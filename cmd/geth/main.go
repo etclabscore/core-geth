@@ -123,6 +123,7 @@ var (
 		utils.ClassicFlag,
 		utils.SocialFlag,
 		utils.MixFlag,
+		utils.EthersocialFlag,
 		utils.RinkebyFlag,
 		utils.VMEnableDebugFlag,
 		utils.NetworkIdFlag,

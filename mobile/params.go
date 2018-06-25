@@ -59,6 +59,15 @@ func MixGenesis() string {
 	return string(enc)
 }
 
+// EthersocialGenesis returns the JSON spec to use for the Ethersocial network.
+func EthersocialGenesis() string {
+	enc, err := json.Marshal(core.DefaultEthersocialGenesisBlock())
+	if err != nil {
+		panic(err)
+	}
+	return string(enc)
+}
+
 // TestnetGenesis returns the JSON spec to use for the Ethereum test network.
 func TestnetGenesis() string {
 	enc, err := json.Marshal(core.DefaultTestnetGenesisBlock())

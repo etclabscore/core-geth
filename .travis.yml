@@ -7,7 +7,7 @@ matrix:
     - os: linux
       dist: trusty
       sudo: required
-      go: 1.10.x
+      go: 1.11.x
       script:
         - sudo modprobe fuse
         - sudo chmod 666 /dev/fuse
@@ -30,7 +30,7 @@ matrix:
         tag_name: "$TRAVIS_TAG"
 
     - os: osx
-      go: 1.10.x
+      go: 1.11.x
       script:
         - unset -f cd # workaround for https://github.com/travis-ci/travis-ci/issues/8703
         - go run build/ci.go install
@@ -52,7 +52,7 @@ matrix:
     # This builder only tests code linters on latest version of Go
     - os: linux
       dist: trusty
-      go: 1.10.x
+      go: 1.11.x
       env:
         - lint
       git:

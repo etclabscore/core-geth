@@ -52,7 +52,7 @@ matrix:
     # This builder only tests code linters on latest version of Go
     - os: linux
       dist: trusty
-      go: 1.11.x
+      go: 1.10.x
       env:
         - lint
       git:

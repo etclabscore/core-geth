@@ -153,6 +153,16 @@ web3._extend({
 			params: 1
 		}),
 		new web3._extend.Method({
+			name: 'addTrustedPeer',
+			call: 'admin_addTrustedPeer',
+			params: 1
+		}),
+		new web3._extend.Method({
+			name: 'removeTrustedPeer',
+			call: 'admin_removeTrustedPeer',
+			params: 1
+		}),
+		new web3._extend.Method({
 			name: 'exportChain',
 			call: 'admin_exportChain',
 			params: 1,
@@ -508,6 +518,11 @@ web3._extend({
 			call: 'miner_setGasPrice',
 			params: 1,
 			inputFormatter: [web3._extend.utils.fromDecimal]
+		}),
+		new web3._extend.Method({
+			name: 'setRecommitInterval',
+			call: 'miner_setRecommitInterval',
+			params: 1,
 		}),
 		new web3._extend.Method({
 			name: 'getHashrate',

@@ -50,6 +50,15 @@ func SocialGenesis() string {
 	return string(enc)
 }
 
+// MixGenesis returns the JSON spec to use for the MIX network.
+func MixGenesis() string {
+	enc, err := json.Marshal(core.DefaultMixGenesisBlock())
+	if err != nil {
+		panic(err)
+	}
+	return string(enc)
+}
+
 // TestnetGenesis returns the JSON spec to use for the Ethereum test network.
 func TestnetGenesis() string {
 	enc, err := json.Marshal(core.DefaultTestnetGenesisBlock())

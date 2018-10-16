@@ -217,6 +217,8 @@ func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
 		return params.EllaismChainConfig
 	case ghash == params.SocialGenesisHash:
 		return params.SocialChainConfig
+	case ghash == params.MixGenesisHash:
+		return params.MixChainConfig
 	default:
 		return params.AllEthashProtocolChanges
 	}
@@ -346,6 +348,18 @@ func DefaultSocialGenesisBlock() *Genesis {
 		GasLimit:   5000,
 		Difficulty: big.NewInt(17179869184),
 		Alloc:      decodePrealloc(socialAllocData),
+	}
+}
+
+// MixGenesisBlock returns the Mix genesis block.
+func DefaultMixGenesisBlock() *Genesis {
+	return &Genesis{
+		Config:     params.MixChainConfig,
+		Nonce:      0x1391eaa92b871f91,
+		ExtraData:  hexutil.MustDecode("0x77656c636f6d65746f7468656c696e6b6564776f726c64000000000000000000"),
+		GasLimit:   3000000,
+		Difficulty: big.NewInt(1048576),
+		Alloc:      decodePrealloc(mixAllocData),
 	}
 }
 

@@ -754,11 +754,8 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 // setListenAddress creates a TCP listening address string from set command
 // line flags.
 func setListenAddress(ctx *cli.Context, cfg *p2p.Config) {
-	switch {
-	case ctx.GlobalIsSet(ListenPortFlag.Name):
+	if ctx.GlobalIsSet(ListenPortFlag.Name) {
 		cfg.ListenAddr = fmt.Sprintf(":%d", ctx.GlobalInt(ListenPortFlag.Name))
-	case ctx.GlobalBool(MixFlag.Name):
-		cfg.ListenAddr = ":30313"
 	}
 }
 
@@ -793,11 +790,8 @@ func setHTTP(ctx *cli.Context, cfg *node.Config) {
 		}
 	}
 
-	switch {
-	case ctx.GlobalIsSet(RPCPortFlag.Name):
+	if ctx.GlobalIsSet(RPCPortFlag.Name) {
 		cfg.HTTPPort = ctx.GlobalInt(RPCPortFlag.Name)
-	case ctx.GlobalBool(MixFlag.Name):
-		cfg.HTTPPort = 8645
 	}
 	if ctx.GlobalIsSet(RPCCORSDomainFlag.Name) {
 		cfg.HTTPCors = splitAndTrim(ctx.GlobalString(RPCCORSDomainFlag.Name))
@@ -820,11 +814,8 @@ func setWS(ctx *cli.Context, cfg *node.Config) {
 		}
 	}
 
-	switch {
-	case ctx.GlobalIsSet(WSPortFlag.Name):
+	if ctx.GlobalIsSet(WSPortFlag.Name) {
 		cfg.WSPort = ctx.GlobalInt(WSPortFlag.Name)
-	case ctx.GlobalBool(MixFlag.Name):
-		cfg.WSPort = 8646
 	}
 	if ctx.GlobalIsSet(WSAllowedOriginsFlag.Name) {
 		cfg.WSOrigins = splitAndTrim(ctx.GlobalString(WSAllowedOriginsFlag.Name))

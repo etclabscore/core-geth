@@ -117,6 +117,7 @@ For a full list of networks supported by multi-geth, take a look at the command-
 --ellaism                            Ellaism network: pre-configured Ellaism mainnet
 --classic                            Ethereum Classic network: pre-configured Ethereum Classic mainnet
 --social                             Ethereum Social network: pre-configured Ethereum Social mainnet
+--mix                                MIX network: pre-configured MIX mainnet
 --rinkeby                            Rinkeby network: pre-configured proof-of-authority test network
 ```
 

@@ -164,6 +164,12 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 				config.EthereumNetworkID = 28
 			}
 		}
+		if config.EthereumGenesis == MixGenesis() {
+			genesis.Config = params.MixChainConfig
+			if config.EthereumNetworkID == 1 {
+				config.EthereumNetworkID = 76
+			}
+		}
 	}
 	// Register the Ethereum protocol if requested
 	if config.EthereumEnabled {

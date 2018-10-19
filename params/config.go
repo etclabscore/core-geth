@@ -108,6 +108,7 @@ var (
 		ECIP1017EraRounds:   big.NewInt(5000000),
 		EIP160Block:         big.NewInt(0),
 		Ethash:              new(EthashConfig),
+	}
 
 	// MainnetTrustedCheckpoint contains the light client trusted checkpoint for the main network.
 	MainnetTrustedCheckpoint = &TrustedCheckpoint{
@@ -116,7 +117,6 @@ var (
 		SectionHead:  common.HexToHash("0x1cdd2a84cf6c1261ffccc88f6bcefb513abd7934a96c1e909fbf74767560f16b"),
 		CHTRoot:      common.HexToHash("0xe453333c20391d16b91b6fe11c104704f62c8dba15f69db73b4cdf7e100105eb"),
 		BloomRoot:    common.HexToHash("0x47f30069473072e00d2cdca146dce40f0aad243dfc8221bf810822c091674efe"),
->>>>>>> 8bbe72075e4e16442c4e28d999edee12e294329e
 	}
 
 	// MixChainConfig is the chain parameters to run a node on the MIX main network.

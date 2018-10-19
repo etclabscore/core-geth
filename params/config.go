@@ -368,6 +368,7 @@ func (c *ChainConfig) IsSocial(num *big.Int) bool {
 
 func (c *ChainConfig) IsECIP1010(num *big.Int) bool {
 	return isForked(c.ECIP1010PauseBlock, num)
+}
 
 // IsEWASM returns whether num represents a block number after the EWASM fork
 func (c *ChainConfig) IsEWASM(num *big.Int) bool {

@@ -219,6 +219,8 @@ func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
 		return params.SocialChainConfig
 	case ghash == params.MixGenesisHash:
 		return params.MixChainConfig
+	case ghash == params.EthersocialGenesisHash:
+		return params.EthersocialChainConfig
 	default:
 		return params.AllEthashProtocolChanges
 	}
@@ -360,6 +362,18 @@ func DefaultMixGenesisBlock() *Genesis {
 		GasLimit:   3000000,
 		Difficulty: big.NewInt(1048576),
 		Alloc:      decodePrealloc(mixAllocData),
+	}
+}
+
+// EthersocialGenesisBlock returns the Ethersocial main net genesis block.
+func DefaultEthersocialGenesisBlock() *Genesis {
+	return &Genesis{
+		Config:     params.EthersocialChainConfig,
+		Nonce:      66,
+		ExtraData:  hexutil.MustDecode("0x"),
+		GasLimit:   3141592,
+		Difficulty: big.NewInt(131072),
+		Alloc:      decodePrealloc(ethersocialAllocData),
 	}
 }
 

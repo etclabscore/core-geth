@@ -134,6 +134,8 @@ func remoteConsole(ctx *cli.Context) error {
 				path = filepath.Join(path, "social")
 			} else if ctx.GlobalBool(utils.MixFlag.Name) {
 				path = filepath.Join(path, "mix")
+			} else if ctx.GlobalBool(utils.EthersocialFlag.Name) {
+				path = filepath.Join(path, "ethersocial")
 			}
 		}
 		endpoint = fmt.Sprintf("%s/geth.ipc", path)

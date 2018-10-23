@@ -77,6 +77,7 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.ClassicFlag,
 			utils.SocialFlag,
 			utils.MixFlag,
+			utils.EthersocialFlag,
 			utils.RinkebyFlag,
 			utils.SyncModeFlag,
 			utils.GCModeFlag,

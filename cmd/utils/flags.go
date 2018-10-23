@@ -152,6 +152,10 @@ var (
 		Name:  "mix",
 		Usage: "MIX network: pre-configured MIX mainnet",
 	}
+	EthersocialFlag = cli.BoolFlag{
+		Name:  "ethersocial",
+		Usage: "Ethersocial network: pre-configured Ethersocial mainnet",
+	}
 	RinkebyFlag = cli.BoolFlag{
 		Name:  "rinkeby",
 		Usage: "Rinkeby network: pre-configured proof-of-authority test network",
@@ -659,6 +663,9 @@ func MakeDataDir(ctx *cli.Context) string {
 		if ctx.GlobalBool(MixFlag.Name) {
 			return filepath.Join(path, "mix")
 		}
+		if ctx.GlobalBool(EthersocialFlag.Name) {
+			return filepath.Join(path, "ethersocial")
+		}
 		if ctx.GlobalBool(RinkebyFlag.Name) {
 			return filepath.Join(path, "rinkeby")
 		}
@@ -722,6 +729,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.SocialBootnodes
 	case ctx.GlobalBool(MixFlag.Name):
 		urls = params.MixBootnodes
+	case ctx.GlobalBool(EthersocialFlag.Name):
+		urls = params.EthersocialBootnodes
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		urls = params.RinkebyBootnodes
 	case cfg.BootstrapNodes != nil:
@@ -1024,6 +1033,8 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "social")
 	case ctx.GlobalBool(MixFlag.Name):
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "mix")
+	case ctx.GlobalBool(EthersocialFlag.Name):
+		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "ethersocial")
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "rinkeby")
 	}
@@ -1169,7 +1180,7 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node, cfg *whisper.Config) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
-	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag, EllaismFlag, ClassicFlag, SocialFlag, MixFlag)
+	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag, EllaismFlag, ClassicFlag, SocialFlag, MixFlag, EthersocialFlag)
 	checkExclusive(ctx, LightServFlag, SyncModeFlag, "light")
 
 	if ctx.GlobalIsSet(EllaismFlag.Name) {
@@ -1279,6 +1290,11 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 			cfg.NetworkId = 28
 		}
 		cfg.Genesis = core.DefaultSocialGenesisBlock()
+	case ctx.GlobalBool(EthersocialFlag.Name):
+		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
+			cfg.NetworkId = 1
+		}
+		cfg.Genesis = core.DefaultEthersocialGenesisBlock()
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 4
@@ -1435,6 +1451,8 @@ func MakeGenesis(ctx *cli.Context) *core.Genesis {
 		genesis = core.DefaultSocialGenesisBlock()
 	case ctx.GlobalBool(MixFlag.Name):
 		genesis = core.DefaultMixGenesisBlock()
+	case ctx.GlobalBool(EthersocialFlag.Name):
+		genesis = core.DefaultEthersocialGenesisBlock()
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		genesis = core.DefaultRinkebyGenesisBlock()
 	case ctx.GlobalBool(DeveloperFlag.Name):

@@ -40,6 +40,8 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/swarm"
+	"github.com/ethereum/go-ethereum/swarm/api"
+	swarmhttp "github.com/ethereum/go-ethereum/swarm/api/http"
 )
 
 var loglevel = flag.Int("loglevel", 3, "verbosity of logs")
@@ -55,6 +57,20 @@ func init() {
 	})
 }
 
+const clusterSize = 3
+
+var clusteronce sync.Once
+var cluster *testCluster
+
+func initCluster(t *testing.T) {
+	clusteronce.Do(func() {
+		cluster = newTestCluster(t, clusterSize)
+	})
+}
+
+func serverFunc(api *api.API) swarmhttp.TestServer {
+	return swarmhttp.NewServer(api, "")
+}
 func TestMain(m *testing.M) {
 	// check if we have been reexec'd
 	if reexec.Init() {

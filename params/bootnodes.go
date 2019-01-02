@@ -108,6 +108,10 @@ var RinkebyBootnodes = []string{
 	"enode://b6b28890b006743680c52e64e0d16db57f28124885595fa03a562be1d2bf0f3a1da297d56b13da25fb992888fd556d4c1a27b1f39d531bde7de1921c90061cc6@159.89.28.211:30303", // AKASHA
 }
 
+// KottiBootnodes are the enode URLs of the P2P bootstrap nodes running on the
+// Kotti test network.
+var KottiBootnodes = []string{}
+
 // DiscoveryV5Bootnodes are the enode URLs of the P2P bootstrap nodes for the
 // experimental RLPx v5 topic-discovery network.
 var DiscoveryV5Bootnodes = []string{

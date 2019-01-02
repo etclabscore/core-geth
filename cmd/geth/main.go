@@ -126,6 +126,7 @@ var (
 		utils.MixFlag,
 		utils.EthersocialFlag,
 		utils.RinkebyFlag,
+		utils.KottiFlag,
 		utils.VMEnableDebugFlag,
 		utils.NetworkIdFlag,
 		utils.ConstantinopleOverrideFlag,

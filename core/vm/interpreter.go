@@ -18,8 +18,10 @@ package vm
 
 import (
 	"fmt"
+	"hash"
 	"sync/atomic"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/params"
 )
@@ -39,6 +41,11 @@ type Config struct {
 	// may be left uninitialised and will be set to the default
 	// table.
 	JumpTable [256]operation
+
+	// Type of the EWASM interpreter
+	EWASMInterpreter string
+	// Type of the EVM interpreter
+	EVMInterpreter string
 }
 
 // Interpreter is used to run Ethereum based contracts and will utilise the
@@ -63,12 +70,24 @@ type Interpreter interface {
 	CanRun([]byte) bool
 }
 
+// keccakState wraps sha3.state. In addition to the usual hash methods, it also supports
+// Read to get a variable amount of data from the hash state. Read is faster than Sum
+// because it doesn't copy the internal state, but also modifies the internal state.
+type keccakState interface {
+	hash.Hash
+	Read([]byte) (int, error)
+}
+
 // EVMInterpreter represents an EVM interpreter
 type EVMInterpreter struct {
 	evm      *EVM
 	cfg      Config
 	gasTable params.GasTable
-	intPool  *intPool
+
+	intPool *intPool
+
+	hasher    keccakState // Keccak256 hasher instance shared across opcodes
+	hasherBuf common.Hash // Keccak256 hasher result array shared aross opcodes
 
 	readOnly   bool   // Whether to throw on stateful modifications
 	returnData []byte // Last CALL's return data for subsequent reuse

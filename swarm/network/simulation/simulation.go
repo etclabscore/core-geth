@@ -25,7 +25,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
-	"github.com/ethereum/go-ethereum/p2p/discover"
+	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/simulations"
 	"github.com/ethereum/go-ethereum/p2p/simulations/adapters"
 )
@@ -33,7 +33,6 @@ import (
 // Common errors that are returned by functions in this package.
 var (
 	ErrNodeNotFound = errors.New("node not found")
-	ErrNoPivotNode  = errors.New("no pivot node set")
 )
 
 // Simulation provides methods on network, nodes and services
@@ -45,8 +44,8 @@ type Simulation struct {
 
 	serviceNames []string
 	cleanupFuncs []func()
-	buckets      map[discover.NodeID]*sync.Map
-	pivotNodeID  *discover.NodeID
+	buckets      map[enode.ID]*sync.Map
+	pivotNodeID  *enode.ID
 	shutdownWG   sync.WaitGroup
 	done         chan struct{}
 	mu           sync.RWMutex
@@ -66,16 +65,22 @@ type Simulation struct {
 // after network shutdown.
 type ServiceFunc func(ctx *adapters.ServiceContext, bucket *sync.Map) (s node.Service, cleanup func(), err error)
 
-// New creates a new Simulation instance with new
-// simulations.Network initialized with provided services.
+// New creates a new simulation instance
+// Services map must have unique keys as service names and
+// every ServiceFunc must return a node.Service of the unique type.
+// This restriction is required by node.Node.Start() function
+// which is used to start node.Service returned by ServiceFunc.
 func New(services map[string]ServiceFunc) (s *Simulation) {
 	s = &Simulation{
-		buckets: make(map[discover.NodeID]*sync.Map),
+		buckets: make(map[enode.ID]*sync.Map),
 		done:    make(chan struct{}),
 	}
 
 	adapterServices := make(map[string]adapters.ServiceFunc, len(services))
 	for name, serviceFunc := range services {
+		// Scope this variables correctly
+		// as they will be in the adapterServices[name] function accessed later.
+		name, serviceFunc := name, serviceFunc
 		s.serviceNames = append(s.serviceNames, name)
 		adapterServices[name] = func(ctx *adapters.ServiceContext) (node.Service, error) {
 			b := new(sync.Map)
@@ -94,7 +99,7 @@ func New(services map[string]ServiceFunc) (s *Simulation) {
 	}
 
 	s.Net = simulations.NewNetwork(
-		adapters.NewSimAdapter(adapterServices),
+		adapters.NewTCPAdapter(adapterServices),
 		&simulations.NetworkConfig{ID: "0"},
 	)
 
@@ -112,7 +117,7 @@ type Result struct {
 }
 
 // Run calls the RunFunc function while taking care of
-// cancelation provided through the Context.
+// cancellation provided through the Context.
 func (s *Simulation) Run(ctx context.Context, f RunFunc) (r Result) {
 	//if the option is set to run a HTTP server with the simulation,
 	//init the server and start it
@@ -164,17 +169,6 @@ var maxParallelCleanups = 10
 func (s *Simulation) Close() {
 	close(s.done)
 
-	// Close all connections before calling the Network Shutdown.
-	// It is possible that p2p.Server.Stop will block if there are
-	// existing connections.
-	for _, c := range s.Net.Conns {
-		if c.Up {
-			s.Net.Disconnect(c.One, c.Other)
-		}
-	}
-	s.shutdownWG.Wait()
-	s.Net.Shutdown()
-
 	sem := make(chan struct{}, maxParallelCleanups)
 	s.mu.RLock()
 	cleanupFuncs := make([]func(), len(s.cleanupFuncs))
@@ -206,6 +200,9 @@ func (s *Simulation) Close() {
 		}
 		close(s.runC)
 	}
+
+	s.shutdownWG.Wait()
+	s.Net.Shutdown()
 }
 
 // Done returns a channel that is closed when the simulation

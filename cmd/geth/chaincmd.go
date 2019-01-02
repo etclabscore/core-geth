@@ -135,6 +135,10 @@ The export-preimages command export hash preimages to an RLP encoded stream`,
 			utils.SyncModeFlag,
 			utils.FakePoWFlag,
 			utils.TestnetFlag,
+			utils.EllaismFlag,
+			utils.ClassicFlag,
+			utils.SocialFlag,
+			utils.EthersocialFlag,
 			utils.RinkebyFlag,
 		},
 		Category: "BLOCKCHAIN COMMANDS",
@@ -340,9 +344,9 @@ func importPreimages(ctx *cli.Context) error {
 
 	start := time.Now()
 	if err := utils.ImportPreimages(diskdb, ctx.Args().First()); err != nil {
-		utils.Fatalf("Export error: %v\n", err)
+		utils.Fatalf("Import error: %v\n", err)
 	}
-	fmt.Printf("Export done in %v\n", time.Since(start))
+	fmt.Printf("Import done in %v\n", time.Since(start))
 	return nil
 }
 

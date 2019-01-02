@@ -152,6 +152,24 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 				config.EthereumNetworkID = 3
 			}
 		}
+		if config.EthereumGenesis == EllaismGenesis() {
+			genesis.Config = params.EllaismChainConfig
+			if config.EthereumNetworkID == 1 {
+				config.EthereumNetworkID = 64
+			}
+		}
+		if config.EthereumGenesis == SocialGenesis() {
+			genesis.Config = params.SocialChainConfig
+			if config.EthereumNetworkID == 1 {
+				config.EthereumNetworkID = 28
+			}
+		}
+		if config.EthereumGenesis == MixGenesis() {
+			genesis.Config = params.MixChainConfig
+			if config.EthereumNetworkID == 1 {
+				config.EthereumNetworkID = 76
+			}
+		}
 	}
 	// Register the Ethereum protocol if requested
 	if config.EthereumEnabled {

@@ -73,6 +73,11 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.NoUSBFlag,
 			utils.NetworkIdFlag,
 			utils.TestnetFlag,
+			utils.EllaismFlag,
+			utils.ClassicFlag,
+			utils.SocialFlag,
+			utils.MixFlag,
+			utils.EthersocialFlag,
 			utils.RinkebyFlag,
 			utils.SyncModeFlag,
 			utils.GCModeFlag,
@@ -81,6 +86,7 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.LightServFlag,
 			utils.LightPeersFlag,
 			utils.LightKDFFlag,
+			utils.WhitelistFlag,
 		},
 	},
 	{
@@ -132,6 +138,7 @@ var AppHelpFlagGroups = []flagGroup{
 		Flags: []cli.Flag{
 			utils.CacheFlag,
 			utils.CacheDatabaseFlag,
+			utils.CacheTrieFlag,
 			utils.CacheGCFlag,
 			utils.TrieCacheGenFlag,
 		},
@@ -207,6 +214,8 @@ var AppHelpFlagGroups = []flagGroup{
 		Name: "VIRTUAL MACHINE",
 		Flags: []cli.Flag{
 			utils.VMEnableDebugFlag,
+			utils.EVMInterpreterFlag,
+			utils.EWASMInterpreterFlag,
 		},
 	},
 	{

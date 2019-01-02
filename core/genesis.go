@@ -151,6 +151,9 @@ func (e *GenesisMismatchError) Error() string {
 //
 // The returned chain configuration is never nil.
 func SetupGenesisBlock(db ethdb.Database, genesis *Genesis) (*params.ChainConfig, common.Hash, error) {
+	return SetupGenesisBlockWithOverride(db, genesis, nil)
+}
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *Genesis, constantinopleOverride *big.Int) (*params.ChainConfig, common.Hash, error) {
 	if genesis != nil && genesis.Config == nil {
 		return params.AllEthashProtocolChanges, common.Hash{}, errGenesisNoConfig
 	}
@@ -178,6 +181,9 @@ func SetupGenesisBlock(db ethdb.Database, genesis *Genesis) (*params.ChainConfig
 
 	// Get the existing chain configuration.
 	newcfg := genesis.configOrDefault(stored)
+	if constantinopleOverride != nil {
+		newcfg.ConstantinopleBlock = constantinopleOverride
+	}
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {
 		log.Warn("Found genesis block without chain config")
@@ -213,6 +219,14 @@ func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
 		return params.MainnetChainConfig
 	case ghash == params.TestnetGenesisHash:
 		return params.TestnetChainConfig
+	case ghash == params.EllaismGenesisHash:
+		return params.EllaismChainConfig
+	case ghash == params.SocialGenesisHash:
+		return params.SocialChainConfig
+	case ghash == params.MixGenesisHash:
+		return params.MixChainConfig
+	case ghash == params.EthersocialGenesisHash:
+		return params.EthersocialChainConfig
 	default:
 		return params.AllEthashProtocolChanges
 	}
@@ -309,6 +323,66 @@ func DefaultGenesisBlock() *Genesis {
 	}
 }
 
+// EllaismGenesisBlock returns the Ellaism genesis block.
+func DefaultEllaismGenesisBlock() *Genesis {
+	return &Genesis{
+		Config:     params.EllaismChainConfig,
+		Nonce:      64,
+		ExtraData:  hexutil.MustDecode("0x0000000000000000000000000000000000000000000000000000000000000000"),
+		GasLimit:   5000,
+		Difficulty: big.NewInt(1073741824),
+		Alloc:      decodePrealloc(ellaismAllocData),
+	}
+}
+
+// ClassicGenesisBlock returns the Ethereum Classic genesis block.
+func DefaultClassicGenesisBlock() *Genesis {
+	return &Genesis{
+		Config:     params.ClassicChainConfig,
+		Nonce:      66,
+		ExtraData:  hexutil.MustDecode("0x11bbe8db4e347b4e8c937c1c8370e4b5ed33adb3db69cbdb7a38e1e50b1b82fa"),
+		GasLimit:   5000,
+		Difficulty: big.NewInt(17179869184),
+		Alloc:      decodePrealloc(mainnetAllocData),
+	}
+}
+
+// SocialGenesisBlock returns the Ethereum Social genesis block.
+func DefaultSocialGenesisBlock() *Genesis {
+	return &Genesis{
+		Config:     params.SocialChainConfig,
+		Nonce:      66,
+		ExtraData:  hexutil.MustDecode("0x3230313820457468657265756d20536f6369616c2050726f6a656374"),
+		GasLimit:   5000,
+		Difficulty: big.NewInt(17179869184),
+		Alloc:      decodePrealloc(socialAllocData),
+	}
+}
+
+// MixGenesisBlock returns the Mix genesis block.
+func DefaultMixGenesisBlock() *Genesis {
+	return &Genesis{
+		Config:     params.MixChainConfig,
+		Nonce:      0x1391eaa92b871f91,
+		ExtraData:  hexutil.MustDecode("0x77656c636f6d65746f7468656c696e6b6564776f726c64000000000000000000"),
+		GasLimit:   3000000,
+		Difficulty: big.NewInt(1048576),
+		Alloc:      decodePrealloc(mixAllocData),
+	}
+}
+
+// EthersocialGenesisBlock returns the Ethersocial main net genesis block.
+func DefaultEthersocialGenesisBlock() *Genesis {
+	return &Genesis{
+		Config:     params.EthersocialChainConfig,
+		Nonce:      66,
+		ExtraData:  hexutil.MustDecode("0x"),
+		GasLimit:   3141592,
+		Difficulty: big.NewInt(131072),
+		Alloc:      decodePrealloc(ethersocialAllocData),
+	}
+}
+
 // DefaultTestnetGenesisBlock returns the Ropsten network genesis block.
 func DefaultTestnetGenesisBlock() *Genesis {
 	return &Genesis{
@@ -355,7 +429,7 @@ func DeveloperGenesisBlock(period uint64, faucet common.Address) *Genesis {
 			common.BytesToAddress([]byte{6}): {Balance: big.NewInt(1)}, // ECAdd
 			common.BytesToAddress([]byte{7}): {Balance: big.NewInt(1)}, // ECScalarMul
 			common.BytesToAddress([]byte{8}): {Balance: big.NewInt(1)}, // ECPairing
-			faucet: {Balance: new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(9))},
+			faucet:                           {Balance: new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(9))},
 		},
 	}
 }

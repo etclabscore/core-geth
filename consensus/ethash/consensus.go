@@ -38,10 +38,29 @@ import (
 
 // Ethash proof-of-work protocol constants.
 var (
-	FrontierBlockReward    = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
-	ByzantiumBlockReward   = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
-	maxUncles              = 2                 // Maximum number of uncles allowed in a single block
-	allowedFutureBlockTime = 15 * time.Second  // Max time from current time allowed for blocks, before they're considered future blocks
+	FrontierBlockReward       = big.NewInt(5e+18)                                   // Block reward in wei for successfully mining a block
+	ByzantiumBlockReward      = big.NewInt(3e+18)                                   // Block reward in wei for successfully mining a block upward from Byzantium
+	ConstantinopleBlockReward = big.NewInt(2e+18)                                   // Block reward in wei for successfully mining a block upward from Constantinople
+	SocialBlockReward         = new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)) // Block reward in wei for successfully mining a block upward for Ethereum Social
+	EthersocialBlockReward    = big.NewInt(5e+18)                                   // Block reward in wei for successfully mining a block upward for Ethersocial Network
+	maxUncles                 = 2                                                   // Maximum number of uncles allowed in a single block
+	allowedFutureBlockTime    = 15 * time.Second                                    // Max time from current time allowed for blocks, before they're considered future blocks
+	DisinflationRateQuotient  = big.NewInt(4)                                       // Disinflation rate quotient for ECIP1017
+	DisinflationRateDivisor   = big.NewInt(5)                                       // Disinflation rate divisor for ECIP1017
+	ExpDiffPeriod             = big.NewInt(100000)                                  // Exponential diff period for ECIP1010
+
+	// calcDifficultyConstantinople is the difficulty adjustment algorithm for Constantinople.
+	// It returns the difficulty that a new block should have when created at time given the
+	// parent block's time and difficulty. The calculation uses the Byzantium rules, but with
+	// bomb offset 5M.
+	// Specification EIP-1234: https://eips.ethereum.org/EIPS/eip-1234
+	calcDifficultyConstantinople = makeDifficultyCalculator(big.NewInt(5000000))
+
+	// calcDifficultyByzantium is the difficulty adjustment algorithm. It returns
+	// the difficulty that a new block should have when created at time given the
+	// parent block's time and difficulty. The calculation uses the Byzantium rules.
+	// Specification EIP-649: https://eips.ethereum.org/EIPS/eip-649
+	calcDifficultyByzantium = makeDifficultyCalculator(big.NewInt(3000000))
 )
 
 // Various error messages to mark blocks invalid. These should be private to
@@ -299,8 +318,14 @@ func (ethash *Ethash) CalcDifficulty(chain consensus.ChainReader, time uint64, p
 func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Header) *big.Int {
 	next := new(big.Int).Add(parent.Number, big1)
 	switch {
+	case config.IsBombDisposal(next):
+		return calcDifficultyBombDisposal(time, parent)
+	case config.IsConstantinople(next):
+		return calcDifficultyConstantinople(time, parent)
 	case config.IsByzantium(next):
 		return calcDifficultyByzantium(time, parent)
+	case config.IsECIP1010(next):
+		return calcDifficultyECIP1010(time, parent, next, config.ECIP1010PauseBlock, config.ECIP1010Length)
 	case config.IsHomestead(next):
 		return calcDifficultyHomestead(time, parent)
 	default:
@@ -316,18 +341,81 @@ var (
 	big9          = big.NewInt(9)
 	big10         = big.NewInt(10)
 	bigMinus99    = big.NewInt(-99)
-	big2999999    = big.NewInt(2999999)
 )
 
-// calcDifficultyByzantium is the difficulty adjustment algorithm. It returns
+// makeDifficultyCalculator creates a difficultyCalculator with the given bomb-delay.
+// the difficulty is calculated with Byzantium rules, which differs from Homestead in
+// how uncles affect the calculation
+func makeDifficultyCalculator(bombDelay *big.Int) func(time uint64, parent *types.Header) *big.Int {
+	// Note, the calculations below looks at the parent number, which is 1 below
+	// the block number. Thus we remove one from the delay given
+	bombDelayFromParent := new(big.Int).Sub(bombDelay, big1)
+	return func(time uint64, parent *types.Header) *big.Int {
+		// https://github.com/ethereum/EIPs/issues/100.
+		// algorithm:
+		// diff = (parent_diff +
+		//         (parent_diff / 2048 * max((2 if len(parent.uncles) else 1) - ((timestamp - parent.timestamp) // 9), -99))
+		//        ) + 2^(periodCount - 2)
+
+		bigTime := new(big.Int).SetUint64(time)
+		bigParentTime := new(big.Int).Set(parent.Time)
+
+		// holds intermediate values to make the algo easier to read & audit
+		x := new(big.Int)
+		y := new(big.Int)
+
+		// (2 if len(parent_uncles) else 1) - (block_timestamp - parent_timestamp) // 9
+		x.Sub(bigTime, bigParentTime)
+		x.Div(x, big9)
+		if parent.UncleHash == types.EmptyUncleHash {
+			x.Sub(big1, x)
+		} else {
+			x.Sub(big2, x)
+		}
+		// max((2 if len(parent_uncles) else 1) - (block_timestamp - parent_timestamp) // 9, -99)
+		if x.Cmp(bigMinus99) < 0 {
+			x.Set(bigMinus99)
+		}
+		// parent_diff + (parent_diff / 2048 * max((2 if len(parent.uncles) else 1) - ((timestamp - parent.timestamp) // 9), -99))
+		y.Div(parent.Difficulty, params.DifficultyBoundDivisor)
+		x.Mul(y, x)
+		x.Add(parent.Difficulty, x)
+
+		// minimum difficulty can ever be (before exponential factor)
+		if x.Cmp(params.MinimumDifficulty) < 0 {
+			x.Set(params.MinimumDifficulty)
+		}
+		// calculate a fake block number for the ice-age delay
+		// Specification: https://eips.ethereum.org/EIPS/eip-1234
+		fakeBlockNumber := new(big.Int)
+		if parent.Number.Cmp(bombDelayFromParent) >= 0 {
+			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, bombDelayFromParent)
+		}
+		// for the exponential factor
+		periodCount := fakeBlockNumber
+		periodCount.Div(periodCount, expDiffPeriod)
+
+		// the exponential factor, commonly referred to as "the bomb"
+		// diff = diff + 2^(periodCount - 2)
+		if periodCount.Cmp(big1) > 0 {
+			y.Sub(periodCount, big2)
+			y.Exp(big2, y, nil)
+			x.Add(x, y)
+		}
+		return x
+	}
+}
+
+// calcDifficultyBombDisposal is the difficulty adjustment algorithm. It returns
 // the difficulty that a new block should have when created at time given the
-// parent block's time and difficulty. The calculation uses the Byzantium rules.
-func calcDifficultyByzantium(time uint64, parent *types.Header) *big.Int {
-	// https://github.com/ethereum/EIPs/issues/100.
+// parent block's time and difficulty. The calculation uses the Homestead/Bomb
+// Disposal rules.
+func calcDifficultyBombDisposal(time uint64, parent *types.Header) *big.Int {
+	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.md
 	// algorithm:
 	// diff = (parent_diff +
-	//         (parent_diff / 2048 * max((2 if len(parent.uncles) else 1) - ((timestamp - parent.timestamp) // 9), -99))
-	//        ) + 2^(periodCount - 2)
+	//         (parent_diff / 2048 * max(1 - (block_timestamp - parent_timestamp) // 10, -99))
+	//        )
 
 	bigTime := new(big.Int).SetUint64(time)
 	bigParentTime := new(big.Int).Set(parent.Time)
@@ -336,19 +424,16 @@ func calcDifficultyByzantium(time uint64, parent *types.Header) *big.Int {
 	x := new(big.Int)
 	y := new(big.Int)
 
-	// (2 if len(parent_uncles) else 1) - (block_timestamp - parent_timestamp) // 9
+	// 1 - (block_timestamp - parent_timestamp) // 10
 	x.Sub(bigTime, bigParentTime)
-	x.Div(x, big9)
-	if parent.UncleHash == types.EmptyUncleHash {
-		x.Sub(big1, x)
-	} else {
-		x.Sub(big2, x)
-	}
-	// max((2 if len(parent_uncles) else 1) - (block_timestamp - parent_timestamp) // 9, -99)
+	x.Div(x, big10)
+	x.Sub(big1, x)
+
+	// max(1 - (block_timestamp - parent_timestamp) // 10, -99)
 	if x.Cmp(bigMinus99) < 0 {
 		x.Set(bigMinus99)
 	}
-	// parent_diff + (parent_diff / 2048 * max((2 if len(parent.uncles) else 1) - ((timestamp - parent.timestamp) // 9), -99))
+	// (parent_diff + parent_diff // 2048 * max(1 - (block_timestamp - parent_timestamp) // 10, -99))
 	y.Div(parent.Difficulty, params.DifficultyBoundDivisor)
 	x.Mul(y, x)
 	x.Add(parent.Difficulty, x)
@@ -357,24 +442,116 @@ func calcDifficultyByzantium(time uint64, parent *types.Header) *big.Int {
 	if x.Cmp(params.MinimumDifficulty) < 0 {
 		x.Set(params.MinimumDifficulty)
 	}
-	// calculate a fake block number for the ice-age delay:
-	// https://github.com/ethereum/EIPs/pull/669
-	// fake_block_number = max(0, block.number - 3_000_000)
-	fakeBlockNumber := new(big.Int)
-	if parent.Number.Cmp(big2999999) >= 0 {
-		fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, big2999999) // Note, parent is 1 less than the actual block number
+
+	return x
+}
+
+func calcDifficultyECIP1010(time uint64, parent *types.Header, nextBlock *big.Int, pauseBlock *big.Int, length *big.Int) *big.Int {
+	explosionBlock := big.NewInt(0).Add(pauseBlock, length)
+	if nextBlock.Cmp(explosionBlock) < 0 {
+		return calcDifficultyDiehard(time, parent.Time.Uint64(), parent.Difficulty, pauseBlock)
+	} else {
+		return calcDifficultyExplosion(time, parent.Time.Uint64(), parent.Number, parent.Difficulty, pauseBlock, explosionBlock)
 	}
+}
+
+func calcDifficultyDiehard(time, parentTime uint64, parentDiff *big.Int, diehardBlock *big.Int) *big.Int {
+	// https://github.com/ethereumproject/ECIPs/blob/master/ECIPS/ECIP-1010.md
+	// algorithm:
+	// diff = (parent_diff +
+	//         (parent_diff / 2048 * max(1 - (block_timestamp - parent_timestamp) // 10, -99))
+	//        ) + 2^(fixed_diff)
+
+	bigTime := new(big.Int).SetUint64(time)
+	bigParentTime := new(big.Int).SetUint64(parentTime)
+
+	// holds intermediate values to make the algo easier to read & audit
+	x := new(big.Int)
+	y := new(big.Int)
+
+	// 1 - (block_timestamp -parent_timestamp) // 10
+	x.Sub(bigTime, bigParentTime)
+	x.Div(x, big10)
+	x.Sub(common.Big1, x)
+
+	// max(1 - (block_timestamp - parent_timestamp) // 10, -99)))
+	if x.Cmp(bigMinus99) < 0 {
+		x.Set(bigMinus99)
+	}
+
+	// (parent_diff + parent_diff // 2048 * max(1 - (block_timestamp - parent_timestamp) // 10, -99))
+	y.Div(parentDiff, params.DifficultyBoundDivisor)
+	x.Mul(y, x)
+	x.Add(parentDiff, x)
+
+	// minimum difficulty can ever be (before exponential factor)
+	if x.Cmp(params.MinimumDifficulty) < 0 {
+		x.Set(params.MinimumDifficulty)
+	}
+
 	// for the exponential factor
-	periodCount := fakeBlockNumber
-	periodCount.Div(periodCount, expDiffPeriod)
+	fixedCount := new(big.Int).Div(diehardBlock, ExpDiffPeriod)
 
 	// the exponential factor, commonly referred to as "the bomb"
 	// diff = diff + 2^(periodCount - 2)
-	if periodCount.Cmp(big1) > 0 {
-		y.Sub(periodCount, big2)
-		y.Exp(big2, y, nil)
+	if fixedCount.Cmp(common.Big1) > 0 {
+		y.Sub(fixedCount, common.Big2)
+		y.Exp(common.Big2, y, nil)
 		x.Add(x, y)
 	}
+
+	return x
+}
+
+func calcDifficultyExplosion(time, parentTime uint64, parentNumber, parentDiff *big.Int, delayBlock *big.Int, continueBlock *big.Int) *big.Int {
+	// https://github.com/ethereumproject/ECIPs/blob/master/ECIPs/ECIP-1010.md
+	// algorithm:
+	// diff = (parent_diff +
+	//         (parent_diff / 2048 * max(1 - (block_timestamp - parent_timestamp) // 10, -99))
+	//        ) + 2^(delayedCount - 2)
+
+	bigTime := new(big.Int).SetUint64(time)
+	bigParentTime := new(big.Int).SetUint64(parentTime)
+
+	// holds intermediate values to make the algo easier to read & audit
+	x := new(big.Int)
+	y := new(big.Int)
+
+	// 1 - (block_timestamp -parent_timestamp) // 10
+	x.Sub(bigTime, bigParentTime)
+	x.Div(x, big10)
+	x.Sub(common.Big1, x)
+
+	// max(1 - (block_timestamp - parent_timestamp) // 10, -99)))
+	if x.Cmp(bigMinus99) < 0 {
+		x.Set(bigMinus99)
+	}
+
+	// (parent_diff + parent_diff // 2048 * max(1 - (block_timestamp - parent_timestamp) // 10, -99))
+	y.Div(parentDiff, params.DifficultyBoundDivisor)
+	x.Mul(y, x)
+	x.Add(parentDiff, x)
+
+	// minimum difficulty can ever be (before exponential factor)
+	if x.Cmp(params.MinimumDifficulty) < 0 {
+		x.Set(params.MinimumDifficulty)
+	}
+
+	// for the exponential factor...
+
+	delayedCount := new(big.Int).Add(parentNumber, common.Big1)
+	delayedCount.Sub(delayedCount, continueBlock)
+	delayedCount.Add(delayedCount, delayBlock)
+	delayedCount.Div(delayedCount, ExpDiffPeriod)
+
+	// the exponential factor, commonly referred to as "the bomb"
+	// diff = diff + 2^(periodCount - 2)
+	if delayedCount.Cmp(common.Big1) > 0 {
+		y.Sub(delayedCount, common.Big2)
+		y.Exp(common.Big2, y, nil)
+		x.Add(x, y)
+	}
+
 	return x
 }
 
@@ -592,18 +769,114 @@ func accumulateRewards(config *params.ChainConfig, state *state.StateDB, header 
 	if config.IsByzantium(header.Number) {
 		blockReward = ByzantiumBlockReward
 	}
-	// Accumulate the rewards for the miner and any included uncles
-	reward := new(big.Int).Set(blockReward)
-	r := new(big.Int)
-	for _, uncle := range uncles {
-		r.Add(uncle.Number, big8)
-		r.Sub(r, header.Number)
-		r.Mul(r, blockReward)
-		r.Div(r, big8)
-		state.AddBalance(uncle.Coinbase, r)
-
-		r.Div(blockReward, big32)
-		reward.Add(reward, r)
+	if config.IsConstantinople(header.Number) {
+		blockReward = ConstantinopleBlockReward
 	}
-	state.AddBalance(header.Coinbase, reward)
+	if config.IsSocial(header.Number) {
+		blockReward = SocialBlockReward
+	}
+	if config.IsEthersocial(header.Number) {
+		blockReward = EthersocialBlockReward
+	}
+	if config.HasECIP1017() {
+		// Ensure value 'era' is configured.
+		eraLen := config.ECIP1017EraRounds
+		era := GetBlockEra(header.Number, eraLen)
+		wr := GetBlockWinnerRewardByEra(era, blockReward)                    // wr "winner reward". 5, 4, 3.2, 2.56, ...
+		wurs := GetBlockWinnerRewardForUnclesByEra(era, uncles, blockReward) // wurs "winner uncle rewards"
+		wr.Add(wr, wurs)
+		state.AddBalance(header.Coinbase, wr) // $$
+
+		// Reward uncle miners.
+		for _, uncle := range uncles {
+			ur := GetBlockUncleRewardByEra(era, header, uncle, blockReward)
+			state.AddBalance(uncle.Coinbase, ur) // $$
+		}
+	} else {
+		// Accumulate the rewards for the miner and any included uncles
+		reward := new(big.Int).Set(blockReward)
+		r := new(big.Int)
+		for _, uncle := range uncles {
+			r.Add(uncle.Number, big8)
+			r.Sub(r, header.Number)
+			r.Mul(r, blockReward)
+			r.Div(r, big8)
+			state.AddBalance(uncle.Coinbase, r)
+
+			r.Div(blockReward, big32)
+			reward.Add(reward, r)
+		}
+		state.AddBalance(header.Coinbase, reward)
+	}
+}
+
+// As of "Era 2" (zero-index era 1), uncle miners and winners are rewarded equally for each included block.
+// So they share this function.
+func getEraUncleBlockReward(era *big.Int, blockReward *big.Int) *big.Int {
+	return new(big.Int).Div(GetBlockWinnerRewardByEra(era, blockReward), big32)
+}
+
+// GetBlockUncleRewardByEra gets called _for each uncle miner_ associated with a winner block's uncles.
+func GetBlockUncleRewardByEra(era *big.Int, header, uncle *types.Header, blockReward *big.Int) *big.Int {
+	// Era 1 (index 0):
+	//   An extra reward to the winning miner for including uncles as part of the block, in the form of an extra 1/32 (0.15625ETC) per uncle included, up to a maximum of two (2) uncles.
+	if era.Cmp(big.NewInt(0)) == 0 {
+		r := new(big.Int)
+		r.Add(uncle.Number, big8) // 2,534,998 + 8              = 2,535,006
+		r.Sub(r, header.Number)   // 2,535,006 - 2,534,999        = 7
+		r.Mul(r, blockReward)     // 7 * 5e+18               = 35e+18
+		r.Div(r, big8)            // 35e+18 / 8                            = 7/8 * 5e+18
+
+		return r
+	}
+	return getEraUncleBlockReward(era, blockReward)
+}
+
+// GetBlockWinnerRewardForUnclesByEra gets called _per winner_, and accumulates rewards for each included uncle.
+// Assumes uncles have been validated and limited (@ func (v *BlockValidator) VerifyUncles).
+func GetBlockWinnerRewardForUnclesByEra(era *big.Int, uncles []*types.Header, blockReward *big.Int) *big.Int {
+	r := big.NewInt(0)
+
+	for range uncles {
+		r.Add(r, getEraUncleBlockReward(era, blockReward)) // can reuse this, since 1/32 for winner's uncles remain unchanged from "Era 1"
+	}
+	return r
+}
+
+// GetRewardByEra gets a block reward at disinflation rate.
+// Constants MaxBlockReward, DisinflationRateQuotient, and DisinflationRateDivisor assumed.
+func GetBlockWinnerRewardByEra(era *big.Int, blockReward *big.Int) *big.Int {
+	if era.Cmp(big.NewInt(0)) == 0 {
+		return new(big.Int).Set(blockReward)
+	}
+
+	// MaxBlockReward _r_ * (4/5)**era == MaxBlockReward * (4**era) / (5**era)
+	// since (q/d)**n == q**n / d**n
+	// qed
+	var q, d, r *big.Int = new(big.Int), new(big.Int), new(big.Int)
+
+	q.Exp(DisinflationRateQuotient, era, nil)
+	d.Exp(DisinflationRateDivisor, era, nil)
+
+	r.Mul(blockReward, q)
+	r.Div(r, d)
+
+	return r
+}
+
+// GetBlockEra gets which "Era" a given block is within, given an era length (ecip-1017 has era=5,000,000 blocks)
+// Returns a zero-index era number, so "Era 1": 0, "Era 2": 1, "Era 3": 2 ...
+func GetBlockEra(blockNum, eraLength *big.Int) *big.Int {
+	// If genesis block or impossible negative-numbered block, return zero-val.
+	if blockNum.Sign() < 1 {
+		return new(big.Int)
+	}
+
+	remainder := big.NewInt(0).Mod(big.NewInt(0).Sub(blockNum, big.NewInt(1)), eraLength)
+	base := big.NewInt(0).Sub(blockNum, remainder)
+
+	d := big.NewInt(0).Div(base, eraLength)
+	dremainder := big.NewInt(0).Mod(d, big.NewInt(1))
+
+	return new(big.Int).Sub(d, dremainder)
 }

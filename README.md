@@ -1,16 +1,15 @@
 ## Go Ethereum
 
-Official golang implementation of the Ethereum protocol.
+A distribution of go-ethereum with support of multiple Ethereum-like networks.
 
 [![API Reference](
 https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/68747470733a2f2f676f646f632e6f72672f6769746875622e636f6d2f676f6c616e672f6764646f3f7374617475732e737667
 )](https://godoc.org/github.com/ethereum/go-ethereum)
-[![Go Report Card](https://goreportcard.com/badge/github.com/ethereum/go-ethereum)](https://goreportcard.com/report/github.com/ethereum/go-ethereum)
-[![Travis](https://travis-ci.org/ethereum/go-ethereum.svg?branch=master)](https://travis-ci.org/ethereum/go-ethereum)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ethereum/go-ethereum?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ethoxy/multi-geth)](https://goreportcard.com/report/github.com/ethoxy/multi-geth)
+[![Travis](https://travis-ci.org/ethoxy/multi-geth.svg?branch=master)](https://travis-ci.org/ethoxy/multi-geth)
+[![Join the chat at https://gitter.im/ethoxy/multi-geth](https://badges.gitter.im/ethoxy/multi-geth.svg)](https://gitter.im/ethoxy/multi-geth)
 
-Automated builds are available for stable releases and the unstable master branch.
-Binary archives are published at https://geth.ethereum.org/downloads/.
+Binary archives are published at https://github.com/ethoxy/multi-geth/releases.
 
 ## Building the source
 
@@ -18,7 +17,7 @@ For prerequisites and detailed build instructions please read the
 [Installation Instructions](https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum)
 on the wiki.
 
-Building geth requires both a Go (version 1.7 or later) and a C compiler.
+Building geth requires both a Go (version 1.10 or later) and a C compiler.
 You can install them using your favourite package manager.
 Once the dependencies are installed, run
 
@@ -27,6 +26,15 @@ Once the dependencies are installed, run
 or, to build the full suite of utilities:
 
     make all
+
+## Ellaism network
+
+This is originally an [Ellaism
+Project](https://github.com/ellaism). However, A [recent hard
+fork](https://github.com/ellaism/specs/blob/master/specs/2018-0003-wasm-hardfork.md)
+makes Ellaism not feasible to support go-ethereum any more. Existing
+Ellaism users are asked to switch to
+[Parity](https://github.com/paritytech/parity).
 
 ## Executables
 
@@ -72,41 +80,46 @@ This command will:
    This tool is optional and if you leave it out you can always attach to an already running Geth instance
    with `geth attach`.
 
-### Full node on the Ethereum test network
+### Full node on the main Ellaism network
 
-Transitioning towards developers, if you'd like to play around with creating Ethereum contracts, you
-almost certainly would like to do that without any real money involved until you get the hang of the
-entire system. In other words, instead of attaching to the main network, you want to join the **test**
-network with your node, which is fully equivalent to the main network, but with play-Ether only.
+To get on Ellaism network and take advantage of fast-sync:
 
 ```
-$ geth --testnet console
+$ geth --ellaism console
 ```
 
-The `console` subcommand have the exact same meaning as above and they are equally useful on the
-testnet too. Please see above for their explanations if you've skipped to here.
+This command will:
 
-Specifying the `--testnet` flag however will reconfigure your Geth instance a bit:
+ * Start geth in fast sync mode and start up geth's built-in interactive JavaScript console,
+   connecting to Ellaism network.
+ * Default data directory will be `~/.ethereum/ellaism`.
 
- * Instead of using the default data directory (`~/.ethereum` on Linux for example), Geth will nest
-   itself one level deeper into a `testnet` subfolder (`~/.ethereum/testnet` on Linux). Note, on OSX
-   and Linux this also means that attaching to a running testnet node requires the use of a custom
-   endpoint since `geth attach` will try to attach to a production node endpoint by default. E.g.
-   `geth attach <datadir>/testnet/geth.ipc`. Windows users are not affected by this.
- * Instead of connecting the main Ethereum network, the client will connect to the test network,
-   which uses different P2P bootnodes, different network IDs and genesis states.
-   
-*Note: Although there are some internal protective measures to prevent transactions from crossing
-over between the main network and test network, you should make sure to always use separate accounts
-for play-money and real-money. Unless you manually move accounts, Geth will by default correctly
-separate the two networks and will not make any accounts available between them.*
+### Full node on the main Ethereum Classic network
 
-### Full node on the Rinkeby test network
-
-The above test network is a cross client one based on the ethash proof-of-work consensus algorithm. As such, it has certain extra overhead and is more susceptible to reorganization attacks due to the network's low difficulty / security. Go Ethereum also supports connecting to a proof-of-authority based test network called [*Rinkeby*](https://www.rinkeby.io) (operated by members of the community). This network is lighter, more secure, but is only supported by go-ethereum.
+To get on Ethereum Classic network and take advantage of fast-sync:
 
 ```
-$ geth --rinkeby console
+$ geth --classic console
+```
+
+This command will:
+
+ * Start geth in fast sync mode and start up geth's built-in interactive JavaScript console,
+   connecting to Ethereum Classic network.
+ * Default data directory will be `~/.ethereum/classic`.
+
+### All networks
+
+For a full list of networks supported by multi-geth, take a look at the command-line help messages:
+
+```
+--testnet                            Ropsten network: pre-configured proof-of-work test network
+--ellaism                            Ellaism network: pre-configured Ellaism mainnet
+--classic                            Ethereum Classic network: pre-configured Ethereum Classic mainnet
+--social                             Ethereum Social network: pre-configured Ethereum Social mainnet
+--mix                                MIX network: pre-configured MIX mainnet
+--ethersocial                        Ethersocial network: pre-configured Ethersocial mainnet
+--rinkeby                            Rinkeby network: pre-configured proof-of-authority test network
 ```
 
 ### Configuration
@@ -168,7 +181,7 @@ HTTP based JSON-RPC API options:
   * `--ipcpath` Filename for IPC socket/pipe within the datadir (explicit paths escape it)
 
 You'll need to use your own programming environments' capabilities (libraries, tools, etc) to connect
-via HTTP, WS or IPC to a Geth node configured with the above flags and you'll need to speak [JSON-RPC](http://www.jsonrpc.org/specification)
+via HTTP, WS or IPC to a Geth node configured with the above flags and you'll need to speak [JSON-RPC](https://www.jsonrpc.org/specification)
 on all transports. You can reuse the same connection for multiple requests!
 
 **Note: Please understand the security implications of opening up an HTTP/WS based transport before

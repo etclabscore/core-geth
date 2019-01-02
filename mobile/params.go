@@ -32,6 +32,42 @@ func MainnetGenesis() string {
 	return ""
 }
 
+// EllaismGenesis returns the JSON spec to use for the Ellaism network.
+func EllaismGenesis() string {
+	enc, err := json.Marshal(core.DefaultEllaismGenesisBlock())
+	if err != nil {
+		panic(err)
+	}
+	return string(enc)
+}
+
+// SocialGenesis returns the JSON spec to use for the Ethereum Social network.
+func SocialGenesis() string {
+	enc, err := json.Marshal(core.DefaultSocialGenesisBlock())
+	if err != nil {
+		panic(err)
+	}
+	return string(enc)
+}
+
+// MixGenesis returns the JSON spec to use for the MIX network.
+func MixGenesis() string {
+	enc, err := json.Marshal(core.DefaultMixGenesisBlock())
+	if err != nil {
+		panic(err)
+	}
+	return string(enc)
+}
+
+// EthersocialGenesis returns the JSON spec to use for the Ethersocial network.
+func EthersocialGenesis() string {
+	enc, err := json.Marshal(core.DefaultEthersocialGenesisBlock())
+	if err != nil {
+		panic(err)
+	}
+	return string(enc)
+}
+
 // TestnetGenesis returns the JSON spec to use for the Ethereum test network.
 func TestnetGenesis() string {
 	enc, err := json.Marshal(core.DefaultTestnetGenesisBlock())

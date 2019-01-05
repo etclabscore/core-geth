@@ -25,17 +25,17 @@ install:
 
 build_script:
   - go run build\ci.go install
-  - 7z a multi-geth-win64.zip .\build\bin\geth.exe
-  - ps: Get-FileHash multi-geth-win64.zip -Algorithm SHA256
-  - ps: Get-FileHash multi-geth-win64.zip -Algorithm SHA256 | Out-File multi-geth-win64.zip.sha256
+  - 7z a ethoxy-multi-geth-win64.zip .\build\bin\geth.exe
+  - ps: Get-FileHash ethoxy-multi-geth-win64.zip -Algorithm SHA256
+  - ps: Get-FileHash ethoxy-multi-geth-win64.zip -Algorithm SHA256 | Out-File ethoxy-multi-geth-win64.zip.sha256
   - 7z a ethoxy-alltools-win64.zip .\build\bin\*
   - ps: Get-FileHash ethoxy-alltools-win64.zip -Algorithm SHA256
   - ps: Get-FileHash ethoxy-alltools-win64.zip | Out-File ethoxy-alltools-win64.zip.sha256
 
 artifacts:
-  - path: '*multi-geth*.zip'
+  - path: '*ethoxy-multi-geth*.zip'
     name: geth
-  - path: '*multi-geth*.zip.sha256'
+  - path: '*ethoxy-multi-geth*.zip.sha256'
     name: geth-sha256
   - path: '*ethoxy-alltools*.zip'
     name: alltools
@@ -43,17 +43,10 @@ artifacts:
     name: alltools-sha256
 
 deploy:
-  - provider: GitHub
-    artifact: /multi-geth-win64\.zip.*/
-    auth_token:
-      secure: 6NcsMzxggkLUTrKSB/oJQKMDORkvDIfa39CMSlF0+J4CaPScg3patFk755g+tHfA
-    draft: true
-    on:
-      appveyor_repo_tag: true
-  - provider: GitHub
-    artifact: /ethoxy-alltools-win64\.zip.*/
-    auth_token:
-      secure: 6NcsMzxggkLUTrKSB/oJQKMDORkvDIfa39CMSlF0+J4CaPScg3patFk755g+tHfA
-    draft: true
-    on:
-      appveyor_repo_tag: true
+  provider: GitHub
+  artifact: /ethoxy-.*-win64\.zip.*/
+  auth_token:
+    secure: 6NcsMzxggkLUTrKSB/oJQKMDORkvDIfa39CMSlF0+J4CaPScg3patFk755g+tHfA
+  draft: true
+  on:
+    appveyor_repo_tag: true

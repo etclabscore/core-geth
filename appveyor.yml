@@ -25,26 +25,26 @@ install:
 
 build_script:
   - go run build\ci.go install
-  - 7z a ethoxy-multi-geth-win64.zip .\build\bin\geth.exe
-  - ps: Get-FileHash ethoxy-multi-geth-win64.zip -Algorithm SHA256
-  - ps: Get-FileHash ethoxy-multi-geth-win64.zip -Algorithm SHA256 | Out-File ethoxy-multi-geth-win64.zip.sha256
-  - 7z a ethoxy-alltools-win64.zip .\build\bin\*
-  - ps: Get-FileHash ethoxy-alltools-win64.zip -Algorithm SHA256
-  - ps: Get-FileHash ethoxy-alltools-win64.zip | Out-File ethoxy-alltools-win64.zip.sha256
+  - 7z a multi-geth-win64.zip .\build\bin\geth.exe
+  - ps: Get-FileHash multi-geth-win64.zip -Algorithm SHA256
+  - ps: Get-FileHash multi-geth-win64.zip -Algorithm SHA256 | Out-File multi-geth-win64.zip.sha256
+  - 7z a multi-geth-alltools-win64.zip .\build\bin\*
+  - ps: Get-FileHash multi-geth-alltools-win64.zip -Algorithm SHA256
+  - ps: Get-FileHash multi-geth-alltools-win64.zip | Out-File multi-geth-alltools-win64.zip.sha256
 
 artifacts:
-  - path: '*ethoxy-multi-geth*.zip'
+  - path: '*multi-geth*.zip'
     name: geth
-  - path: '*ethoxy-multi-geth*.zip.sha256'
+  - path: '*multi-geth*.zip.sha256'
     name: geth-sha256
-  - path: '*ethoxy-alltools*.zip'
+  - path: '*multi-geth-alltools*.zip'
     name: alltools
-  - path: '*ethoxy-alltools*.zip.sha256'
+  - path: '*multi-geth-alltools*.zip.sha256'
     name: alltools-sha256
 
 deploy:
   provider: GitHub
-  artifact: /ethoxy-.*-win64\.zip.*/
+  artifact: /multi-geth.*-win64\.zip.*/
   auth_token:
     secure: 6NcsMzxggkLUTrKSB/oJQKMDORkvDIfa39CMSlF0+J4CaPScg3patFk755g+tHfA
   draft: true

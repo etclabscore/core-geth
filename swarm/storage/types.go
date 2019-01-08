@@ -26,9 +26,9 @@ import (
 	"io"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/swarm/bmt"
 	ch "github.com/ethereum/go-ethereum/swarm/chunk"
+	"golang.org/x/crypto/sha3"
 )
 
 const MaxPO = 16
@@ -59,9 +59,6 @@ func Proximity(one, other []byte) (ret int) {
 	m := 8
 	for i := 0; i < b; i++ {
 		oxo := one[i] ^ other[i]
-		if i == b-1 {
-			m = MaxPO % 8
-		}
 		for j := 0; j < m; j++ {
 			if (oxo>>uint8(7-j))&0x01 != 0 {
 				return i*8 + j
@@ -78,10 +75,10 @@ func MakeHashFunc(hash string) SwarmHasher {
 	case "SHA256":
 		return func() SwarmHash { return &HashWithLength{crypto.SHA256.New()} }
 	case "SHA3":
-		return func() SwarmHash { return &HashWithLength{sha3.NewKeccak256()} }
+		return func() SwarmHash { return &HashWithLength{sha3.NewLegacyKeccak256()} }
 	case "BMT":
 		return func() SwarmHash {
-			hasher := sha3.NewKeccak256
+			hasher := sha3.NewLegacyKeccak256
 			hasherSize := hasher().Size()
 			segmentCount := ch.DefaultSize / hasherSize
 			pool := bmt.NewTreePool(hasher, segmentCount, bmt.PoolSize)

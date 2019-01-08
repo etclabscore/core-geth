@@ -28,18 +28,25 @@ build_script:
   - 7z a multi-geth-win64.zip .\build\bin\geth.exe
   - ps: Get-FileHash multi-geth-win64.zip -Algorithm SHA256
   - ps: Get-FileHash multi-geth-win64.zip -Algorithm SHA256 | Out-File multi-geth-win64.zip.sha256
+  - 7z a multi-geth-alltools-win64.zip .\build\bin\*
+  - ps: Get-FileHash multi-geth-alltools-win64.zip -Algorithm SHA256
+  - ps: Get-FileHash multi-geth-alltools-win64.zip | Out-File multi-geth-alltools-win64.zip.sha256
 
 artifacts:
-  - path: '*.zip'
+  - path: '*multi-geth*.zip'
     name: geth
-  - path: '*.zip.sha256'
+  - path: '*multi-geth*.zip.sha256'
     name: geth-sha256
+  - path: '*multi-geth-alltools*.zip'
+    name: alltools
+  - path: '*multi-geth-alltools*.zip.sha256'
+    name: alltools-sha256
 
 deploy:
-  artifact: /multi-geth-win64\.zip.*/
+  provider: GitHub
+  artifact: /multi-geth.*-win64\.zip.*/
   auth_token:
     secure: 6NcsMzxggkLUTrKSB/oJQKMDORkvDIfa39CMSlF0+J4CaPScg3patFk755g+tHfA
   draft: true
   on:
     appveyor_repo_tag: true
-  provider: GitHub

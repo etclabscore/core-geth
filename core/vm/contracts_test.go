@@ -368,7 +368,7 @@ func TestIsPrecompiledContractEnabled(t *testing.T) {
 	}
 	var byzCts = append(homeCts, byzUniqCts...)
 	var nonCts = []common.Address{
-		common.Address{},
+		{},
 		common.BytesToAddress([]byte{42}),
 		common.HexToAddress("0xdeadbeef"),
 	}

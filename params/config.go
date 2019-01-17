@@ -404,13 +404,13 @@ type ChainConfig struct {
 
 	// HF: Homestead
 	HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)
-	// Note: EIPs 2 and 8 were also included in this fork, but have not been distinguished individually in the code.
 	// "Homestead Hard-fork Changes"
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.md
 	EIP2FBlock *big.Int `json:"eip2FBlock,omitempty"`
 	// DELEGATECALL
 	// https://eips.ethereum.org/EIPS/eip-7
 	EIP7FBlock *big.Int `json:"eip7FBlock,omitempy"`
+	// Note: EIP 8 was also included in this fork, but was not backwards-incompatible
 
 	// HF: DAO
 	DAOForkBlock   *big.Int `json:"daoForkBlock,omitempty"`   // TheDAO hard-fork switch block (nil = no fork)

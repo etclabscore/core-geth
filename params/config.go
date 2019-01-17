@@ -226,6 +226,7 @@ var (
 		big.NewInt(1337), // ChainID
 
 		big.NewInt(0), // HomesteadBlock
+		nil,           // EIP2FBlock
 		nil,           // EIP7FBlock
 
 		nil,   // DAOForkBlock
@@ -279,6 +280,7 @@ var (
 		big.NewInt(1337), // ChainID
 
 		big.NewInt(0), // HomesteadBlock
+		nil,           // EIP2FBlock
 		nil,           // EIP7FBlock
 
 		nil,   // DAOForkBlock
@@ -331,6 +333,7 @@ var (
 		big.NewInt(1), // ChainID
 
 		big.NewInt(0), // HomesteadBlock
+		nil,           // EIP2FBlock
 		nil,           // EIP7FBlock
 
 		nil,   // DAOForkBlock
@@ -402,7 +405,9 @@ type ChainConfig struct {
 	// HF: Homestead
 	HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)
 	// Note: EIPs 2 and 8 were also included in this fork, but have not been distinguished individually in the code.
-	//
+	// "Homestead Hard-fork Changes"
+	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.md
+	EIP2FBlock *big.Int `json:"eip2FBlock,omitempty"`
 	// DELEGATECALL
 	// https://eips.ethereum.org/EIPS/eip-7
 	EIP7FBlock *big.Int `json:"eip7FBlock,omitempy"`
@@ -566,6 +571,11 @@ func (c *ChainConfig) HasECIP1017() bool {
 // IsHomestead returns whether num is either equal to the homestead block or greater.
 func (c *ChainConfig) IsHomestead(num *big.Int) bool {
 	return isForked(c.HomesteadBlock, num)
+}
+
+// IsEIP2F returns whether num is equal to or greater than the Homestead or EIP2 block.
+func (c *ChainConfig) IsEIP2F(num *big.Int) bool {
+	return c.IsHomestead(num) || isForked(c.EIP2FBlock, num)
 }
 
 // IsEIP7F returns whether num is equal to or greater than the Homestead or EIP7 block.
@@ -935,7 +945,7 @@ func (err *ConfigCompatError) Error() string {
 // phases.
 type Rules struct {
 	ChainID                                                                                                        *big.Int
-	IsHomestead, IsEIP7F                                                                                           bool
+	IsHomestead, IsEIP2F, IsEIP7F                                                                                  bool
 	IsEIP150                                                                                                       bool
 	IsEIP155                                                                                                       bool
 	IsEIP158HF, IsEIP160F, IsEIP161F, IsEIP170F                                                                    bool
@@ -954,6 +964,7 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 		ChainID: new(big.Int).Set(chainID),
 
 		IsHomestead: c.IsHomestead(num),
+		IsEIP2F:     c.IsEIP2F(num),
 		IsEIP7F:     c.IsEIP7F(num),
 
 		IsEIP150:   c.IsEIP150(num),

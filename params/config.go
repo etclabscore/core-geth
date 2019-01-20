@@ -49,7 +49,7 @@ var (
 		DisposalBlock:       nil,
 		SocialBlock:         nil,
 		EthersocialBlock:    nil,
-		ConstantinopleBlock: big.NewInt(7080000),
+		ConstantinopleBlock: nil,
 		Ethash:              new(EthashConfig),
 	}
 

@@ -32,6 +32,7 @@ var (
 	MixGenesisHash         = common.HexToHash("0x4fa57903dad05875ddf78030c16b5da886f7d81714cf66946a4c02566dbb2af5")
 	EthersocialGenesisHash = common.HexToHash("0x310dd3c4ae84dd89f1b46cfdd5e26c8f904dfddddc73f323b468127272e20e9f")
 	RinkebyGenesisHash     = common.HexToHash("0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177")
+	KottiGenesisHash       = common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4")
 )
 
 var (
@@ -215,6 +216,31 @@ var (
 		SectionHead:  common.HexToHash("0xec8147d43f936258aaf1b9b9ec91b0a853abf7109f436a23649be809ea43d507"),
 		CHTRoot:      common.HexToHash("0xd92703b444846a3db928e87e450770e5d5cbe193131dc8f7c4cf18b4de925a75"),
 		BloomRoot:    common.HexToHash("0xff45a6f807138a2cde0cea0c209d9ce5ad8e43ccaae5a7c41af801bb72a1ef96"),
+	}
+
+	// KottiChainConfig is the chain parameters to run a node on the Ellaism main network.
+	KottiChainConfig = &ChainConfig{
+		ChainID:             big.NewInt(6),
+		HomesteadBlock:      big.NewInt(0),
+		DAOForkBlock:        nil,
+		DAOForkSupport:      false,
+		EIP150Block:         big.NewInt(0),
+		EIP150Hash:          common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4"),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         nil,
+		ByzantiumBlock:      nil,
+		DisposalBlock:       big.NewInt(0),
+		SocialBlock:         nil,
+		EthersocialBlock:    nil,
+		ConstantinopleBlock: nil,
+		ECIP1017EraRounds:   big.NewInt(5000000),
+		EIP160Block:         big.NewInt(0),
+		ECIP1010PauseBlock:  big.NewInt(0),
+		ECIP1010Length:      big.NewInt(2000000),
+		Clique: &CliqueConfig{
+			Period: 15,
+			Epoch:  30000,
+		},
 	}
 
 	// AllEthashProtocolChanges contains every protocol change (EIPs) introduced

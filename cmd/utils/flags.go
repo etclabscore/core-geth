@@ -129,7 +129,7 @@ var (
 	}
 	NetworkIdFlag = cli.Uint64Flag{
 		Name:  "networkid",
-		Usage: "Network identifier (integer, 1=Frontier, 2=Morden (disused), 3=Ropsten, 4=Rinkeby)",
+		Usage: "Network identifier (integer, 1=Frontier, 2=Morden (disused), 3=Ropsten, 4=Rinkeby, 6=Kotti)",
 		Value: eth.DefaultConfig.NetworkId,
 	}
 	TestnetFlag = cli.BoolFlag{
@@ -159,6 +159,10 @@ var (
 	RinkebyFlag = cli.BoolFlag{
 		Name:  "rinkeby",
 		Usage: "Rinkeby network: pre-configured proof-of-authority test network",
+	}
+	KottiFlag = cli.BoolFlag{
+		Name:  "kotti",
+		Usage: "Kotti network: cross-client proof-of-authority test network",
 	}
 	ConstantinopleOverrideFlag = cli.Uint64Flag{
 		Name:  "override.constantinople",
@@ -682,6 +686,9 @@ func MakeDataDir(ctx *cli.Context) string {
 		if ctx.GlobalBool(RinkebyFlag.Name) {
 			return filepath.Join(path, "rinkeby")
 		}
+		if ctx.GlobalBool(KottiFlag.Name) {
+			return filepath.Join(path, "kotti")
+		}
 		return path
 	}
 	Fatalf("Cannot determine default data directory, please set manually (--datadir)")
@@ -746,6 +753,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.EthersocialBootnodes
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		urls = params.RinkebyBootnodes
+	case ctx.GlobalBool(KottiFlag.Name):
+		urls = params.KottiBootnodes
 	case cfg.BootstrapNodes != nil:
 		return // already set, don't apply defaults.
 	}
@@ -773,6 +782,8 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		}
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		urls = params.RinkebyBootnodes
+	case ctx.GlobalBool(KottiFlag.Name):
+		urls = params.KottiBootnodes
 	case cfg.BootstrapNodesV5 != nil:
 		return // already set, don't apply defaults.
 	}
@@ -1058,6 +1069,8 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "ethersocial")
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "rinkeby")
+	case ctx.GlobalBool(KottiFlag.Name):
+		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "kotti")
 	}
 }
 
@@ -1214,7 +1227,7 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node, cfg *whisper.Config) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
-	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag, EllaismFlag, ClassicFlag, SocialFlag, MixFlag, EthersocialFlag)
+	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag, KottiFlag, EllaismFlag, ClassicFlag, SocialFlag, MixFlag, EthersocialFlag)
 	checkExclusive(ctx, LightServFlag, SyncModeFlag, "light")
 
 	if ctx.GlobalIsSet(EllaismFlag.Name) {
@@ -1337,6 +1350,11 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 			cfg.NetworkId = 4
 		}
 		cfg.Genesis = core.DefaultRinkebyGenesisBlock()
+	case ctx.GlobalBool(KottiFlag.Name):
+		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
+			cfg.NetworkId = 6
+		}
+		cfg.Genesis = core.DefaultKottiGenesisBlock()
 	case ctx.GlobalBool(MixFlag.Name):
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 76
@@ -1492,6 +1510,8 @@ func MakeGenesis(ctx *cli.Context) *core.Genesis {
 		genesis = core.DefaultEthersocialGenesisBlock()
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		genesis = core.DefaultRinkebyGenesisBlock()
+	case ctx.GlobalBool(KottiFlag.Name):
+		genesis = core.DefaultKottiGenesisBlock()
 	case ctx.GlobalBool(DeveloperFlag.Name):
 		Fatalf("Developer chains are ephemeral")
 	}

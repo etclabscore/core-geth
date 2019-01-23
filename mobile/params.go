@@ -86,6 +86,15 @@ func RinkebyGenesis() string {
 	return string(enc)
 }
 
+// KottiGenesis returns the JSON spec to use for the Kotti test network
+func KottiGenesis() string {
+	enc, err := json.Marshal(core.DefaultKottiGenesisBlock())
+	if err != nil {
+		panic(err)
+	}
+	return string(enc)
+}
+
 // FoundationBootnodes returns the enode URLs of the P2P bootstrap nodes operated
 // by the foundation running the V5 discovery protocol.
 func FoundationBootnodes() *Enodes {

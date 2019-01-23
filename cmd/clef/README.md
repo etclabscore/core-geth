@@ -212,7 +212,7 @@ None
 #### Result
   - array with account records:
      - account.address [string]: account address that is derived from the generated key
-     - account.type [string]: type of the
+     - account.type [string]: type of the account
      - account.url [string]: location of the account
 
 #### Sample call

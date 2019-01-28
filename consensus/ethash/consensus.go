@@ -332,7 +332,7 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 		// TODO (#22): calculator for only EIP649:difficulty bomb delay (without EIP100:mean time adjustment)
 		panic("not implemented")
 	case config.IsEIP100F(next):
-		// TODO: calculator for only EIP100:mean time adjustment (without EIP649:difficulty bomb delay)
+		// TODO (#23): calculator for only EIP100:mean time adjustment (without EIP649:difficulty bomb delay)
 		panic("not implemented")
 	case config.IsEIP2F(next):
 		return calcDifficultyHomestead(time, parent)

@@ -329,7 +329,7 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 	case config.IsByzantium(next) || (config.IsEIP649F(next) && config.IsEIP100F(next)):
 		return calcDifficultyByzantium(time, parent)
 	case config.IsEIP649F(next):
-		// TODO: calculator for only EIP649:difficulty bomb delay (without EIP100:mean time adjustment)
+		// TODO (#22): calculator for only EIP649:difficulty bomb delay (without EIP100:mean time adjustment)
 		panic("not implemented")
 	case config.IsEIP100F(next):
 		// TODO: calculator for only EIP100:mean time adjustment (without EIP649:difficulty bomb delay)

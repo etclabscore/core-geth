@@ -48,112 +48,108 @@ type operation struct {
 	valid   bool // indication whether the retrieved operation is valid and known
 	reverts bool // determines whether the operation reverts state (implicitly halts)
 	returns bool // determines whether the operations sets the return data content
+
 }
 
-var (
-	frontierInstructionSet       = newFrontierInstructionSet()
-	homesteadInstructionSet      = newHomesteadInstructionSet()
-	byzantiumInstructionSet      = newByzantiumInstructionSet()
-	constantinopleInstructionSet = newConstantinopleInstructionSet()
-)
+var baseInstructionSet = newBaseInstructionSet()
 
-// NewConstantinopleInstructionSet returns the frontier, homestead
-// byzantium and contantinople instructions.
-func newConstantinopleInstructionSet() [256]operation {
-	// instructions that can be executed during the byzantium phase.
-	instructionSet := newByzantiumInstructionSet()
-	instructionSet[SHL] = operation{
-		execute:       opSHL,
-		gasCost:       constGasFunc(GasFastestStep),
-		validateStack: makeStackFunc(2, 1),
-		valid:         true,
+func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) [256]operation {
+	instructionSet := baseInstructionSet
+	// Homestead
+	if config.IsEIP7F(bn) {
+		instructionSet[DELEGATECALL] = operation{
+			execute:       opDelegateCall,
+			gasCost:       gasDelegateCall,
+			validateStack: makeStackFunc(6, 1),
+			memorySize:    memoryDelegateCall,
+			valid:         true,
+			returns:       true,
+		}
 	}
-	instructionSet[SHR] = operation{
-		execute:       opSHR,
-		gasCost:       constGasFunc(GasFastestStep),
-		validateStack: makeStackFunc(2, 1),
-		valid:         true,
+
+	// Byzantium
+	if config.IsEIP140F(bn) {
+		instructionSet[REVERT] = operation{
+			execute:       opRevert,
+			gasCost:       gasRevert,
+			validateStack: makeStackFunc(2, 0),
+			memorySize:    memoryRevert,
+			valid:         true,
+			reverts:       true,
+			returns:       true,
+		}
 	}
-	instructionSet[SAR] = operation{
-		execute:       opSAR,
-		gasCost:       constGasFunc(GasFastestStep),
-		validateStack: makeStackFunc(2, 1),
-		valid:         true,
+	if config.IsEIP214F(bn) {
+		instructionSet[STATICCALL] = operation{
+			execute:       opStaticCall,
+			gasCost:       gasStaticCall,
+			validateStack: makeStackFunc(6, 1),
+			memorySize:    memoryStaticCall,
+			valid:         true,
+			returns:       true,
+		}
 	}
-	instructionSet[EXTCODEHASH] = operation{
-		execute:       opExtCodeHash,
-		gasCost:       gasExtCodeHash,
-		validateStack: makeStackFunc(1, 1),
-		valid:         true,
+	if config.IsEIP211F(bn) {
+		instructionSet[RETURNDATASIZE] = operation{
+			execute:       opReturnDataSize,
+			gasCost:       constGasFunc(GasQuickStep),
+			validateStack: makeStackFunc(0, 1),
+			valid:         true,
+		}
+		instructionSet[RETURNDATACOPY] = operation{
+			execute:       opReturnDataCopy,
+			gasCost:       gasReturnDataCopy,
+			validateStack: makeStackFunc(3, 0),
+			memorySize:    memoryReturnDataCopy,
+			valid:         true,
+		}
 	}
-	instructionSet[CREATE2] = operation{
-		execute:       opCreate2,
-		gasCost:       gasCreate2,
-		validateStack: makeStackFunc(4, 1),
-		memorySize:    memoryCreate2,
-		valid:         true,
-		writes:        true,
-		returns:       true,
+
+	// Constantinople
+	if config.IsEIP145F(bn) {
+		instructionSet[SHL] = operation{
+			execute:       opSHL,
+			gasCost:       constGasFunc(GasFastestStep),
+			validateStack: makeStackFunc(2, 1),
+			valid:         true,
+		}
+		instructionSet[SHR] = operation{
+			execute:       opSHR,
+			gasCost:       constGasFunc(GasFastestStep),
+			validateStack: makeStackFunc(2, 1),
+			valid:         true,
+		}
+		instructionSet[SAR] = operation{
+			execute:       opSAR,
+			gasCost:       constGasFunc(GasFastestStep),
+			validateStack: makeStackFunc(2, 1),
+			valid:         true,
+		}
+	}
+	if config.IsEIP1014F(bn) {
+		instructionSet[CREATE2] = operation{
+			execute:       opCreate2,
+			gasCost:       gasCreate2,
+			validateStack: makeStackFunc(4, 1),
+			memorySize:    memoryCreate2,
+			valid:         true,
+			writes:        true,
+			returns:       true,
+		}
+	}
+	if config.IsEIP1052F(bn) {
+		instructionSet[EXTCODEHASH] = operation{
+			execute:       opExtCodeHash,
+			gasCost:       gasExtCodeHash,
+			validateStack: makeStackFunc(1, 1),
+			valid:         true,
+		}
 	}
 	return instructionSet
 }
 
-// NewByzantiumInstructionSet returns the frontier, homestead and
-// byzantium instructions.
-func newByzantiumInstructionSet() [256]operation {
-	// instructions that can be executed during the homestead phase.
-	instructionSet := newHomesteadInstructionSet()
-	instructionSet[STATICCALL] = operation{
-		execute:       opStaticCall,
-		gasCost:       gasStaticCall,
-		validateStack: makeStackFunc(6, 1),
-		memorySize:    memoryStaticCall,
-		valid:         true,
-		returns:       true,
-	}
-	instructionSet[RETURNDATASIZE] = operation{
-		execute:       opReturnDataSize,
-		gasCost:       constGasFunc(GasQuickStep),
-		validateStack: makeStackFunc(0, 1),
-		valid:         true,
-	}
-	instructionSet[RETURNDATACOPY] = operation{
-		execute:       opReturnDataCopy,
-		gasCost:       gasReturnDataCopy,
-		validateStack: makeStackFunc(3, 0),
-		memorySize:    memoryReturnDataCopy,
-		valid:         true,
-	}
-	instructionSet[REVERT] = operation{
-		execute:       opRevert,
-		gasCost:       gasRevert,
-		validateStack: makeStackFunc(2, 0),
-		memorySize:    memoryRevert,
-		valid:         true,
-		reverts:       true,
-		returns:       true,
-	}
-	return instructionSet
-}
-
-// NewHomesteadInstructionSet returns the frontier and homestead
-// instructions that can be executed during the homestead phase.
-func newHomesteadInstructionSet() [256]operation {
-	instructionSet := newFrontierInstructionSet()
-	instructionSet[DELEGATECALL] = operation{
-		execute:       opDelegateCall,
-		gasCost:       gasDelegateCall,
-		validateStack: makeStackFunc(6, 1),
-		memorySize:    memoryDelegateCall,
-		valid:         true,
-		returns:       true,
-	}
-	return instructionSet
-}
-
-// NewFrontierInstructionSet returns the frontier instructions
-// that can be executed during the frontier phase.
-func newFrontierInstructionSet() [256]operation {
+// newBaseInstructionSet returns Frontier instructions
+func newBaseInstructionSet() [256]operation {
 	return [256]operation{
 		STOP: {
 			execute:       opStop,

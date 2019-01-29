@@ -37,26 +37,34 @@ type PrecompiledContract interface {
 	Run(input []byte) ([]byte, error) // Run runs the precompiled contract
 }
 
-// PrecompiledContractsHomestead contains the default set of pre-compiled Ethereum
-// contracts used in the Frontier and Homestead releases.
-var PrecompiledContractsHomestead = map[common.Address]PrecompiledContract{
+var basePrecompiledContracts = map[common.Address]PrecompiledContract{
 	common.BytesToAddress([]byte{1}): &ecrecover{},
 	common.BytesToAddress([]byte{2}): &sha256hash{},
 	common.BytesToAddress([]byte{3}): &ripemd160hash{},
 	common.BytesToAddress([]byte{4}): &dataCopy{},
 }
 
-// PrecompiledContractsByzantium contains the default set of pre-compiled Ethereum
-// contracts used in the Byzantium release.
-var PrecompiledContractsByzantium = map[common.Address]PrecompiledContract{
-	common.BytesToAddress([]byte{1}): &ecrecover{},
-	common.BytesToAddress([]byte{2}): &sha256hash{},
-	common.BytesToAddress([]byte{3}): &ripemd160hash{},
-	common.BytesToAddress([]byte{4}): &dataCopy{},
-	common.BytesToAddress([]byte{5}): &bigModExp{},
-	common.BytesToAddress([]byte{6}): &bn256Add{},
-	common.BytesToAddress([]byte{7}): &bn256ScalarMul{},
-	common.BytesToAddress([]byte{8}): &bn256Pairing{},
+// PrecompiledContractsForConfig returns a map containing valid precompiled contracts for a given point in a chain config.
+func PrecompiledContractsForConfig(config *params.ChainConfig, bn *big.Int) map[common.Address]PrecompiledContract {
+	// Copying to a new map is necessary because assigning to the original map
+	// creates a memory reference. Further, setting the vals to nil in case of nonconfiguration causes
+	// a panic during tests because they run asynchronously (also a valid reason for using an explicit copy).
+	precompileds := make(map[common.Address]PrecompiledContract)
+	for k, v := range basePrecompiledContracts {
+		precompileds[k] = v
+	}
+	if config.IsEIP198F(bn) {
+		precompileds[common.BytesToAddress([]byte{5})] = &bigModExp{}
+	}
+	if config.IsEIP213F(bn) {
+		precompileds[common.BytesToAddress([]byte{6})] = &bn256Add{}
+		precompileds[common.BytesToAddress([]byte{7})] = &bn256ScalarMul{}
+	}
+	if config.IsEIP212F(bn) {
+		precompileds[common.BytesToAddress([]byte{8})] = &bn256Pairing{}
+	}
+
+	return precompileds
 }
 
 // RunPrecompiledContract runs and evaluates the output of a precompiled contract.

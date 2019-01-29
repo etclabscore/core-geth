@@ -237,7 +237,7 @@ var (
 		EthersocialBlock:    nil,
 		ConstantinopleBlock: nil,
 		ECIP1017EraRounds:   big.NewInt(5000000),
-		EIP160Block:         big.NewInt(0),
+		EIP160FBlock:        big.NewInt(0),
 		ECIP1010PauseBlock:  big.NewInt(0),
 		ECIP1010Length:      big.NewInt(2000000),
 		Clique: &CliqueConfig{
@@ -526,7 +526,7 @@ type ChainConfig struct {
 	// https://eips.ethereum.org/EIPS/eip-1283
 	EIP1283FBlock *big.Int `json:"eip1283FBlock,omitempty"`
 
-	PetersburgBlock     *big.Int `json:"petersburgBlock,omitempty"`     // Petersburg switch block (nil = same as Constantinople)
+	PetersburgBlock *big.Int `json:"petersburgBlock,omitempty"` // Petersburg switch block (nil = same as Constantinople)
 
 	EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
@@ -793,7 +793,7 @@ func (c *ChainConfig) IsEIP1234F(num *big.Int) bool {
 
 // IsEIP1283F returns whether num is equal to or greater than the Constantinople or EIP1283 block.
 func (c *ChainConfig) IsEIP1283F(num *big.Int) bool {
-	if isForked(c.PetersburgBlock, num) {
+	if c.IsPetersburg(num) {
 		return false
 	} else {
 		return c.IsConstantinople(num) || isForked(c.EIP1283FBlock, num)
@@ -1003,8 +1003,7 @@ type Rules struct {
 	IsEIP158HF, IsEIP160F, IsEIP161F, IsEIP170F                                                                    bool
 	IsByzantium, IsEIP100F, IsEIP140F, IsEIP198F, IsEIP211F, IsEIP212F, IsEIP213F, IsEIP214F, IsEIP649F, IsEIP658F bool
 	IsConstantinople, IsEIP145F, IsEIP1014F, IsEIP1052F, IsEIP1283F, IsEIP1234F                                    bool
-	IsPetersburg
-	       bool
+	IsPetersburg                                                                                                   bool
 	IsBombDisposal, IsSocial, IsEthersocial, IsECIP1010                                                            bool
 }
 
@@ -1046,7 +1045,7 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 		IsEIP1234F:       c.IsEIP1234F(num),
 		IsEIP1283F:       c.IsEIP1283F(num),
 
-		IsPetersburg:     c.IsPetersburg(num),
+		IsPetersburg: c.IsPetersburg(num),
 
 		IsBombDisposal: c.IsBombDisposal(num),
 		IsSocial:       c.IsSocial(num),

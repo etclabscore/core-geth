@@ -17,6 +17,27 @@ For prerequisites and detailed build instructions please read the
 [Installation Instructions](https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum)
 on the wiki.
 
+Since this is a downstream fork of [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum), you'll want to maintain the go import path and git remotes accordingly.
+This repository should occupy `$GOPATH/src/github.com/ethereum/go-ethereum`, and you can optionally use `git` to use this fork as a default upstream remote.
+On Linux or Mac, this can be accomplished by the following or similar.
+
+For a fresh install, the below. This will set [ethoxy/multi-geth](https://github.com/ethoxy/multi-geth) as as the `git` remote `origin` by default.
+
+```sh
+$ env path=$GOPATH/src/github.com/ethereum mkdir -p $path && cd $path
+$ git clone https://github.com/ethoxy/multi-geth.git go-ethereum && cd go-ethereum
+```
+
+Or, with an existing copy of the ethereum/go-ethereum source, the below. This will set [ethoxy/multi-geth](https://github.com/ethoxy/multi-geth) as the `git` remote `ethoxy`,
+and set the local branch `master` to track this repository's `master` branch.
+
+```sh
+$ cd $GOPATH/src/github.com/ethereum/go-ethereum
+$ git remote add ethoxy https://github.com/ethoxy/multi-geth.git
+$ git fetch ethoxy
+$ git checkout -B master -t ethoxy/master
+```
+
 Building geth requires both a Go (version 1.10 or later) and a C compiler.
 You can install them using your favourite package manager.
 Once the dependencies are installed, run

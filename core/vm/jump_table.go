@@ -51,10 +51,105 @@ type operation struct {
 
 }
 
-var baseInstructionSet = newInstructionSet()
+var baseInstructionSet = newBaseInstructionSet()
 
-// newInstructionSet returns all available instructions.
-func newInstructionSet() [256]operation {
+func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) [256]operation {
+	instructionSet := baseInstructionSet
+	// Homestead
+	if config.IsEIP7F(bn) {
+		instructionSet[DELEGATECALL] = operation{
+			execute:       opDelegateCall,
+			gasCost:       gasDelegateCall,
+			validateStack: makeStackFunc(6, 1),
+			memorySize:    memoryDelegateCall,
+			valid:         true,
+			returns:       true,
+		}
+	}
+
+	// Byzantium
+	if config.IsEIP140F(bn) {
+		instructionSet[REVERT] = operation{
+			execute:       opRevert,
+			gasCost:       gasRevert,
+			validateStack: makeStackFunc(2, 0),
+			memorySize:    memoryRevert,
+			valid:         true,
+			reverts:       true,
+			returns:       true,
+		}
+	}
+	if config.IsEIP214F(bn) {
+		instructionSet[STATICCALL] = operation{
+			execute:       opStaticCall,
+			gasCost:       gasStaticCall,
+			validateStack: makeStackFunc(6, 1),
+			memorySize:    memoryStaticCall,
+			valid:         true,
+			returns:       true,
+		}
+	}
+	if config.IsEIP211F(bn) {
+		instructionSet[RETURNDATASIZE] = operation{
+			execute:       opReturnDataSize,
+			gasCost:       constGasFunc(GasQuickStep),
+			validateStack: makeStackFunc(0, 1),
+			valid:         true,
+		}
+		instructionSet[RETURNDATACOPY] = operation{
+			execute:       opReturnDataCopy,
+			gasCost:       gasReturnDataCopy,
+			validateStack: makeStackFunc(3, 0),
+			memorySize:    memoryReturnDataCopy,
+			valid:         true,
+		}
+	}
+
+	// Constantinople
+	if config.IsEIP145F(bn) {
+		instructionSet[SHL] = operation{
+			execute:       opSHL,
+			gasCost:       constGasFunc(GasFastestStep),
+			validateStack: makeStackFunc(2, 1),
+			valid:         true,
+		}
+		instructionSet[SHR] = operation{
+			execute:       opSHR,
+			gasCost:       constGasFunc(GasFastestStep),
+			validateStack: makeStackFunc(2, 1),
+			valid:         true,
+		}
+		instructionSet[SAR] = operation{
+			execute:       opSAR,
+			gasCost:       constGasFunc(GasFastestStep),
+			validateStack: makeStackFunc(2, 1),
+			valid:         true,
+		}
+	}
+	if config.IsEIP1014F(bn) {
+		instructionSet[CREATE2] = operation{
+			execute:       opCreate2,
+			gasCost:       gasCreate2,
+			validateStack: makeStackFunc(4, 1),
+			memorySize:    memoryCreate2,
+			valid:         true,
+			writes:        true,
+			returns:       true,
+		}
+	}
+	if config.IsEIP1052F(bn) {
+		instructionSet[EXTCODEHASH] = operation{
+			execute:       opExtCodeHash,
+			gasCost:       gasExtCodeHash,
+			validateStack: makeStackFunc(1, 1),
+			valid:         true,
+		}
+	}
+	return instructionSet
+}
+
+// newBaseInstructionSet returns Frontier instructions
+func newBaseInstructionSet() [256]operation {
 	return [256]operation{
 		STOP: {
 			execute:       opStop,
@@ -862,93 +957,6 @@ func newInstructionSet() [256]operation {
 			halts:         true,
 			valid:         true,
 			writes:        true,
-		},
-
-		// Homestead
-		// EIP7
-		DELEGATECALL: {
-			execute:       opDelegateCall,
-			gasCost:       gasDelegateCall,
-			validateStack: makeStackFunc(6, 1),
-			memorySize:    memoryDelegateCall,
-			valid:         true,
-			returns:       true,
-		},
-
-		// Byzantium
-		// EIP140
-		REVERT: {
-			execute:       opRevert,
-			gasCost:       gasRevert,
-			validateStack: makeStackFunc(2, 0),
-			memorySize:    memoryRevert,
-			valid:         true,
-			reverts:       true,
-			returns:       true,
-		},
-		// EIP214
-		STATICCALL: {
-			execute:       opStaticCall,
-			gasCost:       gasStaticCall,
-			validateStack: makeStackFunc(6, 1),
-			memorySize:    memoryStaticCall,
-			valid:         true,
-			returns:       true,
-		},
-		// EIP211
-		RETURNDATASIZE: {
-			execute:       opReturnDataSize,
-			gasCost:       constGasFunc(GasQuickStep),
-			validateStack: makeStackFunc(0, 1),
-			valid:         true,
-		},
-		// EIP211
-		RETURNDATACOPY: {
-			execute:       opReturnDataCopy,
-			gasCost:       gasReturnDataCopy,
-			validateStack: makeStackFunc(3, 0),
-			memorySize:    memoryReturnDataCopy,
-			valid:         true,
-		},
-
-		// Constantinople
-		// EIP145
-		SHL: {
-			execute:       opSHL,
-			gasCost:       constGasFunc(GasFastestStep),
-			validateStack: makeStackFunc(2, 1),
-			valid:         true,
-		},
-		// EIP145
-		SHR: {
-			execute:       opSHR,
-			gasCost:       constGasFunc(GasFastestStep),
-			validateStack: makeStackFunc(2, 1),
-			valid:         true,
-		},
-		// EIP145
-		SAR: {
-			execute:       opSAR,
-			gasCost:       constGasFunc(GasFastestStep),
-			validateStack: makeStackFunc(2, 1),
-			valid:         true,
-		},
-		// EIP1014
-		CREATE2: {
-			execute:       opCreate2,
-			gasCost:       gasCreate2,
-			validateStack: makeStackFunc(4, 1),
-			memorySize:    memoryCreate2,
-			valid:         true,
-			writes:        true,
-			returns:       true,
-		},
-		// EIP1052
-		EXTCODEHASH: {
-			execute:       opExtCodeHash,
-			gasCost:       gasExtCodeHash,
-			validateStack: makeStackFunc(1, 1),
-			valid:         true,
 		},
 	}
 }

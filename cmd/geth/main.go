@@ -38,7 +38,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/node"
-	"gopkg.in/urfave/cli.v1"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 const (
@@ -82,6 +82,10 @@ var (
 		utils.TxPoolAccountQueueFlag,
 		utils.TxPoolGlobalQueueFlag,
 		utils.TxPoolLifetimeFlag,
+		utils.ULCModeConfigFlag,
+		utils.OnlyAnnounceModeFlag,
+		utils.ULCTrustedNodesFlag,
+		utils.ULCMinTrustedFractionFlag,
 		utils.SyncModeFlag,
 		utils.GCModeFlag,
 		utils.LightServFlag,
@@ -147,6 +151,11 @@ var (
 		utils.RPCEnabledFlag,
 		utils.RPCListenAddrFlag,
 		utils.RPCPortFlag,
+		utils.GraphQLEnabledFlag,
+		utils.GraphQLListenAddrFlag,
+		utils.GraphQLPortFlag,
+		utils.GraphQLCORSDomainFlag,
+		utils.GraphQLVirtualHostsFlag,
 		utils.RPCApiFlag,
 		utils.WSEnabledFlag,
 		utils.WSListenAddrFlag,
@@ -170,7 +179,7 @@ var (
 		utils.MetricsInfluxDBDatabaseFlag,
 		utils.MetricsInfluxDBUsernameFlag,
 		utils.MetricsInfluxDBPasswordFlag,
-		utils.MetricsInfluxDBHostTagFlag,
+		utils.MetricsInfluxDBTagsFlag,
 	}
 )
 
@@ -178,7 +187,7 @@ func init() {
 	// Initialize the CLI app and start Geth
 	app.Action = geth
 	app.HideVersion = true // we have a command to print the version
-	app.Copyright = "Copyright 2013-2018 The go-ethereum Authors"
+	app.Copyright = "Copyright 2013-2019 The go-ethereum Authors"
 	app.Commands = []cli.Command{
 		// See chaincmd.go:
 		initCommand,

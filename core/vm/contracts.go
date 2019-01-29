@@ -37,37 +37,34 @@ type PrecompiledContract interface {
 	Run(input []byte) ([]byte, error) // Run runs the precompiled contract
 }
 
-// AllPrecompiledContracts returns all possible precompiled contracts.
-var AllPrecompiledContracts = map[common.Address]PrecompiledContract{
+var basePrecompiledContracts = map[common.Address]PrecompiledContract{
 	common.BytesToAddress([]byte{1}): &ecrecover{},
 	common.BytesToAddress([]byte{2}): &sha256hash{},
 	common.BytesToAddress([]byte{3}): &ripemd160hash{},
 	common.BytesToAddress([]byte{4}): &dataCopy{},
-	common.BytesToAddress([]byte{5}): &bigModExp{},
-	common.BytesToAddress([]byte{6}): &bn256Add{},
-	common.BytesToAddress([]byte{7}): &bn256ScalarMul{},
-	common.BytesToAddress([]byte{8}): &bn256Pairing{},
 }
 
-// IsPrecompiledContractEnabled checks whether a given precompiled contract is enabled for a chain config at a given block.
-func IsPrecompiledContractEnabled(config *params.ChainConfig, num *big.Int, codeAddr common.Address) bool {
-	switch codeAddr {
-	case common.BytesToAddress([]byte{1}),
-		common.BytesToAddress([]byte{2}),
-		common.BytesToAddress([]byte{3}),
-		common.BytesToAddress([]byte{4}):
-		return true
-	case common.BytesToAddress([]byte{5}):
-		return config.IsEIP198F(num)
-	case common.BytesToAddress([]byte{6}):
-		return config.IsEIP213F(num)
-	case common.BytesToAddress([]byte{7}):
-		return config.IsEIP213F(num)
-	case common.BytesToAddress([]byte{8}):
-		return config.IsEIP212F(num)
-	default:
-		return false
+// PrecompiledContractsForConfig returns a map containing valid precompiled contracts for a given point in a chain config.
+func PrecompiledContractsForConfig(config *params.ChainConfig, bn *big.Int) map[common.Address]PrecompiledContract {
+	// Copying to a new map is necessary because assigning to the original map
+	// creates a memory reference. Further, setting the vals to nil in case of nonconfiguration causes
+	// a panic during tests because they run asynchronously (also a valid reason for using an explicit copy).
+	precompileds := make(map[common.Address]PrecompiledContract)
+	for k, v := range basePrecompiledContracts {
+		precompileds[k] = v
 	}
+	if config.IsEIP198F(bn) {
+		precompileds[common.BytesToAddress([]byte{5})] = &bigModExp{}
+	}
+	if config.IsEIP213F(bn) {
+		precompileds[common.BytesToAddress([]byte{6})] = &bn256Add{}
+		precompileds[common.BytesToAddress([]byte{7})] = &bn256ScalarMul{}
+	}
+	if config.IsEIP212F(bn) {
+		precompileds[common.BytesToAddress([]byte{8})] = &bn256Pairing{}
+	}
+
+	return precompileds
 }
 
 // RunPrecompiledContract runs and evaluates the output of a precompiled contract.

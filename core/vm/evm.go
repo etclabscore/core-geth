@@ -43,8 +43,9 @@ type (
 // run runs the given contract and takes care of running precompiles with a fallback to the byte code interpreter.
 func run(evm *EVM, contract *Contract, input []byte, readOnly bool) ([]byte, error) {
 	if contract.CodeAddr != nil {
-		if IsPrecompiledContractEnabled(evm.ChainConfig(), evm.BlockNumber, *contract.CodeAddr) {
-			return RunPrecompiledContract(AllPrecompiledContracts[*contract.CodeAddr], input, contract)
+		precomps := PrecompiledContractsForConfig(evm.ChainConfig(), evm.BlockNumber)
+		if p := precomps[*contract.CodeAddr]; p != nil {
+			return RunPrecompiledContract(p, input, contract)
 		}
 	}
 	for _, interpreter := range evm.interpreters {
@@ -193,7 +194,8 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		snapshot = evm.StateDB.Snapshot()
 	)
 	if !evm.StateDB.Exist(addr) {
-		if !IsPrecompiledContractEnabled(evm.ChainConfig(), evm.BlockNumber, addr) && evm.ChainConfig().IsEIP161F(evm.BlockNumber) && value.Sign() == 0 {
+		precomps := PrecompiledContractsForConfig(evm.ChainConfig(), evm.BlockNumber)
+		if precomps[addr] == nil && evm.ChainConfig().IsEIP161F(evm.BlockNumber) && value.Sign() == 0 {
 			// Calling a non existing account, don't do anything, but ping the tracer
 			if evm.vmConfig.Debug && evm.depth == 0 {
 				evm.vmConfig.Tracer.CaptureStart(caller.Address(), addr, false, input, gas, value)

@@ -339,7 +339,7 @@ var bn256PairingTests = []precompiledTest{
 }
 
 func testPrecompiled(addr string, test precompiledTest, t *testing.T) {
-	p := AllPrecompiledContracts[common.HexToAddress(addr)]
+	p := PrecompiledContractsForConfig(params.AllEthashProtocolChanges, big.NewInt(0))[common.HexToAddress(addr)]
 	in := common.Hex2Bytes(test.input)
 	contract := NewContract(AccountRef(common.HexToAddress("1337")),
 
@@ -410,7 +410,7 @@ func TestIsPrecompiledContractEnabled(t *testing.T) {
 	}
 
 	for i, c := range cases {
-		got := IsPrecompiledContractEnabled(c.config, c.blockNum, c.addr)
+		got := PrecompiledContractsForConfig(c.config, c.blockNum)[c.addr] != nil
 		if c.want != got {
 			t.Errorf("test: %d, address: %x, want: %v, got: %v", i, c.addr, c.want, got)
 		}
@@ -435,9 +435,9 @@ func TestIsPrecompiledContractEnabled(t *testing.T) {
 			}
 		}
 		expect := precomps[c.addr] == nil
-		got = !IsPrecompiledContractEnabled(c.config, c.blockNum, c.addr)
+		got = PrecompiledContractsForConfig(c.config, c.blockNum)[c.addr] == nil
 		if got != expect {
-			t.Errorf("addr: %x, bn: %v, want: %v, got: %v", c.addr, c.blockNum, c.want, got)
+			t.Errorf("addr: %x, bn: %v, want: %v, got: %v", c.addr, c.blockNum, c.want, expect)
 		}
 	}
 }
@@ -446,7 +446,7 @@ func benchmarkPrecompiled(addr string, test precompiledTest, bench *testing.B) {
 	if test.noBenchmark {
 		return
 	}
-	p := AllPrecompiledContracts[common.HexToAddress(addr)]
+	p := PrecompiledContractsForConfig(params.AllEthashProtocolChanges, big.NewInt(0))[common.HexToAddress(addr)]
 	in := common.Hex2Bytes(test.input)
 	reqGas := p.RequiredGas(in)
 	contract := NewContract(AccountRef(common.HexToAddress("1337")),

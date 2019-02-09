@@ -164,6 +164,9 @@ var (
 	KottiFlag = cli.BoolFlag{
 		Name:  "kotti",
 		Usage: "Kotti network: cross-client proof-of-authority test network",
+	GoerliFlag = cli.BoolFlag{
+		Name:  "goerli",
+		Usage: "Görli network: pre-configured proof-of-authority test network",
 	}
 	ConstantinopleOverrideFlag = cli.Uint64Flag{
 		Name:  "override.constantinople",
@@ -186,6 +189,10 @@ var (
 		Usage: "Document Root for HTTPClient file scheme",
 		Value: DirectoryString{homeDir()},
 	}
+	ExitWhenSyncedFlag = cli.BoolFlag{
+		Name:  "exitwhensynced",
+		Usage: "Exists syncing after block synchronisation",
+	}
 	ULCModeConfigFlag = cli.StringFlag{
 		Name:  "ulc.config",
 		Usage: "Config file to use for ultra light client mode",
@@ -202,7 +209,6 @@ var (
 		Name:  "ulc.trusted",
 		Usage: "List of trusted ULC servers",
 	}
-
 	defaultSyncMode = eth.DefaultConfig.SyncMode
 	SyncModeFlag    = TextMarshalerFlag{
 		Name:  "syncmode",
@@ -349,12 +355,12 @@ var (
 	}
 	CacheTrieFlag = cli.IntFlag{
 		Name:  "cache.trie",
-		Usage: "Percentage of cache memory allowance to use for trie caching",
+		Usage: "Percentage of cache memory allowance to use for trie caching (default = 25% full mode, 50% archive mode)",
 		Value: 25,
 	}
 	CacheGCFlag = cli.IntFlag{
 		Name:  "cache.gc",
-		Usage: "Percentage of cache memory allowance to use for trie pruning",
+		Usage: "Percentage of cache memory allowance to use for trie pruning (default = 25% full mode, 0% archive mode)",
 		Value: 25,
 	}
 	TrieCacheGenFlag = cli.IntFlag{
@@ -444,7 +450,11 @@ var (
 		Usage: "Password file to use for non-interactive password input",
 		Value: "",
 	}
-
+	ExternalSignerFlag = cli.StringFlag{
+		Name:  "signer",
+		Usage: "External signer (url or path to ipc file)",
+		Value: "",
+	}
 	VMEnableDebugFlag = cli.BoolFlag{
 		Name:  "vmdebug",
 		Usage: "Record information useful for VM and contract debugging",
@@ -730,6 +740,8 @@ func MakeDataDir(ctx *cli.Context) string {
 		}
 		if ctx.GlobalBool(KottiFlag.Name) {
 			return filepath.Join(path, "kotti")
+		if ctx.GlobalBool(GoerliFlag.Name) {
+			return filepath.Join(path, "goerli")
 		}
 		return path
 	}
@@ -797,6 +809,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.RinkebyBootnodes
 	case ctx.GlobalBool(KottiFlag.Name):
 		urls = params.KottiBootnodes
+	case ctx.GlobalBool(GoerliFlag.Name):
+		urls = params.GoerliBootnodes
 	case cfg.BootstrapNodes != nil:
 		return // already set, don't apply defaults.
 	}
@@ -828,6 +842,8 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.RinkebyBootnodes
 	case ctx.GlobalBool(KottiFlag.Name):
 		urls = params.KottiBootnodes
+	case ctx.GlobalBool(GoerliFlag.Name):
+		urls = params.GoerliBootnodes
 	case cfg.BootstrapNodesV5 != nil:
 		return // already set, don't apply defaults.
 	}
@@ -1032,11 +1048,15 @@ func setEtherbase(ctx *cli.Context, ks *keystore.KeyStore, cfg *eth.Config) {
 	}
 	// Convert the etherbase into an address and configure it
 	if etherbase != "" {
-		account, err := MakeAddress(ks, etherbase)
-		if err != nil {
-			Fatalf("Invalid miner etherbase: %v", err)
+		if ks != nil {
+			account, err := MakeAddress(ks, etherbase)
+			if err != nil {
+				Fatalf("Invalid miner etherbase: %v", err)
+			}
+			cfg.Etherbase = account.Address
+		} else {
+			Fatalf("No etherbase configured")
 		}
-		cfg.Etherbase = account.Address
 	}
 }
 
@@ -1135,6 +1155,10 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	setNodeUserIdent(ctx, cfg)
 	setDataDir(ctx, cfg)
 
+	if ctx.GlobalIsSet(ExternalSignerFlag.Name) {
+		cfg.ExternalSigner = ctx.GlobalString(ExternalSignerFlag.Name)
+	}
+
 	if ctx.GlobalIsSet(KeyStoreDirFlag.Name) {
 		cfg.KeyStoreDir = ctx.GlobalString(KeyStoreDirFlag.Name)
 	}
@@ -1168,6 +1192,8 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "rinkeby")
 	case ctx.GlobalBool(KottiFlag.Name):
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "kotti")
+	case ctx.GlobalBool(GoerliFlag.Name):
+		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "goerli")
 	}
 }
 
@@ -1324,7 +1350,7 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node, cfg *whisper.Config) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
-	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag, KottiFlag, EllaismFlag, ClassicFlag, SocialFlag, MixFlag, EthersocialFlag)
+	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag, KottiFlag, GoerliFlag, EllaismFlag, ClassicFlag, SocialFlag, MixFlag, EthersocialFlag)
 	checkExclusive(ctx, LightServFlag, SyncModeFlag, "light")
 
 	if ctx.GlobalIsSet(EllaismFlag.Name) {
@@ -1334,7 +1360,13 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		log.Warn("-------------------------------------------------------------------")
 	}
 
-	ks := stack.AccountManager().Backends(keystore.KeyStoreType)[0].(*keystore.KeyStore)
+	// Can't use both ephemeral unlocked and external signer
+	checkExclusive(ctx, DeveloperFlag, ExternalSignerFlag)
+	var ks *keystore.KeyStore
+	if keystores := stack.AccountManager().Backends(keystore.KeyStoreType); len(keystores) > 0 {
+		ks = keystores[0].(*keystore.KeyStore)
+	}
+
 	setEtherbase(ctx, ks, cfg)
 	setGPO(ctx, &cfg.GPO)
 	setTxPool(ctx, &cfg.TxPool)
@@ -1460,6 +1492,11 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 			cfg.NetworkId = 76
 		}
 		cfg.Genesis = core.DefaultMixGenesisBlock()
+	case ctx.GlobalBool(GoerliFlag.Name):
+		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
+			cfg.NetworkId = 5
+		}
+		cfg.Genesis = core.DefaultGoerliGenesisBlock()
 	case ctx.GlobalBool(DeveloperFlag.Name):
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 1337
@@ -1629,6 +1666,8 @@ func MakeGenesis(ctx *cli.Context) *core.Genesis {
 		genesis = core.DefaultRinkebyGenesisBlock()
 	case ctx.GlobalBool(KottiFlag.Name):
 		genesis = core.DefaultKottiGenesisBlock()
+	case ctx.GlobalBool(GoerliFlag.Name):
+		genesis = core.DefaultGoerliGenesisBlock()
 	case ctx.GlobalBool(DeveloperFlag.Name):
 		Fatalf("Developer chains are ephemeral")
 	}

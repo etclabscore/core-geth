@@ -485,13 +485,13 @@ func (self *Swarm) APIs() []rpc.API {
 		{
 			Namespace: "bzz",
 			Version:   "3.0",
-			Service:   api.NewControl(self.api, self.bzz.Hive),
+			Service:   api.NewInspector(self.api, self.bzz.Hive, self.netStore),
 			Public:    false,
 		},
 		{
 			Namespace: "chequebook",
 			Version:   chequebook.Version,
-			Service:   chequebook.NewApi(self.config.Swap.Chequebook),
+			Service:   chequebook.NewAPI(self.config.Swap.Chequebook),
 			Public:    false,
 		},
 		{

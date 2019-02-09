@@ -80,7 +80,9 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.EthersocialFlag,
 			utils.RinkebyFlag,
 			utils.KottiFlag,
+			utils.GoerliFlag,
 			utils.SyncModeFlag,
+			utils.ExitWhenSyncedFlag,
 			utils.GCModeFlag,
 			utils.EthStatsURLFlag,
 			utils.IdentityFlag,
@@ -149,6 +151,7 @@ var AppHelpFlagGroups = []flagGroup{
 		Flags: []cli.Flag{
 			utils.UnlockedAccountFlag,
 			utils.PasswordFileFlag,
+			utils.ExternalSignerFlag,
 		},
 	},
 	{

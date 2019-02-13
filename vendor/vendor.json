@@ -99,12 +99,12 @@
 			"revisionTime": "2018-01-22T22:25:45Z"
 		},
 		{
-			"checksumSHA1": "/iK7wCPmvourbGwqSeVFC93WS3Y=",
+			"checksumSHA1": "4hZMEZtEmYvoCgts6dCaA5zEIuc=",
 			"path": "github.com/ethereum/evmc/bindings/go/evmc",
-			"revision": "2c6ca3dfbcc79e30b2188628a3ff098b7e2f5f1b",
-			"revisionTime": "2019-01-16T09:38:54Z",
-			"version": "v6.0.2",
-			"versionExact": "v6.0.2"
+			"revision": "a3e35b5654952a3298024f618c8ffbc09ae3eed2",
+			"revisionTime": "2019-02-13T11:02:07Z",
+			"version": "v6.1.1",
+			"versionExact": "v6.1.1"
 		},
 		{
 			"checksumSHA1": "7oFpbmDfGobwKsFLIf6wMUvVoKw=",

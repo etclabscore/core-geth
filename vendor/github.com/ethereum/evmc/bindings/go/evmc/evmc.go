@@ -141,6 +141,8 @@ const (
 	SpuriousDragon   Revision = C.EVMC_SPURIOUS_DRAGON
 	Byzantium        Revision = C.EVMC_BYZANTIUM
 	Constantinople   Revision = C.EVMC_CONSTANTINOPLE
+	Constantinople2  Revision = C.EVMC_CONSTANTINOPLE2
+	Istanbul         Revision = C.EVMC_ISTANBUL
 )
 
 type Instance struct {

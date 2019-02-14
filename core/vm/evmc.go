@@ -126,8 +126,9 @@ func (host *HostContext) SetStorage(addr common.Address, key common.Hash, value 
 
 	env.StateDB.SetState(addr, key, value)
 
-	isConstantinople := env.ChainConfig().IsConstantinople(env.BlockNumber)
-	if !isConstantinople {
+	hasNetStorageCostEIP := env.ChainConfig().IsConstantinople(env.BlockNumber) &&
+		!env.ChainConfig().IsPetersburg(env.BlockNumber)
+	if !hasNetStorageCostEIP {
 
 		zero := common.Hash{}
 		status = evmc.StorageModified
@@ -296,6 +297,9 @@ func (host *HostContext) Call(kind evmc.CallKind,
 func getRevision(env *EVM) evmc.Revision {
 	n := env.BlockNumber
 	conf := env.ChainConfig()
+	if conf.IsPetersburg(n) {
+		return evmc.Constantinople2
+	}
 	if conf.IsConstantinople(n) {
 		return evmc.Constantinople
 	}

@@ -47,6 +47,7 @@ var EllaismBootnodes = []string{
 // ClassicBootnodes are the enode URLs of the P2P bootstrap nodes running on
 // the Ethereum Classic network.
 var ClassicBootnodes = []string{
+	"enode://158ac5a4817265d0d8b977660b3dbe9abee5694ed212f7091cbf784ddf47623ed015e1cb54594d10c1c46118747ddabe86ebf569cf24ae91f2daa0f1adaae390@159.203.56.33:30303", // @whilei
 }
 
 // SocialBootnodes are the enode URLs of the P2P bootstrap nodes running on

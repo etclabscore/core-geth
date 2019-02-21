@@ -490,7 +490,7 @@ func (i *Inbox) Cash() (txhash string, err error) {
 		i.log.Trace("Cashing in chequebook cheque", "amount", i.cheque.Amount, "beneficiary", i.beneficiary)
 		i.cashed = i.cheque.Amount
 	}
-	txhash, err := i.cheque.Cash(i.session)
+	txhash, err = i.cheque.Cash(i.session)
 	i.log.Trace("Cashing in chequebook cheque", "amount", i.cheque.Amount, "beneficiary", i.beneficiary)
 	i.cashed = i.cheque.Amount
 

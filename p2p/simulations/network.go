@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"math/rand"
 	"sync"
 	"time"
@@ -169,10 +168,10 @@ func (net *Network) Start(id enode.ID) error {
 // snapshots
 func (net *Network) startWithSnapshots(id enode.ID, snapshots map[string][]byte) error {
 	net.lock.Lock()
+	defer net.lock.Unlock()
 
 	node := net.getNode(id)
 	if node == nil {
-		net.lock.Unlock()
 		return fmt.Errorf("node %v does not exist", id)
 	}
 	if node.Up() {
@@ -180,7 +179,6 @@ func (net *Network) startWithSnapshots(id enode.ID, snapshots map[string][]byte)
 	}
 	log.Trace("Starting node", "id", id, "adapter", net.nodeAdapter.Name())
 	if err := node.Start(snapshots); err != nil {
-		net.lock.Unlock()
 		log.Warn("Node startup failed", "id", id, "err", err)
 		return err
 	}
@@ -597,12 +595,6 @@ func (net *Network) Shutdown() {
 		log.Debug("Stopping node", "id", node.ID())
 		if err := node.Stop(); err != nil {
 			log.Warn("Can't stop node", "id", node.ID(), "err", err)
-		}
-		// If the node has the close method, call it.
-		if closer, ok := node.Node.(io.Closer); ok {
-			if err := closer.Close(); err != nil {
-				log.Warn("Can't close node", "id", node.ID(), "err", err)
-			}
 		}
 	}
 	close(net.quitc)

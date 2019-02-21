@@ -133,6 +133,8 @@ func sendSimTerminatedEvent(sim *simulation.Simulation) {
 //It also sends some custom events so that the frontend
 //can visualize messages like SendOfferedMsg, WantedHashesMsg, DeliveryMsg
 func TestSnapshotSyncWithServer(t *testing.T) {
+	//t.Skip("temporarily disabled as simulations.WaitTillHealthy cannot be trusted")
+
 	//define a wrapper object to be able to pass around data
 	wrapper := &netWrapper{}
 

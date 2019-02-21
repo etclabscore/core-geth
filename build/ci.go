@@ -521,11 +521,7 @@ func doDebianSource(cmdline []string) {
 				build.MustRunCommand("debsign", changes)
 			}
 			if *upload != "" {
-<<<<<<< variant A
-				build.MustRunCommand("dput", "--passive", "--no-upload-log", *upload, changes)
->>>>>>> variant B
 				ppaUpload(*workdir, *upload, *sshUser, []string{source, dsc, changes})
-======= end
 			}
 		}
 	}

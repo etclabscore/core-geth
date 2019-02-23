@@ -51,7 +51,6 @@ func TestStart(t *testing.T) {
 		ID:             "0",
 		DefaultService: "bzz",
 	})
-	defer net.Shutdown()
 	leftNodeConf := adapters.RandomNodeConfig()
 	leftNodeConf.Services = []string{"bzz", "pss"}
 	leftNode, err := net.NewNodeWithConfig(leftNodeConf)
@@ -129,7 +128,7 @@ func TestStart(t *testing.T) {
 	defer rightSub.Unsubscribe()
 
 	updateC := make(chan []byte)
-	var updateMsg []byte
+	updateMsg := []byte{}
 	ctrlClient := NewController(psses[rightPub])
 	ctrlNotifier := NewController(psses[leftPub])
 	ctrlNotifier.NewNotifier("foo.eth", 2, updateC)
@@ -146,24 +145,17 @@ func TestStart(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	copyOfUpdateMsg := make([]byte, len(updateMsg))
-	copy(copyOfUpdateMsg, updateMsg)
-	ctrlClientError := make(chan error, 1)
 	ctrlClient.Subscribe(rsrcName, pubkey, addrbytes, func(s string, b []byte) error {
-		if s != "foo.eth" || !bytes.Equal(copyOfUpdateMsg, b) {
-			ctrlClientError <- fmt.Errorf("unexpected result in client handler: '%s':'%x'", s, b)
-		} else {
-			log.Info("client handler receive", "s", s, "b", b)
+		if s != "foo.eth" || !bytes.Equal(updateMsg, b) {
+			t.Fatalf("unexpected result in client handler: '%s':'%x'", s, b)
 		}
+		log.Info("client handler receive", "s", s, "b", b)
 		return nil
 	})
 
 	var inMsg *pss.APIMsg
 	select {
 	case inMsg = <-rmsgC:
-	case err := <-ctrlClientError:
-		t.Fatal(err)
 	case <-ctx.Done():
 		t.Fatal(ctx.Err())
 	}

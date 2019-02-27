@@ -152,12 +152,10 @@ func NewEVM(ctx Context, statedb StateDB, chainConfig *params.ChainConfig, vmCon
 	}
 
 	if vmConfig.EVMInterpreter != "" {
-		// Create custom EVM.
 		evm.interpreters = append(evm.interpreters, NewEVMC(vmConfig.EVMInterpreter, evm))
+	} else {
+		evm.interpreters = append(evm.interpreters, NewEVMInterpreter(evm, vmConfig))
 	}
-
-	// Keep the built-in EVM as the failover option.
-	evm.interpreters = append(evm.interpreters, NewEVMInterpreter(evm, vmConfig))
 
 	evm.interpreter = evm.interpreters[0]
 

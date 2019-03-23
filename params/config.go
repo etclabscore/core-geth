@@ -700,63 +700,49 @@ func (c *ChainConfig) ByzantiumEIPFBlocks() []*big.Int {
 	}
 }
 
-// IsByzantium returns whether num is either equal to the Byzantium fork block or greater,
-// or whether the configured params satisfy all requirements fulfilling the Byzantium fork.
-func (c *ChainConfig) IsByzantium(num *big.Int) bool {
-	return isForked(c.ByzantiumBlock, num) || func(n *big.Int) bool {
-		blocks := c.ByzantiumEIPFBlocks()
-		for i := range blocks {
-			if !isForked(blocks[i], n) {
-				return false
-			}
-		}
-		return true
-	}(num)
-}
-
 // IsEIP100F returns whether num is equal to or greater than the Byzantium or EIP100 block.
 func (c *ChainConfig) IsEIP100F(num *big.Int) bool {
-	return c.IsByzantium(num) || c.IsConstantinople(num) || isForked(c.EIP100FBlock, num)
+	return isForked(c.EIP100FBlock, num)
 }
 
 // IsEIP140F returns whether num is equal to or greater than the Byzantium or EIP140 block.
 func (c *ChainConfig) IsEIP140F(num *big.Int) bool {
-	return c.IsByzantium(num) || isForked(c.EIP140FBlock, num)
+	return isForked(c.EIP140FBlock, num)
 }
 
 // IsEIP198F returns whether num is equal to or greater than the Byzantium or EIP198 block.
 func (c *ChainConfig) IsEIP198F(num *big.Int) bool {
-	return c.IsByzantium(num) || isForked(c.EIP198FBlock, num)
+	return isForked(c.EIP198FBlock, num)
 }
 
 // IsEIP211F returns whether num is equal to or greater than the Byzantium or EIP211 block.
 func (c *ChainConfig) IsEIP211F(num *big.Int) bool {
-	return c.IsByzantium(num) || isForked(c.EIP211FBlock, num)
+	return isForked(c.EIP211FBlock, num)
 }
 
 // IsEIP212F returns whether num is equal to or greater than the Byzantium or EIP212 block.
 func (c *ChainConfig) IsEIP212F(num *big.Int) bool {
-	return c.IsByzantium(num) || isForked(c.EIP212FBlock, num)
+	return isForked(c.EIP212FBlock, num)
 }
 
 // IsEIP213F returns whether num is equal to or greater than the Byzantium or EIP213 block.
 func (c *ChainConfig) IsEIP213F(num *big.Int) bool {
-	return c.IsByzantium(num) || isForked(c.EIP213FBlock, num)
+	return isForked(c.EIP213FBlock, num)
 }
 
 // IsEIP214F returns whether num is equal to or greater than the Byzantium or EIP214 block.
 func (c *ChainConfig) IsEIP214F(num *big.Int) bool {
-	return c.IsByzantium(num) || isForked(c.EIP214FBlock, num)
+	return isForked(c.EIP214FBlock, num)
 }
 
 // IsEIP649F returns whether num is equal to or greater than the Byzantium or EIP649 block.
 func (c *ChainConfig) IsEIP649F(num *big.Int) bool {
-	return c.IsByzantium(num) || isForked(c.EIP649FBlock, num)
+	return isForked(c.EIP649FBlock, num)
 }
 
 // IsEIP658F returns whether num is equal to or greater than the Byzantium or EIP658 block.
 func (c *ChainConfig) IsEIP658F(num *big.Int) bool {
-	return c.IsByzantium(num) || isForked(c.EIP658FBlock, num)
+	return isForked(c.EIP658FBlock, num)
 }
 
 // ConstantinopleEIPFBlocks returns the canonical blocks configured for the Constantinople Fork.
@@ -1012,15 +998,15 @@ func (err *ConfigCompatError) Error() string {
 // Rules is a one time interface meaning that it shouldn't be used in between transition
 // phases.
 type Rules struct {
-	ChainID                                                                                                        *big.Int
-	IsHomestead, IsEIP2F, IsEIP7F                                                                                  bool
-	IsEIP150                                                                                                       bool
-	IsEIP155                                                                                                       bool
-	IsEIP158HF, IsEIP160F, IsEIP161F, IsEIP170F                                                                    bool
-	IsByzantium, IsEIP100F, IsEIP140F, IsEIP198F, IsEIP211F, IsEIP212F, IsEIP213F, IsEIP214F, IsEIP649F, IsEIP658F bool
-	IsConstantinople, IsEIP145F, IsEIP1014F, IsEIP1052F, IsEIP1283F, IsEIP1234F                                    bool
-	IsPetersburg                                                                                                   bool
-	IsBombDisposal, IsSocial, IsEthersocial, IsECIP1010                                                            bool
+	ChainID                                                                                           *big.Int
+	IsHomestead, IsEIP2F, IsEIP7F                                                                     bool
+	IsEIP150                                                                                          bool
+	IsEIP155                                                                                          bool
+	IsEIP158HF, IsEIP160F, IsEIP161F, IsEIP170F                                                       bool
+	IsEIP100F, IsEIP140F, IsEIP198F, IsEIP211F, IsEIP212F, IsEIP213F, IsEIP214F, IsEIP649F, IsEIP658F bool
+	IsConstantinople, IsEIP145F, IsEIP1014F, IsEIP1052F, IsEIP1283F, IsEIP1234F                       bool
+	IsPetersburg                                                                                      bool
+	IsBombDisposal, IsSocial, IsEthersocial, IsECIP1010                                               bool
 }
 
 // Rules ensures c's ChainID is not nil.
@@ -1036,22 +1022,21 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 		IsEIP2F:     c.IsEIP2F(num),
 		IsEIP7F:     c.IsEIP7F(num),
 
-		IsEIP150:   c.IsEIP150(num),
-		IsEIP155:   c.IsEIP155(num),
-		IsEIP160F:  c.IsEIP160F(num),
-		IsEIP161F:  c.IsEIP161F(num),
-		IsEIP170F:  c.IsEIP170F(num),
+		IsEIP150:  c.IsEIP150(num),
+		IsEIP155:  c.IsEIP155(num),
+		IsEIP160F: c.IsEIP160F(num),
+		IsEIP161F: c.IsEIP161F(num),
+		IsEIP170F: c.IsEIP170F(num),
 
-		IsByzantium: c.IsByzantium(num),
-		IsEIP100F:   c.IsEIP100F(num),
-		IsEIP140F:   c.IsEIP140F(num),
-		IsEIP198F:   c.IsEIP198F(num),
-		IsEIP211F:   c.IsEIP211F(num),
-		IsEIP212F:   c.IsEIP212F(num),
-		IsEIP213F:   c.IsEIP213F(num),
-		IsEIP214F:   c.IsEIP214F(num),
-		IsEIP649F:   c.IsEIP649F(num),
-		IsEIP658F:   c.IsEIP658F(num),
+		IsEIP100F: c.IsEIP100F(num),
+		IsEIP140F: c.IsEIP140F(num),
+		IsEIP198F: c.IsEIP198F(num),
+		IsEIP211F: c.IsEIP211F(num),
+		IsEIP212F: c.IsEIP212F(num),
+		IsEIP213F: c.IsEIP213F(num),
+		IsEIP214F: c.IsEIP214F(num),
+		IsEIP649F: c.IsEIP649F(num),
+		IsEIP658F: c.IsEIP658F(num),
 
 		IsConstantinople: c.IsConstantinople(num),
 		IsEIP145F:        c.IsEIP145F(num),

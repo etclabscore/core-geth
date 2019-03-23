@@ -655,16 +655,6 @@ func (c *ChainConfig) IsEIP155(num *big.Int) bool {
 	return isForked(c.EIP155Block, num)
 }
 
-// EIP158HFFBlocks returns the canonical EIP blocks configured for the implemented EIP158HF fork,
-// a subset of features introduced at the Spurious Dragon fork.
-func (c *ChainConfig) EIP158HFFBlocks() []*big.Int {
-	return []*big.Int{
-		c.EIP160FBlock,
-		c.EIP161FBlock,
-		c.EIP170FBlock,
-	}
-}
-
 // IsEIP160F returns whether num is either equal to or greater than the "EIP158HF" Block or EIP160 block.
 func (c *ChainConfig) IsEIP160F(num *big.Int) bool {
 	return isForked(c.EIP158Block, num) || isForked(c.EIP160FBlock, num)
@@ -678,21 +668,6 @@ func (c *ChainConfig) IsEIP161F(num *big.Int) bool {
 // IsEIP170F returns whether num is either equal to or greater than the "EIP158HF" Block or EIP170 block.
 func (c *ChainConfig) IsEIP170F(num *big.Int) bool {
 	return isForked(c.EIP158Block, num) || isForked(c.EIP170FBlock, num)
-}
-
-//ByzantiumEIPFBlocks returns the canonical EIP blocks configured for the Byzantium Fork.
-func (c *ChainConfig) ByzantiumEIPFBlocks() []*big.Int {
-	return []*big.Int{
-		c.EIP100FBlock,
-		c.EIP140FBlock,
-		c.EIP198FBlock,
-		c.EIP211FBlock,
-		c.EIP212FBlock,
-		c.EIP213FBlock,
-		c.EIP214FBlock,
-		c.EIP649FBlock,
-		c.EIP658FBlock,
-	}
 }
 
 // IsEIP100F returns whether num is equal to or greater than the Byzantium or EIP100 block.
@@ -738,17 +713,6 @@ func (c *ChainConfig) IsEIP649F(num *big.Int) bool {
 // IsEIP658F returns whether num is equal to or greater than the Byzantium or EIP658 block.
 func (c *ChainConfig) IsEIP658F(num *big.Int) bool {
 	return isForked(c.ByzantiumBlock, num) || isForked(c.EIP658FBlock, num)
-}
-
-// ConstantinopleEIPFBlocks returns the canonical blocks configured for the Constantinople Fork.
-func (c *ChainConfig) ConstantinopleEIPFBlocks() []*big.Int {
-	return []*big.Int{
-		c.EIP145FBlock,
-		c.EIP1014FBlock,
-		c.EIP1052FBlock,
-		c.EIP1234FBlock,
-		c.EIP1283FBlock,
-	}
 }
 
 // IsEIP145F returns whether num is equal to or greater than the Constantinople or EIP145 block.

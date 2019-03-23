@@ -670,33 +670,19 @@ func (c *ChainConfig) EIP158HFFBlocks() []*big.Int {
 	}
 }
 
-// IsEIP158HF returns whether num is either equal to the "EIP158 Hardfork"
-// (an implemented-in-code subset of the Spurious Dragon hard-fork) block or greater.
-func (c *ChainConfig) IsEIP158HF(num *big.Int) bool {
-	return isForked(c.EIP158Block, num) || func(n *big.Int) bool {
-		blocks := c.EIP158HFFBlocks()
-		for i := range blocks {
-			if !isForked(blocks[i], n) {
-				return false
-			}
-		}
-		return true
-	}(num)
-}
-
 // IsEIP160F returns whether num is either equal to or greater than the "EIP158HF" Block or EIP160 block.
 func (c *ChainConfig) IsEIP160F(num *big.Int) bool {
-	return c.IsEIP158HF(num) || isForked(c.EIP160FBlock, num)
+	return isForked(c.EIP160FBlock, num)
 }
 
 // IsEIP161F returns whether num is either equal to or greater than the "EIP158HF" Block or EIP161 block.
 func (c *ChainConfig) IsEIP161F(num *big.Int) bool {
-	return c.IsEIP158HF(num) || isForked(c.EIP161FBlock, num)
+	return isForked(c.EIP161FBlock, num)
 }
 
 // IsEIP170F returns whether num is either equal to or greater than the "EIP158HF" Block or EIP170 block.
 func (c *ChainConfig) IsEIP170F(num *big.Int) bool {
-	return c.IsEIP158HF(num) || isForked(c.EIP170FBlock, num)
+	return isForked(c.EIP170FBlock, num)
 }
 
 //ByzantiumEIPFBlocks returns the canonical EIP blocks configured for the Byzantium Fork.
@@ -1052,7 +1038,6 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 
 		IsEIP150:   c.IsEIP150(num),
 		IsEIP155:   c.IsEIP155(num),
-		IsEIP158HF: c.IsEIP158HF(num),
 		IsEIP160F:  c.IsEIP160F(num),
 		IsEIP161F:  c.IsEIP161F(num),
 		IsEIP170F:  c.IsEIP170F(num),

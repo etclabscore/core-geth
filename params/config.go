@@ -637,7 +637,7 @@ func (c *ChainConfig) IsEIP2F(num *big.Int) bool {
 
 // IsEIP7F returns whether num is equal to or greater than the Homestead or EIP7 block.
 func (c *ChainConfig) IsEIP7F(num *big.Int) bool {
-	return isForked(c.HomesteadBlock, num)|| isForked(c.EIP7FBlock, num)
+	return isForked(c.HomesteadBlock, num) || isForked(c.EIP7FBlock, num)
 }
 
 // IsDAOFork returns whether num is either equal to the DAO fork block or greater.
@@ -672,22 +672,22 @@ func (c *ChainConfig) IsEIP170F(num *big.Int) bool {
 
 // IsEIP100F returns whether num is equal to or greater than the Byzantium or EIP100 block.
 func (c *ChainConfig) IsEIP100F(num *big.Int) bool {
-	return isForked(c.ByzantiumBlock, num) || isForked(c.EIP100FBlock, num)
+	return isForked(c.ByzantiumBlock, num) || isForked(c.ConstantinopleBlock, num) || isForked(c.EIP100FBlock, num)
 }
 
 // IsEIP140F returns whether num is equal to or greater than the Byzantium or EIP140 block.
 func (c *ChainConfig) IsEIP140F(num *big.Int) bool {
-	return isForked(c.ByzantiumBlock, num) ||isForked(c.EIP140FBlock, num)
+	return isForked(c.ByzantiumBlock, num) || isForked(c.EIP140FBlock, num)
 }
 
 // IsEIP198F returns whether num is equal to or greater than the Byzantium or EIP198 block.
 func (c *ChainConfig) IsEIP198F(num *big.Int) bool {
-	return isForked(c.ByzantiumBlock, num) ||isForked(c.EIP198FBlock, num)
+	return isForked(c.ByzantiumBlock, num) || isForked(c.EIP198FBlock, num)
 }
 
 // IsEIP211F returns whether num is equal to or greater than the Byzantium or EIP211 block.
 func (c *ChainConfig) IsEIP211F(num *big.Int) bool {
-	return isForked(c.ByzantiumBlock, num) ||isForked(c.EIP211FBlock, num)
+	return isForked(c.ByzantiumBlock, num) || isForked(c.EIP211FBlock, num)
 }
 
 // IsEIP212F returns whether num is equal to or greater than the Byzantium or EIP212 block.
@@ -722,7 +722,7 @@ func (c *ChainConfig) IsEIP145F(num *big.Int) bool {
 
 // IsEIP1014F returns whether num is equal to or greater than the Constantinople or EIP1014 block.
 func (c *ChainConfig) IsEIP1014F(num *big.Int) bool {
-	return isForked(c.ConstantinopleBlock, num) ||  isForked(c.EIP1014FBlock, num)
+	return isForked(c.ConstantinopleBlock, num) || isForked(c.EIP1014FBlock, num)
 }
 
 // IsEIP1052F returns whether num is equal to or greater than the Constantinople or EIP1052 block.
@@ -939,18 +939,18 @@ func (err *ConfigCompatError) Error() string {
 // Rules is a one time interface meaning that it shouldn't be used in between transition
 // phases.
 type Rules struct {
-	ChainID                                                                                           *big.Int
-	IsHomestead, IsEIP2F, IsEIP7F                                                                     bool
-	IsEIP150                                                                                          bool
-	IsEIP155                                                                                          bool
+	ChainID                       *big.Int
+	IsHomestead, IsEIP2F, IsEIP7F bool
+	IsEIP150                      bool
+	IsEIP155                      bool
 	// EIP158HF - Tangerine Whistle
-	IsEIP160F, IsEIP161F, IsEIP170F                                                       bool
+	IsEIP160F, IsEIP161F, IsEIP170F bool
 	// Byzantium
 	IsEIP100F, IsEIP140F, IsEIP198F, IsEIP211F, IsEIP212F, IsEIP213F, IsEIP214F, IsEIP649F, IsEIP658F bool
 	// Constantinople
-	IsEIP145F, IsEIP1014F, IsEIP1052F, IsEIP1283F, IsEIP1234F                       bool
-	IsPetersburg                                                                                      bool
-	IsBombDisposal, IsSocial, IsEthersocial, IsECIP1010                                               bool
+	IsEIP145F, IsEIP1014F, IsEIP1052F, IsEIP1283F, IsEIP1234F bool
+	IsPetersburg                                              bool
+	IsBombDisposal, IsSocial, IsEthersocial, IsECIP1010       bool
 }
 
 // Rules ensures c's ChainID is not nil.
@@ -961,9 +961,9 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 	}
 	return Rules{
 		ChainID: new(big.Int).Set(chainID),
-		
-		IsEIP2F:     c.IsEIP2F(num),
-		IsEIP7F:     c.IsEIP7F(num),
+
+		IsEIP2F: c.IsEIP2F(num),
+		IsEIP7F: c.IsEIP7F(num),
 
 		IsEIP150:  c.IsEIP150(num),
 		IsEIP155:  c.IsEIP155(num),
@@ -981,11 +981,11 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 		IsEIP649F: c.IsEIP649F(num),
 		IsEIP658F: c.IsEIP658F(num),
 
-		IsEIP145F:        c.IsEIP145F(num),
-		IsEIP1014F:       c.IsEIP1014F(num),
-		IsEIP1052F:       c.IsEIP1052F(num),
-		IsEIP1234F:       c.IsEIP1234F(num),
-		IsEIP1283F:       c.IsEIP1283F(num),
+		IsEIP145F:  c.IsEIP145F(num),
+		IsEIP1014F: c.IsEIP1014F(num),
+		IsEIP1052F: c.IsEIP1052F(num),
+		IsEIP1234F: c.IsEIP1234F(num),
+		IsEIP1283F: c.IsEIP1283F(num),
 
 		IsPetersburg: c.IsPetersburg(num),
 

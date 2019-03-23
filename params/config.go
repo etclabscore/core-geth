@@ -27,7 +27,6 @@ import (
 var (
 	MainnetGenesisHash     = common.HexToHash("0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3")
 	TestnetGenesisHash     = common.HexToHash("0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d")
-	EllaismGenesisHash     = common.HexToHash("0x4d7df65052bb21264d6ad2d6fe2d5578a36be12f71bf8d0559b0c15c4dc539b5")
 	SocialGenesisHash      = common.HexToHash("0xba8314d5c2ebddaf58eb882b364b27cbfa4d3402dacd32b60986754ac25cfe8d")
 	MixGenesisHash         = common.HexToHash("0x4fa57903dad05875ddf78030c16b5da886f7d81714cf66946a4c02566dbb2af5")
 	EthersocialGenesisHash = common.HexToHash("0x310dd3c4ae84dd89f1b46cfdd5e26c8f904dfddddc73f323b468127272e20e9f")
@@ -55,27 +54,7 @@ var (
 		Ethash:              new(EthashConfig),
 	}
 
-	// EllaismChainConfig is the chain parameters to run a node on the Ellaism main network.
-	EllaismChainConfig = &ChainConfig{
-		ChainID:             big.NewInt(64),
-		HomesteadBlock:      big.NewInt(0),
-		DAOForkBlock:        nil,
-		DAOForkSupport:      true,
-		EIP150Block:         big.NewInt(0),
-		EIP150Hash:          common.HexToHash("0x4d7df65052bb21264d6ad2d6fe2d5578a36be12f71bf8d0559b0c15c4dc539b5"),
-		EIP155Block:         big.NewInt(0),
-		EIP158Block:         nil,
-		ByzantiumBlock:      nil,
-		DisposalBlock:       big.NewInt(0),
-		SocialBlock:         nil,
-		EthersocialBlock:    nil,
-		ConstantinopleBlock: nil,
-		ECIP1017EraRounds:   big.NewInt(10000000),
-		EIP160FBlock:        big.NewInt(0),
-		Ethash:              new(EthashConfig),
-	}
-
-	// ClassicChainConfig is the chain parameters to run a node on the Ellaism main network.
+	// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
 	ClassicChainConfig = &ChainConfig{
 		ChainID:             big.NewInt(61),
 		HomesteadBlock:      big.NewInt(1150000),
@@ -221,7 +200,7 @@ var (
 		BloomRoot:    common.HexToHash("0xcf74ca2c14e843b366561dab4fc64237bf6bb335119cbc97d723f3b501863470"),
 	}
 
-	// KottiChainConfig is the chain parameters to run a node on the Ellaism main network.
+	// KottiChainConfig is the chain parameters to run a node on the Kotti main network.
 	KottiChainConfig = &ChainConfig{
 		ChainID:             big.NewInt(6),
 		HomesteadBlock:      big.NewInt(0),

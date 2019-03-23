@@ -630,19 +630,14 @@ func (c *ChainConfig) HasECIP1017() bool {
 	}
 }
 
-// IsHomestead returns whether num is either equal to the homestead block or greater.
-func (c *ChainConfig) IsHomestead(num *big.Int) bool {
-	return isForked(c.HomesteadBlock, num)
-}
-
 // IsEIP2F returns whether num is equal to or greater than the Homestead or EIP2 block.
 func (c *ChainConfig) IsEIP2F(num *big.Int) bool {
-	return c.IsHomestead(num) || isForked(c.EIP2FBlock, num)
+	return isForked(c.HomesteadBlock, num) || isForked(c.EIP2FBlock, num)
 }
 
 // IsEIP7F returns whether num is equal to or greater than the Homestead or EIP7 block.
 func (c *ChainConfig) IsEIP7F(num *big.Int) bool {
-	return c.IsHomestead(num) || isForked(c.EIP7FBlock, num)
+	return isForked(c.HomesteadBlock, num)|| isForked(c.EIP7FBlock, num)
 }
 
 // IsDAOFork returns whether num is either equal to the DAO fork block or greater.
@@ -1002,8 +997,7 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 	}
 	return Rules{
 		ChainID: new(big.Int).Set(chainID),
-
-		IsHomestead: c.IsHomestead(num),
+		
 		IsEIP2F:     c.IsEIP2F(num),
 		IsEIP7F:     c.IsEIP7F(num),
 

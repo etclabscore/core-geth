@@ -790,8 +790,6 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		}
 	case ctx.GlobalBool(TestnetFlag.Name):
 		urls = params.TestnetBootnodes
-	case ctx.GlobalBool(EllaismFlag.Name):
-		urls = params.EllaismBootnodes
 	case ctx.GlobalBool(ClassicFlag.Name):
 		urls = params.ClassicBootnodes
 	case ctx.GlobalBool(SocialFlag.Name):

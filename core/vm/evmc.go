@@ -194,18 +194,15 @@ func (host *hostContext) Selfdestruct(addr common.Address, beneficiary common.Ad
 	db.Suicide(addr)
 }
 
-func (host *hostContext) GetTxContext() (gasPrice common.Hash, origin common.Address, coinbase common.Address,
-	number int64, timestamp int64, gasLimit int64, difficulty common.Hash) {
-
-	gasPrice = common.BigToHash(host.env.GasPrice)
-	origin = host.env.Origin
-	coinbase = host.env.Coinbase
-	number = host.env.BlockNumber.Int64()
-	timestamp = host.env.Time.Int64()
-	gasLimit = int64(host.env.GasLimit)
-	difficulty = common.BigToHash(host.env.Difficulty)
-
-	return gasPrice, origin, coinbase, number, timestamp, gasLimit, difficulty
+func (host *hostContext) GetTxContext() evmc.TxContext {
+	return evmc.TxContext{
+		GasPrice:   common.BigToHash(host.env.GasPrice),
+		Origin:     host.env.Origin,
+		Coinbase:   host.env.Coinbase,
+		Number:     host.env.BlockNumber.Int64(),
+		Timestamp:  host.env.Time.Int64(),
+		GasLimit:   int64(host.env.GasLimit),
+		Difficulty: common.BigToHash(host.env.Difficulty)}
 }
 
 func (host *hostContext) GetBlockHash(number int64) common.Hash {
@@ -286,7 +283,7 @@ func getRevision(env *EVM) evmc.Revision {
 	conf := env.ChainConfig()
 	switch {
 	case conf.IsPetersburg(n):
-		return evmc.Constantinople2
+		return evmc.Petersburg
 	case conf.IsConstantinople(n):
 		return evmc.Constantinople
 	case conf.IsByzantium(n):

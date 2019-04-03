@@ -284,25 +284,22 @@ func (host *hostContext) Call(kind evmc.CallKind,
 func getRevision(env *EVM) evmc.Revision {
 	n := env.BlockNumber
 	conf := env.ChainConfig()
-	if conf.IsPetersburg(n) {
+	switch {
+	case conf.IsPetersburg(n):
 		return evmc.Constantinople2
-	}
-	if conf.IsConstantinople(n) {
+	case conf.IsConstantinople(n):
 		return evmc.Constantinople
-	}
-	if conf.IsByzantium(n) {
+	case conf.IsByzantium(n):
 		return evmc.Byzantium
-	}
-	if conf.IsEIP158(n) {
+	case conf.IsEIP158(n):
 		return evmc.SpuriousDragon
-	}
-	if conf.IsEIP150(n) {
+	case conf.IsEIP150(n):
 		return evmc.TangerineWhistle
-	}
-	if conf.IsHomestead(n) {
+	case conf.IsHomestead(n):
 		return evmc.Homestead
+	default:
+		return evmc.Frontier
 	}
-	return evmc.Frontier
 }
 
 // Run implements Interpreter.Run().

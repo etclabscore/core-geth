@@ -1,6 +1,6 @@
 /* EVMC: Ethereum Client-VM Connector API.
- * Copyright 2018 The EVMC Authors.
- * Licensed under the Apache License, Version 2.0. See the LICENSE file.
+ * Copyright 2019 The EVMC Authors.
+ * Licensed under the Apache License, Version 2.0.
  */
 
 /**
@@ -86,6 +86,15 @@ enum evmc_loader_error_code
  * @return            The pointer to the EVM create function or NULL.
  */
 evmc_create_fn evmc_load(const char* filename, enum evmc_loader_error_code* error_code);
+
+/**
+ * Exposes additional information about ::EVMC_LOADER_CANNOT_OPEN error.
+ *
+ * This function is not thread-safe and not supported on all operating systems.
+ *
+ * @return Error message or NULL if no additional information is available.
+ */
+const char* evmc_cannot_open_error();
 
 /**
  * Dynamically loads the VM DLL and creates the VM instance.

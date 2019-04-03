@@ -1,6 +1,6 @@
 // EVMC: Ethereum Client-VM Connector API.
-// Copyright 2018 The EVMC Authors.
-// Licensed under the Apache License, Version 2.0. See the LICENSE file.
+// Copyright 2019 The EVMC Authors.
+// Licensed under the Apache License, Version 2.0.
 
 package evmc
 
@@ -141,7 +141,7 @@ const (
 	SpuriousDragon   Revision = C.EVMC_SPURIOUS_DRAGON
 	Byzantium        Revision = C.EVMC_BYZANTIUM
 	Constantinople   Revision = C.EVMC_CONSTANTINOPLE
-	Constantinople2  Revision = C.EVMC_CONSTANTINOPLE2
+	Petersburg       Revision = C.EVMC_PETERSBURG
 	Istanbul         Revision = C.EVMC_ISTANBUL
 )
 
@@ -158,7 +158,13 @@ func Load(filename string) (instance *Instance, err error) {
 	case C.EVMC_LOADER_SUCCESS:
 		instance = &Instance{handle}
 	case C.EVMC_LOADER_CANNOT_OPEN:
-		err = fmt.Errorf("evmc loader: cannot open %s", filename)
+		optionalErrMsg := C.evmc_cannot_open_error()
+		if optionalErrMsg != nil {
+			msg := C.GoString(optionalErrMsg)
+			err = fmt.Errorf("evmc loader: %s", msg)
+		} else {
+			err = fmt.Errorf("evmc loader: cannot open %s", filename)
+		}
 	case C.EVMC_LOADER_SYMBOL_NOT_FOUND:
 		err = fmt.Errorf("evmc loader: the EVMC create function not found in %s", filename)
 	case C.EVMC_LOADER_INVALID_ARGUMENT:

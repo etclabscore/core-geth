@@ -422,7 +422,7 @@ func TestIsPrecompiledContractEnabled(t *testing.T) {
 			common.BytesToAddress([]byte{3}): &ripemd160hash{},
 			common.BytesToAddress([]byte{4}): &dataCopy{},
 		}
-		if c.config.IsByzantium(c.blockNum) {
+		if c.config.IsEIP198F(c.blockNum) && c.config.IsEIP212F(c.blockNum) && c.config.IsEIP213F(c.blockNum) {
 			precomps = map[common.Address]PrecompiledContract{
 				common.BytesToAddress([]byte{1}): &ecrecover{},
 				common.BytesToAddress([]byte{2}): &sha256hash{},

@@ -4,12 +4,12 @@
 
 [![API Reference](
 https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/68747470733a2f2f676f646f632e6f72672f6769746875622e636f6d2f676f6c616e672f6764646f3f7374617475732e737667
-)](https://godoc.org/github.com/ethoxy/multi-geth)
-[![Go Report Card](https://goreportcard.com/badge/github.com/ethoxy/multi-geth)](https://goreportcard.com/report/github.com/ethoxy/multi-geth)
-[![Travis](https://travis-ci.org/ethoxy/multi-geth.svg?branch=master)](https://travis-ci.org/ethoxy/multi-geth)
+)](https://godoc.org/github.com/multi-geth/multi-geth)
+[![Go Report Card](https://goreportcard.com/badge/github.com/multi-geth/multi-geth)](https://goreportcard.com/report/github.com/multi-geth/multi-geth)
+[![Travis](https://travis-ci.org/multi-geth/multi-geth.svg?branch=master)](https://travis-ci.org/multi-geth/multi-geth)
 [![Join the chat at https://gitter.im/ethoxy/multi-geth](https://badges.gitter.im/ethoxy/multi-geth.svg)](https://gitter.im/ethoxy/multi-geth)
 
-Binary archives are published at https://github.com/ethoxy/multi-geth/releases.
+Binary archives are published at https://github.com/multi-geth/multi-geth/releases.
 
 Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) is merged to this repository regularly,
  usually at every upstream tagged release. Every effort is made to maintain seamless compatibility with upstream source, including congruent RPC, JS, and CLI
@@ -20,7 +20,7 @@ Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-
 
 Networks supported by the respective go-ethereum packaged `geth` client.
 
-| Ticker | Network/Client                        | ethoxy/multi-geth                                | [ethereumclassic/go-ethereum](https://github.com/ethereumclassic/go-ethereum) | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
+| Ticker | Network/Client                        | multi-geth                                | [ethereumclassic/go-ethereum](https://github.com/ethereumclassic/go-ethereum) | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
 | ---    | ---                                   | ---                                              | ---                                                                           | ---                                                             |
 | ETH    | Ethereum (Foundation)                 | :heavy_check_mark:                               |                                                                               | :heavy_check_mark:                                              |
 | ETC    | Ethereum Classic                      | :heavy_check_mark:                               | :heavy_check_mark:                                                            |                                                                 |
@@ -53,21 +53,21 @@ Since this is a downstream fork of [ethereum/go-ethereum](https://github.com/eth
 This repository should occupy `$GOPATH/src/github.com/ethereum/go-ethereum`, and you can optionally use `git` to set this fork as a default upstream remote.
 On Linux or Mac, this can be accomplished by the following or similar.
 
-For __a fresh install__, the below. This will set [ethoxy/multi-geth](https://github.com/ethoxy/multi-geth) as as the `git` remote `origin` by default.
+For __a fresh install__, the below. This will set [multi-geth/multi-geth](https://github.com/multi-geth/multi-geth) as as the `git` remote `origin` by default.
 
 ```sh
 $ env path=$GOPATH/src/github.com/ethereum mkdir -p $path && cd $path
-$ git clone https://github.com/ethoxy/multi-geth.git go-ethereum && cd go-ethereum
+$ git clone https://github.com/multi-geth/multi-geth.git go-ethereum && cd go-ethereum
 ```
 
-Or, with __an existing copy of the ethereum/go-ethereum source__, the below. This will set [ethoxy/multi-geth](https://github.com/ethoxy/multi-geth) as the `git` remote `ethoxy`,
+Or, with __an existing copy of the ethereum/go-ethereum source__, the below. This will set [multi-geth/multi-geth](https://github.com/multi-geth/multi-geth) as the `git` remote `multi-geth`,
 and set the local branch `master` to track this repository's `master` branch.
 
 ```sh
 $ cd $GOPATH/src/github.com/ethereum/go-ethereum
-$ git remote add ethoxy https://github.com/ethoxy/multi-geth.git
-$ git fetch ethoxy
-$ git checkout -B master -t ethoxy/master
+$ git remote add multi-geth https://github.com/multi-geth/multi-geth.git
+$ git fetch multi-geth
+$ git checkout -B master -t multi-geth/master
 ```
 
 :information_source: Note that these instructions assume a traditional use of `GOPATH`-based Go project organization. Because of the way the `make` command works for this project (using a "GOPATH/work dir" pattern for building)

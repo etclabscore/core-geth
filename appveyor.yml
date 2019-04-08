@@ -46,7 +46,7 @@ deploy:
   provider: GitHub
   artifact: /multi-geth.*-win64\.zip.*/
   auth_token:
-    secure: 6NcsMzxggkLUTrKSB/oJQKMDORkvDIfa39CMSlF0+J4CaPScg3patFk755g+tHfA
+    secure: wzxjgHcWpMV6mDSyYkFrAV9brOyfeVvrgZhxTCFQDaA+AVIMGZazMdudcx4mLL7T
   draft: true
   on:
     appveyor_repo_tag: true

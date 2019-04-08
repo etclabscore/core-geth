@@ -730,7 +730,7 @@ func (c *ChainConfig) IsByzantium(num *big.Int) bool {
 
 // IsEIP100F returns whether num is equal to or greater than the Byzantium or EIP100 block.
 func (c *ChainConfig) IsEIP100F(num *big.Int) bool {
-	return c.IsByzantium(num) || isForked(c.EIP100FBlock, num)
+	return c.IsByzantium(num) || c.IsConstantinople(num) || isForked(c.EIP100FBlock, num)
 }
 
 // IsEIP140F returns whether num is equal to or greater than the Byzantium or EIP140 block.

@@ -21,7 +21,6 @@ import (
 	"encoding/binary"
 	"io"
 	"math/big"
-	"reflect"
 	"sort"
 	"sync/atomic"
 	"time"
@@ -102,8 +101,6 @@ type headerMarshaling struct {
 func (h *Header) Hash() common.Hash {
 	return rlpHash(h)
 }
-
-var headerSize = common.StorageSize(reflect.TypeOf(Header{}).Size())
 
 // Size returns the approximate memory used by all internal contents. It is used
 // to approximate and limit the memory consumption of various caches.

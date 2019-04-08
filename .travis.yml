@@ -5,7 +5,7 @@ matrix:
   include:
     # These are the latest Go versions.
     - os: linux
-      dist: trusty
+      dist: xenial
       sudo: required
       go: 1.11.x
       script:
@@ -59,7 +59,7 @@ matrix:
 
     # This builder only tests code linters on latest version of Go
     - os: linux
-      dist: trusty
+      dist: xenial
       go: 1.11.x
       env:
         - lint

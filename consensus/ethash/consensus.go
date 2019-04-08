@@ -56,7 +56,6 @@ var (
 // codebase, inherently breaking if the engine is swapped out. Please put common
 // error types into the consensus package.
 var (
-	errLargeBlockTime    = errors.New("timestamp too big")
 	errZeroBlockTime     = errors.New("timestamp equals parent's")
 	errTooManyUncles     = errors.New("too many uncles")
 	errDuplicateUncle    = errors.New("duplicate uncle")
@@ -235,20 +234,16 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainReader, header, parent *
 		return fmt.Errorf("extra-data too long: %d > %d", len(header.Extra), params.MaximumExtraDataSize)
 	}
 	// Verify the header's timestamp
-	if uncle {
-		if header.Time.Cmp(math.MaxBig256) > 0 {
-			return errLargeBlockTime
-		}
-	} else {
-		if header.Time.Cmp(big.NewInt(time.Now().Add(allowedFutureBlockTime).Unix())) > 0 {
+	if !uncle {
+		if header.Time > uint64(time.Now().Add(allowedFutureBlockTime).Unix()) {
 			return consensus.ErrFutureBlock
 		}
 	}
-	if header.Time.Cmp(parent.Time) <= 0 {
+	if header.Time <= parent.Time {
 		return errZeroBlockTime
 	}
 	// Verify the block's difficulty based in it's timestamp and parent's difficulty
-	expected := ethash.CalcDifficulty(chain, header.Time.Uint64(), parent)
+	expected := ethash.CalcDifficulty(chain, header.Time, parent)
 
 	if expected.Cmp(header.Difficulty) != 0 {
 		return fmt.Errorf("invalid difficulty: have %v, want %v", header.Difficulty, expected)
@@ -302,7 +297,7 @@ func (ethash *Ethash) CalcDifficulty(chain consensus.ChainReader, time uint64, p
 
 // parent_time_delta is a convenience fn for CalcDifficulty
 func parent_time_delta(t uint64, p *types.Header) *big.Int {
-	return new(big.Int).Sub(new(big.Int).SetUint64(t), p.Time)
+	return new(big.Int).Sub(new(big.Int).SetUint64(t), new(big.Int).SetUint64(p.Time))
 }
 
 // parent_diff_over_dbd is a  convenience fn for CalcDifficulty
@@ -325,6 +320,7 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 		//         (parent_diff / 2048 * max((2 if len(parent.uncles) else 1) - ((timestamp - parent.timestamp) // 9), -99))
 		//        ) + 2^(periodCount - 2)
 		out.Div(parent_time_delta(time, parent), big9)
+
 		if parent.UncleHash == types.EmptyUncleHash {
 			out.Sub(big1, out)
 		} else {
@@ -520,7 +516,7 @@ func (ethash *Ethash) Prepare(chain consensus.ChainReader, header *types.Header)
 	if parent == nil {
 		return consensus.ErrUnknownAncestor
 	}
-	header.Difficulty = ethash.CalcDifficulty(chain, header.Time.Uint64(), parent)
+	header.Difficulty = ethash.CalcDifficulty(chain, header.Time, parent)
 	return nil
 }
 

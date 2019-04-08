@@ -667,17 +667,17 @@ type CallArgs struct {
 	Data     *hexutil.Bytes  `json:"data"`
 }
 
-func DoCall(ctx context.Context, b Backend, args CallArgs, blockNr rpc.BlockNumber, vmCfg vm.Config, timeout time.Duration) ([]byte, uint64, bool, error) {
+func (s *PublicBlockChainAPI) doCall(ctx context.Context, args CallArgs, blockNr rpc.BlockNumber, timeout time.Duration, globalGasCap *big.Int) ([]byte, uint64, bool, error) {
 	defer func(start time.Time) { log.Debug("Executing EVM call finished", "runtime", time.Since(start)) }(time.Now())
 
-	state, header, err := b.StateAndHeaderByNumber(ctx, blockNr)
+	state, header, err := s.b.StateAndHeaderByNumber(ctx, blockNr)
 	if state == nil || err != nil {
 		return nil, 0, false, err
 	}
 	// Set sender address or use a default if none specified
 	var addr common.Address
 	if args.From == nil {
-		if wallets := b.AccountManager().Wallets(); len(wallets) > 0 {
+		if wallets := s.b.AccountManager().Wallets(); len(wallets) > 0 {
 			if accounts := wallets[0].Accounts(); len(accounts) > 0 {
 				addr = accounts[0].Address
 			}
@@ -686,27 +686,20 @@ func DoCall(ctx context.Context, b Backend, args CallArgs, blockNr rpc.BlockNumb
 		addr = *args.From
 	}
 	// Set default gas & gas price if none were set
-	gas := uint64(math.MaxUint64 / 2)
-	if args.Gas != nil {
-		gas = uint64(*args.Gas)
+	gas := uint64(*args.Gas)
+	if gas == 0 {
+		gas = math.MaxUint64 / 2
 	}
-	gasPrice := new(big.Int).SetUint64(defaultGasPrice)
-	if args.GasPrice != nil {
-		gasPrice = args.GasPrice.ToInt()
+	if globalGasCap != nil && globalGasCap.Uint64() < gas {
+		log.Warn("Caller gas above allowance, capping", "requested", gas, "cap", globalGasCap)
+		gas = globalGasCap.Uint64()
 	}
-
-	value := new(big.Int)
-	if args.Value != nil {
-		value = args.Value.ToInt()
+	gasPrice := args.GasPrice.ToInt()
+	if gasPrice.Sign() == 0 {
+		gasPrice = new(big.Int).SetUint64(defaultGasPrice)
 	}
-
-	var data []byte
-	if args.Data != nil {
-		data = []byte(*args.Data)
-	}
-
 	// Create new call message
-	msg := types.NewMessage(addr, args.To, 0, value, gas, gasPrice, data, false)
+	msg := types.NewMessage(addr, args.To, 0, args.Value.ToInt(), gas, gasPrice, *args.Data, false)
 
 	// Setup context so it may be cancelled the call has completed
 	// or, in case of unmetered gas, setup a context with a timeout.
@@ -721,7 +714,7 @@ func DoCall(ctx context.Context, b Backend, args CallArgs, blockNr rpc.BlockNumb
 	defer cancel()
 
 	// Get a new instance of the EVM.
-	evm, vmError, err := b.GetEVM(ctx, msg, state, header)
+	evm, vmError, err := s.b.GetEVM(ctx, msg, state, header)
 	if err != nil {
 		return nil, 0, false, err
 	}
@@ -745,34 +738,42 @@ func DoCall(ctx context.Context, b Backend, args CallArgs, blockNr rpc.BlockNumb
 // Call executes the given transaction on the state for the given block number.
 // It doesn't make and changes in the state/blockchain and is useful to execute and retrieve values.
 func (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNr rpc.BlockNumber) (hexutil.Bytes, error) {
-	result, _, _, err := DoCall(ctx, s.b, args, blockNr, vm.Config{}, 5*time.Second)
+	result, _, _, err := s.doCall(ctx, args, blockNr, 5*time.Second, s.b.RPCGasCap())
 	return (hexutil.Bytes)(result), err
 }
 
-func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNr rpc.BlockNumber) (hexutil.Uint64, error) {
+// EstimateGas returns an estimate of the amount of gas needed to execute the
+// given transaction against the current pending block.
+func (s *PublicBlockChainAPI) EstimateGas(ctx context.Context, args CallArgs) (hexutil.Uint64, error) {
 	// Binary search the gas requirement, as it may be higher than the amount used
 	var (
 		lo  uint64 = params.TxGas - 1
 		hi  uint64
 		cap uint64
 	)
-	if args.Gas != nil && uint64(*args.Gas) >= params.TxGas {
+	if uint64(*args.Gas) >= params.TxGas {
 		hi = uint64(*args.Gas)
 	} else {
-		// Retrieve the block to act as the gas ceiling
-		block, err := b.BlockByNumber(ctx, blockNr)
+		// Retrieve the current pending block to act as the gas ceiling
+		block, err := s.b.BlockByNumber(ctx, rpc.PendingBlockNumber)
 		if err != nil {
 			return 0, err
 		}
 		hi = block.GasLimit()
 	}
+	gasCap := s.b.RPCGasCap()
+	if gasCap != nil && hi > gasCap.Uint64() {
+		log.Warn("Caller gas above allowance, capping", "requested", hi, "cap", gasCap)
+		hi = gasCap.Uint64()
+	}
 	cap = hi
 
 	// Create a helper to check if a gas allowance results in an executable transaction
 	executable := func(gas uint64) bool {
-		args.Gas = (*hexutil.Uint64)(&gas)
+		v := hexutil.Uint64(gas)
+		args.Gas = &v
 
-		_, _, failed, err := DoCall(ctx, b, args, rpc.PendingBlockNumber, vm.Config{}, 0)
+		_, _, failed, err := s.doCall(ctx, args, rpc.PendingBlockNumber, 0, gasCap)
 		if err != nil || failed {
 			return false
 		}
@@ -790,16 +791,10 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNr rpc.Bl
 	// Reject the transaction as invalid if it still fails at the highest allowance
 	if hi == cap {
 		if !executable(hi) {
-			return 0, fmt.Errorf("gas required exceeds allowance or always failing transaction")
+			return 0, fmt.Errorf("gas required exceeds allowance (%d) or always failing transaction", cap)
 		}
 	}
 	return hexutil.Uint64(hi), nil
-}
-
-// EstimateGas returns an estimate of the amount of gas needed to execute the
-// given transaction against the current pending block.
-func (s *PublicBlockChainAPI) EstimateGas(ctx context.Context, args CallArgs) (hexutil.Uint64, error) {
-	return DoEstimateGas(ctx, s.b, args, rpc.PendingBlockNumber)
 }
 
 // ExecutionResult groups all structured logs emitted by the EVM
@@ -883,7 +878,7 @@ func RPCMarshalBlock(b *types.Block, inclTx bool, fullTx bool) (map[string]inter
 		"size":             hexutil.Uint64(b.Size()),
 		"gasLimit":         hexutil.Uint64(head.GasLimit),
 		"gasUsed":          hexutil.Uint64(head.GasUsed),
-		"timestamp":        (*hexutil.Big)(head.Time),
+		"timestamp":        hexutil.Uint64(head.Time),
 		"transactionsRoot": head.TxHash,
 		"receiptsRoot":     head.ReceiptHash,
 	}

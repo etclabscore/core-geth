@@ -138,8 +138,6 @@ var (
 		utils.VMEnableDebugFlag,
 		utils.NetworkIdFlag,
 		utils.ConstantinopleOverrideFlag,
-		utils.RPCCORSDomainFlag,
-		utils.RPCVirtualHostsFlag,
 		utils.EthStatsURLFlag,
 		utils.MetricsEnabledFlag,
 		utils.FakePoWFlag,
@@ -168,6 +166,7 @@ var (
 		utils.WSAllowedOriginsFlag,
 		utils.IPCDisabledFlag,
 		utils.IPCPathFlag,
+		utils.RPCGlobalGasCap,
 	}
 
 	whisperFlags = []cli.Flag{
@@ -367,7 +366,7 @@ func startNode(ctx *cli.Context, stack *node.Node) {
 				if !ok {
 					continue
 				}
-				if timestamp := time.Unix(done.Latest.Time.Int64(), 0); time.Since(timestamp) < 10*time.Minute {
+				if timestamp := time.Unix(int64(done.Latest.Time), 0); time.Since(timestamp) < 10*time.Minute {
 					log.Info("Synchronisation completed", "latestnum", done.Latest.Number, "latesthash", done.Latest.Hash(),
 						"age", common.PrettyAge(timestamp))
 					stack.Stop()

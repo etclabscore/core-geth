@@ -1,4 +1,4 @@
-// Copyright 2018 The go-ethereum Authors
+// Copyright 2019 The go-ethereum Authors
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -14,16 +14,20 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package graphql
+package trie
 
 import (
 	"testing"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethdb"
 )
 
-func TestBuildSchema(t *testing.T) {
-	// Make sure the schema can be parsed and matched up to the object model.
-	_, err := NewHandler(nil)
-	if err != nil {
-		t.Errorf("Could not construct GraphQL handler: %v", err)
+// Tests that the trie database returns a missing trie node error if attempting
+// to retrieve the meta root.
+func TestDatabaseMetarootFetch(t *testing.T) {
+	db := NewDatabase(ethdb.NewMemDatabase())
+	if _, err := db.Node(common.Hash{}); err == nil {
+		t.Fatalf("metaroot retrieval succeeded")
 	}
 }

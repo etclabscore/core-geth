@@ -138,6 +138,8 @@ var (
 		utils.VMEnableDebugFlag,
 		utils.NetworkIdFlag,
 		utils.ConstantinopleOverrideFlag,
+		utils.RPCCORSDomainFlag,
+		utils.RPCVirtualHostsFlag,
 		utils.EthStatsURLFlag,
 		utils.MetricsEnabledFlag,
 		utils.FakePoWFlag,

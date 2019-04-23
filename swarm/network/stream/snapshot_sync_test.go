@@ -19,7 +19,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"runtime"
 	"sync"
@@ -41,8 +40,6 @@ import (
 	mockmem "github.com/ethereum/go-ethereum/swarm/storage/mock/mem"
 	"github.com/ethereum/go-ethereum/swarm/testutil"
 )
-
-const MaxTimeout = 600
 
 type synctestConfig struct {
 	addrs         [][]byte
@@ -80,37 +77,31 @@ func TestSyncingViaGlobalSync(t *testing.T) {
 	if runtime.GOOS == "darwin" && os.Getenv("TRAVIS") == "true" {
 		t.Skip("Flaky on mac on travis")
 	}
+
+	if testutil.RaceEnabled {
+		t.Skip("Segfaults on Travis with -race")
+	}
+
 	//if nodes/chunks have been provided via commandline,
 	//run the tests with these values
 	if *nodes != 0 && *chunks != 0 {
 		log.Info(fmt.Sprintf("Running test with %d chunks and %d nodes...", *chunks, *nodes))
 		testSyncingViaGlobalSync(t, *chunks, *nodes)
 	} else {
-		var nodeCnt []int
-		var chnkCnt []int
+		chunkCounts := []int{4, 32}
+		nodeCounts := []int{32, 16}
+
 		//if the `longrunning` flag has been provided
 		//run more test combinations
 		if *longrunning {
-			chnkCnt = []int{1, 8, 32, 256, 1024}
-			nodeCnt = []int{16, 32, 64, 128, 256}
-		} else if raceTest {
-			// TestSyncingViaGlobalSync allocates a lot of memory
-			// with race detector. By reducing the number of chunks
-			// and nodes, memory consumption is lower and data races
-			// are still checked, while correctness of syncing is
-			// tested with more chunks and nodes in regular (!race)
-			// tests.
-			chnkCnt = []int{4}
-			nodeCnt = []int{16}
-		} else {
-			//default test
-			chnkCnt = []int{4, 32}
-			nodeCnt = []int{32, 16}
+			chunkCounts = []int{64, 128}
+			nodeCounts = []int{32, 64}
 		}
-		for _, chnk := range chnkCnt {
-			for _, n := range nodeCnt {
-				log.Info(fmt.Sprintf("Long running test with %d chunks and %d nodes...", chnk, n))
-				testSyncingViaGlobalSync(t, chnk, n)
+
+		for _, chunkCount := range chunkCounts {
+			for _, n := range nodeCounts {
+				log.Info(fmt.Sprintf("Long running test with %d chunks and %d nodes...", chunkCount, n))
+				testSyncingViaGlobalSync(t, chunkCount, n)
 			}
 		}
 	}
@@ -123,21 +114,7 @@ var simServiceMap = map[string]simulation.ServiceFunc{
 			return nil, nil, err
 		}
 
-		var dir string
-		var store *state.DBStore
-		if raceTest {
-			// Use on-disk DBStore to reduce memory consumption in race tests.
-			dir, err = ioutil.TempDir("", "swarm-stream-")
-			if err != nil {
-				return nil, nil, err
-			}
-			store, err = state.NewDBStore(dir)
-			if err != nil {
-				return nil, nil, err
-			}
-		} else {
-			store = state.NewInmemoryStore()
-		}
+		store := state.NewInmemoryStore()
 
 		r := NewRegistry(addr.ID(), delivery, netStore, store, &RegistryOptions{
 			Retrieval:       RetrievalDisabled,
@@ -170,20 +147,16 @@ func testSyncingViaGlobalSync(t *testing.T, chunkCount int, nodeCount int) {
 	//array where the generated chunk hashes will be stored
 	conf.hashes = make([]storage.Address, 0)
 
-	err := sim.UploadSnapshot(fmt.Sprintf("testing/snapshot_%d.json", nodeCount))
+	ctx, cancelSimRun := context.WithTimeout(context.Background(), 3*time.Minute)
+	defer cancelSimRun()
+
+	filename := fmt.Sprintf("testing/snapshot_%d.json", nodeCount)
+	err := sim.UploadSnapshot(ctx, filename)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ctx, cancelSimRun := context.WithTimeout(context.Background(), 2*time.Minute)
-	defer cancelSimRun()
-
-	if _, err := sim.WaitTillHealthy(ctx); err != nil {
-		t.Fatal(err)
-	}
-
 	result := runSim(conf, ctx, sim, chunkCount)
-
 	if result.Error != nil {
 		t.Fatal(result.Error)
 	}

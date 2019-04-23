@@ -36,7 +36,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/protocols"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -171,10 +170,7 @@ func NewSwarm(config *api.Config, mockStore *mock.NodeStore) (self *Swarm, err e
 		self.accountingMetrics = protocols.SetupAccountingMetrics(10*time.Second, filepath.Join(config.Path, "metrics.db"))
 	}
 
-	var nodeID enode.ID
-	if err := nodeID.UnmarshalText([]byte(config.NodeID)); err != nil {
-		return nil, err
-	}
+	nodeID := config.Enode.ID()
 
 	syncing := stream.SyncingAutoSubscribe
 	if !config.SyncEnabled || config.LightNodeEnabled {
@@ -426,6 +422,7 @@ func (s *Swarm) Start(srv *p2p.Server) error {
 func (s *Swarm) Stop() error {
 	if s.tracerClose != nil {
 		err := s.tracerClose.Close()
+		tracing.FinishSpans()
 		if err != nil {
 			return err
 		}
@@ -507,7 +504,7 @@ func (s *Swarm) APIs() []rpc.API {
 		},
 		{
 			Namespace: "swarmfs",
-			Version:   fuse.Swarmfs_Version,
+			Version:   fuse.SwarmFSVersion,
 			Service:   s.sfs,
 			Public:    false,
 		},
@@ -520,6 +517,8 @@ func (s *Swarm) APIs() []rpc.API {
 	}
 
 	apis = append(apis, s.bzz.APIs()...)
+
+	apis = append(apis, s.streamer.APIs()...)
 
 	if s.ps != nil {
 		apis = append(apis, s.ps.APIs()...)

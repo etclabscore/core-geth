@@ -75,6 +75,7 @@ var (
 	errUnknownPeer             = errors.New("peer is unknown or unhealthy")
 	errBadPeer                 = errors.New("action from bad peer ignored")
 	errStallingPeer            = errors.New("peer is stalling")
+	errUnsyncedPeer            = errors.New("unsynced peer")
 	errNoPeers                 = errors.New("no peers to keep download active")
 	errTimeout                 = errors.New("timeout")
 	errEmptyHeaderSet          = errors.New("empty header set by peer")
@@ -99,10 +100,11 @@ type Downloader struct {
 	mode SyncMode       // Synchronisation mode defining the strategy used (per sync cycle)
 	mux  *event.TypeMux // Event multiplexer to announce sync operation events
 
-	genesis uint64   // Genesis block number to limit sync to (e.g. light client CHT)
-	queue   *queue   // Scheduler for selecting the hashes to download
-	peers   *peerSet // Set of active peers from which download can proceed
-	stateDB ethdb.Database
+	checkpoint uint64   // Checkpoint block number to enforce head against (e.g. fast sync)
+	genesis    uint64   // Genesis block number to limit sync to (e.g. light client CHT)
+	queue      *queue   // Scheduler for selecting the hashes to download
+	peers      *peerSet // Set of active peers from which download can proceed
+	stateDB    ethdb.Database
 
 	rttEstimate   uint64 // Round trip time to target for download requests
 	rttConfidence uint64 // Confidence in the estimated RTT (unit: millionths to allow atomic ops)
@@ -205,15 +207,15 @@ type BlockChain interface {
 }
 
 // New creates a new downloader to fetch hashes and blocks from remote peers.
-func New(mode SyncMode, stateDb ethdb.Database, mux *event.TypeMux, chain BlockChain, lightchain LightChain, dropPeer peerDropFn) *Downloader {
+func New(mode SyncMode, checkpoint uint64, stateDb ethdb.Database, mux *event.TypeMux, chain BlockChain, lightchain LightChain, dropPeer peerDropFn) *Downloader {
 	if lightchain == nil {
 		lightchain = chain
 	}
-
 	dl := &Downloader{
 		mode:           mode,
 		stateDB:        stateDb,
 		mux:            mux,
+		checkpoint:     checkpoint,
 		queue:          newQueue(),
 		peers:          newPeerSet(),
 		rttEstimate:    uint64(rttMaxEstimate),
@@ -326,7 +328,7 @@ func (d *Downloader) Synchronise(id string, head common.Hash, td *big.Int, mode 
 	case nil:
 	case errBusy:
 
-	case errTimeout, errBadPeer, errStallingPeer,
+	case errTimeout, errBadPeer, errStallingPeer, errUnsyncedPeer,
 		errEmptyHeaderSet, errPeersUnavailable, errTooOld,
 		errInvalidAncestor, errInvalidChain:
 		log.Warn("Synchronisation failed, dropping peer", "peer", id, "err", err)
@@ -578,6 +580,10 @@ func (d *Downloader) fetchHeight(p *peerConnection) (*types.Header, error) {
 				return nil, errBadPeer
 			}
 			head := headers[0]
+			if d.mode == FastSync && head.Number.Uint64() < d.checkpoint {
+				p.log.Warn("Remote head below checkpoint", "number", head.Number, "hash", head.Hash())
+				return nil, errUnsyncedPeer
+			}
 			p.log.Debug("Remote head header identified", "number", head.Number, "hash", head.Hash())
 			return head, nil
 
@@ -665,30 +671,32 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 		localHeight = d.lightchain.CurrentHeader().Number.Uint64()
 	}
 	p.log.Debug("Looking for common ancestor", "local", localHeight, "remote", remoteHeight)
+
+	// Recap floor value for binary search
 	if localHeight >= MaxForkAncestry {
 		// We're above the max reorg threshold, find the earliest fork point
 		floor = int64(localHeight - MaxForkAncestry)
-
-		// If we're doing a light sync, ensure the floor doesn't go below the CHT, as
-		// all headers before that point will be missing.
-		if d.mode == LightSync {
-			// If we dont know the current CHT position, find it
-			if d.genesis == 0 {
-				header := d.lightchain.CurrentHeader()
-				for header != nil {
-					d.genesis = header.Number.Uint64()
-					if floor >= int64(d.genesis)-1 {
-						break
-					}
-					header = d.lightchain.GetHeaderByHash(header.ParentHash)
+	}
+	// If we're doing a light sync, ensure the floor doesn't go below the CHT, as
+	// all headers before that point will be missing.
+	if d.mode == LightSync {
+		// If we dont know the current CHT position, find it
+		if d.genesis == 0 {
+			header := d.lightchain.CurrentHeader()
+			for header != nil {
+				d.genesis = header.Number.Uint64()
+				if floor >= int64(d.genesis)-1 {
+					break
 				}
-			}
-			// We already know the "genesis" block number, cap floor to that
-			if floor < int64(d.genesis)-1 {
-				floor = int64(d.genesis) - 1
+				header = d.lightchain.GetHeaderByHash(header.ParentHash)
 			}
 		}
+		// We already know the "genesis" block number, cap floor to that
+		if floor < int64(d.genesis)-1 {
+			floor = int64(d.genesis) - 1
+		}
 	}
+
 	from, count, skip, max := calculateRequestSpan(remoteHeight, localHeight)
 
 	p.log.Trace("Span searching for common ancestor", "count", count, "from", from, "skip", skip)
@@ -719,7 +727,7 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 			}
 			// Make sure the peer's reply conforms to the request
 			for i, header := range headers {
-				expectNumber := from + int64(i)*int64((skip+1))
+				expectNumber := from + int64(i)*int64(skip+1)
 				if number := header.Number.Int64(); number != expectNumber {
 					p.log.Warn("Head headers broke chain ordering", "index", i, "requested", expectNumber, "received", number)
 					return 0, errInvalidChain

@@ -17,6 +17,7 @@
 package lookup_test
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"testing"
@@ -50,7 +51,7 @@ const Year = Day * 365
 const Month = Day * 30
 
 func makeReadFunc(store Store, counter *int) lookup.ReadFunc {
-	return func(epoch lookup.Epoch, now uint64) (interface{}, error) {
+	return func(ctx context.Context, epoch lookup.Epoch, now uint64) (interface{}, error) {
 		*counter++
 		data := store[epoch.ID()]
 		var valueStr string
@@ -88,7 +89,7 @@ func TestLookup(t *testing.T) {
 
 	// try to get the last value
 
-	value, err := lookup.Lookup(now, lookup.NoClue, readFunc)
+	value, err := lookup.Lookup(context.Background(), now, lookup.NoClue, readFunc)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,7 +103,7 @@ func TestLookup(t *testing.T) {
 	// reset the read count for the next test
 	readCount = 0
 	// Provide a hint to get a faster lookup. In particular, we give the exact location of the last update
-	value, err = lookup.Lookup(now, epoch, readFunc)
+	value, err = lookup.Lookup(context.Background(), now, epoch, readFunc)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +122,7 @@ func TestLookup(t *testing.T) {
 
 	expectedTime := now - Year*3 + 6*Month
 
-	value, err = lookup.Lookup(expectedTime, lookup.NoClue, readFunc)
+	value, err = lookup.Lookup(context.Background(), expectedTime, lookup.NoClue, readFunc)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -153,7 +154,7 @@ func TestOneUpdateAt0(t *testing.T) {
 	}
 	update(store, epoch, 0, &data)
 
-	value, err := lookup.Lookup(now, lookup.NoClue, readFunc)
+	value, err := lookup.Lookup(context.Background(), now, lookup.NoClue, readFunc)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -186,13 +187,113 @@ func TestBadHint(t *testing.T) {
 		Time:  1200000000,
 	}
 
-	value, err := lookup.Lookup(now, badHint, readFunc)
+	value, err := lookup.Lookup(context.Background(), now, badHint, readFunc)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if value != &data {
 		t.Fatalf("Expected lookup to return the last written value: %v. Got %v", data, value)
 	}
+}
+
+// Tests whether the update is found when the bad hint is exactly below the last update
+func TestBadHintNextToUpdate(t *testing.T) {
+	store := make(Store)
+	readCount := 0
+
+	readFunc := makeReadFunc(store, &readCount)
+	now := uint64(1533903729)
+	var last *Data
+
+	/*  the following loop places updates in the following epochs:
+	Update# Time       Base       Level
+	0       1200000000 1174405120 25
+	1       1200000001 1191182336 24
+	2       1200000002 1199570944 23
+	3       1200000003 1199570944 22
+	4       1200000004 1199570944 21
+
+	The situation we want to trigger is to give a bad hint exactly
+	in T=1200000005, B=1199570944 and L=20, which is where the next
+	update would have logically been.
+	This affects only when the bad hint's base == previous update's base,
+	in this case 1199570944
+
+	*/
+	var epoch lookup.Epoch
+	for i := uint64(0); i < 5; i++ {
+		data := Data{
+			Payload: i,
+			Time:    0,
+		}
+		last = &data
+		epoch = update(store, epoch, 1200000000+i, &data)
+	}
+
+	// come up with some evil hint:
+	// put it where the next update would have been
+	badHint := lookup.Epoch{
+		Level: 20,
+		Time:  1200000005,
+	}
+
+	value, err := lookup.Lookup(context.Background(), now, badHint, readFunc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if value != last {
+		t.Fatalf("Expected lookup to return the last written value: %v. Got %v", last, value)
+	}
+}
+
+func TestContextCancellation(t *testing.T) {
+
+	readFunc := func(ctx context.Context, epoch lookup.Epoch, now uint64) (interface{}, error) {
+		<-ctx.Done()
+		return nil, ctx.Err()
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	errc := make(chan error)
+
+	go func() {
+		_, err := lookup.Lookup(ctx, 1200000000, lookup.NoClue, readFunc)
+		errc <- err
+	}()
+
+	cancel()
+
+	if err := <-errc; err != context.Canceled {
+		t.Fatalf("Expected lookup to return a context Cancelled error, got %v", err)
+	}
+
+	// text context cancellation during hint lookup:
+	ctx, cancel = context.WithCancel(context.Background())
+	errc = make(chan error)
+	someHint := lookup.Epoch{
+		Level: 25,
+		Time:  300,
+	}
+
+	readFunc = func(ctx context.Context, epoch lookup.Epoch, now uint64) (interface{}, error) {
+		if epoch == someHint {
+			go cancel()
+			<-ctx.Done()
+			return nil, ctx.Err()
+		}
+		return nil, nil
+	}
+
+	go func() {
+		_, err := lookup.Lookup(ctx, 301, someHint, readFunc)
+		errc <- err
+	}()
+
+	if err := <-errc; err != context.Canceled {
+		t.Fatalf("Expected lookup to return a context Cancelled error, got %v", err)
+	}
+
 }
 
 func TestLookupFail(t *testing.T) {
@@ -206,7 +307,7 @@ func TestLookupFail(t *testing.T) {
 	// don't write anything and try to look up.
 	// we're testing we don't get stuck in a loop
 
-	value, err := lookup.Lookup(now, lookup.NoClue, readFunc)
+	value, err := lookup.Lookup(context.Background(), now, lookup.NoClue, readFunc)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -242,7 +343,7 @@ func TestHighFreqUpdates(t *testing.T) {
 		lastData = &data
 	}
 
-	value, err := lookup.Lookup(lastData.Time, lookup.NoClue, readFunc)
+	value, err := lookup.Lookup(context.Background(), lastData.Time, lookup.NoClue, readFunc)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -255,7 +356,7 @@ func TestHighFreqUpdates(t *testing.T) {
 	// reset the read count for the next test
 	readCount = 0
 	// Provide a hint to get a faster lookup. In particular, we give the exact location of the last update
-	value, err = lookup.Lookup(now, epoch, readFunc)
+	value, err = lookup.Lookup(context.Background(), now, epoch, readFunc)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -270,7 +371,7 @@ func TestHighFreqUpdates(t *testing.T) {
 
 	for i := uint64(0); i <= 994; i++ {
 		T := uint64(now - 1000 + i) // update every second for the last 1000 seconds
-		value, err := lookup.Lookup(T, lookup.NoClue, readFunc)
+		value, err := lookup.Lookup(context.Background(), T, lookup.NoClue, readFunc)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -308,7 +409,7 @@ func TestSparseUpdates(t *testing.T) {
 
 	// try to get the last value
 
-	value, err := lookup.Lookup(now, lookup.NoClue, readFunc)
+	value, err := lookup.Lookup(context.Background(), now, lookup.NoClue, readFunc)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -322,7 +423,7 @@ func TestSparseUpdates(t *testing.T) {
 	// reset the read count for the next test
 	readCount = 0
 	// Provide a hint to get a faster lookup. In particular, we give the exact location of the last update
-	value, err = lookup.Lookup(now, epoch, readFunc)
+	value, err = lookup.Lookup(context.Background(), now, epoch, readFunc)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -346,7 +447,7 @@ type testG struct {
 }
 
 // test cases
-var testGetNextLevelCases []testG = []testG{{e: lookup.Epoch{Time: 989875233, Level: 12}, n: 989875233, x: 11}, {e: lookup.Epoch{Time: 995807650, Level: 18}, n: 995598156, x: 19}, {e: lookup.Epoch{Time: 969167082, Level: 0}, n: 968990357, x: 18}, {e: lookup.Epoch{Time: 993087628, Level: 14}, n: 992987044, x: 20}, {e: lookup.Epoch{Time: 963364631, Level: 20}, n: 963364630, x: 19}, {e: lookup.Epoch{Time: 963497510, Level: 16}, n: 963370732, x: 18}, {e: lookup.Epoch{Time: 955421349, Level: 22}, n: 955421348, x: 21}, {e: lookup.Epoch{Time: 968220379, Level: 15}, n: 968220378, x: 14}, {e: lookup.Epoch{Time: 939129014, Level: 6}, n: 939128771, x: 11}, {e: lookup.Epoch{Time: 907847903, Level: 6}, n: 907791833, x: 18}, {e: lookup.Epoch{Time: 910835564, Level: 15}, n: 910835564, x: 14}, {e: lookup.Epoch{Time: 913578333, Level: 22}, n: 881808431, x: 25}, {e: lookup.Epoch{Time: 895818460, Level: 3}, n: 895818132, x: 9}, {e: lookup.Epoch{Time: 903843025, Level: 24}, n: 895609561, x: 23}, {e: lookup.Epoch{Time: 877889433, Level: 13}, n: 877877093, x: 15}, {e: lookup.Epoch{Time: 901450396, Level: 10}, n: 901450058, x: 9}, {e: lookup.Epoch{Time: 925179910, Level: 3}, n: 925168393, x: 16}, {e: lookup.Epoch{Time: 913485477, Level: 21}, n: 913485476, x: 20}, {e: lookup.Epoch{Time: 924462991, Level: 18}, n: 924462990, x: 17}, {e: lookup.Epoch{Time: 941175128, Level: 13}, n: 941175127, x: 12}, {e: lookup.Epoch{Time: 920126583, Level: 3}, n: 920100782, x: 19}, {e: lookup.Epoch{Time: 932403200, Level: 9}, n: 932279891, x: 17}, {e: lookup.Epoch{Time: 948284931, Level: 2}, n: 948284921, x: 9}, {e: lookup.Epoch{Time: 953540997, Level: 7}, n: 950547986, x: 22}, {e: lookup.Epoch{Time: 926639837, Level: 18}, n: 918608882, x: 24}, {e: lookup.Epoch{Time: 954637598, Level: 1}, n: 954578761, x: 17}, {e: lookup.Epoch{Time: 943482981, Level: 10}, n: 942924151, x: 19}, {e: lookup.Epoch{Time: 963580771, Level: 7}, n: 963580771, x: 6}, {e: lookup.Epoch{Time: 993744930, Level: 7}, n: 993690858, x: 16}, {e: lookup.Epoch{Time: 1018890213, Level: 12}, n: 1018890212, x: 11}, {e: lookup.Epoch{Time: 1030309411, Level: 2}, n: 1030309227, x: 9}, {e: lookup.Epoch{Time: 1063204997, Level: 20}, n: 1063204996, x: 19}, {e: lookup.Epoch{Time: 1094340832, Level: 6}, n: 1094340633, x: 7}, {e: lookup.Epoch{Time: 1077880597, Level: 10}, n: 1075914292, x: 20}, {e: lookup.Epoch{Time: 1051114957, Level: 18}, n: 1051114957, x: 17}, {e: lookup.Epoch{Time: 1045649701, Level: 22}, n: 1045649700, x: 21}, {e: lookup.Epoch{Time: 1066198885, Level: 14}, n: 1066198884, x: 13}, {e: lookup.Epoch{Time: 1053231952, Level: 1}, n: 1053210845, x: 16}, {e: lookup.Epoch{Time: 1068763404, Level: 14}, n: 1068675428, x: 18}, {e: lookup.Epoch{Time: 1039042173, Level: 15}, n: 1038973110, x: 17}, {e: lookup.Epoch{Time: 1050747636, Level: 6}, n: 1050747364, x: 9}, {e: lookup.Epoch{Time: 1030034434, Level: 23}, n: 1030034433, x: 22}, {e: lookup.Epoch{Time: 1003783425, Level: 18}, n: 1003783424, x: 17}, {e: lookup.Epoch{Time: 988163976, Level: 15}, n: 988084064, x: 17}, {e: lookup.Epoch{Time: 1007222377, Level: 15}, n: 1007222377, x: 14}, {e: lookup.Epoch{Time: 1001211375, Level: 13}, n: 1001208178, x: 14}, {e: lookup.Epoch{Time: 997623199, Level: 8}, n: 997623198, x: 7}, {e: lookup.Epoch{Time: 1026283830, Level: 10}, n: 1006681704, x: 24}, {e: lookup.Epoch{Time: 1019421907, Level: 20}, n: 1019421906, x: 19}, {e: lookup.Epoch{Time: 1043154306, Level: 16}, n: 1043108343, x: 16}, {e: lookup.Epoch{Time: 1075643767, Level: 17}, n: 1075325898, x: 18}, {e: lookup.Epoch{Time: 1043726309, Level: 20}, n: 1043726308, x: 19}, {e: lookup.Epoch{Time: 1056415324, Level: 17}, n: 1056415324, x: 16}, {e: lookup.Epoch{Time: 1088650219, Level: 13}, n: 1088650218, x: 12}, {e: lookup.Epoch{Time: 1088551662, Level: 7}, n: 1088543355, x: 13}, {e: lookup.Epoch{Time: 1069667265, Level: 6}, n: 1069667075, x: 7}, {e: lookup.Epoch{Time: 1079145970, Level: 18}, n: 1079145969, x: 17}, {e: lookup.Epoch{Time: 1083338876, Level: 7}, n: 1083338875, x: 6}, {e: lookup.Epoch{Time: 1051581086, Level: 4}, n: 1051568869, x: 14}, {e: lookup.Epoch{Time: 1028430882, Level: 4}, n: 1028430864, x: 5}, {e: lookup.Epoch{Time: 1057356462, Level: 1}, n: 1057356417, x: 5}, {e: lookup.Epoch{Time: 1033104266, Level: 0}, n: 1033097479, x: 13}, {e: lookup.Epoch{Time: 1031391367, Level: 11}, n: 1031387304, x: 14}, {e: lookup.Epoch{Time: 1049781164, Level: 15}, n: 1049781163, x: 14}, {e: lookup.Epoch{Time: 1027271628, Level: 12}, n: 1027271627, x: 11}, {e: lookup.Epoch{Time: 1057270560, Level: 23}, n: 1057270560, x: 22}, {e: lookup.Epoch{Time: 1047501317, Level: 15}, n: 1047501317, x: 14}, {e: lookup.Epoch{Time: 1058349035, Level: 11}, n: 1045175573, x: 24}, {e: lookup.Epoch{Time: 1057396147, Level: 20}, n: 1057396147, x: 19}, {e: lookup.Epoch{Time: 1048906375, Level: 18}, n: 1039616919, x: 25}, {e: lookup.Epoch{Time: 1074294831, Level: 20}, n: 1074294831, x: 19}, {e: lookup.Epoch{Time: 1088946052, Level: 1}, n: 1088917364, x: 14}, {e: lookup.Epoch{Time: 1112337595, Level: 17}, n: 1111008110, x: 22}, {e: lookup.Epoch{Time: 1099990284, Level: 5}, n: 1099968370, x: 15}, {e: lookup.Epoch{Time: 1087036441, Level: 16}, n: 1053967855, x: 25}, {e: lookup.Epoch{Time: 1069225185, Level: 8}, n: 1069224660, x: 10}, {e: lookup.Epoch{Time: 1057505479, Level: 9}, n: 1057505170, x: 14}, {e: lookup.Epoch{Time: 1072381377, Level: 12}, n: 1065950959, x: 22}, {e: lookup.Epoch{Time: 1093887139, Level: 8}, n: 1093863305, x: 14}, {e: lookup.Epoch{Time: 1082366510, Level: 24}, n: 1082366510, x: 23}, {e: lookup.Epoch{Time: 1103231132, Level: 14}, n: 1102292201, x: 22}, {e: lookup.Epoch{Time: 1094502355, Level: 3}, n: 1094324652, x: 18}, {e: lookup.Epoch{Time: 1068488344, Level: 12}, n: 1067577330, x: 19}, {e: lookup.Epoch{Time: 1050278233, Level: 12}, n: 1050278232, x: 11}, {e: lookup.Epoch{Time: 1047660768, Level: 5}, n: 1047652137, x: 17}, {e: lookup.Epoch{Time: 1060116167, Level: 11}, n: 1060114091, x: 12}, {e: lookup.Epoch{Time: 1068149392, Level: 21}, n: 1052074801, x: 24}, {e: lookup.Epoch{Time: 1081934120, Level: 6}, n: 1081933847, x: 8}, {e: lookup.Epoch{Time: 1107943693, Level: 16}, n: 1107096139, x: 25}, {e: lookup.Epoch{Time: 1131571649, Level: 9}, n: 1131570428, x: 11}, {e: lookup.Epoch{Time: 1123139367, Level: 0}, n: 1122912198, x: 20}, {e: lookup.Epoch{Time: 1121144423, Level: 6}, n: 1120568289, x: 20}, {e: lookup.Epoch{Time: 1089932411, Level: 17}, n: 1089932410, x: 16}, {e: lookup.Epoch{Time: 1104899012, Level: 22}, n: 1098978789, x: 22}, {e: lookup.Epoch{Time: 1094588059, Level: 21}, n: 1094588059, x: 20}, {e: lookup.Epoch{Time: 1114987438, Level: 24}, n: 1114987437, x: 23}, {e: lookup.Epoch{Time: 1084186305, Level: 7}, n: 1084186241, x: 6}, {e: lookup.Epoch{Time: 1058827111, Level: 8}, n: 1058826504, x: 9}, {e: lookup.Epoch{Time: 1090679810, Level: 12}, n: 1090616539, x: 17}, {e: lookup.Epoch{Time: 1084299475, Level: 23}, n: 1084299475, x: 22}}
+var testGetNextLevelCases = []testG{{e: lookup.Epoch{Time: 989875233, Level: 12}, n: 989875233, x: 11}, {e: lookup.Epoch{Time: 995807650, Level: 18}, n: 995598156, x: 19}, {e: lookup.Epoch{Time: 969167082, Level: 0}, n: 968990357, x: 18}, {e: lookup.Epoch{Time: 993087628, Level: 14}, n: 992987044, x: 20}, {e: lookup.Epoch{Time: 963364631, Level: 20}, n: 963364630, x: 19}, {e: lookup.Epoch{Time: 963497510, Level: 16}, n: 963370732, x: 18}, {e: lookup.Epoch{Time: 955421349, Level: 22}, n: 955421348, x: 21}, {e: lookup.Epoch{Time: 968220379, Level: 15}, n: 968220378, x: 14}, {e: lookup.Epoch{Time: 939129014, Level: 6}, n: 939128771, x: 11}, {e: lookup.Epoch{Time: 907847903, Level: 6}, n: 907791833, x: 18}, {e: lookup.Epoch{Time: 910835564, Level: 15}, n: 910835564, x: 14}, {e: lookup.Epoch{Time: 913578333, Level: 22}, n: 881808431, x: 25}, {e: lookup.Epoch{Time: 895818460, Level: 3}, n: 895818132, x: 9}, {e: lookup.Epoch{Time: 903843025, Level: 24}, n: 895609561, x: 23}, {e: lookup.Epoch{Time: 877889433, Level: 13}, n: 877877093, x: 15}, {e: lookup.Epoch{Time: 901450396, Level: 10}, n: 901450058, x: 9}, {e: lookup.Epoch{Time: 925179910, Level: 3}, n: 925168393, x: 16}, {e: lookup.Epoch{Time: 913485477, Level: 21}, n: 913485476, x: 20}, {e: lookup.Epoch{Time: 924462991, Level: 18}, n: 924462990, x: 17}, {e: lookup.Epoch{Time: 941175128, Level: 13}, n: 941175127, x: 12}, {e: lookup.Epoch{Time: 920126583, Level: 3}, n: 920100782, x: 19}, {e: lookup.Epoch{Time: 932403200, Level: 9}, n: 932279891, x: 17}, {e: lookup.Epoch{Time: 948284931, Level: 2}, n: 948284921, x: 9}, {e: lookup.Epoch{Time: 953540997, Level: 7}, n: 950547986, x: 22}, {e: lookup.Epoch{Time: 926639837, Level: 18}, n: 918608882, x: 24}, {e: lookup.Epoch{Time: 954637598, Level: 1}, n: 954578761, x: 17}, {e: lookup.Epoch{Time: 943482981, Level: 10}, n: 942924151, x: 19}, {e: lookup.Epoch{Time: 963580771, Level: 7}, n: 963580771, x: 6}, {e: lookup.Epoch{Time: 993744930, Level: 7}, n: 993690858, x: 16}, {e: lookup.Epoch{Time: 1018890213, Level: 12}, n: 1018890212, x: 11}, {e: lookup.Epoch{Time: 1030309411, Level: 2}, n: 1030309227, x: 9}, {e: lookup.Epoch{Time: 1063204997, Level: 20}, n: 1063204996, x: 19}, {e: lookup.Epoch{Time: 1094340832, Level: 6}, n: 1094340633, x: 7}, {e: lookup.Epoch{Time: 1077880597, Level: 10}, n: 1075914292, x: 20}, {e: lookup.Epoch{Time: 1051114957, Level: 18}, n: 1051114957, x: 17}, {e: lookup.Epoch{Time: 1045649701, Level: 22}, n: 1045649700, x: 21}, {e: lookup.Epoch{Time: 1066198885, Level: 14}, n: 1066198884, x: 13}, {e: lookup.Epoch{Time: 1053231952, Level: 1}, n: 1053210845, x: 16}, {e: lookup.Epoch{Time: 1068763404, Level: 14}, n: 1068675428, x: 18}, {e: lookup.Epoch{Time: 1039042173, Level: 15}, n: 1038973110, x: 17}, {e: lookup.Epoch{Time: 1050747636, Level: 6}, n: 1050747364, x: 9}, {e: lookup.Epoch{Time: 1030034434, Level: 23}, n: 1030034433, x: 22}, {e: lookup.Epoch{Time: 1003783425, Level: 18}, n: 1003783424, x: 17}, {e: lookup.Epoch{Time: 988163976, Level: 15}, n: 988084064, x: 17}, {e: lookup.Epoch{Time: 1007222377, Level: 15}, n: 1007222377, x: 14}, {e: lookup.Epoch{Time: 1001211375, Level: 13}, n: 1001208178, x: 14}, {e: lookup.Epoch{Time: 997623199, Level: 8}, n: 997623198, x: 7}, {e: lookup.Epoch{Time: 1026283830, Level: 10}, n: 1006681704, x: 24}, {e: lookup.Epoch{Time: 1019421907, Level: 20}, n: 1019421906, x: 19}, {e: lookup.Epoch{Time: 1043154306, Level: 16}, n: 1043108343, x: 16}, {e: lookup.Epoch{Time: 1075643767, Level: 17}, n: 1075325898, x: 18}, {e: lookup.Epoch{Time: 1043726309, Level: 20}, n: 1043726308, x: 19}, {e: lookup.Epoch{Time: 1056415324, Level: 17}, n: 1056415324, x: 16}, {e: lookup.Epoch{Time: 1088650219, Level: 13}, n: 1088650218, x: 12}, {e: lookup.Epoch{Time: 1088551662, Level: 7}, n: 1088543355, x: 13}, {e: lookup.Epoch{Time: 1069667265, Level: 6}, n: 1069667075, x: 7}, {e: lookup.Epoch{Time: 1079145970, Level: 18}, n: 1079145969, x: 17}, {e: lookup.Epoch{Time: 1083338876, Level: 7}, n: 1083338875, x: 6}, {e: lookup.Epoch{Time: 1051581086, Level: 4}, n: 1051568869, x: 14}, {e: lookup.Epoch{Time: 1028430882, Level: 4}, n: 1028430864, x: 5}, {e: lookup.Epoch{Time: 1057356462, Level: 1}, n: 1057356417, x: 5}, {e: lookup.Epoch{Time: 1033104266, Level: 0}, n: 1033097479, x: 13}, {e: lookup.Epoch{Time: 1031391367, Level: 11}, n: 1031387304, x: 14}, {e: lookup.Epoch{Time: 1049781164, Level: 15}, n: 1049781163, x: 14}, {e: lookup.Epoch{Time: 1027271628, Level: 12}, n: 1027271627, x: 11}, {e: lookup.Epoch{Time: 1057270560, Level: 23}, n: 1057270560, x: 22}, {e: lookup.Epoch{Time: 1047501317, Level: 15}, n: 1047501317, x: 14}, {e: lookup.Epoch{Time: 1058349035, Level: 11}, n: 1045175573, x: 24}, {e: lookup.Epoch{Time: 1057396147, Level: 20}, n: 1057396147, x: 19}, {e: lookup.Epoch{Time: 1048906375, Level: 18}, n: 1039616919, x: 25}, {e: lookup.Epoch{Time: 1074294831, Level: 20}, n: 1074294831, x: 19}, {e: lookup.Epoch{Time: 1088946052, Level: 1}, n: 1088917364, x: 14}, {e: lookup.Epoch{Time: 1112337595, Level: 17}, n: 1111008110, x: 22}, {e: lookup.Epoch{Time: 1099990284, Level: 5}, n: 1099968370, x: 15}, {e: lookup.Epoch{Time: 1087036441, Level: 16}, n: 1053967855, x: 25}, {e: lookup.Epoch{Time: 1069225185, Level: 8}, n: 1069224660, x: 10}, {e: lookup.Epoch{Time: 1057505479, Level: 9}, n: 1057505170, x: 14}, {e: lookup.Epoch{Time: 1072381377, Level: 12}, n: 1065950959, x: 22}, {e: lookup.Epoch{Time: 1093887139, Level: 8}, n: 1093863305, x: 14}, {e: lookup.Epoch{Time: 1082366510, Level: 24}, n: 1082366510, x: 23}, {e: lookup.Epoch{Time: 1103231132, Level: 14}, n: 1102292201, x: 22}, {e: lookup.Epoch{Time: 1094502355, Level: 3}, n: 1094324652, x: 18}, {e: lookup.Epoch{Time: 1068488344, Level: 12}, n: 1067577330, x: 19}, {e: lookup.Epoch{Time: 1050278233, Level: 12}, n: 1050278232, x: 11}, {e: lookup.Epoch{Time: 1047660768, Level: 5}, n: 1047652137, x: 17}, {e: lookup.Epoch{Time: 1060116167, Level: 11}, n: 1060114091, x: 12}, {e: lookup.Epoch{Time: 1068149392, Level: 21}, n: 1052074801, x: 24}, {e: lookup.Epoch{Time: 1081934120, Level: 6}, n: 1081933847, x: 8}, {e: lookup.Epoch{Time: 1107943693, Level: 16}, n: 1107096139, x: 25}, {e: lookup.Epoch{Time: 1131571649, Level: 9}, n: 1131570428, x: 11}, {e: lookup.Epoch{Time: 1123139367, Level: 0}, n: 1122912198, x: 20}, {e: lookup.Epoch{Time: 1121144423, Level: 6}, n: 1120568289, x: 20}, {e: lookup.Epoch{Time: 1089932411, Level: 17}, n: 1089932410, x: 16}, {e: lookup.Epoch{Time: 1104899012, Level: 22}, n: 1098978789, x: 22}, {e: lookup.Epoch{Time: 1094588059, Level: 21}, n: 1094588059, x: 20}, {e: lookup.Epoch{Time: 1114987438, Level: 24}, n: 1114987437, x: 23}, {e: lookup.Epoch{Time: 1084186305, Level: 7}, n: 1084186241, x: 6}, {e: lookup.Epoch{Time: 1058827111, Level: 8}, n: 1058826504, x: 9}, {e: lookup.Epoch{Time: 1090679810, Level: 12}, n: 1090616539, x: 17}, {e: lookup.Epoch{Time: 1084299475, Level: 23}, n: 1084299475, x: 22}}
 
 func TestGetNextLevel(t *testing.T) {
 

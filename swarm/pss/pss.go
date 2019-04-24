@@ -130,10 +130,11 @@ type Pss struct {
 	outbox          chan *PssMsg
 
 	// message handling
-	handlers         map[Topic]map[*handler]bool // topic and version based pss payload handlers. See pss.Handle()
-	handlersMu       sync.RWMutex
-	hashPool         sync.Pool
-	topicHandlerCaps map[Topic]*handlerCaps // caches capabilities of each topic's handlers (see handlerCap* consts in types.go)
+	handlers           map[Topic]map[*handler]bool // topic and version based pss payload handlers. See pss.Handle()
+	handlersMu         sync.RWMutex
+	hashPool           sync.Pool
+	topicHandlerCaps   map[Topic]*handlerCaps // caches capabilities of each topic's handlers
+	topicHandlerCapsMu sync.RWMutex
 
 	// process
 	quitC chan struct{}
@@ -295,6 +296,19 @@ func (p *Pss) PublicKey() *ecdsa.PublicKey {
 // SECTION: Message handling
 /////////////////////////////////////////////////////////////////////
 
+func (p *Pss) getTopicHandlerCaps(topic Topic) (hc *handlerCaps, found bool) {
+	p.topicHandlerCapsMu.RLock()
+	defer p.topicHandlerCapsMu.RUnlock()
+	hc, found = p.topicHandlerCaps[topic]
+	return
+}
+
+func (p *Pss) setTopicHandlerCaps(topic Topic, hc *handlerCaps) {
+	p.topicHandlerCapsMu.Lock()
+	defer p.topicHandlerCapsMu.Unlock()
+	p.topicHandlerCaps[topic] = hc
+}
+
 // Links a handler function to a Topic
 //
 // All incoming messages with an envelope Topic matching the
@@ -311,23 +325,28 @@ func (p *Pss) Register(topic *Topic, hndlr *handler) func() {
 	if handlers == nil {
 		handlers = make(map[*handler]bool)
 		p.handlers[*topic] = handlers
-		log.Debug("registered handler", "caps", hndlr.caps)
+		log.Debug("registered handler", "capabilities", hndlr.caps)
 	}
 	if hndlr.caps == nil {
 		hndlr.caps = &handlerCaps{}
 	}
 	handlers[hndlr] = true
-	if _, ok := p.topicHandlerCaps[*topic]; !ok {
-		p.topicHandlerCaps[*topic] = &handlerCaps{}
+
+	capabilities, ok := p.getTopicHandlerCaps(*topic)
+	if !ok {
+		capabilities = &handlerCaps{}
+		p.setTopicHandlerCaps(*topic, capabilities)
 	}
+
 	if hndlr.caps.raw {
-		p.topicHandlerCaps[*topic].raw = true
+		capabilities.raw = true
 	}
 	if hndlr.caps.prox {
-		p.topicHandlerCaps[*topic].prox = true
+		capabilities.prox = true
 	}
 	return func() { p.deregister(topic, hndlr) }
 }
+
 func (p *Pss) deregister(topic *Topic, hndlr *handler) {
 	p.handlersMu.Lock()
 	defer p.handlersMu.Unlock()
@@ -344,17 +363,10 @@ func (p *Pss) deregister(topic *Topic, hndlr *handler) {
 				caps.prox = true
 			}
 		}
-		p.topicHandlerCaps[*topic] = caps
+		p.setTopicHandlerCaps(*topic, caps)
 		return
 	}
 	delete(handlers, hndlr)
-}
-
-// get all registered handlers for respective topics
-func (p *Pss) getHandlers(topic Topic) map[*handler]bool {
-	p.handlersMu.RLock()
-	defer p.handlersMu.RUnlock()
-	return p.handlers[topic]
 }
 
 // Filters incoming messages for processing or forwarding.
@@ -384,8 +396,8 @@ func (p *Pss) handlePssMsg(ctx context.Context, msg interface{}) error {
 	// raw is simplest handler contingency to check, so check that first
 	var isRaw bool
 	if pssmsg.isRaw() {
-		if _, ok := p.topicHandlerCaps[psstopic]; ok {
-			if !p.topicHandlerCaps[psstopic].raw {
+		if capabilities, ok := p.getTopicHandlerCaps(psstopic); ok {
+			if !capabilities.raw {
 				log.Debug("No handler for raw message", "topic", psstopic)
 				return nil
 			}
@@ -398,16 +410,16 @@ func (p *Pss) handlePssMsg(ctx context.Context, msg interface{}) error {
 	// - prox handler on message and we are in prox regardless of partial address match
 	// store this result so we don't calculate again on every handler
 	var isProx bool
-	if _, ok := p.topicHandlerCaps[psstopic]; ok {
-		isProx = p.topicHandlerCaps[psstopic].prox
+	if capabilities, ok := p.getTopicHandlerCaps(psstopic); ok {
+		isProx = capabilities.prox
 	}
 	isRecipient := p.isSelfPossibleRecipient(pssmsg, isProx)
 	if !isRecipient {
-		log.Trace("pss was for someone else :'( ... forwarding", "pss", common.ToHex(p.BaseAddr()), "prox", isProx)
+		log.Trace("pss msg forwarding ===>", "pss", common.ToHex(p.BaseAddr()), "prox", isProx)
 		return p.enqueue(pssmsg)
 	}
 
-	log.Trace("pss for us, yay! ... let's process!", "pss", common.ToHex(p.BaseAddr()), "prox", isProx, "raw", isRaw, "topic", label(pssmsg.Payload.Topic[:]))
+	log.Trace("pss msg processing <===", "pss", common.ToHex(p.BaseAddr()), "prox", isProx, "raw", isRaw, "topic", label(pssmsg.Payload.Topic[:]))
 	if err := p.process(pssmsg, isRaw, isProx); err != nil {
 		qerr := p.enqueue(pssmsg)
 		if qerr != nil {
@@ -415,7 +427,6 @@ func (p *Pss) handlePssMsg(ctx context.Context, msg interface{}) error {
 		}
 	}
 	return nil
-
 }
 
 // Entry point to processing a message for which the current node can be the intended recipient.
@@ -452,21 +463,27 @@ func (p *Pss) process(pssmsg *PssMsg, raw bool, prox bool) error {
 		payload = recvmsg.Payload
 	}
 
-	if len(pssmsg.To) < addressLength {
-		if err := p.enqueue(pssmsg); err != nil {
-			return err
-		}
+	if len(pssmsg.To) < addressLength || prox {
+		err = p.enqueue(pssmsg)
 	}
 	p.executeHandlers(psstopic, payload, from, raw, prox, asymmetric, keyid)
+	return err
+}
 
-	return nil
-
+// copy all registered handlers for respective topic in order to avoid data race or deadlock
+func (p *Pss) getHandlers(topic Topic) (ret []*handler) {
+	p.handlersMu.RLock()
+	defer p.handlersMu.RUnlock()
+	for k := range p.handlers[topic] {
+		ret = append(ret, k)
+	}
+	return ret
 }
 
 func (p *Pss) executeHandlers(topic Topic, payload []byte, from PssAddress, raw bool, prox bool, asymmetric bool, keyid string) {
 	handlers := p.getHandlers(topic)
 	peer := p2p.NewPeer(enode.ID{}, fmt.Sprintf("%x", from), []p2p.Cap{})
-	for h := range handlers {
+	for _, h := range handlers {
 		if !h.caps.raw && raw {
 			log.Warn("norawhandler")
 			continue
@@ -548,8 +565,8 @@ func (p *Pss) SendRaw(address PssAddress, topic Topic, msg []byte) error {
 
 	// if we have a proxhandler on this topic
 	// also deliver message to ourselves
-	if _, ok := p.topicHandlerCaps[topic]; ok {
-		if p.isSelfPossibleRecipient(pssMsg, true) && p.topicHandlerCaps[topic].prox {
+	if capabilities, ok := p.getTopicHandlerCaps(topic); ok {
+		if p.isSelfPossibleRecipient(pssMsg, true) && capabilities.prox {
 			return p.process(pssMsg, true, true)
 		}
 	}
@@ -646,8 +663,8 @@ func (p *Pss) send(to []byte, topic Topic, msg []byte, asymmetric bool, key []by
 	if err != nil {
 		return err
 	}
-	if _, ok := p.topicHandlerCaps[topic]; ok {
-		if p.isSelfPossibleRecipient(pssMsg, true) && p.topicHandlerCaps[topic].prox {
+	if capabilities, ok := p.getTopicHandlerCaps(topic); ok {
+		if p.isSelfPossibleRecipient(pssMsg, true) && capabilities.prox {
 			return p.process(pssMsg, true, true)
 		}
 	}
@@ -656,7 +673,7 @@ func (p *Pss) send(to []byte, topic Topic, msg []byte, asymmetric bool, key []by
 
 // sendFunc is a helper function that tries to send a message and returns true on success.
 // It is set here for usage in production, and optionally overridden in tests.
-var sendFunc func(p *Pss, sp *network.Peer, msg *PssMsg) bool = sendMsg
+var sendFunc = sendMsg
 
 // tries to send a message, returns true if successful
 func sendMsg(p *Pss, sp *network.Peer, msg *PssMsg) bool {

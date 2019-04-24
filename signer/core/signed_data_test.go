@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 //
-package core
+package core_test
 
 import (
 	"context"
@@ -26,9 +26,10 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/signer/core"
 )
 
-var typesStandard = Types{
+var typesStandard = core.Types{
 	"EIP712Domain": {
 		{
 			Name: "name",
@@ -147,7 +148,7 @@ var jsonTypedData = `
 
 const primaryType = "Mail"
 
-var domainStandard = TypedDataDomain{
+var domainStandard = core.TypedDataDomain{
 	"Ether Mail",
 	"1",
 	big.NewInt(1),
@@ -167,7 +168,7 @@ var messageStandard = map[string]interface{}{
 	"contents": "Hello, Bob!",
 }
 
-var typedData = TypedData{
+var typedData = core.TypedData{
 	Types:       typesStandard,
 	PrimaryType: primaryType,
 	Domain:      domainStandard,
@@ -179,34 +180,34 @@ func TestSignData(t *testing.T) {
 	//Create two accounts
 	createAccount(control, api, t)
 	createAccount(control, api, t)
-	control <- "1"
+	control.approveCh <- "1"
 	list, err := api.List(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
 	a := common.NewMixedcaseAddress(list[0])
 
-	control <- "Y"
-	control <- "wrongpassword"
-	signature, err := api.SignData(context.Background(), TextPlain.Mime, a, hexutil.Encode([]byte("EHLO world")))
+	control.approveCh <- "Y"
+	control.inputCh <- "wrongpassword"
+	signature, err := api.SignData(context.Background(), core.TextPlain.Mime, a, hexutil.Encode([]byte("EHLO world")))
 	if signature != nil {
 		t.Errorf("Expected nil-data, got %x", signature)
 	}
 	if err != keystore.ErrDecrypt {
 		t.Errorf("Expected ErrLocked! '%v'", err)
 	}
-	control <- "No way"
-	signature, err = api.SignData(context.Background(), TextPlain.Mime, a, hexutil.Encode([]byte("EHLO world")))
+	control.approveCh <- "No way"
+	signature, err = api.SignData(context.Background(), core.TextPlain.Mime, a, hexutil.Encode([]byte("EHLO world")))
 	if signature != nil {
 		t.Errorf("Expected nil-data, got %x", signature)
 	}
-	if err != ErrRequestDenied {
+	if err != core.ErrRequestDenied {
 		t.Errorf("Expected ErrRequestDenied! '%v'", err)
 	}
 	// text/plain
-	control <- "Y"
-	control <- "a_long_password"
-	signature, err = api.SignData(context.Background(), TextPlain.Mime, a, hexutil.Encode([]byte("EHLO world")))
+	control.approveCh <- "Y"
+	control.inputCh <- "a_long_password"
+	signature, err = api.SignData(context.Background(), core.TextPlain.Mime, a, hexutil.Encode([]byte("EHLO world")))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -214,14 +215,48 @@ func TestSignData(t *testing.T) {
 		t.Errorf("Expected 65 byte signature (got %d bytes)", len(signature))
 	}
 	// data/typed
-	control <- "Y"
-	control <- "a_long_password"
+	control.approveCh <- "Y"
+	control.inputCh <- "a_long_password"
 	signature, err = api.SignTypedData(context.Background(), a, typedData)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if signature == nil || len(signature) != 65 {
 		t.Errorf("Expected 65 byte signature (got %d bytes)", len(signature))
+	}
+}
+
+func TestDomainChainId(t *testing.T) {
+	withoutChainID := core.TypedData{
+		Types: core.Types{
+			"EIP712Domain": []core.Type{
+				{Name: "name", Type: "string"},
+			},
+		},
+		Domain: core.TypedDataDomain{
+			Name: "test",
+		},
+	}
+
+	if _, ok := withoutChainID.Domain.Map()["chainId"]; ok {
+		t.Errorf("Expected the chainId key to not be present in the domain map")
+	}
+
+	withChainID := core.TypedData{
+		Types: core.Types{
+			"EIP712Domain": []core.Type{
+				{Name: "name", Type: "string"},
+				{Name: "chainId", Type: "uint256"},
+			},
+		},
+		Domain: core.TypedDataDomain{
+			Name:    "test",
+			ChainId: big.NewInt(1),
+		},
+	}
+
+	if _, ok := withChainID.Domain.Map()["chainId"]; !ok {
+		t.Errorf("Expected the chainId key be present in the domain map")
 	}
 }
 
@@ -349,7 +384,7 @@ func TestMalformedDomainkeys(t *testing.T) {
       }
     }
 `
-	var malformedDomainTypedData TypedData
+	var malformedDomainTypedData core.TypedData
 	err := json.Unmarshal([]byte(jsonTypedData), &malformedDomainTypedData)
 	if err != nil {
 		t.Fatalf("unmarshalling failed '%v'", err)
@@ -437,7 +472,7 @@ func TestMalformedTypesAndExtradata(t *testing.T) {
       }
     }
 `
-	var malformedTypedData TypedData
+	var malformedTypedData core.TypedData
 	err := json.Unmarshal([]byte(jsonTypedData), &malformedTypedData)
 	if err != nil {
 		t.Fatalf("unmarshalling failed '%v'", err)
@@ -533,7 +568,7 @@ func TestTypeMismatch(t *testing.T) {
       }
     }
 `
-	var mismatchTypedData TypedData
+	var mismatchTypedData core.TypedData
 	err := json.Unmarshal([]byte(jsonTypedData), &mismatchTypedData)
 	if err != nil {
 		t.Fatalf("unmarshalling failed '%v'", err)
@@ -555,7 +590,7 @@ func TestTypeOverflow(t *testing.T) {
 	//{
 	//	"test": 65536 <-- test defined as uint8
 	//}
-	var overflowTypedData TypedData
+	var overflowTypedData core.TypedData
 	err := json.Unmarshal([]byte(jsonTypedData), &overflowTypedData)
 	if err != nil {
 		t.Fatalf("unmarshalling failed '%v'", err)
@@ -633,7 +668,7 @@ func TestArray(t *testing.T) {
 	      }
 	    }
 	`
-	var arrayTypedData TypedData
+	var arrayTypedData core.TypedData
 	err := json.Unmarshal([]byte(jsonTypedData), &arrayTypedData)
 	if err != nil {
 		t.Fatalf("unmarshalling failed '%v'", err)
@@ -746,7 +781,7 @@ func TestCustomTypeAsArray(t *testing.T) {
     }
 
 `
-	var malformedTypedData TypedData
+	var malformedTypedData core.TypedData
 	err := json.Unmarshal([]byte(jsonTypedData), &malformedTypedData)
 	if err != nil {
 		t.Fatalf("unmarshalling failed '%v'", err)
@@ -758,8 +793,7 @@ func TestCustomTypeAsArray(t *testing.T) {
 }
 
 func TestFormatter(t *testing.T) {
-
-	var d TypedData
+	var d core.TypedData
 	err := json.Unmarshal([]byte(jsonTypedData), &d)
 	if err != nil {
 		t.Fatalf("unmarshalling failed '%v'", err)

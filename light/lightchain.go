@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
+// Package light implements on-demand retrieval capable state and chain objects
+// for the Ethereum Light Client.
 package light
 
 import (
@@ -99,7 +101,7 @@ func NewLightChain(odr OdrBackend, config *params.ChainConfig, engine consensus.
 	if bc.genesisBlock == nil {
 		return nil, core.ErrNoGenesis
 	}
-	if cp, ok := trustedCheckpoints[bc.genesisBlock.Hash()]; ok {
+	if cp, ok := params.TrustedCheckpoints[bc.genesisBlock.Hash()]; ok {
 		bc.addTrustedCheckpoint(cp)
 	}
 	if err := bc.loadLastState(); err != nil {
@@ -209,9 +211,8 @@ func (lc *LightChain) Genesis() *types.Block {
 	return lc.genesisBlock
 }
 
-// State returns a new mutable state based on the current HEAD block.
-func (lc *LightChain) State() (*state.StateDB, error) {
-	return nil, errors.New("not implemented, needs client/server interface split")
+func (lc *LightChain) StateCache() state.Database {
+	panic("not implemented")
 }
 
 // GetBody retrieves a block body (transactions and uncles) from the database

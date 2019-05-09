@@ -21,15 +21,16 @@ import (
 )
 
 const (
-	VersionMajor = 1          // Major version component of the current release
-	VersionMinor = 9          // Minor version component of the current release
-	VersionPatch = 0          // Patch version component of the current release
-	VersionMeta  = "unstable" // Version metadata to append to the version string
+	VersionMajor     = 1          // Major version component of the current release
+	VersionMinor     = 9          // Minor version component of the current release
+	VersionPatch     = 0          // Patch version component of the current release
+	VersionMeta      = "unstable" // Version metadata to append to the version string
+	multiGethMoniker = "MG"
 )
 
 // Version holds the textual version string.
 var Version = func() string {
-	return fmt.Sprintf("%d.%d.%d", VersionMajor, VersionMinor, VersionPatch)
+	return fmt.Sprintf("%d.%d.%d-%s", VersionMajor, VersionMinor, VersionPatch, multiGethMoniker)
 }()
 
 // VersionWithMeta holds the textual version string including the metadata.

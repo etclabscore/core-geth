@@ -32,7 +32,7 @@ const MetadataApi = "rpc"
 
 var (
 	// defaultOpenRPCSchemaRaw can be used to establish a default (package-wide) OpenRPC schema from raw JSON.
-	// Methods will be cross referenced with actual registed method names in order to serve
+	// Methods will be cross referenced with actual registered method names in order to serve
 	// only server-enabled methods, enabling user and on-the-fly server endpoint availability configuration.
 	defaultOpenRPCSchemaRaw string
 

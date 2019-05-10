@@ -111,6 +111,7 @@ func localConsole(ctx *cli.Context) error {
 	return nil
 }
 
+// NOTE
 // remoteConsole will connect to a remote geth instance, attaching a JavaScript
 // console to it.
 func remoteConsole(ctx *cli.Context) error {
@@ -174,6 +175,7 @@ func remoteConsole(ctx *cli.Context) error {
 // for "geth attach" and "geth monitor" with no argument.
 func dialRPC(endpoint string) (*rpc.Client, error) {
 	if endpoint == "" {
+		// NOTE
 		endpoint = node.DefaultIPCEndpoint(clientIdentifier)
 	} else if strings.HasPrefix(endpoint, "rpc:") || strings.HasPrefix(endpoint, "ipc:") {
 		// Backwards compatibility with geth < 1.5 which required

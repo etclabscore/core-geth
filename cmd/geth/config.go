@@ -100,7 +100,7 @@ func loadConfig(file string, cfg *gethConfig) error {
 
 func defaultNodeConfig() node.Config {
 	cfg := node.DefaultConfig
-	cfg.Name = clientIdentifier
+	cfg.Name = clientIdentifier // NOTE
 	cfg.Version = params.VersionWithCommit(gitCommit)
 	cfg.HTTPModules = append(cfg.HTTPModules, "eth", "shh")
 	cfg.WSModules = append(cfg.WSModules, "eth", "shh")

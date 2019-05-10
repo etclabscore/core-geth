@@ -730,6 +730,7 @@ var (
 	}
 )
 
+// NOTE
 // MakeDataDir retrieves the currently requested data directory, terminating
 // if none (or the empty string) is specified. If the node is starting a testnet,
 // the a subdirectory of the specified datadir will be used.
@@ -1171,6 +1172,8 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	setGraphQL(ctx, cfg)
 	setWS(ctx, cfg)
 	setNodeUserIdent(ctx, cfg)
+
+	// NOTE
 	setDataDir(ctx, cfg)
 
 	if ctx.GlobalIsSet(ExternalSignerFlag.Name) {
@@ -1191,6 +1194,7 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	}
 }
 
+// NOTE
 func setDataDir(ctx *cli.Context, cfg *node.Config) {
 	switch {
 	case ctx.GlobalIsSet(DataDirFlag.Name):

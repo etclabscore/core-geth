@@ -232,6 +232,7 @@ func DefaultIPCEndpoint(clientIdentifier string) string {
 			panic("empty executable name")
 		}
 	}
+	// NOTE
 	config := &Config{DataDir: DefaultDataDir(), IPCPath: clientIdentifier + ".ipc"}
 	return config.IPCEndpoint()
 }
@@ -302,6 +303,8 @@ func (c *Config) NodeName() string {
 	return name
 }
 
+// NOTE
+// This function winds up being used as a parent directory name.
 func (c *Config) name() string {
 	if c.Name == "" {
 		progname := strings.TrimSuffix(filepath.Base(os.Args[0]), ".exe")
@@ -323,6 +326,8 @@ var isOldGethResource = map[string]bool{
 }
 
 // ResolvePath resolves path in the instance directory.
+// NOTE, aha
+// Is passed 'path=chaindata', for example.
 func (c *Config) ResolvePath(path string) string {
 	if filepath.IsAbs(path) {
 		return path
@@ -347,6 +352,7 @@ func (c *Config) ResolvePath(path string) string {
 	return filepath.Join(c.instanceDir(), path)
 }
 
+// NOTE
 func (c *Config) instanceDir() string {
 	if c.DataDir == "" {
 		return ""

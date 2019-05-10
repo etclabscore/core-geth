@@ -25,6 +25,7 @@ const (
 	VersionMinor = 9          // Minor version component of the current release
 	VersionPatch = 0          // Patch version component of the current release
 	VersionMeta  = "unstable" // Version metadata to append to the version string
+	VersionName  = "MultiGeth"
 )
 
 // Version holds the textual version string.

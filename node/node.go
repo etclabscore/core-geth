@@ -89,7 +89,6 @@ func New(conf *Config) (*Node, error) {
 	}
 	// Ensure that the instance name doesn't cause weird conflicts with
 	// other files in the data directory.
-	// NOTE
 	if strings.ContainsAny(conf.Name, `/\`) {
 		return nil, errors.New(`Config.Name must not contain '/' or '\'`)
 	}

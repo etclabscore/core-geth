@@ -2,6 +2,7 @@
 
 > A "swiss army knife" distribution of _go-ethereum_, with support for many species of Ethereum networks.
 
+[![OpenRPC](https://img.shields.io/static/v1.svg?label=OpenRPC&message=1.1.8&color=blue)](#openrpc-discovery)
 [![API Reference](
 https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/68747470733a2f2f676f646f632e6f72672f6769746875622e636f6d2f676f6c616e672f6764646f3f7374617475732e737667
 )](https://godoc.org/github.com/multi-geth/multi-geth)
@@ -12,7 +13,7 @@ https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/6874
 Binary archives are published at https://github.com/multi-geth/multi-geth/releases.
 
 Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) is merged to this repository regularly,
- usually at every upstream tagged release. Every effort is made to maintain seamless compatibility with upstream source, including congruent RPC, JS, and CLI
+ usually at every upstream tagged release. Every effort is made to maintain seamless compatibility with upstream source, including compatible RPC, JS, and CLI
  APIs, data storage locations and schemas, and, of course, interoperable client protocols. Applicable bug reports, bug fixes, features, and proposals should be
  made upstream whenever possible.
 
@@ -212,6 +213,44 @@ on all transports. You can reuse the same connection for multiple requests!
 doing so! Hackers on the internet are actively trying to subvert Ethereum nodes with exposed APIs!
 Further, all browser tabs can access locally running web servers, so malicious web pages could try to
 subvert locally available APIs!**
+
+### OpenRPC Discovery
+
+MultiGeth supports [OpenRPC's Service Discovery method](https://spec.open-rpc.org/#service-discovery-method), enabling efficient and well-spec'd JSON RPC interfacing and tooling. This method follows the established JSON RPC patterns, and is accessible via HTTP, WebSocket, IPC, and console servers. To use this method:
+```shell
+$ curl -X POST -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","method":"rpc.discover","params":[],"id":1}'
+{                                                                                                                                                         
+  "jsonrpc": "2.0",                                                                                                                                       
+  "id": 1,                                                                                                                                                
+  "result": {                                                                                                                                             
+    "openrpc": "1.0.0",                                                                                                                                   
+    "info": {                                                                                                                                             
+      "description": "This API lets you interact with an EVM-based client via JSON-RPC",                                                                  
+      "license": {                                                                                                                                        
+        "name": "Apache 2.0",                                                                                                                             
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html"                                                                                         
+      },                                                                                                                                                  
+      "title": "Ethereum JSON-RPC",                                                                                                                       
+      "version": "1.0.0"                                                                                                                                  
+    },                                                                                                                                                    
+    "servers": null,                                                                                                                                      
+    "methods": [                                                                                                                                          
+      {                                                                                                                                                   
+        "description": "Returns the version of the current client",                                                                                       
+        "name": "web3_clientVersion",                                                                                                                     
+        "params": [],                                                                                                                                     
+        "result": {                                                                                                                                       
+          "description": "client version",                                                                                                                
+          "name": "clientVersion",                                                                                                                        
+          "schema": {                                                                                                                                     
+            "type": "string"                                                                                                                              
+          }                                                                                                                                               
+        },                                                                                                                                                
+        "summary": "current client version"                                                                                                               
+      },                      
+
+[...]
+```
 
 ### Operating a private network
 

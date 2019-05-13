@@ -12,7 +12,7 @@ https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/6874
 Binary archives are published at https://github.com/multi-geth/multi-geth/releases.
 
 Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) is merged to this repository regularly,
- usually at every upstream tagged release. Every effort is made to maintain seamless compatibility with upstream source, including congruent RPC, JS, and CLI
+ usually at every upstream tagged release. Every effort is made to maintain seamless compatibility with upstream source, including compatible RPC, JS, and CLI
  APIs, data storage locations and schemas, and, of course, interoperable client protocols. Applicable bug reports, bug fixes, features, and proposals should be
  made upstream whenever possible.
 

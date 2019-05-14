@@ -18,6 +18,7 @@ package les
 
 import (
 	"context"
+	"errors"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts"
@@ -78,8 +79,11 @@ func (b *LesApiBackend) BlockByNumber(ctx context.Context, blockNr rpc.BlockNumb
 
 func (b *LesApiBackend) StateAndHeaderByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*state.StateDB, *types.Header, error) {
 	header, err := b.HeaderByNumber(ctx, blockNr)
-	if header == nil || err != nil {
+	if err != nil {
 		return nil, nil, err
+	}
+	if header == nil {
+		return nil, nil, errors.New("header not found")
 	}
 	return light.NewState(ctx, header, b.eth.odr), header, nil
 }
@@ -126,6 +130,10 @@ func (b *LesApiBackend) GetPoolTransactions() (types.Transactions, error) {
 
 func (b *LesApiBackend) GetPoolTransaction(txHash common.Hash) *types.Transaction {
 	return b.eth.txPool.GetTransaction(txHash)
+}
+
+func (b *LesApiBackend) GetTransaction(ctx context.Context, txHash common.Hash) (*types.Transaction, common.Hash, uint64, uint64, error) {
+	return light.GetTransaction(ctx, b.eth.odr, txHash)
 }
 
 func (b *LesApiBackend) GetPoolNonce(ctx context.Context, addr common.Address) (uint64, error) {

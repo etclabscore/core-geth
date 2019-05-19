@@ -49,6 +49,12 @@ var (
 	DisinflationRateDivisor  = big.NewInt(5)                                       // Disinflation rate divisor for ECIP1017
 	ExpDiffPeriod            = big.NewInt(100000)                                  // Exponential diff period for diff bomb & ECIP1010
 
+	// Musicoin
+	Mcip0BlockReward       = new(big.Int).Mul(big.NewInt(314), big.NewInt(1e+18)) // In musicoin code as 'FrontierBlockReward'
+	Mcip3BlockReward       = new(big.Int).Mul(big.NewInt(250), big.NewInt(1e+18))
+	Mcip8BlockReward       = new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18))
+	MusicoinUbiBlockReward = new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18))
+	MusicoinDevBlockReward = new(big.Int).Mul(big.NewInt(14), big.NewInt(1e+18))
 )
 
 // Various error messages to mark blocks invalid. These should be private to
@@ -580,6 +586,47 @@ func accumulateRewards(config *params.ChainConfig, state *state.StateDB, header 
 	}
 	if config.IsEthersocial(header.Number) {
 		blockReward = EthersocialBlockReward
+	}
+	if config.IsMCIP0(header.Number) {
+		// Select the correct block reward based on chain progression
+		blockReward := FrontierBlockReward
+		mcip3Reward := Mcip3BlockReward
+		mcip8Reward := Mcip8BlockReward
+		ubiReservoir := MusicoinUbiBlockReward
+		devReservoir := MusicoinDevBlockReward
+
+		reward := new(big.Int).Set(blockReward)
+
+		// Activate MCIP3-UBI hardfork
+		if config.IsMCIP8(header.Number) {
+			state.AddBalance(header.Coinbase, mcip8Reward)
+			state.AddBalance(common.HexToAddress("0x00eFdd5883eC628983E9063c7d969fE268BBf310"), ubiReservoir)
+			state.AddBalance(common.HexToAddress("0x00756cF8159095948496617F5FB17ED95059f536"), devReservoir)
+			blockReward := mcip8Reward
+			reward := new(big.Int).Set(blockReward)
+			_ = reward
+		} else if config.IsMCIP3(header.Number) {
+			state.AddBalance(header.Coinbase, mcip3Reward)
+			state.AddBalance(common.HexToAddress("0x00eFdd5883eC628983E9063c7d969fE268BBf310"), ubiReservoir)
+			state.AddBalance(common.HexToAddress("0x00756cF8159095948496617F5FB17ED95059f536"), devReservoir)
+			// no change to uncle reward during UBI fork, a mistake but now a legacy
+		} else {
+			state.AddBalance(header.Coinbase, reward)
+		}
+
+		// Accumulate the rewards for the miner and any included uncles
+		r := new(big.Int)
+		for _, uncle := range uncles {
+			r.Add(uncle.Number, big8)
+			r.Sub(r, header.Number)
+			r.Mul(r, blockReward)
+			r.Div(r, big8)
+			state.AddBalance(uncle.Coinbase, r)
+
+			r.Div(blockReward, big32)
+			reward.Add(reward, r)
+		}
+		return
 	}
 	if config.HasECIP1017() {
 		// Ensure value 'era' is configured.

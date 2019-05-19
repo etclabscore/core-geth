@@ -369,6 +369,20 @@ func DefaultEthersocialGenesisBlock() *Genesis {
 	}
 }
 
+// MusicoinGenesisBlock returns the Musicoin main net genesis block.
+func DefaultMusicoinGenesisBlock() *Genesis {
+	return &Genesis{
+		Config:     params.MusicoinChainConfig,
+		Timestamp:  0,
+		Nonce:      42,
+		ExtraData:  nil,
+		Mixhash:    common.HexToHash("0x00000000000000000000000000000000000000647572616c65787365646c6578"),
+		GasLimit:   8000000,
+		Difficulty: big.NewInt(4000000),
+		Alloc:      decodePrealloc(musicoinAllocData),
+	}
+}
+
 // DefaultTestnetGenesisBlock returns the Ropsten network genesis block.
 func DefaultTestnetGenesisBlock() *Genesis {
 	return &Genesis{

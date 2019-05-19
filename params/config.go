@@ -30,6 +30,7 @@ var (
 	SocialGenesisHash      = common.HexToHash("0xba8314d5c2ebddaf58eb882b364b27cbfa4d3402dacd32b60986754ac25cfe8d")
 	MixGenesisHash         = common.HexToHash("0x4fa57903dad05875ddf78030c16b5da886f7d81714cf66946a4c02566dbb2af5")
 	EthersocialGenesisHash = common.HexToHash("0x310dd3c4ae84dd89f1b46cfdd5e26c8f904dfddddc73f323b468127272e20e9f")
+	MusicoinGenesisHash    = common.HexToHash("0x4eba28a4ce8dc0701f94c936a223a8429129b38ca9974ec0e92bf9234ac952e9")
 	RinkebyGenesisHash     = common.HexToHash("0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177")
 	KottiGenesisHash       = common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4")
 	GoerliGenesisHash      = common.HexToHash("0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a")
@@ -149,6 +150,23 @@ var (
 		EthersocialBlock:    big.NewInt(0),
 		ConstantinopleBlock: nil,
 		Ethash:              new(EthashConfig),
+	}
+
+	// MusicoinChainConfig is the chain parameters to run a node on the main network.
+	MusicoinChainConfig = &ChainConfig{
+		MCIP0Block:     big.NewInt(0),
+		ChainID:        big.NewInt(7762959),
+		HomesteadBlock: big.NewInt(1150000),
+		DAOForkBlock:   big.NewInt(36028797018963967),
+		DAOForkSupport: false,
+		EIP150Block:    big.NewInt(2222222),
+		EIP150Hash:     common.HexToHash("0x"),
+		EIP155Block:    big.NewInt(2222222),
+		EIP158Block:    big.NewInt(2222222),
+		ByzantiumBlock: big.NewInt(2222222),
+		MCIP3Block:     big.NewInt(1200001),
+		MCIP8Block:     big.NewInt(5200001),
+		Ethash:         new(EthashConfig),
 	}
 
 	// TestnetChainConfig contains the chain parameters to run a node on the Ropsten test network.
@@ -313,6 +331,10 @@ var (
 		nil, // SocialBlock
 		nil, // EthersocialBlock
 
+		nil, // Musicoin MCIP0Block UBI
+		nil, // Musicoin MCIP3Block UBI
+		nil, // Musicoin MCIP8Block QT
+
 		new(EthashConfig), // Ethash
 		nil,               // Clique
 	}
@@ -368,6 +390,10 @@ var (
 		nil, // SocialBlock
 		nil, // EthersocialBlock
 
+		nil, // Musicoin MCIP0Block UBI
+		nil, // Musicoin MCIP3Block UBI
+		nil, // Musicoin MCIP8Block QT
+
 		nil, // Ethash
 		&CliqueConfig{
 			Period: 0,
@@ -421,6 +447,10 @@ var (
 		nil, // DisposalBlock
 		nil, // SocialBlock
 		nil, // EthersocialBlock
+
+		nil, // Musicoin MCIP0Block UBI
+		nil, // Musicoin MCIP3Block UBI
+		nil, // Musicoin MCIP8Block QT
 
 		new(EthashConfig), // Ethash
 		nil,               // Clique
@@ -552,6 +582,10 @@ type ChainConfig struct {
 	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`      // Bomb disposal HF block
 	SocialBlock        *big.Int `json:"socialBlock,omitempty"`        // Ethereum Social Reward block
 	EthersocialBlock   *big.Int `json:"ethersocialBlock,omitempty"`   // Ethersocial Reward block
+
+	MCIP0Block *big.Int `json:"mcip0Block,omitempty"` // Musicoin default block; no MCIP, just denotes chain pref
+	MCIP3Block *big.Int `json:"mcip3Block,omitempty"` // Musicoin 'UBI Fork' block
+	MCIP8Block *big.Int `json:"mcip8Block,omitempty"` // Musicoin 'QT For' block
 
 	// Various consensus engines
 	Ethash *EthashConfig `json:"ethash,omitempty"`
@@ -743,6 +777,21 @@ func (c *ChainConfig) IsEthersocial(num *big.Int) bool {
 
 func (c *ChainConfig) IsECIP1010(num *big.Int) bool {
 	return isForked(c.ECIP1010PauseBlock, num)
+}
+
+// IsMCIP0 returns whether MCIP0 block is engaged.
+func (c *ChainConfig) IsMCIP0(num *big.Int) bool {
+	return isForked(c.MCIP0Block, num)
+}
+
+// IsMCIP3 returns whether MCIP3-UBI block is engaged.
+func (c *ChainConfig) IsMCIP3(num *big.Int) bool {
+	return isForked(c.MCIP3Block, num)
+}
+
+// IsMCIP8 returns whether MCIP3-QT block is engaged.
+func (c *ChainConfig) IsMCIP8(num *big.Int) bool {
+	return isForked(c.MCIP8Block, num)
 }
 
 // IsPetersburg returns whether num is either
@@ -940,6 +989,7 @@ type Rules struct {
 	IsEIP145F, IsEIP1014F, IsEIP1052F, IsEIP1283F, IsEIP1234F bool
 	IsPetersburg                                              bool
 	IsBombDisposal, IsSocial, IsEthersocial, IsECIP1010       bool
+	IsMCIP0, IsMCIP3, IsMCIP8                                 bool
 }
 
 // Rules ensures c's ChainID is not nil.
@@ -982,5 +1032,9 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 		IsSocial:       c.IsSocial(num),
 		IsEthersocial:  c.IsEthersocial(num),
 		IsECIP1010:     c.IsECIP1010(num),
+
+		IsMCIP0: c.IsMCIP0(num),
+		IsMCIP3: c.IsMCIP3(num),
+		IsMCIP8: c.IsMCIP8(num),
 	}
 }

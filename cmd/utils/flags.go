@@ -153,6 +153,10 @@ var (
 		Name:  "ethersocial",
 		Usage: "Ethersocial network: pre-configured Ethersocial mainnet",
 	}
+	MusicoinFlag = cli.BoolFlag{
+		Name:  "musicoin",
+		Usage: "Musicoin network: pre-configured Musicoin mainnet",
+	}
 	RinkebyFlag = cli.BoolFlag{
 		Name:  "rinkeby",
 		Usage: "Rinkeby network: pre-configured proof-of-authority test network",
@@ -750,6 +754,9 @@ func MakeDataDir(ctx *cli.Context) string {
 		if ctx.GlobalBool(EthersocialFlag.Name) {
 			return filepath.Join(path, "ethersocial")
 		}
+		if ctx.GlobalBool(MusicoinFlag.Name) {
+			return filepath.Join(path, "musicoin")
+		}
 		if ctx.GlobalBool(RinkebyFlag.Name) {
 			return filepath.Join(path, "rinkeby")
 		}
@@ -819,6 +826,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.MixBootnodes
 	case ctx.GlobalBool(EthersocialFlag.Name):
 		urls = params.EthersocialBootnodes
+	case ctx.GlobalBool(MusicoinFlag.Name):
+		urls = params.MusicoinBootnodes
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		urls = params.RinkebyBootnodes
 	case ctx.GlobalBool(KottiFlag.Name):
@@ -1207,6 +1216,8 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "mix")
 	case ctx.GlobalBool(EthersocialFlag.Name):
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "ethersocial")
+	case ctx.GlobalBool(MusicoinFlag.Name):
+		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "musicoin")
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "rinkeby")
 	case ctx.GlobalBool(KottiFlag.Name):
@@ -1402,7 +1413,7 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node, cfg *whisper.Config) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
-	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag, KottiFlag, GoerliFlag, ClassicFlag, SocialFlag, MixFlag, EthersocialFlag)
+	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag, KottiFlag, GoerliFlag, ClassicFlag, SocialFlag, MixFlag, EthersocialFlag, MusicoinFlag)
 	checkExclusive(ctx, LightServFlag, SyncModeFlag, "light")
 
 	// Can't use both ephemeral unlocked and external signer
@@ -1494,6 +1505,13 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 			cfg.NetworkId = 1
 		}
 		cfg.Genesis = core.DefaultEthersocialGenesisBlock()
+
+	case ctx.GlobalBool(MusicoinFlag.Name):
+		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
+			cfg.NetworkId = 7762959
+		}
+		cfg.Genesis = core.DefaultMusicoinGenesisBlock()
+
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 4
@@ -1673,6 +1691,8 @@ func MakeGenesis(ctx *cli.Context) *core.Genesis {
 		genesis = core.DefaultMixGenesisBlock()
 	case ctx.GlobalBool(EthersocialFlag.Name):
 		genesis = core.DefaultEthersocialGenesisBlock()
+	case ctx.GlobalBool(MusicoinFlag.Name):
+		genesis = core.DefaultMusicoinGenesisBlock()
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		genesis = core.DefaultRinkebyGenesisBlock()
 	case ctx.GlobalBool(KottiFlag.Name):

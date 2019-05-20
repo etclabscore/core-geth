@@ -779,7 +779,8 @@ func (c *ChainConfig) IsECIP1010(num *big.Int) bool {
 	return isForked(c.ECIP1010PauseBlock, num)
 }
 
-// IsMCIP0 returns whether MCIP0 block is engaged.
+// IsMCIP0 returns whether MCIP0 block is engaged; this is equivalent to 'IsMusicoin'.
+// (There is no MCIP-0).
 func (c *ChainConfig) IsMCIP0(num *big.Int) bool {
 	return isForked(c.MCIP0Block, num)
 }

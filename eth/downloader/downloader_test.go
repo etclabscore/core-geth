@@ -75,7 +75,7 @@ func newTester() *downloadTester {
 	tester.stateDb = rawdb.NewMemoryDatabase()
 	tester.stateDb.Put(testGenesis.Root().Bytes(), []byte{0x00})
 
-	tester.downloader = New(FullSync, 0, tester.stateDb, new(event.TypeMux), tester, nil, tester.dropPeer)
+	tester.downloader = New(0, tester.stateDb, trie.NewSyncBloom(1, tester.stateDb), new(event.TypeMux), tester, nil, tester.dropPeer)
 	return tester
 }
 
@@ -1594,13 +1594,13 @@ func testCheckpointEnforcement(t *testing.T, protocol int, mode SyncMode) {
 	tester.newPeer("peer", protocol, chain)
 
 	var expect error
-	if mode == FastSync {
+	if mode == FastSync || mode == LightSync {
 		expect = errUnsyncedPeer
 	}
 	if err := tester.sync("peer", nil, mode); err != expect {
 		t.Fatalf("block sync error mismatch: have %v, want %v", err, expect)
 	}
-	if mode == FastSync {
+	if mode == FastSync || mode == LightSync {
 		assertOwnChain(t, tester, 1)
 	} else {
 		assertOwnChain(t, tester, chain.len())

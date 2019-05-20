@@ -589,7 +589,7 @@ func accumulateRewards(config *params.ChainConfig, state *state.StateDB, header 
 	}
 	if config.IsMCIP0(header.Number) {
 		// Select the correct block reward based on chain progression
-		blockReward := FrontierBlockReward
+		blockReward := Mcip0BlockReward
 		mcip3Reward := Mcip3BlockReward
 		mcip8Reward := Mcip8BlockReward
 		ubiReservoir := MusicoinUbiBlockReward

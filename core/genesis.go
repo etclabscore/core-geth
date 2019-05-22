@@ -225,6 +225,8 @@ func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
 		return params.MixChainConfig
 	case ghash == params.EthersocialGenesisHash:
 		return params.EthersocialChainConfig
+	case ghash == params.KottiGenesisHash:
+		return params.KottiChainConfig
 	default:
 		return params.AllEthashProtocolChanges
 	}

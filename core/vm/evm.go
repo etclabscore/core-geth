@@ -21,6 +21,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/ethereum/evmc/bindings/go/evmc"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
@@ -145,14 +147,14 @@ func NewEVM(ctx Context, statedb StateDB, chainConfig *params.ChainConfig, vmCon
 
 	if chainConfig.IsEWASM(ctx.BlockNumber) {
 		if vmConfig.EWASMInterpreter != "" {
-			evm.interpreters = append(evm.interpreters, NewEVMC(vmConfig.EWASMInterpreter, evm))
+			evm.interpreters = append(evm.interpreters, NewEVMC(evmc.CapabilityEWASM, vmConfig.EWASMInterpreter, evm))
 		} else {
 			panic("The default ewasm interpreter not supported yet.")
 		}
 	}
 
 	if vmConfig.EVMInterpreter != "" {
-		evm.interpreters = append(evm.interpreters, NewEVMC(vmConfig.EVMInterpreter, evm))
+		evm.interpreters = append(evm.interpreters, NewEVMC(evmc.CapabilityEVM1, vmConfig.EVMInterpreter, evm))
 	} else {
 		evm.interpreters = append(evm.interpreters, NewEVMInterpreter(evm, vmConfig))
 	}

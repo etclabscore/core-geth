@@ -36,23 +36,40 @@ import (
 // EVMC represents the reference to a common EVMC-based VM instance and
 // the current execution context as required by go-ethereum design.
 type EVMC struct {
-	instance *evmc.Instance // The reference to the EVMC VM instance.
-	env      *EVM           // The execution context.
-	readOnly bool           // The readOnly flag (TODO: Try to get rid of it).
+	instance *evmc.Instance  // The reference to the EVMC VM instance.
+	env      *EVM            // The execution context.
+	cap      evmc.Capability // The supported EVMC capability (EVM or Ewasm)
+	readOnly bool            // The readOnly flag (TODO: Try to get rid of it).
+}
+
+type EVMCModule struct {
+	instance *evmc.Instance // The EVMC VM instance.
+	config   string         // The configuration the module was created with.
+	createMu sync.Mutex     // The mutex protecting EVMC VM instance creation.
 }
 
 var (
-	createMu     sync.Mutex     // The mutex protecting EVMC VM instance creation.
-	evmcConfig   string         // The configuration the instance was created with.
-	evmcInstance *evmc.Instance // The EVMC VM instance.
+	evmModule   EVMCModule
+	ewasmModule EVMCModule
 )
 
 // NewEVMC creates new EVMC-based VM execution context.
-func NewEVMC(config string, env *EVM) *EVMC {
-	createMu.Lock()
-	defer createMu.Unlock()
+func NewEVMC(cap evmc.Capability, config string, env *EVM) *EVMC {
+	var module *EVMCModule
 
-	if evmcInstance == nil {
+	switch cap {
+	case evmc.CapabilityEVM1:
+		module = &evmModule
+	case evmc.CapabilityEWASM:
+		module = &ewasmModule
+	default:
+		panic(fmt.Errorf("EVMC: Unknown capability %d", cap))
+	}
+
+	module.createMu.Lock()
+	defer module.createMu.Unlock()
+
+	if module.instance == nil {
 		options := strings.Split(config, ",")
 		path := options[0]
 
@@ -61,17 +78,18 @@ func NewEVMC(config string, env *EVM) *EVMC {
 		}
 
 		var err error
-		evmcInstance, err = evmc.Load(path)
+		module.instance, err = evmc.Load(path)
 		if err != nil {
 			panic(err.Error())
 		}
-		log.Info("EVMC VM loaded", "name", evmcInstance.Name(), "version", evmcInstance.Version(), "path", path)
+		log.Info("EVMC VM loaded", "name", module.instance.Name(), "version", module.instance.Version(), "path", path)
 
+		// Set options before checking capabilities.
 		for _, option := range options[1:] {
 			if idx := strings.Index(option, "="); idx >= 0 {
 				name := option[:idx]
 				value := option[idx+1:]
-				err := evmcInstance.SetOption(name, value)
+				err := module.instance.SetOption(name, value)
 				if err == nil {
 					log.Info("EVMC VM option set", "name", name, "value", value)
 				} else {
@@ -80,16 +98,16 @@ func NewEVMC(config string, env *EVM) *EVMC {
 			}
 		}
 
-		evm1Cap := evmcInstance.HasCapability(evmc.CapabilityEVM1)
-		ewasmCap := evmcInstance.HasCapability(evmc.CapabilityEWASM)
-		log.Info("EVMC VM capabilities", "evm1", evm1Cap, "ewasm", ewasmCap)
+		if !module.instance.HasCapability(cap) {
+			panic(fmt.Errorf("The EVMC module %s does not have requested capability %d", path, cap))
+		}
 
-		evmcConfig = config // Remember the config.
-	} else if evmcConfig != config {
-		log.Error("New EVMC VM requested", "newconfig", config, "oldconfig", evmcConfig)
+		module.config = config // Remember the config.
+	} else if module.config != config {
+		log.Error("New EVMC VM requested", "newconfig", config, "oldconfig", module.config)
 	}
 
-	return &EVMC{evmcInstance, env, false}
+	return &EVMC{module.instance, env, cap, false}
 }
 
 // hostContext implements evmc.HostContext interface.
@@ -349,11 +367,10 @@ func (evm *EVMC) Run(contract *Contract, input []byte, readOnly bool) (ret []byt
 
 // CanRun implements Interpreter.CanRun().
 func (evm *EVMC) CanRun(code []byte) bool {
-	cap := evmc.CapabilityEVM1
+	required := evmc.CapabilityEVM1
 	wasmPreamble := []byte("\x00asm")
 	if bytes.HasPrefix(code, wasmPreamble) {
-		cap = evmc.CapabilityEWASM
+		required = evmc.CapabilityEWASM
 	}
-	// FIXME: Optimize. Access capabilities once.
-	return evm.instance.HasCapability(cap)
+	return evm.cap == required
 }

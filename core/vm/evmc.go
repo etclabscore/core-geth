@@ -53,6 +53,16 @@ var (
 	ewasmModule EVMCModule
 )
 
+// InitEVMC initializes the EVMC modules.
+func InitEVMC(evmConfig string, ewasmConfig string) {
+	if evmConfig != "" {
+		initEVMC(&evmModule, evmc.CapabilityEVM1, evmConfig)
+	}
+	if ewasmConfig != "" {
+		initEVMC(&ewasmModule, evmc.CapabilityEWASM, ewasmConfig)
+	}
+}
+
 func initEVMC(module *EVMCModule, cap evmc.Capability, config string) {
 	module.once.Do(func() {
 		options := strings.Split(config, ",")
@@ -101,8 +111,6 @@ func NewEVMC(cap evmc.Capability, config string, env *EVM) *EVMC {
 	default:
 		panic(fmt.Errorf("EVMC: Unknown capability %d", cap))
 	}
-
-	initEVMC(module, cap, config)
 
 	return &EVMC{module.instance, env, cap, false}
 }

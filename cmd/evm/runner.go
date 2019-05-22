@@ -185,6 +185,8 @@ func runCmd(ctx *cli.Context) error {
 		},
 	}
 
+	vm.InitEVMC(runtimeConfig.EVMConfig.EVMInterpreter, runtimeConfig.EVMConfig.EWASMInterpreter)
+
 	if cpuProfilePath := ctx.GlobalString(CPUProfileFlag.Name); cpuProfilePath != "" {
 		f, err := os.Create(cpuProfilePath)
 		if err != nil {

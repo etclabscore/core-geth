@@ -1528,6 +1528,8 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 			cfg.Miner.GasPrice = big.NewInt(1)
 		}
 	}
+
+	vm.InitEVMC(cfg.EVMInterpreter, cfg.EWASMInterpreter)
 }
 
 // SetDashboardConfig applies dashboard related command line flags to the config.

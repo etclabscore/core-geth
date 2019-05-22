@@ -243,7 +243,7 @@ func newFaucet(genesis *core.Genesis, port int, enodes []*discv5.Node, network u
 		DataDir: filepath.Join(os.Getenv("HOME"), ".faucet"),
 		P2P: p2p.Config{
 			NAT:              nat.Any(),
-			NoDiscovery:      false,
+			NoDiscovery:      true,
 			DiscoveryV5:      true,
 			ListenAddr:       fmt.Sprintf(":%d", port),
 			MaxPeers:         25,

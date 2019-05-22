@@ -150,6 +150,7 @@ func main() {
 
 	if *kottiFlag {
 		genesis = core.DefaultKottiGenesisBlock()
+		log.Info("kotti enabled", "genesis", genesis.Config.String())
 		if *bootFlag == "" {
 			*bootFlag = strings.Join(params.KottiBootnodes, ",")
 		}

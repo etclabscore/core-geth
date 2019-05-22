@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"math/big"
 	"strings"
-	"sync"
 
 	"github.com/ethereum/evmc/bindings/go/evmc"
 	"github.com/ethereum/go-ethereum/common"
@@ -42,77 +41,51 @@ type EVMC struct {
 	readOnly bool            // The readOnly flag (TODO: Try to get rid of it).
 }
 
-// EVMCModule represents the loaded EVMC module.
-type EVMCModule struct {
-	instance *evmc.Instance // The EVMC VM instance.
-	once     sync.Once      // The mutex protecting EVMC VM instance creation.
-}
-
 var (
-	evmModule   EVMCModule
-	ewasmModule EVMCModule
+	evmModule   *evmc.Instance
+	ewasmModule *evmc.Instance
 )
 
-// InitEVMC initializes the EVMC modules.
-func InitEVMC(evmConfig string, ewasmConfig string) {
-	if evmConfig != "" {
-		initEVMC(&evmModule, evmc.CapabilityEVM1, evmConfig)
-	}
-	if ewasmConfig != "" {
-		initEVMC(&ewasmModule, evmc.CapabilityEWASM, ewasmConfig)
-	}
+func InitEVMCEVM(config string) {
+	evmModule = initEVMC(evmc.CapabilityEVM1, config)
 }
 
-func initEVMC(module *EVMCModule, cap evmc.Capability, config string) {
-	module.once.Do(func() {
-		options := strings.Split(config, ",")
-		path := options[0]
+func InitEVMCEwasm(config string) {
+	ewasmModule = initEVMC(evmc.CapabilityEWASM, config)
+}
 
-		if path == "" {
-			panic("EVMC VM path not provided, set --vm.(evm|ewasm)=/path/to/vm")
-		}
+func initEVMC(cap evmc.Capability, config string) *evmc.Instance {
+	options := strings.Split(config, ",")
+	path := options[0]
 
-		var err error
-		module.instance, err = evmc.Load(path)
-		if err != nil {
-			panic(err.Error())
-		}
-		log.Info("EVMC VM loaded", "name", module.instance.Name(), "version", module.instance.Version(), "path", path)
+	if path == "" {
+		panic("EVMC VM path not provided, set --vm.(evm|ewasm)=/path/to/vm")
+	}
 
-		// Set options before checking capabilities.
-		for _, option := range options[1:] {
-			if idx := strings.Index(option, "="); idx >= 0 {
-				name := option[:idx]
-				value := option[idx+1:]
-				err := module.instance.SetOption(name, value)
-				if err == nil {
-					log.Info("EVMC VM option set", "name", name, "value", value)
-				} else {
-					log.Warn("EVMC VM option setting failed", "name", name, "error", err)
-				}
+	instance, err := evmc.Load(path)
+	if err != nil {
+		panic(err.Error())
+	}
+	log.Info("EVMC VM loaded", "name", instance.Name(), "version", instance.Version(), "path", path)
+
+	// Set options before checking capabilities.
+	for _, option := range options[1:] {
+		if idx := strings.Index(option, "="); idx >= 0 {
+			name := option[:idx]
+			value := option[idx+1:]
+			err := instance.SetOption(name, value)
+			if err == nil {
+				log.Info("EVMC VM option set", "name", name, "value", value)
+			} else {
+				log.Warn("EVMC VM option setting failed", "name", name, "error", err)
 			}
 		}
-
-		if !module.instance.HasCapability(cap) {
-			panic(fmt.Errorf("The EVMC module %s does not have requested capability %d", path, cap))
-		}
-	})
-}
-
-// NewEVMC creates new EVMC-based VM execution context.
-func NewEVMC(cap evmc.Capability, config string, env *EVM) *EVMC {
-	var module *EVMCModule
-
-	switch cap {
-	case evmc.CapabilityEVM1:
-		module = &evmModule
-	case evmc.CapabilityEWASM:
-		module = &ewasmModule
-	default:
-		panic(fmt.Errorf("EVMC: Unknown capability %d", cap))
 	}
 
-	return &EVMC{module.instance, env, cap, false}
+	if !instance.HasCapability(cap) {
+		panic(fmt.Errorf("The EVMC module %s does not have requested capability %d", path, cap))
+	}
+	return instance
 }
 
 // hostContext implements evmc.HostContext interface.

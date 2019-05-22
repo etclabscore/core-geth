@@ -62,6 +62,8 @@ import (
 )
 
 var (
+	kottiFlag = flag.Bool("kotti", false, "Configure genesis and bootnodes for Kotti chain defaults")
+
 	genesisFlag = flag.String("genesis", "", "Genesis json file to seed the chain with")
 	apiPortFlag = flag.Int("apiport", 8080, "Listener port for the HTTP API connection")
 	ethPortFlag = flag.Int("ethport", 30303, "Listener port for the devp2p connection")
@@ -141,16 +143,30 @@ func main() {
 		log.Crit("Failed to render the faucet template", "err", err)
 	}
 	// Load and parse the genesis block requested by the user
-	blob, err := ioutil.ReadFile(*genesisFlag)
-	if err != nil {
-		log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
-	}
-	genesis := new(core.Genesis)
-	if err = json.Unmarshal(blob, genesis); err != nil {
-		log.Crit("Failed to parse genesis block json", "err", err)
-	}
-	// Convert the bootnodes to internal enode representations
+	var genesis *core.Genesis
 	var enodes []*discv5.Node
+
+	var blob []byte
+
+	if *kottiFlag {
+		genesis = core.DefaultKottiGenesisBlock()
+		if *bootFlag == "" {
+			*bootFlag = strings.Join(params.KottiBootnodes, ",")
+		}
+	} else {
+
+		blob, err = ioutil.ReadFile(*genesisFlag)
+		if err != nil {
+			log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
+		}
+		genesis = new(core.Genesis)
+		if err = json.Unmarshal(blob, genesis); err != nil {
+			log.Crit("Failed to parse genesis block json", "err", err)
+		}
+
+	}
+
+	// Convert the bootnodes to internal enode representations
 	for _, boot := range strings.Split(*bootFlag, ",") {
 		if url, err := discv5.ParseNode(boot); err == nil {
 			enodes = append(enodes, url)
@@ -158,6 +174,7 @@ func main() {
 			log.Error("Failed to parse bootnode URL", "url", boot, "err", err)
 		}
 	}
+
 	// Load up the account key and decrypt its password
 	if blob, err = ioutil.ReadFile(*accPassFlag); err != nil {
 		log.Crit("Failed to read account password contents", "file", *accPassFlag, "err", err)

@@ -42,10 +42,10 @@ type EVMC struct {
 	readOnly bool            // The readOnly flag (TODO: Try to get rid of it).
 }
 
+// EVMCModule represents the loaded EVMC module.
 type EVMCModule struct {
 	instance *evmc.Instance // The EVMC VM instance.
-	config   string         // The configuration the module was created with.
-	createMu sync.Mutex     // The mutex protecting EVMC VM instance creation.
+	once     sync.Once      // The mutex protecting EVMC VM instance creation.
 }
 
 var (
@@ -53,23 +53,8 @@ var (
 	ewasmModule EVMCModule
 )
 
-// NewEVMC creates new EVMC-based VM execution context.
-func NewEVMC(cap evmc.Capability, config string, env *EVM) *EVMC {
-	var module *EVMCModule
-
-	switch cap {
-	case evmc.CapabilityEVM1:
-		module = &evmModule
-	case evmc.CapabilityEWASM:
-		module = &ewasmModule
-	default:
-		panic(fmt.Errorf("EVMC: Unknown capability %d", cap))
-	}
-
-	module.createMu.Lock()
-	defer module.createMu.Unlock()
-
-	if module.instance == nil {
+func initEVMC(module *EVMCModule, cap evmc.Capability, config string) {
+	module.once.Do(func() {
 		options := strings.Split(config, ",")
 		path := options[0]
 
@@ -101,11 +86,23 @@ func NewEVMC(cap evmc.Capability, config string, env *EVM) *EVMC {
 		if !module.instance.HasCapability(cap) {
 			panic(fmt.Errorf("The EVMC module %s does not have requested capability %d", path, cap))
 		}
+	})
+}
 
-		module.config = config // Remember the config.
-	} else if module.config != config {
-		log.Error("New EVMC VM requested", "newconfig", config, "oldconfig", module.config)
+// NewEVMC creates new EVMC-based VM execution context.
+func NewEVMC(cap evmc.Capability, config string, env *EVM) *EVMC {
+	var module *EVMCModule
+
+	switch cap {
+	case evmc.CapabilityEVM1:
+		module = &evmModule
+	case evmc.CapabilityEWASM:
+		module = &ewasmModule
+	default:
+		panic(fmt.Errorf("EVMC: Unknown capability %d", cap))
 	}
+
+	initEVMC(module, cap, config)
 
 	return &EVMC{module.instance, env, cap, false}
 }

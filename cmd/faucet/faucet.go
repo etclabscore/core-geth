@@ -180,89 +180,100 @@ func main() {
 	var enodes []*discv5.Node
 	var blob []byte
 
-	if *foundationFlag {
-		genesis = core.DefaultGenesisBlock()
-		if *bootFlag == "" {
-			*bootFlag = strings.Join(params.MainnetBootnodes, ",")
+	genesis, *bootFlag, *netFlag = func() (gs *core.Genesis, bs string, netid uint64) {
+		var configs = []struct {
+			flag  bool
+			gs    *core.Genesis
+			bs    []string
+			netid uint64
+		}{
+			{
+				*foundationFlag,
+				core.DefaultGenesisBlock(),
+				params.MainnetBootnodes,
+				params.NetworkIDFoundation,
+			},
+			{
+				*classicFlag,
+				core.DefaultClassicGenesisBlock(),
+				params.ClassicBootnodes,
+				params.NetworkIDClassic,
+			},
+			{
+				*socialFlag,
+				core.DefaultSocialGenesisBlock(),
+				params.SocialBootnodes,
+				params.NetworkIDSocial,
+			},
+			{
+				*ethersocialFlag,
+				core.DefaultEthersocialGenesisBlock(),
+				params.EthersocialBootnodes,
+				params.NetworkIDEthersocial,
+			},
+			{
+				*mixFlag,
+				core.DefaultMixGenesisBlock(),
+				params.MixBootnodes,
+				params.NetworkIDMix,
+			},
+			{
+				*testnetFlag,
+				core.DefaultTestnetGenesisBlock(),
+				params.TestnetBootnodes,
+				params.NetworkIDTestnet,
+			},
+			{
+				*rinkebyFlag,
+				core.DefaultRinkebyGenesisBlock(),
+				params.RinkebyBootnodes,
+				params.NetworkIDRinkeby,
+			},
+			{
+				*kottiFlag,
+				core.DefaultKottiGenesisBlock(),
+				params.KottiBootnodes,
+				params.NetworkIDKotti,
+			},
+			{
+				*goerliFlag,
+				core.DefaultGoerliGenesisBlock(),
+				params.GoerliBootnodes,
+				params.NetworkIDGoerli,
+			},
 		}
-		if *netFlag == 0 {
-			*netFlag = params.NetworkIDFoundation
+
+		var bss []string
+		for _, conf := range configs {
+			if conf.flag {
+				gs, bss, netid = conf.gs, conf.bs, conf.netid
+				break
+			}
 		}
-	} else if *classicFlag {
-		genesis = core.DefaultClassicGenesisBlock()
-		if *bootFlag == "" {
-			*bootFlag = strings.Join(params.ClassicBootnodes, ",")
+		if len(bss) > 0 {
+			bs = strings.Join(bss, ",")
 		}
-		if *netFlag == 0 {
-			*netFlag = params.NetworkIDClassic
+
+		// allow overrides
+		if *genesisFlag != "" {
+			blob, err = ioutil.ReadFile(*genesisFlag)
+			if err != nil {
+				log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
+			}
+			gs = new(core.Genesis)
+			if err = json.Unmarshal(blob, gs); err != nil {
+				log.Crit("Failed to parse genesis block json", "err", err)
+			}
 		}
-	} else if *socialFlag {
-		genesis = core.DefaultSocialGenesisBlock()
-		if *bootFlag == "" {
-			*bootFlag = strings.Join(params.SocialBootnodes, ",")
+		if *bootFlag != "" {
+			bs = *bootFlag
 		}
-		if *netFlag == 0 {
-			*netFlag = params.NetworkIDSocial
+		if *netFlag != 0 {
+			netid = *netFlag
 		}
-	} else if *ethersocialFlag {
-		genesis = core.DefaultEthersocialGenesisBlock()
-		if *bootFlag == "" {
-			*bootFlag = strings.Join(params.EthersocialBootnodes, ",")
-		}
-		if *netFlag == 0 {
-			*netFlag = params.NetworkIDEthersocial
-		}
-	} else if *mixFlag {
-		genesis = core.DefaultMixGenesisBlock()
-		if *bootFlag == "" {
-			*bootFlag = strings.Join(params.MixBootnodes, ",")
-		}
-		if *netFlag == 0 {
-			*netFlag = params.NetworkIDMix
-		}
-	} else if *testnetFlag {
-		genesis = core.DefaultTestnetGenesisBlock()
-		if *bootFlag == "" {
-			*bootFlag = strings.Join(params.TestnetBootnodes, ",")
-		}
-		if *netFlag == 0 {
-			*netFlag = params.NetworkIDTestnet
-		}
-	} else if *rinkebyFlag {
-		genesis = core.DefaultRinkebyGenesisBlock()
-		if *bootFlag == "" {
-			*bootFlag = strings.Join(params.RinkebyBootnodes, ",")
-		}
-		if *netFlag == 0 {
-			*netFlag = params.NetworkIDRinkeby
-		}
-	} else if *kottiFlag {
-		genesis = core.DefaultKottiGenesisBlock()
-		if *bootFlag == "" {
-			*bootFlag = strings.Join(params.KottiBootnodes, ",")
-		}
-		if *netFlag == 0 {
-			*netFlag = params.NetworkIDKotti
-		}
-	} else if *goerliFlag {
-		genesis = core.DefaultGoerliGenesisBlock()
-		if *bootFlag == "" {
-			*bootFlag = strings.Join(params.GoerliBootnodes, ",")
-		}
-		if *netFlag == 0 {
-			*netFlag = params.NetworkIDGoerli
-		}
-	} else {
-		blob, err = ioutil.ReadFile(*genesisFlag)
-		if err != nil {
-			log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
-		}
-		genesis = new(core.Genesis)
-		if err = json.Unmarshal(blob, genesis); err != nil {
-			log.Crit("Failed to parse genesis block json", "err", err)
-		}
-	}
-	log.Info("configured genesis", "chain config", genesis.Config.String())
+		return
+	}()
+	log.Info("configured chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", genesis.Config.String())
 
 	// Convert the bootnodes to internal enode representations
 	for _, boot := range strings.Split(*bootFlag, ",") {

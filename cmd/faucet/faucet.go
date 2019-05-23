@@ -106,25 +106,20 @@ var (
 
 func faucetDirFromConfig(chainConfig *params.ChainConfig) string {
 	datadir := filepath.Join(os.Getenv("HOME"), ".faucet")
-	switch {
-	case reflect.DeepEqual(chainConfig, params.MainnetChainConfig):
-		// noop
-	case reflect.DeepEqual(chainConfig, params.ClassicChainConfig):
-		datadir = filepath.Join(datadir, "classic")
-	case reflect.DeepEqual(chainConfig, params.SocialChainConfig):
-		datadir = filepath.Join(datadir, "social")
-	case reflect.DeepEqual(chainConfig, params.EthersocialChainConfig):
-		datadir = filepath.Join(datadir, "ethersocial")
-	case reflect.DeepEqual(chainConfig, params.MixChainConfig):
-		datadir = filepath.Join(datadir, "mix")
-	case reflect.DeepEqual(chainConfig, params.TestnetChainConfig):
-		datadir = filepath.Join(datadir, "testnet")
-	case reflect.DeepEqual(chainConfig, params.RinkebyChainConfig):
-		datadir = filepath.Join(datadir, "rinkeby")
-	case reflect.DeepEqual(chainConfig, params.GoerliChainConfig):
-		datadir = filepath.Join(datadir, "goerli")
-	case reflect.DeepEqual(chainConfig, params.KottiChainConfig):
-		datadir = filepath.Join(datadir, "kotti")
+	for conf, suff := range map[*params.ChainConfig]string{
+		params.MainnetChainConfig:     "",
+		params.ClassicChainConfig:     "classic",
+		params.SocialChainConfig:      "social",
+		params.EthersocialChainConfig: "ethersocial",
+		params.MixChainConfig:         "mix",
+		params.TestnetChainConfig:     "testnet",
+		params.RinkebyChainConfig:     "rinkeby",
+		params.GoerliChainConfig:      "goerli",
+		params.KottiChainConfig:       "kotti",
+	} {
+		if reflect.DeepEqual(chainConfig, conf) && suff != "" {
+			datadir = filepath.Join(datadir, suff)
+		}
 	}
 	return datadir
 }

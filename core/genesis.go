@@ -225,6 +225,8 @@ func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
 		return params.MixChainConfig
 	case ghash == params.EthersocialGenesisHash:
 		return params.EthersocialChainConfig
+	case ghash == params.MusicoinGenesisHash:
+		return params.MusicoinChainConfig
 	case ghash == params.KottiGenesisHash:
 		return params.KottiChainConfig
 	default:
@@ -368,6 +370,20 @@ func DefaultEthersocialGenesisBlock() *Genesis {
 		GasLimit:   3141592,
 		Difficulty: big.NewInt(131072),
 		Alloc:      decodePrealloc(ethersocialAllocData),
+	}
+}
+
+// MusicoinGenesisBlock returns the Musicoin main net genesis block.
+func DefaultMusicoinGenesisBlock() *Genesis {
+	return &Genesis{
+		Config:     params.MusicoinChainConfig,
+		Timestamp:  0,
+		Nonce:      42,
+		ExtraData:  nil,
+		Mixhash:    common.HexToHash("0x00000000000000000000000000000000000000647572616c65787365646c6578"),
+		GasLimit:   8000000,
+		Difficulty: big.NewInt(4000000),
+		Alloc:      decodePrealloc(musicoinAllocData),
 	}
 }
 

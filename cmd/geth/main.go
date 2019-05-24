@@ -137,6 +137,7 @@ var (
 		utils.SocialFlag,
 		utils.MixFlag,
 		utils.EthersocialFlag,
+		utils.MusicoinFlag,
 		utils.RinkebyFlag,
 		utils.KottiFlag,
 		utils.GoerliFlag,

@@ -42,7 +42,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
-	"github.com/hashicorp/golang-lru"
+	lru "github.com/hashicorp/golang-lru"
 )
 
 var (
@@ -1144,6 +1144,14 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, []
 	}
 	abort, results := bc.engine.VerifyHeaders(bc, headers, seals)
 	defer close(abort)
+
+	if bc.Config().IsMCIP0(common.Big0) {
+		musicoinErrChain := bc.checkChainForAttack(chain)
+		if musicoinErrChain != nil {
+			log.Error("musicoin rat(s) discovered", "error", musicoinErrChain.Error())
+			return 0, events, coalescedLogs, musicoinErrChain
+		}
+	}
 
 	// Peek the error for the first block to decide the directing import logic
 	it := newInsertIterator(chain, results, bc.validator)

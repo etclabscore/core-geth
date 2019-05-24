@@ -136,6 +136,8 @@ func remoteConsole(ctx *cli.Context) error {
 				path = filepath.Join(path, "mix")
 			} else if ctx.GlobalBool(utils.EthersocialFlag.Name) {
 				path = filepath.Join(path, "ethersocial")
+			} else if ctx.GlobalBool(utils.MusicoinFlag.Name) {
+				path = filepath.Join(path, "musicoin")
 			}
 		}
 		endpoint = fmt.Sprintf("%s/geth.ipc", path)

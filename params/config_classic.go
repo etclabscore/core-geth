@@ -44,6 +44,10 @@ var (
 		Ethash:              new(EthashConfig),
 	}
 
+	DisinflationRateQuotient = big.NewInt(4)      // Disinflation rate quotient for ECIP1017
+	DisinflationRateDivisor  = big.NewInt(5)      // Disinflation rate divisor for ECIP1017
+	ExpDiffPeriod            = big.NewInt(100000) // Exponential diff period for diff bomb & ECIP1010
+
 	// ClassicBootnodes are the enode URLs of the P2P bootstrap nodes running on
 	// the Ethereum Classic network.
 	ClassicBootnodes = []string{

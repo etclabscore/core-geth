@@ -42,6 +42,15 @@ var (
 		Ethash:         new(EthashConfig),
 	}
 
+	MusicoinTimeCapsuleBlock  = int64(4200000)
+	MusicoinTimeCapsuleLength = uint64(50) // Threshold of blocks that can be delayed and the value is in Blocks
+
+	Mcip0BlockReward       = new(big.Int).Mul(big.NewInt(314), big.NewInt(1e+18)) // In musicoin code as 'FrontierBlockReward'
+	Mcip3BlockReward       = new(big.Int).Mul(big.NewInt(250), big.NewInt(1e+18))
+	Mcip8BlockReward       = new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18))
+	MusicoinUbiBlockReward = new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18))
+	MusicoinDevBlockReward = new(big.Int).Mul(big.NewInt(14), big.NewInt(1e+18))
+
 	MusicoinBootnodes = []string{
 		"enode://5812ed9c80cbe08bad47ebd01d754116b23d553e9154b30177504efd57db31c98ec2bbc69f63194799da3d646c11a75b56b60c75509f202d1981de4ba31dc97f@35.237.165.10:30303",
 		"enode://ad5288a8082141ecb6f5b6687835fddac31ec1fd94ca904c21438fec65b4b1d5f4481a30d2e93677acec331ad445739cf6d271adb7c89e26955db6bd64885c04@35.185.67.35:30303",

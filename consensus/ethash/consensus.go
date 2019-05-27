@@ -38,21 +38,11 @@ import (
 
 // Ethash proof-of-work protocol constants.
 var (
-	FrontierBlockReward      = big.NewInt(5e+18)  // Block reward in wei for successfully mining a block
-	EIP649FBlockReward       = big.NewInt(3e+18)  // Block reward in wei for successfully mining a block upward from Byzantium
-	EIP1234FBlockReward      = big.NewInt(2e+18)  // Block reward in wei for successfully mining a block upward from Constantinople
-	maxUncles                = 2                  // Maximum number of uncles allowed in a single block
-	allowedFutureBlockTime   = 15 * time.Second   // Max time from current time allowed for blocks, before they're considered future blocks
-	DisinflationRateQuotient = big.NewInt(4)      // Disinflation rate quotient for ECIP1017
-	DisinflationRateDivisor  = big.NewInt(5)      // Disinflation rate divisor for ECIP1017
-	ExpDiffPeriod            = big.NewInt(100000) // Exponential diff period for diff bomb & ECIP1010
-
-	// Musicoin
-	Mcip0BlockReward       = new(big.Int).Mul(big.NewInt(314), big.NewInt(1e+18)) // In musicoin code as 'FrontierBlockReward'
-	Mcip3BlockReward       = new(big.Int).Mul(big.NewInt(250), big.NewInt(1e+18))
-	Mcip8BlockReward       = new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18))
-	MusicoinUbiBlockReward = new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18))
-	MusicoinDevBlockReward = new(big.Int).Mul(big.NewInt(14), big.NewInt(1e+18))
+	FrontierBlockReward    = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
+	EIP649FBlockReward     = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
+	EIP1234FBlockReward    = big.NewInt(2e+18) // Block reward in wei for successfully mining a block upward from Constantinople
+	maxUncles              = 2                 // Maximum number of uncles allowed in a single block
+	allowedFutureBlockTime = 15 * time.Second  // Max time from current time allowed for blocks, before they're considered future blocks
 )
 
 // Various error messages to mark blocks invalid. These should be private to
@@ -424,8 +414,8 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 	//   2^(( periodRef // EDP) - 2)
 	//
 	x := new(big.Int)
-	x.Div(exPeriodRef, ExpDiffPeriod) // (periodRef // EDP)
-	if x.Cmp(big1) > 0 {              // if result large enough (not in algo explicitly)
+	x.Div(exPeriodRef, params.ExpDiffPeriod) // (periodRef // EDP)
+	if x.Cmp(big1) > 0 {                     // if result large enough (not in algo explicitly)
 		x.Sub(x, big2)      // - 2
 		x.Exp(big2, x, nil) // 2^
 	} else {
@@ -595,11 +585,11 @@ func accumulateRewards(config *params.ChainConfig, state *state.StateDB, header 
 	}
 	if config.IsMCIP0(header.Number) {
 		// Select the correct block reward based on chain progression
-		blockReward := Mcip0BlockReward
-		mcip3Reward := Mcip3BlockReward
-		mcip8Reward := Mcip8BlockReward
-		ubiReservoir := MusicoinUbiBlockReward
-		devReservoir := MusicoinDevBlockReward
+		blockReward := params.Mcip0BlockReward
+		mcip3Reward := params.Mcip3BlockReward
+		mcip8Reward := params.Mcip8BlockReward
+		ubiReservoir := params.MusicoinUbiBlockReward
+		devReservoir := params.MusicoinDevBlockReward
 
 		reward := new(big.Int).Set(blockReward)
 
@@ -710,8 +700,8 @@ func GetBlockWinnerRewardByEra(era *big.Int, blockReward *big.Int) *big.Int {
 	// qed
 	var q, d, r *big.Int = new(big.Int), new(big.Int), new(big.Int)
 
-	q.Exp(DisinflationRateQuotient, era, nil)
-	d.Exp(DisinflationRateDivisor, era, nil)
+	q.Exp(params.DisinflationRateQuotient, era, nil)
+	d.Exp(params.DisinflationRateDivisor, era, nil)
 
 	r.Mul(blockReward, q)
 	r.Div(r, d)

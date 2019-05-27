@@ -38,16 +38,14 @@ import (
 
 // Ethash proof-of-work protocol constants.
 var (
-	FrontierBlockReward      = big.NewInt(5e+18)                                   // Block reward in wei for successfully mining a block
-	EIP649FBlockReward       = big.NewInt(3e+18)                                   // Block reward in wei for successfully mining a block upward from Byzantium
-	EIP1234FBlockReward      = big.NewInt(2e+18)                                   // Block reward in wei for successfully mining a block upward from Constantinople
-	SocialBlockReward        = new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)) // Block reward in wei for successfully mining a block upward for Ethereum Social
-	EthersocialBlockReward   = big.NewInt(5e+18)                                   // Block reward in wei for successfully mining a block upward for Ethersocial Network
-	maxUncles                = 2                                                   // Maximum number of uncles allowed in a single block
-	allowedFutureBlockTime   = 15 * time.Second                                    // Max time from current time allowed for blocks, before they're considered future blocks
-	DisinflationRateQuotient = big.NewInt(4)                                       // Disinflation rate quotient for ECIP1017
-	DisinflationRateDivisor  = big.NewInt(5)                                       // Disinflation rate divisor for ECIP1017
-	ExpDiffPeriod            = big.NewInt(100000)                                  // Exponential diff period for diff bomb & ECIP1010
+	FrontierBlockReward      = big.NewInt(5e+18)  // Block reward in wei for successfully mining a block
+	EIP649FBlockReward       = big.NewInt(3e+18)  // Block reward in wei for successfully mining a block upward from Byzantium
+	EIP1234FBlockReward      = big.NewInt(2e+18)  // Block reward in wei for successfully mining a block upward from Constantinople
+	maxUncles                = 2                  // Maximum number of uncles allowed in a single block
+	allowedFutureBlockTime   = 15 * time.Second   // Max time from current time allowed for blocks, before they're considered future blocks
+	DisinflationRateQuotient = big.NewInt(4)      // Disinflation rate quotient for ECIP1017
+	DisinflationRateDivisor  = big.NewInt(5)      // Disinflation rate divisor for ECIP1017
+	ExpDiffPeriod            = big.NewInt(100000) // Exponential diff period for diff bomb & ECIP1010
 
 	// Musicoin
 	Mcip0BlockReward       = new(big.Int).Mul(big.NewInt(314), big.NewInt(1e+18)) // In musicoin code as 'FrontierBlockReward'
@@ -590,10 +588,10 @@ func accumulateRewards(config *params.ChainConfig, state *state.StateDB, header 
 		blockReward = EIP1234FBlockReward
 	}
 	if config.IsSocial(header.Number) {
-		blockReward = SocialBlockReward
+		blockReward = params.SocialBlockReward
 	}
 	if config.IsEthersocial(header.Number) {
-		blockReward = EthersocialBlockReward
+		blockReward = params.EthersocialBlockReward
 	}
 	if config.IsMCIP0(header.Number) {
 		// Select the correct block reward based on chain progression

@@ -45,6 +45,8 @@ var (
 		Ethash:              new(EthashConfig),
 	}
 
+	SocialBlockReward = new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)) // Block reward in wei for successfully mining a block upward for Ethereum Social
+
 	// SocialBootnodes are the enode URLs of the P2P bootstrap nodes running on
 	// the Ethereum Social network.
 	SocialBootnodes = []string{
@@ -56,3 +58,7 @@ var (
 		"enode://851f14c5cc86cbc0a81acfcbe5dd99ad5c823435357219df736932c5f89ad4318f6973a553857a32d97a71793f5a35c062d46320be282aa0a80b06b9c6b624e4@13.125.232.71:30303",
 	}
 )
+
+func (c *ChainConfig) IsSocial(num *big.Int) bool {
+	return isForked(c.SocialBlock, num)
+}

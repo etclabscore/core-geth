@@ -32,33 +32,6 @@ func MainnetGenesis() string {
 	return ""
 }
 
-// SocialGenesis returns the JSON spec to use for the Ethereum Social network.
-func SocialGenesis() string {
-	enc, err := json.Marshal(core.DefaultSocialGenesisBlock())
-	if err != nil {
-		panic(err)
-	}
-	return string(enc)
-}
-
-// MixGenesis returns the JSON spec to use for the MIX network.
-func MixGenesis() string {
-	enc, err := json.Marshal(core.DefaultMixGenesisBlock())
-	if err != nil {
-		panic(err)
-	}
-	return string(enc)
-}
-
-// EthersocialGenesis returns the JSON spec to use for the Ethersocial network.
-func EthersocialGenesis() string {
-	enc, err := json.Marshal(core.DefaultEthersocialGenesisBlock())
-	if err != nil {
-		panic(err)
-	}
-	return string(enc)
-}
-
 // TestnetGenesis returns the JSON spec to use for the Ethereum test network.
 func TestnetGenesis() string {
 	enc, err := json.Marshal(core.DefaultTestnetGenesisBlock())
@@ -71,15 +44,6 @@ func TestnetGenesis() string {
 // RinkebyGenesis returns the JSON spec to use for the Rinkeby test network
 func RinkebyGenesis() string {
 	enc, err := json.Marshal(core.DefaultRinkebyGenesisBlock())
-	if err != nil {
-		panic(err)
-	}
-	return string(enc)
-}
-
-// KottiGenesis returns the JSON spec to use for the Kotti test network
-func KottiGenesis() string {
-	enc, err := json.Marshal(core.DefaultKottiGenesisBlock())
 	if err != nil {
 		panic(err)
 	}

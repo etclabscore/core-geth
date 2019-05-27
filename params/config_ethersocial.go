@@ -43,6 +43,8 @@ var (
 		Ethash:              new(EthashConfig),
 	}
 
+	EthersocialBlockReward = big.NewInt(5e+18) // Block reward in wei for successfully mining a block upward for Ethersocial Network
+
 	// EthersocialBootnodes are the enode URLs of the P2P bootstrap nodes running on
 	// the Ethersocial network.
 	EthersocialBootnodes = []string{
@@ -53,3 +55,7 @@ var (
 		"enode://52e5e84d44bbda7e24a92826e60dfeb20a5d840c3c0be646b21940d7648f49a91bff2b7c47d37894b962eb183d8c7f71f693efb8534ee170ccd902addd487970@52.226.16.248:50505",
 	}
 )
+
+func (c *ChainConfig) IsEthersocial(num *big.Int) bool {
+	return isForked(c.EthersocialBlock, num)
+}

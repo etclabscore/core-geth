@@ -642,14 +642,6 @@ func (c *ChainConfig) IsBombDisposal(num *big.Int) bool {
 	return isForked(c.DisposalBlock, num)
 }
 
-func (c *ChainConfig) IsSocial(num *big.Int) bool {
-	return isForked(c.SocialBlock, num)
-}
-
-func (c *ChainConfig) IsEthersocial(num *big.Int) bool {
-	return isForked(c.EthersocialBlock, num)
-}
-
 func (c *ChainConfig) IsECIP1010(num *big.Int) bool {
 	return isForked(c.ECIP1010PauseBlock, num)
 }

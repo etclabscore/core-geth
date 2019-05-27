@@ -25,15 +25,10 @@ import (
 
 // Genesis hashes to enforce below configs on.
 var (
-	MainnetGenesisHash     = common.HexToHash("0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3")
-	TestnetGenesisHash     = common.HexToHash("0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d")
-	SocialGenesisHash      = common.HexToHash("0xba8314d5c2ebddaf58eb882b364b27cbfa4d3402dacd32b60986754ac25cfe8d")
-	MixGenesisHash         = common.HexToHash("0x4fa57903dad05875ddf78030c16b5da886f7d81714cf66946a4c02566dbb2af5")
-	EthersocialGenesisHash = common.HexToHash("0x310dd3c4ae84dd89f1b46cfdd5e26c8f904dfddddc73f323b468127272e20e9f")
-	MusicoinGenesisHash    = common.HexToHash("0x4eba28a4ce8dc0701f94c936a223a8429129b38ca9974ec0e92bf9234ac952e9")
-	RinkebyGenesisHash     = common.HexToHash("0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177")
-	KottiGenesisHash       = common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4")
-	GoerliGenesisHash      = common.HexToHash("0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a")
+	MainnetGenesisHash = common.HexToHash("0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3")
+	TestnetGenesisHash = common.HexToHash("0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d")
+	RinkebyGenesisHash = common.HexToHash("0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177")
+	GoerliGenesisHash  = common.HexToHash("0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a")
 )
 
 // TrustedCheckpoints associates each known checkpoint with the genesis hash of
@@ -65,48 +60,6 @@ var (
 		Ethash:              new(EthashConfig),
 	}
 
-	// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
-	ClassicChainConfig = &ChainConfig{
-		ChainID:             big.NewInt(61),
-		HomesteadBlock:      big.NewInt(1150000),
-		DAOForkBlock:        big.NewInt(1920000),
-		DAOForkSupport:      false,
-		EIP150Block:         big.NewInt(2500000),
-		EIP150Hash:          common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
-		EIP155Block:         big.NewInt(3000000),
-		EIP158Block:         nil,
-		ByzantiumBlock:      nil,
-		DisposalBlock:       big.NewInt(5900000),
-		SocialBlock:         nil,
-		EthersocialBlock:    nil,
-		ConstantinopleBlock: nil,
-		ECIP1017EraRounds:   big.NewInt(5000000),
-		EIP160FBlock:        big.NewInt(3000000),
-		ECIP1010PauseBlock:  big.NewInt(3000000),
-		ECIP1010Length:      big.NewInt(2000000),
-		Ethash:              new(EthashConfig),
-	}
-
-	// SocialChainConfig is the chain parameters to run a node on the Ethereum Social main network.
-	SocialChainConfig = &ChainConfig{
-		ChainID:             big.NewInt(28),
-		HomesteadBlock:      big.NewInt(0),
-		DAOForkBlock:        nil,
-		DAOForkSupport:      true,
-		EIP150Block:         big.NewInt(0),
-		EIP150Hash:          common.HexToHash("0xba8314d5c2ebddaf58eb882b364b27cbfa4d3402dacd32b60986754ac25cfe8d"),
-		EIP155Block:         big.NewInt(0),
-		EIP158Block:         nil,
-		ByzantiumBlock:      nil,
-		DisposalBlock:       big.NewInt(0),
-		SocialBlock:         big.NewInt(0),
-		EthersocialBlock:    nil,
-		ConstantinopleBlock: nil,
-		ECIP1017EraRounds:   big.NewInt(5000000),
-		EIP160FBlock:        big.NewInt(0),
-		Ethash:              new(EthashConfig),
-	}
-
 	// MainnetTrustedCheckpoint contains the light client trusted checkpoint for the main network.
 	MainnetTrustedCheckpoint = &TrustedCheckpoint{
 		Name:         "mainnet",
@@ -114,59 +67,6 @@ var (
 		SectionHead:  common.HexToHash("0xa2e0b25d72c2fc6e35a7f853cdacb193b4b4f95c606accf7f8fa8415283582c7"),
 		CHTRoot:      common.HexToHash("0xf69bdd4053b95b61a27b106a0e86103d791edd8574950dc96aa351ab9b9f1aa0"),
 		BloomRoot:    common.HexToHash("0xec1b454d4c6322c78ccedf76ac922a8698c3cac4d98748a84af4995b7bd3d744"),
-	}
-
-	// MixChainConfig is the chain parameters to run a node on the MIX main network.
-	MixChainConfig = &ChainConfig{
-		ChainID:             big.NewInt(76),
-		HomesteadBlock:      big.NewInt(0),
-		DAOForkBlock:        nil,
-		DAOForkSupport:      false,
-		EIP150Block:         big.NewInt(0),
-		EIP150Hash:          common.HexToHash("0x4fa57903dad05875ddf78030c16b5da886f7d81714cf66946a4c02566dbb2af5"),
-		EIP155Block:         big.NewInt(0),
-		EIP158Block:         big.NewInt(0),
-		ByzantiumBlock:      nil,
-		DisposalBlock:       nil,
-		SocialBlock:         nil,
-		EthersocialBlock:    nil,
-		ConstantinopleBlock: nil,
-		EIP160FBlock:        big.NewInt(0),
-	}
-
-	// EthersocialChainConfig is the chain parameters to run a node on the Ethersocial main network.
-	EthersocialChainConfig = &ChainConfig{
-		ChainID:             big.NewInt(31102),
-		HomesteadBlock:      big.NewInt(0),
-		DAOForkBlock:        big.NewInt(0),
-		DAOForkSupport:      false,
-		EIP150Block:         big.NewInt(0),
-		EIP150Hash:          common.HexToHash("0x310dd3c4ae84dd89f1b46cfdd5e26c8f904dfddddc73f323b468127272e20e9f"),
-		EIP155Block:         big.NewInt(845000),
-		EIP158Block:         big.NewInt(845000),
-		ByzantiumBlock:      big.NewInt(600000),
-		DisposalBlock:       nil,
-		SocialBlock:         nil,
-		EthersocialBlock:    big.NewInt(0),
-		ConstantinopleBlock: nil,
-		Ethash:              new(EthashConfig),
-	}
-
-	// MusicoinChainConfig is the chain parameters to run a node on the main network.
-	MusicoinChainConfig = &ChainConfig{
-		MCIP0Block:     big.NewInt(0),
-		ChainID:        big.NewInt(7762959),
-		HomesteadBlock: big.NewInt(1150000),
-		DAOForkBlock:   big.NewInt(36028797018963967),
-		DAOForkSupport: false,
-		EIP150Block:    big.NewInt(2222222),
-		EIP150Hash:     common.HexToHash("0x"),
-		EIP155Block:    big.NewInt(2222222),
-		EIP158Block:    big.NewInt(2222222),
-		ByzantiumBlock: big.NewInt(2222222),
-		MCIP3Block:     big.NewInt(1200001),
-		MCIP8Block:     big.NewInt(5200001),
-		Ethash:         new(EthashConfig),
 	}
 
 	// TestnetChainConfig contains the chain parameters to run a node on the Ropsten test network.
@@ -226,31 +126,6 @@ var (
 		SectionHead:  common.HexToHash("0x8a738386f6bb34add15846f8f49c4c519a2f32519096e792b9f43bcb407c831c"),
 		CHTRoot:      common.HexToHash("0xa1e5720a9bad4dce794f129e4ac6744398197b652868011486a6f89c8ec84a75"),
 		BloomRoot:    common.HexToHash("0xa3048fe8b7e30f77f11bc755a88478363d7d3e71c2bdfe4e8ab9e269cd804ba2"),
-	}
-
-	// KottiChainConfig is the chain parameters to run a node on the Kotti main network.
-	KottiChainConfig = &ChainConfig{
-		ChainID:             big.NewInt(6),
-		HomesteadBlock:      big.NewInt(0),
-		DAOForkBlock:        nil,
-		DAOForkSupport:      false,
-		EIP150Block:         big.NewInt(0),
-		EIP150Hash:          common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4"),
-		EIP155Block:         big.NewInt(0),
-		EIP158Block:         nil,
-		ByzantiumBlock:      nil,
-		DisposalBlock:       big.NewInt(0),
-		SocialBlock:         nil,
-		EthersocialBlock:    nil,
-		ConstantinopleBlock: nil,
-		ECIP1017EraRounds:   big.NewInt(5000000),
-		EIP160FBlock:        big.NewInt(0),
-		ECIP1010PauseBlock:  big.NewInt(0),
-		ECIP1010Length:      big.NewInt(2000000),
-		Clique: &CliqueConfig{
-			Period: 15,
-			Epoch:  30000,
-		},
 	}
 
 	// GoerliChainConfig contains the chain parameters to run a node on the Görli test network.
@@ -777,22 +652,6 @@ func (c *ChainConfig) IsEthersocial(num *big.Int) bool {
 
 func (c *ChainConfig) IsECIP1010(num *big.Int) bool {
 	return isForked(c.ECIP1010PauseBlock, num)
-}
-
-// IsMCIP0 returns whether MCIP0 block is engaged; this is equivalent to 'IsMusicoin'.
-// (There is no MCIP-0).
-func (c *ChainConfig) IsMCIP0(num *big.Int) bool {
-	return isForked(c.MCIP0Block, num)
-}
-
-// IsMCIP3 returns whether MCIP3-UBI block is engaged.
-func (c *ChainConfig) IsMCIP3(num *big.Int) bool {
-	return isForked(c.MCIP3Block, num)
-}
-
-// IsMCIP8 returns whether MCIP3-QT block is engaged.
-func (c *ChainConfig) IsMCIP8(num *big.Int) bool {
-	return isForked(c.MCIP8Block, num)
 }
 
 // IsPetersburg returns whether num is either

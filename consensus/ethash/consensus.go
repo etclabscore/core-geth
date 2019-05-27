@@ -395,15 +395,7 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 		exPeriodRef.Set(fakeBlockNumber)
 
 	} else if config.IsECIP1010(next) {
-		// https://github.com/ethereumproject/ECIPs/blob/master/ECIPs/ECIP-1010.md
-
-		explosionBlock := new(big.Int).Add(config.ECIP1010PauseBlock, config.ECIP1010Length)
-		if next.Cmp(explosionBlock) < 0 {
-			exPeriodRef.Set(config.ECIP1010PauseBlock)
-		} else {
-			exPeriodRef.Sub(exPeriodRef, config.ECIP1010Length)
-		}
-
+		ecip1010Explosion(config, next, exPeriodRef)
 	}
 
 	// EXPLOSION
@@ -584,59 +576,11 @@ func accumulateRewards(config *params.ChainConfig, state *state.StateDB, header 
 		blockReward = params.EthersocialBlockReward
 	}
 	if config.IsMCIP0(header.Number) {
-		// Select the correct block reward based on chain progression
-		blockReward := params.Mcip0BlockReward
-		mcip3Reward := params.Mcip3BlockReward
-		mcip8Reward := params.Mcip8BlockReward
-		ubiReservoir := params.MusicoinUbiBlockReward
-		devReservoir := params.MusicoinDevBlockReward
-
-		reward := new(big.Int).Set(blockReward)
-
-		if config.IsMCIP8(header.Number) {
-			state.AddBalance(header.Coinbase, mcip8Reward)
-			state.AddBalance(common.HexToAddress("0x00eFdd5883eC628983E9063c7d969fE268BBf310"), ubiReservoir)
-			state.AddBalance(common.HexToAddress("0x00756cF8159095948496617F5FB17ED95059f536"), devReservoir)
-			blockReward := mcip8Reward
-			reward := new(big.Int).Set(blockReward)
-			_ = reward
-		} else if config.IsMCIP3(header.Number) {
-			state.AddBalance(header.Coinbase, mcip3Reward)
-			state.AddBalance(common.HexToAddress("0x00eFdd5883eC628983E9063c7d969fE268BBf310"), ubiReservoir)
-			state.AddBalance(common.HexToAddress("0x00756cF8159095948496617F5FB17ED95059f536"), devReservoir)
-			// no change to uncle reward during UBI fork, a mistake but now a legacy
-		} else {
-			state.AddBalance(header.Coinbase, reward)
-		}
-
-		// Accumulate the rewards for the miner and any included uncles
-		r := new(big.Int)
-		for _, uncle := range uncles {
-			r.Add(uncle.Number, big8)
-			r.Sub(r, header.Number)
-			r.Mul(r, blockReward)
-			r.Div(r, big8)
-			state.AddBalance(uncle.Coinbase, r)
-
-			r.Div(blockReward, big32)
-			reward.Add(reward, r)
-		}
+		musicoinBlockReward(config, state, header, uncles)
 		return
 	}
 	if config.HasECIP1017() {
-		// Ensure value 'era' is configured.
-		eraLen := config.ECIP1017EraRounds
-		era := GetBlockEra(header.Number, eraLen)
-		wr := GetBlockWinnerRewardByEra(era, blockReward)                    // wr "winner reward". 5, 4, 3.2, 2.56, ...
-		wurs := GetBlockWinnerRewardForUnclesByEra(era, uncles, blockReward) // wurs "winner uncle rewards"
-		wr.Add(wr, wurs)
-		state.AddBalance(header.Coinbase, wr) // $$
-
-		// Reward uncle miners.
-		for _, uncle := range uncles {
-			ur := GetBlockUncleRewardByEra(era, header, uncle, blockReward)
-			state.AddBalance(uncle.Coinbase, ur) // $$
-		}
+		ecip1017BlockReward(config, state, header, uncles)
 	} else {
 		// Accumulate the rewards for the miner and any included uncles
 		reward := new(big.Int).Set(blockReward)
@@ -707,21 +651,4 @@ func GetBlockWinnerRewardByEra(era *big.Int, blockReward *big.Int) *big.Int {
 	r.Div(r, d)
 
 	return r
-}
-
-// GetBlockEra gets which "Era" a given block is within, given an era length (ecip-1017 has era=5,000,000 blocks)
-// Returns a zero-index era number, so "Era 1": 0, "Era 2": 1, "Era 3": 2 ...
-func GetBlockEra(blockNum, eraLength *big.Int) *big.Int {
-	// If genesis block or impossible negative-numbered block, return zero-val.
-	if blockNum.Sign() < 1 {
-		return new(big.Int)
-	}
-
-	remainder := big.NewInt(0).Mod(big.NewInt(0).Sub(blockNum, big.NewInt(1)), eraLength)
-	base := big.NewInt(0).Sub(blockNum, remainder)
-
-	d := big.NewInt(0).Div(base, eraLength)
-	dremainder := big.NewInt(0).Mod(d, big.NewInt(1))
-
-	return new(big.Int).Sub(d, dremainder)
 }

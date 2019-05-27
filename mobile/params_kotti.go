@@ -16,6 +16,12 @@
 
 package geth
 
+import (
+	"encoding/json"
+
+	"github.com/ethereum/go-ethereum/core"
+)
+
 // KottiGenesis returns the JSON spec to use for the Kotti test network
 func KottiGenesis() string {
 	enc, err := json.Marshal(core.DefaultKottiGenesisBlock())

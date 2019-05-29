@@ -35,6 +35,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -62,6 +63,16 @@ import (
 )
 
 var (
+	foundationFlag  = flag.Bool("chain.foundation", false, "Configure genesis and bootnodes for foundation chain defaults")
+	classicFlag     = flag.Bool("chain.classic", false, "Configure genesis and bootnodes for classic chain defaults")
+	kottiFlag       = flag.Bool("chain.kotti", false, "Configure genesis and bootnodes for kotti chain defaults")
+	socialFlag      = flag.Bool("chain.social", false, "Configure genesis and bootnodes for social chain defaults")
+	ethersocialFlag = flag.Bool("chain.ethersocial", false, "Configure genesis and bootnodes for ethersocial chain defaults")
+	mixFlag         = flag.Bool("chain.mix", false, "Configure genesis and bootnodes for mix chain defaults")
+	testnetFlag     = flag.Bool("chain.testnet", false, "Configure genesis and bootnodes for testnet chain defaults")
+	rinkebyFlag     = flag.Bool("chain.rinkeby", false, "Configure genesis and bootnodes for rinkeby chain defaults")
+	goerliFlag      = flag.Bool("chain.goerli", false, "Configure genesis and bootnodes for goerli chain defaults")
+
 	genesisFlag = flag.String("genesis", "", "Genesis json file to seed the chain with")
 	apiPortFlag = flag.Int("apiport", 8080, "Listener port for the HTTP API connection")
 	ethPortFlag = flag.Int("ethport", 30303, "Listener port for the devp2p connection")
@@ -92,6 +103,26 @@ var (
 	gitCommit = "" // Git SHA1 commit hash of the release (set via linker flags)
 	gitDate   = "" // Git commit date YYYYMMDD of the release (set via linker flags)
 )
+
+func faucetDirFromConfig(chainConfig *params.ChainConfig) string {
+	datadir := filepath.Join(os.Getenv("HOME"), ".faucet")
+	for conf, suff := range map[*params.ChainConfig]string{
+		params.MainnetChainConfig:     "",
+		params.ClassicChainConfig:     "classic",
+		params.SocialChainConfig:      "social",
+		params.EthersocialChainConfig: "ethersocial",
+		params.MixChainConfig:         "mix",
+		params.TestnetChainConfig:     "testnet",
+		params.RinkebyChainConfig:     "rinkeby",
+		params.GoerliChainConfig:      "goerli",
+		params.KottiChainConfig:       "kotti",
+	} {
+		if reflect.DeepEqual(chainConfig, conf) && suff != "" {
+			datadir = filepath.Join(datadir, suff)
+		}
+	}
+	return datadir
+}
 
 func main() {
 	// Parse the flags and set up the logger to print everything requested
@@ -141,16 +172,106 @@ func main() {
 		log.Crit("Failed to render the faucet template", "err", err)
 	}
 	// Load and parse the genesis block requested by the user
-	blob, err := ioutil.ReadFile(*genesisFlag)
-	if err != nil {
-		log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
-	}
-	genesis := new(core.Genesis)
-	if err = json.Unmarshal(blob, genesis); err != nil {
-		log.Crit("Failed to parse genesis block json", "err", err)
-	}
-	// Convert the bootnodes to internal enode representations
+	var genesis *core.Genesis
 	var enodes []*discv5.Node
+	var blob []byte
+
+	genesis, *bootFlag, *netFlag = func() (gs *core.Genesis, bs string, netid uint64) {
+		var configs = []struct {
+			flag  bool
+			gs    *core.Genesis
+			bs    []string
+			netid uint64
+		}{
+			{
+				*foundationFlag,
+				core.DefaultGenesisBlock(),
+				params.MainnetBootnodes,
+				params.NetworkIDFoundation,
+			},
+			{
+				*classicFlag,
+				core.DefaultClassicGenesisBlock(),
+				params.ClassicBootnodes,
+				params.NetworkIDClassic,
+			},
+			{
+				*socialFlag,
+				core.DefaultSocialGenesisBlock(),
+				params.SocialBootnodes,
+				params.NetworkIDSocial,
+			},
+			{
+				*ethersocialFlag,
+				core.DefaultEthersocialGenesisBlock(),
+				params.EthersocialBootnodes,
+				params.NetworkIDEthersocial,
+			},
+			{
+				*mixFlag,
+				core.DefaultMixGenesisBlock(),
+				params.MixBootnodes,
+				params.NetworkIDMix,
+			},
+			{
+				*testnetFlag,
+				core.DefaultTestnetGenesisBlock(),
+				params.TestnetBootnodes,
+				params.NetworkIDTestnet,
+			},
+			{
+				*rinkebyFlag,
+				core.DefaultRinkebyGenesisBlock(),
+				params.RinkebyBootnodes,
+				params.NetworkIDRinkeby,
+			},
+			{
+				*kottiFlag,
+				core.DefaultKottiGenesisBlock(),
+				params.KottiBootnodes,
+				params.NetworkIDKotti,
+			},
+			{
+				*goerliFlag,
+				core.DefaultGoerliGenesisBlock(),
+				params.GoerliBootnodes,
+				params.NetworkIDGoerli,
+			},
+		}
+
+		var bss []string
+		for _, conf := range configs {
+			if conf.flag {
+				gs, bss, netid = conf.gs, conf.bs, conf.netid
+				break
+			}
+		}
+		if len(bss) > 0 {
+			bs = strings.Join(bss, ",")
+		}
+
+		// allow overrides
+		if *genesisFlag != "" {
+			blob, err = ioutil.ReadFile(*genesisFlag)
+			if err != nil {
+				log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
+			}
+			gs = new(core.Genesis)
+			if err = json.Unmarshal(blob, gs); err != nil {
+				log.Crit("Failed to parse genesis block json", "err", err)
+			}
+		}
+		if *bootFlag != "" {
+			bs = *bootFlag
+		}
+		if *netFlag != 0 {
+			netid = *netFlag
+		}
+		return
+	}()
+	log.Info("configured chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", genesis.Config.String())
+
+	// Convert the bootnodes to internal enode representations
 	for _, boot := range strings.Split(*bootFlag, ",") {
 		if url, err := discv5.ParseNode(boot); err == nil {
 			enodes = append(enodes, url)
@@ -158,6 +279,7 @@ func main() {
 			log.Error("Failed to parse bootnode URL", "url", boot, "err", err)
 		}
 	}
+
 	// Load up the account key and decrypt its password
 	if blob, err = ioutil.ReadFile(*accPassFlag); err != nil {
 		log.Crit("Failed to read account password contents", "file", *accPassFlag, "err", err)
@@ -165,7 +287,7 @@ func main() {
 	// Delete trailing newline in password
 	pass := strings.TrimSuffix(string(blob), "\n")
 
-	ks := keystore.NewKeyStore(filepath.Join(os.Getenv("HOME"), ".faucet", "keys"), keystore.StandardScryptN, keystore.StandardScryptP)
+	ks := keystore.NewKeyStore(filepath.Join(faucetDirFromConfig(genesis.Config), "keys"), keystore.StandardScryptN, keystore.StandardScryptP)
 	if blob, err = ioutil.ReadFile(*accJSONFlag); err != nil {
 		log.Crit("Failed to read account key contents", "file", *accJSONFlag, "err", err)
 	}
@@ -220,9 +342,9 @@ type faucet struct {
 func newFaucet(genesis *core.Genesis, port int, enodes []*discv5.Node, network uint64, stats string, ks *keystore.KeyStore, index []byte) (*faucet, error) {
 	// Assemble the raw devp2p protocol stack
 	stack, err := node.New(&node.Config{
-		Name:    "geth",
+		Name:    "MultiFaucet",
 		Version: params.VersionWithCommit(gitCommit, gitDate),
-		DataDir: filepath.Join(os.Getenv("HOME"), ".faucet"),
+		DataDir: faucetDirFromConfig(genesis.Config),
 		P2P: p2p.Config{
 			NAT:              nat.Any(),
 			NoDiscovery:      true,

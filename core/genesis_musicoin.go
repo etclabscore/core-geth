@@ -35,6 +35,3 @@ func DefaultMusicoinGenesisBlock() *Genesis {
 		Alloc:      decodePrealloc(musicoinAllocData),
 	}
 }
-
-// nolint: misspell
-const musicoinAllocData = "\xcc\xc2\x01\x01\xc2\x02\x01\xc2\x03\x01\xc2\x04\x01"

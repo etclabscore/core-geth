@@ -121,7 +121,7 @@ the user doesn't care about years-old historical data, so we can fast-sync quick
 state of the network. To do so:
 
 ```
-$ geth [|--classic|--social|--ethersocial|--testnet|--rinkeby|--kotti|--goerli] console
+$ geth [|--classic|--social|--ethersocial|--mix|--music|--testnet|--rinkeby|--kotti|--goerli|--dev] console
 ```
 
 This command will:

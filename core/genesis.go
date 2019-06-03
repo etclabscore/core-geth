@@ -227,6 +227,10 @@ func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
 		return params.EthersocialChainConfig
 	case ghash == params.MusicoinGenesisHash:
 		return params.MusicoinChainConfig
+	case ghash == params.RinkebyGenesisHash:
+		return params.RinkebyChainConfig
+	case ghash == params.GoerliGenesisHash:
+		return params.GoerliChainConfig
 	case ghash == params.KottiGenesisHash:
 		return params.KottiChainConfig
 	default:
@@ -325,68 +329,6 @@ func DefaultGenesisBlock() *Genesis {
 	}
 }
 
-// ClassicGenesisBlock returns the Ethereum Classic genesis block.
-func DefaultClassicGenesisBlock() *Genesis {
-	return &Genesis{
-		Config:     params.ClassicChainConfig,
-		Nonce:      66,
-		ExtraData:  hexutil.MustDecode("0x11bbe8db4e347b4e8c937c1c8370e4b5ed33adb3db69cbdb7a38e1e50b1b82fa"),
-		GasLimit:   5000,
-		Difficulty: big.NewInt(17179869184),
-		Alloc:      decodePrealloc(mainnetAllocData),
-	}
-}
-
-// SocialGenesisBlock returns the Ethereum Social genesis block.
-func DefaultSocialGenesisBlock() *Genesis {
-	return &Genesis{
-		Config:     params.SocialChainConfig,
-		Nonce:      66,
-		ExtraData:  hexutil.MustDecode("0x3230313820457468657265756d20536f6369616c2050726f6a656374"),
-		GasLimit:   5000,
-		Difficulty: big.NewInt(17179869184),
-		Alloc:      decodePrealloc(socialAllocData),
-	}
-}
-
-// MixGenesisBlock returns the Mix genesis block.
-func DefaultMixGenesisBlock() *Genesis {
-	return &Genesis{
-		Config:     params.MixChainConfig,
-		Nonce:      0x1391eaa92b871f91,
-		ExtraData:  hexutil.MustDecode("0x77656c636f6d65746f7468656c696e6b6564776f726c64000000000000000000"),
-		GasLimit:   3000000,
-		Difficulty: big.NewInt(1048576),
-		Alloc:      decodePrealloc(mixAllocData),
-	}
-}
-
-// EthersocialGenesisBlock returns the Ethersocial main net genesis block.
-func DefaultEthersocialGenesisBlock() *Genesis {
-	return &Genesis{
-		Config:     params.EthersocialChainConfig,
-		Nonce:      66,
-		ExtraData:  hexutil.MustDecode("0x"),
-		GasLimit:   3141592,
-		Difficulty: big.NewInt(131072),
-		Alloc:      decodePrealloc(ethersocialAllocData),
-	}
-}
-
-// MusicoinGenesisBlock returns the Musicoin main net genesis block.
-func DefaultMusicoinGenesisBlock() *Genesis {
-	return &Genesis{
-		Config:     params.MusicoinChainConfig,
-		Timestamp:  0,
-		Nonce:      42,
-		ExtraData:  nil,
-		Mixhash:    common.HexToHash("0x00000000000000000000000000000000000000647572616c65787365646c6578"),
-		GasLimit:   8000000,
-		Difficulty: big.NewInt(4000000),
-		Alloc:      decodePrealloc(musicoinAllocData),
-	}
-}
-
 // DefaultTestnetGenesisBlock returns the Ropsten network genesis block.
 func DefaultTestnetGenesisBlock() *Genesis {
 	return &Genesis{
@@ -408,18 +350,6 @@ func DefaultRinkebyGenesisBlock() *Genesis {
 		GasLimit:   4700000,
 		Difficulty: big.NewInt(1),
 		Alloc:      decodePrealloc(rinkebyAllocData),
-	}
-}
-
-// DefaultKottiGenesisBlock returns the Kotti network genesis block.
-func DefaultKottiGenesisBlock() *Genesis {
-	return &Genesis{
-		Config:     params.KottiChainConfig,
-		Timestamp:  1546461831,
-		ExtraData:  hexutil.MustDecode("0x000000000000000000000000000000000000000000000000000000000000000025b7955e43adf9c2a01a9475908702cce67f302a6aaf8cba3c9255a2b863415d4db7bae4f4bbca020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-		GasLimit:   10485760,
-		Difficulty: big.NewInt(1),
-		Alloc:      decodePrealloc(kottiAllocData),
 	}
 }
 

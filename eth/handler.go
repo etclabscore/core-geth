@@ -125,11 +125,13 @@ func NewProtocolManager(config *params.ChainConfig, mode downloader.SyncMode, ne
 	if mode == downloader.FastSync && blockchain.CurrentBlock().NumberU64() == 0 {
 		manager.fastSync = uint32(1)
 	}
+
 	// If we have trusted checkpoints, enforce them on the chain
-	if checkpoint, ok := params.TrustedCheckpoints[blockchain.Genesis().Hash()]; ok {
+	if checkpoint := config.TrustedCheckpoint; checkpoint != nil {
 		manager.checkpointNumber = (checkpoint.SectionIndex+1)*params.CHTFrequency - 1
 		manager.checkpointHash = checkpoint.SectionHead
 	}
+
 	// Initiate a sub-protocol for every implemented version we can handle
 	manager.SubProtocols = make([]p2p.Protocol, 0, len(ProtocolVersions))
 	for i, version := range ProtocolVersions {

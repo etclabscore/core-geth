@@ -504,10 +504,12 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 
 	// Initialize a chain and generate a fake CHT if checkpointing is enabled
 	var (
-		db      = rawdb.NewMemoryDatabase()
-		config  = new(params.ChainConfig)
-		genesis = (&core.Genesis{Config: config}).MustCommit(db)
+		db     = rawdb.NewMemoryDatabase()
+		config = new(params.ChainConfig)
 	)
+
+	(&core.Genesis{Config: config}).MustCommit(db)
+
 	// If checkpointing is enabled, create and inject a fake CHT and the corresponding
 	// chllenge response.
 	var response *types.Header
@@ -520,8 +522,7 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 			SectionIndex: index,
 			SectionHead:  response.Hash(),
 		}
-		params.TrustedCheckpoints[genesis.Hash()] = cht
-		defer delete(params.TrustedCheckpoints, genesis.Hash())
+		config.TrustedCheckpoint = cht
 	}
 	// Create a checkpoint aware protocol manager
 	blockchain, err := core.NewBlockChain(db, nil, config, ethash.NewFaker(), vm.Config{}, nil)

@@ -176,7 +176,7 @@ func NewProtocolManager(
 	}
 	if lightSync {
 		var checkpoint uint64
-		if cht, ok := params.TrustedCheckpoints[blockchain.Genesis().Hash()]; ok {
+		if cht := chainConfig.TrustedCheckpoint; cht != nil {
 			checkpoint = (cht.SectionIndex+1)*params.CHTFrequency - 1
 		}
 		manager.downloader = downloader.New(checkpoint, chainDb, nil, manager.eventMux, nil, blockchain, removePeer)

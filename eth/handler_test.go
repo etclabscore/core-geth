@@ -504,13 +504,11 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 
 	// Initialize a chain and generate a fake CHT if checkpointing is enabled
 	var (
-		db      = rawdb.NewMemoryDatabase()
-		config  = new(params.ChainConfig)
-		genesis *types.Block
+		db     = rawdb.NewMemoryDatabase()
+		config = new(params.ChainConfig)
 	)
 
-	genesis = (&core.Genesis{Config: config}).MustCommit(db)
-	_ = genesis
+	(&core.Genesis{Config: config}).MustCommit(db)
 
 	// If checkpointing is enabled, create and inject a fake CHT and the corresponding
 	// chllenge response.

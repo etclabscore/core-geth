@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/mclock"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -277,6 +278,31 @@ func testGetCode(t *testing.T, protocol int) {
 	}
 }
 
+// Tests that the stale contract codes can't be retrieved based on account addresses.
+func TestGetStaleCodeLes2(t *testing.T) { testGetStaleCode(t, 2) }
+func TestGetStaleCodeLes3(t *testing.T) { testGetStaleCode(t, 3) }
+
+func testGetStaleCode(t *testing.T, protocol int) {
+	server, tearDown := newServerEnv(t, core.TriesInMemory+4, protocol, nil)
+	defer tearDown()
+	bc := server.pm.blockchain.(*core.BlockChain)
+
+	check := func(number uint64, expected [][]byte) {
+		req := &CodeReq{
+			BHash:  bc.GetHeaderByNumber(number).Hash(),
+			AccKey: crypto.Keccak256(testContractAddr[:]),
+		}
+		cost := server.tPeer.GetRequestCost(GetCodeMsg, 1)
+		sendRequest(server.tPeer.app, GetCodeMsg, 42, cost, []*CodeReq{req})
+		if err := expectResponse(server.tPeer.app, CodeMsg, 42, testBufLimit, expected); err != nil {
+			t.Errorf("codes mismatch: %v", err)
+		}
+	}
+	check(0, [][]byte{})                                                          // Non-exist contract
+	check(testContractDeployed, [][]byte{})                                       // Stale contract
+	check(bc.CurrentHeader().Number.Uint64(), [][]byte{testContractCodeDeployed}) // Fresh contract
+}
+
 // Tests that the transaction receipts can be retrieved based on hashes.
 func TestGetReceiptLes2(t *testing.T) { testGetReceipt(t, 2) }
 
@@ -335,6 +361,43 @@ func testGetProofs(t *testing.T, protocol int) {
 	if err := expectResponse(server.tPeer.app, ProofsV2Msg, 42, testBufLimit, proofsV2.NodeList()); err != nil {
 		t.Errorf("proofs mismatch: %v", err)
 	}
+}
+
+// Tests that the stale contract codes can't be retrieved based on account addresses.
+func TestGetStaleProofLes2(t *testing.T) { testGetStaleProof(t, 2) }
+func TestGetStaleProofLes3(t *testing.T) { testGetStaleProof(t, 3) }
+
+func testGetStaleProof(t *testing.T, protocol int) {
+	server, tearDown := newServerEnv(t, core.TriesInMemory+4, protocol, nil)
+	defer tearDown()
+	bc := server.pm.blockchain.(*core.BlockChain)
+
+	check := func(number uint64, wantOK bool) {
+		var (
+			header  = bc.GetHeaderByNumber(number)
+			account = crypto.Keccak256(testBankAddress.Bytes())
+		)
+		req := &ProofReq{
+			BHash: header.Hash(),
+			Key:   account,
+		}
+		cost := server.tPeer.GetRequestCost(GetProofsV2Msg, 1)
+		sendRequest(server.tPeer.app, GetProofsV2Msg, 42, cost, []*ProofReq{req})
+
+		var expected []rlp.RawValue
+		if wantOK {
+			proofsV2 := light.NewNodeSet()
+			t, _ := trie.New(header.Root, trie.NewDatabase(server.db))
+			t.Prove(crypto.Keccak256(account), 0, proofsV2)
+			expected = proofsV2.NodeList()
+		}
+		if err := expectResponse(server.tPeer.app, ProofsV2Msg, 42, testBufLimit, expected); err != nil {
+			t.Errorf("codes mismatch: %v", err)
+		}
+	}
+	check(0, false)                                 // Non-exist proof
+	check(2, false)                                 // Stale proof
+	check(bc.CurrentHeader().Number.Uint64(), true) // Fresh proof
 }
 
 // Tests that CHT proofs can be correctly retrieved.
@@ -438,7 +501,7 @@ func TestTransactionStatusLes2(t *testing.T) {
 	config.Journal = ""
 	txpool := core.NewTxPool(config, params.TestChainConfig, chain)
 	pm.txpool = txpool
-	peer, _ := newTestPeer(t, "peer", 2, pm, true)
+	peer, _ := newTestPeer(t, "peer", 2, pm, true, 0)
 	defer peer.close()
 
 	var reqID uint64
@@ -518,4 +581,52 @@ func TestTransactionStatusLes2(t *testing.T) {
 	// check if their status is pending again
 	test(tx1, false, light.TxStatus{Status: core.TxStatusPending})
 	test(tx2, false, light.TxStatus{Status: core.TxStatusPending})
+}
+
+func TestStopResumeLes3(t *testing.T) {
+	db := rawdb.NewMemoryDatabase()
+	clock := &mclock.Simulated{}
+	testCost := testBufLimit / 10
+	pm, err := newTestProtocolManager(false, 0, nil, nil, nil, db, nil, testCost, clock)
+	if err != nil {
+		t.Fatalf("Failed to create protocol manager: %v", err)
+	}
+	peer, _ := newTestPeer(t, "peer", 3, pm, true, testCost)
+	defer peer.close()
+
+	expBuf := testBufLimit
+	var reqID uint64
+
+	req := func() {
+		reqID++
+		sendRequest(peer.app, GetBlockHeadersMsg, reqID, testCost, &getBlockHeadersData{Origin: hashOrNumber{Hash: common.Hash{1}}, Amount: 1})
+	}
+
+	for i := 1; i <= 5; i++ {
+		// send requests while we still have enough buffer and expect a response
+		for expBuf >= testCost {
+			req()
+			expBuf -= testCost
+			if err := expectResponse(peer.app, BlockHeadersMsg, reqID, expBuf, nil); err != nil {
+				t.Errorf("expected response and failed: %v", err)
+			}
+		}
+		// send some more requests in excess and expect a single StopMsg
+		c := i
+		for c > 0 {
+			req()
+			c--
+		}
+		if err := p2p.ExpectMsg(peer.app, StopMsg, nil); err != nil {
+			t.Errorf("expected StopMsg and failed: %v", err)
+		}
+		// wait until the buffer is recharged by half of the limit
+		wait := testBufLimit / testBufRecharge / 2
+		clock.Run(time.Millisecond * time.Duration(wait))
+		// expect a ResumeMsg with the partially recharged buffer value
+		expBuf += testBufRecharge * wait
+		if err := p2p.ExpectMsg(peer.app, ResumeMsg, expBuf); err != nil {
+			t.Errorf("expected ResumeMsg and failed: %v", err)
+		}
+	}
 }

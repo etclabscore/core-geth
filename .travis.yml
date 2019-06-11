@@ -6,12 +6,8 @@ matrix:
     # These are the latest Go versions.
     - os: linux
       dist: xenial
-      sudo: required
-      go: 1.11.x
+      go: 1.12.x
       script:
-        - sudo modprobe fuse
-        - sudo chmod 666 /dev/fuse
-        - sudo chown root:$USER /etc/fuse.conf
         - go run build/ci.go install
         - travis_wait 60 go run build/ci.go test
       before_deploy:
@@ -30,7 +26,7 @@ matrix:
         tag_name: "$TRAVIS_TAG"
 
     - os: osx
-      go: 1.11.x
+      go: 1.12.x
       script:
         - echo "Increase the maximum number of open file descriptors on macOS"
         - NOFILE=20480
@@ -60,7 +56,7 @@ matrix:
     # This builder only tests code linters on latest version of Go
     - os: linux
       dist: xenial
-      go: 1.11.x
+      go: 1.12.x
       env:
         - lint
       git:

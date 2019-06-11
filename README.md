@@ -103,8 +103,8 @@ The go-ethereum project comes with several wrappers/executables found in the `cm
 | `evm`         | Developer utility version of the EVM (Ethereum Virtual Machine) that is capable of running bytecode snippets within a configurable environment and execution mode. Its purpose is to allow isolated, fine-grained debugging of EVM opcodes (e.g. `evm --code 60ff60ff --debug`).                                                                                                                                                                                                                                                                     |
 | `gethrpctest` | Developer utility tool to support our [ethereum/rpc-test](https://github.com/ethereum/rpc-tests) test suite which validates baseline conformity to the [Ethereum JSON RPC](https://github.com/ethereum/wiki/wiki/JSON-RPC) specs. Please see the [test suite's readme](https://github.com/ethereum/rpc-tests/blob/master/README.md) for details.                                                                                                                                                                                                     |
 | `rlpdump`     | Developer utility tool to convert binary RLP ([Recursive Length Prefix](https://github.com/ethereum/wiki/wiki/RLP)) dumps (data encoding used by the Ethereum protocol both network as well as consensus wise) to user-friendlier hierarchical representation (e.g. `rlpdump --hex CE0183FFFFFFC4C304050583616263`).                                                                                                                                                                                                                                 |
-| `swarm`       | Swarm daemon and tools. This is the entry point for the Swarm network. `swarm --help` for command line options and subcommands. See [Swarm README](https://github.com/ethereum/go-ethereum/tree/master/swarm) for more information.                                                                                                                                                                                                                                                                                                                  |
 | `puppeth`     | a CLI wizard that aids in creating a new Ethereum network.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+
 
 ## Running geth
 
@@ -133,12 +133,40 @@ This command will:
    (via the trailing `console` subcommand) through which you can invoke all official [`web3` methods](https://github.com/ethereum/wiki/wiki/JavaScript-API)
    as well as Geth's own [management APIs](https://github.com/ethereum/go-ethereum/wiki/Management-APIs).
    This tool is optional and if you leave it out you can always attach to an already running Geth instance
-   with `geth attach`. 
-   > To keep the shell clear of event logs while interacting with the JS console, you
-   > can append `2> stderr.log`, which will redirect the normal stderr log lines to a file for later reference, while
-   > keeping the console and it's output (on stdout) visible in the shell.
-   
-### Full archive node on an Ethereum network
+   with `geth attach`.
+
+### A Full node on the Ethereum test network
+
+Transitioning towards developers, if you'd like to play around with creating Ethereum contracts, you
+almost certainly would like to do that without any real money involved until you get the hang of the
+entire system. In other words, instead of attaching to the main network, you want to join the **test**
+network with your node, which is fully equivalent to the main network, but with play-Ether only.
+
+```
+$ geth --testnet console
+```
+
+The `console` subcommand has the exact same meaning as above and they are equally useful on the
+testnet too. Please see above for their explanations if you've skipped here.
+
+Specifying the `--testnet` flag, however, will reconfigure your Geth instance a bit:
+
+ * Instead of using the default data directory (`~/.ethereum` on Linux for example), Geth will nest
+   itself one level deeper into a `testnet` subfolder (`~/.ethereum/testnet` on Linux). Note, on OSX
+   and Linux this also means that attaching to a running testnet node requires the use of a custom
+   endpoint since `geth attach` will try to attach to a production node endpoint by default. E.g.
+   `geth attach <datadir>/testnet/geth.ipc`. Windows users are not affected by this.
+ * Instead of connecting the main Ethereum network, the client will connect to the test network,
+   which uses different P2P bootnodes, different network IDs and genesis states.
+
+*Note: Although there are some internal protective measures to prevent transactions from crossing
+over between the main network and test network, you should make sure to always use separate accounts
+for play-money and real-money. Unless you manually move accounts, Geth will by default correctly
+separate the two networks and will not make any accounts available between them.*
+
+### Full node on the Rinkeby test network
+
+The above test network is a cross-client one based on the ethash proof-of-work consensus algorithm. As such, it has certain extra overhead and is more susceptible to reorganization attacks due to the network's low difficulty/security. Go Ethereum also supports connecting to a proof-of-authority based test network called [*Rinkeby*](https://www.rinkeby.io) (operated by members of the community). This network is lighter, more secure, but is only supported by go-ethereum.
 
 ```
 $ geth [|--<chain>] --syncmode=full --gcmode=archive

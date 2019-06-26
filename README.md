@@ -8,6 +8,7 @@ https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/6874
 )](https://godoc.org/github.com/multi-geth/multi-geth)
 [![Go Report Card](https://goreportcard.com/badge/github.com/multi-geth/multi-geth)](https://goreportcard.com/report/github.com/multi-geth/multi-geth)
 [![Travis](https://travis-ci.org/multi-geth/multi-geth.svg?branch=master)](https://travis-ci.org/multi-geth/multi-geth)
+[![Gitter](https://badges.gitter.im/multi-geth/community.svg)](https://gitter.im/multi-geth/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Code Shelter](https://www.codeshelter.co/static/badges/badge-flat.svg)](https://www.codeshelter.co/)
 
 Binary archives are published at https://github.com/multi-geth/multi-geth/releases.

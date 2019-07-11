@@ -21,7 +21,7 @@ Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-
 
 Networks supported by the respective go-ethereum packaged `geth` client.
 
-| Ticker | Network/Client                        | multi-geth                                       | [ethereumclassic/go-ethereum](https://github.com/ethereumclassic/go-ethereum) | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
+| Ticker | Network/Client                        | multi-geth                                       | [etclabscore/go-ethereum](https://github.com/etclabscore/go-ethereum) | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
 | ---    | ---                                   | ---                                              | ---                                                                           | ---                                                             |
 | ETH    | Ethereum (Foundation)                 | :heavy_check_mark:                               |                                                                               | :heavy_check_mark:                                              |
 | ETC    | Ethereum Classic                      | :heavy_check_mark:                               | :heavy_check_mark:                                                            |                                                                 |

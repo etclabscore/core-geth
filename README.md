@@ -6,12 +6,12 @@
 [![API Reference](
 https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/68747470733a2f2f676f646f632e6f72672f6769746875622e636f6d2f676f6c616e672f6764646f3f7374617475732e737667
 )](https://godoc.org/github.com/multi-geth/multi-geth)
-[![Go Report Card](https://goreportcard.com/badge/github.com/multi-geth/multi-geth)](https://goreportcard.com/report/github.com/multi-geth/multi-geth)
-[![Travis](https://travis-ci.org/multi-geth/multi-geth.svg?branch=master)](https://travis-ci.org/multi-geth/multi-geth)
+[![Go Report Card](https://goreportcard.com/badge/github.com/etclabscore/multi-geth)](https://goreportcard.com/report/github.com/etclabscore/multi-geth)
+[![Travis](https://travis-ci.org/etclabscore/multi-geth.svg?branch=master)](https://travis-ci.org/etclabscore/multi-geth)
 [![Gitter](https://badges.gitter.im/multi-geth/community.svg)](https://gitter.im/multi-geth/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Code Shelter](https://www.codeshelter.co/static/badges/badge-flat.svg)](https://www.codeshelter.co/)
 
-Binary archives are published at https://github.com/multi-geth/multi-geth/releases.
+Binary archives are published at https://github.com/etclabscore/multi-geth/releases.
 
 Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) is merged to this repository regularly,
  usually at every upstream tagged release. Every effort is made to maintain seamless compatibility with upstream source, including compatible RPC, JS, and CLI

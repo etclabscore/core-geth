@@ -20,7 +20,7 @@ matrix:
         file_glob: true
         draft: true
         on:
-          repo: multi-geth/multi-geth
+          repo: etclabscore/multi-geth
           tags: true
         skip_cleanup: true
         tag_name: "$TRAVIS_TAG"
@@ -48,7 +48,7 @@ matrix:
         file_glob: true
         draft: true
         on:
-          repo: multi-geth/multi-geth
+          repo: etclabscore/multi-geth
           tags: true
         skip_cleanup: true
         tag_name: "$TRAVIS_TAG"

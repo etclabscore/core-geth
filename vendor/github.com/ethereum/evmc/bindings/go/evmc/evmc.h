@@ -2,7 +2,7 @@
  * EVMC: Ethereum Client-VM Connector API
  *
  * @copyright
- * Copyright 2019 The EVMC Authors.
+ * Copyright 2016-2019 The EVMC Authors.
  * Licensed under the Apache License, Version 2.0.
  *
  * @defgroup EVMC EVMC
@@ -303,7 +303,10 @@ enum evmc_status_code
      * For example, the Client tries running a code in the EVM 1.5. If the
      * code is not supported there, the execution falls back to the EVM 1.0.
      */
-    EVMC_REJECTED = -2
+    EVMC_REJECTED = -2,
+
+    /** The VM failed to allocate the amount of memory needed for execution. */
+    EVMC_OUT_OF_MEMORY = -3
 };
 
 /* Forward declaration. */
@@ -362,33 +365,34 @@ struct evmc_result
     size_t output_size;
 
     /**
-     * The pointer to a function releasing all resources associated with
-     *  the result object.
+     * The method releasing all resources associated with the result object.
      *
-     *  This function pointer is optional (MAY be NULL) and MAY be set by
-     *  the EVM implementation. If set it MUST be used by the user to
-     *  release memory and other resources associated with the result object.
-     *  After the result resources are released the result object
-     *  MUST NOT be used any more.
+     * This method (function pointer) is optional (MAY be NULL) and MAY be set
+     * by the VM implementation. If set it MUST be called by the user once to
+     * release memory and other resources associated with the result object.
+     * Once the resources are released the result object MUST NOT be used again.
      *
-     *  The suggested code pattern for releasing EVM results:
-     *  @code
-     *  struct evmc_result result = ...;
-     *  if (result.release)
-     *      result.release(&result);
-     *  @endcode
+     * The suggested code pattern for releasing execution results:
+     * @code
+     * struct evmc_result result = ...;
+     * if (result.release)
+     *     result.release(&result);
+     * @endcode
      *
-     *  @note
-     *  It works similarly to C++ virtual destructor. Attaching the release
-     *  function to the result itself allows EVM composition.
+     * @note
+     * It works similarly to C++ virtual destructor. Attaching the release
+     * function to the result itself allows VM composition.
      */
     evmc_release_result_fn release;
 
     /**
-     * The address of the contract created by CREATE opcode.
+     * The address of the contract created by create instructions.
      *
-     *  This field has valid value only if the result describes successful
-     *  CREATE (evmc_result::status_code is ::EVMC_SUCCESS).
+     * This field has valid value only if:
+     * - it is a result of the Host method evmc_host_interface::call
+     * - and the result describes successful contract creation
+     *   (evmc_result::status_code is ::EVMC_SUCCESS).
+     * In all other cases the address MUST be null bytes.
      */
     evmc_address create_address;
 
@@ -653,12 +657,11 @@ struct evmc_host_interface
 /**
  * Execution context managed by the Host.
  *
- *  The Host MUST pass the pointer to the execution context to
- *  ::evmc_execute_fn. The EVM MUST pass the same pointer back to the Host in
- *  every callback function.
- *  The context MUST contain at least the function table defining the context
- *  callback interface.
- *  Optionally, The Host MAY include in the context additional data.
+ * The Host MUST pass the pointer to the execution context to ::evmc_execute_fn.
+ * The VM MUST pass the same pointer back to the Host in every callback function.
+ * The context MUST contain at least the function table defining
+ * the context callback interface.
+ * Optionally, the Host MAY include in the context additional data.
  */
 struct evmc_context
 {
@@ -791,18 +794,20 @@ enum evmc_revision
 
 
 /**
- * Executes the given EVM bytecode using the input in the message
+ * Executes the given code using the input from the message.
  *
- * This function MAY be invoked multiple times for a single EVM instance.
+ * This function MAY be invoked multiple times for a single VM instance.
  *
- * @param instance   The EVM instance.
- * @param context    The pointer to the Client execution context to be passed
- *                   to the callback functions. @see ::evmc_context.
- * @param rev        Requested EVM specification revision.
- * @param msg        Call parameters. @see ::evmc_message.
- * @param code       Reference to the bytecode to be executed.
- * @param code_size  The length of the bytecode.
- * @return           All execution results.
+ * @param instance   The VM instance. This argument MUST NOT be NULL.
+ * @param context    The pointer to the Host execution context to be passed
+ *                   to the Host interface methods (::evmc_host_interface).
+ *                   This argument MUST NOT be NULL unless
+ *                   the @p instance has the ::EVMC_CAPABILITY_PRECOMPILES capability.
+ * @param rev        The requested EVM specification revision.
+ * @param msg        The call parameters. See ::evmc_message. This argument MUST NOT be NULL.
+ * @param code       The reference to the code to be executed. This argument MAY be NULL.
+ * @param code_size  The length of the code. If @p code is NULL this argument MUST be 0.
+ * @return           The execution result.
  */
 typedef struct evmc_result (*evmc_execute_fn)(struct evmc_instance* instance,
                                               struct evmc_context* context,
@@ -816,8 +821,27 @@ typedef struct evmc_result (*evmc_execute_fn)(struct evmc_instance* instance,
  */
 enum evmc_capabilities
 {
-    EVMC_CAPABILITY_EVM1 = (1u << 0), /**< The VM is capable of executing EVM1 bytecode. */
-    EVMC_CAPABILITY_EWASM = (1u << 1) /**< The VM is capable of execution ewasm bytecode. */
+    /**
+     * The VM is capable of executing EVM1 bytecode.
+     */
+    EVMC_CAPABILITY_EVM1 = (1u << 0),
+
+    /**
+     * The VM is capable of executing ewasm bytecode.
+     */
+    EVMC_CAPABILITY_EWASM = (1u << 1),
+
+    /**
+     * The VM is capable of executing the precompiled contracts
+     * defined for the range of destination addresses.
+     *
+     * The EIP-1352 (https://eips.ethereum.org/EIPS/eip-1352) specifies
+     * the range 0x000...0000 - 0x000...ffff of addresses
+     * reserved for precompiled and system contracts.
+     *
+     * This capability is **experimental** and MAY be removed without notice.
+     */
+    EVMC_CAPABILITY_PRECOMPILES = (1u << 2)
 };
 
 /**
@@ -838,7 +862,11 @@ typedef uint32_t evmc_capabilities_flagset;
  */
 typedef evmc_capabilities_flagset (*evmc_get_capabilities_fn)(struct evmc_instance* instance);
 
-/** The opaque type representing a Client-side tracer object. */
+/**
+ * The opaque type representing a Client-side tracer object.
+ *
+ * @deprecated Deprecated since EVMC 6.3, see evmc_instance::set_tracer().
+ */
 struct evmc_tracer_context;
 
 /**
@@ -849,6 +877,8 @@ struct evmc_tracer_context;
  * The message level information (like call depth, destination address, etc.) are not provided here.
  * This piece of information can be acquired by inspecting messages being sent to the EVM in
  * ::evmc_execute_fn and the results of the messages execution.
+ *
+ * @deprecated Deprecated since EVMC 6.3, see evmc_instance::set_tracer().
  *
  * @param context                The pointer to the Client-side tracing context. This allows to
  *                               implement the tracer in OOP manner.
@@ -897,6 +927,8 @@ typedef void (*evmc_trace_callback)(struct evmc_tracer_context* context,
  *
  * This will overwrite the previous settings (the callback and the context).
  *
+ * @deprecated Deprecated since EVMC 6.3, see evmc_instance::set_tracer().
+ *
  * @param instance    The EVM instance.
  * @param callback    The tracer callback function. This argument MAY be NULL to disable previously
  *                    set tracer.
@@ -912,15 +944,15 @@ typedef void (*evmc_set_tracer_fn)(struct evmc_instance* instance,
 /**
  * The EVM instance.
  *
- *  Defines the base struct of the EVM implementation.
+ * Defines the base struct of the VM implementation.
  */
 struct evmc_instance
 {
     /**
-     *  EVMC ABI version implemented by the EVM instance.
+     * EVMC ABI version implemented by the VM instance.
      *
-     *  Used to detect ABI incompatibilities. The EVMC ABI version
-     *  represented by this file is in ::EVMC_ABI_VERSION.
+     * Can be used to detect ABI incompatibilities.
+     * The EVMC ABI version represented by this file is in ::EVMC_ABI_VERSION.
      */
     const int abi_version;
 
@@ -940,19 +972,29 @@ struct evmc_instance
      */
     const char* version;
 
-    /** Pointer to function destroying the EVM instance. */
+    /**
+     * Pointer to function destroying the EVM instance.
+     *
+     * This is a mandatory method and MUST NOT be set to NULL.
+     */
     evmc_destroy_fn destroy;
 
-    /** Pointer to function executing a code by the EVM instance. */
+    /**
+     * Pointer to function executing a code by the EVM instance.
+     *
+     * This is a mandatory method and MUST NOT be set to NULL.
+     */
     evmc_execute_fn execute;
 
     /**
-     * Pointer to function returning capabilities supported by the VM instance.
+     * A method returning capabilities supported by the VM instance.
      *
-     * The value returned might change when different options are requested via set_option.
+     * The value returned MAY change when different options are set via the set_option() method.
      *
-     * A Client SHOULD only rely on the value returned here if it has queried it after
-     * it has called set_option.
+     * A Client SHOULD only rely on the value returned if it has queried it after
+     * it has called the set_option().
+     *
+     * This is a mandatory method and MUST NOT be set to NULL.
      */
     evmc_get_capabilities_fn get_capabilities;
 
@@ -960,6 +1002,10 @@ struct evmc_instance
      * Optional pointer to function setting the EVM instruction tracer.
      *
      * If the EVM does not support this feature the pointer can be NULL.
+     *
+     * @deprecated
+     * Since EVMC 6.3, the tracing API has been deprecated as there have been some
+     * design flaws discovered. New API is expected to be introduced in future.
      */
     evmc_set_tracer_fn set_tracer;
 

@@ -1,5 +1,5 @@
 /* EVMC: Ethereum Client-VM Connector API.
- * Copyright 2019 The EVMC Authors.
+ * Copyright 2018-2019 The EVMC Authors.
  * Licensed under the Apache License, Version 2.0.
  */
 
@@ -40,14 +40,20 @@ enum evmc_loader_error_code
     EVMC_LOADER_INSTANCE_CREATION_FAILURE = 4,
 
     /** The ABI version of the VM instance has mismatched. */
-    EVMC_LOADER_ABI_VERSION_MISMATCH = 5
+    EVMC_LOADER_ABI_VERSION_MISMATCH = 5,
+
+    /** The VM option is invalid. */
+    EVMC_LOADER_INVALID_OPTION_NAME = 6,
+
+    /** The VM option value is invalid. */
+    EVMC_LOADER_INVALID_OPTION_VALUE = 7
 };
 
 /**
- * Dynamically loads the shared object (DLL) with an EVM implementation.
+ * Dynamically loads the EVMC module with a VM implementation.
  *
- * This function tries to open a DLL at the given `filename`. On UNIX-like systems dlopen() function
- * is used. On Windows LoadLibrary() function is used.
+ * This function tries to open a dynamically loaded library (DLL) at the given `filename`.
+ * On UNIX-like systems dlopen() function is used. On Windows LoadLibrary() function is used.
  *
  * If the file does not exist or is not a valid shared library the ::EVMC_LOADER_CANNOT_OPEN error
  * code is signaled and NULL is returned.
@@ -77,40 +83,91 @@ enum evmc_loader_error_code
  * It is safe to call this function with the same filename argument multiple times
  * (the DLL is not going to be loaded multiple times).
  *
- * @param filename    The null terminated path (absolute or relative) to the shared library
- *                    containing the EVM implementation. If the value is NULL, an empty C-string
- *                    or longer than the path maximum length the ::EVMC_LOADER_INVALID_ARGUMENT is
- *                    signaled.
+ * @param filename    The null terminated path (absolute or relative) to an EVMC module
+ *                    (dynamically loaded library) containing the VM implementation.
+ *                    If the value is NULL, an empty C-string or longer than the path maximum length
+ *                    the ::EVMC_LOADER_INVALID_ARGUMENT is signaled.
  * @param error_code  The pointer to the error code. If not NULL the value is set to
  *                    ::EVMC_LOADER_SUCCESS on success or any other error code as described above.
- * @return            The pointer to the EVM create function or NULL.
+ * @return            The pointer to the EVM create function or NULL in case of error.
  */
 evmc_create_fn evmc_load(const char* filename, enum evmc_loader_error_code* error_code);
 
 /**
- * Exposes additional information about ::EVMC_LOADER_CANNOT_OPEN error.
- *
- * This function is not thread-safe and not supported on all operating systems.
- *
- * @return Error message or NULL if no additional information is available.
- */
-const char* evmc_cannot_open_error();
-
-/**
- * Dynamically loads the VM DLL and creates the VM instance.
+ * Dynamically loads the EVMC module and creates the VM instance.
  *
  * This is a macro for creating the VM instance with the function returned from evmc_load().
  * The function signals the same errors as evmc_load() and additionally:
- *  - ::EVMC_LOADER_INSTANCE_CREATION_FAILURE when the create function returns NULL,
- *  - ::EVMC_LOADER_ABI_VERSION_MISMATCH when the created VM instance has ABI version different
- *  from the ABI version of this library (::EVMC_ABI_VERSION).
+ * - ::EVMC_LOADER_INSTANCE_CREATION_FAILURE when the create function returns NULL,
+ * - ::EVMC_LOADER_ABI_VERSION_MISMATCH when the created VM instance has ABI version different
+ *   from the ABI version of this library (::EVMC_ABI_VERSION).
  *
  * It is safe to call this function with the same filename argument multiple times:
  * the DLL is not going to be loaded multiple times, but the function will return new VM instance
  * each time.
+ *
+ * @param filename    The null terminated path (absolute or relative) to an EVMC module
+ *                    (dynamically loaded library) containing the VM implementation.
+ *                    If the value is NULL, an empty C-string or longer than the path maximum length
+ *                    the ::EVMC_LOADER_INVALID_ARGUMENT is signaled.
+ * @param error_code  The pointer to the error code. If not NULL the value is set to
+ *                    ::EVMC_LOADER_SUCCESS on success or any other error code as described above.
+ * @return            The pointer to the created VM or NULL in case of error.
  */
 struct evmc_instance* evmc_load_and_create(const char* filename,
                                            enum evmc_loader_error_code* error_code);
+
+/**
+ * Dynamically loads the EVMC module, then creates and configures the VM instance.
+ *
+ * This function performs the following actions atomically:
+ * - loads the EVMC module (as evmc_load()),
+ * - creates the VM instance,
+ * - configures the VM instance with options provided in the @p config parameter.
+ *
+ * The configuration string (@p config) has the following syntax:
+ *
+ *     <path> ("," <option-name> ["=" <option-value>])*
+ *
+ * In this syntax, an option without a value can be specified (`,option,`)
+ * as a shortcut for using empty value (`,option=,`).
+ *
+ * Options are passed to a VM in the order they are specified in the configuration string.
+ * It is up to the VM implementation how to handle duplicated options and other conflicts.
+ *
+ * Example configuration string:
+ *
+ *     ./modules/vm.so,engine=compiler,trace,verbosity=2
+ *
+ * The function signals the same errors as evmc_load_and_create() and additionally:
+ * - ::EVMC_LOADER_INVALID_OPTION_NAME
+ *   when the provided options list contains an option unknown for the VM,
+ * - ::EVMC_LOADER_INVALID_OPTION_VALUE
+ *   when there exists unsupported value for a given VM option.
+
+ *
+ * @param config      The path to the EVMC module with additional configuration options.
+ * @param error_code  The pointer to the error code. If not NULL the value is set to
+ *                    ::EVMC_LOADER_SUCCESS on success or any other error code as described above.
+ * @return            The pointer to the created VM or NULL in case of error.
+ */
+struct evmc_instance* evmc_load_and_configure(const char* config,
+                                              enum evmc_loader_error_code* error_code);
+
+/**
+ * Returns the human-readable message describing the most recent error
+ * that occurred in EVMC loading since the last call to this function.
+ *
+ * In case any loading function returned ::EVMC_LOADER_SUCCESS this function always returns NULL.
+ * In case of error code other than success returned, this function MAY return the error message.
+ * Calling this function "consumes" the error message and the function will return NULL
+ * from subsequent invocations.
+ * This function is not thread-safe.
+ *
+ * @return Error message or NULL if no additional information is available.
+ *         The returned pointer MUST NOT be freed by the caller.
+ */
+const char* evmc_last_error_msg();
 
 #if __cplusplus
 }

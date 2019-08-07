@@ -99,12 +99,12 @@
 			"revisionTime": "2018-01-22T22:25:45Z"
 		},
 		{
-			"checksumSHA1": "g9plyZuQ5aPRlEkTUOXUlave1u0=",
+			"checksumSHA1": "JuQlKPAcQK0GjAWhbIrYxmh3ieU=",
 			"path": "github.com/ethereum/evmc/bindings/go/evmc",
-			"revision": "e8067fd3c93b55d2768723f9c7cb8b3dbb7d2264",
-			"revisionTime": "2019-04-03T11:32:30Z",
-			"version": "=dll-error",
-			"versionExact": "dll-error"
+			"revision": "f48ae8ba3b1d43cc3e90d747a94162b06c67d76f",
+			"revisionTime": "2019-08-12T10:00:05Z",
+			"version": "=v6.3.0",
+			"versionExact": "v6.3.0"
 		},
 		{
 			"checksumSHA1": "7oFpbmDfGobwKsFLIf6wMUvVoKw=",

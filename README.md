@@ -58,7 +58,7 @@ On Linux or Mac, this can be accomplished by the following or similar.
 For __a fresh install__, the below. This will set [multi-geth/multi-geth](https://github.com/multi-geth/multi-geth) as as the `git` remote `origin` by default.
 
 ```sh
-$ env path=$GOPATH/src/github.com/ethereum mkdir -p $path && cd $path
+$ path=$GOPATH/src/github.com/ethereum && mkdir -p $path && cd $path
 $ git clone https://github.com/multi-geth/multi-geth.git go-ethereum && cd go-ethereum
 ```
 

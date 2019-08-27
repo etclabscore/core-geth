@@ -58,6 +58,17 @@ var (
 			CHTRoot:      common.HexToHash("0x8992849e2be3390696eaf66312626e484045501cd3ec207922c27a6a80a7bb07"),
 			BloomRoot:    common.HexToHash("0xcc510b51ca4d73fb3fdf43208d73286f8f23817cdc31b8ea9f4de8d645f07df4"),
 		},
+		TrustedCheckpointOracle: &CheckpointOracleConfig{
+			Address: common.HexToAddress("0x9a9070028361F7AAbeB3f2F2Dc07F82C4a98A02a"),
+			Signers: []common.Address{
+				common.HexToAddress("0x1b2C260efc720BE89101890E4Db589b44E950527"), // Peter
+				common.HexToAddress("0x78d1aD571A1A09D60D9BBf25894b44e4C8859595"), // Martin
+				common.HexToAddress("0x286834935f4A8Cfb4FF4C77D5770C2775aE2b0E7"), // Zsolt
+				common.HexToAddress("0xb86e2B0Ab5A4B1373e40c51A7C712c70Ba2f9f8E"), // Gary
+				common.HexToAddress("0x0DF8fa387C602AE62559cC4aFa4972A7045d6707"), // Guillaume
+			},
+			Threshold: 2,
+		},
 	}
 
 	// TestnetChainConfig contains the chain parameters to run a node on the Ropsten test network.
@@ -83,6 +94,17 @@ var (
 			SectionHead:  common.HexToHash("0x7d6db64d8ec43303e4392fb726d2346f7231b246decca3d8140dd7e2c0d0b07d"),
 			CHTRoot:      common.HexToHash("0xa5095e1a004a8642fb93ca682eb91e8f20ef5bce151e47404fbb68772d17705b"),
 			BloomRoot:    common.HexToHash("0x90b28050f948ec6fb35b23a91d9aed38ce0c92d3cdd6e1d383c1bddf8b4071cf"),
+		},
+		TrustedCheckpointOracle: &CheckpointOracleConfig{
+			Address: common.HexToAddress("0xEF79475013f154E6A65b54cB2742867791bf0B84"),
+			Signers: []common.Address{
+				common.HexToAddress("0x32162F3581E88a5f62e8A61892B42C46E2c18f7b"), // Peter
+				common.HexToAddress("0x78d1aD571A1A09D60D9BBf25894b44e4C8859595"), // Martin
+				common.HexToAddress("0x286834935f4A8Cfb4FF4C77D5770C2775aE2b0E7"), // Zsolt
+				common.HexToAddress("0xb86e2B0Ab5A4B1373e40c51A7C712c70Ba2f9f8E"), // Gary
+				common.HexToAddress("0x0DF8fa387C602AE62559cC4aFa4972A7045d6707"), // Guillaume
+			},
+			Threshold: 2,
 		},
 	}
 
@@ -113,6 +135,16 @@ var (
 			CHTRoot:      common.HexToHash("0x8ac7046391fec14834a2a0183513937c0b5f696666545991477d24b067008961"),
 			BloomRoot:    common.HexToHash("0xfe4b852517612d7da54bf7e9fc18861a83171a93c72583bb6a61893b74422168"),
 		},
+		TrustedCheckpointOracle: &CheckpointOracleConfig{
+			Address: common.HexToAddress("0xebe8eFA441B9302A0d7eaECc277c09d20D684540"),
+			Signers: []common.Address{
+				common.HexToAddress("0xd9c9cd5f6779558b6e0ed4e6acf6b1947e7fa1f3"), // Peter
+				common.HexToAddress("0x78d1aD571A1A09D60D9BBf25894b44e4C8859595"), // Martin
+				common.HexToAddress("0x286834935f4A8Cfb4FF4C77D5770C2775aE2b0E7"), // Zsolt
+				common.HexToAddress("0xb86e2B0Ab5A4B1373e40c51A7C712c70Ba2f9f8E"), // Gary
+			},
+			Threshold: 2,
+		},
 	}
 
 	// GoerliChainConfig contains the chain parameters to run a node on the Görli test network.
@@ -137,6 +169,17 @@ var (
 			SectionHead:  common.HexToHash("0x50eaedd8361fa9edd0ac2dec410310b9bdf67b963b60f3b1dce47f84b30670f9"),
 			CHTRoot:      common.HexToHash("0x6504db73139f75ffa9102ae980e41b361cf3d5b66cea06c79cde9f457368820c"),
 			BloomRoot:    common.HexToHash("0x7551ae027bb776252a20ded51ee2ff0cbfbd1d8d57261b9161cc1f2f80237001"),
+		},
+		TrustedCheckpointOracle: &CheckpointOracleConfig{
+			Address: common.HexToAddress("0x18CA0E045F0D772a851BC7e48357Bcaab0a0795D"),
+			Signers: []common.Address{
+				common.HexToAddress("0x4769bcaD07e3b938B7f43EB7D278Bc7Cb9efFb38"), // Peter
+				common.HexToAddress("0x78d1aD571A1A09D60D9BBf25894b44e4C8859595"), // Martin
+				common.HexToAddress("0x286834935f4A8Cfb4FF4C77D5770C2775aE2b0E7"), // Zsolt
+				common.HexToAddress("0xb86e2B0Ab5A4B1373e40c51A7C712c70Ba2f9f8E"), // Gary
+				common.HexToAddress("0x0DF8fa387C602AE62559cC4aFa4972A7045d6707"), // Guillaume
+			},
+			Threshold: 2,
 		},
 	}
 
@@ -198,6 +241,7 @@ var (
 
 		new(EthashConfig), // Ethash
 		nil,               // Clique
+		nil,
 		nil,
 	}
 
@@ -263,6 +307,7 @@ var (
 			Epoch:  30000,
 		},
 		nil,
+		nil,
 	}
 
 	// TestChainConfig is used for tests.
@@ -319,6 +364,7 @@ var (
 
 		new(EthashConfig), // Ethash
 		nil,               // Clique
+		nil,
 		nil,
 	}
 
@@ -489,6 +535,7 @@ type ChainConfig struct {
 	Clique *CliqueConfig `json:"clique,omitempty"`
 
 	TrustedCheckpoint *TrustedCheckpoint `json:"trustedCheckpoint"`
+	TrustedCheckpointOracle *CheckpointOracleConfig `json:"trustedCheckpointOracle"`
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.

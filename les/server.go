@@ -100,7 +100,16 @@ func NewLesServer(e *eth.Ethereum, config *eth.Config) (*LesServer, error) {
 
 	oracle := config.CheckpointOracle
 	if oracle == nil {
-		oracle = params.CheckpointOracles[e.BlockChain().Genesis().Hash()]
+		switch e.BlockChain().Genesis().Hash() {
+		case params.MainnetGenesisHash:
+			oracle = params.MainnetChainConfig.TrustedCheckpointOracle
+		case params.TestnetGenesisHash:
+			oracle = params.TestnetChainConfig.TrustedCheckpointOracle
+		case params.RinkebyGenesisHash:
+			oracle = params.RinkebyChainConfig.TrustedCheckpointOracle
+		case params.GoerliGenesisHash:
+			oracle = params.GoerliChainConfig.TrustedCheckpointOracle
+		}
 	}
 	registrar := newCheckpointOracle(oracle, srv.getLocalCheckpoint)
 	// TODO(rjl493456442) Checkpoint is useless for les server, separate handler for client and server.

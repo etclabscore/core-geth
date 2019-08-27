@@ -151,7 +151,7 @@ func New(ctx *node.ServiceContext, config *eth.Config) (*LightEthereum, error) {
 
 	oracle := config.CheckpointOracle
 	if oracle == nil {
-		oracle = params.CheckpointOracles[genesisHash]
+		oracle = chainConfig.TrustedCheckpointOracle
 	}
 	registrar := newCheckpointOracle(oracle, leth.getLocalCheckpoint)
 	if leth.protocolManager, err = NewProtocolManager(leth.chainConfig, checkpoint, light.DefaultClientIndexerConfig, config.UltraLightServers, config.UltraLightFraction, true, config.NetworkId, leth.eventMux, leth.peers, leth.blockchain, nil, chainDb, leth.odr, leth.serverPool, registrar, quitSync, &leth.wg, nil); err != nil {

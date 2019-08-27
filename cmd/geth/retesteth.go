@@ -86,7 +86,7 @@ type RetestethEthAPI interface {
 }
 
 type RetestethDebugAPI interface {
-	AccountRangeAt(ctx context.Context,
+	AccountRange(ctx context.Context,
 		blockHashOrNumber *math.HexOrDecimal256, txIndex uint64,
 		addressHash *math.HexOrDecimal256, maxResults uint64,
 	) (AccountRangeResult, error)
@@ -533,6 +533,9 @@ func (api *RetestethAPI) mineBlock() error {
 		}
 	}
 	block, err := api.engine.FinalizeAndAssemble(api.blockchain, header, statedb, txs, []*types.Header{}, receipts)
+	if err != nil {
+		return err
+	}
 	return api.importBlock(block)
 }
 
@@ -604,7 +607,7 @@ func (api *RetestethAPI) GetBlockByNumber(ctx context.Context, blockNr math.HexO
 	return nil, fmt.Errorf("block %d not found", blockNr)
 }
 
-func (api *RetestethAPI) AccountRangeAt(ctx context.Context,
+func (api *RetestethAPI) AccountRange(ctx context.Context,
 	blockHashOrNumber *math.HexOrDecimal256, txIndex uint64,
 	addressHash *math.HexOrDecimal256, maxResults uint64,
 ) (AccountRangeResult, error) {
@@ -765,10 +768,10 @@ func (api *RetestethAPI) StorageRangeAt(ctx context.Context,
 			}
 			// Ensure any modifications are committed to the state
 			// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-			root = statedb.IntermediateRoot(vmenv.ChainConfig().IsEIP161F(block.Number()))
+			_ = statedb.IntermediateRoot(vmenv.ChainConfig().IsEIP161F(block.Number()))
 			if idx == int(txIndex) {
 				// This is to make sure root can be opened by OpenTrie
-				root, err = statedb.Commit(vmenv.ChainConfig().IsEIP161F(block.Number()))
+				_, err = statedb.Commit(vmenv.ChainConfig().IsEIP161F(block.Number()))
 				if err != nil {
 					return StorageRangeResult{}, err
 				}
@@ -829,7 +832,7 @@ func retesteth(ctx *cli.Context) error {
 	log.Info("Welcome to retesteth!")
 	// register signer API with server
 	var (
-		extapiURL = "n/a"
+		extapiURL string
 	)
 	apiImpl := &RetestethAPI{}
 	var testApi RetestethTestAPI = apiImpl

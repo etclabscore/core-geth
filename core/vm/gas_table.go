@@ -365,7 +365,7 @@ func gasSelfdestruct(evm *EVM, contract *Contract, stack *Stack, mem *Memory, me
 		gas = params.SelfdestructGasEIP150
 		var address = common.BigToAddress(stack.Back(0))
 
-		if evm.chainRules.IsEIP158 {
+		if evm.chainRules.IsEIP161F {
 			// if empty and transfers value
 			if evm.StateDB.Empty(address) && evm.StateDB.GetBalance(contract.Address()).Sign() != 0 {
 				gas += params.CreateBySelfdestructGas

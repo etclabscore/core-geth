@@ -58,12 +58,11 @@ type operation struct {
 // JumpTable contains the EVM opcodes supported at a given fork.
 type JumpTable [256]operation
 
-var baseInstructionSet = newBaseInstructionSet()
-
 // instructionSetForConfig determines an instruction set for the vm using
 // the chain config params and a current block number
 func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable {
-	instructionSet := baseInstructionSet
+	instructionSet := newBaseInstructionSet()
+
 	// Homestead
 	if config.IsEIP7F(bn) {
 		instructionSet[DELEGATECALL] = operation{
@@ -185,7 +184,7 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 
 // newBaseInstructionSet returns Frontier instructions
 func newBaseInstructionSet() JumpTable {
-	return [256]operation{
+	return JumpTable{
 		STOP: {
 			execute:     opStop,
 			constantGas: 0,

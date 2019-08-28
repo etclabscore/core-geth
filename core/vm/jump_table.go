@@ -60,6 +60,8 @@ type JumpTable [256]operation
 
 var baseInstructionSet = newBaseInstructionSet()
 
+// instructionSetForConfig determines an instruction set for the vm using
+// the chain config params and a current block number
 func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable {
 	instructionSet := baseInstructionSet
 	// Homestead
@@ -74,7 +76,20 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 			returns:    true,
 		}
 	}
-
+	// Spurious Dragon
+	if config.IsEIP150(bn) {
+		instructionSet[BALANCE].constantGas = params.BalanceGasEIP150
+		instructionSet[EXTCODESIZE].constantGas = params.ExtcodeSizeGasEIP150
+		instructionSet[SLOAD].constantGas = params.SloadGasEIP150
+		instructionSet[EXTCODECOPY].constantGas = params.ExtcodeCopyBaseEIP150
+		instructionSet[CALL].constantGas = params.CallGasEIP150
+		instructionSet[CALLCODE].constantGas = params.CallGasEIP150
+		instructionSet[DELEGATECALL].constantGas = params.CallGasEIP150
+	}
+	// Tangerine Whistle
+	if config.IsEIP160F(bn) {
+		instructionSet[EXP].dynamicGas = gasExpEIP158
+	}
 	// Byzantium
 	if config.IsEIP140F(bn) {
 		instructionSet[REVERT] = operation{
@@ -116,7 +131,6 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 			valid:      true,
 		}
 	}
-
 	// Constantinople
 	if config.IsEIP145F(bn) {
 		instructionSet[SHL] = operation{

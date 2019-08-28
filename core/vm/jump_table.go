@@ -69,6 +69,7 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 		instructionSet[DELEGATECALL] = operation{
 			execute:    opDelegateCall,
 			dynamicGas: gasDelegateCall,
+			constantGas: params.CallGasFrontier,
 			minStack:   minStack(6, 1),
 			maxStack:   maxStack(6, 1),
 			memorySize: memoryDelegateCall,
@@ -106,6 +107,7 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 	if config.IsEIP214F(bn) {
 		instructionSet[STATICCALL] = operation{
 			execute:    opStaticCall,
+			constantGas: params.CallGasEIP150,
 			dynamicGas: gasStaticCall,
 			minStack:   minStack(6, 1),
 			maxStack:   maxStack(6, 1),
@@ -124,6 +126,7 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 		}
 		instructionSet[RETURNDATACOPY] = operation{
 			execute:    opReturnDataCopy,
+			constantGas: GasFastestStep,
 			dynamicGas: gasReturnDataCopy,
 			minStack:   minStack(3, 0),
 			maxStack:   maxStack(3, 0),

@@ -1260,19 +1260,19 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 		cfg.DataDir = "" // unless explicitly requested, use memory databases
 	case ctx.GlobalBool(TestnetFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "testnet")
-	case ctx.GlobalBool(ClassicFlag.Name)  && cfg.DataDir == node.DefaultDataDir():
+	case ctx.GlobalBool(ClassicFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "classic")
-	case ctx.GlobalBool(SocialFlag.Name)  && cfg.DataDir == node.DefaultDataDir():
+	case ctx.GlobalBool(SocialFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "social")
-	case ctx.GlobalBool(MixFlag.Name)  && cfg.DataDir == node.DefaultDataDir():
+	case ctx.GlobalBool(MixFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "mix")
-	case ctx.GlobalBool(EthersocialFlag.Name)  && cfg.DataDir == node.DefaultDataDir():
+	case ctx.GlobalBool(EthersocialFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "ethersocial")
 	case ctx.GlobalBool(MusicoinFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "musicoin")
 	case ctx.GlobalBool(RinkebyFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "rinkeby")
-	case ctx.GlobalBool(KottiFlag.Name)  && cfg.DataDir == node.DefaultDataDir():
+	case ctx.GlobalBool(KottiFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "kotti")
 	case ctx.GlobalBool(GoerliFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "goerli")

@@ -66,14 +66,14 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 	// Homestead
 	if config.IsEIP7F(bn) {
 		instructionSet[DELEGATECALL] = operation{
-			execute:    opDelegateCall,
-			dynamicGas: gasDelegateCall,
+			execute:     opDelegateCall,
+			dynamicGas:  gasDelegateCall,
 			constantGas: params.CallGasFrontier,
-			minStack:   minStack(6, 1),
-			maxStack:   maxStack(6, 1),
-			memorySize: memoryDelegateCall,
-			valid:      true,
-			returns:    true,
+			minStack:    minStack(6, 1),
+			maxStack:    maxStack(6, 1),
+			memorySize:  memoryDelegateCall,
+			valid:       true,
+			returns:     true,
 		}
 	}
 	// Spurious Dragon
@@ -105,14 +105,14 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 	}
 	if config.IsEIP214F(bn) {
 		instructionSet[STATICCALL] = operation{
-			execute:    opStaticCall,
+			execute:     opStaticCall,
 			constantGas: params.CallGasEIP150,
-			dynamicGas: gasStaticCall,
-			minStack:   minStack(6, 1),
-			maxStack:   maxStack(6, 1),
-			memorySize: memoryStaticCall,
-			valid:      true,
-			returns:    true,
+			dynamicGas:  gasStaticCall,
+			minStack:    minStack(6, 1),
+			maxStack:    maxStack(6, 1),
+			memorySize:  memoryStaticCall,
+			valid:       true,
+			returns:     true,
 		}
 	}
 	if config.IsEIP211F(bn) {
@@ -124,13 +124,13 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 			valid:       true,
 		}
 		instructionSet[RETURNDATACOPY] = operation{
-			execute:    opReturnDataCopy,
+			execute:     opReturnDataCopy,
 			constantGas: GasFastestStep,
-			dynamicGas: gasReturnDataCopy,
-			minStack:   minStack(3, 0),
-			maxStack:   maxStack(3, 0),
-			memorySize: memoryReturnDataCopy,
-			valid:      true,
+			dynamicGas:  gasReturnDataCopy,
+			minStack:    minStack(3, 0),
+			maxStack:    maxStack(3, 0),
+			memorySize:  memoryReturnDataCopy,
+			valid:       true,
 		}
 	}
 	// Constantinople
@@ -159,24 +159,24 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 	}
 	if config.IsEIP1014F(bn) {
 		instructionSet[CREATE2] = operation{
-			execute:    opCreate2,
+			execute:     opCreate2,
 			constantGas: params.Create2Gas,
-			dynamicGas: gasCreate2,
-			minStack:   minStack(4, 1),
-			maxStack:   maxStack(4, 1),
-			memorySize: memoryCreate2,
-			valid:      true,
-			writes:     true,
-			returns:    true,
+			dynamicGas:  gasCreate2,
+			minStack:    minStack(4, 1),
+			maxStack:    maxStack(4, 1),
+			memorySize:  memoryCreate2,
+			valid:       true,
+			writes:      true,
+			returns:     true,
 		}
 	}
 	if config.IsEIP1052F(bn) {
 		instructionSet[EXTCODEHASH] = operation{
-			execute:    opExtCodeHash,
+			execute:     opExtCodeHash,
 			constantGas: params.ExtcodeHashGasConstantinople,
-			minStack:   minStack(1, 1),
-			maxStack:   maxStack(1, 1),
-			valid:      true,
+			minStack:    minStack(1, 1),
+			maxStack:    maxStack(1, 1),
+			valid:       true,
 		}
 	}
 	return instructionSet

@@ -516,8 +516,8 @@ type ChainConfig struct {
 
 	PetersburgBlock *big.Int `json:"petersburgBlock,omitempty"` // Petersburg switch block (nil = same as Constantinople)
 
-	IstanbulBlock       *big.Int `json:"istanbulBlock,omitempty"`       // Istanbul switch block (nil = no fork, 0 = already on istanbul)
-	EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
+	IstanbulBlock *big.Int `json:"istanbulBlock,omitempty"` // Istanbul switch block (nil = no fork, 0 = already on istanbul)
+	EWASMBlock    *big.Int `json:"ewasmBlock,omitempty"`    // EWASM switch block (nil = no fork, 0 = already activated)
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block
 	ECIP1010Length     *big.Int `json:"ecip1010Length,omitempty"`     // ECIP1010 length
@@ -534,7 +534,7 @@ type ChainConfig struct {
 	Ethash *EthashConfig `json:"ethash,omitempty"`
 	Clique *CliqueConfig `json:"clique,omitempty"`
 
-	TrustedCheckpoint *TrustedCheckpoint `json:"trustedCheckpoint"`
+	TrustedCheckpoint       *TrustedCheckpoint      `json:"trustedCheckpoint"`
 	TrustedCheckpointOracle *CheckpointOracleConfig `json:"trustedCheckpointOracle"`
 }
 
@@ -900,7 +900,7 @@ type Rules struct {
 	IsEIP100F, IsEIP140F, IsEIP198F, IsEIP211F, IsEIP212F, IsEIP213F, IsEIP214F, IsEIP649F, IsEIP658F bool
 	// Constantinople
 	IsEIP145F, IsEIP1014F, IsEIP1052F, IsEIP1283F, IsEIP1234F bool
-	IsPetersburg, IsIstanbul                                              bool
+	IsPetersburg, IsIstanbul                                  bool
 	IsBombDisposal, IsSocial, IsEthersocial, IsECIP1010       bool
 	IsMCIP0, IsMCIP3, IsMCIP8                                 bool
 }
@@ -940,7 +940,7 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 		IsEIP1283F: c.IsEIP1283F(num),
 
 		IsPetersburg: c.IsPetersburg(num),
-		IsIstanbul:       c.IsIstanbul(num),
+		IsIstanbul:   c.IsIstanbul(num),
 
 		IsBombDisposal: c.IsBombDisposal(num),
 		IsSocial:       c.IsSocial(num),

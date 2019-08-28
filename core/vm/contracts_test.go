@@ -429,9 +429,9 @@ func TestIsPrecompiledContractEnabled(t *testing.T) {
 				common.BytesToAddress([]byte{3}): &ripemd160hash{},
 				common.BytesToAddress([]byte{4}): &dataCopy{},
 				common.BytesToAddress([]byte{5}): &bigModExp{},
-				common.BytesToAddress([]byte{6}): &bn256Add{},
-				common.BytesToAddress([]byte{7}): &bn256ScalarMul{},
-				common.BytesToAddress([]byte{8}): &bn256Pairing{},
+				common.BytesToAddress([]byte{6}): &bn256AddByzantium{},
+				common.BytesToAddress([]byte{7}): &bn256ScalarMulByzantium{},
+				common.BytesToAddress([]byte{8}): &bn256PairingByzantium{},
 			}
 		}
 		expect := precomps[c.addr] == nil

@@ -150,7 +150,10 @@ func (t *StateTest) Run(subtest StateSubtest, vmconfig vm.Config) (*state.StateD
 	if err != nil {
 		return nil, UnsupportedForkError{subtest.Fork}
 	}
-	vmconfig.ExtraEips = eips
+	if len(eips) != 0 {
+		return nil, errors.New("some extra eips: " + fmt.Sprintf("%v", eips))
+	}
+	//vmconfig.ExtraEips = eips
 	block := t.genesis(config).ToBlock(nil)
 	statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre)
 

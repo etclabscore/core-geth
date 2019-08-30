@@ -24,7 +24,7 @@ const OpenRPCSchema = `
 {
     "openrpc": "1.0.0",
     "info": {
-      "version": "1.0.0",
+      "version": "1.0.10",
       "title": "Ethereum JSON-RPC",
       "description": "This API lets you interact with an EVM-based client via JSON-RPC",
       "license": {
@@ -42,6 +42,7 @@ const OpenRPCSchema = `
           "name": "clientVersion",
           "description": "client version",
           "schema": {
+            "title": "clientVersion",
             "type": "string"
           }
         }
@@ -56,6 +57,7 @@ const OpenRPCSchema = `
             "description": "data to hash using the Keccak-256 algorithm",
             "summary": "data to hash",
             "schema": {
+              "title": "datahash",
               "type": "string",
               "pattern": "^0x[a-fA-F\\d]+$"
             }
@@ -93,6 +95,7 @@ const OpenRPCSchema = `
           "name": "netListeningResult",
           "description": "` + "`" + `true` + "`" + ` if listening is active or ` + "`" + `false` + "`" + ` if listening is not active",
           "schema": {
+            "title": "isNetListening",
             "type": "boolean"
           }
         },
@@ -117,6 +120,7 @@ const OpenRPCSchema = `
           "name": "quantity",
           "description": "number of connected peers.",
           "schema": {
+            "title": "numConnectedPeers",
             "description": "Hex representation of number of connected peers",
             "type": "string"
           }
@@ -131,7 +135,9 @@ const OpenRPCSchema = `
           "name": "chainID",
           "description": "chain ID associated with the current network",
           "schema": {
-            "type": "string"
+            "title": "chainID",
+            "type": "string",
+            "pattern": "^0x[a-fA-F\\d]+$"
           }
         }
       },
@@ -156,8 +162,8 @@ const OpenRPCSchema = `
         ],
         "result": {
           "name": "returnValue",
+          "description": "The return value of the executed contract",
           "schema": {
-            "description": "The return value of the executed contract",
             "$ref": "#/components/schemas/Bytes"
           }
         }
@@ -171,6 +177,7 @@ const OpenRPCSchema = `
           "name": "chainId",
           "description": "hex format integer of the current chain id. Defaults are mainnet=61, morden=62.",
           "schema": {
+            "title": "chainId",
             "type": "string",
             "pattern": "^0x[a-fA-F\\d]+$"
           }
@@ -182,8 +189,8 @@ const OpenRPCSchema = `
         "params": [],
         "result": {
           "name": "address",
+          "description": "The address owned by the client that is used as default for things like the mining reward",
           "schema": {
-            "description": "The address owned by the client that is used as default for things like the mining reward",
             "$ref": "#/components/schemas/Address"
           }
         }
@@ -198,8 +205,8 @@ const OpenRPCSchema = `
         ],
         "result": {
           "name": "gasUsed",
+          "description": "The amount of gas used",
           "schema": {
-            "description": "The amount of gas used",
             "$ref": "#/components/schemas/Integer"
           }
         }
@@ -218,6 +225,7 @@ const OpenRPCSchema = `
         "params": [
           {
             "name": "address",
+            "required": true,
             "description": "The address of the acccount or contract",
             "schema": {
               "$ref": "#/components/schemas/Address"
@@ -234,6 +242,7 @@ const OpenRPCSchema = `
         "result": {
           "name": "getBalanceResult",
           "schema": {
+            "title": "getBalanceResult",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/Integer"
@@ -261,6 +270,7 @@ const OpenRPCSchema = `
             "description": "If ` + "`" + `true` + "`" + ` it returns the full transaction objects, if ` + "`" + `false` + "`" + ` only the hashes of the transactions.",
             "required": true,
             "schema": {
+              "title": "isTransactionsIncluded",
               "type": "boolean"
             }
           }
@@ -268,6 +278,7 @@ const OpenRPCSchema = `
         "result": {
           "name": "getBlockByHashResult",
           "schema": {
+            "title": "getBlockByHashResult",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/Block"
@@ -291,6 +302,7 @@ const OpenRPCSchema = `
             "description": "If ` + "`" + `true` + "`" + ` it returns the full transaction objects, if ` + "`" + `false` + "`" + ` only the hashes of the transactions.",
             "required": true,
             "schema": {
+              "title": "isTransactionsIncluded",
               "type": "boolean"
             }
           }
@@ -298,6 +310,7 @@ const OpenRPCSchema = `
         "result": {
           "name": "getBlockByNumberResult",
           "schema": {
+            "title": "getBlockByNumberResult",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/Block"
@@ -321,6 +334,7 @@ const OpenRPCSchema = `
           "name": "blockTransactionCountByHash",
           "description": "The Number of total transactions in the given block",
           "schema": {
+            "title": "blockTransactionCountByHash",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/Integer"
@@ -344,6 +358,7 @@ const OpenRPCSchema = `
           "name": "blockTransactionCountByHash",
           "description": "The Number of total transactions in the given block",
           "schema": {
+            "title": "blockTransactionCountByHash",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/Integer"
@@ -361,6 +376,7 @@ const OpenRPCSchema = `
         "params": [
           {
             "name": "address",
+            "required": true,
             "description": "The address of the contract",
             "schema": {
               "$ref": "#/components/schemas/Address"
@@ -396,6 +412,7 @@ const OpenRPCSchema = `
         "result": {
           "name": "logResult",
           "schema": {
+            "title": "logResult",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Log"
@@ -601,6 +618,7 @@ const OpenRPCSchema = `
         "result": {
           "name": "transactionCount",
           "schema": {
+            "title": "nonceOrNull",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/Nonce"
@@ -624,6 +642,7 @@ const OpenRPCSchema = `
           "name": "transactionReceiptResult",
           "description": "returns either a receipt or null",
           "schema": {
+            "title": "transactionReceiptOrNull",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/Receipt"
@@ -654,6 +673,7 @@ const OpenRPCSchema = `
         "result": {
           "name": "uncle",
           "schema": {
+            "title": "uncleOrNull",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/Uncle"
@@ -730,10 +750,11 @@ const OpenRPCSchema = `
         ],
         "result": {
           "name": "uncleCountResult",
-          "description": "The Number of total uncles in the given block",
           "schema": {
+            "title": "uncleCountOrNull",
             "oneOf": [
               {
+                "description": "The Number of total uncles in the given block",
                 "$ref": "#/components/schemas/Integer"
               },
               {
@@ -754,6 +775,7 @@ const OpenRPCSchema = `
         "result": {
           "name": "uncleCountResult",
           "schema": {
+            "title": "uncleCountOrNull",
             "oneOf": [
               {
                 "description": "The Number of total uncles in the given block",
@@ -780,7 +802,9 @@ const OpenRPCSchema = `
           },
           {
             "name": "storageKeys",
+            "required": true,
             "schema": {
+              "title": "storageKeys",
               "description": "The storage keys of all the storage slots being requested",
               "items": {
                 "description": "A storage key is indexed from the solidity compiler by the order it is declaired. For mappings it uses the keccak of the mapping key with its position (and recursively for X-dimensional mappings)",
@@ -795,8 +819,10 @@ const OpenRPCSchema = `
         "result": {
           "name": "account",
           "schema": {
+            "title": "proofAccountOrNull",
             "oneOf": [
               {
+                "title": "proofAccount",
                 "type": "object",
                 "description": "The merkle proofs of the specified account connecting them to the blockhash of the block specified",
                 "properties": {
@@ -914,6 +940,20 @@ const OpenRPCSchema = `
         }
       },
       {
+        "name": "eth_pendingTransactions",
+        "summary": "Returns the pending transactions list",
+        "params": [],
+        "result": {
+          "name": "pendingTransactions",
+          "schema": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          }
+        }
+      },
+      {
         "name": "eth_protocolVersion",
         "summary": "Returns the current ethereum protocol version.",
         "params": [],
@@ -931,6 +971,7 @@ const OpenRPCSchema = `
         "params": [
           {
             "name": "signedTransactionData",
+            "required": true,
             "description": "The signed transaction data",
             "schema": {
               "$ref": "#/components/schemas/Bytes"
@@ -951,12 +992,14 @@ const OpenRPCSchema = `
         "params": [
           {
             "name": "hashRate",
+            "required": true,
             "schema": {
               "$ref": "#/components/schemas/DataWord"
             }
           },
           {
             "name": "id",
+            "required": true,
             "description": "String identifiying the client",
             "schema": {
               "$ref": "#/components/schemas/DataWord"
@@ -980,12 +1023,14 @@ const OpenRPCSchema = `
           },
           {
             "name": "powHash",
+            "required": true,
             "schema": {
               "$ref": "#/components/schemas/PowHash"
             }
           },
           {
             "name": "mixHash",
+            "required": true,
             "schema": {
               "$ref": "#/components/schemas/MixHash"
             }
@@ -1092,42 +1137,6 @@ const OpenRPCSchema = `
     ],
     "components": {
       "schemas": {
-        "CodeResponse": {
-          "description": "An object containing information about the code.",
-          "type": "object",
-          "properties": {
-            "code": {
-              "description": "The compiled Byte code",
-              "$ref": "#/components/schemas/Bytes"
-            },
-            "info": {
-              "description": "An object containing information about the code compilation.",
-              "type": "object",
-              "properties": {
-                "source": {
-                  "type": "string",
-                  "description": "The sorce code that was compiled"
-                },
-                "language": {
-                  "type": "string",
-                  "description": "The language of the code that was compiled"
-                },
-                "languageVersion": {
-                  "type": "string",
-                  "description": "The language version number"
-                },
-                "compilerVersion": {
-                  "type": "string",
-                  "description": "The sorce code that was compiled"
-                },
-                "abiDefinition": {
-                  "type": "object",
-                  "description": "The application binary interface definitions of the code"
-                }
-              }
-            }
-          }
-        },
         "ProofNode": {
           "type": "string",
           "description": "An indiviual node used to prove a path down a merkle-patricia-tree",
@@ -1772,6 +1781,7 @@ const OpenRPCSchema = `
         },
         "Nonce": {
           "name": "nonce",
+          "required": true,
           "schema": {
             "$ref": "#/components/schemas/Nonce"
           }

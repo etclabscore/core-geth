@@ -219,7 +219,9 @@ func (s *RPCService) Discover() (schema *OpenRPCDiscoverSchemaT, err error) {
 	if s.server.OpenRPCSchemaRaw == "" {
 		return nil, errOpenRPCDiscoverUnavailable
 	}
-	schema = &OpenRPCDiscoverSchemaT{}
+	schema = &OpenRPCDiscoverSchemaT{
+		Servers: make([]map[string]interface{}, 0),
+	}
 	err = json.Unmarshal([]byte(s.server.OpenRPCSchemaRaw), schema)
 	if err != nil {
 		log.Crit("openrpc json umarshal", "error", err)

@@ -2,13 +2,12 @@
 
 > A "swiss army knife" distribution of _go-ethereum_, with support for many species of Ethereum networks.
 
-[![OpenRPC](https://img.shields.io/static/v1.svg?label=OpenRPC&message=1.0.10&color=blue)](#openrpc-discovery)
+[![OpenRPC](https://img.shields.io/static/v1.svg?label=OpenRPC&message=1.1.8&color=blue)](#openrpc-discovery)
 [![API Reference](
 https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/68747470733a2f2f676f646f632e6f72672f6769746875622e636f6d2f676f6c616e672f6764646f3f7374617475732e737667
 )](https://godoc.org/github.com/multi-geth/multi-geth)
 [![Go Report Card](https://goreportcard.com/badge/github.com/multi-geth/multi-geth)](https://goreportcard.com/report/github.com/multi-geth/multi-geth)
 [![Travis](https://travis-ci.org/multi-geth/multi-geth.svg?branch=master)](https://travis-ci.org/multi-geth/multi-geth)
-[![Gitter](https://badges.gitter.im/multi-geth/community.svg)](https://gitter.im/multi-geth/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Code Shelter](https://www.codeshelter.co/static/badges/badge-flat.svg)](https://www.codeshelter.co/)
 
 Binary archives are published at https://github.com/multi-geth/multi-geth/releases.
@@ -22,7 +21,7 @@ Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-
 
 Networks supported by the respective go-ethereum packaged `geth` client.
 
-| Ticker | Network/Client                        | multi-geth                                       | [etclabscore/go-ethereum](https://github.com/etclabscore/go-ethereum) | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
+| Ticker | Network/Client                        | multi-geth                                       | [ethereumclassic/go-ethereum](https://github.com/ethereumclassic/go-ethereum) | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
 | ---    | ---                                   | ---                                              | ---                                                                           | ---                                                             |
 | ETH    | Ethereum (Foundation)                 | :heavy_check_mark:                               |                                                                               | :heavy_check_mark:                                              |
 | ETC    | Ethereum Classic                      | :heavy_check_mark:                               | :heavy_check_mark:                                                            |                                                                 |
@@ -58,7 +57,7 @@ On Linux or Mac, this can be accomplished by the following or similar.
 For __a fresh install__, the below. This will set [multi-geth/multi-geth](https://github.com/multi-geth/multi-geth) as as the `git` remote `origin` by default.
 
 ```sh
-$ path=$GOPATH/src/github.com/ethereum && mkdir -p $path && cd $path
+$ env path=$GOPATH/src/github.com/ethereum mkdir -p $path && cd $path
 $ git clone https://github.com/multi-geth/multi-geth.git go-ethereum && cd go-ethereum
 ```
 
@@ -274,7 +273,7 @@ $ curl -X POST -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","met
   "jsonrpc": "2.0",                                                                                                                                       
   "id": 1,                                                                                                                                                
   "result": {                                                                                                                                             
-    "openrpc": "1.0.10",                                                                                                                                   
+    "openrpc": "1.0.0",                                                                                                                                   
     "info": {                                                                                                                                             
       "description": "This API lets you interact with an EVM-based client via JSON-RPC",                                                                  
       "license": {                                                                                                                                        
@@ -284,7 +283,7 @@ $ curl -X POST -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","met
       "title": "Ethereum JSON-RPC",                                                                                                                       
       "version": "1.0.0"                                                                                                                                  
     },                                                                                                                                                    
-    "servers": [],                                                                                                                                      
+    "servers": null,                                                                                                                                      
     "methods": [                                                                                                                                          
       {                                                                                                                                                   
         "description": "Returns the version of the current client",                                                                                       

@@ -2,7 +2,7 @@
 
 > A "swiss army knife" distribution of _go-ethereum_, with support for many species of Ethereum networks.
 
-[![OpenRPC](https://img.shields.io/static/v1.svg?label=OpenRPC&message=1.10.0&color=blue)](#openrpc-discovery)
+[![OpenRPC](https://img.shields.io/static/v1.svg?label=OpenRPC&message=1.0.10&color=blue)](#openrpc-discovery)
 [![API Reference](
 https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/68747470733a2f2f676f646f632e6f72672f6769746875622e636f6d2f676f6c616e672f6764646f3f7374617475732e737667
 )](https://godoc.org/github.com/multi-geth/multi-geth)
@@ -274,7 +274,7 @@ $ curl -X POST -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","met
   "jsonrpc": "2.0",                                                                                                                                       
   "id": 1,                                                                                                                                                
   "result": {                                                                                                                                             
-    "openrpc": "1.0.0",                                                                                                                                   
+    "openrpc": "1.0.10",                                                                                                                                   
     "info": {                                                                                                                                             
       "description": "This API lets you interact with an EVM-based client via JSON-RPC",                                                                  
       "license": {                                                                                                                                        
@@ -284,7 +284,7 @@ $ curl -X POST -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","met
       "title": "Ethereum JSON-RPC",                                                                                                                       
       "version": "1.0.0"                                                                                                                                  
     },                                                                                                                                                    
-    "servers": null,                                                                                                                                      
+    "servers": [],                                                                                                                                      
     "methods": [                                                                                                                                          
       {                                                                                                                                                   
         "description": "Returns the version of the current client",                                                                                       

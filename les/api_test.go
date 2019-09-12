@@ -384,6 +384,7 @@ func getCapacityInfo(ctx context.Context, t *testing.T, server *rpc.Client) (min
 }
 
 func init() {
+	testing.Init()
 	flag.Parse()
 	// register the Delivery service which will run as a devp2p
 	// protocol when using the exec adapter

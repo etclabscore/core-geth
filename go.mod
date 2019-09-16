@@ -5,7 +5,6 @@ go 1.12
 require (
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/Azure/go-autorest/autorest/adal v0.6.0 // indirect
-	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
 	github.com/allegro/bigcache v0.0.0-20190218064605-e24eb225f156
 	github.com/apilayer/freegeoip v0.0.0-20180702111401-3f942d1392f6
 	github.com/aristanetworks/goarista v0.0.0-20170210015632-ea17b1a17847
@@ -19,11 +18,10 @@ require (
 	github.com/fatih/color v1.6.0
 	github.com/fjl/memsize v0.0.0-20180418122429-ca190fb6ffbc
 	github.com/gballet/go-libpcsclite v0.0.0-20190403181518-312b5175032f
-	github.com/go-ole/go-ole v1.2.1 // indirect
 	github.com/go-stack/stack v1.8.0
 	github.com/golang/protobuf v1.3.1
 	github.com/golang/snappy v0.0.1
-	github.com/google/go-cmp v0.2.0 // indirect
+	github.com/golangci/golangci-lint v1.18.0 // indirect
 	github.com/gorilla/websocket v1.4.1
 	github.com/graph-gophers/graphql-go v0.0.0-20190513003547-158e7b876106
 	github.com/hashicorp/golang-lru v0.0.0-20160813221303-0a025b7e63ad
@@ -45,7 +43,6 @@ require (
 	github.com/oschwald/maxminddb-golang v0.0.0-20180819230143-277d39ecb83e // indirect
 	github.com/pborman/uuid v0.0.0-20170112150404-1b00554d8222
 	github.com/peterh/liner v0.0.0-20190123174540-a2c9a5303de7
-	github.com/pkg/errors v0.8.1 // indirect
 	github.com/prometheus/tsdb v0.0.0-20190402121629-4f204dcbc150
 	github.com/rjeczalik/notify v0.9.1
 	github.com/robertkrimen/otto v0.0.0-20170205013659-6a77b7cbc37d

@@ -313,12 +313,11 @@ func getHead(ctx context.Context, t *testing.T, client *rpc.Client) (uint64, com
 }
 
 func testRequest(ctx context.Context, t *testing.T, client *rpc.Client) bool {
-	//res := make(map[string]interface{})
 	var res string
 	var addr common.Address
 	rand.Read(addr[:])
-	c, _ := context.WithTimeout(ctx, time.Second*12)
-	//	if err := client.CallContext(ctx, &res, "eth_getProof", addr, nil, "latest"); err != nil {
+	c, cf := context.WithTimeout(ctx, time.Second*12)
+	defer cf()
 	err := client.CallContext(c, &res, "eth_getBalance", addr, "latest")
 	if err != nil {
 		t.Log("request error:", err)
@@ -384,6 +383,7 @@ func getCapacityInfo(ctx context.Context, t *testing.T, server *rpc.Client) (min
 }
 
 func init() {
+	testing.Init()
 	flag.Parse()
 	// register the Delivery service which will run as a devp2p
 	// protocol when using the exec adapter

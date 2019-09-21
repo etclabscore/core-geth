@@ -325,7 +325,7 @@ func doTest(cmdline []string) {
 	build.MustRun(gotest)
 }
 
-// runs gometalinter on requested packages
+// runs golangci-lint on requested packages
 func doLint(cmdline []string) {
 	flag.CommandLine.Parse(cmdline)
 
@@ -333,13 +333,12 @@ func doLint(cmdline []string) {
 	if len(flag.CommandLine.Args()) > 0 {
 		packages = flag.CommandLine.Args()
 	}
-	// Get metalinter and install all supported linters
-	build.MustRun(goTool("get", "gopkg.in/alecthomas/gometalinter.v2"))
-	build.MustRunCommand(filepath.Join(GOBIN, "gometalinter.v2"), "--install")
+	// Get golangci-lint and install all supported linters
+	build.MustRun(goTool("get", "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.18.0"))
 
 	// Run fast linters batched together
 	configs := []string{
-		"--vendor",
+		"run",
 		"--tests",
 		"--deadline=2m",
 		"--disable-all",
@@ -349,14 +348,13 @@ func doLint(cmdline []string) {
 		"--enable=gofmt",
 		"--enable=misspell",
 		"--enable=goconst",
-		"--min-occurrences=6", // for goconst
 	}
-	build.MustRunCommand(filepath.Join(GOBIN, "gometalinter.v2"), append(configs, packages...)...)
+	build.MustRunCommand(filepath.Join(GOBIN, "golangci-lint"), append(configs, packages...)...)
 
 	// Run slow linters one by one
 	for _, linter := range []string{"unconvert", "gosimple"} {
-		configs = []string{"--vendor", "--tests", "--deadline=10m", "--disable-all", "--enable=" + linter}
-		build.MustRunCommand(filepath.Join(GOBIN, "gometalinter.v2"), append(configs, packages...)...)
+		configs = []string{"run", "--tests", "--deadline=10m", "--disable-all", "--enable=" + linter}
+		build.MustRunCommand(filepath.Join(GOBIN, "golangci-lint"), append(configs, packages...)...)
 	}
 }
 

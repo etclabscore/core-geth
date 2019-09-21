@@ -5,7 +5,7 @@ matrix:
   include:
   - os: linux
     dist: xenial
-    go: 1.12.x
+    go: 1.13.x
     script:
     - go run build/ci.go install
     - travis_wait 60 go run build/ci.go test
@@ -24,7 +24,7 @@ matrix:
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
   - os: osx
-    go: 1.12.x
+    go: 1.13.x
     script:
     - echo "Increase the maximum number of open file descriptors on macOS"
     - NOFILE=20480
@@ -52,7 +52,7 @@ matrix:
       tag_name: "$TRAVIS_TAG"
   - os: linux
     dist: xenial
-    go: 1.12.x
+    go: 1.13.x
     env:
     - lint
     git:

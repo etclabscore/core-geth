@@ -36,8 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
+	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/trie"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -252,11 +251,8 @@ func initGenesis(ctx *cli.Context) error {
 
 func dumpGenesis(ctx *cli.Context) error {
 	genesis := utils.MakeGenesis(ctx)
-	if genesis == nil {
-		genesis = params.DefaultGenesisBlock()
-	}
 	if err := json.NewEncoder(os.Stdout).Encode(genesis); err != nil {
-		utils.Fatalf("could not encode genesis")
+		utils.Fatalf("could not encode defaulty genesis")
 	}
 	return nil
 }

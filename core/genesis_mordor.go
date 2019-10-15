@@ -23,7 +23,7 @@ import (
 func DefaultMordorGenesisBlock() *Genesis {
 	return &Genesis{
 		Config:     params.MordorChainConfig,
-		Nonce:      hexutil.MustDecodeUint64("0x0000000000000000"),
+		Nonce:      hexutil.MustDecodeUint64("0x0"),
 		ExtraData:  hexutil.MustDecode("0x70686f656e697820636869636b656e206162737572642062616e616e61"),
 		GasLimit:   hexutil.MustDecodeUint64("0x2fefd8"),
 		Difficulty: hexutil.MustDecodeBig("0x20000"),

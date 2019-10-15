@@ -65,6 +65,7 @@ import (
 var (
 	foundationFlag  = flag.Bool("chain.foundation", false, "Configure genesis and bootnodes for foundation chain defaults")
 	classicFlag     = flag.Bool("chain.classic", false, "Configure genesis and bootnodes for classic chain defaults")
+	mordorFlag     = flag.Bool("chain.mordor", false, "Configure genesis and bootnodes for mordor chain defaults")
 	kottiFlag       = flag.Bool("chain.kotti", false, "Configure genesis and bootnodes for kotti chain defaults")
 	socialFlag      = flag.Bool("chain.social", false, "Configure genesis and bootnodes for social chain defaults")
 	ethersocialFlag = flag.Bool("chain.ethersocial", false, "Configure genesis and bootnodes for ethersocial chain defaults")
@@ -194,6 +195,12 @@ func main() {
 				core.DefaultClassicGenesisBlock(),
 				params.ClassicBootnodes,
 				params.NetworkIDClassic,
+			},
+			{
+				*mordorFlag,
+				core.DefaultMordorGenesisBlock(),
+				params.MordorBootnodes,
+				params.NetworkIDMordor,
 			},
 			{
 				*socialFlag,

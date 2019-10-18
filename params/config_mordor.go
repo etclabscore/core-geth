@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
+	// MordorChainConfig is the chain parameters to run a node on the Ethereum Classic Mordor test network (PoW).
 	MordorChainConfig = &ChainConfig{
 		ChainID:             big.NewInt(63),
 		HomesteadBlock:      big.NewInt(0),

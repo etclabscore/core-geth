@@ -173,6 +173,10 @@ var (
 		Name:  "kotti",
 		Usage: "Kotti network: cross-client proof-of-authority test network",
 	}
+	MordorFlag = cli.BoolFlag{
+		Name:  "mordor",
+		Usage: "Mordor network: Ethereum Classic's cross-client proof-of-work test network",
+	}
 	GoerliFlag = cli.BoolFlag{
 		Name:  "goerli",
 		Usage: "Görli network: pre-configured proof-of-authority test network",
@@ -774,6 +778,9 @@ func MakeDataDir(ctx *cli.Context) string {
 		if ctx.GlobalBool(ClassicFlag.Name) {
 			return filepath.Join(path, "classic")
 		}
+		if ctx.GlobalBool(MordorFlag.Name) {
+			return filepath.Join(path, "mordor")
+		}
 		if ctx.GlobalBool(SocialFlag.Name) {
 			return filepath.Join(path, "social")
 		}
@@ -849,6 +856,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.TestnetBootnodes
 	case ctx.GlobalBool(ClassicFlag.Name):
 		urls = params.ClassicBootnodes
+	case ctx.GlobalBool(MordorFlag.Name):
+		urls = params.MordorBootnodes
 	case ctx.GlobalBool(SocialFlag.Name):
 		urls = params.SocialBootnodes
 	case ctx.GlobalBool(MixFlag.Name):
@@ -1262,6 +1271,8 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "testnet")
 	case ctx.GlobalBool(ClassicFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "classic")
+	case ctx.GlobalBool(MordorFlag.Name) && cfg.DataDir == node.DefaultDataDir():
+		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "mordor")
 	case ctx.GlobalBool(SocialFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "social")
 	case ctx.GlobalBool(MixFlag.Name) && cfg.DataDir == node.DefaultDataDir():
@@ -1538,6 +1549,11 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 			cfg.NetworkId = params.NetworkIDClassic
 		}
 		cfg.Genesis = core.DefaultClassicGenesisBlock()
+	case ctx.GlobalBool(MordorFlag.Name):
+		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
+			cfg.NetworkId = params.NetworkIDMordor
+		}
+		cfg.Genesis = core.DefaultMordorGenesisBlock()
 	case ctx.GlobalBool(SocialFlag.Name):
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = params.NetworkIDSocial
@@ -1749,6 +1765,8 @@ func MakeGenesis(ctx *cli.Context) *core.Genesis {
 		genesis = core.DefaultTestnetGenesisBlock()
 	case ctx.GlobalBool(ClassicFlag.Name):
 		genesis = core.DefaultClassicGenesisBlock()
+	case ctx.GlobalBool(MordorFlag.Name):
+		genesis = core.DefaultMordorGenesisBlock()
 	case ctx.GlobalBool(SocialFlag.Name):
 		genesis = core.DefaultSocialGenesisBlock()
 	case ctx.GlobalBool(MixFlag.Name):

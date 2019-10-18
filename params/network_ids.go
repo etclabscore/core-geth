@@ -19,6 +19,7 @@ package params
 const (
 	NetworkIDFoundation  = 1
 	NetworkIDClassic     = 1
+	NetworkIDMordor = 7
 	NetworkIDSocial      = 28
 	NetworkIDEthersocial = 1
 	NetworkIDMix         = 76

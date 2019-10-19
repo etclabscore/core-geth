@@ -57,7 +57,7 @@ const OpenRPCSchema = `
             "description": "data to hash using the Keccak-256 algorithm",
             "summary": "data to hash",
             "schema": {
-              "title": "datahash",
+              "title": "data",
               "type": "string",
               "pattern": "^0x[a-fA-F\\d]+$"
             }
@@ -128,16 +128,16 @@ const OpenRPCSchema = `
       },
       {
         "name": "net_version",
-        "summary": "chain ID associated with network",
-        "description": "Returns the chain ID associated with the current network.",
+        "summary": "Network ID associated with network",
+        "description": "Returns the network ID associated with the current network.",
         "params": [],
         "result": {
-          "name": "chainID",
-          "description": "chain ID associated with the current network",
+          "name": "networkID",
+          "description": "Network ID associated with the current network",
           "schema": {
-            "title": "chainID",
+            "title": "networkID",
             "type": "string",
-            "pattern": "^0x[a-fA-F\\d]+$"
+            "pattern": "^[\\d]+$"
           }
         }
       },
@@ -175,7 +175,7 @@ const OpenRPCSchema = `
         "params": [],
         "result": {
           "name": "chainId",
-          "description": "hex format integer of the current chain id. Defaults are mainnet=61, morden=62.",
+          "description": "hex format integer of the current chain id. Defaults are ETC=61, ETH=1, Morden=62.",
           "schema": {
             "title": "chainId",
             "type": "string",
@@ -226,7 +226,7 @@ const OpenRPCSchema = `
           {
             "name": "address",
             "required": true,
-            "description": "The address of the acccount or contract",
+            "description": "The address of the account or contract",
             "schema": {
               "$ref": "#/components/schemas/Address"
             }
@@ -807,7 +807,7 @@ const OpenRPCSchema = `
               "title": "storageKeys",
               "description": "The storage keys of all the storage slots being requested",
               "items": {
-                "description": "A storage key is indexed from the solidity compiler by the order it is declaired. For mappings it uses the keccak of the mapping key with its position (and recursively for X-dimensional mappings)",
+                "description": "A storage key is indexed from the solidity compiler by the order it is declared. For mappings it uses the keccak of the mapping key with its position (and recursively for X-dimensional mappings)",
                 "$ref": "#/components/schemas/Integer"
               }
             }
@@ -1000,7 +1000,7 @@ const OpenRPCSchema = `
           {
             "name": "id",
             "required": true,
-            "description": "String identifiying the client",
+            "description": "String identifying the client",
             "schema": {
               "$ref": "#/components/schemas/DataWord"
             }
@@ -1139,7 +1139,7 @@ const OpenRPCSchema = `
       "schemas": {
         "ProofNode": {
           "type": "string",
-          "description": "An indiviual node used to prove a path down a merkle-patricia-tree",
+          "description": "An individual node used to prove a path down a merkle-patricia-tree",
           "$ref": "#/components/schemas/Bytes"
         },
         "AccountProof": {

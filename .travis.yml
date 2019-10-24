@@ -63,3 +63,4 @@ matrix:
         submodules: false # avoid cloning ethereum/tests
       script:
         - go run build/ci.go lint
+

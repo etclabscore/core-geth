@@ -163,8 +163,14 @@ func ExpandPackagesNoVendor(patterns []string) []string {
 		}
 	}
 	if expand {
-		cmd := GoTool("list", patterns...)
+		// ensure that modules are downloaded and package listing is possible
+		cmd := GoTool("mod", "download")
 		out, err := cmd.CombinedOutput()
+		if err != nil {
+			log.Fatalf("module download failed: %v\n%s", err, string(out))
+		}
+		cmd = GoTool("list", patterns...)
+		out, err = cmd.CombinedOutput()
 		if err != nil {
 			log.Fatalf("package listing failed: %v\n%s", err, string(out))
 		}

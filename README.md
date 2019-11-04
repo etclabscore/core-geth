@@ -51,35 +51,14 @@ Ellaism users are asked to switch to
 
 ## Managing versions
 
-Since this is a downstream fork of [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum), you'll want to maintain the go import path and git remotes accordingly.
-This repository should occupy `$GOPATH/src/github.com/ethereum/go-ethereum`, and you can optionally use `git` to set this fork as a default upstream remote.
-On Linux or Mac, this can be accomplished by the following or similar.
-
-For __a fresh install__, the below. This will set [multi-geth/multi-geth](https://github.com/multi-geth/multi-geth) as as the `git` remote `origin` by default.
-
-```sh
-$ path=$GOPATH/src/github.com/ethereum && mkdir -p $path && cd $path
-$ git clone https://github.com/multi-geth/multi-geth.git go-ethereum && cd go-ethereum
-```
-
-Or, with __an existing copy of the ethereum/go-ethereum source__, the below. This will set [multi-geth/multi-geth](https://github.com/multi-geth/multi-geth) as the `git` remote `multi-geth`,
-and set the local branch `master` to track this repository's `master` branch.
-
-```sh
-$ cd $GOPATH/src/github.com/ethereum/go-ethereum
-$ git remote add multi-geth https://github.com/multi-geth/multi-geth.git
-$ git fetch multi-geth
-$ git checkout -B master -t multi-geth/master
-```
-
-:information_source: Note that these instructions assume a traditional use of `GOPATH`-based Go project organization. Because of the way the `make` command works for this project (using a "GOPATH/work dir" pattern for building)
-you don't have to follow tradition to build; cloning this repo anywhere in your filesystem should be adequate.
+`multi-geth` is a fork of [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum), but build dependencies have been upgraded to use [Go modules](https://github.com/golang/go/wiki/Modules).
+You can clone it anywhere in your filesystem (either inside or outside of `$GOPATH`).
 
 ## Building the source
 
 For prerequisites and detailed build instructions please read the [Installation Instructions](https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum) on the wiki.
 
-Building `geth` requires both a Go (version 1.10 or later) and a C compiler. You can install
+Building `geth` requires both a Go (version 1.11 or later) and a C compiler. You can install
 them using your favourite package manager. Once the dependencies are installed, run
 
 ```shell

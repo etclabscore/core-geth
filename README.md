@@ -51,7 +51,7 @@ Ellaism users are asked to switch to
 
 ## Managing versions
 
-`multi-geth` is a fork of [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum), but it uses Go modules.
+`multi-geth` is a fork of [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum), but build dependencies have been upgraded to use [Go modules](https://github.com/golang/go/wiki/Modules).
 You can clone it anywhere in your filesystem (either inside or outside of `$GOPATH`).
 
 ## Building the source

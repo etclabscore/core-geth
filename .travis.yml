@@ -23,6 +23,37 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
+  - os: linux
+    dist: xenial
+    sudo: required
+    go: 1.13.x
+    env:
+      - ARMv5 
+    git:
+      submodules: false # avoid cloning ethereum/tests
+    addons:
+      apt:
+        packages:
+          - gcc-multilib
+    script:
+      # Switch over GCC to cross compilation (breaks 386, hence why do it here only)
+      - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-arm-linux-gnueabi libc6-dev-armel-cross gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+      - sudo ln -s /usr/include/asm-generic /usr/include/asm
+      - GOPATH=~/go_arm GOARM=5 go run build/ci.go install -arch arm -cc arm-linux-gnueabi-gcc
+    before_deploy:
+      - sh build/deploy_arm.sh
+    deploy:
+      provider: releases
+      api_key:
+        secure: LAMAOVzTJc2FQx5+MpJh/FL+6x7W8e4kQTMzqZV0bY/yS2xYUo2Oq9LlWWAAPHxi4Vo6X6Uuqh76VczyMmONJiMf5hKVNmW2jOOWIvTFvaDebIxvvX4f5KURdhsgFR3Z/UCeq86IDKZUkjI1rezp9QuTRY7AL8L7gqFG8cq6KBVbHODALOdtuN/iP8E016llE2IiQlMdD5Njw4CC7eiIqubiy7lerECo2213DXoI1lPI+DV0z0gnK42++ZSUdxG4ewsobiPqrpCeEEeqzvUMsWNADV0Aaye28kyUj9bglyTkM4mT1jmK/wM6OCfGQDRsoi9g48/yPjZ9m/TP8MK5fPBSk1um43N/ucmfXcl/ahbbdx440YsXqNTd/9jLeWlH4D7d4rDbFxAyh+JTnfTrz7/hvdE1tkMDvoGci7U8X4W+vJz6G2RTyGx2MLzfLCOYn2z3cBt3eRNhCsrTr4Xt1Gefd29UERDDEZNM4/yQd0P0C6nAdCunB/gOdowNCeyUcx2xnijXuyIFrq1J4PtXQBTA98nCKQCTWLfZbjZeJJOEp97ReiwIGHVgyT2gIcB8YN/Th7V3yTNiaNjzkdiGd85lWLAqTIWoXdTlmVDFg/3oJXioM/JS3whSyWi8m5ftR4lDIOl08M2wZXF+qSUfwUrV73kpIz5NXXcK2zVcslc=
+      file: multi-geth*-arm.*
+      file_glob: true
+      draft: true
+      on:
+        repo: etclabscore/multi-geth
+        tags: true
+      skip_cleanup: true
+      tag_name: "$TRAVIS_TAG"
   - os: osx
     go: 1.13.x
     script:

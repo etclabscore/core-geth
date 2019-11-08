@@ -278,6 +278,8 @@ func getRevision(env *EVM) evmc.Revision {
 	n := env.BlockNumber
 	conf := env.ChainConfig()
 	switch {
+	case conf.IsIstanbul(n):
+		return evmc.Istanbul
 	case conf.IsPetersburg(n):
 		return evmc.Petersburg
 	case conf.IsConstantinople(n):

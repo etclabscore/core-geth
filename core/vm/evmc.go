@@ -35,7 +35,7 @@ import (
 // EVMC represents the reference to a common EVMC-based VM instance and
 // the current execution context as required by go-ethereum design.
 type EVMC struct {
-	instance *evmc.VM  // The reference to the EVMC VM instance.
+	instance *evmc.VM        // The reference to the EVMC VM instance.
 	env      *EVM            // The execution context.
 	cap      evmc.Capability // The supported EVMC capability (EVM or Ewasm)
 	readOnly bool            // The readOnly flag (TODO: Try to get rid of it).
@@ -120,8 +120,10 @@ func (host *hostContext) SetStorage(addr common.Address, key common.Hash, value 
 
 	host.env.StateDB.SetState(addr, key, value)
 
-	hasNetStorageCostEIP := host.env.ChainConfig().IsConstantinople(host.env.BlockNumber) &&
-		!host.env.ChainConfig().IsPetersburg(host.env.BlockNumber)
+	hasEIP2200 := host.env.ChainConfig().IsIstanbul(host.env.BlockNumber)
+	hasNetStorageCostEIP := hasEIP2200 ||
+		(host.env.ChainConfig().IsConstantinople(host.env.BlockNumber) &&
+			!host.env.ChainConfig().IsPetersburg(host.env.BlockNumber))
 	if !hasNetStorageCostEIP {
 
 		zero := common.Hash{}
@@ -133,6 +135,14 @@ func (host *hostContext) SetStorage(addr common.Address, key common.Hash, value 
 			return evmc.StorageDeleted
 		}
 		return evmc.StorageModified
+	}
+
+	resetClearRefund := params.NetSstoreResetClearRefund
+	cleanRefund := params.NetSstoreResetRefund
+
+	if hasEIP2200 {
+		resetClearRefund = params.SstoreInitRefundEIP2200
+		cleanRefund = params.SstoreCleanRefundEIP2200
 	}
 
 	if original == current {
@@ -154,9 +164,9 @@ func (host *hostContext) SetStorage(addr common.Address, key common.Hash, value 
 	}
 	if original == value {
 		if original == (common.Hash{}) { // reset to original inexistent slot (2.2.2.1)
-			host.env.StateDB.AddRefund(params.NetSstoreResetClearRefund)
+			host.env.StateDB.AddRefund(resetClearRefund)
 		} else { // reset to original existing slot (2.2.2.2)
-			host.env.StateDB.AddRefund(params.NetSstoreResetRefund)
+			host.env.StateDB.AddRefund(cleanRefund)
 		}
 	}
 	return evmc.StorageModifiedAgain
@@ -198,7 +208,8 @@ func (host *hostContext) GetTxContext() evmc.TxContext {
 		Number:     host.env.BlockNumber.Int64(),
 		Timestamp:  host.env.Time.Int64(),
 		GasLimit:   int64(host.env.GasLimit),
-		Difficulty: common.BigToHash(host.env.Difficulty)}
+		Difficulty: common.BigToHash(host.env.Difficulty),
+		ChainID:    common.BigToHash(host.env.chainConfig.ChainID)}
 }
 
 func (host *hostContext) GetBlockHash(number int64) common.Hash {

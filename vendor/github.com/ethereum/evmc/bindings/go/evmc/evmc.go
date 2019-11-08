@@ -15,24 +15,18 @@ package evmc
 #include <stdlib.h>
 #include <string.h>
 
-static inline enum evmc_set_option_result set_option(struct evmc_instance* instance, char* name, char* value)
+static inline enum evmc_set_option_result set_option(struct evmc_vm* vm, char* name, char* value)
 {
-	enum evmc_set_option_result ret = evmc_set_option(instance, name, value);
+	enum evmc_set_option_result ret = evmc_set_option(vm, name, value);
 	free(name);
 	free(value);
 	return ret;
 }
 
-struct extended_context
-{
-	struct evmc_context context;
-	int64_t index;
-};
-
 extern const struct evmc_host_interface evmc_go_host;
 
-static struct evmc_result execute_wrapper(struct evmc_instance* instance,
-	int64_t context_index, enum evmc_revision rev,
+static struct evmc_result execute_wrapper(struct evmc_vm* vm,
+	uintptr_t context_index, enum evmc_revision rev,
 	enum evmc_call_kind kind, uint32_t flags, int32_t depth, int64_t gas,
 	const evmc_address* destination, const evmc_address* sender,
 	const uint8_t* input_data, size_t input_size, const evmc_uint256be* value,
@@ -51,8 +45,8 @@ static struct evmc_result execute_wrapper(struct evmc_instance* instance,
 		*create2_salt,
 	};
 
-	struct extended_context ctx = {{&evmc_go_host}, context_index};
-	return evmc_execute(instance, &ctx.context, rev, &msg, code, code_size);
+	struct evmc_host_context* context = (struct evmc_host_context*)context_index;
+	return evmc_execute(vm, &evmc_go_host, context, rev, &msg, code, code_size);
 }
 */
 import "C"
@@ -144,18 +138,18 @@ const (
 	Istanbul         Revision = C.EVMC_ISTANBUL
 )
 
-type Instance struct {
-	handle *C.struct_evmc_instance
+type VM struct {
+	handle *C.struct_evmc_vm
 }
 
-func Load(filename string) (instance *Instance, err error) {
+func Load(filename string) (vm *VM, err error) {
 	cfilename := C.CString(filename)
 	var loaderErr C.enum_evmc_loader_error_code
 	handle := C.evmc_load_and_create(cfilename, &loaderErr)
 	C.free(unsafe.Pointer(cfilename))
 
 	if loaderErr == C.EVMC_LOADER_SUCCESS {
-		instance = &Instance{handle}
+		vm = &VM{handle}
 	} else {
 		errMsg := C.evmc_last_error_msg()
 		if errMsg != nil {
@@ -165,21 +159,41 @@ func Load(filename string) (instance *Instance, err error) {
 		}
 	}
 
-	return instance, err
+	return vm, err
 }
 
-func (instance *Instance) Destroy() {
-	C.evmc_destroy(instance.handle)
+func LoadAndConfigure(config string) (vm *VM, err error) {
+	cconfig := C.CString(config)
+	var loaderErr C.enum_evmc_loader_error_code
+	handle := C.evmc_load_and_configure(cconfig, &loaderErr)
+	C.free(unsafe.Pointer(cconfig))
+
+	if loaderErr == C.EVMC_LOADER_SUCCESS {
+		vm = &VM{handle}
+	} else {
+		errMsg := C.evmc_last_error_msg()
+		if errMsg != nil {
+			err = fmt.Errorf("EVMC loading error: %s", C.GoString(errMsg))
+		} else {
+			err = fmt.Errorf("EVMC loading error %d", int(loaderErr))
+		}
+	}
+
+	return vm, err
 }
 
-func (instance *Instance) Name() string {
-	// TODO: consider using C.evmc_vm_name(instance.handle)
-	return C.GoString(instance.handle.name)
+func (vm *VM) Destroy() {
+	C.evmc_destroy(vm.handle)
 }
 
-func (instance *Instance) Version() string {
-	// TODO: consider using C.evmc_vm_version(instance.handle)
-	return C.GoString(instance.handle.version)
+func (vm *VM) Name() string {
+	// TODO: consider using C.evmc_vm_name(vm.handle)
+	return C.GoString(vm.handle.name)
+}
+
+func (vm *VM) Version() string {
+	// TODO: consider using C.evmc_vm_version(vm.handle)
+	return C.GoString(vm.handle.version)
 }
 
 type Capability uint32
@@ -189,13 +203,13 @@ const (
 	CapabilityEWASM Capability = C.EVMC_CAPABILITY_EWASM
 )
 
-func (instance *Instance) HasCapability(capability Capability) bool {
-	return bool(C.evmc_vm_has_capability(instance.handle, uint32(capability)))
+func (vm *VM) HasCapability(capability Capability) bool {
+	return bool(C.evmc_vm_has_capability(vm.handle, uint32(capability)))
 }
 
-func (instance *Instance) SetOption(name string, value string) (err error) {
+func (vm *VM) SetOption(name string, value string) (err error) {
 
-	r := C.set_option(instance.handle, C.CString(name), C.CString(value))
+	r := C.set_option(vm.handle, C.CString(name), C.CString(value))
 	switch r {
 	case C.EVMC_SET_OPTION_INVALID_NAME:
 		err = fmt.Errorf("evmc: option '%s' not accepted", name)
@@ -206,7 +220,7 @@ func (instance *Instance) SetOption(name string, value string) (err error) {
 	return err
 }
 
-func (instance *Instance) Execute(ctx HostContext, rev Revision,
+func (vm *VM) Execute(ctx HostContext, rev Revision,
 	kind CallKind, static bool, depth int, gas int64,
 	destination common.Address, sender common.Address, input []byte, value common.Hash,
 	code []byte, create2Salt common.Hash) (output []byte, gasLeft int64, err error) {
@@ -222,7 +236,7 @@ func (instance *Instance) Execute(ctx HostContext, rev Revision,
 	evmcSender := evmcAddress(sender)
 	evmcValue := evmcBytes32(value)
 	evmcCreate2Salt := evmcBytes32(create2Salt)
-	result := C.execute_wrapper(instance.handle, C.int64_t(ctxId), uint32(rev),
+	result := C.execute_wrapper(vm.handle, C.uintptr_t(ctxId), uint32(rev),
 		C.enum_evmc_call_kind(kind), flags, C.int32_t(depth), C.int64_t(gas),
 		&evmcDestination, &evmcSender, bytesPtr(input), C.size_t(len(input)), &evmcValue,
 		bytesPtr(code), C.size_t(len(code)), &evmcCreate2Salt)
@@ -242,12 +256,12 @@ func (instance *Instance) Execute(ctx HostContext, rev Revision,
 }
 
 var (
-	hostContextCounter int
-	hostContextMap     = map[int]HostContext{}
+	hostContextCounter uintptr
+	hostContextMap     = map[uintptr]HostContext{}
 	hostContextMapMu   sync.Mutex
 )
 
-func addHostContext(ctx HostContext) int {
+func addHostContext(ctx HostContext) uintptr {
 	hostContextMapMu.Lock()
 	id := hostContextCounter
 	hostContextCounter++
@@ -256,13 +270,13 @@ func addHostContext(ctx HostContext) int {
 	return id
 }
 
-func removeHostContext(id int) {
+func removeHostContext(id uintptr) {
 	hostContextMapMu.Lock()
 	delete(hostContextMap, id)
 	hostContextMapMu.Unlock()
 }
 
-func getHostContext(idx int) HostContext {
+func getHostContext(idx uintptr) HostContext {
 	hostContextMapMu.Lock()
 	ctx := hostContextMap[idx]
 	hostContextMapMu.Unlock()

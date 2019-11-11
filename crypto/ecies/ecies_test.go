@@ -35,22 +35,12 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
-	"flag"
 	"fmt"
 	"math/big"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/crypto"
 )
-
-var dumpEnc bool
-
-func init() {
-	testing.Init()
-	flDump := flag.Bool("dump", false, "write encrypted test message to file")
-	flag.Parse()
-	dumpEnc = *flDump
-}
 
 // Ensure the KDF generates appropriately sized keys.
 func TestKDF(t *testing.T) {

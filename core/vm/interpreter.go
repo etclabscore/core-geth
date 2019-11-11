@@ -23,6 +23,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/log"
 )
 
 // Config are the configuration options for the Interpreter
@@ -36,6 +37,8 @@ type Config struct {
 
 	EWASMInterpreter string // External EWASM interpreter options
 	EVMInterpreter   string // External EVM interpreter options
+
+	ExtraEips []int // Additional EIPS that are to be enabled
 }
 
 // Interpreter is used to run Ethereum based contracts and will utilise the
@@ -88,7 +91,17 @@ func NewEVMInterpreter(evm *EVM, cfg Config) *EVMInterpreter {
 	// the jump table was initialised. If it was not
 	// we'll set the default jump table.
 	if !cfg.JumpTable[STOP].valid {
-		cfg.JumpTable = instructionSetForConfig(evm.ChainConfig(), evm.BlockNumber)
+		var jt = instructionSetForConfig(evm.ChainConfig(), evm.BlockNumber)
+
+		for i, eip := range cfg.ExtraEips {
+			if err := EnableEIP(eip, &jt); err != nil {
+				// Disable it, so caller can check if it's activated or not
+				cfg.ExtraEips = append(cfg.ExtraEips[:i], cfg.ExtraEips[i+1:]...)
+				log.Error("EIP activation failed", "eip", eip, "error", err)
+			}
+		}
+
+		cfg.JumpTable = jt
 	}
 
 	return &EVMInterpreter{

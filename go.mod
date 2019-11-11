@@ -10,7 +10,7 @@ require (
 	github.com/aristanetworks/goarista v0.0.0-20170210015632-ea17b1a17847
 	github.com/btcsuite/btcd v0.0.0-20171128150713-2e60448ffcc6
 	github.com/cespare/cp v0.1.0
-	github.com/cloudflare/cloudflare-go v0.10.7 // indirect
+	github.com/cloudflare/cloudflare-go v0.10.7
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deckarep/golang-set v0.0.0-20180603214616-504e848d77ea
 	github.com/docker/docker v0.0.0-20180625184442-8e610b2b55bf

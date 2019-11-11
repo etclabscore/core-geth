@@ -59,11 +59,20 @@ func PrecompiledContractsForConfig(config *params.ChainConfig, bn *big.Int) map[
 		precompileds[common.BytesToAddress([]byte{5})] = &bigModExp{}
 	}
 	if config.IsEIP213F(bn) {
-		precompileds[common.BytesToAddress([]byte{6})] = &bn256AddByzantium{}
-		precompileds[common.BytesToAddress([]byte{7})] = &bn256ScalarMulByzantium{}
+		if config.IsEIP1108F(bn) {
+			precompileds[common.BytesToAddress([]byte{6})] = &bn256AddIstanbul{}
+			precompileds[common.BytesToAddress([]byte{7})] = &bn256ScalarMulIstanbul{}
+		} else {
+			precompileds[common.BytesToAddress([]byte{6})] = &bn256AddByzantium{}
+			precompileds[common.BytesToAddress([]byte{7})] = &bn256ScalarMulByzantium{}
+		}
 	}
 	if config.IsEIP212F(bn) {
-		precompileds[common.BytesToAddress([]byte{8})] = &bn256PairingByzantium{}
+		if config.IsEIP1108F(bn) {
+			precompileds[common.BytesToAddress([]byte{8})] = &bn256PairingIstanbul{}
+		} else {
+			precompileds[common.BytesToAddress([]byte{8})] = &bn256PairingByzantium{}
+		}
 	}
 	if config.IsEIP152F(bn) {
 		precompileds[common.BytesToAddress([]byte{9})] = &blake2F{}

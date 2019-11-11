@@ -78,7 +78,7 @@ you don't have to follow tradition to build; cloning this repo anywhere in your 
 
 For prerequisites and detailed build instructions please read the [Installation Instructions](https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum) on the wiki.
 
-Building `geth` requires both a Go (version 1.10 or later) and a C compiler. You can install
+Building `geth` requires both a Go (version 1.11 or later) and a C compiler. You can install
 them using your favourite package manager. Once the dependencies are installed, run
 
 ```shell
@@ -273,7 +273,7 @@ $ curl -X POST -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","met
   "jsonrpc": "2.0",                                                                                                                                       
   "id": 1,                                                                                                                                                
   "result": {                                                                                                                                             
-    "openrpc": "1.0.0",                                                                                                                                   
+    "openrpc": "1.0.10",                                                                                                                                   
     "info": {                                                                                                                                             
       "description": "This API lets you interact with an EVM-based client via JSON-RPC",                                                                  
       "license": {                                                                                                                                        
@@ -283,7 +283,7 @@ $ curl -X POST -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","met
       "title": "Ethereum JSON-RPC",                                                                                                                       
       "version": "1.0.0"                                                                                                                                  
     },                                                                                                                                                    
-    "servers": null,                                                                                                                                      
+    "servers": [],                                                                                                                                      
     "methods": [                                                                                                                                          
       {                                                                                                                                                   
         "description": "Returns the version of the current client",                                                                                       
@@ -447,3 +447,4 @@ also included in our repository in the `COPYING.LESSER` file.
 The go-ethereum binaries (i.e. all code inside of the `cmd` directory) is licensed under the
 [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html), also
 included in our repository in the `COPYING` file.
+

@@ -17,37 +17,28 @@ package params
 
 import (
 	"math/big"
-
-	"github.com/ethereum/go-ethereum/common"
 )
 
 var (
-	// Genesis hashes to enforce below configs on.
-	KottiGenesisHash = common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4")
-
-	// KottiChainConfig is the chain parameters to run a node on the Kotti main network.
-	KottiChainConfig = &ChainConfig{
-		ChainID:             big.NewInt(6),
+	// MordorChainConfig is the chain parameters to run a node on the Ethereum Classic Mordor test network (PoW).
+	MordorChainConfig = &ChainConfig{
+		ChainID:             big.NewInt(63),
 		HomesteadBlock:      big.NewInt(0),
-		DAOForkBlock:        nil,
-		DAOForkSupport:      false,
 		EIP150Block:         big.NewInt(0),
-		EIP150Hash:          common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4"),
 		EIP155Block:         big.NewInt(0),
-		EIP158Block:         big.NewInt(716617),
-		ByzantiumBlock:      big.NewInt(716617),
-		ConstantinopleBlock: big.NewInt(1705549),
-		PetersburgBlock:     big.NewInt(1705549),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(301243),
+		PetersburgBlock:     big.NewInt(301243),
 		DisposalBlock:       big.NewInt(0),
-		SocialBlock:         nil,
-		EthersocialBlock:    nil,
-		ECIP1017EraRounds:   big.NewInt(5000000),
+		ECIP1017EraRounds:   big.NewInt(2000000),
 		EIP160FBlock:        big.NewInt(0),
 		ECIP1010PauseBlock:  big.NewInt(0),
 		ECIP1010Length:      big.NewInt(2000000),
-		Clique: &CliqueConfig{
-			Period: 15,
-			Epoch:  30000,
-		},
+		Ethash:              new(EthashConfig),
 	}
+	//
+	//DisinflationRateQuotient = big.NewInt(4)      // Disinflation rate quotient for ECIP1017
+	//DisinflationRateDivisor  = big.NewInt(5)      // Disinflation rate divisor for ECIP1017
+	//ExpDiffPeriod            = big.NewInt(100000) // Exponential diff period for diff bomb & ECIP1010
 )

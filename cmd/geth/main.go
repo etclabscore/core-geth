@@ -139,6 +139,7 @@ var (
 		utils.DeveloperPeriodFlag,
 		utils.TestnetFlag,
 		utils.ClassicFlag,
+		utils.MordorFlag,
 		utils.SocialFlag,
 		utils.MixFlag,
 		utils.EthersocialFlag,

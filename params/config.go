@@ -254,8 +254,8 @@ var (
 		nil,           // EIP1234FBlock
 		nil,           // EIP1283FBlock
 
-		nil, // PetersburgBlock
-		nil, // IstanbulBlock
+		big.NewInt(0), // PetersburgBlock
+		big.NewInt(0), // IstanbulBlock
 		nil, // EWASMBlock
 
 		nil, // ECIP1010PauseBlock

@@ -64,3 +64,6 @@ matrix:
       script:
         - go run build/ci.go lint
 
+jobs:
+  allow_failures:
+    - env: lint

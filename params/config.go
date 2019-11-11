@@ -33,6 +33,24 @@ var (
 	GoerliGenesisHash  = common.HexToHash("0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a")
 )
 
+// TrustedCheckpoints associates each known checkpoint with the genesis hash of
+// the chain it belongs to.
+var TrustedCheckpoints = map[common.Hash]*TrustedCheckpoint{
+	MainnetGenesisHash: MainnetTrustedCheckpoint,
+	TestnetGenesisHash: TestnetTrustedCheckpoint,
+	RinkebyGenesisHash: RinkebyTrustedCheckpoint,
+	GoerliGenesisHash:  GoerliTrustedCheckpoint,
+}
+
+// CheckpointOracles associates each known checkpoint oracles with the genesis hash of
+// the chain it belongs to.
+var CheckpointOracles = map[common.Hash]*CheckpointOracleConfig{
+	MainnetGenesisHash: MainnetCheckpointOracle,
+	TestnetGenesisHash: TestnetCheckpointOracle,
+	RinkebyGenesisHash: RinkebyCheckpointOracle,
+	GoerliGenesisHash:  GoerliCheckpointOracle,
+}
+
 var (
 	// MainnetChainConfig is the chain parameters to run a node on the main network.
 	MainnetChainConfig = &ChainConfig{
@@ -724,32 +742,32 @@ func (c *ChainConfig) IsEIP1283F(num *big.Int) bool {
 
 // IsEIP152F returns whether num is equal to or greater than the Istanbul block.
 func (c *ChainConfig) IsEIP152F(num *big.Int) bool {
-	return isForked(c.IstanbulBlokc, num)
+	return isForked(c.IstanbulBlock, num)
 }
 
 // IsEIP1108F returns whether num is equal to or greater than the Istanbul block.
 func (c *ChainConfig) IsEIP1108F(num *big.Int) bool {
-	return isForked(c.IstanbulBlokc, num)
+	return isForked(c.IstanbulBlock, num)
 }
 
 // IsEIP1344F returns whether num is equal to or greater than the Istanbul block.
 func (c *ChainConfig) IsEIP1344F(num *big.Int) bool {
-	return isForked(c.IstanbulBlokc, num)
+	return isForked(c.IstanbulBlock, num)
 }
 
 // IsEIP1884F returns whether num is equal to or greater than the Istanbul block.
 func (c *ChainConfig) IsEIP1884F(num *big.Int) bool {
-	return isForked(c.IstanbulBlokc, num)
+	return isForked(c.IstanbulBlock, num)
 }
 
 // IsEIP2028F returns whether num is equal to or greater than the Istanbul block.
 func (c *ChainConfig) IsEIP2028F(num *big.Int) bool {
-	return isForked(c.IstanbulBlokc, num)
+	return isForked(c.IstanbulBlock, num)
 }
 
 // IsEIP2200F returns whether num is equal to or greater than the Istanbul block.
 func (c *ChainConfig) IsEIP2200F(num *big.Int) bool {
-	return isForked(c.IstanbulBlokc, num)
+	return isForked(c.IstanbulBlock, num)
 }
 
 func (c *ChainConfig) IsBombDisposal(num *big.Int) bool {
@@ -978,6 +996,8 @@ type Rules struct {
 	IsEIP100F, IsEIP140F, IsEIP198F, IsEIP211F, IsEIP212F, IsEIP213F, IsEIP214F, IsEIP649F, IsEIP658F bool
 	// Constantinople
 	IsEIP145F, IsEIP1014F, IsEIP1052F, IsEIP1283F, IsEIP1234F bool
+	/// Istanbul
+	IsEIP152F, IsEIP1108F, IsEIP1344F, IsEIP1884F, IsEIP2028F, IsEIP2200F bool
 	IsPetersburg, IsIstanbul                                  bool
 	IsBombDisposal, IsSocial, IsEthersocial, IsECIP1010       bool
 	IsMCIP0, IsMCIP3, IsMCIP8                                 bool

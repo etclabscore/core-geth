@@ -29,6 +29,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/ethereum/go-ethereum/chainspec"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/log"
@@ -262,13 +263,13 @@ func (w *wizard) manageGenesis() {
 		log.Info("Saved native genesis chain spec", "path", gethJson)
 
 		// Export the genesis spec used by Aleth (formerly C++ Ethereum)
-		if spec, err := NewAlethGenesisSpec(w.network, w.conf.Genesis); err != nil {
+		if spec, err := chainspec.NewAlethGenesisSpec(w.network, w.conf.Genesis); err != nil {
 			log.Error("Failed to create Aleth chain spec", "err", err)
 		} else {
 			saveGenesis(folder, w.network, "aleth", spec)
 		}
 		// Export the genesis spec used by Parity
-		if spec, err := NewParityChainSpec(w.network, w.conf.Genesis, []string{}); err != nil {
+		if spec, err := chainspec.NewParityChainSpec(w.network, w.conf.Genesis, []string{}); err != nil {
 			log.Error("Failed to create Parity chain spec", "err", err)
 		} else {
 			saveGenesis(folder, w.network, "parity", spec)

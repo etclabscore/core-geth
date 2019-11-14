@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/chainspec"
 	"github.com/ethereum/go-ethereum/log"
 )
 
@@ -641,7 +642,7 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 	files[filepath.Join(workdir, network+".json")] = genesis
 
 	if conf.Genesis.Config.Ethash != nil {
-		cppSpec, err := NewAlethGenesisSpec(network, conf.Genesis)
+		cppSpec, err := chainspec.NewAlethGenesisSpec(network, conf.Genesis)
 		if err != nil {
 			return nil, err
 		}
@@ -651,14 +652,14 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 		harmonySpecJSON, _ := conf.Genesis.MarshalJSON()
 		files[filepath.Join(workdir, network+"-harmony.json")] = harmonySpecJSON
 
-		paritySpec, err := NewParityChainSpec(network, conf.Genesis, conf.bootnodes)
+		paritySpec, err := chainspec.NewParityChainSpec(network, conf.Genesis, conf.bootnodes)
 		if err != nil {
 			return nil, err
 		}
 		paritySpecJSON, _ := json.Marshal(paritySpec)
 		files[filepath.Join(workdir, network+"-parity.json")] = paritySpecJSON
 
-		pyethSpec, err := NewPyEthereumGenesisSpec(network, conf.Genesis)
+		pyethSpec, err := chainspec.NewPyEthereumGenesisSpec(network, conf.Genesis)
 		if err != nil {
 			return nil, err
 		}

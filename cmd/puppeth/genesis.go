@@ -31,9 +31,9 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 )
 
-// alethGenesisSpec represents the genesis specification format used by the
+// AlethGenesisSpec represents the genesis specification format used by the
 // C++ Ethereum implementation.
-type alethGenesisSpec struct {
+type AlethGenesisSpec struct {
 	SealEngine string `json:"sealEngine"`
 	Params     struct {
 		AccountStartNonce          math2.HexOrDecimal64   `json:"accountStartNonce"`
@@ -93,15 +93,15 @@ type alethGenesisSpecLinearPricing struct {
 	Word uint64 `json:"word"`
 }
 
-// newAlethGenesisSpec converts a go-ethereum genesis block into a Aleth-specific
+// NewAlethGenesisSpec converts a go-ethereum genesis block into a Aleth-specific
 // chain specification format.
-func newAlethGenesisSpec(network string, genesis *core.Genesis) (*alethGenesisSpec, error) {
+func NewAlethGenesisSpec(network string, genesis *core.Genesis) (*AlethGenesisSpec, error) {
 	// Only ethash is currently supported between go-ethereum and aleth
 	if genesis.Config.Ethash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
 	// Reconstruct the chain spec in Aleth format
-	spec := &alethGenesisSpec{
+	spec := &AlethGenesisSpec{
 		SealEngine: "Ethash",
 	}
 	// Some defaults
@@ -201,7 +201,7 @@ func newAlethGenesisSpec(network string, genesis *core.Genesis) (*alethGenesisSp
 	return spec, nil
 }
 
-func (spec *alethGenesisSpec) setPrecompile(address byte, data *alethGenesisSpecBuiltin) {
+func (spec *AlethGenesisSpec) setPrecompile(address byte, data *alethGenesisSpecBuiltin) {
 	if spec.Accounts == nil {
 		spec.Accounts = make(map[common.UnprefixedAddress]*alethGenesisSpecAccount)
 	}
@@ -212,7 +212,7 @@ func (spec *alethGenesisSpec) setPrecompile(address byte, data *alethGenesisSpec
 	spec.Accounts[addr].Precompiled = data
 }
 
-func (spec *alethGenesisSpec) setAccount(address common.Address, account core.GenesisAccount) {
+func (spec *AlethGenesisSpec) setAccount(address common.Address, account core.GenesisAccount) {
 	if spec.Accounts == nil {
 		spec.Accounts = make(map[common.UnprefixedAddress]*alethGenesisSpecAccount)
 	}
@@ -227,8 +227,8 @@ func (spec *alethGenesisSpec) setAccount(address common.Address, account core.Ge
 
 }
 
-// parityChainSpec is the chain specification format used by Parity.
-type parityChainSpec struct {
+// ParityChainSpec is the chain specification format used by Parity.
+type ParityChainSpec struct {
 	Name    string `json:"name"`
 	Datadir string `json:"dataDir"`
 	Engine  struct {
@@ -348,15 +348,15 @@ type parityChainSpecBlakePricing struct {
 	GasPerRound uint64 `json:"gas_per_round"`
 }
 
-// newParityChainSpec converts a go-ethereum genesis block into a Parity specific
+// NewParityChainSpec converts a go-ethereum genesis block into a Parity specific
 // chain specification format.
-func newParityChainSpec(network string, genesis *core.Genesis, bootnodes []string) (*parityChainSpec, error) {
+func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []string) (*ParityChainSpec, error) {
 	// Only ethash is currently supported between go-ethereum and Parity
 	if genesis.Config.Ethash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
 	// Reconstruct the chain spec in Parity's format
-	spec := &parityChainSpec{
+	spec := &ParityChainSpec{
 		Name:    network,
 		Nodes:   bootnodes,
 		Datadir: strings.ToLower(network),
@@ -477,7 +477,7 @@ func newParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	return spec, nil
 }
 
-func (spec *parityChainSpec) setPrecompile(address byte, data *parityChainSpecBuiltin) {
+func (spec *ParityChainSpec) setPrecompile(address byte, data *parityChainSpecBuiltin) {
 	if spec.Accounts == nil {
 		spec.Accounts = make(map[common.UnprefixedAddress]*parityChainSpecAccount)
 	}
@@ -488,7 +488,7 @@ func (spec *parityChainSpec) setPrecompile(address byte, data *parityChainSpecBu
 	spec.Accounts[a].Builtin = data
 }
 
-func (spec *parityChainSpec) setByzantium(num *big.Int) {
+func (spec *ParityChainSpec) setByzantium(num *big.Int) {
 	spec.Engine.Ethash.Params.BlockReward[hexutil.EncodeBig(num)] = hexutil.EncodeBig(ethash.EIP649FBlockReward)
 	spec.Engine.Ethash.Params.DifficultyBombDelays[hexutil.EncodeBig(num)] = hexutil.EncodeUint64(3000000)
 	n := hexutil.Uint64(num.Uint64())
@@ -499,7 +499,7 @@ func (spec *parityChainSpec) setByzantium(num *big.Int) {
 	spec.Params.EIP658Transition = n
 }
 
-func (spec *parityChainSpec) setConstantinople(num *big.Int) {
+func (spec *ParityChainSpec) setConstantinople(num *big.Int) {
 	spec.Engine.Ethash.Params.BlockReward[hexutil.EncodeBig(num)] = hexutil.EncodeBig(ethash.EIP1234FBlockReward)
 	spec.Engine.Ethash.Params.DifficultyBombDelays[hexutil.EncodeBig(num)] = hexutil.EncodeUint64(2000000)
 	n := hexutil.Uint64(num.Uint64())
@@ -509,11 +509,11 @@ func (spec *parityChainSpec) setConstantinople(num *big.Int) {
 	spec.Params.EIP1283Transition = n
 }
 
-func (spec *parityChainSpec) setConstantinopleFix(num *big.Int) {
+func (spec *ParityChainSpec) setConstantinopleFix(num *big.Int) {
 	spec.Params.EIP1283DisableTransition = hexutil.Uint64(num.Uint64())
 }
 
-func (spec *parityChainSpec) setIstanbul(num *big.Int) {
+func (spec *ParityChainSpec) setIstanbul(num *big.Int) {
 	// spec.Params.EIP152Transition = hexutil.Uint64(num.Uint64())
 	// spec.Params.EIP1108Transition = hexutil.Uint64(num.Uint64())
 	spec.Params.EIP1344Transition = hexutil.Uint64(num.Uint64())
@@ -522,9 +522,9 @@ func (spec *parityChainSpec) setIstanbul(num *big.Int) {
 	spec.Params.EIP1283ReenableTransition = hexutil.Uint64(num.Uint64())
 }
 
-// pyEthereumGenesisSpec represents the genesis specification format used by the
+// PyEthereumGenesisSpec represents the genesis specification format used by the
 // Python Ethereum implementation.
-type pyEthereumGenesisSpec struct {
+type PyEthereumGenesisSpec struct {
 	Nonce      hexutil.Bytes     `json:"nonce"`
 	Timestamp  hexutil.Uint64    `json:"timestamp"`
 	ExtraData  hexutil.Bytes     `json:"extraData"`
@@ -536,14 +536,14 @@ type pyEthereumGenesisSpec struct {
 	ParentHash common.Hash       `json:"parentHash"`
 }
 
-// newPyEthereumGenesisSpec converts a go-ethereum genesis block into a Parity specific
+// NewPyEthereumGenesisSpec converts a go-ethereum genesis block into a Parity specific
 // chain specification format.
-func newPyEthereumGenesisSpec(network string, genesis *core.Genesis) (*pyEthereumGenesisSpec, error) {
+func NewPyEthereumGenesisSpec(network string, genesis *core.Genesis) (*PyEthereumGenesisSpec, error) {
 	// Only ethash is currently supported between go-ethereum and pyethereum
 	if genesis.Config.Ethash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
-	spec := &pyEthereumGenesisSpec{
+	spec := &PyEthereumGenesisSpec{
 		Timestamp:  (hexutil.Uint64)(genesis.Timestamp),
 		ExtraData:  genesis.ExtraData,
 		GasLimit:   (hexutil.Uint64)(genesis.GasLimit),

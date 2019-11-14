@@ -37,7 +37,7 @@ func TestAlethSturebyConverter(t *testing.T) {
 	if err := json.Unmarshal(blob, &genesis); err != nil {
 		t.Fatalf("failed parsing genesis: %v", err)
 	}
-	spec, err := newAlethGenesisSpec("stureby", &genesis)
+	spec, err := NewAlethGenesisSpec("stureby", &genesis)
 	if err != nil {
 		t.Fatalf("failed creating chainspec: %v", err)
 	}
@@ -46,7 +46,7 @@ func TestAlethSturebyConverter(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}
-	expspec := &alethGenesisSpec{}
+	expspec := &AlethGenesisSpec{}
 	if err := json.Unmarshal(expBlob, expspec); err != nil {
 		t.Fatalf("failed parsing genesis: %v", err)
 	}
@@ -76,7 +76,7 @@ func TestParitySturebyConverter(t *testing.T) {
 	if err := json.Unmarshal(blob, &genesis); err != nil {
 		t.Fatalf("failed parsing genesis: %v", err)
 	}
-	spec, err := newParityChainSpec("stureby", &genesis, []string{})
+	spec, err := NewParityChainSpec("stureby", &genesis, []string{})
 	if err != nil {
 		t.Fatalf("failed creating chainspec: %v", err)
 	}
@@ -85,7 +85,7 @@ func TestParitySturebyConverter(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}
-	expspec := &parityChainSpec{}
+	expspec := &ParityChainSpec{}
 	if err := json.Unmarshal(expBlob, expspec); err != nil {
 		t.Fatalf("failed parsing genesis: %v", err)
 	}

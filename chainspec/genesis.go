@@ -242,7 +242,13 @@ type ParityChainSpec struct {
 				HomesteadTransition    hexutil.Uint64    `json:"homesteadTransition"`
 				EIP100bTransition      hexutil.Uint64    `json:"eip100bTransition"`
 			} `json:"params"`
-		} `json:"Ethash"`
+		} `json:"Ethash,omitempty"`
+		Clique struct {
+			Params struct {
+				Period hexutil.Uint64 `json:"period"`
+				Epoch  hexutil.Uint64 `json:"epoch"`
+			} `json:"params"`
+		} `json:"Clique,omitempty"`
 	} `json:"engine"`
 
 	Params struct {
@@ -351,8 +357,8 @@ type parityChainSpecBlakePricing struct {
 // NewParityChainSpec converts a go-ethereum genesis block into a Parity specific
 // chain specification format.
 func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []string) (*ParityChainSpec, error) {
-	// Only ethash is currently supported between go-ethereum and Parity
-	if genesis.Config.Ethash == nil {
+	// Only ethash and clique are currently supported between go-ethereum and Parity
+	if genesis.Config.Ethash == nil && genesis.Config.Clique == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
 	// Reconstruct the chain spec in Parity's format
@@ -361,13 +367,19 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		Nodes:   bootnodes,
 		Datadir: strings.ToLower(network),
 	}
-	spec.Engine.Ethash.Params.BlockReward = make(map[string]string)
-	spec.Engine.Ethash.Params.DifficultyBombDelays = make(map[string]string)
-	// Frontier
-	spec.Engine.Ethash.Params.MinimumDifficulty = (*hexutil.Big)(params.MinimumDifficulty)
-	spec.Engine.Ethash.Params.DifficultyBoundDivisor = (*hexutil.Big)(params.DifficultyBoundDivisor)
-	spec.Engine.Ethash.Params.DurationLimit = (*hexutil.Big)(params.DurationLimit)
-	spec.Engine.Ethash.Params.BlockReward["0x0"] = hexutil.EncodeBig(ethash.FrontierBlockReward)
+	if genesis.Config.Ethash != nil {
+		spec.Engine.Ethash.Params.BlockReward = make(map[string]string)
+		spec.Engine.Ethash.Params.DifficultyBombDelays = make(map[string]string)
+		// Frontier
+		spec.Engine.Ethash.Params.MinimumDifficulty = (*hexutil.Big)(params.MinimumDifficulty)
+		spec.Engine.Ethash.Params.DifficultyBoundDivisor = (*hexutil.Big)(params.DifficultyBoundDivisor)
+		spec.Engine.Ethash.Params.DurationLimit = (*hexutil.Big)(params.DurationLimit)
+		spec.Engine.Ethash.Params.BlockReward["0x0"] = hexutil.EncodeBig(ethash.FrontierBlockReward)
+	}
+	if genesis.Config.Clique != nil {
+		spec.Engine.Clique.Params.Period = hexutil.Uint64(genesis.Config.Clique.Period)
+		spec.Engine.Clique.Params.Epoch = hexutil.Uint64(genesis.Config.Clique.Epoch)
+	}
 
 	// Homestead
 	spec.Engine.Ethash.Params.HomesteadTransition = hexutil.Uint64(genesis.Config.HomesteadBlock.Uint64())

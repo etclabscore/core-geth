@@ -1543,28 +1543,13 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	}
 
 	// Override any default configs for hard coded networks.
-	switch {
-	case ctx.GlobalBool(TestnetFlag.Name):
-		cfg.Genesis = core.DefaultTestnetGenesisBlock()
-	case ctx.GlobalBool(ClassicFlag.Name):
-		cfg.Genesis = core.DefaultClassicGenesisBlock()
-	case ctx.GlobalBool(MordorFlag.Name):
-		cfg.Genesis = core.DefaultMordorGenesisBlock()
-	case ctx.GlobalBool(SocialFlag.Name):
-		cfg.Genesis = core.DefaultSocialGenesisBlock()
-	case ctx.GlobalBool(EthersocialFlag.Name):
-		cfg.Genesis = core.DefaultEthersocialGenesisBlock()
-	case ctx.GlobalBool(MusicoinFlag.Name):
-		cfg.Genesis = core.DefaultMusicoinGenesisBlock()
-	case ctx.GlobalBool(RinkebyFlag.Name):
-		cfg.Genesis = core.DefaultRinkebyGenesisBlock()
-	case ctx.GlobalBool(KottiFlag.Name):
-		cfg.Genesis = core.DefaultKottiGenesisBlock()
-	case ctx.GlobalBool(MixFlag.Name):
-		cfg.Genesis = core.DefaultMixGenesisBlock()
-	case ctx.GlobalBool(GoerliFlag.Name):
-		cfg.Genesis = core.DefaultGoerliGenesisBlock()
-	case ctx.GlobalBool(DeveloperFlag.Name):
+
+	// Override genesis configuration if a --<chain> flag.
+	if gen := genesisForCtxChainConfig(ctx); gen != nil {
+		cfg.Genesis = gen
+	}
+
+	if ctx.GlobalBool(DeveloperFlag.Name) {
 		cfg.NetworkId = 1337
 
 		// Create new developer account or reuse existing one
@@ -1720,7 +1705,11 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 	return chainDb
 }
 
-func MakeGenesis(ctx *cli.Context) *core.Genesis {
+// genesisForCtxChainConfig returns the corresponding Genesis for a non-default flag chain value.
+// If no --<chain> flag is set in the global context, a nil value is returned.
+// It does not handle genesis for --dev mode, since that mode includes but also exceeds
+// chain configuration.
+func genesisForCtxChainConfig(ctx *cli.Context) *core.Genesis {
 	var genesis *core.Genesis
 	switch {
 	case ctx.GlobalBool(TestnetFlag.Name):
@@ -1743,10 +1732,15 @@ func MakeGenesis(ctx *cli.Context) *core.Genesis {
 		genesis = core.DefaultKottiGenesisBlock()
 	case ctx.GlobalBool(GoerliFlag.Name):
 		genesis = core.DefaultGoerliGenesisBlock()
-	case ctx.GlobalBool(DeveloperFlag.Name):
-		Fatalf("Developer chains are ephemeral")
 	}
 	return genesis
+}
+
+func MakeGenesis(ctx *cli.Context) *core.Genesis {
+	if ctx.GlobalBool(DeveloperFlag.Name) {
+		Fatalf("Developer chains are ephemeral")
+	}
+	return genesisForCtxChainConfig(ctx)
 }
 
 // MakeChain creates a chain manager from set command line flags.

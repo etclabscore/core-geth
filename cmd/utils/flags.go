@@ -769,39 +769,9 @@ var (
 // the a subdirectory of the specified datadir will be used.
 func MakeDataDir(ctx *cli.Context) string {
 	if path := ctx.GlobalString(DataDirFlag.Name); path != "" {
-		if ctx.GlobalBool(TestnetFlag.Name) {
-			return filepath.Join(path, "testnet")
-		}
-		if ctx.GlobalBool(ClassicFlag.Name) {
-			return filepath.Join(path, "classic")
-		}
-		if ctx.GlobalBool(MordorFlag.Name) {
-			return filepath.Join(path, "mordor")
-		}
-		if ctx.GlobalBool(SocialFlag.Name) {
-			return filepath.Join(path, "social")
-		}
-		if ctx.GlobalBool(MixFlag.Name) {
-			return filepath.Join(path, "mix")
-		}
-		if ctx.GlobalBool(EthersocialFlag.Name) {
-			return filepath.Join(path, "ethersocial")
-		}
-		if ctx.GlobalBool(MusicoinFlag.Name) {
-			return filepath.Join(path, "musicoin")
-		}
-		if ctx.GlobalBool(RinkebyFlag.Name) {
-			return filepath.Join(path, "rinkeby")
-		}
-		if ctx.GlobalBool(KottiFlag.Name) {
-			return filepath.Join(path, "kotti")
-		}
-		if ctx.GlobalBool(GoerliFlag.Name) {
-			return filepath.Join(path, "goerli")
-		}
-		return path
+		return dataDirPathForCtxChainConfig(ctx, path)
 	}
-	Fatalf("Cannot determine default data directory, please set manually (--datadir)")
+	Fatalf("Cannot determine default data directory, please set manually (--%s)", DataDirFlag.Name)
 	return ""
 }
 
@@ -1263,32 +1233,40 @@ func setSmartCard(ctx *cli.Context, cfg *node.Config) {
 	cfg.SmartCardDaemonPath = path
 }
 
+func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) string {
+	switch {
+	case ctx.GlobalBool(TestnetFlag.Name):
+		return filepath.Join(baseDataDirPath, "testnet")
+	case ctx.GlobalBool(ClassicFlag.Name):
+		return filepath.Join(baseDataDirPath, "classic")
+	case ctx.GlobalBool(MordorFlag.Name):
+		return filepath.Join(baseDataDirPath, "mordor")
+	case ctx.GlobalBool(SocialFlag.Name):
+		return filepath.Join(baseDataDirPath, "social")
+	case ctx.GlobalBool(MixFlag.Name):
+		return filepath.Join(baseDataDirPath, "mix")
+	case ctx.GlobalBool(EthersocialFlag.Name):
+		return filepath.Join(baseDataDirPath, "ethersocial")
+	case ctx.GlobalBool(MusicoinFlag.Name):
+		return filepath.Join(baseDataDirPath, "musicoin")
+	case ctx.GlobalBool(RinkebyFlag.Name):
+		return filepath.Join(baseDataDirPath, "rinkeby")
+	case ctx.GlobalBool(KottiFlag.Name):
+		return filepath.Join(baseDataDirPath, "kotti")
+	case ctx.GlobalBool(GoerliFlag.Name):
+		return filepath.Join(baseDataDirPath, "goerli")
+	}
+	return baseDataDirPath
+}
+
 func setDataDir(ctx *cli.Context, cfg *node.Config) {
 	switch {
 	case ctx.GlobalIsSet(DataDirFlag.Name):
 		cfg.DataDir = ctx.GlobalString(DataDirFlag.Name)
 	case ctx.GlobalBool(DeveloperFlag.Name):
 		cfg.DataDir = "" // unless explicitly requested, use memory databases
-	case ctx.GlobalBool(TestnetFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "testnet")
-	case ctx.GlobalBool(ClassicFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "classic")
-	case ctx.GlobalBool(MordorFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "mordor")
-	case ctx.GlobalBool(SocialFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "social")
-	case ctx.GlobalBool(MixFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "mix")
-	case ctx.GlobalBool(EthersocialFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "ethersocial")
-	case ctx.GlobalBool(MusicoinFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "musicoin")
-	case ctx.GlobalBool(RinkebyFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "rinkeby")
-	case ctx.GlobalBool(KottiFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "kotti")
-	case ctx.GlobalBool(GoerliFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "goerli")
+	case cfg.DataDir == node.DefaultDataDir():
+		cfg.DataDir = dataDirPathForCtxChainConfig(ctx, node.DefaultDataDir())
 	}
 }
 

@@ -579,7 +579,7 @@ func accumulateRewards(config *params.ChainConfig, state *state.StateDB, header 
 		musicoinBlockReward(config, state, header, uncles)
 		return
 	}
-	if config.HasECIP1017() {
+	if config.IsECIP1017F(header.Number) {
 		ecip1017BlockReward(config, state, header, uncles)
 	} else {
 		// Accumulate the rewards for the miner and any included uncles

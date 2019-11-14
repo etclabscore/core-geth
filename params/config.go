@@ -223,7 +223,7 @@ var (
 		nil,           // EIP1052FBlock
 		nil,           // EIP1234FBlock
 		nil,           // EIP1283FBlock
-		
+
 		nil, // PetersburgBlock
 		nil, // IstanbulBlock
 		nil, // EWASMBlock
@@ -524,11 +524,11 @@ type ChainConfig struct {
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block
 	ECIP1010Length     *big.Int `json:"ecip1010Length,omitempty"`     // ECIP1010 length
-	ECIP1017FBlock      *big.Int `json:"ecip1017FBlock,omitempty"`
-	ECIP1017EraRounds  *big.Int `json:"ecip1017EraRounds,omitempty"`  // ECIP1017 era rounds
-	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`    // Bomb disposal HF block
-	SocialBlock        *big.Int `json:"socialBlock,omitempty"`      // Ethereum Social Reward block
-	EthersocialBlock   *big.Int `json:"ethersocialBlock,omitempty"` // Ethersocial Reward block
+	ECIP1017FBlock     *big.Int `json:"ecip1017FBlock,omitempty"`
+	ECIP1017EraRounds  *big.Int `json:"ecip1017EraRounds,omitempty"` // ECIP1017 era rounds
+	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`     // Bomb disposal HF block
+	SocialBlock        *big.Int `json:"socialBlock,omitempty"`       // Ethereum Social Reward block
+	EthersocialBlock   *big.Int `json:"ethersocialBlock,omitempty"`  // Ethersocial Reward block
 
 	MCIP0Block *big.Int `json:"mcip0Block,omitempty"` // Musicoin default block; no MCIP, just denotes chain pref
 	MCIP3Block *big.Int `json:"mcip3Block,omitempty"` // Musicoin 'UBI Fork' block
@@ -595,13 +595,9 @@ func (c *ChainConfig) String() string {
 	)
 }
 
-// HasECIP1017 returns whether the chain is configured with ECIP1017.
-func (c *ChainConfig) HasECIP1017() bool {
-	if c.ECIP1017EraRounds == nil {
-		return false
-	} else {
-		return true
-	}
+// IsECIP1017F returns whether the chain is configured with ECIP1017.
+func (c *ChainConfig) IsECIP1017F(num *big.Int) bool {
+	return isForked(c.ECIP1017FBlock, num)
 }
 
 // IsEIP2F returns whether num is equal to or greater than the Homestead or EIP2 block.
@@ -903,10 +899,10 @@ type Rules struct {
 	// Byzantium
 	IsEIP100F, IsEIP140F, IsEIP198F, IsEIP211F, IsEIP212F, IsEIP213F, IsEIP214F, IsEIP649F, IsEIP658F bool
 	// Constantinople
-	IsEIP145F, IsEIP1014F, IsEIP1052F, IsEIP1283F, IsEIP1234F bool
-	IsPetersburg, IsIstanbul                                  bool
-	IsBombDisposal, IsSocial, IsEthersocial, IsECIP1010       bool
-	IsMCIP0, IsMCIP3, IsMCIP8                                 bool
+	IsEIP145F, IsEIP1014F, IsEIP1052F, IsEIP1283F, IsEIP1234F        bool
+	IsPetersburg, IsIstanbul                                         bool
+	IsBombDisposal, IsSocial, IsEthersocial, IsECIP1010, IsECIP1017F bool
+	IsMCIP0, IsMCIP3, IsMCIP8                                        bool
 }
 
 // Rules ensures c's ChainID is not nil.
@@ -950,6 +946,7 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 		IsSocial:       c.IsSocial(num),
 		IsEthersocial:  c.IsEthersocial(num),
 		IsECIP1010:     c.IsECIP1010(num),
+		IsECIP1017F:    c.IsECIP1017F(num),
 
 		IsMCIP0: c.IsMCIP0(num),
 		IsMCIP3: c.IsMCIP3(num),

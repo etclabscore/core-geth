@@ -593,7 +593,6 @@ type ChainConfig struct {
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block
 	ECIP1010Length     *big.Int `json:"ecip1010Length,omitempty"`     // ECIP1010 length
-
 	ECIP1017FBlock     *big.Int `json:"ecip1017FBlock,omitempty"`
 	ECIP1017EraRounds  *big.Int `json:"ecip1017EraRounds,omitempty"` // ECIP1017 era rounds
 	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`     // Bomb disposal HF block
@@ -1015,9 +1014,15 @@ type Rules struct {
 	IsEIP145F, IsEIP1014F, IsEIP1052F, IsEIP1283F, IsEIP1234F bool
 	/// Istanbul
 	IsEIP152F, IsEIP1108F, IsEIP1344F, IsEIP1884F, IsEIP2028F, IsEIP2200F bool
+<<<<<<< HEAD
 	IsPetersburg, IsIstanbul                                  bool
 	IsBombDisposal, IsSocial, IsEthersocial, IsECIP1010, IsECIP1017F      bool
 	IsMCIP0, IsMCIP3, IsMCIP8                                 bool
+=======
+	IsPetersburg, IsIstanbul                                              bool
+	IsBombDisposal, IsSocial, IsEthersocial, IsECIP1010, IsECIP1017F      bool
+	IsMCIP0, IsMCIP3, IsMCIP8                                             bool
+>>>>>>> consensus/ethash,params: refactor HasECIP1017->IsECIP1017F
 }
 
 // Rules ensures c's ChainID is not nil.

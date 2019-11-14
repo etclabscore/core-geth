@@ -257,6 +257,7 @@ var (
 
 		big.NewInt(0), // PetersburgBlock
 		big.NewInt(0), // IstanbulBlock
+
 		nil, // EIP152FBlock
 		nil, // EIP1108FBlock
 		nil, // EIP1344FBlock
@@ -592,6 +593,7 @@ type ChainConfig struct {
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block
 	ECIP1010Length     *big.Int `json:"ecip1010Length,omitempty"`     // ECIP1010 length
+
 	ECIP1017FBlock     *big.Int `json:"ecip1017FBlock,omitempty"`
 	ECIP1017EraRounds  *big.Int `json:"ecip1017EraRounds,omitempty"` // ECIP1017 era rounds
 	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`     // Bomb disposal HF block
@@ -1052,7 +1054,7 @@ func (c *ChainConfig) Rules(num *big.Int) Rules {
 		IsEIP1234F: c.IsEIP1234F(num),
 		IsEIP1283F: c.IsEIP1283F(num),
 
-		IsEIP152F: c.IsEIP152F(num),
+		IsEIP152F:  c.IsEIP152F(num),
 		IsEIP1108F: c.IsEIP1108F(num),
 		IsEIP1344F: c.IsEIP1344F(num),
 		IsEIP1884F: c.IsEIP1884F(num),

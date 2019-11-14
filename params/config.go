@@ -223,13 +223,14 @@ var (
 		nil,           // EIP1052FBlock
 		nil,           // EIP1234FBlock
 		nil,           // EIP1283FBlock
-
+		
 		nil, // PetersburgBlock
 		nil, // IstanbulBlock
 		nil, // EWASMBlock
 
 		nil, // ECIP1010PauseBlock
 		nil, // ECIP1010Length
+		nil, // ECIP1017FBlock
 		nil, // ECIP1017EraRounds
 		nil, // DisposalBlock
 		nil, // SocialBlock
@@ -292,6 +293,7 @@ var (
 
 		nil, // ECIP1010PauseBlock
 		nil, // ECIP1010Length
+		nil, // ECIP1017FBlock
 		nil, // ECIP1017EraRounds
 		nil, // DisposalBlock
 		nil, // SocialBlock
@@ -353,6 +355,7 @@ var (
 
 		nil, // ECIP1010PauseBlock
 		nil, // ECIP1010Length
+		nil, // ECIP1017FBlock
 		nil, // ECIP1017EraRounds
 		nil, // DisposalBlock
 		nil, // SocialBlock
@@ -521,10 +524,11 @@ type ChainConfig struct {
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block
 	ECIP1010Length     *big.Int `json:"ecip1010Length,omitempty"`     // ECIP1010 length
+	ECIP1017FBlock      *big.Int `json:"ecip1017FBlock,omitempty"`
 	ECIP1017EraRounds  *big.Int `json:"ecip1017EraRounds,omitempty"`  // ECIP1017 era rounds
-	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`      // Bomb disposal HF block
-	SocialBlock        *big.Int `json:"socialBlock,omitempty"`        // Ethereum Social Reward block
-	EthersocialBlock   *big.Int `json:"ethersocialBlock,omitempty"`   // Ethersocial Reward block
+	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`    // Bomb disposal HF block
+	SocialBlock        *big.Int `json:"socialBlock,omitempty"`      // Ethereum Social Reward block
+	EthersocialBlock   *big.Int `json:"ethersocialBlock,omitempty"` // Ethersocial Reward block
 
 	MCIP0Block *big.Int `json:"mcip0Block,omitempty"` // Musicoin default block; no MCIP, just denotes chain pref
 	MCIP3Block *big.Int `json:"mcip3Block,omitempty"` // Musicoin 'UBI Fork' block

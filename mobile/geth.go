@@ -146,32 +146,13 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 		if err := json.Unmarshal([]byte(config.EthereumGenesis), genesis); err != nil {
 			return nil, fmt.Errorf("invalid genesis spec: %v", err)
 		}
-		// If we have the testnet, hard code the chain configs too
-		if config.EthereumGenesis == TestnetGenesis() {
-			genesis.Config = params.TestnetChainConfig
-			if config.EthereumNetworkID == 1 {
-				config.EthereumNetworkID = 3
-			}
-		}
-		if config.EthereumGenesis == SocialGenesis() {
-			genesis.Config = params.SocialChainConfig
-			if config.EthereumNetworkID == 1 {
-				config.EthereumNetworkID = 28
-			}
-		}
-		if config.EthereumGenesis == MixGenesis() {
-			genesis.Config = params.MixChainConfig
-			if config.EthereumNetworkID == 1 {
-				config.EthereumNetworkID = 76
-			}
-		}
 	}
 	// Register the Ethereum protocol if requested
 	if config.EthereumEnabled {
 		ethConf := eth.DefaultConfig
 		ethConf.Genesis = genesis
 		ethConf.SyncMode = downloader.LightSync
-		ethConf.NetworkId = uint64(config.EthereumNetworkID)
+		ethConf.NetworkId = uint64(genesis.Config.NetworkID)
 		ethConf.DatabaseCache = config.EthereumDatabaseCache
 		if err := rawStack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
 			return les.New(ctx, &ethConf)

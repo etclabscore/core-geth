@@ -27,6 +27,7 @@ var (
 
 	// EthersocialChainConfig is the chain parameters to run a node on the Ethersocial main network.
 	EthersocialChainConfig = &ChainConfig{
+		NetworkID:           1,
 		ChainID:             big.NewInt(31102),
 		HomesteadBlock:      big.NewInt(0),
 		DAOForkBlock:        big.NewInt(0),

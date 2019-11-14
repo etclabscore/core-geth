@@ -27,6 +27,7 @@ var (
 
 	// MixChainConfig is the chain parameters to run a node on the MIX main network.
 	MixChainConfig = &ChainConfig{
+		NetworkID:           76,
 		ChainID:             big.NewInt(76),
 		HomesteadBlock:      big.NewInt(0),
 		DAOForkBlock:        nil,

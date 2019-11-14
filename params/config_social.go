@@ -27,6 +27,7 @@ var (
 
 	// SocialChainConfig is the chain parameters to run a node on the Ethereum Social main network.
 	SocialChainConfig = &ChainConfig{
+		NetworkID:           28,
 		ChainID:             big.NewInt(28),
 		HomesteadBlock:      big.NewInt(0),
 		DAOForkBlock:        nil,

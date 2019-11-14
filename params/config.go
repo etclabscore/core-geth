@@ -219,6 +219,7 @@ var (
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
 	AllEthashProtocolChanges = &ChainConfig{
+		1,
 		big.NewInt(1337), // ChainID
 
 		big.NewInt(0), // HomesteadBlock
@@ -288,6 +289,7 @@ var (
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
 	AllCliqueProtocolChanges = &ChainConfig{
+		5,
 		big.NewInt(1337), // ChainID
 
 		big.NewInt(0), // HomesteadBlock
@@ -356,6 +358,7 @@ var (
 
 	// TestChainConfig is used for tests.
 	TestChainConfig = &ChainConfig{
+		3,
 		big.NewInt(1), // ChainID
 
 		big.NewInt(0), // HomesteadBlock
@@ -471,6 +474,7 @@ type CheckpointOracleConfig struct {
 // that any network, identified by its genesis block, can have its own
 // set of configuration options.
 type ChainConfig struct {
+	NetworkID uint64 `json:"networkId"`
 	ChainID *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
 
 	// HF: Homestead

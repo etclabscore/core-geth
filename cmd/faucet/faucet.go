@@ -182,74 +182,63 @@ func main() {
 			flag  bool
 			gs    *core.Genesis
 			bs    []string
-			netid uint64
 		}{
 			{
 				*foundationFlag,
 				core.DefaultGenesisBlock(),
 				params.MainnetBootnodes,
-				params.NetworkIDFoundation,
 			},
 			{
 				*classicFlag,
 				core.DefaultClassicGenesisBlock(),
 				params.ClassicBootnodes,
-				params.NetworkIDClassic,
 			},
 			{
 				*mordorFlag,
 				core.DefaultMordorGenesisBlock(),
 				params.MordorBootnodes,
-				params.NetworkIDMordor,
 			},
 			{
 				*socialFlag,
 				core.DefaultSocialGenesisBlock(),
 				params.SocialBootnodes,
-				params.NetworkIDSocial,
 			},
 			{
 				*ethersocialFlag,
 				core.DefaultEthersocialGenesisBlock(),
 				params.EthersocialBootnodes,
-				params.NetworkIDEthersocial,
 			},
 			{
 				*mixFlag,
 				core.DefaultMixGenesisBlock(),
 				params.MixBootnodes,
-				params.NetworkIDMix,
 			},
 			{
 				*testnetFlag,
 				core.DefaultTestnetGenesisBlock(),
 				params.TestnetBootnodes,
-				params.NetworkIDTestnet,
 			},
 			{
 				*rinkebyFlag,
 				core.DefaultRinkebyGenesisBlock(),
 				params.RinkebyBootnodes,
-				params.NetworkIDRinkeby,
 			},
 			{
 				*kottiFlag,
 				core.DefaultKottiGenesisBlock(),
 				params.KottiBootnodes,
-				params.NetworkIDKotti,
 			},
 			{
 				*goerliFlag,
 				core.DefaultGoerliGenesisBlock(),
 				params.GoerliBootnodes,
-				params.NetworkIDGoerli,
 			},
 		}
 
 		var bss []string
 		for _, conf := range configs {
 			if conf.flag {
-				gs, bss, netid = conf.gs, conf.bs, conf.netid
+				gs, bss, netid = conf.gs, conf.bs, conf.gs.Config.NetworkID
 				break
 			}
 		}

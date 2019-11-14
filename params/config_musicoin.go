@@ -27,6 +27,7 @@ var (
 
 	// MusicoinChainConfig is the chain parameters to run a node on the main network.
 	MusicoinChainConfig = &ChainConfig{
+		NetworkID:      1,
 		MCIP0Block:     big.NewInt(0),
 		ChainID:        big.NewInt(7762959),
 		HomesteadBlock: big.NewInt(1150000),

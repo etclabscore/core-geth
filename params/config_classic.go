@@ -24,6 +24,7 @@ import (
 var (
 	// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
 	ClassicChainConfig = &ChainConfig{
+		NetworkID:           1,
 		ChainID:             big.NewInt(61),
 		HomesteadBlock:      big.NewInt(1150000),
 		DAOForkBlock:        big.NewInt(1920000),

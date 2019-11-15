@@ -35,7 +35,7 @@ ios:
 	@echo "Import \"$(GOBIN)/Geth.framework\" to use the library."
 
 test: all
-	go run build/ci.go test
+	go run build/ci.go test $(testargs)
 
 lint: ## Run linters.
 	go run build/ci.go lint

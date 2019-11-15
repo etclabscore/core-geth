@@ -37,6 +37,9 @@ ios:
 test: all
 	go run build/ci.go test $(testargs)
 
+test-multigeth: ## Runs tests specific to multi-geth.
+	env MULTIGETH_TESTS_CHAINCONFIG_EQUIVALANCE=on go run build/ci.go test $(testargs)
+
 lint: ## Run linters.
 	go run build/ci.go lint
 

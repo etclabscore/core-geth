@@ -132,6 +132,7 @@ type CParamsParams struct {
 	ByzantiumForkBlock         *math.HexOrDecimal64  `json:"byzantiumForkBlock"`
 	ConstantinopleForkBlock    *math.HexOrDecimal64  `json:"constantinopleForkBlock"`
 	ConstantinopleFixForkBlock *math.HexOrDecimal64  `json:"constantinopleFixForkBlock"`
+	IstanbulBlock              *math.HexOrDecimal64  `json:"istanbulForkBlock"`
 	ChainID                    *math.HexOrDecimal256 `json:"chainID"`
 	MaximumExtraDataSize       math.HexOrDecimal64   `json:"maximumExtraDataSize"`
 	TieBreakingGas             bool                  `json:"tieBreakingGas"`
@@ -319,6 +320,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 		byzantiumBlock      *big.Int
 		constantinopleBlock *big.Int
 		petersburgBlock     *big.Int
+		istanbulBlock       *big.Int
 	)
 	if chainParams.Params.HomesteadForkBlock != nil {
 		homesteadBlock = big.NewInt(int64(*chainParams.Params.HomesteadForkBlock))
@@ -345,6 +347,10 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 	if constantinopleBlock != nil && petersburgBlock == nil {
 		petersburgBlock = big.NewInt(100000000000)
 	}
+	if chainParams.Params.IstanbulBlock != nil {
+		istanbulBlock = big.NewInt(int64(*chainParams.Params.IstanbulBlock))
+	}
+
 	genesis := &core.Genesis{
 		Config: &params.ChainConfig{
 			ChainID:             chainId,
@@ -357,6 +363,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 			ByzantiumBlock:      byzantiumBlock,
 			ConstantinopleBlock: constantinopleBlock,
 			PetersburgBlock:     petersburgBlock,
+			IstanbulBlock:       istanbulBlock,
 		},
 		Nonce:      uint64(chainParams.Genesis.Nonce),
 		Timestamp:  uint64(chainParams.Genesis.Timestamp),
@@ -501,7 +508,7 @@ func (api *RetestethAPI) mineBlock() error {
 				statedb.Prepare(tx.Hash(), common.Hash{}, txCount)
 				snap := statedb.Snapshot()
 
-				receipt, _, err := core.ApplyTransaction(
+				receipt, err := core.ApplyTransaction(
 					api.chainConfig,
 					api.blockchain,
 					&api.author,
@@ -672,7 +679,7 @@ func (api *RetestethAPI) AccountRange(ctx context.Context,
 	}
 	it := trie.NewIterator(accountTrie.NodeIterator(common.BigToHash((*big.Int)(addressHash)).Bytes()))
 	result := AccountRangeResult{AddressMap: make(map[common.Hash]common.Address)}
-	for i := 0; /*i < int(maxResults) && */ it.Next(); i++ {
+	for i := 0; i < int(maxResults) && it.Next(); i++ {
 		if preimage := accountTrie.GetKey(it.Key); preimage != nil {
 			result.AddressMap[common.BytesToHash(it.Key)] = common.BytesToAddress(preimage)
 			//fmt.Printf("%x: %x\n", it.Key, preimage)

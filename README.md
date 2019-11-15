@@ -2,16 +2,15 @@
 
 > A "swiss army knife" distribution of _go-ethereum_, with support for many species of Ethereum networks.
 
-[![OpenRPC](https://img.shields.io/static/v1.svg?label=OpenRPC&message=1.0.10&color=blue)](#openrpc-discovery)
+[![OpenRPC](https://img.shields.io/static/v1.svg?label=OpenRPC&message=1.1.8&color=blue)](#openrpc-discovery)
 [![API Reference](
 https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/68747470733a2f2f676f646f632e6f72672f6769746875622e636f6d2f676f6c616e672f6764646f3f7374617475732e737667
 )](https://godoc.org/github.com/multi-geth/multi-geth)
-[![Go Report Card](https://goreportcard.com/badge/github.com/etclabscore/multi-geth)](https://goreportcard.com/report/github.com/etclabscore/multi-geth)
-[![Travis](https://travis-ci.org/etclabscore/multi-geth.svg?branch=master)](https://travis-ci.org/etclabscore/multi-geth)
-[![Gitter](https://badges.gitter.im/multi-geth/community.svg)](https://gitter.im/multi-geth/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Go Report Card](https://goreportcard.com/badge/github.com/multi-geth/multi-geth)](https://goreportcard.com/report/github.com/multi-geth/multi-geth)
+[![Travis](https://travis-ci.org/multi-geth/multi-geth.svg?branch=master)](https://travis-ci.org/multi-geth/multi-geth)
 [![Code Shelter](https://www.codeshelter.co/static/badges/badge-flat.svg)](https://www.codeshelter.co/)
 
-Binary archives are published at https://github.com/etclabscore/multi-geth/releases.
+Binary archives are published at https://github.com/multi-geth/multi-geth/releases.
 
 Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) is merged to this repository regularly,
  usually at every upstream tagged release. Every effort is made to maintain seamless compatibility with upstream source, including compatible RPC, JS, and CLI
@@ -22,7 +21,7 @@ Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-
 
 Networks supported by the respective go-ethereum packaged `geth` client.
 
-| Ticker | Network/Client                        | multi-geth                                       | [etclabscore/go-ethereum](https://github.com/etclabscore/go-ethereum) | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
+| Ticker | Network/Client                        | multi-geth                                       | [ethereumclassic/go-ethereum](https://github.com/ethereumclassic/go-ethereum) | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
 | ---    | ---                                   | ---                                              | ---                                                                           | ---                                                             |
 | ETH    | Ethereum (Foundation)                 | :heavy_check_mark:                               |                                                                               | :heavy_check_mark:                                              |
 | ETC    | Ethereum Classic                      | :heavy_check_mark:                               | :heavy_check_mark:                                                            |                                                                 |
@@ -51,8 +50,29 @@ Ellaism users are asked to switch to
 
 ## Managing versions
 
-`multi-geth` is a fork of [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum), but build dependencies have been upgraded to use [Go modules](https://github.com/golang/go/wiki/Modules).
-You can clone it anywhere in your filesystem (either inside or outside of `$GOPATH`).
+Since this is a downstream fork of [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum), you'll want to maintain the go import path and git remotes accordingly.
+This repository should occupy `$GOPATH/src/github.com/ethereum/go-ethereum`, and you can optionally use `git` to set this fork as a default upstream remote.
+On Linux or Mac, this can be accomplished by the following or similar.
+
+For __a fresh install__, the below. This will set [multi-geth/multi-geth](https://github.com/multi-geth/multi-geth) as as the `git` remote `origin` by default.
+
+```sh
+$ env path=$GOPATH/src/github.com/ethereum mkdir -p $path && cd $path
+$ git clone https://github.com/multi-geth/multi-geth.git go-ethereum && cd go-ethereum
+```
+
+Or, with __an existing copy of the ethereum/go-ethereum source__, the below. This will set [multi-geth/multi-geth](https://github.com/multi-geth/multi-geth) as the `git` remote `multi-geth`,
+and set the local branch `master` to track this repository's `master` branch.
+
+```sh
+$ cd $GOPATH/src/github.com/ethereum/go-ethereum
+$ git remote add multi-geth https://github.com/multi-geth/multi-geth.git
+$ git fetch multi-geth
+$ git checkout -B master -t multi-geth/master
+```
+
+:information_source: Note that these instructions assume a traditional use of `GOPATH`-based Go project organization. Because of the way the `make` command works for this project (using a "GOPATH/work dir" pattern for building)
+you don't have to follow tradition to build; cloning this repo anywhere in your filesystem should be adequate.
 
 ## Building the source
 
@@ -142,7 +162,7 @@ Specifying the `--testnet` flag, however, will reconfigure your `geth` instance 
    this.
  * Instead of connecting the main Ethereum network, the client will connect to the test
    network, which uses different P2P bootnodes, different network IDs and genesis states.
-   
+
 *Note: Although there are some internal protective measures to prevent transactions from
 crossing over between the main network and test network, you should make sure to always
 use separate accounts for play-money and real-money. Unless you manually move
@@ -295,10 +315,14 @@ aware of and agree upon. This consists of a small JSON file (e.g. call it `genes
 ```json
 {
   "config": {
-    "chainId": 0,
+    "chainId": <arbitrary positive integer>,
     "homesteadBlock": 0,
+    "eip150Block": 0,
     "eip155Block": 0,
-    "eip158Block": 0
+    "eip158Block": 0,
+    "byzantiumBlock": 0,
+    "constantinopleBlock": 0,
+    "petersburgBlock": 0
   },
   "alloc": {},
   "coinbase": "0x0000000000000000000000000000000000000000",
@@ -314,8 +338,8 @@ aware of and agree upon. This consists of a small JSON file (e.g. call it `genes
 
 The above fields should be fine for most purposes, although we'd recommend changing
 the `nonce` to some random value so you prevent unknown remote nodes from being able
-to connect to you. If you'd like to pre-fund some accounts for easier testing, you can
-populate the `alloc` field with account configs:
+to connect to you. If you'd like to pre-fund some accounts for easier testing, create
+the accounts and populate the `alloc` field with their addresses.
 
 ```json
 "alloc": {
@@ -384,7 +408,7 @@ ones either). To start a `geth` instance for mining, run it with all your usual 
 by:
 
 ```shell
-$ geth <usual-flags> --mine --minerthreads=1 --etherbase=0x0000000000000000000000000000000000000000
+$ geth <usual-flags> --mine --miner.threads=1 --etherbase=0x0000000000000000000000000000000000000000
 ```
 
 Which will start mining blocks and transactions on a single CPU thread, crediting all
@@ -427,3 +451,4 @@ also included in our repository in the `COPYING.LESSER` file.
 The go-ethereum binaries (i.e. all code inside of the `cmd` directory) is licensed under the
 [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html), also
 included in our repository in the `COPYING` file.
+

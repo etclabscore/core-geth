@@ -549,7 +549,23 @@ type ChainConfig struct {
 
 	PetersburgBlock *big.Int `json:"petersburgBlock,omitempty"` // Petersburg switch block (nil = same as Constantinople)
 
+	// HF: Istanbul
 	IstanbulBlock *big.Int `json:"istanbulBlock,omitempty"` // Istanbul switch block (nil = no fork, 0 = already on istanbul)
+	//
+	// EIP-152: Add Blake2 compression function F precompile
+	EIP152FBlock *big.Int `json:"eip152FBlock,omitempty"`
+	// EIP-1108: Reduce alt_bn128 precompile gas costs
+	EIP1108FBlock *big.Int `json="eip1108FBlock,omitempty"`
+	// EIP-1344: Add ChainID opcode
+	EIP1344FBlock *big.Int `json="eip1344FBlock,omitempty"`
+	// EIP-1884: Repricing for trie-size-dependent opcodes
+	EIP1884FBlock *big.Int `json="eip1884FBlock,omitempty"`
+	// EIP-2028: Calldata gas cost reduction
+	EIP2028FBlock *big.Int `json="eip2028FBlock,omitempty"`
+	// EIP-2200: Rebalance net-metered SSTORE gas cost with consideration of SLOAD gas cost change
+	EIP2200FBlock *big.Int `json="eip2200FBlock,omitempty"`
+
+
 	EWASMBlock    *big.Int `json:"ewasmBlock,omitempty"`    // EWASM switch block (nil = no fork, 0 = already activated)
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block
@@ -742,32 +758,32 @@ func (c *ChainConfig) IsEIP1283F(num *big.Int) bool {
 
 // IsEIP152F returns whether num is equal to or greater than the Istanbul block.
 func (c *ChainConfig) IsEIP152F(num *big.Int) bool {
-	return isForked(c.IstanbulBlock, num)
+	return isForked(c.IstanbulBlock, num) || isForked(c.EIP152FBlock, num)
 }
 
 // IsEIP1108F returns whether num is equal to or greater than the Istanbul block.
 func (c *ChainConfig) IsEIP1108F(num *big.Int) bool {
-	return isForked(c.IstanbulBlock, num)
+	return isForked(c.IstanbulBlock, num) || isForked(c.EIP1108FBlock, num)
 }
 
 // IsEIP1344F returns whether num is equal to or greater than the Istanbul block.
 func (c *ChainConfig) IsEIP1344F(num *big.Int) bool {
-	return isForked(c.IstanbulBlock, num)
+	return isForked(c.IstanbulBlock, num) || isForked(c.EIP1344FBlock, num)
 }
 
 // IsEIP1884F returns whether num is equal to or greater than the Istanbul block.
 func (c *ChainConfig) IsEIP1884F(num *big.Int) bool {
-	return isForked(c.IstanbulBlock, num)
+	return isForked(c.IstanbulBlock, num) || isForked(c.EIP1884FBlock, num)
 }
 
 // IsEIP2028F returns whether num is equal to or greater than the Istanbul block.
 func (c *ChainConfig) IsEIP2028F(num *big.Int) bool {
-	return isForked(c.IstanbulBlock, num)
+	return isForked(c.IstanbulBlock, num) || isForked(c.EIP2028FBlock, num)
 }
 
 // IsEIP2200F returns whether num is equal to or greater than the Istanbul block.
 func (c *ChainConfig) IsEIP2200F(num *big.Int) bool {
-	return isForked(c.IstanbulBlock, num)
+	return isForked(c.IstanbulBlock, num) || isForked(c.EIP2200FBlock, num)
 }
 
 func (c *ChainConfig) IsBombDisposal(num *big.Int) bool {

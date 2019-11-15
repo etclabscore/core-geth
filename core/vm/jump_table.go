@@ -75,7 +75,7 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 			returns:     true,
 		}
 	}
-	// Spurious Dragon
+	// Tangerine Whistle
 	if config.IsEIP150(bn) {
 		instructionSet[BALANCE].constantGas = params.BalanceGasEIP150
 		instructionSet[EXTCODESIZE].constantGas = params.ExtcodeSizeGasEIP150
@@ -85,7 +85,7 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 		instructionSet[CALLCODE].constantGas = params.CallGasEIP150
 		instructionSet[DELEGATECALL].constantGas = params.CallGasEIP150
 	}
-	// Tangerine Whistle
+	// Spurious Dragon
 	if config.IsEIP160F(bn) {
 		instructionSet[EXP].dynamicGas = gasExpEIP158
 	}

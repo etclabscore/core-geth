@@ -37,6 +37,7 @@ var (
 		SocialBlock:         nil,
 		EthersocialBlock:    nil,
 		ConstantinopleBlock: nil,
+		ECIP1017FBlock:      big.NewInt(5000000),
 		ECIP1017EraRounds:   big.NewInt(5000000),
 		EIP160FBlock:        big.NewInt(3000000),
 		ECIP1010PauseBlock:  big.NewInt(3000000),

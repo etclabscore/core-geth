@@ -40,6 +40,7 @@ var (
 		SocialBlock:         big.NewInt(0),
 		EthersocialBlock:    nil,
 		ConstantinopleBlock: nil,
+		ECIP1017FBlock:      big.NewInt(5000000),
 		ECIP1017EraRounds:   big.NewInt(5000000),
 		EIP160FBlock:        big.NewInt(0),
 		Ethash:              new(EthashConfig),

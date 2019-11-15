@@ -821,36 +821,13 @@ func (c *ChainConfig) CheckCompatible(newcfg *ChainConfig, height uint64) *Confi
 // CheckConfigForkOrder checks that we don't "skip" any forks, geth isn't pluggable enough
 // to guarantee that forks
 func (c *ChainConfig) CheckConfigForkOrder() error {
-	type fork struct {
-		name  string
-		block *big.Int
-	}
-	var lastFork fork
-	for _, cur := range []fork{
-		{"homesteadBlock", c.HomesteadBlock},
-		{"eip150Block", c.EIP150Block},
-		{"eip155Block", c.EIP155Block},
-		{"eip158Block", c.EIP158Block},
-		{"byzantiumBlock", c.ByzantiumBlock},
-		{"constantinopleBlock", c.ConstantinopleBlock},
-		{"petersburgBlock", c.PetersburgBlock},
-		{"istanbulBlock", c.IstanbulBlock},
-	} {
-		if lastFork.name != "" {
-			// Next one must be higher number
-			if lastFork.block == nil && cur.block != nil {
-				return fmt.Errorf("unsupported fork ordering: %v not enabled, but %v enabled at %v",
-					lastFork.name, cur.name, cur.block)
-			}
-			if lastFork.block != nil && cur.block != nil {
-				if lastFork.block.Cmp(cur.block) > 0 {
-					return fmt.Errorf("unsupported fork ordering: %v enabled at %v, but %v enabled at %v",
-						lastFork.name, lastFork.block, cur.name, cur.block)
-				}
-			}
-		}
-		lastFork = cur
-	}
+	// Multi-geth does not set or rely on these values in the same way
+	// that ethereum/go-ethereum does; so multi-geth IS "pluggable" in this way -
+	// (with chain configs broken into independent features, fork feature implementations
+	// do not need to make assumptions about preceding forks or their associated
+	// features).
+	// This method was added in response to an issue, summarized here:
+	// https://github.com/ethereum/go-ethereum/issues/20136#issuecomment-541895855
 	return nil
 }
 

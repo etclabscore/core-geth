@@ -814,7 +814,7 @@ func (c *ChainConfig) CheckCompatible(newcfg *ChainConfig, height uint64) *Confi
 }
 
 // CheckConfigForkOrder checks that we don't "skip" any forks, geth isn't pluggable enough
-// to guarantee that forks
+// to guarantee that forks can be implemented in a different order than on official networks
 func (c *ChainConfig) CheckConfigForkOrder() error {
 	// Multi-geth does not set or rely on these values in the same way
 	// that ethereum/go-ethereum does; so multi-geth IS "pluggable" in this way -

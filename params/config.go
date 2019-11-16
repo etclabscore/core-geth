@@ -256,6 +256,12 @@ var (
 
 		big.NewInt(0), // PetersburgBlock
 		big.NewInt(0), // IstanbulBlock
+		nil, // EIP152FBlock
+		nil, // EIP1108FBlock
+		nil, // EIP1344FBlock
+		nil, // EIP1884FBlock
+		nil, // EIP2028FBlock
+		nil, // EIP2200FBlock
 		nil, // EWASMBlock
 
 		nil, // ECIP1010PauseBlock
@@ -319,6 +325,12 @@ var (
 
 		nil, // PetersburgBlock
 		nil, // IstanbulBlock
+		nil, // EIP152FBlock
+		nil, // EIP1108FBlock
+		nil, // EIP1344FBlock
+		nil, // EIP1884FBlock
+		nil, // EIP2028FBlock
+		nil, // EIP2200FBlock
 		nil, // EWASMBlock
 
 		nil, // ECIP1010PauseBlock
@@ -381,6 +393,12 @@ var (
 
 		nil, // PetersburgBlock
 		nil, // IstanbulBlock
+		nil, // EIP152FBlock
+		nil, // EIP1108FBlock
+		nil, // EIP1344FBlock
+		nil, // EIP1884FBlock
+		nil, // EIP2028FBlock
+		nil, // EIP2200FBlock
 		nil, // EWASMBlock
 
 		nil, // ECIP1010PauseBlock

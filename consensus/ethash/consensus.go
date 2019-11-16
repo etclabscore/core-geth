@@ -316,7 +316,7 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 		// diff = (parent_diff +
 		//         (parent_diff / 2048 * max((2 if len(parent.uncles) else 1) - ((timestamp - parent.timestamp) // 9), -99))
 		//        ) + 2^(periodCount - 2)
-		out.Div(parent_time_delta(time, parent), big9)
+		out.Div(parent_time_delta(time, parent), params.EIP100FDifficultyIncrementDivisor)
 
 		if parent.UncleHash == types.EmptyUncleHash {
 			out.Sub(big1, out)
@@ -333,7 +333,7 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 		// diff = (parent_diff +
 		//         (parent_diff / 2048 * max(1 - (block_timestamp - parent_timestamp) // 10, -99))
 		//        )
-		out.Div(parent_time_delta(time, parent), big10)
+		out.Div(parent_time_delta(time, parent), params.EIP2DifficultyIncrementDivisor)
 		out.Sub(big1, out)
 		out.Set(math.BigMax(out, bigMinus99))
 		out.Mul(parent_diff_over_dbd(parent), out)

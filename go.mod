@@ -6,7 +6,7 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/Azure/go-autorest/autorest/adal v0.6.0 // indirect
 	github.com/allegro/bigcache v0.0.0-20190218064605-e24eb225f156
-	github.com/apilayer/freegeoip v0.0.0-20180702111401-3f942d1392f6
+	github.com/apilayer/freegeoip v0.0.0-20180702111401-3f942d1392f6 // indirect
 	github.com/aristanetworks/goarista v0.0.0-20170210015632-ea17b1a17847
 	github.com/btcsuite/btcd v0.0.0-20171128150713-2e60448ffcc6
 	github.com/cespare/cp v0.1.0
@@ -35,7 +35,7 @@ require (
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.0
 	github.com/mattn/go-isatty v0.0.3
-	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
+	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/naoina/go-stringutil v0.1.0 // indirect
 	github.com/naoina/toml v0.0.0-20170918210437-9fafd6967416
 	github.com/olekukonko/tablewriter v0.0.1

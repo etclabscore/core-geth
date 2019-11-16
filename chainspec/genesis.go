@@ -457,16 +457,28 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	})
 	if genesis.Config.ByzantiumBlock != nil {
 		spec.setPrecompile(5, &parityChainSpecBuiltin{
-			Name: "modexp", ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock), Pricing: &parityChainSpecPricing{ModExp: &parityChainSpecModExpPricing{Divisor: 20}},
+			Name: "modexp",
+			ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock),
+			Pricing: &parityChainSpecPricing{
+				ModExp: &parityChainSpecModExpPricing{Divisor: 20}},
 		})
 		spec.setPrecompile(6, &parityChainSpecBuiltin{
-			Name: "alt_bn128_add", ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock), Pricing: &parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 500}},
+			Name: "alt_bn128_add",
+			ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock),
+			Pricing: &parityChainSpecPricing{
+				AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 500}},
 		})
 		spec.setPrecompile(7, &parityChainSpecBuiltin{
-			Name: "alt_bn128_mul", ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock), Pricing: &parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 40000}},
+			Name: "alt_bn128_mul",
+			ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock),
+			Pricing: &parityChainSpecPricing{
+				AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 40000}},
 		})
 		spec.setPrecompile(8, &parityChainSpecBuiltin{
-			Name: "alt_bn128_pairing", ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock), Pricing: &parityChainSpecPricing{AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000}},
+			Name: "alt_bn128_pairing",
+			ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock),
+			Pricing: &parityChainSpecPricing{
+				AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000}},
 		})
 	}
 	if genesis.Config.IstanbulBlock != nil {
@@ -474,16 +486,28 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 			return nil, errors.New("invalid genesis, istanbul fork is enabled while byzantium is not")
 		}
 		spec.setPrecompile(6, &parityChainSpecBuiltin{
-			Name: "alt_bn128_add", ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock), EIP1108Transition: (*hexutil.Big)(genesis.Config.IstanbulBlock), Pricing: &parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 500, EIP1108TransitionPrice: 150}},
+			Name: "alt_bn128_add",
+			ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock), EIP1108Transition: (*hexutil.Big)(genesis.Config.IstanbulBlock),
+			Pricing: &parityChainSpecPricing{
+				AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 500, EIP1108TransitionPrice: 150}},
 		})
 		spec.setPrecompile(7, &parityChainSpecBuiltin{
-			Name: "alt_bn128_mul", ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock), EIP1108Transition: (*hexutil.Big)(genesis.Config.IstanbulBlock), Pricing: &parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 40000, EIP1108TransitionPrice: 6000}},
+			Name: "alt_bn128_mul",
+			ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock), EIP1108Transition: (*hexutil.Big)(genesis.Config.IstanbulBlock),
+			Pricing: &parityChainSpecPricing{
+				AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 40000, EIP1108TransitionPrice: 6000}},
 		})
 		spec.setPrecompile(8, &parityChainSpecBuiltin{
-			Name: "alt_bn128_pairing", ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock), EIP1108Transition: (*hexutil.Big)(genesis.Config.IstanbulBlock), Pricing: &parityChainSpecPricing{AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000, EIP1108TransitionBase: 45000, EIP1108TransitionPair: 34000}},
+			Name: "alt_bn128_pairing",
+			ActivateAt: (*hexutil.Big)(genesis.Config.ByzantiumBlock), EIP1108Transition: (*hexutil.Big)(genesis.Config.IstanbulBlock),
+			Pricing: &parityChainSpecPricing{
+				AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000, EIP1108TransitionBase: 45000, EIP1108TransitionPair: 34000}},
 		})
 		spec.setPrecompile(9, &parityChainSpecBuiltin{
-			Name: "blake2_f", ActivateAt: (*hexutil.Big)(genesis.Config.IstanbulBlock), Pricing: &parityChainSpecPricing{Blake2F: &parityChainSpecBlakePricing{GasPerRound: 1}},
+			Name: "blake2_f",
+			ActivateAt: (*hexutil.Big)(genesis.Config.IstanbulBlock),
+			Pricing: &parityChainSpecPricing{
+				Blake2F: &parityChainSpecBlakePricing{GasPerRound: 1}},
 		})
 	}
 	return spec, nil

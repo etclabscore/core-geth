@@ -666,7 +666,7 @@ func (c *ChainConfig) String() string {
 
 // IsECIP1017F returns whether the chain is configured with ECIP1017.
 func (c *ChainConfig) IsECIP1017F(num *big.Int) bool {
-	return isForked(c.ECIP1017FBlock, num)
+	return isForked(c.ECIP1017FBlock, num) || c.ECIP1017EraRounds != nil
 }
 
 // IsEIP2F returns whether num is equal to or greater than the Homestead or EIP2 block.

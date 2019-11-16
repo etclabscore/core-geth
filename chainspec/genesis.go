@@ -237,7 +237,7 @@ type ParityChainSpec struct {
 				MinimumDifficulty      *hexutil.Big      `json:"minimumDifficulty"`
 				DifficultyBoundDivisor *hexutil.Big      `json:"difficultyBoundDivisor"`
 				DurationLimit          *hexutil.Big      `json:"durationLimit"`
-				BlockReward            map[string]string `json:"blockReward"`
+				BlockReward            Uint64BigValOrMapHex `json:"blockReward"`
 				DifficultyBombDelays   map[string]string `json:"difficultyBombDelays"`
 				HomesteadTransition    hexutil.Uint64    `json:"homesteadTransition"`
 				EIP100bTransition      hexutil.Uint64    `json:"eip100bTransition"`
@@ -368,13 +368,13 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		Datadir: strings.ToLower(network),
 	}
 	if genesis.Config.Ethash != nil {
-		spec.Engine.Ethash.Params.BlockReward = make(map[string]string)
+		spec.Engine.Ethash.Params.BlockReward = Uint64BigValOrMapHex{}
 		spec.Engine.Ethash.Params.DifficultyBombDelays = make(map[string]string)
 		// Frontier
 		spec.Engine.Ethash.Params.MinimumDifficulty = (*hexutil.Big)(params.MinimumDifficulty)
 		spec.Engine.Ethash.Params.DifficultyBoundDivisor = (*hexutil.Big)(params.DifficultyBoundDivisor)
 		spec.Engine.Ethash.Params.DurationLimit = (*hexutil.Big)(params.DurationLimit)
-		spec.Engine.Ethash.Params.BlockReward["0x0"] = hexutil.EncodeBig(ethash.FrontierBlockReward)
+		spec.Engine.Ethash.Params.BlockReward[0] = ethash.FrontierBlockReward
 	}
 	if genesis.Config.Clique != nil {
 		spec.Engine.Clique.Params.Period = hexutil.Uint64(genesis.Config.Clique.Period)
@@ -525,7 +525,7 @@ func (spec *ParityChainSpec) setPrecompile(address byte, data *parityChainSpecBu
 }
 
 func (spec *ParityChainSpec) setByzantium(num *big.Int) {
-	spec.Engine.Ethash.Params.BlockReward[hexutil.EncodeBig(num)] = hexutil.EncodeBig(ethash.EIP649FBlockReward)
+	spec.Engine.Ethash.Params.BlockReward[num.Uint64()] = ethash.EIP649FBlockReward
 	spec.Engine.Ethash.Params.DifficultyBombDelays[hexutil.EncodeBig(num)] = hexutil.EncodeUint64(3000000)
 	n := hexutil.Uint64(num.Uint64())
 	spec.Engine.Ethash.Params.EIP100bTransition = n
@@ -536,7 +536,7 @@ func (spec *ParityChainSpec) setByzantium(num *big.Int) {
 }
 
 func (spec *ParityChainSpec) setConstantinople(num *big.Int) {
-	spec.Engine.Ethash.Params.BlockReward[hexutil.EncodeBig(num)] = hexutil.EncodeBig(ethash.EIP1234FBlockReward)
+	spec.Engine.Ethash.Params.BlockReward[num.Uint64()] = ethash.EIP1234FBlockReward
 	spec.Engine.Ethash.Params.DifficultyBombDelays[hexutil.EncodeBig(num)] = hexutil.EncodeUint64(2000000)
 	n := hexutil.Uint64(num.Uint64())
 	spec.Params.EIP145Transition = n

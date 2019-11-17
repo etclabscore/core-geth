@@ -139,3 +139,10 @@ var (
 	EIP2DifficultyIncrementDivisor    = big.NewInt(10)     // Is related to the equilibrium block intervals for the Homestead era difficulty evolution, redefines the value in (YP:43), originally 10 = 0xa
 	EIP100FDifficultyIncrementDivisor = big.NewInt(9)
 )
+
+var FrontierBlockReward = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
+
+var EIP649FBlockReward = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
+
+var EIP1234FBlockReward = big.NewInt(2e+18) // Block reward in wei for successfully mining a block upward from Constantinople
+

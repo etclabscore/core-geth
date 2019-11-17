@@ -25,7 +25,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	math2 "github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/params"
 )
@@ -142,7 +141,7 @@ func NewAlethGenesisSpec(network string, genesis *core.Genesis) (*AlethGenesisSp
 	spec.Params.DifficultyBoundDivisor = (*math2.HexOrDecimal256)(params.DifficultyBoundDivisor)
 	spec.Params.GasLimitBoundDivisor = (math2.HexOrDecimal64)(params.GasLimitBoundDivisor)
 	spec.Params.DurationLimit = (*math2.HexOrDecimal256)(params.DurationLimit)
-	spec.Params.BlockReward = (*hexutil.Big)(ethash.FrontierBlockReward)
+	spec.Params.BlockReward = (*hexutil.Big)(params.FrontierBlockReward)
 
 	spec.Genesis.Nonce = (hexutil.Bytes)(make([]byte, 8))
 	binary.LittleEndian.PutUint64(spec.Genesis.Nonce[:], genesis.Nonce)
@@ -379,8 +378,8 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	}
 	if genesis.Config.Ethash != nil {
 		spec.Engine.Ethash.Params.DifficultyBombDelays = make(map[string]string)
-		spec.Engine.Ethash.Params.BlockReward = Uint64BigValOrMapHex{}
-		spec.Engine.Ethash.Params.BlockReward[0] = ethash.FrontierBlockReward
+		spec.Engine.Ethash.Params.BlockReward = hexutil.Uint64BigValOrMapHex{}
+		spec.Engine.Ethash.Params.BlockReward[0] = params.FrontierBlockReward
 
 		spec.Engine.Ethash.Params.MinimumDifficulty = (*hexutil.Big)(params.MinimumDifficulty)
 		spec.Engine.Ethash.Params.DifficultyBoundDivisor = (*hexutil.Big)(params.DifficultyBoundDivisor)
@@ -391,11 +390,11 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		}
 
 		if b := params.FeatureOrMetaBlock(genesis.Config.EIP649FBlock, genesis.Config.ByzantiumBlock); b != nil {
-			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = ethash.EIP649FBlockReward
+			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = params.EIP649FBlockReward
 			spec.Engine.Ethash.Params.DifficultyBombDelays[hexutil.EncodeBig(b)] = hexutil.EncodeUint64(3000000)
 		}
 		if b := params.FeatureOrMetaBlock(genesis.Config.EIP1234FBlock, genesis.Config.ConstantinopleBlock); b != nil {
-			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = ethash.EIP1234FBlockReward
+			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = params.EIP1234FBlockReward
 			spec.Engine.Ethash.Params.DifficultyBombDelays[hexutil.EncodeBig(b)] = hexutil.EncodeUint64(2000000)
 		}
 

@@ -24,7 +24,7 @@ import (
 )
 
 func ecip1017BlockReward(config *params.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
-	blockReward := FrontierBlockReward
+	blockReward := params.FrontierBlockReward
 
 	// Ensure value 'era' is configured.
 	eraLen := config.ECIP1017EraRounds

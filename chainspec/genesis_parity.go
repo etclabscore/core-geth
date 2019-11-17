@@ -66,36 +66,36 @@ type ParityChainSpec struct {
 	} `json:"engine"`
 
 	Params struct {
-		AccountStartNonce         *hexutil.Uint64       `json:"accountStartNonce"`
-		MaximumExtraDataSize      *hexutil.Uint64       `json:"maximumExtraDataSize"`
-		MinGasLimit               *hexutil.Uint64       `json:"minGasLimit"`
-		GasLimitBoundDivisor      math2.HexOrDecimal64 `json:"gasLimitBoundDivisor"`
-		NetworkID                 *hexutil.Uint64       `json:"networkID"`
-		ChainID                   *hexutil.Uint64       `json:"chainID"`
-		MaxCodeSize               *hexutil.Uint64       `json:"maxCodeSize"`
-		MaxCodeSizeTransition     *hexutil.Uint64       `json:"maxCodeSizeTransition"`
-		EIP98Transition           *hexutil.Uint64       `json:"eip98Transition"`
-		EIP150Transition          *hexutil.Uint64       `json:"eip150Transition"`
-		EIP160Transition          *hexutil.Uint64       `json:"eip160Transition"`
-		EIP161abcTransition       *hexutil.Uint64       `json:"eip161abcTransition"`
-		EIP161dTransition         *hexutil.Uint64       `json:"eip161dTransition"`
-		EIP155Transition          *hexutil.Uint64       `json:"eip155Transition"`
-		EIP140Transition          *hexutil.Uint64       `json:"eip140Transition"`
-		EIP211Transition          *hexutil.Uint64       `json:"eip211Transition"`
-		EIP214Transition          *hexutil.Uint64       `json:"eip214Transition"`
-		EIP658Transition          *hexutil.Uint64       `json:"eip658Transition"`
-		EIP145Transition          *hexutil.Uint64       `json:"eip145Transition"`
-		EIP1014Transition         *hexutil.Uint64       `json:"eip1014Transition"`
-		EIP1052Transition         *hexutil.Uint64       `json:"eip1052Transition"`
-		EIP1283Transition         *hexutil.Uint64       `json:"eip1283Transition"`
-		EIP1283DisableTransition  *hexutil.Uint64       `json:"eip1283DisableTransition"`
-		EIP1283ReenableTransition *hexutil.Uint64       `json:"eip1283ReenableTransition"`
-		EIP1344Transition         *hexutil.Uint64       `json:"eip1344Transition"`
-		EIP1884Transition         *hexutil.Uint64       `json:"eip1884Transition"`
-		EIP2028Transition         *hexutil.Uint64       `json:"eip2028Transition"`
+		AccountStartNonce         *hexutil.Uint64      `json:"accountStartNonce,omitempty"`
+		MaximumExtraDataSize      *hexutil.Uint64      `json:"maximumExtraDataSize,omitempty"`
+		MinGasLimit               *hexutil.Uint64      `json:"minGasLimit,omitempty"`
+		GasLimitBoundDivisor      math2.HexOrDecimal64 `json:"gasLimitBoundDivisor,omitempty"`
+		NetworkID                 *hexutil.Uint64      `json:"networkID,omitempty"`
+		ChainID                   *hexutil.Uint64      `json:"chainID,omitempty"`
+		MaxCodeSize               *hexutil.Uint64      `json:"maxCodeSize,omitempty"`
+		MaxCodeSizeTransition     *hexutil.Uint64      `json:"maxCodeSizeTransition,omitempty"`
+		EIP98Transition           *hexutil.Uint64      `json:"eip98Transition,omitempty"`
+		EIP150Transition          *hexutil.Uint64      `json:"eip150Transition,omitempty"`
+		EIP160Transition          *hexutil.Uint64      `json:"eip160Transition,omitempty"`
+		EIP161abcTransition       *hexutil.Uint64      `json:"eip161abcTransition,omitempty"`
+		EIP161dTransition         *hexutil.Uint64      `json:"eip161dTransition,omitempty"`
+		EIP155Transition          *hexutil.Uint64      `json:"eip155Transition,omitempty"`
+		EIP140Transition          *hexutil.Uint64      `json:"eip140Transition,omitempty"`
+		EIP211Transition          *hexutil.Uint64      `json:"eip211Transition,omitempty"`
+		EIP214Transition          *hexutil.Uint64      `json:"eip214Transition,omitempty"`
+		EIP658Transition          *hexutil.Uint64      `json:"eip658Transition,omitempty"`
+		EIP145Transition          *hexutil.Uint64      `json:"eip145Transition,omitempty"`
+		EIP1014Transition         *hexutil.Uint64      `json:"eip1014Transition,omitempty"`
+		EIP1052Transition         *hexutil.Uint64      `json:"eip1052Transition,omitempty"`
+		EIP1283Transition         *hexutil.Uint64      `json:"eip1283Transition,omitempty"`
+		EIP1283DisableTransition  *hexutil.Uint64      `json:"eip1283DisableTransition,omitempty"`
+		EIP1283ReenableTransition *hexutil.Uint64      `json:"eip1283ReenableTransition,omitempty"`
+		EIP1344Transition         *hexutil.Uint64      `json:"eip1344Transition,omitempty"`
+		EIP1884Transition         *hexutil.Uint64      `json:"eip1884Transition,omitempty"`
+		EIP2028Transition         *hexutil.Uint64      `json:"eip2028Transition,omitempty"`
 
 		ForkBlock     *hexutil.Uint64 `json:"forkBlock,omitempty"`
-		ForkCanonHash *common.Hash   `json:"forkCanonHash,omitempty"`
+		ForkCanonHash *common.Hash    `json:"forkCanonHash,omitempty"`
 	} `json:"params"`
 
 	Genesis struct {
@@ -121,9 +121,11 @@ type ParityChainSpec struct {
 // parityChainSpecAccount is the prefunded genesis account and/or precompiled
 // contract definition.
 type parityChainSpecAccount struct {
-	Balance math2.HexOrDecimal256   `json:"balance"`
-	Nonce   math2.HexOrDecimal64    `json:"nonce,omitempty"`
-	Builtin *parityChainSpecBuiltin `json:"builtin,omitempty"`
+	Balance math2.HexOrDecimal256       `json:"balance"`
+	Nonce   math2.HexOrDecimal64        `json:"nonce,omitempty"`
+	Code    hexutil.Bytes               `json:"code,omitempty"`
+	Storage map[common.Hash]common.Hash `json:"storage,omitempty"`
+	Builtin *parityChainSpecBuiltin     `json:"builtin,omitempty"`
 }
 
 // parityChainSpecBuiltin is the precompiled contract definition.

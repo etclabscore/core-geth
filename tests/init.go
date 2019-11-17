@@ -96,6 +96,15 @@ func init() {
 
 				config.ConstantinopleBlock = nil
 			}
+			if config.IstanbulBlock != nil {
+				config.EIP152FBlock = config.IstanbulBlock
+				config.EIP1108FBlock = config.IstanbulBlock
+				config.EIP1344FBlock = config.IstanbulBlock
+				config.EIP1884FBlock = config.IstanbulBlock
+				config.EIP2028FBlock = config.IstanbulBlock
+				config.EIP2200FBlock = config.IstanbulBlock
+				config.IstanbulBlock = nil
+			}
 
 		}
 		spew.Config.DisableMethods = true // Turn of ChainConfig Stringer method

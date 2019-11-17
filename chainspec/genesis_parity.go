@@ -41,58 +41,61 @@ type ParityChainSpec struct {
 				DurationLimit          *hexutil.Big                 `json:"durationLimit"`
 				BlockReward            hexutil.Uint64BigValOrMapHex `json:"blockReward"`
 				DifficultyBombDelays   map[string]string            `json:"difficultyBombDelays"`
-				HomesteadTransition    hexutil.Uint64               `json:"homesteadTransition"`
-				EIP100bTransition      hexutil.Uint64               `json:"eip100bTransition"`
+				HomesteadTransition    *hexutil.Uint64               `json:"homesteadTransition"`
+				EIP100bTransition      *hexutil.Uint64               `json:"eip100bTransition"`
 
 				// Note: DAO fields will NOT be written to Parity configs from multi-geth.
 				// The chains with DAO settings are already canonical and have existing chainspecs.
 				// There is no need to replicate this information.
-				DaoHardforkTransition  hexutil.Uint64   `json:"daoHardforkTransition,omitempty"`
+				DaoHardforkTransition  *hexutil.Uint64   `json:"daoHardforkTransition,omitempty"`
 				DaoHardforkBeneficiary *common.Address  `json:"daoHardforkBeneficiary,omitempty"`
 				DaoHardforkAccounts    []common.Address `json:"daoHardforkAccounts,omitempty"`
 
-				BombDefuseTransition       hexutil.Uint64 `json:"bombDefuseTransition"`
-				ECIP1010PauseTransition    hexutil.Uint64 `json:"ecip1010PauseTransition,omitempty"`
-				ECIP1010ContinueTransition hexutil.Uint64 `json:"ecip1010ContinueTransition,omitempty"`
-				ECIP1017EraRounds          hexutil.Uint64 `json:"ecip1017EraRounds,omitempty"`
+				BombDefuseTransition       *hexutil.Uint64 `json:"bombDefuseTransition"`
+				ECIP1010PauseTransition    *hexutil.Uint64 `json:"ecip1010PauseTransition,omitempty"`
+				ECIP1010ContinueTransition *hexutil.Uint64 `json:"ecip1010ContinueTransition,omitempty"`
+				ECIP1017EraRounds          *hexutil.Uint64 `json:"ecip1017EraRounds,omitempty"`
 			} `json:"params"`
 		} `json:"Ethash,omitempty"`
 		Clique struct {
 			Params struct {
-				Period hexutil.Uint64 `json:"period"`
-				Epoch  hexutil.Uint64 `json:"epoch"`
+				Period *hexutil.Uint64 `json:"period"`
+				Epoch  *hexutil.Uint64 `json:"epoch"`
 			} `json:"params"`
 		} `json:"Clique,omitempty"`
 	} `json:"engine"`
 
 	Params struct {
-		AccountStartNonce         hexutil.Uint64       `json:"accountStartNonce"`
-		MaximumExtraDataSize      hexutil.Uint64       `json:"maximumExtraDataSize"`
-		MinGasLimit               hexutil.Uint64       `json:"minGasLimit"`
+		AccountStartNonce         *hexutil.Uint64       `json:"accountStartNonce"`
+		MaximumExtraDataSize      *hexutil.Uint64       `json:"maximumExtraDataSize"`
+		MinGasLimit               *hexutil.Uint64       `json:"minGasLimit"`
 		GasLimitBoundDivisor      math2.HexOrDecimal64 `json:"gasLimitBoundDivisor"`
-		NetworkID                 hexutil.Uint64       `json:"networkID"`
-		ChainID                   hexutil.Uint64       `json:"chainID"`
-		MaxCodeSize               hexutil.Uint64       `json:"maxCodeSize"`
-		MaxCodeSizeTransition     hexutil.Uint64       `json:"maxCodeSizeTransition"`
-		EIP98Transition           hexutil.Uint64       `json:"eip98Transition"`
-		EIP150Transition          hexutil.Uint64       `json:"eip150Transition"`
-		EIP160Transition          hexutil.Uint64       `json:"eip160Transition"`
-		EIP161abcTransition       hexutil.Uint64       `json:"eip161abcTransition"`
-		EIP161dTransition         hexutil.Uint64       `json:"eip161dTransition"`
-		EIP155Transition          hexutil.Uint64       `json:"eip155Transition"`
-		EIP140Transition          hexutil.Uint64       `json:"eip140Transition"`
-		EIP211Transition          hexutil.Uint64       `json:"eip211Transition"`
-		EIP214Transition          hexutil.Uint64       `json:"eip214Transition"`
-		EIP658Transition          hexutil.Uint64       `json:"eip658Transition"`
-		EIP145Transition          hexutil.Uint64       `json:"eip145Transition"`
-		EIP1014Transition         hexutil.Uint64       `json:"eip1014Transition"`
-		EIP1052Transition         hexutil.Uint64       `json:"eip1052Transition"`
-		EIP1283Transition         hexutil.Uint64       `json:"eip1283Transition"`
-		EIP1283DisableTransition  hexutil.Uint64       `json:"eip1283DisableTransition"`
-		EIP1283ReenableTransition hexutil.Uint64       `json:"eip1283ReenableTransition"`
-		EIP1344Transition         hexutil.Uint64       `json:"eip1344Transition"`
-		EIP1884Transition         hexutil.Uint64       `json:"eip1884Transition"`
-		EIP2028Transition         hexutil.Uint64       `json:"eip2028Transition"`
+		NetworkID                 *hexutil.Uint64       `json:"networkID"`
+		ChainID                   *hexutil.Uint64       `json:"chainID"`
+		MaxCodeSize               *hexutil.Uint64       `json:"maxCodeSize"`
+		MaxCodeSizeTransition     *hexutil.Uint64       `json:"maxCodeSizeTransition"`
+		EIP98Transition           *hexutil.Uint64       `json:"eip98Transition"`
+		EIP150Transition          *hexutil.Uint64       `json:"eip150Transition"`
+		EIP160Transition          *hexutil.Uint64       `json:"eip160Transition"`
+		EIP161abcTransition       *hexutil.Uint64       `json:"eip161abcTransition"`
+		EIP161dTransition         *hexutil.Uint64       `json:"eip161dTransition"`
+		EIP155Transition          *hexutil.Uint64       `json:"eip155Transition"`
+		EIP140Transition          *hexutil.Uint64       `json:"eip140Transition"`
+		EIP211Transition          *hexutil.Uint64       `json:"eip211Transition"`
+		EIP214Transition          *hexutil.Uint64       `json:"eip214Transition"`
+		EIP658Transition          *hexutil.Uint64       `json:"eip658Transition"`
+		EIP145Transition          *hexutil.Uint64       `json:"eip145Transition"`
+		EIP1014Transition         *hexutil.Uint64       `json:"eip1014Transition"`
+		EIP1052Transition         *hexutil.Uint64       `json:"eip1052Transition"`
+		EIP1283Transition         *hexutil.Uint64       `json:"eip1283Transition"`
+		EIP1283DisableTransition  *hexutil.Uint64       `json:"eip1283DisableTransition"`
+		EIP1283ReenableTransition *hexutil.Uint64       `json:"eip1283ReenableTransition"`
+		EIP1344Transition         *hexutil.Uint64       `json:"eip1344Transition"`
+		EIP1884Transition         *hexutil.Uint64       `json:"eip1884Transition"`
+		EIP2028Transition         *hexutil.Uint64       `json:"eip2028Transition"`
+
+		ForkBlock     *hexutil.Uint64 `json:"forkBlock,omitempty"`
+		ForkCanonHash *common.Hash   `json:"forkCanonHash,omitempty"`
 	} `json:"params"`
 
 	Genesis struct {
@@ -168,6 +171,11 @@ type parityChainSpecBlakePricing struct {
 	GasPerRound uint64 `json:"gas_per_round"`
 }
 
+func hexutilUint64(i uint64) *hexutil.Uint64 {
+	p := hexutil.Uint64(i)
+	return &p
+}
+
 // NewParityChainSpec converts a go-ethereum genesis block into a Parity specific
 // chain specification format.
 func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []string) (*ParityChainSpec, error) {
@@ -191,7 +199,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		spec.Engine.Ethash.Params.DurationLimit = (*hexutil.Big)(params.DurationLimit)
 
 		if b := params.FeatureOrMetaBlock(genesis.Config.EIP100FBlock, genesis.Config.ByzantiumBlock); b != nil {
-			spec.Engine.Ethash.Params.EIP100bTransition = hexutil.Uint64(b.Uint64())
+			spec.Engine.Ethash.Params.EIP100bTransition = hexutilUint64(b.Uint64())
 		}
 
 		if b := params.FeatureOrMetaBlock(genesis.Config.EIP649FBlock, genesis.Config.ByzantiumBlock); b != nil {
@@ -204,23 +212,23 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		}
 
 		if b := genesis.Config.DisposalBlock; b != nil {
-			spec.Engine.Ethash.Params.BombDefuseTransition = hexutil.Uint64(b.Uint64())
+			spec.Engine.Ethash.Params.BombDefuseTransition = hexutilUint64(b.Uint64())
 		}
 
 		if b := genesis.Config.ECIP1010PauseBlock; b != nil {
-			spec.Engine.Ethash.Params.ECIP1010PauseTransition = hexutil.Uint64(b.Uint64())
+			spec.Engine.Ethash.Params.ECIP1010PauseTransition = hexutilUint64(b.Uint64())
 			if c := genesis.Config.ECIP1010Length; c != nil {
-				spec.Engine.Ethash.Params.ECIP1010ContinueTransition = hexutil.Uint64(b.Uint64())
+				spec.Engine.Ethash.Params.ECIP1010ContinueTransition = hexutilUint64(b.Uint64())
 			}
 		}
 		// FIXME
 		if b := params.FeatureOrMetaBlock(genesis.Config.ECIP1017EraRounds, genesis.Config.ECIP1017FBlock); b != nil {
-			spec.Engine.Ethash.Params.ECIP1017EraRounds = hexutil.Uint64(genesis.Config.ECIP1017EraRounds.Uint64())
+			spec.Engine.Ethash.Params.ECIP1017EraRounds = hexutilUint64(genesis.Config.ECIP1017EraRounds.Uint64())
 		}
 	}
 	if genesis.Config.Clique != nil {
-		spec.Engine.Clique.Params.Period = hexutil.Uint64(genesis.Config.Clique.Period)
-		spec.Engine.Clique.Params.Epoch = hexutil.Uint64(genesis.Config.Clique.Epoch)
+		spec.Engine.Clique.Params.Period = hexutilUint64(genesis.Config.Clique.Period)
+		spec.Engine.Clique.Params.Epoch = hexutilUint64(genesis.Config.Clique.Epoch)
 	}
 
 	// Homestead
@@ -229,30 +237,34 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		genesis.Config.EIP2FBlock,
 		genesis.Config.EIP7FBlock,
 	); b != nil {
-		spec.Engine.Ethash.Params.HomesteadTransition = hexutil.Uint64(b.Uint64())
+		spec.Engine.Ethash.Params.HomesteadTransition = hexutilUint64(b.Uint64())
 	}
 
 	// Tangerine Whistle : 150
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-608.md
 	if b := genesis.Config.EIP150Block; b != nil {
-	spec.Params.EIP150Transition = hexutil.Uint64(b.Uint64())
+	spec.Params.EIP150Transition = hexutilUint64(b.Uint64())
 	}
 
 	// Spurious Dragon: 155, 160, 161, 170
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-607.md
 	if b := genesis.Config.EIP155Block; b != nil {
-		spec.Params.EIP155Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP155Transition = hexutilUint64(b.Uint64())
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP160FBlock, genesis.Config.EIP158Block); b != nil {
-		spec.Params.EIP160Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP160Transition = hexutilUint64(b.Uint64())
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP161FBlock, genesis.Config.EIP158Block); b != nil {
-		spec.Params.EIP161abcTransition = hexutil.Uint64(b.Uint64())
-		spec.Params.EIP161dTransition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP161abcTransition = hexutilUint64(b.Uint64())
+		spec.Params.EIP161dTransition = hexutilUint64(b.Uint64())
+	}
+	if b := params.FeatureOrMetaBlock(genesis.Config.EIP170FBlock, genesis.Config.EIP158Block); b != nil {
+		spec.Params.MaxCodeSizeTransition = hexutilUint64(b.Uint64())
+		spec.Params.MaxCodeSize = hexutilUint64(params.MaxCodeSize)
 	}
 
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP140FBlock, genesis.Config.ByzantiumBlock); b != nil {
-		spec.Params.EIP140Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP140Transition = hexutilUint64(b.Uint64())
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP198FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.setPrecompile(5, &parityChainSpecBuiltin{
@@ -263,7 +275,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		})
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP211FBlock, genesis.Config.ByzantiumBlock); b != nil {
-		spec.Params.EIP211Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP211Transition = hexutilUint64(b.Uint64())
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.setPrecompile(8, &parityChainSpecBuiltin{
@@ -288,33 +300,33 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		})
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP214FBlock, genesis.Config.ByzantiumBlock); b != nil {
-		spec.Params.EIP214Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP214Transition = hexutilUint64(b.Uint64())
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP658FBlock, genesis.Config.ByzantiumBlock); b != nil {
-		spec.Params.EIP658Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP658Transition = hexutilUint64(b.Uint64())
 	}
 
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP145FBlock, genesis.Config.ConstantinopleBlock); b != nil {
-		spec.Params.EIP145Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP145Transition = hexutilUint64(b.Uint64())
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1014FBlock, genesis.Config.ConstantinopleBlock); b != nil {
-		spec.Params.EIP1014Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP1014Transition = hexutilUint64(b.Uint64())
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1052FBlock, genesis.Config.ConstantinopleBlock); b != nil {
-		spec.Params.EIP1052Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP1052Transition = hexutilUint64(b.Uint64())
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1283FBlock, genesis.Config.ConstantinopleBlock); b != nil {
-		spec.Params.EIP1283Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP1283Transition = hexutilUint64(b.Uint64())
 	}
 
 	// ConstantinopleFix (remove eip-1283)
 	if num := genesis.Config.PetersburgBlock; num != nil {
-		spec.Params.EIP1283DisableTransition = hexutil.Uint64(num.Uint64())
+		spec.Params.EIP1283DisableTransition = hexutilUint64(num.Uint64())
 	}
 
 	// EIP-152: Add Blake2 compression function F precompile
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP152FBlock, genesis.Config.IstanbulBlock); b != nil {
-		//spec.Params.EIP152Transition = hexutil.Uint64(b.Uint64())
+		//spec.Params.EIP152Transition = hexutilUint64(b.Uint64())
 		spec.setPrecompile(9, &parityChainSpecBuiltin{
 			Name:       "blake2_f",
 			ActivateAt: (*hexutil.Big)(b),
@@ -325,7 +337,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	// EIP-1108: Reduce alt_bn128 precompile gas costs
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1108FBlock, genesis.Config.IstanbulBlock); b != nil {
 		if genesis.Config.IsEIP212F(b) && genesis.Config.IsEIP213F(b) {
-			//spec.Params.EIP1108Transition = hexutil.Uint64(b.Uint64())
+			//spec.Params.EIP1108Transition = hexutilUint64(b.Uint64())
 			spec.setPrecompile(6, &parityChainSpecBuiltin{
 				Name:              "alt_bn128_add",
 				ActivateAt:        (*hexutil.Big)(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock)),
@@ -352,32 +364,30 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 
 	// EIP-1344: Add ChainID opcode
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1344FBlock, genesis.Config.IstanbulBlock); b != nil {
-		spec.Params.EIP1344Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP1344Transition = hexutilUint64(b.Uint64())
 	}
 	// EIP-1884: Repricing for trie-size-dependent opcodes
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1884FBlock, genesis.Config.IstanbulBlock); b != nil {
-		spec.Params.EIP1884Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP1884Transition = hexutilUint64(b.Uint64())
 	}
 	// EIP-2028: Calldata gas cost reduction
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP2028FBlock, genesis.Config.IstanbulBlock); b != nil {
-		spec.Params.EIP2028Transition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP2028Transition = hexutilUint64(b.Uint64())
 	}
 	// EIP-2200: Rebalance net-metered SSTORE gas cost with consideration of SLOAD gas cost change
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP2200FBlock, genesis.Config.IstanbulBlock); b != nil {
-		spec.Params.EIP1283ReenableTransition = hexutil.Uint64(b.Uint64())
+		spec.Params.EIP1283ReenableTransition = hexutilUint64(b.Uint64())
 	}
 
-	spec.Params.MaximumExtraDataSize = (hexutil.Uint64)(params.MaximumExtraDataSize)
-	spec.Params.MinGasLimit = (hexutil.Uint64)(params.MinGasLimit)
+	spec.Params.AccountStartNonce = hexutilUint64(0)
+	spec.Params.MaximumExtraDataSize = hexutilUint64(params.MaximumExtraDataSize)
+	spec.Params.MinGasLimit = hexutilUint64(params.MinGasLimit)
 	spec.Params.GasLimitBoundDivisor = (math2.HexOrDecimal64)(params.GasLimitBoundDivisor)
-	spec.Params.NetworkID = (hexutil.Uint64)(genesis.Config.NetworkID)
-	spec.Params.ChainID = (hexutil.Uint64)(genesis.Config.ChainID.Uint64())
-	spec.Params.MaxCodeSize = params.MaxCodeSize
-	// geth has it set from zero
-	spec.Params.MaxCodeSizeTransition = 0
+	spec.Params.NetworkID = hexutilUint64(genesis.Config.NetworkID)
+	spec.Params.ChainID = hexutilUint64(genesis.Config.ChainID.Uint64())
 
 	// Disable this one
-	spec.Params.EIP98Transition = math.MaxInt64
+	spec.Params.EIP98Transition = hexutilUint64(math.MaxInt64)
 
 	spec.Genesis.Seal.Ethereum.Nonce = (hexutil.Bytes)(make([]byte, 8))
 	binary.LittleEndian.PutUint64(spec.Genesis.Seal.Ethereum.Nonce[:], genesis.Nonce)

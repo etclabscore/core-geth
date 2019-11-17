@@ -29,7 +29,7 @@
     "networkID": "0x4cb2e",
     "chainID": "0x4cb2e",
     "maxCodeSize": "0x6000",
-    "maxCodeSizeTransition": "0x0",
+    "maxCodeSizeTransition": "0x59d8",
     "eip98Transition": "0x7fffffffffffffff",
     "eip150Transition": "0x3a98",
     "eip160Transition": "0x59d8",

@@ -36,18 +36,18 @@ type ParityChainSpec struct {
 	Engine  struct {
 		Ethash struct {
 			Params struct {
-				MinimumDifficulty      *hexutil.Big                 `json:"minimumDifficulty"`
-				DifficultyBoundDivisor *hexutil.Big                 `json:"difficultyBoundDivisor"`
-				DurationLimit          *hexutil.Big                 `json:"durationLimit"`
-				BlockReward            hexutil.Uint64BigValOrMapHex `json:"blockReward"`
-				DifficultyBombDelays   map[string]string            `json:"difficultyBombDelays"`
-				HomesteadTransition    *hexutil.Uint64               `json:"homesteadTransition"`
-				EIP100bTransition      *hexutil.Uint64               `json:"eip100bTransition"`
+				MinimumDifficulty      *hexutil.Big                   `json:"minimumDifficulty"`
+				DifficultyBoundDivisor *hexutil.Big                   `json:"difficultyBoundDivisor"`
+				DurationLimit          *hexutil.Big                   `json:"durationLimit"`
+				BlockReward            hexutil.Uint64BigValOrMapHex   `json:"blockReward"`
+				DifficultyBombDelays   hexutil.Uint64BigMapEncodesHex `json:"difficultyBombDelays"`
+				HomesteadTransition    *hexutil.Uint64                `json:"homesteadTransition"`
+				EIP100bTransition      *hexutil.Uint64                `json:"eip100bTransition"`
 
 				// Note: DAO fields will NOT be written to Parity configs from multi-geth.
 				// The chains with DAO settings are already canonical and have existing chainspecs.
 				// There is no need to replicate this information.
-				DaoHardforkTransition  *hexutil.Uint64   `json:"daoHardforkTransition,omitempty"`
+				DaoHardforkTransition  *hexutil.Uint64  `json:"daoHardforkTransition,omitempty"`
 				DaoHardforkBeneficiary *common.Address  `json:"daoHardforkBeneficiary,omitempty"`
 				DaoHardforkAccounts    []common.Address `json:"daoHardforkAccounts,omitempty"`
 
@@ -190,7 +190,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		Datadir: strings.ToLower(network),
 	}
 	if genesis.Config.Ethash != nil {
-		spec.Engine.Ethash.Params.DifficultyBombDelays = make(map[string]string)
+		spec.Engine.Ethash.Params.DifficultyBombDelays = hexutil.Uint64BigMapEncodesHex{}
 		spec.Engine.Ethash.Params.BlockReward = hexutil.Uint64BigValOrMapHex{}
 		spec.Engine.Ethash.Params.BlockReward[0] = params.FrontierBlockReward
 
@@ -204,11 +204,11 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 
 		if b := params.FeatureOrMetaBlock(genesis.Config.EIP649FBlock, genesis.Config.ByzantiumBlock); b != nil {
 			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = params.EIP649FBlockReward
-			spec.Engine.Ethash.Params.DifficultyBombDelays[hexutil.EncodeBig(b)] = hexutil.EncodeUint64(3000000)
+			spec.Engine.Ethash.Params.DifficultyBombDelays[b.Uint64()] = big.NewInt(3000000)
 		}
 		if b := params.FeatureOrMetaBlock(genesis.Config.EIP1234FBlock, genesis.Config.ConstantinopleBlock); b != nil {
 			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = params.EIP1234FBlockReward
-			spec.Engine.Ethash.Params.DifficultyBombDelays[hexutil.EncodeBig(b)] = hexutil.EncodeUint64(2000000)
+			spec.Engine.Ethash.Params.DifficultyBombDelays[b.Uint64()] = big.NewInt(2000000)
 		}
 
 		if b := genesis.Config.DisposalBlock; b != nil {

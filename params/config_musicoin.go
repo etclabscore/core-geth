@@ -19,6 +19,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 var (
@@ -41,6 +42,14 @@ var (
 		MCIP3Block:     big.NewInt(1200001),
 		MCIP8Block:     big.NewInt(5200001),
 		Ethash:         new(EthashConfig),
+		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+			uint64(0):       new(big.Int).Mul(big.NewInt(314), big.NewInt(1e+18)),
+			uint64(1200001): new(big.Int).Mul(big.NewInt(250), big.NewInt(1e+18)),
+			uint64(5200001): new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)),
+		},
+		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+			uint64(2222222): new(big.Int).SetUint64(uint64(0x2dc6c0)),
+		},
 	}
 
 	MusicoinTimeCapsuleBlock  = int64(4200000)

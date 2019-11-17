@@ -40,8 +40,6 @@ var (
 		ConstantinopleBlock: big.NewInt(1705549),
 		PetersburgBlock:     big.NewInt(1705549),
 		DisposalBlock:       big.NewInt(0),
-		SocialBlock:         nil,
-		EthersocialBlock:    nil,
 		ECIP1017FBlock:      big.NewInt(5000000),
 		ECIP1017EraRounds:   big.NewInt(5000000),
 		EIP160FBlock:        big.NewInt(0),

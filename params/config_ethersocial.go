@@ -19,6 +19,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 var (
@@ -42,11 +43,11 @@ var (
 		EthersocialBlock:    big.NewInt(0),
 		ConstantinopleBlock: nil,
 		Ethash:              new(EthashConfig),
+		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+			600000: new(big.Int).SetUint64(uint64(0x2dc6c0)),
+		},
+		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+			0: big.NewInt(5e+18),
+		},
 	}
-
-	EthersocialBlockReward = big.NewInt(5e+18) // Block reward in wei for successfully mining a block upward for Ethersocial Network
 )
-
-func (c *ChainConfig) IsEthersocial(num *big.Int) bool {
-	return isForked(c.EthersocialBlock, num)
-}

@@ -19,6 +19,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 var (
@@ -45,11 +46,10 @@ var (
 		ECIP1017EraRounds:   big.NewInt(5000000),
 		EIP160FBlock:        big.NewInt(0),
 		Ethash:              new(EthashConfig),
+		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+			0: new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)),
+		},
 	}
 
 	SocialBlockReward = new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)) // Block reward in wei for successfully mining a block upward for Ethereum Social
 )
-
-func (c *ChainConfig) IsSocial(num *big.Int) bool {
-	return isForked(c.SocialBlock, num)
-}

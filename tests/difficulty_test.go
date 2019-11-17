@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/params"
 )
 
@@ -35,6 +36,13 @@ var (
 		EIP155Block:    big.NewInt(2675000),
 		EIP158Block:    big.NewInt(2675000),
 		ByzantiumBlock: big.NewInt(4370000),
+		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+			uint64(0x0): new(big.Int).SetUint64(uint64(0x4563918244f40000)),
+			uint64(4370000):                 new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
+		},
+		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+			uint64(4370000): new(big.Int).SetUint64(uint64(0x2dc6c0)),
+		},
 	}
 )
 
@@ -65,6 +73,12 @@ func TestDifficulty(t *testing.T) {
 
 	dt.config("Byzantium", params.ChainConfig{
 		ByzantiumBlock: big.NewInt(0),
+		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+			uint64(0): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
+		},
+		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+			uint64(0): new(big.Int).SetUint64(uint64(0x2dc6c0)),
+		},
 	})
 
 	dt.config("Frontier", *params.TestnetChainConfig)
@@ -72,6 +86,14 @@ func TestDifficulty(t *testing.T) {
 	dt.config("CustomMainNetwork", mainnetChainConfig)
 	dt.config("Constantinople", params.ChainConfig{
 		ConstantinopleBlock: big.NewInt(0),
+		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+			uint64(0): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
+		},
+		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+			//uint64(0): new(big.Int).SetUint64(uint64(0x2dc6c0)), // 3000000
+			//uint64(0): new(big.Int).SetUint64(uint64(0x1e8480)), // 2000000
+			0: big.NewInt(5000000), // Because the algo wants compounding or sum.
+		},
 	})
 	dt.config("difficulty.json", mainnetChainConfig)
 

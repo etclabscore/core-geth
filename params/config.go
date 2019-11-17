@@ -121,11 +121,11 @@ var (
 		IstanbulBlock:       big.NewInt(6485846),
 		Ethash:              new(EthashConfig),
 		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
-			uint64(0x42ae50): new(big.Int).SetUint64(uint64(0x2dc6c0)),
-			uint64(0x6f1580): new(big.Int).SetUint64(uint64(0x1e8480)),
+			1700000: new(big.Int).SetUint64(uint64(0x2dc6c0)),
+			4230000: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
 		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
-			uint64(0x0):     new(big.Int).SetUint64(uint64(0x4563918244f40000)),
+			uint64(0):     new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 			uint64(1700000): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
 			uint64(4230000): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},

@@ -355,29 +355,17 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 	// after adjustment and before bomb
 	out.Set(math.BigMax(out, params.MinimumDifficulty))
 
+	if config.IsBombDisposal(next) {
+		return out
+	}
+
 	// EXPLOSION delays
 
 	// exPeriodRef the explosion clause's reference point
 	exPeriodRef := new(big.Int).Add(parent.Number, big1)
 
-	if config.IsBombDisposal(next) {
-		return out
-
-	} else if config.IsEIP1234F(next) {
-		// calcDifficultyEIP1234 is the difficulty adjustment algorithm for Constantinople.
-		// The calculation uses the Byzantium rules, but with bomb offset 5M.
-		// Specification EIP-1234: https://eips.ethereum.org/EIPS/eip-1234
-		// Note, the calculations below looks at the parent number, which is 1 below
-		// the block number. Thus we remove one from the delay given
-
-		// calculate a fake block number for the ice-age delay
-		// Specification: https://eips.ethereum.org/EIPS/eip-1234
-		fakeBlockNumber := new(big.Int)
-		if parent.Number.Cmp(big.NewInt(4999999)) >= 0 {
-			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, big.NewInt(4999999))
-		}
-		exPeriodRef.Set(fakeBlockNumber)
-
+	if config.IsECIP1010(next) {
+		ecip1010Explosion(config, next, exPeriodRef)
 	} else if len(config.DifficultyBombDelaySchedule) > 0 {
 
 		// This logic varies from the original fork-based logic (below) in that
@@ -392,9 +380,6 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 			fakeBlockNumber.Sub(fakeBlockNumber, dur)
 		}
 		exPeriodRef.Set(fakeBlockNumber)
-
-	} else if config.IsECIP1010(next) {
-		ecip1010Explosion(config, next, exPeriodRef)
 	}
 
 	// EXPLOSION

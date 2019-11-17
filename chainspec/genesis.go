@@ -232,13 +232,13 @@ type ParityChainSpec struct {
 	Engine  struct {
 		Ethash struct {
 			Params struct {
-				MinimumDifficulty      *hexutil.Big         `json:"minimumDifficulty"`
-				DifficultyBoundDivisor *hexutil.Big         `json:"difficultyBoundDivisor"`
-				DurationLimit          *hexutil.Big         `json:"durationLimit"`
-				BlockReward            Uint64BigValOrMapHex `json:"blockReward"`
-				DifficultyBombDelays   map[string]string    `json:"difficultyBombDelays"`
-				HomesteadTransition    hexutil.Uint64       `json:"homesteadTransition"`
-				EIP100bTransition      hexutil.Uint64       `json:"eip100bTransition"`
+				MinimumDifficulty      *hexutil.Big                 `json:"minimumDifficulty"`
+				DifficultyBoundDivisor *hexutil.Big                 `json:"difficultyBoundDivisor"`
+				DurationLimit          *hexutil.Big                 `json:"durationLimit"`
+				BlockReward            hexutil.Uint64BigValOrMapHex `json:"blockReward"`
+				DifficultyBombDelays   map[string]string            `json:"difficultyBombDelays"`
+				HomesteadTransition    hexutil.Uint64               `json:"homesteadTransition"`
+				EIP100bTransition      hexutil.Uint64               `json:"eip100bTransition"`
 
 				// Note: DAO fields will NOT be written to Parity configs from multi-geth.
 				// The chains with DAO settings are already canonical and have existing chainspecs.
@@ -519,22 +519,22 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		if genesis.Config.IsEIP212F(b) && genesis.Config.IsEIP213F(b) {
 			//spec.Params.EIP1108Transition = hexutil.Uint64(b.Uint64())
 			spec.setPrecompile(6, &parityChainSpecBuiltin{
-				Name:       "alt_bn128_add",
-				ActivateAt: (*hexutil.Big)(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock)),
+				Name:              "alt_bn128_add",
+				ActivateAt:        (*hexutil.Big)(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock)),
 				EIP1108Transition: (*hexutil.Big)(b),
 				Pricing: &parityChainSpecPricing{
 					AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 500, EIP1108TransitionPrice: 150}},
 			})
 			spec.setPrecompile(7, &parityChainSpecBuiltin{
-				Name:       "alt_bn128_mul",
-				ActivateAt: (*hexutil.Big)(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock)),
+				Name:              "alt_bn128_mul",
+				ActivateAt:        (*hexutil.Big)(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock)),
 				EIP1108Transition: (*hexutil.Big)(b),
 				Pricing: &parityChainSpecPricing{
 					AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 40000, EIP1108TransitionPrice: 6000}},
 			})
 			spec.setPrecompile(8, &parityChainSpecBuiltin{
-				Name:       "alt_bn128_pairing",
-				ActivateAt: (*hexutil.Big)(params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock)),
+				Name:              "alt_bn128_pairing",
+				ActivateAt:        (*hexutil.Big)(params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock)),
 				EIP1108Transition: (*hexutil.Big)(b),
 				Pricing: &parityChainSpecPricing{
 					AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000, EIP1108TransitionBase: 45000, EIP1108TransitionPair: 34000}},

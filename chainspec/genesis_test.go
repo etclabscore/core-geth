@@ -19,12 +19,31 @@ package chainspec
 import (
 	"encoding/json"
 	"io/ioutil"
+	"math/big"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/go-test/deep"
 )
+
+func TestBlockConfig(t *testing.T) {
+	frontierCC := &params.ChainConfig{
+		ChainID: big.NewInt(1),
+		Ethash: new(params.EthashConfig),
+	}
+	genesis := core.DefaultGenesisBlock()
+	genesis.Config = frontierCC
+	paritySpec, err := NewParityChainSpec("frontier", genesis, []string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	parityHomestead := paritySpec.Engine.Ethash.Params.HomesteadTransition
+	if parityHomestead >= 0 {
+		t.Errorf("nonnil parity homestead")
+	}
+}
 
 // Tests the go-ethereum to Aleth chainspec conversion for the Stureby testnet.
 func TestAlethSturebyConverter(t *testing.T) {

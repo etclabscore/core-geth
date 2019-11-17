@@ -224,21 +224,25 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	}
 
 	// Homestead
-	spec.Engine.Ethash.Params.HomesteadTransition = hexutil.Uint64(
-		params.OneOrAllEqOfBlocks(
-			genesis.Config.HomesteadBlock,
-			genesis.Config.EIP2FBlock,
-			genesis.Config.EIP7FBlock,
-		).Uint64(),
-	)
+	if b := params.OneOrAllEqOfBlocks(
+		genesis.Config.HomesteadBlock,
+		genesis.Config.EIP2FBlock,
+		genesis.Config.EIP7FBlock,
+	); b != nil {
+		spec.Engine.Ethash.Params.HomesteadTransition = hexutil.Uint64(b.Uint64())
+	}
 
 	// Tangerine Whistle : 150
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-608.md
-	spec.Params.EIP150Transition = hexutil.Uint64(genesis.Config.EIP150Block.Uint64())
+	if b := genesis.Config.EIP150Block; b != nil {
+	spec.Params.EIP150Transition = hexutil.Uint64(b.Uint64())
+	}
 
 	// Spurious Dragon: 155, 160, 161, 170
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-607.md
-	spec.Params.EIP155Transition = hexutil.Uint64(genesis.Config.EIP155Block.Uint64())
+	if b := genesis.Config.EIP155Block; b != nil {
+		spec.Params.EIP155Transition = hexutil.Uint64(b.Uint64())
+	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP160FBlock, genesis.Config.EIP158Block); b != nil {
 		spec.Params.EIP160Transition = hexutil.Uint64(b.Uint64())
 	}

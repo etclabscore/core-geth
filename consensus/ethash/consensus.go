@@ -38,9 +38,6 @@ import (
 
 // Ethash proof-of-work protocol constants.
 var (
-	FrontierBlockReward    = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
-	EIP649FBlockReward     = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
-	EIP1234FBlockReward    = big.NewInt(2e+18) // Block reward in wei for successfully mining a block upward from Constantinople
 	maxUncles              = 2                 // Maximum number of uncles allowed in a single block
 	allowedFutureBlockTime = 15 * time.Second  // Max time from current time allowed for blocks, before they're considered future blocks
 )

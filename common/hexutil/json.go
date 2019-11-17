@@ -229,6 +229,13 @@ func (b *Big) UnmarshalGraphQL(input interface{}) error {
 // The zero value marshals as "0x0".
 type Uint64 uint64
 
+func (b *Uint64) Big() *big.Int {
+	if b == nil {
+		return nil
+	}
+	return new(big.Int).SetUint64((uint64)(*b))
+}
+
 // MarshalText implements encoding.TextMarshaler.
 func (b Uint64) MarshalText() ([]byte, error) {
 	buf := make([]byte, 2, 10)

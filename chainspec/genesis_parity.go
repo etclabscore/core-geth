@@ -19,7 +19,9 @@ package chainspec
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"math"
+	"math/big"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -245,7 +247,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	// Tangerine Whistle : 150
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-608.md
 	if b := genesis.Config.EIP150Block; b != nil {
-	spec.Params.EIP150Transition = hexutilUint64(b.Uint64())
+		spec.Params.EIP150Transition = hexutilUint64(b.Uint64())
 	}
 
 	// Spurious Dragon: 155, 160, 161, 170
@@ -439,4 +441,209 @@ func (spec *ParityChainSpec) setPrecompile(address byte, data *parityChainSpecBu
 		spec.Accounts[a] = &parityChainSpecAccount{}
 	}
 	spec.Accounts[a].Builtin = data
+}
+
+// ToMultiGethGenesis converts a Parity chainspec to the corresponding MultiGeth datastructure.
+// Note that the return value 'core.Genesis' includes the respective 'params.ChainConfig' values.
+func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
+	var err error
+	mgc := &params.ChainConfig{}
+	if pars := c.Params; pars.NetworkID != nil {
+		if err := checkUnsupportedValsMust(c); err != nil {
+			panic(err)
+		}
+
+		mgc.NetworkID = (uint64)(*pars.NetworkID)
+		mgc.ChainID = pars.ChainID.Big()
+
+		// Defaults according to Parity documentation https://wiki.parity.io/Chain-specification.html
+		if mgc.ChainID == nil && pars.NetworkID != nil {
+			mgc.ChainID = pars.NetworkID.Big()
+		}
+
+		// DAO
+		setMultiGethDAOConfigsFromParity(mgc, c)
+
+		// Tangerine
+		mgc.EIP150Block = pars.EIP150Transition.Big()
+		// mgc.EIP150Hash // optional@mg
+
+		// Spurious
+		mgc.EIP155Block = pars.EIP155Transition.Big()
+		mgc.EIP160FBlock = pars.EIP160Transition.Big()
+		mgc.EIP161FBlock = pars.EIP161abcTransition.Big() // and/or d
+		mgc.EIP170FBlock = pars.MaxCodeSizeTransition.Big()
+		if mgc.EIP170FBlock != nil && uint64(*pars.MaxCodeSize) != uint64(24576) {
+			panic(fmt.Sprintf("%v != %v - unsupported configuration value", pars.MaxCodeSize, 24576))
+		}
+
+		// Byzantium
+		// 100
+		mgc.EIP140FBlock = pars.EIP140Transition.Big()
+		// 198
+		mgc.EIP211FBlock = pars.EIP211Transition.Big() // FIXME this might actually be for EIP210. :-$
+		// 212
+		// 213
+		mgc.EIP214FBlock = pars.EIP214Transition.Big()
+		// 649 - metro diff bomb, block reward
+		mgc.EIP658FBlock = pars.EIP658Transition.Big()
+
+		for _, v := range c.Accounts {
+			if v.Builtin != nil {
+				if v.Builtin.ActivateAt != nil {
+					switch v.Builtin.Name {
+					case "modexp":
+						mgc.EIP198FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
+					case "alt_bn128_pairing":
+						mgc.EIP212FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
+						if v.Builtin.EIP1108Transition != nil {
+							mgc.EIP1108FBlock = new(big.Int).Set(v.Builtin.EIP1108Transition.ToInt())
+						}
+					case "alt_bn128_add", "alt_bn128_mul":
+						mgc.EIP213FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
+						if v.Builtin.EIP1108Transition != nil {
+							mgc.EIP1108FBlock = new(big.Int).Set(v.Builtin.EIP1108Transition.ToInt())
+						}
+					case "blake2_f":
+						mgc.EIP158Block = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
+					case "ripemd160", "ecrecover", "sha256", "identity":
+					default:
+						panic("unsupported builtin contract: " + v.Builtin.Name)
+					}
+				}
+			}
+		}
+
+		// Constantinople
+		mgc.EIP145FBlock = pars.EIP145Transition.Big()
+		mgc.EIP1014FBlock = pars.EIP1014Transition.Big()
+		mgc.EIP1052FBlock = pars.EIP1052Transition.Big()
+		mgc.EIP1283FBlock = pars.EIP1283Transition.Big()
+		mgc.PetersburgBlock = pars.EIP1283DisableTransition.Big()
+
+	}
+
+	if ethash := c.Engine.Ethash; ethash.Params.MinimumDifficulty != nil {
+
+		pars := ethash.Params
+
+		mgc.Ethash = &params.EthashConfig{}
+
+		mgc.HomesteadBlock = pars.HomesteadTransition.Big()
+		mgc.EIP100FBlock = pars.EIP100bTransition.Big()
+		mgc.DisposalBlock = pars.BombDefuseTransition.Big()
+		mgc.ECIP1010PauseBlock = pars.ECIP1010PauseTransition.Big()
+		mgc.ECIP1010Length = func() *big.Int {
+			if pars.ECIP1010ContinueTransition != nil {
+				return new(big.Int).Sub(pars.ECIP1010ContinueTransition.Big(), pars.ECIP1010PauseTransition.Big())
+			} else if pars.ECIP1010PauseTransition == nil && pars.ECIP1010ContinueTransition == nil {
+				return nil
+			}
+			return big.NewInt(0)
+		}()
+		mgc.ECIP1017EraRounds = pars.ECIP1017EraRounds.Big()
+
+		mgc.DifficultyBombDelaySchedule = hexutil.Uint64BigMapEncodesHex{}
+		for k, v := range pars.DifficultyBombDelays {
+			mgc.DifficultyBombDelaySchedule[k] = v
+		}
+		mgc.BlockRewardSchedule = hexutil.Uint64BigMapEncodesHex{}
+		for k, v := range pars.BlockReward {
+			mgc.BlockRewardSchedule[k] = v
+		}
+
+	} else if clique := c.Engine.Clique; clique.Params.Period != nil {
+		mgc.Clique = &params.CliqueConfig{
+			Period: (uint64)(*clique.Params.Period),
+			Epoch:  (uint64)(*clique.Params.Epoch),
+		}
+
+	} else {
+		return nil, errors.New("unsupported engine")
+	}
+	mgg := &core.Genesis{
+		Config: mgc,
+	}
+	if c.Genesis.Difficulty != nil {
+		seal := c.Genesis.Seal.Ethereum
+
+		mgg.Nonce, err = hexutil.DecodeUint64(string(seal.Nonce))
+		if err != nil {
+			return nil, err
+		}
+		mgg.Mixhash = common.BytesToHash(seal.MixHash)
+		mgg.Timestamp = (uint64)(c.Genesis.Timestamp)
+		mgg.GasLimit = (uint64)(c.Genesis.GasLimit)
+		mgg.Difficulty = c.Genesis.Difficulty.ToInt()
+		mgg.Coinbase = c.Genesis.Author
+		mgg.ParentHash = c.Genesis.ParentHash
+		mgg.ExtraData = c.Genesis.ExtraData
+	}
+	if c.Accounts != nil {
+		mgg.Alloc = core.GenesisAlloc{}
+		for k, v := range c.Accounts {
+			addr := common.Address(k)
+
+			bal := (big.Int)(v.Balance)
+			mgg.Alloc[addr] = core.GenesisAccount{
+				Nonce:   (uint64)(v.Nonce),
+				Balance: &bal,
+				Code:    v.Code,
+				Storage: v.Storage,
+			}
+		}
+	}
+	return mgg, nil
+}
+
+func checkUnsupportedValsMust(spec *ParityChainSpec) error {
+	// FIXME
+	if spec.Params.EIP161abcTransition != spec.Params.EIP161dTransition {
+		panic("not supported")
+	}
+	// TODO...
+	// unsupportedValuesMust := map[interface{}]interface{}{
+	// 	pars.AccountStartNonce:                       uint64(0),
+	// 	pars.MaximumExtraDataSize:                    uint64(32),
+	// 	pars.MinGasLimit:                             uint64(5000),
+	// 	pars.SubProtocolName:                         "",
+	// 	pars.ValidateChainIDTransition:               nil,
+	// 	pars.ValidateChainReceiptsTransition:         nil,
+	// 	pars.DustProtectionTransition:                nil,
+	// 	pars.NonceCapIncrement:                       nil,
+	// 	pars.RemoveDustContracts:                     false,
+	// 	pars.EIP210Transition:                        nil,
+	// 	pars.EIP210ContractAddress:                   nil,
+	// 	pars.EIP210ContractCode:                      nil,
+	// 	pars.ApplyReward:                             false,
+	// 	pars.TransactionPermissionContract:           nil,
+	// 	pars.TransactionPermissionContractTransition: nil,
+	// 	pars.KIP4Transition:                          nil,
+	// 	pars.KIP6Transition:                          nil,
+	// }
+	// i := -1
+	// for k, v := range unsupportedValuesMust {
+	// 	i++
+	// 	if v == nil && k == nil {
+	// 		continue
+	// 	}
+	// 	if v != nil && !reflect.DeepEqual(k, v) {
+	// 		panic(fmt.Sprintf("%d: %v != %v - unsupported configuration value", i, k, v))
+	// 	}
+	// }
+	return nil
+}
+
+func setMultiGethDAOConfigsFromParity(mgc *params.ChainConfig, spec *ParityChainSpec) {
+	if spec.Params.ForkCanonHash != nil {
+		if (*spec.Params.ForkCanonHash == common.HexToHash("0x4985f5ca3d2afbec36529aa96f74de3cc10a2a4a6c44f2157a57d2c6059a11bb")) ||
+			(*spec.Params.ForkCanonHash == common.HexToHash("0x3e12d5c0f8d63fbc5831cc7f7273bd824fa4d0a9a4102d65d99a7ea5604abc00")) {
+
+			mgc.DAOForkBlock = new(big.Int).SetUint64(uint64(*spec.Params.ForkBlock))
+			mgc.DAOForkSupport = true
+		}
+		if *spec.Params.ForkCanonHash == common.HexToHash("0x94365e3a8c0b35089c1d1195081fe7489b528a84b22199c916180db8b28ade7f") {
+			mgc.DAOForkBlock = new(big.Int).SetUint64(uint64(*spec.Params.ForkBlock))
+		}
+	}
 }

@@ -19,12 +19,11 @@ package chainspec
 import (
 	"encoding/json"
 	"io/ioutil"
-	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/core"
+	"github.com/go-test/deep"
 )
 
 // Tests the go-ethereum to Aleth chainspec conversion for the Stureby testnet.
@@ -50,19 +49,15 @@ func TestAlethSturebyConverter(t *testing.T) {
 	if err := json.Unmarshal(expBlob, expspec); err != nil {
 		t.Fatalf("failed parsing genesis: %v", err)
 	}
-	if !reflect.DeepEqual(expspec, spec) {
+	// Compare the read-in SomeSpec vs. the generated SomeSpec
+	if diffs := deep.Equal(expspec, spec); len(diffs) != 0 {
 		t.Errorf("chainspec mismatch")
-		c := spew.ConfigState{
-			DisablePointerAddresses: true,
-			SortKeys:                true,
+		for _, d := range diffs {
+			t.Log(d)
 		}
-		exp := strings.Split(c.Sdump(expspec), "\n")
-		got := strings.Split(c.Sdump(spec), "\n")
-		for i := 0; i < len(exp) && i < len(got); i++ {
-			if exp[i] != got[i] {
-				t.Logf("got: %v\nexp: %v\n", exp[i], got[i])
-			}
-		}
+		spew.Dump(spec)
+		bm, _ := json.MarshalIndent(spec, "", "    ")
+		t.Log(string(bm))
 	}
 }
 
@@ -97,18 +92,13 @@ func TestParitySturebyConverter(t *testing.T) {
 	expspec.Nodes = []string{}
 
 	// Compare the read-in SomeSpec vs. the generated SomeSpec
-	if !reflect.DeepEqual(expspec, spec) {
+	if diffs := deep.Equal(expspec, spec); len(diffs) != 0 {
 		t.Errorf("chainspec mismatch")
-		c := spew.ConfigState{
-			DisablePointerAddresses: true,
-			SortKeys:                true,
+		for _, d := range diffs {
+			t.Log(d)
 		}
-		exp := strings.Split(c.Sdump(expspec), "\n")
-		got := strings.Split(c.Sdump(spec), "\n")
-		for i := 0; i < len(exp) && i < len(got); i++ {
-			if exp[i] != got[i] {
-				t.Logf("got: %v\nexp: %v\n", exp[i], got[i])
-			}
-		}
+		spew.Dump(spec)
+		bm, _ := json.MarshalIndent(spec, "", "    ")
+		t.Log(string(bm))
 	}
 }

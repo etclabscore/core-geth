@@ -20,6 +20,7 @@ require (
 	github.com/fjl/memsize v0.0.0-20180418122429-ca190fb6ffbc
 	github.com/gballet/go-libpcsclite v0.0.0-20190403181518-312b5175032f
 	github.com/go-stack/stack v1.8.0
+	github.com/go-test/deep v1.0.4
 	github.com/golang/protobuf v1.3.1
 	github.com/golang/snappy v0.0.1
 	github.com/golangci/golangci-lint v1.18.0 // indirect

@@ -463,7 +463,9 @@ func (bb *Uint64BigMapEncodesHex) UnmarshalJSON(input []byte) error {
 		case int64:
 			vv = big.NewInt(v.(int64))
 		}
-		b[kk] = vv
+		if vv != nil {
+			b[kk] = vv
+		}
 	}
 	*bb = b
 	return nil

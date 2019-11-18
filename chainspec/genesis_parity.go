@@ -450,6 +450,9 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 			panic(err)
 		}
 
+		if *pars.AccountStartNonce != 0 {
+			return nil, errors.New("nonzero account start nonce configuration unsupported")
+		}
 		mgc.NetworkID = (uint64)(*pars.NetworkID)
 		mgc.ChainID = pars.ChainID.Big()
 

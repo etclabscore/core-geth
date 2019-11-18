@@ -17,7 +17,6 @@
 package chainspec
 
 import (
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"math"
@@ -28,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	math2 "github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 )
 
@@ -42,7 +42,7 @@ type ParityChainSpec struct {
 				DifficultyBoundDivisor *hexutil.Big                   `json:"difficultyBoundDivisor"`
 				DurationLimit          *hexutil.Big                   `json:"durationLimit"`
 				BlockReward            hexutil.Uint64BigValOrMapHex   `json:"blockReward"`
-				DifficultyBombDelays   hexutil.Uint64BigMapEncodesHex `json:"difficultyBombDelays"`
+				DifficultyBombDelays   hexutil.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"`
 				HomesteadTransition    *hexutil.Uint64                `json:"homesteadTransition"`
 				EIP100bTransition      *hexutil.Uint64                `json:"eip100bTransition"`
 
@@ -103,7 +103,7 @@ type ParityChainSpec struct {
 	Genesis struct {
 		Seal struct {
 			Ethereum struct {
-				Nonce   hexutil.Bytes `json:"nonce"`
+				Nonce   types.BlockNonce `json:"nonce"`
 				MixHash hexutil.Bytes `json:"mixHash"`
 			} `json:"ethereum"`
 		} `json:"seal"`
@@ -392,9 +392,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 
 	// Disable this one
 	spec.Params.EIP98Transition = hexutilUint64(math.MaxInt64)
-
-	spec.Genesis.Seal.Ethereum.Nonce = (hexutil.Bytes)(make([]byte, 8))
-	binary.LittleEndian.PutUint64(spec.Genesis.Seal.Ethereum.Nonce[:], genesis.Nonce)
+	spec.Genesis.Seal.Ethereum.Nonce = types.EncodeNonce(genesis.Nonce)
 
 	spec.Genesis.Seal.Ethereum.MixHash = (hexutil.Bytes)(genesis.Mixhash[:])
 	spec.Genesis.Difficulty = (*hexutil.Big)(genesis.Difficulty)
@@ -446,7 +444,6 @@ func (spec *ParityChainSpec) setPrecompile(address byte, data *parityChainSpecBu
 // ToMultiGethGenesis converts a Parity chainspec to the corresponding MultiGeth datastructure.
 // Note that the return value 'core.Genesis' includes the respective 'params.ChainConfig' values.
 func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
-	var err error
 	mgc := &params.ChainConfig{}
 	if pars := c.Params; pars.NetworkID != nil {
 		if err := checkUnsupportedValsMust(c); err != nil {
@@ -567,10 +564,7 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 	if c.Genesis.Difficulty != nil {
 		seal := c.Genesis.Seal.Ethereum
 
-		mgg.Nonce, err = hexutil.DecodeUint64(string(seal.Nonce))
-		if err != nil {
-			return nil, err
-		}
+		mgg.Nonce = seal.Nonce.Uint64()
 		mgg.Mixhash = common.BytesToHash(seal.MixHash)
 		mgg.Timestamp = (uint64)(c.Genesis.Timestamp)
 		mgg.GasLimit = (uint64)(c.Genesis.GasLimit)

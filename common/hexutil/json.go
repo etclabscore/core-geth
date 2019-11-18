@@ -439,7 +439,10 @@ type Uint64BigMapEncodesHex map[uint64]*big.Int
 
 // UnmarshalJSON implements the json Unmarshaler interface.
 func (bb *Uint64BigMapEncodesHex) UnmarshalJSON(input []byte) error {
-	m := make(map[string]string)
+	// HACK: Parity uses raw numbers here...
+	// It would be better to use a consistent format... instead of having to do interface{}-ing
+	// and switch on types.
+	m := make(map[string]interface{})
 	err := json.Unmarshal(input, &m)
 	if err != nil {
 		return err
@@ -450,9 +453,15 @@ func (bb *Uint64BigMapEncodesHex) UnmarshalJSON(input []byte) error {
 		if err != nil {
 			return err
 		}
-		vv, err := DecodeBig(v)
-		if err != nil {
-			return err
+		var vv *big.Int
+		switch v.(type) {
+		case string:
+			vv, err = DecodeBig(v.(string))
+			if err != nil {
+				return err
+			}
+		case int64:
+			vv = big.NewInt(v.(int64))
 		}
 		b[kk] = vv
 	}
@@ -468,4 +477,3 @@ func (b Uint64BigMapEncodesHex) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(mm)
 }
-

@@ -55,6 +55,7 @@ var CheckpointOracles = map[common.Hash]*CheckpointOracleConfig{
 var (
 	// MainnetChainConfig is the chain parameters to run a node on the main network.
 	MainnetChainConfig = &ChainConfig{
+		NetworkID:           1,
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(1150000),
 		DAOForkBlock:        big.NewInt(1920000),
@@ -104,6 +105,7 @@ var (
 
 	// TestnetChainConfig contains the chain parameters to run a node on the Ropsten test network.
 	TestnetChainConfig = &ChainConfig{
+		NetworkID:           3,
 		ChainID:             big.NewInt(3),
 		HomesteadBlock:      big.NewInt(0),
 		DAOForkBlock:        nil,
@@ -125,7 +127,7 @@ var (
 			4230000: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
 		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
-			uint64(0):     new(big.Int).SetUint64(uint64(0x4563918244f40000)),
+			uint64(0):       new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 			uint64(1700000): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
 			uint64(4230000): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
@@ -153,6 +155,7 @@ var (
 
 	// RinkebyChainConfig contains the chain parameters to run a node on the Rinkeby test network.
 	RinkebyChainConfig = &ChainConfig{
+		NetworkID:           4,
 		ChainID:             big.NewInt(4),
 		HomesteadBlock:      big.NewInt(1),
 		DAOForkBlock:        nil,
@@ -204,6 +207,7 @@ var (
 
 	// GoerliChainConfig contains the chain parameters to run a node on the Görli test network.
 	GoerliChainConfig = &ChainConfig{
+		NetworkID:           5,
 		ChainID:             big.NewInt(5),
 		HomesteadBlock:      big.NewInt(0),
 		DAOForkBlock:        nil,
@@ -220,10 +224,10 @@ var (
 			Epoch:  30000,
 		},
 		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
-			uint64(0x0):  new(big.Int).SetUint64(uint64(0x1e8480)),
+			uint64(0x0): new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
 		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
-			uint64(0x0):     new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
+			uint64(0x0): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
 	}
 
@@ -318,7 +322,7 @@ var (
 		nil,
 		// DifficultyBombDelaySchedule
 		hexutil.Uint64BigMapEncodesHex{
-			0:  new(big.Int).SetUint64(uint64(0x1e8480)),
+			0: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
 		// BlockRewardSchedule
 		hexutil.Uint64BigMapEncodesHex{
@@ -399,7 +403,7 @@ var (
 		nil,
 		// DifficultyBombDelaySchedule
 		hexutil.Uint64BigMapEncodesHex{
-			0:  new(big.Int).SetUint64(uint64(0x1e8480)),
+			0: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
 		// BlockRewardSchedule
 		hexutil.Uint64BigMapEncodesHex{
@@ -473,7 +477,7 @@ var (
 		nil,
 		// DifficultyBombDelaySchedule
 		hexutil.Uint64BigMapEncodesHex{
-			0:  new(big.Int).SetUint64(uint64(0x1e8480)),
+			0: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
 		// BlockRewardSchedule
 		hexutil.Uint64BigMapEncodesHex{
@@ -1102,7 +1106,7 @@ type Rules struct {
 	/// Istanbul
 	IsEIP152F, IsEIP1108F, IsEIP1344F, IsEIP1884F, IsEIP2028F, IsEIP2200F bool
 	IsPetersburg, IsIstanbul                                              bool
-	IsBombDisposal, IsECIP1010, IsECIP1017F      bool
+	IsBombDisposal, IsECIP1010, IsECIP1017F                               bool
 	IsMCIP0, IsMCIP3, IsMCIP8                                             bool
 }
 

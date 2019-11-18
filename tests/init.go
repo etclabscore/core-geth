@@ -51,6 +51,7 @@ func init() {
 
 		}
 	}
+
 	if os.Getenv("MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALANCE") != "" {
 		log.Println("Setting equivalent fork feature chain configurations")
 		for _, config := range Forks {
@@ -154,15 +155,15 @@ func init() {
 			spec := chainspec.ParityChainSpec{}
 			b, err := ioutil.ReadFile(v)
 			if err != nil {
-				log.Fatalf("%s/%s err: %s\n%s", k, v, err, b)
+				panic(fmt.Sprintf("%s/%s err: %s\n%s", k, v, err, b))
 			}
 			err = json.Unmarshal(b, &spec)
 			if err != nil {
-				log.Fatalf("%s/%s err: %s\n%s", k, v, err, b)
+				panic(fmt.Sprintf("%s/%s err: %s\n%s", k, v, err, b))
 			}
 			genesis, err := chainspec.ParityConfigToMultiGethGenesis(&spec)
 			if err != nil {
-				log.Fatalf("%s/%s err: %s\n%s", k, v, err, b)
+				panic(fmt.Sprintf("%s/%s err: %s\n%s", k, v, err, b))
 			}
 			Forks[k] = genesis.Config
 		}

@@ -608,8 +608,15 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 		mgc.EIP1014FBlock = pars.EIP1014Transition.Big()
 		mgc.EIP1052FBlock = pars.EIP1052Transition.Big()
 		mgc.EIP1283FBlock = pars.EIP1283Transition.Big()
+
+		// St. Peters aka ConstantinopleFix
 		mgc.PetersburgBlock = pars.EIP1283DisableTransition.Big()
 
+		// Istanbul
+		mgc.EIP1344FBlock = pars.EIP1344Transition.Big()
+		mgc.EIP1884FBlock = pars.EIP1884Transition.Big()
+		mgc.EIP2028FBlock = pars.EIP2028Transition.Big()
+		mgc.EIP2200FBlock = pars.EIP1283ReenableTransition.Big()
 	}
 
 	if ethash := c.Engine.Ethash; ethash.Params.MinimumDifficulty != nil {

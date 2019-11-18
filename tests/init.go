@@ -149,7 +149,7 @@ func init() {
 			"Constantinople": paritySpecPath("constantinople_test.json"),
 			"ConstantinopleFix": paritySpecPath("st_peters_test.json"),
 			"EIP158ToByzantiumAt5": paritySpecPath("transition_test.json"),
-			//"Istanbul": paritySpecPath("istanbul_test.json"),
+			"Istanbul": paritySpecPath("istanbul_test.json"),
 		}
 		for k, v := range matchups {
 			spec := chainspec.ParityChainSpec{}

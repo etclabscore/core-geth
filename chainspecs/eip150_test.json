@@ -23,7 +23,7 @@
 		"eip161abcTransition": "0x7fffffffffffffff",
 		"eip161dTransition": "0x7fffffffffffffff",
 		"eip155Transition": "0x7fffffffffffffff",
-		"maxCodeSize": 24576,
+		"maxCodeSize": "0x6000",
 		"maxCodeSizeTransition": "0x7fffffffffffffff"
 	},
 	"genesis": {

@@ -25,7 +25,7 @@
 		"maximumExtraDataSize": "0x20",
 		"minGasLimit": "0x1388",
 		"networkID" : "0x1",
-		"maxCodeSize": 24576,
+		"maxCodeSize": "0x6000",
 		"maxCodeSizeTransition": "0x0",
 		"eip150Transition": "0x0",
 		"eip160Transition": "0x0",

@@ -60,3 +60,6 @@ sed -E -i 's/\"([0-9]{1})\"/\"0x\1\"/g' ./*.json
 
 echo  "Replace all addresses and hashes with 0x- prefixes."
 sed -E -i 's/(\b[a-fA-F0-9]{16})/0x\1/g' ./*.json
+
+echo "Replace default max code size decimal -> hex encoding."
+sed -E -i 's/24576/"0x6000"/g' ./*.json

@@ -598,8 +598,10 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 
 func checkUnsupportedValsMust(spec *ParityChainSpec) error {
 	// FIXME
-	if spec.Params.EIP161abcTransition != spec.Params.EIP161dTransition {
-		panic("not supported")
+
+	if spec.Params.EIP161abcTransition != nil && spec.Params.EIP161dTransition != nil &&
+	   *spec.Params.EIP161abcTransition != *spec.Params.EIP161dTransition {
+		panic(spec.Name + ": eip161abc vs. eip161d transition not supported")
 	}
 	// TODO...
 	// unsupportedValuesMust := map[interface{}]interface{}{

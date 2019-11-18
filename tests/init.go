@@ -47,7 +47,7 @@ func init() {
 
 		}
 	}
-	if os.Getenv("MULTIGETH_TESTS_CHAINCONFIG_EQUIVALANCE") != "" {
+	if os.Getenv("MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALANCE") != "" {
 		log.Println("Setting equivalent fork feature chain configurations")
 		for _, config := range Forks {
 			if config.HomesteadBlock != nil {

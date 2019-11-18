@@ -505,7 +505,7 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 							mgc.EIP1108FBlock = new(big.Int).Set(v.Builtin.EIP1108Transition.ToInt())
 						}
 					case "blake2_f":
-						mgc.EIP158Block = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
+						mgc.EIP152FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
 					case "ripemd160", "ecrecover", "sha256", "identity":
 					default:
 						panic("unsupported builtin contract: " + v.Builtin.Name)

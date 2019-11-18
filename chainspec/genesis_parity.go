@@ -17,10 +17,12 @@
 package chainspec
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
 	"math/big"
+	"reflect"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -104,7 +106,7 @@ type ParityChainSpec struct {
 		Seal struct {
 			Ethereum struct {
 				Nonce   types.BlockNonce `json:"nonce"`
-				MixHash hexutil.Bytes `json:"mixHash"`
+				MixHash hexutil.Bytes    `json:"mixHash"`
 			} `json:"ethereum"`
 		} `json:"seal"`
 
@@ -132,10 +134,43 @@ type parityChainSpecAccount struct {
 
 // parityChainSpecBuiltin is the precompiled contract definition.
 type parityChainSpecBuiltin struct {
-	Name              string                  `json:"name"`                         // Each builtin should has it own name
-	Pricing           *parityChainSpecPricing `json:"pricing"`                      // Each builtin should has it own price strategy
-	ActivateAt        *hexutil.Big            `json:"activate_at,omitempty"`        // ActivateAt can't be omitted if empty, default means no fork
-	EIP1108Transition *hexutil.Big            `json:"eip1108_transition,omitempty"` // EIP1108Transition can't be omitted if empty, default means no fork
+	Name              string                       `json:"name"`                         // Each builtin should has it own name
+	Pricing           *parityChainSpecPricingMaybe `json:"pricing"`                      // Each builtin should has it own price strategy
+	ActivateAt        *hexutil.Big                 `json:"activate_at,omitempty"`        // ActivateAt can't be omitted if empty, default means no fork
+	EIP1108Transition *hexutil.Big                 `json:"eip1108_transition,omitempty"` // EIP1108Transition can't be omitted if empty, default means no fork
+}
+
+type parityChainSpecPricingMaybe struct {
+	Map     map[hexutil.Uint64]parityChainSpecPricingPrice
+	Pricing *parityChainSpecPricing
+}
+
+type parityChainSpecPricingPrice struct {
+	parityChainSpecPricing `json:"price"`
+}
+
+func (p *parityChainSpecPricingMaybe) UnmarshalJSON(input []byte) error {
+	pricing := parityChainSpecPricing{}
+	err := json.Unmarshal(input, &pricing)
+	if err == nil && !reflect.DeepEqual(pricing, parityChainSpecPricing{}) {
+		p.Pricing = &pricing
+		return nil
+	}
+	p.Map = make(map[hexutil.Uint64]parityChainSpecPricingPrice)
+	err = json.Unmarshal(input, &p.Map)
+	if err != nil {
+		return err
+	}
+	if len(p.Map) == 0 {
+		panic("0map")
+	}
+	return nil
+}
+func (p parityChainSpecPricingMaybe) MarshalJSON() ([]byte, error) {
+	if p.Map != nil {
+		return json.Marshal(p.Map)
+	}
+	return json.Marshal(p.Pricing)
 }
 
 // parityChainSpecPricing represents the different pricing models that builtin
@@ -274,8 +309,8 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		spec.setPrecompile(5, &parityChainSpecBuiltin{
 			Name:       "modexp",
 			ActivateAt: (*hexutil.Big)(b),
-			Pricing: &parityChainSpecPricing{
-				ModExp: &parityChainSpecModExpPricing{Divisor: 20}},
+			Pricing: &parityChainSpecPricingMaybe{Pricing: &parityChainSpecPricing{
+				ModExp: &parityChainSpecModExpPricing{Divisor: 20}}},
 		})
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP211FBlock, genesis.Config.ByzantiumBlock); b != nil {
@@ -283,25 +318,31 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.setPrecompile(8, &parityChainSpecBuiltin{
-			Name:       "alt_bn128_pairing",
-			ActivateAt: (*hexutil.Big)(b),
-			Pricing: &parityChainSpecPricing{
-				AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000}},
-		})
+			Name: "alt_bn128_pairing",
+			//ActivateAt: (*hexutil.Big)(b),
+			Pricing: &parityChainSpecPricingMaybe{
+				Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
+					hexutil.Uint64(b.Uint64()): {
+						parityChainSpecPricing{AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000}}}},
+			}})
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.setPrecompile(6, &parityChainSpecBuiltin{
-			Name:       "alt_bn128_add",
-			ActivateAt: (*hexutil.Big)(b),
-			Pricing: &parityChainSpecPricing{
-				AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 500}},
-		})
+			Name: "alt_bn128_add",
+			//ActivateAt: (*hexutil.Big)(b),
+			Pricing: &parityChainSpecPricingMaybe{
+				Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
+					hexutil.Uint64(b.Uint64()): {
+						parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 500}}}},
+			}})
 		spec.setPrecompile(7, &parityChainSpecBuiltin{
-			Name:       "alt_bn128_mul",
-			ActivateAt: (*hexutil.Big)(b),
-			Pricing: &parityChainSpecPricing{
-				AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 40000}},
-		})
+			Name: "alt_bn128_mul",
+			//ActivateAt: (*hexutil.Big)(b),
+			Pricing: &parityChainSpecPricingMaybe{
+				Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
+					hexutil.Uint64(b.Uint64()): {
+						parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 40000}}}},
+			}})
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP214FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.Params.EIP214Transition = hexutilUint64(b.Uint64())
@@ -334,35 +375,49 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		spec.setPrecompile(9, &parityChainSpecBuiltin{
 			Name:       "blake2_f",
 			ActivateAt: (*hexutil.Big)(b),
-			Pricing: &parityChainSpecPricing{
-				Blake2F: &parityChainSpecBlakePricing{GasPerRound: 1}},
+			Pricing: &parityChainSpecPricingMaybe{Pricing: &parityChainSpecPricing{
+				Blake2F: &parityChainSpecBlakePricing{GasPerRound: 1}}},
 		})
 	}
 	// EIP-1108: Reduce alt_bn128 precompile gas costs
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1108FBlock, genesis.Config.IstanbulBlock); b != nil {
 		if genesis.Config.IsEIP212F(b) && genesis.Config.IsEIP213F(b) {
-			//spec.Params.EIP1108Transition = hexutilUint64(b.Uint64())
 			spec.setPrecompile(6, &parityChainSpecBuiltin{
-				Name:              "alt_bn128_add",
-				ActivateAt:        (*hexutil.Big)(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock)),
-				EIP1108Transition: (*hexutil.Big)(b),
-				Pricing: &parityChainSpecPricing{
-					AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 500, EIP1108TransitionPrice: 150}},
+				Name: "alt_bn128_add",
+				//ActivateAt: (*hexutil.Big)(b),
+				Pricing: &parityChainSpecPricingMaybe{
+					Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
+						hexutil.Uint64(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Uint64()): parityChainSpecPricingPrice{parityChainSpecPricing{
+							AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 500}},
+						},
+						hexutil.Uint64(b.Uint64()): parityChainSpecPricingPrice{
+							parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 150}}},
+					},
+				},
 			})
 			spec.setPrecompile(7, &parityChainSpecBuiltin{
-				Name:              "alt_bn128_mul",
-				ActivateAt:        (*hexutil.Big)(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock)),
-				EIP1108Transition: (*hexutil.Big)(b),
-				Pricing: &parityChainSpecPricing{
-					AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 40000, EIP1108TransitionPrice: 6000}},
-			})
+				Name: "alt_bn128_mul",
+				//ActivateAt: (*hexutil.Big)(b),
+				Pricing: &parityChainSpecPricingMaybe{
+					Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
+						hexutil.Uint64(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Uint64()): parityChainSpecPricingPrice{
+							parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 40000}}},
+						hexutil.Uint64(b.Uint64()): parityChainSpecPricingPrice{
+							parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 6000}}},
+					},
+				}})
 			spec.setPrecompile(8, &parityChainSpecBuiltin{
-				Name:              "alt_bn128_pairing",
-				ActivateAt:        (*hexutil.Big)(params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock)),
-				EIP1108Transition: (*hexutil.Big)(b),
-				Pricing: &parityChainSpecPricing{
-					AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000, EIP1108TransitionBase: 45000, EIP1108TransitionPair: 34000}},
-			})
+				Name: "alt_bn128_pairing",
+				//ActivateAt: (*hexutil.Big)(b),
+				Pricing: &parityChainSpecPricingMaybe{
+					Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
+						hexutil.Uint64(params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock).Uint64()): parityChainSpecPricingPrice{
+							parityChainSpecPricing{AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000}}},
+						hexutil.Uint64(b.Uint64()): parityChainSpecPricingPrice{
+							parityChainSpecPricing{AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 45000, Pair: 34000}}},
+					},
+				}})
+
 		}
 	}
 
@@ -415,17 +470,17 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		spec.Accounts[a].Balance = bal
 		spec.Accounts[a].Nonce = math2.HexOrDecimal64(account.Nonce)
 	}
-	spec.setPrecompile(1, &parityChainSpecBuiltin{Name: "ecrecover",
-		Pricing: &parityChainSpecPricing{Linear: &parityChainSpecLinearPricing{Base: 3000}}})
-
+	spec.setPrecompile(1, &parityChainSpecBuiltin{
+		Name: "ecrecover", Pricing: &parityChainSpecPricingMaybe{Pricing: &parityChainSpecPricing{Linear: &parityChainSpecLinearPricing{Base: 3000}}},
+	})
 	spec.setPrecompile(2, &parityChainSpecBuiltin{
-		Name: "sha256", Pricing: &parityChainSpecPricing{Linear: &parityChainSpecLinearPricing{Base: 60, Word: 12}},
+		Name: "sha256", Pricing: &parityChainSpecPricingMaybe{Pricing: &parityChainSpecPricing{Linear: &parityChainSpecLinearPricing{Base: 60, Word: 12}}},
 	})
 	spec.setPrecompile(3, &parityChainSpecBuiltin{
-		Name: "ripemd160", Pricing: &parityChainSpecPricing{Linear: &parityChainSpecLinearPricing{Base: 600, Word: 120}},
+		Name: "ripemd160", Pricing: &parityChainSpecPricingMaybe{Pricing: &parityChainSpecPricing{Linear: &parityChainSpecLinearPricing{Base: 600, Word: 120}}},
 	})
 	spec.setPrecompile(4, &parityChainSpecBuiltin{
-		Name: "identity", Pricing: &parityChainSpecPricing{Linear: &parityChainSpecLinearPricing{Base: 15, Word: 3}},
+		Name: "identity", Pricing: &parityChainSpecPricingMaybe{Pricing: &parityChainSpecPricing{Linear: &parityChainSpecLinearPricing{Base: 15, Word: 3}}},
 	})
 	return spec, nil
 }
@@ -490,26 +545,60 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 
 		for _, v := range c.Accounts {
 			if v.Builtin != nil {
-				if v.Builtin.ActivateAt != nil {
-					switch v.Builtin.Name {
-					case "modexp":
-						mgc.EIP198FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
-					case "alt_bn128_pairing":
+				switch v.Builtin.Name {
+				case "ripemd160", "ecrecover", "sha256", "identity":
+				case "modexp":
+					mgc.EIP198FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
+
+				case "blake2_f":
+					if v.Builtin.Pricing.Pricing != nil {
+						mgc.EIP152FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
+					}
+
+				case "alt_bn128_pairing":
+					if v.Builtin.Pricing.Pricing != nil {
 						mgc.EIP212FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
 						if v.Builtin.EIP1108Transition != nil {
 							mgc.EIP1108FBlock = new(big.Int).Set(v.Builtin.EIP1108Transition.ToInt())
 						}
-					case "alt_bn128_add", "alt_bn128_mul":
+					} else {
+						for k, vv := range v.Builtin.Pricing.Map {
+							if vv.AltBnPairing.Base == 100000 && vv.AltBnPairing.Pair == 80000 {
+								mgc.EIP212FBlock = k.Big()
+							} else if vv.AltBnPairing.Base == 45000 && vv.AltBnPairing.Pair == 34000 {
+								mgc.EIP1108FBlock = k.Big()
+							}
+						}
+					}
+
+				case "alt_bn128_add", "alt_bn128_mul":
+					if v.Builtin.Pricing.Pricing != nil {
 						mgc.EIP213FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
 						if v.Builtin.EIP1108Transition != nil {
 							mgc.EIP1108FBlock = new(big.Int).Set(v.Builtin.EIP1108Transition.ToInt())
 						}
-					case "blake2_f":
-						mgc.EIP152FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
-					case "ripemd160", "ecrecover", "sha256", "identity":
-					default:
-						panic("unsupported builtin contract: " + v.Builtin.Name)
+					} else {
+						for k, vv := range v.Builtin.Pricing.Map {
+							if v.Builtin.Name == "alt_bn128_add" {
+								if vv.AltBnConstOperation.Price == 500 {
+									mgc.EIP213FBlock = k.Big()
+								}
+								if vv.AltBnConstOperation.Price == 150 {
+									mgc.EIP1108FBlock = k.Big()
+								}
+							}
+							if v.Builtin.Name == "alt_bn128_mul" {
+								if vv.AltBnConstOperation.Price == 40000 {
+									mgc.EIP213FBlock = k.Big()
+								}
+								if vv.AltBnConstOperation.Price == 6000 {
+									mgc.EIP1108FBlock = k.Big()
+								}
+							}
+						}
 					}
+				default:
+					panic("unsupported builtin contract: " + v.Builtin.Name)
 				}
 			}
 		}
@@ -597,7 +686,7 @@ func checkUnsupportedValsMust(spec *ParityChainSpec) error {
 	// FIXME
 
 	if spec.Params.EIP161abcTransition != nil && spec.Params.EIP161dTransition != nil &&
-	   *spec.Params.EIP161abcTransition != *spec.Params.EIP161dTransition {
+		*spec.Params.EIP161abcTransition != *spec.Params.EIP161dTransition {
 		panic(spec.Name + ": eip161abc vs. eip161d transition not supported")
 	}
 	// TODO...

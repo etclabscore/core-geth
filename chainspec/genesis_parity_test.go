@@ -42,6 +42,8 @@ func TestParityConfigToMultiGethGenesis(t *testing.T) {
 		}
 
 		if diffs := deep.Equal(gen1, gen2); len(diffs) != 0 {
+			//b, _ := json.MarshalIndent(gen1, "", "    ")
+			//t.Log(string(b)[:10000])
 			for _, d := range diffs {
 				t.Errorf("%s | diff: %s", p, d)
 			}

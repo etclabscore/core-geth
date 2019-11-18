@@ -17,12 +17,16 @@
 package tests
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math/big"
 	"os"
+	"path/filepath"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/ethereum/go-ethereum/chainspec"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/params"
 )
@@ -129,6 +133,39 @@ func init() {
 		}
 		spew.Config.DisableMethods = true // Turn of ChainConfig Stringer method
 		log.Println(spew.Sdump(Forks))
+	}
+	if os.Getenv("MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS") != "" {
+		paritySpecsDir := filepath.Join("..", "chainspecs")
+		paritySpecPath := func(name string) string {
+			return filepath.Join(paritySpecsDir, name)
+		}
+		matchups := map[string]string{
+			"Frontier": paritySpecPath("frontier_test.json"),
+			"Homestead": paritySpecPath("homestead_test.json"),
+			"EIP150": paritySpecPath("eip150_test.json"),
+			"EIP158": paritySpecPath("eip161_test.json"),
+			"Byzantium": paritySpecPath("byzantium_test.json"),
+			"Constantinople": paritySpecPath("constantinople_test.json"),
+			"ConstantinopleFix": paritySpecPath("st_peters_test.json"),
+			"EIP158ToByzantiumAt5": paritySpecPath("transition_test.json"),
+			"Istanbul": paritySpecPath("istanbul_test.json"),
+		}
+		for k, v := range matchups {
+			spec := chainspec.ParityChainSpec{}
+			b, err := ioutil.ReadFile(v)
+			if err != nil {
+				log.Fatalf("%s/%s err: %s\n%s", k, v, err, b)
+			}
+			err = json.Unmarshal(b, &spec)
+			if err != nil {
+				log.Fatalf("%s/%s err: %s\n%s", k, v, err, b)
+			}
+			genesis, err := chainspec.ParityConfigToMultiGethGenesis(&spec)
+			if err != nil {
+				log.Fatalf("%s/%s err: %s\n%s", k, v, err, b)
+			}
+			Forks[k] = genesis.Config
+		}
 	}
 }
 

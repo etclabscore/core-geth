@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/chainspec"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/internal/build"
 	"github.com/ethereum/go-ethereum/params"
 )
@@ -102,7 +103,7 @@ func paritySpecPath(name string) string {
 	return filepath.Join(paritySpecsDir, name)
 }
 
-var mapForkNameChainspecFile = map[string]string{
+var mapForkNameChainspecFileState = map[string]string{
 	"Frontier":             paritySpecPath("frontier_test.json"),
 	"Homestead":            paritySpecPath("homestead_test.json"),
 	"EIP150":               paritySpecPath("eip150_test.json"),
@@ -114,6 +115,48 @@ var mapForkNameChainspecFile = map[string]string{
 	"Istanbul":             paritySpecPath("istanbul_test.json"),
 	"ETC_Atlantis":         paritySpecPath("classic_atlantis_test.json"),
 	"ETC_Agharta":          paritySpecPath("classic_agharta_test.json"),
+}
+
+func mustReadConfig(name string) (genesis *core.Genesis, sha1sum [sha1.Size]byte) {
+	spec := chainspec.ParityChainSpec{}
+	b, err := ioutil.ReadFile(name)
+	if err != nil {
+		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
+	}
+	err = json.Unmarshal(b, &spec)
+	if err != nil {
+		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
+	}
+	genesis, err = chainspec.ParityConfigToMultiGethGenesis(&spec)
+	if err != nil {
+		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
+	}
+	return genesis, sha1.Sum(b)
+}
+
+func init() {
+	for _, config := range Forks {
+		config := config
+		convertMetaForkBlocksDifficultyAndRewardSchedules(config)
+	}
+
+	if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_KEY) != "" {
+		log.Println("Setting equivalent fork feature chain configurations")
+		for _, config := range Forks {
+			config := config
+			convertMetaForkBlocksToFeatures(config)
+		}
+		spew.Config.DisableMethods = true // Turn off ChainConfig Stringer method
+		log.Println(spew.Sdump(Forks))
+
+	} else if os.Getenv(MG_CHAINCONFIG_CHAINSPEC_KEY) != "" {
+		log.Println("Setting chain configurations from Parity chainspecs")
+		for k, v := range mapForkNameChainspecFileState {
+			genesis, sha1sum := mustReadConfig(v)
+			chainspecRefs[k] = chainspecRef{filepath.Base(v), sha1sum}
+			Forks[k] = genesis.Config
+		}
+	}
 }
 
 func convertMetaForkBlocksDifficultyAndRewardSchedules(config *params.ChainConfig) {
@@ -211,43 +254,6 @@ func convertMetaForkBlocksToFeatures(config *params.ChainConfig) {
 		config.EIP2028FBlock = config.IstanbulBlock
 		config.EIP2200FBlock = config.IstanbulBlock
 		config.IstanbulBlock = nil
-	}
-}
-
-func init() {
-	for _, config := range Forks {
-		config := config
-		convertMetaForkBlocksDifficultyAndRewardSchedules(config)
-	}
-
-	if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_KEY) != "" {
-		log.Println("Setting equivalent fork feature chain configurations")
-		for _, config := range Forks {
-			config := config
-			convertMetaForkBlocksToFeatures(config)
-		}
-		spew.Config.DisableMethods = true // Turn of ChainConfig Stringer method
-		log.Println(spew.Sdump(Forks))
-
-	} else if os.Getenv(MG_CHAINCONFIG_CHAINSPEC_KEY) != "" {
-		log.Println("Setting fork feature chain configurations from Parity chainspecs")
-		for k, v := range mapForkNameChainspecFile {
-			spec := chainspec.ParityChainSpec{}
-			b, err := ioutil.ReadFile(v)
-			if err != nil {
-				panic(fmt.Sprintf("%s/%s err: %s\n%s", k, v, err, b))
-			}
-			err = json.Unmarshal(b, &spec)
-			if err != nil {
-				panic(fmt.Sprintf("%s/%s err: %s\n%s", k, v, err, b))
-			}
-			genesis, err := chainspec.ParityConfigToMultiGethGenesis(&spec)
-			if err != nil {
-				panic(fmt.Sprintf("%s/%s err: %s\n%s", k, v, err, b))
-			}
-			chainspecRefs[k] = chainspecRef{filepath.Base(v), sha1.Sum(b)}
-			Forks[k] = genesis.Config
-		}
 	}
 }
 

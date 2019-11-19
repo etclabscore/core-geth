@@ -160,22 +160,21 @@ func init() {
 }
 
 func convertMetaForkBlocksDifficultyAndRewardSchedules(config *params.ChainConfig) {
-	if config.DifficultyBombDelaySchedule == nil {
-		config.DifficultyBombDelaySchedule = hexutil.Uint64BigMapEncodesHex{}
-	}
 	if config.BlockRewardSchedule == nil {
 		config.BlockRewardSchedule = hexutil.Uint64BigMapEncodesHex{
 			uint64(0x0): new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 		}
 	}
-	if config.ByzantiumBlock != nil {
-		config.DifficultyBombDelaySchedule[config.ByzantiumBlock.Uint64()] = big.NewInt(3000000)
-		config.BlockRewardSchedule[config.ByzantiumBlock.Uint64()] = big.NewInt(3000000000000000000)
-	}
-	if config.ConstantinopleBlock != nil {
-		config.DifficultyBombDelaySchedule[config.ConstantinopleBlock.Uint64()] = big.NewInt(2000000)
-		config.BlockRewardSchedule[config.ConstantinopleBlock.Uint64()] = big.NewInt(2000000000000000000)
-
+	if config.DifficultyBombDelaySchedule == nil {
+		config.DifficultyBombDelaySchedule = hexutil.Uint64BigMapEncodesHex{}
+		if config.ByzantiumBlock != nil {
+			config.DifficultyBombDelaySchedule[config.ByzantiumBlock.Uint64()] = big.NewInt(3000000)
+			config.BlockRewardSchedule[config.ByzantiumBlock.Uint64()] = big.NewInt(3000000000000000000)
+		}
+		if config.ConstantinopleBlock != nil {
+			config.DifficultyBombDelaySchedule[config.ConstantinopleBlock.Uint64()] = big.NewInt(2000000)
+			config.BlockRewardSchedule[config.ConstantinopleBlock.Uint64()] = big.NewInt(2000000000000000000)
+		}
 	}
 }
 

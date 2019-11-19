@@ -56,7 +56,11 @@ var (
 var difficultyChainConfiguations = map[string]params.ChainConfig{
 	"Ropsten":  *params.TestnetChainConfig,
 	"Morden":   *params.TestnetChainConfig,
-	"Frontier": {},
+	"Frontier": {
+		Ethash:                      new(params.EthashConfig),
+		BlockRewardSchedule:         hexutil.Uint64BigMapEncodesHex{},
+		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{},
+	},
 	"Homestead": {
 		Ethash:                      new(params.EthashConfig),
 		HomesteadBlock:              big.NewInt(0),

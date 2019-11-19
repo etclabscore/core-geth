@@ -34,6 +34,12 @@ test: all
 
 test-multigeth: ## Runs tests specific to multi-geth.
 	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALANCE=on go run build/ci.go test $(testargs)
+	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on go run build/ci.go test $(testargs)
+
+tests-generate: ## Generate tests.
+	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on \
+	env MULTIGETH_TESTS_GENERATE_STATE_TESTS=on \
+	go run build/ci.go test -v ./tests -run TestGenState
 
 lint: ## Run linters.
 	go run build/ci.go lint

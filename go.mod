@@ -29,6 +29,7 @@ require (
 	github.com/hashicorp/golang-lru v0.0.0-20160813221303-0a025b7e63ad
 	github.com/howeyc/fsnotify v0.0.0-20151003194602-f0c08ee9c607 // indirect
 	github.com/huin/goupnp v0.0.0-20161224104101-679507af18f3
+	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334
 	github.com/influxdata/influxdb v0.0.0-20180221223340-01288bdb0883
 	github.com/jackpal/go-nat-pmp v0.0.0-20160603034137-1fa385a6f458
 	github.com/julienschmidt/httprouter v0.0.0-20170430222011-975b5c4c7c21

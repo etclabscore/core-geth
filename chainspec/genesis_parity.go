@@ -241,13 +241,24 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 			spec.Engine.Ethash.Params.EIP100bTransition = hexutilUint64(b.Uint64())
 		}
 
-		if b := params.FeatureOrMetaBlock(genesis.Config.EIP649FBlock, genesis.Config.ByzantiumBlock); b != nil {
-			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = params.EIP649FBlockReward
-			spec.Engine.Ethash.Params.DifficultyBombDelays[b.Uint64()] = big.NewInt(3000000)
-		}
-		if b := params.FeatureOrMetaBlock(genesis.Config.EIP1234FBlock, genesis.Config.ConstantinopleBlock); b != nil {
+		if genesis.Config.BlockRewardSchedule != nil && len(genesis.Config.BlockRewardSchedule) > 0 {
+			for k, v := range genesis.Config.BlockRewardSchedule {
+				spec.Engine.Ethash.Params.BlockReward[k] = v
+			}
+		} else if b := params.FeatureOrMetaBlock(genesis.Config.EIP1234FBlock, genesis.Config.ConstantinopleBlock); b != nil {
 			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = params.EIP1234FBlockReward
+		} else if b := params.FeatureOrMetaBlock(genesis.Config.EIP649FBlock, genesis.Config.ByzantiumBlock); b != nil {
+			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = params.EIP649FBlockReward
+		}
+
+		if genesis.Config.DifficultyBombDelaySchedule != nil && len(genesis.Config.DifficultyBombDelaySchedule) > 0 {
+			for k, v := range genesis.Config.DifficultyBombDelaySchedule {
+				spec.Engine.Ethash.Params.DifficultyBombDelays[k] = v
+			}
+		} else if b := params.FeatureOrMetaBlock(genesis.Config.EIP1234FBlock, genesis.Config.ConstantinopleBlock); b != nil {
 			spec.Engine.Ethash.Params.DifficultyBombDelays[b.Uint64()] = big.NewInt(2000000)
+		} else if b := params.FeatureOrMetaBlock(genesis.Config.EIP649FBlock, genesis.Config.ByzantiumBlock); b != nil {
+			spec.Engine.Ethash.Params.DifficultyBombDelays[b.Uint64()] = big.NewInt(3000000)
 		}
 
 		if b := genesis.Config.DisposalBlock; b != nil {

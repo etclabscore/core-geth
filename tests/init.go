@@ -27,7 +27,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/chainspec"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -37,26 +36,32 @@ import (
 )
 
 var (
-	MG_GENERATE_STATE_TESTS_KEY   = "MULTIGETH_TESTS_GENERATE_STATE_TESTS"
-	MG_CHAINCONFIG_FEATURE_EQ_KEY = "MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALANCE"
-	MG_CHAINCONFIG_CHAINSPEC_KEY  = "MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS"
+	MG_GENERATE_STATE_TESTS_KEY      = "MULTIGETH_TESTS_GENERATE_STATE_TESTS"
+	MG_GENERATE_DIFFICULTY_TESTS_KEY = "MULTIGETH_TESTS_GENERATE_DIFFICULTY_TESTS"
+	MG_CHAINCONFIG_FEATURE_EQ_KEY    = "MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALANCE"
+	MG_CHAINCONFIG_CHAINSPEC_KEY     = "MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS"
 )
 
-// writeTestReferencePairs defines reference pairs for use when writing tests.
+// writeStateTestsReferencePairs defines reference pairs for use when writing tests.
 // The reference (key) is used to define the environment and parameters, while the
 // output from these tests run against the <value> state is actually written.
-var writeTestReferencePairs = map[string]string{
+var writeStateTestsReferencePairs = map[string]string{
 	"Byzantium":         "ETC_Atlantis",
 	"ConstantinopleFix": "ETC_Agharta",
 }
 
 type chainspecRefsT map[string]chainspecRef
 
-var chainspecRefs = chainspecRefsT{}
+var chainspecRefsState = chainspecRefsT{}
+var chainspecRefsDifficulty = chainspecRefsT{}
 
 type chainspecRef struct {
-	Filename string          `json:"filename"`
-	Sha1Sum  [sha1.Size]byte `json:"sha1sum"`
+	Filename string `json:"filename"`
+	Sha1Sum  []byte `json:"sha1sum"`
+}
+
+func (c chainspecRef) String() string {
+	return fmt.Sprintf("file: %s, file.sha1sum: %x", c.Filename, c.Sha1Sum)
 }
 
 func (c *chainspecRef) UnmarshalJSON(input []byte) error {
@@ -70,22 +75,19 @@ func (c *chainspecRef) UnmarshalJSON(input []byte) error {
 		return err
 	}
 	c.Filename = x.F
-	c.Sha1Sum = [sha1.Size]byte{}
-	bs := common.HexToHash(x.S).Bytes()
-	for i := 0; i < 20; i++ {
-		c.Sha1Sum[i] = bs[i]
-	}
+	c.Sha1Sum = common.Hex2Bytes(x.S)
 	return nil
 }
 
 func (c chainspecRef) MarshalJSON() ([]byte, error) {
-	var x = struct{
+	var x = struct {
 		F string `json:"filename"`
 		S string `json:"sha1sum"`
 	}{
 		F: c.Filename,
-		S: fmt.Sprintf("%x", c.Sha1Sum),
+		S: common.Bytes2Hex(c.Sha1Sum[:]),
 	}
+
 	return json.MarshalIndent(x, "", "    ")
 }
 
@@ -104,20 +106,32 @@ func paritySpecPath(name string) string {
 }
 
 var mapForkNameChainspecFileState = map[string]string{
-	"Frontier":             paritySpecPath("frontier_test.json"),
-	"Homestead":            paritySpecPath("homestead_test.json"),
-	"EIP150":               paritySpecPath("eip150_test.json"),
-	"EIP158":               paritySpecPath("eip161_test.json"),
-	"Byzantium":            paritySpecPath("byzantium_test.json"),
-	"Constantinople":       paritySpecPath("constantinople_test.json"),
-	"ConstantinopleFix":    paritySpecPath("st_peters_test.json"),
-	"EIP158ToByzantiumAt5": paritySpecPath("transition_test.json"),
-	"Istanbul":             paritySpecPath("istanbul_test.json"),
-	"ETC_Atlantis":         paritySpecPath("classic_atlantis_test.json"),
-	"ETC_Agharta":          paritySpecPath("classic_agharta_test.json"),
+	"Frontier":             "frontier_test.json",
+	"Homestead":            "homestead_test.json",
+	"EIP150":               "eip150_test.json",
+	"EIP158":               "eip161_test.json",
+	"Byzantium":            "byzantium_test.json",
+	"Constantinople":       "constantinople_test.json",
+	"ConstantinopleFix":    "st_peters_test.json",
+	"EIP158ToByzantiumAt5": "transition_test.json",
+	"Istanbul":             "istanbul_test.json",
+	"ETC_Atlantis":         "classic_atlantis_test.json",
+	"ETC_Agharta":          "classic_agharta_test.json",
 }
 
-func mustReadConfig(name string) (genesis *core.Genesis, sha1sum [sha1.Size]byte) {
+var mapForkNameChainspecFileDifficulty = map[string]string{
+	"Ropsten":           "ropsten_difficulty_test.json",
+	"Morden":            "morden_difficulty_test.json",
+	"Frontier":          "frontier_difficulty_test.json",
+	"Homestead":         "homestead_difficulty_test.json",
+	"Byzantium":         "byzantium_difficulty_test.json",
+	"MainNetwork":       "mainnetwork_difficulty_test.json",
+	"CustomMainNetwork": "custom_mainnetwork_difficulty_test.json",
+	"Constantinople":    "constantinople_difficulty_test.json",
+	"difficulty.json":   "difficulty_json_difficulty_test.json",
+}
+
+func mustReadConfig(name string) (genesis *core.Genesis, sha1sum []byte) {
 	spec := chainspec.ParityChainSpec{}
 	b, err := ioutil.ReadFile(name)
 	if err != nil {
@@ -131,7 +145,8 @@ func mustReadConfig(name string) (genesis *core.Genesis, sha1sum [sha1.Size]byte
 	if err != nil {
 		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
 	}
-	return genesis, sha1.Sum(b)
+	bb := sha1.Sum(b)
+	return genesis, bb[:]
 }
 
 func init() {
@@ -142,19 +157,34 @@ func init() {
 
 	if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_KEY) != "" {
 		log.Println("Setting equivalent fork feature chain configurations")
+
 		for _, config := range Forks {
 			config := config
 			convertMetaForkBlocksToFeatures(config)
 		}
-		spew.Config.DisableMethods = true // Turn off ChainConfig Stringer method
-		log.Println(spew.Sdump(Forks))
+
+		for k, v := range difficultyChainConfiguations {
+			v := v
+			convertMetaForkBlocksToFeatures(&v)
+			difficultyChainConfiguations[k] = v
+		}
 
 	} else if os.Getenv(MG_CHAINCONFIG_CHAINSPEC_KEY) != "" {
 		log.Println("Setting chain configurations from Parity chainspecs")
+
 		for k, v := range mapForkNameChainspecFileState {
-			genesis, sha1sum := mustReadConfig(v)
-			chainspecRefs[k] = chainspecRef{filepath.Base(v), sha1sum}
+			genesis, sha1sum := mustReadConfig(paritySpecPath(v))
+			chainspecRefsState[k] = chainspecRef{filepath.Base(v), sha1sum}
 			Forks[k] = genesis.Config
+		}
+
+		for k, v := range mapForkNameChainspecFileDifficulty {
+			genesis, sha1sum := mustReadConfig(paritySpecPath(v))
+			if len(sha1sum) == 0 {
+				panic("zero sum game")
+			}
+			chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
+			difficultyChainConfiguations[k] = *genesis.Config
 		}
 	}
 }

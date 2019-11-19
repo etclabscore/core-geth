@@ -91,8 +91,9 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			chainspecRefs[subtest.Fork] = chainspecRef{filepath.Base(filename), sha1.Sum(b)}
-			t.Logf("Created new fork chainspec file: %v", chainspecRefs[subtest.Fork])
+			sum := sha1.Sum(b)
+			chainspecRefsState[subtest.Fork] = chainspecRef{filepath.Base(filename), sum[:]}
+			t.Logf("Created new fork chainspec file: %v", chainspecRefsState[subtest.Fork])
 		}
 	}
 
@@ -103,7 +104,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		// Note that using this function implies that you trust the test runner
 		// to give valid output, ie. only generate tests after you're sure the
 		// reference tests themselves are passing.
-		forkPair, ok := writeTestReferencePairs[subtest.Fork]
+		forkPair, ok := writeStateTestsReferencePairs[subtest.Fork]
 		if !ok {
 			continue
 		}
@@ -139,7 +140,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 					test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, head)
 					test.json.Info.Parent = submoduleParentRef
 					test.json.Info.ParentSha1Sum = fmt.Sprintf("%x", sha1.Sum(fi))
-					test.json.Info.Chainspecs = chainspecRefs
+					test.json.Info.Chainspecs = chainspecRefsState
 
 					err = ioutil.WriteFile(fpath, b, os.ModePerm)
 					if err != nil {

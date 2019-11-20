@@ -581,6 +581,9 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 							if vv.AltBnPairing.Base == 100000 && vv.AltBnPairing.Pair == 80000 {
 								mgc.EIP212FBlock = k.Big()
 							} else if vv.AltBnPairing.Base == 45000 && vv.AltBnPairing.Pair == 34000 {
+								if mgc.EIP212FBlock == nil {
+									mgc.EIP212FBlock = k.Big()
+								}
 								mgc.EIP1108FBlock = k.Big()
 							}
 						}
@@ -599,6 +602,9 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 									mgc.EIP213FBlock = k.Big()
 								}
 								if vv.AltBnConstOperation.Price == 150 {
+									if mgc.EIP213FBlock == nil {
+										mgc.EIP213FBlock = k.Big()
+									}
 									mgc.EIP1108FBlock = k.Big()
 								}
 							}
@@ -607,6 +613,9 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 									mgc.EIP213FBlock = k.Big()
 								}
 								if vv.AltBnConstOperation.Price == 6000 {
+									if mgc.EIP213FBlock == nil {
+										mgc.EIP213FBlock = k.Big()
+									}
 									mgc.EIP1108FBlock = k.Big()
 								}
 							}

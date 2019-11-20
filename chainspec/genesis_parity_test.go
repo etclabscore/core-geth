@@ -95,3 +95,4 @@ var exampleAccountWithBuiltinB = []byte(`{
 func TestParityBuiltinType(t *testing.T) {
 
 }
+

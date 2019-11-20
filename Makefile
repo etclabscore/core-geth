@@ -32,11 +32,15 @@ ios:
 test: all
 	go run build/ci.go test $(testargs)
 
+test-multigeth: test-multigeth-features test-multigeth-chainspecs ## Runs all tests specific to multi-geth.
+
 test-multigeth-features: ## Runs tests specific to multi-geth using Fork/Feature configs.
-	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALANCE=on go run build/ci.go test $(testargs)
+	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALANCE=on go run build/ci.go test -count=1 ./tests $(testargs)
 
 test-multigeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
-	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on go run build/ci.go test $(testargs)
+	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on go run build/ci.go test -count=1 ./tests $(testargs)
+
+tests-generate: tests-generate-state tests-generate-difficulty ## Generate all tests.
 
 tests-generate-state: ## Generate state tests.
 	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on \

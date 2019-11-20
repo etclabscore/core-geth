@@ -44,9 +44,11 @@ tests-generate-state: ## Generate state tests.
 	go run build/ci.go test -v ./tests -run TestGenState
 
 tests-generate-difficulty: ## Generate difficulty tests.
+	# Note that this will NOT generate a unique tests; see following script.
 	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on \
 	env MULTIGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
 	go run build/ci.go test -v ./tests -run TestDifficulty
+	./tests/uniq-difficulty-tests.sh
 
 lint: ## Run linters.
 	go run build/ci.go lint

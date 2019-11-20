@@ -54,8 +54,8 @@ var (
 )
 
 var difficultyChainConfiguations = map[string]params.ChainConfig{
-	"Ropsten":  *params.TestnetChainConfig,
-	"Morden":   *params.TestnetChainConfig,
+	"Ropsten": *params.TestnetChainConfig,
+	"Morden":  *params.TestnetChainConfig,
 	"Frontier": {
 		Ethash:                      new(params.EthashConfig),
 		BlockRewardSchedule:         hexutil.Uint64BigMapEncodesHex{},
@@ -94,6 +94,17 @@ var difficultyChainConfiguations = map[string]params.ChainConfig{
 		},
 	},
 	"difficulty.json": mainnetChainConfig,
+	"ETC_Atlantis": {
+		Ethash:         new(params.EthashConfig),
+		ByzantiumBlock: big.NewInt(0),
+		DisposalBlock:  big.NewInt(0),
+	},
+	"ETC_Agharta": {
+		Ethash:              new(params.EthashConfig),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		DisposalBlock:       big.NewInt(0),
+	},
 }
 
 type DifficultyTest struct {

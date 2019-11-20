@@ -74,6 +74,8 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 	head := build.RunGit("rev-parse", "HEAD")
 	head = strings.TrimSpace(head)
 
+	// For tests using a config that does not have an associated chainspec file,
+	// then generate that file.
 	for _, subtest := range test.Subtests() {
 		subtest := subtest
 		if _, ok := mapForkNameChainspecFileState[subtest.Fork]; !ok {

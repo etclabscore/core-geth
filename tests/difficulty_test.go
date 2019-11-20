@@ -19,12 +19,19 @@ package tests
 import (
 	"bufio"
 	"bytes"
+	"crypto/sha1"
 	"encoding/json"
+	"io/ioutil"
+	"math/big"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/chainspec"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 )
 
@@ -34,6 +41,9 @@ func TestDifficulty(t *testing.T) {
 	if !generateTests {
 		t.Parallel()
 	} else {
+		if os.Getenv(MG_CHAINCONFIG_CHAINSPEC_KEY) == "" {
+			t.Fatal("Must run test generation with JSON file chain configurations.")
+		}
 		err := os.MkdirAll(filepath.Join(difficultyTestDir, "generated_difficulty"), os.ModePerm)
 		if err != nil {
 			t.Fatal(err)
@@ -62,9 +72,13 @@ func TestDifficulty(t *testing.T) {
 
 	// If there is a generated NDJSON difficulty test file available, then use that for testing.
 	// This is a minimum necessary dogfooding for the test generation.
-	// Note that if this file is indeed available, the tests will run
+	// Note that if this file is indeed available, the tests will run.
 	if fi, err := os.Open(filepath.Join(difficultyTestDir, "generated_difficulty", "all_difficulty_tests.json")); err == nil {
+
 		scanner := bufio.NewScanner(fi)
+
+		newTests := []*DifficultyTest{}
+
 		for scanner.Scan() {
 			test := &DifficultyTest{}
 			err := json.Unmarshal(scanner.Bytes(), &test)
@@ -86,17 +100,15 @@ func TestDifficulty(t *testing.T) {
 				t.Fatal("missing chain configurations for forkname: ", forkName)
 			}
 
-			// If tests are using JSON chainspecs, then
-			// reverse lookup and verify the chain config given the JSON spec filename.
-			if os.Getenv(MG_CHAINCONFIG_CHAINSPEC_KEY) != "" {
-				cr, ok := chainspecRefsDifficulty[forkName]
-				if !ok {
-					t.Fatalf("missing chainconfig: %v", forkName)
-				}
-				if !bytes.Equal(cr.Sha1Sum, test.Chainspec.Sha1Sum) {
-					t.Fatalf("mismatch configs, test: %v, spec config sum: %x", test, cr.Sha1Sum)
-				}
+			// Reverse lookup and verify the chain config given the JSON spec filename.
+			cr, ok := chainspecRefsDifficulty[forkName]
+			if !ok {
+				t.Fatalf("missing chainconfig: %v", forkName)
 			}
+			if !bytes.Equal(cr.Sha1Sum, test.Chainspec.Sha1Sum) {
+				t.Fatalf("mismatch configs, test: %v, spec config sum: %x", test, cr.Sha1Sum)
+			}
+
 			t.Run(test.Name, func(t *testing.T) {
 				err = test.Run(&conf)
 				if err != nil {
@@ -104,52 +116,114 @@ func TestDifficulty(t *testing.T) {
 					return
 				}
 				t.Logf("OK %v", test)
+
+				if !generateTests {
+					return
+				}
+
+				// If this is a reference config, and the associated to-generate
+				// chainspec file doesn't exist, create it.
+				associateForkName, ok := writeDifficultyTestsReferencePairs[forkName]
+				if ok {
+					conf, ok := difficultyChainConfiguations[associateForkName]
+					if !ok {
+						panic("generating config associated failed; no existing Go chain config found")
+					}
+
+					genesis := core.DefaultTestnetGenesisBlock()
+					genesis.Config = &conf
+
+					pspec, err := chainspec.NewParityChainSpec(associateForkName, genesis, []string{})
+					if err != nil {
+						t.Fatal(err)
+					}
+					specFilepath, ok := mapForkNameChainspecFileDifficulty[associateForkName]
+					if !ok {
+						t.Fatal("nonexisting chainspec JSON file path, ref/assoc config: ", forkName, associateForkName)
+					}
+
+					b, err := json.MarshalIndent(pspec, "", "    ")
+					if err != nil {
+						t.Fatal(err)
+					}
+
+					err = ioutil.WriteFile(paritySpecPath(specFilepath), b, os.ModePerm)
+					if err != nil {
+						t.Fatal(err)
+					}
+
+					sum := sha1.Sum(b)
+
+					newTest := &DifficultyTest{
+						ParentTimestamp:    test.ParentTimestamp,
+						ParentDifficulty:   test.ParentDifficulty,
+						UncleHash:          test.UncleHash,
+						CurrentTimestamp:   test.CurrentTimestamp,
+						CurrentBlockNumber: test.CurrentBlockNumber,
+						CurrentDifficulty:  ethash.CalcDifficulty(&conf, test.CurrentTimestamp, &types.Header{
+							Difficulty: test.ParentDifficulty,
+							Time:       test.ParentTimestamp,
+							Number:     big.NewInt(int64(test.CurrentBlockNumber - 1)),
+							UncleHash:  test.UncleHash,
+						}),
+						Chainspec:          chainspecRef{
+							Filename: specFilepath,
+							Sha1Sum:  sum[:],
+						},
+						Name:               strings.ReplaceAll(test.Name, forkName, associateForkName),
+					}
+					newTests = append(newTests, newTest)
+				}
 			})
+		}
+		for _, test := range newTests {
+			test := test
+			mustAppendTestToFile(t, test)
 		}
 		return
 	}
 
 	dt.walk(t, difficultyTestDir, func(t *testing.T, name string, test *DifficultyTest) {
 		cfg, key := dt.findConfig(name)
-		test.Chainspec = chainspecRefsDifficulty[key]
+
 		if test.ParentDifficulty.Cmp(params.MinimumDifficulty) < 0 {
 			t.Skip("difficulty below minimum")
 			return
 		}
 		if err := dt.checkFailure(t, name, test.Run(cfg)); err != nil {
 			t.Error(err)
-		} else {
-			if !generateTests {
-				return
-			}
-			test.Name = strings.ReplaceAll(name, ".json", "")
-			b, _ := json.Marshal(test)
-			out := []byte{}
-			buf := bytes.NewBuffer(out)
-			err = json.Compact(buf, b)
-			if err != nil {
-				t.Fatal(err)
-			}
-			buf.Write([]byte("\n"))
+		} else if generateTests {
 
-			fn := filepath.Join(difficultyTestDir, "generated_difficulty", "all_difficulty_tests.json")
-			fi, err := os.OpenFile(fn, os.O_APPEND|os.O_WRONLY|os.O_CREATE, os.ModePerm)
-			if err != nil {
-				t.Fatal(err)
-				return
-			}
-			_, err = fi.Write(buf.Bytes())
-			if err != nil {
-				t.Fatal(err)
-			}
-			err = fi.Close()
-			if err != nil {
-				t.Fatal(err)
-			}
+			test.Chainspec = chainspecRefsDifficulty[key]
+			test.Name = strings.ReplaceAll(name, ".json", "")
+
+			mustAppendTestToFile(t, test)
 		}
 	})
+}
 
-	if !generateTests {
+func mustAppendTestToFile(t *testing.T, test *DifficultyTest) {
+	b, _ := json.Marshal(test)
+	out := []byte{}
+	buf := bytes.NewBuffer(out)
+	err := json.Compact(buf, b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	buf.Write([]byte("\n"))
+
+	fn := filepath.Join(difficultyTestDir, "generated_difficulty", "all_difficulty_tests.json")
+	fi, err := os.OpenFile(fn, os.O_APPEND|os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	if err != nil {
+		t.Fatal(err)
 		return
+	}
+	_, err = fi.Write(buf.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = fi.Close()
+	if err != nil {
+		t.Fatal(err)
 	}
 }

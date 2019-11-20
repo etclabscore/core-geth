@@ -50,6 +50,11 @@ var writeStateTestsReferencePairs = map[string]string{
 	"ConstantinopleFix": "ETC_Agharta",
 }
 
+var writeDifficultyTestsReferencePairs = map[string]string{
+	"Byzantium":      "ETC_Atlantis",
+	"Constantinople": "ETC_Agharta",
+}
+
 type chainspecRefsT map[string]chainspecRef
 
 var chainspecRefsState = chainspecRefsT{}
@@ -129,10 +134,17 @@ var mapForkNameChainspecFileDifficulty = map[string]string{
 	"CustomMainNetwork": "custom_mainnetwork_difficulty_test.json",
 	"Constantinople":    "constantinople_difficulty_test.json",
 	"difficulty.json":   "difficulty_json_difficulty_test.json",
+	"ETC_Atlantis":      "classic_atlantis_difficulty_test.json",
+	"ETC_Agharta":       "classic_agharta_difficulty_test.json",
 }
 
-func mustReadConfig(name string) (genesis *core.Genesis, sha1sum []byte) {
+func readConfigFromSpecFile(name string) (genesis *core.Genesis, sha1sum []byte, err error) {
 	spec := chainspec.ParityChainSpec{}
+	if fi, err := os.Open(name); os.IsNotExist(err) {
+		return nil, nil, err
+	} else {
+		fi.Close()
+	}
 	b, err := ioutil.ReadFile(name)
 	if err != nil {
 		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
@@ -146,7 +158,7 @@ func mustReadConfig(name string) (genesis *core.Genesis, sha1sum []byte) {
 		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
 	}
 	bb := sha1.Sum(b)
-	return genesis, bb[:]
+	return genesis, bb[:], nil
 }
 
 func init() {
@@ -173,18 +185,24 @@ func init() {
 		log.Println("Setting chain configurations from Parity chainspecs")
 
 		for k, v := range mapForkNameChainspecFileState {
-			genesis, sha1sum := mustReadConfig(paritySpecPath(v))
+			genesis, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
+			if err != nil {
+				panic(err)
+			}
 			chainspecRefsState[k] = chainspecRef{filepath.Base(v), sha1sum}
 			Forks[k] = genesis.Config
 		}
 
 		for k, v := range mapForkNameChainspecFileDifficulty {
-			genesis, sha1sum := mustReadConfig(paritySpecPath(v))
-			if len(sha1sum) == 0 {
+			genesis, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
+			if os.IsNotExist(err) && os.Getenv(MG_GENERATE_DIFFICULTY_TESTS_KEY) != "" {
+				log.Println("Will generate chainspec file for", k, v)
+			} else if len(sha1sum) == 0 {
 				panic("zero sum game")
+			} else {
+				chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
+				difficultyChainConfiguations[k] = *genesis.Config
 			}
-			chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
-			difficultyChainConfiguations[k] = *genesis.Config
 		}
 	}
 }

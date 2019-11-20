@@ -3,12 +3,12 @@ package chainspec
 import (
 	"encoding/json"
 	"io/ioutil"
+	"math/big"
 	"path/filepath"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
-	"github.com/go-test/deep"
 )
 
 func asSpecFilePath(name string) string {
@@ -41,11 +41,26 @@ func TestParityConfigToMultiGethGenesis(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if diffs := deep.Equal(gen1, gen2); len(diffs) != 0 {
-			//b, _ := json.MarshalIndent(gen1, "", "    ")
-			//t.Log(string(b)[:10000])
-			for _, d := range diffs {
-				t.Errorf("%s | diff: %s", p, d)
+		for _, bl := range []int64{
+			0, 10000, 40000, 50000, 100000,
+			2000000, 4000000, 6000000, 8000000, 10000000,
+		} {
+			b := big.NewInt(bl)
+			fns := []func(b *big.Int) bool{
+				gen1.Config.IsEIP2F, gen2.Config.IsEIP2F,
+				gen1.Config.IsEIP100F, gen2.Config.IsEIP100F,
+				gen1.Config.IsEIP213F, gen2.Config.IsEIP213F,
+				gen1.Config.IsEIP1052F, gen2.Config.IsEIP1052F,
+				gen1.Config.IsEIP140F, gen2.Config.IsEIP140F,
+				gen1.Config.IsEIP161F, gen2.Config.IsEIP161F,
+			}
+			for i, f := range fns {
+				if i == 0 || i%2 == 0 {
+					continue
+				}
+				if (f(b) && !fns[i-1](b)) || (!f(b) && fns[i-1](b)) {
+					t.Errorf("%d mismatch", i)
+				}
 			}
 		}
 	}
@@ -62,6 +77,7 @@ var exampleAccountWithBuiltinA = []byte(`{
 				}
 			}
 		}`)
+
 var exampleAccountWithBuiltinB = []byte(`{
 			"builtin": {
 				"name": "alt_bn128_add",

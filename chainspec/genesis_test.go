@@ -31,7 +31,7 @@ import (
 func TestBlockConfig(t *testing.T) {
 	frontierCC := &params.ChainConfig{
 		ChainID: big.NewInt(1),
-		Ethash: new(params.EthashConfig),
+		Ethash:  new(params.EthashConfig),
 	}
 	genesis := core.DefaultGenesisBlock()
 	genesis.Config = frontierCC
@@ -80,44 +80,3 @@ func TestAlethSturebyConverter(t *testing.T) {
 	}
 }
 
-// Tests the go-ethereum to Parity chainspec conversion for the Stureby testnet.
-func TestParitySturebyConverter(t *testing.T) {
-	// Read a native genesis json config
-	blob, err := ioutil.ReadFile("testdata/stureby_geth.json")
-	if err != nil {
-		t.Fatalf("could not read file: %v", err)
-	}
-	var genesis core.Genesis
-	if err := json.Unmarshal(blob, &genesis); err != nil {
-		t.Fatalf("failed parsing genesis: %v", err)
-	}
-
-	// Marshall this genesis to SomeSpec
-	spec, err := NewParityChainSpec("stureby", &genesis, []string{})
-	if err != nil {
-		t.Fatalf("failed creating chainspec: %v", err)
-	}
-
-	// Read comparator json config
-	expBlob, err := ioutil.ReadFile("testdata/stureby_parity.json")
-	if err != nil {
-		t.Fatalf("could not read file: %v", err)
-	}
-	// Marshal this config to SomeSpec
-	expspec := &ParityChainSpec{}
-	if err := json.Unmarshal(expBlob, expspec); err != nil {
-		t.Fatalf("failed parsing genesis: %v", err)
-	}
-	expspec.Nodes = []string{}
-
-	// Compare the read-in SomeSpec vs. the generated SomeSpec
-	if diffs := deep.Equal(expspec, spec); len(diffs) != 0 {
-		t.Errorf("chainspec mismatch")
-		for _, d := range diffs {
-			t.Log(d)
-		}
-		spew.Dump(spec)
-		bm, _ := json.MarshalIndent(spec, "", "    ")
-		t.Log(string(bm))
-	}
-}

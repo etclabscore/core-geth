@@ -22,8 +22,8 @@ import (
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -48,9 +48,9 @@ func TestSetupGenesis(t *testing.T) {
 		customghash = common.HexToHash("0x89c99d90b79719238d2645c7642f2c9295246e80775b38cfd162b696817fbd50")
 		customg     = Genesis{
 			Config: &params.ChainConfig{
-				HomesteadBlock: big.NewInt(3),
-				BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{},
-				DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{},
+				HomesteadBlock:              big.NewInt(3),
+				BlockRewardSchedule:         parity.Uint64BigMapEncodesHex{},
+				DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{},
 			},
 			Alloc: GenesisAlloc{
 				{1}: {Balance: big.NewInt(1), Storage: map[common.Hash]common.Hash{{1}: {1}}},

@@ -18,8 +18,8 @@ package params
 import (
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 var (
@@ -43,10 +43,10 @@ var (
 		EthersocialBlock:    big.NewInt(0),
 		ConstantinopleBlock: nil,
 		Ethash:              new(EthashConfig),
-		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
 			600000: new(big.Int).SetUint64(uint64(0x2dc6c0)),
 		},
-		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
 			0: big.NewInt(5e+18),
 		},
 	}

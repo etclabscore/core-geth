@@ -28,8 +28,8 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/chainspec"
+	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/internal/build"
 	"github.com/ethereum/go-ethereum/params"
@@ -104,7 +104,7 @@ var submoduleParentRef = func() string {
 	return subModOut
 }()
 
-var paritySpecsDir = filepath.Join("..", "chainspecs")
+var paritySpecsDir = filepath.Join("..", "chainspecs", "parity")
 
 func paritySpecPath(name string) string {
 	p := filepath.Join(paritySpecsDir, name)
@@ -236,12 +236,12 @@ func init() {
 
 func convertMetaForkBlocksDifficultyAndRewardSchedules(config *params.ChainConfig) {
 	if config.BlockRewardSchedule == nil {
-		config.BlockRewardSchedule = hexutil.Uint64BigMapEncodesHex{
+		config.BlockRewardSchedule = parity.Uint64BigMapEncodesHex{
 			uint64(0x0): new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 		}
 	}
 	if config.DifficultyBombDelaySchedule == nil {
-		config.DifficultyBombDelaySchedule = hexutil.Uint64BigMapEncodesHex{}
+		config.DifficultyBombDelaySchedule = parity.Uint64BigMapEncodesHex{}
 		if config.ByzantiumBlock != nil {
 			config.DifficultyBombDelaySchedule[config.ByzantiumBlock.Uint64()] = big.NewInt(3000000)
 			config.BlockRewardSchedule[config.ByzantiumBlock.Uint64()] = big.NewInt(3000000000000000000)

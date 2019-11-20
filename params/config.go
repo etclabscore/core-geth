@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -72,11 +72,11 @@ var (
 		PetersburgBlock:     big.NewInt(7280000),
 		IstanbulBlock:       big.NewInt(9069000),
 		Ethash:              new(EthashConfig),
-		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
 			uint64(0x42ae50): new(big.Int).SetUint64(uint64(0x2dc6c0)),
 			uint64(0x6f1580): new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
-		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
 			uint64(0x0):      new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 			uint64(0x42ae50): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
 			uint64(0x6f1580): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
@@ -122,11 +122,11 @@ var (
 		PetersburgBlock:     big.NewInt(4939394),
 		IstanbulBlock:       big.NewInt(6485846),
 		Ethash:              new(EthashConfig),
-		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
 			1700000: new(big.Int).SetUint64(uint64(0x2dc6c0)),
 			4230000: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
-		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
 			uint64(0):       new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 			uint64(1700000): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
 			uint64(4230000): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
@@ -175,11 +175,11 @@ var (
 			Period: 15,
 			Epoch:  30000,
 		},
-		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
 			uint64(1035301): new(big.Int).SetUint64(uint64(0x2dc6c0)),
 			uint64(3660663): new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
-		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
 			uint64(0x0):     new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 			uint64(1035301): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
 			uint64(3660663): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
@@ -223,10 +223,10 @@ var (
 			Period: 15,
 			Epoch:  30000,
 		},
-		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
 			uint64(0x0): new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
-		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
 			uint64(0x0): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
 	}
@@ -321,11 +321,11 @@ var (
 		nil,
 		nil,
 		// DifficultyBombDelaySchedule
-		hexutil.Uint64BigMapEncodesHex{
+		parity.Uint64BigMapEncodesHex{
 			0: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
 		// BlockRewardSchedule
-		hexutil.Uint64BigMapEncodesHex{
+		parity.Uint64BigMapEncodesHex{
 			0: new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
 	}
@@ -402,11 +402,11 @@ var (
 		nil,
 		nil,
 		// DifficultyBombDelaySchedule
-		hexutil.Uint64BigMapEncodesHex{
+		parity.Uint64BigMapEncodesHex{
 			0: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
 		// BlockRewardSchedule
-		hexutil.Uint64BigMapEncodesHex{
+		parity.Uint64BigMapEncodesHex{
 			0: new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
 	}
@@ -476,11 +476,11 @@ var (
 		nil,
 		nil,
 		// DifficultyBombDelaySchedule
-		hexutil.Uint64BigMapEncodesHex{
+		parity.Uint64BigMapEncodesHex{
 			0: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
 		// BlockRewardSchedule
-		hexutil.Uint64BigMapEncodesHex{
+		parity.Uint64BigMapEncodesHex{
 			0: new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
 	}
@@ -671,8 +671,8 @@ type ChainConfig struct {
 	TrustedCheckpoint       *TrustedCheckpoint      `json:"trustedCheckpoint"`
 	TrustedCheckpointOracle *CheckpointOracleConfig `json:"trustedCheckpointOracle"`
 
-	DifficultyBombDelaySchedule hexutil.Uint64BigMapEncodesHex
-	BlockRewardSchedule         hexutil.Uint64BigMapEncodesHex
+	DifficultyBombDelaySchedule parity.Uint64BigMapEncodesHex
+	BlockRewardSchedule         parity.Uint64BigMapEncodesHex
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.

@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	math2 "github.com/ethereum/go-ethereum/common/math"
@@ -41,13 +42,13 @@ type ParityChainSpec struct {
 	Engine  struct {
 		Ethash struct {
 			Params struct {
-				MinimumDifficulty      *math2.HexOrDecimal256         `json:"minimumDifficulty"`
-				DifficultyBoundDivisor *math2.HexOrDecimal256         `json:"difficultyBoundDivisor"`
-				DurationLimit          *math2.HexOrDecimal256         `json:"durationLimit"`
-				BlockReward            hexutil.Uint64BigValOrMapHex   `json:"blockReward"`
-				DifficultyBombDelays   hexutil.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"`
-				HomesteadTransition    *hexOrDecimal64                `json:"homesteadTransition"`
-				EIP100bTransition      *hexOrDecimal64                `json:"eip100bTransition"`
+				MinimumDifficulty      *math2.HexOrDecimal256        `json:"minimumDifficulty"`
+				DifficultyBoundDivisor *math2.HexOrDecimal256        `json:"difficultyBoundDivisor"`
+				DurationLimit          *math2.HexOrDecimal256        `json:"durationLimit"`
+				BlockReward            parity.Uint64BigValOrMapHex   `json:"blockReward"`
+				DifficultyBombDelays   parity.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"`
+				HomesteadTransition    *hexOrDecimal64               `json:"homesteadTransition"`
+				EIP100bTransition      *hexOrDecimal64               `json:"eip100bTransition"`
 
 				// Note: DAO fields will NOT be written to Parity configs from multi-geth.
 				// The chains with DAO settings are already canonical and have existing chainspecs.
@@ -287,8 +288,8 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		Datadir: strings.ToLower(network),
 	}
 	if genesis.Config.Ethash != nil {
-		spec.Engine.Ethash.Params.DifficultyBombDelays = hexutil.Uint64BigMapEncodesHex{}
-		spec.Engine.Ethash.Params.BlockReward = hexutil.Uint64BigValOrMapHex{}
+		spec.Engine.Ethash.Params.DifficultyBombDelays = parity.Uint64BigMapEncodesHex{}
+		spec.Engine.Ethash.Params.BlockReward = parity.Uint64BigValOrMapHex{}
 		spec.Engine.Ethash.Params.BlockReward[0] = params.FrontierBlockReward
 
 		spec.Engine.Ethash.Params.MinimumDifficulty = hexOrDecimal256FromBig(params.MinimumDifficulty)
@@ -722,11 +723,11 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 		}()
 		mgc.ECIP1017EraRounds = pars.ECIP1017EraRounds.Big()
 
-		mgc.DifficultyBombDelaySchedule = hexutil.Uint64BigMapEncodesHex{}
+		mgc.DifficultyBombDelaySchedule = parity.Uint64BigMapEncodesHex{}
 		for k, v := range pars.DifficultyBombDelays {
 			mgc.DifficultyBombDelaySchedule[k] = v
 		}
-		mgc.BlockRewardSchedule = hexutil.Uint64BigMapEncodesHex{}
+		mgc.BlockRewardSchedule = parity.Uint64BigMapEncodesHex{}
 		for k, v := range pars.BlockReward {
 			mgc.BlockRewardSchedule[k] = v
 		}

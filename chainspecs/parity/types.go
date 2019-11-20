@@ -1,4 +1,4 @@
-package hexutil
+package parity
 
 import (
 	"encoding/json"

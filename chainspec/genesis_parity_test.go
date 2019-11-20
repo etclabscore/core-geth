@@ -12,7 +12,7 @@ import (
 )
 
 func asSpecFilePath(name string) string {
-	return filepath.Join("..", "chainspecs", name)
+	return filepath.Join("..", "chainspecs", "parity", name)
 }
 
 var chainSpecEquivs = map[string]*core.Genesis{

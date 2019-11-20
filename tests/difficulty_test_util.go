@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -43,11 +43,11 @@ var (
 		EIP155Block:    big.NewInt(2675000),
 		EIP158Block:    big.NewInt(2675000),
 		ByzantiumBlock: big.NewInt(4370000),
-		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
 			uint64(0x0):     new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 			uint64(4370000): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
 		},
-		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
 			uint64(4370000): new(big.Int).SetUint64(uint64(0x2dc6c0)),
 		},
 	}
@@ -58,22 +58,22 @@ var difficultyChainConfiguations = map[string]params.ChainConfig{
 	"Morden":  *params.TestnetChainConfig,
 	"Frontier": {
 		Ethash:                      new(params.EthashConfig),
-		BlockRewardSchedule:         hexutil.Uint64BigMapEncodesHex{},
-		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{},
+		BlockRewardSchedule:         parity.Uint64BigMapEncodesHex{},
+		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{},
 	},
 	"Homestead": {
 		Ethash:                      new(params.EthashConfig),
 		HomesteadBlock:              big.NewInt(0),
-		BlockRewardSchedule:         hexutil.Uint64BigMapEncodesHex{},
-		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{},
+		BlockRewardSchedule:         parity.Uint64BigMapEncodesHex{},
+		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{},
 	},
 	"Byzantium": {
 		Ethash:         new(params.EthashConfig),
 		ByzantiumBlock: big.NewInt(0),
-		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
 			uint64(0): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
 		},
-		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
 			uint64(0): new(big.Int).SetUint64(uint64(0x2dc6c0)),
 		},
 	},
@@ -84,10 +84,10 @@ var difficultyChainConfiguations = map[string]params.ChainConfig{
 		HomesteadBlock:      big.NewInt(0),
 		EIP100FBlock:        big.NewInt(0),
 		ConstantinopleBlock: big.NewInt(0),
-		BlockRewardSchedule: hexutil.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
 			uint64(0): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
-		DifficultyBombDelaySchedule: hexutil.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
 			//uint64(0): new(big.Int).SetUint64(uint64(0x2dc6c0)), // 3000000
 			//uint64(0): new(big.Int).SetUint64(uint64(0x1e8480)), // 2000000
 			0: big.NewInt(5000000), // Because the algo wants compounding or sum.

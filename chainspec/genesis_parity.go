@@ -23,6 +23,7 @@ import (
 	"math"
 	"math/big"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -40,65 +41,65 @@ type ParityChainSpec struct {
 	Engine  struct {
 		Ethash struct {
 			Params struct {
-				MinimumDifficulty      *math2.HexOrDecimal256                   `json:"minimumDifficulty"`
-				DifficultyBoundDivisor *math2.HexOrDecimal256                   `json:"difficultyBoundDivisor"`
-				DurationLimit          *math2.HexOrDecimal256                   `json:"durationLimit"`
+				MinimumDifficulty      *math2.HexOrDecimal256         `json:"minimumDifficulty"`
+				DifficultyBoundDivisor *math2.HexOrDecimal256         `json:"difficultyBoundDivisor"`
+				DurationLimit          *math2.HexOrDecimal256         `json:"durationLimit"`
 				BlockReward            hexutil.Uint64BigValOrMapHex   `json:"blockReward"`
 				DifficultyBombDelays   hexutil.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"`
-				HomesteadTransition    *math2.HexOrDecimal64                `json:"homesteadTransition"`
-				EIP100bTransition      *math2.HexOrDecimal64                `json:"eip100bTransition"`
+				HomesteadTransition    *hexOrDecimal64                `json:"homesteadTransition"`
+				EIP100bTransition      *hexOrDecimal64                `json:"eip100bTransition"`
 
 				// Note: DAO fields will NOT be written to Parity configs from multi-geth.
 				// The chains with DAO settings are already canonical and have existing chainspecs.
 				// There is no need to replicate this information.
-				DaoHardforkTransition  *math2.HexOrDecimal64  `json:"daoHardforkTransition,omitempty"`
+				DaoHardforkTransition  *hexOrDecimal64  `json:"daoHardforkTransition,omitempty"`
 				DaoHardforkBeneficiary *common.Address  `json:"daoHardforkBeneficiary,omitempty"`
 				DaoHardforkAccounts    []common.Address `json:"daoHardforkAccounts,omitempty"`
 
-				BombDefuseTransition       *math2.HexOrDecimal64 `json:"bombDefuseTransition"`
-				ECIP1010PauseTransition    *math2.HexOrDecimal64 `json:"ecip1010PauseTransition,omitempty"`
-				ECIP1010ContinueTransition *math2.HexOrDecimal64 `json:"ecip1010ContinueTransition,omitempty"`
-				ECIP1017EraRounds          *math2.HexOrDecimal64 `json:"ecip1017EraRounds,omitempty"`
+				BombDefuseTransition       *hexOrDecimal64 `json:"bombDefuseTransition"`
+				ECIP1010PauseTransition    *hexOrDecimal64 `json:"ecip1010PauseTransition,omitempty"`
+				ECIP1010ContinueTransition *hexOrDecimal64 `json:"ecip1010ContinueTransition,omitempty"`
+				ECIP1017EraRounds          *hexOrDecimal64 `json:"ecip1017EraRounds,omitempty"`
 			} `json:"params"`
 		} `json:"Ethash,omitempty"`
 		Clique struct {
 			Params struct {
-				Period *math2.HexOrDecimal64 `json:"period"`
-				Epoch  *math2.HexOrDecimal64 `json:"epoch"`
+				Period *hexOrDecimal64 `json:"period"`
+				Epoch  *hexOrDecimal64 `json:"epoch"`
 			} `json:"params"`
 		} `json:"Clique,omitempty"`
 	} `json:"engine"`
 
 	Params struct {
-		AccountStartNonce         *math2.HexOrDecimal64      `json:"accountStartNonce,omitempty"`
-		MaximumExtraDataSize      *math2.HexOrDecimal64      `json:"maximumExtraDataSize,omitempty"`
-		MinGasLimit               *math2.HexOrDecimal64      `json:"minGasLimit,omitempty"`
+		AccountStartNonce         *hexOrDecimal64      `json:"accountStartNonce,omitempty"`
+		MaximumExtraDataSize      *hexOrDecimal64      `json:"maximumExtraDataSize,omitempty"`
+		MinGasLimit               *hexOrDecimal64      `json:"minGasLimit,omitempty"`
 		GasLimitBoundDivisor      math2.HexOrDecimal64 `json:"gasLimitBoundDivisor,omitempty"`
-		NetworkID                 *math2.HexOrDecimal64      `json:"networkID,omitempty"`
-		ChainID                   *math2.HexOrDecimal64      `json:"chainID,omitempty"`
-		MaxCodeSize               *math2.HexOrDecimal64      `json:"maxCodeSize,omitempty"`
-		MaxCodeSizeTransition     *math2.HexOrDecimal64      `json:"maxCodeSizeTransition,omitempty"`
-		EIP98Transition           *math2.HexOrDecimal64      `json:"eip98Transition,omitempty"`
-		EIP150Transition          *math2.HexOrDecimal64      `json:"eip150Transition,omitempty"`
-		EIP160Transition          *math2.HexOrDecimal64      `json:"eip160Transition,omitempty"`
-		EIP161abcTransition       *math2.HexOrDecimal64      `json:"eip161abcTransition,omitempty"`
-		EIP161dTransition         *math2.HexOrDecimal64      `json:"eip161dTransition,omitempty"`
-		EIP155Transition          *math2.HexOrDecimal64      `json:"eip155Transition,omitempty"`
-		EIP140Transition          *math2.HexOrDecimal64      `json:"eip140Transition,omitempty"`
-		EIP211Transition          *math2.HexOrDecimal64      `json:"eip211Transition,omitempty"`
-		EIP214Transition          *math2.HexOrDecimal64      `json:"eip214Transition,omitempty"`
-		EIP658Transition          *math2.HexOrDecimal64      `json:"eip658Transition,omitempty"`
-		EIP145Transition          *math2.HexOrDecimal64      `json:"eip145Transition,omitempty"`
-		EIP1014Transition         *math2.HexOrDecimal64      `json:"eip1014Transition,omitempty"`
-		EIP1052Transition         *math2.HexOrDecimal64      `json:"eip1052Transition,omitempty"`
-		EIP1283Transition         *math2.HexOrDecimal64      `json:"eip1283Transition,omitempty"`
-		EIP1283DisableTransition  *math2.HexOrDecimal64      `json:"eip1283DisableTransition,omitempty"`
-		EIP1283ReenableTransition *math2.HexOrDecimal64      `json:"eip1283ReenableTransition,omitempty"`
-		EIP1344Transition         *math2.HexOrDecimal64      `json:"eip1344Transition,omitempty"`
-		EIP1884Transition         *math2.HexOrDecimal64      `json:"eip1884Transition,omitempty"`
-		EIP2028Transition         *math2.HexOrDecimal64      `json:"eip2028Transition,omitempty"`
+		NetworkID                 *hexOrDecimal64      `json:"networkID,omitempty"`
+		ChainID                   *hexOrDecimal64      `json:"chainID,omitempty"`
+		MaxCodeSize               *hexOrDecimal64      `json:"maxCodeSize,omitempty"`
+		MaxCodeSizeTransition     *hexOrDecimal64      `json:"maxCodeSizeTransition,omitempty"`
+		EIP98Transition           *hexOrDecimal64      `json:"eip98Transition,omitempty"`
+		EIP150Transition          *hexOrDecimal64      `json:"eip150Transition,omitempty"`
+		EIP160Transition          *hexOrDecimal64      `json:"eip160Transition,omitempty"`
+		EIP161abcTransition       *hexOrDecimal64      `json:"eip161abcTransition,omitempty"`
+		EIP161dTransition         *hexOrDecimal64      `json:"eip161dTransition,omitempty"`
+		EIP155Transition          *hexOrDecimal64      `json:"eip155Transition,omitempty"`
+		EIP140Transition          *hexOrDecimal64      `json:"eip140Transition,omitempty"`
+		EIP211Transition          *hexOrDecimal64      `json:"eip211Transition,omitempty"`
+		EIP214Transition          *hexOrDecimal64      `json:"eip214Transition,omitempty"`
+		EIP658Transition          *hexOrDecimal64      `json:"eip658Transition,omitempty"`
+		EIP145Transition          *hexOrDecimal64      `json:"eip145Transition,omitempty"`
+		EIP1014Transition         *hexOrDecimal64      `json:"eip1014Transition,omitempty"`
+		EIP1052Transition         *hexOrDecimal64      `json:"eip1052Transition,omitempty"`
+		EIP1283Transition         *hexOrDecimal64      `json:"eip1283Transition,omitempty"`
+		EIP1283DisableTransition  *hexOrDecimal64      `json:"eip1283DisableTransition,omitempty"`
+		EIP1283ReenableTransition *hexOrDecimal64      `json:"eip1283ReenableTransition,omitempty"`
+		EIP1344Transition         *hexOrDecimal64      `json:"eip1344Transition,omitempty"`
+		EIP1884Transition         *hexOrDecimal64      `json:"eip1884Transition,omitempty"`
+		EIP2028Transition         *hexOrDecimal64      `json:"eip2028Transition,omitempty"`
 
-		ForkBlock     *math2.HexOrDecimal64 `json:"forkBlock,omitempty"`
+		ForkBlock     *hexOrDecimal64 `json:"forkBlock,omitempty"`
 		ForkCanonHash *common.Hash    `json:"forkCanonHash,omitempty"`
 	} `json:"params"`
 
@@ -110,16 +111,59 @@ type ParityChainSpec struct {
 			} `json:"ethereum"`
 		} `json:"seal"`
 
-		Difficulty *math2.HexOrDecimal256   `json:"difficulty"`
-		Author     common.Address `json:"author"`
-		Timestamp  hexutil.Uint64 `json:"timestamp"`
-		ParentHash common.Hash    `json:"parentHash"`
-		ExtraData  hexutil.Bytes  `json:"extraData"`
-		GasLimit   hexutil.Uint64 `json:"gasLimit"`
+		Difficulty *math2.HexOrDecimal256 `json:"difficulty"`
+		Author     common.Address         `json:"author"`
+		Timestamp  math2.HexOrDecimal64   `json:"timestamp"`
+		ParentHash common.Hash            `json:"parentHash"`
+		ExtraData  hexutil.Bytes          `json:"extraData"`
+		GasLimit   math2.HexOrDecimal64   `json:"gasLimit"`
 	} `json:"genesis"`
 
 	Nodes    []string                                             `json:"nodes"`
 	Accounts map[common.UnprefixedAddress]*parityChainSpecAccount `json:"accounts"`
+}
+
+// hexOrDecimal64 implements special Unmarshal interface for math2.HexOrDecimal64
+// as well as a convenience method for converting to *big.Int.
+type hexOrDecimal64 math2.HexOrDecimal64
+
+func (i *hexOrDecimal64) UnmarshalJSON(input []byte) error {
+	if len(input) == 0 {
+		return nil
+	}
+
+	// 0x04
+	var n math2.HexOrDecimal64
+	err := json.Unmarshal(input, &n)
+	if err == nil {
+		*i = (hexOrDecimal64)(n)
+		return nil
+	}
+
+	// "4"
+	s := string(input)
+	s, _ = strconv.Unquote(s)
+	b, ok := new(big.Int).SetString(string(s), 10)
+	if ok {
+		*i = hexOrDecimal64(b.Uint64())
+		return nil
+	}
+
+	// 4
+	var nu uint64
+	err = json.Unmarshal(input, &nu)
+	if err != nil {
+		return err
+	}
+	*i = hexOrDecimal64(nu)
+	return nil
+}
+
+func (i *hexOrDecimal64) Big() *big.Int {
+	if i == nil {
+		return nil
+	}
+	return new(big.Int).SetUint64(uint64(*i))
 }
 
 // parityChainSpecAccount is the prefunded genesis account and/or precompiled
@@ -136,12 +180,12 @@ type parityChainSpecAccount struct {
 type parityChainSpecBuiltin struct {
 	Name              string                       `json:"name"`                         // Each builtin should has it own name
 	Pricing           *parityChainSpecPricingMaybe `json:"pricing"`                      // Each builtin should has it own price strategy
-	ActivateAt        *math2.HexOrDecimal256                 `json:"activate_at,omitempty"`        // ActivateAt can't be omitted if empty, default means no fork
-	EIP1108Transition *math2.HexOrDecimal256                 `json:"eip1108_transition,omitempty"` // EIP1108Transition can't be omitted if empty, default means no fork
+	ActivateAt        *math2.HexOrDecimal256       `json:"activate_at,omitempty"`        // ActivateAt can't be omitted if empty, default means no fork
+	EIP1108Transition *math2.HexOrDecimal256       `json:"eip1108_transition,omitempty"` // EIP1108Transition can't be omitted if empty, default means no fork
 }
 
 type parityChainSpecPricingMaybe struct {
-	Map     map[hexutil.Uint64]parityChainSpecPricingPrice
+	Map     map[*math2.HexOrDecimal256]parityChainSpecPricingPrice
 	Pricing *parityChainSpecPricing
 }
 
@@ -156,10 +200,17 @@ func (p *parityChainSpecPricingMaybe) UnmarshalJSON(input []byte) error {
 		p.Pricing = &pricing
 		return nil
 	}
-	p.Map = make(map[hexutil.Uint64]parityChainSpecPricingPrice)
-	err = json.Unmarshal(input, &p.Map)
+	m := make(map[math2.HexOrDecimal64]parityChainSpecPricingPrice)
+	err = json.Unmarshal(input, &m)
 	if err != nil {
 		return err
+	}
+	if len(m) == 0 {
+		panic("0 map, dragons")
+	}
+	p.Map = make(map[*math2.HexOrDecimal256]parityChainSpecPricingPrice)
+	for k, v := range m {
+		p.Map[math2.NewHexOrDecimal256(int64(k))] = v
 	}
 	if len(p.Map) == 0 {
 		panic("0map")
@@ -210,8 +261,8 @@ type parityChainSpecBlakePricing struct {
 	GasPerRound uint64 `json:"gas_per_round"`
 }
 
-func hexutilUint64(i uint64) *math2.HexOrDecimal64 {
-	p := math2.HexOrDecimal64(i)
+func hexutilUint64(i uint64) *hexOrDecimal64 {
+	p := hexOrDecimal64(i)
 	return &p
 }
 
@@ -317,7 +368,8 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	}
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP170FBlock, genesis.Config.EIP158Block); b != nil {
 		spec.Params.MaxCodeSizeTransition = hexutilUint64(b.Uint64())
-		spec.Params.MaxCodeSize = hexutilUint64(params.MaxCodeSize)
+		size := hexOrDecimal64(params.MaxCodeSize)
+		spec.Params.MaxCodeSize = &size
 	}
 
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP140FBlock, genesis.Config.ByzantiumBlock); b != nil {
@@ -339,8 +391,8 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 			Name: "alt_bn128_pairing",
 			//ActivateAt: hexOrDecimal256FromBig(b),
 			Pricing: &parityChainSpecPricingMaybe{
-				Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
-					hexutil.Uint64(b.Uint64()): {
+				Map: map[*math2.HexOrDecimal256]parityChainSpecPricingPrice{
+					math2.NewHexOrDecimal256(b.Int64()): {
 						parityChainSpecPricing{AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000}}}},
 			}})
 	}
@@ -349,16 +401,16 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 			Name: "alt_bn128_add",
 			//ActivateAt: hexOrDecimal256FromBig(b),
 			Pricing: &parityChainSpecPricingMaybe{
-				Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
-					hexutil.Uint64(b.Uint64()): {
+				Map: map[*math2.HexOrDecimal256]parityChainSpecPricingPrice{
+					math2.NewHexOrDecimal256(b.Int64()): {
 						parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 500}}}},
 			}})
 		spec.setPrecompile(7, &parityChainSpecBuiltin{
 			Name: "alt_bn128_mul",
 			//ActivateAt: hexOrDecimal256FromBig(b),
 			Pricing: &parityChainSpecPricingMaybe{
-				Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
-					hexutil.Uint64(b.Uint64()): {
+				Map: map[*math2.HexOrDecimal256]parityChainSpecPricingPrice{
+					math2.NewHexOrDecimal256(b.Int64()): {
 						parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 40000}}}},
 			}})
 	}
@@ -404,11 +456,11 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 				Name: "alt_bn128_add",
 				//ActivateAt: hexOrDecimal256FromBig(b),
 				Pricing: &parityChainSpecPricingMaybe{
-					Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
-						hexutil.Uint64(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Uint64()): parityChainSpecPricingPrice{parityChainSpecPricing{
+					Map: map[*math2.HexOrDecimal256]parityChainSpecPricingPrice{
+						math2.NewHexOrDecimal256(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Int64()): parityChainSpecPricingPrice{parityChainSpecPricing{
 							AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 500}},
 						},
-						hexutil.Uint64(b.Uint64()): parityChainSpecPricingPrice{
+						math2.NewHexOrDecimal256(b.Int64()): parityChainSpecPricingPrice{
 							parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 150}}},
 					},
 				},
@@ -417,10 +469,10 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 				Name: "alt_bn128_mul",
 				//ActivateAt: hexOrDecimal256FromBig(b),
 				Pricing: &parityChainSpecPricingMaybe{
-					Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
-						hexutil.Uint64(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Uint64()): parityChainSpecPricingPrice{
+					Map: map[*math2.HexOrDecimal256]parityChainSpecPricingPrice{
+						math2.NewHexOrDecimal256(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Int64()): parityChainSpecPricingPrice{
 							parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 40000}}},
-						hexutil.Uint64(b.Uint64()): parityChainSpecPricingPrice{
+						math2.NewHexOrDecimal256(b.Int64()): parityChainSpecPricingPrice{
 							parityChainSpecPricing{AltBnConstOperation: &parityChainSpecAltBnConstOperationPricing{Price: 6000}}},
 					},
 				}})
@@ -428,10 +480,10 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 				Name: "alt_bn128_pairing",
 				//ActivateAt: hexOrDecimal256FromBig(b),
 				Pricing: &parityChainSpecPricingMaybe{
-					Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
-						hexutil.Uint64(params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock).Uint64()): parityChainSpecPricingPrice{
+					Map: map[*math2.HexOrDecimal256]parityChainSpecPricingPrice{
+						math2.NewHexOrDecimal256(params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock).Int64()): parityChainSpecPricingPrice{
 							parityChainSpecPricing{AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000}}},
-						hexutil.Uint64(b.Uint64()): parityChainSpecPricingPrice{
+						math2.NewHexOrDecimal256(b.Int64()): parityChainSpecPricingPrice{
 							parityChainSpecPricing{AltBnPairing: &parityChainSpecAltBnPairingPricing{Base: 45000, Pair: 34000}}},
 					},
 				}})
@@ -474,10 +526,10 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	spec.Genesis.Seal.Ethereum.MixHash = (hexutil.Bytes)(genesis.Mixhash[:])
 	spec.Genesis.Difficulty = hexOrDecimal256FromBig(genesis.Difficulty)
 	spec.Genesis.Author = genesis.Coinbase
-	spec.Genesis.Timestamp = (hexutil.Uint64)(genesis.Timestamp)
+	spec.Genesis.Timestamp = math2.HexOrDecimal64((hexutil.Uint64)(genesis.Timestamp))
 	spec.Genesis.ParentHash = genesis.ParentHash
 	spec.Genesis.ExtraData = (hexutil.Bytes)(genesis.ExtraData)
-	spec.Genesis.GasLimit = (hexutil.Uint64)(genesis.GasLimit)
+	spec.Genesis.GasLimit = math2.HexOrDecimal64((hexutil.Uint64)(genesis.GasLimit))
 
 	if spec.Accounts == nil {
 		spec.Accounts = make(map[common.UnprefixedAddress]*parityChainSpecAccount)
@@ -586,12 +638,12 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 					} else {
 						for k, vv := range v.Builtin.Pricing.Map {
 							if vv.AltBnPairing.Base == 100000 && vv.AltBnPairing.Pair == 80000 {
-								mgc.EIP212FBlock = k.Big()
+								mgc.EIP212FBlock = k.ToInt()
 							} else if vv.AltBnPairing.Base == 45000 && vv.AltBnPairing.Pair == 34000 {
 								if mgc.EIP212FBlock == nil {
-									mgc.EIP212FBlock = k.Big()
+									mgc.EIP212FBlock = k.ToInt()
 								}
-								mgc.EIP1108FBlock = k.Big()
+								mgc.EIP1108FBlock = k.ToInt()
 							}
 						}
 					}
@@ -606,24 +658,24 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 						for k, vv := range v.Builtin.Pricing.Map {
 							if v.Builtin.Name == "alt_bn128_add" {
 								if vv.AltBnConstOperation.Price == 500 {
-									mgc.EIP213FBlock = k.Big()
+									mgc.EIP213FBlock = k.ToInt()
 								}
 								if vv.AltBnConstOperation.Price == 150 {
 									if mgc.EIP213FBlock == nil {
-										mgc.EIP213FBlock = k.Big()
+										mgc.EIP213FBlock = k.ToInt()
 									}
-									mgc.EIP1108FBlock = k.Big()
+									mgc.EIP1108FBlock = k.ToInt()
 								}
 							}
 							if v.Builtin.Name == "alt_bn128_mul" {
 								if vv.AltBnConstOperation.Price == 40000 {
-									mgc.EIP213FBlock = k.Big()
+									mgc.EIP213FBlock = k.ToInt()
 								}
 								if vv.AltBnConstOperation.Price == 6000 {
 									if mgc.EIP213FBlock == nil {
-										mgc.EIP213FBlock = k.Big()
+										mgc.EIP213FBlock = k.ToInt()
 									}
-									mgc.EIP1108FBlock = k.Big()
+									mgc.EIP1108FBlock = k.ToInt()
 								}
 							}
 						}
@@ -773,3 +825,4 @@ func setMultiGethDAOConfigsFromParity(mgc *params.ChainConfig, spec *ParityChain
 		}
 	}
 }
+

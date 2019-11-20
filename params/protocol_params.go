@@ -108,7 +108,7 @@ const (
 	// Introduced in Tangerine Whistle (Eip 150)
 	CreateBySelfdestructGas uint64 = 25000
 
-	MaxCodeSize = 24576 // Maximum bytecode to permit for a contract
+	MaxCodeSize uint64 = 24576 // Maximum bytecode to permit for a contract
 
 	// Precompiled contract gas prices
 

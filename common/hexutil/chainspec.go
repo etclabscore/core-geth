@@ -43,9 +43,9 @@ func (m *Uint64BigValOrMapHex) UnmarshalJSON(input []byte) error {
 
 // MarshalJSON implements the json Marshaler interface.
 func (m Uint64BigValOrMapHex) MarshalJSON() (output []byte, err error) {
-	mm := make(map[math.HexOrDecimal64]math.HexOrDecimal256)
+	mm := make(map[math.HexOrDecimal64]*math.HexOrDecimal256)
 	for k, v := range m {
-		mm[math.HexOrDecimal64(k)] = math.HexOrDecimal256(*v)
+		mm[math.HexOrDecimal64(k)] = math.NewHexOrDecimal256(v.Int64())
 	}
 	return json.Marshal(mm)
 }
@@ -87,9 +87,9 @@ func (bb *Uint64BigMapEncodesHex) UnmarshalJSON(input []byte) error {
 
 // MarshalJSON implements the json Marshaler interface.
 func (b Uint64BigMapEncodesHex) MarshalJSON() ([]byte, error) {
-	mm := make(map[math.HexOrDecimal64]math.HexOrDecimal256)
+	mm := make(map[math.HexOrDecimal64]*math.HexOrDecimal256)
 	for k, v := range b {
-		mm[math.HexOrDecimal64(k)] = math.HexOrDecimal256(*v)
+		mm[math.HexOrDecimal64(k)] = math.NewHexOrDecimal256(v.Int64())
 	}
 	return json.Marshal(mm)
 }

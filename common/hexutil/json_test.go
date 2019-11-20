@@ -22,11 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"math/big"
-	"reflect"
-	"strings"
 	"testing"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 func checkError(t *testing.T, input string, got, want error) bool {

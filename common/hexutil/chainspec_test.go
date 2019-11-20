@@ -20,6 +20,11 @@ var uint64bigMaybeNoD []byte = []byte(`
 	"num": "0x1BC16D674EC80000"
 }`)
 
+var uint64bigMaybeNoDMarshaledMap []byte = []byte(`
+{
+	"num": {"0x0": "0x1BC16D674EC80000"}
+}`)
+
 var uint64bigMaybeYesD []byte = []byte(`
 {
 	"num": {
@@ -31,16 +36,19 @@ var uint64bigMaybeYesD []byte = []byte(`
 type testCase struct {
 	rawjson []byte
 	dat fakeConfig
+	marshaledWant []byte
 }
 
 var testCases = []testCase{
 	{
 		uint64bigMaybeNoD,
 		fakeConfig{Uint64BigValOrMapHex{0: big.NewInt(2000000000000000000)}},
+		uint64bigMaybeNoDMarshaledMap,
 	},
 	{
 		uint64bigMaybeYesD,
 		fakeConfig{Uint64BigValOrMapHex{0: big.NewInt(2000000000000000000), 5: big.NewInt(3000000000000000000)}},
+		uint64bigMaybeYesD,
 	},
 }
 
@@ -73,7 +81,7 @@ func TestUint64BigMapMaybe_MarshalJSON(t *testing.T) {
 		if err := json.Compact(gotb, got); err != nil {
 			t.Fatal(err)
 		}
-		if err := json.Compact(wantb, c.rawjson); err != nil {
+		if err := json.Compact(wantb, c.marshaledWant); err != nil {
 			t.Fatal(err)
 		}
 		gots := strings.ToLower(gotb.String())

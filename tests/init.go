@@ -158,6 +158,20 @@ func readConfigFromSpecFile(name string) (genesis *core.Genesis, sha1sum []byte,
 	}
 	err = json.Unmarshal(b, &spec)
 	if err != nil {
+		if jsonError, ok := err.(*json.SyntaxError); ok {
+			line, character, lcErr := lineAndCharacter(string(b), int(jsonError.Offset))
+			fmt.Fprintf(os.Stderr, "test failed with error: Cannot parse JSON schema due to a syntax error at line %d, character %d: %v\n", line, character, jsonError.Error())
+			if lcErr != nil {
+				fmt.Fprintf(os.Stderr, "Couldn't find the line and character position of the error due to error %v\n", lcErr)
+			}
+		}
+		if jsonError, ok := err.(*json.UnmarshalTypeError); ok {
+			line, character, lcErr := lineAndCharacter(string(b), int(jsonError.Offset))
+			fmt.Fprintf(os.Stderr, "test failed with error: The JSON type '%v' cannot be converted into the Go '%v' type on struct '%s', field '%v'. See input file line %d, character %d\n", jsonError.Value, jsonError.Type.Name(), jsonError.Struct, jsonError.Field, line, character)
+			if lcErr != nil {
+				fmt.Fprintf(os.Stderr, "test failed with error: Couldn't find the line and character position of the error due to error %v\n", lcErr)
+			}
+		}
 		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
 	}
 	genesis, err = chainspec.ParityConfigToMultiGethGenesis(&spec)
@@ -469,4 +483,28 @@ type UnsupportedForkError struct {
 
 func (e UnsupportedForkError) Error() string {
 	return fmt.Sprintf("unsupported fork %q", e.Name)
+}
+
+
+// https://adrianhesketh.com/2017/03/18/getting-line-and-character-positions-from-gos-json-unmarshal-errors/
+func lineAndCharacter(input string, offset int) (line int, character int, err error) {
+	lf := rune(0x0A)
+
+	if offset > len(input) || offset < 0 {
+		return 0, 0, fmt.Errorf("Couldn't find offset %d within the input.", offset)
+	}
+
+	// Humans tend to count from 1.
+	line = 1
+	for i, b := range input {
+		if b == lf {
+			line++
+			character = 0
+		}
+		character++
+		if i == offset {
+			break
+		}
+	}
+	return line, character, nil
 }

@@ -40,9 +40,9 @@ type ParityChainSpec struct {
 	Engine  struct {
 		Ethash struct {
 			Params struct {
-				MinimumDifficulty      *hexutil.Big                   `json:"minimumDifficulty"`
-				DifficultyBoundDivisor *hexutil.Big                   `json:"difficultyBoundDivisor"`
-				DurationLimit          *hexutil.Big                   `json:"durationLimit"`
+				MinimumDifficulty      *math2.HexOrDecimal256                   `json:"minimumDifficulty"`
+				DifficultyBoundDivisor *math2.HexOrDecimal256                   `json:"difficultyBoundDivisor"`
+				DurationLimit          *math2.HexOrDecimal256                   `json:"durationLimit"`
 				BlockReward            hexutil.Uint64BigValOrMapHex   `json:"blockReward"`
 				DifficultyBombDelays   hexutil.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"`
 				HomesteadTransition    *hexutil.Uint64                `json:"homesteadTransition"`
@@ -110,7 +110,7 @@ type ParityChainSpec struct {
 			} `json:"ethereum"`
 		} `json:"seal"`
 
-		Difficulty *hexutil.Big   `json:"difficulty"`
+		Difficulty *math2.HexOrDecimal256   `json:"difficulty"`
 		Author     common.Address `json:"author"`
 		Timestamp  hexutil.Uint64 `json:"timestamp"`
 		ParentHash common.Hash    `json:"parentHash"`
@@ -136,8 +136,8 @@ type parityChainSpecAccount struct {
 type parityChainSpecBuiltin struct {
 	Name              string                       `json:"name"`                         // Each builtin should has it own name
 	Pricing           *parityChainSpecPricingMaybe `json:"pricing"`                      // Each builtin should has it own price strategy
-	ActivateAt        *hexutil.Big                 `json:"activate_at,omitempty"`        // ActivateAt can't be omitted if empty, default means no fork
-	EIP1108Transition *hexutil.Big                 `json:"eip1108_transition,omitempty"` // EIP1108Transition can't be omitted if empty, default means no fork
+	ActivateAt        *math2.HexOrDecimal256                 `json:"activate_at,omitempty"`        // ActivateAt can't be omitted if empty, default means no fork
+	EIP1108Transition *math2.HexOrDecimal256                 `json:"eip1108_transition,omitempty"` // EIP1108Transition can't be omitted if empty, default means no fork
 }
 
 type parityChainSpecPricingMaybe struct {
@@ -215,6 +215,13 @@ func hexutilUint64(i uint64) *hexutil.Uint64 {
 	return &p
 }
 
+func hexOrDecimal256FromBig(i *big.Int) *math2.HexOrDecimal256 {
+	if i == nil {
+		return nil
+	}
+	return math2.NewHexOrDecimal256(i.Int64())
+}
+
 // NewParityChainSpec converts a go-ethereum genesis block into a Parity specific
 // chain specification format.
 func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []string) (*ParityChainSpec, error) {
@@ -233,9 +240,9 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		spec.Engine.Ethash.Params.BlockReward = hexutil.Uint64BigValOrMapHex{}
 		spec.Engine.Ethash.Params.BlockReward[0] = params.FrontierBlockReward
 
-		spec.Engine.Ethash.Params.MinimumDifficulty = (*hexutil.Big)(params.MinimumDifficulty)
-		spec.Engine.Ethash.Params.DifficultyBoundDivisor = (*hexutil.Big)(params.DifficultyBoundDivisor)
-		spec.Engine.Ethash.Params.DurationLimit = (*hexutil.Big)(params.DurationLimit)
+		spec.Engine.Ethash.Params.MinimumDifficulty = hexOrDecimal256FromBig(params.MinimumDifficulty)
+		spec.Engine.Ethash.Params.DifficultyBoundDivisor = hexOrDecimal256FromBig(params.DifficultyBoundDivisor)
+		spec.Engine.Ethash.Params.DurationLimit = hexOrDecimal256FromBig(params.DurationLimit)
 
 		if b := params.FeatureOrMetaBlock(genesis.Config.EIP100FBlock, genesis.Config.ByzantiumBlock); b != nil {
 			spec.Engine.Ethash.Params.EIP100bTransition = hexutilUint64(b.Uint64())
@@ -319,7 +326,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP198FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.setPrecompile(5, &parityChainSpecBuiltin{
 			Name:       "modexp",
-			ActivateAt: (*hexutil.Big)(b),
+			ActivateAt: hexOrDecimal256FromBig(b),
 			Pricing: &parityChainSpecPricingMaybe{Pricing: &parityChainSpecPricing{
 				ModExp: &parityChainSpecModExpPricing{Divisor: 20}}},
 		})
@@ -330,7 +337,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.setPrecompile(8, &parityChainSpecBuiltin{
 			Name: "alt_bn128_pairing",
-			//ActivateAt: (*hexutil.Big)(b),
+			//ActivateAt: hexOrDecimal256FromBig(b),
 			Pricing: &parityChainSpecPricingMaybe{
 				Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
 					hexutil.Uint64(b.Uint64()): {
@@ -340,7 +347,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.setPrecompile(6, &parityChainSpecBuiltin{
 			Name: "alt_bn128_add",
-			//ActivateAt: (*hexutil.Big)(b),
+			//ActivateAt: hexOrDecimal256FromBig(b),
 			Pricing: &parityChainSpecPricingMaybe{
 				Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
 					hexutil.Uint64(b.Uint64()): {
@@ -348,7 +355,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 			}})
 		spec.setPrecompile(7, &parityChainSpecBuiltin{
 			Name: "alt_bn128_mul",
-			//ActivateAt: (*hexutil.Big)(b),
+			//ActivateAt: hexOrDecimal256FromBig(b),
 			Pricing: &parityChainSpecPricingMaybe{
 				Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
 					hexutil.Uint64(b.Uint64()): {
@@ -385,7 +392,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		//spec.Params.EIP152Transition = hexutilUint64(b.Uint64())
 		spec.setPrecompile(9, &parityChainSpecBuiltin{
 			Name:       "blake2_f",
-			ActivateAt: (*hexutil.Big)(b),
+			ActivateAt: hexOrDecimal256FromBig(b),
 			Pricing: &parityChainSpecPricingMaybe{Pricing: &parityChainSpecPricing{
 				Blake2F: &parityChainSpecBlakePricing{GasPerRound: 1}}},
 		})
@@ -395,7 +402,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		if genesis.Config.IsEIP212F(b) && genesis.Config.IsEIP213F(b) {
 			spec.setPrecompile(6, &parityChainSpecBuiltin{
 				Name: "alt_bn128_add",
-				//ActivateAt: (*hexutil.Big)(b),
+				//ActivateAt: hexOrDecimal256FromBig(b),
 				Pricing: &parityChainSpecPricingMaybe{
 					Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
 						hexutil.Uint64(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Uint64()): parityChainSpecPricingPrice{parityChainSpecPricing{
@@ -408,7 +415,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 			})
 			spec.setPrecompile(7, &parityChainSpecBuiltin{
 				Name: "alt_bn128_mul",
-				//ActivateAt: (*hexutil.Big)(b),
+				//ActivateAt: hexOrDecimal256FromBig(b),
 				Pricing: &parityChainSpecPricingMaybe{
 					Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
 						hexutil.Uint64(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Uint64()): parityChainSpecPricingPrice{
@@ -419,7 +426,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 				}})
 			spec.setPrecompile(8, &parityChainSpecBuiltin{
 				Name: "alt_bn128_pairing",
-				//ActivateAt: (*hexutil.Big)(b),
+				//ActivateAt: hexOrDecimal256FromBig(b),
 				Pricing: &parityChainSpecPricingMaybe{
 					Map: map[hexutil.Uint64]parityChainSpecPricingPrice{
 						hexutil.Uint64(params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock).Uint64()): parityChainSpecPricingPrice{
@@ -465,7 +472,7 @@ func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	spec.Genesis.Seal.Ethereum.Nonce = types.EncodeNonce(genesis.Nonce)
 
 	spec.Genesis.Seal.Ethereum.MixHash = (hexutil.Bytes)(genesis.Mixhash[:])
-	spec.Genesis.Difficulty = (*hexutil.Big)(genesis.Difficulty)
+	spec.Genesis.Difficulty = hexOrDecimal256FromBig(genesis.Difficulty)
 	spec.Genesis.Author = genesis.Coinbase
 	spec.Genesis.Timestamp = (hexutil.Uint64)(genesis.Timestamp)
 	spec.Genesis.ParentHash = genesis.ParentHash

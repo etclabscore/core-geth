@@ -107,7 +107,14 @@ var submoduleParentRef = func() string {
 var paritySpecsDir = filepath.Join("..", "chainspecs")
 
 func paritySpecPath(name string) string {
-	return filepath.Join(paritySpecsDir, name)
+	p := filepath.Join(paritySpecsDir, name)
+	if fi, err := os.Open(p); err == nil {
+		fi.Close()
+		return p
+	} else if os.IsNotExist(err) {
+		p = filepath.Join("..", paritySpecsDir, name)
+	}
+	return p
 }
 
 var mapForkNameChainspecFileState = map[string]string{
@@ -186,7 +193,13 @@ func init() {
 
 		for k, v := range mapForkNameChainspecFileState {
 			genesis, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
-			if err != nil {
+			if os.IsNotExist(err) {
+				wd, wde := os.Getwd()
+				if wde != nil {
+					panic(wde)
+				}
+				panic(fmt.Sprintf("failed to find chainspec, wd: %s", wd))
+			} else if err != nil {
 				panic(err)
 			}
 			chainspecRefsState[k] = chainspecRef{filepath.Base(v), sha1sum}

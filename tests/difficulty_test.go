@@ -101,12 +101,14 @@ func TestDifficulty(t *testing.T) {
 			}
 
 			// Reverse lookup and verify the chain config given the JSON spec filename.
-			cr, ok := chainspecRefsDifficulty[forkName]
-			if !ok {
-				t.Fatalf("missing chainconfig: %v", forkName)
-			}
-			if !bytes.Equal(cr.Sha1Sum, test.Chainspec.Sha1Sum) {
-				t.Fatalf("mismatch configs, test: %v, spec config sum: %x", test, cr.Sha1Sum)
+			if os.Getenv(MG_CHAINCONFIG_CHAINSPEC_KEY) != "" {
+				cr, ok := chainspecRefsDifficulty[forkName]
+				if !ok {
+					t.Fatalf("missing chainconfig: %v", forkName)
+				}
+				if !bytes.Equal(cr.Sha1Sum, test.Chainspec.Sha1Sum) {
+					t.Fatalf("mismatch configs, test: %v, spec config sum: %x", test, cr.Sha1Sum)
+				}
 			}
 
 			t.Run(test.Name, func(t *testing.T) {
@@ -160,17 +162,17 @@ func TestDifficulty(t *testing.T) {
 						UncleHash:          test.UncleHash,
 						CurrentTimestamp:   test.CurrentTimestamp,
 						CurrentBlockNumber: test.CurrentBlockNumber,
-						CurrentDifficulty:  ethash.CalcDifficulty(&conf, test.CurrentTimestamp, &types.Header{
+						CurrentDifficulty: ethash.CalcDifficulty(&conf, test.CurrentTimestamp, &types.Header{
 							Difficulty: test.ParentDifficulty,
 							Time:       test.ParentTimestamp,
 							Number:     big.NewInt(int64(test.CurrentBlockNumber - 1)),
 							UncleHash:  test.UncleHash,
 						}),
-						Chainspec:          chainspecRef{
+						Chainspec: chainspecRef{
 							Filename: specFilepath,
 							Sha1Sum:  sum[:],
 						},
-						Name:               strings.ReplaceAll(test.Name, forkName, associateForkName),
+						Name: strings.ReplaceAll(test.Name, forkName, associateForkName),
 					}
 					newTests = append(newTests, newTest)
 				}

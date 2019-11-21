@@ -30,15 +30,15 @@ ios:
 	@echo "Import \"$(GOBIN)/Geth.framework\" to use the library."
 
 test: all
-	go run build/ci.go test $(testargs)
+	go run build/ci.go test
 
 test-multigeth: test-multigeth-features test-multigeth-chainspecs ## Runs all tests specific to multi-geth.
 
 test-multigeth-features: ## Runs tests specific to multi-geth using Fork/Feature configs.
-	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALANCE=on go run build/ci.go test -count=1 ./tests $(testargs)
+	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALANCE=on go run build/ci.go test -count=1 ./tests
 
 test-multigeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
-	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on go run build/ci.go test -count=1 ./tests $(testargs)
+	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on go run build/ci.go test -count=1 ./tests
 
 tests-generate: tests-generate-state tests-generate-difficulty ## Generate all tests.
 
@@ -51,8 +51,7 @@ tests-generate-difficulty: ## Generate difficulty tests.
 	# Note that this will NOT generate a unique tests; see following script.
 	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on \
 	env MULTIGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
-	go run build/ci.go test -v ./tests -run TestDifficulty
-	./tests/uniq-difficulty-tests.sh
+	go run build/ci.go test -v ./tests -run TestDifficultyGen
 
 lint: ## Run linters.
 	go run build/ci.go lint

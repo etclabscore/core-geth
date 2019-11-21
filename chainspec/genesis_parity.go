@@ -128,6 +128,10 @@ type ParityChainSpec struct {
 // as well as a convenience method for converting to *big.Int.
 type hexOrDecimal64 math2.HexOrDecimal64
 
+func (i hexOrDecimal64) MarshalJSON() ([]byte, error) {
+	return []byte(strconv.Quote(hexutil.EncodeUint64(uint64(i)))), nil
+}
+
 func (i *hexOrDecimal64) UnmarshalJSON(input []byte) error {
 	if len(input) == 0 {
 		return nil

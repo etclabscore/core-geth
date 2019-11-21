@@ -53,7 +53,7 @@ var (
 	}
 )
 
-var difficultyChainConfiguations = map[string]params.ChainConfig{
+var difficultyChainConfigurations = map[string]params.ChainConfig{
 	"Ropsten": *params.TestnetChainConfig,
 	"Morden":  *params.TestnetChainConfig,
 	"Frontier": {
@@ -147,15 +147,9 @@ func (test *DifficultyTest) Run(config *params.ChainConfig) error {
 	exp := test.CurrentDifficulty
 
 	if actual.Cmp(exp) != 0 {
-		return fmt.Errorf(`parent[time %v diff %v unclehash:%x]
-child[time %v number %v]
-diff %v != expected %v
-chainspec %v
-config %v`,
-			test.ParentTimestamp, test.ParentDifficulty, test.UncleHash,
-			test.CurrentTimestamp, test.CurrentBlockNumber, actual, exp,
-			test.Chainspec, config,
-		)
+		return fmt.Errorf(`%s got: %v, want: %v
+test: %v
+config: %v`, test.Name, actual, exp, test, config)
 	}
 	return nil
 

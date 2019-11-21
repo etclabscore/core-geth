@@ -108,10 +108,10 @@ func init() {
 			convertMetaForkBlocksToFeatures(config)
 		}
 
-		for k, v := range difficultyChainConfiguations {
+		for k, v := range difficultyChainConfigurations {
 			v := v
 			convertMetaForkBlocksToFeatures(&v)
-			difficultyChainConfiguations[k] = v
+			difficultyChainConfigurations[k] = v
 		}
 
 	} else if os.Getenv(MG_CHAINCONFIG_CHAINSPEC_KEY) != "" {
@@ -140,7 +140,7 @@ func init() {
 				panic("zero sum game")
 			} else {
 				chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
-				difficultyChainConfiguations[k] = *genesis.Config
+				difficultyChainConfigurations[k] = *genesis.Config
 			}
 		}
 	}

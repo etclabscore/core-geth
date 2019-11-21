@@ -19,19 +19,6 @@ var (
 	MG_CHAINCONFIG_CHAINSPEC_KEY     = "MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS"
 )
 
-// writeStateTestsReferencePairs defines reference pairs for use when writing tests.
-// The reference (key) is used to define the environment and parameters, while the
-// output from these tests run against the <value> state is actually written.
-var writeStateTestsReferencePairs = map[string]string{
-	"Byzantium":         "ETC_Atlantis",
-	"ConstantinopleFix": "ETC_Agharta",
-}
-
-var writeDifficultyTestsReferencePairs = map[string]string{
-	"Byzantium":      "ETC_Atlantis",
-	"Constantinople": "ETC_Agharta",
-}
-
 type chainspecRefsT map[string]chainspecRef
 
 var chainspecRefsState = chainspecRefsT{}

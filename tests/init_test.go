@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -174,6 +175,7 @@ func (tm *testMatcher) findConfig(name string) (*params.ChainConfig, string) {
 			return &m.config, m.p.String()
 		}
 	}
+	log.Println("using empty config", name)
 	return new(params.ChainConfig), ""
 }
 

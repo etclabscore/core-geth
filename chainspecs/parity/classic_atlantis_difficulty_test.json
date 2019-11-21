@@ -7,7 +7,9 @@
                 "minimumDifficulty": "0x20000",
                 "difficultyBoundDivisor": "0x800",
                 "durationLimit": "0xd",
-                "blockReward": "0x29a2241af62c0000",
+                "blockReward": {
+                    "0x0": "0x29a2241af62c0000"
+                },
                 "difficultyBombDelays": {
                     "0x0": "0x2dc6c0"
                 },

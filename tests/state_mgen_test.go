@@ -53,10 +53,10 @@ func TestGenState(t *testing.T) {
 	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/0`, "bug in test")
 	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
 
-	st.walkGen(t, stateTestDir, withWritingTests)
+	st.walkFullName(t, stateTestDir, withWritingTests)
 
 	// For Istanbul, older tests were moved into LegacyTests
-	st.walkGen(t, legacyStateTestDir, withWritingTests)
+	st.walkFullName(t, legacyStateTestDir, withWritingTests)
 }
 
 func withWritingTests(t *testing.T, name string, test *StateTest) {

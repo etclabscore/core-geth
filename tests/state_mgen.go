@@ -5,6 +5,14 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 )
 
+// writeStateTestsReferencePairs defines reference pairs for use when writing tests.
+// The reference (key) is used to define the environment and parameters, while the
+// output from these tests run against the <value> state is actually written.
+var writeStateTestsReferencePairs = map[string]string{
+	"Byzantium":         "ETC_Atlantis",
+	"ConstantinopleFix": "ETC_Agharta",
+}
+
 // RunSetPost runs the state subtest for a given config, and writes the resulting
 // state to the corresponding subtest post field.
 func (t *StateTest) RunSetPost(subtest StateSubtest, vmconfig vm.Config) error {

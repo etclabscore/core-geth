@@ -35,7 +35,7 @@ require (
 	github.com/julienschmidt/httprouter v0.0.0-20170430222011-975b5c4c7c21
 	github.com/karalabe/usb v0.0.0-20191104083709-911d15fe12a9
 	github.com/kylelemons/godebug v1.1.0 // indirect
-	github.com/markbates/pkger v0.12.4
+	github.com/markbates/pkger v0.12.4 // indirect
 	github.com/mattn/go-colorable v0.1.0
 	github.com/mattn/go-isatty v0.0.3
 	github.com/naoina/go-stringutil v0.1.0 // indirect

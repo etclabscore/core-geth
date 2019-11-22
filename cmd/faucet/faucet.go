@@ -173,14 +173,14 @@ func main() {
 		log.Crit("Failed to render the faucet template", "err", err)
 	}
 	// Load and parse the genesis block requested by the user
-	var genesis *params.Genesis
+	var genesis *paramtypes.Genesis
 	var enodes []*discv5.Node
 	var blob []byte
 
-	genesis, *bootFlag, *netFlag = func() (gs *params.Genesis, bs string, netid uint64) {
+	genesis, *bootFlag, *netFlag = func() (gs *paramtypes.Genesis, bs string, netid uint64) {
 		var configs = []struct {
 			flag  bool
-			gs    *params.Genesis
+			gs    *paramtypes.Genesis
 			bs    []string
 		}{
 			{
@@ -252,7 +252,7 @@ func main() {
 			if err != nil {
 				log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
 			}
-			gs = new(params.Genesis)
+			gs = new(paramtypes.Genesis)
 			if err = json.Unmarshal(blob, gs); err != nil {
 				log.Crit("Failed to parse genesis block json", "err", err)
 			}
@@ -335,7 +335,7 @@ type faucet struct {
 	lock sync.RWMutex // Lock protecting the faucet's internals
 }
 
-func newFaucet(genesis *params.Genesis, port int, enodes []*discv5.Node, network uint64, stats string, ks *keystore.KeyStore, index []byte) (*faucet, error) {
+func newFaucet(genesis *paramtypes.Genesis, port int, enodes []*discv5.Node, network uint64, stats string, ks *keystore.KeyStore, index []byte) (*faucet, error) {
 	// Assemble the raw devp2p protocol stack
 	stack, err := node.New(&node.Config{
 		Name:    "MultiFaucet",

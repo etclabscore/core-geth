@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // This test case is a repro of an annoying bug that took us forever to catch.
@@ -44,9 +45,9 @@ func TestReimportMirroredState(t *testing.T) {
 		engine = New(params.AllCliqueProtocolChanges.Clique, db)
 		signer = new(types.HomesteadSigner)
 	)
-	genspec := &params.Genesis{
+	genspec := &paramtypes.Genesis{
 		ExtraData: make([]byte, extraVanity+common.AddressLength+extraSeal),
-		Alloc: map[common.Address]params.GenesisAccount{
+		Alloc: map[common.Address]paramtypes.GenesisAccount{
 			addr: {Balance: big.NewInt(1)},
 		},
 	}

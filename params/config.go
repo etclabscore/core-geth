@@ -487,3 +487,29 @@ var (
 	TestRules = TestChainConfig.Rules(new(big.Int))
 )
 
+
+func EthashBlockReward(c *paramtypes.ChainConfig, n *big.Int) *big.Int {
+	// if c.Ethash == nil {
+	// 	panic("non ethash config called EthashBlockReward")
+	// }
+	// Select the correct block reward based on chain progression
+	blockReward := FrontierBlockReward
+	if c == nil || n == nil {
+		return blockReward
+	}
+	// Because the map is not necessarily sorted low-high, we
+	// have to ensure that we're walking upwards only.
+	var lastActivation *big.Int
+	for activation, reward := range c.BlockRewardSchedule {
+		activationBig := big.NewInt(int64(activation))
+		if paramtypes.IsForked(activationBig, n) {
+			if lastActivation == nil {
+				lastActivation = new(big.Int).Set(activationBig)
+			}
+			if activationBig.Cmp(lastActivation) >= 0 {
+				blockReward = reward
+			}
+		}
+	}
+	return blockReward
+}

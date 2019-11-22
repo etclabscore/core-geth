@@ -285,7 +285,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 		api.ethDb.Close()
 	}
 	ethDb := rawdb.NewMemoryDatabase()
-	accounts := make(params.GenesisAlloc)
+	accounts := make(paramtypes.GenesisAlloc)
 	for address, account := range chainParams.Accounts {
 		balance := big.NewInt(0)
 		if account.Balance != nil {
@@ -300,7 +300,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 			for k, v := range account.Storage {
 				storage[common.HexToHash(k)] = common.HexToHash(v)
 			}
-			accounts[address] = params.GenesisAccount{
+			accounts[address] = paramtypes.GenesisAccount{
 				Balance: balance,
 				Code:    account.Code,
 				Nonce:   nonce,
@@ -352,7 +352,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 		istanbulBlock = big.NewInt(int64(*chainParams.Params.IstanbulBlock))
 	}
 
-	genesis := &params.Genesis{
+	genesis := &paramtypes.Genesis{
 		Config: &paramtypes.ChainConfig{
 			ChainID:             chainId,
 			HomesteadBlock:      homesteadBlock,

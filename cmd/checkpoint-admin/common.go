@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rpc"
+	"gopkg.in/urfave/cli.v1"
 )
 
 // newClient creates a client with specified remote URL.

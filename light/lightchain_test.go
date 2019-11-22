@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // So we can deterministically seed different blockchains
@@ -53,7 +54,7 @@ func makeHeaderChain(parent *types.Header, n int, db ethdb.Database, seed int) [
 // header only chain.
 func newCanonical(n int) (ethdb.Database, *LightChain, error) {
 	db := rawdb.NewMemoryDatabase()
-	gspec := params.Genesis{Config: params.TestChainConfig}
+	gspec := paramtypes.Genesis{Config: params.TestChainConfig}
 	genesis := core.MustCommitGenesis(db, &gspec)
 	blockchain, _ := NewLightChain(&dummyOdr{db: db, indexerConfig: TestClientIndexerConfig}, gspec.Config, ethash.NewFaker(), nil)
 
@@ -70,7 +71,7 @@ func newCanonical(n int) (ethdb.Database, *LightChain, error) {
 // newTestLightChain creates a LightChain that doesn't validate anything.
 func newTestLightChain() *LightChain {
 	db := rawdb.NewMemoryDatabase()
-	gspec := &params.Genesis{
+	gspec := &paramtypes.Genesis{
 		Difficulty: big.NewInt(1),
 		Config:     params.TestChainConfig,
 	}

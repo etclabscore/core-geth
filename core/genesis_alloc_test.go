@@ -47,13 +47,13 @@ func TestDefaultGenesisBlock(t *testing.T) {
 func TestSetupGenesis(t *testing.T) {
 	var (
 		customghash = common.HexToHash("0x89c99d90b79719238d2645c7642f2c9295246e80775b38cfd162b696817fbd50")
-		customg     = params.Genesis{
+		customg     = paramtypes.Genesis{
 			Config: &paramtypes.ChainConfig{
 				HomesteadBlock:              big.NewInt(3),
 				BlockRewardSchedule:         parity.Uint64BigMapEncodesHex{},
 				DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{},
 			},
-			Alloc: params.GenesisAlloc{
+			Alloc: paramtypes.GenesisAlloc{
 				{1}: {Balance: big.NewInt(1), Storage: map[common.Hash]common.Hash{{1}: {1}}},
 			},
 		}
@@ -70,9 +70,9 @@ func TestSetupGenesis(t *testing.T) {
 		{
 			name: "genesis without ChainConfig",
 			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
-				return SetupGenesisBlock(db, new(params.Genesis))
+				return SetupGenesisBlock(db, new(paramtypes.Genesis))
 			},
-			wantErr:    params.ErrGenesisNoConfig,
+			wantErr:    paramtypes.ErrGenesisNoConfig,
 			wantConfig: params.AllEthashProtocolChanges,
 		},
 		{
@@ -107,7 +107,7 @@ func TestSetupGenesis(t *testing.T) {
 				MustCommitGenesis(db, &customg)
 				return SetupGenesisBlock(db, params.DefaultTestnetGenesisBlock())
 			},
-			wantErr:    &params.GenesisMismatchError{Stored: customghash, New: params.TestnetGenesisHash},
+			wantErr:    &paramtypes.GenesisMismatchError{Stored: customghash, New: params.TestnetGenesisHash},
 			wantHash:   params.TestnetGenesisHash,
 			wantConfig: params.TestnetChainConfig,
 		},

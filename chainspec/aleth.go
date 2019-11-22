@@ -8,6 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // AlethGenesisSpec represents the genesis specification format used by the
@@ -74,7 +75,7 @@ type alethGenesisSpecLinearPricing struct {
 
 // NewAlethGenesisSpec converts a go-ethereum genesis block into a Aleth-specific
 // chain specification format.
-func NewAlethGenesisSpec(network string, genesis *params.Genesis) (*AlethGenesisSpec, error) {
+func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*AlethGenesisSpec, error) {
 	// Only ethash is currently supported between go-ethereum and aleth
 	if genesis.Config.Ethash == nil {
 		return nil, errors.New("unsupported consensus engine")
@@ -191,7 +192,7 @@ func (spec *AlethGenesisSpec) setPrecompile(address byte, data *alethGenesisSpec
 	spec.Accounts[addr].Precompiled = data
 }
 
-func (spec *AlethGenesisSpec) setAccount(address common.Address, account params.GenesisAccount) {
+func (spec *AlethGenesisSpec) setAccount(address common.Address, account paramtypes.GenesisAccount) {
 	if spec.Accounts == nil {
 		spec.Accounts = make(map[common.UnprefixedAddress]*alethGenesisSpecAccount)
 	}

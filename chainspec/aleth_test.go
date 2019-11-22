@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/go-test/deep"
 )
 
@@ -16,7 +16,7 @@ func TestAlethSturebyConverter(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}
-	var genesis params.Genesis
+	var genesis paramtypes.Genesis
 	if err := json.Unmarshal(blob, &genesis); err != nil {
 		t.Fatalf("failed parsing genesis: %v", err)
 	}

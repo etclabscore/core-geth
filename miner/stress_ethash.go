@@ -42,6 +42,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 func main() {
@@ -131,7 +132,7 @@ func main() {
 
 // makeGenesis creates a custom Ethash genesis block based on some pre-defined
 // faucet accounts.
-func makeGenesis(faucets []*ecdsa.PrivateKey) *params.Genesis {
+func makeGenesis(faucets []*ecdsa.PrivateKey) *paramtypes.Genesis {
 	genesis := params.DefaultTestnetGenesisBlock()
 	genesis.Difficulty = params.MinimumDifficulty
 	genesis.GasLimit = 25000000
@@ -139,16 +140,16 @@ func makeGenesis(faucets []*ecdsa.PrivateKey) *params.Genesis {
 	genesis.Config.ChainID = big.NewInt(18)
 	genesis.Config.EIP150Hash = common.Hash{}
 
-	genesis.Alloc = params.GenesisAlloc{}
+	genesis.Alloc = paramtypes.GenesisAlloc{}
 	for _, faucet := range faucets {
-		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = params.GenesisAccount{
+		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = paramtypes.GenesisAccount{
 			Balance: new(big.Int).Exp(big.NewInt(2), big.NewInt(128), nil),
 		}
 	}
 	return genesis
 }
 
-func makeMiner(genesis *params.Genesis) (*node.Node, error) {
+func makeMiner(genesis *paramtypes.Genesis) (*node.Node, error) {
 	// Define the basic configurations for the Ethereum node
 	datadir, _ := ioutil.TempDir("", "")
 

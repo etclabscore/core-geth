@@ -51,7 +51,7 @@ var runCommand = cli.Command{
 
 // readGenesis will read the given JSON format genesis file and return
 // the initialized Genesis structure
-func readGenesis(genesisPath string) *params.Genesis {
+func readGenesis(genesisPath string) *paramtypes.Genesis {
 	// Make sure we have a valid genesis JSON
 	//genesisPath := ctx.Args().First()
 	if len(genesisPath) == 0 {
@@ -63,7 +63,7 @@ func readGenesis(genesisPath string) *params.Genesis {
 	}
 	defer file.Close()
 
-	genesis := new(params.Genesis)
+	genesis := new(paramtypes.Genesis)
 	if err := json.NewDecoder(file).Decode(genesis); err != nil {
 		utils.Fatalf("invalid genesis file: %v", err)
 	}
@@ -87,7 +87,7 @@ func runCmd(ctx *cli.Context) error {
 		chainConfig   *paramtypes.ChainConfig
 		sender        = common.BytesToAddress([]byte("sender"))
 		receiver      = common.BytesToAddress([]byte("receiver"))
-		genesisConfig *params.Genesis
+		genesisConfig *paramtypes.Genesis
 	)
 	if ctx.GlobalBool(MachineFlag.Name) {
 		tracer = vm.NewJSONLogger(logconfig, os.Stdout)
@@ -106,7 +106,7 @@ func runCmd(ctx *cli.Context) error {
 		chainConfig = gen.Config
 	} else {
 		statedb, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()))
-		genesisConfig = new(params.Genesis)
+		genesisConfig = new(paramtypes.Genesis)
 	}
 	if ctx.GlobalString(SenderFlag.Name) != "" {
 		sender = common.HexToAddress(ctx.GlobalString(SenderFlag.Name))

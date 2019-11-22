@@ -170,9 +170,9 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 	var (
 		evmux  = new(event.TypeMux)
 		engine = ethash.NewFaker()
-		gspec  = params.Genesis{
+		gspec  = paramtypes.Genesis{
 			Config:   params.AllEthashProtocolChanges,
-			Alloc:    params.GenesisAlloc{bankAddr: {Balance: bankFunds}},
+			Alloc:    paramtypes.GenesisAlloc{bankAddr: {Balance: bankFunds}},
 			GasLimit: 100000000,
 		}
 		oracle *checkpointOracle
@@ -226,9 +226,9 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 
 func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Database, peers *peerSet, clock mclock.Clock) (*serverHandler, *backends.SimulatedBackend) {
 	var (
-		gspec = params.Genesis{
+		gspec = paramtypes.Genesis{
 			Config:   params.AllEthashProtocolChanges,
-			Alloc:    params.GenesisAlloc{bankAddr: {Balance: bankFunds}},
+			Alloc:    paramtypes.GenesisAlloc{bankAddr: {Balance: bankFunds}},
 			GasLimit: 100000000,
 		}
 		oracle *checkpointOracle

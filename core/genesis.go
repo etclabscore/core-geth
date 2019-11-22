@@ -43,13 +43,13 @@ import (
 // error is a *params.ConfigCompatError and the new, unwritten config is returned.
 //
 // The returned chain configuration is never nil.
-func SetupGenesisBlock(db ethdb.Database, genesis *params.Genesis) (*paramtypes.ChainConfig, common.Hash, error) {
+func SetupGenesisBlock(db ethdb.Database, genesis *paramtypes.Genesis) (*paramtypes.ChainConfig, common.Hash, error) {
 	return SetupGenesisBlockWithOverride(db, genesis, nil)
 }
 
-func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *params.Genesis, overrideIstanbul *big.Int) (*paramtypes.ChainConfig, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesis, overrideIstanbul *big.Int) (*paramtypes.ChainConfig, common.Hash, error) {
 	if genesis != nil && genesis.Config == nil {
-		return params.AllEthashProtocolChanges, common.Hash{}, params.ErrGenesisNoConfig
+		return params.AllEthashProtocolChanges, common.Hash{}, paramtypes.ErrGenesisNoConfig
 	}
 	// Just commit the new block if there is no stored genesis block.
 	stored := rawdb.ReadCanonicalHash(db, 0)
@@ -77,7 +77,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *params.Genesis, o
 		// Ensure the stored genesis matches with the given one.
 		hash := GenesisToBlock(genesis, nil).Hash()
 		if hash != stored {
-			return genesis.Config, hash, &params.GenesisMismatchError{stored, hash}
+			return genesis.Config, hash, &paramtypes.GenesisMismatchError{stored, hash}
 		}
 		block, err := CommitGenesis(genesis, db)
 		if err != nil {
@@ -90,7 +90,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *params.Genesis, o
 	if genesis != nil {
 		hash := GenesisToBlock(genesis, nil).Hash()
 		if hash != stored {
-			return genesis.Config, hash, &params.GenesisMismatchError{stored, hash}
+			return genesis.Config, hash, &paramtypes.GenesisMismatchError{stored, hash}
 		}
 	}
 
@@ -129,7 +129,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *params.Genesis, o
 	return newcfg, stored, nil
 }
 
-func configOrDefault(g *params.Genesis, ghash common.Hash) *paramtypes.ChainConfig {
+func configOrDefault(g *paramtypes.Genesis, ghash common.Hash) *paramtypes.ChainConfig {
 	switch {
 	case g != nil:
 		return g.Config
@@ -158,7 +158,7 @@ func configOrDefault(g *params.Genesis, ghash common.Hash) *paramtypes.ChainConf
 
 // GenesisToBlock creates the genesis block and writes state of a genesis specification
 // to the given database (or discards it if nil).
-func GenesisToBlock(g *params.Genesis, db ethdb.Database) *types.Block {
+func GenesisToBlock(g *paramtypes.Genesis, db ethdb.Database) *types.Block {
 	if db == nil {
 		db = rawdb.NewMemoryDatabase()
 	}
@@ -199,7 +199,7 @@ func GenesisToBlock(g *params.Genesis, db ethdb.Database) *types.Block {
 
 // CommitGenesis writes the block and state of a genesis specification to the database.
 // The block is committed as the canonical head block.
-func CommitGenesis(g *params.Genesis, db ethdb.Database) (*types.Block, error) {
+func CommitGenesis(g *paramtypes.Genesis, db ethdb.Database) (*types.Block, error) {
 	block := GenesisToBlock(g, db)
 	if block.Number().Sign() != 0 {
 		return nil, fmt.Errorf("can't commit genesis block with number > 0")
@@ -224,7 +224,7 @@ func CommitGenesis(g *params.Genesis, db ethdb.Database) (*types.Block, error) {
 
 // MustCommitGenesis writes the genesis block and state to db, panicking on error.
 // The block is committed as the canonical head block.
-func MustCommitGenesis(db ethdb.Database, g *params.Genesis) *types.Block {
+func MustCommitGenesis(db ethdb.Database, g *paramtypes.Genesis) *types.Block {
 	block, err := CommitGenesis(g, db)
 	if err != nil {
 		panic(err)
@@ -234,7 +234,7 @@ func MustCommitGenesis(db ethdb.Database, g *params.Genesis) *types.Block {
 
 // GenesisBlockForTesting creates and writes a block in which addr has the given wei balance.
 func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big.Int) *types.Block {
-	g := params.Genesis{Alloc: params.GenesisAlloc{addr: {Balance: balance}}}
+	g := paramtypes.Genesis{Alloc: paramtypes.GenesisAlloc{addr: {Balance: balance}}}
 	return MustCommitGenesis(db, &g)
 }
 

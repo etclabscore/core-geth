@@ -18,7 +18,7 @@
 
 /*
 
-   The mkalloc tool creates the genesis allocation constants in genesis_alloc.go
+   The mkalloc tool creates the genesis allocation constants in alloc_params.go
    It outputs a const declaration that contains an RLP-encoded list of (address, balance) tuples.
 
        go run mkalloc.go genesis.json
@@ -34,7 +34,7 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -46,7 +46,7 @@ func (a allocList) Len() int           { return len(a) }
 func (a allocList) Less(i, j int) bool { return a[i].Addr.Cmp(a[j].Addr) < 0 }
 func (a allocList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-func makelist(g *params.Genesis) allocList {
+func makelist(g *paramtypes.Genesis) allocList {
 	a := make(allocList, 0, len(g.Alloc))
 	for addr, account := range g.Alloc {
 		if len(account.Storage) > 0 || len(account.Code) > 0 || account.Nonce != 0 {
@@ -59,7 +59,7 @@ func makelist(g *params.Genesis) allocList {
 	return a
 }
 
-func makealloc(g *params.Genesis) string {
+func makealloc(g *paramtypes.Genesis) string {
 	a := makelist(g)
 	data, err := rlp.EncodeToBytes(a)
 	if err != nil {
@@ -74,7 +74,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	g := new(params.Genesis)
+	g := new(paramtypes.Genesis)
 	file, err := os.Open(os.Args[1])
 	if err != nil {
 		panic(err)

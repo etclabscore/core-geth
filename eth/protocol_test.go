@@ -35,7 +35,6 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 )
@@ -169,8 +168,8 @@ func TestForkIDSplit(t *testing.T) {
 		dbNoFork  = rawdb.NewMemoryDatabase()
 		dbProFork = rawdb.NewMemoryDatabase()
 
-		gspecNoFork  = &params.Genesis{Config: configNoFork}
-		gspecProFork = &params.Genesis{Config: configProFork}
+		gspecNoFork  = &paramtypes.Genesis{Config: configNoFork}
+		gspecProFork = &paramtypes.Genesis{Config: configProFork}
 
 		genesisNoFork  = core.MustCommitGenesis(dbNoFork, gspecNoFork)
 		genesisProFork = core.MustCommitGenesis(dbProFork, gspecProFork)

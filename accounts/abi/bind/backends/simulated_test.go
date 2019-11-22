@@ -27,15 +27,15 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 func TestSimulatedBackend(t *testing.T) {
 	var gasLimit uint64 = 8000029
 	key, _ := crypto.GenerateKey() // nolint: gosec
 	auth := bind.NewKeyedTransactor(key)
-	genAlloc := make(params.GenesisAlloc)
-	genAlloc[auth.From] = params.GenesisAccount{Balance: big.NewInt(9223372036854775807)}
+	genAlloc := make(paramtypes.GenesisAlloc)
+	genAlloc[auth.From] = paramtypes.GenesisAccount{Balance: big.NewInt(9223372036854775807)}
 
 	sim := backends.NewSimulatedBackend(genAlloc, gasLimit)
 	defer sim.Close()

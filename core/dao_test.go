@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // Tests that DAO-fork enabled clients can properly filter out fork-commencing
@@ -33,7 +34,7 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 
 	// Generate a common prefix for both pro-forkers and non-forkers
 	db := rawdb.NewMemoryDatabase()
-	gspec := new(params.Genesis)
+	gspec := new(paramtypes.Genesis)
 	genesis := MustCommitGenesis(db, gspec)
 	prefix, _ := GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, int(forkBlock.Int64()-1), func(i int, gen *BlockGen) {})
 

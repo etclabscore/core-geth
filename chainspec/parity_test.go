@@ -18,7 +18,7 @@ func asSpecFilePath(name string) string {
 	return filepath.Join("..", "chainspecs", "parity", name)
 }
 
-var chainSpecEquivs = map[string]*params.Genesis{
+var chainSpecEquivs = map[string]*paramtypes.Genesis{
 	"classic.json":    params.DefaultClassicGenesisBlock(),
 	"foundation.json": params.DefaultGenesisBlock(),
 }
@@ -41,7 +41,7 @@ func TestBlockConfig(t *testing.T) {
 }
 
 func TestParityConfigToMultiGethGenesis(t *testing.T) {
-	var gen1, gen2 *params.Genesis
+	var gen1, gen2 *paramtypes.Genesis
 
 	for p, gen := range chainSpecEquivs {
 		gen1 = gen

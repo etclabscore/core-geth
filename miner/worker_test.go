@@ -94,14 +94,14 @@ type testWorkerBackend struct {
 	txPool     *core.TxPool
 	chain      *core.BlockChain
 	testTxFeed event.Feed
-	genesis    *params.Genesis
+	genesis    *paramtypes.Genesis
 	uncleBlock *types.Block
 }
 
 func newTestWorkerBackend(t *testing.T, chainConfig *paramtypes.ChainConfig, engine consensus.Engine, db ethdb.Database, n int) *testWorkerBackend {
-	var gspec = params.Genesis{
+	var gspec = paramtypes.Genesis{
 		Config: chainConfig,
-		Alloc:  params.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
+		Alloc:  paramtypes.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
 	}
 
 	switch e := engine.(type) {

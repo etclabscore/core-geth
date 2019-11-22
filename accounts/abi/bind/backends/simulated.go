@@ -68,8 +68,8 @@ type SimulatedBackend struct {
 
 // NewSimulatedBackendWithDatabase creates a new binding backend based on the given database
 // and uses a simulated blockchain for testing purposes.
-func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc params.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
-	genesis := params.Genesis{Config: params.AllEthashProtocolChanges, GasLimit: gasLimit, Alloc: alloc}
+func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc paramtypes.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
+	genesis := paramtypes.Genesis{Config: params.AllEthashProtocolChanges, GasLimit: gasLimit, Alloc: alloc}
 	core.MustCommitGenesis(database, &genesis)
 	blockchain, _ := core.NewBlockChain(database, nil, genesis.Config, ethash.NewFaker(), vm.Config{}, nil)
 
@@ -85,7 +85,7 @@ func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc params.Genes
 
 // NewSimulatedBackend creates a new binding backend using a simulated blockchain
 // for testing purposes.
-func NewSimulatedBackend(alloc params.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
+func NewSimulatedBackend(alloc paramtypes.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
 	return NewSimulatedBackendWithDatabase(rawdb.NewMemoryDatabase(), alloc, gasLimit)
 }
 

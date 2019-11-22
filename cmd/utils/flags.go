@@ -60,6 +60,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/p2p/netutil"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rpc"
 	whisper "github.com/ethereum/go-ethereum/whisper/whisperv6"
 	pcsclite "github.com/gballet/go-libpcsclite"
@@ -1687,8 +1688,8 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 // If no --<chain> flag is set in the global context, a nil value is returned.
 // It does not handle genesis for --dev mode, since that mode includes but also exceeds
 // chain configuration.
-func genesisForCtxChainConfig(ctx *cli.Context) *params.Genesis {
-	var genesis *params.Genesis
+func genesisForCtxChainConfig(ctx *cli.Context) *paramtypes.Genesis {
+	var genesis *paramtypes.Genesis
 	switch {
 	case ctx.GlobalBool(TestnetFlag.Name):
 		genesis = params.DefaultTestnetGenesisBlock()
@@ -1714,7 +1715,7 @@ func genesisForCtxChainConfig(ctx *cli.Context) *params.Genesis {
 	return genesis
 }
 
-func MakeGenesis(ctx *cli.Context) *params.Genesis {
+func MakeGenesis(ctx *cli.Context) *paramtypes.Genesis {
 	if ctx.GlobalBool(DeveloperFlag.Name) {
 		Fatalf("Developer chains are ephemeral")
 	}

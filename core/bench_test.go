@@ -32,6 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 func BenchmarkInsertChain_empty_memdb(b *testing.B) {
@@ -166,9 +167,9 @@ func benchInsertChain(b *testing.B, disk bool, gen func(int, *BlockGen)) {
 
 	// Generate a chain of b.N blocks using the supplied block
 	// generator function.
-	gspec := params.Genesis{
+	gspec := paramtypes.Genesis{
 		Config: params.TestChainConfig,
-		Alloc:  params.GenesisAlloc{benchRootAddr: {Balance: benchRootFunds}},
+		Alloc:  paramtypes.GenesisAlloc{benchRootAddr: {Balance: benchRootFunds}},
 	}
 	genesis := MustCommitGenesis(db, &gspec)
 	chain, _ := GenerateChain(gspec.Config, genesis, ethash.NewFaker(), db, b.N, gen)

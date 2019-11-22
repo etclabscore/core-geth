@@ -134,7 +134,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP198FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.SetPrecompile(5, &parity.ParityChainSpecBuiltin{
 			Name:       "modexp",
-			ActivateAt: hexOrDecimal256FromBig(b),
+			ActivateAt: hexutilUint64(b.Uint64()),
 			Pricing: &parity.ParityChainSpecPricingMaybe{Pricing: &parity.ParityChainSpecPricing{
 				ModExp: &parity.ParityChainSpecModExpPricing{Divisor: 20}}},
 		})
@@ -145,7 +145,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.SetPrecompile(8, &parity.ParityChainSpecBuiltin{
 			Name: "alt_bn128_pairing",
-			//ActivateAt: hexOrDecimal256FromBig(b),
+			//ActivateAt: hexutilUint64(b.Uint64()),
 			Pricing: &parity.ParityChainSpecPricingMaybe{
 				Map: map[*math.HexOrDecimal256]parity.ParityChainSpecPricingPrice{
 					math.NewHexOrDecimal256(b.Int64()): {
@@ -155,7 +155,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 	if b := params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.SetPrecompile(6, &parity.ParityChainSpecBuiltin{
 			Name: "alt_bn128_add",
-			//ActivateAt: hexOrDecimal256FromBig(b),
+			//ActivateAt: hexutilUint64(b.Uint64()),
 			Pricing: &parity.ParityChainSpecPricingMaybe{
 				Map: map[*math.HexOrDecimal256]parity.ParityChainSpecPricingPrice{
 					math.NewHexOrDecimal256(b.Int64()): {
@@ -163,7 +163,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 			}})
 		spec.SetPrecompile(7, &parity.ParityChainSpecBuiltin{
 			Name: "alt_bn128_mul",
-			//ActivateAt: hexOrDecimal256FromBig(b),
+			//ActivateAt: hexutilUint64(b.Uint64()),
 			Pricing: &parity.ParityChainSpecPricingMaybe{
 				Map: map[*math.HexOrDecimal256]parity.ParityChainSpecPricingPrice{
 					math.NewHexOrDecimal256(b.Int64()): {
@@ -200,7 +200,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 		//spec.Params.EIP152Transition = hexutilUint64(b.Uint64())
 		spec.SetPrecompile(9, &parity.ParityChainSpecBuiltin{
 			Name:       "blake2_f",
-			ActivateAt: hexOrDecimal256FromBig(b),
+			ActivateAt: hexutilUint64(b.Uint64()),
 			Pricing: &parity.ParityChainSpecPricingMaybe{Pricing: &parity.ParityChainSpecPricing{
 				Blake2F: &parity.ParityChainSpecBlakePricing{GasPerRound: 1}}},
 		})
@@ -210,7 +210,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 		if genesis.Config.IsEIP212F(b) && genesis.Config.IsEIP213F(b) {
 			spec.SetPrecompile(6, &parity.ParityChainSpecBuiltin{
 				Name: "alt_bn128_add",
-				//ActivateAt: hexOrDecimal256FromBig(b),
+				//ActivateAt: hexutilUint64(b.Uint64()),
 				Pricing: &parity.ParityChainSpecPricingMaybe{
 					Map: map[*math.HexOrDecimal256]parity.ParityChainSpecPricingPrice{
 						math.NewHexOrDecimal256(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Int64()): parity.ParityChainSpecPricingPrice{parity.ParityChainSpecPricing{
@@ -223,7 +223,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 			})
 			spec.SetPrecompile(7, &parity.ParityChainSpecBuiltin{
 				Name: "alt_bn128_mul",
-				//ActivateAt: hexOrDecimal256FromBig(b),
+				//ActivateAt: hexutilUint64(b.Uint64()),
 				Pricing: &parity.ParityChainSpecPricingMaybe{
 					Map: map[*math.HexOrDecimal256]parity.ParityChainSpecPricingPrice{
 						math.NewHexOrDecimal256(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Int64()): parity.ParityChainSpecPricingPrice{
@@ -234,7 +234,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 				}})
 			spec.SetPrecompile(8, &parity.ParityChainSpecBuiltin{
 				Name: "alt_bn128_pairing",
-				//ActivateAt: hexOrDecimal256FromBig(b),
+				//ActivateAt: hexutilUint64(b.Uint64()),
 				Pricing: &parity.ParityChainSpecPricingMaybe{
 					Map: map[*math.HexOrDecimal256]parity.ParityChainSpecPricingPrice{
 						math.NewHexOrDecimal256(params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock).Int64()): parity.ParityChainSpecPricingPrice{
@@ -367,18 +367,18 @@ func ParityConfigToMultiGethGenesis(c *parity.ParityChainSpec) (*paramtypes.Gene
 				switch v.Builtin.Name {
 				case "ripemd160", "ecrecover", "sha256", "identity":
 				case "modexp":
-					mgc.EIP198FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
+					mgc.EIP198FBlock = new(big.Int).Set(v.Builtin.ActivateAt.Big())
 
 				case "blake2_f":
 					if v.Builtin.Pricing.Pricing != nil {
-						mgc.EIP152FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
+						mgc.EIP152FBlock = new(big.Int).Set(v.Builtin.ActivateAt.Big())
 					}
 
 				case "alt_bn128_pairing":
 					if v.Builtin.Pricing.Pricing != nil {
-						mgc.EIP212FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
+						mgc.EIP212FBlock = new(big.Int).Set(v.Builtin.ActivateAt.Big())
 						if v.Builtin.EIP1108Transition != nil {
-							mgc.EIP1108FBlock = new(big.Int).Set(v.Builtin.EIP1108Transition.ToInt())
+							mgc.EIP1108FBlock = new(big.Int).Set(v.Builtin.EIP1108Transition.Big())
 						}
 					} else {
 						for k, vv := range v.Builtin.Pricing.Map {
@@ -395,9 +395,9 @@ func ParityConfigToMultiGethGenesis(c *parity.ParityChainSpec) (*paramtypes.Gene
 
 				case "alt_bn128_add", "alt_bn128_mul":
 					if v.Builtin.Pricing.Pricing != nil {
-						mgc.EIP213FBlock = new(big.Int).Set(v.Builtin.ActivateAt.ToInt())
+						mgc.EIP213FBlock = new(big.Int).Set(v.Builtin.ActivateAt.Big())
 						if v.Builtin.EIP1108Transition != nil {
-							mgc.EIP1108FBlock = new(big.Int).Set(v.Builtin.EIP1108Transition.ToInt())
+							mgc.EIP1108FBlock = new(big.Int).Set(v.Builtin.EIP1108Transition.Big())
 						}
 					} else {
 						for k, vv := range v.Builtin.Pricing.Map {

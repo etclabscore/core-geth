@@ -16,7 +16,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
-var paritySpecsDir = filepath.Join("..", "params", "parity")
+var paritySpecsDir = filepath.Join("..", "params", "parity.json.d")
 
 func paritySpecPath(name string) string {
 	p := filepath.Join(paritySpecsDir, name)

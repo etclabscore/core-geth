@@ -14,7 +14,7 @@ import (
 )
 
 func asSpecFilePath(name string) string {
-	return filepath.Join("..", "parity", name)
+	return filepath.Join("..", "parity.json.d", name)
 }
 
 var chainSpecEquivs = map[string]*paramtypes.Genesis{

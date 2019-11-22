@@ -18,7 +18,7 @@
 
 /*
 
-   The mkalloc tool creates the genesis allocation constants in alloc_params.go
+   The mkalloc tool creates the genesis allocation constants in alloc.go
    It outputs a const declaration that contains an RLP-encoded list of (address, balance) tuples.
 
        go run mkalloc.go genesis.json

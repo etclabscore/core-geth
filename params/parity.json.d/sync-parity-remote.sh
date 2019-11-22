@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# This script downloads JSON chain configurations from github.com/parity-tech/parity
+# master branch.
+# It uses a whitelist approach to avoid including irrelevant and/or unsupported
+# configurations.
+
 set -e
 
 specs=(
@@ -27,10 +32,6 @@ specs=(
 	"mix"
 	"musicoin"
 )
-
-if [[ $# -ne 0 ]]; then
-	specs=("$*")
-fi
 
 for spec_name in "${specs[@]}"; do
     echo "Fetching $spec_name..."

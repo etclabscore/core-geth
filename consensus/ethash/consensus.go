@@ -406,8 +406,6 @@ func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.H
 var (
 	big1       = big.NewInt(1)
 	big2       = big.NewInt(2)
-	big9       = big.NewInt(9)
-	big10      = big.NewInt(10)
 	bigMinus99 = big.NewInt(-99)
 )
 

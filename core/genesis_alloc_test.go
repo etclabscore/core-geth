@@ -33,11 +33,11 @@ import (
 )
 
 func TestDefaultGenesisBlock(t *testing.T) {
-	block := DefaultGenesisBlock().ToBlock(nil)
+	block := GenesisToBlock(DefaultGenesisBlock(), nil)
 	if block.Hash() != params.MainnetGenesisHash {
 		t.Errorf("wrong mainnet genesis hash, got %v, want %v", block.Hash(), params.MainnetGenesisHash)
 	}
-	block = DefaultTestnetGenesisBlock().ToBlock(nil)
+	block = GenesisToBlock(DefaultTestnetGenesisBlock(), nil)
 	if block.Hash() != params.TestnetGenesisHash {
 		t.Errorf("wrong testnet genesis hash, got %v, want %v", block.Hash(), params.TestnetGenesisHash)
 	}

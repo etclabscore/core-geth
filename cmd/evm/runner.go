@@ -100,7 +100,7 @@ func runCmd(ctx *cli.Context) error {
 		gen := readGenesis(ctx.GlobalString(GenesisFlag.Name))
 		genesisConfig = gen
 		db := rawdb.NewMemoryDatabase()
-		genesis := gen.ToBlock(db)
+		genesis := core.GenesisToBlock(gen, db)
 		statedb, _ = state.New(genesis.Root(), state.NewDatabase(db))
 		chainConfig = gen.Config
 	} else {

@@ -183,7 +183,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *Genesis, override
 			genesis = DefaultGenesisBlock()
 		}
 		// Ensure the stored genesis matches with the given one.
-		hash := genesis.ToBlock(nil).Hash()
+		hash := GenesisToBlock(genesis, nil).Hash()
 		if hash != stored {
 			return genesis.Config, hash, &GenesisMismatchError{stored, hash}
 		}
@@ -196,14 +196,14 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *Genesis, override
 
 	// Check whether the genesis block is already written.
 	if genesis != nil {
-		hash := genesis.ToBlock(nil).Hash()
+		hash := GenesisToBlock(genesis, nil).Hash()
 		if hash != stored {
 			return genesis.Config, hash, &GenesisMismatchError{stored, hash}
 		}
 	}
 
 	// Get the existing chain configuration.
-	newcfg := genesis.configOrDefault(stored)
+	newcfg := configOrDefault(genesis, stored)
 	if overrideIstanbul != nil {
 		newcfg.IstanbulBlock = overrideIstanbul
 	}
@@ -237,7 +237,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *Genesis, override
 	return newcfg, stored, nil
 }
 
-func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
+func configOrDefault(g *Genesis, ghash common.Hash) *params.ChainConfig {
 	switch {
 	case g != nil:
 		return g.Config
@@ -264,9 +264,9 @@ func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
 	}
 }
 
-// ToBlock creates the genesis block and writes state of a genesis specification
+// GenesisToBlock creates the genesis block and writes state of a genesis specification
 // to the given database (or discards it if nil).
-func (g *Genesis) ToBlock(db ethdb.Database) *types.Block {
+func GenesisToBlock(g *Genesis, db ethdb.Database) *types.Block {
 	if db == nil {
 		db = rawdb.NewMemoryDatabase()
 	}
@@ -308,7 +308,7 @@ func (g *Genesis) ToBlock(db ethdb.Database) *types.Block {
 // Commit writes the block and state of a genesis specification to the database.
 // The block is committed as the canonical head block.
 func (g *Genesis) Commit(db ethdb.Database) (*types.Block, error) {
-	block := g.ToBlock(db)
+	block := GenesisToBlock(g, db)
 	if block.Number().Sign() != 0 {
 		return nil, fmt.Errorf("can't commit genesis block with number > 0")
 	}

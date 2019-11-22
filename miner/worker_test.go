@@ -114,7 +114,7 @@ func newTestWorkerBackend(t *testing.T, chainConfig *params.ChainConfig, engine 
 	default:
 		t.Fatalf("unexpected consensus engine type: %T", engine)
 	}
-	genesis := gspec.MustCommit(db)
+	genesis := core.MustCommitGenesis(db, &gspec)
 
 	chain, _ := core.NewBlockChain(db, &core.CacheConfig{TrieDirtyDisabled: true}, gspec.Config, engine, vm.Config{}, nil)
 	txpool := core.NewTxPool(testTxPoolConfig, chainConfig, chain)
@@ -212,7 +212,7 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 	defer w.close()
 
 	db2 := rawdb.NewMemoryDatabase()
-	b.genesis.MustCommit(db2)
+	core.MustCommitGenesis(db2, b.genesis)
 	chain, _ := core.NewBlockChain(db2, nil, b.chain.Config(), engine, vm.Config{}, nil)
 	defer chain.Stop()
 

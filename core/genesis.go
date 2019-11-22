@@ -330,9 +330,9 @@ func CommitGenesis(g *Genesis, db ethdb.Database) (*types.Block, error) {
 	return block, nil
 }
 
-// MustCommit writes the genesis block and state to db, panicking on error.
+// MustCommitGenesis writes the genesis block and state to db, panicking on error.
 // The block is committed as the canonical head block.
-func (g *Genesis) MustCommit(db ethdb.Database) *types.Block {
+func MustCommitGenesis(db ethdb.Database, g *Genesis) *types.Block {
 	block, err := CommitGenesis(g, db)
 	if err != nil {
 		panic(err)
@@ -343,7 +343,7 @@ func (g *Genesis) MustCommit(db ethdb.Database) *types.Block {
 // GenesisBlockForTesting creates and writes a block in which addr has the given wei balance.
 func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big.Int) *types.Block {
 	g := Genesis{Alloc: GenesisAlloc{addr: {Balance: balance}}}
-	return g.MustCommit(db)
+	return MustCommitGenesis(db, &g)
 }
 
 // DefaultGenesisBlock returns the Ethereum main net genesis block.

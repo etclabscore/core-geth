@@ -253,9 +253,9 @@ func testChainOdr(t *testing.T, protocol int, fn odrTestFn) {
 		sdb     = rawdb.NewMemoryDatabase()
 		ldb     = rawdb.NewMemoryDatabase()
 		gspec   = core.Genesis{Alloc: core.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
-		genesis = gspec.MustCommit(sdb)
+		genesis = core.MustCommitGenesis(sdb, &gspec)
 	)
-	gspec.MustCommit(ldb)
+	core.MustCommitGenesis(ldb, &gspec)
 	// Assemble the test environment
 	blockchain, _ := core.NewBlockChain(sdb, nil, params.TestChainConfig, ethash.NewFullFaker(), vm.Config{}, nil)
 	gchain, _ := core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), sdb, 4, testChainGen)

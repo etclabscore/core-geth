@@ -171,8 +171,8 @@ func TestForkIDSplit(t *testing.T) {
 		gspecNoFork  = &core.Genesis{Config: configNoFork}
 		gspecProFork = &core.Genesis{Config: configProFork}
 
-		genesisNoFork  = gspecNoFork.MustCommit(dbNoFork)
-		genesisProFork = gspecProFork.MustCommit(dbProFork)
+		genesisNoFork  = core.MustCommitGenesis(dbNoFork, gspecNoFork)
+		genesisProFork = core.MustCommitGenesis(dbProFork, gspecProFork)
 
 		chainNoFork, _  = core.NewBlockChain(dbNoFork, nil, configNoFork, engine, vm.Config{}, nil)
 		chainProFork, _ = core.NewBlockChain(dbProFork, nil, configProFork, engine, vm.Config{}, nil)

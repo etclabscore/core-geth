@@ -51,7 +51,7 @@ func TestReimportMirroredState(t *testing.T) {
 		},
 	}
 	copy(genspec.ExtraData[extraVanity:], addr[:])
-	genesis := genspec.MustCommit(db)
+	genesis := core.MustCommitGenesis(db, genspec)
 
 	// Generate a batch of blocks, each properly signed
 	chain, _ := core.NewBlockChain(db, nil, params.AllCliqueProtocolChanges, engine, vm.Config{}, nil)
@@ -86,7 +86,7 @@ func TestReimportMirroredState(t *testing.T) {
 	}
 	// Insert the first two blocks and make sure the chain is valid
 	db = rawdb.NewMemoryDatabase()
-	genspec.MustCommit(db)
+	core.MustCommitGenesis(db, genspec)
 
 	chain, _ = core.NewBlockChain(db, nil, params.AllCliqueProtocolChanges, engine, vm.Config{}, nil)
 	defer chain.Stop()

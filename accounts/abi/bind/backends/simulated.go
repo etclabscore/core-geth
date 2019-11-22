@@ -69,7 +69,7 @@ type SimulatedBackend struct {
 // and uses a simulated blockchain for testing purposes.
 func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc core.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
 	genesis := core.Genesis{Config: params.AllEthashProtocolChanges, GasLimit: gasLimit, Alloc: alloc}
-	genesis.MustCommit(database)
+	core.MustCommitGenesis(database, &genesis)
 	blockchain, _ := core.NewBlockChain(database, nil, genesis.Config, ethash.NewFaker(), vm.Config{}, nil)
 
 	backend := &SimulatedBackend{

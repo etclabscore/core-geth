@@ -475,7 +475,7 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 		db     = rawdb.NewMemoryDatabase()
 		config = new(params.ChainConfig)
 	)
-	(&core.Genesis{Config: config}).MustCommit(db) // Commit genesis block
+	core.MustCommitGenesis(db, &core.Genesis{Config: config}) // Commit genesis block
 	// If checkpointing is enabled, create and inject a fake CHT and the corresponding
 	// chllenge response.
 	var response *types.Header
@@ -577,7 +577,7 @@ func testBroadcastBlock(t *testing.T, totalPeers, broadcastExpected int) {
 		db      = rawdb.NewMemoryDatabase()
 		config  = &params.ChainConfig{}
 		gspec   = &core.Genesis{Config: config}
-		genesis = gspec.MustCommit(db)
+		genesis = core.MustCommitGenesis(db, gspec)
 	)
 	blockchain, err := core.NewBlockChain(db, nil, config, pow, vm.Config{}, nil)
 	if err != nil {

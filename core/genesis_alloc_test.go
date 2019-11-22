@@ -85,7 +85,7 @@ func TestSetupGenesis(t *testing.T) {
 		{
 			name: "mainnet block in DB, genesis == nil",
 			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
-				DefaultGenesisBlock().MustCommit(db)
+				MustCommitGenesis(db, DefaultGenesisBlock())
 				return SetupGenesisBlock(db, nil)
 			},
 			wantHash:   params.MainnetGenesisHash,
@@ -94,7 +94,7 @@ func TestSetupGenesis(t *testing.T) {
 		{
 			name: "custom block in DB, genesis == nil",
 			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
-				customg.MustCommit(db)
+				MustCommitGenesis(db, &customg)
 				return SetupGenesisBlock(db, nil)
 			},
 			wantHash:   customghash,
@@ -103,7 +103,7 @@ func TestSetupGenesis(t *testing.T) {
 		{
 			name: "custom block in DB, genesis == testnet",
 			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
-				customg.MustCommit(db)
+				MustCommitGenesis(db, &customg)
 				return SetupGenesisBlock(db, DefaultTestnetGenesisBlock())
 			},
 			wantErr:    &GenesisMismatchError{Stored: customghash, New: params.TestnetGenesisHash},
@@ -113,7 +113,7 @@ func TestSetupGenesis(t *testing.T) {
 		{
 			name: "compatible config in DB",
 			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
-				oldcustomg.MustCommit(db)
+				MustCommitGenesis(db, &oldcustomg)
 				return SetupGenesisBlock(db, &customg)
 			},
 			wantHash:   customghash,
@@ -124,7 +124,7 @@ func TestSetupGenesis(t *testing.T) {
 			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
 				// Commit the 'old' genesis block with Homestead transition at #2.
 				// Advance to block #4, past the homestead transition block of customg.
-				genesis := oldcustomg.MustCommit(db)
+				genesis := MustCommitGenesis(db, &oldcustomg)
 
 				bc, _ := NewBlockChain(db, nil, oldcustomg.Config, ethash.NewFullFaker(), vm.Config{}, nil)
 				defer bc.Stop()

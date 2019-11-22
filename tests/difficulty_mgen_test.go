@@ -29,7 +29,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/chainspec"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 )
@@ -134,7 +133,7 @@ func TestDifficultyGen(t *testing.T) {
 			// file first as a dependency for test generation.
 			specref, done := wroteNewChainConfigs[associateForkName]
 			if !done {
-				genesis := core.DefaultTestnetGenesisBlock()
+				genesis := params.DefaultTestnetGenesisBlock()
 				genesis.Config = &conf
 
 				pspec, err := chainspec.NewParityChainSpec(associateForkName, genesis, []string{})

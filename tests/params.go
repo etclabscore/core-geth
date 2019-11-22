@@ -12,7 +12,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/chainspec"
 	"github.com/ethereum/go-ethereum/chainspecs/parity"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/params"
 )
 
@@ -57,7 +56,7 @@ var mapForkNameChainspecFileDifficulty = map[string]string{
 	"ETC_Agharta":       "classic_agharta_difficulty_test.json",
 }
 
-func readConfigFromSpecFile(name string) (genesis *core.Genesis, sha1sum []byte, err error) {
+func readConfigFromSpecFile(name string) (genesis *params.Genesis, sha1sum []byte, err error) {
 	spec := chainspec.ParityChainSpec{}
 	if fi, err := os.Open(name); os.IsNotExist(err) {
 		return nil, nil, err

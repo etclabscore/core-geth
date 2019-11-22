@@ -49,8 +49,8 @@ type vmJSON struct {
 	Logs          common.UnprefixedHash `json:"logs"`
 	GasRemaining  *math.HexOrDecimal64  `json:"gas"`
 	Out           hexutil.Bytes         `json:"out"`
-	Pre           core.GenesisAlloc     `json:"pre"`
-	Post          core.GenesisAlloc     `json:"post"`
+	Pre           params.GenesisAlloc   `json:"pre"`
+	Post          params.GenesisAlloc   `json:"post"`
 	PostStateRoot common.Hash           `json:"postStateRoot"`
 }
 

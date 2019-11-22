@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -139,10 +138,10 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 
 	debug.Memsize.Add("node", rawStack)
 
-	var genesis *core.Genesis
+	var genesis *params.Genesis
 	if config.EthereumGenesis != "" {
 		// Parse the user supplied genesis spec if not mainnet
-		genesis = new(core.Genesis)
+		genesis = new(params.Genesis)
 		if err := json.Unmarshal([]byte(config.EthereumGenesis), genesis); err != nil {
 			return nil, fmt.Errorf("invalid genesis spec: %v", err)
 		}

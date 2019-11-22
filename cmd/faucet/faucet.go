@@ -45,7 +45,6 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/downloader"
@@ -173,64 +172,64 @@ func main() {
 		log.Crit("Failed to render the faucet template", "err", err)
 	}
 	// Load and parse the genesis block requested by the user
-	var genesis *core.Genesis
+	var genesis *params.Genesis
 	var enodes []*discv5.Node
 	var blob []byte
 
-	genesis, *bootFlag, *netFlag = func() (gs *core.Genesis, bs string, netid uint64) {
+	genesis, *bootFlag, *netFlag = func() (gs *params.Genesis, bs string, netid uint64) {
 		var configs = []struct {
 			flag  bool
-			gs    *core.Genesis
+			gs    *params.Genesis
 			bs    []string
 		}{
 			{
 				*foundationFlag,
-				core.DefaultGenesisBlock(),
+				params.DefaultGenesisBlock(),
 				params.MainnetBootnodes,
 			},
 			{
 				*classicFlag,
-				core.DefaultClassicGenesisBlock(),
+				params.DefaultClassicGenesisBlock(),
 				params.ClassicBootnodes,
 			},
 			{
 				*mordorFlag,
-				core.DefaultMordorGenesisBlock(),
+				params.DefaultMordorGenesisBlock(),
 				params.MordorBootnodes,
 			},
 			{
 				*socialFlag,
-				core.DefaultSocialGenesisBlock(),
+				params.DefaultSocialGenesisBlock(),
 				params.SocialBootnodes,
 			},
 			{
 				*ethersocialFlag,
-				core.DefaultEthersocialGenesisBlock(),
+				params.DefaultEthersocialGenesisBlock(),
 				params.EthersocialBootnodes,
 			},
 			{
 				*mixFlag,
-				core.DefaultMixGenesisBlock(),
+				params.DefaultMixGenesisBlock(),
 				params.MixBootnodes,
 			},
 			{
 				*testnetFlag,
-				core.DefaultTestnetGenesisBlock(),
+				params.DefaultTestnetGenesisBlock(),
 				params.TestnetBootnodes,
 			},
 			{
 				*rinkebyFlag,
-				core.DefaultRinkebyGenesisBlock(),
+				params.DefaultRinkebyGenesisBlock(),
 				params.RinkebyBootnodes,
 			},
 			{
 				*kottiFlag,
-				core.DefaultKottiGenesisBlock(),
+				params.DefaultKottiGenesisBlock(),
 				params.KottiBootnodes,
 			},
 			{
 				*goerliFlag,
-				core.DefaultGoerliGenesisBlock(),
+				params.DefaultGoerliGenesisBlock(),
 				params.GoerliBootnodes,
 			},
 		}
@@ -252,7 +251,7 @@ func main() {
 			if err != nil {
 				log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
 			}
-			gs = new(core.Genesis)
+			gs = new(params.Genesis)
 			if err = json.Unmarshal(blob, gs); err != nil {
 				log.Crit("Failed to parse genesis block json", "err", err)
 			}
@@ -335,7 +334,7 @@ type faucet struct {
 	lock sync.RWMutex // Lock protecting the faucet's internals
 }
 
-func newFaucet(genesis *core.Genesis, port int, enodes []*discv5.Node, network uint64, stats string, ks *keystore.KeyStore, index []byte) (*faucet, error) {
+func newFaucet(genesis *params.Genesis, port int, enodes []*discv5.Node, network uint64, stats string, ks *keystore.KeyStore, index []byte) (*faucet, error) {
 	// Assemble the raw devp2p protocol stack
 	stack, err := node.New(&node.Config{
 		Name:    "MultiFaucet",

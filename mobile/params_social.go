@@ -19,12 +19,12 @@ package geth
 import (
 	"encoding/json"
 
-	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 // SocialGenesis returns the JSON spec to use for the Ethereum Social network.
 func SocialGenesis() string {
-	enc, err := json.Marshal(core.DefaultSocialGenesisBlock())
+	enc, err := json.Marshal(params.DefaultSocialGenesisBlock())
 	if err != nil {
 		panic(err)
 	}

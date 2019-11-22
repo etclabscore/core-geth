@@ -44,9 +44,9 @@ func TestReimportMirroredState(t *testing.T) {
 		engine = New(params.AllCliqueProtocolChanges.Clique, db)
 		signer = new(types.HomesteadSigner)
 	)
-	genspec := &core.Genesis{
+	genspec := &params.Genesis{
 		ExtraData: make([]byte, extraVanity+common.AddressLength+extraSeal),
-		Alloc: map[common.Address]core.GenesisAccount{
+		Alloc: map[common.Address]params.GenesisAccount{
 			addr: {Balance: big.NewInt(1)},
 		},
 	}

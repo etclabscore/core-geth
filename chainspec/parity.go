@@ -30,7 +30,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	math2 "github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 )
@@ -280,7 +279,7 @@ func hexOrDecimal256FromBig(i *big.Int) *math2.HexOrDecimal256 {
 
 // NewParityChainSpec converts a go-ethereum genesis block into a Parity specific
 // chain specification format.
-func NewParityChainSpec(network string, genesis *core.Genesis, bootnodes []string) (*ParityChainSpec, error) {
+func NewParityChainSpec(network string, genesis *params.Genesis, bootnodes []string) (*ParityChainSpec, error) {
 	// Only ethash and clique are currently supported between go-ethereum and Parity
 	if genesis.Config.Ethash == nil && genesis.Config.Clique == nil {
 		return nil, errors.New("unsupported consensus engine")
@@ -577,7 +576,7 @@ func (spec *ParityChainSpec) setPrecompile(address byte, data *parityChainSpecBu
 
 // ToMultiGethGenesis converts a Parity chainspec to the corresponding MultiGeth datastructure.
 // Note that the return value 'core.Genesis' includes the respective 'params.ChainConfig' values.
-func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
+func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*params.Genesis, error) {
 	mgc := &params.ChainConfig{}
 	if pars := c.Params; pars.NetworkID != nil {
 		if err := checkUnsupportedValsMust(c); err != nil {
@@ -745,7 +744,7 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 	} else {
 		return nil, errors.New("unsupported engine")
 	}
-	mgg := &core.Genesis{
+	mgg := &params.Genesis{
 		Config: mgc,
 	}
 	if c.Genesis.Difficulty != nil {
@@ -761,12 +760,12 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*core.Genesis, error) {
 		mgg.ExtraData = c.Genesis.ExtraData
 	}
 	if c.Accounts != nil {
-		mgg.Alloc = core.GenesisAlloc{}
+		mgg.Alloc = params.GenesisAlloc{}
 		for k, v := range c.Accounts {
 			addr := common.Address(k)
 
 			bal := (big.Int)(v.Balance)
-			mgg.Alloc[addr] = core.GenesisAccount{
+			mgg.Alloc[addr] = params.GenesisAccount{
 				Nonce:   (uint64)(v.Nonce),
 				Balance: &bal,
 				Code:    v.Code,

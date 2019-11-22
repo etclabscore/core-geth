@@ -6,26 +6,26 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 // PyEthereumGenesisSpec represents the genesis specification format used by the
 // Python Ethereum implementation.
 type PyEthereumGenesisSpec struct {
-	Nonce      hexutil.Bytes     `json:"nonce"`
-	Timestamp  hexutil.Uint64    `json:"timestamp"`
-	ExtraData  hexutil.Bytes     `json:"extraData"`
-	GasLimit   hexutil.Uint64    `json:"gasLimit"`
-	Difficulty *hexutil.Big      `json:"difficulty"`
-	Mixhash    common.Hash       `json:"mixhash"`
-	Coinbase   common.Address    `json:"coinbase"`
-	Alloc      core.GenesisAlloc `json:"alloc"`
-	ParentHash common.Hash       `json:"parentHash"`
+	Nonce      hexutil.Bytes       `json:"nonce"`
+	Timestamp  hexutil.Uint64      `json:"timestamp"`
+	ExtraData  hexutil.Bytes       `json:"extraData"`
+	GasLimit   hexutil.Uint64      `json:"gasLimit"`
+	Difficulty *hexutil.Big        `json:"difficulty"`
+	Mixhash    common.Hash         `json:"mixhash"`
+	Coinbase   common.Address      `json:"coinbase"`
+	Alloc      params.GenesisAlloc `json:"alloc"`
+	ParentHash common.Hash         `json:"parentHash"`
 }
 
 // NewPyEthereumGenesisSpec converts a go-ethereum genesis block into a Parity specific
 // chain specification format.
-func NewPyEthereumGenesisSpec(network string, genesis *core.Genesis) (*PyEthereumGenesisSpec, error) {
+func NewPyEthereumGenesisSpec(network string, genesis *params.Genesis) (*PyEthereumGenesisSpec, error) {
 	// Only ethash is currently supported between go-ethereum and pyethereum
 	if genesis.Config.Ethash == nil {
 		return nil, errors.New("unsupported consensus engine")

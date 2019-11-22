@@ -168,8 +168,8 @@ func TestForkIDSplit(t *testing.T) {
 		dbNoFork  = rawdb.NewMemoryDatabase()
 		dbProFork = rawdb.NewMemoryDatabase()
 
-		gspecNoFork  = &core.Genesis{Config: configNoFork}
-		gspecProFork = &core.Genesis{Config: configProFork}
+		gspecNoFork  = &params.Genesis{Config: configNoFork}
+		gspecProFork = &params.Genesis{Config: configProFork}
 
 		genesisNoFork  = core.MustCommitGenesis(dbNoFork, gspecNoFork)
 		genesisProFork = core.MustCommitGenesis(dbProFork, gspecProFork)

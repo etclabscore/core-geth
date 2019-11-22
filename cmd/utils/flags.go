@@ -1548,7 +1548,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		}
 		log.Info("Using developer account", "address", developer.Address)
 
-		cfg.Genesis = core.DeveloperGenesisBlock(uint64(ctx.GlobalInt(DeveloperPeriodFlag.Name)), developer.Address)
+		cfg.Genesis = params.DeveloperGenesisBlock(uint64(ctx.GlobalInt(DeveloperPeriodFlag.Name)), developer.Address)
 		if !ctx.GlobalIsSet(MinerGasPriceFlag.Name) && !ctx.GlobalIsSet(MinerLegacyGasPriceFlag.Name) {
 			cfg.Miner.GasPrice = big.NewInt(1)
 		}
@@ -1687,34 +1687,34 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 // If no --<chain> flag is set in the global context, a nil value is returned.
 // It does not handle genesis for --dev mode, since that mode includes but also exceeds
 // chain configuration.
-func genesisForCtxChainConfig(ctx *cli.Context) *core.Genesis {
-	var genesis *core.Genesis
+func genesisForCtxChainConfig(ctx *cli.Context) *params.Genesis {
+	var genesis *params.Genesis
 	switch {
 	case ctx.GlobalBool(TestnetFlag.Name):
-		genesis = core.DefaultTestnetGenesisBlock()
+		genesis = params.DefaultTestnetGenesisBlock()
 	case ctx.GlobalBool(ClassicFlag.Name):
-		genesis = core.DefaultClassicGenesisBlock()
+		genesis = params.DefaultClassicGenesisBlock()
 	case ctx.GlobalBool(MordorFlag.Name):
-		genesis = core.DefaultMordorGenesisBlock()
+		genesis = params.DefaultMordorGenesisBlock()
 	case ctx.GlobalBool(SocialFlag.Name):
-		genesis = core.DefaultSocialGenesisBlock()
+		genesis = params.DefaultSocialGenesisBlock()
 	case ctx.GlobalBool(MixFlag.Name):
-		genesis = core.DefaultMixGenesisBlock()
+		genesis = params.DefaultMixGenesisBlock()
 	case ctx.GlobalBool(EthersocialFlag.Name):
-		genesis = core.DefaultEthersocialGenesisBlock()
+		genesis = params.DefaultEthersocialGenesisBlock()
 	case ctx.GlobalBool(MusicoinFlag.Name):
-		genesis = core.DefaultMusicoinGenesisBlock()
+		genesis = params.DefaultMusicoinGenesisBlock()
 	case ctx.GlobalBool(RinkebyFlag.Name):
-		genesis = core.DefaultRinkebyGenesisBlock()
+		genesis = params.DefaultRinkebyGenesisBlock()
 	case ctx.GlobalBool(KottiFlag.Name):
-		genesis = core.DefaultKottiGenesisBlock()
+		genesis = params.DefaultKottiGenesisBlock()
 	case ctx.GlobalBool(GoerliFlag.Name):
-		genesis = core.DefaultGoerliGenesisBlock()
+		genesis = params.DefaultGoerliGenesisBlock()
 	}
 	return genesis
 }
 
-func MakeGenesis(ctx *cli.Context) *core.Genesis {
+func MakeGenesis(ctx *cli.Context) *params.Genesis {
 	if ctx.GlobalBool(DeveloperFlag.Name) {
 		Fatalf("Developer chains are ephemeral")
 	}

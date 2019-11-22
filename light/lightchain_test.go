@@ -53,7 +53,7 @@ func makeHeaderChain(parent *types.Header, n int, db ethdb.Database, seed int) [
 // header only chain.
 func newCanonical(n int) (ethdb.Database, *LightChain, error) {
 	db := rawdb.NewMemoryDatabase()
-	gspec := core.Genesis{Config: params.TestChainConfig}
+	gspec := params.Genesis{Config: params.TestChainConfig}
 	genesis := core.MustCommitGenesis(db, &gspec)
 	blockchain, _ := NewLightChain(&dummyOdr{db: db, indexerConfig: TestClientIndexerConfig}, gspec.Config, ethash.NewFaker(), nil)
 
@@ -70,7 +70,7 @@ func newCanonical(n int) (ethdb.Database, *LightChain, error) {
 // newTestLightChain creates a LightChain that doesn't validate anything.
 func newTestLightChain() *LightChain {
 	db := rawdb.NewMemoryDatabase()
-	gspec := &core.Genesis{
+	gspec := &params.Genesis{
 		Difficulty: big.NewInt(1),
 		Config:     params.TestChainConfig,
 	}

@@ -10,7 +10,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common"
 	math2 "github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/params"
 )
 
@@ -18,9 +17,9 @@ func asSpecFilePath(name string) string {
 	return filepath.Join("..", "chainspecs", "parity", name)
 }
 
-var chainSpecEquivs = map[string]*core.Genesis{
-	"classic.json":    core.DefaultClassicGenesisBlock(),
-	"foundation.json": core.DefaultGenesisBlock(),
+var chainSpecEquivs = map[string]*params.Genesis{
+	"classic.json":    params.DefaultClassicGenesisBlock(),
+	"foundation.json": params.DefaultGenesisBlock(),
 }
 
 func TestBlockConfig(t *testing.T) {
@@ -28,7 +27,7 @@ func TestBlockConfig(t *testing.T) {
 		ChainID: big.NewInt(1),
 		Ethash:  new(params.EthashConfig),
 	}
-	genesis := core.DefaultGenesisBlock()
+	genesis := params.DefaultGenesisBlock()
 	genesis.Config = frontierCC
 	paritySpec, err := NewParityChainSpec("frontier", genesis, []string{})
 	if err != nil {
@@ -41,7 +40,7 @@ func TestBlockConfig(t *testing.T) {
 }
 
 func TestParityConfigToMultiGethGenesis(t *testing.T) {
-	var gen1, gen2 *core.Genesis
+	var gen1, gen2 *params.Genesis
 
 	for p, gen := range chainSpecEquivs {
 		gen1 = gen

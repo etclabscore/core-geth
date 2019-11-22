@@ -57,9 +57,9 @@ func newTestProtocolManager(mode downloader.SyncMode, blocks int, generator func
 		evmux  = new(event.TypeMux)
 		engine = ethash.NewFaker()
 		db     = rawdb.NewMemoryDatabase()
-		gspec  = &core.Genesis{
+		gspec  = &params.Genesis{
 			Config: params.TestChainConfig,
-			Alloc:  core.GenesisAlloc{testBank: {Balance: big.NewInt(1000000)}},
+			Alloc:  params.GenesisAlloc{testBank: {Balance: big.NewInt(1000000)}},
 		}
 		genesis       = core.MustCommitGenesis(db, gspec)
 		blockchain, _ = core.NewBlockChain(db, nil, gspec.Config, engine, vm.Config{}, nil)

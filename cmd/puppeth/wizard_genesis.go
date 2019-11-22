@@ -31,7 +31,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/chainspec"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 )
@@ -39,11 +38,11 @@ import (
 // makeGenesis creates a new genesis struct based on some user input.
 func (w *wizard) makeGenesis() {
 	// Construct a default genesis block
-	genesis := &core.Genesis{
+	genesis := &params.Genesis{
 		Timestamp:  uint64(time.Now().Unix()),
 		GasLimit:   4700000,
 		Difficulty: big.NewInt(524288),
-		Alloc:      make(core.GenesisAlloc),
+		Alloc:      make(params.GenesisAlloc),
 		Config: &params.ChainConfig{
 			HomesteadBlock:      big.NewInt(0),
 			EIP150Block:         big.NewInt(0),
@@ -115,7 +114,7 @@ func (w *wizard) makeGenesis() {
 	for {
 		// Read the address of the account to fund
 		if address := w.readAddress(); address != nil {
-			genesis.Alloc[*address] = core.GenesisAccount{
+			genesis.Alloc[*address] = params.GenesisAccount{
 				Balance: new(big.Int).Lsh(big.NewInt(1), 256-7), // 2^256 / 128 (allow many pre-funds without balance overflows)
 			}
 			continue
@@ -127,7 +126,7 @@ func (w *wizard) makeGenesis() {
 	if w.readDefaultYesNo(true) {
 		// Add a batch of precompile balances to avoid them getting deleted
 		for i := int64(0); i < 256; i++ {
-			genesis.Alloc[common.BigToAddress(big.NewInt(i))] = core.GenesisAccount{Balance: big.NewInt(1)}
+			genesis.Alloc[common.BigToAddress(big.NewInt(i))] = params.GenesisAccount{Balance: big.NewInt(1)}
 		}
 	}
 	// Query the user for some custom extras
@@ -178,7 +177,7 @@ func (w *wizard) importGenesis() {
 		return
 	}
 	// Parse the genesis file and inject it successful
-	var genesis core.Genesis
+	var genesis params.Genesis
 	if err := json.NewDecoder(reader).Decode(&genesis); err != nil {
 		log.Error("Invalid genesis spec: %v", err)
 		return

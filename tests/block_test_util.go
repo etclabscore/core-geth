@@ -35,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -142,7 +143,7 @@ func (t *BlockTest) Run() error {
 	return t.validateImportedHeaders(chain, validBlocks)
 }
 
-func (t *BlockTest) genesis(config *params.ChainConfig) *params.Genesis {
+func (t *BlockTest) genesis(config *paramtypes.ChainConfig) *params.Genesis {
 	return &params.Genesis{
 		Config:     config,
 		Nonce:      t.json.Genesis.Nonce.Uint64(),

@@ -58,6 +58,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/gorilla/websocket"
 )
 
@@ -104,9 +105,9 @@ var (
 	gitDate   = "" // Git commit date YYYYMMDD of the release (set via linker flags)
 )
 
-func faucetDirFromConfig(chainConfig *params.ChainConfig) string {
+func faucetDirFromConfig(chainConfig *paramtypes.ChainConfig) string {
 	datadir := filepath.Join(os.Getenv("HOME"), ".faucet")
-	for conf, suff := range map[*params.ChainConfig]string{
+	for conf, suff := range map[*paramtypes.ChainConfig]string{
 		params.MainnetChainConfig:     "",
 		params.ClassicChainConfig:     "classic",
 		params.SocialChainConfig:      "social",
@@ -314,10 +315,10 @@ type request struct {
 
 // faucet represents a crypto faucet backed by an Ethereum light client.
 type faucet struct {
-	config *params.ChainConfig // Chain configurations for signing
-	stack  *node.Node          // Ethereum protocol stack
-	client *ethclient.Client   // Client connection to the Ethereum chain
-	index  []byte              // Index page to serve up on the web
+	config *paramtypes.ChainConfig // Chain configurations for signing
+	stack  *node.Node              // Ethereum protocol stack
+	client *ethclient.Client       // Client connection to the Ethereum chain
+	index  []byte                  // Index page to serve up on the web
 
 	keystore *keystore.KeyStore // Keystore containing the single signer
 	account  accounts.Account   // Account funding user faucet requests

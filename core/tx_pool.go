@@ -32,7 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 const (
@@ -210,7 +210,7 @@ func (config *TxPoolConfig) sanitize() TxPoolConfig {
 // two states over time as they are received and processed.
 type TxPool struct {
 	config      TxPoolConfig
-	chainconfig *params.ChainConfig
+	chainconfig *paramtypes.ChainConfig
 	chain       blockChain
 	gasPrice    *big.Int
 	txFeed      event.Feed
@@ -250,7 +250,7 @@ type txpoolResetRequest struct {
 
 // NewTxPool creates a new transaction pool to gather, sort and filter inbound
 // transactions from the network.
-func NewTxPool(config TxPoolConfig, chainconfig *params.ChainConfig, chain blockChain) *TxPool {
+func NewTxPool(config TxPoolConfig, chainconfig *paramtypes.ChainConfig, chain blockChain) *TxPool {
 	// Sanitize the input to ensure no vulnerable gas prices are set
 	config = (&config).sanitize()
 

@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // Tests that block headers can be retrieved from a remote chain based on user queries.
@@ -473,19 +474,19 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 	// Initialize a chain and generate a fake CHT if checkpointing is enabled
 	var (
 		db     = rawdb.NewMemoryDatabase()
-		config = new(params.ChainConfig)
+		config = new(paramtypes.ChainConfig)
 	)
 	core.MustCommitGenesis(db, &params.Genesis{Config: config}) // Commit genesis block
 	// If checkpointing is enabled, create and inject a fake CHT and the corresponding
 	// chllenge response.
 	var response *types.Header
-	var cht *params.TrustedCheckpoint
+	var cht *paramtypes.TrustedCheckpoint
 	if checkpoint {
 		index := uint64(rand.Intn(500))
 		number := (index+1)*params.CHTFrequency - 1
 		response = &types.Header{Number: big.NewInt(int64(number)), Extra: []byte("valid")}
 
-		cht = &params.TrustedCheckpoint{
+		cht = &paramtypes.TrustedCheckpoint{
 			SectionIndex: index,
 			SectionHead:  response.Hash(),
 		}
@@ -575,7 +576,7 @@ func testBroadcastBlock(t *testing.T, totalPeers, broadcastExpected int) {
 		evmux   = new(event.TypeMux)
 		pow     = ethash.NewFaker()
 		db      = rawdb.NewMemoryDatabase()
-		config  = &params.ChainConfig{}
+		config  = &paramtypes.ChainConfig{}
 		gspec   = &params.Genesis{Config: config}
 		genesis = core.MustCommitGenesis(db, gspec)
 	)

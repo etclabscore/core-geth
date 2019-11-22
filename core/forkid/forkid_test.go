@@ -23,6 +23,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -34,7 +35,7 @@ func TestCreation(t *testing.T) {
 		want ID
 	}
 	tests := []struct {
-		config  *params.ChainConfig
+		config  *paramtypes.ChainConfig
 		genesis common.Hash
 		cases   []testcase
 	}{
@@ -224,7 +225,7 @@ func TestEncoding(t *testing.T) {
 
 func TestGatherForks(t *testing.T) {
 	cases := []struct {
-		config *params.ChainConfig
+		config *paramtypes.ChainConfig
 		wantNs []uint64
 	}{
 		{

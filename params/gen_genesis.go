@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 var _ = (*genesisSpecMarshaling)(nil)
@@ -17,13 +18,13 @@ var _ = (*genesisSpecMarshaling)(nil)
 // MarshalJSON marshals as JSON.
 func (g Genesis) MarshalJSON() ([]byte, error) {
 	type Genesis struct {
-		Config     *ChainConfig                                `json:"config"`
-		Nonce      math.HexOrDecimal64                         `json:"nonce"`
-		Timestamp  math.HexOrDecimal64                         `json:"timestamp"`
-		ExtraData  hexutil.Bytes                               `json:"extraData"`
-		GasLimit   math.HexOrDecimal64                         `json:"gasLimit"   gencodec:"required"`
-		Difficulty *math.HexOrDecimal256                       `json:"difficulty" gencodec:"required"`
-		Mixhash    common.Hash                                 `json:"mixHash"`
+		Config     *paramtypes.ChainConfig `json:"config"`
+		Nonce      math.HexOrDecimal64     `json:"nonce"`
+		Timestamp  math.HexOrDecimal64     `json:"timestamp"`
+		ExtraData  hexutil.Bytes           `json:"extraData"`
+		GasLimit   math.HexOrDecimal64     `json:"gasLimit"   gencodec:"required"`
+		Difficulty *math.HexOrDecimal256   `json:"difficulty" gencodec:"required"`
+		Mixhash    common.Hash             `json:"mixHash"`
 		Coinbase   common.Address                              `json:"coinbase"`
 		Alloc      map[common.UnprefixedAddress]GenesisAccount `json:"alloc"      gencodec:"required"`
 		Number     math.HexOrDecimal64                         `json:"number"`
@@ -54,13 +55,13 @@ func (g Genesis) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals from JSON.
 func (g *Genesis) UnmarshalJSON(input []byte) error {
 	type Genesis struct {
-		Config     *ChainConfig                                `json:"config"`
-		Nonce      *math.HexOrDecimal64                        `json:"nonce"`
-		Timestamp  *math.HexOrDecimal64                        `json:"timestamp"`
-		ExtraData  *hexutil.Bytes                              `json:"extraData"`
-		GasLimit   *math.HexOrDecimal64                        `json:"gasLimit"   gencodec:"required"`
-		Difficulty *math.HexOrDecimal256                       `json:"difficulty" gencodec:"required"`
-		Mixhash    *common.Hash                                `json:"mixHash"`
+		Config     *paramtypes.ChainConfig `json:"config"`
+		Nonce      *math.HexOrDecimal64    `json:"nonce"`
+		Timestamp  *math.HexOrDecimal64    `json:"timestamp"`
+		ExtraData  *hexutil.Bytes          `json:"extraData"`
+		GasLimit   *math.HexOrDecimal64    `json:"gasLimit"   gencodec:"required"`
+		Difficulty *math.HexOrDecimal256   `json:"difficulty" gencodec:"required"`
+		Mixhash    *common.Hash            `json:"mixHash"`
 		Coinbase   *common.Address                             `json:"coinbase"`
 		Alloc      map[common.UnprefixedAddress]GenesisAccount `json:"alloc"      gencodec:"required"`
 		Number     *math.HexOrDecimal64                        `json:"number"`

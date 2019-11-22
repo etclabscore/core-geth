@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -460,12 +461,12 @@ func TestIsPrecompiledContractEnabled(t *testing.T) {
 	}
 	type c struct {
 		addr     common.Address
-		config   *params.ChainConfig
+		config   *paramtypes.ChainConfig
 		blockNum *big.Int
 		want     bool
 	}
 	cases := []c{}
-	addCaseWhere := func(config *params.ChainConfig, addr common.Address, bn *big.Int, want bool) {
+	addCaseWhere := func(config *paramtypes.ChainConfig, addr common.Address, bn *big.Int, want bool) {
 		cases = append(cases, c{
 			addr:     addr,
 			config:   config,

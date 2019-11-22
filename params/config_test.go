@@ -22,28 +22,29 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 func TestCheckCompatible(t *testing.T) {
 	type test struct {
-		stored, new *ChainConfig
+		stored, new *paramtypes.ChainConfig
 		head        uint64
-		wantErr     *ConfigCompatError
+		wantErr     *paramtypes.ConfigCompatError
 	}
 	tests := []test{
 		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 0, wantErr: nil},
 		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 100, wantErr: nil},
 		{
-			stored:  &ChainConfig{EIP150Block: big.NewInt(10)},
-			new:     &ChainConfig{EIP150Block: big.NewInt(20)},
+			stored:  &paramtypes.ChainConfig{EIP150Block: big.NewInt(10)},
+			new:     &paramtypes.ChainConfig{EIP150Block: big.NewInt(20)},
 			head:    9,
 			wantErr: nil,
 		},
 		{
 			stored: AllEthashProtocolChanges,
-			new:    &ChainConfig{HomesteadBlock: nil},
+			new:    &paramtypes.ChainConfig{HomesteadBlock: nil},
 			head:   3,
-			wantErr: &ConfigCompatError{
+			wantErr: &paramtypes.ConfigCompatError{
 				What:         "Homestead fork block",
 				StoredConfig: big.NewInt(0),
 				NewConfig:    nil,
@@ -52,9 +53,9 @@ func TestCheckCompatible(t *testing.T) {
 		},
 		{
 			stored: AllEthashProtocolChanges,
-			new:    &ChainConfig{HomesteadBlock: big.NewInt(1)},
+			new:    &paramtypes.ChainConfig{HomesteadBlock: big.NewInt(1)},
 			head:   3,
-			wantErr: &ConfigCompatError{
+			wantErr: &paramtypes.ConfigCompatError{
 				What:         "Homestead fork block",
 				StoredConfig: big.NewInt(0),
 				NewConfig:    big.NewInt(1),
@@ -62,10 +63,10 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored: &ChainConfig{HomesteadBlock: big.NewInt(30), EIP150Block: big.NewInt(10)},
-			new:    &ChainConfig{HomesteadBlock: big.NewInt(25), EIP150Block: big.NewInt(20)},
+			stored: &paramtypes.ChainConfig{HomesteadBlock: big.NewInt(30), EIP150Block: big.NewInt(10)},
+			new:    &paramtypes.ChainConfig{HomesteadBlock: big.NewInt(25), EIP150Block: big.NewInt(20)},
 			head:   25,
-			wantErr: &ConfigCompatError{
+			wantErr: &paramtypes.ConfigCompatError{
 				What:         "EIP150 fork block",
 				StoredConfig: big.NewInt(10),
 				NewConfig:    big.NewInt(20),
@@ -73,10 +74,10 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored: &ChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(31)},
-			new:    &ChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(31)},
+			stored: &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(31)},
+			new:    &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(31)},
 			head:   25,
-			wantErr: &ConfigCompatError{
+			wantErr: &paramtypes.ConfigCompatError{
 				What:         "EIP100F/EIP649F not equal",
 				StoredConfig: big.NewInt(30),
 				NewConfig:    big.NewInt(31),
@@ -84,10 +85,10 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored: &ChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
-			new:    &ChainConfig{EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
+			stored: &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
+			new:    &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
 			head:   25,
-			wantErr: &ConfigCompatError{
+			wantErr: &paramtypes.ConfigCompatError{
 				What:         "EIP100F fork block",
 				StoredConfig: big.NewInt(30),
 				NewConfig:    big.NewInt(24),
@@ -95,16 +96,16 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored:  &ChainConfig{ByzantiumBlock: big.NewInt(30)},
-			new:     &ChainConfig{EIP211FBlock: big.NewInt(26)},
+			stored:  &paramtypes.ChainConfig{ByzantiumBlock: big.NewInt(30)},
+			new:     &paramtypes.ChainConfig{EIP211FBlock: big.NewInt(26)},
 			head:    25,
 			wantErr: nil,
 		},
 		{
-			stored: &ChainConfig{ByzantiumBlock: big.NewInt(30)},
-			new:    &ChainConfig{EIP100FBlock: big.NewInt(26)}, // err: EIP649 must also be set
+			stored: &paramtypes.ChainConfig{ByzantiumBlock: big.NewInt(30)},
+			new:    &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(26)}, // err: EIP649 must also be set
 			head:   25,
-			wantErr: &ConfigCompatError{
+			wantErr: &paramtypes.ConfigCompatError{
 				What:         "EIP100F/EIP649F not equal",
 				StoredConfig: big.NewInt(26), // this yields a weird-looking error (correctly, though), b/c ConfigCompatError not set up for these kinds of strange cases
 				NewConfig:    nil,
@@ -112,21 +113,21 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored:  &ChainConfig{ByzantiumBlock: big.NewInt(30)},
-			new:     &ChainConfig{EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
+			stored:  &paramtypes.ChainConfig{ByzantiumBlock: big.NewInt(30)},
+			new:     &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
 			head:    25,
 			wantErr: nil,
 		},
 		{
 			stored: MainnetChainConfig,
-			new: func() *ChainConfig {
-				c := &ChainConfig{}
+			new: func() *paramtypes.ChainConfig {
+				c := &paramtypes.ChainConfig{}
 				*c = *MainnetChainConfig
 				c.DAOForkSupport = !MainnetChainConfig.DAOForkSupport
 				return c
 			}(),
 			head: MainnetChainConfig.DAOForkBlock.Uint64(),
-			wantErr: &ConfigCompatError{
+			wantErr: &paramtypes.ConfigCompatError{
 				What:         "DAO fork support flag",
 				StoredConfig: MainnetChainConfig.DAOForkBlock,
 				NewConfig:    MainnetChainConfig.DAOForkBlock,
@@ -135,14 +136,14 @@ func TestCheckCompatible(t *testing.T) {
 		},
 		{
 			stored: MainnetChainConfig,
-			new: func() *ChainConfig {
-				c := &ChainConfig{}
+			new: func() *paramtypes.ChainConfig {
+				c := &paramtypes.ChainConfig{}
 				*c = *MainnetChainConfig
 				c.ChainID = new(big.Int).Sub(MainnetChainConfig.EIP155Block, common.Big1)
 				return c
 			}(),
 			head: MainnetChainConfig.EIP158Block.Uint64(),
-			wantErr: &ConfigCompatError{
+			wantErr: &paramtypes.ConfigCompatError{
 				What:         "EIP155 chain ID",
 				StoredConfig: MainnetChainConfig.EIP155Block,
 				NewConfig:    MainnetChainConfig.EIP155Block,

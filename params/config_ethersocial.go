@@ -20,6 +20,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 var (
@@ -27,7 +28,7 @@ var (
 	EthersocialGenesisHash = common.HexToHash("0x310dd3c4ae84dd89f1b46cfdd5e26c8f904dfddddc73f323b468127272e20e9f")
 
 	// EthersocialChainConfig is the chain parameters to run a node on the Ethersocial main network.
-	EthersocialChainConfig = &ChainConfig{
+	EthersocialChainConfig = &paramtypes.ChainConfig{
 		NetworkID:           1,
 		ChainID:             big.NewInt(31102),
 		HomesteadBlock:      big.NewInt(0),
@@ -42,7 +43,7 @@ var (
 		SocialBlock:         nil,
 		EthersocialBlock:    big.NewInt(0),
 		ConstantinopleBlock: nil,
-		Ethash:              new(EthashConfig),
+		Ethash:              new(paramtypes.EthashConfig),
 		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
 			600000: new(big.Int).SetUint64(uint64(0x2dc6c0)),
 		},

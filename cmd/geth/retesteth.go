@@ -43,6 +43,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
@@ -104,7 +105,7 @@ type RetestWeb3API interface {
 type RetestethAPI struct {
 	ethDb         ethdb.Database
 	db            state.Database
-	chainConfig   *params.ChainConfig
+	chainConfig   *paramtypes.ChainConfig
 	author        common.Address
 	extraData     []byte
 	genesisHash   common.Hash
@@ -220,7 +221,7 @@ func (e *NoRewardEngine) Prepare(chain consensus.ChainReader, header *types.Head
 	return e.inner.Prepare(chain, header)
 }
 
-func (e *NoRewardEngine) accumulateRewards(config *params.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+func (e *NoRewardEngine) accumulateRewards(config *paramtypes.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
 	// Simply touch miner and uncle coinbase accounts
 	reward := big.NewInt(0)
 	for _, uncle := range uncles {
@@ -352,7 +353,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 	}
 
 	genesis := &params.Genesis{
-		Config: &params.ChainConfig{
+		Config: &paramtypes.ChainConfig{
 			ChainID:             chainId,
 			HomesteadBlock:      homesteadBlock,
 			DAOForkBlock:        daoForkBlock,

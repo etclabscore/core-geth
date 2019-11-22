@@ -19,11 +19,12 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 var (
 	// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
-	ClassicChainConfig = &ChainConfig{
+	ClassicChainConfig = &paramtypes.ChainConfig{
 		NetworkID:           1,
 		ChainID:             big.NewInt(61),
 		HomesteadBlock:      big.NewInt(1150000),
@@ -41,7 +42,7 @@ var (
 		EIP160FBlock:        big.NewInt(3000000),
 		ECIP1010PauseBlock:  big.NewInt(3000000),
 		ECIP1010Length:      big.NewInt(2000000),
-		Ethash:              new(EthashConfig),
+		Ethash:              new(paramtypes.EthashConfig),
 	}
 
 	DisinflationRateQuotient = big.NewInt(4)      // Disinflation rate quotient for ECIP1017

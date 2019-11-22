@@ -32,6 +32,7 @@ import (
 	math2 "github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // ParityChainSpec is the chain specification format used by Parity.
@@ -577,7 +578,7 @@ func (spec *ParityChainSpec) setPrecompile(address byte, data *parityChainSpecBu
 // ToMultiGethGenesis converts a Parity chainspec to the corresponding MultiGeth datastructure.
 // Note that the return value 'core.Genesis' includes the respective 'params.ChainConfig' values.
 func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*params.Genesis, error) {
-	mgc := &params.ChainConfig{}
+	mgc := &paramtypes.ChainConfig{}
 	if pars := c.Params; pars.NetworkID != nil {
 		if err := checkUnsupportedValsMust(c); err != nil {
 			panic(err)
@@ -710,7 +711,7 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*params.Genesis, error)
 
 		pars := ethash.Params
 
-		mgc.Ethash = &params.EthashConfig{}
+		mgc.Ethash = &paramtypes.EthashConfig{}
 
 		mgc.HomesteadBlock = pars.HomesteadTransition.Big()
 		mgc.EIP100FBlock = pars.EIP100bTransition.Big()
@@ -736,7 +737,7 @@ func ParityConfigToMultiGethGenesis(c *ParityChainSpec) (*params.Genesis, error)
 		}
 
 	} else if clique := c.Engine.Clique; clique.Params.Period != nil {
-		mgc.Clique = &params.CliqueConfig{
+		mgc.Clique = &paramtypes.CliqueConfig{
 			Period: (uint64)(*clique.Params.Period),
 			Epoch:  (uint64)(*clique.Params.Epoch),
 		}
@@ -816,7 +817,7 @@ func checkUnsupportedValsMust(spec *ParityChainSpec) error {
 	return nil
 }
 
-func setMultiGethDAOConfigsFromParity(mgc *params.ChainConfig, spec *ParityChainSpec) {
+func setMultiGethDAOConfigsFromParity(mgc *paramtypes.ChainConfig, spec *ParityChainSpec) {
 	if spec.Params.ForkCanonHash != nil {
 		if (*spec.Params.ForkCanonHash == common.HexToHash("0x4985f5ca3d2afbec36529aa96f74de3cc10a2a4a6c44f2157a57d2c6059a11bb")) ||
 			(*spec.Params.ForkCanonHash == common.HexToHash("0x3e12d5c0f8d63fbc5831cc7f7273bd824fa4d0a9a4102d65d99a7ea5604abc00")) {

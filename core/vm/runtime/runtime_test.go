@@ -26,7 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 func TestDefaults(t *testing.T) {
@@ -166,7 +166,7 @@ func benchmarkEVM_Create(bench *testing.B, code string) {
 		Time:        new(big.Int).SetUint64(0),
 		Coinbase:    common.Address{},
 		BlockNumber: new(big.Int).SetUint64(1),
-		ChainConfig: &params.ChainConfig{
+		ChainConfig: &paramtypes.ChainConfig{
 			ChainID:             big.NewInt(1),
 			HomesteadBlock:      new(big.Int),
 			ByzantiumBlock:      new(big.Int),

@@ -11,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	math2 "github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 func asSpecFilePath(name string) string {
@@ -23,9 +24,9 @@ var chainSpecEquivs = map[string]*params.Genesis{
 }
 
 func TestBlockConfig(t *testing.T) {
-	frontierCC := &params.ChainConfig{
+	frontierCC := &paramtypes.ChainConfig{
 		ChainID: big.NewInt(1),
-		Ethash:  new(params.EthashConfig),
+		Ethash:  new(paramtypes.EthashConfig),
 	}
 	genesis := params.DefaultGenesisBlock()
 	genesis.Config = frontierCC

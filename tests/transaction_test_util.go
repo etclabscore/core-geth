@@ -23,7 +23,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -44,7 +44,7 @@ type ttFork struct {
 	Hash   common.UnprefixedHash    `json:"hash"`
 }
 
-func (tt *TransactionTest) Run(config *params.ChainConfig) error {
+func (tt *TransactionTest) Run(config *paramtypes.ChainConfig) error {
 
 	validateTx := func(rlpData hexutil.Bytes, signer types.Signer, isEIP2F bool, isEIP2028F bool) (*common.Address, *common.Hash, error) {
 		tx := new(types.Transaction)

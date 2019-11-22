@@ -27,13 +27,14 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 //go:generate [gencodec -type DifficultyTest -field-override difficultyTestMarshaling -out gen_difficultytest.go]
 
 var (
-	mainnetChainConfig = params.ChainConfig{
-		Ethash:         new(params.EthashConfig),
+	mainnetChainConfig = paramtypes.ChainConfig{
+		Ethash:         new(paramtypes.EthashConfig),
 		ChainID:        big.NewInt(1),
 		HomesteadBlock: big.NewInt(1150000),
 		DAOForkBlock:   big.NewInt(1920000),
@@ -53,22 +54,22 @@ var (
 	}
 )
 
-var difficultyChainConfigurations = map[string]params.ChainConfig{
+var difficultyChainConfigurations = map[string]paramtypes.ChainConfig{
 	"Ropsten": *params.TestnetChainConfig,
 	"Morden":  *params.TestnetChainConfig,
 	"Frontier": {
-		Ethash:                      new(params.EthashConfig),
+		Ethash:                      new(paramtypes.EthashConfig),
 		BlockRewardSchedule:         parity.Uint64BigMapEncodesHex{},
 		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{},
 	},
 	"Homestead": {
-		Ethash:                      new(params.EthashConfig),
+		Ethash:                      new(paramtypes.EthashConfig),
 		HomesteadBlock:              big.NewInt(0),
 		BlockRewardSchedule:         parity.Uint64BigMapEncodesHex{},
 		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{},
 	},
 	"Byzantium": {
-		Ethash:         new(params.EthashConfig),
+		Ethash:         new(paramtypes.EthashConfig),
 		ByzantiumBlock: big.NewInt(0),
 		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
 			uint64(0): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
@@ -80,7 +81,7 @@ var difficultyChainConfigurations = map[string]params.ChainConfig{
 	"MainNetwork":       mainnetChainConfig,
 	"CustomMainNetwork": mainnetChainConfig,
 	"Constantinople": {
-		Ethash:              new(params.EthashConfig),
+		Ethash:              new(paramtypes.EthashConfig),
 		HomesteadBlock:      big.NewInt(0),
 		EIP100FBlock:        big.NewInt(0),
 		ConstantinopleBlock: big.NewInt(0),
@@ -95,12 +96,12 @@ var difficultyChainConfigurations = map[string]params.ChainConfig{
 	},
 	"difficulty.json": mainnetChainConfig,
 	"ETC_Atlantis": {
-		Ethash:         new(params.EthashConfig),
+		Ethash:         new(paramtypes.EthashConfig),
 		ByzantiumBlock: big.NewInt(0),
 		DisposalBlock:  big.NewInt(0),
 	},
 	"ETC_Agharta": {
-		Ethash:              new(params.EthashConfig),
+		Ethash:              new(paramtypes.EthashConfig),
 		ByzantiumBlock:      big.NewInt(0),
 		ConstantinopleBlock: big.NewInt(0),
 		DisposalBlock:       big.NewInt(0),
@@ -134,7 +135,7 @@ func (t *DifficultyTest) String() string {
 	return string(b)
 }
 
-func (test *DifficultyTest) Run(config *params.ChainConfig) error {
+func (test *DifficultyTest) Run(config *paramtypes.ChainConfig) error {
 	parentNumber := big.NewInt(int64(test.CurrentBlockNumber - 1))
 	parent := &types.Header{
 		Difficulty: test.ParentDifficulty,

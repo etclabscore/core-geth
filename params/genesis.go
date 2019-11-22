@@ -13,6 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -24,15 +25,15 @@ var ErrGenesisNoConfig = errors.New("genesis has no chain configuration")
 // Genesis specifies the header fields, state of a genesis block. It also defines hard
 // fork switch-over blocks through the chain configuration.
 type Genesis struct {
-	Config     *ChainConfig   `json:"config"`
-	Nonce      uint64         `json:"nonce"`
-	Timestamp  uint64         `json:"timestamp"`
-	ExtraData  []byte         `json:"extraData"`
-	GasLimit   uint64         `json:"gasLimit"   gencodec:"required"`
-	Difficulty *big.Int       `json:"difficulty" gencodec:"required"`
-	Mixhash    common.Hash    `json:"mixHash"`
-	Coinbase   common.Address `json:"coinbase"`
-	Alloc      GenesisAlloc   `json:"alloc"      gencodec:"required"`
+	Config     *paramtypes.ChainConfig `json:"config"`
+	Nonce      uint64                  `json:"nonce"`
+	Timestamp  uint64                  `json:"timestamp"`
+	ExtraData  []byte                  `json:"extraData"`
+	GasLimit   uint64                  `json:"gasLimit"   gencodec:"required"`
+	Difficulty *big.Int                `json:"difficulty" gencodec:"required"`
+	Mixhash    common.Hash             `json:"mixHash"`
+	Coinbase   common.Address          `json:"coinbase"`
+	Alloc      GenesisAlloc            `json:"alloc"      gencodec:"required"`
 
 	// These fields are used for consensus tests. Please don't use them
 	// in actual genesis blocks.

@@ -32,7 +32,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // Command line flags to configure the interpreters.
@@ -111,7 +111,7 @@ type testMatcher struct {
 
 type testConfig struct {
 	p      *regexp.Regexp
-	config params.ChainConfig
+	config paramtypes.ChainConfig
 }
 
 type testFailure struct {
@@ -142,7 +142,7 @@ func (tm *testMatcher) whitelist(pattern string) {
 }
 
 // config defines chain config for tests matching the pattern.
-func (tm *testMatcher) config(pattern string, cfg params.ChainConfig) {
+func (tm *testMatcher) config(pattern string, cfg paramtypes.ChainConfig) {
 	tm.configpat = append(tm.configpat, testConfig{regexp.MustCompile(pattern), cfg})
 }
 
@@ -168,7 +168,7 @@ func (tm *testMatcher) findSkip(name string) (reason string, skipload bool) {
 }
 
 // findConfig returns the chain config matching defined patterns.
-func (tm *testMatcher) findConfig(name string) (*params.ChainConfig, string) {
+func (tm *testMatcher) findConfig(name string) (*paramtypes.ChainConfig, string) {
 	// TODO(fjl): name can be derived from testing.T when min Go version is 1.8
 	for _, m := range tm.configpat {
 		if m.p.MatchString(name) {
@@ -176,7 +176,7 @@ func (tm *testMatcher) findConfig(name string) (*params.ChainConfig, string) {
 		}
 	}
 	log.Println("using empty config", name)
-	return new(params.ChainConfig), ""
+	return new(paramtypes.ChainConfig), ""
 }
 
 // checkFailure checks whether a failure is expected.

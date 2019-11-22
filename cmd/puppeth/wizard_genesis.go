@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // makeGenesis creates a new genesis struct based on some user input.
@@ -43,7 +44,7 @@ func (w *wizard) makeGenesis() {
 		GasLimit:   4700000,
 		Difficulty: big.NewInt(524288),
 		Alloc:      make(params.GenesisAlloc),
-		Config: &params.ChainConfig{
+		Config: &paramtypes.ChainConfig{
 			HomesteadBlock:      big.NewInt(0),
 			EIP150Block:         big.NewInt(0),
 			EIP155Block:         big.NewInt(0),
@@ -64,13 +65,13 @@ func (w *wizard) makeGenesis() {
 	switch {
 	case choice == "1":
 		// In case of ethash, we're pretty much done
-		genesis.Config.Ethash = new(params.EthashConfig)
+		genesis.Config.Ethash = new(paramtypes.EthashConfig)
 		genesis.ExtraData = make([]byte, 32)
 
 	case choice == "" || choice == "2":
 		// In the case of clique, configure the consensus parameters
 		genesis.Difficulty = big.NewInt(1)
-		genesis.Config.Clique = &params.CliqueConfig{
+		genesis.Config.Clique = &paramtypes.CliqueConfig{
 			Period: 15,
 			Epoch:  30000,
 		}

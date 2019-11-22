@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -157,8 +158,8 @@ func TestForkIDSplit(t *testing.T) {
 	var (
 		engine = ethash.NewFaker()
 
-		configNoFork  = &params.ChainConfig{HomesteadBlock: big.NewInt(1)}
-		configProFork = &params.ChainConfig{
+		configNoFork  = &paramtypes.ChainConfig{HomesteadBlock: big.NewInt(1)}
+		configProFork = &paramtypes.ChainConfig{
 			HomesteadBlock: big.NewInt(1),
 			EIP150Block:    big.NewInt(2),
 			EIP155Block:    big.NewInt(2),

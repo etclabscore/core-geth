@@ -19,6 +19,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 var (
@@ -26,7 +27,7 @@ var (
 	MixGenesisHash = common.HexToHash("0x4fa57903dad05875ddf78030c16b5da886f7d81714cf66946a4c02566dbb2af5")
 
 	// MixChainConfig is the chain parameters to run a node on the MIX main network.
-	MixChainConfig = &ChainConfig{
+	MixChainConfig = &paramtypes.ChainConfig{
 		NetworkID:           76,
 		ChainID:             big.NewInt(76),
 		HomesteadBlock:      big.NewInt(0),

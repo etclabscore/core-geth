@@ -29,7 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 var (
@@ -65,7 +65,7 @@ func NewID(chain *core.BlockChain) ID {
 // newID is the internal version of NewID, which takes extracted values as its
 // arguments instead of a chain. The reason is to allow testing the IDs without
 // having to simulate an entire blockchain.
-func newID(config *params.ChainConfig, genesis common.Hash, head uint64) ID {
+func newID(config *paramtypes.ChainConfig, genesis common.Hash, head uint64) ID {
 	// Calculate the starting checksum from the genesis hash
 	hash := crc32.ChecksumIEEE(genesis[:])
 
@@ -96,7 +96,7 @@ func NewFilter(chain *core.BlockChain) Filter {
 }
 
 // NewStaticFilter creates a filter at block zero.
-func NewStaticFilter(config *params.ChainConfig, genesis common.Hash) Filter {
+func NewStaticFilter(config *paramtypes.ChainConfig, genesis common.Hash) Filter {
 	head := func() uint64 { return 0 }
 	return newFilter(config, genesis, head)
 }
@@ -104,7 +104,7 @@ func NewStaticFilter(config *params.ChainConfig, genesis common.Hash) Filter {
 // newFilter is the internal version of NewFilter, taking closures as its arguments
 // instead of a chain. The reason is to allow testing it without having to simulate
 // an entire blockchain.
-func newFilter(config *params.ChainConfig, genesis common.Hash, headfn func() uint64) Filter {
+func newFilter(config *paramtypes.ChainConfig, genesis common.Hash, headfn func() uint64) Filter {
 	// Calculate the all the valid fork hash and fork next combos
 	var (
 		forks = gatherForks(config)
@@ -209,9 +209,9 @@ func checksumToBytes(hash uint32) [4]byte {
 }
 
 // gatherForks gathers all the known forks and creates a sorted list out of them.
-func gatherForks(config *params.ChainConfig) []uint64 {
+func gatherForks(config *paramtypes.ChainConfig) []uint64 {
 	// Gather all the fork block numbers via reflection
-	kind := reflect.TypeOf(params.ChainConfig{})
+	kind := reflect.TypeOf(paramtypes.ChainConfig{})
 	conf := reflect.ValueOf(config).Elem()
 
 	var forks []uint64

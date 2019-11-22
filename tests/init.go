@@ -20,11 +20,11 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // Forks table defines supported forks and their chain config.
-var Forks = map[string]*params.ChainConfig{
+var Forks = map[string]*paramtypes.ChainConfig{
 	"Frontier": {
 		ChainID: big.NewInt(1),
 	},

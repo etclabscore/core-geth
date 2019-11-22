@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // SetupGenesisBlock writes or updates the genesis block in db.
@@ -42,11 +43,11 @@ import (
 // error is a *params.ConfigCompatError and the new, unwritten config is returned.
 //
 // The returned chain configuration is never nil.
-func SetupGenesisBlock(db ethdb.Database, genesis *params.Genesis) (*params.ChainConfig, common.Hash, error) {
+func SetupGenesisBlock(db ethdb.Database, genesis *params.Genesis) (*paramtypes.ChainConfig, common.Hash, error) {
 	return SetupGenesisBlockWithOverride(db, genesis, nil)
 }
 
-func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *params.Genesis, overrideIstanbul *big.Int) (*params.ChainConfig, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *params.Genesis, overrideIstanbul *big.Int) (*paramtypes.ChainConfig, common.Hash, error) {
 	if genesis != nil && genesis.Config == nil {
 		return params.AllEthashProtocolChanges, common.Hash{}, params.ErrGenesisNoConfig
 	}
@@ -128,7 +129,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *params.Genesis, o
 	return newcfg, stored, nil
 }
 
-func configOrDefault(g *params.Genesis, ghash common.Hash) *params.ChainConfig {
+func configOrDefault(g *params.Genesis, ghash common.Hash) *paramtypes.ChainConfig {
 	switch {
 	case g != nil:
 		return g.Config

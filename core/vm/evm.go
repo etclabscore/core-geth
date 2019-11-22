@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // emptyCodeHash is used by create to ensure deployment is disallowed to already
@@ -105,9 +106,9 @@ type EVM struct {
 	depth int
 
 	// chainConfig contains information about the current chain
-	chainConfig *params.ChainConfig
+	chainConfig *paramtypes.ChainConfig
 	// chain rules contains the chain rules for the current epoch
-	chainRules params.Rules
+	chainRules paramtypes.Rules
 	// virtual machine configuration options used to initialise the
 	// evm.
 	vmConfig Config
@@ -126,7 +127,7 @@ type EVM struct {
 
 // NewEVM returns a new EVM. The returned EVM is not thread safe and should
 // only ever be used *once*.
-func NewEVM(ctx Context, statedb StateDB, chainConfig *params.ChainConfig, vmConfig Config) *EVM {
+func NewEVM(ctx Context, statedb StateDB, chainConfig *paramtypes.ChainConfig, vmConfig Config) *EVM {
 	evm := &EVM{
 		Context:      ctx,
 		StateDB:      statedb,
@@ -461,4 +462,4 @@ func (evm *EVM) Create2(caller ContractRef, code []byte, gas uint64, endowment *
 }
 
 // ChainConfig returns the environment's chain configuration
-func (evm *EVM) ChainConfig() *params.ChainConfig { return evm.chainConfig }
+func (evm *EVM) ChainConfig() *paramtypes.ChainConfig { return evm.chainConfig }

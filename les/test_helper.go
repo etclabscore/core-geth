@@ -44,6 +44,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 var (
@@ -179,15 +180,15 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 	genesis := core.MustCommitGenesis(db, &gspec)
 	chain, _ := light.NewLightChain(odr, gspec.Config, engine, nil)
 	if indexers != nil {
-		checkpointConfig := &params.CheckpointOracleConfig{
+		checkpointConfig := &paramtypes.CheckpointOracleConfig{
 			Address:   crypto.CreateAddress(bankAddr, 0),
 			Signers:   []common.Address{signerAddr},
 			Threshold: 1,
 		}
-		getLocal := func(index uint64) params.TrustedCheckpoint {
+		getLocal := func(index uint64) paramtypes.TrustedCheckpoint {
 			chtIndexer := indexers[0]
 			sectionHead := chtIndexer.SectionHead(index)
-			return params.TrustedCheckpoint{
+			return paramtypes.TrustedCheckpoint{
 				SectionIndex: index,
 				SectionHead:  sectionHead,
 				CHTRoot:      light.GetChtRoot(db, index, sectionHead),
@@ -242,15 +243,15 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 	txpoolConfig.Journal = ""
 	txpool := core.NewTxPool(txpoolConfig, gspec.Config, simulation.Blockchain())
 	if indexers != nil {
-		checkpointConfig := &params.CheckpointOracleConfig{
+		checkpointConfig := &paramtypes.CheckpointOracleConfig{
 			Address:   crypto.CreateAddress(bankAddr, 0),
 			Signers:   []common.Address{signerAddr},
 			Threshold: 1,
 		}
-		getLocal := func(index uint64) params.TrustedCheckpoint {
+		getLocal := func(index uint64) paramtypes.TrustedCheckpoint {
 			chtIndexer := indexers[0]
 			sectionHead := chtIndexer.SectionHead(index)
-			return params.TrustedCheckpoint{
+			return paramtypes.TrustedCheckpoint{
 				SectionIndex: index,
 				SectionHead:  sectionHead,
 				CHTRoot:      light.GetChtRoot(db, index, sectionHead),

@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 func ExampleGenerateChain() {
@@ -41,7 +42,7 @@ func ExampleGenerateChain() {
 
 	// Ensure that key1 has some funds in the genesis block.
 	gspec := &params.Genesis{
-		Config: &params.ChainConfig{HomesteadBlock: new(big.Int)},
+		Config: &paramtypes.ChainConfig{HomesteadBlock: new(big.Int)},
 		Alloc:  params.GenesisAlloc{addr1: {Balance: big.NewInt(1000000)}},
 	}
 	genesis := MustCommitGenesis(db, gspec)

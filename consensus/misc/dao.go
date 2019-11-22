@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 var (
@@ -44,7 +45,7 @@ var (
 //      with the fork specific extra-data set
 //   b) if the node is pro-fork, require blocks in the specific range to have the
 //      unique extra-data set.
-func VerifyDAOHeaderExtraData(config *params.ChainConfig, header *types.Header) error {
+func VerifyDAOHeaderExtraData(config *paramtypes.ChainConfig, header *types.Header) error {
 	// Short circuit validation if the node doesn't care about the DAO fork
 	if config.DAOForkBlock == nil {
 		return nil

@@ -20,6 +20,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 var (
@@ -27,7 +28,7 @@ var (
 	SocialGenesisHash = common.HexToHash("0xba8314d5c2ebddaf58eb882b364b27cbfa4d3402dacd32b60986754ac25cfe8d")
 
 	// SocialChainConfig is the chain parameters to run a node on the Ethereum Social main network.
-	SocialChainConfig = &ChainConfig{
+	SocialChainConfig = &paramtypes.ChainConfig{
 		NetworkID:           28,
 		ChainID:             big.NewInt(28),
 		HomesteadBlock:      big.NewInt(0),
@@ -45,7 +46,7 @@ var (
 		ECIP1017FBlock:      big.NewInt(5000000),
 		ECIP1017EraRounds:   big.NewInt(5000000),
 		EIP160FBlock:        big.NewInt(0),
-		Ethash:              new(EthashConfig),
+		Ethash:              new(paramtypes.EthashConfig),
 		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
 			0: new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)),
 		},

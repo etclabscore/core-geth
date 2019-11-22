@@ -26,13 +26,13 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // Config is a basic type specifying certain configuration flags for running
 // the EVM.
 type Config struct {
-	ChainConfig *params.ChainConfig
+	ChainConfig *paramtypes.ChainConfig
 	Difficulty  *big.Int
 	Origin      common.Address
 	Coinbase    common.Address
@@ -51,7 +51,7 @@ type Config struct {
 // sets defaults on the config
 func setDefaults(cfg *Config) {
 	if cfg.ChainConfig == nil {
-		cfg.ChainConfig = &params.ChainConfig{
+		cfg.ChainConfig = &paramtypes.ChainConfig{
 			ChainID:        big.NewInt(1),
 			HomesteadBlock: new(big.Int),
 			DAOForkBlock:   new(big.Int),

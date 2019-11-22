@@ -29,6 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/go-test/deep"
 )
 
@@ -47,7 +48,7 @@ func TestSetupGenesis(t *testing.T) {
 	var (
 		customghash = common.HexToHash("0x89c99d90b79719238d2645c7642f2c9295246e80775b38cfd162b696817fbd50")
 		customg     = params.Genesis{
-			Config: &params.ChainConfig{
+			Config: &paramtypes.ChainConfig{
 				HomesteadBlock:              big.NewInt(3),
 				BlockRewardSchedule:         parity.Uint64BigMapEncodesHex{},
 				DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{},
@@ -58,17 +59,17 @@ func TestSetupGenesis(t *testing.T) {
 		}
 		oldcustomg = customg
 	)
-	oldcustomg.Config = &params.ChainConfig{HomesteadBlock: big.NewInt(2)}
+	oldcustomg.Config = &paramtypes.ChainConfig{HomesteadBlock: big.NewInt(2)}
 	tests := []struct {
 		name       string
-		fn         func(ethdb.Database) (*params.ChainConfig, common.Hash, error)
-		wantConfig *params.ChainConfig
+		fn         func(ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error)
+		wantConfig *paramtypes.ChainConfig
 		wantHash   common.Hash
 		wantErr    error
 	}{
 		{
 			name: "genesis without ChainConfig",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
 				return SetupGenesisBlock(db, new(params.Genesis))
 			},
 			wantErr:    params.ErrGenesisNoConfig,
@@ -76,7 +77,7 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "no block in DB, genesis == nil",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
 				return SetupGenesisBlock(db, nil)
 			},
 			wantHash:   params.MainnetGenesisHash,
@@ -84,7 +85,7 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "mainnet block in DB, genesis == nil",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
 				MustCommitGenesis(db, params.DefaultGenesisBlock())
 				return SetupGenesisBlock(db, nil)
 			},
@@ -93,7 +94,7 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "custom block in DB, genesis == nil",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
 				MustCommitGenesis(db, &customg)
 				return SetupGenesisBlock(db, nil)
 			},
@@ -102,7 +103,7 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "custom block in DB, genesis == testnet",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
 				MustCommitGenesis(db, &customg)
 				return SetupGenesisBlock(db, params.DefaultTestnetGenesisBlock())
 			},
@@ -112,7 +113,7 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "compatible config in DB",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
 				MustCommitGenesis(db, &oldcustomg)
 				return SetupGenesisBlock(db, &customg)
 			},
@@ -121,7 +122,7 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "incompatible config in DB",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
 				// Commit the 'old' genesis block with Homestead transition at #2.
 				// Advance to block #4, past the homestead transition block of customg.
 				genesis := MustCommitGenesis(db, &oldcustomg)
@@ -137,7 +138,7 @@ func TestSetupGenesis(t *testing.T) {
 			},
 			wantHash:   customghash,
 			wantConfig: customg.Config,
-			wantErr: &params.ConfigCompatError{
+			wantErr: &paramtypes.ConfigCompatError{
 				What:         "Homestead fork block",
 				StoredConfig: big.NewInt(2),
 				NewConfig:    big.NewInt(3),

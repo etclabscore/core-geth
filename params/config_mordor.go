@@ -17,11 +17,13 @@ package params
 
 import (
 	"math/big"
+
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 var (
 	// MordorChainConfig is the chain parameters to run a node on the Ethereum Classic Mordor test network (PoW).
-	MordorChainConfig = &ChainConfig{
+	MordorChainConfig = &paramtypes.ChainConfig{
 		NetworkID:           7,
 		ChainID:             big.NewInt(63),
 		HomesteadBlock:      big.NewInt(0),
@@ -37,7 +39,7 @@ var (
 		EIP160FBlock:        big.NewInt(0),
 		ECIP1010PauseBlock:  big.NewInt(0),
 		ECIP1010Length:      big.NewInt(2000000),
-		Ethash:              new(EthashConfig),
+		Ethash:              new(paramtypes.EthashConfig),
 	}
 	//
 	//DisinflationRateQuotient = big.NewInt(4)      // Disinflation rate quotient for ECIP1017

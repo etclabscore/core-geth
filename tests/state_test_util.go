@@ -35,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
 )
@@ -139,7 +140,7 @@ type stTransactionMarshaling struct {
 // The fork definition can be
 // - a plain forkname, e.g. `Byzantium`,
 // - a fork basename, and a list of EIPs to enable; e.g. `Byzantium+1884+1283`.
-func getVMConfig(forkString string) (baseConfig *params.ChainConfig, eips []int, err error) {
+func getVMConfig(forkString string) (baseConfig *paramtypes.ChainConfig, eips []int, err error) {
 	var (
 		splitForks            = strings.Split(forkString, "+")
 		ok                    bool
@@ -246,7 +247,7 @@ func MakePreState(db ethdb.Database, accounts params.GenesisAlloc) *state.StateD
 	return statedb
 }
 
-func (t *StateTest) genesis(config *params.ChainConfig) *params.Genesis {
+func (t *StateTest) genesis(config *paramtypes.ChainConfig) *params.Genesis {
 	return &params.Genesis{
 		Config:     config,
 		Coinbase:   t.json.Env.Coinbase,

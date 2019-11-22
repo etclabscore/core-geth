@@ -13,6 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/chainspec"
 	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 var paritySpecsDir = filepath.Join("..", "chainspecs", "parity")
@@ -145,7 +146,7 @@ func init() {
 	}
 }
 
-func convertMetaForkBlocksDifficultyAndRewardSchedules(config *params.ChainConfig) {
+func convertMetaForkBlocksDifficultyAndRewardSchedules(config *paramtypes.ChainConfig) {
 	if config.BlockRewardSchedule == nil {
 		config.BlockRewardSchedule = parity.Uint64BigMapEncodesHex{
 			uint64(0x0): new(big.Int).SetUint64(uint64(0x4563918244f40000)),
@@ -164,7 +165,7 @@ func convertMetaForkBlocksDifficultyAndRewardSchedules(config *params.ChainConfi
 	}
 }
 
-func convertMetaForkBlocksToFeatures(config *params.ChainConfig) {
+func convertMetaForkBlocksToFeatures(config *paramtypes.ChainConfig) {
 	if config.HomesteadBlock != nil {
 		config.EIP2FBlock = config.HomesteadBlock
 		config.EIP7FBlock = config.HomesteadBlock

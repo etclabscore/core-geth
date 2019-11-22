@@ -35,7 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/light"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -83,7 +83,7 @@ type peer struct {
 	announceType uint64
 
 	// Checkpoint relative fields
-	checkpoint       params.TrustedCheckpoint
+	checkpoint       paramtypes.TrustedCheckpoint
 	checkpointNumber uint64
 
 	id string

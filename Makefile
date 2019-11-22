@@ -36,7 +36,7 @@ test-multigeth: test-multigeth-features test-multigeth-chainspecs ## Runs all te
 
 test-multigeth-features: ## Runs tests specific to multi-geth using Fork/Feature configs.
 	@echo "Testing fork/feature equivalence."
-	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALANCE=on go test -count=1 ./tests
+	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE=on go test -count=1 ./tests
 
 test-multigeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
 	@echo "Testing Parity JSON chainspec equivalence."

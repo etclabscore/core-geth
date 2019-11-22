@@ -31,6 +31,6 @@ func DefaultSocialGenesisBlock() *Genesis {
 		ExtraData:  hexutil.MustDecode("0x3230313820457468657265756d20536f6369616c2050726f6a656374"),
 		GasLimit:   5000,
 		Difficulty: big.NewInt(17179869184),
-		Alloc:      decodePrealloc(socialAllocData),
+		Alloc:      decodePrealloc(params.SocialAllocData),
 	}
 }

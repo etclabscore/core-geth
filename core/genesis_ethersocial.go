@@ -30,6 +30,6 @@ func DefaultEthersocialGenesisBlock() *Genesis {
 		ExtraData:  hexutil.MustDecode("0x"),
 		GasLimit:   3141592,
 		Difficulty: big.NewInt(131072),
-		Alloc:      decodePrealloc(ethersocialAllocData),
+		Alloc:      decodePrealloc(params.EthersocialAllocData),
 	}
 }

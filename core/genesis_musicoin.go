@@ -32,6 +32,6 @@ func DefaultMusicoinGenesisBlock() *Genesis {
 		Mixhash:    common.HexToHash("0x00000000000000000000000000000000000000647572616c65787365646c6578"),
 		GasLimit:   8000000,
 		Difficulty: big.NewInt(4000000),
-		Alloc:      decodePrealloc(musicoinAllocData),
+		Alloc:      decodePrealloc(params.MusicoinAllocData),
 	}
 }

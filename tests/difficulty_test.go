@@ -39,7 +39,6 @@ func TestDifficulty(t *testing.T) {
 	dt.skipLoad("difficultyCustomHomestead\\.json")
 	dt.skipLoad("difficultyMorden\\.json")
 	dt.skipLoad("difficultyOlimpic\\.json")
-	dt.skipLoad("all_difficulty_tests\\.json")
 
 	for k, v := range difficultyChainConfigurations {
 		dt.config(k, v)
@@ -62,19 +61,8 @@ func TestDifficulty2(t *testing.T) {
 
 	dt := new(testMatcher)
 
-	// Not difficulty-tests
-	dt.skipLoad("hexencodetest.*")
-	dt.skipLoad("crypto.*")
-	dt.skipLoad("blockgenesistest\\.json")
-	dt.skipLoad("genesishashestest\\.json")
-	dt.skipLoad("keyaddrtest\\.json")
-	dt.skipLoad("txtest\\.json")
-
-	// files are 2 years old, contains strange values
-	dt.skipLoad("difficultyCustomHomestead\\.json")
-	dt.skipLoad("difficultyMorden\\.json")
-	dt.skipLoad("difficultyOlimpic\\.json")
-	dt.skipLoad("all_difficulty_tests\\.json")
+	// Not NDJSON
+	dt.skipLoad(`\\.json$`)
 
 	for k, v := range difficultyChainConfigurations {
 		dt.config(k, v)

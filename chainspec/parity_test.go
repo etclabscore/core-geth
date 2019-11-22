@@ -11,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	math2 "github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 func asSpecFilePath(name string) string {
@@ -20,6 +21,23 @@ func asSpecFilePath(name string) string {
 var chainSpecEquivs = map[string]*core.Genesis{
 	"classic.json":    core.DefaultClassicGenesisBlock(),
 	"foundation.json": core.DefaultGenesisBlock(),
+}
+
+func TestBlockConfig(t *testing.T) {
+	frontierCC := &params.ChainConfig{
+		ChainID: big.NewInt(1),
+		Ethash:  new(params.EthashConfig),
+	}
+	genesis := core.DefaultGenesisBlock()
+	genesis.Config = frontierCC
+	paritySpec, err := NewParityChainSpec("frontier", genesis, []string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	parityHomestead := paritySpec.Engine.Ethash.Params.HomesteadTransition
+	if parityHomestead != nil && *parityHomestead >= 0 {
+		t.Errorf("nonnil parity homestead")
+	}
 }
 
 func TestParityConfigToMultiGethGenesis(t *testing.T) {

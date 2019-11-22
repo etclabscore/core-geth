@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"sync"
 	"sync/atomic"
@@ -38,16 +39,13 @@ import (
 	"github.com/mattn/go-colorable"
 )
 
-var (
-	loglevel = flag.Int("loglevel", 2, "verbosity of logs")
-)
+func TestMain(m *testing.M) {
+	loglevel := flag.Int("loglevel", 2, "verbosity of logs")
 
-func init() {
-	testing.Init()
 	flag.Parse()
-
 	log.PrintOrigins(true)
 	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(*loglevel), log.StreamHandler(colorable.NewColorableStderr(), log.TerminalFormat(true))))
+	os.Exit(m.Run())
 }
 
 // testService implements the node.Service interface and provides protocols
@@ -426,8 +424,7 @@ func (t *expectEvents) nodeEvent(id string, up bool) *Event {
 		Config: &adapters.NodeConfig{
 			ID: enode.HexID(id),
 		},
-		up:   up,
-		upMu: new(sync.RWMutex),
+		up: up,
 	}
 	return &Event{
 		Type: EventTypeNode,

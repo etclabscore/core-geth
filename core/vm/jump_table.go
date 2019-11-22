@@ -52,7 +52,6 @@ type operation struct {
 	valid   bool // indication whether the retrieved operation is valid and known
 	reverts bool // determines whether the operation reverts state (implicitly halts)
 	returns bool // determines whether the operations sets the return data content
-
 }
 
 // JumpTable contains the EVM opcodes supported at a given fork.
@@ -178,6 +177,15 @@ func instructionSetForConfig(config *params.ChainConfig, bn *big.Int) JumpTable 
 			maxStack:    maxStack(1, 1),
 			valid:       true,
 		}
+	}
+	if config.IsEIP1344F(bn) {
+		enable1344(&instructionSet) // ChainID opcode - https://eips.ethereum.org/EIPS/eip-1344
+	}
+	if config.IsEIP1884F(bn) {
+		enable1884(&instructionSet) // Reprice reader opcodes - https://eips.ethereum.org/EIPS/eip-1884
+	}
+	if config.IsEIP2200F(bn) {
+		enable2200(&instructionSet) // Net metered SSTORE - https://eips.ethereum.org/EIPS/eip-2200
 	}
 	return instructionSet
 }

@@ -2,12 +2,14 @@ package parity
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
 	math2 "github.com/ethereum/go-ethereum/common/math"
 )
-
 
 var exampleAccountWithBuiltinA = []byte(`
 			{
@@ -65,5 +67,34 @@ func TestParityBuiltinType(t *testing.T) {
 				t.Errorf("wrong map: %v", spew.Sdump(b.Pricing))
 			}
 		}
+	}
+}
+
+// TestParityChainSpec_UnmarshalJSON shows that the data structure
+// is valid for all included (whitelisty) parity json specs.
+func TestParityChainSpec_UnmarshalJSON(t *testing.T) {
+	err := filepath.Walk(filepath.Join("..", "..", "parity.json.d"), func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+		if filepath.Ext(info.Name()) != ".json" {
+			return nil
+		}
+		t.Run(info.Name(), func(t *testing.T) {
+			b, err := ioutil.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			spec := ParityChainSpec{}
+			err = json.Unmarshal(b, &spec)
+			if err != nil {
+				t.Errorf("%s, err: %v", info.Name(), err)
+			}
+		})
+		return nil
+	})
+
+	if err != nil {
+		t.Fatal(err)
 	}
 }

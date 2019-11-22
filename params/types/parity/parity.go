@@ -163,8 +163,8 @@ type ParityChainSpecAccount struct {
 type ParityChainSpecBuiltin struct {
 	Name              string                       `json:"name"`                         // Each builtin should has it own name
 	Pricing           *ParityChainSpecPricingMaybe `json:"pricing"`                      // Each builtin should has it own price strategy
-	ActivateAt        *math.HexOrDecimal256        `json:"activate_at,omitempty"`        // ActivateAt can't be omitted if empty, default means no fork
-	EIP1108Transition *math.HexOrDecimal256        `json:"eip1108_transition,omitempty"` // EIP1108Transition can't be omitted if empty, default means no fork
+	ActivateAt        *ParityU64                   `json:"activate_at,omitempty"`        // ActivateAt can't be omitted if empty, default means no fork
+	EIP1108Transition *ParityU64                   `json:"eip1108_transition,omitempty"` // EIP1108Transition can't be omitted if empty, default means no fork
 }
 
 type ParityChainSpecPricingMaybe struct {
@@ -254,4 +254,3 @@ func (spec *ParityChainSpec) SetPrecompile(address byte, data *ParityChainSpecBu
 	}
 	spec.Accounts[a].Builtin = data
 }
-

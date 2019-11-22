@@ -1424,9 +1424,9 @@ func TestEIP161AccountRemoval(t *testing.T) {
 			Config: &params.ChainConfig{
 				ChainID:        big.NewInt(1),
 				HomesteadBlock: new(big.Int),
-				EIP155Block:    new(big.Int),
 				EIP150Block:    new(big.Int),
-				EIP158Block:    big.NewInt(2),
+				EIP155Block:    new(big.Int),
+				EIP161FBlock:    big.NewInt(2),
 			},
 			Alloc: GenesisAlloc{address: {Balance: funds}},
 		}

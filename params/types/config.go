@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 )
 
 // TrustedCheckpoint represents a set of post-processed trie roots (CHT and
@@ -192,8 +192,8 @@ type ChainConfig struct {
 	TrustedCheckpoint       *TrustedCheckpoint      `json:"trustedCheckpoint"`
 	TrustedCheckpointOracle *CheckpointOracleConfig `json:"trustedCheckpointOracle"`
 
-	DifficultyBombDelaySchedule parity.Uint64BigMapEncodesHex
-	BlockRewardSchedule         parity.Uint64BigMapEncodesHex
+	DifficultyBombDelaySchedule common2.Uint64BigMapEncodesHex
+	BlockRewardSchedule         common2.Uint64BigMapEncodesHex
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.

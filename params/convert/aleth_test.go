@@ -1,4 +1,4 @@
-package chainspec
+package convert
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/aleth"
 	"github.com/go-test/deep"
 )
 
@@ -29,7 +30,7 @@ func TestAlethSturebyConverter(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}
-	expspec := &AlethGenesisSpec{}
+	expspec := &aleth.AlethGenesisSpec{}
 	if err := json.Unmarshal(expBlob, expspec); err != nil {
 		t.Fatalf("failed parsing genesis: %v", err)
 	}

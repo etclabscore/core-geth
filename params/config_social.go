@@ -18,9 +18,9 @@ package params
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 )
 
 var (
@@ -47,7 +47,7 @@ var (
 		ECIP1017EraRounds:   big.NewInt(5000000),
 		EIP160FBlock:        big.NewInt(0),
 		Ethash:              new(paramtypes.EthashConfig),
-		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
 			0: new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)),
 		},
 	}

@@ -10,10 +10,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/chainspec"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/internal/build"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/convert"
 	"github.com/iancoleman/strcase"
 )
 
@@ -80,7 +80,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		subtest := subtest
 		if _, ok := mapForkNameChainspecFileState[subtest.Fork]; !ok {
 			genesis := test.genesis(Forks[subtest.Fork])
-			pspec, err := chainspec.NewParityChainSpec(subtest.Fork, genesis, []string{})
+			pspec, err := convert.NewParityChainSpec(subtest.Fork, genesis, []string{})
 			if err != nil {
 				t.Fatal(err)
 			}

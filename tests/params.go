@@ -10,12 +10,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/chainspec"
-	"github.com/ethereum/go-ethereum/chainspecs/parity"
+	"github.com/ethereum/go-ethereum/params/convert"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
-var paritySpecsDir = filepath.Join("..", "chainspecs", "parity")
+var paritySpecsDir = filepath.Join("..", "params", "parity")
 
 func paritySpecPath(name string) string {
 	p := filepath.Join(paritySpecsDir, name)
@@ -23,6 +24,10 @@ func paritySpecPath(name string) string {
 		fi.Close()
 		return p
 	} else if os.IsNotExist(err) {
+		// This is an ugly HACK because tests function are sometimes called from
+		// other packages that are nested more deeply, eg. eth/tracers.
+		// This is a workaround for that.
+		// And it sucks.
 		p = filepath.Join("..", paritySpecsDir, name)
 	}
 	return p
@@ -57,7 +62,7 @@ var mapForkNameChainspecFileDifficulty = map[string]string{
 }
 
 func readConfigFromSpecFile(name string) (genesis *paramtypes.Genesis, sha1sum []byte, err error) {
-	spec := chainspec.ParityChainSpec{}
+	spec := parity.ParityChainSpec{}
 	if fi, err := os.Open(name); os.IsNotExist(err) {
 		return nil, nil, err
 	} else {
@@ -85,7 +90,7 @@ func readConfigFromSpecFile(name string) (genesis *paramtypes.Genesis, sha1sum [
 		}
 		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
 	}
-	genesis, err = chainspec.ParityConfigToMultiGethGenesis(&spec)
+	genesis, err = convert.ParityConfigToMultiGethGenesis(&spec)
 	if err != nil {
 		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
 	}
@@ -147,12 +152,12 @@ func init() {
 
 func convertMetaForkBlocksDifficultyAndRewardSchedules(config *paramtypes.ChainConfig) {
 	if config.BlockRewardSchedule == nil {
-		config.BlockRewardSchedule = parity.Uint64BigMapEncodesHex{
+		config.BlockRewardSchedule = common.Uint64BigMapEncodesHex{
 			uint64(0x0): new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 		}
 	}
 	if config.DifficultyBombDelaySchedule == nil {
-		config.DifficultyBombDelaySchedule = parity.Uint64BigMapEncodesHex{}
+		config.DifficultyBombDelaySchedule = common.Uint64BigMapEncodesHex{}
 		if config.ByzantiumBlock != nil {
 			config.DifficultyBombDelaySchedule[config.ByzantiumBlock.Uint64()] = big.NewInt(3000000)
 			config.BlockRewardSchedule[config.ByzantiumBlock.Uint64()] = big.NewInt(3000000000000000000)

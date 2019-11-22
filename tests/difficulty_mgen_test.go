@@ -27,10 +27,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/chainspec"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/convert"
 )
 
 var outNDJSONFile = filepath.Join(difficultyTestDir, "mgen_difficulty.ndjson")
@@ -136,7 +136,7 @@ func TestDifficultyGen(t *testing.T) {
 				genesis := params.DefaultTestnetGenesisBlock()
 				genesis.Config = &conf
 
-				pspec, err := chainspec.NewParityChainSpec(associateForkName, genesis, []string{})
+				pspec, err := convert.NewParityChainSpec(associateForkName, genesis, []string{})
 				if err != nil {
 					t.Fatal(err)
 				}

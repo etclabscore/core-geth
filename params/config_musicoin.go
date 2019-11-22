@@ -18,9 +18,9 @@ package params
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 )
 
 var (
@@ -43,12 +43,12 @@ var (
 		MCIP3Block:     big.NewInt(1200001),
 		MCIP8Block:     big.NewInt(5200001),
 		Ethash:         new(paramtypes.EthashConfig),
-		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
 			uint64(0):       new(big.Int).Mul(big.NewInt(314), big.NewInt(1e+18)),
 			uint64(1200001): new(big.Int).Mul(big.NewInt(250), big.NewInt(1e+18)),
 			uint64(5200001): new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)),
 		},
-		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{
 			uint64(2222222): new(big.Int).SetUint64(uint64(0x2dc6c0)),
 		},
 	}

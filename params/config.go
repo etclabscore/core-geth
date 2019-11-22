@@ -19,9 +19,9 @@ package params
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/chainspecs/parity"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 )
 
 // Genesis hashes to enforce below configs on.
@@ -70,11 +70,11 @@ var (
 		PetersburgBlock:     big.NewInt(7280000),
 		IstanbulBlock:       big.NewInt(9069000),
 		Ethash:              new(paramtypes.EthashConfig),
-		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{
 			uint64(0x42ae50): new(big.Int).SetUint64(uint64(0x2dc6c0)),
 			uint64(0x6f1580): new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
-		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
 			uint64(0x0):      new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 			uint64(0x42ae50): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
 			uint64(0x6f1580): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
@@ -120,11 +120,11 @@ var (
 		PetersburgBlock:     big.NewInt(4939394),
 		IstanbulBlock:       big.NewInt(6485846),
 		Ethash:              new(paramtypes.EthashConfig),
-		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{
 			1700000: new(big.Int).SetUint64(uint64(0x2dc6c0)),
 			4230000: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
-		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
 			uint64(0):       new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 			uint64(1700000): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
 			uint64(4230000): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
@@ -173,11 +173,11 @@ var (
 			Period: 15,
 			Epoch:  30000,
 		},
-		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{
 			uint64(1035301): new(big.Int).SetUint64(uint64(0x2dc6c0)),
 			uint64(3660663): new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
-		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
 			uint64(0x0):     new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 			uint64(1035301): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
 			uint64(3660663): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
@@ -221,10 +221,10 @@ var (
 			Period: 15,
 			Epoch:  30000,
 		},
-		DifficultyBombDelaySchedule: parity.Uint64BigMapEncodesHex{
+		DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{
 			uint64(0x0): new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
-		BlockRewardSchedule: parity.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
 			uint64(0x0): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
 	}
@@ -319,11 +319,11 @@ var (
 		nil,
 		nil,
 		// DifficultyBombDelaySchedule
-		parity.Uint64BigMapEncodesHex{
+		common2.Uint64BigMapEncodesHex{
 			0: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
 		// BlockRewardSchedule
-		parity.Uint64BigMapEncodesHex{
+		common2.Uint64BigMapEncodesHex{
 			0: new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
 	}
@@ -400,11 +400,11 @@ var (
 		nil,
 		nil,
 		// DifficultyBombDelaySchedule
-		parity.Uint64BigMapEncodesHex{
+		common2.Uint64BigMapEncodesHex{
 			0: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
 		// BlockRewardSchedule
-		parity.Uint64BigMapEncodesHex{
+		common2.Uint64BigMapEncodesHex{
 			0: new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
 	}
@@ -474,11 +474,11 @@ var (
 		nil,
 		nil,
 		// DifficultyBombDelaySchedule
-		parity.Uint64BigMapEncodesHex{
+		common2.Uint64BigMapEncodesHex{
 			0: new(big.Int).SetUint64(uint64(0x1e8480)),
 		},
 		// BlockRewardSchedule
-		parity.Uint64BigMapEncodesHex{
+		common2.Uint64BigMapEncodesHex{
 			0: new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
 	}

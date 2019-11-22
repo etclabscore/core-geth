@@ -1,4 +1,4 @@
-package parity
+package common
 
 import (
 	"bytes"

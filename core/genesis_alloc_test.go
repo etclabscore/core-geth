@@ -29,7 +29,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/go-test/deep"
 )
 
@@ -50,8 +49,6 @@ func TestSetupGenesis(t *testing.T) {
 		customg     = paramtypes.Genesis{
 			Config: &paramtypes.ChainConfig{
 				HomesteadBlock:              big.NewInt(3),
-				BlockRewardSchedule:         common2.Uint64BigMapEncodesHex{},
-				DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{},
 			},
 			Alloc: paramtypes.GenesisAlloc{
 				{1}: {Balance: big.NewInt(1), Storage: map[common.Hash]common.Hash{{1}: {1}}},

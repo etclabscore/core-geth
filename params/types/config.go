@@ -192,8 +192,8 @@ type ChainConfig struct {
 	TrustedCheckpoint       *TrustedCheckpoint      `json:"trustedCheckpoint"`
 	TrustedCheckpointOracle *CheckpointOracleConfig `json:"trustedCheckpointOracle"`
 
-	DifficultyBombDelaySchedule common2.Uint64BigMapEncodesHex
-	BlockRewardSchedule         common2.Uint64BigMapEncodesHex
+	DifficultyBombDelaySchedule common2.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"'` // JSON tag matches Parity's
+	BlockRewardSchedule         common2.Uint64BigMapEncodesHex `json:"blockReward,omitempty"`           // JSON tag matches Parity's
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.

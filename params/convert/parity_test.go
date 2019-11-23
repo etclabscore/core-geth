@@ -84,3 +84,4 @@ func TestParityConfigToMultiGethGenesis(t *testing.T) {
 		}
 	}
 }
+

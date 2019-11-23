@@ -51,7 +51,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 		spec.Engine.Ethash.Params.DifficultyBoundDivisor = hexOrDecimal256FromBig(params.DifficultyBoundDivisor)
 		spec.Engine.Ethash.Params.DurationLimit = hexOrDecimal256FromBig(params.DurationLimit)
 
-		if b := params.FeatureOrMetaBlock(genesis.Config.EIP100FBlock, genesis.Config.ByzantiumBlock); b != nil {
+		if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP100FBlock, genesis.Config.ByzantiumBlock); b != nil {
 			spec.Engine.Ethash.Params.EIP100bTransition = hexutilUint64(b.Uint64())
 		}
 
@@ -59,9 +59,9 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 			for k, v := range genesis.Config.BlockRewardSchedule {
 				spec.Engine.Ethash.Params.BlockReward[k] = v
 			}
-		} else if b := params.FeatureOrMetaBlock(genesis.Config.EIP1234FBlock, genesis.Config.ConstantinopleBlock); b != nil {
+		} else if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP1234FBlock, genesis.Config.ConstantinopleBlock); b != nil {
 			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = params.EIP1234FBlockReward
-		} else if b := params.FeatureOrMetaBlock(genesis.Config.EIP649FBlock, genesis.Config.ByzantiumBlock); b != nil {
+		} else if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP649FBlock, genesis.Config.ByzantiumBlock); b != nil {
 			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = params.EIP649FBlockReward
 		}
 
@@ -69,9 +69,9 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 			for k, v := range genesis.Config.DifficultyBombDelaySchedule {
 				spec.Engine.Ethash.Params.DifficultyBombDelays[k] = v
 			}
-		} else if b := params.FeatureOrMetaBlock(genesis.Config.EIP1234FBlock, genesis.Config.ConstantinopleBlock); b != nil {
+		} else if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP1234FBlock, genesis.Config.ConstantinopleBlock); b != nil {
 			spec.Engine.Ethash.Params.DifficultyBombDelays[b.Uint64()] = big.NewInt(2000000)
-		} else if b := params.FeatureOrMetaBlock(genesis.Config.EIP649FBlock, genesis.Config.ByzantiumBlock); b != nil {
+		} else if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP649FBlock, genesis.Config.ByzantiumBlock); b != nil {
 			spec.Engine.Ethash.Params.DifficultyBombDelays[b.Uint64()] = big.NewInt(3000000)
 		}
 
@@ -86,7 +86,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 			}
 		}
 		// FIXME
-		if b := params.FeatureOrMetaBlock(genesis.Config.ECIP1017EraRounds, genesis.Config.ECIP1017FBlock); b != nil {
+		if b := paramtypes.FeatureOrMetaBlock(genesis.Config.ECIP1017EraRounds, genesis.Config.ECIP1017FBlock); b != nil {
 			spec.Engine.Ethash.Params.ECIP1017EraRounds = hexutilUint64(genesis.Config.ECIP1017EraRounds.Uint64())
 		}
 	}
@@ -96,7 +96,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 	}
 
 	// Homestead
-	if b := params.OneOrAllEqOfBlocks(
+	if b := paramtypes.OneOrAllEqOfBlocks(
 		genesis.Config.HomesteadBlock,
 		genesis.Config.EIP2FBlock,
 		genesis.Config.EIP7FBlock,
@@ -115,23 +115,23 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 	if b := genesis.Config.EIP155Block; b != nil {
 		spec.Params.EIP155Transition = hexutilUint64(b.Uint64())
 	}
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP160FBlock, genesis.Config.EIP158Block); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP160FBlock, genesis.Config.EIP158Block); b != nil {
 		spec.Params.EIP160Transition = hexutilUint64(b.Uint64())
 	}
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP161FBlock, genesis.Config.EIP158Block); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP161FBlock, genesis.Config.EIP158Block); b != nil {
 		spec.Params.EIP161abcTransition = hexutilUint64(b.Uint64())
 		spec.Params.EIP161dTransition = hexutilUint64(b.Uint64())
 	}
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP170FBlock, genesis.Config.EIP158Block); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP170FBlock, genesis.Config.EIP158Block); b != nil {
 		spec.Params.MaxCodeSizeTransition = hexutilUint64(b.Uint64())
 		size := parity.ParityU64(params.MaxCodeSize)
 		spec.Params.MaxCodeSize = &size
 	}
 
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP140FBlock, genesis.Config.ByzantiumBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP140FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.Params.EIP140Transition = hexutilUint64(b.Uint64())
 	}
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP198FBlock, genesis.Config.ByzantiumBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP198FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.SetPrecompile(5, &parity.ParityChainSpecBuiltin{
 			Name:       "modexp",
 			ActivateAt: hexutilUint64(b.Uint64()),
@@ -139,10 +139,10 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 				ModExp: &parity.ParityChainSpecModExpPricing{Divisor: 20}}},
 		})
 	}
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP211FBlock, genesis.Config.ByzantiumBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP211FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.Params.EIP211Transition = hexutilUint64(b.Uint64())
 	}
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.SetPrecompile(8, &parity.ParityChainSpecBuiltin{
 			Name: "alt_bn128_pairing",
 			//ActivateAt: hexutilUint64(b.Uint64()),
@@ -152,7 +152,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 						parity.ParityChainSpecPricing{AltBnPairing: &parity.ParityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000}}}},
 			}})
 	}
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.SetPrecompile(6, &parity.ParityChainSpecBuiltin{
 			Name: "alt_bn128_add",
 			//ActivateAt: hexutilUint64(b.Uint64()),
@@ -170,23 +170,23 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 						parity.ParityChainSpecPricing{AltBnConstOperation: &parity.ParityChainSpecAltBnConstOperationPricing{Price: 40000}}}},
 			}})
 	}
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP214FBlock, genesis.Config.ByzantiumBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP214FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.Params.EIP214Transition = hexutilUint64(b.Uint64())
 	}
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP658FBlock, genesis.Config.ByzantiumBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP658FBlock, genesis.Config.ByzantiumBlock); b != nil {
 		spec.Params.EIP658Transition = hexutilUint64(b.Uint64())
 	}
 
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP145FBlock, genesis.Config.ConstantinopleBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP145FBlock, genesis.Config.ConstantinopleBlock); b != nil {
 		spec.Params.EIP145Transition = hexutilUint64(b.Uint64())
 	}
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1014FBlock, genesis.Config.ConstantinopleBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP1014FBlock, genesis.Config.ConstantinopleBlock); b != nil {
 		spec.Params.EIP1014Transition = hexutilUint64(b.Uint64())
 	}
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1052FBlock, genesis.Config.ConstantinopleBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP1052FBlock, genesis.Config.ConstantinopleBlock); b != nil {
 		spec.Params.EIP1052Transition = hexutilUint64(b.Uint64())
 	}
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1283FBlock, genesis.Config.ConstantinopleBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP1283FBlock, genesis.Config.ConstantinopleBlock); b != nil {
 		spec.Params.EIP1283Transition = hexutilUint64(b.Uint64())
 	}
 
@@ -196,7 +196,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 	}
 
 	// EIP-152: Add Blake2 compression function F precompile
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP152FBlock, genesis.Config.IstanbulBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP152FBlock, genesis.Config.IstanbulBlock); b != nil {
 		//spec.Params.EIP152Transition = hexutilUint64(b.Uint64())
 		spec.SetPrecompile(9, &parity.ParityChainSpecBuiltin{
 			Name:       "blake2_f",
@@ -206,14 +206,14 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 		})
 	}
 	// EIP-1108: Reduce alt_bn128 precompile gas costs
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1108FBlock, genesis.Config.IstanbulBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP1108FBlock, genesis.Config.IstanbulBlock); b != nil {
 		if genesis.Config.IsEIP212F(b) && genesis.Config.IsEIP213F(b) {
 			spec.SetPrecompile(6, &parity.ParityChainSpecBuiltin{
 				Name: "alt_bn128_add",
 				//ActivateAt: hexutilUint64(b.Uint64()),
 				Pricing: &parity.ParityChainSpecPricingMaybe{
 					Map: map[*math.HexOrDecimal256]parity.ParityChainSpecPricingPrice{
-						math.NewHexOrDecimal256(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Int64()): parity.ParityChainSpecPricingPrice{parity.ParityChainSpecPricing{
+						math.NewHexOrDecimal256(paramtypes.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Int64()): parity.ParityChainSpecPricingPrice{parity.ParityChainSpecPricing{
 							AltBnConstOperation: &parity.ParityChainSpecAltBnConstOperationPricing{Price: 500}},
 						},
 						math.NewHexOrDecimal256(b.Int64()): parity.ParityChainSpecPricingPrice{
@@ -226,7 +226,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 				//ActivateAt: hexutilUint64(b.Uint64()),
 				Pricing: &parity.ParityChainSpecPricingMaybe{
 					Map: map[*math.HexOrDecimal256]parity.ParityChainSpecPricingPrice{
-						math.NewHexOrDecimal256(params.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Int64()): parity.ParityChainSpecPricingPrice{
+						math.NewHexOrDecimal256(paramtypes.FeatureOrMetaBlock(genesis.Config.EIP213FBlock, genesis.Config.ByzantiumBlock).Int64()): parity.ParityChainSpecPricingPrice{
 							parity.ParityChainSpecPricing{AltBnConstOperation: &parity.ParityChainSpecAltBnConstOperationPricing{Price: 40000}}},
 						math.NewHexOrDecimal256(b.Int64()): parity.ParityChainSpecPricingPrice{
 							parity.ParityChainSpecPricing{AltBnConstOperation: &parity.ParityChainSpecAltBnConstOperationPricing{Price: 6000}}},
@@ -237,7 +237,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 				//ActivateAt: hexutilUint64(b.Uint64()),
 				Pricing: &parity.ParityChainSpecPricingMaybe{
 					Map: map[*math.HexOrDecimal256]parity.ParityChainSpecPricingPrice{
-						math.NewHexOrDecimal256(params.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock).Int64()): parity.ParityChainSpecPricingPrice{
+						math.NewHexOrDecimal256(paramtypes.FeatureOrMetaBlock(genesis.Config.EIP212FBlock, genesis.Config.ByzantiumBlock).Int64()): parity.ParityChainSpecPricingPrice{
 							parity.ParityChainSpecPricing{AltBnPairing: &parity.ParityChainSpecAltBnPairingPricing{Base: 100000, Pair: 80000}}},
 						math.NewHexOrDecimal256(b.Int64()): parity.ParityChainSpecPricingPrice{
 							parity.ParityChainSpecPricing{AltBnPairing: &parity.ParityChainSpecAltBnPairingPricing{Base: 45000, Pair: 34000}}},
@@ -248,19 +248,19 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 	}
 
 	// EIP-1344: Add ChainID opcode
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1344FBlock, genesis.Config.IstanbulBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP1344FBlock, genesis.Config.IstanbulBlock); b != nil {
 		spec.Params.EIP1344Transition = hexutilUint64(b.Uint64())
 	}
 	// EIP-1884: Repricing for trie-size-dependent opcodes
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP1884FBlock, genesis.Config.IstanbulBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP1884FBlock, genesis.Config.IstanbulBlock); b != nil {
 		spec.Params.EIP1884Transition = hexutilUint64(b.Uint64())
 	}
 	// EIP-2028: Calldata gas cost reduction
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP2028FBlock, genesis.Config.IstanbulBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP2028FBlock, genesis.Config.IstanbulBlock); b != nil {
 		spec.Params.EIP2028Transition = hexutilUint64(b.Uint64())
 	}
 	// EIP-2200: Rebalance net-metered SSTORE gas cost with consideration of SLOAD gas cost change
-	if b := params.FeatureOrMetaBlock(genesis.Config.EIP2200FBlock, genesis.Config.IstanbulBlock); b != nil {
+	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP2200FBlock, genesis.Config.IstanbulBlock); b != nil {
 		spec.Params.EIP1283ReenableTransition = hexutilUint64(b.Uint64())
 	}
 

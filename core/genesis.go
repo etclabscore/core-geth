@@ -44,7 +44,9 @@ import (
 //
 // The returned chain configuration is never nil.
 func SetupGenesisBlock(db ethdb.Database, genesis *paramtypes.Genesis) (*paramtypes.ChainConfig, common.Hash, error) {
-	return SetupGenesisBlockWithOverride(db, genesis, nil)
+	conf, hash, err := SetupGenesisBlockWithOverride(db, genesis, nil)
+	conf.UpgradeToSchedules()
+	return conf, hash, err
 }
 
 func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesis, overrideIstanbul *big.Int) (*paramtypes.ChainConfig, common.Hash, error) {

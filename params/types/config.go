@@ -196,39 +196,6 @@ type ChainConfig struct {
 	BlockRewardSchedule         common2.Uint64BigMapEncodesHex `json:"blockReward,omitempty"`           // JSON tag matches Parity's
 }
 
-func (c *ChainConfig) UpgradeToSchedules() {
-	c.SetDifficultyBombDelaysFromMetaBlocks()
-	c.SetBlockRewardsFromMetaBlocks()
-}
-
-func (c *ChainConfig) SetDifficultyBombDelaysFromMetaBlocks() {
-	if len(c.DifficultyBombDelaySchedule) > 0 {
-		return
-	}
-	c.DifficultyBombDelaySchedule = common2.Uint64BigMapEncodesHex{}
-	if b := FeatureOrMetaBlock(c.EIP649FBlock, c.ByzantiumBlock); b != nil {
-		c.DifficultyBombDelaySchedule[b.Uint64()] = big.NewInt(0x2dc6c0)
-	}
-	if b := FeatureOrMetaBlock(c.EIP1234FBlock, c.ConstantinopleBlock); b != nil {
-		c.DifficultyBombDelaySchedule[b.Uint64()] = big.NewInt(0x1e8480)
-	}
-}
-
-func (c *ChainConfig) SetBlockRewardsFromMetaBlocks() {
-	if len(c.BlockRewardSchedule) > 0 {
-		return
-	}
-	c.BlockRewardSchedule = common2.Uint64BigMapEncodesHex{
-		0: new(big.Int).SetUint64(uint64(0x4563918244f40000)),
-	}
-	if b := FeatureOrMetaBlock(c.EIP649FBlock, c.ByzantiumBlock); b != nil {
-		c.BlockRewardSchedule[b.Uint64()] = big.NewInt(0x29a2241af62c0000)
-	}
-	if b := FeatureOrMetaBlock(c.EIP1234FBlock, c.ConstantinopleBlock); b != nil {
-		c.BlockRewardSchedule[b.Uint64()] = big.NewInt(0x1bc16d674ec80000)
-	}
-}
-
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.
 type EthashConfig struct{}
 

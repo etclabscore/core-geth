@@ -33,17 +33,6 @@ func Test_UnmarshalJSON(t *testing.T) {
 			if c.Config.NetworkID != 314158 {
 				t.Errorf("networkid")
 			}
-
-			c.Config.UpgradeToSchedules()
-
-			if len(c.Config.DifficultyBombDelaySchedule) == 0 {
-				t.Errorf("no diff sched")
-			}
-			//t.Log(spew.Sdump(c.Config.DifficultyBombDelaySchedule))
-			if len(c.Config.BlockRewardSchedule) == 0 {
-				t.Errorf("no block sched")
-			}
-			//t.Log(spew.Sdump(c.Config.BlockRewardSchedule))
 		case "parity":
 			p := &parity.ParityChainSpec{}
 			mustOpenF(f, p)

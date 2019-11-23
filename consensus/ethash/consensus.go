@@ -39,8 +39,8 @@ import (
 
 // Ethash proof-of-work protocol constants.
 var (
-	maxUncles              = 2                 // Maximum number of uncles allowed in a single block
-	allowedFutureBlockTime = 15 * time.Second  // Max time from current time allowed for blocks, before they're considered future blocks
+	maxUncles              = 2                // Maximum number of uncles allowed in a single block
+	allowedFutureBlockTime = 15 * time.Second // Max time from current time allowed for blocks, before they're considered future blocks
 )
 
 // Various error messages to mark blocks invalid. These should be private to
@@ -367,8 +367,8 @@ func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.H
 
 	if config.IsECIP1010(next) {
 		ecip1010Explosion(config, next, exPeriodRef)
-	} else if len(config.DifficultyBombDelaySchedule) > 0 {
 
+	} else if len(config.DifficultyBombDelaySchedule) > 0 {
 		// This logic varies from the original fork-based logic (below) in that
 		// configured delay values are treated as compounding values (-2000000 + -3000000 = -5000000@constantinople)
 		// as opposed to hardcoded pre-compounded values (-5000000@constantinople).
@@ -381,6 +381,35 @@ func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.H
 			fakeBlockNumber.Sub(fakeBlockNumber, dur)
 		}
 		exPeriodRef.Set(fakeBlockNumber)
+
+	} else if config.IsEIP1234F(next) {
+		// calcDifficultyEIP1234 is the difficulty adjustment algorithm for Constantinople.
+		// The calculation uses the Byzantium rules, but with bomb offset 5M.
+		// Specification EIP-1234: https://eips.ethereum.org/EIPS/eip-1234
+		// Note, the calculations below looks at the parent number, which is 1 below
+		// the block number. Thus we remove one from the delay given
+
+		// calculate a fake block number for the ice-age delay
+		// Specification: https://eips.ethereum.org/EIPS/eip-1234
+		fakeBlockNumber := new(big.Int)
+		if parent.Number.Cmp(big.NewInt(4999999)) >= 0 {
+			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, big.NewInt(4999999))
+		}
+		exPeriodRef.Set(fakeBlockNumber)
+
+	} else if config.IsEIP649F(next) {
+		// The calculation uses the Byzantium rules, with bomb offset of 3M.
+		// Specification EIP-649: https://eips.ethereum.org/EIPS/eip-649
+		// Related meta-ish EIP-669: https://github.com/ethereum/EIPs/pull/669
+		// Note, the calculations below looks at the parent number, which is 1 below
+		// the block number. Thus we remove one from the delay given
+
+		fakeBlockNumber := new(big.Int)
+		if parent.Number.Cmp(big.NewInt(2999999)) >= 0 {
+			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, big.NewInt(2999999))
+		}
+		exPeriodRef.Set(fakeBlockNumber)
+
 	}
 
 	// EXPLOSION
@@ -554,7 +583,7 @@ func accumulateRewards(config *paramtypes.ChainConfig, state *state.StateDB, hea
 	}
 
 	blockReward := params.EthashBlockReward(config, header.Number)
-	
+
 	// Accumulate the rewards for the miner and any included uncles
 	reward := new(big.Int).Set(blockReward)
 	r := new(big.Int)

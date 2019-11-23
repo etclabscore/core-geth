@@ -26,7 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	lru "github.com/hashicorp/golang-lru"
 )
 
@@ -48,7 +48,7 @@ type Tally struct {
 
 // Snapshot is the state of the authorization voting at a given point in time.
 type Snapshot struct {
-	config   *paramtypes.CliqueConfig // Consensus engine parameters to fine tune behavior
+	config   *goethereum.CliqueConfig // Consensus engine parameters to fine tune behavior
 	sigcache *lru.ARCCache            // Cache of recent block signatures to speed up ecrecover
 
 	Number  uint64                      `json:"number"`  // Block number where the snapshot was created
@@ -69,7 +69,7 @@ func (s signersAscending) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 // newSnapshot creates a new snapshot with the specified startup parameters. This
 // method does not initialize the set of recent signers, so only ever use if for
 // the genesis block.
-func newSnapshot(config *paramtypes.CliqueConfig, sigcache *lru.ARCCache, number uint64, hash common.Hash, signers []common.Address) *Snapshot {
+func newSnapshot(config *goethereum.CliqueConfig, sigcache *lru.ARCCache, number uint64, hash common.Hash, signers []common.Address) *Snapshot {
 	snap := &Snapshot{
 		config:   config,
 		sigcache: sigcache,
@@ -86,7 +86,7 @@ func newSnapshot(config *paramtypes.CliqueConfig, sigcache *lru.ARCCache, number
 }
 
 // loadSnapshot loads an existing snapshot from the database.
-func loadSnapshot(config *paramtypes.CliqueConfig, sigcache *lru.ARCCache, db ethdb.Database, hash common.Hash) (*Snapshot, error) {
+func loadSnapshot(config *goethereum.CliqueConfig, sigcache *lru.ARCCache, db ethdb.Database, hash common.Hash) (*Snapshot, error) {
 	blob, err := db.Get(append([]byte("clique-"), hash[:]...))
 	if err != nil {
 		return nil, err

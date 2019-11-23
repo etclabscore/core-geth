@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/convert"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // makeGenesis creates a new genesis struct based on some user input.
@@ -44,14 +45,16 @@ func (w *wizard) makeGenesis() {
 		Difficulty: big.NewInt(524288),
 		Alloc:      make(paramtypes.GenesisAlloc),
 		Config: &paramtypes.ChainConfig{
-			HomesteadBlock:      big.NewInt(0),
-			EIP150Block:         big.NewInt(0),
-			EIP155Block:         big.NewInt(0),
-			EIP158Block:         big.NewInt(0),
-			ByzantiumBlock:      big.NewInt(0),
-			ConstantinopleBlock: big.NewInt(0),
-			PetersburgBlock:     big.NewInt(0),
-			IstanbulBlock:       big.NewInt(0),
+			ChainConfig: goethereum.ChainConfig{
+				HomesteadBlock:      big.NewInt(0),
+				EIP150Block:         big.NewInt(0),
+				EIP155Block:         big.NewInt(0),
+				EIP158Block:         big.NewInt(0),
+				ByzantiumBlock:      big.NewInt(0),
+				ConstantinopleBlock: big.NewInt(0),
+				PetersburgBlock:     big.NewInt(0),
+				IstanbulBlock:       big.NewInt(0),
+			},
 		},
 	}
 	// Figure out which consensus engine to choose
@@ -64,13 +67,13 @@ func (w *wizard) makeGenesis() {
 	switch {
 	case choice == "1":
 		// In case of ethash, we're pretty much done
-		genesis.Config.Ethash = new(paramtypes.EthashConfig)
+		genesis.Config.Ethash = new(goethereum.EthashConfig)
 		genesis.ExtraData = make([]byte, 32)
 
 	case choice == "" || choice == "2":
 		// In the case of clique, configure the consensus parameters
 		genesis.Difficulty = big.NewInt(1)
-		genesis.Config.Clique = &paramtypes.CliqueConfig{
+		genesis.Config.Clique = &goethereum.CliqueConfig{
 			Period: 15,
 			Epoch:  30000,
 		}

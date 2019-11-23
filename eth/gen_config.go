@@ -13,6 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/gasprice"
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // MarshalTOML marshals as TOML.
@@ -47,8 +48,8 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		EWASMInterpreter        string
 		EVMInterpreter          string
 		RPCGasCap               *big.Int                           `toml:",omitempty"`
-		Checkpoint              *paramtypes.TrustedCheckpoint      `toml:",omitempty"`
-		CheckpointOracle        *paramtypes.CheckpointOracleConfig `toml:",omitempty"`
+		Checkpoint              *goethereum.TrustedCheckpoint      `toml:",omitempty"`
+		CheckpointOracle        *goethereum.CheckpointOracleConfig `toml:",omitempty"`
 	}
 	var enc Config
 	enc.Genesis = c.Genesis
@@ -117,8 +118,8 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		EWASMInterpreter        *string
 		EVMInterpreter          *string
 		RPCGasCap               *big.Int                           `toml:",omitempty"`
-		Checkpoint              *paramtypes.TrustedCheckpoint      `toml:",omitempty"`
-		CheckpointOracle        *paramtypes.CheckpointOracleConfig `toml:",omitempty"`
+		Checkpoint              *goethereum.TrustedCheckpoint      `toml:",omitempty"`
+		CheckpointOracle        *goethereum.CheckpointOracleConfig `toml:",omitempty"`
 	}
 	var dec Config
 	if err := unmarshal(&dec); err != nil {

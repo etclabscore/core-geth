@@ -26,7 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/contracts/checkpointoracle"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/rpc"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -61,8 +61,8 @@ func getContractAddr(client *rpc.Client) common.Address {
 
 // getCheckpoint retrieves the specified checkpoint or the latest one
 // through rpc request.
-func getCheckpoint(ctx *cli.Context, client *rpc.Client) *paramtypes.TrustedCheckpoint {
-	var checkpoint *paramtypes.TrustedCheckpoint
+func getCheckpoint(ctx *cli.Context, client *rpc.Client) *goethereum.TrustedCheckpoint {
+	var checkpoint *goethereum.TrustedCheckpoint
 
 	if ctx.GlobalIsSet(indexFlag.Name) {
 		var result [3]string
@@ -70,7 +70,7 @@ func getCheckpoint(ctx *cli.Context, client *rpc.Client) *paramtypes.TrustedChec
 		if err := client.Call(&result, "les_getCheckpoint", index); err != nil {
 			utils.Fatalf("Failed to get local checkpoint %v, please ensure the les API is exposed", err)
 		}
-		checkpoint = &paramtypes.TrustedCheckpoint{
+		checkpoint = &goethereum.TrustedCheckpoint{
 			SectionIndex: index,
 			SectionHead:  common.HexToHash(result[0]),
 			CHTRoot:      common.HexToHash(result[1]),
@@ -86,7 +86,7 @@ func getCheckpoint(ctx *cli.Context, client *rpc.Client) *paramtypes.TrustedChec
 		if err != nil {
 			utils.Fatalf("Failed to parse checkpoint index %v", err)
 		}
-		checkpoint = &paramtypes.TrustedCheckpoint{
+		checkpoint = &goethereum.TrustedCheckpoint{
 			SectionIndex: index,
 			SectionHead:  common.HexToHash(result[1]),
 			CHTRoot:      common.HexToHash(result[2]),

@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -451,7 +452,7 @@ func ParityConfigToMultiGethGenesis(c *parity.ParityChainSpec) (*paramtypes.Gene
 
 		pars := ethash.Params
 
-		mgc.Ethash = &paramtypes.EthashConfig{}
+		mgc.Ethash = &goethereum.EthashConfig{}
 
 		mgc.HomesteadBlock = pars.HomesteadTransition.Big()
 		mgc.EIP100FBlock = pars.EIP100bTransition.Big()
@@ -477,7 +478,7 @@ func ParityConfigToMultiGethGenesis(c *parity.ParityChainSpec) (*paramtypes.Gene
 		}
 
 	} else if clique := c.Engine.Clique; clique.Params.Period != nil {
-		mgc.Clique = &paramtypes.CliqueConfig{
+		mgc.Clique = &goethereum.CliqueConfig{
 			Period: (uint64)(*clique.Params.Period),
 			Epoch:  (uint64)(*clique.Params.Epoch),
 		}

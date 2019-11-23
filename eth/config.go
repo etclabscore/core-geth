@@ -32,6 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // DefaultConfig contains default settings for use on the Ethereum main net.
@@ -151,10 +152,10 @@ type Config struct {
 	RPCGasCap *big.Int `toml:",omitempty"`
 
 	// Checkpoint is a hardcoded checkpoint which can be nil.
-	Checkpoint *paramtypes.TrustedCheckpoint `toml:",omitempty"`
+	Checkpoint *goethereum.TrustedCheckpoint `toml:",omitempty"`
 
 	// CheckpointOracle is the configuration for checkpoint oracle.
-	CheckpointOracle *paramtypes.CheckpointOracleConfig `toml:",omitempty"`
+	CheckpointOracle *goethereum.CheckpointOracleConfig `toml:",omitempty"`
 
 	// Istanbul block override (TODO: remove after the fork)
 	OverrideIstanbul *big.Int

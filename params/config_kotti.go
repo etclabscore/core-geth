@@ -20,6 +20,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var (
@@ -28,27 +29,29 @@ var (
 
 	// KottiChainConfig is the chain parameters to run a node on the Kotti main network.
 	KottiChainConfig = &paramtypes.ChainConfig{
+		ChainConfig: goethereum.ChainConfig{
+			ChainID:             big.NewInt(6),
+			HomesteadBlock:      big.NewInt(0),
+			DAOForkBlock:        nil,
+			DAOForkSupport:      false,
+			EIP150Block:         big.NewInt(0),
+			EIP150Hash:          common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4"),
+			EIP155Block:         big.NewInt(0),
+			EIP158Block:         big.NewInt(716617),
+			ByzantiumBlock:      big.NewInt(716617),
+			ConstantinopleBlock: big.NewInt(1705549),
+			PetersburgBlock:     big.NewInt(1705549),
+			Clique: &goethereum.CliqueConfig{
+				Period: 15,
+				Epoch:  30000,
+			},
+		},
 		NetworkID:           6,
-		ChainID:             big.NewInt(6),
-		HomesteadBlock:      big.NewInt(0),
-		DAOForkBlock:        nil,
-		DAOForkSupport:      false,
-		EIP150Block:         big.NewInt(0),
-		EIP150Hash:          common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4"),
-		EIP155Block:         big.NewInt(0),
-		EIP158Block:         big.NewInt(716617),
-		ByzantiumBlock:      big.NewInt(716617),
-		ConstantinopleBlock: big.NewInt(1705549),
-		PetersburgBlock:     big.NewInt(1705549),
 		DisposalBlock:       big.NewInt(0),
 		ECIP1017FBlock:      big.NewInt(5000000),
 		ECIP1017EraRounds:   big.NewInt(5000000),
 		EIP160FBlock:        big.NewInt(0),
 		ECIP1010PauseBlock:  big.NewInt(0),
 		ECIP1010Length:      big.NewInt(2000000),
-		Clique: &paramtypes.CliqueConfig{
-			Period: 15,
-			Epoch:  30000,
-		},
 	}
 )

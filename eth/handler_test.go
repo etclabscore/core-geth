@@ -37,6 +37,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // Tests that block headers can be retrieved from a remote chain based on user queries.
@@ -480,13 +481,13 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 	// If checkpointing is enabled, create and inject a fake CHT and the corresponding
 	// chllenge response.
 	var response *types.Header
-	var cht *paramtypes.TrustedCheckpoint
+	var cht *goethereum.TrustedCheckpoint
 	if checkpoint {
 		index := uint64(rand.Intn(500))
 		number := (index+1)*params.CHTFrequency - 1
 		response = &types.Header{Number: big.NewInt(int64(number)), Extra: []byte("valid")}
 
-		cht = &paramtypes.TrustedCheckpoint{
+		cht = &goethereum.TrustedCheckpoint{
 			SectionIndex: index,
 			SectionHead:  response.Hash(),
 		}

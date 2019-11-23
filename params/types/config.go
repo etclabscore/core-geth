@@ -1,56 +1,12 @@
 package paramtypes
 
 import (
-	"encoding/binary"
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
-
-// TrustedCheckpoint represents a set of post-processed trie roots (CHT and
-// BloomTrie) associated with the appropriate section index and head hash. It is
-// used to start light syncing from this checkpoint and avoid downloading the
-// entire header chain while still being able to securely access old headers/logs.
-type TrustedCheckpoint struct {
-	SectionIndex uint64      `json:"sectionIndex"`
-	SectionHead  common.Hash `json:"sectionHead"`
-	CHTRoot      common.Hash `json:"chtRoot"`
-	BloomRoot    common.Hash `json:"bloomRoot"`
-}
-
-// HashEqual returns an indicator comparing the itself hash with given one.
-func (c *TrustedCheckpoint) HashEqual(hash common.Hash) bool {
-	if c.Empty() {
-		return hash == common.Hash{}
-	}
-	return c.Hash() == hash
-}
-
-// Hash returns the hash of checkpoint's four key fields(index, sectionHead, chtRoot and bloomTrieRoot).
-func (c *TrustedCheckpoint) Hash() common.Hash {
-	buf := make([]byte, 8+3*common.HashLength)
-	binary.BigEndian.PutUint64(buf, c.SectionIndex)
-	copy(buf[8:], c.SectionHead.Bytes())
-	copy(buf[8+common.HashLength:], c.CHTRoot.Bytes())
-	copy(buf[8+2*common.HashLength:], c.BloomRoot.Bytes())
-	return crypto.Keccak256Hash(buf)
-}
-
-// Empty returns an indicator whether the checkpoint is regarded as empty.
-func (c *TrustedCheckpoint) Empty() bool {
-	return c.SectionHead == (common.Hash{}) || c.CHTRoot == (common.Hash{}) || c.BloomRoot == (common.Hash{})
-}
-
-// CheckpointOracleConfig represents a set of checkpoint contract(which acts as an oracle)
-// config which used for light client checkpoint syncing.
-type CheckpointOracleConfig struct {
-	Address   common.Address   `json:"address"`
-	Signers   []common.Address `json:"signers"`
-	Threshold uint64           `json:"threshold"`
-}
 
 // ChainConfig is the core config which determines the blockchain settings.
 //
@@ -58,11 +14,20 @@ type CheckpointOracleConfig struct {
 // that any network, identified by its genesis block, can have its own
 // set of configuration options.
 type ChainConfig struct {
+
+	// Embedded ethereum/go-ethereum ChainConfig.
+	// This is not a pointer value because it can be expected that there will
+	// always be at least one (even zero-value) value desired from that data type, eg ChainID or engine.
+	goethereum.ChainConfig
+
+	// Following fields are left commented because it's useful to see pairings,
+	// both for reference and edification.
+
 	NetworkID uint64   `json:"networkId"`
-	ChainID   *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
+	//ChainID   *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
 
 	// HF: Homestead
-	HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)
+	//HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)
 	// "Homestead Hard-fork Changes"
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.md
 	EIP2FBlock *big.Int `json:"eip2FBlock,omitempty"`
@@ -72,17 +37,17 @@ type ChainConfig struct {
 	// Note: EIP 8 was also included in this fork, but was not backwards-incompatible
 
 	// HF: DAO
-	DAOForkBlock   *big.Int `json:"daoForkBlock,omitempty"`   // TheDAO hard-fork switch block (nil = no fork)
-	DAOForkSupport bool     `json:"daoForkSupport,omitempty"` // Whether the nodes supports or opposes the DAO hard-fork
+	//DAOForkBlock   *big.Int `json:"daoForkBlock,omitempty"`   // TheDAO hard-fork switch block (nil = no fork)
+	//DAOForkSupport bool     `json:"daoForkSupport,omitempty"` // Whether the nodes supports or opposes the DAO hard-fork
 
 	// HF: Tangerine Whistle
 	// EIP150 implements the Gas price changes (https://github.com/ethereum/EIPs/issues/150)
-	EIP150Block *big.Int    `json:"eip150Block,omitempty"` // EIP150 HF block (nil = no fork)
-	EIP150Hash  common.Hash `json:"eip150Hash,omitempty"`  // EIP150 HF hash (needed for header only clients as only gas pricing changed)
+	//EIP150Block *big.Int    `json:"eip150Block,omitempty"` // EIP150 HF block (nil = no fork)
+	//EIP150Hash  common.Hash `json:"eip150Hash,omitempty"`  // EIP150 HF hash (needed for header only clients as only gas pricing changed)
 
 	// HF: Spurious Dragon
-	EIP155Block *big.Int `json:"eip155Block,omitempty"` // EIP155 HF block
-	EIP158Block *big.Int `json:"eip158Block,omitempty"` // EIP158 HF block, includes implementations of 158/161, 160, and 170
+	//EIP155Block *big.Int `json:"eip155Block,omitempty"` // EIP155 HF block
+	//EIP158Block *big.Int `json:"eip158Block,omitempty"` // EIP158 HF block, includes implementations of 158/161, 160, and 170
 	//
 	// EXP cost increase
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-160.md
@@ -99,8 +64,8 @@ type ChainConfig struct {
 	EIP170FBlock *big.Int `json:"eip170FBlock,omitempty"`
 
 	// HF: Byzantium
-	ByzantiumBlock *big.Int `json:"byzantiumBlock,omitempty"` // Byzantium switch block (nil = no fork, 0 = already on byzantium)
-	//
+	//ByzantiumBlock *big.Int `json:"byzantiumBlock,omitempty"` // Byzantium switch block (nil = no fork, 0 = already on byzantium)
+
 	// Difficulty adjustment to target mean block time including uncles
 	// https://github.com/ethereum/EIPs/issues/100
 	EIP100FBlock *big.Int `json:"eip100FBlock,omitempty"`
@@ -135,7 +100,7 @@ type ChainConfig struct {
 	// EIP684FBlock *big.Int `json:"eip684BFlock,omitempty"`
 
 	// HF: Constantinople
-	ConstantinopleBlock *big.Int `json:"constantinopleBlock,omitempty"` // Constantinople switch block (nil = no fork, 0 = already activated)
+	//ConstantinopleBlock *big.Int `json:"constantinopleBlock,omitempty"` // Constantinople switch block (nil = no fork, 0 = already activated)
 	//
 	// Opcodes SHR, SHL, SAR
 	// https://eips.ethereum.org/EIPS/eip-145
@@ -153,10 +118,10 @@ type ChainConfig struct {
 	// https://eips.ethereum.org/EIPS/eip-1283
 	EIP1283FBlock *big.Int `json:"eip1283FBlock,omitempty"`
 
-	PetersburgBlock *big.Int `json:"petersburgBlock,omitempty"` // Petersburg switch block (nil = same as Constantinople)
+	//PetersburgBlock *big.Int `json:"petersburgBlock,omitempty"` // Petersburg switch block (nil = same as Constantinople)
 
 	// HF: Istanbul
-	IstanbulBlock *big.Int `json:"istanbulBlock,omitempty"` // Istanbul switch block (nil = no fork, 0 = already on istanbul)
+	//IstanbulBlock *big.Int `json:"istanbulBlock,omitempty"` // Istanbul switch block (nil = no fork, 0 = already on istanbul)
 	//
 	// EIP-152: Add Blake2 compression function F precompile
 	EIP152FBlock *big.Int `json:"eip152FBlock,omitempty"`
@@ -171,7 +136,7 @@ type ChainConfig struct {
 	// EIP-2200: Rebalance net-metered SSTORE gas cost with consideration of SLOAD gas cost change
 	EIP2200FBlock *big.Int `json="eip2200FBlock,omitempty"`
 
-	EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
+	//EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block
 	ECIP1010Length     *big.Int `json:"ecip1010Length,omitempty"`     // ECIP1010 length
@@ -186,33 +151,14 @@ type ChainConfig struct {
 	MCIP8Block *big.Int `json:"mcip8Block,omitempty"` // Musicoin 'QT For' block
 
 	// Various consensus engines
-	Ethash *EthashConfig `json:"ethash,omitempty"`
-	Clique *CliqueConfig `json:"clique,omitempty"`
+	//Ethash *goethereum.EthashConfig `json:"ethash,omitempty"`
+	//Clique *goethereum.CliqueConfig `json:"clique,omitempty"`
 
-	TrustedCheckpoint       *TrustedCheckpoint      `json:"trustedCheckpoint"`
-	TrustedCheckpointOracle *CheckpointOracleConfig `json:"trustedCheckpointOracle"`
+	//TrustedCheckpoint       *goethereum.TrustedCheckpoint      `json:"trustedCheckpoint"`
+	//TrustedCheckpointOracle *goethereum.CheckpointOracleConfig `json:"trustedCheckpointOracle"`
 
 	DifficultyBombDelaySchedule common2.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"'` // JSON tag matches Parity's
 	BlockRewardSchedule         common2.Uint64BigMapEncodesHex `json:"blockReward,omitempty"`           // JSON tag matches Parity's
-}
-
-// EthashConfig is the consensus engine configs for proof-of-work based sealing.
-type EthashConfig struct{}
-
-// String implements the stringer interface, returning the consensus engine details.
-func (c *EthashConfig) String() string {
-	return "ethash"
-}
-
-// CliqueConfig is the consensus engine configs for proof-of-authority based sealing.
-type CliqueConfig struct {
-	Period uint64 `json:"period"` // Number of seconds between blocks to enforce
-	Epoch  uint64 `json:"epoch"`  // Epoch length to reset votes and checkpoint
-}
-
-// String implements the stringer interface, returning the consensus engine details.
-func (c *CliqueConfig) String() string {
-	return "clique"
 }
 
 // String implements the fmt.Stringer interface.

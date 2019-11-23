@@ -35,12 +35,14 @@ func TestCreation(t *testing.T) {
 		want ID
 	}
 	tests := []struct {
+		name string
 		config  *paramtypes.ChainConfig
 		genesis common.Hash
 		cases   []testcase
 	}{
 		// Mainnet test cases
 		{
+			"mainnet",
 			params.MainnetChainConfig,
 			params.MainnetGenesisHash,
 			[]testcase{
@@ -64,6 +66,7 @@ func TestCreation(t *testing.T) {
 		},
 		// Ropsten test cases
 		{
+			"ropsten",
 			params.TestnetChainConfig,
 			params.TestnetGenesisHash,
 			[]testcase{
@@ -83,6 +86,7 @@ func TestCreation(t *testing.T) {
 		},
 		// Rinkeby test cases
 		{
+			"rinkeby",
 			params.RinkebyChainConfig,
 			params.RinkebyGenesisHash,
 			[]testcase{
@@ -103,6 +107,7 @@ func TestCreation(t *testing.T) {
 		},
 		// Goerli test cases
 		{
+			"goerli",
 			params.GoerliChainConfig,
 			params.GoerliGenesisHash,
 			[]testcase{
@@ -116,7 +121,7 @@ func TestCreation(t *testing.T) {
 	for i, tt := range tests {
 		for j, ttt := range tt.cases {
 			if have := newID(tt.config, tt.genesis, ttt.head); have != ttt.want {
-				t.Errorf("test %d, case %d: fork ID mismatch: have %x, want %x", i, j, have, ttt.want)
+				t.Errorf("test %d, case %d, name: %s: fork ID mismatch: have %x, want %x", i, j, tt.name, have, ttt.want)
 			}
 		}
 	}

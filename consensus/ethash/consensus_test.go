@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 type diffTest struct {
@@ -70,7 +71,7 @@ func TestCalcDifficulty(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	config := &paramtypes.ChainConfig{HomesteadBlock: big.NewInt(1150000)}
+	config := &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{HomesteadBlock: big.NewInt(1150000)}}
 
 	for name, test := range tests {
 		number := new(big.Int).Sub(test.CurrentBlocknumber, big.NewInt(1))

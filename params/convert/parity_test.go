@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params"
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -24,8 +25,10 @@ var chainSpecEquivs = map[string]*paramtypes.Genesis{
 
 func TestBlockConfig(t *testing.T) {
 	frontierCC := &paramtypes.ChainConfig{
-		ChainID: big.NewInt(1),
-		Ethash:  new(paramtypes.EthashConfig),
+		ChainConfig: goethereum.ChainConfig{
+			ChainID: big.NewInt(1),
+			Ethash:  new(goethereum.EthashConfig),
+		},
 	}
 	genesis := params.DefaultGenesisBlock()
 	genesis.Config = frontierCC

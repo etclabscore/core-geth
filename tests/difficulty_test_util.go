@@ -28,22 +28,25 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 //go:generate [gencodec -type DifficultyTest -field-override difficultyTestMarshaling -out gen_difficultytest.go]
 
 var (
 	mainnetChainConfig = paramtypes.ChainConfig{
-		Ethash:         new(paramtypes.EthashConfig),
-		ChainID:        big.NewInt(1),
-		HomesteadBlock: big.NewInt(1150000),
-		DAOForkBlock:   big.NewInt(1920000),
-		DAOForkSupport: true,
-		EIP150Block:    big.NewInt(2463000),
-		EIP150Hash:     common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
-		EIP155Block:    big.NewInt(2675000),
-		EIP158Block:    big.NewInt(2675000),
-		ByzantiumBlock: big.NewInt(4370000),
+		ChainConfig: goethereum.ChainConfig{
+			Ethash:         new(goethereum.EthashConfig),
+			ChainID:        big.NewInt(1),
+			HomesteadBlock: big.NewInt(1150000),
+			DAOForkBlock:   big.NewInt(1920000),
+			DAOForkSupport: true,
+			EIP150Block:    big.NewInt(2463000),
+			EIP150Hash:     common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
+			EIP155Block:    big.NewInt(2675000),
+			EIP158Block:    big.NewInt(2675000),
+			ByzantiumBlock: big.NewInt(4370000),
+		},
 		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
 			uint64(0x0):     new(big.Int).SetUint64(uint64(0x4563918244f40000)),
 			uint64(4370000): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
@@ -58,19 +61,25 @@ var difficultyChainConfigurations = map[string]paramtypes.ChainConfig{
 	"Ropsten": *params.TestnetChainConfig,
 	"Morden":  *params.TestnetChainConfig,
 	"Frontier": {
-		Ethash:                      new(paramtypes.EthashConfig),
+		ChainConfig: goethereum.ChainConfig{
+			Ethash: new(goethereum.EthashConfig),
+		},
 		BlockRewardSchedule:         common2.Uint64BigMapEncodesHex{},
 		DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{},
 	},
 	"Homestead": {
-		Ethash:                      new(paramtypes.EthashConfig),
-		HomesteadBlock:              big.NewInt(0),
+		ChainConfig: goethereum.ChainConfig{
+			Ethash:         new(goethereum.EthashConfig),
+			HomesteadBlock: big.NewInt(0),
+		},
 		BlockRewardSchedule:         common2.Uint64BigMapEncodesHex{},
 		DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{},
 	},
 	"Byzantium": {
-		Ethash:         new(paramtypes.EthashConfig),
-		ByzantiumBlock: big.NewInt(0),
+		ChainConfig: goethereum.ChainConfig{
+			Ethash:         new(goethereum.EthashConfig),
+			ByzantiumBlock: big.NewInt(0),
+		},
 		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
 			uint64(0): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
 		},
@@ -81,10 +90,12 @@ var difficultyChainConfigurations = map[string]paramtypes.ChainConfig{
 	"MainNetwork":       mainnetChainConfig,
 	"CustomMainNetwork": mainnetChainConfig,
 	"Constantinople": {
-		Ethash:              new(paramtypes.EthashConfig),
-		HomesteadBlock:      big.NewInt(0),
-		EIP100FBlock:        big.NewInt(0),
-		ConstantinopleBlock: big.NewInt(0),
+		ChainConfig: goethereum.ChainConfig{
+			Ethash:              new(goethereum.EthashConfig),
+			HomesteadBlock:      big.NewInt(0),
+			ConstantinopleBlock: big.NewInt(0),
+		},
+		EIP100FBlock: big.NewInt(0),
 		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
 			uint64(0): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
@@ -96,15 +107,19 @@ var difficultyChainConfigurations = map[string]paramtypes.ChainConfig{
 	},
 	"difficulty.json": mainnetChainConfig,
 	"ETC_Atlantis": {
-		Ethash:         new(paramtypes.EthashConfig),
-		ByzantiumBlock: big.NewInt(0),
-		DisposalBlock:  big.NewInt(0),
+		ChainConfig: goethereum.ChainConfig{
+			Ethash:         new(goethereum.EthashConfig),
+			ByzantiumBlock: big.NewInt(0),
+		},
+		DisposalBlock: big.NewInt(0),
 	},
 	"ETC_Agharta": {
-		Ethash:              new(paramtypes.EthashConfig),
-		ByzantiumBlock:      big.NewInt(0),
-		ConstantinopleBlock: big.NewInt(0),
-		DisposalBlock:       big.NewInt(0),
+		ChainConfig: goethereum.ChainConfig{
+			Ethash:              new(goethereum.EthashConfig),
+			ByzantiumBlock:      big.NewInt(0),
+			ConstantinopleBlock: big.NewInt(0),
+		},
+		DisposalBlock: big.NewInt(0),
 	},
 }
 

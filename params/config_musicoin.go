@@ -21,6 +21,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var (
@@ -29,20 +30,22 @@ var (
 
 	// MusicoinChainConfig is the chain parameters to run a node on the main network.
 	MusicoinChainConfig = &paramtypes.ChainConfig{
+		ChainConfig: goethereum.ChainConfig{
+			ChainID:        big.NewInt(7762959),
+			HomesteadBlock: big.NewInt(1150000),
+			DAOForkBlock:   big.NewInt(36028797018963967),
+			DAOForkSupport: false,
+			EIP150Block:    big.NewInt(2222222),
+			EIP150Hash:     common.HexToHash("0x"),
+			EIP155Block:    big.NewInt(2222222),
+			EIP158Block:    big.NewInt(2222222),
+			ByzantiumBlock: big.NewInt(2222222),
+			Ethash:         new(goethereum.EthashConfig),
+		},
 		NetworkID:      776959,
 		MCIP0Block:     big.NewInt(0),
-		ChainID:        big.NewInt(7762959),
-		HomesteadBlock: big.NewInt(1150000),
-		DAOForkBlock:   big.NewInt(36028797018963967),
-		DAOForkSupport: false,
-		EIP150Block:    big.NewInt(2222222),
-		EIP150Hash:     common.HexToHash("0x"),
-		EIP155Block:    big.NewInt(2222222),
-		EIP158Block:    big.NewInt(2222222),
-		ByzantiumBlock: big.NewInt(2222222),
 		MCIP3Block:     big.NewInt(1200001),
 		MCIP8Block:     big.NewInt(5200001),
-		Ethash:         new(paramtypes.EthashConfig),
 		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
 			uint64(0):       new(big.Int).Mul(big.NewInt(314), big.NewInt(1e+18)),
 			uint64(1200001): new(big.Int).Mul(big.NewInt(250), big.NewInt(1e+18)),

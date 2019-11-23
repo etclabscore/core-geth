@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 const (
@@ -77,7 +78,7 @@ func init() {
 	testTxPoolConfig.Journal = ""
 	ethashChainConfig = params.TestChainConfig
 	cliqueChainConfig = params.TestChainConfig
-	cliqueChainConfig.Clique = &paramtypes.CliqueConfig{
+	cliqueChainConfig.Clique = &goethereum.CliqueConfig{
 		Period: 10,
 		Epoch:  30000,
 	}
@@ -202,7 +203,7 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 	)
 	if isClique {
 		chainConfig = params.AllCliqueProtocolChanges
-		chainConfig.Clique = &paramtypes.CliqueConfig{Period: 1, Epoch: 30000}
+		chainConfig.Clique = &goethereum.CliqueConfig{Period: 1, Epoch: 30000}
 		engine = clique.New(chainConfig.Clique, db)
 	} else {
 		chainConfig = params.AllEthashProtocolChanges

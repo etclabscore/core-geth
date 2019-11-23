@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // Config is a basic type specifying certain configuration flags for running
@@ -52,13 +53,15 @@ type Config struct {
 func setDefaults(cfg *Config) {
 	if cfg.ChainConfig == nil {
 		cfg.ChainConfig = &paramtypes.ChainConfig{
-			ChainID:        big.NewInt(1),
-			HomesteadBlock: new(big.Int),
-			DAOForkBlock:   new(big.Int),
-			DAOForkSupport: false,
-			EIP150Block:    new(big.Int),
-			EIP155Block:    new(big.Int),
-			EIP158Block:    new(big.Int),
+			ChainConfig: goethereum.ChainConfig{
+				ChainID:        big.NewInt(1),
+				HomesteadBlock: new(big.Int),
+				DAOForkBlock:   new(big.Int),
+				DAOForkSupport: false,
+				EIP150Block:    new(big.Int),
+				EIP155Block:    new(big.Int),
+				EIP158Block:    new(big.Int),
+			},
 		}
 	}
 

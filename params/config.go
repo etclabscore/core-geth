@@ -487,7 +487,6 @@ var (
 	TestRules = TestChainConfig.Rules(new(big.Int))
 )
 
-
 func EthashBlockReward(c *paramtypes.ChainConfig, n *big.Int) *big.Int {
 	// if c.Ethash == nil {
 	// 	panic("non ethash config called EthashBlockReward")
@@ -497,19 +496,30 @@ func EthashBlockReward(c *paramtypes.ChainConfig, n *big.Int) *big.Int {
 	if c == nil || n == nil {
 		return blockReward
 	}
-	// Because the map is not necessarily sorted low-high, we
-	// have to ensure that we're walking upwards only.
-	var lastActivation *big.Int
-	for activation, reward := range c.BlockRewardSchedule {
-		activationBig := big.NewInt(int64(activation))
-		if paramtypes.IsForked(activationBig, n) {
-			if lastActivation == nil {
-				lastActivation = new(big.Int).Set(activationBig)
-			}
-			if activationBig.Cmp(lastActivation) >= 0 {
-				blockReward = reward
+
+	if len(c.BlockRewardSchedule) > 0 {
+		// Because the map is not necessarily sorted low-high, we
+		// have to ensure that we're walking upwards only.
+		var lastActivation *big.Int
+		for activation, reward := range c.BlockRewardSchedule {
+			activationBig := big.NewInt(int64(activation))
+			if paramtypes.IsForked(activationBig, n) {
+				if lastActivation == nil {
+					lastActivation = new(big.Int).Set(activationBig)
+				}
+				if activationBig.Cmp(lastActivation) >= 0 {
+					blockReward = reward
+				}
 			}
 		}
+		return blockReward
 	}
+
+	if c.IsEIP1234F(n) {
+		blockReward = EIP1234FBlockReward
+	} else if c.IsEIP649F(n) {
+		blockReward = EIP649FBlockReward
+	}
+
 	return blockReward
 }

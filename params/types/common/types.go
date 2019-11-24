@@ -19,11 +19,42 @@ package common
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"math/big"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/common/math"
 )
+
+type UnsupportedConfigErr error
+
+var (
+	ErrUnsupportedConfigNoop  UnsupportedConfigErr = errors.New("aset")
+	ErrUnsupportedConfigFatal UnsupportedConfigErr = errors.New("unsupported config value (fatal)")
+)
+
+type ErrUnsupportedConfig struct {
+	Err    error
+	Method string
+	Value  interface{}
+}
+
+func (e ErrUnsupportedConfig) Error() string {
+	return fmt.Sprintf("%v: , field: %s, value: %v", e.Err, e.Method, e.Value)
+}
+
+func IsFatalUnsupportedErr(err error) bool {
+	return err == ErrUnsupportedConfigFatal
+}
+
+func UnsupportedConfigError(err error, method string, value interface{}) ErrUnsupportedConfig {
+	return ErrUnsupportedConfig{
+		Err:    err,
+		Method: method,
+		Value:  value,
+	}
+}
 
 // Uint64BigValOrMapHex is an encoding type for Parity's chain config,
 // used for their 'blockReward' field.

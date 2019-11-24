@@ -285,7 +285,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 	spec.Params.AccountStartNonce = hexutilUint64(0)
 	spec.Params.MaximumExtraDataSize = hexutilUint64(params.MaximumExtraDataSize)
 	spec.Params.MinGasLimit = hexutilUint64(params.MinGasLimit)
-	spec.Params.GasLimitBoundDivisor = (math.HexOrDecimal64)(params.GasLimitBoundDivisor)
+	spec.Params.GasLimitBoundDivisor = hexutilUint64(params.GasLimitBoundDivisor)
 	spec.Params.NetworkID = hexutilUint64(genesis.Config.NetworkID)
 	if id := genesis.Config.ChainID; id != nil {
 		spec.Params.ChainID = hexutilUint64(id.Uint64())

@@ -2,37 +2,13 @@ package convert
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"reflect"
 	"strings"
 
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/common"
 )
-
-var ErrUnsupportedConfigNoop = errors.New("unsupported config value (ineffectual)")
-var ErrUnsupportedConfigFatal = errors.New("unsupported config value (fatal)")
-
-type ErrUnsupportedConfig struct {
-	Err    error
-	Method string
-	Value  interface{}
-}
-
-func (e ErrUnsupportedConfig) Error() string {
-	return fmt.Sprintf("%v: , field: %s, value: %v", e.Err, e.Method, e.Value)
-}
-
-func (e ErrUnsupportedConfig) IsFatal() bool {
-	return e.Err == ErrUnsupportedConfigFatal
-}
-
-func unsupportedConfigError(err error, method string, value interface{}) ErrUnsupportedConfig {
-	return ErrUnsupportedConfig{
-		Err:    err,
-		Method: method,
-		Value:  value,
-	}
-}
 
 func Convert(from, to *paramtypes.ChainConfigurator) error {
 	if _, ok := (*from).(paramtypes.ChainConfigurator); !ok {
@@ -43,7 +19,7 @@ func Convert(from, to *paramtypes.ChainConfigurator) error {
 	}
 
 	// Automagically translate between [Must|]Setters and Getters.
-	magic := func (k reflect.Type) error {
+	magic := func(k reflect.Type) error {
 		for i := 0; i < k.NumMethod(); i++ {
 			method := k.Method(i)
 
@@ -60,7 +36,12 @@ func Convert(from, to *paramtypes.ChainConfigurator) error {
 			setResponse := reflect.ValueOf(to).MethodByName(setterName).Call(response)
 
 			if !setResponse[0].IsNil() {
-				return unsupportedConfigError(setResponse[0].Interface().(error), strings.TrimPrefix(method.Name, "Get"), response[0].Interface())
+				err := setResponse[0].Interface().(error)
+				e := common.UnsupportedConfigError(err, strings.TrimPrefix(method.Name, "Get"), response[0].Interface())
+				if common.IsFatalUnsupportedErr(err) {
+					return e
+				}
+				log.Println(e) // FIXME?
 			}
 		}
 		return nil
@@ -76,7 +57,7 @@ func Convert(from, to *paramtypes.ChainConfigurator) error {
 			return err
 		}
 	default:
-		return unsupportedConfigError(ErrUnsupportedConfigFatal, "sealing type", paramtypes.BlockSealing_Unknown)
+		return common.UnsupportedConfigError(common.ErrUnsupportedConfigFatal, "sealing type", paramtypes.BlockSealing_Unknown)
 	}
 
 	// Set accounts (genesis).
@@ -91,7 +72,11 @@ func Convert(from, to *paramtypes.ChainConfigurator) error {
 	}
 
 	// Set consensus engine params.
-	switch (*from).GetConsensusEngineType() {
+	engineType := (*from).GetConsensusEngineType()
+	if err := (*to).MustSetConsensusEngineType(engineType); err != nil {
+		return common.UnsupportedConfigError(err, "consensus engine", engineType)
+	}
+	switch engineType {
 	case paramtypes.ConsensusEngineT_Ethash:
 		k := reflect.TypeOf((*paramtypes.EthashConfigurator)(nil)).Elem()
 		if err := magic(k); err != nil {
@@ -103,7 +88,7 @@ func Convert(from, to *paramtypes.ChainConfigurator) error {
 			return err
 		}
 	default:
-		return unsupportedConfigError(ErrUnsupportedConfigFatal, "consensus engine", paramtypes.ConsensusEngineT_Unknown)
+		return common.UnsupportedConfigError(common.ErrUnsupportedConfigFatal, "consensus engine", paramtypes.ConsensusEngineT_Unknown)
 	}
 
 	return nil

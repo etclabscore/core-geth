@@ -53,7 +53,7 @@ type ParityChainSpec struct {
 		AccountStartNonce         *ParityU64          `json:"accountStartNonce,omitempty"`
 		MaximumExtraDataSize      *ParityU64          `json:"maximumExtraDataSize,omitempty"`
 		MinGasLimit               *ParityU64          `json:"minGasLimit,omitempty"`
-		GasLimitBoundDivisor      math.HexOrDecimal64 `json:"gasLimitBoundDivisor,omitempty"`
+		GasLimitBoundDivisor      *ParityU64 `json:"gasLimitBoundDivisor,omitempty"`
 		NetworkID                 *ParityU64          `json:"networkID,omitempty"`
 		ChainID                   *ParityU64          `json:"chainID,omitempty"`
 		MaxCodeSize               *ParityU64          `json:"maxCodeSize,omitempty"`
@@ -147,6 +147,24 @@ func (i *ParityU64) Big() *big.Int {
 		return nil
 	}
 	return new(big.Int).SetUint64(uint64(*i))
+}
+
+func (i *ParityU64) Uint64P() *uint64 {
+	if i == nil {
+		return nil
+	}
+	u := uint64(*i)
+	return &u
+}
+
+func (i *ParityU64) SetUint64(n *uint64) *ParityU64 {
+	if n == nil {
+		i = nil
+		return i
+	}
+	u := ParityU64(*n)
+	*i = u
+	return i
 }
 
 // ParityChainSpecAccount is the prefunded genesis account and/or precompiled

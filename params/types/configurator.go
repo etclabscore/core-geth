@@ -100,7 +100,7 @@ func (c ConsensusEngineT) String() string {
 
 type ConsensusEnginator interface {
 	GetConsensusEngineType() ConsensusEngineT
-	MustSetConsensusEngineType(ConsensusEngineT)
+	MustSetConsensusEngineType(ConsensusEngineT) error
 	EthashConfigurator
 	CliqueConfigurator
 }
@@ -110,6 +110,8 @@ type EthashConfigurator interface {
 	SetEthashMinimumDifficulty(*big.Int) error
 	GetEthashDifficultyBoundDivisor() *big.Int
 	SetEthashDifficultyBoundDivisor(*big.Int) error
+	GetEthashDurationLimit() *big.Int
+	SetEthashDurationLimit(*big.Int) error
 	GetEthashHomesteadTransition() *big.Int
 	SetEthashHomesteadTransition(*big.Int) error
 	GetEthashEIP2Transition() *big.Int

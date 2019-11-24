@@ -454,6 +454,7 @@ func ParityConfigToMultiGethGenesis(c *parity.ParityChainSpec) (*paramtypes.Gene
 
 		mgc.Ethash = &goethereum.EthashConfig{}
 
+		params.MinimumDifficulty = pars.MinimumDifficulty.ToInt()
 		mgc.HomesteadBlock = pars.HomesteadTransition.Big()
 		mgc.EIP100FBlock = pars.EIP100bTransition.Big()
 		mgc.DisposalBlock = pars.BombDefuseTransition.Big()

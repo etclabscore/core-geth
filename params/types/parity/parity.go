@@ -67,33 +67,33 @@ type ParityChainSpec struct {
 	} `json:"engine"`
 
 	Params struct {
-		AccountStartNonce         *ParityU64          `json:"accountStartNonce,omitempty"`
-		MaximumExtraDataSize      *ParityU64          `json:"maximumExtraDataSize,omitempty"`
-		MinGasLimit               *ParityU64          `json:"minGasLimit,omitempty"`
+		AccountStartNonce         *ParityU64 `json:"accountStartNonce,omitempty"`
+		MaximumExtraDataSize      *ParityU64 `json:"maximumExtraDataSize,omitempty"`
+		MinGasLimit               *ParityU64 `json:"minGasLimit,omitempty"`
 		GasLimitBoundDivisor      *ParityU64 `json:"gasLimitBoundDivisor,omitempty"`
-		NetworkID                 *ParityU64          `json:"networkID,omitempty"`
-		ChainID                   *ParityU64          `json:"chainID,omitempty"`
-		MaxCodeSize               *ParityU64          `json:"maxCodeSize,omitempty"`
-		MaxCodeSizeTransition     *ParityU64          `json:"maxCodeSizeTransition,omitempty"`
-		EIP98Transition           *ParityU64          `json:"eip98Transition,omitempty"`
-		EIP150Transition          *ParityU64          `json:"eip150Transition,omitempty"`
-		EIP160Transition          *ParityU64          `json:"eip160Transition,omitempty"`
-		EIP161abcTransition       *ParityU64          `json:"eip161abcTransition,omitempty"`
-		EIP161dTransition         *ParityU64          `json:"eip161dTransition,omitempty"`
-		EIP155Transition          *ParityU64          `json:"eip155Transition,omitempty"`
-		EIP140Transition          *ParityU64          `json:"eip140Transition,omitempty"`
-		EIP211Transition          *ParityU64          `json:"eip211Transition,omitempty"`
-		EIP214Transition          *ParityU64          `json:"eip214Transition,omitempty"`
-		EIP658Transition          *ParityU64          `json:"eip658Transition,omitempty"`
-		EIP145Transition          *ParityU64          `json:"eip145Transition,omitempty"`
-		EIP1014Transition         *ParityU64          `json:"eip1014Transition,omitempty"`
-		EIP1052Transition         *ParityU64          `json:"eip1052Transition,omitempty"`
-		EIP1283Transition         *ParityU64          `json:"eip1283Transition,omitempty"`
-		EIP1283DisableTransition  *ParityU64          `json:"eip1283DisableTransition,omitempty"`
-		EIP1283ReenableTransition *ParityU64          `json:"eip1283ReenableTransition,omitempty"`
-		EIP1344Transition         *ParityU64          `json:"eip1344Transition,omitempty"`
-		EIP1884Transition         *ParityU64          `json:"eip1884Transition,omitempty"`
-		EIP2028Transition         *ParityU64          `json:"eip2028Transition,omitempty"`
+		NetworkID                 *ParityU64 `json:"networkID,omitempty"`
+		ChainID                   *ParityU64 `json:"chainID,omitempty"`
+		MaxCodeSize               *ParityU64 `json:"maxCodeSize,omitempty"`
+		MaxCodeSizeTransition     *ParityU64 `json:"maxCodeSizeTransition,omitempty"`
+		EIP98Transition           *ParityU64 `json:"eip98Transition,omitempty"`
+		EIP150Transition          *ParityU64 `json:"eip150Transition,omitempty"`
+		EIP160Transition          *ParityU64 `json:"eip160Transition,omitempty"`
+		EIP161abcTransition       *ParityU64 `json:"eip161abcTransition,omitempty"`
+		EIP161dTransition         *ParityU64 `json:"eip161dTransition,omitempty"`
+		EIP155Transition          *ParityU64 `json:"eip155Transition,omitempty"`
+		EIP140Transition          *ParityU64 `json:"eip140Transition,omitempty"`
+		EIP211Transition          *ParityU64 `json:"eip211Transition,omitempty"`
+		EIP214Transition          *ParityU64 `json:"eip214Transition,omitempty"`
+		EIP658Transition          *ParityU64 `json:"eip658Transition,omitempty"`
+		EIP145Transition          *ParityU64 `json:"eip145Transition,omitempty"`
+		EIP1014Transition         *ParityU64 `json:"eip1014Transition,omitempty"`
+		EIP1052Transition         *ParityU64 `json:"eip1052Transition,omitempty"`
+		EIP1283Transition         *ParityU64 `json:"eip1283Transition,omitempty"`
+		EIP1283DisableTransition  *ParityU64 `json:"eip1283DisableTransition,omitempty"`
+		EIP1283ReenableTransition *ParityU64 `json:"eip1283ReenableTransition,omitempty"`
+		EIP1344Transition         *ParityU64 `json:"eip1344Transition,omitempty"`
+		EIP1884Transition         *ParityU64 `json:"eip1884Transition,omitempty"`
+		EIP2028Transition         *ParityU64 `json:"eip2028Transition,omitempty"`
 
 		ForkBlock     *ParityU64   `json:"forkBlock,omitempty"`
 		ForkCanonHash *common.Hash `json:"forkCanonHash,omitempty"`
@@ -279,6 +279,29 @@ type ParityChainSpecBlakePricing struct {
 	GasPerRound uint64 `json:"gas_per_round"`
 }
 
+func (spec *ParityChainSpec) GetPrecompile(address common.Address, pricing ParityChainSpecPricing) *ParityU64 {
+	if spec.Accounts == nil {
+		return nil
+	}
+	acc, ok := spec.Accounts[common.UnprefixedAddress(address)]
+	if !ok || acc.Builtin == nil || acc.Builtin.Pricing == nil {
+		return nil
+	}
+	if acc.Builtin.Pricing.Map != nil {
+		for k, v := range acc.Builtin.Pricing.Map {
+			if reflect.DeepEqual(v.ParityChainSpecPricing, pricing) {
+				activation := ParityU64(k.ToInt().Uint64())
+				return &activation
+			}
+		}
+		return nil
+	}
+	if reflect.DeepEqual(acc.Builtin.Pricing.Pricing, pricing) {
+		return acc.Builtin.ActivateAt
+	}
+	return nil
+}
+
 func (spec *ParityChainSpec) SetPrecompile(address byte, data *ParityChainSpecBuiltin) {
 	if spec.Accounts == nil {
 		spec.Accounts = make(map[common.UnprefixedAddress]*ParityChainSpecAccount)
@@ -288,4 +311,36 @@ func (spec *ParityChainSpec) SetPrecompile(address byte, data *ParityChainSpecBu
 		spec.Accounts[a] = &ParityChainSpecAccount{}
 	}
 	spec.Accounts[a].Builtin = data
+}
+
+func (spec *ParityChainSpec) SetPrecompile2(address common.Address, name string, activationBlock *uint64, pricing ParityChainSpecPricing) {
+	if activationBlock == nil {
+		return
+	}
+	if spec.Accounts == nil {
+		spec.Accounts = make(map[common.UnprefixedAddress]*ParityChainSpecAccount)
+	}
+	if _, exist := spec.Accounts[common.UnprefixedAddress(address)]; !exist {
+		spec.Accounts[common.UnprefixedAddress(address)] = &ParityChainSpecAccount{}
+	}
+
+	bin := spec.Accounts[common.UnprefixedAddress(address)].Builtin
+	if bin == nil {
+		bin = &ParityChainSpecBuiltin{}
+	}
+	defer func() {
+		spec.Accounts[common.UnprefixedAddress(address)].Builtin = bin
+	}()
+
+	bin.Name = name
+	if bin.Pricing == nil {
+		bin.Pricing = &ParityChainSpecPricingMaybe{
+			Map:     make(map[*math.HexOrDecimal256]ParityChainSpecPricingPrice),
+			Pricing: nil,
+		}
+	}
+	bin.Pricing.Map[math.NewHexOrDecimal256(int64(*activationBlock))] = ParityChainSpecPricingPrice{
+		ParityChainSpecPricing: pricing,
+	}
+	return
 }

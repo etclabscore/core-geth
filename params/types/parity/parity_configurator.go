@@ -4,10 +4,13 @@ import (
 	"math/big"
 	"reflect"
 
+	math2 "math"
+
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/core/types"
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
-	"github.com/ethereum/go-ethereum/common/math"
 )
 
 var zero = uint64(0)
@@ -101,7 +104,8 @@ func (spec *ParityChainSpec) GetEIP98Transition() *uint64 {
 }
 
 func (spec *ParityChainSpec) SetEIP98Transition(i *uint64) error {
-	spec.Params.EIP98Transition = new(ParityU64).SetUint64(i)
+	max := uint64(math2.MaxInt64)
+	spec.Params.EIP98Transition = new(ParityU64).SetUint64(&max)
 	return nil
 }
 
@@ -267,6 +271,153 @@ func (spec *ParityChainSpec) SetEIP2028Transition(i *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetEIP152Transition() *uint64 {
+	at := common.BytesToAddress([]byte{9})
+	return spec.GetPrecompile(at, ParityChainSpecPricing{
+		Blake2F: &ParityChainSpecBlakePricing{
+			GasPerRound: 1,
+		},
+	}).Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP152Transition(i *uint64) error {
+	spec.SetPrecompile2(common.BytesToAddress([]byte{9}), "blake2_f", i, ParityChainSpecPricing{
+		Blake2F: &ParityChainSpecBlakePricing{
+			GasPerRound: 1,
+		},
+	})
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP170Transition() *uint64 {
+	return spec.Params.MaxCodeSizeTransition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP170Transition(i *uint64) error {
+	spec.Params.MaxCodeSizeTransition = new(ParityU64).SetUint64(i)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP198Transition() *uint64 {
+	return spec.GetPrecompile(common.BytesToAddress([]byte{5}), ParityChainSpecPricing{
+		ModExp: &ParityChainSpecModExpPricing{
+			Divisor: 20,
+		},
+	}).Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP198Transition(n *uint64) error {
+	spec.SetPrecompile2(common.BytesToAddress([]byte{5}), "modexp", n, ParityChainSpecPricing{
+		ModExp: &ParityChainSpecModExpPricing{
+			Divisor: 20,
+		},
+	})
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP212Transition() *uint64 {
+	return spec.GetPrecompile(common.BytesToAddress([]byte{8}),
+		ParityChainSpecPricing{
+			AltBnPairing: &ParityChainSpecAltBnPairingPricing{
+				Base: 100000,
+				Pair: 80000,
+			},
+		}).Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP212Transition(n *uint64) error {
+	spec.SetPrecompile2(common.BytesToAddress([]byte{8}), "alt_bn128_pairing", n, ParityChainSpecPricing{
+		AltBnPairing: &ParityChainSpecAltBnPairingPricing{
+			Base: 100000,
+			Pair: 80000,
+		},
+	})
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP213Transition() *uint64 {
+	x := spec.GetPrecompile(common.BytesToAddress([]byte{6}),
+		ParityChainSpecPricing{
+			AltBnConstOperation: &ParityChainSpecAltBnConstOperationPricing{
+				Price: 500,
+			},
+		}).Uint64P()
+
+	y := spec.GetPrecompile(common.BytesToAddress([]byte{7}),
+		ParityChainSpecPricing{
+			AltBnConstOperation: &ParityChainSpecAltBnConstOperationPricing{
+				Price: 40000,
+			},
+		}).Uint64P()
+	if x != y {
+		panic("eip213 activation mismatch")
+	}
+	return x
+}
+
+func (spec *ParityChainSpec) SetEIP213Transition(n *uint64) error {
+	spec.SetPrecompile2(common.BytesToAddress([]byte{6}), "alt_bn128_add", n, ParityChainSpecPricing{
+		AltBnConstOperation: &ParityChainSpecAltBnConstOperationPricing{
+			Price: 500,
+		},
+	})
+	spec.SetPrecompile2(common.BytesToAddress([]byte{7}), "alt_bn128_mul", n, ParityChainSpecPricing{
+		AltBnConstOperation: &ParityChainSpecAltBnConstOperationPricing{
+			Price: 40000,
+		},
+	})
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP1108Transition() *uint64 {
+	x := spec.GetPrecompile(common.BytesToAddress([]byte{6}),
+		ParityChainSpecPricing{
+			AltBnConstOperation: &ParityChainSpecAltBnConstOperationPricing{
+				Price: 150,
+			},
+		}).Uint64P()
+
+	y := spec.GetPrecompile(common.BytesToAddress([]byte{7}),
+		ParityChainSpecPricing{
+			AltBnConstOperation: &ParityChainSpecAltBnConstOperationPricing{
+				Price: 6000,
+			},
+		}).Uint64P()
+
+	z := spec.GetPrecompile(common.BytesToAddress([]byte{8}),
+		ParityChainSpecPricing{
+			AltBnPairing: &ParityChainSpecAltBnPairingPricing{
+				Base: 45000,
+				Pair: 34000,
+			},
+		}).Uint64P()
+
+	if x != y || y != z {
+		panic("eip1108 activation mismatch")
+	}
+	return x
+}
+
+func (spec *ParityChainSpec) SetEIP1108Transition(n *uint64) error {
+	spec.SetPrecompile2(common.BytesToAddress([]byte{6}), "alt_bn128_add", n, ParityChainSpecPricing{
+		AltBnConstOperation: &ParityChainSpecAltBnConstOperationPricing{
+			Price: 150,
+		},
+	})
+	spec.SetPrecompile2(common.BytesToAddress([]byte{7}), "alt_bn128_mul", n, ParityChainSpecPricing{
+		AltBnConstOperation: &ParityChainSpecAltBnConstOperationPricing{
+			Price: 6000,
+		},
+	})
+	spec.SetPrecompile2(common.BytesToAddress([]byte{8}), "alt_bn128_pairing", n, ParityChainSpecPricing{
+		AltBnPairing: &ParityChainSpecAltBnPairingPricing{
+			Base: 45000,
+			Pair: 34000,
+		},
+	})
+	return nil
+}
+
 func (spec *ParityChainSpec) IsForked(fn func(*big.Int) bool, n *big.Int) bool {
 	if n == nil || fn == nil {
 		return false
@@ -378,7 +529,7 @@ func (spec *ParityChainSpec) SetEthashECIP1010ContinueTransition(n *big.Int) err
 		return nil
 	}
 	nn := n.Uint64()
-	spec.Engine.Ethash.Params.ECIP1010ContinueTransition= new(ParityU64).SetUint64(&nn)
+	spec.Engine.Ethash.Params.ECIP1010ContinueTransition = new(ParityU64).SetUint64(&nn)
 	return nil
 }
 
@@ -387,12 +538,7 @@ func (spec *ParityChainSpec) GetEthashECIP1017Transition() *big.Int {
 }
 
 func (spec *ParityChainSpec) SetEthashECIP1017Transition(n *big.Int) error {
-	if n == nil {
-		return nil
-	}
-	nn := n.Uint64()
-	spec.Engine.Ethash.Params.ECIP1017Transition= new(ParityU64).SetUint64(&nn)
-	return nil
+	return common2.ErrUnsupportedConfigNoop
 }
 
 func (spec *ParityChainSpec) GetEthashECIP1017EraRounds() *big.Int {
@@ -404,7 +550,7 @@ func (spec *ParityChainSpec) SetEthashECIP1017EraRounds(n *big.Int) error {
 		return nil
 	}
 	nn := n.Uint64()
-	spec.Engine.Ethash.Params.ECIP1017EraRounds= new(ParityU64).SetUint64(&nn)
+	spec.Engine.Ethash.Params.ECIP1017EraRounds = new(ParityU64).SetUint64(&nn)
 	return nil
 }
 
@@ -417,7 +563,7 @@ func (spec *ParityChainSpec) SetEthashEIP100BTransition(n *big.Int) error {
 		return nil
 	}
 	nn := n.Uint64()
-	spec.Engine.Ethash.Params.EIP100bTransition= new(ParityU64).SetUint64(&nn)
+	spec.Engine.Ethash.Params.EIP100bTransition = new(ParityU64).SetUint64(&nn)
 	return nil
 }
 
@@ -430,118 +576,172 @@ func (spec *ParityChainSpec) SetEthashECIP1041Transition(n *big.Int) error {
 		return nil
 	}
 	nn := n.Uint64()
-	spec.Engine.Ethash.Params.BombDefuseTransition= new(ParityU64).SetUint64(&nn)
+	spec.Engine.Ethash.Params.BombDefuseTransition = new(ParityU64).SetUint64(&nn)
 	return nil
 }
 
 func (spec *ParityChainSpec) GetEthashDifficultyBombDelaySchedule() common2.Uint64BigMapEncodesHex {
-	panic("implement me")
+	return spec.Engine.Ethash.Params.DifficultyBombDelays
 }
 
-func (spec *ParityChainSpec) SetEthashDifficultyBombDelaySchedule(common2.Uint64BigMapEncodesHex) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetEthashDifficultyBombDelaySchedule(input common2.Uint64BigMapEncodesHex) error {
+	spec.Engine.Ethash.Params.DifficultyBombDelays = input
+	return nil
 }
 
 func (spec *ParityChainSpec) GetEthashBlockRewardSchedule() common2.Uint64BigMapEncodesHex {
-	panic("implement me")
+	return common2.Uint64BigMapEncodesHex(spec.Engine.Ethash.Params.BlockReward)
 }
 
-func (spec *ParityChainSpec) SetEthashBlockRewardSchedule(common2.Uint64BigMapEncodesHex) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetEthashBlockRewardSchedule(input common2.Uint64BigMapEncodesHex) error {
+	spec.Engine.Ethash.Params.BlockReward = common2.Uint64BigValOrMapHex(input)
+	return nil
 }
 
 func (spec *ParityChainSpec) GetCliquePeriod() *uint64 {
-	panic("implement me")
+	return spec.Engine.Clique.Params.Period.Uint64P()
 }
 
-func (spec *ParityChainSpec) SetCliquePeriod(uint64) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetCliquePeriod(i uint64) error {
+	spec.Engine.Clique.Params.Period = new(ParityU64).SetUint64(&i)
+	return nil
 }
 
 func (spec *ParityChainSpec) GetCliqueEpoch() *uint64 {
-	panic("implement me")
+	return spec.Engine.Clique.Params.Epoch.Uint64P()
 }
 
-func (spec *ParityChainSpec) SetCliqueEpoch(uint64) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetCliqueEpoch(i uint64) error {
+	spec.Engine.Clique.Params.Epoch = new(ParityU64).SetUint64(&i)
+	return nil
 }
 
 func (spec *ParityChainSpec) GetSealingType() paramtypes.BlockSealingT {
-	panic("implement me")
+	if !reflect.DeepEqual(spec.Genesis.Seal.Ethereum, reflect.Zero(reflect.TypeOf(spec.Genesis.Seal.Ethereum)).Interface()) {
+		return paramtypes.BlockSealing_Ethereum
+	}
+	return paramtypes.BlockSealing_Unknown
 }
 
-func (spec *ParityChainSpec) SetSealingType(paramtypes.BlockSealer) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetSealingType(in paramtypes.BlockSealingT) error {
+	switch in {
+	case paramtypes.BlockSealing_Ethereum:
+	}
+	return common2.ErrUnsupportedConfigFatal
 }
 
-func (spec *ParityChainSpec) GetGenesisSealerNonce() uint64 {
-	panic("implement me")
+func (spec *ParityChainSpec) GetGenesisSealerEthereumNonce() uint64 {
+	return spec.Genesis.Seal.Ethereum.Nonce.Uint64()
 }
 
-func (spec *ParityChainSpec) SetGenesisSealerNonce(uint64) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetGenesisSealerEthereumNonce(i uint64) error {
+	spec.Genesis.Seal.Ethereum.Nonce = types.EncodeNonce(i)
+	return nil
 }
 
-func (spec *ParityChainSpec) GetGenesisSealerMixHash() common.Hash {
-	panic("implement me")
+func (spec *ParityChainSpec) GetGenesisSealerEthereumMixHash() common.Hash {
+	return common.BytesToHash(spec.Genesis.Seal.Ethereum.MixHash)
 }
 
-func (spec *ParityChainSpec) SetGenesisSealerMixHash(common.Hash) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetGenesisSealerEthereumMixHash(input common.Hash) error {
+	spec.Genesis.Seal.Ethereum.MixHash = input[:]
+	return nil
 }
 
 func (spec *ParityChainSpec) GetGenesisDifficulty() *big.Int {
-	panic("implement me")
+	return spec.Genesis.Difficulty.ToInt()
 }
 
-func (spec *ParityChainSpec) SetGenesisDifficulty(*big.Int) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetGenesisDifficulty(i *big.Int) error {
+	spec.Genesis.Difficulty = math.NewHexOrDecimal256(i.Int64())
+	return nil
 }
 
 func (spec *ParityChainSpec) GetGenesisAuthor() common.Address {
-	panic("implement me")
+	return spec.Genesis.Author
 }
 
-func (spec *ParityChainSpec) SetGenesisAuthor(common.Address) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetGenesisAuthor(input common.Address) error {
+	spec.Genesis.Author = input
+	return nil
 }
 
 func (spec *ParityChainSpec) GetGenesisTimestamp() uint64 {
-	panic("implement me")
+	return uint64(spec.Genesis.Timestamp)
 }
 
-func (spec *ParityChainSpec) SetGenesisTimestamp(uint64) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetGenesisTimestamp(i uint64) error {
+	spec.Genesis.Timestamp = math.HexOrDecimal64(i)
+	return nil
 }
 
 func (spec *ParityChainSpec) GetGenesisParentHash() common.Hash {
-	panic("implement me")
+	return spec.Genesis.ParentHash
 }
 
-func (spec *ParityChainSpec) SetGenesisParentHash(common.Hash) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetGenesisParentHash(input common.Hash) error {
+	spec.Genesis.ParentHash = input
+	return nil
 }
 
 func (spec *ParityChainSpec) GetGenesisExtraData() common.Hash {
-	panic("implement me")
+	return common.BytesToHash(spec.Genesis.ExtraData)
 }
 
-func (spec *ParityChainSpec) SetGenesisExtraData(common.Hash) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetGenesisExtraData(input common.Hash) error {
+	spec.Genesis.ExtraData = input[:]
+	return nil
 }
 
 func (spec *ParityChainSpec) GetGenesisGasLimit() uint64 {
-	panic("implement me")
+	return uint64(spec.Genesis.GasLimit)
 }
 
-func (spec *ParityChainSpec) SetGenesisGasLimit(uint64) error {
-	panic("implement me")
+func (spec *ParityChainSpec) SetGenesisGasLimit(i uint64) error {
+	spec.Genesis.GasLimit = math.HexOrDecimal64(i)
+	return nil
 }
 
-func (spec *ParityChainSpec) ForEachAccount(fn paramtypes.AccountIteratorFn) error {
-	panic("implement me")
+func (spec *ParityChainSpec) ForEachAccount(fn func(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error) error {
+	var err error
+	for k, v := range spec.Accounts {
+		err = fn(common.Address(k), v.Balance.ToInt(), uint64(v.Nonce), v.Code, v.Storage)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (spec *ParityChainSpec) SetPlainAccount(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error {
-	panic("implement me")
+func (spec *ParityChainSpec) UpdateAccount(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error {
+	addr := common.UnprefixedAddress(address)
+	if spec.Accounts == nil {
+		spec.Accounts = make(map[common.UnprefixedAddress]*ParityChainSpecAccount)
+	}
+	_, ok := spec.Accounts[addr]
+	if !ok {
+		spec.Accounts[addr] = &ParityChainSpecAccount{}
+	}
+	spec.Accounts[addr].Balance = *math.NewHexOrDecimal256(bal.Int64())
+	spec.Accounts[addr].Nonce = math.HexOrDecimal64(nonce)
+
+	switch address {
+	case common.BytesToAddress([]byte{1}):
+		spec.SetPrecompile(1, &ParityChainSpecBuiltin{
+			Name: "ecrecover", Pricing: &ParityChainSpecPricingMaybe{Pricing: &ParityChainSpecPricing{Linear: &ParityChainSpecLinearPricing{Base: 3000}}},
+		})
+	case common.BytesToAddress([]byte{2}):
+		spec.SetPrecompile(2, &ParityChainSpecBuiltin{
+			Name: "sha256", Pricing: &ParityChainSpecPricingMaybe{Pricing: &ParityChainSpecPricing{Linear: &ParityChainSpecLinearPricing{Base: 60, Word: 12}}},
+		})
+	case common.BytesToAddress([]byte{3}):
+		spec.SetPrecompile(3, &ParityChainSpecBuiltin{
+			Name: "ripemd160", Pricing: &ParityChainSpecPricingMaybe{Pricing: &ParityChainSpecPricing{Linear: &ParityChainSpecLinearPricing{Base: 600, Word: 120}}},
+		})
+	case common.BytesToAddress([]byte{4}):
+		spec.SetPrecompile(4, &ParityChainSpecBuiltin{
+			Name: "identity", Pricing: &ParityChainSpecPricingMaybe{Pricing: &ParityChainSpecPricing{Linear: &ParityChainSpecLinearPricing{Base: 15, Word: 3}}},
+		})
+	}
+	return nil
 }

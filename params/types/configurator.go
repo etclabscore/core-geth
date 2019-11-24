@@ -5,7 +5,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
-
 )
 
 type ChainConfigurator interface {
@@ -19,68 +18,81 @@ type ChainConfigurator interface {
 
 type CatHerder interface {
 	GetAccountStartNonce() *uint64
-	SetAccountStartNonce(*uint64) error
+	SetAccountStartNonce(n *uint64) error
 	GetMaximumExtraDataSize() *uint64
-	SetMaximumExtraDataSize(*uint64) error
+	SetMaximumExtraDataSize(n *uint64) error
 	GetMinGasLimit() *uint64
-	SetMinGasLimit(*uint64) error
+	SetMinGasLimit(n *uint64) error
 	GetGasLimitBoundDivisor() *uint64
-	SetGasLimitBoundDivisor(*uint64) error
+	SetGasLimitBoundDivisor(n *uint64) error
 	GetNetworkID() *uint64
-	SetNetworkID(*uint64) error
+	SetNetworkID(n *uint64) error
 	GetChainID() *uint64
-	SetChainID(*uint64) error
+	SetChainID(n *uint64) error
 	GetMaxCodeSize() *uint64
-	SetMaxCodeSize(*uint64) error
+	SetMaxCodeSize(n *uint64) error
 	GetMaxCodeSizeTransition() *uint64
-	SetMaxCodeSizeTransition(*uint64) error
+	SetMaxCodeSizeTransition(n *uint64) error
 	GetEIP7Transition() *uint64
-	SetEIP7Transition(*uint64) error
+	SetEIP7Transition(n *uint64) error
 	GetEIP98Transition() *uint64
-	SetEIP98Transition(*uint64) error
+	SetEIP98Transition(n *uint64) error
 	GetEIP150Transition() *uint64
-	SetEIP150Transition(*uint64) error
+	SetEIP150Transition(n *uint64) error
+	GetEIP152Transition() *uint64
+	SetEIP152Transition(n *uint64) error
 	GetEIP160Transition() *uint64
-	SetEIP160Transition(*uint64) error
+	SetEIP160Transition(n *uint64) error
 	GetEIP161abcTransition() *uint64
-	SetEIP161abcTransition(*uint64) error
+	SetEIP161abcTransition(n *uint64) error
 	GetEIP161dTransition() *uint64
-	SetEIP161dTransition(*uint64) error
+	SetEIP161dTransition(n *uint64) error
+	GetEIP170Transition() *uint64
+	SetEIP170Transition(n *uint64) error
 	GetEIP155Transition() *uint64
-	SetEIP155Transition(*uint64) error
+	SetEIP155Transition(n *uint64) error
 	GetEIP140Transition() *uint64
-	SetEIP140Transition(*uint64) error
+	SetEIP140Transition(n *uint64) error
+	GetEIP198Transition() *uint64
+	SetEIP198Transition(n *uint64) error
 	GetEIP211Transition() *uint64
-	SetEIP211Transition(*uint64) error
+	SetEIP211Transition(n *uint64) error
+	GetEIP212Transition() *uint64
+	SetEIP212Transition(n *uint64) error
+	GetEIP213Transition() *uint64
+	SetEIP213Transition(n *uint64) error
 	GetEIP214Transition() *uint64
-	SetEIP214Transition(*uint64) error
+	SetEIP214Transition(n *uint64) error
 	GetEIP658Transition() *uint64
-	SetEIP658Transition(*uint64) error
+	SetEIP658Transition(n *uint64) error
 	GetEIP145Transition() *uint64
-	SetEIP145Transition(*uint64) error
+	SetEIP145Transition(n *uint64) error
+	GetEIP1108Transition() *uint64
+	SetEIP1108Transition(n *uint64) error
 	GetEIP1014Transition() *uint64
-	SetEIP1014Transition(*uint64) error
+	SetEIP1014Transition(n *uint64) error
 	GetEIP1052Transition() *uint64
-	SetEIP1052Transition(*uint64) error
+	SetEIP1052Transition(n *uint64) error
 	GetEIP1283Transition() *uint64
-	SetEIP1283Transition(*uint64) error
+	SetEIP1283Transition(n *uint64) error
 	GetEIP1283DisableTransition() *uint64
-	SetEIP1283DisableTransition(*uint64) error
+	SetEIP1283DisableTransition(n *uint64) error
 	GetEIP1283ReenableTransition() *uint64
-	SetEIP1283ReenableTransition(*uint64) error
+	SetEIP1283ReenableTransition(n *uint64) error
 	GetEIP1344Transition() *uint64
-	SetEIP1344Transition(*uint64) error
+	SetEIP1344Transition(n *uint64) error
 	GetEIP1884Transition() *uint64
-	SetEIP1884Transition(*uint64) error
+	SetEIP1884Transition(n *uint64) error
 	GetEIP2028Transition() *uint64
-	SetEIP2028Transition(*uint64) error
+	SetEIP2028Transition(n *uint64) error
 }
 
 type Forker interface {
-	IsForked(func(*big.Int) bool, *big.Int) bool
+	IsForked(fn func(*big.Int) bool, n *big.Int) bool
 }
 
 type ConsensusEngineT int
+
 const (
 	ConsensusEngineT_Unknown = iota
 	ConsensusEngineT_Ethash
@@ -100,34 +112,34 @@ func (c ConsensusEngineT) String() string {
 
 type ConsensusEnginator interface {
 	GetConsensusEngineType() ConsensusEngineT
-	MustSetConsensusEngineType(ConsensusEngineT) error
+	MustSetConsensusEngineType(t ConsensusEngineT) error
 	EthashConfigurator
 	CliqueConfigurator
 }
 
 type EthashConfigurator interface {
 	GetEthashMinimumDifficulty() *big.Int
-	SetEthashMinimumDifficulty(*big.Int) error
+	SetEthashMinimumDifficulty(i *big.Int) error
 	GetEthashDifficultyBoundDivisor() *big.Int
-	SetEthashDifficultyBoundDivisor(*big.Int) error
+	SetEthashDifficultyBoundDivisor(i *big.Int) error
 	GetEthashDurationLimit() *big.Int
-	SetEthashDurationLimit(*big.Int) error
+	SetEthashDurationLimit(i *big.Int) error
 	GetEthashHomesteadTransition() *big.Int
-	SetEthashHomesteadTransition(*big.Int) error
+	SetEthashHomesteadTransition(i *big.Int) error
 	GetEthashEIP2Transition() *big.Int
-	SetEthashEIP2Transition(*big.Int) error
+	SetEthashEIP2Transition(i *big.Int) error
 	GetEthashECIP1010PauseTransition() *big.Int
-	SetEthashECIP1010PauseTransition(*big.Int) error
+	SetEthashECIP1010PauseTransition(i *big.Int) error
 	GetEthashECIP1010ContinueTransition() *big.Int
-	SetEthashECIP1010ContinueTransition(*big.Int) error
+	SetEthashECIP1010ContinueTransition(i *big.Int) error
 	GetEthashECIP1017Transition() *big.Int
-	SetEthashECIP1017Transition(*big.Int) error
+	SetEthashECIP1017Transition(i *big.Int) error
 	GetEthashECIP1017EraRounds() *big.Int
-	SetEthashECIP1017EraRounds(*big.Int) error
+	SetEthashECIP1017EraRounds(i *big.Int) error
 	GetEthashEIP100BTransition() *big.Int
-	SetEthashEIP100BTransition(*big.Int) error
+	SetEthashEIP100BTransition(i *big.Int) error
 	GetEthashECIP1041Transition() *big.Int
-	SetEthashECIP1041Transition(*big.Int) error
+	SetEthashECIP1041Transition(i *big.Int) error
 
 	GetEthashDifficultyBombDelaySchedule() common2.Uint64BigMapEncodesHex
 	SetEthashDifficultyBombDelaySchedule(common2.Uint64BigMapEncodesHex) error
@@ -137,9 +149,9 @@ type EthashConfigurator interface {
 
 type CliqueConfigurator interface {
 	GetCliquePeriod() *uint64
-	SetCliquePeriod(uint64) error
+	SetCliquePeriod(n uint64) error
 	GetCliqueEpoch() *uint64
-	SetCliqueEpoch(uint64) error
+	SetCliqueEpoch(n uint64) error
 }
 
 type BlockSealingT int
@@ -160,31 +172,31 @@ func (b BlockSealingT) String() string {
 
 type BlockSealer interface {
 	GetSealingType() BlockSealingT
-	SetSealingType(BlockSealer) error
+	SetSealingType(BlockSealingT) error
 	BlockSealerEthereum
 }
 
 type BlockSealerEthereum interface {
-	GetGenesisSealerNonce() uint64
-	SetGenesisSealerNonce(uint64) error
-	GetGenesisSealerMixHash() common.Hash
-	SetGenesisSealerMixHash(common.Hash) error
+	GetGenesisSealerEthereumNonce() uint64
+	SetGenesisSealerEthereumNonce(n uint64) error
+	GetGenesisSealerEthereumMixHash() common.Hash
+	SetGenesisSealerEthereumMixHash(h common.Hash) error
 }
 
 type GenesisBlocker interface {
 	BlockSealer
 	GetGenesisDifficulty() *big.Int
-	SetGenesisDifficulty(*big.Int) error
+	SetGenesisDifficulty(i *big.Int) error
 	GetGenesisAuthor() common.Address
-	SetGenesisAuthor(common.Address) error
+	SetGenesisAuthor(a common.Address) error
 	GetGenesisTimestamp() uint64
-	SetGenesisTimestamp(uint64) error
+	SetGenesisTimestamp(u uint64) error
 	GetGenesisParentHash() common.Hash
-	SetGenesisParentHash(common.Hash) error
+	SetGenesisParentHash(h common.Hash) error
 	GetGenesisExtraData() common.Hash
-	SetGenesisExtraData(common.Hash) error
+	SetGenesisExtraData(h common.Hash) error
 	GetGenesisGasLimit() uint64
-	SetGenesisGasLimit(uint64) error
+	SetGenesisGasLimit(u uint64) error
 }
 
 //type BuiltinContractT int
@@ -208,11 +220,8 @@ type GenesisBlocker interface {
 //	SpecificationIP string
 //}
 
-type AccountIteratorFn func(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error
 type Accounter interface {
-	ForEachAccount(fn AccountIteratorFn) error
-	SetPlainAccount(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error
+	ForEachAccount(fn func(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error) error
+	UpdateAccount(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error
 	//SetBuiltin(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash, builtin *BuiltinT) error
 }
-
-

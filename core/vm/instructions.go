@@ -692,7 +692,7 @@ func opCreate(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memor
 		input        = memory.GetCopy(offset.Int64(), size.Int64())
 		gas          = contract.Gas
 	)
-	if interpreter.evm.chainRules.IsEIP150 {
+	if interpreter.evm.ChainConfig().IsEIP150(interpreter.evm.BlockNumber) {
 		gas -= gas / 64
 	}
 
@@ -702,7 +702,7 @@ func opCreate(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memor
 	// homestead we must check for CodeStoreOutOfGasError (homestead only
 	// rule) and treat as an error, if the ruleset is frontier we must
 	// ignore this error and pretend the operation was successful.
-	if interpreter.evm.chainRules.IsEIP2F && suberr == ErrCodeStoreOutOfGas {
+	if interpreter.evm.ChainConfig().IsEIP2F(interpreter.evm.BlockNumber) && suberr == ErrCodeStoreOutOfGas {
 		stack.push(interpreter.intPool.getZero())
 	} else if suberr != nil && suberr != ErrCodeStoreOutOfGas {
 		stack.push(interpreter.intPool.getZero())

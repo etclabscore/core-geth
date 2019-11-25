@@ -1,10 +1,9 @@
-package paramtypes
+package common
 
 import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
 )
 
 type ChainConfigurator interface {
@@ -90,8 +89,8 @@ type Forker interface {
 }
 
 type ConsensusEnginator interface {
-	GetConsensusEngineType() common2.ConsensusEngineT
-	MustSetConsensusEngineType(t common2.ConsensusEngineT) error
+	GetConsensusEngineType() ConsensusEngineT
+	MustSetConsensusEngineType(t ConsensusEngineT) error
 	EthashConfigurator
 	CliqueConfigurator
 }
@@ -120,10 +119,10 @@ type EthashConfigurator interface {
 	GetEthashECIP1041Transition() *big.Int
 	SetEthashECIP1041Transition(i *big.Int) error
 
-	GetEthashDifficultyBombDelaySchedule() common2.Uint64BigMapEncodesHex
-	SetEthashDifficultyBombDelaySchedule(m common2.Uint64BigMapEncodesHex) error
-	GetEthashBlockRewardSchedule() common2.Uint64BigMapEncodesHex
-	SetEthashBlockRewardSchedule(m common2.Uint64BigMapEncodesHex) error
+	GetEthashDifficultyBombDelaySchedule() Uint64BigMapEncodesHex
+	SetEthashDifficultyBombDelaySchedule(m Uint64BigMapEncodesHex) error
+	GetEthashBlockRewardSchedule() Uint64BigMapEncodesHex
+	SetEthashBlockRewardSchedule(m Uint64BigMapEncodesHex) error
 }
 
 type CliqueConfigurator interface {
@@ -134,8 +133,8 @@ type CliqueConfigurator interface {
 }
 
 type BlockSealer interface {
-	GetSealingType() common2.BlockSealingT
-	SetSealingType(common2.BlockSealingT) error
+	GetSealingType() BlockSealingT
+	SetSealingType(BlockSealingT) error
 	BlockSealerEthereum
 }
 

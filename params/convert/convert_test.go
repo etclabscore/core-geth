@@ -10,6 +10,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
+	"github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -59,7 +60,7 @@ func TestConvert(t *testing.T) {
 		t.Error(err)
 	}
 
-	if method, equal := Equal(reflect.TypeOf((*paramtypes.ChainConfigurator)(nil)), &spec, &spec2); !equal {
+	if method, equal := Equal(reflect.TypeOf((*common.ChainConfigurator)(nil)), &spec, &spec2); !equal {
 		t.Error("not equal", method)
 	}
 

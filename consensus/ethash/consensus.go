@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
 )
@@ -225,8 +226,8 @@ func (ethash *Ethash) VerifyUncles(chain consensus.ChainReader, block *types.Blo
 // See YP section 4.3.4. "Block Header Validity"
 func (ethash *Ethash) verifyHeader(chain consensus.ChainReader, header, parent *types.Header, uncle bool, seal bool) error {
 	// Ensure that the header's extra-data section is of a reasonable size
-	if uint64(len(header.Extra)) > params.MaximumExtraDataSize {
-		return fmt.Errorf("extra-data too long: %d > %d", len(header.Extra), params.MaximumExtraDataSize)
+	if uint64(len(header.Extra)) > vars.MaximumExtraDataSize {
+		return fmt.Errorf("extra-data too long: %d > %d", len(header.Extra), vars.MaximumExtraDataSize)
 	}
 	// Verify the header's timestamp
 	if !uncle {
@@ -258,9 +259,9 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainReader, header, parent *
 	if diff < 0 {
 		diff *= -1
 	}
-	limit := parent.GasLimit / params.GasLimitBoundDivisor
+	limit := parent.GasLimit / vars.GasLimitBoundDivisor
 
-	if uint64(diff) >= limit || header.GasLimit < params.MinGasLimit {
+	if uint64(diff) >= limit || header.GasLimit < vars.MinGasLimit {
 		return fmt.Errorf("invalid gas limit: have %d, want %d += %d", header.GasLimit, parent.GasLimit, limit)
 	}
 	// Verify that the block number is parent's +1
@@ -297,7 +298,7 @@ func parent_time_delta(t uint64, p *types.Header) *big.Int {
 
 // parent_diff_over_dbd is a  convenience fn for CalcDifficulty
 func parent_diff_over_dbd(p *types.Header) *big.Int {
-	return new(big.Int).Div(p.Difficulty, params.DifficultyBoundDivisor)
+	return new(big.Int).Div(p.Difficulty, vars.DifficultyBoundDivisor)
 }
 
 // CalcDifficulty is the difficulty adjustment algorithm. It returns
@@ -314,7 +315,7 @@ func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.H
 		// diff = (parent_diff +
 		//         (parent_diff / 2048 * max((2 if len(parent.uncles) else 1) - ((timestamp - parent.timestamp) // 9), -99))
 		//        ) + 2^(periodCount - 2)
-		out.Div(parent_time_delta(time, parent), params.EIP100FDifficultyIncrementDivisor)
+		out.Div(parent_time_delta(time, parent), vars.EIP100FDifficultyIncrementDivisor)
 
 		if parent.UncleHash == types.EmptyUncleHash {
 			out.Sub(big1, out)
@@ -331,7 +332,7 @@ func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.H
 		// diff = (parent_diff +
 		//         (parent_diff / 2048 * max(1 - (block_timestamp - parent_timestamp) // 10, -99))
 		//        )
-		out.Div(parent_time_delta(time, parent), params.EIP2DifficultyIncrementDivisor)
+		out.Div(parent_time_delta(time, parent), vars.EIP2DifficultyIncrementDivisor)
 		out.Sub(big1, out)
 		out.Set(math.BigMax(out, bigMinus99))
 		out.Mul(parent_diff_over_dbd(parent), out)
@@ -346,7 +347,7 @@ func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.H
 		//   else
 		//      parent_diff - (parent_diff // 2048)
 		out.Set(parent.Difficulty)
-		if parent_time_delta(time, parent).Cmp(params.DurationLimit) < 0 {
+		if parent_time_delta(time, parent).Cmp(vars.DurationLimit) < 0 {
 			out.Add(out, parent_diff_over_dbd(parent))
 		} else {
 			out.Sub(out, parent_diff_over_dbd(parent))
@@ -354,7 +355,7 @@ func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.H
 	}
 
 	// after adjustment and before bomb
-	out.Set(math.BigMax(out, params.MinimumDifficulty))
+	out.Set(math.BigMax(out, vars.MinimumDifficulty))
 
 	if config.IsBombDisposal(next) {
 		return out

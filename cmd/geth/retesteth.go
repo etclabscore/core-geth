@@ -45,6 +45,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
@@ -478,12 +479,12 @@ func (api *RetestethAPI) mineBlock() error {
 	// If we are care about TheDAO hard-fork check whether to override the extra-data or not
 	if daoBlock := api.chainConfig.DAOForkBlock; daoBlock != nil {
 		// Check whether the block is among the fork extra-override range
-		limit := new(big.Int).Add(daoBlock, params.DAOForkExtraRange)
+		limit := new(big.Int).Add(daoBlock, vars.DAOForkExtraRange)
 		if header.Number.Cmp(daoBlock) >= 0 && header.Number.Cmp(limit) < 0 {
 			// Depending whether we support or oppose the fork, override differently
 			if api.chainConfig.DAOForkSupport {
-				header.Extra = common.CopyBytes(params.DAOForkBlockExtra)
-			} else if bytes.Equal(header.Extra, params.DAOForkBlockExtra) {
+				header.Extra = common.CopyBytes(vars.DAOForkBlockExtra)
+			} else if bytes.Equal(header.Extra, vars.DAOForkBlockExtra) {
 				header.Extra = []byte{} // If miner opposes, don't let it use the reserved extra-data
 			}
 		}
@@ -500,7 +501,7 @@ func (api *RetestethAPI) mineBlock() error {
 	var txs []*types.Transaction
 	var receipts []*types.Receipt
 	var coalescedLogs []*types.Log
-	var blockFull = gasPool.Gas() < params.TxGas
+	var blockFull = gasPool.Gas() < vars.TxGas
 	for address := range api.txSenders {
 		if blockFull {
 			break
@@ -534,7 +535,7 @@ func (api *RetestethAPI) mineBlock() error {
 					delete(api.txSenders, address)
 				}
 				txCount++
-				if gasPool.Gas() < params.TxGas {
+				if gasPool.Gas() < vars.TxGas {
 					blockFull = true
 					break
 				}

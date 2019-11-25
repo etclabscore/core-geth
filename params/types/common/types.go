@@ -141,3 +141,39 @@ func (b Uint64BigMapEncodesHex) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(mm)
 }
+
+type ConsensusEngineT int
+
+const (
+	ConsensusEngineT_Unknown = iota
+	ConsensusEngineT_Ethash
+	ConsensusEngineT_Clique
+)
+
+func (c ConsensusEngineT) String() string {
+	switch c {
+	case ConsensusEngineT_Ethash:
+		return "ethash"
+	case ConsensusEngineT_Clique:
+		return "clique"
+	default:
+		return "unknown"
+	}
+}
+
+type BlockSealingT int
+
+const (
+	BlockSealing_Unknown = iota
+	BlockSealing_Ethereum
+)
+
+func (b BlockSealingT) String() string {
+	switch b {
+	case BlockSealing_Ethereum:
+		return "ethereum"
+	default:
+		return "unknown"
+	}
+}
+

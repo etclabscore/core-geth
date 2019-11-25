@@ -28,11 +28,11 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/parity"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func hexutilUint64(i uint64) *parity.ParityU64 {
@@ -63,11 +63,11 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 	if genesis.Config.Ethash != nil {
 		spec.Engine.Ethash.Params.DifficultyBombDelays = common2.Uint64BigMapEncodesHex{}
 		spec.Engine.Ethash.Params.BlockReward = common2.Uint64BigValOrMapHex{}
-		spec.Engine.Ethash.Params.BlockReward[0] = params.FrontierBlockReward
+		spec.Engine.Ethash.Params.BlockReward[0] = vars.FrontierBlockReward
 
-		spec.Engine.Ethash.Params.MinimumDifficulty = hexOrDecimal256FromBig(params.MinimumDifficulty)
-		spec.Engine.Ethash.Params.DifficultyBoundDivisor = hexOrDecimal256FromBig(params.DifficultyBoundDivisor)
-		spec.Engine.Ethash.Params.DurationLimit = hexOrDecimal256FromBig(params.DurationLimit)
+		spec.Engine.Ethash.Params.MinimumDifficulty = hexOrDecimal256FromBig(vars.MinimumDifficulty)
+		spec.Engine.Ethash.Params.DifficultyBoundDivisor = hexOrDecimal256FromBig(vars.DifficultyBoundDivisor)
+		spec.Engine.Ethash.Params.DurationLimit = hexOrDecimal256FromBig(vars.DurationLimit)
 
 		if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP100FBlock, genesis.Config.ByzantiumBlock); b != nil {
 			spec.Engine.Ethash.Params.EIP100bTransition = hexutilUint64(b.Uint64())
@@ -78,9 +78,9 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 				spec.Engine.Ethash.Params.BlockReward[k] = v
 			}
 		} else if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP1234FBlock, genesis.Config.ConstantinopleBlock); b != nil {
-			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = params.EIP1234FBlockReward
+			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = vars.EIP1234FBlockReward
 		} else if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP649FBlock, genesis.Config.ByzantiumBlock); b != nil {
-			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = params.EIP649FBlockReward
+			spec.Engine.Ethash.Params.BlockReward[b.Uint64()] = vars.EIP649FBlockReward
 		}
 
 		if genesis.Config.DifficultyBombDelaySchedule != nil && len(genesis.Config.DifficultyBombDelaySchedule) > 0 {
@@ -142,7 +142,7 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 	}
 	if b := paramtypes.FeatureOrMetaBlock(genesis.Config.EIP170FBlock, genesis.Config.EIP158Block); b != nil {
 		spec.Params.MaxCodeSizeTransition = hexutilUint64(b.Uint64())
-		size := parity.ParityU64(params.MaxCodeSize)
+		size := parity.ParityU64(vars.MaxCodeSize)
 		spec.Params.MaxCodeSize = &size
 	}
 
@@ -283,9 +283,9 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 	}
 
 	spec.Params.AccountStartNonce = hexutilUint64(0)
-	spec.Params.MaximumExtraDataSize = hexutilUint64(params.MaximumExtraDataSize)
-	spec.Params.MinGasLimit = hexutilUint64(params.MinGasLimit)
-	spec.Params.GasLimitBoundDivisor = hexutilUint64(params.GasLimitBoundDivisor)
+	spec.Params.MaximumExtraDataSize = hexutilUint64(vars.MaximumExtraDataSize)
+	spec.Params.MinGasLimit = hexutilUint64(vars.MinGasLimit)
+	spec.Params.GasLimitBoundDivisor = hexutilUint64(vars.GasLimitBoundDivisor)
 	spec.Params.NetworkID = hexutilUint64(genesis.Config.NetworkID)
 	if id := genesis.Config.ChainID; id != nil {
 		spec.Params.ChainID = hexutilUint64(id.Uint64())
@@ -471,7 +471,7 @@ func ParityConfigToMultiGethGenesis(c *parity.ParityChainSpec) (*paramtypes.Gene
 
 		mgc.Ethash = &goethereum.EthashConfig{}
 
-		params.MinimumDifficulty = pars.MinimumDifficulty.ToInt()
+		vars.MinimumDifficulty = pars.MinimumDifficulty.ToInt()
 		mgc.HomesteadBlock = pars.HomesteadTransition.Big()
 		mgc.EIP100FBlock = pars.EIP100bTransition.Big()
 		mgc.DisposalBlock = pars.BombDefuseTransition.Big()

@@ -11,7 +11,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 )
 
@@ -417,21 +416,21 @@ func (spec *ParityChainSpec) IsForked(fn func(*big.Int) bool, n *big.Int) bool {
 	return fn(n)
 }
 
-func (spec *ParityChainSpec) GetConsensusEngineType() paramtypes.ConsensusEngineT {
+func (spec *ParityChainSpec) GetConsensusEngineType() common2.ConsensusEngineT {
 	if !reflect.DeepEqual(spec.Engine.Ethash, reflect.Zero(reflect.TypeOf(spec.Engine.Ethash)).Interface()) {
-		return paramtypes.ConsensusEngineT_Ethash
+		return common2.ConsensusEngineT_Ethash
 	}
 	if !reflect.DeepEqual(spec.Engine.Clique, reflect.Zero(reflect.TypeOf(spec.Engine.Clique)).Interface()) {
-		return paramtypes.ConsensusEngineT_Clique
+		return common2.ConsensusEngineT_Clique
 	}
-	return paramtypes.ConsensusEngineT_Unknown
+	return common2.ConsensusEngineT_Unknown
 }
 
-func (spec *ParityChainSpec) MustSetConsensusEngineType(t paramtypes.ConsensusEngineT) error {
+func (spec *ParityChainSpec) MustSetConsensusEngineType(t common2.ConsensusEngineT) error {
 	switch t {
-	case paramtypes.ConsensusEngineT_Ethash:
+	case common2.ConsensusEngineT_Ethash:
 		return nil
-	case paramtypes.ConsensusEngineT_Clique:
+	case common2.ConsensusEngineT_Clique:
 		return nil
 	default:
 		return common2.ErrUnsupportedConfigFatal
@@ -575,19 +574,31 @@ func (spec *ParityChainSpec) SetEthashECIP1041Transition(n *big.Int) error {
 }
 
 func (spec *ParityChainSpec) GetEthashDifficultyBombDelaySchedule() common2.Uint64BigMapEncodesHex {
+	if reflect.DeepEqual(spec.Engine.Ethash, reflect.Zero(reflect.TypeOf(spec.Engine.Ethash)).Interface()) {
+		return nil
+	}
 	return spec.Engine.Ethash.Params.DifficultyBombDelays
 }
 
 func (spec *ParityChainSpec) SetEthashDifficultyBombDelaySchedule(input common2.Uint64BigMapEncodesHex) error {
+	if reflect.DeepEqual(spec.Engine.Ethash, reflect.Zero(reflect.TypeOf(spec.Engine.Ethash)).Interface()) {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	spec.Engine.Ethash.Params.DifficultyBombDelays = input
 	return nil
 }
 
 func (spec *ParityChainSpec) GetEthashBlockRewardSchedule() common2.Uint64BigMapEncodesHex {
+	if reflect.DeepEqual(spec.Engine.Ethash, reflect.Zero(reflect.TypeOf(spec.Engine.Ethash)).Interface()) {
+		return nil
+	}
 	return common2.Uint64BigMapEncodesHex(spec.Engine.Ethash.Params.BlockReward)
 }
 
 func (spec *ParityChainSpec) SetEthashBlockRewardSchedule(input common2.Uint64BigMapEncodesHex) error {
+	if reflect.DeepEqual(spec.Engine.Ethash, reflect.Zero(reflect.TypeOf(spec.Engine.Ethash)).Interface()) {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	spec.Engine.Ethash.Params.BlockReward = common2.Uint64BigValOrMapHex(input)
 	return nil
 }
@@ -610,20 +621,20 @@ func (spec *ParityChainSpec) SetCliqueEpoch(i uint64) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) GetSealingType() paramtypes.BlockSealingT {
+func (spec *ParityChainSpec) GetSealingType() common2.BlockSealingT {
 	if !reflect.DeepEqual(spec.Genesis.Seal.Ethereum, reflect.Zero(reflect.TypeOf(spec.Genesis.Seal.Ethereum)).Interface()) {
-		return paramtypes.BlockSealing_Ethereum
+		return common2.BlockSealing_Ethereum
 	}
 	log.Println(spew.Sdump(spec.Genesis))
 	log.Println(spew.Sdump(reflect.Zero(reflect.TypeOf(spec.Genesis.Seal.Ethereum)).Interface()))
 	b, _ := json.MarshalIndent(spec, "", "    ")
 	log.Println(string(b))
-	return paramtypes.BlockSealing_Unknown
+	return common2.BlockSealing_Unknown
 }
 
-func (spec *ParityChainSpec) SetSealingType(in paramtypes.BlockSealingT) error {
+func (spec *ParityChainSpec) SetSealingType(in common2.BlockSealingT) error {
 	switch in {
-	case paramtypes.BlockSealing_Ethereum:
+	case common2.BlockSealing_Ethereum:
 		return nil
 	}
 	return common2.ErrUnsupportedConfigFatal

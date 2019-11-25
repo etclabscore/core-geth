@@ -89,28 +89,9 @@ type Forker interface {
 	IsForked(fn func(*big.Int) bool, n *big.Int) bool
 }
 
-type ConsensusEngineT int
-
-const (
-	ConsensusEngineT_Unknown = iota
-	ConsensusEngineT_Ethash
-	ConsensusEngineT_Clique
-)
-
-func (c ConsensusEngineT) String() string {
-	switch c {
-	case ConsensusEngineT_Ethash:
-		return "ethash"
-	case ConsensusEngineT_Clique:
-		return "clique"
-	default:
-		return "unknown"
-	}
-}
-
 type ConsensusEnginator interface {
-	GetConsensusEngineType() ConsensusEngineT
-	MustSetConsensusEngineType(t ConsensusEngineT) error
+	GetConsensusEngineType() common2.ConsensusEngineT
+	MustSetConsensusEngineType(t common2.ConsensusEngineT) error
 	EthashConfigurator
 	CliqueConfigurator
 }
@@ -152,25 +133,9 @@ type CliqueConfigurator interface {
 	SetCliqueEpoch(n uint64) error
 }
 
-type BlockSealingT int
-
-const (
-	BlockSealing_Unknown = iota
-	BlockSealing_Ethereum
-)
-
-func (b BlockSealingT) String() string {
-	switch b {
-	case BlockSealing_Ethereum:
-		return "ethereum"
-	default:
-		return "unknown"
-	}
-}
-
 type BlockSealer interface {
-	GetSealingType() BlockSealingT
-	SetSealingType(BlockSealingT) error
+	GetSealingType() common2.BlockSealingT
+	SetSealingType(common2.BlockSealingT) error
 	BlockSealerEthereum
 }
 

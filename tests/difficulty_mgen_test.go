@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var outNDJSONFile = filepath.Join(difficultyTestDir, "mgen_difficulty.ndjson")
@@ -84,7 +85,7 @@ func TestDifficultyGen(t *testing.T) {
 	dt.walk(t, difficultyTestDir, func(t *testing.T, name string, test *DifficultyTest) {
 		cfg, key := dt.findConfig(name)
 
-		if test.ParentDifficulty.Cmp(params.MinimumDifficulty) < 0 {
+		if test.ParentDifficulty.Cmp(vars.MinimumDifficulty) < 0 {
 			t.Skip("difficulty below minimum")
 			return
 		}

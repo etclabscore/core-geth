@@ -28,8 +28,8 @@ import (
 	"github.com/ethereum/go-ethereum/light"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // clientHandler is responsible for receiving and processing all incoming server
@@ -62,7 +62,7 @@ func newClientHandler(ulcServers []string, ulcFraction int, checkpoint *goethere
 	}
 	var height uint64
 	if checkpoint != nil {
-		height = (checkpoint.SectionIndex+1)*params.CHTFrequency - 1
+		height = (checkpoint.SectionIndex+1)*vars.CHTFrequency - 1
 	}
 	handler.fetcher = newLightFetcher(handler)
 	handler.downloader = downloader.New(height, backend.chainDb, nil, backend.eventMux, nil, backend.blockchain, handler.removePeer)

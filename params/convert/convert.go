@@ -78,7 +78,7 @@ func Convert(from, to paramtypes.ChainConfigurator) error {
 	// Set Genesis.
 	et := from.GetSealingType()
 	switch et {
-	case paramtypes.BlockSealing_Ethereum:
+	case common.BlockSealing_Ethereum:
 		k := reflect.TypeOf((*paramtypes.GenesisBlocker)(nil)).Elem()
 		if err := convert(k, from, to); err != nil {
 			return err
@@ -104,18 +104,18 @@ func Convert(from, to paramtypes.ChainConfigurator) error {
 		return common.UnsupportedConfigError(err, "consensus engine", engineType)
 	}
 	switch engineType {
-	case paramtypes.ConsensusEngineT_Ethash:
+	case common.ConsensusEngineT_Ethash:
 		k := reflect.TypeOf((*paramtypes.EthashConfigurator)(nil)).Elem()
 		if err := convert(k, from, to); err != nil {
 			return err
 		}
-	case paramtypes.ConsensusEngineT_Clique:
+	case common.ConsensusEngineT_Clique:
 		k := reflect.TypeOf((*paramtypes.CliqueConfigurator)(nil)).Elem()
 		if err := convert(k, from, to); err != nil {
 			return err
 		}
 	default:
-		return common.UnsupportedConfigError(common.ErrUnsupportedConfigFatal, "consensus engine", paramtypes.ConsensusEngineT_Unknown)
+		return common.UnsupportedConfigError(common.ErrUnsupportedConfigFatal, "consensus engine", common.ConsensusEngineT_Unknown)
 	}
 
 	return nil

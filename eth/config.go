@@ -45,7 +45,7 @@ var DefaultConfig = Config{
 		DatasetsInMem:  1,
 		DatasetsOnDisk: 2,
 	},
-	NetworkId:          1,
+	NetworkId:          params.DefaultNetworkID,
 	LightPeers:         100,
 	UltraLightFraction: 75,
 	DatabaseCache:      512,

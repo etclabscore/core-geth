@@ -31,8 +31,6 @@ type CatHerder interface {
 	SetChainID(n *uint64) error
 	GetMaxCodeSize() *uint64
 	SetMaxCodeSize(n *uint64) error
-	GetMaxCodeSizeTransition() *uint64
-	SetMaxCodeSizeTransition(n *uint64) error
 	GetEIP7Transition() *uint64
 	SetEIP7Transition(n *uint64) error
 	GetEIP98Transition() *uint64
@@ -67,8 +65,6 @@ type CatHerder interface {
 	SetEIP658Transition(n *uint64) error
 	GetEIP145Transition() *uint64
 	SetEIP145Transition(n *uint64) error
-	GetEIP1108Transition() *uint64
-	SetEIP1108Transition(n *uint64) error
 	GetEIP1014Transition() *uint64
 	SetEIP1014Transition(n *uint64) error
 	GetEIP1052Transition() *uint64
@@ -77,6 +73,8 @@ type CatHerder interface {
 	SetEIP1283Transition(n *uint64) error
 	GetEIP1283DisableTransition() *uint64
 	SetEIP1283DisableTransition(n *uint64) error
+	GetEIP1108Transition() *uint64
+	SetEIP1108Transition(n *uint64) error
 	GetEIP1283ReenableTransition() *uint64
 	SetEIP1283ReenableTransition(n *uint64) error
 	GetEIP1344Transition() *uint64
@@ -142,9 +140,9 @@ type EthashConfigurator interface {
 	SetEthashECIP1041Transition(i *big.Int) error
 
 	GetEthashDifficultyBombDelaySchedule() common2.Uint64BigMapEncodesHex
-	SetEthashDifficultyBombDelaySchedule(common2.Uint64BigMapEncodesHex) error
+	SetEthashDifficultyBombDelaySchedule(m common2.Uint64BigMapEncodesHex) error
 	GetEthashBlockRewardSchedule() common2.Uint64BigMapEncodesHex
-	SetEthashBlockRewardSchedule(common2.Uint64BigMapEncodesHex) error
+	SetEthashBlockRewardSchedule(m common2.Uint64BigMapEncodesHex) error
 }
 
 type CliqueConfigurator interface {
@@ -199,29 +197,7 @@ type GenesisBlocker interface {
 	SetGenesisGasLimit(u uint64) error
 }
 
-//type BuiltinContractT int
-//
-//const (
-//	BuiltinContract_Unknown = iota
-//	BuiltinContract_ECRecover
-//	BuiltinContract_SHA256
-//	BuiltinContract_RipeMD160
-//	BuiltinContract_Identity
-//	BuiltinContract_ModExp
-//	BuiltinContract_Blake2F
-//	BuiltinContract_AltBn128Add
-//	BuiltinContract_AltBn128Mul
-//	BuiltinContract_AltBn128Pairing
-//)
-//
-//type BuiltinT struct {
-//	Contract        BuiltinContractT
-//	ActivationBlock uint64
-//	SpecificationIP string
-//}
-
 type Accounter interface {
 	ForEachAccount(fn func(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error) error
 	UpdateAccount(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error
-	//SetBuiltin(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash, builtin *BuiltinT) error
 }

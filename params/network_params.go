@@ -19,6 +19,10 @@ package params
 // These are network parameters that need to be constant between clients, but
 // aren't necessarily consensus related.
 
+var (
+	DefaultNetworkID uint64 = 1
+)
+
 const (
 	// BloomBitsBlocks is the number of blocks a single bloom bit section vector
 	// contains on the server side.

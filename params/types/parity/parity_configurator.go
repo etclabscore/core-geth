@@ -74,24 +74,6 @@ func (spec *ParityChainSpec) SetChainID(i *uint64) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) GetMaxCodeSize() *uint64 {
-	return spec.Params.MaxCodeSize.Uint64P()
-}
-
-func (spec *ParityChainSpec) SetMaxCodeSize(i *uint64) error {
-	spec.Params.MaxCodeSize = new(ParityU64).SetUint64(i)
-	return nil
-}
-
-func (spec *ParityChainSpec) GetMaxCodeSizeTransition() *uint64 {
-	return spec.Params.MaxCodeSizeTransition.Uint64P()
-}
-
-func (spec *ParityChainSpec) SetMaxCodeSizeTransition(i *uint64) error {
-	spec.Params.MaxCodeSizeTransition = new(ParityU64).SetUint64(i)
-	return nil
-}
-
 func (spec *ParityChainSpec) GetEIP7Transition() *uint64 {
 	return spec.Engine.Ethash.Params.HomesteadTransition.Uint64P()
 }
@@ -299,6 +281,15 @@ func (spec *ParityChainSpec) SetEIP170Transition(i *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetMaxCodeSize() *uint64 {
+	return spec.Params.MaxCodeSize.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetMaxCodeSize(i *uint64) error {
+	spec.Params.MaxCodeSize = new(ParityU64).SetUint64(i)
+	return nil
+}
+
 func (spec *ParityChainSpec) GetEIP198Transition() *uint64 {
 	return spec.GetPrecompile(common.BytesToAddress([]byte{5}), ParityChainSpecPricing{
 		ModExp: &ParityChainSpecModExpPricing{
@@ -436,8 +427,8 @@ func (spec *ParityChainSpec) GetConsensusEngineType() paramtypes.ConsensusEngine
 	return paramtypes.ConsensusEngineT_Unknown
 }
 
-func (spec *ParityChainSpec) MustSetConsensusEngineType(engine paramtypes.ConsensusEngineT) error {
-	switch engine {
+func (spec *ParityChainSpec) MustSetConsensusEngineType(t paramtypes.ConsensusEngineT) error {
+	switch t {
 	case paramtypes.ConsensusEngineT_Ethash:
 		return nil
 	case paramtypes.ConsensusEngineT_Clique:

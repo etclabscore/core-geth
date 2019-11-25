@@ -543,9 +543,6 @@ var (
 			0: new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
 	}
-
-	// TestRules are all rules from TestChainConfig initialized at 0.
-	TestRules = TestChainConfig.Rules(new(big.Int))
 )
 
 func EthashBlockReward(c *paramtypes.ChainConfig, n *big.Int) *big.Int {

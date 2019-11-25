@@ -6,12 +6,15 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
+type Configurator interface {
+	ChainConfigurator
+	GenesisBlocker
+}
+
 type ChainConfigurator interface {
 	CatHerder
 	Forker
 	ConsensusEnginator // Consensus Engine
-	GenesisBlocker
-	Accounter
 	// CHTer
 }
 
@@ -147,6 +150,7 @@ type BlockSealerEthereum interface {
 
 type GenesisBlocker interface {
 	BlockSealer
+	Accounter
 	GetGenesisDifficulty() *big.Int
 	SetGenesisDifficulty(i *big.Int) error
 	GetGenesisAuthor() common.Address

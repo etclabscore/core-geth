@@ -8,7 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
-// File contains the go-ethereum implementation of the ChainConfigurator interface.
+// File contains the go-ethereum implementation of the Configurator interface.
 // TODO: Handle 'unsupported' Feature, Fork-only cases (where unequal feature settings cause _undetermined_ behavior),
 // eg. where SetEIP1052 -> Constantinople AND SetEIP145 -> Constantinople;
 // If these values are different, the GetConstantinople result is undetermined.

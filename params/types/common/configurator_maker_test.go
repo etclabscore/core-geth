@@ -1,4 +1,4 @@
-package paramtypes
+package common
 
 import (
 	"fmt"
@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
 )
 
 // File contains development-driven tests to reduce number
@@ -26,8 +25,8 @@ func TestQuickerGetterSetter_Inferface_Maker(t *testing.T) {
 		ECIP1017EraRounds           *big.Int
 		EIP100BTransition           *big.Int
 		ECIP1041Transition          *big.Int
-		DifficultyBombDelaySchedule common2.Uint64BigMapEncodesHex
-		BlockRewardSchedule         common2.Uint64BigMapEncodesHex
+		DifficultyBombDelaySchedule Uint64BigMapEncodesHex
+		BlockRewardSchedule         Uint64BigMapEncodesHex
 	}
 	type Cliquer struct {
 		Period uint64

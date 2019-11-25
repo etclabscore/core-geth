@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"strings"
 
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/common"
 )
 
@@ -65,11 +64,11 @@ func compare(k reflect.Type, source, target interface{}) (method string, value i
 	return "", nil, nil
 }
 
-func Convert(from, to paramtypes.ChainConfigurator) error {
-	if _, ok := from.(paramtypes.ChainConfigurator); !ok {
+func Convert(from, to common.ChainConfigurator) error {
+	if _, ok := from.(common.ChainConfigurator); !ok {
 		return errors.New("from value not a configurator")
 	}
-	if _, ok := to.(paramtypes.ChainConfigurator); !ok {
+	if _, ok := to.(common.ChainConfigurator); !ok {
 		return errors.New("to value not a configurator")
 	}
 
@@ -79,7 +78,7 @@ func Convert(from, to paramtypes.ChainConfigurator) error {
 	et := from.GetSealingType()
 	switch et {
 	case common.BlockSealing_Ethereum:
-		k := reflect.TypeOf((*paramtypes.GenesisBlocker)(nil)).Elem()
+		k := reflect.TypeOf((*common.GenesisBlocker)(nil)).Elem()
 		if err := convert(k, from, to); err != nil {
 			return err
 		}
@@ -93,7 +92,7 @@ func Convert(from, to paramtypes.ChainConfigurator) error {
 	}
 
 	// Set general chain parameters.
-	k := reflect.TypeOf((*paramtypes.CatHerder)(nil)).Elem()
+	k := reflect.TypeOf((*common.CatHerder)(nil)).Elem()
 	if err := convert(k, from, to); err != nil {
 		return err
 	}
@@ -105,12 +104,12 @@ func Convert(from, to paramtypes.ChainConfigurator) error {
 	}
 	switch engineType {
 	case common.ConsensusEngineT_Ethash:
-		k := reflect.TypeOf((*paramtypes.EthashConfigurator)(nil)).Elem()
+		k := reflect.TypeOf((*common.EthashConfigurator)(nil)).Elem()
 		if err := convert(k, from, to); err != nil {
 			return err
 		}
 	case common.ConsensusEngineT_Clique:
-		k := reflect.TypeOf((*paramtypes.CliqueConfigurator)(nil)).Elem()
+		k := reflect.TypeOf((*common.CliqueConfigurator)(nil)).Elem()
 		if err := convert(k, from, to); err != nil {
 			return err
 		}
@@ -121,7 +120,7 @@ func Convert(from, to paramtypes.ChainConfigurator) error {
 	return nil
 }
 
-func Equal(k reflect.Type, a, b paramtypes.ChainConfigurator) (string, bool) {
+func Equal(k reflect.Type, a, b common.ChainConfigurator) (string, bool) {
 	m, _, err := compare(k.Elem(), a, b) // TODO: maybe return a value, or even a dedicated type, for better debugging
 	if err == nil {
 		return "", true

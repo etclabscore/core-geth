@@ -84,7 +84,7 @@ var defaultNodeConfig = &NodeConfig{
 	BootstrapNodes:        FoundationBootnodes(),
 	MaxPeers:              25,
 	EthereumEnabled:       true,
-	EthereumNetworkID:     1,
+	EthereumNetworkID:     int64(params.DefaultNetworkID),
 	EthereumDatabaseCache: 16,
 }
 
@@ -152,7 +152,7 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 		ethConf := eth.DefaultConfig
 		ethConf.Genesis = genesis
 		ethConf.SyncMode = downloader.LightSync
-		ethConf.NetworkId = uint64(genesis.Config.NetworkID)
+		ethConf.NetworkId = genesis.Config.NetworkID
 		ethConf.DatabaseCache = config.EthereumDatabaseCache
 		if err := rawStack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
 			return les.New(ctx, &ethConf)

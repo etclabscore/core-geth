@@ -134,7 +134,7 @@ type CliqueConfigurator interface {
 
 type BlockSealer interface {
 	GetSealingType() BlockSealingT
-	SetSealingType(BlockSealingT) error
+	SetSealingType(t BlockSealingT) error
 	BlockSealerEthereum
 }
 

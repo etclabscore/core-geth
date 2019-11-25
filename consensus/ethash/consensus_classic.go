@@ -20,12 +20,12 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func ecip1017BlockReward(config *paramtypes.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
-	blockReward := params.FrontierBlockReward
+	blockReward := vars.FrontierBlockReward
 
 	// Ensure value 'era' is configured.
 	eraLen := config.ECIP1017EraRounds

@@ -22,8 +22,8 @@ import (
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // BlockValidator is responsible for validating block headers, uncles and
@@ -108,10 +108,10 @@ func (v *BlockValidator) ValidateState(block *types.Block, statedb *state.StateD
 // the gas allowance.
 func CalcGasLimit(parent *types.Block, gasFloor, gasCeil uint64) uint64 {
 	// contrib = (parentGasUsed * 3 / 2) / 1024
-	contrib := (parent.GasUsed() + parent.GasUsed()/2) / params.GasLimitBoundDivisor
+	contrib := (parent.GasUsed() + parent.GasUsed()/2) / vars.GasLimitBoundDivisor
 
 	// decay = parentGasLimit / 1024 -1
-	decay := parent.GasLimit()/params.GasLimitBoundDivisor - 1
+	decay := parent.GasLimit()/vars.GasLimitBoundDivisor - 1
 
 	/*
 		strategy: gasLimit of block-to-mine is set based on parent's
@@ -121,8 +121,8 @@ func CalcGasLimit(parent *types.Block, gasFloor, gasCeil uint64) uint64 {
 		from parentGasLimit * (2/3) parentGasUsed is.
 	*/
 	limit := parent.GasLimit() - decay + contrib
-	if limit < params.MinGasLimit {
-		limit = params.MinGasLimit
+	if limit < vars.MinGasLimit {
+		limit = vars.MinGasLimit
 	}
 	// If we're outside our allowed gas range, we try to hone towards them
 	if limit < gasFloor {

@@ -23,6 +23,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // Genesis hashes to enforce below configs on.
@@ -552,7 +553,7 @@ func EthashBlockReward(c *paramtypes.ChainConfig, n *big.Int) *big.Int {
 	// 	panic("non ethash config called EthashBlockReward")
 	// }
 	// Select the correct block reward based on chain progression
-	blockReward := FrontierBlockReward
+	blockReward := vars.FrontierBlockReward
 	if c == nil || n == nil {
 		return blockReward
 	}
@@ -576,9 +577,9 @@ func EthashBlockReward(c *paramtypes.ChainConfig, n *big.Int) *big.Int {
 	}
 
 	if c.IsEIP1234F(n) {
-		blockReward = EIP1234FBlockReward
+		blockReward = vars.EIP1234FBlockReward
 	} else if c.IsEIP649F(n) {
-		blockReward = EIP649FBlockReward
+		blockReward = vars.EIP649FBlockReward
 	}
 
 	return blockReward

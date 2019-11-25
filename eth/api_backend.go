@@ -34,8 +34,8 @@ import (
 	"github.com/ethereum/go-ethereum/eth/gasprice"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -294,7 +294,7 @@ func (b *EthAPIBackend) RPCGasCap() *big.Int {
 
 func (b *EthAPIBackend) BloomStatus() (uint64, uint64) {
 	sections, _, _ := b.eth.bloomIndexer.Sections()
-	return params.BloomBitsBlocks, sections
+	return vars.BloomBitsBlocks, sections
 }
 
 func (b *EthAPIBackend) ServiceFilter(ctx context.Context, session *bloombits.MatcherSession) {

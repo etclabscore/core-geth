@@ -38,9 +38,9 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
 )
@@ -143,7 +143,7 @@ func NewProtocolManager(config *paramtypes.ChainConfig, checkpoint *goethereum.T
 	}
 	// If we have trusted checkpoints, enforce them on the chain
 	if checkpoint != nil {
-		manager.checkpointNumber = (checkpoint.SectionIndex+1)*params.CHTFrequency - 1
+		manager.checkpointNumber = (checkpoint.SectionIndex+1)*vars.CHTFrequency - 1
 		manager.checkpointHash = checkpoint.SectionHead
 	}
 

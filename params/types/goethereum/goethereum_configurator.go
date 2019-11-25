@@ -3,11 +3,9 @@ package goethereum
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/params"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // File contains the go-ethereum implementation of the ChainConfigurator interface.
@@ -48,29 +46,29 @@ func (c *ChainConfig) SetAccountStartNonce(n *uint64) error {
 }
 
 func (c *ChainConfig) GetMaximumExtraDataSize() *uint64 {
-	return newU64(params.MaximumExtraDataSize)
+	return newU64(vars.MaximumExtraDataSize)
 }
 
 func (c *ChainConfig) SetMaximumExtraDataSize(n *uint64) error {
-	params.MaximumExtraDataSize = *n
+	vars.MaximumExtraDataSize = *n
 	return nil
 }
 
 func (c *ChainConfig) GetMinGasLimit() *uint64 {
-	return newU64(params.MinGasLimit)
+	return newU64(vars.MinGasLimit)
 }
 
 func (c *ChainConfig) SetMinGasLimit(n *uint64) error {
-	params.MinGasLimit = *n
+	vars.MinGasLimit = *n
 	return nil
 }
 
 func (c *ChainConfig) GetGasLimitBoundDivisor() *uint64 {
-	return newU64(params.GasLimitBoundDivisor)
+	return newU64(vars.GasLimitBoundDivisor)
 }
 
 func (c *ChainConfig) SetGasLimitBoundDivisor(n *uint64) error {
-	params.GasLimitBoundDivisor = *n
+	vars.GasLimitBoundDivisor = *n
 	return nil
 }
 
@@ -78,11 +76,11 @@ func (c *ChainConfig) GetNetworkID() *uint64 {
 	if c.ChainID != nil {
 		return newU64(c.ChainID.Uint64())
 	}
-	return newU64(params.DefaultNetworkID)
+	return newU64(vars.DefaultNetworkID)
 }
 
 func (c *ChainConfig) SetNetworkID(n *uint64) error {
-	params.DefaultNetworkID = *n
+	vars.DefaultNetworkID = *n
 	return nil
 }
 
@@ -96,11 +94,11 @@ func (c *ChainConfig) SetChainID(n *uint64) error {
 }
 
 func (c *ChainConfig) GetMaxCodeSize() *uint64 {
-	return newU64(params.MaxCodeSize)
+	return newU64(vars.MaxCodeSize)
 }
 
 func (c *ChainConfig) SetMaxCodeSize(n *uint64) error {
-	params.MaxCodeSize = *n
+	vars.MaxCodeSize = *n
 	return nil
 }
 
@@ -344,22 +342,22 @@ func (c *ChainConfig) IsForked(fn func(*big.Int) bool, n *big.Int) bool {
 	return fn(n)
 }
 
-func (c *ChainConfig) GetConsensusEngineType() paramtypes.ConsensusEngineT {
+func (c *ChainConfig) GetConsensusEngineType() common2.ConsensusEngineT {
 	if c.Ethash != nil {
-		return paramtypes.ConsensusEngineT_Ethash
+		return common2.ConsensusEngineT_Ethash
 	}
 	if c.Clique != nil {
-		return paramtypes.ConsensusEngineT_Clique
+		return common2.ConsensusEngineT_Clique
 	}
-	return paramtypes.ConsensusEngineT_Unknown
+	return common2.ConsensusEngineT_Unknown
 }
 
-func (c *ChainConfig) MustSetConsensusEngineType(t paramtypes.ConsensusEngineT) error {
+func (c *ChainConfig) MustSetConsensusEngineType(t common2.ConsensusEngineT) error {
 	switch t {
-	case paramtypes.ConsensusEngineT_Ethash:
+	case common2.ConsensusEngineT_Ethash:
 		c.Ethash = new(EthashConfig)
 		return nil
-	case paramtypes.ConsensusEngineT_Clique:
+	case common2.ConsensusEngineT_Clique:
 		c.Clique = new(CliqueConfig)
 		return nil
 	default:
@@ -368,29 +366,29 @@ func (c *ChainConfig) MustSetConsensusEngineType(t paramtypes.ConsensusEngineT) 
 }
 
 func (c *ChainConfig) GetEthashMinimumDifficulty() *big.Int {
-	return params.MinimumDifficulty
+	return vars.MinimumDifficulty
 }
 
 func (c *ChainConfig) SetEthashMinimumDifficulty(i *big.Int) error {
-	params.MinimumDifficulty = i
+	vars.MinimumDifficulty = i
 	return nil
 }
 
 func (c *ChainConfig) GetEthashDifficultyBoundDivisor() *big.Int {
-	return params.DifficultyBoundDivisor
+	return vars.DifficultyBoundDivisor
 }
 
 func (c *ChainConfig) SetEthashDifficultyBoundDivisor(i *big.Int) error {
-	params.DifficultyBoundDivisor = i
+	vars.DifficultyBoundDivisor = i
 	return nil
 }
 
 func (c *ChainConfig) GetEthashDurationLimit() *big.Int {
-	return params.DurationLimit
+	return vars.DurationLimit
 }
 
 func (c *ChainConfig) SetEthashDurationLimit(i *big.Int) error {
-	params.DurationLimit = i
+	vars.DurationLimit = i
 	return nil
 }
 
@@ -461,7 +459,7 @@ func (c *ChainConfig) GetEthashEIP100BTransition() *big.Int {
 }
 
 func (c *ChainConfig) SetEthashEIP100BTransition(i *big.Int) error {
-	setBig(c.ByzantiumBlock, i)
+	c.ByzantiumBlock = i
 	return nil
 }
 
@@ -477,14 +475,17 @@ func (c *ChainConfig) SetEthashECIP1041Transition(i *big.Int) error {
 }
 
 func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() common2.Uint64BigMapEncodesHex {
+	if c.Ethash == nil {
+		return nil
+	}
 	m := common2.Uint64BigMapEncodesHex{
-		0: params.FrontierBlockReward,
+		0: vars.FrontierBlockReward,
 	}
 	if c.ByzantiumBlock != nil {
-		m[c.ByzantiumBlock.Uint64()] = params.EIP649FBlockReward
+		m[c.ByzantiumBlock.Uint64()] = vars.EIP649FBlockReward
 	}
 	if c.ConstantinopleBlock != nil {
-		m[c.ConstantinopleBlock.Uint64()] = params.EIP1234FBlockReward
+		m[c.ConstantinopleBlock.Uint64()] = vars.EIP1234FBlockReward
 	}
 	return m
 }
@@ -494,14 +495,17 @@ func (c *ChainConfig) SetEthashDifficultyBombDelaySchedule(m common2.Uint64BigMa
 }
 
 func (c *ChainConfig) GetEthashBlockRewardSchedule() common2.Uint64BigMapEncodesHex {
+	if c.Ethash == nil {
+		return nil
+	}
 	m := common2.Uint64BigMapEncodesHex{
-		0: params.FrontierBlockReward
+		0: vars.FrontierBlockReward,
 	}
 	if c.ByzantiumBlock != nil {
-		m[c.ByzantiumBlock.Uint64()] = params.EIP649FBlockReward
+		m[c.ByzantiumBlock.Uint64()] = vars.EIP649FBlockReward
 	}
 	if c.ConstantinopleBlock != nil {
-		m[c.ConstantinopleBlock.Uint64()] = params.EIP1234FBlockReward
+		m[c.ConstantinopleBlock.Uint64()] = vars.EIP1234FBlockReward
 	}
 	return m
 }
@@ -511,97 +515,31 @@ func (c *ChainConfig) SetEthashBlockRewardSchedule(m common2.Uint64BigMapEncodes
 }
 
 func (c *ChainConfig) GetCliquePeriod() *uint64 {
-	panic("implement me")
+	if c.Clique == nil {
+		return nil
+	}
+	return newU64(c.Clique.Period)
 }
 
 func (c *ChainConfig) SetCliquePeriod(n uint64) error {
-	panic("implement me")
+	if c.Clique == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
+	c.Clique.Period = n
+	return nil
 }
 
 func (c *ChainConfig) GetCliqueEpoch() *uint64 {
-	panic("implement me")
+	if c.Clique == nil {
+		return nil
+	}
+	return newU64(c.Clique.Epoch)
 }
 
 func (c *ChainConfig) SetCliqueEpoch(n uint64) error {
-	panic("implement me")
-}
-
-func (c *ChainConfig) GetSealingType() paramtypes.BlockSealingT {
-	panic("implement me")
-}
-
-func (c *ChainConfig) SetSealingType(paramtypes.BlockSealingT) error {
-	panic("implement me")
-}
-
-func (c *ChainConfig) GetGenesisSealerEthereumNonce() uint64 {
-	panic("implement me")
-}
-
-func (c *ChainConfig) SetGenesisSealerEthereumNonce(n uint64) error {
-	panic("implement me")
-}
-
-func (c *ChainConfig) GetGenesisSealerEthereumMixHash() common.Hash {
-	panic("implement me")
-}
-
-func (c *ChainConfig) SetGenesisSealerEthereumMixHash(h common.Hash) error {
-	panic("implement me")
-}
-
-func (c *ChainConfig) GetGenesisDifficulty() *big.Int {
-	panic("implement me")
-}
-
-func (c *ChainConfig) SetGenesisDifficulty(i *big.Int) error {
-	panic("implement me")
-}
-
-func (c *ChainConfig) GetGenesisAuthor() common.Address {
-	panic("implement me")
-}
-
-func (c *ChainConfig) SetGenesisAuthor(a common.Address) error {
-	panic("implement me")
-}
-
-func (c *ChainConfig) GetGenesisTimestamp() uint64 {
-	panic("implement me")
-}
-
-func (c *ChainConfig) SetGenesisTimestamp(u uint64) error {
-	panic("implement me")
-}
-
-func (c *ChainConfig) GetGenesisParentHash() common.Hash {
-	panic("implement me")
-}
-
-func (c *ChainConfig) SetGenesisParentHash(h common.Hash) error {
-	panic("implement me")
-}
-
-func (c *ChainConfig) GetGenesisExtraData() common.Hash {
-	panic("implement me")
-}
-
-func (c *ChainConfig) SetGenesisExtraData(h common.Hash) error {
-	panic("implement me")
-}
-
-func (c *ChainConfig) GetGenesisGasLimit() uint64 {
-	panic("implement me")
-}
-
-func (c *ChainConfig) SetGenesisGasLimit(u uint64) error {
-	panic("implement me")
-}
-
-func (c *ChainConfig) ForEachAccount(fn func(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error) error {
-	panic("implement me")
-}
-
-func (c *ChainConfig) UpdateAccount(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error {
-	panic("implement me")
+	if c.Clique == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
+	c.Clique.Epoch = n
+	return nil
 }

@@ -33,7 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -136,7 +136,7 @@ func (b *benchmarkHelperTrie) init(h *serverHandler, count int) error {
 		b.sectionCount, b.headNum, _ = h.server.bloomTrieIndexer.Sections()
 	} else {
 		b.sectionCount, _, _ = h.server.chtIndexer.Sections()
-		b.headNum = b.sectionCount*params.CHTFrequency - 1
+		b.headNum = b.sectionCount*vars.CHTFrequency - 1
 	}
 	if b.sectionCount == 0 {
 		return fmt.Errorf("no processed sections available")

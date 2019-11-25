@@ -23,7 +23,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -758,7 +758,7 @@ func opCall(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory 
 	args := memory.GetPtr(inOffset.Int64(), inSize.Int64())
 
 	if value.Sign() != 0 {
-		gas += params.CallStipend
+		gas += vars.CallStipend
 	}
 	ret, returnGas, err := interpreter.evm.Call(contract, toAddr, args, gas, value)
 	if err != nil {
@@ -787,7 +787,7 @@ func opCallCode(pc *uint64, interpreter *EVMInterpreter, contract *Contract, mem
 	args := memory.GetPtr(inOffset.Int64(), inSize.Int64())
 
 	if value.Sign() != 0 {
-		gas += params.CallStipend
+		gas += vars.CallStipend
 	}
 	ret, returnGas, err := interpreter.evm.CallCode(contract, toAddr, args, gas, value)
 	if err != nil {

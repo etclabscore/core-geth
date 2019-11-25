@@ -50,6 +50,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enr"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -153,7 +154,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 		gasPrice:       config.Miner.GasPrice,
 		etherbase:      config.Miner.Etherbase,
 		bloomRequests:  make(chan chan *bloombits.Retrieval),
-		bloomIndexer:   NewBloomIndexer(chainDb, params.BloomBitsBlocks, params.BloomConfirms),
+		bloomIndexer:   NewBloomIndexer(chainDb, vars.BloomBitsBlocks, vars.BloomConfirms),
 	}
 
 	bcVersion := rawdb.ReadDatabaseVersion(chainDb)
@@ -234,8 +235,8 @@ func makeExtraData(extra []byte) []byte {
 			runtime.GOOS,
 		})
 	}
-	if uint64(len(extra)) > params.MaximumExtraDataSize {
-		log.Warn("Miner extra data exceed limit", "extra", hexutil.Bytes(extra), "limit", params.MaximumExtraDataSize)
+	if uint64(len(extra)) > vars.MaximumExtraDataSize {
+		log.Warn("Miner extra data exceed limit", "extra", hexutil.Bytes(extra), "limit", vars.MaximumExtraDataSize)
 		extra = nil
 	}
 	return extra
@@ -524,7 +525,7 @@ func (s *Ethereum) Start(srvr *p2p.Server) error {
 	s.startEthEntryUpdate(srvr.LocalNode())
 
 	// Start the bloom bits servicing goroutines
-	s.startBloomHandlers(params.BloomBitsBlocks)
+	s.startBloomHandlers(vars.BloomBitsBlocks)
 
 	// Start the RPC service
 	s.netRPCService = ethapi.NewPublicNetAPI(srvr, s.NetVersion())

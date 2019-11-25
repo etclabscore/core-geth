@@ -20,8 +20,8 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 type (
@@ -68,7 +68,7 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 		instructionSet[DELEGATECALL] = operation{
 			execute:     opDelegateCall,
 			dynamicGas:  gasDelegateCall,
-			constantGas: params.CallGasFrontier,
+			constantGas: vars.CallGasFrontier,
 			minStack:    minStack(6, 1),
 			maxStack:    maxStack(6, 1),
 			memorySize:  memoryDelegateCall,
@@ -78,13 +78,13 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 	}
 	// Tangerine Whistle
 	if config.IsEIP150(bn) {
-		instructionSet[BALANCE].constantGas = params.BalanceGasEIP150
-		instructionSet[EXTCODESIZE].constantGas = params.ExtcodeSizeGasEIP150
-		instructionSet[SLOAD].constantGas = params.SloadGasEIP150
-		instructionSet[EXTCODECOPY].constantGas = params.ExtcodeCopyBaseEIP150
-		instructionSet[CALL].constantGas = params.CallGasEIP150
-		instructionSet[CALLCODE].constantGas = params.CallGasEIP150
-		instructionSet[DELEGATECALL].constantGas = params.CallGasEIP150
+		instructionSet[BALANCE].constantGas = vars.BalanceGasEIP150
+		instructionSet[EXTCODESIZE].constantGas = vars.ExtcodeSizeGasEIP150
+		instructionSet[SLOAD].constantGas = vars.SloadGasEIP150
+		instructionSet[EXTCODECOPY].constantGas = vars.ExtcodeCopyBaseEIP150
+		instructionSet[CALL].constantGas = vars.CallGasEIP150
+		instructionSet[CALLCODE].constantGas = vars.CallGasEIP150
+		instructionSet[DELEGATECALL].constantGas = vars.CallGasEIP150
 	}
 	// Spurious Dragon
 	if config.IsEIP160F(bn) {
@@ -106,7 +106,7 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 	if config.IsEIP214F(bn) {
 		instructionSet[STATICCALL] = operation{
 			execute:     opStaticCall,
-			constantGas: params.CallGasEIP150,
+			constantGas: vars.CallGasEIP150,
 			dynamicGas:  gasStaticCall,
 			minStack:    minStack(6, 1),
 			maxStack:    maxStack(6, 1),
@@ -160,7 +160,7 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 	if config.IsEIP1014F(bn) {
 		instructionSet[CREATE2] = operation{
 			execute:     opCreate2,
-			constantGas: params.Create2Gas,
+			constantGas: vars.Create2Gas,
 			dynamicGas:  gasCreate2,
 			minStack:    minStack(4, 1),
 			maxStack:    maxStack(4, 1),
@@ -173,7 +173,7 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 	if config.IsEIP1052F(bn) {
 		instructionSet[EXTCODEHASH] = operation{
 			execute:     opExtCodeHash,
-			constantGas: params.ExtcodeHashGasConstantinople,
+			constantGas: vars.ExtcodeHashGasConstantinople,
 			minStack:    minStack(1, 1),
 			maxStack:    maxStack(1, 1),
 			valid:       true,
@@ -358,7 +358,7 @@ func newBaseInstructionSet() JumpTable {
 		},
 		SHA3: {
 			execute:     opSha3,
-			constantGas: params.Sha3Gas,
+			constantGas: vars.Sha3Gas,
 			dynamicGas:  gasSha3,
 			minStack:    minStack(2, 1),
 			maxStack:    maxStack(2, 1),
@@ -374,7 +374,7 @@ func newBaseInstructionSet() JumpTable {
 		},
 		BALANCE: {
 			execute:     opBalance,
-			constantGas: params.BalanceGasFrontier,
+			constantGas: vars.BalanceGasFrontier,
 			minStack:    minStack(1, 1),
 			maxStack:    maxStack(1, 1),
 			valid:       true,
@@ -448,14 +448,14 @@ func newBaseInstructionSet() JumpTable {
 		},
 		EXTCODESIZE: {
 			execute:     opExtCodeSize,
-			constantGas: params.ExtcodeSizeGasFrontier,
+			constantGas: vars.ExtcodeSizeGasFrontier,
 			minStack:    minStack(1, 1),
 			maxStack:    maxStack(1, 1),
 			valid:       true,
 		},
 		EXTCODECOPY: {
 			execute:     opExtCodeCopy,
-			constantGas: params.ExtcodeCopyBaseFrontier,
+			constantGas: vars.ExtcodeCopyBaseFrontier,
 			dynamicGas:  gasExtCodeCopy,
 			minStack:    minStack(4, 0),
 			maxStack:    maxStack(4, 0),
@@ -541,7 +541,7 @@ func newBaseInstructionSet() JumpTable {
 		},
 		SLOAD: {
 			execute:     opSload,
-			constantGas: params.SloadGasFrontier,
+			constantGas: vars.SloadGasFrontier,
 			minStack:    minStack(1, 1),
 			maxStack:    maxStack(1, 1),
 			valid:       true,
@@ -593,7 +593,7 @@ func newBaseInstructionSet() JumpTable {
 		},
 		JUMPDEST: {
 			execute:     opJumpdest,
-			constantGas: params.JumpdestGas,
+			constantGas: vars.JumpdestGas,
 			minStack:    minStack(0, 0),
 			maxStack:    maxStack(0, 0),
 			valid:       true,
@@ -1093,7 +1093,7 @@ func newBaseInstructionSet() JumpTable {
 		},
 		CREATE: {
 			execute:     opCreate,
-			constantGas: params.CreateGas,
+			constantGas: vars.CreateGas,
 			dynamicGas:  gasCreate,
 			minStack:    minStack(3, 1),
 			maxStack:    maxStack(3, 1),
@@ -1104,7 +1104,7 @@ func newBaseInstructionSet() JumpTable {
 		},
 		CALL: {
 			execute:     opCall,
-			constantGas: params.CallGasFrontier,
+			constantGas: vars.CallGasFrontier,
 			dynamicGas:  gasCall,
 			minStack:    minStack(7, 1),
 			maxStack:    maxStack(7, 1),
@@ -1114,7 +1114,7 @@ func newBaseInstructionSet() JumpTable {
 		},
 		CALLCODE: {
 			execute:     opCallCode,
-			constantGas: params.CallGasFrontier,
+			constantGas: vars.CallGasFrontier,
 			dynamicGas:  gasCallCode,
 			minStack:    minStack(7, 1),
 			maxStack:    maxStack(7, 1),

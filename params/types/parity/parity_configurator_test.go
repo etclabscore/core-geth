@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common/math"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/common"
 )
 
 // This file contains a few unit tests for the parity-specific configuration interface.
@@ -15,12 +15,12 @@ import (
 func TestParityChainSpec_GetConsensusEngineType(t *testing.T) {
 	spec := new(ParityChainSpec)
 
-	if engine := (*spec).GetConsensusEngineType(); engine != paramtypes.ConsensusEngineT_Unknown {
+	if engine := (*spec).GetConsensusEngineType(); engine != common.ConsensusEngineT_Unknown {
 		t.Error("unwanted engine type", engine)
 	}
 
 	spec.Engine.Ethash.Params.MinimumDifficulty = math.NewHexOrDecimal256(42)
-	if engine := (*spec).GetConsensusEngineType(); engine != paramtypes.ConsensusEngineT_Ethash {
+	if engine := (*spec).GetConsensusEngineType(); engine != common.ConsensusEngineT_Ethash {
 		t.Error("mismatch engine", engine)
 	}
 }

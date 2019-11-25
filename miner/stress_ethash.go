@@ -43,6 +43,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func main() {
@@ -134,7 +135,7 @@ func main() {
 // faucet accounts.
 func makeGenesis(faucets []*ecdsa.PrivateKey) *paramtypes.Genesis {
 	genesis := params.DefaultTestnetGenesisBlock()
-	genesis.Difficulty = params.MinimumDifficulty
+	genesis.Difficulty = vars.MinimumDifficulty
 	genesis.GasLimit = 25000000
 
 	genesis.Config.ChainID = big.NewInt(18)

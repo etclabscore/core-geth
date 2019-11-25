@@ -19,7 +19,7 @@ package vm
 import (
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // EnableEIP enables the given EIP on the config.
@@ -46,9 +46,9 @@ func EnableEIP(eipNum int, jt *JumpTable) error {
 // - Define SELFBALANCE, with cost GasFastStep (5)
 func enable1884(jt *JumpTable) {
 	// Gas cost changes
-	jt[BALANCE].constantGas = params.BalanceGasEIP1884
-	jt[EXTCODEHASH].constantGas = params.ExtcodeHashGasEIP1884
-	jt[SLOAD].constantGas = params.SloadGasEIP1884
+	jt[BALANCE].constantGas = vars.BalanceGasEIP1884
+	jt[EXTCODEHASH].constantGas = vars.ExtcodeHashGasEIP1884
+	jt[SLOAD].constantGas = vars.SloadGasEIP1884
 
 	// New opcode
 	jt[SELFBALANCE] = operation{

@@ -6,9 +6,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // NewAlethGenesisSpec converts a go-ethereum genesis block into a Aleth-specific
@@ -55,14 +55,14 @@ func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*aleth.Al
 	}
 	spec.Params.NetworkID = (hexutil.Uint64)(genesis.Config.ChainID.Uint64())
 	spec.Params.ChainID = (hexutil.Uint64)(genesis.Config.ChainID.Uint64())
-	spec.Params.MaximumExtraDataSize = (hexutil.Uint64)(params.MaximumExtraDataSize)
-	spec.Params.MinGasLimit = (hexutil.Uint64)(params.MinGasLimit)
+	spec.Params.MaximumExtraDataSize = (hexutil.Uint64)(vars.MaximumExtraDataSize)
+	spec.Params.MinGasLimit = (hexutil.Uint64)(vars.MinGasLimit)
 	spec.Params.MaxGasLimit = (hexutil.Uint64)(math.MaxInt64)
-	spec.Params.MinimumDifficulty = (*hexutil.Big)(params.MinimumDifficulty)
-	spec.Params.DifficultyBoundDivisor = (*math.HexOrDecimal256)(params.DifficultyBoundDivisor)
-	spec.Params.GasLimitBoundDivisor = (math.HexOrDecimal64)(params.GasLimitBoundDivisor)
-	spec.Params.DurationLimit = (*math.HexOrDecimal256)(params.DurationLimit)
-	spec.Params.BlockReward = (*hexutil.Big)(params.FrontierBlockReward)
+	spec.Params.MinimumDifficulty = (*hexutil.Big)(vars.MinimumDifficulty)
+	spec.Params.DifficultyBoundDivisor = (*math.HexOrDecimal256)(vars.DifficultyBoundDivisor)
+	spec.Params.GasLimitBoundDivisor = (math.HexOrDecimal64)(vars.GasLimitBoundDivisor)
+	spec.Params.DurationLimit = (*math.HexOrDecimal256)(vars.DurationLimit)
+	spec.Params.BlockReward = (*hexutil.Big)(vars.FrontierBlockReward)
 
 	spec.Genesis.Nonce = (hexutil.Bytes)(make([]byte, 8))
 	binary.LittleEndian.PutUint64(spec.Genesis.Nonce[:], genesis.Nonce)

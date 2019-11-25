@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 type testTxRelay struct {
@@ -78,7 +79,7 @@ func txPoolTestChainGen(i int, block *core.BlockGen) {
 
 func TestTxPool(t *testing.T) {
 	for i := range testTx {
-		testTx[i], _ = types.SignTx(types.NewTransaction(uint64(i), acc1Addr, big.NewInt(10000), params.TxGas, nil, nil), types.HomesteadSigner{}, testBankKey)
+		testTx[i], _ = types.SignTx(types.NewTransaction(uint64(i), acc1Addr, big.NewInt(10000), vars.TxGas, nil, nil), types.HomesteadSigner{}, testBankKey)
 	}
 
 	var (

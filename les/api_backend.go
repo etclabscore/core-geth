@@ -35,8 +35,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -267,7 +267,7 @@ func (b *LesApiBackend) BloomStatus() (uint64, uint64) {
 		return 0, 0
 	}
 	sections, _, _ := b.eth.bloomIndexer.Sections()
-	return params.BloomBitsBlocksClient, sections
+	return vars.BloomBitsBlocksClient, sections
 }
 
 func (b *LesApiBackend) ServiceFilter(ctx context.Context, session *bloombits.MatcherSession) {

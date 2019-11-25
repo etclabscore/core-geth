@@ -34,7 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -109,8 +109,8 @@ func deploy(ctx *cli.Context) error {
 
 	// Deploy the checkpoint oracle
 	fmt.Println("Sending deploy request to Clef...")
-	oracle, tx, _, err := contract.DeployCheckpointOracle(transactor, client, addrs, big.NewInt(int64(params.CheckpointFrequency)),
-		big.NewInt(int64(params.CheckpointProcessConfirmations)), big.NewInt(int64(needed)))
+	oracle, tx, _, err := contract.DeployCheckpointOracle(transactor, client, addrs, big.NewInt(int64(vars.CheckpointFrequency)),
+		big.NewInt(int64(vars.CheckpointProcessConfirmations)), big.NewInt(int64(needed)))
 	if err != nil {
 		utils.Fatalf("Failed to deploy checkpoint oracle %v", err)
 	}
@@ -165,7 +165,7 @@ func sign(ctx *cli.Context) error {
 			return err
 		}
 		num := head.Number.Uint64()
-		if num < ((cindex+1)*params.CheckpointFrequency + params.CheckpointProcessConfirmations) {
+		if num < ((cindex+1)*vars.CheckpointFrequency + vars.CheckpointProcessConfirmations) {
 			utils.Fatalf("Invalid future checkpoint")
 		}
 		_, oracle = newContract(node)

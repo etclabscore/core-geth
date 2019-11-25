@@ -41,14 +41,14 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/tyler-smith/go-bip39"
 )
 
 const (
-	defaultGasPrice = params.GWei
+	defaultGasPrice = vars.GWei
 )
 
 // PublicEthereumAPI provides an API to access Ethereum related information.
@@ -886,11 +886,11 @@ func (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNrOr
 func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.BlockNumberOrHash, gasCap *big.Int) (hexutil.Uint64, error) {
 	// Binary search the gas requirement, as it may be higher than the amount used
 	var (
-		lo  uint64 = params.TxGas - 1
+		lo  uint64 = vars.TxGas - 1
 		hi  uint64
 		cap uint64
 	)
-	if args.Gas != nil && uint64(*args.Gas) >= params.TxGas {
+	if args.Gas != nil && uint64(*args.Gas) >= vars.TxGas {
 		hi = uint64(*args.Gas)
 	} else {
 		// Retrieve the block to act as the gas ceiling

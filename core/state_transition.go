@@ -24,7 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var (
@@ -80,9 +80,9 @@ func IntrinsicGas(data []byte, contractCreation, isEIP2 bool, isEIP2028 bool) (u
 	// Set the starting gas for the raw transaction
 	var gas uint64
 	if contractCreation && isEIP2 {
-		gas = params.TxGasContractCreation
+		gas = vars.TxGasContractCreation
 	} else {
-		gas = params.TxGas
+		gas = vars.TxGas
 	}
 	// Bump the required gas by the amount of transactional data
 	if len(data) > 0 {
@@ -94,9 +94,9 @@ func IntrinsicGas(data []byte, contractCreation, isEIP2 bool, isEIP2028 bool) (u
 			}
 		}
 		// Make sure we don't exceed uint64 for all data combinations
-		nonZeroGas := params.TxDataNonZeroGasFrontier
+		nonZeroGas := vars.TxDataNonZeroGasFrontier
 		if isEIP2028 {
-			nonZeroGas = params.TxDataNonZeroGasEIP2028
+			nonZeroGas = vars.TxDataNonZeroGasEIP2028
 		}
 		if (math.MaxUint64-gas)/nonZeroGas < nz {
 			return 0, vm.ErrOutOfGas
@@ -104,10 +104,10 @@ func IntrinsicGas(data []byte, contractCreation, isEIP2 bool, isEIP2028 bool) (u
 		gas += nz * nonZeroGas
 
 		z := uint64(len(data)) - nz
-		if (math.MaxUint64-gas)/params.TxDataZeroGas < z {
+		if (math.MaxUint64-gas)/vars.TxDataZeroGas < z {
 			return 0, vm.ErrOutOfGas
 		}
-		gas += z * params.TxDataZeroGas
+		gas += z * vars.TxDataZeroGas
 	}
 	return gas, nil
 }

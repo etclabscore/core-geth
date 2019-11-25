@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // SetupGenesisBlock writes or updates the genesis block in db.
@@ -186,10 +187,10 @@ func GenesisToBlock(g *paramtypes.Genesis, db ethdb.Database) *types.Block {
 		Root:       root,
 	}
 	if g.GasLimit == 0 {
-		head.GasLimit = params.GenesisGasLimit
+		head.GasLimit = vars.GenesisGasLimit
 	}
 	if g.Difficulty == nil {
-		head.Difficulty = params.GenesisDifficulty
+		head.Difficulty = vars.GenesisDifficulty
 	}
 	statedb.Commit(false)
 	statedb.Database().TrieDB().Commit(root, true)

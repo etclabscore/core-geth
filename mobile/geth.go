@@ -35,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/vars"
 	whisper "github.com/ethereum/go-ethereum/whisper/whisperv6"
 )
 
@@ -84,7 +85,7 @@ var defaultNodeConfig = &NodeConfig{
 	BootstrapNodes:        FoundationBootnodes(),
 	MaxPeers:              25,
 	EthereumEnabled:       true,
-	EthereumNetworkID:     int64(params.DefaultNetworkID),
+	EthereumNetworkID:     int64(vars.DefaultNetworkID),
 	EthereumDatabaseCache: 16,
 }
 

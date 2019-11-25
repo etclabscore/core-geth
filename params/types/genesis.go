@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/rlp"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 )
 
 //go:generate gencodec -type Genesis -field-override genesisSpecMarshaling -out gen_genesis.go
@@ -142,4 +143,89 @@ func DecodePreAlloc(data string) GenesisAlloc {
 		ga[common.BigToAddress(account.Addr)] = GenesisAccount{Balance: account.Balance}
 	}
 	return ga
+}
+
+// Following methods implement the common2.GenesisBlocker interface.
+
+func (g *Genesis) GetSealingType() common2.BlockSealingT {
+	return common2.BlockSealing_Ethereum
+}
+
+func (g *Genesis) SetSealingType(t common2.BlockSealingT) error {
+	if t != common2.BlockSealing_Ethereum {
+		return common2.ErrUnsupportedConfigFatal
+	}
+	return nil
+}
+
+func (g *Genesis) GetGenesisSealerEthereumNonce() uint64 {
+	return g.Nonce
+}
+
+func (g *Genesis) SetGenesisSealerEthereumNonce(n uint64) error {
+	g.Nonce = n
+	return nil
+}
+
+func (g *Genesis) GetGenesisSealerEthereumMixHash() common.Hash {
+	return g.Mixhash
+}
+
+func (g *Genesis) SetGenesisSealerEthereumMixHash(h common.Hash) error {
+	g.Mixhash = h
+	return nil
+}
+
+func (g *Genesis) GetGenesisDifficulty() *big.Int {
+	return g.Difficulty
+}
+
+func (g *Genesis) SetGenesisDifficulty(i *big.Int) error {
+	g.Difficulty = i
+	return nil
+}
+
+func (g *Genesis) GetGenesisAuthor() common.Address {
+	return g.Coinbase
+}
+
+func (g *Genesis) SetGenesisAuthor(a common.Address) error {
+	g.Coinbase = a
+	return nil
+}
+
+func (g *Genesis) GetGenesisTimestamp() uint64 {
+	return g.Timestamp
+}
+
+func (g *Genesis) SetGenesisTimestamp(u uint64) error {
+	g.Timestamp = u
+	return nil
+}
+
+func (g *Genesis) GetGenesisParentHash() common.Hash {
+	return g.ParentHash
+}
+
+func (g *Genesis) SetGenesisParentHash(h common.Hash) error {
+	g.ParentHash = h
+	return nil
+}
+
+func (g *Genesis) GetGenesisExtraData() common.Hash {
+	return common.BytesToHash(g.ExtraData)
+}
+
+func (g *Genesis) SetGenesisExtraData(h common.Hash) error {
+	g.ExtraData = h[:]
+	return nil
+}
+
+func (g *Genesis) GetGenesisGasLimit() uint64 {
+	return g.GasLimit
+}
+
+func (g *Genesis) SetGenesisGasLimit(u uint64) error {
+	g.GasLimit = u
+	return nil
 }

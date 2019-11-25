@@ -60,9 +60,17 @@ func TestConvert(t *testing.T) {
 		t.Error(err)
 	}
 
-	if method, equal := Equal(reflect.TypeOf((*common.ChainConfigurator)(nil)), &spec, &spec2); !equal {
+	if method, equal := Equal(reflect.TypeOf((*common.Configurator)(nil)), &spec, &spec2); !equal {
 		t.Error("not equal", method)
 	}
+
+	//genesis := params.DefaultGenesisBlock()
+	//genesis2 := paramtypes.Genesis{}
+	//
+	//err = Convert(genesis, genesis2)
+	//if err != nil {
+	//
+	//}
 
 	//b, _ := json.MarshalIndent(&spec, "", "    ")
 	//b2, _ := json.MarshalIndent(&spec2, "", "    ")

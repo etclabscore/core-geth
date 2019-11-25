@@ -64,11 +64,11 @@ func compare(k reflect.Type, source, target interface{}) (method string, value i
 	return "", nil, nil
 }
 
-func Convert(from, to common.ChainConfigurator) error {
-	if _, ok := from.(common.ChainConfigurator); !ok {
+func Convert(from, to common.Configurator) error {
+	if _, ok := from.(common.Configurator); !ok {
 		return errors.New("from value not a configurator")
 	}
-	if _, ok := to.(common.ChainConfigurator); !ok {
+	if _, ok := to.(common.Configurator); !ok {
 		return errors.New("to value not a configurator")
 	}
 
@@ -120,7 +120,7 @@ func Convert(from, to common.ChainConfigurator) error {
 	return nil
 }
 
-func Equal(k reflect.Type, a, b common.ChainConfigurator) (string, bool) {
+func Equal(k reflect.Type, a, b common.Configurator) (string, bool) {
 	m, _, err := compare(k.Elem(), a, b) // TODO: maybe return a value, or even a dedicated type, for better debugging
 	if err == nil {
 		return "", true

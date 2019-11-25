@@ -58,6 +58,34 @@ type Genesis struct {
 	ParentHash common.Hash `json:"parentHash"`
 }
 
+func (g *Genesis) ForEachAccount(fn func(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error) error {
+	for k, v := range g.Alloc {
+		if err := fn(k, v.Balance, v.Nonce, v.Code, v.Storage); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (g *Genesis) UpdateAccount(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error {
+	if g.Alloc == nil {
+		g.Alloc = GenesisAlloc{}
+	}
+
+	var acc GenesisAccount
+	if _, ok := g.Alloc[address]; ok {
+		acc = g.Alloc[address]
+	}
+
+	acc.Nonce = nonce
+	acc.Balance = bal
+	acc.Code = code
+	acc.Storage = storage
+
+	g.Alloc[address] = acc
+	return nil
+}
+
 // GenesisAlloc specifies the initial state that is part of the genesis block.
 type GenesisAlloc map[common.Address]GenesisAccount
 

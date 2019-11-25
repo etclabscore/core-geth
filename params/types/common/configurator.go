@@ -88,7 +88,12 @@ type CatHerder interface {
 }
 
 type Forker interface {
-	IsForked(fn func(*big.Int) bool, n *big.Int) bool
+	// IsForked tells if interface has met or exceeded a fork block number.
+	// eg. IsForked(c.GetEIP1108Transition, big.NewInt(42)))
+	IsForked(fn func() *uint64, n *big.Int) bool
+	// Forks returns all unique fork block numbers.
+	// Used for core/forkid logic.
+	// Forks() []uint64
 }
 
 type ConsensusEnginator interface {
@@ -105,22 +110,22 @@ type EthashConfigurator interface {
 	SetEthashDifficultyBoundDivisor(i *big.Int) error
 	GetEthashDurationLimit() *big.Int
 	SetEthashDurationLimit(i *big.Int) error
-	GetEthashHomesteadTransition() *big.Int
-	SetEthashHomesteadTransition(i *big.Int) error
-	GetEthashEIP2Transition() *big.Int
-	SetEthashEIP2Transition(i *big.Int) error
-	GetEthashECIP1010PauseTransition() *big.Int
-	SetEthashECIP1010PauseTransition(i *big.Int) error
-	GetEthashECIP1010ContinueTransition() *big.Int
-	SetEthashECIP1010ContinueTransition(i *big.Int) error
-	GetEthashECIP1017Transition() *big.Int
-	SetEthashECIP1017Transition(i *big.Int) error
-	GetEthashECIP1017EraRounds() *big.Int
-	SetEthashECIP1017EraRounds(i *big.Int) error
-	GetEthashEIP100BTransition() *big.Int
-	SetEthashEIP100BTransition(i *big.Int) error
-	GetEthashECIP1041Transition() *big.Int
-	SetEthashECIP1041Transition(i *big.Int) error
+	GetEthashHomesteadTransition() *uint64
+	SetEthashHomesteadTransition(n *uint64) error
+	GetEthashEIP2Transition() *uint64
+	SetEthashEIP2Transition(n *uint64) error
+	GetEthashECIP1010PauseTransition() *uint64
+	SetEthashECIP1010PauseTransition(n *uint64) error
+	GetEthashECIP1010ContinueTransition() *uint64
+	SetEthashECIP1010ContinueTransition(n *uint64) error
+	GetEthashECIP1017Transition() *uint64
+	SetEthashECIP1017Transition(n *uint64) error
+	GetEthashECIP1017EraRounds() *uint64
+	SetEthashECIP1017EraRounds(n *uint64) error
+	GetEthashEIP100BTransition() *uint64
+	SetEthashEIP100BTransition(n *uint64) error
+	GetEthashECIP1041Transition() *uint64
+	SetEthashECIP1041Transition(n *uint64) error
 
 	GetEthashDifficultyBombDelaySchedule() Uint64BigMapEncodesHex
 	SetEthashDifficultyBombDelaySchedule(m Uint64BigMapEncodesHex) error

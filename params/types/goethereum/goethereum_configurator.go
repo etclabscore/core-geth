@@ -335,11 +335,12 @@ func (c *ChainConfig) SetEIP2028Transition(n *uint64) error {
 	return nil
 }
 
-func (c *ChainConfig) IsForked(fn func(*big.Int) bool, n *big.Int) bool {
-	if n == nil || fn == nil {
+func (c *ChainConfig) IsForked(fn func() *uint64, n *big.Int) bool {
+	f := fn()
+	if f == nil || n == nil {
 		return false
 	}
-	return fn(n)
+	return big.NewInt(int64(*f)).Cmp(n) <= 0
 }
 
 func (c *ChainConfig) GetConsensusEngineType() common2.ConsensusEngineT {
@@ -392,51 +393,51 @@ func (c *ChainConfig) SetEthashDurationLimit(i *big.Int) error {
 	return nil
 }
 
-func (c *ChainConfig) GetEthashHomesteadTransition() *big.Int {
-	return c.HomesteadBlock
+func (c *ChainConfig) GetEthashHomesteadTransition() *uint64 {
+	return bigNewU64(c.HomesteadBlock)
 }
 
-func (c *ChainConfig) SetEthashHomesteadTransition(i *big.Int) error {
-	c.HomesteadBlock = i
+func (c *ChainConfig) SetEthashHomesteadTransition(i *uint64) error {
+	setBig(c.HomesteadBlock, i)
 	return nil
 }
 
-func (c *ChainConfig) GetEthashEIP2Transition() *big.Int {
-	return c.HomesteadBlock
+func (c *ChainConfig) GetEthashEIP2Transition() *uint64 {
+	return bigNewU64(c.HomesteadBlock)
 }
 
-func (c *ChainConfig) SetEthashEIP2Transition(i *big.Int) error {
-	c.HomesteadBlock = i
+func (c *ChainConfig) SetEthashEIP2Transition(i *uint64) error {
+	setBig(c.HomesteadBlock, i)
 	return nil
 }
 
-func (c *ChainConfig) GetEthashECIP1010PauseTransition() *big.Int {
+func (c *ChainConfig) GetEthashECIP1010PauseTransition() *uint64 {
 	return nil
 }
 
-func (c *ChainConfig) SetEthashECIP1010PauseTransition(i *big.Int) error {
+func (c *ChainConfig) SetEthashECIP1010PauseTransition(i *uint64) error {
 	if i == nil {
 		return nil
 	}
 	return common2.ErrUnsupportedConfigFatal
 }
 
-func (c *ChainConfig) GetEthashECIP1010ContinueTransition() *big.Int {
+func (c *ChainConfig) GetEthashECIP1010ContinueTransition() *uint64 {
 	return nil
 }
 
-func (c *ChainConfig) SetEthashECIP1010ContinueTransition(i *big.Int) error {
+func (c *ChainConfig) SetEthashECIP1010ContinueTransition(i *uint64) error {
 	if i == nil {
 		return nil
 	}
 	return common2.ErrUnsupportedConfigFatal
 }
 
-func (c *ChainConfig) GetEthashECIP1017Transition() *big.Int {
+func (c *ChainConfig) GetEthashECIP1017Transition() *uint64 {
 	return nil
 }
 
-func (c *ChainConfig) SetEthashECIP1017Transition(i *big.Int) error {
+func (c *ChainConfig) SetEthashECIP1017Transition(i *uint64) error {
 	if i == nil {
 		return nil
 	}
@@ -454,20 +455,20 @@ func (c *ChainConfig) SetEthashECIP1017EraRounds(i *big.Int) error {
 	return common2.ErrUnsupportedConfigFatal
 }
 
-func (c *ChainConfig) GetEthashEIP100BTransition() *big.Int {
-	return c.ByzantiumBlock
+func (c *ChainConfig) GetEthashEIP100BTransition() *uint64 {
+	return bigNewU64(c.ByzantiumBlock)
 }
 
-func (c *ChainConfig) SetEthashEIP100BTransition(i *big.Int) error {
-	c.ByzantiumBlock = i
+func (c *ChainConfig) SetEthashEIP100BTransition(i *uint64) error {
+	setBig(c.ByzantiumBlock, i)
 	return nil
 }
 
-func (c *ChainConfig) GetEthashECIP1041Transition() *big.Int {
+func (c *ChainConfig) GetEthashECIP1041Transition() *uint64 {
 	return nil
 }
 
-func (c *ChainConfig) SetEthashECIP1041Transition(i *big.Int) error {
+func (c *ChainConfig) SetEthashECIP1041Transition(i *uint64) error {
 	if i == nil {
 		return nil
 	}

@@ -409,11 +409,12 @@ func (spec *ParityChainSpec) SetEIP1108Transition(n *uint64) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) IsForked(fn func(*big.Int) bool, n *big.Int) bool {
-	if n == nil || fn == nil {
+func (spec *ParityChainSpec) IsForked(fn func() *uint64, n *big.Int) bool {
+	f := fn()
+	if f == nil || n == nil {
 		return false
 	}
-	return fn(n)
+	return big.NewInt(int64(*f)).Cmp(n) <= 0
 }
 
 func (spec *ParityChainSpec) GetConsensusEngineType() common2.ConsensusEngineT {
@@ -473,103 +474,77 @@ func (spec *ParityChainSpec) SetEthashDurationLimit(n *big.Int) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) GetEthashHomesteadTransition() *big.Int {
-
-	return spec.Engine.Ethash.Params.HomesteadTransition.Big()
+func (spec *ParityChainSpec) GetEthashHomesteadTransition() *uint64 {
+	return spec.Engine.Ethash.Params.HomesteadTransition.Uint64P()
 }
 
-func (spec *ParityChainSpec) SetEthashHomesteadTransition(n *big.Int) error {
-	if n == nil {
-		return nil
-	}
-	nn := n.Uint64()
-	spec.Engine.Ethash.Params.HomesteadTransition = new(ParityU64).SetUint64(&nn)
+func (spec *ParityChainSpec) SetEthashHomesteadTransition(n *uint64) error {
+	spec.Engine.Ethash.Params.HomesteadTransition = new(ParityU64).SetUint64(n)
 	return nil
 }
 
-func (spec *ParityChainSpec) GetEthashEIP2Transition() *big.Int {
-	return spec.Engine.Ethash.Params.HomesteadTransition.Big()
+func (spec *ParityChainSpec) GetEthashEIP2Transition() *uint64 {
+	return spec.Engine.Ethash.Params.HomesteadTransition.Uint64P()
 }
 
-func (spec *ParityChainSpec) SetEthashEIP2Transition(n *big.Int) error {
-	if n == nil {
-		return nil
-	}
-	nn := n.Uint64()
-	spec.Engine.Ethash.Params.HomesteadTransition = new(ParityU64).SetUint64(&nn)
+func (spec *ParityChainSpec) SetEthashEIP2Transition(n *uint64) error {
+	spec.Engine.Ethash.Params.HomesteadTransition = new(ParityU64).SetUint64(n)
 	return nil
 }
 
-func (spec *ParityChainSpec) GetEthashECIP1010PauseTransition() *big.Int {
-	return spec.Engine.Ethash.Params.ECIP1010PauseTransition.Big()
+func (spec *ParityChainSpec) GetEthashECIP1010PauseTransition() *uint64 {
+	return spec.Engine.Ethash.Params.ECIP1010PauseTransition.Uint64P()
 }
 
-func (spec *ParityChainSpec) SetEthashECIP1010PauseTransition(n *big.Int) error {
-	if n == nil {
-		return nil
-	}
-	nn := n.Uint64()
-	spec.Engine.Ethash.Params.ECIP1010PauseTransition = new(ParityU64).SetUint64(&nn)
+func (spec *ParityChainSpec) SetEthashECIP1010PauseTransition(n *uint64) error {
+	spec.Engine.Ethash.Params.ECIP1010PauseTransition = new(ParityU64).SetUint64(n)
 	return nil
 }
 
-func (spec *ParityChainSpec) GetEthashECIP1010ContinueTransition() *big.Int {
-	return spec.Engine.Ethash.Params.ECIP1010ContinueTransition.Big()
+func (spec *ParityChainSpec) GetEthashECIP1010ContinueTransition() *uint64 {
+	return spec.Engine.Ethash.Params.ECIP1010ContinueTransition.Uint64P()
 }
 
-func (spec *ParityChainSpec) SetEthashECIP1010ContinueTransition(n *big.Int) error {
-	if n == nil {
-		return nil
-	}
-	nn := n.Uint64()
-	spec.Engine.Ethash.Params.ECIP1010ContinueTransition = new(ParityU64).SetUint64(&nn)
+func (spec *ParityChainSpec) SetEthashECIP1010ContinueTransition(n *uint64) error {
+	spec.Engine.Ethash.Params.ECIP1010ContinueTransition = new(ParityU64).SetUint64(n)
 	return nil
 }
 
-func (spec *ParityChainSpec) GetEthashECIP1017Transition() *big.Int {
-	return spec.Engine.Ethash.Params.ECIP1017EraRounds.Big()
+// NOTE: Uses rounds as equivalence to transition.
+// This is not per spec, but per implementation (it just so happened that the
+// ETC fork happened at block 5m and rounds are 5m.
+func (spec *ParityChainSpec) GetEthashECIP1017Transition() *uint64 {
+	return spec.Engine.Ethash.Params.ECIP1017EraRounds.Uint64P()
 }
 
-func (spec *ParityChainSpec) SetEthashECIP1017Transition(n *big.Int) error {
+func (spec *ParityChainSpec) SetEthashECIP1017Transition(n *uint64) error {
 	return common2.ErrUnsupportedConfigNoop
 }
 
-func (spec *ParityChainSpec) GetEthashECIP1017EraRounds() *big.Int {
-	return spec.Engine.Ethash.Params.ECIP1017EraRounds.Big()
+func (spec *ParityChainSpec) GetEthashECIP1017EraRounds() *uint64 {
+	return spec.Engine.Ethash.Params.ECIP1017EraRounds.Uint64P()
 }
 
-func (spec *ParityChainSpec) SetEthashECIP1017EraRounds(n *big.Int) error {
-	if n == nil {
-		return nil
-	}
-	nn := n.Uint64()
-	spec.Engine.Ethash.Params.ECIP1017EraRounds = new(ParityU64).SetUint64(&nn)
+func (spec *ParityChainSpec) SetEthashECIP1017EraRounds(n *uint64) error {
+	spec.Engine.Ethash.Params.ECIP1017EraRounds = new(ParityU64).SetUint64(n)
 	return nil
 }
 
-func (spec *ParityChainSpec) GetEthashEIP100BTransition() *big.Int {
-	return spec.Engine.Ethash.Params.EIP100bTransition.Big()
+func (spec *ParityChainSpec) GetEthashEIP100BTransition() *uint64 {
+	return spec.Engine.Ethash.Params.EIP100bTransition.Uint64P()
 }
 
-func (spec *ParityChainSpec) SetEthashEIP100BTransition(n *big.Int) error {
-	if n == nil {
-		return nil
-	}
-	nn := n.Uint64()
-	spec.Engine.Ethash.Params.EIP100bTransition = new(ParityU64).SetUint64(&nn)
+func (spec *ParityChainSpec) SetEthashEIP100BTransition(n *uint64) error {
+	spec.Engine.Ethash.Params.EIP100bTransition = new(ParityU64).SetUint64(n)
 	return nil
 }
 
-func (spec *ParityChainSpec) GetEthashECIP1041Transition() *big.Int {
-	return spec.Engine.Ethash.Params.BombDefuseTransition.Big()
+func (spec *ParityChainSpec) GetEthashECIP1041Transition() *uint64 {
+	return spec.Engine.Ethash.Params.BombDefuseTransition.Uint64P()
 }
 
-func (spec *ParityChainSpec) SetEthashECIP1041Transition(n *big.Int) error {
-	if n == nil {
-		return nil
-	}
-	nn := n.Uint64()
-	spec.Engine.Ethash.Params.BombDefuseTransition = new(ParityU64).SetUint64(&nn)
+func (spec *ParityChainSpec) SetEthashECIP1041Transition(n *uint64) error {
+	spec.Engine.Ethash.Params.BombDefuseTransition = new(ParityU64).SetUint64(n)
 	return nil
 }
 

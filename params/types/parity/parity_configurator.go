@@ -1,11 +1,13 @@
 package parity
 
 import (
+	"encoding/json"
+	"log"
+	math2 "math"
 	"math/big"
 	"reflect"
 
-	math2 "math"
-
+	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -272,8 +274,7 @@ func (spec *ParityChainSpec) SetEIP2028Transition(i *uint64) error {
 }
 
 func (spec *ParityChainSpec) GetEIP152Transition() *uint64 {
-	at := common.BytesToAddress([]byte{9})
-	return spec.GetPrecompile(at, ParityChainSpecPricing{
+	return spec.GetPrecompile(common.BytesToAddress([]byte{9}), ParityChainSpecPricing{
 		Blake2F: &ParityChainSpecBlakePricing{
 			GasPerRound: 1,
 		},
@@ -349,7 +350,7 @@ func (spec *ParityChainSpec) GetEIP213Transition() *uint64 {
 				Price: 40000,
 			},
 		}).Uint64P()
-	if x != y {
+	if *x != *y {
 		panic("eip213 activation mismatch")
 	}
 	return x
@@ -392,7 +393,7 @@ func (spec *ParityChainSpec) GetEIP1108Transition() *uint64 {
 			},
 		}).Uint64P()
 
-	if x != y || y != z {
+	if *x != *y || *y != *z {
 		panic("eip1108 activation mismatch")
 	}
 	return x
@@ -437,7 +438,9 @@ func (spec *ParityChainSpec) GetConsensusEngineType() paramtypes.ConsensusEngine
 
 func (spec *ParityChainSpec) MustSetConsensusEngineType(engine paramtypes.ConsensusEngineT) error {
 	switch engine {
-	case paramtypes.ConsensusEngineT_Ethash, paramtypes.ConsensusEngineT_Clique:
+	case paramtypes.ConsensusEngineT_Ethash:
+		return nil
+	case paramtypes.ConsensusEngineT_Clique:
 		return nil
 	default:
 		return common2.ErrUnsupportedConfigFatal
@@ -620,12 +623,17 @@ func (spec *ParityChainSpec) GetSealingType() paramtypes.BlockSealingT {
 	if !reflect.DeepEqual(spec.Genesis.Seal.Ethereum, reflect.Zero(reflect.TypeOf(spec.Genesis.Seal.Ethereum)).Interface()) {
 		return paramtypes.BlockSealing_Ethereum
 	}
+	log.Println(spew.Sdump(spec.Genesis))
+	log.Println(spew.Sdump(reflect.Zero(reflect.TypeOf(spec.Genesis.Seal.Ethereum)).Interface()))
+	b, _ := json.MarshalIndent(spec, "", "    ")
+	log.Println(string(b))
 	return paramtypes.BlockSealing_Unknown
 }
 
 func (spec *ParityChainSpec) SetSealingType(in paramtypes.BlockSealingT) error {
 	switch in {
 	case paramtypes.BlockSealing_Ethereum:
+		return nil
 	}
 	return common2.ErrUnsupportedConfigFatal
 }
@@ -725,22 +733,34 @@ func (spec *ParityChainSpec) UpdateAccount(address common.Address, bal *big.Int,
 	spec.Accounts[addr].Balance = *math.NewHexOrDecimal256(bal.Int64())
 	spec.Accounts[addr].Nonce = math.HexOrDecimal64(nonce)
 
+	zero := uint64(0)
 	switch address {
 	case common.BytesToAddress([]byte{1}):
-		spec.SetPrecompile(1, &ParityChainSpecBuiltin{
-			Name: "ecrecover", Pricing: &ParityChainSpecPricingMaybe{Pricing: &ParityChainSpecPricing{Linear: &ParityChainSpecLinearPricing{Base: 3000}}},
+		spec.SetPrecompile2(common.BytesToAddress([]byte{1}), "ecrecover", &zero, ParityChainSpecPricing{
+			Linear: &ParityChainSpecLinearPricing{
+				Base: 3000,
+			},
 		})
 	case common.BytesToAddress([]byte{2}):
-		spec.SetPrecompile(2, &ParityChainSpecBuiltin{
-			Name: "sha256", Pricing: &ParityChainSpecPricingMaybe{Pricing: &ParityChainSpecPricing{Linear: &ParityChainSpecLinearPricing{Base: 60, Word: 12}}},
+		spec.SetPrecompile2(common.BytesToAddress([]byte{2}), "sha256", &zero, ParityChainSpecPricing{
+			Linear: &ParityChainSpecLinearPricing{
+				Base: 60,
+				Word: 2,
+			},
 		})
 	case common.BytesToAddress([]byte{3}):
-		spec.SetPrecompile(3, &ParityChainSpecBuiltin{
-			Name: "ripemd160", Pricing: &ParityChainSpecPricingMaybe{Pricing: &ParityChainSpecPricing{Linear: &ParityChainSpecLinearPricing{Base: 600, Word: 120}}},
+		spec.SetPrecompile2(common.BytesToAddress([]byte{3}), "ripemd160", &zero, ParityChainSpecPricing{
+			Linear: &ParityChainSpecLinearPricing{
+				Base: 600,
+				Word: 1,
+			},
 		})
 	case common.BytesToAddress([]byte{4}):
-		spec.SetPrecompile(4, &ParityChainSpecBuiltin{
-			Name: "identity", Pricing: &ParityChainSpecPricingMaybe{Pricing: &ParityChainSpecPricing{Linear: &ParityChainSpecLinearPricing{Base: 15, Word: 3}}},
+		spec.SetPrecompile2(common.BytesToAddress([]byte{4}), "identity", &zero, ParityChainSpecPricing{
+			Linear: &ParityChainSpecLinearPricing{
+				Base: 15,
+				Word: 3,
+			},
 		})
 	}
 	return nil

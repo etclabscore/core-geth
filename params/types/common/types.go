@@ -13,7 +13,7 @@ import (
 type UnsupportedConfigErr error
 
 var (
-	ErrUnsupportedConfigNoop  UnsupportedConfigErr = errors.New("aset")
+	ErrUnsupportedConfigNoop  UnsupportedConfigErr = errors.New("unsupported config value (noop)")
 	ErrUnsupportedConfigFatal UnsupportedConfigErr = errors.New("unsupported config value (fatal)")
 )
 
@@ -24,7 +24,7 @@ type ErrUnsupportedConfig struct {
 }
 
 func (e ErrUnsupportedConfig) Error() string {
-	return fmt.Sprintf("%v: , field: %s, value: %v", e.Err, e.Method, e.Value)
+	return fmt.Sprintf("%v, field: %s, value: %v", e.Err, e.Method, e.Value)
 }
 
 func IsFatalUnsupportedErr(err error) bool {

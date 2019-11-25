@@ -43,9 +43,9 @@ type ParityChainSpec struct {
 		} `json:"Ethash,omitempty"`
 		Clique struct {
 			Params struct {
-				Period *ParityU64 `json:"period"`
-				Epoch  *ParityU64 `json:"epoch"`
-			} `json:"params"`
+				Period *ParityU64 `json:"period,omitempty"`
+				Epoch  *ParityU64 `json:"epoch,omitempty"`
+			} `json:"params,omitempty"`
 		} `json:"Clique,omitempty"`
 	} `json:"engine"`
 
@@ -279,7 +279,7 @@ func (spec *ParityChainSpec) GetPrecompile(address common.Address, pricing Parit
 		}
 		return nil
 	}
-	if reflect.DeepEqual(acc.Builtin.Pricing.Pricing, pricing) {
+	if reflect.DeepEqual(acc.Builtin.Pricing.Pricing, &pricing) {
 		return acc.Builtin.ActivateAt
 	}
 	return nil
@@ -308,12 +308,13 @@ func (spec *ParityChainSpec) SetPrecompile2(address common.Address, name string,
 	}
 
 	bin := spec.Accounts[common.UnprefixedAddress(address)].Builtin
-	if bin == nil {
-		bin = &ParityChainSpecBuiltin{}
-	}
 	defer func() {
 		spec.Accounts[common.UnprefixedAddress(address)].Builtin = bin
 	}()
+
+	if bin == nil {
+		bin = &ParityChainSpecBuiltin{}
+	}
 
 	bin.Name = name
 	if bin.Pricing == nil {
@@ -322,6 +323,8 @@ func (spec *ParityChainSpec) SetPrecompile2(address common.Address, name string,
 			Pricing: nil,
 		}
 	}
+
+	// Always write in activation-map format.
 	bin.Pricing.Map[math.NewHexOrDecimal256(int64(*activationBlock))] = ParityChainSpecPricingPrice{
 		ParityChainSpecPricing: pricing,
 	}

@@ -256,7 +256,7 @@ var (
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
 	AllEthashProtocolChanges = &paramtypes.ChainConfig{
-		goethereum.ChainConfig{
+		ChainConfig: goethereum.ChainConfig{
 			ChainID:                 big.NewInt(1137),
 			HomesteadBlock:          big.NewInt(0),
 			DAOForkBlock:            nil,
@@ -275,77 +275,6 @@ var (
 			TrustedCheckpoint:       nil,
 			TrustedCheckpointOracle: nil,
 		},
-		1337,
-		//big.NewInt(1337), // ChainID
-
-		//big.NewInt(0), // HomesteadBlock
-		nil,           // EIP2FBlock
-		nil,           // EIP7FBlock
-
-		//nil,   // DAOForkBlock
-		//false, // DAOForkSupport
-
-		//big.NewInt(0), // EIP150Block
-		//common.Hash{}, // EIP150Hash
-		//big.NewInt(0), // EIP155Block
-		//big.NewInt(0), // EIP158Block
-		nil,           // EIP160FBlock
-		nil,           // EIP161FBlock
-		nil,           // EIP170FBlock
-
-		//big.NewInt(0), // ByzantiumBlock
-		nil,           // EIP100FBlock
-		nil,           // EIP140FBlock
-		nil,           // EIP198FBlock
-		nil,           // EIP211FBlock
-		nil,           // EIP212FBlock
-		nil,           // EIP213FBlock
-		nil,           // EIP214FBlock
-		nil,           // EIP649FBlock
-		nil,           // EIP658FBlock
-
-		//big.NewInt(0), // ConstantinopleBlock
-		nil,           // EIP145FBlock
-		nil,           // EIP1014FBlock
-		nil,           // EIP1052FBlock
-		nil,           // EIP1234FBlock
-		nil,           // EIP1283FBlock
-
-		//big.NewInt(0), // PetersburgBlock
-		//big.NewInt(0), // IstanbulBlock
-
-		nil, // EIP152FBlock
-		nil, // EIP1108FBlock
-		nil, // EIP1344FBlock
-		nil, // EIP1884FBlock
-		nil, // EIP2028FBlock
-		nil, // EIP2200FBlock
-		//nil, // EWASMBlock
-
-		nil, // ECIP1010PauseBlock
-		nil, // ECIP1010Length
-		nil, // ECIP1017FBlock
-		nil, // ECIP1017EraRounds
-		nil, // DisposalBlock
-		nil, // SocialBlock
-		nil, // EthersocialBlock
-
-		nil, // Musicoin MCIP0Block UBI
-		nil, // Musicoin MCIP3Block UBI
-		nil, // Musicoin MCIP8Block QT
-
-		//new(goethereum.EthashConfig), // Ethash
-		//nil,                          // Clique
-		//nil,
-		//nil,
-		// DifficultyBombDelaySchedule
-		common2.Uint64BigMapEncodesHex{
-			0: new(big.Int).SetUint64(uint64(0x1e8480)),
-		},
-		// BlockRewardSchedule
-		common2.Uint64BigMapEncodesHex{
-			0: new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
-		},
 	}
 
 	// AllCliqueProtocolChanges contains every protocol change (EIPs) introduced
@@ -354,7 +283,7 @@ var (
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
 	AllCliqueProtocolChanges = &paramtypes.ChainConfig{
-		goethereum.ChainConfig{
+		ChainConfig: goethereum.ChainConfig{
 			ChainID:                 big.NewInt(1337),
 			HomesteadBlock:          big.NewInt(0),
 			DAOForkBlock:            nil,
@@ -376,84 +305,11 @@ var (
 			TrustedCheckpoint:       nil,
 			TrustedCheckpointOracle: nil,
 		},
-		5,
-		//big.NewInt(1337), // ChainID
-
-		//big.NewInt(0), // HomesteadBlock
-		nil,           // EIP2FBlock
-		nil,           // EIP7FBlock
-
-		//nil,   // DAOForkBlock
-		//false, // DAOForkSupport
-
-		//big.NewInt(0), // EIP150Block
-		//common.Hash{}, // EIP150Hash
-		//big.NewInt(0), // EIP155Block
-		//big.NewInt(0), // EIP158Block
-		nil,           // EIP160FBlock
-		nil,           // EIP161FBlock
-		nil,           // EIP170FBlock
-
-		//big.NewInt(0), // ByzantiumBlock
-		nil,           // EIP100FBlock
-		nil,           // EIP140FBlock
-		nil,           // EIP198FBlock
-		nil,           // EIP211FBlock
-		nil,           // EIP212FBlock
-		nil,           // EIP213FBlock
-		nil,           // EIP214FBlock
-		nil,           // EIP649FBlock
-		nil,           // EIP658FBlock
-
-		//big.NewInt(0), // ConstantinopleBlock
-		nil,           // EIP145FBlock
-		nil,           // EIP1014FBlock
-		nil,           // EIP1052FBlock
-		nil,           // EIP1234FBlock
-		nil,           // EIP1283FBlock
-
-		//nil, // PetersburgBlock
-		//nil, // IstanbulBlock
-		nil, // EIP152FBlock
-		nil, // EIP1108FBlock
-		nil, // EIP1344FBlock
-		nil, // EIP1884FBlock
-		nil, // EIP2028FBlock
-		nil, // EIP2200FBlock
-		//nil, // EWASMBlock
-
-		nil, // ECIP1010PauseBlock
-		nil, // ECIP1010Length
-		nil, // ECIP1017FBlock
-		nil, // ECIP1017EraRounds
-		nil, // DisposalBlock
-		nil, // SocialBlock
-		nil, // EthersocialBlock
-
-		nil, // Musicoin MCIP0Block UBI
-		nil, // Musicoin MCIP3Block UBI
-		nil, // Musicoin MCIP8Block QT
-
-		//nil, // Ethash
-		//&goethereum.CliqueConfig{
-		//	Period: 0,
-		//	Epoch:  30000,
-		//},
-		//nil,
-		//nil,
-		// DifficultyBombDelaySchedule
-		common2.Uint64BigMapEncodesHex{
-			0: new(big.Int).SetUint64(uint64(0x1e8480)),
-		},
-		// BlockRewardSchedule
-		common2.Uint64BigMapEncodesHex{
-			0: new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
-		},
 	}
 
 	// TestChainConfig is used for tests.
 	TestChainConfig = &paramtypes.ChainConfig{
-		goethereum.ChainConfig{
+		ChainConfig: goethereum.ChainConfig{
 			ChainID:                 big.NewInt(1),
 			HomesteadBlock:          nil,
 			DAOForkBlock:            nil,
@@ -471,76 +327,6 @@ var (
 			Clique:                  nil,
 			TrustedCheckpoint:       nil,
 			TrustedCheckpointOracle: nil,
-		},
-		3,
-		//big.NewInt(1), // ChainID
-
-		//big.NewInt(0), // HomesteadBlock
-		nil,           // EIP2FBlock
-		nil,           // EIP7FBlock
-
-		//nil,   // DAOForkBlock
-		//false, // DAOForkSupport
-
-		//big.NewInt(0), // EIP150Block
-		//common.Hash{}, // EIP150Hash
-		//big.NewInt(0), // EIP155Block
-		//big.NewInt(0), // EIP158Block
-		nil,           // EIP160FBlock
-		nil,           // EIP161FBlock
-		nil,           // EIP170FBlock
-
-		//big.NewInt(0), // ByzantiumBlock
-		nil,           // EIP100FBlock
-		nil,           // EIP140FBlock
-		nil,           // EIP198FBlock
-		nil,           // EIP211FBlock
-		nil,           // EIP212FBlock
-		nil,           // EIP213FBlock
-		nil,           // EIP214FBlock
-		nil,           // EIP649FBlock
-		nil,           // EIP658FBlock
-
-		//big.NewInt(0), // ConstantinopleBlock
-		nil,           // EIP145FBlock
-		nil,           // EIP1014FBlock
-		nil,           // EIP1052FBlock
-		nil,           // EIP1234FBlock
-		nil,           // EIP1283FBlock
-
-		//big.NewInt(0), // PetersburgBlock
-		//big.NewInt(0), // IstanbulBlock
-		nil, // EIP152FBlock
-		nil, // EIP1108FBlock
-		nil, // EIP1344FBlock
-		nil, // EIP1884FBlock
-		nil, // EIP2028FBlock
-		nil, // EIP2200FBlock
-		//nil, // EWASMBlock
-
-		nil, // ECIP1010PauseBlock
-		nil, // ECIP1010Length
-		nil, // ECIP1017FBlock
-		nil, // ECIP1017EraRounds
-		nil, // DisposalBlock
-		nil, // SocialBlock
-		nil, // EthersocialBlock
-
-		nil, // Musicoin MCIP0Block UBI
-		nil, // Musicoin MCIP3Block UBI
-		nil, // Musicoin MCIP8Block QT
-
-		//new(goethereum.EthashConfig), // Ethash
-		//nil,                          // Clique
-		//nil,
-		//nil,
-		// DifficultyBombDelaySchedule
-		common2.Uint64BigMapEncodesHex{
-			0: new(big.Int).SetUint64(uint64(0x1e8480)),
-		},
-		// BlockRewardSchedule
-		common2.Uint64BigMapEncodesHex{
-			0: new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
 		},
 	}
 )

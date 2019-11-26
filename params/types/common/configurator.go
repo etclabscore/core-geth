@@ -6,6 +6,20 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
+// This file holds the Configurator interfaces.
+// Interface methods follow distinct naming and signature patterns
+// to enable abstracted logic.
+//
+// All methods are in pairs; Get'ers and Set'ers.
+// Some Set methods are prefixed with Must, ie MustSet. These methods
+// are allowed to return errors for debugging and logging, but
+// any non-nil errors returned should stop program execution.
+//
+// All Forking methods (getting and setting Hard-fork requiring protocol changes)
+// are suffixed with "Transition", and use *uint64 as in- and out-put variable types.
+// A pointer is used because it's important that the fields can be nil, to signal
+// being unset (as opposed to zero value uint64 == 0, ie from Genesis).
+
 type Configurator interface {
 	ChainConfigurator
 	GenesisBlocker
@@ -18,6 +32,7 @@ type ChainConfigurator interface {
 	// CHTer
 }
 
+// CatHerder defines protocol interfaces that are agnostic of consensus engine.
 type CatHerder interface {
 	GetAccountStartNonce() *uint64
 	SetAccountStartNonce(n *uint64) error

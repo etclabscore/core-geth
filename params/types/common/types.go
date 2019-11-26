@@ -130,10 +130,10 @@ func (b Uint64BigMapEncodesHex) MarshalJSON() ([]byte, error) {
 // This is a reverse lookup to extract EIP-spec'd parameters from difficulty and reward maps implementations.
 func ExtractHostageSituationN(difficulties Uint64BigMapEncodesHex, rewards Uint64BigMapEncodesHex, difficultySum, wantedReward *big.Int) *uint64 {
 	var diffN *uint64
-	var sl = make([]uint64, len(difficulties))
+	var sl = []uint64{}
 
 	// difficulty
-	for k := range difficulties {
+	for k, _ := range difficulties {
 		sl = append(sl, k)
 	}
 	sort.Slice(sl, func(i, j int) bool {
@@ -142,7 +142,11 @@ func ExtractHostageSituationN(difficulties Uint64BigMapEncodesHex, rewards Uint6
 
 	var total = new(big.Int)
 	for _, s := range sl {
-		total.Add(total, difficulties[s])
+		d :=  difficulties[s]
+		if d == nil {
+			panic(fmt.Sprintf("dnil difficulties: %v, sl: %v", difficulties, sl))
+		}
+		total.Add(total, d)
 		if total.Cmp(difficultySum) == 0 {
 			diffN = &s
 			break

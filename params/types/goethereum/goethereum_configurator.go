@@ -411,10 +411,15 @@ func (c *ChainConfig) SetEthashDurationLimit(i *big.Int) error {
 	return nil
 }
 
+// NOTE: Checking for if c.Ethash == nil is a consideration.
+// If set, settings are strictly enforced, and can avoid misconfiguration.
+// If not, settings are more lenient, and allow for more shorthand testing.
+// For the current implementation I have chosen to USE the nil check
+// for Set_ methods, and to abstain for Get_ methods.
+// This allows for shorthand-initialized structs, eg. for testing,
+// but refuses un-strict Conversion methods.
+
 func (c *ChainConfig) GetEthashHomesteadTransition() *uint64 {
-	if c.Ethash == nil {
-		return nil
-	}
 	return bigNewU64(c.HomesteadBlock)
 }
 
@@ -427,9 +432,6 @@ func (c *ChainConfig) SetEthashHomesteadTransition(i *uint64) error {
 }
 
 func (c *ChainConfig) GetEthashEIP2Transition() *uint64 {
-	if c.Ethash == nil {
-		return nil
-	}
 	return bigNewU64(c.HomesteadBlock)
 }
 
@@ -466,9 +468,6 @@ func (c *ChainConfig) SetEthashEIP649Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEthashEIP1234TransitionV() *uint64 {
-	if c.Ethash == nil {
-		return nil
-	}
 	return bigNewU64(c.ConstantinopleBlock)
 }
 
@@ -525,9 +524,6 @@ func (c *ChainConfig) SetEthashECIP1017EraRounds(i *uint64) error {
 }
 
 func (c *ChainConfig) GetEthashEIP100BTransition() *uint64 {
-	if c.Ethash == nil {
-		return nil
-	}
 	return bigNewU64(c.ByzantiumBlock)
 }
 

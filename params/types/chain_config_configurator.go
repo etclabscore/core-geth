@@ -363,6 +363,9 @@ func (c *ChainConfig) GetEthashHomesteadTransition() *uint64 {
 }
 
 func (c *ChainConfig) SetEthashHomesteadTransition(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	setBig(c.EIP2FBlock, n)
 	setBig(c.EIP7FBlock, n)
 	return nil
@@ -373,6 +376,9 @@ func (c *ChainConfig) GetEthashEIP2Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEthashEIP2Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	setBig(c.EIP2FBlock, n)
 	return nil
 }
@@ -410,6 +416,9 @@ func (c *ChainConfig) GetEthashEIP649TransitionV() *uint64 {
 }
 
 func (c *ChainConfig) SetEthashEIP649Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	setBig(c.EIP649FBlock, n)
 	c.eip649FInferred = true
 	if n == nil {
@@ -447,6 +456,9 @@ func (c *ChainConfig) GetEthashEIP1234TransitionV() *uint64 {
 }
 
 func (c *ChainConfig) SetEthashEIP1234Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	setBig(c.EIP1234FBlock, n)
 	c.eip1234FInferred = true
 	if n == nil {
@@ -474,16 +486,28 @@ func (c *ChainConfig) GetEthashECIP1010PauseTransition() *uint64 {
 }
 
 func (c *ChainConfig) SetEthashECIP1010PauseTransition(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	setBig(c.ECIP1010PauseBlock, n)
 	return nil
 }
 
 func (c *ChainConfig) GetEthashECIP1010ContinueTransition() *uint64 {
+	if c.ECIP1010PauseBlock == nil {
+		return nil
+	}
+	if c.ECIP1010Length == nil {
+		return nil
+	}
 	// transition = pause + length
 	return bigNewU64(new(big.Int).Add(c.ECIP1010PauseBlock, c.ECIP1010Length))
 }
 
 func (c *ChainConfig) SetEthashECIP1010ContinueTransition(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	// length = continue - pause
 	if n == nil {
 		return common2.ErrUnsupportedConfigNoop
@@ -500,6 +524,9 @@ func (c *ChainConfig) GetEthashECIP1017Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEthashECIP1017Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	setBig(c.ECIP1017FBlock, n)
 	return nil
 }
@@ -509,6 +536,9 @@ func (c *ChainConfig) GetEthashECIP1017EraRounds() *uint64 {
 }
 
 func (c *ChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	setBig(c.ECIP1017EraRounds, n)
 	return nil
 }
@@ -518,6 +548,9 @@ func (c *ChainConfig) GetEthashEIP100BTransition() *uint64 {
 }
 
 func (c *ChainConfig) SetEthashEIP100BTransition(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	setBig(c.EIP100FBlock, n)
 	return nil
 }
@@ -527,6 +560,9 @@ func (c *ChainConfig) GetEthashECIP1041Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEthashECIP1041Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	setBig(c.DisposalBlock, n)
 	return nil
 }
@@ -536,6 +572,9 @@ func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() common.Uint64BigMap
 }
 
 func (c *ChainConfig) SetEthashDifficultyBombDelaySchedule(m common.Uint64BigMapEncodesHex) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	c.DifficultyBombDelaySchedule = m
 	return nil
 }
@@ -545,6 +584,9 @@ func (c *ChainConfig) GetEthashBlockRewardSchedule() common.Uint64BigMapEncodesH
 }
 
 func (c *ChainConfig) SetEthashBlockRewardSchedule(m common.Uint64BigMapEncodesHex) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	c.BlockRewardSchedule = m
 	return nil
 }

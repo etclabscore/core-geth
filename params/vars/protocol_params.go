@@ -19,6 +19,18 @@ package vars
 import "math/big"
 
 var (
+	FrontierBlockReward = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
+	EIP649FBlockReward = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
+	EIP1234FBlockReward = big.NewInt(2e+18) // Block reward in wei for successfully mining a block upward from Constantinople
+
+	// Values represent TOTAL delays, per specs
+	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-649.md
+	EIP649DifficultyBombDelay = big.NewInt(3000000)
+	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1234.md
+	EIP1234DifficultyBombDelay = big.NewInt(5000000)
+	)
+
+var (
 	GasLimitBoundDivisor uint64 = 1024    // The bound divisor of the gas limit, used in update calculations.
 	MinGasLimit          uint64 = 5000    // Minimum the gas limit may ever be.
 	GenesisGasLimit      uint64 = 4712388 // Gas limit of the Genesis block.
@@ -139,10 +151,3 @@ var (
 	EIP2DifficultyIncrementDivisor    = big.NewInt(10)     // Is related to the equilibrium block intervals for the Homestead era difficulty evolution, redefines the value in (YP:43), originally 10 = 0xa
 	EIP100FDifficultyIncrementDivisor = big.NewInt(9)
 )
-
-var FrontierBlockReward = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
-
-var EIP649FBlockReward = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
-
-var EIP1234FBlockReward = big.NewInt(2e+18) // Block reward in wei for successfully mining a block upward from Constantinople
-

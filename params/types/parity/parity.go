@@ -42,8 +42,18 @@ type ParityChainSpec struct {
 				DurationLimit          *math.HexOrDecimal256          `json:"durationLimit"`
 				BlockReward            common2.Uint64BigValOrMapHex   `json:"blockReward"`
 				DifficultyBombDelays   common2.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"`
-				HomesteadTransition    *ParityU64                     `json:"homesteadTransition"`
-				EIP100bTransition      *ParityU64                     `json:"eip100bTransition"`
+
+				// Caches.
+				// These inferences require computation.
+				// This makes it so that the 'heavy-lifting' only has to run once.
+				// See common2.ExtractHostageSituationN for this bespoke logic.
+				eip649inferred    bool       `json:"-"`
+				eip649Transition  *ParityU64 `json:"-"`
+				eip1234inferred   bool       `json:"-"`
+				eip1234Transition *ParityU64 `json:"-"`
+
+				HomesteadTransition *ParityU64 `json:"homesteadTransition"`
+				EIP100bTransition   *ParityU64 `json:"eip100bTransition"`
 
 				// Note: DAO fields will NOT be written to Parity configs from multi-geth.
 				// The chains with DAO settings are already canonical and have existing chainspecs.

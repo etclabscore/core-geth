@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"sort"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/common/math"
@@ -140,6 +141,45 @@ func (b Uint64BigMapEncodesHex) MarshalJSON() ([]byte, error) {
 		mm[math.HexOrDecimal64(k)] = math.NewHexOrDecimal256(v.Int64())
 	}
 	return json.Marshal(mm)
+}
+
+// ExtractHostageSituationN returns the block number for a given hostage situation, ie EIP649 and/or EIP1234.
+// This is a reverse lookup to extract EIP-spec'd parameters from difficulty and reward maps implementations.
+func ExtractHostageSituationN(difficulties Uint64BigMapEncodesHex, rewards Uint64BigMapEncodesHex, difficultySum, wantedReward *big.Int) *uint64 {
+	var diffN *uint64
+	var sl = make([]uint64, len(difficulties))
+
+	// difficulty
+	for k := range difficulties {
+		sl = append(sl, k)
+	}
+	sort.Slice(sl, func(i, j int) bool {
+		return sl[i] < sl[j]
+	})
+
+	var total = new(big.Int)
+	for _, s := range sl {
+		total.Add(total, difficulties[s])
+		if total.Cmp(difficultySum) == 0 {
+			diffN = &s
+			break
+		}
+	}
+	if diffN == nil {
+		// difficulty bomb delay not configured,
+		// then does not meet eip649/eip1234 spec
+		return nil
+	}
+
+	reward, ok := rewards[*diffN]
+	if !ok {
+		return nil
+	}
+	if reward.Cmp(wantedReward) != 0 {
+		return nil
+	}
+
+	return diffN
 }
 
 type ConsensusEngineT int

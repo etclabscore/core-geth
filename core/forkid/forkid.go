@@ -20,17 +20,17 @@ package forkid
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"hash/crc32"
 	"math"
-	"math/big"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/types"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var (
@@ -212,49 +212,51 @@ func checksumToBytes(hash uint32) [4]byte {
 // gatherForks gathers all the known forks and creates a sorted list out of them.
 func gatherForks(config *paramtypes.ChainConfig) []uint64 {
 	var forks []uint64
-	var forksM = make(map[uint64]struct{})
+	var forksM = make(map[uint64]struct{}) // Will key for uniqueness as fork numbers are appended to slice.
 
-	for kind, v := range map[reflect.Type]interface{}{
-		reflect.TypeOf(goethereum.ChainConfig{}): &config.ChainConfig,
-		reflect.TypeOf(paramtypes.ChainConfig{}): config,
+	for _, v := range []interface{}{
+		&config.ChainConfig,
+		config,
 	} {
 		// Gather all the fork block numbers via reflection
-		//kind := reflect.TypeOf(paramtypes.ChainConfig{})
-		conf := reflect.ValueOf(v).Elem()
+		kind := reflect.TypeOf(v)
 
-		for i := 0; i < kind.NumField(); i++ {
+		for i := 0; i < kind.NumMethod(); i++ {
 			// Fetch the next field and skip non-fork rules
-			field := kind.Field(i)
-			if !strings.HasSuffix(field.Name, "Block") {
+			method := kind.Method(i)
+			if !strings.HasSuffix(method.Name, "Transition") || !strings.HasPrefix(method.Name, "Get") {
 				continue
 			}
-			if field.Type != reflect.TypeOf(new(big.Int)) {
-				continue
-			}
+
 			// Extract the fork rule block number and aggregate it
-			rule := conf.Field(i).Interface().(*big.Int)
-			if rule != nil {
-				if _, ok := forksM[rule.Uint64()]; !ok {
-					forks = append(forks, rule.Uint64())
-					forksM[rule.Uint64()] = struct{}{}
-				}
+			response := reflect.ValueOf(v).MethodByName(method.Name).Call([]reflect.Value{})
+			if len(response) == 0 {
+				continue // should never happen b/c interface Get_ pattern always returns a *uint64
+			}
+			r := response[0]
+			if r.IsNil() {
+				continue
+			}
+			rule, ok := r.Interface().(*uint64)
+			if !ok {
+				panic(fmt.Sprintf("%s.%s wrong ChainConfigurator interface", kind.Name(), method.Name))
+			}
+
+			if *rule == math.MaxUint64 {
+				continue
+			}
+
+			// Only append unique fork numbers, excluding 0 (genesis config is not considered a fork)
+			if _, ok := forksM[*rule]; !ok && *rule != 0 {
+				forks = append(forks, *rule)
+				forksM[*rule] = struct{}{}
 			}
 		}
 	}
 
-	// Sort the fork block numbers to permit chronologival XOR
-	for i := 0; i < len(forks); i++ {
-		for j := i + 1; j < len(forks); j++ {
-			if forks[i] > forks[j] {
-				forks[i], forks[j] = forks[j], forks[i]
-			}
-		}
-	}
-
-	// Skip any forks in block 0, that's the genesis ruleset
-	if len(forks) > 0 && forks[0] == 0 {
-		forks = forks[1:]
-	}
+	sort.Slice(forks, func(i, j int) bool {
+		return forks[i] < forks[j]
+	})
 
 	return forks
 }

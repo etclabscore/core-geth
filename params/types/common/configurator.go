@@ -106,9 +106,6 @@ type Forker interface {
 	// IsForked tells if interface has met or exceeded a fork block number.
 	// eg. IsForked(c.GetEIP1108Transition, big.NewInt(42)))
 	IsForked(fn func() *uint64, n *big.Int) bool
-	// Forks returns all unique fork block numbers.
-	// Used for core/forkid logic.
-	// Forks() []uint64
 }
 
 type ConsensusEnginator interface {

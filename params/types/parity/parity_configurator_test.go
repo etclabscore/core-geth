@@ -24,3 +24,19 @@ func TestParityChainSpec_GetConsensusEngineType(t *testing.T) {
 		t.Error("mismatch engine", engine)
 	}
 }
+
+func TestParityChainSpec_GetSetUint64(t *testing.T) {
+	spec := &ParityChainSpec{}
+	if spec.GetEthashHomesteadTransition() != nil {
+		t.Error("not empty")
+	}
+	spec.SetEthashHomesteadTransition(nil)
+	if spec.GetEthashHomesteadTransition() != nil {
+		t.Error("not nil")
+	}
+	fortyTwo := uint64(42)
+	spec.SetEthashHomesteadTransition(&fortyTwo)
+	if *spec.GetEthashHomesteadTransition() != fortyTwo {
+		t.Error("not right answer")
+	}
+}

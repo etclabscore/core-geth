@@ -158,15 +158,13 @@ func TestForkIDSplit(t *testing.T) {
 	var (
 		engine = ethash.NewFaker()
 
-		configNoFork  = &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{HomesteadBlock: big.NewInt(1)}}
-		configProFork = &paramtypes.ChainConfig{
-			ChainConfig: goethereum.ChainConfig{
-				HomesteadBlock: big.NewInt(1),
-				EIP150Block:    big.NewInt(2),
-				EIP155Block:    big.NewInt(2),
-				EIP158Block:    big.NewInt(2),
-				ByzantiumBlock: big.NewInt(3),
-			},
+		configNoFork  = &goethereum.ChainConfig{HomesteadBlock: big.NewInt(1)}
+		configProFork = &goethereum.ChainConfig{
+			HomesteadBlock: big.NewInt(1),
+			EIP150Block:    big.NewInt(2),
+			EIP155Block:    big.NewInt(2),
+			EIP158Block:    big.NewInt(2),
+			ByzantiumBlock: big.NewInt(3),
 		}
 		dbNoFork  = rawdb.NewMemoryDatabase()
 		dbProFork = rawdb.NewMemoryDatabase()

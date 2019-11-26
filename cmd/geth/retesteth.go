@@ -355,20 +355,18 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 	}
 
 	genesis := &paramtypes.Genesis{
-		Config: &paramtypes.ChainConfig{
-			ChainConfig: goethereum.ChainConfig{
-				ChainID:             chainId,
-				HomesteadBlock:      homesteadBlock,
-				DAOForkBlock:        daoForkBlock,
-				DAOForkSupport:      false,
-				EIP150Block:         eip150Block,
-				EIP155Block:         eip155Block,
-				EIP158Block:         eip158Block,
-				ByzantiumBlock:      byzantiumBlock,
-				ConstantinopleBlock: constantinopleBlock,
-				PetersburgBlock:     petersburgBlock,
-				IstanbulBlock:       istanbulBlock,
-			},
+		Config: &goethereum.ChainConfig{
+			ChainID:             chainId,
+			HomesteadBlock:      homesteadBlock,
+			DAOForkBlock:        daoForkBlock,
+			DAOForkSupport:      false,
+			EIP150Block:         eip150Block,
+			EIP155Block:         eip155Block,
+			EIP158Block:         eip158Block,
+			ByzantiumBlock:      byzantiumBlock,
+			ConstantinopleBlock: constantinopleBlock,
+			PetersburgBlock:     petersburgBlock,
+			IstanbulBlock:       istanbulBlock,
 		},
 		Nonce:      uint64(chainParams.Genesis.Nonce),
 		Timestamp:  uint64(chainParams.Genesis.Timestamp),

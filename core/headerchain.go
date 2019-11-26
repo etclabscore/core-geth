@@ -32,7 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	lru "github.com/hashicorp/golang-lru"
 )
 
@@ -48,7 +48,7 @@ const (
 // It is not thread safe either, the encapsulating chain structures should do
 // the necessary mutex locking/unlocking.
 type HeaderChain struct {
-	config *paramtypes.ChainConfig
+	config common2.ChainConfigurator
 
 	chainDb       ethdb.Database
 	genesisHeader *types.Header
@@ -70,7 +70,7 @@ type HeaderChain struct {
 //  getValidator should return the parent's validator
 //  procInterrupt points to the parent's interrupt semaphore
 //  wg points to the parent's shutdown wait group
-func NewHeaderChain(chainDb ethdb.Database, config *paramtypes.ChainConfig, engine consensus.Engine, procInterrupt func() bool) (*HeaderChain, error) {
+func NewHeaderChain(chainDb ethdb.Database, config common2.ChainConfigurator, engine consensus.Engine, procInterrupt func() bool) (*HeaderChain, error) {
 	headerCache, _ := lru.New(headerCacheLimit)
 	tdCache, _ := lru.New(tdCacheLimit)
 	numberCache, _ := lru.New(numberCacheLimit)
@@ -533,7 +533,7 @@ func (hc *HeaderChain) SetGenesis(head *types.Header) {
 }
 
 // Config retrieves the header chain's chain configuration.
-func (hc *HeaderChain) Config() *paramtypes.ChainConfig { return hc.config }
+func (hc *HeaderChain) Config() common2.ChainConfigurator { return hc.config }
 
 // Engine retrieves the header chain's consensus engine.
 func (hc *HeaderChain) Engine() consensus.Engine { return hc.engine }

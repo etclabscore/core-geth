@@ -205,6 +205,14 @@ func (c ConsensusEngineT) String() string {
 	}
 }
 
+func (c ConsensusEngineT) IsEthash() bool {
+	return c == ConsensusEngineT_Ethash
+}
+
+func (c ConsensusEngineT) IsClique() bool {
+	return c == ConsensusEngineT_Clique
+}
+
 type BlockSealingT int
 
 const (

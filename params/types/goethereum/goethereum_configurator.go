@@ -87,15 +87,12 @@ func (c *ChainConfig) SetNetworkID(n *uint64) error {
 	return nil
 }
 
-func (c *ChainConfig) GetChainID() *uint64 {
-	return bigNewU64(c.ChainID)
+func (c *ChainConfig) GetChainID() *big.Int {
+	return c.ChainID
 }
 
-func (c *ChainConfig) SetChainID(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	c.ChainID = big.NewInt(int64(*n))
+func (c *ChainConfig) SetChainID(n *big.Int) error {
+	c.ChainID = n
 	return nil
 }
 

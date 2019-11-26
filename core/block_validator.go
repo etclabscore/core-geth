@@ -22,7 +22,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -31,13 +31,13 @@ import (
 //
 // BlockValidator implements Validator.
 type BlockValidator struct {
-	config *paramtypes.ChainConfig // Chain configuration options
-	bc     *BlockChain             // Canonical block chain
-	engine consensus.Engine        // Consensus engine used for validating
+	config common2.ChainConfigurator // Chain configuration options
+	bc     *BlockChain               // Canonical block chain
+	engine consensus.Engine          // Consensus engine used for validating
 }
 
 // NewBlockValidator returns a new block validator which is safe for re-use
-func NewBlockValidator(config *paramtypes.ChainConfig, blockchain *BlockChain, engine consensus.Engine) *BlockValidator {
+func NewBlockValidator(config common2.ChainConfigurator, blockchain *BlockChain, engine consensus.Engine) *BlockValidator {
 	validator := &BlockValidator{
 		config: config,
 		engine: engine,
@@ -95,8 +95,8 @@ func (v *BlockValidator) ValidateState(block *types.Block, statedb *state.StateD
 		return fmt.Errorf("invalid receipt root hash (remote: %x local: %x)", header.ReceiptHash, receiptSha)
 	}
 	// Validate the state root against the received state root and throw
+	if root := statedb.IntermediateRoot(v.config.IsForked(v.config.GetEIP161abcTransition, header.Number)); header.Root != root {
 	// an error if they don't match.
-	if root := statedb.IntermediateRoot(v.config.IsEIP161F(header.Number)); header.Root != root {
 		return fmt.Errorf("invalid merkle root (remote: %x local: %x)", header.Root, root)
 	}
 	return nil

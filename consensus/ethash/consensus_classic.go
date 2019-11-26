@@ -20,16 +20,16 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
-func ecip1017BlockReward(config *paramtypes.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+func ecip1017BlockReward(config common2.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
 	blockReward := vars.FrontierBlockReward
 
 	// Ensure value 'era' is configured.
-	eraLen := config.ECIP1017EraRounds
-	era := GetBlockEra(header.Number, eraLen)
+	eraLen := config.GetEthashECIP1017EraRounds()
+	era := GetBlockEra(header.Number, new(big.Int).SetUint64(*eraLen))
 	wr := GetBlockWinnerRewardByEra(era, blockReward)                    // wr "winner reward". 5, 4, 3.2, 2.56, ...
 	wurs := GetBlockWinnerRewardForUnclesByEra(era, uncles, blockReward) // wurs "winner uncle rewards"
 	wr.Add(wr, wurs)
@@ -42,14 +42,14 @@ func ecip1017BlockReward(config *paramtypes.ChainConfig, state *state.StateDB, h
 	}
 }
 
-func ecip1010Explosion(config *paramtypes.ChainConfig, next *big.Int, exPeriodRef *big.Int) {
+func ecip1010Explosion(config common2.ChainConfigurator, next *big.Int, exPeriodRef *big.Int) {
 	// https://github.com/ethereumproject/ECIPs/blob/master/ECIPs/ECIP-1010.md
 
-	explosionBlock := new(big.Int).Add(config.ECIP1010PauseBlock, config.ECIP1010Length)
-	if next.Cmp(explosionBlock) < 0 {
-		exPeriodRef.Set(config.ECIP1010PauseBlock)
+	if next.Uint64() < *config.GetEthashECIP1010ContinueTransition() {
+		exPeriodRef.SetUint64(*config.GetEthashECIP1010PauseTransition())
 	} else {
-		exPeriodRef.Sub(exPeriodRef, config.ECIP1010Length)
+		length := new(big.Int).SetUint64(*config.GetEthashECIP1010ContinueTransition() - *config.GetEthashECIP1010PauseTransition())
+		exPeriodRef.Sub(exPeriodRef, length)
 	}
 }
 

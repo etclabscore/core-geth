@@ -65,12 +65,16 @@ func (spec *ParityChainSpec) SetNetworkID(i *uint64) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) GetChainID() *uint64 {
-	return spec.Params.ChainID.Uint64P()
+func (spec *ParityChainSpec) GetChainID() *big.Int {
+	return spec.Params.ChainID.Big()
 }
 
-func (spec *ParityChainSpec) SetChainID(i *uint64) error {
-	spec.Params.ChainID = new(ParityU64).SetUint64(i)
+func (spec *ParityChainSpec) SetChainID(i *big.Int) error {
+	if i == nil {
+		return nil
+	}
+	u := i.Uint64()
+	spec.Params.ChainID = new(ParityU64).SetUint64(&u)
 	return nil
 }
 

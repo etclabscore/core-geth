@@ -43,7 +43,7 @@ func ExampleGenerateChain() {
 
 	// Ensure that key1 has some funds in the genesis block.
 	gspec := &paramtypes.Genesis{
-		Config: &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{HomesteadBlock: new(big.Int)}},
+		Config: &goethereum.ChainConfig{HomesteadBlock: new(big.Int)},
 		Alloc:  paramtypes.GenesisAlloc{addr1: {Balance: big.NewInt(1000000)}},
 	}
 	genesis := MustCommitGenesis(db, gspec)

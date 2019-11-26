@@ -601,7 +601,7 @@ func TestFastVsFullChains(t *testing.T) {
 			Alloc:  paramtypes.GenesisAlloc{address: {Balance: funds}},
 		}
 		genesis = MustCommitGenesis(gendb, gspec)
-		signer  = types.NewEIP155Signer(gspec.Config.ChainID)
+		signer  = types.NewEIP155Signer(gspec.Config.GetChainID())
 	)
 	blocks, receipts := GenerateChain(gspec.Config, genesis, ethash.NewFaker(), gendb, 1024, func(i int, block *BlockGen) {
 		block.SetCoinbase(common.Address{0x00})
@@ -836,7 +836,7 @@ func TestChainTxReorgs(t *testing.T) {
 			},
 		}
 		genesis = MustCommitGenesis(db, gspec)
-		signer  = types.NewEIP155Signer(gspec.Config.ChainID)
+		signer  = types.NewEIP155Signer(gspec.Config.GetChainID())
 	)
 
 	// Create two transactions shared between the chains:
@@ -941,7 +941,7 @@ func TestLogReorgs(t *testing.T) {
 		code    = common.Hex2Bytes("60606040525b7f24ec1d3ff24c2f6ff210738839dbc339cd45a5294d85c79361016243157aae7b60405180905060405180910390a15b600a8060416000396000f360606040526008565b00")
 		gspec   = &paramtypes.Genesis{Config: params.TestChainConfig, Alloc: paramtypes.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
 		genesis = MustCommitGenesis(db, gspec)
-		signer  = types.NewEIP155Signer(gspec.Config.ChainID)
+		signer  = types.NewEIP155Signer(gspec.Config.GetChainID())
 	)
 
 	blockchain, _ := NewBlockChain(db, nil, gspec.Config, ethash.NewFaker(), vm.Config{}, nil)
@@ -988,7 +988,7 @@ func TestLogRebirth(t *testing.T) {
 		code     = common.Hex2Bytes("60606040525b7f24ec1d3ff24c2f6ff210738839dbc339cd45a5294d85c79361016243157aae7b60405180905060405180910390a15b600a8060416000396000f360606040526008565b00")
 		gspec    = &paramtypes.Genesis{Config: params.TestChainConfig, Alloc: paramtypes.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
 		genesis  = MustCommitGenesis(db, gspec)
-		signer   = types.NewEIP155Signer(gspec.Config.ChainID)
+		signer   = types.NewEIP155Signer(gspec.Config.GetChainID())
 		newLogCh = make(chan bool)
 	)
 
@@ -1110,7 +1110,7 @@ func TestSideLogRebirth(t *testing.T) {
 		code     = common.Hex2Bytes("60606040525b7f24ec1d3ff24c2f6ff210738839dbc339cd45a5294d85c79361016243157aae7b60405180905060405180910390a15b600a8060416000396000f360606040526008565b00")
 		gspec    = &paramtypes.Genesis{Config: params.TestChainConfig, Alloc: paramtypes.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
 		genesis  = MustCommitGenesis(db, gspec)
-		signer   = types.NewEIP155Signer(gspec.Config.ChainID)
+		signer   = types.NewEIP155Signer(gspec.Config.GetChainID())
 		newLogCh = make(chan bool)
 	)
 
@@ -1195,7 +1195,7 @@ func TestReorgSideEvent(t *testing.T) {
 			Alloc:  paramtypes.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}},
 		}
 		genesis = MustCommitGenesis(db, gspec)
-		signer  = types.NewEIP155Signer(gspec.Config.ChainID)
+		signer  = types.NewEIP155Signer(gspec.Config.GetChainID())
 	)
 
 	blockchain, _ := NewBlockChain(db, nil, gspec.Config, ethash.NewFaker(), vm.Config{}, nil)
@@ -1321,12 +1321,10 @@ func TestEIP155Transition(t *testing.T) {
 		funds      = big.NewInt(1000000000)
 		deleteAddr = common.Address{1}
 		gspec      = &paramtypes.Genesis{
-			Config: &paramtypes.ChainConfig{
-				ChainConfig: goethereum.ChainConfig{
-					ChainID:     big.NewInt(1),
-					EIP150Block: big.NewInt(0),
-					EIP155Block: big.NewInt(2), HomesteadBlock: new(big.Int),
-				},
+			Config: &goethereum.ChainConfig{
+				ChainID:     big.NewInt(1),
+				EIP150Block: big.NewInt(0),
+				EIP155Block: big.NewInt(2), HomesteadBlock: new(big.Int),
 			},
 			Alloc: paramtypes.GenesisAlloc{address: {Balance: funds}, deleteAddr: {Balance: new(big.Int)}},
 		}
@@ -1358,7 +1356,7 @@ func TestEIP155Transition(t *testing.T) {
 			}
 			block.AddTx(tx)
 
-			tx, err = basicTx(types.NewEIP155Signer(gspec.Config.ChainID))
+			tx, err = basicTx(types.NewEIP155Signer(gspec.Config.GetChainID()))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -1370,7 +1368,7 @@ func TestEIP155Transition(t *testing.T) {
 			}
 			block.AddTx(tx)
 
-			tx, err = basicTx(types.NewEIP155Signer(gspec.Config.ChainID))
+			tx, err = basicTx(types.NewEIP155Signer(gspec.Config.GetChainID()))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -1398,7 +1396,7 @@ func TestEIP155Transition(t *testing.T) {
 	}
 
 	// generate an invalid chain id transaction
-	config := &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{ChainID: big.NewInt(2), EIP150Block: big.NewInt(0), EIP155Block: big.NewInt(2), HomesteadBlock: new(big.Int)}}
+	config := &goethereum.ChainConfig{ChainID: big.NewInt(2), EIP150Block: big.NewInt(0), EIP155Block: big.NewInt(2), HomesteadBlock: new(big.Int)}
 	blocks, _ = GenerateChain(config, blocks[len(blocks)-1], ethash.NewFaker(), db, 4, func(i int, block *BlockGen) {
 		var (
 			tx      *types.Transaction
@@ -1430,14 +1428,12 @@ func TestEIP161AccountRemoval(t *testing.T) {
 		funds   = big.NewInt(1000000000)
 		theAddr = common.Address{1}
 		gspec   = &paramtypes.Genesis{
-			Config: &paramtypes.ChainConfig{
-				ChainConfig: goethereum.ChainConfig{
-					ChainID:        big.NewInt(1),
-					HomesteadBlock: new(big.Int),
-					EIP150Block:    new(big.Int),
-					EIP155Block:    new(big.Int),
-				},
-				EIP161FBlock: big.NewInt(2),
+			Config: &goethereum.ChainConfig{
+				ChainID:        big.NewInt(1),
+				HomesteadBlock: new(big.Int),
+				EIP150Block:    new(big.Int),
+				EIP155Block:    new(big.Int),
+				EIP158Block:    big.NewInt(2),
 			},
 			Alloc: paramtypes.GenesisAlloc{address: {Balance: funds}},
 		}
@@ -1450,7 +1446,7 @@ func TestEIP161AccountRemoval(t *testing.T) {
 		var (
 			tx     *types.Transaction
 			err    error
-			signer = types.NewEIP155Signer(gspec.Config.ChainID)
+			signer = types.NewEIP155Signer(gspec.Config.GetChainID())
 		)
 		switch i {
 		case 0:

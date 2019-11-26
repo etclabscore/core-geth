@@ -11,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
 	"github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -63,16 +64,27 @@ func TestConvert(t *testing.T) {
 	if method, equal := Equal(reflect.TypeOf((*common.Configurator)(nil)), &spec, &spec2); !equal {
 		t.Error("not equal", method)
 	}
+}
 
-	//genesis := params.DefaultGenesisBlock()
-	//genesis2 := paramtypes.Genesis{}
-	//
-	//err = Convert(genesis, genesis2)
-	//if err != nil {
-	//
-	//}
+// TestConfiguratorImplementationsSatisfied tests that data types expected
+// to fulfil certain interfaces do fill them.
+func TestConfiguratorImplementationsSatisfied(t *testing.T) {
+	for _, ty := range []interface{}{
+		&parity.ParityChainSpec{},
+	}{
+		_ = ty.(common.Configurator)
+	}
 
-	//b, _ := json.MarshalIndent(&spec, "", "    ")
-	//b2, _ := json.MarshalIndent(&spec2, "", "    ")
-	//t.Log(string(b), string(b2))
+	for _, ty := range []interface{}{
+		&goethereum.ChainConfig{},
+		&paramtypes.ChainConfig{},
+	} {
+		_ = ty.(common.ChainConfigurator)
+	}
+
+	for _, ty := range []interface{}{
+		&paramtypes.Genesis{},
+	}{
+		_ = ty.(common.GenesisBlocker)
+	}
 }

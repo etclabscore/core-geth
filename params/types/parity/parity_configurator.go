@@ -493,6 +493,15 @@ func (spec *ParityChainSpec) SetEthashEIP2Transition(n *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetEthashEIP779Transition() *uint64 {
+	return spec.Engine.Ethash.Params.DaoHardforkTransition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEthashEIP779Transition(n *uint64) error {
+	spec.Engine.Ethash.Params.DaoHardforkTransition = new(ParityU64).SetUint64(n)
+	return nil
+}
+
 func (spec *ParityChainSpec) GetEthashEIP649TransitionV() *uint64 {
 	if spec.Engine.Ethash.Params.eip649inferred {
 		return spec.Engine.Ethash.Params.eip649Transition.Uint64P()

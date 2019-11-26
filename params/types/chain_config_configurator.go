@@ -377,6 +377,18 @@ func (c *ChainConfig) SetEthashEIP2Transition(n *uint64) error {
 	return nil
 }
 
+func (c *ChainConfig) GetEthashEIP779Transition() *uint64 {
+	return bigNewU64(c.DAOForkBlock)
+}
+
+func (c *ChainConfig) SetEthashEIP779Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
+	setBig(c.DAOForkBlock, n)
+	return nil
+}
+
 func (c *ChainConfig) GetEthashEIP649TransitionV() *uint64 {
 	if c.eip649FInferred {
 		return bigNewU64(c.EIP649FBlock)

@@ -114,6 +114,8 @@ type EthashConfigurator interface {
 	SetEthashHomesteadTransition(n *uint64) error
 	GetEthashEIP2Transition() *uint64
 	SetEthashEIP2Transition(n *uint64) error
+	GetEthashEIP779Transition() *uint64 // DAO
+	SetEthashEIP779Transition(n *uint64) error
 	GetEthashEIP649TransitionV() *uint64
 	SetEthashEIP649Transition(n *uint64) error
 	GetEthashEIP1234TransitionV() *uint64

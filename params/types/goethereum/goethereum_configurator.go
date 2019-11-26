@@ -441,6 +441,36 @@ func (c *ChainConfig) SetEthashEIP2Transition(i *uint64) error {
 	return nil
 }
 
+func (c *ChainConfig) GetEthashEIP649TransitionV() *uint64 {
+	if c.Ethash == nil {
+		return nil
+	}
+	return bigNewU64(c.ByzantiumBlock)
+}
+
+func (c *ChainConfig) SetEthashEIP649Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
+	setBig(c.ByzantiumBlock, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEthashEIP1234TransitionV() *uint64 {
+	if c.Ethash == nil {
+		return nil
+	}
+	return bigNewU64(c.ConstantinopleBlock)
+}
+
+func (c *ChainConfig) SetEthashEIP1234Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
+	setBig(c.ConstantinopleBlock, n)
+	return nil
+}
+
 func (c *ChainConfig) GetEthashECIP1010PauseTransition() *uint64 {
 	return nil
 }

@@ -91,7 +91,8 @@ type ChainConfig struct {
 	// https://github.com/ethereum/EIPs/issues/649
 	// note that this is closely related to EIP100.
 	// In fact, EIP100 is bundled in
-	EIP649FBlock *big.Int `json:"eip649FBlock,omitempty"`
+	eip649FInferred bool     `json:"-"`
+	EIP649FBlock    *big.Int `json:"-"`
 	// Transaction receipt status
 	// https://github.com/ethereum/EIPs/issues/658
 	EIP658FBlock *big.Int `json:"eip658FBlock,omitempty"`
@@ -113,7 +114,8 @@ type ChainConfig struct {
 	EIP1052FBlock *big.Int `json:"eip1052FBlock,omitempty"`
 	// Constantinople difficulty bomb delay and block reward adjustment
 	// https://eips.ethereum.org/EIPS/eip-1234
-	EIP1234FBlock *big.Int `json:"eip1234FBlock,omitempty"`
+	eip1234FInferred bool     `json:"-"`
+	EIP1234FBlock    *big.Int `json:"-"`
 	// Net gas metering
 	// https://eips.ethereum.org/EIPS/eip-1283
 	EIP1283FBlock *big.Int `json:"eip1283FBlock,omitempty"`

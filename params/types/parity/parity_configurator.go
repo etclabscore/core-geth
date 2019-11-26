@@ -12,6 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var zero = uint64(0)
@@ -489,6 +490,86 @@ func (spec *ParityChainSpec) GetEthashEIP2Transition() *uint64 {
 
 func (spec *ParityChainSpec) SetEthashEIP2Transition(n *uint64) error {
 	spec.Engine.Ethash.Params.HomesteadTransition = new(ParityU64).SetUint64(n)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEthashEIP649TransitionV() *uint64 {
+	if spec.Engine.Ethash.Params.eip649inferred {
+		return spec.Engine.Ethash.Params.eip649Transition.Uint64P()
+	}
+
+	var diffN *uint64
+	defer func() {
+		spec.Engine.Ethash.Params.eip649Transition = new(ParityU64).SetUint64(diffN)
+		spec.Engine.Ethash.Params.eip649inferred = true
+	}()
+
+	diffN = common2.ExtractHostageSituationN(
+		spec.Engine.Ethash.Params.DifficultyBombDelays,
+		common2.Uint64BigMapEncodesHex(spec.Engine.Ethash.Params.BlockReward),
+		vars.EIP649DifficultyBombDelay,
+		vars.EIP649FBlockReward,
+	)
+	return diffN
+}
+
+func (spec *ParityChainSpec) SetEthashEIP649Transition(n *uint64) error {
+	spec.Engine.Ethash.Params.eip649Transition = new(ParityU64).SetUint64(n)
+	spec.Engine.Ethash.Params.eip649inferred = true
+	if n == nil {
+		return nil
+	}
+	spec.Engine.Ethash.Params.BlockReward[*n] = vars.EIP649FBlockReward
+
+	eip1234N := spec.Engine.Ethash.Params.eip1234Transition
+	if eip1234N == nil || *eip1234N.Uint64P() != *n {
+		spec.Engine.Ethash.Params.DifficultyBombDelays[*n] = vars.EIP649DifficultyBombDelay
+	}
+	// Else EIP1234 has been set to equal activation value, which means the map contains a sum value (eg 5m),
+	// so the EIP649 difficulty adjustment is already accounted for.
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEthashEIP1234TransitionV() *uint64 {
+	if spec.Engine.Ethash.Params.eip1234inferred {
+		return spec.Engine.Ethash.Params.eip1234Transition.Uint64P()
+	}
+
+	var diffN *uint64
+	defer func() {
+		spec.Engine.Ethash.Params.eip1234Transition = new(ParityU64).SetUint64(diffN)
+		spec.Engine.Ethash.Params.eip1234inferred = true
+	}()
+
+	diffN = common2.ExtractHostageSituationN(
+		spec.Engine.Ethash.Params.DifficultyBombDelays,
+		common2.Uint64BigMapEncodesHex(spec.Engine.Ethash.Params.BlockReward),
+		vars.EIP1234DifficultyBombDelay,
+		vars.EIP1234FBlockReward,
+		)
+	return diffN
+}
+
+func (spec *ParityChainSpec) SetEthashEIP1234Transition(n *uint64) error {
+	spec.Engine.Ethash.Params.eip1234Transition = new(ParityU64).SetUint64(n)
+	spec.Engine.Ethash.Params.eip1234inferred = true
+	if n == nil {
+		return nil
+	}
+
+	// Block reward is a simple lookup; doesn't matter if overwrite or not.
+	spec.Engine.Ethash.Params.BlockReward[*n] = vars.EIP1234FBlockReward
+
+	eip649N := spec.Engine.Ethash.Params.eip649Transition
+	if eip649N == nil || *eip649N.Uint64P() == *n {
+		// EIP649 has NOT been set, OR has been set to identical block, eg. 0 for testing
+		// Overwrite key with total delay (5m)
+		spec.Engine.Ethash.Params.DifficultyBombDelays[*n] = vars.EIP1234DifficultyBombDelay
+		return nil
+	}
+
+	spec.Engine.Ethash.Params.DifficultyBombDelays[*n] = new(big.Int).Sub(vars.EIP1234DifficultyBombDelay, vars.EIP649DifficultyBombDelay)
+
 	return nil
 }
 

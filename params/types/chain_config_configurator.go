@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/common"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func newU64(u uint64) *uint64 {
@@ -27,6 +28,9 @@ func setBig(i *big.Int, u *uint64) {
 	i = big.NewInt(int64(*u))
 }
 
+// upstream is used as a way to share common interface methods
+// This pattern should only be used where the receiver value of the method
+// is not used, ie when accessing/setting global default parameters, eg. vars/ pkg values.
 var upstream = goethereum.ChainConfig{}
 
 func (c *ChainConfig) GetAccountStartNonce() *uint64        { return upstream.GetAccountStartNonce() }
@@ -370,6 +374,86 @@ func (c *ChainConfig) GetEthashEIP2Transition() *uint64 {
 
 func (c *ChainConfig) SetEthashEIP2Transition(n *uint64) error {
 	setBig(c.EIP2FBlock, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEthashEIP649TransitionV() *uint64 {
+	if c.eip649FInferred {
+		return bigNewU64(c.EIP649FBlock)
+	}
+
+	var diffN *uint64
+	defer func() {
+		setBig(c.EIP649FBlock, diffN)
+		c.eip649FInferred = true
+	}()
+
+	diffN = common2.ExtractHostageSituationN(
+		c.DifficultyBombDelaySchedule,
+		common2.Uint64BigMapEncodesHex(c.BlockRewardSchedule),
+		vars.EIP649DifficultyBombDelay,
+		vars.EIP649FBlockReward,
+	)
+	return diffN
+}
+
+func (c *ChainConfig) SetEthashEIP649Transition(n *uint64) error {
+	setBig(c.EIP649FBlock, n)
+	c.eip649FInferred = true
+	if n == nil {
+		return nil
+	}
+	c.BlockRewardSchedule[*n] = vars.EIP649FBlockReward
+
+	eip1234N := c.EIP1234FBlock
+	if eip1234N == nil || eip1234N.Uint64() != *n {
+		c.DifficultyBombDelaySchedule[*n] = vars.EIP649DifficultyBombDelay
+	}
+	// Else EIP1234 has been set to equal activation value, which means the map contains a sum value (eg 5m),
+	// so the EIP649 difficulty adjustment is already accounted for.
+	return nil
+}
+
+func (c *ChainConfig) GetEthashEIP1234TransitionV() *uint64 {
+	if c.eip1234FInferred {
+		return bigNewU64(c.EIP1234FBlock)
+	}
+
+	var diffN *uint64
+	defer func() {
+		setBig(c.EIP1234FBlock, diffN)
+		c.eip1234FInferred = true
+	}()
+
+	diffN = common2.ExtractHostageSituationN(
+		c.DifficultyBombDelaySchedule,
+		c.BlockRewardSchedule,
+		vars.EIP1234DifficultyBombDelay,
+		vars.EIP1234FBlockReward,
+	)
+	return diffN
+}
+
+func (c *ChainConfig) SetEthashEIP1234Transition(n *uint64) error {
+	setBig(c.EIP1234FBlock, n)
+	c.eip1234FInferred = true
+	if n == nil {
+		return nil
+	}
+
+	// Block reward is a simple lookup; doesn't matter if overwrite or not.
+	c.BlockRewardSchedule[*n] = vars.EIP1234FBlockReward
+
+	eip649N := c.EIP649FBlock
+	if eip649N == nil || eip649N.Uint64() == *n {
+		// EIP649 has NOT been set, OR has been set to identical block, eg. 0 for testing
+		// Overwrite key with total delay (5m)
+		c.DifficultyBombDelaySchedule[*n] = vars.EIP1234DifficultyBombDelay
+		return nil
+	}
+
+	c.DifficultyBombDelaySchedule[*n] = new(big.Int).Sub(vars.EIP1234DifficultyBombDelay, vars.EIP649DifficultyBombDelay)
+
 	return nil
 }
 

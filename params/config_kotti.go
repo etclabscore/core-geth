@@ -20,20 +20,28 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
+
+type ConfiguratorSetter func(*uint64) error
 
 var (
 	// Genesis hashes to enforce below configs on.
 	KottiGenesisHash = common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4")
 
-	// KottiChainConfig is the chain parameters to run a node on the Kotti main network.
-	KottiChainConfig = &paramtypes.ChainConfig{
-		ChainConfig: goethereum.ChainConfig{
+	KottiNetworkID          uint64 = 6
+	//KottiDisposalBlock             = uint64(0)
+	//KottiECIP1017FBlock            = uint64(5000000)
+	//KottiECIP1017EraRounds         = uint64(5000000)
+	//KottiEIP160FBlock              = uint64(0)
+	//KottiECIP1010PauseBlock        = uint64(0)
+	//KottiECIP1010Length            = uint64(2000000)
+
+	KottiChainConfig = func() common2.ChainConfigurator {
+		c := &goethereum.ChainConfig{
 			ChainID:             big.NewInt(6),
 			HomesteadBlock:      big.NewInt(0),
-			DAOForkBlock:        nil,
-			DAOForkSupport:      false,
 			EIP150Block:         big.NewInt(0),
 			EIP150Hash:          common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4"),
 			EIP155Block:         big.NewInt(0),
@@ -45,13 +53,9 @@ var (
 				Period: 15,
 				Epoch:  30000,
 			},
-		},
-		NetworkID:           6,
-		DisposalBlock:       big.NewInt(0),
-		ECIP1017FBlock:      big.NewInt(5000000),
-		ECIP1017EraRounds:   big.NewInt(5000000),
-		EIP160FBlock:        big.NewInt(0),
-		ECIP1010PauseBlock:  big.NewInt(0),
-		ECIP1010Length:      big.NewInt(2000000),
-	}
+		}
+		c.SetNetworkID(&KottiNetworkID)
+
+		return c
+	}()
 )

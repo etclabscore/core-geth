@@ -54,32 +54,20 @@ var CheckpointOracles = map[common.Hash]*goethereum.CheckpointOracleConfig{
 
 var (
 	// MainnetChainConfig is the chain parameters to run a node on the main network.
-	MainnetChainConfig = &paramtypes.ChainConfig{
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:             big.NewInt(1),
-			HomesteadBlock:      big.NewInt(1150000),
-			DAOForkBlock:        big.NewInt(1920000),
-			DAOForkSupport:      true,
-			EIP150Block:         big.NewInt(2463000),
-			EIP150Hash:          common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
-			EIP155Block:         big.NewInt(2675000),
-			EIP158Block:         big.NewInt(2675000),
-			ByzantiumBlock:      big.NewInt(4370000),
-			ConstantinopleBlock: big.NewInt(7280000),
-			PetersburgBlock:     big.NewInt(7280000),
-			IstanbulBlock:       big.NewInt(9069000),
-			Ethash:              new(goethereum.EthashConfig),
-		},
-		NetworkID:           1,
-		DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{
-			uint64(0x42ae50): new(big.Int).SetUint64(uint64(0x2dc6c0)),
-			uint64(0x6f1580): new(big.Int).SetUint64(uint64(0x1e8480)),
-		},
-		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
-			uint64(0x0):      new(big.Int).SetUint64(uint64(0x4563918244f40000)),
-			uint64(0x42ae50): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
-			uint64(0x6f1580): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
-		},
+	MainnetChainConfig = &goethereum.ChainConfig{
+		ChainID:             big.NewInt(1),
+		HomesteadBlock:      big.NewInt(1150000),
+		DAOForkBlock:        big.NewInt(1920000),
+		DAOForkSupport:      true,
+		EIP150Block:         big.NewInt(2463000),
+		EIP150Hash:          common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
+		EIP155Block:         big.NewInt(2675000),
+		EIP158Block:         big.NewInt(2675000),
+		ByzantiumBlock:      big.NewInt(4370000),
+		ConstantinopleBlock: big.NewInt(7280000),
+		PetersburgBlock:     big.NewInt(7280000),
+		IstanbulBlock:       big.NewInt(9069000),
+		Ethash:              new(goethereum.EthashConfig),
 	}
 
 	// MainnetTrustedCheckpoint contains the light client trusted checkpoint for the main network.
@@ -103,32 +91,20 @@ var (
 	}
 
 	// TestnetChainConfig contains the chain parameters to run a node on the Ropsten test network.
-	TestnetChainConfig = &paramtypes.ChainConfig{
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:             big.NewInt(3),
-			HomesteadBlock:      big.NewInt(0),
-			DAOForkBlock:        nil,
-			DAOForkSupport:      true,
-			EIP150Block:         big.NewInt(0),
-			EIP150Hash:          common.HexToHash("0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d"),
-			EIP155Block:         big.NewInt(10),
-			EIP158Block:         big.NewInt(10),
-			ByzantiumBlock:      big.NewInt(1700000),
-			ConstantinopleBlock: big.NewInt(4230000),
-			PetersburgBlock:     big.NewInt(4939394),
-			IstanbulBlock:       big.NewInt(6485846),
-			Ethash:              new(goethereum.EthashConfig),
-		},
-		NetworkID:           3,
-		DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{
-			1700000: new(big.Int).SetUint64(uint64(0x2dc6c0)),
-			4230000: new(big.Int).SetUint64(uint64(0x1e8480)),
-		},
-		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
-			uint64(0):       new(big.Int).SetUint64(uint64(0x4563918244f40000)),
-			uint64(1700000): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
-			uint64(4230000): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
-		},
+	TestnetChainConfig = &goethereum.ChainConfig{
+		ChainID:             big.NewInt(3),
+		HomesteadBlock:      big.NewInt(0),
+		DAOForkBlock:        nil,
+		DAOForkSupport:      true,
+		EIP150Block:         big.NewInt(0),
+		EIP150Hash:          common.HexToHash("0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d"),
+		EIP155Block:         big.NewInt(10),
+		EIP158Block:         big.NewInt(10),
+		ByzantiumBlock:      big.NewInt(1700000),
+		ConstantinopleBlock: big.NewInt(4230000),
+		PetersburgBlock:     big.NewInt(4939394),
+		IstanbulBlock:       big.NewInt(6485846),
+		Ethash:              new(goethereum.EthashConfig),
 	}
 
 	// TestnetTrustedCheckpoint contains the light client trusted checkpoint for the Ropsten test network.
@@ -152,34 +128,22 @@ var (
 	}
 
 	// RinkebyChainConfig contains the chain parameters to run a node on the Rinkeby test network.
-	RinkebyChainConfig = &paramtypes.ChainConfig{
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:             big.NewInt(4),
-			HomesteadBlock:      big.NewInt(1),
-			DAOForkBlock:        nil,
-			DAOForkSupport:      true,
-			EIP150Block:         big.NewInt(2),
-			EIP150Hash:          common.HexToHash("0x9b095b36c15eaf13044373aef8ee0bd3a382a5abb92e402afa44b8249c3a90e9"),
-			EIP155Block:         big.NewInt(3),
-			EIP158Block:         big.NewInt(3),
-			ByzantiumBlock:      big.NewInt(1035301),
-			ConstantinopleBlock: big.NewInt(3660663),
-			PetersburgBlock:     big.NewInt(4321234),
-			IstanbulBlock:       big.NewInt(5435345),
-			Clique: &goethereum.CliqueConfig{
-				Period: 15,
-				Epoch:  30000,
-			},
-		},
-		NetworkID:           4,
-		DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{
-			uint64(1035301): new(big.Int).SetUint64(uint64(0x2dc6c0)),
-			uint64(3660663): new(big.Int).SetUint64(uint64(0x1e8480)),
-		},
-		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
-			uint64(0x0):     new(big.Int).SetUint64(uint64(0x4563918244f40000)),
-			uint64(1035301): new(big.Int).SetUint64(uint64(0x29a2241af62c0000)),
-			uint64(3660663): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
+	RinkebyChainConfig = &goethereum.ChainConfig{
+		ChainID:             big.NewInt(4),
+		HomesteadBlock:      big.NewInt(1),
+		DAOForkBlock:        nil,
+		DAOForkSupport:      true,
+		EIP150Block:         big.NewInt(2),
+		EIP150Hash:          common.HexToHash("0x9b095b36c15eaf13044373aef8ee0bd3a382a5abb92e402afa44b8249c3a90e9"),
+		EIP155Block:         big.NewInt(3),
+		EIP158Block:         big.NewInt(3),
+		ByzantiumBlock:      big.NewInt(1035301),
+		ConstantinopleBlock: big.NewInt(3660663),
+		PetersburgBlock:     big.NewInt(4321234),
+		IstanbulBlock:       big.NewInt(5435345),
+		Clique: &goethereum.CliqueConfig{
+			Period: 15,
+			Epoch:  30000,
 		},
 	}
 
@@ -203,30 +167,21 @@ var (
 	}
 
 	// GoerliChainConfig contains the chain parameters to run a node on the Görli test network.
-	GoerliChainConfig = &paramtypes.ChainConfig{
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:             big.NewInt(5),
-			HomesteadBlock:      big.NewInt(0),
-			DAOForkBlock:        nil,
-			DAOForkSupport:      true,
-			EIP150Block:         big.NewInt(0),
-			EIP155Block:         big.NewInt(0),
-			EIP158Block:         big.NewInt(0),
-			ByzantiumBlock:      big.NewInt(0),
-			ConstantinopleBlock: big.NewInt(0),
-			PetersburgBlock:     big.NewInt(0),
-			IstanbulBlock:       big.NewInt(1561651),
-			Clique: &goethereum.CliqueConfig{
-				Period: 15,
-				Epoch:  30000,
-			},
-		},
-		NetworkID:           5,
-		DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{
-			uint64(0x0): new(big.Int).SetUint64(uint64(0x1e8480)),
-		},
-		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
-			uint64(0x0): new(big.Int).SetUint64(uint64(0x1bc16d674ec80000)),
+	GoerliChainConfig = &goethereum.ChainConfig{
+		ChainID:             big.NewInt(5),
+		HomesteadBlock:      big.NewInt(0),
+		DAOForkBlock:        nil,
+		DAOForkSupport:      true,
+		EIP150Block:         big.NewInt(0),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(0),
+		IstanbulBlock:       big.NewInt(1561651),
+		Clique: &goethereum.CliqueConfig{
+			Period: 15,
+			Epoch:  30000,
 		},
 	}
 
@@ -255,26 +210,24 @@ var (
 	//
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
-	AllEthashProtocolChanges = &paramtypes.ChainConfig{
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:                 big.NewInt(1137),
-			HomesteadBlock:          big.NewInt(0),
-			DAOForkBlock:            nil,
-			DAOForkSupport:          false,
-			EIP150Block:             big.NewInt(0),
-			EIP150Hash:              common.Hash{},
-			EIP155Block:             big.NewInt(0),
-			EIP158Block:             big.NewInt(0),
-			ByzantiumBlock:          big.NewInt(0),
-			ConstantinopleBlock:     big.NewInt(0),
-			PetersburgBlock:         big.NewInt(0),
-			IstanbulBlock:           big.NewInt(0),
-			EWASMBlock:              nil,
-			Ethash:                  new(goethereum.EthashConfig),
-			Clique:                  nil,
-			TrustedCheckpoint:       nil,
-			TrustedCheckpointOracle: nil,
-		},
+	AllEthashProtocolChanges = &goethereum.ChainConfig{
+		ChainID:                 big.NewInt(1137),
+		HomesteadBlock:          big.NewInt(0),
+		DAOForkBlock:            nil,
+		DAOForkSupport:          false,
+		EIP150Block:             big.NewInt(0),
+		EIP150Hash:              common.Hash{},
+		EIP155Block:             big.NewInt(0),
+		EIP158Block:             big.NewInt(0),
+		ByzantiumBlock:          big.NewInt(0),
+		ConstantinopleBlock:     big.NewInt(0),
+		PetersburgBlock:         big.NewInt(0),
+		IstanbulBlock:           big.NewInt(0),
+		EWASMBlock:              nil,
+		Ethash:                  new(goethereum.EthashConfig),
+		Clique:                  nil,
+		TrustedCheckpoint:       nil,
+		TrustedCheckpointOracle: nil,
 	}
 
 	// AllCliqueProtocolChanges contains every protocol change (EIPs) introduced
@@ -282,56 +235,52 @@ var (
 	//
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
-	AllCliqueProtocolChanges = &paramtypes.ChainConfig{
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:                 big.NewInt(1337),
-			HomesteadBlock:          big.NewInt(0),
-			DAOForkBlock:            nil,
-			DAOForkSupport:          false,
-			EIP150Block:             big.NewInt(0),
-			EIP150Hash:              common.Hash{},
-			EIP155Block:             big.NewInt(0),
-			EIP158Block:             big.NewInt(0),
-			ByzantiumBlock:          big.NewInt(0),
-			ConstantinopleBlock:     big.NewInt(0),
-			PetersburgBlock:         big.NewInt(0),
-			IstanbulBlock:           big.NewInt(0),
-			EWASMBlock:              nil,
-			Ethash:                  nil,
-			Clique:                  &goethereum.CliqueConfig{
-				Period: 0,
-				Epoch:  30000,
-			},
-			TrustedCheckpoint:       nil,
-			TrustedCheckpointOracle: nil,
+	AllCliqueProtocolChanges = &goethereum.ChainConfig{
+		ChainID:             big.NewInt(1337),
+		HomesteadBlock:      big.NewInt(0),
+		DAOForkBlock:        nil,
+		DAOForkSupport:      false,
+		EIP150Block:         big.NewInt(0),
+		EIP150Hash:          common.Hash{},
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(0),
+		IstanbulBlock:       big.NewInt(0),
+		EWASMBlock:          nil,
+		Ethash:              nil,
+		Clique: &goethereum.CliqueConfig{
+			Period: 0,
+			Epoch:  30000,
 		},
+		TrustedCheckpoint:       nil,
+		TrustedCheckpointOracle: nil,
 	}
 
 	// TestChainConfig is used for tests.
-	TestChainConfig = &paramtypes.ChainConfig{
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:                 big.NewInt(1),
-			HomesteadBlock:          nil,
-			DAOForkBlock:            nil,
-			DAOForkSupport:          false,
-			EIP150Block:             big.NewInt(0),
-			EIP150Hash:              common.Hash{},
-			EIP155Block:             big.NewInt(0),
-			EIP158Block:             big.NewInt(0),
-			ByzantiumBlock:          big.NewInt(0),
-			ConstantinopleBlock:     big.NewInt(0),
-			PetersburgBlock:         big.NewInt(0),
-			IstanbulBlock:           big.NewInt(0),
-			EWASMBlock:              nil,
-			Ethash:                  new(goethereum.EthashConfig),
-			Clique:                  nil,
-			TrustedCheckpoint:       nil,
-			TrustedCheckpointOracle: nil,
-		},
+	TestChainConfig = &goethereum.ChainConfig{
+		ChainID:                 big.NewInt(1),
+		HomesteadBlock:          nil,
+		DAOForkBlock:            nil,
+		DAOForkSupport:          false,
+		EIP150Block:             big.NewInt(0),
+		EIP150Hash:              common.Hash{},
+		EIP155Block:             big.NewInt(0),
+		EIP158Block:             big.NewInt(0),
+		ByzantiumBlock:          big.NewInt(0),
+		ConstantinopleBlock:     big.NewInt(0),
+		PetersburgBlock:         big.NewInt(0),
+		IstanbulBlock:           big.NewInt(0),
+		EWASMBlock:              nil,
+		Ethash:                  new(goethereum.EthashConfig),
+		Clique:                  nil,
+		TrustedCheckpoint:       nil,
+		TrustedCheckpointOracle: nil,
 	}
 )
 
-func EthashBlockReward(c *paramtypes.ChainConfig, n *big.Int) *big.Int {
+func EthashBlockReward(c common2.ChainConfigurator, n *big.Int) *big.Int {
 	// if c.Ethash == nil {
 	// 	panic("non ethash config called EthashBlockReward")
 	// }
@@ -341,11 +290,11 @@ func EthashBlockReward(c *paramtypes.ChainConfig, n *big.Int) *big.Int {
 		return blockReward
 	}
 
-	if len(c.BlockRewardSchedule) > 0 {
+	if len(c.GetEthashBlockRewardSchedule()) > 0 {
 		// Because the map is not necessarily sorted low-high, we
 		// have to ensure that we're walking upwards only.
 		var lastActivation *big.Int
-		for activation, reward := range c.BlockRewardSchedule {
+		for activation, reward := range c.GetEthashBlockRewardSchedule() {
 			activationBig := big.NewInt(int64(activation))
 			if paramtypes.IsForked(activationBig, n) {
 				if lastActivation == nil {
@@ -359,9 +308,9 @@ func EthashBlockReward(c *paramtypes.ChainConfig, n *big.Int) *big.Int {
 		return blockReward
 	}
 
-	if c.IsEIP1234F(n) {
+	if c.IsForked(c.GetEthashEIP1234TransitionV, n) {
 		blockReward = vars.EIP1234FBlockReward
-	} else if c.IsEIP649F(n) {
+	} else if c.IsForked(c.GetEthashEIP649TransitionV, n) {
 		blockReward = vars.EIP649FBlockReward
 	}
 

@@ -24,7 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 )
 
 // StateProcessor is a basic Processor, which takes care of transitioning
@@ -32,13 +32,13 @@ import (
 //
 // StateProcessor implements Processor.
 type StateProcessor struct {
-	config *paramtypes.ChainConfig // Chain configuration options
+	config common2.ChainConfigurator // Chain configuration options
 	bc     *BlockChain             // Canonical block chain
 	engine consensus.Engine        // Consensus engine used for block rewards
 }
 
 // NewStateProcessor initialises a new StateProcessor.
-func NewStateProcessor(config *paramtypes.ChainConfig, bc *BlockChain, engine consensus.Engine) *StateProcessor {
+func NewStateProcessor(config common2.ChainConfigurator, bc *BlockChain, engine consensus.Engine) *StateProcessor {
 	return &StateProcessor{
 		config: config,
 		bc:     bc,
@@ -62,7 +62,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 		gp       = new(GasPool).AddGas(block.GasLimit())
 	)
 	// Mutate the block and state according to any hard-fork specs
-	if p.config.DAOForkSupport && p.config.DAOForkBlock != nil && p.config.DAOForkBlock.Cmp(block.Number()) == 0 {
+	if p.config.IsForked(p.config.GetEthashEIP779Transition, block.Number()) {
 		misc.ApplyDAOHardFork(statedb)
 	}
 	// Iterate over and process the individual transactions
@@ -85,7 +85,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 // and uses the input parameters for its environment. It returns the receipt
 // for the transaction, gas used and an error if the transaction failed,
 // indicating the block was invalid.
-func ApplyTransaction(config *paramtypes.ChainConfig, bc ChainContext, author *common.Address, gp *GasPool, statedb *state.StateDB, header *types.Header, tx *types.Transaction, usedGas *uint64, cfg vm.Config) (*types.Receipt, error) {
+func ApplyTransaction(config common2.ChainConfigurator, bc ChainContext, author *common.Address, gp *GasPool, statedb *state.StateDB, header *types.Header, tx *types.Transaction, usedGas *uint64, cfg vm.Config) (*types.Receipt, error) {
 	msg, err := tx.AsMessage(types.MakeSigner(config, header.Number))
 	if err != nil {
 		return nil, err
@@ -102,10 +102,11 @@ func ApplyTransaction(config *paramtypes.ChainConfig, bc ChainContext, author *c
 	}
 	// Update the state with pending changes
 	var root []byte
-	if config.IsEIP658F(header.Number) {
-		statedb.Finalise(config.IsEIP161F(header.Number))
+	eip161 := config.IsForked(config.GetEIP161abcTransition, header.Number)
+	if config.IsForked(config.GetEIP658Transition, header.Number) {
+		statedb.Finalise(eip161)
 	} else {
-		root = statedb.IntermediateRoot(config.IsEIP161F(header.Number)).Bytes()
+		root = statedb.IntermediateRoot(eip161).Bytes()
 	}
 	*usedGas += gas
 

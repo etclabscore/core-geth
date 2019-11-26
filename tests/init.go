@@ -20,52 +20,46 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
+func newUint64(n uint64) *uint64 {
+	return &n
+}
+
 // Forks table defines supported forks and their chain config.
-var Forks = map[string]*paramtypes.ChainConfig{
-	"Frontier": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID: big.NewInt(1),
-		},
+var Forks = map[string]common2.ChainConfigurator{
+	"Frontier": &goethereum.ChainConfig{
+		ChainID: big.NewInt(1),
 	},
-	"Homestead": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:        big.NewInt(1),
-			HomesteadBlock: big.NewInt(0),
-		},
+	"Homestead": &goethereum.ChainConfig{
+		ChainID:        big.NewInt(1),
+		HomesteadBlock: big.NewInt(0),
 	},
-	"EIP150": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:        big.NewInt(1),
-			HomesteadBlock: big.NewInt(0),
-			EIP150Block:    big.NewInt(0),
-		},
+	"EIP150": &goethereum.ChainConfig{
+		ChainID:        big.NewInt(1),
+		HomesteadBlock: big.NewInt(0),
+		EIP150Block:    big.NewInt(0),
 	},
-	"EIP158": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:        big.NewInt(1),
-			HomesteadBlock: big.NewInt(0),
-			EIP150Block:    big.NewInt(0),
-			EIP155Block:    big.NewInt(0),
-			EIP158Block:    big.NewInt(0),
-		},
+	"EIP158": &goethereum.ChainConfig{
+		ChainID:        big.NewInt(1),
+		HomesteadBlock: big.NewInt(0),
+		EIP150Block:    big.NewInt(0),
+		EIP155Block:    big.NewInt(0),
+		EIP158Block:    big.NewInt(0),
 	},
-	"Byzantium": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:        big.NewInt(1),
-			HomesteadBlock: big.NewInt(0),
-			EIP150Block:    big.NewInt(0),
-			EIP155Block:    big.NewInt(0),
-			EIP158Block:    big.NewInt(0),
-			DAOForkBlock:   big.NewInt(0),
-			ByzantiumBlock: big.NewInt(0),
-		},
+	"Byzantium": &goethereum.ChainConfig{
+		ChainID:        big.NewInt(1),
+		HomesteadBlock: big.NewInt(0),
+		EIP150Block:    big.NewInt(0),
+		EIP155Block:    big.NewInt(0),
+		EIP158Block:    big.NewInt(0),
+		DAOForkBlock:   big.NewInt(0),
+		ByzantiumBlock: big.NewInt(0),
 	},
-	"ETC_Atlantis": {
-		ChainConfig: goethereum.ChainConfig{
+	"ETC_Atlantis": func() common2.ChainConfigurator {
+		c := &goethereum.ChainConfig{
 			ChainID:        big.NewInt(1),
 			HomesteadBlock: big.NewInt(0),
 			EIP150Block:    big.NewInt(0),
@@ -73,55 +67,36 @@ var Forks = map[string]*paramtypes.ChainConfig{
 			EIP158Block:    big.NewInt(0),
 			DAOForkBlock:   big.NewInt(0),
 			ByzantiumBlock: big.NewInt(0),
-		},
-		ECIP1017EraRounds: big.NewInt(5000000),
-		ECIP1017FBlock:    big.NewInt(0),
-		DisposalBlock:     big.NewInt(0),
+		}
+		c.SetEthashECIP1017EraRounds(newUint64(5000000))
+		c.SetEthashECIP1017Transition(newUint64(0))
+		c.SetEthashECIP1041Transition(newUint64(0))
+		return c
+	}(),
+	"Constantinople": &goethereum.ChainConfig{
+		ChainID:             big.NewInt(1),
+		HomesteadBlock:      big.NewInt(0),
+		EIP150Block:         big.NewInt(0),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		DAOForkBlock:        big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(10000000),
 	},
-	"Constantinople": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:             big.NewInt(1),
-			HomesteadBlock:      big.NewInt(0),
-			EIP150Block:         big.NewInt(0),
-			EIP155Block:         big.NewInt(0),
-			EIP158Block:         big.NewInt(0),
-			DAOForkBlock:        big.NewInt(0),
-			ByzantiumBlock:      big.NewInt(0),
-			ConstantinopleBlock: big.NewInt(0),
-			PetersburgBlock:     big.NewInt(10000000),
-		},
+	"ConstantinopleFix": &goethereum.ChainConfig{
+		ChainID:             big.NewInt(1),
+		HomesteadBlock:      big.NewInt(0),
+		EIP150Block:         big.NewInt(0),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		DAOForkBlock:        big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(0),
 	},
-	"ConstantinopleFix": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:             big.NewInt(1),
-			HomesteadBlock:      big.NewInt(0),
-			EIP150Block:         big.NewInt(0),
-			EIP155Block:         big.NewInt(0),
-			EIP158Block:         big.NewInt(0),
-			DAOForkBlock:        big.NewInt(0),
-			ByzantiumBlock:      big.NewInt(0),
-			ConstantinopleBlock: big.NewInt(0),
-			PetersburgBlock:     big.NewInt(0),
-		},
-	},
-	"ETC_Agharta": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:             big.NewInt(1),
-			HomesteadBlock:      big.NewInt(0),
-			EIP150Block:         big.NewInt(0),
-			EIP155Block:         big.NewInt(0),
-			EIP158Block:         big.NewInt(0),
-			DAOForkBlock:        big.NewInt(0),
-			ByzantiumBlock:      big.NewInt(0),
-			ConstantinopleBlock: big.NewInt(0),
-			PetersburgBlock:     big.NewInt(0),
-		},
-		ECIP1017EraRounds: big.NewInt(5000000),
-		ECIP1017FBlock:    big.NewInt(0),
-		DisposalBlock:     big.NewInt(0),
-	},
-	"Istanbul": {
-		ChainConfig: goethereum.ChainConfig{
+	"ETC_Agharta": func() common2.ChainConfigurator {
+		c := &goethereum.ChainConfig{
 			ChainID:             big.NewInt(1),
 			HomesteadBlock:      big.NewInt(0),
 			EIP150Block:         big.NewInt(0),
@@ -131,75 +106,76 @@ var Forks = map[string]*paramtypes.ChainConfig{
 			ByzantiumBlock:      big.NewInt(0),
 			ConstantinopleBlock: big.NewInt(0),
 			PetersburgBlock:     big.NewInt(0),
-			IstanbulBlock:       big.NewInt(0),
-		},
+		}
+		c.SetEthashECIP1017EraRounds(newUint64(5000000))
+		c.SetEthashECIP1017Transition(newUint64(0))
+		c.SetEthashECIP1041Transition(newUint64(0))
+		return c
+	}(),
+	"Istanbul": &goethereum.ChainConfig{
+		ChainID:             big.NewInt(1),
+		HomesteadBlock:      big.NewInt(0),
+		EIP150Block:         big.NewInt(0),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		DAOForkBlock:        big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(0),
+		IstanbulBlock:       big.NewInt(0),
 	},
-	"FrontierToHomesteadAt5": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:        big.NewInt(1),
-			HomesteadBlock: big.NewInt(5),
-		},
+	"FrontierToHomesteadAt5": &goethereum.ChainConfig{
+		ChainID:        big.NewInt(1),
+		HomesteadBlock: big.NewInt(5),
 	},
-	"HomesteadToEIP150At5": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:        big.NewInt(1),
-			HomesteadBlock: big.NewInt(0),
-			EIP150Block:    big.NewInt(5),
-		},
+	"HomesteadToEIP150At5": &goethereum.ChainConfig{
+		ChainID:        big.NewInt(1),
+		HomesteadBlock: big.NewInt(0),
+		EIP150Block:    big.NewInt(5),
 	},
-	"HomesteadToDaoAt5": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:        big.NewInt(1),
-			HomesteadBlock: big.NewInt(0),
-			DAOForkBlock:   big.NewInt(5),
-			DAOForkSupport: true,
-		},
+	"HomesteadToDaoAt5": &goethereum.ChainConfig{
+		ChainID:        big.NewInt(1),
+		HomesteadBlock: big.NewInt(0),
+		DAOForkBlock:   big.NewInt(5),
+		DAOForkSupport: true,
 	},
-	"EIP158ToByzantiumAt5": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:        big.NewInt(1),
-			HomesteadBlock: big.NewInt(0),
-			EIP150Block:    big.NewInt(0),
-			EIP155Block:    big.NewInt(0),
-			EIP158Block:    big.NewInt(0),
-			ByzantiumBlock: big.NewInt(5),
-		},
+	"EIP158ToByzantiumAt5": &goethereum.ChainConfig{
+		ChainID:        big.NewInt(1),
+		HomesteadBlock: big.NewInt(0),
+		EIP150Block:    big.NewInt(0),
+		EIP155Block:    big.NewInt(0),
+		EIP158Block:    big.NewInt(0),
+		ByzantiumBlock: big.NewInt(5),
 	},
-	"ByzantiumToConstantinopleAt5": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:             big.NewInt(1),
-			HomesteadBlock:      big.NewInt(0),
-			EIP150Block:         big.NewInt(0),
-			EIP155Block:         big.NewInt(0),
-			EIP158Block:         big.NewInt(0),
-			ByzantiumBlock:      big.NewInt(0),
-			ConstantinopleBlock: big.NewInt(5),
-		},
+	"ByzantiumToConstantinopleAt5": &goethereum.ChainConfig{
+		ChainID:             big.NewInt(1),
+		HomesteadBlock:      big.NewInt(0),
+		EIP150Block:         big.NewInt(0),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(5),
 	},
-	"ByzantiumToConstantinopleFixAt5": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:             big.NewInt(1),
-			HomesteadBlock:      big.NewInt(0),
-			EIP150Block:         big.NewInt(0),
-			EIP155Block:         big.NewInt(0),
-			EIP158Block:         big.NewInt(0),
-			ByzantiumBlock:      big.NewInt(0),
-			ConstantinopleBlock: big.NewInt(5),
-			PetersburgBlock:     big.NewInt(5),
-		},
+	"ByzantiumToConstantinopleFixAt5": &goethereum.ChainConfig{
+		ChainID:             big.NewInt(1),
+		HomesteadBlock:      big.NewInt(0),
+		EIP150Block:         big.NewInt(0),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(5),
+		PetersburgBlock:     big.NewInt(5),
 	},
-	"ConstantinopleFixToIstanbulAt5": {
-		ChainConfig: goethereum.ChainConfig{
-			ChainID:             big.NewInt(1),
-			HomesteadBlock:      big.NewInt(0),
-			EIP150Block:         big.NewInt(0),
-			EIP155Block:         big.NewInt(0),
-			EIP158Block:         big.NewInt(0),
-			ByzantiumBlock:      big.NewInt(0),
-			ConstantinopleBlock: big.NewInt(0),
-			PetersburgBlock:     big.NewInt(0),
-			IstanbulBlock:       big.NewInt(5),
-		},
+	"ConstantinopleFixToIstanbulAt5": &goethereum.ChainConfig{
+		ChainID:             big.NewInt(1),
+		HomesteadBlock:      big.NewInt(0),
+		EIP150Block:         big.NewInt(0),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(0),
+		IstanbulBlock:       big.NewInt(5),
 	},
 }
 

@@ -23,7 +23,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -31,7 +31,7 @@ import (
 // blockchain during header and/or uncle verification.
 type ChainReader interface {
 	// Config retrieves the blockchain's chain configuration.
-	Config() *paramtypes.ChainConfig
+	Config() common2.ChainConfigurator
 
 	// CurrentHeader retrieves the current header from the local chain.
 	CurrentHeader() *types.Header

@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -106,7 +107,7 @@ type EVM struct {
 	depth int
 
 	// chainConfig contains information about the current chain
-	chainConfig *paramtypes.ChainConfig
+	chainConfig common2.ChainConfigurator
 	// virtual machine configuration options used to initialise the
 	// evm.
 	vmConfig Config
@@ -125,7 +126,7 @@ type EVM struct {
 
 // NewEVM returns a new EVM. The returned EVM is not thread safe and should
 // only ever be used *once*.
-func NewEVM(ctx Context, statedb StateDB, chainConfig *paramtypes.ChainConfig, vmConfig Config) *EVM {
+func NewEVM(ctx Context, statedb StateDB, chainConfig common2.ChainConfigurator, vmConfig Config) *EVM {
 	evm := &EVM{
 		Context:      ctx,
 		StateDB:      statedb,
@@ -134,21 +135,21 @@ func NewEVM(ctx Context, statedb StateDB, chainConfig *paramtypes.ChainConfig, v
 		interpreters: make([]Interpreter, 0, 1),
 	}
 
-	if chainConfig.IsEWASM(evm.BlockNumber) {
-		// to be implemented by EVM-C and Wagon PRs.
-		// if vmConfig.EWASMInterpreter != "" {
-		//  extIntOpts := strings.Split(vmConfig.EWASMInterpreter, ":")
-		//  path := extIntOpts[0]
-		//  options := []string{}
-		//  if len(extIntOpts) > 1 {
-		//    options = extIntOpts[1..]
-		//  }
-		//  evm.interpreters = append(evm.interpreters, NewEVMVCInterpreter(evm, vmConfig, options))
-		// } else {
-		// 	evm.interpreters = append(evm.interpreters, NewEWASMInterpreter(evm, vmConfig))
-		// }
-		panic("No supported ewasm interpreter yet.")
-	}
+	//if chainConfig.IsForked(chainConfig.Getevm.BlockNumber) {
+	//	// to be implemented by EVM-C and Wagon PRs.
+	//	// if vmConfig.EWASMInterpreter != "" {
+	//	//  extIntOpts := strings.Split(vmConfig.EWASMInterpreter, ":")
+	//	//  path := extIntOpts[0]
+	//	//  options := []string{}
+	//	//  if len(extIntOpts) > 1 {
+	//	//    options = extIntOpts[1..]
+	//	//  }
+	//	//  evm.interpreters = append(evm.interpreters, NewEVMVCInterpreter(evm, vmConfig, options))
+	//	// } else {
+	//	// 	evm.interpreters = append(evm.interpreters, NewEWASMInterpreter(evm, vmConfig))
+	//	// }
+	//	panic("No supported ewasm interpreter yet.")
+	//}
 
 	// vmConfig.EVMInterpreter will be used by EVM-C, it won't be checked here
 	// as we always want to have the built-in EVM as the failover option.

@@ -44,8 +44,8 @@ type CatHerder interface {
 	SetGasLimitBoundDivisor(n *uint64) error
 	GetNetworkID() *uint64
 	SetNetworkID(n *uint64) error
-	GetChainID() *uint64
-	SetChainID(n *uint64) error
+	GetChainID() *big.Int
+	SetChainID(i *big.Int) error
 	GetMaxCodeSize() *uint64
 	SetMaxCodeSize(n *uint64) error
 	GetEIP7Transition() *uint64

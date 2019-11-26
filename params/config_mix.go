@@ -19,17 +19,18 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var (
 	// Genesis hashes to enforce below configs on.
 	MixGenesisHash = common.HexToHash("0x4fa57903dad05875ddf78030c16b5da886f7d81714cf66946a4c02566dbb2af5")
+	MixNetworkID = uint64(76)
 
 	// MixChainConfig is the chain parameters to run a node on the MIX main network.
-	MixChainConfig = &paramtypes.ChainConfig{
-		ChainConfig: goethereum.ChainConfig{
+	MixChainConfig = func () common2.ChainConfigurator {
+		c := &goethereum.ChainConfig{
 			ChainID:             big.NewInt(76),
 			HomesteadBlock:      big.NewInt(0),
 			DAOForkBlock:        nil,
@@ -40,9 +41,8 @@ var (
 			EIP158Block:         big.NewInt(0),
 			ByzantiumBlock:      nil,
 			ConstantinopleBlock: nil,
-		},
-		NetworkID:           76,
-		DisposalBlock:       nil,
-		EIP160FBlock:        big.NewInt(0),
-	}
+		}
+		c.SetNetworkID(&MixNetworkID)
+		return c
+	}()
 )

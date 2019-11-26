@@ -23,12 +23,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 func TestCheckCompatible(t *testing.T) {
 	type test struct {
-		stored, new *paramtypes.ChainConfig
+		stored, new common2.ChainConfigurator
 		head        uint64
 		wantErr     *paramtypes.ConfigCompatError
 	}
@@ -36,14 +37,14 @@ func TestCheckCompatible(t *testing.T) {
 		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 0, wantErr: nil},
 		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 100, wantErr: nil},
 		{
-			stored:  &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{EIP150Block: big.NewInt(10)}},
-			new:     &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{EIP150Block: big.NewInt(20)}},
+			stored:  &goethereum.ChainConfig{EIP150Block: big.NewInt(10)},
+			new:     &goethereum.ChainConfig{EIP150Block: big.NewInt(20)},
 			head:    9,
 			wantErr: nil,
 		},
 		{
 			stored: AllEthashProtocolChanges,
-			new:    &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{HomesteadBlock: nil}},
+			new:    &goethereum.ChainConfig{HomesteadBlock: nil},
 			head:   3,
 			wantErr: &paramtypes.ConfigCompatError{
 				What:         "Homestead fork block",
@@ -54,7 +55,7 @@ func TestCheckCompatible(t *testing.T) {
 		},
 		{
 			stored: AllEthashProtocolChanges,
-			new:    &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{HomesteadBlock: big.NewInt(1)}},
+			new:    &goethereum.ChainConfig{HomesteadBlock: big.NewInt(1)},
 			head:   3,
 			wantErr: &paramtypes.ConfigCompatError{
 				What:         "Homestead fork block",
@@ -64,8 +65,8 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored: &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{HomesteadBlock: big.NewInt(30), EIP150Block: big.NewInt(10)}},
-			new:    &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{HomesteadBlock: big.NewInt(25), EIP150Block: big.NewInt(20)}},
+			stored: &goethereum.ChainConfig{HomesteadBlock: big.NewInt(30), EIP150Block: big.NewInt(10)},
+			new:    &goethereum.ChainConfig{HomesteadBlock: big.NewInt(25), EIP150Block: big.NewInt(20)},
 			head:   25,
 			wantErr: &paramtypes.ConfigCompatError{
 				What:         "EIP150 fork block",
@@ -97,13 +98,13 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored:  &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)}},
+			stored:  &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
 			new:     &paramtypes.ChainConfig{EIP211FBlock: big.NewInt(26)},
 			head:    25,
 			wantErr: nil,
 		},
 		{
-			stored: &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)}},
+			stored: &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
 			new:    &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(26)}, // err: EIP649 must also be set
 			head:   25,
 			wantErr: &paramtypes.ConfigCompatError{
@@ -114,17 +115,17 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored:  &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)}},
+			stored:  &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
 			new:     &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
 			head:    25,
 			wantErr: nil,
 		},
 		{
 			stored: MainnetChainConfig,
-			new: func() *paramtypes.ChainConfig {
+			new: func() common2.ChainConfigurator {
 				c := &paramtypes.ChainConfig{}
 				*c = *MainnetChainConfig
-				c.DAOForkSupport = !MainnetChainConfig.DAOForkSupport
+				c.SetEthashEIP779Transition(nil)
 				return c
 			}(),
 			head: MainnetChainConfig.DAOForkBlock.Uint64(),
@@ -140,7 +141,7 @@ func TestCheckCompatible(t *testing.T) {
 			new: func() *paramtypes.ChainConfig {
 				c := &paramtypes.ChainConfig{}
 				*c = *MainnetChainConfig
-				c.ChainID = new(big.Int).Sub(MainnetChainConfig.EIP155Block, common.Big1)
+				c.SetChainID(new(big.Int).Sub(MainnetChainConfig.EIP155Block, common.Big1))
 				return c
 			}(),
 			head: MainnetChainConfig.EIP158Block.Uint64(),
@@ -154,7 +155,7 @@ func TestCheckCompatible(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		err := test.stored.CheckCompatible(test.new, test.head)
+		err := test.stored.(*paramtypes.ChainConfig).CheckCompatible(test.new, test.head)
 		if !reflect.DeepEqual(err, test.wantErr) {
 			t.Errorf("error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", test.stored, test.new, test.head, err, test.wantErr)
 		}

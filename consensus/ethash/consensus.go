@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
@@ -304,12 +305,12 @@ func parent_diff_over_dbd(p *types.Header) *big.Int {
 // CalcDifficulty is the difficulty adjustment algorithm. It returns
 // the difficulty that a new block should have when created at time
 // given the parent block's time and difficulty.
-func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.Header) *big.Int {
+func CalcDifficulty(config common2.ChainConfigurator, time uint64, parent *types.Header) *big.Int {
 	next := new(big.Int).Add(parent.Number, big1)
 	out := new(big.Int)
 
 	// ADJUSTMENT algorithms
-	if config.IsEIP100F(next) {
+	if config.IsForked(config.GetEthashEIP100BTransition, next) {
 		// https://github.com/ethereum/EIPs/issues/100
 		// algorithm:
 		// diff = (parent_diff +
@@ -326,7 +327,7 @@ func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.H
 		out.Mul(parent_diff_over_dbd(parent), out)
 		out.Add(out, parent.Difficulty)
 
-	} else if config.IsEIP2F(next) {
+	} else if config.IsForked(config.GetEthashEIP2Transition, next) {
 		// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.md
 		// algorithm:
 		// diff = (parent_diff +
@@ -357,7 +358,7 @@ func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.H
 	// after adjustment and before bomb
 	out.Set(math.BigMax(out, vars.MinimumDifficulty))
 
-	if config.IsBombDisposal(next) {
+	if config.IsForked(config.GetEthashECIP1041Transition, next) {
 		return out
 	}
 
@@ -366,16 +367,16 @@ func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.H
 	// exPeriodRef the explosion clause's reference point
 	exPeriodRef := new(big.Int).Add(parent.Number, big1)
 
-	if config.IsECIP1010(next) {
+	if config.IsForked(config.GetEthashECIP1010PauseTransition, next) {
 		ecip1010Explosion(config, next, exPeriodRef)
 
-	} else if len(config.DifficultyBombDelaySchedule) > 0 {
+	} else if len(config.GetEthashDifficultyBombDelaySchedule()) > 0 {
 		// This logic varies from the original fork-based logic (below) in that
 		// configured delay values are treated as compounding values (-2000000 + -3000000 = -5000000@constantinople)
 		// as opposed to hardcoded pre-compounded values (-5000000@constantinople).
 		// Thus the Sub-ing.
 		fakeBlockNumber := new(big.Int).Set(exPeriodRef)
-		for activated, dur := range config.DifficultyBombDelaySchedule {
+		for activated, dur := range config.GetEthashDifficultyBombDelaySchedule() {
 			if exPeriodRef.Cmp(big.NewInt(int64(activated))) < 0 {
 				continue
 			}
@@ -383,7 +384,7 @@ func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.H
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 
-	} else if config.IsEIP1234F(next) {
+	} else if config.IsForked(config.GetEthashEIP1234TransitionV, next) {
 		// calcDifficultyEIP1234 is the difficulty adjustment algorithm for Constantinople.
 		// The calculation uses the Byzantium rules, but with bomb offset 5M.
 		// Specification EIP-1234: https://eips.ethereum.org/EIPS/eip-1234
@@ -398,7 +399,7 @@ func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.H
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 
-	} else if config.IsEIP649F(next) {
+	} else if config.IsForked(config.GetEthashEIP649TransitionV, next) {
 		// The calculation uses the Byzantium rules, with bomb offset of 3M.
 		// Specification EIP-649: https://eips.ethereum.org/EIPS/eip-649
 		// Related meta-ish EIP-669: https://github.com/ethereum/EIPs/pull/669
@@ -573,12 +574,8 @@ var (
 // AccumulateRewards credits the coinbase of the given block with the mining
 // reward. The total reward consists of the static block reward and rewards for
 // included uncles. The coinbase of each uncle block is also rewarded.
-func accumulateRewards(config *paramtypes.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
-	if config.IsMCIP0(header.Number) {
-		musicoinBlockReward(config, state, header, uncles)
-		return
-	}
-	if config.IsECIP1017F(header.Number) {
+func accumulateRewards(config common2.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+	if config.IsForked(config.GetEthashECIP1017Transition, header.Number) {
 		ecip1017BlockReward(config, state, header, uncles)
 		return
 	}

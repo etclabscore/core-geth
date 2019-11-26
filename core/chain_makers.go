@@ -28,7 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -46,7 +46,7 @@ type BlockGen struct {
 	receipts []*types.Receipt
 	uncles   []*types.Header
 
-	config *paramtypes.ChainConfig
+	config common2.ChainConfigurator
 	engine consensus.Engine
 }
 
@@ -187,7 +187,7 @@ func (b *BlockGen) OffsetTime(seconds int64) {
 // Blocks created by GenerateChain do not contain valid proof of work
 // values. Inserting them into BlockChain requires use of FakePow or
 // a similar non-validating proof of work implementation.
-func GenerateChain(config *paramtypes.ChainConfig, parent *types.Block, engine consensus.Engine, db ethdb.Database, n int, gen func(int, *BlockGen)) ([]*types.Block, []types.Receipts) {
+func GenerateChain(config common2.ChainConfigurator, parent *types.Block, engine consensus.Engine, db ethdb.Database, n int, gen func(int, *BlockGen)) ([]*types.Block, []types.Receipts) {
 	if config == nil {
 		config = params.TestChainConfig
 	}
@@ -198,15 +198,15 @@ func GenerateChain(config *paramtypes.ChainConfig, parent *types.Block, engine c
 		b.header = makeHeader(chainreader, parent, statedb, b.engine)
 
 		// Mutate the state and block according to any hard-fork specs
-		if daoBlock := config.DAOForkBlock; daoBlock != nil {
-			limit := new(big.Int).Add(daoBlock, vars.DAOForkExtraRange)
-			if b.header.Number.Cmp(daoBlock) >= 0 && b.header.Number.Cmp(limit) < 0 {
-				if config.DAOForkSupport {
-					b.header.Extra = common.CopyBytes(vars.DAOForkBlockExtra)
-				}
+
+		daoBlock := config.GetEthashEIP779Transition()
+		if daoBlock != nil {
+			limit := new(big.Int).Add(new(big.Int).SetUint64(*daoBlock), vars.DAOForkExtraRange)
+			if b.header.Number.Cmp(new(big.Int).SetUint64(*daoBlock)) >= 0 && b.header.Number.Cmp(limit) < 0 {
+				b.header.Extra = common.CopyBytes(vars.DAOForkBlockExtra)
 			}
 		}
-		if config.DAOForkSupport && config.DAOForkBlock != nil && config.DAOForkBlock.Cmp(b.header.Number) == 0 {
+		if daoBlock != nil && *daoBlock == b.header.Number.Uint64() {
 			misc.ApplyDAOHardFork(statedb)
 		}
 		// Execute any user modifications to the block
@@ -218,7 +218,7 @@ func GenerateChain(config *paramtypes.ChainConfig, parent *types.Block, engine c
 			block, _ := b.engine.FinalizeAndAssemble(chainreader, b.header, statedb, b.txs, b.uncles, b.receipts)
 
 			// Write state changes to db
-			root, err := statedb.Commit(config.IsEIP161F(b.header.Number))
+			root, err := statedb.Commit(config.IsForked(config.GetEIP161abcTransition, b.header.Number))
 			if err != nil {
 				panic(fmt.Sprintf("state write error: %v", err))
 			}
@@ -251,7 +251,7 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 	}
 
 	return &types.Header{
-		Root:       state.IntermediateRoot(chain.Config().IsEIP161F(parent.Number())),
+		Root:       state.IntermediateRoot(chain.Config().IsForked(chain.Config().GetEIP161abcTransition, parent.Number())),
 		ParentHash: parent.Hash(),
 		Coinbase:   parent.Coinbase(),
 		Difficulty: engine.CalcDifficulty(chain, time, &types.Header{
@@ -285,12 +285,12 @@ func makeBlockChain(parent *types.Block, n int, engine consensus.Engine, db ethd
 }
 
 type fakeChainReader struct {
-	config  *paramtypes.ChainConfig
+	config  common2.ChainConfigurator
 	genesis *types.Block
 }
 
 // Config returns the chain configuration.
-func (cr *fakeChainReader) Config() *paramtypes.ChainConfig {
+func (cr *fakeChainReader) Config() common2.ChainConfigurator {
 	return cr.config
 }
 

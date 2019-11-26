@@ -80,15 +80,21 @@ func (c *ChainConfig) GetNetworkID() *uint64 {
 }
 
 func (c *ChainConfig) SetNetworkID(n *uint64) error {
+	if n == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	vars.DefaultNetworkID = *n
 	return nil
 }
 
 func (c *ChainConfig) GetChainID() *uint64 {
-	return newU64(c.ChainID.Uint64())
+	return bigNewU64(c.ChainID)
 }
 
 func (c *ChainConfig) SetChainID(n *uint64) error {
+	if n == nil {
+		return nil
+	}
 	c.ChainID = big.NewInt(int64(*n))
 	return nil
 }
@@ -98,6 +104,9 @@ func (c *ChainConfig) GetMaxCodeSize() *uint64 {
 }
 
 func (c *ChainConfig) SetMaxCodeSize(n *uint64) error {
+	if n == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	vars.MaxCodeSize = *n
 	return nil
 }
@@ -371,6 +380,9 @@ func (c *ChainConfig) GetEthashMinimumDifficulty() *big.Int {
 }
 
 func (c *ChainConfig) SetEthashMinimumDifficulty(i *big.Int) error {
+	if i == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	vars.MinimumDifficulty = i
 	return nil
 }
@@ -380,6 +392,9 @@ func (c *ChainConfig) GetEthashDifficultyBoundDivisor() *big.Int {
 }
 
 func (c *ChainConfig) SetEthashDifficultyBoundDivisor(i *big.Int) error {
+	if i == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	vars.DifficultyBoundDivisor = i
 	return nil
 }
@@ -389,24 +404,39 @@ func (c *ChainConfig) GetEthashDurationLimit() *big.Int {
 }
 
 func (c *ChainConfig) SetEthashDurationLimit(i *big.Int) error {
+	if i == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	vars.DurationLimit = i
 	return nil
 }
 
 func (c *ChainConfig) GetEthashHomesteadTransition() *uint64 {
+	if c.Ethash == nil {
+		return nil
+	}
 	return bigNewU64(c.HomesteadBlock)
 }
 
 func (c *ChainConfig) SetEthashHomesteadTransition(i *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	setBig(c.HomesteadBlock, i)
 	return nil
 }
 
 func (c *ChainConfig) GetEthashEIP2Transition() *uint64 {
+	if c.Ethash == nil {
+		return nil
+	}
 	return bigNewU64(c.HomesteadBlock)
 }
 
 func (c *ChainConfig) SetEthashEIP2Transition(i *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	setBig(c.HomesteadBlock, i)
 	return nil
 }
@@ -444,11 +474,11 @@ func (c *ChainConfig) SetEthashECIP1017Transition(i *uint64) error {
 	return common2.ErrUnsupportedConfigFatal
 }
 
-func (c *ChainConfig) GetEthashECIP1017EraRounds() *big.Int {
+func (c *ChainConfig) GetEthashECIP1017EraRounds() *uint64 {
 	return nil
 }
 
-func (c *ChainConfig) SetEthashECIP1017EraRounds(i *big.Int) error {
+func (c *ChainConfig) SetEthashECIP1017EraRounds(i *uint64) error {
 	if i == nil {
 		return nil
 	}
@@ -456,10 +486,16 @@ func (c *ChainConfig) SetEthashECIP1017EraRounds(i *big.Int) error {
 }
 
 func (c *ChainConfig) GetEthashEIP100BTransition() *uint64 {
+	if c.Ethash == nil {
+		return nil
+	}
 	return bigNewU64(c.ByzantiumBlock)
 }
 
 func (c *ChainConfig) SetEthashEIP100BTransition(i *uint64) error {
+	if c.Ethash == nil {
+		return common2.ErrUnsupportedConfigFatal
+	}
 	setBig(c.ByzantiumBlock, i)
 	return nil
 }
@@ -476,19 +512,7 @@ func (c *ChainConfig) SetEthashECIP1041Transition(i *uint64) error {
 }
 
 func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() common2.Uint64BigMapEncodesHex {
-	if c.Ethash == nil {
-		return nil
-	}
-	m := common2.Uint64BigMapEncodesHex{
-		0: vars.FrontierBlockReward,
-	}
-	if c.ByzantiumBlock != nil {
-		m[c.ByzantiumBlock.Uint64()] = vars.EIP649FBlockReward
-	}
-	if c.ConstantinopleBlock != nil {
-		m[c.ConstantinopleBlock.Uint64()] = vars.EIP1234FBlockReward
-	}
-	return m
+	return nil
 }
 
 func (c *ChainConfig) SetEthashDifficultyBombDelaySchedule(m common2.Uint64BigMapEncodesHex) error {
@@ -496,19 +520,7 @@ func (c *ChainConfig) SetEthashDifficultyBombDelaySchedule(m common2.Uint64BigMa
 }
 
 func (c *ChainConfig) GetEthashBlockRewardSchedule() common2.Uint64BigMapEncodesHex {
-	if c.Ethash == nil {
-		return nil
-	}
-	m := common2.Uint64BigMapEncodesHex{
-		0: vars.FrontierBlockReward,
-	}
-	if c.ByzantiumBlock != nil {
-		m[c.ByzantiumBlock.Uint64()] = vars.EIP649FBlockReward
-	}
-	if c.ConstantinopleBlock != nil {
-		m[c.ConstantinopleBlock.Uint64()] = vars.EIP1234FBlockReward
-	}
-	return m
+	return nil
 }
 
 func (c *ChainConfig) SetEthashBlockRewardSchedule(m common2.Uint64BigMapEncodesHex) error {

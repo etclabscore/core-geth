@@ -70,9 +70,9 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 		ParentHash *common.Hash                                `json:"parentHash"`
 	}
 	var dec Genesis
-	dec.Config = &goethereum.ChainConfig{}
+	dec.Config = &MultiGethChainConfig{}
 	if err := json.Unmarshal(input, &dec); err != nil {
-		dec.Config = &MultiGethChainConfig{}
+		dec.Config = &goethereum.ChainConfig{}
 		if err := json.Unmarshal(input, &dec); err != nil {
 			return err
 		}

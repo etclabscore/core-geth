@@ -54,7 +54,7 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 	MustCommitGenesis(conDb, gspec)
 
 	conConf := *params.TestChainConfig
-	conConf.DAOForkBlock = forkBlock
+	conConf.DAOForkBlock = nil
 	conConf.DAOForkSupport = false
 
 	conBc, _ := NewBlockChain(conDb, nil, &conConf, ethash.NewFaker(), vm.Config{}, nil)

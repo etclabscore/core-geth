@@ -21,7 +21,6 @@ package geth
 import (
 	"encoding/json"
 
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/p2p/discv5"
 	"github.com/ethereum/go-ethereum/params"
 )
@@ -34,7 +33,7 @@ func MainnetGenesis() string {
 
 // TestnetGenesis returns the JSON spec to use for the Ethereum test network.
 func TestnetGenesis() string {
-	enc, err := json.Marshal(core.DefaultTestnetGenesisBlock())
+	enc, err := json.Marshal(params.DefaultTestnetGenesisBlock())
 	if err != nil {
 		panic(err)
 	}
@@ -43,7 +42,7 @@ func TestnetGenesis() string {
 
 // RinkebyGenesis returns the JSON spec to use for the Rinkeby test network
 func RinkebyGenesis() string {
-	enc, err := json.Marshal(core.DefaultRinkebyGenesisBlock())
+	enc, err := json.Marshal(params.DefaultRinkebyGenesisBlock())
 	if err != nil {
 		panic(err)
 	}

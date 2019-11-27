@@ -26,7 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // Test light syncing which will download all headers from genesis.
@@ -63,7 +63,7 @@ func testCheckpointSyncing(t *testing.T, protocol int, syncMode int) {
 	if syncMode == 1 || syncMode == 2 {
 		// Assemble checkpoint 0
 		s, _, head := server.chtIndexer.Sections()
-		cp := &params.TrustedCheckpoint{
+		cp := &goethereum.TrustedCheckpoint{
 			SectionIndex: 0,
 			SectionHead:  head,
 			CHTRoot:      light.GetChtRoot(server.db, s-1, head),
@@ -152,7 +152,7 @@ func testMissOracleBackend(t *testing.T, hasCheckpoint bool) {
 	expected := config.ChtSize + config.ChtConfirms
 
 	s, _, head := server.chtIndexer.Sections()
-	cp := &params.TrustedCheckpoint{
+	cp := &goethereum.TrustedCheckpoint{
 		SectionIndex: 0,
 		SectionHead:  head,
 		CHTRoot:      light.GetChtRoot(server.db, s-1, head),

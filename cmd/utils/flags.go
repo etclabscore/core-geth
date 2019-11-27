@@ -60,6 +60,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/p2p/netutil"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rpc"
 	whisper "github.com/ethereum/go-ethereum/whisper/whisperv6"
 	pcsclite "github.com/gballet/go-libpcsclite"
@@ -769,39 +770,9 @@ var (
 // the a subdirectory of the specified datadir will be used.
 func MakeDataDir(ctx *cli.Context) string {
 	if path := ctx.GlobalString(DataDirFlag.Name); path != "" {
-		if ctx.GlobalBool(TestnetFlag.Name) {
-			return filepath.Join(path, "testnet")
-		}
-		if ctx.GlobalBool(ClassicFlag.Name) {
-			return filepath.Join(path, "classic")
-		}
-		if ctx.GlobalBool(MordorFlag.Name) {
-			return filepath.Join(path, "mordor")
-		}
-		if ctx.GlobalBool(SocialFlag.Name) {
-			return filepath.Join(path, "social")
-		}
-		if ctx.GlobalBool(MixFlag.Name) {
-			return filepath.Join(path, "mix")
-		}
-		if ctx.GlobalBool(EthersocialFlag.Name) {
-			return filepath.Join(path, "ethersocial")
-		}
-		if ctx.GlobalBool(MusicoinFlag.Name) {
-			return filepath.Join(path, "musicoin")
-		}
-		if ctx.GlobalBool(RinkebyFlag.Name) {
-			return filepath.Join(path, "rinkeby")
-		}
-		if ctx.GlobalBool(KottiFlag.Name) {
-			return filepath.Join(path, "kotti")
-		}
-		if ctx.GlobalBool(GoerliFlag.Name) {
-			return filepath.Join(path, "goerli")
-		}
-		return path
+		return dataDirPathForCtxChainConfig(ctx, path)
 	}
-	Fatalf("Cannot determine default data directory, please set manually (--datadir)")
+	Fatalf("Cannot determine default data directory, please set manually (--%s)", DataDirFlag.Name)
 	return ""
 }
 
@@ -1263,32 +1234,40 @@ func setSmartCard(ctx *cli.Context, cfg *node.Config) {
 	cfg.SmartCardDaemonPath = path
 }
 
+func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) string {
+	switch {
+	case ctx.GlobalBool(TestnetFlag.Name):
+		return filepath.Join(baseDataDirPath, "testnet")
+	case ctx.GlobalBool(ClassicFlag.Name):
+		return filepath.Join(baseDataDirPath, "classic")
+	case ctx.GlobalBool(MordorFlag.Name):
+		return filepath.Join(baseDataDirPath, "mordor")
+	case ctx.GlobalBool(SocialFlag.Name):
+		return filepath.Join(baseDataDirPath, "social")
+	case ctx.GlobalBool(MixFlag.Name):
+		return filepath.Join(baseDataDirPath, "mix")
+	case ctx.GlobalBool(EthersocialFlag.Name):
+		return filepath.Join(baseDataDirPath, "ethersocial")
+	case ctx.GlobalBool(MusicoinFlag.Name):
+		return filepath.Join(baseDataDirPath, "musicoin")
+	case ctx.GlobalBool(RinkebyFlag.Name):
+		return filepath.Join(baseDataDirPath, "rinkeby")
+	case ctx.GlobalBool(KottiFlag.Name):
+		return filepath.Join(baseDataDirPath, "kotti")
+	case ctx.GlobalBool(GoerliFlag.Name):
+		return filepath.Join(baseDataDirPath, "goerli")
+	}
+	return baseDataDirPath
+}
+
 func setDataDir(ctx *cli.Context, cfg *node.Config) {
 	switch {
 	case ctx.GlobalIsSet(DataDirFlag.Name):
 		cfg.DataDir = ctx.GlobalString(DataDirFlag.Name)
 	case ctx.GlobalBool(DeveloperFlag.Name):
 		cfg.DataDir = "" // unless explicitly requested, use memory databases
-	case ctx.GlobalBool(TestnetFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "testnet")
-	case ctx.GlobalBool(ClassicFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "classic")
-	case ctx.GlobalBool(MordorFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "mordor")
-	case ctx.GlobalBool(SocialFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "social")
-	case ctx.GlobalBool(MixFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "mix")
-	case ctx.GlobalBool(EthersocialFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "ethersocial")
-	case ctx.GlobalBool(MusicoinFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "musicoin")
-	case ctx.GlobalBool(RinkebyFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "rinkeby")
-	case ctx.GlobalBool(KottiFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "kotti")
-	case ctx.GlobalBool(GoerliFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "goerli")
+	case cfg.DataDir == node.DefaultDataDir():
+		cfg.DataDir = dataDirPathForCtxChainConfig(ctx, node.DefaultDataDir())
 	}
 }
 
@@ -1543,63 +1522,15 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	}
 
 	// Override any default configs for hard coded networks.
-	switch {
-	case ctx.GlobalBool(TestnetFlag.Name):
-		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = params.NetworkIDTestnet
-		}
-		cfg.Genesis = core.DefaultTestnetGenesisBlock()
-	case ctx.GlobalBool(ClassicFlag.Name):
-		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = params.NetworkIDClassic
-		}
-		cfg.Genesis = core.DefaultClassicGenesisBlock()
-	case ctx.GlobalBool(MordorFlag.Name):
-		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = params.NetworkIDMordor
-		}
-		cfg.Genesis = core.DefaultMordorGenesisBlock()
-	case ctx.GlobalBool(SocialFlag.Name):
-		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = params.NetworkIDSocial
-		}
-		cfg.Genesis = core.DefaultSocialGenesisBlock()
-	case ctx.GlobalBool(EthersocialFlag.Name):
-		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = params.NetworkIDEthersocial
-		}
-		cfg.Genesis = core.DefaultEthersocialGenesisBlock()
 
-	case ctx.GlobalBool(MusicoinFlag.Name):
-		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = 7762959
-		}
-		cfg.Genesis = core.DefaultMusicoinGenesisBlock()
+	// Override genesis configuration if a --<chain> flag.
+	if gen := genesisForCtxChainConfig(ctx); gen != nil {
+		cfg.Genesis = gen
+	}
 
-	case ctx.GlobalBool(RinkebyFlag.Name):
-		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = params.NetworkIDRinkeby
-		}
-		cfg.Genesis = core.DefaultRinkebyGenesisBlock()
-	case ctx.GlobalBool(KottiFlag.Name):
-		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = params.NetworkIDKotti
-		}
-		cfg.Genesis = core.DefaultKottiGenesisBlock()
-	case ctx.GlobalBool(MixFlag.Name):
-		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = params.NetworkIDMix
-		}
-		cfg.Genesis = core.DefaultMixGenesisBlock()
-	case ctx.GlobalBool(GoerliFlag.Name):
-		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = params.NetworkIDGoerli
-		}
-		cfg.Genesis = core.DefaultGoerliGenesisBlock()
-	case ctx.GlobalBool(DeveloperFlag.Name):
-		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = params.NetworkIDDeveloper
-		}
+	if ctx.GlobalBool(DeveloperFlag.Name) {
+		cfg.NetworkId = 1337
+
 		// Create new developer account or reuse existing one
 		var (
 			developer accounts.Account
@@ -1618,10 +1549,14 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		}
 		log.Info("Using developer account", "address", developer.Address)
 
-		cfg.Genesis = core.DeveloperGenesisBlock(uint64(ctx.GlobalInt(DeveloperPeriodFlag.Name)), developer.Address)
+		cfg.Genesis = params.DeveloperGenesisBlock(uint64(ctx.GlobalInt(DeveloperPeriodFlag.Name)), developer.Address)
 		if !ctx.GlobalIsSet(MinerGasPriceFlag.Name) && !ctx.GlobalIsSet(MinerLegacyGasPriceFlag.Name) {
 			cfg.Miner.GasPrice = big.NewInt(1)
 		}
+	}
+
+	if ctx.GlobalIsSet(NetworkIdFlag.Name) {
+		cfg.NetworkId = ctx.GlobalUint64(NetworkIdFlag.Name)
 	}
 }
 
@@ -1749,33 +1684,42 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 	return chainDb
 }
 
-func MakeGenesis(ctx *cli.Context) *core.Genesis {
-	var genesis *core.Genesis
+// genesisForCtxChainConfig returns the corresponding Genesis for a non-default flag chain value.
+// If no --<chain> flag is set in the global context, a nil value is returned.
+// It does not handle genesis for --dev mode, since that mode includes but also exceeds
+// chain configuration.
+func genesisForCtxChainConfig(ctx *cli.Context) *paramtypes.Genesis {
+	var genesis *paramtypes.Genesis
 	switch {
 	case ctx.GlobalBool(TestnetFlag.Name):
-		genesis = core.DefaultTestnetGenesisBlock()
+		genesis = params.DefaultTestnetGenesisBlock()
 	case ctx.GlobalBool(ClassicFlag.Name):
-		genesis = core.DefaultClassicGenesisBlock()
+		genesis = params.DefaultClassicGenesisBlock()
 	case ctx.GlobalBool(MordorFlag.Name):
-		genesis = core.DefaultMordorGenesisBlock()
+		genesis = params.DefaultMordorGenesisBlock()
 	case ctx.GlobalBool(SocialFlag.Name):
-		genesis = core.DefaultSocialGenesisBlock()
+		genesis = params.DefaultSocialGenesisBlock()
 	case ctx.GlobalBool(MixFlag.Name):
-		genesis = core.DefaultMixGenesisBlock()
+		genesis = params.DefaultMixGenesisBlock()
 	case ctx.GlobalBool(EthersocialFlag.Name):
-		genesis = core.DefaultEthersocialGenesisBlock()
+		genesis = params.DefaultEthersocialGenesisBlock()
 	case ctx.GlobalBool(MusicoinFlag.Name):
-		genesis = core.DefaultMusicoinGenesisBlock()
+		genesis = params.DefaultMusicoinGenesisBlock()
 	case ctx.GlobalBool(RinkebyFlag.Name):
-		genesis = core.DefaultRinkebyGenesisBlock()
+		genesis = params.DefaultRinkebyGenesisBlock()
 	case ctx.GlobalBool(KottiFlag.Name):
-		genesis = core.DefaultKottiGenesisBlock()
+		genesis = params.DefaultKottiGenesisBlock()
 	case ctx.GlobalBool(GoerliFlag.Name):
-		genesis = core.DefaultGoerliGenesisBlock()
-	case ctx.GlobalBool(DeveloperFlag.Name):
-		Fatalf("Developer chains are ephemeral")
+		genesis = params.DefaultGoerliGenesisBlock()
 	}
 	return genesis
+}
+
+func MakeGenesis(ctx *cli.Context) *paramtypes.Genesis {
+	if ctx.GlobalBool(DeveloperFlag.Name) {
+		Fatalf("Developer chains are ephemeral")
+	}
+	return genesisForCtxChainConfig(ctx)
 }
 
 // MakeChain creates a chain manager from set command line flags.

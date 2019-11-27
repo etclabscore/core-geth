@@ -49,6 +49,14 @@ func NewHexOrDecimal256(x int64) *HexOrDecimal256 {
 	return &h
 }
 
+func (i *HexOrDecimal256) ToInt() *big.Int {
+	if i == nil {
+		return nil
+	}
+	o := (big.Int)(*i)
+	return new(big.Int).Set(&o)
+}
+
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (i *HexOrDecimal256) UnmarshalText(input []byte) error {
 	bigint, ok := ParseBig256(string(input))

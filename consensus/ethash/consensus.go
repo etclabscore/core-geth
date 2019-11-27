@@ -32,17 +32,15 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
 )
 
 // Ethash proof-of-work protocol constants.
 var (
-	FrontierBlockReward    = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
-	EIP649FBlockReward     = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
-	EIP1234FBlockReward    = big.NewInt(2e+18) // Block reward in wei for successfully mining a block upward from Constantinople
-	maxUncles              = 2                 // Maximum number of uncles allowed in a single block
-	allowedFutureBlockTime = 15 * time.Second  // Max time from current time allowed for blocks, before they're considered future blocks
+	maxUncles              = 2                // Maximum number of uncles allowed in a single block
+	allowedFutureBlockTime = 15 * time.Second // Max time from current time allowed for blocks, before they're considered future blocks
 )
 
 // Various error messages to mark blocks invalid. These should be private to
@@ -305,7 +303,7 @@ func parent_diff_over_dbd(p *types.Header) *big.Int {
 // CalcDifficulty is the difficulty adjustment algorithm. It returns
 // the difficulty that a new block should have when created at time
 // given the parent block's time and difficulty.
-func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Header) *big.Int {
+func CalcDifficulty(config *paramtypes.ChainConfig, time uint64, parent *types.Header) *big.Int {
 	next := new(big.Int).Add(parent.Number, big1)
 	out := new(big.Int)
 
@@ -316,7 +314,7 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 		// diff = (parent_diff +
 		//         (parent_diff / 2048 * max((2 if len(parent.uncles) else 1) - ((timestamp - parent.timestamp) // 9), -99))
 		//        ) + 2^(periodCount - 2)
-		out.Div(parent_time_delta(time, parent), big9)
+		out.Div(parent_time_delta(time, parent), params.EIP100FDifficultyIncrementDivisor)
 
 		if parent.UncleHash == types.EmptyUncleHash {
 			out.Sub(big1, out)
@@ -333,7 +331,7 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 		// diff = (parent_diff +
 		//         (parent_diff / 2048 * max(1 - (block_timestamp - parent_timestamp) // 10, -99))
 		//        )
-		out.Div(parent_time_delta(time, parent), big10)
+		out.Div(parent_time_delta(time, parent), params.EIP2DifficultyIncrementDivisor)
 		out.Sub(big1, out)
 		out.Set(math.BigMax(out, bigMinus99))
 		out.Mul(parent_diff_over_dbd(parent), out)
@@ -358,13 +356,31 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 	// after adjustment and before bomb
 	out.Set(math.BigMax(out, params.MinimumDifficulty))
 
+	if config.IsBombDisposal(next) {
+		return out
+	}
+
 	// EXPLOSION delays
 
 	// exPeriodRef the explosion clause's reference point
 	exPeriodRef := new(big.Int).Add(parent.Number, big1)
 
-	if config.IsBombDisposal(next) {
-		return out
+	if config.IsECIP1010(next) {
+		ecip1010Explosion(config, next, exPeriodRef)
+
+	} else if len(config.DifficultyBombDelaySchedule) > 0 {
+		// This logic varies from the original fork-based logic (below) in that
+		// configured delay values are treated as compounding values (-2000000 + -3000000 = -5000000@constantinople)
+		// as opposed to hardcoded pre-compounded values (-5000000@constantinople).
+		// Thus the Sub-ing.
+		fakeBlockNumber := new(big.Int).Set(exPeriodRef)
+		for activated, dur := range config.DifficultyBombDelaySchedule {
+			if exPeriodRef.Cmp(big.NewInt(int64(activated))) < 0 {
+				continue
+			}
+			fakeBlockNumber.Sub(fakeBlockNumber, dur)
+		}
+		exPeriodRef.Set(fakeBlockNumber)
 
 	} else if config.IsEIP1234F(next) {
 		// calcDifficultyEIP1234 is the difficulty adjustment algorithm for Constantinople.
@@ -394,8 +410,6 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 
-	} else if config.IsECIP1010(next) {
-		ecip1010Explosion(config, next, exPeriodRef)
 	}
 
 	// EXPLOSION
@@ -421,8 +435,6 @@ func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Heade
 var (
 	big1       = big.NewInt(1)
 	big2       = big.NewInt(2)
-	big9       = big.NewInt(9)
-	big10      = big.NewInt(10)
 	bigMinus99 = big.NewInt(-99)
 )
 
@@ -560,43 +572,32 @@ var (
 // AccumulateRewards credits the coinbase of the given block with the mining
 // reward. The total reward consists of the static block reward and rewards for
 // included uncles. The coinbase of each uncle block is also rewarded.
-func accumulateRewards(config *params.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
-	// Select the correct block reward based on chain progression
-	blockReward := FrontierBlockReward
-	if config.IsEIP649F(header.Number) {
-		blockReward = EIP649FBlockReward
-	}
-	if config.IsEIP1234F(header.Number) {
-		blockReward = EIP1234FBlockReward
-	}
-	if config.IsSocial(header.Number) {
-		blockReward = params.SocialBlockReward
-	}
-	if config.IsEthersocial(header.Number) {
-		blockReward = params.EthersocialBlockReward
-	}
+func accumulateRewards(config *paramtypes.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
 	if config.IsMCIP0(header.Number) {
 		musicoinBlockReward(config, state, header, uncles)
 		return
 	}
 	if config.IsECIP1017F(header.Number) {
 		ecip1017BlockReward(config, state, header, uncles)
-	} else {
-		// Accumulate the rewards for the miner and any included uncles
-		reward := new(big.Int).Set(blockReward)
-		r := new(big.Int)
-		for _, uncle := range uncles {
-			r.Add(uncle.Number, big8)
-			r.Sub(r, header.Number)
-			r.Mul(r, blockReward)
-			r.Div(r, big8)
-			state.AddBalance(uncle.Coinbase, r)
-
-			r.Div(blockReward, big32)
-			reward.Add(reward, r)
-		}
-		state.AddBalance(header.Coinbase, reward)
+		return
 	}
+
+	blockReward := params.EthashBlockReward(config, header.Number)
+
+	// Accumulate the rewards for the miner and any included uncles
+	reward := new(big.Int).Set(blockReward)
+	r := new(big.Int)
+	for _, uncle := range uncles {
+		r.Add(uncle.Number, big8)
+		r.Sub(r, header.Number)
+		r.Mul(r, blockReward)
+		r.Div(r, big8)
+		state.AddBalance(uncle.Coinbase, r)
+
+		r.Div(blockReward, big32)
+		reward.Add(reward, r)
+	}
+	state.AddBalance(header.Coinbase, reward)
 }
 
 // As of "Era 2" (zero-index era 1), uncle miners and winners are rewarded equally for each included block.

@@ -45,7 +45,6 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/downloader"
@@ -59,6 +58,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/gorilla/websocket"
 )
 
@@ -105,9 +105,9 @@ var (
 	gitDate   = "" // Git commit date YYYYMMDD of the release (set via linker flags)
 )
 
-func faucetDirFromConfig(chainConfig *params.ChainConfig) string {
+func faucetDirFromConfig(chainConfig *paramtypes.ChainConfig) string {
 	datadir := filepath.Join(os.Getenv("HOME"), ".faucet")
-	for conf, suff := range map[*params.ChainConfig]string{
+	for conf, suff := range map[*paramtypes.ChainConfig]string{
 		params.MainnetChainConfig:     "",
 		params.ClassicChainConfig:     "classic",
 		params.SocialChainConfig:      "social",
@@ -173,83 +173,72 @@ func main() {
 		log.Crit("Failed to render the faucet template", "err", err)
 	}
 	// Load and parse the genesis block requested by the user
-	var genesis *core.Genesis
+	var genesis *paramtypes.Genesis
 	var enodes []*discv5.Node
 	var blob []byte
 
-	genesis, *bootFlag, *netFlag = func() (gs *core.Genesis, bs string, netid uint64) {
+	genesis, *bootFlag, *netFlag = func() (gs *paramtypes.Genesis, bs string, netid uint64) {
 		var configs = []struct {
 			flag  bool
-			gs    *core.Genesis
+			gs    *paramtypes.Genesis
 			bs    []string
-			netid uint64
 		}{
 			{
 				*foundationFlag,
-				core.DefaultGenesisBlock(),
+				params.DefaultGenesisBlock(),
 				params.MainnetBootnodes,
-				params.NetworkIDFoundation,
 			},
 			{
 				*classicFlag,
-				core.DefaultClassicGenesisBlock(),
+				params.DefaultClassicGenesisBlock(),
 				params.ClassicBootnodes,
-				params.NetworkIDClassic,
 			},
 			{
 				*mordorFlag,
-				core.DefaultMordorGenesisBlock(),
+				params.DefaultMordorGenesisBlock(),
 				params.MordorBootnodes,
-				params.NetworkIDMordor,
 			},
 			{
 				*socialFlag,
-				core.DefaultSocialGenesisBlock(),
+				params.DefaultSocialGenesisBlock(),
 				params.SocialBootnodes,
-				params.NetworkIDSocial,
 			},
 			{
 				*ethersocialFlag,
-				core.DefaultEthersocialGenesisBlock(),
+				params.DefaultEthersocialGenesisBlock(),
 				params.EthersocialBootnodes,
-				params.NetworkIDEthersocial,
 			},
 			{
 				*mixFlag,
-				core.DefaultMixGenesisBlock(),
+				params.DefaultMixGenesisBlock(),
 				params.MixBootnodes,
-				params.NetworkIDMix,
 			},
 			{
 				*testnetFlag,
-				core.DefaultTestnetGenesisBlock(),
+				params.DefaultTestnetGenesisBlock(),
 				params.TestnetBootnodes,
-				params.NetworkIDTestnet,
 			},
 			{
 				*rinkebyFlag,
-				core.DefaultRinkebyGenesisBlock(),
+				params.DefaultRinkebyGenesisBlock(),
 				params.RinkebyBootnodes,
-				params.NetworkIDRinkeby,
 			},
 			{
 				*kottiFlag,
-				core.DefaultKottiGenesisBlock(),
+				params.DefaultKottiGenesisBlock(),
 				params.KottiBootnodes,
-				params.NetworkIDKotti,
 			},
 			{
 				*goerliFlag,
-				core.DefaultGoerliGenesisBlock(),
+				params.DefaultGoerliGenesisBlock(),
 				params.GoerliBootnodes,
-				params.NetworkIDGoerli,
 			},
 		}
 
 		var bss []string
 		for _, conf := range configs {
 			if conf.flag {
-				gs, bss, netid = conf.gs, conf.bs, conf.netid
+				gs, bss, netid = conf.gs, conf.bs, conf.gs.Config.NetworkID
 				break
 			}
 		}
@@ -263,7 +252,7 @@ func main() {
 			if err != nil {
 				log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
 			}
-			gs = new(core.Genesis)
+			gs = new(paramtypes.Genesis)
 			if err = json.Unmarshal(blob, gs); err != nil {
 				log.Crit("Failed to parse genesis block json", "err", err)
 			}
@@ -326,10 +315,10 @@ type request struct {
 
 // faucet represents a crypto faucet backed by an Ethereum light client.
 type faucet struct {
-	config *params.ChainConfig // Chain configurations for signing
-	stack  *node.Node          // Ethereum protocol stack
-	client *ethclient.Client   // Client connection to the Ethereum chain
-	index  []byte              // Index page to serve up on the web
+	config *paramtypes.ChainConfig // Chain configurations for signing
+	stack  *node.Node              // Ethereum protocol stack
+	client *ethclient.Client       // Client connection to the Ethereum chain
+	index  []byte                  // Index page to serve up on the web
 
 	keystore *keystore.KeyStore // Keystore containing the single signer
 	account  accounts.Account   // Account funding user faucet requests
@@ -346,7 +335,7 @@ type faucet struct {
 	lock sync.RWMutex // Lock protecting the faucet's internals
 }
 
-func newFaucet(genesis *core.Genesis, port int, enodes []*discv5.Node, network uint64, stats string, ks *keystore.KeyStore, index []byte) (*faucet, error) {
+func newFaucet(genesis *paramtypes.Genesis, port int, enodes []*discv5.Node, network uint64, stats string, ks *keystore.KeyStore, index []byte) (*faucet, error) {
 	// Assemble the raw devp2p protocol stack
 	stack, err := node.New(&node.Config{
 		Name:    "MultiFaucet",

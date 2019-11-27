@@ -17,29 +17,31 @@ package params
 
 import (
 	"math/big"
+
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var (
 	// MordorChainConfig is the chain parameters to run a node on the Ethereum Classic Mordor test network (PoW).
-	MordorChainConfig = &ChainConfig{
-		ChainID:             big.NewInt(63),
-		HomesteadBlock:      big.NewInt(0),
-		EIP150Block:         big.NewInt(0),
-		EIP155Block:         big.NewInt(0),
-		EIP158Block:         big.NewInt(0),
-		ByzantiumBlock:      big.NewInt(0),
-		ConstantinopleBlock: big.NewInt(301243),
-		PetersburgBlock:     big.NewInt(301243),
-		DisposalBlock:       big.NewInt(0),
-		ECIP1017FBlock:      big.NewInt(2000000),
-		ECIP1017EraRounds:   big.NewInt(2000000),
-		EIP160FBlock:        big.NewInt(0),
-		ECIP1010PauseBlock:  big.NewInt(0),
-		ECIP1010Length:      big.NewInt(2000000),
-		Ethash:              new(EthashConfig),
+	MordorChainConfig = &paramtypes.ChainConfig{
+		ChainConfig: goethereum.ChainConfig{
+			ChainID:             big.NewInt(63),
+			HomesteadBlock:      big.NewInt(0),
+			EIP150Block:         big.NewInt(0),
+			EIP155Block:         big.NewInt(0),
+			EIP158Block:         big.NewInt(0),
+			ByzantiumBlock:      big.NewInt(0),
+			ConstantinopleBlock: big.NewInt(301243),
+			PetersburgBlock:     big.NewInt(301243),
+			Ethash:              new(goethereum.EthashConfig),
+		},
+		NetworkID: 7,
+		DisposalBlock:      big.NewInt(0),
+		ECIP1017FBlock:     big.NewInt(2000000),
+		ECIP1017EraRounds:  big.NewInt(2000000),
+		EIP160FBlock:       big.NewInt(0),
+		ECIP1010PauseBlock: big.NewInt(0),
+		ECIP1010Length:     big.NewInt(2000000),
 	}
-	//
-	//DisinflationRateQuotient = big.NewInt(4)      // Disinflation rate quotient for ECIP1017
-	//DisinflationRateDivisor  = big.NewInt(5)      // Disinflation rate divisor for ECIP1017
-	//ExpDiffPeriod            = big.NewInt(100000) // Exponential diff period for diff bomb & ECIP1010
 )

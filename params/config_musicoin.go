@@ -19,6 +19,9 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var (
@@ -26,20 +29,31 @@ var (
 	MusicoinGenesisHash = common.HexToHash("0x4eba28a4ce8dc0701f94c936a223a8429129b38ca9974ec0e92bf9234ac952e9")
 
 	// MusicoinChainConfig is the chain parameters to run a node on the main network.
-	MusicoinChainConfig = &ChainConfig{
+	MusicoinChainConfig = &paramtypes.ChainConfig{
+		ChainConfig: goethereum.ChainConfig{
+			ChainID:        big.NewInt(7762959),
+			HomesteadBlock: big.NewInt(1150000),
+			DAOForkBlock:   big.NewInt(36028797018963967),
+			DAOForkSupport: false,
+			EIP150Block:    big.NewInt(2222222),
+			EIP150Hash:     common.HexToHash("0x"),
+			EIP155Block:    big.NewInt(2222222),
+			EIP158Block:    big.NewInt(2222222),
+			ByzantiumBlock: big.NewInt(2222222),
+			Ethash:         new(goethereum.EthashConfig),
+		},
+		NetworkID:      776959,
 		MCIP0Block:     big.NewInt(0),
-		ChainID:        big.NewInt(7762959),
-		HomesteadBlock: big.NewInt(1150000),
-		DAOForkBlock:   big.NewInt(36028797018963967),
-		DAOForkSupport: false,
-		EIP150Block:    big.NewInt(2222222),
-		EIP150Hash:     common.HexToHash("0x"),
-		EIP155Block:    big.NewInt(2222222),
-		EIP158Block:    big.NewInt(2222222),
-		ByzantiumBlock: big.NewInt(2222222),
 		MCIP3Block:     big.NewInt(1200001),
 		MCIP8Block:     big.NewInt(5200001),
-		Ethash:         new(EthashConfig),
+		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
+			uint64(0):       new(big.Int).Mul(big.NewInt(314), big.NewInt(1e+18)),
+			uint64(1200001): new(big.Int).Mul(big.NewInt(250), big.NewInt(1e+18)),
+			uint64(5200001): new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)),
+		},
+		DifficultyBombDelaySchedule: common2.Uint64BigMapEncodesHex{
+			uint64(2222222): new(big.Int).SetUint64(uint64(0x2dc6c0)),
+		},
 	}
 
 	MusicoinTimeCapsuleBlock  = int64(4200000)
@@ -52,18 +66,3 @@ var (
 	MusicoinDevBlockReward = new(big.Int).Mul(big.NewInt(14), big.NewInt(1e+18))
 )
 
-// IsMCIP0 returns whether MCIP0 block is engaged; this is equivalent to 'IsMusicoin'.
-// (There is no MCIP-0).
-func (c *ChainConfig) IsMCIP0(num *big.Int) bool {
-	return isForked(c.MCIP0Block, num)
-}
-
-// IsMCIP3 returns whether MCIP3-UBI block is engaged.
-func (c *ChainConfig) IsMCIP3(num *big.Int) bool {
-	return isForked(c.MCIP3Block, num)
-}
-
-// IsMCIP8 returns whether MCIP3-QT block is engaged.
-func (c *ChainConfig) IsMCIP8(num *big.Int) bool {
-	return isForked(c.MCIP8Block, num)
-}

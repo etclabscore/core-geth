@@ -231,7 +231,7 @@ func TestEncoding(t *testing.T) {
 
 func TestGatherForks(t *testing.T) {
 	cases := []struct {
-		config *paramtypes.ChainConfig
+		config *paramtypes.MultiGethChainConfig
 		wantNs []uint64
 	}{
 		{

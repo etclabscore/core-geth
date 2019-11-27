@@ -52,8 +52,8 @@ const (
 var (
 	// Test chain configurations
 	testTxPoolConfig  core.TxPoolConfig
-	ethashChainConfig *paramtypes.ChainConfig
-	cliqueChainConfig *paramtypes.ChainConfig
+	ethashChainConfig *paramtypes.MultiGethChainConfig
+	cliqueChainConfig *paramtypes.MultiGethChainConfig
 
 	// Test accounts
 	testBankKey, _  = crypto.GenerateKey()
@@ -100,7 +100,7 @@ type testWorkerBackend struct {
 	uncleBlock *types.Block
 }
 
-func newTestWorkerBackend(t *testing.T, chainConfig *paramtypes.ChainConfig, engine consensus.Engine, db ethdb.Database, n int) *testWorkerBackend {
+func newTestWorkerBackend(t *testing.T, chainConfig *paramtypes.MultiGethChainConfig, engine consensus.Engine, db ethdb.Database, n int) *testWorkerBackend {
 	var gspec = paramtypes.Genesis{
 		Config: chainConfig,
 		Alloc:  paramtypes.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
@@ -180,7 +180,7 @@ func (b *testWorkerBackend) newRandomTx(creation bool) *types.Transaction {
 	return tx
 }
 
-func newTestWorker(t *testing.T, chainConfig *paramtypes.ChainConfig, engine consensus.Engine, db ethdb.Database, blocks int) (*worker, *testWorkerBackend) {
+func newTestWorker(t *testing.T, chainConfig *paramtypes.MultiGethChainConfig, engine consensus.Engine, db ethdb.Database, blocks int) (*worker, *testWorkerBackend) {
 	backend := newTestWorkerBackend(t, chainConfig, engine, db, blocks)
 	backend.txPool.AddLocals(pendingTxs)
 	w := newWorker(testConfig, chainConfig, engine, backend, new(event.TypeMux), nil)
@@ -199,7 +199,7 @@ func TestGenerateBlockAndImportClique(t *testing.T) {
 func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 	var (
 		engine      consensus.Engine
-		chainConfig *paramtypes.ChainConfig
+		chainConfig *paramtypes.MultiGethChainConfig
 		db          = rawdb.NewMemoryDatabase()
 	)
 	if isClique {
@@ -279,7 +279,7 @@ func TestPendingStateAndBlockClique(t *testing.T) {
 	testPendingStateAndBlock(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, rawdb.NewMemoryDatabase()))
 }
 
-func testPendingStateAndBlock(t *testing.T, chainConfig *paramtypes.ChainConfig, engine consensus.Engine) {
+func testPendingStateAndBlock(t *testing.T, chainConfig *paramtypes.MultiGethChainConfig, engine consensus.Engine) {
 	defer engine.Close()
 
 	w, b := newTestWorker(t, chainConfig, engine, rawdb.NewMemoryDatabase(), 0)
@@ -311,7 +311,7 @@ func TestEmptyWorkClique(t *testing.T) {
 	testEmptyWork(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, rawdb.NewMemoryDatabase()))
 }
 
-func testEmptyWork(t *testing.T, chainConfig *paramtypes.ChainConfig, engine consensus.Engine) {
+func testEmptyWork(t *testing.T, chainConfig *paramtypes.MultiGethChainConfig, engine consensus.Engine) {
 	defer engine.Close()
 
 	w, _ := newTestWorker(t, chainConfig, engine, rawdb.NewMemoryDatabase(), 0)
@@ -430,7 +430,7 @@ func TestRegenerateMiningBlockClique(t *testing.T) {
 	testRegenerateMiningBlock(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, rawdb.NewMemoryDatabase()))
 }
 
-func testRegenerateMiningBlock(t *testing.T, chainConfig *paramtypes.ChainConfig, engine consensus.Engine) {
+func testRegenerateMiningBlock(t *testing.T, chainConfig *paramtypes.MultiGethChainConfig, engine consensus.Engine) {
 	defer engine.Close()
 
 	w, b := newTestWorker(t, chainConfig, engine, rawdb.NewMemoryDatabase(), 0)
@@ -495,7 +495,7 @@ func TestAdjustIntervalClique(t *testing.T) {
 	testAdjustInterval(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, rawdb.NewMemoryDatabase()))
 }
 
-func testAdjustInterval(t *testing.T, chainConfig *paramtypes.ChainConfig, engine consensus.Engine) {
+func testAdjustInterval(t *testing.T, chainConfig *paramtypes.MultiGethChainConfig, engine consensus.Engine) {
 	defer engine.Close()
 
 	w, _ := newTestWorker(t, chainConfig, engine, rawdb.NewMemoryDatabase(), 0)

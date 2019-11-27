@@ -68,7 +68,7 @@ var difficultyChainConfigurations = map[string]common2.ChainConfigurator{
 		ConstantinopleBlock: big.NewInt(0),
 	},
 	"difficulty.json": mainnetChainConfig,
-	"ETC_Atlantis": &paramtypes.ChainConfig{
+	"ETC_Atlantis": &paramtypes.MultiGethChainConfig{
 		Ethash:        new(goethereum.EthashConfig),
 		EIP100FBlock:  big.NewInt(0),
 		EIP140FBlock:  big.NewInt(0),
@@ -80,7 +80,7 @@ var difficultyChainConfigurations = map[string]common2.ChainConfigurator{
 		EIP658FBlock:  big.NewInt(0),
 		DisposalBlock: big.NewInt(0),
 	},
-	"ETC_Agharta": &paramtypes.ChainConfig{
+	"ETC_Agharta": &paramtypes.MultiGethChainConfig{
 		Ethash:        new(goethereum.EthashConfig),
 		EIP100FBlock:  big.NewInt(0),
 		EIP140FBlock:  big.NewInt(0),

@@ -111,7 +111,7 @@ type testMatcher struct {
 
 type testConfig struct {
 	p      *regexp.Regexp
-	config paramtypes.ChainConfig
+	config paramtypes.MultiGethChainConfig
 }
 
 type testFailure struct {
@@ -142,7 +142,7 @@ func (tm *testMatcher) whitelist(pattern string) {
 }
 
 // config defines chain config for tests matching the pattern.
-func (tm *testMatcher) config(pattern string, cfg paramtypes.ChainConfig) {
+func (tm *testMatcher) config(pattern string, cfg paramtypes.MultiGethChainConfig) {
 	tm.configpat = append(tm.configpat, testConfig{regexp.MustCompile(pattern), cfg})
 }
 
@@ -168,7 +168,7 @@ func (tm *testMatcher) findSkip(name string) (reason string, skipload bool) {
 }
 
 // findConfig returns the chain config matching defined patterns.
-func (tm *testMatcher) findConfig(name string) (*paramtypes.ChainConfig, string) {
+func (tm *testMatcher) findConfig(name string) (*paramtypes.MultiGethChainConfig, string) {
 	// TODO(fjl): name can be derived from testing.T when min Go version is 1.8
 	for _, m := range tm.configpat {
 		if m.p.MatchString(name) {
@@ -176,7 +176,7 @@ func (tm *testMatcher) findConfig(name string) (*paramtypes.ChainConfig, string)
 		}
 	}
 	log.Println("using empty config", name)
-	return new(paramtypes.ChainConfig), ""
+	return new(paramtypes.MultiGethChainConfig), ""
 }
 
 // checkFailure checks whether a failure is expected.

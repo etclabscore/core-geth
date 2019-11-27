@@ -80,8 +80,8 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored: &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(31)},
-			new:    &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(31)},
+			stored: &paramtypes.MultiGethChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(31)},
+			new:    &paramtypes.MultiGethChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(31)},
 			head:   25,
 			wantErr: &common2.ConfigCompatError{
 				What:         "EIP100F/EIP649F not equal",
@@ -91,8 +91,8 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored: &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
-			new:    &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
+			stored: &paramtypes.MultiGethChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
+			new:    &paramtypes.MultiGethChainConfig{EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
 			head:   25,
 			wantErr: &common2.ConfigCompatError{
 				What:         "EIP100F fork block",
@@ -103,13 +103,13 @@ func TestCheckCompatible(t *testing.T) {
 		},
 		{
 			stored:  &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
-			new:     &paramtypes.ChainConfig{EIP211FBlock: big.NewInt(26)},
+			new:     &paramtypes.MultiGethChainConfig{EIP211FBlock: big.NewInt(26)},
 			head:    25,
 			wantErr: nil,
 		},
 		{
 			stored: &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
-			new:    &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(26)}, // err: EIP649 must also be set
+			new:    &paramtypes.MultiGethChainConfig{EIP100FBlock: big.NewInt(26)}, // err: EIP649 must also be set
 			head:   25,
 			wantErr: &common2.ConfigCompatError{
 				What:         "EIP100F/EIP649F not equal",
@@ -120,7 +120,7 @@ func TestCheckCompatible(t *testing.T) {
 		},
 		{
 			stored:  &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
-			new:     &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
+			new:     &paramtypes.MultiGethChainConfig{EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
 			head:    25,
 			wantErr: nil,
 		},

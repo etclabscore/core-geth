@@ -68,7 +68,7 @@ func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) common2.ChainCon
 	} else {
 		return &config
 	}
-	var config2 paramtypes.ChainConfig
+	var config2 paramtypes.MultiGethChainConfig
 	if err := json.Unmarshal(data, &config2); err != nil {
 		log.Error("Invalid chain config JSON", "hash", hash, "err", err)
 		//return nil

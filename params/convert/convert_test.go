@@ -95,7 +95,7 @@ func TestConfiguratorImplementationsSatisfied(t *testing.T) {
 
 	for _, ty := range []interface{}{
 		&goethereum.ChainConfig{},
-		&paramtypes.ChainConfig{},
+		&paramtypes.MultiGethChainConfig{},
 	} {
 		_ = ty.(common.ChainConfigurator)
 	}
@@ -118,7 +118,7 @@ func TestCompatible(t *testing.T) {
 
 func TestGatherForks(t *testing.T) {
 	cases := []struct {
-		config *paramtypes.ChainConfig
+		config *paramtypes.MultiGethChainConfig
 		wantNs []uint64
 	}{
 		{

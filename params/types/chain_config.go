@@ -26,17 +26,17 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
-// ChainConfig is the core config which determines the blockchain settings.
+// MultiGethChainConfig is the core config which determines the blockchain settings.
 //
-// ChainConfig is stored in the database on a per block basis. This means
+// MultiGethChainConfig is stored in the database on a per block basis. This means
 // that any network, identified by its genesis block, can have its own
 // set of configuration options.
-type ChainConfig struct {
+type MultiGethChainConfig struct {
 
-	// Embedded ethereum/go-ethereum ChainConfig.
+	// Embedded ethereum/go-ethereum MultiGethChainConfig.
 	// This is not a pointer value because it can be expected that there will
 	// always be at least one (even zero-value) value desired from that data type, eg ChainID or engine.
-	//goethereum.ChainConfig
+	//goethereum.MultiGethChainConfig
 
 	// Following fields are left commented because it's useful to see pairings,
 	// both for reference and edification.
@@ -182,7 +182,7 @@ type ChainConfig struct {
 }
 
 // String implements the fmt.Stringer interface.
-func (c *ChainConfig) String() string {
+func (c *MultiGethChainConfig) String() string {
 	var engine interface{}
 	switch {
 	case c.Ethash != nil:
@@ -201,171 +201,171 @@ func (c *ChainConfig) String() string {
 
 //
 //// IsECIP1017F returns whether the chain is configured with ECIP1017.
-//func (c *ChainConfig) IsECIP1017F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsECIP1017F(num *big.Int) bool {
 //	return IsForked(c.ECIP1017FBlock, num) || c.ECIP1017EraRounds != nil
 //}
 //
 //// IsEIP2F returns whether num is equal to or greater than the Homestead or EIP2 block.
-//func (c *ChainConfig) IsEIP2F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP2F(num *big.Int) bool {
 //	return IsForked(c.HomesteadBlock, num) || IsForked(c.EIP2FBlock, num)
 //}
 //
 //// IsEIP7F returns whether num is equal to or greater than the Homestead or EIP7 block.
-//func (c *ChainConfig) IsEIP7F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP7F(num *big.Int) bool {
 //	return IsForked(c.HomesteadBlock, num) || IsForked(c.EIP7FBlock, num)
 //}
 //
 //// IsDAOFork returns whether num is either equal to the DAO fork block or greater.
-//func (c *ChainConfig) IsDAOFork(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsDAOFork(num *big.Int) bool {
 //	return IsForked(c.DAOForkBlock, num)
 //}
 //
 //// IsEIP150 returns whether num is either equal to the EIP150 fork block or greater.
-//func (c *ChainConfig) IsEIP150(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP150(num *big.Int) bool {
 //	return IsForked(c.EIP150Block, num)
 //}
 //
 //// IsEIP155 returns whether num is either equal to the EIP155 fork block or greater.
-//func (c *ChainConfig) IsEIP155(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP155(num *big.Int) bool {
 //	return IsForked(c.EIP155Block, num)
 //}
 //
 //// IsEIP160F returns whether num is either equal to or greater than the "EIP158HF" Block or EIP160 block.
-//func (c *ChainConfig) IsEIP160F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP160F(num *big.Int) bool {
 //	return IsForked(c.EIP158Block, num) || IsForked(c.EIP160FBlock, num)
 //}
 //
 //// IsEIP161F returns whether num is either equal to or greater than the "EIP158HF" Block or EIP161 block.
-//func (c *ChainConfig) IsEIP161F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP161F(num *big.Int) bool {
 //	return IsForked(c.EIP158Block, num) || IsForked(c.EIP161FBlock, num)
 //}
 //
 //// IsEIP170F returns whether num is either equal to or greater than the "EIP158HF" Block or EIP170 block.
-//func (c *ChainConfig) IsEIP170F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP170F(num *big.Int) bool {
 //	return IsForked(c.EIP158Block, num) || IsForked(c.EIP170FBlock, num)
 //}
 //
 //// IsEIP100F returns whether num is equal to or greater than the Byzantium or EIP100 block.
-//func (c *ChainConfig) IsEIP100F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP100F(num *big.Int) bool {
 //	return IsForked(c.ByzantiumBlock, num) || IsForked(c.ConstantinopleBlock, num) || IsForked(c.EIP100FBlock, num)
 //}
 //
 //// IsEIP140F returns whether num is equal to or greater than the Byzantium or EIP140 block.
-//func (c *ChainConfig) IsEIP140F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP140F(num *big.Int) bool {
 //	return IsForked(c.ByzantiumBlock, num) || IsForked(c.EIP140FBlock, num)
 //}
 //
 //// IsEIP198F returns whether num is equal to or greater than the Byzantium or EIP198 block.
-//func (c *ChainConfig) IsEIP198F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP198F(num *big.Int) bool {
 //	return IsForked(c.ByzantiumBlock, num) || IsForked(c.EIP198FBlock, num)
 //}
 //
 //// IsEIP211F returns whether num is equal to or greater than the Byzantium or EIP211 block.
-//func (c *ChainConfig) IsEIP211F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP211F(num *big.Int) bool {
 //	return IsForked(c.ByzantiumBlock, num) || IsForked(c.EIP211FBlock, num)
 //}
 //
 //// IsEIP212F returns whether num is equal to or greater than the Byzantium or EIP212 block.
-//func (c *ChainConfig) IsEIP212F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP212F(num *big.Int) bool {
 //	return IsForked(c.ByzantiumBlock, num) || IsForked(c.EIP212FBlock, num)
 //}
 //
 //// IsEIP213F returns whether num is equal to or greater than the Byzantium or EIP213 block.
-//func (c *ChainConfig) IsEIP213F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP213F(num *big.Int) bool {
 //	return IsForked(c.ByzantiumBlock, num) || IsForked(c.EIP213FBlock, num)
 //}
 //
 //// IsEIP214F returns whether num is equal to or greater than the Byzantium or EIP214 block.
-//func (c *ChainConfig) IsEIP214F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP214F(num *big.Int) bool {
 //	return IsForked(c.ByzantiumBlock, num) || IsForked(c.EIP214FBlock, num)
 //}
 //
 //// IsEIP649F returns whether num is equal to or greater than the Byzantium or EIP649 block.
-//func (c *ChainConfig) IsEIP649F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP649F(num *big.Int) bool {
 //	return IsForked(c.ByzantiumBlock, num) || IsForked(c.EIP649FBlock, num)
 //}
 //
 //// IsEIP658F returns whether num is equal to or greater than the Byzantium or EIP658 block.
-//func (c *ChainConfig) IsEIP658F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP658F(num *big.Int) bool {
 //	return IsForked(c.ByzantiumBlock, num) || IsForked(c.EIP658FBlock, num)
 //}
 //
 //// IsEIP145F returns whether num is equal to or greater than the Constantinople or EIP145 block.
-//func (c *ChainConfig) IsEIP145F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP145F(num *big.Int) bool {
 //	return IsForked(c.ConstantinopleBlock, num) || IsForked(c.EIP145FBlock, num)
 //}
 //
 //// IsEIP1014F returns whether num is equal to or greater than the Constantinople or EIP1014 block.
-//func (c *ChainConfig) IsEIP1014F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP1014F(num *big.Int) bool {
 //	return IsForked(c.ConstantinopleBlock, num) || IsForked(c.EIP1014FBlock, num)
 //}
 //
 //// IsEIP1052F returns whether num is equal to or greater than the Constantinople or EIP1052 block.
-//func (c *ChainConfig) IsEIP1052F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP1052F(num *big.Int) bool {
 //	return IsForked(c.ConstantinopleBlock, num) || IsForked(c.EIP1052FBlock, num)
 //}
 //
 //// IsEIP1234F returns whether num is equal to or greater than the Constantinople or EIP1234 block.
-//func (c *ChainConfig) IsEIP1234F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP1234F(num *big.Int) bool {
 //	return IsForked(c.ConstantinopleBlock, num) || IsForked(c.EIP1234FBlock, num)
 //}
 //
 //// IsEIP1283F returns whether num is equal to or greater than the Constantinople or EIP1283 block.
-//func (c *ChainConfig) IsEIP1283F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP1283F(num *big.Int) bool {
 //	return !c.IsPetersburg(num) && (IsForked(c.ConstantinopleBlock, num) || IsForked(c.EIP1283FBlock, num))
 //}
 //
 //// IsEIP152F returns whether num is equal to or greater than the Istanbul block.
-//func (c *ChainConfig) IsEIP152F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP152F(num *big.Int) bool {
 //	return IsForked(c.IstanbulBlock, num) || IsForked(c.EIP152FBlock, num)
 //}
 //
 //// IsEIP1108F returns whether num is equal to or greater than the Istanbul block.
-//func (c *ChainConfig) IsEIP1108F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP1108F(num *big.Int) bool {
 //	return IsForked(c.IstanbulBlock, num) || IsForked(c.EIP1108FBlock, num)
 //}
 //
 //// IsEIP1344F returns whether num is equal to or greater than the Istanbul block.
-//func (c *ChainConfig) IsEIP1344F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP1344F(num *big.Int) bool {
 //	return IsForked(c.IstanbulBlock, num) || IsForked(c.EIP1344FBlock, num)
 //}
 //
 //// IsEIP1884F returns whether num is equal to or greater than the Istanbul block.
-//func (c *ChainConfig) IsEIP1884F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP1884F(num *big.Int) bool {
 //	return IsForked(c.IstanbulBlock, num) || IsForked(c.EIP1884FBlock, num)
 //}
 //
 //// IsEIP2028F returns whether num is equal to or greater than the Istanbul block.
-//func (c *ChainConfig) IsEIP2028F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP2028F(num *big.Int) bool {
 //	return IsForked(c.IstanbulBlock, num) || IsForked(c.EIP2028FBlock, num)
 //}
 //
 //// IsEIP2200F returns whether num is equal to or greater than the Istanbul block.
-//func (c *ChainConfig) IsEIP2200F(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEIP2200F(num *big.Int) bool {
 //	return IsForked(c.IstanbulBlock, num) || IsForked(c.EIP2200FBlock, num)
 //}
 //
-//func (c *ChainConfig) IsBombDisposal(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsBombDisposal(num *big.Int) bool {
 //	return IsForked(c.DisposalBlock, num)
 //}
 //
-//func (c *ChainConfig) IsECIP1010(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsECIP1010(num *big.Int) bool {
 //	return IsForked(c.ECIP1010PauseBlock, num)
 //}
 //
 //// IsPetersburg returns whether num is either
 //// - equal to or greater than the PetersburgBlock fork block,
 //// - OR is nil, and Constantinople is active
-//func (c *ChainConfig) IsPetersburg(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsPetersburg(num *big.Int) bool {
 //	return IsForked(c.PetersburgBlock, num) || c.PetersburgBlock == nil && IsForked(c.ConstantinopleBlock, num)
 //}
 //
 //// IsIstanbul returns whether num is either equal to the Istanbul fork block or greater.
-//func (c *ChainConfig) IsIstanbul(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsIstanbul(num *big.Int) bool {
 //	return IsForked(c.IstanbulBlock, num)
 //}
 //
 //// IsEWASM returns whether num represents a block number after the EWASM fork
-//func (c *ChainConfig) IsEWASM(num *big.Int) bool {
+//func (c *MultiGethChainConfig) IsEWASM(num *big.Int) bool {
 //	return IsForked(c.EWASMBlock, num)
 //}

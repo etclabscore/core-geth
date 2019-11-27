@@ -38,6 +38,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
@@ -84,7 +85,7 @@ func runCmd(ctx *cli.Context) error {
 		tracer        vm.Tracer
 		debugLogger   *vm.StructLogger
 		statedb       *state.StateDB
-		chainConfig   *paramtypes.ChainConfig
+		chainConfig   common2.ChainConfigurator
 		sender        = common.BytesToAddress([]byte("sender"))
 		receiver      = common.BytesToAddress([]byte("receiver"))
 		genesisConfig *paramtypes.Genesis

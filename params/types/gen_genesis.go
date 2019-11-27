@@ -10,7 +10,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	common0 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var _ = (*genesisSpecMarshaling)(nil)
@@ -18,7 +19,7 @@ var _ = (*genesisSpecMarshaling)(nil)
 // MarshalJSON marshals as JSON.
 func (g Genesis) MarshalJSON() ([]byte, error) {
 	type Genesis struct {
-		Config     common2.ChainConfigurator                                `json:"config"`
+		Config     common0.ChainConfigurator                   `json:"config"`
 		Nonce      math.HexOrDecimal64                         `json:"nonce"`
 		Timestamp  math.HexOrDecimal64                         `json:"timestamp"`
 		ExtraData  hexutil.Bytes                               `json:"extraData"`
@@ -55,7 +56,7 @@ func (g Genesis) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals from JSON.
 func (g *Genesis) UnmarshalJSON(input []byte) error {
 	type Genesis struct {
-		Config     common2.ChainConfigurator                                `json:"config"`
+		Config     common0.ChainConfigurator                   `json:"config"`
 		Nonce      *math.HexOrDecimal64                        `json:"nonce"`
 		Timestamp  *math.HexOrDecimal64                        `json:"timestamp"`
 		ExtraData  *hexutil.Bytes                              `json:"extraData"`
@@ -69,8 +70,12 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 		ParentHash *common.Hash                                `json:"parentHash"`
 	}
 	var dec Genesis
+	dec.Config = &goethereum.ChainConfig{}
 	if err := json.Unmarshal(input, &dec); err != nil {
-		return err
+		dec.Config = &ChainConfig{}
+		if err := json.Unmarshal(input, &dec); err != nil {
+			return err
+		}
 	}
 	if dec.Config != nil {
 		g.Config = dec.Config

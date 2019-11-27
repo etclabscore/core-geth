@@ -18,7 +18,6 @@ package main
 
 import (
 	"io/ioutil"
-	"math/big"
 	"os"
 	"path/filepath"
 	"testing"
@@ -77,30 +76,30 @@ var daoProForkGenesis = `{
 }`
 
 var daoGenesisHash = common.HexToHash("5e1fc79cb4ffa4739177b5408045cd5d51c6cf766133f23f7cd72ee1f8d790e0")
-var daoGenesisForkBlock = big.NewInt(314)
+var daoGenesisForkBlock = uint64(314)
 
 // TestDAOForkBlockNewChain tests that the DAO hard-fork number and the nodes support/opposition is correctly
 // set in the database after various initialization procedures and invocations.
 func TestDAOForkBlockNewChain(t *testing.T) {
 	for i, arg := range []struct {
 		genesis     string
-		expectBlock *big.Int
+		expectBlock *uint64
 		expectVote  bool
 	}{
 		// Test DAO Default Mainnet
-		{"", params.MainnetChainConfig.DAOForkBlock, true},
+		{"", params.MainnetChainConfig.GetEthashEIP779Transition(), true},
 		// test DAO Init Old Privnet
 		//{daoOldGenesis, nil, false},
 		// test DAO Default No Fork Privnet
-		{daoNoForkGenesis, daoGenesisForkBlock, false},
+		{daoNoForkGenesis, &daoGenesisForkBlock, false},
 		// test DAO Default Pro Fork Privnet
-		{daoProForkGenesis, daoGenesisForkBlock, true},
+		{daoProForkGenesis, &daoGenesisForkBlock, true},
 	} {
 		testDAOForkBlockNewChain(t, i, arg.genesis, arg.expectBlock, arg.expectVote)
 	}
 }
 
-func testDAOForkBlockNewChain(t *testing.T, test int, genesis string, expectBlock *big.Int, expectVote bool) {
+func testDAOForkBlockNewChain(t *testing.T, test int, genesis string, expectBlock *uint64, expectVote bool) {
 	// Create a temporary data directory to use and inspect later
 	datadir := tmpdir(t)
 	defer os.RemoveAll(datadir)
@@ -136,16 +135,17 @@ func testDAOForkBlockNewChain(t *testing.T, test int, genesis string, expectBloc
 		return // we want to return here, the other checks can't make it past this point (nil panic).
 	}
 	// Validate the DAO hard-fork block number against the expected value
-	if config.DAOForkBlock == nil {
+	if config.GetEthashEIP779Transition() == nil {
 		if expectBlock != nil {
 			t.Errorf("test %d: dao hard-fork block mismatch: have nil, want %v", test, expectBlock)
 		}
 	} else if expectBlock == nil {
-		t.Errorf("test %d: dao hard-fork block mismatch: have %v, want nil", test, config.DAOForkBlock)
-	} else if config.DAOForkBlock.Cmp(expectBlock) != 0 {
-		t.Errorf("test %d: dao hard-fork block mismatch: have %v, want %v", test, config.DAOForkBlock, expectBlock)
+		t.Errorf("test %d: dao hard-fork block mismatch: have %v, want nil", test, config.GetEthashEIP779Transition())
+	} else if *config.GetEthashEIP779Transition() != *expectBlock {
+		t.Errorf("test %d: dao hard-fork block mismatch: have %v, want %v", test, config.GetEthashEIP779Transition(), expectBlock)
 	}
-	if config.DAOForkSupport != expectVote {
-		t.Errorf("test %d: dao hard-fork support mismatch: have %v, want %v", test, config.DAOForkSupport, expectVote)
+	configDAOForkSupport := config.GetEthashEIP779Transition() != nil
+	if configDAOForkSupport != expectVote {
+		t.Errorf("test %d: dao hard-fork support mismatch: have %v, want %v", test, configDAOForkSupport, expectVote)
 	}
 }

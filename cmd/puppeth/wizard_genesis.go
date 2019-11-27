@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/convert"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
@@ -65,19 +66,21 @@ func (w *wizard) makeGenesis() {
 	switch {
 	case choice == "1":
 		// In case of ethash, we're pretty much done
-		genesis.Config.Ethash = new(goethereum.EthashConfig)
+		genesis.Config.MustSetConsensusEngineType(common2.ConsensusEngineT_Ethash)
 		genesis.ExtraData = make([]byte, 32)
 
 	case choice == "" || choice == "2":
 		// In the case of clique, configure the consensus parameters
 		genesis.Difficulty = big.NewInt(1)
-		genesis.Config.Clique = &goethereum.CliqueConfig{
-			Period: 15,
-			Epoch:  30000,
-		}
+		genesis.Config.MustSetConsensusEngineType(common2.ConsensusEngineT_Clique)
+		genesis.Config.SetCliquePeriod(15)
+		genesis.Config.SetCliqueEpoch(30000)
 		fmt.Println()
 		fmt.Println("How many seconds should blocks take? (default = 15)")
-		genesis.Config.Clique.Period = uint64(w.readDefaultInt(15))
+		if err := genesis.Config.SetCliquePeriod(uint64(w.readDefaultInt(15))); err != nil {
+			log.Crit("error setting clique period", "err", err)
+			return
+		}
 
 		// We also need the initial list of signers
 		fmt.Println()
@@ -133,7 +136,7 @@ func (w *wizard) makeGenesis() {
 	// Query the user for some custom extras
 	fmt.Println()
 	fmt.Println("Specify your chain/network ID if you want an explicit one (default = random)")
-	genesis.Config.ChainID = new(big.Int).SetUint64(uint64(w.readDefaultInt(rand.Intn(65536))))
+	genesis.Config.SetChainID(new(big.Int).SetUint64(uint64(w.readDefaultInt(rand.Intn(65536)))))
 
 	// All done, store the genesis and flush to disk
 	log.Info("Configured new genesis block")
@@ -203,38 +206,38 @@ func (w *wizard) manageGenesis() {
 	case "1":
 		// Fork rule updating requested, iterate over each fork
 		fmt.Println()
-		fmt.Printf("Which block should Homestead come into effect? (default = %v)\n", w.conf.Genesis.Config.HomesteadBlock)
-		w.conf.Genesis.Config.HomesteadBlock = w.readDefaultBigInt(w.conf.Genesis.Config.HomesteadBlock)
+		fmt.Printf("Which block should Homestead come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEthashHomesteadTransition())
+		w.conf.Genesis.Config.SetEthashHomesteadTransition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEthashHomesteadTransition()))
 
 		fmt.Println()
-		fmt.Printf("Which block should EIP150 (Tangerine Whistle) come into effect? (default = %v)\n", w.conf.Genesis.Config.EIP150Block)
-		w.conf.Genesis.Config.EIP150Block = w.readDefaultBigInt(w.conf.Genesis.Config.EIP150Block)
+		fmt.Printf("Which block should EIP150 (Tangerine Whistle) come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP150Transition())
+		w.conf.Genesis.Config.SetEIP150Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP150Transition()))
 
 		fmt.Println()
-		fmt.Printf("Which block should EIP155 (Spurious Dragon) come into effect? (default = %v)\n", w.conf.Genesis.Config.EIP155Block)
-		w.conf.Genesis.Config.EIP155Block = w.readDefaultBigInt(w.conf.Genesis.Config.EIP155Block)
+		fmt.Printf("Which block should EIP155 (Spurious Dragon) come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP155Transition())
+		w.conf.Genesis.Config.SetEIP155Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP155Transition()))
 
 		fmt.Println()
-		fmt.Printf("Which block should EIP158/161 (also Spurious Dragon) come into effect? (default = %v)\n", w.conf.Genesis.Config.EIP158Block)
-		w.conf.Genesis.Config.EIP158Block = w.readDefaultBigInt(w.conf.Genesis.Config.EIP158Block)
+		fmt.Printf("Which block should EIP158/161 (also Spurious Dragon) come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP161abcTransition())
+		w.conf.Genesis.Config.SetEIP161abcTransition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP161abcTransition()))
 
 		fmt.Println()
-		fmt.Printf("Which block should Byzantium come into effect? (default = %v)\n", w.conf.Genesis.Config.ByzantiumBlock)
-		w.conf.Genesis.Config.ByzantiumBlock = w.readDefaultBigInt(w.conf.Genesis.Config.ByzantiumBlock)
+		fmt.Printf("Which block should Byzantium come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEthashEIP649TransitionV())
+		w.conf.Genesis.Config.SetEthashEIP649Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEthashEIP649TransitionV()))
 
 		fmt.Println()
-		fmt.Printf("Which block should Constantinople come into effect? (default = %v)\n", w.conf.Genesis.Config.ConstantinopleBlock)
-		w.conf.Genesis.Config.ConstantinopleBlock = w.readDefaultBigInt(w.conf.Genesis.Config.ConstantinopleBlock)
-		if w.conf.Genesis.Config.PetersburgBlock == nil {
-			w.conf.Genesis.Config.PetersburgBlock = w.conf.Genesis.Config.ConstantinopleBlock
+		fmt.Printf("Which block should Constantinople come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEthashEIP1234TransitionV())
+		w.conf.Genesis.Config.SetEthashEIP1234Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEthashEIP1234TransitionV()))
+		if w.conf.Genesis.Config.GetEIP1283DisableTransition() == nil {
+			w.conf.Genesis.Config.SetEIP1283DisableTransition(w.conf.Genesis.Config.GetEthashEIP1234TransitionV())
 		}
 		fmt.Println()
-		fmt.Printf("Which block should Petersburg come into effect? (default = %v)\n", w.conf.Genesis.Config.PetersburgBlock)
-		w.conf.Genesis.Config.PetersburgBlock = w.readDefaultBigInt(w.conf.Genesis.Config.PetersburgBlock)
+		fmt.Printf("Which block should Petersburg come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP1283DisableTransition())
+		w.conf.Genesis.Config.SetEIP1283DisableTransition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP1283DisableTransition()))
 
 		fmt.Println()
-		fmt.Printf("Which block should Istanbul come into effect? (default = %v)\n", w.conf.Genesis.Config.IstanbulBlock)
-		w.conf.Genesis.Config.IstanbulBlock = w.readDefaultBigInt(w.conf.Genesis.Config.IstanbulBlock)
+		fmt.Printf("Which block should Istanbul come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP145Transition())
+		w.conf.Genesis.Config.SetEIP145Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP145Transition()))
 
 		out, _ := json.MarshalIndent(w.conf.Genesis.Config, "", "  ")
 		fmt.Printf("Chain configuration updated:\n\n%s\n", out)

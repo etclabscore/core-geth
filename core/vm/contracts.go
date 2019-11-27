@@ -27,7 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/blake2b"
 	"github.com/ethereum/go-ethereum/crypto/bn256"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"golang.org/x/crypto/ripemd160"
 )
@@ -48,7 +48,7 @@ var basePrecompiledContracts = map[common.Address]PrecompiledContract{
 }
 
 // PrecompiledContractsForConfig returns a map containing valid precompiled contracts for a given point in a chain config.
-func PrecompiledContractsForConfig(config *paramtypes.ChainConfig, bn *big.Int) map[common.Address]PrecompiledContract {
+func PrecompiledContractsForConfig(config common2.ChainConfigurator, bn *big.Int) map[common.Address]PrecompiledContract {
 	// Copying to a new map is necessary because assigning to the original map
 	// creates a memory reference. Further, setting the vals to nil in case of nonconfiguration causes
 	// a panic during tests because they run asynchronously (also a valid reason for using an explicit copy).
@@ -56,11 +56,11 @@ func PrecompiledContractsForConfig(config *paramtypes.ChainConfig, bn *big.Int) 
 	for k, v := range basePrecompiledContracts {
 		precompileds[k] = v
 	}
-	if config.IsEIP198F(bn) {
+	if config.IsForked(config.GetEIP198Transition, bn) {
 		precompileds[common.BytesToAddress([]byte{5})] = &bigModExp{}
 	}
-	if config.IsEIP213F(bn) {
-		if config.IsEIP1108F(bn) {
+	if config.IsForked(config.GetEIP213Transition, bn) {
+		if config.IsForked(config.GetEIP1108Transition, bn) {
 			precompileds[common.BytesToAddress([]byte{6})] = &bn256AddIstanbul{}
 			precompileds[common.BytesToAddress([]byte{7})] = &bn256ScalarMulIstanbul{}
 		} else {
@@ -68,14 +68,14 @@ func PrecompiledContractsForConfig(config *paramtypes.ChainConfig, bn *big.Int) 
 			precompileds[common.BytesToAddress([]byte{7})] = &bn256ScalarMulByzantium{}
 		}
 	}
-	if config.IsEIP212F(bn) {
-		if config.IsEIP1108F(bn) {
+	if config.IsForked(config.GetEIP212Transition, bn) {
+		if config.IsForked(config.GetEIP1108Transition, bn) {
 			precompileds[common.BytesToAddress([]byte{8})] = &bn256PairingIstanbul{}
 		} else {
 			precompileds[common.BytesToAddress([]byte{8})] = &bn256PairingByzantium{}
 		}
 	}
-	if config.IsEIP152F(bn) {
+	if config.IsForked(config.GetEIP152Transition, bn) {
 		precompileds[common.BytesToAddress([]byte{9})] = &blake2F{}
 	}
 

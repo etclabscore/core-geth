@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/rlp"
 	lru "github.com/hashicorp/golang-lru"
@@ -463,7 +464,7 @@ func (lc *LightChain) GetHeaderByNumberOdr(ctx context.Context, number uint64) (
 }
 
 // Config retrieves the header chain's chain configuration.
-func (lc *LightChain) Config() *paramtypes.ChainConfig { return lc.hc.Config() }
+func (lc *LightChain) Config() common2.ChainConfigurator { return lc.hc.Config() }
 
 // SyncCheckpoint fetches the checkpoint point block header according to
 // the checkpoint provided by the remote peer.
@@ -475,8 +476,8 @@ func (lc *LightChain) SyncCheckpoint(ctx context.Context, checkpoint *goethereum
 	head := lc.CurrentHeader().Number.Uint64()
 
 	latest := (checkpoint.SectionIndex+1)*lc.indexerConfig.ChtSize - 1
-	if clique := lc.hc.Config().Clique; clique != nil {
-		latest -= latest % clique.Epoch // epoch snapshot for clique
+	if lc.hc.Config().GetConsensusEngineType().IsClique() {
+		latest -= latest % *lc.hc.Config().GetCliqueEpoch()
 	}
 	if head >= latest {
 		return true

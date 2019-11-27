@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
 	"github.com/ethereum/go-ethereum/params/types/common"
@@ -96,4 +97,39 @@ func TestCompatible(t *testing.T) {
 		t.Log(names[i], fn())
 	}
 	t.Log(fns)
+}
+
+func TestGatherForks(t *testing.T) {
+	cases := []struct {
+		config *paramtypes.ChainConfig
+		wantNs []uint64
+	}{
+		{
+			params.ClassicChainConfig,
+			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000},
+		},
+	}
+	sliceContains := func (sl []uint64, u uint64) bool {
+		for _, s := range sl {
+			if s == u {
+				return true
+			}
+		}
+		return false
+	}
+	for ci, c := range cases {
+		gotForkNs := common.Forks(c.config)
+		if len(gotForkNs) != len(c.wantNs) {
+			for _, n := range c.wantNs {
+				if !sliceContains(gotForkNs, n) {
+					t.Errorf("config.i=%d missing wanted fork at block number: %d", ci, n)
+				}
+			}
+			for _, n := range gotForkNs {
+				if !sliceContains(c.wantNs, n) {
+					t.Errorf("config.i=%d gathered unwanted fork at block number: %d", ci, n)
+				}
+			}
+		}
+	}
 }

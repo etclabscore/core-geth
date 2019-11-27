@@ -59,14 +59,14 @@ func TestSetupGenesis(t *testing.T) {
 	oldcustomg.Config = &goethereum.ChainConfig{HomesteadBlock: big.NewInt(2)}
 	tests := []struct {
 		name       string
-		fn         func(ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error)
-		wantConfig *paramtypes.ChainConfig
+		fn         func(ethdb.Database) (common2.ChainConfigurator, common.Hash, error)
+		wantConfig *goethereum.ChainConfig
 		wantHash   common.Hash
 		wantErr    error
 	}{
 		{
 			name: "genesis without ChainConfig",
-			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (common2.ChainConfigurator, common.Hash, error) {
 				return SetupGenesisBlock(db, new(paramtypes.Genesis))
 			},
 			wantErr:    paramtypes.ErrGenesisNoConfig,
@@ -74,7 +74,7 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "no block in DB, genesis == nil",
-			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (common2.ChainConfigurator, common.Hash, error) {
 				return SetupGenesisBlock(db, nil)
 			},
 			wantHash:   params.MainnetGenesisHash,
@@ -82,7 +82,7 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "mainnet block in DB, genesis == nil",
-			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (common2.ChainConfigurator, common.Hash, error) {
 				MustCommitGenesis(db, params.DefaultGenesisBlock())
 				return SetupGenesisBlock(db, nil)
 			},
@@ -91,16 +91,16 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "custom block in DB, genesis == nil",
-			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (common2.ChainConfigurator, common.Hash, error) {
 				MustCommitGenesis(db, &customg)
 				return SetupGenesisBlock(db, nil)
 			},
 			wantHash:   customghash,
-			wantConfig: customg.Config,
+			wantConfig: customg.Config.(*goethereum.ChainConfig),
 		},
 		{
 			name: "custom block in DB, genesis == testnet",
-			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (common2.ChainConfigurator, common.Hash, error) {
 				MustCommitGenesis(db, &customg)
 				return SetupGenesisBlock(db, params.DefaultTestnetGenesisBlock())
 			},
@@ -110,16 +110,16 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "compatible config in DB",
-			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (common2.ChainConfigurator, common.Hash, error) {
 				MustCommitGenesis(db, &oldcustomg)
 				return SetupGenesisBlock(db, &customg)
 			},
 			wantHash:   customghash,
-			wantConfig: customg.Config,
+			wantConfig: customg.Config.(*goethereum.ChainConfig),
 		},
 		{
 			name: "incompatible config in DB",
-			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (common2.ChainConfigurator, common.Hash, error) {
 				// Commit the 'old' genesis block with Homestead transition at #2.
 				// Advance to block #4, past the homestead transition block of customg.
 				genesis := MustCommitGenesis(db, &oldcustomg)
@@ -134,11 +134,11 @@ func TestSetupGenesis(t *testing.T) {
 				return SetupGenesisBlock(db, &customg)
 			},
 			wantHash:   customghash,
-			wantConfig: customg.Config,
+			wantConfig: customg.Config.(*goethereum.ChainConfig),
 			wantErr: &common2.ConfigCompatError{
 				What:         "Homestead fork block",
-				StoredConfig: big.NewInt(2),
-				NewConfig:    big.NewInt(3),
+				StoredConfig: func() *uint64 { b := big.NewInt(2).Uint64(); return &b }(),
+				NewConfig:    func() *uint64 { b := big.NewInt(3).Uint64(); return &b }(),
 				RewindTo:     1,
 			},
 		},

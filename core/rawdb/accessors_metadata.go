@@ -18,11 +18,15 @@ package rawdb
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/parity"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -53,21 +57,29 @@ func WriteDatabaseVersion(db ethdb.KeyValueWriter, version uint64) {
 }
 
 // ReadChainConfig retrieves the consensus settings based on the given genesis hash.
-func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) *paramtypes.ChainConfig {
+func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) common2.ChainConfigurator {
 	data, _ := db.Get(configKey(hash))
 	if len(data) == 0 {
 		return nil
 	}
-	var config paramtypes.ChainConfig
-	if err := json.Unmarshal(data, &config); err != nil {
-		log.Error("Invalid chain config JSON", "hash", hash, "err", err)
-		return nil
+	var err = errors.New("Invalid chain config JSON")
+	var unMarshalErr error
+	for _, t := range []common2.ChainConfigurator{
+		&paramtypes.ChainConfig{},
+		&goethereum.ChainConfig{},
+		&parity.ParityChainSpec{},
+	}{
+		unMarshalErr = json.Unmarshal(data, t)
+		if unMarshalErr == nil {
+			return t
+		}
 	}
-	return &config
+	log.Error(err.Error(), "hash", hash, "err", unMarshalErr)
+	return nil
 }
 
 // WriteChainConfig writes the chain config settings to the database.
-func WriteChainConfig(db ethdb.KeyValueWriter, hash common.Hash, cfg *paramtypes.ChainConfig) {
+func WriteChainConfig(db ethdb.KeyValueWriter, hash common.Hash, cfg common2.ChainConfigurator) {
 	if cfg == nil {
 		return
 	}

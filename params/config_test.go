@@ -27,6 +27,10 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
+func uint64P(n uint64) *uint64 {
+	return &n
+}
+
 func TestCheckCompatible(t *testing.T) {
 	type test struct {
 		stored, new common2.ChainConfigurator
@@ -48,7 +52,7 @@ func TestCheckCompatible(t *testing.T) {
 			head:   3,
 			wantErr: &common2.ConfigCompatError{
 				What:         "Homestead fork block",
-				StoredConfig: big.NewInt(0),
+				StoredConfig: uint64P(0),
 				NewConfig:    nil,
 				RewindTo:     0,
 			},
@@ -59,8 +63,8 @@ func TestCheckCompatible(t *testing.T) {
 			head:   3,
 			wantErr: &common2.ConfigCompatError{
 				What:         "Homestead fork block",
-				StoredConfig: big.NewInt(0),
-				NewConfig:    big.NewInt(1),
+				StoredConfig: uint64P(0),
+				NewConfig:    uint64P(1),
 				RewindTo:     0,
 			},
 		},
@@ -70,8 +74,8 @@ func TestCheckCompatible(t *testing.T) {
 			head:   25,
 			wantErr: &common2.ConfigCompatError{
 				What:         "EIP150 fork block",
-				StoredConfig: big.NewInt(10),
-				NewConfig:    big.NewInt(20),
+				StoredConfig: uint64P(10),
+				NewConfig:    uint64P(20),
 				RewindTo:     9,
 			},
 		},
@@ -81,8 +85,8 @@ func TestCheckCompatible(t *testing.T) {
 			head:   25,
 			wantErr: &common2.ConfigCompatError{
 				What:         "EIP100F/EIP649F not equal",
-				StoredConfig: big.NewInt(30),
-				NewConfig:    big.NewInt(31),
+				StoredConfig: uint64P(30),
+				NewConfig:    uint64P(31),
 				RewindTo:     29,
 			},
 		},
@@ -92,8 +96,8 @@ func TestCheckCompatible(t *testing.T) {
 			head:   25,
 			wantErr: &common2.ConfigCompatError{
 				What:         "EIP100F fork block",
-				StoredConfig: big.NewInt(30),
-				NewConfig:    big.NewInt(24),
+				StoredConfig: uint64P(30),
+				NewConfig:    uint64P(24),
 				RewindTo:     23,
 			},
 		},
@@ -109,7 +113,7 @@ func TestCheckCompatible(t *testing.T) {
 			head:   25,
 			wantErr: &common2.ConfigCompatError{
 				What:         "EIP100F/EIP649F not equal",
-				StoredConfig: big.NewInt(26), // this yields a weird-looking error (correctly, though), b/c ConfigCompatError not set up for these kinds of strange cases
+				StoredConfig: uint64P(26), // this yields a weird-looking error (correctly, though), b/c ConfigCompatError not set up for these kinds of strange cases
 				NewConfig:    nil,
 				RewindTo:     25,
 			},
@@ -123,7 +127,7 @@ func TestCheckCompatible(t *testing.T) {
 		{
 			stored: MainnetChainConfig,
 			new: func() common2.ChainConfigurator {
-				c := &paramtypes.ChainConfig{}
+				c := &goethereum.ChainConfig{}
 				*c = *MainnetChainConfig
 				c.SetEthashEIP779Transition(nil)
 				return c
@@ -131,15 +135,15 @@ func TestCheckCompatible(t *testing.T) {
 			head: MainnetChainConfig.DAOForkBlock.Uint64(),
 			wantErr: &common2.ConfigCompatError{
 				What:         "DAO fork support flag",
-				StoredConfig: MainnetChainConfig.DAOForkBlock,
-				NewConfig:    MainnetChainConfig.DAOForkBlock,
+				StoredConfig: uint64P(MainnetChainConfig.DAOForkBlock.Uint64()),
+				NewConfig:    uint64P(MainnetChainConfig.DAOForkBlock.Uint64()),
 				RewindTo:     new(big.Int).Sub(MainnetChainConfig.DAOForkBlock, common.Big1).Uint64(),
 			},
 		},
 		{
 			stored: MainnetChainConfig,
-			new: func() *paramtypes.ChainConfig {
-				c := &paramtypes.ChainConfig{}
+			new: func() common2.ChainConfigurator {
+				c := &goethereum.ChainConfig{}
 				*c = *MainnetChainConfig
 				c.SetChainID(new(big.Int).Sub(MainnetChainConfig.EIP155Block, common.Big1))
 				return c
@@ -147,15 +151,15 @@ func TestCheckCompatible(t *testing.T) {
 			head: MainnetChainConfig.EIP158Block.Uint64(),
 			wantErr: &common2.ConfigCompatError{
 				What:         "EIP155 chain ID",
-				StoredConfig: MainnetChainConfig.EIP155Block,
-				NewConfig:    MainnetChainConfig.EIP155Block,
+				StoredConfig: uint64P(MainnetChainConfig.EIP155Block.Uint64()),
+				NewConfig:    uint64P(MainnetChainConfig.EIP155Block.Uint64()),
 				RewindTo:     new(big.Int).Sub(MainnetChainConfig.EIP158Block, common.Big1).Uint64(),
 			},
 		},
 	}
 
 	for _, test := range tests {
-		err := test.stored.(*paramtypes.ChainConfig).CheckCompatible(test.new, test.head)
+		err := common2.Compatible(&test.head, test.stored, test.new)
 		if !reflect.DeepEqual(err, test.wantErr) {
 			t.Errorf("error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", test.stored, test.new, test.head, err, test.wantErr)
 		}

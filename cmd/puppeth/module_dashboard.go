@@ -610,7 +610,7 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 	}
 	template.Must(template.New("").Parse(dashboardContent)).Execute(indexfile, map[string]interface{}{
 		"Network":           network,
-		"NetworkID":         conf.Genesis.Config.NetworkID,
+		"NetworkID":         conf.Genesis.Config.GetNetworkID(),
 		"NetworkTitle":      strings.Title(network),
 		"EthstatsPage":      config.ethstats,
 		"ExplorerPage":      config.explorer,
@@ -620,7 +620,7 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 		"Bootnodes":         conf.bootnodes,
 		"BootnodesFlat":     strings.Join(conf.bootnodes, ","),
 		"Ethstats":          statsLogin,
-		"Ethash":            conf.Genesis.Config.Ethash != nil,
+		"Ethash":            conf.Genesis.Config.GetConsensusEngineType().IsEthash(),
 		"CppGenesis":        network + "-cpp.json",
 		"CppBootnodes":      strings.Join(bootCpp, " "),
 		"HarmonyGenesis":    network + "-harmony.json",
@@ -628,12 +628,12 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 		"ParityGenesis":     network + "-parity.json",
 		"PythonGenesis":     network + "-python.json",
 		"PythonBootnodes":   strings.Join(bootPython, ","),
-		"Homestead":         conf.Genesis.Config.HomesteadBlock,
-		"Tangerine":         conf.Genesis.Config.EIP150Block,
-		"Spurious":          conf.Genesis.Config.EIP155Block,
-		"Byzantium":         conf.Genesis.Config.ByzantiumBlock,
-		"Constantinople":    conf.Genesis.Config.ConstantinopleBlock,
-		"ConstantinopleFix": conf.Genesis.Config.PetersburgBlock,
+		"Homestead":         conf.Genesis.Config.GetEthashHomesteadTransition(),
+		"Tangerine":         conf.Genesis.Config.GetEIP150Transition(),
+		"Spurious":          conf.Genesis.Config.GetEIP155Transition(),
+		"Byzantium":         conf.Genesis.Config.GetEthashEIP649TransitionV(),
+		"Constantinople":    conf.Genesis.Config.GetEthashEIP1234TransitionV(),
+		"ConstantinopleFix": conf.Genesis.Config.GetEIP1283DisableTransition(),
 	})
 	files[filepath.Join(workdir, "index.html")] = indexfile.Bytes()
 
@@ -641,7 +641,7 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 	genesis, _ := conf.Genesis.MarshalJSON()
 	files[filepath.Join(workdir, network+".json")] = genesis
 
-	if conf.Genesis.Config.Ethash != nil {
+	if conf.Genesis.Config.GetConsensusEngineType().IsEthash() {
 		cppSpec, err := convert.NewAlethGenesisSpec(network, conf.Genesis)
 		if err != nil {
 			return nil, err

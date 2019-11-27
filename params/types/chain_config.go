@@ -175,29 +175,13 @@ func (c *ChainConfig) String() string {
 	default:
 		engine = "unknown"
 	}
-	return fmt.Sprintf("{NetworkID: %v, ChainID: %v Homestead: %v DAO: %v DAOSupport: %v EIP150: %v EIP155: %v EIP158: %v Byzantium: %v Disposal: %v Social: %v Ethersocial: %v ECIP1017: %v EIP160: %v ECIP1010PauseBlock: %v ECIP1010Length: %v Constantinople: %v ConstantinopleFix: %v Istanbul: %v Engine: %v}",
+	return fmt.Sprintf("<FIXME!!> NetworkID: %v, ChainID: %v Engine: %v",
 		c.NetworkID,
 		c.ChainID,
-		c.HomesteadBlock,
-		c.DAOForkBlock,
-		c.DAOForkSupport,
-		c.EIP150Block,
-		c.EIP155Block,
-		c.EIP158Block,
-		c.ByzantiumBlock,
-		c.DisposalBlock,
-		c.SocialBlock,
-		c.EthersocialBlock,
-		c.ECIP1017EraRounds,
-		c.EIP160FBlock,
-		c.ECIP1010PauseBlock,
-		c.ECIP1010Length,
-		c.ConstantinopleBlock,
-		c.PetersburgBlock,
-		c.IstanbulBlock,
 		engine,
 	)
 }
+
 //
 //// IsECIP1017F returns whether the chain is configured with ECIP1017.
 //func (c *ChainConfig) IsECIP1017F(num *big.Int) bool {
@@ -369,23 +353,23 @@ func (c *ChainConfig) String() string {
 //	return IsForked(c.EWASMBlock, num)
 //}
 
-// CheckCompatible checks whether scheduled fork transitions have been imported
-// with a mismatching chain configuration.
-func (c *ChainConfig) CheckCompatible(newcfg *ChainConfig, height uint64) *ConfigCompatError {
-	bhead := new(big.Int).SetUint64(height)
-
-	// Iterate checkCompatible to find the lowest conflict.
-	var lasterr *ConfigCompatError
-	for {
-		err := c.checkCompatible(newcfg, bhead)
-		if err == nil || (lasterr != nil && err.RewindTo == lasterr.RewindTo) {
-			break
-		}
-		lasterr = err
-		bhead.SetUint64(err.RewindTo)
-	}
-	return lasterr
-}
+//// CheckCompatible checks whether scheduled fork transitions have been imported
+//// with a mismatching chain configuration.
+//func (c *ChainConfig) CheckCompatible(newcfg *ChainConfig, height uint64) *common2.ConfigCompatError {
+//	bhead := new(big.Int).SetUint64(height)
+//
+//	// Iterate checkCompatible to find the lowest conflict.
+//	var lasterr *common2.ConfigCompatError
+//	for {
+//		err := c.checkCompatible(newcfg, bhead)
+//		if err == nil || (lasterr != nil && err.RewindTo == lasterr.RewindTo) {
+//			break
+//		}
+//		lasterr = err
+//		bhead.SetUint64(err.RewindTo)
+//	}
+//	return lasterr
+//}
 
 // CheckConfigForkOrder checks that we don't "skip" any forks, geth isn't pluggable enough
 // to guarantee that forks can be implemented in a different order than on official networks
@@ -399,150 +383,103 @@ func (c *ChainConfig) CheckConfigForkOrder() error {
 	// https://github.com/ethereum/go-ethereum/issues/20136#issuecomment-541895855
 	return nil
 }
-
-func (c *ChainConfig) checkCompatible(newcfg *ChainConfig, head *big.Int) *ConfigCompatError {
-	for _, ch := range []struct {
-		name   string
-		c1, c2 *big.Int
-	}{
-		{"Homestead", c.HomesteadBlock, newcfg.HomesteadBlock},
-		{"EIP7F", c.EIP7FBlock, newcfg.EIP7FBlock},
-		{"DAO", c.DAOForkBlock, newcfg.DAOForkBlock},
-		{"EIP150", c.EIP150Block, newcfg.EIP150Block},
-		{"EIP155", c.EIP155Block, newcfg.EIP155Block},
-		{"EIP158", c.EIP158Block, newcfg.EIP158Block},
-		{"EIP160F", c.EIP160FBlock, newcfg.EIP160FBlock},
-		{"EIP161F", c.EIP161FBlock, newcfg.EIP161FBlock},
-		{"EIP170F", c.EIP170FBlock, newcfg.EIP170FBlock},
-		{"Byzantium", c.ByzantiumBlock, newcfg.ByzantiumBlock},
-		{"EIP100F", c.EIP100FBlock, newcfg.EIP100FBlock},
-		{"EIP140F", c.EIP140FBlock, newcfg.EIP140FBlock},
-		{"EIP198F", c.EIP198FBlock, newcfg.EIP198FBlock},
-		{"EIP211F", c.EIP211FBlock, newcfg.EIP211FBlock},
-		{"EIP212F", c.EIP212FBlock, newcfg.EIP212FBlock},
-		{"EIP213F", c.EIP213FBlock, newcfg.EIP213FBlock},
-		{"EIP214F", c.EIP214FBlock, newcfg.EIP214FBlock},
-		{"EIP649F", c.EIP649FBlock, newcfg.EIP649FBlock},
-		{"EIP658F", c.EIP658FBlock, newcfg.EIP658FBlock},
-		{"Constantinople", c.ConstantinopleBlock, newcfg.ConstantinopleBlock},
-		{"EIP145F", c.EIP145FBlock, newcfg.EIP145FBlock},
-		{"EIP1014F", c.EIP1014FBlock, newcfg.EIP1014FBlock},
-		{"EIP1052F", c.EIP1052FBlock, newcfg.EIP1052FBlock},
-		{"EIP1234F", c.EIP1234FBlock, newcfg.EIP1234FBlock},
-		{"EIP1283F", c.EIP1283FBlock, newcfg.EIP1283FBlock},
-		{"EWASM", c.EWASMBlock, newcfg.EWASMBlock},
-	} {
-		if err := func(c1, c2, head *big.Int) *ConfigCompatError {
-			if isForkIncompatible(ch.c1, ch.c2, head) {
-				return newCompatError(ch.name+" fork block", ch.c1, ch.c2)
-			}
-			return nil
-		}(ch.c1, ch.c2, head); err != nil {
-			return err
-		}
-	}
-
-	if c.IsDAOFork(head) && c.DAOForkSupport != newcfg.DAOForkSupport {
-		return newCompatError("DAO fork support flag", c.DAOForkBlock, newcfg.DAOForkBlock)
-	}
-	if c.IsEIP155(head) && !configNumEqual(c.ChainID, newcfg.ChainID) {
-		return newCompatError("EIP155 chain ID", c.EIP155Block, newcfg.EIP155Block)
-	}
-	// Either Byzantium block must be set OR EIP100 and EIP649 must be equivalent
-	if newcfg.ByzantiumBlock == nil {
-		if !configNumEqual(newcfg.EIP100FBlock, newcfg.EIP649FBlock) {
-			return newCompatError("EIP100F/EIP649F not equal", newcfg.EIP100FBlock, newcfg.EIP649FBlock)
-		}
-		if isForkIncompatible(c.EIP100FBlock, newcfg.EIP649FBlock, head) {
-			return newCompatError("EIP100F/EIP649F fork block", c.EIP100FBlock, newcfg.EIP649FBlock)
-		}
-		if isForkIncompatible(c.EIP649FBlock, newcfg.EIP100FBlock, head) {
-			return newCompatError("EIP649F/EIP100F fork block", c.EIP649FBlock, newcfg.EIP100FBlock)
-		}
-	}
-	if isForkIncompatible(c.PetersburgBlock, newcfg.PetersburgBlock, head) {
-		return newCompatError("ConstantinopleFix fork block", c.PetersburgBlock, newcfg.PetersburgBlock)
-	}
-	if isForkIncompatible(c.PetersburgBlock, newcfg.PetersburgBlock, head) {
-		return newCompatError("Petersburg fork block", c.PetersburgBlock, newcfg.PetersburgBlock)
-	}
-	if isForkIncompatible(c.IstanbulBlock, newcfg.IstanbulBlock, head) {
-		return newCompatError("Istanbul fork block", c.IstanbulBlock, newcfg.IstanbulBlock)
-	}
-	if isForkIncompatible(c.EWASMBlock, newcfg.EWASMBlock, head) {
-		return newCompatError("ewasm fork block", c.EWASMBlock, newcfg.EWASMBlock)
-	}
-
-	return nil
-}
-
-// isForkIncompatible returns true if a fork scheduled at s1 cannot be rescheduled to
-// block s2 because head is already past the fork.
-func isForkIncompatible(s1, s2, head *big.Int) bool {
-	return (IsForked(s1, head) || IsForked(s2, head)) && !configNumEqual(s1, s2)
-}
-
-// IsForked returns whether a fork scheduled at block s is active at the given head block.
-func IsForked(s, head *big.Int) bool {
-	if s == nil || head == nil {
-		return false
-	}
-	return s.Cmp(head) <= 0
-}
-
-func configNumEqual(x, y *big.Int) bool {
-	if x == nil {
-		return y == nil
-	}
-	if y == nil {
-		return x == nil
-	}
-	return x.Cmp(y) == 0
-}
-
-// ConfigCompatError is raised if the locally-stored blockchain is initialised with a
-// ChainConfig that would alter the past.
-type ConfigCompatError struct {
-	What string
-	// block numbers of the stored and new configurations
-	StoredConfig, NewConfig *big.Int
-	// the block number to which the local chain must be rewound to correct the error
-	RewindTo uint64
-}
-
-func newCompatError(what string, storedblock, newblock *big.Int) *ConfigCompatError {
-	var rew *big.Int
-	switch {
-	case storedblock == nil:
-		rew = newblock
-	case newblock == nil || storedblock.Cmp(newblock) < 0:
-		rew = storedblock
-	default:
-		rew = newblock
-	}
-	err := &ConfigCompatError{what, storedblock, newblock, 0}
-	if rew != nil && rew.Sign() > 0 {
-		err.RewindTo = rew.Uint64() - 1
-	}
-	return err
-}
-
-func (err *ConfigCompatError) Error() string {
-	return fmt.Sprintf("mismatching %s in database (have %d, want %d, rewindto %d)", err.What, err.StoredConfig, err.NewConfig, err.RewindTo)
-}
-
-// IsMCIP0 returns whether MCIP0 block is engaged; this is equivalent to 'IsMusicoin'.
-// (There is no MCIP-0).
-func (c *ChainConfig) IsMCIP0(num *big.Int) bool {
-	return IsForked(c.MCIP0Block, num)
-}
-
-// IsMCIP3 returns whether MCIP3-UBI block is engaged.
-func (c *ChainConfig) IsMCIP3(num *big.Int) bool {
-	return IsForked(c.MCIP3Block, num)
-}
-
-// IsMCIP8 returns whether MCIP3-QT block is engaged.
-func (c *ChainConfig) IsMCIP8(num *big.Int) bool {
-	return IsForked(c.MCIP8Block, num)
-}
+//
+//func (c *ChainConfig) checkCompatible(newcfg *ChainConfig, head *big.Int) *common2.ConfigCompatError {
+//	for _, ch := range []struct {
+//		name   string
+//		c1, c2 *big.Int
+//	}{
+//		{"Homestead", c.HomesteadBlock, newcfg.HomesteadBlock},
+//		{"EIP7F", c.EIP7FBlock, newcfg.EIP7FBlock},
+//		{"DAO", c.DAOForkBlock, newcfg.DAOForkBlock},
+//		{"EIP150", c.EIP150Block, newcfg.EIP150Block},
+//		{"EIP155", c.EIP155Block, newcfg.EIP155Block},
+//		{"EIP158", c.EIP158Block, newcfg.EIP158Block},
+//		{"EIP160F", c.EIP160FBlock, newcfg.EIP160FBlock},
+//		{"EIP161F", c.EIP161FBlock, newcfg.EIP161FBlock},
+//		{"EIP170F", c.EIP170FBlock, newcfg.EIP170FBlock},
+//		{"Byzantium", c.ByzantiumBlock, newcfg.ByzantiumBlock},
+//		{"EIP100F", c.EIP100FBlock, newcfg.EIP100FBlock},
+//		{"EIP140F", c.EIP140FBlock, newcfg.EIP140FBlock},
+//		{"EIP198F", c.EIP198FBlock, newcfg.EIP198FBlock},
+//		{"EIP211F", c.EIP211FBlock, newcfg.EIP211FBlock},
+//		{"EIP212F", c.EIP212FBlock, newcfg.EIP212FBlock},
+//		{"EIP213F", c.EIP213FBlock, newcfg.EIP213FBlock},
+//		{"EIP214F", c.EIP214FBlock, newcfg.EIP214FBlock},
+//		{"EIP649F", c.EIP649FBlock, newcfg.EIP649FBlock},
+//		{"EIP658F", c.EIP658FBlock, newcfg.EIP658FBlock},
+//		{"Constantinople", c.ConstantinopleBlock, newcfg.ConstantinopleBlock},
+//		{"EIP145F", c.EIP145FBlock, newcfg.EIP145FBlock},
+//		{"EIP1014F", c.EIP1014FBlock, newcfg.EIP1014FBlock},
+//		{"EIP1052F", c.EIP1052FBlock, newcfg.EIP1052FBlock},
+//		{"EIP1234F", c.EIP1234FBlock, newcfg.EIP1234FBlock},
+//		{"EIP1283F", c.EIP1283FBlock, newcfg.EIP1283FBlock},
+//		{"EWASM", c.EWASMBlock, newcfg.EWASMBlock},
+//	} {
+//		if err := func(c1, c2, head *big.Int) *common2.ConfigCompatError {
+//			if isForkIncompatible(ch.c1, ch.c2, head) {
+//				return common2.newCompatError(ch.name+" fork block", ch.c1, ch.c2)
+//			}
+//			return nil
+//		}(ch.c1, ch.c2, head); err != nil {
+//			return err
+//		}
+//	}
+//
+//	if c.IsDAOFork(head) && c.DAOForkSupport != newcfg.DAOForkSupport {
+//		return common2.newCompatError("DAO fork support flag", c.DAOForkBlock, newcfg.DAOForkBlock)
+//	}
+//	if c.IsEIP155(head) && !configNumEqual(c.ChainID, newcfg.ChainID) {
+//		return common2.newCompatError("EIP155 chain ID", c.EIP155Block, newcfg.EIP155Block)
+//	}
+//	// Either Byzantium block must be set OR EIP100 and EIP649 must be equivalent
+//	if newcfg.ByzantiumBlock == nil {
+//		if !configNumEqual(newcfg.EIP100FBlock, newcfg.EIP649FBlock) {
+//			return common2.newCompatError("EIP100F/EIP649F not equal", newcfg.EIP100FBlock, newcfg.EIP649FBlock)
+//		}
+//		if isForkIncompatible(c.EIP100FBlock, newcfg.EIP649FBlock, head) {
+//			return common2.newCompatError("EIP100F/EIP649F fork block", c.EIP100FBlock, newcfg.EIP649FBlock)
+//		}
+//		if isForkIncompatible(c.EIP649FBlock, newcfg.EIP100FBlock, head) {
+//			return common2.newCompatError("EIP649F/EIP100F fork block", c.EIP649FBlock, newcfg.EIP100FBlock)
+//		}
+//	}
+//	if isForkIncompatible(c.PetersburgBlock, newcfg.PetersburgBlock, head) {
+//		return common2.newCompatError("ConstantinopleFix fork block", c.PetersburgBlock, newcfg.PetersburgBlock)
+//	}
+//	if isForkIncompatible(c.PetersburgBlock, newcfg.PetersburgBlock, head) {
+//		return common2.newCompatError("Petersburg fork block", c.PetersburgBlock, newcfg.PetersburgBlock)
+//	}
+//	if isForkIncompatible(c.IstanbulBlock, newcfg.IstanbulBlock, head) {
+//		return common2.newCompatError("Istanbul fork block", c.IstanbulBlock, newcfg.IstanbulBlock)
+//	}
+//	if isForkIncompatible(c.EWASMBlock, newcfg.EWASMBlock, head) {
+//		return common2.newCompatError("ewasm fork block", c.EWASMBlock, newcfg.EWASMBlock)
+//	}
+//
+//	return nil
+//}
+//
+//// isForkIncompatible returns true if a fork scheduled at s1 cannot be rescheduled to
+//// block s2 because head is already past the fork.
+//func isForkIncompatible(s1, s2, head *big.Int) bool {
+//	return (IsForked(s1, head) || IsForked(s2, head)) && !configNumEqual(s1, s2)
+//}
+//
+//// IsForked returns whether a fork scheduled at block s is active at the given head block.
+//func IsForked(s, head *big.Int) bool {
+//	if s == nil || head == nil {
+//		return false
+//	}
+//	return s.Cmp(head) <= 0
+//}
+//
+//func configNumEqual(x, y *big.Int) bool {
+//	if x == nil {
+//		return y == nil
+//	}
+//	if y == nil {
+//		return x == nil
+//	}
+//	return x.Cmp(y) == 0
+//}

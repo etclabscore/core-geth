@@ -10,60 +10,6 @@ import (
 )
 
 // Automagically translate between [Must|]Setters and Getters.
-func convert(k reflect.Type, source, target interface{}) error {
-	for i := 0; i < k.NumMethod(); i++ {
-		method := k.Method(i)
-
-		var setterName string
-		if strings.HasPrefix(method.Name, "Get") {
-			setterName = strings.Replace(method.Name, "Get", "Set", 1)
-		}
-		if _, ok := k.MethodByName(setterName); !ok {
-			continue
-		}
-
-		callGetIn := []reflect.Value{}
-		response := reflect.ValueOf(source).MethodByName(method.Name).Call(callGetIn)
-		setResponse := reflect.ValueOf(target).MethodByName(setterName).Call(response)
-
-		if !setResponse[0].IsNil() {
-			err := setResponse[0].Interface().(error)
-			e := common.UnsupportedConfigError(err, strings.TrimPrefix(method.Name, "Get"), response[0].Interface())
-			if common.IsFatalUnsupportedErr(err) {
-				return e
-			}
-			log.Println(e) // FIXME?
-		}
-	}
-	return nil
-}
-
-func compare(k reflect.Type, source, target interface{}) (method string, value interface{}, err error) {
-	if k.NumMethod() == 0 {
-		return "", "", errors.New("empty comparison")
-	}
-	for i := 0; i < k.NumMethod(); i++ {
-		method := k.Method(i)
-
-		if !strings.HasPrefix(method.Name, "Get") {
-			continue
-		}
-
-		callGetIn := []reflect.Value{}
-		response := reflect.ValueOf(source).MethodByName(method.Name).Call(callGetIn)
-		response2 := reflect.ValueOf(target).MethodByName(method.Name).Call(callGetIn)
-
-		if !reflect.DeepEqual(response[0].Interface(), response2[0].Interface()) {
-			return method.Name, struct{
-				source, target interface{}
-			}{
-				response, response2,
-			}, errors.New("reflect.DeepEqual")
-		}
-	}
-	return "", nil, nil
-}
-
 func Convert(from, to common.Configurator) error {
 	if _, ok := from.(common.Configurator); !ok {
 		return errors.New("from value not a configurator")
@@ -120,6 +66,33 @@ func Convert(from, to common.Configurator) error {
 	return nil
 }
 
+func convert(k reflect.Type, source, target interface{}) error {
+	for i := 0; i < k.NumMethod(); i++ {
+		method := k.Method(i)
+
+		var setterName string
+		if strings.HasPrefix(method.Name, "Get") {
+			setterName = strings.Replace(method.Name, "Get", "Set", 1)
+		}
+		if _, ok := k.MethodByName(setterName); !ok {
+			continue
+		}
+
+		callGetIn := []reflect.Value{}
+		response := reflect.ValueOf(source).MethodByName(method.Name).Call(callGetIn)
+		setResponse := reflect.ValueOf(target).MethodByName(setterName).Call(response)
+
+		if !setResponse[0].IsNil() {
+			err := setResponse[0].Interface().(error)
+			e := common.UnsupportedConfigError(err, strings.TrimPrefix(method.Name, "Get"), response[0].Interface())
+			if common.IsFatalUnsupportedErr(err) {
+				return e
+			}
+			log.Println(e) // FIXME?
+		}
+	}
+	return nil
+}
 func Equal(k reflect.Type, a, b common.Configurator) (string, bool) {
 	m, _, err := compare(k.Elem(), a, b) // TODO: maybe return a value, or even a dedicated type, for better debugging
 	if err == nil {
@@ -127,3 +100,30 @@ func Equal(k reflect.Type, a, b common.Configurator) (string, bool) {
 	}
 	return m, false
 }
+
+func compare(k reflect.Type, source, target interface{}) (method string, value interface{}, err error) {
+	if k.NumMethod() == 0 {
+		return "", "", errors.New("empty comparison")
+	}
+	for i := 0; i < k.NumMethod(); i++ {
+		method := k.Method(i)
+
+		if !strings.HasPrefix(method.Name, "Get") {
+			continue
+		}
+
+		callGetIn := []reflect.Value{}
+		response := reflect.ValueOf(source).MethodByName(method.Name).Call(callGetIn)
+		response2 := reflect.ValueOf(target).MethodByName(method.Name).Call(callGetIn)
+
+		if !reflect.DeepEqual(response[0].Interface(), response2[0].Interface()) {
+			return method.Name, struct {
+				source, target interface{}
+			}{
+				response, response2,
+			}, errors.New("reflect.DeepEqual")
+		}
+	}
+	return "", nil, nil
+}
+

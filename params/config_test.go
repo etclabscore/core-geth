@@ -31,7 +31,7 @@ func TestCheckCompatible(t *testing.T) {
 	type test struct {
 		stored, new common2.ChainConfigurator
 		head        uint64
-		wantErr     *paramtypes.ConfigCompatError
+		wantErr     *common2.ConfigCompatError
 	}
 	tests := []test{
 		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 0, wantErr: nil},
@@ -46,7 +46,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: AllEthashProtocolChanges,
 			new:    &goethereum.ChainConfig{HomesteadBlock: nil},
 			head:   3,
-			wantErr: &paramtypes.ConfigCompatError{
+			wantErr: &common2.ConfigCompatError{
 				What:         "Homestead fork block",
 				StoredConfig: big.NewInt(0),
 				NewConfig:    nil,
@@ -57,7 +57,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: AllEthashProtocolChanges,
 			new:    &goethereum.ChainConfig{HomesteadBlock: big.NewInt(1)},
 			head:   3,
-			wantErr: &paramtypes.ConfigCompatError{
+			wantErr: &common2.ConfigCompatError{
 				What:         "Homestead fork block",
 				StoredConfig: big.NewInt(0),
 				NewConfig:    big.NewInt(1),
@@ -68,7 +68,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: &goethereum.ChainConfig{HomesteadBlock: big.NewInt(30), EIP150Block: big.NewInt(10)},
 			new:    &goethereum.ChainConfig{HomesteadBlock: big.NewInt(25), EIP150Block: big.NewInt(20)},
 			head:   25,
-			wantErr: &paramtypes.ConfigCompatError{
+			wantErr: &common2.ConfigCompatError{
 				What:         "EIP150 fork block",
 				StoredConfig: big.NewInt(10),
 				NewConfig:    big.NewInt(20),
@@ -79,7 +79,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(31)},
 			new:    &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(31)},
 			head:   25,
-			wantErr: &paramtypes.ConfigCompatError{
+			wantErr: &common2.ConfigCompatError{
 				What:         "EIP100F/EIP649F not equal",
 				StoredConfig: big.NewInt(30),
 				NewConfig:    big.NewInt(31),
@@ -90,7 +90,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
 			new:    &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
 			head:   25,
-			wantErr: &paramtypes.ConfigCompatError{
+			wantErr: &common2.ConfigCompatError{
 				What:         "EIP100F fork block",
 				StoredConfig: big.NewInt(30),
 				NewConfig:    big.NewInt(24),
@@ -107,7 +107,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
 			new:    &paramtypes.ChainConfig{EIP100FBlock: big.NewInt(26)}, // err: EIP649 must also be set
 			head:   25,
-			wantErr: &paramtypes.ConfigCompatError{
+			wantErr: &common2.ConfigCompatError{
 				What:         "EIP100F/EIP649F not equal",
 				StoredConfig: big.NewInt(26), // this yields a weird-looking error (correctly, though), b/c ConfigCompatError not set up for these kinds of strange cases
 				NewConfig:    nil,
@@ -129,7 +129,7 @@ func TestCheckCompatible(t *testing.T) {
 				return c
 			}(),
 			head: MainnetChainConfig.DAOForkBlock.Uint64(),
-			wantErr: &paramtypes.ConfigCompatError{
+			wantErr: &common2.ConfigCompatError{
 				What:         "DAO fork support flag",
 				StoredConfig: MainnetChainConfig.DAOForkBlock,
 				NewConfig:    MainnetChainConfig.DAOForkBlock,
@@ -145,7 +145,7 @@ func TestCheckCompatible(t *testing.T) {
 				return c
 			}(),
 			head: MainnetChainConfig.EIP158Block.Uint64(),
-			wantErr: &paramtypes.ConfigCompatError{
+			wantErr: &common2.ConfigCompatError{
 				What:         "EIP155 chain ID",
 				StoredConfig: MainnetChainConfig.EIP155Block,
 				NewConfig:    MainnetChainConfig.EIP155Block,

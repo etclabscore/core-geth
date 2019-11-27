@@ -20,7 +20,6 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -293,14 +292,11 @@ func EthashBlockReward(c common2.ChainConfigurator, n *big.Int) *big.Int {
 	if len(c.GetEthashBlockRewardSchedule()) > 0 {
 		// Because the map is not necessarily sorted low-high, we
 		// have to ensure that we're walking upwards only.
-		var lastActivation *big.Int
+		var lastActivation uint64
 		for activation, reward := range c.GetEthashBlockRewardSchedule() {
-			activationBig := big.NewInt(int64(activation))
-			if paramtypes.IsForked(activationBig, n) {
-				if lastActivation == nil {
-					lastActivation = new(big.Int).Set(activationBig)
-				}
-				if activationBig.Cmp(lastActivation) >= 0 {
+			if activation >= n.Uint64() {
+				if activation > lastActivation {
+					lastActivation = activation
 					blockReward = reward
 				}
 			}

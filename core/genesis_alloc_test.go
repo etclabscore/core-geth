@@ -29,6 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/go-test/deep"
 )
@@ -134,7 +135,7 @@ func TestSetupGenesis(t *testing.T) {
 			},
 			wantHash:   customghash,
 			wantConfig: customg.Config,
-			wantErr: &paramtypes.ConfigCompatError{
+			wantErr: &common2.ConfigCompatError{
 				What:         "Homestead fork block",
 				StoredConfig: big.NewInt(2),
 				NewConfig:    big.NewInt(3),

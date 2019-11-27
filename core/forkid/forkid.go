@@ -20,17 +20,13 @@ package forkid
 import (
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"hash/crc32"
 	"math"
-	"reflect"
-	"sort"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 )
 
 var (
@@ -66,7 +62,7 @@ func NewID(chain *core.BlockChain) ID {
 // newID is the internal version of NewID, which takes extracted values as its
 // arguments instead of a chain. The reason is to allow testing the IDs without
 // having to simulate an entire blockchain.
-func newID(config *paramtypes.ChainConfig, genesis common.Hash, head uint64) ID {
+func newID(config common2.ChainConfigurator, genesis common.Hash, head uint64) ID {
 	// Calculate the starting checksum from the genesis hash
 	hash := crc32.ChecksumIEEE(genesis[:])
 
@@ -97,7 +93,7 @@ func NewFilter(chain *core.BlockChain) Filter {
 }
 
 // NewStaticFilter creates a filter at block zero.
-func NewStaticFilter(config *paramtypes.ChainConfig, genesis common.Hash) Filter {
+func NewStaticFilter(config common2.ChainConfigurator, genesis common.Hash) Filter {
 	head := func() uint64 { return 0 }
 	return newFilter(config, genesis, head)
 }
@@ -105,7 +101,7 @@ func NewStaticFilter(config *paramtypes.ChainConfig, genesis common.Hash) Filter
 // newFilter is the internal version of NewFilter, taking closures as its arguments
 // instead of a chain. The reason is to allow testing it without having to simulate
 // an entire blockchain.
-func newFilter(config *paramtypes.ChainConfig, genesis common.Hash, headfn func() uint64) Filter {
+func newFilter(config common2.ChainConfigurator, genesis common.Hash, headfn func() uint64) Filter {
 	// Calculate the all the valid fork hash and fork next combos
 	var (
 		forks = gatherForks(config)
@@ -210,53 +206,6 @@ func checksumToBytes(hash uint32) [4]byte {
 }
 
 // gatherForks gathers all the known forks and creates a sorted list out of them.
-func gatherForks(config *paramtypes.ChainConfig) []uint64 {
-	var forks []uint64
-	var forksM = make(map[uint64]struct{}) // Will key for uniqueness as fork numbers are appended to slice.
-
-	for _, v := range []interface{}{
-		&config.ChainConfig,
-		config,
-	} {
-		// Gather all the fork block numbers via reflection
-		kind := reflect.TypeOf(v)
-
-		for i := 0; i < kind.NumMethod(); i++ {
-			// Fetch the next field and skip non-fork rules
-			method := kind.Method(i)
-			if !strings.HasSuffix(method.Name, "Transition") || !strings.HasPrefix(method.Name, "Get") {
-				continue
-			}
-
-			// Extract the fork rule block number and aggregate it
-			response := reflect.ValueOf(v).MethodByName(method.Name).Call([]reflect.Value{})
-			if len(response) == 0 {
-				continue // should never happen b/c interface Get_ pattern always returns a *uint64
-			}
-			r := response[0]
-			if r.IsNil() {
-				continue
-			}
-			rule, ok := r.Interface().(*uint64)
-			if !ok {
-				panic(fmt.Sprintf("%s.%s wrong ChainConfigurator interface", kind.Name(), method.Name))
-			}
-
-			if *rule == math.MaxUint64 {
-				continue
-			}
-
-			// Only append unique fork numbers, excluding 0 (genesis config is not considered a fork)
-			if _, ok := forksM[*rule]; !ok && *rule != 0 {
-				forks = append(forks, *rule)
-				forksM[*rule] = struct{}{}
-			}
-		}
-	}
-
-	sort.Slice(forks, func(i, j int) bool {
-		return forks[i] < forks[j]
-	})
-
-	return forks
+func gatherForks(config common2.ChainConfigurator) []uint64 {
+	return common2.Forks(config)
 }

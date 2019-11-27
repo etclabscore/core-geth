@@ -328,10 +328,10 @@ func (pool *TxPool) loop() {
 		// Handle ChainHeadEvent
 		case ev := <-pool.chainHeadCh:
 			if ev.Block != nil {
-				if pool.chainconfig.IsEIP2F(ev.Block.Number()) {
+				if pool.chainconfig.IsForked(pool.chainconfig.GetEthashEIP2Transition, ev.Block.Number()) {
 					pool.eip2f = true
 				}
-				if pool.chainconfig.IsEIP2028F(ev.Block.Number()) {
+				if pool.chainconfig.IsForked(pool.chainconfig.GetEIP2028Transition, ev.Block.Number()) {
 					pool.eip2028f = true
 				}
 				pool.requestReset(head.Header(), ev.Block.Header())
@@ -1156,7 +1156,7 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 
 	// Update all fork indicator by next pending block number.
 	next := new(big.Int).Add(newHead.Number, big.NewInt(1))
-	pool.eip2028f = pool.chainconfig.IsEIP2028F(next)
+	pool.eip2028f = pool.chainconfig.IsForked(pool.chainconfig.GetEIP2028Transition, next)
 }
 
 // promoteExecutables moves transactions that have become processable from the

@@ -2,8 +2,10 @@ package common
 
 import (
 	"fmt"
+	"math"
 	"math/big"
 	"reflect"
+	"sort"
 	"strings"
 )
 
@@ -55,7 +57,14 @@ func (err *ConfigValidError) Error() string {
 	return fmt.Sprintf("%s, %v/%v", err.What, err.A, err.B)
 }
 
-func Valid(conf ChainConfigurator, head *uint64) *ConfigValidError {
+func IsEmpty(anything interface{}) bool {
+	if anything == nil {
+		return true
+	}
+	return reflect.DeepEqual(anything, reflect.Zero(reflect.TypeOf(anything)).Interface())
+}
+
+func IsValid(conf ChainConfigurator, head *uint64) *ConfigValidError {
 	var bhead *big.Int
 	if head != nil {
 		bhead = new(big.Int).SetUint64(*head)
@@ -64,25 +73,24 @@ func Valid(conf ChainConfigurator, head *uint64) *ConfigValidError {
 	if conf.IsForked(conf.GetEIP155Transition, bhead) && conf.GetChainID() == nil {
 		return NewValidErr("EIP155 requires ChainID. A:EIP155/B:ChainID", conf.GetEIP155Transition(), conf.GetChainID())
 	}
-	if !u2Equal(conf.GetEthashEIP100BTransition(), conf.GetEthashEIP649TransitionV()) {}
+	return nil
 }
 
-func Compatible(head uint64, a, b ChainConfigurator) *ConfigCompatError {
-	bhead := &head
+func Compatible(head *uint64, a, b ChainConfigurator) *ConfigCompatError {
 	// Iterate checkCompatible to find the lowest conflict.
 	var lastErr *ConfigCompatError
 	for {
-		err := compatible(bhead, a, b)
+		err := compatible(head, a, b)
 		if err == nil || (lastErr != nil && err.RewindTo == lastErr.RewindTo) {
 			break
 		}
 		lastErr = err
-		*bhead = err.RewindTo
+		head = &err.RewindTo
 	}
 	return lastErr
 }
 
-// transitions gets transition functions and their names for a ChainConfigurator.
+// Transitions gets all available transition (fork) functions and their names for a ChainConfigurator.
 func Transitions(conf ChainConfigurator) (fns []func() *uint64, names []string) {
 	names = []string{}
 	fns = []func() *uint64{}
@@ -97,6 +105,53 @@ func Transitions(conf ChainConfigurator) (fns []func() *uint64, names []string) 
 		names = append(names, method.Name)
 	}
 	return fns, names
+}
+
+// Forks returns non-nil, non <maxUin64>, unique sorted forks for a ChainConfigurator.
+func Forks(conf ChainConfigurator) []uint64 {
+	var forks []uint64
+	var forksM = make(map[uint64]struct{}) // Will key for uniqueness as fork numbers are appended to slice.
+
+	// Gather all the fork block numbers via reflection
+	kind := reflect.TypeOf(conf)
+
+	for i := 0; i < kind.NumMethod(); i++ {
+		// Fetch the next field and skip non-fork rules
+		method := kind.Method(i)
+		if !strings.HasSuffix(method.Name, "Transition") || !strings.HasPrefix(method.Name, "Get") {
+			continue
+		}
+
+		// Extract the fork rule block number and aggregate it
+		response := reflect.ValueOf(conf).MethodByName(method.Name).Call([]reflect.Value{})
+		if len(response) == 0 {
+			continue // should never happen b/c interface Get_ pattern always returns a *uint64
+		}
+		r := response[0]
+		if r.IsNil() {
+			continue
+		}
+		rule, ok := r.Interface().(*uint64)
+		if !ok {
+			panic(fmt.Sprintf("%s.%s wrong ChainConfigurator interface", kind.Name(), method.Name))
+		}
+
+		if *rule == math.MaxUint64 {
+			continue
+		}
+
+		// Only append unique fork numbers, excluding 0 (genesis config is not considered a fork)
+		if _, ok := forksM[*rule]; !ok && *rule != 0 {
+			forks = append(forks, *rule)
+			forksM[*rule] = struct{}{}
+		}
+	}
+
+	sort.Slice(forks, func(i, j int) bool {
+		return forks[i] < forks[j]
+	})
+
+	return forks
 }
 
 func compatible(head *uint64, a, b ChainConfigurator) *ConfigCompatError {
@@ -135,5 +190,3 @@ func u2Equal(x, y *uint64) bool {
 	}
 	return *x == *y
 }
-
-

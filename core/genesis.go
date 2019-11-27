@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -44,12 +45,12 @@ import (
 // error is a *params.ConfigCompatError and the new, unwritten config is returned.
 //
 // The returned chain configuration is never nil.
-func SetupGenesisBlock(db ethdb.Database, genesis *paramtypes.Genesis) (*paramtypes.ChainConfig, common.Hash, error) {
-	return SetupGenesisBlockWithOverride(db, genesis, nil)
+func SetupGenesisBlock(db ethdb.Database, genesis *paramtypes.Genesis) (common2.ChainConfigurator, common.Hash, error) {
+	return SetupGenesisBlockWithOverride(db, genesis)
 }
 
-func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesis, overrideIstanbul *big.Int) (*paramtypes.ChainConfig, common.Hash, error) {
-	if genesis != nil && genesis.Config == nil {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesis) (common2.ChainConfigurator, common.Hash, error) {
+	if genesis != nil && common2.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, paramtypes.ErrGenesisNoConfig
 	}
 	// Just commit the new block if there is no stored genesis block.
@@ -97,12 +98,6 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesi
 
 	// Get the existing chain configuration.
 	newcfg := configOrDefault(genesis, stored)
-	if overrideIstanbul != nil {
-		newcfg.IstanbulBlock = overrideIstanbul
-	}
-	if err := newcfg.CheckConfigForkOrder(); err != nil {
-		return newcfg, common.Hash{}, err
-	}
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {
 		log.Warn("Found genesis block without chain config")
@@ -122,7 +117,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesi
 	if height == nil {
 		return newcfg, stored, fmt.Errorf("missing block number for head header hash")
 	}
-	compatErr := storedcfg.CheckCompatible(newcfg, *height)
+	compatErr := common2.Compatible(height, storedcfg, newcfg)
 	if compatErr != nil && *height != 0 && compatErr.RewindTo != 0 {
 		return newcfg, stored, compatErr
 	}
@@ -130,7 +125,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesi
 	return newcfg, stored, nil
 }
 
-func configOrDefault(g *paramtypes.Genesis, ghash common.Hash) *paramtypes.ChainConfig {
+func configOrDefault(g *paramtypes.Genesis, ghash common.Hash) common2.ChainConfigurator {
 	switch {
 	case g != nil:
 		return g.Config
@@ -144,8 +139,6 @@ func configOrDefault(g *paramtypes.Genesis, ghash common.Hash) *paramtypes.Chain
 		return params.MixChainConfig
 	case ghash == params.EthersocialGenesisHash:
 		return params.EthersocialChainConfig
-	case ghash == params.MusicoinGenesisHash:
-		return params.MusicoinChainConfig
 	case ghash == params.RinkebyGenesisHash:
 		return params.RinkebyChainConfig
 	case ghash == params.GoerliGenesisHash:
@@ -208,9 +201,6 @@ func CommitGenesis(g *paramtypes.Genesis, db ethdb.Database) (*types.Block, erro
 	config := g.Config
 	if config == nil {
 		config = params.AllEthashProtocolChanges
-	}
-	if err := config.CheckConfigForkOrder(); err != nil {
-		return nil, err
 	}
 	rawdb.WriteTd(db, block.Hash(), block.NumberU64(), g.Difficulty)
 	rawdb.WriteBlock(db, block)

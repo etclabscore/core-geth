@@ -20,7 +20,7 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -60,11 +60,11 @@ type JumpTable [256]operation
 
 // instructionSetForConfig determines an instruction set for the vm using
 // the chain config params and a current block number
-func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTable {
+func instructionSetForConfig(config common.ChainConfigurator, bn *big.Int) JumpTable {
 	instructionSet := newBaseInstructionSet()
 
 	// Homestead
-	if config.IsEIP7F(bn) {
+	if config.IsForked(config.GetEIP7Transition, bn) {
 		instructionSet[DELEGATECALL] = operation{
 			execute:     opDelegateCall,
 			dynamicGas:  gasDelegateCall,
@@ -77,7 +77,7 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 		}
 	}
 	// Tangerine Whistle
-	if config.IsEIP150(bn) {
+	if config.IsForked(config.GetEIP150Transition, bn) {
 		instructionSet[BALANCE].constantGas = vars.BalanceGasEIP150
 		instructionSet[EXTCODESIZE].constantGas = vars.ExtcodeSizeGasEIP150
 		instructionSet[SLOAD].constantGas = vars.SloadGasEIP150
@@ -87,11 +87,11 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 		instructionSet[DELEGATECALL].constantGas = vars.CallGasEIP150
 	}
 	// Spurious Dragon
-	if config.IsEIP160F(bn) {
+	if config.IsForked(config.GetEIP160Transition, bn) {
 		instructionSet[EXP].dynamicGas = gasExpEIP158
 	}
 	// Byzantium
-	if config.IsEIP140F(bn) {
+	if config.IsForked(config.GetEIP140Transition, bn) {
 		instructionSet[REVERT] = operation{
 			execute:    opRevert,
 			dynamicGas: gasRevert,
@@ -103,7 +103,7 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 			returns:    true,
 		}
 	}
-	if config.IsEIP214F(bn) {
+	if config.IsForked(config.GetEIP214Transition, bn) {
 		instructionSet[STATICCALL] = operation{
 			execute:     opStaticCall,
 			constantGas: vars.CallGasEIP150,
@@ -115,7 +115,7 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 			returns:     true,
 		}
 	}
-	if config.IsEIP211F(bn) {
+	if config.IsForked(config.GetEIP211Transition, bn) {
 		instructionSet[RETURNDATASIZE] = operation{
 			execute:     opReturnDataSize,
 			constantGas: GasQuickStep,
@@ -134,7 +134,7 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 		}
 	}
 	// Constantinople
-	if config.IsEIP145F(bn) {
+	if config.IsForked(config.GetEIP145Transition, bn) {
 		instructionSet[SHL] = operation{
 			execute:     opSHL,
 			constantGas: GasFastestStep,
@@ -157,7 +157,7 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 			valid:       true,
 		}
 	}
-	if config.IsEIP1014F(bn) {
+	if config.IsForked(config.GetEIP1014Transition, bn) {
 		instructionSet[CREATE2] = operation{
 			execute:     opCreate2,
 			constantGas: vars.Create2Gas,
@@ -170,7 +170,7 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 			returns:     true,
 		}
 	}
-	if config.IsEIP1052F(bn) {
+	if config.IsForked(config.GetEIP1052Transition, bn) {
 		instructionSet[EXTCODEHASH] = operation{
 			execute:     opExtCodeHash,
 			constantGas: vars.ExtcodeHashGasConstantinople,
@@ -179,13 +179,13 @@ func instructionSetForConfig(config *paramtypes.ChainConfig, bn *big.Int) JumpTa
 			valid:       true,
 		}
 	}
-	if config.IsEIP1344F(bn) {
+	if config.IsForked(config.GetEIP1344Transition, bn) {
 		enable1344(&instructionSet) // ChainID opcode - https://eips.ethereum.org/EIPS/eip-1344
 	}
-	if config.IsEIP1884F(bn) {
+	if config.IsForked(config.GetEIP1884Transition, bn) {
 		enable1884(&instructionSet) // Reprice reader opcodes - https://eips.ethereum.org/EIPS/eip-1884
 	}
-	if config.IsEIP2200F(bn) {
+	if config.IsForked(config.GetEIP1283ReenableTransition, bn) {
 		enable2200(&instructionSet) // Net metered SSTORE - https://eips.ethereum.org/EIPS/eip-2200
 	}
 	return instructionSet

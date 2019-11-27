@@ -61,6 +61,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/netutil"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/rpc"
 	whisper "github.com/ethereum/go-ethereum/whisper/whisperv6"
 	pcsclite "github.com/gballet/go-libpcsclite"
@@ -174,10 +175,6 @@ var (
 	EthersocialFlag = cli.BoolFlag{
 		Name:  "ethersocial",
 		Usage: "Ethersocial network: pre-configured Ethersocial mainnet",
-	}
-	MusicoinFlag = cli.BoolFlag{
-		Name:  "musicoin",
-		Usage: "Musicoin network: pre-configured Musicoin mainnet",
 	}
 	RinkebyFlag = cli.BoolFlag{
 		Name:  "rinkeby",
@@ -832,8 +829,6 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.MixBootnodes
 	case ctx.GlobalBool(EthersocialFlag.Name):
 		urls = params.EthersocialBootnodes
-	case ctx.GlobalBool(MusicoinFlag.Name):
-		urls = params.MusicoinBootnodes
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		urls = params.RinkebyBootnodes
 	case ctx.GlobalBool(KottiFlag.Name):
@@ -1248,8 +1243,6 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "mix")
 	case ctx.GlobalBool(EthersocialFlag.Name):
 		return filepath.Join(baseDataDirPath, "ethersocial")
-	case ctx.GlobalBool(MusicoinFlag.Name):
-		return filepath.Join(baseDataDirPath, "musicoin")
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		return filepath.Join(baseDataDirPath, "rinkeby")
 	case ctx.GlobalBool(KottiFlag.Name):
@@ -1703,8 +1696,6 @@ func genesisForCtxChainConfig(ctx *cli.Context) *paramtypes.Genesis {
 		genesis = params.DefaultMixGenesisBlock()
 	case ctx.GlobalBool(EthersocialFlag.Name):
 		genesis = params.DefaultEthersocialGenesisBlock()
-	case ctx.GlobalBool(MusicoinFlag.Name):
-		genesis = params.DefaultMusicoinGenesisBlock()
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		genesis = params.DefaultRinkebyGenesisBlock()
 	case ctx.GlobalBool(KottiFlag.Name):
@@ -1731,8 +1722,11 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 		Fatalf("%v", err)
 	}
 	var engine consensus.Engine
-	if config.Clique != nil {
-		engine = clique.New(config.Clique, chainDb)
+	if config.GetConsensusEngineType().IsClique() {
+		engine = clique.New(&goethereum.CliqueConfig{
+			Period: *config.GetCliquePeriod(),
+			Epoch:  *config.GetCliqueEpoch(),
+		}, chainDb)
 	} else {
 		engine = ethash.NewFaker()
 		if !ctx.GlobalBool(FakePoWFlag.Name) {

@@ -54,7 +54,7 @@ func (w *wizard) deployExplorer() {
 	existed := err == nil
 
 	infos.node.genesis, _ = json.MarshalIndent(w.conf.Genesis, "", "  ")
-	infos.node.network = w.conf.Genesis.Config.ChainID.Int64()
+	infos.node.network = w.conf.Genesis.Config.GetChainID().Int64()
 
 	// Figure out which port to listen on
 	fmt.Println()
@@ -105,7 +105,7 @@ func (w *wizard) deployExplorer() {
 		fmt.Printf("Should the explorer be built from scratch (y/n)? (default = no)\n")
 		nocache = w.readDefaultYesNo(false)
 	}
-	if out, err := deployExplorer(client, w.network, w.conf.bootnodes, infos, nocache, w.conf.Genesis.Config.Clique != nil); err != nil {
+	if out, err := deployExplorer(client, w.network, w.conf.bootnodes, infos, nocache, w.conf.Genesis.Config.GetConsensusEngineType().IsClique()); err != nil {
 		log.Error("Failed to deploy explorer container", "err", err)
 		if len(out) > 0 {
 			fmt.Printf("%s\n", out)

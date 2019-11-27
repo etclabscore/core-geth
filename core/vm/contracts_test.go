@@ -24,7 +24,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -461,12 +461,12 @@ func TestIsPrecompiledContractEnabled(t *testing.T) {
 	}
 	type c struct {
 		addr     common.Address
-		config   *paramtypes.ChainConfig
+		config   common2.ChainConfigurator
 		blockNum *big.Int
 		want     bool
 	}
 	cases := []c{}
-	addCaseWhere := func(config *paramtypes.ChainConfig, addr common.Address, bn *big.Int, want bool) {
+	addCaseWhere := func(config common2.ChainConfigurator, addr common.Address, bn *big.Int, want bool) {
 		cases = append(cases, c{
 			addr:     addr,
 			config:   config,
@@ -509,7 +509,7 @@ func TestIsPrecompiledContractEnabled(t *testing.T) {
 			common.BytesToAddress([]byte{3}): &ripemd160hash{},
 			common.BytesToAddress([]byte{4}): &dataCopy{},
 		}
-		if c.config.IsEIP198F(c.blockNum) && c.config.IsEIP212F(c.blockNum) && c.config.IsEIP213F(c.blockNum) {
+		if c.config.IsForked(c.config.GetEIP198Transition, c.blockNum) && c.config.IsForked(c.config.GetEIP212Transition, c.blockNum) && c.config.IsForked(c.config.GetEIP213Transition, c.blockNum) {
 			precomps = map[common.Address]PrecompiledContract{
 				common.BytesToAddress([]byte{1}): &ecrecover{},
 				common.BytesToAddress([]byte{2}): &sha256hash{},

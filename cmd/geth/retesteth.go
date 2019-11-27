@@ -17,7 +17,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"math/big"
@@ -44,6 +43,7 @@ import (
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -107,7 +107,7 @@ type RetestWeb3API interface {
 type RetestethAPI struct {
 	ethDb         ethdb.Database
 	db            state.Database
-	chainConfig   *paramtypes.ChainConfig
+	chainConfig   common2.ChainConfigurator
 	author        common.Address
 	extraData     []byte
 	genesisHash   common.Hash
@@ -223,7 +223,7 @@ func (e *NoRewardEngine) Prepare(chain consensus.ChainReader, header *types.Head
 	return e.inner.Prepare(chain, header)
 }
 
-func (e *NoRewardEngine) accumulateRewards(config *paramtypes.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+func (e *NoRewardEngine) accumulateRewards(config common2.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
 	// Simply touch miner and uncle coinbase accounts
 	reward := big.NewInt(0)
 	for _, uncle := range uncles {
@@ -238,7 +238,7 @@ func (e *NoRewardEngine) Finalize(chain consensus.ChainReader, header *types.Hea
 		e.inner.Finalize(chain, header, statedb, txs, uncles)
 	} else {
 		e.accumulateRewards(chain.Config(), statedb, header, uncles)
-		header.Root = statedb.IntermediateRoot(chain.Config().IsEIP161F(header.Number))
+		header.Root = statedb.IntermediateRoot(chain.Config().IsForked(chain.Config().GetEIP161abcTransition, header.Number))
 	}
 }
 
@@ -248,7 +248,7 @@ func (e *NoRewardEngine) FinalizeAndAssemble(chain consensus.ChainReader, header
 		return e.inner.FinalizeAndAssemble(chain, header, statedb, txs, uncles, receipts)
 	} else {
 		e.accumulateRewards(chain.Config(), statedb, header, uncles)
-		header.Root = statedb.IntermediateRoot(chain.Config().IsEIP161F(header.Number))
+		header.Root = statedb.IntermediateRoot(chain.Config().IsForked(chain.Config().GetEIP161abcTransition, header.Number))
 
 		// Header seems complete, assemble into a block and return
 		return types.NewBlock(header, txs, uncles, receipts), nil
@@ -475,23 +475,19 @@ func (api *RetestethAPI) mineBlock() error {
 		api.engine.Prepare(api.blockchain, header)
 	}
 	// If we are care about TheDAO hard-fork check whether to override the extra-data or not
-	if daoBlock := api.chainConfig.DAOForkBlock; daoBlock != nil {
+	if daoBlockUint64 := api.chainConfig.GetEthashEIP779Transition(); daoBlockUint64 != nil {
+		daoBlock := new(big.Int).SetUint64(*daoBlockUint64)
 		// Check whether the block is among the fork extra-override range
 		limit := new(big.Int).Add(daoBlock, vars.DAOForkExtraRange)
 		if header.Number.Cmp(daoBlock) >= 0 && header.Number.Cmp(limit) < 0 {
-			// Depending whether we support or oppose the fork, override differently
-			if api.chainConfig.DAOForkSupport {
-				header.Extra = common.CopyBytes(vars.DAOForkBlockExtra)
-			} else if bytes.Equal(header.Extra, vars.DAOForkBlockExtra) {
-				header.Extra = []byte{} // If miner opposes, don't let it use the reserved extra-data
-			}
+			header.Extra = common.CopyBytes(vars.DAOForkBlockExtra)
 		}
 	}
 	statedb, err := api.blockchain.StateAt(parent.Root())
 	if err != nil {
 		return err
 	}
-	if api.chainConfig.DAOForkSupport && api.chainConfig.DAOForkBlock != nil && api.chainConfig.DAOForkBlock.Cmp(header.Number) == 0 {
+	if api.chainConfig.IsForked(api.chainConfig.GetEthashEIP779Transition, header.Number) {
 		misc.ApplyDAOHardFork(statedb)
 	}
 	gasPool := new(core.GasPool).AddGas(header.GasLimit)
@@ -665,10 +661,10 @@ func (api *RetestethAPI) AccountRange(ctx context.Context,
 			}
 			// Ensure any modifications are committed to the state
 			// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-			root = statedb.IntermediateRoot(vmenv.ChainConfig().IsEIP161F(block.Number()))
+			root = statedb.IntermediateRoot(vmenv.ChainConfig().IsForked(vmenv.ChainConfig().GetEIP161abcTransition, block.Number()))
 			if idx == int(txIndex) {
 				// This is to make sure root can be opened by OpenTrie
-				root, err = statedb.Commit(api.chainConfig.IsEIP161F(block.Number()))
+				root, err = statedb.Commit(api.chainConfig.IsForked(api.chainConfig.GetEIP161abcTransition, block.Number()))
 				if err != nil {
 					return AccountRangeResult{}, err
 				}
@@ -778,10 +774,10 @@ func (api *RetestethAPI) StorageRangeAt(ctx context.Context,
 			}
 			// Ensure any modifications are committed to the state
 			// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-			_ = statedb.IntermediateRoot(vmenv.ChainConfig().IsEIP161F(block.Number()))
+			_ = statedb.IntermediateRoot(vmenv.ChainConfig().IsForked(vmenv.ChainConfig().GetEIP161abcTransition, block.Number()))
 			if idx == int(txIndex) {
 				// This is to make sure root can be opened by OpenTrie
-				_, err = statedb.Commit(vmenv.ChainConfig().IsEIP161F(block.Number()))
+				_, err = statedb.Commit(vmenv.ChainConfig().IsForked(vmenv.ChainConfig().GetEIP161abcTransition, block.Number()))
 				if err != nil {
 					return StorageRangeResult{}, err
 				}

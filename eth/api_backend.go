@@ -34,7 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/gasprice"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -47,7 +47,7 @@ type EthAPIBackend struct {
 }
 
 // ChainConfig returns the active chain configuration.
-func (b *EthAPIBackend) ChainConfig() *paramtypes.ChainConfig {
+func (b *EthAPIBackend) ChainConfig() common2.ChainConfigurator {
 	return b.eth.blockchain.Config()
 }
 

@@ -33,7 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -124,7 +124,7 @@ type intervalAdjust struct {
 // and gathering the sealing result.
 type worker struct {
 	config      *Config
-	chainConfig *paramtypes.ChainConfig
+	chainConfig common2.ChainConfigurator
 	engine      consensus.Engine
 	eth         Backend
 	chain       *core.BlockChain
@@ -177,7 +177,7 @@ type worker struct {
 	resubmitHook func(time.Duration, time.Duration) // Method to call upon updating resubmitting interval.
 }
 
-func newWorker(config *Config, chainConfig *paramtypes.ChainConfig, engine consensus.Engine, eth Backend, mux *event.TypeMux, isLocalBlock func(*types.Block) bool) *worker {
+func newWorker(config *Config, chainConfig common2.ChainConfigurator, engine consensus.Engine, eth Backend, mux *event.TypeMux, isLocalBlock func(*types.Block) bool) *worker {
 	worker := &worker{
 		config:             config,
 		chainConfig:        chainConfig,
@@ -353,7 +353,7 @@ func (w *worker) newWorkLoop(recommit time.Duration) {
 		case <-timer.C:
 			// If mining is running resubmit a new work cycle periodically to pull in
 			// higher priced transactions. Disable this overhead for pending blocks.
-			if w.isRunning() && (w.chainConfig.Clique == nil || w.chainConfig.Clique.Period > 0) {
+			if w.isRunning() && (!w.chainConfig.GetConsensusEngineType().IsClique() || *w.chainConfig.GetCliquePeriod() > 0) {
 				// Short circuit if no new transaction arrives.
 				if atomic.LoadInt32(&w.newTxs) == 0 {
 					timer.Reset(recommit)
@@ -478,7 +478,7 @@ func (w *worker) mainLoop() {
 			} else {
 				// If clique is running in dev mode(period is 0), disable
 				// advance sealing here.
-				if w.chainConfig.Clique != nil && w.chainConfig.Clique.Period == 0 {
+				if w.chainConfig.GetConsensusEngineType().IsClique() && *w.chainConfig.GetCliquePeriod() == 0 {
 					w.commitNewWork(nil, true, time.Now().Unix())
 				}
 			}
@@ -627,7 +627,7 @@ func (w *worker) makeCurrent(parent *types.Block, header *types.Header) error {
 		return err
 	}
 	env := &environment{
-		signer:    types.NewEIP155Signer(w.chainConfig.ChainID),
+		signer:    types.NewEIP155Signer(w.chainConfig.GetChainID()),
 		state:     state,
 		ancestors: mapset.NewSet(),
 		family:    mapset.NewSet(),
@@ -766,8 +766,8 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 		from, _ := types.Sender(w.current.signer, tx)
 		// Check whether the tx is replay protected. If we're not in the EIP155 hf
 		// phase, start ignoring the sender until we do.
-		if tx.Protected() && !w.chainConfig.IsEIP155(w.current.header.Number) {
-			log.Trace("Ignoring reply protected transaction", "hash", tx.Hash(), "eip155", w.chainConfig.EIP155Block)
+		if tx.Protected() && !w.chainConfig.IsForked(w.chainConfig.GetEIP155Transition, w.current.header.Number) {
+			log.Trace("Ignoring reply protected transaction", "hash", tx.Hash(), "eip155", w.chainConfig.GetEIP155Transition())
 
 			txs.Pop()
 			continue
@@ -868,12 +868,13 @@ func (w *worker) commitNewWork(interrupt *int32, noempty bool, timestamp int64) 
 		return
 	}
 	// If we are care about TheDAO hard-fork check whether to override the extra-data or not
-	if daoBlock := w.chainConfig.DAOForkBlock; daoBlock != nil {
+	if daoBlockUint64 := w.chainConfig.GetEthashEIP779Transition(); daoBlockUint64 != nil {
+		daoBlock := new(big.Int).SetUint64(*daoBlockUint64)
 		// Check whether the block is among the fork extra-override range
 		limit := new(big.Int).Add(daoBlock, vars.DAOForkExtraRange)
 		if header.Number.Cmp(daoBlock) >= 0 && header.Number.Cmp(limit) < 0 {
 			// Depending whether we support or oppose the fork, override differently
-			if w.chainConfig.DAOForkSupport {
+			if w.chainConfig.GetEthashEIP779Transition() != nil {
 				header.Extra = common.CopyBytes(vars.DAOForkBlockExtra)
 			} else if bytes.Equal(header.Extra, vars.DAOForkBlockExtra) {
 				header.Extra = []byte{} // If miner opposes, don't let it use the reserved extra-data
@@ -888,7 +889,7 @@ func (w *worker) commitNewWork(interrupt *int32, noempty bool, timestamp int64) 
 	}
 	// Create the current work task and check any fork transitions needed
 	env := w.current
-	if w.chainConfig.DAOForkSupport && w.chainConfig.DAOForkBlock != nil && w.chainConfig.DAOForkBlock.Cmp(header.Number) == 0 {
+	if w.chainConfig.IsForked(w.chainConfig.GetEthashEIP779Transition, header.Number) {
 		misc.ApplyDAOHardFork(env.state)
 	}
 	// Accumulate the uncles for the current block

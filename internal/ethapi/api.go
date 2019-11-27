@@ -355,7 +355,7 @@ func (s *PrivateAccountAPI) signTransaction(ctx context.Context, args *SendTxArg
 	// Assemble the transaction and sign with the wallet
 	tx := args.toTransaction()
 
-	return wallet.SignTxWithPassphrase(account, passwd, tx, s.b.ChainConfig().ChainID)
+	return wallet.SignTxWithPassphrase(account, passwd, tx, s.b.ChainConfig().GetChainID())
 }
 
 // SendTransaction will create a transaction from the given arguments and
@@ -518,7 +518,7 @@ func NewPublicBlockChainAPI(b Backend) *PublicBlockChainAPI {
 
 // ChainId returns the chainID value for transaction replay protection.
 func (s *PublicBlockChainAPI) ChainId() *hexutil.Big {
-	return (*hexutil.Big)(s.b.ChainConfig().ChainID)
+	return (*hexutil.Big)(s.b.ChainConfig().GetChainID())
 }
 
 // BlockNumber returns the block number of the chain head.
@@ -1340,7 +1340,7 @@ func (s *PublicTransactionPoolAPI) sign(addr common.Address, tx *types.Transacti
 		return nil, err
 	}
 	// Request the wallet to sign the transaction
-	return wallet.SignTx(account, tx, s.b.ChainConfig().ChainID)
+	return wallet.SignTx(account, tx, s.b.ChainConfig().GetChainID())
 }
 
 // SendTxArgs represents the arguments to sumbit a new transaction into the transaction pool.
@@ -1474,7 +1474,7 @@ func (s *PublicTransactionPoolAPI) SendTransaction(ctx context.Context, args Sen
 	// Assemble the transaction and sign with the wallet
 	tx := args.toTransaction()
 
-	signed, err := wallet.SignTx(account, tx, s.b.ChainConfig().ChainID)
+	signed, err := wallet.SignTx(account, tx, s.b.ChainConfig().GetChainID())
 	if err != nil {
 		return common.Hash{}, err
 	}

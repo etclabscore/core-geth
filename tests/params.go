@@ -102,7 +102,7 @@ func init() {
 		log.Println("Setting equivalent fork feature chain configurations")
 
 		for i, config := range Forks {
-			pt := &paramtypes.ChainConfig{}
+			pt := &paramtypes.MultiGethChainConfig{}
 			if err := convert.Convert(config, pt); err != nil {
 				panic(err)
 			}
@@ -110,7 +110,7 @@ func init() {
 		}
 
 		for k, v := range difficultyChainConfigurations {
-			pt := &paramtypes.ChainConfig{}
+			pt := &paramtypes.MultiGethChainConfig{}
 			if err := convert.Convert(v, pt); err != nil {
 				panic(err)
 			}
@@ -149,7 +149,7 @@ func init() {
 	}
 }
 
-//func convertMetaForkBlocksToFeatures(config *paramtypes.ChainConfig) {
+//func convertMetaForkBlocksToFeatures(config *paramtypes.MultiGethChainConfig) {
 //	if config.HomesteadBlock != nil {
 //		config.EIP2FBlock = config.HomesteadBlock
 //		config.EIP7FBlock = config.HomesteadBlock

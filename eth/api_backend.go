@@ -46,7 +46,7 @@ type EthAPIBackend struct {
 	gpo           *gasprice.Oracle
 }
 
-// ChainConfig returns the active chain configuration.
+// MultiGethChainConfig returns the active chain configuration.
 func (b *EthAPIBackend) ChainConfig() common2.ChainConfigurator {
 	return b.eth.blockchain.Config()
 }

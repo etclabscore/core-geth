@@ -72,7 +72,7 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 	var dec Genesis
 	dec.Config = &goethereum.ChainConfig{}
 	if err := json.Unmarshal(input, &dec); err != nil {
-		dec.Config = &ChainConfig{}
+		dec.Config = &MultiGethChainConfig{}
 		if err := json.Unmarshal(input, &dec); err != nil {
 			return err
 		}

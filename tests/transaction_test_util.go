@@ -44,7 +44,7 @@ type ttFork struct {
 	Hash   common.UnprefixedHash    `json:"hash"`
 }
 
-func (tt *TransactionTest) Run(config *paramtypes.ChainConfig) error {
+func (tt *TransactionTest) Run(config *paramtypes.MultiGethChainConfig) error {
 
 	validateTx := func(rlpData hexutil.Bytes, signer types.Signer, isEIP2F bool, isEIP2028F bool) (*common.Address, *common.Hash, error) {
 		tx := new(types.Transaction)

@@ -25,7 +25,7 @@ import (
 
 var (
 	// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
-	ClassicChainConfig = &paramtypes.ChainConfig{
+	ClassicChainConfig = &paramtypes.MultiGethChainConfig{
 		ChainID:    big.NewInt(61),
 		EIP2FBlock: big.NewInt(1150000),
 		EIP7FBlock: big.NewInt(1150000),

@@ -209,7 +209,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 	cacheLimit := cacheConfig.TrieCleanLimit + cacheConfig.TrieDirtyLimit
 	checkpoint := config.Checkpoint
 	if checkpoint == nil {
-		if p, ok := chainConfig.(*paramtypes.ChainConfig); ok {
+		if p, ok := chainConfig.(*paramtypes.MultiGethChainConfig); ok {
 			checkpoint = p.TrustedCheckpoint
 		} else if p, ok := chainConfig.(*goethereum.ChainConfig); ok {
 			checkpoint = p.TrustedCheckpoint

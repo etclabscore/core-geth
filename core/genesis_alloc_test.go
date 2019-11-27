@@ -65,7 +65,7 @@ func TestSetupGenesis(t *testing.T) {
 		wantErr    error
 	}{
 		{
-			name: "genesis without ChainConfig",
+			name: "genesis without MultiGethChainConfig",
 			fn: func(db ethdb.Database) (common2.ChainConfigurator, common.Hash, error) {
 				return SetupGenesisBlock(db, new(paramtypes.Genesis))
 			},

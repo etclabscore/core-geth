@@ -345,8 +345,12 @@ func (spec *ParityChainSpec) GetEIP213Transition() *uint64 {
 				Price: 40000,
 			},
 		}).Uint64P()
+
+	if x == nil || y == nil {
+		return nil
+	}
 	if *x != *y {
-		panic("eip213 activation mismatch")
+		return nil
 	}
 	return x
 }
@@ -388,8 +392,12 @@ func (spec *ParityChainSpec) GetEIP1108Transition() *uint64 {
 			},
 		}).Uint64P()
 
+	if x == nil || y == nil || z == nil {
+		return nil
+	}
+
 	if *x != *y || *y != *z {
-		panic("eip1108 activation mismatch")
+		return nil
 	}
 	return x
 }

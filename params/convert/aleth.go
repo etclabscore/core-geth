@@ -32,7 +32,7 @@ import (
 // chain specification format.
 func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*aleth.AlethGenesisSpec, error) {
 	// Only ethash is currently supported between go-ethereum and aleth
-	if genesis.Config.Ethash == nil {
+	if !genesis.Config.GetConsensusEngineType().IsEthash() {
 		return nil, errors.New("unsupported consensus engine")
 	}
 	// Reconstruct the chain spec in Aleth format
@@ -49,29 +49,30 @@ func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*aleth.Al
 	// fork block.
 	spec.Params.DaoHardforkBlock = 0
 
-	if num := genesis.Config.HomesteadBlock; num != nil {
-		spec.Params.HomesteadForkBlock = (*hexutil.Big)(num)
+	if num := genesis.Config.GetEthashHomesteadTransition(); num != nil {
+		spec.Params.HomesteadForkBlock = (*hexutil.Big)(((*hexutil.Uint64)(num)).Big()) // Fuckin beautiful
 	}
-	if num := genesis.Config.EIP150Block; num != nil {
-		spec.Params.EIP150ForkBlock = (*hexutil.Big)(num)
+	if num := genesis.Config.GetEIP150Transition(); num != nil {
+		spec.Params.EIP150ForkBlock = (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())
 	}
-	if num := genesis.Config.EIP158Block; num != nil {
-		spec.Params.EIP158ForkBlock = (*hexutil.Big)(num)
+	// Just choosing random signal blocks for any given fork bundle.
+	if num := genesis.Config.GetEIP161abcTransition(); num != nil {
+		spec.Params.EIP158ForkBlock = (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())
 	}
-	if num := genesis.Config.ByzantiumBlock; num != nil {
-		spec.Params.ByzantiumForkBlock = (*hexutil.Big)(num)
+	if num := genesis.Config.GetEthashEIP649TransitionV(); num != nil {
+		spec.Params.ByzantiumForkBlock = (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())
 	}
-	if num := genesis.Config.ConstantinopleBlock; num != nil {
-		spec.Params.ConstantinopleForkBlock = (*hexutil.Big)(num)
+	if num := genesis.Config.GetEthashEIP1234TransitionV(); num != nil {
+		spec.Params.ConstantinopleForkBlock = (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())
 	}
-	if num := genesis.Config.PetersburgBlock; num != nil {
-		spec.Params.ConstantinopleFixForkBlock = (*hexutil.Big)(num)
+	if num := genesis.Config.GetEIP1283DisableTransition(); num != nil {
+		spec.Params.ConstantinopleFixForkBlock = (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())
 	}
-	if num := genesis.Config.IstanbulBlock; num != nil {
-		spec.Params.IstanbulForkBlock = (*hexutil.Big)(num)
+	if num := genesis.Config.GetEIP145Transition(); num != nil {
+		spec.Params.IstanbulForkBlock = (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())
 	}
-	spec.Params.NetworkID = (hexutil.Uint64)(genesis.Config.ChainID.Uint64())
-	spec.Params.ChainID = (hexutil.Uint64)(genesis.Config.ChainID.Uint64())
+	spec.Params.NetworkID = (hexutil.Uint64)(genesis.Config.GetChainID().Uint64())
+	spec.Params.ChainID = (hexutil.Uint64)(genesis.Config.GetChainID().Uint64())
 	spec.Params.MaximumExtraDataSize = (hexutil.Uint64)(vars.MaximumExtraDataSize)
 	spec.Params.MinGasLimit = (hexutil.Uint64)(vars.MinGasLimit)
 	spec.Params.MaxGasLimit = (hexutil.Uint64)(math.MaxInt64)
@@ -104,33 +105,34 @@ func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*aleth.Al
 		Linear: &aleth.AlethGenesisSpecLinearPricing{Base: 600, Word: 120}})
 	spec.SetPrecompile(4, &aleth.AlethGenesisSpecBuiltin{Name: "identity",
 		Linear: &aleth.AlethGenesisSpecLinearPricing{Base: 15, Word: 3}})
-	if genesis.Config.ByzantiumBlock != nil {
+	if num := genesis.Config.GetEIP212Transition(); num != nil {
 		spec.SetPrecompile(5, &aleth.AlethGenesisSpecBuiltin{Name: "modexp",
-			StartingBlock: (*hexutil.Big)(genesis.Config.ByzantiumBlock)})
+			StartingBlock: (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())})
 		spec.SetPrecompile(6, &aleth.AlethGenesisSpecBuiltin{Name: "alt_bn128_G1_add",
-			StartingBlock: (*hexutil.Big)(genesis.Config.ByzantiumBlock),
+			StartingBlock: (*hexutil.Big)(((*hexutil.Uint64)(num)).Big()),
 			Linear:        &aleth.AlethGenesisSpecLinearPricing{Base: 500}})
 		spec.SetPrecompile(7, &aleth.AlethGenesisSpecBuiltin{Name: "alt_bn128_G1_mul",
-			StartingBlock: (*hexutil.Big)(genesis.Config.ByzantiumBlock),
+			StartingBlock: (*hexutil.Big)(((*hexutil.Uint64)(num)).Big()),
 			Linear:        &aleth.AlethGenesisSpecLinearPricing{Base: 40000}})
 		spec.SetPrecompile(8, &aleth.AlethGenesisSpecBuiltin{Name: "alt_bn128_pairing_product",
-			StartingBlock: (*hexutil.Big)(genesis.Config.ByzantiumBlock)})
+			StartingBlock: (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())})
 	}
-	if genesis.Config.IstanbulBlock != nil {
-		if genesis.Config.ByzantiumBlock == nil {
+	if num := genesis.Config.GetEIP1108Transition(); num != nil {
+		byz := genesis.Config.GetEIP212Transition()
+		if byz == nil {
 			return nil, errors.New("invalid genesis, istanbul fork is enabled while byzantium is not")
 		}
 		spec.SetPrecompile(6, &aleth.AlethGenesisSpecBuiltin{
 			Name:          "alt_bn128_G1_add",
-			StartingBlock: (*hexutil.Big)(genesis.Config.ByzantiumBlock),
+			StartingBlock: (*hexutil.Big)(spec.Params.ByzantiumForkBlock),
 		}) // Aleth hardcoded the gas policy
 		spec.SetPrecompile(7, &aleth.AlethGenesisSpecBuiltin{
 			Name:          "alt_bn128_G1_mul",
-			StartingBlock: (*hexutil.Big)(genesis.Config.ByzantiumBlock),
+			StartingBlock: (*hexutil.Big)(spec.Params.ByzantiumForkBlock),
 		}) // Aleth hardcoded the gas policy
 		spec.SetPrecompile(9, &aleth.AlethGenesisSpecBuiltin{
 			Name:          "blake2_compression",
-			StartingBlock: (*hexutil.Big)(genesis.Config.IstanbulBlock),
+			StartingBlock: (*hexutil.Big)(((*hexutil.Uint64)(num)).Big()),
 		})
 	}
 	return spec, nil

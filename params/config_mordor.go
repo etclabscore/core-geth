@@ -18,7 +18,6 @@ package params
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )

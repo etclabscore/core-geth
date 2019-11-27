@@ -51,7 +51,7 @@ func Test_UnmarshalJSON(t *testing.T) {
 		case "geth":
 			c := &paramtypes.Genesis{}
 			mustOpenF(t, f, c)
-			if c.Config.NetworkID != 314158 {
+			if *c.Config.GetNetworkID() != 314158 {
 				t.Errorf("networkid")
 			}
 		case "parity":
@@ -88,7 +88,7 @@ func TestConvert(t *testing.T) {
 func TestConfiguratorImplementationsSatisfied(t *testing.T) {
 	for _, ty := range []interface{}{
 		&parity.ParityChainSpec{},
-	}{
+	} {
 		_ = ty.(common.Configurator)
 	}
 
@@ -101,7 +101,16 @@ func TestConfiguratorImplementationsSatisfied(t *testing.T) {
 
 	for _, ty := range []interface{}{
 		&paramtypes.Genesis{},
-	}{
+	} {
 		_ = ty.(common.GenesisBlocker)
 	}
+}
+
+func TestCompatible(t *testing.T) {
+	spec := &parity.ParityChainSpec{}
+	fns, names := common.Transitions(spec)
+	for i, fn := range fns {
+		t.Log(names[i], fn())
+	}
+	t.Log(fns)
 }

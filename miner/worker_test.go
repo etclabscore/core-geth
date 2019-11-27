@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -52,8 +53,8 @@ const (
 var (
 	// Test chain configurations
 	testTxPoolConfig  core.TxPoolConfig
-	ethashChainConfig *paramtypes.MultiGethChainConfig
-	cliqueChainConfig *paramtypes.MultiGethChainConfig
+	ethashChainConfig common2.ChainConfigurator
+	cliqueChainConfig common2.ChainConfigurator
 
 	// Test accounts
 	testBankKey, _  = crypto.GenerateKey()
@@ -79,10 +80,9 @@ func init() {
 	testTxPoolConfig.Journal = ""
 	ethashChainConfig = params.TestChainConfig
 	cliqueChainConfig = params.TestChainConfig
-	cliqueChainConfig.Clique = &goethereum.CliqueConfig{
-		Period: 10,
-		Epoch:  30000,
-	}
+	cliqueChainConfig.MustSetConsensusEngineType(common2.ConsensusEngineT_Clique)
+	cliqueChainConfig.SetCliquePeriod(10)
+	cliqueChainConfig.SetCliqueEpoch(30000)
 	tx1, _ := types.SignTx(types.NewTransaction(0, testUserAddress, big.NewInt(1000), vars.TxGas, nil, nil), types.HomesteadSigner{}, testBankKey)
 	pendingTxs = append(pendingTxs, tx1)
 	tx2, _ := types.SignTx(types.NewTransaction(1, testUserAddress, big.NewInt(1000), vars.TxGas, nil, nil), types.HomesteadSigner{}, testBankKey)
@@ -100,7 +100,7 @@ type testWorkerBackend struct {
 	uncleBlock *types.Block
 }
 
-func newTestWorkerBackend(t *testing.T, chainConfig *paramtypes.MultiGethChainConfig, engine consensus.Engine, db ethdb.Database, n int) *testWorkerBackend {
+func newTestWorkerBackend(t *testing.T, chainConfig common2.ChainConfigurator, engine consensus.Engine, db ethdb.Database, n int) *testWorkerBackend {
 	var gspec = paramtypes.Genesis{
 		Config: chainConfig,
 		Alloc:  paramtypes.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
@@ -180,7 +180,7 @@ func (b *testWorkerBackend) newRandomTx(creation bool) *types.Transaction {
 	return tx
 }
 
-func newTestWorker(t *testing.T, chainConfig *paramtypes.MultiGethChainConfig, engine consensus.Engine, db ethdb.Database, blocks int) (*worker, *testWorkerBackend) {
+func newTestWorker(t *testing.T, chainConfig common2.ChainConfigurator, engine consensus.Engine, db ethdb.Database, blocks int) (*worker, *testWorkerBackend) {
 	backend := newTestWorkerBackend(t, chainConfig, engine, db, blocks)
 	backend.txPool.AddLocals(pendingTxs)
 	w := newWorker(testConfig, chainConfig, engine, backend, new(event.TypeMux), nil)
@@ -199,13 +199,17 @@ func TestGenerateBlockAndImportClique(t *testing.T) {
 func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 	var (
 		engine      consensus.Engine
-		chainConfig *paramtypes.MultiGethChainConfig
+		chainConfig common2.ChainConfigurator
 		db          = rawdb.NewMemoryDatabase()
 	)
 	if isClique {
 		chainConfig = params.AllCliqueProtocolChanges
-		chainConfig.Clique = &goethereum.CliqueConfig{Period: 1, Epoch: 30000}
-		engine = clique.New(chainConfig.Clique, db)
+		chainConfig.SetCliquePeriod(1)
+		chainConfig.SetCliqueEpoch(30000)
+		engine = clique.New(&goethereum.CliqueConfig{
+			Period: *chainConfig.GetCliquePeriod(),
+			Epoch:  *chainConfig.GetCliqueEpoch(),
+		}, db)
 	} else {
 		chainConfig = params.AllEthashProtocolChanges
 		engine = ethash.NewFaker()
@@ -276,10 +280,13 @@ func TestPendingStateAndBlockEthash(t *testing.T) {
 	testPendingStateAndBlock(t, ethashChainConfig, ethash.NewFaker())
 }
 func TestPendingStateAndBlockClique(t *testing.T) {
-	testPendingStateAndBlock(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, rawdb.NewMemoryDatabase()))
+	testPendingStateAndBlock(t, cliqueChainConfig, clique.New(&goethereum.CliqueConfig{
+		Period: *cliqueChainConfig.GetCliquePeriod(),
+		Epoch:  *cliqueChainConfig.GetCliqueEpoch(),
+	}, rawdb.NewMemoryDatabase()))
 }
 
-func testPendingStateAndBlock(t *testing.T, chainConfig *paramtypes.MultiGethChainConfig, engine consensus.Engine) {
+func testPendingStateAndBlock(t *testing.T, chainConfig common2.ChainConfigurator, engine consensus.Engine) {
 	defer engine.Close()
 
 	w, b := newTestWorker(t, chainConfig, engine, rawdb.NewMemoryDatabase(), 0)
@@ -308,10 +315,13 @@ func TestEmptyWorkEthash(t *testing.T) {
 	testEmptyWork(t, ethashChainConfig, ethash.NewFaker())
 }
 func TestEmptyWorkClique(t *testing.T) {
-	testEmptyWork(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, rawdb.NewMemoryDatabase()))
+	testEmptyWork(t, cliqueChainConfig, clique.New(&goethereum.CliqueConfig{
+		Period: *cliqueChainConfig.GetCliquePeriod(),
+		Epoch:  *cliqueChainConfig.GetCliqueEpoch(),
+	}, rawdb.NewMemoryDatabase()))
 }
 
-func testEmptyWork(t *testing.T, chainConfig *paramtypes.MultiGethChainConfig, engine consensus.Engine) {
+func testEmptyWork(t *testing.T, chainConfig common2.ChainConfigurator, engine consensus.Engine) {
 	defer engine.Close()
 
 	w, _ := newTestWorker(t, chainConfig, engine, rawdb.NewMemoryDatabase(), 0)
@@ -427,10 +437,13 @@ func TestRegenerateMiningBlockEthash(t *testing.T) {
 }
 
 func TestRegenerateMiningBlockClique(t *testing.T) {
-	testRegenerateMiningBlock(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, rawdb.NewMemoryDatabase()))
+	testRegenerateMiningBlock(t, cliqueChainConfig, clique.New(&goethereum.CliqueConfig{
+		Period: *cliqueChainConfig.GetCliquePeriod(),
+		Epoch:  *cliqueChainConfig.GetCliqueEpoch(),
+	}, rawdb.NewMemoryDatabase()))
 }
 
-func testRegenerateMiningBlock(t *testing.T, chainConfig *paramtypes.MultiGethChainConfig, engine consensus.Engine) {
+func testRegenerateMiningBlock(t *testing.T, chainConfig common2.ChainConfigurator, engine consensus.Engine) {
 	defer engine.Close()
 
 	w, b := newTestWorker(t, chainConfig, engine, rawdb.NewMemoryDatabase(), 0)
@@ -492,10 +505,13 @@ func TestAdjustIntervalEthash(t *testing.T) {
 }
 
 func TestAdjustIntervalClique(t *testing.T) {
-	testAdjustInterval(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, rawdb.NewMemoryDatabase()))
+	testAdjustInterval(t, cliqueChainConfig, clique.New(&goethereum.CliqueConfig{
+		Period: *cliqueChainConfig.GetCliquePeriod(),
+		Epoch:  *cliqueChainConfig.GetCliqueEpoch(),
+	}, rawdb.NewMemoryDatabase()))
 }
 
-func testAdjustInterval(t *testing.T, chainConfig *paramtypes.MultiGethChainConfig, engine consensus.Engine) {
+func testAdjustInterval(t *testing.T, chainConfig common2.ChainConfigurator, engine consensus.Engine) {
 	defer engine.Close()
 
 	w, _ := newTestWorker(t, chainConfig, engine, rawdb.NewMemoryDatabase(), 0)

@@ -202,7 +202,7 @@ func GenerateChain(config common2.ChainConfigurator, parent *types.Block, engine
 		daoBlock := config.GetEthashEIP779Transition()
 		if daoBlock != nil {
 			limit := new(big.Int).Add(new(big.Int).SetUint64(*daoBlock), vars.DAOForkExtraRange)
-			if b.header.Number.Cmp(new(big.Int).SetUint64(*daoBlock)) >= 0 && b.header.Number.Cmp(limit) < 0 {
+			if b.header.Number.Uint64() >= *daoBlock && b.header.Number.Cmp(limit) < 0 {
 				b.header.Extra = common.CopyBytes(vars.DAOForkBlockExtra)
 			}
 		}

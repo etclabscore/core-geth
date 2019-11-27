@@ -59,6 +59,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/gorilla/websocket"
 )
 
@@ -105,9 +106,9 @@ var (
 	gitDate   = "" // Git commit date YYYYMMDD of the release (set via linker flags)
 )
 
-func faucetDirFromConfig(chainConfig *paramtypes.ChainConfig) string {
+func faucetDirFromConfig(chainConfig common2.ChainConfigurator) string {
 	datadir := filepath.Join(os.Getenv("HOME"), ".faucet")
-	for conf, suff := range map[*paramtypes.ChainConfig]string{
+	for conf, suff := range map[common2.ChainConfigurator]string{
 		params.MainnetChainConfig:     "",
 		params.ClassicChainConfig:     "classic",
 		params.SocialChainConfig:      "social",
@@ -239,7 +240,7 @@ func main() {
 		var bss []string
 		for _, conf := range configs {
 			if conf.flag {
-				gs, bss, netid = conf.gs, conf.bs, conf.gs.Config.NetworkID
+				gs, bss, netid = conf.gs, conf.bs, *conf.gs.Config.GetNetworkID()
 				break
 			}
 		}
@@ -266,7 +267,7 @@ func main() {
 		}
 		return
 	}()
-	log.Info("configured chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", genesis.Config.String())
+	log.Info("configured chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", fmt.Sprintf("%v", genesis.Config))
 
 	// Convert the bootnodes to internal enode representations
 	for _, boot := range strings.Split(*bootFlag, ",") {
@@ -316,7 +317,7 @@ type request struct {
 
 // faucet represents a crypto faucet backed by an Ethereum light client.
 type faucet struct {
-	config *paramtypes.ChainConfig // Chain configurations for signing
+	config common2.ChainConfigurator // Chain configurations for signing
 	stack  *node.Node              // Ethereum protocol stack
 	client *ethclient.Client       // Client connection to the Ethereum chain
 	index  []byte                  // Index page to serve up on the web
@@ -605,7 +606,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 			amount = new(big.Int).Div(amount, new(big.Int).Exp(big.NewInt(2), big.NewInt(int64(msg.Tier)), nil))
 
 			tx := types.NewTransaction(f.nonce+uint64(len(f.reqs)), address, amount, 21000, f.price, nil)
-			signed, err := f.keystore.SignTx(f.account, tx, f.config.ChainID)
+			signed, err := f.keystore.SignTx(f.account, tx, f.config.GetChainID())
 			if err != nil {
 				f.lock.Unlock()
 				if err = sendError(conn, err); err != nil {

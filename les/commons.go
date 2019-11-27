@@ -31,7 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/discv5"
 	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
@@ -58,7 +58,7 @@ type chainReader interface {
 type lesCommons struct {
 	genesis                      common.Hash
 	config                       *eth.Config
-	chainConfig                  *paramtypes.ChainConfig
+	chainConfig                  common2.ChainConfigurator
 	iConfig                      *light.IndexerConfig
 	chainDb                      ethdb.Database
 	peers                        *peerSet
@@ -76,7 +76,7 @@ type NodeInfo struct {
 	Network    uint64                       `json:"network"`    // Ethereum network ID (1=Frontier, 2=Morden, Ropsten=3, Rinkeby=4)
 	Difficulty *big.Int                     `json:"difficulty"` // Total difficulty of the host's blockchain
 	Genesis    common.Hash                  `json:"genesis"`    // SHA3 hash of the host's genesis block
-	Config     *paramtypes.ChainConfig      `json:"config"`     // Chain configuration for the fork rules
+	Config     common2.ChainConfigurator      `json:"config"`     // Chain configuration for the fork rules
 	Head       common.Hash                  `json:"head"`       // SHA3 hash of the host's best owned block
 	CHT        goethereum.TrustedCheckpoint `json:"cht"`        // Trused CHT checkpoint for fast catchup
 }

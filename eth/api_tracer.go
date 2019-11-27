@@ -215,7 +215,7 @@ func (api *PrivateDebugAPI) traceChain(ctx context.Context, start, end *types.Bl
 						break
 					}
 					// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-					task.statedb.Finalise(api.eth.blockchain.Config().IsEIP161F(task.block.Number()))
+					task.statedb.Finalise(api.eth.blockchain.Config().IsForked(api.eth.blockchain.Config().GetEIP161abcTransition, task.block.Number()))
 					task.results[i] = &txTraceResult{Result: res}
 				}
 				// Stream the result back to the user or abort on teardown
@@ -295,7 +295,7 @@ func (api *PrivateDebugAPI) traceChain(ctx context.Context, start, end *types.Bl
 				break
 			}
 			// Finalize the state so any modifications are written to the trie
-			root, err := statedb.Commit(api.eth.blockchain.Config().IsEIP161F(block.Number()))
+			root, err := statedb.Commit(api.eth.blockchain.Config().IsForked(api.eth.blockchain.Config().GetEIP161abcTransition, block.Number()))
 			if err != nil {
 				failed = err
 				break
@@ -508,7 +508,7 @@ func (api *PrivateDebugAPI) traceBlock(ctx context.Context, block *types.Block, 
 		}
 		// Finalize the state so any modifications are written to the trie
 		// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-		statedb.Finalise(vmenv.ChainConfig().IsEIP161F(block.Number()))
+		statedb.Finalise(vmenv.ChainConfig().IsForked(vmenv.ChainConfig().GetEIP161abcTransition, block.Number()))
 	}
 	close(jobs)
 	pend.Wait()
@@ -609,7 +609,7 @@ func (api *PrivateDebugAPI) standardTraceBlockToFile(ctx context.Context, block 
 		}
 		// Finalize the state so any modifications are written to the trie
 		// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-		statedb.Finalise(vmenv.ChainConfig().IsEIP161F(block.Number()))
+		statedb.Finalise(vmenv.ChainConfig().IsForked(vmenv.ChainConfig().GetEIP161abcTransition, block.Number()))
 
 		// If we've traced the transaction we were looking for, abort
 		if tx.Hash() == txHash {
@@ -681,7 +681,7 @@ func (api *PrivateDebugAPI) computeStateDB(block *types.Block, reexec uint64) (*
 			return nil, fmt.Errorf("processing block %d failed: %v", block.NumberU64(), err)
 		}
 		// Finalize the state so any modifications are written to the trie
-		root, err := statedb.Commit(api.eth.blockchain.Config().IsEIP161F(block.Number()))
+		root, err := statedb.Commit(api.eth.blockchain.Config().IsForked(api.eth.blockchain.Config().GetEIP161abcTransition, block.Number()))
 		if err != nil {
 			return nil, err
 		}
@@ -817,7 +817,7 @@ func (api *PrivateDebugAPI) computeTxEnv(blockHash common.Hash, txIndex int, ree
 		}
 		// Ensure any modifications are committed to the state
 		// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-		statedb.Finalise(vmenv.ChainConfig().IsEIP161F(block.Number()))
+		statedb.Finalise(vmenv.ChainConfig().IsForked(vmenv.ChainConfig().GetEIP161abcTransition, block.Number()))
 	}
 	return nil, vm.Context{}, nil, fmt.Errorf("transaction index %d out of range for block %#x", txIndex, blockHash)
 }

@@ -31,7 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -82,7 +82,7 @@ type Backend interface {
 	SubscribeLogsEvent(ch chan<- []*types.Log) event.Subscription
 	SubscribeRemovedLogsEvent(ch chan<- core.RemovedLogsEvent) event.Subscription
 
-	ChainConfig() *paramtypes.ChainConfig
+	ChainConfig() common2.ChainConfigurator
 	CurrentBlock() *types.Block
 }
 

@@ -49,8 +49,9 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enr"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
+	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -138,7 +139,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 	if err != nil {
 		return nil, err
 	}
-	chainConfig, genesisHash, genesisErr := core.SetupGenesisBlockWithOverride(chainDb, config.Genesis, config.OverrideIstanbul)
+	chainConfig, genesisHash, genesisErr := core.SetupGenesisBlockWithOverride(chainDb, config.Genesis)
 	if _, ok := genesisErr.(*common2.ConfigCompatError); genesisErr != nil && !ok {
 		return nil, genesisErr
 	}
@@ -208,7 +209,11 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 	cacheLimit := cacheConfig.TrieCleanLimit + cacheConfig.TrieDirtyLimit
 	checkpoint := config.Checkpoint
 	if checkpoint == nil {
-		checkpoint = chainConfig.TrustedCheckpoint
+		if p, ok := chainConfig.(*paramtypes.ChainConfig); ok {
+			checkpoint = p.TrustedCheckpoint
+		} else if p, ok := chainConfig.(*goethereum.ChainConfig); ok {
+			checkpoint = p.TrustedCheckpoint
+		}
 	}
 	if eth.protocolManager, err = NewProtocolManager(chainConfig, checkpoint, config.SyncMode, config.NetworkId, eth.eventMux, eth.txPool, eth.engine, eth.blockchain, chainDb, cacheLimit, config.Whitelist); err != nil {
 		return nil, err
@@ -244,10 +249,13 @@ func makeExtraData(extra []byte) []byte {
 }
 
 // CreateConsensusEngine creates the required type of consensus engine instance for an Ethereum service
-func CreateConsensusEngine(ctx *node.ServiceContext, chainConfig *paramtypes.ChainConfig, config *ethash.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
+func CreateConsensusEngine(ctx *node.ServiceContext, chainConfig common2.ChainConfigurator, config *ethash.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
 	// If proof-of-authority is requested, set it up
-	if chainConfig.Clique != nil {
-		return clique.New(chainConfig.Clique, db)
+	if chainConfig.GetConsensusEngineType().IsClique() {
+		return clique.New(&goethereum.CliqueConfig{
+			Period: *chainConfig.GetCliquePeriod(),
+			Epoch: *chainConfig.GetCliqueEpoch(),
+		}, db)
 	}
 	// Otherwise assume proof-of-work
 	switch config.PowMode {

@@ -112,41 +112,19 @@ func Forks(conf ChainConfigurator) []uint64 {
 	var forks []uint64
 	var forksM = make(map[uint64]struct{}) // Will key for uniqueness as fork numbers are appended to slice.
 
-	// Gather all the fork block numbers via reflection
-	kind := reflect.TypeOf(conf)
-
-	for i := 0; i < kind.NumMethod(); i++ {
-		// Fetch the next field and skip non-fork rules
-		method := kind.Method(i)
-		if !strings.HasSuffix(method.Name, "Transition") || !strings.HasPrefix(method.Name, "Get") {
-			continue
-		}
-
+	transitions, _ := Transitions(conf)
+	for _, tr := range transitions {
 		// Extract the fork rule block number and aggregate it
-		response := reflect.ValueOf(conf).MethodByName(method.Name).Call([]reflect.Value{})
-		if len(response) == 0 {
-			continue // should never happen b/c interface Get_ pattern always returns a *uint64
-		}
-		r := response[0]
-		if r.IsNil() {
+		response := tr()
+		if response == nil || *response == math.MaxUint64 {
 			continue
 		}
-		rule, ok := r.Interface().(*uint64)
-		if !ok {
-			panic(fmt.Sprintf("%s.%s wrong ChainConfigurator interface", kind.Name(), method.Name))
-		}
-
-		if *rule == math.MaxUint64 {
-			continue
-		}
-
 		// Only append unique fork numbers, excluding 0 (genesis config is not considered a fork)
-		if _, ok := forksM[*rule]; !ok && *rule != 0 {
-			forks = append(forks, *rule)
-			forksM[*rule] = struct{}{}
+		if _, ok := forksM[*response]; !ok && *response != 0 {
+			forks = append(forks, *response)
+			forksM[*response] = struct{}{}
 		}
 	}
-
 	sort.Slice(forks, func(i, j int) bool {
 		return forks[i] < forks[j]
 	})

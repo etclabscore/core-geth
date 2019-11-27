@@ -2,6 +2,7 @@ package convert
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"reflect"
 	"strings"
@@ -10,53 +11,70 @@ import (
 )
 
 // Automagically translate between [Must|]Setters and Getters.
-func Convert(from, to common.Configurator) error {
-	if _, ok := from.(common.Configurator); !ok {
-		return errors.New("from value not a configurator")
-	}
-	if _, ok := to.(common.Configurator); !ok {
-		return errors.New("to value not a configurator")
+func Convert(from, to interface{}) error {
+	// Interfaces must be either ChainConfigurator or GenesisBlocker.
+	for i, v := range []interface{}{
+		from, to,
+	}{
+		_, genesiser := v.(common.GenesisBlocker)
+		_, chainconfer := v.(common.ChainConfigurator)
+		if !genesiser && !chainconfer {
+			return fmt.Errorf("%d value neither chain nor genesis configurator", i)
+		}
 	}
 
 	// Order may matter; configuration parameters may be interdependent across data structures, eg EIP1283 and Genesis builtins.
-	// Try to order translation sensibly.
+	// Try to order translation sensibly
+
+	fromGener, fromGenerOk := from.(common.GenesisBlocker)
+	toGener, toGenerOk := to.(common.GenesisBlocker)
+
 	// Set Genesis.
-	et := from.GetSealingType()
-	switch et {
-	case common.BlockSealing_Ethereum:
-		k := reflect.TypeOf((*common.GenesisBlocker)(nil)).Elem()
-		if err := convert(k, from, to); err != nil {
+	if fromGenerOk && toGenerOk {
+		et := fromGener.GetSealingType()
+		switch et {
+		case common.BlockSealing_Ethereum:
+			k := reflect.TypeOf((*common.GenesisBlocker)(nil)).Elem()
+			if err := convert(k, fromGener, toGener); err != nil {
+				return err
+			}
+		default:
+			return common.UnsupportedConfigError(common.ErrUnsupportedConfigFatal, "sealing type", et)
+		}
+
+		// Set accounts (genesis).
+		if err := fromGener.ForEachAccount(toGener.UpdateAccount); err != nil {
 			return err
 		}
-	default:
-		return common.UnsupportedConfigError(common.ErrUnsupportedConfigFatal, "sealing type", et)
 	}
 
-	// Set accounts (genesis).
-	if err := from.ForEachAccount(to.UpdateAccount); err != nil {
-		return err
+	fromChainer, fromChainerOk := from.(common.ChainConfigurator)
+	toChainer, toChainerOk := to.(common.ChainConfigurator)
+
+	if !fromChainerOk || !toChainerOk {
+		return nil
 	}
 
 	// Set general chain parameters.
 	k := reflect.TypeOf((*common.CatHerder)(nil)).Elem()
-	if err := convert(k, from, to); err != nil {
+	if err := convert(k, fromChainer, toChainer); err != nil {
 		return err
 	}
 
 	// Set consensus engine params.
-	engineType := from.GetConsensusEngineType()
-	if err := to.MustSetConsensusEngineType(engineType); err != nil {
+	engineType := fromChainer.GetConsensusEngineType()
+	if err := toChainer.MustSetConsensusEngineType(engineType); err != nil {
 		return common.UnsupportedConfigError(err, "consensus engine", engineType)
 	}
 	switch engineType {
 	case common.ConsensusEngineT_Ethash:
 		k := reflect.TypeOf((*common.EthashConfigurator)(nil)).Elem()
-		if err := convert(k, from, to); err != nil {
+		if err := convert(k, fromChainer, toChainer); err != nil {
 			return err
 		}
 	case common.ConsensusEngineT_Clique:
 		k := reflect.TypeOf((*common.CliqueConfigurator)(nil)).Elem()
-		if err := convert(k, from, to); err != nil {
+		if err := convert(k, fromChainer, toChainer); err != nil {
 			return err
 		}
 	default:
@@ -127,3 +145,45 @@ func compare(k reflect.Type, source, target interface{}) (method string, value i
 	return "", nil, nil
 }
 
+
+//func UnmarshalConfigurator(data []byte) (Configurator, error) {
+//	var unMarshalErr error
+//	for _, t := range []Configurator{
+//		&parity.ParityChainSpec{},
+//	}{
+//		unMarshalErr = json.Unmarshal(data, t)
+//		if unMarshalErr == nil {
+//			return t, nil
+//		}
+//	}
+//	return nil, unMarshalErr
+//}
+
+//func UnmarshalChainConfigurator(data []byte) (common.ChainConfigurator, error) {
+//	var unMarshalErr error
+//	for _, t := range []interface{}{
+//		&paramtypes.ChainConfig{},
+//		&goethereum.ChainConfig{},
+//		&parity.ParityChainSpec{},
+//		&paramtypes.Genesis{
+//			Config: &paramtypes.ChainConfig{},
+//		},
+//		&paramtypes.Genesis{
+//			Config: &goethereum.ChainConfig{},
+//		},
+//	}{
+//		unMarshalErr = json.Unmarshal(data, t)
+//		if unMarshalErr == nil {
+//			rt := t
+//			if d, ok := t.(*paramtypes.Genesis); ok {
+//				if e, ok := d.Config.(*paramtypes.ChainConfig); ok {
+//					rt = e
+//				} else if e, ok := d.Config.(*goethereum.ChainConfig); ok {
+//					rt = e
+//				}
+//			}
+//			return rt.(common.ChainConfigurator), nil
+//		}
+//	}
+//	return nil, unMarshalErr
+//}

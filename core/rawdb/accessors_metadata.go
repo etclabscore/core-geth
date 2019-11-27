@@ -18,12 +18,11 @@ package rawdb
 
 import (
 	"encoding/json"
-	"errors"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params/types"
+	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/parity"
@@ -62,20 +61,26 @@ func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) common2.ChainCon
 	if len(data) == 0 {
 		return nil
 	}
-	var err = errors.New("Invalid chain config JSON")
-	var unMarshalErr error
-	for _, t := range []common2.ChainConfigurator{
-		&paramtypes.ChainConfig{},
-		&goethereum.ChainConfig{},
-		&parity.ParityChainSpec{},
-	}{
-		unMarshalErr = json.Unmarshal(data, t)
-		if unMarshalErr == nil {
-			return t
-		}
+	var config goethereum.ChainConfig
+	if err := json.Unmarshal(data, &config); err != nil {
+		log.Error("Invalid chain config JSON", "hash", hash, "err", err)
+		//return nil
+	} else {
+		return &config
 	}
-	log.Error(err.Error(), "hash", hash, "err", unMarshalErr)
-	return nil
+	var config2 paramtypes.ChainConfig
+	if err := json.Unmarshal(data, &config2); err != nil {
+		log.Error("Invalid chain config JSON", "hash", hash, "err", err)
+		//return nil
+	} else {
+		return &config2
+	}
+	var config3 parity.ParityChainSpec
+	if err := json.Unmarshal(data, &config3); err != nil {
+		log.Error("Invalid chain config JSON", "hash", hash, "err", err)
+		return nil
+	}
+	return &config3
 }
 
 // WriteChainConfig writes the chain config settings to the database.

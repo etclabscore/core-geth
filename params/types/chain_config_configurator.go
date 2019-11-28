@@ -21,11 +21,12 @@ func bigNewU64(i *big.Int) *uint64 {
 	return newU64(i.Uint64())
 }
 
-func setBig(i *big.Int, u *uint64) {
+func setBig(i *big.Int, u *uint64) *big.Int {
 	if u == nil {
-		return
+		return nil
 	}
 	i = big.NewInt(int64(*u))
+	return i
 }
 
 // upstream is used as a way to share common interface methods
@@ -75,7 +76,7 @@ func (c *MultiGethChainConfig) GetEIP7Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP7Transition(n *uint64) error {
-	setBig(c.EIP7FBlock, n)
+	c.EIP7FBlock = setBig(c.EIP7FBlock, n)
 	return nil
 }
 
@@ -87,7 +88,7 @@ func (c *MultiGethChainConfig) GetEIP150Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP150Transition(n *uint64) error {
-	setBig(c.EIP150Block, n)
+	c.EIP150Block = setBig(c.EIP150Block, n)
 	return nil
 }
 
@@ -96,7 +97,7 @@ func (c *MultiGethChainConfig) GetEIP152Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP152Transition(n *uint64) error {
-	setBig(c.EIP152FBlock, n)
+	c.EIP152FBlock = setBig(c.EIP152FBlock, n)
 	return nil
 }
 
@@ -105,7 +106,7 @@ func (c *MultiGethChainConfig) GetEIP160Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP160Transition(n *uint64) error {
-	setBig(c.EIP160FBlock, n)
+	c.EIP160FBlock = setBig(c.EIP160FBlock, n)
 	return nil
 }
 
@@ -114,7 +115,7 @@ func (c *MultiGethChainConfig) GetEIP161abcTransition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP161abcTransition(n *uint64) error {
-	setBig(c.EIP161FBlock, n)
+	c.EIP161FBlock = setBig(c.EIP161FBlock, n)
 	return nil
 }
 
@@ -123,7 +124,7 @@ func (c *MultiGethChainConfig) GetEIP161dTransition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP161dTransition(n *uint64) error {
-	setBig(c.EIP161FBlock, n)
+	c.EIP161FBlock = setBig(c.EIP161FBlock, n)
 	return nil
 }
 
@@ -132,7 +133,7 @@ func (c *MultiGethChainConfig) GetEIP170Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP170Transition(n *uint64) error {
-	setBig(c.EIP170FBlock, n)
+	c.EIP170FBlock = setBig(c.EIP170FBlock, n)
 	return nil
 }
 
@@ -141,7 +142,7 @@ func (c *MultiGethChainConfig) GetEIP155Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP155Transition(n *uint64) error {
-	setBig(c.EIP155Block, n)
+	c.EIP155Block = setBig(c.EIP155Block, n)
 	return nil
 }
 
@@ -150,7 +151,7 @@ func (c *MultiGethChainConfig) GetEIP140Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP140Transition(n *uint64) error {
-	setBig(c.EIP140FBlock, n)
+	c.EIP140FBlock = setBig(c.EIP140FBlock, n)
 	return nil
 }
 
@@ -159,7 +160,7 @@ func (c *MultiGethChainConfig) GetEIP198Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP198Transition(n *uint64) error {
-	setBig(c.EIP198FBlock, n)
+	c.EIP198FBlock = setBig(c.EIP198FBlock, n)
 	return nil
 }
 
@@ -168,7 +169,7 @@ func (c *MultiGethChainConfig) GetEIP211Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP211Transition(n *uint64) error {
-	setBig(c.EIP211FBlock, n)
+	c.EIP211FBlock = setBig(c.EIP211FBlock, n)
 	return nil
 }
 
@@ -177,7 +178,7 @@ func (c *MultiGethChainConfig) GetEIP212Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP212Transition(n *uint64) error {
-	setBig(c.EIP212FBlock, n)
+	c.EIP212FBlock = setBig(c.EIP212FBlock, n)
 	return nil
 }
 
@@ -186,7 +187,7 @@ func (c *MultiGethChainConfig) GetEIP213Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP213Transition(n *uint64) error {
-	setBig(c.EIP213FBlock, n)
+	c.EIP213FBlock = setBig(c.EIP213FBlock, n)
 	return nil
 }
 
@@ -195,7 +196,7 @@ func (c *MultiGethChainConfig) GetEIP214Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP214Transition(n *uint64) error {
-	setBig(c.EIP214FBlock, n)
+	c.EIP214FBlock = setBig(c.EIP214FBlock, n)
 	return nil
 }
 
@@ -204,7 +205,7 @@ func (c *MultiGethChainConfig) GetEIP658Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP658Transition(n *uint64) error {
-	setBig(c.EIP658FBlock, n)
+	c.EIP658FBlock = setBig(c.EIP658FBlock, n)
 	return nil
 }
 
@@ -213,7 +214,7 @@ func (c *MultiGethChainConfig) GetEIP145Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP145Transition(n *uint64) error {
-	setBig(c.EIP145FBlock, n)
+	c.EIP145FBlock = setBig(c.EIP145FBlock, n)
 	return nil
 }
 
@@ -222,7 +223,7 @@ func (c *MultiGethChainConfig) GetEIP1014Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP1014Transition(n *uint64) error {
-	setBig(c.EIP1014FBlock, n)
+	c.EIP1014FBlock = setBig(c.EIP1014FBlock, n)
 	return nil
 }
 
@@ -231,7 +232,7 @@ func (c *MultiGethChainConfig) GetEIP1052Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP1052Transition(n *uint64) error {
-	setBig(c.EIP1052FBlock, n)
+	c.EIP1052FBlock = setBig(c.EIP1052FBlock, n)
 	return nil
 }
 
@@ -240,7 +241,7 @@ func (c *MultiGethChainConfig) GetEIP1283Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP1283Transition(n *uint64) error {
-	setBig(c.EIP1283FBlock, n)
+	c.EIP1283FBlock = setBig(c.EIP1283FBlock, n)
 	return nil
 }
 
@@ -249,7 +250,7 @@ func (c *MultiGethChainConfig) GetEIP1283DisableTransition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP1283DisableTransition(n *uint64) error {
-	setBig(c.PetersburgBlock, n)
+	c.PetersburgBlock = setBig(c.PetersburgBlock, n)
 	return nil
 }
 
@@ -258,7 +259,7 @@ func (c *MultiGethChainConfig) GetEIP1108Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP1108Transition(n *uint64) error {
-	setBig(c.EIP1108FBlock, n)
+	c.EIP1108FBlock = setBig(c.EIP1108FBlock, n)
 	return nil
 }
 
@@ -267,7 +268,7 @@ func (c *MultiGethChainConfig) GetEIP1283ReenableTransition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP1283ReenableTransition(n *uint64) error {
-	setBig(c.EIP2200FBlock, n)
+	c.EIP2200FBlock = setBig(c.EIP2200FBlock, n)
 	return nil
 }
 
@@ -276,7 +277,7 @@ func (c *MultiGethChainConfig) GetEIP1344Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP1344Transition(n *uint64) error {
-	setBig(c.EIP1344FBlock, n)
+	c.EIP1344FBlock = setBig(c.EIP1344FBlock, n)
 	return nil
 }
 
@@ -285,7 +286,7 @@ func (c *MultiGethChainConfig) GetEIP1884Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP1884Transition(n *uint64) error {
-	setBig(c.EIP1884FBlock, n)
+	c.EIP1884FBlock = setBig(c.EIP1884FBlock, n)
 	return nil
 }
 
@@ -294,7 +295,7 @@ func (c *MultiGethChainConfig) GetEIP2028Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEIP2028Transition(n *uint64) error {
-	setBig(c.EIP2028FBlock, n)
+	c.EIP2028FBlock = setBig(c.EIP2028FBlock, n)
 	return nil
 }
 
@@ -363,8 +364,8 @@ func (c *MultiGethChainConfig) SetEthashHomesteadTransition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.EIP2FBlock, n)
-	setBig(c.EIP7FBlock, n)
+	c.EIP2FBlock = setBig(c.EIP2FBlock, n)
+	c.EIP7FBlock = setBig(c.EIP7FBlock, n)
 	return nil
 }
 
@@ -376,7 +377,7 @@ func (c *MultiGethChainConfig) SetEthashEIP2Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.EIP2FBlock, n)
+	c.EIP2FBlock = setBig(c.EIP2FBlock, n)
 	return nil
 }
 
@@ -388,7 +389,7 @@ func (c *MultiGethChainConfig) SetEthashEIP779Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.DAOForkBlock, n)
+	c.DAOForkBlock = setBig(c.DAOForkBlock, n)
 	return nil
 }
 
@@ -399,7 +400,7 @@ func (c *MultiGethChainConfig) GetEthashEIP649TransitionV() *uint64 {
 
 	var diffN *uint64
 	defer func() {
-		setBig(c.EIP649FBlock, diffN)
+		c.EIP649FBlock = setBig(c.EIP649FBlock, diffN)
 		c.eip649FInferred = true
 	}()
 
@@ -416,7 +417,7 @@ func (c *MultiGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.EIP649FBlock, n)
+	c.EIP649FBlock = setBig(c.EIP649FBlock, n)
 	c.eip649FInferred = true
 	if n == nil {
 		return nil
@@ -439,7 +440,7 @@ func (c *MultiGethChainConfig) GetEthashEIP1234TransitionV() *uint64 {
 
 	var diffN *uint64
 	defer func() {
-		setBig(c.EIP1234FBlock, diffN)
+		c.EIP1234FBlock = setBig(c.EIP1234FBlock, diffN)
 		c.eip1234FInferred = true
 	}()
 
@@ -456,7 +457,7 @@ func (c *MultiGethChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.EIP1234FBlock, n)
+	c.EIP1234FBlock = setBig(c.EIP1234FBlock, n)
 	c.eip1234FInferred = true
 	if n == nil {
 		return nil
@@ -486,7 +487,7 @@ func (c *MultiGethChainConfig) SetEthashECIP1010PauseTransition(n *uint64) error
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.ECIP1010PauseBlock, n)
+	c.ECIP1010PauseBlock = setBig(c.ECIP1010PauseBlock, n)
 	return nil
 }
 
@@ -524,7 +525,7 @@ func (c *MultiGethChainConfig) SetEthashECIP1017Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.ECIP1017FBlock, n)
+	c.ECIP1017FBlock = setBig(c.ECIP1017FBlock, n)
 	return nil
 }
 
@@ -536,7 +537,7 @@ func (c *MultiGethChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.ECIP1017EraRounds, n)
+	c.ECIP1017EraRounds = setBig(c.ECIP1017EraRounds, n)
 	return nil
 }
 
@@ -548,7 +549,7 @@ func (c *MultiGethChainConfig) SetEthashEIP100BTransition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.EIP100FBlock, n)
+	c.EIP100FBlock = setBig(c.EIP100FBlock, n)
 	return nil
 }
 
@@ -560,7 +561,7 @@ func (c *MultiGethChainConfig) SetEthashECIP1041Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.DisposalBlock, n)
+	c.DisposalBlock = setBig(c.DisposalBlock, n)
 	return nil
 }
 

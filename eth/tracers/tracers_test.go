@@ -39,6 +39,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/tests"
+	"github.com/go-test/deep"
 )
 
 // To generate a new callTracer test, copy paste the makeTest method below into
@@ -271,7 +272,12 @@ func TestCallTracer(t *testing.T) {
 			}
 
 			if !reflect.DeepEqual(ret, test.Result) {
-				t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
+				diffs := deep.Equal(ret, test.Result)
+				t.Log(len(diffs), "diffs")
+				for _, d := range diffs {
+					t.Log(d)
+				}
+				t.Fatalf("trace mismatch: \nhave %+v\nwant %+v\nconfig: %v", ret, test.Result, test.Genesis.Config)
 			}
 		})
 	}

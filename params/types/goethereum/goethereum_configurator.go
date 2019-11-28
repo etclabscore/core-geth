@@ -27,11 +27,12 @@ func bigNewU64(i *big.Int) *uint64 {
 	return newU64(i.Uint64())
 }
 
-func setBig(i *big.Int, u *uint64) {
+func setBig(i *big.Int, u *uint64) *big.Int {
 	if u == nil {
-		return
+		return nil
 	}
 	i = big.NewInt(int64(*u))
+	return i
 }
 
 func (c *ChainConfig) GetAccountStartNonce() *uint64 {
@@ -113,7 +114,7 @@ func (c *ChainConfig) GetEIP7Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP7Transition(n *uint64) error {
-	setBig(c.HomesteadBlock, n)
+	c.HomesteadBlock = setBig(c.HomesteadBlock, n)
 	return nil
 }
 
@@ -130,7 +131,7 @@ func (c *ChainConfig) GetEIP150Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP150Transition(n *uint64) error {
-	setBig(c.EIP150Block, n)
+	c.EIP150Block = setBig(c.EIP150Block, n)
 	return nil
 }
 
@@ -139,7 +140,7 @@ func (c *ChainConfig) GetEIP152Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP152Transition(n *uint64) error {
-	setBig(c.IstanbulBlock, n)
+	c.IstanbulBlock = setBig(c.IstanbulBlock, n)
 	return nil
 }
 
@@ -148,7 +149,7 @@ func (c *ChainConfig) GetEIP160Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP160Transition(n *uint64) error {
-	setBig(c.EIP158Block, n)
+	c.EIP158Block = setBig(c.EIP158Block, n)
 	return nil
 }
 
@@ -157,7 +158,7 @@ func (c *ChainConfig) GetEIP161abcTransition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP161abcTransition(n *uint64) error {
-	setBig(c.EIP158Block, n)
+	c.EIP158Block = setBig(c.EIP158Block, n)
 	return nil
 }
 
@@ -166,7 +167,7 @@ func (c *ChainConfig) GetEIP161dTransition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP161dTransition(n *uint64) error {
-	setBig(c.EIP158Block, n)
+	c.EIP158Block = setBig(c.EIP158Block, n)
 	return nil
 }
 
@@ -175,7 +176,7 @@ func (c *ChainConfig) GetEIP170Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP170Transition(n *uint64) error {
-	setBig(c.EIP158Block, n)
+	c.EIP158Block = setBig(c.EIP158Block, n)
 	return nil
 }
 
@@ -184,7 +185,7 @@ func (c *ChainConfig) GetEIP155Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP155Transition(n *uint64) error {
-	setBig(c.EIP155Block, n)
+	c.EIP155Block = setBig(c.EIP155Block, n)
 	return nil
 }
 
@@ -193,7 +194,7 @@ func (c *ChainConfig) GetEIP140Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP140Transition(n *uint64) error {
-	setBig(c.ByzantiumBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
@@ -202,7 +203,7 @@ func (c *ChainConfig) GetEIP198Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP198Transition(n *uint64) error {
-	setBig(c.ByzantiumBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
@@ -211,7 +212,7 @@ func (c *ChainConfig) GetEIP211Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP211Transition(n *uint64) error {
-	setBig(c.ByzantiumBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
@@ -220,7 +221,7 @@ func (c *ChainConfig) GetEIP212Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP212Transition(n *uint64) error {
-	setBig(c.ByzantiumBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
@@ -229,7 +230,7 @@ func (c *ChainConfig) GetEIP213Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP213Transition(n *uint64) error {
-	setBig(c.ByzantiumBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
@@ -238,7 +239,7 @@ func (c *ChainConfig) GetEIP214Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP214Transition(n *uint64) error {
-	setBig(c.ByzantiumBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
@@ -247,7 +248,7 @@ func (c *ChainConfig) GetEIP658Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP658Transition(n *uint64) error {
-	setBig(c.ByzantiumBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
@@ -256,7 +257,7 @@ func (c *ChainConfig) GetEIP145Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP145Transition(n *uint64) error {
-	setBig(c.ConstantinopleBlock, n)
+	c.ConstantinopleBlock = setBig(c.ConstantinopleBlock, n)
 	return nil
 }
 
@@ -265,7 +266,7 @@ func (c *ChainConfig) GetEIP1014Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP1014Transition(n *uint64) error {
-	setBig(c.ConstantinopleBlock, n)
+	c.ConstantinopleBlock = setBig(c.ConstantinopleBlock, n)
 	return nil
 }
 
@@ -274,7 +275,7 @@ func (c *ChainConfig) GetEIP1052Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP1052Transition(n *uint64) error {
-	setBig(c.ConstantinopleBlock, n)
+	c.ConstantinopleBlock = setBig(c.ConstantinopleBlock, n)
 	return nil
 }
 
@@ -283,7 +284,7 @@ func (c *ChainConfig) GetEIP1283Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP1283Transition(n *uint64) error {
-	setBig(c.ConstantinopleBlock, n)
+	c.ConstantinopleBlock = setBig(c.ConstantinopleBlock, n)
 	return nil
 }
 
@@ -292,7 +293,7 @@ func (c *ChainConfig) GetEIP1283DisableTransition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP1283DisableTransition(n *uint64) error {
-	setBig(c.PetersburgBlock, n)
+	c.PetersburgBlock = setBig(c.PetersburgBlock, n)
 	return nil
 }
 
@@ -301,7 +302,7 @@ func (c *ChainConfig) GetEIP1108Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP1108Transition(n *uint64) error {
-	setBig(c.IstanbulBlock, n)
+	c.IstanbulBlock = setBig(c.IstanbulBlock, n)
 	return nil
 }
 
@@ -310,7 +311,7 @@ func (c *ChainConfig) GetEIP1283ReenableTransition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP1283ReenableTransition(n *uint64) error {
-	setBig(c.IstanbulBlock, n)
+	c.IstanbulBlock = setBig(c.IstanbulBlock, n)
 	return nil
 }
 
@@ -319,7 +320,7 @@ func (c *ChainConfig) GetEIP1344Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP1344Transition(n *uint64) error {
-	setBig(c.IstanbulBlock, n)
+	c.IstanbulBlock = setBig(c.IstanbulBlock, n)
 	return nil
 }
 
@@ -328,7 +329,7 @@ func (c *ChainConfig) GetEIP1884Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP1884Transition(n *uint64) error {
-	setBig(c.IstanbulBlock, n)
+	c.IstanbulBlock = setBig(c.IstanbulBlock, n)
 	return nil
 }
 
@@ -337,7 +338,7 @@ func (c *ChainConfig) GetEIP2028Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP2028Transition(n *uint64) error {
-	setBig(c.IstanbulBlock, n)
+	c.IstanbulBlock = setBig(c.IstanbulBlock, n)
 	return nil
 }
 
@@ -424,7 +425,7 @@ func (c *ChainConfig) SetEthashHomesteadTransition(i *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.HomesteadBlock, i)
+	c.HomesteadBlock = setBig(c.HomesteadBlock, i)
 	return nil
 }
 
@@ -436,7 +437,7 @@ func (c *ChainConfig) SetEthashEIP2Transition(i *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.HomesteadBlock, i)
+	c.HomesteadBlock = setBig(c.HomesteadBlock, i)
 	return nil
 }
 
@@ -448,7 +449,10 @@ func (c *ChainConfig) SetEthashEIP779Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.DAOForkBlock, n)
+	c.DAOForkBlock = setBig(c.DAOForkBlock, n)
+	if c.DAOForkBlock == nil {
+		c.DAOForkSupport = false // FIXME
+	}
 	return nil
 }
 
@@ -460,7 +464,7 @@ func (c *ChainConfig) SetEthashEIP649Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.ByzantiumBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
@@ -472,7 +476,7 @@ func (c *ChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.ConstantinopleBlock, n)
+	c.ConstantinopleBlock = setBig(c.ConstantinopleBlock, n)
 	return nil
 }
 
@@ -528,7 +532,7 @@ func (c *ChainConfig) SetEthashEIP100BTransition(i *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
-	setBig(c.ByzantiumBlock, i)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, i)
 	return nil
 }
 

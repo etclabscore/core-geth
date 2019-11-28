@@ -145,6 +145,30 @@ func compatible(head *uint64, a, b ChainConfigurator) *ConfigCompatError {
 			return err
 		}
 	}
+	if head == nil {
+		return nil
+	}
+	if a.IsForked(a.GetEIP155Transition, new(big.Int).SetUint64(*head)) {
+		if a.GetChainID().Cmp(b.GetChainID()) != 0 {
+			return NewCompatError("mismatching chain ids after EIP155 transition", a.GetEIP155Transition(), b.GetEIP155Transition())
+		}
+	}
+
+	adao, bdao := a.GetEthashEIP779Transition(), b.GetEthashEIP779Transition()
+	if adao == nil && bdao == nil {
+		return nil
+	}
+
+	headB := new(big.Int).SetUint64(*head)
+	if !a.IsForked(a.GetEthashEIP779Transition, headB) && !b.IsForked(b.GetEthashEIP779Transition, headB) {
+		return nil
+	}
+
+	if *adao != *bdao {
+				return NewCompatError("mismatching DAO fork", adao, bdao)
+
+	}
+
 	return nil
 }
 

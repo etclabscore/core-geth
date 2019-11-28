@@ -18,10 +18,10 @@ package params
 
 import (
 	"math/big"
-	"reflect"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/params/convert"
 	"github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
@@ -80,17 +80,6 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored: &paramtypes.MultiGethChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(31)},
-			new:    &paramtypes.MultiGethChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(31)},
-			head:   25,
-			wantErr: &common2.ConfigCompatError{
-				What:         "EIP100F/EIP649F not equal",
-				StoredConfig: uint64P(30),
-				NewConfig:    uint64P(31),
-				RewindTo:     29,
-			},
-		},
-		{
 			stored: &paramtypes.MultiGethChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
 			new:    &paramtypes.MultiGethChainConfig{EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
 			head:   25,
@@ -108,17 +97,6 @@ func TestCheckCompatible(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			stored: &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
-			new:    &paramtypes.MultiGethChainConfig{EIP100FBlock: big.NewInt(26)}, // err: EIP649 must also be set
-			head:   25,
-			wantErr: &common2.ConfigCompatError{
-				What:         "EIP100F/EIP649F not equal",
-				StoredConfig: uint64P(26), // this yields a weird-looking error (correctly, though), b/c ConfigCompatError not set up for these kinds of strange cases
-				NewConfig:    nil,
-				RewindTo:     25,
-			},
-		},
-		{
 			stored:  &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
 			new:     &paramtypes.MultiGethChainConfig{EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
 			head:    25,
@@ -128,7 +106,23 @@ func TestCheckCompatible(t *testing.T) {
 			stored: MainnetChainConfig,
 			new: func() common2.ChainConfigurator {
 				c := &goethereum.ChainConfig{}
-				*c = *MainnetChainConfig
+				convert.Convert(MainnetChainConfig, c)
+				c.SetEthashEIP779Transition(uint64P(1900000))
+				return c
+			}(),
+			head: MainnetChainConfig.DAOForkBlock.Uint64(),
+			wantErr: &common2.ConfigCompatError{
+				What:         "DAO fork support flag",
+				StoredConfig: uint64P(MainnetChainConfig.DAOForkBlock.Uint64()),
+				NewConfig:    uint64P(1900000),
+				RewindTo:     1900000-1,
+			},
+		},
+		{
+			stored: MainnetChainConfig,
+			new: func() common2.ChainConfigurator {
+				c := &goethereum.ChainConfig{}
+				convert.Convert(MainnetChainConfig, c)
 				c.SetEthashEIP779Transition(nil)
 				return c
 			}(),
@@ -136,8 +130,8 @@ func TestCheckCompatible(t *testing.T) {
 			wantErr: &common2.ConfigCompatError{
 				What:         "DAO fork support flag",
 				StoredConfig: uint64P(MainnetChainConfig.DAOForkBlock.Uint64()),
-				NewConfig:    uint64P(MainnetChainConfig.DAOForkBlock.Uint64()),
-				RewindTo:     new(big.Int).Sub(MainnetChainConfig.DAOForkBlock, common.Big1).Uint64(),
+				NewConfig:    nil,
+				RewindTo:     1920000-1,
 			},
 		},
 		{
@@ -160,7 +154,10 @@ func TestCheckCompatible(t *testing.T) {
 
 	for _, test := range tests {
 		err := common2.Compatible(&test.head, test.stored, test.new)
-		if !reflect.DeepEqual(err, test.wantErr) {
+		if (err == nil && test.wantErr != nil) || (err != nil && test.wantErr == nil) {
+			t.Errorf("nil/nonnil, error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", test.stored, test.new, test.head, err, test.wantErr)
+		} else if err != nil && (err.RewindTo != test.wantErr.RewindTo) {
+		//if !reflect.DeepEqual(err, test.wantErr) {
 			t.Errorf("error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", test.stored, test.new, test.head, err, test.wantErr)
 		}
 	}

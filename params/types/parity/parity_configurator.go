@@ -658,9 +658,6 @@ func (spec *ParityChainSpec) GetEthashDifficultyBombDelaySchedule() common2.Uint
 }
 
 func (spec *ParityChainSpec) SetEthashDifficultyBombDelaySchedule(input common2.Uint64BigMapEncodesHex) error {
-	if reflect.DeepEqual(spec.Engine.Ethash, reflect.Zero(reflect.TypeOf(spec.Engine.Ethash)).Interface()) {
-		return common2.ErrUnsupportedConfigFatal
-	}
 	spec.Engine.Ethash.Params.DifficultyBombDelays = input
 	return nil
 }
@@ -673,9 +670,6 @@ func (spec *ParityChainSpec) GetEthashBlockRewardSchedule() common2.Uint64BigMap
 }
 
 func (spec *ParityChainSpec) SetEthashBlockRewardSchedule(input common2.Uint64BigMapEncodesHex) error {
-	if reflect.DeepEqual(spec.Engine.Ethash, reflect.Zero(reflect.TypeOf(spec.Engine.Ethash)).Interface()) {
-		return common2.ErrUnsupportedConfigFatal
-	}
 	spec.Engine.Ethash.Params.BlockReward = common2.Uint64BigValOrMapHex(input)
 	return nil
 }

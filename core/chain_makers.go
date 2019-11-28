@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/convert"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -198,15 +199,15 @@ func GenerateChain(config common2.ChainConfigurator, parent *types.Block, engine
 		b.header = makeHeader(chainreader, parent, statedb, b.engine)
 
 		// Mutate the state and block according to any hard-fork specs
-
-		daoBlock := config.GetEthashEIP779Transition()
-		if daoBlock != nil {
+		if daoBlock := config.GetEthashEIP779Transition(); daoBlock != nil {
 			limit := new(big.Int).Add(new(big.Int).SetUint64(*daoBlock), vars.DAOForkExtraRange)
 			if b.header.Number.Uint64() >= *daoBlock && b.header.Number.Cmp(limit) < 0 {
-				b.header.Extra = common.CopyBytes(vars.DAOForkBlockExtra)
+				if convert.AsGenericCC(config).DAOSupport() {
+					b.header.Extra = common.CopyBytes(vars.DAOForkBlockExtra)
+				}
 			}
 		}
-		if daoBlock != nil && *daoBlock == b.header.Number.Uint64() {
+		if convert.AsGenericCC(config).DAOSupport() && config.GetEthashEIP779Transition() != nil && *config.GetEthashEIP779Transition() == b.header.Number.Uint64() {
 			misc.ApplyDAOHardFork(statedb)
 		}
 		// Execute any user modifications to the block

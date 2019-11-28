@@ -261,7 +261,7 @@ var (
 	TestChainConfig = &goethereum.ChainConfig{
 		ChainID:                 big.NewInt(1),
 		HomesteadBlock:          big.NewInt(0),
-		DAOForkBlock:            big.NewInt(0),
+		DAOForkBlock:            nil,
 		DAOForkSupport:          false,
 		EIP150Block:             big.NewInt(0),
 		EIP150Hash:              common.Hash{},

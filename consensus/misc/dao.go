@@ -49,7 +49,9 @@ var (
 func VerifyDAOHeaderExtraData(config common.ChainConfigurator, header *types.Header) error {
 	// Short circuit validation if the node doesn't care about the DAO fork
 	daoForkBlock := config.GetEthashEIP779Transition()
-	if daoForkBlock == nil && !convert.AsGenericCC(config).DAOSupport(){
+	// Second clause catches test configs with nil fork blocks (maybe set dynamically or
+	// testing agnostic of chain config).
+	if daoForkBlock == nil && !convert.AsGenericCC(config).DAOSupport() {
 		return nil
 	}
 

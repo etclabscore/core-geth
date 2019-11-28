@@ -135,7 +135,7 @@ func TestDifficultyGen(t *testing.T) {
 			specref, done := wroteNewChainConfigs[associateForkName]
 			if !done {
 				genesis := params.DefaultTestnetGenesisBlock()
-				genesis.Config = &conf
+				genesis.Config = conf
 
 				pspec, err := convert.NewParityChainSpec(associateForkName, genesis, []string{})
 				if err != nil {
@@ -170,7 +170,7 @@ func TestDifficultyGen(t *testing.T) {
 				UncleHash:          test.UncleHash,
 				CurrentTimestamp:   test.CurrentTimestamp,
 				CurrentBlockNumber: test.CurrentBlockNumber,
-				CurrentDifficulty: ethash.CalcDifficulty(&conf, test.CurrentTimestamp, &types.Header{
+				CurrentDifficulty: ethash.CalcDifficulty(conf, test.CurrentTimestamp, &types.Header{
 					Difficulty: test.ParentDifficulty,
 					Time:       test.ParentTimestamp,
 					Number:     big.NewInt(int64(test.CurrentBlockNumber - 1)),
@@ -181,7 +181,7 @@ func TestDifficultyGen(t *testing.T) {
 			}
 
 			// "Dogfood".
-			if err := newTest.Run(&conf); err != nil {
+			if err := newTest.Run(conf); err != nil {
 				t.Fatal(err)
 			}
 			mustAppendTestToFile(t, newTest, outNDJSONFile)

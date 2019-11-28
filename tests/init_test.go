@@ -33,6 +33,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/common"
 )
 
 // Command line flags to configure the interpreters.
@@ -111,7 +112,7 @@ type testMatcher struct {
 
 type testConfig struct {
 	p      *regexp.Regexp
-	config paramtypes.MultiGethChainConfig
+	config common.ChainConfigurator
 }
 
 type testFailure struct {
@@ -142,7 +143,7 @@ func (tm *testMatcher) whitelist(pattern string) {
 }
 
 // config defines chain config for tests matching the pattern.
-func (tm *testMatcher) config(pattern string, cfg paramtypes.MultiGethChainConfig) {
+func (tm *testMatcher) config(pattern string, cfg common.ChainConfigurator) {
 	tm.configpat = append(tm.configpat, testConfig{regexp.MustCompile(pattern), cfg})
 }
 
@@ -168,11 +169,11 @@ func (tm *testMatcher) findSkip(name string) (reason string, skipload bool) {
 }
 
 // findConfig returns the chain config matching defined patterns.
-func (tm *testMatcher) findConfig(name string) (*paramtypes.MultiGethChainConfig, string) {
+func (tm *testMatcher) findConfig(name string) (common.ChainConfigurator, string) {
 	// TODO(fjl): name can be derived from testing.T when min Go version is 1.8
 	for _, m := range tm.configpat {
 		if m.p.MatchString(name) {
-			return &m.config, m.p.String()
+			return m.config, m.p.String()
 		}
 	}
 	log.Println("using empty config", name)

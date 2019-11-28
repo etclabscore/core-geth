@@ -23,7 +23,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -44,7 +44,7 @@ type ttFork struct {
 	Hash   common.UnprefixedHash    `json:"hash"`
 }
 
-func (tt *TransactionTest) Run(config *paramtypes.MultiGethChainConfig) error {
+func (tt *TransactionTest) Run(config common2.ChainConfigurator) error {
 
 	validateTx := func(rlpData hexutil.Bytes, signer types.Signer, isEIP2F bool, isEIP2028F bool) (*common.Address, *common.Hash, error) {
 		tx := new(types.Transaction)
@@ -77,11 +77,11 @@ func (tt *TransactionTest) Run(config *paramtypes.MultiGethChainConfig) error {
 		{"Frontier", types.FrontierSigner{}, tt.Frontier, false, false},
 		{"Homestead", types.HomesteadSigner{}, tt.Homestead, true, false},
 		{"EIP150", types.HomesteadSigner{}, tt.EIP150, true, false},
-		{"EIP158", types.NewEIP155Signer(config.ChainID), tt.EIP158, true, false},
-		{"Byzantium", types.NewEIP155Signer(config.ChainID), tt.Byzantium, true, false},
-		{"Constantinople", types.NewEIP155Signer(config.ChainID), tt.Constantinople, true, false},
+		{"EIP158", types.NewEIP155Signer(config.GetChainID()), tt.EIP158, true, false},
+		{"Byzantium", types.NewEIP155Signer(config.GetChainID()), tt.Byzantium, true, false},
+		{"Constantinople", types.NewEIP155Signer(config.GetChainID()), tt.Constantinople, true, false},
 		//TODO! @holiman or @rjl493456442 : enable this after tests have been updated for Istanbul
-		{"Istanbul", types.NewEIP155Signer(config.ChainID), tt.Istanbul, true, true},
+		{"Istanbul", types.NewEIP155Signer(config.GetChainID()), tt.Istanbul, true, true},
 	} {
 		sender, txhash, err := validateTx(tt.RLP, testcase.signer, testcase.isHomestead, testcase.isIstanbul)
 

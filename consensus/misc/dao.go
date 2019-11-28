@@ -23,6 +23,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/params/convert"
 	"github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -48,9 +49,10 @@ var (
 func VerifyDAOHeaderExtraData(config common.ChainConfigurator, header *types.Header) error {
 	// Short circuit validation if the node doesn't care about the DAO fork
 	daoForkBlock := config.GetEthashEIP779Transition()
-	if daoForkBlock  == nil {
+	if daoForkBlock == nil && !convert.AsGenericCC(config).DAOSupport(){
 		return nil
 	}
+
 	daoForkBlockB := new(big.Int).SetUint64(*daoForkBlock)
 
 	// Make sure the block is within the fork's modified extra-data range
@@ -59,7 +61,7 @@ func VerifyDAOHeaderExtraData(config common.ChainConfigurator, header *types.Hea
 		return nil
 	}
 	// Depending on whether we support or oppose the fork, validate the extra-data contents
-	if config.GetEthashEIP779Transition() != nil {
+	if convert.AsGenericCC(config).DAOSupport() {
 		if !bytes.Equal(header.Extra, vars.DAOForkBlockExtra) {
 			return ErrBadProDAOExtra
 		}

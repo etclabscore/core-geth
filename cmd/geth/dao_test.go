@@ -25,6 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/convert"
 )
 
 // Genesis block for nodes which don't care about the DAO fork (i.e. not configured)
@@ -53,6 +54,8 @@ var daoNoForkGenesis = `{
 	"parentHash" : "0x0000000000000000000000000000000000000000000000000000000000000000",
 	"timestamp"  : "0x00",
 	"config"     : {
+		"daoForkBlock"   : 314,
+		"daoForkSupport" : false
 	}
 }`
 
@@ -89,7 +92,7 @@ func TestDAOForkBlockNewChain(t *testing.T) {
 		// test DAO Init Old Privnet
 		//{daoOldGenesis, nil, false},
 		// test DAO Default No Fork Privnet
-		{daoNoForkGenesis, nil, false},
+		{daoNoForkGenesis, &daoGenesisForkBlock, false},
 		// test DAO Default Pro Fork Privnet
 		{daoProForkGenesis, &daoGenesisForkBlock, true},
 	} {
@@ -137,11 +140,12 @@ func testDAOForkBlockNewChain(t *testing.T, test int, genesis string, expectBloc
 		if expectBlock != nil {
 			t.Errorf("test %d: dao hard-fork block mismatch: have nil, want %v", test, expectBlock)
 		}
-	} else if expectBlock != nil && *config.GetEthashEIP779Transition() != *expectBlock {
+	} else if expectBlock == nil {
+		t.Errorf("test %d: dao hard-fork block mismatch: have %v, want %v", test, config.GetEthashEIP779Transition(), expectBlock)
+	} else if *config.GetEthashEIP779Transition() != *expectBlock {
 		t.Errorf("test %d: dao hard-fork block mismatch: have %v, want %v", test, config.GetEthashEIP779Transition(), expectBlock)
 	}
-	configDAOForkSupport := config.GetEthashEIP779Transition() != nil
-	if configDAOForkSupport != expectVote {
-		t.Errorf("test %d: dao hard-fork support mismatch: have %v, want %v", test, configDAOForkSupport, expectVote)
+	if convert.AsGenericCC(config).DAOSupport() != expectVote {
+		t.Errorf("test %d: dao hard-fork support mismatch: have %v, want %v", test, convert.AsGenericCC(config).DAOSupport(), expectVote)
 	}
 }

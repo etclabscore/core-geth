@@ -146,15 +146,15 @@ type MultiGethChainConfig struct {
 	// EIP-152: Add Blake2 compression function F precompile
 	EIP152FBlock *big.Int `json:"eip152FBlock,omitempty"`
 	// EIP-1108: Reduce alt_bn128 precompile gas costs
-	EIP1108FBlock *big.Int `json="eip1108FBlock,omitempty"`
+	EIP1108FBlock *big.Int `json:"eip1108FBlock,omitempty"`
 	// EIP-1344: Add ChainID opcode
-	EIP1344FBlock *big.Int `json="eip1344FBlock,omitempty"`
+	EIP1344FBlock *big.Int `json:"eip1344FBlock,omitempty"`
 	// EIP-1884: Repricing for trie-size-dependent opcodes
-	EIP1884FBlock *big.Int `json="eip1884FBlock,omitempty"`
+	EIP1884FBlock *big.Int `json:"eip1884FBlock,omitempty"`
 	// EIP-2028: Calldata gas cost reduction
-	EIP2028FBlock *big.Int `json="eip2028FBlock,omitempty"`
+	EIP2028FBlock *big.Int `json:"eip2028FBlock,omitempty"`
 	// EIP-2200: Rebalance net-metered SSTORE gas cost with consideration of SLOAD gas cost change
-	EIP2200FBlock *big.Int `json="eip2200FBlock,omitempty"`
+	EIP2200FBlock *big.Int `json:"eip2200FBlock,omitempty"`
 
 	//EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
@@ -165,11 +165,7 @@ type MultiGethChainConfig struct {
 	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`     // Bomb disposal HF block
 	SocialBlock        *big.Int `json:"socialBlock,omitempty"`       // Ethereum Social Reward block
 	EthersocialBlock   *big.Int `json:"ethersocialBlock,omitempty"`  // Ethersocial Reward block
-
-	MCIP0Block *big.Int `json:"mcip0Block,omitempty"` // Musicoin default block; no MCIP, just denotes chain pref
-	MCIP3Block *big.Int `json:"mcip3Block,omitempty"` // Musicoin 'UBI Fork' block
-	MCIP8Block *big.Int `json:"mcip8Block,omitempty"` // Musicoin 'QT For' block
-
+	
 	// Various consensus engines
 	Ethash *goethereum.EthashConfig `json:"ethash,omitempty"`
 	Clique *goethereum.CliqueConfig `json:"clique,omitempty"`

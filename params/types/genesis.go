@@ -33,7 +33,8 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
-//go:generate gencodec -type Genesis -field-override genesisSpecMarshaling -out gen_genesis.go
+// MultiGeth: Manually override this file generation; it requires manual editing.
+//// go:generate gencodec -type Genesis -field-override genesisSpecMarshaling -out gen_genesis.go
 //go:generate gencodec -type GenesisAccount -field-override genesisAccountMarshaling -out gen_genesis_account.go
 
 var ErrGenesisNoConfig = errors.New("genesis has no chain configuration")

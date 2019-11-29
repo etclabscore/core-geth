@@ -87,13 +87,26 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 		ParentHash *common.Hash                                `json:"parentHash"`
 	}
 	var dec Genesis
-	dec.Config = &goethereum.ChainConfig{}
-	if err := json.Unmarshal(input, &dec); err != nil {
+
+	// Use a stand-in MultiGeth chain configuration struct.
+	// MultiGeth has an ever-preset 'networkID' field, where
+	// go-ethereum doesn't. This should be enough to differentiate them.
+	type MGC struct {
+		NetworkID uint64   `json:"networkId"`
+	}
+	var mgc MGC
+	if err := json.Unmarshal(input, &mgc); err != nil {
 		dec.Config = &MultiGethChainConfig{}
 		if err := json.Unmarshal(input, &dec); err != nil {
 			return err
 		}
+	} else {
+		dec.Config = &goethereum.ChainConfig{}
+		if err := json.Unmarshal(input, &dec); err != nil {
+			return err
+		}
 	}
+
 	if dec.Config != nil {
 		g.Config = dec.Config
 	}

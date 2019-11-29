@@ -280,9 +280,6 @@ var (
 )
 
 func EthashBlockReward(c common2.ChainConfigurator, n *big.Int) *big.Int {
-	// if c.Ethash == nil {
-	// 	panic("non ethash config called EthashBlockReward")
-	// }
 	// Select the correct block reward based on chain progression
 	blockReward := vars.FrontierBlockReward
 	if c == nil || n == nil {

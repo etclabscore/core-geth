@@ -103,11 +103,16 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesi
 		log.Warn("Found genesis block without chain config")
 		rawdb.WriteChainConfig(db, stored, newcfg)
 		return newcfg, stored, nil
+	} else {
+		log.Info("Found stored genesis block", "config", storedcfg)
 	}
 	// Special case: don't change the existing config of a non-mainnet chain if no new
 	// config is supplied. These chains would get AllProtocolChanges (and a compat error)
 	// if we just continued here.
-	if genesis == nil && stored != params.MainnetGenesisHash {
+	if genesis == nil &&
+		stored != params.MainnetGenesisHash &&
+		*genesis.Config.GetNetworkID() == *params.DefaultGenesisBlock().Config.GetNetworkID() &&
+		genesis.Config.GetChainID().Cmp(params.DefaultGenesisBlock().Config.GetChainID()) == 0 {
 		return storedcfg, stored, nil
 	}
 

@@ -19,6 +19,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -216,16 +217,19 @@ func initGenesis(ctx *cli.Context) error {
 	if len(genesisPath) == 0 {
 		utils.Fatalf("Must supply path to genesis JSON file")
 	}
-	file, err := os.Open(genesisPath)
+
+	genesis := new(paramtypes.Genesis)
+	bs, err := ioutil.ReadFile(genesisPath)
 	if err != nil {
 		utils.Fatalf("Failed to read genesis file: %v", err)
 	}
-	defer file.Close()
 
-	genesis := new(paramtypes.Genesis)
-	if err := json.NewDecoder(file).Decode(genesis); err != nil {
+	err = genesis.UnmarshalJSON(bs)
+	if err != nil {
 		utils.Fatalf("invalid genesis file: %v", err)
 	}
+
+	log.Info("Initialising genesis", "config", genesis.Config)
 	// Open an initialise both full and light databases
 	stack := makeFullNode(ctx)
 	defer stack.Close()

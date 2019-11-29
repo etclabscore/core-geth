@@ -23,8 +23,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
-type ConfiguratorSetter func(*uint64) error
-
 var (
 	// Genesis hashes to enforce below configs on.
 	KottiGenesisHash = common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4")

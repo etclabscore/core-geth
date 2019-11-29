@@ -17,6 +17,9 @@
 package misc
 
 import (
+	"fmt"
+
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 )
@@ -29,13 +32,9 @@ func VerifyForkHashes(config common2.ChainConfigurator, header *types.Header, un
 	if uncle {
 		return nil
 	}
-	// If the homestead reprice hash is set, validate it
-	if config.GetEIP150Transition() != nil && *config.GetEIP150Transition() == header.Number.Uint64() {
-		// TODO(meows)
-		//if config.EIP150Hash != (common.Hash{}) && config.EIP150Hash != header.Hash() {
-		//	return fmt.Errorf("homestead gas reprice fork: have 0x%x, want 0x%x", header.Hash(), config.EIP150Hash)
-		//}
+	if wantHash := config.ForkCanonHash(header.Number.Uint64()); wantHash == (common.Hash{}) || wantHash == header.Hash() {
+		return nil
+	} else {
+		return fmt.Errorf("verify canonical block hash failed, block number %d: have 0x%x, want 0x%x", header.Number.Uint64(), header.Hash(), wantHash)
 	}
-	// All ok, return
-	return nil
 }

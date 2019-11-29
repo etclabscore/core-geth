@@ -34,7 +34,6 @@ var (
 		EIP2FBlock:          big.NewInt(0),
 		EIP7FBlock:          big.NewInt(0),
 		EIP150Block:         big.NewInt(0),
-		EIP150Hash:          common.HexToHash("0xba8314d5c2ebddaf58eb882b364b27cbfa4d3402dacd32b60986754ac25cfe8d"),
 		EIP155Block:         big.NewInt(0),
 		Ethash:              new(goethereum.EthashConfig),
 		NetworkID:         28,
@@ -46,6 +45,9 @@ var (
 		EIP160FBlock:      big.NewInt(0),
 		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
 			0: new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)),
+		},
+		RequireBlockHashes: map[uint64]common.Hash{
+			0: common.HexToHash("0xba8314d5c2ebddaf58eb882b364b27cbfa4d3402dacd32b60986754ac25cfe8d"),
 		},
 	}
 )

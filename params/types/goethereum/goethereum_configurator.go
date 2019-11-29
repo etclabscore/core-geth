@@ -3,6 +3,7 @@ package goethereum
 import (
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -348,6 +349,13 @@ func (c *ChainConfig) IsForked(fn func() *uint64, n *big.Int) bool {
 		return false
 	}
 	return big.NewInt(int64(*f)).Cmp(n) <= 0
+}
+
+func (c *ChainConfig) ForkCanonHash(n uint64) common.Hash {
+	if c.EIP150Block != nil && c.EIP150Block.Uint64() == n {
+		return c.EIP150Hash
+	}
+	return common.Hash{}
 }
 
 func (c *ChainConfig) GetConsensusEngineType() common2.ConsensusEngineT {

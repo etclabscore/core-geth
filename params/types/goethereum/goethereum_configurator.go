@@ -422,9 +422,6 @@ func (c *ChainConfig) GetEthashHomesteadTransition() *uint64 {
 }
 
 func (c *ChainConfig) SetEthashHomesteadTransition(i *uint64) error {
-	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
-	}
 	c.HomesteadBlock = setBig(c.HomesteadBlock, i)
 	return nil
 }
@@ -434,9 +431,6 @@ func (c *ChainConfig) GetEthashEIP2Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEthashEIP2Transition(i *uint64) error {
-	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
-	}
 	c.HomesteadBlock = setBig(c.HomesteadBlock, i)
 	return nil
 }
@@ -451,7 +445,7 @@ func (c *ChainConfig) SetEthashEIP779Transition(n *uint64) error {
 	}
 	c.DAOForkBlock = setBig(c.DAOForkBlock, n)
 	if c.DAOForkBlock == nil {
-		c.DAOForkSupport = false // FIXME
+		c.DAOForkSupport = false
 	}
 	return nil
 }

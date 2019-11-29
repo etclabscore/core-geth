@@ -361,9 +361,6 @@ func (c *MultiGethChainConfig) GetEthashHomesteadTransition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEthashHomesteadTransition(n *uint64) error {
-	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
-	}
 	c.EIP2FBlock = setBig(c.EIP2FBlock, n)
 	c.EIP7FBlock = setBig(c.EIP7FBlock, n)
 	return nil
@@ -374,9 +371,6 @@ func (c *MultiGethChainConfig) GetEthashEIP2Transition() *uint64 {
 }
 
 func (c *MultiGethChainConfig) SetEthashEIP2Transition(n *uint64) error {
-	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
-	}
 	c.EIP2FBlock = setBig(c.EIP2FBlock, n)
 	return nil
 }

@@ -4,7 +4,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/common"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -307,7 +307,19 @@ func (c *MultiGethChainConfig) IsForked(fn func() *uint64, n *big.Int) bool {
 	return big.NewInt(int64(*f)).Cmp(n) <= 0
 }
 
-func (c *MultiGethChainConfig) GetConsensusEngineType() common.ConsensusEngineT {
+func (c *MultiGethChainConfig) ForkCanonHash(n uint64) common.Hash {
+	if c.RequireBlockHashes == nil {
+		return common.Hash{}
+	}
+	for k, v := range c.RequireBlockHashes {
+		if k == n {
+			return v
+		}
+	}
+	return common.Hash{}
+}
+
+func (c *MultiGethChainConfig) GetConsensusEngineType() common2.ConsensusEngineT {
 	if c.Ethash != nil {
 		return common2.ConsensusEngineT_Ethash
 	}
@@ -317,7 +329,7 @@ func (c *MultiGethChainConfig) GetConsensusEngineType() common.ConsensusEngineT 
 	return common2.ConsensusEngineT_Unknown
 }
 
-func (c *MultiGethChainConfig) MustSetConsensusEngineType(t common.ConsensusEngineT) error {
+func (c *MultiGethChainConfig) MustSetConsensusEngineType(t common2.ConsensusEngineT) error {
 	switch t {
 	case common2.ConsensusEngineT_Ethash:
 		c.Ethash = new(goethereum.EthashConfig)
@@ -559,11 +571,11 @@ func (c *MultiGethChainConfig) SetEthashECIP1041Transition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashDifficultyBombDelaySchedule() common.Uint64BigMapEncodesHex {
+func (c *MultiGethChainConfig) GetEthashDifficultyBombDelaySchedule() common2.Uint64BigMapEncodesHex {
 	return c.DifficultyBombDelaySchedule
 }
 
-func (c *MultiGethChainConfig) SetEthashDifficultyBombDelaySchedule(m common.Uint64BigMapEncodesHex) error {
+func (c *MultiGethChainConfig) SetEthashDifficultyBombDelaySchedule(m common2.Uint64BigMapEncodesHex) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
@@ -571,11 +583,11 @@ func (c *MultiGethChainConfig) SetEthashDifficultyBombDelaySchedule(m common.Uin
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashBlockRewardSchedule() common.Uint64BigMapEncodesHex {
+func (c *MultiGethChainConfig) GetEthashBlockRewardSchedule() common2.Uint64BigMapEncodesHex {
 	return c.BlockRewardSchedule
 }
 
-func (c *MultiGethChainConfig) SetEthashBlockRewardSchedule(m common.Uint64BigMapEncodesHex) error {
+func (c *MultiGethChainConfig) SetEthashBlockRewardSchedule(m common2.Uint64BigMapEncodesHex) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}

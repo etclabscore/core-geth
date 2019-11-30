@@ -167,51 +167,8 @@ func Identical(a, b common.ChainConfigurator, fields []string) bool {
 		res1 := reflect.ValueOf(a).MethodByName("Get"+m).Call([]reflect.Value{})
 		res2 := reflect.ValueOf(b).MethodByName("Get"+m).Call([]reflect.Value{})
 		if !reflect.DeepEqual(res1[0].Interface(), res2[0].Interface()) {
-			log.Println(res1[0].Elem().Interface(), res2[0].Elem().Interface())
 			return false
 		}
 	}
 	return true
 }
-
-//func UnmarshalConfigurator(data []byte) (Configurator, error) {
-//	var unMarshalErr error
-//	for _, t := range []Configurator{
-//		&parity.ParityChainSpec{},
-//	}{
-//		unMarshalErr = json.Unmarshal(data, t)
-//		if unMarshalErr == nil {
-//			return t, nil
-//		}
-//	}
-//	return nil, unMarshalErr
-//}
-
-//func UnmarshalChainConfigurator(data []byte) (common.ChainConfigurator, error) {
-//	var unMarshalErr error
-//	for _, t := range []interface{}{
-//		&paramtypes.ChainConfig{},
-//		&goethereum.ChainConfig{},
-//		&parity.ParityChainSpec{},
-//		&paramtypes.Genesis{
-//			Config: &paramtypes.ChainConfig{},
-//		},
-//		&paramtypes.Genesis{
-//			Config: &goethereum.ChainConfig{},
-//		},
-//	}{
-//		unMarshalErr = json.Unmarshal(data, t)
-//		if unMarshalErr == nil {
-//			rt := t
-//			if d, ok := t.(*paramtypes.Genesis); ok {
-//				if e, ok := d.Config.(*paramtypes.ChainConfig); ok {
-//					rt = e
-//				} else if e, ok := d.Config.(*goethereum.ChainConfig); ok {
-//					rt = e
-//				}
-//			}
-//			return rt.(common.ChainConfigurator), nil
-//		}
-//	}
-//	return nil, unMarshalErr
-//}

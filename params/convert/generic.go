@@ -6,6 +6,11 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
+// GenericCC is a generic-y struct type used to expose some meta-logic methods
+// shared by all ChainConfigurator implementations but not existing in that interface.
+// These logics differentiate from the logics present in the ChainConfigurator interface
+// itself because they are chain-aware, or fit nuanced, or adhoc, use cases and should
+// not be demanded of EVM-based ecosystem logic as a whole. Debatable. NOTE.
 type GenericCC struct {
 	common.ChainConfigurator
 }

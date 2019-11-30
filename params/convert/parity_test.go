@@ -47,7 +47,7 @@ func TestBlockConfig(t *testing.T) {
 //			t.Fatal(err)
 //		}
 //		paritySpec := parity.ParityChainSpec{}
-//		err = json.Unmarshal(b, &paritySpec)
+//		err = json.UnmarshalChainConfigurator(b, &paritySpec)
 //		if err != nil {
 //			t.Fatal(err)
 //		}

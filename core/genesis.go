@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/convert"
 	"github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -106,13 +107,17 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesi
 	} else {
 		log.Info("Found stored genesis block", "config", storedcfg)
 	}
+
 	// Special case: don't change the existing config of a non-mainnet chain if no new
 	// config is supplied. These chains would get AllProtocolChanges (and a compat error)
 	// if we just continued here.
-	if genesis == nil &&
-		stored != params.MainnetGenesisHash &&
-		*genesis.Config.GetNetworkID() == *params.DefaultGenesisBlock().Config.GetNetworkID() &&
-		genesis.Config.GetChainID().Cmp(params.DefaultGenesisBlock().Config.GetChainID()) == 0 {
+	//
+	// (meowsbits): The idea here is to use stored configs when they are not upgrade-able via defaults.
+	// Pre-existing logic only upgraded mainnet, when it should upgrade all defaulty chains.
+	// New logic (below) checks _inequality_ between a defaulty config and a stored config. If different,
+	// the stored config is used. This breaks auto-upgrade magic for defaulty chains.
+	if genesis == nil && !convert.Identical(storedcfg, newcfg) {
+		log.Info("Found non-defaulty stored config, using it.")
 		return storedcfg, stored, nil
 	}
 
@@ -233,4 +238,3 @@ func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big
 	g := paramtypes.Genesis{Alloc: paramtypes.GenesisAlloc{addr: {Balance: balance}}}
 	return MustCommitGenesis(db, &g)
 }
-

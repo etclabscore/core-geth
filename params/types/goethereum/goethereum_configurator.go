@@ -74,6 +74,12 @@ func (c *ChainConfig) SetGasLimitBoundDivisor(n *uint64) error {
 	return nil
 }
 
+// GetNetworkID and the following Set/Getters for ChainID too
+// are... opinionated... because of where and how currently the NetworkID
+// value is designed.
+// This can cause unexpected and/or counter-intuitive behavior, especially with SetNetworkID.
+// In order to use these logic properly, one should call NetworkID setter before ChainID setter.
+// FIXME.
 func (c *ChainConfig) GetNetworkID() *uint64 {
 	if c.ChainID != nil {
 		return newU64(c.ChainID.Uint64())
@@ -85,6 +91,7 @@ func (c *ChainConfig) SetNetworkID(n *uint64) error {
 	if n == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
+	c.ChainID = new(big.Int).SetUint64(*n)
 	vars.DefaultNetworkID = *n
 	return nil
 }

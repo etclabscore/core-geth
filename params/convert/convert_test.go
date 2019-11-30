@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/big"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -64,6 +65,37 @@ func TestConvert(t *testing.T) {
 
 	if method, equal := Equal(reflect.TypeOf((*common.Configurator)(nil)), &spec, &spec2); !equal {
 		t.Error("not equal", method)
+	}
+}
+
+func TestIdentical(t *testing.T) {
+	methods := []string{
+		"ChainID",
+		"NetworkID",
+	}
+	configs :=  []common.ChainConfigurator{
+		&paramtypes.MultiGethChainConfig{},
+		&goethereum.ChainConfig{},
+		&parity.ParityChainSpec{},
+		&paramtypes.MultiGethChainConfig{}, // Complete combination test set.
+	}
+	for i := range configs {
+		if i == 0 {
+			continue
+		}
+		f42, f43 := uint64(43), big.NewInt(43)
+		configs[i-1].SetNetworkID(&f42)
+		configs[i].SetNetworkID(&f42)
+		configs[i-1].SetChainID(f43)
+		configs[i].SetChainID(f43)
+		if !Identical(configs[i-1], configs[i], methods) {
+			t.Errorf("nonident")
+		}
+		f24 := uint64(24)
+		configs[i-1].SetNetworkID(&f24)
+		if Identical(configs[i-1], configs[i], methods) {
+			t.Error(i, "ident")
+		}
 	}
 }
 

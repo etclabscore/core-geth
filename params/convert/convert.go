@@ -111,6 +111,9 @@ func convert(k reflect.Type, source, target interface{}) error {
 	}
 	return nil
 }
+
+
+
 func Equal(k reflect.Type, a, b interface{}) (string, bool) {
 	// Interfaces must be either ChainConfigurator or GenesisBlocker.
 	for _, v := range []interface{}{
@@ -156,23 +159,17 @@ func compare(k reflect.Type, source, target interface{}) (method string, value i
 	return "", nil, nil
 }
 
-// Identical determines if chains are of the same identity; comparing equivalence
-// of only essnetial network and chain parameters. This allows for identity comparison
+// Identical determines if chain fields are of the same identity; comparing equivalence
+// of only essential network and chain parameters. This allows for identity comparison
 // independent of potential or realized chain upgrades.
-func Identical(a, b common.ChainConfigurator) bool {
-	if a.GetChainID() != nil && b.GetChainID() != nil {
-		if a.GetChainID().Cmp(b.GetChainID()) != 0 {
+func Identical(a, b common.ChainConfigurator, fields []string) bool {
+	for _, m := range fields {
+		res1 := reflect.ValueOf(a).MethodByName("Get"+m).Call([]reflect.Value{})
+		res2 := reflect.ValueOf(b).MethodByName("Get"+m).Call([]reflect.Value{})
+		if !reflect.DeepEqual(res1[0].Interface(), res2[0].Interface()) {
+			log.Println(res1[0].Elem().Interface(), res2[0].Elem().Interface())
 			return false
 		}
-	} else if !(a.GetChainID() == nil && b.GetChainID() == nil) {
-		return false
-	}
-	if a.GetNetworkID() != nil && b.GetNetworkID() != nil {
-		if *a.GetNetworkID() != *b.GetNetworkID() {
-			return false
-		}
-	} else if !(a.GetNetworkID() == nil && b.GetNetworkID() == nil) {
-		return false
 	}
 	return true
 }

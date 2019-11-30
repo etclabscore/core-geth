@@ -59,7 +59,7 @@ func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) common2.ChainCon
 	if len(data) == 0 {
 		return nil
 	}
-	c, err := convert.Unmarshal(data)
+	c, err := convert.UnmarshalChainConfigurator(data)
 	if err != nil {
 		log.Error("Invalid chain config JSON", "hash", hash, "err", err)
 		return nil

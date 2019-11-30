@@ -88,13 +88,16 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 	}
 	var dec Genesis
 
-	// MultiGeth has an ever-preset 'networkID' field, where
-	// go-ethereum doesn't. This should be enough to differentiate them.
+	// Note that this logic is importantly relate to the logic in params/convert/json.go, for ChainConfigurator
+	// unmarshaling.
 	dec.Config = &MultiGethChainConfig{}
-	if err := json.Unmarshal(input, &dec); err != nil {
+	if err := json.Unmarshal(input, &dec); err != nil || common0.IsValid(dec.Config, nil) != nil {
 		dec.Config = &goethereum.ChainConfig{}
 		if err := json.Unmarshal(input, &dec); err != nil {
-			return nil
+			return err
+		}
+		if err := common0.IsValid(dec.Config, nil); err !=nil {
+			return err
 		}
 	}
 

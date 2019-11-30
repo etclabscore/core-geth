@@ -146,6 +146,6 @@ func testDAOForkBlockNewChain(t *testing.T, test int, genesis string, expectBloc
 		t.Errorf("test %d: dao hard-fork block mismatch: have %v, want %v", test, config.GetEthashEIP779Transition(), expectBlock)
 	}
 	if convert.AsGenericCC(config).DAOSupport() != expectVote {
-		t.Errorf("test %d: dao hard-fork support mismatch: have %v, want %v", test, convert.AsGenericCC(config).DAOSupport(), expectVote)
+		t.Errorf("test %d: dao hard-fork support mismatch: have %v, want %v\nconfig: %v", test, convert.AsGenericCC(config).DAOSupport(), expectVote, config)
 	}
 }

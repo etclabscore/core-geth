@@ -65,14 +65,22 @@ func IsEmpty(anything interface{}) bool {
 }
 
 func IsValid(conf ChainConfigurator, head *uint64) *ConfigValidError {
-	var bhead *big.Int
-	if head != nil {
-		bhead = new(big.Int).SetUint64(*head)
+
+	// head-agnostic logic
+	if conf.GetNetworkID() == nil || *conf.GetNetworkID() == 0 {
+		return NewValidErr("NetworkID cannot be empty nor zero", ">=0", conf.GetNetworkID())
 	}
+	if head == nil {
+		return nil
+	}
+
 	// head-full logic
+	var bhead = new(big.Int).SetUint64(*head)
+
 	if conf.IsForked(conf.GetEIP155Transition, bhead) && conf.GetChainID() == nil {
 		return NewValidErr("EIP155 requires ChainID. A:EIP155/B:ChainID", conf.GetEIP155Transition(), conf.GetChainID())
 	}
+
 	return nil
 }
 

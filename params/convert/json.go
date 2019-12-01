@@ -12,21 +12,19 @@ import (
 )
 
 func UnmarshalChainConfigurator(input []byte) (common.ChainConfigurator, error) {
-	var err1, err2, err3 error
-	var config goethereum.ChainConfig
-	err2 = json.Unmarshal(input, &config)
-	if err2 == nil {
-		return &config, nil
+	ifaces := []interface{}{
+		&goethereum.ChainConfig{},
+		&paramtypes.MultiGethChainConfig{},
+		&parity.ParityChainSpec{},
 	}
-	var config2 paramtypes.MultiGethChainConfig
-	err1 = json.Unmarshal(input, &config2)
-	if err1 == nil {
-		return &config2, nil
+	errs := []string{}
+	for _, iface := range ifaces {
+		err := json.Unmarshal(input, iface)
+		if err != nil {
+			errs = append(errs, err.Error())
+		} else {
+			return iface.(common.ChainConfigurator), nil
+		}
 	}
-	var config3 parity.ParityChainSpec
-	err3 = json.Unmarshal(input, &config3)
-	if err3 == nil {
-		return &config3, nil
-	}
-	return nil, errors.New(strings.Join([]string{err1.Error(), err2.Error(), err3.Error()}, "\n"))
+	return nil, errors.New(strings.Join(errs, "\n"))
 }

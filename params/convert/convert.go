@@ -102,7 +102,7 @@ func convert(k reflect.Type, source, target interface{}) error {
 
 		if !setResponse[0].IsNil() {
 			err := setResponse[0].Interface().(error)
-			e := common.UnsupportedConfigError(err, strings.TrimPrefix(method.Name, "Get"), response[0].Interface())
+			e := common.UnsupportedConfigError(err, strings.TrimPrefix(method.Name, "Get"), response[0].Elem().Interface())
 			if common.IsFatalUnsupportedErr(err) {
 				return e
 			}

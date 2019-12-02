@@ -8,9 +8,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"reflect"
 
 	"github.com/ethereum/go-ethereum/params/convert"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -59,8 +61,8 @@ var mapForkNameChainspecFileDifficulty = map[string]string{
 	"ETC_Agharta":       "classic_agharta_difficulty_test.json",
 }
 
-func readConfigFromSpecFile(name string) (genesis *paramtypes.Genesis, sha1sum []byte, err error) {
-	spec := parity.ParityChainSpec{}
+func readConfigFromSpecFile(name string) (spec common.ChainConfigurator, sha1sum []byte, err error) {
+	spec = &parity.ParityChainSpec{}
 	if fi, err := os.Open(name); os.IsNotExist(err) {
 		return nil, nil, err
 	} else {
@@ -70,7 +72,7 @@ func readConfigFromSpecFile(name string) (genesis *paramtypes.Genesis, sha1sum [
 	if err != nil {
 		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
 	}
-	err = json.Unmarshal(b, &spec)
+	err = json.Unmarshal(b, spec)
 	if err != nil {
 		if jsonError, ok := err.(*json.SyntaxError); ok {
 			line, character, lcErr := lineAndCharacter(string(b), int(jsonError.Offset))
@@ -88,12 +90,8 @@ func readConfigFromSpecFile(name string) (genesis *paramtypes.Genesis, sha1sum [
 		}
 		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
 	}
-	genesis, err = convert.ParityConfigToMultiGethGenesis(&spec)
-	if err != nil {
-		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
-	}
 	bb := sha1.Sum(b)
-	return genesis, bb[:], nil
+	return spec, bb[:], nil
 }
 
 func init() {
@@ -103,7 +101,7 @@ func init() {
 
 		for i, config := range Forks {
 			pt := &paramtypes.MultiGethChainConfig{}
-			if err := convert.Convert(config, pt); err != nil {
+			if err := convert.Convert(config, pt); common.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			Forks[i] = pt
@@ -111,7 +109,7 @@ func init() {
 
 		for k, v := range difficultyChainConfigurations {
 			pt := &paramtypes.MultiGethChainConfig{}
-			if err := convert.Convert(v, pt); err != nil {
+			if err := convert.Convert(v, pt); common.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = pt
@@ -121,7 +119,7 @@ func init() {
 		log.Println("Setting chain configurations from Parity chainspecs")
 
 		for k, v := range mapForkNameChainspecFileState {
-			genesis, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
+			config, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
 			if os.IsNotExist(err) {
 				wd, wde := os.Getwd()
 				if wde != nil {
@@ -132,18 +130,29 @@ func init() {
 				panic(err)
 			}
 			chainspecRefsState[k] = chainspecRef{filepath.Base(v), sha1sum}
-			Forks[k] = genesis.Config
+			if diffs := convert.Equal(reflect.TypeOf((*common.ChainConfigurator)(nil)), Forks[k], config); len(diffs) != 0 {
+				log.Println(k, v, len(diffs), "diffs")
+				for _, diff := range diffs {
+					log.Println(diff)
+				}
+				//panic("not same configs")
+			}
+			if err := common.Equivalent(Forks[k], config); err != nil {
+				log.Println("Not equivalent configs", "err", err)
+				panic("")
+			}
+			Forks[k] = config
 		}
 
 		for k, v := range mapForkNameChainspecFileDifficulty {
-			genesis, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
+			config, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
 			if os.IsNotExist(err) && os.Getenv(MG_GENERATE_DIFFICULTY_TESTS_KEY) != "" {
 				log.Println("Will generate chainspec file for", k, v)
 			} else if len(sha1sum) == 0 {
 				panic("zero sum game")
 			} else {
 				chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
-				difficultyChainConfigurations[k] = genesis.Config
+				difficultyChainConfigurations[k] = config
 			}
 		}
 	}

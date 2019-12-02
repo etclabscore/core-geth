@@ -46,6 +46,9 @@ func (e ErrUnsupportedConfig) Error() string {
 }
 
 func IsFatalUnsupportedErr(err error) bool {
+	if err == nil {
+		return false
+	}
 	return err == ErrUnsupportedConfigFatal
 }
 

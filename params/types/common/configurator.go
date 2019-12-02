@@ -98,6 +98,32 @@ func Compatible(head *uint64, a, b ChainConfigurator) *ConfigCompatError {
 	return lastErr
 }
 
+// FIXME(meows): This is not yet really equivalence.
+func Equivalent(a, b ChainConfigurator) error {
+	fa, fb := Forks(a), Forks(b)
+	if len(fa) != len(fb) {
+		return fmt.Errorf("different fork count: %d / %d (%v / %v)", len(fa), len(fb), fa, fb)
+	}
+	for i := range fa {
+		if fa[i] != fb[i] {
+			return fmt.Errorf("fork index %d not same: %d / %d", i, fa[i], fb[i])
+		}
+	}
+	//ta, anames := Transitions(a)
+	//tb, _ := Transitions(b)
+	//
+	//if len(ta) != len(tb) {
+	//	return errors.New("not same number of transitions")
+	//}
+	//
+	//for i := range ta {
+	//	if ta[i]() != tb[i]() {
+	//		return fmt.Errorf("%s: %v / %v", anames[i], ta[i](), tb[i]())
+	//	}
+	//}
+	return nil
+}
+
 // Transitions gets all available transition (fork) functions and their names for a ChainConfigurator.
 func Transitions(conf ChainConfigurator) (fns []func() *uint64, names []string) {
 	names = []string{}

@@ -22,8 +22,10 @@ func TestSetupGenesisBlock(t *testing.T) {
 	if wantHash := GenesisToBlock(defGenBl, nil).Hash(); wantHash != hash  {
 		t.Errorf("mismatch block hash, want: %x, got: %x", wantHash, hash)
 	}
-	if diff, eq := convert.Equal(reflect.TypeOf((*common.ChainConfigurator)(nil)), defGenBl.Config, config); !eq {
-		t.Error("mismatch", "diff=", diff, "in", defGenBl.Config, "out", config)
+	if diffs := convert.Equal(reflect.TypeOf((*common.ChainConfigurator)(nil)), defGenBl.Config, config); len(diffs) != 0 {
+		for _, diff := range diffs {
+			t.Error("mismatch", "diff=", diff, "in", defGenBl.Config, "out", config)
+		}
 	}
 
 	clGenBl := params.DefaultClassicGenesisBlock()
@@ -35,7 +37,9 @@ func TestSetupGenesisBlock(t *testing.T) {
 	if wantHash := GenesisToBlock(clGenBl, nil).Hash(); wantHash != clHash  {
 		t.Errorf("mismatch block hash, want: %x, got: %x", wantHash, clHash)
 	}
-	if diff, eq := convert.Equal(reflect.TypeOf((*common.ChainConfigurator)(nil)), clGenBl.Config, clConfig); !eq {
-		t.Error("mismatch", "diff=", diff, "in", clGenBl.Config, "out", clConfig)
+	if diffs := convert.Equal(reflect.TypeOf((*common.ChainConfigurator)(nil)), clGenBl.Config, clConfig); len(diffs) != 0 {
+		for _, diff := range diffs {
+			t.Error("mismatch", "diff=", diff, "in", clGenBl.Config, "out", clConfig)
+		}
 	}
 }

@@ -80,8 +80,10 @@ func TestConvert(t *testing.T) {
 		t.Error(err)
 	}
 
-	if method, equal := Equal(reflect.TypeOf((*common.Configurator)(nil)), &spec, &spec2); !equal {
-		t.Error("not equal", method)
+	if diffs := Equal(reflect.TypeOf((*common.Configurator)(nil)), &spec, &spec2); len(diffs) != 0 {
+		for _, diff := range diffs {
+			t.Error("not equal", diff.Field, diff.A, diff.B)
+		}
 	}
 }
 

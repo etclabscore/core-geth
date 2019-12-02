@@ -1,7 +1,6 @@
 package convert
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"reflect"
@@ -102,7 +101,11 @@ func convert(k reflect.Type, source, target interface{}) error {
 
 		if !setResponse[0].IsNil() {
 			err := setResponse[0].Interface().(error)
-			e := common.UnsupportedConfigError(err, strings.TrimPrefix(method.Name, "Get"), response[0].Elem().Interface())
+			v := response[0].Interface()
+			if !response[0].IsNil() {
+				v = response[0].Elem().Interface()
+			}
+			e := common.UnsupportedConfigError(err, strings.TrimPrefix(method.Name, "Get"), v)
 			if common.IsFatalUnsupportedErr(err) {
 				return e
 			}
@@ -112,30 +115,43 @@ func convert(k reflect.Type, source, target interface{}) error {
 	return nil
 }
 
+type DiffT struct {
+	Field string
+	A interface{}
+	B interface{}
+}
 
+func (d DiffT) String() string {
+	return fmt.Sprintf("Field: %s, A: %v, B: %v", d.Field, d.A, d.B)
+}
 
-func Equal(k reflect.Type, a, b interface{}) (string, bool) {
+func Equal(k reflect.Type, a, b interface{}) (diffs []DiffT) {
 	// Interfaces must be either ChainConfigurator or GenesisBlocker.
 	for _, v := range []interface{}{
 		a, b,
-	}{
+	} {
 		_, genesiser := v.(common.GenesisBlocker)
 		_, chainconfer := v.(common.ChainConfigurator)
 		if !genesiser && !chainconfer {
-			return "%d value neither chain nor genesis configurator", false
+			return []DiffT{
+				{
+					Field: "any (not chain nor genesis configurator)",
+					A:     a,
+					B:     b,
+				},
+			}
 		}
 	}
 
-	m, _, err := compare(k.Elem(), a, b) // TODO: maybe return a value, or even a dedicated type, for better debugging
-	if err == nil {
-		return "", true
-	}
-	return m, false
+	return compare(k.Elem(), a, b)
 }
 
-func compare(k reflect.Type, source, target interface{}) (method string, value interface{}, err error) {
+func compare(k reflect.Type, source, target interface{}) (diffs []DiffT) {
 	if k.NumMethod() == 0 {
-		return "", "", errors.New("empty comparison")
+		return []DiffT{}
+	}
+	diffV := func(v interface{}) interface{} {
+		return v
 	}
 	for i := 0; i < k.NumMethod(); i++ {
 		method := k.Method(i)
@@ -149,14 +165,14 @@ func compare(k reflect.Type, source, target interface{}) (method string, value i
 		response2 := reflect.ValueOf(target).MethodByName(method.Name).Call(callGetIn)
 
 		if !reflect.DeepEqual(response[0].Interface(), response2[0].Interface()) {
-			return method.Name, struct {
-				source, target interface{}
-			}{
-				response, response2,
-			}, errors.New("reflect.DeepEqual")
+			diffs = append(diffs, DiffT{
+				Field: strings.TrimPrefix(method.Name, "Get"),
+				A: diffV(response[0]),
+				B: diffV(response2[0]),
+			})
 		}
 	}
-	return "", nil, nil
+	return
 }
 
 // Identical determines if chain fields are of the same identity; comparing equivalence

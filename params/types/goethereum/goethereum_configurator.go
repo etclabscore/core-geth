@@ -111,7 +111,7 @@ func (c *ChainConfig) GetMaxCodeSize() *uint64 {
 
 func (c *ChainConfig) SetMaxCodeSize(n *uint64) error {
 	if n == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return nil
 	}
 	vars.MaxCodeSize = *n
 	return nil

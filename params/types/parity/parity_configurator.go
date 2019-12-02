@@ -66,7 +66,11 @@ func (spec *ParityChainSpec) SetNetworkID(i *uint64) error {
 }
 
 func (spec *ParityChainSpec) GetChainID() *big.Int {
-	return spec.Params.ChainID.Big()
+	if chainid := spec.Params.ChainID.Big(); chainid == nil {
+		return spec.Params.NetworkID.Big()
+	} else {
+		return chainid
+	}
 }
 
 func (spec *ParityChainSpec) SetChainID(i *big.Int) error {

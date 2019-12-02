@@ -50,8 +50,6 @@ type CatHerder interface {
 	SetMaxCodeSize(n *uint64) error
 	GetEIP7Transition() *uint64
 	SetEIP7Transition(n *uint64) error
-	GetEIP98Transition() *uint64
-	SetEIP98Transition(n *uint64) error
 	GetEIP150Transition() *uint64
 	SetEIP150Transition(n *uint64) error
 	GetEIP152Transition() *uint64

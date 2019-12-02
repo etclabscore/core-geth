@@ -100,19 +100,19 @@ func init() {
 		log.Println("Setting equivalent fork feature chain configurations")
 
 		for i, config := range Forks {
-			pt := &paramtypes.MultiGethChainConfig{}
-			if err := convert.Convert(config, pt); common.IsFatalUnsupportedErr(err) {
+			mgc := &paramtypes.MultiGethChainConfig{}
+			if err := convert.Convert(config, mgc); common.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
-			Forks[i] = pt
+			Forks[i] = mgc
 		}
 
 		for k, v := range difficultyChainConfigurations {
-			pt := &paramtypes.MultiGethChainConfig{}
-			if err := convert.Convert(v, pt); common.IsFatalUnsupportedErr(err) {
+			mgc := &paramtypes.MultiGethChainConfig{}
+			if err := convert.Convert(v, mgc); common.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
-			difficultyChainConfigurations[k] = pt
+			difficultyChainConfigurations[k] = mgc
 		}
 
 	} else if os.Getenv(MG_CHAINCONFIG_CHAINSPEC_KEY) != "" {

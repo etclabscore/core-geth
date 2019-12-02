@@ -3,7 +3,6 @@ package parity
 import (
 	"encoding/json"
 	"log"
-	math2 "math"
 	"math/big"
 	"reflect"
 
@@ -88,16 +87,6 @@ func (spec *ParityChainSpec) GetEIP7Transition() *uint64 {
 
 func (spec *ParityChainSpec) SetEIP7Transition(i *uint64) error {
 	spec.Engine.Ethash.Params.HomesteadTransition = new(ParityU64).SetUint64(i)
-	return nil
-}
-
-func (spec *ParityChainSpec) GetEIP98Transition() *uint64 {
-	return spec.Params.EIP98Transition.Uint64P()
-}
-
-func (spec *ParityChainSpec) SetEIP98Transition(i *uint64) error {
-	max := uint64(math2.MaxInt64)
-	spec.Params.EIP98Transition = new(ParityU64).SetUint64(&max)
 	return nil
 }
 

@@ -3,8 +3,8 @@ package paramtypes
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/math"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -35,14 +35,20 @@ func setBig(i *big.Int, u *uint64) *big.Int {
 var upstream = goethereum.ChainConfig{}
 
 func (c *MultiGethChainConfig) GetAccountStartNonce() *uint64 { return upstream.GetAccountStartNonce() }
-func (c *MultiGethChainConfig) SetAccountStartNonce(n *uint64) error { return upstream.SetAccountStartNonce(n) }
-func (c *MultiGethChainConfig) GetMaximumExtraDataSize() *uint64     { return upstream.GetMaximumExtraDataSize() }
+func (c *MultiGethChainConfig) SetAccountStartNonce(n *uint64) error {
+	return upstream.SetAccountStartNonce(n)
+}
+func (c *MultiGethChainConfig) GetMaximumExtraDataSize() *uint64 {
+	return upstream.GetMaximumExtraDataSize()
+}
 func (c *MultiGethChainConfig) SetMaximumExtraDataSize(n *uint64) error {
 	return upstream.SetMaximumExtraDataSize(n)
 }
 func (c *MultiGethChainConfig) GetMinGasLimit() *uint64        { return upstream.GetMinGasLimit() }
 func (c *MultiGethChainConfig) SetMinGasLimit(n *uint64) error { return upstream.SetMinGasLimit(n) }
-func (c *MultiGethChainConfig) GetGasLimitBoundDivisor() *uint64 { return upstream.GetGasLimitBoundDivisor() }
+func (c *MultiGethChainConfig) GetGasLimitBoundDivisor() *uint64 {
+	return upstream.GetGasLimitBoundDivisor()
+}
 func (c *MultiGethChainConfig) SetGasLimitBoundDivisor(n *uint64) error {
 	return upstream.SetGasLimitBoundDivisor(n)
 }
@@ -79,9 +85,6 @@ func (c *MultiGethChainConfig) SetEIP7Transition(n *uint64) error {
 	c.EIP7FBlock = setBig(c.EIP7FBlock, n)
 	return nil
 }
-
-func (c *MultiGethChainConfig) GetEIP98Transition() *uint64 { return upstream.GetEIP98Transition() }
-func (c *MultiGethChainConfig) SetEIP98Transition(n *uint64) error { return upstream.SetEIP98Transition(n) }
 
 func (c *MultiGethChainConfig) GetEIP150Transition() *uint64 {
 	return bigNewU64(c.EIP150Block)

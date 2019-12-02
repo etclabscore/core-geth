@@ -4,7 +4,6 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/math"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -124,14 +123,6 @@ func (c *ChainConfig) GetEIP7Transition() *uint64 {
 func (c *ChainConfig) SetEIP7Transition(n *uint64) error {
 	c.HomesteadBlock = setBig(c.HomesteadBlock, n)
 	return nil
-}
-
-func (c *ChainConfig) GetEIP98Transition() *uint64 {
-	return newU64(math.MaxUint64)
-}
-
-func (c *ChainConfig) SetEIP98Transition(n *uint64) error {
-	return common2.ErrUnsupportedConfigNoop
 }
 
 func (c *ChainConfig) GetEIP150Transition() *uint64 {

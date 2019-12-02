@@ -316,13 +316,18 @@ func (spec *ParityChainSpec) SetEIP198Transition(n *uint64) error {
 }
 
 func (spec *ParityChainSpec) GetEIP212Transition() *uint64 {
-	return spec.GetPrecompile(common.BytesToAddress([]byte{8}),
+	f212 := spec.GetPrecompile(common.BytesToAddress([]byte{8}),
 		ParityChainSpecPricing{
 			AltBnPairing: &ParityChainSpecAltBnPairingPricing{
 				Base: 100000,
 				Pair: 80000,
 			},
 		}).Uint64P()
+
+	if f212 != nil {
+		return f212
+	}
+	return spec.GetEIP1108Transition()
 }
 
 func (spec *ParityChainSpec) SetEIP212Transition(n *uint64) error {
@@ -351,7 +356,7 @@ func (spec *ParityChainSpec) GetEIP213Transition() *uint64 {
 		}).Uint64P()
 
 	if x == nil || y == nil {
-		return nil
+		return spec.GetEIP1108Transition()
 	}
 	if *x != *y {
 		return nil

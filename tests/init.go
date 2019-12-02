@@ -82,7 +82,7 @@ var Forks = map[string]common2.ChainConfigurator{
 		DAOForkBlock:        big.NewInt(0),
 		ByzantiumBlock:      big.NewInt(0),
 		ConstantinopleBlock: big.NewInt(0),
-		PetersburgBlock:     big.NewInt(10000000),
+		PetersburgBlock:     nil,
 	},
 	"ConstantinopleFix": &goethereum.ChainConfig{
 		ChainID:             big.NewInt(1),

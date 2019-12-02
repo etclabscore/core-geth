@@ -37,7 +37,20 @@ func NewCompatError(what string, storedblock, newblock *uint64) *ConfigCompatErr
 }
 
 func (err *ConfigCompatError) Error() string {
-	return fmt.Sprintf("mismatching %s in database (have %d, want %d, rewindto %d)", err.What, err.StoredConfig, err.NewConfig, err.RewindTo)
+	var have, want interface{}
+	if err.StoredConfig != nil {
+		have = *err.StoredConfig
+	}
+	if err.NewConfig != nil {
+		want = *err.NewConfig
+	}
+	if have == nil {
+		have = "nil"
+	}
+	if want == nil {
+		want = "nil"
+	}
+	return fmt.Sprintf("mismatching %s in database (have %v, want %v, rewindto %d)", err.What, have, want, err.RewindTo)
 }
 
 type ConfigValidError struct {
@@ -98,29 +111,28 @@ func Compatible(head *uint64, a, b ChainConfigurator) *ConfigCompatError {
 	return lastErr
 }
 
-// FIXME(meows): This is not yet really equivalence.
+// FIXME(meows): Incomplete.
 func Equivalent(a, b ChainConfigurator) error {
+	var m uint64 = math.MaxUint64
+	if err := Compatible(&m, a, b); err != nil {
+		return err
+	}
+
 	fa, fb := Forks(a), Forks(b)
 	if len(fa) != len(fb) {
 		return fmt.Errorf("different fork count: %d / %d (%v / %v)", len(fa), len(fb), fa, fb)
 	}
 	for i := range fa {
 		if fa[i] != fb[i] {
+			if fa[i] == math.MaxUint64 {
+				return fmt.Errorf("fa bigmax: %d", fa[i])
+			}
+			if fb[i] == math.MaxUint64 {
+				return fmt.Errorf("fb bigmax: %d", fb[i])
+			}
 			return fmt.Errorf("fork index %d not same: %d / %d", i, fa[i], fb[i])
 		}
 	}
-	//ta, anames := Transitions(a)
-	//tb, _ := Transitions(b)
-	//
-	//if len(ta) != len(tb) {
-	//	return errors.New("not same number of transitions")
-	//}
-	//
-	//for i := range ta {
-	//	if ta[i]() != tb[i]() {
-	//		return fmt.Errorf("%s: %v / %v", anames[i], ta[i](), tb[i]())
-	//	}
-	//}
 	return nil
 }
 
@@ -150,9 +162,13 @@ func Forks(conf ChainConfigurator) []uint64 {
 	for _, tr := range transitions {
 		// Extract the fork rule block number and aggregate it
 		response := tr()
-		if response == nil || *response == math.MaxUint64 {
+		if response == nil ||
+			*response == math.MaxUint64 ||
+			*response == 0x7fffffffffffff ||
+			*response == 0x7FFFFFFFFFFFFFFF {
 			continue
 		}
+
 		// Only append unique fork numbers, excluding 0 (genesis config is not considered a fork)
 		if _, ok := forksM[*response]; !ok && *response != 0 {
 			forks = append(forks, *response)
@@ -199,7 +215,7 @@ func compatible(head *uint64, a, b ChainConfigurator) *ConfigCompatError {
 	}
 
 	if *adao != *bdao {
-				return NewCompatError("mismatching DAO fork", adao, bdao)
+		return NewCompatError("mismatching DAO fork", adao, bdao)
 
 	}
 

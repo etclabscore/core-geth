@@ -33,7 +33,7 @@ func paritySpecPath(name string) string {
 	return p
 }
 
-var mapForkNameChainspecFileState = map[string]string{
+var MapForkNameChainspecFileState = map[string]string{
 	"Frontier":             "frontier_test.json",
 	"Homestead":            "homestead_test.json",
 	"EIP150":               "eip150_test.json",
@@ -118,7 +118,7 @@ func init() {
 	} else if os.Getenv(MG_CHAINCONFIG_CHAINSPEC_KEY) != "" {
 		log.Println("Setting chain configurations from Parity chainspecs")
 
-		for k, v := range mapForkNameChainspecFileState {
+		for k, v := range MapForkNameChainspecFileState {
 			config, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
 			if os.IsNotExist(err) {
 				wd, wde := os.Getwd()

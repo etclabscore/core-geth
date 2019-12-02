@@ -78,7 +78,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 	// then generate that file.
 	for _, subtest := range test.Subtests() {
 		subtest := subtest
-		if _, ok := mapForkNameChainspecFileState[subtest.Fork]; !ok {
+		if _, ok := MapForkNameChainspecFileState[subtest.Fork]; !ok {
 			genesis := test.genesis(Forks[subtest.Fork])
 			pspec, err := convert.NewParityChainSpec(subtest.Fork, genesis, []string{})
 			if err != nil {

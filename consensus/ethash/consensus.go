@@ -579,7 +579,7 @@ func accumulateRewards(config common2.ChainConfigurator, state *state.StateDB, h
 		return
 	}
 
-	blockReward := params.EthashBlockReward(config, header.Number)
+	blockReward := common2.EthashBlockReward(config, header.Number)
 
 	// Accumulate the rewards for the miner and any included uncles
 	reward := new(big.Int).Set(blockReward)

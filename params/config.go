@@ -20,9 +20,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // Genesis hashes to enforce below configs on.
@@ -279,33 +277,3 @@ var (
 	}
 )
 
-func EthashBlockReward(c common2.ChainConfigurator, n *big.Int) *big.Int {
-	// Select the correct block reward based on chain progression
-	blockReward := vars.FrontierBlockReward
-	if c == nil || n == nil {
-		return blockReward
-	}
-
-	if len(c.GetEthashBlockRewardSchedule()) > 0 {
-		// Because the map is not necessarily sorted low-high, we
-		// have to ensure that we're walking upwards only.
-		var lastActivation uint64
-		for activation, reward := range c.GetEthashBlockRewardSchedule() {
-			if activation >= n.Uint64() {
-				if activation > lastActivation {
-					lastActivation = activation
-					blockReward = reward
-				}
-			}
-		}
-		return blockReward
-	}
-
-	if c.IsForked(c.GetEthashEIP1234TransitionV, n) {
-		blockReward = vars.EIP1234FBlockReward
-	} else if c.IsForked(c.GetEthashEIP649TransitionV, n) {
-		blockReward = vars.EIP649FBlockReward
-	}
-
-	return blockReward
-}

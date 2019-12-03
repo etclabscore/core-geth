@@ -426,11 +426,21 @@ func (c *MultiGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
+
 	c.EIP649FBlock = setBig(c.EIP649FBlock, n)
 	c.eip649FInferred = true
+
 	if n == nil {
 		return nil
 	}
+
+	if c.BlockRewardSchedule == nil {
+		c.BlockRewardSchedule = common2.Uint64BigMapEncodesHex{}
+	}
+	if c.DifficultyBombDelaySchedule == nil {
+		c.DifficultyBombDelaySchedule = common2.Uint64BigMapEncodesHex{}
+	}
+
 	c.BlockRewardSchedule[*n] = vars.EIP649FBlockReward
 
 	eip1234N := c.EIP1234FBlock
@@ -466,10 +476,19 @@ func (c *MultiGethChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
+
 	c.EIP1234FBlock = setBig(c.EIP1234FBlock, n)
 	c.eip1234FInferred = true
+
 	if n == nil {
 		return nil
+	}
+
+	if c.BlockRewardSchedule == nil {
+		c.BlockRewardSchedule = common2.Uint64BigMapEncodesHex{}
+	}
+	if c.DifficultyBombDelaySchedule == nil {
+		c.DifficultyBombDelaySchedule = common2.Uint64BigMapEncodesHex{}
 	}
 
 	// Block reward is a simple lookup; doesn't matter if overwrite or not.

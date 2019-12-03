@@ -548,6 +548,12 @@ func (spec *ParityChainSpec) SetEthashEIP649Transition(n *uint64) error {
 	if n == nil {
 		return nil
 	}
+	if spec.Engine.Ethash.Params.BlockReward == nil {
+		spec.Engine.Ethash.Params.BlockReward = common2.Uint64BigValOrMapHex{}
+	}
+	if spec.Engine.Ethash.Params.DifficultyBombDelays == nil {
+		spec.Engine.Ethash.Params.DifficultyBombDelays = common2.Uint64BigMapEncodesHex{}
+	}
 	spec.Engine.Ethash.Params.BlockReward[*n] = vars.EIP649FBlockReward
 
 	eip1234N := spec.Engine.Ethash.Params.eip1234Transition
@@ -585,7 +591,12 @@ func (spec *ParityChainSpec) SetEthashEIP1234Transition(n *uint64) error {
 	if n == nil {
 		return nil
 	}
-
+	if spec.Engine.Ethash.Params.BlockReward == nil {
+		spec.Engine.Ethash.Params.BlockReward = common2.Uint64BigValOrMapHex{}
+	}
+	if spec.Engine.Ethash.Params.DifficultyBombDelays == nil {
+		spec.Engine.Ethash.Params.DifficultyBombDelays = common2.Uint64BigMapEncodesHex{}
+	}
 	// Block reward is a simple lookup; doesn't matter if overwrite or not.
 	spec.Engine.Ethash.Params.BlockReward[*n] = vars.EIP1234FBlockReward
 

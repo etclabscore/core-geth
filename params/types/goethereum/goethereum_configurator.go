@@ -456,7 +456,7 @@ func (c *ChainConfig) SetEthashEIP779Transition(n *uint64) error {
 	return nil
 }
 
-func (c *ChainConfig) GetEthashEIP649TransitionV() *uint64 {
+func (c *ChainConfig) GetEthashEIP649Transition() *uint64 {
 	return bigNewU64(c.ByzantiumBlock)
 }
 
@@ -468,7 +468,7 @@ func (c *ChainConfig) SetEthashEIP649Transition(n *uint64) error {
 	return nil
 }
 
-func (c *ChainConfig) GetEthashEIP1234TransitionV() *uint64 {
+func (c *ChainConfig) GetEthashEIP1234Transition() *uint64 {
 	return bigNewU64(c.ConstantinopleBlock)
 }
 

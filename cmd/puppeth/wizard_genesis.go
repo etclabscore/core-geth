@@ -222,14 +222,14 @@ func (w *wizard) manageGenesis() {
 		w.conf.Genesis.Config.SetEIP161abcTransition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP161abcTransition()))
 
 		fmt.Println()
-		fmt.Printf("Which block should Byzantium come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEthashEIP649TransitionV())
-		w.conf.Genesis.Config.SetEthashEIP649Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEthashEIP649TransitionV()))
+		fmt.Printf("Which block should Byzantium come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEthashEIP649Transition())
+		w.conf.Genesis.Config.SetEthashEIP649Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEthashEIP649Transition()))
 
 		fmt.Println()
-		fmt.Printf("Which block should Constantinople come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEthashEIP1234TransitionV())
-		w.conf.Genesis.Config.SetEthashEIP1234Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEthashEIP1234TransitionV()))
+		fmt.Printf("Which block should Constantinople come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEthashEIP1234Transition())
+		w.conf.Genesis.Config.SetEthashEIP1234Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEthashEIP1234Transition()))
 		if w.conf.Genesis.Config.GetEIP1283DisableTransition() == nil {
-			w.conf.Genesis.Config.SetEIP1283DisableTransition(w.conf.Genesis.Config.GetEthashEIP1234TransitionV())
+			w.conf.Genesis.Config.SetEIP1283DisableTransition(w.conf.Genesis.Config.GetEthashEIP1234Transition())
 		}
 		fmt.Println()
 		fmt.Printf("Which block should Petersburg come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP1283DisableTransition())

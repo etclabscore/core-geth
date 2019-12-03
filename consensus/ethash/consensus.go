@@ -383,7 +383,7 @@ func CalcDifficulty(config common2.ChainConfigurator, time uint64, parent *types
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 
-	} else if config.IsForked(config.GetEthashEIP1234TransitionV, next) {
+	} else if config.IsForked(config.GetEthashEIP1234Transition, next) {
 		// calcDifficultyEIP1234 is the difficulty adjustment algorithm for Constantinople.
 		// The calculation uses the Byzantium rules, but with bomb offset 5M.
 		// Specification EIP-1234: https://eips.ethereum.org/EIPS/eip-1234
@@ -398,7 +398,7 @@ func CalcDifficulty(config common2.ChainConfigurator, time uint64, parent *types
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 
-	} else if config.IsForked(config.GetEthashEIP649TransitionV, next) {
+	} else if config.IsForked(config.GetEthashEIP649Transition, next) {
 		// The calculation uses the Byzantium rules, with bomb offset of 3M.
 		// Specification EIP-649: https://eips.ethereum.org/EIPS/eip-649
 		// Related meta-ish EIP-669: https://github.com/ethereum/EIPs/pull/669

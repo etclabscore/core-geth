@@ -130,9 +130,9 @@ type EthashConfigurator interface {
 	SetEthashEIP2Transition(n *uint64) error
 	GetEthashEIP779Transition() *uint64 // DAO
 	SetEthashEIP779Transition(n *uint64) error
-	GetEthashEIP649TransitionV() *uint64
+	GetEthashEIP649Transition() *uint64
 	SetEthashEIP649Transition(n *uint64) error
-	GetEthashEIP1234TransitionV() *uint64
+	GetEthashEIP1234Transition() *uint64
 	SetEthashEIP1234Transition(n *uint64) error
 	GetEthashECIP1010PauseTransition() *uint64
 	SetEthashECIP1010PauseTransition(n *uint64) error

@@ -522,7 +522,7 @@ func (spec *ParityChainSpec) SetEthashEIP779Transition(n *uint64) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) GetEthashEIP649TransitionV() *uint64 {
+func (spec *ParityChainSpec) GetEthashEIP649Transition() *uint64 {
 	if spec.Engine.Ethash.Params.eip649inferred {
 		return spec.Engine.Ethash.Params.eip649Transition.Uint64P()
 	}
@@ -559,7 +559,7 @@ func (spec *ParityChainSpec) SetEthashEIP649Transition(n *uint64) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) GetEthashEIP1234TransitionV() *uint64 {
+func (spec *ParityChainSpec) GetEthashEIP1234Transition() *uint64 {
 	if spec.Engine.Ethash.Params.eip1234inferred {
 		return spec.Engine.Ethash.Params.eip1234Transition.Uint64P()
 	}

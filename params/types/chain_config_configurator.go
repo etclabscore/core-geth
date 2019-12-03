@@ -402,7 +402,7 @@ func (c *MultiGethChainConfig) SetEthashEIP779Transition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashEIP649TransitionV() *uint64 {
+func (c *MultiGethChainConfig) GetEthashEIP649Transition() *uint64 {
 	if c.eip649FInferred {
 		return bigNewU64(c.EIP649FBlock)
 	}
@@ -442,7 +442,7 @@ func (c *MultiGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashEIP1234TransitionV() *uint64 {
+func (c *MultiGethChainConfig) GetEthashEIP1234Transition() *uint64 {
 	if c.eip1234FInferred {
 		return bigNewU64(c.EIP1234FBlock)
 	}

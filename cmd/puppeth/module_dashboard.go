@@ -631,8 +631,8 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 		"Homestead":         conf.Genesis.Config.GetEthashHomesteadTransition(),
 		"Tangerine":         conf.Genesis.Config.GetEIP150Transition(),
 		"Spurious":          conf.Genesis.Config.GetEIP155Transition(),
-		"Byzantium":         conf.Genesis.Config.GetEthashEIP649TransitionV(),
-		"Constantinople":    conf.Genesis.Config.GetEthashEIP1234TransitionV(),
+		"Byzantium":         conf.Genesis.Config.GetEthashEIP649Transition(),
+		"Constantinople":    conf.Genesis.Config.GetEthashEIP1234Transition(),
 		"ConstantinopleFix": conf.Genesis.Config.GetEIP1283DisableTransition(),
 	})
 	files[filepath.Join(workdir, "index.html")] = indexfile.Bytes()

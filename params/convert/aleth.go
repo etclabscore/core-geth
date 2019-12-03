@@ -59,10 +59,10 @@ func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*aleth.Al
 	if num := genesis.Config.GetEIP161abcTransition(); num != nil {
 		spec.Params.EIP158ForkBlock = (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())
 	}
-	if num := genesis.Config.GetEthashEIP649TransitionV(); num != nil {
+	if num := genesis.Config.GetEthashEIP649Transition(); num != nil {
 		spec.Params.ByzantiumForkBlock = (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())
 	}
-	if num := genesis.Config.GetEthashEIP1234TransitionV(); num != nil {
+	if num := genesis.Config.GetEthashEIP1234Transition(); num != nil {
 		spec.Params.ConstantinopleForkBlock = (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())
 	}
 	if num := genesis.Config.GetEIP1283DisableTransition(); num != nil {

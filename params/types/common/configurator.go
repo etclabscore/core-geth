@@ -50,7 +50,7 @@ func (err *ConfigCompatError) Error() string {
 	if want == nil {
 		want = "nil"
 	}
-	return fmt.Sprintf("mismatching %s in database (have %v, want %v, rewindto %d)", err.What, have, want, err.RewindTo)
+	return fmt.Sprintf("mismatching %s in database (old: %v, new: %v, rewindto %d)", err.What, have, want, err.RewindTo)
 }
 
 type ConfigValidError struct {

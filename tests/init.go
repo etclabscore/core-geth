@@ -88,7 +88,7 @@ var Forks = map[string]common2.ChainConfigurator{
 		EIP1283FBlock:      nil,
 		EIP2200FBlock:      nil, // RePetersburg
 		DisposalBlock:      big.NewInt(0),
-		ECIP1017FBlock:     nil,
+		ECIP1017FBlock:     big.NewInt(5000000), // FIXME(meows) maybe
 		ECIP1017EraRounds:  big.NewInt(5000000),
 		ECIP1010PauseBlock: nil,
 		ECIP1010Length:     nil,
@@ -140,7 +140,7 @@ var Forks = map[string]common2.ChainConfigurator{
 		EIP1283FBlock:      big.NewInt(0),
 		PetersburgBlock:    big.NewInt(0),
 		DisposalBlock:      big.NewInt(0),
-		ECIP1017FBlock:     nil,
+		ECIP1017FBlock:     big.NewInt(5000000), // FIXME(meows) maybe
 		ECIP1017EraRounds:  big.NewInt(5000000),
 		ECIP1010PauseBlock: nil,
 		ECIP1010Length:     nil,

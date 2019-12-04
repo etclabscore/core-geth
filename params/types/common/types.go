@@ -207,6 +207,10 @@ func (c ConsensusEngineT) IsClique() bool {
 	return c == ConsensusEngineT_Clique
 }
 
+func (c ConsensusEngineT) IsUnknown() bool {
+	return c == ConsensusEngineT_Unknown
+}
+
 type BlockSealingT int
 
 const (

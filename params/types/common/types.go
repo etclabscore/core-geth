@@ -126,8 +126,16 @@ func (bb *Uint64BigMapEncodesHex) UnmarshalJSON(input []byte) error {
 				return err
 			}
 			vv = b.ToInt()
-		case int64:
+		case int, int64:
 			vv = big.NewInt(v.(int64))
+		case float64:
+			i, err := strconv.ParseUint(fmt.Sprintf("%.0f", v), 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			vv = big.NewInt(int64(i))
+		default:
+			panic(fmt.Sprintf("unknown type: %t %v", v, v))
 		}
 		if vv != nil {
 			b[uint64(k)] = vv

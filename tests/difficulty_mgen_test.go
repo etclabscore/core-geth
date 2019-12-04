@@ -42,7 +42,7 @@ func TestDifficultyGen(t *testing.T) {
 	if !generateTests {
 		t.Skip()
 	}
-	if os.Getenv(MG_CHAINCONFIG_CHAINSPEC_KEY) == "" {
+	if os.Getenv(MG_CHAINCONFIG_CHAINSPECS_PARITY_KEY) == "" {
 		t.Fatal("Must run test generation with JSON file chain configurations.")
 	}
 

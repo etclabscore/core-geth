@@ -30,10 +30,18 @@ import (
 // to the task of generating tests.
 
 var (
-	MG_GENERATE_STATE_TESTS_KEY      = "MULTIGETH_TESTS_GENERATE_STATE_TESTS"
-	MG_GENERATE_DIFFICULTY_TESTS_KEY = "MULTIGETH_TESTS_GENERATE_DIFFICULTY_TESTS"
-	MG_CHAINCONFIG_FEATURE_EQ_KEY    = "MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE"
-	MG_CHAINCONFIG_CHAINSPEC_KEY     = "MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS"
+	MG_GENERATE_STATE_TESTS_KEY             = "MULTIGETH_TESTS_GENERATE_STATE_TESTS"
+	MG_GENERATE_DIFFICULTY_TESTS_KEY        = "MULTIGETH_TESTS_GENERATE_DIFFICULTY_TESTS"
+
+	// Feature Equivalence tests use convert.Convert to
+	// run tests using alternating ChainConfig data type implementations.
+	MG_CHAINCONFIG_FEATURE_EQ_MULTIGETH_KEY = "MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETH"
+	MG_CHAINCONFIG_FEATURE_EQ_PARITY_KEY    = "MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_PARITY"
+
+	// Parity specs tests use Parity JSON config data (in params/parity.json.d/)
+	// when applicable as equivalent config implementations for the default Go data type
+	// configs.
+	MG_CHAINCONFIG_CHAINSPECS_PARITY_KEY = "MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS"
 )
 
 type chainspecRefsT map[string]chainspecRef
@@ -84,4 +92,3 @@ var submoduleParentRef = func() string {
 	subModOut = strings.ReplaceAll(strings.TrimSpace(subModOut), " ", "_")
 	return subModOut
 }()
-

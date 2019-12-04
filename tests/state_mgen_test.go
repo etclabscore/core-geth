@@ -21,7 +21,7 @@ func TestGenState(t *testing.T) {
 	if os.Getenv(MG_GENERATE_STATE_TESTS_KEY) == "" {
 		t.Skip()
 	}
-	if os.Getenv(MG_CHAINCONFIG_CHAINSPEC_KEY) == "" {
+	if os.Getenv(MG_CHAINCONFIG_CHAINSPECS_PARITY_KEY) == "" {
 		t.Fatal("Must use chainspec files for fork configurations.")
 	}
 

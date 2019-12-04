@@ -344,8 +344,11 @@ func (spec *ParityChainSpec) GetEIP213Transition() *uint64 {
 			},
 		}).Uint64P()
 
-	if x == nil || y == nil {
+	if x == nil && y == nil {
 		return spec.GetEIP1108Transition()
+	}
+	if x == nil || y == nil {
+		return nil
 	}
 	if *x != *y {
 		return nil

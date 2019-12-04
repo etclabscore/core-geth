@@ -644,7 +644,10 @@ func (spec *ParityChainSpec) GetEthashECIP1017Transition() *uint64 {
 }
 
 func (spec *ParityChainSpec) SetEthashECIP1017Transition(n *uint64) error {
-	return common2.ErrUnsupportedConfigNoop
+	// Even though this feature is not explicitly supported,
+	// we'll follow the ad hoc logic as above.
+	spec.Engine.Ethash.Params.ECIP1017EraRounds = new(ParityU64).SetUint64(n)
+	return nil
 }
 
 func (spec *ParityChainSpec) GetEthashECIP1017EraRounds() *uint64 {

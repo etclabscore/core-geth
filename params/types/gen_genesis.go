@@ -28,7 +28,6 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	common0 "github.com/ethereum/go-ethereum/params/types/common"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var _ = (*genesisSpecMarshaling)(nil)
@@ -87,20 +86,9 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 		ParentHash *common.Hash                                `json:"parentHash"`
 	}
 	var dec Genesis
-
-	// Note that this logic is importantly relate to the logic in params/convert/json.go, for ChainConfigurator
-	// unmarshaling.
-	dec.Config = &MultiGethChainConfig{}
-	if err := json.Unmarshal(input, &dec); err != nil || common0.IsValid(dec.Config, nil) != nil {
-		dec.Config = &goethereum.ChainConfig{}
-		if err := json.Unmarshal(input, &dec); err != nil {
-			return err
-		}
-		if err := common0.IsValid(dec.Config, nil); err !=nil {
-			return err
-		}
+	if err := json.Unmarshal(input, &dec); err != nil {
+		return err
 	}
-
 	if dec.Config != nil {
 		g.Config = dec.Config
 	}

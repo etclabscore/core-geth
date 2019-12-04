@@ -111,13 +111,12 @@ func Compatible(head *uint64, a, b ChainConfigurator) *ConfigCompatError {
 	return lastErr
 }
 
-// FIXME(meows): Incomplete.
 func Equivalent(a, b ChainConfigurator) error {
-	var m uint64 = math.MaxUint64
-	if err := Compatible(&m, a, b); err != nil {
-		return err
+	if a.GetConsensusEngineType() != b.GetConsensusEngineType() {
+		return fmt.Errorf("mismatch consensus engine types, A: %s, B: %s", a.GetConsensusEngineType(), b.GetConsensusEngineType())
 	}
 
+	// Check forks sameness.
 	fa, fb := Forks(a), Forks(b)
 	if len(fa) != len(fb) {
 		return fmt.Errorf("different fork count: %d / %d (%v / %v)", len(fa), len(fb), fa, fb)
@@ -131,6 +130,58 @@ func Equivalent(a, b ChainConfigurator) error {
 				return fmt.Errorf("fb bigmax: %d", fb[i])
 			}
 			return fmt.Errorf("fork index %d not same: %d / %d", i, fa[i], fb[i])
+		}
+	}
+
+	// Check initial, at- and around-fork, and eventual compatibility.
+	var testForks = []uint64{}
+	copy(testForks, fa)
+	// Don't care about dupes.
+	for _, f := range fa {
+		testForks = append(testForks, f-1)
+	}
+	testForks = append(testForks, 0, math.MaxUint64)
+
+	// essentiallyEquivalent treats nil and bitsize-max numbers as essentially equivalent.
+	essentiallyEquivalent := func(x, y *uint64) bool {
+		if x == nil && y != nil {
+			return *y == math.MaxUint64 ||
+				*y == 0x7FFFFFFFFFFFFFFF ||
+				*y == 0x7FFFFFFFFFFFFFF ||
+				*y == 0x7FFFFFFFFFFFFF
+		}
+		if x != nil && y == nil {
+			return *x == math.MaxUint64 ||
+				*x == 0x7FFFFFFFFFFFFFFF ||
+				*x == 0x7FFFFFFFFFFFFFF ||
+				*x == 0x7FFFFFFFFFFFFF
+		}
+		return false
+	}
+	for _, h := range testForks {
+		if err := Compatible(&h, a, b); err != nil {
+			if !essentiallyEquivalent(err.StoredConfig, err.NewConfig) {
+				return err
+			}
+		}
+	}
+
+	if a.GetConsensusEngineType() == ConsensusEngineT_Ethash {
+		for _, f := range fa { // fa and fb are fork-equivalent
+			ar := EthashBlockReward(a, new(big.Int).SetUint64(f))
+			br := EthashBlockReward(b, new(big.Int).SetUint64(f))
+			if ar.Cmp(br) != 0 {
+				return fmt.Errorf("mismatch block reward, fork block: %v, A: %v, B: %v", f, ar, br)
+			}
+			// TODO: add difficulty comparison
+			// Currently tough/complex to do because of necessary overhead (ie build a parent block).
+		}
+	} else if a.GetConsensusEngineType() == ConsensusEngineT_Clique {
+		if *a.GetCliqueEpoch() != *b.GetCliqueEpoch() {
+			return fmt.Errorf("mismatch clique epochs: A: %v, B: %v", *a.GetCliqueEpoch(), *b.GetCliqueEpoch())
+		}
+		if *a.GetCliquePeriod() != *b.GetCliquePeriod() {
+			return fmt.Errorf("mismatch clique periods: A: %v, B: %v", *a.GetCliquePeriod(), *b.GetCliquePeriod())
 		}
 	}
 	return nil

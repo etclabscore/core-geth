@@ -144,6 +144,9 @@ func (t *BlockTest) Run() error {
 }
 
 func (t *BlockTest) genesis(config common2.ChainConfigurator) *paramtypes.Genesis {
+	if config == nil {
+		panic("nil block genesis config")
+	}
 	return &paramtypes.Genesis{
 		Config:     config,
 		Nonce:      t.json.Genesis.Nonce.Uint64(),

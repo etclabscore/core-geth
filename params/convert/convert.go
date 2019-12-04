@@ -2,7 +2,6 @@ package convert
 
 import (
 	"fmt"
-	"log"
 	"reflect"
 	"strings"
 
@@ -109,7 +108,7 @@ func convert(k reflect.Type, source, target interface{}) error {
 			if common.IsFatalUnsupportedErr(err) {
 				return e
 			}
-			log.Println(e) // FIXME?
+			//log.Println(e) // FIXME?
 		}
 	}
 	return nil

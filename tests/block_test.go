@@ -46,7 +46,7 @@ func TestBlockchain(t *testing.T) {
 
 	bt.walk(t, blockTestDir, func(t *testing.T, name string, test *BlockTest) {
 		if err := bt.checkFailure(t, name, test.Run()); err != nil {
-			t.Error(err)
+			t.Errorf("%v (config=%s)", err, test.json.Network)
 		}
 	})
 

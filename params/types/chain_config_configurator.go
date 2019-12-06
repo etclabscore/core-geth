@@ -515,6 +515,11 @@ func (c *MultiGethChainConfig) SetEthashECIP1010PauseTransition(n *uint64) error
 	if c.Ethash == nil {
 		return common2.ErrUnsupportedConfigFatal
 	}
+	if c.ECIP1010PauseBlock == nil && c.ECIP1010Length != nil {
+		c.ECIP1010PauseBlock = setBig(c.ECIP1010PauseBlock, n)
+		c.ECIP1010Length = c.ECIP1010Length.Sub(c.ECIP1010Length, c.ECIP1010PauseBlock)
+		return nil
+	}
 	c.ECIP1010PauseBlock = setBig(c.ECIP1010PauseBlock, n)
 	return nil
 }
@@ -539,7 +544,8 @@ func (c *MultiGethChainConfig) SetEthashECIP1010ContinueTransition(n *uint64) er
 		return common2.ErrUnsupportedConfigNoop
 	}
 	if c.ECIP1010PauseBlock == nil {
-		return common2.ErrUnsupportedConfigFatal
+		c.ECIP1010Length = new(big.Int).SetUint64(*n)
+		return nil
 	}
 	c.ECIP1010Length = new(big.Int).Sub(big.NewInt(int64(*n)), c.ECIP1010PauseBlock)
 	return nil

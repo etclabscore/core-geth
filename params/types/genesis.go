@@ -242,3 +242,422 @@ func (g *Genesis) SetGenesisGasLimit(u uint64) error {
 	g.GasLimit = u
 	return nil
 }
+
+
+// Implement methods to satisfy Configurator interface.
+
+func (g *Genesis) GetAccountStartNonce() *uint64 {
+	return g.Config.GetAccountStartNonce()
+}
+
+func (g *Genesis) SetAccountStartNonce(n *uint64) error {
+	return g.Config.SetAccountStartNonce(n)
+}
+
+func (g *Genesis) GetMaximumExtraDataSize() *uint64 {
+	return g.Config.GetMaximumExtraDataSize()
+}
+
+func (g *Genesis) SetMaximumExtraDataSize(n *uint64) error {
+	return g.Config.SetMaximumExtraDataSize(n)
+}
+
+func (g *Genesis) GetMinGasLimit() *uint64 {
+	return g.Config.GetMinGasLimit()
+}
+
+func (g *Genesis) SetMinGasLimit(n *uint64) error {
+	return g.Config.SetMinGasLimit(n)
+}
+
+func (g *Genesis) GetGasLimitBoundDivisor() *uint64 {
+	return g.Config.GetGasLimitBoundDivisor()
+}
+
+func (g *Genesis) SetGasLimitBoundDivisor(n *uint64) error {
+	return g.Config.SetGasLimitBoundDivisor(n)
+}
+
+func (g *Genesis) GetNetworkID() *uint64 {
+	return g.Config.GetNetworkID()
+}
+
+func (g *Genesis) SetNetworkID(n *uint64) error {
+	return g.Config.SetNetworkID(n)
+}
+
+func (g *Genesis) GetChainID() *big.Int {
+	return g.Config.GetChainID()
+}
+
+func (g *Genesis) SetChainID(i *big.Int) error {
+	return g.Config.SetChainID(i)
+}
+
+func (g *Genesis) GetMaxCodeSize() *uint64 {
+	return g.Config.GetMaxCodeSize()
+}
+
+func (g *Genesis) SetMaxCodeSize(n *uint64) error {
+	return g.Config.SetMaxCodeSize(n)
+}
+
+func (g *Genesis) GetEIP7Transition() *uint64 {
+	return g.Config.GetEIP7Transition()
+}
+
+func (g *Genesis) SetEIP7Transition(n *uint64) error {
+	return g.Config.SetEIP7Transition(n)
+}
+
+func (g *Genesis) GetEIP150Transition() *uint64 {
+	return g.Config.GetEIP150Transition()
+}
+
+func (g *Genesis) SetEIP150Transition(n *uint64) error {
+	return g.Config.SetEIP150Transition(n)
+}
+
+func (g *Genesis) GetEIP152Transition() *uint64 {
+	return g.Config.GetEIP152Transition()
+}
+
+func (g *Genesis) SetEIP152Transition(n *uint64) error {
+	return g.Config.SetEIP152Transition(n)
+}
+
+func (g *Genesis) GetEIP160Transition() *uint64 {
+	return g.Config.GetEIP160Transition()
+}
+
+func (g *Genesis) SetEIP160Transition(n *uint64) error {
+	return g.Config.SetEIP160Transition(n)
+}
+
+func (g *Genesis) GetEIP161abcTransition() *uint64 {
+	return g.Config.GetEIP161abcTransition()
+}
+
+func (g *Genesis) SetEIP161abcTransition(n *uint64) error {
+	return g.Config.SetEIP161abcTransition(n)
+}
+
+func (g *Genesis) GetEIP161dTransition() *uint64 {
+	return g.Config.GetEIP161dTransition()
+}
+
+func (g *Genesis) SetEIP161dTransition(n *uint64) error {
+	return g.Config.SetEIP161dTransition(n)
+}
+
+func (g *Genesis) GetEIP170Transition() *uint64 {
+	return g.Config.GetEIP170Transition()
+}
+
+func (g *Genesis) SetEIP170Transition(n *uint64) error {
+	return g.Config.SetEIP170Transition(n)
+}
+
+func (g *Genesis) GetEIP155Transition() *uint64 {
+	return g.Config.GetEIP155Transition()
+}
+
+func (g *Genesis) SetEIP155Transition(n *uint64) error {
+	return g.Config.SetEIP155Transition(n)
+}
+
+func (g *Genesis) GetEIP140Transition() *uint64 {
+	return g.Config.GetEIP140Transition()
+}
+
+func (g *Genesis) SetEIP140Transition(n *uint64) error {
+	return g.Config.SetEIP140Transition(n)
+}
+
+func (g *Genesis) GetEIP198Transition() *uint64 {
+	return g.Config.GetEIP198Transition()
+}
+
+func (g *Genesis) SetEIP198Transition(n *uint64) error {
+	return g.Config.SetEIP198Transition(n)
+}
+
+func (g *Genesis) GetEIP211Transition() *uint64 {
+	return g.Config.GetEIP211Transition()
+}
+
+func (g *Genesis) SetEIP211Transition(n *uint64) error {
+	return g.Config.SetEIP211Transition(n)
+}
+
+func (g *Genesis) GetEIP212Transition() *uint64 {
+	return g.Config.GetEIP212Transition()
+}
+
+func (g *Genesis) SetEIP212Transition(n *uint64) error {
+	return g.Config.SetEIP212Transition(n)
+}
+
+func (g *Genesis) GetEIP213Transition() *uint64 {
+	return g.Config.GetEIP213Transition()
+}
+
+func (g *Genesis) SetEIP213Transition(n *uint64) error {
+	return g.Config.SetEIP213Transition(n)
+}
+
+func (g *Genesis) GetEIP214Transition() *uint64 {
+	return g.Config.GetEIP214Transition()
+}
+
+func (g *Genesis) SetEIP214Transition(n *uint64) error {
+	return g.Config.SetEIP214Transition(n)
+}
+
+func (g *Genesis) GetEIP658Transition() *uint64 {
+	return g.Config.GetEIP658Transition()
+}
+
+func (g *Genesis) SetEIP658Transition(n *uint64) error {
+	return g.Config.SetEIP658Transition(n)
+}
+
+func (g *Genesis) GetEIP145Transition() *uint64 {
+	return g.Config.GetEIP145Transition()
+}
+
+func (g *Genesis) SetEIP145Transition(n *uint64) error {
+	return g.Config.SetEIP145Transition(n)
+}
+
+func (g *Genesis) GetEIP1014Transition() *uint64 {
+	return g.Config.GetEIP1014Transition()
+}
+
+func (g *Genesis) SetEIP1014Transition(n *uint64) error {
+	return g.Config.SetEIP1014Transition(n)
+}
+
+func (g *Genesis) GetEIP1052Transition() *uint64 {
+	return g.Config.GetEIP1052Transition()
+}
+
+func (g *Genesis) SetEIP1052Transition(n *uint64) error {
+	return g.Config.SetEIP1052Transition(n)
+}
+
+func (g *Genesis) GetEIP1283Transition() *uint64 {
+	return g.Config.GetEIP1283Transition()
+}
+
+func (g *Genesis) SetEIP1283Transition(n *uint64) error {
+	return g.Config.SetEIP1283Transition(n)
+}
+
+func (g *Genesis) GetEIP1283DisableTransition() *uint64 {
+	return g.Config.GetEIP1283DisableTransition()
+}
+
+func (g *Genesis) SetEIP1283DisableTransition(n *uint64) error {
+	return g.Config.SetEIP1283DisableTransition(n)
+}
+
+func (g *Genesis) GetEIP1108Transition() *uint64 {
+	return g.Config.GetEIP1108Transition()
+}
+
+func (g *Genesis) SetEIP1108Transition(n *uint64) error {
+	return g.Config.SetEIP1108Transition(n)
+}
+
+func (g *Genesis) GetEIP1283ReenableTransition() *uint64 {
+	return g.Config.GetEIP1283ReenableTransition()
+}
+
+func (g *Genesis) SetEIP1283ReenableTransition(n *uint64) error {
+	return g.Config.SetEIP1283ReenableTransition(n)
+}
+
+func (g *Genesis) GetEIP1344Transition() *uint64 {
+	return g.Config.GetEIP1344Transition()
+}
+
+func (g *Genesis) SetEIP1344Transition(n *uint64) error {
+	return g.Config.SetEIP1344Transition(n)
+}
+
+func (g *Genesis) GetEIP1884Transition() *uint64 {
+	return g.Config.GetEIP1884Transition()
+}
+
+func (g *Genesis) SetEIP1884Transition(n *uint64) error {
+	return g.Config.SetEIP1884Transition(n)
+}
+
+func (g *Genesis) GetEIP2028Transition() *uint64 {
+	return g.Config.GetEIP2028Transition()
+}
+
+func (g *Genesis) SetEIP2028Transition(n *uint64) error {
+	return g.Config.SetEIP2028Transition(n)
+}
+
+func (g *Genesis) IsForked(fn func() *uint64, n *big.Int) bool {
+	return g.Config.IsForked(fn, n)
+}
+
+func (g *Genesis) ForkCanonHash(n uint64) common.Hash {
+	return g.Config.ForkCanonHash(n)
+}
+
+func (g *Genesis) GetConsensusEngineType() common2.ConsensusEngineT {
+	return g.Config.GetConsensusEngineType()
+}
+
+func (g *Genesis) MustSetConsensusEngineType(t common2.ConsensusEngineT) error {
+	return g.Config.MustSetConsensusEngineType(t)
+}
+
+func (g *Genesis) GetEthashMinimumDifficulty() *big.Int {
+	return g.Config.GetEthashMinimumDifficulty()
+}
+
+func (g *Genesis) SetEthashMinimumDifficulty(i *big.Int) error {
+	return g.Config.SetEthashMinimumDifficulty(i)
+}
+
+func (g *Genesis) GetEthashDifficultyBoundDivisor() *big.Int {
+	return g.Config.GetEthashDifficultyBoundDivisor()
+}
+
+func (g *Genesis) SetEthashDifficultyBoundDivisor(i *big.Int) error {
+	return g.Config.SetEthashDifficultyBoundDivisor(i)
+}
+
+func (g *Genesis) GetEthashDurationLimit() *big.Int {
+	return g.Config.GetEthashDurationLimit()
+}
+
+func (g *Genesis) SetEthashDurationLimit(i *big.Int) error {
+	return g.Config.SetEthashDurationLimit(i)
+}
+
+func (g *Genesis) GetEthashHomesteadTransition() *uint64 {
+	return g.Config.GetEthashHomesteadTransition()
+}
+
+func (g *Genesis) SetEthashHomesteadTransition(n *uint64) error {
+	return g.Config.SetEthashHomesteadTransition(n)
+}
+
+func (g *Genesis) GetEthashEIP2Transition() *uint64 {
+	return g.Config.GetEthashEIP2Transition()
+}
+
+func (g *Genesis) SetEthashEIP2Transition(n *uint64) error {
+	return g.Config.SetEthashEIP2Transition(n)
+}
+
+func (g *Genesis) GetEthashEIP779Transition() *uint64 {
+	return g.Config.GetEthashEIP779Transition()
+}
+
+func (g *Genesis) SetEthashEIP779Transition(n *uint64) error {
+	return g.Config.SetEthashEIP779Transition(n)
+}
+
+func (g *Genesis) GetEthashEIP649Transition() *uint64 {
+	return g.Config.GetEthashEIP649Transition()
+}
+
+func (g *Genesis) SetEthashEIP649Transition(n *uint64) error {
+	return g.Config.SetEthashEIP649Transition(n)
+}
+
+func (g *Genesis) GetEthashEIP1234Transition() *uint64 {
+	return g.Config.GetEthashEIP1234Transition()
+}
+
+func (g *Genesis) SetEthashEIP1234Transition(n *uint64) error {
+	return g.Config.SetEthashEIP1234Transition(n)
+}
+
+func (g *Genesis) GetEthashECIP1010PauseTransition() *uint64 {
+	return g.Config.GetEthashECIP1010PauseTransition()
+}
+
+func (g *Genesis) SetEthashECIP1010PauseTransition(n *uint64) error {
+	return g.Config.SetEthashECIP1010PauseTransition(n)
+}
+
+func (g *Genesis) GetEthashECIP1010ContinueTransition() *uint64 {
+	return g.Config.GetEthashECIP1010ContinueTransition()
+}
+
+func (g *Genesis) SetEthashECIP1010ContinueTransition(n *uint64) error {
+	return g.Config.SetEthashECIP1010ContinueTransition(n)
+}
+
+func (g *Genesis) GetEthashECIP1017Transition() *uint64 {
+	return g.Config.GetEthashECIP1017Transition()
+}
+
+func (g *Genesis) SetEthashECIP1017Transition(n *uint64) error {
+	return g.Config.SetEthashECIP1017Transition(n)
+}
+
+func (g *Genesis) GetEthashECIP1017EraRounds() *uint64 {
+	return g.Config.GetEthashECIP1017EraRounds()
+}
+
+func (g *Genesis) SetEthashECIP1017EraRounds(n *uint64) error {
+	return g.Config.SetEthashECIP1017EraRounds(n)
+}
+
+func (g *Genesis) GetEthashEIP100BTransition() *uint64 {
+	return g.Config.GetEthashEIP100BTransition()
+}
+
+func (g *Genesis) SetEthashEIP100BTransition(n *uint64) error {
+	return g.Config.SetEthashEIP100BTransition(n)
+}
+
+func (g *Genesis) GetEthashECIP1041Transition() *uint64 {
+	return g.Config.GetEthashECIP1041Transition()
+}
+
+func (g *Genesis) SetEthashECIP1041Transition(n *uint64) error {
+	return g.Config.SetEthashECIP1041Transition(n)
+}
+
+func (g *Genesis) GetEthashDifficultyBombDelaySchedule() common2.Uint64BigMapEncodesHex {
+	return g.Config.GetEthashDifficultyBombDelaySchedule()
+}
+
+func (g *Genesis) SetEthashDifficultyBombDelaySchedule(m common2.Uint64BigMapEncodesHex) error {
+	return g.Config.SetEthashDifficultyBombDelaySchedule(m)
+}
+
+func (g *Genesis) GetEthashBlockRewardSchedule() common2.Uint64BigMapEncodesHex {
+	return g.Config.GetEthashBlockRewardSchedule()
+}
+
+func (g *Genesis) SetEthashBlockRewardSchedule(m common2.Uint64BigMapEncodesHex) error {
+	return g.Config.SetEthashBlockRewardSchedule(m)
+}
+
+func (g *Genesis) GetCliquePeriod() *uint64 {
+	return g.Config.GetCliquePeriod()
+}
+
+func (g *Genesis) SetCliquePeriod(n uint64) error {
+	return g.Config.SetCliquePeriod(n)
+}
+
+func (g *Genesis) GetCliqueEpoch() *uint64 {
+	return g.Config.GetCliqueEpoch()
+}
+
+func (g *Genesis) SetCliqueEpoch(n uint64) error {
+	return g.Config.SetCliqueEpoch(n)
+}

@@ -310,7 +310,7 @@ func (c *MultiGethChainConfig) IsForked(fn func() *uint64, n *big.Int) bool {
 	return big.NewInt(int64(*f)).Cmp(n) <= 0
 }
 
-func (c *MultiGethChainConfig) ForkCanonHash(n uint64) common.Hash {
+func (c *MultiGethChainConfig) GetForkCanonHash(n uint64) common.Hash {
 	if c.RequireBlockHashes == nil {
 		return common.Hash{}
 	}
@@ -320,6 +320,18 @@ func (c *MultiGethChainConfig) ForkCanonHash(n uint64) common.Hash {
 		}
 	}
 	return common.Hash{}
+}
+
+func (c *MultiGethChainConfig) SetForkCanonHash(n uint64, h common.Hash) error {
+	if c.RequireBlockHashes == nil {
+		c.RequireBlockHashes = make(map[uint64]common.Hash)
+	}
+	c.RequireBlockHashes[n] = h
+	return nil
+}
+
+func (c *MultiGethChainConfig) GetForkCanonHashes() map[uint64]common.Hash {
+	return c.RequireBlockHashes
 }
 
 func (c *MultiGethChainConfig) GetConsensusEngineType() common2.ConsensusEngineT {

@@ -431,7 +431,7 @@ func (spec *ParityChainSpec) IsForked(fn func() *uint64, n *big.Int) bool {
 	return big.NewInt(int64(*f)).Cmp(n) <= 0
 }
 
-func (spec *ParityChainSpec) ForkCanonHash(n uint64) common.Hash {
+func (spec *ParityChainSpec) GetForkCanonHash(n uint64) common.Hash {
 	if spec.Params.ForkBlock == nil || spec.Params.ForkCanonHash == nil {
 		return common.Hash{}
 	}
@@ -439,6 +439,21 @@ func (spec *ParityChainSpec) ForkCanonHash(n uint64) common.Hash {
 		return *spec.Params.ForkCanonHash
 	}
 	return common.Hash{}
+}
+
+func (spec *ParityChainSpec) SetForkCanonHash(n uint64, h common.Hash) error {
+	spec.Params.ForkBlock = new(ParityU64).SetUint64(&n)
+	spec.Params.ForkCanonHash = &h
+	return nil
+}
+
+func (spec *ParityChainSpec) GetForkCanonHashes() map[uint64]common.Hash {
+	if spec.Params.ForkBlock == nil || spec.Params.ForkCanonHash == nil {
+		return nil
+	}
+	return map[uint64]common.Hash{
+		spec.Params.ForkBlock.Big().Uint64(): *spec.Params.ForkCanonHash,
+	}
 }
 
 func (spec *ParityChainSpec) GetConsensusEngineType() common2.ConsensusEngineT {

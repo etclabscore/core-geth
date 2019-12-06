@@ -105,9 +105,11 @@ type Forker interface {
 	// eg. IsForked(c.GetEIP1108Transition, big.NewInt(42)))
 	IsForked(fn func() *uint64, n *big.Int) bool
 
-	// VerifyForkNumberHash yields arbitrary number/hash pairs.
+	// ForkCanonHash yields arbitrary number/hash pairs.
 	// This is an abstraction derived from the original EIP150 implementation.
-	ForkCanonHash(n uint64) common.Hash
+	GetForkCanonHash(n uint64) common.Hash
+	SetForkCanonHash(n uint64, h common.Hash) error
+	GetForkCanonHashes() map[uint64]common.Hash
 }
 
 type ConsensusEnginator interface {

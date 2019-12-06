@@ -59,6 +59,13 @@ func Convert(from, to interface{}) error {
 		return err
 	}
 
+	// Set hardcoded fork hash(es)
+	for f, h := range fromChainer.GetForkCanonHashes() {
+		if err := toChainer.SetForkCanonHash(f, h); common.IsFatalUnsupportedErr(err) {
+			return err
+		}
+	}
+
 	// Set consensus engine params.
 	engineType := fromChainer.GetConsensusEngineType()
 	if err := toChainer.MustSetConsensusEngineType(engineType); err != nil {

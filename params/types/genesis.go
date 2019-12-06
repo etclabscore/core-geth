@@ -506,8 +506,16 @@ func (g *Genesis) IsForked(fn func() *uint64, n *big.Int) bool {
 	return g.Config.IsForked(fn, n)
 }
 
-func (g *Genesis) ForkCanonHash(n uint64) common.Hash {
-	return g.Config.ForkCanonHash(n)
+func (g *Genesis) GetForkCanonHash(n uint64) common.Hash {
+	return g.Config.GetForkCanonHash(n)
+}
+
+func (g *Genesis) SetForkCanonHash(n uint64, h common.Hash) error {
+	return g.Config.SetForkCanonHash(n, h)
+}
+
+func (g *Genesis) GetForkCanonHashes() map[uint64]common.Hash {
+	return g.Config.GetForkCanonHashes()
 }
 
 func (g *Genesis) GetConsensusEngineType() common2.ConsensusEngineT {

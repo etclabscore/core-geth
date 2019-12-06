@@ -349,11 +349,28 @@ func (c *ChainConfig) IsForked(fn func() *uint64, n *big.Int) bool {
 	return big.NewInt(int64(*f)).Cmp(n) <= 0
 }
 
-func (c *ChainConfig) ForkCanonHash(n uint64) common.Hash {
+func (c *ChainConfig) GetForkCanonHash(n uint64) common.Hash {
 	if c.EIP150Block != nil && c.EIP150Block.Uint64() == n {
 		return c.EIP150Hash
 	}
 	return common.Hash{}
+}
+
+func (c *ChainConfig) SetForkCanonHash(n uint64, h common.Hash) error {
+	if c.GetEIP150Transition() != nil && *c.GetEIP150Transition() == n {
+		c.EIP150Hash = h
+		return nil
+	}
+	return common2.ErrUnsupportedConfigNoop
+}
+
+func (c *ChainConfig) GetForkCanonHashes() map[uint64]common.Hash {
+	if c.EIP150Block == nil || c.EIP150Hash == (common.Hash{}) {
+		return nil
+	}
+	return map[uint64]common.Hash{
+		c.EIP150Block.Uint64(): c.EIP150Hash,
+	}
 }
 
 func (c *ChainConfig) GetConsensusEngineType() common2.ConsensusEngineT {

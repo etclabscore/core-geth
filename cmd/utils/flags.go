@@ -1724,8 +1724,8 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 	var engine consensus.Engine
 	if config.GetConsensusEngineType().IsClique() {
 		engine = clique.New(&goethereum.CliqueConfig{
-			Period: *config.GetCliquePeriod(),
-			Epoch:  *config.GetCliqueEpoch(),
+			Period: config.GetCliquePeriod(),
+			Epoch:  config.GetCliqueEpoch(),
 		}, chainDb)
 	} else {
 		engine = ethash.NewFaker()

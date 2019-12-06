@@ -716,8 +716,8 @@ func (spec *ParityChainSpec) SetEthashBlockRewardSchedule(input common2.Uint64Bi
 	return nil
 }
 
-func (spec *ParityChainSpec) GetCliquePeriod() *uint64 {
-	return spec.Engine.Clique.Params.Period.Uint64P()
+func (spec *ParityChainSpec) GetCliquePeriod() uint64 {
+	return *spec.Engine.Clique.Params.Period.Uint64P()
 }
 
 func (spec *ParityChainSpec) SetCliquePeriod(i uint64) error {
@@ -725,8 +725,8 @@ func (spec *ParityChainSpec) SetCliquePeriod(i uint64) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) GetCliqueEpoch() *uint64 {
-	return spec.Engine.Clique.Params.Epoch.Uint64P()
+func (spec *ParityChainSpec) GetCliqueEpoch() uint64 {
+	return *spec.Engine.Clique.Params.Epoch.Uint64P()
 }
 
 func (spec *ParityChainSpec) SetCliqueEpoch(i uint64) error {

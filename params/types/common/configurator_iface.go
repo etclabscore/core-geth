@@ -156,9 +156,9 @@ type EthashConfigurator interface {
 }
 
 type CliqueConfigurator interface {
-	GetCliquePeriod() *uint64
+	GetCliquePeriod() uint64
 	SetCliquePeriod(n uint64) error
-	GetCliqueEpoch() *uint64
+	GetCliqueEpoch() uint64
 	SetCliqueEpoch(n uint64) error
 }
 

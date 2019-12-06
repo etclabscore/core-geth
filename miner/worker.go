@@ -353,7 +353,7 @@ func (w *worker) newWorkLoop(recommit time.Duration) {
 		case <-timer.C:
 			// If mining is running resubmit a new work cycle periodically to pull in
 			// higher priced transactions. Disable this overhead for pending blocks.
-			if w.isRunning() && (!w.chainConfig.GetConsensusEngineType().IsClique() || *w.chainConfig.GetCliquePeriod() > 0) {
+			if w.isRunning() && (!w.chainConfig.GetConsensusEngineType().IsClique() || w.chainConfig.GetCliquePeriod() > 0) {
 				// Short circuit if no new transaction arrives.
 				if atomic.LoadInt32(&w.newTxs) == 0 {
 					timer.Reset(recommit)
@@ -478,7 +478,7 @@ func (w *worker) mainLoop() {
 			} else {
 				// If clique is running in dev mode(period is 0), disable
 				// advance sealing here.
-				if w.chainConfig.GetConsensusEngineType().IsClique() && *w.chainConfig.GetCliquePeriod() == 0 {
+				if w.chainConfig.GetConsensusEngineType().IsClique() && w.chainConfig.GetCliquePeriod() == 0 {
 					w.commitNewWork(nil, true, time.Now().Unix())
 				}
 			}

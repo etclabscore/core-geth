@@ -671,7 +671,7 @@ func (g *Genesis) SetEthashBlockRewardSchedule(m common2.Uint64BigMapEncodesHex)
 	return g.Config.SetEthashBlockRewardSchedule(m)
 }
 
-func (g *Genesis) GetCliquePeriod() *uint64 {
+func (g *Genesis) GetCliquePeriod() uint64 {
 	return g.Config.GetCliquePeriod()
 }
 
@@ -679,7 +679,7 @@ func (g *Genesis) SetCliquePeriod(n uint64) error {
 	return g.Config.SetCliquePeriod(n)
 }
 
-func (g *Genesis) GetCliqueEpoch() *uint64 {
+func (g *Genesis) GetCliqueEpoch() uint64 {
 	return g.Config.GetCliqueEpoch()
 }
 

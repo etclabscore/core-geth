@@ -580,11 +580,11 @@ func (c *ChainConfig) SetEthashBlockRewardSchedule(m common2.Uint64BigMapEncodes
 	return common2.ErrUnsupportedConfigNoop
 }
 
-func (c *ChainConfig) GetCliquePeriod() *uint64 {
+func (c *ChainConfig) GetCliquePeriod() uint64 {
 	if c.Clique == nil {
-		return nil
+		return 0
 	}
-	return newU64(c.Clique.Period)
+	return c.Clique.Period
 }
 
 func (c *ChainConfig) SetCliquePeriod(n uint64) error {
@@ -595,11 +595,11 @@ func (c *ChainConfig) SetCliquePeriod(n uint64) error {
 	return nil
 }
 
-func (c *ChainConfig) GetCliqueEpoch() *uint64 {
+func (c *ChainConfig) GetCliqueEpoch() uint64 {
 	if c.Clique == nil {
-		return nil
+		return 0
 	}
-	return newU64(c.Clique.Epoch)
+	return c.Clique.Epoch
 }
 
 func (c *ChainConfig) SetCliqueEpoch(n uint64) error {

@@ -253,8 +253,8 @@ func CreateConsensusEngine(ctx *node.ServiceContext, chainConfig common2.ChainCo
 	// If proof-of-authority is requested, set it up
 	if chainConfig.GetConsensusEngineType().IsClique() {
 		return clique.New(&goethereum.CliqueConfig{
-			Period: *chainConfig.GetCliquePeriod(),
-			Epoch: *chainConfig.GetCliqueEpoch(),
+			Period: chainConfig.GetCliquePeriod(),
+			Epoch: chainConfig.GetCliqueEpoch(),
 		}, db)
 	}
 	// Otherwise assume proof-of-work

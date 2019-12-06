@@ -177,11 +177,11 @@ func Equivalent(a, b ChainConfigurator) error {
 			// Currently tough/complex to do because of necessary overhead (ie build a parent block).
 		}
 	} else if a.GetConsensusEngineType() == ConsensusEngineT_Clique {
-		if *a.GetCliqueEpoch() != *b.GetCliqueEpoch() {
-			return fmt.Errorf("mismatch clique epochs: A: %v, B: %v", *a.GetCliqueEpoch(), *b.GetCliqueEpoch())
+		if a.GetCliqueEpoch() != b.GetCliqueEpoch() {
+			return fmt.Errorf("mismatch clique epochs: A: %v, B: %v", a.GetCliqueEpoch(), b.GetCliqueEpoch())
 		}
-		if *a.GetCliquePeriod() != *b.GetCliquePeriod() {
-			return fmt.Errorf("mismatch clique periods: A: %v, B: %v", *a.GetCliquePeriod(), *b.GetCliquePeriod())
+		if a.GetCliquePeriod() != b.GetCliquePeriod() {
+			return fmt.Errorf("mismatch clique periods: A: %v, B: %v", a.GetCliquePeriod(), b.GetCliquePeriod())
 		}
 	}
 	return nil

@@ -635,11 +635,11 @@ func (c *MultiGethChainConfig) SetEthashBlockRewardSchedule(m common2.Uint64BigM
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetCliquePeriod() *uint64 {
+func (c *MultiGethChainConfig) GetCliquePeriod() uint64 {
 	if c.Clique == nil {
-		return nil
+		return 0
 	}
-	return newU64(c.Clique.Period)
+	return c.Clique.Period
 }
 
 func (c *MultiGethChainConfig) SetCliquePeriod(n uint64) error {
@@ -650,11 +650,11 @@ func (c *MultiGethChainConfig) SetCliquePeriod(n uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetCliqueEpoch() *uint64 {
+func (c *MultiGethChainConfig) GetCliqueEpoch() uint64 {
 	if c.Clique == nil {
-		return nil
+		return 0
 	}
-	return newU64(c.Clique.Epoch)
+	return c.Clique.Epoch
 }
 
 func (c *MultiGethChainConfig) SetCliqueEpoch(n uint64) error {

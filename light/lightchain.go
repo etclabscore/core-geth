@@ -476,7 +476,7 @@ func (lc *LightChain) SyncCheckpoint(ctx context.Context, checkpoint *goethereum
 
 	latest := (checkpoint.SectionIndex+1)*lc.indexerConfig.ChtSize - 1
 	if lc.hc.Config().GetConsensusEngineType().IsClique() {
-		latest -= latest % *lc.hc.Config().GetCliqueEpoch()
+		latest -= latest % lc.hc.Config().GetCliqueEpoch()
 	}
 	if head >= latest {
 		return true

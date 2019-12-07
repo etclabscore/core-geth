@@ -165,6 +165,9 @@ func compare(k reflect.Type, source, target interface{}) (diffs []DiffT) {
 		if !strings.HasPrefix(method.Name, "Get") {
 			continue
 		}
+		if reflect.ValueOf(source).MethodByName(method.Name).Type().NumIn() > 0 {
+			continue
+		}
 
 		callGetIn := []reflect.Value{}
 		response := reflect.ValueOf(source).MethodByName(method.Name).Call(callGetIn)

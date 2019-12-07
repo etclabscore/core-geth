@@ -331,6 +331,7 @@ func gasCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize
 		transfersValue = stack.Back(2).Sign() != 0
 		address        = common.BigToAddress(stack.Back(1))
 	)
+	// EIP161b
 	if evm.ChainConfig().IsForked(evm.chainConfig.GetEIP161abcTransition, evm.BlockNumber) {
 		if transfersValue && evm.StateDB.Empty(address) {
 			gas += vars.CallNewAccountGas

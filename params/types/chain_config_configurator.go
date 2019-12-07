@@ -113,20 +113,20 @@ func (c *MultiGethChainConfig) SetEIP160Transition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP161abcTransition() *uint64 {
-	return bigNewU64(c.EIP161FBlock)
-}
-
-func (c *MultiGethChainConfig) SetEIP161abcTransition(n *uint64) error {
-	c.EIP161FBlock = setBig(c.EIP161FBlock, n)
-	return nil
-}
-
 func (c *MultiGethChainConfig) GetEIP161dTransition() *uint64 {
 	return bigNewU64(c.EIP161FBlock)
 }
 
 func (c *MultiGethChainConfig) SetEIP161dTransition(n *uint64) error {
+	c.EIP161FBlock = setBig(c.EIP161FBlock, n)
+	return nil
+}
+
+func (c *MultiGethChainConfig) GetEIP161abcTransition() *uint64 {
+	return bigNewU64(c.EIP161FBlock)
+}
+
+func (c *MultiGethChainConfig) SetEIP161abcTransition(n *uint64) error {
 	c.EIP161FBlock = setBig(c.EIP161FBlock, n)
 	return nil
 }

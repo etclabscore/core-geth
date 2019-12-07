@@ -218,8 +218,8 @@ func (w *wizard) manageGenesis() {
 		w.conf.Genesis.Config.SetEIP155Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP155Transition()))
 
 		fmt.Println()
-		fmt.Printf("Which block should EIP158/161 (also Spurious Dragon) come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP161abcTransition())
-		w.conf.Genesis.Config.SetEIP161abcTransition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP161abcTransition()))
+		fmt.Printf("Which block should EIP158/161 (also Spurious Dragon) come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP161dTransition())
+		w.conf.Genesis.Config.SetEIP161dTransition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP161dTransition()))
 
 		fmt.Println()
 		fmt.Printf("Which block should Byzantium come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEthashEIP649Transition())

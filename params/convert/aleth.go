@@ -39,7 +39,7 @@ func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*aleth.Al
 		spec.Params.EIP150ForkBlock = (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())
 	}
 	// Just choosing random signal blocks for any given fork bundle.
-	if num := genesis.Config.GetEIP161abcTransition(); num != nil {
+	if num := genesis.Config.GetEIP161dTransition(); num != nil {
 		spec.Params.EIP158ForkBlock = (*hexutil.Big)(((*hexutil.Uint64)(num)).Big())
 	}
 	if num := genesis.Config.GetEthashEIP649Transition(); num != nil {

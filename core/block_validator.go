@@ -95,7 +95,7 @@ func (v *BlockValidator) ValidateState(block *types.Block, statedb *state.StateD
 		return fmt.Errorf("invalid receipt root hash (remote: %x local: %x)", header.ReceiptHash, receiptSha)
 	}
 	// Validate the state root against the received state root and throw
-	if root := statedb.IntermediateRoot(v.config.IsForked(v.config.GetEIP161abcTransition, header.Number)); header.Root != root {
+	if root := statedb.IntermediateRoot(v.config.IsForked(v.config.GetEIP161dTransition, header.Number)); header.Root != root {
 	// an error if they don't match.
 		return fmt.Errorf("invalid merkle root (remote: %x local: %x)", header.Root, root)
 	}

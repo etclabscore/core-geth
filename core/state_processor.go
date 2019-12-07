@@ -102,11 +102,11 @@ func ApplyTransaction(config common2.ChainConfigurator, bc ChainContext, author 
 	}
 	// Update the state with pending changes
 	var root []byte
-	eip161 := config.IsForked(config.GetEIP161abcTransition, header.Number)
+	eip161d := config.IsForked(config.GetEIP161dTransition, header.Number)
 	if config.IsForked(config.GetEIP658Transition, header.Number) {
-		statedb.Finalise(eip161)
+		statedb.Finalise(eip161d)
 	} else {
-		root = statedb.IntermediateRoot(eip161).Bytes()
+		root = statedb.IntermediateRoot(eip161d).Bytes()
 	}
 	*usedGas += gas
 

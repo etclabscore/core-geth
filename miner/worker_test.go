@@ -207,8 +207,8 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 		chainConfig.SetCliquePeriod(1)
 		chainConfig.SetCliqueEpoch(30000)
 		engine = clique.New(&goethereum.CliqueConfig{
-			Period: *chainConfig.GetCliquePeriod(),
-			Epoch:  *chainConfig.GetCliqueEpoch(),
+			Period: chainConfig.GetCliquePeriod(),
+			Epoch:  chainConfig.GetCliqueEpoch(),
 		}, db)
 	} else {
 		chainConfig = params.AllEthashProtocolChanges
@@ -281,8 +281,8 @@ func TestPendingStateAndBlockEthash(t *testing.T) {
 }
 func TestPendingStateAndBlockClique(t *testing.T) {
 	testPendingStateAndBlock(t, cliqueChainConfig, clique.New(&goethereum.CliqueConfig{
-		Period: *cliqueChainConfig.GetCliquePeriod(),
-		Epoch:  *cliqueChainConfig.GetCliqueEpoch(),
+		Period: cliqueChainConfig.GetCliquePeriod(),
+		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
 	}, rawdb.NewMemoryDatabase()))
 }
 
@@ -316,8 +316,8 @@ func TestEmptyWorkEthash(t *testing.T) {
 }
 func TestEmptyWorkClique(t *testing.T) {
 	testEmptyWork(t, cliqueChainConfig, clique.New(&goethereum.CliqueConfig{
-		Period: *cliqueChainConfig.GetCliquePeriod(),
-		Epoch:  *cliqueChainConfig.GetCliqueEpoch(),
+		Period: cliqueChainConfig.GetCliquePeriod(),
+		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
 	}, rawdb.NewMemoryDatabase()))
 }
 
@@ -438,8 +438,8 @@ func TestRegenerateMiningBlockEthash(t *testing.T) {
 
 func TestRegenerateMiningBlockClique(t *testing.T) {
 	testRegenerateMiningBlock(t, cliqueChainConfig, clique.New(&goethereum.CliqueConfig{
-		Period: *cliqueChainConfig.GetCliquePeriod(),
-		Epoch:  *cliqueChainConfig.GetCliqueEpoch(),
+		Period: cliqueChainConfig.GetCliquePeriod(),
+		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
 	}, rawdb.NewMemoryDatabase()))
 }
 
@@ -506,8 +506,8 @@ func TestAdjustIntervalEthash(t *testing.T) {
 
 func TestAdjustIntervalClique(t *testing.T) {
 	testAdjustInterval(t, cliqueChainConfig, clique.New(&goethereum.CliqueConfig{
-		Period: *cliqueChainConfig.GetCliquePeriod(),
-		Epoch:  *cliqueChainConfig.GetCliqueEpoch(),
+		Period: cliqueChainConfig.GetCliquePeriod(),
+		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
 	}, rawdb.NewMemoryDatabase()))
 }
 

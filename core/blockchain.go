@@ -1287,7 +1287,7 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 	}
 	rawdb.WriteBlock(bc.db, block)
 
-	root, err := state.Commit(bc.chainConfig.IsForked(bc.chainConfig.GetEIP161abcTransition, block.Number()))
+	root, err := state.Commit(bc.chainConfig.IsForked(bc.chainConfig.GetEIP161dTransition, block.Number()))
 	if err != nil {
 		return NonStatTy, err
 	}

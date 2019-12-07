@@ -351,20 +351,20 @@ func (g *Genesis) SetEIP160Transition(n *uint64) error {
 	return g.Config.SetEIP160Transition(n)
 }
 
-func (g *Genesis) GetEIP161abcTransition() *uint64 {
-	return g.Config.GetEIP161abcTransition()
-}
-
-func (g *Genesis) SetEIP161abcTransition(n *uint64) error {
-	return g.Config.SetEIP161abcTransition(n)
-}
-
 func (g *Genesis) GetEIP161dTransition() *uint64 {
 	return g.Config.GetEIP161dTransition()
 }
 
 func (g *Genesis) SetEIP161dTransition(n *uint64) error {
 	return g.Config.SetEIP161dTransition(n)
+}
+
+func (g *Genesis) GetEIP161abcTransition() *uint64 {
+	return g.Config.GetEIP161abcTransition()
+}
+
+func (g *Genesis) SetEIP161abcTransition(n *uint64) error {
+	return g.Config.SetEIP161abcTransition(n)
 }
 
 func (g *Genesis) GetEIP170Transition() *uint64 {

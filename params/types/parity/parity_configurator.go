@@ -108,21 +108,21 @@ func (spec *ParityChainSpec) SetEIP160Transition(i *uint64) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) GetEIP161abcTransition() *uint64 {
-	return spec.Params.EIP161abcTransition.Uint64P()
-}
-
-func (spec *ParityChainSpec) SetEIP161abcTransition(i *uint64) error {
-	spec.Params.EIP161abcTransition = new(ParityU64).SetUint64(i)
-	return nil
-}
-
 func (spec *ParityChainSpec) GetEIP161dTransition() *uint64 {
 	return spec.Params.EIP161dTransition.Uint64P()
 }
 
 func (spec *ParityChainSpec) SetEIP161dTransition(i *uint64) error {
 	spec.Params.EIP161dTransition = new(ParityU64).SetUint64(i)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP161abcTransition() *uint64 {
+	return spec.Params.EIP161abcTransition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP161abcTransition(i *uint64) error {
+	spec.Params.EIP161abcTransition = new(ParityU64).SetUint64(i)
 	return nil
 }
 
@@ -717,7 +717,11 @@ func (spec *ParityChainSpec) SetEthashBlockRewardSchedule(input common2.Uint64Bi
 }
 
 func (spec *ParityChainSpec) GetCliquePeriod() uint64 {
-	return *spec.Engine.Clique.Params.Period.Uint64P()
+	p := spec.Engine.Clique.Params.Period.Uint64P()
+	if p == nil {
+		return 0
+	}
+	return *p
 }
 
 func (spec *ParityChainSpec) SetCliquePeriod(i uint64) error {
@@ -726,7 +730,11 @@ func (spec *ParityChainSpec) SetCliquePeriod(i uint64) error {
 }
 
 func (spec *ParityChainSpec) GetCliqueEpoch() uint64 {
-	return *spec.Engine.Clique.Params.Epoch.Uint64P()
+	p := spec.Engine.Clique.Params.Epoch.Uint64P()
+	if p == nil {
+		return 0
+	}
+	return *p
 }
 
 func (spec *ParityChainSpec) SetCliqueEpoch(i uint64) error {

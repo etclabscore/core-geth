@@ -152,20 +152,20 @@ func (c *ChainConfig) SetEIP160Transition(n *uint64) error {
 	return nil
 }
 
-func (c *ChainConfig) GetEIP161abcTransition() *uint64 {
-	return bigNewU64(c.EIP158Block)
-}
-
-func (c *ChainConfig) SetEIP161abcTransition(n *uint64) error {
-	c.EIP158Block = setBig(c.EIP158Block, n)
-	return nil
-}
-
 func (c *ChainConfig) GetEIP161dTransition() *uint64 {
 	return bigNewU64(c.EIP158Block)
 }
 
 func (c *ChainConfig) SetEIP161dTransition(n *uint64) error {
+	c.EIP158Block = setBig(c.EIP158Block, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEIP161abcTransition() *uint64 {
+	return bigNewU64(c.EIP158Block)
+}
+
+func (c *ChainConfig) SetEIP161abcTransition(n *uint64) error {
 	c.EIP158Block = setBig(c.EIP158Block, n)
 	return nil
 }

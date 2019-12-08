@@ -32,7 +32,7 @@ func setBig(i *big.Int, u *uint64) *big.Int {
 // upstream is used as a way to share common interface methods
 // This pattern should only be used where the receiver value of the method
 // is not used, ie when accessing/setting global default parameters, eg. vars/ pkg values.
-var upstream = goethereum.ChainConfig{}
+var upstream = &goethereum.ChainConfig{}
 
 func (c *MultiGethChainConfig) GetAccountStartNonce() *uint64 { return upstream.GetAccountStartNonce() }
 func (c *MultiGethChainConfig) SetAccountStartNonce(n *uint64) error {

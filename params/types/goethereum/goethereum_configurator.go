@@ -40,6 +40,9 @@ func (c *ChainConfig) GetAccountStartNonce() *uint64 {
 }
 
 func (c *ChainConfig) SetAccountStartNonce(n *uint64) error {
+	if n == nil {
+		return nil
+	}
 	if *n != 0 {
 		return common2.ErrUnsupportedConfigFatal
 	}

@@ -80,7 +80,11 @@ func (m *Uint64BigValOrMapHex) UnmarshalJSON(input []byte) error {
 func (m Uint64BigValOrMapHex) MarshalJSON() (output []byte, err error) {
 	mm := make(map[math.HexOrDecimal64]*math.HexOrDecimal256)
 	for k, v := range m {
-		mm[math.HexOrDecimal64(k)] = math.NewHexOrDecimal256(v.Int64())
+		if v == nil {
+			continue // should never happen
+		}
+		d := math.HexOrDecimal256(*v)
+		mm[math.HexOrDecimal64(k)] = &d
 	}
 	return json.Marshal(mm)
 }
@@ -132,7 +136,11 @@ func (bb *Uint64BigMapEncodesHex) UnmarshalJSON(input []byte) error {
 func (b Uint64BigMapEncodesHex) MarshalJSON() ([]byte, error) {
 	mm := make(map[math.HexOrDecimal64]*math.HexOrDecimal256)
 	for k, v := range b {
-		mm[math.HexOrDecimal64(k)] = math.NewHexOrDecimal256(v.Int64())
+		if v == nil {
+			continue // should never happen
+		}
+		d := math.HexOrDecimal256(*v)
+		mm[math.HexOrDecimal64(k)] = &d
 	}
 	return json.Marshal(mm)
 }

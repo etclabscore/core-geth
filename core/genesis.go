@@ -156,6 +156,8 @@ func configOrDefault(g *paramtypes.Genesis, ghash common.Hash) common2.ChainConf
 		return params.GoerliChainConfig
 	case ghash == params.KottiGenesisHash:
 		return params.KottiChainConfig
+	case ghash == params.MordorGenesisHash:
+		return params.MordorChainConfig
 	default:
 		return params.AllEthashProtocolChanges
 	}

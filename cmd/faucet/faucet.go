@@ -181,9 +181,9 @@ func main() {
 
 	genesis, *bootFlag, *netFlag = func() (gs *paramtypes.Genesis, bs string, netid uint64) {
 		var configs = []struct {
-			flag  bool
-			gs    *paramtypes.Genesis
-			bs    []string
+			flag bool
+			gs   *paramtypes.Genesis
+			bs   []string
 		}{
 			{
 				*foundationFlag,
@@ -318,9 +318,9 @@ type request struct {
 // faucet represents a crypto faucet backed by an Ethereum light client.
 type faucet struct {
 	config common2.ChainConfigurator // Chain configurations for signing
-	stack  *node.Node              // Ethereum protocol stack
-	client *ethclient.Client       // Client connection to the Ethereum chain
-	index  []byte                  // Index page to serve up on the web
+	stack  *node.Node                // Ethereum protocol stack
+	client *ethclient.Client         // Client connection to the Ethereum chain
+	index  []byte                    // Index page to serve up on the web
 
 	keystore *keystore.KeyStore // Keystore containing the single signer
 	account  accounts.Account   // Account funding user faucet requests

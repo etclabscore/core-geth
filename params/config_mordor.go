@@ -18,6 +18,8 @@ package params
 import (
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/params/convert"
+	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	common2 "github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
@@ -44,12 +46,18 @@ var (
 			PetersburgBlock:     big.NewInt(301243),
 			Ethash:              new(goethereum.EthashConfig),
 		}
-		c.SetNetworkID(&MordorNetworkID)
-		c.SetEthashECIP1041Transition(&MordorDisposalBlock)
-		c.SetEthashECIP1041Transition(&MordorECIP1017FBlock)
-		c.SetEthashECIP1017EraRounds(&MordorECIP1017EraRounds)
-		c.SetEthashECIP1010PauseTransition(&MordorECIP1010PauseBlock)
-		c.SetEthashECIP1010ContinueTransition(&MordorECIP1010Length)
-		return c
+		cc := &paramtypes.MultiGethChainConfig{}
+		err := convert.Convert(c, cc)
+		if err != nil {
+			panic(err)
+		}
+
+		cc.SetNetworkID(&MordorNetworkID)
+		cc.SetEthashECIP1041Transition(&MordorDisposalBlock)
+		cc.SetEthashECIP1041Transition(&MordorECIP1017FBlock)
+		cc.SetEthashECIP1017EraRounds(&MordorECIP1017EraRounds)
+		cc.SetEthashECIP1010PauseTransition(&MordorECIP1010PauseBlock)
+		cc.SetEthashECIP1010ContinueTransition(&MordorECIP1010Length)
+		return cc
 	}()
 )

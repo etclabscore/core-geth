@@ -22,6 +22,8 @@ func UnmarshalChainConfigurator(input []byte) (common.ChainConfigurator, error) 
 		err := json.Unmarshal(input, iface)
 		if err != nil {
 			errs = append(errs, err.Error())
+		} else if e := common. IsValid(iface.(common.ChainConfigurator), nil); e != nil {
+			errs = append(errs, e.Error())
 		} else {
 			return iface.(common.ChainConfigurator), nil
 		}

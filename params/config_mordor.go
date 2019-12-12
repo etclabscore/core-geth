@@ -30,8 +30,6 @@ var (
 	MordorECIP1017FBlock            = uint64(2000000)
 	MordorECIP1017EraRounds         = uint64(2000000)
 	MordorEIP160FBlock              = uint64(0)
-	MordorECIP1010PauseBlock        = uint64(0)
-	MordorECIP1010Length            = uint64(2000000)
 
 	// MordorChainConfig is the chain parameters to run a node on the Ethereum Classic Mordor test network (PoW).
 	MordorChainConfig = func() common2.ChainConfigurator {
@@ -56,8 +54,6 @@ var (
 		cc.SetEthashECIP1041Transition(&MordorDisposalBlock)
 		cc.SetEthashECIP1041Transition(&MordorECIP1017FBlock)
 		cc.SetEthashECIP1017EraRounds(&MordorECIP1017EraRounds)
-		cc.SetEthashECIP1010PauseTransition(&MordorECIP1010PauseBlock)
-		cc.SetEthashECIP1010ContinueTransition(&MordorECIP1010Length)
 		return cc
 	}()
 )

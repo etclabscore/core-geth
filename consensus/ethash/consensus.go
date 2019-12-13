@@ -561,27 +561,26 @@ var (
 // reward. The total reward consists of the static block reward and rewards for
 // included uncles. The coinbase of each uncle block is also rewarded.
 func accumulateRewards(config *params.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
-	// Select the correct block reward based on chain progression
-	blockReward := FrontierBlockReward
-	if config.IsEIP649F(header.Number) {
-		blockReward = EIP649FBlockReward
-	}
-	if config.IsEIP1234F(header.Number) {
-		blockReward = EIP1234FBlockReward
-	}
-	if config.IsSocial(header.Number) {
-		blockReward = params.SocialBlockReward
-	}
-	if config.IsEthersocial(header.Number) {
-		blockReward = params.EthersocialBlockReward
-	}
 	if config.IsMCIP0(header.Number) {
 		musicoinBlockReward(config, state, header, uncles)
-		return
-	}
-	if config.IsECIP1017F(header.Number) {
+	} else if config.IsECIP1017F(header.Number) {
 		ecip1017BlockReward(config, state, header, uncles)
 	} else {
+		// Select the correct block reward based on chain progression
+		blockReward := FrontierBlockReward
+		if config.IsEIP649F(header.Number) {
+			blockReward = EIP649FBlockReward
+		}
+		if config.IsEIP1234F(header.Number) {
+			blockReward = EIP1234FBlockReward
+		}
+		if config.IsSocial(header.Number) {
+			blockReward = params.SocialBlockReward
+		}
+		if config.IsEthersocial(header.Number) {
+			blockReward = params.EthersocialBlockReward
+		}
+
 		// Accumulate the rewards for the miner and any included uncles
 		reward := new(big.Int).Set(blockReward)
 		r := new(big.Int)

@@ -225,12 +225,12 @@ func (g *Genesis) SetGenesisParentHash(h common.Hash) error {
 	return nil
 }
 
-func (g *Genesis) GetGenesisExtraData() common.Hash {
-	return common.BytesToHash(g.ExtraData)
+func (g *Genesis) GetGenesisExtraData() []byte {
+	return g.ExtraData
 }
 
-func (g *Genesis) SetGenesisExtraData(h common.Hash) error {
-	g.ExtraData = h[:]
+func (g *Genesis) SetGenesisExtraData(b []byte) error {
+	g.ExtraData = b
 	return nil
 }
 

@@ -7,12 +7,16 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/convert"
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/common"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 	"github.com/ethereum/go-ethereum/tests"
+	"github.com/go-test/deep"
 )
 
 func TestEquivalent_Features(t *testing.T) {
@@ -128,6 +132,76 @@ func TestEquivalent_ReadParity(t *testing.T) {
 			t.Log(b.Engine.Ethash.Params.BlockReward)
 			t.Log(b.Engine.Ethash.Params.DifficultyBombDelays)
 			t.Errorf("%s:%s err: %v", k, v, err)
+		}
+	}
+}
+
+func TestParityGeneses(t *testing.T) {
+	testes := []struct{
+		filename string
+		defaultGenesis *paramtypes.Genesis
+	}{
+		{
+			"foundation.json",
+			params.DefaultGenesisBlock(),
+		},
+		{
+			"classic.json",
+			params.DefaultClassicGenesisBlock(),
+		},
+		{
+			"mordor.json",
+			params.DefaultMordorGenesisBlock(),
+		},
+		{
+			"ropsten.json",
+			params.DefaultTestnetGenesisBlock(),
+		},
+		{
+			"kotti.json",
+			params.DefaultKottiGenesisBlock(),
+		},
+	}
+	for _, tt := range testes {
+		p := filepath.Join("..", "params", "parity.json.d", tt.filename)
+		pspec := &parity.ParityChainSpec{}
+		b, err := ioutil.ReadFile(p)
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = json.Unmarshal(b, pspec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		genc := &paramtypes.Genesis{
+			Config: &paramtypes.MultiGethChainConfig{},
+		}
+		err = convert.Convert(pspec, genc)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		wantBlock:= core.GenesisToBlock(tt.defaultGenesis, nil)
+		gotBlock := core.GenesisToBlock(genc, nil)
+
+		if wantBlock.Hash() != gotBlock.Hash() {
+			t.Errorf("%s: mismatch gen hash, want(default): %s, got: %s", tt.filename, wantBlock.Hash().Hex(), gotBlock.Hash().Hex() )
+
+			// state roots
+			t.Logf("stateroots, want(default): %s, got: %s", wantBlock.Root().Hex(), gotBlock.Root().Hex())
+
+			// extradata
+			t.Logf("extras: %x, %x", wantBlock.Extra(), gotBlock.Extra())
+			t.Logf("extras_orig: %x, %s", pspec.GetGenesisExtraData(), genc.GetGenesisExtraData())
+
+			diffs := deep.Equal(wantBlock, gotBlock)
+			t.Log("genesis block diffs len", len(diffs))
+			for _, d := range diffs {
+				t.Log(d)
+			}
+
+			t.Log("want(default)",spew.Sdump(wantBlock))
+			t.Log("got",spew.Sdump(gotBlock))
 		}
 	}
 }

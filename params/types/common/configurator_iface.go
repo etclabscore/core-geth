@@ -186,8 +186,8 @@ type GenesisBlocker interface {
 	SetGenesisTimestamp(u uint64) error
 	GetGenesisParentHash() common.Hash
 	SetGenesisParentHash(h common.Hash) error
-	GetGenesisExtraData() common.Hash
-	SetGenesisExtraData(h common.Hash) error
+	GetGenesisExtraData() []byte
+	SetGenesisExtraData(b []byte) error
 	GetGenesisGasLimit() uint64
 	SetGenesisGasLimit(u uint64) error
 }

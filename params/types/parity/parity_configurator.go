@@ -815,12 +815,12 @@ func (spec *ParityChainSpec) SetGenesisParentHash(input common.Hash) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) GetGenesisExtraData() common.Hash {
-	return common.BytesToHash(spec.Genesis.ExtraData)
+func (spec *ParityChainSpec) GetGenesisExtraData() []byte {
+	return spec.Genesis.ExtraData
 }
 
-func (spec *ParityChainSpec) SetGenesisExtraData(input common.Hash) error {
-	spec.Genesis.ExtraData = input[:]
+func (spec *ParityChainSpec) SetGenesisExtraData(input []byte) error {
+	spec.Genesis.ExtraData = input
 	return nil
 }
 
@@ -836,6 +836,9 @@ func (spec *ParityChainSpec) SetGenesisGasLimit(i uint64) error {
 func (spec *ParityChainSpec) ForEachAccount(fn func(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error) error {
 	var err error
 	for k, v := range spec.Accounts {
+		if v.Builtin != nil && (v.Balance.ToInt() == nil || v.Balance.ToInt().Cmp(new(big.Int)) == 0) {
+			continue
+		}
 		err = fn(common.Address(k), v.Balance.ToInt(), uint64(v.Nonce), v.Code, v.Storage)
 		if err != nil {
 			return err

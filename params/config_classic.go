@@ -45,11 +45,12 @@ var (
 		EIP213FBlock:       big.NewInt(8772000),
 		EIP214FBlock:       big.NewInt(8772000),
 		EIP658FBlock:       big.NewInt(8772000),
-		EIP145FBlock: big.NewInt(9573000),
-		EIP1014FBlock: big.NewInt(9573000),
-		EIP1052FBlock: big.NewInt(9573000),
+		EIP145FBlock:       big.NewInt(9573000),
+		EIP1014FBlock:      big.NewInt(9573000),
+		EIP1052FBlock:      big.NewInt(9573000),
 		EIP1283FBlock:      nil,
-		EIP2200FBlock:      nil, // RePetersburg
+		PetersburgBlock:    nil, // Un1283
+		EIP2200FBlock:      nil, // RePetersburg (== re-1283)
 		DisposalBlock:      big.NewInt(5900000),
 		ECIP1017FBlock:     big.NewInt(5000000),
 		ECIP1017EraRounds:  big.NewInt(5000000),

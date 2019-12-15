@@ -2,8 +2,6 @@ package convert
 
 import (
 	"encoding/json"
-	"errors"
-	"strings"
 
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/common"
@@ -12,21 +10,33 @@ import (
 )
 
 func UnmarshalChainConfigurator(input []byte) (common.ChainConfigurator, error) {
-	ifaces := []interface{}{
-		&goethereum.ChainConfig{},
-		&paramtypes.MultiGethChainConfig{},
-		&parity.ParityChainSpec{},
+	var map1 = make(map[string]interface{})
+	err := json.Unmarshal(input, &map1)
+	if err != nil {
+		return nil, err
 	}
-	errs := []string{}
-	for _, iface := range ifaces {
-		err := json.Unmarshal(input, iface)
+	if _, ok := map1["params"]; ok {
+		pspec := &parity.ParityChainSpec{}
+		err = json.Unmarshal(input, pspec)
 		if err != nil {
-			errs = append(errs, err.Error())
-		} else if e := common. IsValid(iface.(common.ChainConfigurator), nil); e != nil {
-			errs = append(errs, e.Error())
-		} else {
-			return iface.(common.ChainConfigurator), nil
+			return nil, err
 		}
+		return pspec, nil
 	}
-	return nil, errors.New(strings.Join(errs, "\n"))
+
+	if _, ok := map1["networkId"]; ok {
+		mspec := &paramtypes.MultiGethChainConfig{}
+		err = json.Unmarshal(input, mspec)
+		if err != nil {
+			return nil, err
+		}
+		return mspec, nil
+	}
+
+	gspec := &goethereum.ChainConfig{}
+	err = json.Unmarshal(input,gspec)
+	if err != nil {
+		return nil, err
+	}
+	return gspec, nil
 }

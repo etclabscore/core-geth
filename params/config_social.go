@@ -20,7 +20,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
@@ -43,7 +43,7 @@ var (
 		ECIP1017FBlock:    big.NewInt(5000000),
 		ECIP1017EraRounds: big.NewInt(5000000),
 		EIP160FBlock:      big.NewInt(0),
-		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
+		BlockRewardSchedule: ctypes.Uint64BigMapEncodesHex{
 			0: new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)),
 		},
 		RequireBlockHashes: map[uint64]common.Hash{

@@ -35,7 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
 )
@@ -140,7 +140,7 @@ type stTransactionMarshaling struct {
 // The fork definition can be
 // - a plain forkname, e.g. `Byzantium`,
 // - a fork basename, and a list of EIPs to enable; e.g. `Byzantium+1884+1283`.
-func getVMConfig(forkString string) (baseConfig common2.ChainConfigurator, eips []int, err error) {
+func getVMConfig(forkString string) (baseConfig ctypes.ChainConfigurator, eips []int, err error) {
 	var (
 		splitForks            = strings.Split(forkString, "+")
 		ok                    bool
@@ -247,7 +247,7 @@ func MakePreState(db ethdb.Database, accounts paramtypes.GenesisAlloc) *state.St
 	return statedb
 }
 
-func (t *StateTest) genesis(config common2.ChainConfigurator) *paramtypes.Genesis {
+func (t *StateTest) genesis(config ctypes.ChainConfigurator) *paramtypes.Genesis {
 	return &paramtypes.Genesis{
 		Config:     config,
 		Coinbase:   t.json.Env.Coinbase,

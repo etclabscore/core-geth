@@ -21,7 +21,7 @@ import (
 	"math/big"
 
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
@@ -30,7 +30,7 @@ func newUint64(n uint64) *uint64 {
 }
 
 // Forks table defines supported forks and their chain config.
-var Forks = map[string]common2.ChainConfigurator{
+var Forks = map[string]ctypes.ChainConfigurator{
 	"Frontier": &goethereum.ChainConfig{
 		Ethash:  new(goethereum.EthashConfig),
 		ChainID: big.NewInt(1),

@@ -35,7 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -143,7 +143,7 @@ func (t *BlockTest) Run() error {
 	return t.validateImportedHeaders(chain, validBlocks)
 }
 
-func (t *BlockTest) genesis(config common2.ChainConfigurator) *paramtypes.Genesis {
+func (t *BlockTest) genesis(config ctypes.ChainConfigurator) *paramtypes.Genesis {
 	if config == nil {
 		panic("nil block genesis config")
 	}

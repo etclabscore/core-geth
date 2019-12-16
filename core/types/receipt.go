@@ -27,7 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -294,7 +294,7 @@ func (r Receipts) GetRlp(i int) []byte {
 
 // DeriveFields fills the receipts with their computed fields based on consensus
 // data and contextual infos like containing block and transactions.
-func (r Receipts) DeriveFields(config common2.ChainConfigurator, hash common.Hash, number uint64, txs Transactions) error {
+func (r Receipts) DeriveFields(config ctypes.ChainConfigurator, hash common.Hash, number uint64, txs Transactions) error {
 	signer := MakeSigner(config, new(big.Int).SetUint64(number))
 
 	logIndex := uint(0)

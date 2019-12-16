@@ -21,12 +21,12 @@ import (
 	"encoding/json"
 
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
-	"github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
-func UnmarshalChainConfigurator(input []byte) (common.ChainConfigurator, error) {
+func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) {
 	var map1 = make(map[string]interface{})
 	err := json.Unmarshal(input, &map1)
 	if err != nil {

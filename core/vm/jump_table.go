@@ -20,7 +20,7 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -60,7 +60,7 @@ type JumpTable [256]operation
 
 // instructionSetForConfig determines an instruction set for the vm using
 // the chain config params and a current block number
-func instructionSetForConfig(config common.ChainConfigurator, bn *big.Int) JumpTable {
+func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpTable {
 	instructionSet := newBaseInstructionSet()
 
 	// Homestead

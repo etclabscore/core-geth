@@ -19,7 +19,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
@@ -29,7 +29,7 @@ var (
 	EthersocialGenesisHash = common.HexToHash("0x310dd3c4ae84dd89f1b46cfdd5e26c8f904dfddddc73f323b468127272e20e9f")
 
 	// EthersocialChainConfig is the chain parameters to run a node on the Ethersocial main network.
-	EthersocialChainConfig = func() common2.ChainConfigurator {
+	EthersocialChainConfig = func() ctypes.ChainConfigurator {
 		c := &goethereum.ChainConfig{
 			ChainID:             big.NewInt(31102),
 			HomesteadBlock:      big.NewInt(0),
@@ -45,10 +45,10 @@ var (
 		}
 		c.SetNetworkID(&EtherSocialNetworkID)
 		//EthersocialBlock:    big.NewInt(0)
-		c.SetEthashDifficultyBombDelaySchedule(common2.Uint64BigMapEncodesHex{
+		c.SetEthashDifficultyBombDelaySchedule(ctypes.Uint64BigMapEncodesHex{
 			600000: new(big.Int).SetUint64(uint64(0x2dc6c0)),
 		})
-		c.SetEthashBlockRewardSchedule(common2.Uint64BigMapEncodesHex{
+		c.SetEthashBlockRewardSchedule(ctypes.Uint64BigMapEncodesHex{
 			0: big.NewInt(5e+18),
 		})
 		return c

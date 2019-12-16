@@ -29,7 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
-	"github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
@@ -80,7 +80,7 @@ func TestConvert(t *testing.T) {
 		t.Error(err)
 	}
 
-	if diffs := Equal(reflect.TypeOf((*common.Configurator)(nil)), &spec, &spec2); len(diffs) != 0 {
+	if diffs := Equal(reflect.TypeOf((*ctypes.Configurator)(nil)), &spec, &spec2); len(diffs) != 0 {
 		for _, diff := range diffs {
 			t.Error("not equal", diff.Field, diff.A, diff.B)
 		}
@@ -92,7 +92,7 @@ func TestIdentical(t *testing.T) {
 		"ChainID",
 		"NetworkID",
 	}
-	configs :=  []common.ChainConfigurator{
+	configs :=  []ctypes.ChainConfigurator{
 		&paramtypes.MultiGethChainConfig{},
 		&goethereum.ChainConfig{},
 		&parity.ParityChainSpec{},
@@ -124,26 +124,26 @@ func TestConfiguratorImplementationsSatisfied(t *testing.T) {
 	for _, ty := range []interface{}{
 		&parity.ParityChainSpec{},
 	} {
-		_ = ty.(common.Configurator)
+		_ = ty.(ctypes.Configurator)
 	}
 
 	for _, ty := range []interface{}{
 		&goethereum.ChainConfig{},
 		&paramtypes.MultiGethChainConfig{},
 	} {
-		_ = ty.(common.ChainConfigurator)
+		_ = ty.(ctypes.ChainConfigurator)
 	}
 
 	for _, ty := range []interface{}{
 		&paramtypes.Genesis{},
 	} {
-		_ = ty.(common.GenesisBlocker)
+		_ = ty.(ctypes.GenesisBlocker)
 	}
 }
 
 func TestCompatible(t *testing.T) {
 	spec := &parity.ParityChainSpec{}
-	fns, names := common.Transitions(spec)
+	fns, names := ctypes.Transitions(spec)
 	for i, fn := range fns {
 		t.Log(names[i], fn())
 	}
@@ -169,7 +169,7 @@ func TestGatherForks(t *testing.T) {
 		return false
 	}
 	for ci, c := range cases {
-		gotForkNs := common.Forks(c.config)
+		gotForkNs := ctypes.Forks(c.config)
 		if len(gotForkNs) != len(c.wantNs) {
 			for _, n := range c.wantNs {
 				if !sliceContains(gotForkNs, n) {

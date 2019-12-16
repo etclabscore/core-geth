@@ -22,7 +22,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -76,7 +76,7 @@ func (c *MultiGethChainConfig) GetNetworkID() *uint64 {
 
 func (c *MultiGethChainConfig) SetNetworkID(n *uint64) error {
 	if n == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.NetworkID = *n
 	return nil
@@ -351,26 +351,26 @@ func (c *MultiGethChainConfig) GetForkCanonHashes() map[uint64]common.Hash {
 	return c.RequireBlockHashes
 }
 
-func (c *MultiGethChainConfig) GetConsensusEngineType() common2.ConsensusEngineT {
+func (c *MultiGethChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT {
 	if c.Ethash != nil {
-		return common2.ConsensusEngineT_Ethash
+		return ctypes.ConsensusEngineT_Ethash
 	}
 	if c.Clique != nil {
-		return common2.ConsensusEngineT_Clique
+		return ctypes.ConsensusEngineT_Clique
 	}
-	return common2.ConsensusEngineT_Unknown
+	return ctypes.ConsensusEngineT_Unknown
 }
 
-func (c *MultiGethChainConfig) MustSetConsensusEngineType(t common2.ConsensusEngineT) error {
+func (c *MultiGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
 	switch t {
-	case common2.ConsensusEngineT_Ethash:
+	case ctypes.ConsensusEngineT_Ethash:
 		c.Ethash = new(goethereum.EthashConfig)
 		return nil
-	case common2.ConsensusEngineT_Clique:
+	case ctypes.ConsensusEngineT_Clique:
 		c.Clique = new(goethereum.CliqueConfig)
 		return nil
 	default:
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 }
 
@@ -425,7 +425,7 @@ func (c *MultiGethChainConfig) GetEthashEIP779Transition() *uint64 {
 
 func (c *MultiGethChainConfig) SetEthashEIP779Transition(n *uint64) error {
 	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.DAOForkBlock = setBig(c.DAOForkBlock, n)
 	return nil
@@ -442,9 +442,9 @@ func (c *MultiGethChainConfig) GetEthashEIP649Transition() *uint64 {
 		c.eip649FInferred = true
 	}()
 
-	diffN = common2.ExtractHostageSituationN(
+	diffN = ctypes.ExtractHostageSituationN(
 		c.DifficultyBombDelaySchedule,
-		common2.Uint64BigMapEncodesHex(c.BlockRewardSchedule),
+		ctypes.Uint64BigMapEncodesHex(c.BlockRewardSchedule),
 		vars.EIP649DifficultyBombDelay,
 		vars.EIP649FBlockReward,
 	)
@@ -453,7 +453,7 @@ func (c *MultiGethChainConfig) GetEthashEIP649Transition() *uint64 {
 
 func (c *MultiGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
 	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 
 	c.EIP649FBlock = setBig(c.EIP649FBlock, n)
@@ -464,10 +464,10 @@ func (c *MultiGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
 	}
 
 	if c.BlockRewardSchedule == nil {
-		c.BlockRewardSchedule = common2.Uint64BigMapEncodesHex{}
+		c.BlockRewardSchedule = ctypes.Uint64BigMapEncodesHex{}
 	}
 	if c.DifficultyBombDelaySchedule == nil {
-		c.DifficultyBombDelaySchedule = common2.Uint64BigMapEncodesHex{}
+		c.DifficultyBombDelaySchedule = ctypes.Uint64BigMapEncodesHex{}
 	}
 
 	c.BlockRewardSchedule[*n] = vars.EIP649FBlockReward
@@ -492,7 +492,7 @@ func (c *MultiGethChainConfig) GetEthashEIP1234Transition() *uint64 {
 		c.eip1234FInferred = true
 	}()
 
-	diffN = common2.ExtractHostageSituationN(
+	diffN = ctypes.ExtractHostageSituationN(
 		c.DifficultyBombDelaySchedule,
 		c.BlockRewardSchedule,
 		vars.EIP1234DifficultyBombDelay,
@@ -503,7 +503,7 @@ func (c *MultiGethChainConfig) GetEthashEIP1234Transition() *uint64 {
 
 func (c *MultiGethChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 
 	c.EIP1234FBlock = setBig(c.EIP1234FBlock, n)
@@ -514,10 +514,10 @@ func (c *MultiGethChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 	}
 
 	if c.BlockRewardSchedule == nil {
-		c.BlockRewardSchedule = common2.Uint64BigMapEncodesHex{}
+		c.BlockRewardSchedule = ctypes.Uint64BigMapEncodesHex{}
 	}
 	if c.DifficultyBombDelaySchedule == nil {
-		c.DifficultyBombDelaySchedule = common2.Uint64BigMapEncodesHex{}
+		c.DifficultyBombDelaySchedule = ctypes.Uint64BigMapEncodesHex{}
 	}
 
 	// Block reward is a simple lookup; doesn't matter if overwrite or not.
@@ -542,7 +542,7 @@ func (c *MultiGethChainConfig) GetEthashECIP1010PauseTransition() *uint64 {
 
 func (c *MultiGethChainConfig) SetEthashECIP1010PauseTransition(n *uint64) error {
 	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	if c.ECIP1010PauseBlock == nil && c.ECIP1010Length != nil {
 		c.ECIP1010PauseBlock = setBig(c.ECIP1010PauseBlock, n)
@@ -566,11 +566,11 @@ func (c *MultiGethChainConfig) GetEthashECIP1010ContinueTransition() *uint64 {
 
 func (c *MultiGethChainConfig) SetEthashECIP1010ContinueTransition(n *uint64) error {
 	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	// length = continue - pause
 	if n == nil {
-		return common2.ErrUnsupportedConfigNoop
+		return ctypes.ErrUnsupportedConfigNoop
 	}
 	if c.ECIP1010PauseBlock == nil {
 		c.ECIP1010Length = new(big.Int).SetUint64(*n)
@@ -586,7 +586,7 @@ func (c *MultiGethChainConfig) GetEthashECIP1017Transition() *uint64 {
 
 func (c *MultiGethChainConfig) SetEthashECIP1017Transition(n *uint64) error {
 	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.ECIP1017FBlock = setBig(c.ECIP1017FBlock, n)
 	return nil
@@ -598,7 +598,7 @@ func (c *MultiGethChainConfig) GetEthashECIP1017EraRounds() *uint64 {
 
 func (c *MultiGethChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
 	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.ECIP1017EraRounds = setBig(c.ECIP1017EraRounds, n)
 	return nil
@@ -610,7 +610,7 @@ func (c *MultiGethChainConfig) GetEthashEIP100BTransition() *uint64 {
 
 func (c *MultiGethChainConfig) SetEthashEIP100BTransition(n *uint64) error {
 	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.EIP100FBlock = setBig(c.EIP100FBlock, n)
 	return nil
@@ -622,31 +622,31 @@ func (c *MultiGethChainConfig) GetEthashECIP1041Transition() *uint64 {
 
 func (c *MultiGethChainConfig) SetEthashECIP1041Transition(n *uint64) error {
 	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.DisposalBlock = setBig(c.DisposalBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashDifficultyBombDelaySchedule() common2.Uint64BigMapEncodesHex {
+func (c *MultiGethChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	return c.DifficultyBombDelaySchedule
 }
 
-func (c *MultiGethChainConfig) SetEthashDifficultyBombDelaySchedule(m common2.Uint64BigMapEncodesHex) error {
+func (c *MultiGethChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint64BigMapEncodesHex) error {
 	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.DifficultyBombDelaySchedule = m
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashBlockRewardSchedule() common2.Uint64BigMapEncodesHex {
+func (c *MultiGethChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
 	return c.BlockRewardSchedule
 }
 
-func (c *MultiGethChainConfig) SetEthashBlockRewardSchedule(m common2.Uint64BigMapEncodesHex) error {
+func (c *MultiGethChainConfig) SetEthashBlockRewardSchedule(m ctypes.Uint64BigMapEncodesHex) error {
 	if c.Ethash == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.BlockRewardSchedule = m
 	return nil
@@ -661,7 +661,7 @@ func (c *MultiGethChainConfig) GetCliquePeriod() uint64 {
 
 func (c *MultiGethChainConfig) SetCliquePeriod(n uint64) error {
 	if c.Clique == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.Clique.Period = n
 	return nil
@@ -676,7 +676,7 @@ func (c *MultiGethChainConfig) GetCliqueEpoch() uint64 {
 
 func (c *MultiGethChainConfig) SetCliqueEpoch(n uint64) error {
 	if c.Clique == nil {
-		return common2.ErrUnsupportedConfigFatal
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.Clique.Epoch = n
 	return nil

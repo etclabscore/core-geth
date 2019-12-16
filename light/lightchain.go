@@ -35,7 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/rlp"
 	lru "github.com/hashicorp/golang-lru"
@@ -78,7 +78,7 @@ type LightChain struct {
 // NewLightChain returns a fully initialised light chain using information
 // available in the database. It initialises the default Ethereum header
 // validator.
-func NewLightChain(odr OdrBackend, config common2.ChainConfigurator, engine consensus.Engine, checkpoint *goethereum.TrustedCheckpoint) (*LightChain, error) {
+func NewLightChain(odr OdrBackend, config ctypes.ChainConfigurator, engine consensus.Engine, checkpoint *goethereum.TrustedCheckpoint) (*LightChain, error) {
 	bodyCache, _ := lru.New(bodyCacheLimit)
 	bodyRLPCache, _ := lru.New(bodyCacheLimit)
 	blockCache, _ := lru.New(blockCacheLimit)
@@ -463,7 +463,7 @@ func (lc *LightChain) GetHeaderByNumberOdr(ctx context.Context, number uint64) (
 }
 
 // Config retrieves the header chain's chain configuration.
-func (lc *LightChain) Config() common2.ChainConfigurator { return lc.hc.Config() }
+func (lc *LightChain) Config() ctypes.ChainConfigurator { return lc.hc.Config() }
 
 // SyncCheckpoint fetches the checkpoint point block header according to
 // the checkpoint provided by the remote peer.

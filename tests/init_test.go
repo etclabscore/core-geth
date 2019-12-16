@@ -33,7 +33,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params/types"
-	"github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 // Command line flags to configure the interpreters.
@@ -112,7 +112,7 @@ type testMatcher struct {
 
 type testConfig struct {
 	p      *regexp.Regexp
-	config common.ChainConfigurator
+	config ctypes.ChainConfigurator
 }
 
 type testFailure struct {
@@ -143,7 +143,7 @@ func (tm *testMatcher) whitelist(pattern string) {
 }
 
 // config defines chain config for tests matching the pattern.
-func (tm *testMatcher) config(pattern string, cfg common.ChainConfigurator) {
+func (tm *testMatcher) config(pattern string, cfg ctypes.ChainConfigurator) {
 	tm.configpat = append(tm.configpat, testConfig{regexp.MustCompile(pattern), cfg})
 }
 
@@ -169,7 +169,7 @@ func (tm *testMatcher) findSkip(name string) (reason string, skipload bool) {
 }
 
 // findConfig returns the chain config matching defined patterns.
-func (tm *testMatcher) findConfig(name string) (common.ChainConfigurator, string) {
+func (tm *testMatcher) findConfig(name string) (ctypes.ChainConfigurator, string) {
 	// TODO(fjl): name can be derived from testing.T when min Go version is 1.8
 	for _, m := range tm.configpat {
 		if m.p.MatchString(name) {

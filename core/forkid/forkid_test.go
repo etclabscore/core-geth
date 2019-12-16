@@ -24,7 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -37,7 +37,7 @@ func TestCreation(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		config  common2.ChainConfigurator
+		config  ctypes.ChainConfigurator
 		genesis common.Hash
 		cases   []testcase
 	}{

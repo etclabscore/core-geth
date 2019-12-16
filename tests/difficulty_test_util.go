@@ -27,7 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
@@ -48,7 +48,7 @@ var (
 	}
 )
 
-var difficultyChainConfigurations = map[string]common2.ChainConfigurator{
+var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 	"Ropsten":  params.TestnetChainConfig,
 	"Morden":   params.TestnetChainConfig,
 	"Frontier": &goethereum.ChainConfig{},
@@ -127,7 +127,7 @@ func (t *DifficultyTest) String() string {
 	return string(b)
 }
 
-func (test *DifficultyTest) Run(config common2.ChainConfigurator) error {
+func (test *DifficultyTest) Run(config ctypes.ChainConfigurator) error {
 	parentNumber := big.NewInt(int64(test.CurrentBlockNumber - 1))
 	parent := &types.Header{
 		Difficulty: test.ParentDifficulty,

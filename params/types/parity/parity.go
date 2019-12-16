@@ -27,7 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 // ParityChainSpec is the chain specification format used by Parity.
@@ -40,13 +40,13 @@ type ParityChainSpec struct {
 				MinimumDifficulty      *math.HexOrDecimal256          `json:"minimumDifficulty"`
 				DifficultyBoundDivisor *math.HexOrDecimal256          `json:"difficultyBoundDivisor"`
 				DurationLimit          *math.HexOrDecimal256          `json:"durationLimit"`
-				BlockReward            common2.Uint64BigValOrMapHex   `json:"blockReward"`
-				DifficultyBombDelays   common2.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"`
+				BlockReward            ctypes.Uint64BigValOrMapHex   `json:"blockReward"`
+				DifficultyBombDelays   ctypes.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"`
 
 				// Caches.
 				// These inferences require computation.
 				// This makes it so that the 'heavy-lifting' only has to run once.
-				// See common2.ExtractHostageSituationN for this bespoke logic.
+				// See ctypes.ExtractHostageSituationN for this bespoke logic.
 				eip649inferred    bool       `json:"-"`
 				eip649Transition  *ParityU64 `json:"-"`
 				eip1234inferred   bool       `json:"-"`

@@ -29,7 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/convert"
 	"github.com/ethereum/go-ethereum/params/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -46,12 +46,12 @@ import (
 // error is a *params.ConfigCompatError and the new, unwritten config is returned.
 //
 // The returned chain configuration is never nil.
-func SetupGenesisBlock(db ethdb.Database, genesis *paramtypes.Genesis) (common2.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlock(db ethdb.Database, genesis *paramtypes.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
 	return SetupGenesisBlockWithOverride(db, genesis)
 }
 
-func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesis) (common2.ChainConfigurator, common.Hash, error) {
-	if genesis != nil && common2.IsEmpty(genesis.Config) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
+	if genesis != nil && ctypes.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, paramtypes.ErrGenesisNoConfig
 	}
 	// Just commit the new block if there is no stored genesis block.
@@ -128,7 +128,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesi
 	if height == nil {
 		return newcfg, stored, fmt.Errorf("missing block number for head header hash")
 	}
-	compatErr := common2.Compatible(height, storedcfg, newcfg)
+	compatErr := ctypes.Compatible(height, storedcfg, newcfg)
 	if compatErr != nil && *height != 0 && compatErr.RewindTo != 0 {
 		return newcfg, stored, compatErr
 	}
@@ -136,7 +136,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesi
 	return newcfg, stored, nil
 }
 
-func configOrDefault(g *paramtypes.Genesis, ghash common.Hash) common2.ChainConfigurator {
+func configOrDefault(g *paramtypes.Genesis, ghash common.Hash) ctypes.ChainConfigurator {
 	switch {
 	case g != nil:
 		return g.Config

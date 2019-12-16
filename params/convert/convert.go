@@ -22,7 +22,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 // Automagically translate between [Must|]Setters and Getters.
@@ -31,8 +31,8 @@ func Convert(from, to interface{}) error {
 	for i, v := range []interface{}{
 		from, to,
 	}{
-		_, genesiser := v.(common.GenesisBlocker)
-		_, chainconfer := v.(common.ChainConfigurator)
+		_, genesiser := v.(ctypes.GenesisBlocker)
+		_, chainconfer := v.(ctypes.ChainConfigurator)
 		if !genesiser && !chainconfer {
 			return fmt.Errorf("%d value neither chain nor genesis configurator", i)
 		}
@@ -41,20 +41,20 @@ func Convert(from, to interface{}) error {
 	// Order may matter; configuration parameters may be interdependent across data structures, eg EIP1283 and Genesis builtins.
 	// Try to order translation sensibly
 
-	fromGener, fromGenerOk := from.(common.GenesisBlocker)
-	toGener, toGenerOk := to.(common.GenesisBlocker)
+	fromGener, fromGenerOk := from.(ctypes.GenesisBlocker)
+	toGener, toGenerOk := to.(ctypes.GenesisBlocker)
 
 	// Set Genesis.
 	if fromGenerOk && toGenerOk {
 		et := fromGener.GetSealingType()
 		switch et {
-		case common.BlockSealing_Ethereum:
-			k := reflect.TypeOf((*common.GenesisBlocker)(nil)).Elem()
+		case ctypes.BlockSealing_Ethereum:
+			k := reflect.TypeOf((*ctypes.GenesisBlocker)(nil)).Elem()
 			if err := convert(k, fromGener, toGener); err != nil {
 				return err
 			}
 		default:
-			return common.UnsupportedConfigError(common.ErrUnsupportedConfigFatal, "sealing type", et)
+			return ctypes.UnsupportedConfigError(ctypes.ErrUnsupportedConfigFatal, "sealing type", et)
 		}
 
 		// Set accounts (genesis).
@@ -63,22 +63,22 @@ func Convert(from, to interface{}) error {
 		}
 	}
 
-	fromChainer, fromChainerOk := from.(common.ChainConfigurator)
-	toChainer, toChainerOk := to.(common.ChainConfigurator)
+	fromChainer, fromChainerOk := from.(ctypes.ChainConfigurator)
+	toChainer, toChainerOk := to.(ctypes.ChainConfigurator)
 
 	if !fromChainerOk || !toChainerOk {
 		return nil
 	}
 
 	// Set general chain parameters.
-	k := reflect.TypeOf((*common.CatHerder)(nil)).Elem()
+	k := reflect.TypeOf((*ctypes.CatHerder)(nil)).Elem()
 	if err := convert(k, fromChainer, toChainer); err != nil {
 		return err
 	}
 
 	// Set hardcoded fork hash(es)
 	for f, h := range fromChainer.GetForkCanonHashes() {
-		if err := toChainer.SetForkCanonHash(f, h); common.IsFatalUnsupportedErr(err) {
+		if err := toChainer.SetForkCanonHash(f, h); ctypes.IsFatalUnsupportedErr(err) {
 			return err
 		}
 	}
@@ -86,21 +86,21 @@ func Convert(from, to interface{}) error {
 	// Set consensus engine params.
 	engineType := fromChainer.GetConsensusEngineType()
 	if err := toChainer.MustSetConsensusEngineType(engineType); err != nil {
-		return common.UnsupportedConfigError(err, "consensus engine", engineType)
+		return ctypes.UnsupportedConfigError(err, "consensus engine", engineType)
 	}
 	switch engineType {
-	case common.ConsensusEngineT_Ethash:
-		k := reflect.TypeOf((*common.EthashConfigurator)(nil)).Elem()
+	case ctypes.ConsensusEngineT_Ethash:
+		k := reflect.TypeOf((*ctypes.EthashConfigurator)(nil)).Elem()
 		if err := convert(k, fromChainer, toChainer); err != nil {
 			return err
 		}
-	case common.ConsensusEngineT_Clique:
-		k := reflect.TypeOf((*common.CliqueConfigurator)(nil)).Elem()
+	case ctypes.ConsensusEngineT_Clique:
+		k := reflect.TypeOf((*ctypes.CliqueConfigurator)(nil)).Elem()
 		if err := convert(k, fromChainer, toChainer); err != nil {
 			return err
 		}
 	default:
-		return common.UnsupportedConfigError(common.ErrUnsupportedConfigFatal, "consensus engine", common.ConsensusEngineT_Unknown)
+		return ctypes.UnsupportedConfigError(ctypes.ErrUnsupportedConfigFatal, "consensus engine", ctypes.ConsensusEngineT_Unknown)
 	}
 
 	return nil
@@ -128,8 +128,8 @@ func convert(k reflect.Type, source, target interface{}) error {
 			if !response[0].IsNil() {
 				v = response[0].Elem().Interface()
 			}
-			e := common.UnsupportedConfigError(err, strings.TrimPrefix(method.Name, "Get"), v)
-			if common.IsFatalUnsupportedErr(err) {
+			e := ctypes.UnsupportedConfigError(err, strings.TrimPrefix(method.Name, "Get"), v)
+			if ctypes.IsFatalUnsupportedErr(err) {
 				return e
 			}
 			//log.Println(e) // FIXME?
@@ -153,8 +153,8 @@ func Equal(k reflect.Type, a, b interface{}) (diffs []DiffT) {
 	for _, v := range []interface{}{
 		a, b,
 	} {
-		_, genesiser := v.(common.GenesisBlocker)
-		_, chainconfer := v.(common.ChainConfigurator)
+		_, genesiser := v.(ctypes.GenesisBlocker)
+		_, chainconfer := v.(ctypes.ChainConfigurator)
 		if !genesiser && !chainconfer {
 			return []DiffT{
 				{
@@ -204,7 +204,7 @@ func compare(k reflect.Type, source, target interface{}) (diffs []DiffT) {
 // Identical determines if chain fields are of the same identity; comparing equivalence
 // of only essential network and chain parameters. This allows for identity comparison
 // independent of potential or realized chain upgrades.
-func Identical(a, b common.ChainConfigurator, fields []string) bool {
+func Identical(a, b ctypes.ChainConfigurator, fields []string) bool {
 	for _, m := range fields {
 		res1 := reflect.ValueOf(a).MethodByName("Get"+m).Call([]reflect.Value{})
 		res2 := reflect.ValueOf(b).MethodByName("Get"+m).Call([]reflect.Value{})

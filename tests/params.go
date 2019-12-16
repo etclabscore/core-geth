@@ -28,7 +28,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/params/convert"
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
-	"github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -77,7 +77,7 @@ var mapForkNameChainspecFileDifficulty = map[string]string{
 	"ETC_Agharta":       "classic_agharta_difficulty_test.json",
 }
 
-func readConfigFromSpecFile(name string) (spec common.ChainConfigurator, sha1sum []byte, err error) {
+func readConfigFromSpecFile(name string) (spec ctypes.ChainConfigurator, sha1sum []byte, err error) {
 	spec = &parity.ParityChainSpec{}
 	if fi, err := os.Open(name); os.IsNotExist(err) {
 		return nil, nil, err
@@ -117,7 +117,7 @@ func init() {
 
 		for i, config := range Forks {
 			mgc := &paramtypes.MultiGethChainConfig{}
-			if err := convert.Convert(config, mgc); common.IsFatalUnsupportedErr(err) {
+			if err := convert.Convert(config, mgc); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			Forks[i] = mgc
@@ -125,7 +125,7 @@ func init() {
 
 		for k, v := range difficultyChainConfigurations {
 			mgc := &paramtypes.MultiGethChainConfig{}
-			if err := convert.Convert(v, mgc); common.IsFatalUnsupportedErr(err) {
+			if err := convert.Convert(v, mgc); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = mgc
@@ -136,7 +136,7 @@ func init() {
 
 		for i, config := range Forks {
 			pspec := &parity.ParityChainSpec{}
-			if err := convert.Convert(config, pspec); common.IsFatalUnsupportedErr(err) {
+			if err := convert.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			Forks[i] = pspec
@@ -144,7 +144,7 @@ func init() {
 
 		for k, v := range difficultyChainConfigurations {
 			pspec := &parity.ParityChainSpec{}
-			if err := convert.Convert(v, pspec); common.IsFatalUnsupportedErr(err) {
+			if err := convert.Convert(v, pspec); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = pspec

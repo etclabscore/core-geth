@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
-	"github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -33,10 +33,10 @@ import (
 // itself because they are chain-aware, or fit nuanced, or adhoc, use cases and should
 // not be demanded of EVM-based ecosystem logic as a whole. Debatable. NOTE.
 type GenericCC struct {
-	common.ChainConfigurator
+	ctypes.ChainConfigurator
 }
 
-func AsGenericCC(c common.ChainConfigurator) GenericCC {
+func AsGenericCC(c ctypes.ChainConfigurator) GenericCC {
 	return GenericCC{c}
 }
 

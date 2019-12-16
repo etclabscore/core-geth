@@ -23,7 +23,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -106,7 +106,7 @@ type EVM struct {
 	depth int
 
 	// chainConfig contains information about the current chain
-	chainConfig common2.ChainConfigurator
+	chainConfig ctypes.ChainConfigurator
 	// virtual machine configuration options used to initialise the
 	// evm.
 	vmConfig Config
@@ -125,7 +125,7 @@ type EVM struct {
 
 // NewEVM returns a new EVM. The returned EVM is not thread safe and should
 // only ever be used *once*.
-func NewEVM(ctx Context, statedb StateDB, chainConfig common2.ChainConfigurator, vmConfig Config) *EVM {
+func NewEVM(ctx Context, statedb StateDB, chainConfig ctypes.ChainConfigurator, vmConfig Config) *EVM {
 	evm := &EVM{
 		Context:      ctx,
 		StateDB:      statedb,
@@ -459,4 +459,4 @@ func (evm *EVM) Create2(caller ContractRef, code []byte, gas uint64, endowment *
 }
 
 // ChainConfig returns the environment's chain configuration
-func (evm *EVM) ChainConfig() common2.ChainConfigurator { return evm.chainConfig }
+func (evm *EVM) ChainConfig() ctypes.ChainConfigurator { return evm.chainConfig }

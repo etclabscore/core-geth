@@ -19,7 +19,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
@@ -35,7 +35,7 @@ var (
 	//KottiECIP1010PauseBlock        = uint64(0)
 	//KottiECIP1010Length            = uint64(2000000)
 
-	KottiChainConfig = func() common2.ChainConfigurator {
+	KottiChainConfig = func() ctypes.ChainConfigurator {
 		c := &goethereum.ChainConfig{
 			ChainID:             big.NewInt(6),
 			HomesteadBlock:      big.NewInt(0),

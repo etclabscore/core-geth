@@ -29,7 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -43,7 +43,7 @@ var ErrGenesisNoConfig = errors.New("genesis has no chain configuration")
 // Genesis specifies the header fields, state of a genesis block. It also defines hard
 // fork switch-over blocks through the chain configuration.
 type Genesis struct {
-	Config     common2.ChainConfigurator `json:"config"`
+	Config     ctypes.ChainConfigurator `json:"config"`
 	Nonce      uint64                    `json:"nonce"`
 	Timestamp  uint64                    `json:"timestamp"`
 	ExtraData  []byte                    `json:"extraData"`
@@ -175,15 +175,15 @@ func DecodePreAlloc(data string) GenesisAlloc {
 	return ga
 }
 
-// Following methods implement the common2.GenesisBlocker interface.
+// Following methods implement the ctypes.GenesisBlocker interface.
 
-func (g *Genesis) GetSealingType() common2.BlockSealingT {
-	return common2.BlockSealing_Ethereum
+func (g *Genesis) GetSealingType() ctypes.BlockSealingT {
+	return ctypes.BlockSealing_Ethereum
 }
 
-func (g *Genesis) SetSealingType(t common2.BlockSealingT) error {
-	if t != common2.BlockSealing_Ethereum {
-		return common2.ErrUnsupportedConfigFatal
+func (g *Genesis) SetSealingType(t ctypes.BlockSealingT) error {
+	if t != ctypes.BlockSealing_Ethereum {
+		return ctypes.ErrUnsupportedConfigFatal
 	}
 	return nil
 }
@@ -535,11 +535,11 @@ func (g *Genesis) GetForkCanonHashes() map[uint64]common.Hash {
 	return g.Config.GetForkCanonHashes()
 }
 
-func (g *Genesis) GetConsensusEngineType() common2.ConsensusEngineT {
+func (g *Genesis) GetConsensusEngineType() ctypes.ConsensusEngineT {
 	return g.Config.GetConsensusEngineType()
 }
 
-func (g *Genesis) MustSetConsensusEngineType(t common2.ConsensusEngineT) error {
+func (g *Genesis) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
 	return g.Config.MustSetConsensusEngineType(t)
 }
 
@@ -655,19 +655,19 @@ func (g *Genesis) SetEthashECIP1041Transition(n *uint64) error {
 	return g.Config.SetEthashECIP1041Transition(n)
 }
 
-func (g *Genesis) GetEthashDifficultyBombDelaySchedule() common2.Uint64BigMapEncodesHex {
+func (g *Genesis) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	return g.Config.GetEthashDifficultyBombDelaySchedule()
 }
 
-func (g *Genesis) SetEthashDifficultyBombDelaySchedule(m common2.Uint64BigMapEncodesHex) error {
+func (g *Genesis) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint64BigMapEncodesHex) error {
 	return g.Config.SetEthashDifficultyBombDelaySchedule(m)
 }
 
-func (g *Genesis) GetEthashBlockRewardSchedule() common2.Uint64BigMapEncodesHex {
+func (g *Genesis) GetEthashBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
 	return g.Config.GetEthashBlockRewardSchedule()
 }
 
-func (g *Genesis) SetEthashBlockRewardSchedule(m common2.Uint64BigMapEncodesHex) error {
+func (g *Genesis) SetEthashBlockRewardSchedule(m ctypes.Uint64BigMapEncodesHex) error {
 	return g.Config.SetEthashBlockRewardSchedule(m)
 }
 

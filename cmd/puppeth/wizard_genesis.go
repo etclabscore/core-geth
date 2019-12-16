@@ -30,28 +30,31 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // makeGenesis creates a new genesis struct based on some user input.
 func (w *wizard) makeGenesis() {
 	// Construct a default genesis block
-	genesis := &core.Genesis{
+	genesis := &paramtypes.Genesis{
 		Timestamp:  uint64(time.Now().Unix()),
 		GasLimit:   4700000,
 		Difficulty: big.NewInt(524288),
-		Alloc:      make(core.GenesisAlloc),
-		Config: &params.ChainConfig{
-			HomesteadBlock:      big.NewInt(0),
-			EIP150Block:         big.NewInt(0),
-			EIP155Block:         big.NewInt(0),
-			EIP158Block:         big.NewInt(0),
-			ByzantiumBlock:      big.NewInt(0),
-			ConstantinopleBlock: big.NewInt(0),
-			PetersburgBlock:     big.NewInt(0),
-			IstanbulBlock:       big.NewInt(0),
+		Alloc:      make(paramtypes.GenesisAlloc),
+		Config: &paramtypes.ChainConfig{
+			ChainConfig: goethereum.ChainConfig{
+				HomesteadBlock:      big.NewInt(0),
+				EIP150Block:         big.NewInt(0),
+				EIP155Block:         big.NewInt(0),
+				EIP158Block:         big.NewInt(0),
+				ByzantiumBlock:      big.NewInt(0),
+				ConstantinopleBlock: big.NewInt(0),
+				PetersburgBlock:     big.NewInt(0),
+				IstanbulBlock:       big.NewInt(0),
+			},
 		},
 	}
 	// Figure out which consensus engine to choose
@@ -64,13 +67,13 @@ func (w *wizard) makeGenesis() {
 	switch {
 	case choice == "1":
 		// In case of ethash, we're pretty much done
-		genesis.Config.Ethash = new(params.EthashConfig)
+		genesis.Config.Ethash = new(goethereum.EthashConfig)
 		genesis.ExtraData = make([]byte, 32)
 
 	case choice == "" || choice == "2":
 		// In the case of clique, configure the consensus parameters
 		genesis.Difficulty = big.NewInt(1)
-		genesis.Config.Clique = &params.CliqueConfig{
+		genesis.Config.Clique = &goethereum.CliqueConfig{
 			Period: 15,
 			Epoch:  30000,
 		}
@@ -114,7 +117,7 @@ func (w *wizard) makeGenesis() {
 	for {
 		// Read the address of the account to fund
 		if address := w.readAddress(); address != nil {
-			genesis.Alloc[*address] = core.GenesisAccount{
+			genesis.Alloc[*address] = paramtypes.GenesisAccount{
 				Balance: new(big.Int).Lsh(big.NewInt(1), 256-7), // 2^256 / 128 (allow many pre-funds without balance overflows)
 			}
 			continue
@@ -126,7 +129,7 @@ func (w *wizard) makeGenesis() {
 	if w.readDefaultYesNo(true) {
 		// Add a batch of precompile balances to avoid them getting deleted
 		for i := int64(0); i < 256; i++ {
-			genesis.Alloc[common.BigToAddress(big.NewInt(i))] = core.GenesisAccount{Balance: big.NewInt(1)}
+			genesis.Alloc[common.BigToAddress(big.NewInt(i))] = paramtypes.GenesisAccount{Balance: big.NewInt(1)}
 		}
 	}
 	// Query the user for some custom extras
@@ -177,7 +180,7 @@ func (w *wizard) importGenesis() {
 		return
 	}
 	// Parse the genesis file and inject it successful
-	var genesis core.Genesis
+	var genesis paramtypes.Genesis
 	if err := json.NewDecoder(reader).Decode(&genesis); err != nil {
 		log.Error("Invalid genesis spec: %v", err)
 		return
@@ -262,13 +265,13 @@ func (w *wizard) manageGenesis() {
 		log.Info("Saved native genesis chain spec", "path", gethJson)
 
 		// Export the genesis spec used by Aleth (formerly C++ Ethereum)
-		if spec, err := newAlethGenesisSpec(w.network, w.conf.Genesis); err != nil {
+		if spec, err := convert.NewAlethGenesisSpec(w.network, w.conf.Genesis); err != nil {
 			log.Error("Failed to create Aleth chain spec", "err", err)
 		} else {
 			saveGenesis(folder, w.network, "aleth", spec)
 		}
 		// Export the genesis spec used by Parity
-		if spec, err := newParityChainSpec(w.network, w.conf.Genesis, []string{}); err != nil {
+		if spec, err := convert.NewParityChainSpec(w.network, w.conf.Genesis, []string{}); err != nil {
 			log.Error("Failed to create Parity chain spec", "err", err)
 		} else {
 			saveGenesis(folder, w.network, "parity", spec)

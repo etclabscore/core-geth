@@ -35,7 +35,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/rlp"
 	lru "github.com/hashicorp/golang-lru"
 )
@@ -77,7 +78,7 @@ type LightChain struct {
 // NewLightChain returns a fully initialised light chain using information
 // available in the database. It initialises the default Ethereum header
 // validator.
-func NewLightChain(odr OdrBackend, config *params.ChainConfig, engine consensus.Engine, checkpoint *params.TrustedCheckpoint) (*LightChain, error) {
+func NewLightChain(odr OdrBackend, config *paramtypes.ChainConfig, engine consensus.Engine, checkpoint *goethereum.TrustedCheckpoint) (*LightChain, error) {
 	bodyCache, _ := lru.New(bodyCacheLimit)
 	bodyRLPCache, _ := lru.New(bodyCacheLimit)
 	blockCache, _ := lru.New(blockCacheLimit)
@@ -119,7 +120,7 @@ func NewLightChain(odr OdrBackend, config *params.ChainConfig, engine consensus.
 }
 
 // AddTrustedCheckpoint adds a trusted checkpoint to the blockchain
-func (lc *LightChain) AddTrustedCheckpoint(cp *params.TrustedCheckpoint) {
+func (lc *LightChain) AddTrustedCheckpoint(cp *goethereum.TrustedCheckpoint) {
 	if lc.odr.ChtIndexer() != nil {
 		StoreChtRoot(lc.chainDb, cp.SectionIndex, cp.SectionHead, cp.CHTRoot)
 		lc.odr.ChtIndexer().AddCheckpoint(cp.SectionIndex, cp.SectionHead)
@@ -462,14 +463,14 @@ func (lc *LightChain) GetHeaderByNumberOdr(ctx context.Context, number uint64) (
 }
 
 // Config retrieves the header chain's chain configuration.
-func (lc *LightChain) Config() *params.ChainConfig { return lc.hc.Config() }
+func (lc *LightChain) Config() *paramtypes.ChainConfig { return lc.hc.Config() }
 
 // SyncCheckpoint fetches the checkpoint point block header according to
 // the checkpoint provided by the remote peer.
 //
 // Note if we are running the clique, fetches the last epoch snapshot header
 // which covered by checkpoint.
-func (lc *LightChain) SyncCheckpoint(ctx context.Context, checkpoint *params.TrustedCheckpoint) bool {
+func (lc *LightChain) SyncCheckpoint(ctx context.Context, checkpoint *goethereum.TrustedCheckpoint) bool {
 	// Ensure the remote checkpoint head is ahead of us
 	head := lc.CurrentHeader().Number.Uint64()
 

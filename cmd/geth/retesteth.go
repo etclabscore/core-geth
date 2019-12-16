@@ -43,6 +43,8 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
@@ -104,7 +106,7 @@ type RetestWeb3API interface {
 type RetestethAPI struct {
 	ethDb         ethdb.Database
 	db            state.Database
-	chainConfig   *params.ChainConfig
+	chainConfig   *paramtypes.ChainConfig
 	author        common.Address
 	extraData     []byte
 	genesisHash   common.Hash
@@ -220,7 +222,7 @@ func (e *NoRewardEngine) Prepare(chain consensus.ChainReader, header *types.Head
 	return e.inner.Prepare(chain, header)
 }
 
-func (e *NoRewardEngine) accumulateRewards(config *params.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+func (e *NoRewardEngine) accumulateRewards(config *paramtypes.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
 	// Simply touch miner and uncle coinbase accounts
 	reward := big.NewInt(0)
 	for _, uncle := range uncles {
@@ -284,7 +286,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 		api.ethDb.Close()
 	}
 	ethDb := rawdb.NewMemoryDatabase()
-	accounts := make(core.GenesisAlloc)
+	accounts := make(paramtypes.GenesisAlloc)
 	for address, account := range chainParams.Accounts {
 		balance := big.NewInt(0)
 		if account.Balance != nil {
@@ -299,7 +301,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 			for k, v := range account.Storage {
 				storage[common.HexToHash(k)] = common.HexToHash(v)
 			}
-			accounts[address] = core.GenesisAccount{
+			accounts[address] = paramtypes.GenesisAccount{
 				Balance: balance,
 				Code:    account.Code,
 				Nonce:   nonce,
@@ -351,19 +353,21 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 		istanbulBlock = big.NewInt(int64(*chainParams.Params.IstanbulBlock))
 	}
 
-	genesis := &core.Genesis{
-		Config: &params.ChainConfig{
-			ChainID:             chainId,
-			HomesteadBlock:      homesteadBlock,
-			DAOForkBlock:        daoForkBlock,
-			DAOForkSupport:      false,
-			EIP150Block:         eip150Block,
-			EIP155Block:         eip155Block,
-			EIP158Block:         eip158Block,
-			ByzantiumBlock:      byzantiumBlock,
-			ConstantinopleBlock: constantinopleBlock,
-			PetersburgBlock:     petersburgBlock,
-			IstanbulBlock:       istanbulBlock,
+	genesis := &paramtypes.Genesis{
+		Config: &paramtypes.ChainConfig{
+			ChainConfig: goethereum.ChainConfig{
+				ChainID:             chainId,
+				HomesteadBlock:      homesteadBlock,
+				DAOForkBlock:        daoForkBlock,
+				DAOForkSupport:      false,
+				EIP150Block:         eip150Block,
+				EIP155Block:         eip155Block,
+				EIP158Block:         eip158Block,
+				ByzantiumBlock:      byzantiumBlock,
+				ConstantinopleBlock: constantinopleBlock,
+				PetersburgBlock:     petersburgBlock,
+				IstanbulBlock:       istanbulBlock,
+			},
 		},
 		Nonce:      uint64(chainParams.Genesis.Nonce),
 		Timestamp:  uint64(chainParams.Genesis.Timestamp),

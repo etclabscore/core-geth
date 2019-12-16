@@ -21,10 +21,11 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
-func ecip1017BlockReward(config *params.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
-	blockReward := FrontierBlockReward
+func ecip1017BlockReward(config *paramtypes.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+	blockReward := params.FrontierBlockReward
 
 	// Ensure value 'era' is configured.
 	eraLen := config.ECIP1017EraRounds
@@ -41,7 +42,7 @@ func ecip1017BlockReward(config *params.ChainConfig, state *state.StateDB, heade
 	}
 }
 
-func ecip1010Explosion(config *params.ChainConfig, next *big.Int, exPeriodRef *big.Int) {
+func ecip1010Explosion(config *paramtypes.ChainConfig, next *big.Int, exPeriodRef *big.Int) {
 	// https://github.com/ethereumproject/ECIPs/blob/master/ECIPs/ECIP-1010.md
 
 	explosionBlock := new(big.Int).Add(config.ECIP1010PauseBlock, config.ECIP1010Length)

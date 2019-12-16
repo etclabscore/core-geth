@@ -229,6 +229,9 @@ func doInstall(cmdline []string) {
 
 	if *arch == "" || *arch == runtime.GOARCH {
 		goinstall := goTool("install", buildFlags(env)...)
+		if runtime.GOARCH == "arm64" {
+			goinstall.Args = append(goinstall.Args, "-p", "1")
+		}
 		goinstall.Args = append(goinstall.Args, "-v")
 		goinstall.Args = append(goinstall.Args, packages...)
 		build.MustRun(goinstall)
@@ -241,6 +244,7 @@ func doInstall(cmdline []string) {
 			os.RemoveAll(filepath.Join(path, "pkg", runtime.GOOS+"_arm"))
 		}
 	}
+
 	// Seems we are cross compiling, work around forbidden GOBIN
 	goinstall := goToolArch(*arch, *cc, "install", buildFlags(env)...)
 	goinstall.Args = append(goinstall.Args, "-v")
@@ -315,6 +319,7 @@ func goToolArch(arch string, cc string, subcmd string, args ...string) *exec.Cmd
 
 func doTest(cmdline []string) {
 	coverage := flag.Bool("coverage", false, "Whether to record code coverage")
+	verbose := flag.Bool("v", false, "Whether to log verbosely")
 	flag.CommandLine.Parse(cmdline)
 	env := build.Env()
 
@@ -330,6 +335,9 @@ func doTest(cmdline []string) {
 	gotest.Args = append(gotest.Args, "-p", "1", "-timeout", "5m", "--short")
 	if *coverage {
 		gotest.Args = append(gotest.Args, "-covermode=atomic", "-cover")
+	}
+	if *verbose {
+		gotest.Args = append(gotest.Args, "-v")
 	}
 
 	gotest.Args = append(gotest.Args, packages...)

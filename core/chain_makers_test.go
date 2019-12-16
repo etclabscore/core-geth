@@ -26,6 +26,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 func ExampleGenerateChain() {
@@ -40,11 +42,11 @@ func ExampleGenerateChain() {
 	)
 
 	// Ensure that key1 has some funds in the genesis block.
-	gspec := &Genesis{
-		Config: &params.ChainConfig{HomesteadBlock: new(big.Int)},
-		Alloc:  GenesisAlloc{addr1: {Balance: big.NewInt(1000000)}},
+	gspec := &paramtypes.Genesis{
+		Config: &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{HomesteadBlock: new(big.Int)}},
+		Alloc:  paramtypes.GenesisAlloc{addr1: {Balance: big.NewInt(1000000)}},
 	}
-	genesis := gspec.MustCommit(db)
+	genesis := MustCommitGenesis(db, gspec)
 
 	// This call generates a chain of 5 blocks. The function runs for
 	// each block and adds different features to gen based on the

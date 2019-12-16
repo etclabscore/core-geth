@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto/blake2b"
 	"github.com/ethereum/go-ethereum/crypto/bn256"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"golang.org/x/crypto/ripemd160"
 )
 
@@ -47,7 +48,7 @@ var basePrecompiledContracts = map[common.Address]PrecompiledContract{
 }
 
 // PrecompiledContractsForConfig returns a map containing valid precompiled contracts for a given point in a chain config.
-func PrecompiledContractsForConfig(config *params.ChainConfig, bn *big.Int) map[common.Address]PrecompiledContract {
+func PrecompiledContractsForConfig(config *paramtypes.ChainConfig, bn *big.Int) map[common.Address]PrecompiledContract {
 	// Copying to a new map is necessary because assigning to the original map
 	// creates a memory reference. Further, setting the vals to nil in case of nonconfiguration causes
 	// a panic during tests because they run asynchronously (also a valid reason for using an explicit copy).

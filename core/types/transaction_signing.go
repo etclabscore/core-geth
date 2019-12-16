@@ -24,7 +24,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 var (
@@ -39,7 +39,7 @@ type sigCache struct {
 }
 
 // MakeSigner returns a Signer based on the given chain config and block number.
-func MakeSigner(config *params.ChainConfig, blockNumber *big.Int) Signer {
+func MakeSigner(config *paramtypes.ChainConfig, blockNumber *big.Int) Signer {
 	var signer Signer
 	switch {
 	case config.IsEIP155(blockNumber):

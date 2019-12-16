@@ -34,7 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
 )
@@ -42,6 +42,9 @@ import (
 // StateTest checks transaction processing without block context.
 // See https://github.com/ethereum/EIPs/issues/176 for the test format specification.
 type StateTest struct {
+	// Name is only used for writing tests (Marshaling).
+	// It is set by inference, using the test's filepath base.
+	Name string
 	json stJSON
 }
 
@@ -55,12 +58,34 @@ func (t *StateTest) UnmarshalJSON(in []byte) error {
 	return json.Unmarshal(in, &t.json)
 }
 
+func (t StateTest) MarshalJSON() ([]byte, error) {
+	m := map[string]stJSON{
+		t.Name: t.json,
+	}
+	return json.MarshalIndent(m, "", "    ")
+}
+
 type stJSON struct {
+	Info stInfo                   `json:"_info"`
 	Env  stEnv                    `json:"env"`
-	Pre  core.GenesisAlloc        `json:"pre"`
+	Pre  paramtypes.GenesisAlloc  `json:"pre"`
 	Tx   stTransaction            `json:"transaction"`
 	Out  hexutil.Bytes            `json:"out"`
 	Post map[string][]stPostState `json:"post"`
+}
+
+type stInfo struct {
+	Comment            string         `json:"comment"`
+	FillingRPCServer   string         `json:"filling-rpc-server"`
+	FillingToolVersion string         `json:"filling-tool-version"`
+	FilledWith         string         `json:"filledWith"`
+	LLLCVersion        string         `json:"lllcversion"`
+	Source             string         `json:"source"`
+	SourceHash         string         `json:"sourceHash"`
+	WrittenWith        string         `json:"written-with"`
+	Parent             string         `json:"parent"`
+	ParentSha1Sum      string         `json:"parentSha1Sum"`
+	Chainspecs         chainspecRefsT `json:"chainspecs"`
 }
 
 type stPostState struct {
@@ -114,7 +139,7 @@ type stTransactionMarshaling struct {
 // The fork definition can be
 // - a plain forkname, e.g. `Byzantium`,
 // - a fork basename, and a list of EIPs to enable; e.g. `Byzantium+1884+1283`.
-func getVMConfig(forkString string) (baseConfig *params.ChainConfig, eips []int, err error) {
+func getVMConfig(forkString string) (baseConfig *paramtypes.ChainConfig, eips []int, err error) {
 	var (
 		splitForks            = strings.Split(forkString, "+")
 		ok                    bool
@@ -169,7 +194,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config) (*stat
 		return nil, common.Hash{}, UnsupportedForkError{subtest.Fork}
 	}
 	vmconfig.ExtraEips = eips
-	block := t.genesis(config).ToBlock(nil)
+	block := core.GenesisToBlock(t.genesis(config), nil)
 	statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre)
 
 	post := t.json.Post[subtest.Fork][subtest.Index]
@@ -188,7 +213,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config) (*stat
 		statedb.RevertToSnapshot(snapshot)
 	}
 	// Commit block
-	statedb.Commit(config.IsEIP158(block.Number()))
+	statedb.Commit(config.IsEIP161F(block.Number()))
 	// Add 0-value mining reward. This only makes a difference in the cases
 	// where
 	// - the coinbase suicided, or
@@ -196,7 +221,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config) (*stat
 	//   the coinbase gets no txfee, so isn't created, and thus needs to be touched
 	statedb.AddBalance(block.Coinbase(), new(big.Int))
 	// And _now_ get the state root
-	root := statedb.IntermediateRoot(config.IsEIP158(block.Number()))
+	root := statedb.IntermediateRoot(config.IsEIP161F(block.Number()))
 	return statedb, root, nil
 }
 
@@ -204,7 +229,7 @@ func (t *StateTest) gasLimit(subtest StateSubtest) uint64 {
 	return t.json.Tx.GasLimit[t.json.Post[subtest.Fork][subtest.Index].Indexes.Gas]
 }
 
-func MakePreState(db ethdb.Database, accounts core.GenesisAlloc) *state.StateDB {
+func MakePreState(db ethdb.Database, accounts paramtypes.GenesisAlloc) *state.StateDB {
 	sdb := state.NewDatabase(db)
 	statedb, _ := state.New(common.Hash{}, sdb)
 	for addr, a := range accounts {
@@ -221,8 +246,8 @@ func MakePreState(db ethdb.Database, accounts core.GenesisAlloc) *state.StateDB 
 	return statedb
 }
 
-func (t *StateTest) genesis(config *params.ChainConfig) *core.Genesis {
-	return &core.Genesis{
+func (t *StateTest) genesis(config *paramtypes.ChainConfig) *paramtypes.Genesis {
+	return &paramtypes.Genesis{
 		Config:     config,
 		Coinbase:   t.json.Env.Coinbase,
 		Difficulty: t.json.Env.Difficulty,

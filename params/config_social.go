@@ -19,6 +19,9 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/params/types"
+	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var (
@@ -26,28 +29,29 @@ var (
 	SocialGenesisHash = common.HexToHash("0xba8314d5c2ebddaf58eb882b364b27cbfa4d3402dacd32b60986754ac25cfe8d")
 
 	// SocialChainConfig is the chain parameters to run a node on the Ethereum Social main network.
-	SocialChainConfig = &ChainConfig{
-		ChainID:             big.NewInt(28),
-		HomesteadBlock:      big.NewInt(0),
-		DAOForkBlock:        nil,
-		DAOForkSupport:      true,
-		EIP150Block:         big.NewInt(0),
-		EIP150Hash:          common.HexToHash("0xba8314d5c2ebddaf58eb882b364b27cbfa4d3402dacd32b60986754ac25cfe8d"),
-		EIP155Block:         big.NewInt(0),
-		EIP158Block:         nil,
-		ByzantiumBlock:      nil,
+	SocialChainConfig = &paramtypes.ChainConfig{
+		ChainConfig: goethereum.ChainConfig{
+			ChainID:             big.NewInt(28),
+			HomesteadBlock:      big.NewInt(0),
+			DAOForkBlock:        nil,
+			DAOForkSupport:      true,
+			EIP150Block:         big.NewInt(0),
+			EIP150Hash:          common.HexToHash("0xba8314d5c2ebddaf58eb882b364b27cbfa4d3402dacd32b60986754ac25cfe8d"),
+			EIP155Block:         big.NewInt(0),
+			EIP158Block:         nil,
+			ByzantiumBlock:      nil,
+			ConstantinopleBlock: nil,
+			Ethash:              new(goethereum.EthashConfig),
+		},
+		NetworkID:           28,
 		DisposalBlock:       big.NewInt(0),
 		SocialBlock:         big.NewInt(0),
 		EthersocialBlock:    nil,
-		ConstantinopleBlock: nil,
+		ECIP1017FBlock:      big.NewInt(5000000),
 		ECIP1017EraRounds:   big.NewInt(5000000),
 		EIP160FBlock:        big.NewInt(0),
-		Ethash:              new(EthashConfig),
+		BlockRewardSchedule: common2.Uint64BigMapEncodesHex{
+			0: new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)),
+		},
 	}
-
-	SocialBlockReward = new(big.Int).Mul(big.NewInt(50), big.NewInt(1e+18)) // Block reward in wei for successfully mining a block upward for Ethereum Social
 )
-
-func (c *ChainConfig) IsSocial(num *big.Int) bool {
-	return isForked(c.SocialBlock, num)
-}

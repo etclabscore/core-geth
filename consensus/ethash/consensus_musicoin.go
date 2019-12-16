@@ -22,9 +22,10 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
-func musicoinBlockReward(config *params.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+func musicoinBlockReward(config *paramtypes.ChainConfig, state *state.StateDB, header *types.Header, uncles []*types.Header) {
 	// Select the correct block reward based on chain progression
 	blockReward := params.Mcip0BlockReward
 	mcip3Reward := params.Mcip3BlockReward

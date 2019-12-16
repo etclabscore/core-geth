@@ -12,13 +12,14 @@ import (
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/eth/gasprice"
 	"github.com/ethereum/go-ethereum/miner"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // MarshalTOML marshals as TOML.
 func (c Config) MarshalTOML() (interface{}, error) {
 	type Config struct {
-		Genesis                 *core.Genesis `toml:",omitempty"`
+		Genesis                 *paramtypes.Genesis `toml:",omitempty"`
 		NetworkId               uint64
 		SyncMode                downloader.SyncMode
 		NoPruning               bool
@@ -46,9 +47,9 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		DocRoot                 string `toml:"-"`
 		EWASMInterpreter        string
 		EVMInterpreter          string
-		RPCGasCap               *big.Int                       `toml:",omitempty"`
-		Checkpoint              *params.TrustedCheckpoint      `toml:",omitempty"`
-		CheckpointOracle        *params.CheckpointOracleConfig `toml:",omitempty"`
+		RPCGasCap               *big.Int                           `toml:",omitempty"`
+		Checkpoint              *goethereum.TrustedCheckpoint      `toml:",omitempty"`
+		CheckpointOracle        *goethereum.CheckpointOracleConfig `toml:",omitempty"`
 	}
 	var enc Config
 	enc.Genesis = c.Genesis
@@ -88,7 +89,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 // UnmarshalTOML unmarshals from TOML.
 func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	type Config struct {
-		Genesis                 *core.Genesis `toml:",omitempty"`
+		Genesis                 *paramtypes.Genesis `toml:",omitempty"`
 		NetworkId               *uint64
 		SyncMode                *downloader.SyncMode
 		NoPruning               *bool
@@ -116,9 +117,9 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		DocRoot                 *string `toml:"-"`
 		EWASMInterpreter        *string
 		EVMInterpreter          *string
-		RPCGasCap               *big.Int                       `toml:",omitempty"`
-		Checkpoint              *params.TrustedCheckpoint      `toml:",omitempty"`
-		CheckpointOracle        *params.CheckpointOracleConfig `toml:",omitempty"`
+		RPCGasCap               *big.Int                           `toml:",omitempty"`
+		Checkpoint              *goethereum.TrustedCheckpoint      `toml:",omitempty"`
+		CheckpointOracle        *goethereum.CheckpointOracleConfig `toml:",omitempty"`
 	}
 	var dec Config
 	if err := unmarshal(&dec); err != nil {

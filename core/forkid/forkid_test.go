@@ -23,6 +23,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -34,12 +35,14 @@ func TestCreation(t *testing.T) {
 		want ID
 	}
 	tests := []struct {
-		config  *params.ChainConfig
+		name string
+		config  *paramtypes.ChainConfig
 		genesis common.Hash
 		cases   []testcase
 	}{
 		// Mainnet test cases
 		{
+			"mainnet",
 			params.MainnetChainConfig,
 			params.MainnetGenesisHash,
 			[]testcase{
@@ -63,6 +66,7 @@ func TestCreation(t *testing.T) {
 		},
 		// Ropsten test cases
 		{
+			"ropsten",
 			params.TestnetChainConfig,
 			params.TestnetGenesisHash,
 			[]testcase{
@@ -82,6 +86,7 @@ func TestCreation(t *testing.T) {
 		},
 		// Rinkeby test cases
 		{
+			"rinkeby",
 			params.RinkebyChainConfig,
 			params.RinkebyGenesisHash,
 			[]testcase{
@@ -102,6 +107,7 @@ func TestCreation(t *testing.T) {
 		},
 		// Goerli test cases
 		{
+			"goerli",
 			params.GoerliChainConfig,
 			params.GoerliGenesisHash,
 			[]testcase{
@@ -115,7 +121,7 @@ func TestCreation(t *testing.T) {
 	for i, tt := range tests {
 		for j, ttt := range tt.cases {
 			if have := newID(tt.config, tt.genesis, ttt.head); have != ttt.want {
-				t.Errorf("test %d, case %d: fork ID mismatch: have %x, want %x", i, j, have, ttt.want)
+				t.Errorf("test %d, case %d, name: %s: fork ID mismatch: have %x, want %x", i, j, tt.name, have, ttt.want)
 			}
 		}
 	}
@@ -218,6 +224,41 @@ func TestEncoding(t *testing.T) {
 		}
 		if !bytes.Equal(have, tt.want) {
 			t.Errorf("test %d: RLP mismatch: have %x, want %x", i, have, tt.want)
+		}
+	}
+}
+
+func TestGatherForks(t *testing.T) {
+	cases := []struct {
+		config *paramtypes.ChainConfig
+		wantNs []uint64
+	}{
+		{
+			params.ClassicChainConfig,
+			[]uint64{1150000, 1920000, 2500000, 3000000, 5000000, 5900000, 8772000},
+		},
+	}
+	sliceContains := func (sl []uint64, u uint64) bool {
+		for _, s := range sl {
+			if s == u {
+				return true
+			}
+		}
+		return false
+	}
+	for ci, c := range cases {
+		gotForkNs := gatherForks(c.config)
+		if len(gotForkNs) != len(c.wantNs) {
+			for _, n := range c.wantNs {
+				if !sliceContains(gotForkNs, n) {
+					t.Errorf("config.i=%d missing wanted fork at block number: %d", ci, n)
+				}
+			}
+			for _, n := range gotForkNs {
+				if !sliceContains(c.wantNs, n) {
+					t.Errorf("config.i=%d gathered unwanted fork at block number: %d", ci, n)
+				}
+			}
 		}
 	}
 }

@@ -26,7 +26,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 func TestDefaults(t *testing.T) {
@@ -166,16 +167,16 @@ func benchmarkEVM_Create(bench *testing.B, code string) {
 		Time:        new(big.Int).SetUint64(0),
 		Coinbase:    common.Address{},
 		BlockNumber: new(big.Int).SetUint64(1),
-		ChainConfig: &params.ChainConfig{
-			ChainID:             big.NewInt(1),
-			HomesteadBlock:      new(big.Int),
-			ByzantiumBlock:      new(big.Int),
-			ConstantinopleBlock: new(big.Int),
-			DAOForkBlock:        new(big.Int),
-			DAOForkSupport:      false,
-			EIP150Block:         new(big.Int),
-			EIP155Block:         new(big.Int),
-			EIP158Block:         new(big.Int),
+		ChainConfig: &paramtypes.ChainConfig{
+			ChainConfig: goethereum.ChainConfig{ChainID: big.NewInt(1),
+				HomesteadBlock:      new(big.Int),
+				ByzantiumBlock:      new(big.Int),
+				ConstantinopleBlock: new(big.Int),
+				DAOForkBlock:        new(big.Int),
+				DAOForkSupport:      false,
+				EIP150Block:         new(big.Int),
+				EIP155Block:         new(big.Int),
+				EIP158Block:         new(big.Int)},
 		},
 		EVMConfig: vm.Config{},
 	}

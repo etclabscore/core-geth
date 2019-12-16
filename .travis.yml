@@ -3,67 +3,91 @@ go_import_path: github.com/ethereum/go-ethereum
 sudo: false
 matrix:
   include:
-    # These are the latest Go versions.
-    - os: linux
-      dist: xenial
-      go: 1.13.x
-      script:
-        - go run build/ci.go install
-        - travis_wait 60 go run build/ci.go test
-      before_deploy:
-        - sh build/deploy.sh
-      deploy:
-        provider: releases
-        api_key:
-          secure: KARrS20Qud7MMa4NCxmKIbDeMeeA83Wb+a+O22vIGXOk8IJeG6EcUF+gRsnbT+ARqrKdRZIS84OUB/aebgNLT+j2bk8L+UoBQuz6J6JHDqz1duoVa5CK5bIopVEBfu44ZBXHdE01XWLgGS1ce027iCCk0VRAAjpKDVG2X83YONxClg+cCOc6EpVXviHsxnoMSyOpgxTXQRgdgmv1XyzbBTyYKKFWbtNg7AUbxQ0ngQf800+0OmHLZ7ooILlRH115DQ0KJQeKyegCdjJ0Uc4uoSlqVF1VXKvwCColWT3MHU/U9Ig6Edqloh8ulM3BVhnORrwYwJ+oScfzPUPkg9kwzDdA4QgAhdKHKjOa9V62vPlz/oq4fD4LRs81BHiHQVo/WFK+UTkvrqYpDi+hiFfuob8N4sUGckXP8eEVyY2XP5fCMzkhwe2Xnz2CvWqoLt6v6LeZzYFQs68ZwGuwfKn22PqkuyvO+H3X4qqe7F60ofIl9OjJCeLuIpGovG13t/ivNlRiVk8OYaYQQK6OGDVhVqeWI81GXNrttPQygLStr6nnaQo6Gawtsrwk5/OL2ztKrzypXMy+8o2AaQyxrtaGJxnDv8MMkiv0AN2r3uAAfpS2N8xaImeD0R6/EB9W/P/S54KzxyCvsgcVQ0OHJq1LmICHipzFL7lSj7wBmlXmaiA=
-        file: multi-geth*-$TRAVIS_OS_NAME.*
-        file_glob: true
-        draft: true
-        on:
-          repo: multi-geth/multi-geth
-          tags: true
-        skip_cleanup: true
-        tag_name: "$TRAVIS_TAG"
-
-    - os: osx
-      go: 1.13.x
-      script:
-        - echo "Increase the maximum number of open file descriptors on macOS"
-        - NOFILE=20480
-        - sudo sysctl -w kern.maxfiles=$NOFILE
-        - sudo sysctl -w kern.maxfilesperproc=$NOFILE
-        - sudo launchctl limit maxfiles $NOFILE $NOFILE
-        - sudo launchctl limit maxfiles
-        - ulimit -S -n $NOFILE
-        - ulimit -n
-        - unset -f cd # workaround for https://github.com/travis-ci/travis-ci/issues/8703
-        - go run build/ci.go install
-      before_deploy:
-        - sh build/deploy.sh
-      deploy:
-        provider: releases
-        api_key:
-          secure: KARrS20Qud7MMa4NCxmKIbDeMeeA83Wb+a+O22vIGXOk8IJeG6EcUF+gRsnbT+ARqrKdRZIS84OUB/aebgNLT+j2bk8L+UoBQuz6J6JHDqz1duoVa5CK5bIopVEBfu44ZBXHdE01XWLgGS1ce027iCCk0VRAAjpKDVG2X83YONxClg+cCOc6EpVXviHsxnoMSyOpgxTXQRgdgmv1XyzbBTyYKKFWbtNg7AUbxQ0ngQf800+0OmHLZ7ooILlRH115DQ0KJQeKyegCdjJ0Uc4uoSlqVF1VXKvwCColWT3MHU/U9Ig6Edqloh8ulM3BVhnORrwYwJ+oScfzPUPkg9kwzDdA4QgAhdKHKjOa9V62vPlz/oq4fD4LRs81BHiHQVo/WFK+UTkvrqYpDi+hiFfuob8N4sUGckXP8eEVyY2XP5fCMzkhwe2Xnz2CvWqoLt6v6LeZzYFQs68ZwGuwfKn22PqkuyvO+H3X4qqe7F60ofIl9OjJCeLuIpGovG13t/ivNlRiVk8OYaYQQK6OGDVhVqeWI81GXNrttPQygLStr6nnaQo6Gawtsrwk5/OL2ztKrzypXMy+8o2AaQyxrtaGJxnDv8MMkiv0AN2r3uAAfpS2N8xaImeD0R6/EB9W/P/S54KzxyCvsgcVQ0OHJq1LmICHipzFL7lSj7wBmlXmaiA=
-        file: multi-geth*-$TRAVIS_OS_NAME.*
-        file_glob: true
-        draft: true
-        on:
-          repo: multi-geth/multi-geth
-          tags: true
-        skip_cleanup: true
-        tag_name: "$TRAVIS_TAG"
-
-    # This builder only tests code linters on latest version of Go
-    - os: linux
-      dist: xenial
-      go: 1.13.x
-      env:
-        - lint
-      git:
-        submodules: false # avoid cloning ethereum/tests
-      script:
-        - go run build/ci.go lint
-
-  allow_failures:
-    - env:
-        - lint
+  - os: linux
+    dist: xenial
+    go: 1.13.x
+    script:
+    - go run build/ci.go install
+    - travis_wait 60 go run build/ci.go test
+    - make test-multigeth
+    before_deploy:
+    - sh build/deploy.sh
+    deploy:
+      provider: releases
+      api_key:
+        secure: pGlbI2DRfTzdF75hkEwP5vMIpcP1iVEeW3W41DT1X+/GQPlgDN1DB/ocXtMbEId2vJCWgt1HfCSNb9F4NBI94TMamFJQPz4zy/VIXBClG1IGesloe159vU4PixrLBgeTTcuDJRx7X45JeKlHW9LN5ABxeEhYEzPj1De6P5NDePmbFNDvhOkaf5Spk0xGLumRzzf2SHk+w3au9RQM5gVUcgr5U81Qi/ys8aGCLtZ1T+avSoX9rFoB1/YGoHllJfMoNGJr5CLiBwnFGMY8SNfD7XruFptUjTe4D0sMNTgAbT8iDPbw9s5aa2ou2eFWsuGaa8v840kLF+J0dEW0L/y88YzzRbbK3Ve6qNvka8MZ26HLSry7JtAqT6QY0W+h2yMgOmJX6ehlCGg1PoZYVwTp4d0usE88CGa8kTSNlt6/OxVmvNU5E2TPCbiTxF1yI42RliE+r7FyX5TtvXvZmSzfrlZcJFn3amC02woe1Fs0GJWvscxdqyftuyIezpaRmkIrL0X+OzYjOLJA2CH6eUdJu0O52zSLg00UeXDd4y9dBgm8AWD1k5tuHQrqq2/tF7abz2XOtmt3cuL9XYOcbXm0lf88AiOEusDaWCoPNNBmvL8mJMCwLWdNsRGQO6NhdkzqH81njP86TCdpFQi7OJDgTobEuy+NXwRkx4B0620JssU= 
+      file: multi-geth*-$TRAVIS_OS_NAME.*
+      file_glob: true
+      draft: true
+      on:
+        repo: etclabscore/multi-geth
+        tags: true
+      skip_cleanup: true
+      tag_name: "$TRAVIS_TAG"
+  - os: linux
+    dist: xenial
+    sudo: required
+    go: 1.13.x
+    env:
+      - ARMv5 
+    git:
+      submodules: false # avoid cloning ethereum/tests
+    addons:
+      apt:
+        packages:
+          - gcc-multilib
+    script:
+      # Switch over GCC to cross compilation (breaks 386, hence why do it here only)
+      - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-arm-linux-gnueabi libc6-dev-armel-cross gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+      - sudo ln -s /usr/include/asm-generic /usr/include/asm
+      - GOPATH=~/go_arm GOARM=5 go run build/ci.go install -arch arm -cc arm-linux-gnueabi-gcc
+    before_deploy:
+      - sh build/deploy_arm.sh
+    deploy:
+      provider: releases
+      api_key:
+        secure: pGlbI2DRfTzdF75hkEwP5vMIpcP1iVEeW3W41DT1X+/GQPlgDN1DB/ocXtMbEId2vJCWgt1HfCSNb9F4NBI94TMamFJQPz4zy/VIXBClG1IGesloe159vU4PixrLBgeTTcuDJRx7X45JeKlHW9LN5ABxeEhYEzPj1De6P5NDePmbFNDvhOkaf5Spk0xGLumRzzf2SHk+w3au9RQM5gVUcgr5U81Qi/ys8aGCLtZ1T+avSoX9rFoB1/YGoHllJfMoNGJr5CLiBwnFGMY8SNfD7XruFptUjTe4D0sMNTgAbT8iDPbw9s5aa2ou2eFWsuGaa8v840kLF+J0dEW0L/y88YzzRbbK3Ve6qNvka8MZ26HLSry7JtAqT6QY0W+h2yMgOmJX6ehlCGg1PoZYVwTp4d0usE88CGa8kTSNlt6/OxVmvNU5E2TPCbiTxF1yI42RliE+r7FyX5TtvXvZmSzfrlZcJFn3amC02woe1Fs0GJWvscxdqyftuyIezpaRmkIrL0X+OzYjOLJA2CH6eUdJu0O52zSLg00UeXDd4y9dBgm8AWD1k5tuHQrqq2/tF7abz2XOtmt3cuL9XYOcbXm0lf88AiOEusDaWCoPNNBmvL8mJMCwLWdNsRGQO6NhdkzqH81njP86TCdpFQi7OJDgTobEuy+NXwRkx4B0620JssU= 
+      file: multi-geth*-arm.*
+      file_glob: true
+      draft: true
+      on:
+        repo: etclabscore/multi-geth
+        tags: true
+      skip_cleanup: true
+      tag_name: "$TRAVIS_TAG"
+  - os: osx
+    go: 1.13.x
+    script:
+    - echo "Increase the maximum number of open file descriptors on macOS"
+    - NOFILE=20480
+    - sudo sysctl -w kern.maxfiles=$NOFILE
+    - sudo sysctl -w kern.maxfilesperproc=$NOFILE
+    - sudo launchctl limit maxfiles $NOFILE $NOFILE
+    - sudo launchctl limit maxfiles
+    - ulimit -S -n $NOFILE
+    - ulimit -n
+    - unset -f cd
+    - go run build/ci.go install
+    before_deploy:
+    - sh build/deploy.sh
+    deploy:
+      provider: releases
+      api_key:
+        secure: pGlbI2DRfTzdF75hkEwP5vMIpcP1iVEeW3W41DT1X+/GQPlgDN1DB/ocXtMbEId2vJCWgt1HfCSNb9F4NBI94TMamFJQPz4zy/VIXBClG1IGesloe159vU4PixrLBgeTTcuDJRx7X45JeKlHW9LN5ABxeEhYEzPj1De6P5NDePmbFNDvhOkaf5Spk0xGLumRzzf2SHk+w3au9RQM5gVUcgr5U81Qi/ys8aGCLtZ1T+avSoX9rFoB1/YGoHllJfMoNGJr5CLiBwnFGMY8SNfD7XruFptUjTe4D0sMNTgAbT8iDPbw9s5aa2ou2eFWsuGaa8v840kLF+J0dEW0L/y88YzzRbbK3Ve6qNvka8MZ26HLSry7JtAqT6QY0W+h2yMgOmJX6ehlCGg1PoZYVwTp4d0usE88CGa8kTSNlt6/OxVmvNU5E2TPCbiTxF1yI42RliE+r7FyX5TtvXvZmSzfrlZcJFn3amC02woe1Fs0GJWvscxdqyftuyIezpaRmkIrL0X+OzYjOLJA2CH6eUdJu0O52zSLg00UeXDd4y9dBgm8AWD1k5tuHQrqq2/tF7abz2XOtmt3cuL9XYOcbXm0lf88AiOEusDaWCoPNNBmvL8mJMCwLWdNsRGQO6NhdkzqH81njP86TCdpFQi7OJDgTobEuy+NXwRkx4B0620JssU=
+      file: multi-geth*-$TRAVIS_OS_NAME.*
+      file_glob: true
+      draft: true
+      on:
+        repo: etclabscore/multi-geth
+        tags: true
+      skip_cleanup: true
+      tag_name: "$TRAVIS_TAG"
+  - os: linux
+    dist: xenial
+    go: 1.13.x
+    env:
+    - lint
+    git:
+      submodules: false
+    script:
+    - go run build/ci.go lint

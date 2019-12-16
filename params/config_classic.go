@@ -19,29 +19,33 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var (
 	// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
-	ClassicChainConfig = &ChainConfig{
-		ChainID:             big.NewInt(61),
-		HomesteadBlock:      big.NewInt(1150000),
-		DAOForkBlock:        big.NewInt(1920000),
-		DAOForkSupport:      false,
-		EIP150Block:         big.NewInt(2500000),
-		EIP150Hash:          common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
-		EIP155Block:         big.NewInt(3000000),
-		EIP158Block:         big.NewInt(8772000),
-		ByzantiumBlock:      big.NewInt(8772000),
+	ClassicChainConfig = &paramtypes.ChainConfig{
+		ChainConfig: goethereum.ChainConfig{
+			ChainID:             big.NewInt(61),
+			HomesteadBlock:      big.NewInt(1150000),
+			DAOForkBlock:        big.NewInt(1920000),
+			DAOForkSupport:      false,
+			EIP150Block:         big.NewInt(2500000),
+			EIP150Hash:          common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
+			EIP155Block:         big.NewInt(3000000),
+			EIP158Block:         big.NewInt(8772000),
+			ByzantiumBlock:      big.NewInt(8772000),
+			ConstantinopleBlock: nil,
+			Ethash:              new(goethereum.EthashConfig),
+		},
+		NetworkID:           1,
 		DisposalBlock:       big.NewInt(5900000),
-		SocialBlock:         nil,
-		EthersocialBlock:    nil,
-		ConstantinopleBlock: nil,
+		ECIP1017FBlock:      big.NewInt(5000000),
 		ECIP1017EraRounds:   big.NewInt(5000000),
 		EIP160FBlock:        big.NewInt(3000000),
 		ECIP1010PauseBlock:  big.NewInt(3000000),
 		ECIP1010Length:      big.NewInt(2000000),
-		Ethash:              new(EthashConfig),
 	}
 
 	DisinflationRateQuotient = big.NewInt(4)      // Disinflation rate quotient for ECIP1017

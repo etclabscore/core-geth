@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/light"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -45,7 +46,7 @@ type LesApiBackend struct {
 	gpo           *gasprice.Oracle
 }
 
-func (b *LesApiBackend) ChainConfig() *params.ChainConfig {
+func (b *LesApiBackend) ChainConfig() *paramtypes.ChainConfig {
 	return b.eth.chainConfig
 }
 

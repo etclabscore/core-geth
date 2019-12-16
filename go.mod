@@ -5,8 +5,8 @@ go 1.12
 require (
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/Azure/go-autorest/autorest/adal v0.6.0 // indirect
+	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
 	github.com/allegro/bigcache v0.0.0-20190218064605-e24eb225f156
-	github.com/apilayer/freegeoip v0.0.0-20180702111401-3f942d1392f6
 	github.com/aristanetworks/goarista v0.0.0-20170210015632-ea17b1a17847
 	github.com/btcsuite/btcd v0.0.0-20171128150713-2e60448ffcc6
 	github.com/cespare/cp v0.1.0
@@ -19,15 +19,17 @@ require (
 	github.com/fatih/color v1.6.0
 	github.com/fjl/memsize v0.0.0-20180418122429-ca190fb6ffbc
 	github.com/gballet/go-libpcsclite v0.0.0-20190403181518-312b5175032f
+	github.com/go-ole/go-ole v1.2.1 // indirect
 	github.com/go-stack/stack v1.8.0
+	github.com/go-test/deep v1.0.4
 	github.com/golang/protobuf v1.3.1
 	github.com/golang/snappy v0.0.1
-	github.com/golangci/golangci-lint v1.18.0 // indirect
+	github.com/google/go-cmp v0.2.0 // indirect
 	github.com/gorilla/websocket v1.4.1
 	github.com/graph-gophers/graphql-go v0.0.0-20190513003547-158e7b876106
 	github.com/hashicorp/golang-lru v0.0.0-20160813221303-0a025b7e63ad
-	github.com/howeyc/fsnotify v0.0.0-20151003194602-f0c08ee9c607 // indirect
 	github.com/huin/goupnp v0.0.0-20161224104101-679507af18f3
+	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334
 	github.com/influxdata/influxdb v0.0.0-20180221223340-01288bdb0883
 	github.com/jackpal/go-nat-pmp v0.0.0-20160603034137-1fa385a6f458
 	github.com/julienschmidt/httprouter v0.0.0-20170430222011-975b5c4c7c21
@@ -35,13 +37,11 @@ require (
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.0
 	github.com/mattn/go-isatty v0.0.3
-	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/naoina/go-stringutil v0.1.0 // indirect
 	github.com/naoina/toml v0.0.0-20170918210437-9fafd6967416
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
-	github.com/oschwald/maxminddb-golang v0.0.0-20180819230143-277d39ecb83e // indirect
 	github.com/pborman/uuid v0.0.0-20170112150404-1b00554d8222
 	github.com/peterh/liner v0.0.0-20190123174540-a2c9a5303de7
 	github.com/prometheus/tsdb v0.0.0-20190402121629-4f204dcbc150
@@ -56,7 +56,7 @@ require (
 	github.com/syndtr/goleveldb v1.0.1-0.20190923125748-758128399b1d
 	github.com/tyler-smith/go-bip39 v0.0.0-20181017060643-dbb3b84ba2ef
 	github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208
-	golang.org/x/crypto v0.0.0-20190313024323-a1f597ede03a
+	golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529
 	golang.org/x/net v0.0.0-20191101175033-0deb6923b6d9
 	golang.org/x/sync v0.0.0-20190423024810-112230192c58
 	golang.org/x/sys v0.0.0-20190422165155-953cdadca894
@@ -66,6 +66,7 @@ require (
 	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20180302121509-abf0ba0be5d5
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/urfave/cli.v1 v1.20.0
+	gopkg.in/yaml.v2 v2.2.4 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
 
 )

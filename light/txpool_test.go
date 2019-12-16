@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 type testTxRelay struct {
@@ -83,10 +84,10 @@ func TestTxPool(t *testing.T) {
 	var (
 		sdb     = rawdb.NewMemoryDatabase()
 		ldb     = rawdb.NewMemoryDatabase()
-		gspec   = core.Genesis{Alloc: core.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
-		genesis = gspec.MustCommit(sdb)
+		gspec   = paramtypes.Genesis{Alloc: paramtypes.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
+		genesis = core.MustCommitGenesis(sdb, &gspec)
 	)
-	gspec.MustCommit(ldb)
+	core.MustCommitGenesis(ldb, &gspec)
 	// Assemble the test environment
 	blockchain, _ := core.NewBlockChain(sdb, nil, params.TestChainConfig, ethash.NewFullFaker(), vm.Config{}, nil)
 	gchain, _ := core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), sdb, poolTestBlocks, txPoolTestChainGen)

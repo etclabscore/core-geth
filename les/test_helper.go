@@ -44,6 +44,8 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var (
@@ -169,25 +171,25 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 	var (
 		evmux  = new(event.TypeMux)
 		engine = ethash.NewFaker()
-		gspec  = core.Genesis{
+		gspec  = paramtypes.Genesis{
 			Config:   params.AllEthashProtocolChanges,
-			Alloc:    core.GenesisAlloc{bankAddr: {Balance: bankFunds}},
+			Alloc:    paramtypes.GenesisAlloc{bankAddr: {Balance: bankFunds}},
 			GasLimit: 100000000,
 		}
 		oracle *checkpointOracle
 	)
-	genesis := gspec.MustCommit(db)
+	genesis := core.MustCommitGenesis(db, &gspec)
 	chain, _ := light.NewLightChain(odr, gspec.Config, engine, nil)
 	if indexers != nil {
-		checkpointConfig := &params.CheckpointOracleConfig{
+		checkpointConfig := &goethereum.CheckpointOracleConfig{
 			Address:   crypto.CreateAddress(bankAddr, 0),
 			Signers:   []common.Address{signerAddr},
 			Threshold: 1,
 		}
-		getLocal := func(index uint64) params.TrustedCheckpoint {
+		getLocal := func(index uint64) goethereum.TrustedCheckpoint {
 			chtIndexer := indexers[0]
 			sectionHead := chtIndexer.SectionHead(index)
-			return params.TrustedCheckpoint{
+			return goethereum.TrustedCheckpoint{
 				SectionIndex: index,
 				SectionHead:  sectionHead,
 				CHTRoot:      light.GetChtRoot(db, index, sectionHead),
@@ -225,14 +227,14 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 
 func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Database, peers *peerSet, clock mclock.Clock) (*serverHandler, *backends.SimulatedBackend) {
 	var (
-		gspec = core.Genesis{
+		gspec = paramtypes.Genesis{
 			Config:   params.AllEthashProtocolChanges,
-			Alloc:    core.GenesisAlloc{bankAddr: {Balance: bankFunds}},
+			Alloc:    paramtypes.GenesisAlloc{bankAddr: {Balance: bankFunds}},
 			GasLimit: 100000000,
 		}
 		oracle *checkpointOracle
 	)
-	genesis := gspec.MustCommit(db)
+	genesis := core.MustCommitGenesis(db, &gspec)
 
 	// create a simulation backend and pre-commit several customized block to the database.
 	simulation := backends.NewSimulatedBackendWithDatabase(db, gspec.Alloc, 100000000)
@@ -242,15 +244,15 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 	txpoolConfig.Journal = ""
 	txpool := core.NewTxPool(txpoolConfig, gspec.Config, simulation.Blockchain())
 	if indexers != nil {
-		checkpointConfig := &params.CheckpointOracleConfig{
+		checkpointConfig := &goethereum.CheckpointOracleConfig{
 			Address:   crypto.CreateAddress(bankAddr, 0),
 			Signers:   []common.Address{signerAddr},
 			Threshold: 1,
 		}
-		getLocal := func(index uint64) params.TrustedCheckpoint {
+		getLocal := func(index uint64) goethereum.TrustedCheckpoint {
 			chtIndexer := indexers[0]
 			sectionHead := chtIndexer.SectionHead(index)
-			return params.TrustedCheckpoint{
+			return goethereum.TrustedCheckpoint{
 				SectionIndex: index,
 				SectionHead:  sectionHead,
 				CHTRoot:      light.GetChtRoot(db, index, sectionHead),

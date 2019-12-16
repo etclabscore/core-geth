@@ -42,6 +42,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/convert"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
@@ -475,8 +476,8 @@ func (api *RetestethAPI) mineBlock() error {
 		api.engine.Prepare(api.blockchain, header)
 	}
 	// If we are care about TheDAO hard-fork check whether to override the extra-data or not
-	if daoBlockUint64 := api.chainConfig.GetEthashEIP779Transition(); daoBlockUint64 != nil {
-		daoBlock := new(big.Int).SetUint64(*daoBlockUint64)
+	if convert.AsGenericCC(api.chainConfig).DAOSupport() {
+		daoBlock := new(big.Int).SetUint64(*api.chainConfig.GetEthashEIP779Transition())
 		// Check whether the block is among the fork extra-override range
 		limit := new(big.Int).Add(daoBlock, vars.DAOForkExtraRange)
 		if header.Number.Cmp(daoBlock) >= 0 && header.Number.Cmp(limit) < 0 {

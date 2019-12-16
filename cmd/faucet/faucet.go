@@ -117,6 +117,7 @@ func faucetDirFromConfig(chainConfig *paramtypes.ChainConfig) string {
 		params.RinkebyChainConfig:     "rinkeby",
 		params.GoerliChainConfig:      "goerli",
 		params.KottiChainConfig:       "kotti",
+		params.MordorChainConfig:      "mordor",
 	} {
 		if reflect.DeepEqual(chainConfig, conf) && suff != "" {
 			datadir = filepath.Join(datadir, suff)

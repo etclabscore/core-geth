@@ -235,7 +235,7 @@ func TestGatherForks(t *testing.T) {
 	}{
 		{
 			params.ClassicChainConfig,
-			[]uint64{1150000, 1920000, 2500000, 3000000, 5000000, 5900000, 8772000},
+			[]uint64{1150000, 1920000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000},
 		},
 	}
 	sliceContains := func (sl []uint64, u uint64) bool {

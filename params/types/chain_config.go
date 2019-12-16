@@ -137,6 +137,8 @@ type MultiGethChainConfig struct {
 	// EIP-2028: Calldata gas cost reduction
 	EIP2028FBlock *big.Int `json:"eip2028FBlock,omitempty"`
 	// EIP-2200: Rebalance net-metered SSTORE gas cost with consideration of SLOAD gas cost change
+	// It's a combined version of EIP-1283 + EIP-1706, with a structured definition so as to make it
+	// interoperable with other gas changes such as EIP-1884.
 	EIP2200FBlock *big.Int `json:"eip2200FBlock,omitempty"`
 
 	//EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)

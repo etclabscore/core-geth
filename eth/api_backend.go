@@ -34,7 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/gasprice"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -47,7 +47,7 @@ type EthAPIBackend struct {
 }
 
 // MultiGethChainConfig returns the active chain configuration.
-func (b *EthAPIBackend) ChainConfig() common2.ChainConfigurator {
+func (b *EthAPIBackend) ChainConfig() ctypes.ChainConfigurator {
 	return b.eth.blockchain.Config()
 }
 

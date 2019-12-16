@@ -19,7 +19,7 @@ import (
 	"math/big"
 
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
@@ -31,7 +31,7 @@ var (
 	//MordorEIP160FBlock             = uint64(0)
 
 	// MordorChainConfig is the chain parameters to run a node on the Ethereum Classic Mordor test network (PoW).
-	MordorChainConfig = func() common2.ChainConfigurator {
+	MordorChainConfig = func() ctypes.ChainConfigurator {
 		//c := &goethereum.ChainConfig{
 		//	ChainID:             big.NewInt(63),
 		//	HomesteadBlock:      big.NewInt(0),

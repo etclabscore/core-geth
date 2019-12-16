@@ -33,7 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/convert"
 	"github.com/ethereum/go-ethereum/params/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
@@ -66,13 +66,13 @@ func (w *wizard) makeGenesis() {
 	switch {
 	case choice == "1":
 		// In case of ethash, we're pretty much done
-		genesis.Config.MustSetConsensusEngineType(common2.ConsensusEngineT_Ethash)
+		genesis.Config.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Ethash)
 		genesis.ExtraData = make([]byte, 32)
 
 	case choice == "" || choice == "2":
 		// In the case of clique, configure the consensus parameters
 		genesis.Difficulty = big.NewInt(1)
-		genesis.Config.MustSetConsensusEngineType(common2.ConsensusEngineT_Clique)
+		genesis.Config.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Clique)
 		genesis.Config.SetCliquePeriod(15)
 		genesis.Config.SetCliqueEpoch(30000)
 		fmt.Println()

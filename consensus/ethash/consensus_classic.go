@@ -20,11 +20,11 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
-func ecip1017BlockReward(config common2.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+func ecip1017BlockReward(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
 	blockReward := vars.FrontierBlockReward
 
 	// Ensure value 'era' is configured.
@@ -42,7 +42,7 @@ func ecip1017BlockReward(config common2.ChainConfigurator, state *state.StateDB,
 	}
 }
 
-func ecip1010Explosion(config common2.ChainConfigurator, next *big.Int, exPeriodRef *big.Int) {
+func ecip1010Explosion(config ctypes.ChainConfigurator, next *big.Int, exPeriodRef *big.Int) {
 	// https://github.com/ethereumproject/ECIPs/blob/master/ECIPs/ECIP-1010.md
 
 	if next.Uint64() < *config.GetEthashECIP1010ContinueTransition() {

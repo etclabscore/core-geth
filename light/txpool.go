@@ -31,7 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -50,7 +50,7 @@ var txPermanent = uint64(500)
 // always receive all locally signed transactions in the same order as they are
 // created.
 type TxPool struct {
-	config       common2.ChainConfigurator
+	config       ctypes.ChainConfigurator
 	signer       types.Signer
 	quit         chan bool
 	txFeed       event.Feed
@@ -88,7 +88,7 @@ type TxRelayBackend interface {
 }
 
 // NewTxPool creates a new light transaction pool
-func NewTxPool(config common2.ChainConfigurator, chain *LightChain, relay TxRelayBackend) *TxPool {
+func NewTxPool(config ctypes.ChainConfigurator, chain *LightChain, relay TxRelayBackend) *TxPool {
 	pool := &TxPool{
 		config:      config,
 		signer:      types.NewEIP155Signer(config.GetChainID()),

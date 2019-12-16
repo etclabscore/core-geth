@@ -29,7 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/convert"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -47,7 +47,7 @@ type BlockGen struct {
 	receipts []*types.Receipt
 	uncles   []*types.Header
 
-	config common2.ChainConfigurator
+	config ctypes.ChainConfigurator
 	engine consensus.Engine
 }
 
@@ -188,7 +188,7 @@ func (b *BlockGen) OffsetTime(seconds int64) {
 // Blocks created by GenerateChain do not contain valid proof of work
 // values. Inserting them into BlockChain requires use of FakePow or
 // a similar non-validating proof of work implementation.
-func GenerateChain(config common2.ChainConfigurator, parent *types.Block, engine consensus.Engine, db ethdb.Database, n int, gen func(int, *BlockGen)) ([]*types.Block, []types.Receipts) {
+func GenerateChain(config ctypes.ChainConfigurator, parent *types.Block, engine consensus.Engine, db ethdb.Database, n int, gen func(int, *BlockGen)) ([]*types.Block, []types.Receipts) {
 	if config == nil {
 		config = params.TestChainConfig
 	}
@@ -286,12 +286,12 @@ func makeBlockChain(parent *types.Block, n int, engine consensus.Engine, db ethd
 }
 
 type fakeChainReader struct {
-	config  common2.ChainConfigurator
+	config  ctypes.ChainConfigurator
 	genesis *types.Block
 }
 
 // Config returns the chain configuration.
-func (cr *fakeChainReader) Config() common2.ChainConfigurator {
+func (cr *fakeChainReader) Config() ctypes.ChainConfigurator {
 	return cr.config
 }
 

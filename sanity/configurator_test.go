@@ -30,7 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/convert"
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
-	"github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 	"github.com/ethereum/go-ethereum/tests"
 	"github.com/go-test/deep"
@@ -38,12 +38,12 @@ import (
 
 func TestEquivalent_Features(t *testing.T) {
 
-	mustValidate := func (c common.ChainConfigurator) {
+	mustValidate := func (c ctypes.ChainConfigurator) {
 		zero, max := uint64(0), uint64(math.MaxUint64)
 		for _, head := range []*uint64{
 			nil, &zero, &max,
 		} {
-			if err := common.IsValid(c, head); err != nil {
+			if err := ctypes.IsValid(c, head); err != nil {
 				t.Fatalf("invalid config, err: %v", err)
 			}
 		}
@@ -54,7 +54,7 @@ func TestEquivalent_Features(t *testing.T) {
 		oconf := oconf
 
 		if oconf.GetConsensusEngineType().IsUnknown() {
-			oconf.MustSetConsensusEngineType(common.ConsensusEngineT_Ethash)
+			oconf.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Ethash)
 		}
 
 		mustValidate(oconf)
@@ -73,7 +73,7 @@ func TestEquivalent_Features(t *testing.T) {
 			t.Fatal("unknown consensus mg")
 		}
 
-		err = common.Equivalent(oconf, mg)
+		err = ctypes.Equivalent(oconf, mg)
 		if err != nil {
 			t.Log("--------------------")
 			t.Errorf("%s oconf/mg err: %v", name, err)
@@ -111,7 +111,7 @@ func TestEquivalent_Features(t *testing.T) {
 
 		mustValidate(pc)
 
-		err = common.Equivalent(mg, pc)
+		err = ctypes.Equivalent(mg, pc)
 		if err != nil {
 			t.Errorf("%s oconf/p err: %v", name, err)
 		}
@@ -143,7 +143,7 @@ func TestEquivalent_ReadParity(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = common.Equivalent(a, b)
+		err = ctypes.Equivalent(a, b)
 		if err != nil {
 			t.Log("-------------------")
 			t.Log(b.Engine.Ethash.Params.BlockReward)

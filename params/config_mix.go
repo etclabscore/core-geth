@@ -19,7 +19,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
@@ -29,7 +29,7 @@ var (
 	MixNetworkID   = uint64(76)
 
 	// MixChainConfig is the chain parameters to run a node on the MIX main network.
-	MixChainConfig = func() common2.ChainConfigurator {
+	MixChainConfig = func() ctypes.ChainConfigurator {
 		c := &goethereum.ChainConfig{
 			ChainID:             big.NewInt(76),
 			Ethash:              new(goethereum.EthashConfig),

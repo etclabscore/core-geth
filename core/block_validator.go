@@ -22,7 +22,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
-	common2 "github.com/ethereum/go-ethereum/params/types/common"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -31,13 +31,13 @@ import (
 //
 // BlockValidator implements Validator.
 type BlockValidator struct {
-	config common2.ChainConfigurator // Chain configuration options
+	config ctypes.ChainConfigurator // Chain configuration options
 	bc     *BlockChain               // Canonical block chain
 	engine consensus.Engine          // Consensus engine used for validating
 }
 
 // NewBlockValidator returns a new block validator which is safe for re-use
-func NewBlockValidator(config common2.ChainConfigurator, blockchain *BlockChain, engine consensus.Engine) *BlockValidator {
+func NewBlockValidator(config ctypes.ChainConfigurator, blockchain *BlockChain, engine consensus.Engine) *BlockValidator {
 	validator := &BlockValidator{
 		config: config,
 		engine: engine,

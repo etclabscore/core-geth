@@ -15,7 +15,7 @@
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
 
-package common
+package ctypes
 
 import (
 	"encoding/json"

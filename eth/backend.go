@@ -252,7 +252,7 @@ func makeExtraData(extra []byte) []byte {
 func CreateConsensusEngine(ctx *node.ServiceContext, chainConfig ctypes.ChainConfigurator, config *ethash.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
 	// If proof-of-authority is requested, set it up
 	if chainConfig.GetConsensusEngineType().IsClique() {
-		return clique.New(&goethereum.CliqueConfig{
+		return clique.New(&ctypes.CliqueConfig{
 			Period: chainConfig.GetCliquePeriod(),
 			Epoch: chainConfig.GetCliqueEpoch(),
 		}, db)

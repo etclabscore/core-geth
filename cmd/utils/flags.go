@@ -61,7 +61,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/netutil"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rpc"
 	whisper "github.com/ethereum/go-ethereum/whisper/whisperv6"
 	pcsclite "github.com/gballet/go-libpcsclite"
@@ -1722,7 +1722,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 	}
 	var engine consensus.Engine
 	if config.GetConsensusEngineType().IsClique() {
-		engine = clique.New(&goethereum.CliqueConfig{
+		engine = clique.New(&ctypes.CliqueConfig{
 			Period: config.GetCliquePeriod(),
 			Epoch:  config.GetCliqueEpoch(),
 		}, chainDb)

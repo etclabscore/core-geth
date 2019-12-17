@@ -24,7 +24,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // MultiGethChainConfig is the core config which determines the blockchain settings.
@@ -165,8 +164,8 @@ type MultiGethChainConfig struct {
 	EthersocialBlock   *big.Int `json:"ethersocialBlock,omitempty"`  // Ethersocial Reward block
 	
 	// Various consensus engines
-	Ethash *goethereum.EthashConfig `json:"ethash,omitempty"`
-	Clique *goethereum.CliqueConfig `json:"clique,omitempty"`
+	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
+	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
 
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint"`
 	TrustedCheckpointOracle *ctypes.CheckpointOracleConfig `json:"trustedCheckpointOracle"`

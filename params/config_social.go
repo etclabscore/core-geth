@@ -21,7 +21,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var (
@@ -35,7 +34,7 @@ var (
 		EIP7FBlock:          big.NewInt(0),
 		EIP150Block:         big.NewInt(0),
 		EIP155Block:         big.NewInt(0),
-		Ethash:              new(goethereum.EthashConfig),
+		Ethash:              new(ctypes.EthashConfig),
 		NetworkID:         28,
 		DisposalBlock:     big.NewInt(0),
 		SocialBlock:       big.NewInt(0),

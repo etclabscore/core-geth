@@ -46,7 +46,7 @@ var (
 			ByzantiumBlock:      big.NewInt(716617),
 			ConstantinopleBlock: big.NewInt(1705549),
 			PetersburgBlock:     big.NewInt(1705549),
-			Clique: &goethereum.CliqueConfig{
+			Clique: &ctypes.CliqueConfig{
 				Period: 15,
 				Epoch:  30000,
 			},

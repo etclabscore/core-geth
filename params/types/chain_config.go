@@ -33,14 +33,9 @@ import (
 // that any network, identified by its genesis block, can have its own
 // set of configuration options.
 type MultiGethChainConfig struct {
-
-	// Embedded ethereum/go-ethereum MultiGethChainConfig.
-	// This is not a pointer value because it can be expected that there will
-	// always be at least one (even zero-value) value desired from that data type, eg ChainID or engine.
-	//goethereum.MultiGethChainConfig
-
-	// Following fields are left commented because it's useful to see pairings,
+	// Some of the following fields are left commented because it's useful to see pairings,
 	// both for reference and edification.
+	// They show a difference between the upstream configuration data type (goethereum.ChainConfig) and this one.
 
 	NetworkID uint64   `json:"networkId"`
 	ChainID   *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection

@@ -20,6 +20,7 @@ package paramtypes
 import (
 	"fmt"
 	"math/big"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -192,9 +193,16 @@ func (c *MultiGethChainConfig) String() string {
 	default:
 		engine = "unknown"
 	}
-	return fmt.Sprintf("<FIXME!!> NetworkID: %v, ChainID: %v Engine: %v",
+	trxs, names := ctypes.Transitions(c)
+	str := fmt.Sprintf("NetworkID: %v, ChainID: %v Engine: %v ",
 		c.NetworkID,
 		c.ChainID,
-		engine,
-	)
+		engine)
+
+	for i, trx := range trxs {
+		if trx() != nil {
+			str += fmt.Sprintf("%s: %d ", strings.TrimSuffix(strings.TrimPrefix(names[i], "Get"), "Transition"), *trx())
+		}
+	}
+	return str
 }

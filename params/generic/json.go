@@ -15,14 +15,14 @@
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
 
-package convert
+package generic
 
 import (
 	"encoding/json"
 
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -42,7 +42,7 @@ func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) 
 	}
 
 	if _, ok := map1["networkId"]; ok {
-		mspec := &paramtypes.MultiGethChainConfig{}
+		mspec := &multigeth.MultiGethChainConfig{}
 		err = json.Unmarshal(input, mspec)
 		if err != nil {
 			return nil, err

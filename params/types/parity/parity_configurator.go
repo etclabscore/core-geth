@@ -26,7 +26,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -783,7 +782,7 @@ func (spec *ParityChainSpec) GetGenesisSealerEthereumNonce() uint64 {
 }
 
 func (spec *ParityChainSpec) SetGenesisSealerEthereumNonce(i uint64) error {
-	spec.Genesis.Seal.Ethereum.Nonce = types.EncodeNonce(i)
+	spec.Genesis.Seal.Ethereum.Nonce = EncodeNonce(i)
 	return nil
 }
 

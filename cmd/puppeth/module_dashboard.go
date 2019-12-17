@@ -27,7 +27,7 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/tconvert"
 )
 
 // dashboardContent is the actual dashboard HTML content to serve up when users
@@ -642,7 +642,7 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 	files[filepath.Join(workdir, network+".json")] = genesis
 
 	if conf.Genesis.Config.GetConsensusEngineType().IsEthash() {
-		cppSpec, err := convert.NewAlethGenesisSpec(network, conf.Genesis)
+		cppSpec, err := tconvert.NewAlethGenesisSpec(network, conf.Genesis)
 		if err != nil {
 			return nil, err
 		}
@@ -652,14 +652,14 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 		harmonySpecJSON, _ := conf.Genesis.MarshalJSON()
 		files[filepath.Join(workdir, network+"-harmony.json")] = harmonySpecJSON
 
-		paritySpec, err := convert.NewParityChainSpec(network, conf.Genesis, conf.bootnodes)
+		paritySpec, err := tconvert.NewParityChainSpec(network, conf.Genesis, conf.bootnodes)
 		if err != nil {
 			return nil, err
 		}
 		paritySpecJSON, _ := json.Marshal(paritySpec)
 		files[filepath.Join(workdir, network+"-parity.json")] = paritySpecJSON
 
-		pyethSpec, err := convert.NewPyEthereumGenesisSpec(network, conf.Genesis)
+		pyethSpec, err := tconvert.NewPyEthereumGenesisSpec(network, conf.Genesis)
 		if err != nil {
 			return nil, err
 		}

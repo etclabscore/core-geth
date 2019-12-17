@@ -32,8 +32,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 // Command line flags to configure the interpreters.
@@ -177,7 +177,7 @@ func (tm *testMatcher) findConfig(name string) (ctypes.ChainConfigurator, string
 		}
 	}
 	log.Println("using empty config", name)
-	return new(paramtypes.MultiGethChainConfig), ""
+	return new(multigeth.MultiGethChainConfig), ""
 }
 
 // checkFailure checks whether a failure is expected.

@@ -19,14 +19,21 @@ package goethereum
 import (
 	"fmt"
 	"math/big"
+	"os"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
+var ChainConfigUseAlt = func() string {
+	return os.Getenv("MULTIGETH_CHAIN_CONFIG_ALT")
+}()
+
 type ChainConfig struct {
-	NetworkID uint64   `json:"-"`
-	ChainID   *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
+	Converting bool
+	altDT      ctypes.ChainConfigurator
+	NetworkID  uint64   `json:"-"`
+	ChainID    *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
 
 	// HF: Homestead
 	HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)

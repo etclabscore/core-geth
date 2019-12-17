@@ -28,7 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/generic"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -202,12 +202,12 @@ func GenerateChain(config ctypes.ChainConfigurator, parent *types.Block, engine 
 		if daoBlock := config.GetEthashEIP779Transition(); daoBlock != nil {
 			limit := new(big.Int).Add(new(big.Int).SetUint64(*daoBlock), vars.DAOForkExtraRange)
 			if b.header.Number.Uint64() >= *daoBlock && b.header.Number.Cmp(limit) < 0 {
-				if convert.AsGenericCC(config).DAOSupport() {
+				if generic.AsGenericCC(config).DAOSupport() {
 					b.header.Extra = common.CopyBytes(vars.DAOForkBlockExtra)
 				}
 			}
 		}
-		if convert.AsGenericCC(config).DAOSupport() && config.GetEthashEIP779Transition() != nil && *config.GetEthashEIP779Transition() == b.header.Number.Uint64() {
+		if generic.AsGenericCC(config).DAOSupport() && config.GetEthashEIP779Transition() != nil && *config.GetEthashEIP779Transition() == b.header.Number.Uint64() {
 			misc.ApplyDAOHardFork(statedb)
 		}
 		// Execute any user modifications to the block

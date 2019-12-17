@@ -27,8 +27,8 @@ import (
 	"path/filepath"
 
 	"github.com/ethereum/go-ethereum/params/convert"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -113,10 +113,10 @@ func readConfigFromSpecFile(name string) (spec ctypes.ChainConfigurator, sha1sum
 func init() {
 
 	if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_MULTIGETH_KEY) != "" {
-		log.Println("Converting to MultiGeth Chain Config data type.")
+		log.Println("converting to MultiGeth Chain Config data type.")
 
 		for i, config := range Forks {
-			mgc := &paramtypes.MultiGethChainConfig{}
+			mgc := &multigeth.MultiGethChainConfig{}
 			if err := convert.Convert(config, mgc); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
@@ -124,7 +124,7 @@ func init() {
 		}
 
 		for k, v := range difficultyChainConfigurations {
-			mgc := &paramtypes.MultiGethChainConfig{}
+			mgc := &multigeth.MultiGethChainConfig{}
 			if err := convert.Convert(v, mgc); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
@@ -132,7 +132,7 @@ func init() {
 		}
 
 	} else if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_PARITY_KEY) != "" {
-		log.Println("Converting to Parity data type.")
+		log.Println("converting to Parity data type.")
 
 		for i, config := range Forks {
 			pspec := &parity.ParityChainSpec{}

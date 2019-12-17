@@ -30,7 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/internal/build"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/tconvert"
 	"github.com/iancoleman/strcase"
 )
 
@@ -97,7 +97,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		subtest := subtest
 		if _, ok := MapForkNameChainspecFileState[subtest.Fork]; !ok {
 			genesis := test.genesis(Forks[subtest.Fork])
-			pspec, err := convert.NewParityChainSpec(subtest.Fork, genesis, []string{})
+			pspec, err := tconvert.NewParityChainSpec(subtest.Fork, genesis, []string{})
 			if err != nil {
 				t.Fatal(err)
 			}

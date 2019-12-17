@@ -15,7 +15,7 @@
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
 
-package convert
+package convert_test
 
 import (
 	"encoding/json"
@@ -27,10 +27,13 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/tconvert"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -59,7 +62,7 @@ func Test_UnmarshalJSON(t *testing.T) {
 		case "parity":
 			p := &parity.ParityChainSpec{}
 			mustOpenF(t, f, p)
-			_, err := ParityConfigToMultiGethGenesis(p)
+			_, err := tconvert.ParityConfigToMultiGethGenesis(p)
 			if err != nil {
 				t.Error(err)
 			}
@@ -75,12 +78,12 @@ func TestConvert(t *testing.T) {
 	mustOpenF(t, "parity", &spec)
 
 	spec2 := parity.ParityChainSpec{}
-	err := Convert(&spec, &spec2)
+	err := convert.Convert(&spec, &spec2)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if diffs := Equal(reflect.TypeOf((*ctypes.Configurator)(nil)), &spec, &spec2); len(diffs) != 0 {
+	if diffs := convert.Equal(reflect.TypeOf((*ctypes.Configurator)(nil)), &spec, &spec2); len(diffs) != 0 {
 		for _, diff := range diffs {
 			t.Error("not equal", diff.Field, diff.A, diff.B)
 		}
@@ -93,10 +96,10 @@ func TestIdentical(t *testing.T) {
 		"NetworkID",
 	}
 	configs :=  []ctypes.ChainConfigurator{
-		&paramtypes.MultiGethChainConfig{},
+		&multigeth.MultiGethChainConfig{},
 		&goethereum.ChainConfig{},
 		&parity.ParityChainSpec{},
-		&paramtypes.MultiGethChainConfig{}, // Complete combination test set.
+		&multigeth.MultiGethChainConfig{}, // Complete combination test set.
 	}
 	for i := range configs {
 		if i == 0 {
@@ -107,12 +110,12 @@ func TestIdentical(t *testing.T) {
 		configs[i].SetNetworkID(&f42)
 		configs[i-1].SetChainID(f43)
 		configs[i].SetChainID(f43)
-		if !Identical(configs[i-1], configs[i], methods) {
+		if !convert.Identical(configs[i-1], configs[i], methods) {
 			t.Errorf("nonident")
 		}
 		f24 := uint64(24)
 		configs[i-1].SetNetworkID(&f24)
-		if Identical(configs[i-1], configs[i], methods) {
+		if convert.Identical(configs[i-1], configs[i], methods) {
 			t.Error(i, "ident")
 		}
 	}
@@ -129,7 +132,7 @@ func TestConfiguratorImplementationsSatisfied(t *testing.T) {
 
 	for _, ty := range []interface{}{
 		&goethereum.ChainConfig{},
-		&paramtypes.MultiGethChainConfig{},
+		&multigeth.MultiGethChainConfig{},
 	} {
 		_ = ty.(ctypes.ChainConfigurator)
 	}
@@ -152,7 +155,7 @@ func TestCompatible(t *testing.T) {
 
 func TestGatherForks(t *testing.T) {
 	cases := []struct {
-		config *paramtypes.MultiGethChainConfig
+		config *multigeth.MultiGethChainConfig
 		wantNs []uint64
 	}{
 		{

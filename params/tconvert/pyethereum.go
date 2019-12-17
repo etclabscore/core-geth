@@ -15,7 +15,7 @@
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
 
-package convert
+package tconvert
 
 import (
 	"encoding/binary"
@@ -23,6 +23,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/pyethereum"
 )
 
@@ -30,7 +31,7 @@ import (
 // chain specification format.
 func NewPyEthereumGenesisSpec(network string, genesis *paramtypes.Genesis) (*pyethereum.PyEthereumGenesisSpec, error) {
 	// Only ethash is currently supported between go-ethereum and pyethereum
-	if genesis.Config.(*paramtypes.MultiGethChainConfig).Ethash == nil {
+	if genesis.Config.(*multigeth.MultiGethChainConfig).Ethash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
 	spec := &pyethereum.PyEthereumGenesisSpec{

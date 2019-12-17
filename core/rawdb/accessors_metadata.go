@@ -22,7 +22,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/generic"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 )
@@ -59,7 +59,7 @@ func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) ctypes.ChainConf
 	if len(data) == 0 {
 		return nil
 	}
-	c, err := convert.UnmarshalChainConfigurator(data)
+	c, err := generic.UnmarshalChainConfigurator(data)
 	if err != nil {
 		log.Error("Invalid chain config JSON", "hash", hash, "err", err)
 		return nil

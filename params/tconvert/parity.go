@@ -15,12 +15,14 @@
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
 
-package convert
+package tconvert
 
 import (
 	"strings"
 
+	"github.com/ethereum/go-ethereum/params/convert"
 	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -32,10 +34,10 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 		Nodes:   bootnodes,
 		Datadir: strings.ToLower(network),
 	}
-	if err := Convert(genesis, spec); err != nil {
+	if err := convert.Convert(genesis, spec); err != nil {
 		return nil, err
 	}
-	if err := Convert(genesis.Config, spec); err != nil {
+	if err := convert.Convert(genesis.Config, spec); err != nil {
 		return nil, err
 	}
 	return spec, nil
@@ -45,13 +47,13 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 // Note that the return value 'core.Genesis' includes the respective 'params.MultiGethChainConfig' values.
 func ParityConfigToMultiGethGenesis(c *parity.ParityChainSpec) (*paramtypes.Genesis, error) {
 	mg := &paramtypes.Genesis{
-		Config: &paramtypes.MultiGethChainConfig{},
+		Config: &multigeth.MultiGethChainConfig{},
 	}
 
-	if err := Convert(c, mg); err != nil {
+	if err := convert.Convert(c, mg); err != nil {
 		return nil,err
 	}
-	if err := Convert(c, mg.Config); err != nil {
+	if err := convert.Convert(c, mg.Config); err != nil {
 		return nil, err
 	}
 	return mg, nil

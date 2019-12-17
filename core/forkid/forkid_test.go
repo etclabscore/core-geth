@@ -23,8 +23,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -231,7 +231,7 @@ func TestEncoding(t *testing.T) {
 
 func TestGatherForks(t *testing.T) {
 	cases := []struct {
-		config *paramtypes.MultiGethChainConfig
+		config *multigeth.MultiGethChainConfig
 		wantNs []uint64
 	}{
 		{

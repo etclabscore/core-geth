@@ -15,7 +15,7 @@
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
 
-package convert
+package tconvert
 
 // FIXME(meowsbits): Requires implementing ChainConfigurator interface for Aleth data type.
 //// Tests the go-ethereum to Aleth chainspec conversion for the Stureby testnet.

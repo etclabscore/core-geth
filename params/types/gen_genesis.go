@@ -29,6 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	common0 "github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 var _ = (*genesisSpecMarshaling)(nil)
@@ -90,7 +91,7 @@ func (g *Genesis) UnmarshalJSON(input []byte) error {
 
 	// Note that this logic is importantly relate to the logic in params/convert/json.go, for ChainConfigurator
 	// unmarshaling.
-	dec.Config = &MultiGethChainConfig{}
+	dec.Config = &multigeth.MultiGethChainConfig{}
 	if err := json.Unmarshal(input, &dec); err != nil || common0.IsValid(dec.Config, nil) != nil {
 		dec.Config = &goethereum.ChainConfig{}
 		if err := json.Unmarshal(input, &dec); err != nil {

@@ -6,9 +6,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
-var testConfig = &MultiGethChainConfig{
+var testConfig = &multigeth.MultiGethChainConfig{
 	NetworkID:  1,
 	Ethash:     new(ctypes.EthashConfig),
 	ChainID:    big.NewInt(61),

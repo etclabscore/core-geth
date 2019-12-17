@@ -18,8 +18,8 @@ package params
 import (
 	"math/big"
 
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 var (
@@ -53,7 +53,7 @@ var (
 		//cc.SetEthashECIP1017Transition(&MordorECIP1017FBlock)
 		//cc.SetEthashECIP1017EraRounds(&MordorECIP1017EraRounds)
 
-		return &paramtypes.MultiGethChainConfig{
+		return &multigeth.MultiGethChainConfig{
 			NetworkID:  7,
 			ChainID:    big.NewInt(63),
 			Ethash:     new(ctypes.EthashConfig),

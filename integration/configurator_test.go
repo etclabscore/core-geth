@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/convert"
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 	"github.com/ethereum/go-ethereum/tests"
 	"github.com/go-test/deep"
@@ -61,7 +62,7 @@ func TestEquivalent_Features(t *testing.T) {
 
 		// Integration tests: conversion
 
-		mg := &paramtypes.MultiGethChainConfig{}
+		mg := &multigeth.MultiGethChainConfig{}
 		err := convert.Convert(oconf, mg)
 		if err != nil {
 			t.Fatal(err)
@@ -190,7 +191,7 @@ func TestParityGeneses(t *testing.T) {
 			t.Fatal(err)
 		}
 		genc := &paramtypes.Genesis{
-			Config: &paramtypes.MultiGethChainConfig{},
+			Config: &multigeth.MultiGethChainConfig{},
 		}
 		err = convert.Convert(pspec, genc)
 		if err != nil {

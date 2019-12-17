@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
-package paramtypes
+package multigeth
 
 import (
 	"math/big"
@@ -23,7 +22,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/internal"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -46,28 +45,29 @@ func setBig(i *big.Int, u *uint64) *big.Int {
 	return i
 }
 
-// upstream is used as a way to share common interface methods
-// This pattern should only be used where the receiver value of the method
-// is not used, ie when accessing/setting global default parameters, eg. vars/ pkg values.
-var upstream = &goethereum.ChainConfig{}
-
-func (c *MultiGethChainConfig) GetAccountStartNonce() *uint64 { return upstream.GetAccountStartNonce() }
+func (c *MultiGethChainConfig) GetAccountStartNonce() *uint64 {
+	return internal.One().GetAccountStartNonce()
+}
 func (c *MultiGethChainConfig) SetAccountStartNonce(n *uint64) error {
-	return upstream.SetAccountStartNonce(n)
+	return internal.One().SetAccountStartNonce(n)
 }
 func (c *MultiGethChainConfig) GetMaximumExtraDataSize() *uint64 {
-	return upstream.GetMaximumExtraDataSize()
+	return internal.One().GetMaximumExtraDataSize()
 }
 func (c *MultiGethChainConfig) SetMaximumExtraDataSize(n *uint64) error {
-	return upstream.SetMaximumExtraDataSize(n)
+	return internal.One().SetMaximumExtraDataSize(n)
 }
-func (c *MultiGethChainConfig) GetMinGasLimit() *uint64        { return upstream.GetMinGasLimit() }
-func (c *MultiGethChainConfig) SetMinGasLimit(n *uint64) error { return upstream.SetMinGasLimit(n) }
+func (c *MultiGethChainConfig) GetMinGasLimit() *uint64 {
+	return internal.One().GetMinGasLimit()
+}
+func (c *MultiGethChainConfig) SetMinGasLimit(n *uint64) error {
+	return internal.One().SetMinGasLimit(n)
+}
 func (c *MultiGethChainConfig) GetGasLimitBoundDivisor() *uint64 {
-	return upstream.GetGasLimitBoundDivisor()
+	return internal.One().GetGasLimitBoundDivisor()
 }
 func (c *MultiGethChainConfig) SetGasLimitBoundDivisor(n *uint64) error {
-	return upstream.SetGasLimitBoundDivisor(n)
+	return internal.One().SetGasLimitBoundDivisor(n)
 }
 
 func (c *MultiGethChainConfig) GetNetworkID() *uint64 {
@@ -91,8 +91,12 @@ func (c *MultiGethChainConfig) SetChainID(n *big.Int) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetMaxCodeSize() *uint64        { return upstream.GetMaxCodeSize() }
-func (c *MultiGethChainConfig) SetMaxCodeSize(n *uint64) error { return upstream.SetMaxCodeSize(n) }
+func (c *MultiGethChainConfig) GetMaxCodeSize() *uint64 {
+	return internal.One().GetMaxCodeSize()
+}
+func (c *MultiGethChainConfig) SetMaxCodeSize(n *uint64) error {
+	return internal.One().SetMaxCodeSize(n)
+}
 
 func (c *MultiGethChainConfig) GetEIP7Transition() *uint64 {
 	return bigNewU64(c.EIP7FBlock)
@@ -375,26 +379,26 @@ func (c *MultiGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngi
 }
 
 func (c *MultiGethChainConfig) GetEthashMinimumDifficulty() *big.Int {
-	return upstream.GetEthashMinimumDifficulty()
+	return internal.One().GetEthashMinimumDifficulty()
 }
 func (c *MultiGethChainConfig) SetEthashMinimumDifficulty(i *big.Int) error {
-	return upstream.SetEthashMinimumDifficulty(i)
+	return internal.One().SetEthashMinimumDifficulty(i)
 }
 
 func (c *MultiGethChainConfig) GetEthashDifficultyBoundDivisor() *big.Int {
-	return upstream.GetEthashDifficultyBoundDivisor()
+	return internal.One().GetEthashDifficultyBoundDivisor()
 }
 
 func (c *MultiGethChainConfig) SetEthashDifficultyBoundDivisor(i *big.Int) error {
-	return upstream.SetEthashDifficultyBoundDivisor(i)
+	return internal.One().SetEthashDifficultyBoundDivisor(i)
 }
 
 func (c *MultiGethChainConfig) GetEthashDurationLimit() *big.Int {
-	return upstream.GetEthashDurationLimit()
+	return internal.One().GetEthashDurationLimit()
 }
 
 func (c *MultiGethChainConfig) SetEthashDurationLimit(i *big.Int) error {
-	return upstream.SetEthashDurationLimit(i)
+	return internal.One().SetEthashDurationLimit(i)
 }
 
 func (c *MultiGethChainConfig) GetEthashHomesteadTransition() *uint64 {

@@ -15,13 +15,14 @@
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
 
-package convert
+package convert_test
 
 import (
 	"math/big"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/tconvert"
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
@@ -39,7 +40,7 @@ func TestBlockConfig(t *testing.T) {
 	}
 	genesis := params.DefaultGenesisBlock()
 	genesis.Config = frontierCC
-	paritySpec, err := NewParityChainSpec("frontier", genesis, []string{})
+	paritySpec, err := tconvert.NewParityChainSpec("frontier", genesis, []string{})
 	if err != nil {
 		t.Fatal(err)
 	}

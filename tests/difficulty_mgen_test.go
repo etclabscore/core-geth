@@ -30,7 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/tconvert"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -137,7 +137,7 @@ func TestDifficultyGen(t *testing.T) {
 				genesis := params.DefaultTestnetGenesisBlock()
 				genesis.Config = conf
 
-				pspec, err := convert.NewParityChainSpec(associateForkName, genesis, []string{})
+				pspec, err := tconvert.NewParityChainSpec(associateForkName, genesis, []string{})
 				if err != nil {
 					t.Fatal(err)
 				}

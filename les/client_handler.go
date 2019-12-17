@@ -28,7 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/light"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -36,7 +36,7 @@ import (
 // responses.
 type clientHandler struct {
 	ulc        *ulc
-	checkpoint *goethereum.TrustedCheckpoint
+	checkpoint *ctypes.TrustedCheckpoint
 	fetcher    *lightFetcher
 	downloader *downloader.Downloader
 	backend    *LightEthereum
@@ -46,7 +46,7 @@ type clientHandler struct {
 	syncDone func()         // Test hooks when syncing is done.
 }
 
-func newClientHandler(ulcServers []string, ulcFraction int, checkpoint *goethereum.TrustedCheckpoint, backend *LightEthereum) *clientHandler {
+func newClientHandler(ulcServers []string, ulcFraction int, checkpoint *ctypes.TrustedCheckpoint, backend *LightEthereum) *clientHandler {
 	handler := &clientHandler{
 		checkpoint: checkpoint,
 		backend:    backend,

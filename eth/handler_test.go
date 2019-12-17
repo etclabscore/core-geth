@@ -36,7 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/params/types"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -481,13 +481,13 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 	// If checkpointing is enabled, create and inject a fake CHT and the corresponding
 	// chllenge response.
 	var response *types.Header
-	var cht *goethereum.TrustedCheckpoint
+	var cht *ctypes.TrustedCheckpoint
 	if checkpoint {
 		index := uint64(rand.Intn(500))
 		number := (index+1)*vars.CHTFrequency - 1
 		response = &types.Header{Number: big.NewInt(int64(number)), Extra: []byte("valid")}
 
-		cht = &goethereum.TrustedCheckpoint{
+		cht = &ctypes.TrustedCheckpoint{
 			SectionIndex: index,
 			SectionHead:  response.Hash(),
 		}

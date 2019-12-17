@@ -100,6 +100,9 @@ func (c *ChainConfig) SetGasLimitBoundDivisor(n *uint64) error {
 // In order to use these logic properly, one should call NetworkID setter before ChainID setter.
 // FIXME.
 func (c *ChainConfig) GetNetworkID() *uint64 {
+	if c.NetworkID != 0 {
+		return &c.NetworkID
+	}
 	if c.ChainID != nil {
 		return newU64(c.ChainID.Uint64())
 	}
@@ -110,8 +113,10 @@ func (c *ChainConfig) SetNetworkID(n *uint64) error {
 	if n == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
-	c.ChainID = new(big.Int).SetUint64(*n)
-	vars.DefaultNetworkID = *n
+	if c.ChainID == nil {
+		c.ChainID = new(big.Int).SetUint64(*n)
+	}
+	c.NetworkID = *n
 	return nil
 }
 

@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package goethereum
 
 import (
@@ -26,6 +25,7 @@ import (
 )
 
 type ChainConfig struct {
+	NetworkID uint64   `json:"-"`
 	ChainID   *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
 
 	// HF: Homestead

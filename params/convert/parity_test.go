@@ -19,17 +19,12 @@ package convert
 
 import (
 	"math/big"
-	"path/filepath"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params"
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
-
-func asSpecFilePath(name string) string {
-	return filepath.Join("..", "parity.json.d", name)
-}
 
 var chainSpecEquivs = map[string]*paramtypes.Genesis{
 	"classic.json":    params.DefaultClassicGenesisBlock(),

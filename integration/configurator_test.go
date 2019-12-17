@@ -75,12 +75,10 @@ func TestEquivalent_Features(t *testing.T) {
 
 		err = ctypes.Equivalent(oconf, mg)
 		if err != nil {
-			t.Log("--------------------")
-			t.Errorf("%s oconf/mg err: %v", name, err)
 
-			//s := spew.ConfigState{DisableMethods:true, DisablePointerAddresses: true, Indent: "    "}
-			//t.Log("OG:", s.Sdump(oconf))
-			//t.Log("MG:", s.Sdump(mg))
+			// Debugging log lines.
+			t.Log("--------------------")
+			t.Errorf("%s oconf/mg err: %v", name, err) // With error.
 
 			nicelog := func (n *uint64) interface{} {
 				if n == nil {
@@ -95,7 +93,6 @@ func TestEquivalent_Features(t *testing.T) {
 
 			t.Log(mg.GetEthashBlockRewardSchedule())
 
-			// this looks right
 			if v := oconf.GetEthashEIP649Transition(); v != nil {
 				t.Log(name, "649T", *v)
 			} else {
@@ -153,6 +150,8 @@ func TestEquivalent_ReadParity(t *testing.T) {
 	}
 }
 
+// TestParityGenesis shows that for select configs, the read and converted parity specs
+// are equivalent to the default Go coded specs for the scope of the respective genesis blocks.
 func TestParityGeneses(t *testing.T) {
 	testes := []struct{
 		filename string

@@ -20,14 +20,14 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 var (
 	// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
 	ClassicChainConfig = &paramtypes.MultiGethChainConfig{
 		NetworkID:  1,
-		Ethash:     new(goethereum.EthashConfig),
+		Ethash:     new(ctypes.EthashConfig),
 		ChainID:    big.NewInt(61),
 		EIP2FBlock: big.NewInt(1150000),
 		EIP7FBlock: big.NewInt(1150000),

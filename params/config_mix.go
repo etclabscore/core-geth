@@ -32,7 +32,7 @@ var (
 	MixChainConfig = func() ctypes.ChainConfigurator {
 		c := &goethereum.ChainConfig{
 			ChainID:             big.NewInt(76),
-			Ethash:              new(goethereum.EthashConfig),
+			Ethash:              new(ctypes.EthashConfig),
 			HomesteadBlock:      big.NewInt(0),
 			DAOForkBlock:        nil,
 			DAOForkSupport:      false,

@@ -20,7 +20,6 @@ import (
 
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var (
@@ -57,7 +56,7 @@ var (
 		return &paramtypes.MultiGethChainConfig{
 			NetworkID:  7,
 			ChainID:    big.NewInt(63),
-			Ethash:     new(goethereum.EthashConfig),
+			Ethash:     new(ctypes.EthashConfig),
 			EIP2FBlock: big.NewInt(0),
 			EIP7FBlock: big.NewInt(0),
 			//DAOForkBlock:        big.NewInt(1920000),

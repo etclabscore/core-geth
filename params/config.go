@@ -65,7 +65,7 @@ var (
 		ConstantinopleBlock: big.NewInt(7280000),
 		PetersburgBlock:     big.NewInt(7280000),
 		IstanbulBlock:       big.NewInt(9069000),
-		Ethash:              new(goethereum.EthashConfig),
+		Ethash:              new(ctypes.EthashConfig),
 	}
 
 	// MainnetTrustedCheckpoint contains the light client trusted checkpoint for the main network.
@@ -102,7 +102,7 @@ var (
 		ConstantinopleBlock: big.NewInt(4230000),
 		PetersburgBlock:     big.NewInt(4939394),
 		IstanbulBlock:       big.NewInt(6485846),
-		Ethash:              new(goethereum.EthashConfig),
+		Ethash:              new(ctypes.EthashConfig),
 	}
 
 	// TestnetTrustedCheckpoint contains the light client trusted checkpoint for the Ropsten test network.
@@ -139,7 +139,7 @@ var (
 		ConstantinopleBlock: big.NewInt(3660663),
 		PetersburgBlock:     big.NewInt(4321234),
 		IstanbulBlock:       big.NewInt(5435345),
-		Clique: &goethereum.CliqueConfig{
+		Clique: &ctypes.CliqueConfig{
 			Period: 15,
 			Epoch:  30000,
 		},
@@ -177,7 +177,7 @@ var (
 		ConstantinopleBlock: big.NewInt(0),
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(1561651),
-		Clique: &goethereum.CliqueConfig{
+		Clique: &ctypes.CliqueConfig{
 			Period: 15,
 			Epoch:  30000,
 		},
@@ -222,7 +222,7 @@ var (
 		PetersburgBlock:         big.NewInt(0),
 		IstanbulBlock:           big.NewInt(0),
 		EWASMBlock:              nil,
-		Ethash:                  new(goethereum.EthashConfig),
+		Ethash:                  new(ctypes.EthashConfig),
 		Clique:                  nil,
 		TrustedCheckpoint:       nil,
 		TrustedCheckpointOracle: nil,
@@ -248,7 +248,7 @@ var (
 		IstanbulBlock:       big.NewInt(0),
 		EWASMBlock:          nil,
 		Ethash:              nil,
-		Clique: &goethereum.CliqueConfig{
+		Clique: &ctypes.CliqueConfig{
 			Period: 0,
 			Epoch:  30000,
 		},
@@ -271,7 +271,7 @@ var (
 		PetersburgBlock:         big.NewInt(0),
 		IstanbulBlock:           big.NewInt(0),
 		EWASMBlock:              nil,
-		Ethash:                  new(goethereum.EthashConfig),
+		Ethash:                  new(ctypes.EthashConfig),
 		Clique:                  nil,
 		TrustedCheckpoint:       nil,
 		TrustedCheckpointOracle: nil,

@@ -297,3 +297,22 @@ type CheckpointOracleConfig struct {
 	Threshold uint64           `json:"threshold"`
 }
 
+// EthashConfig is the consensus engine configs for proof-of-work based sealing.
+type EthashConfig struct{}
+
+// String implements the stringer interface, returning the consensus engine details.
+func (c *EthashConfig) String() string {
+	return "ethash"
+}
+
+// CliqueConfig is the consensus engine configs for proof-of-authority based sealing.
+type CliqueConfig struct {
+	Period uint64 `json:"period"` // Number of seconds between blocks to enforce
+	Epoch  uint64 `json:"epoch"`  // Epoch length to reset votes and checkpoint
+}
+
+// String implements the stringer interface, returning the consensus engine details.
+func (c *CliqueConfig) String() string {
+	return "clique"
+}
+

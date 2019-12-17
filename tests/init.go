@@ -32,22 +32,22 @@ func newUint64(n uint64) *uint64 {
 // Forks table defines supported forks and their chain config.
 var Forks = map[string]ctypes.ChainConfigurator{
 	"Frontier": &goethereum.ChainConfig{
-		Ethash:  new(goethereum.EthashConfig),
+		Ethash:  new(ctypes.EthashConfig),
 		ChainID: big.NewInt(1),
 	},
 	"Homestead": &goethereum.ChainConfig{
-		Ethash:         new(goethereum.EthashConfig),
+		Ethash:         new(ctypes.EthashConfig),
 		ChainID:        big.NewInt(1),
 		HomesteadBlock: big.NewInt(0),
 	},
 	"EIP150": &goethereum.ChainConfig{
-		Ethash:         new(goethereum.EthashConfig),
+		Ethash:         new(ctypes.EthashConfig),
 		ChainID:        big.NewInt(1),
 		HomesteadBlock: big.NewInt(0),
 		EIP150Block:    big.NewInt(0),
 	},
 	"EIP158": &goethereum.ChainConfig{
-		Ethash:         new(goethereum.EthashConfig),
+		Ethash:         new(ctypes.EthashConfig),
 		ChainID:        big.NewInt(1),
 		HomesteadBlock: big.NewInt(0),
 		EIP150Block:    big.NewInt(0),
@@ -55,7 +55,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		EIP158Block:    big.NewInt(0),
 	},
 	"Byzantium": &goethereum.ChainConfig{
-		Ethash:         new(goethereum.EthashConfig),
+		Ethash:         new(ctypes.EthashConfig),
 		ChainID:        big.NewInt(1),
 		HomesteadBlock: big.NewInt(0),
 		EIP150Block:    big.NewInt(0),
@@ -65,7 +65,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 	},
 	"ETC_Atlantis": &paramtypes.MultiGethChainConfig{
 		NetworkID:          1,
-		Ethash:             new(goethereum.EthashConfig),
+		Ethash:             new(ctypes.EthashConfig),
 		ChainID:            big.NewInt(61),
 		EIP2FBlock:         big.NewInt(0),
 		EIP7FBlock:         big.NewInt(0),
@@ -94,7 +94,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ECIP1010Length:     nil,
 	},
 	"Constantinople": &goethereum.ChainConfig{
-		Ethash:              new(goethereum.EthashConfig),
+		Ethash:              new(ctypes.EthashConfig),
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),
@@ -105,7 +105,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		PetersburgBlock:     nil,
 	},
 	"ConstantinopleFix": &goethereum.ChainConfig{
-		Ethash:              new(goethereum.EthashConfig),
+		Ethash:              new(ctypes.EthashConfig),
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),
@@ -117,7 +117,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 	},
 	"ETC_Agharta": &paramtypes.MultiGethChainConfig{
 		NetworkID:          1,
-		Ethash:             new(goethereum.EthashConfig),
+		Ethash:             new(ctypes.EthashConfig),
 		ChainID:            big.NewInt(61),
 		EIP2FBlock:         big.NewInt(0),
 		EIP7FBlock:         big.NewInt(0),
@@ -146,7 +146,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ECIP1010Length:     nil,
 	},
 	"Istanbul": &goethereum.ChainConfig{
-		Ethash:              new(goethereum.EthashConfig),
+		Ethash:              new(ctypes.EthashConfig),
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),
@@ -158,25 +158,25 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		IstanbulBlock:       big.NewInt(0),
 	},
 	"FrontierToHomesteadAt5": &goethereum.ChainConfig{
-		Ethash:         new(goethereum.EthashConfig),
+		Ethash:         new(ctypes.EthashConfig),
 		ChainID:        big.NewInt(1),
 		HomesteadBlock: big.NewInt(5),
 	},
 	"HomesteadToEIP150At5": &goethereum.ChainConfig{
-		Ethash:         new(goethereum.EthashConfig),
+		Ethash:         new(ctypes.EthashConfig),
 		ChainID:        big.NewInt(1),
 		HomesteadBlock: big.NewInt(0),
 		EIP150Block:    big.NewInt(5),
 	},
 	"HomesteadToDaoAt5": &goethereum.ChainConfig{
-		Ethash:         new(goethereum.EthashConfig),
+		Ethash:         new(ctypes.EthashConfig),
 		ChainID:        big.NewInt(1),
 		HomesteadBlock: big.NewInt(0),
 		DAOForkBlock:   big.NewInt(5),
 		DAOForkSupport: true,
 	},
 	"EIP158ToByzantiumAt5": &goethereum.ChainConfig{
-		Ethash:         new(goethereum.EthashConfig),
+		Ethash:         new(ctypes.EthashConfig),
 		ChainID:        big.NewInt(1),
 		HomesteadBlock: big.NewInt(0),
 		EIP150Block:    big.NewInt(0),
@@ -185,7 +185,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ByzantiumBlock: big.NewInt(5),
 	},
 	"ByzantiumToConstantinopleAt5": &goethereum.ChainConfig{
-		Ethash:              new(goethereum.EthashConfig),
+		Ethash:              new(ctypes.EthashConfig),
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),
@@ -195,7 +195,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ConstantinopleBlock: big.NewInt(5),
 	},
 	"ByzantiumToConstantinopleFixAt5": &goethereum.ChainConfig{
-		Ethash:              new(goethereum.EthashConfig),
+		Ethash:              new(ctypes.EthashConfig),
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),
@@ -206,7 +206,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		PetersburgBlock:     big.NewInt(5),
 	},
 	"ConstantinopleFixToIstanbulAt5": &goethereum.ChainConfig{
-		Ethash:              new(goethereum.EthashConfig),
+		Ethash:              new(ctypes.EthashConfig),
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),

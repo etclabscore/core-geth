@@ -35,7 +35,7 @@ import (
 
 var (
 	mainnetChainConfig = &goethereum.ChainConfig{
-		Ethash:         new(goethereum.EthashConfig),
+		Ethash:         new(ctypes.EthashConfig),
 		ChainID:        big.NewInt(1),
 		HomesteadBlock: big.NewInt(1150000),
 		DAOForkBlock:   big.NewInt(1920000),
@@ -53,24 +53,24 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 	"Morden":   params.TestnetChainConfig,
 	"Frontier": &goethereum.ChainConfig{},
 	"Homestead": &goethereum.ChainConfig{
-		Ethash:         new(goethereum.EthashConfig),
+		Ethash:         new(ctypes.EthashConfig),
 		HomesteadBlock: big.NewInt(0),
 	},
 	"Byzantium": &goethereum.ChainConfig{
-		Ethash:         new(goethereum.EthashConfig),
+		Ethash:         new(ctypes.EthashConfig),
 		ByzantiumBlock: big.NewInt(0),
 	},
 	"MainNetwork":       mainnetChainConfig,
 	"CustomMainNetwork": mainnetChainConfig,
 	"Constantinople": &goethereum.ChainConfig{
-		Ethash:              new(goethereum.EthashConfig),
+		Ethash:              new(ctypes.EthashConfig),
 		HomesteadBlock:      big.NewInt(0),
 		ByzantiumBlock: big.NewInt(0),
 		ConstantinopleBlock: big.NewInt(0),
 	},
 	"difficulty.json": mainnetChainConfig,
 	"ETC_Atlantis": &paramtypes.MultiGethChainConfig{
-		Ethash:        new(goethereum.EthashConfig),
+		Ethash:        new(ctypes.EthashConfig),
 		EIP100FBlock:  big.NewInt(0),
 		EIP140FBlock:  big.NewInt(0),
 		EIP198FBlock:  big.NewInt(0),
@@ -82,7 +82,7 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 		DisposalBlock: big.NewInt(0),
 	},
 	"ETC_Agharta": &paramtypes.MultiGethChainConfig{
-		Ethash:        new(goethereum.EthashConfig),
+		Ethash:        new(ctypes.EthashConfig),
 		EIP100FBlock:  big.NewInt(0),
 		EIP140FBlock:  big.NewInt(0),
 		EIP198FBlock:  big.NewInt(0),

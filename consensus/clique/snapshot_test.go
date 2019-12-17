@@ -30,7 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 // testerAccountPool is a pool to maintain currently active tester accounts,
@@ -407,7 +407,7 @@ func TestClique(t *testing.T) {
 
 		// Assemble a chain of headers from the cast votes
 		config := *params.TestChainConfig
-		config.Clique = &goethereum.CliqueConfig{
+		config.Clique = &ctypes.CliqueConfig{
 			Period: 1,
 			Epoch:  tt.epoch,
 		}

@@ -37,7 +37,6 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -206,7 +205,7 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 		chainConfig = params.AllCliqueProtocolChanges
 		chainConfig.SetCliquePeriod(1)
 		chainConfig.SetCliqueEpoch(30000)
-		engine = clique.New(&goethereum.CliqueConfig{
+		engine = clique.New(&ctypes.CliqueConfig{
 			Period: chainConfig.GetCliquePeriod(),
 			Epoch:  chainConfig.GetCliqueEpoch(),
 		}, db)
@@ -280,7 +279,7 @@ func TestPendingStateAndBlockEthash(t *testing.T) {
 	testPendingStateAndBlock(t, ethashChainConfig, ethash.NewFaker())
 }
 func TestPendingStateAndBlockClique(t *testing.T) {
-	testPendingStateAndBlock(t, cliqueChainConfig, clique.New(&goethereum.CliqueConfig{
+	testPendingStateAndBlock(t, cliqueChainConfig, clique.New(&ctypes.CliqueConfig{
 		Period: cliqueChainConfig.GetCliquePeriod(),
 		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
 	}, rawdb.NewMemoryDatabase()))
@@ -315,7 +314,7 @@ func TestEmptyWorkEthash(t *testing.T) {
 	testEmptyWork(t, ethashChainConfig, ethash.NewFaker())
 }
 func TestEmptyWorkClique(t *testing.T) {
-	testEmptyWork(t, cliqueChainConfig, clique.New(&goethereum.CliqueConfig{
+	testEmptyWork(t, cliqueChainConfig, clique.New(&ctypes.CliqueConfig{
 		Period: cliqueChainConfig.GetCliquePeriod(),
 		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
 	}, rawdb.NewMemoryDatabase()))
@@ -437,7 +436,7 @@ func TestRegenerateMiningBlockEthash(t *testing.T) {
 }
 
 func TestRegenerateMiningBlockClique(t *testing.T) {
-	testRegenerateMiningBlock(t, cliqueChainConfig, clique.New(&goethereum.CliqueConfig{
+	testRegenerateMiningBlock(t, cliqueChainConfig, clique.New(&ctypes.CliqueConfig{
 		Period: cliqueChainConfig.GetCliquePeriod(),
 		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
 	}, rawdb.NewMemoryDatabase()))
@@ -505,7 +504,7 @@ func TestAdjustIntervalEthash(t *testing.T) {
 }
 
 func TestAdjustIntervalClique(t *testing.T) {
-	testAdjustInterval(t, cliqueChainConfig, clique.New(&goethereum.CliqueConfig{
+	testAdjustInterval(t, cliqueChainConfig, clique.New(&ctypes.CliqueConfig{
 		Period: cliqueChainConfig.GetCliquePeriod(),
 		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
 	}, rawdb.NewMemoryDatabase()))

@@ -41,7 +41,7 @@ var (
 			EIP158Block:         big.NewInt(845000),
 			ByzantiumBlock:      big.NewInt(600000),
 			ConstantinopleBlock: nil,
-			Ethash:              new(goethereum.EthashConfig),
+			Ethash:              new(ctypes.EthashConfig),
 		}
 		c.SetNetworkID(&EtherSocialNetworkID)
 		//EthersocialBlock:    big.NewInt(0)

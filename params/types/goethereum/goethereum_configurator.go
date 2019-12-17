@@ -406,10 +406,10 @@ func (c *ChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT {
 func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
 	switch t {
 	case ctypes.ConsensusEngineT_Ethash:
-		c.Ethash = new(EthashConfig)
+		c.Ethash = new(ctypes.EthashConfig)
 		return nil
 	case ctypes.ConsensusEngineT_Clique:
-		c.Clique = new(CliqueConfig)
+		c.Clique = new(ctypes.CliqueConfig)
 		return nil
 	default:
 		return ctypes.ErrUnsupportedConfigFatal

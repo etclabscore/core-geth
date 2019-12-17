@@ -364,10 +364,10 @@ func (c *MultiGethChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT 
 func (c *MultiGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
 	switch t {
 	case ctypes.ConsensusEngineT_Ethash:
-		c.Ethash = new(goethereum.EthashConfig)
+		c.Ethash = new(ctypes.EthashConfig)
 		return nil
 	case ctypes.ConsensusEngineT_Clique:
-		c.Clique = new(goethereum.CliqueConfig)
+		c.Clique = new(ctypes.CliqueConfig)
 		return nil
 	default:
 		return ctypes.ErrUnsupportedConfigFatal

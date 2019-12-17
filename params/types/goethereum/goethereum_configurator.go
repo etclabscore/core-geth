@@ -325,11 +325,11 @@ func (c *ChainConfig) SetEIP1108Transition(n *uint64) error {
 	return nil
 }
 
-func (c *ChainConfig) GetEIP1283ReenableTransition() *uint64 {
+func (c *ChainConfig) GetEIP2200Transition() *uint64 {
 	return bigNewU64(c.IstanbulBlock)
 }
 
-func (c *ChainConfig) SetEIP1283ReenableTransition(n *uint64) error {
+func (c *ChainConfig) SetEIP2200Transition(n *uint64) error {
 	c.IstanbulBlock = setBig(c.IstanbulBlock, n)
 	return nil
 }

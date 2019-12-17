@@ -283,11 +283,11 @@ func (c *MultiGethChainConfig) SetEIP1108Transition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP1283ReenableTransition() *uint64 {
+func (c *MultiGethChainConfig) GetEIP2200Transition() *uint64 {
 	return bigNewU64(c.EIP2200FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP1283ReenableTransition(n *uint64) error {
+func (c *MultiGethChainConfig) SetEIP2200Transition(n *uint64) error {
 	c.EIP2200FBlock = setBig(c.EIP2200FBlock, n)
 	return nil
 }

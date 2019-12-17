@@ -70,18 +70,6 @@ func Convert(from, to interface{}) error {
 		return nil
 	}
 
-	// The goethereum ChainConfig type has feature to "hotswap" itself to a converted configuration data type,
-	// and to use that converted typed data instead of itself, which is useful for testing data type
-	// equivalence anywhere this data type is hardcoded.
-	// Since this hotswap method is called whenever a configurator interface method is called,
-	// this bool field prevents stack overflows at that conversion step.
-	if _, ok := reflect.TypeOf(fromChainer).Elem().FieldByName("Converting"); ok {
-		reflect.ValueOf(fromChainer).Elem().Field(0).SetBool(true)
-		defer func() {
-			reflect.ValueOf(fromChainer).Elem().Field(0).SetBool(false)
-		}()
-	}
-
 	// Set general chain parameters.
 	k := reflect.TypeOf((*ctypes.CatHerder)(nil)).Elem()
 	if err := convert(k, fromChainer, toChainer); err != nil {

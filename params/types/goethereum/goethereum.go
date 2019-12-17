@@ -19,15 +19,10 @@ package goethereum
 import (
 	"fmt"
 	"math/big"
-	"os"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
-
-var ChainConfigUseAlt = func() string {
-	return os.Getenv("MULTIGETH_CHAIN_CONFIG_ALT")
-}()
 
 type ChainConfig struct {
 	Converting bool

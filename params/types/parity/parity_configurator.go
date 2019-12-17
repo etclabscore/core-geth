@@ -233,11 +233,11 @@ func (spec *ParityChainSpec) SetEIP1283DisableTransition(i *uint64) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) GetEIP1283ReenableTransition() *uint64 {
+func (spec *ParityChainSpec) GetEIP2200Transition() *uint64 {
 	return spec.Params.EIP1283ReenableTransition.Uint64P()
 }
 
-func (spec *ParityChainSpec) SetEIP1283ReenableTransition(i *uint64) error {
+func (spec *ParityChainSpec) SetEIP2200Transition(i *uint64) error {
 	spec.Params.EIP1283ReenableTransition = new(ParityU64).SetUint64(i)
 	return nil
 }

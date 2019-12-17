@@ -487,12 +487,12 @@ func (g *Genesis) SetEIP1108Transition(n *uint64) error {
 	return g.Config.SetEIP1108Transition(n)
 }
 
-func (g *Genesis) GetEIP1283ReenableTransition() *uint64 {
-	return g.Config.GetEIP1283ReenableTransition()
+func (g *Genesis) GetEIP2200Transition() *uint64 {
+	return g.Config.GetEIP2200Transition()
 }
 
-func (g *Genesis) SetEIP1283ReenableTransition(n *uint64) error {
-	return g.Config.SetEIP1283ReenableTransition(n)
+func (g *Genesis) SetEIP2200Transition(n *uint64) error {
+	return g.Config.SetEIP2200Transition(n)
 }
 
 func (g *Genesis) GetEIP1344Transition() *uint64 {

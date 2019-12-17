@@ -33,11 +33,6 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
-// MultiGeth: Manually override this file generation; it requires manual editing. The
-// git patch for the edited difference is supplied at gen_genesis_patch.diff.
-//// go:generate gencodec -type Genesis -field-override genesisSpecMarshaling -out gen_genesis.go
-//go:generate gencodec -type GenesisAccount -field-override genesisAccountMarshaling -out gen_genesis_account.go
-
 var ErrGenesisNoConfig = errors.New("genesis has no chain configuration")
 
 // Genesis specifies the header fields, state of a genesis block. It also defines hard

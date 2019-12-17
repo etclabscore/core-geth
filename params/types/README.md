@@ -1,3 +1,24 @@
+`type Genesis struct` and `type GenesisAccount struct` have custom JSON un/marshaling methods.
+
+These methods are defined in the files prefixed with `gen_`, and were generated
+initially with the following commands:
+
+```go
+gencodec -type Genesis -field-override genesisSpecMarshaling -out gen_genesis.go
+gencodec -type GenesisAccount -field-override genesisAccountMarshaling -out gen_genesis_account.go
+```
+
+The source for the `gencodec` command is here: https://github.com/fjl/gencodec. 
+
+While these were once unmodified and thus "pure" generated files, that is no longer the case.
+MultiGeth's needs for custom JSON un/marshaling have outgrown the capabilities
+of the tool.
+
+This is a comparative `git diff` which could be used to modify the original
+generated files with a command such as `git apply`.
+
+
+```txt
 diff --git a/params/types/gen_genesis.go b/params/types/gen_genesis.go
 index 392b710fd..573d8fba7 100644
 --- a/params/types/gen_genesis.go
@@ -33,3 +54,4 @@ index 392b710fd..573d8fba7 100644
  	if dec.Config != nil {
  		g.Config = dec.Config
  	}
+```

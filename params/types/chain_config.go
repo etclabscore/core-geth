@@ -168,8 +168,8 @@ type MultiGethChainConfig struct {
 	Ethash *goethereum.EthashConfig `json:"ethash,omitempty"`
 	Clique *goethereum.CliqueConfig `json:"clique,omitempty"`
 
-	TrustedCheckpoint       *goethereum.TrustedCheckpoint      `json:"trustedCheckpoint"`
-	TrustedCheckpointOracle *goethereum.CheckpointOracleConfig `json:"trustedCheckpointOracle"`
+	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint"`
+	TrustedCheckpointOracle *ctypes.CheckpointOracleConfig `json:"trustedCheckpointOracle"`
 
 	DifficultyBombDelaySchedule ctypes.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"'` // JSON tag matches Parity's
 	BlockRewardSchedule         ctypes.Uint64BigMapEncodesHex `json:"blockReward,omitempty"`           // JSON tag matches Parity's

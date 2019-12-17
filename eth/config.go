@@ -31,7 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/gasprice"
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/params/types"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -152,10 +152,10 @@ type Config struct {
 	RPCGasCap *big.Int `toml:",omitempty"`
 
 	// Checkpoint is a hardcoded checkpoint which can be nil.
-	Checkpoint *goethereum.TrustedCheckpoint `toml:",omitempty"`
+	Checkpoint *ctypes.TrustedCheckpoint `toml:",omitempty"`
 
 	// CheckpointOracle is the configuration for checkpoint oracle.
-	CheckpointOracle *goethereum.CheckpointOracleConfig `toml:",omitempty"`
+	CheckpointOracle *ctypes.CheckpointOracleConfig `toml:",omitempty"`
 
 	// Istanbul block override (TODO: remove after the fork)
 	OverrideIstanbul *big.Int

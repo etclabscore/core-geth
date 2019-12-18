@@ -35,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -46,7 +47,7 @@ type EthAPIBackend struct {
 }
 
 // ChainConfig returns the active chain configuration.
-func (b *EthAPIBackend) ChainConfig() *params.ChainConfig {
+func (b *EthAPIBackend) ChainConfig() *paramtypes.ChainConfig {
 	return b.eth.blockchain.Config()
 }
 

@@ -21,13 +21,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 // VerifyForkHashes verifies that blocks conforming to network hard-forks do have
 // the correct hashes, to avoid clients going off on different chains. This is an
 // optional feature.
-func VerifyForkHashes(config *params.ChainConfig, header *types.Header, uncle bool) error {
+func VerifyForkHashes(config *paramtypes.ChainConfig, header *types.Header, uncle bool) error {
 	// We don't care about uncles
 	if uncle {
 		return nil

@@ -22,7 +22,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -53,12 +53,12 @@ func WriteDatabaseVersion(db ethdb.KeyValueWriter, version uint64) {
 }
 
 // ReadChainConfig retrieves the consensus settings based on the given genesis hash.
-func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) *params.ChainConfig {
+func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) *paramtypes.ChainConfig {
 	data, _ := db.Get(configKey(hash))
 	if len(data) == 0 {
 		return nil
 	}
-	var config params.ChainConfig
+	var config paramtypes.ChainConfig
 	if err := json.Unmarshal(data, &config); err != nil {
 		log.Error("Invalid chain config JSON", "hash", hash, "err", err)
 		return nil
@@ -67,7 +67,7 @@ func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) *params.ChainCon
 }
 
 // WriteChainConfig writes the chain config settings to the database.
-func WriteChainConfig(db ethdb.KeyValueWriter, hash common.Hash, cfg *params.ChainConfig) {
+func WriteChainConfig(db ethdb.KeyValueWriter, hash common.Hash, cfg *paramtypes.ChainConfig) {
 	if cfg == nil {
 		return
 	}

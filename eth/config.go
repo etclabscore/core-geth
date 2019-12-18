@@ -31,6 +31,8 @@ import (
 	"github.com/ethereum/go-ethereum/eth/gasprice"
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // DefaultConfig contains default settings for use on the Ethereum main net.
@@ -89,7 +91,7 @@ func init() {
 type Config struct {
 	// The genesis block, which is inserted if the database is empty.
 	// If nil, the Ethereum main net block is used.
-	Genesis *core.Genesis `toml:",omitempty"`
+	Genesis *paramtypes.Genesis `toml:",omitempty"`
 
 	// Protocol options
 	NetworkId uint64 // Network ID to use for selecting peers to connect to
@@ -150,10 +152,10 @@ type Config struct {
 	RPCGasCap *big.Int `toml:",omitempty"`
 
 	// Checkpoint is a hardcoded checkpoint which can be nil.
-	Checkpoint *params.TrustedCheckpoint `toml:",omitempty"`
+	Checkpoint *goethereum.TrustedCheckpoint `toml:",omitempty"`
 
 	// CheckpointOracle is the configuration for checkpoint oracle.
-	CheckpointOracle *params.CheckpointOracleConfig `toml:",omitempty"`
+	CheckpointOracle *goethereum.CheckpointOracleConfig `toml:",omitempty"`
 
 	// Istanbul block override (TODO: remove after the fork)
 	OverrideIstanbul *big.Int

@@ -29,7 +29,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 var (
@@ -65,7 +66,7 @@ func NewID(chain *core.BlockChain) ID {
 // newID is the internal version of NewID, which takes extracted values as its
 // arguments instead of a chain. The reason is to allow testing the IDs without
 // having to simulate an entire blockchain.
-func newID(config *params.ChainConfig, genesis common.Hash, head uint64) ID {
+func newID(config *paramtypes.ChainConfig, genesis common.Hash, head uint64) ID {
 	// Calculate the starting checksum from the genesis hash
 	hash := crc32.ChecksumIEEE(genesis[:])
 
@@ -96,7 +97,7 @@ func NewFilter(chain *core.BlockChain) Filter {
 }
 
 // NewStaticFilter creates a filter at block zero.
-func NewStaticFilter(config *params.ChainConfig, genesis common.Hash) Filter {
+func NewStaticFilter(config *paramtypes.ChainConfig, genesis common.Hash) Filter {
 	head := func() uint64 { return 0 }
 	return newFilter(config, genesis, head)
 }
@@ -104,7 +105,7 @@ func NewStaticFilter(config *params.ChainConfig, genesis common.Hash) Filter {
 // newFilter is the internal version of NewFilter, taking closures as its arguments
 // instead of a chain. The reason is to allow testing it without having to simulate
 // an entire blockchain.
-func newFilter(config *params.ChainConfig, genesis common.Hash, headfn func() uint64) Filter {
+func newFilter(config *paramtypes.ChainConfig, genesis common.Hash, headfn func() uint64) Filter {
 	// Calculate the all the valid fork hash and fork next combos
 	var (
 		forks = gatherForks(config)
@@ -209,27 +210,38 @@ func checksumToBytes(hash uint32) [4]byte {
 }
 
 // gatherForks gathers all the known forks and creates a sorted list out of them.
-func gatherForks(config *params.ChainConfig) []uint64 {
-	// Gather all the fork block numbers via reflection
-	kind := reflect.TypeOf(params.ChainConfig{})
-	conf := reflect.ValueOf(config).Elem()
-
+func gatherForks(config *paramtypes.ChainConfig) []uint64 {
 	var forks []uint64
-	for i := 0; i < kind.NumField(); i++ {
-		// Fetch the next field and skip non-fork rules
-		field := kind.Field(i)
-		if !strings.HasSuffix(field.Name, "Block") {
-			continue
-		}
-		if field.Type != reflect.TypeOf(new(big.Int)) {
-			continue
-		}
-		// Extract the fork rule block number and aggregate it
-		rule := conf.Field(i).Interface().(*big.Int)
-		if rule != nil {
-			forks = append(forks, rule.Uint64())
+	var forksM = make(map[uint64]struct{})
+
+	for kind, v := range map[reflect.Type]interface{}{
+		reflect.TypeOf(goethereum.ChainConfig{}): &config.ChainConfig,
+		reflect.TypeOf(paramtypes.ChainConfig{}): config,
+	} {
+		// Gather all the fork block numbers via reflection
+		//kind := reflect.TypeOf(paramtypes.ChainConfig{})
+		conf := reflect.ValueOf(v).Elem()
+
+		for i := 0; i < kind.NumField(); i++ {
+			// Fetch the next field and skip non-fork rules
+			field := kind.Field(i)
+			if !strings.HasSuffix(field.Name, "Block") {
+				continue
+			}
+			if field.Type != reflect.TypeOf(new(big.Int)) {
+				continue
+			}
+			// Extract the fork rule block number and aggregate it
+			rule := conf.Field(i).Interface().(*big.Int)
+			if rule != nil {
+				if _, ok := forksM[rule.Uint64()]; !ok {
+					forks = append(forks, rule.Uint64())
+					forksM[rule.Uint64()] = struct{}{}
+				}
+			}
 		}
 	}
+
 	// Sort the fork block numbers to permit chronologival XOR
 	for i := 0; i < len(forks); i++ {
 		for j := i + 1; j < len(forks); j++ {
@@ -238,16 +250,11 @@ func gatherForks(config *params.ChainConfig) []uint64 {
 			}
 		}
 	}
-	// Deduplicate block numbers applying multiple forks
-	for i := 1; i < len(forks); i++ {
-		if forks[i] == forks[i-1] {
-			forks = append(forks[:i], forks[i+1:]...)
-			i--
-		}
-	}
+
 	// Skip any forks in block 0, that's the genesis ruleset
 	if len(forks) > 0 && forks[0] == 0 {
 		forks = forks[1:]
 	}
+
 	return forks
 }

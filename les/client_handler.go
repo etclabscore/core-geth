@@ -29,13 +29,14 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // clientHandler is responsible for receiving and processing all incoming server
 // responses.
 type clientHandler struct {
 	ulc        *ulc
-	checkpoint *params.TrustedCheckpoint
+	checkpoint *goethereum.TrustedCheckpoint
 	fetcher    *lightFetcher
 	downloader *downloader.Downloader
 	backend    *LightEthereum
@@ -45,7 +46,7 @@ type clientHandler struct {
 	syncDone func()         // Test hooks when syncing is done.
 }
 
-func newClientHandler(ulcServers []string, ulcFraction int, checkpoint *params.TrustedCheckpoint, backend *LightEthereum) *clientHandler {
+func newClientHandler(ulcServers []string, ulcFraction int, checkpoint *goethereum.TrustedCheckpoint, backend *LightEthereum) *clientHandler {
 	handler := &clientHandler{
 		checkpoint: checkpoint,
 		backend:    backend,

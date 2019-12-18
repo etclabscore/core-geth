@@ -29,6 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/trie"
 )
 
@@ -36,10 +37,10 @@ func TestNodeIterator(t *testing.T) {
 	var (
 		fulldb  = rawdb.NewMemoryDatabase()
 		lightdb = rawdb.NewMemoryDatabase()
-		gspec   = core.Genesis{Alloc: core.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
-		genesis = gspec.MustCommit(fulldb)
+		gspec   = paramtypes.Genesis{Alloc: paramtypes.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
+		genesis = core.MustCommitGenesis(fulldb, &gspec)
 	)
-	gspec.MustCommit(lightdb)
+	core.MustCommitGenesis(lightdb, &gspec)
 	blockchain, _ := core.NewBlockChain(fulldb, nil, params.TestChainConfig, ethash.NewFullFaker(), vm.Config{}, nil)
 	gchain, _ := core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), fulldb, 4, testChainGen)
 	if _, err := blockchain.InsertChain(gchain); err != nil {

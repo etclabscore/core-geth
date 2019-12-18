@@ -19,12 +19,12 @@ package geth
 import (
 	"encoding/json"
 
-	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 // EthersocialGenesis returns the JSON spec to use for the Ethersocial network.
 func EthersocialGenesis() string {
-	enc, err := json.Marshal(core.DefaultEthersocialGenesisBlock())
+	enc, err := json.Marshal(params.DefaultEthersocialGenesisBlock())
 	if err != nil {
 		panic(err)
 	}

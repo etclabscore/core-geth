@@ -28,14 +28,17 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/go-test/deep"
 )
 
 func TestDefaultGenesisBlock(t *testing.T) {
-	block := DefaultGenesisBlock().ToBlock(nil)
+	block := GenesisToBlock(params.DefaultGenesisBlock(), nil)
 	if block.Hash() != params.MainnetGenesisHash {
 		t.Errorf("wrong mainnet genesis hash, got %v, want %v", block.Hash(), params.MainnetGenesisHash)
 	}
-	block = DefaultTestnetGenesisBlock().ToBlock(nil)
+	block = GenesisToBlock(params.DefaultTestnetGenesisBlock(), nil)
 	if block.Hash() != params.TestnetGenesisHash {
 		t.Errorf("wrong testnet genesis hash, got %v, want %v", block.Hash(), params.TestnetGenesisHash)
 	}
@@ -44,33 +47,35 @@ func TestDefaultGenesisBlock(t *testing.T) {
 func TestSetupGenesis(t *testing.T) {
 	var (
 		customghash = common.HexToHash("0x89c99d90b79719238d2645c7642f2c9295246e80775b38cfd162b696817fbd50")
-		customg     = Genesis{
-			Config: &params.ChainConfig{HomesteadBlock: big.NewInt(3)},
-			Alloc: GenesisAlloc{
+		customg     = paramtypes.Genesis{
+			Config: &paramtypes.ChainConfig{
+				ChainConfig: goethereum.ChainConfig{HomesteadBlock:              big.NewInt(3)},
+			},
+			Alloc: paramtypes.GenesisAlloc{
 				{1}: {Balance: big.NewInt(1), Storage: map[common.Hash]common.Hash{{1}: {1}}},
 			},
 		}
 		oldcustomg = customg
 	)
-	oldcustomg.Config = &params.ChainConfig{HomesteadBlock: big.NewInt(2)}
+	oldcustomg.Config = &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{HomesteadBlock: big.NewInt(2)}}
 	tests := []struct {
 		name       string
-		fn         func(ethdb.Database) (*params.ChainConfig, common.Hash, error)
-		wantConfig *params.ChainConfig
+		fn         func(ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error)
+		wantConfig *paramtypes.ChainConfig
 		wantHash   common.Hash
 		wantErr    error
 	}{
 		{
 			name: "genesis without ChainConfig",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
-				return SetupGenesisBlock(db, new(Genesis))
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
+				return SetupGenesisBlock(db, new(paramtypes.Genesis))
 			},
-			wantErr:    errGenesisNoConfig,
+			wantErr:    paramtypes.ErrGenesisNoConfig,
 			wantConfig: params.AllEthashProtocolChanges,
 		},
 		{
 			name: "no block in DB, genesis == nil",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
 				return SetupGenesisBlock(db, nil)
 			},
 			wantHash:   params.MainnetGenesisHash,
@@ -78,8 +83,8 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "mainnet block in DB, genesis == nil",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
-				DefaultGenesisBlock().MustCommit(db)
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
+				MustCommitGenesis(db, params.DefaultGenesisBlock())
 				return SetupGenesisBlock(db, nil)
 			},
 			wantHash:   params.MainnetGenesisHash,
@@ -87,8 +92,8 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "custom block in DB, genesis == nil",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
-				customg.MustCommit(db)
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
+				MustCommitGenesis(db, &customg)
 				return SetupGenesisBlock(db, nil)
 			},
 			wantHash:   customghash,
@@ -96,18 +101,18 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "custom block in DB, genesis == testnet",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
-				customg.MustCommit(db)
-				return SetupGenesisBlock(db, DefaultTestnetGenesisBlock())
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
+				MustCommitGenesis(db, &customg)
+				return SetupGenesisBlock(db, params.DefaultTestnetGenesisBlock())
 			},
-			wantErr:    &GenesisMismatchError{Stored: customghash, New: params.TestnetGenesisHash},
+			wantErr:    &paramtypes.GenesisMismatchError{Stored: customghash, New: params.TestnetGenesisHash},
 			wantHash:   params.TestnetGenesisHash,
 			wantConfig: params.TestnetChainConfig,
 		},
 		{
 			name: "compatible config in DB",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
-				oldcustomg.MustCommit(db)
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
+				MustCommitGenesis(db, &oldcustomg)
 				return SetupGenesisBlock(db, &customg)
 			},
 			wantHash:   customghash,
@@ -115,10 +120,10 @@ func TestSetupGenesis(t *testing.T) {
 		},
 		{
 			name: "incompatible config in DB",
-			fn: func(db ethdb.Database) (*params.ChainConfig, common.Hash, error) {
+			fn: func(db ethdb.Database) (*paramtypes.ChainConfig, common.Hash, error) {
 				// Commit the 'old' genesis block with Homestead transition at #2.
 				// Advance to block #4, past the homestead transition block of customg.
-				genesis := oldcustomg.MustCommit(db)
+				genesis := MustCommitGenesis(db, &oldcustomg)
 
 				bc, _ := NewBlockChain(db, nil, oldcustomg.Config, ethash.NewFullFaker(), vm.Config{}, nil)
 				defer bc.Stop()
@@ -131,7 +136,7 @@ func TestSetupGenesis(t *testing.T) {
 			},
 			wantHash:   customghash,
 			wantConfig: customg.Config,
-			wantErr: &params.ConfigCompatError{
+			wantErr: &paramtypes.ConfigCompatError{
 				What:         "Homestead fork block",
 				StoredConfig: big.NewInt(2),
 				NewConfig:    big.NewInt(3),
@@ -149,7 +154,13 @@ func TestSetupGenesis(t *testing.T) {
 			t.Errorf("%s: returned error %#v, want %#v", test.name, spew.NewFormatter(err), spew.NewFormatter(test.wantErr))
 		}
 		if !reflect.DeepEqual(config, test.wantConfig) {
-			t.Errorf("%s:\nreturned %v\nwant     %v", test.name, config, test.wantConfig)
+			spew.Config.DisableMethods = true
+			t.Errorf("%s:\nreturned %v\nwant     %v", test.name, spew.Sdump(config), spew.Sdump(test.wantConfig))
+			diffs := deep.Equal(config, test.wantConfig)
+			t.Log(len(diffs), "differences")
+			for _, d := range diffs {
+				t.Log(d)
+			}
 		}
 		if hash != test.wantHash {
 			t.Errorf("%s: returned hash %s, want %s", test.name, hash.Hex(), test.wantHash.Hex())

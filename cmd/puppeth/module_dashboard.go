@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params/convert"
 )
 
 // dashboardContent is the actual dashboard HTML content to serve up when users
@@ -641,7 +642,7 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 	files[filepath.Join(workdir, network+".json")] = genesis
 
 	if conf.Genesis.Config.Ethash != nil {
-		cppSpec, err := newAlethGenesisSpec(network, conf.Genesis)
+		cppSpec, err := convert.NewAlethGenesisSpec(network, conf.Genesis)
 		if err != nil {
 			return nil, err
 		}
@@ -651,14 +652,14 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 		harmonySpecJSON, _ := conf.Genesis.MarshalJSON()
 		files[filepath.Join(workdir, network+"-harmony.json")] = harmonySpecJSON
 
-		paritySpec, err := newParityChainSpec(network, conf.Genesis, conf.bootnodes)
+		paritySpec, err := convert.NewParityChainSpec(network, conf.Genesis, conf.bootnodes)
 		if err != nil {
 			return nil, err
 		}
 		paritySpecJSON, _ := json.Marshal(paritySpec)
 		files[filepath.Join(workdir, network+"-parity.json")] = paritySpecJSON
 
-		pyethSpec, err := newPyEthereumGenesisSpec(network, conf.Genesis)
+		pyethSpec, err := convert.NewPyEthereumGenesisSpec(network, conf.Genesis)
 		if err != nil {
 			return nil, err
 		}

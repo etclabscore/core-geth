@@ -108,7 +108,7 @@ const (
 	// Introduced in Tangerine Whistle (Eip 150)
 	CreateBySelfdestructGas uint64 = 25000
 
-	MaxCodeSize = 24576 // Maximum bytecode to permit for a contract
+	MaxCodeSize uint64 = 24576 // Maximum bytecode to permit for a contract
 
 	// Precompiled contract gas prices
 
@@ -132,8 +132,17 @@ const (
 )
 
 var (
-	DifficultyBoundDivisor = big.NewInt(2048)   // The bound divisor of the difficulty, used in the update calculations.
-	GenesisDifficulty      = big.NewInt(131072) // Difficulty of the Genesis block.
-	MinimumDifficulty      = big.NewInt(131072) // The minimum that the difficulty may ever be.
-	DurationLimit          = big.NewInt(13)     // The decision boundary on the blocktime duration used to determine whether difficulty should go up or not.
+	DifficultyBoundDivisor            = big.NewInt(2048)   // The bound divisor of the difficulty, used in the update calculations.
+	GenesisDifficulty                 = big.NewInt(131072) // Difficulty of the Genesis block.
+	MinimumDifficulty                 = big.NewInt(131072) // The minimum that the difficulty may ever be.
+	DurationLimit                     = big.NewInt(13)     // The decision boundary on the blocktime duration used to determine whether difficulty should go up or not.
+	EIP2DifficultyIncrementDivisor    = big.NewInt(10)     // Is related to the equilibrium block intervals for the Homestead era difficulty evolution, redefines the value in (YP:43), originally 10 = 0xa
+	EIP100FDifficultyIncrementDivisor = big.NewInt(9)
 )
+
+var FrontierBlockReward = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
+
+var EIP649FBlockReward = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
+
+var EIP1234FBlockReward = big.NewInt(2e+18) // Block reward in wei for successfully mining a block upward from Constantinople
+

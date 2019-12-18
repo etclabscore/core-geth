@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -35,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	whisper "github.com/ethereum/go-ethereum/whisper/whisperv6"
 )
 
@@ -139,31 +139,12 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 
 	debug.Memsize.Add("node", rawStack)
 
-	var genesis *core.Genesis
+	var genesis *paramtypes.Genesis
 	if config.EthereumGenesis != "" {
 		// Parse the user supplied genesis spec if not mainnet
-		genesis = new(core.Genesis)
+		genesis = new(paramtypes.Genesis)
 		if err := json.Unmarshal([]byte(config.EthereumGenesis), genesis); err != nil {
 			return nil, fmt.Errorf("invalid genesis spec: %v", err)
-		}
-		// If we have the testnet, hard code the chain configs too
-		if config.EthereumGenesis == TestnetGenesis() {
-			genesis.Config = params.TestnetChainConfig
-			if config.EthereumNetworkID == 1 {
-				config.EthereumNetworkID = 3
-			}
-		}
-		if config.EthereumGenesis == SocialGenesis() {
-			genesis.Config = params.SocialChainConfig
-			if config.EthereumNetworkID == 1 {
-				config.EthereumNetworkID = 28
-			}
-		}
-		if config.EthereumGenesis == MixGenesis() {
-			genesis.Config = params.MixChainConfig
-			if config.EthereumNetworkID == 1 {
-				config.EthereumNetworkID = 76
-			}
 		}
 	}
 	// Register the Ethereum protocol if requested
@@ -171,7 +152,7 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 		ethConf := eth.DefaultConfig
 		ethConf.Genesis = genesis
 		ethConf.SyncMode = downloader.LightSync
-		ethConf.NetworkId = uint64(config.EthereumNetworkID)
+		ethConf.NetworkId = uint64(genesis.Config.NetworkID)
 		ethConf.DatabaseCache = config.EthereumDatabaseCache
 		if err := rawStack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
 			return les.New(ctx, &ethConf)

@@ -32,7 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 const (
@@ -210,15 +210,13 @@ func (config *TxPoolConfig) sanitize() TxPoolConfig {
 // two states over time as they are received and processed.
 type TxPool struct {
 	config      TxPoolConfig
-	chainconfig *params.ChainConfig
+	chainconfig *paramtypes.ChainConfig
 	chain       blockChain
 	gasPrice    *big.Int
 	txFeed      event.Feed
 	scope       event.SubscriptionScope
 	signer      types.Signer
 	mu          sync.RWMutex
-
-	istanbul bool // Fork indicator whether we are in the istanbul stage.
 
 	currentState  *state.StateDB // Current state in the blockchain head
 	pendingNonces *txNoncer      // Pending state tracking virtual nonces
@@ -252,7 +250,7 @@ type txpoolResetRequest struct {
 
 // NewTxPool creates a new transaction pool to gather, sort and filter inbound
 // transactions from the network.
-func NewTxPool(config TxPoolConfig, chainconfig *params.ChainConfig, chain blockChain) *TxPool {
+func NewTxPool(config TxPoolConfig, chainconfig *paramtypes.ChainConfig, chain blockChain) *TxPool {
 	// Sanitize the input to ensure no vulnerable gas prices are set
 	config = (&config).sanitize()
 
@@ -1158,7 +1156,7 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 
 	// Update all fork indicator by next pending block number.
 	next := new(big.Int).Add(newHead.Number, big.NewInt(1))
-	pool.istanbul = pool.chainconfig.IsIstanbul(next)
+	pool.eip2028f = pool.chainconfig.IsEIP2028F(next)
 }
 
 // promoteExecutables moves transactions that have become processable from the

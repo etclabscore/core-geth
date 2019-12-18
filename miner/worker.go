@@ -34,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 )
 
 const (
@@ -123,7 +124,7 @@ type intervalAdjust struct {
 // and gathering the sealing result.
 type worker struct {
 	config      *Config
-	chainConfig *params.ChainConfig
+	chainConfig *paramtypes.ChainConfig
 	engine      consensus.Engine
 	eth         Backend
 	chain       *core.BlockChain
@@ -176,7 +177,7 @@ type worker struct {
 	resubmitHook func(time.Duration, time.Duration) // Method to call upon updating resubmitting interval.
 }
 
-func newWorker(config *Config, chainConfig *params.ChainConfig, engine consensus.Engine, eth Backend, mux *event.TypeMux, isLocalBlock func(*types.Block) bool) *worker {
+func newWorker(config *Config, chainConfig *paramtypes.ChainConfig, engine consensus.Engine, eth Backend, mux *event.TypeMux, isLocalBlock func(*types.Block) bool) *worker {
 	worker := &worker{
 		config:             config,
 		chainConfig:        chainConfig,

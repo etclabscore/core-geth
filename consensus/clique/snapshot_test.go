@@ -29,6 +29,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // testerAccountPool is a pool to maintain currently active tester accounts,
@@ -393,7 +395,7 @@ func TestClique(t *testing.T) {
 			}
 		}
 		// Create the genesis block with the initial set of signers
-		genesis := &core.Genesis{
+		genesis := &paramtypes.Genesis{
 			ExtraData: make([]byte, extraVanity+common.AddressLength*len(signers)+extraSeal),
 		}
 		for j, signer := range signers {
@@ -401,18 +403,18 @@ func TestClique(t *testing.T) {
 		}
 		// Create a pristine blockchain with the genesis injected
 		db := rawdb.NewMemoryDatabase()
-		genesis.Commit(db)
+		core.CommitGenesis(genesis, db)
 
 		// Assemble a chain of headers from the cast votes
 		config := *params.TestChainConfig
-		config.Clique = &params.CliqueConfig{
+		config.Clique = &goethereum.CliqueConfig{
 			Period: 1,
 			Epoch:  tt.epoch,
 		}
 		engine := New(config.Clique, db)
 		engine.fakeDiff = true
 
-		blocks, _ := core.GenerateChain(&config, genesis.ToBlock(db), engine, db, len(tt.votes), func(j int, gen *core.BlockGen) {
+		blocks, _ := core.GenerateChain(&config, core.GenesisToBlock(genesis, db), engine, db, len(tt.votes), func(j int, gen *core.BlockGen) {
 			// Cast the vote contained in this block
 			gen.SetCoinbase(accounts.address(tt.votes[j].voted))
 			if tt.votes[j].auth {

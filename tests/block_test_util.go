@@ -34,7 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -49,13 +49,13 @@ func (t *BlockTest) UnmarshalJSON(in []byte) error {
 }
 
 type btJSON struct {
-	Blocks     []btBlock             `json:"blocks"`
-	Genesis    btHeader              `json:"genesisBlockHeader"`
-	Pre        core.GenesisAlloc     `json:"pre"`
-	Post       core.GenesisAlloc     `json:"postState"`
-	BestBlock  common.UnprefixedHash `json:"lastblockhash"`
-	Network    string                `json:"network"`
-	SealEngine string                `json:"sealEngine"`
+	Blocks     []btBlock               `json:"blocks"`
+	Genesis    btHeader                `json:"genesisBlockHeader"`
+	Pre        paramtypes.GenesisAlloc `json:"pre"`
+	Post       paramtypes.GenesisAlloc `json:"postState"`
+	BestBlock  common.UnprefixedHash   `json:"lastblockhash"`
+	Network    string                  `json:"network"`
+	SealEngine string                  `json:"sealEngine"`
 }
 
 type btBlock struct {
@@ -102,7 +102,7 @@ func (t *BlockTest) Run() error {
 
 	// import pre accounts & construct test genesis block & state root
 	db := rawdb.NewMemoryDatabase()
-	gblock, err := t.genesis(config).Commit(db)
+	gblock, err := core.CommitGenesis(t.genesis(config), db)
 	if err != nil {
 		return err
 	}
@@ -142,8 +142,8 @@ func (t *BlockTest) Run() error {
 	return t.validateImportedHeaders(chain, validBlocks)
 }
 
-func (t *BlockTest) genesis(config *params.ChainConfig) *core.Genesis {
-	return &core.Genesis{
+func (t *BlockTest) genesis(config *paramtypes.ChainConfig) *paramtypes.Genesis {
+	return &paramtypes.Genesis{
 		Config:     config,
 		Nonce:      t.json.Genesis.Nonce.Uint64(),
 		Timestamp:  t.json.Genesis.Timestamp,

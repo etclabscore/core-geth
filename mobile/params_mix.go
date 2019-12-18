@@ -19,12 +19,12 @@ package geth
 import (
 	"encoding/json"
 
-	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 // MixGenesis returns the JSON spec to use for the MIX network.
 func MixGenesis() string {
-	enc, err := json.Marshal(core.DefaultMixGenesisBlock())
+	enc, err := json.Marshal(params.DefaultMixGenesisBlock())
 	if err != nil {
 		panic(err)
 	}

@@ -35,7 +35,8 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -157,22 +158,24 @@ func TestForkIDSplit(t *testing.T) {
 	var (
 		engine = ethash.NewFaker()
 
-		configNoFork  = &params.ChainConfig{HomesteadBlock: big.NewInt(1)}
-		configProFork = &params.ChainConfig{
-			HomesteadBlock: big.NewInt(1),
-			EIP150Block:    big.NewInt(2),
-			EIP155Block:    big.NewInt(2),
-			EIP158Block:    big.NewInt(2),
-			ByzantiumBlock: big.NewInt(3),
+		configNoFork  = &paramtypes.ChainConfig{ChainConfig: goethereum.ChainConfig{HomesteadBlock: big.NewInt(1)}}
+		configProFork = &paramtypes.ChainConfig{
+			ChainConfig: goethereum.ChainConfig{
+				HomesteadBlock: big.NewInt(1),
+				EIP150Block:    big.NewInt(2),
+				EIP155Block:    big.NewInt(2),
+				EIP158Block:    big.NewInt(2),
+				ByzantiumBlock: big.NewInt(3),
+			},
 		}
 		dbNoFork  = rawdb.NewMemoryDatabase()
 		dbProFork = rawdb.NewMemoryDatabase()
 
-		gspecNoFork  = &core.Genesis{Config: configNoFork}
-		gspecProFork = &core.Genesis{Config: configProFork}
+		gspecNoFork  = &paramtypes.Genesis{Config: configNoFork}
+		gspecProFork = &paramtypes.Genesis{Config: configProFork}
 
-		genesisNoFork  = gspecNoFork.MustCommit(dbNoFork)
-		genesisProFork = gspecProFork.MustCommit(dbProFork)
+		genesisNoFork  = core.MustCommitGenesis(dbNoFork, gspecNoFork)
+		genesisProFork = core.MustCommitGenesis(dbProFork, gspecProFork)
 
 		chainNoFork, _  = core.NewBlockChain(dbNoFork, nil, configNoFork, engine, vm.Config{}, nil)
 		chainProFork, _ = core.NewBlockChain(dbProFork, nil, configProFork, engine, vm.Config{}, nil)

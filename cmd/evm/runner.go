@@ -37,6 +37,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm/runtime"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
@@ -50,7 +51,7 @@ var runCommand = cli.Command{
 
 // readGenesis will read the given JSON format genesis file and return
 // the initialized Genesis structure
-func readGenesis(genesisPath string) *core.Genesis {
+func readGenesis(genesisPath string) *paramtypes.Genesis {
 	// Make sure we have a valid genesis JSON
 	//genesisPath := ctx.Args().First()
 	if len(genesisPath) == 0 {
@@ -62,7 +63,7 @@ func readGenesis(genesisPath string) *core.Genesis {
 	}
 	defer file.Close()
 
-	genesis := new(core.Genesis)
+	genesis := new(paramtypes.Genesis)
 	if err := json.NewDecoder(file).Decode(genesis); err != nil {
 		utils.Fatalf("invalid genesis file: %v", err)
 	}
@@ -83,10 +84,10 @@ func runCmd(ctx *cli.Context) error {
 		tracer        vm.Tracer
 		debugLogger   *vm.StructLogger
 		statedb       *state.StateDB
-		chainConfig   *params.ChainConfig
+		chainConfig   *paramtypes.ChainConfig
 		sender        = common.BytesToAddress([]byte("sender"))
 		receiver      = common.BytesToAddress([]byte("receiver"))
-		genesisConfig *core.Genesis
+		genesisConfig *paramtypes.Genesis
 	)
 	if ctx.GlobalBool(MachineFlag.Name) {
 		tracer = vm.NewJSONLogger(logconfig, os.Stdout)
@@ -100,12 +101,12 @@ func runCmd(ctx *cli.Context) error {
 		gen := readGenesis(ctx.GlobalString(GenesisFlag.Name))
 		genesisConfig = gen
 		db := rawdb.NewMemoryDatabase()
-		genesis := gen.ToBlock(db)
+		genesis := core.GenesisToBlock(gen, db)
 		statedb, _ = state.New(genesis.Root(), state.NewDatabase(db))
 		chainConfig = gen.Config
 	} else {
 		statedb, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()))
-		genesisConfig = new(core.Genesis)
+		genesisConfig = new(paramtypes.Genesis)
 	}
 	if ctx.GlobalString(SenderFlag.Name) != "" {
 		sender = common.HexToAddress(ctx.GlobalString(SenderFlag.Name))

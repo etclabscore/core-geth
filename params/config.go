@@ -227,7 +227,7 @@ var (
 		ConstantinopleBlock:     big.NewInt(0),
 		PetersburgBlock:         big.NewInt(0),
 		IstanbulBlock:           big.NewInt(0),
-		MuirGlacierBlock: big.NewInt(0),
+		MuirGlacierBlock:        nil,
 		EWASMBlock:              nil,
 		Ethash:                  new(ctypes.EthashConfig),
 		Clique:                  nil,
@@ -253,7 +253,7 @@ var (
 		ConstantinopleBlock: big.NewInt(0),
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(0),
-		MuirGlacierBlock: nil,
+		MuirGlacierBlock:    nil,
 		EWASMBlock:          nil,
 		Ethash:              nil,
 		Clique: &ctypes.CliqueConfig{
@@ -285,4 +285,3 @@ var (
 		TrustedCheckpointOracle: nil,
 	}
 )
-

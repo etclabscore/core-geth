@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
@@ -207,5 +208,5 @@ func checksumToBytes(hash uint32) [4]byte {
 
 // gatherForks gathers all the known forks and creates a sorted list out of them.
 func gatherForks(config ctypes.ChainConfigurator) []uint64 {
-	return ctypes.Forks(config)
+	return confp.Forks(config)
 }

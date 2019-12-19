@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
@@ -187,7 +188,7 @@ func (c *MultiGethChainConfig) String() string {
 	default:
 		engine = "unknown"
 	}
-	trxs, names := ctypes.Transitions(c)
+	trxs, names := confp.Transitions(c)
 	str := fmt.Sprintf("NetworkID: %v, ChainID: %v Engine: %v ",
 		c.NetworkID,
 		c.ChainID,

@@ -35,7 +35,7 @@ func TestCheckCompatible(t *testing.T) {
 	type test struct {
 		stored, new ctypes.ChainConfigurator
 		head        uint64
-		wantErr     *ctypes.ConfigCompatError
+		wantErr     *confp.ConfigCompatError
 	}
 	tests := []test{
 		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 0, wantErr: nil},
@@ -50,7 +50,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: AllEthashProtocolChanges,
 			new:    &goethereum.ChainConfig{HomesteadBlock: nil},
 			head:   3,
-			wantErr: &ctypes.ConfigCompatError{
+			wantErr: &confp.ConfigCompatError{
 				What:         "Homestead fork block",
 				StoredConfig: uint64P(0),
 				NewConfig:    nil,
@@ -61,7 +61,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: AllEthashProtocolChanges,
 			new:    &goethereum.ChainConfig{HomesteadBlock: big.NewInt(1)},
 			head:   3,
-			wantErr: &ctypes.ConfigCompatError{
+			wantErr: &confp.ConfigCompatError{
 				What:         "Homestead fork block",
 				StoredConfig: uint64P(0),
 				NewConfig:    uint64P(1),
@@ -72,7 +72,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: &goethereum.ChainConfig{HomesteadBlock: big.NewInt(30), EIP150Block: big.NewInt(10)},
 			new:    &goethereum.ChainConfig{HomesteadBlock: big.NewInt(25), EIP150Block: big.NewInt(20)},
 			head:   25,
-			wantErr: &ctypes.ConfigCompatError{
+			wantErr: &confp.ConfigCompatError{
 				What:         "EIP150 fork block",
 				StoredConfig: uint64P(10),
 				NewConfig:    uint64P(20),
@@ -83,7 +83,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: &multigeth.MultiGethChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
 			new:    &multigeth.MultiGethChainConfig{EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
 			head:   25,
-			wantErr: &ctypes.ConfigCompatError{
+			wantErr: &confp.ConfigCompatError{
 				What:         "EIP100F fork block",
 				StoredConfig: uint64P(30),
 				NewConfig:    uint64P(24),
@@ -111,7 +111,7 @@ func TestCheckCompatible(t *testing.T) {
 				return c
 			}(),
 			head: MainnetChainConfig.DAOForkBlock.Uint64(),
-			wantErr: &ctypes.ConfigCompatError{
+			wantErr: &confp.ConfigCompatError{
 				What:         "DAO fork support flag",
 				StoredConfig: uint64P(MainnetChainConfig.DAOForkBlock.Uint64()),
 				NewConfig:    uint64P(1900000),
@@ -127,7 +127,7 @@ func TestCheckCompatible(t *testing.T) {
 				return c
 			}(),
 			head: MainnetChainConfig.DAOForkBlock.Uint64(),
-			wantErr: &ctypes.ConfigCompatError{
+			wantErr: &confp.ConfigCompatError{
 				What:         "DAO fork support flag",
 				StoredConfig: uint64P(MainnetChainConfig.DAOForkBlock.Uint64()),
 				NewConfig:    nil,
@@ -143,7 +143,7 @@ func TestCheckCompatible(t *testing.T) {
 				return c
 			}(),
 			head: MainnetChainConfig.EIP158Block.Uint64(),
-			wantErr: &ctypes.ConfigCompatError{
+			wantErr: &confp.ConfigCompatError{
 				What:         "EIP155 chain ID",
 				StoredConfig: uint64P(MainnetChainConfig.EIP155Block.Uint64()),
 				NewConfig:    uint64P(MainnetChainConfig.EIP155Block.Uint64()),
@@ -153,7 +153,7 @@ func TestCheckCompatible(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		err := ctypes.Compatible(&test.head, test.stored, test.new)
+		err := confp.Compatible(&test.head, test.stored, test.new)
 		if (err == nil && test.wantErr != nil) || (err != nil && test.wantErr == nil) {
 			t.Errorf("nil/nonnil, error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", test.stored, test.new, test.head, err, test.wantErr)
 		} else if err != nil && (err.RewindTo != test.wantErr.RewindTo) {

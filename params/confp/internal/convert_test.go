@@ -146,7 +146,7 @@ func TestConfiguratorImplementationsSatisfied(t *testing.T) {
 
 func TestCompatible(t *testing.T) {
 	spec := &parity.ParityChainSpec{}
-	fns, names := ctypes.Transitions(spec)
+	fns, names := confp.Transitions(spec)
 	for i, fn := range fns {
 		t.Log(names[i], fn())
 	}
@@ -172,7 +172,7 @@ func TestGatherForks(t *testing.T) {
 		return false
 	}
 	for ci, c := range cases {
-		gotForkNs := ctypes.Forks(c.config)
+		gotForkNs := confp.Forks(c.config)
 		if len(gotForkNs) != len(c.wantNs) {
 			for _, n := range c.wantNs {
 				if !sliceContains(gotForkNs, n) {

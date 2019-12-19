@@ -51,7 +51,7 @@ func SetupGenesisBlock(db ethdb.Database, genesis *paramtypes.Genesis) (ctypes.C
 }
 
 func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
-	if genesis != nil && ctypes.IsEmpty(genesis.Config) {
+	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, paramtypes.ErrGenesisNoConfig
 	}
 	// Just commit the new block if there is no stored genesis block.
@@ -128,7 +128,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesi
 	if height == nil {
 		return newcfg, stored, fmt.Errorf("missing block number for head header hash")
 	}
-	compatErr := ctypes.Compatible(height, storedcfg, newcfg)
+	compatErr := confp.Compatible(height, storedcfg, newcfg)
 	if compatErr != nil && *height != 0 && compatErr.RewindTo != 0 {
 		return newcfg, stored, compatErr
 	}

@@ -44,7 +44,7 @@ func TestEquivalent_Features(t *testing.T) {
 		for _, head := range []*uint64{
 			nil, &zero, &max,
 		} {
-			if err := ctypes.IsValid(c, head); err != nil {
+			if err := confp.IsValid(c, head); err != nil {
 				t.Fatalf("invalid config, err: %v", err)
 			}
 		}
@@ -74,7 +74,7 @@ func TestEquivalent_Features(t *testing.T) {
 			t.Fatal("unknown consensus mg")
 		}
 
-		err = ctypes.Equivalent(oconf, mg)
+		err = confp.Equivalent(oconf, mg)
 		if err != nil {
 
 			// Debugging log lines.
@@ -109,7 +109,7 @@ func TestEquivalent_Features(t *testing.T) {
 
 		mustValidate(pc)
 
-		err = ctypes.Equivalent(mg, pc)
+		err = confp.Equivalent(mg, pc)
 		if err != nil {
 			t.Errorf("%s oconf/p err: %v", name, err)
 		}
@@ -141,7 +141,7 @@ func TestEquivalent_ReadParity(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = ctypes.Equivalent(a, b)
+		err = confp.Equivalent(a, b)
 		if err != nil {
 			t.Log("-------------------")
 			t.Log(b.Engine.Ethash.Params.BlockReward)

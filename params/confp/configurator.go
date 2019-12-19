@@ -15,7 +15,7 @@
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
 
-package ctypes
+package confp
 
 import (
 	"fmt"
@@ -24,6 +24,8 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 // ConfigCompatError is raised if the locally-stored blockchain is initialised with a
@@ -94,7 +96,7 @@ func IsEmpty(anything interface{}) bool {
 	return reflect.DeepEqual(anything, reflect.Zero(reflect.TypeOf(anything)).Interface())
 }
 
-func IsValid(conf ChainConfigurator, head *uint64) *ConfigValidError {
+func IsValid(conf ctypes.ChainConfigurator, head *uint64) *ConfigValidError {
 
 	// head-agnostic logic
 	if conf.GetNetworkID() == nil || *conf.GetNetworkID() == 0 {
@@ -114,7 +116,7 @@ func IsValid(conf ChainConfigurator, head *uint64) *ConfigValidError {
 	return nil
 }
 
-func Compatible(head *uint64, a, b ChainConfigurator) *ConfigCompatError {
+func Compatible(head *uint64, a, b ctypes.ChainConfigurator) *ConfigCompatError {
 	// Iterate checkCompatible to find the lowest conflict.
 	var lastErr *ConfigCompatError
 	for {
@@ -128,7 +130,7 @@ func Compatible(head *uint64, a, b ChainConfigurator) *ConfigCompatError {
 	return lastErr
 }
 
-func Equivalent(a, b ChainConfigurator) error {
+func Equivalent(a, b ctypes.ChainConfigurator) error {
 	if a.GetConsensusEngineType() != b.GetConsensusEngineType() {
 		return fmt.Errorf("mismatch consensus engine types, A: %s, B: %s", a.GetConsensusEngineType(), b.GetConsensusEngineType())
 	}
@@ -183,17 +185,17 @@ func Equivalent(a, b ChainConfigurator) error {
 		}
 	}
 
-	if a.GetConsensusEngineType() == ConsensusEngineT_Ethash {
+	if a.GetConsensusEngineType() == ctypes.ConsensusEngineT_Ethash {
 		for _, f := range fa { // fa and fb are fork-equivalent
-			ar := EthashBlockReward(a, new(big.Int).SetUint64(f))
-			br := EthashBlockReward(b, new(big.Int).SetUint64(f))
+			ar := ctypes.EthashBlockReward(a, new(big.Int).SetUint64(f))
+			br := ctypes.EthashBlockReward(b, new(big.Int).SetUint64(f))
 			if ar.Cmp(br) != 0 {
 				return fmt.Errorf("mismatch block reward, fork block: %v, A: %v, B: %v", f, ar, br)
 			}
 			// TODO: add difficulty comparison
 			// Currently tough/complex to do because of necessary overhead (ie build a parent block).
 		}
-	} else if a.GetConsensusEngineType() == ConsensusEngineT_Clique {
+	} else if a.GetConsensusEngineType() == ctypes.ConsensusEngineT_Clique {
 		if a.GetCliqueEpoch() != b.GetCliqueEpoch() {
 			return fmt.Errorf("mismatch clique epochs: A: %v, B: %v", a.GetCliqueEpoch(), b.GetCliqueEpoch())
 		}
@@ -205,7 +207,7 @@ func Equivalent(a, b ChainConfigurator) error {
 }
 
 // Transitions gets all available transition (fork) functions and their names for a ChainConfigurator.
-func Transitions(conf ChainConfigurator) (fns []func() *uint64, names []string) {
+func Transitions(conf ctypes.ChainConfigurator) (fns []func() *uint64, names []string) {
 	names = []string{}
 	fns = []func() *uint64{}
 	k := reflect.TypeOf(conf)
@@ -222,7 +224,7 @@ func Transitions(conf ChainConfigurator) (fns []func() *uint64, names []string) 
 }
 
 // Forks returns non-nil, non <maxUin64>, unique sorted forks for a ChainConfigurator.
-func Forks(conf ChainConfigurator) []uint64 {
+func Forks(conf ctypes.ChainConfigurator) []uint64 {
 	var forks []uint64
 	var forksM = make(map[uint64]struct{}) // Will key for uniqueness as fork numbers are appended to slice.
 
@@ -250,7 +252,7 @@ func Forks(conf ChainConfigurator) []uint64 {
 	return forks
 }
 
-func compatible(head *uint64, a, b ChainConfigurator) *ConfigCompatError {
+func compatible(head *uint64, a, b ctypes.ChainConfigurator) *ConfigCompatError {
 	aFns, aNames := Transitions(a)
 	bFns, _ := Transitions(b)
 	for i, afn := range aFns {

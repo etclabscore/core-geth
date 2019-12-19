@@ -38,7 +38,7 @@ import (
 )
 
 func mustOpenF(t *testing.T, fabbrev string, into interface{}) {
-	b, err := ioutil.ReadFile(filepath.Join("testdata", fmt.Sprintf("stureby_%s.json", fabbrev)))
+	b, err := ioutil.ReadFile(filepath.Join("..", "testdata", fmt.Sprintf("stureby_%s.json", fabbrev)))
 	if err != nil {
 		t.Fatal(err)
 	}

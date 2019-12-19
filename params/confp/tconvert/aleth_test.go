@@ -33,7 +33,7 @@ import (
 func TestAlethSturebyConverter(t *testing.T) {
 
 	// Read GETH genesis type.
-	blob, err := ioutil.ReadFile(filepath.Join("..", "internal", "testdata", "stureby_geth.json"))
+	blob, err := ioutil.ReadFile(filepath.Join("..", "testdata", "stureby_geth.json"))
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}
@@ -49,7 +49,7 @@ func TestAlethSturebyConverter(t *testing.T) {
 	}
 
 	// Read the aleth JSON spec.
-	expBlob, err := ioutil.ReadFile(filepath.Join("..", "internal", "testdata", "stureby_aleth.json"))
+	expBlob, err := ioutil.ReadFile(filepath.Join("..", "testdata", "stureby_aleth.json"))
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}

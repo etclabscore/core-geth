@@ -18,15 +18,15 @@ func TestUnmarshalChainConfigurator(t *testing.T) {
 		wantT interface{}
 	}{
 		{
-			filepath.Join("..", "internal", "testdata", "stureby_parity.json"),
+			filepath.Join("..", "testdata", "stureby_parity.json"),
 			&parity.ParityChainSpec{},
 		},
 		{
-			filepath.Join("..", "internal", "testdata", "stureby_geth.json"),
+			filepath.Join("..", "testdata", "stureby_geth.json"),
 			&goethereum.ChainConfig{},
 		},
 		{
-			filepath.Join("..", "internal", "testdata", "stureby_multigeth.json"),
+			filepath.Join("..", "testdata", "stureby_multigeth.json"),
 			&multigeth.MultiGethChainConfig{},
 		},
 	}

@@ -27,7 +27,7 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params/tconvert"
+	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 )
 
 // dashboardContent is the actual dashboard HTML content to serve up when users

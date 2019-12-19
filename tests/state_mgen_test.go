@@ -30,7 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/internal/build"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/tconvert"
+	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/iancoleman/strcase"
 )
 

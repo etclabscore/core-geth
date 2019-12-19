@@ -30,7 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/tconvert"
+	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 

@@ -28,7 +28,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
-	"github.com/ethereum/go-ethereum/params/tconvert"
+	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"

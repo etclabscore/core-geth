@@ -18,6 +18,7 @@
 package generic
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -54,4 +55,36 @@ func (c GenericCC) DAOSupport() bool {
 			len(pc.Engine.Ethash.Params.DaoHardforkAccounts) == len(vars.DAODrainList())
 	}
 	panic(fmt.Sprintf("uimplemented DAO logic, config: %v", c.ChainConfigurator))
+}
+
+func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) {
+	var map1 = make(map[string]interface{})
+	err := json.Unmarshal(input, &map1)
+	if err != nil {
+		return nil, err
+	}
+	if _, ok := map1["params"]; ok {
+		pspec := &parity.ParityChainSpec{}
+		err = json.Unmarshal(input, pspec)
+		if err != nil {
+			return nil, err
+		}
+		return pspec, nili
+	}
+
+	if _, ok := map1["networkId"]; ok {
+		mspec := &multigeth.MultiGethChainConfig{}
+		err = json.Unmarshal(input, mspec)
+		if err != nil {
+			return nil, err
+		}
+		return mspec, nil
+	}
+
+	gspec := &goethereum.ChainConfig{}
+	err = json.Unmarshal(input,gspec)
+	if err != nil {
+		return nil, err
+	}
+	return gspec, nil
 }

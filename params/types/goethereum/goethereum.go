@@ -25,8 +25,6 @@ import (
 )
 
 type ChainConfig struct {
-	Converting bool
-	altDT      ctypes.ChainConfigurator
 	NetworkID  uint64   `json:"-"`
 	ChainID    *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
 

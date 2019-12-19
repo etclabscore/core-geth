@@ -20,7 +20,7 @@ package tconvert
 import (
 	"strings"
 
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
@@ -34,10 +34,10 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 		Nodes:   bootnodes,
 		Datadir: strings.ToLower(network),
 	}
-	if err := convert.Convert(genesis, spec); err != nil {
+	if err := confp.Convert(genesis, spec); err != nil {
 		return nil, err
 	}
-	if err := convert.Convert(genesis.Config, spec); err != nil {
+	if err := confp.Convert(genesis.Config, spec); err != nil {
 		return nil, err
 	}
 	return spec, nil
@@ -50,10 +50,10 @@ func ParityConfigToMultiGethGenesis(c *parity.ParityChainSpec) (*paramtypes.Gene
 		Config: &multigeth.MultiGethChainConfig{},
 	}
 
-	if err := convert.Convert(c, mg); err != nil {
+	if err := confp.Convert(c, mg); err != nil {
 		return nil,err
 	}
-	if err := convert.Convert(c, mg.Config); err != nil {
+	if err := confp.Convert(c, mg.Config); err != nil {
 		return nil, err
 	}
 	return mg, nil

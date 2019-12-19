@@ -27,7 +27,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/tconvert"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
@@ -78,12 +78,12 @@ func TestConvert(t *testing.T) {
 	mustOpenF(t, "parity", &spec)
 
 	spec2 := parity.ParityChainSpec{}
-	err := convert.Convert(&spec, &spec2)
+	err := confp.Convert(&spec, &spec2)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if diffs := convert.Equal(reflect.TypeOf((*ctypes.Configurator)(nil)), &spec, &spec2); len(diffs) != 0 {
+	if diffs := confp.Equal(reflect.TypeOf((*ctypes.Configurator)(nil)), &spec, &spec2); len(diffs) != 0 {
 		for _, diff := range diffs {
 			t.Error("not equal", diff.Field, diff.A, diff.B)
 		}
@@ -110,12 +110,12 @@ func TestIdentical(t *testing.T) {
 		configs[i].SetNetworkID(&f42)
 		configs[i-1].SetChainID(f43)
 		configs[i].SetChainID(f43)
-		if !convert.Identical(configs[i-1], configs[i], methods) {
+		if !confp.Identical(configs[i-1], configs[i], methods) {
 			t.Errorf("nonident")
 		}
 		f24 := uint64(24)
 		configs[i-1].SetNetworkID(&f24)
-		if convert.Identical(configs[i-1], configs[i], methods) {
+		if confp.Identical(configs[i-1], configs[i], methods) {
 			t.Error(i, "ident")
 		}
 	}

@@ -21,7 +21,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
@@ -106,7 +106,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: MainnetChainConfig,
 			new: func() ctypes.ChainConfigurator {
 				c := &goethereum.ChainConfig{}
-				convert.Convert(MainnetChainConfig, c)
+				confp.Convert(MainnetChainConfig, c)
 				c.SetEthashEIP779Transition(uint64P(1900000))
 				return c
 			}(),
@@ -122,7 +122,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: MainnetChainConfig,
 			new: func() ctypes.ChainConfigurator {
 				c := &goethereum.ChainConfig{}
-				convert.Convert(MainnetChainConfig, c)
+				confp.Convert(MainnetChainConfig, c)
 				c.SetEthashEIP779Transition(nil)
 				return c
 			}(),

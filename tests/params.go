@@ -26,7 +26,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
@@ -117,7 +117,7 @@ func init() {
 
 		for i, config := range Forks {
 			mgc := &multigeth.MultiGethChainConfig{}
-			if err := convert.Convert(config, mgc); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Convert(config, mgc); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			Forks[i] = mgc
@@ -125,7 +125,7 @@ func init() {
 
 		for k, v := range difficultyChainConfigurations {
 			mgc := &multigeth.MultiGethChainConfig{}
-			if err := convert.Convert(v, mgc); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Convert(v, mgc); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = mgc
@@ -136,7 +136,7 @@ func init() {
 
 		for i, config := range Forks {
 			pspec := &parity.ParityChainSpec{}
-			if err := convert.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			Forks[i] = pspec
@@ -144,7 +144,7 @@ func init() {
 
 		for k, v := range difficultyChainConfigurations {
 			pspec := &parity.ParityChainSpec{}
-			if err := convert.Convert(v, pspec); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Convert(v, pspec); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = pspec

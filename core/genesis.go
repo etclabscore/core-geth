@@ -27,7 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -117,7 +117,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *paramtypes.Genesi
 	// Pre-existing logic only upgraded mainnet, when it should upgrade all defaulty chains.
 	// New logic (below) checks _inequality_ between a defaulty config and a stored config. If different,
 	// the stored config is used. This breaks auto-upgrade magic for defaulty chains.
-	if genesis == nil && !convert.Identical(storedcfg, newcfg, []string{"NetworkID", "ChainID"}) {
+	if genesis == nil && !confp.Identical(storedcfg, newcfg, []string{"NetworkID", "ChainID"}) {
 		log.Info("Found non-defaulty stored config, using it.")
 		return storedcfg, stored, nil
 	}

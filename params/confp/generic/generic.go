@@ -19,6 +19,7 @@ package generic
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -26,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/tidwall/gjson"
 )
 
 // GenericCC is a generic-y struct type used to expose some meta-logic methods
@@ -57,34 +59,51 @@ func (c GenericCC) DAOSupport() bool {
 	panic(fmt.Sprintf("uimplemented DAO logic, config: %v", c.ChainConfigurator))
 }
 
+// Following vars define sufficient JSON schema keys for configurator type inference.
+var (
+	paritySchemaKeysMust = []string{
+		"engine",
+		"genesis.seal",
+	}
+	multigethSchemaMust = []string{
+		"networkId", "config.networkId",
+		"eip2FBlock", "config.eip2FBlock",
+	}
+	goethereumSchemaMust = []string{
+		"difficulty",
+		"chainId", "config.chainId",
+		"eip158Block", "config.eip158Block",
+		"byzantiumBlock", "config.byzantiumBlock",
+	}
+)
+
 func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) {
-	var map1 = make(map[string]interface{})
-	err := json.Unmarshal(input, &map1)
-	if err != nil {
-		return nil, err
+	var cases = map[ctypes.ChainConfigurator][]string{
+		&parity.ParityChainSpec{}: paritySchemaKeysMust,
+		&multigeth.MultiGethChainConfig{}: multigethSchemaMust,
+		&goethereum.ChainConfig{}: goethereumSchemaMust,
 	}
-	if _, ok := map1["params"]; ok {
-		pspec := &parity.ParityChainSpec{}
-		err = json.Unmarshal(input, pspec)
+	for c, fn := range cases {
+		ok, err := asMapHasAnyKey(input, fn)
 		if err != nil {
 			return nil, err
 		}
-		return pspec, nil
-	}
-
-	if _, ok := map1["networkId"]; ok {
-		mspec := &multigeth.MultiGethChainConfig{}
-		err = json.Unmarshal(input, mspec)
-		if err != nil {
-			return nil, err
+		if ok {
+			if err := json.Unmarshal(input, c); err != nil {
+				return nil, err
+			}
+			return c, nil
 		}
-		return mspec, nil
 	}
+	return nil, errors.New("invalid configurator schema")
+}
 
-	gspec := &goethereum.ChainConfig{}
-	err = json.Unmarshal(input,gspec)
-	if err != nil {
-		return nil, err
+func asMapHasAnyKey(input []byte, keys []string) (bool, error) {
+	results := gjson.GetManyBytes(input, keys...)
+	for _, g := range results {
+		if g.Exists() {
+			return true, nil
+		}
 	}
-	return gspec, nil
+	return false, nil
 }

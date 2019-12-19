@@ -54,6 +54,7 @@ require (
 	github.com/steakknife/hamming v0.0.0-20180906055917-c99c65617cd3 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/syndtr/goleveldb v1.0.1-0.20190923125748-758128399b1d
+	github.com/tidwall/gjson v1.3.5
 	github.com/tyler-smith/go-bip39 v0.0.0-20181017060643-dbb3b84ba2ef
 	github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208
 	golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529

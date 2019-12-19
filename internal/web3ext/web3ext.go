@@ -74,7 +74,7 @@ web3._extend({
 			name: 'getSnapshot',
 			call: 'clique_getSnapshot',
 			params: 1,
-			inputFormatter: [null]
+			inputFormatter: [web3._extend.utils.fromDecimal]
 		}),
 		new web3._extend.Method({
 			name: 'getSnapshotAtHash',
@@ -85,7 +85,7 @@ web3._extend({
 			name: 'getSigners',
 			call: 'clique_getSigners',
 			params: 1,
-			inputFormatter: [null]
+			inputFormatter: [web3._extend.utils.fromDecimal]
 		}),
 		new web3._extend.Method({
 			name: 'getSignersAtHash',
@@ -101,6 +101,11 @@ web3._extend({
 			name: 'discard',
 			call: 'clique_discard',
 			params: 1
+		}),
+		new web3._extend.Method({
+			name: 'status',
+			call: 'clique_status',
+			params: 0
 		}),
 	],
 	properties: [
@@ -222,6 +227,11 @@ const DebugJs = `
 web3._extend({
 	property: 'debug',
 	methods: [
+		new web3._extend.Method({
+			name: 'accountRange',
+			call: 'debug_accountRange',
+			params: 2
+		}),
 		new web3._extend.Method({
 			name: 'printBlock',
 			call: 'debug_printBlock',
@@ -830,8 +840,8 @@ web3._extend({
 			params: 1
 		}),
 		new web3._extend.Method({
-			name: 'updateBalance',
-			call: 'les_updateBalance',
+			name: 'addBalance',
+			call: 'les_addBalance',
 			params: 3
 		}),
 	],

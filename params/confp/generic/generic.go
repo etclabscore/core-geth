@@ -69,7 +69,7 @@ func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) 
 		if err != nil {
 			return nil, err
 		}
-		return pspec, nili
+		return pspec, nil
 	}
 
 	if _, ok := map1["networkId"]; ok {

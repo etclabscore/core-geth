@@ -46,12 +46,12 @@ type ParityChainSpec struct {
 				// These inferences require computation.
 				// This makes it so that the 'heavy-lifting' only has to run once.
 				// See ctypes.MapMeetsSpecification for this bespoke logic.
-				eip649inferred    bool       `json:"-"`
+				eip649Inferred    bool       `json:"-"`
 				eip649Transition  *ParityU64 `json:"-"`
-				eip1234inferred   bool       `json:"-"`
+				eip1234Inferred   bool       `json:"-"`
 				eip1234Transition *ParityU64 `json:"-"`
-				eip2384inferred   bool       `json:"-"`
-				eip2384Transition *ParityU64       `json:"-"`
+				eip2384Inferred   bool       `json:"-"`
+				eip2384Transition *ParityU64 `json:"-"`
 
 				HomesteadTransition *ParityU64 `json:"homesteadTransition"`
 				EIP100bTransition   *ParityU64 `json:"eip100bTransition"`

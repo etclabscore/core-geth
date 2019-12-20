@@ -570,14 +570,14 @@ func (spec *ParityChainSpec) SetEthashEIP779Transition(n *uint64) error {
 }
 
 func (spec *ParityChainSpec) GetEthashEIP649Transition() *uint64 {
-	if spec.Engine.Ethash.Params.eip649inferred {
+	if spec.Engine.Ethash.Params.eip649Inferred {
 		return spec.Engine.Ethash.Params.eip649Transition.Uint64P()
 	}
 
 	var diffN *uint64
 	defer func() {
 		spec.Engine.Ethash.Params.eip649Transition = new(ParityU64).SetUint64(diffN)
-		spec.Engine.Ethash.Params.eip649inferred = true
+		spec.Engine.Ethash.Params.eip649Inferred = true
 	}()
 
 	diffN = ctypes.MapMeetsSpecification(
@@ -591,7 +591,7 @@ func (spec *ParityChainSpec) GetEthashEIP649Transition() *uint64 {
 
 func (spec *ParityChainSpec) SetEthashEIP649Transition(n *uint64) error {
 	spec.Engine.Ethash.Params.eip649Transition = new(ParityU64).SetUint64(n)
-	spec.Engine.Ethash.Params.eip649inferred = true
+	spec.Engine.Ethash.Params.eip649Inferred = true
 	if n == nil {
 		return nil
 	}
@@ -609,14 +609,14 @@ func (spec *ParityChainSpec) SetEthashEIP649Transition(n *uint64) error {
 }
 
 func (spec *ParityChainSpec) GetEthashEIP1234Transition() *uint64 {
-	if spec.Engine.Ethash.Params.eip1234inferred {
+	if spec.Engine.Ethash.Params.eip1234Inferred {
 		return spec.Engine.Ethash.Params.eip1234Transition.Uint64P()
 	}
 
 	var diffN *uint64
 	defer func() {
 		spec.Engine.Ethash.Params.eip1234Transition = new(ParityU64).SetUint64(diffN)
-		spec.Engine.Ethash.Params.eip1234inferred = true
+		spec.Engine.Ethash.Params.eip1234Inferred = true
 	}()
 
 	diffN = ctypes.MapMeetsSpecification(
@@ -630,7 +630,7 @@ func (spec *ParityChainSpec) GetEthashEIP1234Transition() *uint64 {
 
 func (spec *ParityChainSpec) SetEthashEIP1234Transition(n *uint64) error {
 	spec.Engine.Ethash.Params.eip1234Transition = new(ParityU64).SetUint64(n)
-	spec.Engine.Ethash.Params.eip1234inferred = true
+	spec.Engine.Ethash.Params.eip1234Inferred = true
 	if n == nil {
 		return nil
 	}
@@ -646,14 +646,14 @@ func (spec *ParityChainSpec) SetEthashEIP1234Transition(n *uint64) error {
 }
 
 func (spec *ParityChainSpec) GetEthashEIP2384Transition() *uint64 {
-	if spec.Engine.Ethash.Params.eip2384inferred {
+	if spec.Engine.Ethash.Params.eip2384Inferred {
 		return spec.Engine.Ethash.Params.eip2384Transition.Uint64P()
 	}
 
 	var diffN *uint64
 	defer func() {
 		spec.Engine.Ethash.Params.eip2384Transition = new(ParityU64).SetUint64(diffN)
-		spec.Engine.Ethash.Params.eip2384inferred = true
+		spec.Engine.Ethash.Params.eip2384Inferred = true
 	}()
 
 	// Get block number (key) from map where EIP2384 criteria is met.
@@ -663,7 +663,7 @@ func (spec *ParityChainSpec) GetEthashEIP2384Transition() *uint64 {
 
 func (spec *ParityChainSpec) SetEthashEIP2384Transition(n *uint64) error {
 	spec.Engine.Ethash.Params.eip2384Transition = new(ParityU64).SetUint64(n)
-	spec.Engine.Ethash.Params.eip2384inferred = true
+	spec.Engine.Ethash.Params.eip2384Inferred = true
 
 	if n == nil {
 		return nil

@@ -128,14 +128,14 @@ const OpenRPCSchema = `
       },
       {
         "name": "net_version",
-        "summary": "Network ID associated with network",
+        "summary": "Network identifier associated with network",
         "description": "Returns the network ID associated with the current network.",
         "params": [],
         "result": {
-          "name": "networkID",
+          "name": "networkId",
           "description": "Network ID associated with the current network",
           "schema": {
-            "title": "networkID",
+            "title": "networkId",
             "type": "string",
             "pattern": "^[\\d]+$"
           }
@@ -242,15 +242,7 @@ const OpenRPCSchema = `
         "result": {
           "name": "getBalanceResult",
           "schema": {
-            "title": "getBalanceResult",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/Integer"
-              },
-              {
-                "$ref": "#/components/schemas/Null"
-              }
-            ]
+            "$ref": "#/components/schemas/IntegerOrNull"
           }
         }
       },
@@ -278,21 +270,13 @@ const OpenRPCSchema = `
         "result": {
           "name": "getBlockByHashResult",
           "schema": {
-            "title": "getBlockByHashResult",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/Block"
-              },
-              {
-                "$ref": "#/components/schemas/Null"
-              }
-            ]
+            "$ref": "#/components/schemas/BlockOrNull"
           }
         }
       },
       {
         "name": "eth_getBlockByNumber",
-        "summary": "Gets a block for a given number salad",
+        "summary": "Gets a block for a given number",
         "params": [
           {
             "$ref": "#/components/contentDescriptors/BlockNumber"
@@ -310,15 +294,7 @@ const OpenRPCSchema = `
         "result": {
           "name": "getBlockByNumberResult",
           "schema": {
-            "title": "getBlockByNumberResult",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/Block"
-              },
-              {
-                "$ref": "#/components/schemas/Null"
-              }
-            ]
+            "$ref": "#/components/schemas/BlockOrNull"
           }
         }
       },
@@ -334,15 +310,7 @@ const OpenRPCSchema = `
           "name": "blockTransactionCountByHash",
           "description": "The Number of total transactions in the given block",
           "schema": {
-            "title": "blockTransactionCountByHash",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/Integer"
-              },
-              {
-                "$ref": "#/components/schemas/Null"
-              }
-            ]
+            "$ref": "#/components/schemas/IntegerOrNull"
           }
         }
       },
@@ -358,15 +326,7 @@ const OpenRPCSchema = `
           "name": "blockTransactionCountByHash",
           "description": "The Number of total transactions in the given block",
           "schema": {
-            "title": "blockTransactionCountByHash",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/Integer"
-              },
-              {
-                "$ref": "#/components/schemas/Null"
-              }
-            ]
+            "$ref": "#/components/schemas/IntegerOrNull"
           }
         }
       },
@@ -673,15 +633,7 @@ const OpenRPCSchema = `
         "result": {
           "name": "uncle",
           "schema": {
-            "title": "uncleOrNull",
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/Uncle"
-              },
-              {
-                "$ref": "#/components/schemas/Null"
-              }
-            ]
+            "$ref": "#/components/schemas/UncleOrNull"
           }
         }
       },
@@ -710,14 +662,7 @@ const OpenRPCSchema = `
           "name": "uncleResult",
           "description": "returns an uncle or null",
           "schema": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/Uncle"
-              },
-              {
-                "$ref": "#/components/schemas/Null"
-              }
-            ]
+            "$ref": "#/components/schemas/UncleOrNull"
           }
         },
         "examples": [
@@ -750,17 +695,9 @@ const OpenRPCSchema = `
         ],
         "result": {
           "name": "uncleCountResult",
+          "description": "The Number of total uncles in the given block",
           "schema": {
-            "title": "uncleCountOrNull",
-            "oneOf": [
-              {
-                "description": "The Number of total uncles in the given block",
-                "$ref": "#/components/schemas/Integer"
-              },
-              {
-                "$ref": "#/components/schemas/Null"
-              }
-            ]
+            "$ref": "#/components/schemas/IntegerOrNull"
           }
         }
       },
@@ -773,19 +710,7 @@ const OpenRPCSchema = `
           }
         ],
         "result": {
-          "name": "uncleCountResult",
-          "schema": {
-            "title": "uncleCountOrNull",
-            "oneOf": [
-              {
-                "description": "The Number of total uncles in the given block",
-                "$ref": "#/components/schemas/Integer"
-              },
-              {
-                "$ref": "#/components/schemas/Null"
-              }
-            ]
-          }
+          "$ref": "#/components/contentDescriptors/UncleCountResult"
         }
       },
       {
@@ -805,10 +730,9 @@ const OpenRPCSchema = `
             "required": true,
             "schema": {
               "title": "storageKeys",
-              "description": "The storage keys of all the storage slots being requested",
+              "description": "A storage key is indexed from the solidity compiler by the order it is declared. For mappings it uses the keccak of the mapping key with its position (and recursively for X-dimensional mappings)",
               "items": {
-                "description": "A storage key is indexed from the solidity compiler by the order it is declared. For mappings it uses the keccak of the mapping key with its position (and recursively for X-dimensional mappings)",
-                "$ref": "#/components/schemas/Integer"
+                "$ref": "#/components/schemas/StorageProofKey"
               }
             }
           },
@@ -827,6 +751,7 @@ const OpenRPCSchema = `
                 "description": "The merkle proofs of the specified account connecting them to the blockhash of the block specified",
                 "properties": {
                   "address": {
+                    "title": "proofAccountAddress",
                     "description": "The address of the account or contract of the request",
                     "$ref": "#/components/schemas/Address"
                   },
@@ -834,18 +759,22 @@ const OpenRPCSchema = `
                     "$ref": "#/components/schemas/AccountProof"
                   },
                   "balance": {
+                    "title": "proofAccountBalance",
                     "description": "The Ether balance of the account or contract of the request",
                     "$ref": "#/components/schemas/Integer"
                   },
                   "codeHash": {
+                    "title": "proofAccountCodeHash",
                     "description": "The code hash of the contract of the request (keccak(NULL) if external account)",
                     "$ref": "#/components/schemas/Keccak"
                   },
                   "nonce": {
+                    "title": "proofAccountNonce",
                     "description": "The transaction count of the account or contract of the request",
                     "$ref": "#/components/schemas/Nonce"
                   },
                   "storageHash": {
+                    "title": "proofAccountStorageHash",
                     "description": "The storage hash of the contract of the request (keccak(rlp(NULL)) if external account)",
                     "$ref": "#/components/schemas/Keccak"
                   },
@@ -868,6 +797,7 @@ const OpenRPCSchema = `
         "result": {
           "name": "work",
           "schema": {
+            "title": "getWorkResults",
             "type": "array",
             "items": [
               {
@@ -889,8 +819,8 @@ const OpenRPCSchema = `
         "params": [],
         "result": {
           "name": "hashesPerSecond",
+          "description": "Integer of the number of hashes per second",
           "schema": {
-            "description": "Integer of the number of hashes per second",
             "$ref": "#/components/schemas/Integer"
           }
         }
@@ -901,8 +831,8 @@ const OpenRPCSchema = `
         "params": [],
         "result": {
           "name": "mining",
+          "description": "Whether or not the client is mining",
           "schema": {
-            "description": "Whether of not the client is mining",
             "type": "boolean"
           }
         }
@@ -925,8 +855,8 @@ const OpenRPCSchema = `
         ],
         "result": {
           "name": "filterId",
+          "description": "The filter ID for use in ` + "`" + `eth_getFilterChanges` + "`" + `",
           "schema": {
-            "description": "The filter ID for use in ` + "`" + `eth_getFilterChanges` + "`" + `",
             "$ref": "#/components/schemas/Integer"
           }
         }
@@ -946,10 +876,7 @@ const OpenRPCSchema = `
         "result": {
           "name": "pendingTransactions",
           "schema": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Transaction"
-            }
+            "$ref": "#/components/schemas/Transactions"
           }
         }
       },
@@ -959,8 +886,8 @@ const OpenRPCSchema = `
         "params": [],
         "result": {
           "name": "protocolVersion",
+          "description": "The current ethereum protocol version",
           "schema": {
-            "description": "The current ethereum protocol version",
             "$ref": "#/components/schemas/Integer"
           }
         }
@@ -980,15 +907,16 @@ const OpenRPCSchema = `
         ],
         "result": {
           "name": "transactionHash",
+          "description": "The transaction hash, or the zero hash if the transaction is not yet available.",
           "schema": {
-            "description": "The transaction hash, or the zero hash if the transaction is not yet available.",
             "$ref": "#/components/schemas/Keccak"
           }
         }
       },
       {
         "name": "eth_submitHashrate",
-        "summary": "Returns an array of all logs matching a given filter object.",
+        "deprecated": true,
+        "summary": "Used for submitting mining hashrate.",
         "params": [
           {
             "name": "hashRate",
@@ -1008,9 +936,9 @@ const OpenRPCSchema = `
         ],
         "result": {
           "name": "submitHashRateSuccess",
+          "description": "whether of not submitting went through successfully",
           "schema": {
-            "type": "boolean",
-            "description": "whether of not submitting went through successfully"
+            "type": "boolean"
           }
         }
       },
@@ -1040,8 +968,7 @@ const OpenRPCSchema = `
           "name": "solutionValid",
           "description": "returns true if the provided solution is valid, otherwise false.",
           "schema": {
-            "type": "boolean",
-            "description": "Whether or not the provided solution is valid"
+            "type": "boolean"
           }
         },
         "examples": [
@@ -1079,36 +1006,42 @@ const OpenRPCSchema = `
         "result": {
           "name": "syncing",
           "schema": {
+            "title": "isSyncingResult",
             "oneOf": [
               {
+                "title": "syncingData",
                 "description": "An object with sync status data",
                 "type": "object",
                 "properties": {
                   "startingBlock": {
+                    "title": "syncingDataStartingBlock",
                     "description": "Block at which the import started (will only be reset, after the sync reached his head)",
                     "$ref": "#/components/schemas/Integer"
                   },
                   "currentBlock": {
+                    "title": "syncingDataCurrentBlock",
                     "description": "The current block, same as eth_blockNumber",
                     "$ref": "#/components/schemas/Integer"
                   },
                   "highestBlock": {
+                    "title": "syncingDataHighestBlock",
                     "description": "The estimated highest block",
                     "$ref": "#/components/schemas/Integer"
                   },
                   "knownStates": {
+                    "title": "syncingDataKnownStates",
                     "description": "The known states",
                     "$ref": "#/components/schemas/Integer"
                   },
                   "pulledStates": {
+                    "title": "syncingDataPulledStates",
                     "description": "The pulled states",
                     "$ref": "#/components/schemas/Integer"
                   }
                 }
               },
               {
-                "type": "boolean",
-                "description": "The value ` + "`" + `false` + "`" + ` indicating that syncing is complete"
+                "type": "boolean"
               }
             ]
           }
@@ -1128,9 +1061,9 @@ const OpenRPCSchema = `
         ],
         "result": {
           "name": "filterUninstalledSuccess",
+          "description": "returns true if the filter was successfully uninstalled, false otherwise.",
           "schema": {
-            "type": "boolean",
-            "description": "Whether of not the filter was successfully uninstalled"
+            "type": "boolean"
           }
         }
       }
@@ -1138,6 +1071,7 @@ const OpenRPCSchema = `
     "components": {
       "schemas": {
         "ProofNode": {
+          "title": "proofNode",
           "type": "string",
           "description": "An individual node used to prove a path down a merkle-patricia-tree",
           "$ref": "#/components/schemas/Bytes"
@@ -1145,18 +1079,25 @@ const OpenRPCSchema = `
         "AccountProof": {
           "$ref": "#/components/schemas/ProofNodes"
         },
+        "StorageProofKey": {
+          "title": "storageProofKey",
+          "description": "The key used to get the storage slot in its account tree.",
+          "$ref": "#/components/schemas/Integer"
+        },
         "StorageProof": {
+          "title": "storageProofSet",
           "type": "array",
           "description": "Current block header PoW hash.",
           "items": {
+            "title": "storageProof",
             "type": "object",
             "description": "Object proving a relationship of a storage value to an account's storageHash.",
             "properties": {
               "key": {
-                "description": "The key used to get the storage slot in its account tree",
-                "$ref": "#/components/schemas/Integer"
+                "$ref": "#/components/schemas/StorageProofKey"
               },
               "value": {
+                "title": "storageProofValue",
                 "description": "The value of the storage slot in its account tree",
                 "$ref": "#/components/schemas/Integer"
               },
@@ -1167,6 +1108,7 @@ const OpenRPCSchema = `
           }
         },
         "ProofNodes": {
+          "title": "proofNodes",
           "type": "array",
           "description": "The set of node values needed to traverse a patricia merkle tree (from root to leaf) to retrieve a value",
           "items": {
@@ -1174,36 +1116,44 @@ const OpenRPCSchema = `
           }
         },
         "PowHash": {
+          "title": "powHash",
           "description": "Current block header PoW hash.",
           "$ref": "#/components/schemas/DataWord"
         },
         "SeedHash": {
+          "title": "seedHash",
           "description": "The seed hash used for the DAG.",
           "$ref": "#/components/schemas/DataWord"
         },
         "MixHash": {
+          "title": "mixHash",
           "description": "The mix digest.",
           "$ref": "#/components/schemas/DataWord"
         },
         "Difficulty": {
+          "title": "difficulty",
           "description": "The boundary condition ('target'), 2^256 / difficulty.",
           "$ref": "#/components/schemas/DataWord"
         },
         "FilterId": {
+          "title": "filterId",
           "type": "string",
           "description": "An identifier used to reference the filter."
         },
         "BlockHash": {
+          "title": "blockHash",
           "type": "string",
           "pattern": "^0x[a-fA-F\\d]{64}$",
           "description": "The hex representation of the Keccak 256 of the RLP encoded block"
         },
         "BlockNumber": {
+          "title": "blockNumber",
           "type": "string",
-          "pattern": "^0x[a-fA-F\\d]+$",
-          "description": "The hex representation of the block's height"
+          "description": "The hex representation of the block's height",
+          "$ref": "#/components/schemas/Integer"
         },
         "BlockNumberTag": {
+          "title": "blockNumberTag",
           "type": "string",
           "description": "The optional block height description",
           "enum": [
@@ -1212,7 +1162,52 @@ const OpenRPCSchema = `
             "pending"
           ]
         },
+        "BlockOrNull": {
+          "title": "blockOrNull",
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/Block"
+            },
+            {
+              "$ref": "#/components/schemas/Null"
+            }
+          ]
+        },
+        "IntegerOrNull": {
+          "title": "integerOrNull",
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/Integer"
+            },
+            {
+              "$ref": "#/components/schemas/Null"
+            }
+          ]
+        },
+        "UncleOrNull": {
+          "title": "uncleOrNull",
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/Uncle"
+            },
+            {
+              "$ref": "#/components/schemas/Null"
+            }
+          ]
+        },
+        "AddressOrNull": {
+          "title": "addressOrNull",
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/Address"
+            },
+            {
+              "$ref": "#/components/schemas/Null"
+            }
+          ]
+        },
         "Receipt": {
+          "title": "receipt",
           "type": "object",
           "description": "The receipt of a transaction",
           "required": [
@@ -1230,30 +1225,31 @@ const OpenRPCSchema = `
           ],
           "properties": {
             "blockHash": {
-              "description": "BlockHash of the block in which the transaction was mined",
               "$ref": "#/components/schemas/BlockHash"
             },
             "blockNumber": {
-              "description": "BlockNumber of the block in which the transaction was mined",
               "$ref": "#/components/schemas/BlockNumber"
             },
             "contractAddress": {
+              "title": "ReceiptContractAddress",
               "description": "The contract address created, if the transaction was a contract creation, otherwise null",
-              "$ref": "#/components/schemas/Address"
+              "$ref": "#/components/schemas/AddressOrNull"
             },
             "cumulativeGasUsed": {
+              "title": "ReceiptCumulativeGasUsed",
               "description": "The gas units used by the transaction",
               "$ref": "#/components/schemas/Integer"
             },
             "from": {
-              "description": "The sender of the transaction",
-              "$ref": "#/components/schemas/Address"
+              "$ref": "#/components/schemas/From"
             },
             "gasUsed": {
+              "title": "ReceiptGasUsed",
               "description": "The total gas used by the transaction",
               "$ref": "#/components/schemas/Integer"
             },
             "logs": {
+              "title": "logs",
               "type": "array",
               "description": "An array of all the logs triggered during the transaction",
               "items": {
@@ -1264,274 +1260,268 @@ const OpenRPCSchema = `
               "$ref": "#/components/schemas/BloomFilter"
             },
             "to": {
-              "description": "Destination address of the transaction",
-              "$ref": "#/components/schemas/Address"
+              "$ref": "#/components/schemas/To"
             },
             "transactionHash": {
-              "description": "Keccak 256 of the transaction",
-              "$ref": "#/components/schemas/Keccak"
+              "$ref": "#/components/schemas/TransactionHash"
             },
             "transactionIndex": {
-              "description": "An array of all the logs triggered during the transaction",
-              "$ref": "#/components/schemas/BloomFilter"
+              "$ref": "#/components/schemas/TransactionIndex"
             },
             "postTransactionState": {
+              "title": "ReceiptPostTransactionState",
               "description": "The intermediate stateRoot directly after transaction execution.",
               "$ref": "#/components/schemas/Keccak"
             },
             "status": {
+              "title": "ReceiptStatus",
               "description": "Whether or not the transaction threw an error.",
               "type": "boolean"
             }
           }
         },
         "BloomFilter": {
+          "title": "bloomFilter",
           "type": "string",
           "description": "A 2048 bit bloom filter from the logs of the transaction. Each log sets 3 bits though taking the low-order 11 bits of each of the first three pairs of bytes in a Keccak 256 hash of the log's byte series"
         },
         "Log": {
+          "title": "log",
           "type": "object",
           "description": "An indexed event generated during a transaction",
           "properties": {
             "address": {
+              "title": "LogAddress",
               "description": "Sender of the transaction",
               "$ref": "#/components/schemas/Address"
             },
             "blockHash": {
-              "description": "BlockHash of the block in which the transaction was mined",
               "$ref": "#/components/schemas/BlockHash"
             },
             "blockNumber": {
-              "description": "BlockNumber of the block in which the transaction was mined",
               "$ref": "#/components/schemas/BlockNumber"
             },
             "data": {
+              "title": "LogData",
               "description": "The data/input string sent along with the transaction",
               "$ref": "#/components/schemas/Bytes"
             },
             "logIndex": {
+              "title": "LogIndex",
               "description": "The index of the event within its transaction, null when its pending",
               "$ref": "#/components/schemas/Integer"
             },
             "removed": {
-              "schema": {
-                "description": "Whether or not the log was orphaned off the main chain",
-                "type": "boolean"
-              }
+              "title": "logIsRemoved",
+              "description": "Whether or not the log was orphaned off the main chain",
+              "type": "boolean"
             },
             "topics": {
-              "type": "array",
-              "items": {
-                "topic": {
-                  "description": "32 Bytes DATA of indexed log arguments. (In solidity: The first topic is the hash of the signature of the event (e.g. Deposit(address,bytes32,uint256))",
-                  "$ref": "#/components/schemas/DataWord"
-                }
-              }
+              "$ref": "#/components/schemas/Topics"
             },
             "transactionHash": {
-              "description": "The hash of the transaction in which the log occurred",
-              "$ref": "#/components/schemas/Keccak"
+              "$ref": "#/components/schemas/TransactionHash"
             },
             "transactionIndex": {
-              "description": "The index of the transaction in which the log occurred",
-              "$ref": "#/components/schemas/Integer"
+              "$ref": "#/components/schemas/TransactionIndex"
+            }
+          }
+        },
+        "Topics": {
+          "title": "LogTopics",
+          "description": "Topics are order-dependent. Each topic can also be an array of DATA with 'or' options.",
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Topic"
+          }
+        },
+        "Topic": {
+          "title": "topic",
+          "description": "32 Bytes DATA of indexed log arguments. (In solidity: The first topic is the hash of the signature of the event (e.g. Deposit(address,bytes32,uint256))",
+          "$ref": "#/components/schemas/DataWord"
+        },
+        "TransactionIndex": {
+          "title": "transactionIndex",
+          "description": "The index of the transaction. null when its pending",
+          "$ref": "#/components/schemas/IntegerOrNull"
+        },
+        "BlockNumberOrNull": {
+          "title": "blockNumberOrNull",
+          "description": "The block number or null when its the pending block",
+          "oneOf": [
+            { "$ref": "#/components/schemas/BlockNumber" },
+            { "$ref": "#/components/schemas/Null" }
+          ]
+        },
+        "BlockHashOrNull": {
+          "title": "blockNumberOrNull",
+          "description": "The block hash or null when its the pending block",
+          "$ref": "#/components/schemas/KeccakOrPending"
+        },
+        "NonceOrNull": {
+          "title": "nonceOrNull",
+          "description": "Randomly selected number to satisfy the proof-of-work or null when its the pending block",
+          "oneOf": [
+            { "$ref": "#/components/schemas/Nonce" },
+            { "$ref": "#/components/schemas/Null" }
+          ]
+        },
+        "From": {
+          "title": "From",
+          "description": "The sender of the transaction",
+          "$ref": "#/components/schemas/Address"
+        },
+        "To": {
+          "title": "To",
+          "description": "Destination address of the transaction. Null if it was a contract create.",
+          "oneOf": [
+            { "$ref": "#/components/schemas/Address" },
+            { "$ref": "#/components/schemas/Null" }
+          ]
+        },
+        "LightBlock": {
+          "title": "lightBlock",
+          "type": "object",
+          "properties": {
+            "number": {
+              "$ref": "#/components/schemas/BlockNumberOrNull"
+            },
+            "hash": {
+              "$ref": "#/components/schemas/BlockHashOrNull"
+            },
+            "parentHash": {
+              "$ref": "#/components/schemas/BlockHash"
+            },
+            "nonce": {
+              "$ref": "#/components/schemas/NonceOrNull"
+            },
+            "sha3Uncles": {
+              "title": "blockShaUncles",
+              "description": "Keccak hash of the uncles data in the block",
+              "$ref": "#/components/schemas/Keccak"
+            },
+            "logsBloom": {
+              "title": "blockLogsBloom",
+              "type": "string",
+              "description": "The bloom filter for the logs of the block or null when its the pending block",
+              "pattern": "^0x[a-fA-F\\d]+$"
+            },
+            "transactionsRoot": {
+              "title": "blockTransactionsRoot",
+              "description": "The root of the transactions trie of the block.",
+              "$ref": "#/components/schemas/Keccak"
+            },
+            "stateRoot": {
+              "title": "blockStateRoot",
+              "description": "The root of the final state trie of the block",
+              "$ref": "#/components/schemas/Keccak"
+            },
+            "receiptsRoot": {
+              "title": "blockReceiptsRoot",
+              "description": "The root of the receipts trie of the block",
+              "$ref": "#/components/schemas/Keccak"
+            },
+            "miner": {
+              "$ref": "#/components/schemas/AddressOrNull"
+            },
+            "difficulty": {
+              "title": "blockDifficulty",
+              "type": "string",
+              "description": "Integer of the difficulty for this block"
+            },
+            "totalDifficulty": {
+              "title": "blockTotalDifficulty",
+              "description": "Integer of the total difficulty of the chain until this block",
+              "$ref": "#/components/schemas/IntegerOrNull"
+            },
+            "extraData": {
+              "title": "blockExtraData",
+              "type": "string",
+              "description": "The 'extra data' field of this block"
+            },
+            "size": {
+              "title": "blockSize",
+              "type": "string",
+              "description": "Integer the size of this block in bytes"
+            },
+            "gasLimit": {
+              "title": "blockGasLimit",
+              "type": "string",
+              "description": "The maximum gas allowed in this block"
+            },
+            "gasUsed": {
+              "title": "blockGasUsed",
+              "type": "string",
+              "description": "The total used gas by all transactions in this block"
+            },
+            "timestamp": {
+              "title": "blockTimeStamp",
+              "type": "string",
+              "description": "The unix timestamp for when the block was collated"
             }
           }
         },
         "Uncle": {
+          "title": "uncle",
           "type": "object",
           "description": "Orphaned blocks that can be included in the chain but at a lower block reward. NOTE: An uncle doesn’t contain individual transactions.",
-          "properties": {
-            "number": {
-              "description": "The block number or null when its the pending block",
-              "$ref": "#/components/schemas/IntOrPending"
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/LightBlock"
             },
-            "hash": {
-              "description": "The block hash or null when its the pending block",
-              "$ref": "#/components/schemas/KeccakOrPending"
-            },
-            "parentHash": {
-              "description": "Hash of the parent block",
-              "$ref": "#/components/schemas/Keccak"
-            },
-            "nonce": {
-              "description": "Randomly selected number to satisfy the proof-of-work or null when its the pending block",
-              "$ref": "#/components/schemas/IntOrPending"
-            },
-            "sha3Uncles": {
-              "description": "Keccak hash of the uncles data in the block",
-              "$ref": "#/components/schemas/Keccak"
-            },
-            "logsBloom": {
-              "type": "string",
-              "description": "The bloom filter for the logs of the block or null when its the pending block",
-              "pattern": "^0x[a-fA-F\\d]+$"
-            },
-            "transactionsRoot": {
-              "description": "The root of the transactions trie of the block.",
-              "$ref": "#/components/schemas/Keccak"
-            },
-            "stateRoot": {
-              "description": "The root of the final state trie of the block",
-              "$ref": "#/components/schemas/Keccak"
-            },
-            "receiptsRoot": {
-              "description": "The root of the receipts trie of the block",
-              "$ref": "#/components/schemas/Keccak"
-            },
-            "miner": {
-              "description": "The address of the beneficiary to whom the mining rewards were given or null when its the pending block",
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/Address"
-                },
-                {
-                  "$ref": "#/components/schemas/Null"
+            {
+              "title": "uncleData",
+              "type": "object",
+              "properties": {
+                "uncles": {
+                  "title": "uncleHashes",
+                  "description": "Array of uncle hashes",
+                  "type": "array",
+                  "items": {
+                    "title": "uncleHash",
+                    "description": "Block hash of the RLP encoding of an uncle block",
+                    "$ref": "#/components/schemas/Keccak"
+                  }
                 }
-              ]
-            },
-            "difficulty": {
-              "type": "string",
-              "description": "Integer of the difficulty for this block"
-            },
-            "totalDifficulty": {
-              "description": "Integer of the total difficulty of the chain until this block",
-              "$ref": "#/components/schemas/IntOrPending"
-            },
-            "extraData": {
-              "type": "string",
-              "description": "The 'extra data' field of this block"
-            },
-            "size": {
-              "type": "string",
-              "description": "Integer the size of this block in bytes"
-            },
-            "gasLimit": {
-              "type": "string",
-              "description": "The maximum gas allowed in this block"
-            },
-            "gasUsed": {
-              "type": "string",
-              "description": "The total used gas by all transactions in this block"
-            },
-            "timestamp": {
-              "type": "string",
-              "description": "The unix timestamp for when the block was collated"
-            },
-            "uncles": {
-              "description": "Array of uncle hashes",
-              "type": "array",
-              "items": {
-                "description": "Block hash of the RLP encoding of an uncle block",
-                "$ref": "#/components/schemas/Keccak"
               }
             }
-          }
+          ]
         },
         "Block": {
+          "title": "block",
           "type": "object",
-          "properties": {
-            "number": {
-              "description": "The block number or null when its the pending block",
-              "$ref": "#/components/schemas/IntOrPending"
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/LightBlock"
             },
-            "hash": {
-              "description": "The block hash or null when its the pending block",
-              "$ref": "#/components/schemas/KeccakOrPending"
+            {
+              "$ref": "#/components/schemas/Uncle"
             },
-            "parentHash": {
-              "description": "Hash of the parent block",
-              "$ref": "#/components/schemas/Keccak"
-            },
-            "nonce": {
-              "description": "Randomly selected number to satisfy the proof-of-work or null when its the pending block",
-              "$ref": "#/components/schemas/IntOrPending"
-            },
-            "sha3Uncles": {
-              "description": "Keccak hash of the uncles data in the block",
-              "$ref": "#/components/schemas/Keccak"
-            },
-            "logsBloom": {
-              "type": "string",
-              "description": "The bloom filter for the logs of the block or null when its the pending block",
-              "pattern": "^0x[a-fA-F\\d]+$"
-            },
-            "transactionsRoot": {
-              "description": "The root of the transactions trie of the block.",
-              "$ref": "#/components/schemas/Keccak"
-            },
-            "stateRoot": {
-              "description": "The root of the final state trie of the block",
-              "$ref": "#/components/schemas/Keccak"
-            },
-            "receiptsRoot": {
-              "description": "The root of the receipts trie of the block",
-              "$ref": "#/components/schemas/Keccak"
-            },
-            "miner": {
-              "description": "The address of the beneficiary to whom the mining rewards were given or null when its the pending block",
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/Address"
-                },
-                {
-                  "$ref": "#/components/schemas/Null"
-                }
-              ]
-            },
-            "difficulty": {
-              "type": "string",
-              "description": "Integer of the difficulty for this block"
-            },
-            "totalDifficulty": {
-              "description": "Integer of the total difficulty of the chain until this block",
-              "$ref": "#/components/schemas/IntOrPending"
-            },
-            "extraData": {
-              "type": "string",
-              "description": "The 'extra data' field of this block"
-            },
-            "size": {
-              "type": "string",
-              "description": "Integer the size of this block in bytes"
-            },
-            "gasLimit": {
-              "type": "string",
-              "description": "The maximum gas allowed in this block"
-            },
-            "gasUsed": {
-              "type": "string",
-              "description": "The total used gas by all transactions in this block"
-            },
-            "timestamp": {
-              "type": "string",
-              "description": "The unix timestamp for when the block was collated"
-            },
-            "transactions": {
-              "description": "Array of transaction objects, or 32 Bytes transaction hashes depending on the last given parameter",
-              "type": "array",
-              "items": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Transaction"
-                  },
-                  {
-                    "$ref": "#/components/schemas/TransactionHash"
+            {
+              "title": "blockData",
+              "type": "object",
+              "properties": {
+                "transactions": {
+                  "title": "transactionsOrHashes",
+                  "description": "Array of transaction objects, or 32 Bytes transaction hashes depending on the last given parameter",
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/Transaction"
+                      },
+                      {
+                        "$ref": "#/components/schemas/TransactionHash"
+                      }
+                    ]
                   }
-                ]
-              }
-            },
-            "uncles": {
-              "description": "Array of uncle hashes",
-              "type": "array",
-              "items": {
-                "description": "Block hash of the RLP encoding of an uncle block",
-                "$ref": "#/components/schemas/Keccak"
+                }
               }
             }
-          }
+          ]
         },
         "Transaction": {
+          "title": "transaction",
           "type": "object",
           "required": [
             "gas",
@@ -1540,22 +1530,21 @@ const OpenRPCSchema = `
           ],
           "properties": {
             "blockHash": {
-              "description": "Hash of the block where this transaction was in. null when its pending",
-              "$ref": "#/components/schemas/KeccakOrPending"
+              "$ref": "#/components/schemas/BlockHashOrNull"
             },
             "blockNumber": {
-              "description": "Block number where this transaction was in. null when its pending",
-              "$ref": "#/components/schemas/IntOrPending"
+              "$ref": "#/components/schemas/BlockNumberOrNull"
             },
             "from": {
-              "description": "Address of the sender",
-              "$ref": "#/components/schemas/Address"
+              "$ref": "#/components/schemas/From"
             },
             "gas": {
+              "title": "transactionGas",
               "type": "string",
               "description": "The gas limit provided by the sender in Wei"
             },
             "gasPrice": {
+              "title": "transactionGasPrice",
               "type": "string",
               "description": "The gas price willing to be paid by the sender in Wei"
             },
@@ -1563,58 +1552,62 @@ const OpenRPCSchema = `
               "$ref": "#/components/schemas/TransactionHash"
             },
             "input": {
+              "title": "transactionInput",
               "type": "string",
               "description": "The data field sent with the transaction"
             },
             "nonce": {
+              "title": "transactionNonce",
               "description": "The total number of prior transactions made by the sender",
               "$ref": "#/components/schemas/Nonce"
             },
             "to": {
-              "description": "address of the receiver. null when its a contract creation transaction",
-              "$ref": "#/components/schemas/Address"
+              "$ref": "#/components/schemas/To"
             },
             "transactionIndex": {
-              "description": "Integer of the transaction's index position in the block. null when its pending",
-              "$ref": "#/components/schemas/IntOrPending"
+              "$ref": "#/components/schemas/TransactionIndex"
             },
             "value": {
+              "title": "transactionValue",
               "description": "Value of Ether being transferred in Wei",
               "$ref": "#/components/schemas/Keccak"
             },
             "v": {
+              "title": "transactionSigV",
               "type": "string",
               "description": "ECDSA recovery id"
             },
             "r": {
+              "title": "transactionSigR",
               "type": "string",
               "description": "ECDSA signature r"
             },
             "s": {
+              "title": "transactionSigS",
               "type": "string",
               "description": "ECDSA signature s"
             }
           }
         },
+        "Transactions": {
+          "title": "transactions",
+          "description": "An array of transactions",
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Transaction"
+          }
+        },
         "TransactionHash": {
+          "title": "transactionHash",
           "type": "string",
           "description": "Keccak 256 Hash of the RLP encoding of a transaction",
           "$ref": "#/components/schemas/Keccak"
         },
         "KeccakOrPending": {
+          "title": "keccakOrPending",
           "oneOf": [
             {
               "$ref": "#/components/schemas/Keccak"
-            },
-            {
-              "$ref": "#/components/schemas/Null"
-            }
-          ]
-        },
-        "IntOrPending": {
-          "oneOf": [
-            {
-              "$ref": "#/components/schemas/Integer"
             },
             {
               "$ref": "#/components/schemas/Null"
@@ -1622,39 +1615,54 @@ const OpenRPCSchema = `
           ]
         },
         "Keccak": {
+          "title": "keccak",
           "type": "string",
           "description": "Hex representation of a Keccak 256 hash",
           "pattern": "^0x[a-fA-F\\d]{64}$"
         },
         "Nonce": {
+          "title": "nonce",
           "description": "A number only to be used once",
-          "pattern": "^0x[a-fA-F0-9]+$",
-          "type": "string"
+          "$ref": "#/components/schemas/Integer"
         },
         "Null": {
+          "title": "null",
           "type": "null",
           "description": "Null"
         },
         "Integer": {
+          "title": "integer",
           "type": "string",
           "pattern": "^0x[a-fA-F0-9]+$",
           "description": "Hex representation of the integer"
         },
         "Address": {
+          "title": "address",
           "type": "string",
           "pattern": "^0x[a-fA-F\\d]{40}$"
         },
+        "Addresses": {
+          "title": "addresses",
+          "type": "array",
+          "description": "List of contract addresses from which to monitor events",
+          "items": {
+            "$ref": "#/components/schemas/Address"
+          }
+        },
         "Position": {
+          "title": "position",
           "type": "string",
           "description": "Hex representation of the storage slot where the variable exists",
           "pattern": "^0x([a-fA-F0-9]?)+$"
         },
         "DataWord": {
+          "title": "dataWord",
           "type": "string",
           "description": "Hex representation of a 256 bit unit of data",
           "pattern": "^0x([a-fA-F\\d]{64})?$"
         },
         "Bytes": {
+          "title": "bytes",
           "type": "string",
           "description": "Hex representation of a variable length byte array",
           "pattern": "^0x([a-fA-F0-9]?)+$"
@@ -1674,8 +1682,7 @@ const OpenRPCSchema = `
           "description": "JSON Null value",
           "summary": "Null value",
           "schema": {
-            "type": "null",
-            "description": "Null value"
+            "$ref": "#/components/schemas/Null"
           }
         },
         "Signature": {
@@ -1683,7 +1690,9 @@ const OpenRPCSchema = `
           "summary": "The signature.",
           "required": true,
           "schema": {
-            "$ref": "#/components/schemas/Bytes",
+            "title": "signatureBytes",
+            "type": "string",
+            "description": "Hex representation of byte array between 2 and 65 chars long",
             "pattern": "0x^([A-Fa-f0-9]{2}){65}$"
           }
         },
@@ -1716,6 +1725,13 @@ const OpenRPCSchema = `
             ]
           }
         },
+        "UncleCountResult": {
+          "name": "uncleCountResult",
+          "description": "The Number of total uncles in the given block",
+          "schema": {
+            "$ref": "#/components/schemas/IntegerOrNull"
+          }
+        },
         "Message": {
           "name": "message",
           "required": true,
@@ -1727,40 +1743,29 @@ const OpenRPCSchema = `
           "name": "filter",
           "required": true,
           "schema": {
+            "title": "filter",
             "type": "object",
             "description": "A filter used to monitor the blockchain for log/events",
             "properties": {
               "fromBlock": {
-                "description": "Block from which to begin filtering events",
                 "$ref": "#/components/schemas/BlockNumber"
               },
               "toBlock": {
-                "description": "Block from which to end filtering events",
                 "$ref": "#/components/schemas/BlockNumber"
               },
               "address": {
+                "title": "oneOrArrayOfAddresses",
                 "oneOf": [
                   {
-                    "type": "string",
-                    "description": "Address of the contract from which to monitor events",
                     "$ref": "#/components/schemas/Address"
                   },
                   {
-                    "type": "array",
-                    "description": "List of contract addresses from which to monitor events",
-                    "items": {
-                      "$ref": "#/components/schemas/Address"
-                    }
+                    "$ref": "#/components/schemas/Addresses"
                   }
                 ]
               },
               "topics": {
-                "type": "array",
-                "description": "Array of 32 Bytes DATA topics. Topics are order-dependent. Each topic can also be an array of DATA with 'or' options",
-                "items": {
-                  "description": "Indexable 32 bytes piece of data (made from the event's function signature in solidity)",
-                  "$ref": "#/components/schemas/DataWord"
-                }
+                "$ref": "#/components/schemas/Topics"
               }
             }
           }
@@ -1806,8 +1811,7 @@ const OpenRPCSchema = `
         "FilterId": {
           "name": "filterId",
           "schema": {
-            "description": "The filter ID for use in ` + "`" + `eth_getFilterChanges` + "`" + `",
-            "$ref": "#/components/schemas/Integer"
+            "$ref": "#/components/schemas/FilterId"
           }
         },
         "BlockNumber": {

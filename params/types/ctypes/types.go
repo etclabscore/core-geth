@@ -212,23 +212,8 @@ func (b Uint64BigMapEncodesHex) SetValueTotalForHeight(n *uint64, val *big.Int) 
 	}()
 
 	hDiff := new(big.Int).Sub(val, sumPrior)
-	// If the difference between "incoming" height value
-	// is positive (a higher value than prior sum), then
-	// we can normally add this difference (hDiff) to the map.
-	// However, if the difference is equal or negative, that
-	// means that the caller is setting a total value BELOW
-	// the respective level.
-		b[*n] = hDiff
-	//if hDiff.Cmp(common.Big0) > 0 {
-	//} else {
-	//	b[*n] = val
-	//	for _, s := range sl {
-	//		if s >= *n {
-	//			break
-	//		}
-	//		b[s] = big.NewInt(0)
-	//	}
-	//}
+
+	b[*n] = hDiff
 
 	if valNext != nil {
 		b[keyNext] = valNext.Sub(valNext, b[*n])

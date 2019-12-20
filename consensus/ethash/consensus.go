@@ -383,6 +383,22 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 
+	} else if config.IsForked(config.GetEthashEIP2384Transition, next) {
+		// calcDifficultyEIP1234 is the difficulty adjustment algorithm for Constantinople.
+		// The calculation uses the Byzantium rules, but with bomb offset 5M.
+		// Specification EIP-1234: https://eips.ethereum.org/EIPS/eip-1234
+		// Note, the calculations below looks at the parent number, which is 1 below
+		// the block number. Thus we remove one from the delay given
+
+		// calculate a fake block number for the ice-age delay
+		// Specification: https://eips.ethereum.org/EIPS/eip-1234
+		fakeBlockNumber := new(big.Int)
+		delayWithOffset := new(big.Int).Sub(vars.EIP2384DifficultyBombDelay, common.Big1)
+		if parent.Number.Cmp(delayWithOffset) >= 0 {
+			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
+		}
+		exPeriodRef.Set(fakeBlockNumber)
+
 	} else if config.IsForked(config.GetEthashEIP1234Transition, next) {
 		// calcDifficultyEIP1234 is the difficulty adjustment algorithm for Constantinople.
 		// The calculation uses the Byzantium rules, but with bomb offset 5M.
@@ -393,8 +409,9 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// calculate a fake block number for the ice-age delay
 		// Specification: https://eips.ethereum.org/EIPS/eip-1234
 		fakeBlockNumber := new(big.Int)
-		if parent.Number.Cmp(big.NewInt(4999999)) >= 0 {
-			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, big.NewInt(4999999))
+		delayWithOffset := new(big.Int).Sub(vars.EIP1234DifficultyBombDelay, common.Big1)
+		if parent.Number.Cmp(delayWithOffset) >= 0 {
+			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 
@@ -406,12 +423,14 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		// the block number. Thus we remove one from the delay given
 
 		fakeBlockNumber := new(big.Int)
-		if parent.Number.Cmp(big.NewInt(2999999)) >= 0 {
-			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, big.NewInt(2999999))
+		delayWithOffset := new(big.Int).Sub(vars.EIP649DifficultyBombDelay, common.Big1)
+		if parent.Number.Cmp(delayWithOffset) >= 0 {
+			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 
 	}
+
 
 	// EXPLOSION
 

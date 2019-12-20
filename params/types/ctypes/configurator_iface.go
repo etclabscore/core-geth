@@ -153,6 +153,8 @@ type EthashConfigurator interface {
 	SetEthashEIP649Transition(n *uint64) error
 	GetEthashEIP1234Transition() *uint64
 	SetEthashEIP1234Transition(n *uint64) error
+	GetEthashEIP2384Transition() *uint64
+	SetEthashEIP2384Transition(n *uint64) error
 	GetEthashECIP1010PauseTransition() *uint64
 	SetEthashECIP1010PauseTransition(n *uint64) error
 	GetEthashECIP1010ContinueTransition() *uint64

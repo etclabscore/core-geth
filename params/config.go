@@ -65,7 +65,6 @@ var (
 		ConstantinopleBlock: big.NewInt(7280000),
 		PetersburgBlock:     big.NewInt(7280000),
 		IstanbulBlock:       big.NewInt(9069000),
-		MuirGlacierBlock:    big.NewInt(9200000),
 		Ethash:              new(ctypes.EthashConfig),
 	}
 
@@ -104,7 +103,6 @@ var (
 		ConstantinopleBlock: big.NewInt(4230000),
 		PetersburgBlock:     big.NewInt(4939394),
 		IstanbulBlock:       big.NewInt(6485846),
-		MuirGlacierBlock:    big.NewInt(7117117),
 		Ethash:              new(ctypes.EthashConfig),
 	}
 
@@ -227,7 +225,6 @@ var (
 		ConstantinopleBlock:     big.NewInt(0),
 		PetersburgBlock:         big.NewInt(0),
 		IstanbulBlock:           big.NewInt(0),
-		MuirGlacierBlock:        nil,
 		EWASMBlock:              nil,
 		Ethash:                  new(ctypes.EthashConfig),
 		Clique:                  nil,
@@ -253,7 +250,6 @@ var (
 		ConstantinopleBlock: big.NewInt(0),
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(0),
-		MuirGlacierBlock:    nil,
 		EWASMBlock:          nil,
 		Ethash:              nil,
 		Clique: &ctypes.CliqueConfig{

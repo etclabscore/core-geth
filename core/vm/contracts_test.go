@@ -421,7 +421,7 @@ func testPrecompiled(addr string, test precompiledTest, t *testing.T) {
 }
 
 func testPrecompiledOOG(addr string, test precompiledTest, t *testing.T) {
-	p := PrecompiledContractsIstanbul[common.HexToAddress(addr)]
+	p := PrecompiledContractsForConfig(params.AllEthashProtocolChanges, big.NewInt(0))[common.HexToAddress(addr)]
 	in := common.Hex2Bytes(test.input)
 	contract := NewContract(AccountRef(common.HexToAddress("1337")),
 		nil, new(big.Int), p.RequiredGas(in)-1)

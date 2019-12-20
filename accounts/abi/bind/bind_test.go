@@ -1489,14 +1489,14 @@ var bindTests = []struct {
 		"github.com/ethereum/go-ethereum/accounts/abi/bind"
 		"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 		"github.com/ethereum/go-ethereum/crypto"
-		"github.com/ethereum/go-ethereum/core"
+		"github.com/ethereum/go-ethereum/params/types"
         `,
 		`
 		key, _ := crypto.GenerateKey()
 		addr := crypto.PubkeyToAddress(key.PublicKey)
 
 		// Deploy registrar contract
-		sim := backends.NewSimulatedBackend(core.GenesisAlloc{addr: {Balance: big.NewInt(1000000000)}}, 10000000)
+		sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{addr: {Balance: big.NewInt(1000000000)}}, 10000000)
 		defer sim.Close()
 
 		transactOpts := bind.NewKeyedTransactor(key)

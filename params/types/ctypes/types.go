@@ -165,9 +165,102 @@ func (b Uint64BigMapEncodesHex) MarshalJSON() ([]byte, error) {
 	return json.Marshal(mm)
 }
 
-// ExtractHostageSituationN returns the block number for a given hostage situation, ie EIP649 and/or EIP1234.
+func (b Uint64BigMapEncodesHex) SetValueTotalForHeight(n *uint64, val *big.Int) {
+	if n == nil || val == nil {
+		return
+	}
+	if b[*n] != nil && new(big.Int).SetUint64(b.SumValues(n)).Cmp(val) == 0 {
+		return
+	}
+
+	var sl = []uint64{}
+
+	for k, _ := range b {
+		if k == *n {
+			continue
+		}
+		sl = append(sl, k)
+	}
+	sl = append(sl, *n)
+
+	if len(sl) == 1 {
+		b[*n] = new(big.Int).Set(val)
+		return
+	}
+
+	sort.Slice(sl, func(i, j int) bool {
+		return sl[i] < sl[j]
+	})
+
+	sumPrior := func() *big.Int {
+		sum := big.NewInt(0)
+		for _, s := range sl {
+			if s >= *n {
+				break
+			}
+			sum.Add(sum, b[s])
+		}
+		return sum
+	}()
+	keyNext, valNext := func() (uint64, *big.Int) {
+		for _, s := range sl {
+			if s > *n {
+				return s, b[s]
+			}
+		}
+		return 0, nil
+	}()
+
+	hDiff := new(big.Int).Sub(val, sumPrior)
+	// If the difference between "incoming" height value
+	// is positive (a higher value than prior sum), then
+	// we can normally add this difference (hDiff) to the map.
+	// However, if the difference is equal or negative, that
+	// means that the caller is setting a total value BELOW
+	// the respective level.
+		b[*n] = hDiff
+	//if hDiff.Cmp(common.Big0) > 0 {
+	//} else {
+	//	b[*n] = val
+	//	for _, s := range sl {
+	//		if s >= *n {
+	//			break
+	//		}
+	//		b[s] = big.NewInt(0)
+	//	}
+	//}
+
+	if valNext != nil {
+		b[keyNext] = valNext.Sub(valNext, b[*n])
+	}
+}
+
+func (b Uint64BigMapEncodesHex) SumValues(n *uint64) uint64 {
+	var sumB = big.NewInt(0)
+	var sl = []uint64{}
+
+	for k, _ := range b {
+		sl = append(sl, k)
+	}
+	sort.Slice(sl, func(i, j int) bool {
+		return sl[i] < sl[j]
+	})
+
+	for _, s := range sl {
+		if s > *n {
+			// break because we're sorted chronologically,
+			// all following indexes will be greater than limit n.
+			break
+		}
+		sumB.Add(sumB, b[s])
+	}
+
+	return sumB.Uint64()
+}
+
+// MapMeetsSpecification returns the block number at which a difficulty/+reward map meet specifications, eg. EIP649 and/or EIP1234, or EIP2384.
 // This is a reverse lookup to extract EIP-spec'd parameters from difficulty and reward maps implementations.
-func ExtractHostageSituationN(difficulties Uint64BigMapEncodesHex, rewards Uint64BigMapEncodesHex, difficultySum, wantedReward *big.Int) *uint64 {
+func MapMeetsSpecification(difficulties Uint64BigMapEncodesHex, rewards Uint64BigMapEncodesHex, difficultySum, wantedReward *big.Int) *uint64 {
 	var diffN *uint64
 	var sl = []uint64{}
 
@@ -195,6 +288,10 @@ func ExtractHostageSituationN(difficulties Uint64BigMapEncodesHex, rewards Uint6
 		// difficulty bomb delay not configured,
 		// then does not meet eip649/eip1234 spec
 		return nil
+	}
+
+	if wantedReward == nil || rewards == nil {
+		return diffN
 	}
 
 	reward, ok := rewards[*diffN]

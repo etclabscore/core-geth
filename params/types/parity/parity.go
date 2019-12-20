@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package parity
 
 import (
@@ -37,20 +36,22 @@ type ParityChainSpec struct {
 	Engine  struct {
 		Ethash struct {
 			Params struct {
-				MinimumDifficulty      *math.HexOrDecimal256          `json:"minimumDifficulty"`
-				DifficultyBoundDivisor *math.HexOrDecimal256          `json:"difficultyBoundDivisor"`
-				DurationLimit          *math.HexOrDecimal256          `json:"durationLimit"`
+				MinimumDifficulty      *math.HexOrDecimal256         `json:"minimumDifficulty"`
+				DifficultyBoundDivisor *math.HexOrDecimal256         `json:"difficultyBoundDivisor"`
+				DurationLimit          *math.HexOrDecimal256         `json:"durationLimit"`
 				BlockReward            ctypes.Uint64BigValOrMapHex   `json:"blockReward"`
 				DifficultyBombDelays   ctypes.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"`
 
 				// Caches.
 				// These inferences require computation.
 				// This makes it so that the 'heavy-lifting' only has to run once.
-				// See ctypes.ExtractHostageSituationN for this bespoke logic.
+				// See ctypes.MapMeetsSpecification for this bespoke logic.
 				eip649inferred    bool       `json:"-"`
 				eip649Transition  *ParityU64 `json:"-"`
 				eip1234inferred   bool       `json:"-"`
 				eip1234Transition *ParityU64 `json:"-"`
+				eip2384inferred   bool       `json:"-"`
+				eip2384Transition *ParityU64       `json:"-"`
 
 				HomesteadTransition *ParityU64 `json:"homesteadTransition"`
 				EIP100bTransition   *ParityU64 `json:"eip100bTransition"`
@@ -112,8 +113,8 @@ type ParityChainSpec struct {
 	Genesis struct {
 		Seal struct {
 			Ethereum struct {
-				Nonce   BlockNonce `json:"nonce"`
-				MixHash hexutil.Bytes    `json:"mixHash"`
+				Nonce   BlockNonce    `json:"nonce"`
+				MixHash hexutil.Bytes `json:"mixHash"`
 			} `json:"ethereum"`
 		} `json:"seal"`
 

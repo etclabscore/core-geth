@@ -154,6 +154,10 @@ type MultiGethChainConfig struct {
 	// interoperable with other gas changes such as EIP-1884.
 	EIP2200FBlock *big.Int `json:"eip2200FBlock,omitempty"`
 
+	// EIP-2384: Difficulty Bomb Delay (Muir Glacier)
+	eip2384Inferred bool
+	EIP2384FBlock *big.Int `json:"eip2384FBlock,omitempty"`
+
 	//EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block

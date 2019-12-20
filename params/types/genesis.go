@@ -602,6 +602,14 @@ func (g *Genesis) SetEthashEIP1234Transition(n *uint64) error {
 	return g.Config.SetEthashEIP1234Transition(n)
 }
 
+func (g *Genesis) GetEthashEIP2384Transition() *uint64 {
+	return g.Config.GetEthashEIP2384Transition()
+}
+
+func (g *Genesis) SetEthashEIP2384Transition(n *uint64) error {
+	return g.Config.SetEthashEIP2384Transition(n)
+}
+
 func (g *Genesis) GetEthashECIP1010PauseTransition() *uint64 {
 	return g.Config.GetEthashECIP1010PauseTransition()
 }

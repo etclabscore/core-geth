@@ -28,6 +28,8 @@ var (
 	EIP649DifficultyBombDelay = big.NewInt(3000000)
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1234.md
 	EIP1234DifficultyBombDelay = big.NewInt(5000000)
+
+	EIP2384DifficultyBombDelay = big.NewInt(9000000)
 	)
 
 var (

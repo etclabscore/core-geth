@@ -991,7 +991,7 @@ func TestLogRebirth(t *testing.T) {
 
 		// this code generates a log
 		code        = common.Hex2Bytes("60606040525b7f24ec1d3ff24c2f6ff210738839dbc339cd45a5294d85c79361016243157aae7b60405180905060405180910390a15b600a8060416000396000f360606040526008565b00")
-		gspec       = &paramtypes.Genesis{Config: params.TestChainConfig, Alloc: GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
+		gspec       = &paramtypes.Genesis{Config: params.TestChainConfig, Alloc: paramtypes.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
 		genesis     = MustCommitGenesis(db, gspec)
 		signer      = types.NewEIP155Signer(gspec.Config.GetChainID())
 		newLogCh    = make(chan bool)

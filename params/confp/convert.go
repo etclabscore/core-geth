@@ -179,7 +179,7 @@ func compare(k reflect.Type, source, target interface{}) (diffs []DiffT) {
 	for i := 0; i < k.NumMethod(); i++ {
 		method := k.Method(i)
 
-		if !strings.HasPrefix(method.Name, "Get") {
+		if !strings.HasPrefix(method.Name, "Get") || !strings.HasSuffix(method.Name, "Transition") {
 			continue
 		}
 		if reflect.ValueOf(source).MethodByName(method.Name).Type().NumIn() > 0 {

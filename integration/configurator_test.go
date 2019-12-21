@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package integration
 
 import (
@@ -54,7 +53,7 @@ func TestConstantinopleEquivalence(t *testing.T) {
 
 func TestEquivalent_Features(t *testing.T) {
 
-	mustValidate := func (c ctypes.ChainConfigurator) {
+	mustValidate := func(c ctypes.ChainConfigurator) {
 		zero, max := uint64(0), uint64(math.MaxUint64)
 		for _, head := range []*uint64{
 			nil, &zero, &max,
@@ -96,7 +95,7 @@ func TestEquivalent_Features(t *testing.T) {
 			t.Log("--------------------")
 			t.Errorf("%s oconf/mg err: %v", name, err) // With error.
 
-			nicelog := func (n *uint64) interface{} {
+			nicelog := func(n *uint64) interface{} {
 				if n == nil {
 					return "nil"
 				}

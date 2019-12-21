@@ -133,7 +133,7 @@ type CacheConfig struct {
 // canonical chain.
 type BlockChain struct {
 	chainConfig ctypes.ChainConfigurator // Chain & network configuration
-	cacheConfig *CacheConfig            // Cache configuration for pruning
+	cacheConfig *CacheConfig             // Cache configuration for pruning
 
 	db     ethdb.Database // Low level persistent database to store final content in
 	triegc *prque.Prque   // Priority queue mapping block numbers to tries to gc

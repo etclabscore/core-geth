@@ -33,9 +33,24 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/tests"
 	"github.com/go-test/deep"
 )
+
+func TestConstantinopleEquivalence(t *testing.T) {
+	conf := tests.Forks["Constantinople"]
+	pspec := &parity.ParityChainSpec{}
+	err := confp.Convert(conf, pspec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// This test's config will set Byz delay (3m) at 0, and Const delay (5m) at 0.
+	// This check ensures that 5m delay being greater than 3m takes precedence at simultaneous blocks.
+	if pspec.GetEthashDifficultyBombDelaySchedule()[*conf.GetEthashEIP1234Transition()].Cmp(vars.EIP1234DifficultyBombDelay) != 0 {
+		t.Error("bad")
+	}
+}
 
 func TestEquivalent_Features(t *testing.T) {
 
@@ -113,7 +128,6 @@ func TestEquivalent_Features(t *testing.T) {
 		if err != nil {
 			t.Errorf("%s oconf/p err: %v", name, err)
 		}
-
 	}
 }
 
@@ -154,8 +168,8 @@ func TestEquivalent_ReadParity(t *testing.T) {
 // TestParityGenesis shows that for select configs, the read and converted parity specs
 // are equivalent to the default Go coded specs for the scope of the respective genesis blocks.
 func TestParityGeneses(t *testing.T) {
-	testes := []struct{
-		filename string
+	testes := []struct {
+		filename       string
 		defaultGenesis *paramtypes.Genesis
 	}{
 		{
@@ -198,11 +212,11 @@ func TestParityGeneses(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		wantBlock:= core.GenesisToBlock(tt.defaultGenesis, nil)
+		wantBlock := core.GenesisToBlock(tt.defaultGenesis, nil)
 		gotBlock := core.GenesisToBlock(genc, nil)
 
 		if wantBlock.Hash() != gotBlock.Hash() {
-			t.Errorf("%s: mismatch gen hash, want(default): %s, got: %s", tt.filename, wantBlock.Hash().Hex(), gotBlock.Hash().Hex() )
+			t.Errorf("%s: mismatch gen hash, want(default): %s, got: %s", tt.filename, wantBlock.Hash().Hex(), gotBlock.Hash().Hex())
 
 			// state roots
 			t.Logf("stateroots, want(default): %s, got: %s", wantBlock.Root().Hex(), gotBlock.Root().Hex())
@@ -217,8 +231,8 @@ func TestParityGeneses(t *testing.T) {
 				t.Log(d)
 			}
 
-			t.Log("want(default)",spew.Sdump(wantBlock))
-			t.Log("got",spew.Sdump(gotBlock))
+			t.Log("want(default)", spew.Sdump(wantBlock))
+			t.Log("got", spew.Sdump(gotBlock))
 		}
 	}
 }

@@ -142,7 +142,7 @@ func (test *DifficultyTest) Run(config ctypes.ChainConfigurator) error {
 	if actual.Cmp(exp) != 0 {
 		return fmt.Errorf(`%s got: %v, want: %v
 test: %v
-config: %v`, test.Name, actual, exp, test, config)
+config: %s`, test.Name, actual, exp, test, config)
 	}
 	return nil
 

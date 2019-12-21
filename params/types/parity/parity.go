@@ -130,6 +130,16 @@ type ParityChainSpec struct {
 	Accounts map[common.UnprefixedAddress]*ParityChainSpecAccount `json:"accounts"`
 }
 
+func (c *ParityChainSpec) String() string {
+	cc := &ParityChainSpec{}
+	*cc = *c
+	if cc.Engine.Ethash.Params.DaoHardforkAccounts != nil {
+		cc.Engine.Ethash.Params.DaoHardforkAccounts = nil
+	}
+	j, _ := json.MarshalIndent(cc, "", "    ")
+	return string(j)
+}
+
 // A BlockNonce is a 64-bit hash which proves (combined with the
 // mix-hash) that a sufficient amount of computation has been carried
 // out on a block.

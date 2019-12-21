@@ -169,54 +169,31 @@ func (b Uint64BigMapEncodesHex) SetValueTotalForHeight(n *uint64, val *big.Int) 
 	if n == nil || val == nil {
 		return
 	}
-	if b[*n] != nil && new(big.Int).SetUint64(b.SumValues(n)).Cmp(val) == 0 {
-		return
+
+	sums := make(map[uint64]*big.Int)
+	for k := range b {
+		sums[k] = new(big.Int).SetUint64(b.SumValues(&k))
+	}
+	if sums[*n] != nil {
+		if sums[*n].Cmp(val) < 0 {
+			sums[*n] = val
+		}
+	} else {
+		sums[*n] = val
 	}
 
-	var sl = []uint64{}
-
-	for k, _ := range b {
-		if k == *n {
-			continue
-		}
+	sumR := big.NewInt(0)
+	sl := []uint64{}
+	for k, _ := range sums {
 		sl = append(sl, k)
 	}
-	sl = append(sl, *n)
-
-	if len(sl) == 1 {
-		b[*n] = new(big.Int).Set(val)
-		return
-	}
-
 	sort.Slice(sl, func(i, j int) bool {
 		return sl[i] < sl[j]
 	})
-
-	sumPrior := func() *big.Int {
-		sum := big.NewInt(0)
-		for _, s := range sl {
-			if s >= *n {
-				break
-			}
-			sum.Add(sum, b[s])
-		}
-		return sum
-	}()
-	keyNext, valNext := func() (uint64, *big.Int) {
-		for _, s := range sl {
-			if s > *n {
-				return s, b[s]
-			}
-		}
-		return 0, nil
-	}()
-
-	hDiff := new(big.Int).Sub(val, sumPrior)
-
-	b[*n] = hDiff
-
-	if valNext != nil {
-		b[keyNext] = valNext.Sub(valNext, b[*n])
+	for _, s := range sl {
+		d := new(big.Int).Sub(sums[s], sumR)
+		b[s] = d
+		sumR.Add(sumR, d)
 	}
 }
 

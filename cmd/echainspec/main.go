@@ -94,7 +94,6 @@ var errInvalidOutputFlag = errors.New("invalid output format type")
 var errNoChainspecValue = errors.New("undetermined chainspec value")
 var errInvalidDefaultValue = errors.New("no default chainspec found for name given")
 var errInvalidChainspecValue = errors.New("could not read given chainspec")
-var errEmptyChainspecValue = errors.New("missing chainspec data")
 
 func mustGetChainspecValue(ctx *cli.Context) error {
 	if ctx.NArg() >= 1 {

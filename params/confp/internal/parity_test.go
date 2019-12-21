@@ -23,15 +23,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
-
-var chainSpecEquivs = map[string]*paramtypes.Genesis{
-	"classic.json":    params.DefaultClassicGenesisBlock(),
-	"foundation.json": params.DefaultGenesisBlock(),
-}
 
 func TestBlockConfig(t *testing.T) {
 	frontierCC := &goethereum.ChainConfig{

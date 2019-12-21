@@ -60,18 +60,6 @@ participating.
 
 It expects the genesis file as argument.`,
 	}
-	dumpGenesisCommand = cli.Command{
-		Action:    utils.MigrateFlags(dumpGenesis),
-		Name:      "dumpgenesis",
-		Usage:     "Dumps genesis block JSON configuration to stdout",
-		ArgsUsage: "",
-		Flags: []cli.Flag{
-			utils.DataDirFlag,
-		},
-		Category: "BLOCKCHAIN COMMANDS",
-		Description: `
-The dumpgenesis command dumps the genesis block configuration in JSON format to stdout.`,
-	}
 	importCommand = cli.Command{
 		Action:    utils.MigrateFlags(importChain),
 		Name:      "import",

@@ -32,6 +32,9 @@ ios:
 test: all
 	go run build/ci.go test
 
+sync-clients:
+	./params/parity.json.d/sync-parity-remote.sh
+
 test-multigeth: test-multigeth-features test-multigeth-chainspecs ## Runs all tests specific to multi-geth.
 
 test-multigeth-features: test-multigeth-features-parity test-multigeth-features-multigeth ## Runs tests specific to multi-geth using Fork/Feature configs.

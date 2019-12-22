@@ -19,7 +19,7 @@ package pyethereum
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/params/types"
+	paramtypes "github.com/ethereum/go-ethereum/params/types"
 )
 
 // PyEthereumGenesisSpec represents the genesis specification format used by the

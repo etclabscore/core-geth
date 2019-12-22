@@ -8,8 +8,8 @@ import (
 )
 
 var forksCommand = cli.Command{
-	Name:               "forks",
-	Usage:              "List unique and non-zero fork numbers",
+	Name:   "forks",
+	Usage:  "List unique and non-zero fork numbers",
 	Action: forks,
 }
 

@@ -31,7 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/gasprice"
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/genesis"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -91,7 +91,7 @@ func init() {
 type Config struct {
 	// The genesis block, which is inserted if the database is empty.
 	// If nil, the Ethereum main net block is used.
-	Genesis *genesis.Genesis `toml:",omitempty"`
+	Genesis *genesisT.Genesis `toml:",omitempty"`
 
 	// Protocol options
 	NetworkId uint64 // Network ID to use for selecting peers to connect to

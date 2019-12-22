@@ -20,17 +20,17 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/params/types/genesis"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 // EthersocialGenesisBlock returns the Ethersocial main net genesis block.
-func DefaultEthersocialGenesisBlock() *genesis.Genesis {
-	return &genesis.Genesis{
+func DefaultEthersocialGenesisBlock() *genesisT.Genesis {
+	return &genesisT.Genesis{
 		Config:     EthersocialChainConfig,
 		Nonce:      66,
 		ExtraData:  hexutil.MustDecode("0x"),
 		GasLimit:   3141592,
 		Difficulty: big.NewInt(131072),
-		Alloc:      genesis.DecodePreAlloc(EthersocialAllocData),
+		Alloc:      genesisT.DecodePreAlloc(EthersocialAllocData),
 	}
 }

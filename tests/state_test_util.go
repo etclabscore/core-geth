@@ -34,9 +34,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/genesis"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
 )
@@ -70,7 +69,7 @@ func (t StateTest) MarshalJSON() ([]byte, error) {
 type stJSON struct {
 	Info stInfo                   `json:"_info"`
 	Env  stEnv                    `json:"env"`
-	Pre  genesis.GenesisAlloc     `json:"pre"`
+	Pre  genesisT.GenesisAlloc    `json:"pre"`
 	Tx   stTransaction            `json:"transaction"`
 	Out  hexutil.Bytes            `json:"out"`
 	Post map[string][]stPostState `json:"post"`
@@ -231,7 +230,7 @@ func (t *StateTest) gasLimit(subtest StateSubtest) uint64 {
 	return t.json.Tx.GasLimit[t.json.Post[subtest.Fork][subtest.Index].Indexes.Gas]
 }
 
-func MakePreState(db ethdb.Database, accounts genesis.GenesisAlloc) *state.StateDB {
+func MakePreState(db ethdb.Database, accounts genesisT.GenesisAlloc) *state.StateDB {
 	sdb := state.NewDatabase(db)
 	statedb, _ := state.New(common.Hash{}, sdb)
 	for addr, a := range accounts {
@@ -248,8 +247,8 @@ func MakePreState(db ethdb.Database, accounts genesis.GenesisAlloc) *state.State
 	return statedb
 }
 
-func (t *StateTest) genesis(config ctypes.ChainConfigurator) *genesis.Genesis {
-	return &genesis.Genesis{
+func (t *StateTest) genesis(config ctypes.ChainConfigurator) *genesisT.Genesis {
+	return &genesisT.Genesis{
 		Config:     config,
 		Coinbase:   t.json.Env.Coinbase,
 		Difficulty: t.json.Env.Difficulty,

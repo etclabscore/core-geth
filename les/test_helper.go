@@ -45,7 +45,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
+	genesisT "github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -172,9 +172,9 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 	var (
 		evmux  = new(event.TypeMux)
 		engine = ethash.NewFaker()
-		gspec  = genesis2.Genesis{
+		gspec  = genesisT.Genesis{
 			Config:   params.AllEthashProtocolChanges,
-			Alloc:    genesis2.GenesisAlloc{bankAddr: {Balance: bankFunds}},
+			Alloc:    genesisT.GenesisAlloc{bankAddr: {Balance: bankFunds}},
 			GasLimit: 100000000,
 		}
 		oracle *checkpointOracle
@@ -228,9 +228,9 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 
 func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Database, peers *peerSet, clock mclock.Clock) (*serverHandler, *backends.SimulatedBackend) {
 	var (
-		gspec = genesis2.Genesis{
+		gspec = genesisT.Genesis{
 			Config:   params.AllEthashProtocolChanges,
-			Alloc:    genesis2.GenesisAlloc{bankAddr: {Balance: bankFunds}},
+			Alloc:    genesisT.GenesisAlloc{bankAddr: {Balance: bankFunds}},
 			GasLimit: 100000000,
 		}
 		oracle *checkpointOracle

@@ -35,7 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/params"
-	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
+	genesisT "github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -170,7 +170,7 @@ func TestBlockSubscription(t *testing.T) {
 		chainFeed   = new(event.Feed)
 		backend     = &testBackend{mux, db, 0, txFeed, rmLogsFeed, logsFeed, chainFeed}
 		api         = NewPublicFilterAPI(backend, false)
-		genesis     = core.MustCommitGenesis(db, new(genesis2.Genesis))
+		genesis     = core.MustCommitGenesis(db, new(genesisT.Genesis))
 		chain, _    = core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, 10, func(i int, gen *core.BlockGen) {})
 		chainEvents = []core.ChainEvent{}
 	)

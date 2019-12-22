@@ -29,7 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/genesis"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -46,13 +46,13 @@ import (
 // error is a *params.ConfigCompatError and the new, unwritten config is returned.
 //
 // The returned chain configuration is never nil.
-func SetupGenesisBlock(db ethdb.Database, genesis *genesis.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
 	return SetupGenesisBlockWithOverride(db, genesis)
 }
 
-func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesis.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
-		return params.AllEthashProtocolChanges, common.Hash{}, genesis.ErrGenesisNoConfig
+		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
 	// Just commit the new block if there is no stored genesis block.
 	stored := rawdb.ReadCanonicalHash(db, 0)
@@ -81,7 +81,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesis.Genesis) 
 		// Ensure the stored genesis matches with the given one.
 		hash := GenesisToBlock(genesis, nil).Hash()
 		if hash != stored {
-			return genesis.Config, hash, &genesis.GenesisMismatchError{stored, hash}
+			return genesis.Config, hash, &genesisT.GenesisMismatchError{stored, hash}
 		}
 		block, err := CommitGenesis(genesis, db)
 		if err != nil {
@@ -94,7 +94,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesis.Genesis) 
 	if genesis != nil {
 		hash := GenesisToBlock(genesis, nil).Hash()
 		if hash != stored {
-			return genesis.Config, hash, &genesis.GenesisMismatchError{stored, hash}
+			return genesis.Config, hash, &genesisT.GenesisMismatchError{stored, hash}
 		}
 	}
 
@@ -136,7 +136,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesis.Genesis) 
 	return newcfg, stored, nil
 }
 
-func configOrDefault(g *genesis.Genesis, ghash common.Hash) ctypes.ChainConfigurator {
+func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigurator {
 	switch {
 	case g != nil:
 		return g.Config
@@ -165,7 +165,7 @@ func configOrDefault(g *genesis.Genesis, ghash common.Hash) ctypes.ChainConfigur
 
 // GenesisToBlock creates the genesis block and writes state of a genesis specification
 // to the given database (or discards it if nil).
-func GenesisToBlock(g *genesis.Genesis, db ethdb.Database) *types.Block {
+func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	if db == nil {
 		db = rawdb.NewMemoryDatabase()
 	}
@@ -206,7 +206,7 @@ func GenesisToBlock(g *genesis.Genesis, db ethdb.Database) *types.Block {
 
 // CommitGenesis writes the block and state of a genesis specification to the database.
 // The block is committed as the canonical head block.
-func CommitGenesis(g *genesis.Genesis, db ethdb.Database) (*types.Block, error) {
+func CommitGenesis(g *genesisT.Genesis, db ethdb.Database) (*types.Block, error) {
 	block := GenesisToBlock(g, db)
 	if block.Number().Sign() != 0 {
 		return nil, fmt.Errorf("can't commit genesis block with number > 0")
@@ -228,7 +228,7 @@ func CommitGenesis(g *genesis.Genesis, db ethdb.Database) (*types.Block, error) 
 
 // MustCommitGenesis writes the genesis block and state to db, panicking on error.
 // The block is committed as the canonical head block.
-func MustCommitGenesis(db ethdb.Database, g *genesis.Genesis) *types.Block {
+func MustCommitGenesis(db ethdb.Database, g *genesisT.Genesis) *types.Block {
 	block, err := CommitGenesis(g, db)
 	if err != nil {
 		panic(err)
@@ -238,6 +238,6 @@ func MustCommitGenesis(db ethdb.Database, g *genesis.Genesis) *types.Block {
 
 // GenesisBlockForTesting creates and writes a block in which addr has the given wei balance.
 func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big.Int) *types.Block {
-	g := genesis.Genesis{Alloc: genesis.GenesisAlloc{addr: {Balance: balance}}}
+	g := genesisT.Genesis{Alloc: genesisT.GenesisAlloc{addr: {Balance: balance}}}
 	return MustCommitGenesis(db, &g)
 }

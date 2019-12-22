@@ -36,7 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
-	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
+	genesisT "github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
@@ -255,7 +255,7 @@ func testChainOdr(t *testing.T, protocol int, fn odrTestFn) {
 	var (
 		sdb     = rawdb.NewMemoryDatabase()
 		ldb     = rawdb.NewMemoryDatabase()
-		gspec   = genesis2.Genesis{Alloc: genesis2.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
+		gspec   = genesisT.Genesis{Alloc: genesisT.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
 		genesis = core.MustCommitGenesis(sdb, &gspec)
 	)
 	core.MustCommitGenesis(ldb, &gspec)

@@ -31,7 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types/genesis"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 // VMTest checks EVM execution without block or transaction context.
@@ -50,8 +50,8 @@ type vmJSON struct {
 	Logs          common.UnprefixedHash `json:"logs"`
 	GasRemaining  *math.HexOrDecimal64  `json:"gas"`
 	Out           hexutil.Bytes         `json:"out"`
-	Pre           genesis.GenesisAlloc  `json:"pre"`
-	Post          genesis.GenesisAlloc  `json:"post"`
+	Pre           genesisT.GenesisAlloc `json:"pre"`
+	Post          genesisT.GenesisAlloc `json:"post"`
 	PostStateRoot common.Hash           `json:"postStateRoot"`
 }
 

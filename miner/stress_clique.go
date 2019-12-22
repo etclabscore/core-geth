@@ -42,7 +42,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
-	"github.com/ethereum/go-ethereum/params/types/genesis"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 func main() {
@@ -137,7 +137,7 @@ func main() {
 
 // makeGenesis creates a custom Clique genesis block based on some pre-defined
 // signer and faucet accounts.
-func makeGenesis(faucets []*ecdsa.PrivateKey, sealers []*ecdsa.PrivateKey) *genesis.Genesis {
+func makeGenesis(faucets []*ecdsa.PrivateKey, sealers []*ecdsa.PrivateKey) *genesisT.Genesis {
 	// Create a Clique network based off of the Rinkeby config
 	genesis := params.DefaultRinkebyGenesisBlock()
 	genesis.GasLimit = 25000000
@@ -172,7 +172,7 @@ func makeGenesis(faucets []*ecdsa.PrivateKey, sealers []*ecdsa.PrivateKey) *gene
 	return genesis
 }
 
-func makeSealer(genesis *genesis.Genesis) (*node.Node, error) {
+func makeSealer(genesis *genesisT.Genesis) (*node.Node, error) {
 	// Define the basic configurations for the Ethereum node
 	datadir, _ := ioutil.TempDir("", "")
 

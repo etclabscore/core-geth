@@ -31,7 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
+	genesisT "github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 // testerAccountPool is a pool to maintain currently active tester accounts,
@@ -396,7 +396,7 @@ func TestClique(t *testing.T) {
 			}
 		}
 		// Create the genesis block with the initial set of signers
-		genesis := &genesis2.Genesis{
+		genesis := &genesisT.Genesis{
 			ExtraData: make([]byte, extraVanity+common.AddressLength*len(signers)+extraSeal),
 		}
 		for j, signer := range signers {

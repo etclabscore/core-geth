@@ -33,7 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
-	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
+	genesisT "github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -169,9 +169,9 @@ func benchInsertChain(b *testing.B, disk bool, gen func(int, *BlockGen)) {
 
 	// Generate a chain of b.N blocks using the supplied block
 	// generator function.
-	gspec := genesis2.Genesis{
+	gspec := genesisT.Genesis{
 		Config: params.TestChainConfig,
-		Alloc:  genesis2.GenesisAlloc{benchRootAddr: {Balance: benchRootFunds}},
+		Alloc:  genesisT.GenesisAlloc{benchRootAddr: {Balance: benchRootFunds}},
 	}
 	genesis := MustCommitGenesis(db, &gspec)
 	chain, _ := GenerateChain(gspec.Config, genesis, ethash.NewFaker(), db, b.N, gen)

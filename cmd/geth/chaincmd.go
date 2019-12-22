@@ -37,7 +37,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
-	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
+	genesisT "github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/trie"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -206,7 +206,7 @@ func initGenesis(ctx *cli.Context) error {
 		utils.Fatalf("Must supply path to genesis JSON file")
 	}
 
-	genesis := new(genesis2.Genesis)
+	genesis := new(genesisT.Genesis)
 	bs, err := ioutil.ReadFile(genesisPath)
 	if err != nil {
 		utils.Fatalf("Failed to read genesis file: %v", err)

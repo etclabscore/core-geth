@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params/types/aleth"
-	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
+	genesisT "github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/go-test/deep"
 )
 
@@ -36,7 +36,7 @@ func TestAlethSturebyConverter(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}
-	var genesis genesis2.Genesis
+	var genesis genesisT.Genesis
 	if err := json.Unmarshal(blob, &genesis); err != nil {
 		t.Fatalf("failed parsing genesis: %v", err)
 	}

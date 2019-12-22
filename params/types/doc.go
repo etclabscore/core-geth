@@ -15,8 +15,9 @@
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
 /*
-Package genesis holds genesis data types and logic.
+Package paramtypes is a parent package for parameter types.
  */
 
-package genesis
+package paramtypes
+
 

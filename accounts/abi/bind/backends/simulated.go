@@ -40,7 +40,7 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
+	genesisT "github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -70,8 +70,8 @@ type SimulatedBackend struct {
 
 // NewSimulatedBackendWithDatabase creates a new binding backend based on the given database
 // and uses a simulated blockchain for testing purposes.
-func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc genesis2.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
-	genesis := genesis2.Genesis{Config: params.AllEthashProtocolChanges, GasLimit: gasLimit, Alloc: alloc}
+func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc genesisT.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
+	genesis := genesisT.Genesis{Config: params.AllEthashProtocolChanges, GasLimit: gasLimit, Alloc: alloc}
 	core.MustCommitGenesis(database, &genesis)
 	blockchain, _ := core.NewBlockChain(database, nil, genesis.Config, ethash.NewFaker(), vm.Config{}, nil)
 
@@ -87,7 +87,7 @@ func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc genesis2.Gen
 
 // NewSimulatedBackend creates a new binding backend using a simulated blockchain
 // for testing purposes.
-func NewSimulatedBackend(alloc genesis2.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
+func NewSimulatedBackend(alloc genesisT.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
 	return NewSimulatedBackendWithDatabase(rawdb.NewMemoryDatabase(), alloc, gasLimit)
 }
 

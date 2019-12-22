@@ -42,7 +42,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
-	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
+	genesisT "github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 var (
@@ -58,9 +58,9 @@ func newTestProtocolManager(mode downloader.SyncMode, blocks int, generator func
 		evmux  = new(event.TypeMux)
 		engine = ethash.NewFaker()
 		db     = rawdb.NewMemoryDatabase()
-		gspec  = &genesis2.Genesis{
+		gspec  = &genesisT.Genesis{
 			Config: params.TestChainConfig,
-			Alloc:  genesis2.GenesisAlloc{testBank: {Balance: big.NewInt(1000000)}},
+			Alloc:  genesisT.GenesisAlloc{testBank: {Balance: big.NewInt(1000000)}},
 		}
 		genesis       = core.MustCommitGenesis(db, gspec)
 		blockchain, _ = core.NewBlockChain(db, nil, gspec.Config, engine, vm.Config{}, nil)

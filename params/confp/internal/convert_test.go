@@ -30,7 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/genesis"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
@@ -53,7 +53,7 @@ func Test_UnmarshalJSON(t *testing.T) {
 	} {
 		switch f {
 		case "geth":
-			c := &genesis.Genesis{}
+			c := &genesisT.Genesis{}
 			mustOpenF(t, f, c)
 			if *c.Config.GetNetworkID() != 314158 {
 				t.Errorf("networkid")
@@ -137,7 +137,7 @@ func TestConfiguratorImplementationsSatisfied(t *testing.T) {
 	}
 
 	for _, ty := range []interface{}{
-		&genesis.Genesis{},
+		&genesisT.Genesis{},
 	} {
 		_ = ty.(ctypes.GenesisBlocker)
 	}

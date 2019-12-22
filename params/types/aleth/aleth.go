@@ -20,7 +20,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/params/types/genesis"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 // AlethGenesisSpec represents the genesis specification format used by the
@@ -95,7 +95,7 @@ func (spec *AlethGenesisSpec) SetPrecompile(address byte, data *AlethGenesisSpec
 	spec.Accounts[addr].Precompiled = data
 }
 
-func (spec *AlethGenesisSpec) SetAccount(address common.Address, account genesis.GenesisAccount) {
+func (spec *AlethGenesisSpec) SetAccount(address common.Address, account genesisT.GenesisAccount) {
 	if spec.Accounts == nil {
 		spec.Accounts = make(map[common.UnprefixedAddress]*AlethGenesisSpecAccount)
 	}

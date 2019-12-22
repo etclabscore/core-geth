@@ -13,13 +13,13 @@ import (
 	"github.com/ethereum/go-ethereum/eth/gasprice"
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/genesis"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 // MarshalTOML marshals as TOML.
 func (c Config) MarshalTOML() (interface{}, error) {
 	type Config struct {
-		Genesis                 *genesis.Genesis `toml:",omitempty"`
+		Genesis                 *genesisT.Genesis `toml:",omitempty"`
 		NetworkId               uint64
 		SyncMode                downloader.SyncMode
 		NoPruning               bool
@@ -89,7 +89,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 // UnmarshalTOML unmarshals from TOML.
 func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	type Config struct {
-		Genesis                 *genesis.Genesis `toml:",omitempty"`
+		Genesis                 *genesisT.Genesis `toml:",omitempty"`
 		NetworkId               *uint64
 		SyncMode                *downloader.SyncMode
 		NoPruning               *bool

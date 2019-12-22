@@ -14,14 +14,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package params
 
 import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/params/types"
+	paramtypes "github.com/ethereum/go-ethereum/params/types"
 )
 
 // ClassicGenesisBlock returns the Ethereum Classic genesis block.

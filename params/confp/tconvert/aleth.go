@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package tconvert
 
 import (
@@ -137,4 +136,3 @@ func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*aleth.Al
 	}
 	return spec, nil
 }
-

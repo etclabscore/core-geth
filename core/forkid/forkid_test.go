@@ -35,7 +35,7 @@ func TestCreation(t *testing.T) {
 		want ID
 	}
 	tests := []struct {
-		name string
+		name    string
 		config  ctypes.ChainConfigurator
 		genesis common.Hash
 		cases   []testcase
@@ -82,7 +82,7 @@ func TestCreation(t *testing.T) {
 				{4939393, ID{Hash: checksumToBytes(0x97b544f3), Next: 4939394}}, // Last Constantinople block
 				{4939394, ID{Hash: checksumToBytes(0xd6e2149b), Next: 6485846}}, // First Petersburg block
 				{6485845, ID{Hash: checksumToBytes(0xd6e2149b), Next: 6485846}}, // Last Petersburg block
-				{6485846, ID{Hash: checksumToBytes(0x4bc66396), Next: 7117117}},       // First Istanbul block
+				{6485846, ID{Hash: checksumToBytes(0x4bc66396), Next: 7117117}}, // First Istanbul block
 				{7117116, ID{Hash: checksumToBytes(0x4bc66396), Next: 7117117}}, // Last Istanbul block
 				{7117117, ID{Hash: checksumToBytes(0x6727ef90), Next: 0}},       // First Muir Glacier block
 				{7500000, ID{Hash: checksumToBytes(0x6727ef90), Next: 0}},       // Future
@@ -246,7 +246,7 @@ func TestGatherForks(t *testing.T) {
 			[]uint64{1150000, 1920000, 2463000, 2675000, 4370000, 7280000, 9069000, 9200000},
 		},
 	}
-	sliceContains := func (sl []uint64, u uint64) bool {
+	sliceContains := func(sl []uint64, u uint64) bool {
 		for _, s := range sl {
 			if s == u {
 				return true

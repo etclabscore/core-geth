@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package paramtypes
 
 import (
@@ -39,14 +38,14 @@ var ErrGenesisNoConfig = errors.New("genesis has no chain configuration")
 // fork switch-over blocks through the chain configuration.
 type Genesis struct {
 	Config     ctypes.ChainConfigurator `json:"config"`
-	Nonce      uint64                    `json:"nonce"`
-	Timestamp  uint64                    `json:"timestamp"`
-	ExtraData  []byte                    `json:"extraData"`
-	GasLimit   uint64                    `json:"gasLimit"   gencodec:"required"`
-	Difficulty *big.Int                  `json:"difficulty" gencodec:"required"`
-	Mixhash    common.Hash               `json:"mixHash"`
-	Coinbase   common.Address            `json:"coinbase"`
-	Alloc      GenesisAlloc              `json:"alloc"      gencodec:"required"`
+	Nonce      uint64                   `json:"nonce"`
+	Timestamp  uint64                   `json:"timestamp"`
+	ExtraData  []byte                   `json:"extraData"`
+	GasLimit   uint64                   `json:"gasLimit"   gencodec:"required"`
+	Difficulty *big.Int                 `json:"difficulty" gencodec:"required"`
+	Mixhash    common.Hash              `json:"mixHash"`
+	Coinbase   common.Address           `json:"coinbase"`
+	Alloc      GenesisAlloc             `json:"alloc"      gencodec:"required"`
 
 	// These fields are used for consensus tests. Please don't use them
 	// in actual genesis blocks.
@@ -254,7 +253,6 @@ func (g *Genesis) SetGenesisGasLimit(u uint64) error {
 	g.GasLimit = u
 	return nil
 }
-
 
 // Implement methods to satisfy Configurator interface.
 

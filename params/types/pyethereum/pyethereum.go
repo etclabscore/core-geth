@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package pyethereum
 
 import (
@@ -36,4 +35,3 @@ type PyEthereumGenesisSpec struct {
 	Alloc      paramtypes.GenesisAlloc `json:"alloc"`
 	ParentHash common.Hash             `json:"parentHash"`
 }
-

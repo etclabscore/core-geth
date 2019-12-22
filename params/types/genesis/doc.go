@@ -14,23 +14,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-package params
+/*
+Package genesis holds genesis data types and logic.
+ */
 
-import (
-	"math/big"
+package genesis
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/params/types/genesis"
-)
-
-// DefaultKottiGenesisBlock returns the Kotti network genesis block.
-func DefaultKottiGenesisBlock() *genesis.Genesis {
-	return &genesis.Genesis{
-		Config:     KottiChainConfig,
-		Timestamp:  1546461831,
-		ExtraData:  hexutil.MustDecode("0x000000000000000000000000000000000000000000000000000000000000000025b7955e43adf9c2a01a9475908702cce67f302a6aaf8cba3c9255a2b863415d4db7bae4f4bbca020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-		GasLimit:   10485760,
-		Difficulty: big.NewInt(1),
-		Alloc:      genesis.DecodePreAlloc(KottiAllocData),
-	}
-}

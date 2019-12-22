@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesis"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -50,13 +51,13 @@ func (t *BlockTest) UnmarshalJSON(in []byte) error {
 }
 
 type btJSON struct {
-	Blocks     []btBlock               `json:"blocks"`
-	Genesis    btHeader                `json:"genesisBlockHeader"`
-	Pre        paramtypes.GenesisAlloc `json:"pre"`
-	Post       paramtypes.GenesisAlloc `json:"postState"`
-	BestBlock  common.UnprefixedHash   `json:"lastblockhash"`
-	Network    string                  `json:"network"`
-	SealEngine string                  `json:"sealEngine"`
+	Blocks     []btBlock             `json:"blocks"`
+	Genesis    btHeader              `json:"genesisBlockHeader"`
+	Pre        genesis.GenesisAlloc  `json:"pre"`
+	Post       genesis.GenesisAlloc  `json:"postState"`
+	BestBlock  common.UnprefixedHash `json:"lastblockhash"`
+	Network    string                `json:"network"`
+	SealEngine string                `json:"sealEngine"`
 }
 
 type btBlock struct {
@@ -143,11 +144,11 @@ func (t *BlockTest) Run() error {
 	return t.validateImportedHeaders(chain, validBlocks)
 }
 
-func (t *BlockTest) genesis(config ctypes.ChainConfigurator) *paramtypes.Genesis {
+func (t *BlockTest) genesis(config ctypes.ChainConfigurator) *genesis.Genesis {
 	if config == nil {
 		panic("nil block genesis config")
 	}
-	return &paramtypes.Genesis{
+	return &genesis.Genesis{
 		Config:     config,
 		Nonce:      t.json.Genesis.Nonce.Uint64(),
 		Timestamp:  t.json.Genesis.Timestamp,

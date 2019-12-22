@@ -27,7 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
+	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -46,9 +46,9 @@ func TestReimportMirroredState(t *testing.T) {
 		engine = New(params.AllCliqueProtocolChanges.Clique, db)
 		signer = new(types.HomesteadSigner)
 	)
-	genspec := &paramtypes.Genesis{
+	genspec := &genesis2.Genesis{
 		ExtraData: make([]byte, extraVanity+common.AddressLength+extraSeal),
-		Alloc: map[common.Address]paramtypes.GenesisAccount{
+		Alloc: map[common.Address]genesis2.GenesisAccount{
 			addr: {Balance: big.NewInt(1)},
 		},
 	}

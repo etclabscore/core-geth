@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
 )
 
 // Tests that simple header verification works, for both good and bad blocks.
@@ -34,7 +35,7 @@ func TestHeaderVerification(t *testing.T) {
 	// Create a simple chain to verify
 	var (
 		testdb    = rawdb.NewMemoryDatabase()
-		gspec     = &paramtypes.Genesis{Config: params.TestChainConfig}
+		gspec     = &genesis2.Genesis{Config: params.TestChainConfig}
 		genesis   = MustCommitGenesis(testdb, gspec)
 		blocks, _ = GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), testdb, 8, nil)
 	)
@@ -86,7 +87,7 @@ func testHeaderConcurrentVerification(t *testing.T, threads int) {
 	// Create a simple chain to verify
 	var (
 		testdb    = rawdb.NewMemoryDatabase()
-		gspec     = &paramtypes.Genesis{Config: params.TestChainConfig}
+		gspec     = &genesis2.Genesis{Config: params.TestChainConfig}
 		genesis   = MustCommitGenesis(testdb, gspec)
 		blocks, _ = GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), testdb, 8, nil)
 	)
@@ -158,7 +159,7 @@ func testHeaderConcurrentAbortion(t *testing.T, threads int) {
 	// Create a simple chain to verify
 	var (
 		testdb    = rawdb.NewMemoryDatabase()
-		gspec     = &paramtypes.Genesis{Config: params.TestChainConfig}
+		gspec     = &genesis2.Genesis{Config: params.TestChainConfig}
 		genesis   = MustCommitGenesis(testdb, gspec)
 		blocks, _ = GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), testdb, 1024, nil)
 	)

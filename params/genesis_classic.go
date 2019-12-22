@@ -20,17 +20,17 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/genesis"
 )
 
 // ClassicGenesisBlock returns the Ethereum Classic genesis block.
-func DefaultClassicGenesisBlock() *paramtypes.Genesis {
-	return &paramtypes.Genesis{
+func DefaultClassicGenesisBlock() *genesis.Genesis {
+	return &genesis.Genesis{
 		Config:     ClassicChainConfig,
 		Nonce:      66,
 		ExtraData:  hexutil.MustDecode("0x11bbe8db4e347b4e8c937c1c8370e4b5ed33adb3db69cbdb7a38e1e50b1b82fa"),
 		GasLimit:   5000,
 		Difficulty: big.NewInt(17179869184),
-		Alloc:      paramtypes.DecodePreAlloc(MainnetAllocData),
+		Alloc:      genesis.DecodePreAlloc(MainnetAllocData),
 	}
 }

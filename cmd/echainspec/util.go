@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesis"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"gopkg.in/urfave/cli.v1"
@@ -48,7 +48,7 @@ func unmarshalChainSpec(format string, data []byte) (conf ctypes.Configurator, e
 	} else {
 		panic("impossible")
 	}
-	t := chainspecFormatTypes[format].(*paramtypes.Genesis)
+	t := chainspecFormatTypes[format].(*genesis.Genesis)
 	err = json.Unmarshal(data, &d)
 	if err != nil {
 		return conf, err

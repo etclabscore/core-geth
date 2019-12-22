@@ -37,8 +37,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm/runtime"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesis"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
@@ -52,7 +52,7 @@ var runCommand = cli.Command{
 
 // readGenesis will read the given JSON format genesis file and return
 // the initialized Genesis structure
-func readGenesis(genesisPath string) *paramtypes.Genesis {
+func readGenesis(genesisPath string) *genesis.Genesis {
 	// Make sure we have a valid genesis JSON
 	//genesisPath := ctx.Args().First()
 	if len(genesisPath) == 0 {
@@ -64,7 +64,7 @@ func readGenesis(genesisPath string) *paramtypes.Genesis {
 	}
 	defer file.Close()
 
-	genesis := new(paramtypes.Genesis)
+	genesis := new(genesis.Genesis)
 	if err := json.NewDecoder(file).Decode(genesis); err != nil {
 		utils.Fatalf("invalid genesis file: %v", err)
 	}
@@ -88,7 +88,7 @@ func runCmd(ctx *cli.Context) error {
 		chainConfig   ctypes.ChainConfigurator
 		sender        = common.BytesToAddress([]byte("sender"))
 		receiver      = common.BytesToAddress([]byte("receiver"))
-		genesisConfig *paramtypes.Genesis
+		genesisConfig *genesis.Genesis
 	)
 	if ctx.GlobalBool(MachineFlag.Name) {
 		tracer = vm.NewJSONLogger(logconfig, os.Stdout)
@@ -107,7 +107,7 @@ func runCmd(ctx *cli.Context) error {
 		chainConfig = gen.Config
 	} else {
 		statedb, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()))
-		genesisConfig = new(paramtypes.Genesis)
+		genesisConfig = new(genesis.Genesis)
 	}
 	if ctx.GlobalString(SenderFlag.Name) != "" {
 		sender = common.HexToAddress(ctx.GlobalString(SenderFlag.Name))

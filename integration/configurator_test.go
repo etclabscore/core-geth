@@ -28,8 +28,8 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesis"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -169,7 +169,7 @@ func TestEquivalent_ReadParity(t *testing.T) {
 func TestParityGeneses(t *testing.T) {
 	testes := []struct {
 		filename       string
-		defaultGenesis *paramtypes.Genesis
+		defaultGenesis *genesis.Genesis
 	}{
 		{
 			"foundation.json",
@@ -203,7 +203,7 @@ func TestParityGeneses(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		genc := &paramtypes.Genesis{
+		genc := &genesis.Genesis{
 			Config: &multigeth.MultiGethChainConfig{},
 		}
 		err = confp.Convert(pspec, genc)

@@ -20,14 +20,14 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/params/confp"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/genesis"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
 // NewParityChainSpec converts a go-ethereum genesis block into a Parity specific
 // chain specification format.
-func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes []string) (*parity.ParityChainSpec, error) {
+func NewParityChainSpec(network string, genesis *genesis.Genesis, bootnodes []string) (*parity.ParityChainSpec, error) {
 	spec := &parity.ParityChainSpec{
 		Name:    network,
 		Nodes:   bootnodes,
@@ -44,8 +44,8 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 
 // ToMultiGethGenesis converts a Parity chainspec to the corresponding MultiGeth datastructure.
 // Note that the return value 'core.Genesis' includes the respective 'params.MultiGethChainConfig' values.
-func ParityConfigToMultiGethGenesis(c *parity.ParityChainSpec) (*paramtypes.Genesis, error) {
-	mg := &paramtypes.Genesis{
+func ParityConfigToMultiGethGenesis(c *parity.ParityChainSpec) (*genesis.Genesis, error) {
+	mg := &genesis.Genesis{
 		Config: &multigeth.MultiGethChainConfig{},
 	}
 

@@ -21,14 +21,14 @@ import (
 	"errors"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/genesis"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/pyethereum"
 )
 
 // NewPyEthereumGenesisSpec converts a go-ethereum genesis block into a Parity specific
 // chain specification format.
-func NewPyEthereumGenesisSpec(network string, genesis *paramtypes.Genesis) (*pyethereum.PyEthereumGenesisSpec, error) {
+func NewPyEthereumGenesisSpec(network string, genesis *genesis.Genesis) (*pyethereum.PyEthereumGenesisSpec, error) {
 	// Only ethash is currently supported between go-ethereum and pyethereum
 	if genesis.Config.(*multigeth.MultiGethChainConfig).Ethash == nil {
 		return nil, errors.New("unsupported consensus engine")

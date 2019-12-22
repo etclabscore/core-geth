@@ -33,7 +33,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/genesis"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -44,8 +44,8 @@ type config struct {
 	bootnodes []string // Bootnodes to always connect to by all nodes
 	ethstats  string   // Ethstats settings to cache for node deploys
 
-	Genesis *paramtypes.Genesis `json:"genesis,omitempty"` // Genesis block to cache for node deploys
-	Servers map[string][]byte   `json:"servers,omitempty"`
+	Genesis *genesis.Genesis  `json:"genesis,omitempty"` // Genesis block to cache for node deploys
+	Servers map[string][]byte `json:"servers,omitempty"`
 }
 
 // servers retrieves an alphabetically sorted list of servers.

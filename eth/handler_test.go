@@ -36,8 +36,8 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/params/types"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesis"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -479,7 +479,7 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 		db     = rawdb.NewMemoryDatabase()
 		config = new(multigeth.MultiGethChainConfig)
 	)
-	core.MustCommitGenesis(db, &paramtypes.Genesis{Config: config}) // Commit genesis block
+	core.MustCommitGenesis(db, &genesis.Genesis{Config: config}) // Commit genesis block
 	// If checkpointing is enabled, create and inject a fake CHT and the corresponding
 	// chllenge response.
 	var response *types.Header
@@ -580,7 +580,7 @@ func testBroadcastBlock(t *testing.T, totalPeers, broadcastExpected int) {
 		pow     = ethash.NewFaker()
 		db      = rawdb.NewMemoryDatabase()
 		config  = &multigeth.MultiGethChainConfig{}
-		gspec   = &paramtypes.Genesis{Config: config}
+		gspec   = &genesis.Genesis{Config: config}
 		genesis = core.MustCommitGenesis(db, gspec)
 	)
 	blockchain, err := core.NewBlockChain(db, nil, config, pow, vm.Config{}, nil)

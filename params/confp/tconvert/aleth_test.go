@@ -22,8 +22,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
+	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
 	"github.com/go-test/deep"
 )
 
@@ -36,7 +36,7 @@ func TestAlethSturebyConverter(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}
-	var genesis paramtypes.Genesis
+	var genesis genesis2.Genesis
 	if err := json.Unmarshal(blob, &genesis); err != nil {
 		t.Fatalf("failed parsing genesis: %v", err)
 	}

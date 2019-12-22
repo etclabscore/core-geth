@@ -38,6 +38,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types"
+	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -54,7 +55,7 @@ var (
 func newCanonical(engine consensus.Engine, n int, full bool) (ethdb.Database, *BlockChain, error) {
 	var (
 		db      = rawdb.NewMemoryDatabase()
-		genesis = MustCommitGenesis(db, new(paramtypes.Genesis))
+		genesis = MustCommitGenesis(db, new(genesis2.Genesis))
 	)
 
 	// Initialize a fresh chain with only a genesis block
@@ -597,9 +598,9 @@ func TestFastVsFullChains(t *testing.T) {
 		key, _  = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		address = crypto.PubkeyToAddress(key.PublicKey)
 		funds   = big.NewInt(1000000000)
-		gspec   = &paramtypes.Genesis{
+		gspec   = &genesis2.Genesis{
 			Config: params.TestChainConfig,
-			Alloc:  paramtypes.GenesisAlloc{address: {Balance: funds}},
+			Alloc:  genesis2.GenesisAlloc{address: {Balance: funds}},
 		}
 		genesis = MustCommitGenesis(gendb, gspec)
 		signer  = types.NewEIP155Signer(gspec.Config.GetChainID())
@@ -714,7 +715,7 @@ func TestLightVsFastVsFullChainHeads(t *testing.T) {
 		key, _  = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		address = crypto.PubkeyToAddress(key.PublicKey)
 		funds   = big.NewInt(1000000000)
-		gspec   = &paramtypes.Genesis{Config: params.TestChainConfig, Alloc: paramtypes.GenesisAlloc{address: {Balance: funds}}}
+		gspec   = &genesis2.Genesis{Config: params.TestChainConfig, Alloc: genesis2.GenesisAlloc{address: {Balance: funds}}}
 		genesis = MustCommitGenesis(gendb, gspec)
 	)
 	height := uint64(1024)
@@ -827,10 +828,10 @@ func TestChainTxReorgs(t *testing.T) {
 		addr2   = crypto.PubkeyToAddress(key2.PublicKey)
 		addr3   = crypto.PubkeyToAddress(key3.PublicKey)
 		db      = rawdb.NewMemoryDatabase()
-		gspec   = &paramtypes.Genesis{
+		gspec   = &genesis2.Genesis{
 			Config:   params.TestChainConfig,
 			GasLimit: 3141592,
-			Alloc: paramtypes.GenesisAlloc{
+			Alloc: genesis2.GenesisAlloc{
 				addr1: {Balance: big.NewInt(1000000)},
 				addr2: {Balance: big.NewInt(1000000)},
 				addr3: {Balance: big.NewInt(1000000)},
@@ -940,7 +941,7 @@ func TestLogReorgs(t *testing.T) {
 		db      = rawdb.NewMemoryDatabase()
 		// this code generates a log
 		code    = common.Hex2Bytes("60606040525b7f24ec1d3ff24c2f6ff210738839dbc339cd45a5294d85c79361016243157aae7b60405180905060405180910390a15b600a8060416000396000f360606040526008565b00")
-		gspec   = &paramtypes.Genesis{Config: params.TestChainConfig, Alloc: paramtypes.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
+		gspec   = &genesis2.Genesis{Config: params.TestChainConfig, Alloc: genesis2.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
 		genesis = MustCommitGenesis(db, gspec)
 		signer  = types.NewEIP155Signer(gspec.Config.GetChainID())
 	)
@@ -991,7 +992,7 @@ func TestLogRebirth(t *testing.T) {
 
 		// this code generates a log
 		code        = common.Hex2Bytes("60606040525b7f24ec1d3ff24c2f6ff210738839dbc339cd45a5294d85c79361016243157aae7b60405180905060405180910390a15b600a8060416000396000f360606040526008565b00")
-		gspec       = &paramtypes.Genesis{Config: params.TestChainConfig, Alloc: paramtypes.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
+		gspec       = &genesis2.Genesis{Config: params.TestChainConfig, Alloc: genesis2.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
 		genesis     = MustCommitGenesis(db, gspec)
 		signer      = types.NewEIP155Signer(gspec.Config.GetChainID())
 		newLogCh    = make(chan bool)
@@ -1112,7 +1113,7 @@ func TestSideLogRebirth(t *testing.T) {
 
 		// this code generates a log
 		code     = common.Hex2Bytes("60606040525b7f24ec1d3ff24c2f6ff210738839dbc339cd45a5294d85c79361016243157aae7b60405180905060405180910390a15b600a8060416000396000f360606040526008565b00")
-		gspec    = &paramtypes.Genesis{Config: params.TestChainConfig, Alloc: paramtypes.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
+		gspec    = &genesis2.Genesis{Config: params.TestChainConfig, Alloc: genesis2.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
 		genesis  = MustCommitGenesis(db, gspec)
 		signer   = types.NewEIP155Signer(gspec.Config.GetChainID())
 		newLogCh = make(chan bool)
@@ -1193,9 +1194,9 @@ func TestReorgSideEvent(t *testing.T) {
 		db      = rawdb.NewMemoryDatabase()
 		key1, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		addr1   = crypto.PubkeyToAddress(key1.PublicKey)
-		gspec   = &paramtypes.Genesis{
+		gspec   = &genesis2.Genesis{
 			Config: params.TestChainConfig,
-			Alloc:  paramtypes.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}},
+			Alloc:  genesis2.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}},
 		}
 		genesis = MustCommitGenesis(db, gspec)
 		signer  = types.NewEIP155Signer(gspec.Config.GetChainID())
@@ -1326,13 +1327,13 @@ func TestEIP155Transition(t *testing.T) {
 		address    = crypto.PubkeyToAddress(key.PublicKey)
 		funds      = big.NewInt(1000000000)
 		deleteAddr = common.Address{1}
-		gspec      = &paramtypes.Genesis{
+		gspec      = &genesis2.Genesis{
 			Config: &goethereum.ChainConfig{
 				ChainID:     big.NewInt(1),
 				EIP150Block: big.NewInt(0),
 				EIP155Block: big.NewInt(2), HomesteadBlock: new(big.Int),
 			},
-			Alloc: paramtypes.GenesisAlloc{address: {Balance: funds}, deleteAddr: {Balance: new(big.Int)}},
+			Alloc: genesis2.GenesisAlloc{address: {Balance: funds}, deleteAddr: {Balance: new(big.Int)}},
 		}
 		genesis = MustCommitGenesis(db, gspec)
 	)
@@ -1433,7 +1434,7 @@ func TestEIP161AccountRemoval(t *testing.T) {
 		address = crypto.PubkeyToAddress(key.PublicKey)
 		funds   = big.NewInt(1000000000)
 		theAddr = common.Address{1}
-		gspec   = &paramtypes.Genesis{
+		gspec   = &genesis2.Genesis{
 			Config: &goethereum.ChainConfig{
 				ChainID:        big.NewInt(1),
 				HomesteadBlock: new(big.Int),
@@ -1441,7 +1442,7 @@ func TestEIP161AccountRemoval(t *testing.T) {
 				EIP155Block:    new(big.Int),
 				EIP158Block:    big.NewInt(2),
 			},
-			Alloc: paramtypes.GenesisAlloc{address: {Balance: funds}},
+			Alloc: genesis2.GenesisAlloc{address: {Balance: funds}},
 		}
 		genesis = MustCommitGenesis(db, gspec)
 	)
@@ -1502,7 +1503,7 @@ func TestBlockchainHeaderchainReorgConsistency(t *testing.T) {
 	engine := ethash.NewFaker()
 
 	db := rawdb.NewMemoryDatabase()
-	genesis := MustCommitGenesis(db, new(paramtypes.Genesis))
+	genesis := MustCommitGenesis(db, new(genesis2.Genesis))
 	blocks, _ := GenerateChain(params.TestChainConfig, genesis, engine, db, 64, func(i int, b *BlockGen) { b.SetCoinbase(common.Address{1}) })
 
 	// Generate a bunch of fork blocks, each side forking from the canonical chain
@@ -1518,7 +1519,7 @@ func TestBlockchainHeaderchainReorgConsistency(t *testing.T) {
 	// Import the canonical and fork chain side by side, verifying the current block
 	// and current header consistency
 	diskdb := rawdb.NewMemoryDatabase()
-	MustCommitGenesis(diskdb, new(paramtypes.Genesis))
+	MustCommitGenesis(diskdb, new(genesis2.Genesis))
 
 	chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{}, nil)
 	if err != nil {
@@ -1547,7 +1548,7 @@ func TestTrieForkGC(t *testing.T) {
 	engine := ethash.NewFaker()
 
 	db := rawdb.NewMemoryDatabase()
-	genesis := MustCommitGenesis(db, new(paramtypes.Genesis))
+	genesis := MustCommitGenesis(db, new(genesis2.Genesis))
 	blocks, _ := GenerateChain(params.TestChainConfig, genesis, engine, db, 2*TriesInMemory, func(i int, b *BlockGen) { b.SetCoinbase(common.Address{1}) })
 
 	// Generate a bunch of fork blocks, each side forking from the canonical chain
@@ -1562,7 +1563,7 @@ func TestTrieForkGC(t *testing.T) {
 	}
 	// Import the canonical and fork chain side by side, forcing the trie cache to cache both
 	diskdb := rawdb.NewMemoryDatabase()
-	MustCommitGenesis(diskdb, new(paramtypes.Genesis))
+	MustCommitGenesis(diskdb, new(genesis2.Genesis))
 
 	chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{}, nil)
 	if err != nil {
@@ -1593,7 +1594,7 @@ func TestLargeReorgTrieGC(t *testing.T) {
 	engine := ethash.NewFaker()
 
 	db := rawdb.NewMemoryDatabase()
-	genesis := MustCommitGenesis(db, new(paramtypes.Genesis))
+	genesis := MustCommitGenesis(db, new(genesis2.Genesis))
 
 	shared, _ := GenerateChain(params.TestChainConfig, genesis, engine, db, 64, func(i int, b *BlockGen) { b.SetCoinbase(common.Address{1}) })
 	original, _ := GenerateChain(params.TestChainConfig, shared[len(shared)-1], engine, db, 2*TriesInMemory, func(i int, b *BlockGen) { b.SetCoinbase(common.Address{2}) })
@@ -1601,7 +1602,7 @@ func TestLargeReorgTrieGC(t *testing.T) {
 
 	// Import the shared chain and the original canonical one
 	diskdb := rawdb.NewMemoryDatabase()
-	MustCommitGenesis(diskdb, new(paramtypes.Genesis))
+	MustCommitGenesis(diskdb, new(genesis2.Genesis))
 
 	chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{}, nil)
 	if err != nil {
@@ -1646,7 +1647,7 @@ func TestBlockchainRecovery(t *testing.T) {
 		key, _  = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		address = crypto.PubkeyToAddress(key.PublicKey)
 		funds   = big.NewInt(1000000000)
-		gspec   = &paramtypes.Genesis{Config: params.TestChainConfig, Alloc: paramtypes.GenesisAlloc{address: {Balance: funds}}}
+		gspec   = &genesis2.Genesis{Config: params.TestChainConfig, Alloc: genesis2.GenesisAlloc{address: {Balance: funds}}}
 		genesis = MustCommitGenesis(gendb, gspec)
 	)
 	height := uint64(1024)
@@ -1702,7 +1703,7 @@ func TestIncompleteAncientReceiptChainInsertion(t *testing.T) {
 		key, _  = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		address = crypto.PubkeyToAddress(key.PublicKey)
 		funds   = big.NewInt(1000000000)
-		gspec   = &paramtypes.Genesis{Config: params.TestChainConfig, Alloc: paramtypes.GenesisAlloc{address: {Balance: funds}}}
+		gspec   = &genesis2.Genesis{Config: params.TestChainConfig, Alloc: genesis2.GenesisAlloc{address: {Balance: funds}}}
 		genesis = MustCommitGenesis(gendb, gspec)
 	)
 	height := uint64(1024)
@@ -1763,7 +1764,7 @@ func TestLowDiffLongChain(t *testing.T) {
 	// Generate a canonical chain to act as the main dataset
 	engine := ethash.NewFaker()
 	db := rawdb.NewMemoryDatabase()
-	genesis := MustCommitGenesis(db, new(paramtypes.Genesis))
+	genesis := MustCommitGenesis(db, new(genesis2.Genesis))
 
 	// We must use a pretty long chain to ensure that the fork doesn't overtake us
 	// until after at least 128 blocks post tip
@@ -1774,7 +1775,7 @@ func TestLowDiffLongChain(t *testing.T) {
 
 	// Import the canonical chain
 	diskdb := rawdb.NewMemoryDatabase()
-	MustCommitGenesis(diskdb, new(paramtypes.Genesis))
+	MustCommitGenesis(diskdb, new(genesis2.Genesis))
 
 	chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{}, nil)
 	if err != nil {
@@ -1817,12 +1818,12 @@ func testSideImport(t *testing.T, numCanonBlocksInSidechain, blocksBetweenCommon
 	// Generate a canonical chain to act as the main dataset
 	engine := ethash.NewFaker()
 	db := rawdb.NewMemoryDatabase()
-	genesis := MustCommitGenesis(db, new(paramtypes.Genesis))
+	genesis := MustCommitGenesis(db, new(genesis2.Genesis))
 
 	// Generate and import the canonical chain
 	blocks, _ := GenerateChain(params.TestChainConfig, genesis, engine, db, 2*TriesInMemory, nil)
 	diskdb := rawdb.NewMemoryDatabase()
-	MustCommitGenesis(diskdb, new(paramtypes.Genesis))
+	MustCommitGenesis(diskdb, new(genesis2.Genesis))
 	chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{}, nil)
 	if err != nil {
 		t.Fatalf("failed to create tester chain: %v", err)
@@ -1897,7 +1898,7 @@ func testInsertKnownChainData(t *testing.T, typ string) {
 	engine := ethash.NewFaker()
 
 	db := rawdb.NewMemoryDatabase()
-	genesis := MustCommitGenesis(db, new(paramtypes.Genesis))
+	genesis := MustCommitGenesis(db, new(genesis2.Genesis))
 
 	blocks, receipts := GenerateChain(params.TestChainConfig, genesis, engine, db, 32, func(i int, b *BlockGen) { b.SetCoinbase(common.Address{1}) })
 	// A longer chain but total difficulty is lower.
@@ -1917,7 +1918,7 @@ func testInsertKnownChainData(t *testing.T, typ string) {
 	if err != nil {
 		t.Fatalf("failed to create temp freezer db: %v", err)
 	}
-	MustCommitGenesis(chaindb, new(paramtypes.Genesis))
+	MustCommitGenesis(chaindb, new(genesis2.Genesis))
 	defer os.RemoveAll(dir)
 
 	chain, err := NewBlockChain(chaindb, nil, params.TestChainConfig, engine, vm.Config{}, nil)
@@ -2026,7 +2027,7 @@ func getLongAndShortChains() (*BlockChain, []*types.Block, []*types.Block, error
 	// Generate a canonical chain to act as the main dataset
 	engine := ethash.NewFaker()
 	db := rawdb.NewMemoryDatabase()
-	genesis := MustCommitGenesis(db, new(paramtypes.Genesis))
+	genesis := MustCommitGenesis(db, new(genesis2.Genesis))
 
 	// Generate and import the canonical chain,
 	// Offset the time, to keep the difficulty low
@@ -2034,7 +2035,7 @@ func getLongAndShortChains() (*BlockChain, []*types.Block, []*types.Block, error
 		b.SetCoinbase(common.Address{1})
 	})
 	diskdb := rawdb.NewMemoryDatabase()
-	MustCommitGenesis(diskdb, new(paramtypes.Genesis))
+	MustCommitGenesis(diskdb, new(genesis2.Genesis))
 
 	chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{}, nil)
 	if err != nil {
@@ -2147,9 +2148,9 @@ func benchmarkLargeNumberOfValueToNonexisting(b *testing.B, numTxs, numBlocks in
 		testBankKey, _  = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		testBankAddress = crypto.PubkeyToAddress(testBankKey.PublicKey)
 		bankFunds       = big.NewInt(100000000000000000)
-		gspec           = paramtypes.Genesis{
+		gspec           = genesis2.Genesis{
 			Config: params.TestChainConfig,
-			Alloc: paramtypes.GenesisAlloc{
+			Alloc: genesis2.GenesisAlloc{
 				testBankAddress: {Balance: bankFunds},
 				common.HexToAddress("0xc0de"): {
 					Code:    []byte{0x60, 0x01, 0x50},
@@ -2261,12 +2262,12 @@ func TestSideImportPrunedBlocks(t *testing.T) {
 	// Generate a canonical chain to act as the main dataset
 	engine := ethash.NewFaker()
 	db := rawdb.NewMemoryDatabase()
-	genesis := MustCommitGenesis(db, new(paramtypes.Genesis))
+	genesis := MustCommitGenesis(db, new(genesis2.Genesis))
 
 	// Generate and import the canonical chain
 	blocks, _ := GenerateChain(params.TestChainConfig, genesis, engine, db, 2*TriesInMemory, nil)
 	diskdb := rawdb.NewMemoryDatabase()
-	MustCommitGenesis(diskdb, new(paramtypes.Genesis))
+	MustCommitGenesis(diskdb, new(genesis2.Genesis))
 	chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{}, nil)
 	if err != nil {
 		t.Fatalf("failed to create tester chain: %v", err)
@@ -2315,9 +2316,9 @@ func TestDeleteCreateRevert(t *testing.T) {
 		key, _  = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		address = crypto.PubkeyToAddress(key.PublicKey)
 		funds   = big.NewInt(1000000000)
-		gspec   = &paramtypes.Genesis{
+		gspec   = &genesis2.Genesis{
 			Config: params.TestChainConfig,
-			Alloc: paramtypes.GenesisAlloc{
+			Alloc: genesis2.GenesisAlloc{
 				address: {Balance: funds},
 				// The address 0xAAAAA selfdestructs if called
 				aa: {

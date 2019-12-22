@@ -34,7 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
+	genesis2 "github.com/ethereum/go-ethereum/params/types/genesis"
 	"github.com/ethereum/go-ethereum/params/vars"
 	whisper "github.com/ethereum/go-ethereum/whisper/whisperv6"
 )
@@ -140,10 +140,10 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 
 	debug.Memsize.Add("node", rawStack)
 
-	var genesis *paramtypes.Genesis
+	var genesis *genesis2.Genesis
 	if config.EthereumGenesis != "" {
 		// Parse the user supplied genesis spec if not mainnet
-		genesis = new(paramtypes.Genesis)
+		genesis = new(genesis2.Genesis)
 		if err := json.Unmarshal([]byte(config.EthereumGenesis), genesis); err != nil {
 			return nil, fmt.Errorf("invalid genesis spec: %v", err)
 		}

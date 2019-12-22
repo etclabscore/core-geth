@@ -22,14 +22,14 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
+	"github.com/ethereum/go-ethereum/params/types/genesis"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // NewAlethGenesisSpec converts a go-ethereum genesis block into a Aleth-specific
 // chain specification format.
-func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*aleth.AlethGenesisSpec, error) {
+func NewAlethGenesisSpec(network string, genesis *genesis.Genesis) (*aleth.AlethGenesisSpec, error) {
 	// Only ethash is currently supported between go-ethereum and aleth
 	if !genesis.Config.GetConsensusEngineType().IsEthash() {
 		return nil, errors.New("unsupported consensus engine")

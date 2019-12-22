@@ -9,8 +9,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesis"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
@@ -23,10 +23,10 @@ var gitDate = ""
 var (
 	chainspecFormatTypes = map[string]ctypes.Configurator{
 		"parity": &parity.ParityChainSpec{},
-		"multigeth": &paramtypes.Genesis{
+		"multigeth": &genesis.Genesis{
 			Config: &multigeth.MultiGethChainConfig{},
 		},
-		"geth": &paramtypes.Genesis{
+		"geth": &genesis.Genesis{
 			Config: &goethereum.ChainConfig{},
 		},
 		// TODO

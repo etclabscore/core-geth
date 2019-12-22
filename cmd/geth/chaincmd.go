@@ -37,7 +37,6 @@ import (
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
 	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/trie"
 	"gopkg.in/urfave/cli.v1"

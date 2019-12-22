@@ -16,8 +16,6 @@
 
 /*
 Package paramtypes is a parent package for parameter types.
- */
+*/
 
 package paramtypes
-
-

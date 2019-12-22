@@ -16,7 +16,6 @@
 
 /*
 Package genesis holds genesis data types and logic.
- */
+*/
 
 package genesisT
-

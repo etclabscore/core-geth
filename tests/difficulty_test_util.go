@@ -65,7 +65,7 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 	"Constantinople": &goethereum.ChainConfig{
 		Ethash:              new(ctypes.EthashConfig),
 		HomesteadBlock:      big.NewInt(0),
-		ByzantiumBlock: big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
 		ConstantinopleBlock: big.NewInt(0),
 	},
 	"difficulty.json": mainnetChainConfig,

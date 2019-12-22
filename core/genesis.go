@@ -81,7 +81,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis)
 		// Ensure the stored genesis matches with the given one.
 		hash := GenesisToBlock(genesis, nil).Hash()
 		if hash != stored {
-			return genesis.Config, hash, &genesisT.GenesisMismatchError{stored, hash}
+			return genesis.Config, hash, &genesisT.GenesisMismatchError{Stored: stored, New: hash}
 		}
 		block, err := CommitGenesis(genesis, db)
 		if err != nil {
@@ -94,7 +94,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis)
 	if genesis != nil {
 		hash := GenesisToBlock(genesis, nil).Hash()
 		if hash != stored {
-			return genesis.Config, hash, &genesisT.GenesisMismatchError{stored, hash}
+			return genesis.Config, hash, &genesisT.GenesisMismatchError{Stored: stored, New: hash}
 		}
 	}
 

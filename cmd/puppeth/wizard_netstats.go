@@ -24,7 +24,7 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/log"
-	genesisT "github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/olekukonko/tablewriter"
 )
 

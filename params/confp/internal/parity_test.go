@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package convert_test
 
 import (
@@ -29,8 +28,8 @@ import (
 
 func TestBlockConfig(t *testing.T) {
 	frontierCC := &goethereum.ChainConfig{
-			ChainID: big.NewInt(1),
-			Ethash:  new(ctypes.EthashConfig),
+		ChainID: big.NewInt(1),
+		Ethash:  new(ctypes.EthashConfig),
 	}
 	genesis := params.DefaultGenesisBlock()
 	genesis.Config = frontierCC

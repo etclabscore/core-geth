@@ -124,11 +124,11 @@ func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*aleth.Al
 		}
 		spec.SetPrecompile(6, &aleth.AlethGenesisSpecBuiltin{
 			Name:          "alt_bn128_G1_add",
-			StartingBlock: (*hexutil.Big)(spec.Params.ByzantiumForkBlock),
+			StartingBlock: (spec.Params.ByzantiumForkBlock),
 		}) // Aleth hardcoded the gas policy
 		spec.SetPrecompile(7, &aleth.AlethGenesisSpecBuiltin{
 			Name:          "alt_bn128_G1_mul",
-			StartingBlock: (*hexutil.Big)(spec.Params.ByzantiumForkBlock),
+			StartingBlock: (spec.Params.ByzantiumForkBlock),
 		}) // Aleth hardcoded the gas policy
 		spec.SetPrecompile(9, &aleth.AlethGenesisSpecBuiltin{
 			Name:          "blake2_compression",

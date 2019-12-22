@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package ctypes
 
 import (
@@ -56,8 +55,8 @@ var uint64bigMaybeYesD []byte = []byte(`
 }`)
 
 type testCase struct {
-	rawjson []byte
-	dat fakeConfig
+	rawjson       []byte
+	dat           fakeConfig
 	marshaledWant []byte
 }
 
@@ -181,7 +180,6 @@ func TestUint64BigMapEncodesHex_SetValueTotalForHeight(t *testing.T) {
 	check(mgSoloOrdered, mgSoloOrdered.SumValues(&muirBlock), vars.EIP2384DifficultyBombDelay.Uint64())
 	check(mgSoloOrdered, mgSoloOrdered.SumValues(&max), vars.EIP2384DifficultyBombDelay.Uint64())
 
-
 	checkFinal := func(mg Uint64BigMapEncodesHex) {
 		check(mg, mg.SumValues(&byzaBlock), vars.EIP649DifficultyBombDelay.Uint64())
 		check(mg, mg.SumValues(&consBlock), vars.EIP1234DifficultyBombDelay.Uint64())
@@ -241,7 +239,6 @@ func TestUint64BigMapEncodesHex_SetValueTotalForHeight(t *testing.T) {
 	mgRepetitious.SetValueTotalForHeight(&byzaBlock, vars.EIP649DifficultyBombDelay)
 
 	checkFinal(mgRepetitious)
-
 
 	mgTestlike := newMG()
 	zero := uint64(0)

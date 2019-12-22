@@ -8,7 +8,6 @@ import (
 )
 
 type GlobalVarsConfigurator struct {
-
 }
 
 func One() *GlobalVarsConfigurator {

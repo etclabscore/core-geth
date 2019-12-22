@@ -46,12 +46,12 @@ type ParityChainSpec struct {
 				// These inferences require computation.
 				// This makes it so that the 'heavy-lifting' only has to run once.
 				// See ctypes.MapMeetsSpecification for this bespoke logic.
-				eip649Inferred    bool       `json:"-"`
-				eip649Transition  *ParityU64 `json:"-"`
-				eip1234Inferred   bool       `json:"-"`
-				eip1234Transition *ParityU64 `json:"-"`
-				eip2384Inferred   bool       `json:"-"`
-				eip2384Transition *ParityU64 `json:"-"`
+				eip649Inferred    bool
+				eip649Transition  *ParityU64
+				eip1234Inferred   bool
+				eip1234Transition *ParityU64
+				eip2384Inferred   bool
+				eip2384Transition *ParityU64
 
 				HomesteadTransition *ParityU64 `json:"homesteadTransition"`
 				EIP100bTransition   *ParityU64 `json:"eip100bTransition"`
@@ -191,7 +191,7 @@ func (i *ParityU64) UnmarshalJSON(input []byte) error {
 	// "4"
 	s := string(input)
 	s, _ = strconv.Unquote(s)
-	b, ok := new(big.Int).SetString(string(s), 10)
+	b, ok := new(big.Int).SetString(s, 10)
 	if ok {
 		*i = ParityU64(b.Uint64())
 		return nil
@@ -393,5 +393,4 @@ func (spec *ParityChainSpec) SetPrecompile2(address common.Address, name string,
 	bin.Pricing.Map[math.NewHexOrDecimal256(int64(*activationBlock))] = ParityChainSpecPricingPrice{
 		ParityChainSpecPricing: pricing,
 	}
-	return
 }

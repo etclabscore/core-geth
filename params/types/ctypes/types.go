@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package ctypes
 
 import (
@@ -65,7 +64,7 @@ func UnsupportedConfigError(err error, method string, value interface{}) ErrUnsu
 
 // Uint64BigValOrMapHex is an encoding type for Parity's chain config,
 // used for their 'blockReward' field.
-// When only an intial value, eg 0:0x42 is set, the type is a hex-encoded string.
+// When only an initial value, eg 0:0x42 is set, the type is a hex-encoded string.
 // When multiple values are set, eg modified block rewards, the type is a map of hex-encoded strings.
 type Uint64BigValOrMapHex map[uint64]*big.Int
 
@@ -125,10 +124,10 @@ func (bb *Uint64BigMapEncodesHex) UnmarshalJSON(input []byte) error {
 	b := make(map[uint64]*big.Int)
 	for k, v := range m {
 		var vv *big.Int
-		switch v.(type) {
+		switch v := v.(type) {
 		case string:
 			var b = new(math.HexOrDecimal256)
-			err = b.UnmarshalText([]byte(v.(string)))
+			err = b.UnmarshalText([]byte(v))
 			if err != nil {
 				return err
 			}
@@ -236,7 +235,7 @@ func MapMeetsSpecification(difficulties Uint64BigMapEncodesHex, rewards Uint64Bi
 
 	var total = new(big.Int)
 	for _, s := range sl {
-		d :=  difficulties[s]
+		d := difficulties[s]
 		if d == nil {
 			panic(fmt.Sprintf("dnil difficulties: %v, sl: %v", difficulties, sl))
 		}
@@ -374,4 +373,3 @@ type CliqueConfig struct {
 func (c *CliqueConfig) String() string {
 	return "clique"
 }
-

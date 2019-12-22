@@ -248,7 +248,6 @@ func (w *wizard) readDefaultUint64P(def uint64) *uint64 {
 	}
 }
 
-
 /*
 // readFloat reads a single line from stdin, trimming if from spaces, enforcing it
 // to parse into a float.

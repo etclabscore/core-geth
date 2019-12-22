@@ -471,7 +471,7 @@ func (c *MultiGethChainConfig) GetEthashEIP649Transition() *uint64 {
 	// Get block number (key) from maps where EIP649 criteria is met.
 	diffN = ctypes.MapMeetsSpecification(
 		c.DifficultyBombDelaySchedule,
-		ctypes.Uint64BigMapEncodesHex(c.BlockRewardSchedule),
+		c.BlockRewardSchedule,
 		vars.EIP649DifficultyBombDelay,
 		vars.EIP649FBlockReward,
 	)

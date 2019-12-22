@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package generic
 
 import (
@@ -79,9 +78,9 @@ var (
 
 func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) {
 	var cases = map[ctypes.ChainConfigurator][]string{
-		&parity.ParityChainSpec{}: paritySchemaKeysMust,
+		&parity.ParityChainSpec{}:         paritySchemaKeysMust,
 		&multigeth.MultiGethChainConfig{}: multigethSchemaMust,
-		&goethereum.ChainConfig{}: goethereumSchemaMust,
+		&goethereum.ChainConfig{}:         goethereumSchemaMust,
 	}
 	for c, fn := range cases {
 		ok, err := asMapHasAnyKey(input, fn)

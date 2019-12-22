@@ -183,7 +183,7 @@ func (b Uint64BigMapEncodesHex) SetValueTotalForHeight(n *uint64, val *big.Int) 
 
 	sumR := big.NewInt(0)
 	sl := []uint64{}
-	for k, _ := range sums {
+	for k := range sums {
 		sl = append(sl, k)
 	}
 	sort.Slice(sl, func(i, j int) bool {
@@ -200,7 +200,7 @@ func (b Uint64BigMapEncodesHex) SumValues(n *uint64) uint64 {
 	var sumB = big.NewInt(0)
 	var sl = []uint64{}
 
-	for k, _ := range b {
+	for k := range b {
 		sl = append(sl, k)
 	}
 	sort.Slice(sl, func(i, j int) bool {
@@ -226,7 +226,7 @@ func MapMeetsSpecification(difficulties Uint64BigMapEncodesHex, rewards Uint64Bi
 	var sl = []uint64{}
 
 	// difficulty
-	for k, _ := range difficulties {
+	for k := range difficulties {
 		sl = append(sl, k)
 	}
 	sort.Slice(sl, func(i, j int) bool {

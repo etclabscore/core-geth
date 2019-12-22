@@ -239,7 +239,7 @@ func TestGatherForks(t *testing.T) {
 	}{
 		{
 			params.ClassicChainConfig,
-			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000},
+			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000, 10500839},
 		},
 		{
 			params.MainnetChainConfig,

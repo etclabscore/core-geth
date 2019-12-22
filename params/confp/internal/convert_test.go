@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package convert_test
 
 import (
@@ -29,7 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
-	"github.com/ethereum/go-ethereum/params/types"
+	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
@@ -95,7 +94,7 @@ func TestIdentical(t *testing.T) {
 		"ChainID",
 		"NetworkID",
 	}
-	configs :=  []ctypes.ChainConfigurator{
+	configs := []ctypes.ChainConfigurator{
 		&multigeth.MultiGethChainConfig{},
 		&goethereum.ChainConfig{},
 		&parity.ParityChainSpec{},
@@ -163,7 +162,7 @@ func TestGatherForks(t *testing.T) {
 			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000},
 		},
 	}
-	sliceContains := func (sl []uint64, u uint64) bool {
+	sliceContains := func(sl []uint64, u uint64) bool {
 		for _, s := range sl {
 			if s == u {
 				return true

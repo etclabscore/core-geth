@@ -431,7 +431,6 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 
 	}
 
-
 	// EXPLOSION
 
 	// the 'periodRef' (from above) represents the many ways of hackishly modifying the reference number

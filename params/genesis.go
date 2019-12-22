@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package params
 
 import (
@@ -23,7 +22,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params/types"
+	paramtypes "github.com/ethereum/go-ethereum/params/types"
 )
 
 // DefaultGenesisBlock returns the Ethereum main net genesis block.
@@ -100,4 +99,3 @@ func DeveloperGenesisBlock(period uint64, faucet common.Address) *paramtypes.Gen
 		},
 	}
 }
-

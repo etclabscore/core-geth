@@ -27,7 +27,7 @@ var (
 	// Genesis hashes to enforce below configs on.
 	KottiGenesisHash = common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4")
 
-	KottiNetworkID          uint64 = 6
+	KottiNetworkID uint64 = 6
 	//KottiDisposalBlock             = uint64(0)
 	//KottiECIP1017FBlock            = uint64(5000000)
 	//KottiECIP1017EraRounds         = uint64(5000000)

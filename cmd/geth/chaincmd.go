@@ -238,17 +238,6 @@ func initGenesis(ctx *cli.Context) error {
 	return nil
 }
 
-func dumpGenesis(ctx *cli.Context) error {
-	genesis := utils.MakeGenesis(ctx)
-	if genesis == nil {
-		genesis = params.DefaultGenesisBlock()
-	}
-	if err := json.NewEncoder(os.Stdout).Encode(genesis); err != nil {
-		utils.Fatalf("could not encode genesis")
-	}
-	return nil
-}
-
 func importChain(ctx *cli.Context) error {
 	if len(ctx.Args()) < 1 {
 		utils.Fatalf("This command requires an argument.")

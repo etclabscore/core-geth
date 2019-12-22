@@ -189,8 +189,6 @@ func TestDifficultyGen(t *testing.T) {
 
 		}
 	})
-
-	return
 }
 
 func mustAppendTestToFile(t *testing.T, test *DifficultyTest, filep string) {

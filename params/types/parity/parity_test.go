@@ -196,6 +196,9 @@ func TestParityChainSpec_GetPrecompile(t *testing.T) {
         "name": "alt_bn128_mul",
         "pricing": {
           "42": {
+            "price": { "alt_bn128_const_operations": { "price": 50000 }}
+          },
+          "42": {
             "price": { "alt_bn128_const_operations": { "price": 40000 }}
           },
           "0x2a": {
@@ -228,12 +231,18 @@ func TestParityChainSpec_GetPrecompile(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Use 'alt_bn128_mul' as our test case.
 	got := pspec.GetPrecompile(common.BytesToAddress([]byte{7}),
 		ParityChainSpecPricing{
 			AltBnConstOperation: &ParityChainSpecAltBnConstOperationPricing{
-				Price: 40000, // Want 40000 because "42" lexically comes after "0x2a", etc
+				// Want 40000 because "42" lexically comes after "0x2a" and "0x02a".
+				// And then we cross our fingers and hope that literal order is preserved
+				// for the map during JSON unmarshaling with the keys as strings, since "42" == "42".
+				// We want bottom-wins parsing.
+				Price: 40000,
 			},
 		}).Uint64P()
+
 	want := uint64(42)
 
 	if got == nil || *got != want {

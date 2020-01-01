@@ -53,35 +53,35 @@ func setBig(i *big.Int, u *uint64) *big.Int {
 }
 
 func (c *ChainConfig) GetAccountStartNonce() *uint64 {
-	return internal.One().GetAccountStartNonce()
+	return internal.GlobalConfigurator().GetAccountStartNonce()
 }
 
 func (c *ChainConfig) SetAccountStartNonce(n *uint64) error {
-	return internal.One().SetAccountStartNonce(n)
+	return internal.GlobalConfigurator().SetAccountStartNonce(n)
 }
 
 func (c *ChainConfig) GetMaximumExtraDataSize() *uint64 {
-	return internal.One().GetMaximumExtraDataSize()
+	return internal.GlobalConfigurator().GetMaximumExtraDataSize()
 }
 
 func (c *ChainConfig) SetMaximumExtraDataSize(n *uint64) error {
-	return internal.One().SetMaximumExtraDataSize(n)
+	return internal.GlobalConfigurator().SetMaximumExtraDataSize(n)
 }
 
 func (c *ChainConfig) GetMinGasLimit() *uint64 {
-	return internal.One().GetMinGasLimit()
+	return internal.GlobalConfigurator().GetMinGasLimit()
 }
 
 func (c *ChainConfig) SetMinGasLimit(n *uint64) error {
-	return internal.One().SetMinGasLimit(n)
+	return internal.GlobalConfigurator().SetMinGasLimit(n)
 }
 
 func (c *ChainConfig) GetGasLimitBoundDivisor() *uint64 {
-	return internal.One().GetGasLimitBoundDivisor()
+	return internal.GlobalConfigurator().GetGasLimitBoundDivisor()
 }
 
 func (c *ChainConfig) SetGasLimitBoundDivisor(n *uint64) error {
-	return internal.One().SetGasLimitBoundDivisor(n)
+	return internal.GlobalConfigurator().SetGasLimitBoundDivisor(n)
 }
 
 // GetNetworkID and the following Set/Getters for ChainID too
@@ -121,11 +121,11 @@ func (c *ChainConfig) SetChainID(n *big.Int) error {
 }
 
 func (c *ChainConfig) GetMaxCodeSize() *uint64 {
-	return internal.One().GetMaxCodeSize()
+	return internal.GlobalConfigurator().GetMaxCodeSize()
 }
 
 func (c *ChainConfig) SetMaxCodeSize(n *uint64) error {
-	return internal.One().SetMaxCodeSize(n)
+	return internal.GlobalConfigurator().SetMaxCodeSize(n)
 }
 
 func (c *ChainConfig) GetEIP7Transition() *uint64 {
@@ -409,27 +409,27 @@ func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) erro
 }
 
 func (c *ChainConfig) GetEthashMinimumDifficulty() *big.Int {
-	return internal.One().GetEthashMinimumDifficulty()
+	return internal.GlobalConfigurator().GetEthashMinimumDifficulty()
 }
 
 func (c *ChainConfig) SetEthashMinimumDifficulty(i *big.Int) error {
-	return internal.One().SetEthashMinimumDifficulty(i)
+	return internal.GlobalConfigurator().SetEthashMinimumDifficulty(i)
 }
 
 func (c *ChainConfig) GetEthashDifficultyBoundDivisor() *big.Int {
-	return internal.One().GetEthashDifficultyBoundDivisor()
+	return internal.GlobalConfigurator().GetEthashDifficultyBoundDivisor()
 }
 
 func (c *ChainConfig) SetEthashDifficultyBoundDivisor(i *big.Int) error {
-	return internal.One().SetEthashDifficultyBoundDivisor(i)
+	return internal.GlobalConfigurator().SetEthashDifficultyBoundDivisor(i)
 }
 
 func (c *ChainConfig) GetEthashDurationLimit() *big.Int {
-	return internal.One().GetEthashDurationLimit()
+	return internal.GlobalConfigurator().GetEthashDurationLimit()
 }
 
 func (c *ChainConfig) SetEthashDurationLimit(i *big.Int) error {
-	return internal.One().SetEthashDurationLimit(i)
+	return internal.GlobalConfigurator().SetEthashDurationLimit(i)
 }
 
 // NOTE: Checking for if c.Ethash == nil is a consideration.

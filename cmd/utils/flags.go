@@ -1527,6 +1527,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Override genesis configuration if a --<chain> flag.
 	if gen := genesisForCtxChainConfig(ctx); gen != nil {
 		cfg.Genesis = gen
+		cfg.NetworkId = gen.Config.NetworkID
 	}
 
 	if ctx.GlobalBool(DeveloperFlag.Name) {

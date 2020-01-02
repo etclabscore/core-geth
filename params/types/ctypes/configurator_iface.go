@@ -146,7 +146,12 @@ type EthashConfigurator interface {
 	SetEthashHomesteadTransition(n *uint64) error
 	GetEthashEIP2Transition() *uint64
 	SetEthashEIP2Transition(n *uint64) error
+
+	// GetEthashEIP779Transition should return the block if the node wants the fork.
+	// Otherwise, nil should be returned.
 	GetEthashEIP779Transition() *uint64 // DAO
+
+	// SetEthashEIP779Transition should turn DAO support on (nonnil) or off (nil).
 	SetEthashEIP779Transition(n *uint64) error
 	GetEthashEIP649Transition() *uint64
 	SetEthashEIP649Transition(n *uint64) error

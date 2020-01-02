@@ -456,6 +456,9 @@ func (c *ChainConfig) SetEthashEIP2Transition(i *uint64) error {
 }
 
 func (c *ChainConfig) GetEthashEIP779Transition() *uint64 {
+	if !c.DAOForkSupport {
+		return nil
+	}
 	return bigNewU64(c.DAOForkBlock)
 }
 
@@ -463,10 +466,14 @@ func (c *ChainConfig) SetEthashEIP779Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
-	c.DAOForkBlock = setBig(c.DAOForkBlock, n)
-	if c.DAOForkBlock == nil {
+
+	if n == nil {
 		c.DAOForkSupport = false
+	} else {
+		c.DAOForkSupport = true
 	}
+	c.DAOForkBlock = setBig(c.DAOForkBlock, n)
+
 	return nil
 }
 

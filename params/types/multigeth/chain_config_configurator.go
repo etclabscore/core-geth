@@ -68,28 +68,28 @@ func (c *MultiGethChainConfig) ensureExistingDifficultySchedule() {
 }
 
 func (c *MultiGethChainConfig) GetAccountStartNonce() *uint64 {
-	return internal.One().GetAccountStartNonce()
+	return internal.GlobalConfigurator().GetAccountStartNonce()
 }
 func (c *MultiGethChainConfig) SetAccountStartNonce(n *uint64) error {
-	return internal.One().SetAccountStartNonce(n)
+	return internal.GlobalConfigurator().SetAccountStartNonce(n)
 }
 func (c *MultiGethChainConfig) GetMaximumExtraDataSize() *uint64 {
-	return internal.One().GetMaximumExtraDataSize()
+	return internal.GlobalConfigurator().GetMaximumExtraDataSize()
 }
 func (c *MultiGethChainConfig) SetMaximumExtraDataSize(n *uint64) error {
-	return internal.One().SetMaximumExtraDataSize(n)
+	return internal.GlobalConfigurator().SetMaximumExtraDataSize(n)
 }
 func (c *MultiGethChainConfig) GetMinGasLimit() *uint64 {
-	return internal.One().GetMinGasLimit()
+	return internal.GlobalConfigurator().GetMinGasLimit()
 }
 func (c *MultiGethChainConfig) SetMinGasLimit(n *uint64) error {
-	return internal.One().SetMinGasLimit(n)
+	return internal.GlobalConfigurator().SetMinGasLimit(n)
 }
 func (c *MultiGethChainConfig) GetGasLimitBoundDivisor() *uint64 {
-	return internal.One().GetGasLimitBoundDivisor()
+	return internal.GlobalConfigurator().GetGasLimitBoundDivisor()
 }
 func (c *MultiGethChainConfig) SetGasLimitBoundDivisor(n *uint64) error {
-	return internal.One().SetGasLimitBoundDivisor(n)
+	return internal.GlobalConfigurator().SetGasLimitBoundDivisor(n)
 }
 
 func (c *MultiGethChainConfig) GetNetworkID() *uint64 {
@@ -114,10 +114,10 @@ func (c *MultiGethChainConfig) SetChainID(n *big.Int) error {
 }
 
 func (c *MultiGethChainConfig) GetMaxCodeSize() *uint64 {
-	return internal.One().GetMaxCodeSize()
+	return internal.GlobalConfigurator().GetMaxCodeSize()
 }
 func (c *MultiGethChainConfig) SetMaxCodeSize(n *uint64) error {
-	return internal.One().SetMaxCodeSize(n)
+	return internal.GlobalConfigurator().SetMaxCodeSize(n)
 }
 
 func (c *MultiGethChainConfig) GetEIP7Transition() *uint64 {
@@ -401,26 +401,26 @@ func (c *MultiGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngi
 }
 
 func (c *MultiGethChainConfig) GetEthashMinimumDifficulty() *big.Int {
-	return internal.One().GetEthashMinimumDifficulty()
+	return internal.GlobalConfigurator().GetEthashMinimumDifficulty()
 }
 func (c *MultiGethChainConfig) SetEthashMinimumDifficulty(i *big.Int) error {
-	return internal.One().SetEthashMinimumDifficulty(i)
+	return internal.GlobalConfigurator().SetEthashMinimumDifficulty(i)
 }
 
 func (c *MultiGethChainConfig) GetEthashDifficultyBoundDivisor() *big.Int {
-	return internal.One().GetEthashDifficultyBoundDivisor()
+	return internal.GlobalConfigurator().GetEthashDifficultyBoundDivisor()
 }
 
 func (c *MultiGethChainConfig) SetEthashDifficultyBoundDivisor(i *big.Int) error {
-	return internal.One().SetEthashDifficultyBoundDivisor(i)
+	return internal.GlobalConfigurator().SetEthashDifficultyBoundDivisor(i)
 }
 
 func (c *MultiGethChainConfig) GetEthashDurationLimit() *big.Int {
-	return internal.One().GetEthashDurationLimit()
+	return internal.GlobalConfigurator().GetEthashDurationLimit()
 }
 
 func (c *MultiGethChainConfig) SetEthashDurationLimit(i *big.Int) error {
-	return internal.One().SetEthashDurationLimit(i)
+	return internal.GlobalConfigurator().SetEthashDurationLimit(i)
 }
 
 func (c *MultiGethChainConfig) GetEthashHomesteadTransition() *uint64 {

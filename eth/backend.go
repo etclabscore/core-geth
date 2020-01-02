@@ -49,9 +49,10 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enr"
 	"github.com/ethereum/go-ethereum/params"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -140,7 +141,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 		return nil, err
 	}
 	chainConfig, genesisHash, genesisErr := core.SetupGenesisBlockWithOverride(chainDb, config.Genesis)
-	if _, ok := genesisErr.(*ctypes.ConfigCompatError); genesisErr != nil && !ok {
+	if _, ok := genesisErr.(*confp.ConfigCompatError); genesisErr != nil && !ok {
 		return nil, genesisErr
 	}
 	log.Info("Initialised chain configuration", "config", chainConfig)
@@ -193,7 +194,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 		return nil, err
 	}
 	// Rewind the chain in case of an incompatible config upgrade.
-	if compat, ok := genesisErr.(*ctypes.ConfigCompatError); ok {
+	if compat, ok := genesisErr.(*confp.ConfigCompatError); ok {
 		log.Warn("Rewinding chain to upgrade configuration", "err", compat)
 		eth.blockchain.SetHead(compat.RewindTo)
 		rawdb.WriteChainConfig(chainDb, genesisHash, chainConfig)
@@ -209,7 +210,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 	cacheLimit := cacheConfig.TrieCleanLimit + cacheConfig.TrieDirtyLimit
 	checkpoint := config.Checkpoint
 	if checkpoint == nil {
-		if p, ok := chainConfig.(*paramtypes.MultiGethChainConfig); ok {
+		if p, ok := chainConfig.(*multigeth.MultiGethChainConfig); ok {
 			checkpoint = p.TrustedCheckpoint
 		} else if p, ok := chainConfig.(*goethereum.ChainConfig); ok {
 			checkpoint = p.TrustedCheckpoint
@@ -254,7 +255,7 @@ func CreateConsensusEngine(ctx *node.ServiceContext, chainConfig ctypes.ChainCon
 	if chainConfig.GetConsensusEngineType().IsClique() {
 		return clique.New(&ctypes.CliqueConfig{
 			Period: chainConfig.GetCliquePeriod(),
-			Epoch: chainConfig.GetCliqueEpoch(),
+			Epoch:  chainConfig.GetCliqueEpoch(),
 		}, db)
 	}
 	// Otherwise assume proof-of-work

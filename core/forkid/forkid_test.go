@@ -23,7 +23,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 )
@@ -36,7 +35,7 @@ func TestCreation(t *testing.T) {
 		want ID
 	}
 	tests := []struct {
-		name string
+		name    string
 		config  ctypes.ChainConfigurator
 		genesis common.Hash
 		cases   []testcase
@@ -61,8 +60,10 @@ func TestCreation(t *testing.T) {
 				{7279999, ID{Hash: checksumToBytes(0xa00bc324), Next: 7280000}}, // Last Byzantium block
 				{7280000, ID{Hash: checksumToBytes(0x668db0af), Next: 9069000}}, // First and last Constantinople, first Petersburg block
 				{9068999, ID{Hash: checksumToBytes(0x668db0af), Next: 9069000}}, // Last Petersburg block
-				{9069000, ID{Hash: checksumToBytes(0x879d6e30), Next: 0}},       // Today Istanbul block
-				{10000000, ID{Hash: checksumToBytes(0x879d6e30), Next: 0}},      // Future Istanbul block
+				{9069000, ID{Hash: checksumToBytes(0x879d6e30), Next: 9200000}}, // First Istanbul and first Muir Glacier block
+				{9199999, ID{Hash: checksumToBytes(0x879d6e30), Next: 9200000}}, // Last Istanbul and first Muir Glacier block
+				{9200000, ID{Hash: checksumToBytes(0xe029e991), Next: 0}},       // First Muir Glacier block
+				{10000000, ID{Hash: checksumToBytes(0xe029e991), Next: 0}},      // Future Muir Glacier block
 			},
 		},
 		// Ropsten test cases
@@ -81,8 +82,10 @@ func TestCreation(t *testing.T) {
 				{4939393, ID{Hash: checksumToBytes(0x97b544f3), Next: 4939394}}, // Last Constantinople block
 				{4939394, ID{Hash: checksumToBytes(0xd6e2149b), Next: 6485846}}, // First Petersburg block
 				{6485845, ID{Hash: checksumToBytes(0xd6e2149b), Next: 6485846}}, // Last Petersburg block
-				{6485846, ID{Hash: checksumToBytes(0x4bc66396), Next: 0}},       // First Istanbul block
-				{7500000, ID{Hash: checksumToBytes(0x4bc66396), Next: 0}},       // Future Istanbul block
+				{6485846, ID{Hash: checksumToBytes(0x4bc66396), Next: 7117117}}, // First Istanbul block
+				{7117116, ID{Hash: checksumToBytes(0x4bc66396), Next: 7117117}}, // Last Istanbul block
+				{7117117, ID{Hash: checksumToBytes(0x6727ef90), Next: 0}},       // First Muir Glacier block
+				{7500000, ID{Hash: checksumToBytes(0x6727ef90), Next: 0}},       // Future
 			},
 		},
 		// Rinkeby test cases
@@ -122,7 +125,7 @@ func TestCreation(t *testing.T) {
 	for i, tt := range tests {
 		for j, ttt := range tt.cases {
 			if have := newID(tt.config, tt.genesis, ttt.head); have != ttt.want {
-				t.Errorf("test %d, case %d, name: %s: fork ID mismatch: have %x, want %x", i, j, tt.name, have, ttt.want)
+				t.Errorf("test %d, case %d, name: %s, head: %d: fork ID mismatch: have %x, want %x", i, j, tt.name, ttt.head, have, ttt.want)
 			}
 		}
 	}
@@ -188,11 +191,11 @@ func TestValidation(t *testing.T) {
 		// Local is mainnet Petersburg, remote is Rinkeby Petersburg.
 		{7987396, ID{Hash: checksumToBytes(0xafec6b27), Next: 0}, ErrLocalIncompatibleOrStale},
 
-		// Local is mainnet Istanbul, far in the future. Remote announces Gopherium (non existing fork)
+		// Local is mainnet Muir Glacier, far in the future. Remote announces Gopherium (non existing fork)
 		// at some future block 88888888, for itself, but past block for local. Local is incompatible.
 		//
 		// This case detects non-upgraded nodes with majority hash power (typical Ropsten mess).
-		{88888888, ID{Hash: checksumToBytes(0x879d6e30), Next: 88888888}, ErrLocalIncompatibleOrStale},
+		{88888888, ID{Hash: checksumToBytes(0xe029e991), Next: 88888888}, ErrLocalIncompatibleOrStale},
 
 		// Local is mainnet Byzantium. Remote is also in Byzantium, but announces Gopherium (non existing
 		// fork) at block 7279999, before Petersburg. Local is incompatible.
@@ -201,7 +204,7 @@ func TestValidation(t *testing.T) {
 	for i, tt := range tests {
 		filter := newFilter(params.MainnetChainConfig, params.MainnetGenesisHash, func() uint64 { return tt.head })
 		if err := filter(tt.id); err != tt.err {
-			t.Errorf("test %d: validation error mismatch: have %v, want %v", i, err, tt.err)
+			t.Errorf("test %d, head: %d: validation error mismatch: have %v, want %v", i, tt.head, err, tt.err)
 		}
 	}
 }
@@ -231,15 +234,19 @@ func TestEncoding(t *testing.T) {
 
 func TestGatherForks(t *testing.T) {
 	cases := []struct {
-		config *paramtypes.MultiGethChainConfig
+		config ctypes.ChainConfigurator
 		wantNs []uint64
 	}{
 		{
 			params.ClassicChainConfig,
-			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000},
+			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000, 10500839},
+		},
+		{
+			params.MainnetChainConfig,
+			[]uint64{1150000, 1920000, 2463000, 2675000, 4370000, 7280000, 9069000, 9200000},
 		},
 	}
-	sliceContains := func (sl []uint64, u uint64) bool {
+	sliceContains := func(sl []uint64, u uint64) bool {
 		for _, s := range sl {
 			if s == u {
 				return true

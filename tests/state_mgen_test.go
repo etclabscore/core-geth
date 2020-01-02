@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package tests
 
 import (
@@ -30,7 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/internal/build"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/iancoleman/strcase"
 )
 
@@ -41,7 +40,6 @@ func TestGenState(t *testing.T) {
 	if os.Getenv(MG_CHAINCONFIG_CHAINSPECS_PARITY_KEY) == "" {
 		t.Fatal("Must use chainspec files for fork configurations.")
 	}
-
 
 	st := new(testMatcher)
 
@@ -97,7 +95,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		subtest := subtest
 		if _, ok := MapForkNameChainspecFileState[subtest.Fork]; !ok {
 			genesis := test.genesis(Forks[subtest.Fork])
-			pspec, err := convert.NewParityChainSpec(subtest.Fork, genesis, []string{})
+			pspec, err := tconvert.NewParityChainSpec(subtest.Fork, genesis, []string{})
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -105,7 +103,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			filename := paritySpecPath(strcase.ToSnake(subtest.Fork)+".json")
+			filename := paritySpecPath(strcase.ToSnake(subtest.Fork) + ".json")
 			err = ioutil.WriteFile(filename, b, os.ModePerm)
 			if err != nil {
 				t.Fatal(err)

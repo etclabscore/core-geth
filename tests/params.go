@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package tests
 
 import (
@@ -26,9 +25,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/params/convert"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -113,30 +112,30 @@ func readConfigFromSpecFile(name string) (spec ctypes.ChainConfigurator, sha1sum
 func init() {
 
 	if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_MULTIGETH_KEY) != "" {
-		log.Println("Converting to MultiGeth Chain Config data type.")
+		log.Println("converting to MultiGeth Chain Config data type.")
 
 		for i, config := range Forks {
-			mgc := &paramtypes.MultiGethChainConfig{}
-			if err := convert.Convert(config, mgc); ctypes.IsFatalUnsupportedErr(err) {
+			mgc := &multigeth.MultiGethChainConfig{}
+			if err := confp.Convert(config, mgc); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			Forks[i] = mgc
 		}
 
 		for k, v := range difficultyChainConfigurations {
-			mgc := &paramtypes.MultiGethChainConfig{}
-			if err := convert.Convert(v, mgc); ctypes.IsFatalUnsupportedErr(err) {
+			mgc := &multigeth.MultiGethChainConfig{}
+			if err := confp.Convert(v, mgc); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = mgc
 		}
 
 	} else if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_PARITY_KEY) != "" {
-		log.Println("Converting to Parity data type.")
+		log.Println("converting to Parity data type.")
 
 		for i, config := range Forks {
 			pspec := &parity.ParityChainSpec{}
-			if err := convert.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			Forks[i] = pspec
@@ -144,7 +143,7 @@ func init() {
 
 		for k, v := range difficultyChainConfigurations {
 			pspec := &parity.ParityChainSpec{}
-			if err := convert.Convert(v, pspec); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Convert(v, pspec); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = pspec

@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package ctypes
 
 import (
@@ -65,7 +64,7 @@ func UnsupportedConfigError(err error, method string, value interface{}) ErrUnsu
 
 // Uint64BigValOrMapHex is an encoding type for Parity's chain config,
 // used for their 'blockReward' field.
-// When only an intial value, eg 0:0x42 is set, the type is a hex-encoded string.
+// When only an initial value, eg 0:0x42 is set, the type is a hex-encoded string.
 // When multiple values are set, eg modified block rewards, the type is a map of hex-encoded strings.
 type Uint64BigValOrMapHex map[uint64]*big.Int
 
@@ -125,10 +124,10 @@ func (bb *Uint64BigMapEncodesHex) UnmarshalJSON(input []byte) error {
 	b := make(map[uint64]*big.Int)
 	for k, v := range m {
 		var vv *big.Int
-		switch v.(type) {
+		switch v := v.(type) {
 		case string:
 			var b = new(math.HexOrDecimal256)
-			err = b.UnmarshalText([]byte(v.(string)))
+			err = b.UnmarshalText([]byte(v))
 			if err != nil {
 				return err
 			}
@@ -165,14 +164,69 @@ func (b Uint64BigMapEncodesHex) MarshalJSON() ([]byte, error) {
 	return json.Marshal(mm)
 }
 
-// ExtractHostageSituationN returns the block number for a given hostage situation, ie EIP649 and/or EIP1234.
+func (b Uint64BigMapEncodesHex) SetValueTotalForHeight(n *uint64, val *big.Int) {
+	if n == nil || val == nil {
+		return
+	}
+
+	sums := make(map[uint64]*big.Int)
+	for k := range b {
+		sums[k] = new(big.Int).SetUint64(b.SumValues(&k))
+	}
+	if sums[*n] != nil {
+		if sums[*n].Cmp(val) < 0 {
+			sums[*n] = val
+		}
+	} else {
+		sums[*n] = val
+	}
+
+	sumR := big.NewInt(0)
+	sl := []uint64{}
+	for k := range sums {
+		sl = append(sl, k)
+	}
+	sort.Slice(sl, func(i, j int) bool {
+		return sl[i] < sl[j]
+	})
+	for _, s := range sl {
+		d := new(big.Int).Sub(sums[s], sumR)
+		b[s] = d
+		sumR.Add(sumR, d)
+	}
+}
+
+func (b Uint64BigMapEncodesHex) SumValues(n *uint64) uint64 {
+	var sumB = big.NewInt(0)
+	var sl = []uint64{}
+
+	for k := range b {
+		sl = append(sl, k)
+	}
+	sort.Slice(sl, func(i, j int) bool {
+		return sl[i] < sl[j]
+	})
+
+	for _, s := range sl {
+		if s > *n {
+			// break because we're sorted chronologically,
+			// all following indexes will be greater than limit n.
+			break
+		}
+		sumB.Add(sumB, b[s])
+	}
+
+	return sumB.Uint64()
+}
+
+// MapMeetsSpecification returns the block number at which a difficulty/+reward map meet specifications, eg. EIP649 and/or EIP1234, or EIP2384.
 // This is a reverse lookup to extract EIP-spec'd parameters from difficulty and reward maps implementations.
-func ExtractHostageSituationN(difficulties Uint64BigMapEncodesHex, rewards Uint64BigMapEncodesHex, difficultySum, wantedReward *big.Int) *uint64 {
+func MapMeetsSpecification(difficulties Uint64BigMapEncodesHex, rewards Uint64BigMapEncodesHex, difficultySum, wantedReward *big.Int) *uint64 {
 	var diffN *uint64
 	var sl = []uint64{}
 
 	// difficulty
-	for k, _ := range difficulties {
+	for k := range difficulties {
 		sl = append(sl, k)
 	}
 	sort.Slice(sl, func(i, j int) bool {
@@ -181,7 +235,7 @@ func ExtractHostageSituationN(difficulties Uint64BigMapEncodesHex, rewards Uint6
 
 	var total = new(big.Int)
 	for _, s := range sl {
-		d :=  difficulties[s]
+		d := difficulties[s]
 		if d == nil {
 			panic(fmt.Sprintf("dnil difficulties: %v, sl: %v", difficulties, sl))
 		}
@@ -195,6 +249,10 @@ func ExtractHostageSituationN(difficulties Uint64BigMapEncodesHex, rewards Uint6
 		// difficulty bomb delay not configured,
 		// then does not meet eip649/eip1234 spec
 		return nil
+	}
+
+	if wantedReward == nil || rewards == nil {
+		return diffN
 	}
 
 	reward, ok := rewards[*diffN]
@@ -315,4 +373,3 @@ type CliqueConfig struct {
 func (c *CliqueConfig) String() string {
 	return "clique"
 }
-

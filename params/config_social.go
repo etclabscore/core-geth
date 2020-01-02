@@ -19,8 +19,8 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 var (
@@ -28,13 +28,13 @@ var (
 	SocialGenesisHash = common.HexToHash("0xba8314d5c2ebddaf58eb882b364b27cbfa4d3402dacd32b60986754ac25cfe8d")
 
 	// SocialChainConfig is the chain parameters to run a node on the Ethereum Social main network.
-	SocialChainConfig = &paramtypes.MultiGethChainConfig{
-		ChainID:             big.NewInt(28),
-		EIP2FBlock:          big.NewInt(0),
-		EIP7FBlock:          big.NewInt(0),
-		EIP150Block:         big.NewInt(0),
-		EIP155Block:         big.NewInt(0),
-		Ethash:              new(ctypes.EthashConfig),
+	SocialChainConfig = &multigeth.MultiGethChainConfig{
+		ChainID:           big.NewInt(28),
+		EIP2FBlock:        big.NewInt(0),
+		EIP7FBlock:        big.NewInt(0),
+		EIP150Block:       big.NewInt(0),
+		EIP155Block:       big.NewInt(0),
+		Ethash:            new(ctypes.EthashConfig),
 		NetworkID:         28,
 		DisposalBlock:     big.NewInt(0),
 		SocialBlock:       big.NewInt(0),

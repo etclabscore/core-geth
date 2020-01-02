@@ -287,7 +287,7 @@ func (c *BoundContract) FilterLogs(opts *FilterOpts, name string, query ...[]int
 		return nil
 	}), nil
 
-	return logs, sub, nil
+	return logs, sub, err
 }
 
 // WatchLogs filters subscribes to contract logs for future blocks, returning a

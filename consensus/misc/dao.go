@@ -23,7 +23,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/confp/generic"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -51,8 +51,12 @@ func VerifyDAOHeaderExtraData(config ctypes.ChainConfigurator, header *types.Hea
 	daoForkBlock := config.GetEthashEIP779Transition()
 	// Second clause catches test configs with nil fork blocks (maybe set dynamically or
 	// testing agnostic of chain config).
-	if daoForkBlock == nil && !convert.AsGenericCC(config).DAOSupport() {
+	if daoForkBlock == nil && !generic.AsGenericCC(config).DAOSupport() {
 		return nil
+	}
+
+	if daoForkBlock == nil {
+
 	}
 
 	daoForkBlockB := new(big.Int).SetUint64(*daoForkBlock)
@@ -63,7 +67,7 @@ func VerifyDAOHeaderExtraData(config ctypes.ChainConfigurator, header *types.Hea
 		return nil
 	}
 	// Depending on whether we support or oppose the fork, validate the extra-data contents
-	if convert.AsGenericCC(config).DAOSupport() {
+	if generic.AsGenericCC(config).DAOSupport() {
 		if !bytes.Equal(header.Extra, vars.DAOForkBlockExtra) {
 			return ErrBadProDAOExtra
 		}

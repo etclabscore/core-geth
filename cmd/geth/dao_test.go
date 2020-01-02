@@ -25,22 +25,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/convert"
+	"github.com/ethereum/go-ethereum/params/confp/generic"
 )
-
-// Genesis block for nodes which don't care about the DAO fork (i.e. not configured)
-var daoOldGenesis = `{
-	"alloc"      : {},
-	"coinbase"   : "0x0000000000000000000000000000000000000000",
-	"difficulty" : "0x20000",
-	"extraData"  : "",
-	"gasLimit"   : "0x2fefd8",
-	"nonce"      : "0x0000000000000042",
-	"mixhash"    : "0x0000000000000000000000000000000000000000000000000000000000000000",
-	"parentHash" : "0x0000000000000000000000000000000000000000000000000000000000000000",
-	"timestamp"  : "0x00",
-	"config"     : {}
-}`
 
 // Genesis block for nodes which actively oppose the DAO fork
 var daoNoForkGenesis = `{
@@ -145,7 +131,7 @@ func testDAOForkBlockNewChain(t *testing.T, test int, genesis string, expectBloc
 	} else if *config.GetEthashEIP779Transition() != *expectBlock {
 		t.Errorf("test %d: dao hard-fork block mismatch: have %v, want %v", test, config.GetEthashEIP779Transition(), expectBlock)
 	}
-	if convert.AsGenericCC(config).DAOSupport() != expectVote {
-		t.Errorf("test %d: dao hard-fork support mismatch: have %v, want %v\nconfig: %v", test, convert.AsGenericCC(config).DAOSupport(), expectVote, config)
+	if generic.AsGenericCC(config).DAOSupport() != expectVote {
+		t.Errorf("test %d: dao hard-fork support mismatch: have %v, want %v\nconfig: %v", test, generic.AsGenericCC(config).DAOSupport(), expectVote, config)
 	}
 }

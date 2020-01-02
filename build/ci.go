@@ -58,7 +58,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/cespare/cp"
 	"github.com/ethereum/go-ethereum/internal/build"
 	"github.com/ethereum/go-ethereum/params"
 )
@@ -75,6 +75,7 @@ var (
 		"COPYING",
 		executablePath("abigen"),
 		executablePath("bootnode"),
+		executablePath("echainspec"),
 		executablePath("evm"),
 		executablePath("geth"),
 		executablePath("puppeth"),
@@ -92,6 +93,10 @@ var (
 		{
 			BinaryName:  "bootnode",
 			Description: "Ethereum bootnode.",
+		},
+		{
+			BinaryName: "echainspec",
+			Description: "Developer utility to manage chain external chain configuration",
 		},
 		{
 			BinaryName:  "evm",
@@ -332,7 +337,7 @@ func doTest(cmdline []string) {
 	// Test a single package at a time. CI builders are slow
 	// and some tests run into timeouts under load.
 	gotest := goTool("test", buildFlags(env)...)
-	gotest.Args = append(gotest.Args, "-p", "1", "-timeout", "5m", "--short")
+	gotest.Args = append(gotest.Args, "-p", "1", "-timeout", "5m")
 	if *coverage {
 		gotest.Args = append(gotest.Args, "-covermode=atomic", "-cover")
 	}
@@ -344,37 +349,38 @@ func doTest(cmdline []string) {
 	build.MustRun(gotest)
 }
 
-// runs golangci-lint on requested packages
+// doLint runs golangci-lint on requested packages.
 func doLint(cmdline []string) {
+	var (
+		cachedir = flag.String("cachedir", "./build/cache", "directory for caching golangci-lint binary.")
+	)
 	flag.CommandLine.Parse(cmdline)
-
 	packages := []string{"./..."}
 	if len(flag.CommandLine.Args()) > 0 {
 		packages = flag.CommandLine.Args()
 	}
-	// Get golangci-lint and install all supported linters
-	build.MustRun(goTool("get", "github.com/golangci/golangci-lint/cmd/golangci-lint@v1.18.0"))
 
-	// Run fast linters batched together
-	configs := []string{
-		"run",
-		"--tests",
-		"--deadline=2m",
-		"--disable-all",
-		"--enable=goimports",
-		"--enable=varcheck",
-		"--enable=vet",
-		"--enable=gofmt",
-		"--enable=misspell",
-		"--enable=goconst",
-	}
-	build.MustRunCommand(filepath.Join(GOBIN, "golangci-lint"), append(configs, packages...)...)
+	linter := downloadLinter(*cachedir)
+	lflags := []string{"run", "--config", ".golangci.yml"}
+	build.MustRunCommand(linter, append(lflags, packages...)...)
+	fmt.Println("You have achieved perfection.")
+}
 
-	// Run slow linters one by one
-	for _, linter := range []string{"unconvert", "gosimple"} {
-		configs = []string{"run", "--tests", "--deadline=10m", "--disable-all", "--enable=" + linter}
-		build.MustRunCommand(filepath.Join(GOBIN, "golangci-lint"), append(configs, packages...)...)
+// downloadLinter downloads and unpacks golangci-lint.
+func downloadLinter(cachedir string) string {
+	const version = "1.21.0"
+
+	csdb := build.MustLoadChecksums("build/checksums.txt")
+	base := fmt.Sprintf("golangci-lint-%s-%s-%s", version, runtime.GOOS, runtime.GOARCH)
+	url := fmt.Sprintf("https://github.com/golangci/golangci-lint/releases/download/v%s/%s.tar.gz", version, base)
+	archivePath := filepath.Join(cachedir, base+".tar.gz")
+	if err := csdb.DownloadFile(url, archivePath); err != nil {
+		log.Fatal(err)
 	}
+	if err := build.ExtractTarballArchive(archivePath, cachedir); err != nil {
+		log.Fatal(err)
+	}
+	return filepath.Join(cachedir, base, "golangci-lint")
 }
 
 // Release Packaging
@@ -478,8 +484,7 @@ func maybeSkipArchive(env build.Environment) {
 func doDebianSource(cmdline []string) {
 	var (
 		goversion = flag.String("goversion", "", `Go version to build with (will be included in the source package)`)
-		gobundle  = flag.String("gobundle", "/tmp/go.tar.gz", `Filesystem path to cache the downloaded Go bundles at`)
-		gohash    = flag.String("gohash", "", `SHA256 checksum of the Go sources requested to build with`)
+		cachedir  = flag.String("cachedir", "./build/cache", `Filesystem path to cache the downloaded Go bundles at`)
 		signer    = flag.String("signer", "", `Signing key name, also used as package author`)
 		upload    = flag.String("upload", "", `Where to upload the source package (usually "ethereum/ethereum")`)
 		sshUser   = flag.String("sftp-user", "", `Username for SFTP upload (usually "geth-ci")`)
@@ -497,26 +502,40 @@ func doDebianSource(cmdline []string) {
 		gpg.Stdin = bytes.NewReader(key)
 		build.MustRun(gpg)
 	}
-	// Download and verify the Go source package
-	if err := build.EnsureGoSources(*goversion, hexutil.MustDecode("0x"+*gohash), *gobundle); err != nil {
-		log.Fatalf("Failed to ensure Go source package: %v", err)
-	}
-	// Create Debian packages and upload them
+
+	// Download and verify the Go source package.
+	gobundle := downloadGoSources(*goversion, *cachedir)
+
+	// Download all the dependencies needed to build the sources and run the ci script
+	srcdepfetch := goTool("install", "-n", "./...")
+	srcdepfetch.Env = append(os.Environ(), "GOPATH="+filepath.Join(*workdir, "modgopath"))
+	build.MustRun(srcdepfetch)
+
+	cidepfetch := goTool("run", "./build/ci.go")
+	cidepfetch.Env = append(os.Environ(), "GOPATH="+filepath.Join(*workdir, "modgopath"))
+	cidepfetch.Run() // Command fails, don't care, we only need the deps to start it
+
+	// Create Debian packages and upload them.
 	for _, pkg := range debPackages {
 		for distro, goboot := range debDistroGoBoots {
-			// Prepare the debian package with the go-ethereum sources
+			// Prepare the debian package with the go-ethereum sources.
 			meta := newDebMetadata(distro, goboot, *signer, env, now, pkg.Name, pkg.Version, pkg.Executables)
 			pkgdir := stageDebianSource(*workdir, meta)
 
-			// Ship the Go sources along so we have a proper thing to build with
-			if err := build.ExtractTarballArchive(*gobundle, pkgdir); err != nil {
+			// Add Go source code
+			if err := build.ExtractTarballArchive(gobundle, pkgdir); err != nil {
 				log.Fatalf("Failed to extract Go sources: %v", err)
 			}
 			if err := os.Rename(filepath.Join(pkgdir, "go"), filepath.Join(pkgdir, ".go")); err != nil {
 				log.Fatalf("Failed to rename Go source folder: %v", err)
 			}
+			// Add all dependency modules in compressed form
+			os.MkdirAll(filepath.Join(pkgdir, ".mod", "cache"), 0755)
+			if err := cp.CopyAll(filepath.Join(pkgdir, ".mod", "cache", "download"), filepath.Join(*workdir, "modgopath", "pkg", "mod", "cache", "download")); err != nil {
+				log.Fatalf("Failed to copy Go module dependencies: %v", err)
+			}
 			// Run the packaging and upload to the PPA
-			debuild := exec.Command("debuild", "-S", "-sa", "-us", "-uc", "-d", "-Zxz")
+			debuild := exec.Command("debuild", "-S", "-sa", "-us", "-uc", "-d", "-Zxz", "-nc")
 			debuild.Dir = pkgdir
 			build.MustRun(debuild)
 
@@ -534,6 +553,17 @@ func doDebianSource(cmdline []string) {
 			}
 		}
 	}
+}
+
+func downloadGoSources(version string, cachedir string) string {
+	csdb := build.MustLoadChecksums("build/checksums.txt")
+	file := fmt.Sprintf("go%s.src.tar.gz", version)
+	url := "https://dl.google.com/go/" + file
+	dst := filepath.Join(cachedir, file)
+	if err := csdb.DownloadFile(url, dst); err != nil {
+		log.Fatal(err)
+	}
+	return dst
 }
 
 func ppaUpload(workdir, ppa, sshUser string, files []string) {
@@ -769,9 +799,12 @@ func doWindowsInstaller(cmdline []string) {
 	build.Render("build/nsis.uninstall.nsh", filepath.Join(*workdir, "uninstall.nsh"), 0644, allTools)
 	build.Render("build/nsis.pathupdate.nsh", filepath.Join(*workdir, "PathUpdate.nsh"), 0644, nil)
 	build.Render("build/nsis.envvarupdate.nsh", filepath.Join(*workdir, "EnvVarUpdate.nsh"), 0644, nil)
-	build.CopyFile(filepath.Join(*workdir, "SimpleFC.dll"), "build/nsis.simplefc.dll", 0755)
-	build.CopyFile(filepath.Join(*workdir, "COPYING"), "COPYING", 0755)
-
+	if err := cp.CopyFile(filepath.Join(*workdir, "SimpleFC.dll"), "build/nsis.simplefc.dll"); err != nil {
+		log.Fatal("Failed to copy SimpleFC.dll: %v", err)
+	}
+	if err := cp.CopyFile(filepath.Join(*workdir, "COPYING"), "COPYING"); err != nil {
+		log.Fatal("Failed to copy copyright note: %v", err)
+	}
 	// Build the installer. This assumes that all the needed files have been previously
 	// built (don't mix building and packaging to keep cross compilation complexity to a
 	// minimum).
@@ -788,7 +821,6 @@ func doWindowsInstaller(cmdline []string) {
 		"/DARCH="+*arch,
 		filepath.Join(*workdir, "geth.nsi"),
 	)
-
 	// Sign and publish installer.
 	if err := archiveUpload(installer, *upload, *signer); err != nil {
 		log.Fatal(err)
@@ -1049,16 +1081,11 @@ func doXgo(cmdline []string) {
 
 func xgoTool(args []string) *exec.Cmd {
 	cmd := exec.Command(filepath.Join(GOBIN, "xgo"), args...)
-	cmd.Env = []string{
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, []string{
 		"GOPATH=" + build.GOPATH(),
 		"GOBIN=" + GOBIN,
-	}
-	for _, e := range os.Environ() {
-		if strings.HasPrefix(e, "GOPATH=") || strings.HasPrefix(e, "GOBIN=") {
-			continue
-		}
-		cmd.Env = append(cmd.Env, e)
-	}
+	}...)
 	return cmd
 }
 

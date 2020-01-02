@@ -223,6 +223,7 @@ func init() {
 	}
 	app.Action = signer
 	app.Commands = []cli.Command{initCommand, attestCommand, setCredentialCommand, delCredentialCommand, gendocCommand}
+	cli.CommandHelpTemplate = utils.OriginCommandHelpTemplate
 }
 
 func main() {
@@ -387,7 +388,7 @@ func initialize(c *cli.Context) error {
 	if c.GlobalBool(stdiouiFlag.Name) {
 		logOutput = os.Stderr
 		// If using the stdioui, we can't do the 'confirm'-flow
-		fmt.Fprintf(logOutput, legalWarning)
+		fmt.Fprint(logOutput, legalWarning)
 	} else {
 		if !confirm(legalWarning) {
 			return fmt.Errorf("aborted by user")
@@ -579,7 +580,7 @@ func signer(c *cli.Context) error {
 		},
 	})
 
-	abortChan := make(chan os.Signal)
+	abortChan := make(chan os.Signal, 1)
 	signal.Notify(abortChan, os.Interrupt)
 
 	sig := <-abortChan
@@ -694,7 +695,7 @@ func checkFile(filename string) error {
 
 // confirm displays a text and asks for user confirmation
 func confirm(text string) bool {
-	fmt.Printf(text)
+	fmt.Print(text)
 	fmt.Printf("\nEnter 'ok' to proceed:\n> ")
 
 	text, err := bufio.NewReader(os.Stdin).ReadString('\n')
@@ -766,7 +767,6 @@ func testExternalUI(api *core.SignerAPI) {
 			Root:        common.HexToHash("0000H00H"),
 			TxHash:      common.HexToHash("0000H45H"),
 			ReceiptHash: common.HexToHash("0000H45H"),
-			Bloom:       types.Bloom{},
 			Difficulty:  big.NewInt(1337),
 			Number:      big.NewInt(1337),
 			GasLimit:    1338,
@@ -774,7 +774,6 @@ func testExternalUI(api *core.SignerAPI) {
 			Time:        1338,
 			Extra:       []byte("Extra data Extra data Extra data  Extra data  Extra data  Extra data  Extra data Extra data"),
 			MixDigest:   common.HexToHash("0x0000H45H"),
-			Nonce:       types.BlockNonce{},
 		}
 		cliqueRlp, err := rlp.EncodeToBytes(cliqueHeader)
 		if err != nil {
@@ -970,7 +969,7 @@ func GenDoc(ctx *cli.Context) {
 			Meta: meta,
 			Callinfo: []core.ValidationInfo{
 				{Typ: "Warning", Message: "Something looks odd, show this message as a warning"},
-				{Typ: "Info", Message: "User should see this aswell"},
+				{Typ: "Info", Message: "User should see this as well"},
 			},
 			Transaction: core.SendTxArgs{
 				Data:     &data,
@@ -1044,8 +1043,13 @@ func GenDoc(ctx *cli.Context) {
 			"Note: the UI is free to respond with any address the caller, regardless of whether it exists or not",
 			&core.ListResponse{
 				Accounts: []accounts.Account{
-					{Address: common.HexToAddress("0xcowbeef000000cowbeef00000000000000000c0w"), URL: accounts.URL{Path: ".. ignored .."}},
-					{Address: common.HexToAddress("0xffffffffffffffffffffffffffffffffffffffff"), URL: accounts.URL{}},
+					{
+						Address: common.HexToAddress("0xcowbeef000000cowbeef00000000000000000c0w"),
+						URL:     accounts.URL{Path: ".. ignored .."},
+					},
+					{
+						Address: common.HexToAddress("0xffffffffffffffffffffffffffffffffffffffff"),
+					},
 				}})
 	}
 

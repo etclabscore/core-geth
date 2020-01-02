@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package goethereum
 
 import (
@@ -22,6 +21,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/internal"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -53,44 +53,35 @@ func setBig(i *big.Int, u *uint64) *big.Int {
 }
 
 func (c *ChainConfig) GetAccountStartNonce() *uint64 {
-	return newU64(0)
+	return internal.GlobalConfigurator().GetAccountStartNonce()
 }
 
 func (c *ChainConfig) SetAccountStartNonce(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	if *n != 0 {
-		return ctypes.ErrUnsupportedConfigFatal
-	}
-	return nil
+	return internal.GlobalConfigurator().SetAccountStartNonce(n)
 }
 
 func (c *ChainConfig) GetMaximumExtraDataSize() *uint64 {
-	return newU64(vars.MaximumExtraDataSize)
+	return internal.GlobalConfigurator().GetMaximumExtraDataSize()
 }
 
 func (c *ChainConfig) SetMaximumExtraDataSize(n *uint64) error {
-	vars.MaximumExtraDataSize = *n
-	return nil
+	return internal.GlobalConfigurator().SetMaximumExtraDataSize(n)
 }
 
 func (c *ChainConfig) GetMinGasLimit() *uint64 {
-	return newU64(vars.MinGasLimit)
+	return internal.GlobalConfigurator().GetMinGasLimit()
 }
 
 func (c *ChainConfig) SetMinGasLimit(n *uint64) error {
-	vars.MinGasLimit = *n
-	return nil
+	return internal.GlobalConfigurator().SetMinGasLimit(n)
 }
 
 func (c *ChainConfig) GetGasLimitBoundDivisor() *uint64 {
-	return newU64(vars.GasLimitBoundDivisor)
+	return internal.GlobalConfigurator().GetGasLimitBoundDivisor()
 }
 
 func (c *ChainConfig) SetGasLimitBoundDivisor(n *uint64) error {
-	vars.GasLimitBoundDivisor = *n
-	return nil
+	return internal.GlobalConfigurator().SetGasLimitBoundDivisor(n)
 }
 
 // GetNetworkID and the following Set/Getters for ChainID too
@@ -130,15 +121,11 @@ func (c *ChainConfig) SetChainID(n *big.Int) error {
 }
 
 func (c *ChainConfig) GetMaxCodeSize() *uint64 {
-	return newU64(vars.MaxCodeSize)
+	return internal.GlobalConfigurator().GetMaxCodeSize()
 }
 
 func (c *ChainConfig) SetMaxCodeSize(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	vars.MaxCodeSize = *n
-	return nil
+	return internal.GlobalConfigurator().SetMaxCodeSize(n)
 }
 
 func (c *ChainConfig) GetEIP7Transition() *uint64 {
@@ -399,13 +386,10 @@ func (c *ChainConfig) GetForkCanonHashes() map[uint64]common.Hash {
 }
 
 func (c *ChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT {
-	if c.Ethash != nil {
-		return ctypes.ConsensusEngineT_Ethash
-	}
 	if c.Clique != nil {
 		return ctypes.ConsensusEngineT_Clique
 	}
-	return ctypes.ConsensusEngineT_Unknown
+	return ctypes.ConsensusEngineT_Ethash
 }
 
 func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
@@ -422,39 +406,27 @@ func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) erro
 }
 
 func (c *ChainConfig) GetEthashMinimumDifficulty() *big.Int {
-	return vars.MinimumDifficulty
+	return internal.GlobalConfigurator().GetEthashMinimumDifficulty()
 }
 
 func (c *ChainConfig) SetEthashMinimumDifficulty(i *big.Int) error {
-	if i == nil {
-		return ctypes.ErrUnsupportedConfigFatal
-	}
-	vars.MinimumDifficulty = i
-	return nil
+	return internal.GlobalConfigurator().SetEthashMinimumDifficulty(i)
 }
 
 func (c *ChainConfig) GetEthashDifficultyBoundDivisor() *big.Int {
-	return vars.DifficultyBoundDivisor
+	return internal.GlobalConfigurator().GetEthashDifficultyBoundDivisor()
 }
 
 func (c *ChainConfig) SetEthashDifficultyBoundDivisor(i *big.Int) error {
-	if i == nil {
-		return ctypes.ErrUnsupportedConfigFatal
-	}
-	vars.DifficultyBoundDivisor = i
-	return nil
+	return internal.GlobalConfigurator().SetEthashDifficultyBoundDivisor(i)
 }
 
 func (c *ChainConfig) GetEthashDurationLimit() *big.Int {
-	return vars.DurationLimit
+	return internal.GlobalConfigurator().GetEthashDurationLimit()
 }
 
 func (c *ChainConfig) SetEthashDurationLimit(i *big.Int) error {
-	if i == nil {
-		return ctypes.ErrUnsupportedConfigFatal
-	}
-	vars.DurationLimit = i
-	return nil
+	return internal.GlobalConfigurator().SetEthashDurationLimit(i)
 }
 
 // NOTE: Checking for if c.Ethash == nil is a consideration.
@@ -519,6 +491,18 @@ func (c *ChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.ConstantinopleBlock = setBig(c.ConstantinopleBlock, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEthashEIP2384Transition() *uint64 {
+	return bigNewU64(c.MuirGlacierBlock)
+}
+
+func (c *ChainConfig) SetEthashEIP2384Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	c.MuirGlacierBlock = setBig(c.MuirGlacierBlock, n)
 	return nil
 }
 

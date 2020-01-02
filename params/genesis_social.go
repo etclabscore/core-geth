@@ -14,24 +14,23 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package params
 
 import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 // SocialGenesisBlock returns the Ethereum Social genesis block.
-func DefaultSocialGenesisBlock() *paramtypes.Genesis {
-	return &paramtypes.Genesis{
+func DefaultSocialGenesisBlock() *genesisT.Genesis {
+	return &genesisT.Genesis{
 		Config:     SocialChainConfig,
 		Nonce:      66,
 		ExtraData:  hexutil.MustDecode("0x3230313820457468657265756d20536f6369616c2050726f6a656374"),
 		GasLimit:   5000,
 		Difficulty: big.NewInt(17179869184),
-		Alloc:      paramtypes.DecodePreAlloc(SocialAllocData),
+		Alloc:      genesisT.DecodePreAlloc(SocialAllocData),
 	}
 }

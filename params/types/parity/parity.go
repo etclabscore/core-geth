@@ -14,19 +14,19 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package parity
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"math/big"
 	"reflect"
+	"sort"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
@@ -37,20 +37,22 @@ type ParityChainSpec struct {
 	Engine  struct {
 		Ethash struct {
 			Params struct {
-				MinimumDifficulty      *math.HexOrDecimal256          `json:"minimumDifficulty"`
-				DifficultyBoundDivisor *math.HexOrDecimal256          `json:"difficultyBoundDivisor"`
-				DurationLimit          *math.HexOrDecimal256          `json:"durationLimit"`
+				MinimumDifficulty      *math.HexOrDecimal256         `json:"minimumDifficulty"`
+				DifficultyBoundDivisor *math.HexOrDecimal256         `json:"difficultyBoundDivisor"`
+				DurationLimit          *math.HexOrDecimal256         `json:"durationLimit"`
 				BlockReward            ctypes.Uint64BigValOrMapHex   `json:"blockReward"`
 				DifficultyBombDelays   ctypes.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"`
 
 				// Caches.
 				// These inferences require computation.
 				// This makes it so that the 'heavy-lifting' only has to run once.
-				// See ctypes.ExtractHostageSituationN for this bespoke logic.
-				eip649inferred    bool       `json:"-"`
-				eip649Transition  *ParityU64 `json:"-"`
-				eip1234inferred   bool       `json:"-"`
-				eip1234Transition *ParityU64 `json:"-"`
+				// See ctypes.MapMeetsSpecification for this bespoke logic.
+				eip649Inferred    bool
+				eip649Transition  *ParityU64
+				eip1234Inferred   bool
+				eip1234Transition *ParityU64
+				eip2384Inferred   bool
+				eip2384Transition *ParityU64
 
 				HomesteadTransition *ParityU64 `json:"homesteadTransition"`
 				EIP100bTransition   *ParityU64 `json:"eip100bTransition"`
@@ -112,8 +114,8 @@ type ParityChainSpec struct {
 	Genesis struct {
 		Seal struct {
 			Ethereum struct {
-				Nonce   types.BlockNonce `json:"nonce"`
-				MixHash hexutil.Bytes    `json:"mixHash"`
+				Nonce   BlockNonce    `json:"nonce"`
+				MixHash hexutil.Bytes `json:"mixHash"`
 			} `json:"ethereum"`
 		} `json:"seal"`
 
@@ -127,6 +129,43 @@ type ParityChainSpec struct {
 
 	Nodes    []string                                             `json:"nodes"`
 	Accounts map[common.UnprefixedAddress]*ParityChainSpecAccount `json:"accounts"`
+}
+
+func (c *ParityChainSpec) String() string {
+	cc := &ParityChainSpec{}
+	*cc = *c
+	if cc.Engine.Ethash.Params.DaoHardforkAccounts != nil {
+		cc.Engine.Ethash.Params.DaoHardforkAccounts = nil
+	}
+	j, _ := json.MarshalIndent(cc, "", "    ")
+	return string(j)
+}
+
+// A BlockNonce is a 64-bit hash which proves (combined with the
+// mix-hash) that a sufficient amount of computation has been carried
+// out on a block.
+type BlockNonce [8]byte
+
+// EncodeNonce converts the given integer to a block nonce.
+func EncodeNonce(i uint64) BlockNonce {
+	var n BlockNonce
+	binary.BigEndian.PutUint64(n[:], i)
+	return n
+}
+
+// Uint64 returns the integer value of a block nonce.
+func (n BlockNonce) Uint64() uint64 {
+	return binary.BigEndian.Uint64(n[:])
+}
+
+// MarshalText encodes n as a hex string with 0x prefix.
+func (n BlockNonce) MarshalText() ([]byte, error) {
+	return hexutil.Bytes(n[:]).MarshalText()
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (n *BlockNonce) UnmarshalText(input []byte) error {
+	return hexutil.UnmarshalFixedText("BlockNonce", input, n[:])
 }
 
 // ParityU64 implements special Unmarshal interface for math2.HexOrDecimal64
@@ -153,7 +192,7 @@ func (i *ParityU64) UnmarshalJSON(input []byte) error {
 	// "4"
 	s := string(input)
 	s, _ = strconv.Unquote(s)
-	b, ok := new(big.Int).SetString(string(s), 10)
+	b, ok := new(big.Int).SetString(s, 10)
 	if ok {
 		*i = ParityU64(b.Uint64())
 		return nil
@@ -222,29 +261,39 @@ type ParityChainSpecPricingPrice struct {
 }
 
 func (p *ParityChainSpecPricingMaybe) UnmarshalJSON(input []byte) error {
+
+	// If old schema structure with "pricing" field
 	pricing := ParityChainSpecPricing{}
 	err := json.Unmarshal(input, &pricing)
 	if err == nil && !reflect.DeepEqual(pricing, ParityChainSpecPricing{}) {
 		p.Pricing = &pricing
 		return nil
 	}
-	m := make(map[math.HexOrDecimal64]ParityChainSpecPricingPrice)
-	err = json.Unmarshal(input, &m)
+
+	// Otherwise it's a map keyed on activation block numbers,
+	// where the keys are strings and could be duplicates.
+	// According to JSON specification we should use the last lexicographically
+	// ordered value in case of duplicates.
+	mm := make(map[string]ParityChainSpecPricingPrice)
+	err = json.Unmarshal(input, &mm)
 	if err != nil {
 		return err
 	}
-	if len(m) == 0 {
-		panic("0 map, dragons")
+	sl := []string{}
+	for k := range mm {
+		sl = append(sl, k)
 	}
+	sort.Strings(sl)
 	p.Map = make(map[*math.HexOrDecimal256]ParityChainSpecPricingPrice)
-	for k, v := range m {
-		p.Map[math.NewHexOrDecimal256(int64(k))] = v
+	for _, s := range sl {
+		p.Map[(*math.HexOrDecimal256)(math.MustParseBig256(s))] = mm[s]
 	}
 	if len(p.Map) == 0 {
 		panic("0map")
 	}
 	return nil
 }
+
 func (p ParityChainSpecPricingMaybe) MarshalJSON() ([]byte, error) {
 	if p.Map != nil {
 		return json.Marshal(p.Map)
@@ -355,5 +404,4 @@ func (spec *ParityChainSpec) SetPrecompile2(address common.Address, name string,
 	bin.Pricing.Map[math.NewHexOrDecimal256(int64(*activationBlock))] = ParityChainSpecPricingPrice{
 		ParityChainSpecPricing: pricing,
 	}
-	return
 }

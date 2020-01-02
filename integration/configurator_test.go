@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package integration
 
 import (
@@ -28,22 +27,38 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/convert"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/tests"
 	"github.com/go-test/deep"
 )
 
+func TestConstantinopleEquivalence(t *testing.T) {
+	conf := tests.Forks["Constantinople"]
+	pspec := &parity.ParityChainSpec{}
+	err := confp.Convert(conf, pspec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// This test's config will set Byz delay (3m) at 0, and Const delay (5m) at 0.
+	// This check ensures that 5m delay being greater than 3m takes precedence at simultaneous blocks.
+	if pspec.GetEthashDifficultyBombDelaySchedule()[*conf.GetEthashEIP1234Transition()].Cmp(vars.EIP1234DifficultyBombDelay) != 0 {
+		t.Error("bad")
+	}
+}
+
 func TestEquivalent_Features(t *testing.T) {
 
-	mustValidate := func (c ctypes.ChainConfigurator) {
+	mustValidate := func(c ctypes.ChainConfigurator) {
 		zero, max := uint64(0), uint64(math.MaxUint64)
 		for _, head := range []*uint64{
 			nil, &zero, &max,
 		} {
-			if err := ctypes.IsValid(c, head); err != nil {
+			if err := confp.IsValid(c, head); err != nil {
 				t.Fatalf("invalid config, err: %v", err)
 			}
 		}
@@ -61,8 +76,8 @@ func TestEquivalent_Features(t *testing.T) {
 
 		// Integration tests: conversion
 
-		mg := &paramtypes.MultiGethChainConfig{}
-		err := convert.Convert(oconf, mg)
+		mg := &multigeth.MultiGethChainConfig{}
+		err := confp.Convert(oconf, mg)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -73,14 +88,14 @@ func TestEquivalent_Features(t *testing.T) {
 			t.Fatal("unknown consensus mg")
 		}
 
-		err = ctypes.Equivalent(oconf, mg)
+		err = confp.Equivalent(oconf, mg)
 		if err != nil {
 
 			// Debugging log lines.
 			t.Log("--------------------")
 			t.Errorf("%s oconf/mg err: %v", name, err) // With error.
 
-			nicelog := func (n *uint64) interface{} {
+			nicelog := func(n *uint64) interface{} {
 				if n == nil {
 					return "nil"
 				}
@@ -101,18 +116,17 @@ func TestEquivalent_Features(t *testing.T) {
 		}
 
 		pc := &parity.ParityChainSpec{}
-		err = convert.Convert(oconf, pc)
+		err = confp.Convert(oconf, pc)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		mustValidate(pc)
 
-		err = ctypes.Equivalent(mg, pc)
+		err = confp.Equivalent(mg, pc)
 		if err != nil {
 			t.Errorf("%s oconf/p err: %v", name, err)
 		}
-
 	}
 }
 
@@ -140,7 +154,7 @@ func TestEquivalent_ReadParity(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = ctypes.Equivalent(a, b)
+		err = confp.Equivalent(a, b)
 		if err != nil {
 			t.Log("-------------------")
 			t.Log(b.Engine.Ethash.Params.BlockReward)
@@ -153,9 +167,9 @@ func TestEquivalent_ReadParity(t *testing.T) {
 // TestParityGenesis shows that for select configs, the read and converted parity specs
 // are equivalent to the default Go coded specs for the scope of the respective genesis blocks.
 func TestParityGeneses(t *testing.T) {
-	testes := []struct{
-		filename string
-		defaultGenesis *paramtypes.Genesis
+	testes := []struct {
+		filename       string
+		defaultGenesis *genesisT.Genesis
 	}{
 		{
 			"foundation.json",
@@ -189,19 +203,19 @@ func TestParityGeneses(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		genc := &paramtypes.Genesis{
-			Config: &paramtypes.MultiGethChainConfig{},
+		genc := &genesisT.Genesis{
+			Config: &multigeth.MultiGethChainConfig{},
 		}
-		err = convert.Convert(pspec, genc)
+		err = confp.Convert(pspec, genc)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		wantBlock:= core.GenesisToBlock(tt.defaultGenesis, nil)
+		wantBlock := core.GenesisToBlock(tt.defaultGenesis, nil)
 		gotBlock := core.GenesisToBlock(genc, nil)
 
 		if wantBlock.Hash() != gotBlock.Hash() {
-			t.Errorf("%s: mismatch gen hash, want(default): %s, got: %s", tt.filename, wantBlock.Hash().Hex(), gotBlock.Hash().Hex() )
+			t.Errorf("%s: mismatch gen hash, want(default): %s, got: %s", tt.filename, wantBlock.Hash().Hex(), gotBlock.Hash().Hex())
 
 			// state roots
 			t.Logf("stateroots, want(default): %s, got: %s", wantBlock.Root().Hex(), gotBlock.Root().Hex())
@@ -216,8 +230,8 @@ func TestParityGeneses(t *testing.T) {
 				t.Log(d)
 			}
 
-			t.Log("want(default)",spew.Sdump(wantBlock))
-			t.Log("got",spew.Sdump(gotBlock))
+			t.Log("want(default)", spew.Sdump(wantBlock))
+			t.Log("got", spew.Sdump(gotBlock))
 		}
 	}
 }

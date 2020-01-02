@@ -32,8 +32,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 // Command line flags to configure the interpreters.
@@ -177,7 +177,7 @@ func (tm *testMatcher) findConfig(name string) (ctypes.ChainConfigurator, string
 		}
 	}
 	log.Println("using empty config", name)
-	return new(paramtypes.MultiGethChainConfig), ""
+	return new(multigeth.MultiGethChainConfig), ""
 }
 
 // checkFailure checks whether a failure is expected.
@@ -290,5 +290,16 @@ func runTestFunc(runTest interface{}, t *testing.T, name string, m reflect.Value
 		reflect.ValueOf(t),
 		reflect.ValueOf(name),
 		m.MapIndex(reflect.ValueOf(key)),
+	})
+}
+
+func TestMatcherWhitelist(t *testing.T) {
+	t.Parallel()
+	tm := new(testMatcher)
+	tm.whitelist("invalid*")
+	tm.walk(t, rlpTestDir, func(t *testing.T, name string, test *RLPTest) {
+		if name[:len("invalidRLPTest.json")] != "invalidRLPTest.json" {
+			t.Fatalf("invalid test found: %s != invalidRLPTest.json", name)
+		}
 	})
 }

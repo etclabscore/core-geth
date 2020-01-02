@@ -26,9 +26,9 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 //go:generate [gencodec -type DifficultyTest -field-override difficultyTestMarshaling -out gen_difficultytest.go]
@@ -65,11 +65,11 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 	"Constantinople": &goethereum.ChainConfig{
 		Ethash:              new(ctypes.EthashConfig),
 		HomesteadBlock:      big.NewInt(0),
-		ByzantiumBlock: big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
 		ConstantinopleBlock: big.NewInt(0),
 	},
 	"difficulty.json": mainnetChainConfig,
-	"ETC_Atlantis": &paramtypes.MultiGethChainConfig{
+	"ETC_Atlantis": &multigeth.MultiGethChainConfig{
 		Ethash:        new(ctypes.EthashConfig),
 		EIP100FBlock:  big.NewInt(0),
 		EIP140FBlock:  big.NewInt(0),
@@ -81,7 +81,7 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 		EIP658FBlock:  big.NewInt(0),
 		DisposalBlock: big.NewInt(0),
 	},
-	"ETC_Agharta": &paramtypes.MultiGethChainConfig{
+	"ETC_Agharta": &multigeth.MultiGethChainConfig{
 		Ethash:        new(ctypes.EthashConfig),
 		EIP100FBlock:  big.NewInt(0),
 		EIP140FBlock:  big.NewInt(0),
@@ -142,7 +142,7 @@ func (test *DifficultyTest) Run(config ctypes.ChainConfigurator) error {
 	if actual.Cmp(exp) != 0 {
 		return fmt.Errorf(`%s got: %v, want: %v
 test: %v
-config: %v`, test.Name, actual, exp, test, config)
+config: %s`, test.Name, actual, exp, test, config)
 	}
 	return nil
 

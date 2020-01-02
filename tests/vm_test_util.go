@@ -31,7 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 // VMTest checks EVM execution without block or transaction context.
@@ -45,14 +45,14 @@ func (t *VMTest) UnmarshalJSON(data []byte) error {
 }
 
 type vmJSON struct {
-	Env           stEnv                   `json:"env"`
-	Exec          vmExec                  `json:"exec"`
-	Logs          common.UnprefixedHash   `json:"logs"`
-	GasRemaining  *math.HexOrDecimal64    `json:"gas"`
-	Out           hexutil.Bytes           `json:"out"`
-	Pre           paramtypes.GenesisAlloc `json:"pre"`
-	Post          paramtypes.GenesisAlloc `json:"post"`
-	PostStateRoot common.Hash             `json:"postStateRoot"`
+	Env           stEnv                 `json:"env"`
+	Exec          vmExec                `json:"exec"`
+	Logs          common.UnprefixedHash `json:"logs"`
+	GasRemaining  *math.HexOrDecimal64  `json:"gas"`
+	Out           hexutil.Bytes         `json:"out"`
+	Pre           genesisT.GenesisAlloc `json:"pre"`
+	Post          genesisT.GenesisAlloc `json:"post"`
+	PostStateRoot common.Hash           `json:"postStateRoot"`
 }
 
 //go:generate gencodec -type vmExec -field-override vmExecMarshaling -out gen_vmexec.go

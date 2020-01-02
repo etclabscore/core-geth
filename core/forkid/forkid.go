@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
@@ -183,13 +184,6 @@ func newFilter(config ctypes.ChainConfigurator, genesis common.Hash, headfn func
 	}
 }
 
-// checksum calculates the IEEE CRC32 checksum of a block number.
-func checksum(fork uint64) uint32 {
-	var blob [8]byte
-	binary.BigEndian.PutUint64(blob[:], fork)
-	return crc32.ChecksumIEEE(blob[:])
-}
-
 // checksumUpdate calculates the next IEEE CRC32 checksum based on the previous
 // one and a fork block number (equivalent to CRC32(original-blob || fork)).
 func checksumUpdate(hash uint32, fork uint64) uint32 {
@@ -207,5 +201,5 @@ func checksumToBytes(hash uint32) [4]byte {
 
 // gatherForks gathers all the known forks and creates a sorted list out of them.
 func gatherForks(config ctypes.ChainConfigurator) []uint64 {
-	return ctypes.Forks(config)
+	return confp.Forks(config)
 }

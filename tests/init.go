@@ -20,14 +20,10 @@ import (
 	"fmt"
 	"math/big"
 
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
-
-func newUint64(n uint64) *uint64 {
-	return &n
-}
 
 // Forks table defines supported forks and their chain config.
 var Forks = map[string]ctypes.ChainConfigurator{
@@ -63,7 +59,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		EIP158Block:    big.NewInt(0),
 		ByzantiumBlock: big.NewInt(0),
 	},
-	"ETC_Atlantis": &paramtypes.MultiGethChainConfig{
+	"ETC_Atlantis": &multigeth.MultiGethChainConfig{
 		NetworkID:          1,
 		Ethash:             new(ctypes.EthashConfig),
 		ChainID:            big.NewInt(61),
@@ -115,7 +111,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ConstantinopleBlock: big.NewInt(0),
 		PetersburgBlock:     big.NewInt(0),
 	},
-	"ETC_Agharta": &paramtypes.MultiGethChainConfig{
+	"ETC_Agharta": &multigeth.MultiGethChainConfig{
 		NetworkID:          1,
 		Ethash:             new(ctypes.EthashConfig),
 		ChainID:            big.NewInt(61),

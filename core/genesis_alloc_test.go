@@ -28,8 +28,9 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/go-test/deep"
 )
@@ -48,9 +49,9 @@ func TestDefaultGenesisBlock(t *testing.T) {
 func TestSetupGenesis(t *testing.T) {
 	var (
 		customghash = common.HexToHash("0x89c99d90b79719238d2645c7642f2c9295246e80775b38cfd162b696817fbd50")
-		customg     = paramtypes.Genesis{
+		customg     = genesisT.Genesis{
 			Config: &goethereum.ChainConfig{HomesteadBlock: big.NewInt(3)},
-			Alloc: paramtypes.GenesisAlloc{
+			Alloc: genesisT.GenesisAlloc{
 				{1}: {Balance: big.NewInt(1), Storage: map[common.Hash]common.Hash{{1}: {1}}},
 			},
 		}
@@ -67,9 +68,9 @@ func TestSetupGenesis(t *testing.T) {
 		{
 			name: "genesis without MultiGethChainConfig",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
-				return SetupGenesisBlock(db, new(paramtypes.Genesis))
+				return SetupGenesisBlock(db, new(genesisT.Genesis))
 			},
-			wantErr:    paramtypes.ErrGenesisNoConfig,
+			wantErr:    genesisT.ErrGenesisNoConfig,
 			wantConfig: params.AllEthashProtocolChanges,
 		},
 		{
@@ -104,7 +105,7 @@ func TestSetupGenesis(t *testing.T) {
 				MustCommitGenesis(db, &customg)
 				return SetupGenesisBlock(db, params.DefaultTestnetGenesisBlock())
 			},
-			wantErr:    &paramtypes.GenesisMismatchError{Stored: customghash, New: params.TestnetGenesisHash},
+			wantErr:    &genesisT.GenesisMismatchError{Stored: customghash, New: params.TestnetGenesisHash},
 			wantHash:   params.TestnetGenesisHash,
 			wantConfig: params.TestnetChainConfig,
 		},
@@ -135,7 +136,7 @@ func TestSetupGenesis(t *testing.T) {
 			},
 			wantHash:   customghash,
 			wantConfig: customg.Config.(*goethereum.ChainConfig),
-			wantErr: &ctypes.ConfigCompatError{
+			wantErr: &confp.ConfigCompatError{
 				What:         "incompatible fork value: GetEIP7Transition",
 				StoredConfig: func() *uint64 { b := big.NewInt(2).Uint64(); return &b }(),
 				NewConfig:    func() *uint64 { b := big.NewInt(3).Uint64(); return &b }(),

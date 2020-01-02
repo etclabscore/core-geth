@@ -78,7 +78,7 @@ func TestDAOForkBlockNewChain(t *testing.T) {
 		// test DAO Init Old Privnet
 		//{daoOldGenesis, nil, false},
 		// test DAO Default No Fork Privnet
-		{daoNoForkGenesis, &daoGenesisForkBlock, false},
+		{daoNoForkGenesis, nil, false},
 		// test DAO Default Pro Fork Privnet
 		{daoProForkGenesis, &daoGenesisForkBlock, true},
 	} {

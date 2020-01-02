@@ -9,8 +9,8 @@ import (
 )
 
 var ipsCommand = cli.Command{
-	Name:               "ips",
-	Usage:              "List IP transition names and values",
+	Name:   "ips",
+	Usage:  "List IP transition names and values",
 	Action: ips,
 }
 
@@ -32,4 +32,3 @@ func ips(ctx *cli.Context) error {
 	}
 	return nil
 }
-

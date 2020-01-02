@@ -37,8 +37,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -97,14 +97,14 @@ type testWorkerBackend struct {
 	txPool     *core.TxPool
 	chain      *core.BlockChain
 	testTxFeed event.Feed
-	genesis    *paramtypes.Genesis
+	genesis    *genesisT.Genesis
 	uncleBlock *types.Block
 }
 
 func newTestWorkerBackend(t *testing.T, chainConfig ctypes.ChainConfigurator, engine consensus.Engine, db ethdb.Database, n int) *testWorkerBackend {
-	var gspec = paramtypes.Genesis{
+	var gspec = genesisT.Genesis{
 		Config: chainConfig,
-		Alloc:  paramtypes.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
+		Alloc:  genesisT.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
 	}
 
 	switch e := engine.(type) {

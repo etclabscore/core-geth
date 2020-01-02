@@ -115,7 +115,7 @@ func TestCheckCompatible(t *testing.T) {
 				What:         "DAO fork support flag",
 				StoredConfig: uint64P(MainnetChainConfig.DAOForkBlock.Uint64()),
 				NewConfig:    uint64P(1900000),
-				RewindTo:     1900000-1,
+				RewindTo:     1900000 - 1,
 			},
 		},
 		{
@@ -131,7 +131,7 @@ func TestCheckCompatible(t *testing.T) {
 				What:         "DAO fork support flag",
 				StoredConfig: uint64P(MainnetChainConfig.DAOForkBlock.Uint64()),
 				NewConfig:    nil,
-				RewindTo:     1920000-1,
+				RewindTo:     1920000 - 1,
 			},
 		},
 		{
@@ -157,7 +157,7 @@ func TestCheckCompatible(t *testing.T) {
 		if (err == nil && test.wantErr != nil) || (err != nil && test.wantErr == nil) {
 			t.Errorf("nil/nonnil, error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", test.stored, test.new, test.head, err, test.wantErr)
 		} else if err != nil && (err.RewindTo != test.wantErr.RewindTo) {
-		//if !reflect.DeepEqual(err, test.wantErr) {
+			//if !reflect.DeepEqual(err, test.wantErr) {
 			t.Errorf("error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", test.stored, test.new, test.head, err, test.wantErr)
 		}
 	}

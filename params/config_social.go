@@ -29,12 +29,12 @@ var (
 
 	// SocialChainConfig is the chain parameters to run a node on the Ethereum Social main network.
 	SocialChainConfig = &multigeth.MultiGethChainConfig{
-		ChainID:             big.NewInt(28),
-		EIP2FBlock:          big.NewInt(0),
-		EIP7FBlock:          big.NewInt(0),
-		EIP150Block:         big.NewInt(0),
-		EIP155Block:         big.NewInt(0),
-		Ethash:              new(ctypes.EthashConfig),
+		ChainID:           big.NewInt(28),
+		EIP2FBlock:        big.NewInt(0),
+		EIP7FBlock:        big.NewInt(0),
+		EIP150Block:       big.NewInt(0),
+		EIP155Block:       big.NewInt(0),
+		Ethash:            new(ctypes.EthashConfig),
 		NetworkID:         28,
 		DisposalBlock:     big.NewInt(0),
 		SocialBlock:       big.NewInt(0),

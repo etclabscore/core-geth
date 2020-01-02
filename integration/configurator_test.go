@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package integration
 
 import (
@@ -29,8 +28,8 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -54,7 +53,7 @@ func TestConstantinopleEquivalence(t *testing.T) {
 
 func TestEquivalent_Features(t *testing.T) {
 
-	mustValidate := func (c ctypes.ChainConfigurator) {
+	mustValidate := func(c ctypes.ChainConfigurator) {
 		zero, max := uint64(0), uint64(math.MaxUint64)
 		for _, head := range []*uint64{
 			nil, &zero, &max,
@@ -96,7 +95,7 @@ func TestEquivalent_Features(t *testing.T) {
 			t.Log("--------------------")
 			t.Errorf("%s oconf/mg err: %v", name, err) // With error.
 
-			nicelog := func (n *uint64) interface{} {
+			nicelog := func(n *uint64) interface{} {
 				if n == nil {
 					return "nil"
 				}
@@ -170,7 +169,7 @@ func TestEquivalent_ReadParity(t *testing.T) {
 func TestParityGeneses(t *testing.T) {
 	testes := []struct {
 		filename       string
-		defaultGenesis *paramtypes.Genesis
+		defaultGenesis *genesisT.Genesis
 	}{
 		{
 			"foundation.json",
@@ -204,7 +203,7 @@ func TestParityGeneses(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		genc := &paramtypes.Genesis{
+		genc := &genesisT.Genesis{
 			Config: &multigeth.MultiGethChainConfig{},
 		}
 		err = confp.Convert(pspec, genc)

@@ -58,8 +58,8 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/gorilla/websocket"
 )
 
@@ -175,14 +175,14 @@ func main() {
 		log.Crit("Failed to render the faucet template", "err", err)
 	}
 	// Load and parse the genesis block requested by the user
-	var genesis *paramtypes.Genesis
+	var genesis *genesisT.Genesis
 	var enodes []*discv5.Node
 	var blob []byte
 
-	genesis, *bootFlag, *netFlag = func() (gs *paramtypes.Genesis, bs string, netid uint64) {
+	genesis, *bootFlag, *netFlag = func() (gs *genesisT.Genesis, bs string, netid uint64) {
 		var configs = []struct {
 			flag bool
-			gs   *paramtypes.Genesis
+			gs   *genesisT.Genesis
 			bs   []string
 		}{
 			{
@@ -254,7 +254,7 @@ func main() {
 			if err != nil {
 				log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
 			}
-			gs = new(paramtypes.Genesis)
+			gs = new(genesisT.Genesis)
 			if err = json.Unmarshal(blob, gs); err != nil {
 				log.Crit("Failed to parse genesis block json", "err", err)
 			}
@@ -318,9 +318,9 @@ type request struct {
 // faucet represents a crypto faucet backed by an Ethereum light client.
 type faucet struct {
 	config ctypes.ChainConfigurator // Chain configurations for signing
-	stack  *node.Node                // Ethereum protocol stack
-	client *ethclient.Client         // Client connection to the Ethereum chain
-	index  []byte                    // Index page to serve up on the web
+	stack  *node.Node               // Ethereum protocol stack
+	client *ethclient.Client        // Client connection to the Ethereum chain
+	index  []byte                   // Index page to serve up on the web
 
 	keystore *keystore.KeyStore // Keystore containing the single signer
 	account  accounts.Account   // Account funding user faucet requests
@@ -337,7 +337,7 @@ type faucet struct {
 	lock sync.RWMutex // Lock protecting the faucet's internals
 }
 
-func newFaucet(genesis *paramtypes.Genesis, port int, enodes []*discv5.Node, network uint64, stats string, ks *keystore.KeyStore, index []byte) (*faucet, error) {
+func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, network uint64, stats string, ks *keystore.KeyStore, index []byte) (*faucet, error) {
 	// Assemble the raw devp2p protocol stack
 	stack, err := node.New(&node.Config{
 		Name:    "MultiFaucet",

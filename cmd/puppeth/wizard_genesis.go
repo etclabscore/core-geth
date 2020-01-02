@@ -32,19 +32,19 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // makeGenesis creates a new genesis struct based on some user input.
 func (w *wizard) makeGenesis() {
 	// Construct a default genesis block
-	genesis := &paramtypes.Genesis{
+	genesis := &genesisT.Genesis{
 		Timestamp:  uint64(time.Now().Unix()),
 		GasLimit:   4700000,
 		Difficulty: big.NewInt(524288),
-		Alloc:      make(paramtypes.GenesisAlloc),
+		Alloc:      make(genesisT.GenesisAlloc),
 		Config: &goethereum.ChainConfig{
 			HomesteadBlock:      big.NewInt(0),
 			EIP150Block:         big.NewInt(0),
@@ -118,7 +118,7 @@ func (w *wizard) makeGenesis() {
 	for {
 		// Read the address of the account to fund
 		if address := w.readAddress(); address != nil {
-			genesis.Alloc[*address] = paramtypes.GenesisAccount{
+			genesis.Alloc[*address] = genesisT.GenesisAccount{
 				Balance: new(big.Int).Lsh(big.NewInt(1), 256-7), // 2^256 / 128 (allow many pre-funds without balance overflows)
 			}
 			continue
@@ -130,7 +130,7 @@ func (w *wizard) makeGenesis() {
 	if w.readDefaultYesNo(true) {
 		// Add a batch of precompile balances to avoid them getting deleted
 		for i := int64(0); i < 256; i++ {
-			genesis.Alloc[common.BigToAddress(big.NewInt(i))] = paramtypes.GenesisAccount{Balance: big.NewInt(1)}
+			genesis.Alloc[common.BigToAddress(big.NewInt(i))] = genesisT.GenesisAccount{Balance: big.NewInt(1)}
 		}
 	}
 	// Query the user for some custom extras
@@ -181,7 +181,7 @@ func (w *wizard) importGenesis() {
 		return
 	}
 	// Parse the genesis file and inject it successful
-	var genesis paramtypes.Genesis
+	var genesis genesisT.Genesis
 	if err := json.NewDecoder(reader).Decode(&genesis); err != nil {
 		log.Error("Invalid genesis spec: %v", err)
 		return

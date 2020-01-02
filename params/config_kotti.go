@@ -20,39 +20,65 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 var (
 	// Genesis hashes to enforce below configs on.
 	KottiGenesisHash = common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4")
 
-	KottiNetworkID          uint64 = 6
-	//KottiDisposalBlock             = uint64(0)
-	//KottiECIP1017FBlock            = uint64(5000000)
-	//KottiECIP1017EraRounds         = uint64(5000000)
-	//KottiEIP160FBlock              = uint64(0)
-	//KottiECIP1010PauseBlock        = uint64(0)
-	//KottiECIP1010Length            = uint64(2000000)
+	KottiChainConfig = &multigeth.MultiGethChainConfig{
+		NetworkID: 6,
+		ChainID:   big.NewInt(6),
+		Clique: &ctypes.CliqueConfig{
+			Period: 15,
+			Epoch:  30000,
+		},
 
-	KottiChainConfig = func() ctypes.ChainConfigurator {
-		c := &goethereum.ChainConfig{
-			ChainID:             big.NewInt(6),
-			HomesteadBlock:      big.NewInt(0),
-			EIP150Block:         big.NewInt(0),
-			EIP150Hash:          common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4"),
-			EIP155Block:         big.NewInt(0),
-			EIP158Block:         big.NewInt(716617),
-			ByzantiumBlock:      big.NewInt(716617),
-			ConstantinopleBlock: big.NewInt(1705549),
-			PetersburgBlock:     big.NewInt(1705549),
-			Clique: &ctypes.CliqueConfig{
-				Period: 15,
-				Epoch:  30000,
-			},
-		}
-		c.SetNetworkID(&KottiNetworkID)
+		EIP2FBlock: big.NewInt(0),
+		EIP7FBlock: big.NewInt(0),
 
-		return c
-	}()
+		EIP150Block: big.NewInt(0),
+
+		EIP155Block: big.NewInt(0),
+
+		// EIP158 eq
+		EIP160FBlock: big.NewInt(0),
+		EIP161FBlock: big.NewInt(716617),
+		EIP170FBlock: big.NewInt(716617),
+
+		// Byzantium eq
+		EIP100FBlock: big.NewInt(716617),
+		EIP140FBlock: big.NewInt(716617),
+		EIP198FBlock: big.NewInt(716617),
+		EIP211FBlock: big.NewInt(716617),
+		EIP212FBlock: big.NewInt(716617),
+		EIP213FBlock: big.NewInt(716617),
+		EIP214FBlock: big.NewInt(716617),
+		EIP658FBlock: big.NewInt(716617),
+
+		// Constantinople eq
+		EIP145FBlock:  big.NewInt(1705549),
+		EIP1014FBlock: big.NewInt(1705549),
+		EIP1052FBlock: big.NewInt(1705549),
+
+		// Istanbul eq
+		EIP152FBlock:  big.NewInt(2058191),
+		EIP1108FBlock: big.NewInt(2058191),
+		EIP1344FBlock: big.NewInt(2058191),
+		EIP1884FBlock: nil,
+		EIP2028FBlock: big.NewInt(2058191),
+		EIP2200FBlock: big.NewInt(2058191), // RePetersburg (== re-1283)
+
+		ECIP1017FBlock:    big.NewInt(5000000),
+		ECIP1017EraRounds: big.NewInt(5000000),
+
+		DisposalBlock:      big.NewInt(0),
+		ECIP1010PauseBlock: big.NewInt(0),
+		ECIP1010Length:     big.NewInt(2000000),
+
+		RequireBlockHashes: map[uint64]common.Hash{
+			0: KottiGenesisHash,
+		},
+	}
 )

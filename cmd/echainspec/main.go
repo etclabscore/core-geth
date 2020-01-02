@@ -9,8 +9,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
@@ -23,10 +23,10 @@ var gitDate = ""
 var (
 	chainspecFormatTypes = map[string]ctypes.Configurator{
 		"parity": &parity.ParityChainSpec{},
-		"multigeth": &paramtypes.Genesis{
+		"multigeth": &genesisT.Genesis{
 			Config: &multigeth.MultiGethChainConfig{},
 		},
-		"geth": &paramtypes.Genesis{
+		"geth": &genesisT.Genesis{
 			Config: &goethereum.ChainConfig{},
 		},
 		// TODO
@@ -94,7 +94,6 @@ var errInvalidOutputFlag = errors.New("invalid output format type")
 var errNoChainspecValue = errors.New("undetermined chainspec value")
 var errInvalidDefaultValue = errors.New("no default chainspec found for name given")
 var errInvalidChainspecValue = errors.New("could not read given chainspec")
-var errEmptyChainspecValue = errors.New("missing chainspec data")
 
 func mustGetChainspecValue(ctx *cli.Context) error {
 	if ctx.NArg() >= 1 {

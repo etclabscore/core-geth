@@ -24,7 +24,7 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -170,7 +170,7 @@ func (w *wizard) gatherStats(server string, pubkey []byte, client *sshClient) *s
 	defer w.lock.Unlock()
 
 	if genesis != "" && w.conf.Genesis == nil {
-		g := new(paramtypes.Genesis)
+		g := new(genesisT.Genesis)
 		if err := json.Unmarshal([]byte(genesis), g); err != nil {
 			log.Error("Failed to parse remote genesis", "err", err)
 		} else {

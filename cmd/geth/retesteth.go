@@ -43,8 +43,8 @@ import (
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp/generic"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -288,7 +288,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 		api.ethDb.Close()
 	}
 	ethDb := rawdb.NewMemoryDatabase()
-	accounts := make(paramtypes.GenesisAlloc)
+	accounts := make(genesisT.GenesisAlloc)
 	for address, account := range chainParams.Accounts {
 		balance := big.NewInt(0)
 		if account.Balance != nil {
@@ -303,7 +303,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 			for k, v := range account.Storage {
 				storage[common.HexToHash(k)] = common.HexToHash(v)
 			}
-			accounts[address] = paramtypes.GenesisAccount{
+			accounts[address] = genesisT.GenesisAccount{
 				Balance: balance,
 				Code:    account.Code,
 				Nonce:   nonce,
@@ -355,7 +355,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 		istanbulBlock = big.NewInt(int64(*chainParams.Params.IstanbulBlock))
 	}
 
-	genesis := &paramtypes.Genesis{
+	genesis := &genesisT.Genesis{
 		Config: &goethereum.ChainConfig{
 			ChainID:             chainId,
 			HomesteadBlock:      homesteadBlock,

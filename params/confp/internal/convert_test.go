@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package convert_test
 
 import (
@@ -26,12 +25,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
@@ -54,7 +52,7 @@ func Test_UnmarshalJSON(t *testing.T) {
 	} {
 		switch f {
 		case "geth":
-			c := &paramtypes.Genesis{}
+			c := &genesisT.Genesis{}
 			mustOpenF(t, f, c)
 			if *c.Config.GetNetworkID() != 314158 {
 				t.Errorf("networkid")
@@ -95,7 +93,7 @@ func TestIdentical(t *testing.T) {
 		"ChainID",
 		"NetworkID",
 	}
-	configs :=  []ctypes.ChainConfigurator{
+	configs := []ctypes.ChainConfigurator{
 		&multigeth.MultiGethChainConfig{},
 		&goethereum.ChainConfig{},
 		&parity.ParityChainSpec{},
@@ -138,7 +136,7 @@ func TestConfiguratorImplementationsSatisfied(t *testing.T) {
 	}
 
 	for _, ty := range []interface{}{
-		&paramtypes.Genesis{},
+		&genesisT.Genesis{},
 	} {
 		_ = ty.(ctypes.GenesisBlocker)
 	}
@@ -151,39 +149,4 @@ func TestCompatible(t *testing.T) {
 		t.Log(names[i], fn())
 	}
 	t.Log(fns)
-}
-
-func TestGatherForks(t *testing.T) {
-	cases := []struct {
-		config *multigeth.MultiGethChainConfig
-		wantNs []uint64
-	}{
-		{
-			params.ClassicChainConfig,
-			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000},
-		},
-	}
-	sliceContains := func (sl []uint64, u uint64) bool {
-		for _, s := range sl {
-			if s == u {
-				return true
-			}
-		}
-		return false
-	}
-	for ci, c := range cases {
-		gotForkNs := confp.Forks(c.config)
-		if len(gotForkNs) != len(c.wantNs) {
-			for _, n := range c.wantNs {
-				if !sliceContains(gotForkNs, n) {
-					t.Errorf("config.i=%d missing wanted fork at block number: %d", ci, n)
-				}
-			}
-			for _, n := range gotForkNs {
-				if !sliceContains(c.wantNs, n) {
-					t.Errorf("config.i=%d gathered unwanted fork at block number: %d", ci, n)
-				}
-			}
-		}
-	}
 }

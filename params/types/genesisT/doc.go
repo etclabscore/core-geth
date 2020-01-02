@@ -14,31 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-package convert_test
+/*
+Package genesisT holds genesis data types and logic.
+*/
 
-import (
-	"math/big"
-	"testing"
-
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/confp/tconvert"
-	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
-)
-
-func TestBlockConfig(t *testing.T) {
-	frontierCC := &goethereum.ChainConfig{
-		ChainID: big.NewInt(1),
-		Ethash:  new(ctypes.EthashConfig),
-	}
-	genesis := params.DefaultGenesisBlock()
-	genesis.Config = frontierCC
-	paritySpec, err := tconvert.NewParityChainSpec("frontier", genesis, []string{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	parityHomestead := paritySpec.Engine.Ethash.Params.HomesteadTransition
-	if parityHomestead != nil && *parityHomestead >= 0 {
-		t.Errorf("nonnil parity homestead")
-	}
-}
+package genesisT

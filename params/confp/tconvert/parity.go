@@ -14,21 +14,20 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package tconvert
 
 import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/params/confp"
-	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
 // NewParityChainSpec converts a go-ethereum genesis block into a Parity specific
 // chain specification format.
-func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes []string) (*parity.ParityChainSpec, error) {
+func NewParityChainSpec(network string, genesis *genesisT.Genesis, bootnodes []string) (*parity.ParityChainSpec, error) {
 	spec := &parity.ParityChainSpec{
 		Name:    network,
 		Nodes:   bootnodes,
@@ -45,13 +44,13 @@ func NewParityChainSpec(network string, genesis *paramtypes.Genesis, bootnodes [
 
 // ToMultiGethGenesis converts a Parity chainspec to the corresponding MultiGeth datastructure.
 // Note that the return value 'core.Genesis' includes the respective 'params.MultiGethChainConfig' values.
-func ParityConfigToMultiGethGenesis(c *parity.ParityChainSpec) (*paramtypes.Genesis, error) {
-	mg := &paramtypes.Genesis{
+func ParityConfigToMultiGethGenesis(c *parity.ParityChainSpec) (*genesisT.Genesis, error) {
+	mg := &genesisT.Genesis{
 		Config: &multigeth.MultiGethChainConfig{},
 	}
 
 	if err := confp.Convert(c, mg); err != nil {
-		return nil,err
+		return nil, err
 	}
 	if err := confp.Convert(c, mg.Config); err != nil {
 		return nil, err

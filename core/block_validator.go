@@ -32,8 +32,8 @@ import (
 // BlockValidator implements Validator.
 type BlockValidator struct {
 	config ctypes.ChainConfigurator // Chain configuration options
-	bc     *BlockChain               // Canonical block chain
-	engine consensus.Engine          // Consensus engine used for validating
+	bc     *BlockChain              // Canonical block chain
+	engine consensus.Engine         // Consensus engine used for validating
 }
 
 // NewBlockValidator returns a new block validator which is safe for re-use
@@ -96,7 +96,7 @@ func (v *BlockValidator) ValidateState(block *types.Block, statedb *state.StateD
 	}
 	// Validate the state root against the received state root and throw
 	if root := statedb.IntermediateRoot(v.config.IsForked(v.config.GetEIP161dTransition, header.Number)); header.Root != root {
-	// an error if they don't match.
+		// an error if they don't match.
 		return fmt.Errorf("invalid merkle root (remote: %x local: %x)", header.Root, root)
 	}
 	return nil

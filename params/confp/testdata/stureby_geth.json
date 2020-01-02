@@ -1,6 +1,5 @@
 {
   "config": {
-    "networkId": 314158,
     "chainId": 314158,
     "homesteadBlock": 10000,
     "eip150Block": 15000,

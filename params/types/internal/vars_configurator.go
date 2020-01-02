@@ -8,22 +8,23 @@ import (
 )
 
 type GlobalVarsConfigurator struct {
-
 }
 
-func One() *GlobalVarsConfigurator {
-	return &GlobalVarsConfigurator{}
+var gc = &GlobalVarsConfigurator{}
+
+func GlobalConfigurator() *GlobalVarsConfigurator {
+	return gc
 }
 
 func newU64(u uint64) *uint64 {
 	return &u
 }
 
-func (g GlobalVarsConfigurator) GetAccountStartNonce() *uint64 {
+func (_ GlobalVarsConfigurator) GetAccountStartNonce() *uint64 {
 	return newU64(0)
 }
 
-func (g GlobalVarsConfigurator) SetAccountStartNonce(n *uint64) error {
+func (_ GlobalVarsConfigurator) SetAccountStartNonce(n *uint64) error {
 	if n == nil {
 		return nil
 	}
@@ -33,38 +34,38 @@ func (g GlobalVarsConfigurator) SetAccountStartNonce(n *uint64) error {
 	return nil
 }
 
-func (g GlobalVarsConfigurator) GetMaximumExtraDataSize() *uint64 {
+func (_ GlobalVarsConfigurator) GetMaximumExtraDataSize() *uint64 {
 	return newU64(vars.MaximumExtraDataSize)
 }
 
-func (g GlobalVarsConfigurator) SetMaximumExtraDataSize(n *uint64) error {
+func (_ GlobalVarsConfigurator) SetMaximumExtraDataSize(n *uint64) error {
 	vars.MaximumExtraDataSize = *n
 	return nil
 }
 
-func (g GlobalVarsConfigurator) GetMinGasLimit() *uint64 {
+func (_ GlobalVarsConfigurator) GetMinGasLimit() *uint64 {
 	return newU64(vars.MinGasLimit)
 }
 
-func (g GlobalVarsConfigurator) SetMinGasLimit(n *uint64) error {
+func (_ GlobalVarsConfigurator) SetMinGasLimit(n *uint64) error {
 	vars.MinGasLimit = *n
 	return nil
 }
 
-func (g GlobalVarsConfigurator) GetGasLimitBoundDivisor() *uint64 {
+func (_ GlobalVarsConfigurator) GetGasLimitBoundDivisor() *uint64 {
 	return newU64(vars.GasLimitBoundDivisor)
 }
 
-func (g GlobalVarsConfigurator) SetGasLimitBoundDivisor(n *uint64) error {
+func (_ GlobalVarsConfigurator) SetGasLimitBoundDivisor(n *uint64) error {
 	vars.GasLimitBoundDivisor = *n
 	return nil
 }
 
-func (g GlobalVarsConfigurator) GetMaxCodeSize() *uint64 {
+func (_ GlobalVarsConfigurator) GetMaxCodeSize() *uint64 {
 	return newU64(vars.MaxCodeSize)
 }
 
-func (g GlobalVarsConfigurator) SetMaxCodeSize(n *uint64) error {
+func (_ GlobalVarsConfigurator) SetMaxCodeSize(n *uint64) error {
 	if n == nil {
 		return nil
 	}
@@ -72,10 +73,10 @@ func (g GlobalVarsConfigurator) SetMaxCodeSize(n *uint64) error {
 	return nil
 }
 
-func (c GlobalVarsConfigurator) GetEthashMinimumDifficulty() *big.Int {
+func (_ GlobalVarsConfigurator) GetEthashMinimumDifficulty() *big.Int {
 	return vars.MinimumDifficulty
 }
-func (c GlobalVarsConfigurator) SetEthashMinimumDifficulty(i *big.Int) error {
+func (_ GlobalVarsConfigurator) SetEthashMinimumDifficulty(i *big.Int) error {
 	if i == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -83,11 +84,11 @@ func (c GlobalVarsConfigurator) SetEthashMinimumDifficulty(i *big.Int) error {
 	return nil
 }
 
-func (c GlobalVarsConfigurator) GetEthashDifficultyBoundDivisor() *big.Int {
+func (_ GlobalVarsConfigurator) GetEthashDifficultyBoundDivisor() *big.Int {
 	return vars.DifficultyBoundDivisor
 }
 
-func (c GlobalVarsConfigurator) SetEthashDifficultyBoundDivisor(i *big.Int) error {
+func (_ GlobalVarsConfigurator) SetEthashDifficultyBoundDivisor(i *big.Int) error {
 	if i == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -95,11 +96,11 @@ func (c GlobalVarsConfigurator) SetEthashDifficultyBoundDivisor(i *big.Int) erro
 	return nil
 }
 
-func (c GlobalVarsConfigurator) GetEthashDurationLimit() *big.Int {
+func (_ GlobalVarsConfigurator) GetEthashDurationLimit() *big.Int {
 	return vars.DurationLimit
 }
 
-func (c GlobalVarsConfigurator) SetEthashDurationLimit(i *big.Int) error {
+func (_ GlobalVarsConfigurator) SetEthashDurationLimit(i *big.Int) error {
 	if i == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}

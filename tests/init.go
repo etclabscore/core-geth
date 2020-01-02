@@ -25,10 +25,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
-func newUint64(n uint64) *uint64 {
-	return &n
-}
-
 // Forks table defines supported forks and their chain config.
 var Forks = map[string]ctypes.ChainConfigurator{
 	"Frontier": &goethereum.ChainConfig{

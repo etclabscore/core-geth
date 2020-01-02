@@ -43,8 +43,8 @@ import (
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp/generic"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -288,7 +288,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 		api.ethDb.Close()
 	}
 	ethDb := rawdb.NewMemoryDatabase()
-	accounts := make(paramtypes.GenesisAlloc)
+	accounts := make(genesisT.GenesisAlloc)
 	for address, account := range chainParams.Accounts {
 		balance := big.NewInt(0)
 		if account.Balance != nil {
@@ -303,7 +303,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 			for k, v := range account.Storage {
 				storage[common.HexToHash(k)] = common.HexToHash(v)
 			}
-			accounts[address] = paramtypes.GenesisAccount{
+			accounts[address] = genesisT.GenesisAccount{
 				Balance: balance,
 				Code:    account.Code,
 				Nonce:   nonce,
@@ -355,7 +355,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 		istanbulBlock = big.NewInt(int64(*chainParams.Params.IstanbulBlock))
 	}
 
-	genesis := &paramtypes.Genesis{
+	genesis := &genesisT.Genesis{
 		Config: &goethereum.ChainConfig{
 			ChainID:             chainId,
 			HomesteadBlock:      homesteadBlock,
@@ -495,7 +495,6 @@ func (api *RetestethAPI) mineBlock() error {
 	txCount := 0
 	var txs []*types.Transaction
 	var receipts []*types.Receipt
-	var coalescedLogs []*types.Log
 	var blockFull = gasPool.Gas() < vars.TxGas
 	for address := range api.txSenders {
 		if blockFull {
@@ -522,7 +521,6 @@ func (api *RetestethAPI) mineBlock() error {
 				}
 				txs = append(txs, tx)
 				receipts = append(receipts, receipt)
-				coalescedLogs = append(coalescedLogs, receipt.Logs...)
 				delete(m, nonce)
 				if len(m) == 0 {
 					// Last tx for the sender
@@ -682,9 +680,6 @@ func (api *RetestethAPI) AccountRange(ctx context.Context,
 	for i := 0; i < int(maxResults) && it.Next(); i++ {
 		if preimage := accountTrie.GetKey(it.Key); preimage != nil {
 			result.AddressMap[common.BytesToHash(it.Key)] = common.BytesToAddress(preimage)
-			//fmt.Printf("%x: %x\n", it.Key, preimage)
-		} else {
-			//fmt.Printf("could not find preimage for %x\n", it.Key)
 		}
 	}
 	//fmt.Printf("Number of entries returned: %d\n", len(result.AddressMap))
@@ -889,7 +884,7 @@ func retesteth(ctx *cli.Context) error {
 		log.Info("HTTP endpoint closed", "url", httpEndpoint)
 	}()
 
-	abortChan := make(chan os.Signal)
+	abortChan := make(chan os.Signal, 11)
 	signal.Notify(abortChan, os.Interrupt)
 
 	sig := <-abortChan

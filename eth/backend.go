@@ -255,7 +255,7 @@ func CreateConsensusEngine(ctx *node.ServiceContext, chainConfig ctypes.ChainCon
 	if chainConfig.GetConsensusEngineType().IsClique() {
 		return clique.New(&ctypes.CliqueConfig{
 			Period: chainConfig.GetCliquePeriod(),
-			Epoch: chainConfig.GetCliqueEpoch(),
+			Epoch:  chainConfig.GetCliqueEpoch(),
 		}, db)
 	}
 	// Otherwise assume proof-of-work

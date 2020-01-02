@@ -14,6 +14,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
+/*
+This file contains logic implementing the Configurator interface for multi-geth.
+
+Notes:
+When setting the difficulty bomb delay map using a wanted total difficulty
+value. The map, following Parity's format, uses aggregating values (summed) to yield a net difficulty delay,
+while the specs use a max value (eg 3m, 5m, 9m). The model's difficulty bomb delay map data type has a
+method SetValueForHeight which is used for this.
+*/
+
 package multigeth
 
 import (
@@ -45,29 +55,41 @@ func setBig(i *big.Int, u *uint64) *big.Int {
 	return i
 }
 
+func (c *MultiGethChainConfig) ensureExistingRewardSchedule() {
+	if c.BlockRewardSchedule == nil {
+		c.BlockRewardSchedule = ctypes.Uint64BigMapEncodesHex{}
+	}
+}
+
+func (c *MultiGethChainConfig) ensureExistingDifficultySchedule() {
+	if c.DifficultyBombDelaySchedule == nil {
+		c.DifficultyBombDelaySchedule = ctypes.Uint64BigMapEncodesHex{}
+	}
+}
+
 func (c *MultiGethChainConfig) GetAccountStartNonce() *uint64 {
-	return internal.One().GetAccountStartNonce()
+	return internal.GlobalConfigurator().GetAccountStartNonce()
 }
 func (c *MultiGethChainConfig) SetAccountStartNonce(n *uint64) error {
-	return internal.One().SetAccountStartNonce(n)
+	return internal.GlobalConfigurator().SetAccountStartNonce(n)
 }
 func (c *MultiGethChainConfig) GetMaximumExtraDataSize() *uint64 {
-	return internal.One().GetMaximumExtraDataSize()
+	return internal.GlobalConfigurator().GetMaximumExtraDataSize()
 }
 func (c *MultiGethChainConfig) SetMaximumExtraDataSize(n *uint64) error {
-	return internal.One().SetMaximumExtraDataSize(n)
+	return internal.GlobalConfigurator().SetMaximumExtraDataSize(n)
 }
 func (c *MultiGethChainConfig) GetMinGasLimit() *uint64 {
-	return internal.One().GetMinGasLimit()
+	return internal.GlobalConfigurator().GetMinGasLimit()
 }
 func (c *MultiGethChainConfig) SetMinGasLimit(n *uint64) error {
-	return internal.One().SetMinGasLimit(n)
+	return internal.GlobalConfigurator().SetMinGasLimit(n)
 }
 func (c *MultiGethChainConfig) GetGasLimitBoundDivisor() *uint64 {
-	return internal.One().GetGasLimitBoundDivisor()
+	return internal.GlobalConfigurator().GetGasLimitBoundDivisor()
 }
 func (c *MultiGethChainConfig) SetGasLimitBoundDivisor(n *uint64) error {
-	return internal.One().SetGasLimitBoundDivisor(n)
+	return internal.GlobalConfigurator().SetGasLimitBoundDivisor(n)
 }
 
 func (c *MultiGethChainConfig) GetNetworkID() *uint64 {
@@ -92,10 +114,10 @@ func (c *MultiGethChainConfig) SetChainID(n *big.Int) error {
 }
 
 func (c *MultiGethChainConfig) GetMaxCodeSize() *uint64 {
-	return internal.One().GetMaxCodeSize()
+	return internal.GlobalConfigurator().GetMaxCodeSize()
 }
 func (c *MultiGethChainConfig) SetMaxCodeSize(n *uint64) error {
-	return internal.One().SetMaxCodeSize(n)
+	return internal.GlobalConfigurator().SetMaxCodeSize(n)
 }
 
 func (c *MultiGethChainConfig) GetEIP7Transition() *uint64 {
@@ -379,26 +401,26 @@ func (c *MultiGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngi
 }
 
 func (c *MultiGethChainConfig) GetEthashMinimumDifficulty() *big.Int {
-	return internal.One().GetEthashMinimumDifficulty()
+	return internal.GlobalConfigurator().GetEthashMinimumDifficulty()
 }
 func (c *MultiGethChainConfig) SetEthashMinimumDifficulty(i *big.Int) error {
-	return internal.One().SetEthashMinimumDifficulty(i)
+	return internal.GlobalConfigurator().SetEthashMinimumDifficulty(i)
 }
 
 func (c *MultiGethChainConfig) GetEthashDifficultyBoundDivisor() *big.Int {
-	return internal.One().GetEthashDifficultyBoundDivisor()
+	return internal.GlobalConfigurator().GetEthashDifficultyBoundDivisor()
 }
 
 func (c *MultiGethChainConfig) SetEthashDifficultyBoundDivisor(i *big.Int) error {
-	return internal.One().SetEthashDifficultyBoundDivisor(i)
+	return internal.GlobalConfigurator().SetEthashDifficultyBoundDivisor(i)
 }
 
 func (c *MultiGethChainConfig) GetEthashDurationLimit() *big.Int {
-	return internal.One().GetEthashDurationLimit()
+	return internal.GlobalConfigurator().GetEthashDurationLimit()
 }
 
 func (c *MultiGethChainConfig) SetEthashDurationLimit(i *big.Int) error {
-	return internal.One().SetEthashDurationLimit(i)
+	return internal.GlobalConfigurator().SetEthashDurationLimit(i)
 }
 
 func (c *MultiGethChainConfig) GetEthashHomesteadTransition() *uint64 {
@@ -446,9 +468,10 @@ func (c *MultiGethChainConfig) GetEthashEIP649Transition() *uint64 {
 		c.eip649FInferred = true
 	}()
 
-	diffN = ctypes.ExtractHostageSituationN(
+	// Get block number (key) from maps where EIP649 criteria is met.
+	diffN = ctypes.MapMeetsSpecification(
 		c.DifficultyBombDelaySchedule,
-		ctypes.Uint64BigMapEncodesHex(c.BlockRewardSchedule),
+		c.BlockRewardSchedule,
 		vars.EIP649DifficultyBombDelay,
 		vars.EIP649FBlockReward,
 	)
@@ -467,21 +490,12 @@ func (c *MultiGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
 		return nil
 	}
 
-	if c.BlockRewardSchedule == nil {
-		c.BlockRewardSchedule = ctypes.Uint64BigMapEncodesHex{}
-	}
-	if c.DifficultyBombDelaySchedule == nil {
-		c.DifficultyBombDelaySchedule = ctypes.Uint64BigMapEncodesHex{}
-	}
-
+	c.ensureExistingRewardSchedule()
 	c.BlockRewardSchedule[*n] = vars.EIP649FBlockReward
 
-	eip1234N := c.EIP1234FBlock
-	if eip1234N == nil || eip1234N.Uint64() != *n {
-		c.DifficultyBombDelaySchedule[*n] = vars.EIP649DifficultyBombDelay
-	}
-	// Else EIP1234 has been set to equal activation value, which means the map contains a sum value (eg 5m),
-	// so the EIP649 difficulty adjustment is already accounted for.
+	c.ensureExistingDifficultySchedule()
+	c.DifficultyBombDelaySchedule.SetValueTotalForHeight(n, vars.EIP649DifficultyBombDelay)
+
 	return nil
 }
 
@@ -496,7 +510,8 @@ func (c *MultiGethChainConfig) GetEthashEIP1234Transition() *uint64 {
 		c.eip1234FInferred = true
 	}()
 
-	diffN = ctypes.ExtractHostageSituationN(
+	// Get block number (key) from maps where EIP1234 criteria is met.
+	diffN = ctypes.MapMeetsSpecification(
 		c.DifficultyBombDelaySchedule,
 		c.BlockRewardSchedule,
 		vars.EIP1234DifficultyBombDelay,
@@ -517,25 +532,46 @@ func (c *MultiGethChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 		return nil
 	}
 
-	if c.BlockRewardSchedule == nil {
-		c.BlockRewardSchedule = ctypes.Uint64BigMapEncodesHex{}
-	}
-	if c.DifficultyBombDelaySchedule == nil {
-		c.DifficultyBombDelaySchedule = ctypes.Uint64BigMapEncodesHex{}
-	}
-
 	// Block reward is a simple lookup; doesn't matter if overwrite or not.
+	c.ensureExistingRewardSchedule()
 	c.BlockRewardSchedule[*n] = vars.EIP1234FBlockReward
 
-	eip649N := c.EIP649FBlock
-	if eip649N == nil || eip649N.Uint64() == *n {
-		// EIP649 has NOT been set, OR has been set to identical block, eg. 0 for testing
-		// Overwrite key with total delay (5m)
-		c.DifficultyBombDelaySchedule[*n] = vars.EIP1234DifficultyBombDelay
+	c.ensureExistingDifficultySchedule()
+	c.DifficultyBombDelaySchedule.SetValueTotalForHeight(n, vars.EIP1234DifficultyBombDelay)
+
+	return nil
+}
+
+func (c *MultiGethChainConfig) GetEthashEIP2384Transition() *uint64 {
+	if c.eip2384Inferred {
+		return bigNewU64(c.EIP2384FBlock)
+	}
+
+	var diffN *uint64
+	defer func() {
+		c.EIP2384FBlock = setBig(c.EIP2384FBlock, diffN)
+		c.eip2384Inferred = true
+	}()
+
+	// Get block number (key) from map where EIP2384 criteria is met.
+	diffN = ctypes.MapMeetsSpecification(c.DifficultyBombDelaySchedule, nil, vars.EIP2384DifficultyBombDelay, nil)
+	return diffN
+}
+
+func (c *MultiGethChainConfig) SetEthashEIP2384Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+
+	c.EIP2384FBlock = setBig(c.EIP2384FBlock, n)
+	c.eip2384Inferred = true
+
+	if n == nil {
 		return nil
 	}
 
-	c.DifficultyBombDelaySchedule[*n] = new(big.Int).Sub(vars.EIP1234DifficultyBombDelay, vars.EIP649DifficultyBombDelay)
+	c.ensureExistingDifficultySchedule()
+	c.DifficultyBombDelaySchedule.SetValueTotalForHeight(n, vars.EIP2384DifficultyBombDelay)
 
 	return nil
 }

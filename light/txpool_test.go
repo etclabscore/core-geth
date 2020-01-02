@@ -30,7 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -85,7 +85,7 @@ func TestTxPool(t *testing.T) {
 	var (
 		sdb     = rawdb.NewMemoryDatabase()
 		ldb     = rawdb.NewMemoryDatabase()
-		gspec   = paramtypes.Genesis{Alloc: paramtypes.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
+		gspec   = genesisT.Genesis{Alloc: genesisT.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
 		genesis = core.MustCommitGenesis(sdb, &gspec)
 	)
 	core.MustCommitGenesis(ldb, &gspec)

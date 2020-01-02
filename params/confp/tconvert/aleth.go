@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package tconvert
 
 import (
@@ -23,14 +22,14 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // NewAlethGenesisSpec converts a go-ethereum genesis block into a Aleth-specific
 // chain specification format.
-func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*aleth.AlethGenesisSpec, error) {
+func NewAlethGenesisSpec(network string, genesis *genesisT.Genesis) (*aleth.AlethGenesisSpec, error) {
 	// Only ethash is currently supported between go-ethereum and aleth
 	if !genesis.Config.GetConsensusEngineType().IsEthash() {
 		return nil, errors.New("unsupported consensus engine")
@@ -124,11 +123,11 @@ func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*aleth.Al
 		}
 		spec.SetPrecompile(6, &aleth.AlethGenesisSpecBuiltin{
 			Name:          "alt_bn128_G1_add",
-			StartingBlock: (*hexutil.Big)(spec.Params.ByzantiumForkBlock),
+			StartingBlock: (spec.Params.ByzantiumForkBlock),
 		}) // Aleth hardcoded the gas policy
 		spec.SetPrecompile(7, &aleth.AlethGenesisSpecBuiltin{
 			Name:          "alt_bn128_G1_mul",
-			StartingBlock: (*hexutil.Big)(spec.Params.ByzantiumForkBlock),
+			StartingBlock: (spec.Params.ByzantiumForkBlock),
 		}) // Aleth hardcoded the gas policy
 		spec.SetPrecompile(9, &aleth.AlethGenesisSpecBuiltin{
 			Name:          "blake2_compression",
@@ -137,4 +136,3 @@ func NewAlethGenesisSpec(network string, genesis *paramtypes.Genesis) (*aleth.Al
 	}
 	return spec, nil
 }
-

@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package ctypes
 
 import (
@@ -153,6 +152,8 @@ type EthashConfigurator interface {
 	SetEthashEIP649Transition(n *uint64) error
 	GetEthashEIP1234Transition() *uint64
 	SetEthashEIP1234Transition(n *uint64) error
+	GetEthashEIP2384Transition() *uint64
+	SetEthashEIP2384Transition(n *uint64) error
 	GetEthashECIP1010PauseTransition() *uint64
 	SetEthashECIP1010PauseTransition(n *uint64) error
 	GetEthashECIP1010ContinueTransition() *uint64

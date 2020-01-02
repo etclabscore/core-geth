@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"math/big"
 	"reflect"
+	"sort"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -260,29 +261,39 @@ type ParityChainSpecPricingPrice struct {
 }
 
 func (p *ParityChainSpecPricingMaybe) UnmarshalJSON(input []byte) error {
+
+	// If old schema structure with "pricing" field
 	pricing := ParityChainSpecPricing{}
 	err := json.Unmarshal(input, &pricing)
 	if err == nil && !reflect.DeepEqual(pricing, ParityChainSpecPricing{}) {
 		p.Pricing = &pricing
 		return nil
 	}
-	m := make(map[math.HexOrDecimal64]ParityChainSpecPricingPrice)
-	err = json.Unmarshal(input, &m)
+
+	// Otherwise it's a map keyed on activation block numbers,
+	// where the keys are strings and could be duplicates.
+	// According to JSON specification we should use the last lexicographically
+	// ordered value in case of duplicates.
+	mm := make(map[string]ParityChainSpecPricingPrice)
+	err = json.Unmarshal(input, &mm)
 	if err != nil {
 		return err
 	}
-	if len(m) == 0 {
-		panic("0 map, dragons")
+	sl := []string{}
+	for k := range mm {
+		sl = append(sl, k)
 	}
+	sort.Strings(sl)
 	p.Map = make(map[*math.HexOrDecimal256]ParityChainSpecPricingPrice)
-	for k, v := range m {
-		p.Map[math.NewHexOrDecimal256(int64(k))] = v
+	for _, s := range sl {
+		p.Map[(*math.HexOrDecimal256)(math.MustParseBig256(s))] = mm[s]
 	}
 	if len(p.Map) == 0 {
 		panic("0map")
 	}
 	return nil
 }
+
 func (p ParityChainSpecPricingMaybe) MarshalJSON() ([]byte, error) {
 	if p.Map != nil {
 		return json.Marshal(p.Map)

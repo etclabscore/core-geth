@@ -12,6 +12,8 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
+// TestUnmarshalChainConfigurator is a non deterministic test. WTF.
+// go test ./params/... -run TestUnmarshalChainConfigurator -count [1|100]
 func TestUnmarshalChainConfigurator(t *testing.T) {
 	cases := []struct {
 		file  string

@@ -65,7 +65,7 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 	"Constantinople": &goethereum.ChainConfig{
 		Ethash:              new(ctypes.EthashConfig),
 		HomesteadBlock:      big.NewInt(0),
-		ByzantiumBlock: big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
 		ConstantinopleBlock: big.NewInt(0),
 	},
 	"difficulty.json": mainnetChainConfig,
@@ -142,7 +142,7 @@ func (test *DifficultyTest) Run(config ctypes.ChainConfigurator) error {
 	if actual.Cmp(exp) != 0 {
 		return fmt.Errorf(`%s got: %v, want: %v
 test: %v
-config: %v`, test.Name, actual, exp, test, config)
+config: %s`, test.Name, actual, exp, test, config)
 	}
 	return nil
 

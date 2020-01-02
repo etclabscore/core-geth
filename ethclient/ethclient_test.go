@@ -35,7 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 // Verify that Client implements the ethereum interfaces.
@@ -193,12 +193,12 @@ func newTestBackend(t *testing.T) (*node.Node, []*types.Block) {
 	return n, blocks
 }
 
-func generateTestChain() (*paramtypes.Genesis, []*types.Block) {
+func generateTestChain() (*genesisT.Genesis, []*types.Block) {
 	db := rawdb.NewMemoryDatabase()
 	config := params.AllEthashProtocolChanges
-	genesis := &paramtypes.Genesis{
+	genesis := &genesisT.Genesis{
 		Config:    config,
-		Alloc:     paramtypes.GenesisAlloc{testAddr: {Balance: testBalance}},
+		Alloc:     genesisT.GenesisAlloc{testAddr: {Balance: testBalance}},
 		ExtraData: []byte("test genesis"),
 		Timestamp: 9000,
 	}

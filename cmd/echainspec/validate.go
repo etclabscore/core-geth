@@ -10,12 +10,12 @@ import (
 )
 
 var validateCommand = cli.Command{
-	Name:      "validate",
-	Aliases:   []string{"valid"},
+	Name:        "validate",
+	Aliases:     []string{"valid"},
 	Description: "Exits 0 if valid, 1 if not.",
-	Usage:     "Tests whether a configuration is valid",
-	ArgsUsage: "[|0x042|0x42|42]",
-	Action:    validate,
+	Usage:       "Tests whether a configuration is valid",
+	ArgsUsage:   "[|0x042|0x42|42]",
+	Action:      validate,
 }
 
 func validate(ctx *cli.Context) error {

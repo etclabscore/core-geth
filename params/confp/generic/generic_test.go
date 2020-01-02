@@ -13,8 +13,8 @@ import (
 )
 
 func TestUnmarshalChainConfigurator(t *testing.T) {
-	cases := []struct{
-		file string
+	cases := []struct {
+		file  string
 		wantT interface{}
 	}{
 		{
@@ -57,7 +57,7 @@ result:
 				reflect.TypeOf(got).String(),
 				string(b),
 				string(gotb),
-				)
+			)
 		}
 	}
 }

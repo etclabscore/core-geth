@@ -6,7 +6,7 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/Azure/go-autorest/autorest/adal v0.6.0 // indirect
 	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
-	github.com/allegro/bigcache v0.0.0-20190218064605-e24eb225f156
+	github.com/VictoriaMetrics/fastcache v1.5.4
 	github.com/aristanetworks/goarista v0.0.0-20170210015632-ea17b1a17847
 	github.com/btcsuite/btcd v0.0.0-20171128150713-2e60448ffcc6
 	github.com/cespare/cp v0.1.0
@@ -57,12 +57,13 @@ require (
 	github.com/tidwall/gjson v1.3.5
 	github.com/tyler-smith/go-bip39 v0.0.0-20181017060643-dbb3b84ba2ef
 	github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208
-	golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529
-	golang.org/x/net v0.0.0-20191101175033-0deb6923b6d9
-	golang.org/x/sync v0.0.0-20190423024810-112230192c58
-	golang.org/x/sys v0.0.0-20190422165155-953cdadca894
-	golang.org/x/text v0.3.0
-	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127
+	golang.org/x/crypto v0.0.0-20191219195013-becbf705a915
+	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
+	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
+	golang.org/x/sys v0.0.0-20191220220014-0732a990476f
+	golang.org/x/text v0.3.2
+	golang.org/x/tools v0.0.0-20191220234730-f13409bbebaf // indirect
+	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20180302121509-abf0ba0be5d5
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect

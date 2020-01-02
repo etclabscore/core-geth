@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package confp
 
 import (
@@ -30,7 +29,7 @@ func Convert(from, to interface{}) error {
 	// Interfaces must be either ChainConfigurator or GenesisBlocker.
 	for i, v := range []interface{}{
 		from, to,
-	}{
+	} {
 		_, genesiser := v.(ctypes.GenesisBlocker)
 		_, chainconfer := v.(ctypes.ChainConfigurator)
 		if !genesiser && !chainconfer {
@@ -140,8 +139,8 @@ func convert(k reflect.Type, source, target interface{}) error {
 
 type DiffT struct {
 	Field string
-	A interface{}
-	B interface{}
+	A     interface{}
+	B     interface{}
 }
 
 func (d DiffT) String() string {
@@ -179,7 +178,7 @@ func compare(k reflect.Type, source, target interface{}) (diffs []DiffT) {
 	for i := 0; i < k.NumMethod(); i++ {
 		method := k.Method(i)
 
-		if !strings.HasPrefix(method.Name, "Get") {
+		if !strings.HasPrefix(method.Name, "Get") || !strings.HasSuffix(method.Name, "Transition") {
 			continue
 		}
 		if reflect.ValueOf(source).MethodByName(method.Name).Type().NumIn() > 0 {
@@ -193,8 +192,8 @@ func compare(k reflect.Type, source, target interface{}) (diffs []DiffT) {
 		if !reflect.DeepEqual(response[0].Interface(), response2[0].Interface()) {
 			diffs = append(diffs, DiffT{
 				Field: strings.TrimPrefix(method.Name, "Get"),
-				A: diffV(response[0]),
-				B: diffV(response2[0]),
+				A:     diffV(response[0]),
+				B:     diffV(response2[0]),
 			})
 		}
 	}
@@ -206,8 +205,8 @@ func compare(k reflect.Type, source, target interface{}) (diffs []DiffT) {
 // independent of potential or realized chain upgrades.
 func Identical(a, b ctypes.ChainConfigurator, fields []string) bool {
 	for _, m := range fields {
-		res1 := reflect.ValueOf(a).MethodByName("Get"+m).Call([]reflect.Value{})
-		res2 := reflect.ValueOf(b).MethodByName("Get"+m).Call([]reflect.Value{})
+		res1 := reflect.ValueOf(a).MethodByName("Get" + m).Call([]reflect.Value{})
+		res2 := reflect.ValueOf(b).MethodByName("Get" + m).Call([]reflect.Value{})
 		if !reflect.DeepEqual(res1[0].Interface(), res2[0].Interface()) {
 			return false
 		}

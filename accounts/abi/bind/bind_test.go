@@ -283,7 +283,7 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -291,7 +291,7 @@ var bindTests = []struct {
 			key, _ := crypto.GenerateKey()
 			auth := bind.NewKeyedTransactor(key)
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 
 			// Deploy an interaction tester contract and call a transaction on it
@@ -338,7 +338,7 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -346,7 +346,7 @@ var bindTests = []struct {
 			key, _ := crypto.GenerateKey()
 			auth := bind.NewKeyedTransactor(key)
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 
 			// Deploy a tuple tester contract and execute a structured call on it
@@ -384,7 +384,7 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -392,7 +392,7 @@ var bindTests = []struct {
 			key, _ := crypto.GenerateKey()
 			auth := bind.NewKeyedTransactor(key)
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 
 			// Deploy a tuple tester contract and execute a structured call on it
@@ -442,7 +442,7 @@ var bindTests = []struct {
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 			"github.com/ethereum/go-ethereum/common"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -450,7 +450,7 @@ var bindTests = []struct {
 			key, _ := crypto.GenerateKey()
 			auth := bind.NewKeyedTransactor(key)
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 
 			// Deploy a slice tester contract and execute a n array call on it
@@ -490,7 +490,7 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -498,7 +498,7 @@ var bindTests = []struct {
 			key, _ := crypto.GenerateKey()
 			auth := bind.NewKeyedTransactor(key)
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 
 			// Deploy a default method invoker contract and execute its default method
@@ -538,12 +538,12 @@ var bindTests = []struct {
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 			"github.com/ethereum/go-ethereum/common"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Create a simulator and wrap a non-deployed contract
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{}, uint64(10000000000))
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{}, uint64(10000000000))
 			defer sim.Close()
 
 			nonexistent, err := NewNonExistent(common.Address{}, sim)
@@ -585,7 +585,7 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -593,7 +593,7 @@ var bindTests = []struct {
 			key, _ := crypto.GenerateKey()
 			auth := bind.NewKeyedTransactor(key)
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 
 			// Deploy a funky gas pattern contract
@@ -635,7 +635,7 @@ var bindTests = []struct {
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 			"github.com/ethereum/go-ethereum/common"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -643,7 +643,7 @@ var bindTests = []struct {
 			key, _ := crypto.GenerateKey()
 			auth := bind.NewKeyedTransactor(key)
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 
 			// Deploy a sender tester contract and execute a structured call on it
@@ -710,7 +710,7 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -718,7 +718,7 @@ var bindTests = []struct {
 			key, _ := crypto.GenerateKey()
 			auth := bind.NewKeyedTransactor(key)
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 
 			// Deploy a underscorer tester contract and execute a structured call on it
@@ -804,7 +804,7 @@ var bindTests = []struct {
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 			"github.com/ethereum/go-ethereum/common"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -812,7 +812,7 @@ var bindTests = []struct {
 			key, _ := crypto.GenerateKey()
 			auth := bind.NewKeyedTransactor(key)
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 
 			// Deploy an eventer contract
@@ -994,7 +994,7 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -1002,7 +1002,7 @@ var bindTests = []struct {
 			key, _ := crypto.GenerateKey()
 			auth := bind.NewKeyedTransactor(key)
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 
 			//deploy the test contract
@@ -1129,7 +1129,7 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 
@@ -1137,7 +1137,7 @@ var bindTests = []struct {
 			key, _ := crypto.GenerateKey()
 			auth := bind.NewKeyedTransactor(key)
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 
 			_, _, contract, err := DeployTuple(auth, sim)
@@ -1271,7 +1271,7 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/params/types"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
@@ -1279,7 +1279,7 @@ var bindTests = []struct {
 			key, _ := crypto.GenerateKey()
 			auth := bind.NewKeyedTransactor(key)
 
-			sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 
 			//deploy the test contract
@@ -1320,7 +1320,7 @@ var bindTests = []struct {
 
 		  event bar(uint256 i);
 		  event bar(uint256 i, uint256 j);
-			
+
 		  function foo(uint256 i) public {
 			  emit bar(i);
 		  }
@@ -1337,14 +1337,14 @@ var bindTests = []struct {
 
 		"github.com/ethereum/go-ethereum/accounts/abi/bind"
 		"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-		"github.com/ethereum/go-ethereum/params/types"
+		"github.com/ethereum/go-ethereum/params/types/genesisT"
 		"github.com/ethereum/go-ethereum/crypto"
 		`,
 		`
 		// Initialize test accounts
 		key, _ := crypto.GenerateKey()
 		auth := bind.NewKeyedTransactor(key)
-		sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+		sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 		defer sim.Close()
 
 		// deploy the test contract
@@ -1426,7 +1426,7 @@ var bindTests = []struct {
 		"github.com/ethereum/go-ethereum/accounts/abi/bind"
 		"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 		"github.com/ethereum/go-ethereum/crypto"
-		"github.com/ethereum/go-ethereum/params/types"
+		"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 		// Initialize test accounts
@@ -1434,7 +1434,7 @@ var bindTests = []struct {
 		addr := crypto.PubkeyToAddress(key.PublicKey)
 
 		// Deploy registrar contract
-		sim := backends.NewSimulatedBackend(paramtypes.GenesisAlloc{addr: {Balance: big.NewInt(1000000000)}}, 10000000)
+		sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{addr: {Balance: big.NewInt(1000000000)}}, 10000000)
 		defer sim.Close()
 
 		transactOpts := bind.NewKeyedTransactor(key)
@@ -1447,6 +1447,88 @@ var bindTests = []struct {
 		nil,
 		map[string]string{"_myVar": "pubVar"}, // alias MyVar to PubVar
 		nil,
+	},
+	{
+		"MultiContracts",
+		`
+		pragma solidity ^0.5.11;
+		pragma experimental ABIEncoderV2;
+
+		library ExternalLib {
+			struct SharedStruct{
+				uint256 f1;
+				bytes32 f2;
+			}
+		}
+
+		contract ContractOne {
+			function foo(ExternalLib.SharedStruct memory s) pure public {
+				// Do stuff
+			}
+		}
+
+		contract ContractTwo {
+			function bar(ExternalLib.SharedStruct memory s) pure public {
+				// Do stuff
+			}
+		}
+        `,
+		[]string{
+			`60806040523480156100115760006000fd5b50610017565b6101b5806100266000396000f3fe60806040523480156100115760006000fd5b50600436106100305760003560e01c80639d8a8ba81461003657610030565b60006000fd5b610050600480360361004b91908101906100d1565b610052565b005b5b5056610171565b6000813590506100698161013d565b92915050565b6000604082840312156100825760006000fd5b61008c60406100fb565b9050600061009c848285016100bc565b60008301525060206100b08482850161005a565b60208301525092915050565b6000813590506100cb81610157565b92915050565b6000604082840312156100e45760006000fd5b60006100f28482850161006f565b91505092915050565b6000604051905081810181811067ffffffffffffffff8211171561011f5760006000fd5b8060405250919050565b6000819050919050565b6000819050919050565b61014681610129565b811415156101545760006000fd5b50565b61016081610133565b8114151561016e5760006000fd5b50565bfea365627a7a72315820749274eb7f6c01010d5322af4e1668b0a154409eb7968bd6cae5524c7ed669bb6c6578706572696d656e74616cf564736f6c634300050c0040`,
+			`60806040523480156100115760006000fd5b50610017565b6101b5806100266000396000f3fe60806040523480156100115760006000fd5b50600436106100305760003560e01c8063db8ba08c1461003657610030565b60006000fd5b610050600480360361004b91908101906100d1565b610052565b005b5b5056610171565b6000813590506100698161013d565b92915050565b6000604082840312156100825760006000fd5b61008c60406100fb565b9050600061009c848285016100bc565b60008301525060206100b08482850161005a565b60208301525092915050565b6000813590506100cb81610157565b92915050565b6000604082840312156100e45760006000fd5b60006100f28482850161006f565b91505092915050565b6000604051905081810181811067ffffffffffffffff8211171561011f5760006000fd5b8060405250919050565b6000819050919050565b6000819050919050565b61014681610129565b811415156101545760006000fd5b50565b61016081610133565b8114151561016e5760006000fd5b50565bfea365627a7a723158209bc28ee7ea97c131a13330d77ec73b4493b5c59c648352da81dd288b021192596c6578706572696d656e74616cf564736f6c634300050c0040`,
+			`606c6026600b82828239805160001a6073141515601857fe5b30600052607381538281f350fe73000000000000000000000000000000000000000030146080604052600436106023575b60006000fdfea365627a7a72315820518f0110144f5b3de95697d05e456a064656890d08e6f9cff47f3be710cc46a36c6578706572696d656e74616cf564736f6c634300050c0040`,
+		},
+		[]string{
+			`[{"constant":true,"inputs":[{"components":[{"internalType":"uint256","name":"f1","type":"uint256"},{"internalType":"bytes32","name":"f2","type":"bytes32"}],"internalType":"struct ExternalLib.SharedStruct","name":"s","type":"tuple"}],"name":"foo","outputs":[],"payable":false,"stateMutability":"pure","type":"function"}]`,
+			`[{"constant":true,"inputs":[{"components":[{"internalType":"uint256","name":"f1","type":"uint256"},{"internalType":"bytes32","name":"f2","type":"bytes32"}],"internalType":"struct ExternalLib.SharedStruct","name":"s","type":"tuple"}],"name":"bar","outputs":[],"payable":false,"stateMutability":"pure","type":"function"}]`,
+			`[]`,
+		},
+		`
+		"math/big"
+
+		"github.com/ethereum/go-ethereum/accounts/abi/bind"
+		"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
+		"github.com/ethereum/go-ethereum/crypto"
+		"github.com/ethereum/go-ethereum/params/types/genesisT"
+        `,
+		`
+		key, _ := crypto.GenerateKey()
+		addr := crypto.PubkeyToAddress(key.PublicKey)
+
+		// Deploy registrar contract
+		sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{addr: {Balance: big.NewInt(1000000000)}}, 10000000)
+		defer sim.Close()
+
+		transactOpts := bind.NewKeyedTransactor(key)
+		_, _, c1, err := DeployContractOne(transactOpts, sim)
+		if err != nil {
+			t.Fatal("Failed to deploy contract")
+		}
+		sim.Commit()
+		err = c1.Foo(nil, ExternalLibSharedStruct{
+			F1: big.NewInt(100),
+			F2: [32]byte{0x01, 0x02, 0x03},
+		})
+		if err != nil {
+			t.Fatal("Failed to invoke function")
+		}
+		_, _, c2, err := DeployContractTwo(transactOpts, sim)
+		if err != nil {
+			t.Fatal("Failed to deploy contract")
+		}
+		sim.Commit()
+		err = c2.Bar(nil, ExternalLibSharedStruct{
+			F1: big.NewInt(100),
+			F2: [32]byte{0x01, 0x02, 0x03},
+		})
+		if err != nil {
+			t.Fatal("Failed to invoke function")
+		}
+        `,
+		nil,
+		nil,
+		nil,
+		[]string{"ContractOne", "ContractTwo", "ExternalLib"},
 	},
 }
 
@@ -1497,6 +1579,18 @@ func TestGolangBindings(t *testing.T) {
 		if err := ioutil.WriteFile(filepath.Join(pkg, strings.ToLower(tt.name)+"_test.go"), []byte(code), 0600); err != nil {
 			t.Fatalf("test %d: failed to write tests: %v", i, err)
 		}
+	}
+	// Convert the package to go modules and use the current source for go-ethereum
+	moder := exec.Command(gocmd, "mod", "init", "bindtest")
+	moder.Dir = pkg
+	if out, err := moder.CombinedOutput(); err != nil {
+		t.Fatalf("failed to convert binding test to modules: %v\n%s", err, out)
+	}
+	pwd, _ := os.Getwd()
+	replacer := exec.Command(gocmd, "mod", "edit", "-replace", "github.com/ethereum/go-ethereum="+filepath.Join(pwd, "..", "..", "..")) // Repo root
+	replacer.Dir = pkg
+	if out, err := replacer.CombinedOutput(); err != nil {
+		t.Fatalf("failed to replace binding test dependency to current source tree: %v\n%s", err, out)
 	}
 	// Test the entire package and report any failures
 	cmd := exec.Command(gocmd, "test", "-v", "-count", "1")

@@ -32,11 +32,19 @@ ios:
 test: all
 	go run build/ci.go test
 
+sync-clients:
+	./params/parity.json.d/sync-parity-remote.sh
+
 test-multigeth: test-multigeth-features test-multigeth-chainspecs ## Runs all tests specific to multi-geth.
 
-test-multigeth-features: ## Runs tests specific to multi-geth using Fork/Feature configs.
-	@echo "Testing fork/feature/datatype implementation; equivalence."
+test-multigeth-features: test-multigeth-features-parity test-multigeth-features-multigeth ## Runs tests specific to multi-geth using Fork/Feature configs.
+
+test-multigeth-features-multigeth:
+	@echo "Testing fork/feature/datatype implementation; equivalence - PARITY."
 	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_PARITY=on go test -count=1 ./tests
+
+test-multigeth-features-parity:
+	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETH."
 	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETH=on go test -count=1 ./tests
 
 test-multigeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
@@ -63,6 +71,8 @@ lint: ## Run linters.
 clean:
 	./build/clean_go_build_cache.sh
 	rm -fr $(GOBIN)/*
+	go clean -cache
+	rm -fr build/_workspace/pkg/ $(GOBIN)/*
 
 # The devtools target installs tools required for 'go generate'.
 # You need to put $GOBIN (or $GOPATH/bin) in your PATH to use 'go generate'.

@@ -1527,7 +1527,12 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Override genesis configuration if a --<chain> flag.
 	if gen := genesisForCtxChainConfig(ctx); gen != nil {
 		cfg.Genesis = gen
-		cfg.NetworkId = gen.Config.NetworkID
+	}
+
+	if ctx.GlobalIsSet(NetworkIdFlag.Name) {
+		cfg.NetworkId = ctx.GlobalUint64(NetworkIdFlag.Name)
+	} else if cfg.Genesis != nil {
+		cfg.NetworkId = *cfg.Genesis.GetNetworkID()
 	}
 
 	if ctx.GlobalBool(DeveloperFlag.Name) {
@@ -1555,12 +1560,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		if !ctx.GlobalIsSet(MinerGasPriceFlag.Name) && !ctx.GlobalIsSet(MinerLegacyGasPriceFlag.Name) {
 			cfg.Miner.GasPrice = big.NewInt(1)
 		}
-	}
-
-	if ctx.GlobalIsSet(NetworkIdFlag.Name) {
-		cfg.NetworkId = ctx.GlobalUint64(NetworkIdFlag.Name)
-	} else if cfg.Genesis != nil {
-		cfg.NetworkId = *cfg.Genesis.GetNetworkID()
 	}
 }
 

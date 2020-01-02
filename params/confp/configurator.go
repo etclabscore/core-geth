@@ -129,6 +129,31 @@ func Compatible(head *uint64, a, b ctypes.ChainConfigurator) *ConfigCompatError 
 	return lastErr
 }
 
+func compatible(head *uint64, a, b ctypes.ChainConfigurator) *ConfigCompatError {
+	aFns, aNames := Transitions(a)
+	bFns, _ := Transitions(b)
+	for i, afn := range aFns {
+		if err := func(c1, c2, head *uint64) *ConfigCompatError {
+			if isForkIncompatible(c1, c2, head) {
+				return NewCompatError("incompatible fork value: "+aNames[i], c1, c2)
+			}
+			return nil
+		}(afn(), bFns[i](), head); err != nil {
+			return err
+		}
+	}
+	if head == nil {
+		return nil
+	}
+	if a.IsForked(a.GetEIP155Transition, new(big.Int).SetUint64(*head)) {
+		if a.GetChainID().Cmp(b.GetChainID()) != 0 {
+			return NewCompatError("mismatching chain ids after EIP155 transition", a.GetEIP155Transition(), b.GetEIP155Transition())
+		}
+	}
+
+	return nil
+}
+
 func Equivalent(a, b ctypes.ChainConfigurator) error {
 	if a.GetConsensusEngineType() != b.GetConsensusEngineType() {
 		return fmt.Errorf("mismatch consensus engine types, A: %s, B: %s", a.GetConsensusEngineType(), b.GetConsensusEngineType())
@@ -249,46 +274,6 @@ func Forks(conf ctypes.ChainConfigurator) []uint64 {
 	})
 
 	return forks
-}
-
-func compatible(head *uint64, a, b ctypes.ChainConfigurator) *ConfigCompatError {
-	aFns, aNames := Transitions(a)
-	bFns, _ := Transitions(b)
-	for i, afn := range aFns {
-		if err := func(c1, c2, head *uint64) *ConfigCompatError {
-			if isForkIncompatible(c1, c2, head) {
-				return NewCompatError("incompatible fork value: "+aNames[i], c1, c2)
-			}
-			return nil
-		}(afn(), bFns[i](), head); err != nil {
-			return err
-		}
-	}
-	if head == nil {
-		return nil
-	}
-	if a.IsForked(a.GetEIP155Transition, new(big.Int).SetUint64(*head)) {
-		if a.GetChainID().Cmp(b.GetChainID()) != 0 {
-			return NewCompatError("mismatching chain ids after EIP155 transition", a.GetEIP155Transition(), b.GetEIP155Transition())
-		}
-	}
-
-	adao, bdao := a.GetEthashEIP779Transition(), b.GetEthashEIP779Transition()
-	if adao == nil && bdao == nil {
-		return nil
-	}
-
-	headB := new(big.Int).SetUint64(*head)
-	if !a.IsForked(a.GetEthashEIP779Transition, headB) && !b.IsForked(b.GetEthashEIP779Transition, headB) {
-		return nil
-	}
-
-	if *adao != *bdao {
-		return NewCompatError("mismatching DAO fork", adao, bdao)
-
-	}
-
-	return nil
 }
 
 func isForkIncompatible(a, b, head *uint64) bool {

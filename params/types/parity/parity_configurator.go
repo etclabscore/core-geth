@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package parity
 
 import (
@@ -30,7 +29,17 @@ import (
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
-var zero = uint64(0)
+func (spec *ParityChainSpec) ensureExistingRewardSchedule() {
+	if spec.Engine.Ethash.Params.BlockReward == nil {
+		spec.Engine.Ethash.Params.BlockReward = ctypes.Uint64BigValOrMapHex{}
+	}
+}
+
+func (spec *ParityChainSpec) ensureExistingDifficultyDelaySchedule() {
+	if spec.Engine.Ethash.Params.DifficultyBombDelays == nil {
+		spec.Engine.Ethash.Params.DifficultyBombDelays = ctypes.Uint64BigMapEncodesHex{}
+	}
+}
 
 func (spec *ParityChainSpec) GetAccountStartNonce() *uint64 {
 	return spec.Params.AccountStartNonce.Uint64P()
@@ -559,17 +568,17 @@ func (spec *ParityChainSpec) SetEthashEIP779Transition(n *uint64) error {
 }
 
 func (spec *ParityChainSpec) GetEthashEIP649Transition() *uint64 {
-	if spec.Engine.Ethash.Params.eip649inferred {
+	if spec.Engine.Ethash.Params.eip649Inferred {
 		return spec.Engine.Ethash.Params.eip649Transition.Uint64P()
 	}
 
 	var diffN *uint64
 	defer func() {
 		spec.Engine.Ethash.Params.eip649Transition = new(ParityU64).SetUint64(diffN)
-		spec.Engine.Ethash.Params.eip649inferred = true
+		spec.Engine.Ethash.Params.eip649Inferred = true
 	}()
 
-	diffN = ctypes.ExtractHostageSituationN(
+	diffN = ctypes.MapMeetsSpecification(
 		spec.Engine.Ethash.Params.DifficultyBombDelays,
 		ctypes.Uint64BigMapEncodesHex(spec.Engine.Ethash.Params.BlockReward),
 		vars.EIP649DifficultyBombDelay,
@@ -580,39 +589,35 @@ func (spec *ParityChainSpec) GetEthashEIP649Transition() *uint64 {
 
 func (spec *ParityChainSpec) SetEthashEIP649Transition(n *uint64) error {
 	spec.Engine.Ethash.Params.eip649Transition = new(ParityU64).SetUint64(n)
-	spec.Engine.Ethash.Params.eip649inferred = true
+	spec.Engine.Ethash.Params.eip649Inferred = true
 	if n == nil {
 		return nil
-	}
-	if spec.Engine.Ethash.Params.BlockReward == nil {
-		spec.Engine.Ethash.Params.BlockReward = ctypes.Uint64BigValOrMapHex{}
 	}
 	if spec.Engine.Ethash.Params.DifficultyBombDelays == nil {
 		spec.Engine.Ethash.Params.DifficultyBombDelays = ctypes.Uint64BigMapEncodesHex{}
 	}
+
+	spec.ensureExistingRewardSchedule()
 	spec.Engine.Ethash.Params.BlockReward[*n] = vars.EIP649FBlockReward
 
-	eip1234N := spec.Engine.Ethash.Params.eip1234Transition
-	if eip1234N == nil || *eip1234N.Uint64P() != *n {
-		spec.Engine.Ethash.Params.DifficultyBombDelays[*n] = vars.EIP649DifficultyBombDelay
-	}
-	// Else EIP1234 has been set to equal activation value, which means the map contains a sum value (eg 5m),
-	// so the EIP649 difficulty adjustment is already accounted for.
+	spec.ensureExistingDifficultyDelaySchedule()
+	spec.Engine.Ethash.Params.DifficultyBombDelays.SetValueTotalForHeight(n, vars.EIP649DifficultyBombDelay)
+
 	return nil
 }
 
 func (spec *ParityChainSpec) GetEthashEIP1234Transition() *uint64 {
-	if spec.Engine.Ethash.Params.eip1234inferred {
+	if spec.Engine.Ethash.Params.eip1234Inferred {
 		return spec.Engine.Ethash.Params.eip1234Transition.Uint64P()
 	}
 
 	var diffN *uint64
 	defer func() {
 		spec.Engine.Ethash.Params.eip1234Transition = new(ParityU64).SetUint64(diffN)
-		spec.Engine.Ethash.Params.eip1234inferred = true
+		spec.Engine.Ethash.Params.eip1234Inferred = true
 	}()
 
-	diffN = ctypes.ExtractHostageSituationN(
+	diffN = ctypes.MapMeetsSpecification(
 		spec.Engine.Ethash.Params.DifficultyBombDelays,
 		ctypes.Uint64BigMapEncodesHex(spec.Engine.Ethash.Params.BlockReward),
 		vars.EIP1234DifficultyBombDelay,
@@ -623,28 +628,47 @@ func (spec *ParityChainSpec) GetEthashEIP1234Transition() *uint64 {
 
 func (spec *ParityChainSpec) SetEthashEIP1234Transition(n *uint64) error {
 	spec.Engine.Ethash.Params.eip1234Transition = new(ParityU64).SetUint64(n)
-	spec.Engine.Ethash.Params.eip1234inferred = true
+	spec.Engine.Ethash.Params.eip1234Inferred = true
 	if n == nil {
 		return nil
 	}
-	if spec.Engine.Ethash.Params.BlockReward == nil {
-		spec.Engine.Ethash.Params.BlockReward = ctypes.Uint64BigValOrMapHex{}
-	}
-	if spec.Engine.Ethash.Params.DifficultyBombDelays == nil {
-		spec.Engine.Ethash.Params.DifficultyBombDelays = ctypes.Uint64BigMapEncodesHex{}
-	}
+
 	// Block reward is a simple lookup; doesn't matter if overwrite or not.
+	spec.ensureExistingRewardSchedule()
 	spec.Engine.Ethash.Params.BlockReward[*n] = vars.EIP1234FBlockReward
 
-	eip649N := spec.Engine.Ethash.Params.eip649Transition
-	if eip649N == nil || *eip649N.Uint64P() == *n {
-		// EIP649 has NOT been set, OR has been set to identical block, eg. 0 for testing
-		// Overwrite key with total delay (5m)
-		spec.Engine.Ethash.Params.DifficultyBombDelays[*n] = vars.EIP1234DifficultyBombDelay
+	spec.ensureExistingDifficultyDelaySchedule()
+	spec.Engine.Ethash.Params.DifficultyBombDelays.SetValueTotalForHeight(n, vars.EIP1234DifficultyBombDelay)
+
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEthashEIP2384Transition() *uint64 {
+	if spec.Engine.Ethash.Params.eip2384Inferred {
+		return spec.Engine.Ethash.Params.eip2384Transition.Uint64P()
+	}
+
+	var diffN *uint64
+	defer func() {
+		spec.Engine.Ethash.Params.eip2384Transition = new(ParityU64).SetUint64(diffN)
+		spec.Engine.Ethash.Params.eip2384Inferred = true
+	}()
+
+	// Get block number (key) from map where EIP2384 criteria is met.
+	diffN = ctypes.MapMeetsSpecification(spec.Engine.Ethash.Params.DifficultyBombDelays, nil, vars.EIP2384DifficultyBombDelay, nil)
+	return diffN
+}
+
+func (spec *ParityChainSpec) SetEthashEIP2384Transition(n *uint64) error {
+	spec.Engine.Ethash.Params.eip2384Transition = new(ParityU64).SetUint64(n)
+	spec.Engine.Ethash.Params.eip2384Inferred = true
+
+	if n == nil {
 		return nil
 	}
 
-	spec.Engine.Ethash.Params.DifficultyBombDelays[*n] = new(big.Int).Sub(vars.EIP1234DifficultyBombDelay, vars.EIP649DifficultyBombDelay)
+	spec.ensureExistingDifficultyDelaySchedule()
+	spec.Engine.Ethash.Params.DifficultyBombDelays.SetValueTotalForHeight(n, vars.EIP2384DifficultyBombDelay)
 
 	return nil
 }

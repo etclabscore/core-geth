@@ -27,15 +27,15 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params/types"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 func TestSimulatedBackend(t *testing.T) {
 	var gasLimit uint64 = 8000029
 	key, _ := crypto.GenerateKey() // nolint: gosec
 	auth := bind.NewKeyedTransactor(key)
-	genAlloc := make(paramtypes.GenesisAlloc)
-	genAlloc[auth.From] = paramtypes.GenesisAccount{Balance: big.NewInt(9223372036854775807)}
+	genAlloc := make(genesisT.GenesisAlloc)
+	genAlloc[auth.From] = genesisT.GenesisAccount{Balance: big.NewInt(9223372036854775807)}
 
 	sim := backends.NewSimulatedBackend(genAlloc, gasLimit)
 	defer sim.Close()
@@ -72,7 +72,7 @@ func TestSimulatedBackend(t *testing.T) {
 	}
 
 	sim.Commit()
-	tx, isPending, err = sim.TransactionByHash(context.Background(), txHash)
+	_, isPending, err = sim.TransactionByHash(context.Background(), txHash)
 	if err != nil {
 		t.Fatalf("error getting transaction with hash: %v", txHash.String())
 	}

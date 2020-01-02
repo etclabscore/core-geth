@@ -14,14 +14,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package core
 
 import (
 	"reflect"
 	"testing"
 
-		"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -36,7 +35,7 @@ func TestSetupGenesisBlock(t *testing.T) {
 	if err != nil {
 		t.Errorf("err: %v", err)
 	}
-	if wantHash := GenesisToBlock(defGenBl, nil).Hash(); wantHash != hash  {
+	if wantHash := GenesisToBlock(defGenBl, nil).Hash(); wantHash != hash {
 		t.Errorf("mismatch block hash, want: %x, got: %x", wantHash, hash)
 	}
 	if diffs := confp.Equal(reflect.TypeOf((*ctypes.ChainConfigurator)(nil)), defGenBl.Config, config); len(diffs) != 0 {
@@ -51,7 +50,7 @@ func TestSetupGenesisBlock(t *testing.T) {
 	if clErr != nil {
 		t.Errorf("err: %v", clErr)
 	}
-	if wantHash := GenesisToBlock(clGenBl, nil).Hash(); wantHash != clHash  {
+	if wantHash := GenesisToBlock(clGenBl, nil).Hash(); wantHash != clHash {
 		t.Errorf("mismatch block hash, want: %x, got: %x", wantHash, clHash)
 	}
 	if diffs := confp.Equal(reflect.TypeOf((*ctypes.ChainConfigurator)(nil)), clGenBl.Config, clConfig); len(diffs) != 0 {

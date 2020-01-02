@@ -28,20 +28,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp/generic"
 )
 
-// Genesis block for nodes which don't care about the DAO fork (i.e. not configured)
-var daoOldGenesis = `{
-	"alloc"      : {},
-	"coinbase"   : "0x0000000000000000000000000000000000000000",
-	"difficulty" : "0x20000",
-	"extraData"  : "",
-	"gasLimit"   : "0x2fefd8",
-	"nonce"      : "0x0000000000000042",
-	"mixhash"    : "0x0000000000000000000000000000000000000000000000000000000000000000",
-	"parentHash" : "0x0000000000000000000000000000000000000000000000000000000000000000",
-	"timestamp"  : "0x00",
-	"config"     : {}
-}`
-
 // Genesis block for nodes which actively oppose the DAO fork
 var daoNoForkGenesis = `{
 	"alloc"      : {},

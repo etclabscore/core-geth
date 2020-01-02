@@ -42,9 +42,9 @@ const (
 // These tests should cover expected default values and possible flag-interacting values, like --<chain> with --networkid=n.
 func TestConsoleCmdNetworkIdentities(t *testing.T) {
 	chainIdentityCases := []struct {
-		flags      []string
-		networkId int
-		chainId int
+		flags       []string
+		networkId   int
+		chainId     int
 		genesisHash string
 	}{
 		// Default chain value, without and with --networkid flag set.

@@ -20,5 +20,5 @@ several packages, `parity`, `goetherem`, and `multigeth`.
 
 The actual `convert` package should be agnostic of these data types and logics implementations;
 only the testing should care about these specifics.
- */
+*/
 package convert_test

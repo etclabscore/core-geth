@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package multigeth
 
 import (
@@ -105,7 +104,7 @@ type MultiGethChainConfig struct {
 	// https://github.com/ethereum/EIPs/issues/649
 	// note that this is closely related to EIP100.
 	// In fact, EIP100 is bundled in
-	eip649FInferred bool     `json:"-"`
+	eip649FInferred bool
 	EIP649FBlock    *big.Int `json:"-"`
 	// Transaction receipt status
 	// https://github.com/ethereum/EIPs/issues/658
@@ -128,7 +127,7 @@ type MultiGethChainConfig struct {
 	EIP1052FBlock *big.Int `json:"eip1052FBlock,omitempty"`
 	// Constantinople difficulty bomb delay and block reward adjustment
 	// https://eips.ethereum.org/EIPS/eip-1234
-	eip1234FInferred bool     `json:"-"`
+	eip1234FInferred bool
 	EIP1234FBlock    *big.Int `json:"-"`
 	// Net gas metering
 	// https://eips.ethereum.org/EIPS/eip-1283
@@ -154,6 +153,10 @@ type MultiGethChainConfig struct {
 	// interoperable with other gas changes such as EIP-1884.
 	EIP2200FBlock *big.Int `json:"eip2200FBlock,omitempty"`
 
+	// EIP-2384: Difficulty Bomb Delay (Muir Glacier)
+	eip2384Inferred bool
+	EIP2384FBlock   *big.Int `json:"eip2384FBlock,omitempty"`
+
 	//EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block
@@ -163,7 +166,7 @@ type MultiGethChainConfig struct {
 	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`     // Bomb disposal HF block
 	SocialBlock        *big.Int `json:"socialBlock,omitempty"`       // Ethereum Social Reward block
 	EthersocialBlock   *big.Int `json:"ethersocialBlock,omitempty"`  // Ethersocial Reward block
-	
+
 	// Various consensus engines
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
 	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
@@ -171,8 +174,8 @@ type MultiGethChainConfig struct {
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint"`
 	TrustedCheckpointOracle *ctypes.CheckpointOracleConfig `json:"trustedCheckpointOracle"`
 
-	DifficultyBombDelaySchedule ctypes.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"'` // JSON tag matches Parity's
-	BlockRewardSchedule         ctypes.Uint64BigMapEncodesHex `json:"blockReward,omitempty"`           // JSON tag matches Parity's
+	DifficultyBombDelaySchedule ctypes.Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"` // JSON tag matches Parity's
+	BlockRewardSchedule         ctypes.Uint64BigMapEncodesHex `json:"blockReward,omitempty"`          // JSON tag matches Parity's
 
 	RequireBlockHashes map[uint64]common.Hash `json:"requireBlockHashes"`
 }

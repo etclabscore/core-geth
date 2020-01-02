@@ -150,6 +150,60 @@ func TestCheckCompatible(t *testing.T) {
 				RewindTo:     new(big.Int).Sub(MainnetChainConfig.EIP158Block, common.Big1).Uint64(),
 			},
 		},
+		{
+			stored: func() ctypes.ChainConfigurator {
+				c := &goethereum.ChainConfig{
+					DAOForkBlock:   big.NewInt(3),
+					DAOForkSupport: false,
+				}
+				return c
+			}(),
+			new: func() ctypes.ChainConfigurator {
+				c := &multigeth.MultiGethChainConfig{
+					DAOForkBlock: nil,
+				}
+				return c
+			}(),
+			head:    5,
+			wantErr: nil,
+		},
+		{
+			// v1.9.5 -> v1.9.7
+			stored: func() ctypes.ChainConfigurator {
+				c := &multigeth.MultiGethChainConfig{}
+				*c = *ClassicChainConfig
+				c.SetEIP145Transition(nil)
+				c.SetEIP1014Transition(nil)
+				c.SetEIP1052Transition(nil)
+				c.SetEIP152Transition(nil)
+				c.SetEIP1108Transition(nil)
+				c.SetEIP1344Transition(nil)
+				//c.SetEIP1884Transition(nil)
+				c.SetEIP2028Transition(nil)
+				c.SetEIP2200Transition(nil)
+				return c
+			}(),
+			new:     ClassicChainConfig,
+			head:    9550000,
+			wantErr: nil,
+		},
+		{
+			// v1.9.6 -> v1.9.7
+			stored: func() ctypes.ChainConfigurator {
+				c := &multigeth.MultiGethChainConfig{}
+				*c = *ClassicChainConfig
+				c.SetEIP152Transition(nil)
+				c.SetEIP1108Transition(nil)
+				c.SetEIP1344Transition(nil)
+				//c.SetEIP1884Transition(nil)
+				c.SetEIP2028Transition(nil)
+				c.SetEIP2200Transition(nil)
+				return c
+			}(),
+			new:     ClassicChainConfig,
+			head:    9550000,
+			wantErr: nil,
+		},
 	}
 
 	for _, test := range tests {
@@ -160,5 +214,12 @@ func TestCheckCompatible(t *testing.T) {
 			//if !reflect.DeepEqual(err, test.wantErr) {
 			t.Errorf("error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", test.stored, test.new, test.head, err, test.wantErr)
 		}
+	}
+}
+
+func TestFoundationIsForked(t *testing.T) {
+	c := MainnetChainConfig
+	if !c.IsForked(c.GetEthashEIP2384Transition, big.NewInt(9200001)) {
+		t.Fatal("nofork muir bad")
 	}
 }

@@ -65,7 +65,7 @@ function testSignText(){
 function testClique(){
     if( accts && accts.length > 0){
         var a = accts[0]
-        var r = debug.testSignCliqueBlock(a, 0); // Sign genesis
+        var r = debug.testSignCliqueBlock(a, 0); // Sign genesisT
         console.log("signing response",  r)
         if( a != r){
             throw new Error("Requested signing by "+a+ " but got sealer "+r)

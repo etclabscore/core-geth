@@ -20,7 +20,7 @@ import "math/big"
 
 var (
 	FrontierBlockReward = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
-	EIP649FBlockReward = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
+	EIP649FBlockReward  = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
 	EIP1234FBlockReward = big.NewInt(2e+18) // Block reward in wei for successfully mining a block upward from Constantinople
 
 	// Values represent TOTAL delays, per specs
@@ -28,7 +28,9 @@ var (
 	EIP649DifficultyBombDelay = big.NewInt(3000000)
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1234.md
 	EIP1234DifficultyBombDelay = big.NewInt(5000000)
-	)
+
+	EIP2384DifficultyBombDelay = big.NewInt(9000000)
+)
 
 var (
 	GasLimitBoundDivisor uint64 = 1024    // The bound divisor of the gas limit, used in update calculations.

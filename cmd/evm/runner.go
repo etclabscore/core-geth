@@ -37,8 +37,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm/runtime"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
@@ -52,7 +52,7 @@ var runCommand = cli.Command{
 
 // readGenesis will read the given JSON format genesis file and return
 // the initialized Genesis structure
-func readGenesis(genesisPath string) *paramtypes.Genesis {
+func readGenesis(genesisPath string) *genesisT.Genesis {
 	// Make sure we have a valid genesis JSON
 	//genesisPath := ctx.Args().First()
 	if len(genesisPath) == 0 {
@@ -64,7 +64,7 @@ func readGenesis(genesisPath string) *paramtypes.Genesis {
 	}
 	defer file.Close()
 
-	genesis := new(paramtypes.Genesis)
+	genesis := new(genesisT.Genesis)
 	if err := json.NewDecoder(file).Decode(genesis); err != nil {
 		utils.Fatalf("invalid genesis file: %v", err)
 	}
@@ -88,7 +88,7 @@ func runCmd(ctx *cli.Context) error {
 		chainConfig   ctypes.ChainConfigurator
 		sender        = common.BytesToAddress([]byte("sender"))
 		receiver      = common.BytesToAddress([]byte("receiver"))
-		genesisConfig *paramtypes.Genesis
+		genesisConfig *genesisT.Genesis
 	)
 	if ctx.GlobalBool(MachineFlag.Name) {
 		tracer = vm.NewJSONLogger(logconfig, os.Stdout)
@@ -107,7 +107,7 @@ func runCmd(ctx *cli.Context) error {
 		chainConfig = gen.Config
 	} else {
 		statedb, _ = state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()))
-		genesisConfig = new(paramtypes.Genesis)
+		genesisConfig = new(genesisT.Genesis)
 	}
 	if ctx.GlobalString(SenderFlag.Name) != "" {
 		sender = common.HexToAddress(ctx.GlobalString(SenderFlag.Name))
@@ -207,14 +207,24 @@ func runCmd(ctx *cli.Context) error {
 	}
 	tstart := time.Now()
 	var leftOverGas uint64
+	var hexInput []byte
+	if inputFileFlag := ctx.GlobalString(InputFileFlag.Name); inputFileFlag != "" {
+		if hexInput, err = ioutil.ReadFile(inputFileFlag); err != nil {
+			fmt.Printf("could not load input from file: %v\n", err)
+			os.Exit(1)
+		}
+	} else {
+		hexInput = []byte(ctx.GlobalString(InputFlag.Name))
+	}
+	input := common.FromHex(string(bytes.TrimSpace(hexInput)))
 	if ctx.GlobalBool(CreateFlag.Name) {
-		input := append(code, common.Hex2Bytes(ctx.GlobalString(InputFlag.Name))...)
+		input = append(code, input...)
 		ret, _, leftOverGas, err = runtime.Create(input, &runtimeConfig)
 	} else {
 		if len(code) > 0 {
 			statedb.SetCode(receiver, code)
 		}
-		ret, leftOverGas, err = runtime.Call(receiver, common.Hex2Bytes(ctx.GlobalString(InputFlag.Name)), &runtimeConfig)
+		ret, leftOverGas, err = runtime.Call(receiver, input, &runtimeConfig)
 	}
 	execTime := time.Since(tstart)
 

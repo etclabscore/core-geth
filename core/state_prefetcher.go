@@ -32,8 +32,8 @@ import (
 // data from disk before the main block processor start executing.
 type statePrefetcher struct {
 	config ctypes.ChainConfigurator // Chain configuration options
-	bc     *BlockChain             // Canonical block chain
-	engine consensus.Engine        // Consensus engine used for block rewards
+	bc     *BlockChain              // Canonical block chain
+	engine consensus.Engine         // Consensus engine used for block rewards
 }
 
 // newStatePrefetcher initialises a new statePrefetcher.

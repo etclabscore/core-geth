@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package tests
 
 import (
@@ -30,8 +29,8 @@ import (
 // to the task of generating tests.
 
 var (
-	MG_GENERATE_STATE_TESTS_KEY             = "MULTIGETH_TESTS_GENERATE_STATE_TESTS"
-	MG_GENERATE_DIFFICULTY_TESTS_KEY        = "MULTIGETH_TESTS_GENERATE_DIFFICULTY_TESTS"
+	MG_GENERATE_STATE_TESTS_KEY      = "MULTIGETH_TESTS_GENERATE_STATE_TESTS"
+	MG_GENERATE_DIFFICULTY_TESTS_KEY = "MULTIGETH_TESTS_GENERATE_DIFFICULTY_TESTS"
 
 	// Feature Equivalence tests use convert.Convert to
 	// run tests using alternating ChainConfig data type implementations.

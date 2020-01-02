@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package tconvert
 
 import (
@@ -23,8 +22,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/go-test/deep"
 )
 
@@ -33,11 +32,11 @@ import (
 func TestAlethSturebyConverter(t *testing.T) {
 
 	// Read GETH genesis type.
-	blob, err := ioutil.ReadFile(filepath.Join("..", "internal", "testdata", "stureby_geth.json"))
+	blob, err := ioutil.ReadFile(filepath.Join("..", "testdata", "stureby_geth.json"))
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}
-	var genesis paramtypes.Genesis
+	var genesis genesisT.Genesis
 	if err := json.Unmarshal(blob, &genesis); err != nil {
 		t.Fatalf("failed parsing genesis: %v", err)
 	}
@@ -49,7 +48,7 @@ func TestAlethSturebyConverter(t *testing.T) {
 	}
 
 	// Read the aleth JSON spec.
-	expBlob, err := ioutil.ReadFile(filepath.Join("..", "internal", "testdata", "stureby_aleth.json"))
+	expBlob, err := ioutil.ReadFile(filepath.Join("..", "testdata", "stureby_aleth.json"))
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}

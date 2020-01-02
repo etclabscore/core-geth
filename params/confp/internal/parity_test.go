@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-
 package convert_test
 
 import (
@@ -23,20 +22,14 @@ import (
 
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
-	paramtypes "github.com/ethereum/go-ethereum/params/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
-var chainSpecEquivs = map[string]*paramtypes.Genesis{
-	"classic.json":    params.DefaultClassicGenesisBlock(),
-	"foundation.json": params.DefaultGenesisBlock(),
-}
-
 func TestBlockConfig(t *testing.T) {
 	frontierCC := &goethereum.ChainConfig{
-			ChainID: big.NewInt(1),
-			Ethash:  new(ctypes.EthashConfig),
+		ChainID: big.NewInt(1),
+		Ethash:  new(ctypes.EthashConfig),
 	}
 	genesis := params.DefaultGenesisBlock()
 	genesis.Config = frontierCC

@@ -1529,6 +1529,14 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		cfg.Genesis = gen
 	}
 
+	// Establish NetworkID.
+	// If dev-mode is used, then NetworkID will be overridden.
+	if ctx.GlobalIsSet(NetworkIdFlag.Name) {
+		cfg.NetworkId = ctx.GlobalUint64(NetworkIdFlag.Name)
+	} else if cfg.Genesis != nil {
+		cfg.NetworkId = *cfg.Genesis.GetNetworkID()
+	}
+
 	if ctx.GlobalBool(DeveloperFlag.Name) {
 		cfg.NetworkId = 1337
 
@@ -1554,12 +1562,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		if !ctx.GlobalIsSet(MinerGasPriceFlag.Name) && !ctx.GlobalIsSet(MinerLegacyGasPriceFlag.Name) {
 			cfg.Miner.GasPrice = big.NewInt(1)
 		}
-	}
-
-	if ctx.GlobalIsSet(NetworkIdFlag.Name) {
-		cfg.NetworkId = ctx.GlobalUint64(NetworkIdFlag.Name)
-	} else if cfg.Genesis != nil {
-		cfg.NetworkId = *cfg.Genesis.GetNetworkID()
 	}
 }
 

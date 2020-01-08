@@ -29,33 +29,33 @@ import (
 func TestSetupGenesisBlock(t *testing.T) {
 	db := rawdb.NewMemoryDatabase()
 
-	defGenBl := params.DefaultGenesisBlock()
+	defaultGenesisBlock := params.DefaultGenesisBlock()
 
-	config, hash, err := SetupGenesisBlock(db, defGenBl)
+	config, hash, err := SetupGenesisBlock(db, defaultGenesisBlock)
 	if err != nil {
 		t.Errorf("err: %v", err)
 	}
-	if wantHash := GenesisToBlock(defGenBl, nil).Hash(); wantHash != hash {
+	if wantHash := GenesisToBlock(defaultGenesisBlock, nil).Hash(); wantHash != hash {
 		t.Errorf("mismatch block hash, want: %x, got: %x", wantHash, hash)
 	}
-	if diffs := confp.Equal(reflect.TypeOf((*ctypes.ChainConfigurator)(nil)), defGenBl.Config, config); len(diffs) != 0 {
+	if diffs := confp.Equal(reflect.TypeOf((*ctypes.ChainConfigurator)(nil)), defaultGenesisBlock.Config, config); len(diffs) != 0 {
 		for _, diff := range diffs {
-			t.Error("mismatch", "diff=", diff, "in", defGenBl.Config, "out", config)
+			t.Error("mismatch", "diff=", diff, "in", defaultGenesisBlock.Config, "out", config)
 		}
 	}
 
-	clGenBl := params.DefaultClassicGenesisBlock()
+	classicGenesisBlock := params.DefaultClassicGenesisBlock()
 
-	clConfig, clHash, clErr := SetupGenesisBlock(db, clGenBl)
+	clConfig, clHash, clErr := SetupGenesisBlock(db, classicGenesisBlock)
 	if clErr != nil {
 		t.Errorf("err: %v", clErr)
 	}
-	if wantHash := GenesisToBlock(clGenBl, nil).Hash(); wantHash != clHash {
+	if wantHash := GenesisToBlock(classicGenesisBlock, nil).Hash(); wantHash != clHash {
 		t.Errorf("mismatch block hash, want: %x, got: %x", wantHash, clHash)
 	}
-	if diffs := confp.Equal(reflect.TypeOf((*ctypes.ChainConfigurator)(nil)), clGenBl.Config, clConfig); len(diffs) != 0 {
+	if diffs := confp.Equal(reflect.TypeOf((*ctypes.ChainConfigurator)(nil)), classicGenesisBlock.Config, clConfig); len(diffs) != 0 {
 		for _, diff := range diffs {
-			t.Error("mismatch", "diff=", diff, "in", clGenBl.Config, "out", clConfig)
+			t.Error("mismatch", "diff=", diff, "in", classicGenesisBlock.Config, "out", clConfig)
 		}
 	}
 }

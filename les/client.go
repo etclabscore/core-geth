@@ -129,7 +129,7 @@ func New(ctx *node.ServiceContext, config *eth.Config) (*LightEthereum, error) {
 	if oracle == nil {
 		if p, ok := chainConfig.(*multigeth.MultiGethChainConfig); ok {
 			oracle = p.TrustedCheckpointOracle
-		} else if p, ok  := chainConfig.(*goethereum.ChainConfig); ok {
+		} else if p, ok := chainConfig.(*goethereum.ChainConfig); ok {
 			oracle = p.TrustedCheckpointOracle
 		}
 	}

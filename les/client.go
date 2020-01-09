@@ -41,8 +41,9 @@ import (
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -109,7 +110,11 @@ func New(ctx *node.ServiceContext, config *eth.Config) (*LightEthereum, error) {
 
 	checkpoint := config.Checkpoint
 	if checkpoint == nil {
-		checkpoint = params.TrustedCheckpoints[genesisHash]
+		if p, ok := chainConfig.(*multigeth.MultiGethChainConfig); ok {
+			checkpoint = p.TrustedCheckpoint
+		} else if p, ok := chainConfig.(*goethereum.ChainConfig); ok {
+			checkpoint = p.TrustedCheckpoint
+		}
 	}
 	// Note: NewLightChain adds the trusted checkpoint so it needs an ODR with
 	// indexers already set but not started yet
@@ -122,7 +127,11 @@ func New(ctx *node.ServiceContext, config *eth.Config) (*LightEthereum, error) {
 	// Set up checkpoint oracle.
 	oracle := config.CheckpointOracle
 	if oracle == nil {
-		oracle = params.CheckpointOracles[genesisHash]
+		if p, ok := chainConfig.(*multigeth.MultiGethChainConfig); ok {
+			oracle = p.TrustedCheckpointOracle
+		} else if p, ok := chainConfig.(*goethereum.ChainConfig); ok {
+			oracle = p.TrustedCheckpointOracle
+		}
 	}
 	leth.oracle = newCheckpointOracle(oracle, leth.localCheckpoint)
 

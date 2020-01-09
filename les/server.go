@@ -31,7 +31,8 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/discv5"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/enr"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -95,7 +96,11 @@ func NewLesServer(e *eth.Ethereum, config *eth.Config) (*LesServer, error) {
 	// Set up checkpoint oracle.
 	oracle := config.CheckpointOracle
 	if oracle == nil {
-		oracle = params.CheckpointOracles[e.BlockChain().Genesis().Hash()]
+		if p, ok := e.BlockChain().Config().(*multigeth.MultiGethChainConfig); ok {
+			oracle = p.TrustedCheckpointOracle
+		} else if p, ok := e.BlockChain().Config().(*goethereum.ChainConfig); ok {
+			oracle = p.TrustedCheckpointOracle
+		}
 	}
 	srv.oracle = newCheckpointOracle(oracle, srv.localCheckpoint)
 

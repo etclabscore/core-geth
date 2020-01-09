@@ -128,7 +128,11 @@ func New(ctx *node.ServiceContext, config *eth.Config) (*LightEthereum, error) {
 	// Set up checkpoint oracle.
 	oracle := config.CheckpointOracle
 	if oracle == nil {
-		oracle = params.CheckpointOracles[genesisHash]
+		if p, ok := chainConfig.(*multigeth.MultiGethChainConfig); ok {
+			oracle = p.TrustedCheckpointOracle
+		} else if p, ok  := chainConfig.(*goethereum.ChainConfig); ok {
+			oracle = p.TrustedCheckpointOracle
+		}
 	}
 	leth.oracle = newCheckpointOracle(oracle, leth.localCheckpoint)
 

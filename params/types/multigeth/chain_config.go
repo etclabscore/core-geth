@@ -163,9 +163,10 @@ type MultiGethChainConfig struct {
 	ECIP1010Length     *big.Int `json:"ecip1010Length,omitempty"`     // ECIP1010 length
 	ECIP1017FBlock     *big.Int `json:"ecip1017FBlock,omitempty"`
 	ECIP1017EraRounds  *big.Int `json:"ecip1017EraRounds,omitempty"` // ECIP1017 era rounds
-	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`     // Bomb disposal HF block
-	SocialBlock        *big.Int `json:"socialBlock,omitempty"`       // Ethereum Social Reward block
-	EthersocialBlock   *big.Int `json:"ethersocialBlock,omitempty"`  // Ethersocial Reward block
+	ECIP1080FBlock     *big.Int `json:"ecip1080FBlock,omitempty"`
+	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`    // Bomb disposal HF block
+	SocialBlock        *big.Int `json:"socialBlock,omitempty"`      // Ethereum Social Reward block
+	EthersocialBlock   *big.Int `json:"ethersocialBlock,omitempty"` // Ethersocial Reward block
 
 	// Various consensus engines
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`

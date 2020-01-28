@@ -512,6 +512,14 @@ func (g *Genesis) SetEIP2028Transition(n *uint64) error {
 	return g.Config.SetEIP2028Transition(n)
 }
 
+func (g *Genesis) GetECIP1080Transition() *uint64 {
+	return g.Config.GetECIP1080Transition()
+}
+
+func (g *Genesis) SetECIP1080Transition(n *uint64) error {
+	return g.Config.SetECIP1080Transition(n)
+}
+
 func (g *Genesis) IsForked(fn func() *uint64, n *big.Int) bool {
 	return g.Config.IsForked(fn, n)
 }

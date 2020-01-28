@@ -32,6 +32,7 @@ type (
 )
 
 var errGasUintOverflow = errors.New("gas uint64 overflow")
+var errGasLeftTooLow = errors.New("insufficient gas left")
 
 type operation struct {
 	// execute is the operation function

@@ -361,6 +361,14 @@ func (c *ChainConfig) SetECIP1080Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
+func (c *ChainConfig) GetEIP1706Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP1706Transition(n *uint64) error {
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
 func (c *ChainConfig) IsForked(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

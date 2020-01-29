@@ -65,6 +65,9 @@ type ChainConfig struct {
 	// NOTE: These are not included in this type upstream.
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint"`
 	TrustedCheckpointOracle *ctypes.CheckpointOracleConfig `json:"trustedCheckpointOracle"`
+
+	EIP1706Transition *big.Int `json:"-"`
+	ECIP1080Transition *big.Int `json:"-"`
 }
 
 // String implements the fmt.Stringer interface.

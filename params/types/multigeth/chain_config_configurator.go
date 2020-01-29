@@ -354,6 +354,15 @@ func (c *MultiGethChainConfig) SetECIP1080Transition(n *uint64) error {
 	return nil
 }
 
+func (c *MultiGethChainConfig) GetEIP1706Transition() *uint64 {
+	return bigNewU64(c.EIP1706FBlock)
+}
+
+func (c *MultiGethChainConfig) SetEIP1706Transition(n *uint64) error {
+	c.EIP1706FBlock = setBig(c.EIP1706FBlock, n)
+	return nil
+}
+
 func (c *MultiGethChainConfig) IsForked(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

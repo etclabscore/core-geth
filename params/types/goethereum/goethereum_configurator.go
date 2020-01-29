@@ -354,11 +354,21 @@ func (c *ChainConfig) SetEIP2028Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetECIP1080Transition() *uint64 {
-	return nil
+	return bigNewU64(c.ECIP1080Transition) // FIXME, fudgey
 }
 
 func (c *ChainConfig) SetECIP1080Transition(n *uint64) error {
-	return ctypes.ErrUnsupportedConfigFatal
+	c.ECIP1080Transition = setBig(c.ECIP1080Transition, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEIP1706Transition() *uint64 {
+	return bigNewU64(c.EIP1706Transition)
+}
+
+func (c *ChainConfig) SetEIP1706Transition(n *uint64) error {
+	c.EIP1706Transition = setBig(c.EIP1706Transition, n)
+	return nil
 }
 
 func (c *ChainConfig) IsForked(fn func() *uint64, n *big.Int) bool {

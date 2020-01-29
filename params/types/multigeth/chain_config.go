@@ -157,6 +157,10 @@ type MultiGethChainConfig struct {
 	eip2384Inferred bool
 	EIP2384FBlock   *big.Int `json:"eip2384FBlock,omitempty"`
 
+	// EIP-1706: Resolves reentrancy attack vector enabled with EIP1283.
+	// https://eips.ethereum.org/EIPS/eip-1706
+	EIP1706FBlock *big.Int `json:"eip1706FBlock,omitempty"`
+
 	//EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block

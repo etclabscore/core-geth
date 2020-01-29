@@ -131,6 +131,11 @@ func gasSStore(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySi
 	// 	  2.2.2. If original value equals new value (this storage slot is reset)
 	//       2.2.2.1. If original value is 0, add 19800 gas to refund counter.
 	// 	     2.2.2.2. Otherwise, add 4800 gas to refund counter.
+
+	// Enforce sufficient gas left, per EIP1706, guarding against reentrancy attacks.
+	if contract.Gas <= vars.CallStipend && evm.chainConfig.IsForked(evm.chainConfig.GetEIP1706Transition, evm.BlockNumber) {
+		return 0, errGasLeftTooLow
+	}
 	value := common.BigToHash(y)
 	if current == value { // noop (1)
 		return vars.NetSstoreNoopGas, nil

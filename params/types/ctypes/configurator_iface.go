@@ -116,6 +116,8 @@ type CatHerder interface {
 	SetEIP2028Transition(n *uint64) error
 	GetECIP1080Transition() *uint64
 	SetECIP1080Transition(n *uint64) error
+	GetEIP1706Transition() *uint64
+	SetEIP1706Transition(n *uint64) error
 }
 
 type Forker interface {

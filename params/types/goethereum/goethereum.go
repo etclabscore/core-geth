@@ -66,7 +66,7 @@ type ChainConfig struct {
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint"`
 	TrustedCheckpointOracle *ctypes.CheckpointOracleConfig `json:"trustedCheckpointOracle"`
 
-	EIP1706Transition *big.Int `json:"-"`
+	EIP1706Transition  *big.Int `json:"-"`
 	ECIP1080Transition *big.Int `json:"-"`
 }
 

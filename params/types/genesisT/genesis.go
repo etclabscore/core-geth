@@ -521,7 +521,7 @@ func (g *Genesis) SetECIP1080Transition(n *uint64) error {
 }
 
 func (g Genesis) GetEIP1706Transition() *uint64 {
-	return g.Config.GetECIP1080Transition()
+	return g.Config.GetEIP1706Transition()
 }
 
 func (g Genesis) SetEIP1706Transition(n *uint64) error {

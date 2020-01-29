@@ -106,6 +106,7 @@ type ParityChainSpec struct {
 		EIP1344Transition         *ParityU64 `json:"eip1344Transition,omitempty"`
 		EIP1884Transition         *ParityU64 `json:"eip1884Transition,omitempty"`
 		EIP2028Transition         *ParityU64 `json:"eip2028Transition,omitempty"`
+		EIP1706Transition         *ParityU64 `json:"eip1706Transition,omitempty"`
 
 		ForkBlock     *ParityU64   `json:"forkBlock,omitempty"`
 		ForkCanonHash *common.Hash `json:"forkCanonHash,omitempty"`

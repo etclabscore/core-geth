@@ -457,11 +457,12 @@ func (c *ParityChainSpec) SetECIP1080Transition(n *uint64) error {
 }
 
 func (c *ParityChainSpec) GetEIP1706Transition() *uint64 {
-	return nil // FIXME when+if upstream implements
+	return c.Params.EIP1706Transition.Uint64P() // FIXME when+if upstream implements
 }
 
 func (c *ParityChainSpec) SetEIP1706Transition(n *uint64) error {
-	return ctypes.ErrUnsupportedConfigFatal
+	c.Params.EIP1706Transition = new(ParityU64).SetUint64(i)
+	return nil
 }
 
 func (spec *ParityChainSpec) IsForked(fn func() *uint64, n *big.Int) bool {

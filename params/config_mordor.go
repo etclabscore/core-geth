@@ -64,8 +64,8 @@ var (
 		EIP2028FBlock: big.NewInt(778507),
 		// ECIP-1078, ECIP-1079
 		//EIP2200FBlock: big.NewInt(778507), // RePetersburg (== re-1283)
-		EIP1283FBlock: big.NewInt(778507),
-		EIP1706FBlock: big.NewInt(778507),
+		EIP1283FBlock:  big.NewInt(778507),
+		EIP1706FBlock:  big.NewInt(778507),
 		ECIP1080FBlock: big.NewInt(778507),
 
 		DisposalBlock:      big.NewInt(0),

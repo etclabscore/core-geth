@@ -359,6 +359,7 @@ func (c *ChainConfig) GetECIP1080Transition() *uint64 {
 
 func (c *ChainConfig) SetECIP1080Transition(n *uint64) error {
 	c.ECIP1080Transition = setBig(c.ECIP1080Transition, n)
+	return nil
 }
 
 func (c *ChainConfig) GetEIP1706Transition() *uint64 {

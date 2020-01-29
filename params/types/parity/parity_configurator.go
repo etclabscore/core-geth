@@ -462,7 +462,7 @@ func (c *ParityChainSpec) GetEIP1706Transition() *uint64 {
 }
 
 func (c *ParityChainSpec) SetEIP1706Transition(n *uint64) error {
-	c.Params.EIP1706Transition = new(ParityU64).SetUint64(i)
+	c.Params.EIP1706Transition = new(ParityU64).SetUint64(n)
 	return nil
 }
 

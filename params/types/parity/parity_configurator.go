@@ -449,11 +449,12 @@ func (spec *ParityChainSpec) SetEIP1108Transition(n *uint64) error {
 }
 
 func (c *ParityChainSpec) GetECIP1080Transition() *uint64 {
-	return nil // FIXME when+if upstream implements
+	return c.Params.ECIP1080Transition.Uint64P()
 }
 
 func (c *ParityChainSpec) SetECIP1080Transition(n *uint64) error {
-	return ctypes.ErrUnsupportedConfigFatal
+	c.Params.ECIP1080Transition = new(ParityU64).SetUint64(n)
+	return nil
 }
 
 func (c *ParityChainSpec) GetEIP1706Transition() *uint64 {

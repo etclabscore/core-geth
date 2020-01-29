@@ -57,12 +57,16 @@ var (
 		EIP1052FBlock: big.NewInt(301243),
 
 		// Istanbul eq
+		// ECIP-1061, ECIP-1072
 		EIP152FBlock:  big.NewInt(778507),
 		EIP1108FBlock: big.NewInt(778507),
 		EIP1344FBlock: big.NewInt(778507),
-		EIP1884FBlock: nil,
 		EIP2028FBlock: big.NewInt(778507),
-		EIP2200FBlock: big.NewInt(778507), // RePetersburg (== re-1283)
+		// ECIP-1078, ECIP-1079
+		//EIP2200FBlock: big.NewInt(778507), // RePetersburg (== re-1283)
+		EIP1283FBlock: big.NewInt(778507),
+		EIP1706FBlock: big.NewInt(778507),
+		ECIP1080FBlock: big.NewInt(778507),
 
 		DisposalBlock:      big.NewInt(0),
 		ECIP1017FBlock:     big.NewInt(0),

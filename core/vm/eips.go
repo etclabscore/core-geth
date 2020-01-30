@@ -39,6 +39,16 @@ func EnableEIP(eipNum int, jt *JumpTable) error {
 	return nil
 }
 
+func enableSelfBalance(jt *JumpTable) {
+	jt[SELFBALANCE] = operation{
+		execute:     opSelfBalance,
+		constantGas: GasFastStep,
+		minStack:    minStack(0, 1),
+		maxStack:    maxStack(0, 1),
+		valid:       true,
+	}
+}
+
 // enable1884 applies EIP-1884 to the given jump table:
 // - Increase cost of BALANCE to 700
 // - Increase cost of EXTCODEHASH to 700
@@ -51,13 +61,7 @@ func enable1884(jt *JumpTable) {
 	jt[SLOAD].constantGas = vars.SloadGasEIP1884
 
 	// New opcode
-	jt[SELFBALANCE] = operation{
-		execute:     opSelfBalance,
-		constantGas: GasFastStep,
-		minStack:    minStack(0, 1),
-		maxStack:    maxStack(0, 1),
-		valid:       true,
-	}
+	enableSelfBalance(jt)
 }
 
 func opSelfBalance(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {

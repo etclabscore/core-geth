@@ -157,15 +157,20 @@ type MultiGethChainConfig struct {
 	eip2384Inferred bool
 	EIP2384FBlock   *big.Int `json:"eip2384FBlock,omitempty"`
 
+	// EIP-1706: Resolves reentrancy attack vector enabled with EIP1283.
+	// https://eips.ethereum.org/EIPS/eip-1706
+	EIP1706FBlock *big.Int `json:"eip1706FBlock,omitempty"`
+
 	//EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block
 	ECIP1010Length     *big.Int `json:"ecip1010Length,omitempty"`     // ECIP1010 length
 	ECIP1017FBlock     *big.Int `json:"ecip1017FBlock,omitempty"`
 	ECIP1017EraRounds  *big.Int `json:"ecip1017EraRounds,omitempty"` // ECIP1017 era rounds
-	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`     // Bomb disposal HF block
-	SocialBlock        *big.Int `json:"socialBlock,omitempty"`       // Ethereum Social Reward block
-	EthersocialBlock   *big.Int `json:"ethersocialBlock,omitempty"`  // Ethersocial Reward block
+	ECIP1080FBlock     *big.Int `json:"ecip1080FBlock,omitempty"`
+	DisposalBlock      *big.Int `json:"disposalBlock,omitempty"`    // Bomb disposal HF block
+	SocialBlock        *big.Int `json:"socialBlock,omitempty"`      // Ethereum Social Reward block
+	EthersocialBlock   *big.Int `json:"ethersocialBlock,omitempty"` // Ethersocial Reward block
 
 	// Various consensus engines
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`

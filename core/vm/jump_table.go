@@ -32,6 +32,7 @@ type (
 )
 
 var errGasUintOverflow = errors.New("gas uint64 overflow")
+var errGasLeftTooLow = errors.New("insufficient gas left")
 
 type operation struct {
 	// execute is the operation function
@@ -184,6 +185,9 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 	}
 	if config.IsForked(config.GetEIP1884Transition, bn) {
 		enable1884(&instructionSet) // Reprice reader opcodes - https://eips.ethereum.org/EIPS/eip-1884
+	}
+	if config.IsForked(config.GetECIP1080Transition, bn) {
+		enableSelfBalance(&instructionSet)
 	}
 	if config.IsForked(config.GetEIP2200Transition, bn) {
 		enable2200(&instructionSet) // Net metered SSTORE - https://eips.ethereum.org/EIPS/eip-2200

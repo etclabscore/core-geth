@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
+	"github.com/ethereum/go-ethereum/params/types/oldmultigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/tidwall/gjson"
@@ -46,6 +47,9 @@ func (c GenericCC) DAOSupport() bool {
 	if gc, ok := c.ChainConfigurator.(*goethereum.ChainConfig); ok {
 		return gc.DAOForkSupport
 	}
+	if omg, ok := c.ChainConfigurator.(*oldmultigeth.ChainConfig); ok {
+		return omg.DAOForkSupport
+	}
 	if mg, ok := c.ChainConfigurator.(*multigeth.MultiGethChainConfig); ok {
 		return mg.GetEthashEIP779Transition() != nil
 	}
@@ -64,8 +68,14 @@ var (
 		"engine",
 		"genesis.seal",
 	}
+	// These are fields which must differentiate "new" multigeth from "old" multigeth.
 	multigethSchemaMust = []string{
 		"networkId", "config.networkId",
+	}
+	// These are fields which differentiate old multigeth from goethereum config.
+	oldmultigethSchemaMust = []string{
+		"eip160Block", "config.eip160Block",
+		"ecip1010PauseBlock", "config.ecip1010PauseBlock",
 	}
 	goethereumSchemaMust = []string{
 		"difficulty",
@@ -79,6 +89,7 @@ func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) 
 	var cases = map[ctypes.ChainConfigurator][]string{
 		&parity.ParityChainSpec{}:         paritySchemaKeysMust,
 		&multigeth.MultiGethChainConfig{}: multigethSchemaMust,
+		&oldmultigeth.ChainConfig{}:       oldmultigethSchemaMust,
 		&goethereum.ChainConfig{}:         goethereumSchemaMust,
 	}
 	for c, fn := range cases {

@@ -86,22 +86,25 @@ var (
 )
 
 func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) {
-	var cases = map[ctypes.ChainConfigurator][]string{
-		&parity.ParityChainSpec{}:         paritySchemaKeysMust,
-		&multigeth.MultiGethChainConfig{}: multigethSchemaMust,
-		&oldmultigeth.ChainConfig{}:       oldmultigethSchemaMust,
-		&goethereum.ChainConfig{}:         goethereumSchemaMust,
+	var cases = []struct {
+		cnf ctypes.ChainConfigurator
+		fn  []string
+	}{
+		{&parity.ParityChainSpec{}, paritySchemaKeysMust},
+		{&multigeth.MultiGethChainConfig{}, multigethSchemaMust},
+		{&oldmultigeth.ChainConfig{}, oldmultigethSchemaMust},
+		{&goethereum.ChainConfig{}, goethereumSchemaMust},
 	}
-	for c, fn := range cases {
-		ok, err := asMapHasAnyKey(input, fn)
+	for _, c := range cases {
+		ok, err := asMapHasAnyKey(input, c.fn)
 		if err != nil {
 			return nil, err
 		}
 		if ok {
-			if err := json.Unmarshal(input, c); err != nil {
+			if err := json.Unmarshal(input, c.cnf); err != nil {
 				return nil, err
 			}
-			return c, nil
+			return c.cnf, nil
 		}
 	}
 	return nil, errors.New("invalid configurator schema")

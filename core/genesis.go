@@ -130,10 +130,8 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis)
 	}
 	compatErr := confp.Compatible(height, storedcfg, newcfg)
 	if compatErr != nil && *height != 0 && compatErr.RewindTo != 0 {
-		panic(fmt.Sprintf("compat error: %v / stored=%v new=%v", compatErr, stored, newcfg))
 		return newcfg, stored, compatErr
 	}
-	panic(fmt.Sprintf("chaindb OK: stored=%v new=%v", stored, newcfg))
 	rawdb.WriteChainConfig(db, stored, newcfg)
 	return newcfg, stored, nil
 }

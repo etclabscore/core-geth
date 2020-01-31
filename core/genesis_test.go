@@ -17,13 +17,16 @@
 package core
 
 import (
+	"math/big"
 	"reflect"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/oldmultigeth"
 )
 
 func TestSetupGenesisBlock(t *testing.T) {
@@ -57,5 +60,55 @@ func TestSetupGenesisBlock(t *testing.T) {
 		for _, diff := range diffs {
 			t.Error("mismatch", "diff=", diff, "in", classicGenesisBlock.Config, "out", clConfig)
 		}
+	}
+}
+
+func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
+	db := rawdb.NewMemoryDatabase()
+	genA := params.DefaultGenesisBlock()
+	genA.Config = &oldmultigeth.ChainConfig{
+		ChainID:              big.NewInt(61),
+		HomesteadBlock:       big.NewInt(1150000),
+		DAOForkBlock:         big.NewInt(1920000),
+		DAOForkSupport:       false,
+		EIP150Block:          big.NewInt(2500000),
+		EIP150Hash:           common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
+		EIP155Block:          big.NewInt(3000000),
+		EIP158Block:          big.NewInt(8772000),
+		ByzantiumBlock:       big.NewInt(8772000),
+		DisposalBlock:        big.NewInt(5900000),
+		SocialBlock:          nil,
+		EthersocialBlock:     nil,
+		ConstantinopleBlock:  big.NewInt(9573000),
+		PetersburgBlock:      big.NewInt(9573000),
+		IstanbulBlock:        big.NewInt(10500839),
+		EIP1884DisableFBlock: big.NewInt(10500839),
+		ECIP1017EraRounds:    big.NewInt(5000000),
+		EIP160FBlock:         big.NewInt(3000000),
+		ECIP1010PauseBlock:   big.NewInt(3000000),
+		ECIP1010Length:       big.NewInt(2000000),
+		Ethash:               new(ctypes.EthashConfig),
+	}
+	config, hash, err := SetupGenesisBlock(db, genA)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	headHash := common.HexToHash("0xe618c1b2d738dfa09052e199e5870274f09eb83c684a8a2c194b82dedc00a977")
+	rawdb.WriteHeadHeaderHash(db, headHash)
+	rawdb.WriteHeaderNumber(db, headHash, 9700559)
+
+	genB := params.DefaultClassicGenesisBlock()
+
+	newConfig, newHash, err := SetupGenesisBlock(db, genB)
+	if err != nil {
+		t.Fatal("incompat conf", err)
+	}
+	if hash != newHash {
+		t.Fatal("hash mismatch")
+	}
+
+	if !confp.Identical(config, newConfig, []string{"NetworkID", "ChainID"}) {
+		t.Fatal("chain config identities not same")
 	}
 }

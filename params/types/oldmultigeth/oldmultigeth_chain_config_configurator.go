@@ -675,5 +675,3 @@ func (c *ChainConfig) SetCliqueEpoch(n uint64) error {
 	c.Clique.Epoch = n
 	return nil
 }
-
-

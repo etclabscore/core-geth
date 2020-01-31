@@ -304,7 +304,7 @@ func TestFoundationIsForked(t *testing.T) {
 func TestClassicIs649(t *testing.T) {
 	c := ClassicChainConfig
 	got := c.GetEthashEIP649Transition()
-	if got == nil {
-		t.Fatal("nil")
+	if got != nil {
+		t.Fatal("classic config doesn't support 649; difficulty bomb was disposed of")
 	}
 }

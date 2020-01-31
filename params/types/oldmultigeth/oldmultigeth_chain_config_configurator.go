@@ -76,9 +76,6 @@ func (c *ChainConfig) GetNetworkID() *uint64 {
 	if c.NetworkID != 0 {
 		return &c.NetworkID
 	}
-	if c.ChainID != nil {
-		return newU64(c.ChainID.Uint64())
-	}
 	return newU64(vars.DefaultNetworkID)
 }
 

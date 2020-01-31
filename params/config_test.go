@@ -204,6 +204,17 @@ func TestCheckCompatible(t *testing.T) {
 			head:    9550000,
 			wantErr: nil,
 		},
+		{
+			stored: MainnetChainConfig,
+			new: func() ctypes.ChainConfigurator {
+				c := &multigeth.MultiGethChainConfig{}
+				err := confp.Convert(MainnetChainConfig, c)
+				if err != nil {
+					panic(err)
+				}
+				return c
+			}(),
+		},
 	}
 
 	for _, test := range tests {

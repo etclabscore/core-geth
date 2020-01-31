@@ -66,13 +66,12 @@ var (
 	}
 	multigethSchemaMust = []string{
 		"networkId", "config.networkId",
-		"eip2FBlock", "config.eip2FBlock",
 	}
 	goethereumSchemaMust = []string{
 		"difficulty",
-		"chainId", "config.chainId",
-		"eip158Block", "config.eip158Block",
 		"byzantiumBlock", "config.byzantiumBlock",
+		"chainId", "config.chainId",
+		"homesteadBlock", "config.homesteadBlock",
 	}
 )
 

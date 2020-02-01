@@ -64,44 +64,72 @@ func (c GenericCC) DAOSupport() bool {
 
 // Following vars define sufficient JSON schema keys for configurator type inference.
 var (
-	paritySchemaKeysMust = []string{
+	paritySchemaKeysSuffice = []string{
 		"engine",
 		"genesis.seal",
 	}
+	paritySchemaKeysMustNot = []string{}
+
 	// These are fields which must differentiate "new" multigeth from "old" multigeth.
-	multigethSchemaMust = []string{
-		"eip2FBlock", "config.eip2FBlock",
-		"eip7FBlock", "config.eip7FBlock",
+	multigethSchemaSuffice = []string{
+		"networkId", "config.networkId",
+		"requireBlockHashes", "config.requireBlockHashes",
 	}
+	multigethSchemaMustNot = []string{
+		"EIP1108FBlock", "config.EIP1108FBlock",
+		"eip158Block", "config.eip158Block",
+		"daoForkSupport", "config.daoForkSupport",
+	}
+
 	// These are fields which differentiate old multigeth from goethereum config.
-	oldmultigethSchemaMust = []string{
-		"eip160Block", "config.eip160Block",
+	oldmultigethSchemaSuffice = []string{
+		"EIP1108FBlock", "config.EIP1108FBlock",
+		"eip7FBlock", "config.eip7FBlock",
+		"eip2FBlock", "config.eip2FBlock",
 		"ecip1010PauseBlock", "config.ecip1010PauseBlock",
+		"disposalBlock", "config.disposalBlock",
 	}
-	goethereumSchemaMust = []string{
+	oldmultigethSchemaMustNot = []string{
+		"requireBlockHashes", "config.requireBlockHashes",
+	}
+
+	goethereumSchemaSuffice = []string{
 		"difficulty",
 		"byzantiumBlock", "config.byzantiumBlock",
 		"chainId", "config.chainId",
 		"homesteadBlock", "config.homesteadBlock",
 	}
+	goethereumSchemaMustNot = []string{
+		"engine",
+		"genesis.seal",
+		"networkId", "config.networkId",
+	}
 )
 
 func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) {
 	var cases = []struct {
-		cnf ctypes.ChainConfigurator
-		fn  []string
+		cnf        ctypes.ChainConfigurator
+		sufficient []string
+		negates    []string
 	}{
-		{&parity.ParityChainSpec{}, paritySchemaKeysMust},
-		{&multigeth.MultiGethChainConfig{}, multigethSchemaMust},
-		{&oldmultigeth.ChainConfig{}, oldmultigethSchemaMust},
-		{&goethereum.ChainConfig{}, goethereumSchemaMust},
+		{&parity.ParityChainSpec{}, paritySchemaKeysSuffice, paritySchemaKeysMustNot},
+		{&multigeth.MultiGethChainConfig{}, multigethSchemaSuffice, multigethSchemaMustNot},
+		{&oldmultigeth.ChainConfig{}, oldmultigethSchemaSuffice, oldmultigethSchemaMustNot},
+		{&goethereum.ChainConfig{}, goethereumSchemaSuffice, goethereumSchemaMustNot},
 	}
 	for _, c := range cases {
-		ok, err := asMapHasAnyKey(input, c.fn)
+		ok, err := asMapHasAnyKey(input, c.sufficient)
 		if err != nil {
 			return nil, err
 		}
-		if ok {
+		negated := false
+		if len(c.negates) > 0 {
+			negated, err = asMapHasAnyKey(input, c.negates)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if !negated && ok {
 			if err := json.Unmarshal(input, c.cnf); err != nil {
 				return nil, err
 			}
@@ -114,9 +142,22 @@ func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) 
 func asMapHasAnyKey(input []byte, keys []string) (bool, error) {
 	results := gjson.GetManyBytes(input, keys...)
 	for _, g := range results {
-		if g.Exists() && g.Value() != nil {
+		if g.Exists() {
 			return true, nil
 		}
 	}
 	return false, nil
 }
+
+// asMapHasValueForAnyKey extends the logic from asMapHasAnyKey, but
+// requires that the fields also denote non-nil values.
+// This was one path of logic, and may be removed later if not used.
+//func asMapHasValueForAnyKey(input []byte, keys []string) (bool, error) {
+//	results := gjson.GetManyBytes(input, keys...)
+//	for _, g := range results {
+//		if g.Exists() && g.Value() != nil {
+//			return true, nil
+//		}
+//	}
+//	return false, nil
+//}

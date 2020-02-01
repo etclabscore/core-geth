@@ -17,6 +17,8 @@
 package core
 
 import (
+	"bytes"
+	"encoding/json"
 	"math/big"
 	"reflect"
 	"testing"
@@ -93,10 +95,22 @@ func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	b, _ := json.MarshalIndent(config, "", "    ")
+	//t.Log(string(b))
 
+	stored := rawdb.ReadCanonicalHash(db, 0)
+	storedConfig := rawdb.ReadChainConfig(db, stored)
+	b2, _ := json.MarshalIndent(storedConfig, "", "    ")
+	//t.Log(string(b2))
+
+	if bytes.Compare(b, b2) != 0 {
+		t.Fatal("not really set genesis config db")
+	}
+
+	headHeight := uint64(9700559)
 	headHash := common.HexToHash("0xe618c1b2d738dfa09052e199e5870274f09eb83c684a8a2c194b82dedc00a977")
 	rawdb.WriteHeadHeaderHash(db, headHash)
-	rawdb.WriteHeaderNumber(db, headHash, 9700559)
+	rawdb.WriteHeaderNumber(db, headHash, headHeight)
 
 	genB := params.DefaultClassicGenesisBlock()
 
@@ -110,5 +124,14 @@ func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 
 	if !confp.Identical(config, newConfig, []string{"NetworkID", "ChainID"}) {
 		t.Fatal("chain config identities not same")
+	}
+
+	// These should be redundant to the SetupGenesisBlock method, but this is
+	// for double double double extra sureness.
+	if compatErr := confp.Compatible(&headHeight, genA, genB); compatErr != nil {
+		t.Fatal(err)
+	}
+	if compatErr := confp.Compatible(&headHeight, config, newConfig); compatErr != nil {
+		t.Fatal(err)
 	}
 }

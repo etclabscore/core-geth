@@ -16,13 +16,13 @@ limitations under the License.
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/spf13/cobra"
+	"github.com/tidwall/pretty"
 )
 
 // readChainconfigCmd represents the readChainconfig command
@@ -52,13 +52,13 @@ Example:
 			log.Fatal(err)
 		}
 
-		storedConfig := rawdb.ReadChainConfig(db, common.HexToHash(args[0]))
-
-		b, err := json.MarshalIndent(storedConfig, "", "    ")
+		data, err := db.Get(rawdb.ConfigKey(common.HexToHash(args[0])))
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(string(b))
+
+		data = pretty.Pretty(data)
+		fmt.Println(string(data))
 	},
 }
 

@@ -54,7 +54,7 @@ var (
 	bloomBitsPrefix = []byte("B") // bloomBitsPrefix + bit (uint16 big endian) + section (uint64 big endian) + hash -> bloom bits
 
 	preimagePrefix = []byte("secure-key-")      // preimagePrefix + hash -> preimage
-	configPrefix   = []byte("ethereum-config-") // config prefix for the db
+	ConfigPrefix   = []byte("ethereum-config-") // config prefix for the db
 
 	// Chain index prefixes (use `i` + single byte to avoid mixing data types).
 	BloomBitsIndexPrefix = []byte("iB") // BloomBitsIndexPrefix is the data table of a chain indexer to track its progress
@@ -160,7 +160,7 @@ func preimageKey(hash common.Hash) []byte {
 	return append(preimagePrefix, hash.Bytes()...)
 }
 
-// configKey = configPrefix + hash
-func configKey(hash common.Hash) []byte {
-	return append(configPrefix, hash.Bytes()...)
+// ConfigKey = ConfigPrefix + hash
+func ConfigKey(hash common.Hash) []byte {
+	return append(ConfigPrefix, hash.Bytes()...)
 }

@@ -18,5 +18,5 @@ package main
 import "github.com/ethereum/go-ethereum/cmd/echaindb/cmd"
 
 func main() {
-  cmd.Execute()
+	cmd.Execute()
 }

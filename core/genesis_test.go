@@ -103,7 +103,7 @@ func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 	b2, _ := json.MarshalIndent(storedConfig, "", "    ")
 	//t.Log(string(b2))
 
-	if bytes.Compare(b, b2) != 0 {
+	if bytes.Equal(b, b2) {
 		t.Fatal("not really set genesis config db")
 	}
 

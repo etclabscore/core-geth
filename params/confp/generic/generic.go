@@ -70,7 +70,8 @@ var (
 	}
 	// These are fields which must differentiate "new" multigeth from "old" multigeth.
 	multigethSchemaMust = []string{
-		"networkId", "config.networkId",
+		"eip2FBlock", "config.eip2FBlock",
+		"eip7FBlock", "config.eip7FBlock",
 	}
 	// These are fields which differentiate old multigeth from goethereum config.
 	oldmultigethSchemaMust = []string{
@@ -113,7 +114,7 @@ func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) 
 func asMapHasAnyKey(input []byte, keys []string) (bool, error) {
 	results := gjson.GetManyBytes(input, keys...)
 	for _, g := range results {
-		if g.Exists() {
+		if g.Exists() && g.Value() != nil {
 			return true, nil
 		}
 	}

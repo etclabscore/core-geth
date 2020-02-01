@@ -61,7 +61,6 @@ Example:
 			log.Fatal(err)
 		}
 
-
 		log.Println("Opening database...")
 		db, err := rawdb.NewLevelDBDatabase(chainDBPath, 256, 16, "")
 		if err != nil {

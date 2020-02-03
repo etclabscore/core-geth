@@ -145,6 +145,8 @@ func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 	}
 }
 
+// This test is very similar and in some way redundant to generic.TestUnmarshalChainConfigurator2
+// but intended to be more "integrative".
 func TestSetupGenesisBlock2(t *testing.T) {
 	db := rawdb.NewMemoryDatabase()
 
@@ -160,36 +162,34 @@ func TestSetupGenesisBlock2(t *testing.T) {
 	// written to the database, and which should be superceded by the
 	// config below (cc_v197_a).
 	var cc_v196_a = `{
-  "chainId":61,
-  "homesteadBlock":1150000,
-  "daoForkBlock":1920000,
-  "eip150Block":2500000,
-  "eip150Hash":"0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a",
-  "eip155Block":3000000,
-  "eip158Block":8772000,
-  "byzantiumBlock":8772000,
-  "constantinopleBlock":9573000,
-  "petersburgBlock":9573000,
-  "ethash":{
-
-  
-},
-  "trustedCheckpoint":null,
-  "trustedCheckpointOracle":null,
-  "networkId":1,
-  "eip7FBlock":null,
-  "eip160Block":3000000,
-  "EIP1108FBlock":null,
-  "EIP1344FBlock":null,
-  "EIP1884FBlock":null,
-  "EIP2028FBlock":null,
-  "EIP2200FBlock":null,
-  "ecip1010PauseBlock":3000000,
-  "ecip1010Length":2000000,
-  "ecip1017FBlock":5000000,
-  "ecip1017EraRounds":5000000,
-  "disposalBlock":5900000
-}`
+  "chainId": 61,
+  "homesteadBlock": 1150000,
+  "daoForkBlock": 1920000,
+  "eip150Block": 2500000,
+  "eip150Hash": "0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a",
+  "eip155Block": 3000000,
+  "eip158Block": 8772000,
+  "byzantiumBlock": 8772000,
+  "constantinopleBlock": 9573000,
+  "petersburgBlock": 9573000,
+  "ethash": {},
+  "trustedCheckpoint": null,
+  "trustedCheckpointOracle": null,
+  "networkId": 1,
+  "eip7FBlock": null,
+  "eip160Block": 3000000,
+  "EIP1108FBlock": null,
+  "EIP1344FBlock": null,
+  "EIP1884FBlock": null,
+  "EIP2028FBlock": null,
+  "EIP2200FBlock": null,
+  "ecip1010PauseBlock": 3000000,
+  "ecip1010Length": 2000000,
+  "ecip1017FBlock": 5000000,
+  "ecip1017EraRounds": 5000000,
+  "disposalBlock": 5900000
+}
+`
 
 	// An example of a "healthy" multigeth configuration marshaled to JSON.
 	var cc_v197_a = `{

@@ -46,7 +46,7 @@ type MultiGethChainConfig struct {
 	EIP2FBlock *big.Int `json:"eip2FBlock,omitempty"`
 	// DELEGATECALL
 	// https://eips.ethereum.org/EIPS/eip-7
-	EIP7FBlock *big.Int `json:"eip7FBlock,omitempy"`
+	EIP7FBlock *big.Int `json:"eip7FBlock,omitempty"`
 	// Note: EIP 8 was also included in this fork, but was not backwards-incompatible
 
 	// HF: DAO

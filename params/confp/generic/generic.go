@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
+	"github.com/ethereum/go-ethereum/params/types/oldmultigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/tidwall/gjson"
@@ -46,6 +47,9 @@ func (c GenericCC) DAOSupport() bool {
 	if gc, ok := c.ChainConfigurator.(*goethereum.ChainConfig); ok {
 		return gc.DAOForkSupport
 	}
+	if omg, ok := c.ChainConfigurator.(*oldmultigeth.ChainConfig); ok {
+		return omg.DAOForkSupport
+	}
 	if mg, ok := c.ChainConfigurator.(*multigeth.MultiGethChainConfig); ok {
 		return mg.GetEthashEIP779Transition() != nil
 	}
@@ -64,34 +68,43 @@ var (
 		"engine",
 		"genesis.seal",
 	}
+	// These are fields which must differentiate "new" multigeth from "old" multigeth.
 	multigethSchemaMust = []string{
 		"networkId", "config.networkId",
-		"eip2FBlock", "config.eip2FBlock",
+	}
+	// These are fields which differentiate old multigeth from goethereum config.
+	oldmultigethSchemaMust = []string{
+		"eip160Block", "config.eip160Block",
+		"ecip1010PauseBlock", "config.ecip1010PauseBlock",
 	}
 	goethereumSchemaMust = []string{
 		"difficulty",
-		"chainId", "config.chainId",
-		"eip158Block", "config.eip158Block",
 		"byzantiumBlock", "config.byzantiumBlock",
+		"chainId", "config.chainId",
+		"homesteadBlock", "config.homesteadBlock",
 	}
 )
 
 func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) {
-	var cases = map[ctypes.ChainConfigurator][]string{
-		&parity.ParityChainSpec{}:         paritySchemaKeysMust,
-		&multigeth.MultiGethChainConfig{}: multigethSchemaMust,
-		&goethereum.ChainConfig{}:         goethereumSchemaMust,
+	var cases = []struct {
+		cnf ctypes.ChainConfigurator
+		fn  []string
+	}{
+		{&parity.ParityChainSpec{}, paritySchemaKeysMust},
+		{&multigeth.MultiGethChainConfig{}, multigethSchemaMust},
+		{&oldmultigeth.ChainConfig{}, oldmultigethSchemaMust},
+		{&goethereum.ChainConfig{}, goethereumSchemaMust},
 	}
-	for c, fn := range cases {
-		ok, err := asMapHasAnyKey(input, fn)
+	for _, c := range cases {
+		ok, err := asMapHasAnyKey(input, c.fn)
 		if err != nil {
 			return nil, err
 		}
 		if ok {
-			if err := json.Unmarshal(input, c); err != nil {
+			if err := json.Unmarshal(input, c.cnf); err != nil {
 				return nil, err
 			}
-			return c, nil
+			return c.cnf, nil
 		}
 	}
 	return nil, errors.New("invalid configurator schema")

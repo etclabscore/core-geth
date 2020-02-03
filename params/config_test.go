@@ -25,6 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
+	"github.com/ethereum/go-ethereum/params/types/oldmultigeth"
 )
 
 func uint64P(n uint64) *uint64 {
@@ -204,6 +205,82 @@ func TestCheckCompatible(t *testing.T) {
 			head:    9550000,
 			wantErr: nil,
 		},
+		{
+			stored: MainnetChainConfig,
+			new: func() ctypes.ChainConfigurator {
+				c := &multigeth.MultiGethChainConfig{}
+				err := confp.Convert(MainnetChainConfig, c)
+				if err != nil {
+					panic(err)
+				}
+				return c
+			}(),
+		},
+		{
+			stored: func() ctypes.ChainConfigurator {
+				// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
+				c := &oldmultigeth.ChainConfig{
+					ChainID:             big.NewInt(61),
+					HomesteadBlock:      big.NewInt(1150000),
+					DAOForkBlock:        big.NewInt(1920000),
+					DAOForkSupport:      false,
+					EIP150Block:         big.NewInt(2500000),
+					EIP150Hash:          common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
+					EIP155Block:         big.NewInt(3000000),
+					EIP158Block:         big.NewInt(8772000),
+					ByzantiumBlock:      big.NewInt(8772000),
+					DisposalBlock:       big.NewInt(5900000),
+					SocialBlock:         nil,
+					EthersocialBlock:    nil,
+					ConstantinopleBlock: big.NewInt(9573000),
+					PetersburgBlock:     big.NewInt(9573000),
+					// As if client hasn't upgraded config to latest fork.
+					//IstanbulBlock:       big.NewInt(10500839),
+					//EIP1884DisableFBlock:big.NewInt(10500839),
+					ECIP1017EraRounds:  big.NewInt(5000000),
+					EIP160FBlock:       big.NewInt(3000000),
+					ECIP1010PauseBlock: big.NewInt(3000000),
+					ECIP1010Length:     big.NewInt(2000000),
+					Ethash:             new(ctypes.EthashConfig),
+				}
+				return c
+			}(),
+			new:     ClassicChainConfig,
+			head:    9700000,
+			wantErr: nil,
+		},
+		{
+			stored: func() ctypes.ChainConfigurator {
+				// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
+				c := &oldmultigeth.ChainConfig{
+					ChainID:              big.NewInt(61),
+					HomesteadBlock:       big.NewInt(1150000),
+					DAOForkBlock:         big.NewInt(1920000),
+					DAOForkSupport:       false,
+					EIP150Block:          big.NewInt(2500000),
+					EIP150Hash:           common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
+					EIP155Block:          big.NewInt(3000000),
+					EIP158Block:          big.NewInt(8772000),
+					ByzantiumBlock:       big.NewInt(8772000),
+					DisposalBlock:        big.NewInt(5900000),
+					SocialBlock:          nil,
+					EthersocialBlock:     nil,
+					ConstantinopleBlock:  big.NewInt(9573000),
+					PetersburgBlock:      big.NewInt(9573000),
+					IstanbulBlock:        big.NewInt(10500839),
+					EIP1884DisableFBlock: big.NewInt(10500839),
+					ECIP1017EraRounds:    big.NewInt(5000000),
+					EIP160FBlock:         big.NewInt(3000000),
+					ECIP1010PauseBlock:   big.NewInt(3000000),
+					ECIP1010Length:       big.NewInt(2000000),
+					Ethash:               new(ctypes.EthashConfig),
+				}
+				return c
+			}(),
+			new:     ClassicChainConfig,
+			head:    9700000,
+			wantErr: nil,
+		},
 	}
 
 	for _, test := range tests {
@@ -221,5 +298,13 @@ func TestFoundationIsForked(t *testing.T) {
 	c := MainnetChainConfig
 	if !c.IsForked(c.GetEthashEIP2384Transition, big.NewInt(9200001)) {
 		t.Fatal("nofork muir bad")
+	}
+}
+
+func TestClassicIs649(t *testing.T) {
+	c := ClassicChainConfig
+	got := c.GetEthashEIP649Transition()
+	if got != nil {
+		t.Fatal("classic config doesn't support 649; difficulty bomb was disposed of")
 	}
 }

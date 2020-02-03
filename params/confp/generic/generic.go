@@ -24,7 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
-	"github.com/ethereum/go-ethereum/params/types/oldmultigeth"
+	"github.com/ethereum/go-ethereum/params/types/multigethv0"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/tidwall/gjson"
@@ -47,7 +47,7 @@ func (c GenericCC) DAOSupport() bool {
 	if gc, ok := c.ChainConfigurator.(*goethereum.ChainConfig); ok {
 		return gc.DAOForkSupport
 	}
-	if omg, ok := c.ChainConfigurator.(*oldmultigeth.ChainConfig); ok {
+	if omg, ok := c.ChainConfigurator.(*multigethv0.ChainConfig); ok {
 		return omg.DAOForkSupport
 	}
 	if mg, ok := c.ChainConfigurator.(*multigeth.MultiGethChainConfig); ok {
@@ -114,7 +114,7 @@ func UnmarshalChainConfigurator(input []byte) (ctypes.ChainConfigurator, error) 
 	}{
 		{&parity.ParityChainSpec{}, paritySchemaKeysSuffice, paritySchemaKeysMustNot},
 		{&multigeth.MultiGethChainConfig{}, multigethSchemaSuffice, multigethSchemaMustNot},
-		{&oldmultigeth.ChainConfig{}, oldmultigethSchemaSuffice, oldmultigethSchemaMustNot},
+		{&multigethv0.ChainConfig{}, oldmultigethSchemaSuffice, oldmultigethSchemaMustNot},
 		{&goethereum.ChainConfig{}, goethereumSchemaSuffice, goethereumSchemaMustNot},
 	}
 	for _, c := range cases {

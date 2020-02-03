@@ -25,7 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
-	"github.com/ethereum/go-ethereum/params/types/oldmultigeth"
+	"github.com/ethereum/go-ethereum/params/types/multigethv0"
 )
 
 func uint64P(n uint64) *uint64 {
@@ -219,7 +219,7 @@ func TestCheckCompatible(t *testing.T) {
 		{
 			stored: func() ctypes.ChainConfigurator {
 				// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
-				c := &oldmultigeth.ChainConfig{
+				c := &multigethv0.ChainConfig{
 					ChainID:             big.NewInt(61),
 					HomesteadBlock:      big.NewInt(1150000),
 					DAOForkBlock:        big.NewInt(1920000),
@@ -252,7 +252,7 @@ func TestCheckCompatible(t *testing.T) {
 		{
 			stored: func() ctypes.ChainConfigurator {
 				// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
-				c := &oldmultigeth.ChainConfig{
+				c := &multigethv0.ChainConfig{
 					ChainID:              big.NewInt(61),
 					HomesteadBlock:       big.NewInt(1150000),
 					DAOForkBlock:         big.NewInt(1920000),

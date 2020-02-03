@@ -225,20 +225,20 @@ var cc_v198_a = `{
 }`
 
 func TestUnmarshalChainConfigurator2(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		versionid string
-		raw string
-		wantType reflect.Type
+		raw       string
+		wantType  reflect.Type
 	}{
 		{
 			versionid: "v196",
-			raw: cc_v196_a,
-			wantType: reflect.TypeOf(&oldmultigeth.ChainConfig{}),
+			raw:       cc_v196_a,
+			wantType:  reflect.TypeOf(&oldmultigeth.ChainConfig{}),
 		},
 		{
 			versionid: "v197",
-			raw: cc_v197_a,
-			wantType: reflect.TypeOf(&oldmultigeth.ChainConfig{}),
+			raw:       cc_v197_a,
+			wantType:  reflect.TypeOf(&oldmultigeth.ChainConfig{}),
 		},
 		{
 			versionid: "v198",
@@ -249,7 +249,7 @@ func TestUnmarshalChainConfigurator2(t *testing.T) {
 			versionid: "v199",
 			// Same same as v198; would like to use a real "latest" runtime marshaled config,
 			// but this will at least enable a test of a::a.
-			raw: cc_v198_a,
+			raw:      cc_v198_a,
 			wantType: reflect.TypeOf(&multigeth.MultiGethChainConfig{}),
 		},
 		// FIXME

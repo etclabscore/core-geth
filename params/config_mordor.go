@@ -62,11 +62,13 @@ var (
 		EIP1108FBlock: big.NewInt(778507),
 		EIP1344FBlock: big.NewInt(778507),
 		EIP2028FBlock: big.NewInt(778507),
+		EIP2200FBlock: big.NewInt(778507), // RePetersburg (== re-1283)
+
 		// ECIP-1078, ECIP-1079
-		//EIP2200FBlock: big.NewInt(778507), // RePetersburg (== re-1283)
-		EIP1283FBlock:  big.NewInt(778507),
-		EIP1706FBlock:  big.NewInt(778507),
-		ECIP1080FBlock: big.NewInt(778507),
+		EIP2200DisableFBlock: big.NewInt(976_231),
+		EIP1283FBlock:        big.NewInt(976_231),
+		EIP1706FBlock:        big.NewInt(976_231),
+		ECIP1080FBlock:       big.NewInt(976_231),
 
 		DisposalBlock:      big.NewInt(0),
 		ECIP1017FBlock:     big.NewInt(0),

@@ -61,15 +61,16 @@ var (
 
 		// Istanbul eq
 		// ECIP-1061, ECIP-1072
-		EIP152FBlock:  big.NewInt(10500839),
-		EIP1108FBlock: big.NewInt(10500839),
-		EIP1344FBlock: big.NewInt(10500839),
-		EIP2028FBlock: big.NewInt(10500839),
-		// ECIP-1078, ECIP-1079
+		EIP152FBlock:  big.NewInt(10_500_839),
+		EIP1108FBlock: big.NewInt(10_500_839),
+		EIP1344FBlock: big.NewInt(10_500_839),
+		EIP2028FBlock: big.NewInt(10_500_839),
 		//EIP2200FBlock: big.NewInt(10500839), // RePetersburg (=~ re-1283)
-		EIP1283FBlock:  big.NewInt(10500839),
-		EIP1706FBlock:  big.NewInt(10500839),
-		ECIP1080FBlock: big.NewInt(10500839),
+
+		// ECIP-1078, ECIP-1079
+		EIP1283FBlock:  big.NewInt(10_500_839),
+		EIP1706FBlock:  big.NewInt(10_500_839),
+		ECIP1080FBlock: big.NewInt(10_500_839),
 
 		PetersburgBlock: nil, // Un1283
 

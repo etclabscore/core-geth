@@ -189,7 +189,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 	if config.IsForked(config.GetECIP1080Transition, bn) {
 		enableSelfBalance(&instructionSet)
 	}
-	if config.IsForked(config.GetEIP2200Transition, bn) {
+	if config.IsForked(config.GetEIP2200Transition, bn) && !config.IsForked(config.GetEIP2200DisableTransition, bn) {
 		enable2200(&instructionSet) // Net metered SSTORE - https://eips.ethereum.org/EIPS/eip-2200
 	}
 	return instructionSet

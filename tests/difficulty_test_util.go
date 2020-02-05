@@ -139,10 +139,11 @@ func (test *DifficultyTest) Run(config ctypes.ChainConfigurator) error {
 	actual := ethash.CalcDifficulty(config, test.CurrentTimestamp, parent)
 	exp := test.CurrentDifficulty
 
+	b, _ := json.Marshal(config)
 	if actual.Cmp(exp) != 0 {
 		return fmt.Errorf(`%s got: %v, want: %v
 test: %v
-config: %s`, test.Name, actual, exp, test, config)
+config: %s`, test.Name, actual, exp, test, string(b))
 	}
 	return nil
 

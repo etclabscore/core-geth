@@ -539,14 +539,12 @@ func (c *ChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 
 // Muir Glacier difficulty bomb delay
 func (c *ChainConfig) GetEthashEIP2384Transition() *uint64 {
-	return nil
+	return bigNewU64(c.MuirGlacierBlock)
 }
 
 func (c *ChainConfig) SetEthashEIP2384Transition(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	return ctypes.ErrUnsupportedConfigNoop
+	c.MuirGlacierBlock = setBig(c.MuirGlacierBlock, n)
+	return nil
 }
 
 func (c *ChainConfig) GetEthashECIP1010PauseTransition() *uint64 {

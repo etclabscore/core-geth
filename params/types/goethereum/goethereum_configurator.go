@@ -326,6 +326,17 @@ func (c *ChainConfig) SetEIP2200Transition(n *uint64) error {
 	return nil
 }
 
+func (c *ChainConfig) GetEIP2200DisableTransition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP2200DisableTransition(n *uint64) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
 func (c *ChainConfig) GetEIP1344Transition() *uint64 {
 	return bigNewU64(c.IstanbulBlock)
 }

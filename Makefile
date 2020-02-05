@@ -49,7 +49,7 @@ test-multigeth-features-multigeth:
 
 test-multigeth-features-multigethv0:
 	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETHv0."
-	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALANCE_MULTIGETHV0=on go test -count=1 ./tests
+	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETHV0=on go test -count=1 ./tests
 
 test-multigeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
 	@echo "Testing Parity JSON chainspec equivalence."

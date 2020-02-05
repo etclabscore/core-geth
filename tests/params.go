@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
+	"github.com/ethereum/go-ethereum/params/types/multigethv0"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -128,6 +129,25 @@ func init() {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = mgc
+		}
+
+	} else if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_MULTIGETHV0_KEY) != "" {
+		log.Println("converting to MultiGethV0 data type.")
+
+		for i, config := range Forks {
+			pspec := &multigethv0.ChainConfig{}
+			if err := confp.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
+				panic(err)
+			}
+			Forks[i] = pspec
+		}
+
+		for k, v := range difficultyChainConfigurations {
+			pspec := &multigethv0.ChainConfig{}
+			if err := confp.Convert(v, pspec); ctypes.IsFatalUnsupportedErr(err) {
+				panic(err)
+			}
+			difficultyChainConfigurations[k] = pspec
 		}
 
 	} else if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_PARITY_KEY) != "" {

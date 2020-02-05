@@ -37,15 +37,19 @@ sync-clients:
 
 test-multigeth: test-multigeth-features test-multigeth-chainspecs ## Runs all tests specific to multi-geth.
 
-test-multigeth-features: test-multigeth-features-parity test-multigeth-features-multigeth ## Runs tests specific to multi-geth using Fork/Feature configs.
+test-multigeth-features: test-multigeth-features-parity test-multigeth-features-multigeth test-multigeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
 
-test-multigeth-features-multigeth:
+test-multigeth-features-parity:
 	@echo "Testing fork/feature/datatype implementation; equivalence - PARITY."
 	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_PARITY=on go test -count=1 ./tests
 
-test-multigeth-features-parity:
+test-multigeth-features-multigeth:
 	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETH."
 	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETH=on go test -count=1 ./tests
+
+test-multigeth-features-multigethv0:
+	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETHv0."
+	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALANCE_MULTIGETHV0=on go test -count=1 ./tests
 
 test-multigeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
 	@echo "Testing Parity JSON chainspec equivalence."

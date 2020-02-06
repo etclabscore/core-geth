@@ -210,7 +210,7 @@ func (tm *testMatcher) walk(t *testing.T, dir string, runTest interface{}) {
 	dirinfo, err := os.Stat(dir)
 	if os.IsNotExist(err) || !dirinfo.IsDir() {
 		fmt.Fprintf(os.Stderr, "can't find test files in %s, did you clone the tests submodule?\n", dir)
-		t.Skip("missing test files")
+		t.Fatal("missing test files")
 	}
 	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		name := filepath.ToSlash(strings.TrimPrefix(path, dir+string(filepath.Separator)))

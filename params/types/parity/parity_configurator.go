@@ -250,6 +250,17 @@ func (spec *ParityChainSpec) SetEIP2200Transition(i *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetEIP2200DisableTransition() *uint64 {
+	return nil
+}
+
+func (spec *ParityChainSpec) SetEIP2200DisableTransition(n *uint64) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
 func (spec *ParityChainSpec) GetEIP1344Transition() *uint64 {
 	return spec.Params.EIP1344Transition.Uint64P()
 }

@@ -108,6 +108,8 @@ type CatHerder interface {
 	SetEIP1108Transition(n *uint64) error
 	GetEIP2200Transition() *uint64
 	SetEIP2200Transition(n *uint64) error
+	GetEIP2200DisableTransition() *uint64
+	SetEIP2200DisableTransition(n *uint64) error
 	GetEIP1344Transition() *uint64
 	SetEIP1344Transition(n *uint64) error
 	GetEIP1884Transition() *uint64

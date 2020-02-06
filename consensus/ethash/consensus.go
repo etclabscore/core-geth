@@ -384,14 +384,8 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		exPeriodRef.Set(fakeBlockNumber)
 
 	} else if config.IsForked(config.GetEthashEIP2384Transition, next) {
-		// calcDifficultyEIP1234 is the difficulty adjustment algorithm for Constantinople.
-		// The calculation uses the Byzantium rules, but with bomb offset 5M.
-		// Specification EIP-1234: https://eips.ethereum.org/EIPS/eip-1234
-		// Note, the calculations below looks at the parent number, which is 1 below
-		// the block number. Thus we remove one from the delay given
-
-		// calculate a fake block number for the ice-age delay
-		// Specification: https://eips.ethereum.org/EIPS/eip-1234
+		// calcDifficultyEIP2384 is the difficulty adjustment algorithm for Muir Glacier.
+		// The calculation uses the Byzantium rules, but with bomb offset 9M.
 		fakeBlockNumber := new(big.Int)
 		delayWithOffset := new(big.Int).Sub(vars.EIP2384DifficultyBombDelay, common.Big1)
 		if parent.Number.Cmp(delayWithOffset) >= 0 {

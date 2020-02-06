@@ -1,4 +1,4 @@
-package oldmultigeth
+package multigethv0
 
 import (
 	"math/big"
@@ -314,6 +314,17 @@ func (c *ChainConfig) SetEIP2200Transition(n *uint64) error {
 	return nil
 }
 
+func (c *ChainConfig) GetEIP2200DisableTransition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP2200DisableTransition(n *uint64) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
 func (c *ChainConfig) GetEIP1344Transition() *uint64 {
 	return bigNewU64(c.IstanbulBlock)
 }
@@ -526,15 +537,14 @@ func (c *ChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 	return nil
 }
 
+// Muir Glacier difficulty bomb delay
 func (c *ChainConfig) GetEthashEIP2384Transition() *uint64 {
-	return nil
+	return bigNewU64(c.MuirGlacierBlock)
 }
 
 func (c *ChainConfig) SetEthashEIP2384Transition(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	return ctypes.ErrUnsupportedConfigFatal
+	c.MuirGlacierBlock = setBig(c.MuirGlacierBlock, n)
+	return nil
 }
 
 func (c *ChainConfig) GetEthashECIP1010PauseTransition() *uint64 {
@@ -600,9 +610,11 @@ func (c *ChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEthashEIP100BTransition() *uint64 {
-	x := bigNewU64(bigMax(c.EIP100FBlock, c.ByzantiumBlock))
+	// Because the Ethereum Foundation network (and client... and tests) assume that if Constantinople
+	// is activated, then Byzantium must be (have been) as well.
+	x := bigMax(c.EIP100FBlock, c.ByzantiumBlock)
 	if x != nil {
-		return x
+		return bigNewU64(x)
 	}
 	return bigNewU64(bigMax(c.EIP100FBlock, c.ConstantinopleBlock))
 }

@@ -288,7 +288,7 @@ func (c *Config) ExtRPCEnabled() bool {
 func (c *Config) NodeName() string {
 	name := c.name()
 	// Backwards compatibility: previous versions used Geth or MultiGeth
-	if name == "geth" || name == "geth-testnet" || name == "multigeth" || name == "MultiGeth" {
+	if strings.ToLower(name) == "geth" || strings.ToLower(name) == "geth-testnet" || strings.ToLower(name) == "multigeth" {
 		name = "PhoenixGeth"
 	}
 	if params.VersionName != "" {

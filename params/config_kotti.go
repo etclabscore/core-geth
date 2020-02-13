@@ -57,18 +57,25 @@ var (
 		EIP214FBlock: big.NewInt(716617),
 		EIP658FBlock: big.NewInt(716617),
 
-		// Constantinople eq
+		// Constantinople eq, aka Agharta
 		EIP145FBlock:  big.NewInt(1705549),
 		EIP1014FBlock: big.NewInt(1705549),
 		EIP1052FBlock: big.NewInt(1705549),
 
-		// Istanbul eq
+		// Istanbul eq, aka Aztlan
+		// ECIP-1061
 		EIP152FBlock:  big.NewInt(2058191),
 		EIP1108FBlock: big.NewInt(2058191),
 		EIP1344FBlock: big.NewInt(2058191),
 		EIP1884FBlock: nil,
 		EIP2028FBlock: big.NewInt(2058191),
 		EIP2200FBlock: big.NewInt(2058191), // RePetersburg (== re-1283)
+
+		// ECIP-1078, aka Phoenix Fix
+		EIP2200DisableFBlock: big.NewInt(2_208_203),
+		EIP1283FBlock:        big.NewInt(2_208_203),
+		EIP1706FBlock:        big.NewInt(2_208_203),
+		ECIP1080FBlock:       big.NewInt(2_208_203),
 
 		ECIP1017FBlock:    big.NewInt(5000000),
 		ECIP1017EraRounds: big.NewInt(5000000),

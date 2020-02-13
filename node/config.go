@@ -287,9 +287,9 @@ func (c *Config) ExtRPCEnabled() bool {
 // NodeName returns the devp2p node identifier.
 func (c *Config) NodeName() string {
 	name := c.name()
-	// Backwards compatibility: previous versions used title-cased "Geth", keep that.
-	if name == "geth" || name == "geth-testnet" {
-		name = "Geth"
+	// Backwards compatibility: previous versions used Geth or MultiGeth
+	if name == "geth" || name == "geth-testnet" || name == "multigeth" || name == "MultiGeth" {
+		name = "PhoenixGeth"
 	}
 	if params.VersionName != "" {
 		name = params.VersionName

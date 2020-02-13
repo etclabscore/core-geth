@@ -56,9 +56,9 @@ func enableSelfBalance(jt *JumpTable) {
 // - Define SELFBALANCE, with cost GasFastStep (5)
 func enable1884(jt *JumpTable) {
 	// Gas cost changes
+	jt[SLOAD].constantGas = vars.SloadGasEIP1884
 	jt[BALANCE].constantGas = vars.BalanceGasEIP1884
 	jt[EXTCODEHASH].constantGas = vars.ExtcodeHashGasEIP1884
-	jt[SLOAD].constantGas = vars.SloadGasEIP1884
 
 	// New opcode
 	enableSelfBalance(jt)
@@ -92,5 +92,6 @@ func opChainID(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memo
 
 // enable2200 applies EIP-2200 (Rebalance net-metered SSTORE)
 func enable2200(jt *JumpTable) {
+	jt[SLOAD].constantGas = vars.SloadGasEIP2200
 	jt[SSTORE].dynamicGas = gasSStoreEIP2200
 }

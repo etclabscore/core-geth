@@ -119,7 +119,7 @@ func TestBootnodesDiscV4Ping(t *testing.T) {
 		{Name: "ethersocial", Bootnodes: params.EthersocialBootnodes},
 		{Name: "mix", Bootnodes: params.MixBootnodes},
 	} {
-		t.Run(fmt.Sprintf("%s", c.Name), func(t *testing.T) {
+		t.Run(c.Name, func(t *testing.T) {
 			rate := defaultMinPassRate
 			if c.MinPassRate != nil {
 				rate = *c.MinPassRate

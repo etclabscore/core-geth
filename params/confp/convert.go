@@ -70,7 +70,7 @@ func Convert(from, to interface{}) error {
 	}
 
 	// Set general chain parameters.
-	k := reflect.TypeOf((*ctypes.CatHerder)(nil)).Elem()
+	k := reflect.TypeOf((*ctypes.ProtocolSpecifier)(nil)).Elem()
 	if err := convert(k, fromChainer, toChainer); err != nil {
 		return err
 	}

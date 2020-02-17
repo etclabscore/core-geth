@@ -42,14 +42,14 @@ type Configurator interface {
 }
 
 type ChainConfigurator interface {
-	CatHerder
+	ProtocolSpecifier
 	Forker
 	ConsensusEnginator // Consensus Engine
 	// CHTer
 }
 
-// CatHerder defines protocol interfaces that are agnostic of consensus engine.
-type CatHerder interface {
+// ProtocolSpecifier defines protocol interfaces that are agnostic of consensus engine.
+type ProtocolSpecifier interface {
 	GetAccountStartNonce() *uint64
 	SetAccountStartNonce(n *uint64) error
 	GetMaximumExtraDataSize() *uint64

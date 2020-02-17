@@ -214,7 +214,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config) (*stat
 		statedb.RevertToSnapshot(snapshot)
 	}
 	// Commit block
-	statedb.Commit(config.IsForked(config.GetEIP161dTransition, block.Number()))
+	statedb.Commit(config.IsEnabled(config.GetEIP161dTransition, block.Number()))
 	// Add 0-value mining reward. This only makes a difference in the cases
 	// where
 	// - the coinbase suicided, or
@@ -222,7 +222,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config) (*stat
 	//   the coinbase gets no txfee, so isn't created, and thus needs to be touched
 	statedb.AddBalance(block.Coinbase(), new(big.Int))
 	// And _now_ get the state root
-	root := statedb.IntermediateRoot(config.IsForked(config.GetEIP161dTransition, block.Number()))
+	root := statedb.IntermediateRoot(config.IsEnabled(config.GetEIP161dTransition, block.Number()))
 	return statedb, root, nil
 }
 

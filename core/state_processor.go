@@ -62,7 +62,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 		gp       = new(GasPool).AddGas(block.GasLimit())
 	)
 	// Mutate the block and state according to any hard-fork specs
-	if p.config.IsForked(p.config.GetEthashEIP779Transition, block.Number()) {
+	if p.config.IsEnabled(p.config.GetEthashEIP779Transition, block.Number()) {
 		misc.ApplyDAOHardFork(statedb)
 	}
 	// Iterate over and process the individual transactions
@@ -102,8 +102,8 @@ func ApplyTransaction(config ctypes.ChainConfigurator, bc ChainContext, author *
 	}
 	// Update the state with pending changes
 	var root []byte
-	eip161d := config.IsForked(config.GetEIP161dTransition, header.Number)
-	if config.IsForked(config.GetEIP658Transition, header.Number) {
+	eip161d := config.IsEnabled(config.GetEIP161dTransition, header.Number)
+	if config.IsEnabled(config.GetEIP658Transition, header.Number) {
 		statedb.Finalise(eip161d)
 	} else {
 		root = statedb.IntermediateRoot(eip161d).Bytes()

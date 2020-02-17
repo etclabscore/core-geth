@@ -555,7 +555,7 @@ func (c *Clique) Prepare(chain consensus.ChainReader, header *types.Header) erro
 // rewards given.
 func (c *Clique) Finalize(chain consensus.ChainReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header) {
 	// No block rewards in PoA, so the state remains as is and uncles are dropped
-	header.Root = state.IntermediateRoot(chain.Config().IsForked(chain.Config().GetEIP161dTransition, header.Number))
+	header.Root = state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, header.Number))
 	header.UncleHash = types.CalcUncleHash(nil)
 }
 
@@ -563,7 +563,7 @@ func (c *Clique) Finalize(chain consensus.ChainReader, header *types.Header, sta
 // nor block rewards given, and returns the final block.
 func (c *Clique) FinalizeAndAssemble(chain consensus.ChainReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt) (*types.Block, error) {
 	// No block rewards in PoA, so the state remains as is and uncles are dropped
-	header.Root = state.IntermediateRoot(chain.Config().IsForked(chain.Config().GetEIP161dTransition, header.Number))
+	header.Root = state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, header.Number))
 	header.UncleHash = types.CalcUncleHash(nil)
 
 	// Assemble and return the final block for sealing

@@ -311,11 +311,11 @@ func (pool *TxPool) setNewHead(head *types.Header) {
 	txc, _ := pool.reorgOnNewHead(ctx, head)
 	m, r := txc.getLists()
 	pool.relay.NewHead(pool.head, m, r)
-	pool.eip2f = pool.config.IsForked(pool.config.GetEthashEIP2Transition, head.Number)
+	pool.eip2f = pool.config.IsEnabled(pool.config.GetEthashEIP2Transition, head.Number)
 
 	// Update fork indicator by next pending block number
 	next := new(big.Int).Add(head.Number, big.NewInt(1))
-	pool.eip2028f = pool.config.IsForked(pool.config.GetEIP2028Transition, next)
+	pool.eip2028f = pool.config.IsEnabled(pool.config.GetEIP2028Transition, next)
 }
 
 // Stop stops the light transaction pool

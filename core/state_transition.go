@@ -190,8 +190,8 @@ func (st *StateTransition) TransitionDb() (ret []byte, usedGas uint64, failed bo
 	}
 	msg := st.msg
 	sender := vm.AccountRef(msg.From())
-	eip2f := st.evm.ChainConfig().IsForked(st.evm.ChainConfig().GetEthashEIP2Transition, st.evm.BlockNumber)
-	eip2028f := st.evm.ChainConfig().IsForked(st.evm.ChainConfig().GetEIP2028Transition, st.evm.BlockNumber)
+	eip2f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEthashEIP2Transition, st.evm.BlockNumber)
+	eip2028f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2028Transition, st.evm.BlockNumber)
 	contractCreation := msg.To() == nil
 
 	// Pay intrinsic gas

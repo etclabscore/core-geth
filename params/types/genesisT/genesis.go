@@ -536,8 +536,8 @@ func (g Genesis) SetEIP1706Transition(n *uint64) error {
 	return g.Config.SetEIP1706Transition(n)
 }
 
-func (g *Genesis) IsForked(fn func() *uint64, n *big.Int) bool {
-	return g.Config.IsForked(fn, n)
+func (g *Genesis) IsEnabled(fn func() *uint64, n *big.Int) bool {
+	return g.Config.IsEnabled(fn, n)
 }
 
 func (g *Genesis) GetForkCanonHash(n uint64) common.Hash {

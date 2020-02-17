@@ -757,7 +757,7 @@ func (w *worker) commitTransactions(txs *types.TransactionsByPriceAndNonce, coin
 		from, _ := types.Sender(w.current.signer, tx)
 		// Check whether the tx is replay protected. If we're not in the EIP155 hf
 		// phase, start ignoring the sender until we do.
-		if tx.Protected() && !w.chainConfig.IsForked(w.chainConfig.GetEIP155Transition, w.current.header.Number) {
+		if tx.Protected() && !w.chainConfig.IsEnabled(w.chainConfig.GetEIP155Transition, w.current.header.Number) {
 			log.Trace("Ignoring reply protected transaction", "hash", tx.Hash(), "eip155", w.chainConfig.GetEIP155Transition())
 
 			txs.Pop()
@@ -880,7 +880,7 @@ func (w *worker) commitNewWork(interrupt *int32, noempty bool, timestamp int64) 
 	}
 	// Create the current work task and check any fork transitions needed
 	env := w.current
-	if w.chainConfig.IsForked(w.chainConfig.GetEthashEIP779Transition, header.Number) {
+	if w.chainConfig.IsEnabled(w.chainConfig.GetEthashEIP779Transition, header.Number) {
 		misc.ApplyDAOHardFork(env.state)
 	}
 	// Accumulate the uncles for the current block

@@ -123,9 +123,9 @@ type ProtocolSpecifier interface {
 }
 
 type Forker interface {
-	// IsForked tells if interface has met or exceeded a fork block number.
-	// eg. IsForked(c.GetEIP1108Transition, big.NewInt(42)))
-	IsForked(fn func() *uint64, n *big.Int) bool
+	// IsEnabled tells if interface has met or exceeded a fork block number.
+	// eg. IsEnabled(c.GetEIP1108Transition, big.NewInt(42)))
+	IsEnabled(fn func() *uint64, n *big.Int) bool
 
 	// ForkCanonHash yields arbitrary number/hash pairs.
 	// This is an abstraction derived from the original EIP150 implementation.

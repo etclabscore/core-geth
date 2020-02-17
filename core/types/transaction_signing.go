@@ -42,9 +42,9 @@ type sigCache struct {
 func MakeSigner(config ctypes.ChainConfigurator, blockNumber *big.Int) Signer {
 	var signer Signer
 	switch {
-	case config.IsForked(config.GetEIP155Transition, blockNumber):
+	case config.IsEnabled(config.GetEIP155Transition, blockNumber):
 		signer = NewEIP155Signer(config.GetChainID())
-	case config.IsForked(config.GetEthashEIP2Transition, blockNumber):
+	case config.IsEnabled(config.GetEthashEIP2Transition, blockNumber):
 		signer = HomesteadSigner{}
 	default:
 		signer = FrontierSigner{}

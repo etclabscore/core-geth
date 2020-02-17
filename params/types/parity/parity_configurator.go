@@ -477,7 +477,7 @@ func (c *ParityChainSpec) SetEIP1706Transition(n *uint64) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) IsForked(fn func() *uint64, n *big.Int) bool {
+func (spec *ParityChainSpec) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {
 		return false

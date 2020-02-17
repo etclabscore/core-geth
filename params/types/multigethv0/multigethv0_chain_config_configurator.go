@@ -385,7 +385,7 @@ func (c *ChainConfig) SetEIP1706Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
-func (c *ChainConfig) IsForked(fn func() *uint64, n *big.Int) bool {
+func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {
 		return false

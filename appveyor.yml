@@ -32,15 +32,22 @@ build_script:
   - ps: Get-FileHash multi-geth-alltools-win64.zip -Algorithm SHA256
   - ps: Get-FileHash multi-geth-alltools-win64.zip | Out-File multi-geth-alltools-win64.zip.sha256
 
-artifacts:
-  - path: '*core-geth*.zip'
-    name: geth
-  - path: '*core-geth*.zip.sha256'
-    name: geth-sha256
-  - path: '*core-geth-alltools*.zip'
-    name: alltools
-  - path: '*core-geth-alltools*.zip.sha256'
-    name: alltools-sha256
+for:
+  - branches:
+      only:
+        - master
+        - /v\d*\.\d*\.\d*/
+        - /v\d*\.\d*\.\d*-beta\.\d*/
+        - release*
+    artifacts:
+      - path: '*core-geth*.zip'
+        name: geth
+      - path: '*core-geth*.zip.sha256'
+        name: geth-sha256
+      - path: '*core-geth-alltools*.zip'
+        name: alltools
+      - path: '*core-geth-alltools*.zip.sha256'
+        name: alltools-sha256
 
 deploy:
   provider: GitHub

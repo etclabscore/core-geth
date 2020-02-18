@@ -90,13 +90,11 @@ func opChainID(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memo
 	return nil, nil
 }
 
-
 // enable2200Sloppy applies EIP-2200 (Rebalance net-metered SSTORE)
 // WITHOUT IMPLEMENTING THE GAS REPRICING FOR SLOAD OPCODE.
 func enable2200Sloppy(jt *JumpTable) {
 	jt[SSTORE].dynamicGas = gasSStoreEIP2200
 }
-
 
 // enable2200 applies EIP-2200 (Rebalance net-metered SSTORE)
 func enable2200(jt *JumpTable) {

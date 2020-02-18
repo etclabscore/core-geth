@@ -49,6 +49,7 @@ import (
 
 const (
 	clientIdentifier = "core" // Client identifier to advertise over the network
+	databaseIdentifier = "geth" // Client identifier to be used by the database
 )
 
 var (

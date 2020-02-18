@@ -105,6 +105,7 @@ func (t *Trie) TryGet(key []byte) ([]byte, error) {
 	return value, err
 }
 
+// tryGet can take a long time for nonexistent keys.
 func (t *Trie) tryGet(origNode node, key []byte, pos int) (value []byte, newnode node, didResolve bool, err error) {
 	switch n := (origNode).(type) {
 	case nil:

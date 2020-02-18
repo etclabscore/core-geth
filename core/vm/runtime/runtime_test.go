@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func TestDefaults(t *testing.T) {
@@ -201,4 +202,59 @@ func BenchmarkEVM_CREATE_1200(bench *testing.B) {
 func BenchmarkEVM_CREATE2_1200(bench *testing.B) {
 	// initcode size 1200K, repeatedly calls CREATE2 and then modifies the mem contents
 	benchmarkEVM_Create(bench, "5b5862124f80600080f5600152600056")
+}
+
+func benchmarkEVM_BalanceDNE(bench *testing.B, gas uint64) {
+	/*
+	0000  5b jumpdest      // sets a jump point at 0x00
+	0001  5a gas           // loads the value of the message gas remaining to the stack
+	0002  31 balance       // tries to get the balance from the address at the gas value (this is the slow part if the account doesnt exist)
+	0003  50 pop           // removes the balance from the stack because it isnt important
+	0004  60 push1 0x00    // puts 0x00 on the stack
+	0005  56 jump          // jumps to 0x00
+	 */
+	weis := common.Hex2Bytes(`5b5a3150600056`)
+
+	config := new(Config)
+	setDefaults(config)
+
+	st, _ := state.New(common.Hash{}, state.NewDatabase(rawdb.NewMemoryDatabase()))
+	config.State = st
+
+	config.GasLimit = gas
+
+	bench.ResetTimer()
+	for i := 0; i < bench.N; i++ {
+		//_, _, err := Execute(weis, nil, &Config{State:st})
+		Execute(weis, nil, config)
+		//if err != nil {
+		//	bench.Fatal(err)
+		//}
+	}
+	bench.StopTimer()
+}
+
+func BenchmarkEVM_BalanceDNE_Gas40(bench *testing.B) {
+	benchmarkEVM_BalanceDNE(bench, 40)
+}
+func BenchmarkEVM_BalanceDNE_Gas400(bench *testing.B) {
+	benchmarkEVM_BalanceDNE(bench, 400)
+}
+func BenchmarkEVM_BalanceDNE_Gas4000(bench *testing.B) {
+	benchmarkEVM_BalanceDNE(bench, 4000)
+}
+func BenchmarkEVM_BalanceDNE_Gas40000(bench *testing.B) {
+	benchmarkEVM_BalanceDNE(bench, 40000)
+}
+func BenchmarkEVM_BalanceDNE_Gas004Gwei(bench *testing.B) {
+	benchmarkEVM_BalanceDNE(bench, 4*vars.GWei/100) // => 13333966493 ns/op = 13.3 seconds
+}
+func BenchmarkEVM_BalanceDNE_Gas04Gwei(bench *testing.B) {
+	benchmarkEVM_BalanceDNE(bench, 4*vars.GWei/10) // => 13333966493 ns/op = 13.3 seconds
+}
+func BenchmarkEVM_BalanceDNE_Gas4Gwei(bench *testing.B) {
+	benchmarkEVM_BalanceDNE(bench, 4*vars.GWei) // => 13333966493 ns/op = 13.3 seconds
+}
+func BenchmarkEVM_BalanceDNE_Gas40Gwei(bench *testing.B) {
+	benchmarkEVM_BalanceDNE(bench, 40*vars.GWei) // => 13333966493 ns/op = 13.3 seconds
 }

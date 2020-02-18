@@ -62,6 +62,7 @@ type Trie interface {
 	// TryGet returns the value for key stored in the trie. The value bytes must
 	// not be modified by the caller. If a node was not found in the database, a
 	// trie.MissingNodeError is returned.
+	// $$$ balbad beep
 	TryGet(key []byte) ([]byte, error)
 
 	// TryUpdate associates key with value in the trie. If value has length zero, any

@@ -75,6 +75,7 @@ func (t *SecureTrie) Get(key []byte) []byte {
 // TryGet returns the value for key stored in the trie.
 // The value bytes must not be modified by the caller.
 // If a node was not found in the database, a MissingNodeError is returned.
+// $$$ beep
 func (t *SecureTrie) TryGet(key []byte) ([]byte, error) {
 	return t.trie.TryGet(t.hashKey(key))
 }

@@ -680,3 +680,39 @@ func TestDeleteCreateRevert(t *testing.T) {
 		t.Fatalf("self-destructed contract came alive")
 	}
 }
+
+func BenchmarkStateDB_GetBalance_Existing(bench *testing.B) {
+	state, _ := New(common.Hash{}, NewDatabase(rawdb.NewMemoryDatabase()))
+
+	accs := []string{"fah", "so", "lah", "tee", "doh"}
+	for _, a := range accs {
+		addr := toAddr([]byte(a))
+		state.SetBalance(addr, big.NewInt(1))
+	}
+	root, _ := state.Commit(false)
+	state.Reset(root)
+
+	for i := 0; i < bench.N; i++ {
+		for _, a := range accs {
+			state.GetBalance(toAddr([]byte(a)))
+		}
+	}
+}
+
+func BenchmarkStateDB_GetBalance_DNE(bench *testing.B) {
+	state, _ := New(common.Hash{}, NewDatabase(rawdb.NewMemoryDatabase()))
+
+	accs := []string{"fah", "so", "lah", "tee", "doh"}
+	//for _, a := range accs {
+	//	addr := toAddr([]byte(a))
+	//	state.SetBalance(addr, big.NewInt(1))
+	//}
+	root, _ := state.Commit(false)
+	state.Reset(root)
+
+	for i := 0; i < bench.N; i++ {
+		for _, a := range accs {
+			state.GetBalance(toAddr([]byte(a)))
+		}
+	}
+}

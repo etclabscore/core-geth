@@ -224,6 +224,7 @@ func (s *StateDB) Empty(addr common.Address) bool {
 
 // Retrieve the balance from the given address or 0 if object not found
 func (s *StateDB) GetBalance(addr common.Address) *big.Int {
+	// balbad beep $$$
 	stateObject := s.getStateObject(addr)
 	if stateObject != nil {
 		return stateObject.Balance()
@@ -454,9 +455,12 @@ func (s *StateDB) deleteStateObject(obj *stateObject) {
 // the object is not found or was deleted in this execution context. If you need
 // to differentiate between non-existent/just-deleted, use getDeletedStateObject.
 func (s *StateDB) getStateObject(addr common.Address) *stateObject {
+	//fmt.Println("Getting state object...")
+	//balbad beep $$$
 	if obj := s.getDeletedStateObject(addr); obj != nil && !obj.deleted {
 		return obj
 	}
+	//fmt.Println("Done getting state object.")
 	return nil
 }
 
@@ -474,6 +478,7 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 		defer func(start time.Time) { s.AccountReads += time.Since(start) }(time.Now())
 	}
 	// Load the object from the database
+	// balbad beep $$$
 	enc, err := s.trie.TryGet(addr[:])
 	if len(enc) == 0 {
 		s.setError(err)

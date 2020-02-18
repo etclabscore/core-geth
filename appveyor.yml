@@ -25,12 +25,12 @@ install:
 
 build_script:
   - go run build\ci.go install
-  - 7z a multi-geth-win64.zip .\build\bin\geth.exe
-  - ps: Get-FileHash multi-geth-win64.zip -Algorithm SHA256
-  - ps: Get-FileHash multi-geth-win64.zip -Algorithm SHA256 | Out-File multi-geth-win64.zip.sha256
-  - 7z a multi-geth-alltools-win64.zip .\build\bin\*
-  - ps: Get-FileHash multi-geth-alltools-win64.zip -Algorithm SHA256
-  - ps: Get-FileHash multi-geth-alltools-win64.zip | Out-File multi-geth-alltools-win64.zip.sha256
+  - 7z a core-geth-win64.zip .\build\bin\geth.exe
+  - ps: Get-FileHash core-geth-win64.zip -Algorithm SHA256
+  - ps: Get-FileHash core-geth-win64.zip -Algorithm SHA256 | Out-File core-geth-win64.zip.sha256
+  - 7z a core-geth-alltools-win64.zip .\build\bin\*
+  - ps: Get-FileHash core-geth-alltools-win64.zip -Algorithm SHA256
+  - ps: Get-FileHash core-geth-alltools-win64.zip | Out-File core-geth-alltools-win64.zip.sha256
 
 for:
   - branches:

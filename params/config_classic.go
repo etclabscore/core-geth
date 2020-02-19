@@ -69,10 +69,10 @@ var (
 		EIP2200FBlock: big.NewInt(10_500_839), // RePetersburg (=~ re-1283)
 
 		// ECIP-1078, aka Phoenix Fix
-		EIP2200DisableFBlock: big.NewInt(10_500_839),
-		EIP1283FBlock:        big.NewInt(10_500_839),
-		EIP1706FBlock:        big.NewInt(10_500_839),
-		ECIP1080FBlock:       big.NewInt(10_500_839),
+		EIP2200DisableFBlock: nil, // big.NewInt(10_500_839)
+		EIP1283FBlock:        nil, // big.NewInt(10_500_839)
+		EIP1706FBlock:        nil, // big.NewInt(10_500_839)
+		ECIP1080FBlock:       nil, // big.NewInt(10_500_839)
 
 		DisposalBlock:      big.NewInt(5900000),
 		ECIP1017FBlock:     big.NewInt(5000000),

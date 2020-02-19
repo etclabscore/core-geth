@@ -78,9 +78,10 @@ func TestECIP1086_ETCMainnet(t *testing.T) {
 
 	for _, f := range confp.Forks(etc) {
 		for _, ft := range []uint64{f - 1, f, f + 1} {
-			jt := instructionSetForConfig(etc, new(big.Int).SetUint64(ft))
-			if jt[SLOAD].constantGas == vars.SloadGasEIP2200 {
-				t.Error("bad gas")
+			head := new(big.Int).SetUint64(ft)
+			jt := instructionSetForConfig(etc, head)
+			if jt[SLOAD].constantGas == vars.SloadGasEIP2200 && etc.IsEnabled(etc.GetEIP2200DisableTransition, head) {
+				t.Errorf("wrong gas")
 			}
 		}
 	}

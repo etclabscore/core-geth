@@ -54,7 +54,7 @@ deploy:
   repository: etclabscore/core-geth
   artifact: /core-geth.*-win64\.zip.*/
   auth_token:
-    secure: 2ImMvNMj+kevxYhBcAzbqII4cGC/SIX1Kvp0yDwIOBveSr7n8FhX84o+XzOkY3cI
+    secure: tLl/Lbjrer4HCRxAUD/KHocjIsyRWuR7QeK5OCMVTv5lCF2IUKCT6h51nNW4hjOZ
   draft: true
   on:
     appveyor_repo_tag: true

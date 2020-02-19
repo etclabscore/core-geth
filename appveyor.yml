@@ -35,10 +35,7 @@ build_script:
 for:
   - branches:
       only:
-        - master
-        - /v\d*\.\d*\.\d*/
-        - /v\d*\.\d*\.\d*-beta\.\d*/
-        - release*
+        - /v\d*\.\d*\.\d*.*/
     artifacts:
       - path: '*core-geth*.zip'
         name: geth

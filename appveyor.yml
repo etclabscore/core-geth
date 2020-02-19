@@ -51,7 +51,7 @@ for:
 
 deploy:
   provider: GitHub
-  repository: etclabscore/multi-geth
+  repository: etclabscore/core-geth
   artifact: /core-geth.*-win64\.zip.*/
   auth_token:
     secure: 2ImMvNMj+kevxYhBcAzbqII4cGC/SIX1Kvp0yDwIOBveSr7n8FhX84o+XzOkY3cI

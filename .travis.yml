@@ -16,7 +16,7 @@ matrix:
       provider: releases
       api_key:
         secure: pGlbI2DRfTzdF75hkEwP5vMIpcP1iVEeW3W41DT1X+/GQPlgDN1DB/ocXtMbEId2vJCWgt1HfCSNb9F4NBI94TMamFJQPz4zy/VIXBClG1IGesloe159vU4PixrLBgeTTcuDJRx7X45JeKlHW9LN5ABxeEhYEzPj1De6P5NDePmbFNDvhOkaf5Spk0xGLumRzzf2SHk+w3au9RQM5gVUcgr5U81Qi/ys8aGCLtZ1T+avSoX9rFoB1/YGoHllJfMoNGJr5CLiBwnFGMY8SNfD7XruFptUjTe4D0sMNTgAbT8iDPbw9s5aa2ou2eFWsuGaa8v840kLF+J0dEW0L/y88YzzRbbK3Ve6qNvka8MZ26HLSry7JtAqT6QY0W+h2yMgOmJX6ehlCGg1PoZYVwTp4d0usE88CGa8kTSNlt6/OxVmvNU5E2TPCbiTxF1yI42RliE+r7FyX5TtvXvZmSzfrlZcJFn3amC02woe1Fs0GJWvscxdqyftuyIezpaRmkIrL0X+OzYjOLJA2CH6eUdJu0O52zSLg00UeXDd4y9dBgm8AWD1k5tuHQrqq2/tF7abz2XOtmt3cuL9XYOcbXm0lf88AiOEusDaWCoPNNBmvL8mJMCwLWdNsRGQO6NhdkzqH81njP86TCdpFQi7OJDgTobEuy+NXwRkx4B0620JssU=
-      file: multi-geth*-$TRAVIS_OS_NAME.*
+      file: core-geth*-$TRAVIS_OS_NAME.*
       file_glob: true
       draft: true
       on:
@@ -47,7 +47,7 @@ matrix:
       provider: releases
       api_key:
         secure: pGlbI2DRfTzdF75hkEwP5vMIpcP1iVEeW3W41DT1X+/GQPlgDN1DB/ocXtMbEId2vJCWgt1HfCSNb9F4NBI94TMamFJQPz4zy/VIXBClG1IGesloe159vU4PixrLBgeTTcuDJRx7X45JeKlHW9LN5ABxeEhYEzPj1De6P5NDePmbFNDvhOkaf5Spk0xGLumRzzf2SHk+w3au9RQM5gVUcgr5U81Qi/ys8aGCLtZ1T+avSoX9rFoB1/YGoHllJfMoNGJr5CLiBwnFGMY8SNfD7XruFptUjTe4D0sMNTgAbT8iDPbw9s5aa2ou2eFWsuGaa8v840kLF+J0dEW0L/y88YzzRbbK3Ve6qNvka8MZ26HLSry7JtAqT6QY0W+h2yMgOmJX6ehlCGg1PoZYVwTp4d0usE88CGa8kTSNlt6/OxVmvNU5E2TPCbiTxF1yI42RliE+r7FyX5TtvXvZmSzfrlZcJFn3amC02woe1Fs0GJWvscxdqyftuyIezpaRmkIrL0X+OzYjOLJA2CH6eUdJu0O52zSLg00UeXDd4y9dBgm8AWD1k5tuHQrqq2/tF7abz2XOtmt3cuL9XYOcbXm0lf88AiOEusDaWCoPNNBmvL8mJMCwLWdNsRGQO6NhdkzqH81njP86TCdpFQi7OJDgTobEuy+NXwRkx4B0620JssU=
-      file: multi-geth*-arm.*
+      file: core-geth*-arm.*
       file_glob: true
       draft: true
       on:
@@ -74,7 +74,7 @@ matrix:
       provider: releases
       api_key:
         secure: pGlbI2DRfTzdF75hkEwP5vMIpcP1iVEeW3W41DT1X+/GQPlgDN1DB/ocXtMbEId2vJCWgt1HfCSNb9F4NBI94TMamFJQPz4zy/VIXBClG1IGesloe159vU4PixrLBgeTTcuDJRx7X45JeKlHW9LN5ABxeEhYEzPj1De6P5NDePmbFNDvhOkaf5Spk0xGLumRzzf2SHk+w3au9RQM5gVUcgr5U81Qi/ys8aGCLtZ1T+avSoX9rFoB1/YGoHllJfMoNGJr5CLiBwnFGMY8SNfD7XruFptUjTe4D0sMNTgAbT8iDPbw9s5aa2ou2eFWsuGaa8v840kLF+J0dEW0L/y88YzzRbbK3Ve6qNvka8MZ26HLSry7JtAqT6QY0W+h2yMgOmJX6ehlCGg1PoZYVwTp4d0usE88CGa8kTSNlt6/OxVmvNU5E2TPCbiTxF1yI42RliE+r7FyX5TtvXvZmSzfrlZcJFn3amC02woe1Fs0GJWvscxdqyftuyIezpaRmkIrL0X+OzYjOLJA2CH6eUdJu0O52zSLg00UeXDd4y9dBgm8AWD1k5tuHQrqq2/tF7abz2XOtmt3cuL9XYOcbXm0lf88AiOEusDaWCoPNNBmvL8mJMCwLWdNsRGQO6NhdkzqH81njP86TCdpFQi7OJDgTobEuy+NXwRkx4B0620JssU=
-      file: multi-geth*-$TRAVIS_OS_NAME.*
+      file: core-geth*-$TRAVIS_OS_NAME.*
       file_glob: true
       draft: true
       on:

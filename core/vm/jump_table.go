@@ -189,7 +189,17 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 	if config.IsEnabled(config.GetECIP1080Transition, bn) {
 		enableSelfBalance(&instructionSet)
 	}
-	if config.IsEnabled(config.GetEIP2200Transition, bn) && !config.IsEnabled(config.GetEIP2200DisableTransition, bn) {
+
+	// EIP2200 was originally implemented incorrectly (not meeting specifications) by ethereum/go-ethereum, multi-geth, and Parity
+	// clients.
+	// ECIP1086 is a specification to allow this "bad" implementation, which is useful for ETC testnets Kotti and Mordor.
+	//
+	is2200enabled := config.IsEnabled(config.GetEIP2200Transition, bn) && !config.IsEnabled(config.GetEIP2200DisableTransition, bn)
+	if is2200enabled &&
+		config.IsEnabled(config.GetECIP1086Transition, bn) &&
+		!config.IsEnabled(config.GetEIP1884Transition, bn) {
+		enable2200Sloppy(&instructionSet)
+	} else if is2200enabled {
 		enable2200(&instructionSet) // Net metered SSTORE - https://eips.ethereum.org/EIPS/eip-2200
 	}
 	return instructionSet

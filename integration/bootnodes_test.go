@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/p2p/discover"
@@ -65,19 +66,20 @@ nodesloop:
 			t.Fatal(err)
 		}
 		for i := 1; i <= maxTrials; i++ {
+			start := time.Now()
 			err = disc.Ping(en)
 			if err == nil {
-				t.Logf("ping OK: enode=%s", en.String())
+				t.Logf("OK (RTT %v): enode=%s", time.Since(start), en.String())
 				continue nodesloop
 			}
 		}
 		// Max trial attempts were reached, all with errors.
-		t.Logf("ping FAIL (%d/%d): enode=%s err=%v", maxTrials, maxTrials, en.String(), err)
+		t.Logf("FAIL (%d/%d): enode=%s err=%v", maxTrials, maxTrials, en.String(), err)
 		failed++
 	}
 
 	okCount := total - failed
-	line := fmt.Sprintf("%.0f%% (%d / %d) nodes responded to ping (%d failed)", float64(okCount)/float64(total)*100, okCount, total, failed)
+	line := fmt.Sprintf("=> %.0f%% (%d / %d) nodes responded to ping [min pass rate = %.02f, max trials = %d]", float64(okCount)/float64(total)*100, okCount, total, minPassRate, maxTrials)
 	if okCount < int(minPassN) {
 		t.Error(line)
 	} else {

@@ -6,6 +6,17 @@ matrix:
   - os: linux
     dist: xenial
     go: 1.13.x
+    branches:
+      only:
+      - /test-bootnode-availability\/.*/
+    script:
+    - make test-bootnode-availability
+  - os: linux
+    dist: xenial
+    go: 1.13.x
+    branches:
+      except:
+        - /test-bootnode-availability\/.*/
     script:
     - go run build/ci.go install
     - travis_wait 60 go run build/ci.go test
@@ -28,6 +39,9 @@ matrix:
     dist: xenial
     sudo: required
     go: 1.13.x
+    branches:
+      except:
+        - /test-bootnode-availability\/.*/
     env:
       - ARMv5
     git:
@@ -57,6 +71,9 @@ matrix:
       tag_name: "$TRAVIS_TAG"
   - os: osx
     go: 1.13.x
+    branches:
+      except:
+        - /test-bootnode-availability\/.*/
     script:
     - echo "Increase the maximum number of open file descriptors on macOS"
     - NOFILE=20480

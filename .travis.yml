@@ -3,13 +3,13 @@ go_import_path: github.com/ethereum/go-ethereum
 sudo: false
 matrix:
   include:
-  - if: branch =~ ^test-bootnode-availability
+  - if: branch =~ ^ci-test-bootnode-availability
     os: linux
     dist: xenial
     go: 1.13.x
     script:
     - make test-bootnode-availability
-  - if: branch =~ /^((?!test-bootnode-availability).)*$/
+  - if: branch =~ /^((?!ci-test-bootnode-availability).)*$/
     os: linux
     dist: xenial
     go: 1.13.x
@@ -31,7 +31,7 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-  - if: branch =~ /^((?!test-bootnode-availability).)*$/
+  - if: branch =~ /^((?!ci-test-bootnode-availability).)*$/
     os: linux
     dist: xenial
     sudo: required
@@ -63,7 +63,7 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-  - if: branch =~ /^((?!test-bootnode-availability).)*$/
+  - if: branch =~ /^((?!ci-test-bootnode-availability).)*$/
     os: osx
     go: 1.13.x
     script:
@@ -91,7 +91,7 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-  - if: branch =~ /^((?!test-bootnode-availability).)*$/
+  - if: branch =~ /^((?!ci-test-bootnode-availability).)*$/
     os: linux
     dist: xenial
     go: 1.13.x

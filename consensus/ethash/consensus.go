@@ -309,7 +309,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	out := new(big.Int)
 
 	// ADJUSTMENT algorithms
-	if config.IsForked(config.GetEthashEIP100BTransition, next) {
+	if config.IsEnabled(config.GetEthashEIP100BTransition, next) {
 		// https://github.com/ethereum/EIPs/issues/100
 		// algorithm:
 		// diff = (parent_diff +
@@ -326,7 +326,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		out.Mul(parent_diff_over_dbd(parent), out)
 		out.Add(out, parent.Difficulty)
 
-	} else if config.IsForked(config.GetEthashEIP2Transition, next) {
+	} else if config.IsEnabled(config.GetEthashEIP2Transition, next) {
 		// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.md
 		// algorithm:
 		// diff = (parent_diff +
@@ -357,7 +357,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	// after adjustment and before bomb
 	out.Set(math.BigMax(out, vars.MinimumDifficulty))
 
-	if config.IsForked(config.GetEthashECIP1041Transition, next) {
+	if config.IsEnabled(config.GetEthashECIP1041Transition, next) {
 		return out
 	}
 
@@ -366,7 +366,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	// exPeriodRef the explosion clause's reference point
 	exPeriodRef := new(big.Int).Add(parent.Number, big1)
 
-	if config.IsForked(config.GetEthashECIP1010PauseTransition, next) {
+	if config.IsEnabled(config.GetEthashECIP1010PauseTransition, next) {
 		ecip1010Explosion(config, next, exPeriodRef)
 
 	} else if len(config.GetEthashDifficultyBombDelaySchedule()) > 0 {
@@ -383,7 +383,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 
-	} else if config.IsForked(config.GetEthashEIP2384Transition, next) {
+	} else if config.IsEnabled(config.GetEthashEIP2384Transition, next) {
 		// calcDifficultyEIP2384 is the difficulty adjustment algorithm for Muir Glacier.
 		// The calculation uses the Byzantium rules, but with bomb offset 9M.
 		fakeBlockNumber := new(big.Int)
@@ -393,7 +393,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 
-	} else if config.IsForked(config.GetEthashEIP1234Transition, next) {
+	} else if config.IsEnabled(config.GetEthashEIP1234Transition, next) {
 		// calcDifficultyEIP1234 is the difficulty adjustment algorithm for Constantinople.
 		// The calculation uses the Byzantium rules, but with bomb offset 5M.
 		// Specification EIP-1234: https://eips.ethereum.org/EIPS/eip-1234
@@ -409,7 +409,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 
-	} else if config.IsForked(config.GetEthashEIP649Transition, next) {
+	} else if config.IsEnabled(config.GetEthashEIP649Transition, next) {
 		// The calculation uses the Byzantium rules, with bomb offset of 3M.
 		// Specification EIP-649: https://eips.ethereum.org/EIPS/eip-649
 		// Related meta-ish EIP-669: https://github.com/ethereum/EIPs/pull/669
@@ -539,7 +539,7 @@ func (ethash *Ethash) Prepare(chain consensus.ChainReader, header *types.Header)
 func (ethash *Ethash) Finalize(chain consensus.ChainReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header) {
 	// Accumulate any block and uncle rewards and commit the final state root
 	accumulateRewards(chain.Config(), state, header, uncles)
-	header.Root = state.IntermediateRoot(chain.Config().IsForked(chain.Config().GetEIP161dTransition, header.Number))
+	header.Root = state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, header.Number))
 }
 
 // FinalizeAndAssemble implements consensus.Engine, accumulating the block and
@@ -547,7 +547,7 @@ func (ethash *Ethash) Finalize(chain consensus.ChainReader, header *types.Header
 func (ethash *Ethash) FinalizeAndAssemble(chain consensus.ChainReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt) (*types.Block, error) {
 	// Accumulate any block and uncle rewards and commit the final state root
 	accumulateRewards(chain.Config(), state, header, uncles)
-	header.Root = state.IntermediateRoot(chain.Config().IsForked(chain.Config().GetEIP161dTransition, header.Number))
+	header.Root = state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, header.Number))
 
 	// Header seems complete, assemble into a block and return
 	return types.NewBlock(header, txs, uncles, receipts), nil
@@ -586,7 +586,7 @@ var (
 // reward. The total reward consists of the static block reward and rewards for
 // included uncles. The coinbase of each uncle block is also rewarded.
 func accumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
-	if config.IsForked(config.GetEthashECIP1017Transition, header.Number) {
+	if config.IsEnabled(config.GetEthashECIP1017Transition, header.Number) {
 		ecip1017BlockReward(config, state, header, uncles)
 		return
 	}

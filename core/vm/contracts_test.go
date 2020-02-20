@@ -526,7 +526,7 @@ func TestIsPrecompiledContractEnabled(t *testing.T) {
 			common.BytesToAddress([]byte{3}): &ripemd160hash{},
 			common.BytesToAddress([]byte{4}): &dataCopy{},
 		}
-		if c.config.IsForked(c.config.GetEIP198Transition, c.blockNum) && c.config.IsForked(c.config.GetEIP212Transition, c.blockNum) && c.config.IsForked(c.config.GetEIP213Transition, c.blockNum) {
+		if c.config.IsEnabled(c.config.GetEIP198Transition, c.blockNum) && c.config.IsEnabled(c.config.GetEIP212Transition, c.blockNum) && c.config.IsEnabled(c.config.GetEIP213Transition, c.blockNum) {
 			precomps = map[common.Address]PrecompiledContract{
 				common.BytesToAddress([]byte{1}): &ecrecover{},
 				common.BytesToAddress([]byte{2}): &sha256hash{},

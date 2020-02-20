@@ -29,9 +29,9 @@ func EthashBlockReward(c ChainConfigurator, n *big.Int) *big.Int {
 		return blockReward
 	}
 
-	if c.IsForked(c.GetEthashEIP1234Transition, n) {
+	if c.IsEnabled(c.GetEthashEIP1234Transition, n) {
 		return vars.EIP1234FBlockReward
-	} else if c.IsForked(c.GetEthashEIP649Transition, n) {
+	} else if c.IsEnabled(c.GetEthashEIP649Transition, n) {
 		return vars.EIP649FBlockReward
 	} else if len(c.GetEthashBlockRewardSchedule()) > 0 {
 		// Because the map is not necessarily sorted low-high, we

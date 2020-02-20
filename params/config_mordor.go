@@ -65,6 +65,8 @@ var (
 		EIP2028FBlock: big.NewInt(778507),
 		EIP2200FBlock: big.NewInt(778507), // RePetersburg (== re-1283)
 
+		ECIP1086FBlock: big.NewInt(778507),
+
 		// ECIP-1078, aka Phoenix Fix
 		EIP2200DisableFBlock: big.NewInt(976_231),
 		EIP1283FBlock:        big.NewInt(976_231),

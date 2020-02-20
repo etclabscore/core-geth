@@ -58,11 +58,11 @@ func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int)
 	for k, v := range basePrecompiledContracts {
 		precompileds[k] = v
 	}
-	if config.IsForked(config.GetEIP198Transition, bn) {
+	if config.IsEnabled(config.GetEIP198Transition, bn) {
 		precompileds[common.BytesToAddress([]byte{5})] = &bigModExp{}
 	}
-	if config.IsForked(config.GetEIP213Transition, bn) {
-		if config.IsForked(config.GetEIP1108Transition, bn) {
+	if config.IsEnabled(config.GetEIP213Transition, bn) {
+		if config.IsEnabled(config.GetEIP1108Transition, bn) {
 			precompileds[common.BytesToAddress([]byte{6})] = &bn256AddIstanbul{}
 			precompileds[common.BytesToAddress([]byte{7})] = &bn256ScalarMulIstanbul{}
 		} else {
@@ -70,14 +70,14 @@ func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int)
 			precompileds[common.BytesToAddress([]byte{7})] = &bn256ScalarMulByzantium{}
 		}
 	}
-	if config.IsForked(config.GetEIP212Transition, bn) {
-		if config.IsForked(config.GetEIP1108Transition, bn) {
+	if config.IsEnabled(config.GetEIP212Transition, bn) {
+		if config.IsEnabled(config.GetEIP1108Transition, bn) {
 			precompileds[common.BytesToAddress([]byte{8})] = &bn256PairingIstanbul{}
 		} else {
 			precompileds[common.BytesToAddress([]byte{8})] = &bn256PairingByzantium{}
 		}
 	}
-	if config.IsForked(config.GetEIP152Transition, bn) {
+	if config.IsEnabled(config.GetEIP152Transition, bn) {
 		precompileds[common.BytesToAddress([]byte{9})] = &blake2F{}
 	}
 

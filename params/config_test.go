@@ -296,7 +296,7 @@ func TestCheckCompatible(t *testing.T) {
 
 func TestFoundationIsForked(t *testing.T) {
 	c := MainnetChainConfig
-	if !c.IsForked(c.GetEthashEIP2384Transition, big.NewInt(9200001)) {
+	if !c.IsEnabled(c.GetEthashEIP2384Transition, big.NewInt(9200001)) {
 		t.Fatal("nofork muir bad")
 	}
 }

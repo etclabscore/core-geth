@@ -239,7 +239,7 @@ func (e *NoRewardEngine) Finalize(chain consensus.ChainReader, header *types.Hea
 		e.inner.Finalize(chain, header, statedb, txs, uncles)
 	} else {
 		e.accumulateRewards(chain.Config(), statedb, header, uncles)
-		header.Root = statedb.IntermediateRoot(chain.Config().IsForked(chain.Config().GetEIP161dTransition, header.Number))
+		header.Root = statedb.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, header.Number))
 	}
 }
 
@@ -249,7 +249,7 @@ func (e *NoRewardEngine) FinalizeAndAssemble(chain consensus.ChainReader, header
 		return e.inner.FinalizeAndAssemble(chain, header, statedb, txs, uncles, receipts)
 	} else {
 		e.accumulateRewards(chain.Config(), statedb, header, uncles)
-		header.Root = statedb.IntermediateRoot(chain.Config().IsForked(chain.Config().GetEIP161dTransition, header.Number))
+		header.Root = statedb.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, header.Number))
 
 		// Header seems complete, assemble into a block and return
 		return types.NewBlock(header, txs, uncles, receipts), nil
@@ -488,7 +488,7 @@ func (api *RetestethAPI) mineBlock() error {
 	if err != nil {
 		return err
 	}
-	if api.chainConfig.IsForked(api.chainConfig.GetEthashEIP779Transition, header.Number) {
+	if api.chainConfig.IsEnabled(api.chainConfig.GetEthashEIP779Transition, header.Number) {
 		misc.ApplyDAOHardFork(statedb)
 	}
 	gasPool := new(core.GasPool).AddGas(header.GasLimit)
@@ -660,10 +660,10 @@ func (api *RetestethAPI) AccountRange(ctx context.Context,
 			}
 			// Ensure any modifications are committed to the state
 			// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-			root = statedb.IntermediateRoot(vmenv.ChainConfig().IsForked(vmenv.ChainConfig().GetEIP161dTransition, block.Number()))
+			root = statedb.IntermediateRoot(vmenv.ChainConfig().IsEnabled(vmenv.ChainConfig().GetEIP161dTransition, block.Number()))
 			if idx == int(txIndex) {
 				// This is to make sure root can be opened by OpenTrie
-				root, err = statedb.Commit(api.chainConfig.IsForked(api.chainConfig.GetEIP161dTransition, block.Number()))
+				root, err = statedb.Commit(api.chainConfig.IsEnabled(api.chainConfig.GetEIP161dTransition, block.Number()))
 				if err != nil {
 					return AccountRangeResult{}, err
 				}
@@ -770,10 +770,10 @@ func (api *RetestethAPI) StorageRangeAt(ctx context.Context,
 			}
 			// Ensure any modifications are committed to the state
 			// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-			_ = statedb.IntermediateRoot(vmenv.ChainConfig().IsForked(vmenv.ChainConfig().GetEIP161dTransition, block.Number()))
+			_ = statedb.IntermediateRoot(vmenv.ChainConfig().IsEnabled(vmenv.ChainConfig().GetEIP161dTransition, block.Number()))
 			if idx == int(txIndex) {
 				// This is to make sure root can be opened by OpenTrie
-				_, err = statedb.Commit(vmenv.ChainConfig().IsForked(vmenv.ChainConfig().GetEIP161dTransition, block.Number()))
+				_, err = statedb.Commit(vmenv.ChainConfig().IsEnabled(vmenv.ChainConfig().GetEIP161dTransition, block.Number()))
 				if err != nil {
 					return StorageRangeResult{}, err
 				}

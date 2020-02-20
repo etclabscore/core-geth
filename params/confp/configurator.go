@@ -108,7 +108,7 @@ func IsValid(conf ctypes.ChainConfigurator, head *uint64) *ConfigValidError {
 	// head-full logic
 	var bhead = new(big.Int).SetUint64(*head)
 
-	if conf.IsForked(conf.GetEIP155Transition, bhead) && conf.GetChainID() == nil {
+	if conf.IsEnabled(conf.GetEIP155Transition, bhead) && conf.GetChainID() == nil {
 		return NewValidErr("EIP155 requires ChainID. A:EIP155/B:ChainID", conf.GetEIP155Transition(), conf.GetChainID())
 	}
 
@@ -145,7 +145,7 @@ func compatible(head *uint64, a, b ctypes.ChainConfigurator) *ConfigCompatError 
 	if head == nil {
 		return nil
 	}
-	if a.IsForked(a.GetEIP155Transition, new(big.Int).SetUint64(*head)) {
+	if a.IsEnabled(a.GetEIP155Transition, new(big.Int).SetUint64(*head)) {
 		if a.GetChainID().Cmp(b.GetChainID()) != 0 {
 			return NewCompatError("mismatching chain ids after EIP155 transition", a.GetEIP155Transition(), b.GetEIP155Transition())
 		}

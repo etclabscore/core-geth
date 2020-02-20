@@ -3,14 +3,15 @@ go_import_path: github.com/ethereum/go-ethereum
 sudo: false
 matrix:
   include:
-  - if: branch =~ ^ci-test-bootnode-availability
+  - if: commit_message =~ ci:test-bootnode-availability
     os: linux
     dist: xenial
     go: 1.13.x
+    env:
+    - bootnode-availability
     script:
     - make test-bootnode-availability
-  - if: branch =~ /^((?!ci-test-bootnode-availability).)*$/
-    os: linux
+  - os: linux
     dist: xenial
     go: 1.13.x
     script:
@@ -31,8 +32,7 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-  - if: branch =~ /^((?!ci-test-bootnode-availability).)*$/
-    os: linux
+  - os: linux
     dist: xenial
     sudo: required
     go: 1.13.x
@@ -63,8 +63,7 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-  - if: branch =~ /^((?!ci-test-bootnode-availability).)*$/
-    os: osx
+  - os: osx
     go: 1.13.x
     script:
     - echo "Increase the maximum number of open file descriptors on macOS"
@@ -91,8 +90,7 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-  - if: branch =~ /^((?!ci-test-bootnode-availability).)*$/
-    os: linux
+  - os: linux
     dist: xenial
     go: 1.13.x
     env:

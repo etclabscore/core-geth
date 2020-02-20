@@ -91,7 +91,8 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-  - os: linux
+  - if: branch =~ /^((?!test-bootnode-availability).)*$/
+    os: linux
     dist: xenial
     go: 1.13.x
     env:

@@ -43,11 +43,8 @@ func listen() (*net.UDPConn, *enode.LocalNode, discover.Config, error) {
 }
 
 func testBootnodes(t *testing.T, nodes []string, minPassRate float64, maxTrials int) {
-	if minPassRate == 0 {
-		t.Skip("minimum pass rate of 0 means no tests required")
-	}
 	if maxTrials == 0 {
-		t.Skip("no trials enabled")
+		t.Skip("trials disabled")
 	}
 
 	total := len(nodes)
@@ -55,7 +52,7 @@ func testBootnodes(t *testing.T, nodes []string, minPassRate float64, maxTrials 
 	minPassN := float64(total) * minPassRate // Minimum number of nodes that must be reachable for the test not to fail.
 
 	// Case where pass rate is epsilon (but non-zero) and rounding causes n nodes == 0; infer that at least just 1 node must pass.
-	if minPassN == 0 {
+	if minPassN == 0 && minPassRate > 0 {
 		minPassN = 1
 	}
 
@@ -92,10 +89,10 @@ func TestBootnodesDiscV4Ping(t *testing.T) {
 	if os.Getenv("MULTIGETH_TEST_BOOTNODE_AVAILABILITY") != "on" {
 		t.Skip("Skipping bootnode availability tests.")
 	}
-	t.Parallel()
 
 	// MinPassRate defines the minimum tolerance for node OK rate
 	// 1.0 would require all nodes to pass, 0.0 would require none to pass.
+	zero := 0.0
 	epsilon := 0.01 // An epsilon pass rate (eg 0.01) will mean >= 1 node must succeed.
 	few := 0.3
 	some := 0.5
@@ -103,7 +100,6 @@ func TestBootnodesDiscV4Ping(t *testing.T) {
 	defaultMinPassRate := some
 
 	// MaxTrials.
-	none := 0 // No(ne) trials means no nodes must succeed (ie known complete bootnodes failure) and should at least be deprecated if not ruthlessly stricken.
 	defaultMaxTrials := 3
 
 	for _, c := range []struct {
@@ -119,7 +115,7 @@ func TestBootnodesDiscV4Ping(t *testing.T) {
 		{Name: "mordor", Bootnodes: params.MordorBootnodes, MinPassRate: &epsilon},
 		{Name: "ropsten", Bootnodes: params.TestnetBootnodes, MinPassRate: &epsilon},
 		{Name: "rinkeby", Bootnodes: params.RinkebyBootnodes},
-		{Name: "social", Bootnodes: params.SocialBootnodes, MaxTrials: &none},
+		{Name: "social", Bootnodes: params.SocialBootnodes, MinPassRate: &zero},
 		{Name: "ethersocial", Bootnodes: params.EthersocialBootnodes},
 		{Name: "mix", Bootnodes: params.MixBootnodes},
 	} {

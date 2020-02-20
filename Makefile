@@ -69,6 +69,9 @@ tests-generate-difficulty: ## Generate difficulty tests.
 	env MULTIGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
 	go run build/ci.go test -v ./tests -run TestDifficultyGen
 
+test-bootnode-availability: ## Test default bootnode reachability by ping.
+	env MULTIGETH_TEST_BOOTNODE_AVAILABILITY=on go test -v ./integration -run TestBootnodes
+
 lint: ## Run linters.
 	go run build/ci.go lint
 

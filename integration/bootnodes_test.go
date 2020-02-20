@@ -3,6 +3,7 @@ package integration
 import (
 	"fmt"
 	"net"
+	"os"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/crypto"
@@ -88,6 +89,9 @@ nodesloop:
 }
 
 func TestBootnodesDiscV4Ping(t *testing.T) {
+	if os.Getenv("MULTIGETH_TEST_BOOTNODE_AVAILABILITY") != "on" {
+		t.Skip("Skipping bootnode availability tests.")
+	}
 	t.Parallel()
 
 	// MinPassRate defines the minimum tolerance for node OK rate

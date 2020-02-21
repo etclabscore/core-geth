@@ -536,14 +536,6 @@ func (g Genesis) SetEIP1706Transition(n *uint64) error {
 	return g.Config.SetEIP1706Transition(n)
 }
 
-func (g Genesis) GetECIP1086Transition() *uint64 {
-	return g.Config.GetECIP1086Transition()
-}
-
-func (g Genesis) SetECIP1086Transition(n *uint64) error {
-	return g.Config.SetECIP1086Transition(n)
-}
-
 func (g *Genesis) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	return g.Config.IsEnabled(fn, n)
 }

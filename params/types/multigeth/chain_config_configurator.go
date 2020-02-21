@@ -372,15 +372,6 @@ func (c *MultiGethChainConfig) SetEIP1706Transition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetECIP1086Transition() *uint64 {
-	return bigNewU64(c.ECIP1086FBlock)
-}
-
-func (c *MultiGethChainConfig) SetECIP1086Transition(n *uint64) error {
-	c.ECIP1086FBlock = setBig(c.ECIP1086FBlock, n)
-	return nil
-}
-
 func (c *MultiGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

@@ -638,9 +638,9 @@ func TestBroadcastMalformedBlock(t *testing.T) {
 	var (
 		engine  = ethash.NewFaker()
 		db      = rawdb.NewMemoryDatabase()
-		config  = &params.ChainConfig{}
-		gspec   = &core.Genesis{Config: config}
-		genesis = gspec.MustCommit(db)
+		config  = &multigeth.MultiGethChainConfig{}
+		gspec   = &genesisT.Genesis{Config: config}
+		genesis = core.MustCommitGenesis(db, gspec)
 	)
 	blockchain, err := core.NewBlockChain(db, nil, config, engine, vm.Config{}, nil)
 	if err != nil {

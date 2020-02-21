@@ -71,6 +71,9 @@ func testBootnodes(t *testing.T, nodes []string, minPassRate float64, maxTrials 
 
 	disc := startV4(t)
 
+	// Log self enode. This lets a reader be able to know IP + port in case that's useful.
+	t.Logf("IAM enode=%s", disc.Self().String())
+
 	for _, n := range nodes {
 		en, err := enode.ParseV4(n)
 		if err != nil {

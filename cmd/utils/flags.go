@@ -1551,7 +1551,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 
 	// FIXME:meowsbits 		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.RinkebyGenesisHash])
 
-
 	if ctx.GlobalBool(DeveloperFlag.Name) {
 		cfg.NetworkId = 1337
 

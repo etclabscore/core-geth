@@ -8,6 +8,7 @@ run:
   skip-dirs-use-default: true
   skip-files:
     - core/genesis_alloc.go
+    - params/alloc.go
 
 linters:
   disable-all: true

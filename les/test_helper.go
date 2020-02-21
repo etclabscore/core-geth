@@ -39,6 +39,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/les/checkpointoracle"
 	"github.com/ethereum/go-ethereum/les/flowcontrol"
 	"github.com/ethereum/go-ethereum/light"
 	"github.com/ethereum/go-ethereum/p2p"
@@ -177,7 +178,7 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 			Alloc:    genesisT.GenesisAlloc{bankAddr: {Balance: bankFunds}},
 			GasLimit: 100000000,
 		}
-		oracle *checkpointOracle
+		oracle *checkpointoracle.CheckpointOracle
 	)
 	genesis := core.MustCommitGenesis(db, &gspec)
 	chain, _ := light.NewLightChain(odr, gspec.Config, engine, nil)
@@ -197,7 +198,7 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 				BloomRoot:    light.GetBloomTrieRoot(db, index, sectionHead),
 			}
 		}
-		oracle = newCheckpointOracle(checkpointConfig, getLocal)
+		oracle = checkpointoracle.New(checkpointConfig, getLocal)
 	}
 	client := &LightEthereum{
 		lesCommons: lesCommons{
@@ -221,7 +222,7 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 	client.handler = newClientHandler(ulcServers, ulcFraction, nil, client)
 
 	if client.oracle != nil {
-		client.oracle.start(backend)
+		client.oracle.Start(backend)
 	}
 	return client.handler
 }
@@ -233,7 +234,7 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 			Alloc:    genesisT.GenesisAlloc{bankAddr: {Balance: bankFunds}},
 			GasLimit: 100000000,
 		}
-		oracle *checkpointOracle
+		oracle *checkpointoracle.CheckpointOracle
 	)
 	genesis := core.MustCommitGenesis(db, &gspec)
 
@@ -260,7 +261,7 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 				BloomRoot:    light.GetBloomTrieRoot(db, index, sectionHead),
 			}
 		}
-		oracle = newCheckpointOracle(checkpointConfig, getLocal)
+		oracle = checkpointoracle.New(checkpointConfig, getLocal)
 	}
 	server := &LesServer{
 		lesCommons: lesCommons{
@@ -287,7 +288,7 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 	server.clientPool.setLimits(10000, 10000) // Assign enough capacity for clientpool
 	server.handler = newServerHandler(server, simulation.Blockchain(), db, txpool, func() bool { return true })
 	if server.oracle != nil {
-		server.oracle.start(simulation)
+		server.oracle.Start(simulation)
 	}
 	server.servingQueue.setThreads(4)
 	server.handler.start()

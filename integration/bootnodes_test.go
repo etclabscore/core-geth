@@ -43,7 +43,7 @@ func listen() (*net.UDPConn, *enode.LocalNode, discover.Config, error) {
 	return socket, ln, cfg, nil
 }
 
-func checkENodePing(disc *discover.UDPv4, en *enode.Node, maxTrials int) (time.Duration, tookTrials int, error) {
+func checkENodePing(disc *discover.UDPv4, en *enode.Node, maxTrials int) (time.Duration, int, error) {
 	var err error
 	for i := 1; i <= maxTrials; i++ {
 		start := time.Now()

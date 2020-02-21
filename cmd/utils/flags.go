@@ -1549,7 +1549,19 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		cfg.NetworkId = *cfg.Genesis.GetNetworkID()
 	}
 
-	// FIXME:meowsbits 		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.RinkebyGenesisHash])
+	// Set DNS discovery defaults for hard coded networks with DNS defaults.
+	switch {
+	case ctx.GlobalBool(TestnetFlag.Name):
+		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.TestnetGenesisHash])
+	case ctx.GlobalBool(RinkebyFlag.Name):
+		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.RinkebyGenesisHash])
+	case ctx.GlobalBool(GoerliFlag.Name):
+		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.GoerliGenesisHash])
+	default:
+		if cfg.NetworkId == 1 {
+			setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.MainnetGenesisHash])
+		}
+	}
 
 	if ctx.GlobalBool(DeveloperFlag.Name) {
 		cfg.NetworkId = 1337

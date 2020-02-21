@@ -43,6 +43,18 @@ func listen() (*net.UDPConn, *enode.LocalNode, discover.Config, error) {
 	return socket, ln, cfg, nil
 }
 
+func checkENodePing(disc *discover.UDPv4, en *enode.Node, maxTrials int) (time.Duration, tookTrials int, error) {
+	var err error
+	for i := 1; i <= maxTrials; i++ {
+		start := time.Now()
+		err = disc.Ping(en)
+		if err == nil {
+			return time.Since(start), i, nil
+		}
+	}
+	return 0, maxTrials, err
+}
+
 func testBootnodes(t *testing.T, nodes []string, minPassRate float64, maxTrials int) {
 	if maxTrials == 0 {
 		t.Skip("trials disabled")
@@ -59,27 +71,24 @@ func testBootnodes(t *testing.T, nodes []string, minPassRate float64, maxTrials 
 
 	disc := startV4(t)
 
-nodesloop:
 	for _, n := range nodes {
 		en, err := enode.ParseV4(n)
 		if err != nil {
 			t.Fatal(err)
 		}
-		for i := 1; i <= maxTrials; i++ {
-			start := time.Now()
-			err = disc.Ping(en)
-			if err == nil {
-				t.Logf("OK (RTT %v): enode=%s", time.Since(start), en.String())
-				continue nodesloop
-			}
+
+		took, trials, err := checkENodePing(disc, en, maxTrials)
+		if err == nil {
+			t.Logf("OK enode=%s rtt=%v", en.String(), took)
 		}
+
 		// Max trial attempts were reached, all with errors.
-		t.Logf("FAIL (%d/%d): enode=%s err=%v", maxTrials, maxTrials, en.String(), err)
+		t.Logf("FAIL enode=%s err=%v trials=%d/%d", en.String(), err, trials, maxTrials)
 		failed++
 	}
 
 	okCount := total - failed
-	line := fmt.Sprintf("=> %.0f%% (%d / %d) nodes responded to ping [min pass rate = %.02f, max trials = %d]", float64(okCount)/float64(total)*100, okCount, total, minPassRate, maxTrials)
+	line := fmt.Sprintf("%.0f%% (%d / %d) nodes responded to ping [min pass rate = %.02f, max trials = %d]", float64(okCount)/float64(total)*100, okCount, total, minPassRate, maxTrials)
 	if okCount < int(minPassN) {
 		t.Error(line)
 	} else {

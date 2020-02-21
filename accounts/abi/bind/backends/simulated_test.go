@@ -30,6 +30,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
@@ -108,7 +110,7 @@ func TestNewSimulatedBackend(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 	expectedBal := big.NewInt(10000000000)
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: expectedBal},
 		}, 10000000,
 	)
@@ -131,7 +133,7 @@ func TestNewSimulatedBackend(t *testing.T) {
 
 func TestSimulatedBackend_AdjustTime(t *testing.T) {
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{}, 10000000,
+		genesisT.GenesisAlloc{}, 10000000,
 	)
 	defer sim.Close()
 
@@ -151,7 +153,7 @@ func TestSimulatedBackend_BalanceAt(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 	expectedBal := big.NewInt(10000000000)
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: expectedBal},
 		}, 10000000,
 	)
@@ -170,7 +172,7 @@ func TestSimulatedBackend_BalanceAt(t *testing.T) {
 
 func TestSimulatedBackend_BlockByHash(t *testing.T) {
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{}, 10000000,
+		genesisT.GenesisAlloc{}, 10000000,
 	)
 	defer sim.Close()
 	bgCtx := context.Background()
@@ -191,7 +193,7 @@ func TestSimulatedBackend_BlockByHash(t *testing.T) {
 
 func TestSimulatedBackend_BlockByNumber(t *testing.T) {
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{}, 10000000,
+		genesisT.GenesisAlloc{}, 10000000,
 	)
 	defer sim.Close()
 	bgCtx := context.Background()
@@ -228,7 +230,7 @@ func TestSimulatedBackend_NonceAt(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000)},
 		}, 10000000,
 	)
@@ -272,7 +274,7 @@ func TestSimulatedBackend_SendTransaction(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000)},
 		}, 10000000,
 	)
@@ -307,7 +309,7 @@ func TestSimulatedBackend_TransactionByHash(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000)},
 		}, 10000000,
 	)
@@ -356,7 +358,7 @@ func TestSimulatedBackend_TransactionByHash(t *testing.T) {
 
 func TestSimulatedBackend_EstimateGas(t *testing.T) {
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{}, 10000000,
+		genesisT.GenesisAlloc{}, 10000000,
 	)
 	defer sim.Close()
 	bgCtx := context.Background()
@@ -381,7 +383,7 @@ func TestSimulatedBackend_HeaderByHash(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000)},
 		}, 10000000,
 	)
@@ -406,7 +408,7 @@ func TestSimulatedBackend_HeaderByNumber(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000)},
 		}, 10000000,
 	)
@@ -457,7 +459,7 @@ func TestSimulatedBackend_TransactionCount(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000)},
 		}, 10000000,
 	)
@@ -511,7 +513,7 @@ func TestSimulatedBackend_TransactionInBlock(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000)},
 		}, 10000000,
 	)
@@ -578,7 +580,7 @@ func TestSimulatedBackend_PendingNonceAt(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000)},
 		}, 10000000,
 	)
@@ -644,7 +646,7 @@ func TestSimulatedBackend_TransactionReceipt(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000)},
 		}, 10000000,
 	)
@@ -677,7 +679,7 @@ func TestSimulatedBackend_TransactionReceipt(t *testing.T) {
 
 func TestSimulatedBackend_SuggestGasPrice(t *testing.T) {
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{},
+		genesisT.GenesisAlloc{},
 		10000000,
 	)
 	defer sim.Close()
@@ -694,7 +696,7 @@ func TestSimulatedBackend_SuggestGasPrice(t *testing.T) {
 func TestSimulatedBackend_PendingCodeAt(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000)},
 		},
 		10000000,
@@ -735,7 +737,7 @@ func TestSimulatedBackend_PendingCodeAt(t *testing.T) {
 func TestSimulatedBackend_CodeAt(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000)},
 		},
 		10000000,
@@ -779,7 +781,7 @@ func TestSimulatedBackend_CodeAt(t *testing.T) {
 func TestSimulatedBackend_PendingAndCallContract(t *testing.T) {
 	testAddr := crypto.PubkeyToAddress(testKey.PublicKey)
 	sim := NewSimulatedBackend(
-		core.GenesisAlloc{
+		genesisT.GenesisAlloc{
 			testAddr: {Balance: big.NewInt(10000000000)},
 		},
 		10000000,

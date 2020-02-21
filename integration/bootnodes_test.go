@@ -83,6 +83,7 @@ func testBootnodes(t *testing.T, nodes []string, minPassRate float64, maxTrials 
 		took, trials, err := checkENodePing(disc, en, maxTrials)
 		if err == nil {
 			t.Logf("OK enode=%s rtt=%v", en.String(), took)
+			continue
 		}
 
 		// Max trial attempts were reached, all with errors.

@@ -36,7 +36,7 @@ type CheckpointOracle struct {
 }
 
 // NewCheckpointOracle binds checkpoint contract and returns a registrar instance.
-func NewCheckpointOracle(contractAddr common.Address, backend bind.ContractBackend) (*CheckpointOracle, error) {
+func NewCheckPointOracle(contractAddr common.Address, backend bind.ContractBackend) (*CheckpointOracle, error) {
 	c, err := contract.NewCheckpointOracle(contractAddr, backend)
 	if err != nil {
 		return nil, err

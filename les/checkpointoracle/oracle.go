@@ -43,7 +43,7 @@ type CheckpointOracle struct {
 }
 
 // New creates a checkpoint oracle handler with given configs and callback.
-func newCheckpointOracle(config *ctypes.CheckpointOracleConfig, getLocal func(uint64) ctypes.TrustedCheckpoint) *CheckpointOracle {
+func New(config *ctypes.CheckpointOracleConfig, getLocal func(uint64) ctypes.TrustedCheckpoint) *CheckpointOracle {
 	if config == nil {
 		log.Info("Checkpoint registrar is not enabled")
 		return nil
@@ -63,7 +63,7 @@ func newCheckpointOracle(config *ctypes.CheckpointOracleConfig, getLocal func(ui
 // Start binds the contract backend, initializes the oracle instance
 // and marks the status as available.
 func (oracle *CheckpointOracle) Start(backend bind.ContractBackend) {
-	contract, err := checkpointoracle.NewCheckpointOracle(oracle.config.Address, backend)
+	contract, err := checkpointoracle.NewCheckPointOracle(oracle.config.Address, backend)
 	if err != nil {
 		log.Error("Oracle contract binding failed", "err", err)
 		return

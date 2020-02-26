@@ -22,26 +22,26 @@ Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-
 
 Networks supported by the respective go-ethereum packaged `geth` client.
 
-| Ticker | Network/Client                        | core-geth                                       | [etclabscore/go-ethereum(Obsoleted)](https://github.com/etclabscore/core-geth) | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
-| ---    | ---                                   | ---                                              | ---                                                                           | ---                                                             |
-| ETH    | Ethereum (Foundation)                 | :heavy_check_mark:                               |                                                                               | :heavy_check_mark:                                              |
-| ETC    | Ethereum Classic                      | :heavy_check_mark:                               | :heavy_check_mark:                                                            |                                                                 |
-| ETSC   | Ethereum Social                       | :heavy_check_mark:                               |                                                                               |                                                                 |
-| ESN    | EtherSocial                           | :heavy_check_mark:                               |                                                                               |                                                                 |
-| MIX    | Mix                                   | :heavy_check_mark:                               |                                                                               |                                                                 |
-| EXP    | Expanse                               |                                                  |                                                                               |                                                                 |
-| ELLA   | Ellaism                               | :no_entry_sign:<sup>[1](#ellaism-footnote)</sup> |                                                                               |                                                                 |
-| MUSIC  | Musicoin                              | :heavy_check_mark:                               |                                                                               |                                                                 |
-|        | Mordor (Geth+Parity ETH PoW Testnet)  | :heavy_check_mark:                               | :heavy_check_mark:                                                            |                                                                 |
-|        | Morden (Geth+Parity ETH PoW Testnet)  |                                                  | :heavy_check_mark:                                                            |                                                                 |
-|        | Ropsten (Geth+Parity ETH PoW Testnet) | :heavy_check_mark:                               |                                                                               | :heavy_check_mark:                                              |
-|        | Rinkeby (Geth-only ETH PoA Testnet)   | :heavy_check_mark:                               |                                                                               | :heavy_check_mark:                                              |
-|        | Goerli (Geth+Parity ETH PoA Testnet)  | :heavy_check_mark:                               |                                                                               | :heavy_check_mark:                                              |
-|        | Kotti (Geth+Parity ETC PoA Testnet)   | :heavy_check_mark:                               |                                                                               |                                                                 |
-|        | Kovan (Parity-only ETH PoA Testnet)   |                                                  |                                                                               |                                                                 |
-|        | Tobalaba (EWF Testnet)                |                                                  |                                                                               |                                                                 |
-|        | Ephemeral development PoA network     | :heavy_check_mark:                               |                                                                               |                                                                 |
-|        | Private chains                        | :heavy_check_mark:                               | :heavy_check_mark:                                                            | :heavy_check_mark:                                              |
+| Ticker | Network/Client                        | core-geth                                        | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
+| ---    | ---                                   | ---                                              | ---                                                             |
+| ETH    | Ethereum (Foundation)                 | :heavy_check_mark:                               | :heavy_check_mark:                                              |
+| ETC    | Ethereum Classic                      | :heavy_check_mark:                               |                                                                 |
+| ETSC   | Ethereum Social                       | :heavy_check_mark:                               |                                                                 |
+| ESN    | EtherSocial                           | :heavy_check_mark:                               |                                                                 |
+| MIX    | Mix                                   | :heavy_check_mark:                               |                                                                 |
+| EXP    | Expanse                               |                                                  |                                                                 |
+| ELLA   | Ellaism                               | :no_entry_sign:<sup>[1](#ellaism-footnote)</sup> |                                                                 |
+| MUSIC  | Musicoin                              | :heavy_check_mark:                               |                                                                 |
+|        | Mordor (Geth+Parity ETH PoW Testnet)  | :heavy_check_mark:                               |                                                                 |
+|        | Morden (Geth+Parity ETH PoW Testnet)  |                                                  |                                                                 |
+|        | Ropsten (Geth+Parity ETH PoW Testnet) | :heavy_check_mark:                               | :heavy_check_mark:                                              |
+|        | Rinkeby (Geth-only ETH PoA Testnet)   | :heavy_check_mark:                               | :heavy_check_mark:                                              |
+|        | Goerli (Geth+Parity ETH PoA Testnet)  | :heavy_check_mark:                               | :heavy_check_mark:                                              |
+|        | Kotti (Geth+Parity ETC PoA Testnet)   | :heavy_check_mark:                               |                                                                 |
+|        | Kovan (Parity-only ETH PoA Testnet)   |                                                  |                                                                 |
+|        | Tobalaba (EWF Testnet)                |                                                  |                                                                 |
+|        | Ephemeral development PoA network     | :heavy_check_mark:                               |                                                                 |
+|        | Private chains                        | :heavy_check_mark:                               | :heavy_check_mark:                                              |
 
 <a name="ellaism-footnote">1</a>: This is originally an [Ellaism
 Project](https://github.com/ellaism). However, A [recent hard

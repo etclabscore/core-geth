@@ -117,6 +117,7 @@ func gasSStore(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySi
 			return vars.SstoreResetGas, nil
 		}
 	}
+
 	// The new gas metering is based on net gas costs (EIP-1283):
 	//
 	// 1. If current value equals new value (this is a no-op), 200 gas is deducted.

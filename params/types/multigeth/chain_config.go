@@ -169,6 +169,7 @@ type MultiGethChainConfig struct {
 	ECIP1017FBlock     *big.Int `json:"ecip1017FBlock,omitempty"`
 	ECIP1017EraRounds  *big.Int `json:"ecip1017EraRounds,omitempty"` // ECIP1017 era rounds
 	ECIP1080FBlock     *big.Int `json:"ecip1080FBlock,omitempty"`
+	ECIP1043FBlock     *big.Int `json:"ecip1043FBlock,omitempty"` // Ethash DAG limit 4GB
 
 	ECIP1086FBlock *big.Int `json:"ecip1086FBlock,omitempty"`
 

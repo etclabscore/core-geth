@@ -688,6 +688,14 @@ func (g *Genesis) SetEthashECIP1041Transition(n *uint64) error {
 	return g.Config.SetEthashECIP1041Transition(n)
 }
 
+func (g *Genesis) GetEthashECIP1043Transition() *uint64 {
+	return g.Config.GetEthashECIP1043Transition()
+}
+
+func (g *Genesis) SetEthashECIP1043Transition(n *uint64) error {
+	return g.Config.SetEthashECIP1043Transition(n)
+}
+
 func (g *Genesis) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	return g.Config.GetEthashDifficultyBombDelaySchedule()
 }

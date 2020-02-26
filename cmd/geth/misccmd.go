@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/eth"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -35,7 +36,7 @@ var (
 		Action:    utils.MigrateFlags(makecache),
 		Name:      "makecache",
 		Usage:     "Generate ethash verification cache (for testing)",
-		ArgsUsage: "<blockNum> <outputDir>",
+		ArgsUsage: "[flags] <blockNum> <outputDir>",
 		Category:  "MISCELLANEOUS COMMANDS",
 		Description: `
 The makecache command generates an ethash cache in <outputDir>.
@@ -43,12 +44,15 @@ The makecache command generates an ethash cache in <outputDir>.
 This command exists to support the system testing project.
 Regular users do not need to execute it.
 `,
+		Flags: []cli.Flag{
+			ethashDAGSizeStuntBlockFlag,
+		},
 	}
 	makedagCommand = cli.Command{
 		Action:    utils.MigrateFlags(makedag),
 		Name:      "makedag",
 		Usage:     "Generate ethash mining DAG (for testing)",
-		ArgsUsage: "<blockNum> <outputDir>",
+		ArgsUsage: "[flags] <blockNum> <outputDir>",
 		Category:  "MISCELLANEOUS COMMANDS",
 		Description: `
 The makedag command generates an ethash DAG in <outputDir>.
@@ -56,6 +60,9 @@ The makedag command generates an ethash DAG in <outputDir>.
 This command exists to support the system testing project.
 Regular users do not need to execute it.
 `,
+		Flags: []cli.Flag{
+			ethashDAGSizeStuntBlockFlag,
+		},
 	}
 	versionCommand = cli.Command{
 		Action:    utils.MigrateFlags(version),
@@ -76,6 +83,12 @@ The output of this command is supposed to be machine-readable.
 	}
 )
 
+var ethashDAGSizeStuntBlockFlag = cli.Int64Flag{
+	Name:  "size-stunt-block",
+	Usage: "Block at which Ethash DAG and/or cache size will be capped (zero is noop)",
+	Value: 0,
+}
+
 // makecache generates an ethash verification cache into the provided folder.
 func makecache(ctx *cli.Context) error {
 	args := ctx.Args()
@@ -86,7 +99,9 @@ func makecache(ctx *cli.Context) error {
 	if err != nil {
 		utils.Fatalf("Invalid block number: %v", err)
 	}
-	ethash.MakeCache(block, args[1])
+	stunt := uint64(ctx.Int64(ethashDAGSizeStuntBlockFlag.Name))
+	log.Info("flag values", ethashDAGSizeStuntBlockFlag.Name, stunt)
+	ethash.MakeCache(block, stunt, args[1])
 
 	return nil
 }
@@ -101,7 +116,9 @@ func makedag(ctx *cli.Context) error {
 	if err != nil {
 		utils.Fatalf("Invalid block number: %v", err)
 	}
-	ethash.MakeDataset(block, args[1])
+	stunt := uint64(ctx.Int64(ethashDAGSizeStuntBlockFlag.Name))
+	log.Info("flag values", ethashDAGSizeStuntBlockFlag.Name, stunt)
+	ethash.MakeDataset(block, stunt, args[1])
 
 	return nil
 }

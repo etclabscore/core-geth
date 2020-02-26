@@ -17,6 +17,7 @@
 package ethash
 
 import (
+	"fmt"
 	"io/ioutil"
 	"math/big"
 	"math/rand"
@@ -165,5 +166,106 @@ func TestClosedRemoteSealer(t *testing.T) {
 
 	if res := api.SubmitHashRate(hexutil.Uint64(100), common.HexToHash("a")); res {
 		t.Error("expect to return false when submit hashrate to a stopped ethash")
+	}
+}
+
+// TestPrintDAGandCacheSizes isn't really a test; it's a just development tool to print scheduled
+// DAG and cache sizes in human-readable form.
+func TestPrintDAGandCacheSizes(t *testing.T) {
+	logSizes := func(blockN uint64) {
+		datasetS := datasetSize(blockN)
+		cacheS := cacheSize(blockN)
+		t.Logf("block=%d / epoch=%d -> data=%d (bin=%s dec=%s) cache=%d (bin=%s dec=%s)", blockN, blockN/epochLength,
+			datasetS,
+			byteCountBinary(datasetS),
+			byteCountDecimal(datasetS),
+			cacheS,
+			byteCountBinary(cacheS),
+			byteCountDecimal(cacheS),
+		)
+	}
+	for _, n := range []uint64{0,1,2,3} {
+		logSizes(n*epochLength)
+	}
+	for n := uint64(500_000); n < 16_000_000; n += uint64(500_000) {
+		logSizes(n)
+	}
+}
+
+// https://programming.guide/go/formatting-byte-size-to-human-readable-format.html
+func byteCountDecimal(b uint64) string {
+	const unit = 1000
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB", float64(b)/float64(div), "kMGTPE"[exp])
+}
+
+// https://programming.guide/go/formatting-byte-size-to-human-readable-format.html
+func byteCountBinary(b uint64) string {
+	const unit = 1024
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %ciB", float64(b)/float64(div), "KMGTPE"[exp])
+}
+
+// TestGenerateSizeStuntLogic tests the logic that stunts the dataset and cache size growth by epoch.
+// It's a weak test because it just copy-pastes the logic and the logic is pretty simple logic anyways.
+// But at least an I-wrote-the-test-and-want-to-be-sane kind of thing.
+/*
+// generate ensures that the dataset content is generated before use.
+func (d *dataset) generate(dir string, limit int, test bool) {
+	d.once.Do(func() {
+		// Mark the dataset generated after we're done. This is needed for remote
+		defer atomic.StoreUint32(&d.done, 1)
+
+		// NOTE:ECIP1043
+		var epoch = d.epoch
+		if d.epochSizeStunt != 0 && d.epoch > d.epochSizeStunt {
+			epoch = d.epochSizeStunt
+		}
+		csize := cacheSize(epoch*epochLength + 1)
+		dsize := datasetSize(epoch*epochLength + 1)
+*/
+func TestGenerateSizeStuntLogic(t *testing.T) {
+	testDataSet := []struct {
+		epoch          uint64
+		epochSizeStunt uint64
+		wantSizeIndex  uint64
+	}{
+		{42, 40, 40},
+		{38, 40, 38},
+		{0, 0, 0},
+		{0, 40, 0},
+		{42, 0, 42},
+	}
+	for i, c := range testDataSet {
+
+		// Reiterate the logic from the functions *dataset.generate and *cache.generate
+		var epoch = c.epoch
+		if c.epochSizeStunt != 0 && c.epoch > c.epochSizeStunt {
+			epoch = c.epochSizeStunt
+		}
+		csize := cacheSize(epoch*epochLength + 1)
+		dsize := datasetSize(epoch*epochLength + 1)
+
+		// Make sure that the size fns returned with the expected values.
+		if csize != cacheSizes[c.wantSizeIndex] {
+			t.Error(i, "bad cache size", csize)
+		}
+		if dsize != datasetSizes[c.wantSizeIndex] {
+			t.Error(i, "bad dataset size", dsize)
+		}
 	}
 }

@@ -704,6 +704,18 @@ func (c *MultiGethChainConfig) SetEthashECIP1041Transition(n *uint64) error {
 	return nil
 }
 
+func (c *MultiGethChainConfig) GetEthashECIP1043Transition() *uint64 {
+	return bigNewU64(c.ECIP1043FBlock)
+}
+
+func (c *MultiGethChainConfig) SetEthashECIP1043Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	c.ECIP1043FBlock = setBig(c.ECIP1043FBlock, n)
+	return nil
+}
+
 func (c *MultiGethChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	return c.DifficultyBombDelaySchedule
 }

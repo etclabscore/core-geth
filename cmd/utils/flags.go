@@ -1733,6 +1733,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 	if err != nil {
 		Fatalf("%v", err)
 	}
+
 	var engine consensus.Engine
 	if config.GetConsensusEngineType().IsClique() {
 		engine = clique.New(&ctypes.CliqueConfig{
@@ -1742,6 +1743,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 	} else {
 		engine = ethash.NewFaker()
 		if !ctx.GlobalBool(FakePoWFlag.Name) {
+			// NOTE:ECIP1043
 			engine = ethash.New(ethash.Config{
 				CacheDir:       stack.ResolvePath(eth.DefaultConfig.Ethash.CacheDir),
 				CachesInMem:    eth.DefaultConfig.Ethash.CachesInMem,
@@ -1749,6 +1751,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 				DatasetDir:     stack.ResolvePath(eth.DefaultConfig.Ethash.DatasetDir),
 				DatasetsInMem:  eth.DefaultConfig.Ethash.DatasetsInMem,
 				DatasetsOnDisk: eth.DefaultConfig.Ethash.DatasetsOnDisk,
+				DAGStuntBlock:  config.GetEthashECIP1043Transition(),
 			}, nil, false)
 		}
 	}

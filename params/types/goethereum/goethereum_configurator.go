@@ -620,6 +620,20 @@ func (c *ChainConfig) SetEthashECIP1041Transition(i *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
+func (c *ChainConfig) GetEthashECIP1043Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEthashECIP1043Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
 func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	return nil
 }

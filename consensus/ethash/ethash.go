@@ -48,7 +48,7 @@ var (
 	two256 = new(big.Int).Exp(big.NewInt(2), big.NewInt(256), big.NewInt(0))
 
 	// sharedEthash is a full instance that can be shared between multiple users.
-	sharedEthash = New(Config{"", 3, 0, "", 1, 0, ModeNormal, nil}, nil, false)
+	sharedEthash = New(Config{"", 3, 0, "", 1, 0, ModeNormal, nil, nil}, nil, false)
 
 	// algorithmRevision is the data structure version used for file naming.
 	algorithmRevision = 23
@@ -148,7 +148,7 @@ func memoryMapAndGenerate(path string, size uint64, generator func(buffer []uint
 // lru tracks caches or datasets by their last use time, keeping at most N of them.
 type lru struct {
 	what string
-	new  func(epoch uint64) interface{}
+	new  func(epoch uint64, epochSizeStunt uint64) interface{}
 	mu   sync.Mutex
 	// Items are kept in a LRU cache, but there is a special case:
 	// We always keep an item for (highest seen epoch) + 1 as the 'future item'.
@@ -159,7 +159,7 @@ type lru struct {
 
 // newlru create a new least-recently-used cache for either the verification caches
 // or the mining datasets.
-func newlru(what string, maxItems int, new func(epoch uint64) interface{}) *lru {
+func newlru(what string, maxItems int, new func(epoch uint64, epochSizeStunt uint64) interface{}) *lru {
 	if maxItems <= 0 {
 		maxItems = 1
 	}
@@ -172,7 +172,7 @@ func newlru(what string, maxItems int, new func(epoch uint64) interface{}) *lru 
 // get retrieves or creates an item for the given epoch. The first return value is always
 // non-nil. The second return value is non-nil if lru thinks that an item will be useful in
 // the near future.
-func (lru *lru) get(epoch uint64) (item, future interface{}) {
+func (lru *lru) get(epoch uint64, epochSizeStunt uint64) (item, future interface{}) {
 	lru.mu.Lock()
 	defer lru.mu.Unlock()
 
@@ -183,14 +183,14 @@ func (lru *lru) get(epoch uint64) (item, future interface{}) {
 			item = lru.futureItem
 		} else {
 			log.Trace("Requiring new ethash "+lru.what, "epoch", epoch)
-			item = lru.new(epoch)
+			item = lru.new(epoch, epochSizeStunt)
 		}
 		lru.cache.Add(epoch, item)
 	}
 	// Update the 'future item' if epoch is larger than previously seen.
 	if epoch < maxEpoch-1 && lru.future < epoch+1 {
 		log.Trace("Requiring new future ethash "+lru.what, "epoch", epoch+1)
-		future = lru.new(epoch + 1)
+		future = lru.new(epoch+1, epochSizeStunt)
 		lru.future = epoch + 1
 		lru.futureItem = future
 	}
@@ -199,23 +199,30 @@ func (lru *lru) get(epoch uint64) (item, future interface{}) {
 
 // cache wraps an ethash cache with some metadata to allow easier concurrent use.
 type cache struct {
-	epoch uint64    // Epoch for which this cache is relevant
-	dump  *os.File  // File descriptor of the memory mapped cache
-	mmap  mmap.MMap // Memory map itself to unmap before releasing
-	cache []uint32  // The actual cache data content (may be memory mapped)
-	once  sync.Once // Ensures the cache is generated only once
+	epoch          uint64    // Epoch for which this cache is relevant
+	epochSizeStunt uint64    // Epoch at which the cache size plateaus
+	dump           *os.File  // File descriptor of the memory mapped cache
+	mmap           mmap.MMap // Memory map itself to unmap before releasing
+	cache          []uint32  // The actual cache data content (may be memory mapped)
+	once           sync.Once // Ensures the cache is generated only once
 }
 
 // newCache creates a new ethash verification cache and returns it as a plain Go
 // interface to be usable in an LRU cache.
-func newCache(epoch uint64) interface{} {
-	return &cache{epoch: epoch}
+func newCache(epoch, epochSizeStunt uint64) interface{} {
+	return &cache{epoch: epoch, epochSizeStunt: epochSizeStunt}
 }
 
 // generate ensures that the cache content is generated before use.
 func (c *cache) generate(dir string, limit int, test bool) {
 	c.once.Do(func() {
-		size := cacheSize(c.epoch*epochLength + 1)
+
+		var epoch = c.epoch
+		if c.epochSizeStunt != 0 && c.epoch > c.epochSizeStunt {
+			epoch = c.epochSizeStunt
+		}
+		size := cacheSize(epoch*epochLength + 1)
+
 		seed := seedHash(c.epoch*epochLength + 1)
 		if test {
 			size = 1024
@@ -275,18 +282,19 @@ func (c *cache) finalizer() {
 
 // dataset wraps an ethash dataset with some metadata to allow easier concurrent use.
 type dataset struct {
-	epoch   uint64    // Epoch for which this cache is relevant
-	dump    *os.File  // File descriptor of the memory mapped cache
-	mmap    mmap.MMap // Memory map itself to unmap before releasing
-	dataset []uint32  // The actual cache data content
-	once    sync.Once // Ensures the cache is generated only once
-	done    uint32    // Atomic flag to determine generation status
+	epoch          uint64    // Epoch for which this cache is relevant
+	epochSizeStunt uint64    // Epoch at which the dataset size plateaus
+	dump           *os.File  // File descriptor of the memory mapped cache
+	mmap           mmap.MMap // Memory map itself to unmap before releasing
+	dataset        []uint32  // The actual cache data content
+	once           sync.Once // Ensures the cache is generated only once
+	done           uint32    // Atomic flag to determine generation status
 }
 
 // newDataset creates a new ethash mining dataset and returns it as a plain Go
 // interface to be usable in an LRU cache.
-func newDataset(epoch uint64) interface{} {
-	return &dataset{epoch: epoch}
+func newDataset(epoch, epochSizeStunt uint64) interface{} {
+	return &dataset{epoch: epoch, epochSizeStunt: epochSizeStunt}
 }
 
 // generate ensures that the dataset content is generated before use.
@@ -295,8 +303,14 @@ func (d *dataset) generate(dir string, limit int, test bool) {
 		// Mark the dataset generated after we're done. This is needed for remote
 		defer atomic.StoreUint32(&d.done, 1)
 
-		csize := cacheSize(d.epoch*epochLength + 1)
-		dsize := datasetSize(d.epoch*epochLength + 1)
+		// NOTE:ECIP1043
+		var epoch = d.epoch
+		if d.epochSizeStunt != 0 && d.epoch > d.epochSizeStunt {
+			epoch = d.epochSizeStunt
+		}
+		csize := cacheSize(epoch*epochLength + 1)
+		dsize := datasetSize(epoch*epochLength + 1)
+
 		seed := seedHash(d.epoch*epochLength + 1)
 		if test {
 			csize = 1024
@@ -369,15 +383,16 @@ func (d *dataset) finalizer() {
 	}
 }
 
+// NOTE:ECIP1043
 // MakeCache generates a new ethash cache and optionally stores it to disk.
-func MakeCache(block uint64, dir string) {
-	c := cache{epoch: block / epochLength}
+func MakeCache(block, blockStunt uint64, dir string) {
+	c := cache{epoch: block / epochLength, epochSizeStunt: blockStunt / epochLength}
 	c.generate(dir, math.MaxInt32, false)
 }
 
 // MakeDataset generates a new ethash dataset and optionally stores it to disk.
-func MakeDataset(block uint64, dir string) {
-	d := dataset{epoch: block / epochLength}
+func MakeDataset(block, blockStunt uint64, dir string) {
+	d := dataset{epoch: block / epochLength, epochSizeStunt: blockStunt / epochLength}
 	d.generate(dir, math.MaxInt32, false)
 }
 
@@ -403,6 +418,13 @@ type Config struct {
 	PowMode        Mode
 
 	Log log.Logger `toml:"-"`
+
+	// DAGStuntBlock is the block at which DAG size as a function of epoch magnitude plateaus.
+	// All epochs larger than this value will return a DAG and cache size equivalent to the
+	// size yielded by the epoch corresponding to this block value.
+	// Note that this is configured as a BLOCK number value.
+	// Ethash.cache and Ethash.dataset methods are responsible for converting the BLOCK number into EPOCH.
+	DAGStuntBlock *uint64
 }
 
 // Ethash is a consensus engine based on proof-of-work implementing the ethash
@@ -446,6 +468,8 @@ func New(config Config, notify []string, noverify bool) *Ethash {
 	if config.DatasetDir != "" && config.DatasetsOnDisk > 0 {
 		config.Log.Info("Disk storage enabled for ethash DAGs", "dir", config.DatasetDir, "count", config.DatasetsOnDisk)
 	}
+
+	// NOTE:ECIP1043
 	ethash := &Ethash{
 		config:   config,
 		caches:   newlru("cache", config.CachesInMem, newCache),
@@ -460,6 +484,7 @@ func New(config Config, notify []string, noverify bool) *Ethash {
 // NewTester creates a small sized ethash PoW scheme useful only for testing
 // purposes.
 func NewTester(notify []string, noverify bool) *Ethash {
+	// NOTE:ECIP1043
 	ethash := &Ethash{
 		config:   Config{PowMode: ModeTest, Log: log.Root()},
 		caches:   newlru("cache", 1, newCache),
@@ -545,8 +570,14 @@ func (ethash *Ethash) Close() error {
 // stored on disk, and finally generating one if none can be found.
 func (ethash *Ethash) cache(block uint64) *cache {
 	epoch := block / epochLength
-	currentI, futureI := ethash.caches.get(epoch)
+	stuntBlock := uint64(0)
+	if s := ethash.config.DAGStuntBlock; s != nil {
+		stuntBlock = *s
+	}
+	currentI, futureI := ethash.caches.get(epoch, stuntBlock/epochLength)
 	current := currentI.(*cache)
+
+	// NOTE:ECIP1043
 
 	// Wait for generation finish.
 	current.generate(ethash.config.CacheDir, ethash.config.CachesOnDisk, ethash.config.PowMode == ModeTest)
@@ -568,8 +599,14 @@ func (ethash *Ethash) cache(block uint64) *cache {
 func (ethash *Ethash) dataset(block uint64, async bool) *dataset {
 	// Retrieve the requested ethash dataset
 	epoch := block / epochLength
-	currentI, futureI := ethash.datasets.get(epoch)
+	stuntBlock := uint64(0)
+	if s := ethash.config.DAGStuntBlock; s != nil {
+		stuntBlock = *s
+	}
+	currentI, futureI := ethash.datasets.get(epoch, stuntBlock/epochLength)
 	current := currentI.(*dataset)
+
+	// NOTE:ECIP1043
 
 	// If async is specified, generate everything in a background thread
 	if async && !current.generated() {

@@ -31,7 +31,6 @@ specs=(
 	"ropsten"
 
 	"classic"
-	"morden"
 	"mordor"
 	"kotti"
 

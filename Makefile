@@ -34,7 +34,7 @@ test: all
 	$(GORUN) build/ci.go test
 	go run build/ci.go test
 
-sync-clients:
+sync-parity-chainspecs:
 	./params/parity.json.d/sync-parity-remote.sh
 
 test-multigeth: test-multigeth-features test-multigeth-chainspecs ## Runs all tests specific to multi-geth.

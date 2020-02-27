@@ -1557,6 +1557,12 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.RinkebyGenesisHash])
 	case ctx.GlobalBool(GoerliFlag.Name):
 		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.GoerliGenesisHash])
+	case ctx.GlobalBool(ClassicFlag.Name):
+		setDNSDiscoveryDefaults(cfg, params.ClassicDNSNetwork1)
+	case ctx.GlobalBool(KottiFlag.Name):
+		setDNSDiscoveryDefaults(cfg, params.KottiDNSNetwork1)
+	case ctx.GlobalBool(MordorFlag.Name):
+		setDNSDiscoveryDefaults(cfg, params.MordorDNSNetwork1)
 	default:
 		if cfg.NetworkId == 1 {
 			setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.MainnetGenesisHash])

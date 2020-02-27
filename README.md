@@ -5,11 +5,11 @@
 [![OpenRPC](https://img.shields.io/static/v1.svg?label=OpenRPC&message=1.0.10&color=blue)](#openrpc-discovery)
 [![API Reference](
 https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/68747470733a2f2f676f646f632e6f72672f6769746875622e636f6d2f676f6c616e672f6764646f3f7374617475732e737667
-)](https://godoc.org/github.com/multi-geth/multi-geth)
+)](https://godoc.org/github.com/etclabscore/core-geth)
 [![Go Report Card](https://goreportcard.com/badge/github.com/etclabscore/core-geth)](https://goreportcard.com/report/github.com/etclabscore/core-geth)
 [![Travis](https://travis-ci.org/etclabscore/core-geth.svg?branch=master)](https://travis-ci.org/etclabscore/core-geth)
-[![Gitter](https://badges.gitter.im/multi-geth/community.svg)](https://gitter.im/multi-geth/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![Code Shelter](https://www.codeshelter.co/static/badges/badge-flat.svg)](https://www.codeshelter.co/)
+[![Gitter](https://badges.gitter.im/core-geth/community.svg)](https://gitter.im/core-geth/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 
 Binary archives are published at https://github.com/etclabscore/core-geth/releases.
 
@@ -22,26 +22,26 @@ Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-
 
 Networks supported by the respective go-ethereum packaged `geth` client.
 
-| Ticker | Network/Client                        | multi-geth                                       | [etclabscore/go-ethereum](https://github.com/etclabscore/go-ethereum) | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
-| ---    | ---                                   | ---                                              | ---                                                                           | ---                                                             |
-| ETH    | Ethereum (Foundation)                 | :heavy_check_mark:                               |                                                                               | :heavy_check_mark:                                              |
-| ETC    | Ethereum Classic                      | :heavy_check_mark:                               | :heavy_check_mark:                                                            |                                                                 |
-| ETSC   | Ethereum Social                       | :heavy_check_mark:                               |                                                                               |                                                                 |
-| ESN    | EtherSocial                           | :heavy_check_mark:                               |                                                                               |                                                                 |
-| MIX    | Mix                                   | :heavy_check_mark:                               |                                                                               |                                                                 |
-| EXP    | Expanse                               |                                                  |                                                                               |                                                                 |
-| ELLA   | Ellaism                               | :no_entry_sign:<sup>[1](#ellaism-footnote)</sup> |                                                                               |                                                                 |
-| MUSIC  | Musicoin                              | :heavy_check_mark:                               |                                                                               |                                                                 |
-|        | Mordor (Geth+Parity ETH PoW Testnet)  | :heavy_check_mark:                               | :heavy_check_mark:                                                            |                                                                 |
-|        | Morden (Geth+Parity ETH PoW Testnet)  |                                                  | :heavy_check_mark:                                                            |                                                                 |
-|        | Ropsten (Geth+Parity ETH PoW Testnet) | :heavy_check_mark:                               |                                                                               | :heavy_check_mark:                                              |
-|        | Rinkeby (Geth-only ETH PoA Testnet)   | :heavy_check_mark:                               |                                                                               | :heavy_check_mark:                                              |
-|        | Goerli (Geth+Parity ETH PoA Testnet)  | :heavy_check_mark:                               |                                                                               | :heavy_check_mark:                                              |
-|        | Kotti (Geth+Parity ETC PoA Testnet)   | :heavy_check_mark:                               |                                                                               |                                                                 |
-|        | Kovan (Parity-only ETH PoA Testnet)   |                                                  |                                                                               |                                                                 |
-|        | Tobalaba (EWF Testnet)                |                                                  |                                                                               |                                                                 |
-|        | Ephemeral development PoA network     | :heavy_check_mark:                               |                                                                               |                                                                 |
-|        | Private chains                        | :heavy_check_mark:                               | :heavy_check_mark:                                                            | :heavy_check_mark:                                              |
+| Ticker | Network/Client                        | core-geth                                        | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
+| ---    | ---                                   | ---                                              | ---                                                             |
+| ETH    | Ethereum (Foundation)                 | :heavy_check_mark:                               | :heavy_check_mark:                                              |
+| ETC    | Ethereum Classic                      | :heavy_check_mark:                               |                                                                 |
+| ETSC   | Ethereum Social                       | :heavy_check_mark:                               |                                                                 |
+| ESN    | EtherSocial                           | :heavy_check_mark:                               |                                                                 |
+| MIX    | Mix                                   | :heavy_check_mark:                               |                                                                 |
+| EXP    | Expanse                               |                                                  |                                                                 |
+| ELLA   | Ellaism                               | :no_entry_sign:<sup>[1](#ellaism-footnote)</sup> |                                                                 |
+| MUSIC  | Musicoin                              | :heavy_check_mark:                               |                                                                 |
+|        | Mordor (Geth+Parity ETH PoW Testnet)  | :heavy_check_mark:                               |                                                                 |
+|        | Morden (Geth+Parity ETH PoW Testnet)  |                                                  |                                                                 |
+|        | Ropsten (Geth+Parity ETH PoW Testnet) | :heavy_check_mark:                               | :heavy_check_mark:                                              |
+|        | Rinkeby (Geth-only ETH PoA Testnet)   | :heavy_check_mark:                               | :heavy_check_mark:                                              |
+|        | Goerli (Geth+Parity ETH PoA Testnet)  | :heavy_check_mark:                               | :heavy_check_mark:                                              |
+|        | Kotti (Geth+Parity ETC PoA Testnet)   | :heavy_check_mark:                               |                                                                 |
+|        | Kovan (Parity-only ETH PoA Testnet)   |                                                  |                                                                 |
+|        | Tobalaba (EWF Testnet)                |                                                  |                                                                 |
+|        | Ephemeral development PoA network     | :heavy_check_mark:                               |                                                                 |
+|        | Private chains                        | :heavy_check_mark:                               | :heavy_check_mark:                                              |
 
 <a name="ellaism-footnote">1</a>: This is originally an [Ellaism
 Project](https://github.com/ellaism). However, A [recent hard
@@ -52,7 +52,7 @@ Ellaism users are asked to switch to
 
 ## Managing versions
 
-`multi-geth` is a fork of [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum), but build dependencies have been upgraded to use [Go modules](https://github.com/golang/go/wiki/Modules).
+`core-geth` is a fork of [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum), but build dependencies have been upgraded to use [Go modules](https://github.com/golang/go/wiki/Modules).
 You can clone it anywhere in your filesystem (either inside or outside of `$GOPATH`).
 
 ## Building the source
@@ -104,7 +104,7 @@ particular use-case the user doesn't care about years-old historical data, so we
 fast-sync quickly to the current state of the network. To do so:
 
 ```
-$ geth [|--classic|--social|--ethersocial|--mix|--music|--testnet|--rinkeby|--kotti|--goerli] console
+$ geth [|--classic|--social|--ethersocial|--mix|--music|--testnet|--rinkeby|--kotti|--goerli|--mordor] console
 ```
 
 This command will:
@@ -247,7 +247,7 @@ APIs!**
 
 ### OpenRPC Discovery
 
-MultiGeth supports [OpenRPC's Service Discovery method](https://spec.open-rpc.org/#service-discovery-method), enabling efficient and well-spec'd JSON RPC interfacing and tooling. This method follows the established JSON RPC patterns, and is accessible via HTTP, WebSocket, IPC, and console servers. To use this method:
+CoreGeth supports [OpenRPC's Service Discovery method](https://spec.open-rpc.org/#service-discovery-method), enabling efficient and well-spec'd JSON RPC interfacing and tooling. This method follows the established JSON RPC patterns, and is accessible via HTTP, WebSocket, IPC, and console servers. To use this method:
 ```shell
 $ curl -X POST -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","method":"rpc.discover","params":[],"id":1}'
 {                                                                                                                                                         
@@ -402,7 +402,7 @@ transactions are accepted at (`--gasprice`).
 Thank you for considering to help out with the source code! We welcome contributions
 from anyone on the internet, and are grateful for even the smallest of fixes!
 
-If you'd like to contribute to go-ethereum, please fork, fix, commit and send a pull request
+If you'd like to contribute to core-geth, please fork, fix, commit and send a pull request
 for the maintainers to review and merge into the main code base. If you wish to submit
 more complex changes though, please check up with the core devs first on [our gitter channel](https://gitter.im/ethereum/go-ethereum)
 to ensure those changes are in line with the general philosophy of the project and/or get
@@ -425,11 +425,11 @@ testing procedures.
 
 ## License
 
-The go-ethereum library (i.e. all code outside of the `cmd` directory) is licensed under the
+The core-geth library (i.e. all code outside of the `cmd` directory) is licensed under the
 [GNU Lesser General Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.en.html),
 also included in our repository in the `COPYING.LESSER` file.
 
-The go-ethereum binaries (i.e. all code inside of the `cmd` directory) is licensed under the
+The core-geth binaries (i.e. all code inside of the `cmd` directory) is licensed under the
 [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html), also
 included in our repository in the `COPYING` file.
 

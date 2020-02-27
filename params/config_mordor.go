@@ -56,20 +56,14 @@ var (
 		EIP1014FBlock: big.NewInt(301243),
 		EIP1052FBlock: big.NewInt(301243),
 
-		// Istanbul eq, aka Aztlan
-		// ECIP-1061
-		EIP152FBlock:  big.NewInt(778507),
-		EIP1108FBlock: big.NewInt(778507),
-		EIP1344FBlock: big.NewInt(778507),
-		EIP1884FBlock: nil,
-		EIP2028FBlock: big.NewInt(778507),
-		EIP2200FBlock: big.NewInt(778507), // RePetersburg (== re-1283)
-
-		// ECIP-1078, aka Phoenix Fix
-		EIP2200DisableFBlock: big.NewInt(976_231),
-		EIP1283FBlock:        big.NewInt(976_231),
-		EIP1706FBlock:        big.NewInt(976_231),
-		ECIP1080FBlock:       big.NewInt(976_231),
+		// Istanbul eq, aka Phoenix
+		// ECIP-1088
+		EIP152FBlock:  big.NewInt(839_246),
+		EIP1108FBlock: big.NewInt(839_246),
+		EIP1344FBlock: big.NewInt(839_246),
+		EIP1884FBlock: big.NewInt(839_246),
+		EIP2028FBlock: big.NewInt(839_246),
+		EIP2200FBlock: big.NewInt(839_246), // RePetersburg (== re-1283)
 
 		DisposalBlock:      big.NewInt(0),
 		ECIP1017FBlock:     big.NewInt(0),

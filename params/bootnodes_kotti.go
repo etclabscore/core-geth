@@ -24,3 +24,5 @@ var KottiBootnodes = []string{
 	"enode://e8a786a894db053fe6886e283fc4385389ad034e04a692a26335f30b714059efd5cead0e410ecd783ce095888fdafcc21a685f13501594e969d6f5ac7ba0388c@86.103.236.55:63384",
 	"enode://a59e33ccd2b3e52d578f1fbd70c6f9babda2650f0760d6ff3b37742fdcdfdb3defba5d56d315b40c46b70198c7621e63ffa3f987389c7118634b0fefbbdfa7fd@51.158.191.43:37956", // soc1c
 }
+
+var KottiDNSNetwork1 = dnsPrefixETC + "all.kotti.blockd.info"

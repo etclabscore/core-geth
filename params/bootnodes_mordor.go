@@ -45,3 +45,5 @@ var MordorBootnodes = []string{
 	"enode://0fade975875f77237de433cba75893a09264e370d7c4d81a0a269d94ad01d9ebf6056f4d690e82f4fa636f02fee94b0393f6994919bb4cb275b26de352d40517@84.160.87.178:60648",
 	"enode://642cf9650dd8869d42525dbf6858012e3b4d64f475e733847ab6f7742341a4397414865d953874e8f5ed91b0e4e1c533dee14ad1d6bb276a5459b2471460ff0d@157.230.152.87:30303", // @meowsbits but don't count on it
 }
+
+var MordorDNSNetwork1 = dnsPrefixETC + "all.mordor.blockd.info"

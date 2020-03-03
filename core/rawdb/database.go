@@ -177,7 +177,7 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 		return nil
 	}
 
-	truncateKVtoAncient := func(freezerdb *freezer, ddb ethdb.KeyValueStore) {
+	truncateKVtoFreezer := func(freezerdb *freezer, ddb ethdb.KeyValueStore) {
 		hhh := ReadHeadHeaderHash(ddb)
 		n := *ReadHeaderNumber(ddb, hhh)
 		frozen, _ := freezerdb.Ancients()
@@ -252,7 +252,7 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 
 		log.Warn("Freezer repair OK")
 
-		truncateKVtoAncient(frdb, db)
+		truncateKVtoFreezer(frdb, db)
 
 		// Re-validate the ancient/kv dbs.
 		// If still a gap, try removing the kv data back to the ancient level.

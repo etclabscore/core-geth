@@ -180,7 +180,7 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 	validateErr := validateFreezerVsKV(frdb, db)
 	if validateErr != nil {
 
-		log.Warn("New freezer db got validation error, attempting freezer repair", "error", validateErr)
+		log.Warn("Freezer/KV validation error, attempting freezer repair", "error", validateErr)
 		if reperr := frdb.repair(); reperr != nil {
 			log.Warn("Freezer repair errored", "error", reperr)
 

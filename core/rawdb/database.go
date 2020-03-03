@@ -396,27 +396,21 @@ func truncateKVtoFreezer(freezerdb *freezer, db ethdb.KeyValueStore) {
 	n := *ReadHeaderNumber(db, hhh)
 	frozen, _ := freezerdb.Ancients()
 
-	headHeader, headHeaderHash := func() uint64 {
-		if n := ReadHeaderNumber(db, ReadHeadHeaderHash(db)); n == nil {
+	normalize := func(n *uint64) uint64 {
+		if n == nil {
 			return 0
-		} else {
-			return *n
 		}
-	}(), ReadHeadHeaderHash(db)
-	headFast, headFastHash := func() uint64 {
-		if n := ReadHeaderNumber(db, ReadHeadFastBlockHash(db)); n == nil {
-			return 0
-		} else {
-			return *n
-		}
-	}(), ReadHeadFastBlockHash(db)
-	headFull, headFullHash := func() uint64 {
-		if n := ReadHeaderNumber(db, ReadHeadBlockHash(db)); n == nil {
-			return 0
-		} else {
-			return *n
-		}
-	}(), ReadHeadBlockHash(db)
+		return *n
+	}
+
+	headHeaderHash := ReadHeadHeaderHash(db)
+	headHeader := normalize(ReadHeaderNumber(db, headHeaderHash))
+
+	headFastHash := ReadHeadFastBlockHash(db)
+	headFast := normalize(ReadHeaderNumber(db, headFastHash))
+
+	headFullHash := ReadHeadBlockHash(db)
+	headFull := normalize(ReadHeaderNumber(db, headFullHash))
 
 	log.Warn("Head header", "number", headHeader, "hash", headHeaderHash)
 	log.Warn("Head fast", "number", headFast, "hash", headFastHash)
@@ -424,15 +418,13 @@ func truncateKVtoFreezer(freezerdb *freezer, db ethdb.KeyValueStore) {
 
 	log.Warn("Persistent Freezer/KV gap: Truncating KV database to freezer height", "ancients", frozen, "kv.head_header_number", n, "kv.head_header_hash", hhh)
 
-	for ; n > frozen-1; n-- {
-		if n != 0 {
-			for _, hash := range ReadAllHashes(db, n) {
-				if n%10000 == 0 {
-					log.Warn("Removing KV block data", "n", n, "hash", hash.String())
-				}
-				DeleteBlock(db, hash, n)
-				DeleteCanonicalHash(db, n)
+	for ; n > frozen-1 && n != 0; n-- {
+		for _, hash := range ReadAllHashes(db, n) {
+			if n%10000 == 0 {
+				log.Warn("Removing KV block data", "n", n, "hash", hash.String())
 			}
+			DeleteBlock(db, hash, n)
+			DeleteCanonicalHash(db, n)
 		}
 	}
 	log.Warn("Finished KV truncation")

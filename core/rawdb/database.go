@@ -193,42 +193,46 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 		// Re-validate the ancient/kv dbs.
 		// If still a gap, try removing the kv data back to the ancient level.
 		validateErr = validateFreezerVsKV(frdb, db)
-		if validateErr != nil && strings.Contains(validateErr.Error(), "gap") {
+	}
 
-			hhh := ReadHeadHeaderHash(db)
-			n := *ReadHeaderNumber(db, hhh)
-			frozen, _ := frdb.Ancients()
+	if validateErr != nil && strings.Contains(validateErr.Error(), "gap") {
 
-			log.Warn("Persistent KV/Freezer gap: Truncating KV database to freezer height", "ancients", frozen, "kv.head_header_number", n, "kv.head_header_hash", hhh)
+		hhh := ReadHeadHeaderHash(db)
+		n := *ReadHeaderNumber(db, hhh)
+		frozen, _ := frdb.Ancients()
 
-			for ; n > frozen-1; n-- {
-				if n != 0 {
-					for _, hash := range ReadAllHashes(db, n) {
-						if n%10000 == 0 {
-							log.Warn("Removing KV block data", "n", n, "hash", hash.String())
-						}
-						DeleteBlock(db, hash, n)
+		log.Warn("Persistent KV/Freezer gap: Truncating KV database to freezer height", "ancients", frozen, "kv.head_header_number", n, "kv.head_header_hash", hhh)
+
+		for ; n > frozen-1; n-- {
+			if n != 0 {
+				for _, hash := range ReadAllHashes(db, n) {
+					if n%10000 == 0 {
+						log.Warn("Removing KV block data", "n", n, "hash", hash.String())
 					}
+					DeleteBlock(db, hash, n)
 				}
 			}
-
-			log.Warn("Finished KV truncation")
-
-			data, _ := frdb.Ancient(freezerHashTable, n)
-			h := common.BytesToHash(data)
-
-			log.Warn("Writing KV head header", "hash", h.String())
-			WriteHeadHeaderHash(db, h)
-
-			// Re-validate again.
-			if validateErr2 := validateFreezerVsKV(frdb, db); validateErr2 != nil {
-				// If this fails, there's nothing left for us to do.
-				log.Warn("KV truncation failed to resuscitate kv/freezer db gap.")
-				return nil, validateErr2
-			}
-		} else if validateErr != nil {
-			return nil, validateErr
 		}
+
+		log.Warn("Finished KV truncation")
+
+		data, _ := frdb.Ancient(freezerHashTable, n)
+		h := common.BytesToHash(data)
+
+		log.Warn("Writing KV head header", "hash", h.String())
+		WriteHeadHeaderHash(db, h)
+
+		// Re-validate again.
+		validateErr = validateFreezerVsKV(frdb, db)
+
+	} else if validateErr != nil {
+		return nil, validateErr
+	}
+
+	if validateErr != nil {
+		// If this fails, there's nothing left for us to do.
+		log.Warn("KV truncation failed to resuscitate kv/freezer db gap.")
+		return nil, validateErr
 	}
 
 	// Freezer is consistent with the key-value database, permit combining the two

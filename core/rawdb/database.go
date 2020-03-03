@@ -210,6 +210,7 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 						log.Warn("Removing KV block data", "n", n, "hash", hash.String())
 					}
 					DeleteBlock(db, hash, n)
+					DeleteCanonicalHash(db, n)
 				}
 			}
 		}

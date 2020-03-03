@@ -201,7 +201,7 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 		n := *ReadHeaderNumber(db, hhh)
 		frozen, _ := frdb.Ancients()
 
-		log.Warn("Persistent KV/Freezer gap: Truncating KV database to freezer height", "ancients", frozen, "kv.head_header_number", n, "kv.head_header_hash", hhh)
+		log.Warn("Persistent Freezer/KV gap: Truncating KV database to freezer height", "ancients", frozen, "kv.head_header_number", n, "kv.head_header_hash", hhh)
 
 		for ; n > frozen-1; n-- {
 			if n != 0 {
@@ -231,7 +231,7 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 
 	if validateErr != nil {
 		// If this fails, there's nothing left for us to do.
-		log.Warn("KV truncation failed to resuscitate kv/freezer db gap.")
+		log.Warn("KV truncation failed to resuscitate Freezer/KV db gap.")
 		return nil, validateErr
 	}
 

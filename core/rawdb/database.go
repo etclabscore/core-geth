@@ -177,6 +177,68 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 		return nil
 	}
 
+	truncateKVtoAncient := func(freezerdb *freezer, ddb ethdb.KeyValueStore) {
+		hhh := ReadHeadHeaderHash(ddb)
+		n := *ReadHeaderNumber(ddb, hhh)
+		frozen, _ := freezerdb.Ancients()
+
+		head_header, head_header_hash := func() uint64 {
+			if n := ReadHeaderNumber(ddb, ReadHeadHeaderHash(ddb)); n == nil {
+				return 0
+			} else {
+				return *n
+			}
+		}(), ReadHeadHeaderHash(ddb)
+		head_fast, head_fast_hash := func() uint64 {
+			if n := ReadHeaderNumber(ddb, ReadHeadFastBlockHash(ddb)); n == nil {
+				return 0
+			} else {
+				return *n
+			}
+		}(), ReadHeadFastBlockHash(ddb)
+		head_full, head_full_hash := func() uint64 {
+			if n := ReadHeaderNumber(ddb, ReadHeadBlockHash(ddb)); n == nil {
+				return 0
+			} else {
+				return *n
+			}
+		}(), ReadHeadBlockHash(ddb)
+
+		log.Warn("Head header", "number", head_header, "hash", head_header_hash)
+		log.Warn("Head fast", "number", head_fast, "hash", head_fast_hash)
+		log.Warn("Head full", "number", head_full, "hash", head_full_hash)
+
+		log.Warn("Persistent Freezer/KV gap: Truncating KV database to freezer height", "ancients", frozen, "kv.head_header_number", n, "kv.head_header_hash", hhh)
+
+		for ; n > frozen-1; n-- {
+			if n != 0 {
+				for _, hash := range ReadAllHashes(ddb, n) {
+					if n%10000 == 0 {
+						log.Warn("Removing KV block data", "n", n, "hash", hash.String())
+					}
+					DeleteBlock(ddb, hash, n)
+					DeleteCanonicalHash(ddb, n)
+				}
+			}
+		}
+
+		log.Warn("Finished KV truncation")
+
+		data, _ := freezerdb.Ancient(freezerHashTable, n)
+		h := common.BytesToHash(data)
+
+		log.Warn("Writing KV head header", "hash", h.String())
+
+		// If we had nonzero values for full and/or fast blocks, infer that preceding states will still be valid.
+		WriteHeadHeaderHash(ddb, h)
+		if head_fast != 0 {
+			WriteHeadFastBlockHash(ddb, h)
+		}
+		if head_full != 0 {
+			WriteHeadBlockHash(ddb, h)
+		}
+	}
+
 	validateErr := validateFreezerVsKV(frdb, db)
 	if validateErr != nil {
 
@@ -190,38 +252,14 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 
 		log.Warn("Freezer repair OK")
 
+		truncateKVtoAncient(frdb, db)
+
 		// Re-validate the ancient/kv dbs.
 		// If still a gap, try removing the kv data back to the ancient level.
 		validateErr = validateFreezerVsKV(frdb, db)
 	}
 
 	if validateErr != nil && strings.Contains(validateErr.Error(), "gap") {
-
-		hhh := ReadHeadHeaderHash(db)
-		n := *ReadHeaderNumber(db, hhh)
-		frozen, _ := frdb.Ancients()
-
-		log.Warn("Persistent Freezer/KV gap: Truncating KV database to freezer height", "ancients", frozen, "kv.head_header_number", n, "kv.head_header_hash", hhh)
-
-		for ; n > frozen-1; n-- {
-			if n != 0 {
-				for _, hash := range ReadAllHashes(db, n) {
-					if n%10000 == 0 {
-						log.Warn("Removing KV block data", "n", n, "hash", hash.String())
-					}
-					DeleteBlock(db, hash, n)
-					DeleteCanonicalHash(db, n)
-				}
-			}
-		}
-
-		log.Warn("Finished KV truncation")
-
-		data, _ := frdb.Ancient(freezerHashTable, n)
-		h := common.BytesToHash(data)
-
-		log.Warn("Writing KV head header", "hash", h.String())
-		WriteHeadHeaderHash(db, h)
 
 		// Re-validate again.
 		validateErr = validateFreezerVsKV(frdb, db)

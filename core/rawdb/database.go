@@ -396,21 +396,21 @@ func truncateKVtoFreezer(freezerdb *freezer, db ethdb.KeyValueStore) {
 	n := *ReadHeaderNumber(db, hhh)
 	frozen, _ := freezerdb.Ancients()
 
-	head_header, head_header_hash := func() uint64 {
+	headHeader, headHeaderHash := func() uint64 {
 		if n := ReadHeaderNumber(db, ReadHeadHeaderHash(db)); n == nil {
 			return 0
 		} else {
 			return *n
 		}
 	}(), ReadHeadHeaderHash(db)
-	head_fast, head_fast_hash := func() uint64 {
+	headFast, headFastHash := func() uint64 {
 		if n := ReadHeaderNumber(db, ReadHeadFastBlockHash(db)); n == nil {
 			return 0
 		} else {
 			return *n
 		}
 	}(), ReadHeadFastBlockHash(db)
-	head_full, head_full_hash := func() uint64 {
+	headFull, headFullHash := func() uint64 {
 		if n := ReadHeaderNumber(db, ReadHeadBlockHash(db)); n == nil {
 			return 0
 		} else {
@@ -418,9 +418,9 @@ func truncateKVtoFreezer(freezerdb *freezer, db ethdb.KeyValueStore) {
 		}
 	}(), ReadHeadBlockHash(db)
 
-	log.Warn("Head header", "number", head_header, "hash", head_header_hash)
-	log.Warn("Head fast", "number", head_fast, "hash", head_fast_hash)
-	log.Warn("Head full", "number", head_full, "hash", head_full_hash)
+	log.Warn("Head header", "number", headHeader, "hash", headHeaderHash)
+	log.Warn("Head fast", "number", headFast, "hash", headFastHash)
+	log.Warn("Head full", "number", headFull, "hash", headFullHash)
 
 	log.Warn("Persistent Freezer/KV gap: Truncating KV database to freezer height", "ancients", frozen, "kv.head_header_number", n, "kv.head_header_hash", hhh)
 
@@ -444,10 +444,10 @@ func truncateKVtoFreezer(freezerdb *freezer, db ethdb.KeyValueStore) {
 
 	// If we had nonzero values for full and/or fast blocks, infer that preceding states will still be valid.
 	WriteHeadHeaderHash(db, h)
-	if head_fast != 0 {
+	if headFast != 0 {
 		WriteHeadFastBlockHash(db, h)
 	}
-	if head_full != 0 {
+	if headFull != 0 {
 		WriteHeadBlockHash(db, h)
 	}
 }

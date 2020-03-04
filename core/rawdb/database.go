@@ -136,8 +136,8 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 		if reperr := frdb.repair(); reperr != nil {
 			log.Warn("Freezer repair errored", "error", reperr)
 
-			// Repair did error, and that's bad, but return the initial error.
-			return nil, validateErr
+			// Repair did error, AND the validation errored, so return both together because that's double bad.
+			return nil, fmt.Errorf("freezer/kv error=%v freezer repair error=%v", validateErr, reperr)
 		}
 
 		log.Warn("Freezer repair OK")
@@ -359,7 +359,6 @@ func validateFreezerVsKV(freezerdb *freezer, db ethdb.KeyValueStore) error {
 			// Key-value store and freezer belong to the same network. Ensure that they
 			// are contiguous, otherwise we might end up with a non-functional freezer.
 			if kvhash, _ := db.Get(headerHashKey(frozen)); len(kvhash) == 0 {
-
 				// Subsequent header after the freezer limit is missing from the database.
 				// Reject startup is the database has a more recent head.
 				if headHeaderN := *ReadHeaderNumber(db, ReadHeadHeaderHash(db)); headHeaderN > frozen-1 {
@@ -382,10 +381,10 @@ func validateFreezerVsKV(freezerdb *freezer, db ethdb.KeyValueStore) error {
 				if kvblob, _ := db.Get(headerHashKey(1)); len(kvblob) == 0 {
 					return errors.New("ancient chain segments already extracted, please set --datadir.ancient to the correct path")
 				}
-				// Block #1 is still in the database, we're allowed to init a new feezer
+				// Block #1 is still in the database, we're allowed to init a new freezer.
 			}
 			// Otherwise, the head header is still the genesis, we're allowed to init a new
-			// feezer.
+			// freezer.
 		}
 	}
 	return nil
@@ -432,10 +431,16 @@ func truncateKVtoFreezer(freezerdb *freezer, db ethdb.KeyValueStore) {
 	data, _ := freezerdb.Ancient(freezerHashTable, n)
 	h := common.BytesToHash(data)
 
+	// If h is the empty common hash, then when the headHeaderHash gets read, whoever's reading it isn't going to like that.
+	// This logic doesn't check for that because there's really nothing that can be sensibly done in this scope,
+	// and it seems reasonable to think that when a higher level function like `loadLastState` finds an empty hash in the
+	// headHeaderHash value, it's going to bark pretty loudly and probably just roll the whole thing (database(s)) back since the
+	// ancient database would appear to be screwy beyond repair since it lied about what frozen headers it had.
+	// So we're just gonna write this sucker.
 	log.Warn("Writing KV head header", "hash", h.String())
+	WriteHeadHeaderHash(db, h)
 
 	// If we had nonzero values for full and/or fast blocks, infer that preceding states will still be valid.
-	WriteHeadHeaderHash(db, h)
 	if headFast != 0 {
 		WriteHeadFastBlockHash(db, h)
 	}

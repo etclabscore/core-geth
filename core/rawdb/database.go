@@ -359,9 +359,9 @@ func validateFreezerVsKV(freezerdb *freezer, db ethdb.KeyValueStore) error {
 			// Key-value store and freezer belong to the same network. Ensure that they
 			// are contiguous, otherwise we might end up with a non-functional freezer.
 			if kvhash, _ := db.Get(headerHashKey(frozen)); len(kvhash) == 0 {
+
 				// Subsequent header after the freezer limit is missing from the database.
 				// Reject startup is the database has a more recent head.
-
 				if headHeaderN := *ReadHeaderNumber(db, ReadHeadHeaderHash(db)); headHeaderN > frozen-1 {
 					return fmt.Errorf("gap (chaindb=#%d frozen=#%d) in the chain between ancients and leveldb", headHeaderN, frozen)
 				}

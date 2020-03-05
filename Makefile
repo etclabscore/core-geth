@@ -20,6 +20,9 @@ geth:
 all:
 	$(GORUN) build/ci.go install
 
+generate:
+	cd evmc/bindings/go/evmc; env GO111MODULE=on go generate; cd -
+
 android:
 	$(GORUN) build/ci.go aar --local
 	@echo "Done building."
@@ -30,7 +33,7 @@ ios:
 	@echo "Done building."
 	@echo "Import \"$(GOBIN)/Geth.framework\" to use the library."
 
-test: all
+test: all generate
 	$(GORUN) build/ci.go test
 	go run build/ci.go test
 

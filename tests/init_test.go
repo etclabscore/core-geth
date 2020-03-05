@@ -40,8 +40,8 @@ import (
 // Command line flags to configure the interpreters.
 var (
 	// PTAL: What is the API of this value? => filepath<str/ing>,capabilities<k=v>,...
-	testEVM   = flag.String("vm.evm", "", "EVM configuration")
-	testEWASM = flag.String("vm.ewasm", "", "EWASM configuration")
+	testEVM   = flag.String("evmc.evm", "", "EVMC EVM1 configuration")
+	testEWASM = flag.String("evmc.ewasm", "", "EVMC EWASM configuration")
 )
 
 func TestMain(m *testing.M) {

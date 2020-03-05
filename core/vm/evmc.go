@@ -266,7 +266,7 @@ func (host *hostContext) Call(kind evmc.CallKind,
 	case evmc.Create:
 		var createOutput []byte
 		createOutput, createAddr, gasLeftU, err = host.env.Create(host.contract, input, gasU, value)
-		isHomestead := host.env.ChainConfig().IsHomestead(host.env.BlockNumber)
+		isHomestead := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEthashEIP2Transition, host.env.BlockNumber)
 		if !isHomestead && err == ErrCodeStoreOutOfGas {
 			err = nil
 		}

@@ -39,6 +39,7 @@ import (
 
 // Command line flags to configure the interpreters.
 var (
+	// PTAL: What is the API of this value? => filepath<str/ing>,capabilities<k=v>,...
 	testEVM   = flag.String("vm.evm", "", "EVM configuration")
 	testEWASM = flag.String("vm.ewasm", "", "EWASM configuration")
 )

@@ -4,6 +4,8 @@ go 1.13
 
 require (
 	github.com/Azure/azure-storage-blob-go v0.8.0
+	github.com/Azure/go-autorest/autorest/adal v0.8.2 // indirect
+	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/VictoriaMetrics/fastcache v1.5.4
 	github.com/aristanetworks/goarista v0.0.0-20170210015632-ea17b1a17847
 	github.com/aws/aws-sdk-go v1.25.48
@@ -17,10 +19,11 @@ require (
 	github.com/dop251/goja v0.0.0-20200106141417-aaec0e7bde29
 	github.com/edsrzf/mmap-go v0.0.0-20160512033002-935e0e8a636c
 	github.com/elastic/gosigar v0.8.1-0.20180330100440-37f05ff46ffa
-	github.com/ethereum/evmc v6.3.1+incompatible
+	github.com/ethereum/evmc v6.3.2-alpha+incompatible
 	github.com/fatih/color v1.6.0
 	github.com/fjl/memsize v0.0.0-20180418122429-ca190fb6ffbc
 	github.com/gballet/go-libpcsclite v0.0.0-20190607065134-2772fd86a8ff
+	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-stack/stack v1.8.0
 	github.com/go-test/deep v1.0.4
@@ -35,6 +38,7 @@ require (
 	github.com/jackpal/go-nat-pmp v1.0.2-0.20160603034137-1fa385a6f458
 	github.com/julienschmidt/httprouter v1.2.0
 	github.com/karalabe/usb v0.0.0-20191104083709-911d15fe12a9
+	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.0
 	github.com/mattn/go-isatty v0.0.5-0.20180830101745-3fb116b82035
 	github.com/mitchellh/go-homedir v1.1.0
@@ -69,10 +73,11 @@ require (
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20190213234257-ec84240a7772
 	gopkg.in/urfave/cli.v1 v1.20.0
+	gotest.tools v2.2.0+incompatible // indirect
 
 )
 
 // see https://github.com/golang/lint/issues/436#issuecomment-482066447
 replace github.com/golang/lint v0.0.0-20190409202823-959b441ac422 => github.com/golang/lint v0.0.0-20190409202823-5614ed5bae6fb75893070bdc0996a68765fdd275
 
-replace github.com/ethereum/evmc => ./evmc
+replace github.com/ethereum/evmc v6.3.2-alpha+incompatible => ./evmc

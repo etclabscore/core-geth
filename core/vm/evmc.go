@@ -305,19 +305,26 @@ func getRevision(env *EVM) evmc.Revision {
 	n := env.BlockNumber
 	conf := env.ChainConfig()
 	switch {
-	case conf.IsIstanbul(n):
+	// This is an example of choosing to use an "abstracted" idea
+	// about chain config, where I'm choosing to prioritize "indicative" features
+	// as identifiers for Fork-Feature-Groups. Note that this is very different
+	// than using Feature-complete sets to assert "did Forkage." I may not be
+	// correct here (ie it may not 'correctly' translate to the EVMC logic. This
+	// is why building interoperable tools is annoying; there's no API... yet).
+	// eg. What does your Istanbul mean?
+	case conf.IsEnabled(conf.GetEIP1884Transition, n):
 		return evmc.Istanbul
-	case conf.IsPetersburg(n):
+	case conf.IsEnabled(conf.GetEIP1283DisableTransition, n):
 		return evmc.Petersburg
-	case conf.IsConstantinople(n):
+	case conf.IsEnabled(conf.GetEIP145Transition, n):
 		return evmc.Constantinople
-	case conf.IsByzantium(n):
+	case conf.IsEnabled(conf.GetEIP198Transition, n):
 		return evmc.Byzantium
-	case conf.IsEIP158(n):
+	case conf.IsEnabled(conf.GetEIP161dTransition, n): // It might be 161abc. Can never keep them straight.
 		return evmc.SpuriousDragon
-	case conf.IsEIP150(n):
+	case conf.IsEnabled(conf.GetEIP150Transition, n):
 		return evmc.TangerineWhistle
-	case conf.IsHomestead(n):
+	case conf.IsEnabled(conf.GetEIP7Transition, n):
 		return evmc.Homestead
 	default:
 		return evmc.Frontier

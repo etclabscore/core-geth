@@ -48,10 +48,12 @@ func TestMain(m *testing.M) {
 	flag.Parse()
 
 	if (*testEVM != "") {
+		log.Printf("Running tests with %s=%s", "evmc.evm", *testEVM)
 		vm.InitEVMCEVM(*testEVM)
 	}
 
 	if (*testEWASM != "") {
+		log.Printf("Running tests with %s=%s", "evmc.ewasm", *testEWASM)
 		vm.InitEVMCEwasm(*testEWASM)
 	}
 

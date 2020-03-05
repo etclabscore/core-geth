@@ -21,7 +21,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ethereum/evmc/bindings/go/evmc"
+	"github.com/ethereum/go-ethereum/evmc/bindings/go/evmc"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"

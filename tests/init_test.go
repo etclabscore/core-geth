@@ -34,6 +34,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/core/vm"
 )
 
 // Command line flags to configure the interpreters.
@@ -44,6 +46,15 @@ var (
 
 func TestMain(m *testing.M) {
 	flag.Parse()
+
+	if (*testEVM != "") {
+		vm.InitEVMCEVM(*testEVM)
+	}
+
+	if (*testEWASM != "") {
+		vm.InitEVMCEwasm(*testEWASM)
+	}
+
 	os.Exit(m.Run())
 }
 

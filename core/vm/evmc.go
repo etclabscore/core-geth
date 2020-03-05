@@ -225,7 +225,7 @@ func (host *hostContext) GetTxContext() evmc.TxContext {
 		Timestamp:  host.env.Time.Int64(),
 		GasLimit:   int64(host.env.GasLimit),
 		Difficulty: common.BigToHash(host.env.Difficulty),
-		ChainID:    common.BigToHash(host.env.chainConfig.ChainID)}
+		ChainID:    common.BigToHash(host.env.chainConfig.GetChainID())}
 }
 
 func (host *hostContext) GetBlockHash(number int64) common.Hash {

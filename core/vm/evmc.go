@@ -35,15 +35,15 @@ import (
 // EVMC represents the reference to a common EVMC-based VM instance and
 // the current execution context as required by go-ethereum design.
 type EVMC struct {
-	instance *evmc.VM        // The reference to the EVMC VM instance.
+	instance *evmc.Instance        // The reference to the EVMC VM instance.
 	env      *EVM            // The execution context.
 	cap      evmc.Capability // The supported EVMC capability (EVM or Ewasm)
 	readOnly bool            // The readOnly flag (TODO: Try to get rid of it).
 }
 
 var (
-	evmModule   *evmc.VM
-	ewasmModule *evmc.VM
+	evmModule   *evmc.Instance
+	ewasmModule *evmc.Instance
 )
 
 func InitEVMCEVM(config string) {
@@ -54,7 +54,7 @@ func InitEVMCEwasm(config string) {
 	ewasmModule = initEVMC(evmc.CapabilityEWASM, config)
 }
 
-func initEVMC(cap evmc.Capability, config string) *evmc.VM {
+func initEVMC(cap evmc.Capability, config string) *evmc.Instance {
 	options := strings.Split(config, ",")
 	path := options[0]
 

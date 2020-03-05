@@ -95,7 +95,8 @@ type hostContext struct {
 }
 
 func (host *hostContext) AccountExists(addr common.Address) bool {
-	if host.env.ChainConfig().IsEIP158(host.env.BlockNumber) {
+	// if host.env.ChainConfig().IsEIP158(host.env.BlockNumber) {
+	if host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP161dTransition, host.env.BlockNumber) {
 		if !host.env.StateDB.Empty(addr) {
 			return true
 		}

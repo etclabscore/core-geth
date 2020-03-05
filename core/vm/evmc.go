@@ -29,7 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // EVMC represents the reference to a common EVMC-based VM instance and
@@ -147,18 +147,18 @@ func (host *hostContext) SetStorage(addr common.Address, key common.Hash, value 
 		if oldValue == zero {
 			return evmc.StorageAdded
 		} else if value == zero {
-			host.env.StateDB.AddRefund(params.SstoreRefundGas)
+			host.env.StateDB.AddRefund(vars.SstoreRefundGas)
 			return evmc.StorageDeleted
 		}
 		return evmc.StorageModified
 	}
 
-	resetClearRefund := params.NetSstoreResetClearRefund
-	cleanRefund := params.NetSstoreResetRefund
+	resetClearRefund := vars.NetSstoreResetClearRefund
+	cleanRefund := vars.NetSstoreResetRefund
 
 	if hasEIP2200 {
-		resetClearRefund = params.SstoreInitRefundEIP2200
-		cleanRefund = params.SstoreCleanRefundEIP2200
+		resetClearRefund = vars.SstoreInitRefundEIP2200
+		cleanRefund = vars.SstoreCleanRefundEIP2200
 	}
 
 	if original == current {
@@ -166,16 +166,16 @@ func (host *hostContext) SetStorage(addr common.Address, key common.Hash, value 
 			return evmc.StorageAdded
 		}
 		if value == (common.Hash{}) { // delete slot (2.1.2b)
-			host.env.StateDB.AddRefund(params.NetSstoreClearRefund)
+			host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
 			return evmc.StorageDeleted
 		}
 		return evmc.StorageModified
 	}
 	if original != (common.Hash{}) {
 		if current == (common.Hash{}) { // recreate slot (2.2.1.1)
-			host.env.StateDB.SubRefund(params.NetSstoreClearRefund)
+			host.env.StateDB.SubRefund(vars.NetSstoreClearRefund)
 		} else if value == (common.Hash{}) { // delete slot (2.2.1.2)
-			host.env.StateDB.AddRefund(params.NetSstoreClearRefund)
+			host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
 		}
 	}
 	if original == value {
@@ -210,7 +210,7 @@ func (host *hostContext) GetCode(addr common.Address) []byte {
 func (host *hostContext) Selfdestruct(addr common.Address, beneficiary common.Address) {
 	db := host.env.StateDB
 	if !db.HasSuicided(addr) {
-		db.AddRefund(params.SelfdestructRefundGas)
+		db.AddRefund(vars.SelfdestructRefundGas)
 	}
 	db.AddBalance(beneficiary, db.GetBalance(addr))
 	db.Suicide(addr)

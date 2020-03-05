@@ -32,10 +32,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/core/vm"
 )
 
 // Command line flags to configure the interpreters.

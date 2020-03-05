@@ -120,10 +120,25 @@ func (host *hostContext) SetStorage(addr common.Address, key common.Hash, value 
 
 	host.env.StateDB.SetState(addr, key, value)
 
-	hasEIP2200 := host.env.ChainConfig().IsIstanbul(host.env.BlockNumber)
-	hasNetStorageCostEIP := hasEIP2200 ||
-		(host.env.ChainConfig().IsConstantinople(host.env.BlockNumber) &&
-			!host.env.ChainConfig().IsPetersburg(host.env.BlockNumber))
+	/*
+		hasEIP2200 := host.env.ChainConfig().IsIstanbul(host.env.BlockNumber)
+		hasNetStorageCostEIP := hasEIP2200 ||
+			(host.env.ChainConfig().IsConstantinople(host.env.BlockNumber) &&
+				!host.env.ChainConfig().IsPetersburg(host.env.BlockNumber))
+		if !hasNetStorageCostEIP {
+	*/
+
+	// Here's a great example of one of the limits of our (core-geth) current chainconfig interface model.
+	// Should we handle the logic here about historic-featuro logic (which really is nice, because when reading the strange-incantation implemations, it's nice to see why it is),
+	// or should we handle the question where we handle the rest of the questions like this, since this logic is
+	// REALLY logic that belongs to the abstract idea of a chainconfiguration (aka chainconfig), which makes sense
+	// but depends on ECIPs having steadier and more predictable logic.
+	hasEIP2200 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP2200Transition, host.env.BlockNumber)
+	hasEIP1884 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP1884Transition, host.env.BlockNumber)
+
+	// Here's an example where to me, it makes sense to use individual EIPs in the code...
+	// when they don't specify each other in the spec.
+	hasNetStorageCostEIP := hasEIP2200 && hasEIP1884
 	if !hasNetStorageCostEIP {
 
 		zero := common.Hash{}

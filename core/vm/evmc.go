@@ -25,9 +25,9 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/evmc/bindings/go/evmc"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/evmc/bindings/go/evmc"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -35,7 +35,7 @@ import (
 // EVMC represents the reference to a common EVMC-based VM instance and
 // the current execution context as required by go-ethereum design.
 type EVMC struct {
-	instance *evmc.Instance        // The reference to the EVMC VM instance.
+	instance *evmc.Instance  // The reference to the EVMC VM instance.
 	env      *EVM            // The execution context.
 	cap      evmc.Capability // The supported EVMC capability (EVM or Ewasm)
 	readOnly bool            // The readOnly flag (TODO: Try to get rid of it).

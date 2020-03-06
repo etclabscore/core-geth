@@ -8,6 +8,7 @@ matrix:
     go: 1.13.x
     script:
     - go run build/ci.go install
+    - make evmc
     - travis_wait 60 go run build/ci.go test
     - make test-multigeth
     before_deploy:
@@ -24,6 +25,7 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
+
   - os: linux
     dist: xenial
     sudo: required
@@ -55,6 +57,7 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
+
   - os: osx
     go: 1.13.x
     script:
@@ -82,6 +85,7 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
+
   - os: linux
     dist: xenial
     go: 1.13.x

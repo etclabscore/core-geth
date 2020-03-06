@@ -6,7 +6,7 @@
 Priority is given to reducing opinions around chain configuration, IP-based feature implementations, and API predictability.
 Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) is merged to this repository regularly,
  usually at every upstream tagged release. Every effort is made to maintain seamless compatibility with upstream source, including compatible RPC, JS, and CLI
- APIs, data storage locations and schemas, and, of course, interoperable client protocols. Applicable bug reports, bug fixes, features, and proposals should be
+ APIs, data storage locations and schemas, and, of course, interoperable node protocols. Applicable bug reports, bug fixes, features, and proposals should be
  made upstream whenever possible.
 
 [![OpenRPC](https://img.shields.io/static/v1.svg?label=OpenRPC&message=1.0.10&color=blue)](#openrpc-discovery)
@@ -15,11 +15,11 @@ Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-
 [![Travis](https://travis-ci.org/etclabscore/core-geth.svg?branch=master)](https://travis-ci.org/etclabscore/core-geth)
 [![Gitter](https://badges.gitter.im/core-geth/community.svg)](https://gitter.im/core-geth/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-## Network/client comparison
+## Network/provider comparison
 
-Networks supported by the respective go-ethereum packaged `geth` client.
+Networks supported by the respective go-ethereum packaged `geth` program.
 
-| Ticker | Consensus         | Network/Client                        | core-geth                                                | ethereum/go-ethereum |
+| Ticker | Consensus         | Network                               | core-geth                                                | ethereum/go-ethereum |
 | ---    | ---               | ---                                   | ---                                                      | ---                  |
 | ETC    | :zap:             | Ethereum Classic                      | :heavy_check_mark:                                       |                      |
 | ETH    | :zap:             | Ethereum (Foundation)                 | :heavy_check_mark:                                       | :heavy_check_mark:   |
@@ -61,31 +61,33 @@ Binary archives are published at https://github.com/etclabscore/core-geth/releas
 
 ### With Docker
 
-#### Docker quick start
+All runnable examples below are for images limited to `geth`. For images including the full suite of
+tools available from this source, use the Docker Hub tag prefix `alltools.`, like `etclabscore/core-geth:alltools.latest`, or the associated Docker file directly `./Dockerfile.alltools`.
+
+#### `docker run`
 
 One of the quickest ways to get Ethereum up and running on your machine is by using
 Docker:
 
 ```shell
 $ docker run -d \
-    -v /Users/alice/core-geth:/root \
-    -p 8545:8545 \
+    --name core-geth \
+    -v $LOCAL_DATADIR:/root \
     -p 30303:30303 \
-    --name ethereum-protocol-provider \
-    etclabscore/core-geth
+    -p 8545:8545 \
+    etclabscore/core-geth \
+    --classic \
+    --rpc --rpcport 8545
 ```
 
 This will start `geth` in fast-sync mode with a DB memory allowance of 1GB just as the
-above command does.  It will also create a persistent volume in your home directory for
-saving your blockchain as well as map the default ports. There is also an `alpine` tag
-available for a slim version of the image.
+above command does.  It will also create a persistent volume in your `$LOCAL_DATADIR` for
+saving your blockchain, as well as map the default devp2p and JSON-RPC API ports.
 
 Do not forget `--rpcaddr 0.0.0.0`, if you want to access RPC from other containers
 and/or hosts. By default, `geth` binds to the local interface and RPC endpoints is not
 accessible from the outside.
 
-All runnable examples below are for images limited to `geth`. For images including the full suite of
-tools available from this source, use the Docker Hub tag prefix `alltools.`, like `etclabscore/core-geth:alltools.latest`, or the associated Docker file directly `./Dockerfile.alltools`.
 
 #### `docker pull`
 
@@ -101,7 +103,7 @@ $ docker pull etclabscore/core-geth:latest
 
 ##### Image: `<tag>`
 
-Repository tags like `v1.2.3` correspond to Docker tags like `version-1.2.3`
+Repository tags like `v1.2.3` correspond to Docker tags like __`version-1.2.3`__.
 
 An example:
 ```shell
@@ -115,7 +117,7 @@ You can build a local docker image directly from the source:
 ```shell
 $ git clone https://github.com/etclabscore/core-geth.git
 $ cd core-geth
-$ docker build -t core-geth .
+$ docker build -t=core-geth .
 ```
 
 Or with all tools:
@@ -143,7 +145,6 @@ Once the dependencies are installed, it's time to clone and build the source:
 $ git clone https://github.com/etclabscore/core-geth.git
 $ cd core-geth
 $ make all
-[...]
 $ ./build/bin/geth --help
 ```
 
@@ -186,4 +187,3 @@ also included in our repository in the `COPYING.LESSER` file.
 The core-geth binaries (i.e. all code inside of the `cmd` directory) is licensed under the
 [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html), also
 included in our repository in the `COPYING` file.
-

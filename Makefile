@@ -20,7 +20,7 @@ geth:
 all:
 	$(GORUN) build/ci.go install
 
-generate:
+evmc:
 	cd evmc/bindings/go/evmc; env GO111MODULE=on go generate; cd -
 
 android:
@@ -33,7 +33,7 @@ ios:
 	@echo "Done building."
 	@echo "Import \"$(GOBIN)/Geth.framework\" to use the library."
 
-test: all generate
+test: all evmc
 	$(GORUN) build/ci.go test
 
 sync-parity-chainspecs:

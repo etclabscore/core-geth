@@ -1,6 +1,7 @@
-## Go Ethereum
+## CoreGeth: An Ethereum Protocol Provider
 
-> A "swiss army knife" distribution of _go-ethereum_, with support for many species of Ethereum networks.
+> An [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) downstream effort to make the Ethereum Protocol accessible and extensible for a diverse ecosystem.
+> Priority is given to reducing opinions around chain configuration, IP-based feature implementations, and API predictability.
 
 [![OpenRPC](https://img.shields.io/static/v1.svg?label=OpenRPC&message=1.0.10&color=blue)](#openrpc-discovery)
 [![API Reference](
@@ -11,7 +12,6 @@ https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/6874
 [![Gitter](https://badges.gitter.im/core-geth/community.svg)](https://gitter.im/core-geth/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 
-Binary archives are published at https://github.com/etclabscore/core-geth/releases.
 
 Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) is merged to this repository regularly,
  usually at every upstream tagged release. Every effort is made to maintain seamless compatibility with upstream source, including compatible RPC, JS, and CLI
@@ -22,26 +22,28 @@ Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-
 
 Networks supported by the respective go-ethereum packaged `geth` client.
 
-| Ticker | Network/Client                        | core-geth                                        | [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) |
-| ---    | ---                                   | ---                                              | ---                                                             |
-| ETH    | Ethereum (Foundation)                 | :heavy_check_mark:                               | :heavy_check_mark:                                              |
-| ETC    | Ethereum Classic                      | :heavy_check_mark:                               |                                                                 |
-| ETSC   | Ethereum Social                       | :heavy_check_mark:                               |                                                                 |
-| ESN    | EtherSocial                           | :heavy_check_mark:                               |                                                                 |
-| MIX    | Mix                                   | :heavy_check_mark:                               |                                                                 |
-| EXP    | Expanse                               |                                                  |                                                                 |
-| ELLA   | Ellaism                               | :no_entry_sign:<sup>[1](#ellaism-footnote)</sup> |                                                                 |
-| MUSIC  | Musicoin                              | :heavy_check_mark:                               |                                                                 |
-|        | Mordor (Geth+Parity ETH PoW Testnet)  | :heavy_check_mark:                               |                                                                 |
-|        | Morden (Geth+Parity ETH PoW Testnet)  |                                                  |                                                                 |
-|        | Ropsten (Geth+Parity ETH PoW Testnet) | :heavy_check_mark:                               | :heavy_check_mark:                                              |
-|        | Rinkeby (Geth-only ETH PoA Testnet)   | :heavy_check_mark:                               | :heavy_check_mark:                                              |
-|        | Goerli (Geth+Parity ETH PoA Testnet)  | :heavy_check_mark:                               | :heavy_check_mark:                                              |
-|        | Kotti (Geth+Parity ETC PoA Testnet)   | :heavy_check_mark:                               |                                                                 |
-|        | Kovan (Parity-only ETH PoA Testnet)   |                                                  |                                                                 |
-|        | Tobalaba (EWF Testnet)                |                                                  |                                                                 |
-|        | Ephemeral development PoA network     | :heavy_check_mark:                               |                                                                 |
-|        | Private chains                        | :heavy_check_mark:                               | :heavy_check_mark:                                              |
+| Ticker | Consensus           | Network/Client                        | core-geth                                                | ethereum/go-ethereum |
+| ---    | ---                 | ---                                   | ---                                                      | ---                  |
+| ETC    | :zap:               | Ethereum Classic                      | :heavy_check_mark:                                       |                      |
+| ETH    | :zap:               | Ethereum (Foundation)                 | :heavy_check_mark:                                       | :heavy_check_mark:   |
+| ETSC   | :zap:               | Ethereum Social                       | :heavy_check_mark:                                       |                      |
+| ESN    | :zap:               | EtherSocial                           | :heavy_check_mark:                                       |                      |
+| MIX    | :zap:               | Mix                                   | :heavy_check_mark:                                       |                      |
+| ELLA   | :zap:               | Ellaism                               | :no_entry_sign:<sup>[1](#ellaism-footnote)</sup>         |                      |
+| MUSIC  | :zap:               | Musicoin                              | :open_file_folder:<sup>[2](#configuration-capable)</sup> |                      |
+| -      | :zap: / :handshake: | Private chains                        | :heavy_check_mark:                                       | :heavy_check_mark:   |
+|        | :zap:               | Mordor (Geth+Parity ETH PoW Testnet)  | :heavy_check_mark:                                       |                      |
+|        | :zap:               | Morden (Geth+Parity ETH PoW Testnet)  |                                                          |                      |
+|        | :zap:               | Ropsten (Geth+Parity ETH PoW Testnet) | :heavy_check_mark:                                       | :heavy_check_mark:   |
+|        | :handshake:         | Rinkeby (Geth-only ETH PoA Testnet)   | :heavy_check_mark:                                       | :heavy_check_mark:   |
+|        | :handshake:         | Goerli (Geth+Parity ETH PoA Testnet)  | :heavy_check_mark:                                       | :heavy_check_mark:   |
+|        | :handshake:         | Kotti (Geth+Parity ETC PoA Testnet)   | :heavy_check_mark:                                       |                      |
+|        | :handshake:         | Kovan (Parity-only ETH PoA Testnet)   |                                                          |                      |
+|        |                     | Tobalaba (EWF Testnet)                |                                                          |                      |
+|        |                     | Ephemeral development PoA network     | :heavy_check_mark:                                       | :heavy_check_mark:   |
+
+- :handshake: = __Proof of Authority__
+- :zap: = __Proof of Work__
 
 <a name="ellaism-footnote">1</a>: This is originally an [Ellaism
 Project](https://github.com/ellaism). However, A [recent hard
@@ -50,33 +52,86 @@ makes Ellaism not feasible to support with go-ethereum any more. Existing
 Ellaism users are asked to switch to
 [Parity](https://github.com/paritytech/parity).
 
-## Managing versions
+<a name="configuration-capable">2</a>: Network not supported by default, but network configuration is possible. Make a PR!
 
-`core-geth` is a fork of [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum), but build dependencies have been upgraded to use [Go modules](https://github.com/golang/go/wiki/Modules).
-You can clone it anywhere in your filesystem (either inside or outside of `$GOPATH`).
+## Install
 
-## Building the source
+### Pre-built executable
 
-For prerequisites and detailed build instructions please read the [Installation Instructions](https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum) on the wiki.
+If you just want to download and run `geth` or any of the other tools here, this is the quickest and simplest way.
 
-Building `geth` requires both a Go (version 1.11 or later) and a C compiler. You can install
-them using your favourite package manager. Once the dependencies are installed, run
+Binary archives are published at https://github.com/etclabscore/core-geth/releases. Find the latest one for your OS, download it, (check the SHA sum), unarchive it, and run!
+
+### With Docker
+
+All runnable examples below are for images limited to `geth`. For images including the full suite of
+tools available from this source, use the Docker Hub tag prefix `alltools.`, like `etclabscore/core-geth:alltools.latest`, or the associated Docker file directly `./Dockerfile.alltools`.
+
+#### `docker pull`
+
+Docker images are automatically [published on Docker Hub](https://hub.docker.com/r/etclabscore/core-geth/tags).
+
+##### Image: `latest`
+
+Image `latest` is built automatically from the `master` branch whenever it's updated.
 
 ```shell
-make geth
+$ docker pull etclabscore/core-geth:latest
 ```
 
-or, to build the full suite of utilities:
+##### Image: `<tag>`
+
+Repository tags like `v1.2.3` correspond to Docker tags like `version-1.2.3`
+
+An example:
+```shell
+$ docker pull etclabscore/core-geth:version-1.11.1
+```
+
+#### `docker build`
+
+You can build a local docker image directly from the source:
 
 ```shell
-make all
+$ git clone https://github.com/etclabscore/core-geth.git
+$ cd core-geth
+$ docker build -t core-geth .
+```
+
+Or with all tools:
+
+```shell
+$ docker build -t core-geth-alltools -f Dockerfile.alltools .
+```
+
+### Build from source
+
+#### Dependencies
+
+- Make sure your system has __Go__ installed. Version 1.13+ is recommended. https://golang.org/doc/install
+- Make sure your system has a C compiler installed. For example, with Linux Ubuntu:
+
+```shell
+$ sudo apt-get install -y build-essential
+```
+
+#### Source
+
+Once the dependencies are installed, it's time to clone and build the source:
+
+```shell
+$ git clone https://github.com/etclabscore/core-geth.git
+$ cd core-geth
+$ make all
+[...]
+$ ./build/bin/geth --help
 ```
 
 
 ## Executables
 
 The go-ethereum project comes with several wrappers/executables found in the `cmd`
-directory.
+directory, and which, with `make all`, will be built to `./build/bin/`.
 
 | Command       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | :----------:  | -------------                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |

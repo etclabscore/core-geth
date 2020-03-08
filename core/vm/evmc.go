@@ -267,7 +267,7 @@ func (host *hostContext) Call(kind evmc.CallKind,
 	case evmc.Create:
 		var createOutput []byte
 		createOutput, createAddr, gasLeftU, err = host.env.Create(host.contract, input, gasU, value)
-		isHomestead := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEthashEIP2Transition, host.env.BlockNumber)
+		isHomestead := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP7Transition, host.env.BlockNumber)
 		if !isHomestead && err == ErrCodeStoreOutOfGas {
 			err = nil
 		}
@@ -321,7 +321,7 @@ func getRevision(env *EVM) evmc.Revision {
 		return evmc.Constantinople
 	case conf.IsEnabled(conf.GetEIP198Transition, n):
 		return evmc.Byzantium
-	case conf.IsEnabled(conf.GetEIP161dTransition, n): // It might be 161abc. Can never keep them straight.
+	case conf.IsEnabled(conf.GetEIP155Transition, n): // It might be 161abc. Can never keep them straight.
 		return evmc.SpuriousDragon
 	case conf.IsEnabled(conf.GetEIP150Transition, n):
 		return evmc.TangerineWhistle

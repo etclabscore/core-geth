@@ -27,22 +27,30 @@ import (
 )
 
 func TestState(t *testing.T) {
-	t.Parallel()
+
 
 	st := new(testMatcher)
-	// Long tests:
-	st.slow(`^stAttackTest/ContractCreationSpam`)
-	st.slow(`^stBadOpcode/badOpcodes`)
-	st.slow(`^stPreCompiledContracts/modexp`)
-	st.slow(`^stQuadraticComplexityTest/`)
-	st.slow(`^stStaticCall/static_Call50000`)
-	st.slow(`^stStaticCall/static_Return50000`)
-	st.slow(`^stStaticCall/static_Call1MB`)
-	st.slow(`^stSystemOperationsTest/CallRecursiveBomb`)
-	st.slow(`^stTransactionTest/Opcodes_TransactionInit`)
 
-	// Very time consuming
-	st.skipLoad(`^stTimeConsuming/`)
+	if *testEWASM != "" {
+		// FIXME: For now, only run EWASM tests when the vm.ewasm flag is in use.
+		st.whitelist(`^stEWASM`)
+	} else {
+		t.Parallel()
+		// Long tests:
+		st.slow(`^stAttackTest/ContractCreationSpam`)
+		st.slow(`^stBadOpcode/badOpcodes`)
+		st.slow(`^stPreCompiledContracts/modexp`)
+		st.slow(`^stQuadraticComplexityTest/`)
+		st.slow(`^stStaticCall/static_Call50000`)
+		st.slow(`^stStaticCall/static_Return50000`)
+		st.slow(`^stStaticCall/static_Call1MB`)
+		st.slow(`^stSystemOperationsTest/CallRecursiveBomb`)
+		st.slow(`^stTransactionTest/Opcodes_TransactionInit`)
+
+		// Very time consuming
+		st.skipLoad(`^stTimeConsuming/`)
+		st.skipLoad(`^EWASM`)
+	}
 
 	// Broken tests:
 	// Expected failures:
@@ -80,6 +88,7 @@ const traceErrorLimit = 400000
 func withTrace(t *testing.T, gasLimit uint64, test func(vm.Config) error) {
 	// Use config from command line arguments.
 	config := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
+
 	err := test(config)
 	if err == nil {
 		return
@@ -87,19 +96,24 @@ func withTrace(t *testing.T, gasLimit uint64, test func(vm.Config) error) {
 
 	// Test failed, re-run with tracing enabled.
 	t.Error(err)
+
 	if gasLimit > traceErrorLimit {
 		t.Log("gas limit too high for EVM trace")
 		return
 	}
+
 	buf := new(bytes.Buffer)
 	w := bufio.NewWriter(buf)
 	tracer := vm.NewJSONLogger(&vm.LogConfig{DisableMemory: true}, w)
 	config.Debug, config.Tracer = true, tracer
+
 	err2 := test(config)
 	if !reflect.DeepEqual(err, err2) {
 		t.Errorf("different error for second run: %v", err2)
 	}
+
 	w.Flush()
+
 	if buf.Len() == 0 {
 		t.Log("no EVM operation logs generated")
 	} else {

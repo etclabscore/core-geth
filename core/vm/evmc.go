@@ -21,6 +21,7 @@ package vm
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"math/big"
 	"strings"
@@ -44,6 +45,7 @@ type EVMC struct {
 var (
 	evmModule   *evmc.Instance
 	ewasmModule *evmc.Instance
+	evmcModuleError = errors.New("EVMC internal error")
 )
 
 func InitEVMCEVM(config string) {
@@ -374,7 +376,9 @@ func (evm *EVMC) Run(contract *Contract, input []byte, readOnly bool) (ret []byt
 	if err == evmc.Revert {
 		err = errExecutionReverted
 	} else if evmcError, ok := err.(evmc.Error); ok && evmcError.IsInternalError() {
-		panic(fmt.Sprintf("EVMC VM internal error: %s", evmcError.Error()))
+		//panic(fmt.Sprintf("EVMC VM internal error: %s", evmcError.Error()))
+		fmt.Println(fmt.Errorf("%s: %v (%v)", evmcModuleError, evmcError.Error(), err.Error()))
+		return nil, fmt.Errorf("%s: %v", evmcModuleError, evmcError.Error())
 	}
 
 	return output, err

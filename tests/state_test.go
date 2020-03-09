@@ -34,6 +34,7 @@ func TestState(t *testing.T) {
 	if *testEWASM != "" {
 		// FIXME: For now, only run EWASM tests when the vm.ewasm flag is in use.
 		st.whitelist(`^stEWASM`)
+		st.skipLoad(`callSenderBalanceExceeds128Bits`)
 	} else {
 		t.Parallel()
 		// Long tests:

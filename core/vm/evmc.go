@@ -43,8 +43,8 @@ type EVMC struct {
 }
 
 var (
-	evmModule   *evmc.Instance
-	ewasmModule *evmc.Instance
+	evmModule       *evmc.Instance
+	ewasmModule     *evmc.Instance
 	evmcModuleError = errors.New("EVMC internal error")
 )
 
@@ -367,7 +367,7 @@ func (evm *EVMC) Run(contract *Contract, input []byte, readOnly bool) (ret []byt
 		contract.Address(),
 		contract.Caller(),
 		input,
-		common.BigToHash(contract.value),
+		common.BigToHash(contract.Value()),
 		contract.Code,
 		common.Hash{})
 

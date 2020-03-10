@@ -55,6 +55,8 @@ type StatetestResult struct {
 	State *state.Dump `json:"state,omitempty"`
 }
 
+var errTestFailed = errors.New("at least one (sub)test failed")
+
 func stateTestCmd(ctx *cli.Context) error {
 	if len(ctx.Args().First()) == 0 {
 		return errors.New("path-to-test argument required")
@@ -118,17 +120,27 @@ func stateTestCmd(ctx *cli.Context) error {
 
 		for key, test := range tests {
 			for _, st := range test.Subtests() {
+
 				// Run the test and aggregate the result
-				result := &StatetestResult{Name: key, Fork: st.Fork, Pass: true}
+				result := &StatetestResult{
+					Name: key,
+					Fork: st.Fork,
+					Pass: false,
+					Error: "",
+				}
+
 				state, err := test.Run(st, cfg)
+
 				// print state root for evmlab tracing
 				if ctx.GlobalBool(MachineFlag.Name) && state != nil {
 					fmt.Fprintf(os.Stderr, "{\"stateRoot\": \"%x\"}\n", state.IntermediateRoot(false))
 				}
-				if err != nil {
+				if err == nil {
+					result.Pass = true
+				} else {
 					// Test failed, mark as so and dump any state to aid debugging
-					result.Pass, result.Error = false, err.Error()
 					hadFailure = true
+					result.Error = err.Error()
 					if ctx.GlobalBool(DumpFlag.Name) && state != nil {
 						dump := state.RawDump(false, false, true)
 						result.State = &dump
@@ -140,8 +152,10 @@ func stateTestCmd(ctx *cli.Context) error {
 				// Print any structured logs collected
 				if ctx.GlobalBool(DebugFlag.Name) {
 					if debugger != nil {
-						fmt.Fprintln(os.Stderr, "#### TRACE ####")
-						vm.WriteTrace(os.Stderr, debugger.StructLogs())
+						if len(debugger.StructLogs()) > 0 {
+							fmt.Fprintln(os.Stderr, "#### VM.TRACE ####")
+							vm.WriteTrace(os.Stderr, debugger.StructLogs())
+						}
 					}
 				}
 			}
@@ -185,7 +199,7 @@ func stateTestCmd(ctx *cli.Context) error {
 	out, _ := json.MarshalIndent(results, "", "  ")
 	fmt.Println(string(out))
 	if hadFailure {
-		os.Exit(1)
+		return errTestFailed
 	}
 	return nil
 }

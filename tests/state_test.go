@@ -37,8 +37,10 @@ func TestState(t *testing.T) {
 		// FIXME: For now, only run EWASM tests when the vm.ewasm flag is in use.
 		st.whitelist(`^stEWASM`)
 		if strings.Contains(*testEWASM, "hera") {
-			st.skipLoad(`^stEWASMTests/callSenderBalanceExceeds128Bits`)
-			st.skipLoad(`^stEWASMTests/ecAddCallDataCopy`)
+
+			// Apparently these aren't failing anymore...?
+			//st.skipLoad(`^stEWASMTests/callSenderBalanceExceeds128Bits`)
+			//st.skipLoad(`^stEWASMTests/ecAddCallDataCopy`)
 
 		} else if strings.Contains(*testEWASM, "ssvm") {
 			// Don't know if these pass or not for ssvm.

@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -88,52 +89,103 @@ func stateTestCmd(ctx *cli.Context) error {
 	default:
 		debugger = vm.NewStructLogger(config)
 	}
-	// Load the test content from the input file
-	src, err := ioutil.ReadFile(ctx.Args().First())
-	if err != nil {
-		return err
-	}
-	var tests map[string]tests.StateTest
-	if err = json.Unmarshal(src, &tests); err != nil {
-		return err
-	}
+
 	// Iterate over all the tests, run them and aggregate the results
 	cfg := vm.Config{
 		Tracer:           tracer,
 		Debug:            ctx.GlobalBool(DebugFlag.Name) || ctx.GlobalBool(MachineFlag.Name),
 		EWASMInterpreter: ctx.String(stateTestEVMCEWASMFlag.Name),
 	}
-	results := make([]StatetestResult, 0, len(tests))
-	for key, test := range tests {
-		for _, st := range test.Subtests() {
-			// Run the test and aggregate the result
-			result := &StatetestResult{Name: key, Fork: st.Fork, Pass: true}
-			state, err := test.Run(st, cfg)
-			// print state root for evmlab tracing
-			if ctx.GlobalBool(MachineFlag.Name) && state != nil {
-				fmt.Fprintf(os.Stderr, "{\"stateRoot\": \"%x\"}\n", state.IntermediateRoot(false))
-			}
-			if err != nil {
-				// Test failed, mark as so and dump any state to aid debugging
-				result.Pass, result.Error = false, err.Error()
-				if ctx.GlobalBool(DumpFlag.Name) && state != nil {
-					dump := state.RawDump(false, false, true)
-					result.State = &dump
+
+	results := []StatetestResult{}
+	hadFailure := false
+
+	runFile := func(filename string) error {
+		if filepath.Ext(filename) != ".json" {
+			log.Warn("Skipping non-json file", "file", filename)
+			return nil
+		}
+		// Load the test content from the input file
+		src, err := ioutil.ReadFile(filename)
+		if err != nil {
+			return err
+		}
+
+		var tests map[string]tests.StateTest
+		if err = json.Unmarshal(src, &tests); err != nil {
+			return fmt.Errorf("err=%v filename=%v", err, filename)
+		}
+
+		for key, test := range tests {
+			for _, st := range test.Subtests() {
+				// Run the test and aggregate the result
+				result := &StatetestResult{Name: key, Fork: st.Fork, Pass: true}
+				state, err := test.Run(st, cfg)
+				// print state root for evmlab tracing
+				if ctx.GlobalBool(MachineFlag.Name) && state != nil {
+					fmt.Fprintf(os.Stderr, "{\"stateRoot\": \"%x\"}\n", state.IntermediateRoot(false))
 				}
-			}
+				if err != nil {
+					// Test failed, mark as so and dump any state to aid debugging
+					result.Pass, result.Error = false, err.Error()
+					hadFailure = true
+					if ctx.GlobalBool(DumpFlag.Name) && state != nil {
+						dump := state.RawDump(false, false, true)
+						result.State = &dump
+					}
+				}
 
-			results = append(results, *result)
+				results = append(results, *result)
 
-			// Print any structured logs collected
-			if ctx.GlobalBool(DebugFlag.Name) {
-				if debugger != nil {
-					fmt.Fprintln(os.Stderr, "#### TRACE ####")
-					vm.WriteTrace(os.Stderr, debugger.StructLogs())
+				// Print any structured logs collected
+				if ctx.GlobalBool(DebugFlag.Name) {
+					if debugger != nil {
+						fmt.Fprintln(os.Stderr, "#### TRACE ####")
+						vm.WriteTrace(os.Stderr, debugger.StructLogs())
+					}
 				}
 			}
 		}
+		return nil
 	}
+	runDir := func(filename string) error {
+		return filepath.Walk(filename, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			log.Info(path)
+			if info.IsDir() {
+				return nil
+			}
+			err = runFile(path)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+	}
+	target := ctx.Args().First()
+	if info, err := os.Stat(target); err != nil {
+		log.Error("err stat", "error", err.Error())
+		return err
+	} else if info.IsDir() {
+		log.Info("rundir", target)
+		if err := runDir(target); err != nil {
+			log.Error("err dir", "error", err.Error())
+			return err
+		}
+	} else {
+		log.Info("runfile", target)
+		if err := runFile(target); err != nil {
+			log.Error("err file", "error", err.Error())
+			return err
+		}
+	}
+
 	out, _ := json.MarshalIndent(results, "", "  ")
 	fmt.Println(string(out))
+	if hadFailure {
+		os.Exit(1)
+	}
 	return nil
 }

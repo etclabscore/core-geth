@@ -123,9 +123,9 @@ func stateTestCmd(ctx *cli.Context) error {
 
 				// Run the test and aggregate the result
 				result := &StatetestResult{
-					Name: key,
-					Fork: st.Fork,
-					Pass: false,
+					Name:  key,
+					Fork:  st.Fork,
+					Pass:  false,
 					Error: "",
 				}
 

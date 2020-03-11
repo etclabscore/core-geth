@@ -3,7 +3,7 @@
 # don't need to bother with make.
 
 .PHONY: all test clean
-.PHONY: evmc
+.PHONY: hera evmc
 .PHONY: geth android ios geth-cross
 .PHONY: geth-linux geth-linux-386 geth-linux-amd64 geth-linux-mips64 geth-linux-mips64le
 .PHONY: geth-linux-arm geth-linux-arm-5 geth-linux-arm-6 geth-linux-arm-7 geth-linux-arm64
@@ -13,6 +13,7 @@
 GOBIN = ./build/bin
 GO ?= latest
 GORUN = env GO111MODULE=on go run
+ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 geth:
 	$(GORUN) build/ci.go install ./cmd/geth
@@ -41,7 +42,13 @@ test: all evmc
 sync-parity-chainspecs:
 	./params/parity.json.d/sync-parity-remote.sh
 
-test-multigeth: test-multigeth-features test-multigeth-chainspecs ## Runs all tests specific to multi-geth.
+test-multigeth: test-multigeth-features test-multigeth-chainspecs test-evmc ## Runs all tests specific to multi-geth.
+
+hera:
+	./build/hera.sh
+
+test-evmc: hera
+	go test -v -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/hera/build/src/libhera.so
 
 test-multigeth-features: test-multigeth-features-parity test-multigeth-features-multigeth test-multigeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
 

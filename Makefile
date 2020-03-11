@@ -42,7 +42,7 @@ test: all evmc
 sync-parity-chainspecs:
 	./params/parity.json.d/sync-parity-remote.sh
 
-test-multigeth: test-evmc test-multigeth-features test-multigeth-chainspecs ## Runs all tests specific to multi-geth.
+test-multigeth: test-multigeth-features test-multigeth-chainspecs ## Runs all tests specific to multi-geth.
 
 hera:
 	./build/hera.sh

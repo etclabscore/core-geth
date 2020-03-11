@@ -26,10 +26,10 @@ install:
 build_script:
   - ps: $env:VERSION = "$(git describe)"
   - go run build\ci.go install
-  - 7z a core-geth-win64-$env:VERSION.zip .\build\bin\geth.exe
+  - 7z a core-geth-win64-%VERSION%.zip .\build\bin\geth.exe
   - ps: Get-FileHash core-geth-win64-$env:VERSION.zip -Algorithm SHA256
   - ps: Get-FileHash core-geth-win64-$env:VERSION.zip -Algorithm SHA256 | Out-File core-geth-win64-$env:VERSION.zip.sha256
-  - 7z a core-geth-alltools-win64-$env:VERSION.zip .\build\bin\*
+  - 7z a core-geth-alltools-win64-%VERSION%.zip .\build\bin\*
   - ps: Get-FileHash core-geth-alltools-win64-$env:VERSION.zip -Algorithm SHA256
   - ps: Get-FileHash core-geth-alltools-win64-$env:VERSION.zip | Out-File core-geth-alltools-win64-$env:VERSION.zip.sha256
 

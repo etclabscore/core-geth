@@ -64,7 +64,7 @@ func TestState(t *testing.T) {
 
 		// Very time consuming
 		st.skipLoad(`^stTimeConsuming/`)
-		st.skipLoad(`^EWASM`)
+		st.skipLoad(`^stEWASM`)
 	}
 
 	// Broken tests:

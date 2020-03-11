@@ -47,8 +47,15 @@ test-multigeth: test-multigeth-features test-multigeth-chainspecs test-evmc ## R
 hera:
 	./build/hera.sh
 
-test-evmc: hera
+ssvm:
+	./build/ssvm.sh
+
+test-evmc: hera ssvm
 	go test -v -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/hera/build/src/libhera.so
+	go test -v -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so
+
+clean-evmc:
+	rm -rf ./build/_workspace/hera ./build/_workspace/SSVM
 
 test-multigeth-features: test-multigeth-features-parity test-multigeth-features-multigeth test-multigeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
 

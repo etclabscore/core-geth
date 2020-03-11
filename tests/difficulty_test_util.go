@@ -98,6 +98,13 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 		EIP2200FBlock: big.NewInt(0), // Petersburg
 		DisposalBlock: big.NewInt(0),
 	},
+	"EIP2384": &goethereum.ChainConfig{
+		Ethash:              new(ctypes.EthashConfig),
+		HomesteadBlock:      big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		MuirGlacierBlock:    big.NewInt(0),
+	},
 }
 
 type DifficultyTest struct {

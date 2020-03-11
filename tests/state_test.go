@@ -45,8 +45,8 @@ func TestState(t *testing.T) {
 		} else if strings.Contains(*testEWASM, "ssvm") {
 			// Don't know if these pass or not for ssvm.
 			// Just copied directly from hera for the "benefit of the doubt."
-			st.skipLoad(`^stEWASMTests/callSenderBalanceExceeds128Bits`)
-			st.skipLoad(`^stEWASMTests/ecAddCallDataCopy`)
+			//st.skipLoad(`^stEWASMTests/callSenderBalanceExceeds128Bits`)
+			//st.skipLoad(`^stEWASMTests/ecAddCallDataCopy`)
 		}
 
 	} else {

@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"strings"
 	"sync/atomic"
 
@@ -229,12 +230,13 @@ func (s *RPCService) methods() map[string][]string {
 	return methods
 }
 
-func (s *RPCService) SetOpenRPCDiscoverDocument(doc string) error {
-	if err := validateOpenRPCSchemaRaw(doc); err != nil {
+func (s *RPCService) SetOpenRPCDiscoverDocument(documentPath string) error {
+	bs, err := ioutil.ReadFile(documentPath)
+	if err != nil {
 		return err
 	}
-	s.server.OpenRPCSchemaRaw = doc
-	return nil
+	doc := string(bs)
+	return s.server.SetOpenRPCSchemaRaw(doc)
 }
 
 type OpenRPCCheck struct {

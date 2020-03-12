@@ -11,6 +11,23 @@
     },
     "methods": [
       {
+        "name": "admin_addPeer",
+        "description": "adds a peer",
+        "summary": "Adds a peer",
+        "params": [
+          {
+            "$ref": "#/components/contentDescriptors/Enode"
+          }
+        ],
+        "result": {
+          "name": "addPeerResult",
+          "description": "whether added",
+          "schema": {
+            "$ref": "#/components/schemas/Bool"
+          }
+        }
+      },
+      {
         "name": "web3_clientVersion",
         "description": "Returns the version of the current client",
         "summary": "current client version",
@@ -1579,6 +1596,11 @@
           "type": "null",
           "description": "Null"
         },
+        "Bool": {
+          "title": "bool",
+          "type": "boolean",
+          "description": "Bool"
+        },
         "Integer": {
           "title": "integer",
           "type": "string",
@@ -1615,9 +1637,24 @@
           "type": "string",
           "description": "Hex representation of a variable length byte array",
           "pattern": "^0x([a-fA-F0-9]?)+$"
+        },
+        "Enode": {
+          "title": "enode",
+          "type": "string",
+          "description": "ethereum node address",
+          "pattern": "^enode://"
         }
       },
       "contentDescriptors": {
+        "Enode": {
+          "name": "enode",
+          "summary": "an ethereum node address",
+          "description": "An enode",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/Enode"
+          }
+        },
         "Block": {
           "name": "block",
           "summary": "A block",

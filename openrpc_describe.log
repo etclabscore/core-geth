@@ -1,21 +1,9 @@
 {
   "jsonrpc": "2.0", 
-  "id": 1584030881, 
+  "id": 1584032672, 
   "result": {
     "Over": [], 
     "Under": [
-      {
-        "Name": "admin_addPeer", 
-        "Fn": "\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e", 
-        "IsSubscribe": false, 
-        "ErrPos": 1, 
-        "Args": [
-          {
-            "Name": "string", 
-            "Kind": "string"
-          }
-        ]
-      }, 
       {
         "Name": "admin_addTrustedPeer", 
         "Fn": "\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e", 

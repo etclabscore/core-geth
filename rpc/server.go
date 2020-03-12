@@ -242,7 +242,19 @@ type OpenRPCCheck struct {
 	Over []string
 
 	// Under is the methods on the server not available in the document.
-	Under []string
+	Under []OpenRPCCheckUnder
+}
+
+type OpenRPCCheckUnder struct {
+	Name        string
+	Fn          string
+	IsSubscribe bool
+	ErrPos      int
+	Args        []OpenRPCCheckUnderArg
+}
+
+type OpenRPCCheckUnderArg struct {
+	Name, Kind string
 }
 
 func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
@@ -260,7 +272,7 @@ func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
 
 	check := &OpenRPCCheck{
 		Over:  []string{},
-		Under: []string{},
+		Under: []OpenRPCCheckUnder{},
 	}
 
 	// Audit documented doc methods vs. actual server availability
@@ -298,7 +310,6 @@ outer:
 		// Were not continued over; path was not found.
 		check.Over = append(check.Over, methodName)
 	}
-	//doc.Methods = docMethodsAvailable
 
 	// Find under methods.
 	for mod, list := range serverMethodsAvailable {
@@ -310,7 +321,25 @@ outer:
 					continue modmethodlistloop
 				}
 			}
-			check.Under = append(check.Under, name)
+			it := s.server.services.services[mod].callbacks[item]
+			cu := OpenRPCCheckUnder{
+				Name:        name,
+				Fn:          it.fn.String(),
+				IsSubscribe: it.isSubscribe,
+				ErrPos:      it.errPos,
+				Args:        []OpenRPCCheckUnderArg{},
+			}
+			it.makeArgTypes()
+			argTypes := it.argTypes
+
+			for _, a := range argTypes {
+				cu.Args = append(cu.Args, OpenRPCCheckUnderArg{
+					Name: a.Name(),
+					Kind: a.Kind().String(),
+				})
+			}
+
+			check.Under = append(check.Under, cu)
 		}
 	}
 	return check, nil

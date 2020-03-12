@@ -28,6 +28,23 @@
         }
       },
       {
+        "name": "admin_addTrustedPeer",
+        "description": "adds a trusted peer",
+        "summary": "Adds a trusted peer",
+        "params": [
+          {
+            "$ref": "#/components/contentDescriptors/Enode"
+          }
+        ],
+        "result": {
+          "name": "addPeerResult",
+          "description": "whether added",
+          "schema": {
+            "$ref": "#/components/schemas/Bool"
+          }
+        }
+      },
+      {
         "name": "web3_clientVersion",
         "description": "Returns the version of the current client",
         "summary": "current client version",

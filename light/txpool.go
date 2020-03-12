@@ -224,7 +224,12 @@ func (pool *TxPool) reorgOnNewHead(ctx context.Context, newHeader *types.Header)
 	txc := make(txStateChanges)
 	oldh := pool.chain.GetHeaderByHash(pool.head)
 	if oldh == nil {
-		oldh = pool.chain.GetHeaderByHash(pool.chain.CurrentHeader().ParentHash)
+		current := pool.chain.CurrentHeader()
+		if current.Number.Uint64() > 0 {
+			oldh = pool.chain.GetHeaderByHash(current.ParentHash)
+		} else {
+			oldh = current
+		}
 		pool.head = oldh.Hash()
 	}
 	newh := newHeader

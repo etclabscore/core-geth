@@ -1,8 +1,8 @@
 {
   "jsonrpc": "2.0", 
-  "id": 1584030823, 
+  "id": 1584030881, 
   "result": {
-    "Over": ["eth_submitHashrate"], 
+    "Over": [], 
     "Under": [
       {
         "Name": "admin_addPeer", 

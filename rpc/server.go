@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"sync/atomic"
 
 	mapset "github.com/deckarep/golang-set"
@@ -194,6 +195,22 @@ func (s *RPCService) Modules() map[string]string {
 	return modules
 }
 
+func (s *RPCService) ModuleMethods(mod string) []string {
+	s.server.services.mu.Lock()
+	defer s.server.services.mu.Unlock()
+
+	list := []string{}
+
+	for name, ser := range s.server.services.services {
+		if name == mod {
+			for cname := range ser.callbacks {
+				list = append(list, cname)
+			}
+		}
+	}
+	return list
+}
+
 func (s *RPCService) methods() map[string][]string {
 	s.server.services.mu.Lock()
 	defer s.server.services.mu.Unlock()
@@ -210,6 +227,93 @@ func (s *RPCService) methods() map[string][]string {
 		}
 	}
 	return methods
+}
+
+func (s *RPCService) SetOpenRPCDiscoverDocument(doc string) error {
+	if err := validateOpenRPCSchemaRaw(doc); err != nil {
+		return err
+	}
+	s.server.OpenRPCSchemaRaw = doc
+	return nil
+}
+
+type OpenRPCCheck struct {
+	// Over is the methods in the document which are not actually available at the server.
+	Over []string
+
+	// Under is the methods on the server not available in the document.
+	Under []string
+}
+
+func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
+	var err error
+	if s.server.OpenRPCSchemaRaw == "" {
+		return nil, errOpenRPCDiscoverUnavailable
+	}
+	doc := &OpenRPCDiscoverSchemaT{
+		Servers: make([]map[string]interface{}, 0),
+	}
+	err = json.Unmarshal([]byte(s.server.OpenRPCSchemaRaw), doc)
+	if err != nil {
+		log.Crit("openrpc json umarshal", "error", err)
+	}
+
+	check := &OpenRPCCheck{
+		Over:  []string{},
+		Under: []string{},
+	}
+
+	// Audit documented doc methods vs. actual server availability
+	// This removes methods described in the OpenRPC JSON document
+	// which are not currently exposed on the server's API.
+	// This is done on the fly (as opposed to at servre init or doc setting)
+	// because it's possible that exposed APIs could be modified in proc.
+	docMethodsAvailable := []map[string]interface{}{}
+	serverMethodsAvailable := s.methods()
+
+outer:
+	for _, m := range doc.Methods {
+		// Get the module/method name from the document.
+		methodName := m["name"].(string)
+		module, path, err := elementizeMethodName(methodName)
+		if err != nil {
+			return nil, err
+		}
+
+		// Check if the server has this module available.
+		paths, ok := serverMethodsAvailable[module]
+		if !ok {
+			check.Over = append(check.Over, methodName)
+			continue
+		}
+
+		// Check if the server has this module+path(=full method name).
+		for _, pa := range paths {
+			if pa == path {
+				docMethodsAvailable = append(docMethodsAvailable, m)
+				continue outer
+			}
+		}
+
+		// Were not continued over; path was not found.
+		check.Over = append(check.Over, methodName)
+	}
+	//doc.Methods = docMethodsAvailable
+
+	// Find under methods.
+	for mod, list := range serverMethodsAvailable {
+	modmethodlistloop:
+		for _, item := range list {
+			name := strings.Join([]string{mod, item}, serviceMethodSeparators[0])
+			for _, m := range doc.Methods {
+				if m["name"].(string) == name {
+					continue modmethodlistloop
+				}
+			}
+			check.Under = append(check.Under, name)
+		}
+	}
+	return check, nil
 }
 
 // Discover returns a configured schema that is audited for actual server availability.

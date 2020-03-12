@@ -1,16 +1,9 @@
 {
   "jsonrpc": "2.0", 
-  "id": 1584032799, 
+  "id": 1584033156, 
   "result": {
     "Over": [], 
     "Under": [
-      {
-        "Name": "admin_datadir", 
-        "Fn": "\u003cfunc(*node.PublicAdminAPI) string Value\u003e", 
-        "IsSubscribe": false, 
-        "ErrPos": -1, 
-        "Args": []
-      }, 
       {
         "Name": "admin_exportChain", 
         "Fn": "\u003cfunc(*eth.PrivateAdminAPI, string, *uint64, *uint64) (bool, error) Value\u003e", 

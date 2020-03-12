@@ -224,38 +224,30 @@ func (pool *TxPool) reorgOnNewHead(ctx context.Context, newHeader *types.Header)
 	txc := make(txStateChanges)
 	oldh := pool.chain.GetHeaderByHash(pool.head)
 	newh := newHeader
+	// find common ancestor, create list of rolled back and new block hashes
 	var oldHashes, newHashes []common.Hash
-
-	if oldh != nil {
-		// find common ancestor, create list of rolled back and new block hashes
-		for oldh.Hash() != newh.Hash() {
-			if oldh.Number.Uint64() >= newh.Number.Uint64() {
-				oldHashes = append(oldHashes, oldh.Hash())
-				oldh = pool.chain.GetHeader(oldh.ParentHash, oldh.Number.Uint64()-1)
-			}
-			if oldh.Number.Uint64() < newh.Number.Uint64() {
-				newHashes = append(newHashes, newh.Hash())
-				newh = pool.chain.GetHeader(newh.ParentHash, newh.Number.Uint64()-1)
-				if newh == nil {
-					// happens when CHT syncing, nothing to do
-					newh = oldh
-				}
+	for oldh.Hash() != newh.Hash() {
+		if oldh.Number.Uint64() >= newh.Number.Uint64() {
+			oldHashes = append(oldHashes, oldh.Hash())
+			oldh = pool.chain.GetHeader(oldh.ParentHash, oldh.Number.Uint64()-1)
+		}
+		if oldh.Number.Uint64() < newh.Number.Uint64() {
+			newHashes = append(newHashes, newh.Hash())
+			newh = pool.chain.GetHeader(newh.ParentHash, newh.Number.Uint64()-1)
+			if newh == nil {
+				// happens when CHT syncing, nothing to do
+				newh = oldh
 			}
 		}
-		if oldh.Number.Uint64() < pool.clearIdx {
-			pool.clearIdx = oldh.Number.Uint64()
-		}
-		// roll back old blocks
-		for _, hash := range oldHashes {
-			pool.rollbackTxs(hash, txc)
-		}
-		pool.head = oldh.Hash()
 	}
-
-	if newHeader == nil {
-		return txc, nil
+	if oldh.Number.Uint64() < pool.clearIdx {
+		pool.clearIdx = oldh.Number.Uint64()
 	}
-
+	// roll back old blocks
+	for _, hash := range oldHashes {
+		pool.rollbackTxs(hash, txc)
+	}
+	pool.head = oldh.Hash()
 	// check mined txs of new blocks (array is in reversed order)
 	for i := len(newHashes) - 1; i >= 0; i-- {
 		hash := newHashes[i]
@@ -373,7 +365,7 @@ func (pool *TxPool) validateTx(ctx context.Context, tx *types.Transaction) error
 	// Check the transaction doesn't exceed the current
 	// block limit gas.
 	header := pool.chain.GetHeaderByHash(pool.head)
-	if header != nil && header.GasLimit < tx.Gas() {
+	if header.GasLimit < tx.Gas() {
 		return core.ErrGasLimit
 	}
 

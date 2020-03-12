@@ -26,7 +26,6 @@ import (
 	"sort"
 	"strings"
 	"sync/atomic"
-	"unicode"
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/log"
@@ -255,32 +254,15 @@ func (o OpenRPCCheckUnderSet) Len() int {
 	return len(o)
 }
 
-func (s OpenRPCCheckUnderSet) Less(i, j int) bool {
-	iRunes := []rune(s[i].Name)
-	jRunes := []rune(s[j].Name)
-
-	max := len(iRunes)
-	if max > len(jRunes) {
-		max = len(jRunes)
+func (o OpenRPCCheckUnderSet) Less(i, j int) bool {
+	var si string = o[i].Name
+	var sj string = o[j].Name
+	var si_lower = strings.ToLower(si)
+	var sj_lower = strings.ToLower(sj)
+	if si_lower == sj_lower {
+		return si < sj
 	}
-
-	for idx := 0; idx < max; idx++ {
-		ir := iRunes[idx]
-		jr := jRunes[idx]
-
-		lir := unicode.ToLower(ir)
-		ljr := unicode.ToLower(jr)
-
-		if lir != ljr {
-			return lir < ljr
-		}
-
-		// the lowercase runes are the same, so compare the original
-		if ir != jr {
-			return ir < jr
-		}
-	}
-
+	return si_lower < sj_lower
 	return false
 }
 

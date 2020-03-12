@@ -11,7 +11,8 @@ make geth && ./build/bin/geth --datadir=/tmp/gethddd --nodiscover --maxpeers=0 -
 fi
 
 # Logs are truncated with each run, they only show the latest state.
-http --json POST http://localhost:8545 id:=$(date +%s) method=rpc_setOpenRPCDiscoverDocument params:='["./openrpc.json"]' > openrpc_set.log
+http --json POST http://localhost:8545 id:=$(date +%s) method=rpc_setOpenRPCDiscoverDocument params:='["./openrpc.json"]' |& tee openrpc_set.log
+grep -q error openrpc_set.log && exit 1 
 http --json POST http://localhost:8545 id:=$(date +%s) method=rpc_describeOpenRPC params:='[]' | jj -p > openrpc_describe.log
 
 # Developer can then inspect the logs, eg.

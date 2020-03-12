@@ -141,11 +141,7 @@ func TestTxPool(t *testing.T) {
 			pool.setNewHead(h)
 		}
 		if _, err := lightchain.InsertHeaderChain([]*types.Header{block.Header()}, 1); err != nil {
-			panic(err)
-		}
-
-		if _, err := lightchain.InsertHeaderChain([]*types.Header{block.Header()}, 1); err != nil {
-			panic(err)
+			t.Fatal(err)
 		}
 
 		got := <-relay.mined

@@ -23,8 +23,10 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"sort"
 	"strings"
 	"sync/atomic"
+	"unicode"
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/log"
@@ -244,7 +246,46 @@ type OpenRPCCheck struct {
 	Over []string
 
 	// Under is the methods on the server not available in the document.
-	Under []OpenRPCCheckUnder
+	Under OpenRPCCheckUnderSet
+}
+
+type OpenRPCCheckUnderSet []OpenRPCCheckUnder
+
+func (o OpenRPCCheckUnderSet) Len() int {
+	return len(o)
+}
+
+func (s OpenRPCCheckUnderSet) Less(i, j int) bool {
+	iRunes := []rune(s[i].Name)
+	jRunes := []rune(s[j].Name)
+
+	max := len(iRunes)
+	if max > len(jRunes) {
+		max = len(jRunes)
+	}
+
+	for idx := 0; idx < max; idx++ {
+		ir := iRunes[idx]
+		jr := jRunes[idx]
+
+		lir := unicode.ToLower(ir)
+		ljr := unicode.ToLower(jr)
+
+		if lir != ljr {
+			return lir < ljr
+		}
+
+		// the lowercase runes are the same, so compare the original
+		if ir != jr {
+			return ir < jr
+		}
+	}
+
+	return false
+}
+
+func (o OpenRPCCheckUnderSet) Swap(i, j int) {
+	o[i], o[j] = o[j], o[i]
 }
 
 type OpenRPCCheckUnder struct {
@@ -344,6 +385,7 @@ outer:
 			check.Under = append(check.Under, cu)
 		}
 	}
+	sort.Sort(check.Under)
 	return check, nil
 }
 

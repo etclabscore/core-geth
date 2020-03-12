@@ -1,1 +1,1289 @@
-{"jsonrpc":"2.0","id":1584030071,"result":{"Over":["eth_submitHashrate"],"Under":[{"Name":"miner_setExtra","Fn":"\u003cfunc(*eth.PrivateMinerAPI, string) (bool, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"miner_setGasPrice","Fn":"\u003cfunc(*eth.PrivateMinerAPI, hexutil.Big) bool Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"Big","Kind":"struct"}]},{"Name":"miner_setRecommitInterval","Fn":"\u003cfunc(*eth.PrivateMinerAPI, int) Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"int","Kind":"int"}]},{"Name":"miner_start","Fn":"\u003cfunc(*eth.PrivateMinerAPI, *int) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"","Kind":"ptr"}]},{"Name":"miner_stop","Fn":"\u003cfunc(*eth.PrivateMinerAPI) Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"miner_getHashrate","Fn":"\u003cfunc(*eth.PrivateMinerAPI) uint64 Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"miner_setEtherbase","Fn":"\u003cfunc(*eth.PrivateMinerAPI, common.Address) bool Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"Address","Kind":"array"}]},{"Name":"rpc_moduleMethods","Fn":"\u003cfunc(*rpc.RPCService, string) []string Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"rpc_modules","Fn":"\u003cfunc(*rpc.RPCService) map[string]string Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"rpc_setOpenRPCDiscoverDocument","Fn":"\u003cfunc(*rpc.RPCService, string) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"rpc_describeOpenRPC","Fn":"\u003cfunc(*rpc.RPCService) (*rpc.OpenRPCCheck, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[]},{"Name":"rpc_discover","Fn":"\u003cfunc(*rpc.RPCService) (*rpc.OpenRPCDiscoverSchemaT, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[]},{"Name":"debug_traceBadBlock","Fn":"\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Hash","Kind":"array"},{"Name":"","Kind":"ptr"}]},{"Name":"debug_storageRangeAt","Fn":"\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, int, common.Address, hexutil.Bytes, int) (eth.StorageRangeResult, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Hash","Kind":"array"},{"Name":"int","Kind":"int"},{"Name":"Address","Kind":"array"},{"Name":"Bytes","Kind":"slice"},{"Name":"int","Kind":"int"}]},{"Name":"debug_memStats","Fn":"\u003cfunc(*debug.HandlerT) *runtime.MemStats Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"debug_stopCPUProfile","Fn":"\u003cfunc(*debug.HandlerT) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[]},{"Name":"debug_getBlockRlp","Fn":"\u003cfunc(*ethapi.PublicDebugAPI, context.Context, uint64) (string, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"uint64","Kind":"uint64"}]},{"Name":"debug_setHead","Fn":"\u003cfunc(*ethapi.PrivateDebugAPI, hexutil.Uint64) Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"Uint64","Kind":"uint64"}]},{"Name":"debug_backtraceAt","Fn":"\u003cfunc(*debug.HandlerT, string) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"debug_blockProfile","Fn":"\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"},{"Name":"uint","Kind":"uint"}]},{"Name":"debug_stacks","Fn":"\u003cfunc(*debug.HandlerT) string Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"debug_preimage","Fn":"\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash) (hexutil.Bytes, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Hash","Kind":"array"}]},{"Name":"debug_standardTraceBlockToFile","Fn":"\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.StdTraceConfig) ([]string, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Hash","Kind":"array"},{"Name":"","Kind":"ptr"}]},{"Name":"debug_vmodule","Fn":"\u003cfunc(*debug.HandlerT, string) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"debug_startCPUProfile","Fn":"\u003cfunc(*debug.HandlerT, string) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"debug_setMutexProfileFraction","Fn":"\u003cfunc(*debug.HandlerT, int) Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"int","Kind":"int"}]},{"Name":"debug_getModifiedAccountsByHash","Fn":"\u003cfunc(*eth.PrivateDebugAPI, common.Hash, *common.Hash) ([]common.Address, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Hash","Kind":"array"},{"Name":"","Kind":"ptr"}]},{"Name":"debug_writeMutexProfile","Fn":"\u003cfunc(*debug.HandlerT, string) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"debug_chaindbCompact","Fn":"\u003cfunc(*ethapi.PrivateDebugAPI) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[]},{"Name":"debug_accountRange","Fn":"\u003cfunc(*eth.PrivateDebugAPI, context.Context, *common.Hash, int) (eth.AccountRangeResult, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"","Kind":"ptr"},{"Name":"int","Kind":"int"}]},{"Name":"debug_traceBlockByHash","Fn":"\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Hash","Kind":"array"},{"Name":"","Kind":"ptr"}]},{"Name":"debug_cpuProfile","Fn":"\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"},{"Name":"uint","Kind":"uint"}]},{"Name":"debug_setBlockProfileRate","Fn":"\u003cfunc(*debug.HandlerT, int) Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"int","Kind":"int"}]},{"Name":"debug_chaindbProperty","Fn":"\u003cfunc(*ethapi.PrivateDebugAPI, string) (string, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"debug_traceBlockByNumber","Fn":"\u003cfunc(*eth.PrivateDebugAPI, context.Context, rpc.BlockNumber, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"BlockNumber","Kind":"int64"},{"Name":"","Kind":"ptr"}]},{"Name":"debug_printBlock","Fn":"\u003cfunc(*ethapi.PublicDebugAPI, context.Context, uint64) (string, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"uint64","Kind":"uint64"}]},{"Name":"debug_traceTransaction","Fn":"\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.TraceConfig) (interface {}, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Hash","Kind":"array"},{"Name":"","Kind":"ptr"}]},{"Name":"debug_startGoTrace","Fn":"\u003cfunc(*debug.HandlerT, string) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"debug_writeMemProfile","Fn":"\u003cfunc(*debug.HandlerT, string) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"debug_writeBlockProfile","Fn":"\u003cfunc(*debug.HandlerT, string) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"debug_mutexProfile","Fn":"\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"},{"Name":"uint","Kind":"uint"}]},{"Name":"debug_traceBlockFromFile","Fn":"\u003cfunc(*eth.PrivateDebugAPI, context.Context, string, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"},{"Name":"","Kind":"ptr"}]},{"Name":"debug_getModifiedAccountsByNumber","Fn":"\u003cfunc(*eth.PrivateDebugAPI, uint64, *uint64) ([]common.Address, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"uint64","Kind":"uint64"},{"Name":"","Kind":"ptr"}]},{"Name":"debug_freeOSMemory","Fn":"\u003cfunc(*debug.HandlerT) Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"debug_setGCPercent","Fn":"\u003cfunc(*debug.HandlerT, int) int Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"int","Kind":"int"}]},{"Name":"debug_gcStats","Fn":"\u003cfunc(*debug.HandlerT) *debug.GCStats Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"debug_seedHash","Fn":"\u003cfunc(*ethapi.PublicDebugAPI, context.Context, uint64) (string, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"uint64","Kind":"uint64"}]},{"Name":"debug_dumpBlock","Fn":"\u003cfunc(*eth.PublicDebugAPI, rpc.BlockNumber) (state.Dump, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"BlockNumber","Kind":"int64"}]},{"Name":"debug_traceBlock","Fn":"\u003cfunc(*eth.PrivateDebugAPI, context.Context, []uint8, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"","Kind":"slice"},{"Name":"","Kind":"ptr"}]},{"Name":"debug_getBadBlocks","Fn":"\u003cfunc(*eth.PrivateDebugAPI, context.Context) ([]*eth.BadBlockArgs, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[]},{"Name":"debug_standardTraceBadBlockToFile","Fn":"\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.StdTraceConfig) ([]string, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Hash","Kind":"array"},{"Name":"","Kind":"ptr"}]},{"Name":"debug_verbosity","Fn":"\u003cfunc(*debug.HandlerT, int) Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"int","Kind":"int"}]},{"Name":"debug_goTrace","Fn":"\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"},{"Name":"uint","Kind":"uint"}]},{"Name":"debug_stopGoTrace","Fn":"\u003cfunc(*debug.HandlerT) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[]},{"Name":"debug_testSignCliqueBlock","Fn":"\u003cfunc(*ethapi.PublicDebugAPI, context.Context, common.Address, uint64) (common.Address, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Address","Kind":"array"},{"Name":"uint64","Kind":"uint64"}]},{"Name":"txpool_inspect","Fn":"\u003cfunc(*ethapi.PublicTxPoolAPI) map[string]map[string]map[string]string Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"txpool_status","Fn":"\u003cfunc(*ethapi.PublicTxPoolAPI) map[string]hexutil.Uint Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"txpool_content","Fn":"\u003cfunc(*ethapi.PublicTxPoolAPI) map[string]map[string]map[string]*ethapi.RPCTransaction Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"ethash_submitHashRate","Fn":"\u003cfunc(*ethash.API, hexutil.Uint64, common.Hash) bool Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"Uint64","Kind":"uint64"},{"Name":"Hash","Kind":"array"}]},{"Name":"ethash_submitWork","Fn":"\u003cfunc(*ethash.API, types.BlockNonce, common.Hash, common.Hash) bool Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"BlockNonce","Kind":"array"},{"Name":"Hash","Kind":"array"},{"Name":"Hash","Kind":"array"}]},{"Name":"ethash_getHashrate","Fn":"\u003cfunc(*ethash.API) uint64 Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"ethash_getWork","Fn":"\u003cfunc(*ethash.API) ([4]string, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[]},{"Name":"admin_addTrustedPeer","Fn":"\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"admin_removeTrustedPeer","Fn":"\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"admin_peers","Fn":"\u003cfunc(*node.PublicAdminAPI) ([]*p2p.PeerInfo, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[]},{"Name":"admin_datadir","Fn":"\u003cfunc(*node.PublicAdminAPI) string Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"admin_exportChain","Fn":"\u003cfunc(*eth.PrivateAdminAPI, string, *uint64, *uint64) (bool, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"},{"Name":"","Kind":"ptr"},{"Name":"","Kind":"ptr"}]},{"Name":"admin_removePeer","Fn":"\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"admin_nodeInfo","Fn":"\u003cfunc(*node.PublicAdminAPI) (*p2p.NodeInfo, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[]},{"Name":"admin_importChain","Fn":"\u003cfunc(*eth.PrivateAdminAPI, string) (bool, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"admin_startRPC","Fn":"\u003cfunc(*node.PrivateAdminAPI, *string, *int, *string, *string, *string) (bool, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"","Kind":"ptr"},{"Name":"","Kind":"ptr"},{"Name":"","Kind":"ptr"},{"Name":"","Kind":"ptr"},{"Name":"","Kind":"ptr"}]},{"Name":"admin_startWS","Fn":"\u003cfunc(*node.PrivateAdminAPI, *string, *int, *string, *string) (bool, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"","Kind":"ptr"},{"Name":"","Kind":"ptr"},{"Name":"","Kind":"ptr"},{"Name":"","Kind":"ptr"}]},{"Name":"admin_stopWS","Fn":"\u003cfunc(*node.PrivateAdminAPI) (bool, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[]},{"Name":"admin_addPeer","Fn":"\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"admin_stopRPC","Fn":"\u003cfunc(*node.PrivateAdminAPI) (bool, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[]},{"Name":"eth_getHashrate","Fn":"\u003cfunc(*ethash.API) uint64 Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"eth_submitHashRate","Fn":"\u003cfunc(*ethash.API, hexutil.Uint64, common.Hash) bool Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"Uint64","Kind":"uint64"},{"Name":"Hash","Kind":"array"}]},{"Name":"eth_subscribeSyncStatus","Fn":"\u003cfunc(*downloader.PublicDownloaderAPI, chan interface {}) *downloader.SyncStatusSubscription Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"","Kind":"chan"}]},{"Name":"eth_accounts","Fn":"\u003cfunc(*ethapi.PublicAccountAPI) []common.Address Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"eth_sendTransaction","Fn":"\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs) (common.Hash, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"SendTxArgs","Kind":"struct"}]},{"Name":"eth_signTransaction","Fn":"\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs) (*ethapi.SignTransactionResult, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"SendTxArgs","Kind":"struct"}]},{"Name":"eth_resend","Fn":"\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs, *hexutil.Big, *hexutil.Uint64) (common.Hash, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"SendTxArgs","Kind":"struct"},{"Name":"","Kind":"ptr"},{"Name":"","Kind":"ptr"}]},{"Name":"eth_etherbase","Fn":"\u003cfunc(*eth.PublicEthereumAPI) (common.Address, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[]},{"Name":"eth_getHeaderByHash","Fn":"\u003cfunc(*ethapi.PublicBlockChainAPI, context.Context, common.Hash) map[string]interface {} Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"Hash","Kind":"array"}]},{"Name":"eth_fillTransaction","Fn":"\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs) (*ethapi.SignTransactionResult, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"SendTxArgs","Kind":"struct"}]},{"Name":"eth_getHeaderByNumber","Fn":"\u003cfunc(*ethapi.PublicBlockChainAPI, context.Context, rpc.BlockNumber) (map[string]interface {}, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"BlockNumber","Kind":"int64"}]},{"Name":"eth_sign","Fn":"\u003cfunc(*ethapi.PublicTransactionPoolAPI, common.Address, hexutil.Bytes) (hexutil.Bytes, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Address","Kind":"array"},{"Name":"Bytes","Kind":"slice"}]},{"Name":"personal_newAccount","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, string) (common.Address, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"personal_signTransaction","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (*ethapi.SignTransactionResult, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"SendTxArgs","Kind":"struct"},{"Name":"string","Kind":"string"}]},{"Name":"personal_sendTransaction","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (common.Hash, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"SendTxArgs","Kind":"struct"},{"Name":"string","Kind":"string"}]},{"Name":"personal_ecRecover","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, hexutil.Bytes, hexutil.Bytes) (common.Address, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Bytes","Kind":"slice"},{"Name":"Bytes","Kind":"slice"}]},{"Name":"personal_listAccounts","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI) []common.Address Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"personal_unlockAccount","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, common.Address, string, *uint64) (bool, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Address","Kind":"array"},{"Name":"string","Kind":"string"},{"Name":"","Kind":"ptr"}]},{"Name":"personal_sign","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, hexutil.Bytes, common.Address, string) (hexutil.Bytes, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"Bytes","Kind":"slice"},{"Name":"Address","Kind":"array"},{"Name":"string","Kind":"string"}]},{"Name":"personal_unpair","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, string, string) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"},{"Name":"string","Kind":"string"}]},{"Name":"personal_deriveAccount","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, string, string, *bool) (accounts.Account, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"},{"Name":"string","Kind":"string"},{"Name":"","Kind":"ptr"}]},{"Name":"personal_initializeWallet","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, string) (string, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"}]},{"Name":"personal_importRawKey","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, string, string) (common.Address, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"string","Kind":"string"},{"Name":"string","Kind":"string"}]},{"Name":"personal_listWallets","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI) []ethapi.rawWallet Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[]},{"Name":"personal_lockAccount","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, common.Address) bool Value\u003e","IsSubscribe":false,"ErrPos":-1,"Args":[{"Name":"Address","Kind":"array"}]},{"Name":"personal_openWallet","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, string, *string) error Value\u003e","IsSubscribe":false,"ErrPos":0,"Args":[{"Name":"string","Kind":"string"},{"Name":"","Kind":"ptr"}]},{"Name":"personal_signAndSendTransaction","Fn":"\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (common.Hash, error) Value\u003e","IsSubscribe":false,"ErrPos":1,"Args":[{"Name":"SendTxArgs","Kind":"struct"},{"Name":"string","Kind":"string"}]}]}}
+{
+  "jsonrpc": "2.0", 
+  "id": 1584030633, 
+  "result": {
+    "Over": ["eth_submitHashrate"], 
+    "Under": [
+      {
+        "Name": "admin_addPeer", 
+        "Fn": "\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "admin_addTrustedPeer", 
+        "Fn": "\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "admin_datadir", 
+        "Fn": "\u003cfunc(*node.PublicAdminAPI) string Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "admin_exportChain", 
+        "Fn": "\u003cfunc(*eth.PrivateAdminAPI, string, *uint64, *uint64) (bool, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "admin_importChain", 
+        "Fn": "\u003cfunc(*eth.PrivateAdminAPI, string) (bool, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "admin_nodeInfo", 
+        "Fn": "\u003cfunc(*node.PublicAdminAPI) (*p2p.NodeInfo, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": []
+      }, 
+      {
+        "Name": "admin_peers", 
+        "Fn": "\u003cfunc(*node.PublicAdminAPI) ([]*p2p.PeerInfo, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": []
+      }, 
+      {
+        "Name": "admin_removePeer", 
+        "Fn": "\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "admin_removeTrustedPeer", 
+        "Fn": "\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "admin_startRPC", 
+        "Fn": "\u003cfunc(*node.PrivateAdminAPI, *string, *int, *string, *string, *string) (bool, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "admin_startWS", 
+        "Fn": "\u003cfunc(*node.PrivateAdminAPI, *string, *int, *string, *string) (bool, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "admin_stopRPC", 
+        "Fn": "\u003cfunc(*node.PrivateAdminAPI) (bool, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": []
+      }, 
+      {
+        "Name": "admin_stopWS", 
+        "Fn": "\u003cfunc(*node.PrivateAdminAPI) (bool, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": []
+      }, 
+      {
+        "Name": "debug_accountRange", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, *common.Hash, int) (eth.AccountRangeResult, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }, 
+          {
+            "Name": "int", 
+            "Kind": "int"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_backtraceAt", 
+        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_blockProfile", 
+        "Fn": "\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }, 
+          {
+            "Name": "uint", 
+            "Kind": "uint"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_chaindbCompact", 
+        "Fn": "\u003cfunc(*ethapi.PrivateDebugAPI) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": []
+      }, 
+      {
+        "Name": "debug_chaindbProperty", 
+        "Fn": "\u003cfunc(*ethapi.PrivateDebugAPI, string) (string, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_cpuProfile", 
+        "Fn": "\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }, 
+          {
+            "Name": "uint", 
+            "Kind": "uint"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_dumpBlock", 
+        "Fn": "\u003cfunc(*eth.PublicDebugAPI, rpc.BlockNumber) (state.Dump, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "BlockNumber", 
+            "Kind": "int64"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_freeOSMemory", 
+        "Fn": "\u003cfunc(*debug.HandlerT) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "debug_gcStats", 
+        "Fn": "\u003cfunc(*debug.HandlerT) *debug.GCStats Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "debug_getBadBlocks", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context) ([]*eth.BadBlockArgs, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": []
+      }, 
+      {
+        "Name": "debug_getBlockRlp", 
+        "Fn": "\u003cfunc(*ethapi.PublicDebugAPI, context.Context, uint64) (string, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "uint64", 
+            "Kind": "uint64"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_getModifiedAccountsByHash", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, common.Hash, *common.Hash) ([]common.Address, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_getModifiedAccountsByNumber", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, uint64, *uint64) ([]common.Address, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "uint64", 
+            "Kind": "uint64"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_goTrace", 
+        "Fn": "\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }, 
+          {
+            "Name": "uint", 
+            "Kind": "uint"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_memStats", 
+        "Fn": "\u003cfunc(*debug.HandlerT) *runtime.MemStats Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "debug_mutexProfile", 
+        "Fn": "\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }, 
+          {
+            "Name": "uint", 
+            "Kind": "uint"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_preimage", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash) (hexutil.Bytes, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_printBlock", 
+        "Fn": "\u003cfunc(*ethapi.PublicDebugAPI, context.Context, uint64) (string, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "uint64", 
+            "Kind": "uint64"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_seedHash", 
+        "Fn": "\u003cfunc(*ethapi.PublicDebugAPI, context.Context, uint64) (string, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "uint64", 
+            "Kind": "uint64"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_setBlockProfileRate", 
+        "Fn": "\u003cfunc(*debug.HandlerT, int) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "int", 
+            "Kind": "int"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_setGCPercent", 
+        "Fn": "\u003cfunc(*debug.HandlerT, int) int Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "int", 
+            "Kind": "int"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_setHead", 
+        "Fn": "\u003cfunc(*ethapi.PrivateDebugAPI, hexutil.Uint64) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "Uint64", 
+            "Kind": "uint64"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_setMutexProfileFraction", 
+        "Fn": "\u003cfunc(*debug.HandlerT, int) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "int", 
+            "Kind": "int"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_stacks", 
+        "Fn": "\u003cfunc(*debug.HandlerT) string Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "debug_standardTraceBadBlockToFile", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.StdTraceConfig) ([]string, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_standardTraceBlockToFile", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.StdTraceConfig) ([]string, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_startCPUProfile", 
+        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_startGoTrace", 
+        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_stopCPUProfile", 
+        "Fn": "\u003cfunc(*debug.HandlerT) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": []
+      }, 
+      {
+        "Name": "debug_stopGoTrace", 
+        "Fn": "\u003cfunc(*debug.HandlerT) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": []
+      }, 
+      {
+        "Name": "debug_storageRangeAt", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, int, common.Address, hexutil.Bytes, int) (eth.StorageRangeResult, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "int", 
+            "Kind": "int"
+          }, 
+          {
+            "Name": "Address", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "Bytes", 
+            "Kind": "slice"
+          }, 
+          {
+            "Name": "int", 
+            "Kind": "int"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_testSignCliqueBlock", 
+        "Fn": "\u003cfunc(*ethapi.PublicDebugAPI, context.Context, common.Address, uint64) (common.Address, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Address", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "uint64", 
+            "Kind": "uint64"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_traceBadBlock", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_traceBlockByHash", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_traceBlockByNumber", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, rpc.BlockNumber, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "BlockNumber", 
+            "Kind": "int64"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_traceBlockFromFile", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, string, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_traceBlock", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, []uint8, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "", 
+            "Kind": "slice"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_traceTransaction", 
+        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.TraceConfig) (interface {}, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_verbosity", 
+        "Fn": "\u003cfunc(*debug.HandlerT, int) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "int", 
+            "Kind": "int"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_vmodule", 
+        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_writeBlockProfile", 
+        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_writeMemProfile", 
+        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "debug_writeMutexProfile", 
+        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "eth_accounts", 
+        "Fn": "\u003cfunc(*ethapi.PublicAccountAPI) []common.Address Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "eth_etherbase", 
+        "Fn": "\u003cfunc(*eth.PublicEthereumAPI) (common.Address, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": []
+      }, 
+      {
+        "Name": "eth_fillTransaction", 
+        "Fn": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs) (*ethapi.SignTransactionResult, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "SendTxArgs", 
+            "Kind": "struct"
+          }
+        ]
+      }, 
+      {
+        "Name": "eth_getHashrate", 
+        "Fn": "\u003cfunc(*ethash.API) uint64 Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "eth_getHeaderByHash", 
+        "Fn": "\u003cfunc(*ethapi.PublicBlockChainAPI, context.Context, common.Hash) map[string]interface {} Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }
+        ]
+      }, 
+      {
+        "Name": "eth_getHeaderByNumber", 
+        "Fn": "\u003cfunc(*ethapi.PublicBlockChainAPI, context.Context, rpc.BlockNumber) (map[string]interface {}, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "BlockNumber", 
+            "Kind": "int64"
+          }
+        ]
+      }, 
+      {
+        "Name": "eth_resend", 
+        "Fn": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs, *hexutil.Big, *hexutil.Uint64) (common.Hash, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "SendTxArgs", 
+            "Kind": "struct"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "eth_sendTransaction", 
+        "Fn": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs) (common.Hash, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "SendTxArgs", 
+            "Kind": "struct"
+          }
+        ]
+      }, 
+      {
+        "Name": "eth_sign", 
+        "Fn": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, common.Address, hexutil.Bytes) (hexutil.Bytes, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Address", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "Bytes", 
+            "Kind": "slice"
+          }
+        ]
+      }, 
+      {
+        "Name": "eth_signTransaction", 
+        "Fn": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs) (*ethapi.SignTransactionResult, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "SendTxArgs", 
+            "Kind": "struct"
+          }
+        ]
+      }, 
+      {
+        "Name": "eth_submitHashRate", 
+        "Fn": "\u003cfunc(*ethash.API, hexutil.Uint64, common.Hash) bool Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "Uint64", 
+            "Kind": "uint64"
+          }, 
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }
+        ]
+      }, 
+      {
+        "Name": "eth_subscribeSyncStatus", 
+        "Fn": "\u003cfunc(*downloader.PublicDownloaderAPI, chan interface {}) *downloader.SyncStatusSubscription Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "", 
+            "Kind": "chan"
+          }
+        ]
+      }, 
+      {
+        "Name": "ethash_getHashrate", 
+        "Fn": "\u003cfunc(*ethash.API) uint64 Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "ethash_getWork", 
+        "Fn": "\u003cfunc(*ethash.API) ([4]string, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": []
+      }, 
+      {
+        "Name": "ethash_submitHashRate", 
+        "Fn": "\u003cfunc(*ethash.API, hexutil.Uint64, common.Hash) bool Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "Uint64", 
+            "Kind": "uint64"
+          }, 
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }
+        ]
+      }, 
+      {
+        "Name": "ethash_submitWork", 
+        "Fn": "\u003cfunc(*ethash.API, types.BlockNonce, common.Hash, common.Hash) bool Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "BlockNonce", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "Hash", 
+            "Kind": "array"
+          }
+        ]
+      }, 
+      {
+        "Name": "miner_getHashrate", 
+        "Fn": "\u003cfunc(*eth.PrivateMinerAPI) uint64 Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "miner_setEtherbase", 
+        "Fn": "\u003cfunc(*eth.PrivateMinerAPI, common.Address) bool Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "Address", 
+            "Kind": "array"
+          }
+        ]
+      }, 
+      {
+        "Name": "miner_setExtra", 
+        "Fn": "\u003cfunc(*eth.PrivateMinerAPI, string) (bool, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "miner_setGasPrice", 
+        "Fn": "\u003cfunc(*eth.PrivateMinerAPI, hexutil.Big) bool Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "Big", 
+            "Kind": "struct"
+          }
+        ]
+      }, 
+      {
+        "Name": "miner_setRecommitInterval", 
+        "Fn": "\u003cfunc(*eth.PrivateMinerAPI, int) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "int", 
+            "Kind": "int"
+          }
+        ]
+      }, 
+      {
+        "Name": "miner_start", 
+        "Fn": "\u003cfunc(*eth.PrivateMinerAPI, *int) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "miner_stop", 
+        "Fn": "\u003cfunc(*eth.PrivateMinerAPI) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "personal_deriveAccount", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, string, string, *bool) (accounts.Account, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }, 
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "personal_ecRecover", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, hexutil.Bytes, hexutil.Bytes) (common.Address, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Bytes", 
+            "Kind": "slice"
+          }, 
+          {
+            "Name": "Bytes", 
+            "Kind": "slice"
+          }
+        ]
+      }, 
+      {
+        "Name": "personal_importRawKey", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, string, string) (common.Address, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }, 
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "personal_initializeWallet", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, string) (string, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "personal_listAccounts", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI) []common.Address Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "personal_listWallets", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI) []ethapi.rawWallet Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "personal_lockAccount", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, common.Address) bool Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "Address", 
+            "Kind": "array"
+          }
+        ]
+      }, 
+      {
+        "Name": "personal_newAccount", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, string) (common.Address, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "personal_openWallet", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, string, *string) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "personal_sendTransaction", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (common.Hash, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "SendTxArgs", 
+            "Kind": "struct"
+          }, 
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "personal_signAndSendTransaction", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (common.Hash, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "SendTxArgs", 
+            "Kind": "struct"
+          }, 
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "personal_signTransaction", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (*ethapi.SignTransactionResult, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "SendTxArgs", 
+            "Kind": "struct"
+          }, 
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "personal_sign", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, hexutil.Bytes, common.Address, string) (hexutil.Bytes, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Bytes", 
+            "Kind": "slice"
+          }, 
+          {
+            "Name": "Address", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "personal_unlockAccount", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, common.Address, string, *uint64) (bool, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": [
+          {
+            "Name": "Address", 
+            "Kind": "array"
+          }, 
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }, 
+          {
+            "Name": "", 
+            "Kind": "ptr"
+          }
+        ]
+      }, 
+      {
+        "Name": "personal_unpair", 
+        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, string, string) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }, 
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "rpc_describeOpenRPC", 
+        "Fn": "\u003cfunc(*rpc.RPCService) (*rpc.OpenRPCCheck, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": []
+      }, 
+      {
+        "Name": "rpc_discover", 
+        "Fn": "\u003cfunc(*rpc.RPCService) (*rpc.OpenRPCDiscoverSchemaT, error) Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 1, 
+        "Args": []
+      }, 
+      {
+        "Name": "rpc_moduleMethods", 
+        "Fn": "\u003cfunc(*rpc.RPCService, string) []string Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "rpc_modules", 
+        "Fn": "\u003cfunc(*rpc.RPCService) map[string]string Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "rpc_setOpenRPCDiscoverDocument", 
+        "Fn": "\u003cfunc(*rpc.RPCService, string) error Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": 0, 
+        "Args": [
+          {
+            "Name": "string", 
+            "Kind": "string"
+          }
+        ]
+      }, 
+      {
+        "Name": "txpool_content", 
+        "Fn": "\u003cfunc(*ethapi.PublicTxPoolAPI) map[string]map[string]map[string]*ethapi.RPCTransaction Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "txpool_inspect", 
+        "Fn": "\u003cfunc(*ethapi.PublicTxPoolAPI) map[string]map[string]map[string]string Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }, 
+      {
+        "Name": "txpool_status", 
+        "Fn": "\u003cfunc(*ethapi.PublicTxPoolAPI) map[string]hexutil.Uint Value\u003e", 
+        "IsSubscribe": false, 
+        "ErrPos": -1, 
+        "Args": []
+      }
+    ]
+  }
+}

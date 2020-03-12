@@ -12,7 +12,7 @@ fi
 
 # Logs are truncated with each run, they only show the latest state.
 http --json POST http://localhost:8545 id:=$(date +%s) method=rpc_setOpenRPCDiscoverDocument params:='["./openrpc.json"]' > openrpc_set.log
-http --json POST http://localhost:8545 id:=$(date +%s) method=rpc_describeOpenRPC params:='[]' > openrpc_describe.log
+http --json POST http://localhost:8545 id:=$(date +%s) method=rpc_describeOpenRPC params:='[]' | jj -p > openrpc_describe.log
 
 # Developer can then inspect the logs, eg.
 

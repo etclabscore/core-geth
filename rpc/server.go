@@ -21,12 +21,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"io"
 	"io/ioutil"
+	"runtime"
 	"sort"
 	"strings"
 	"sync/atomic"
 
+	"github.com/davecgh/go-spew/spew"
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/log"
 )
@@ -271,11 +276,24 @@ func (o OpenRPCCheckUnderSet) Swap(i, j int) {
 }
 
 type OpenRPCCheckUnder struct {
+	Name                    string `json:"name"`
+	Description             string `json:"description"`
+	Summary                 string `json:"summary"`
+	Fn                      OpenRPCCheckUnderFn
+	IsSubscribe, HasContext bool
+	ErrPos                  int
+	Args                    []OpenRPCCheckUnderArg
+}
+
+type OpenRPCCheckUnderFn struct {
+	Str         string
 	Name        string
-	Fn          string
-	IsSubscribe bool
-	ErrPos      int
-	Args        []OpenRPCCheckUnderArg
+	File        string
+	Line        int
+	Doc         string
+	Body        []string
+	ParamsList  []string
+	ResultsList []string
 }
 
 type OpenRPCCheckUnderArg struct {
@@ -347,10 +365,102 @@ outer:
 				}
 			}
 			it := s.server.services.services[mod].callbacks[item]
+			fnp := runtime.FuncForPC(it.fn.Pointer())
+			fnFile, fnLine := fnp.FileLine(fnp.Entry())
+
+			/*
+			   {
+			     "Name": "admin_importChain",
+			     "Fn": {
+			       "Str": "\u003cfunc(*eth.PrivateAdminAPI, string) (bool, error) Value\u003e",
+			       "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateAdminAPI).ImportChain",
+			       "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go",
+			       "Line": 219,
+			       "Doc": "ImportChain imports a blockchain from a local file.\n",
+			       "Body": [],
+			       "ParamsList": ["file"]
+			     },
+			     "IsSubscribe": false,
+			     "ErrPos": 1,
+			     "Args": [
+			       {
+			         "Name": "string",
+			         "Kind": "string"
+			       }
+			     ]
+			   },
+			*/
+			fns := OpenRPCCheckUnderFn{
+				Str:         it.fn.String(),
+				Name:        fnp.Name(),
+				File:        fnFile,
+				Line:        fnLine,
+				Body:        []string{},
+				ParamsList:  []string{},
+				ResultsList: []string{},
+			}
+
+			fset := token.NewFileSet()
+			f, err := parser.ParseFile(fset, fnFile, nil, parser.ParseComments)
+			if err != nil {
+				panic(err)
+			}
+
+			for _, decl := range f.Decls {
+				fn, ok := decl.(*ast.FuncDecl)
+				if !ok {
+					continue
+				}
+
+				// If this is the function we're looking for.
+				spl := strings.Split(fnp.Name(), ".")
+
+				// FIXME: We can't assume that the first matching function Name
+				// in the file is the correct one. Best to use file/+pos measurements.
+				if fn.Name.Name == spl[len(spl)-1] {
+					fns.Doc = fn.Doc.Text()
+					// for _, l := range fn.Body.List {
+
+					// }
+					// spew.Config.DisablePointerAddresses = true
+					// spew.Config.Dis
+					if fn.Type.Params != nil {
+						for _, p := range fn.Type.Params.List {
+							if p == nil {
+								continue
+							}
+							//fns.ParamsList = append(fns.ParamsList, spew.Sdump(p))
+
+
+
+							// for _, n := range p.Names {
+							// 	fns.ParamsList = append(fns.ParamsList, n.Name) // n.String()
+							// }
+						}
+					}
+					if fn.Type.Results != nil {
+						for _, p := range fn.Type.Results.List {
+							if p == nil {
+								continue
+							}
+
+							fns.ResultsList = append(fns.ResultsList, spew.Sdump(p))
+							// for _, n := range p.Names {
+							// 	fns.ParamsList = append(fns.ResultsList, n.Name) // n.String()
+							// }
+						}
+					}
+
+				} else {
+					// fmt.Println("NONMATCH", fn.Name.Name)
+				}
+			}
+
 			cu := OpenRPCCheckUnder{
 				Name:        name,
-				Fn:          it.fn.String(),
+				Fn:          fns,
 				IsSubscribe: it.isSubscribe,
+				HasContext:  it.hasCtx,
 				ErrPos:      it.errPos,
 				Args:        []OpenRPCCheckUnderArg{},
 			}

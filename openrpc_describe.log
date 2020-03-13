@@ -1,33 +1,28 @@
 {
   "jsonrpc": "2.0", 
-  "id": 1584034477, 
+  "id": 1584104446, 
   "result": {
     "Over": [], 
     "Under": [
       {
-        "Name": "admin_exportChain", 
-        "Fn": "\u003cfunc(*eth.PrivateAdminAPI, string, *uint64, *uint64) (bool, error) Value\u003e", 
-        "IsSubscribe": false, 
-        "ErrPos": 1, 
-        "Args": [
-          {
-            "Name": "string", 
-            "Kind": "string"
-          }, 
-          {
-            "Name": "", 
-            "Kind": "ptr"
-          }, 
-          {
-            "Name": "", 
-            "Kind": "ptr"
-          }
-        ]
-      }, 
-      {
         "Name": "admin_importChain", 
-        "Fn": "\u003cfunc(*eth.PrivateAdminAPI, string) (bool, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateAdminAPI, string) (bool, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateAdminAPI).ImportChain", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 219, 
+          "Doc": "ImportChain imports a blockchain from a local file.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(file)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -38,22 +33,63 @@
       }, 
       {
         "Name": "admin_nodeInfo", 
-        "Fn": "\u003cfunc(*node.PublicAdminAPI) (*p2p.NodeInfo, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*node.PublicAdminAPI) (*p2p.NodeInfo, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/node.(*PublicAdminAPI).NodeInfo", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go", 
+          "Line": 285, 
+          "Doc": "NodeInfo retrieves all the information we know about the host node at the\nprotocol granularity.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 8192,\n  X: (*ast.SelectorExpr)({\n   X: (*ast.Ident)(p2p),\n   Sel: (*ast.Ident)(NodeInfo)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": []
       }, 
       {
         "Name": "admin_peers", 
-        "Fn": "\u003cfunc(*node.PublicAdminAPI) ([]*p2p.PeerInfo, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*node.PublicAdminAPI) ([]*p2p.PeerInfo, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/node.(*PublicAdminAPI).Peers", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go", 
+          "Line": 275, 
+          "Doc": "Peers retrieves all the information we know about each individual peer at the\nprotocol granularity.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 7909,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.StarExpr)({\n   Star: (token.Pos) 7911,\n   X: (*ast.SelectorExpr)({\n    X: (*ast.Ident)(p2p),\n    Sel: (*ast.Ident)(PeerInfo)\n   })\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": []
       }, 
       {
         "Name": "admin_removePeer", 
-        "Fn": "\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).RemovePeer", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go", 
+          "Line": 61, 
+          "Doc": "RemovePeer disconnects from a remote node if the connection exists\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(url)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -64,8 +100,23 @@
       }, 
       {
         "Name": "admin_removeTrustedPeer", 
-        "Fn": "\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*node.PrivateAdminAPI, string) (bool, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).RemoveTrustedPeer", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go", 
+          "Line": 93, 
+          "Doc": "RemoveTrustedPeer removes a remote node from the trusted peer set, but it\ndoes not disconnect it automatically.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(url)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -76,8 +127,27 @@
       }, 
       {
         "Name": "admin_startRPC", 
-        "Fn": "\u003cfunc(*node.PrivateAdminAPI, *string, *int, *string, *string, *string) (bool, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*node.PrivateAdminAPI, *string, *int, *string, *string, *string) (bool, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).StartRPC", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go", 
+          "Line": 146, 
+          "Doc": "StartRPC starts the HTTP RPC API server.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(host)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 4412,\n  X: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(port)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 4426,\n  X: (*ast.Ident)(int)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(cors)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 4437,\n  X: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(apis)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 4451,\n  X: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(vhosts)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 4467,\n  X: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -104,8 +174,26 @@
       }, 
       {
         "Name": "admin_startWS", 
-        "Fn": "\u003cfunc(*node.PrivateAdminAPI, *string, *int, *string, *string) (bool, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*node.PrivateAdminAPI, *string, *int, *string, *string) (bool, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).StartWS", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go", 
+          "Line": 208, 
+          "Doc": "StartWS starts the websocket RPC API server.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(host)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 6068,\n  X: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(port)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 6082,\n  X: (*ast.Ident)(int)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(allowedOrigins)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 6103,\n  X: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(apis)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 6117,\n  X: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -128,22 +216,65 @@
       }, 
       {
         "Name": "admin_stopRPC", 
-        "Fn": "\u003cfunc(*node.PrivateAdminAPI) (bool, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*node.PrivateAdminAPI) (bool, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).StopRPC", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go", 
+          "Line": 196, 
+          "Doc": "StopRPC terminates an already running HTTP RPC API endpoint.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": []
       }, 
       {
         "Name": "admin_stopWS", 
-        "Fn": "\u003cfunc(*node.PrivateAdminAPI) (bool, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*node.PrivateAdminAPI) (bool, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).StopWS", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go", 
+          "Line": 250, 
+          "Doc": "StopWS terminates an already running websocket RPC API endpoint.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": []
       }, 
       {
         "Name": "debug_accountRange", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, *common.Hash, int) (eth.AccountRangeResult, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, *common.Hash, int) (eth.AccountRangeResult, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).AccountRange", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 395, 
+          "Doc": "AccountRange enumerates all accounts in the latest state\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(start)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 12730,\n  X: (*ast.SelectorExpr)({\n   X: (*ast.Ident)(common),\n   Sel: (*ast.Ident)(Hash)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(maxResults)\n },\n Type: (*ast.Ident)(int),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(AccountRangeResult),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -158,8 +289,22 @@
       }, 
       {
         "Name": "debug_backtraceAt", 
-        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).BacktraceAt", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 68, 
+          "Doc": "BacktraceAt sets the log backtrace location. See package log for details on\nthe pattern syntax.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(location)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -170,8 +315,23 @@
       }, 
       {
         "Name": "debug_blockProfile", 
-        "Fn": "\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).BlockProfile", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 147, 
+          "Doc": "BlockProfile turns on goroutine profiling for nsec seconds and writes profile data to\nfile. It uses a profile rate of 1 for most accurate information. If a different rate is\ndesired, set the rate and write the profile manually.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(file)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(nsec)\n },\n Type: (*ast.Ident)(uint),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -186,15 +346,42 @@
       }, 
       {
         "Name": "debug_chaindbCompact", 
-        "Fn": "\u003cfunc(*ethapi.PrivateDebugAPI) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateDebugAPI) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).ChaindbCompact", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 1759, 
+          "Doc": "ChaindbCompact flattens the entire key-value database into a single level,\nremoving all unused slots and merging all keys.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": []
       }, 
       {
         "Name": "debug_chaindbProperty", 
-        "Fn": "\u003cfunc(*ethapi.PrivateDebugAPI, string) (string, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateDebugAPI, string) (string, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).ChaindbProperty", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 1748, 
+          "Doc": "ChaindbProperty returns leveldb properties of the key-value database.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(property)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -205,8 +392,23 @@
       }, 
       {
         "Name": "debug_cpuProfile", 
-        "Fn": "\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).CpuProfile", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 88, 
+          "Doc": "CpuProfile turns on CPU profiling for nsec seconds and writes\nprofile data to file.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(file)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(nsec)\n },\n Type: (*ast.Ident)(uint),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -221,8 +423,23 @@
       }, 
       {
         "Name": "debug_dumpBlock", 
-        "Fn": "\u003cfunc(*eth.PublicDebugAPI, rpc.BlockNumber) (state.Dump, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PublicDebugAPI, rpc.BlockNumber) (state.Dump, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PublicDebugAPI).DumpBlock", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 280, 
+          "Doc": "DumpBlock retrieves the entire state of the database at a given block.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(blockNr)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(rpc),\n  Sel: (*ast.Ident)(BlockNumber)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(state),\n  Sel: (*ast.Ident)(Dump)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -233,29 +450,82 @@
       }, 
       {
         "Name": "debug_freeOSMemory", 
-        "Fn": "\u003cfunc(*debug.HandlerT) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).FreeOSMemory", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 200, 
+          "Doc": "FreeOSMemory returns unused memory to the OS.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": []
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "debug_gcStats", 
-        "Fn": "\u003cfunc(*debug.HandlerT) *debug.GCStats Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT) *debug.GCStats Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).GcStats", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 80, 
+          "Doc": "GcStats returns GC statistics.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 2387,\n  X: (*ast.SelectorExpr)({\n   X: (*ast.Ident)(debug),\n   Sel: (*ast.Ident)(GCStats)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "debug_getBadBlocks", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context) ([]*eth.BadBlockArgs, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, context.Context) ([]*eth.BadBlockArgs, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).GetBadBlocks", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 333, 
+          "Doc": "GetBadBlocks returns a list of the last 'bad blocks' that the client has seen on the network\nand returns them as a JSON list of block-hashes\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 10727,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.StarExpr)({\n   Star: (token.Pos) 10729,\n   X: (*ast.Ident)(BadBlockArgs)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": []
       }, 
       {
         "Name": "debug_getBlockRlp", 
-        "Fn": "\u003cfunc(*ethapi.PublicDebugAPI, context.Context, uint64) (string, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicDebugAPI, context.Context, uint64) (string, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).GetBlockRlp", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 1666, 
+          "Doc": "GetBlockRlp retrieves the RLP encoded for of a single block.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(number)\n },\n Type: (*ast.Ident)(uint64),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -266,8 +536,24 @@
       }, 
       {
         "Name": "debug_getModifiedAccountsByHash", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, common.Hash, *common.Hash) ([]common.Address, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, common.Hash, *common.Hash) ([]common.Address, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).GetModifiedAccountsByHash", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 502, 
+          "Doc": "GetModifiedAccountsByHash returns all accounts that have changed between the\ntwo blocks specified. A change is defined as a difference in nonce, balance,\ncode hash, or storage hash.\n\nWith one parameter, returns the list of accounts modified in the specified block.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(startHash)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(endHash)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 16478,\n  X: (*ast.SelectorExpr)({\n   X: (*ast.Ident)(common),\n   Sel: (*ast.Ident)(Hash)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 16493,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.SelectorExpr)({\n   X: (*ast.Ident)(common),\n   Sel: (*ast.Ident)(Address)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -282,8 +568,24 @@
       }, 
       {
         "Name": "debug_getModifiedAccountsByNumber", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, uint64, *uint64) ([]common.Address, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, uint64, *uint64) ([]common.Address, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).GetModifiedAccountsByNumber", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 474, 
+          "Doc": "GetModifiedAccountsByNumber returns all accounts that have changed between the\ntwo blocks specified. A change is defined as a difference in nonce, balance,\ncode hash, or storage hash.\n\nWith one parameter, returns the list of accounts modified in the specified block.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(startNum)\n },\n Type: (*ast.Ident)(uint64),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(endNum)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 15452,\n  X: (*ast.Ident)(uint64)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 15462,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.SelectorExpr)({\n   X: (*ast.Ident)(common),\n   Sel: (*ast.Ident)(Address)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -298,8 +600,23 @@
       }, 
       {
         "Name": "debug_goTrace", 
-        "Fn": "\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).GoTrace", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 135, 
+          "Doc": "GoTrace turns on tracing for nsec seconds and writes\ntrace data to file.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(file)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(nsec)\n },\n Type: (*ast.Ident)(uint),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -314,15 +631,42 @@
       }, 
       {
         "Name": "debug_memStats", 
-        "Fn": "\u003cfunc(*debug.HandlerT) *runtime.MemStats Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT) *runtime.MemStats Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).MemStats", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 73, 
+          "Doc": "MemStats returns detailed runtime memory statistics.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 2240,\n  X: (*ast.SelectorExpr)({\n   X: (*ast.Ident)(runtime),\n   Sel: (*ast.Ident)(MemStats)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "debug_mutexProfile", 
-        "Fn": "\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, string, uint) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).MutexProfile", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 168, 
+          "Doc": "MutexProfile turns on mutex profiling for nsec seconds and writes profile data to file.\nIt uses a profile rate of 1 for most accurate information. If a different rate is\ndesired, set the rate and write the profile manually.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(file)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(nsec)\n },\n Type: (*ast.Ident)(uint),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -337,8 +681,24 @@
       }, 
       {
         "Name": "debug_preimage", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash) (hexutil.Bytes, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash) (hexutil.Bytes, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).Preimage", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 317, 
+          "Doc": "Preimage is a debug API function that returns the preimage for a sha3 hash, if known.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(hash)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Bytes)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -349,8 +709,24 @@
       }, 
       {
         "Name": "debug_printBlock", 
-        "Fn": "\u003cfunc(*ethapi.PublicDebugAPI, context.Context, uint64) (string, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicDebugAPI, context.Context, uint64) (string, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).PrintBlock", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 1718, 
+          "Doc": "PrintBlock retrieves a block and returns its pretty printed form.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(number)\n },\n Type: (*ast.Ident)(uint64),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -361,8 +737,24 @@
       }, 
       {
         "Name": "debug_seedHash", 
-        "Fn": "\u003cfunc(*ethapi.PublicDebugAPI, context.Context, uint64) (string, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicDebugAPI, context.Context, uint64) (string, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).SeedHash", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 1727, 
+          "Doc": "SeedHash retrieves the seed hash of a block.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(number)\n },\n Type: (*ast.Ident)(uint64),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -373,8 +765,20 @@
       }, 
       {
         "Name": "debug_setBlockProfileRate", 
-        "Fn": "\u003cfunc(*debug.HandlerT, int) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, int) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).SetBlockProfileRate", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 156, 
+          "Doc": "SetBlockProfileRate sets the rate of goroutine block profile data collection.\nrate 0 disables block profiling.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(rate)\n },\n Type: (*ast.Ident)(int),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": []
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -385,8 +789,22 @@
       }, 
       {
         "Name": "debug_setGCPercent", 
-        "Fn": "\u003cfunc(*debug.HandlerT, int) int Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, int) int Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).SetGCPercent", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 206, 
+          "Doc": "SetGCPercent sets the garbage collection target percentage. It returns the previous\nsetting. A negative value disables GC.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(v)\n },\n Type: (*ast.Ident)(int),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(int),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -397,8 +815,20 @@
       }, 
       {
         "Name": "debug_setHead", 
-        "Fn": "\u003cfunc(*ethapi.PrivateDebugAPI, hexutil.Uint64) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateDebugAPI, hexutil.Uint64) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).SetHead", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 1771, 
+          "Doc": "SetHead rewinds the head of the blockchain to a previous block.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(number)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Uint64)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": []
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -409,8 +839,20 @@
       }, 
       {
         "Name": "debug_setMutexProfileFraction", 
-        "Fn": "\u003cfunc(*debug.HandlerT, int) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, int) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).SetMutexProfileFraction", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 177, 
+          "Doc": "SetMutexProfileFraction sets the rate of mutex profiling.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(rate)\n },\n Type: (*ast.Ident)(int),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": []
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -421,15 +863,44 @@
       }, 
       {
         "Name": "debug_stacks", 
-        "Fn": "\u003cfunc(*debug.HandlerT) string Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT) string Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).Stacks", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 193, 
+          "Doc": "Stacks returns a printed representation of the stacks of all goroutines.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "debug_standardTraceBadBlockToFile", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.StdTraceConfig) ([]string, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.StdTraceConfig) ([]string, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).StandardTraceBadBlockToFile", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go", 
+          "Line": 431, 
+          "Doc": "StandardTraceBadBlockToFile dumps the structured logs created during the\nexecution of EVM against a block pulled from the pool of bad ones to the\nlocal file system and returns a list of files to the caller.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(hash)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(config)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 15407,\n  X: (*ast.Ident)(StdTraceConfig)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 15425,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -444,8 +915,25 @@
       }, 
       {
         "Name": "debug_standardTraceBlockToFile", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.StdTraceConfig) ([]string, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.StdTraceConfig) ([]string, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).StandardTraceBlockToFile", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go", 
+          "Line": 420, 
+          "Doc": "StandardTraceBlockToFile dumps the structured logs created during the\nexecution of EVM to the local file system and returns a list of files\nto the caller.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(hash)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(config)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 14866,\n  X: (*ast.Ident)(StdTraceConfig)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 14884,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -460,8 +948,22 @@
       }, 
       {
         "Name": "debug_startCPUProfile", 
-        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).StartCPUProfile", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 98, 
+          "Doc": "StartCPUProfile turns on CPU profiling, writing to the given file.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(file)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -472,8 +974,22 @@
       }, 
       {
         "Name": "debug_startGoTrace", 
-        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).StartGoTrace", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/trace.go", 
+          "Line": 30, 
+          "Doc": "StartGoTrace turns on tracing, writing to the given file.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(file)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -484,22 +1000,66 @@
       }, 
       {
         "Name": "debug_stopCPUProfile", 
-        "Fn": "\u003cfunc(*debug.HandlerT) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).StopCPUProfile", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 119, 
+          "Doc": "StopCPUProfile stops an ongoing CPU profile.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": []
       }, 
       {
         "Name": "debug_stopGoTrace", 
-        "Fn": "\u003cfunc(*debug.HandlerT) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).StopGoTrace", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/trace.go", 
+          "Line": 51, 
+          "Doc": "StopTrace stops an ongoing trace.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": []
       }, 
       {
         "Name": "debug_storageRangeAt", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, int, common.Address, hexutil.Bytes, int) (eth.StorageRangeResult, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, int, common.Address, hexutil.Bytes, int) (eth.StorageRangeResult, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).StorageRangeAt", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 434, 
+          "Doc": "StorageRangeAt returns the storage at the given block height and transaction index.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(blockHash)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(txIndex)\n },\n Type: (*ast.Ident)(int),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(contractAddress)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(keyStart)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Bytes)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(maxResult)\n },\n Type: (*ast.Ident)(int),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(StorageRangeResult),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -526,8 +1086,25 @@
       }, 
       {
         "Name": "debug_testSignCliqueBlock", 
-        "Fn": "\u003cfunc(*ethapi.PublicDebugAPI, context.Context, common.Address, uint64) (common.Address, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicDebugAPI, context.Context, common.Address, uint64) (common.Address, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).TestSignCliqueBlock", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 1683, 
+          "Doc": "TestSignCliqueBlock fetches the given block number, and attempts to sign it as a clique header with the\ngiven address, returning the address of the recovered signature\n\nThis is a temporary method to debug the externalsigner integration,\nTODO: Remove this method when the integration is mature\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(address)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(number)\n },\n Type: (*ast.Ident)(uint64),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -542,8 +1119,25 @@
       }, 
       {
         "Name": "debug_traceBadBlock", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBadBlock", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go", 
+          "Line": 407, 
+          "Doc": "TraceBadBlockByHash returns the structured logs created during the execution of\nEVM against a block pulled from the pool of bad ones and returns them as a JSON\nobject.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(hash)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(config)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 14347,\n  X: (*ast.Ident)(TraceConfig)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 14362,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.StarExpr)({\n   Star: (token.Pos) 14364,\n   X: (*ast.Ident)(txTraceResult)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -558,8 +1152,25 @@
       }, 
       {
         "Name": "debug_traceBlock", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, []uint8, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, []uint8, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlock", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go", 
+          "Line": 386, 
+          "Doc": "TraceBlock returns the structured logs created during the execution of EVM\nand returns them as a JSON object.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(blob)\n },\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 13411,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.Ident)(byte)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(config)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 13426,\n  X: (*ast.Ident)(TraceConfig)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 13441,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.StarExpr)({\n   Star: (token.Pos) 13443,\n   X: (*ast.Ident)(txTraceResult)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -574,8 +1185,25 @@
       }, 
       {
         "Name": "debug_traceBlockByHash", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlockByHash", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go", 
+          "Line": 376, 
+          "Doc": "TraceBlockByHash returns the structured logs created during the execution of\nEVM and returns them as a JSON object.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(hash)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(config)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 13016,\n  X: (*ast.Ident)(TraceConfig)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 13031,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.StarExpr)({\n   Star: (token.Pos) 13033,\n   X: (*ast.Ident)(txTraceResult)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -590,8 +1218,25 @@
       }, 
       {
         "Name": "debug_traceBlockByNumber", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, rpc.BlockNumber, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, rpc.BlockNumber, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlockByNumber", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go", 
+          "Line": 355, 
+          "Doc": "TraceBlockByNumber returns the structured logs created during the execution of\nEVM and returns them as a JSON object.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(number)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(rpc),\n  Sel: (*ast.Ident)(BlockNumber)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(config)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 12300,\n  X: (*ast.Ident)(TraceConfig)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 12315,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.StarExpr)({\n   Star: (token.Pos) 12317,\n   X: (*ast.Ident)(txTraceResult)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -606,8 +1251,25 @@
       }, 
       {
         "Name": "debug_traceBlockFromFile", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, string, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, string, *eth.TraceConfig) ([]*eth.txTraceResult, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlockFromFile", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go", 
+          "Line": 396, 
+          "Doc": "TraceBlockFromFile returns the structured logs created during the execution of\nEVM and returns them as a JSON object.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(file)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(config)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 13882,\n  X: (*ast.Ident)(TraceConfig)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 13897,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.StarExpr)({\n   Star: (token.Pos) 13899,\n   X: (*ast.Ident)(txTraceResult)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -622,8 +1284,25 @@
       }, 
       {
         "Name": "debug_traceTransaction", 
-        "Fn": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.TraceConfig) (interface {}, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateDebugAPI, context.Context, common.Hash, *eth.TraceConfig) (interface {}, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceTransaction", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go", 
+          "Line": 704, 
+          "Doc": "TraceTransaction returns the structured logs created during the execution of EVM\nand returns them as a JSON object.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(hash)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(config)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 24895,\n  X: (*ast.Ident)(TraceConfig)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.InterfaceType)({\n  Interface: (token.Pos) 24910,\n  Methods: (*ast.FieldList)({\n   Opening: (token.Pos) 24919,\n   List: ([]*ast.Field) \u003cnil\u003e,\n   Closing: (token.Pos) 24920\n  }),\n  Incomplete: (bool) false\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -638,8 +1317,20 @@
       }, 
       {
         "Name": "debug_verbosity", 
-        "Fn": "\u003cfunc(*debug.HandlerT, int) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, int) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).Verbosity", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 57, 
+          "Doc": "Verbosity sets the log verbosity ceiling. The verbosity of individual packages\nand source files can be raised using Vmodule.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(level)\n },\n Type: (*ast.Ident)(int),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": []
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -650,8 +1341,22 @@
       }, 
       {
         "Name": "debug_vmodule", 
-        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).Vmodule", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 62, 
+          "Doc": "Vmodule sets the log verbosity pattern. See package log for details on the\npattern syntax.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(pattern)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -662,8 +1367,22 @@
       }, 
       {
         "Name": "debug_writeBlockProfile", 
-        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).WriteBlockProfile", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 161, 
+          "Doc": "WriteBlockProfile writes a goroutine blocking profile to the given file.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(file)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -674,8 +1393,22 @@
       }, 
       {
         "Name": "debug_writeMemProfile", 
-        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).WriteMemProfile", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 188, 
+          "Doc": "WriteMemProfile writes an allocation profile to the given file.\nNote that the profiling rate cannot be set through the API,\nit must be set on the command line.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(file)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -686,8 +1419,22 @@
       }, 
       {
         "Name": "debug_writeMutexProfile", 
-        "Fn": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*debug.HandlerT, string) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).WriteMutexProfile", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go", 
+          "Line": 181, 
+          "Doc": "WriteMutexProfile writes a goroutine blocking profile to the given file.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(file)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -698,22 +1445,63 @@
       }, 
       {
         "Name": "eth_accounts", 
-        "Fn": "\u003cfunc(*ethapi.PublicAccountAPI) []common.Address Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicAccountAPI) []common.Address Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicAccountAPI).Accounts", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 193, 
+          "Doc": "Accounts returns the collection of accounts this node manages\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 7004,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.SelectorExpr)({\n   X: (*ast.Ident)(common),\n   Sel: (*ast.Ident)(Address)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "eth_etherbase", 
-        "Fn": "\u003cfunc(*eth.PublicEthereumAPI) (common.Address, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PublicEthereumAPI) (common.Address, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PublicEthereumAPI).Etherbase", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 55, 
+          "Doc": "Etherbase is the address that mining rewards will be send to\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": []
       }, 
       {
         "Name": "eth_fillTransaction", 
-        "Fn": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs) (*ethapi.SignTransactionResult, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs) (*ethapi.SignTransactionResult, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).FillTransaction", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 1500, 
+          "Doc": "FillTransaction fills the defaults (nonce, gas, gasPrice) on a given unsigned transaction,\nand returns it to the caller for further processing (signing + broadcast)\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(args)\n },\n Type: (*ast.Ident)(SendTxArgs),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 54975,\n  X: (*ast.Ident)(SignTransactionResult)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -724,15 +1512,42 @@
       }, 
       {
         "Name": "eth_getHashrate", 
-        "Fn": "\u003cfunc(*ethash.API) uint64 Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethash.API) uint64 Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).GetHashrate", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go", 
+          "Line": 110, 
+          "Doc": "GetHashrate returns the current hashrate for local CPU miner and remote miner.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(uint64),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "eth_getHeaderByHash", 
-        "Fn": "\u003cfunc(*ethapi.PublicBlockChainAPI, context.Context, common.Hash) map[string]interface {} Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicBlockChainAPI, context.Context, common.Hash) map[string]interface {} Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetHeaderByHash", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 626, 
+          "Doc": "GetHeaderByHash returns the requested header by hash.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(hash)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.MapType)({\n  Map: (token.Pos) 23071,\n  Key: (*ast.Ident)(string),\n  Value: (*ast.InterfaceType)({\n   Interface: (token.Pos) 23082,\n   Methods: (*ast.FieldList)({\n    Opening: (token.Pos) 23091,\n    List: ([]*ast.Field) \u003cnil\u003e,\n    Closing: (token.Pos) 23092\n   }),\n   Incomplete: (bool) false\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -743,8 +1558,24 @@
       }, 
       {
         "Name": "eth_getHeaderByNumber", 
-        "Fn": "\u003cfunc(*ethapi.PublicBlockChainAPI, context.Context, rpc.BlockNumber) (map[string]interface {}, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicBlockChainAPI, context.Context, rpc.BlockNumber) (map[string]interface {}, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetHeaderByNumber", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 610, 
+          "Doc": "GetHeaderByNumber returns the requested canonical block header.\n* When blockNr is -1 the chain head is returned.\n* When blockNr is -2 the pending chain head is returned.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(number)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(rpc),\n  Sel: (*ast.Ident)(BlockNumber)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.MapType)({\n  Map: (token.Pos) 22540,\n  Key: (*ast.Ident)(string),\n  Value: (*ast.InterfaceType)({\n   Interface: (token.Pos) 22551,\n   Methods: (*ast.FieldList)({\n    Opening: (token.Pos) 22560,\n    List: ([]*ast.Field) \u003cnil\u003e,\n    Closing: (token.Pos) 22561\n   }),\n   Incomplete: (bool) false\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -755,8 +1586,26 @@
       }, 
       {
         "Name": "eth_resend", 
-        "Fn": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs, *hexutil.Big, *hexutil.Uint64) (common.Hash, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs, *hexutil.Big, *hexutil.Uint64) (common.Hash, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).Resend", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 1611, 
+          "Doc": "Resend accepts an existing transaction and a new gas price and limit. It will remove\nthe given transaction from the pool and reinsert it with the new gas price and limit.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(sendArgs)\n },\n Type: (*ast.Ident)(SendTxArgs),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(gasPrice)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 58892,\n  X: (*ast.SelectorExpr)({\n   X: (*ast.Ident)(hexutil),\n   Sel: (*ast.Ident)(Big)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(gasLimit)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 58915,\n  X: (*ast.SelectorExpr)({\n   X: (*ast.Ident)(hexutil),\n   Sel: (*ast.Ident)(Uint64)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -775,8 +1624,29 @@
       }, 
       {
         "Name": "eth_sendTransaction", 
-        "Fn": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs) (common.Hash, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs) (common.Hash, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SendTransaction", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 1468, 
+          "Doc": "SendTransaction creates a transaction for the given argument, sign it and submit it to the\ntransaction pool.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(args)\n },\n Type: (*ast.Ident)(SendTxArgs),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(passwd)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(args)\n },\n Type: (*ast.Ident)(SendTxArgs),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -787,8 +1657,30 @@
       }, 
       {
         "Name": "eth_sign", 
-        "Fn": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, common.Address, hexutil.Bytes) (hexutil.Bytes, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, common.Address, hexutil.Bytes) (hexutil.Bytes, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).Sign", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 1533, 
+          "Doc": "Sign calculates an ECDSA signature for:\nkeccack256(\"\\x19Ethereum Signed Message:\\n\" + len(message) + message).\n\nNote, the produced signature conforms to the secp256k1 curve R, S and V values,\nwhere the V value will be 27 or 28 for legacy reasons.\n\nThe account associated with addr must be unlocked.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(data)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Bytes)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(addr)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(passwd)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(addr)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(data)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Bytes)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Bytes)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Bytes)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -803,8 +1695,29 @@
       }, 
       {
         "Name": "eth_signTransaction", 
-        "Fn": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs) (*ethapi.SignTransactionResult, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicTransactionPoolAPI, context.Context, ethapi.SendTxArgs) (*ethapi.SignTransactionResult, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SignTransaction", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 1558, 
+          "Doc": "SignTransaction will sign the given transaction with the from account.\nThe node needs to have the private key of the account corresponding with\nthe given from address and it needs to be unlocked.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(args)\n },\n Type: (*ast.Ident)(SendTxArgs),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(passwd)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(args)\n },\n Type: (*ast.Ident)(SendTxArgs),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 14100,\n  X: (*ast.Ident)(SignTransactionResult)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 57155,\n  X: (*ast.Ident)(SignTransactionResult)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -815,8 +1728,23 @@
       }, 
       {
         "Name": "eth_submitHashRate", 
-        "Fn": "\u003cfunc(*ethash.API, hexutil.Uint64, common.Hash) bool Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethash.API, hexutil.Uint64, common.Hash) bool Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).SubmitHashRate", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go", 
+          "Line": 92, 
+          "Doc": "SubmitHashrate can be used for remote miners to submit their hash rate.\nThis enables the node to report the combined hash rate of all miners\nwhich submit work through this node.\n\nIt accepts the miner hash rate and an identifier which must be unique\nbetween nodes.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(rate)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Uint64)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(id)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -831,8 +1759,22 @@
       }, 
       {
         "Name": "eth_subscribeSyncStatus", 
-        "Fn": "\u003cfunc(*downloader.PublicDownloaderAPI, chan interface {}) *downloader.SyncStatusSubscription Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*downloader.PublicDownloaderAPI, chan interface {}) *downloader.SyncStatusSubscription Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth/downloader.(*PublicDownloaderAPI).SubscribeSyncStatus", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/downloader/api.go", 
+          "Line": 163, 
+          "Doc": "SubscribeSyncStatus creates a subscription that will broadcast new synchronisation updates.\nThe given channel must receive interface values, the result can either\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(status)\n },\n Type: (*ast.ChanType)({\n  Begin: (token.Pos) 5328,\n  Arrow: (token.Pos) 0,\n  Dir: (ast.ChanDir) 3,\n  Value: (*ast.InterfaceType)({\n   Interface: (token.Pos) 5333,\n   Methods: (*ast.FieldList)({\n    Opening: (token.Pos) 5342,\n    List: ([]*ast.Field) \u003cnil\u003e,\n    Closing: (token.Pos) 5343\n   }),\n   Incomplete: (bool) false\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 5346,\n  X: (*ast.Ident)(SyncStatusSubscription)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -843,22 +1785,62 @@
       }, 
       {
         "Name": "ethash_getHashrate", 
-        "Fn": "\u003cfunc(*ethash.API) uint64 Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethash.API) uint64 Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).GetHashrate", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go", 
+          "Line": 110, 
+          "Doc": "GetHashrate returns the current hashrate for local CPU miner and remote miner.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(uint64),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "ethash_getWork", 
-        "Fn": "\u003cfunc(*ethash.API) ([4]string, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethash.API) ([4]string, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).GetWork", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go", 
+          "Line": 41, 
+          "Doc": "GetWork returns a work package for external miner.\n\nThe work package consists of 3 strings:\n  result[0] - 32 bytes hex encoded current block header pow-hash\n  result[1] - 32 bytes hex encoded seed hash used for DAG\n  result[2] - 32 bytes hex encoded boundary condition (\"target\"), 2^256/difficulty\n  result[3] - hex encoded block number\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 1506,\n  Len: (*ast.BasicLit)({\n   ValuePos: (token.Pos) 1507,\n   Kind: (token.Token) INT,\n   Value: (string) (len=1) \"4\"\n  }),\n  Elt: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": []
       }, 
       {
         "Name": "ethash_submitHashRate", 
-        "Fn": "\u003cfunc(*ethash.API, hexutil.Uint64, common.Hash) bool Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethash.API, hexutil.Uint64, common.Hash) bool Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).SubmitHashRate", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go", 
+          "Line": 92, 
+          "Doc": "SubmitHashrate can be used for remote miners to submit their hash rate.\nThis enables the node to report the combined hash rate of all miners\nwhich submit work through this node.\n\nIt accepts the miner hash rate and an identifier which must be unique\nbetween nodes.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(rate)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Uint64)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(id)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -873,8 +1855,23 @@
       }, 
       {
         "Name": "ethash_submitWork", 
-        "Fn": "\u003cfunc(*ethash.API, types.BlockNonce, common.Hash, common.Hash) bool Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethash.API, types.BlockNonce, common.Hash, common.Hash) bool Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).SubmitWork", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go", 
+          "Line": 66, 
+          "Doc": "SubmitWork can be used by external miner to submit their POW solution.\nIt returns an indication if the work was accepted.\nNote either an invalid solution, a stale work a non-existent work will return false.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(nonce)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(types),\n  Sel: (*ast.Ident)(BlockNonce)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=2 cap=2) {\n  (*ast.Ident)(hash),\n  (*ast.Ident)(digest)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -893,15 +1890,41 @@
       }, 
       {
         "Name": "miner_getHashrate", 
-        "Fn": "\u003cfunc(*eth.PrivateMinerAPI) uint64 Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateMinerAPI) uint64 Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).GetHashrate", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 153, 
+          "Doc": "GetHashrate returns the current hashrate of the miner.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(uint64),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "miner_setEtherbase", 
-        "Fn": "\u003cfunc(*eth.PrivateMinerAPI, common.Address) bool Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateMinerAPI, common.Address) bool Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).SetEtherbase", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 142, 
+          "Doc": "SetEtherbase sets the etherbase of the miner\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(etherbase)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -912,8 +1935,23 @@
       }, 
       {
         "Name": "miner_setExtra", 
-        "Fn": "\u003cfunc(*eth.PrivateMinerAPI, string) (bool, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateMinerAPI, string) (bool, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).SetExtra", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 124, 
+          "Doc": "SetExtra sets the extra data string that is included when this miner mines a block.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(extra)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -924,8 +1962,22 @@
       }, 
       {
         "Name": "miner_setGasPrice", 
-        "Fn": "\u003cfunc(*eth.PrivateMinerAPI, hexutil.Big) bool Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateMinerAPI, hexutil.Big) bool Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).SetGasPrice", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 132, 
+          "Doc": "SetGasPrice sets the minimum accepted gas price for the miner.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(gasPrice)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Big)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -936,8 +1988,20 @@
       }, 
       {
         "Name": "miner_setRecommitInterval", 
-        "Fn": "\u003cfunc(*eth.PrivateMinerAPI, int) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateMinerAPI, int) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).SetRecommitInterval", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 148, 
+          "Doc": "SetRecommitInterval updates the interval for miner sealing work recommitting.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(interval)\n },\n Type: (*ast.Ident)(int),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": []
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -948,8 +2012,22 @@
       }, 
       {
         "Name": "miner_start", 
-        "Fn": "\u003cfunc(*eth.PrivateMinerAPI, *int) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateMinerAPI, *int) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).Start", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 110, 
+          "Doc": "Start starts the miner with the given number of threads. If threads is nil,\nthe number of workers started is equal to the number of logical CPUs that are\nusable by this process. If mining is already running, this method adjust the\nnumber of threads allowed to use and updates the minimum price required by the\ntransaction pool.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(threads)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 3810,\n  X: (*ast.Ident)(int)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -960,15 +2038,42 @@
       }, 
       {
         "Name": "miner_stop", 
-        "Fn": "\u003cfunc(*eth.PrivateMinerAPI) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*eth.PrivateMinerAPI) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).Stop", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go", 
+          "Line": 119, 
+          "Doc": "Stop terminates the miner, both at the consensus engine level as well as at\nthe block creation level.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": []
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "personal_deriveAccount", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, string, string, *bool) (accounts.Account, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, string, string, *bool) (accounts.Account, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).DeriveAccount", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 266, 
+          "Doc": "DeriveAccount requests a HD wallet to derive a new account, optionally pinning\nit for later reuse.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(url)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(path)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(pin)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 9318,\n  X: (*ast.Ident)(bool)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(accounts),\n  Sel: (*ast.Ident)(Account)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -987,8 +2092,24 @@
       }, 
       {
         "Name": "personal_ecRecover", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, hexutil.Bytes, hexutil.Bytes) (common.Address, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, hexutil.Bytes, hexutil.Bytes) (common.Address, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).EcRecover", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 444, 
+          "Doc": "EcRecover returns the address for the account that was used to create the signature.\nNote, this function is compatible with eth_sign and personal_sign. As such it recovers\nthe address of:\nhash = keccak256(\"\\x19Ethereum Signed Message:\\n\"${message length}${message})\naddr = ecrecover(hash, signature)\n\nNote, the signature must conform to the secp256k1 curve R, S and V values, where\nthe V value must be 27 or 28 for legacy reasons.\n\nhttps://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_ecRecover\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=2 cap=2) {\n  (*ast.Ident)(data),\n  (*ast.Ident)(sig)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Bytes)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -1003,8 +2124,24 @@
       }, 
       {
         "Name": "personal_importRawKey", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, string, string) (common.Address, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, string, string) (common.Address, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ImportRawKey", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 300, 
+          "Doc": "ImportRawKey stores the given hex encoded ECDSA key into the key directory,\nencrypting it with the passphrase.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(privkey)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(password)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -1019,8 +2156,24 @@
       }, 
       {
         "Name": "personal_initializeWallet", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, string) (string, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, string) (string, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).InitializeWallet", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 467, 
+          "Doc": "InitializeWallet initializes a new wallet at the provided URL, by generating and returning a new private key.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(url)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -1031,22 +2184,60 @@
       }, 
       {
         "Name": "personal_listAccounts", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI) []common.Address Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI) []common.Address Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ListAccounts", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 216, 
+          "Doc": "listAccounts will return a list of addresses for accounts this node manages.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 7742,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.SelectorExpr)({\n   X: (*ast.Ident)(common),\n   Sel: (*ast.Ident)(Address)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "personal_listWallets", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI) []ethapi.rawWallet Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI) []ethapi.rawWallet Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ListWallets", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 230, 
+          "Doc": "ListWallets will return a list of wallets this node manages.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 8247,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.Ident)(rawWallet)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "personal_lockAccount", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, common.Address) bool Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, common.Address) bool Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).LockAccount", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 337, 
+          "Doc": "LockAccount will lock the account associated with the given address when it's unlocked.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(addr)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -1057,8 +2248,23 @@
       }, 
       {
         "Name": "personal_newAccount", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, string) (common.Address, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, string) (common.Address, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).NewAccount", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 282, 
+          "Doc": "NewAccount will create a new account and returns the address for the new account.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(password)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -1069,8 +2275,23 @@
       }, 
       {
         "Name": "personal_openWallet", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, string, *string) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, string, *string) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).OpenWallet", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 252, 
+          "Doc": "OpenWallet initiates a hardware wallet opening procedure, establishing a USB\nconnection and attempting to authenticate via the provided passphrase. Note,\nthe method may return an extra challenge requiring a second open (e.g. the\nTrezor PIN matrix challenge).\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(url)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(passphrase)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 8970,\n  X: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -1085,8 +2306,29 @@
       }, 
       {
         "Name": "personal_sendTransaction", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (common.Hash, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (common.Hash, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SendTransaction", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 364, 
+          "Doc": "SendTransaction creates a transaction for the given argument, sign it and submit it to the\ntransaction pool.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(args)\n },\n Type: (*ast.Ident)(SendTxArgs),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(passwd)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(args)\n },\n Type: (*ast.Ident)(SendTxArgs),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -1101,8 +2343,30 @@
       }, 
       {
         "Name": "personal_sign", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, hexutil.Bytes, common.Address, string) (hexutil.Bytes, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, hexutil.Bytes, common.Address, string) (hexutil.Bytes, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).Sign", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 416, 
+          "Doc": "Sign calculates an ECDSA signature for:\nkeccack256(\"\\x19Ethereum Signed Message:\\n\" + len(message) + message).\n\nNote, the produced signature conforms to the secp256k1 curve R, S and V values,\nwhere the V value will be 27 or 28 for legacy reasons.\n\nThe account associated with addr must be unlocked.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(data)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Bytes)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(addr)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(passwd)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(addr)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(data)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Bytes)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Bytes)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(hexutil),\n  Sel: (*ast.Ident)(Bytes)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -1121,8 +2385,25 @@
       }, 
       {
         "Name": "personal_signAndSendTransaction", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (common.Hash, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (common.Hash, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SignAndSendTransaction", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 462, 
+          "Doc": "SignAndSendTransaction was renamed to SendTransaction. This method is deprecated\nand will be removed in the future. It primary goal is to give clients time to update.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(args)\n },\n Type: (*ast.Ident)(SendTxArgs),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(passwd)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Hash)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -1137,8 +2418,29 @@
       }, 
       {
         "Name": "personal_signTransaction", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (*ethapi.SignTransactionResult, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (*ethapi.SignTransactionResult, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SignTransaction", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 383, 
+          "Doc": "SignTransaction will sign the given transaction with the from account.\nThe node needs to have the private key of the account corresponding with\nthe given from address and it needs to be unlocked.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(args)\n },\n Type: (*ast.Ident)(SendTxArgs),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(passwd)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(args)\n },\n Type: (*ast.Ident)(SendTxArgs),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 14100,\n  X: (*ast.Ident)(SignTransactionResult)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 57155,\n  X: (*ast.Ident)(SignTransactionResult)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -1153,8 +2455,26 @@
       }, 
       {
         "Name": "personal_unlockAccount", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, common.Address, string, *uint64) (bool, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, common.Address, string, *uint64) (bool, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).UnlockAccount", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 312, 
+          "Doc": "UnlockAccount will unlock the account associated with the given address with\nthe given password for duration seconds. If duration is nil it will use a\ndefault of 300 seconds. It returns an indication if the account was unlocked.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(addr)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(common),\n  Sel: (*ast.Ident)(Address)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(password)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(duration)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 11052,\n  X: (*ast.Ident)(uint64)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(bool),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 1, 
         "Args": [
           {
@@ -1173,8 +2493,24 @@
       }, 
       {
         "Name": "personal_unpair", 
-        "Fn": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, string, string) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, string, string) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).Unpair", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 494, 
+          "Doc": "Unpair deletes a pairing between wallet and geth.\n", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(ctx)\n },\n Type: (*ast.SelectorExpr)({\n  X: (*ast.Ident)(context),\n  Sel: (*ast.Ident)(Context)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(url)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(pin)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": true, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -1189,22 +2525,62 @@
       }, 
       {
         "Name": "rpc_describeOpenRPC", 
-        "Fn": "\u003cfunc(*rpc.RPCService) (*rpc.OpenRPCCheck, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*rpc.RPCService) (*rpc.OpenRPCCheck, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/rpc.(*RPCService).DescribeOpenRPC", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/rpc/server.go", 
+          "Line": 301, 
+          "Doc": "", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 8421,\n  X: (*ast.Ident)(OpenRPCCheck)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": []
       }, 
       {
         "Name": "rpc_discover", 
-        "Fn": "\u003cfunc(*rpc.RPCService) (*rpc.OpenRPCDiscoverSchemaT, error) Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*rpc.RPCService) (*rpc.OpenRPCDiscoverSchemaT, error) Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/rpc.(*RPCService).Discover", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/rpc/server.go", 
+          "Line": 477, 
+          "Doc": "Discover returns a configured schema that is audited for actual server availability.\nOnly methods that the server makes available are included in the 'methods' array of\nthe discover schema. Components are not audited.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(schema)\n },\n Type: (*ast.StarExpr)({\n  Star: (token.Pos) 13346,\n  X: (*ast.Ident)(OpenRPCDiscoverSchemaT)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n", 
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(err)\n },\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 1, 
         "Args": []
       }, 
       {
         "Name": "rpc_moduleMethods", 
-        "Fn": "\u003cfunc(*rpc.RPCService, string) []string Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*rpc.RPCService, string) []string Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/rpc.(*RPCService).ModuleMethods", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/rpc/server.go", 
+          "Line": 205, 
+          "Doc": "", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(mod)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.ArrayType)({\n  Lbrack: (token.Pos) 6335,\n  Len: (ast.Expr) \u003cnil\u003e,\n  Elt: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": [
           {
@@ -1215,15 +2591,41 @@
       }, 
       {
         "Name": "rpc_modules", 
-        "Fn": "\u003cfunc(*rpc.RPCService) map[string]string Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*rpc.RPCService) map[string]string Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/rpc.(*RPCService).Modules", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/rpc/server.go", 
+          "Line": 194, 
+          "Doc": "Modules returns the list of RPC services with their version number\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.MapType)({\n  Map: (token.Pos) 6071,\n  Key: (*ast.Ident)(string),\n  Value: (*ast.Ident)(string)\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "rpc_setOpenRPCDiscoverDocument", 
-        "Fn": "\u003cfunc(*rpc.RPCService, string) error Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*rpc.RPCService, string) error Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/rpc.(*RPCService).SetOpenRPCDiscoverDocument", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/rpc/server.go", 
+          "Line": 239, 
+          "Doc": "", 
+          "Body": [], 
+          "ParamsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) (len=1 cap=1) {\n  (*ast.Ident)(documentPath)\n },\n Type: (*ast.Ident)(string),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.Ident)(error),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": 0, 
         "Args": [
           {
@@ -1234,22 +2636,58 @@
       }, 
       {
         "Name": "txpool_content", 
-        "Fn": "\u003cfunc(*ethapi.PublicTxPoolAPI) map[string]map[string]map[string]*ethapi.RPCTransaction Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicTxPoolAPI) map[string]map[string]map[string]*ethapi.RPCTransaction Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Content", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 111, 
+          "Doc": "Content returns the transactions contained within the transaction pool.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.MapType)({\n  Map: (token.Pos) 4228,\n  Key: (*ast.Ident)(string),\n  Value: (*ast.MapType)({\n   Map: (token.Pos) 4239,\n   Key: (*ast.Ident)(string),\n   Value: (*ast.MapType)({\n    Map: (token.Pos) 4250,\n    Key: (*ast.Ident)(string),\n    Value: (*ast.StarExpr)({\n     Star: (token.Pos) 4261,\n     X: (*ast.Ident)(RPCTransaction)\n    })\n   })\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "txpool_inspect", 
-        "Fn": "\u003cfunc(*ethapi.PublicTxPoolAPI) map[string]map[string]map[string]string Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicTxPoolAPI) map[string]map[string]map[string]string Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Inspect", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 148, 
+          "Doc": "Inspect retrieves the content of the transaction pool and flattens it into an\neasily inspectable list.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.MapType)({\n  Map: (token.Pos) 5465,\n  Key: (*ast.Ident)(string),\n  Value: (*ast.MapType)({\n   Map: (token.Pos) 5476,\n   Key: (*ast.Ident)(string),\n   Value: (*ast.MapType)({\n    Map: (token.Pos) 5487,\n    Key: (*ast.Ident)(string),\n    Value: (*ast.Ident)(string)\n   })\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }, 
       {
         "Name": "txpool_status", 
-        "Fn": "\u003cfunc(*ethapi.PublicTxPoolAPI) map[string]hexutil.Uint Value\u003e", 
+        "Fn": {
+          "Str": "\u003cfunc(*ethapi.PublicTxPoolAPI) map[string]hexutil.Uint Value\u003e", 
+          "Name": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Status", 
+          "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go", 
+          "Line": 138, 
+          "Doc": "Status returns the number of pending and queued transaction in the pool.\n", 
+          "Body": [], 
+          "ParamsList": [], 
+          "ResultsList": [
+            "(*ast.Field)({\n Doc: (*ast.CommentGroup)(\u003cnil\u003e),\n Names: ([]*ast.Ident) \u003cnil\u003e,\n Type: (*ast.MapType)({\n  Map: (token.Pos) 5154,\n  Key: (*ast.Ident)(string),\n  Value: (*ast.SelectorExpr)({\n   X: (*ast.Ident)(hexutil),\n   Sel: (*ast.Ident)(Uint)\n  })\n }),\n Tag: (*ast.BasicLit)(\u003cnil\u003e),\n Comment: (*ast.CommentGroup)(\u003cnil\u003e)\n})\n"
+          ]
+        }, 
         "IsSubscribe": false, 
+        "HasContext": false, 
         "ErrPos": -1, 
         "Args": []
       }

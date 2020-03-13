@@ -59,13 +59,27 @@
         }
       },
       {
+        "name": "admin_exportChain",
+        "summary": "Export chain",
+        "description": "Filesystem path to the data directory",
+        "params": [],
+        "result": {
+          "name": "path",
+          "description": "path to datadir",
+          "schema": {
+            "title": "datadir path",
+            "type": "string"
+          }
+        }
+      },
+      {
         "name": "web3_clientVersion",
         "description": "Returns the version of the current client",
         "summary": "current client version",
         "params": [],
         "result": {
           "name": "clientVersion",
-          "description": "client version",
+          "description": "client version ",
           "schema": {
             "title": "clientVersion",
             "type": "string"

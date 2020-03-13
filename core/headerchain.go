@@ -225,6 +225,9 @@ type WhCallback func(*types.Header) error
 func (hc *HeaderChain) ValidateHeaderChain(chain []*types.Header, checkFreq int) (int, error) {
 	// Do a sanity check that the provided chain is actually ordered and linked
 	for i := 1; i < len(chain); i++ {
+		if chain[i] == nil {
+			return 0, fmt.Errorf("header was nil")
+		}
 		if chain[i].Number.Uint64() != chain[i-1].Number.Uint64()+1 || chain[i].ParentHash != chain[i-1].Hash() {
 			// Chain broke ancestry, log a message (programming error) and skip insertion
 			log.Error("Non contiguous header insert", "number", chain[i].Number, "hash", chain[i].Hash(),
@@ -290,6 +293,9 @@ func (hc *HeaderChain) InsertHeaderChain(chain []*types.Header, writeHeader WhCa
 		if hc.procInterrupt() {
 			log.Debug("Premature abort during headers import")
 			return i, errors.New("aborted")
+		}
+		if header == nil {
+			return i, fmt.Errorf("nil header")
 		}
 		// If the header's already known, skip it, otherwise store
 		hash := header.Hash()

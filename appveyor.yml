@@ -24,7 +24,7 @@ install:
   - gcc --version
 
 build_script:
-  - ps: $env:VERSION = "$(git describe)"
+  - ps: $env:VERSION = "$(git describe --always)"
   - go run build\ci.go install
   - 7z a core-geth-win64-%VERSION%.zip .\build\bin\geth.exe
   - ps: Get-FileHash core-geth-win64-$env:VERSION.zip -Algorithm SHA256

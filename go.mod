@@ -23,6 +23,7 @@ require (
 	github.com/fjl/memsize v0.0.0-20180418122429-ca190fb6ffbc
 	github.com/gballet/go-libpcsclite v0.0.0-20190403181518-312b5175032f
 	github.com/go-ole/go-ole v1.2.1 // indirect
+	github.com/go-openapi/spec v0.19.2
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-stack/stack v1.8.0
 	github.com/go-test/deep v1.0.4
@@ -30,6 +31,7 @@ require (
 	github.com/golang/snappy v0.0.1
 	github.com/gorilla/websocket v1.4.1
 	github.com/graph-gophers/graphql-go v0.0.0-20190513003547-158e7b876106
+	github.com/gregdhill/go-openrpc v0.0.0-20191115123255-ebc6f01c6db3
 	github.com/hashicorp/golang-lru v0.0.0-20160813221303-0a025b7e63ad
 	github.com/huin/goupnp v0.0.0-20161224104101-679507af18f3
 	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334

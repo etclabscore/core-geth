@@ -52,6 +52,7 @@ type callback struct {
 	fn          reflect.Value  // the function
 	rcvr        reflect.Value  // receiver object of method, set if fn is method
 	argTypes    []reflect.Type // input argument types
+	retTypes    []reflect.Type // return types
 	hasCtx      bool           // method's first argument is a context (not included in argTypes)
 	errPos      int            // err return idx, of -1 when method cannot return error
 	isSubscribe bool           // true if this is a subscription callback
@@ -176,6 +177,16 @@ func (c *callback) makeArgTypes() {
 	c.argTypes = make([]reflect.Type, fntype.NumIn()-firstArg)
 	for i := firstArg; i < fntype.NumIn(); i++ {
 		c.argTypes[i-firstArg] = fntype.In(i)
+	}
+}
+
+// makeRetTypes composes the argTypes list.
+func (c *callback) makeRetTypes() {
+	fntype := c.fn.Type()
+	// Add all remaining parameters.
+	c.retTypes = make([]reflect.Type, fntype.NumOut())
+	for i := 0; i < fntype.NumOut(); i++ {
+		c.retTypes[i] = fntype.Out(i)
 	}
 }
 

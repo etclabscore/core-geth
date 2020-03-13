@@ -31,9 +31,11 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/davecgh/go-spew/spew"
+	"github.com/aws/aws-sdk-go/private/util"
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/go-openapi/spec"
+	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
 
 const MetadataApi = "rpc"
@@ -250,8 +252,10 @@ type OpenRPCCheck struct {
 	Over []string
 
 	// Under is the methods on the server not available in the document.
-	Under OpenRPCCheckUnderSet
+	Under []goopenrpcT.Method // OpenRPCCheckUnderSet
 }
+
+type GoOpenRPCMethodSet []goopenrpcT.Method
 
 type OpenRPCCheckUnderSet []OpenRPCCheckUnder
 
@@ -315,7 +319,7 @@ func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
 
 	check := &OpenRPCCheck{
 		Over:  []string{},
-		Under: []OpenRPCCheckUnder{},
+		Under: []goopenrpcT.Method{}, //[]OpenRPCCheckUnder{},
 	}
 
 	// Audit documented doc methods vs. actual server availability
@@ -326,6 +330,9 @@ func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
 	docMethodsAvailable := []map[string]interface{}{}
 	serverMethodsAvailable := s.methods()
 
+	// Find Over methods.
+	// These are methods described in the document, but which are not available
+	// at the server.
 outer:
 	for _, m := range doc.Methods {
 		// Get the module/method name from the document.
@@ -355,7 +362,11 @@ outer:
 	}
 
 	// Find under methods.
+	// These are methods which are available on the server, but not described in the document.
 	for mod, list := range serverMethodsAvailable {
+		if mod == "rpc" {
+			continue
+		}
 	modmethodlistloop:
 		for _, item := range list {
 			name := strings.Join([]string{mod, item}, serviceMethodSeparators[0])
@@ -364,8 +375,29 @@ outer:
 					continue modmethodlistloop
 				}
 			}
+
 			it := s.server.services.services[mod].callbacks[item]
+			it.makeArgTypes()
+			it.makeRetTypes()
+
 			fnp := runtime.FuncForPC(it.fn.Pointer())
+
+			orpcM := goopenrpcT.Method{
+				Name:           name,
+				Tags:           nil,
+				Summary:        "",
+				Description:    "",
+				ExternalDocs:   goopenrpcT.ExternalDocs{},
+				Params:         nil,
+				Result:         nil,
+				Deprecated:     false,
+				Servers:        nil,
+				Errors:         nil,
+				Links:          nil,
+				ParamStructure: "",
+				Examples:       nil,
+			}
+
 			fnFile, fnLine := fnp.FileLine(fnp.Entry())
 
 			/*
@@ -419,17 +451,92 @@ outer:
 				// in the file is the correct one. Best to use file/+pos measurements.
 				if fn.Name.Name == spl[len(spl)-1] {
 					fns.Doc = fn.Doc.Text()
+
+					orpcM.Summary = fn.Doc.Text()
+					orpcM.Description = fmt.Sprintf(`%s
+%s:%d
+%s`, fnp.Name(), fnFile, fnLine, it.fn.String())
+
+					//for _, l := range fn.Body.List {
+					//	l.Pos()
+					//}
+
 					// for _, l := range fn.Body.List {
 
 					// }
 					// spew.Config.DisablePointerAddresses = true
 					// spew.Config.Dis
 					if fn.Type.Params != nil {
-						for _, p := range fn.Type.Params.List {
+						j := 0
+						for i, p := range fn.Type.Params.List {
 							if p == nil {
 								continue
 							}
+							if it.hasCtx && strings.Contains(fmt.Sprintf("%s", p.Type), "context") {
+								continue
+							}
 							//fns.ParamsList = append(fns.ParamsList, spew.Sdump(p))
+
+							if orpcM.Params == nil {
+								orpcM.Params = []*goopenrpcT.ContentDescriptor{}
+							}
+							for _, n := range p.Names {
+								//names = append(names, n.Name)
+
+								pname := n.Name
+								//pname := strings.Join(names, "+")
+								resType := fmt.Sprintf("type:%v", p.Type)
+								if p.Tag != nil {
+									resType = "tag:" + p.Tag.Value
+								}
+
+								// use other types for type
+								ts := []string{}
+								for _, a := range it.argTypes {
+									ts = append(ts, a.String())
+								}
+								resType = strings.Join(ts, "/")
+								if len(it.argTypes) > 0 && j <= len(it.argTypes)-1 {
+									rt  := it.argTypes[j]
+									if rtname := rt.Name(); rtname != "" {
+										//resType = "name:"+rtname
+										resType = rtname
+									} else if rtname = rt.String(); rtname != "" {
+										//resType = "string:"+rtname
+										resType = rtname
+									} else if rtname = rt.Kind().String(); rtname != "" {
+										//resType = "kind:"+rtname
+										resType = rtname
+									}
+									if strings.HasPrefix(resType, "*") {
+										resType = strings.TrimPrefix(resType, "*")
+										//resType = util.Capitalize(resType)
+										resType += "OrNull"
+									}
+									j++
+								}
+
+								tit := fmt.Sprintf("%s_%s:Arg%d", mod, item, i)
+								if pname != "" {
+									tit = fmt.Sprintf("%s_%s:%s", mod, item, util.Capitalize(pname))
+								}
+
+								orpcM.Params = append(orpcM.Params, &goopenrpcT.ContentDescriptor{
+									Content: goopenrpcT.Content{
+										Name:        pname,
+										Summary:     p.Doc.Text(),
+										Description: p.Comment.Text(), // p.Tag.Value,
+										Required:    false,            // FIXME
+										Deprecated:  false,            // FIXME
+										Schema: spec.Schema{
+											SchemaProps: spec.SchemaProps{
+												Title: tit,
+												Type:  spec.StringOrArray{resType}, // FIXME
+											},
+										},
+									},
+								})
+							}
 
 
 
@@ -439,17 +546,145 @@ outer:
 						}
 					}
 					if fn.Type.Results != nil {
+						j := 0
 						for _, p := range fn.Type.Results.List {
 							if p == nil {
 								continue
 							}
+							if strings.Contains(fmt.Sprintf("%v", p.Type), "error") {
+								continue
+							}
+							//fns.ResultsList = append(fns.ResultsList, spew.Sdump(p))
 
-							fns.ResultsList = append(fns.ResultsList, spew.Sdump(p))
+							if len(p.Names) > 0 {
+								for _, n := range p.Names {
+									//names = append(names, n.String())
+									pname := n.Name
+									resType := fmt.Sprintf("type:%v", p.Type)
+									if p.Tag != nil {
+										resType = "tag:" + p.Tag.Value
+									}
+									// use other types for type
+									ts := []string{}
+									for _, a := range it.retTypes {
+										ts = append(ts, a.String())
+									}
+									resType = strings.Join(ts, "/")
+									if len(it.retTypes) > 0 && j <= len(it.retTypes)-1 {
+										rt  := it.retTypes[j]
+										if rtname := rt.Name(); rtname != "" {
+											//resType = "name:"+rtname
+											resType = rtname
+										} else if rtname = rt.String(); rtname != "" {
+											//resType = "string:"+rtname
+											resType = rtname
+										} else if rtname = rt.Kind().String(); rtname != "" {
+											//resType = "kind:"+rtname
+											resType = rtname
+										}
+										if strings.HasPrefix(resType, "*") {
+											resType = strings.TrimPrefix(resType, "*")
+											//resType = util.Capitalize(resType)
+											resType += "OrNull"
+										}
+										j++
+									}
+
+									tit := fmt.Sprintf("%s_%s:Result", mod, item)
+									if pname != "" {
+										tit = fmt.Sprintf("%s_%s:%s", mod, item, util.Capitalize(pname))
+									}
+									orpcM.Result = &goopenrpcT.ContentDescriptor{
+										Content: goopenrpcT.Content{
+											Name:        pname,
+											Summary:     p.Doc.Text(),
+											Description: p.Comment.Text(), // p.Tag.Value,
+											Required:    false,            // FIXME
+											Deprecated:  false,            // FIXME
+											Schema: spec.Schema{
+												SchemaProps: spec.SchemaProps{
+													Title: tit,
+													Type:  spec.StringOrArray{resType}, // FIXME
+												},
+											},
+										},
+									}
+
+								}
+							} else {
+								//names = append(names, n.String())
+								pname := fmt.Sprintf("%s", it.retTypes[0].String())
+								resType := fmt.Sprintf("type:%v", p.Type)
+								if p.Tag != nil {
+									resType = "tag:" + p.Tag.Value
+								}
+								// use other types for type
+								ts := []string{}
+								for _, a := range it.retTypes {
+									ts = append(ts, a.String())
+								}
+								resType = strings.Join(ts, "/")
+								if len(it.retTypes) > 0 && j <= len(it.retTypes)-1 {
+									rt  := it.retTypes[j]
+									if rtname := rt.Name(); rtname != "" {
+										//resType = "name:"+rtname
+										resType = rtname
+									} else if rtname = rt.String(); rtname != "" {
+										//resType = "string:"+rtname
+										resType = rtname
+									} else if rtname = rt.Kind().String(); rtname != "" {
+										//resType = "kind:"+rtname
+										resType = rtname
+									}
+									if strings.HasPrefix(resType, "*") {
+										resType = strings.TrimPrefix(resType, "*")
+										//resType = util.Capitalize(resType)
+										resType += "OrNull"
+									}
+									j++
+								}
+
+								tit := fmt.Sprintf("%s_%s:Result", mod, item)
+								//if pname != "" {
+								//	tit = fmt.Sprintf("%s%_s", item, util.Capitalize(pname))
+								//}
+								orpcM.Result = &goopenrpcT.ContentDescriptor{
+									Content: goopenrpcT.Content{
+										Name:        pname,
+										Summary:     p.Doc.Text(),
+										Description: p.Comment.Text(), // p.Tag.Value,
+										Required:    false,            // FIXME
+										Deprecated:  false,            // FIXME
+										Schema: spec.Schema{
+											SchemaProps: spec.SchemaProps{
+												Title: tit,
+												Type:  spec.StringOrArray{resType}, // FIXME
+											},
+										},
+									},
+								}
+							}
+
+							//pname := strings.Join(names, "+")
+
+
 							// for _, n := range p.Names {
-							// 	fns.ParamsList = append(fns.ResultsList, n.Name) // n.String()
+							// 	fns.ParamsList = append(fns.ParamsList, n.Name) // n.String()
 							// }
 						}
 					}
+					//if fn.Type.Results != nil {
+					//	for _, p := range fn.Type.Results.List {
+					//		if p == nil {
+					//			continue
+					//		}
+					//
+					//		fns.ResultsList = append(fns.ResultsList, spew.Sdump(p))
+					//		// for _, n := range p.Names {
+					//		// 	fns.ParamsList = append(fns.ResultsList, n.Name) // n.String()
+					//		// }
+					//	}
+					//}
 
 				} else {
 					// fmt.Println("NONMATCH", fn.Name.Name)
@@ -464,8 +699,9 @@ outer:
 				ErrPos:      it.errPos,
 				Args:        []OpenRPCCheckUnderArg{},
 			}
-			it.makeArgTypes()
+
 			argTypes := it.argTypes
+
 
 			for _, a := range argTypes {
 				cu.Args = append(cu.Args, OpenRPCCheckUnderArg{
@@ -474,10 +710,13 @@ outer:
 				})
 			}
 
-			check.Under = append(check.Under, cu)
+			check.Under = append(check.Under, orpcM)
 		}
 	}
-	sort.Sort(check.Under)
+	//sort.Sort(check.Under)
+	sort.Slice(check.Under, func(i, j int) bool {
+		return check.Under[i].Name < check.Under[j].Name
+	})
 	return check, nil
 }
 

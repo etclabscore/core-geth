@@ -53,33 +53,33 @@ func (self *testTxRelay) Discard(hashes []common.Hash) {
 	self.discard <- len(hashes)
 }
 
-const poolTestTxs = 1000
-const poolTestBlocks = 100
+const poolTestTxsN = 1000
+const poolTestBlocksN = 100
 
 // test tx 0..n-1
-var testTx [poolTestTxs]*types.Transaction
+var testTxSet [poolTestTxsN]*types.Transaction
 
 // txs sent before block i
 func sentTx(i int) int {
-	return int(math.Pow(float64(i)/float64(poolTestBlocks), 0.9) * poolTestTxs)
+	return int(math.Pow(float64(i)/float64(poolTestBlocksN), 0.9) * poolTestTxsN)
 }
 
 // txs included in block i or before that (minedTx(i) <= sentTx(i))
 func minedTx(i int) int {
-	return int(math.Pow(float64(i)/float64(poolTestBlocks), 1.1) * poolTestTxs)
+	return int(math.Pow(float64(i)/float64(poolTestBlocksN), 1.1) * poolTestTxsN)
 }
 
 func txPoolTestChainGen(i int, block *core.BlockGen) {
 	s := minedTx(i)
 	e := minedTx(i + 1)
 	for i := s; i < e; i++ {
-		block.AddTx(testTx[i])
+		block.AddTx(testTxSet[i])
 	}
 }
 
 func TestTxPool(t *testing.T) {
-	for i := range testTx {
-		testTx[i], _ = types.SignTx(types.NewTransaction(uint64(i), acc1Addr, big.NewInt(10000), vars.TxGas, nil, nil), types.HomesteadSigner{}, testBankKey)
+	for i := range testTxSet {
+		testTxSet[i], _ = types.SignTx(types.NewTransaction(uint64(i), acc1Addr, big.NewInt(10000), vars.TxGas, nil, nil), types.HomesteadSigner{}, testBankKey)
 	}
 
 	var (
@@ -91,7 +91,7 @@ func TestTxPool(t *testing.T) {
 	core.MustCommitGenesis(ldb, &gspec)
 	// Assemble the test environment
 	blockchain, _ := core.NewBlockChain(sdb, nil, params.TestChainConfig, ethash.NewFullFaker(), vm.Config{}, nil)
-	gchain, _ := core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), sdb, poolTestBlocks, txPoolTestChainGen)
+	gchain, _ := core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), sdb, poolTestBlocksN, txPoolTestChainGen)
 	if _, err := blockchain.InsertChain(gchain); err != nil {
 		panic(err)
 	}
@@ -113,16 +113,35 @@ func TestTxPool(t *testing.T) {
 		s := sentTx(i - 1)
 		e := sentTx(i)
 		for i := s; i < e; i++ {
-			pool.Add(ctx, testTx[i])
+			pool.Add(ctx, testTxSet[i])
 			got := <-relay.send
 			exp := 1
 			if got != exp {
 				t.Errorf("relay.Send expected len = %d, got %d", exp, got)
 			}
 		}
+		if ii == len(gchain)/4 {
+			// Fuck up pool head
+			// This is an edge case that I'm not sure could really happen (hopefully not),
+			// but checking anyways. Call it sanity.
+			t.Log("Setting pool head to empty hash")
+			pool.head = common.Hash{}
+		}
 
+		if ii == len(gchain)/2 {
+			// Attempt to insert a nil header into the headerchain
+			t.Log("Inserting nil header into header chain")
+			if _, err := lightchain.InsertHeaderChain([]*types.Header{nil}, 1); err == nil {
+				t.Fatal("insert nil header error should not be errorless")
+			}
+		}
+		if ii == len(gchain)/4*3 {
+			var h *types.Header
+			t.Log("Setting pool head to a nil header", h.Hash().Hex())
+			pool.setNewHead(h)
+		}
 		if _, err := lightchain.InsertHeaderChain([]*types.Header{block.Header()}, 1); err != nil {
-			panic(err)
+			t.Fatal(err)
 		}
 
 		got := <-relay.mined

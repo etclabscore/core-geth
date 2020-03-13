@@ -223,6 +223,15 @@ func (pool *TxPool) rollbackTxs(hash common.Hash, txc txStateChanges) {
 func (pool *TxPool) reorgOnNewHead(ctx context.Context, newHeader *types.Header) (txStateChanges, error) {
 	txc := make(txStateChanges)
 	oldh := pool.chain.GetHeaderByHash(pool.head)
+	if oldh == nil {
+		current := pool.chain.CurrentHeader()
+		if current.Number.Uint64() > 0 {
+			oldh = pool.chain.GetHeaderByHash(current.ParentHash)
+		} else {
+			oldh = current
+		}
+		pool.head = oldh.Hash()
+	}
 	newh := newHeader
 	// find common ancestor, create list of rolled back and new block hashes
 	var oldHashes, newHashes []common.Hash
@@ -308,7 +317,15 @@ func (pool *TxPool) setNewHead(head *types.Header) {
 	ctx, cancel := context.WithTimeout(context.Background(), blockCheckTimeout)
 	defer cancel()
 
-	txc, _ := pool.reorgOnNewHead(ctx, head)
+	if head == nil {
+		return
+	}
+
+	txc, err := pool.reorgOnNewHead(ctx, head)
+	if err != nil {
+		log.Info("light.txpool reorg failed", "error", err)
+		return
+	}
 	m, r := txc.getLists()
 	pool.relay.NewHead(pool.head, m, r)
 	pool.eip2f = pool.config.IsEnabled(pool.config.GetEthashEIP2Transition, head.Number)

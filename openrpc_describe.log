@@ -1,6 +1,6 @@
 {
   "jsonrpc": "2.0", 
-  "id": 1584113385, 
+  "id": 1584130932, 
   "result": {
     "Over": [], 
     "Under": [
@@ -61,7 +61,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "type": "p2p.NodeInfoOrNull", 
+            "type": "*p2p.NodeInfo", 
             "title": "admin_nodeInfo:Result"
           }
         }, 
@@ -197,7 +197,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "stringOrNull", 
+              "type": "*string", 
               "title": "admin_startRPC:Host"
             }
           }, 
@@ -208,7 +208,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "intOrNull", 
+              "type": "*int", 
               "title": "admin_startRPC:Port"
             }
           }, 
@@ -219,7 +219,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "stringOrNull", 
+              "type": "*string", 
               "title": "admin_startRPC:Cors"
             }
           }, 
@@ -230,7 +230,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "stringOrNull", 
+              "type": "*string", 
               "title": "admin_startRPC:Apis"
             }
           }, 
@@ -241,7 +241,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "stringOrNull", 
+              "type": "*string", 
               "title": "admin_startRPC:Vhosts"
             }
           }
@@ -281,7 +281,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "stringOrNull", 
+              "type": "*string", 
               "title": "admin_startWS:Host"
             }
           }, 
@@ -292,7 +292,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "intOrNull", 
+              "type": "*int", 
               "title": "admin_startWS:Port"
             }
           }, 
@@ -303,7 +303,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "stringOrNull", 
+              "type": "*string", 
               "title": "admin_startWS:AllowedOrigins"
             }
           }, 
@@ -314,7 +314,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "stringOrNull", 
+              "type": "*string", 
               "title": "admin_startWS:Apis"
             }
           }
@@ -410,7 +410,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "common.HashOrNull", 
+              "type": "*common.Hash", 
               "title": "debug_accountRange:Start"
             }
           }, 
@@ -689,7 +689,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "type": "debug.GCStatsOrNull", 
+            "type": "*debug.GCStats", 
             "title": "debug_gcStats:Result"
           }
         }, 
@@ -796,7 +796,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "common.HashOrNull", 
+              "type": "*common.Hash", 
               "title": "debug_getModifiedAccountsByHash:EndHash"
             }
           }
@@ -847,7 +847,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "uint64OrNull", 
+              "type": "*uint64", 
               "title": "debug_getModifiedAccountsByNumber:EndNum"
             }
           }
@@ -928,7 +928,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "type": "runtime.MemStatsOrNull", 
+            "type": "*runtime.MemStats", 
             "title": "debug_memStats:Result"
           }
         }, 
@@ -1286,7 +1286,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "eth.StdTraceConfigOrNull", 
+              "type": "*eth.StdTraceConfig", 
               "title": "debug_standardTraceBadBlockToFile:Config"
             }
           }
@@ -1337,7 +1337,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "eth.StdTraceConfigOrNull", 
+              "type": "*eth.StdTraceConfig", 
               "title": "debug_standardTraceBlockToFile:Config"
             }
           }
@@ -1619,7 +1619,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "eth.TraceConfigOrNull", 
+              "type": "*eth.TraceConfig", 
               "title": "debug_traceBadBlock:Config"
             }
           }
@@ -1670,7 +1670,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "eth.TraceConfigOrNull", 
+              "type": "*eth.TraceConfig", 
               "title": "debug_traceBlock:Config"
             }
           }
@@ -1721,7 +1721,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "eth.TraceConfigOrNull", 
+              "type": "*eth.TraceConfig", 
               "title": "debug_traceBlockByHash:Config"
             }
           }
@@ -1772,7 +1772,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "eth.TraceConfigOrNull", 
+              "type": "*eth.TraceConfig", 
               "title": "debug_traceBlockByNumber:Config"
             }
           }
@@ -1823,7 +1823,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "eth.TraceConfigOrNull", 
+              "type": "*eth.TraceConfig", 
               "title": "debug_traceBlockFromFile:Config"
             }
           }
@@ -1874,7 +1874,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "eth.TraceConfigOrNull", 
+              "type": "*eth.TraceConfig", 
               "title": "debug_traceTransaction:Config"
             }
           }
@@ -2132,7 +2132,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "type": "ethapi.SignTransactionResultOrNull", 
+            "type": "*ethapi.SignTransactionResult", 
             "title": "eth_fillTransaction:Result"
           }
         }, 
@@ -2279,7 +2279,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "hexutil.BigOrNull", 
+              "type": "*hexutil.Big", 
               "title": "eth_resend:GasPrice"
             }
           }, 
@@ -2290,7 +2290,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "hexutil.Uint64OrNull", 
+              "type": "*hexutil.Uint64", 
               "title": "eth_resend:GasLimit"
             }
           }
@@ -2341,7 +2341,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "ethapi.SendTxArgs", 
+              "type": "ethapi.SendTxArgs@1", 
               "title": "eth_sendTransaction:Passwd"
             }
           }, 
@@ -2414,7 +2414,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "common.Address/hexutil.Bytes", 
+              "type": "common.Address,hexutil.Bytes@2", 
               "title": "eth_sign:Addr"
             }
           }, 
@@ -2425,7 +2425,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "common.Address/hexutil.Bytes", 
+              "type": "common.Address,hexutil.Bytes@2", 
               "title": "eth_sign:Passwd"
             }
           }, 
@@ -2498,8 +2498,19 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "ethapi.SendTxArgs", 
+              "type": "ethapi.SendTxArgs@1", 
               "title": "eth_signTransaction:Passwd"
+            }
+          }, 
+          {
+            "name": "passwd2", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "type": "ethapi.SendTxArgs@1", 
+              "title": "eth_signTransaction:Passwd2"
             }
           }, 
           {
@@ -2521,7 +2532,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "type": "ethapi.SignTransactionResultOrNull", 
+            "type": "*ethapi.SignTransactionResult", 
             "title": "eth_signTransaction:Result"
           }
         }, 
@@ -2612,7 +2623,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "type": "downloader.SyncStatusSubscriptionOrNull", 
+            "type": "*downloader.SyncStatusSubscription", 
             "title": "eth_subscribeSyncStatus:Result"
           }
         }, 
@@ -2987,7 +2998,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "intOrNull", 
+              "type": "*int", 
               "title": "miner_start:Threads"
             }
           }
@@ -3057,7 +3068,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "boolOrNull", 
+              "type": "*bool", 
               "title": "personal_deriveAccount:Pin"
             }
           }
@@ -3386,7 +3397,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "stringOrNull", 
+              "type": "*string", 
               "title": "personal_openWallet:Passphrase"
             }
           }
@@ -3600,7 +3611,7 @@
         "name": "personal_signTransaction", 
         "tags": null, 
         "summary": "SignTransaction will sign the given transaction with the from account.\nThe node needs to have the private key of the account corresponding with\nthe given from address and it needs to be unlocked.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SignTransaction\n/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:383\n\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string) (*ethapi.SignTransactionResult, error) Value\u003e", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SignTransaction\n/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:383\n\u003cfunc(*ethapi.PrivateAccountAPI, context.Context, ethapi.SendTxArgs, string, string) (*ethapi.SignTransactionResult, error) Value\u003e", 
         "externalDocs": {
           "description": "", 
           "url": ""
@@ -3629,6 +3640,17 @@
             }
           }, 
           {
+            "name": "passwd2", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "type": "string", 
+              "title": "personal_signTransaction:Passwd2"
+            }
+          }, 
+          {
             "name": "args", 
             "summary": "", 
             "description": "", 
@@ -3647,7 +3669,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "type": "ethapi.SignTransactionResultOrNull", 
+            "type": "*ethapi.SignTransactionResult", 
             "title": "personal_signTransaction:Result"
           }
         }, 
@@ -3697,7 +3719,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "type": "uint64OrNull", 
+              "type": "*uint64", 
               "title": "personal_unlockAccount:Duration"
             }
           }

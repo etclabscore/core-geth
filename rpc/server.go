@@ -26,12 +26,14 @@ import (
 	"go/token"
 	"io"
 	"io/ioutil"
+	"regexp"
 	"runtime"
 	"sort"
 	"strings"
 	"sync/atomic"
 
 	"github.com/aws/aws-sdk-go/private/util"
+	"github.com/davecgh/go-spew/spew"
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/go-openapi/spec"
@@ -304,6 +306,18 @@ type OpenRPCCheckUnderArg struct {
 	Name, Kind string
 }
 
+func packageNameFromRuntimePCFuncName(runtimeFuncForPCName string) string {
+	re := regexp.MustCompile(`(?im)^(?P<pkgdir>.*/)(?P<pkgbase>[a-zA-Z0-9\-_]*)`)
+	match := re.FindStringSubmatch(runtimeFuncForPCName)
+	pmap := make(map[string]string)
+	for i, name := range re.SubexpNames() {
+		if i > 0 && i <= len(match) {
+			pmap[name] = match[i]
+		}
+	}
+	return pmap["pkgdir"] + pmap["pkgbase"]
+}
+
 func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
 	var err error
 	if s.server.OpenRPCSchemaRaw == "" {
@@ -438,6 +452,13 @@ outer:
 				panic(err)
 			}
 
+			fp, err := parser.ParseFile(fset, fnFile, nil, parser.PackageClauseOnly)
+
+			pkgName := "N/A"
+			if fp.Name != nil {
+				pkgName = fp.Name.Name
+			}
+
 			for _, decl := range f.Decls {
 				fn, ok := decl.(*ast.FuncDecl)
 				if !ok {
@@ -483,21 +504,54 @@ outer:
 							for _, n := range p.Names {
 								//names = append(names, n.Name)
 
+								spew.Config.Indent = "    "
+								spew.Config.DisablePointerAddresses = true
+								spew.Config.DisableCapacities = true
+
+								fmt.Println("********")
+								fmt.Println(mod, item, "i=", i, "j=", j)
+								fmt.Println("__it__=> ", spew.Sdump(it))
+								fmt.Println()
+								fmt.Println("__fn__=> ", spew.Sdump(fn))
+								//fmt.Println()
+								//fmt.Println("__pkgPath__=>", it.fn.Type().Elem().PkgPath())
+								//fmt.Println()
+								//fmt.Println("__f.Package__=>", spew.Sdump(f.Package))
+								fmt.Println()
+								fmt.Println("__packageName__=>", pkgName)
+								fmt.Println()
+								fmt.Println("__packageNameR__=>", fnp.Name(), "->", packageNameFromRuntimePCFuncName(fnp.Name()))
+								fmt.Println()
+								fmt.Println("__p.type__=>", spew.Sdump(p.Type))
+
+
+								//
+								switch tt := p.Type.(type) {
+								case *ast.SelectorExpr:
+
+									fmt.Println("p.Type(selector_expr).name=", tt.X, tt.Sel)
+								case *ast.StarExpr:
+									fmt.Println("p.Type(star_expr).name=", tt.X, tt.Star)
+								default:
+									fmt.Println("p.Type(default).name=", tt)
+								}
+
 								pname := n.Name
 								//pname := strings.Join(names, "+")
-								resType := fmt.Sprintf("type:%v", p.Type)
-								if p.Tag != nil {
-									resType = "tag:" + p.Tag.Value
-								}
+								//resType := fmt.Sprintf("type:%v", p.Type)
+								//if p.Tag != nil {
+								//	resType = "tag:" + p.Tag.Value
+								//}
 
 								// use other types for type
 								ts := []string{}
 								for _, a := range it.argTypes {
 									ts = append(ts, a.String())
 								}
-								resType = strings.Join(ts, "/")
+								resType := strings.Join(ts, ",") + "@" + fmt.Sprintf("%d", j)
 								if len(it.argTypes) > 0 && j <= len(it.argTypes)-1 {
-									rt  := it.argTypes[j]
+									rt := it.argTypes[j]
+
 									if rtname := rt.Name(); rtname != "" {
 										//resType = "name:"+rtname
 										resType = rtname
@@ -509,9 +563,9 @@ outer:
 										resType = rtname
 									}
 									if strings.HasPrefix(resType, "*") {
-										resType = strings.TrimPrefix(resType, "*")
+										//resType = strings.TrimPrefix(resType, "*")
 										//resType = util.Capitalize(resType)
-										resType += "OrNull"
+										//resType += "OrNull"
 									}
 									j++
 								}
@@ -538,8 +592,6 @@ outer:
 								})
 							}
 
-
-
 							// for _, n := range p.Names {
 							// 	fns.ParamsList = append(fns.ParamsList, n.Name) // n.String()
 							// }
@@ -557,75 +609,22 @@ outer:
 							//fns.ResultsList = append(fns.ResultsList, spew.Sdump(p))
 
 							if len(p.Names) > 0 {
-								for _, n := range p.Names {
-									//names = append(names, n.String())
-									pname := n.Name
-									resType := fmt.Sprintf("type:%v", p.Type)
-									if p.Tag != nil {
-										resType = "tag:" + p.Tag.Value
-									}
-									// use other types for type
-									ts := []string{}
-									for _, a := range it.retTypes {
-										ts = append(ts, a.String())
-									}
-									resType = strings.Join(ts, "/")
-									if len(it.retTypes) > 0 && j <= len(it.retTypes)-1 {
-										rt  := it.retTypes[j]
-										if rtname := rt.Name(); rtname != "" {
-											//resType = "name:"+rtname
-											resType = rtname
-										} else if rtname = rt.String(); rtname != "" {
-											//resType = "string:"+rtname
-											resType = rtname
-										} else if rtname = rt.Kind().String(); rtname != "" {
-											//resType = "kind:"+rtname
-											resType = rtname
-										}
-										if strings.HasPrefix(resType, "*") {
-											resType = strings.TrimPrefix(resType, "*")
-											//resType = util.Capitalize(resType)
-											resType += "OrNull"
-										}
-										j++
-									}
-
-									tit := fmt.Sprintf("%s_%s:Result", mod, item)
-									if pname != "" {
-										tit = fmt.Sprintf("%s_%s:%s", mod, item, util.Capitalize(pname))
-									}
-									orpcM.Result = &goopenrpcT.ContentDescriptor{
-										Content: goopenrpcT.Content{
-											Name:        pname,
-											Summary:     p.Doc.Text(),
-											Description: p.Comment.Text(), // p.Tag.Value,
-											Required:    false,            // FIXME
-											Deprecated:  false,            // FIXME
-											Schema: spec.Schema{
-												SchemaProps: spec.SchemaProps{
-													Title: tit,
-													Type:  spec.StringOrArray{resType}, // FIXME
-												},
-											},
-										},
-									}
-
-								}
-							} else {
+								//for _, n := range p.Names {
 								//names = append(names, n.String())
-								pname := fmt.Sprintf("%s", it.retTypes[0].String())
-								resType := fmt.Sprintf("type:%v", p.Type)
-								if p.Tag != nil {
-									resType = "tag:" + p.Tag.Value
-								}
+								pname := p.Names[0].Name
+								//fmt.Sprintf("%v", p.Type)
+								//resType := fmt.Sprintf("type:%v", p.Type)
+								//if p.Tag != nil {
+								//	resType = "tag:" + p.Tag.Value
+								//}
 								// use other types for type
 								ts := []string{}
 								for _, a := range it.retTypes {
 									ts = append(ts, a.String())
 								}
-								resType = strings.Join(ts, "/")
+								resType := strings.Join(ts, "/")
 								if len(it.retTypes) > 0 && j <= len(it.retTypes)-1 {
-									rt  := it.retTypes[j]
+									rt := it.retTypes[j]
 									if rtname := rt.Name(); rtname != "" {
 										//resType = "name:"+rtname
 										resType = rtname
@@ -637,9 +636,64 @@ outer:
 										resType = rtname
 									}
 									if strings.HasPrefix(resType, "*") {
-										resType = strings.TrimPrefix(resType, "*")
-										//resType = util.Capitalize(resType)
-										resType += "OrNull"
+										//resType = strings.TrimPrefix(resType, "*")
+										////resType = util.Capitalize(resType)
+										//resType += "OrNull"
+									}
+									j++
+								}
+
+								tit := fmt.Sprintf("%s_%s:Result", mod, item)
+								if pname != "" {
+									tit = fmt.Sprintf("%s_%s:%s", mod, item, util.Capitalize(pname))
+								}
+								orpcM.Result = &goopenrpcT.ContentDescriptor{
+									Content: goopenrpcT.Content{
+										Name:        pname,
+										Summary:     p.Doc.Text(),
+										Description: p.Comment.Text(), // p.Tag.Value,
+										Required:    false,            // FIXME
+										Deprecated:  false,            // FIXME
+										Schema: spec.Schema{
+											SchemaProps: spec.SchemaProps{
+												Title: tit,
+												Type:  spec.StringOrArray{resType}, // FIXME
+											},
+										},
+									},
+								}
+
+								//}
+							} else {
+								//names = append(names, n.String())
+								pname := fmt.Sprintf("%s", it.retTypes[0].String())
+								//resType := fmt.Sprintf("type:%v", p.Type)
+								//if p.Tag != nil {
+								//	resType = "tag:" + p.Tag.Value
+								//}
+
+								// use other types for type
+								ts := []string{}
+								for _, a := range it.retTypes {
+									ts = append(ts, a.String())
+								}
+								resType := strings.Join(ts, "/")
+								if len(it.retTypes) > 0 && j <= len(it.retTypes)-1 {
+									rt := it.retTypes[j]
+									if rtname := rt.Name(); rtname != "" {
+										//resType = "name:"+rtname
+										resType = rtname
+									} else if rtname = rt.String(); rtname != "" {
+										//resType = "string:"+rtname
+										resType = rtname
+									} else if rtname = rt.Kind().String(); rtname != "" {
+										//resType = "kind:"+rtname
+										resType = rtname
+									}
+									if strings.HasPrefix(resType, "*") {
+										//resType = strings.TrimPrefix(resType, "*")
+										////resType = util.Capitalize(resType)
+										//resType += "OrNull"
 									}
 									j++
 								}
@@ -666,7 +720,6 @@ outer:
 							}
 
 							//pname := strings.Join(names, "+")
-
 
 							// for _, n := range p.Names {
 							// 	fns.ParamsList = append(fns.ParamsList, n.Name) // n.String()
@@ -701,7 +754,6 @@ outer:
 			}
 
 			argTypes := it.argTypes
-
 
 			for _, a := range argTypes {
 				cu.Args = append(cu.Args, OpenRPCCheckUnderArg{

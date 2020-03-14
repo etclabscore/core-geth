@@ -82,9 +82,10 @@ func NewServer() *Server {
 		run:              1,
 		OpenRPCSchemaRaw: defaultOpenRPCSchemaRaw,
 	}
+
 	// Register the default service providing meta information about the RPC service such
 	// as the services and methods it offers.
-	rpcService := &RPCService{server: server}
+	rpcService := &RPCService{server: server, doc: NewOpenRPCDescription(server)}
 	server.RegisterName(MetadataApi, rpcService)
 	return server
 }
@@ -93,7 +94,7 @@ func validateOpenRPCSchemaRaw(schemaJSON string) error {
 	if schemaJSON == "" {
 		return errOpenRPCDiscoverSchemaInvalid
 	}
-	var schema OpenRPCDiscoverSchemaT
+	var schema goopenrpcT.OpenRPCSpec1
 	if err := json.Unmarshal([]byte(schemaJSON), &schema); err != nil {
 		return fmt.Errorf("%v: %v", errOpenRPCDiscoverSchemaInvalid, err)
 	}
@@ -192,6 +193,7 @@ func (s *Server) Stop() {
 // e.g. gives information about the loaded modules.
 type RPCService struct {
 	server *Server
+	doc    *OpenRPCDescription
 }
 
 // Modules returns the list of RPC services with their version number
@@ -323,8 +325,8 @@ func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
 	if s.server.OpenRPCSchemaRaw == "" {
 		return nil, errOpenRPCDiscoverUnavailable
 	}
-	doc := &OpenRPCDiscoverSchemaT{
-		Servers: make([]map[string]interface{}, 0),
+	doc := &goopenrpcT.OpenRPCSpec1{
+		Servers: []goopenrpcT.Server{},
 	}
 	err = json.Unmarshal([]byte(s.server.OpenRPCSchemaRaw), doc)
 	if err != nil {
@@ -341,7 +343,7 @@ func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
 	// which are not currently exposed on the server's API.
 	// This is done on the fly (as opposed to at servre init or doc setting)
 	// because it's possible that exposed APIs could be modified in proc.
-	docMethodsAvailable := []map[string]interface{}{}
+	docMethodsAvailable := []goopenrpcT.Method{}
 	serverMethodsAvailable := s.methods()
 
 	// Find Over methods.
@@ -350,7 +352,7 @@ func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
 outer:
 	for _, m := range doc.Methods {
 		// Get the module/method name from the document.
-		methodName := m["name"].(string)
+		methodName := m.Name
 		module, path, err := elementizeMethodName(methodName)
 		if err != nil {
 			return nil, err
@@ -385,7 +387,7 @@ outer:
 		for _, item := range list {
 			name := strings.Join([]string{mod, item}, serviceMethodSeparators[0])
 			for _, m := range doc.Methods {
-				if m["name"].(string) == name {
+				if m.Name == name {
 					continue modmethodlistloop
 				}
 			}
@@ -453,6 +455,9 @@ outer:
 			}
 
 			fp, err := parser.ParseFile(fset, fnFile, nil, parser.PackageClauseOnly)
+			if err != nil {
+				panic(err)
+			}
 
 			pkgName := "N/A"
 			if fp.Name != nil {
@@ -523,7 +528,6 @@ outer:
 								fmt.Println("__packageNameR__=>", fnp.Name(), "->", packageNameFromRuntimePCFuncName(fnp.Name()))
 								fmt.Println()
 								fmt.Println("__p.type__=>", spew.Sdump(p.Type))
-
 
 								//
 								switch tt := p.Type.(type) {
@@ -775,12 +779,12 @@ outer:
 // Discover returns a configured schema that is audited for actual server availability.
 // Only methods that the server makes available are included in the 'methods' array of
 // the discover schema. Components are not audited.
-func (s *RPCService) Discover() (schema *OpenRPCDiscoverSchemaT, err error) {
+func (s *RPCService) Discover() (schema *goopenrpcT.OpenRPCSpec1, err error) {
 	if s.server.OpenRPCSchemaRaw == "" {
 		return nil, errOpenRPCDiscoverUnavailable
 	}
-	schema = &OpenRPCDiscoverSchemaT{
-		Servers: make([]map[string]interface{}, 0),
+	schema = &goopenrpcT.OpenRPCSpec1{
+		Servers: []goopenrpcT.Server{},
 	}
 	err = json.Unmarshal([]byte(s.server.OpenRPCSchemaRaw), schema)
 	if err != nil {
@@ -792,11 +796,11 @@ func (s *RPCService) Discover() (schema *OpenRPCDiscoverSchemaT, err error) {
 	// which are not currently exposed on the server's API.
 	// This is done on the fly (as opposed to at servre init or schema setting)
 	// because it's possible that exposed APIs could be modified in proc.
-	schemaMethodsAvailable := []map[string]interface{}{}
+	schemaMethodsAvailable := []goopenrpcT.Method{}
 	serverMethodsAvailable := s.methods()
 
 	for _, m := range schema.Methods {
-		module, path, err := elementizeMethodName(m["name"].(string))
+		module, path, err := elementizeMethodName(m.Name)
 		if err != nil {
 			return nil, err
 		}

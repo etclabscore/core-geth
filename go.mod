@@ -23,6 +23,7 @@ require (
 	github.com/fjl/memsize v0.0.0-20180418122429-ca190fb6ffbc
 	github.com/gballet/go-libpcsclite v0.0.0-20190403181518-312b5175032f
 	github.com/go-ole/go-ole v1.2.1 // indirect
+	github.com/go-openapi/jsonreference v0.19.2
 	github.com/go-openapi/spec v0.19.2
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-stack/stack v1.8.0

@@ -20,8 +20,11 @@ import (
 	"context"
 	"encoding/binary"
 	"errors"
+	"math/big"
 	"sync"
 	"time"
+
+	"github.com/ethereum/go-ethereum/common"
 )
 
 func newTestServer() *Server {
@@ -94,6 +97,11 @@ func (s *testService) InvalidRets3() (string, string, error) {
 	return "", "", nil
 }
 
+func (s *testService) DoHash(myint int64) (common.Hash, error) {
+	return common.BigToHash(new(big.Int).SetInt64(myint)), nil
+}
+
+// CallMeBack is a test method that should be a callback.
 func (s *testService) CallMeBack(ctx context.Context, method string, args []interface{}) (interface{}, error) {
 	c, ok := ClientFromContext(ctx)
 	if !ok {

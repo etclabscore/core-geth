@@ -1113,7 +1113,7 @@
               },
               "proof": {
                 "$ref": "#/components/schemas/ProofNodes"
-              }
+               }
             }
           }
         },

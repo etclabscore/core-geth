@@ -30,6 +30,7 @@ import (
 	"strings"
 
 	"github.com/alecthomas/jsonschema"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
@@ -46,7 +47,9 @@ func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 			method := s.server.services.services[module].callbacks[methodName]
 
 			// FIXME: Development only.
-			if method.isSubscribe {
+			// There is a bug with the isPubSub method, it's not picking up #PublicEthAPI.eth_subscribeSyncStatus
+			// because the isPubSub conditionals are wrong or the method is wrong.
+			if method.isSubscribe || strings.Contains(fullName, subscribeMethodSuffix){
 				continue
 			}
 			if err := s.doc.RegisterMethod(fullName, method); err != nil {
@@ -97,7 +100,10 @@ func (d *OpenRPCDescription) RegisterMethod(name string, cb *callback) error {
 		return fmt.Errorf("nil ast func: method name: %s", name)
 	}
 
-	method := makeMethod(name, cb, rtFunc, astFuncDel)
+	method, err := makeMethod(name, cb, rtFunc, astFuncDel)
+	if err != nil {
+		return fmt.Errorf("make method error method=%s cb=%s error=%v", name, spew.Sdump(cb), err)
+	}
 
 	d.Doc.Methods = append(d.Doc.Methods, method)
 	sort.Slice(d.Doc.Methods, func(i, j int) bool {
@@ -109,17 +115,17 @@ func (d *OpenRPCDescription) RegisterMethod(name string, cb *callback) error {
 
 type argIdent struct {
 	ident *ast.Ident
-	argIndex int
+	name string
 }
 
 func (a argIdent) Name() string {
 	if a.ident != nil {
 		return a.ident.Name
 	}
-	return fmt.Sprintf("arg%d", a.argIndex)
+	return a.name
 }
 
-func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) goopenrpcT.Method {
+func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (goopenrpcT.Method, error) {
 	file, line := rt.FileLine(rt.Entry())
 	m := goopenrpcT.Method{
 		Name:    name,
@@ -155,12 +161,18 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) g
 						log.Println(name, cb.argTypes, field.Names, j)
 						continue
 					}
-					cd := makeContentDescriptor(cb.argTypes[j], field, argIdent{ident, j})
+					cd, err := makeContentDescriptor(cb.argTypes[j], field, argIdent{ident, fmt.Sprintf("%sParameter%d", name, j)})
+					if err != nil {
+						return m, err
+					}
 					j++
 					m.Params = append(m.Params, &cd)
 				}
 			} else {
-				cd := makeContentDescriptor(cb.argTypes[j], field, argIdent{nil, j})
+				cd, err := makeContentDescriptor(cb.argTypes[j], field, argIdent{nil, fmt.Sprintf("%sParameter%d", name, j)})
+				if err != nil {
+					return m, err
+				}
 				j++
 				m.Params = append(m.Params, &cd)
 			}
@@ -177,13 +189,22 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) g
 				continue
 			}
 			if len(field.Names) > 0 {
+				// This really should never ever happen I don't think.
+				// JSON-RPC returns _an_ result. So there can't be > 1 return value.
+				// But just in case.
 				for _, ident := range field.Names {
-					cd := makeContentDescriptor(cb.retTypes[j], field, argIdent{ident, j})
+					cd, err := makeContentDescriptor(cb.retTypes[j], field, argIdent{ident, fmt.Sprintf("%sResult%d", name, j)})
+					if err != nil {
+						return m, err
+					}
 					j++
 					m.Result = &cd
 				}
 			} else {
-				cd := makeContentDescriptor(cb.retTypes[j], field, argIdent{nil, j})
+				cd, err := makeContentDescriptor(cb.retTypes[j], field, argIdent{nil, fmt.Sprintf("%sResult", name)})
+				if err != nil {
+					return m, err
+				}
 				j++
 				m.Result = &cd
 			}
@@ -191,10 +212,10 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) g
 		}
 	}
 
-	return m
+	return m, nil
 }
 
-func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) goopenrpcT.ContentDescriptor {
+func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (goopenrpcT.ContentDescriptor, error) {
 	cd := goopenrpcT.ContentDescriptor{
 		//Content: goopenrpcT.Content{
 		//	Name:        "",
@@ -288,7 +309,7 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) go
 	case *ast.StarExpr:
 		schemaType = fmt.Sprintf("%v", tt.X)
 		ty = ty.Elem()
-		cd.Schema.Nullable = true
+		//cd.Schema.Nullable = true
 	default:
 		schemaType = ty.Name()
 	}
@@ -301,23 +322,43 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) go
 	cd.Summary = field.Doc.Text()
 	cd.Description = field.Comment.Text()
 
-	//jsch := jsonschema.Reflect(reflect.New(reflect.ValueOf(ty).Type()).Elem())
-	jsch := jsonschema.Reflect(reflect.New(ty).Interface())
-	m, err := json.Marshal(jsch)
-	if err != nil {
-		log.Fatal(err)
+
+	supported := false
+	switch ty.Kind() {
+	case reflect.Struct,
+	reflect.Map,
+	reflect.Slice, reflect.Array,
+	reflect.Interface,
+	reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+	reflect.Float32, reflect.Float64,
+	reflect.Bool,
+	reflect.String,
+	reflect.Ptr:
+		supported = true
+	default:
 	}
-	sch := spec.Schema{}
-	err = json.Unmarshal(m, &sch)
-	if err != nil {
-		log.Fatal(err)
+
+	if supported {
+		//jsch := jsonschema.Reflect(reflect.New(reflect.ValueOf(ty).Type()).Elem())
+		jsch := jsonschema.Reflect(reflect.New(ty).Interface())
+		m, err := json.Marshal(jsch)
+		if err != nil {
+			log.Fatal(err)
+		}
+		sch := spec.Schema{}
+		err = json.Unmarshal(m, &sch)
+		if err != nil {
+			log.Fatal(err)
+		}
+		cd.Schema = sch
+	} else {
+		return cd, fmt.Errorf("unsupported iface: %v %v %v", spew.Sdump(ty), spew.Sdump(field), spew.Sdump(ident))
 	}
-	cd.Schema = sch
 	if cd.Schema.Description == "" {
 		cd.Schema.Description = schemaType
 	}
 
-	return cd
+	return cd, nil
 }
 
 func getAstFunc(cb *callback, astFile *ast.File, rf *runtime.Func) *ast.FuncDecl {

@@ -129,18 +129,18 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (
 	file, line := rt.FileLine(rt.Entry())
 	m := goopenrpcT.Method{
 		Name:    name,
-		Tags:    nil,
+		Tags:    []goopenrpcT.Tag{},
 		Summary: fn.Doc.Text(),
 		Description: fmt.Sprintf(`%s@%s:%d'`, rt.Name(), file, line),
 		ExternalDocs:   goopenrpcT.ExternalDocs{},
 		Params:         []*goopenrpcT.ContentDescriptor{},
 		//Result:         &goopenrpcT.ContentDescriptor{},
 		Deprecated:     false,
-		Servers:        nil,
-		Errors:         nil,
-		Links:          nil,
-		ParamStructure: "",
-		Examples:       nil,
+		Servers:        []goopenrpcT.Server{},
+		Errors:         []goopenrpcT.Error{},
+		Links:          []goopenrpcT.Link{},
+		ParamStructure: "by-position",
+		Examples:       []goopenrpcT.ExamplePairing{},
 	}
 
 	if fn.Type.Params != nil {
@@ -338,9 +338,22 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 	default:
 	}
 
+	supported = true
+
 	if supported {
 		//jsch := jsonschema.Reflect(reflect.New(reflect.ValueOf(ty).Type()).Elem())
-		jsch := jsonschema.Reflect(reflect.New(ty).Interface())
+		//jsch := jsonschema.Reflect(reflect.New(ty).Interface())
+
+		//jsch := jsonschema.ReflectFromType(ty)
+		//chaninterface := make(chan interface{})
+		rflctr := jsonschema.Reflector{
+			AllowAdditionalProperties:  false,
+			RequiredFromJSONSchemaTags: false,
+			ExpandedStruct:             false,
+			//IgnoredTypes:               []interface{}{chaninterface},
+			TypeMapper:                 nil,
+		}
+		jsch := rflctr.ReflectFromType(ty)
 		m, err := json.Marshal(jsch)
 		if err != nil {
 			log.Fatal(err)
@@ -354,9 +367,12 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 	} else {
 		return cd, fmt.Errorf("unsupported iface: %v %v %v", spew.Sdump(ty), spew.Sdump(field), spew.Sdump(ident))
 	}
-	if cd.Schema.Description == "" {
+
+	if cd.Schema.Description == "" || cd.Schema.Description == ":" {
 		cd.Schema.Description = schemaType
 	}
+
+	//if ty.MethodByName()
 
 	return cd, nil
 }

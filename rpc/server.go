@@ -21,22 +21,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"go/ast"
-	"go/parser"
-	"go/token"
 	"io"
 	"io/ioutil"
 	"regexp"
-	"runtime"
 	"sort"
 	"strings"
 	"sync/atomic"
 
-	"github.com/aws/aws-sdk-go/private/util"
-	"github.com/davecgh/go-spew/spew"
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
 
@@ -253,7 +246,7 @@ func (s *RPCService) SetOpenRPCDiscoverDocument(documentPath string) error {
 
 type OpenRPCCheck struct {
 	// Over is the methods in the document which are not actually available at the server.
-	Over []string
+	Over []goopenrpcT.Method
 
 	// Under is the methods on the server not available in the document.
 	Under []goopenrpcT.Method // OpenRPCCheckUnderSet
@@ -325,451 +318,116 @@ func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
 	if s.server.OpenRPCSchemaRaw == "" {
 		return nil, errOpenRPCDiscoverUnavailable
 	}
-	doc := &goopenrpcT.OpenRPCSpec1{
+	referenceDoc := &goopenrpcT.OpenRPCSpec1{
 		Servers: []goopenrpcT.Server{},
 	}
-	err = json.Unmarshal([]byte(s.server.OpenRPCSchemaRaw), doc)
+	err = json.Unmarshal([]byte(s.server.OpenRPCSchemaRaw), referenceDoc)
 	if err != nil {
 		log.Crit("openrpc json umarshal", "error", err)
 	}
 
+	describedDoc, err := s.Describe()
+	if err != nil {
+		return nil, err
+	}
+
 	check := &OpenRPCCheck{
-		Over:  []string{},
+		Over:  []goopenrpcT.Method{},
 		Under: []goopenrpcT.Method{}, //[]OpenRPCCheckUnder{},
 	}
 
-	// Audit documented doc methods vs. actual server availability
-	// This removes methods described in the OpenRPC JSON document
-	// which are not currently exposed on the server's API.
-	// This is done on the fly (as opposed to at servre init or doc setting)
-	// because it's possible that exposed APIs could be modified in proc.
-	docMethodsAvailable := []goopenrpcT.Method{}
-	serverMethodsAvailable := s.methods()
-
-	// Find Over methods.
-	// These are methods described in the document, but which are not available
-	// at the server.
-outer:
-	for _, m := range doc.Methods {
-		// Get the module/method name from the document.
-		methodName := m.Name
-		module, path, err := elementizeMethodName(methodName)
-		if err != nil {
-			return nil, err
-		}
-
-		// Check if the server has this module available.
-		paths, ok := serverMethodsAvailable[module]
-		if !ok {
-			check.Over = append(check.Over, methodName)
-			continue
-		}
-
-		// Check if the server has this module+path(=full method name).
-		for _, pa := range paths {
-			if pa == path {
-				docMethodsAvailable = append(docMethodsAvailable, m)
-				continue outer
+	referenceSuper := func(reference, target *goopenrpcT.OpenRPCSpec1) (methods []goopenrpcT.Method) {
+		referenceLoop:
+		for _, r := range reference.Methods {
+			for _, t := range target.Methods {
+				if r.Name == t.Name {
+					continue referenceLoop
+				}
 			}
+			methods = append(methods, r)
 		}
-
-		// Were not continued over; path was not found.
-		check.Over = append(check.Over, methodName)
+		return
 	}
+
+	check.Over = referenceSuper(referenceDoc, describedDoc)
+	check.Under = referenceSuper(describedDoc, referenceDoc)
+
+
+
+//	// Audit documented doc methods vs. actual server availability
+//	// This removes methods described in the OpenRPC JSON document
+//	// which are not currently exposed on the server's API.
+//	// This is done on the fly (as opposed to at servre init or doc setting)
+//	// because it's possible that exposed APIs could be modified in proc.
+//	docMethodsAvailable := []goopenrpcT.Method{}
+//	serverMethodsAvailable := s.methods()
+//
+//	// Find Over methods.
+//	// These are methods described in the document, but which are not available
+//	// at the server.
+//outer:
+//	for _, m := range doc.Methods {
+//		// Get the module/method name from the document.
+//		methodName := m.Name
+//		module, path, err := elementizeMethodName(methodName)
+//		if err != nil {
+//			return nil, err
+//		}
+//
+//		// Check if the server has this module available.
+//		paths, ok := serverMethodsAvailable[module]
+//		if !ok {
+//			check.Over = append(check.Over, methodName)
+//			continue
+//		}
+//
+//		// Check if the server has this module+path(=full method name).
+//		for _, pa := range paths {
+//			if pa == path {
+//				docMethodsAvailable = append(docMethodsAvailable, m)
+//				continue outer
+//			}
+//		}
+//
+//		// Were not continued over; path was not found.
+//		check.Over = append(check.Over, methodName)
+//	}
+
+
+	//
+	//copy(check.Under, described.Methods)
+	//
+	//for i, u := range check.Under {
+	//	for _, d := range docMethodsAvailable {
+	//		if u.Name == d.Name {
+	//			check.Under = append(check.Under[:i], check.Under[i+1:]...)
+	//		}
+	//	}
+	//}
+
 
 	// Find under methods.
 	// These are methods which are available on the server, but not described in the document.
-	for mod, list := range serverMethodsAvailable {
-		if mod == "rpc" {
-			continue
-		}
-	modmethodlistloop:
-		for _, item := range list {
-			name := strings.Join([]string{mod, item}, serviceMethodSeparators[0])
-			for _, m := range doc.Methods {
-				if m.Name == name {
-					continue modmethodlistloop
-				}
-			}
-
-			it := s.server.services.services[mod].callbacks[item]
-			it.makeArgTypes()
-			it.makeRetTypes()
-
-			fnp := runtime.FuncForPC(it.fn.Pointer())
-
-			orpcM := goopenrpcT.Method{
-				Name:           name,
-				Tags:           nil,
-				Summary:        "",
-				Description:    "",
-				ExternalDocs:   goopenrpcT.ExternalDocs{},
-				Params:         nil,
-				Result:         nil,
-				Deprecated:     false,
-				Servers:        nil,
-				Errors:         nil,
-				Links:          nil,
-				ParamStructure: "",
-				Examples:       nil,
-			}
-
-			fnFile, fnLine := fnp.FileLine(fnp.Entry())
-
-			/*
-			   {
-			     "Name": "admin_importChain",
-			     "Fn": {
-			       "Str": "\u003cfunc(*eth.PrivateAdminAPI, string) (bool, error) Value\u003e",
-			       "Name": "github.com/ethereum/go-ethereum/eth.(*PrivateAdminAPI).ImportChain",
-			       "File": "/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go",
-			       "Line": 219,
-			       "Doc": "ImportChain imports a blockchain from a local file.\n",
-			       "Body": [],
-			       "ParamsList": ["file"]
-			     },
-			     "IsSubscribe": false,
-			     "ErrPos": 1,
-			     "Args": [
-			       {
-			         "Name": "string",
-			         "Kind": "string"
-			       }
-			     ]
-			   },
-			*/
-			fns := OpenRPCCheckUnderFn{
-				Str:         it.fn.String(),
-				Name:        fnp.Name(),
-				File:        fnFile,
-				Line:        fnLine,
-				Body:        []string{},
-				ParamsList:  []string{},
-				ResultsList: []string{},
-			}
-
-			fset := token.NewFileSet()
-			f, err := parser.ParseFile(fset, fnFile, nil, parser.ParseComments)
-			if err != nil {
-				panic(err)
-			}
-
-			fp, err := parser.ParseFile(fset, fnFile, nil, parser.PackageClauseOnly)
-			if err != nil {
-				panic(err)
-			}
-
-			pkgName := "N/A"
-			if fp.Name != nil {
-				pkgName = fp.Name.Name
-			}
-
-			for _, decl := range f.Decls {
-				fn, ok := decl.(*ast.FuncDecl)
-				if !ok {
-					continue
-				}
-
-				// If this is the function we're looking for.
-				spl := strings.Split(fnp.Name(), ".")
-
-				// FIXME: We can't assume that the first matching function Name
-				// in the file is the correct one. Best to use file/+pos measurements.
-				if fn.Name.Name == spl[len(spl)-1] {
-					fns.Doc = fn.Doc.Text()
-
-					orpcM.Summary = fn.Doc.Text()
-					orpcM.Description = fmt.Sprintf(`%s
-%s:%d
-%s`, fnp.Name(), fnFile, fnLine, it.fn.String())
-
-					//for _, l := range fn.Body.List {
-					//	l.Pos()
-					//}
-
-					// for _, l := range fn.Body.List {
-
-					// }
-					// spew.Config.DisablePointerAddresses = true
-					// spew.Config.Dis
-					if fn.Type.Params != nil {
-						j := 0
-						for i, p := range fn.Type.Params.List {
-							if p == nil {
-								continue
-							}
-							if it.hasCtx && strings.Contains(fmt.Sprintf("%s", p.Type), "context") {
-								continue
-							}
-							//fns.ParamsList = append(fns.ParamsList, spew.Sdump(p))
-
-							if orpcM.Params == nil {
-								orpcM.Params = []*goopenrpcT.ContentDescriptor{}
-							}
-							for _, n := range p.Names {
-								//names = append(names, n.Name)
-
-								spew.Config.Indent = "    "
-								spew.Config.DisablePointerAddresses = true
-								spew.Config.DisableCapacities = true
-
-								fmt.Println("********")
-								fmt.Println(mod, item, "i=", i, "j=", j)
-								fmt.Println("__it__=> ", spew.Sdump(it))
-								fmt.Println()
-								fmt.Println("__fn__=> ", spew.Sdump(fn))
-								//fmt.Println()
-								//fmt.Println("__pkgPath__=>", it.fn.Type().Elem().PkgPath())
-								//fmt.Println()
-								//fmt.Println("__f.Package__=>", spew.Sdump(f.Package))
-								fmt.Println()
-								fmt.Println("__packageName__=>", pkgName)
-								fmt.Println()
-								fmt.Println("__packageNameR__=>", fnp.Name(), "->", packageNameFromRuntimePCFuncName(fnp.Name()))
-								fmt.Println()
-								fmt.Println("__p.type__=>", spew.Sdump(p.Type))
-
-								//
-								switch tt := p.Type.(type) {
-								case *ast.SelectorExpr:
-
-									fmt.Println("p.Type(selector_expr).name=", tt.X, tt.Sel)
-								case *ast.StarExpr:
-									fmt.Println("p.Type(star_expr).name=", tt.X, tt.Star)
-								default:
-									fmt.Println("p.Type(default).name=", tt)
-								}
-
-								pname := n.Name
-								//pname := strings.Join(names, "+")
-								//resType := fmt.Sprintf("type:%v", p.Type)
-								//if p.Tag != nil {
-								//	resType = "tag:" + p.Tag.Value
-								//}
-
-								// use other types for type
-								ts := []string{}
-								for _, a := range it.argTypes {
-									ts = append(ts, a.String())
-								}
-								resType := strings.Join(ts, ",") + "@" + fmt.Sprintf("%d", j)
-								if len(it.argTypes) > 0 && j <= len(it.argTypes)-1 {
-									rt := it.argTypes[j]
-
-									if rtname := rt.Name(); rtname != "" {
-										//resType = "name:"+rtname
-										resType = rtname
-									} else if rtname = rt.String(); rtname != "" {
-										//resType = "string:"+rtname
-										resType = rtname
-									} else if rtname = rt.Kind().String(); rtname != "" {
-										//resType = "kind:"+rtname
-										resType = rtname
-									}
-									if strings.HasPrefix(resType, "*") {
-										//resType = strings.TrimPrefix(resType, "*")
-										//resType = util.Capitalize(resType)
-										//resType += "OrNull"
-									}
-									j++
-								}
-
-								tit := fmt.Sprintf("%s_%s:Arg%d", mod, item, i)
-								if pname != "" {
-									tit = fmt.Sprintf("%s_%s:%s", mod, item, util.Capitalize(pname))
-								}
-
-								orpcM.Params = append(orpcM.Params, &goopenrpcT.ContentDescriptor{
-									Content: goopenrpcT.Content{
-										Name:        pname,
-										Summary:     p.Doc.Text(),
-										Description: p.Comment.Text(), // p.Tag.Value,
-										Required:    false,            // FIXME
-										Deprecated:  false,            // FIXME
-										Schema: spec.Schema{
-											SchemaProps: spec.SchemaProps{
-												Title: tit,
-												Type:  spec.StringOrArray{resType}, // FIXME
-											},
-										},
-									},
-								})
-							}
-
-							// for _, n := range p.Names {
-							// 	fns.ParamsList = append(fns.ParamsList, n.Name) // n.String()
-							// }
-						}
-					}
-					if fn.Type.Results != nil {
-						j := 0
-						for _, p := range fn.Type.Results.List {
-							if p == nil {
-								continue
-							}
-							if strings.Contains(fmt.Sprintf("%v", p.Type), "error") {
-								continue
-							}
-							//fns.ResultsList = append(fns.ResultsList, spew.Sdump(p))
-
-							if len(p.Names) > 0 {
-								//for _, n := range p.Names {
-								//names = append(names, n.String())
-								pname := p.Names[0].Name
-								//fmt.Sprintf("%v", p.Type)
-								//resType := fmt.Sprintf("type:%v", p.Type)
-								//if p.Tag != nil {
-								//	resType = "tag:" + p.Tag.Value
-								//}
-								// use other types for type
-								ts := []string{}
-								for _, a := range it.retTypes {
-									ts = append(ts, a.String())
-								}
-								resType := strings.Join(ts, "/")
-								if len(it.retTypes) > 0 && j <= len(it.retTypes)-1 {
-									rt := it.retTypes[j]
-									if rtname := rt.Name(); rtname != "" {
-										//resType = "name:"+rtname
-										resType = rtname
-									} else if rtname = rt.String(); rtname != "" {
-										//resType = "string:"+rtname
-										resType = rtname
-									} else if rtname = rt.Kind().String(); rtname != "" {
-										//resType = "kind:"+rtname
-										resType = rtname
-									}
-									if strings.HasPrefix(resType, "*") {
-										//resType = strings.TrimPrefix(resType, "*")
-										////resType = util.Capitalize(resType)
-										//resType += "OrNull"
-									}
-									j++
-								}
-
-								tit := fmt.Sprintf("%s_%s:Result", mod, item)
-								if pname != "" {
-									tit = fmt.Sprintf("%s_%s:%s", mod, item, util.Capitalize(pname))
-								}
-								orpcM.Result = &goopenrpcT.ContentDescriptor{
-									Content: goopenrpcT.Content{
-										Name:        pname,
-										Summary:     p.Doc.Text(),
-										Description: p.Comment.Text(), // p.Tag.Value,
-										Required:    false,            // FIXME
-										Deprecated:  false,            // FIXME
-										Schema: spec.Schema{
-											SchemaProps: spec.SchemaProps{
-												Title: tit,
-												Type:  spec.StringOrArray{resType}, // FIXME
-											},
-										},
-									},
-								}
-
-								//}
-							} else {
-								//names = append(names, n.String())
-								pname := fmt.Sprintf("%s", it.retTypes[0].String())
-								//resType := fmt.Sprintf("type:%v", p.Type)
-								//if p.Tag != nil {
-								//	resType = "tag:" + p.Tag.Value
-								//}
-
-								// use other types for type
-								ts := []string{}
-								for _, a := range it.retTypes {
-									ts = append(ts, a.String())
-								}
-								resType := strings.Join(ts, "/")
-								if len(it.retTypes) > 0 && j <= len(it.retTypes)-1 {
-									rt := it.retTypes[j]
-									if rtname := rt.Name(); rtname != "" {
-										//resType = "name:"+rtname
-										resType = rtname
-									} else if rtname = rt.String(); rtname != "" {
-										//resType = "string:"+rtname
-										resType = rtname
-									} else if rtname = rt.Kind().String(); rtname != "" {
-										//resType = "kind:"+rtname
-										resType = rtname
-									}
-									if strings.HasPrefix(resType, "*") {
-										//resType = strings.TrimPrefix(resType, "*")
-										////resType = util.Capitalize(resType)
-										//resType += "OrNull"
-									}
-									j++
-								}
-
-								tit := fmt.Sprintf("%s_%s:Result", mod, item)
-								//if pname != "" {
-								//	tit = fmt.Sprintf("%s%_s", item, util.Capitalize(pname))
-								//}
-								orpcM.Result = &goopenrpcT.ContentDescriptor{
-									Content: goopenrpcT.Content{
-										Name:        pname,
-										Summary:     p.Doc.Text(),
-										Description: p.Comment.Text(), // p.Tag.Value,
-										Required:    false,            // FIXME
-										Deprecated:  false,            // FIXME
-										Schema: spec.Schema{
-											SchemaProps: spec.SchemaProps{
-												Title: tit,
-												Type:  spec.StringOrArray{resType}, // FIXME
-											},
-										},
-									},
-								}
-							}
-
-							//pname := strings.Join(names, "+")
-
-							// for _, n := range p.Names {
-							// 	fns.ParamsList = append(fns.ParamsList, n.Name) // n.String()
-							// }
-						}
-					}
-					//if fn.Type.Results != nil {
-					//	for _, p := range fn.Type.Results.List {
-					//		if p == nil {
-					//			continue
-					//		}
-					//
-					//		fns.ResultsList = append(fns.ResultsList, spew.Sdump(p))
-					//		// for _, n := range p.Names {
-					//		// 	fns.ParamsList = append(fns.ResultsList, n.Name) // n.String()
-					//		// }
-					//	}
-					//}
-
-				} else {
-					// fmt.Println("NONMATCH", fn.Name.Name)
-				}
-			}
-
-			cu := OpenRPCCheckUnder{
-				Name:        name,
-				Fn:          fns,
-				IsSubscribe: it.isSubscribe,
-				HasContext:  it.hasCtx,
-				ErrPos:      it.errPos,
-				Args:        []OpenRPCCheckUnderArg{},
-			}
-
-			argTypes := it.argTypes
-
-			for _, a := range argTypes {
-				cu.Args = append(cu.Args, OpenRPCCheckUnderArg{
-					Name: a.Name(),
-					Kind: a.Kind().String(),
-				})
-			}
-
-			check.Under = append(check.Under, orpcM)
-		}
-	}
+	//for mod, list := range check.Under {
+	//	if mod == "rpc" {
+	//		continue
+	//	}
+	//modmethodlistloop:
+	//	for _, item := range list {
+	//		name := strings.Join([]string{mod, item}, serviceMethodSeparators[0])
+	//		for _, m := range doc.Methods {
+	//			if m.Name == name {
+	//
+	//				continue modmethodlistloop
+	//			}
+	//		}
+	//		check.Under = append(check.Under, orpcM)
+	//	}
+	//}
 	//sort.Sort(check.Under)
+	sort.Slice(check.Over, func(i, j int) bool {
+		return check.Over[i].Name < check.Over[j].Name
+	})
 	sort.Slice(check.Under, func(i, j int) bool {
 		return check.Under[i].Name < check.Under[j].Name
 	})

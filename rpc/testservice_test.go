@@ -101,6 +101,19 @@ func (s *testService) DoHash(myint int64) (common.Hash, error) {
 	return common.BigToHash(new(big.Int).SetInt64(myint)), nil
 }
 
+func (s *testService) AddPointers(a, b *uint64) uint64 {
+	if a == nil && b == nil {
+		return 0
+	}
+	if a == nil {
+		return *b
+	}
+	if b == nil {
+		return *a
+	}
+	return *a + *b
+}
+
 // CallMeBack is a test method that should be a callback.
 func (s *testService) CallMeBack(ctx context.Context, method string, args []interface{}) (interface{}, error) {
 	c, ok := ClientFromContext(ctx)

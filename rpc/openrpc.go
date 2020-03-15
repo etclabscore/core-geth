@@ -285,10 +285,20 @@ func makeContentDescriptor(v reflect.Type, field *ast.Field, ident *ast.Ident) g
 	}
 	schemaType = fmt.Sprintf("%s:%s", v.PkgPath(), schemaType)
 
+	switch v.Kind() {
+	case reflect.Invalid:
+		panic("invalid type")
+	case reflect.Chan, reflect.Func:
+		panic("unsupported type")
+	case reflect.Bool, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr, reflect.Float32, reflect.Float64, reflect.Complex64, reflect.Complex128:
+
+	}
+
 	cd.Name = schemaType
 	if ident != nil {
 		cd.Name = ident.Name
 	}
+	//cd.Schema.ID
 
 	cd.Summary = field.Doc.Text()
 	cd.Description = field.Comment.Text()

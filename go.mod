@@ -7,6 +7,7 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.6.0 // indirect
 	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
 	github.com/VictoriaMetrics/fastcache v1.5.4
+	github.com/alecthomas/jsonschema v0.0.0-20200217214135-7152f22193c9
 	github.com/aristanetworks/goarista v0.0.0-20170210015632-ea17b1a17847
 	github.com/aws/aws-sdk-go v1.25.48
 	github.com/btcsuite/btcd v0.0.0-20171128150713-2e60448ffcc6

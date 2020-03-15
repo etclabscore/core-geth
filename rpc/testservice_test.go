@@ -97,7 +97,7 @@ func (s *testService) InvalidRets3() (string, string, error) {
 	return "", "", nil
 }
 
-func (s *testService) DoHash(myint int64) (common.Hash, error) {
+func (s *testService) DoHash(myint int64) (myhash common.Hash, myerr error) {
 	return common.BigToHash(new(big.Int).SetInt64(myint)), nil
 }
 

@@ -17,6 +17,7 @@
 package rpc
 
 import (
+	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -28,6 +29,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/alecthomas/jsonschema"
+	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
 
@@ -104,8 +107,16 @@ func (d *OpenRPCDescription) RegisterMethod(name string, cb *callback) error {
 	return nil
 }
 
-type argOrRet struct {
-	v reflect.Value
+type argIdent struct {
+	ident *ast.Ident
+	argIndex int
+}
+
+func (a argIdent) Name() string {
+	if a.ident != nil {
+		return a.ident.Name
+	}
+	return fmt.Sprintf("arg%d", a.argIndex)
 }
 
 func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) goopenrpcT.Method {
@@ -114,9 +125,7 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) g
 		Name:    name,
 		Tags:    nil,
 		Summary: fn.Doc.Text(),
-		Description: fmt.Sprintf(`
-%s
-%s:%d'`, rt.Name(), file, line),
+		Description: fmt.Sprintf(`%s@%s:%d'`, rt.Name(), file, line),
 		ExternalDocs:   goopenrpcT.ExternalDocs{},
 		Params:         []*goopenrpcT.ContentDescriptor{},
 		//Result:         &goopenrpcT.ContentDescriptor{},
@@ -146,12 +155,12 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) g
 						log.Println(name, cb.argTypes, field.Names, j)
 						continue
 					}
-					cd := makeContentDescriptor(cb.argTypes[j], field, ident)
+					cd := makeContentDescriptor(cb.argTypes[j], field, argIdent{ident, j})
 					j++
 					m.Params = append(m.Params, &cd)
 				}
 			} else {
-				cd := makeContentDescriptor(cb.argTypes[j], field, nil)
+				cd := makeContentDescriptor(cb.argTypes[j], field, argIdent{nil, j})
 				j++
 				m.Params = append(m.Params, &cd)
 			}
@@ -169,12 +178,12 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) g
 			}
 			if len(field.Names) > 0 {
 				for _, ident := range field.Names {
-					cd := makeContentDescriptor(cb.retTypes[j], field, ident)
+					cd := makeContentDescriptor(cb.retTypes[j], field, argIdent{ident, j})
 					j++
 					m.Result = &cd
 				}
 			} else {
-				cd := makeContentDescriptor(cb.retTypes[j], field, nil)
+				cd := makeContentDescriptor(cb.retTypes[j], field, argIdent{nil, j})
 				j++
 				m.Result = &cd
 			}
@@ -185,7 +194,7 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) g
 	return m
 }
 
-func makeContentDescriptor(v reflect.Type, field *ast.Field, ident *ast.Ident) goopenrpcT.ContentDescriptor {
+func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) goopenrpcT.ContentDescriptor {
 	cd := goopenrpcT.ContentDescriptor{
 		//Content: goopenrpcT.Content{
 		//	Name:        "",
@@ -278,32 +287,35 @@ func makeContentDescriptor(v reflect.Type, field *ast.Field, ident *ast.Ident) g
 		schemaType = fmt.Sprintf("%v.%v", tt.X, tt.Sel)
 	case *ast.StarExpr:
 		schemaType = fmt.Sprintf("%v", tt.X)
-		v = v.Elem()
+		ty = ty.Elem()
 		cd.Schema.Nullable = true
 	default:
-		schemaType = v.Name()
+		schemaType = ty.Name()
 	}
-	schemaType = fmt.Sprintf("%s:%s", v.PkgPath(), schemaType)
+	schemaType = fmt.Sprintf("%s:%s", ty.PkgPath(), schemaType)
 
-	switch v.Kind() {
-	case reflect.Invalid:
-		panic("invalid type")
-	case reflect.Chan, reflect.Func:
-		panic("unsupported type")
-	case reflect.Bool, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr, reflect.Float32, reflect.Float64, reflect.Complex64, reflect.Complex128:
+	//cd.Name = schemaType
+	cd.Name = ident.Name()
 
-	}
-
-	cd.Name = schemaType
-	if ident != nil {
-		cd.Name = ident.Name
-	}
-	//cd.Schema.ID
 
 	cd.Summary = field.Doc.Text()
 	cd.Description = field.Comment.Text()
-	cd.Schema.Type = []string{schemaType}
 
+	//jsch := jsonschema.Reflect(reflect.New(reflect.ValueOf(ty).Type()).Elem())
+	jsch := jsonschema.Reflect(reflect.New(ty).Interface())
+	m, err := json.Marshal(jsch)
+	if err != nil {
+		log.Fatal(err)
+	}
+	sch := spec.Schema{}
+	err = json.Unmarshal(m, &sch)
+	if err != nil {
+		log.Fatal(err)
+	}
+	cd.Schema = sch
+	if cd.Schema.Description == "" {
+		cd.Schema.Description = schemaType
+	}
 
 	return cd
 }

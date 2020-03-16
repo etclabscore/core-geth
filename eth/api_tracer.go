@@ -20,6 +20,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -699,9 +700,10 @@ func (api *PrivateDebugAPI) computeStateDB(block *types.Block, reexec uint64) (*
 	return statedb, nil
 }
 
+// FIXME: Is this really supposed to return an *ethapi.ExecutionResult type, or the empty interface in case not *vm.StructLogger?
 // TraceTransaction returns the structured logs created during the execution of EVM
 // and returns them as a JSON object.
-func (api *PrivateDebugAPI) TraceTransaction(ctx context.Context, hash common.Hash, config *TraceConfig) (interface{}, error) {
+func (api *PrivateDebugAPI) TraceTransaction(ctx context.Context, hash common.Hash, config *TraceConfig) (*ethapi.ExecutionResult, error) {
 	// Retrieve the transaction and assemble its EVM context
 	tx, blockHash, _, index := rawdb.ReadTransaction(api.eth.ChainDb(), hash)
 	if tx == nil {
@@ -722,7 +724,7 @@ func (api *PrivateDebugAPI) TraceTransaction(ctx context.Context, hash common.Ha
 // traceTx configures a new tracer according to the provided configuration, and
 // executes the given message in the provided environment. The return value will
 // be tracer dependent.
-func (api *PrivateDebugAPI) traceTx(ctx context.Context, message core.Message, vmctx vm.Context, statedb *state.StateDB, config *TraceConfig) (interface{}, error) {
+func (api *PrivateDebugAPI) traceTx(ctx context.Context, message core.Message, vmctx vm.Context, statedb *state.StateDB, config *TraceConfig) (*ethapi.ExecutionResult, error) {
 	// Assemble the structured logger or the JavaScript tracer
 	var (
 		tracer vm.Tracer
@@ -773,7 +775,16 @@ func (api *PrivateDebugAPI) traceTx(ctx context.Context, message core.Message, v
 		}, nil
 
 	case *tracers.Tracer:
-		return tracer.GetResult()
+		m, err := tracer.GetResult()
+		if err != nil {
+			return nil, err
+		}
+		r := ethapi.ExecutionResult{}
+		err = json.Unmarshal(m, &r)
+		if err != nil {
+			return nil, err
+		}
+		return &r, nil
 
 	default:
 		panic(fmt.Sprintf("bad tracer type %T", tracer))

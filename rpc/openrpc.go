@@ -23,6 +23,7 @@ import (
 	"go/parser"
 	"go/token"
 	"log"
+	"math/big"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -339,18 +340,21 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 		return cd, fmt.Errorf("unsupported iface: %v %v %v", spew.Sdump(ty), spew.Sdump(field), spew.Sdump(ident))
 	}
 
-	var schemaType string
+	schemaType := fmt.Sprintf("%s:%s", ty.PkgPath(), ty.Name())
 	switch tt := field.Type.(type) {
 	case *ast.SelectorExpr:
 		schemaType = fmt.Sprintf("%v.%v", tt.X, tt.Sel)
+		schemaType = fmt.Sprintf("%s:%s", ty.PkgPath(), schemaType)
 	case *ast.StarExpr:
 		schemaType = fmt.Sprintf("%v", tt.X)
+		schemaType = fmt.Sprintf("*%s:%s", ty.PkgPath(), schemaType)
+		if reflect.ValueOf(ty).Type().Kind() == reflect.Ptr {
+			schemaType = fmt.Sprintf("%v", ty.Elem().Name())
+			schemaType = fmt.Sprintf("*%s:%s", ty.Elem().PkgPath(), schemaType)
+		}
 		//ty = ty.Elem() // FIXME: wart warn
-		//cd.Schema.Nullable = true
-	default:
-		schemaType = ty.Name()
 	}
-	schemaType = fmt.Sprintf("%s:%s", ty.PkgPath(), schemaType)
+	//schemaType = fmt.Sprintf("%s:%s", ty.PkgPath(), schemaType)
 
 	//cd.Name = schemaType
 	cd.Name = ident.Name()
@@ -477,6 +481,11 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 	// Use a slice instead of a map because it preserves order, as a logic safeguard/fallback.
 	dict := []schemaDictEntry{
 
+		{new(big.Int), integerD},
+		{big.Int{}, integerD},
+		{new(hexutil.Big), integerD},
+		{hexutil.Big{}, integerD},
+
 		{new(common.Address), `{
           "title": "keccak",
           "type": "string",
@@ -501,6 +510,13 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 
 		{
 			hexutil.Bytes{}, `{
+          "title": "dataWord",
+          "type": "string",
+          "description": "Hex representation of a 256 bit unit of data",
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
+        }`},
+		{
+			new(hexutil.Bytes), `{
           "title": "dataWord",
           "type": "string",
           "description": "Hex representation of a 256 bit unit of data",
@@ -558,8 +574,9 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 
 	// First, handle primitives.
 	switch r.Kind() {
-	case reflect.Struct,
-		reflect.Map,
+	case reflect.Struct:
+
+	case reflect.Map,
 		reflect.Interface:
 	case reflect.Slice, reflect.Array:
 

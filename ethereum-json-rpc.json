@@ -256,7 +256,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "description": ":\u0026{p2p NodeInfo}", 
+          "description": "*github.com/ethereum/go-ethereum/p2p:NodeInfo", 
           "definitions": {
             "": {
               "type": "object", 
@@ -525,7 +525,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":string", 
+            "description": "*:string", 
             "type": "string"
           }
         }, 
@@ -549,7 +549,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":string", 
+            "description": "*:string", 
             "type": "string"
           }
         }, 
@@ -560,7 +560,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":string", 
+            "description": "*:string", 
             "type": "string"
           }
         }, 
@@ -571,7 +571,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":string", 
+            "description": "*:string", 
             "type": "string"
           }
         }
@@ -611,7 +611,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":string", 
+            "description": "*:string", 
             "type": "string"
           }
         }, 
@@ -635,7 +635,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":string", 
+            "description": "*:string", 
             "type": "string"
           }
         }, 
@@ -646,7 +646,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":string", 
+            "description": "*:string", 
             "type": "string"
           }
         }
@@ -1133,7 +1133,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "description": ":\u0026{debug GCStats}", 
+          "description": "*runtime/debug:GCStats", 
           "definitions": {
             "GCStats": {
               "type": "object", 
@@ -1476,7 +1476,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "description": ":\u0026{runtime MemStats}", 
+          "description": "*runtime:MemStats", 
           "definitions": {
             "": {
               "type": "object", 
@@ -2068,7 +2068,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).StandardTraceBadBlockToFile", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:431"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:432"
       }, 
       "params": [
         {
@@ -2091,7 +2091,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":StdTraceConfig", 
+            "description": "*github.com/ethereum/go-ethereum/eth:StdTraceConfig", 
             "definitions": {
               "StdTraceConfig": {
                 "type": "object", 
@@ -2168,7 +2168,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).StandardTraceBlockToFile", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:420"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:421"
       }, 
       "params": [
         {
@@ -2191,7 +2191,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":StdTraceConfig", 
+            "description": "*github.com/ethereum/go-ethereum/eth:StdTraceConfig", 
             "definitions": {
               "StdTraceConfig": {
                 "type": "object", 
@@ -2556,7 +2556,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBadBlock", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:407"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:408"
       }, 
       "params": [
         {
@@ -2579,7 +2579,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":TraceConfig", 
+            "description": "*github.com/ethereum/go-ethereum/eth:TraceConfig", 
             "definitions": {
               "TraceConfig": {
                 "type": "object", 
@@ -2673,7 +2673,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlock", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:386"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:387"
       }, 
       "params": [
         {
@@ -2696,7 +2696,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":TraceConfig", 
+            "description": "*github.com/ethereum/go-ethereum/eth:TraceConfig", 
             "definitions": {
               "TraceConfig": {
                 "type": "object", 
@@ -2790,7 +2790,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlockByHash", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:376"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:377"
       }, 
       "params": [
         {
@@ -2813,7 +2813,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":TraceConfig", 
+            "description": "*github.com/ethereum/go-ethereum/eth:TraceConfig", 
             "definitions": {
               "TraceConfig": {
                 "type": "object", 
@@ -2907,7 +2907,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlockByNumber", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:355"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:356"
       }, 
       "params": [
         {
@@ -2942,7 +2942,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":TraceConfig", 
+            "description": "*github.com/ethereum/go-ethereum/eth:TraceConfig", 
             "definitions": {
               "TraceConfig": {
                 "type": "object", 
@@ -3036,7 +3036,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlockFromFile", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:396"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:397"
       }, 
       "params": [
         {
@@ -3057,7 +3057,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":TraceConfig", 
+            "description": "*github.com/ethereum/go-ethereum/eth:TraceConfig", 
             "definitions": {
               "TraceConfig": {
                 "type": "object", 
@@ -3147,11 +3147,11 @@
     {
       "name": "debug_traceTransaction", 
       "tags": [], 
-      "summary": "TraceTransaction returns the structured logs created during the execution of EVM\nand returns them as a JSON object.\n", 
+      "summary": "FIXME: Is this really supposed to return an *ethapi.ExecutionResult type, or the empty interface in case not *vm.StructLogger?\nTraceTransaction returns the structured logs created during the execution of EVM\nand returns them as a JSON object.\n", 
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceTransaction", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:704"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:706"
       }, 
       "params": [
         {
@@ -3174,7 +3174,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":TraceConfig", 
+            "description": "*github.com/ethereum/go-ethereum/eth:TraceConfig", 
             "definitions": {
               "TraceConfig": {
                 "type": "object", 
@@ -3233,7 +3233,89 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "additionalProperties": true
+          "description": "*github.com/ethereum/go-ethereum/internal/ethapi:ExecutionResult", 
+          "definitions": {
+            "ExecutionResult": {
+              "type": "object", 
+              "required": ["gas", "failed", "returnValue", "structLogs"], 
+              "properties": {
+                "failed": {
+                  "type": "boolean"
+                }, 
+                "gas": {
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
+                }, 
+                "returnValue": {
+                  "type": "string"
+                }, 
+                "structLogs": {
+                  "type": "array", 
+                  "items": {
+                    "$ref": "#/definitions/StructLogRes", 
+                    "$schema": "http://json-schema.org/draft-04/schema"
+                  }
+                }
+              }, 
+              "additionalProperties": false
+            }, 
+            "StructLogRes": {
+              "type": "object", 
+              "required": ["pc", "op", "gas", "gasCost", "depth"], 
+              "properties": {
+                "depth": {
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
+                }, 
+                "error": {
+                  "additionalProperties": true
+                }, 
+                "gas": {
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
+                }, 
+                "gasCost": {
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
+                }, 
+                "memory": {
+                  "type": "array", 
+                  "items": {
+                    "type": "string"
+                  }
+                }, 
+                "op": {
+                  "type": "string"
+                }, 
+                "pc": {
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
+                }, 
+                "stack": {
+                  "type": "array", 
+                  "items": {
+                    "type": "string"
+                  }
+                }, 
+                "storage": {
+                  "type": "object", 
+                  "patternProperties": {
+                    ".*": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }, 
+              "additionalProperties": false
+            }
+          }, 
+          "$ref": "#/definitions/ExecutionResult", 
+          "$schema": "http://json-schema.org/draft-04/schema"
         }
       }, 
       "deprecated": false, 
@@ -3476,10 +3558,6 @@
           "schema": {
             "description": "github.com/ethereum/go-ethereum/internal/ethapi:CallArgs", 
             "definitions": {
-              "Big": {
-                "type": "object", 
-                "additionalProperties": false
-              }, 
               "CallArgs": {
                 "type": "object", 
                 "required": ["from", "to", "gas", "gasPrice", "value", "data"], 
@@ -3500,8 +3578,9 @@
                     "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "gasPrice": {
-                    "$ref": "#/definitions/Big", 
-                    "$schema": "http://json-schema.org/draft-04/schema"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "to": {
                     "type": "string", 
@@ -3509,7 +3588,9 @@
                     "pattern": "^0x[a-fA-F\\d]{64}$"
                   }, 
                   "value": {
-                    "$ref": "#/definitions/Big"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }
                 }, 
                 "additionalProperties": false
@@ -3551,7 +3632,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":\u0026{32624 0xc0046b87c0 account}", 
+            "description": "*:", 
             "type": "object", 
             "patternProperties": {
               ".*": {
@@ -3560,17 +3641,14 @@
               }
             }, 
             "definitions": {
-              "Big": {
-                "type": "object", 
-                "additionalProperties": false
-              }, 
               "account": {
                 "type": "object", 
                 "required": ["nonce", "code", "balance", "state", "stateDiff"], 
                 "properties": {
                   "balance": {
-                    "$ref": "#/definitions/Big", 
-                    "$schema": "http://json-schema.org/draft-04/schema"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "code": {
                     "type": "string", 
@@ -3710,10 +3788,6 @@
           "schema": {
             "description": "github.com/ethereum/go-ethereum/internal/ethapi:CallArgs", 
             "definitions": {
-              "Big": {
-                "type": "object", 
-                "additionalProperties": false
-              }, 
               "CallArgs": {
                 "type": "object", 
                 "required": ["from", "to", "gas", "gasPrice", "value", "data"], 
@@ -3734,8 +3808,9 @@
                     "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "gasPrice": {
-                    "$ref": "#/definitions/Big", 
-                    "$schema": "http://json-schema.org/draft-04/schema"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "to": {
                     "type": "string", 
@@ -3743,7 +3818,9 @@
                     "pattern": "^0x[a-fA-F\\d]{64}$"
                   }, 
                   "value": {
-                    "$ref": "#/definitions/Big"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }
                 }, 
                 "additionalProperties": false
@@ -3823,10 +3900,6 @@
           "schema": {
             "description": "github.com/ethereum/go-ethereum/internal/ethapi:SendTxArgs", 
             "definitions": {
-              "Big": {
-                "type": "object", 
-                "additionalProperties": false
-              }, 
               "SendTxArgs": {
                 "type": "object", 
                 "required": [
@@ -3841,6 +3914,7 @@
                 ], 
                 "properties": {
                   "data": {
+                    "description": "Field _input_ should be preferred", 
                     "type": "string", 
                     "title": "dataWord", 
                     "pattern": "^0x([a-fA-F\\d]{64})?$"
@@ -3856,8 +3930,9 @@
                     "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "gasPrice": {
-                    "$ref": "#/definitions/Big", 
-                    "$schema": "http://json-schema.org/draft-04/schema"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "input": {
                     "type": "string", 
@@ -3875,7 +3950,9 @@
                     "pattern": "^0x[a-fA-F\\d]{64}$"
                   }, 
                   "value": {
-                    "$ref": "#/definitions/Big"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }
                 }, 
                 "additionalProperties": false
@@ -3893,7 +3970,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "description": ":SignTransactionResult", 
+          "description": "*github.com/ethereum/go-ethereum/internal/ethapi:SignTransactionResult", 
           "definitions": {
             "SignTransactionResult": {
               "type": "object", 
@@ -3944,15 +4021,10 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "description": ":\u0026{hexutil Big}", 
-          "definitions": {
-            "Big": {
-              "type": "object", 
-              "additionalProperties": false
-            }
-          }, 
-          "$ref": "#/definitions/Big", 
-          "$schema": "http://json-schema.org/draft-04/schema"
+          "description": "Hex representation of the integer", 
+          "type": "string", 
+          "title": "integer", 
+          "pattern": "^0x[a-fA-F0-9]+$"
         }
       }, 
       "deprecated": false, 
@@ -4018,15 +4090,10 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "description": ":\u0026{hexutil Big}", 
-          "definitions": {
-            "Big": {
-              "type": "object", 
-              "additionalProperties": false
-            }
-          }, 
-          "$ref": "#/definitions/Big", 
-          "$schema": "http://json-schema.org/draft-04/schema"
+          "description": "Hex representation of the integer", 
+          "type": "string", 
+          "title": "integer", 
+          "pattern": "^0x[a-fA-F0-9]+$"
         }
       }, 
       "deprecated": false, 
@@ -4656,11 +4723,14 @@
                     "pattern": "^0x[a-fA-F\\d]{64}$"
                   }, 
                   "FromBlock": {
-                    "$ref": "#/definitions/Int", 
-                    "$schema": "http://json-schema.org/draft-04/schema"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "ToBlock": {
-                    "$ref": "#/definitions/Int"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "Topics": {
                     "type": "array", 
@@ -4675,10 +4745,6 @@
                     }
                   }
                 }, 
-                "additionalProperties": false
-              }, 
-              "Int": {
-                "type": "object", 
                 "additionalProperties": false
               }
             }, 
@@ -4843,7 +4909,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "description": ":AccountResult", 
+          "description": "*github.com/ethereum/go-ethereum/internal/ethapi:AccountResult", 
           "definitions": {
             "AccountResult": {
               "type": "object", 
@@ -4869,8 +4935,9 @@
                   "pattern": "^0x[a-fA-F\\d]{40}$"
                 }, 
                 "balance": {
-                  "$ref": "#/definitions/Big", 
-                  "$schema": "http://json-schema.org/draft-04/schema"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "codeHash": {
                   "type": "string", 
@@ -4897,10 +4964,6 @@
               }, 
               "additionalProperties": false
             }, 
-            "Big": {
-              "type": "object", 
-              "additionalProperties": false
-            }, 
             "StorageResult": {
               "type": "object", 
               "required": ["key", "value", "proof"], 
@@ -4915,7 +4978,9 @@
                   }
                 }, 
                 "value": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }
               }, 
               "additionalProperties": false
@@ -5226,12 +5291,8 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "description": ":RPCTransaction", 
+          "description": "*github.com/ethereum/go-ethereum/internal/ethapi:RPCTransaction", 
           "definitions": {
-            "Big": {
-              "type": "object", 
-              "additionalProperties": false
-            }, 
             "RPCTransaction": {
               "type": "object", 
               "required": [
@@ -5257,8 +5318,9 @@
                   "pattern": "^0x[a-fA-F\\d]{64}$"
                 }, 
                 "blockNumber": {
-                  "$ref": "#/definitions/Big", 
-                  "$schema": "http://json-schema.org/draft-04/schema"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "from": {
                   "type": "string", 
@@ -5271,7 +5333,9 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "gasPrice": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "hash": {
                   "type": "string", 
@@ -5289,10 +5353,14 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "r": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "s": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "to": {
                   "type": "string", 
@@ -5305,10 +5373,14 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "v": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "value": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }
               }, 
               "additionalProperties": false
@@ -5381,12 +5453,8 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "description": ":RPCTransaction", 
+          "description": "*github.com/ethereum/go-ethereum/internal/ethapi:RPCTransaction", 
           "definitions": {
-            "Big": {
-              "type": "object", 
-              "additionalProperties": false
-            }, 
             "RPCTransaction": {
               "type": "object", 
               "required": [
@@ -5412,8 +5480,9 @@
                   "pattern": "^0x[a-fA-F\\d]{64}$"
                 }, 
                 "blockNumber": {
-                  "$ref": "#/definitions/Big", 
-                  "$schema": "http://json-schema.org/draft-04/schema"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "from": {
                   "type": "string", 
@@ -5426,7 +5495,9 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "gasPrice": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "hash": {
                   "type": "string", 
@@ -5444,10 +5515,14 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "r": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "s": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "to": {
                   "type": "string", 
@@ -5460,10 +5535,14 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "v": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "value": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }
               }, 
               "additionalProperties": false
@@ -5511,12 +5590,8 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "description": ":RPCTransaction", 
+          "description": "*github.com/ethereum/go-ethereum/internal/ethapi:RPCTransaction", 
           "definitions": {
-            "Big": {
-              "type": "object", 
-              "additionalProperties": false
-            }, 
             "RPCTransaction": {
               "type": "object", 
               "required": [
@@ -5542,8 +5617,9 @@
                   "pattern": "^0x[a-fA-F\\d]{64}$"
                 }, 
                 "blockNumber": {
-                  "$ref": "#/definitions/Big", 
-                  "$schema": "http://json-schema.org/draft-04/schema"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "from": {
                   "type": "string", 
@@ -5556,7 +5632,9 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "gasPrice": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "hash": {
                   "type": "string", 
@@ -5574,10 +5652,14 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "r": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "s": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "to": {
                   "type": "string", 
@@ -5590,10 +5672,14 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "v": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "value": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }
               }, 
               "additionalProperties": false
@@ -6116,11 +6202,14 @@
                     "pattern": "^0x[a-fA-F\\d]{64}$"
                   }, 
                   "FromBlock": {
-                    "$ref": "#/definitions/Int", 
-                    "$schema": "http://json-schema.org/draft-04/schema"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "ToBlock": {
-                    "$ref": "#/definitions/Int"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "Topics": {
                     "type": "array", 
@@ -6135,10 +6224,6 @@
                     }
                   }
                 }, 
-                "additionalProperties": false
-              }, 
-              "Int": {
-                "type": "object", 
                 "additionalProperties": false
               }
             }, 
@@ -6216,10 +6301,6 @@
             "$schema": "http://json-schema.org/draft-04/schema"
           }, 
           "definitions": {
-            "Big": {
-              "type": "object", 
-              "additionalProperties": false
-            }, 
             "RPCTransaction": {
               "type": "object", 
               "required": [
@@ -6245,8 +6326,9 @@
                   "pattern": "^0x[a-fA-F\\d]{64}$"
                 }, 
                 "blockNumber": {
-                  "$ref": "#/definitions/Big", 
-                  "$schema": "http://json-schema.org/draft-04/schema"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "from": {
                   "type": "string", 
@@ -6259,7 +6341,9 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "gasPrice": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "hash": {
                   "type": "string", 
@@ -6277,10 +6361,14 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "r": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "s": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "to": {
                   "type": "string", 
@@ -6293,10 +6381,14 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "v": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "value": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }
               }, 
               "additionalProperties": false
@@ -6360,10 +6452,6 @@
           "schema": {
             "description": "github.com/ethereum/go-ethereum/internal/ethapi:SendTxArgs", 
             "definitions": {
-              "Big": {
-                "type": "object", 
-                "additionalProperties": false
-              }, 
               "SendTxArgs": {
                 "type": "object", 
                 "required": [
@@ -6378,6 +6466,7 @@
                 ], 
                 "properties": {
                   "data": {
+                    "description": "Field _input_ should be preferred", 
                     "type": "string", 
                     "title": "dataWord", 
                     "pattern": "^0x([a-fA-F\\d]{64})?$"
@@ -6393,8 +6482,9 @@
                     "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "gasPrice": {
-                    "$ref": "#/definitions/Big", 
-                    "$schema": "http://json-schema.org/draft-04/schema"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "input": {
                     "type": "string", 
@@ -6412,7 +6502,9 @@
                     "pattern": "^0x[a-fA-F\\d]{64}$"
                   }, 
                   "value": {
-                    "$ref": "#/definitions/Big"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }
                 }, 
                 "additionalProperties": false
@@ -6429,15 +6521,10 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":\u0026{hexutil Big}", 
-            "definitions": {
-              "Big": {
-                "type": "object", 
-                "additionalProperties": false
-              }
-            }, 
-            "$ref": "#/definitions/Big", 
-            "$schema": "http://json-schema.org/draft-04/schema"
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
           }
         }, 
         {
@@ -6537,10 +6624,6 @@
           "schema": {
             "description": "github.com/ethereum/go-ethereum/internal/ethapi:SendTxArgs", 
             "definitions": {
-              "Big": {
-                "type": "object", 
-                "additionalProperties": false
-              }, 
               "SendTxArgs": {
                 "type": "object", 
                 "required": [
@@ -6555,6 +6638,7 @@
                 ], 
                 "properties": {
                   "data": {
+                    "description": "Field _input_ should be preferred", 
                     "type": "string", 
                     "title": "dataWord", 
                     "pattern": "^0x([a-fA-F\\d]{64})?$"
@@ -6570,8 +6654,9 @@
                     "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "gasPrice": {
-                    "$ref": "#/definitions/Big", 
-                    "$schema": "http://json-schema.org/draft-04/schema"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "input": {
                     "type": "string", 
@@ -6589,7 +6674,9 @@
                     "pattern": "^0x[a-fA-F\\d]{64}$"
                   }, 
                   "value": {
-                    "$ref": "#/definitions/Big"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }
                 }, 
                 "additionalProperties": false
@@ -6696,10 +6783,6 @@
           "schema": {
             "description": "github.com/ethereum/go-ethereum/internal/ethapi:SendTxArgs", 
             "definitions": {
-              "Big": {
-                "type": "object", 
-                "additionalProperties": false
-              }, 
               "SendTxArgs": {
                 "type": "object", 
                 "required": [
@@ -6714,6 +6797,7 @@
                 ], 
                 "properties": {
                   "data": {
+                    "description": "Field _input_ should be preferred", 
                     "type": "string", 
                     "title": "dataWord", 
                     "pattern": "^0x([a-fA-F\\d]{64})?$"
@@ -6729,8 +6813,9 @@
                     "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "gasPrice": {
-                    "$ref": "#/definitions/Big", 
-                    "$schema": "http://json-schema.org/draft-04/schema"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "input": {
                     "type": "string", 
@@ -6748,7 +6833,9 @@
                     "pattern": "^0x[a-fA-F\\d]{64}$"
                   }, 
                   "value": {
-                    "$ref": "#/definitions/Big"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }
                 }, 
                 "additionalProperties": false
@@ -6766,7 +6853,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "description": ":SignTransactionResult", 
+          "description": "*github.com/ethereum/go-ethereum/internal/ethapi:SignTransactionResult", 
           "definitions": {
             "SignTransactionResult": {
               "type": "object", 
@@ -7316,15 +7403,10 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": "github.com/ethereum/go-ethereum/common/hexutil:hexutil.Big", 
-            "definitions": {
-              "Big": {
-                "type": "object", 
-                "additionalProperties": false
-              }
-            }, 
-            "$ref": "#/definitions/Big", 
-            "$schema": "http://json-schema.org/draft-04/schema"
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
           }
         }
       ], 
@@ -7553,7 +7635,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":bool", 
+            "description": "*:bool", 
             "type": "boolean"
           }
         }
@@ -7987,7 +8069,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":string", 
+            "description": "*:string", 
             "type": "string"
           }
         }
@@ -8019,10 +8101,6 @@
           "schema": {
             "description": "github.com/ethereum/go-ethereum/internal/ethapi:SendTxArgs", 
             "definitions": {
-              "Big": {
-                "type": "object", 
-                "additionalProperties": false
-              }, 
               "SendTxArgs": {
                 "type": "object", 
                 "required": [
@@ -8037,6 +8115,7 @@
                 ], 
                 "properties": {
                   "data": {
+                    "description": "Field _input_ should be preferred", 
                     "type": "string", 
                     "title": "dataWord", 
                     "pattern": "^0x([a-fA-F\\d]{64})?$"
@@ -8052,8 +8131,9 @@
                     "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "gasPrice": {
-                    "$ref": "#/definitions/Big", 
-                    "$schema": "http://json-schema.org/draft-04/schema"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "input": {
                     "type": "string", 
@@ -8071,7 +8151,9 @@
                     "pattern": "^0x[a-fA-F\\d]{64}$"
                   }, 
                   "value": {
-                    "$ref": "#/definitions/Big"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }
                 }, 
                 "additionalProperties": false
@@ -8200,10 +8282,6 @@
           "schema": {
             "description": "github.com/ethereum/go-ethereum/internal/ethapi:SendTxArgs", 
             "definitions": {
-              "Big": {
-                "type": "object", 
-                "additionalProperties": false
-              }, 
               "SendTxArgs": {
                 "type": "object", 
                 "required": [
@@ -8218,6 +8296,7 @@
                 ], 
                 "properties": {
                   "data": {
+                    "description": "Field _input_ should be preferred", 
                     "type": "string", 
                     "title": "dataWord", 
                     "pattern": "^0x([a-fA-F\\d]{64})?$"
@@ -8233,8 +8312,9 @@
                     "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "gasPrice": {
-                    "$ref": "#/definitions/Big", 
-                    "$schema": "http://json-schema.org/draft-04/schema"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "input": {
                     "type": "string", 
@@ -8252,7 +8332,9 @@
                     "pattern": "^0x[a-fA-F\\d]{64}$"
                   }, 
                   "value": {
-                    "$ref": "#/definitions/Big"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }
                 }, 
                 "additionalProperties": false
@@ -8313,10 +8395,6 @@
           "schema": {
             "description": "github.com/ethereum/go-ethereum/internal/ethapi:SendTxArgs", 
             "definitions": {
-              "Big": {
-                "type": "object", 
-                "additionalProperties": false
-              }, 
               "SendTxArgs": {
                 "type": "object", 
                 "required": [
@@ -8331,6 +8409,7 @@
                 ], 
                 "properties": {
                   "data": {
+                    "description": "Field _input_ should be preferred", 
                     "type": "string", 
                     "title": "dataWord", 
                     "pattern": "^0x([a-fA-F\\d]{64})?$"
@@ -8346,8 +8425,9 @@
                     "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "gasPrice": {
-                    "$ref": "#/definitions/Big", 
-                    "$schema": "http://json-schema.org/draft-04/schema"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }, 
                   "input": {
                     "type": "string", 
@@ -8365,7 +8445,9 @@
                     "pattern": "^0x[a-fA-F\\d]{64}$"
                   }, 
                   "value": {
-                    "$ref": "#/definitions/Big"
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
                   }
                 }, 
                 "additionalProperties": false
@@ -8405,7 +8487,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "description": ":SignTransactionResult", 
+          "description": "*github.com/ethereum/go-ethereum/internal/ethapi:SignTransactionResult", 
           "definitions": {
             "SignTransactionResult": {
               "type": "object", 
@@ -8581,10 +8663,6 @@
             }
           }, 
           "definitions": {
-            "Big": {
-              "type": "object", 
-              "additionalProperties": false
-            }, 
             "RPCTransaction": {
               "type": "object", 
               "required": [
@@ -8610,8 +8688,9 @@
                   "pattern": "^0x[a-fA-F\\d]{64}$"
                 }, 
                 "blockNumber": {
-                  "$ref": "#/definitions/Big", 
-                  "$schema": "http://json-schema.org/draft-04/schema"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "from": {
                   "type": "string", 
@@ -8624,7 +8703,9 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "gasPrice": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "hash": {
                   "type": "string", 
@@ -8642,10 +8723,14 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "r": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "s": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "to": {
                   "type": "string", 
@@ -8658,10 +8743,14 @@
                   "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "v": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }, 
                 "value": {
-                  "$ref": "#/definitions/Big"
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
                 }
               }, 
               "additionalProperties": false

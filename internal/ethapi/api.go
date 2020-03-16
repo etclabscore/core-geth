@@ -1367,7 +1367,7 @@ type SendTxArgs struct {
 	Nonce    *hexutil.Uint64 `json:"nonce"`
 	// We accept "data" and "input" for backwards-compatibility reasons. "input" is the
 	// newer name and should be preferred by clients.
-	Data  *hexutil.Bytes `json:"data"`
+	Data  *hexutil.Bytes `json:"data" jsonschema:"description=Field 'input' should be preferred"`
 	Input *hexutil.Bytes `json:"input"`
 }
 

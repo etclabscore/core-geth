@@ -89,6 +89,9 @@ func TestState(t *testing.T) {
 				t.Run(key, func(t *testing.T) {
 					withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
 						_, err := test.Run(subtest, vmconfig)
+						if err != nil && *testEWASM != "" {
+							err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
+						}
 						return st.checkFailure(t, name, err)
 					})
 				})

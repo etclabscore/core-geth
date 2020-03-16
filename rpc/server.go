@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"regexp"
 	"sort"
 	"strings"
@@ -79,6 +80,28 @@ func NewServer() *Server {
 	// Register the default service providing meta information about the RPC service such
 	// as the services and methods it offers.
 	rpcService := &RPCService{server: server, doc: NewOpenRPCDescription(server)}
+	server.RegisterName(MetadataApi, rpcService)
+	return server
+}
+
+func NewServerWithListener(listener net.Listener) *Server {
+	server := &Server{
+		idgen:            randomIDGenerator(),
+		codecs:           mapset.NewSet(),
+		run:              1,
+		OpenRPCSchemaRaw: defaultOpenRPCSchemaRaw,
+	}
+
+	// Register the default service providing meta information about the RPC service such
+	// as the services and methods it offers.
+	rpcService := &RPCService{server: server, doc: NewOpenRPCDescription(server)}
+	rpcService.doc.Doc.Servers = append(rpcService.doc.Doc.Servers, goopenrpcT.Server{
+		Name:        listener.Addr().Network(),
+		URL:         listener.Addr().String(),
+		Summary:     "",
+		Description: "",
+		Variables:   nil,
+	})
 	server.RegisterName(MetadataApi, rpcService)
 	return server
 }

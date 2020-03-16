@@ -40,7 +40,7 @@ import (
 func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 
 	if s.doc == nil {
-		s.doc =  NewOpenRPCDescription(s.server)
+		s.doc = NewOpenRPCDescription(s.server)
 	}
 
 	for module, list := range s.methods() {
@@ -48,7 +48,7 @@ func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 			continue
 		}
 
-		methodListLoop:
+	methodListLoop:
 		for _, methodName := range list {
 			fullName := strings.Join([]string{module, methodName}, serviceMethodSeparators[0])
 			method := s.server.services.services[module].callbacks[methodName]
@@ -83,8 +83,8 @@ type OpenRPCDescription struct {
 func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
 
 	doc := &goopenrpcT.OpenRPCSpec1{
-		OpenRPC:      "1.2.4",
-		Info:         goopenrpcT.Info{
+		OpenRPC: "1.2.4",
+		Info: goopenrpcT.Info{
 			Title:          "Ethereum JSON-RPC",
 			Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
 			TermsOfService: "https://github.com/etclabscore/core-geth/blob/master/COPYING",
@@ -99,15 +99,7 @@ func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
 			},
 			Version: "1.0.10",
 		},
-		Servers:      []goopenrpcT.Server{
-			goopenrpcT.Server{
-				Name:        "",
-				URL:         "",
-				Summary:     "",
-				Description: "",
-				Variables:   nil,
-			},
-		},
+		Servers:      []goopenrpcT.Server{},
 		Methods:      []goopenrpcT.Method{},
 		Components:   goopenrpcT.Components{},
 		ExternalDocs: goopenrpcT.ExternalDocs{},
@@ -168,15 +160,15 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (
 	//packageName := strings.Split(rt.Name(), ".")[0]
 
 	m := goopenrpcT.Method{
-		Name:         name,
-		Tags:         []goopenrpcT.Tag{},
-		Summary:      fn.Doc.Text(),
-		Description:  "", // fmt.Sprintf(`%s@%s:%d'`, rt.Name(), file, line),
+		Name:        name,
+		Tags:        []goopenrpcT.Tag{},
+		Summary:     fn.Doc.Text(),
+		Description: "", // fmt.Sprintf(`%s@%s:%d'`, rt.Name(), file, line),
 		ExternalDocs: goopenrpcT.ExternalDocs{
 			Description: fmt.Sprintf(`%s`, rt.Name()),
-			URL: fmt.Sprintf("file://%s:%d", file, line),
+			URL:         fmt.Sprintf("file://%s:%d", file, line),
 		},
-		Params:       []*goopenrpcT.ContentDescriptor{},
+		Params: []*goopenrpcT.ContentDescriptor{},
 		//Result:         &goopenrpcT.ContentDescriptor{},
 		Deprecated:     false,
 		Servers:        []goopenrpcT.Server{},
@@ -533,7 +525,6 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 		  "description": "Block tag or hex representation of a block number",
 		  "oneOf": [%s, %s]
 		}`, commonHashD, blockNumberTagD)},
-
 	}
 
 	for _, d := range dict {

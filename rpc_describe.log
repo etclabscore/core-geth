@@ -1,6 +1,6 @@
 {
   "jsonrpc": "2.0", 
-  "id": 1584371033, 
+  "id": 1584374383, 
   "result": {
     "openrpc": "1.2.4", 
     "info": {
@@ -20,8 +20,8 @@
     }, 
     "servers": [
       {
-        "name": "", 
-        "url": "", 
+        "name": "tcp", 
+        "url": "127.0.0.1:8545", 
         "summary": "", 
         "description": "", 
         "variables": null
@@ -3561,7 +3561,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "description": ":\u0026{32624 0xc0022acec0 account}", 
+              "description": ":\u0026{32624 0xc002d8e320 account}", 
               "type": "object", 
               "patternProperties": {
                 ".*": {

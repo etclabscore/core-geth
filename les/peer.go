@@ -353,7 +353,7 @@ type serverPeer struct {
 
 	// Advertised checkpoint fields
 	checkpointNumber uint64                   // The block height which the checkpoint is registered.
-	checkpoint       params.TrustedCheckpoint // The advertised checkpoint sent by server.
+	checkpoint       ctypes.TrustedCheckpoint // The advertised checkpoint sent by server.
 
 	poolEntry *poolEntry              // Statistic for server peer.
 	fcServer  *flowcontrol.ServerNode // Client side mirror token bucket.

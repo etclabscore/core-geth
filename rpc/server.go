@@ -313,6 +313,14 @@ func packageNameFromRuntimePCFuncName(runtimeFuncForPCName string) string {
 	return pmap["pkgdir"] + pmap["pkgbase"]
 }
 
+//func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
+//	describedDoc, err := s.Describe()
+//	if err != nil {
+//		return nil, err
+//	}
+//	return describedDoc, nil
+//}
+
 func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
 	var err error
 	if s.server.OpenRPCSchemaRaw == "" {

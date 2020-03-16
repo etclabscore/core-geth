@@ -32,17 +32,23 @@ import (
 	"github.com/alecthomas/jsonschema"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
 
 func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 
+	if s.doc == nil {
+		s.doc =  NewOpenRPCDescription(s.server)
+	}
+
 	for module, list := range s.methods() {
 		if module == "rpc" {
 			continue
 		}
 
+		methodListLoop:
 		for _, methodName := range list {
 			fullName := strings.Join([]string{module, methodName}, serviceMethodSeparators[0])
 			method := s.server.services.services[module].callbacks[methodName]
@@ -52,6 +58,13 @@ func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 			// because the isPubSub conditionals are wrong or the method is wrong.
 			if method.isSubscribe || strings.Contains(fullName, subscribeMethodSuffix) {
 				continue
+			}
+
+			// Dedupe. Not sure how `admin_datadir` got in there twice.
+			for _, m := range s.doc.Doc.Methods {
+				if m.Name == fullName {
+					continue methodListLoop
+				}
 			}
 			if err := s.doc.RegisterMethod(fullName, method); err != nil {
 				return nil, err
@@ -71,8 +84,30 @@ func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
 
 	doc := &goopenrpcT.OpenRPCSpec1{
 		OpenRPC:      "v1",
-		Info:         goopenrpcT.Info{},
-		Servers:      []goopenrpcT.Server{},
+		Info:         goopenrpcT.Info{
+			Title:          "Ethereum JSON-RPC",
+			Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
+			TermsOfService: "",
+			Contact: goopenrpcT.Contact{
+				Name:  "",
+				URL:   "",
+				Email: "",
+			},
+			License: goopenrpcT.License{
+				Name: "Apache-2.0",
+				URL:  "https://www.apache.org/licenses/LICENSE-2.0.html",
+			},
+			Version: "1.0.10",
+		},
+		Servers:      []goopenrpcT.Server{
+			goopenrpcT.Server{
+				Name:        "",
+				URL:         "",
+				Summary:     "",
+				Description: "",
+				Variables:   nil,
+			},
+		},
 		Methods:      []goopenrpcT.Method{},
 		Components:   goopenrpcT.Components{},
 		ExternalDocs: goopenrpcT.ExternalDocs{},
@@ -210,7 +245,6 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (
 				j++
 				m.Result = &cd
 			}
-
 		}
 	}
 
@@ -386,6 +420,7 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 		}
 		return &js
 	}
+
 	//unmarshalJSONToJSONSchemaTypeGlom := func(input string, ref *jsonschema.Type) *jsonschema.Type {
 	//	err := json.Unmarshal([]byte(input), ref)
 	//	if err != nil {
@@ -406,10 +441,10 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 	//			ttt.OneOf = append(ttt.OneOf, ret)
 	//			ttt.OneOf = append(ttt.OneOf, unmarshalJSONToJSONSchemaType(`
 	//	{
-    //      "title": "null",
-    //      "type": "null",
-    //      "description": "Null"
-    //    }`))
+	//      "title": "null",
+	//      "type": "null",
+	//      "description": "Null"
+	//    }`))
 	//			return ttt
 	//		}
 	//	}
@@ -417,53 +452,39 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 	//	return ret
 	//}
 
-	// First, handle primitives.
-	switch r.Kind() {
-	case reflect.Struct,
-		reflect.Map,
-		reflect.Slice, reflect.Array,
-		reflect.Interface:
-
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		ret := unmarshalJSONToJSONSchemaType(`{
+	integerD := `{
           "title": "integer",
           "type": "string",
           "pattern": "^0x[a-fA-F0-9]+$",
           "description": "Hex representation of the integer"
-        }`)
-
-		//if reflect.ValueOf(r).Type().Kind() == reflect.Ptr {
-		//	if ret.OneOf == nil || len(ret.OneOf) == 0 {
-		//		ttt := &jsonschema.Type{}
-		//		ttt.Title = ret.Title // Only keep the title.
-		//		ttt.OneOf = []*jsonschema.Type{}
-		//		ttt.OneOf = append(ttt.OneOf, ret)
-		//		ttt.OneOf = append(ttt.OneOf, unmarshalJSONToJSONSchemaType(`
-		//{
-        //  "title": "null",
-        //  "type": "null",
-        //  "description": "Null"
-        //}`))
-		//		return ttt
-		//	}
-		//}
-		return ret
-
-	case reflect.Float32, reflect.Float64:
-
-	case reflect.Bool:
-
-	case reflect.String:
-
-	case reflect.Ptr:
-
-	default:
-		panic("prevent me somewhere else please")
-	}
+        }`
+	commonHashD := `{
+          "title": "keccak",
+          "type": "string",
+          "description": "Hex representation of a Keccak 256 hash",
+          "pattern": "^0x[a-fA-F\\d]{64}$"
+        }`
+	blockNumberTagD := `{
+          "title": "blockNumberTag",
+          "type": "string",
+          "description": "The optional block height description",
+          "enum": [
+            "earliest",
+            "latest",
+            "pending"
+          ]
+        }`
 
 	// Second, handle other types.
 	// Use a slice instead of a map because it preserves order, as a logic safeguard/fallback.
 	dict := []schemaDictEntry{
+
+		{new(common.Address), `{
+          "title": "keccak",
+          "type": "string",
+          "description": "Hex representation of a Keccak 256 hash POINTER",
+          "pattern": "^0x[a-fA-F\\d]{64}$"
+        }`},
 
 		{common.Address{}, `{
           "title": "address",
@@ -478,12 +499,35 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
           "pattern": "^0x[a-fA-F\\d]{64}$"
         }`},
 
-		{common.Hash{}, `{
-          "title": "keccak",
+		{common.Hash{}, commonHashD},
+
+		{
+			hexutil.Bytes{}, `{
+          "title": "dataWord",
           "type": "string",
-          "description": "Hex representation of a Keccak 256 hash",
-          "pattern": "^0x[a-fA-F\\d]{64}$"
+          "description": "Hex representation of a 256 bit unit of data",
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
         }`},
+
+		{[]byte{}, `{
+          "title": "bytes",
+          "type": "string",
+          "description": "Hex representation of a variable length byte array",
+          "pattern": "^0x([a-fA-F0-9]?)+$"
+        }`},
+
+		{BlockNumberOrHash{}, fmt.Sprintf(`{
+		  "title": "blockNumberOrHash",
+		  "description": "Hex representation of a block number or hash",
+		  "oneOf": [%s, %s]
+		}`, commonHashD, integerD)},
+
+		{BlockNumber(0), fmt.Sprintf(`{
+		  "title": "blockNumberOrTag",
+		  "description": "Block tag or hex representation of a block number",
+		  "oneOf": [%s, %s]
+		}`, commonHashD, blockNumberTagD)},
+
 	}
 
 	for _, d := range dict {
@@ -510,9 +554,50 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 			//			return ttt
 			//		}
 			//	}
+
 			return tt // handleNil(r, tt)
 		}
 	}
+
+	// First, handle primitives.
+	switch r.Kind() {
+	case reflect.Struct,
+		reflect.Map,
+		reflect.Interface:
+	case reflect.Slice, reflect.Array:
+
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		ret := unmarshalJSONToJSONSchemaType(integerD)
+
+		//if reflect.ValueOf(r).Type().Kind() == reflect.Ptr {
+		//	if ret.OneOf == nil || len(ret.OneOf) == 0 {
+		//		ttt := &jsonschema.Type{}
+		//		ttt.Title = ret.Title // Only keep the title.
+		//		ttt.OneOf = []*jsonschema.Type{}
+		//		ttt.OneOf = append(ttt.OneOf, ret)
+		//		ttt.OneOf = append(ttt.OneOf, unmarshalJSONToJSONSchemaType(`
+		//{
+		//  "title": "null",
+		//  "type": "null",
+		//  "description": "Null"
+		//}`))
+		//		return ttt
+		//	}
+		//}
+		return ret
+
+	case reflect.Float32, reflect.Float64:
+
+	case reflect.Bool:
+
+	case reflect.String:
+
+	case reflect.Ptr:
+
+	default:
+		panic("prevent me somewhere else please")
+	}
+
 	return nil
 }
 

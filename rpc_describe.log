@@ -1,9 +1,207 @@
 {
   "jsonrpc": "2.0", 
-  "id": 1584362907, 
+  "id": 1584362908, 
   "result": {
-    "Over": null, 
-    "Under": [
+    "openrpc": "v1", 
+    "info": {
+      "title": "Ethereum JSON-RPC", 
+      "description": "This API lets you interact with an EVM-based client via JSON-RPC", 
+      "termsOfService": "", 
+      "contact": {
+        "name": "", 
+        "url": "", 
+        "email": ""
+      }, 
+      "license": {
+        "name": "Apache-2.0", 
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+      }, 
+      "version": "1.0.10"
+    }, 
+    "servers": [
+      {
+        "name": "", 
+        "url": "", 
+        "summary": "", 
+        "description": "", 
+        "variables": null
+      }
+    ], 
+    "methods": [
+      {
+        "name": "admin_addPeer", 
+        "tags": [], 
+        "summary": "AddPeer requests connecting to a remote node, and also maintaining the new\nconnection at all times, even reconnecting if it is lost.\n", 
+        "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).AddPeer@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:45'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "url", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": ":string", 
+              "type": "string"
+            }
+          }
+        ], 
+        "result": {
+          "name": "admin_addPeerResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":bool", 
+            "type": "boolean"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "admin_addTrustedPeer", 
+        "tags": [], 
+        "summary": "AddTrustedPeer allows a remote node to always connect, even if slots are full\n", 
+        "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).AddTrustedPeer@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:77'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "url", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": ":string", 
+              "type": "string"
+            }
+          }
+        ], 
+        "result": {
+          "name": "admin_addTrustedPeerResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":bool", 
+            "type": "boolean"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "admin_datadir", 
+        "tags": [], 
+        "summary": "Datadir retrieves the current data directory the node is using.\n", 
+        "description": "github.com/ethereum/go-ethereum/node.(*PublicAdminAPI).Datadir@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:295'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "admin_datadirResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":string", 
+            "type": "string"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "admin_exportChain", 
+        "tags": [], 
+        "summary": "ExportChain exports the current blockchain into a local file,\nor a range of blocks if first and last are non-nil\n", 
+        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateAdminAPI).ExportChain@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:171'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "file", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": ":string", 
+              "type": "string"
+            }
+          }, 
+          {
+            "name": "first", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of the integer", 
+              "type": "string", 
+              "title": "integer", 
+              "pattern": "^0x[a-fA-F0-9]+$"
+            }
+          }, 
+          {
+            "name": "last", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of the integer", 
+              "type": "string", 
+              "title": "integer", 
+              "pattern": "^0x[a-fA-F0-9]+$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "admin_exportChainResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":bool", 
+            "type": "boolean"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
       {
         "name": "admin_importChain", 
         "tags": [], 
@@ -3233,6 +3431,373 @@
         "examples": []
       }, 
       {
+        "name": "eth_blockNumber", 
+        "tags": [], 
+        "summary": "BlockNumber returns the block number of the chain head.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).BlockNumber@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:525'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "eth_blockNumberResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_call", 
+        "tags": [], 
+        "summary": "Call executes the given transaction on the state for the given block number.\n\nAdditionally, the caller can specify a batch of contract for fields overriding.\n\nNote, this function doesn't make and changes in the state/blockchain and is\nuseful to execute and retrieve values.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).Call@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:877'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "args", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/internal/ethapi:CallArgs", 
+              "definitions": {
+                "Big": {
+                  "type": "object", 
+                  "additionalProperties": false
+                }, 
+                "CallArgs": {
+                  "type": "object", 
+                  "required": [
+                    "from", 
+                    "to", 
+                    "gas", 
+                    "gasPrice", 
+                    "value", 
+                    "data"
+                  ], 
+                  "properties": {
+                    "data": {
+                      "type": "string", 
+                      "title": "dataWord", 
+                      "pattern": "^0x([a-fA-F\\d]{64})?$"
+                    }, 
+                    "from": {
+                      "type": "string", 
+                      "title": "keccak", 
+                      "pattern": "^0x[a-fA-F\\d]{64}$"
+                    }, 
+                    "gas": {
+                      "type": "string", 
+                      "title": "integer", 
+                      "pattern": "^0x[a-fA-F0-9]+$"
+                    }, 
+                    "gasPrice": {
+                      "$ref": "#/definitions/Big", 
+                      "$schema": "http://json-schema.org/draft-04/schema"
+                    }, 
+                    "to": {
+                      "type": "string", 
+                      "title": "keccak", 
+                      "pattern": "^0x[a-fA-F\\d]{64}$"
+                    }, 
+                    "value": {
+                      "$ref": "#/definitions/Big"
+                    }
+                  }, 
+                  "additionalProperties": false
+                }
+              }, 
+              "$ref": "#/definitions/CallArgs", 
+              "$schema": "http://json-schema.org/draft-04/schema"
+            }
+          }, 
+          {
+            "name": "blockNrOrHash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a block number or hash", 
+              "title": "blockNumberOrHash", 
+              "oneOf": [
+                {
+                  "description": "Hex representation of a Keccak 256 hash", 
+                  "type": "string", 
+                  "title": "keccak", 
+                  "pattern": "^0x[a-fA-F\\d]{64}$"
+                }, 
+                {
+                  "description": "Hex representation of the integer", 
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
+                }
+              ]
+            }
+          }, 
+          {
+            "name": "overrides", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": ":\u0026{32624 0xc00388b620 account}", 
+              "type": "object", 
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/account", 
+                  "$schema": "http://json-schema.org/draft-04/schema"
+                }
+              }, 
+              "definitions": {
+                "Big": {
+                  "type": "object", 
+                  "additionalProperties": false
+                }, 
+                "account": {
+                  "type": "object", 
+                  "required": [
+                    "nonce", 
+                    "code", 
+                    "balance", 
+                    "state", 
+                    "stateDiff"
+                  ], 
+                  "properties": {
+                    "balance": {
+                      "$ref": "#/definitions/Big", 
+                      "$schema": "http://json-schema.org/draft-04/schema"
+                    }, 
+                    "code": {
+                      "type": "string", 
+                      "title": "dataWord", 
+                      "pattern": "^0x([a-fA-F\\d]{64})?$"
+                    }, 
+                    "nonce": {
+                      "type": "string", 
+                      "title": "integer", 
+                      "pattern": "^0x[a-fA-F0-9]+$"
+                    }, 
+                    "state": {
+                      "type": "object", 
+                      "patternProperties": {
+                        ".*": {
+                          "description": "Hex representation of a Keccak 256 hash", 
+                          "type": "string", 
+                          "title": "keccak", 
+                          "pattern": "^0x[a-fA-F\\d]{64}$"
+                        }
+                      }
+                    }, 
+                    "stateDiff": {
+                      "type": "object", 
+                      "patternProperties": {
+                        ".*": {
+                          "description": "Hex representation of a Keccak 256 hash", 
+                          "type": "string", 
+                          "title": "keccak", 
+                          "pattern": "^0x[a-fA-F\\d]{64}$"
+                        }
+                      }
+                    }
+                  }, 
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_callResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of a 256 bit unit of data", 
+            "type": "string", 
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_chainId", 
+        "tags": [], 
+        "summary": "ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\n", 
+        "description": "github.com/ethereum/go-ethereum/eth.(*PublicEthereumAPI).ChainId@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:70'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "eth_chainIdResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_coinbase", 
+        "tags": [], 
+        "summary": "Coinbase is the address that mining rewards will be send to (alias for Etherbase)\n", 
+        "description": "github.com/ethereum/go-ethereum/eth.(*PublicEthereumAPI).Coinbase@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:60'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "eth_coinbaseResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "github.com/ethereum/go-ethereum/common:common.Address", 
+            "type": "string", 
+            "title": "address", 
+            "pattern": "^0x[a-fA-F\\d]{40}$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_estimateGas", 
+        "tags": [], 
+        "summary": "EstimateGas returns an estimate of the amount of gas needed to execute the\ngiven transaction against the current pending block.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).EstimateGas@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:951'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "args", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/internal/ethapi:CallArgs", 
+              "definitions": {
+                "Big": {
+                  "type": "object", 
+                  "additionalProperties": false
+                }, 
+                "CallArgs": {
+                  "type": "object", 
+                  "required": [
+                    "from", 
+                    "to", 
+                    "gas", 
+                    "gasPrice", 
+                    "value", 
+                    "data"
+                  ], 
+                  "properties": {
+                    "data": {
+                      "type": "string", 
+                      "title": "dataWord", 
+                      "pattern": "^0x([a-fA-F\\d]{64})?$"
+                    }, 
+                    "from": {
+                      "type": "string", 
+                      "title": "keccak", 
+                      "pattern": "^0x[a-fA-F\\d]{64}$"
+                    }, 
+                    "gas": {
+                      "type": "string", 
+                      "title": "integer", 
+                      "pattern": "^0x[a-fA-F0-9]+$"
+                    }, 
+                    "gasPrice": {
+                      "$ref": "#/definitions/Big", 
+                      "$schema": "http://json-schema.org/draft-04/schema"
+                    }, 
+                    "to": {
+                      "type": "string", 
+                      "title": "keccak", 
+                      "pattern": "^0x[a-fA-F\\d]{64}$"
+                    }, 
+                    "value": {
+                      "$ref": "#/definitions/Big"
+                    }
+                  }, 
+                  "additionalProperties": false
+                }
+              }, 
+              "$ref": "#/definitions/CallArgs", 
+              "$schema": "http://json-schema.org/draft-04/schema"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_estimateGasResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
         "name": "eth_etherbase", 
         "tags": [], 
         "summary": "Etherbase is the address that mining rewards will be send to\n", 
@@ -3386,6 +3951,558 @@
         "examples": []
       }, 
       {
+        "name": "eth_gasPrice", 
+        "tags": [], 
+        "summary": "GasPrice returns a suggestion for a gas price.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicEthereumAPI).GasPrice@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:66'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "eth_gasPriceResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":\u0026{hexutil Big}", 
+            "definitions": {
+              "Big": {
+                "type": "object", 
+                "additionalProperties": false
+              }
+            }, 
+            "$ref": "#/definitions/Big", 
+            "$schema": "http://json-schema.org/draft-04/schema"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getBalance", 
+        "tags": [], 
+        "summary": "GetBalance returns the amount of wei for the given address in the state of the\ngiven block number. The rpc.LatestBlockNumber and rpc.PendingBlockNumber meta\nblock numbers are also allowed.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetBalance@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:533'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "address", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/common:common.Address", 
+              "type": "string", 
+              "title": "address", 
+              "pattern": "^0x[a-fA-F\\d]{40}$"
+            }
+          }, 
+          {
+            "name": "blockNrOrHash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a block number or hash", 
+              "title": "blockNumberOrHash", 
+              "oneOf": [
+                {
+                  "description": "Hex representation of a Keccak 256 hash", 
+                  "type": "string", 
+                  "title": "keccak", 
+                  "pattern": "^0x[a-fA-F\\d]{64}$"
+                }, 
+                {
+                  "description": "Hex representation of the integer", 
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
+                }
+              ]
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getBalanceResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":\u0026{hexutil Big}", 
+            "definitions": {
+              "Big": {
+                "type": "object", 
+                "additionalProperties": false
+              }
+            }, 
+            "$ref": "#/definitions/Big", 
+            "$schema": "http://json-schema.org/draft-04/schema"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getBlockByHash", 
+        "tags": [], 
+        "summary": "GetBlockByHash returns the requested block. When fullTx is true all transactions in the block are returned in full\ndetail, otherwise only the transaction hash is returned.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetBlockByHash@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:656'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "hash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a Keccak 256 hash", 
+              "type": "string", 
+              "title": "keccak", 
+              "pattern": "^0x[a-fA-F\\d]{64}$"
+            }
+          }, 
+          {
+            "name": "fullTx", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": ":bool", 
+              "type": "boolean"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getBlockByHashResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "type": "object", 
+            "patternProperties": {
+              ".*": {
+                "additionalProperties": true
+              }
+            }
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getBlockByNumber", 
+        "tags": [], 
+        "summary": "GetBlockByNumber returns the requested canonical block.\n* When blockNr is -1 the chain head is returned.\n* When blockNr is -2 the pending chain head is returned.\n* When fullTx is true all transactions in the block are returned, otherwise\n  only the transaction hash is returned.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetBlockByNumber@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:639'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "number", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Block tag or hex representation of a block number", 
+              "title": "blockNumberOrTag", 
+              "oneOf": [
+                {
+                  "description": "Hex representation of a Keccak 256 hash", 
+                  "type": "string", 
+                  "title": "keccak", 
+                  "pattern": "^0x[a-fA-F\\d]{64}$"
+                }, 
+                {
+                  "description": "The optional block height description", 
+                  "type": "string", 
+                  "title": "blockNumberTag", 
+                  "enum": ["earliest", "latest", "pending"]
+                }
+              ]
+            }
+          }, 
+          {
+            "name": "fullTx", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": ":bool", 
+              "type": "boolean"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getBlockByNumberResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "type": "object", 
+            "patternProperties": {
+              ".*": {
+                "additionalProperties": true
+              }
+            }
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getBlockTransactionCountByHash", 
+        "tags": [], 
+        "summary": "GetBlockTransactionCountByHash returns the number of transactions in the block with the given hash.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetBlockTransactionCountByHash@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1201'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "blockHash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a Keccak 256 hash", 
+              "type": "string", 
+              "title": "keccak", 
+              "pattern": "^0x[a-fA-F\\d]{64}$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getBlockTransactionCountByHashResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getBlockTransactionCountByNumber", 
+        "tags": [], 
+        "summary": "GetBlockTransactionCountByNumber returns the number of transactions in the block with the given block number.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetBlockTransactionCountByNumber@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1192'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "blockNr", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Block tag or hex representation of a block number", 
+              "title": "blockNumberOrTag", 
+              "oneOf": [
+                {
+                  "description": "Hex representation of a Keccak 256 hash", 
+                  "type": "string", 
+                  "title": "keccak", 
+                  "pattern": "^0x[a-fA-F\\d]{64}$"
+                }, 
+                {
+                  "description": "The optional block height description", 
+                  "type": "string", 
+                  "title": "blockNumberTag", 
+                  "enum": ["earliest", "latest", "pending"]
+                }
+              ]
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getBlockTransactionCountByNumberResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getCode", 
+        "tags": [], 
+        "summary": "GetCode returns the code stored at the given address in the state for the given block number.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetCode@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:715'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "address", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/common:common.Address", 
+              "type": "string", 
+              "title": "address", 
+              "pattern": "^0x[a-fA-F\\d]{40}$"
+            }
+          }, 
+          {
+            "name": "blockNrOrHash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a block number or hash", 
+              "title": "blockNumberOrHash", 
+              "oneOf": [
+                {
+                  "description": "Hex representation of a Keccak 256 hash", 
+                  "type": "string", 
+                  "title": "keccak", 
+                  "pattern": "^0x[a-fA-F\\d]{64}$"
+                }, 
+                {
+                  "description": "Hex representation of the integer", 
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
+                }
+              ]
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getCodeResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of a 256 bit unit of data", 
+            "type": "string", 
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getFilterChanges", 
+        "tags": [], 
+        "summary": "GetFilterChanges returns the logs for the filter with the given id since\nlast time it was called. This can be used for polling.\n\nFor pending transaction and block filters the result is []common.Hash.\n(pending)Log filters return []Log.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterchanges\n", 
+        "description": "github.com/ethereum/go-ethereum/eth/filters.(*PublicFilterAPI).GetFilterChanges@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/filters/api.go:413'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "id", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/rpc:rpc.ID", 
+              "type": "string"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getFilterChangesResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "additionalProperties": true
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getFilterLogs", 
+        "tags": [], 
+        "summary": "GetFilterLogs returns the logs for the filter with the given id.\nIf the filter could not be found an empty array of logs is returned.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterlogs\n", 
+        "description": "github.com/ethereum/go-ethereum/eth/filters.(*PublicFilterAPI).GetFilterLogs@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/filters/api.go:372'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "id", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/rpc:rpc.ID", 
+              "type": "string"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getFilterLogsResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "type": "array", 
+            "items": {
+              "$ref": "#/definitions/Log", 
+              "$schema": "http://json-schema.org/draft-04/schema"
+            }, 
+            "definitions": {
+              "Log": {
+                "type": "object", 
+                "required": [
+                  "address", 
+                  "topics", 
+                  "data", 
+                  "blockNumber", 
+                  "transactionHash", 
+                  "transactionIndex", 
+                  "blockHash", 
+                  "logIndex", 
+                  "removed"
+                ], 
+                "properties": {
+                  "address": {
+                    "type": "string", 
+                    "title": "address", 
+                    "pattern": "^0x[a-fA-F\\d]{40}$"
+                  }, 
+                  "blockHash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "blockNumber": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "data": {
+                    "type": "string", 
+                    "title": "bytes", 
+                    "pattern": "^0x([a-fA-F0-9]?)+$"
+                  }, 
+                  "logIndex": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "removed": {
+                    "type": "boolean"
+                  }, 
+                  "topics": {
+                    "type": "array", 
+                    "items": {
+                      "description": "Hex representation of a Keccak 256 hash", 
+                      "type": "string", 
+                      "title": "keccak", 
+                      "pattern": "^0x[a-fA-F\\d]{64}$"
+                    }
+                  }, 
+                  "transactionHash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "transactionIndex": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }
+                }, 
+                "additionalProperties": false
+              }
+            }
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
         "name": "eth_getHashrate", 
         "tags": [], 
         "summary": "GetHashrate returns the current hashrate for local CPU miner and remote miner.\n", 
@@ -3520,6 +4637,1734 @@
         "examples": []
       }, 
       {
+        "name": "eth_getLogs", 
+        "tags": [], 
+        "summary": "GetLogs returns logs matching the given argument that are stored within the state.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getlogs\n", 
+        "description": "github.com/ethereum/go-ethereum/eth/filters.(*PublicFilterAPI).GetLogs@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/filters/api.go:325'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "crit", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/eth/filters:FilterCriteria", 
+              "definitions": {
+                "FilterCriteria": {
+                  "type": "object", 
+                  "required": [
+                    "BlockHash", 
+                    "FromBlock", 
+                    "ToBlock", 
+                    "Addresses", 
+                    "Topics"
+                  ], 
+                  "properties": {
+                    "Addresses": {
+                      "type": "array", 
+                      "items": {
+                        "type": "string", 
+                        "title": "address", 
+                        "pattern": "^0x[a-fA-F\\d]{40}$"
+                      }
+                    }, 
+                    "BlockHash": {
+                      "type": "string", 
+                      "title": "keccak", 
+                      "pattern": "^0x[a-fA-F\\d]{64}$"
+                    }, 
+                    "FromBlock": {
+                      "$ref": "#/definitions/Int", 
+                      "$schema": "http://json-schema.org/draft-04/schema"
+                    }, 
+                    "ToBlock": {
+                      "$ref": "#/definitions/Int"
+                    }, 
+                    "Topics": {
+                      "type": "array", 
+                      "items": {
+                        "type": "array", 
+                        "items": {
+                          "description": "Hex representation of a Keccak 256 hash", 
+                          "type": "string", 
+                          "title": "keccak", 
+                          "pattern": "^0x[a-fA-F\\d]{64}$"
+                        }
+                      }
+                    }
+                  }, 
+                  "additionalProperties": false
+                }, 
+                "Int": {
+                  "type": "object", 
+                  "additionalProperties": false
+                }
+              }, 
+              "$ref": "#/definitions/FilterCriteria", 
+              "$schema": "http://json-schema.org/draft-04/schema"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getLogsResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "type": "array", 
+            "items": {
+              "$ref": "#/definitions/Log", 
+              "$schema": "http://json-schema.org/draft-04/schema"
+            }, 
+            "definitions": {
+              "Log": {
+                "type": "object", 
+                "required": [
+                  "address", 
+                  "topics", 
+                  "data", 
+                  "blockNumber", 
+                  "transactionHash", 
+                  "transactionIndex", 
+                  "blockHash", 
+                  "logIndex", 
+                  "removed"
+                ], 
+                "properties": {
+                  "address": {
+                    "type": "string", 
+                    "title": "address", 
+                    "pattern": "^0x[a-fA-F\\d]{40}$"
+                  }, 
+                  "blockHash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "blockNumber": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "data": {
+                    "type": "string", 
+                    "title": "bytes", 
+                    "pattern": "^0x([a-fA-F0-9]?)+$"
+                  }, 
+                  "logIndex": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "removed": {
+                    "type": "boolean"
+                  }, 
+                  "topics": {
+                    "type": "array", 
+                    "items": {
+                      "description": "Hex representation of a Keccak 256 hash", 
+                      "type": "string", 
+                      "title": "keccak", 
+                      "pattern": "^0x[a-fA-F\\d]{64}$"
+                    }
+                  }, 
+                  "transactionHash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "transactionIndex": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }
+                }, 
+                "additionalProperties": false
+              }
+            }
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getProof", 
+        "tags": [], 
+        "summary": "GetProof returns the Merkle-proof for a given account and optionally some storage keys.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetProof@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:558'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "address", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/common:common.Address", 
+              "type": "string", 
+              "title": "address", 
+              "pattern": "^0x[a-fA-F\\d]{40}$"
+            }
+          }, 
+          {
+            "name": "storageKeys", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "type": "array", 
+              "items": {
+                "type": "string"
+              }
+            }
+          }, 
+          {
+            "name": "blockNrOrHash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a block number or hash", 
+              "title": "blockNumberOrHash", 
+              "oneOf": [
+                {
+                  "description": "Hex representation of a Keccak 256 hash", 
+                  "type": "string", 
+                  "title": "keccak", 
+                  "pattern": "^0x[a-fA-F\\d]{64}$"
+                }, 
+                {
+                  "description": "Hex representation of the integer", 
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
+                }
+              ]
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getProofResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":AccountResult", 
+            "definitions": {
+              "AccountResult": {
+                "type": "object", 
+                "required": [
+                  "address", 
+                  "accountProof", 
+                  "balance", 
+                  "codeHash", 
+                  "nonce", 
+                  "storageHash", 
+                  "storageProof"
+                ], 
+                "properties": {
+                  "accountProof": {
+                    "type": "array", 
+                    "items": {
+                      "type": "string"
+                    }
+                  }, 
+                  "address": {
+                    "type": "string", 
+                    "title": "address", 
+                    "pattern": "^0x[a-fA-F\\d]{40}$"
+                  }, 
+                  "balance": {
+                    "$ref": "#/definitions/Big", 
+                    "$schema": "http://json-schema.org/draft-04/schema"
+                  }, 
+                  "codeHash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "nonce": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "storageHash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "storageProof": {
+                    "type": "array", 
+                    "items": {
+                      "$ref": "#/definitions/StorageResult", 
+                      "$schema": "http://json-schema.org/draft-04/schema"
+                    }
+                  }
+                }, 
+                "additionalProperties": false
+              }, 
+              "Big": {
+                "type": "object", 
+                "additionalProperties": false
+              }, 
+              "StorageResult": {
+                "type": "object", 
+                "required": ["key", "value", "proof"], 
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  }, 
+                  "proof": {
+                    "type": "array", 
+                    "items": {
+                      "type": "string"
+                    }
+                  }, 
+                  "value": {
+                    "$ref": "#/definitions/Big"
+                  }
+                }, 
+                "additionalProperties": false
+              }
+            }, 
+            "$ref": "#/definitions/AccountResult", 
+            "$schema": "http://json-schema.org/draft-04/schema"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getRawTransactionByBlockHashAndIndex", 
+        "tags": [], 
+        "summary": "GetRawTransactionByBlockHashAndIndex returns the bytes of the transaction for the given block hash and index.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetRawTransactionByBlockHashAndIndex@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1234'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "blockHash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a Keccak 256 hash", 
+              "type": "string", 
+              "title": "keccak", 
+              "pattern": "^0x[a-fA-F\\d]{64}$"
+            }
+          }, 
+          {
+            "name": "index", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of the integer", 
+              "type": "string", 
+              "title": "integer", 
+              "pattern": "^0x[a-fA-F0-9]+$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getRawTransactionByBlockHashAndIndexResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of a 256 bit unit of data", 
+            "type": "string", 
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getRawTransactionByBlockNumberAndIndex", 
+        "tags": [], 
+        "summary": "GetRawTransactionByBlockNumberAndIndex returns the bytes of the transaction for the given block number and index.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetRawTransactionByBlockNumberAndIndex@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1226'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "blockNr", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Block tag or hex representation of a block number", 
+              "title": "blockNumberOrTag", 
+              "oneOf": [
+                {
+                  "description": "Hex representation of a Keccak 256 hash", 
+                  "type": "string", 
+                  "title": "keccak", 
+                  "pattern": "^0x[a-fA-F\\d]{64}$"
+                }, 
+                {
+                  "description": "The optional block height description", 
+                  "type": "string", 
+                  "title": "blockNumberTag", 
+                  "enum": ["earliest", "latest", "pending"]
+                }
+              ]
+            }
+          }, 
+          {
+            "name": "index", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of the integer", 
+              "type": "string", 
+              "title": "integer", 
+              "pattern": "^0x[a-fA-F0-9]+$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getRawTransactionByBlockNumberAndIndexResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of a 256 bit unit of data", 
+            "type": "string", 
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getRawTransactionByHash", 
+        "tags": [], 
+        "summary": "GetRawTransactionByHash returns the bytes of the transaction for the given hash.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetRawTransactionByHash@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1280'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "hash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a Keccak 256 hash", 
+              "type": "string", 
+              "title": "keccak", 
+              "pattern": "^0x[a-fA-F\\d]{64}$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getRawTransactionByHashResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of a 256 bit unit of data", 
+            "type": "string", 
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getStorageAt", 
+        "tags": [], 
+        "summary": "GetStorageAt returns the storage from the state at the given address, key and\nblock number. The rpc.LatestBlockNumber and rpc.PendingBlockNumber meta block\nnumbers are also allowed.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetStorageAt@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:727'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "address", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/common:common.Address", 
+              "type": "string", 
+              "title": "address", 
+              "pattern": "^0x[a-fA-F\\d]{40}$"
+            }
+          }, 
+          {
+            "name": "key", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": ":string", 
+              "type": "string"
+            }
+          }, 
+          {
+            "name": "blockNrOrHash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a block number or hash", 
+              "title": "blockNumberOrHash", 
+              "oneOf": [
+                {
+                  "description": "Hex representation of a Keccak 256 hash", 
+                  "type": "string", 
+                  "title": "keccak", 
+                  "pattern": "^0x[a-fA-F\\d]{64}$"
+                }, 
+                {
+                  "description": "Hex representation of the integer", 
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
+                }
+              ]
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getStorageAtResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of a 256 bit unit of data", 
+            "type": "string", 
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getTransactionByBlockHashAndIndex", 
+        "tags": [], 
+        "summary": "GetTransactionByBlockHashAndIndex returns the transaction for the given block hash and index.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionByBlockHashAndIndex@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1218'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "blockHash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a Keccak 256 hash", 
+              "type": "string", 
+              "title": "keccak", 
+              "pattern": "^0x[a-fA-F\\d]{64}$"
+            }
+          }, 
+          {
+            "name": "index", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of the integer", 
+              "type": "string", 
+              "title": "integer", 
+              "pattern": "^0x[a-fA-F0-9]+$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getTransactionByBlockHashAndIndexResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":RPCTransaction", 
+            "definitions": {
+              "Big": {
+                "type": "object", 
+                "additionalProperties": false
+              }, 
+              "RPCTransaction": {
+                "type": "object", 
+                "required": [
+                  "blockHash", 
+                  "blockNumber", 
+                  "from", 
+                  "gas", 
+                  "gasPrice", 
+                  "hash", 
+                  "input", 
+                  "nonce", 
+                  "to", 
+                  "transactionIndex", 
+                  "value", 
+                  "v", 
+                  "r", 
+                  "s"
+                ], 
+                "properties": {
+                  "blockHash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "blockNumber": {
+                    "$ref": "#/definitions/Big", 
+                    "$schema": "http://json-schema.org/draft-04/schema"
+                  }, 
+                  "from": {
+                    "type": "string", 
+                    "title": "address", 
+                    "pattern": "^0x[a-fA-F\\d]{40}$"
+                  }, 
+                  "gas": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "gasPrice": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "hash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "input": {
+                    "type": "string", 
+                    "title": "dataWord", 
+                    "pattern": "^0x([a-fA-F\\d]{64})?$"
+                  }, 
+                  "nonce": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "r": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "s": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "to": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "transactionIndex": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "v": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "value": {
+                    "$ref": "#/definitions/Big"
+                  }
+                }, 
+                "additionalProperties": false
+              }
+            }, 
+            "$ref": "#/definitions/RPCTransaction", 
+            "$schema": "http://json-schema.org/draft-04/schema"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getTransactionByBlockNumberAndIndex", 
+        "tags": [], 
+        "summary": "GetTransactionByBlockNumberAndIndex returns the transaction for the given block number and index.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionByBlockNumberAndIndex@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1210'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "blockNr", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Block tag or hex representation of a block number", 
+              "title": "blockNumberOrTag", 
+              "oneOf": [
+                {
+                  "description": "Hex representation of a Keccak 256 hash", 
+                  "type": "string", 
+                  "title": "keccak", 
+                  "pattern": "^0x[a-fA-F\\d]{64}$"
+                }, 
+                {
+                  "description": "The optional block height description", 
+                  "type": "string", 
+                  "title": "blockNumberTag", 
+                  "enum": ["earliest", "latest", "pending"]
+                }
+              ]
+            }
+          }, 
+          {
+            "name": "index", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of the integer", 
+              "type": "string", 
+              "title": "integer", 
+              "pattern": "^0x[a-fA-F0-9]+$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getTransactionByBlockNumberAndIndexResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":RPCTransaction", 
+            "definitions": {
+              "Big": {
+                "type": "object", 
+                "additionalProperties": false
+              }, 
+              "RPCTransaction": {
+                "type": "object", 
+                "required": [
+                  "blockHash", 
+                  "blockNumber", 
+                  "from", 
+                  "gas", 
+                  "gasPrice", 
+                  "hash", 
+                  "input", 
+                  "nonce", 
+                  "to", 
+                  "transactionIndex", 
+                  "value", 
+                  "v", 
+                  "r", 
+                  "s"
+                ], 
+                "properties": {
+                  "blockHash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "blockNumber": {
+                    "$ref": "#/definitions/Big", 
+                    "$schema": "http://json-schema.org/draft-04/schema"
+                  }, 
+                  "from": {
+                    "type": "string", 
+                    "title": "address", 
+                    "pattern": "^0x[a-fA-F\\d]{40}$"
+                  }, 
+                  "gas": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "gasPrice": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "hash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "input": {
+                    "type": "string", 
+                    "title": "dataWord", 
+                    "pattern": "^0x([a-fA-F\\d]{64})?$"
+                  }, 
+                  "nonce": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "r": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "s": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "to": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "transactionIndex": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "v": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "value": {
+                    "$ref": "#/definitions/Big"
+                  }
+                }, 
+                "additionalProperties": false
+              }
+            }, 
+            "$ref": "#/definitions/RPCTransaction", 
+            "$schema": "http://json-schema.org/draft-04/schema"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getTransactionByHash", 
+        "tags": [], 
+        "summary": "GetTransactionByHash returns the transaction for the given hash\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionByHash@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1261'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "hash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a Keccak 256 hash", 
+              "type": "string", 
+              "title": "keccak", 
+              "pattern": "^0x[a-fA-F\\d]{64}$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getTransactionByHashResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":RPCTransaction", 
+            "definitions": {
+              "Big": {
+                "type": "object", 
+                "additionalProperties": false
+              }, 
+              "RPCTransaction": {
+                "type": "object", 
+                "required": [
+                  "blockHash", 
+                  "blockNumber", 
+                  "from", 
+                  "gas", 
+                  "gasPrice", 
+                  "hash", 
+                  "input", 
+                  "nonce", 
+                  "to", 
+                  "transactionIndex", 
+                  "value", 
+                  "v", 
+                  "r", 
+                  "s"
+                ], 
+                "properties": {
+                  "blockHash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "blockNumber": {
+                    "$ref": "#/definitions/Big", 
+                    "$schema": "http://json-schema.org/draft-04/schema"
+                  }, 
+                  "from": {
+                    "type": "string", 
+                    "title": "address", 
+                    "pattern": "^0x[a-fA-F\\d]{40}$"
+                  }, 
+                  "gas": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "gasPrice": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "hash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "input": {
+                    "type": "string", 
+                    "title": "dataWord", 
+                    "pattern": "^0x([a-fA-F\\d]{64})?$"
+                  }, 
+                  "nonce": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "r": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "s": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "to": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "transactionIndex": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "v": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "value": {
+                    "$ref": "#/definitions/Big"
+                  }
+                }, 
+                "additionalProperties": false
+              }
+            }, 
+            "$ref": "#/definitions/RPCTransaction", 
+            "$schema": "http://json-schema.org/draft-04/schema"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getTransactionCount", 
+        "tags": [], 
+        "summary": "GetTransactionCount returns the number of transactions the given address has sent for the given block number\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionCount@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1242'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "address", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/common:common.Address", 
+              "type": "string", 
+              "title": "address", 
+              "pattern": "^0x[a-fA-F\\d]{40}$"
+            }
+          }, 
+          {
+            "name": "blockNrOrHash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a block number or hash", 
+              "title": "blockNumberOrHash", 
+              "oneOf": [
+                {
+                  "description": "Hex representation of a Keccak 256 hash", 
+                  "type": "string", 
+                  "title": "keccak", 
+                  "pattern": "^0x[a-fA-F\\d]{64}$"
+                }, 
+                {
+                  "description": "Hex representation of the integer", 
+                  "type": "string", 
+                  "title": "integer", 
+                  "pattern": "^0x[a-fA-F0-9]+$"
+                }
+              ]
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getTransactionCountResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getTransactionReceipt", 
+        "tags": [], 
+        "summary": "GetTransactionReceipt returns the transaction receipt for the given transaction hash.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionReceipt@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1297'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "hash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a Keccak 256 hash", 
+              "type": "string", 
+              "title": "keccak", 
+              "pattern": "^0x[a-fA-F\\d]{64}$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getTransactionReceiptResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "type": "object", 
+            "patternProperties": {
+              ".*": {
+                "additionalProperties": true
+              }
+            }
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getUncleByBlockHashAndIndex", 
+        "tags": [], 
+        "summary": "GetUncleByBlockHashAndIndex returns the uncle block for the given block hash and index. When fullTx is true\nall transactions in the block are returned in full detail, otherwise only the transaction hash is returned.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetUncleByBlockHashAndIndex@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:682'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "blockHash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a Keccak 256 hash", 
+              "type": "string", 
+              "title": "keccak", 
+              "pattern": "^0x[a-fA-F\\d]{64}$"
+            }
+          }, 
+          {
+            "name": "index", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of the integer", 
+              "type": "string", 
+              "title": "integer", 
+              "pattern": "^0x[a-fA-F0-9]+$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getUncleByBlockHashAndIndexResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "type": "object", 
+            "patternProperties": {
+              ".*": {
+                "additionalProperties": true
+              }
+            }
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getUncleByBlockNumberAndIndex", 
+        "tags": [], 
+        "summary": "GetUncleByBlockNumberAndIndex returns the uncle block for the given block hash and index. When fullTx is true\nall transactions in the block are returned in full detail, otherwise only the transaction hash is returned.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetUncleByBlockNumberAndIndex@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:666'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "blockNr", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Block tag or hex representation of a block number", 
+              "title": "blockNumberOrTag", 
+              "oneOf": [
+                {
+                  "description": "Hex representation of a Keccak 256 hash", 
+                  "type": "string", 
+                  "title": "keccak", 
+                  "pattern": "^0x[a-fA-F\\d]{64}$"
+                }, 
+                {
+                  "description": "The optional block height description", 
+                  "type": "string", 
+                  "title": "blockNumberTag", 
+                  "enum": ["earliest", "latest", "pending"]
+                }
+              ]
+            }
+          }, 
+          {
+            "name": "index", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of the integer", 
+              "type": "string", 
+              "title": "integer", 
+              "pattern": "^0x[a-fA-F0-9]+$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getUncleByBlockNumberAndIndexResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "type": "object", 
+            "patternProperties": {
+              ".*": {
+                "additionalProperties": true
+              }
+            }
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getUncleCountByBlockHash", 
+        "tags": [], 
+        "summary": "GetUncleCountByBlockHash returns number of uncles in the block for the given block hash\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetUncleCountByBlockHash@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:706'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "blockHash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a Keccak 256 hash", 
+              "type": "string", 
+              "title": "keccak", 
+              "pattern": "^0x[a-fA-F\\d]{64}$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getUncleCountByBlockHashResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getUncleCountByBlockNumber", 
+        "tags": [], 
+        "summary": "GetUncleCountByBlockNumber returns number of uncles in the block for the given block number\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetUncleCountByBlockNumber@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:697'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "blockNr", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Block tag or hex representation of a block number", 
+              "title": "blockNumberOrTag", 
+              "oneOf": [
+                {
+                  "description": "Hex representation of a Keccak 256 hash", 
+                  "type": "string", 
+                  "title": "keccak", 
+                  "pattern": "^0x[a-fA-F\\d]{64}$"
+                }, 
+                {
+                  "description": "The optional block height description", 
+                  "type": "string", 
+                  "title": "blockNumberTag", 
+                  "enum": ["earliest", "latest", "pending"]
+                }
+              ]
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_getUncleCountByBlockNumberResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_getWork", 
+        "tags": [], 
+        "summary": "GetWork returns a work package for external miner.\n\nThe work package consists of 3 strings:\n  result[0] - 32 bytes hex encoded current block header pow-hash\n  result[1] - 32 bytes hex encoded seed hash used for DAG\n  result[2] - 32 bytes hex encoded boundary condition (\"target\"), 2^256/difficulty\n  result[3] - hex encoded block number\n", 
+        "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).GetWork@/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:41'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "eth_getWorkResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "type": "array", 
+            "maxItems": 4, 
+            "minItems": 4, 
+            "items": {
+              "type": "string"
+            }
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_hashrate", 
+        "tags": [], 
+        "summary": "Hashrate returns the POW hashrate\n", 
+        "description": "github.com/ethereum/go-ethereum/eth.(*PublicEthereumAPI).Hashrate@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:65'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "eth_hashrateResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_mining", 
+        "tags": [], 
+        "summary": "Mining returns an indication if this node is currently mining.\n", 
+        "description": "github.com/ethereum/go-ethereum/eth.(*PublicMinerAPI).Mining@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:91'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "eth_miningResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":bool", 
+            "type": "boolean"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_newBlockFilter", 
+        "tags": [], 
+        "summary": "NewBlockFilter creates a filter that fetches blocks that are imported into the chain.\nIt is part of the filter package since polling goes with eth_getFilterChanges.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_newblockfilter\n", 
+        "description": "github.com/ethereum/go-ethereum/eth/filters.(*PublicFilterAPI).NewBlockFilter@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/filters/api.go:174'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "eth_newBlockFilterResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "github.com/ethereum/go-ethereum/rpc:rpc.ID", 
+            "type": "string"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_newFilter", 
+        "tags": [], 
+        "summary": "NewFilter creates a new filter and returns the filter id. It can be\nused to retrieve logs when the state changes. This method cannot be\nused to fetch logs that are already stored in the state.\n\nDefault criteria for the from and to block are \"latest\".\nUsing \"latest\" as block number will return logs for mined blocks.\nUsing \"pending\" as block number returns logs for not yet mined (pending) blocks.\nIn case logs are removed (chain reorg) previously returned logs are returned\nagain but with the removed property set to true.\n\nIn case \"fromBlock\" \u003e \"toBlock\" an error is returned.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_newfilter\n", 
+        "description": "github.com/ethereum/go-ethereum/eth/filters.(*PublicFilterAPI).NewFilter@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/filters/api.go:290'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "crit", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/eth/filters:FilterCriteria", 
+              "definitions": {
+                "FilterCriteria": {
+                  "type": "object", 
+                  "required": [
+                    "BlockHash", 
+                    "FromBlock", 
+                    "ToBlock", 
+                    "Addresses", 
+                    "Topics"
+                  ], 
+                  "properties": {
+                    "Addresses": {
+                      "type": "array", 
+                      "items": {
+                        "type": "string", 
+                        "title": "address", 
+                        "pattern": "^0x[a-fA-F\\d]{40}$"
+                      }
+                    }, 
+                    "BlockHash": {
+                      "type": "string", 
+                      "title": "keccak", 
+                      "pattern": "^0x[a-fA-F\\d]{64}$"
+                    }, 
+                    "FromBlock": {
+                      "$ref": "#/definitions/Int", 
+                      "$schema": "http://json-schema.org/draft-04/schema"
+                    }, 
+                    "ToBlock": {
+                      "$ref": "#/definitions/Int"
+                    }, 
+                    "Topics": {
+                      "type": "array", 
+                      "items": {
+                        "type": "array", 
+                        "items": {
+                          "description": "Hex representation of a Keccak 256 hash", 
+                          "type": "string", 
+                          "title": "keccak", 
+                          "pattern": "^0x[a-fA-F\\d]{64}$"
+                        }
+                      }
+                    }
+                  }, 
+                  "additionalProperties": false
+                }, 
+                "Int": {
+                  "type": "object", 
+                  "additionalProperties": false
+                }
+              }, 
+              "$ref": "#/definitions/FilterCriteria", 
+              "$schema": "http://json-schema.org/draft-04/schema"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_newFilterResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "github.com/ethereum/go-ethereum/rpc:rpc.ID", 
+            "type": "string"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_newPendingTransactionFilter", 
+        "tags": [], 
+        "summary": "NewPendingTransactionFilter creates a filter that fetches pending transaction hashes\nas transactions enter the pending state.\n\nIt is part of the filter package because this filter can be used through the\n`eth_getFilterChanges` polling method that is also used for log filters.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_newpendingtransactionfilter\n", 
+        "description": "github.com/ethereum/go-ethereum/eth/filters.(*PublicFilterAPI).NewPendingTransactionFilter@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/filters/api.go:104'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "eth_newPendingTransactionFilterResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "github.com/ethereum/go-ethereum/rpc:rpc.ID", 
+            "type": "string"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_pendingTransactions", 
+        "tags": [], 
+        "summary": "PendingTransactions returns the transactions that are in the transaction pool\nand have a from address that is one of the accounts this node manages.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).PendingTransactions@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1584'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "eth_pendingTransactionsResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "type": "array", 
+            "items": {
+              "$ref": "#/definitions/RPCTransaction", 
+              "$schema": "http://json-schema.org/draft-04/schema"
+            }, 
+            "definitions": {
+              "Big": {
+                "type": "object", 
+                "additionalProperties": false
+              }, 
+              "RPCTransaction": {
+                "type": "object", 
+                "required": [
+                  "blockHash", 
+                  "blockNumber", 
+                  "from", 
+                  "gas", 
+                  "gasPrice", 
+                  "hash", 
+                  "input", 
+                  "nonce", 
+                  "to", 
+                  "transactionIndex", 
+                  "value", 
+                  "v", 
+                  "r", 
+                  "s"
+                ], 
+                "properties": {
+                  "blockHash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "blockNumber": {
+                    "$ref": "#/definitions/Big", 
+                    "$schema": "http://json-schema.org/draft-04/schema"
+                  }, 
+                  "from": {
+                    "type": "string", 
+                    "title": "address", 
+                    "pattern": "^0x[a-fA-F\\d]{40}$"
+                  }, 
+                  "gas": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "gasPrice": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "hash": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "input": {
+                    "type": "string", 
+                    "title": "dataWord", 
+                    "pattern": "^0x([a-fA-F\\d]{64})?$"
+                  }, 
+                  "nonce": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "r": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "s": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "to": {
+                    "type": "string", 
+                    "title": "keccak", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$"
+                  }, 
+                  "transactionIndex": {
+                    "type": "string", 
+                    "title": "integer", 
+                    "pattern": "^0x[a-fA-F0-9]+$"
+                  }, 
+                  "v": {
+                    "$ref": "#/definitions/Big"
+                  }, 
+                  "value": {
+                    "$ref": "#/definitions/Big"
+                  }
+                }, 
+                "additionalProperties": false
+              }
+            }
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_protocolVersion", 
+        "tags": [], 
+        "summary": "ProtocolVersion returns the current Ethereum protocol version this node supports\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicEthereumAPI).ProtocolVersion@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:72'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "eth_protocolVersionResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
         "name": "eth_resend", 
         "tags": [], 
         "summary": "Resend accepts an existing transaction and a new gas price and limit. It will remove\nthe given transaction from the pool and reinsert it with the new gas price and limit.\n", 
@@ -3634,6 +6479,50 @@
         ], 
         "result": {
           "name": "eth_resendResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of a Keccak 256 hash", 
+            "type": "string", 
+            "title": "keccak", 
+            "pattern": "^0x[a-fA-F\\d]{64}$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_sendRawTransaction", 
+        "tags": [], 
+        "summary": "SendRawTransaction will add the signed transaction to the transaction pool.\nThe sender is responsible for signing the transaction and using the correct nonce.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SendRawTransaction@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1516'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "encodedTx", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a 256 bit unit of data", 
+              "type": "string", 
+              "title": "dataWord", 
+              "pattern": "^0x([a-fA-F\\d]{64})?$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_sendRawTransactionResult", 
           "summary": "", 
           "description": "", 
           "required": false, 
@@ -3973,6 +6862,147 @@
         ], 
         "result": {
           "name": "eth_submitHashRateResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":bool", 
+            "type": "boolean"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_submitWork", 
+        "tags": [], 
+        "summary": "SubmitWork can be used by external miner to submit their POW solution.\nIt returns an indication if the work was accepted.\nNote either an invalid solution, a stale work a non-existent work will return false.\n", 
+        "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).SubmitWork@/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:66'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "nonce", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/core/types:types.BlockNonce", 
+              "type": "array", 
+              "maxItems": 8, 
+              "minItems": 8, 
+              "items": {
+                "description": "Hex representation of the integer", 
+                "type": "string", 
+                "title": "integer", 
+                "pattern": "^0x[a-fA-F0-9]+$"
+              }
+            }
+          }, 
+          {
+            "name": "hash", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a Keccak 256 hash", 
+              "type": "string", 
+              "title": "keccak", 
+              "pattern": "^0x[a-fA-F\\d]{64}$"
+            }
+          }, 
+          {
+            "name": "digest", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a Keccak 256 hash", 
+              "type": "string", 
+              "title": "keccak", 
+              "pattern": "^0x[a-fA-F\\d]{64}$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_submitWorkResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":bool", 
+            "type": "boolean"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_syncing", 
+        "tags": [], 
+        "summary": "Syncing returns false in case the node is currently not syncing with the network. It can be up to date or has not\nyet received the latest block headers from its pears. In case it is synchronizing:\n- startingBlock: block number this node started to synchronise from\n- currentBlock:  block number this node is currently importing\n- highestBlock:  block number of the highest block header this node has received from peers\n- pulledStates:  number of state entries processed until now\n- knownStates:   number of known state entries that still need to be pulled\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicEthereumAPI).Syncing@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:83'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "eth_syncingResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "additionalProperties": true
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "eth_uninstallFilter", 
+        "tags": [], 
+        "summary": "UninstallFilter removes the filter with the given filter id.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_uninstallfilter\n", 
+        "description": "github.com/ethereum/go-ethereum/eth/filters.(*PublicFilterAPI).UninstallFilter@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/filters/api.go:354'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "id", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "github.com/ethereum/go-ethereum/rpc:rpc.ID", 
+              "type": "string"
+            }
+          }
+        ], 
+        "result": {
+          "name": "eth_uninstallFilterResult", 
           "summary": "", 
           "description": "", 
           "required": false, 
@@ -4414,6 +7444,92 @@
         }, 
         "params": [], 
         "result": null, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "net_listening", 
+        "tags": [], 
+        "summary": "Listening returns an indication if the node is listening for network connections.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicNetAPI).Listening@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1788'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "net_listeningResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":bool", 
+            "type": "boolean"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "net_peerCount", 
+        "tags": [], 
+        "summary": "PeerCount returns the number of connected peers\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicNetAPI).PeerCount@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1792'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "net_peerCountResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of the integer", 
+            "type": "string", 
+            "title": "integer", 
+            "pattern": "^0x[a-fA-F0-9]+$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "net_version", 
+        "tags": [], 
+        "summary": "Version returns the current ethereum protocol version.\n", 
+        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicNetAPI).Version@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1797'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "net_versionResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":string", 
+            "type": "string"
+          }
+        }, 
         "deprecated": false, 
         "servers": [], 
         "errors": [], 
@@ -5659,7 +8775,92 @@
         "links": [], 
         "paramStructure": "by-position", 
         "examples": []
+      }, 
+      {
+        "name": "web3_clientVersion", 
+        "tags": [], 
+        "summary": "ClientVersion returns the node name\n", 
+        "description": "github.com/ethereum/go-ethereum/node.(*PublicWeb3API).ClientVersion@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:309'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [], 
+        "result": {
+          "name": "web3_clientVersionResult", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": ":string", 
+            "type": "string"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
+      }, 
+      {
+        "name": "web3_sha3", 
+        "tags": [], 
+        "summary": "Sha3 applies the ethereum sha3 implementation on the input.\nIt assumes the input is hex encoded.\n", 
+        "description": "github.com/ethereum/go-ethereum/node.(*PublicWeb3API).Sha3@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:315'", 
+        "externalDocs": {
+          "description": "", 
+          "url": ""
+        }, 
+        "params": [
+          {
+            "name": "input", 
+            "summary": "", 
+            "description": "", 
+            "required": false, 
+            "deprecated": false, 
+            "schema": {
+              "description": "Hex representation of a 256 bit unit of data", 
+              "type": "string", 
+              "title": "dataWord", 
+              "pattern": "^0x([a-fA-F\\d]{64})?$"
+            }
+          }
+        ], 
+        "result": {
+          "name": "web3_sha3Result", 
+          "summary": "", 
+          "description": "", 
+          "required": false, 
+          "deprecated": false, 
+          "schema": {
+            "description": "Hex representation of a 256 bit unit of data", 
+            "type": "string", 
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
+          }
+        }, 
+        "deprecated": false, 
+        "servers": [], 
+        "errors": [], 
+        "links": [], 
+        "paramStructure": "by-position", 
+        "examples": []
       }
-    ]
+    ], 
+    "components": {
+      "contentDescriptors": null, 
+      "schemas": null, 
+      "examples": null, 
+      "links": null, 
+      "errors": null, 
+      "examplePairingObjects": null, 
+      "tags": null
+    }, 
+    "externalDocs": {
+      "description": "", 
+      "url": ""
+    }
   }
 }

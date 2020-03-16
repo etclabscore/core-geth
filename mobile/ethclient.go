@@ -241,7 +241,7 @@ func (ec *EthereumClient) SubscribeFilterLogs(ctx *Context, query *FilterQuery, 
 
 // Pending State
 
-// GetPendingBalanceAt returns the wei balance of the given account in the pending state.
+// PendingBalanceAt returns the wei balance of the given account in the pending state.
 func (ec *EthereumClient) GetPendingBalanceAt(ctx *Context, account *Address) (balance *BigInt, _ error) {
 	rawBalance, err := ec.client.PendingBalanceAt(ctx.context, account.address)
 	return &BigInt{rawBalance}, err

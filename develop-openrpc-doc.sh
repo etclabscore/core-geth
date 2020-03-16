@@ -15,6 +15,8 @@ http --json POST http://localhost:8545 id:=$(date +%s) method=rpc_setOpenRPCDisc
 grep -q error openrpc_set.log && exit 1 
 http --json POST http://localhost:8545 id:=$(date +%s) method=rpc_describeOpenRPC params:='[]' | jj -p > openrpc_describe.log
 
+http --json POST http://localhost:8545 id:=$(date +%s) method=rpc_describe params:='[]' | jj -p > rpc_describe.log
+
 # Developer can then inspect the logs, eg.
 
 # cat openrpc_describe.log | jj -p | head -40

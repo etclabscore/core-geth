@@ -1110,7 +1110,7 @@
                 "title": "storageProofValue",
                 "description": "The value of the storage slot in its account tree",
                 "$ref": "#/components/schemas/Integer"
-              },
+            },
               "proof": {
                 "$ref": "#/components/schemas/ProofNodes"
                }

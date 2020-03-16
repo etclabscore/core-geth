@@ -1,6 +1,6 @@
 {
   "jsonrpc": "2.0", 
-  "id": 1584283500, 
+  "id": 1584285596, 
   "result": {
     "Over": null, 
     "Under": [
@@ -271,7 +271,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/PeerInfo", 
@@ -372,7 +371,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/PeerInfo", 
@@ -1969,7 +1967,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/BadBlockArgs", 
@@ -2029,7 +2026,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/BadBlockArgs", 
@@ -2202,7 +2198,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "type": "array", 
@@ -2271,7 +2266,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "type": "array", 
@@ -2330,7 +2324,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "type": "array", 
@@ -2389,7 +2382,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "type": "array", 
@@ -3631,7 +3623,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "type": "string"
@@ -3734,7 +3725,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "type": "string"
@@ -3837,7 +3827,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "type": "string"
@@ -3940,7 +3929,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "type": "string"
@@ -4650,7 +4638,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/txTraceResult", 
@@ -4767,7 +4754,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/txTraceResult", 
@@ -4813,7 +4799,6 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "description": ":", 
               "type": "string", 
               "media": {
                 "binaryEncoding": "base64"
@@ -4882,7 +4867,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/txTraceResult", 
@@ -4928,7 +4912,6 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "description": ":", 
               "type": "string", 
               "media": {
                 "binaryEncoding": "base64"
@@ -4997,7 +4980,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/txTraceResult", 
@@ -5114,7 +5096,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/txTraceResult", 
@@ -5231,7 +5212,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/txTraceResult", 
@@ -5343,7 +5323,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/txTraceResult", 
@@ -5455,7 +5434,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/txTraceResult", 
@@ -5567,7 +5545,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/txTraceResult", 
@@ -5679,7 +5656,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/txTraceResult", 
@@ -5796,7 +5772,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "additionalProperties": true
           }
         }, 
@@ -5895,7 +5870,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "additionalProperties": true
           }
         }, 
@@ -6223,7 +6197,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "type": "array", 
@@ -6259,7 +6232,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "type": "array", 
@@ -6690,7 +6662,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "object", 
             "patternProperties": {
               ".*": {
@@ -6740,7 +6711,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "object", 
             "patternProperties": {
               ".*": {
@@ -6785,7 +6755,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "object", 
             "patternProperties": {
               ".*": {
@@ -6830,7 +6799,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "object", 
             "patternProperties": {
               ".*": {
@@ -7905,7 +7873,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "maxItems": 4, 
             "minItems": 4, 
@@ -7938,7 +7905,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "maxItems": 4, 
             "minItems": 4, 
@@ -9223,7 +9189,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "type": "array", 
@@ -9259,7 +9224,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "type": "array", 
@@ -9295,7 +9259,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/rawWallet", 
@@ -9384,7 +9347,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "array", 
             "items": {
               "$ref": "#/definitions/rawWallet", 
@@ -10877,7 +10839,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "object", 
             "patternProperties": {
               ".*": {
@@ -11015,7 +10976,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "object", 
             "patternProperties": {
               ".*": {
@@ -11153,7 +11113,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "object", 
             "patternProperties": {
               ".*": {
@@ -11196,7 +11155,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "object", 
             "patternProperties": {
               ".*": {
@@ -11239,7 +11197,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "object", 
             "patternProperties": {
               ".*": {
@@ -11272,7 +11229,6 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "description": ":", 
             "type": "object", 
             "patternProperties": {
               ".*": {

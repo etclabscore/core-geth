@@ -31,6 +31,7 @@ import (
 
 	"github.com/alecthomas/jsonschema"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
@@ -49,7 +50,7 @@ func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 			// FIXME: Development only.
 			// There is a bug with the isPubSub method, it's not picking up #PublicEthAPI.eth_subscribeSyncStatus
 			// because the isPubSub conditionals are wrong or the method is wrong.
-			if method.isSubscribe || strings.Contains(fullName, subscribeMethodSuffix){
+			if method.isSubscribe || strings.Contains(fullName, subscribeMethodSuffix) {
 				continue
 			}
 			if err := s.doc.RegisterMethod(fullName, method); err != nil {
@@ -94,6 +95,7 @@ func (d *OpenRPCDescription) RegisterMethod(name string, cb *callback) error {
 	if err != nil {
 		return err
 	}
+
 	astFuncDel := getAstFunc(cb, astFile, rtFunc)
 
 	if astFuncDel == nil {
@@ -115,7 +117,7 @@ func (d *OpenRPCDescription) RegisterMethod(name string, cb *callback) error {
 
 type argIdent struct {
 	ident *ast.Ident
-	name string
+	name  string
 }
 
 func (a argIdent) Name() string {
@@ -128,12 +130,12 @@ func (a argIdent) Name() string {
 func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (goopenrpcT.Method, error) {
 	file, line := rt.FileLine(rt.Entry())
 	m := goopenrpcT.Method{
-		Name:    name,
-		Tags:    []goopenrpcT.Tag{},
-		Summary: fn.Doc.Text(),
-		Description: fmt.Sprintf(`%s@%s:%d'`, rt.Name(), file, line),
-		ExternalDocs:   goopenrpcT.ExternalDocs{},
-		Params:         []*goopenrpcT.ContentDescriptor{},
+		Name:         name,
+		Tags:         []goopenrpcT.Tag{},
+		Summary:      fn.Doc.Text(),
+		Description:  fmt.Sprintf(`%s@%s:%d'`, rt.Name(), file, line),
+		ExternalDocs: goopenrpcT.ExternalDocs{},
+		Params:       []*goopenrpcT.ContentDescriptor{},
 		//Result:         &goopenrpcT.ContentDescriptor{},
 		Deprecated:     false,
 		Servers:        []goopenrpcT.Server{},
@@ -157,7 +159,7 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (
 					if ident == nil {
 						continue
 					}
-					if j > len(cb.argTypes) - 1 {
+					if j > len(cb.argTypes)-1 {
 						log.Println(name, cb.argTypes, field.Names, j)
 						continue
 					}
@@ -301,6 +303,9 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 		//	},
 		//},
 	}
+	if !jsonschemaPkgSupport(ty) {
+		return cd, fmt.Errorf("unsupported iface: %v %v %v", spew.Sdump(ty), spew.Sdump(field), spew.Sdump(ident))
+	}
 
 	var schemaType string
 	switch tt := field.Type.(type) {
@@ -308,7 +313,7 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 		schemaType = fmt.Sprintf("%v.%v", tt.X, tt.Sel)
 	case *ast.StarExpr:
 		schemaType = fmt.Sprintf("%v", tt.X)
-		ty = ty.Elem()
+		//ty = ty.Elem() // FIXME: wart warn
 		//cd.Schema.Nullable = true
 	default:
 		schemaType = ty.Name()
@@ -318,63 +323,197 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 	//cd.Name = schemaType
 	cd.Name = ident.Name()
 
-
 	cd.Summary = field.Doc.Text()
 	cd.Description = field.Comment.Text()
 
-
-	supported := false
-	switch ty.Kind() {
-	case reflect.Struct,
-	reflect.Map,
-	reflect.Slice, reflect.Array,
-	reflect.Interface,
-	reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
-	reflect.Float32, reflect.Float64,
-	reflect.Bool,
-	reflect.String,
-	reflect.Ptr:
-		supported = true
-	default:
+	rflctr := jsonschema.Reflector{
+		AllowAdditionalProperties:  false,
+		RequiredFromJSONSchemaTags: false,
+		ExpandedStruct:             false,
+		//IgnoredTypes:               []interface{}{chaninterface},
+		TypeMapper: OpenRPCJSONSchemaTypeMapper,
 	}
 
-	supported = true
+	jsch := rflctr.ReflectFromType(ty)
 
-	if supported {
-		//jsch := jsonschema.Reflect(reflect.New(reflect.ValueOf(ty).Type()).Elem())
-		//jsch := jsonschema.Reflect(reflect.New(ty).Interface())
-
-		//jsch := jsonschema.ReflectFromType(ty)
-		//chaninterface := make(chan interface{})
-		rflctr := jsonschema.Reflector{
-			AllowAdditionalProperties:  false,
-			RequiredFromJSONSchemaTags: false,
-			ExpandedStruct:             false,
-			//IgnoredTypes:               []interface{}{chaninterface},
-			TypeMapper:                 nil,
-		}
-		jsch := rflctr.ReflectFromType(ty)
-		m, err := json.Marshal(jsch)
-		if err != nil {
-			log.Fatal(err)
-		}
-		sch := spec.Schema{}
-		err = json.Unmarshal(m, &sch)
-		if err != nil {
-			log.Fatal(err)
-		}
-		cd.Schema = sch
-	} else {
-		return cd, fmt.Errorf("unsupported iface: %v %v %v", spew.Sdump(ty), spew.Sdump(field), spew.Sdump(ident))
+	// Poor man's type cast.
+	m, err := json.Marshal(jsch)
+	if err != nil {
+		log.Fatal(err)
 	}
+	sch := spec.Schema{}
+	err = json.Unmarshal(m, &sch)
+	if err != nil {
+		log.Fatal(err)
+	}
+	cd.Schema = sch
 
-	if cd.Schema.Description == "" || cd.Schema.Description == ":" {
+	if schemaType != ":" && (cd.Schema.Description == "" || cd.Schema.Description == ":") {
 		cd.Schema.Description = schemaType
 	}
 
-	//if ty.MethodByName()
-
 	return cd, nil
+}
+
+func jsonschemaPkgSupport(r reflect.Type) bool {
+	switch r.Kind() {
+	case reflect.Struct,
+		reflect.Map,
+		reflect.Slice, reflect.Array,
+		reflect.Interface,
+		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+		reflect.Float32, reflect.Float64,
+		reflect.Bool,
+		reflect.String,
+		reflect.Ptr:
+		return true
+	default:
+		return false
+	}
+}
+
+type schemaDictEntry struct {
+	t interface{}
+	j string
+}
+
+func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
+	unmarshalJSONToJSONSchemaType := func(input string) *jsonschema.Type {
+		var js jsonschema.Type
+		err := json.Unmarshal([]byte(input), &js)
+		if err != nil {
+			return nil
+		}
+		return &js
+	}
+	//unmarshalJSONToJSONSchemaTypeGlom := func(input string, ref *jsonschema.Type) *jsonschema.Type {
+	//	err := json.Unmarshal([]byte(input), ref)
+	//	if err != nil {
+	//		return nil
+	//	}
+	//	return ref
+	//}
+
+	//handleNil := func(r reflect.Type, ret *jsonschema.Type) *jsonschema.Type {
+	//	if ret == nil {
+	//		return nil
+	//	}
+	//	if reflect.ValueOf(r).Kind() == reflect.Ptr {
+	//		if ret.OneOf == nil || len(ret.OneOf) == 0 {
+	//			ttt := &jsonschema.Type{}
+	//			ttt.Title = ret.Title // Only keep the title.
+	//			ttt.OneOf = []*jsonschema.Type{}
+	//			ttt.OneOf = append(ttt.OneOf, ret)
+	//			ttt.OneOf = append(ttt.OneOf, unmarshalJSONToJSONSchemaType(`
+	//	{
+    //      "title": "null",
+    //      "type": "null",
+    //      "description": "Null"
+    //    }`))
+	//			return ttt
+	//		}
+	//	}
+	//
+	//	return ret
+	//}
+
+	// First, handle primitives.
+	switch r.Kind() {
+	case reflect.Struct,
+		reflect.Map,
+		reflect.Slice, reflect.Array,
+		reflect.Interface:
+
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		ret := unmarshalJSONToJSONSchemaType(`{
+          "title": "integer",
+          "type": "string",
+          "pattern": "^0x[a-fA-F0-9]+$",
+          "description": "Hex representation of the integer"
+        }`)
+
+		//if reflect.ValueOf(r).Type().Kind() == reflect.Ptr {
+		//	if ret.OneOf == nil || len(ret.OneOf) == 0 {
+		//		ttt := &jsonschema.Type{}
+		//		ttt.Title = ret.Title // Only keep the title.
+		//		ttt.OneOf = []*jsonschema.Type{}
+		//		ttt.OneOf = append(ttt.OneOf, ret)
+		//		ttt.OneOf = append(ttt.OneOf, unmarshalJSONToJSONSchemaType(`
+		//{
+        //  "title": "null",
+        //  "type": "null",
+        //  "description": "Null"
+        //}`))
+		//		return ttt
+		//	}
+		//}
+		return ret
+
+	case reflect.Float32, reflect.Float64:
+
+	case reflect.Bool:
+
+	case reflect.String:
+
+	case reflect.Ptr:
+
+	default:
+		panic("prevent me somewhere else please")
+	}
+
+	// Second, handle other types.
+	// Use a slice instead of a map because it preserves order, as a logic safeguard/fallback.
+	dict := []schemaDictEntry{
+
+		{common.Address{}, `{
+          "title": "address",
+          "type": "string",
+          "pattern": "^0x[a-fA-F\\d]{40}$"
+        }`},
+
+		{new(common.Hash), `{
+          "title": "keccak",
+          "type": "string",
+          "description": "Hex representation of a Keccak 256 hash POINTER",
+          "pattern": "^0x[a-fA-F\\d]{64}$"
+        }`},
+
+		{common.Hash{}, `{
+          "title": "keccak",
+          "type": "string",
+          "description": "Hex representation of a Keccak 256 hash",
+          "pattern": "^0x[a-fA-F\\d]{64}$"
+        }`},
+	}
+
+	for _, d := range dict {
+		d := d
+		if reflect.TypeOf(d.t) == r {
+			tt := unmarshalJSONToJSONSchemaType(d.j)
+
+			//	// If the value is a pointer, then it can be nil.
+			//	// Which means it should be oneOf <the value> or <Null>.
+			//	//if strings.Contains(reflect.ValueOf(d.t).Type().Name(), "*") { // .Kind() == reflect.Ptr
+			//	//if d.t == nil {
+			//	if reflect.ValueOf(d.t).Type().Kind() == reflect.Ptr {
+			//		if tt.OneOf == nil || len(tt.OneOf) == 0 {
+			//			ttt := &jsonschema.Type{}
+			//			ttt.Title = tt.Title // Only keep the title.
+			//			ttt.OneOf = []*jsonschema.Type{}
+			//			ttt.OneOf = append(ttt.OneOf, tt)
+			//			ttt.OneOf = append(ttt.OneOf, unmarshalJSONToJSONSchemaType(`
+			//{
+			//  "title": "null",
+			//  "type": "null",
+			//  "description": "Null"
+			//}`))
+			//			return ttt
+			//		}
+			//	}
+			return tt // handleNil(r, tt)
+		}
+	}
+	return nil
 }
 
 func getAstFunc(cb *callback, astFile *ast.File, rf *runtime.Func) *ast.FuncDecl {
@@ -404,12 +543,53 @@ func getAstFunc(cb *callback, astFile *ast.File, rf *runtime.Func) *ast.FuncDecl
 				fnRecName = fmt.Sprintf("%v", s.X)
 			}
 		}
-		log.Println("=>", "recvr=", cb.rcvr.String(), "fn=", fnRecName)
-		if !strings.Contains(cb.rcvr.String(), fnRecName) {
+		// Ensure that this is the one true function.
+		// Have to match receiver AND method names.
+		/*
+		 => recvr= <*ethapi.PublicBlockChainAPI Value> fn= PublicBlockChainAPI
+		 => recvr= <*ethash.API Value> fn= API
+		 => recvr= <*ethapi.PublicTxPoolAPI Value> fn= PublicTxPoolAPI
+		 => recvr= <*ethapi.PublicTxPoolAPI Value> fn= PublicTxPoolAPI
+		 => recvr= <*ethapi.PublicTxPoolAPI Value> fn= PublicTxPoolAPI
+		 => recvr= <*ethapi.PublicNetAPI Value> fn= PublicNetAPI
+		 => recvr= <*ethapi.PublicNetAPI Value> fn= PublicNetAPI
+		 => recvr= <*ethapi.PublicNetAPI Value> fn= PublicNetAPI
+		 => recvr= <*node.PrivateAdminAPI Value> fn= PrivateAdminAPI
+		 => recvr= <*node.PublicAdminAPI Value> fn= PublicAdminAPI
+		 => recvr= <*node.PublicAdminAPI Value> fn= PublicAdminAPI
+		 => recvr= <*eth.PrivateAdminAPI Value> fn= PrivateAdminAPI
+		*/
+		reRec := regexp.MustCompile(fnRecName + `\s`)
+		if !reRec.MatchString(cb.rcvr.String()) {
 			continue
 		}
-		// FIXME: Ensure that this is the one true function.
 		return fn
+	}
+	return nil
+}
+
+func getAstType(astFile *ast.File, t reflect.Type) *ast.TypeSpec {
+	log.Println("getAstType", t.Name(), t.String())
+	for _, decl := range astFile.Decls {
+		d, ok := decl.(*ast.GenDecl)
+		if !ok {
+			continue
+		}
+		if d.Tok != token.TYPE {
+			continue
+		}
+		for _, s := range d.Specs {
+			sp, ok := s.(*ast.TypeSpec)
+			if !ok {
+				continue
+			}
+			if sp.Name != nil && sp.Name.Name == t.Name() {
+				return sp
+			} else if sp.Name != nil {
+				log.Println("nomatch", sp.Name.Name)
+			}
+		}
+
 	}
 	return nil
 }

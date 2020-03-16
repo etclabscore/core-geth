@@ -101,6 +101,15 @@ func (s *testService) DoHash(myint int64) (myhash common.Hash, myerr error) {
 	return common.BigToHash(new(big.Int).SetInt64(myint)), nil
 }
 
+func (s *testService) DoHashOfPointer(mypint *int64) (myhash common.Hash, myerr error) {
+	return common.BigToHash(new(big.Int).SetInt64(*mypint)), nil
+}
+
+func (s *testService) DoHashPointer(myint int64) (myhash *common.Hash, myerr error) {
+	h := common.BigToHash(new(big.Int).SetInt64(myint))
+	return &h, nil
+}
+
 func (s *testService) AddPointers(a, b *uint64) uint64 {
 	if a == nil && b == nil {
 		return 0

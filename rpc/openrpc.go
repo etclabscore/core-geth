@@ -83,11 +83,11 @@ type OpenRPCDescription struct {
 func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
 
 	doc := &goopenrpcT.OpenRPCSpec1{
-		OpenRPC:      "v1",
+		OpenRPC:      "1.2.4",
 		Info:         goopenrpcT.Info{
 			Title:          "Ethereum JSON-RPC",
 			Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
-			TermsOfService: "",
+			TermsOfService: "https://github.com/etclabscore/core-geth/blob/master/COPYING",
 			Contact: goopenrpcT.Contact{
 				Name:  "",
 				URL:   "",
@@ -164,12 +164,18 @@ func (a argIdent) Name() string {
 
 func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (goopenrpcT.Method, error) {
 	file, line := rt.FileLine(rt.Entry())
+
+	//packageName := strings.Split(rt.Name(), ".")[0]
+
 	m := goopenrpcT.Method{
 		Name:         name,
 		Tags:         []goopenrpcT.Tag{},
 		Summary:      fn.Doc.Text(),
-		Description:  fmt.Sprintf(`%s@%s:%d'`, rt.Name(), file, line),
-		ExternalDocs: goopenrpcT.ExternalDocs{},
+		Description:  "", // fmt.Sprintf(`%s@%s:%d'`, rt.Name(), file, line),
+		ExternalDocs: goopenrpcT.ExternalDocs{
+			Description: fmt.Sprintf(`%s`, rt.Name()),
+			URL: fmt.Sprintf("file://%s:%d", file, line),
+		},
 		Params:       []*goopenrpcT.ContentDescriptor{},
 		//Result:         &goopenrpcT.ContentDescriptor{},
 		Deprecated:     false,

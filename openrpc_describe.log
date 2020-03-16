@@ -1,6 +1,6 @@
 {
   "jsonrpc": "2.0", 
-  "id": 1584362907, 
+  "id": 1584371033, 
   "result": {
     "Over": null, 
     "Under": [
@@ -8,10 +8,10 @@
         "name": "admin_importChain", 
         "tags": [], 
         "summary": "ImportChain imports a blockchain from a local file.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateAdminAPI).ImportChain@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:219'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateAdminAPI).ImportChain", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:219"
         }, 
         "params": [
           {
@@ -48,10 +48,10 @@
         "name": "admin_nodeInfo", 
         "tags": [], 
         "summary": "NodeInfo retrieves all the information we know about the host node at the\nprotocol granularity.\n", 
-        "description": "github.com/ethereum/go-ethereum/node.(*PublicAdminAPI).NodeInfo@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:285'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/node.(*PublicAdminAPI).NodeInfo", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:285"
         }, 
         "params": [], 
         "result": {
@@ -137,10 +137,10 @@
         "name": "admin_peers", 
         "tags": [], 
         "summary": "Peers retrieves all the information we know about each individual peer at the\nprotocol granularity.\n", 
-        "description": "github.com/ethereum/go-ethereum/node.(*PublicAdminAPI).Peers@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:275'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/node.(*PublicAdminAPI).Peers", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:275"
         }, 
         "params": [], 
         "result": {
@@ -237,10 +237,10 @@
         "name": "admin_removePeer", 
         "tags": [], 
         "summary": "RemovePeer disconnects from a remote node if the connection exists\n", 
-        "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).RemovePeer@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:61'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).RemovePeer", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:61"
         }, 
         "params": [
           {
@@ -277,10 +277,10 @@
         "name": "admin_removeTrustedPeer", 
         "tags": [], 
         "summary": "RemoveTrustedPeer removes a remote node from the trusted peer set, but it\ndoes not disconnect it automatically.\n", 
-        "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).RemoveTrustedPeer@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:93'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).RemoveTrustedPeer", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:93"
         }, 
         "params": [
           {
@@ -317,10 +317,10 @@
         "name": "admin_startRPC", 
         "tags": [], 
         "summary": "StartRPC starts the HTTP RPC API server.\n", 
-        "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).StartRPC@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:146'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).StartRPC", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:146"
         }, 
         "params": [
           {
@@ -403,10 +403,10 @@
         "name": "admin_startWS", 
         "tags": [], 
         "summary": "StartWS starts the websocket RPC API server.\n", 
-        "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).StartWS@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:208'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).StartWS", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:208"
         }, 
         "params": [
           {
@@ -478,10 +478,10 @@
         "name": "admin_stopRPC", 
         "tags": [], 
         "summary": "StopRPC terminates an already running HTTP RPC API endpoint.\n", 
-        "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).StopRPC@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:196'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).StopRPC", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:196"
         }, 
         "params": [], 
         "result": {
@@ -506,10 +506,10 @@
         "name": "admin_stopWS", 
         "tags": [], 
         "summary": "StopWS terminates an already running websocket RPC API endpoint.\n", 
-        "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).StopWS@/home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:250'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/node.(*PrivateAdminAPI).StopWS", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/node/api.go:250"
         }, 
         "params": [], 
         "result": {
@@ -534,10 +534,10 @@
         "name": "debug_accountRange", 
         "tags": [], 
         "summary": "AccountRange enumerates all accounts in the latest state\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).AccountRange@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:395'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).AccountRange", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:395"
         }, 
         "params": [
           {
@@ -615,10 +615,10 @@
         "name": "debug_backtraceAt", 
         "tags": [], 
         "summary": "BacktraceAt sets the log backtrace location. See package log for details on\nthe pattern syntax.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).BacktraceAt@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:68'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).BacktraceAt", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:68"
         }, 
         "params": [
           {
@@ -645,10 +645,10 @@
         "name": "debug_blockProfile", 
         "tags": [], 
         "summary": "BlockProfile turns on goroutine profiling for nsec seconds and writes profile data to\nfile. It uses a profile rate of 1 for most accurate information. If a different rate is\ndesired, set the rate and write the profile manually.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).BlockProfile@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:147'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).BlockProfile", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:147"
         }, 
         "params": [
           {
@@ -688,10 +688,10 @@
         "name": "debug_chaindbCompact", 
         "tags": [], 
         "summary": "ChaindbCompact flattens the entire key-value database into a single level,\nremoving all unused slots and merging all keys.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).ChaindbCompact@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1759'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).ChaindbCompact", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1759"
         }, 
         "params": [], 
         "result": null, 
@@ -706,10 +706,10 @@
         "name": "debug_chaindbProperty", 
         "tags": [], 
         "summary": "ChaindbProperty returns leveldb properties of the key-value database.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).ChaindbProperty@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1748'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).ChaindbProperty", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1748"
         }, 
         "params": [
           {
@@ -746,10 +746,10 @@
         "name": "debug_cpuProfile", 
         "tags": [], 
         "summary": "CpuProfile turns on CPU profiling for nsec seconds and writes\nprofile data to file.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).CpuProfile@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:88'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).CpuProfile", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:88"
         }, 
         "params": [
           {
@@ -789,10 +789,10 @@
         "name": "debug_dumpBlock", 
         "tags": [], 
         "summary": "DumpBlock retrieves the entire state of the database at a given block.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PublicDebugAPI).DumpBlock@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:280'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PublicDebugAPI).DumpBlock", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:280"
         }, 
         "params": [
           {
@@ -907,10 +907,10 @@
         "name": "debug_freeOSMemory", 
         "tags": [], 
         "summary": "FreeOSMemory returns unused memory to the OS.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).FreeOSMemory@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:200'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).FreeOSMemory", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:200"
         }, 
         "params": [], 
         "result": null, 
@@ -925,10 +925,10 @@
         "name": "debug_gcStats", 
         "tags": [], 
         "summary": "GcStats returns GC statistics.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).GcStats@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:80'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).GcStats", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:80"
         }, 
         "params": [], 
         "result": {
@@ -1009,10 +1009,10 @@
         "name": "debug_getBadBlocks", 
         "tags": [], 
         "summary": "GetBadBlocks returns a list of the last 'bad blocks' that the client has seen on the network\nand returns them as a JSON list of block-hashes\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).GetBadBlocks@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:333'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).GetBadBlocks", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:333"
         }, 
         "params": [], 
         "result": {
@@ -1065,10 +1065,10 @@
         "name": "debug_getBlockRlp", 
         "tags": [], 
         "summary": "GetBlockRlp retrieves the RLP encoded for of a single block.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).GetBlockRlp@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1666'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).GetBlockRlp", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1666"
         }, 
         "params": [
           {
@@ -1107,10 +1107,10 @@
         "name": "debug_getModifiedAccountsByHash", 
         "tags": [], 
         "summary": "GetModifiedAccountsByHash returns all accounts that have changed between the\ntwo blocks specified. A change is defined as a difference in nonce, balance,\ncode hash, or storage hash.\n\nWith one parameter, returns the list of accounts modified in the specified block.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).GetModifiedAccountsByHash@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:502'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).GetModifiedAccountsByHash", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:502"
         }, 
         "params": [
           {
@@ -1166,10 +1166,10 @@
         "name": "debug_getModifiedAccountsByNumber", 
         "tags": [], 
         "summary": "GetModifiedAccountsByNumber returns all accounts that have changed between the\ntwo blocks specified. A change is defined as a difference in nonce, balance,\ncode hash, or storage hash.\n\nWith one parameter, returns the list of accounts modified in the specified block.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).GetModifiedAccountsByNumber@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:474'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).GetModifiedAccountsByNumber", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:474"
         }, 
         "params": [
           {
@@ -1225,10 +1225,10 @@
         "name": "debug_goTrace", 
         "tags": [], 
         "summary": "GoTrace turns on tracing for nsec seconds and writes\ntrace data to file.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).GoTrace@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:135'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).GoTrace", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:135"
         }, 
         "params": [
           {
@@ -1268,10 +1268,10 @@
         "name": "debug_memStats", 
         "tags": [], 
         "summary": "MemStats returns detailed runtime memory statistics.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).MemStats@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:73'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).MemStats", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:73"
         }, 
         "params": [], 
         "result": {
@@ -1531,10 +1531,10 @@
         "name": "debug_mutexProfile", 
         "tags": [], 
         "summary": "MutexProfile turns on mutex profiling for nsec seconds and writes profile data to file.\nIt uses a profile rate of 1 for most accurate information. If a different rate is\ndesired, set the rate and write the profile manually.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).MutexProfile@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:168'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).MutexProfile", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:168"
         }, 
         "params": [
           {
@@ -1574,10 +1574,10 @@
         "name": "debug_preimage", 
         "tags": [], 
         "summary": "Preimage is a debug API function that returns the preimage for a sha3 hash, if known.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).Preimage@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:317'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).Preimage", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:317"
         }, 
         "params": [
           {
@@ -1618,10 +1618,10 @@
         "name": "debug_printBlock", 
         "tags": [], 
         "summary": "PrintBlock retrieves a block and returns its pretty printed form.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).PrintBlock@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1718'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).PrintBlock", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1718"
         }, 
         "params": [
           {
@@ -1660,10 +1660,10 @@
         "name": "debug_seedHash", 
         "tags": [], 
         "summary": "SeedHash retrieves the seed hash of a block.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).SeedHash@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1727'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).SeedHash", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1727"
         }, 
         "params": [
           {
@@ -1702,10 +1702,10 @@
         "name": "debug_setBlockProfileRate", 
         "tags": [], 
         "summary": "SetBlockProfileRate sets the rate of goroutine block profile data collection.\nrate 0 disables block profiling.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).SetBlockProfileRate@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:156'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).SetBlockProfileRate", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:156"
         }, 
         "params": [
           {
@@ -1734,10 +1734,10 @@
         "name": "debug_setGCPercent", 
         "tags": [], 
         "summary": "SetGCPercent sets the garbage collection target percentage. It returns the previous\nsetting. A negative value disables GC.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).SetGCPercent@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:206'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).SetGCPercent", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:206"
         }, 
         "params": [
           {
@@ -1778,10 +1778,10 @@
         "name": "debug_setHead", 
         "tags": [], 
         "summary": "SetHead rewinds the head of the blockchain to a previous block.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).SetHead@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1771'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).SetHead", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1771"
         }, 
         "params": [
           {
@@ -1810,10 +1810,10 @@
         "name": "debug_setMutexProfileFraction", 
         "tags": [], 
         "summary": "SetMutexProfileFraction sets the rate of mutex profiling.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).SetMutexProfileFraction@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:177'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).SetMutexProfileFraction", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:177"
         }, 
         "params": [
           {
@@ -1842,10 +1842,10 @@
         "name": "debug_stacks", 
         "tags": [], 
         "summary": "Stacks returns a printed representation of the stacks of all goroutines.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).Stacks@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:193'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).Stacks", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:193"
         }, 
         "params": [], 
         "result": {
@@ -1870,10 +1870,10 @@
         "name": "debug_standardTraceBadBlockToFile", 
         "tags": [], 
         "summary": "StandardTraceBadBlockToFile dumps the structured logs created during the\nexecution of EVM against a block pulled from the pool of bad ones to the\nlocal file system and returns a list of files to the caller.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).StandardTraceBadBlockToFile@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:431'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).StandardTraceBadBlockToFile", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:431"
         }, 
         "params": [
           {
@@ -1970,10 +1970,10 @@
         "name": "debug_standardTraceBlockToFile", 
         "tags": [], 
         "summary": "StandardTraceBlockToFile dumps the structured logs created during the\nexecution of EVM to the local file system and returns a list of files\nto the caller.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).StandardTraceBlockToFile@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:420'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).StandardTraceBlockToFile", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:420"
         }, 
         "params": [
           {
@@ -2070,10 +2070,10 @@
         "name": "debug_startCPUProfile", 
         "tags": [], 
         "summary": "StartCPUProfile turns on CPU profiling, writing to the given file.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).StartCPUProfile@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:98'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).StartCPUProfile", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:98"
         }, 
         "params": [
           {
@@ -2100,10 +2100,10 @@
         "name": "debug_startGoTrace", 
         "tags": [], 
         "summary": "StartGoTrace turns on tracing, writing to the given file.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).StartGoTrace@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/trace.go:30'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).StartGoTrace", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/trace.go:30"
         }, 
         "params": [
           {
@@ -2130,10 +2130,10 @@
         "name": "debug_stopCPUProfile", 
         "tags": [], 
         "summary": "StopCPUProfile stops an ongoing CPU profile.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).StopCPUProfile@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:119'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).StopCPUProfile", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:119"
         }, 
         "params": [], 
         "result": null, 
@@ -2148,10 +2148,10 @@
         "name": "debug_stopGoTrace", 
         "tags": [], 
         "summary": "StopTrace stops an ongoing trace.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).StopGoTrace@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/trace.go:51'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).StopGoTrace", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/trace.go:51"
         }, 
         "params": [], 
         "result": null, 
@@ -2166,10 +2166,10 @@
         "name": "debug_storageRangeAt", 
         "tags": [], 
         "summary": "StorageRangeAt returns the storage at the given block height and transaction index.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).StorageRangeAt@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:434'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).StorageRangeAt", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:434"
         }, 
         "params": [
           {
@@ -2301,10 +2301,10 @@
         "name": "debug_testSignCliqueBlock", 
         "tags": [], 
         "summary": "TestSignCliqueBlock fetches the given block number, and attempts to sign it as a clique header with the\ngiven address, returning the address of the recovered signature\n\nThis is a temporary method to debug the externalsigner integration,\nTODO: Remove this method when the integration is mature\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).TestSignCliqueBlock@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1683'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).TestSignCliqueBlock", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1683"
         }, 
         "params": [
           {
@@ -2358,10 +2358,10 @@
         "name": "debug_traceBadBlock", 
         "tags": [], 
         "summary": "TraceBadBlockByHash returns the structured logs created during the execution of\nEVM against a block pulled from the pool of bad ones and returns them as a JSON\nobject.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBadBlock@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:407'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBadBlock", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:407"
         }, 
         "params": [
           {
@@ -2475,10 +2475,10 @@
         "name": "debug_traceBlock", 
         "tags": [], 
         "summary": "TraceBlock returns the structured logs created during the execution of EVM\nand returns them as a JSON object.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlock@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:386'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlock", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:386"
         }, 
         "params": [
           {
@@ -2592,10 +2592,10 @@
         "name": "debug_traceBlockByHash", 
         "tags": [], 
         "summary": "TraceBlockByHash returns the structured logs created during the execution of\nEVM and returns them as a JSON object.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlockByHash@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:376'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlockByHash", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:376"
         }, 
         "params": [
           {
@@ -2709,10 +2709,10 @@
         "name": "debug_traceBlockByNumber", 
         "tags": [], 
         "summary": "TraceBlockByNumber returns the structured logs created during the execution of\nEVM and returns them as a JSON object.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlockByNumber@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:355'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlockByNumber", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:355"
         }, 
         "params": [
           {
@@ -2838,10 +2838,10 @@
         "name": "debug_traceBlockFromFile", 
         "tags": [], 
         "summary": "TraceBlockFromFile returns the structured logs created during the execution of\nEVM and returns them as a JSON object.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlockFromFile@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:396'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceBlockFromFile", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:396"
         }, 
         "params": [
           {
@@ -2953,10 +2953,10 @@
         "name": "debug_traceTransaction", 
         "tags": [], 
         "summary": "TraceTransaction returns the structured logs created during the execution of EVM\nand returns them as a JSON object.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceTransaction@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:704'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateDebugAPI).TraceTransaction", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api_tracer.go:704"
         }, 
         "params": [
           {
@@ -3052,10 +3052,10 @@
         "name": "debug_verbosity", 
         "tags": [], 
         "summary": "Verbosity sets the log verbosity ceiling. The verbosity of individual packages\nand source files can be raised using Vmodule.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).Verbosity@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:57'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).Verbosity", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:57"
         }, 
         "params": [
           {
@@ -3084,10 +3084,10 @@
         "name": "debug_vmodule", 
         "tags": [], 
         "summary": "Vmodule sets the log verbosity pattern. See package log for details on the\npattern syntax.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).Vmodule@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:62'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).Vmodule", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:62"
         }, 
         "params": [
           {
@@ -3114,10 +3114,10 @@
         "name": "debug_writeBlockProfile", 
         "tags": [], 
         "summary": "WriteBlockProfile writes a goroutine blocking profile to the given file.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).WriteBlockProfile@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:161'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).WriteBlockProfile", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:161"
         }, 
         "params": [
           {
@@ -3144,10 +3144,10 @@
         "name": "debug_writeMemProfile", 
         "tags": [], 
         "summary": "WriteMemProfile writes an allocation profile to the given file.\nNote that the profiling rate cannot be set through the API,\nit must be set on the command line.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).WriteMemProfile@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:188'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).WriteMemProfile", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:188"
         }, 
         "params": [
           {
@@ -3174,10 +3174,10 @@
         "name": "debug_writeMutexProfile", 
         "tags": [], 
         "summary": "WriteMutexProfile writes a goroutine blocking profile to the given file.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).WriteMutexProfile@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:181'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/debug.(*HandlerT).WriteMutexProfile", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/debug/api.go:181"
         }, 
         "params": [
           {
@@ -3204,10 +3204,10 @@
         "name": "eth_accounts", 
         "tags": [], 
         "summary": "Accounts returns the collection of accounts this node manages\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicAccountAPI).Accounts@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:193'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicAccountAPI).Accounts", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:193"
         }, 
         "params": [], 
         "result": {
@@ -3236,10 +3236,10 @@
         "name": "eth_etherbase", 
         "tags": [], 
         "summary": "Etherbase is the address that mining rewards will be send to\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PublicEthereumAPI).Etherbase@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:55'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PublicEthereumAPI).Etherbase", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:55"
         }, 
         "params": [], 
         "result": {
@@ -3266,10 +3266,10 @@
         "name": "eth_fillTransaction", 
         "tags": [], 
         "summary": "FillTransaction fills the defaults (nonce, gas, gasPrice) on a given unsigned transaction,\nand returns it to the caller for further processing (signing + broadcast)\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).FillTransaction@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1500'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).FillTransaction", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1500"
         }, 
         "params": [
           {
@@ -3389,10 +3389,10 @@
         "name": "eth_getHashrate", 
         "tags": [], 
         "summary": "GetHashrate returns the current hashrate for local CPU miner and remote miner.\n", 
-        "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).GetHashrate@/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:110'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).GetHashrate", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:110"
         }, 
         "params": [], 
         "result": {
@@ -3419,10 +3419,10 @@
         "name": "eth_getHeaderByHash", 
         "tags": [], 
         "summary": "GetHeaderByHash returns the requested header by hash.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetHeaderByHash@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:626'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetHeaderByHash", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:626"
         }, 
         "params": [
           {
@@ -3465,10 +3465,10 @@
         "name": "eth_getHeaderByNumber", 
         "tags": [], 
         "summary": "GetHeaderByNumber returns the requested canonical block header.\n* When blockNr is -1 the chain head is returned.\n* When blockNr is -2 the pending chain head is returned.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetHeaderByNumber@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:610'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetHeaderByNumber", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:610"
         }, 
         "params": [
           {
@@ -3523,10 +3523,10 @@
         "name": "eth_resend", 
         "tags": [], 
         "summary": "Resend accepts an existing transaction and a new gas price and limit. It will remove\nthe given transaction from the pool and reinsert it with the new gas price and limit.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).Resend@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1611'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).Resend", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1611"
         }, 
         "params": [
           {
@@ -3656,10 +3656,10 @@
         "name": "eth_sendTransaction", 
         "tags": [], 
         "summary": "SendTransaction creates a transaction for the given argument, sign it and submit it to the\ntransaction pool.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SendTransaction@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1468'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SendTransaction", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1468"
         }, 
         "params": [
           {
@@ -3758,10 +3758,10 @@
         "name": "eth_sign", 
         "tags": [], 
         "summary": "Sign calculates an ECDSA signature for:\nkeccack256(\"\\x19Ethereum Signed Message:\\n\" + len(message) + message).\n\nNote, the produced signature conforms to the secp256k1 curve R, S and V values,\nwhere the V value will be 27 or 28 for legacy reasons.\n\nThe account associated with addr must be unlocked.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).Sign@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1533'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).Sign", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1533"
         }, 
         "params": [
           {
@@ -3815,10 +3815,10 @@
         "name": "eth_signTransaction", 
         "tags": [], 
         "summary": "SignTransaction will sign the given transaction with the from account.\nThe node needs to have the private key of the account corresponding with\nthe given from address and it needs to be unlocked.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SignTransaction@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1558'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SignTransaction", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1558"
         }, 
         "params": [
           {
@@ -3938,10 +3938,10 @@
         "name": "eth_submitHashRate", 
         "tags": [], 
         "summary": "SubmitHashrate can be used for remote miners to submit their hash rate.\nThis enables the node to report the combined hash rate of all miners\nwhich submit work through this node.\n\nIt accepts the miner hash rate and an identifier which must be unique\nbetween nodes.\n", 
-        "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).SubmitHashRate@/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:92'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).SubmitHashRate", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:92"
         }, 
         "params": [
           {
@@ -3993,10 +3993,10 @@
         "name": "ethash_getHashrate", 
         "tags": [], 
         "summary": "GetHashrate returns the current hashrate for local CPU miner and remote miner.\n", 
-        "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).GetHashrate@/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:110'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).GetHashrate", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:110"
         }, 
         "params": [], 
         "result": {
@@ -4023,10 +4023,10 @@
         "name": "ethash_getWork", 
         "tags": [], 
         "summary": "GetWork returns a work package for external miner.\n\nThe work package consists of 3 strings:\n  result[0] - 32 bytes hex encoded current block header pow-hash\n  result[1] - 32 bytes hex encoded seed hash used for DAG\n  result[2] - 32 bytes hex encoded boundary condition (\"target\"), 2^256/difficulty\n  result[3] - hex encoded block number\n", 
-        "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).GetWork@/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:41'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).GetWork", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:41"
         }, 
         "params": [], 
         "result": {
@@ -4055,10 +4055,10 @@
         "name": "ethash_submitHashRate", 
         "tags": [], 
         "summary": "SubmitHashrate can be used for remote miners to submit their hash rate.\nThis enables the node to report the combined hash rate of all miners\nwhich submit work through this node.\n\nIt accepts the miner hash rate and an identifier which must be unique\nbetween nodes.\n", 
-        "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).SubmitHashRate@/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:92'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).SubmitHashRate", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:92"
         }, 
         "params": [
           {
@@ -4110,10 +4110,10 @@
         "name": "ethash_submitWork", 
         "tags": [], 
         "summary": "SubmitWork can be used by external miner to submit their POW solution.\nIt returns an indication if the work was accepted.\nNote either an invalid solution, a stale work a non-existent work will return false.\n", 
-        "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).SubmitWork@/home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:66'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/consensus/ethash.(*API).SubmitWork", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/consensus/ethash/api.go:66"
         }, 
         "params": [
           {
@@ -4184,10 +4184,10 @@
         "name": "miner_getHashrate", 
         "tags": [], 
         "summary": "GetHashrate returns the current hashrate of the miner.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).GetHashrate@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:153'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).GetHashrate", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:153"
         }, 
         "params": [], 
         "result": {
@@ -4214,10 +4214,10 @@
         "name": "miner_setEtherbase", 
         "tags": [], 
         "summary": "SetEtherbase sets the etherbase of the miner\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).SetEtherbase@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:142'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).SetEtherbase", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:142"
         }, 
         "params": [
           {
@@ -4256,10 +4256,10 @@
         "name": "miner_setExtra", 
         "tags": [], 
         "summary": "SetExtra sets the extra data string that is included when this miner mines a block.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).SetExtra@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:124'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).SetExtra", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:124"
         }, 
         "params": [
           {
@@ -4296,10 +4296,10 @@
         "name": "miner_setGasPrice", 
         "tags": [], 
         "summary": "SetGasPrice sets the minimum accepted gas price for the miner.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).SetGasPrice@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:132'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).SetGasPrice", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:132"
         }, 
         "params": [
           {
@@ -4343,10 +4343,10 @@
         "name": "miner_setRecommitInterval", 
         "tags": [], 
         "summary": "SetRecommitInterval updates the interval for miner sealing work recommitting.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).SetRecommitInterval@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:148'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).SetRecommitInterval", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:148"
         }, 
         "params": [
           {
@@ -4375,10 +4375,10 @@
         "name": "miner_start", 
         "tags": [], 
         "summary": "Start starts the miner with the given number of threads. If threads is nil,\nthe number of workers started is equal to the number of logical CPUs that are\nusable by this process. If mining is already running, this method adjust the\nnumber of threads allowed to use and updates the minimum price required by the\ntransaction pool.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).Start@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:110'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).Start", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:110"
         }, 
         "params": [
           {
@@ -4407,10 +4407,10 @@
         "name": "miner_stop", 
         "tags": [], 
         "summary": "Stop terminates the miner, both at the consensus engine level as well as at\nthe block creation level.\n", 
-        "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).Stop@/home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:119'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/eth.(*PrivateMinerAPI).Stop", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go:119"
         }, 
         "params": [], 
         "result": null, 
@@ -4425,10 +4425,10 @@
         "name": "personal_deriveAccount", 
         "tags": [], 
         "summary": "DeriveAccount requests a HD wallet to derive a new account, optionally pinning\nit for later reuse.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).DeriveAccount@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:266'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).DeriveAccount", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:266"
         }, 
         "params": [
           {
@@ -4519,10 +4519,10 @@
         "name": "personal_ecRecover", 
         "tags": [], 
         "summary": "EcRecover returns the address for the account that was used to create the signature.\nNote, this function is compatible with eth_sign and personal_sign. As such it recovers\nthe address of:\nhash = keccak256(\"\\x19Ethereum Signed Message:\\n\"${message length}${message})\naddr = ecrecover(hash, signature)\n\nNote, the signature must conform to the secp256k1 curve R, S and V values, where\nthe V value must be 27 or 28 for legacy reasons.\n\nhttps://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_ecRecover\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).EcRecover@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:444'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).EcRecover", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:444"
         }, 
         "params": [
           {
@@ -4576,10 +4576,10 @@
         "name": "personal_importRawKey", 
         "tags": [], 
         "summary": "ImportRawKey stores the given hex encoded ECDSA key into the key directory,\nencrypting it with the passphrase.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ImportRawKey@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:300'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ImportRawKey", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:300"
         }, 
         "params": [
           {
@@ -4629,10 +4629,10 @@
         "name": "personal_initializeWallet", 
         "tags": [], 
         "summary": "InitializeWallet initializes a new wallet at the provided URL, by generating and returning a new private key.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).InitializeWallet@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:467'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).InitializeWallet", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:467"
         }, 
         "params": [
           {
@@ -4669,10 +4669,10 @@
         "name": "personal_listAccounts", 
         "tags": [], 
         "summary": "listAccounts will return a list of addresses for accounts this node manages.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ListAccounts@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:216'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ListAccounts", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:216"
         }, 
         "params": [], 
         "result": {
@@ -4701,10 +4701,10 @@
         "name": "personal_listWallets", 
         "tags": [], 
         "summary": "ListWallets will return a list of wallets this node manages.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ListWallets@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:230'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ListWallets", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:230"
         }, 
         "params": [], 
         "result": {
@@ -4786,10 +4786,10 @@
         "name": "personal_lockAccount", 
         "tags": [], 
         "summary": "LockAccount will lock the account associated with the given address when it's unlocked.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).LockAccount@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:337'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).LockAccount", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:337"
         }, 
         "params": [
           {
@@ -4828,10 +4828,10 @@
         "name": "personal_newAccount", 
         "tags": [], 
         "summary": "NewAccount will create a new account and returns the address for the new account.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).NewAccount@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:282'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).NewAccount", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:282"
         }, 
         "params": [
           {
@@ -4870,10 +4870,10 @@
         "name": "personal_openWallet", 
         "tags": [], 
         "summary": "OpenWallet initiates a hardware wallet opening procedure, establishing a USB\nconnection and attempting to authenticate via the provided passphrase. Note,\nthe method may return an extra challenge requiring a second open (e.g. the\nTrezor PIN matrix challenge).\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).OpenWallet@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:252'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).OpenWallet", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:252"
         }, 
         "params": [
           {
@@ -4911,10 +4911,10 @@
         "name": "personal_sendTransaction", 
         "tags": [], 
         "summary": "SendTransaction will create a transaction from the given arguments and\ntries to sign it with the key associated with args.To. If the given passwd isn't\nable to decrypt the key it fails.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SendTransaction@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:364'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SendTransaction", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:364"
         }, 
         "params": [
           {
@@ -5024,10 +5024,10 @@
         "name": "personal_sign", 
         "tags": [], 
         "summary": "Sign calculates an Ethereum ECDSA signature for:\nkeccack256(\"\\x19Ethereum Signed Message:\\n\" + len(message) + message))\n\nNote, the produced signature conforms to the secp256k1 curve R, S and V values,\nwhere the V value will be 27 or 28 for legacy reasons.\n\nThe key used to calculate the signature is decrypted with the given password.\n\nhttps://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_sign\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).Sign@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:416'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).Sign", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:416"
         }, 
         "params": [
           {
@@ -5092,10 +5092,10 @@
         "name": "personal_signAndSendTransaction", 
         "tags": [], 
         "summary": "SignAndSendTransaction was renamed to SendTransaction. This method is deprecated\nand will be removed in the future. It primary goal is to give clients time to update.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SignAndSendTransaction@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:462'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SignAndSendTransaction", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:462"
         }, 
         "params": [
           {
@@ -5205,10 +5205,10 @@
         "name": "personal_signTransaction", 
         "tags": [], 
         "summary": "SignTransaction will create a transaction from the given arguments and\ntries to sign it with the key associated with args.To. If the given passwd isn't\nable to decrypt the key it fails. The transaction is returned in RLP-form, not broadcast\nto other nodes\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SignTransaction@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:383'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SignTransaction", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:383"
         }, 
         "params": [
           {
@@ -5350,10 +5350,10 @@
         "name": "personal_unlockAccount", 
         "tags": [], 
         "summary": "UnlockAccount will unlock the account associated with the given address with\nthe given password for duration seconds. If duration is nil it will use a\ndefault of 300 seconds. It returns an indication if the account was unlocked.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).UnlockAccount@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:312'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).UnlockAccount", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:312"
         }, 
         "params": [
           {
@@ -5416,10 +5416,10 @@
         "name": "personal_unpair", 
         "tags": [], 
         "summary": "Unpair deletes a pairing between wallet and geth.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).Unpair@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:494'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).Unpair", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:494"
         }, 
         "params": [
           {
@@ -5457,10 +5457,10 @@
         "name": "txpool_content", 
         "tags": [], 
         "summary": "Content returns the transactions contained within the transaction pool.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Content@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:111'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Content", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:111"
         }, 
         "params": [], 
         "result": {
@@ -5587,10 +5587,10 @@
         "name": "txpool_inspect", 
         "tags": [], 
         "summary": "Inspect retrieves the content of the transaction pool and flattens it into an\neasily inspectable list.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Inspect@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:148'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Inspect", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:148"
         }, 
         "params": [], 
         "result": {
@@ -5629,10 +5629,10 @@
         "name": "txpool_status", 
         "tags": [], 
         "summary": "Status returns the number of pending and queued transaction in the pool.\n", 
-        "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Status@/home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:138'", 
+        "description": "", 
         "externalDocs": {
-          "description": "", 
-          "url": ""
+          "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Status", 
+          "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:138"
         }, 
         "params": [], 
         "result": {

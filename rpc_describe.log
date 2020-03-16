@@ -1,6 +1,6 @@
 {
   "jsonrpc": "2.0", 
-  "id": 1584374383, 
+  "id": 1584375872, 
   "result": {
     "openrpc": "1.2.4", 
     "info": {
@@ -23,7 +23,7 @@
         "name": "tcp", 
         "url": "127.0.0.1:8545", 
         "summary": "", 
-        "description": "", 
+        "description": "CoreGeth/v1.11.2-unstable", 
         "variables": null
       }
     ], 
@@ -3561,7 +3561,7 @@
             "required": false, 
             "deprecated": false, 
             "schema": {
-              "description": ":\u0026{32624 0xc002d8e320 account}", 
+              "description": ":\u0026{32624 0xc0046b87c0 account}", 
               "type": "object", 
               "patternProperties": {
                 ".*": {

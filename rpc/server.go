@@ -31,6 +31,7 @@ import (
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
 
@@ -99,7 +100,7 @@ func NewServerWithListener(listener net.Listener) *Server {
 		Name:        listener.Addr().Network(),
 		URL:         listener.Addr().String(),
 		Summary:     "",
-		Description: "",
+		Description: params.VersionName+"/v"+params.VersionWithMeta,
 		Variables:   nil,
 	})
 	server.RegisterName(MetadataApi, rpcService)

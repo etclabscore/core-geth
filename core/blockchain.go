@@ -261,6 +261,7 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, chainConfig ctyp
 		if fullBlock != nil && fullBlock != bc.genesisBlock && fullBlock.NumberU64() < frozen-1 {
 			needRewind = true
 			low = fullBlock.NumberU64()
+			log.Warn("Blockchain needs rewind, low fullblock", "low", low, "frozen", frozen)
 		}
 		// In fast sync, it may happen that ancient data has been written to the
 		// ancient store, but the LastFastBlock has not been updated, truncate the
@@ -271,6 +272,7 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, chainConfig ctyp
 			if fastBlock.NumberU64() < low || low == 0 {
 				low = fastBlock.NumberU64()
 			}
+			log.Warn("Blockchain needs rewind, low fastblock", "low", low, "frozen", frozen)
 		}
 		if needRewind {
 			var hashes []common.Hash
@@ -278,8 +280,9 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, chainConfig ctyp
 			for i := low + 1; i <= bc.CurrentHeader().Number.Uint64(); i++ {
 				hashes = append(hashes, rawdb.ReadCanonicalHash(bc.db, i))
 			}
+			log.Warn("Blockchain rollback", "len", len(hashes))
 			bc.Rollback(hashes)
-			log.Warn("Truncate ancient chain", "from", previous, "to", low)
+			log.Warn("Truncated ancient chain", "from", previous, "to", low)
 		}
 	}
 	// Check the current state of the block hashes and make sure that we do not have any of the bad blocks in our chain
@@ -931,6 +934,15 @@ func (bc *BlockChain) Rollback(chain []common.Hash) {
 	}
 	if err := batch.Write(); err != nil {
 		log.Crit("Failed to rollback chain markers", "err", err)
+	} else {
+		log.Warn("Rolled back chain markers",
+			"full.number", bc.CurrentBlock().NumberU64(),
+			"full.hash", bc.CurrentBlock().Hash().Hex(),
+			"fast.number", bc.CurrentFastBlock().NumberU64(),
+			"fast.hash", bc.CurrentFastBlock().Hash().Hex(),
+			"header.number", bc.CurrentHeader().Number.Uint64(),
+			"header.hash", bc.CurrentHeader().Hash().Hex(),
+		)
 	}
 	// Truncate ancient data which exceeds the current header.
 	//
@@ -939,6 +951,8 @@ func (bc *BlockChain) Rollback(chain []common.Hash) {
 	// system will self recovery by truncating the extra data during the setup phase.
 	if err := bc.truncateAncient(bc.hc.CurrentHeader().Number.Uint64()); err != nil {
 		log.Crit("Truncate ancient store failed", "err", err)
+	} else {
+		log.Warn("Truncated ancient store", "number", bc.hc.CurrentHeader().Number.Uint64())
 	}
 }
 

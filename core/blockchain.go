@@ -1986,6 +1986,18 @@ func (bc *BlockChain) reorg(oldBlock, newBlock *types.Block) error {
 	if newBlock == nil {
 		return fmt.Errorf("invalid new chain")
 	}
+
+	if oldBlock.NumberU64() == newBlock.NumberU64() &&
+		oldBlock.Hash() == newBlock.Hash() {
+		log.Error("Reorg called for same blocks",
+			"oldnum", oldBlock.Number(),
+			"oldhash", oldBlock.Hash().Hex(),
+			"newnum", newBlock.Number(),
+			"newhash", newBlock.Hash().Hex(),
+		)
+		return fmt.Errorf("reorg new block same as old")
+	}
+
 	// Both sides of the reorg are at the same number, reduce both until the common
 	// ancestor is found
 	for {

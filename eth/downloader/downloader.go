@@ -818,6 +818,10 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 			return 0, errInvalidAncestor
 		}
 		p.log.Debug("Found common ancestor", "number", number, "hash", hash)
+		if number > localHeight {
+			p.log.Warn("Ancestor above local, setting to local", "local", localHeight, "ancestor", number)
+			number = localHeight
+		}
 		return number, nil
 	}
 	// Ancestor not found, we need to binary search over our chain

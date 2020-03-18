@@ -2024,8 +2024,17 @@ func (bc *BlockChain) reorg(oldBlock, newBlock *types.Block) error {
 		blockReorgAddMeter.Mark(int64(len(newChain)))
 		blockReorgDropMeter.Mark(int64(len(oldChain)))
 	} else {
-		log.Error("Impossible reorg, please file an issue", "oldnum", oldBlock.Number(), "oldhash", oldBlock.Hash(), "newnum", newBlock.Number(), "newhash", newBlock.Hash(), "oldchain.len", len(oldChain), "newchain.len", len(newChain))
-		return fmt.Errorf(fmt.Sprint("impossible reorg", "oldnum", oldBlock.Number(), "oldhash", oldBlock.Hash(), "newnum", newBlock.Number(), "newhash", newBlock.Hash(), "oldchain.len", len(oldChain), "newchain.len", len(newChain)))
+		errorArgs := []interface{}{
+			"Impossible reorg, please file an issue",
+			"oldnum", oldBlock.Number(),
+			"oldhash", oldBlock.Hash().Hex(),
+			"newnum", newBlock.Number(),
+			"newhash", newBlock.Hash().Hex(),
+			"oldchain.len", len(oldChain),
+			"newchain.len", len(newChain),
+		}
+		log.Error(errorArgs[0].(string), errorArgs[1:]...)
+		return errors.New(fmt.Sprintln(errorArgs...))
 	}
 	// Insert the new chain(except the head block(reverse order)),
 	// taking care of the proper incremental order.

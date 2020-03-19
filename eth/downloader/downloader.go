@@ -710,8 +710,10 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 		localHeight = d.blockchain.CurrentBlock().NumberU64()
 	case FastSync:
 		localHeight = d.blockchain.CurrentFastBlock().NumberU64()
-	default:
+	case LightSync:
 		localHeight = d.lightchain.CurrentHeader().Number.Uint64()
+	default:
+		panic("unknown sync mode: " + d.mode.String())
 	}
 	p.log.Debug("Looking for common ancestor", "local", localHeight, "remote", remoteHeight)
 
@@ -793,8 +795,10 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 					known = d.blockchain.HasBlock(h, n)
 				case FastSync:
 					known = d.blockchain.HasFastBlock(h, n)
-				default:
+				case LightSync:
 					known = d.lightchain.HasHeader(h, n)
+				default:
+					panic("unknown sync mode: " + d.mode.String())
 				}
 				if known {
 					number, hash = n, h
@@ -866,8 +870,10 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 					known = d.blockchain.HasBlock(h, n)
 				case FastSync:
 					known = d.blockchain.HasFastBlock(h, n)
-				default:
+				case LightSync:
 					known = d.lightchain.HasHeader(h, n)
+				default:
+					panic("unknown sync mode: " + d.mode.String())
 				}
 				if !known {
 					end = check

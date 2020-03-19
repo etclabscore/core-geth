@@ -917,16 +917,26 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 
 	// Only attempt span search if local head is "close" to reported remote
 	if remoteHeight-localHeight < uint64(MaxHeaderFetch) {
-		u, err := d.findAncestorSpanSearch(p, remoteHeight, localHeight, floor)
+		a, err := d.findAncestorSpanSearch(p, remoteHeight, localHeight, floor)
 		if err == nil {
-			return u, nil
+			if a > localHeight {
+				a = localHeight
+			}
+			return a, nil
 		} else if err != errNoCommonAncestorFound {
 			return 0, err
 		}
 	}
 
 	// Ancestor not found, we need to binary search over our chain
-	return d.findAncestorBinarySearch(p, remoteHeight, floor)
+	a, err := d.findAncestorBinarySearch(p, remoteHeight, floor)
+	if err != nil {
+		return 0, err
+	}
+	if a > localHeight {
+		a = localHeight
+	}
+	return a, nil
 }
 
 // fetchHeaders keeps retrieving headers concurrently from the number

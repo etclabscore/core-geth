@@ -653,7 +653,7 @@ func calculateRequestSpan(remoteHeight, localHeight uint64) (int64, int, int, ui
 	var (
 		from     int
 		count    int
-		MaxCount = MaxHeaderFetch / 16
+		MaxCount = MaxHeaderFetch / 16 // MaxHeaderFetch = 192 => 12
 	)
 	// requestHead is the highest block that we will ask for. If requestHead is not offset,
 	// the highest block that we will get is 16 blocks back from head, which means we
@@ -710,7 +710,7 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 		localHeight = d.blockchain.CurrentBlock().NumberU64()
 	case FastSync:
 		localHeight = d.blockchain.CurrentFastBlock().NumberU64()
-	default:
+	case LightSync:
 		localHeight = d.lightchain.CurrentHeader().Number.Uint64()
 	}
 	p.log.Debug("Looking for common ancestor", "local", localHeight, "remote", remoteHeight)
@@ -793,7 +793,7 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 					known = d.blockchain.HasBlock(h, n)
 				case FastSync:
 					known = d.blockchain.HasFastBlock(h, n)
-				default:
+				case LightSync:
 					known = d.lightchain.HasHeader(h, n)
 				}
 				if known {
@@ -825,15 +825,15 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 		return number, nil
 	}
 	// Ancestor not found, we need to binary search over our chain
-	start, end := uint64(0), remoteHeight
+	ancestorCandidate, end := uint64(0), remoteHeight
 	if floor > 0 {
-		start = uint64(floor)
+		ancestorCandidate = uint64(floor)
 	}
-	p.log.Trace("Binary searching for common ancestor", "start", start, "end", end)
+	p.log.Trace("Binary searching for common ancestor", "start", ancestorCandidate, "end", end)
 
-	for start+1 < end {
+	for ancestorCandidate+1 < end {
 		// Split our chain interval in two, and request the hash to cross check
-		check := (start + end) / 2
+		check := (ancestorCandidate + end) / 2
 
 		ttl := d.requestTTL()
 		timeout := time.After(ttl)
@@ -882,7 +882,7 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 					p.log.Debug("Received non requested header", "number", header.Number, "hash", header.Hash(), "request", check)
 					return 0, errBadPeer
 				}
-				start = check
+				ancestorCandidate = check
 				hash = h
 
 			case <-timeout:
@@ -896,12 +896,12 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 		}
 	}
 	// Ensure valid ancestry and return
-	if int64(start) <= floor {
-		p.log.Warn("Ancestor below allowance", "number", start, "hash", hash, "allowance", floor)
+	if int64(ancestorCandidate) <= floor {
+		p.log.Warn("Ancestor below allowance", "number", ancestorCandidate, "hash", hash, "allowance", floor)
 		return 0, errInvalidAncestor
 	}
-	p.log.Debug("Found common ancestor", "number", start, "hash", hash)
-	return start, nil
+	p.log.Debug("Found common ancestor", "number", ancestorCandidate, "hash", hash)
+	return ancestorCandidate, nil
 }
 
 // fetchHeaders keeps retrieving headers concurrently from the number

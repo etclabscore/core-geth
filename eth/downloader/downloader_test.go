@@ -1621,6 +1621,27 @@ func TestRemoteHeaderRequestSpan(t *testing.T) {
 	}
 }
 
+func TestCalculateRequestSpan(t *testing.T) {
+	cases := []struct{
+		local, remote uint64
+	}{
+		{0, 8_888_888},
+		{0, 8},
+		{2_000_000, 2_000_500},
+		{2_000_000, 8_888_888},
+		{8_888_880, 8_888_888},
+	}
+
+	for _, c := range cases {
+		from, count, skip, max := calculateRequestSpan(c.remote, c.local)
+		t.Logf("local=%d remote=%d : from=%d count=%d skip=%d max=%d (from/max delta=%d)",
+			c.local, c.remote,
+			from, count, skip, max,
+			max-uint64(from),
+		)
+	}
+}
+
 // Tests that peers below a pre-configured checkpoint block are prevented from
 // being fast-synced from, avoiding potential cheap eclipse attacks.
 func TestCheckpointEnforcement62(t *testing.T)      { testCheckpointEnforcement(t, 62, FullSync) }

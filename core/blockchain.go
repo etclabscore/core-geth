@@ -275,14 +275,19 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, chainConfig ctyp
 			log.Warn("Blockchain needs rewind, low fastblock", "low", low, "frozen", frozen)
 		}
 		if needRewind {
-			var hashes []common.Hash
-			previous := bc.CurrentHeader().Number.Uint64()
-			for i := low + 1; i <= bc.CurrentHeader().Number.Uint64(); i++ {
-				hashes = append(hashes, rawdb.ReadCanonicalHash(bc.db, i))
+			if low == fullBlock.NumberU64() {
+				if err := bc.SetHead(low); err != nil {
+					return bc, err
+				}
+			} else {
+				var hashes []common.Hash
+				for i := low; i <= bc.CurrentHeader().Number.Uint64(); i++ {
+					hashes = append(hashes, rawdb.ReadCanonicalHash(bc.db, i))
+				}
+				log.Warn("Blockchain rollback", "len", len(hashes))
+				bc.Rollback(hashes)
 			}
-			log.Warn("Blockchain rollback", "len", len(hashes))
-			bc.Rollback(hashes)
-			log.Warn("Truncated ancient chain", "from", previous, "to", low)
+
 		}
 	}
 	// Check the current state of the block hashes and make sure that we do not have any of the bad blocks in our chain
@@ -344,12 +349,13 @@ func (bc *BlockChain) loadLastState() error {
 		return bc.Reset()
 	}
 	// Make sure the state associated with the block is available
-	if _, err := bc.StateAt(currentBlock.Root()); err != nil {
+	if !bc.HasState(currentBlock.Root()) {
 		// Dangling block without a state associated, init from scratch
 		log.Warn("Head state missing, repairing chain", "number", currentBlock.Number(), "hash", currentBlock.Hash())
-		if err := bc.getLatestBlockWithState(&currentBlock); err != nil {
+		if err := bc.getLatestBlockWithState(currentBlock); err != nil {
 			return err
 		}
+		bc.Reset()
 		rawdb.WriteHeadBlockHash(bc.db, currentBlock.Hash())
 	}
 	// Everything seems to be fine, set as the head block
@@ -578,19 +584,22 @@ func (bc *BlockChain) ResetWithGenesisBlock(genesis *types.Block) error {
 //
 // This method only rolls back the current block. The current header and current
 // fast block are left intact.
-func (bc *BlockChain) getLatestBlockWithState(head **types.Block) error {
+func (bc *BlockChain) getLatestBlockWithState(head *types.Block) error {
+	var check = &types.Block{}
+	*check = *head
 	for {
 		// Abort if we've rewound to a head block that does have associated state
-		if _, err := bc.StateAt((*head).Root()); err == nil {
-			log.Info("Rewound blockchain to past state", "number", (*head).Number(), "hash", (*head).Hash())
+		if bc.HasState(check.Root()) {
+			log.Info("Found latest block with state", "number", (*head).Number(), "hash", (*head).Hash())
+			*head = *check
 			return nil
 		}
 		// Otherwise rewind one block and recheck state availability there
-		block := bc.GetBlock((*head).ParentHash(), (*head).NumberU64()-1)
-		if block == nil {
-			return fmt.Errorf("missing block %d [%x]", (*head).NumberU64()-1, (*head).ParentHash())
+		back := bc.GetBlock(check.ParentHash(), check.NumberU64()-1)
+		if back == nil {
+			return fmt.Errorf("missing block %d [%x]", check.NumberU64()-1, check.ParentHash())
 		}
-		*head = block
+		*check = *back
 	}
 }
 
@@ -906,6 +915,7 @@ func (bc *BlockChain) Rollback(chain []common.Hash) {
 	defer bc.chainmu.Unlock()
 
 	batch := bc.db.NewBatch()
+	previousCurrentHeader := bc.hc.CurrentHeader()
 	for i := len(chain) - 1; i >= 0; i-- {
 		hash := chain[i]
 
@@ -936,13 +946,14 @@ func (bc *BlockChain) Rollback(chain []common.Hash) {
 		log.Crit("Failed to rollback chain markers", "err", err)
 	} else {
 		log.Warn("Rolled back chain markers",
+			"previous.header.number", previousCurrentHeader.Number.Uint64(),
+			"previous.header.hex", previousCurrentHeader.Hash().Hex(),
 			"full.number", bc.CurrentBlock().NumberU64(),
 			"full.hash", bc.CurrentBlock().Hash().Hex(),
 			"fast.number", bc.CurrentFastBlock().NumberU64(),
 			"fast.hash", bc.CurrentFastBlock().Hash().Hex(),
 			"header.number", bc.CurrentHeader().Number.Uint64(),
-			"header.hash", bc.CurrentHeader().Hash().Hex(),
-		)
+			"header.hash", bc.CurrentHeader().Hash().Hex())
 	}
 	// Truncate ancient data which exceeds the current header.
 	//
@@ -952,7 +963,10 @@ func (bc *BlockChain) Rollback(chain []common.Hash) {
 	if err := bc.truncateAncient(bc.hc.CurrentHeader().Number.Uint64()); err != nil {
 		log.Crit("Truncate ancient store failed", "err", err)
 	} else {
-		log.Warn("Truncated ancient store", "number", bc.hc.CurrentHeader().Number.Uint64())
+		log.Warn("Truncated ancient store",
+			"current", bc.hc.CurrentHeader().Number.Uint64(),
+			"previous.header.number", previousCurrentHeader.Number.Uint64(),
+			"previous.header.hex", previousCurrentHeader.Hash().Hex())
 	}
 }
 
@@ -1725,7 +1739,6 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 		if err != nil {
 			return it.index, err
 		}
-
 		// Update the metrics touched during block commit
 		accountCommitTimer.Update(statedb.AccountCommits) // Account commits are complete, we can mark them
 		storageCommitTimer.Update(statedb.StorageCommits) // Storage commits are complete, we can mark them

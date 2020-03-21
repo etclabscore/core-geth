@@ -18,6 +18,7 @@ package params
 import (
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
@@ -70,5 +71,9 @@ var (
 		ECIP1017EraRounds:  big.NewInt(2000000),
 		ECIP1010PauseBlock: nil,
 		ECIP1010Length:     nil,
+		RequireBlockHashes: map[uint64]common.Hash{
+			840013: common.HexToHash("0x2ceada2b191879b71a5bcf2241dd9bc50d6d953f1640e62f9c2cee941dc61c9d"),
+			840014: common.HexToHash("0x8ec29dd692c8985b82410817bac232fc82805b746538d17bc924624fe74a0fcf"),
+		},
 	}
 )

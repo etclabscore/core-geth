@@ -122,6 +122,7 @@ func TestCreation(t *testing.T) {
 			},
 		},
 		{
+			"classic",
 			params.ClassicChainConfig,
 			params.MainnetGenesisHash,
 			[]testcase{
@@ -158,6 +159,7 @@ func TestCreation(t *testing.T) {
 			},
 		},
 		{
+			"kotti",
 			params.KottiChainConfig,
 			params.KottiGenesisHash,
 			[]testcase{
@@ -194,6 +196,7 @@ func TestCreation(t *testing.T) {
 			},
 		},
 		{
+			"mordor",
 			params.MordorChainConfig,
 			params.MordorGenesisHash,
 			[]testcase{

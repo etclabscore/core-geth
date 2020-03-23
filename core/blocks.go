@@ -22,4 +22,5 @@ import "github.com/ethereum/go-ethereum/common"
 var BadHashes = map[common.Hash]bool{
 	common.HexToHash("05bef30ef572270f654746da22639a7a0c97dd97a7050b9e252391996aaeb689"): true,
 	common.HexToHash("7d05d08cbc596a2e5e4f13b80a743e53e09221b5323c3a61946b20873e58583f"): true,
+	common.HexToHash("0x10bb4614cd887b70ac55635a94cba06ba8e5ffe0c7a7af5d12865daf3185f9e0"): true, // ETH: 9679398
 }

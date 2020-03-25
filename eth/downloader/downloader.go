@@ -81,6 +81,7 @@ var (
 	errTimeout                 = errors.New("timeout")
 	errEmptyHeaderSet          = errors.New("empty header set by peer")
 	errPeersUnavailable        = errors.New("no peers available or all tried for download")
+	errNoAncestor              = errors.New("no common ancestor")
 	errInvalidAncestor         = errors.New("retrieved ancestor is invalid")
 	errInvalidChain            = errors.New("retrieved hash chain is invalid")
 	errInvalidBody             = errors.New("retrieved block body is invalid")
@@ -701,8 +702,80 @@ func calculateRequestSpan(remoteHeight, localHeight uint64) (int64, int, int, ui
 	return int64(from), count, span - 1, uint64(max)
 }
 
-var errNoCommonAncestorFound = errors.New("no common ancestor")
+// findAncestor tries to locate the common ancestor link of the local chain and
+// a remote peers blockchain. In the general case when our node was in sync and
+// on the correct chain, checking the top N links should already get us a match.
+// In the rare scenario when we ended up on a long reorganisation (i.e. none of
+// the head links match), we do a binary search to find the common ancestor.
+func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header) (uint64, error) {
+	// Figure out the valid ancestor range to prevent rewrite attacks
+	var (
+		floor        = int64(-1)
+		localHeight  uint64
+		remoteHeight = remoteHeader.Number.Uint64()
+	)
+	switch d.mode {
+	case FullSync:
+		localHeight = d.blockchain.CurrentBlock().NumberU64()
+	case FastSync:
+		localHeight = d.blockchain.CurrentFastBlock().NumberU64()
+	case LightSync:
+		localHeight = d.lightchain.CurrentHeader().Number.Uint64()
+	default:
+		log.Crit("unknown sync mode", "mode", d.mode)
+	}
+	p.log.Debug("Looking for common ancestor", "local", localHeight, "remote", remoteHeight)
 
+	// Recap floor value for binary search
+	if localHeight >= maxForkAncestry {
+		// We're above the max reorg threshold, find the earliest fork point
+		floor = int64(localHeight - maxForkAncestry)
+	}
+	// If we're doing a light sync, ensure the floor doesn't go below the CHT, as
+	// all headers before that point will be missing.
+	if d.mode == LightSync {
+		// If we dont know the current CHT position, find it
+		if d.genesis == 0 {
+			header := d.lightchain.CurrentHeader()
+			for header != nil {
+				d.genesis = header.Number.Uint64()
+				if floor >= int64(d.genesis)-1 {
+					break
+				}
+				header = d.lightchain.GetHeaderByHash(header.ParentHash)
+			}
+		}
+		// We already know the "genesis" block number, cap floor to that
+		if floor < int64(d.genesis)-1 {
+			floor = int64(d.genesis) - 1
+		}
+	}
+
+	// Only attempt span search if local head is "close" to reported remote
+	if remoteHeight-localHeight < uint64(MaxHeaderFetch) {
+		a, err := d.findAncestorSpanSearch(p, remoteHeight, localHeight, floor)
+		if err == nil {
+			if a > localHeight {
+				a = localHeight
+			}
+			return a, nil
+		} else if err != errNoAncestor {
+			return 0, err
+		}
+	}
+
+	// Ancestor not found, we need to binary search over our chain
+	a, err := d.findAncestorBinarySearch(p, remoteHeight, floor)
+	if err != nil {
+		return 0, err
+	}
+	if a > localHeight {
+		a = localHeight
+	}
+	return a, nil
+}
+
+// findAncestorSpanSearch looks for a common ancestor by requesting a spaced set of headers between ours and theirs.
 func (d *Downloader) findAncestorSpanSearch(p *peerConnection, remoteHeight, localHeight uint64, floor int64) (uint64, error) {
 	from, count, skip, max := calculateRequestSpan(remoteHeight, localHeight)
 
@@ -787,9 +860,10 @@ func (d *Downloader) findAncestorSpanSearch(p *peerConnection, remoteHeight, loc
 		p.log.Debug("Found common ancestor", "number", number, "hash", hash)
 		return number, nil
 	}
-	return 0, errNoCommonAncestorFound
+	return 0, errNoAncestor
 }
 
+// findAncestorBinarySearch negotiates a binary search using their reported chain.
 func (d *Downloader) findAncestorBinarySearch(p *peerConnection, remoteHeight uint64, floor int64) (uint64, error) {
 	start, end := uint64(0), remoteHeight
 	if floor > 0 {
@@ -872,79 +946,6 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, remoteHeight ui
 	}
 	p.log.Debug("Found common ancestor", "number", start, "hash", hash)
 	return start, nil
-}
-
-// findAncestor tries to locate the common ancestor link of the local chain and
-// a remote peers blockchain. In the general case when our node was in sync and
-// on the correct chain, checking the top N links should already get us a match.
-// In the rare scenario when we ended up on a long reorganisation (i.e. none of
-// the head links match), we do a binary search to find the common ancestor.
-func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header) (uint64, error) {
-	// Figure out the valid ancestor range to prevent rewrite attacks
-	var (
-		floor        = int64(-1)
-		localHeight  uint64
-		remoteHeight = remoteHeader.Number.Uint64()
-	)
-	switch d.mode {
-	case FullSync:
-		localHeight = d.blockchain.CurrentBlock().NumberU64()
-	case FastSync:
-		localHeight = d.blockchain.CurrentFastBlock().NumberU64()
-	case LightSync:
-		localHeight = d.lightchain.CurrentHeader().Number.Uint64()
-	default:
-		log.Crit("unknown sync mode", "mode", d.mode)
-	}
-	p.log.Debug("Looking for common ancestor", "local", localHeight, "remote", remoteHeight)
-
-	// Recap floor value for binary search
-	if localHeight >= maxForkAncestry {
-		// We're above the max reorg threshold, find the earliest fork point
-		floor = int64(localHeight - maxForkAncestry)
-	}
-	// If we're doing a light sync, ensure the floor doesn't go below the CHT, as
-	// all headers before that point will be missing.
-	if d.mode == LightSync {
-		// If we dont know the current CHT position, find it
-		if d.genesis == 0 {
-			header := d.lightchain.CurrentHeader()
-			for header != nil {
-				d.genesis = header.Number.Uint64()
-				if floor >= int64(d.genesis)-1 {
-					break
-				}
-				header = d.lightchain.GetHeaderByHash(header.ParentHash)
-			}
-		}
-		// We already know the "genesis" block number, cap floor to that
-		if floor < int64(d.genesis)-1 {
-			floor = int64(d.genesis) - 1
-		}
-	}
-
-	// Only attempt span search if local head is "close" to reported remote
-	if remoteHeight-localHeight < uint64(MaxHeaderFetch) {
-		a, err := d.findAncestorSpanSearch(p, remoteHeight, localHeight, floor)
-		if err == nil {
-			if a > localHeight {
-				a = localHeight
-			}
-			return a, nil
-		} else if err != errNoCommonAncestorFound {
-			return 0, err
-		}
-	}
-
-	// Ancestor not found, we need to binary search over our chain
-	a, err := d.findAncestorBinarySearch(p, remoteHeight, floor)
-	if err != nil {
-		return 0, err
-	}
-	if a > localHeight {
-		a = localHeight
-	}
-	return a, nil
 }
 
 // fetchHeaders keeps retrieving headers concurrently from the number

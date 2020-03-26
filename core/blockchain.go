@@ -1626,7 +1626,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 	switch {
 	// First block is pruned, insert as sidechain and reorg only if TD grows enough
 	case err == consensus.ErrPrunedAncestor:
-		if bc.CurrentBlock().NumberU64() > block.NumberU64() + vars.ImmutabilityThreshold {
+		if bc.CurrentBlock().NumberU64() > block.NumberU64()+vars.ImmutabilityThreshold {
 			return it.index, fmt.Errorf("pruned ancestor block too old number=%d hash=%x", block.NumberU64(), block.Hash())
 		}
 		log.Debug("Pruned ancestor, inserting as sidechain", "number", block.Number(), "hash", block.Hash())

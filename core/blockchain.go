@@ -343,13 +343,43 @@ func (bc *BlockChain) loadLastState() error {
 		// NOTE: The following comment is perhaps the shadow of a troubled past, and a clue in our detective story.
 		// Dangling block without a state associated, init from scratch
 		log.Warn("Head state missing, repairing chain", "number", currentBlock.Number(), "hash", currentBlock.Hash())
+
+		badHeight := currentBlock.NumberU64()
+		// Set currentBlock to the first (block number chronologically) ok block.
+		// Worst case scenario is genesis.
 		if err := bc.repair(&currentBlock); err != nil {
 			return err
 		}
-		if err := bc.SetHead(currentBlock.NumberU64()); err != nil {
-			return err
+
+		// Clear out all ancients above new currentHead
+		frozen, _ := bc.db.Ancients()
+		if n := currentBlock.NumberU64(); frozen > n {
+			if err := bc.db.TruncateAncients(n + 1); err != nil {
+				log.Crit("Failed to truncate ancient data", "number", n, "err", err)
+				return err
+			}
 		}
-		//rawdb.WriteHeadBlockHash(bc.db, currentBlock.Hash())
+
+		// Leave the headers.
+
+		// Purge block data above the new currentHead
+		for n := badHeight; n > currentBlock.NumberU64(); n-- {
+			// We know that the block above the current head are not nil.
+			b := bc.GetBlockByNumber(n)
+			if bc.HasBlock(b.Hash(), b.NumberU64()) {
+				//if bc.HasState(b.Root()) {
+				//st, _ := bc.StateAt(b.Root())
+				//}
+				rawdb.DeleteBlock(bc.db, b.Hash(), b.NumberU64())
+				rawdb.DeleteCanonicalHash(bc.db, b.NumberU64())
+			}
+		}
+
+		rawdb.WriteHeadBlockHash(bc.db, currentBlock.Hash())
+
+		//if err := bc.SetHead(currentBlock.NumberU64()); err != nil {
+		//	return err
+		//}
 	}
 	// Everything seems to be fine, set as the head block
 	bc.currentBlock.Store(currentBlock)
@@ -583,7 +613,7 @@ func (bc *BlockChain) repair(head **types.Block) error {
 	// if the block is bad, set it's parent as head;
 	// if the block is missing (canonical DNE), return an error.
 	var iterb *types.Block
-	for it := (*iterb).NumberU64()-1; it >= 0; it-- {
+	for it := (*iterb).NumberU64() - 1; it >= 0; it-- {
 		iterb = bc.GetBlockByNumber(it)
 		if iterb == nil {
 			return fmt.Errorf("missing block %d", it)
@@ -591,7 +621,7 @@ func (bc *BlockChain) repair(head **types.Block) error {
 		bad := !bc.HasBlockAndState(iterb.Hash(), iterb.NumberU64())
 		if bad {
 			// Shouldn't have issue in case of near genesis, assuming bc will always have genesis.
-			*head = bc.GetBlockByNumber(it-1)
+			*head = bc.GetBlockByNumber(it - 1)
 		}
 	}
 

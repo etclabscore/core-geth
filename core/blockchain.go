@@ -574,19 +574,16 @@ func (bc *BlockChain) ResetWithGenesisBlock(genesis *types.Block) error {
 // This method only rolls back the current block. The current header and current
 // fast block are left intact.
 func (bc *BlockChain) repair(head **types.Block) error {
-	for {
-		// Abort if we've rewound to a head block that does have associated state
-		if _, err := state.New((*head).Root(), bc.stateCache); err == nil {
-			log.Info("Rewound blockchain to past state", "number", (*head).Number(), "hash", (*head).Hash())
-			return nil
-		}
-		// Otherwise rewind one block and recheck state availability there
+	for *head != nil && !bc.HasBlockAndState((*head).Hash(), (*head).NumberU64()) {
+
 		block := bc.GetBlock((*head).ParentHash(), (*head).NumberU64()-1)
 		if block == nil {
 			return fmt.Errorf("missing block %d [%x]", (*head).NumberU64()-1, (*head).ParentHash())
 		}
+
 		*head = block
 	}
+	return nil
 }
 
 // Export writes the active chain to the given writer.

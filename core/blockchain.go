@@ -574,15 +574,32 @@ func (bc *BlockChain) ResetWithGenesisBlock(genesis *types.Block) error {
 // This method only rolls back the current block. The current header and current
 // fast block are left intact.
 func (bc *BlockChain) repair(head **types.Block) error {
-	for *head != nil && !bc.HasBlockAndState((*head).Hash(), (*head).NumberU64()) {
 
-		block := bc.GetBlock((*head).ParentHash(), (*head).NumberU64()-1)
-		if block == nil {
-			return fmt.Errorf("missing block %d [%x]", (*head).NumberU64()-1, (*head).ParentHash())
+	// For every number between head and 0,
+	// if the block is bad, set it's parent as head;
+	// if the block is missing (canonical DNE), return an error.
+	var iterb *types.Block
+	for it := (*iterb).NumberU64()-1; it >= 0; it-- {
+		iterb = bc.GetBlockByNumber(it)
+		if iterb == nil {
+			return fmt.Errorf("missing block %d", it)
 		}
-
-		*head = block
+		bad := !bc.HasBlockAndState(iterb.Hash(), iterb.NumberU64())
+		if bad {
+			// Shouldn't have issue in case of near genesis, assuming bc will always have genesis.
+			*head = bc.GetBlockByNumber(it-1)
+		}
 	}
+
+	//for *head != nil && !bc.HasBlockAndState((*head).Hash(), (*head).NumberU64()) {
+	//
+	//	block := bc.GetBlock((*head).ParentHash(), (*head).NumberU64()-1)
+	//	if block == nil {
+	//		return fmt.Errorf("missing block %d [%x]", (*head).NumberU64()-1, (*head).ParentHash())
+	//	}
+	//
+	//	*head = block
+	//}
 	return nil
 }
 

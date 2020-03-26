@@ -360,8 +360,6 @@ func (bc *BlockChain) loadLastState() error {
 			}
 		}
 
-		// Leave the headers.
-
 		// Purge block data above the new currentHead
 		for n := badHeight; n > currentBlock.NumberU64(); n-- {
 			// We know that the block above the current head are not nil.

@@ -612,7 +612,7 @@ func (bc *BlockChain) repair(head **types.Block) error {
 	// if the block is bad, set it's parent as head;
 	// if the block is missing (canonical DNE), return an error.
 	var iterb *types.Block
-	for it := (*iterb).NumberU64() - 1; it >= 0; it-- {
+	for it := (*head).NumberU64() - 1; it >= 0; it-- {
 		iterb = bc.GetBlockByNumber(it)
 		if iterb == nil {
 			return fmt.Errorf("missing block %d", it)

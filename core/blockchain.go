@@ -340,12 +340,16 @@ func (bc *BlockChain) loadLastState() error {
 	}
 	// Make sure the state associated with the block is available
 	if _, err := state.New(currentBlock.Root(), bc.stateCache); err != nil {
+		// NOTE: The following comment is perhaps the shadow of a troubled past, and a clue in our detective story.
 		// Dangling block without a state associated, init from scratch
 		log.Warn("Head state missing, repairing chain", "number", currentBlock.Number(), "hash", currentBlock.Hash())
 		if err := bc.repair(&currentBlock); err != nil {
 			return err
 		}
-		rawdb.WriteHeadBlockHash(bc.db, currentBlock.Hash())
+		if err := bc.SetHead(currentBlock.NumberU64()); err != nil {
+			return err
+		}
+		//rawdb.WriteHeadBlockHash(bc.db, currentBlock.Hash())
 	}
 	// Everything seems to be fine, set as the head block
 	bc.currentBlock.Store(currentBlock)

@@ -392,7 +392,11 @@ func validateFreezerVsKV(freezerdb *freezer, db ethdb.KeyValueStore) error {
 
 func truncateKVtoFreezer(freezerdb *freezer, db ethdb.KeyValueStore) {
 	hhh := ReadHeadHeaderHash(db)
-	n := *ReadHeaderNumber(db, hhh)
+	hn := ReadHeaderNumber(db, hhh)
+	if hn == nil {
+		return
+	}
+	n := *hn
 	frozen, _ := freezerdb.Ancients()
 
 	normalize := func(n *uint64) uint64 {

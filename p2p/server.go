@@ -1059,12 +1059,14 @@ type NodeInfo struct {
 	Enode string `json:"enode"` // Enode URL for adding this peer from remote peers
 	ENR   string `json:"enr"`   // Ethereum Node Record
 	IP    string `json:"ip"`    // IP address of the node
-	Ports struct {
-		Discovery int `json:"discovery"` // UDP listening port for discovery protocol
-		Listener  int `json:"listener"`  // TCP listening port for RLPx
-	} `json:"ports"`
+	Ports NodeInfoPorts `json:"ports"`
 	ListenAddr string                 `json:"listenAddr"`
 	Protocols  map[string]interface{} `json:"protocols"`
+}
+
+type NodeInfoPorts struct {
+	Discovery int `json:"discovery"` // UDP listening port for discovery protocol
+	Listener int `json:"listener"` // TCP listening port for RLPx
 }
 
 // NodeInfo gathers and returns a collection of metadata known about the host.

@@ -102,8 +102,19 @@ func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
 		},
 		Servers:      []goopenrpcT.Server{},
 		Methods:      []goopenrpcT.Method{},
-		Components:   goopenrpcT.Components{},
-		ExternalDocs: goopenrpcT.ExternalDocs{},
+		Components:   goopenrpcT.Components{
+			ContentDescriptors:    make(map[string]*goopenrpcT.ContentDescriptor),
+			Schemas:               make(map[string]spec.Schema),
+			Examples:              make(map[string]goopenrpcT.Example),
+			Links:                 make(map[string]goopenrpcT.Link),
+			Errors:                make(map[string]goopenrpcT.Error),
+			ExamplePairingObjects: make(map[string]goopenrpcT.ExamplePairing),
+			Tags:                  make(map[string]goopenrpcT.Tag),
+		},
+		ExternalDocs: goopenrpcT.ExternalDocs{
+			Description: "Source",
+			URL: "https://github.com/etclabscore/core-geth",
+		},
 		Objects:      nil,
 	}
 
@@ -170,7 +181,7 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (
 			URL:         fmt.Sprintf("file://%s:%d", file, line),
 		},
 		Params: []*goopenrpcT.ContentDescriptor{},
-		//Result:         &goopenrpcT.ContentDescriptor{},
+		Result:         &goopenrpcT.ContentDescriptor{},
 		Deprecated:     false,
 		Servers:        []goopenrpcT.Server{},
 		Errors:         []goopenrpcT.Error{},
@@ -178,6 +189,14 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (
 		ParamStructure: "by-position",
 		Examples:       []goopenrpcT.ExamplePairing{},
 	}
+
+	defer func() {
+		if m.Result.Name == "" {
+			m.Result.Name = "null"
+			m.Result.Schema.Type = []string{"null"}
+			m.Result.Schema.Description = "Null"
+		}
+	}()
 
 	if fn.Type.Params != nil {
 		j := 0
@@ -363,9 +382,9 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 	cd.Description = field.Comment.Text()
 
 	rflctr := jsonschema.Reflector{
-		AllowAdditionalProperties:  false,
+		AllowAdditionalProperties:  false, // false,
 		RequiredFromJSONSchemaTags: false,
-		ExpandedStruct:             false,
+		ExpandedStruct:             false, // false,
 		//IgnoredTypes:               []interface{}{chaninterface},
 		TypeMapper: OpenRPCJSONSchemaTypeMapper,
 	}

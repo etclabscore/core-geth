@@ -82,3 +82,6 @@ require (
 
 // see https://github.com/golang/lint/issues/436#issuecomment-482066447
 replace github.com/golang/lint v0.0.0-20190409202823-959b441ac422 => github.com/golang/lint v0.0.0-20190409202823-5614ed5bae6fb75893070bdc0996a68765fdd275
+
+// Use a local development version, managed as a submodule.
+replace github.com/gregdhill/go-openrpc => ./go-openrpc

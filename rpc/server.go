@@ -96,9 +96,16 @@ func NewServerWithListener(listener net.Listener) *Server {
 	// Register the default service providing meta information about the RPC service such
 	// as the services and methods it offers.
 	rpcService := &RPCService{server: server, doc: NewOpenRPCDescription(server)}
+	network := listener.Addr().Network()
+	url := listener.Addr().String()
+	if network == "tcp" || network == "udp" {
+		url = "http://"+url // TODO: https:// ?
+	} else if network == "ipc" {
+		url = "ipc:"+url
+	}
 	rpcService.doc.Doc.Servers = append(rpcService.doc.Doc.Servers, goopenrpcT.Server{
-		Name:        listener.Addr().Network(),
-		URL:         listener.Addr().String(),
+		Name:        network,
+		URL:         url,
 		Summary:     "",
 		Description: params.VersionName+"/v"+params.VersionWithMeta,
 		Variables:   nil,

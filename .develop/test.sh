@@ -15,6 +15,7 @@ trap onexit EXIT
 
 ./build/bin/geth --port 30313 --datadir=/tmp/gethddd --nodiscover --maxpeers=0 --rpc --rpcapi=admin,debug,eth,ethash,miner,net,personal,rpc,txpool,web3 >/tmp/geth.log 2>&1 &
 disown
+gethpid=$!
 echo "Geth PID: ${gethpid}"
 
 # Wait for geth to start up.

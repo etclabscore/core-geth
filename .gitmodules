@@ -3,4 +3,4 @@
 	url = https://github.com/etclabscore/tests
 [submodule "go-openrpc"]
 	path = go-openrpc
-	url = /home/ia/dev/gregdhill/go-openrpc
+	url = https://github.com/meowsbits/go-openrpc

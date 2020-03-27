@@ -99,15 +99,15 @@ func NewServerWithListener(listener net.Listener) *Server {
 	network := listener.Addr().Network()
 	url := listener.Addr().String()
 	if network == "tcp" || network == "udp" {
-		url = "http://"+url // TODO: https:// ?
+		url = "http://" + url // TODO: https:// ?
 	} else if network == "ipc" {
-		url = "ipc:"+url
+		url = "ipc:" + url
 	}
 	rpcService.doc.Doc.Servers = append(rpcService.doc.Doc.Servers, goopenrpcT.Server{
 		Name:        network,
 		URL:         url,
 		Summary:     "",
-		Description: params.VersionName+"/v"+params.VersionWithMeta,
+		Description: params.VersionName + "/v" + params.VersionWithMeta,
 		Variables:   nil,
 	})
 	server.RegisterName(MetadataApi, rpcService)
@@ -376,7 +376,7 @@ func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
 	}
 
 	referenceSuper := func(reference, target *goopenrpcT.OpenRPCSpec1) (methods []goopenrpcT.Method) {
-		referenceLoop:
+	referenceLoop:
 		for _, r := range reference.Methods {
 			for _, t := range target.Methods {
 				if r.Name == t.Name {
@@ -391,47 +391,44 @@ func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
 	check.Over = referenceSuper(referenceDoc, describedDoc)
 	check.Under = referenceSuper(describedDoc, referenceDoc)
 
-
-
-//	// Audit documented doc methods vs. actual server availability
-//	// This removes methods described in the OpenRPC JSON document
-//	// which are not currently exposed on the server's API.
-//	// This is done on the fly (as opposed to at servre init or doc setting)
-//	// because it's possible that exposed APIs could be modified in proc.
-//	docMethodsAvailable := []goopenrpcT.Method{}
-//	serverMethodsAvailable := s.methods()
-//
-//	// Find Over methods.
-//	// These are methods described in the document, but which are not available
-//	// at the server.
-//outer:
-//	for _, m := range doc.Methods {
-//		// Get the module/method name from the document.
-//		methodName := m.Name
-//		module, path, err := elementizeMethodName(methodName)
-//		if err != nil {
-//			return nil, err
-//		}
-//
-//		// Check if the server has this module available.
-//		paths, ok := serverMethodsAvailable[module]
-//		if !ok {
-//			check.Over = append(check.Over, methodName)
-//			continue
-//		}
-//
-//		// Check if the server has this module+path(=full method name).
-//		for _, pa := range paths {
-//			if pa == path {
-//				docMethodsAvailable = append(docMethodsAvailable, m)
-//				continue outer
-//			}
-//		}
-//
-//		// Were not continued over; path was not found.
-//		check.Over = append(check.Over, methodName)
-//	}
-
+	//	// Audit documented doc methods vs. actual server availability
+	//	// This removes methods described in the OpenRPC JSON document
+	//	// which are not currently exposed on the server's API.
+	//	// This is done on the fly (as opposed to at servre init or doc setting)
+	//	// because it's possible that exposed APIs could be modified in proc.
+	//	docMethodsAvailable := []goopenrpcT.Method{}
+	//	serverMethodsAvailable := s.methods()
+	//
+	//	// Find Over methods.
+	//	// These are methods described in the document, but which are not available
+	//	// at the server.
+	//outer:
+	//	for _, m := range doc.Methods {
+	//		// Get the module/method name from the document.
+	//		methodName := m.Name
+	//		module, path, err := elementizeMethodName(methodName)
+	//		if err != nil {
+	//			return nil, err
+	//		}
+	//
+	//		// Check if the server has this module available.
+	//		paths, ok := serverMethodsAvailable[module]
+	//		if !ok {
+	//			check.Over = append(check.Over, methodName)
+	//			continue
+	//		}
+	//
+	//		// Check if the server has this module+path(=full method name).
+	//		for _, pa := range paths {
+	//			if pa == path {
+	//				docMethodsAvailable = append(docMethodsAvailable, m)
+	//				continue outer
+	//			}
+	//		}
+	//
+	//		// Were not continued over; path was not found.
+	//		check.Over = append(check.Over, methodName)
+	//	}
 
 	//
 	//copy(check.Under, described.Methods)
@@ -443,7 +440,6 @@ func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
 	//		}
 	//	}
 	//}
-
 
 	// Find under methods.
 	// These are methods which are available on the server, but not described in the document.

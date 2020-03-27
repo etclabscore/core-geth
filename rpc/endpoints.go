@@ -51,7 +51,6 @@ func StartHTTPEndpoint(endpoint string, apis []API, modules []string, cors []str
 		return nil, nil, err
 	}
 
-
 	if bad, available := checkModuleAvailability(modules, apis); len(bad) > 0 {
 		log.Error("Unavailable modules in HTTP API list", "unavailable", bad, "available", available)
 	}

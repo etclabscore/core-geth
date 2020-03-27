@@ -100,9 +100,9 @@ func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
 			},
 			Version: "1.0.10",
 		},
-		Servers:      []goopenrpcT.Server{},
-		Methods:      []goopenrpcT.Method{},
-		Components:   goopenrpcT.Components{
+		Servers: []goopenrpcT.Server{},
+		Methods: []goopenrpcT.Method{},
+		Components: goopenrpcT.Components{
 			ContentDescriptors:    make(map[string]*goopenrpcT.ContentDescriptor),
 			Schemas:               make(map[string]spec.Schema),
 			Examples:              make(map[string]goopenrpcT.Example),
@@ -113,9 +113,9 @@ func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
 		},
 		ExternalDocs: goopenrpcT.ExternalDocs{
 			Description: "Source",
-			URL: "https://github.com/etclabscore/core-geth",
+			URL:         "https://github.com/etclabscore/core-geth",
 		},
-		Objects:      nil,
+		Objects: nil,
 	}
 
 	return &OpenRPCDescription{Doc: doc}
@@ -180,7 +180,7 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (
 			Description: fmt.Sprintf(`%s`, rt.Name()),
 			URL:         fmt.Sprintf("file://%s:%d", file, line),
 		},
-		Params: []*goopenrpcT.ContentDescriptor{},
+		Params:         []*goopenrpcT.ContentDescriptor{},
 		Result:         &goopenrpcT.ContentDescriptor{},
 		Deprecated:     false,
 		Servers:        []goopenrpcT.Server{},

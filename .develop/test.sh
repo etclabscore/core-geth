@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
+echo "Building ./build/bin/devgeth"
 go build -o ./build/bin/devgeth ./cmd/geth
 
 # Clean up any bad leftovers.
@@ -13,7 +14,7 @@ onexit(){
 }
 trap onexit EXIT
 
-./build/bin/geth --port 30313 --datadir=/tmp/gethddd --nodiscover --maxpeers=0 --rpc --rpcapi=admin,debug,eth,ethash,miner,net,personal,rpc,txpool,web3 >/tmp/geth.log 2>&1 &
+./build/bin/devgeth --port 30313 --datadir=/tmp/gethddd --nodiscover --maxpeers=0 --rpc --rpcapi=admin,debug,eth,ethash,miner,net,personal,rpc,txpool,web3 >/tmp/geth.log 2>&1 &
 disown
 gethpid=$!
 echo "Geth PID: ${gethpid}"

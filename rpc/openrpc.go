@@ -72,6 +72,19 @@ func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 			}
 		}
 	}
+
+	//s.doc.Doc.Components.
+
+	//parse.GetTypes(s.doc.Doc, s.doc.Doc.Objects)
+	//
+	//for _, k := range s.doc.Doc.Objects.GetKeys() {
+	//	kk := s.doc.Doc.Objects.Get(k)
+	//	kkk := kk.GetKeys()
+	//	log.Println(kk, kkk)
+	//}
+	////b, _ := json.MarshalIndent(s.doc.Doc.Objects, "", "    ")
+	////log.Println("objects", string(b), len(s.doc.Doc.Objects.GetKeys()))
+
 	return s.doc.Doc, nil
 }
 
@@ -82,7 +95,6 @@ type OpenRPCDescription struct {
 }
 
 func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
-
 	doc := &goopenrpcT.OpenRPCSpec1{
 		OpenRPC: "1.2.4",
 		Info: goopenrpcT.Info{
@@ -115,7 +127,7 @@ func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
 			Description: "Source",
 			URL:         "https://github.com/etclabscore/core-geth",
 		},
-		Objects: nil,
+		Objects: goopenrpcT.NewObjectMap(),
 	}
 
 	return &OpenRPCDescription{Doc: doc}
@@ -150,7 +162,6 @@ func (d *OpenRPCDescription) RegisterMethod(name string, cb *callback) error {
 	sort.Slice(d.Doc.Methods, func(i, j int) bool {
 		return d.Doc.Methods[i].Name < d.Doc.Methods[j].Name
 	})
-
 	return nil
 }
 
@@ -270,91 +281,7 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (
 }
 
 func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (goopenrpcT.ContentDescriptor, error) {
-	cd := goopenrpcT.ContentDescriptor{
-		//Content: goopenrpcT.Content{
-		//	Name:        "",
-		//	Summary:     field.Doc.Text(),
-		//	Description: field.Comment.Text(),
-		//	Required:    false,
-		//	Deprecated:  false,
-		//	Schema: spec.Schema{
-		//		VendorExtensible: spec.VendorExtensible{
-		//			Extensions: nil,
-		//		},
-		//		SchemaProps: spec.SchemaProps{
-		//			ID: "",
-		//			Ref: spec.Ref{
-		//				Ref: jsonreference.Ref{
-		//					HasFullURL:      false,
-		//					HasURLPathOnly:  false,
-		//					HasFragmentOnly: false,
-		//					HasFileScheme:   false,
-		//					HasFullFilePath: false,
-		//				},
-		//			},
-		//			Schema:           "",
-		//			Description:      "",
-		//			Type:             []string{schemaType},
-		//			Nullable:         nullable,
-		//			Format:           "",
-		//			Title:            "",
-		//			Default:          nil,
-		//			Maximum:          nil,
-		//			ExclusiveMaximum: false,
-		//			Minimum:          nil,
-		//			ExclusiveMinimum: false,
-		//			MaxLength:        nil,
-		//			MinLength:        nil,
-		//			Pattern:          "",
-		//			MaxItems:         nil,
-		//			MinItems:         nil,
-		//			UniqueItems:      false,
-		//			MultipleOf:       nil,
-		//			Enum:             nil,
-		//			MaxProperties:    nil,
-		//			MinProperties:    nil,
-		//			Required:         nil,
-		//			Items: &spec.SchemaOrArray{
-		//				Schema:  &spec.Schema{},
-		//				Schemas: nil,
-		//			},
-		//			AllOf:      nil,
-		//			OneOf:      nil,
-		//			AnyOf:      nil,
-		//			Not:        &spec.Schema{},
-		//			Properties: nil,
-		//			AdditionalProperties: &spec.SchemaOrBool{
-		//				Allows: false,
-		//				Schema: &spec.Schema{},
-		//			},
-		//			PatternProperties: nil,
-		//			Dependencies:      nil,
-		//			AdditionalItems: &spec.SchemaOrBool{
-		//				Allows: false,
-		//				Schema: &spec.Schema{},
-		//			},
-		//			Definitions: nil,
-		//		},
-		//		SwaggerSchemaProps: spec.SwaggerSchemaProps{
-		//			Discriminator: "",
-		//			ReadOnly:      false,
-		//			XML: &spec.XMLObject{
-		//				Name:      "",
-		//				Namespace: "",
-		//				Prefix:    "",
-		//				Attribute: false,
-		//				Wrapped:   false,
-		//			},
-		//			ExternalDocs: &spec.ExternalDocumentation{
-		//				Description: "",
-		//				URL:         "",
-		//			},
-		//			Example: nil,
-		//		},
-		//		ExtraProps: nil,
-		//	},
-		//},
-	}
+	cd := goopenrpcT.ContentDescriptor{}
 	if !jsonschemaPkgSupport(ty) {
 		return cd, fmt.Errorf("unsupported iface: %v %v %v", spew.Sdump(ty), spew.Sdump(field), spew.Sdump(ident))
 	}
@@ -384,7 +311,7 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 	rflctr := jsonschema.Reflector{
 		AllowAdditionalProperties:  false, // false,
 		RequiredFromJSONSchemaTags: false,
-		ExpandedStruct:             false, // false,
+		ExpandedStruct:             true, // false, // false,
 		//IgnoredTypes:               []interface{}{chaninterface},
 		TypeMapper: OpenRPCJSONSchemaTypeMapper,
 	}
@@ -401,11 +328,12 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 	if err != nil {
 		log.Fatal(err)
 	}
-	cd.Schema = sch
 
 	if schemaType != ":" && (cd.Schema.Description == "" || cd.Schema.Description == ":") {
-		cd.Schema.Description = schemaType
+		sch.Description = schemaType
 	}
+
+	cd.Schema = sch
 
 	return cd, nil
 }

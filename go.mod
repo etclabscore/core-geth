@@ -24,8 +24,8 @@ require (
 	github.com/fjl/memsize v0.0.0-20180418122429-ca190fb6ffbc
 	github.com/gballet/go-libpcsclite v0.0.0-20190403181518-312b5175032f
 	github.com/go-ole/go-ole v1.2.1 // indirect
-	github.com/go-openapi/jsonreference v0.19.2
-	github.com/go-openapi/spec v0.19.2
+	github.com/go-openapi/analysis v0.19.10
+	github.com/go-openapi/spec v0.19.6
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-stack/stack v1.8.0
 	github.com/go-test/deep v1.0.4
@@ -50,7 +50,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
-	github.com/pborman/uuid v0.0.0-20170112150404-1b00554d8222
+	github.com/pborman/uuid v1.2.0
 	github.com/peterh/liner v0.0.0-20190123174540-a2c9a5303de7
 	github.com/prometheus/tsdb v0.7.1
 	github.com/rjeczalik/notify v0.9.1
@@ -68,7 +68,6 @@ require (
 	github.com/tyler-smith/go-bip39 v0.0.0-20181017060643-dbb3b84ba2ef
 	github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208
 	golang.org/x/crypto v0.0.0-20191219195013-becbf705a915
-	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/sys v0.0.0-20191220220014-0732a990476f
 	golang.org/x/text v0.3.2

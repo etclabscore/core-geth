@@ -26,6 +26,13 @@ sleep 3
 # Save a copy of the generated openrpc document by HTTP RPC query.
 http --json POST http://localhost:8545 id:=$(date +%s) method='rpc_describe' params:='[]' | jj -p 'result' | tee "$(pwd)/.develop/spec.json"
 
+echo
+echo "Geth log:"
+echo "---------------------------------------------"
+cat /tmp/geth.log
+echo "---------------------------------------------"
+echo
+
 # Update our gist before validation; the script will exit if the validator fails.
 gist -u 4da4c08765679dac1899543002d1f545 "$(pwd)/.develop/spec.json" >/dev/null 2>&1 &
 

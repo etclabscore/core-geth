@@ -24,6 +24,7 @@ import (
 	"go/token"
 	"log"
 	"math/big"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -34,8 +35,10 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/go-openapi/jsonreference"
 	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
+	"github.com/imdario/mergo"
 )
 
 func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
@@ -72,6 +75,16 @@ func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 			}
 		}
 	}
+
+	//for _, m := range s.doc.Doc.Methods {
+	//	for _, p := range m.Params {
+	//		//sch := derefSchemaRecurse(&s.doc.Doc.Components, p.Schema)
+	//		//s.doc.Doc.Components.Schemas[sch.Ref]
+	//		//p.Schema = sch
+	//	}
+	//	//s := derefSchemaRecurse(&s.doc.Doc.Components, m.Result.Schema)
+	//	//m.Result.Schema = s
+	//}
 
 	//s.doc.Doc.Components.
 
@@ -162,6 +175,7 @@ func (d *OpenRPCDescription) RegisterMethod(name string, cb *callback) error {
 	sort.Slice(d.Doc.Methods, func(i, j int) bool {
 		return d.Doc.Methods[i].Name < d.Doc.Methods[j].Name
 	})
+
 	return nil
 }
 
@@ -175,6 +189,234 @@ func (a argIdent) Name() string {
 		return a.ident.Name
 	}
 	return a.name
+}
+
+//type AnalysisTErrorHandling int
+//const (
+//	AnalysisTErrorFirst AnalysisTErrorHandling = iota
+//	AnalysisTErrorLast
+//	AnalysisTErrorAll
+//)
+type AnalysisT struct {
+	OpenMetaDescription string
+	//ErrorHandling AnalysisTErrorHandling
+	//Errors []error
+	schemaTitles map[string]string
+	//TitleKeyer   func(schema spec.Schema) string
+}
+//
+//func (a *AnalysisT) handleError(err error, atFirst bool) error {
+//	switch a.ErrorHandling {
+//	case AnalysisTErrorFirst:
+//		return err
+//	case AnalysisTErrorLast:
+//		if !atFirst {
+//
+//		}
+//	}
+//}
+
+func (a *AnalysisT) schemaReferenced(sch spec.Schema) (refSchema spec.Schema) {
+	b, _ := json.Marshal(sch)
+	titleKey, ok := a.schemaTitles[string(b)]
+	if !ok {
+		if sch.Ref.String() != "" {
+			return sch
+		}
+		if sch.Ref.GetPointer().IsEmpty() {
+			return sch
+		}
+		bb, _ := json.Marshal(sch)
+		panic(fmt.Sprintf("schema not available as reference: %s @ %v", string(b), string(bb)))
+	}
+
+	refSchema.Ref = spec.Ref{
+		Ref: jsonreference.MustCreateRef("#/schemas/" +titleKey),
+	}
+	return 
+}
+func (a *AnalysisT) registerSchema(sch spec.Schema, titleKeyer func(schema spec.Schema) string) {
+	b, _ := json.Marshal(sch)
+	a.schemaTitles[string(b)] = titleKeyer(sch)
+}
+
+// analysisOnNode runs a callback function on each leaf of a the JSON schema tree.
+// It will return the first error it encounters.
+func (a *AnalysisT) analysisOnNode(sch spec.Schema, onNode func(node spec.Schema) error) error {
+
+	onNode(sch)
+
+	if sch.Ref.String() != "" {
+		return nil
+	}
+	for k, defSch := range sch.Definitions {
+		defSch.Title = k
+		a.analysisOnNode(defSch, onNode)
+	}
+	for i := range sch.OneOf {
+		a.analysisOnLeaf(sch.OneOf[i], onNode)
+	}
+	for i := range sch.AnyOf {
+		a.analysisOnLeaf(sch.AnyOf[i], onNode)
+	}
+	for i := range sch.AllOf {
+		a.analysisOnLeaf(sch.AllOf[i], onNode)
+	}
+	for k, _ := range sch.Properties {
+		a.analysisOnLeaf(sch.Properties[k], onNode)
+	}
+	for k, _ := range sch.PatternProperties {
+		a.analysisOnLeaf(sch.PatternProperties[k], onNode)
+	}
+	if sch.Items == nil {
+		return nil
+	}
+	if sch.Items.Len() > 1 {
+		for i := range sch.Items.Schemas {
+			a.analysisOnLeaf(sch.Items.Schemas[i], onNode) // PTAL: Is this right?
+		}
+	} else {
+		// Is schema
+		a.analysisOnLeaf(*sch.Items.Schema, onNode)
+	}
+	return nil
+}
+
+// analysisOnLeaf runs a callback function on each leaf of a the JSON schema tree.
+// It will return the first error it encounters.
+func (a *AnalysisT) analysisOnLeaf(sch spec.Schema, onLeaf func(leaf spec.Schema) error) error {
+	if sch.Ref.String() != "" {
+		return onLeaf(sch)
+	}
+	for i := range sch.Definitions {
+		a.analysisOnLeaf(sch.Definitions[i], onLeaf)
+	}
+	for i := range sch.OneOf {
+		a.analysisOnLeaf(sch.OneOf[i], onLeaf)
+	}
+	for i := range sch.AnyOf {
+		a.analysisOnLeaf(sch.AnyOf[i], onLeaf)
+	}
+	for i := range sch.AllOf {
+		a.analysisOnLeaf(sch.AllOf[i], onLeaf)
+	}
+	for k, _ := range sch.Properties {
+		a.analysisOnLeaf(sch.Properties[k], onLeaf)
+	}
+	for k, _ := range sch.PatternProperties {
+		a.analysisOnLeaf(sch.PatternProperties[k], onLeaf)
+	}
+	if sch.Items == nil {
+		return onLeaf(sch)
+	}
+	if sch.Items.Len() > 1 {
+		for i := range sch.Items.Schemas {
+			a.analysisOnLeaf(sch.Items.Schemas[i], onLeaf) // PTAL: Is this right?
+		}
+	} else {
+		// Is schema
+		a.analysisOnLeaf(*sch.Items.Schema, onLeaf)
+	}
+	return onLeaf(sch)
+}
+
+func schemaHasRef(sch spec.Schema) bool {
+	return sch.Ref.String() != ""
+}
+
+func getComponentsSchemaFromRef(cmpnts *goopenrpcT.Components, ref spec.Ref) (sch spec.Schema) {
+	if cmpnts == nil || ref.String() == "" {
+		return
+	}
+	r := filepath.Base(ref.String())
+	sch = cmpnts.Schemas[r] // Trust parser
+	return
+}
+
+func derefSchemaRecurse(cts *goopenrpcT.Components, sch spec.Schema) spec.Schema {
+	if schemaHasRef(sch) {
+		sch = getComponentsSchemaFromRef(cts, sch.Ref)
+		sch = derefSchemaRecurse(cts, sch)
+	}
+	for i := range sch.Definitions {
+		got := derefSchemaRecurse(cts, sch.Definitions[i])
+		if err := mergo.Merge(&got, sch.Definitions[i]); err != nil {
+			panic(err.Error())
+		}
+		got.Schema = ""
+		sch.Ref = spec.Ref{}
+		sch.Definitions[i] = got
+	}
+	for i := range sch.OneOf {
+		got := derefSchemaRecurse(cts, sch.OneOf[i])
+		if err := mergo.Merge(&got, sch.OneOf[i]); err != nil {
+			panic(err.Error())
+		}
+		got.Schema = ""
+		sch.Ref = spec.Ref{}
+		sch.OneOf[i] = got
+	}
+	for i := range sch.AnyOf {
+		got := derefSchemaRecurse(cts, sch.AnyOf[i])
+		if err := mergo.Merge(&got, sch.AnyOf[i]); err != nil {
+			panic(err.Error())
+		}
+		got.Schema = ""
+		sch.Ref = spec.Ref{}
+		sch.AnyOf[i] = got
+	}
+	for i := range sch.AllOf {
+		got := derefSchemaRecurse(cts, sch.AllOf[i])
+		if err := mergo.Merge(&got, sch.AllOf[i]); err != nil {
+			panic(err.Error())
+		}
+		got.Schema = ""
+		sch.Ref = spec.Ref{}
+		sch.AllOf[i] = got
+	}
+	for k, _ := range sch.Properties {
+		got := derefSchemaRecurse(cts, sch.Properties[k])
+		if err := mergo.Merge(&got, sch.Properties[k]); err != nil {
+			panic(err.Error())
+		}
+		got.Schema = ""
+		sch.Ref = spec.Ref{}
+		sch.Properties[k] = got
+	}
+	for k, _ := range sch.PatternProperties {
+		got := derefSchemaRecurse(cts, sch.PatternProperties[k])
+		if err := mergo.Merge(&got, sch.PatternProperties[k]); err != nil {
+			panic(err.Error())
+		}
+		got.Schema = ""
+		sch.Ref = spec.Ref{}
+		sch.PatternProperties[k] = got
+	}
+	if sch.Items == nil {
+		return sch
+	}
+	if sch.Items.Len() > 1 {
+		for i := range sch.Items.Schemas {
+			got := derefSchemaRecurse(cts, sch.Items.Schemas[i])
+			if err := mergo.Merge(&got, sch.Items.Schemas[i]); err != nil {
+				panic(err.Error())
+			}
+			got.Schema = ""
+			sch.Ref = spec.Ref{}
+			sch.Items.Schemas[i] = got
+		}
+	} else {
+		// Is schema
+		got := derefSchemaRecurse(cts, *sch.Items.Schema)
+		if err := mergo.Merge(&got, sch.Items.Schema); err != nil {
+			panic(err.Error())
+		}
+		got.Schema = ""
+		sch.Ref = spec.Ref{}
+		sch.Items.Schema = &got
+	}
+
+	return sch
 }
 
 func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (goopenrpcT.Method, error) {
@@ -208,6 +450,12 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (
 			m.Result.Schema.Description = "Null"
 		}
 	}()
+
+	//derefContentDescriptor := func(descriptor *goopenrpcT.ContentDescriptor) {
+	//	for _, d := range descriptor.Schema.Definitions {
+	//
+	//	}
+	//}
 
 	if fn.Type.Params != nil {
 		j := 0

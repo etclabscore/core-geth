@@ -25,6 +25,7 @@ require (
 	github.com/gballet/go-libpcsclite v0.0.0-20190403181518-312b5175032f
 	github.com/go-ole/go-ole v1.2.1 // indirect
 	github.com/go-openapi/analysis v0.19.10
+	github.com/go-openapi/jsonreference v0.19.3
 	github.com/go-openapi/spec v0.19.6
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-stack/stack v1.8.0
@@ -37,6 +38,7 @@ require (
 	github.com/hashicorp/golang-lru v0.0.0-20160813221303-0a025b7e63ad
 	github.com/huin/goupnp v0.0.0-20161224104101-679507af18f3
 	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334
+	github.com/imdario/mergo v0.3.7
 	github.com/influxdata/influxdb v0.0.0-20180221223340-01288bdb0883
 	github.com/jackpal/go-nat-pmp v0.0.0-20160603034137-1fa385a6f458
 	github.com/julienschmidt/httprouter v1.2.0

@@ -304,8 +304,7 @@
               "type": "string"
             }, 
             "ports": {
-              "$ref": "#/definitions/NodeInfoPorts", 
-              "$schema": "http://json-schema.org/draft-04/schema"
+              "$ref": "#/definitions/NodeInfoPorts"
             }, 
             "protocols": {
               "type": "object", 
@@ -1041,8 +1040,7 @@
               "type": "object", 
               "patternProperties": {
                 ".*": {
-                  "$ref": "#/definitions/DumpAccount", 
-                  "$schema": "http://json-schema.org/draft-04/schema"
+                  "$ref": "#/definitions/DumpAccount"
                 }
               }
             }, 
@@ -1521,8 +1519,7 @@
               "maxItems": 61, 
               "minItems": 61, 
               "items": {
-                "$ref": "#/definitions/", 
-                "$schema": "http://json-schema.org/draft-04/schema"
+                "$ref": "#/definitions/"
               }
             }, 
             "DebugGC": {
@@ -2499,8 +2496,7 @@
               "type": "object", 
               "patternProperties": {
                 ".*": {
-                  "$ref": "#/definitions/storageEntry", 
-                  "$schema": "http://json-schema.org/draft-04/schema"
+                  "$ref": "#/definitions/storageEntry"
                 }
               }
             }
@@ -3173,8 +3169,7 @@
             "structLogs": {
               "type": "array", 
               "items": {
-                "$ref": "#/definitions/StructLogRes", 
-                "$schema": "http://json-schema.org/draft-04/schema"
+                "$ref": "#/definitions/StructLogRes"
               }
             }
           }, 
@@ -3904,8 +3899,7 @@
               "pattern": "^0x([a-fA-F\\d]{64})?$"
             }, 
             "tx": {
-              "$ref": "#/definitions/Transaction", 
-              "$schema": "http://json-schema.org/draft-04/schema"
+              "$ref": "#/definitions/Transaction"
             }
           }, 
           "additionalProperties": false, 
@@ -4741,8 +4735,7 @@
             "storageProof": {
               "type": "array", 
               "items": {
-                "$ref": "#/definitions/StorageResult", 
-                "$schema": "http://json-schema.org/draft-04/schema"
+                "$ref": "#/definitions/StorageResult"
               }
             }
           }, 
@@ -6495,8 +6488,7 @@
               "pattern": "^0x([a-fA-F\\d]{64})?$"
             }, 
             "tx": {
-              "$ref": "#/definitions/Transaction", 
-              "$schema": "http://json-schema.org/draft-04/schema"
+              "$ref": "#/definitions/Transaction"
             }
           }, 
           "additionalProperties": false, 
@@ -7333,8 +7325,7 @@
               "pattern": "^0x[a-fA-F\\d]{40}$"
             }, 
             "url": {
-              "$ref": "#/definitions/URL", 
-              "$schema": "http://json-schema.org/draft-04/schema"
+              "$ref": "#/definitions/URL"
             }
           }, 
           "additionalProperties": false, 
@@ -8132,8 +8123,7 @@
               "pattern": "^0x([a-fA-F\\d]{64})?$"
             }, 
             "tx": {
-              "$ref": "#/definitions/Transaction", 
-              "$schema": "http://json-schema.org/draft-04/schema"
+              "$ref": "#/definitions/Transaction"
             }
           }, 
           "additionalProperties": false, 

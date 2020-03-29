@@ -9,7 +9,6 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -74,10 +73,21 @@ func TestOpenRPC_Analysis(t *testing.T) {
 	uniqueKeyFn := func(sch spec.Schema) string {
 		b, _ := json.Marshal(sch)
 		sum := sha1.Sum(b)
-		out := fmt.Sprintf("%s%x", sch.Title, sum[:4])
+		out := fmt.Sprintf("%x", sum[:4])
+
+		if sch.Title != "" {
+			out = fmt.Sprintf("%s.", sch.Title) + out
+		}
+
+		if len(sch.Type) != 0 {
+			out = fmt.Sprintf("%s.", strings.Join(sch.Type, "+")) + out
+		}
 
 		spl := strings.Split(sch.Description, ":")
-		out = spl[len(spl)-1] + out
+		splv := spl[len(spl)-1]
+		if splv != "" && !strings.Contains(splv, " ") {
+			out = splv + "_" + out
+		}
 
 		return out
 	}
@@ -87,9 +97,9 @@ func TestOpenRPC_Analysis(t *testing.T) {
 		return nil
 	}
 
-	schemaIsEmpty := func(sch *spec.Schema) bool {
-		return sch == nil || reflect.DeepEqual(*sch, spec.Schema{})
-	}
+	//schemaIsEmpty := func(sch *spec.Schema) bool {
+	//	return sch == nil || reflect.DeepEqual(*sch, spec.Schema{})
+	//}
 
 	//onSchema :=
 
@@ -104,8 +114,9 @@ func TestOpenRPC_Analysis(t *testing.T) {
 		fmt.Println(doc.Methods[im].Name)
 		for ip := 0; ip < len(doc.Methods[im].Params); ip++ {
 			fmt.Println(" < ", doc.Methods[im].Params[ip].Name)
-			a.analysisOnNode(root, &doc.Methods[im].Params[ip].Schema, func(parentSch *spec.Schema, sch *spec.Schema) error {
-				if parentSch.Ref.String() != "" || sch.Ref.String() != "" {
+			a.analysisOnNode(&doc.Methods[im].Params[ip].Schema, &doc.Methods[im].Params[ip].Schema, func(parentSch *spec.Schema, sch *spec.Schema) error {
+
+				if parentSch.Ref.String() != "" {
 					return nil
 				}
 				err := registerSchema(*sch)
@@ -124,23 +135,27 @@ func TestOpenRPC_Analysis(t *testing.T) {
 				//	panic("parent has definitions")
 				//}
 
-				if parentSch != nil && !schemaIsEmpty(parentSch) && !schemaIsEmpty(sch) {
-					r, err := a.schemaReferenced(*sch)
-					if err != nil {
-						fmt.Println("error getting schema as ref-only schema")
-						return err
-					}
-					fmt.Println("   @", mustMarshalString(r))
-					*parentSch = r
-					fmt.Println("   **=", mustMarshalString(parentSch))
-
-					doc.Components.Schemas[uniqueKeyFn(*sch)] = *sch
-					doc.Methods[im].Params[ip].Schema = r
-					fmt.Println("   **@", mustMarshalString(doc.Methods[im].Params[ip].Schema))
+				r, err := a.schemaReferenced(*sch)
+				if err != nil {
+					fmt.Println("error getting schema as ref-only schema")
+					return err
 				}
+				//fmt.Println("   @", mustMarshalString(r))
+
+				*parentSch = r
+				//fmt.Println("   **=", mustMarshalString(parentSch))
+
+				doc.Components.Schemas[uniqueKeyFn(*sch)] = *sch
+				*sch = r
+				//*sch = r
+				//v := doc.Methods[im].Params[ip]
+				//v.Schema = r
+				//fmt.Println("   @", mustMarshalString(doc.Methods[im].Params[ip].Schema))
+				fmt.Println("   @", mustMarshalString(parentSch), "->", mustMarshalString(sch))
 
 				return nil
 			})
+			fmt.Println("   :", mustMarshalString(&doc.Methods[im].Params[ip]))
 		}
 		fmt.Println(" > ", doc.Methods[im].Result.Name)
 		a.analysisOnNode(root, &doc.Methods[im].Result.Schema, func(parentSch *spec.Schema, sch *spec.Schema) error {
@@ -163,33 +178,29 @@ func TestOpenRPC_Analysis(t *testing.T) {
 			//	panic("parent has definitions")
 			//}
 
-			if parentSch != nil && !schemaIsEmpty(parentSch) && !schemaIsEmpty(sch) {
-				r, err := a.schemaReferenced(*sch)
-				if err != nil {
-					fmt.Println("error getting schema as ref-only schema")
-					return err
-				}
-				fmt.Println("   @", mustMarshalString(r))
-				*parentSch = r
-				fmt.Println("   **=", mustMarshalString(parentSch))
-
-				doc.Components.Schemas[uniqueKeyFn(*sch)] = *sch
-				doc.Methods[im].Result.Schema = r
-				fmt.Println("   **@", mustMarshalString(doc.Methods[im].Result.Schema))
+			r, err := a.schemaReferenced(*sch)
+			if err != nil {
+				fmt.Println("error getting schema as ref-only schema")
+				return err
 			}
+			*parentSch = r
+
+			doc.Components.Schemas[uniqueKeyFn(*sch)] = *sch
+			doc.Methods[im].Result.Schema = r
+			fmt.Println("   @", mustMarshalString(doc.Methods[im].Result.Schema))
 
 			return nil
 		})
 	}
 
-	for schv, tit := range a.schemaTitles {
-		sch := spec.Schema{}
-		err := json.Unmarshal([]byte(schv), &sch)
-		if err != nil {
-			t.Fatal(err)
-		}
-		doc.Components.Schemas[tit] = sch
-	}
+	//for schv, tit := range a.schemaTitles {
+	//	sch := spec.Schema{}
+	//	err := json.Unmarshal([]byte(schv), &sch)
+	//	if err != nil {
+	//		t.Fatal(err)
+	//	}
+	//	doc.Components.Schemas[tit] = sch
+	//}
 
 	docbb, err := json.MarshalIndent(doc, "", "    ")
 	if err != nil {

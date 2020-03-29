@@ -24,7 +24,6 @@ import (
 	"go/token"
 	"log"
 	"math/big"
-	"path/filepath"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -38,7 +37,6 @@ import (
 	"github.com/go-openapi/jsonreference"
 	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
-	"github.com/imdario/mergo"
 )
 
 func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
@@ -75,28 +73,6 @@ func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 			}
 		}
 	}
-
-	//for _, m := range s.doc.Doc.Methods {
-	//	for _, p := range m.Params {
-	//		//sch := derefSchemaRecurse(&s.doc.Doc.Components, p.Schema)
-	//		//s.doc.Doc.Components.Schemas[sch.Ref]
-	//		//p.Schema = sch
-	//	}
-	//	//s := derefSchemaRecurse(&s.doc.Doc.Components, m.Result.Schema)
-	//	//m.Result.Schema = s
-	//}
-
-	//s.doc.Doc.Components.
-
-	//parse.GetTypes(s.doc.Doc, s.doc.Doc.Objects)
-	//
-	//for _, k := range s.doc.Doc.Objects.GetKeys() {
-	//	kk := s.doc.Doc.Objects.Get(k)
-	//	kkk := kk.GetKeys()
-	//	log.Println(kk, kkk)
-	//}
-	////b, _ := json.MarshalIndent(s.doc.Doc.Objects, "", "    ")
-	////log.Println("objects", string(b), len(s.doc.Doc.Objects.GetKeys()))
 
 	return s.doc.Doc, nil
 }
@@ -227,51 +203,6 @@ func (a *AnalysisT) schemaFromRef(psch spec.Schema, ref spec.Ref) (schema spec.S
 	return v.(spec.Schema), nil
 }
 
-//
-//func (a *AnalysisT) dereferenceSchema(sch *spec.Schema) {
-//
-//	// Slices.
-//	for i := 0; i < len(sch.OneOf); i++ {
-//		it := sch.OneOf[i]
-//		a.analysisOnNode(sch, &it, onNode)
-//	}
-//	for i := 0; i < len(sch.AnyOf); i++ {
-//		it := sch.AnyOf[i]
-//		a.analysisOnNode(sch, &it, onNode)
-//	}
-//	for i := 0; i < len(sch.AllOf); i++ {
-//		it := sch.AllOf[i]
-//		a.analysisOnNode(sch, &it, onNode)
-//	}
-//	// Maps.
-//	for k, defSch := range sch.Definitions {
-//		defSch.Title = k
-//		a.analysisOnNode(sch, &defSch, onNode)
-//	}
-//	for k := range sch.Properties {
-//		v := sch.Properties[k]
-//		a.analysisOnNode(sch, &v, onNode)
-//	}
-//	for k := range sch.PatternProperties {
-//		v := sch.PatternProperties[k]
-//		a.analysisOnNode(sch, &v, onNode)
-//	}
-//	if sch.Items == nil {
-//		//onNode(prnt, sch)
-//		return nil
-//	}
-//	if sch.Items.Len() > 1 {
-//		for i := range sch.Items.Schemas {
-//			a.analysisOnNode(sch, &sch.Items.Schemas[i], onNode) // PTAL: Is this right?
-//		}
-//	} else {
-//		// Is schema
-//		a.analysisOnNode(sch, sch.Items.Schema, onNode)
-//	}
-//	//onNode(prnt, sch)
-//	return nil
-//}
-
 // analysisOnNode runs a callback function on each leaf of a the JSON schema tree.
 // It will return the first error it encounters.
 func (a *AnalysisT) analysisOnNode(sch *spec.Schema, onNode func(node *spec.Schema) error) error {
@@ -361,105 +292,6 @@ func (a *AnalysisT) analysisOnLeaf(sch spec.Schema, onLeaf func(leaf spec.Schema
 	return onLeaf(sch)
 }
 
-func schemaHasRef(sch spec.Schema) bool {
-	return sch.Ref.String() != ""
-}
-
-func getComponentsSchemaFromRef(cmpnts *goopenrpcT.Components, ref spec.Ref) (sch spec.Schema) {
-	if cmpnts == nil || ref.String() == "" {
-		return
-	}
-	r := filepath.Base(ref.String())
-	sch = cmpnts.Schemas[r] // Trust parser
-	return
-}
-
-func derefSchemaRecurse(cts *goopenrpcT.Components, sch spec.Schema) spec.Schema {
-	if schemaHasRef(sch) {
-		sch = getComponentsSchemaFromRef(cts, sch.Ref)
-		sch = derefSchemaRecurse(cts, sch)
-	}
-	for i := range sch.Definitions {
-		got := derefSchemaRecurse(cts, sch.Definitions[i])
-		if err := mergo.Merge(&got, sch.Definitions[i]); err != nil {
-			panic(err.Error())
-		}
-		got.Schema = ""
-		sch.Ref = spec.Ref{}
-		sch.Definitions[i] = got
-	}
-	for i := range sch.OneOf {
-		got := derefSchemaRecurse(cts, sch.OneOf[i])
-		if err := mergo.Merge(&got, sch.OneOf[i]); err != nil {
-			panic(err.Error())
-		}
-		got.Schema = ""
-		sch.Ref = spec.Ref{}
-		sch.OneOf[i] = got
-	}
-	for i := range sch.AnyOf {
-		got := derefSchemaRecurse(cts, sch.AnyOf[i])
-		if err := mergo.Merge(&got, sch.AnyOf[i]); err != nil {
-			panic(err.Error())
-		}
-		got.Schema = ""
-		sch.Ref = spec.Ref{}
-		sch.AnyOf[i] = got
-	}
-	for i := range sch.AllOf {
-		got := derefSchemaRecurse(cts, sch.AllOf[i])
-		if err := mergo.Merge(&got, sch.AllOf[i]); err != nil {
-			panic(err.Error())
-		}
-		got.Schema = ""
-		sch.Ref = spec.Ref{}
-		sch.AllOf[i] = got
-	}
-	for k, _ := range sch.Properties {
-		got := derefSchemaRecurse(cts, sch.Properties[k])
-		if err := mergo.Merge(&got, sch.Properties[k]); err != nil {
-			panic(err.Error())
-		}
-		got.Schema = ""
-		sch.Ref = spec.Ref{}
-		sch.Properties[k] = got
-	}
-	for k, _ := range sch.PatternProperties {
-		got := derefSchemaRecurse(cts, sch.PatternProperties[k])
-		if err := mergo.Merge(&got, sch.PatternProperties[k]); err != nil {
-			panic(err.Error())
-		}
-		got.Schema = ""
-		sch.Ref = spec.Ref{}
-		sch.PatternProperties[k] = got
-	}
-	if sch.Items == nil {
-		return sch
-	}
-	if sch.Items.Len() > 1 {
-		for i := range sch.Items.Schemas {
-			got := derefSchemaRecurse(cts, sch.Items.Schemas[i])
-			if err := mergo.Merge(&got, sch.Items.Schemas[i]); err != nil {
-				panic(err.Error())
-			}
-			got.Schema = ""
-			sch.Ref = spec.Ref{}
-			sch.Items.Schemas[i] = got
-		}
-	} else {
-		// Is schema
-		got := derefSchemaRecurse(cts, *sch.Items.Schema)
-		if err := mergo.Merge(&got, sch.Items.Schema); err != nil {
-			panic(err.Error())
-		}
-		got.Schema = ""
-		sch.Ref = spec.Ref{}
-		sch.Items.Schema = &got
-	}
-
-	return sch
-}
-
 func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (goopenrpcT.Method, error) {
 	file, line := rt.FileLine(rt.Entry())
 
@@ -491,12 +323,6 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (
 			m.Result.Schema.Description = "Null"
 		}
 	}()
-
-	//derefContentDescriptor := func(descriptor *goopenrpcT.ContentDescriptor) {
-	//	for _, d := range descriptor.Schema.Definitions {
-	//
-	//	}
-	//}
 
 	if fn.Type.Params != nil {
 		j := 0
@@ -608,6 +434,10 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 	jsch := rflctr.ReflectFromType(ty)
 
 	// Poor man's type cast.
+	// Need to get the type from the go struct -> json reflector package
+	// to the swagger/go-openapi/jsonschema spec.
+	// Do this with JSON marshaling.
+	// Hacky? Maybe. Effective? Maybe.
 	m, err := json.Marshal(jsch)
 	if err != nil {
 		log.Fatal(err)
@@ -617,6 +447,7 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 	if err != nil {
 		log.Fatal(err)
 	}
+	// End Hacky maybe.
 
 	if schemaType != ":" && (cd.Schema.Description == "" || cd.Schema.Description == ":") {
 		sch.Description = schemaType
@@ -658,37 +489,6 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 		}
 		return &js
 	}
-
-	//unmarshalJSONToJSONSchemaTypeGlom := func(input string, ref *jsonschema.Type) *jsonschema.Type {
-	//	err := json.Unmarshal([]byte(input), ref)
-	//	if err != nil {
-	//		return nil
-	//	}
-	//	return ref
-	//}
-
-	//handleNil := func(r reflect.Type, ret *jsonschema.Type) *jsonschema.Type {
-	//	if ret == nil {
-	//		return nil
-	//	}
-	//	if reflect.ValueOf(r).Kind() == reflect.Ptr {
-	//		if ret.OneOf == nil || len(ret.OneOf) == 0 {
-	//			ttt := &jsonschema.Type{}
-	//			ttt.Title = ret.Title // Only keep the title.
-	//			ttt.OneOf = []*jsonschema.Type{}
-	//			ttt.OneOf = append(ttt.OneOf, ret)
-	//			ttt.OneOf = append(ttt.OneOf, unmarshalJSONToJSONSchemaType(`
-	//	{
-	//      "title": "null",
-	//      "type": "null",
-	//      "description": "Null"
-	//    }`))
-	//			return ttt
-	//		}
-	//	}
-	//
-	//	return ret
-	//}
 
 	integerD := `{
           "title": "integer",
@@ -784,27 +584,7 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 		if reflect.TypeOf(d.t) == r {
 			tt := unmarshalJSONToJSONSchemaType(d.j)
 
-			//	// If the value is a pointer, then it can be nil.
-			//	// Which means it should be oneOf <the value> or <Null>.
-			//	//if strings.Contains(reflect.ValueOf(d.t).Type().Name(), "*") { // .Kind() == reflect.Ptr
-			//	//if d.t == nil {
-			//	if reflect.ValueOf(d.t).Type().Kind() == reflect.Ptr {
-			//		if tt.OneOf == nil || len(tt.OneOf) == 0 {
-			//			ttt := &jsonschema.Type{}
-			//			ttt.Title = tt.Title // Only keep the title.
-			//			ttt.OneOf = []*jsonschema.Type{}
-			//			ttt.OneOf = append(ttt.OneOf, tt)
-			//			ttt.OneOf = append(ttt.OneOf, unmarshalJSONToJSONSchemaType(`
-			//{
-			//  "title": "null",
-			//  "type": "null",
-			//  "description": "Null"
-			//}`))
-			//			return ttt
-			//		}
-			//	}
-
-			return tt // handleNil(r, tt)
+			return tt
 		}
 	}
 
@@ -818,22 +598,6 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		ret := unmarshalJSONToJSONSchemaType(integerD)
-
-		//if reflect.ValueOf(r).Type().Kind() == reflect.Ptr {
-		//	if ret.OneOf == nil || len(ret.OneOf) == 0 {
-		//		ttt := &jsonschema.Type{}
-		//		ttt.Title = ret.Title // Only keep the title.
-		//		ttt.OneOf = []*jsonschema.Type{}
-		//		ttt.OneOf = append(ttt.OneOf, ret)
-		//		ttt.OneOf = append(ttt.OneOf, unmarshalJSONToJSONSchemaType(`
-		//{
-		//  "title": "null",
-		//  "type": "null",
-		//  "description": "Null"
-		//}`))
-		//		return ttt
-		//	}
-		//}
 		return ret
 
 	case reflect.Float32, reflect.Float64:

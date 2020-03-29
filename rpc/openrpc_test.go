@@ -97,12 +97,6 @@ func TestOpenRPC_Analysis(t *testing.T) {
 		return nil
 	}
 
-	//schemaIsEmpty := func(sch *spec.Schema) bool {
-	//	return sch == nil || reflect.DeepEqual(*sch, spec.Schema{})
-	//}
-
-	//onSchema :=
-
 	mustMarshalString := func(v interface{}) string {
 		b, _ := json.Marshal(v)
 		return string(b)
@@ -178,21 +172,6 @@ func TestOpenRPC_Analysis(t *testing.T) {
 		fmt.Println("   :", mustMarshalString(&met.Result))
 	}
 
-	//for k, v := range doc.Components.Schemas {
-	//	if strings.Contains(v.Ref.String(), "definitions") {
-	//		delete(doc.Components.Schemas, k)
-	//	}
-	//}
-
-	//for schv, tit := range a.schemaTitles {
-	//	sch := spec.Schema{}
-	//	err := json.Unmarshal([]byte(schv), &sch)
-	//	if err != nil {
-	//		t.Fatal(err)
-	//	}
-	//	doc.Components.Schemas[tit] = sch
-	//}
-
 	docbb, err := json.MarshalIndent(doc, "", "    ")
 	if err != nil {
 		t.Fatal(err)
@@ -209,104 +188,4 @@ func TestOpenRPC_Analysis(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	// Extract schemas. Put
 }
-
-//for _, m := range doc.Methods {
-//	for _, param := range m.Params {
-//		a.analysisOnNode(param.Schema, func(sch spec.Schema) error {
-//			if err := registerSchema(sch); err != nil {
-//				return err
-//			}
-//			param.Schema = sch
-//			return nil
-//		})
-//	}
-//	a.analysisOnNode(m.Result.Schema, func(sch spec.Schema) error {
-//		if err := registerSchema(sch); err != nil {
-//			return err
-//		}
-//		m.Result.Schema = sch
-//		return nil
-//	})
-//}
-//
-//for _, m := range doc.Methods {
-//	for _, param := range m.Params {
-//		a.analysisOnNode(param.Schema, func(sch spec.Schema) error {
-//			ns, err := a.schemaAsReferenceSchema(sch)
-//			if err != nil {
-//				return err
-//			}
-//			param.Schema = ns
-//			return nil
-//		})
-//
-//	}
-//	a.analysisOnNode(m.Result.Schema, func(sch spec.Schema) error {
-//		ns, err := a.schemaAsReferenceSchema(sch)
-//		if err != nil {
-//			return err
-//		}
-//		m.Result.Schema = ns
-//		return nil
-//	})
-//}
-//
-//doc.Components.Schemas = make(map[string]spec.Schema)
-//
-//// Add schema to component.schemas for all leaves.
-//for _, m := range doc.Methods {
-//	for _, param := range m.Params {
-//		a.analysisOnLeaf(param.Schema, func(sch spec.Schema) error {
-//			tit, err := a.getRegisteredSchemaKey(sch)
-//			if err != nil {
-//				return err
-//			}
-//			doc.Components.Schemas[tit] = sch
-//			return nil
-//		})
-//	}
-//	a.analysisOnLeaf(m.Result.Schema, func(sch spec.Schema) error {
-//		tit, err := a.getRegisteredSchemaKey(sch)
-//		if err != nil {
-//			return err
-//		}
-//		doc.Components.Schemas[tit] = sch
-//		doc.Components.Schemas[uniqueKeyFn(sch)] = sch
-//		return nil
-//	})
-//}
-
-//for schv, tit := range a.schemaTitles {
-//	sch := spec.Schema{}
-//	err := json.Unmarshal([]byte(schv), &sch)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	doc.Components.Schemas[tit] = sch
-//}
-
-//for tit, sch := range doc.Components.Schemas {
-//	a.analysisOnNode(sch, func(node spec.Schema) error {
-//		ns, err := a.schemaAsReferenceSchema(node)
-//		if err != nil {
-//			return err // NOTE
-//		}
-//		key := uniqueKeyFn(ns)
-//		if v, ok := doc.Components.Schemas[key]; ok {
-//			if v.Ref.String() == "" {
-//				return nil
-//			}
-//			v = spec.Schema{
-//				SchemaProps: spec.SchemaProps{
-//					Ref: spec.Ref{
-//						Ref: jsonreference.MustCreateRef("#/components/schemas/" + tit),
-//					},
-//				},
-//			}
-//		}
-//		return nil
-//	})
-//}

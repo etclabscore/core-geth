@@ -204,6 +204,7 @@ type AnalysisT struct {
 	schemaTitles map[string]string
 	//TitleKeyer   func(schema spec.Schema) string
 }
+
 //
 //func (a *AnalysisT) handleError(err error, atFirst bool) error {
 //	switch a.ErrorHandling {
@@ -216,25 +217,35 @@ type AnalysisT struct {
 //	}
 //}
 
-func (a *AnalysisT) schemaReferenced(sch spec.Schema) (refSchema spec.Schema) {
+func (a *AnalysisT) schemaReferenced(sch spec.Schema) (refSchema spec.Schema, err error) {
 	b, _ := json.Marshal(sch)
 	titleKey, ok := a.schemaTitles[string(b)]
 	if !ok {
-		if sch.Ref.String() != "" {
-			return sch
-		}
-		if sch.Ref.GetPointer().IsEmpty() {
-			return sch
-		}
+		//if sch.Ref.String() != "" {
+		//	return sch, nil
+		//}
+		//if sch.Ref.GetPointer().IsEmpty() {
+		//	return sch, nil
+		//}
 		bb, _ := json.Marshal(sch)
-		panic(fmt.Sprintf("schema not available as reference: %s @ %v", string(b), string(bb)))
+		return refSchema, fmt.Errorf("schema not available as reference: %s @ %v", string(b), string(bb))
 	}
-
 	refSchema.Ref = spec.Ref{
-		Ref: jsonreference.MustCreateRef("#/schemas/" +titleKey),
+		Ref: jsonreference.MustCreateRef("#/components/schemas/" + titleKey),
 	}
-	return 
+	return
 }
+
+func (a *AnalysisT) getRegisteredSchemaTitlekey(sch spec.Schema) (string, error) {
+	b, _ := json.Marshal(sch)
+	tit, ok := a.schemaTitles[string(b)]
+	if !ok {
+		return "", fmt.Errorf("no registered schema found: schema=%s", string(b))
+	}
+	return tit, nil
+}
+
+//func (a *AnalysisT) getRegisteredSchema()
 func (a *AnalysisT) registerSchema(sch spec.Schema, titleKeyer func(schema spec.Schema) string) {
 	b, _ := json.Marshal(sch)
 	a.schemaTitles[string(b)] = titleKeyer(sch)
@@ -242,52 +253,57 @@ func (a *AnalysisT) registerSchema(sch spec.Schema, titleKeyer func(schema spec.
 
 // analysisOnNode runs a callback function on each leaf of a the JSON schema tree.
 // It will return the first error it encounters.
-func (a *AnalysisT) analysisOnNode(sch spec.Schema, onNode func(node spec.Schema) error) error {
+func (a *AnalysisT) analysisOnNode(parentSch *spec.Schema, sch *spec.Schema, onNode func(parentNode *spec.Schema, node *spec.Schema) error) error {
 
-	onNode(sch)
+	defer func() {
+		*parentSch = *sch
+		onNode(parentSch, sch)
+	}()
 
-	if sch.Ref.String() != "" {
-		return nil
+	// Slices.
+	for i := 0; i < len(sch.OneOf); i++ {
+		it := sch.OneOf[i]
+		//*parentSch = it
+		a.analysisOnNode(sch, &it, onNode)
 	}
+	for i := 0; i < len(sch.AnyOf); i++ {
+		it := sch.AnyOf[i]
+		a.analysisOnNode(sch, &it, onNode)
+	}
+	for i := 0; i < len(sch.AllOf); i++ {
+		it := sch.AllOf[i]
+		a.analysisOnNode(sch, &it, onNode)
+	}
+	// Maps.
 	for k, defSch := range sch.Definitions {
 		defSch.Title = k
-		a.analysisOnNode(defSch, onNode)
+		a.analysisOnNode(sch, &defSch, onNode)
 	}
-	for i := range sch.OneOf {
-		a.analysisOnLeaf(sch.OneOf[i], onNode)
+	for _, v := range sch.Properties {
+		a.analysisOnNode(sch, &v, onNode)
 	}
-	for i := range sch.AnyOf {
-		a.analysisOnLeaf(sch.AnyOf[i], onNode)
-	}
-	for i := range sch.AllOf {
-		a.analysisOnLeaf(sch.AllOf[i], onNode)
-	}
-	for k, _ := range sch.Properties {
-		a.analysisOnLeaf(sch.Properties[k], onNode)
-	}
-	for k, _ := range sch.PatternProperties {
-		a.analysisOnLeaf(sch.PatternProperties[k], onNode)
+	for _, v := range sch.PatternProperties {
+		a.analysisOnNode(sch, &v, onNode)
 	}
 	if sch.Items == nil {
+		onNode(parentSch, sch)
 		return nil
 	}
 	if sch.Items.Len() > 1 {
 		for i := range sch.Items.Schemas {
-			a.analysisOnLeaf(sch.Items.Schemas[i], onNode) // PTAL: Is this right?
+			a.analysisOnNode(sch, &sch.Items.Schemas[i], onNode) // PTAL: Is this right?
 		}
 	} else {
 		// Is schema
-		a.analysisOnLeaf(*sch.Items.Schema, onNode)
+		a.analysisOnNode(sch, sch.Items.Schema, onNode)
 	}
+	onNode(parentSch, sch)
 	return nil
 }
 
 // analysisOnLeaf runs a callback function on each leaf of a the JSON schema tree.
 // It will return the first error it encounters.
 func (a *AnalysisT) analysisOnLeaf(sch spec.Schema, onLeaf func(leaf spec.Schema) error) error {
-	if sch.Ref.String() != "" {
-		return onLeaf(sch)
-	}
 	for i := range sch.Definitions {
 		a.analysisOnLeaf(sch.Definitions[i], onLeaf)
 	}

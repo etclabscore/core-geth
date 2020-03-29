@@ -304,7 +304,7 @@
               "type": "string"
             }, 
             "ports": {
-              "$ref": "#/definitions/NodeInfoPorts", 
+              "$ref": "#/components/schemas/NodeInfoPorts",
               "$schema": "http://json-schema.org/draft-04/schema"
             }, 
             "protocols": {
@@ -316,26 +316,7 @@
               }
             }
           }, 
-          "additionalProperties": false, 
-          "definitions": {
-            "NodeInfoPorts": {
-              "type": "object", 
-              "required": ["discovery", "listener"], 
-              "properties": {
-                "discovery": {
-                  "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
-                }, 
-                "listener": {
-                  "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
-                }
-              }, 
-              "additionalProperties": false
-            }
-          }, 
+          "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-04/schema"
         }
       }, 
@@ -1041,7 +1022,7 @@
               "type": "object", 
               "patternProperties": {
                 ".*": {
-                  "$ref": "#/definitions/DumpAccount", 
+                  "$ref": "#/components/schemas/DumpAccount",
                   "$schema": "http://json-schema.org/draft-04/schema"
                 }
               }
@@ -1051,50 +1032,6 @@
             }
           }, 
           "additionalProperties": false, 
-          "definitions": {
-            "DumpAccount": {
-              "type": "object", 
-              "required": ["balance", "nonce", "root", "codeHash"], 
-              "properties": {
-                "address": {
-                  "type": "string", 
-                  "title": "keccak", 
-                  "pattern": "^0x[a-fA-F\\d]{64}$"
-                }, 
-                "balance": {
-                  "type": "string"
-                }, 
-                "code": {
-                  "type": "string"
-                }, 
-                "codeHash": {
-                  "type": "string"
-                }, 
-                "key": {
-                  "type": "string", 
-                  "title": "dataWord", 
-                  "pattern": "^0x([a-fA-F\\d]{64})?$"
-                }, 
-                "nonce": {
-                  "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
-                }, 
-                "root": {
-                  "type": "string"
-                }, 
-                "storage": {
-                  "type": "object", 
-                  "patternProperties": {
-                    ".*": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }, 
-              "additionalProperties": false
-            }
-          }, 
           "$schema": "http://json-schema.org/draft-04/schema"
         }
       }, 
@@ -8440,7 +8377,69 @@
       "examples": []
     }
   ], 
-  "components": {}, 
+  "components": {
+    "schemas": {
+      "NodeInfoPorts": {
+        "type": "object",
+        "required": ["discovery", "listener"],
+        "properties": {
+          "discovery": {
+            "type": "string",
+            "title": "integer",
+            "pattern": "^0x[a-fA-F0-9]+$"
+          },
+          "listener": {
+            "type": "string",
+            "title": "integer",
+            "pattern": "^0x[a-fA-F0-9]+$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DumpAccount": {
+        "type": "object",
+        "required": ["balance", "nonce", "root", "codeHash"],
+        "properties": {
+          "address": {
+            "type": "string",
+            "title": "keccak",
+            "pattern": "^0x[a-fA-F\\d]{64}$"
+          },
+          "balance": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "codeHash": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string",
+            "title": "dataWord",
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
+          },
+          "nonce": {
+            "type": "string",
+            "title": "integer",
+            "pattern": "^0x[a-fA-F0-9]+$"
+          },
+          "root": {
+            "type": "string"
+          },
+          "storage": {
+            "type": "object",
+            "patternProperties": {
+              ".*": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
   "externalDocs": {
     "description": "Source", 
     "url": "https://github.com/etclabscore/core-geth"

@@ -827,7 +827,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.Dump.db7d5864"
+                    "$ref": "#/components/schemas/object.Dump.3f30c119"
                 }
             },
             "deprecated": false,
@@ -2557,7 +2557,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.SignTransactionResult.6875b7d6"
+                    "$ref": "#/components/schemas/object.SignTransactionResult.55736efa"
                 }
             },
             "deprecated": false,
@@ -5396,7 +5396,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.SignTransactionResult.6875b7d6"
+                    "$ref": "#/components/schemas/object.SignTransactionResult.55736efa"
                 }
             },
             "deprecated": false,
@@ -5882,42 +5882,6 @@
                     }
                 }
             },
-            "object.014f79ce": {
-                "type": "object",
-                "required": [
-                    "balance",
-                    "nonce",
-                    "root",
-                    "codeHash"
-                ],
-                "properties": {
-                    "address": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "balance": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "code": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "codeHash": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "key": {
-                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
-                    },
-                    "nonce": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "root": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "storage": {
-                        "$ref": "#/components/schemas/object.c018b64e"
-                    }
-                },
-                "additionalProperties": false
-            },
             "object.043997da": {
                 "type": "object",
                 "required": [
@@ -5971,6 +5935,14 @@
                 "patternProperties": {
                     ".*": {
                         "$ref": "#/components/schemas/string.keccak.3242e7ca"
+                    }
+                }
+            },
+            "object.367e4be7": {
+                "type": "object",
+                "patternProperties": {
+                    ".*": {
+                        "$ref": "#/components/schemas/object.DumpAccount.0efc3103"
                     }
                 }
             },
@@ -6175,7 +6147,7 @@
                 },
                 "additionalProperties": false
             },
-            "object.Dump.db7d5864": {
+            "object.Dump.3f30c119": {
                 "type": "object",
                 "title": "Dump",
                 "required": [
@@ -6184,10 +6156,47 @@
                 ],
                 "properties": {
                     "accounts": {
-                        "$ref": "#/components/schemas/object.d074b9a7"
+                        "$ref": "#/components/schemas/object.367e4be7"
                     },
                     "root": {
                         "$ref": "#/components/schemas/string.5b1cd571"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "object.DumpAccount.0efc3103": {
+                "type": "object",
+                "title": "DumpAccount",
+                "required": [
+                    "balance",
+                    "nonce",
+                    "root",
+                    "codeHash"
+                ],
+                "properties": {
+                    "address": {
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+                    },
+                    "balance": {
+                        "$ref": "#/components/schemas/string.5b1cd571"
+                    },
+                    "code": {
+                        "$ref": "#/components/schemas/string.5b1cd571"
+                    },
+                    "codeHash": {
+                        "$ref": "#/components/schemas/string.5b1cd571"
+                    },
+                    "key": {
+                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
+                    },
+                    "nonce": {
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
+                    },
+                    "root": {
+                        "$ref": "#/components/schemas/string.5b1cd571"
+                    },
+                    "storage": {
+                        "$ref": "#/components/schemas/object.c018b64e"
                     }
                 },
                 "additionalProperties": false
@@ -6661,23 +6670,6 @@
                 },
                 "additionalProperties": false
             },
-            "object.SignTransactionResult.6875b7d6": {
-                "type": "object",
-                "title": "SignTransactionResult",
-                "required": [
-                    "raw",
-                    "tx"
-                ],
-                "properties": {
-                    "raw": {
-                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
-                    },
-                    "tx": {
-                        "$ref": "#/components/schemas/object.Transaction.88e7e12e"
-                    }
-                },
-                "additionalProperties": false
-            },
             "object.StdTraceConfig.b9777e1e": {
                 "type": "object",
                 "title": "StdTraceConfig",
@@ -6771,11 +6763,6 @@
                         "$ref": "#/components/schemas/string.5b1cd571"
                     }
                 },
-                "additionalProperties": false
-            },
-            "object.Transaction.88e7e12e": {
-                "type": "object",
-                "title": "Transaction",
                 "additionalProperties": false
             },
             "object.ab8ba582": {
@@ -6872,14 +6859,6 @@
                 "patternProperties": {
                     ".*": {
                         "$ref": "#/components/schemas/string.integer.edb7ed14"
-                    }
-                }
-            },
-            "object.d074b9a7": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/object.014f79ce"
                     }
                 }
             },

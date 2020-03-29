@@ -1,7 +1,6 @@
 package rpc
 
 import (
-	"crypto/sha1"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -9,11 +8,9 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
-	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
 
@@ -65,111 +62,8 @@ func TestOpenRPC_Analysis(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	a := &AnalysisT{
-		OpenMetaDescription: "Analysis test",
-		schemaTitles:        make(map[string]string),
-	}
-
-	uniqueKeyFn := func(sch spec.Schema) string {
-		b, _ := json.Marshal(sch)
-		sum := sha1.Sum(b)
-		out := fmt.Sprintf("%x", sum[:4])
-
-		if sch.Title != "" {
-			out = fmt.Sprintf("%s.", sch.Title) + out
-		}
-
-		if len(sch.Type) != 0 {
-			out = fmt.Sprintf("%s.", strings.Join(sch.Type, "+")) + out
-		}
-
-		spl := strings.Split(sch.Description, ":")
-		splv := spl[len(spl)-1]
-		if splv != "" && !strings.Contains(splv, " ") {
-			out = splv + "_" + out
-		}
-
-		return out
-	}
-
-	registerSchema := func(leaf spec.Schema) error {
-		a.registerSchema(leaf, uniqueKeyFn)
-		return nil
-	}
-
-	mustMarshalString := func(v interface{}) string {
-		b, _ := json.Marshal(v)
-		return string(b)
-	}
-
-	doc.Components.Schemas = make(map[string]spec.Schema)
-	for im := 0; im < len(doc.Methods); im++ {
-
-		met := doc.Methods[im]
-		fmt.Println(met.Name)
-
-		parent := &spec.Schema{}
-
-		deferencer := func(sch *spec.Schema) error {
-
-			if sch.Ref.String() == "" {
-				return nil
-			}
-			rr, err := a.schemaFromRef(*parent, sch.Ref)
-			if err == nil {
-				*sch = rr
-			}
-			return nil
-		}
-
-		referencer := func(sch *spec.Schema) error {
-
-			err = registerSchema(*sch)
-			if err != nil {
-				fmt.Println("!!! ", err)
-				return err
-			}
-
-			fmt.Println("   *", mustMarshalString(sch))
-
-			r, err := a.schemaAsReferenceSchema(*sch)
-			if err != nil {
-				fmt.Println("error getting schema as ref-only schema")
-				return err
-			}
-
-			doc.Components.Schemas[uniqueKeyFn(*sch)] = *sch
-			*sch = r
-
-			fmt.Println("    @", mustMarshalString(sch))
-			return nil
-		}
-
-		workaroundDefinitions := func(sch *spec.Schema) error {
-			sch.Definitions = nil
-			return nil
-		}
-
-		// Params.
-		for ip := 0; ip < len(met.Params); ip++ {
-			par := met.Params[ip]
-			fmt.Println(" < ", par.Name)
-
-			*parent = par.Schema
-			a.analysisOnNode(&par.Schema, deferencer)
-			a.analysisOnNode(&par.Schema, workaroundDefinitions)
-			a.analysisOnNode(&par.Schema, referencer)
-			met.Params[ip] = par
-			fmt.Println("   :", mustMarshalString(par))
-		}
-
-		// Result (single).
-		fmt.Println(" > ", doc.Methods[im].Result.Name)
-		*parent = met.Result.Schema
-		a.analysisOnNode(&met.Result.Schema, deferencer)
-		a.analysisOnNode(&met.Result.Schema, workaroundDefinitions)
-		a.analysisOnNode(&met.Result.Schema, referencer)
-		fmt.Println("   :", mustMarshalString(&met.Result))
+	if err := Clean(doc); err != nil {
+		t.Fatal(err)
 	}
 
 	docbb, err := json.MarshalIndent(doc, "", "    ")

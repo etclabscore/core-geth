@@ -151,6 +151,11 @@ func TestOpenRPC_Analysis(t *testing.T) {
 			return nil
 		}
 
+		workaroundDefinitions := func(sch *spec.Schema) error {
+			sch.Definitions = nil
+			return nil
+		}
+
 		// Params.
 		for ip := 0; ip < len(met.Params); ip++ {
 			par := met.Params[ip]
@@ -158,6 +163,7 @@ func TestOpenRPC_Analysis(t *testing.T) {
 
 			*parent = par.Schema
 			a.analysisOnNode(&par.Schema, deferencer)
+			a.analysisOnNode(&par.Schema, workaroundDefinitions)
 			a.analysisOnNode(&par.Schema, referencer)
 			met.Params[ip] = par
 			fmt.Println("   :", mustMarshalString(par))
@@ -167,9 +173,16 @@ func TestOpenRPC_Analysis(t *testing.T) {
 		fmt.Println(" > ", doc.Methods[im].Result.Name)
 		*parent = met.Result.Schema
 		a.analysisOnNode(&met.Result.Schema, deferencer)
+		a.analysisOnNode(&met.Result.Schema, workaroundDefinitions)
 		a.analysisOnNode(&met.Result.Schema, referencer)
 		fmt.Println("   :", mustMarshalString(&met.Result))
 	}
+
+	//for k, v := range doc.Components.Schemas {
+	//	if strings.Contains(v.Ref.String(), "definitions") {
+	//		delete(doc.Components.Schemas, k)
+	//	}
+	//}
 
 	//for schv, tit := range a.schemaTitles {
 	//	sch := spec.Schema{}

@@ -600,7 +600,7 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 	rflctr := jsonschema.Reflector{
 		AllowAdditionalProperties:  false, // false,
 		RequiredFromJSONSchemaTags: false,
-		ExpandedStruct:             true, // false, // false,
+		ExpandedStruct:             false, // false, // false,
 		//IgnoredTypes:               []interface{}{chaninterface},
 		TypeMapper: OpenRPCJSONSchemaTypeMapper,
 	}

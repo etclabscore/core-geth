@@ -203,6 +203,7 @@ type AnalysisT struct {
 	//Errors []error
 	schemaTitles map[string]string
 	//TitleKeyer   func(schema spec.Schema) string
+	lastSch *spec.Schema
 }
 
 //
@@ -250,6 +251,7 @@ func (a *AnalysisT) registerSchema(sch spec.Schema, titleKeyer func(schema spec.
 	b, _ := json.Marshal(sch)
 	a.schemaTitles[string(b)] = titleKeyer(sch)
 }
+
 //
 //func (a *AnalysisT) expandDefinitions(sch *spec.Schema) {
 //
@@ -297,62 +299,58 @@ func (a *AnalysisT) registerSchema(sch spec.Schema, titleKeyer func(schema spec.
 
 // analysisOnNode runs a callback function on each leaf of a the JSON schema tree.
 // It will return the first error it encounters.
-func (a *AnalysisT) analysisOnNode(parentSch *spec.Schema, sch *spec.Schema, onNode func(parentNode *spec.Schema, node *spec.Schema) error) error {
-
-	var prnt = &spec.Schema{}
-	var chld = &spec.Schema{}
-
-	*prnt = *parentSch
-	*chld = *sch
-
-	//prnt := parentSch
-	//chld := sch
-
-	defer func() {
-		onNode(prnt, chld)
-		//*prnt = *chld
-	}()
+func (a *AnalysisT) analysisOnNode(sch *spec.Schema, onNode func(node *spec.Schema) error) error {
 
 	// Slices.
-	for i := 0; i < len(chld.OneOf); i++ {
-		it := chld.OneOf[i]
-		a.analysisOnNode(chld, &it, onNode)
+	for i := 0; i < len(sch.OneOf); i++ {
+		it := sch.OneOf[i]
+		a.analysisOnNode(&it, onNode)
+		sch.OneOf[i] = it
 	}
-	for i := 0; i < len(chld.AnyOf); i++ {
-		it := chld.AnyOf[i]
-		a.analysisOnNode(chld, &it, onNode)
+	for i := 0; i < len(sch.AnyOf); i++ {
+		it := sch.AnyOf[i]
+		a.analysisOnNode(&it, onNode)
+		sch.AnyOf[i] = it
 	}
-	for i := 0; i < len(chld.AllOf); i++ {
-		it := chld.AllOf[i]
-		a.analysisOnNode(chld, &it, onNode)
+	for i := 0; i < len(sch.AllOf); i++ {
+		it := sch.AllOf[i]
+		a.analysisOnNode(&it, onNode)
+		sch.AllOf[i] = it
 	}
 	// Maps.
-	for k, defSch := range chld.Definitions {
-		defSch.Title = k
-		a.analysisOnNode(chld, &defSch, onNode)
+	for k := range sch.Definitions {
+		v := sch.Definitions[k]
+		v.Title = k
+		a.analysisOnNode(&v, onNode)
+		sch.Definitions[k] = v
 	}
-	for k := range chld.Properties {
-		v := chld.Properties[k]
-		a.analysisOnNode(chld, &v, onNode)
+	for k := range sch.Properties {
+		v := sch.Properties[k]
+		v.Title = k
+		a.analysisOnNode(&v, onNode)
+		sch.Properties[k] = v
 	}
-	for k := range chld.PatternProperties {
-		v := chld.PatternProperties[k]
-		a.analysisOnNode(chld, &v, onNode)
+	for k := range sch.PatternProperties {
+		v := sch.PatternProperties[k]
+		v.Title = k
+		a.analysisOnNode(&v, onNode)
+		sch.PatternProperties[k] = v
 	}
-	if chld.Items == nil {
-		//onNode(prnt, chld)
-		return nil
+	if sch.Items == nil {
+		//onNode(sch)
+		return onNode(sch)
+		//return nil
 	}
-	if chld.Items.Len() > 1 {
-		for i := range chld.Items.Schemas {
-			a.analysisOnNode(chld, &chld.Items.Schemas[i], onNode) // PTAL: Is this right?
+	if sch.Items.Len() > 1 {
+		for i := range sch.Items.Schemas {
+			a.analysisOnNode(&sch.Items.Schemas[i], onNode) // PTAL: Is this right?
+			//sch.Items.Schemas[i]
 		}
 	} else {
 		// Is chldema
-		a.analysisOnNode(chld, chld.Items.Schema, onNode)
+		a.analysisOnNode(sch.Items.Schema, onNode)
 	}
-	//onNode(prnt, chld)
-	return nil
+	return onNode(sch)
 }
 
 // analysisOnLeaf runs a callback function on each leaf of a the JSON schema tree.

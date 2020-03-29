@@ -109,14 +109,18 @@ func TestOpenRPC_Analysis(t *testing.T) {
 	}
 
 	doc.Components.Schemas = make(map[string]spec.Schema)
-	root := &spec.Schema{}
 	for im := 0; im < len(doc.Methods); im++ {
-		fmt.Println(doc.Methods[im].Name)
-		for ip := 0; ip < len(doc.Methods[im].Params); ip++ {
-			fmt.Println(" < ", doc.Methods[im].Params[ip].Name)
-			a.analysisOnNode(&doc.Methods[im].Params[ip].Schema, &doc.Methods[im].Params[ip].Schema, func(parentSch *spec.Schema, sch *spec.Schema) error {
 
-				if parentSch.Ref.String() != "" {
+		met := doc.Methods[im]
+		fmt.Println(met.Name)
+
+		for ip := 0; ip < len(met.Params); ip++ {
+			par := met.Params[ip]
+			fmt.Println(" < ", par.Name)
+			a.analysisOnNode(&par.Schema, func(sch *spec.Schema) error {
+
+
+				if sch.Ref.String() != "" {
 					return nil
 				}
 				err := registerSchema(*sch)
@@ -125,41 +129,29 @@ func TestOpenRPC_Analysis(t *testing.T) {
 					return err
 				}
 
-				fmt.Println("   *", mustMarshalString(parentSch))
-				fmt.Println("   -", mustMarshalString(sch))
-
-				//if len(sch.Definitions) > 0 {
-				//	panic("sch has definitions")
-				//}
-				//if len(parentSch.Definitions) > 0 {
-				//	panic("parent has definitions")
-				//}
+				fmt.Println("   *", mustMarshalString(sch))
 
 				r, err := a.schemaReferenced(*sch)
 				if err != nil {
 					fmt.Println("error getting schema as ref-only schema")
 					return err
 				}
-				//fmt.Println("   @", mustMarshalString(r))
-
-				*parentSch = r
-				//fmt.Println("   **=", mustMarshalString(parentSch))
 
 				doc.Components.Schemas[uniqueKeyFn(*sch)] = *sch
 				*sch = r
-				//*sch = r
-				//v := doc.Methods[im].Params[ip]
-				//v.Schema = r
-				//fmt.Println("   @", mustMarshalString(doc.Methods[im].Params[ip].Schema))
-				fmt.Println("   @", mustMarshalString(parentSch), "->", mustMarshalString(sch))
 
+				fmt.Println("    @", mustMarshalString(sch))
 				return nil
 			})
-			fmt.Println("   :", mustMarshalString(&doc.Methods[im].Params[ip]))
+			met.Params[ip] = par
+			//np = append(np, par)
+			fmt.Println("   :", mustMarshalString(par))
 		}
+
 		fmt.Println(" > ", doc.Methods[im].Result.Name)
-		a.analysisOnNode(root, &doc.Methods[im].Result.Schema, func(parentSch *spec.Schema, sch *spec.Schema) error {
-			if parentSch.Ref.String() != "" || sch.Ref.String() != "" {
+		a.analysisOnNode(&met.Result.Schema, func(sch *spec.Schema) error {
+
+			if sch.Ref.String() != "" {
 				return nil
 			}
 			err := registerSchema(*sch)
@@ -168,29 +160,21 @@ func TestOpenRPC_Analysis(t *testing.T) {
 				return err
 			}
 
-			fmt.Println("   *", mustMarshalString(parentSch))
-			fmt.Println("   -", mustMarshalString(sch))
-
-			//if len(sch.Definitions) > 0 {
-			//	panic("sch has definitions")
-			//}
-			//if len(parentSch.Definitions) > 0 {
-			//	panic("parent has definitions")
-			//}
+			fmt.Println("   *", mustMarshalString(sch))
 
 			r, err := a.schemaReferenced(*sch)
 			if err != nil {
 				fmt.Println("error getting schema as ref-only schema")
 				return err
 			}
-			*parentSch = r
 
 			doc.Components.Schemas[uniqueKeyFn(*sch)] = *sch
-			doc.Methods[im].Result.Schema = r
-			fmt.Println("   @", mustMarshalString(doc.Methods[im].Result.Schema))
+			*sch = r
 
+			fmt.Println("    @", mustMarshalString(sch))
 			return nil
 		})
+		fmt.Println("   :", mustMarshalString(&met.Result))
 	}
 
 	//for schv, tit := range a.schemaTitles {

@@ -191,12 +191,6 @@ func (a argIdent) Name() string {
 	return a.name
 }
 
-//type AnalysisTErrorHandling int
-//const (
-//	AnalysisTErrorFirst AnalysisTErrorHandling = iota
-//	AnalysisTErrorLast
-//	AnalysisTErrorAll
-//)
 type AnalysisT struct {
 	OpenMetaDescription string
 	//ErrorHandling AnalysisTErrorHandling
@@ -206,28 +200,10 @@ type AnalysisT struct {
 	lastSch *spec.Schema
 }
 
-//
-//func (a *AnalysisT) handleError(err error, atFirst bool) error {
-//	switch a.ErrorHandling {
-//	case AnalysisTErrorFirst:
-//		return err
-//	case AnalysisTErrorLast:
-//		if !atFirst {
-//
-//		}
-//	}
-//}
-
-func (a *AnalysisT) schemaReferenced(sch spec.Schema) (refSchema spec.Schema, err error) {
+func (a *AnalysisT) schemaAsReferenceSchema(sch spec.Schema) (refSchema spec.Schema, err error) {
 	b, _ := json.Marshal(sch)
 	titleKey, ok := a.schemaTitles[string(b)]
 	if !ok {
-		//if sch.Ref.String() != "" {
-		//	return sch, nil
-		//}
-		//if sch.Ref.GetPointer().IsEmpty() {
-		//	return sch, nil
-		//}
 		bb, _ := json.Marshal(sch)
 		return refSchema, fmt.Errorf("schema not available as reference: %s @ %v", string(b), string(bb))
 	}
@@ -237,63 +213,62 @@ func (a *AnalysisT) schemaReferenced(sch spec.Schema) (refSchema spec.Schema, er
 	return
 }
 
-func (a *AnalysisT) getRegisteredSchemaTitlekey(sch spec.Schema) (string, error) {
-	b, _ := json.Marshal(sch)
-	tit, ok := a.schemaTitles[string(b)]
-	if !ok {
-		return "", fmt.Errorf("no registered schema found: schema=%s", string(b))
-	}
-	return tit, nil
-}
-
 //func (a *AnalysisT) getRegisteredSchema()
 func (a *AnalysisT) registerSchema(sch spec.Schema, titleKeyer func(schema spec.Schema) string) {
 	b, _ := json.Marshal(sch)
 	a.schemaTitles[string(b)] = titleKeyer(sch)
 }
 
+func (a *AnalysisT) schemaFromRef(psch spec.Schema, ref spec.Ref) (schema spec.Schema, err error) {
+	v, _, err := ref.GetPointer().Get(psch)
+	if err != nil {
+		return
+	}
+	return v.(spec.Schema), nil
+}
+
 //
-//func (a *AnalysisT) expandDefinitions(sch *spec.Schema) {
+//func (a *AnalysisT) dereferenceSchema(sch *spec.Schema) {
 //
 //	// Slices.
-//	for i := 0; i < len(chld.OneOf); i++ {
-//		it := chld.OneOf[i]
-//		a.analysisOnNode(chld, &it, onNode)
+//	for i := 0; i < len(sch.OneOf); i++ {
+//		it := sch.OneOf[i]
+//		a.analysisOnNode(sch, &it, onNode)
 //	}
-//	for i := 0; i < len(chld.AnyOf); i++ {
-//		it := chld.AnyOf[i]
-//		a.analysisOnNode(chld, &it, onNode)
+//	for i := 0; i < len(sch.AnyOf); i++ {
+//		it := sch.AnyOf[i]
+//		a.analysisOnNode(sch, &it, onNode)
 //	}
-//	for i := 0; i < len(chld.AllOf); i++ {
-//		it := chld.AllOf[i]
-//		a.analysisOnNode(chld, &it, onNode)
+//	for i := 0; i < len(sch.AllOf); i++ {
+//		it := sch.AllOf[i]
+//		a.analysisOnNode(sch, &it, onNode)
 //	}
 //	// Maps.
-//	for k, defSch := range chld.Definitions {
+//	for k, defSch := range sch.Definitions {
 //		defSch.Title = k
-//		a.analysisOnNode(chld, &defSch, onNode)
+//		a.analysisOnNode(sch, &defSch, onNode)
 //	}
-//	for k := range chld.Properties {
-//		v := chld.Properties[k]
-//		a.analysisOnNode(chld, &v, onNode)
+//	for k := range sch.Properties {
+//		v := sch.Properties[k]
+//		a.analysisOnNode(sch, &v, onNode)
 //	}
-//	for k := range chld.PatternProperties {
-//		v := chld.PatternProperties[k]
-//		a.analysisOnNode(chld, &v, onNode)
+//	for k := range sch.PatternProperties {
+//		v := sch.PatternProperties[k]
+//		a.analysisOnNode(sch, &v, onNode)
 //	}
-//	if chld.Items == nil {
-//		//onNode(prnt, chld)
+//	if sch.Items == nil {
+//		//onNode(prnt, sch)
 //		return nil
 //	}
-//	if chld.Items.Len() > 1 {
-//		for i := range chld.Items.Schemas {
-//			a.analysisOnNode(chld, &chld.Items.Schemas[i], onNode) // PTAL: Is this right?
+//	if sch.Items.Len() > 1 {
+//		for i := range sch.Items.Schemas {
+//			a.analysisOnNode(sch, &sch.Items.Schemas[i], onNode) // PTAL: Is this right?
 //		}
 //	} else {
-//		// Is chldema
-//		a.analysisOnNode(chld, chld.Items.Schema, onNode)
+//		// Is schema
+//		a.analysisOnNode(sch, sch.Items.Schema, onNode)
 //	}
-//	//onNode(prnt, chld)
+//	//onNode(prnt, sch)
 //	return nil
 //}
 
@@ -326,13 +301,13 @@ func (a *AnalysisT) analysisOnNode(sch *spec.Schema, onNode func(node *spec.Sche
 	}
 	for k := range sch.Properties {
 		v := sch.Properties[k]
-		v.Title = k
+		//v.Title = k
 		a.analysisOnNode(&v, onNode)
 		sch.Properties[k] = v
 	}
 	for k := range sch.PatternProperties {
 		v := sch.PatternProperties[k]
-		v.Title = k
+		//v.Title = k
 		a.analysisOnNode(&v, onNode)
 		sch.PatternProperties[k] = v
 	}
@@ -344,10 +319,8 @@ func (a *AnalysisT) analysisOnNode(sch *spec.Schema, onNode func(node *spec.Sche
 	if sch.Items.Len() > 1 {
 		for i := range sch.Items.Schemas {
 			a.analysisOnNode(&sch.Items.Schemas[i], onNode) // PTAL: Is this right?
-			//sch.Items.Schemas[i]
 		}
 	} else {
-		// Is chldema
 		a.analysisOnNode(sch.Items.Schema, onNode)
 	}
 	return onNode(sch)

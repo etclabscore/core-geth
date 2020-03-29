@@ -239,7 +239,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/NodeInfo_object.5f14a0ee"
+                    "$ref": "#/components/schemas/NodeInfo_object.af2a2e46"
                 }
             },
             "deprecated": false,
@@ -590,7 +590,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/AccountRangeResult_object.8f49e1b4"
+                    "$ref": "#/components/schemas/AccountRangeResult_object.818e7f11"
                 }
             },
             "deprecated": false,
@@ -827,7 +827,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/state.Dump_object.f3517821"
+                    "$ref": "#/components/schemas/state.Dump_object.346c5cdb"
                 }
             },
             "deprecated": false,
@@ -881,7 +881,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/GCStats_object.2cc8b180"
+                    "$ref": "#/components/schemas/GCStats_object.616d5adb"
                 }
             },
             "deprecated": false,
@@ -1117,7 +1117,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/MemStats_object.f3711c32"
+                    "$ref": "#/components/schemas/MemStats_object.420da896"
                 }
             },
             "deprecated": false,
@@ -1495,7 +1495,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/StdTraceConfig_object.bfb37ac9"
+                        "$ref": "#/components/schemas/StdTraceConfig_object.232453a1"
                     }
                 }
             ],
@@ -1543,7 +1543,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/StdTraceConfig_object.bfb37ac9"
+                        "$ref": "#/components/schemas/StdTraceConfig_object.232453a1"
                     }
                 }
             ],
@@ -1762,7 +1762,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/StorageRangeResult_object.bd9af469"
+                    "$ref": "#/components/schemas/StorageRangeResult_object.009058a4"
                 }
             },
             "deprecated": false,
@@ -1847,7 +1847,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/TraceConfig_object.4484d154"
+                        "$ref": "#/components/schemas/TraceConfig_object.c49f574b"
                     }
                 }
             ],
@@ -1895,7 +1895,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/TraceConfig_object.4484d154"
+                        "$ref": "#/components/schemas/TraceConfig_object.c49f574b"
                     }
                 }
             ],
@@ -1943,7 +1943,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/TraceConfig_object.4484d154"
+                        "$ref": "#/components/schemas/TraceConfig_object.c49f574b"
                     }
                 }
             ],
@@ -1991,7 +1991,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/TraceConfig_object.4484d154"
+                        "$ref": "#/components/schemas/TraceConfig_object.c49f574b"
                     }
                 }
             ],
@@ -2039,7 +2039,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/TraceConfig_object.4484d154"
+                        "$ref": "#/components/schemas/TraceConfig_object.c49f574b"
                     }
                 }
             ],
@@ -2087,7 +2087,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/TraceConfig_object.4484d154"
+                        "$ref": "#/components/schemas/TraceConfig_object.c49f574b"
                     }
                 }
             ],
@@ -2098,7 +2098,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/ExecutionResult_object.641d4de5"
+                    "$ref": "#/components/schemas/ExecutionResult_object.43574480"
                 }
             },
             "deprecated": false,
@@ -2369,7 +2369,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/CallArgs_object.73b007bc"
+                        "$ref": "#/components/schemas/CallArgs_object.e5940922"
                     }
                 },
                 {
@@ -2379,7 +2379,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_object.fc2cc3db"
+                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_object.edb53aa4"
                     }
                 },
                 {
@@ -2481,7 +2481,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/CallArgs_object.73b007bc"
+                        "$ref": "#/components/schemas/CallArgs_object.e5940922"
                     }
                 }
             ],
@@ -2546,7 +2546,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/SendTxArgs_object.a4f3ea2d"
+                        "$ref": "#/components/schemas/SendTxArgs_object.7d82067d"
                     }
                 }
             ],
@@ -2557,7 +2557,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/SignTransactionResult_object.1f448696"
+                    "$ref": "#/components/schemas/SignTransactionResult_object.3abfa7f7"
                 }
             },
             "deprecated": false,
@@ -2621,7 +2621,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_object.fc2cc3db"
+                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_object.edb53aa4"
                     }
                 }
             ],
@@ -2841,7 +2841,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_object.fc2cc3db"
+                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_object.edb53aa4"
                     }
                 }
             ],
@@ -3058,7 +3058,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/FilterCriteria_object.9649566c"
+                        "$ref": "#/components/schemas/FilterCriteria_object.ef144690"
                     }
                 }
             ],
@@ -3116,7 +3116,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_object.fc2cc3db"
+                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_object.edb53aa4"
                     }
                 }
             ],
@@ -3127,7 +3127,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/AccountResult_object.04b2e0bf"
+                    "$ref": "#/components/schemas/AccountResult_object.ac7a327c"
                 }
             },
             "deprecated": false,
@@ -3308,7 +3308,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_object.fc2cc3db"
+                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_object.edb53aa4"
                     }
                 }
             ],
@@ -3367,7 +3367,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/RPCTransaction_object.eaf98344"
+                    "$ref": "#/components/schemas/RPCTransaction_object.f5271664"
                 }
             },
             "deprecated": false,
@@ -3415,7 +3415,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/RPCTransaction_object.eaf98344"
+                    "$ref": "#/components/schemas/RPCTransaction_object.f5271664"
                 }
             },
             "deprecated": false,
@@ -3453,7 +3453,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/RPCTransaction_object.eaf98344"
+                    "$ref": "#/components/schemas/RPCTransaction_object.f5271664"
                 }
             },
             "deprecated": false,
@@ -3490,7 +3490,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_object.fc2cc3db"
+                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_object.edb53aa4"
                     }
                 }
             ],
@@ -3846,7 +3846,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/FilterCriteria_object.9649566c"
+                        "$ref": "#/components/schemas/FilterCriteria_object.ef144690"
                     }
                 }
             ],
@@ -3965,7 +3965,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/SendTxArgs_object.a4f3ea2d"
+                        "$ref": "#/components/schemas/SendTxArgs_object.7d82067d"
                     }
                 },
                 {
@@ -4061,7 +4061,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/SendTxArgs_object.a4f3ea2d"
+                        "$ref": "#/components/schemas/SendTxArgs_object.7d82067d"
                     }
                 }
             ],
@@ -4147,7 +4147,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/SendTxArgs_object.a4f3ea2d"
+                        "$ref": "#/components/schemas/SendTxArgs_object.7d82067d"
                     }
                 }
             ],
@@ -4158,7 +4158,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/SignTransactionResult_object.1f448696"
+                    "$ref": "#/components/schemas/SignTransactionResult_object.3abfa7f7"
                 }
             },
             "deprecated": false,
@@ -4872,7 +4872,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/accounts.Account_object.bb03962a"
+                    "$ref": "#/components/schemas/accounts.Account_object.b8f64ce5"
                 }
             },
             "deprecated": false,
@@ -5211,7 +5211,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/SendTxArgs_object.a4f3ea2d"
+                        "$ref": "#/components/schemas/SendTxArgs_object.7d82067d"
                     }
                 },
                 {
@@ -5317,7 +5317,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/SendTxArgs_object.a4f3ea2d"
+                        "$ref": "#/components/schemas/SendTxArgs_object.7d82067d"
                     }
                 },
                 {
@@ -5365,7 +5365,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/SendTxArgs_object.a4f3ea2d"
+                        "$ref": "#/components/schemas/SendTxArgs_object.7d82067d"
                     }
                 },
                 {
@@ -5396,7 +5396,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/SignTransactionResult_object.1f448696"
+                    "$ref": "#/components/schemas/SignTransactionResult_object.3abfa7f7"
                 }
             },
             "deprecated": false,
@@ -5661,11 +5661,19 @@
     ],
     "components": {
         "schemas": {
-            ".*.f3c4e093": {
-                "title": ".*",
+            "32b9d267": {
+                "$ref": "#/components/schemas/string.integer.fe0a5094"
+            },
+            "3ef9ee5c": {
                 "additionalProperties": true
             },
-            "AccountRangeResult_object.8f49e1b4": {
+            "6eef3f71": {
+                "$ref": "#/components/schemas/string.5b1cd571"
+            },
+            "872b45d1": {
+                "$ref": "#/components/schemas/array.2800749e"
+            },
+            "AccountRangeResult_object.818e7f11": {
                 "description": "github.com/ethereum/go-ethereum/eth:AccountRangeResult",
                 "type": "object",
                 "required": [
@@ -5674,16 +5682,16 @@
                 ],
                 "properties": {
                     "accounts": {
-                        "$ref": "#/components/schemas/object.accounts.39f4fc7e"
+                        "$ref": "#/components/schemas/object.f06f16ea"
                     },
                     "next": {
-                        "$ref": "#/components/schemas/string.next.1c12596a"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     }
                 },
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "AccountResult_object.04b2e0bf": {
+            "AccountResult_object.ac7a327c": {
                 "description": "*github.com/ethereum/go-ethereum/internal/ethapi:AccountResult",
                 "type": "object",
                 "required": [
@@ -5697,31 +5705,31 @@
                 ],
                 "properties": {
                     "accountProof": {
-                        "$ref": "#/components/schemas/array.accountProof.53babe1f"
+                        "$ref": "#/components/schemas/array.2800749e"
                     },
                     "address": {
                         "$ref": "#/components/schemas/string.address.a5a48ce4"
                     },
                     "balance": {
-                        "$ref": "#/components/schemas/string.balance.0bb0f80e"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "codeHash": {
-                        "$ref": "#/components/schemas/string.codeHash.61826704"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     },
                     "nonce": {
-                        "$ref": "#/components/schemas/string.nonce.3c84644b"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "storageHash": {
-                        "$ref": "#/components/schemas/string.storageHash.b1d44b21"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     },
                     "storageProof": {
-                        "$ref": "#/components/schemas/array.storageProof.ddeeec82"
+                        "$ref": "#/components/schemas/array.c9dd4a54"
                     }
                 },
                 "additionalProperties": false,
                 "definitions": {
                     "StorageResult": {
-                        "$ref": "#/components/schemas/object.StorageResult.919198ae"
+                        "$ref": "#/components/schemas/object.StorageResult.9f9f642f"
                     }
                 },
                 "$schema": "http://json-schema.org/draft-04/schema"
@@ -5732,7 +5740,7 @@
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "CallArgs_object.73b007bc": {
+            "CallArgs_object.e5940922": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi:CallArgs",
                 "type": "object",
                 "required": [
@@ -5745,28 +5753,28 @@
                 ],
                 "properties": {
                     "data": {
-                        "$ref": "#/components/schemas/string.data.68e4b0bc"
+                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
                     },
                     "from": {
-                        "$ref": "#/components/schemas/string.from.14e9ac86"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     },
                     "gas": {
-                        "$ref": "#/components/schemas/string.gas.93d6f8f6"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "gasPrice": {
-                        "$ref": "#/components/schemas/string.gasPrice.29b28ce2"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "to": {
-                        "$ref": "#/components/schemas/string.to.facdf185"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     },
                     "value": {
-                        "$ref": "#/components/schemas/string.value.d1081ede"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     }
                 },
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "ExecutionResult_object.641d4de5": {
+            "ExecutionResult_object.43574480": {
                 "description": "*github.com/ethereum/go-ethereum/internal/ethapi:ExecutionResult",
                 "type": "object",
                 "required": [
@@ -5777,27 +5785,27 @@
                 ],
                 "properties": {
                     "failed": {
-                        "$ref": "#/components/schemas/boolean.failed.18c5e582"
+                        "$ref": "#/components/schemas/boolean.420dffc4"
                     },
                     "gas": {
-                        "$ref": "#/components/schemas/string.gas.93d6f8f6"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "returnValue": {
-                        "$ref": "#/components/schemas/string.returnValue.aed29388"
+                        "$ref": "#/components/schemas/string.5b1cd571"
                     },
                     "structLogs": {
-                        "$ref": "#/components/schemas/array.structLogs.a9ac93a3"
+                        "$ref": "#/components/schemas/array.a095c0e0"
                     }
                 },
                 "additionalProperties": false,
                 "definitions": {
                     "StructLogRes": {
-                        "$ref": "#/components/schemas/object.StructLogRes.c4c9caa4"
+                        "$ref": "#/components/schemas/object.StructLogRes.f4432917"
                     }
                 },
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "FilterCriteria_object.9649566c": {
+            "FilterCriteria_object.ef144690": {
                 "description": "github.com/ethereum/go-ethereum/eth/filters:FilterCriteria",
                 "type": "object",
                 "required": [
@@ -5809,25 +5817,25 @@
                 ],
                 "properties": {
                     "Addresses": {
-                        "$ref": "#/components/schemas/array.Addresses.1cdcd9ba"
+                        "$ref": "#/components/schemas/array.0e2ed272"
                     },
                     "BlockHash": {
-                        "$ref": "#/components/schemas/string.BlockHash.2c1b3046"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     },
                     "FromBlock": {
-                        "$ref": "#/components/schemas/string.FromBlock.91943f8b"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "ToBlock": {
-                        "$ref": "#/components/schemas/string.ToBlock.68c041ae"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "Topics": {
-                        "$ref": "#/components/schemas/array.Topics.401614e0"
+                        "$ref": "#/components/schemas/array.b036d5dd"
                     }
                 },
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "GCStats_object.2cc8b180": {
+            "GCStats_object.616d5adb": {
                 "description": "*runtime/debug:GCStats",
                 "type": "object",
                 "required": [
@@ -5840,22 +5848,22 @@
                 ],
                 "properties": {
                     "LastGC": {
-                        "$ref": "#/components/schemas/string.LastGC.3a48a289"
+                        "$ref": "#/components/schemas/string.c824b4e5"
                     },
                     "NumGC": {
-                        "$ref": "#/components/schemas/string.NumGC.3cea71af"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "Pause": {
-                        "$ref": "#/components/schemas/array.Pause.67e9274d"
+                        "$ref": "#/components/schemas/array.212c3507"
                     },
                     "PauseEnd": {
-                        "$ref": "#/components/schemas/array.PauseEnd.24602532"
+                        "$ref": "#/components/schemas/array.f3a92465"
                     },
                     "PauseQuantiles": {
-                        "$ref": "#/components/schemas/array.PauseQuantiles.435e1234"
+                        "$ref": "#/components/schemas/array.212c3507"
                     },
                     "PauseTotal": {
-                        "$ref": "#/components/schemas/string.PauseTotal.c0e36316"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     }
                 },
                 "additionalProperties": false,
@@ -5867,7 +5875,7 @@
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "MemStats_object.f3711c32": {
+            "MemStats_object.420da896": {
                 "description": "*runtime:MemStats",
                 "type": "object",
                 "required": [
@@ -5906,106 +5914,106 @@
                 ],
                 "properties": {
                     "Alloc": {
-                        "$ref": "#/components/schemas/string.Alloc.fd1ea478"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "BuckHashSys": {
-                        "$ref": "#/components/schemas/string.BuckHashSys.b5af7eda"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "BySize": {
-                        "$ref": "#/components/schemas/array.BySize.21f5626a"
+                        "$ref": "#/components/schemas/array.2ec5bbf4"
                     },
                     "DebugGC": {
-                        "$ref": "#/components/schemas/boolean.DebugGC.f72dd86d"
+                        "$ref": "#/components/schemas/boolean.420dffc4"
                     },
                     "EnableGC": {
-                        "$ref": "#/components/schemas/boolean.EnableGC.649c9481"
+                        "$ref": "#/components/schemas/boolean.420dffc4"
                     },
                     "Frees": {
-                        "$ref": "#/components/schemas/string.Frees.59756969"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "GCCPUFraction": {
-                        "$ref": "#/components/schemas/number.GCCPUFraction.edfb669d"
+                        "$ref": "#/components/schemas/number.caa7697b"
                     },
                     "GCSys": {
-                        "$ref": "#/components/schemas/string.GCSys.29519af7"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "HeapAlloc": {
-                        "$ref": "#/components/schemas/string.HeapAlloc.0da889e3"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "HeapIdle": {
-                        "$ref": "#/components/schemas/string.HeapIdle.f5f8bd70"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "HeapInuse": {
-                        "$ref": "#/components/schemas/string.HeapInuse.46c1a802"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "HeapObjects": {
-                        "$ref": "#/components/schemas/string.HeapObjects.8e65f376"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "HeapReleased": {
-                        "$ref": "#/components/schemas/string.HeapReleased.70e64625"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "HeapSys": {
-                        "$ref": "#/components/schemas/string.HeapSys.e2d36825"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "LastGC": {
-                        "$ref": "#/components/schemas/string.LastGC.3a026d1e"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "Lookups": {
-                        "$ref": "#/components/schemas/string.Lookups.78c59e71"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "MCacheInuse": {
-                        "$ref": "#/components/schemas/string.MCacheInuse.5170758e"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "MCacheSys": {
-                        "$ref": "#/components/schemas/string.MCacheSys.12962687"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "MSpanInuse": {
-                        "$ref": "#/components/schemas/string.MSpanInuse.6638f9e8"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "MSpanSys": {
-                        "$ref": "#/components/schemas/string.MSpanSys.f974e520"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "Mallocs": {
-                        "$ref": "#/components/schemas/string.Mallocs.7479edd0"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "NextGC": {
-                        "$ref": "#/components/schemas/string.NextGC.84d1efc6"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "NumForcedGC": {
-                        "$ref": "#/components/schemas/string.NumForcedGC.c135d726"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "NumGC": {
-                        "$ref": "#/components/schemas/string.NumGC.3cea71af"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "OtherSys": {
-                        "$ref": "#/components/schemas/string.OtherSys.7d267520"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "PauseEnd": {
-                        "$ref": "#/components/schemas/array.PauseEnd.0af58e66"
+                        "$ref": "#/components/schemas/array.1c86b5fa"
                     },
                     "PauseNs": {
-                        "$ref": "#/components/schemas/array.PauseNs.4528cd3b"
+                        "$ref": "#/components/schemas/array.1c86b5fa"
                     },
                     "PauseTotalNs": {
-                        "$ref": "#/components/schemas/string.PauseTotalNs.c146de2f"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "StackInuse": {
-                        "$ref": "#/components/schemas/string.StackInuse.8aabb20d"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "StackSys": {
-                        "$ref": "#/components/schemas/string.StackSys.96f6d619"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "Sys": {
-                        "$ref": "#/components/schemas/string.Sys.114447e2"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "TotalAlloc": {
-                        "$ref": "#/components/schemas/string.TotalAlloc.de2f4c9d"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     }
                 },
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "NodeInfo_object.5f14a0ee": {
+            "NodeInfo_object.af2a2e46": {
                 "description": "*github.com/ethereum/go-ethereum/p2p:NodeInfo",
                 "type": "object",
                 "required": [
@@ -6020,36 +6028,34 @@
                 ],
                 "properties": {
                     "enode": {
-                        "$ref": "#/components/schemas/string.enode.3329c28e"
+                        "$ref": "#/components/schemas/string.5b1cd571"
                     },
                     "enr": {
-                        "$ref": "#/components/schemas/string.enr.bc35e074"
+                        "$ref": "#/components/schemas/string.5b1cd571"
                     },
                     "id": {
-                        "$ref": "#/components/schemas/string.id.01c84a3b"
+                        "$ref": "#/components/schemas/string.5b1cd571"
                     },
                     "ip": {
-                        "$ref": "#/components/schemas/string.ip.20c7fa54"
+                        "$ref": "#/components/schemas/string.5b1cd571"
                     },
                     "listenAddr": {
-                        "$ref": "#/components/schemas/string.listenAddr.d48b0e6a"
+                        "$ref": "#/components/schemas/string.5b1cd571"
                     },
                     "name": {
-                        "$ref": "#/components/schemas/string.name.4747b405"
+                        "$ref": "#/components/schemas/string.5b1cd571"
                     },
                     "ports": {
-                        "title": "ports",
-                        "$ref": "#/definitions/NodeInfoPorts",
-                        "$schema": "http://json-schema.org/draft-04/schema"
+                        "$ref": "#/components/schemas/object.NodeInfoPorts.b1001076"
                     },
                     "protocols": {
-                        "$ref": "#/components/schemas/object.protocols.8be8b3f8"
+                        "$ref": "#/components/schemas/object.0134db4e"
                     }
                 },
                 "additionalProperties": false,
                 "definitions": {
                     "NodeInfoPorts": {
-                        "$ref": "#/components/schemas/object.NodeInfoPorts.c03b8bfb"
+                        "$ref": "#/components/schemas/object.NodeInfoPorts.4f03b707"
                     }
                 },
                 "$schema": "http://json-schema.org/draft-04/schema"
@@ -6058,7 +6064,7 @@
                 "description": "Null",
                 "type": "null"
             },
-            "RPCTransaction_object.eaf98344": {
+            "RPCTransaction_object.f5271664": {
                 "description": "*github.com/ethereum/go-ethereum/internal/ethapi:RPCTransaction",
                 "type": "object",
                 "required": [
@@ -6079,52 +6085,52 @@
                 ],
                 "properties": {
                     "blockHash": {
-                        "$ref": "#/components/schemas/string.blockHash.895f7b68"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     },
                     "blockNumber": {
-                        "$ref": "#/components/schemas/string.blockNumber.ed346720"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "from": {
-                        "$ref": "#/components/schemas/string.from.cc80dfc4"
+                        "$ref": "#/components/schemas/string.address.a5a48ce4"
                     },
                     "gas": {
-                        "$ref": "#/components/schemas/string.gas.93d6f8f6"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "gasPrice": {
-                        "$ref": "#/components/schemas/string.gasPrice.29b28ce2"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "hash": {
-                        "$ref": "#/components/schemas/string.hash.33935b6e"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     },
                     "input": {
-                        "$ref": "#/components/schemas/string.input.14d210c8"
+                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
                     },
                     "nonce": {
-                        "$ref": "#/components/schemas/string.nonce.3c84644b"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "r": {
-                        "$ref": "#/components/schemas/string.r.9eca4676"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "s": {
-                        "$ref": "#/components/schemas/string.s.98fd5b13"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "to": {
-                        "$ref": "#/components/schemas/string.to.facdf185"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     },
                     "transactionIndex": {
-                        "$ref": "#/components/schemas/string.transactionIndex.ea3605fb"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "v": {
-                        "$ref": "#/components/schemas/string.v.9d04f339"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "value": {
-                        "$ref": "#/components/schemas/string.value.d1081ede"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     }
                 },
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "SendTxArgs_object.a4f3ea2d": {
+            "SendTxArgs_object.7d82067d": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi:SendTxArgs",
                 "type": "object",
                 "required": [
@@ -6139,34 +6145,34 @@
                 ],
                 "properties": {
                     "data": {
-                        "$ref": "#/components/schemas/string.data.86f3ddb1"
+                        "$ref": "#/components/schemas/string.dataWord.259d3594"
                     },
                     "from": {
-                        "$ref": "#/components/schemas/string.from.cc80dfc4"
+                        "$ref": "#/components/schemas/string.address.a5a48ce4"
                     },
                     "gas": {
-                        "$ref": "#/components/schemas/string.gas.93d6f8f6"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "gasPrice": {
-                        "$ref": "#/components/schemas/string.gasPrice.29b28ce2"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "input": {
-                        "$ref": "#/components/schemas/string.input.14d210c8"
+                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
                     },
                     "nonce": {
-                        "$ref": "#/components/schemas/string.nonce.3c84644b"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "to": {
-                        "$ref": "#/components/schemas/string.to.facdf185"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     },
                     "value": {
-                        "$ref": "#/components/schemas/string.value.d1081ede"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     }
                 },
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "SignTransactionResult_object.1f448696": {
+            "SignTransactionResult_object.3abfa7f7": {
                 "description": "*github.com/ethereum/go-ethereum/internal/ethapi:SignTransactionResult",
                 "type": "object",
                 "required": [
@@ -6175,12 +6181,10 @@
                 ],
                 "properties": {
                     "raw": {
-                        "$ref": "#/components/schemas/string.raw.95d8640d"
+                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
                     },
                     "tx": {
-                        "title": "tx",
-                        "$ref": "#/definitions/Transaction",
-                        "$schema": "http://json-schema.org/draft-04/schema"
+                        "$ref": "#/components/schemas/object.Transaction.88e7e12e"
                     }
                 },
                 "additionalProperties": false,
@@ -6191,7 +6195,7 @@
                 },
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "StdTraceConfig_object.bfb37ac9": {
+            "StdTraceConfig_object.232453a1": {
                 "description": "*github.com/ethereum/go-ethereum/eth:StdTraceConfig",
                 "type": "object",
                 "required": [
@@ -6205,31 +6209,31 @@
                 ],
                 "properties": {
                     "Debug": {
-                        "$ref": "#/components/schemas/boolean.Debug.17cc120d"
+                        "$ref": "#/components/schemas/boolean.420dffc4"
                     },
                     "DisableMemory": {
-                        "$ref": "#/components/schemas/boolean.DisableMemory.621c04c7"
+                        "$ref": "#/components/schemas/boolean.420dffc4"
                     },
                     "DisableStack": {
-                        "$ref": "#/components/schemas/boolean.DisableStack.04abcc9b"
+                        "$ref": "#/components/schemas/boolean.420dffc4"
                     },
                     "DisableStorage": {
-                        "$ref": "#/components/schemas/boolean.DisableStorage.32228a09"
+                        "$ref": "#/components/schemas/boolean.420dffc4"
                     },
                     "Limit": {
-                        "$ref": "#/components/schemas/string.Limit.ff1608db"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "Reexec": {
-                        "$ref": "#/components/schemas/string.Reexec.506bc176"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "TxHash": {
-                        "$ref": "#/components/schemas/string.TxHash.588c2537"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     }
                 },
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "StorageRangeResult_object.bd9af469": {
+            "StorageRangeResult_object.009058a4": {
                 "description": "github.com/ethereum/go-ethereum/eth:StorageRangeResult",
                 "type": "object",
                 "required": [
@@ -6238,21 +6242,21 @@
                 ],
                 "properties": {
                     "nextKey": {
-                        "$ref": "#/components/schemas/string.nextKey.860bf835"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     },
                     "storage": {
-                        "$ref": "#/components/schemas/object.storage.aef073e3"
+                        "$ref": "#/components/schemas/object.e77806c6"
                     }
                 },
                 "additionalProperties": false,
                 "definitions": {
                     "storageEntry": {
-                        "$ref": "#/components/schemas/object.storageEntry.dbc1634d"
+                        "$ref": "#/components/schemas/object.storageEntry.79c24779"
                     }
                 },
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "TraceConfig_object.4484d154": {
+            "TraceConfig_object.c49f574b": {
                 "description": "*github.com/ethereum/go-ethereum/eth:TraceConfig",
                 "type": "object",
                 "required": [
@@ -6267,28 +6271,28 @@
                 ],
                 "properties": {
                     "Debug": {
-                        "$ref": "#/components/schemas/boolean.Debug.17cc120d"
+                        "$ref": "#/components/schemas/boolean.420dffc4"
                     },
                     "DisableMemory": {
-                        "$ref": "#/components/schemas/boolean.DisableMemory.621c04c7"
+                        "$ref": "#/components/schemas/boolean.420dffc4"
                     },
                     "DisableStack": {
-                        "$ref": "#/components/schemas/boolean.DisableStack.04abcc9b"
+                        "$ref": "#/components/schemas/boolean.420dffc4"
                     },
                     "DisableStorage": {
-                        "$ref": "#/components/schemas/boolean.DisableStorage.32228a09"
+                        "$ref": "#/components/schemas/boolean.420dffc4"
                     },
                     "Limit": {
-                        "$ref": "#/components/schemas/string.Limit.ff1608db"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "Reexec": {
-                        "$ref": "#/components/schemas/string.Reexec.506bc176"
+                        "$ref": "#/components/schemas/string.integer.fe0a5094"
                     },
                     "Timeout": {
-                        "$ref": "#/components/schemas/string.Timeout.e0ebbed2"
+                        "$ref": "#/components/schemas/string.5b1cd571"
                     },
                     "Tracer": {
-                        "$ref": "#/components/schemas/string.Tracer.afb109d6"
+                        "$ref": "#/components/schemas/string.5b1cd571"
                     }
                 },
                 "additionalProperties": false,
@@ -6306,7 +6310,14 @@
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "accounts.Account_object.bb03962a": {
+            "a0f71722": {
+                "$ref": "#/definitions/",
+                "$schema": "http://json-schema.org/draft-04/schema"
+            },
+            "a8db9e38": {
+                "$ref": "#/components/schemas/object.c018b64e"
+            },
+            "accounts.Account_object.b8f64ce5": {
                 "description": "github.com/ethereum/go-ethereum/accounts:accounts.Account",
                 "type": "object",
                 "required": [
@@ -6318,18 +6329,50 @@
                         "$ref": "#/components/schemas/string.address.a5a48ce4"
                     },
                     "url": {
-                        "title": "url",
-                        "$ref": "#/definitions/URL",
-                        "$schema": "http://json-schema.org/draft-04/schema"
+                        "$ref": "#/components/schemas/object.URL.d32cb12f"
                     }
                 },
                 "additionalProperties": false,
                 "definitions": {
                     "URL": {
-                        "$ref": "#/components/schemas/object.URL.3d224db8"
+                        "$ref": "#/components/schemas/object.URL.3de1a6ce"
                     }
                 },
                 "$schema": "http://json-schema.org/draft-04/schema"
+            },
+            "array.0e2ed272": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/string.address.a5a48ce4"
+                }
+            },
+            "array.1c86b5fa": {
+                "type": "array",
+                "maxItems": 256,
+                "minItems": 256,
+                "items": {
+                    "$ref": "#/components/schemas/string.integer.edb7ed14"
+                }
+            },
+            "array.212c3507": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/string.integer.edb7ed14"
+                }
+            },
+            "array.2800749e": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/string.5b1cd571"
+                }
+            },
+            "array.2ec5bbf4": {
+                "type": "array",
+                "maxItems": 61,
+                "minItems": 61,
+                "items": {
+                    "$ref": "#/components/schemas/a0f71722"
+                }
             },
             "array.3da9f289": {
                 "type": "array",
@@ -6337,115 +6380,35 @@
                     "$ref": "#/components/schemas/string.keccak.3242e7ca"
                 }
             },
-            "array.Addresses.1cdcd9ba": {
+            "array.a095c0e0": {
                 "type": "array",
-                "title": "Addresses",
                 "items": {
-                    "$ref": "#/components/schemas/string.address.a5a48ce4"
+                    "$ref": "#/components/schemas/object.StructLogRes.2248122a"
                 }
             },
-            "array.BySize.21f5626a": {
+            "array.b036d5dd": {
                 "type": "array",
-                "title": "BySize",
-                "maxItems": 61,
-                "minItems": 61,
-                "items": {
-                    "$ref": "#/definitions/",
-                    "$schema": "http://json-schema.org/draft-04/schema"
-                }
-            },
-            "array.Pause.67e9274d": {
-                "type": "array",
-                "title": "Pause",
-                "items": {
-                    "$ref": "#/components/schemas/string.integer.edb7ed14"
-                }
-            },
-            "array.PauseEnd.0af58e66": {
-                "type": "array",
-                "title": "PauseEnd",
-                "maxItems": 256,
-                "minItems": 256,
-                "items": {
-                    "$ref": "#/components/schemas/string.integer.edb7ed14"
-                }
-            },
-            "array.PauseEnd.24602532": {
-                "type": "array",
-                "title": "PauseEnd",
-                "items": {
-                    "$ref": "#/components/schemas/string.c824b4e5"
-                }
-            },
-            "array.PauseNs.4528cd3b": {
-                "type": "array",
-                "title": "PauseNs",
-                "maxItems": 256,
-                "minItems": 256,
-                "items": {
-                    "$ref": "#/components/schemas/string.integer.edb7ed14"
-                }
-            },
-            "array.PauseQuantiles.435e1234": {
-                "type": "array",
-                "title": "PauseQuantiles",
-                "items": {
-                    "$ref": "#/components/schemas/string.integer.edb7ed14"
-                }
-            },
-            "array.Topics.401614e0": {
-                "type": "array",
-                "title": "Topics",
                 "items": {
                     "$ref": "#/components/schemas/array.3da9f289"
                 }
             },
-            "array.accountProof.53babe1f": {
+            "array.c9dd4a54": {
                 "type": "array",
-                "title": "accountProof",
                 "items": {
-                    "$ref": "#/components/schemas/string.5b1cd571"
+                    "$ref": "#/components/schemas/object.StorageResult.88ef1687"
                 }
             },
-            "array.memory.8642792c": {
+            "array.f3a92465": {
                 "type": "array",
-                "title": "memory",
                 "items": {
-                    "$ref": "#/components/schemas/string.5b1cd571"
+                    "$ref": "#/components/schemas/string.c824b4e5"
                 }
             },
-            "array.proof.464c728b": {
-                "type": "array",
-                "title": "proof",
-                "items": {
-                    "$ref": "#/components/schemas/string.5b1cd571"
-                }
+            "b4478bb6": {
+                "$ref": "#/components/schemas/3ef9ee5c"
             },
-            "array.stack.f9c56d91": {
-                "type": "array",
-                "title": "stack",
-                "items": {
-                    "$ref": "#/components/schemas/string.5b1cd571"
-                }
-            },
-            "array.storageProof.ddeeec82": {
-                "type": "array",
-                "title": "storageProof",
-                "items": {
-                    "$ref": "#/definitions/StorageResult",
-                    "$schema": "http://json-schema.org/draft-04/schema"
-                }
-            },
-            "array.structLogs.a9ac93a3": {
-                "type": "array",
-                "title": "structLogs",
-                "items": {
-                    "$ref": "#/definitions/StructLogRes",
-                    "$schema": "http://json-schema.org/draft-04/schema"
-                }
-            },
-            "blockNumber.7692c2ec": {
-                "title": "blockNumber",
+            "blockNumberOrTag.802fd43c": {
+                "title": "blockNumberOrTag",
                 "oneOf": [
                     {
                         "$ref": "#/components/schemas/string.keccak.3242e7ca"
@@ -6467,37 +6430,8 @@
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "boolean.Debug.17cc120d": {
-                "type": "boolean",
-                "title": "Debug"
-            },
-            "boolean.DebugGC.f72dd86d": {
-                "type": "boolean",
-                "title": "DebugGC"
-            },
-            "boolean.DisableMemory.621c04c7": {
-                "type": "boolean",
-                "title": "DisableMemory"
-            },
-            "boolean.DisableStack.04abcc9b": {
-                "type": "boolean",
-                "title": "DisableStack"
-            },
-            "boolean.DisableStorage.32228a09": {
-                "type": "boolean",
-                "title": "DisableStorage"
-            },
-            "boolean.EnableGC.649c9481": {
-                "type": "boolean",
-                "title": "EnableGC"
-            },
-            "boolean.failed.18c5e582": {
-                "type": "boolean",
-                "title": "failed"
-            },
-            "boolean.requireCanonical.d7e2cb19": {
-                "type": "boolean",
-                "title": "requireCanonical"
+            "boolean.420dffc4": {
+                "type": "boolean"
             },
             "common.Address_object.674138f2": {
                 "description": "github.com/ethereum/go-ethereum/common:common.Address",
@@ -6511,9 +6445,11 @@
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "error.b3001d7a": {
-                "title": "error",
-                "additionalProperties": true
+            "dbd25355": {
+                "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+            },
+            "e71ae30a": {
+                "$ref": "#/components/schemas/string.dataWord.e8659da6"
             },
             "hexutil.Big_object.4570b814": {
                 "description": "github.com/ethereum/go-ethereum/common/hexutil:hexutil.Big",
@@ -6551,16 +6487,31 @@
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "number.GCCPUFraction.edfb669d": {
-                "type": "number",
-                "title": "GCCPUFraction"
+            "number.caa7697b": {
+                "type": "number"
+            },
+            "object.0134db4e": {
+                "type": "object",
+                "patternProperties": {
+                    ".*": {
+                        "$ref": "#/components/schemas/3ef9ee5c"
+                    }
+                }
             },
             "object.708f9e72": {
                 "type": "object",
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "object.DumpAccount.348c105d": {
+            "object.9a9175d8": {
+                "type": "object",
+                "patternProperties": {
+                    ".*": {
+                        "$ref": "#/components/schemas/object.DumpAccount.0e0e1dd0"
+                    }
+                }
+            },
+            "object.DumpAccount.0e0e1dd0": {
                 "type": "object",
                 "title": "DumpAccount",
                 "required": [
@@ -6571,33 +6522,70 @@
                 ],
                 "properties": {
                     "address": {
-                        "$ref": "#/components/schemas/string.address.3e2f8305"
+                        "$ref": "#/components/schemas/dbd25355"
                     },
                     "balance": {
-                        "$ref": "#/components/schemas/string.balance.7562fc36"
+                        "$ref": "#/components/schemas/6eef3f71"
                     },
                     "code": {
-                        "$ref": "#/components/schemas/string.code.de981cc7"
+                        "$ref": "#/components/schemas/6eef3f71"
                     },
                     "codeHash": {
-                        "$ref": "#/components/schemas/string.codeHash.a2f086c3"
+                        "$ref": "#/components/schemas/6eef3f71"
                     },
                     "key": {
-                        "$ref": "#/components/schemas/string.key.1f50a888"
+                        "$ref": "#/components/schemas/e71ae30a"
                     },
                     "nonce": {
-                        "$ref": "#/components/schemas/string.nonce.3c84644b"
+                        "$ref": "#/components/schemas/32b9d267"
                     },
                     "root": {
-                        "$ref": "#/components/schemas/string.root.5d1ba2c0"
+                        "$ref": "#/components/schemas/6eef3f71"
                     },
                     "storage": {
-                        "$ref": "#/components/schemas/object.storage.4b646cbc"
+                        "$ref": "#/components/schemas/a8db9e38"
                     }
                 },
                 "additionalProperties": false
             },
-            "object.NodeInfoPorts.c03b8bfb": {
+            "object.DumpAccount.0efc3103": {
+                "type": "object",
+                "title": "DumpAccount",
+                "required": [
+                    "balance",
+                    "nonce",
+                    "root",
+                    "codeHash"
+                ],
+                "properties": {
+                    "address": {
+                        "$ref": "#/components/schemas/dbd25355"
+                    },
+                    "balance": {
+                        "$ref": "#/components/schemas/6eef3f71"
+                    },
+                    "code": {
+                        "$ref": "#/components/schemas/6eef3f71"
+                    },
+                    "codeHash": {
+                        "$ref": "#/components/schemas/6eef3f71"
+                    },
+                    "key": {
+                        "$ref": "#/components/schemas/e71ae30a"
+                    },
+                    "nonce": {
+                        "$ref": "#/components/schemas/32b9d267"
+                    },
+                    "root": {
+                        "$ref": "#/components/schemas/6eef3f71"
+                    },
+                    "storage": {
+                        "$ref": "#/components/schemas/a8db9e38"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "object.NodeInfoPorts.4f03b707": {
                 "type": "object",
                 "title": "NodeInfoPorts",
                 "required": [
@@ -6606,15 +6594,32 @@
                 ],
                 "properties": {
                     "discovery": {
-                        "$ref": "#/components/schemas/string.discovery.f0f9b51c"
+                        "$ref": "#/components/schemas/32b9d267"
                     },
                     "listener": {
-                        "$ref": "#/components/schemas/string.listener.0781a275"
+                        "$ref": "#/components/schemas/32b9d267"
                     }
                 },
                 "additionalProperties": false
             },
-            "object.StorageResult.919198ae": {
+            "object.NodeInfoPorts.b1001076": {
+                "type": "object",
+                "title": "NodeInfoPorts",
+                "required": [
+                    "discovery",
+                    "listener"
+                ],
+                "properties": {
+                    "discovery": {
+                        "$ref": "#/components/schemas/32b9d267"
+                    },
+                    "listener": {
+                        "$ref": "#/components/schemas/32b9d267"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "object.StorageResult.88ef1687": {
                 "type": "object",
                 "title": "StorageResult",
                 "required": [
@@ -6624,18 +6629,39 @@
                 ],
                 "properties": {
                     "key": {
-                        "$ref": "#/components/schemas/string.key.cb75b513"
+                        "$ref": "#/components/schemas/6eef3f71"
                     },
                     "proof": {
-                        "$ref": "#/components/schemas/array.proof.464c728b"
+                        "$ref": "#/components/schemas/872b45d1"
                     },
                     "value": {
-                        "$ref": "#/components/schemas/string.value.d1081ede"
+                        "$ref": "#/components/schemas/32b9d267"
                     }
                 },
                 "additionalProperties": false
             },
-            "object.StructLogRes.c4c9caa4": {
+            "object.StorageResult.9f9f642f": {
+                "type": "object",
+                "title": "StorageResult",
+                "required": [
+                    "key",
+                    "value",
+                    "proof"
+                ],
+                "properties": {
+                    "key": {
+                        "$ref": "#/components/schemas/6eef3f71"
+                    },
+                    "proof": {
+                        "$ref": "#/components/schemas/872b45d1"
+                    },
+                    "value": {
+                        "$ref": "#/components/schemas/32b9d267"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "object.StructLogRes.2248122a": {
                 "type": "object",
                 "title": "StructLogRes",
                 "required": [
@@ -6647,31 +6673,72 @@
                 ],
                 "properties": {
                     "depth": {
-                        "$ref": "#/components/schemas/string.depth.4d2b8a98"
+                        "$ref": "#/components/schemas/32b9d267"
                     },
                     "error": {
-                        "$ref": "#/components/schemas/error.b3001d7a"
+                        "$ref": "#/components/schemas/b4478bb6"
                     },
                     "gas": {
-                        "$ref": "#/components/schemas/string.gas.93d6f8f6"
+                        "$ref": "#/components/schemas/32b9d267"
                     },
                     "gasCost": {
-                        "$ref": "#/components/schemas/string.gasCost.6337dac0"
+                        "$ref": "#/components/schemas/32b9d267"
                     },
                     "memory": {
-                        "$ref": "#/components/schemas/array.memory.8642792c"
+                        "$ref": "#/components/schemas/872b45d1"
                     },
                     "op": {
-                        "$ref": "#/components/schemas/string.op.b91a09fb"
+                        "$ref": "#/components/schemas/6eef3f71"
                     },
                     "pc": {
-                        "$ref": "#/components/schemas/string.pc.ce9f7f9a"
+                        "$ref": "#/components/schemas/32b9d267"
                     },
                     "stack": {
-                        "$ref": "#/components/schemas/array.stack.f9c56d91"
+                        "$ref": "#/components/schemas/872b45d1"
                     },
                     "storage": {
-                        "$ref": "#/components/schemas/object.storage.4b646cbc"
+                        "$ref": "#/components/schemas/a8db9e38"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "object.StructLogRes.f4432917": {
+                "type": "object",
+                "title": "StructLogRes",
+                "required": [
+                    "pc",
+                    "op",
+                    "gas",
+                    "gasCost",
+                    "depth"
+                ],
+                "properties": {
+                    "depth": {
+                        "$ref": "#/components/schemas/32b9d267"
+                    },
+                    "error": {
+                        "$ref": "#/components/schemas/b4478bb6"
+                    },
+                    "gas": {
+                        "$ref": "#/components/schemas/32b9d267"
+                    },
+                    "gasCost": {
+                        "$ref": "#/components/schemas/32b9d267"
+                    },
+                    "memory": {
+                        "$ref": "#/components/schemas/872b45d1"
+                    },
+                    "op": {
+                        "$ref": "#/components/schemas/6eef3f71"
+                    },
+                    "pc": {
+                        "$ref": "#/components/schemas/32b9d267"
+                    },
+                    "stack": {
+                        "$ref": "#/components/schemas/872b45d1"
+                    },
+                    "storage": {
+                        "$ref": "#/components/schemas/a8db9e38"
                     }
                 },
                 "additionalProperties": false
@@ -6681,7 +6748,7 @@
                 "title": "Transaction",
                 "additionalProperties": false
             },
-            "object.URL.3d224db8": {
+            "object.URL.3de1a6ce": {
                 "type": "object",
                 "title": "URL",
                 "required": [
@@ -6690,31 +6757,36 @@
                 ],
                 "properties": {
                     "Path": {
-                        "$ref": "#/components/schemas/string.Path.9629b41c"
+                        "$ref": "#/components/schemas/6eef3f71"
                     },
                     "Scheme": {
-                        "$ref": "#/components/schemas/string.Scheme.e331bb45"
+                        "$ref": "#/components/schemas/6eef3f71"
                     }
                 },
                 "additionalProperties": false
             },
-            "object.accounts.39f4fc7e": {
+            "object.URL.d32cb12f": {
                 "type": "object",
-                "title": "accounts",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/string..*.96226db0"
+                "title": "URL",
+                "required": [
+                    "Scheme",
+                    "Path"
+                ],
+                "properties": {
+                    "Path": {
+                        "$ref": "#/components/schemas/6eef3f71"
+                    },
+                    "Scheme": {
+                        "$ref": "#/components/schemas/6eef3f71"
                     }
-                }
+                },
+                "additionalProperties": false
             },
-            "object.accounts.58113d8c": {
+            "object.c018b64e": {
                 "type": "object",
-                "title": "accounts",
                 "patternProperties": {
                     ".*": {
-                        "title": ".*",
-                        "$ref": "#/definitions/DumpAccount",
-                        "$schema": "http://json-schema.org/draft-04/schema"
+                        "$ref": "#/components/schemas/string.5b1cd571"
                     }
                 }
             },
@@ -6724,36 +6796,23 @@
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "object.protocols.8be8b3f8": {
+            "object.e77806c6": {
                 "type": "object",
-                "title": "protocols",
                 "patternProperties": {
                     ".*": {
-                        "$ref": "#/components/schemas/.*.f3c4e093"
+                        "$ref": "#/components/schemas/object.storageEntry.79fdd04b"
                     }
                 }
             },
-            "object.storage.4b646cbc": {
+            "object.f06f16ea": {
                 "type": "object",
-                "title": "storage",
                 "patternProperties": {
                     ".*": {
-                        "$ref": "#/components/schemas/string..*.c6ba4185"
+                        "$ref": "#/components/schemas/string.keccak.bd2ff551"
                     }
                 }
             },
-            "object.storage.aef073e3": {
-                "type": "object",
-                "title": "storage",
-                "patternProperties": {
-                    ".*": {
-                        "title": ".*",
-                        "$ref": "#/definitions/storageEntry",
-                        "$schema": "http://json-schema.org/draft-04/schema"
-                    }
-                }
-            },
-            "object.storageEntry.dbc1634d": {
+            "object.storageEntry.79c24779": {
                 "type": "object",
                 "title": "storageEntry",
                 "required": [
@@ -6762,26 +6821,43 @@
                 ],
                 "properties": {
                     "key": {
-                        "$ref": "#/components/schemas/string.key.f2187fd9"
+                        "$ref": "#/components/schemas/dbd25355"
                     },
                     "value": {
-                        "$ref": "#/components/schemas/string.value.da294fca"
+                        "$ref": "#/components/schemas/dbd25355"
                     }
                 },
                 "additionalProperties": false
             },
-            "rpc.BlockNumberOrHash_object.fc2cc3db": {
+            "object.storageEntry.79fdd04b": {
+                "type": "object",
+                "title": "storageEntry",
+                "required": [
+                    "key",
+                    "value"
+                ],
+                "properties": {
+                    "key": {
+                        "$ref": "#/components/schemas/dbd25355"
+                    },
+                    "value": {
+                        "$ref": "#/components/schemas/dbd25355"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "rpc.BlockNumberOrHash_object.edb53aa4": {
                 "description": "github.com/ethereum/go-ethereum/rpc:rpc.BlockNumberOrHash",
                 "type": "object",
                 "properties": {
                     "blockHash": {
-                        "$ref": "#/components/schemas/string.blockHash.895f7b68"
+                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
                     },
                     "blockNumber": {
-                        "$ref": "#/components/schemas/blockNumber.7692c2ec"
+                        "$ref": "#/components/schemas/blockNumberOrTag.802fd43c"
                     },
                     "requireCanonical": {
-                        "$ref": "#/components/schemas/boolean.requireCanonical.d7e2cb19"
+                        "$ref": "#/components/schemas/boolean.420dffc4"
                     }
                 },
                 "additionalProperties": false,
@@ -6799,7 +6875,7 @@
                 "additionalProperties": false,
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "state.Dump_object.f3517821": {
+            "state.Dump_object.346c5cdb": {
                 "description": "github.com/ethereum/go-ethereum/core/state:state.Dump",
                 "type": "object",
                 "required": [
@@ -6808,247 +6884,27 @@
                 ],
                 "properties": {
                     "accounts": {
-                        "$ref": "#/components/schemas/object.accounts.58113d8c"
+                        "$ref": "#/components/schemas/object.9a9175d8"
                     },
                     "root": {
-                        "$ref": "#/components/schemas/string.root.5d1ba2c0"
+                        "$ref": "#/components/schemas/string.5b1cd571"
                     }
                 },
                 "additionalProperties": false,
                 "definitions": {
                     "DumpAccount": {
-                        "$ref": "#/components/schemas/object.DumpAccount.348c105d"
+                        "$ref": "#/components/schemas/object.DumpAccount.0efc3103"
                     }
                 },
                 "$schema": "http://json-schema.org/draft-04/schema"
             },
-            "string..*.96226db0": {
-                "description": "Hex representation of a Keccak 256 hash POINTER",
-                "type": "string",
-                "title": ".*",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string..*.c6ba4185": {
-                "type": "string",
-                "title": ".*"
-            },
             "string.5b1cd571": {
                 "type": "string"
-            },
-            "string.Alloc.fd1ea478": {
-                "type": "string",
-                "title": "Alloc",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.BlockHash.2c1b3046": {
-                "type": "string",
-                "title": "BlockHash",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string.BuckHashSys.b5af7eda": {
-                "type": "string",
-                "title": "BuckHashSys",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.Frees.59756969": {
-                "type": "string",
-                "title": "Frees",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.FromBlock.91943f8b": {
-                "type": "string",
-                "title": "FromBlock",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.GCSys.29519af7": {
-                "type": "string",
-                "title": "GCSys",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.HeapAlloc.0da889e3": {
-                "type": "string",
-                "title": "HeapAlloc",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.HeapIdle.f5f8bd70": {
-                "type": "string",
-                "title": "HeapIdle",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.HeapInuse.46c1a802": {
-                "type": "string",
-                "title": "HeapInuse",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.HeapObjects.8e65f376": {
-                "type": "string",
-                "title": "HeapObjects",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.HeapReleased.70e64625": {
-                "type": "string",
-                "title": "HeapReleased",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.HeapSys.e2d36825": {
-                "type": "string",
-                "title": "HeapSys",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.LastGC.3a026d1e": {
-                "type": "string",
-                "title": "LastGC",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.LastGC.3a48a289": {
-                "type": "string",
-                "format": "date-time",
-                "title": "LastGC"
-            },
-            "string.Limit.ff1608db": {
-                "type": "string",
-                "title": "Limit",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.Lookups.78c59e71": {
-                "type": "string",
-                "title": "Lookups",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.MCacheInuse.5170758e": {
-                "type": "string",
-                "title": "MCacheInuse",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.MCacheSys.12962687": {
-                "type": "string",
-                "title": "MCacheSys",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.MSpanInuse.6638f9e8": {
-                "type": "string",
-                "title": "MSpanInuse",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.MSpanSys.f974e520": {
-                "type": "string",
-                "title": "MSpanSys",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.Mallocs.7479edd0": {
-                "type": "string",
-                "title": "Mallocs",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.NextGC.84d1efc6": {
-                "type": "string",
-                "title": "NextGC",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.NumForcedGC.c135d726": {
-                "type": "string",
-                "title": "NumForcedGC",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.NumGC.3cea71af": {
-                "type": "string",
-                "title": "NumGC",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.OtherSys.7d267520": {
-                "type": "string",
-                "title": "OtherSys",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.Path.9629b41c": {
-                "type": "string",
-                "title": "Path"
-            },
-            "string.PauseTotal.c0e36316": {
-                "type": "string",
-                "title": "PauseTotal",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.PauseTotalNs.c146de2f": {
-                "type": "string",
-                "title": "PauseTotalNs",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.Reexec.506bc176": {
-                "type": "string",
-                "title": "Reexec",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.Scheme.e331bb45": {
-                "type": "string",
-                "title": "Scheme"
-            },
-            "string.StackInuse.8aabb20d": {
-                "type": "string",
-                "title": "StackInuse",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.StackSys.96f6d619": {
-                "type": "string",
-                "title": "StackSys",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.Sys.114447e2": {
-                "type": "string",
-                "title": "Sys",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.Timeout.e0ebbed2": {
-                "type": "string",
-                "title": "Timeout"
-            },
-            "string.ToBlock.68c041ae": {
-                "type": "string",
-                "title": "ToBlock",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.TotalAlloc.de2f4c9d": {
-                "type": "string",
-                "title": "TotalAlloc",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.Tracer.afb109d6": {
-                "type": "string",
-                "title": "Tracer"
-            },
-            "string.TxHash.588c2537": {
-                "type": "string",
-                "title": "TxHash",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string.address.3e2f8305": {
-                "type": "string",
-                "title": "address",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
             },
             "string.address.a5a48ce4": {
                 "type": "string",
                 "title": "address",
                 "pattern": "^0x[a-fA-F\\d]{40}$"
-            },
-            "string.balance.0bb0f80e": {
-                "type": "string",
-                "title": "balance",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.balance.7562fc36": {
-                "type": "string",
-                "title": "balance"
-            },
-            "string.blockHash.895f7b68": {
-                "type": "string",
-                "title": "blockHash",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string.blockNumber.ed346720": {
-                "type": "string",
-                "title": "blockNumber",
-                "pattern": "^0x[a-fA-F0-9]+$"
             },
             "string.blockNumberTag.5eff517d": {
                 "description": "The optional block height description",
@@ -7064,85 +6920,15 @@
                 "type": "string",
                 "format": "date-time"
             },
-            "string.code.de981cc7": {
-                "type": "string",
-                "title": "code"
-            },
-            "string.codeHash.61826704": {
-                "type": "string",
-                "title": "codeHash",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string.codeHash.a2f086c3": {
-                "type": "string",
-                "title": "codeHash"
-            },
-            "string.data.68e4b0bc": {
-                "type": "string",
-                "title": "data",
-                "pattern": "^0x([a-fA-F\\d]{64})?$"
-            },
-            "string.data.86f3ddb1": {
+            "string.dataWord.259d3594": {
                 "description": "Field 'input' should be preferred",
                 "type": "string",
-                "title": "data",
+                "title": "dataWord",
                 "pattern": "^0x([a-fA-F\\d]{64})?$"
             },
-            "string.depth.4d2b8a98": {
+            "string.dataWord.e8659da6": {
                 "type": "string",
-                "title": "depth",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.discovery.f0f9b51c": {
-                "type": "string",
-                "title": "discovery",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.enode.3329c28e": {
-                "type": "string",
-                "title": "enode"
-            },
-            "string.enr.bc35e074": {
-                "type": "string",
-                "title": "enr"
-            },
-            "string.from.14e9ac86": {
-                "type": "string",
-                "title": "from",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string.from.cc80dfc4": {
-                "type": "string",
-                "title": "from",
-                "pattern": "^0x[a-fA-F\\d]{40}$"
-            },
-            "string.gas.93d6f8f6": {
-                "type": "string",
-                "title": "gas",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.gasCost.6337dac0": {
-                "type": "string",
-                "title": "gasCost",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.gasPrice.29b28ce2": {
-                "type": "string",
-                "title": "gasPrice",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.hash.33935b6e": {
-                "type": "string",
-                "title": "hash",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string.id.01c84a3b": {
-                "type": "string",
-                "title": "id"
-            },
-            "string.input.14d210c8": {
-                "type": "string",
-                "title": "input",
+                "title": "dataWord",
                 "pattern": "^0x([a-fA-F\\d]{64})?$"
             },
             "string.integer.edb7ed14": {
@@ -7151,9 +6937,10 @@
                 "title": "integer",
                 "pattern": "^0x[a-fA-F0-9]+$"
             },
-            "string.ip.20c7fa54": {
+            "string.integer.fe0a5094": {
                 "type": "string",
-                "title": "ip"
+                "title": "integer",
+                "pattern": "^0x[a-fA-F0-9]+$"
             },
             "string.keccak.3242e7ca": {
                 "description": "Hex representation of a Keccak 256 hash",
@@ -7161,108 +6948,15 @@
                 "title": "keccak",
                 "pattern": "^0x[a-fA-F\\d]{64}$"
             },
-            "string.key.1f50a888": {
+            "string.keccak.8fa02b0f": {
                 "type": "string",
-                "title": "key",
-                "pattern": "^0x([a-fA-F\\d]{64})?$"
-            },
-            "string.key.cb75b513": {
-                "type": "string",
-                "title": "key"
-            },
-            "string.key.f2187fd9": {
-                "type": "string",
-                "title": "key",
+                "title": "keccak",
                 "pattern": "^0x[a-fA-F\\d]{64}$"
             },
-            "string.listenAddr.d48b0e6a": {
+            "string.keccak.bd2ff551": {
+                "description": "Hex representation of a Keccak 256 hash POINTER",
                 "type": "string",
-                "title": "listenAddr"
-            },
-            "string.listener.0781a275": {
-                "type": "string",
-                "title": "listener",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.name.4747b405": {
-                "type": "string",
-                "title": "name"
-            },
-            "string.next.1c12596a": {
-                "type": "string",
-                "title": "next",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string.nextKey.860bf835": {
-                "type": "string",
-                "title": "nextKey",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string.nonce.3c84644b": {
-                "type": "string",
-                "title": "nonce",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.op.b91a09fb": {
-                "type": "string",
-                "title": "op"
-            },
-            "string.pc.ce9f7f9a": {
-                "type": "string",
-                "title": "pc",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.r.9eca4676": {
-                "type": "string",
-                "title": "r",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.raw.95d8640d": {
-                "type": "string",
-                "title": "raw",
-                "pattern": "^0x([a-fA-F\\d]{64})?$"
-            },
-            "string.returnValue.aed29388": {
-                "type": "string",
-                "title": "returnValue"
-            },
-            "string.root.5d1ba2c0": {
-                "type": "string",
-                "title": "root"
-            },
-            "string.s.98fd5b13": {
-                "type": "string",
-                "title": "s",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.storageHash.b1d44b21": {
-                "type": "string",
-                "title": "storageHash",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string.to.facdf185": {
-                "type": "string",
-                "title": "to",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string.transactionIndex.ea3605fb": {
-                "type": "string",
-                "title": "transactionIndex",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.v.9d04f339": {
-                "type": "string",
-                "title": "v",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.value.d1081ede": {
-                "type": "string",
-                "title": "value",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.value.da294fca": {
-                "type": "string",
-                "title": "value",
+                "title": "keccak",
                 "pattern": "^0x[a-fA-F\\d]{64}$"
             },
             "string_object.05b4a19a": {

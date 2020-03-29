@@ -114,47 +114,23 @@ func TestOpenRPC_Analysis(t *testing.T) {
 		met := doc.Methods[im]
 		fmt.Println(met.Name)
 
-		for ip := 0; ip < len(met.Params); ip++ {
-			par := met.Params[ip]
-			fmt.Println(" < ", par.Name)
-			a.analysisOnNode(&par.Schema, func(sch *spec.Schema) error {
+		parent := &spec.Schema{}
 
+		deferencer := func(sch *spec.Schema) error {
 
-				if sch.Ref.String() != "" {
-					return nil
-				}
-				err := registerSchema(*sch)
-				if err != nil {
-					fmt.Println("!!! ", err)
-					return err
-				}
-
-				fmt.Println("   *", mustMarshalString(sch))
-
-				r, err := a.schemaReferenced(*sch)
-				if err != nil {
-					fmt.Println("error getting schema as ref-only schema")
-					return err
-				}
-
-				doc.Components.Schemas[uniqueKeyFn(*sch)] = *sch
-				*sch = r
-
-				fmt.Println("    @", mustMarshalString(sch))
-				return nil
-			})
-			met.Params[ip] = par
-			//np = append(np, par)
-			fmt.Println("   :", mustMarshalString(par))
-		}
-
-		fmt.Println(" > ", doc.Methods[im].Result.Name)
-		a.analysisOnNode(&met.Result.Schema, func(sch *spec.Schema) error {
-
-			if sch.Ref.String() != "" {
+			if sch.Ref.String() == "" {
 				return nil
 			}
-			err := registerSchema(*sch)
+			rr, err := a.schemaFromRef(*parent, sch.Ref)
+			if err == nil {
+				*sch = rr
+			}
+			return nil
+		}
+
+		referencer := func(sch *spec.Schema) error {
+
+			err = registerSchema(*sch)
 			if err != nil {
 				fmt.Println("!!! ", err)
 				return err
@@ -162,7 +138,7 @@ func TestOpenRPC_Analysis(t *testing.T) {
 
 			fmt.Println("   *", mustMarshalString(sch))
 
-			r, err := a.schemaReferenced(*sch)
+			r, err := a.schemaAsReferenceSchema(*sch)
 			if err != nil {
 				fmt.Println("error getting schema as ref-only schema")
 				return err
@@ -173,7 +149,25 @@ func TestOpenRPC_Analysis(t *testing.T) {
 
 			fmt.Println("    @", mustMarshalString(sch))
 			return nil
-		})
+		}
+
+		// Params.
+		for ip := 0; ip < len(met.Params); ip++ {
+			par := met.Params[ip]
+			fmt.Println(" < ", par.Name)
+
+			*parent = par.Schema
+			a.analysisOnNode(&par.Schema, deferencer)
+			a.analysisOnNode(&par.Schema, referencer)
+			met.Params[ip] = par
+			fmt.Println("   :", mustMarshalString(par))
+		}
+
+		// Result (single).
+		fmt.Println(" > ", doc.Methods[im].Result.Name)
+		*parent = met.Result.Schema
+		a.analysisOnNode(&met.Result.Schema, deferencer)
+		a.analysisOnNode(&met.Result.Schema, referencer)
 		fmt.Println("   :", mustMarshalString(&met.Result))
 	}
 
@@ -228,7 +222,7 @@ func TestOpenRPC_Analysis(t *testing.T) {
 //for _, m := range doc.Methods {
 //	for _, param := range m.Params {
 //		a.analysisOnNode(param.Schema, func(sch spec.Schema) error {
-//			ns, err := a.schemaReferenced(sch)
+//			ns, err := a.schemaAsReferenceSchema(sch)
 //			if err != nil {
 //				return err
 //			}
@@ -238,7 +232,7 @@ func TestOpenRPC_Analysis(t *testing.T) {
 //
 //	}
 //	a.analysisOnNode(m.Result.Schema, func(sch spec.Schema) error {
-//		ns, err := a.schemaReferenced(sch)
+//		ns, err := a.schemaAsReferenceSchema(sch)
 //		if err != nil {
 //			return err
 //		}
@@ -253,7 +247,7 @@ func TestOpenRPC_Analysis(t *testing.T) {
 //for _, m := range doc.Methods {
 //	for _, param := range m.Params {
 //		a.analysisOnLeaf(param.Schema, func(sch spec.Schema) error {
-//			tit, err := a.getRegisteredSchemaTitlekey(sch)
+//			tit, err := a.getRegisteredSchemaKey(sch)
 //			if err != nil {
 //				return err
 //			}
@@ -262,7 +256,7 @@ func TestOpenRPC_Analysis(t *testing.T) {
 //		})
 //	}
 //	a.analysisOnLeaf(m.Result.Schema, func(sch spec.Schema) error {
-//		tit, err := a.getRegisteredSchemaTitlekey(sch)
+//		tit, err := a.getRegisteredSchemaKey(sch)
 //		if err != nil {
 //			return err
 //		}
@@ -283,7 +277,7 @@ func TestOpenRPC_Analysis(t *testing.T) {
 
 //for tit, sch := range doc.Components.Schemas {
 //	a.analysisOnNode(sch, func(node spec.Schema) error {
-//		ns, err := a.schemaReferenced(node)
+//		ns, err := a.schemaAsReferenceSchema(node)
 //		if err != nil {
 //			return err // NOTE
 //		}

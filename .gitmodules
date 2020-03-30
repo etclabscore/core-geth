@@ -4,3 +4,6 @@
 [submodule "go-openrpc"]
 	path = go-openrpc
 	url = https://github.com/meowsbits/go-openrpc
+[submodule "jsonschema"]
+	path = jsonschema
+	url = https://github.com/meowsbits/jsonschema

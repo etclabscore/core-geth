@@ -35,6 +35,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/go-openapi/jsonreference"
 	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
@@ -347,13 +348,13 @@ func (a *AnalysisT) analysisOnNode(sch *spec.Schema, onNode func(node *spec.Sche
 	}
 	for k := range sch.Properties {
 		v := sch.Properties[k]
-		//v.Title = k
+		//v.Title = k // PTAL: Is this right?
 		a.analysisOnNode(&v, onNode)
 		sch.Properties[k] = v
 	}
 	for k := range sch.PatternProperties {
 		v := sch.PatternProperties[k]
-		//v.Title = k
+		//v.Title = k // PTAL: Ditto?
 		a.analysisOnNode(&v, onNode)
 		sch.PatternProperties[k] = v
 	}
@@ -563,7 +564,6 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 		log.Fatal(err)
 	}
 	// End Hacky maybe.
-
 	if schemaType != ":" && (cd.Schema.Description == "" || cd.Schema.Description == ":") {
 		sch.Description = schemaType
 	}
@@ -628,6 +628,12 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
           ]
         }`
 
+	//s := jsonschema.Reflect(ethapi.Progress{})
+	//ethSyncingResultProgress, err := json.Marshal(s)
+	//if err != nil {
+	//	return nil
+	//}
+
 	// Second, handle other types.
 	// Use a slice instead of a map because it preserves order, as a logic safeguard/fallback.
 	dict := []schemaDictEntry{
@@ -636,6 +642,8 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 		{big.Int{}, integerD},
 		{new(hexutil.Big), integerD},
 		{hexutil.Big{}, integerD},
+
+		{types.BlockNonce{}, integerD},kj
 
 		{new(common.Address), `{
           "title": "keccak",
@@ -692,6 +700,21 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 		  "description": "Block tag or hex representation of a block number",
 		  "oneOf": [%s, %s]
 		}`, commonHashD, blockNumberTagD)},
+
+//		{ethapi.EthSyncingResult{}, fmt.Sprintf(`{
+//          "title": "ethSyncingResult",
+//		  "description": "Syncing returns false in case the node is currently not syncing with the network. It can be up to date or has not
+//yet received the latest block headers from its pears. In case it is synchronizing:
+//- startingBlock: block number this node started to synchronise from
+//- currentBlock:  block number this node is currently importing
+//- highestBlock:  block number of the highest block header this node has received from peers
+//- pulledStates:  number of state entries processed until now
+//- knownStates:   number of known state entries that still need to be pulled",
+//		  "oneOf": [%s, %s]
+//		}`, `{
+//        "type": "boolean"
+//      }`, `{"type": "object"}`)},
+
 	}
 
 	for _, d := range dict {

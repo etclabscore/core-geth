@@ -693,7 +693,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).ChaindbCompact", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1759"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1788"
       }, 
       "params": [], 
       "result": {
@@ -720,7 +720,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).ChaindbProperty", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1748"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1777"
       }, 
       "params": [
         {
@@ -925,7 +925,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).GetBlockRlp", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1666"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1695"
       }, 
       "params": [
         {
@@ -1220,7 +1220,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).PrintBlock", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1718"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1747"
       }, 
       "params": [
         {
@@ -1258,7 +1258,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).SeedHash", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1727"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1756"
       }, 
       "params": [
         {
@@ -1372,7 +1372,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).SetHead", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1771"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1800"
       }, 
       "params": [
         {
@@ -1762,7 +1762,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.StorageRangeResult.5676fb59"
+          "$ref": "#/components/schemas/object.StorageRangeResult.c08df921"
         }
       }, 
       "deprecated": false, 
@@ -1779,7 +1779,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).TestSignCliqueBlock", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1683"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1712"
       }, 
       "params": [
         {
@@ -2305,7 +2305,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicAccountAPI).Accounts", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:193"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:222"
       }, 
       "params": [], 
       "result": {
@@ -2332,7 +2332,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).BlockNumber", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:525"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:554"
       }, 
       "params": [], 
       "result": {
@@ -2359,7 +2359,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).Call", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:877"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:906"
       }, 
       "params": [
         {
@@ -2471,7 +2471,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).EstimateGas", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:951"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:980"
       }, 
       "params": [
         {
@@ -2536,7 +2536,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).FillTransaction", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1500"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1529"
       }, 
       "params": [
         {
@@ -2574,7 +2574,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicEthereumAPI).GasPrice", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:66"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:67"
       }, 
       "params": [], 
       "result": {
@@ -2601,7 +2601,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetBalance", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:533"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:562"
       }, 
       "params": [
         {
@@ -2649,7 +2649,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetBlockByHash", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:656"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:685"
       }, 
       "params": [
         {
@@ -2697,7 +2697,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetBlockByNumber", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:639"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:668"
       }, 
       "params": [
         {
@@ -2745,7 +2745,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetBlockTransactionCountByHash", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1201"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1230"
       }, 
       "params": [
         {
@@ -2783,7 +2783,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetBlockTransactionCountByNumber", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1192"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1221"
       }, 
       "params": [
         {
@@ -2821,7 +2821,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetCode", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:715"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:744"
       }, 
       "params": [
         {
@@ -2972,7 +2972,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetHeaderByHash", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:626"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:655"
       }, 
       "params": [
         {
@@ -3010,7 +3010,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetHeaderByNumber", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:610"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:639"
       }, 
       "params": [
         {
@@ -3086,7 +3086,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetProof", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:558"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:587"
       }, 
       "params": [
         {
@@ -3144,7 +3144,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetRawTransactionByBlockHashAndIndex", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1234"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1263"
       }, 
       "params": [
         {
@@ -3192,7 +3192,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetRawTransactionByBlockNumberAndIndex", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1226"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1255"
       }, 
       "params": [
         {
@@ -3240,7 +3240,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetRawTransactionByHash", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1280"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1309"
       }, 
       "params": [
         {
@@ -3278,7 +3278,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetStorageAt", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:727"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:756"
       }, 
       "params": [
         {
@@ -3336,7 +3336,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionByBlockHashAndIndex", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1218"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1247"
       }, 
       "params": [
         {
@@ -3384,7 +3384,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionByBlockNumberAndIndex", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1210"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1239"
       }, 
       "params": [
         {
@@ -3432,7 +3432,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionByHash", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1261"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1290"
       }, 
       "params": [
         {
@@ -3470,7 +3470,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionCount", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1242"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1271"
       }, 
       "params": [
         {
@@ -3518,7 +3518,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionReceipt", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1297"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1326"
       }, 
       "params": [
         {
@@ -3556,7 +3556,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetUncleByBlockHashAndIndex", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:682"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:711"
       }, 
       "params": [
         {
@@ -3604,7 +3604,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetUncleByBlockNumberAndIndex", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:666"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:695"
       }, 
       "params": [
         {
@@ -3652,7 +3652,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetUncleCountByBlockHash", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:706"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:735"
       }, 
       "params": [
         {
@@ -3690,7 +3690,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetUncleCountByBlockNumber", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:697"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:726"
       }, 
       "params": [
         {
@@ -3901,7 +3901,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).PendingTransactions", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1584"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1613"
       }, 
       "params": [], 
       "result": {
@@ -3928,7 +3928,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicEthereumAPI).ProtocolVersion", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:72"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:73"
       }, 
       "params": [], 
       "result": {
@@ -3955,7 +3955,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).Resend", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1611"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1640"
       }, 
       "params": [
         {
@@ -4013,7 +4013,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SendRawTransaction", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1516"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1545"
       }, 
       "params": [
         {
@@ -4051,7 +4051,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SendTransaction", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1468"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1497"
       }, 
       "params": [
         {
@@ -4089,7 +4089,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).Sign", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1533"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1562"
       }, 
       "params": [
         {
@@ -4137,7 +4137,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SignTransaction", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1558"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1587"
       }, 
       "params": [
         {
@@ -4158,7 +4158,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.SignTransactionResult.6875b7d6"
+          "$ref": "#/components/schemas/object.SignTransactionResult.55736efa"
         }
       }, 
       "deprecated": false, 
@@ -4233,7 +4233,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/types.BlockNonce_array.46e3772e"
+            "$ref": "#/components/schemas/types.BlockNonce_string.integer.b33e8698"
           }
         }, 
         {
@@ -4281,7 +4281,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicEthereumAPI).Syncing", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:83"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:109"
       }, 
       "params": [], 
       "result": {
@@ -4291,7 +4291,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/3ef9ee5c"
+          "$ref": "#/components/schemas/object.EthSyncingResult.8e115ca5"
         }
       }, 
       "deprecated": false, 
@@ -4458,7 +4458,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/types.BlockNonce_array.46e3772e"
+            "$ref": "#/components/schemas/types.BlockNonce_string.integer.b33e8698"
           }
         }, 
         {
@@ -4750,7 +4750,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicNetAPI).Listening", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1788"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1817"
       }, 
       "params": [], 
       "result": {
@@ -4777,7 +4777,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicNetAPI).PeerCount", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1792"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1821"
       }, 
       "params": [], 
       "result": {
@@ -4804,7 +4804,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicNetAPI).Version", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1797"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1826"
       }, 
       "params": [], 
       "result": {
@@ -4831,7 +4831,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).DeriveAccount", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:266"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:295"
       }, 
       "params": [
         {
@@ -4889,7 +4889,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).EcRecover", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:444"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:473"
       }, 
       "params": [
         {
@@ -4937,7 +4937,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ImportRawKey", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:300"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:329"
       }, 
       "params": [
         {
@@ -4985,7 +4985,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).InitializeWallet", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:467"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:496"
       }, 
       "params": [
         {
@@ -5023,7 +5023,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ListAccounts", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:216"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:245"
       }, 
       "params": [], 
       "result": {
@@ -5050,7 +5050,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ListWallets", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:230"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:259"
       }, 
       "params": [], 
       "result": {
@@ -5077,7 +5077,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).LockAccount", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:337"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:366"
       }, 
       "params": [
         {
@@ -5115,7 +5115,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).NewAccount", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:282"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:311"
       }, 
       "params": [
         {
@@ -5153,7 +5153,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).OpenWallet", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:252"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:281"
       }, 
       "params": [
         {
@@ -5201,7 +5201,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SendTransaction", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:364"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:393"
       }, 
       "params": [
         {
@@ -5249,7 +5249,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).Sign", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:416"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:445"
       }, 
       "params": [
         {
@@ -5307,7 +5307,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SignAndSendTransaction", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:462"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:491"
       }, 
       "params": [
         {
@@ -5355,7 +5355,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SignTransaction", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:383"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:412"
       }, 
       "params": [
         {
@@ -5413,7 +5413,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).UnlockAccount", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:312"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:341"
       }, 
       "params": [
         {
@@ -5471,7 +5471,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).Unpair", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:494"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:523"
       }, 
       "params": [
         {
@@ -5519,7 +5519,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Content", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:111"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:140"
       }, 
       "params": [], 
       "result": {
@@ -5546,7 +5546,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Inspect", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:148"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:177"
       }, 
       "params": [], 
       "result": {
@@ -5573,7 +5573,7 @@
       "description": "", 
       "externalDocs": {
         "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Status", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:138"
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:167"
       }, 
       "params": [], 
       "result": {
@@ -5934,6 +5934,19 @@
           }
         }
       }, 
+      "object.0a615bdb": {
+        "type": "object", 
+        "required": ["key", "value"], 
+        "properties": {
+          "key": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "value": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
       "object.23d7d8bb": {
         "type": "object", 
         "patternProperties": {
@@ -6136,6 +6149,20 @@
           }, 
           "root": {
             "$ref": "#/components/schemas/string.5b1cd571"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.EthSyncingResult.8e115ca5": {
+        "type": "object", 
+        "title": "EthSyncingResult", 
+        "required": ["Syncing", "Progress"], 
+        "properties": {
+          "Progress": {
+            "$ref": "#/components/schemas/object.d4507e8b"
+          }, 
+          "Syncing": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
           }
         }, 
         "additionalProperties": false
@@ -6594,20 +6621,6 @@
         }, 
         "additionalProperties": false
       }, 
-      "object.SignTransactionResult.6875b7d6": {
-        "type": "object", 
-        "title": "SignTransactionResult", 
-        "required": ["raw", "tx"], 
-        "properties": {
-          "raw": {
-            "$ref": "#/components/schemas/string.dataWord.e8659da6"
-          }, 
-          "tx": {
-            "$ref": "#/components/schemas/object.Transaction.88e7e12e"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
       "object.StdTraceConfig.b9777e1e": {
         "type": "object", 
         "title": "StdTraceConfig", 
@@ -6645,7 +6658,7 @@
         }, 
         "additionalProperties": false
       }, 
-      "object.StorageRangeResult.5676fb59": {
+      "object.StorageRangeResult.c08df921": {
         "type": "object", 
         "title": "StorageRangeResult", 
         "required": ["storage", "nextKey"], 
@@ -6654,7 +6667,7 @@
             "$ref": "#/components/schemas/string.keccak.8fa02b0f"
           }, 
           "storage": {
-            "$ref": "#/components/schemas/object.b8656166"
+            "$ref": "#/components/schemas/object.e6b6807c"
           }
         }, 
         "additionalProperties": false
@@ -6698,11 +6711,6 @@
             "$ref": "#/components/schemas/string.5b1cd571"
           }
         }, 
-        "additionalProperties": false
-      }, 
-      "object.Transaction.88e7e12e": {
-        "type": "object", 
-        "title": "Transaction", 
         "additionalProperties": false
       }, 
       "object.ab8ba582": {
@@ -6769,14 +6777,6 @@
         }, 
         "additionalProperties": false
       }, 
-      "object.b8656166": {
-        "type": "object", 
-        "patternProperties": {
-          ".*": {
-            "$ref": "#/components/schemas/object.storageEntry.79c24779"
-          }
-        }
-      }, 
       "object.c018b64e": {
         "type": "object", 
         "patternProperties": {
@@ -6809,6 +6809,34 @@
           }
         }
       }, 
+      "object.d4507e8b": {
+        "type": "object", 
+        "required": [
+          "StartingBlock", 
+          "CurrentgBlock", 
+          "HighestgBlock", 
+          "PulledStates", 
+          "KnownStates"
+        ], 
+        "properties": {
+          "CurrentgBlock": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "HighestgBlock": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "KnownStates": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "PulledStates": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "StartingBlock": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
       "object.d6dac6ba": {
         "description": "*:", 
         "type": "object", 
@@ -6827,6 +6855,14 @@
         "patternProperties": {
           ".*": {
             "$ref": "#/components/schemas/object.23d7d8bb"
+          }
+        }
+      }, 
+      "object.e6b6807c": {
+        "type": "object", 
+        "patternProperties": {
+          ".*": {
+            "$ref": "#/components/schemas/object.0a615bdb"
           }
         }
       }, 
@@ -6888,20 +6924,6 @@
           }, 
           "url": {
             "$ref": "#/components/schemas/string.5b1cd571"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.storageEntry.79c24779": {
-        "type": "object", 
-        "title": "storageEntry", 
-        "required": ["key", "value"], 
-        "properties": {
-          "key": {
-            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-          }, 
-          "value": {
-            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
           }
         }, 
         "additionalProperties": false
@@ -7023,14 +7045,11 @@
         "description": ":string", 
         "type": "string"
       }, 
-      "types.BlockNonce_array.46e3772e": {
+      "types.BlockNonce_string.integer.b33e8698": {
         "description": "github.com/ethereum/go-ethereum/core/types:types.BlockNonce", 
-        "type": "array", 
-        "maxItems": 8, 
-        "minItems": 8, 
-        "items": {
-          "$ref": "#/components/schemas/string.integer.edb7ed14"
-        }
+        "type": "string", 
+        "title": "integer", 
+        "pattern": "^0x[a-fA-F0-9]+$"
       }, 
       "uint64_string.integer.6f4a1a95": {
         "description": "*:uint64", 

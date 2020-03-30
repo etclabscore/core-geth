@@ -19,6 +19,7 @@ package ethapi
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -73,6 +74,31 @@ func (s *PublicEthereumAPI) ProtocolVersion() hexutil.Uint {
 	return hexutil.Uint(s.b.ProtocolVersion())
 }
 
+//
+// FIXME: Can't get jsonschema oneOf to work right.
+//
+type EthSyncingResult struct {
+	Syncing  EthSyncingResultSyncing   // `jsonschema:"oneof_type=syncing"` // `jsonschema:"oneof_type=EthSyncingResultSyncing"`
+	Progress *EthSyncingResultProgress // `jsonschema:"oneof_type=progress"` // `jsonschema:"oneof_type=EthSyncingResultProgress"`
+}
+
+type EthSyncingResultSyncing bool
+
+type EthSyncingResultProgress struct {
+	StartingBlock hexutil.Uint64
+	CurrentgBlock hexutil.Uint64
+	HighestgBlock hexutil.Uint64
+	PulledStates  hexutil.Uint64
+	KnownStates   hexutil.Uint64
+}
+
+func (r EthSyncingResult) MarshalJSON() ([]byte, error) {
+	if !r.Syncing {
+		return json.Marshal(r.Syncing)
+	}
+	return json.Marshal(r.Progress)
+}
+
 // Syncing returns false in case the node is currently not syncing with the network. It can be up to date or has not
 // yet received the latest block headers from its pears. In case it is synchronizing:
 // - startingBlock: block number this node started to synchronise from
@@ -80,20 +106,23 @@ func (s *PublicEthereumAPI) ProtocolVersion() hexutil.Uint {
 // - highestBlock:  block number of the highest block header this node has received from peers
 // - pulledStates:  number of state entries processed until now
 // - knownStates:   number of known state entries that still need to be pulled
-func (s *PublicEthereumAPI) Syncing() (interface{}, error) {
+func (s *PublicEthereumAPI) Syncing() (EthSyncingResult, error) {
 	progress := s.b.Downloader().Progress()
 
 	// Return not syncing if the synchronisation already completed
 	if progress.CurrentBlock >= progress.HighestBlock {
-		return false, nil
+		not := EthSyncingResultSyncing(false)
+		return EthSyncingResult{Syncing: not}, nil
 	}
 	// Otherwise gather the block sync stats
-	return map[string]interface{}{
-		"startingBlock": hexutil.Uint64(progress.StartingBlock),
-		"currentBlock":  hexutil.Uint64(progress.CurrentBlock),
-		"highestBlock":  hexutil.Uint64(progress.HighestBlock),
-		"pulledStates":  hexutil.Uint64(progress.PulledStates),
-		"knownStates":   hexutil.Uint64(progress.KnownStates),
+	return EthSyncingResult{
+		Progress: &EthSyncingResultProgress{
+			hexutil.Uint64(progress.StartingBlock),
+			hexutil.Uint64(progress.CurrentBlock),
+			hexutil.Uint64(progress.HighestBlock),
+			hexutil.Uint64(progress.PulledStates),
+			hexutil.Uint64(progress.KnownStates),
+		},
 	}, nil
 }
 

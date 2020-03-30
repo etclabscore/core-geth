@@ -40,7 +40,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -51,7 +51,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -78,7 +78,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -89,7 +89,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -116,7 +116,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/string_string.301d5adc"
+                    "$ref": "#/components/schemas/bbfa9c31"
                 }
             },
             "deprecated": false,
@@ -143,7 +143,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -153,7 +153,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint64_string.integer.6f4a1a95"
+                        "$ref": "#/components/schemas/3b25fedd"
                     }
                 },
                 {
@@ -163,7 +163,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint64_string.integer.6f4a1a95"
+                        "$ref": "#/components/schemas/3b25fedd"
                     }
                 }
             ],
@@ -174,7 +174,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -201,7 +201,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -212,7 +212,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -239,7 +239,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.NodeInfo.6e9bbac8"
+                    "$ref": "#/components/schemas/19d14d7c"
                 }
             },
             "deprecated": false,
@@ -266,7 +266,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.dc0fbff8"
+                    "$ref": "#/components/schemas/3d6ca2ce"
                 }
             },
             "deprecated": false,
@@ -293,7 +293,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -304,7 +304,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -331,7 +331,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -342,7 +342,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -369,7 +369,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.043590b5"
+                        "$ref": "#/components/schemas/ee62999c"
                     }
                 },
                 {
@@ -379,7 +379,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/int_string.integer.ce902a4d"
+                        "$ref": "#/components/schemas/5ac6539d"
                     }
                 },
                 {
@@ -389,7 +389,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.043590b5"
+                        "$ref": "#/components/schemas/ee62999c"
                     }
                 },
                 {
@@ -399,7 +399,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.043590b5"
+                        "$ref": "#/components/schemas/ee62999c"
                     }
                 },
                 {
@@ -409,7 +409,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.043590b5"
+                        "$ref": "#/components/schemas/ee62999c"
                     }
                 }
             ],
@@ -420,7 +420,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -447,7 +447,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.043590b5"
+                        "$ref": "#/components/schemas/ee62999c"
                     }
                 },
                 {
@@ -457,7 +457,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/int_string.integer.ce902a4d"
+                        "$ref": "#/components/schemas/5ac6539d"
                     }
                 },
                 {
@@ -467,7 +467,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.043590b5"
+                        "$ref": "#/components/schemas/ee62999c"
                     }
                 },
                 {
@@ -477,7 +477,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.043590b5"
+                        "$ref": "#/components/schemas/ee62999c"
                     }
                 }
             ],
@@ -488,7 +488,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -515,7 +515,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -542,7 +542,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -569,7 +569,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/Hash_string.keccak.4e9cb34b"
+                        "$ref": "#/components/schemas/77a4ae92"
                     }
                 },
                 {
@@ -579,7 +579,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/int_string.integer.d105ce99"
+                        "$ref": "#/components/schemas/2dda9d56"
                     }
                 }
             ],
@@ -590,7 +590,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.AccountRangeResult.408b5544"
+                    "$ref": "#/components/schemas/ba54eab6"
                 }
             },
             "deprecated": false,
@@ -617,7 +617,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -628,7 +628,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -655,7 +655,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -665,7 +665,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint_string.integer.ddf1775d"
+                        "$ref": "#/components/schemas/7cd1a15c"
                     }
                 }
             ],
@@ -676,7 +676,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -693,7 +693,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).ChaindbCompact",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1759"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1789"
             },
             "params": [],
             "result": {
@@ -703,7 +703,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -720,7 +720,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).ChaindbProperty",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1748"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1778"
             },
             "params": [
                 {
@@ -730,7 +730,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -741,7 +741,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/string_string.301d5adc"
+                    "$ref": "#/components/schemas/bbfa9c31"
                 }
             },
             "deprecated": false,
@@ -768,7 +768,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -778,7 +778,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint_string.integer.ddf1775d"
+                        "$ref": "#/components/schemas/7cd1a15c"
                     }
                 }
             ],
@@ -789,7 +789,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -816,7 +816,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumber_blockNumberOrTag.6c30ca5d"
+                        "$ref": "#/components/schemas/77d20ccc"
                     }
                 }
             ],
@@ -827,7 +827,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.Dump.3f30c119"
+                    "$ref": "#/components/schemas/cf91b34a"
                 }
             },
             "deprecated": false,
@@ -854,7 +854,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -881,7 +881,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.GCStats.b866cacd"
+                    "$ref": "#/components/schemas/ad646739"
                 }
             },
             "deprecated": false,
@@ -908,7 +908,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.e557aa32"
+                    "$ref": "#/components/schemas/7199b7b0"
                 }
             },
             "deprecated": false,
@@ -925,7 +925,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).GetBlockRlp",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1666"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1696"
             },
             "params": [
                 {
@@ -935,7 +935,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint64_string.integer.99afc08e"
+                        "$ref": "#/components/schemas/15d2db86"
                     }
                 }
             ],
@@ -946,7 +946,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/string_string.301d5adc"
+                    "$ref": "#/components/schemas/bbfa9c31"
                 }
             },
             "deprecated": false,
@@ -973,7 +973,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -983,7 +983,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/Hash_string.keccak.4e9cb34b"
+                        "$ref": "#/components/schemas/77a4ae92"
                     }
                 }
             ],
@@ -994,7 +994,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.0e2ed272"
+                    "$ref": "#/components/schemas/0b965467"
                 }
             },
             "deprecated": false,
@@ -1021,7 +1021,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint64_string.integer.99afc08e"
+                        "$ref": "#/components/schemas/15d2db86"
                     }
                 },
                 {
@@ -1031,7 +1031,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint64_string.integer.6f4a1a95"
+                        "$ref": "#/components/schemas/3b25fedd"
                     }
                 }
             ],
@@ -1042,7 +1042,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.0e2ed272"
+                    "$ref": "#/components/schemas/0b965467"
                 }
             },
             "deprecated": false,
@@ -1069,7 +1069,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -1079,7 +1079,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint_string.integer.ddf1775d"
+                        "$ref": "#/components/schemas/7cd1a15c"
                     }
                 }
             ],
@@ -1090,7 +1090,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -1117,7 +1117,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.MemStats.254faba5"
+                    "$ref": "#/components/schemas/4b37eb21"
                 }
             },
             "deprecated": false,
@@ -1144,7 +1144,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -1154,7 +1154,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint_string.integer.ddf1775d"
+                        "$ref": "#/components/schemas/7cd1a15c"
                     }
                 }
             ],
@@ -1165,7 +1165,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -1192,7 +1192,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 }
             ],
@@ -1203,7 +1203,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                    "$ref": "#/components/schemas/c789004b"
                 }
             },
             "deprecated": false,
@@ -1220,7 +1220,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).PrintBlock",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1718"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1748"
             },
             "params": [
                 {
@@ -1230,7 +1230,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint64_string.integer.99afc08e"
+                        "$ref": "#/components/schemas/15d2db86"
                     }
                 }
             ],
@@ -1241,7 +1241,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/string_string.301d5adc"
+                    "$ref": "#/components/schemas/bbfa9c31"
                 }
             },
             "deprecated": false,
@@ -1258,7 +1258,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).SeedHash",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1727"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1757"
             },
             "params": [
                 {
@@ -1268,7 +1268,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint64_string.integer.99afc08e"
+                        "$ref": "#/components/schemas/15d2db86"
                     }
                 }
             ],
@@ -1279,7 +1279,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/string_string.301d5adc"
+                    "$ref": "#/components/schemas/bbfa9c31"
                 }
             },
             "deprecated": false,
@@ -1306,7 +1306,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/int_string.integer.d105ce99"
+                        "$ref": "#/components/schemas/2dda9d56"
                     }
                 }
             ],
@@ -1317,7 +1317,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -1344,7 +1344,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/int_string.integer.d105ce99"
+                        "$ref": "#/components/schemas/2dda9d56"
                     }
                 }
             ],
@@ -1355,7 +1355,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/int_string.integer.d105ce99"
+                    "$ref": "#/components/schemas/2dda9d56"
                 }
             },
             "deprecated": false,
@@ -1372,7 +1372,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateDebugAPI).SetHead",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1771"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1801"
             },
             "params": [
                 {
@@ -1382,7 +1382,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Uint64_string.integer.9327e20a"
+                        "$ref": "#/components/schemas/cf076949"
                     }
                 }
             ],
@@ -1393,7 +1393,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -1420,7 +1420,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/int_string.integer.d105ce99"
+                        "$ref": "#/components/schemas/2dda9d56"
                     }
                 }
             ],
@@ -1431,7 +1431,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -1458,7 +1458,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/string_string.301d5adc"
+                    "$ref": "#/components/schemas/bbfa9c31"
                 }
             },
             "deprecated": false,
@@ -1485,7 +1485,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -1495,7 +1495,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.StdTraceConfig.b9777e1e"
+                        "$ref": "#/components/schemas/57913d61"
                     }
                 }
             ],
@@ -1506,7 +1506,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.2800749e"
+                    "$ref": "#/components/schemas/872b45d1"
                 }
             },
             "deprecated": false,
@@ -1533,7 +1533,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -1543,7 +1543,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.StdTraceConfig.b9777e1e"
+                        "$ref": "#/components/schemas/57913d61"
                     }
                 }
             ],
@@ -1554,7 +1554,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.2800749e"
+                    "$ref": "#/components/schemas/872b45d1"
                 }
             },
             "deprecated": false,
@@ -1581,7 +1581,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -1592,7 +1592,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -1619,7 +1619,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -1630,7 +1630,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -1657,7 +1657,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -1684,7 +1684,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -1711,7 +1711,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -1721,7 +1721,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/int_string.integer.d105ce99"
+                        "$ref": "#/components/schemas/2dda9d56"
                     }
                 },
                 {
@@ -1731,7 +1731,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                        "$ref": "#/components/schemas/953fd027"
                     }
                 },
                 {
@@ -1741,7 +1741,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                        "$ref": "#/components/schemas/c789004b"
                     }
                 },
                 {
@@ -1751,7 +1751,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/int_string.integer.d105ce99"
+                        "$ref": "#/components/schemas/2dda9d56"
                     }
                 }
             ],
@@ -1762,7 +1762,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.StorageRangeResult.c08df921"
+                    "$ref": "#/components/schemas/96ea3f6d"
                 }
             },
             "deprecated": false,
@@ -1779,7 +1779,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicDebugAPI).TestSignCliqueBlock",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1683"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1713"
             },
             "params": [
                 {
@@ -1789,7 +1789,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                        "$ref": "#/components/schemas/953fd027"
                     }
                 },
                 {
@@ -1799,7 +1799,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint64_string.integer.99afc08e"
+                        "$ref": "#/components/schemas/15d2db86"
                     }
                 }
             ],
@@ -1810,7 +1810,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                    "$ref": "#/components/schemas/953fd027"
                 }
             },
             "deprecated": false,
@@ -1837,7 +1837,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -1847,7 +1847,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.TraceConfig.a2191d97"
+                        "$ref": "#/components/schemas/c9ce359d"
                     }
                 }
             ],
@@ -1858,7 +1858,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.7e99ae42"
+                    "$ref": "#/components/schemas/a94a2cf3"
                 }
             },
             "deprecated": false,
@@ -1885,7 +1885,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string.bytes.99a4fec9"
+                        "$ref": "#/components/schemas/7535b0b5"
                     }
                 },
                 {
@@ -1895,7 +1895,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.TraceConfig.a2191d97"
+                        "$ref": "#/components/schemas/c9ce359d"
                     }
                 }
             ],
@@ -1906,7 +1906,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.7e99ae42"
+                    "$ref": "#/components/schemas/a94a2cf3"
                 }
             },
             "deprecated": false,
@@ -1933,7 +1933,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -1943,7 +1943,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.TraceConfig.a2191d97"
+                        "$ref": "#/components/schemas/c9ce359d"
                     }
                 }
             ],
@@ -1954,7 +1954,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.7e99ae42"
+                    "$ref": "#/components/schemas/a94a2cf3"
                 }
             },
             "deprecated": false,
@@ -1981,7 +1981,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumber_blockNumberOrTag.6c30ca5d"
+                        "$ref": "#/components/schemas/77d20ccc"
                     }
                 },
                 {
@@ -1991,7 +1991,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.TraceConfig.a2191d97"
+                        "$ref": "#/components/schemas/c9ce359d"
                     }
                 }
             ],
@@ -2002,7 +2002,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.7e99ae42"
+                    "$ref": "#/components/schemas/a94a2cf3"
                 }
             },
             "deprecated": false,
@@ -2029,7 +2029,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -2039,7 +2039,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.TraceConfig.a2191d97"
+                        "$ref": "#/components/schemas/c9ce359d"
                     }
                 }
             ],
@@ -2050,7 +2050,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.7e99ae42"
+                    "$ref": "#/components/schemas/a94a2cf3"
                 }
             },
             "deprecated": false,
@@ -2077,7 +2077,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -2087,7 +2087,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.TraceConfig.a2191d97"
+                        "$ref": "#/components/schemas/c9ce359d"
                     }
                 }
             ],
@@ -2098,7 +2098,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.ExecutionResult.b7bda5b1"
+                    "$ref": "#/components/schemas/17f70f68"
                 }
             },
             "deprecated": false,
@@ -2125,7 +2125,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/int_string.integer.d105ce99"
+                        "$ref": "#/components/schemas/2dda9d56"
                     }
                 }
             ],
@@ -2136,7 +2136,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -2163,7 +2163,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -2174,7 +2174,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -2201,7 +2201,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -2212,7 +2212,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -2239,7 +2239,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -2250,7 +2250,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -2277,7 +2277,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -2288,7 +2288,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -2305,7 +2305,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicAccountAPI).Accounts",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:193"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:223"
             },
             "params": [],
             "result": {
@@ -2315,7 +2315,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.0e2ed272"
+                    "$ref": "#/components/schemas/0b965467"
                 }
             },
             "deprecated": false,
@@ -2332,7 +2332,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).BlockNumber",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:525"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:555"
             },
             "params": [],
             "result": {
@@ -2342,7 +2342,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Uint64_string.integer.9327e20a"
+                    "$ref": "#/components/schemas/cf076949"
                 }
             },
             "deprecated": false,
@@ -2359,7 +2359,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).Call",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:877"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:907"
             },
             "params": [
                 {
@@ -2369,7 +2369,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.CallArgs.9791053e"
+                        "$ref": "#/components/schemas/b2c4cbc8"
                     }
                 },
                 {
@@ -2379,7 +2379,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.d4005edc"
+                        "$ref": "#/components/schemas/56f4037d"
                     }
                 },
                 {
@@ -2389,7 +2389,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.d6dac6ba"
+                        "$ref": "#/components/schemas/fa7edfc7"
                     }
                 }
             ],
@@ -2400,7 +2400,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                    "$ref": "#/components/schemas/c789004b"
                 }
             },
             "deprecated": false,
@@ -2427,7 +2427,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Uint64_string.integer.9327e20a"
+                    "$ref": "#/components/schemas/cf076949"
                 }
             },
             "deprecated": false,
@@ -2454,7 +2454,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                    "$ref": "#/components/schemas/953fd027"
                 }
             },
             "deprecated": false,
@@ -2471,7 +2471,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).EstimateGas",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:951"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:981"
             },
             "params": [
                 {
@@ -2481,7 +2481,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.CallArgs.9791053e"
+                        "$ref": "#/components/schemas/b2c4cbc8"
                     }
                 }
             ],
@@ -2492,7 +2492,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Uint64_string.integer.9327e20a"
+                    "$ref": "#/components/schemas/cf076949"
                 }
             },
             "deprecated": false,
@@ -2519,7 +2519,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                    "$ref": "#/components/schemas/953fd027"
                 }
             },
             "deprecated": false,
@@ -2536,7 +2536,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).FillTransaction",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1500"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1530"
             },
             "params": [
                 {
@@ -2546,7 +2546,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.SendTxArgs.1e27de41"
+                        "$ref": "#/components/schemas/2618493c"
                     }
                 }
             ],
@@ -2557,7 +2557,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.SignTransactionResult.55736efa"
+                    "$ref": "#/components/schemas/809e8ef0"
                 }
             },
             "deprecated": false,
@@ -2574,7 +2574,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicEthereumAPI).GasPrice",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:66"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:67"
             },
             "params": [],
             "result": {
@@ -2584,7 +2584,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Big_string.integer.ddafdcbc"
+                    "$ref": "#/components/schemas/67e24145"
                 }
             },
             "deprecated": false,
@@ -2601,7 +2601,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetBalance",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:533"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:563"
             },
             "params": [
                 {
@@ -2611,7 +2611,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                        "$ref": "#/components/schemas/953fd027"
                     }
                 },
                 {
@@ -2621,7 +2621,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.d4005edc"
+                        "$ref": "#/components/schemas/56f4037d"
                     }
                 }
             ],
@@ -2632,7 +2632,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Big_string.integer.ddafdcbc"
+                    "$ref": "#/components/schemas/67e24145"
                 }
             },
             "deprecated": false,
@@ -2649,7 +2649,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetBlockByHash",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:656"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:686"
             },
             "params": [
                 {
@@ -2659,7 +2659,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -2669,7 +2669,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/bool_boolean.66977b29"
+                        "$ref": "#/components/schemas/1d850e3a"
                     }
                 }
             ],
@@ -2680,7 +2680,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.0134db4e"
+                    "$ref": "#/components/schemas/64660f7a"
                 }
             },
             "deprecated": false,
@@ -2697,7 +2697,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetBlockByNumber",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:639"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:669"
             },
             "params": [
                 {
@@ -2707,7 +2707,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumber_blockNumberOrTag.6c30ca5d"
+                        "$ref": "#/components/schemas/77d20ccc"
                     }
                 },
                 {
@@ -2717,7 +2717,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/bool_boolean.66977b29"
+                        "$ref": "#/components/schemas/1d850e3a"
                     }
                 }
             ],
@@ -2728,7 +2728,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.0134db4e"
+                    "$ref": "#/components/schemas/64660f7a"
                 }
             },
             "deprecated": false,
@@ -2745,7 +2745,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetBlockTransactionCountByHash",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1201"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1231"
             },
             "params": [
                 {
@@ -2755,7 +2755,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 }
             ],
@@ -2766,7 +2766,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Uint_string.integer.334b351a"
+                    "$ref": "#/components/schemas/3a6d16fd"
                 }
             },
             "deprecated": false,
@@ -2783,7 +2783,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetBlockTransactionCountByNumber",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1192"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1222"
             },
             "params": [
                 {
@@ -2793,7 +2793,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumber_blockNumberOrTag.6c30ca5d"
+                        "$ref": "#/components/schemas/77d20ccc"
                     }
                 }
             ],
@@ -2804,7 +2804,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Uint_string.integer.334b351a"
+                    "$ref": "#/components/schemas/3a6d16fd"
                 }
             },
             "deprecated": false,
@@ -2821,7 +2821,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetCode",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:715"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:745"
             },
             "params": [
                 {
@@ -2831,7 +2831,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                        "$ref": "#/components/schemas/953fd027"
                     }
                 },
                 {
@@ -2841,7 +2841,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.d4005edc"
+                        "$ref": "#/components/schemas/56f4037d"
                     }
                 }
             ],
@@ -2852,7 +2852,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                    "$ref": "#/components/schemas/c789004b"
                 }
             },
             "deprecated": false,
@@ -2879,7 +2879,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.ID_string.ffd91372"
+                        "$ref": "#/components/schemas/5ef1292e"
                     }
                 }
             ],
@@ -2890,7 +2890,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/3ef9ee5c"
+                    "$ref": "#/components/schemas/b4478bb6"
                 }
             },
             "deprecated": false,
@@ -2917,7 +2917,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.ID_string.ffd91372"
+                        "$ref": "#/components/schemas/5ef1292e"
                     }
                 }
             ],
@@ -2928,7 +2928,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.5cd3b3f4"
+                    "$ref": "#/components/schemas/7bad17ff"
                 }
             },
             "deprecated": false,
@@ -2955,7 +2955,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/uint64_string.integer.99afc08e"
+                    "$ref": "#/components/schemas/15d2db86"
                 }
             },
             "deprecated": false,
@@ -2972,7 +2972,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetHeaderByHash",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:626"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:656"
             },
             "params": [
                 {
@@ -2982,7 +2982,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 }
             ],
@@ -2993,7 +2993,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.0134db4e"
+                    "$ref": "#/components/schemas/64660f7a"
                 }
             },
             "deprecated": false,
@@ -3010,7 +3010,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetHeaderByNumber",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:610"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:640"
             },
             "params": [
                 {
@@ -3020,7 +3020,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumber_blockNumberOrTag.6c30ca5d"
+                        "$ref": "#/components/schemas/77d20ccc"
                     }
                 }
             ],
@@ -3031,7 +3031,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.0134db4e"
+                    "$ref": "#/components/schemas/64660f7a"
                 }
             },
             "deprecated": false,
@@ -3058,7 +3058,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.FilterCriteria.4dc579fc"
+                        "$ref": "#/components/schemas/a3f9291b"
                     }
                 }
             ],
@@ -3069,7 +3069,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.5cd3b3f4"
+                    "$ref": "#/components/schemas/7bad17ff"
                 }
             },
             "deprecated": false,
@@ -3086,7 +3086,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetProof",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:558"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:588"
             },
             "params": [
                 {
@@ -3096,7 +3096,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                        "$ref": "#/components/schemas/953fd027"
                     }
                 },
                 {
@@ -3106,7 +3106,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/array.2800749e"
+                        "$ref": "#/components/schemas/872b45d1"
                     }
                 },
                 {
@@ -3116,7 +3116,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.d4005edc"
+                        "$ref": "#/components/schemas/56f4037d"
                     }
                 }
             ],
@@ -3127,7 +3127,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.AccountResult.7783b8a2"
+                    "$ref": "#/components/schemas/7f1a20fd"
                 }
             },
             "deprecated": false,
@@ -3144,7 +3144,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetRawTransactionByBlockHashAndIndex",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1234"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1264"
             },
             "params": [
                 {
@@ -3154,7 +3154,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -3164,7 +3164,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Uint_string.integer.1fd7f86a"
+                        "$ref": "#/components/schemas/1d92a8cf"
                     }
                 }
             ],
@@ -3175,7 +3175,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                    "$ref": "#/components/schemas/c789004b"
                 }
             },
             "deprecated": false,
@@ -3192,7 +3192,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetRawTransactionByBlockNumberAndIndex",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1226"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1256"
             },
             "params": [
                 {
@@ -3202,7 +3202,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumber_blockNumberOrTag.6c30ca5d"
+                        "$ref": "#/components/schemas/77d20ccc"
                     }
                 },
                 {
@@ -3212,7 +3212,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Uint_string.integer.1fd7f86a"
+                        "$ref": "#/components/schemas/1d92a8cf"
                     }
                 }
             ],
@@ -3223,7 +3223,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                    "$ref": "#/components/schemas/c789004b"
                 }
             },
             "deprecated": false,
@@ -3240,7 +3240,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetRawTransactionByHash",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1280"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1310"
             },
             "params": [
                 {
@@ -3250,7 +3250,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 }
             ],
@@ -3261,7 +3261,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                    "$ref": "#/components/schemas/c789004b"
                 }
             },
             "deprecated": false,
@@ -3278,7 +3278,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetStorageAt",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:727"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:757"
             },
             "params": [
                 {
@@ -3288,7 +3288,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                        "$ref": "#/components/schemas/953fd027"
                     }
                 },
                 {
@@ -3298,7 +3298,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -3308,7 +3308,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.d4005edc"
+                        "$ref": "#/components/schemas/56f4037d"
                     }
                 }
             ],
@@ -3319,7 +3319,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                    "$ref": "#/components/schemas/c789004b"
                 }
             },
             "deprecated": false,
@@ -3336,7 +3336,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionByBlockHashAndIndex",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1218"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1248"
             },
             "params": [
                 {
@@ -3346,7 +3346,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -3356,7 +3356,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Uint_string.integer.1fd7f86a"
+                        "$ref": "#/components/schemas/1d92a8cf"
                     }
                 }
             ],
@@ -3367,7 +3367,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.RPCTransaction.75fc8af8"
+                    "$ref": "#/components/schemas/bbe5a657"
                 }
             },
             "deprecated": false,
@@ -3384,7 +3384,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionByBlockNumberAndIndex",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1210"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1240"
             },
             "params": [
                 {
@@ -3394,7 +3394,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumber_blockNumberOrTag.6c30ca5d"
+                        "$ref": "#/components/schemas/77d20ccc"
                     }
                 },
                 {
@@ -3404,7 +3404,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Uint_string.integer.1fd7f86a"
+                        "$ref": "#/components/schemas/1d92a8cf"
                     }
                 }
             ],
@@ -3415,7 +3415,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.RPCTransaction.75fc8af8"
+                    "$ref": "#/components/schemas/bbe5a657"
                 }
             },
             "deprecated": false,
@@ -3432,7 +3432,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionByHash",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1261"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1291"
             },
             "params": [
                 {
@@ -3442,7 +3442,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 }
             ],
@@ -3453,7 +3453,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.RPCTransaction.75fc8af8"
+                    "$ref": "#/components/schemas/bbe5a657"
                 }
             },
             "deprecated": false,
@@ -3470,7 +3470,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionCount",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1242"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1272"
             },
             "params": [
                 {
@@ -3480,7 +3480,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                        "$ref": "#/components/schemas/953fd027"
                     }
                 },
                 {
@@ -3490,7 +3490,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.d4005edc"
+                        "$ref": "#/components/schemas/56f4037d"
                     }
                 }
             ],
@@ -3501,7 +3501,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Uint64_string.integer.34584798"
+                    "$ref": "#/components/schemas/2f1ff889"
                 }
             },
             "deprecated": false,
@@ -3518,7 +3518,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).GetTransactionReceipt",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1297"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1327"
             },
             "params": [
                 {
@@ -3528,7 +3528,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 }
             ],
@@ -3539,7 +3539,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.0134db4e"
+                    "$ref": "#/components/schemas/64660f7a"
                 }
             },
             "deprecated": false,
@@ -3556,7 +3556,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetUncleByBlockHashAndIndex",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:682"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:712"
             },
             "params": [
                 {
@@ -3566,7 +3566,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -3576,7 +3576,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Uint_string.integer.1fd7f86a"
+                        "$ref": "#/components/schemas/1d92a8cf"
                     }
                 }
             ],
@@ -3587,7 +3587,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.0134db4e"
+                    "$ref": "#/components/schemas/64660f7a"
                 }
             },
             "deprecated": false,
@@ -3604,7 +3604,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetUncleByBlockNumberAndIndex",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:666"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:696"
             },
             "params": [
                 {
@@ -3614,7 +3614,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumber_blockNumberOrTag.6c30ca5d"
+                        "$ref": "#/components/schemas/77d20ccc"
                     }
                 },
                 {
@@ -3624,7 +3624,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Uint_string.integer.1fd7f86a"
+                        "$ref": "#/components/schemas/1d92a8cf"
                     }
                 }
             ],
@@ -3635,7 +3635,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.0134db4e"
+                    "$ref": "#/components/schemas/64660f7a"
                 }
             },
             "deprecated": false,
@@ -3652,7 +3652,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetUncleCountByBlockHash",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:706"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:736"
             },
             "params": [
                 {
@@ -3662,7 +3662,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 }
             ],
@@ -3673,7 +3673,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Uint_string.integer.334b351a"
+                    "$ref": "#/components/schemas/3a6d16fd"
                 }
             },
             "deprecated": false,
@@ -3690,7 +3690,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicBlockChainAPI).GetUncleCountByBlockNumber",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:697"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:727"
             },
             "params": [
                 {
@@ -3700,7 +3700,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.BlockNumber_blockNumberOrTag.6c30ca5d"
+                        "$ref": "#/components/schemas/77d20ccc"
                     }
                 }
             ],
@@ -3711,7 +3711,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Uint_string.integer.334b351a"
+                    "$ref": "#/components/schemas/3a6d16fd"
                 }
             },
             "deprecated": false,
@@ -3738,7 +3738,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.09c4961f"
+                    "$ref": "#/components/schemas/c5820385"
                 }
             },
             "deprecated": false,
@@ -3765,7 +3765,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Uint64_string.integer.9327e20a"
+                    "$ref": "#/components/schemas/cf076949"
                 }
             },
             "deprecated": false,
@@ -3792,7 +3792,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -3819,7 +3819,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/rpc.ID_string.ffd91372"
+                    "$ref": "#/components/schemas/5ef1292e"
                 }
             },
             "deprecated": false,
@@ -3846,7 +3846,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.FilterCriteria.4dc579fc"
+                        "$ref": "#/components/schemas/a3f9291b"
                     }
                 }
             ],
@@ -3857,7 +3857,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/rpc.ID_string.ffd91372"
+                    "$ref": "#/components/schemas/5ef1292e"
                 }
             },
             "deprecated": false,
@@ -3884,7 +3884,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/rpc.ID_string.ffd91372"
+                    "$ref": "#/components/schemas/5ef1292e"
                 }
             },
             "deprecated": false,
@@ -3901,7 +3901,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).PendingTransactions",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1584"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1614"
             },
             "params": [],
             "result": {
@@ -3911,7 +3911,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.cfa48e18"
+                    "$ref": "#/components/schemas/c40084a1"
                 }
             },
             "deprecated": false,
@@ -3928,7 +3928,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicEthereumAPI).ProtocolVersion",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:72"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:73"
             },
             "params": [],
             "result": {
@@ -3938,7 +3938,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Uint_string.integer.1fd7f86a"
+                    "$ref": "#/components/schemas/1d92a8cf"
                 }
             },
             "deprecated": false,
@@ -3955,7 +3955,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).Resend",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1611"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1641"
             },
             "params": [
                 {
@@ -3965,7 +3965,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.SendTxArgs.1e27de41"
+                        "$ref": "#/components/schemas/2618493c"
                     }
                 },
                 {
@@ -3975,7 +3975,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/Big_string.integer.ddafdcbc"
+                        "$ref": "#/components/schemas/67e24145"
                     }
                 },
                 {
@@ -3985,7 +3985,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/Uint64_string.integer.34584798"
+                        "$ref": "#/components/schemas/2f1ff889"
                     }
                 }
             ],
@@ -3996,7 +3996,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                    "$ref": "#/components/schemas/c96f4211"
                 }
             },
             "deprecated": false,
@@ -4013,7 +4013,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SendRawTransaction",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1516"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1546"
             },
             "params": [
                 {
@@ -4023,7 +4023,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                        "$ref": "#/components/schemas/c789004b"
                     }
                 }
             ],
@@ -4034,7 +4034,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                    "$ref": "#/components/schemas/c96f4211"
                 }
             },
             "deprecated": false,
@@ -4051,7 +4051,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SendTransaction",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1468"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1498"
             },
             "params": [
                 {
@@ -4061,7 +4061,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.SendTxArgs.1e27de41"
+                        "$ref": "#/components/schemas/2618493c"
                     }
                 }
             ],
@@ -4072,7 +4072,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                    "$ref": "#/components/schemas/c96f4211"
                 }
             },
             "deprecated": false,
@@ -4089,7 +4089,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).Sign",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1533"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1563"
             },
             "params": [
                 {
@@ -4099,7 +4099,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                        "$ref": "#/components/schemas/953fd027"
                     }
                 },
                 {
@@ -4109,7 +4109,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                        "$ref": "#/components/schemas/c789004b"
                     }
                 }
             ],
@@ -4120,7 +4120,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                    "$ref": "#/components/schemas/c789004b"
                 }
             },
             "deprecated": false,
@@ -4137,7 +4137,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTransactionPoolAPI).SignTransaction",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1558"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1588"
             },
             "params": [
                 {
@@ -4147,7 +4147,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.SendTxArgs.1e27de41"
+                        "$ref": "#/components/schemas/2618493c"
                     }
                 }
             ],
@@ -4158,7 +4158,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.SignTransactionResult.55736efa"
+                    "$ref": "#/components/schemas/809e8ef0"
                 }
             },
             "deprecated": false,
@@ -4185,7 +4185,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Uint64_string.integer.9327e20a"
+                        "$ref": "#/components/schemas/cf076949"
                     }
                 },
                 {
@@ -4195,7 +4195,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 }
             ],
@@ -4206,7 +4206,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -4233,7 +4233,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/types.BlockNonce_array.46e3772e"
+                        "$ref": "#/components/schemas/54aa2e54"
                     }
                 },
                 {
@@ -4243,7 +4243,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -4253,7 +4253,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 }
             ],
@@ -4264,7 +4264,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -4281,7 +4281,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicEthereumAPI).Syncing",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:83"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:109"
             },
             "params": [],
             "result": {
@@ -4291,7 +4291,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/3ef9ee5c"
+                    "$ref": "#/components/schemas/598766fa"
                 }
             },
             "deprecated": false,
@@ -4318,7 +4318,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/rpc.ID_string.ffd91372"
+                        "$ref": "#/components/schemas/5ef1292e"
                     }
                 }
             ],
@@ -4329,7 +4329,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -4356,7 +4356,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/uint64_string.integer.99afc08e"
+                    "$ref": "#/components/schemas/15d2db86"
                 }
             },
             "deprecated": false,
@@ -4383,7 +4383,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.09c4961f"
+                    "$ref": "#/components/schemas/c5820385"
                 }
             },
             "deprecated": false,
@@ -4410,7 +4410,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Uint64_string.integer.9327e20a"
+                        "$ref": "#/components/schemas/cf076949"
                     }
                 },
                 {
@@ -4420,7 +4420,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 }
             ],
@@ -4431,7 +4431,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -4458,7 +4458,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/types.BlockNonce_array.46e3772e"
+                        "$ref": "#/components/schemas/54aa2e54"
                     }
                 },
                 {
@@ -4468,7 +4468,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 },
                 {
@@ -4478,7 +4478,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                        "$ref": "#/components/schemas/c96f4211"
                     }
                 }
             ],
@@ -4489,7 +4489,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -4516,7 +4516,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/uint64_string.integer.99afc08e"
+                    "$ref": "#/components/schemas/15d2db86"
                 }
             },
             "deprecated": false,
@@ -4543,7 +4543,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                        "$ref": "#/components/schemas/953fd027"
                     }
                 }
             ],
@@ -4554,7 +4554,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -4581,7 +4581,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -4592,7 +4592,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -4619,7 +4619,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Big_string.integer.e9fbc064"
+                        "$ref": "#/components/schemas/7ed7a408"
                     }
                 }
             ],
@@ -4630,7 +4630,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -4657,7 +4657,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/int_string.integer.d105ce99"
+                        "$ref": "#/components/schemas/2dda9d56"
                     }
                 }
             ],
@@ -4668,7 +4668,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -4695,7 +4695,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/int_string.integer.ce902a4d"
+                        "$ref": "#/components/schemas/5ac6539d"
                     }
                 }
             ],
@@ -4706,7 +4706,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -4733,7 +4733,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -4750,7 +4750,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicNetAPI).Listening",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1788"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1818"
             },
             "params": [],
             "result": {
@@ -4760,7 +4760,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -4777,7 +4777,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicNetAPI).PeerCount",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1792"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1822"
             },
             "params": [],
             "result": {
@@ -4787,7 +4787,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Uint_string.integer.1fd7f86a"
+                    "$ref": "#/components/schemas/1d92a8cf"
                 }
             },
             "deprecated": false,
@@ -4804,7 +4804,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicNetAPI).Version",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1797"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:1827"
             },
             "params": [],
             "result": {
@@ -4814,7 +4814,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/string_string.301d5adc"
+                    "$ref": "#/components/schemas/bbfa9c31"
                 }
             },
             "deprecated": false,
@@ -4831,7 +4831,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).DeriveAccount",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:266"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:296"
             },
             "params": [
                 {
@@ -4841,7 +4841,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -4851,7 +4851,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -4861,7 +4861,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/bool_boolean.9b89f070"
+                        "$ref": "#/components/schemas/dc32604d"
                     }
                 }
             ],
@@ -4872,7 +4872,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.Account.74b00c34"
+                    "$ref": "#/components/schemas/3a7ed679"
                 }
             },
             "deprecated": false,
@@ -4889,7 +4889,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).EcRecover",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:444"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:474"
             },
             "params": [
                 {
@@ -4899,7 +4899,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                        "$ref": "#/components/schemas/c789004b"
                     }
                 },
                 {
@@ -4909,7 +4909,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                        "$ref": "#/components/schemas/c789004b"
                     }
                 }
             ],
@@ -4920,7 +4920,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                    "$ref": "#/components/schemas/953fd027"
                 }
             },
             "deprecated": false,
@@ -4937,7 +4937,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ImportRawKey",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:300"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:330"
             },
             "params": [
                 {
@@ -4947,7 +4947,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -4957,7 +4957,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -4968,7 +4968,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                    "$ref": "#/components/schemas/953fd027"
                 }
             },
             "deprecated": false,
@@ -4985,7 +4985,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).InitializeWallet",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:467"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:497"
             },
             "params": [
                 {
@@ -4995,7 +4995,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -5006,7 +5006,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/string_string.301d5adc"
+                    "$ref": "#/components/schemas/bbfa9c31"
                 }
             },
             "deprecated": false,
@@ -5023,7 +5023,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ListAccounts",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:216"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:246"
             },
             "params": [],
             "result": {
@@ -5033,7 +5033,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.0e2ed272"
+                    "$ref": "#/components/schemas/0b965467"
                 }
             },
             "deprecated": false,
@@ -5050,7 +5050,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).ListWallets",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:230"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:260"
             },
             "params": [],
             "result": {
@@ -5060,7 +5060,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/array.07869778"
+                    "$ref": "#/components/schemas/dec2410a"
                 }
             },
             "deprecated": false,
@@ -5077,7 +5077,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).LockAccount",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:337"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:367"
             },
             "params": [
                 {
@@ -5087,7 +5087,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                        "$ref": "#/components/schemas/953fd027"
                     }
                 }
             ],
@@ -5098,7 +5098,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -5115,7 +5115,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).NewAccount",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:282"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:312"
             },
             "params": [
                 {
@@ -5125,7 +5125,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -5136,7 +5136,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                    "$ref": "#/components/schemas/953fd027"
                 }
             },
             "deprecated": false,
@@ -5153,7 +5153,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).OpenWallet",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:252"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:282"
             },
             "params": [
                 {
@@ -5163,7 +5163,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -5173,7 +5173,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.043590b5"
+                        "$ref": "#/components/schemas/ee62999c"
                     }
                 }
             ],
@@ -5184,7 +5184,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -5201,7 +5201,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SendTransaction",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:364"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:394"
             },
             "params": [
                 {
@@ -5211,7 +5211,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.SendTxArgs.1e27de41"
+                        "$ref": "#/components/schemas/2618493c"
                     }
                 },
                 {
@@ -5221,7 +5221,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -5232,7 +5232,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                    "$ref": "#/components/schemas/c96f4211"
                 }
             },
             "deprecated": false,
@@ -5249,7 +5249,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).Sign",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:416"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:446"
             },
             "params": [
                 {
@@ -5259,7 +5259,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                        "$ref": "#/components/schemas/c789004b"
                     }
                 },
                 {
@@ -5269,7 +5269,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                        "$ref": "#/components/schemas/953fd027"
                     }
                 },
                 {
@@ -5279,7 +5279,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -5290,7 +5290,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                    "$ref": "#/components/schemas/c789004b"
                 }
             },
             "deprecated": false,
@@ -5307,7 +5307,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SignAndSendTransaction",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:462"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:492"
             },
             "params": [
                 {
@@ -5317,7 +5317,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.SendTxArgs.1e27de41"
+                        "$ref": "#/components/schemas/2618493c"
                     }
                 },
                 {
@@ -5327,7 +5327,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -5338,7 +5338,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+                    "$ref": "#/components/schemas/c96f4211"
                 }
             },
             "deprecated": false,
@@ -5355,7 +5355,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).SignTransaction",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:383"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:413"
             },
             "params": [
                 {
@@ -5365,7 +5365,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/object.SendTxArgs.1e27de41"
+                        "$ref": "#/components/schemas/2618493c"
                     }
                 },
                 {
@@ -5375,7 +5375,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -5385,7 +5385,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -5396,7 +5396,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.SignTransactionResult.55736efa"
+                    "$ref": "#/components/schemas/809e8ef0"
                 }
             },
             "deprecated": false,
@@ -5413,7 +5413,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).UnlockAccount",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:312"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:342"
             },
             "params": [
                 {
@@ -5423,7 +5423,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+                        "$ref": "#/components/schemas/953fd027"
                     }
                 },
                 {
@@ -5433,7 +5433,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -5443,7 +5443,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/uint64_string.integer.6f4a1a95"
+                        "$ref": "#/components/schemas/3b25fedd"
                     }
                 }
             ],
@@ -5454,7 +5454,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/bool_boolean.66977b29"
+                    "$ref": "#/components/schemas/1d850e3a"
                 }
             },
             "deprecated": false,
@@ -5471,7 +5471,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PrivateAccountAPI).Unpair",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:494"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:524"
             },
             "params": [
                 {
@@ -5481,7 +5481,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 },
                 {
@@ -5491,7 +5491,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/string_string.301d5adc"
+                        "$ref": "#/components/schemas/bbfa9c31"
                     }
                 }
             ],
@@ -5502,7 +5502,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+                    "$ref": "#/components/schemas/ea9c7b32"
                 }
             },
             "deprecated": false,
@@ -5519,7 +5519,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Content",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:111"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:141"
             },
             "params": [],
             "result": {
@@ -5529,7 +5529,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.373580df"
+                    "$ref": "#/components/schemas/b351847b"
                 }
             },
             "deprecated": false,
@@ -5546,7 +5546,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Inspect",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:148"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:178"
             },
             "params": [],
             "result": {
@@ -5556,7 +5556,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.07ae319c"
+                    "$ref": "#/components/schemas/7d50a3ed"
                 }
             },
             "deprecated": false,
@@ -5573,7 +5573,7 @@
             "description": "",
             "externalDocs": {
                 "description": "github.com/ethereum/go-ethereum/internal/ethapi.(*PublicTxPoolAPI).Status",
-                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:138"
+                "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go:168"
             },
             "params": [],
             "result": {
@@ -5583,7 +5583,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/object.c79a510c"
+                    "$ref": "#/components/schemas/34edbd73"
                 }
             },
             "deprecated": false,
@@ -5610,7 +5610,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/string_string.301d5adc"
+                    "$ref": "#/components/schemas/bbfa9c31"
                 }
             },
             "deprecated": false,
@@ -5637,7 +5637,7 @@
                     "required": false,
                     "deprecated": false,
                     "schema": {
-                        "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                        "$ref": "#/components/schemas/c789004b"
                     }
                 }
             ],
@@ -5648,7 +5648,7 @@
                 "required": false,
                 "deprecated": false,
                 "schema": {
-                    "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+                    "$ref": "#/components/schemas/c789004b"
                 }
             },
             "deprecated": false,
@@ -5661,1454 +5661,176 @@
     ],
     "components": {
         "schemas": {
-            "3ef9ee5c": {
-                "additionalProperties": true
-            },
-            "5c4862d9": {
-                "$ref": "#/components/schemas/boolean.420dffc4"
-            },
-            "6eef3f71": {
-                "$ref": "#/components/schemas/string.5b1cd571"
-            },
-            "Big_string.integer.ddafdcbc": {
-                "description": "*github.com/ethereum/go-ethereum/common/hexutil:Big",
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "Hash_string.keccak.4e9cb34b": {
-                "description": "*github.com/ethereum/go-ethereum/common:Hash",
-                "type": "string",
-                "title": "keccak",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "Null_null.2d1dcd4c": {
-                "description": "Null",
-                "type": "null"
-            },
-            "Uint64_string.integer.34584798": {
-                "description": "*github.com/ethereum/go-ethereum/common/hexutil:Uint64",
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "Uint_string.integer.334b351a": {
-                "description": "*github.com/ethereum/go-ethereum/common/hexutil:Uint",
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "array.07869778": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/object.rawWallet.91e009ee"
-                }
-            },
-            "array.09c4961f": {
-                "type": "array",
-                "maxItems": 4,
-                "minItems": 4,
-                "items": {
-                    "$ref": "#/components/schemas/string.5b1cd571"
-                }
-            },
-            "array.0e2ed272": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/string.address.a5a48ce4"
-                }
-            },
-            "array.1c86b5fa": {
-                "type": "array",
-                "maxItems": 256,
-                "minItems": 256,
-                "items": {
-                    "$ref": "#/components/schemas/string.integer.edb7ed14"
-                }
-            },
-            "array.212c3507": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/string.integer.edb7ed14"
-                }
-            },
-            "array.2800749e": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/string.5b1cd571"
-                }
-            },
-            "array.3da9f289": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/string.keccak.3242e7ca"
-                }
-            },
-            "array.567a97cc": {
-                "type": "array",
-                "maxItems": 61,
-                "minItems": 61,
-                "items": {
-                    "$ref": "#/components/schemas/object.6a742164"
-                }
-            },
-            "array.5cd3b3f4": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/object.Log.7045f48b"
-                }
-            },
-            "array.7e99ae42": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/object.txTraceResult.838f7cb1"
-                }
-            },
-            "array.8c89b997": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/object.Account.74b00c34"
-                }
-            },
-            "array.aa0a3267": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/object.f36162a7"
-                }
-            },
-            "array.ace0b93c": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/object.7308f691"
-                }
-            },
-            "array.b036d5dd": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/array.3da9f289"
-                }
-            },
-            "array.cfa48e18": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/object.RPCTransaction.75fc8af8"
-                }
-            },
-            "array.dc0fbff8": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/object.PeerInfo.5c89736d"
-                }
-            },
-            "array.e557aa32": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/object.BadBlockArgs.1e611d99"
-                }
-            },
-            "array.f3a92465": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/string.c824b4e5"
-                }
-            },
-            "bool_boolean.66977b29": {
-                "description": ":bool",
-                "type": "boolean"
-            },
-            "bool_boolean.9b89f070": {
-                "description": "*:bool",
-                "type": "boolean"
-            },
-            "boolean.420dffc4": {
-                "type": "boolean"
-            },
-            "common.Address_string.address.d6bf798c": {
-                "description": "github.com/ethereum/go-ethereum/common:common.Address",
-                "type": "string",
-                "title": "address",
-                "pattern": "^0x[a-fA-F\\d]{40}$"
-            },
-            "common.Hash_string.keccak.b92d32d1": {
-                "description": "github.com/ethereum/go-ethereum/common:common.Hash",
-                "type": "string",
-                "title": "keccak",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "hexutil.Big_string.integer.e9fbc064": {
-                "description": "github.com/ethereum/go-ethereum/common/hexutil:hexutil.Big",
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "hexutil.Bytes_string.dataWord.991c4306": {
-                "description": "github.com/ethereum/go-ethereum/common/hexutil:hexutil.Bytes",
-                "type": "string",
-                "title": "dataWord",
-                "pattern": "^0x([a-fA-F\\d]{64})?$"
-            },
-            "hexutil.Uint64_string.integer.9327e20a": {
-                "description": "github.com/ethereum/go-ethereum/common/hexutil:hexutil.Uint64",
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "hexutil.Uint_string.integer.1fd7f86a": {
-                "description": "github.com/ethereum/go-ethereum/common/hexutil:hexutil.Uint",
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "int_string.integer.ce902a4d": {
-                "description": "*:int",
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "int_string.integer.d105ce99": {
-                "description": ":int",
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "number.caa7697b": {
-                "type": "number"
-            },
-            "object.0134db4e": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/3ef9ee5c"
-                    }
-                }
-            },
-            "object.043997da": {
-                "type": "object",
-                "required": [
-                    "discovery",
-                    "listener"
-                ],
-                "properties": {
-                    "discovery": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "listener": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.07ae319c": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/object.c6b1a918"
-                    }
-                }
-            },
-            "object.0a615bdb": {
-                "type": "object",
-                "required": [
-                    "key",
-                    "value"
-                ],
-                "properties": {
-                    "key": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "value": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.23d7d8bb": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/object.RPCTransaction.75fc8af8"
-                    }
-                }
-            },
-            "object.301ae63f": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/string.keccak.3242e7ca"
-                    }
-                }
-            },
-            "object.367e4be7": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/object.DumpAccount.0efc3103"
-                    }
-                }
-            },
-            "object.373580df": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/object.da309f85"
-                    }
-                }
-            },
-            "object.6a742164": {
-                "type": "object",
-                "required": [
-                    "Size",
-                    "Mallocs",
-                    "Frees"
-                ],
-                "properties": {
-                    "Frees": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "Mallocs": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "Size": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.701529bd": {
-                "type": "object",
-                "required": [
-                    "localAddress",
-                    "remoteAddress",
-                    "inbound",
-                    "trusted",
-                    "static"
-                ],
-                "properties": {
-                    "inbound": {
-                        "$ref": "#/components/schemas/5c4862d9"
-                    },
-                    "localAddress": {
-                        "$ref": "#/components/schemas/6eef3f71"
-                    },
-                    "remoteAddress": {
-                        "$ref": "#/components/schemas/6eef3f71"
-                    },
-                    "static": {
-                        "$ref": "#/components/schemas/5c4862d9"
-                    },
-                    "trusted": {
-                        "$ref": "#/components/schemas/5c4862d9"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.7308f691": {
-                "type": "object",
-                "required": [
-                    "key",
-                    "value",
-                    "proof"
-                ],
-                "properties": {
-                    "key": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "proof": {
-                        "$ref": "#/components/schemas/array.2800749e"
-                    },
-                    "value": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.Account.74b00c34": {
-                "type": "object",
-                "title": "Account",
-                "required": [
-                    "address",
-                    "url"
-                ],
-                "properties": {
-                    "address": {
-                        "$ref": "#/components/schemas/string.address.a5a48ce4"
-                    },
-                    "url": {
-                        "$ref": "#/components/schemas/object.b3c4b0c9"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.AccountRangeResult.408b5544": {
-                "type": "object",
-                "title": "AccountRangeResult",
-                "required": [
-                    "accounts",
-                    "next"
-                ],
-                "properties": {
-                    "accounts": {
-                        "$ref": "#/components/schemas/object.f06f16ea"
-                    },
-                    "next": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.AccountResult.7783b8a2": {
-                "type": "object",
-                "title": "AccountResult",
-                "required": [
-                    "address",
-                    "accountProof",
-                    "balance",
-                    "codeHash",
-                    "nonce",
-                    "storageHash",
-                    "storageProof"
-                ],
-                "properties": {
-                    "accountProof": {
-                        "$ref": "#/components/schemas/array.2800749e"
-                    },
-                    "address": {
-                        "$ref": "#/components/schemas/string.address.a5a48ce4"
-                    },
-                    "balance": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "codeHash": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "nonce": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "storageHash": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "storageProof": {
-                        "$ref": "#/components/schemas/array.ace0b93c"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.BadBlockArgs.1e611d99": {
-                "type": "object",
-                "title": "BadBlockArgs",
-                "required": [
-                    "hash",
-                    "block",
-                    "rlp"
-                ],
-                "properties": {
-                    "block": {
-                        "$ref": "#/components/schemas/object.0134db4e"
-                    },
-                    "hash": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "rlp": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.CallArgs.9791053e": {
-                "type": "object",
-                "title": "CallArgs",
-                "required": [
-                    "from",
-                    "to",
-                    "gas",
-                    "gasPrice",
-                    "value",
-                    "data"
-                ],
-                "properties": {
-                    "data": {
-                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
-                    },
-                    "from": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "gas": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "gasPrice": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "to": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "value": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.Dump.3f30c119": {
-                "type": "object",
-                "title": "Dump",
-                "required": [
-                    "root",
-                    "accounts"
-                ],
-                "properties": {
-                    "accounts": {
-                        "$ref": "#/components/schemas/object.367e4be7"
-                    },
-                    "root": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.DumpAccount.0efc3103": {
-                "type": "object",
-                "title": "DumpAccount",
-                "required": [
-                    "balance",
-                    "nonce",
-                    "root",
-                    "codeHash"
-                ],
-                "properties": {
-                    "address": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "balance": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "code": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "codeHash": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "key": {
-                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
-                    },
-                    "nonce": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "root": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "storage": {
-                        "$ref": "#/components/schemas/object.c018b64e"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.ExecutionResult.b7bda5b1": {
-                "type": "object",
-                "title": "ExecutionResult",
-                "required": [
-                    "gas",
-                    "failed",
-                    "returnValue",
-                    "structLogs"
-                ],
-                "properties": {
-                    "failed": {
-                        "$ref": "#/components/schemas/boolean.420dffc4"
-                    },
-                    "gas": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "returnValue": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "structLogs": {
-                        "$ref": "#/components/schemas/array.aa0a3267"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.FilterCriteria.4dc579fc": {
-                "type": "object",
-                "title": "FilterCriteria",
-                "required": [
-                    "BlockHash",
-                    "FromBlock",
-                    "ToBlock",
-                    "Addresses",
-                    "Topics"
-                ],
-                "properties": {
-                    "Addresses": {
-                        "$ref": "#/components/schemas/array.0e2ed272"
-                    },
-                    "BlockHash": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "FromBlock": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "ToBlock": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "Topics": {
-                        "$ref": "#/components/schemas/array.b036d5dd"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.GCStats.b866cacd": {
-                "type": "object",
-                "title": "GCStats",
-                "required": [
-                    "LastGC",
-                    "NumGC",
-                    "PauseTotal",
-                    "Pause",
-                    "PauseEnd",
-                    "PauseQuantiles"
-                ],
-                "properties": {
-                    "LastGC": {
-                        "$ref": "#/components/schemas/string.c824b4e5"
-                    },
-                    "NumGC": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "Pause": {
-                        "$ref": "#/components/schemas/array.212c3507"
-                    },
-                    "PauseEnd": {
-                        "$ref": "#/components/schemas/array.f3a92465"
-                    },
-                    "PauseQuantiles": {
-                        "$ref": "#/components/schemas/array.212c3507"
-                    },
-                    "PauseTotal": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.Log.7045f48b": {
-                "type": "object",
-                "title": "Log",
-                "required": [
-                    "address",
-                    "topics",
-                    "data",
-                    "blockNumber",
-                    "transactionHash",
-                    "transactionIndex",
-                    "blockHash",
-                    "logIndex",
-                    "removed"
-                ],
-                "properties": {
-                    "address": {
-                        "$ref": "#/components/schemas/string.address.a5a48ce4"
-                    },
-                    "blockHash": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "blockNumber": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "data": {
-                        "$ref": "#/components/schemas/string.bytes.ad0f9edc"
-                    },
-                    "logIndex": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "removed": {
-                        "$ref": "#/components/schemas/boolean.420dffc4"
-                    },
-                    "topics": {
-                        "$ref": "#/components/schemas/array.3da9f289"
-                    },
-                    "transactionHash": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "transactionIndex": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.MemStats.254faba5": {
-                "type": "object",
-                "title": "MemStats",
-                "required": [
-                    "Alloc",
-                    "TotalAlloc",
-                    "Sys",
-                    "Lookups",
-                    "Mallocs",
-                    "Frees",
-                    "HeapAlloc",
-                    "HeapSys",
-                    "HeapIdle",
-                    "HeapInuse",
-                    "HeapReleased",
-                    "HeapObjects",
-                    "StackInuse",
-                    "StackSys",
-                    "MSpanInuse",
-                    "MSpanSys",
-                    "MCacheInuse",
-                    "MCacheSys",
-                    "BuckHashSys",
-                    "GCSys",
-                    "OtherSys",
-                    "NextGC",
-                    "LastGC",
-                    "PauseTotalNs",
-                    "PauseNs",
-                    "PauseEnd",
-                    "NumGC",
-                    "NumForcedGC",
-                    "GCCPUFraction",
-                    "EnableGC",
-                    "DebugGC",
-                    "BySize"
-                ],
-                "properties": {
-                    "Alloc": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "BuckHashSys": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "BySize": {
-                        "$ref": "#/components/schemas/array.567a97cc"
-                    },
-                    "DebugGC": {
-                        "$ref": "#/components/schemas/boolean.420dffc4"
-                    },
-                    "EnableGC": {
-                        "$ref": "#/components/schemas/boolean.420dffc4"
-                    },
-                    "Frees": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "GCCPUFraction": {
-                        "$ref": "#/components/schemas/number.caa7697b"
-                    },
-                    "GCSys": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "HeapAlloc": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "HeapIdle": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "HeapInuse": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "HeapObjects": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "HeapReleased": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "HeapSys": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "LastGC": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "Lookups": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "MCacheInuse": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "MCacheSys": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "MSpanInuse": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "MSpanSys": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "Mallocs": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "NextGC": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "NumForcedGC": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "NumGC": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "OtherSys": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "PauseEnd": {
-                        "$ref": "#/components/schemas/array.1c86b5fa"
-                    },
-                    "PauseNs": {
-                        "$ref": "#/components/schemas/array.1c86b5fa"
-                    },
-                    "PauseTotalNs": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "StackInuse": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "StackSys": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "Sys": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "TotalAlloc": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.NodeInfo.6e9bbac8": {
-                "type": "object",
-                "title": "NodeInfo",
-                "required": [
-                    "id",
-                    "name",
-                    "enode",
-                    "enr",
-                    "ip",
-                    "ports",
-                    "listenAddr",
-                    "protocols"
-                ],
-                "properties": {
-                    "enode": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "enr": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "id": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "ip": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "listenAddr": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "name": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "ports": {
-                        "$ref": "#/components/schemas/object.043997da"
-                    },
-                    "protocols": {
-                        "$ref": "#/components/schemas/object.0134db4e"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.PeerInfo.5c89736d": {
-                "type": "object",
-                "title": "PeerInfo",
-                "required": [
-                    "enode",
-                    "id",
-                    "name",
-                    "caps",
-                    "network",
-                    "protocols"
-                ],
-                "properties": {
-                    "caps": {
-                        "$ref": "#/components/schemas/array.2800749e"
-                    },
-                    "enode": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "enr": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "id": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "name": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "network": {
-                        "$ref": "#/components/schemas/object.701529bd"
-                    },
-                    "protocols": {
-                        "$ref": "#/components/schemas/object.ab8ba582"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.RPCTransaction.75fc8af8": {
-                "type": "object",
-                "title": "RPCTransaction",
-                "required": [
-                    "blockHash",
-                    "blockNumber",
-                    "from",
-                    "gas",
-                    "gasPrice",
-                    "hash",
-                    "input",
-                    "nonce",
-                    "to",
-                    "transactionIndex",
-                    "value",
-                    "v",
-                    "r",
-                    "s"
-                ],
-                "properties": {
-                    "blockHash": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "blockNumber": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "from": {
-                        "$ref": "#/components/schemas/string.address.a5a48ce4"
-                    },
-                    "gas": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "gasPrice": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "hash": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "input": {
-                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
-                    },
-                    "nonce": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "r": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "s": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "to": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "transactionIndex": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "v": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "value": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.SendTxArgs.1e27de41": {
-                "type": "object",
-                "title": "SendTxArgs",
-                "required": [
-                    "from",
-                    "to",
-                    "gas",
-                    "gasPrice",
-                    "value",
-                    "nonce",
-                    "data",
-                    "input"
-                ],
-                "properties": {
-                    "data": {
-                        "$ref": "#/components/schemas/string.dataWord.259d3594"
-                    },
-                    "from": {
-                        "$ref": "#/components/schemas/string.address.a5a48ce4"
-                    },
-                    "gas": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "gasPrice": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "input": {
-                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
-                    },
-                    "nonce": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "to": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "value": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.SignTransactionResult.55736efa": {
-                "type": "object",
-                "title": "SignTransactionResult",
-                "required": [
-                    "raw",
-                    "tx"
-                ],
-                "properties": {
-                    "raw": {
-                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
-                    },
-                    "tx": {
-                        "$ref": "#/components/schemas/object.d9873742"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.StdTraceConfig.b9777e1e": {
-                "type": "object",
-                "title": "StdTraceConfig",
-                "required": [
-                    "DisableMemory",
-                    "DisableStack",
-                    "DisableStorage",
-                    "Debug",
-                    "Limit",
-                    "Reexec",
-                    "TxHash"
-                ],
-                "properties": {
-                    "Debug": {
-                        "$ref": "#/components/schemas/boolean.420dffc4"
-                    },
-                    "DisableMemory": {
-                        "$ref": "#/components/schemas/boolean.420dffc4"
-                    },
-                    "DisableStack": {
-                        "$ref": "#/components/schemas/boolean.420dffc4"
-                    },
-                    "DisableStorage": {
-                        "$ref": "#/components/schemas/boolean.420dffc4"
-                    },
-                    "Limit": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "Reexec": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "TxHash": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.StorageRangeResult.c08df921": {
-                "type": "object",
-                "title": "StorageRangeResult",
-                "required": [
-                    "storage",
-                    "nextKey"
-                ],
-                "properties": {
-                    "nextKey": {
-                        "$ref": "#/components/schemas/string.keccak.8fa02b0f"
-                    },
-                    "storage": {
-                        "$ref": "#/components/schemas/object.e6b6807c"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.TraceConfig.a2191d97": {
-                "type": "object",
-                "title": "TraceConfig",
-                "required": [
-                    "DisableMemory",
-                    "DisableStack",
-                    "DisableStorage",
-                    "Debug",
-                    "Limit",
-                    "Tracer",
-                    "Timeout",
-                    "Reexec"
-                ],
-                "properties": {
-                    "Debug": {
-                        "$ref": "#/components/schemas/boolean.420dffc4"
-                    },
-                    "DisableMemory": {
-                        "$ref": "#/components/schemas/boolean.420dffc4"
-                    },
-                    "DisableStack": {
-                        "$ref": "#/components/schemas/boolean.420dffc4"
-                    },
-                    "DisableStorage": {
-                        "$ref": "#/components/schemas/boolean.420dffc4"
-                    },
-                    "Limit": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "Reexec": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "Timeout": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "Tracer": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.ab8ba582": {
-                "type": "object",
-                "required": [
-                    "localAddress",
-                    "remoteAddress",
-                    "inbound",
-                    "trusted",
-                    "static"
-                ],
-                "properties": {
-                    "inbound": {
-                        "$ref": "#/components/schemas/5c4862d9"
-                    },
-                    "localAddress": {
-                        "$ref": "#/components/schemas/6eef3f71"
-                    },
-                    "remoteAddress": {
-                        "$ref": "#/components/schemas/6eef3f71"
-                    },
-                    "static": {
-                        "$ref": "#/components/schemas/5c4862d9"
-                    },
-                    "trusted": {
-                        "$ref": "#/components/schemas/5c4862d9"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.account.8cb43f1a": {
-                "type": "object",
-                "title": "account",
-                "required": [
-                    "nonce",
-                    "code",
-                    "balance",
-                    "state",
-                    "stateDiff"
-                ],
-                "properties": {
-                    "balance": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "code": {
-                        "$ref": "#/components/schemas/string.dataWord.e8659da6"
-                    },
-                    "nonce": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "state": {
-                        "$ref": "#/components/schemas/object.301ae63f"
-                    },
-                    "stateDiff": {
-                        "$ref": "#/components/schemas/object.301ae63f"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.b3c4b0c9": {
-                "type": "object",
-                "required": [
-                    "Scheme",
-                    "Path"
-                ],
-                "properties": {
-                    "Path": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "Scheme": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.c018b64e": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    }
-                }
-            },
-            "object.c6b1a918": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/object.c018b64e"
-                    }
-                }
-            },
-            "object.c79a510c": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/string.integer.edb7ed14"
-                    }
-                }
-            },
-            "object.d6dac6ba": {
-                "description": "*:",
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/object.account.8cb43f1a"
-                    }
-                }
-            },
-            "object.d9873742": {
-                "type": "object",
-                "additionalProperties": false
-            },
-            "object.da309f85": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/object.23d7d8bb"
-                    }
-                }
-            },
-            "object.e6b6807c": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/object.0a615bdb"
-                    }
-                }
-            },
-            "object.f06f16ea": {
-                "type": "object",
-                "patternProperties": {
-                    ".*": {
-                        "$ref": "#/components/schemas/string.keccak.bd2ff551"
-                    }
-                }
-            },
-            "object.f36162a7": {
-                "type": "object",
-                "required": [
-                    "pc",
-                    "op",
-                    "gas",
-                    "gasCost",
-                    "depth"
-                ],
-                "properties": {
-                    "depth": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "error": {
-                        "$ref": "#/components/schemas/3ef9ee5c"
-                    },
-                    "gas": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "gasCost": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "memory": {
-                        "$ref": "#/components/schemas/array.2800749e"
-                    },
-                    "op": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "pc": {
-                        "$ref": "#/components/schemas/string.integer.fe0a5094"
-                    },
-                    "stack": {
-                        "$ref": "#/components/schemas/array.2800749e"
-                    },
-                    "storage": {
-                        "$ref": "#/components/schemas/object.c018b64e"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.rawWallet.91e009ee": {
-                "type": "object",
-                "title": "rawWallet",
-                "required": [
-                    "url",
-                    "status"
-                ],
-                "properties": {
-                    "accounts": {
-                        "$ref": "#/components/schemas/array.8c89b997"
-                    },
-                    "failure": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "status": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "url": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "object.txTraceResult.838f7cb1": {
-                "type": "object",
-                "title": "txTraceResult",
-                "properties": {
-                    "error": {
-                        "$ref": "#/components/schemas/string.5b1cd571"
-                    },
-                    "result": {
-                        "$ref": "#/components/schemas/3ef9ee5c"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "rpc.BlockNumberOrHash_blockNumberOrHash.d4005edc": {
-                "description": "github.com/ethereum/go-ethereum/rpc:rpc.BlockNumberOrHash",
-                "title": "blockNumberOrHash",
-                "oneOf": [
-                    {
-                        "$ref": "#/components/schemas/string.keccak.3242e7ca"
-                    },
-                    {
-                        "$ref": "#/components/schemas/string.integer.edb7ed14"
-                    }
-                ]
-            },
-            "rpc.BlockNumber_blockNumberOrTag.6c30ca5d": {
-                "description": "github.com/ethereum/go-ethereum/rpc:rpc.BlockNumber",
-                "title": "blockNumberOrTag",
-                "oneOf": [
-                    {
-                        "$ref": "#/components/schemas/string.keccak.3242e7ca"
-                    },
-                    {
-                        "$ref": "#/components/schemas/string.blockNumberTag.5eff517d"
-                    }
-                ]
-            },
-            "rpc.ID_string.ffd91372": {
-                "description": "github.com/ethereum/go-ethereum/rpc:rpc.ID",
-                "type": "string"
-            },
-            "string.5b1cd571": {
-                "type": "string"
-            },
-            "string.address.a5a48ce4": {
-                "type": "string",
-                "title": "address",
-                "pattern": "^0x[a-fA-F\\d]{40}$"
-            },
-            "string.blockNumberTag.5eff517d": {
-                "description": "The optional block height description",
-                "type": "string",
-                "title": "blockNumberTag",
-                "enum": [
-                    "earliest",
-                    "latest",
-                    "pending"
-                ]
-            },
-            "string.bytes.99a4fec9": {
-                "description": "Hex representation of a variable length byte array",
-                "type": "string",
-                "title": "bytes",
-                "pattern": "^0x([a-fA-F0-9]?)+$"
-            },
-            "string.bytes.ad0f9edc": {
-                "type": "string",
-                "title": "bytes",
-                "pattern": "^0x([a-fA-F0-9]?)+$"
-            },
-            "string.c824b4e5": {
-                "type": "string",
-                "format": "date-time"
-            },
-            "string.dataWord.259d3594": {
-                "description": "Field 'input' should be preferred",
-                "type": "string",
-                "title": "dataWord",
-                "pattern": "^0x([a-fA-F\\d]{64})?$"
-            },
-            "string.dataWord.e8659da6": {
-                "type": "string",
-                "title": "dataWord",
-                "pattern": "^0x([a-fA-F\\d]{64})?$"
-            },
-            "string.integer.edb7ed14": {
-                "description": "Hex representation of the integer",
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.integer.fe0a5094": {
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "string.keccak.3242e7ca": {
-                "description": "Hex representation of a Keccak 256 hash",
-                "type": "string",
-                "title": "keccak",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string.keccak.8fa02b0f": {
-                "type": "string",
-                "title": "keccak",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string.keccak.bd2ff551": {
-                "description": "Hex representation of a Keccak 256 hash POINTER",
-                "type": "string",
-                "title": "keccak",
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-            },
-            "string_string.043590b5": {
-                "description": "*:string",
-                "type": "string"
-            },
-            "string_string.301d5adc": {
-                "description": ":string",
-                "type": "string"
-            },
-            "types.BlockNonce_array.46e3772e": {
-                "description": "github.com/ethereum/go-ethereum/core/types:types.BlockNonce",
-                "type": "array",
-                "maxItems": 8,
-                "minItems": 8,
-                "items": {
-                    "$ref": "#/components/schemas/string.integer.edb7ed14"
-                }
-            },
-            "uint64_string.integer.6f4a1a95": {
-                "description": "*:uint64",
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "uint64_string.integer.99afc08e": {
-                "description": ":uint64",
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
-            },
-            "uint_string.integer.ddf1775d": {
-                "description": ":uint",
-                "type": "string",
-                "title": "integer",
-                "pattern": "^0x[a-fA-F0-9]+$"
+            "0b965467": {
+                "$ref": "#/components/schemas/array.0e2ed272"
+            },
+            "15d2db86": {
+                "$ref": "#/components/schemas/uint64_string.integer.99afc08e"
+            },
+            "17f70f68": {
+                "$ref": "#/components/schemas/object.ExecutionResult.5cba9189"
+            },
+            "19d14d7c": {
+                "$ref": "#/components/schemas/object.NodeInfo.531cf050"
+            },
+            "1d850e3a": {
+                "$ref": "#/components/schemas/bool_boolean.66977b29"
+            },
+            "1d92a8cf": {
+                "$ref": "#/components/schemas/hexutil.Uint_string.integer.1fd7f86a"
+            },
+            "2618493c": {
+                "$ref": "#/components/schemas/object.SendTxArgs.6470304b"
+            },
+            "2dda9d56": {
+                "$ref": "#/components/schemas/int_string.integer.d105ce99"
+            },
+            "2f1ff889": {
+                "$ref": "#/components/schemas/Uint64_string.integer.34584798"
+            },
+            "34edbd73": {
+                "$ref": "#/components/schemas/object.c79a510c"
+            },
+            "3a6d16fd": {
+                "$ref": "#/components/schemas/Uint_string.integer.334b351a"
+            },
+            "3a7ed679": {
+                "$ref": "#/components/schemas/object.Account.fe9d6649"
+            },
+            "3b25fedd": {
+                "$ref": "#/components/schemas/uint64_string.integer.6f4a1a95"
+            },
+            "3d6ca2ce": {
+                "$ref": "#/components/schemas/array.ab5f0bb5"
+            },
+            "4b37eb21": {
+                "$ref": "#/components/schemas/object.MemStats.372ed753"
+            },
+            "54aa2e54": {
+                "$ref": "#/components/schemas/types.BlockNonce_string.integer.b33e8698"
+            },
+            "56f4037d": {
+                "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.d4005edc"
+            },
+            "57913d61": {
+                "$ref": "#/components/schemas/object.StdTraceConfig.b88a4f58"
+            },
+            "598766fa": {
+                "$ref": "#/components/schemas/object.EthSyncingResult.7f592c20"
+            },
+            "5ac6539d": {
+                "$ref": "#/components/schemas/int_string.integer.ce902a4d"
+            },
+            "5ef1292e": {
+                "$ref": "#/components/schemas/rpc.ID_string.ffd91372"
+            },
+            "64660f7a": {
+                "$ref": "#/components/schemas/object.0134db4e"
+            },
+            "67e24145": {
+                "$ref": "#/components/schemas/Big_string.integer.ddafdcbc"
+            },
+            "7199b7b0": {
+                "$ref": "#/components/schemas/array.a8b9dbac"
+            },
+            "7535b0b5": {
+                "$ref": "#/components/schemas/string.bytes.99a4fec9"
+            },
+            "77a4ae92": {
+                "$ref": "#/components/schemas/Hash_string.keccak.4e9cb34b"
+            },
+            "77d20ccc": {
+                "$ref": "#/components/schemas/rpc.BlockNumber_blockNumberOrTag.6c30ca5d"
+            },
+            "7bad17ff": {
+                "$ref": "#/components/schemas/array.5429abe2"
+            },
+            "7cd1a15c": {
+                "$ref": "#/components/schemas/uint_string.integer.ddf1775d"
+            },
+            "7d50a3ed": {
+                "$ref": "#/components/schemas/object.07ae319c"
+            },
+            "7ed7a408": {
+                "$ref": "#/components/schemas/hexutil.Big_string.integer.e9fbc064"
+            },
+            "7f1a20fd": {
+                "$ref": "#/components/schemas/object.AccountResult.459f3632"
+            },
+            "809e8ef0": {
+                "$ref": "#/components/schemas/object.SignTransactionResult.d3a3acba"
+            },
+            "872b45d1": {
+                "$ref": "#/components/schemas/array.2800749e"
+            },
+            "953fd027": {
+                "$ref": "#/components/schemas/common.Address_string.address.d6bf798c"
+            },
+            "96ea3f6d": {
+                "$ref": "#/components/schemas/object.StorageRangeResult.caeac994"
+            },
+            "a3f9291b": {
+                "$ref": "#/components/schemas/object.FilterCriteria.6a25dd91"
+            },
+            "a94a2cf3": {
+                "$ref": "#/components/schemas/array.7e99ae42"
+            },
+            "ad646739": {
+                "$ref": "#/components/schemas/object.GCStats.ddfbe9cd"
+            },
+            "b2c4cbc8": {
+                "$ref": "#/components/schemas/object.CallArgs.db0e8113"
+            },
+            "b351847b": {
+                "$ref": "#/components/schemas/object.d31233b1"
+            },
+            "b4478bb6": {
+                "$ref": "#/components/schemas/3ef9ee5c"
+            },
+            "ba54eab6": {
+                "$ref": "#/components/schemas/object.AccountRangeResult.949b14a3"
+            },
+            "bbe5a657": {
+                "$ref": "#/components/schemas/object.RPCTransaction.1ea92fcd"
+            },
+            "bbfa9c31": {
+                "$ref": "#/components/schemas/string_string.301d5adc"
+            },
+            "c40084a1": {
+                "$ref": "#/components/schemas/array.f050d6b7"
+            },
+            "c5820385": {
+                "$ref": "#/components/schemas/array.09c4961f"
+            },
+            "c789004b": {
+                "$ref": "#/components/schemas/hexutil.Bytes_string.dataWord.991c4306"
+            },
+            "c96f4211": {
+                "$ref": "#/components/schemas/common.Hash_string.keccak.b92d32d1"
+            },
+            "c9ce359d": {
+                "$ref": "#/components/schemas/object.TraceConfig.a31a343b"
+            },
+            "cf076949": {
+                "$ref": "#/components/schemas/hexutil.Uint64_string.integer.9327e20a"
+            },
+            "cf91b34a": {
+                "$ref": "#/components/schemas/object.Dump.42f08fb6"
+            },
+            "dc32604d": {
+                "$ref": "#/components/schemas/bool_boolean.9b89f070"
+            },
+            "dec2410a": {
+                "$ref": "#/components/schemas/array.2f80fd20"
+            },
+            "ea9c7b32": {
+                "$ref": "#/components/schemas/Null_null.2d1dcd4c"
+            },
+            "ee62999c": {
+                "$ref": "#/components/schemas/string_string.043590b5"
+            },
+            "fa7edfc7": {
+                "$ref": "#/components/schemas/object.89791ecd"
             }
         }
     },

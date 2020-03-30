@@ -78,7 +78,7 @@ func (s *PublicEthereumAPI) ProtocolVersion() hexutil.Uint {
 // FIXME: Can't get jsonschema oneOf to work right.
 //
 type EthSyncingResult struct {
-	Syncing  EthSyncingResultSyncing   `jsonschema:"oneof_required=ethSyncing"` // `jsonschema:"oneof_type=EthSyncingResultSyncing"`
+	Syncing  EthSyncingResultSyncing   `jsonschema:"oneof_required=ethSyncing"`  // `jsonschema:"oneof_type=EthSyncingResultSyncing"`
 	Progress *EthSyncingResultProgress `jsonschema:"oneof_required=ethProgress"` // `jsonschema:"oneof_type=EthSyncingResultProgress"`
 }
 

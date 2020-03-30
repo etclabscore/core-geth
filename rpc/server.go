@@ -24,7 +24,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net"
-	"regexp"
 	"sort"
 	"strings"
 	"sync/atomic"
@@ -302,7 +301,6 @@ func (o OpenRPCCheckUnderSet) Less(i, j int) bool {
 		return si < sj
 	}
 	return si_lower < sj_lower
-	return false
 }
 
 func (o OpenRPCCheckUnderSet) Swap(i, j int) {
@@ -334,17 +332,17 @@ type OpenRPCCheckUnderArg struct {
 	Name, Kind string
 }
 
-func packageNameFromRuntimePCFuncName(runtimeFuncForPCName string) string {
-	re := regexp.MustCompile(`(?im)^(?P<pkgdir>.*/)(?P<pkgbase>[a-zA-Z0-9\-_]*)`)
-	match := re.FindStringSubmatch(runtimeFuncForPCName)
-	pmap := make(map[string]string)
-	for i, name := range re.SubexpNames() {
-		if i > 0 && i <= len(match) {
-			pmap[name] = match[i]
-		}
-	}
-	return pmap["pkgdir"] + pmap["pkgbase"]
-}
+//func packageNameFromRuntimePCFuncName(runtimeFuncForPCName string) string {
+//	re := regexp.MustCompile(`(?im)^(?P<pkgdir>.*/)(?P<pkgbase>[a-zA-Z0-9\-_]*)`)
+//	match := re.FindStringSubmatch(runtimeFuncForPCName)
+//	pmap := make(map[string]string)
+//	for i, name := range re.SubexpNames() {
+//		if i > 0 && i <= len(match) {
+//			pmap[name] = match[i]
+//		}
+//	}
+//	return pmap["pkgdir"] + pmap["pkgbase"]
+//}
 
 //func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 //	describedDoc, err := s.Describe()

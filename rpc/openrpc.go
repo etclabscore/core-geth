@@ -288,7 +288,7 @@ func (a argIdent) Name() string {
 
 type AnalysisT struct {
 	OpenMetaDescription string
-	schemaTitles map[string]string
+	schemaTitles        map[string]string
 }
 
 func (a *AnalysisT) schemaAsReferenceSchema(sch spec.Schema) (refSchema spec.Schema, err error) {
@@ -304,12 +304,10 @@ func (a *AnalysisT) schemaAsReferenceSchema(sch spec.Schema) (refSchema spec.Sch
 	return
 }
 
-
 func (a *AnalysisT) registerSchema(sch spec.Schema, titleKeyer func(schema spec.Schema) string) {
 	b, _ := json.Marshal(sch)
 	a.schemaTitles[string(b)] = titleKeyer(sch)
 }
-
 
 func (a *AnalysisT) schemaFromRef(psch spec.Schema, ref spec.Ref) (schema spec.Schema, err error) {
 	v, _, err := ref.GetPointer().Get(psch)
@@ -388,10 +386,10 @@ func (a *AnalysisT) analysisOnLeaf(sch spec.Schema, onLeaf func(leaf spec.Schema
 	for i := range sch.AllOf {
 		a.analysisOnLeaf(sch.AllOf[i], onLeaf)
 	}
-	for k, _ := range sch.Properties {
+	for k := range sch.Properties {
 		a.analysisOnLeaf(sch.Properties[k], onLeaf)
 	}
-	for k, _ := range sch.PatternProperties {
+	for k := range sch.PatternProperties {
 		a.analysisOnLeaf(sch.PatternProperties[k], onLeaf)
 	}
 	if sch.Items == nil {
@@ -419,7 +417,7 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (
 		Summary:     fn.Doc.Text(),
 		Description: "", // fmt.Sprintf(`%s@%s:%d'`, rt.Name(), file, line),
 		ExternalDocs: goopenrpcT.ExternalDocs{
-			Description: fmt.Sprintf(`%s`, rt.Name()),
+			Description: rt.Name(),
 			URL:         fmt.Sprintf("file://%s:%d", file, line),
 		},
 		Params:         []*goopenrpcT.ContentDescriptor{},
@@ -701,19 +699,19 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 		  "oneOf": [%s, %s]
 		}`, commonHashD, blockNumberTagD)},
 
-//		{ethapi.EthSyncingResult{}, fmt.Sprintf(`{
-//          "title": "ethSyncingResult",
-//		  "description": "Syncing returns false in case the node is currently not syncing with the network. It can be up to date or has not
-//yet received the latest block headers from its pears. In case it is synchronizing:
-//- startingBlock: block number this node started to synchronise from
-//- currentBlock:  block number this node is currently importing
-//- highestBlock:  block number of the highest block header this node has received from peers
-//- pulledStates:  number of state entries processed until now
-//- knownStates:   number of known state entries that still need to be pulled",
-//		  "oneOf": [%s, %s]
-//		}`, `{
-//        "type": "boolean"
-//      }`, `{"type": "object"}`)},
+		//		{ethapi.EthSyncingResult{}, fmt.Sprintf(`{
+		//          "title": "ethSyncingResult",
+		//		  "description": "Syncing returns false in case the node is currently not syncing with the network. It can be up to date or has not
+		//yet received the latest block headers from its pears. In case it is synchronizing:
+		//- startingBlock: block number this node started to synchronise from
+		//- currentBlock:  block number this node is currently importing
+		//- highestBlock:  block number of the highest block header this node has received from peers
+		//- pulledStates:  number of state entries processed until now
+		//- knownStates:   number of known state entries that still need to be pulled",
+		//		  "oneOf": [%s, %s]
+		//		}`, `{
+		//        "type": "boolean"
+		//      }`, `{"type": "object"}`)},
 
 	}
 
@@ -805,31 +803,31 @@ func getAstFunc(cb *callback, astFile *ast.File, rf *runtime.Func) *ast.FuncDecl
 	return nil
 }
 
-func getAstType(astFile *ast.File, t reflect.Type) *ast.TypeSpec {
-	log.Println("getAstType", t.Name(), t.String())
-	for _, decl := range astFile.Decls {
-		d, ok := decl.(*ast.GenDecl)
-		if !ok {
-			continue
-		}
-		if d.Tok != token.TYPE {
-			continue
-		}
-		for _, s := range d.Specs {
-			sp, ok := s.(*ast.TypeSpec)
-			if !ok {
-				continue
-			}
-			if sp.Name != nil && sp.Name.Name == t.Name() {
-				return sp
-			} else if sp.Name != nil {
-				log.Println("nomatch", sp.Name.Name)
-			}
-		}
-
-	}
-	return nil
-}
+//func getAstType(astFile *ast.File, t reflect.Type) *ast.TypeSpec {
+//	log.Println("getAstType", t.Name(), t.String())
+//	for _, decl := range astFile.Decls {
+//		d, ok := decl.(*ast.GenDecl)
+//		if !ok {
+//			continue
+//		}
+//		if d.Tok != token.TYPE {
+//			continue
+//		}
+//		for _, s := range d.Specs {
+//			sp, ok := s.(*ast.TypeSpec)
+//			if !ok {
+//				continue
+//			}
+//			if sp.Name != nil && sp.Name.Name == t.Name() {
+//				return sp
+//			} else if sp.Name != nil {
+//				log.Println("nomatch", sp.Name.Name)
+//			}
+//		}
+//
+//	}
+//	return nil
+//}
 
 func runtimeFuncName(rf *runtime.Func) string {
 	spl := strings.Split(rf.Name(), ".")
@@ -845,14 +843,14 @@ func (d *OpenRPCDescription) findMethodByName(name string) (ok bool, method goop
 	return false, goopenrpcT.Method{}
 }
 
-func runtimeFuncPackageName(rf *runtime.Func) string {
-	re := regexp.MustCompile(`(?im)^(?P<pkgdir>.*/)(?P<pkgbase>[a-zA-Z0-9\-_]*)`)
-	match := re.FindStringSubmatch(rf.Name())
-	pmap := make(map[string]string)
-	for i, name := range re.SubexpNames() {
-		if i > 0 && i <= len(match) {
-			pmap[name] = match[i]
-		}
-	}
-	return pmap["pkgdir"] + pmap["pkgbase"]
-}
+//func runtimeFuncPackageName(rf *runtime.Func) string {
+//	re := regexp.MustCompile(`(?im)^(?P<pkgdir>.*/)(?P<pkgbase>[a-zA-Z0-9\-_]*)`)
+//	match := re.FindStringSubmatch(rf.Name())
+//	pmap := make(map[string]string)
+//	for i, name := range re.SubexpNames() {
+//		if i > 0 && i <= len(match) {
+//			pmap[name] = match[i]
+//		}
+//	}
+//	return pmap["pkgdir"] + pmap["pkgbase"]
+//}

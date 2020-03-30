@@ -643,7 +643,7 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 		{new(hexutil.Big), integerD},
 		{hexutil.Big{}, integerD},
 
-		{types.BlockNonce{}, integerD},kj
+		{types.BlockNonce{}, integerD},
 
 		{new(common.Address), `{
           "title": "keccak",

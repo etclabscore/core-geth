@@ -78,8 +78,8 @@ func (s *PublicEthereumAPI) ProtocolVersion() hexutil.Uint {
 // FIXME: Can't get jsonschema oneOf to work right.
 //
 type EthSyncingResult struct {
-	Syncing  EthSyncingResultSyncing   // `jsonschema:"oneof_type=syncing"` // `jsonschema:"oneof_type=EthSyncingResultSyncing"`
-	Progress *EthSyncingResultProgress // `jsonschema:"oneof_type=progress"` // `jsonschema:"oneof_type=EthSyncingResultProgress"`
+	Syncing  EthSyncingResultSyncing   `jsonschema:"oneof_required=ethSyncing"` // `jsonschema:"oneof_type=EthSyncingResultSyncing"`
+	Progress *EthSyncingResultProgress `jsonschema:"oneof_required=ethProgress"` // `jsonschema:"oneof_type=EthSyncingResultProgress"`
 }
 
 type EthSyncingResultSyncing bool
@@ -116,6 +116,7 @@ func (s *PublicEthereumAPI) Syncing() (EthSyncingResult, error) {
 	}
 	// Otherwise gather the block sync stats
 	return EthSyncingResult{
+		Syncing: true,
 		Progress: &EthSyncingResultProgress{
 			hexutil.Uint64(progress.StartingBlock),
 			hexutil.Uint64(progress.CurrentBlock),

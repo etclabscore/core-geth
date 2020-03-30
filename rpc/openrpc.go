@@ -76,9 +76,9 @@ func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 		}
 	}
 
-	if err := Clean(s.doc.Doc); err != nil {
-		panic(err.Error())
-	}
+	//if err := Clean(s.doc.Doc); err != nil {
+	//	panic(err.Error())
+	//}
 
 	return s.doc.Doc, nil
 }
@@ -541,7 +541,7 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 
 	rflctr := jsonschema.Reflector{
 		AllowAdditionalProperties:  false, // false,
-		RequiredFromJSONSchemaTags: false,
+		RequiredFromJSONSchemaTags: true,
 		ExpandedStruct:             false, // false, // false,
 		//IgnoredTypes:               []interface{}{chaninterface},
 		TypeMapper: OpenRPCJSONSchemaTypeMapper,

@@ -102,6 +102,8 @@ func NewServerWithListener(listener net.Listener) *Server {
 		url = "http://" + url // TODO: https:// ?
 	} else if network == "ipc" {
 		url = "ipc:" + url
+	} else if network == "ws" {
+		url = "ws:"
 	}
 	rpcService.doc.Doc.Servers = append(rpcService.doc.Doc.Servers, goopenrpcT.Server{
 		Name:        network,

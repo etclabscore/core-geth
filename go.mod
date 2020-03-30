@@ -86,3 +86,5 @@ replace github.com/golang/lint v0.0.0-20190409202823-959b441ac422 => github.com/
 
 // Use a local development version, managed as a submodule.
 replace github.com/gregdhill/go-openrpc => ./go-openrpc
+
+replace github.com/alecthomas/jsonschema => ./jsonschema

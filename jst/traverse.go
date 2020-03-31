@@ -90,7 +90,7 @@ func (a *AnalysisT) SchemaFromRef(psch spec.Schema, ref spec.Ref) (schema spec.S
 //	s1.
 //}
 
-func (a *AnalysisT) rec(s *spec.Schema, onNode func(node *spec.Schema) *spec.Schema) *spec.Schema {
+func (a *AnalysisT) rec(s *spec.Schema, onNode func(node *spec.Schema) error) error {
 	if s == nil {
 		panic("nil schema")
 	}
@@ -138,7 +138,7 @@ func (a *AnalysisT) seen(sch spec.Schema) bool {
 
 // analysisOnNode runs a callback function on each leaf of a the JSON schema tree.
 // It will return the first error it encounters.
-func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) *spec.Schema) *spec.Schema {
+func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) error) error {
 
 	a.recurseIter++
 
@@ -149,48 +149,48 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) *s
 	cop := &spec.Schema{}
 	*cop = *sch
 	if a.seen(*cop) {
-		return sch
+		return nil
 	}
 	a.recursorStack = append(a.recursorStack, *cop)
 
 	// Slices.
 	for i := 0; i < len(sch.OneOf); i++ {
 		it := sch.OneOf[i]
-
-		sch.OneOf[i] = *a.Traverse(&it, onNode)
+		a.Traverse(&it, onNode)
+		sch.OneOf[i] = it
 	}
 	for i := 0; i < len(sch.AnyOf); i++ {
 		it := sch.AnyOf[i]
-
-		sch.AnyOf[i] = *a.Traverse(&it, onNode)
+		a.Traverse(&it, onNode)
+		sch.AnyOf[i] = it
 	}
 	for i := 0; i < len(sch.AllOf); i++ {
 		it := sch.AllOf[i]
-
-		sch.AllOf[i] = *a.Traverse(&it, onNode)
+		a.Traverse(&it, onNode)
+		sch.AllOf[i] = it
 	}
-	// Maps.
 
+	// Maps.
 	// FIXME: Handle as "$ref" instead.
 	for k := range sch.Definitions {
 		v := sch.Definitions[k]
-		v.Title = k
-
-		sch.Definitions[k] = *a.Traverse(&v, onNode)
+		//v.Title = k
+		a.Traverse(&v, onNode)
+		sch.Definitions[k] = v
 	}
 
 	for k := range sch.Properties {
 		v := sch.Properties[k]
-		//v.Title = k // PTAL: Is this right?
-		fmt.Println("in props", a.recursorStack)
-
-		sch.Properties[k] = *a.Traverse(&v, onNode)
+		//v.Title = k
+		// PTAL: Is this right?
+		a.Traverse(&v, onNode)
+		sch.Properties[k] = v
 	}
 	for k := range sch.PatternProperties {
 		v := sch.PatternProperties[k]
 		//v.Title = k // PTAL: Ditto?
-
-		sch.PatternProperties[k] = *a.Traverse(&v, onNode)
+		a.Traverse(&v, onNode)
+		sch.PatternProperties[k] = v
 	}
 	if sch.Items == nil {
 		//onNode(sch)
@@ -199,10 +199,11 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) *s
 	}
 	if sch.Items.Len() > 1 {
 		for i := range sch.Items.Schemas {
-			sch.Items.Schemas[i] = *a.Traverse(&sch.Items.Schemas[i], onNode) // PTAL: Is this right, onNode)?
+			// PTAL: Is this right, onNode)?
+			a.Traverse(&sch.Items.Schemas[i], onNode)
 		}
 	} else {
-		*sch.Items.Schema = *a.Traverse(sch.Items.Schema, onNode)
+		a.Traverse(sch.Items.Schema, onNode)
 	}
 	return onNode(sch)
 }

@@ -51,55 +51,90 @@ func TestTraverse(t *testing.T) {
 		doc              string
 		rawSchema        string
 		nodeTestMutation func(s *spec.Schema) *spec.Schema
-		onNode           func(s *spec.Schema) *spec.Schema
+		onNode           func(s *spec.Schema) error
 		onNodeCallWantN  int
 	}{
-		{`empty schema`, `
-{
-}`, nil, nil, 1},
-
-		{`schema with prop`, `
-{
-	"type": "object",
-	"properties": {
-		"foo": {}
-	}
-}`, nil, nil, 2},
-
-// FIXME: A seemingly infinite jest.
-
-				{`simplest cyclical schema`,`
 		{
+			doc:             `empty schema`,
+			rawSchema:       `{}`,
+			onNodeCallWantN: 1,
+		},
+
+		{
+			doc: `schema with prop`,
+			rawSchema: `{
+				"type": "object",
+				"properties": {
+					"foo": {}
+				}
+			}`,
+			onNodeCallWantN: 2,
+		},
+
+		{
+			doc: `simplest cyclical schema, literal`,
+			rawSchema: `{
+			"type": "object",
+			"properties": {
+				"foo": {
+					"type": "object",
+					"properties": {
+						"foo": {}
+					}
+				}
+			}
+			}`,
+			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
+				return s
+			},
+			onNode: func(s *spec.Schema) error {
+				fmt.Println("onnode(mutator fn)", s)
+				return nil
+			},
+			onNodeCallWantN: 3,
+		},
+
+		{
+			doc: `simplest cyclical schema, programmatic`,
+			rawSchema: `{
 			"type": "object",
 			"properties": {
 				"foo": {}
 			}
-		}`, func(s *spec.Schema) *spec.Schema {
-					s.Properties["foo"] = *s
-					return s
-				}, nil, 1},
-
+			}`,
+			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
+				// Programmatically modify test value.
+				ps := make(map[string]spec.Schema)
+				for k, v := range s.Properties {
+					ps[k] = v
+				}
+				ps["foo"] = *s
+				s.WithProperties(ps)
+				return s
+			},
+			onNodeCallWantN: 3,
+		},
 	}
 
 	for i, c := range cases {
 		a := NewAnalysisT()
-
 		n = 0
 		sch := mustReadSchema(c.rawSchema)
 		if c.nodeTestMutation != nil {
-			if err := c.nodeTestMutation(&sch); err != nil {
-				t.Fatal(err)
-			}
+			revisedSchema := c.nodeTestMutation(&sch)
+			sch = *revisedSchema
 		}
 		// Wrap the node call fn for call count, and to handle nil check.
-		onNodeCallback := func(s *spec.Schema) *spec.Schema {
+		onNodeCallback := func(s *spec.Schema) error {
 			n++
 			fmt.Println(mustWriteJSON(s))
-			if c.onNode != nil {
-				return c.onNode(s)
+			if c.onNode == nil {
+				c.onNode = func(s *spec.Schema) error {
+					fmt.Println("default on node mutation fn", mustWriteJSON(s))
+					return nil
+				}
 			}
-			return s
-			//return nil
+			return c.onNode(s)
 		}
 		a.Traverse(&sch, onNodeCallback)
 

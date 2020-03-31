@@ -36,7 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/go-openapi/jsonreference"
+	"github.com/ethereum/go-ethereum/jst"
 	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
@@ -131,10 +131,7 @@ func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
 // Clean makes the openrpc validator happy.
 // FIXME: Name me something better/organize me better.
 func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
-	a := &AnalysisT{
-		OpenMetaDescription: "Analysis test",
-		schemaTitles:        make(map[string]string),
-	}
+	a := jst.NewAnalysisT()
 
 	uniqueKeyFn := func(sch spec.Schema) string {
 		b, _ := json.Marshal(sch)
@@ -159,7 +156,7 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 	}
 
 	registerSchema := func(leaf spec.Schema) error {
-		a.registerSchema(leaf, uniqueKeyFn)
+		a.RegisterSchema(leaf, uniqueKeyFn)
 		return nil
 	}
 
@@ -181,7 +178,7 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 			if sch.Ref.String() == "" {
 				return nil
 			}
-			rr, err := a.schemaFromRef(*parent, sch.Ref)
+			rr, err := a.SchemaFromRef(*parent, sch.Ref)
 			if err == nil {
 				*sch = rr
 			}
@@ -198,7 +195,7 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 
 			fmt.Println("   *", mustMarshalString(sch))
 
-			r, err := a.schemaAsReferenceSchema(*sch)
+			r, err := a.SchemaAsReferenceSchema(*sch)
 			if err != nil {
 				fmt.Println("error getting schema as ref-only schema")
 				return err
@@ -222,9 +219,9 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 			fmt.Println(" < ", par.Name)
 
 			*parent = par.Schema
-			a.analysisOnNode(&par.Schema, deferencer)
-			a.analysisOnNode(&par.Schema, workaroundDefinitions)
-			a.analysisOnNode(&par.Schema, referencer)
+			a.Traverse(&par.Schema, deferencer)
+			a.Traverse(&par.Schema, workaroundDefinitions)
+			a.Traverse(&par.Schema, referencer)
 			met.Params[ip] = par
 			fmt.Println("   :", mustMarshalString(par))
 		}
@@ -232,9 +229,9 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 		// Result (single).
 		fmt.Println(" > ", doc.Methods[im].Result.Name)
 		*parent = met.Result.Schema
-		a.analysisOnNode(&met.Result.Schema, deferencer)
-		a.analysisOnNode(&met.Result.Schema, workaroundDefinitions)
-		a.analysisOnNode(&met.Result.Schema, referencer)
+		a.Traverse(&met.Result.Schema, deferencer)
+		a.Traverse(&met.Result.Schema, workaroundDefinitions)
+		a.Traverse(&met.Result.Schema, referencer)
 		fmt.Println("   :", mustMarshalString(&met.Result))
 	}
 
@@ -286,135 +283,40 @@ func (a argIdent) Name() string {
 	return a.name
 }
 
-type AnalysisT struct {
-	OpenMetaDescription string
-	schemaTitles        map[string]string
-}
-
-func NewAnalysisT() *AnalysisT {
-	return &AnalysisT{
-		OpenMetaDescription: "Analysisiser",
-		schemaTitles:        make(map[string]string),
-	}
-}
-
-func (a *AnalysisT) schemaAsReferenceSchema(sch spec.Schema) (refSchema spec.Schema, err error) {
-	b, _ := json.Marshal(sch)
-	titleKey, ok := a.schemaTitles[string(b)]
-	if !ok {
-		bb, _ := json.Marshal(sch)
-		return refSchema, fmt.Errorf("schema not available as reference: %s @ %v", string(b), string(bb))
-	}
-	refSchema.Ref = spec.Ref{
-		Ref: jsonreference.MustCreateRef("#/components/schemas/" + titleKey),
-	}
-	return
-}
-
-func (a *AnalysisT) registerSchema(sch spec.Schema, titleKeyer func(schema spec.Schema) string) {
-	b, _ := json.Marshal(sch)
-	a.schemaTitles[string(b)] = titleKeyer(sch)
-}
-
-func (a *AnalysisT) schemaFromRef(psch spec.Schema, ref spec.Ref) (schema spec.Schema, err error) {
-	v, _, err := ref.GetPointer().Get(psch)
-	if err != nil {
-		return
-	}
-	return v.(spec.Schema), nil
-}
-
-// analysisOnNode runs a callback function on each leaf of a the JSON schema tree.
-// It will return the first error it encounters.
-func (a *AnalysisT) analysisOnNode(sch *spec.Schema, onNode func(node *spec.Schema) error) error {
-
-	// Slices.
-	for i := 0; i < len(sch.OneOf); i++ {
-		it := sch.OneOf[i]
-		a.analysisOnNode(&it, onNode)
-		sch.OneOf[i] = it
-	}
-	for i := 0; i < len(sch.AnyOf); i++ {
-		it := sch.AnyOf[i]
-		a.analysisOnNode(&it, onNode)
-		sch.AnyOf[i] = it
-	}
-	for i := 0; i < len(sch.AllOf); i++ {
-		it := sch.AllOf[i]
-		a.analysisOnNode(&it, onNode)
-		sch.AllOf[i] = it
-	}
-	// Maps.
-
-	// FIXME: Handle as "$ref" instead.
-	for k := range sch.Definitions {
-		v := sch.Definitions[k]
-		v.Title = k
-		a.analysisOnNode(&v, onNode)
-		sch.Definitions[k] = v
-	}
-
-	for k := range sch.Properties {
-		v := sch.Properties[k]
-		//v.Title = k // PTAL: Is this right?
-		a.analysisOnNode(&v, onNode)
-		sch.Properties[k] = v
-	}
-	for k := range sch.PatternProperties {
-		v := sch.PatternProperties[k]
-		//v.Title = k // PTAL: Ditto?
-		a.analysisOnNode(&v, onNode)
-		sch.PatternProperties[k] = v
-	}
-	if sch.Items == nil {
-		//onNode(sch)
-		return onNode(sch)
-		//return nil
-	}
-	if sch.Items.Len() > 1 {
-		for i := range sch.Items.Schemas {
-			a.analysisOnNode(&sch.Items.Schemas[i], onNode) // PTAL: Is this right?
-		}
-	} else {
-		a.analysisOnNode(sch.Items.Schema, onNode)
-	}
-	return onNode(sch)
-}
-
-// analysisOnLeaf runs a callback function on each leaf of a the JSON schema tree.
-// It will return the first error it encounters.
-func (a *AnalysisT) analysisOnLeaf(sch spec.Schema, onLeaf func(leaf spec.Schema) error) error {
-	for i := range sch.Definitions {
-		a.analysisOnLeaf(sch.Definitions[i], onLeaf)
-	}
-	for i := range sch.OneOf {
-		a.analysisOnLeaf(sch.OneOf[i], onLeaf)
-	}
-	for i := range sch.AnyOf {
-		a.analysisOnLeaf(sch.AnyOf[i], onLeaf)
-	}
-	for i := range sch.AllOf {
-		a.analysisOnLeaf(sch.AllOf[i], onLeaf)
-	}
-	for k := range sch.Properties {
-		a.analysisOnLeaf(sch.Properties[k], onLeaf)
-	}
-	for k := range sch.PatternProperties {
-		a.analysisOnLeaf(sch.PatternProperties[k], onLeaf)
-	}
-	if sch.Items == nil {
-		return onLeaf(sch)
-	}
-	if sch.Items.Len() > 1 {
-		for i := range sch.Items.Schemas {
-			a.analysisOnLeaf(sch.Items.Schemas[i], onLeaf) // PTAL: Is this right?
-		}
-	} else {
-		// Is schema
-		a.analysisOnLeaf(*sch.Items.Schema, onLeaf)
-	}
-	return onLeaf(sch)
-}
+//// analysisOnLeaf runs a callback function on each leaf of a the JSON schema tree.
+//// It will return the first error it encounters.
+//func (a *jst.AnalysisT) analysisOnLeaf(sch spec.Schema, onLeaf func(leaf spec.Schema) error) error {
+//	for i := range sch.Definitions {
+//		a.analysisOnLeaf(sch.Definitions[i], onLeaf)
+//	}
+//	for i := range sch.OneOf {
+//		a.analysisOnLeaf(sch.OneOf[i], onLeaf)
+//	}
+//	for i := range sch.AnyOf {
+//		a.analysisOnLeaf(sch.AnyOf[i], onLeaf)
+//	}
+//	for i := range sch.AllOf {
+//		a.analysisOnLeaf(sch.AllOf[i], onLeaf)
+//	}
+//	for k := range sch.Properties {
+//		a.analysisOnLeaf(sch.Properties[k], onLeaf)
+//	}
+//	for k := range sch.PatternProperties {
+//		a.analysisOnLeaf(sch.PatternProperties[k], onLeaf)
+//	}
+//	if sch.Items == nil {
+//		return onLeaf(sch)
+//	}
+//	if sch.Items.Len() > 1 {
+//		for i := range sch.Items.Schemas {
+//			a.analysisOnLeaf(sch.Items.Schemas[i], onLeaf) // PTAL: Is this right?
+//		}
+//	} else {
+//		// Is schema
+//		a.analysisOnLeaf(*sch.Items.Schema, onLeaf)
+//	}
+//	return onLeaf(sch)
+//}
 
 func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (goopenrpcT.Method, error) {
 	file, line := rt.FileLine(rt.Entry())

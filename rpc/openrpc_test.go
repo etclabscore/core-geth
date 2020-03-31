@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ethereum/go-ethereum/jst"
 	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
@@ -109,14 +110,14 @@ func TestAnalysisOnNode(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	aa := NewAnalysisT()
-	err = aa.analysisOnNode(&schema, testOnNode)
+	aa := jst.NewAnalysisT()
+	err = aa.Traverse(&schema, testOnNode)
 	if err != nil {
 		t.Error(err)
 	}
 
 	schema.Properties["foo"] = schema
-	err = aa.analysisOnNode(&schema, testOnNode)
+	err = aa.Traverse(&schema, testOnNode)
 	if err != nil {
 		t.Error(err)
 	}

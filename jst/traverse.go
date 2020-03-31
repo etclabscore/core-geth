@@ -50,6 +50,11 @@ func mustWriteJSON(v interface{}) string {
 	return string(b)
 }
 
+func mustWriteJSONIndent(v interface{}) string {
+	b, _ := json.MarshalIndent(v, "", "    ")
+	return string(b)
+}
+
 func (a *AnalysisT) SchemaAsReferenceSchema(sch spec.Schema) (refSchema spec.Schema, err error) {
 	b, _ := json.Marshal(sch)
 	titleKey, ok := a.schemaTitles[string(b)]
@@ -145,9 +150,7 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 		sch.PatternProperties[k] = v
 	}
 	if sch.Items == nil {
-		//onNode(sch)
 		return onNode(sch)
-		//return nil
 	}
 	if sch.Items.Len() > 1 {
 		for i := range sch.Items.Schemas {

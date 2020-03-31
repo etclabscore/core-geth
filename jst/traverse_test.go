@@ -29,24 +29,6 @@ func BenchmarkJSONMarshalDeterminism(b *testing.B) {
 }
 
 func TestTraverse(t *testing.T) {
-
-	n := 0
-
-	//testfn := func(prop string, val *spec.Schema) {
-	//	//var a, b = spec.Schema{}, spec.Schema{}
-	//	sch := spec.Schema{}
-	//	if val != nil {
-	//		sch.SetProperty(prop, *val)
-	//	} else {
-	//		sch.SetProperty(prop, mustReadSchema(`[a: {}, b: {}]`))
-	//	}
-	//	a := NewAnalysisT()
-	//	a.Traverse(&sch, func(node *spec.Schema) error {
-	//		n++;
-	//		return nil
-	//	})
-	//}
-
 	cases := []struct {
 		doc              string
 		rawSchema        string
@@ -88,7 +70,6 @@ func TestTraverse(t *testing.T) {
 				return s
 			},
 			onNode: func(s *spec.Schema) error {
-				fmt.Println("onnode(mutator fn)", s)
 				return nil
 			},
 			onNodeCallWantN: 3,
@@ -141,8 +122,16 @@ func TestTraverse(t *testing.T) {
        }
       }`,
 			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
-				*s.Properties["foo"].Items.Schemas[0].Items.Schema = *s
+
+				// a: "works"
+				news := mustReadSchema(mustWriteJSON(s))
+				*s.Properties["foo"].Items.Schemas[0].Items.Schema = *news
+
+				// b: overflow
+				//*s.Properties["foo"].Items.Schemas[0].Items.Schema = *s
+
 				fmt.Println("@debug/chained-cycles", mustWriteJSON(s))
+
 				return s
 			},
 			onNode:          nil,
@@ -152,7 +141,6 @@ func TestTraverse(t *testing.T) {
 
 	for i, c := range cases {
 		a := NewAnalysisT()
-		n = 0
 		sch := mustReadSchema(c.rawSchema)
 
 		// Develop:skip
@@ -170,20 +158,25 @@ func TestTraverse(t *testing.T) {
 		}
 
 		if c.nodeTestMutation != nil {
-
-			sch.AsWritable() //sch.ReadOnly = false
+			sch.AsWritable()
 			c.nodeTestMutation(sch)
-			//revisedSchema := c.nodeTestMutation(sch)
-			//*sch = *revisedSchema
 		}
+
+		if i == 4 {
+			fmt.Println("postmutation", mustWriteJSON(sch))
+		}
+
+		// n is the mutator fn (ie onNodeCallback) call counter.
+		n := 0
 
 		// Wrap the node call fn for call count, and to handle nil check.
 		onNodeCallback := func(s *spec.Schema) error {
 			n++
-			fmt.Println(mustWriteJSON(s))
+
+			// Set a default callback for test cases not specifying a mutator function.
 			if c.onNode == nil {
 				c.onNode = func(s *spec.Schema) error {
-					fmt.Println("default on node mutation fn", mustWriteJSON(s))
+					fmt.Println("~node mutation:", mustWriteJSON(s))
 					return nil
 				}
 			}
@@ -192,7 +185,7 @@ func TestTraverse(t *testing.T) {
 		a.Traverse(sch, onNodeCallback)
 
 		if n != c.onNodeCallWantN {
-			t.Errorf("bad calln, testcase=%d \"%s\" got=%d want=%d ,schema=%s", i, c.doc, n, c.onNodeCallWantN, c.rawSchema)
+			t.Errorf("fail, testcase=%d \"%s\" got=%d want=%d ,schema=%s", i, c.doc, n, c.onNodeCallWantN, mustWriteJSONIndent(sch))
 		}
 	}
 }

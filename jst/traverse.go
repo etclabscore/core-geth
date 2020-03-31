@@ -2,6 +2,7 @@ package jst
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -34,8 +35,8 @@ func NewAnalysisT() *AnalysisT {
 	}
 }
 
-func mustReadSchema(jsonStr string) spec.Schema {
-	s := spec.Schema{}
+func mustReadSchema(jsonStr string) *spec.Schema {
+	s := &spec.Schema{}
 	json.Unmarshal([]byte(jsonStr), &s)
 	return s
 }
@@ -143,8 +144,10 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 	a.recurseIter++
 
 	if sch == nil {
-		return nil
+		return errors.New("traverse called on nil schema")
 	}
+
+	sch.AsWritable()
 
 	cop := &spec.Schema{}
 	*cop = *sch

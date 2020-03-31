@@ -103,14 +103,21 @@ func TestTraverse(t *testing.T) {
 			}
 			}`,
 			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
-				// Programmatically modify test value.
+
+				//PASSING:
+				//Programmatically modify test value.
 				ps := make(map[string]spec.Schema)
 				for k, v := range s.Properties {
 					ps[k] = v
 				}
 				ps["foo"] = *s
 				s.WithProperties(ps)
+				s.Properties = ps
 				return s
+
+				//// FAILING:
+				//s.Properties["foo"] = *s
+				//return s
 			},
 			onNodeCallWantN: 3,
 		},
@@ -120,10 +127,16 @@ func TestTraverse(t *testing.T) {
 		a := NewAnalysisT()
 		n = 0
 		sch := mustReadSchema(c.rawSchema)
+
 		if c.nodeTestMutation != nil {
-			revisedSchema := c.nodeTestMutation(&sch)
-			sch = *revisedSchema
+
+			sch.AsWritable() //sch.ReadOnly = false
+
+			revisedSchema := c.nodeTestMutation(sch)
+			*sch = *revisedSchema
+
 		}
+
 		// Wrap the node call fn for call count, and to handle nil check.
 		onNodeCallback := func(s *spec.Schema) error {
 			n++
@@ -136,7 +149,7 @@ func TestTraverse(t *testing.T) {
 			}
 			return c.onNode(s)
 		}
-		a.Traverse(&sch, onNodeCallback)
+		a.Traverse(sch, onNodeCallback)
 
 		if n != c.onNodeCallWantN {
 			t.Errorf("bad calln, testcase=%d \"%s\" got=%d want=%d ,schema=%s", i, c.doc, n, c.onNodeCallWantN, c.rawSchema)
@@ -154,7 +167,7 @@ func TestSchemaEq(t *testing.T) {
 		}`)
 
 	list := []*spec.Schema{}
-	list = append(list, &orig)
+	list = append(list, orig)
 
 	seen1 := false
 	for _, l := range list {
@@ -169,7 +182,7 @@ func TestSchemaEq(t *testing.T) {
 	}
 
 	cop := &spec.Schema{}
-	*cop = orig
+	*cop = *orig
 
 	seen2 := false
 	for _, l := range list {

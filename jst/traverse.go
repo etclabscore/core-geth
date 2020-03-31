@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"reflect"
 
 	"github.com/go-openapi/jsonreference"
@@ -15,8 +16,8 @@ type AnalysisT struct {
 	schemaTitles        map[string]string
 
 	recurseIter   int
-	recursorStack []spec.Schema
-	mutatedStack  []spec.Schema
+	recursorStack []*spec.Schema
+	mutatedStack  []*spec.Schema
 
 	/*
 		@BelfordZ could modify 'prePostMap' to just postArray,
@@ -30,14 +31,17 @@ func NewAnalysisT() *AnalysisT {
 		OpenMetaDescription: "Analysisiser",
 		schemaTitles:        make(map[string]string),
 		recurseIter:         0,
-		recursorStack:       []spec.Schema{},
-		mutatedStack:        []spec.Schema{},
+		recursorStack:       []*spec.Schema{},
+		mutatedStack:        []*spec.Schema{},
 	}
 }
 
 func mustReadSchema(jsonStr string) *spec.Schema {
 	s := &spec.Schema{}
-	json.Unmarshal([]byte(jsonStr), &s)
+	err := json.Unmarshal([]byte(jsonStr), &s)
+	if err != nil {
+			log.Fatalf("read schema error: %v", err)
+	}
 	return s
 }
 
@@ -72,63 +76,7 @@ func (a *AnalysisT) SchemaFromRef(psch spec.Schema, ref spec.Ref) (schema spec.S
 	return v.(spec.Schema), nil
 }
 
-//type AnalysedSchema struct {
-//	j string
-//	spec.Schema
-//}
-//
-//func AsAnalysedSchema(s spec.Schema) AnalysedSchema {
-//	b, _ := json.Marshal(s)
-//	return AnalysedSchema{j: string(b), Schema: s}
-//}
-//
-//func (a AnalysedSchema) SchemaDeterministicID() string {
-//	// We need to guarantee orders.
-//	return a.j
-//}
-
-//func SchemasAreEquivalent(s1, s2 *spec.Schema) bool {
-//	s1.
-//}
-
-func (a *AnalysisT) rec(s *spec.Schema, onNode func(node *spec.Schema) error) error {
-	if s == nil {
-		panic("nil schema")
-	}
-	loop := -1
-	for i, st := range a.recursorStack {
-		//if mustWriteJSON(st) == mustWriteJSON(s) {
-		if reflect.DeepEqual(a.recursorStack[i], s) {
-
-			fmt.Println("same", mustWriteJSON(st))
-
-			loop = i
-			break
-
-		}
-		//loop++
-		fmt.Println("notsame", mustWriteJSON(st), mustWriteJSON(s))
-		if a.recurseIter > 100 {
-			panic("gotcha")
-		}
-	}
-
-	if loop >= 0 {
-		return nil
-	}
-
-	//// If the stack of mutated schemas is not yet long enough
-	//// as this index, then append to it.
-	//// There is no way of getting the eventual length ahead of time.
-	//for (len(a.mutatedStack))-1 < loop {
-	//	a.mutatedStack = append(a.mutatedStack, nil)
-	//}
-	//a.mutatedStack[loop] = s
-
-	return a.Traverse(s, onNode)
-}
-
-func (a *AnalysisT) seen(sch spec.Schema) bool {
+func (a *AnalysisT) seen(sch *spec.Schema) bool {
 	for i := range a.recursorStack {
 		if reflect.DeepEqual(a.recursorStack[i], sch) {
 			return true
@@ -149,12 +97,13 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 
 	sch.AsWritable()
 
-	cop := &spec.Schema{}
-	*cop = *sch
-	if a.seen(*cop) {
+	if a.seen(sch) {
 		return nil
 	}
-	a.recursorStack = append(a.recursorStack, *cop)
+	a.recursorStack = append(a.recursorStack, sch)
+	defer func() {
+		a.mutatedStack = append(a.mutatedStack, sch)
+	}()
 
 	// Slices.
 	for i := 0; i < len(sch.OneOf); i++ {

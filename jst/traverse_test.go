@@ -121,6 +121,33 @@ func TestTraverse(t *testing.T) {
 			},
 			onNodeCallWantN: 3,
 		},
+
+		{
+			doc: "chained cycles",
+			rawSchema: `{
+       "title": "1",
+       "type": "object",
+       "properties": {
+         "foo": {
+           "title": "2",
+           "items": [
+             {
+               "title": "3",
+               "type": "array",
+               "items": { "title": "4" }
+             }
+           ]
+         }
+       }
+      }`,
+			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
+				*s.Properties["foo"].Items.Schemas[0].Items.Schema = *s
+				fmt.Println("@debug/chained-cycles", mustWriteJSON(s))
+				return s
+			},
+			onNode:          nil,
+			onNodeCallWantN: 3,
+		},
 	}
 
 	for i, c := range cases {
@@ -128,13 +155,26 @@ func TestTraverse(t *testing.T) {
 		n = 0
 		sch := mustReadSchema(c.rawSchema)
 
+		// Develop:skip
+		failing := []int{}
+		isAFailure := func() bool {
+			for _, f := range failing {
+				if i == f {
+					return true
+				}
+			}
+			return false
+		}
+		if isAFailure() {
+			continue
+		}
+
 		if c.nodeTestMutation != nil {
 
 			sch.AsWritable() //sch.ReadOnly = false
-
-			revisedSchema := c.nodeTestMutation(sch)
-			*sch = *revisedSchema
-
+			c.nodeTestMutation(sch)
+			//revisedSchema := c.nodeTestMutation(sch)
+			//*sch = *revisedSchema
 		}
 
 		// Wrap the node call fn for call count, and to handle nil check.

@@ -291,6 +291,13 @@ type AnalysisT struct {
 	schemaTitles        map[string]string
 }
 
+func NewAnalysisT() *AnalysisT {
+	return &AnalysisT{
+		OpenMetaDescription: "Analysisiser",
+		schemaTitles:        make(map[string]string),
+	}
+}
+
 func (a *AnalysisT) schemaAsReferenceSchema(sch spec.Schema) (refSchema spec.Schema, err error) {
 	b, _ := json.Marshal(sch)
 	titleKey, ok := a.schemaTitles[string(b)]
@@ -338,12 +345,15 @@ func (a *AnalysisT) analysisOnNode(sch *spec.Schema, onNode func(node *spec.Sche
 		sch.AllOf[i] = it
 	}
 	// Maps.
+
+	// FIXME: Handle as "$ref" instead.
 	for k := range sch.Definitions {
 		v := sch.Definitions[k]
 		v.Title = k
 		a.analysisOnNode(&v, onNode)
 		sch.Definitions[k] = v
 	}
+
 	for k := range sch.Properties {
 		v := sch.Properties[k]
 		//v.Title = k // PTAL: Is this right?

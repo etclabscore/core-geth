@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
 
@@ -82,4 +83,42 @@ func TestOpenRPC_Analysis(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func testOnNode(node *spec.Schema) error {
+	b, err := json.MarshalIndent(node, "", "    ")
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(b))
+	return nil
+}
+
+func TestAnalysisOnNode(t *testing.T) {
+	schemaJSON := `
+{
+	"type": "object",
+	"properties": {
+		"foo": {}
+	}
+}`
+
+	schema := spec.Schema{}
+	err := json.Unmarshal([]byte(schemaJSON), &schema)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	aa := NewAnalysisT()
+	err = aa.analysisOnNode(&schema, testOnNode)
+	if err != nil {
+		t.Error(err)
+	}
+
+	schema.Properties["foo"] = schema
+	err = aa.analysisOnNode(&schema, testOnNode)
+	if err != nil {
+		t.Error(err)
+	}
+
 }

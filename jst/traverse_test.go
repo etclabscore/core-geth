@@ -123,11 +123,14 @@ func TestTraverse(t *testing.T) {
       }`,
 			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
 
-				// a: "works"
+				// Create a hacky shallow copy of the schema.
+				// Creating nested references (pointers) in the struct
+				// will cause Go's json library Marshaler to overflow
+				// because... wait for it... it too uses traversal.
 				news := mustReadSchema(mustWriteJSON(s))
 				*s.Properties["foo"].Items.Schemas[0].Items.Schema = *news
 
-				// b: overflow
+				// Overflows:
 				//*s.Properties["foo"].Items.Schemas[0].Items.Schema = *s
 
 				fmt.Println("@debug/chained-cycles", mustWriteJSON(s))
@@ -227,5 +230,18 @@ func TestSchemaEq(t *testing.T) {
 	if !seen2 {
 		t.Fatal("not seen 2")
 	}
+}
 
+// GOTCHA
+func TestMarshalOverflow(t *testing.T) {
+	str := `{
+			"type": "object",
+			"properties": {
+				"foo": {}
+			}
+			}`
+	sch := mustReadSchema(str)
+	sch.Properties["foo"] = *sch
+	output := mustWriteJSONIndent(sch)
+	t.Log(output)
 }

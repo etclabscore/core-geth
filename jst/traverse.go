@@ -46,12 +46,18 @@ func mustReadSchema(jsonStr string) *spec.Schema {
 }
 
 func mustWriteJSON(v interface{}) string {
-	b, _ := json.Marshal(v)
+	b, err := json.Marshal(v)
+	if err != nil {
+		panic(err.Error())
+	}
 	return string(b)
 }
 
 func mustWriteJSONIndent(v interface{}) string {
-	b, _ := json.MarshalIndent(v, "", "    ")
+	b, err := json.MarshalIndent(v, "", "    ")
+	if err != nil {
+		panic(err.Error())
+	}
 	return string(b)
 }
 
@@ -83,6 +89,7 @@ func (a *AnalysisT) SchemaFromRef(psch spec.Schema, ref spec.Ref) (schema spec.S
 
 func (a *AnalysisT) seen(sch *spec.Schema) bool {
 	for i := range a.recursorStack {
+		//if mustWriteJSON(a.recursorStack[i]) == mustWriteJSON(sch) {
 		if reflect.DeepEqual(a.recursorStack[i], sch) {
 			return true
 		}

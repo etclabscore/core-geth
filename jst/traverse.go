@@ -40,7 +40,7 @@ func mustReadSchema(jsonStr string) *spec.Schema {
 	s := &spec.Schema{}
 	err := json.Unmarshal([]byte(jsonStr), &s)
 	if err != nil {
-			log.Fatalf("read schema error: %v", err)
+		log.Fatalf("read schema error: %v", err)
 	}
 	return s
 }
@@ -87,6 +87,11 @@ func (a *AnalysisT) SchemaFromRef(psch spec.Schema, ref spec.Ref) (schema spec.S
 	return v.(spec.Schema), nil
 }
 
+func copySchema(sch *spec.Schema) spec.Schema {
+	ns := mustReadSchema(mustWriteJSON(sch))
+	return *ns
+}
+
 func (a *AnalysisT) seen(sch *spec.Schema) bool {
 	for i := range a.recursorStack {
 		//if mustWriteJSON(a.recursorStack[i]) == mustWriteJSON(sch) {
@@ -95,11 +100,6 @@ func (a *AnalysisT) seen(sch *spec.Schema) bool {
 		}
 	}
 	return false
-}
-
-func copySchema(sch *spec.Schema) (spec.Schema) {
-	ns := mustReadSchema(mustWriteJSON(sch))
-	return *ns
 }
 
 // analysisOnNode runs a callback function on each leaf of a the JSON schema tree.
@@ -114,28 +114,32 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 
 	sch.AsWritable()
 
-	if a.seen(sch) {
-		return nil
-	}
 	a.recursorStack = append(a.recursorStack, sch)
 	defer func() {
 		a.mutatedStack = append(a.mutatedStack, sch)
 	}()
 
+	rec := func(s *spec.Schema, fn func(n *spec.Schema) error) error {
+		if a.seen(s) {
+			return nil
+		}
+		return a.Traverse(s, fn)
+	}
+
 	// Slices.
 	for i := 0; i < len(sch.OneOf); i++ {
 		it := sch.OneOf[i]
-		a.Traverse(&it, onNode)
+		rec(&it, onNode)
 		sch.OneOf[i] = it
 	}
 	for i := 0; i < len(sch.AnyOf); i++ {
 		it := sch.AnyOf[i]
-		a.Traverse(&it, onNode)
+		rec(&it, onNode)
 		sch.AnyOf[i] = it
 	}
 	for i := 0; i < len(sch.AllOf); i++ {
 		it := sch.AllOf[i]
-		a.Traverse(&it, onNode)
+		rec(&it, onNode)
 		sch.AllOf[i] = it
 	}
 
@@ -144,7 +148,7 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 	for k := range sch.Definitions {
 		v := sch.Definitions[k]
 		//v.Title = k
-		a.Traverse(&v, onNode)
+		rec(&v, onNode)
 		sch.Definitions[k] = v
 	}
 
@@ -152,13 +156,13 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 		v := sch.Properties[k]
 		//v.Title = k
 		// PTAL: Is this right?
-		a.Traverse(&v, onNode)
+		rec(&v, onNode)
 		sch.Properties[k] = v
 	}
 	for k := range sch.PatternProperties {
 		v := sch.PatternProperties[k]
 		//v.Title = k // PTAL: Ditto?
-		a.Traverse(&v, onNode)
+		rec(&v, onNode)
 		sch.PatternProperties[k] = v
 	}
 	if sch.Items == nil {
@@ -167,10 +171,10 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 	if sch.Items.Len() > 1 {
 		for i := range sch.Items.Schemas {
 			// PTAL: Is this right, onNode)?
-			a.Traverse(&sch.Items.Schemas[i], onNode)
+			rec(&sch.Items.Schemas[i], onNode)
 		}
 	} else {
-		a.Traverse(sch.Items.Schema, onNode)
+		rec(sch.Items.Schema, onNode)
 	}
 	return onNode(sch)
 }

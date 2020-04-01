@@ -92,7 +92,7 @@ func TestTraverse(t *testing.T) {
 		{
 			doc: "chained cycles",
 			rawSchema: `{
-			   "title": "1",
+			   "title": "1-top",
 			   "type": "object",
 			   "properties": {
 				 "foo": {
@@ -101,7 +101,7 @@ func TestTraverse(t *testing.T) {
 					 {
 					   "title": "3",
 					   "type": "array",
-					   "items": { "title": "4" }
+					   "items": { "title": "4-maxdepth" }
 					 }
 				   ]
 				 }
@@ -120,13 +120,14 @@ func TestTraverse(t *testing.T) {
 		a := NewAnalysisT()
 		sch := mustReadSchema(c.rawSchema)
 
-		fmt.Printf("%d: %s %s\n", i, c.doc, mustWriteJSON(sch))
-
 		// Run programmatic test-schema mutation, if any.
 		if c.nodeTestMutation != nil {
 			sch.AsWritable()
 			c.nodeTestMutation(sch)
 		}
+		fmt.Println("--------------------------------------------------------------")
+		fmt.Printf("%d: %s\n%s\n", i, c.doc, mustWriteJSONIndent(sch))
+		fmt.Println()
 
 		// n is the mutator fn (ie onNodeCallbackWrapper) call counter.
 		n := 0
@@ -138,7 +139,7 @@ func TestTraverse(t *testing.T) {
 		// Wrap the node call fn for call count, and to handle nil check.
 		a.Traverse(sch, func(s *spec.Schema) error {
 			n++
-			fmt.Printf("%s%s [MUTATOR] traverse_n=%d mutator_call_times=%d schema=\n%s\n", strings.Repeat(".", a.recurseIter), strings.Repeat("  |", a.recurseIter-n), a.recurseIter, n, mustWriteJSONIndent(s))
+			fmt.Printf("%s [MUTATOR] traverse_iter_n=%d mutator_call_times=%d (expect=%d) schema=\n%s\n", strings.Repeat("  |", a.recurseIter-n), a.recurseIter, n, c.onNodeCallWantN, mustWriteJSONIndent(s))
 			if c.onNode != nil {
 				c.onNode(s)
 			}
@@ -147,9 +148,9 @@ func TestTraverse(t *testing.T) {
 
 		testController.Finish()
 
-		//if n != c.onNodeCallWantN {
-		//	t.Errorf("fail, testcase=%d \"%s\" got=%d want=%d ,schema=%s", i, c.doc, n, c.onNodeCallWantN, mustWriteJSONIndent(sch))
-		//}
+		if n != c.onNodeCallWantN {
+			t.Errorf("testcase=%d \"%s\" got=%d want=%d ,schema=%s", i, c.doc, n, c.onNodeCallWantN, mustWriteJSONIndent(sch))
+		}
 
 		fmt.Println()
 	}

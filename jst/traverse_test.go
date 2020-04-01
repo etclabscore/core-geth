@@ -30,18 +30,38 @@ func BenchmarkJSONMarshalDeterminism(b *testing.B) {
 	}
 }
 
+func noMutate(s *spec.Schema) *spec.Schema {
+	return s
+}
+
+func assertMockMutatorCalledTimes(n int) func(m *MockMutator) {
+	return func(m *MockMutator) {
+		m.EXPECT().OnSchema(Any()).Times(n)
+	}
+}
+
 func TestTraverse(t *testing.T) {
+	type mutateExpect struct {
+		mutate func(s *spec.Schema) *spec.Schema
+		expect func(m *MockMutator)
+	}
+
 	cases := []struct {
 		doc              string
 		rawSchema        string
 		nodeTestMutation func(s *spec.Schema) *spec.Schema
 		onNode           func(s *spec.Schema) error
-		onNodeCallWantN  int
+		tests            []mutateExpect
 	}{
 		{
-			doc:             `empty schema`,
-			rawSchema:       `{}`,
-			onNodeCallWantN: 1,
+			doc:       `empty schema`,
+			rawSchema: `{}`,
+			tests: []mutateExpect{
+				{
+					mutate: noMutate,
+					expect: assertMockMutatorCalledTimes(1),
+				},
+			},
 		},
 
 		{
@@ -52,7 +72,12 @@ func TestTraverse(t *testing.T) {
 					"foo": {}
 				}
 			}`,
-			onNodeCallWantN: 2,
+			tests: []mutateExpect{
+				{
+					mutate: noMutate,
+					expect: assertMockMutatorCalledTimes(2),
+				},
+			},
 		},
 
 		{
@@ -68,9 +93,12 @@ func TestTraverse(t *testing.T) {
 				}
 			}
 			}`,
-			nodeTestMutation: nil,
-			onNode:           nil,
-			onNodeCallWantN:  3,
+			tests: []mutateExpect{
+				{
+					mutate: noMutate,
+					expect: assertMockMutatorCalledTimes(3),
+				},
+			},
 		},
 
 		{
@@ -81,12 +109,16 @@ func TestTraverse(t *testing.T) {
 				"foo": {}
 			}
 			}`,
-			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
-				// Test a one-deep cycle
-				s.Properties["foo"] = copySchema(s)
-				return s
+			tests: []mutateExpect{
+				{
+					mutate: func(s *spec.Schema) *spec.Schema {
+						// Test a one-deep cycle
+						s.Properties["foo"] = copySchema(s)
+						return s
+					},
+					expect: assertMockMutatorCalledTimes(3),
+				},
 			},
-			onNodeCallWantN: 3,
 		},
 
 		{
@@ -107,52 +139,54 @@ func TestTraverse(t *testing.T) {
 				 }
 			   }
 			  }`,
-			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
-				*s.Properties["foo"].Items.Schemas[0].Items.Schema = copySchema(s)
-				return s
+			tests: []mutateExpect{
+				{
+					mutate: func(s *spec.Schema) *spec.Schema {
+						// Test a one-deep cycle
+						s.Properties["foo"] = copySchema(s)
+						return s
+					},
+					expect: assertMockMutatorCalledTimes(3),
+				},
 			},
-			onNode:          nil,
-			onNodeCallWantN: 2,
 		},
 	}
 
 	for i, c := range cases {
-		a := NewAnalysisT()
-		sch := mustReadSchema(c.rawSchema)
+		for j, k := range c.tests {
+			a := NewAnalysisT()
+			sch := mustReadSchema(c.rawSchema)
 
-		// Run programmatic test-schema mutation, if any.
-		if c.nodeTestMutation != nil {
-			sch.AsWritable()
-			c.nodeTestMutation(sch)
-		}
-		fmt.Println("--------------------------------------------------------------")
-		fmt.Printf("%d: %s\n%s\n", i, c.doc, mustWriteJSONIndent(sch))
-		fmt.Println()
-
-		// n is the mutator fn (ie onNodeCallbackWrapper) call counter.
-		n := 0
-
-		testController := NewController(t)
-		mockMutator := NewMockMutator(testController)
-		mockMutator.EXPECT().OnSchema(Any()).Return(nil).Times(c.onNodeCallWantN)
-
-		// Wrap the node call fn for call count, and to handle nil check.
-		a.Traverse(sch, func(s *spec.Schema) error {
-			n++
-			fmt.Printf("%s [MUTATOR] traverse_iter_n=%d mutator_call_times=%d (expect=%d) schema=\n%s\n", strings.Repeat("  |", a.recurseIter-n), a.recurseIter, n, c.onNodeCallWantN, mustWriteJSONIndent(s))
-			if c.onNode != nil {
-				c.onNode(s)
+			// Run programmatic test-schema mutation, if any.
+			if k.mutate != nil {
+				sch.AsWritable()
+				k.mutate(sch)
 			}
-			return mockMutator.OnSchema(s)
-		})
+			fmt.Printf("* %d/%d: %s\nschema=%s\n", i, j, c.doc, mustWriteJSONIndent(sch))
+			fmt.Println()
 
-		testController.Finish()
+			// n is the mutator fn (ie onNodeCallbackWrapper) call counter.
+			n := 0
 
-		if n != c.onNodeCallWantN {
-			t.Errorf("testcase=%d \"%s\" got=%d want=%d ,schema=%s", i, c.doc, n, c.onNodeCallWantN, mustWriteJSONIndent(sch))
+			testController := NewController(t)
+			mockMutator := NewMockMutator(testController)
+			k.expect(mockMutator)
+
+			// Wrap the node call fn for call count, and to handle nil check.
+			a.Traverse(sch, func(s *spec.Schema) error {
+				n++
+				fmt.Printf("a.recurseIter=%d/n=%d]%s> schema=\n%s\n", a.recurseIter, n, strings.Repeat("=", a.recurseIter-n), mustWriteJSONIndent(s))
+				if c.onNode != nil {
+					c.onNode(s)
+				}
+				return mockMutator.OnSchema(s)
+			})
+
+			testController.Finish()
+
+			fmt.Println()
+			fmt.Println()
 		}
-
-		fmt.Println()
 	}
 }
 

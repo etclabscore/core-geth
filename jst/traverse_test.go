@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/go-openapi/spec"
+	. "github.com/golang/mock/gomock"
 	_ "github.com/test-go/testify"
 )
 
@@ -68,8 +69,8 @@ func TestTraverse(t *testing.T) {
 			}
 			}`,
 			nodeTestMutation: nil,
-			onNode: nil,
-			onNodeCallWantN: 3,
+			onNode:           nil,
+			onNodeCallWantN:  3,
 		},
 
 		{
@@ -81,6 +82,7 @@ func TestTraverse(t *testing.T) {
 			}
 			}`,
 			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
+				// Test a one-deep cycle
 				s.Properties["foo"] = copySchema(s)
 				return s
 			},
@@ -90,21 +92,21 @@ func TestTraverse(t *testing.T) {
 		{
 			doc: "chained cycles",
 			rawSchema: `{
-       "title": "1",
-       "type": "object",
-       "properties": {
-         "foo": {
-           "title": "2",
-           "items": [
-             {
-               "title": "3",
-               "type": "array",
-               "items": { "title": "4" }
-             }
-           ]
-         }
-       }
-      }`,
+			   "title": "1",
+			   "type": "object",
+			   "properties": {
+				 "foo": {
+				   "title": "2",
+				   "items": [
+					 {
+					   "title": "3",
+					   "type": "array",
+					   "items": { "title": "4" }
+					 }
+				   ]
+				 }
+			   }
+			  }`,
 			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
 				*s.Properties["foo"].Items.Schemas[0].Items.Schema = copySchema(s)
 				return s
@@ -126,28 +128,30 @@ func TestTraverse(t *testing.T) {
 			c.nodeTestMutation(sch)
 		}
 
-		// n is the mutator fn (ie onNodeCallback) call counter.
+		// n is the mutator fn (ie onNodeCallbackWrapper) call counter.
 		n := 0
 
+		testController := NewController(t)
+		mockMutator := NewMockMutator(testController)
+		mockMutator.EXPECT().OnSchema(Any()).Return(nil).Times(c.onNodeCallWantN)
+
 		// Wrap the node call fn for call count, and to handle nil check.
-		onNodeCallback := func(s *spec.Schema) error {
+		a.Traverse(sch, func(s *spec.Schema) error {
 			n++
-
-			// Set a default callback for test cases not specifying a mutator function.
-			if c.onNode == nil {
-				c.onNode = func(s *spec.Schema) error {
-					fmt.Printf("%s%straverse_n=%d cb_n=%d schema=%s\n", strings.Repeat(".", a.recurseIter), strings.Repeat(" ", n), a.recurseIter, n, mustWriteJSON(s))
-					return nil
-				}
+			fmt.Printf("%s%straverse_n=%d cb_n=%d schema=%s\n", strings.Repeat(".", a.recurseIter), strings.Repeat(" ", n), a.recurseIter, n, mustWriteJSON(s))
+			if c.onNode != nil {
+				c.onNode(s)
 			}
-			return c.onNode(s)
-		}
-		a.Traverse(sch, onNodeCallback)
+			return mockMutator.OnSchema(s)
+		})
 
-		if n != c.onNodeCallWantN {
-			t.Errorf("fail, testcase=%d \"%s\" got=%d want=%d ,schema=%s", i, c.doc, n, c.onNodeCallWantN, mustWriteJSONIndent(sch))
-		}
-		fmt.Println("---")
+		testController.Finish()
+
+		//if n != c.onNodeCallWantN {
+		//	t.Errorf("fail, testcase=%d \"%s\" got=%d want=%d ,schema=%s", i, c.doc, n, c.onNodeCallWantN, mustWriteJSONIndent(sch))
+		//}
+
+		fmt.Println()
 	}
 }
 

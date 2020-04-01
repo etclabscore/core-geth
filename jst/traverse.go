@@ -97,6 +97,11 @@ func (a *AnalysisT) seen(sch *spec.Schema) bool {
 	return false
 }
 
+func copySchema(sch *spec.Schema) (spec.Schema) {
+	ns := mustReadSchema(mustWriteJSON(sch))
+	return *ns
+}
+
 // analysisOnNode runs a callback function on each leaf of a the JSON schema tree.
 // It will return the first error it encounters.
 func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) error) error {

@@ -3,6 +3,7 @@ package jst
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/go-openapi/spec"
@@ -66,12 +67,8 @@ func TestTraverse(t *testing.T) {
 				}
 			}
 			}`,
-			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
-				return s
-			},
-			onNode: func(s *spec.Schema) error {
-				return nil
-			},
+			nodeTestMutation: nil,
+			onNode: nil,
 			onNodeCallWantN: 3,
 		},
 
@@ -84,21 +81,8 @@ func TestTraverse(t *testing.T) {
 			}
 			}`,
 			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
-
-				//PASSING:
-				//Programmatically modify test value.
-				ps := make(map[string]spec.Schema)
-				for k, v := range s.Properties {
-					ps[k] = v
-				}
-				ps["foo"] = *s
-				s.WithProperties(ps)
-				s.Properties = ps
+				s.Properties["foo"] = copySchema(s)
 				return s
-
-				//// FAILING:
-				//s.Properties["foo"] = *s
-				//return s
 			},
 			onNodeCallWantN: 3,
 		},
@@ -122,19 +106,7 @@ func TestTraverse(t *testing.T) {
        }
       }`,
 			nodeTestMutation: func(s *spec.Schema) *spec.Schema {
-
-				// Create a hacky shallow copy of the schema.
-				// Creating nested references (pointers) in the struct
-				// will cause Go's json library Marshaler to overflow
-				// because... wait for it... it too uses traversal.
-				news := mustReadSchema(mustWriteJSON(s))
-				*s.Properties["foo"].Items.Schemas[0].Items.Schema = *news
-
-				// Overflows:
-				//*s.Properties["foo"].Items.Schemas[0].Items.Schema = *s
-
-				fmt.Println("@debug/chained-cycles", mustWriteJSON(s))
-
+				*s.Properties["foo"].Items.Schemas[0].Items.Schema = copySchema(s)
 				return s
 			},
 			onNode:          nil,
@@ -146,27 +118,12 @@ func TestTraverse(t *testing.T) {
 		a := NewAnalysisT()
 		sch := mustReadSchema(c.rawSchema)
 
-		// Develop:skip
-		failing := []int{}
-		isAFailure := func() bool {
-			for _, f := range failing {
-				if i == f {
-					return true
-				}
-			}
-			return false
-		}
-		if isAFailure() {
-			continue
-		}
+		fmt.Printf("%d: %s %s\n", i, c.doc, mustWriteJSON(sch))
 
+		// Run programmatic test-schema mutation, if any.
 		if c.nodeTestMutation != nil {
 			sch.AsWritable()
 			c.nodeTestMutation(sch)
-		}
-
-		if i == 4 {
-			fmt.Println("postmutation", mustWriteJSON(sch))
 		}
 
 		// n is the mutator fn (ie onNodeCallback) call counter.
@@ -179,7 +136,7 @@ func TestTraverse(t *testing.T) {
 			// Set a default callback for test cases not specifying a mutator function.
 			if c.onNode == nil {
 				c.onNode = func(s *spec.Schema) error {
-					fmt.Println("~node mutation:", mustWriteJSON(s))
+					fmt.Printf("%s%straverse_n=%d cb_n=%d schema=%s\n", strings.Repeat(".", a.recurseIter), strings.Repeat(" ", n), a.recurseIter, n, mustWriteJSON(s))
 					return nil
 				}
 			}
@@ -190,6 +147,7 @@ func TestTraverse(t *testing.T) {
 		if n != c.onNodeCallWantN {
 			t.Errorf("fail, testcase=%d \"%s\" got=%d want=%d ,schema=%s", i, c.doc, n, c.onNodeCallWantN, mustWriteJSONIndent(sch))
 		}
+		fmt.Println("---")
 	}
 }
 
@@ -232,16 +190,17 @@ func TestSchemaEq(t *testing.T) {
 	}
 }
 
-// GOTCHA
-func TestMarshalOverflow(t *testing.T) {
-	str := `{
-			"type": "object",
-			"properties": {
-				"foo": {}
-			}
-			}`
-	sch := mustReadSchema(str)
-	sch.Properties["foo"] = *sch
-	output := mustWriteJSONIndent(sch)
-	t.Log(output)
-}
+// GOTCHA: This panics at JSON marshaling.
+//func TestMarshalOverflow(t *testing.T) {
+//	str := `{
+//			"type": "object",
+//			"properties": {
+//				"foo": {}
+//			}
+//			}`
+//	sch := mustReadSchema(str)
+//	sch.Properties["foo"] = *sch
+//
+//	output := mustWriteJSONIndent(sch)
+//	t.Log(output)
+//}

@@ -54,7 +54,7 @@ func mustWriteJSON(v interface{}) string {
 }
 
 func mustWriteJSONIndent(v interface{}) string {
-	b, err := json.MarshalIndent(v, "", "    ")
+	b, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
 		panic(err.Error())
 	}

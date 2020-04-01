@@ -56,7 +56,7 @@ func TestTraverse(t *testing.T) {
 		},
 
 		{
-			doc: `simplest cyclical schema, literal`,
+			doc: `basic cyclical schema, literal`,
 			rawSchema: `{
 			"type": "object",
 			"properties": {
@@ -74,7 +74,7 @@ func TestTraverse(t *testing.T) {
 		},
 
 		{
-			doc: `simplest cyclical schema, programmatic`,
+			doc: `basic cyclical schema, programmatic`,
 			rawSchema: `{
 			"type": "object",
 			"properties": {
@@ -112,7 +112,7 @@ func TestTraverse(t *testing.T) {
 				return s
 			},
 			onNode:          nil,
-			onNodeCallWantN: 3,
+			onNodeCallWantN: 2,
 		},
 	}
 
@@ -138,7 +138,7 @@ func TestTraverse(t *testing.T) {
 		// Wrap the node call fn for call count, and to handle nil check.
 		a.Traverse(sch, func(s *spec.Schema) error {
 			n++
-			fmt.Printf("%s%straverse_n=%d cb_n=%d schema=%s\n", strings.Repeat(".", a.recurseIter), strings.Repeat(" ", n), a.recurseIter, n, mustWriteJSON(s))
+			fmt.Printf("%s%s [MUTATOR] traverse_n=%d mutator_call_times=%d schema=\n%s\n", strings.Repeat(".", a.recurseIter), strings.Repeat("  |", a.recurseIter-n), a.recurseIter, n, mustWriteJSONIndent(s))
 			if c.onNode != nil {
 				c.onNode(s)
 			}

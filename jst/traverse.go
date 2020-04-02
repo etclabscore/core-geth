@@ -113,6 +113,7 @@ func (a *AnalysisT) seen(sch *spec.Schema) bool {
 func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) error) error {
 
 	a.recurseIter++
+	iter := a.recurseIter
 
 	if sch == nil {
 		return errors.New("traverse called on nil schema")
@@ -120,93 +121,122 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 
 	sch.AsWritable()
 
-	if a.TraverseOptions.ExpandAtNode {
+	if a.ExpandAtNode {
 		spec.ExpandSchema(sch, sch, nil)
 	}
 
-	a.recursorStack = append(a.recursorStack, sch)
-	defer func() {
-		a.mutatedStack = append(a.mutatedStack, sch)
-	}()
+	// Keep a pristine copy of the value on the recurse stack.
+	// The incoming pointer value will be mutated.
+	cp := &spec.Schema{}
+	*cp = *sch
 
-	rec := func(s *spec.Schema, fn func(n *spec.Schema) error) error {
-		if a.TraverseOptions.UniqueOnly {
-			if a.seen(s) {
+	if a.UniqueOnly {
+		for i := range a.recursorStack {
+			if mustWriteJSON(a.recursorStack[i]) == mustWriteJSON(cp) {
+				*a.mutatedStack[i] = *cp
 				return nil
 			}
 		}
+	}
+	
+	for len(a.recursorStack)-1 < iter {
+		a.recursorStack = append(a.recursorStack, nil)
+	}
+	a.recursorStack[iter] = cp
+
+	run := func() error {
+		for len(a.mutatedStack)-1 < iter {
+			a.mutatedStack = append(a.mutatedStack, nil)
+		}
+		err := onNode(sch)
+		a.mutatedStack[iter] = sch
+		return err
+	}
+
+	rec := func(s *spec.Schema, fn func(n *spec.Schema) error) error {
 		return a.Traverse(s, fn)
 	}
 
-	// Slices.
+	// jsonschema slices.
 	for i := 0; i < len(sch.AnyOf); i++ {
-		it := sch.AnyOf[i]
-		rec(&it, onNode)
-		sch.AnyOf[i] = it
+		rec(&sch.AnyOf[i], onNode)
 	}
 	for i := 0; i < len(sch.AllOf); i++ {
-		it := sch.AllOf[i]
-		rec(&it, onNode)
-		sch.AllOf[i] = it
+		rec(&sch.AllOf[i], onNode)
 	}
 	for i := 0; i < len(sch.OneOf); i++ {
-		it := sch.OneOf[i]
-		rec(&it, onNode)
-		sch.OneOf[i] = it
+		rec(&sch.OneOf[i], onNode)
 	}
 
+	// jsonschemama maps
 	for k := range sch.Properties {
 		v := sch.Properties[k]
-		//v.ID = "prop:"+k // PTAL: Is this right?
 		rec(&v, onNode)
 		sch.Properties[k] = v
 	}
 	for k := range sch.PatternProperties {
 		v := sch.PatternProperties[k]
-		//v.Title = k // PTAL: Ditto?
 		rec(&v, onNode)
 		sch.PatternProperties[k] = v
 	}
+
+	// jsonschema special type
 	if sch.Items == nil {
-		return onNode(sch)
+		return run()
 	}
 	if sch.Items.Len() > 1 {
 		for i := range sch.Items.Schemas {
-			// PTAL: Is this right, onNode)?
 			rec(&sch.Items.Schemas[i], onNode)
 		}
 	} else {
 		rec(sch.Items.Schema, onNode)
 	}
-	return onNode(sch)
+
+	return run()
 }
 
-//as := AsAnalysedSchema(*sch)
-//a.schemaTitles[as.j] = as.j
+/*
+	unique := func() bool {
+		if !a.UniqueOnly {
+			return true // we don't care, fake uniqueness
+		}
 
-////a.schemaTitles[mustWriteJSON(sch)] = mustWriteJSON(sch)
-//for i, st := range a.recursorStack {
-//	if reflect.DeepEqual(st , sch) { // } mustWriteJSON(st) == mustWriteJSON(sch) {
-//		//if reflect.DeepEqual(st, s) {
-//		// If the stack of mutated schemas is not yet long enough
-//		// as this index, then append to it.
-//		// There is no way of getting the eventual length ahead of time.
-//		for (len(a.mutatedStack))-1 < i {
-//			a.mutatedStack = append(a.mutatedStack, nil)
-//		}
-//		a.mutatedStack[i] = sch
-//		fmt.Println("same", mustWriteJSON(st))
-//		return nil
-//	} else {
-//		fmt.Println("notsame", mustWriteJSON(st), mustWriteJSON(sch))
-//		//panic("samsambutdiff")
-//	}
-//	if a.recurseIter > 100 {
-//		panic("gotcha")
-//	}
-//}
-////a.recursorStack = append(a.recursorStack, sch)
-//if len(a.recursorStack) > 100 {
-//	panic("lngstck")
-//}
-////a.mutatedStack[a.recurseIter] = *sch
+		for i := range a.recursorStack {
+			for j := range a.recursorStack {
+				if i == j {
+					continue
+				}
+				if mustWriteJSON(a.recursorStack[i]) == mustWriteJSON(a.recursorStack[j]) {
+					return false
+				}
+			}
+		}
+		return true
+	}()
+
+	final := func(unique bool, s *spec.Schema) {
+		if unique {
+			onNode(s)
+			for len(a.mutatedStack)-1 < a.recurseIter {
+				a.mutatedStack = append(a.mutatedStack, nil)
+			}
+			a.mutatedStack[a.recurseIter] = s
+		} else {
+			*s =
+		}
+
+		if a.UniqueOnly {
+			for i := range a.recursorStack {
+				for j := range a.recursorStack {
+					if i == j {
+						continue
+					}
+					if mustWriteJSON(a.recursorStack[i]) == mustWriteJSON(a.recursorStack[j]) {
+						*a.mutatedStack[i] = *a.recursorStack[i]
+						continue
+					}
+				}
+			}
+		}
+	}()
+*/

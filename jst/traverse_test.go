@@ -323,12 +323,198 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		}())
 	})
 
-	t.Run("mutated schema refs", func(t *testing.T) {
+	t.Run("mutator function mutates schema values", func(t *testing.T) {
 
+		descriptionMutator := func(s *spec.Schema) error {
+			s.Description = "baz"
+			return nil
+		}
+
+		mutationTest := func(domain string, newAnalyst func() *AnalysisT, s *spec.Schema, mut func(*spec.Schema) error, checkFn func(*AnalysisT, *spec.Schema)) {
+
+			fmt.Printf("mutation test '%s' Before @schema=\n%s\n", domain, mustWriteJSONIndent(s))
+
+			a := newAnalyst()
+
+			a.Traverse(s, mut)
+
+		fmt.Printf("mutation test '%s' After @schema=\n%s\n", domain, mustWriteJSONIndent(s))
+
+			// Tests.
+			checkFn(a, s)
+			if len(a.recursorStack) != len(a.mutatedStack) {
+				fmt.Printf("mutation test '%s' After @schema=\n%s\n", domain, mustWriteJSONIndent(s))
+				t.Error("bad")
+			}
+
+			// Logs.
+			for i, v := range a.recursorStack {
+				fmt.Println("orig=", mustWriteJSON(v), "mutated=", mustWriteJSON(a.mutatedStack[i]))
+			}
+		}
+
+		basicSchema := mustReadSchema(`{"title": "object", "properties": {"foo": {"title": "bar"}}}`)
+		mutationTest("basic", NewAnalysisT, basicSchema, descriptionMutator, func(aa *AnalysisT, s *spec.Schema) {
+			if s.Description != "baz" {
+				t.Error("notbaz")
+			}
+			if s.Properties["foo"].Description != "baz" {
+				t.Error(".foo not baz")
+			}
+		})
+
+		anyOfSchema := mustReadSchema(`
+{
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "foo": {}
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "foo": {}
+      }
+    }
+  ]
+}`)
+
+		mutationTest("anyOf nonunique", NewAnalysisT, anyOfSchema, descriptionMutator, func(aa *AnalysisT, s *spec.Schema) {
+			if s.Description != "baz" {
+				t.Error(". not baz")
+			}
+			if s.AnyOf[0].Description != "baz" {
+				t.Error(".anyOf[0] not baz")
+			}
+			if s.AnyOf[0].Properties["foo"].Description != "baz" {
+				t.Error(".anyOf[0].foo not baz")
+			}
+			if s.AnyOf[1].Description != "baz" {
+				t.Error(".anyOf[1] not baz")
+			}
+			if s.AnyOf[1].Properties["foo"].Description != "baz" {
+				t.Error(".anyOf[1].foo not baz")
+			}
+		})
+
+		anyOfSchema2 := mustReadSchema(`
+{
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "foo": {}
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "foo": {}
+      }
+    }
+  ]
+}`)
+		mutationTest("anyOf unique", func() *AnalysisT {
+			a := NewAnalysisT()
+			a.UniqueOnly = true
+			return a
+		}, anyOfSchema2, descriptionMutator, func(aa *AnalysisT, s *spec.Schema) {
+			if s.Description != "baz" {
+				t.Error(". not baz")
+			}
+			if s.AnyOf[0].Description == "baz" {
+				t.Error(".anyOf[0] is baz")
+			}
+			if s.AnyOf[0].Properties["foo"].Description == "baz" {
+				t.Error(".anyOf[0].foo is baz")
+			}
+			// PTAL: Since the mutator runs from the bottom-up (depth-first traversal),
+			// the
+			if s.AnyOf[1].Description == "baz" {
+				t.Error(".anyOf[1] is baz")
+			}
+			if s.AnyOf[1].Properties["foo"].Description == "baz" {
+				t.Error(".anyOf[1].foo is baz")
+			}
+		})
+	})
+
+	t.Run("unique schemas memoization pattern", func(t *testing.T) {
+		s := func() *spec.Schema {
+			raw := `{
+  "title": "1",
+  "type": "object",
+  "properties": {
+    "foo": {
+      "title": "2",
+      "anyOf": [
+        {
+          "title": "3",
+          "type": "array",
+          "items": {
+            "title": "4",
+            "properties": {
+              "baz": {
+                "title": "5"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "bar": {
+      "title": "6",
+      "type": "object",
+      "allOf": [
+        {
+          "title": "7",
+          "type": "object",
+          "properties": {
+            "baz": {
+                "title": "5"
+			},
+			"baz2": {
+                "title": "5"
+			}
+          }
+        }
+      ]
+    }
+  }
+}`
+			s := mustReadSchema(raw)
+			return s
+		}()
+
+		a := NewAnalysisT()
+		a.UniqueOnly = true
+
+		registry := make(map[string]*spec.Schema)
+
+		countMutCall := 0
+		a.Traverse(s, func(s *spec.Schema) error {
+			countMutCall++
+			registry[mustWriteJSON(s)] = s
+			return nil
+		})
+		fmt.Println("countMutCall", countMutCall)
+
+		if len(registry) != 7 {
+			t.Fatal("bad")
+		}
+
+		n := 0
+		for k := range registry {
+			fmt.Println(n, k)
+			n++
+		}
 	})
 }
 
-func TestSchemaExpand(t *testing.T) {
+// TestDemoSchemaExpand is just an demonstration to stdout of what jsonschema.ExpandSchema does.
+func TestDemoSchemaExpand(t *testing.T) {
 	raw := `{
 	  "title": "1",
 	  "type": "object",

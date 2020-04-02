@@ -34,8 +34,8 @@ func noMutate(s *spec.Schema) *spec.Schema {
 	return s
 }
 
-func assertMockMutatorCalledTimes(n int) func(m *MockMutator) {
-	return func(m *MockMutator) {
+func assertMockMutatorCalledTimes(n int) func(m *MockMutator, s *spec.Schema) {
+	return func(m *MockMutator, s *spec.Schema) {
 		m.EXPECT().OnSchema(Any()).Times(n)
 	}
 }
@@ -43,7 +43,7 @@ func assertMockMutatorCalledTimes(n int) func(m *MockMutator) {
 func TestTraverse(t *testing.T) {
 	type mutateExpect struct {
 		mutate func(s *spec.Schema) *spec.Schema
-		expect func(m *MockMutator)
+		expect func(m *MockMutator, s *spec.Schema)
 	}
 
 	cases := []struct {
@@ -79,9 +79,94 @@ func TestTraverse(t *testing.T) {
 				},
 			},
 		},
+		//
+		//{
+		//	doc: `properties`,
+		//	tests: func () (mes []mutateExpect) {
+		//		for _, a := range []string{"anyOf", "allOf", "oneOf"} {
+		//			a := a
+		//			sch := mustReadSchema(fmt.Sprintf(`{"%s": [{}, {}]}`, a))
+		//
+		//			mes = append(mes, mutateExpect{
+		//				mutate: func(s *spec.Schema) *spec.Schema {
+		//					*s = *sch
+		//					//*saddr = *s
+		//					return s
+		//				},
+		//				expect:	func(m *MockMutator, s *spec.Schema) {
+		//					//m.EXPECT().OnSchema(Any()).Times(2) // PASS
+		//					//m.EXPECT().OnSchema(sch).Times(2) // FAIL
+		//					//m.EXPECT().OnSchema(*sch).Times(2) // FAIL
+		//					//m.EXPECT().OnSchema(saddr).Times(2) // FAIL
+		//					//m.EXPECT().OnSchema(saddr).Times(2) // FAIL
+		//					//m.EXPECT().OnSchema(Any()).Times(2) // FAIL
+		//					m.EXPECT().OnSchema(mock.MatchedBy(func(in interface{}) bool {
+		//						//fmt.Println(spew.Sdump(in))
+		//						jsoon := mustWriteJSON(in)
+		//						fmt.Println("jsoooonn===>>>>", jsoon)
+		//						return jsoon  == "{}"
+		//					})).MinTimes(1)
+		//
+		//					//switch a {
+		//					//case "anyOf":
+		//					//
+		//					//
+		//					//
+		//					//	//m.EXPECT().OnSchema(sch.AnyOf[0]).MinTimes(1)
+		//					//	//m.EXPECT().OnSchema(&sch.AnyOf[0]).Times(0) // PASS
+		//					//	//m.EXPECT().OnSchema(mock.MatchedBy(func(in interface{}) bool {
+		//					//	//	v := in.(spec.Schema)
+		//					//	//	fmt.Println("in", spew.Sdump(v))
+		//					//	//	fmt.Println("want", spew.Sdump(sch.AnyOf[0]))
+		//					//	//	return reflect.DeepEqual(v, spec.Schema{})
+		//					//	//	return reflect.DeepEqual(in.(spec.Schema), spec.Schema{})
+		//					//	//}).Matches(sch.AnyOf[0])).MinTimes()
+		//					//
+		//					//	//m.EXPECT().OnSchema(mock.MatchedBy(func(in interface{}) bool {
+		//					//	//	v := in.(*spec.Schema)
+		//					//	//	return reflect.DeepEqual(v, s)
+		//					//	//}).Matches(&sch.AnyOf[0])).MinTimes(1)
+		//					//
+		//					//	// FUCK THIS
+		//					//
+		//					//case "oneOf":
+		//					//	fmt.Println("!!!!!", mustWriteJSONIndent(sch))
+		//					//	//m.EXPECT().OnSchema(sch.Items.Schema).MinTimes(1)
+		//					//	//m.EXPECT().OnSchema(sch.OneOf[0]).MinTimes(1)
+		//					//	//m.EXPECT().OnSchema(sch.OneOf[0]).Times(2)
+		//					//case "allOf":
+		//					//	//m.EXPECT().OnSchema(sch.AllOf[0]).Times(2)
+		//					//}
+		//				},
+		//			})
+		//		}
+		//		return
+		//	}(),
+		//},
+
+		//{
+		//	doc: `anyOf`,
+		//	tests: func() (mes []mutateExpect) {
+		//		mu := func(s *spec.Schema) *spec.Schema {
+		//			*s = *mustReadSchema(fmt.Sprintf(`{"%s": [{}, {}]}`, "anyOf"))
+		//			return s
+		//		}
+		//		mes = append(mes, mutateExpect{
+		//			mutate: mu,
+		//			expect: func(m *MockMutator, s *spec.Schema) {
+		//				m.EXPECT().OnSchema(mock.MatchedBy(func(in interface{}) bool {
+		//					jsoon := mustWriteJSON(in)
+		//					fmt.Println("jsoooonn===>>>>", jsoon)
+		//					return jsoon == "{}"
+		//				})).MinTimes(0)
+		//			},
+		//		})
+		//		return
+		//	}(),
+		//},
 
 		{
-			doc: `basic cyclical schema, literal`,
+			doc: `cyclical schema: basic, literal`,
 			rawSchema: `{
 			"type": "object",
 			"properties": {
@@ -102,7 +187,7 @@ func TestTraverse(t *testing.T) {
 		},
 
 		{
-			doc: `basic cyclical schema, programmatic`,
+			doc: `cyclical schema: basic, programmatic`,
 			rawSchema: `{
 			"type": "object",
 			"properties": {
@@ -122,7 +207,7 @@ func TestTraverse(t *testing.T) {
 		},
 
 		{
-			doc: "chained cycles",
+			doc: "cyclical schema: chained, programmatic",
 			rawSchema: `{
 			   "title": "1-top",
 			   "type": "object",
@@ -155,7 +240,12 @@ func TestTraverse(t *testing.T) {
 	for i, c := range cases {
 		for j, k := range c.tests {
 			a := NewAnalysisT()
-			sch := mustReadSchema(c.rawSchema)
+			var sch *spec.Schema
+			if c.rawSchema != "" {
+				sch = mustReadSchema(c.rawSchema)
+			} else {
+				sch = &spec.Schema{}
+			}
 
 			// Run programmatic test-schema mutation, if any.
 			if k.mutate != nil {
@@ -170,12 +260,12 @@ func TestTraverse(t *testing.T) {
 
 			testController := NewController(t)
 			mockMutator := NewMockMutator(testController)
-			k.expect(mockMutator)
+			k.expect(mockMutator, sch)
 
 			// Wrap the node call fn for call count, and to handle nil check.
 			a.Traverse(sch, func(s *spec.Schema) error {
 				n++
-				fmt.Printf("a.recurseIter=%d/n=%d]%s> schema=\n%s\n", a.recurseIter, n, strings.Repeat("=", a.recurseIter-n), mustWriteJSONIndent(s))
+				fmt.Printf("n=%d/a.recurseIter=%d]%s> schema=\n%s\n", a.recurseIter, n, strings.Repeat("=", a.recurseIter-n), mustWriteJSONIndent(s))
 				if c.onNode != nil {
 					c.onNode(s)
 				}
@@ -243,3 +333,83 @@ func TestSchemaEq(t *testing.T) {
 //	output := mustWriteJSONIndent(sch)
 //	t.Log(output)
 //}
+
+func TestAnalysisT_Traverse(t *testing.T) {
+	test := func(prop string, s *spec.Schema) {
+		// Ternary default set
+		if s == nil {
+			s = mustReadSchema(fmt.Sprintf(`{"%s": [{}, {}]}`, prop))
+		} else {
+
+		}
+	}
+}
+
+/*
+space
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/

@@ -102,6 +102,14 @@ func (a *AnalysisT) seen(sch *spec.Schema) bool {
 	return false
 }
 
+func schemasAreEquivalent(s1, s2 *spec.Schema) bool {
+	return mustWriteJSON(s1) == mustWriteJSON(s2)
+}
+
+func schemaMustSetAnyStandard(s *spec.Schema, prop string, any interface{}) {
+
+}
+
 // analysisOnNode runs a callback function on each leaf of a the JSON schema tree.
 // It will return the first error it encounters.
 func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) error) error {
@@ -127,11 +135,6 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 	}
 
 	// Slices.
-	for i := 0; i < len(sch.OneOf); i++ {
-		it := sch.OneOf[i]
-		rec(&it, onNode)
-		sch.OneOf[i] = it
-	}
 	for i := 0; i < len(sch.AnyOf); i++ {
 		it := sch.AnyOf[i]
 		rec(&it, onNode)
@@ -141,6 +144,11 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 		it := sch.AllOf[i]
 		rec(&it, onNode)
 		sch.AllOf[i] = it
+	}
+	for i := 0; i < len(sch.OneOf); i++ {
+		it := sch.OneOf[i]
+		rec(&it, onNode)
+		sch.OneOf[i] = it
 	}
 
 	// Maps.

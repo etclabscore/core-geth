@@ -219,6 +219,7 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 			fmt.Println(" < ", par.Name)
 
 			*parent = par.Schema
+			//spec.ExpandSchema(parent, parent, nil)
 			a.Traverse(&par.Schema, deferencer)
 			a.Traverse(&par.Schema, workaroundDefinitions)
 			a.Traverse(&par.Schema, referencer)
@@ -229,6 +230,7 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 		// Result (single).
 		fmt.Println(" > ", doc.Methods[im].Result.Name)
 		*parent = met.Result.Schema
+		//spec.ExpandSchema(parent, parent, nil)
 		a.Traverse(&met.Result.Schema, deferencer)
 		a.Traverse(&met.Result.Schema, workaroundDefinitions)
 		a.Traverse(&met.Result.Schema, referencer)

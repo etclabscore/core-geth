@@ -13,7 +13,7 @@ import (
 type AnalysisT struct {
 	OpenMetaDescription string
 	TraverseOptions
-	schemaTitles        map[string]string
+	schemaTitles map[string]string
 
 	recurseIter   int
 	recursorStack []*spec.Schema
@@ -28,6 +28,7 @@ type AnalysisT struct {
 
 type TraverseOptions struct {
 	ExpandAtNode bool
+	UniqueOnly   bool
 }
 
 func NewAnalysisT() *AnalysisT {
@@ -92,8 +93,8 @@ func (a *AnalysisT) SchemaFromRef(psch spec.Schema, ref spec.Ref) (schema spec.S
 }
 
 func schemasAreEquivalent(s1, s2 *spec.Schema) bool {
-	spec.ExpandSchema(s1,  nil, nil)
-	spec.ExpandSchema(s2,  nil, nil)
+	spec.ExpandSchema(s1, nil, nil)
+	spec.ExpandSchema(s2, nil, nil)
 	return reflect.DeepEqual(s1, s2)
 }
 
@@ -129,9 +130,11 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 	}()
 
 	rec := func(s *spec.Schema, fn func(n *spec.Schema) error) error {
-		//if a.seen(s) {
-		//	return nil
-		//}
+		if a.TraverseOptions.UniqueOnly {
+			if a.seen(s) {
+				return nil
+			}
+		}
 		return a.Traverse(s, fn)
 	}
 

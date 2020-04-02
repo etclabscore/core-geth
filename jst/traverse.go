@@ -86,9 +86,10 @@ func (a *AnalysisT) SchemaFromRef(psch spec.Schema, ref spec.Ref) (schema spec.S
 	return v.(spec.Schema), nil
 }
 
-func copySchema(sch *spec.Schema) spec.Schema {
-	ns := mustReadSchema(mustWriteJSON(sch))
-	return *ns
+func schemasAreEquivalent(s1, s2 *spec.Schema) bool {
+	spec.ExpandSchema(s1,  nil, nil)
+	spec.ExpandSchema(s2,  nil, nil)
+	return reflect.DeepEqual(s1, s2)
 }
 
 func (a *AnalysisT) seen(sch *spec.Schema) bool {
@@ -99,34 +100,6 @@ func (a *AnalysisT) seen(sch *spec.Schema) bool {
 		}
 	}
 	return false
-}
-
-func schemasAreEquivalent(s1, s2 *spec.Schema) bool {
-	spec.ExpandSchema(s1,  nil, nil)
-	spec.ExpandSchema(s2,  nil, nil)
-
-	same := len(s1.AnyOf) == len(s2.AnyOf)
-	same = same &&  len(s1.AllOf) == len(s2.AllOf)
-	same = same &&  len(s1.OneOf) == len(s2.OneOf)
-	same = same &&  s1.Title == s2.Title
-	same = same &&  len(s1.Type) == len(s2.Type)
-	// Same types
-	t1loop:
-	for _, t1 := range s1.Type {
-		for _, t2 := range s2.Type {
-			if t1 == t2 {
-				continue t1loop
-			}
-		}
-		return false // t1 item not found in t2
-	}
-	same = same &&  len(s1.Properties) == len(s2.Properties)
-	//return mustWriteJSON(s1) == mustWriteJSON(s2)
-	return same
-}
-
-func schemaMustSetAnyStandard(s *spec.Schema, prop string, any interface{}) {
-
 }
 
 // analysisOnNode runs a callback function on each leaf of a the JSON schema tree.

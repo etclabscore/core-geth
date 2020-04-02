@@ -157,8 +157,7 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 
 	for k := range sch.Properties {
 		v := sch.Properties[k]
-		//v.ID = "prop:"+k
-		// PTAL: Is this right?
+		//v.ID = "prop:"+k // PTAL: Is this right?
 		rec(&v, onNode)
 		sch.Properties[k] = v
 	}

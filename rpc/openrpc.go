@@ -272,41 +272,6 @@ func (a argIdent) Name() string {
 	return a.name
 }
 
-//// analysisOnLeaf runs a callback function on each leaf of a the JSON schema tree.
-//// It will return the first error it encounters.
-//func (a *jst.AnalysisT) analysisOnLeaf(sch spec.Schema, onLeaf func(leaf spec.Schema) error) error {
-//	for i := range sch.Definitions {
-//		a.analysisOnLeaf(sch.Definitions[i], onLeaf)
-//	}
-//	for i := range sch.OneOf {
-//		a.analysisOnLeaf(sch.OneOf[i], onLeaf)
-//	}
-//	for i := range sch.AnyOf {
-//		a.analysisOnLeaf(sch.AnyOf[i], onLeaf)
-//	}
-//	for i := range sch.AllOf {
-//		a.analysisOnLeaf(sch.AllOf[i], onLeaf)
-//	}
-//	for k := range sch.Properties {
-//		a.analysisOnLeaf(sch.Properties[k], onLeaf)
-//	}
-//	for k := range sch.PatternProperties {
-//		a.analysisOnLeaf(sch.PatternProperties[k], onLeaf)
-//	}
-//	if sch.Items == nil {
-//		return onLeaf(sch)
-//	}
-//	if sch.Items.Len() > 1 {
-//		for i := range sch.Items.Schemas {
-//			a.analysisOnLeaf(sch.Items.Schemas[i], onLeaf) // PTAL: Is this right?
-//		}
-//	} else {
-//		// Is schema
-//		a.analysisOnLeaf(*sch.Items.Schema, onLeaf)
-//	}
-//	return onLeaf(sch)
-//}
-
 func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (goopenrpcT.Method, error) {
 	file, line := rt.FileLine(rt.Entry())
 

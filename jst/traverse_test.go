@@ -49,15 +49,14 @@ func (s schemaMatcher) String() string {
 	return fmt.Sprintf("%v", s.s)
 }
 
-func traverseTest(t *testing.T, prop string, sch *spec.Schema, expectCallTotal, expectCallTotalUnique int) {
+func traverseTest(t *testing.T, prop string, options *TraverseOptions, sch *spec.Schema, expectCallTotal int) {
 
-	prop = t.Name() + ":" + prop
 	runTest := func(a *AnalysisT, prop string, sch *spec.Schema, expectCallTotal int) {
 		testController := NewController(t)
 		mockMutator := NewMockMutator(testController)
 
 		mutatorCalledN := 0
-		fmt.Printf("'%s' unique=%v mutatorCalledN=%d/want_N=%d, a.recurseIter=%d %s@ schema=\n%s\n",  prop, a.TraverseOptions.UniqueOnly, mutatorCalledN,  expectCallTotal, a.recurseIter, strings.Repeat(" .", a.recurseIter-mutatorCalledN), mustWriteJSONIndent(sch))
+		fmt.Printf("'%s' unique=%v schema=\n%s\n", prop, a.TraverseOptions.UniqueOnly, mustWriteJSONIndent(sch))
 		a.Traverse(sch, func(s *spec.Schema) error {
 			mutatorCalledN++
 			fmt.Printf("'%s' unique=%v mutatorCalledN=%d, a.recurseIter=%d %s %s\n", prop, a.TraverseOptions.UniqueOnly, mutatorCalledN, a.recurseIter, strings.Repeat(" .", a.recurseIter-mutatorCalledN), mustWriteJSON(s))
@@ -75,18 +74,27 @@ func traverseTest(t *testing.T, prop string, sch *spec.Schema, expectCallTotal, 
 	}
 
 	a := NewAnalysisT()
-	var cop = &spec.Schema{}
-	*cop = *sch
-	runTest(a, prop, cop, expectCallTotal)
-
-	a = NewAnalysisT()
-	a.TraverseOptions.UniqueOnly = true
-	var cop2 = &spec.Schema{}
-	*cop2 = *sch
-	runTest(a, prop, cop2, expectCallTotalUnique)
+	if options != nil {
+		a.TraverseOptions = *options
+	}
+	prop = t.Name() + ":" + prop
+	runTest(a, prop, sch, expectCallTotal)
 }
 
 func TestAnalysisT_Traverse(t *testing.T) {
+
+	type traverseTestsOptsExpect map[*int]*TraverseOptions
+	traverseUniqueOpts := &TraverseOptions{UniqueOnly: true}
+	pint := func(i int) *int {
+		return &i
+	}
+
+	runTraverseTestWithOptsExpect := func(t *testing.T, prop string, oe traverseTestsOptsExpect, sch *spec.Schema) {
+		for k := range oe {
+			v := oe[k]
+			traverseTest(t, prop, v, sch, *k)
+		}
+	}
 
 	t.Run("basic functionality", func(t *testing.T) {
 		newBasicSchema := func(prop string, any interface{}) *spec.Schema { // Ternary default set
@@ -100,29 +108,61 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		}
 
 		for _, s := range []string{"anyOf", "allOf", "oneOf"} {
-			traverseTest(t,s, newBasicSchema(s, nil), 3, 2)
+			runTraverseTestWithOptsExpect(t, s, traverseTestsOptsExpect{
+				pint(3): nil,
+				pint(2): traverseUniqueOpts,
+			}, newBasicSchema(s, nil))
 		}
-		traverseTest(t,"traverses items when items is ordered list", newBasicSchema("items", nil), 3, 2)
-		traverseTest(t,"traverses items when items constrained to single schema", mustReadSchema(`{"items": {"items": {"a": {}, "b": {}}}}`), 3, 3)
+
+		runTraverseTestWithOptsExpect(t, "traverses items when items is ordered list", traverseTestsOptsExpect{
+			pint(3): nil,
+			pint(2): traverseUniqueOpts,
+		}, newBasicSchema("items", nil))
+
+		runTraverseTestWithOptsExpect(t, "traverses items when items constrained to single schema", traverseTestsOptsExpect{
+			pint(3): nil,
+			pint(3): traverseUniqueOpts,
+		}, mustReadSchema(`{"items": {"items": {"a": {}, "b": {}}}}`))
 
 		// This test is a good example of behavior.
 		// The schema at properties.a is equivalent to the one at properties.b
 		// If the Traverser uses schema equivalence to abort traversal, then
 		// equivalent schemas at multiple paths will not be called.
-		traverseTest(t,"traverses properties", mustReadSchema(`{"properties": {"a": {}, "b": {}}}`), 3, 2)
+		runTraverseTestWithOptsExpect(t, "traverses properties", traverseTestsOptsExpect{
+			pint(3): nil,
+			pint(2): traverseUniqueOpts,
+		}, mustReadSchema(`{"properties": {"a": {}, "b": {}}}`))
 	})
 
 	t.Run("cycle detection", func(t *testing.T) {
-		traverseTest(t,"basic", func() *spec.Schema {
+		runTraverseTestWithOptsExpect(t, "basic", traverseTestsOptsExpect{
+			pint(3): nil,
+			pint(3): traverseUniqueOpts,
+		}, func() *spec.Schema {
 
 			raw := `{"type": "object", "properties": {"foo": {}}}`
 			s := mustReadSchema(raw)
 			s.Properties["foo"] = *mustReadSchema(raw)
 			return s
 
-		}(), 3, 3)
+		}())
 
-		traverseTest(t,"chained", func() *spec.Schema {
+		runTraverseTestWithOptsExpect(t, "basic", traverseTestsOptsExpect{
+			pint(3): nil,
+			pint(3): traverseUniqueOpts,
+		}, func() *spec.Schema {
+
+			raw := `{"type": "object", "properties": {"foo": {}}}`
+			s := mustReadSchema(raw)
+			s.Properties["foo"] = *mustReadSchema(raw)
+			return s
+
+		}())
+
+		runTraverseTestWithOptsExpect(t, "chained", traverseTestsOptsExpect{
+			pint(2): nil,
+			pint(2): traverseUniqueOpts,
+		}, func() *spec.Schema {
 
 			raw := `{
 			  "title": "1-top",
@@ -147,9 +187,12 @@ func TestAnalysisT_Traverse(t *testing.T) {
 			s.Properties["foo"].Items.Schemas[0].Items.Schema = mustReadSchema(raw)
 			return s
 
-		}(), 2, 2)
+		}())
 
-		traverseTest(t,"chained in media res", func() *spec.Schema {
+		runTraverseTestWithOptsExpect(t, "chained in media res", traverseTestsOptsExpect{
+			pint(8): nil,
+			pint(8): traverseUniqueOpts,
+		}, func() *spec.Schema {
 			raw := `{
 			  "title": "1",
 			  "type": "object",
@@ -177,9 +220,12 @@ func TestAnalysisT_Traverse(t *testing.T) {
 			s := mustReadSchema(raw)
 			s.Properties["foo"].AnyOf[0].Items.Schema.Properties["baz"] = mustReadSchema(raw).Properties["foo"]
 			return s
-		}(), 8, 8)
+		}())
 
-		traverseTest(t,"chained in media res different branch", func() *spec.Schema {
+		runTraverseTestWithOptsExpect(t, "chained in media res different branch", traverseTestsOptsExpect{
+			pint(17): nil,
+			pint(14): traverseUniqueOpts,
+		}, func() *spec.Schema {
 			raw := `{
   "title": "1",
   "type": "object",
@@ -222,9 +268,12 @@ func TestAnalysisT_Traverse(t *testing.T) {
 			s.Properties["foo"].AnyOf[0].Items.Schema.Properties["baz"] = *mustReadSchema(raw)
 			s.Properties["bar"].AllOf[0].Properties["baz"] = mustReadSchema(raw).Properties["foo"].AnyOf[0]
 			return s
-		}(), 17, 14)
+		}())
 
-		traverseTest(t,"multiple cycles", func() *spec.Schema {
+		runTraverseTestWithOptsExpect(t, "multiple cycles", traverseTestsOptsExpect{
+			pint(8): nil,
+			pint(7): traverseUniqueOpts,
+		}, func() *spec.Schema {
 
 			raw := `{
   "title": "1",
@@ -271,7 +320,7 @@ func TestAnalysisT_Traverse(t *testing.T) {
 			bar.WithAllOf(*mustReadSchema(raw))
 			bar.WithAllOf(mustReadSchema(raw).Properties["foo"].AnyOf[0].Items.Schemas...)
 			return s
-		}(), 8, 7)
+		}())
 	})
 
 	t.Run("mutated schema refs", func(t *testing.T) {
@@ -352,4 +401,4 @@ func TestSchemaExpand(t *testing.T) {
 
 
 
-*/
+ */

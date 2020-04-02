@@ -55,17 +55,19 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		testController := NewController(t)
 		mockMutator := NewMockMutator(testController)
 
-		n := 0
-		fmt.Printf("'%s' n=%d/a.recurseIter=%d %s@ schema=%s\n", prop, n, a.recurseIter, strings.Repeat(" .", a.recurseIter-n), mustWriteJSONIndent(sch))
+		mutatorCalledN := 0
+		fmt.Printf("'%s' mutatorCalledN=%d/want_N=%d, a.recurseIter=%d %s@ schema=\n%s\n",  prop, mutatorCalledN,  expectCallTotal, a.recurseIter, strings.Repeat(" .", a.recurseIter-mutatorCalledN), mustWriteJSONIndent(sch))
 		a.Traverse(sch, func(s *spec.Schema) error {
-			n++
-			fmt.Printf("'%s' n=%d/a.recurseIter=%d %s| schema=%s\n", prop, n, a.recurseIter, strings.Repeat(" .", a.recurseIter-n), mustWriteJSON(s))
+			mutatorCalledN++
+			fmt.Printf("'%s' mutatorCalledN=%d, a.recurseIter=%d %s %s\n", prop, mutatorCalledN, a.recurseIter, strings.Repeat(" .", a.recurseIter-mutatorCalledN), mustWriteJSON(s))
 			matcher := newSchemaMatcherFromJSON(s)
 			mockMutator.EXPECT().OnSchema(matcher).Times(1)
 			return mockMutator.OnSchema(s)
 		})
-		if n != expectCallTotal {
-			t.Errorf("bad mutator call total: '%s' want=%d got=%d", prop, expectCallTotal, n)
+		if mutatorCalledN != expectCallTotal {
+			t.Errorf("bad mutator call total: '%s' want=%d got=%d", prop, expectCallTotal, mutatorCalledN)
+		} else {
+			fmt.Printf("'%s' OK: mutatorCalledN %d/%d\n", prop, mutatorCalledN, expectCallTotal)
 		}
 		fmt.Println()
 		testController.Finish()
@@ -87,7 +89,11 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		}
 		test("traverses items when items is ordered list", newBasicSchema("items", nil), 2)
 		test("traverses items when items constrained to single schema", mustReadSchema(`{"items": {"items": {"a": {}, "b": {}}}}`), 3)
-		test("traverses properties", mustReadSchema(`{"properties": {"a": {}, "b": {}}}`), 3)
+
+		// This test is a good example of behavior.
+		// The schema at properties.a is equivalent to the one at properties.b
+		//
+		test("traverses properties", mustReadSchema(`{"properties": {"a": {}, "b": {}}}`), 2)
 	})
 
 	t.Run("cycle detection", func(t *testing.T) {
@@ -256,3 +262,78 @@ func TestAnalysisT_Traverse(t *testing.T) {
 
 	})
 }
+
+func TestSchemaExpand(t *testing.T) {
+	raw := `{
+	  "title": "1",
+	  "type": "object",
+	  "properties": {
+		"foo": {
+		  "$ref": "#/definitions/foo"
+		}
+	  },
+	  "definitions": {
+		"foo": {
+		  "title": "myfoo"
+		}
+	  }
+	}`
+
+	s := mustReadSchema(raw)
+
+	fmt.Println("Before", mustWriteJSONIndent(s))
+
+	s.AsWritable()
+	err := spec.ExpandSchema(s, s, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Println("After", mustWriteJSONIndent(s))
+}
+
+/*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/

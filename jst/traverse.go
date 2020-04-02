@@ -12,6 +12,7 @@ import (
 
 type AnalysisT struct {
 	OpenMetaDescription string
+	TraverseOptions
 	schemaTitles        map[string]string
 
 	recurseIter   int
@@ -23,6 +24,10 @@ type AnalysisT struct {
 		and have isCycle just be "findSchema", returning the mutated schema if any.
 		Look up orig--mutated by index/uniquetitle.
 	*/
+}
+
+type TraverseOptions struct {
+	ExpandAtNode bool
 }
 
 func NewAnalysisT() *AnalysisT {
@@ -114,15 +119,19 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 
 	sch.AsWritable()
 
+	if a.TraverseOptions.ExpandAtNode {
+		spec.ExpandSchema(sch, sch, nil)
+	}
+
 	a.recursorStack = append(a.recursorStack, sch)
 	defer func() {
 		a.mutatedStack = append(a.mutatedStack, sch)
 	}()
 
 	rec := func(s *spec.Schema, fn func(n *spec.Schema) error) error {
-		if a.seen(s) {
-			return nil
-		}
+		//if a.seen(s) {
+		//	return nil
+		//}
 		return a.Traverse(s, fn)
 	}
 
@@ -143,18 +152,9 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 		sch.OneOf[i] = it
 	}
 
-	// Maps.
-	// FIXME: Handle as "$ref" instead.
-	//for k := range sch.Definitions {
-	//	v := sch.Definitions[k]
-	//	//v.Title = k
-	//	rec(&v, onNode)
-	//	sch.Definitions[k] = v
-	//}
-
 	for k := range sch.Properties {
 		v := sch.Properties[k]
-		v.ID = "prop:"+k
+		//v.ID = "prop:"+k
 		// PTAL: Is this right?
 		rec(&v, onNode)
 		sch.Properties[k] = v

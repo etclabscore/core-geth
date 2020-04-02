@@ -132,6 +132,7 @@ func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
 // FIXME: Name me something better/organize me better.
 func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 	a := jst.NewAnalysisT()
+	a.TraverseOptions = jst.TraverseOptions{ExpandAtNode: true}
 
 	uniqueKeyFn := func(sch spec.Schema) string {
 		b, _ := json.Marshal(sch)
@@ -171,20 +172,6 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 		met := doc.Methods[im]
 		fmt.Println(met.Name)
 
-		parent := &spec.Schema{}
-
-		deferencer := func(sch *spec.Schema) error {
-
-			if sch.Ref.String() == "" {
-				return nil
-			}
-			rr, err := a.SchemaFromRef(*parent, sch.Ref)
-			if err == nil {
-				*sch = rr
-			}
-			return nil
-		}
-
 		referencer := func(sch *spec.Schema) error {
 
 			err := registerSchema(*sch)
@@ -208,7 +195,12 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 			return nil
 		}
 
-		workaroundDefinitions := func(sch *spec.Schema) error {
+		/*
+		removeDefinitions is a workaround to get rid of definitions at each schema,
+		instead of doing what we probably should which is updating the reference uri against
+		the document root
+		*/
+		removeDefinitions := func(sch *spec.Schema) error {
 			sch.Definitions = nil
 			return nil
 		}
@@ -218,21 +210,16 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 			par := met.Params[ip]
 			fmt.Println(" < ", par.Name)
 
-			*parent = par.Schema
-			//spec.ExpandSchema(parent, parent, nil)
-			a.Traverse(&par.Schema, deferencer)
-			a.Traverse(&par.Schema, workaroundDefinitions)
+			a.Traverse(&par.Schema, removeDefinitions)
 			a.Traverse(&par.Schema, referencer)
 			met.Params[ip] = par
 			fmt.Println("   :", mustMarshalString(par))
 		}
 
 		// Result (single).
-		fmt.Println(" > ", doc.Methods[im].Result.Name)
-		*parent = met.Result.Schema
-		//spec.ExpandSchema(parent, parent, nil)
-		a.Traverse(&met.Result.Schema, deferencer)
-		a.Traverse(&met.Result.Schema, workaroundDefinitions)
+		//fmt.Println(" > ", doc.Methods[im].Result.Name)
+
+		a.Traverse(&met.Result.Schema, removeDefinitions)
 		a.Traverse(&met.Result.Schema, referencer)
 		fmt.Println("   :", mustMarshalString(&met.Result))
 	}

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"reflect"
 
 	"github.com/go-openapi/jsonreference"
@@ -40,7 +39,7 @@ func mustReadSchema(jsonStr string) *spec.Schema {
 	s := &spec.Schema{}
 	err := json.Unmarshal([]byte(jsonStr), &s)
 	if err != nil {
-		log.Fatalf("read schema error: %v", err)
+		panic(fmt.Sprintf("read schema error: %v", err))
 	}
 	return s
 }
@@ -103,7 +102,27 @@ func (a *AnalysisT) seen(sch *spec.Schema) bool {
 }
 
 func schemasAreEquivalent(s1, s2 *spec.Schema) bool {
-	return mustWriteJSON(s1) == mustWriteJSON(s2)
+	spec.ExpandSchema(s1,  nil, nil)
+	spec.ExpandSchema(s2,  nil, nil)
+
+	same := len(s1.AnyOf) == len(s2.AnyOf)
+	same = same &&  len(s1.AllOf) == len(s2.AllOf)
+	same = same &&  len(s1.OneOf) == len(s2.OneOf)
+	same = same &&  s1.Title == s2.Title
+	same = same &&  len(s1.Type) == len(s2.Type)
+	// Same types
+	t1loop:
+	for _, t1 := range s1.Type {
+		for _, t2 := range s2.Type {
+			if t1 == t2 {
+				continue t1loop
+			}
+		}
+		return false // t1 item not found in t2
+	}
+	same = same &&  len(s1.Properties) == len(s2.Properties)
+	//return mustWriteJSON(s1) == mustWriteJSON(s2)
+	return same
 }
 
 func schemaMustSetAnyStandard(s *spec.Schema, prop string, any interface{}) {
@@ -153,16 +172,16 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 
 	// Maps.
 	// FIXME: Handle as "$ref" instead.
-	for k := range sch.Definitions {
-		v := sch.Definitions[k]
-		//v.Title = k
-		rec(&v, onNode)
-		sch.Definitions[k] = v
-	}
+	//for k := range sch.Definitions {
+	//	v := sch.Definitions[k]
+	//	//v.Title = k
+	//	rec(&v, onNode)
+	//	sch.Definitions[k] = v
+	//}
 
 	for k := range sch.Properties {
 		v := sch.Properties[k]
-		//v.Title = k
+		v.ID = "prop:"+k
 		// PTAL: Is this right?
 		rec(&v, onNode)
 		sch.Properties[k] = v

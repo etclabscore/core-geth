@@ -334,15 +334,232 @@ func TestSchemaEq(t *testing.T) {
 //	t.Log(output)
 //}
 
-func TestAnalysisT_Traverse(t *testing.T) {
-	test := func(prop string, s *spec.Schema) {
-		// Ternary default set
-		if s == nil {
-			s = mustReadSchema(fmt.Sprintf(`{"%s": [{}, {}]}`, prop))
-		} else {
+type schemaMatcher struct {
+	s *spec.Schema
+}
 
-		}
+func newSchemaMatcherFromJSON(s *spec.Schema) schemaMatcher {
+	return schemaMatcher{s: s}
+}
+
+func (s schemaMatcher) Matches(s2i interface{}) bool {
+	s2, cast := s2i.(*spec.Schema)
+	if !cast {
+		return false
 	}
+	return schemasAreEquivalent(s.s, s2)
+}
+
+func (s schemaMatcher) String() string {
+	return fmt.Sprintf("%v", s.s)
+}
+
+func TestAnalysisT_Traverse(t *testing.T) {
+	test := func(prop string, sch *spec.Schema, expectCallTotal int) {
+		a := NewAnalysisT()
+		testController := NewController(t)
+		mockMutator := NewMockMutator(testController)
+
+		n := 0
+		fmt.Printf("'%s' n=%d/a.recurseIter=%d %s@ schema=%s\n", prop, n, a.recurseIter, strings.Repeat(" .", a.recurseIter-n), mustWriteJSONIndent(sch))
+		a.Traverse(sch, func(s *spec.Schema) error {
+			n++
+			fmt.Printf("'%s' n=%d/a.recurseIter=%d %s| schema=%s\n", prop, n, a.recurseIter, strings.Repeat(" .", a.recurseIter-n), mustWriteJSON(s))
+			matcher := newSchemaMatcherFromJSON(s)
+			mockMutator.EXPECT().OnSchema(matcher).Times(1)
+			return mockMutator.OnSchema(s)
+		})
+		if n != expectCallTotal {
+			t.Errorf("bad mutator call total: '%s' want=%d got=%d", prop, expectCallTotal, n)
+		}
+		fmt.Println()
+		testController.Finish()
+	}
+
+	t.Run("basic functionality", func(t *testing.T) {
+		newBasicSchema := func(prop string, any interface{}) *spec.Schema { // Ternary default set
+			var s *spec.Schema
+			if any == nil {
+				s = mustReadSchema(fmt.Sprintf(`{"%s": [{}, {}]}`, prop))
+			} else {
+				s = mustReadSchema(fmt.Sprintf(`{"%s": %s}`, prop, mustWriteJSON(any)))
+			}
+			return s
+		}
+
+		for _, s := range []string{"anyOf", "allOf", "oneOf"} {
+			test(s, newBasicSchema(s, nil), 2)
+		}
+		test("traverses items when items is ordered list", newBasicSchema("items", nil), 2)
+		test("traverses items when items constrained to single schema", mustReadSchema(`{"items": {"items": {"a": {}, "b": {}}}}`), 3)
+		test("traverses properties", mustReadSchema(`{"properties": {"a": {}, "b": {}}}`), 3)
+	})
+
+	t.Run("cycle detection", func(t *testing.T) {
+		test("basic", func() *spec.Schema {
+
+			raw := `{"type": "object", "properties": {"foo": {}}}`
+			s := mustReadSchema(raw)
+			s.Properties["foo"] = *mustReadSchema(raw)
+			return s
+
+		}(), 3)
+
+		test("chained", func() *spec.Schema {
+
+			raw := `{
+			  "title": "1-top",
+			  "type": "object",
+			  "properties": {
+				"foo": {
+				  "title": "2",
+				  "items": [
+					{
+					  "title": "3",
+					  "type": "array",
+					  "items": {
+						"title": "4-maxdepth"
+					  }
+					}
+				  ]
+				}
+			  }
+			}`
+
+			s := mustReadSchema(raw)
+			s.Properties["foo"].Items.Schemas[0].Items.Schema = mustReadSchema(raw)
+			return s
+
+		}(), 2)
+
+		test("chained in media res", func() *spec.Schema {
+			raw := `{
+			  "title": "1",
+			  "type": "object",
+			  "properties": {
+				"foo": {
+				  "title": "2",
+				  "anyOf": [
+					{
+					  "title": "3",
+					  "type": "array",
+					  "items": {
+						"title": "4",
+						"properties": {
+						  "baz": {
+							"title": "5"
+						  }
+						}
+					  }
+					}
+				  ]
+				}
+			  }
+			}`
+
+			s := mustReadSchema(raw)
+			s.Properties["foo"].AnyOf[0].Items.Schema.Properties["baz"] = mustReadSchema(raw).Properties["foo"]
+			return s
+		}(), 8)
+
+		test("chained in media res different branch", func() *spec.Schema {
+			raw := `{
+  "title": "1",
+  "type": "object",
+  "properties": {
+    "foo": {
+      "title": "2",
+      "anyOf": [
+        {
+          "title": "3",
+          "type": "array",
+          "items": {
+            "title": "4",
+            "properties": {
+              "baz": {
+                "title": "5"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "bar": {
+      "title": "6",
+      "type": "object",
+      "allOf": [
+        {
+          "title": "7",
+          "type": "object",
+          "properties": {
+            "baz": {
+              "title": "8"
+            }
+          }
+        }
+      ]
+    }
+  }
+}`
+			s := mustReadSchema(raw)
+			s.Properties["foo"].AnyOf[0].Items.Schema.Properties["baz"] = *mustReadSchema(raw)
+			s.Properties["bar"].AllOf[0].Properties["baz"] = mustReadSchema(raw).Properties["foo"].AnyOf[0]
+			return s
+		}(), 16)
+
+		test("multiple cycles", func() *spec.Schema {
+
+			raw := `{
+  "title": "1",
+  "type": "object",
+  "properties": {
+    "foo": {
+      "title": "2",
+      "anyOf": [
+        {
+          "title": "3",
+          "type": "array",
+          "items": {
+            "title": "4",
+            "properties": {
+              "baz": {
+                "title": "5"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "bar": {
+      "title": "6",
+      "type": "object",
+      "allOf": [
+        {
+          "title": "7",
+          "type": "object",
+          "properties": {
+            "baz": {
+              "title": "8"
+            }
+          }
+        }
+      ]
+    }
+  }
+}`
+
+			s := mustReadSchema(raw)
+			s.Properties["bar"].AllOf[0].Properties["baz"] = mustReadSchema(raw).Properties["foo"].AnyOf[0].Items.Schema.Properties["baz"]
+			bar := s.Properties["bar"]
+			bar.WithAllOf(*mustReadSchema(raw))
+			bar.WithAllOf(mustReadSchema(raw).Properties["foo"].AnyOf[0].Items.Schemas...)
+			return s
+		}(), 7)
+	})
+
+	t.Run("mutated schema refs", func(t *testing.T) {
+
+	})
 }
 
 /*

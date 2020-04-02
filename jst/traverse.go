@@ -108,6 +108,20 @@ func (a *AnalysisT) seen(sch *spec.Schema) bool {
 	return false
 }
 
+func (a *AnalysisT) setHistory(sl []*spec.Schema, item *spec.Schema, index int) {
+	if len(sl) == 0 || sl == nil {
+		sl = []*spec.Schema{}
+	}
+	if len(sl) - 1 >= index {
+		*sl[index] = *item
+		return
+	}
+	for len(sl) -1 < index {
+		sl = append(sl, nil)
+	}
+	sl[index] = item
+}
+
 // analysisOnNode runs a callback function on each leaf of a the JSON schema tree.
 // It will return the first error it encounters.
 func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) error) error {
@@ -130,28 +144,34 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 	cp := &spec.Schema{}
 	*cp = *sch
 
+	// If depth-first, a duplicity check should happen immediately before the onnode function
+	// is called.
+	//	If the schema (prior to mutation) is a duplicate of any other known
+	// 	unmutated schema, then if the matching schema was mutated, it should be reverted.
+	//  Otherwise, the schema is unique, and can be mutated, storing it's mutated ref
+	//  in the history (in case a later duplicate is found).
+
+	// If breadth-first, a duplicity check should happen immediately.
+	//  If a duplicate schema is found (comparing originals), then the duplicate should be
+	//  reverted to it's original value. The mutator should not be called.
+
+	// ---
+
+	// If unique only is set, and the recursion iter == 0 (at root schema)
+	//  then the Traverse function should call itself using a unique schema registry closure.
+	//  Once unique schemas have been collected
+
 	if a.UniqueOnly {
-		for i := range a.recursorStack {
-			if mustWriteJSON(a.recursorStack[i]) == mustWriteJSON(cp) {
-				*a.mutatedStack[i] = *cp
-				return nil
-			}
+		if a.seen(sch) {
+			a.setHistory(a.mutatedStack, cp, iter)
+			return nil
 		}
 	}
-	
+
 	for len(a.recursorStack)-1 < iter {
 		a.recursorStack = append(a.recursorStack, nil)
 	}
 	a.recursorStack[iter] = cp
-
-	run := func() error {
-		for len(a.mutatedStack)-1 < iter {
-			a.mutatedStack = append(a.mutatedStack, nil)
-		}
-		err := onNode(sch)
-		a.mutatedStack[iter] = sch
-		return err
-	}
 
 	rec := func(s *spec.Schema, fn func(n *spec.Schema) error) error {
 		return a.Traverse(s, fn)
@@ -182,7 +202,7 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 
 	// jsonschema special type
 	if sch.Items == nil {
-		return run()
+		return onNode(sch)
 	}
 	if sch.Items.Len() > 1 {
 		for i := range sch.Items.Schemas {
@@ -192,7 +212,7 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 		rec(sch.Items.Schema, onNode)
 	}
 
-	return run()
+	return onNode(sch)
 }
 
 /*

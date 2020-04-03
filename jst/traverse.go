@@ -92,16 +92,6 @@ func schemasAreEquivalent(s1, s2 *spec.Schema) bool {
 	return reflect.DeepEqual(s1, s2)
 }
 
-func (a *AnalysisT) seen(sch *spec.Schema) bool {
-	for i := range a.recursorStack {
-		//if mustWriteJSON(a.recursorStack[i]) == mustWriteJSON(sch) {
-		if reflect.DeepEqual(a.recursorStack[i], sch) {
-			return true
-		}
-	}
-	return false
-}
-
 func (a *AnalysisT) setHistory(sl []*spec.Schema, item *spec.Schema, index int) {
 	if len(sl) == 0 || sl == nil {
 		sl = []*spec.Schema{}
@@ -131,10 +121,6 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 	// The incoming pointer value will be mutated.
 	cp := &spec.Schema{}
 	*cp = *sch
-
-	if a.seen(sch) {
-		return nil
-	}
 
 	a.setHistory(a.recursorStack, cp, iter)
 

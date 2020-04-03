@@ -176,17 +176,25 @@ func TestAnalysisT_Traverse(t *testing.T) {
 
 		}())
 
-		runTraverseTestWithOptsExpect(t, "basic", traverseTestsOptsExpect{
-			pint(3): nil,
-			pint(3): traverseUniqueOpts,
-		}, func() *spec.Schema {
+		/*
+			This test will cause a stack overflow because it uses
+			the parent as it's own child.
+			This case is allowed to overflow because
+			an overflow is caused if the same case is applied to json.Marshal.
+			If the standard library fails in this case, then we can too.
+		*/
+		//runTraverseTestWithOptsExpect(t, "basic-ref", traverseTestsOptsExpect{
+		//	pint(3): nil,
+		//	pint(3): traverseUniqueOpts,
+		//}, func() *spec.Schema {
+		//
+		//	raw := `{"type": "object", "properties": {"foo": {}}}`
+		//	s := mustReadSchema(raw)
+		//	s.Properties["foo"] = *s
+		//	return s
+		//
+		//}())
 
-			raw := `{"type": "object", "properties": {"foo": {}}}`
-			s := mustReadSchema(raw)
-			s.Properties["foo"] = *mustReadSchema(raw)
-			return s
-
-		}())
 
 		runTraverseTestWithOptsExpect(t, "chained", traverseTestsOptsExpect{
 			pint(2): nil,
@@ -429,7 +437,7 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		})
 	})
 
-	// Test (demonstration) a usage pattern that only mutates uniq nodes.
+	// Demonstrates a usage pattern that only mutates unique nodes.
 	t.Run("uniq mutations pattern test", func(t *testing.T) {
 		anyOfSchema2 := mustReadSchema(`
 		{
@@ -555,13 +563,10 @@ func TestAnalysisT_Traverse(t *testing.T) {
 
 		registry := make(map[string]*spec.Schema)
 
-		countMutCall := 0
 		a.Traverse(s, func(s *spec.Schema) error {
-			countMutCall++
 			registry[mustWriteJSON(s)] = s
 			return nil
 		})
-		fmt.Println("countMutCall", countMutCall)
 
 		if len(registry) != 7 {
 			t.Fatal("bad")

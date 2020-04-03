@@ -24,27 +24,29 @@ require (
 	github.com/fjl/memsize v0.0.0-20180418122429-ca190fb6ffbc
 	github.com/gballet/go-libpcsclite v0.0.0-20190403181518-312b5175032f
 	github.com/go-ole/go-ole v1.2.1 // indirect
-	github.com/go-openapi/analysis v0.19.10
 	github.com/go-openapi/jsonreference v0.19.3
 	github.com/go-openapi/spec v0.19.6
+	github.com/go-openapi/swag v0.19.7 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-stack/stack v1.8.0
 	github.com/go-test/deep v1.0.4
 	github.com/golang/mock v1.4.3
 	github.com/golang/protobuf v1.3.1
 	github.com/golang/snappy v0.0.1
+	github.com/google/go-cmp v0.3.0 // indirect
+	github.com/google/uuid v1.1.1 // indirect
 	github.com/gorilla/websocket v1.4.1
 	github.com/graph-gophers/graphql-go v0.0.0-20190513003547-158e7b876106
 	github.com/gregdhill/go-openrpc v0.0.0-20191115123255-ebc6f01c6db3
 	github.com/hashicorp/golang-lru v0.0.0-20160813221303-0a025b7e63ad
 	github.com/huin/goupnp v0.0.0-20161224104101-679507af18f3
 	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334
-	github.com/imdario/mergo v0.3.7
 	github.com/influxdata/influxdb v0.0.0-20180221223340-01288bdb0883
 	github.com/jackpal/go-nat-pmp v0.0.0-20160603034137-1fa385a6f458
 	github.com/julienschmidt/httprouter v1.2.0
 	github.com/karalabe/usb v0.0.0-20191104083709-911d15fe12a9
 	github.com/kylelemons/godebug v1.1.0 // indirect
+	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/mattn/go-colorable v0.1.0
 	github.com/mattn/go-isatty v0.0.3
 	github.com/mitchellh/go-homedir v1.1.0
@@ -54,6 +56,7 @@ require (
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/pborman/uuid v1.2.0
+	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/peterh/liner v0.0.0-20190123174540-a2c9a5303de7
 	github.com/prometheus/tsdb v0.7.1
 	github.com/rjeczalik/notify v0.9.1
@@ -72,6 +75,7 @@ require (
 	github.com/tyler-smith/go-bip39 v0.0.0-20181017060643-dbb3b84ba2ef
 	github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208
 	golang.org/x/crypto v0.0.0-20191219195013-becbf705a915
+	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/sys v0.0.0-20191220220014-0732a990476f
 	golang.org/x/text v0.3.2
@@ -79,6 +83,7 @@ require (
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20180302121509-abf0ba0be5d5
 	gopkg.in/urfave/cli.v1 v1.20.0
+	gopkg.in/yaml.v2 v2.2.8 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
 
 )

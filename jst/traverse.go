@@ -12,7 +12,6 @@ import (
 
 type AnalysisT struct {
 	OpenMetaDescription string
-	TraverseOptions
 	schemaTitles map[string]string
 
 	recurseIter   int
@@ -24,11 +23,6 @@ type AnalysisT struct {
 		and have isCycle just be "findSchema", returning the mutated schema if any.
 		Look up orig--mutated by index/uniquetitle.
 	*/
-}
-
-type TraverseOptions struct {
-	ExpandAtNode bool
-	UniqueOnly   bool
 }
 
 func NewAnalysisT() *AnalysisT {
@@ -133,130 +127,57 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 		return errors.New("traverse called on nil schema")
 	}
 
-	sch.AsWritable()
-
-	if a.ExpandAtNode {
-		spec.ExpandSchema(sch, sch, nil)
-	}
-
 	// Keep a pristine copy of the value on the recurse stack.
 	// The incoming pointer value will be mutated.
 	cp := &spec.Schema{}
 	*cp = *sch
 
-	// If depth-first, a duplicity check should happen immediately before the onnode function
-	// is called.
-	//	If the schema (prior to mutation) is a duplicate of any other known
-	// 	unmutated schema, then if the matching schema was mutated, it should be reverted.
-	//  Otherwise, the schema is unique, and can be mutated, storing it's mutated ref
-	//  in the history (in case a later duplicate is found).
-
-	// If breadth-first, a duplicity check should happen immediately.
-	//  If a duplicate schema is found (comparing originals), then the duplicate should be
-	//  reverted to it's original value. The mutator should not be called.
-
-	// ---
-
-	// If unique only is set, and the recursion iter == 0 (at root schema)
-	//  then the Traverse function should call itself using a unique schema registry closure.
-	//  Once unique schemas have been collected
-
-	if a.UniqueOnly {
-		if a.seen(sch) {
-			a.setHistory(a.mutatedStack, cp, iter)
-			return nil
-		}
+	if a.seen(sch) {
+		return nil
 	}
 
-	for len(a.recursorStack)-1 < iter {
-		a.recursorStack = append(a.recursorStack, nil)
-	}
-	a.recursorStack[iter] = cp
+	a.setHistory(a.recursorStack, cp, iter)
 
-	rec := func(s *spec.Schema, fn func(n *spec.Schema) error) error {
-		return a.Traverse(s, fn)
+	final := func(s *spec.Schema) error {
+		err := onNode(s)
+		a.setHistory(a.mutatedStack, s, iter)
+		return err
 	}
 
 	// jsonschema slices.
 	for i := 0; i < len(sch.AnyOf); i++ {
-		rec(&sch.AnyOf[i], onNode)
+		a.Traverse(&sch.AnyOf[i], onNode)
 	}
 	for i := 0; i < len(sch.AllOf); i++ {
-		rec(&sch.AllOf[i], onNode)
+		a.Traverse(&sch.AllOf[i], onNode)
 	}
 	for i := 0; i < len(sch.OneOf); i++ {
-		rec(&sch.OneOf[i], onNode)
+		a.Traverse(&sch.OneOf[i], onNode)
 	}
 
 	// jsonschemama maps
 	for k := range sch.Properties {
 		v := sch.Properties[k]
-		rec(&v, onNode)
+		a.Traverse(&v, onNode)
 		sch.Properties[k] = v
 	}
 	for k := range sch.PatternProperties {
 		v := sch.PatternProperties[k]
-		rec(&v, onNode)
+		a.Traverse(&v, onNode)
 		sch.PatternProperties[k] = v
 	}
 
 	// jsonschema special type
 	if sch.Items == nil {
-		return onNode(sch)
+		return final(sch)
 	}
 	if sch.Items.Len() > 1 {
 		for i := range sch.Items.Schemas {
-			rec(&sch.Items.Schemas[i], onNode)
+			a.Traverse(&sch.Items.Schemas[i], onNode)
 		}
 	} else {
-		rec(sch.Items.Schema, onNode)
+		a.Traverse(sch.Items.Schema, onNode)
 	}
 
-	return onNode(sch)
+	return final(sch)
 }
-
-/*
-	unique := func() bool {
-		if !a.UniqueOnly {
-			return true // we don't care, fake uniqueness
-		}
-
-		for i := range a.recursorStack {
-			for j := range a.recursorStack {
-				if i == j {
-					continue
-				}
-				if mustWriteJSON(a.recursorStack[i]) == mustWriteJSON(a.recursorStack[j]) {
-					return false
-				}
-			}
-		}
-		return true
-	}()
-
-	final := func(unique bool, s *spec.Schema) {
-		if unique {
-			onNode(s)
-			for len(a.mutatedStack)-1 < a.recurseIter {
-				a.mutatedStack = append(a.mutatedStack, nil)
-			}
-			a.mutatedStack[a.recurseIter] = s
-		} else {
-			*s =
-		}
-
-		if a.UniqueOnly {
-			for i := range a.recursorStack {
-				for j := range a.recursorStack {
-					if i == j {
-						continue
-					}
-					if mustWriteJSON(a.recursorStack[i]) == mustWriteJSON(a.recursorStack[j]) {
-						*a.mutatedStack[i] = *a.recursorStack[i]
-						continue
-					}
-				}
-			}
-		}
-	}()
-*/

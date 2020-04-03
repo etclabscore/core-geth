@@ -49,42 +49,71 @@ func (s schemaMatcher) String() string {
 	return fmt.Sprintf("%v", s.s)
 }
 
-func traverseTest(t *testing.T, prop string, options *TraverseOptions, sch *spec.Schema, expectCallTotal int) {
+type traverseTestOptions struct {
+	UniqueOnly bool
+}
+
+func traverseTest(t *testing.T, prop string, options *traverseTestOptions, sch *spec.Schema, expectCallTotal int) {
 
 	runTest := func(a *AnalysisT, prop string, sch *spec.Schema, expectCallTotal int) {
 		testController := NewController(t)
 		mockMutator := NewMockMutator(testController)
 
 		mutatorCalledN := 0
-		fmt.Printf("'%s' unique=%v schema=\n%s\n", prop, a.TraverseOptions.UniqueOnly, mustWriteJSONIndent(sch))
+		fmt.Printf("'%s' unique=%v schema=\n%s\n", prop, options.UniqueOnly, mustWriteJSONIndent(sch))
+
+		registryUniq := make(map[string]*spec.Schema)
+		registryDupe := make(map[string]*spec.Schema)
+		if options.UniqueOnly {
+			a.Traverse(sch, func(s *spec.Schema) error {
+				// If the key already exist in the registery
+				k := mustWriteJSON(s)
+				if _, ok := registryUniq[k]; ok {
+					delete(registryUniq, k)
+					registryDupe[k] = s
+				} else {
+					registryUniq[k] = s
+				}
+				return nil
+			})
+		}
+
 		a.Traverse(sch, func(s *spec.Schema) error {
+			if options.UniqueOnly {
+				_, ok := registryUniq[mustWriteJSON(s)]
+				if !ok {
+					return nil
+				}
+			}
 			mutatorCalledN++
-			fmt.Printf("'%s' unique=%v mutatorCalledN=%d, a.recurseIter=%d %s %s\n", prop, a.TraverseOptions.UniqueOnly, mutatorCalledN, a.recurseIter, strings.Repeat(" .", a.recurseIter-mutatorCalledN), mustWriteJSON(s))
+			fmt.Printf("'%s' unique=%v mutatorCalledN=%d, a.recurseIter=%d %s %s\n", prop, options.UniqueOnly, mutatorCalledN, a.recurseIter, strings.Repeat(" .", a.recurseIter-mutatorCalledN), mustWriteJSON(s))
 			matcher := newSchemaMatcherFromJSON(s)
 			mockMutator.EXPECT().OnSchema(matcher).Times(1)
 			return mockMutator.OnSchema(s)
 		})
+
 		if mutatorCalledN != expectCallTotal {
-			t.Errorf("bad mutator call total: '%s' unique=%v want=%d got=%d", prop, a.TraverseOptions.UniqueOnly, expectCallTotal, mutatorCalledN)
+			t.Errorf("bad mutator call total: '%s' unique=%v want=%d got=%d", prop, options.UniqueOnly, expectCallTotal, mutatorCalledN)
 		} else {
-			fmt.Printf("'%s' unique=%v OK: mutatorCalledN %d/%d\n", prop, a.TraverseOptions.UniqueOnly, mutatorCalledN, expectCallTotal)
+			fmt.Printf("'%s' unique=%v OK: mutatorCalledN %d/%d\n", prop, options.UniqueOnly, mutatorCalledN, expectCallTotal)
 		}
 		fmt.Println()
 		testController.Finish()
 	}
 
-	a := NewAnalysisT()
-	if options != nil {
-		a.TraverseOptions = *options
+	if options == nil {
+		options = &traverseTestOptions{}
 	}
+
+	a := NewAnalysisT()
 	prop = t.Name() + ":" + prop
 	runTest(a, prop, sch, expectCallTotal)
 }
 
 func TestAnalysisT_Traverse(t *testing.T) {
 
-	type traverseTestsOptsExpect map[*int]*TraverseOptions
-	traverseUniqueOpts := &TraverseOptions{UniqueOnly: true}
+	type traverseTestsOptsExpect map[*int]*traverseTestOptions
+	traverseUniqueOpts := &traverseTestOptions{UniqueOnly: true}
 	pint := func(i int) *int {
 		return &i
 	}
@@ -110,13 +139,13 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		for _, s := range []string{"anyOf", "allOf", "oneOf"} {
 			runTraverseTestWithOptsExpect(t, s, traverseTestsOptsExpect{
 				pint(3): nil,
-				pint(2): traverseUniqueOpts,
+				pint(1): traverseUniqueOpts,
 			}, newBasicSchema(s, nil))
 		}
 
 		runTraverseTestWithOptsExpect(t, "traverses items when items is ordered list", traverseTestsOptsExpect{
 			pint(3): nil,
-			pint(2): traverseUniqueOpts,
+			pint(1): traverseUniqueOpts,
 		}, newBasicSchema("items", nil))
 
 		runTraverseTestWithOptsExpect(t, "traverses items when items constrained to single schema", traverseTestsOptsExpect{
@@ -130,7 +159,7 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		// equivalent schemas at multiple paths will not be called.
 		runTraverseTestWithOptsExpect(t, "traverses properties", traverseTestsOptsExpect{
 			pint(3): nil,
-			pint(2): traverseUniqueOpts,
+			pint(1): traverseUniqueOpts,
 		}, mustReadSchema(`{"properties": {"a": {}, "b": {}}}`))
 	})
 
@@ -224,46 +253,46 @@ func TestAnalysisT_Traverse(t *testing.T) {
 
 		runTraverseTestWithOptsExpect(t, "chained in media res different branch", traverseTestsOptsExpect{
 			pint(17): nil,
-			pint(14): traverseUniqueOpts,
+			pint(11): traverseUniqueOpts,
 		}, func() *spec.Schema {
 			raw := `{
-  "title": "1",
-  "type": "object",
-  "properties": {
-    "foo": {
-      "title": "2",
-      "anyOf": [
-        {
-          "title": "3",
-          "type": "array",
-          "items": {
-            "title": "4",
-            "properties": {
-              "baz": {
-                "title": "5"
-              }
-            }
-          }
-        }
-      ]
-    },
-    "bar": {
-      "title": "6",
-      "type": "object",
-      "allOf": [
-        {
-          "title": "7",
-          "type": "object",
-          "properties": {
-            "baz": {
-              "title": "8"
-            }
-          }
-        }
-      ]
-    }
-  }
-}`
+			  "title": "1",
+			  "type": "object",
+			  "properties": {
+				"foo": {
+				  "title": "2",
+				  "anyOf": [
+					{
+					  "title": "3",
+					  "type": "array",
+					  "items": {
+						"title": "4",
+						"properties": {
+						  "baz": {
+							"title": "5"
+						  }
+						}
+					  }
+					}
+				  ]
+				},
+				"bar": {
+				  "title": "6",
+				  "type": "object",
+				  "allOf": [
+					{
+					  "title": "7",
+					  "type": "object",
+					  "properties": {
+						"baz": {
+						  "title": "8"
+						}
+					  }
+					}
+				  ]
+				}
+			  }
+			}`
 			s := mustReadSchema(raw)
 			s.Properties["foo"].AnyOf[0].Items.Schema.Properties["baz"] = *mustReadSchema(raw)
 			s.Properties["bar"].AllOf[0].Properties["baz"] = mustReadSchema(raw).Properties["foo"].AnyOf[0]
@@ -272,47 +301,47 @@ func TestAnalysisT_Traverse(t *testing.T) {
 
 		runTraverseTestWithOptsExpect(t, "multiple cycles", traverseTestsOptsExpect{
 			pint(8): nil,
-			pint(7): traverseUniqueOpts,
+			pint(6): traverseUniqueOpts,
 		}, func() *spec.Schema {
 
 			raw := `{
-  "title": "1",
-  "type": "object",
-  "properties": {
-    "foo": {
-      "title": "2",
-      "anyOf": [
-        {
-          "title": "3",
-          "type": "array",
-          "items": {
-            "title": "4",
-            "properties": {
-              "baz": {
-                "title": "5"
-              }
-            }
-          }
-        }
-      ]
-    },
-    "bar": {
-      "title": "6",
-      "type": "object",
-      "allOf": [
-        {
-          "title": "7",
-          "type": "object",
-          "properties": {
-            "baz": {
-              "title": "8"
-            }
-          }
-        }
-      ]
-    }
-  }
-}`
+			  "title": "1",
+			  "type": "object",
+			  "properties": {
+				"foo": {
+				  "title": "2",
+				  "anyOf": [
+					{
+					  "title": "3",
+					  "type": "array",
+					  "items": {
+						"title": "4",
+						"properties": {
+						  "baz": {
+							"title": "5"
+						  }
+						}
+					  }
+					}
+				  ]
+				},
+				"bar": {
+				  "title": "6",
+				  "type": "object",
+				  "allOf": [
+					{
+					  "title": "7",
+					  "type": "object",
+					  "properties": {
+						"baz": {
+						  "title": "8"
+						}
+					  }
+					}
+				  ]
+				}
+			  }
+			}`
 
 			s := mustReadSchema(raw)
 			s.Properties["bar"].AllOf[0].Properties["baz"] = mustReadSchema(raw).Properties["foo"].AnyOf[0].Items.Schema.Properties["baz"]
@@ -323,34 +352,34 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		}())
 	})
 
+
+	mutationTest := func(domain string, newAnalyst func() *AnalysisT, s *spec.Schema, mut func(*spec.Schema) error, checkFn func(*AnalysisT, *spec.Schema)) {
+
+		fmt.Printf("mutation test '%s' Before @schema=\n%s\n", domain, mustWriteJSONIndent(s))
+
+		a := newAnalyst()
+		a.Traverse(s, mut)
+		fmt.Printf("mutation test '%s' After @schema=\n%s\n", domain, mustWriteJSONIndent(s))
+
+		// Checks.
+		checkFn(a, s)
+		if len(a.recursorStack) != len(a.mutatedStack) {
+			fmt.Printf("mutation test '%s' After @schema=\n%s\n", domain, mustWriteJSONIndent(s))
+			t.Error("bad")
+		}
+
+		// Logs.
+		for i, v := range a.recursorStack {
+			fmt.Println("orig=", mustWriteJSON(v), "mutated=", mustWriteJSON(a.mutatedStack[i]))
+		}
+	}
+
+	// Test that every node gets mutated.
 	t.Run("mutator function mutates schema values", func(t *testing.T) {
 
 		descriptionMutator := func(s *spec.Schema) error {
 			s.Description = "baz"
 			return nil
-		}
-
-		mutationTest := func(domain string, newAnalyst func() *AnalysisT, s *spec.Schema, mut func(*spec.Schema) error, checkFn func(*AnalysisT, *spec.Schema)) {
-
-			fmt.Printf("mutation test '%s' Before @schema=\n%s\n", domain, mustWriteJSONIndent(s))
-
-			a := newAnalyst()
-
-			a.Traverse(s, mut)
-
-		fmt.Printf("mutation test '%s' After @schema=\n%s\n", domain, mustWriteJSONIndent(s))
-
-			// Tests.
-			checkFn(a, s)
-			if len(a.recursorStack) != len(a.mutatedStack) {
-				fmt.Printf("mutation test '%s' After @schema=\n%s\n", domain, mustWriteJSONIndent(s))
-				t.Error("bad")
-			}
-
-			// Logs.
-			for i, v := range a.recursorStack {
-				fmt.Println("orig=", mustWriteJSON(v), "mutated=", mustWriteJSON(a.mutatedStack[i]))
-			}
 		}
 
 		basicSchema := mustReadSchema(`{"title": "object", "properties": {"foo": {"title": "bar"}}}`)
@@ -364,22 +393,22 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		})
 
 		anyOfSchema := mustReadSchema(`
-{
-  "anyOf": [
-    {
-      "type": "object",
-      "properties": {
-        "foo": {}
-      }
-    },
-    {
-      "type": "object",
-      "properties": {
-        "foo": {}
-      }
-    }
-  ]
-}`)
+		{
+		  "anyOf": [
+			{
+			  "type": "object",
+			  "properties": {
+				"foo": {}
+			  }
+			},
+			{
+			  "type": "object",
+			  "properties": {
+				"foo": {}
+			  }
+			}
+		  ]
+		}`)
 
 		mutationTest("anyOf nonunique", NewAnalysisT, anyOfSchema, descriptionMutator, func(aa *AnalysisT, s *spec.Schema) {
 			if s.Description != "baz" {
@@ -398,29 +427,60 @@ func TestAnalysisT_Traverse(t *testing.T) {
 				t.Error(".anyOf[1].foo not baz")
 			}
 		})
+	})
 
+	// Test (demonstration) a usage pattern that only mutates uniq nodes.
+	t.Run("uniq mutations pattern test", func(t *testing.T) {
 		anyOfSchema2 := mustReadSchema(`
-{
-  "anyOf": [
-    {
-      "type": "object",
-      "properties": {
-        "foo": {}
-      }
-    },
-    {
-      "type": "object",
-      "properties": {
-        "foo": {}
-      }
-    }
-  ]
-}`)
+		{
+		  "anyOf": [
+			{
+			  "type": "object",
+			  "properties": {
+				"foo": {}
+			  }
+			},
+			{
+			  "type": "object",
+			  "properties": {
+				"foo": {}
+			  }
+			}
+		  ]
+		}`)
+
+
+		registryUniq := make(map[string]*spec.Schema)
+		registryDupe := make(map[string]*spec.Schema)
+		descriptionMutatorCollectUniq := func(s *spec.Schema) error {
+			k := mustWriteJSON(s)
+			if _, ok := registryUniq[k]; ok {
+				delete(registryUniq, k)
+				registryDupe[k] = s
+				return nil
+			}
+			registryUniq[k] = s
+			return nil
+		}
+		descriptionMutatorIfUniq := func(s *spec.Schema) error {
+			if _, ok := registryUniq[mustWriteJSON(s)]; !ok {
+				return nil
+			}
+			s.Description = "baz"
+			return nil
+		}
+
+		a := NewAnalysisT()
+
+		// Pass 1: Collect the dictionaries of unique and duped schemas for the whole graph.
+		a.Traverse(anyOfSchema2, descriptionMutatorCollectUniq)
+
+		// Pass 2: Run the mutation test using the -IfUniq mutator, expecting that
+		// only schemas identified in Pass 1 as unique will be mutated.
 		mutationTest("anyOf unique", func() *AnalysisT {
 			a := NewAnalysisT()
-			a.UniqueOnly = true
 			return a
-		}, anyOfSchema2, descriptionMutator, func(aa *AnalysisT, s *spec.Schema) {
+		}, anyOfSchema2, descriptionMutatorIfUniq, func(aa *AnalysisT, s *spec.Schema) {
 			if s.Description != "baz" {
 				t.Error(". not baz")
 			}
@@ -441,55 +501,57 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		})
 	})
 
-	t.Run("unique schemas memoization pattern", func(t *testing.T) {
+	// Distinct schemas represents at most one of each schema object.
+	// This is different from unique schemas, since schemas with dupes
+	// are included one time, instead of zero times.
+	t.Run("distinct schemas memoization pattern", func(t *testing.T) {
 		s := func() *spec.Schema {
 			raw := `{
-  "title": "1",
-  "type": "object",
-  "properties": {
-    "foo": {
-      "title": "2",
-      "anyOf": [
-        {
-          "title": "3",
-          "type": "array",
-          "items": {
-            "title": "4",
-            "properties": {
-              "baz": {
-                "title": "5"
-              }
-            }
-          }
-        }
-      ]
-    },
-    "bar": {
-      "title": "6",
-      "type": "object",
-      "allOf": [
-        {
-          "title": "7",
-          "type": "object",
-          "properties": {
-            "baz": {
-                "title": "5"
-			},
-			"baz2": {
-                "title": "5"
-			}
-          }
-        }
-      ]
-    }
-  }
-}`
+			  "title": "1",
+			  "type": "object",
+			  "properties": {
+				"foo": {
+				  "title": "2",
+				  "anyOf": [
+					{
+					  "title": "3",
+					  "type": "array",
+					  "items": {
+						"title": "4",
+						"properties": {
+						  "baz": {
+							"title": "5"
+						  }
+						}
+					  }
+					}
+				  ]
+				},
+				"bar": {
+				  "title": "6",
+				  "type": "object",
+				  "allOf": [
+					{
+					  "title": "7",
+					  "type": "object",
+					  "properties": {
+						"baz": {
+							"title": "5"
+						},
+						"baz2": {
+							"title": "5"
+						}
+					  }
+					}
+				  ]
+				}
+			  }
+			}`
 			s := mustReadSchema(raw)
 			return s
 		}()
 
 		a := NewAnalysisT()
-		a.UniqueOnly = true
 
 		registry := make(map[string]*spec.Schema)
 

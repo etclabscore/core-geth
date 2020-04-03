@@ -13,7 +13,7 @@
       "name": "Apache-2.0", 
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }, 
-    "version": "1.0.10-2020-04-03T12:07:51-05:00-1585933671"
+    "version": "1.0.10-2020-04-03T15:12:05-05:00-1585944725"
   }, 
   "servers": [
     {
@@ -816,7 +816,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/rpc.BlockNumber_string.integer.8ca3bf83"
+            "$ref": "#/components/schemas/rpc.BlockNumber_eb6f6941"
           }
         }
       ], 
@@ -1981,7 +1981,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/rpc.BlockNumber_string.integer.8ca3bf83"
+            "$ref": "#/components/schemas/rpc.BlockNumber_eb6f6941"
           }
         }, 
         {
@@ -2379,7 +2379,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.a2cd2b93"
+            "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.18c83656"
           }
         }, 
         {
@@ -2621,7 +2621,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.a2cd2b93"
+            "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.18c83656"
           }
         }
       ], 
@@ -2707,7 +2707,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/rpc.BlockNumber_string.integer.8ca3bf83"
+            "$ref": "#/components/schemas/rpc.BlockNumber_eb6f6941"
           }
         }, 
         {
@@ -2793,7 +2793,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/rpc.BlockNumber_string.integer.8ca3bf83"
+            "$ref": "#/components/schemas/rpc.BlockNumber_eb6f6941"
           }
         }
       ], 
@@ -2841,7 +2841,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.a2cd2b93"
+            "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.18c83656"
           }
         }
       ], 
@@ -3020,7 +3020,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/rpc.BlockNumber_string.integer.8ca3bf83"
+            "$ref": "#/components/schemas/rpc.BlockNumber_eb6f6941"
           }
         }
       ], 
@@ -3116,7 +3116,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.a2cd2b93"
+            "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.18c83656"
           }
         }
       ], 
@@ -3202,7 +3202,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/rpc.BlockNumber_string.integer.8ca3bf83"
+            "$ref": "#/components/schemas/rpc.BlockNumber_eb6f6941"
           }
         }, 
         {
@@ -3308,7 +3308,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.a2cd2b93"
+            "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.18c83656"
           }
         }
       ], 
@@ -3394,7 +3394,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/rpc.BlockNumber_string.integer.8ca3bf83"
+            "$ref": "#/components/schemas/rpc.BlockNumber_eb6f6941"
           }
         }, 
         {
@@ -3490,7 +3490,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.a2cd2b93"
+            "$ref": "#/components/schemas/rpc.BlockNumberOrHash_blockNumberOrHash.18c83656"
           }
         }
       ], 
@@ -3614,7 +3614,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/rpc.BlockNumber_string.integer.8ca3bf83"
+            "$ref": "#/components/schemas/rpc.BlockNumber_eb6f6941"
           }
         }, 
         {
@@ -3700,7 +3700,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/rpc.BlockNumber_string.integer.8ca3bf83"
+            "$ref": "#/components/schemas/rpc.BlockNumber_eb6f6941"
           }
         }
       ], 
@@ -5664,6 +5664,16 @@
       "3ef9ee5c": {
         "additionalProperties": true
       }, 
+      "5c5c7737": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/d6a2aa17"
+          }, 
+          {
+            "$ref": "#/components/schemas/object.7a2341f2"
+          }
+        ]
+      }, 
       "Big_string.integer.ddafdcbc": {
         "description": "*github.com/ethereum/go-ethereum/common/hexutil:Big", 
         "type": "string", 
@@ -5832,6 +5842,16 @@
         "type": "string", 
         "title": "keccak", 
         "pattern": "^0x[a-fA-F\\d]{64}$"
+      }, 
+      "d6a2aa17": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/string.blockNumberTag.5eff517d"
+          }, 
+          {
+            "$ref": "#/components/schemas/string.keccak.3242e7ca"
+          }
+        ]
       }, 
       "hexutil.Big_string.integer.e9fbc064": {
         "description": "github.com/ethereum/go-ethereum/common/hexutil:hexutil.Big", 
@@ -6052,26 +6072,6 @@
         }, 
         "additionalProperties": true
       }, 
-      "object.3b2c9309": {
-        "type": "object", 
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/string.blockNumber.ed346720"
-          }, 
-          {
-            "$ref": "#/components/schemas/string.blockHash.895f7b68"
-          }
-        ], 
-        "properties": {
-          "blockHash": {
-            "$ref": "#/components/schemas/string.blockHash.895f7b68"
-          }, 
-          "blockNumber": {
-            "$ref": "#/components/schemas/string.blockNumber.ed346720"
-          }
-        }, 
-        "additionalProperties": true
-      }, 
       "object.3c370f4d": {
         "type": "object", 
         "properties": {
@@ -6244,6 +6244,15 @@
           }
         }
       }, 
+      "object.7a2341f2": {
+        "type": "object", 
+        "properties": {
+          "requireCanonical": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
       "object.7c429d7b": {
         "type": "object", 
         "properties": {
@@ -6351,18 +6360,6 @@
           }, 
           "Scheme": {
             "$ref": "#/components/schemas/string.5b1cd571"
-          }
-        }, 
-        "additionalProperties": true
-      }, 
-      "object.a2cd2b93": {
-        "type": "object", 
-        "properties": {
-          "BlockNumberOrHash": {
-            "$ref": "#/components/schemas/object.3b2c9309"
-          }, 
-          "requireCanonical": {
-            "$ref": "#/components/schemas/boolean.420dffc4"
           }
         }, 
         "additionalProperties": true
@@ -6771,11 +6768,28 @@
         }, 
         "additionalProperties": true
       }, 
-      "rpc.BlockNumber_string.integer.8ca3bf83": {
+      "rpc.BlockNumberOrHash_blockNumberOrHash.18c83656": {
+        "description": "github.com/ethereum/go-ethereum/rpc:rpc.BlockNumberOrHash", 
+        "title": "blockNumberOrHash", 
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/d6a2aa17"
+          }, 
+          {
+            "$ref": "#/components/schemas/5c5c7737"
+          }
+        ]
+      }, 
+      "rpc.BlockNumber_eb6f6941": {
         "description": "github.com/ethereum/go-ethereum/rpc:rpc.BlockNumber", 
-        "type": "string", 
-        "title": "integer", 
-        "pattern": "^0x[a-fA-F0-9]+$"
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/string.blockNumberTag.5eff517d"
+          }, 
+          {
+            "$ref": "#/components/schemas/string.keccak.3242e7ca"
+          }
+        ]
       }, 
       "rpc.ID_string.ffd91372": {
         "description": "github.com/ethereum/go-ethereum/rpc:rpc.ID", 
@@ -6789,15 +6803,11 @@
         "title": "address", 
         "pattern": "^0x[a-fA-F\\d]{40}$"
       }, 
-      "string.blockHash.895f7b68": {
+      "string.blockNumberTag.5eff517d": {
+        "description": "The optional block height description", 
         "type": "string", 
-        "title": "blockHash", 
-        "pattern": "^0x[a-fA-F\\d]{64}$"
-      }, 
-      "string.blockNumber.ed346720": {
-        "type": "string", 
-        "title": "blockNumber", 
-        "pattern": "^0x[a-fA-F0-9]+$"
+        "title": "blockNumberTag", 
+        "enum": ["earliest", "latest", "pending"]
       }, 
       "string.bytes.99a4fec9": {
         "description": "Hex representation of a variable length byte array", 

@@ -452,7 +452,7 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 		var js jsonschema.Type
 		err := json.Unmarshal([]byte(input), &js)
 		if err != nil {
-			return nil
+			panic(err)
 		}
 		return &js
 	}
@@ -469,16 +469,23 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
           "description": "Hex representation of a Keccak 256 hash",
           "pattern": "^0x[a-fA-F\\d]{64}$"
         }`
-	//blockNumberTagD := `{
-	//      "title": "blockNumberTag",
-	//      "type": "string",
-	//      "description": "The optional block height description",
-	//      "enum": [
-	//        "earliest",
-	//        "latest",
-	//        "pending"
-	//      ]
-	//    }`
+	blockNumberTagD := `{
+	     "title": "blockNumberTag",
+	     "type": "string",
+	     "description": "The optional block height description",
+	     "enum": [
+	       "earliest",
+	       "latest",
+	       "pending"
+	     ]
+	   }`
+
+	blockNumberOrHashD := fmt.Sprintf(`{
+          "oneOf": [
+            %s,
+            %s
+          ]
+        }`, blockNumberTagD, commonHashD)
 
 	//s := jsonschema.Reflect(ethapi.Progress{})
 	//ethSyncingResultProgress, err := json.Marshal(s)
@@ -540,6 +547,35 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
           "description": "Hex representation of a variable length byte array",
           "pattern": "^0x([a-fA-F0-9]?)+$"
         }`},
+
+		{BlockNumber(0),
+			blockNumberOrHashD,
+		},
+
+		{BlockNumberOrHash{}, fmt.Sprintf(`{
+		  "title": "blockNumberOrHash",
+		  "oneOf": [
+			%s,
+			{
+			  "allOf": [
+				%s,
+				{
+				  "type": "object",
+				  "properties": {
+					"requireCanonical": {
+					  "type": "boolean"
+					}
+				  },
+				  "additionalProperties": false
+				}
+			  ]
+			}
+		  ]
+		}`, blockNumberOrHashD, blockNumberOrHashD)},
+
+		//{
+		//	BlockNumber(0): blockNumberOrHashD,
+		//},
 
 		//{BlockNumberOrHash{}, fmt.Sprintf(`{
 		//  "title": "blockNumberOrHash",

@@ -70,7 +70,7 @@ func traverseTest(t *testing.T, prop string, options *traverseTestOptions, sch *
 		registryDupe := make(map[string]*spec.Schema)
 		if options.UniqueOnly {
 			a.WalkDepthFirst(sch, func(s *spec.Schema) error {
-				// If the key already exist in the registery
+				// If the key already exist in the registry
 				k := mustWriteJSON(s)
 				if _, ok := registryUniq[k]; ok {
 					delete(registryUniq, k)
@@ -448,17 +448,18 @@ func TestAnalysisT_WalkDepthFirst1(t *testing.T) {
 	// Test that every node in the graph gets mutated gets mutated.
 	t.Run("mutator function mutates schema values", func(t *testing.T) {
 
+		const mockDescription = "baz"
 		descriptionMutator := func(s *spec.Schema) error {
-			s.Description = "baz"
+			s.Description = mockDescription
 			return nil
 		}
 
 		basicSchema := mustReadSchema(`{"title": "object", "properties": {"foo": {"title": "bar"}}}`)
 		mutationTest("basic", NewAnalysisT, basicSchema, descriptionMutator, func(aa *AnalysisT, s *spec.Schema) {
-			if s.Description != "baz" {
+			if s.Description != mockDescription {
 				t.Error("notbaz")
 			}
-			if s.Properties["foo"].Description != "baz" {
+			if s.Properties["foo"].Description != mockDescription {
 				t.Error(".foo not baz")
 			}
 		})
@@ -482,19 +483,19 @@ func TestAnalysisT_WalkDepthFirst1(t *testing.T) {
 		}`)
 
 		mutationTest("anyOf nonunique", NewAnalysisT, anyOfSchema, descriptionMutator, func(aa *AnalysisT, s *spec.Schema) {
-			if s.Description != "baz" {
+			if s.Description != mockDescription {
 				t.Error(". not baz")
 			}
-			if s.AnyOf[0].Description != "baz" {
+			if s.AnyOf[0].Description != mockDescription {
 				t.Error(".anyOf[0] not baz")
 			}
-			if s.AnyOf[0].Properties["foo"].Description != "baz" {
+			if s.AnyOf[0].Properties["foo"].Description != mockDescription {
 				t.Error(".anyOf[0].foo not baz")
 			}
-			if s.AnyOf[1].Description != "baz" {
+			if s.AnyOf[1].Description != mockDescription {
 				t.Error(".anyOf[1] not baz")
 			}
-			if s.AnyOf[1].Properties["foo"].Description != "baz" {
+			if s.AnyOf[1].Properties["foo"].Description != mockDescription {
 				t.Error(".anyOf[1].foo not baz")
 			}
 		})
@@ -532,11 +533,12 @@ func TestAnalysisT_WalkDepthFirst1(t *testing.T) {
 			registryUniq[k] = s
 			return nil
 		}
+		const mockDescription = "baz"
 		descriptionMutatorIfUniq := func(s *spec.Schema) error {
 			if _, ok := registryUniq[mustWriteJSON(s)]; !ok {
 				return nil
 			}
-			s.Description = "baz"
+			s.Description = mockDescription
 			return nil
 		}
 
@@ -551,21 +553,21 @@ func TestAnalysisT_WalkDepthFirst1(t *testing.T) {
 			a := NewAnalysisT()
 			return a
 		}, anyOfSchema2, descriptionMutatorIfUniq, func(aa *AnalysisT, s *spec.Schema) {
-			if s.Description != "baz" {
+			if s.Description != mockDescription {
 				t.Error(". not baz")
 			}
-			if s.AnyOf[0].Description == "baz" {
+			if s.AnyOf[0].Description == mockDescription {
 				t.Error(".anyOf[0] is baz")
 			}
-			if s.AnyOf[0].Properties["foo"].Description == "baz" {
+			if s.AnyOf[0].Properties["foo"].Description == mockDescription {
 				t.Error(".anyOf[0].foo is baz")
 			}
 			// PTAL: Since the mutator runs from the bottom-up (depth-first traversal),
 			// the
-			if s.AnyOf[1].Description == "baz" {
+			if s.AnyOf[1].Description == mockDescription {
 				t.Error(".anyOf[1] is baz")
 			}
-			if s.AnyOf[1].Properties["foo"].Description == "baz" {
+			if s.AnyOf[1].Properties["foo"].Description == mockDescription {
 				t.Error(".anyOf[1].foo is baz")
 			}
 		})

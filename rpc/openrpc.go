@@ -43,6 +43,7 @@ import (
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
 
+
 func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 
 	if s.doc == nil {

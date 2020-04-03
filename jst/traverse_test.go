@@ -62,6 +62,10 @@ func traverseTest(t *testing.T, prop string, options *traverseTestOptions, sch *
 		mutatorCalledN := 0
 		fmt.Printf("'%s' unique=%v schema=\n%s\n", prop, options.UniqueOnly, mustWriteJSONIndent(sch))
 
+		// Unique pattern is provided as an option, with the logic
+		// provided here as a convenience.
+		// This allows tests to expectations for unique node counts (fairly human readable),
+		// compared to total node counts.
 		registryUniq := make(map[string]*spec.Schema)
 		registryDupe := make(map[string]*spec.Schema)
 		if options.UniqueOnly {
@@ -110,16 +114,69 @@ func traverseTest(t *testing.T, prop string, options *traverseTestOptions, sch *
 	runTest(a, prop, sch, expectCallTotal)
 }
 
+//
+//func TestSchemaItems(t *testing.T) {
+//
+//	raw := `{
+//			  "title": "1-top",
+//			  "type": "object",
+//			  "properties": {
+//				"foo": {
+//				  "title": "2",
+//				  "items": [
+//					{
+//					  "title": "3",
+//					  "type": "array",
+//					  "items": {
+//						"title": "1-top",
+//						"type": "object",
+//						"properties": {
+//						  "foo": {
+//							"title": "2",
+//							"items": [
+//							  {
+//								"title": "3",
+//								"type": "array",
+//								"items": {
+//								  "title": "4-maxdepth"
+//								}
+//							  }
+//							]
+//						  }
+//						}
+//					  }
+//					}
+//				  ]
+//				}
+//			  }
+//			}`
+//
+//	sch := mustReadSchema(raw)
+//
+//	if sch.Properties["foo"].Items == nil {
+//		t.Fatal("bad")
+//	}
+//	if sch.Properties["foo"].Items.Len() != 1 {
+//		t.Fatal("bad")
+//	}
+//}
+
 func TestAnalysisT_Traverse(t *testing.T) {
 
 	type traverseTestsOptsExpect map[*int]*traverseTestOptions
-	traverseUniqueOpts := &traverseTestOptions{UniqueOnly: true}
+	uniqueOpts := &traverseTestOptions{UniqueOnly: true}
 	pint := func(i int) *int {
 		return &i
 	}
 
 	runTraverseTestWithOptsExpect := func(t *testing.T, prop string, oe traverseTestsOptsExpect, sch *spec.Schema) {
 		for k := range oe {
+
+			// You can limit the test scenarios that run with a whitelist on prop match.
+			//if prop != "chained" {
+			//	return
+			//}
+
 			v := oe[k]
 			traverseTest(t, prop, v, sch, *k)
 		}
@@ -139,19 +196,19 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		for _, s := range []string{"anyOf", "allOf", "oneOf"} {
 			runTraverseTestWithOptsExpect(t, s, traverseTestsOptsExpect{
 				pint(3): nil,
-				pint(1): traverseUniqueOpts,
+				pint(1): uniqueOpts,
 			}, newBasicSchema(s, nil))
 		}
 
 		runTraverseTestWithOptsExpect(t, "traverses items when items is ordered list", traverseTestsOptsExpect{
 			pint(3): nil,
-			pint(1): traverseUniqueOpts,
+			pint(1): uniqueOpts,
 		}, newBasicSchema("items", nil))
 
 		runTraverseTestWithOptsExpect(t, "traverses items when items constrained to single schema", traverseTestsOptsExpect{
-			pint(3): nil,
-			pint(3): traverseUniqueOpts,
-		}, mustReadSchema(`{"items": {"items": {"a": {}, "b": {}}}}`))
+			pint(2): nil,
+			pint(2): uniqueOpts,
+		}, mustReadSchema(`{"items": {"a": {}, "b": {}}}`))
 
 		// This test is a good example of behavior.
 		// The schema at properties.a is equivalent to the one at properties.b
@@ -159,17 +216,25 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		// equivalent schemas at multiple paths will not be called.
 		runTraverseTestWithOptsExpect(t, "traverses properties", traverseTestsOptsExpect{
 			pint(3): nil,
-			pint(1): traverseUniqueOpts,
+			pint(1): uniqueOpts,
 		}, mustReadSchema(`{"properties": {"a": {}, "b": {}}}`))
 	})
 
 	t.Run("cycle detection", func(t *testing.T) {
+
+		// Expect that
 		runTraverseTestWithOptsExpect(t, "basic", traverseTestsOptsExpect{
 			pint(3): nil,
-			pint(3): traverseUniqueOpts,
+			pint(3): uniqueOpts,
 		}, func() *spec.Schema {
 
-			raw := `{"type": "object", "properties": {"foo": {}}}`
+			raw := `{
+			  "type": "object",
+			  "properties": {
+				"foo": {}
+			  }
+			}`
+
 			s := mustReadSchema(raw)
 			s.Properties["foo"] = *mustReadSchema(raw)
 			return s
@@ -185,7 +250,7 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		*/
 		//runTraverseTestWithOptsExpect(t, "basic-ref", traverseTestsOptsExpect{
 		//	pint(3): nil,
-		//	pint(3): traverseUniqueOpts,
+		//	pint(3): uniqueOpts,
 		//}, func() *spec.Schema {
 		//
 		//	raw := `{"type": "object", "properties": {"foo": {}}}`
@@ -195,10 +260,9 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		//
 		//}())
 
-
 		runTraverseTestWithOptsExpect(t, "chained", traverseTestsOptsExpect{
-			pint(2): nil,
-			pint(2): traverseUniqueOpts,
+			pint(7): nil,
+			pint(7): uniqueOpts,
 		}, func() *spec.Schema {
 
 			raw := `{
@@ -228,7 +292,7 @@ func TestAnalysisT_Traverse(t *testing.T) {
 
 		runTraverseTestWithOptsExpect(t, "chained in media res", traverseTestsOptsExpect{
 			pint(8): nil,
-			pint(8): traverseUniqueOpts,
+			pint(8): uniqueOpts,
 		}, func() *spec.Schema {
 			raw := `{
 			  "title": "1",
@@ -261,7 +325,7 @@ func TestAnalysisT_Traverse(t *testing.T) {
 
 		runTraverseTestWithOptsExpect(t, "chained in media res different branch", traverseTestsOptsExpect{
 			pint(17): nil,
-			pint(11): traverseUniqueOpts,
+			pint(11): uniqueOpts,
 		}, func() *spec.Schema {
 			raw := `{
 			  "title": "1",
@@ -309,7 +373,7 @@ func TestAnalysisT_Traverse(t *testing.T) {
 
 		runTraverseTestWithOptsExpect(t, "multiple cycles", traverseTestsOptsExpect{
 			pint(8): nil,
-			pint(6): traverseUniqueOpts,
+			pint(6): uniqueOpts,
 		}, func() *spec.Schema {
 
 			raw := `{
@@ -360,7 +424,6 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		}())
 	})
 
-
 	mutationTest := func(domain string, newAnalyst func() *AnalysisT, s *spec.Schema, mut func(*spec.Schema) error, checkFn func(*AnalysisT, *spec.Schema)) {
 
 		fmt.Printf("mutation test '%s' Before @schema=\n%s\n", domain, mustWriteJSONIndent(s))
@@ -382,7 +445,7 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		}
 	}
 
-	// Test that every node gets mutated.
+	// Test that every node in the graph gets mutated gets mutated.
 	t.Run("mutator function mutates schema values", func(t *testing.T) {
 
 		descriptionMutator := func(s *spec.Schema) error {
@@ -456,7 +519,6 @@ func TestAnalysisT_Traverse(t *testing.T) {
 			}
 		  ]
 		}`)
-
 
 		registryUniq := make(map[string]*spec.Schema)
 		registryDupe := make(map[string]*spec.Schema)

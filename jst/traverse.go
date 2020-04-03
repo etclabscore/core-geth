@@ -12,7 +12,7 @@ import (
 
 type AnalysisT struct {
 	OpenMetaDescription string
-	schemaTitles map[string]string
+	schemaTitles        map[string]string
 
 	recurseIter   int
 	recursorStack []*spec.Schema
@@ -96,11 +96,11 @@ func (a *AnalysisT) setHistory(sl []*spec.Schema, item *spec.Schema, index int) 
 	if len(sl) == 0 || sl == nil {
 		sl = []*spec.Schema{}
 	}
-	if len(sl) - 1 >= index {
+	if len(sl)-1 >= index {
 		*sl[index] = *item
 		return
 	}
-	for len(sl) -1 < index {
+	for len(sl)-1 < index {
 		sl = append(sl, nil)
 	}
 	sl[index] = item
@@ -157,12 +157,13 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 	if sch.Items == nil {
 		return final(sch)
 	}
-	if sch.Items.Len() > 1 {
+
+	if sch.Items.Schema != nil {
+		a.Traverse(sch.Items.Schema, onNode)
+	} else {
 		for i := range sch.Items.Schemas {
 			a.Traverse(&sch.Items.Schemas[i], onNode)
 		}
-	} else {
-		a.Traverse(sch.Items.Schema, onNode)
 	}
 
 	return final(sch)

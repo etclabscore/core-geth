@@ -111,13 +111,13 @@ func TestAnalysisOnNode(t *testing.T) {
 	}
 
 	aa := jst.NewAnalysisT()
-	err = aa.Traverse(&schema, testOnNode)
+	err = aa.WalkDepthFirst(&schema, testOnNode)
 	if err != nil {
 		t.Error(err)
 	}
 
 	schema.Properties["foo"] = schema
-	err = aa.Traverse(&schema, testOnNode)
+	err = aa.WalkDepthFirst(&schema, testOnNode)
 	if err != nil {
 		t.Error(err)
 	}

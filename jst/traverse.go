@@ -78,14 +78,6 @@ func (a *AnalysisT) RegisterSchema(sch spec.Schema, titleKeyer func(schema spec.
 	a.schemaTitles[string(b)] = titleKeyer(sch)
 }
 
-func (a *AnalysisT) SchemaFromRef(psch spec.Schema, ref spec.Ref) (schema spec.Schema, err error) {
-	v, _, err := ref.GetPointer().Get(psch)
-	if err != nil {
-		return
-	}
-	return v.(spec.Schema), nil
-}
-
 func schemasAreEquivalent(s1, s2 *spec.Schema) bool {
 	spec.ExpandSchema(s1, nil, nil)
 	spec.ExpandSchema(s2, nil, nil)

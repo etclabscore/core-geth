@@ -132,7 +132,6 @@ func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
 // FIXME: Name me something better/organize me better.
 func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 	a := jst.NewAnalysisT()
-	a.TraverseOptions = jst.TraverseOptions{ExpandAtNode: true}
 
 	uniqueKeyFn := func(sch spec.Schema) string {
 		b, _ := json.Marshal(sch)
@@ -172,6 +171,20 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 		met := doc.Methods[im]
 		fmt.Println(met.Name)
 
+		expander := func(sch *spec.Schema) error {
+			return spec.ExpandSchema(sch, nil, nil)
+		}
+
+		/*
+		removeDefinitions is a workaround to get rid of definitions at each schema,
+		instead of doing what we probably should which is updating the reference uri against
+		the document root
+		*/
+		removeDefinitions := func(sch *spec.Schema) error {
+			sch.Definitions = nil
+			return nil
+		}
+
 		referencer := func(sch *spec.Schema) error {
 
 			err := registerSchema(*sch)
@@ -195,23 +208,14 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 			return nil
 		}
 
-		/*
-		removeDefinitions is a workaround to get rid of definitions at each schema,
-		instead of doing what we probably should which is updating the reference uri against
-		the document root
-		*/
-		removeDefinitions := func(sch *spec.Schema) error {
-			sch.Definitions = nil
-			return nil
-		}
-
 		// Params.
 		for ip := 0; ip < len(met.Params); ip++ {
 			par := met.Params[ip]
 			fmt.Println(" < ", par.Name)
 
-			a.Traverse(&par.Schema, removeDefinitions)
-			a.Traverse(&par.Schema, referencer)
+			a.WalkDepthFirst(&par.Schema, expander)
+			a.WalkDepthFirst(&par.Schema, removeDefinitions)
+			a.WalkDepthFirst(&par.Schema, referencer)
 			met.Params[ip] = par
 			fmt.Println("   :", mustMarshalString(par))
 		}
@@ -219,8 +223,9 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 		// Result (single).
 		//fmt.Println(" > ", doc.Methods[im].Result.Name)
 
-		a.Traverse(&met.Result.Schema, removeDefinitions)
-		a.Traverse(&met.Result.Schema, referencer)
+		a.WalkDepthFirst(&met.Result.Schema, expander)
+		a.WalkDepthFirst(&met.Result.Schema, removeDefinitions)
+		a.WalkDepthFirst(&met.Result.Schema, referencer)
 		fmt.Println("   :", mustMarshalString(&met.Result))
 	}
 

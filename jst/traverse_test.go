@@ -711,7 +711,6 @@ func TestAnalysisT_WalkDepthFirst1(t *testing.T) {
 	})
 }
 
-
 // TestDemoSchemaExpand is just an demonstration to stdout of what jsonschema.ExpandSchema does.
 func TestDemoSchemaExpand(t *testing.T) {
 	raw := `{

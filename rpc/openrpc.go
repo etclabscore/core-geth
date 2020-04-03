@@ -43,7 +43,6 @@ import (
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
 
-
 func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 
 	if s.doc == nil {
@@ -471,15 +470,15 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
           "pattern": "^0x[a-fA-F\\d]{64}$"
         }`
 	//blockNumberTagD := `{
-    //      "title": "blockNumberTag",
-    //      "type": "string",
-    //      "description": "The optional block height description",
-    //      "enum": [
-    //        "earliest",
-    //        "latest",
-    //        "pending"
-    //      ]
-    //    }`
+	//      "title": "blockNumberTag",
+	//      "type": "string",
+	//      "description": "The optional block height description",
+	//      "enum": [
+	//        "earliest",
+	//        "latest",
+	//        "pending"
+	//      ]
+	//    }`
 
 	//s := jsonschema.Reflect(ethapi.Progress{})
 	//ethSyncingResultProgress, err := json.Marshal(s)

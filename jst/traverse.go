@@ -23,9 +23,9 @@ type AnalysisT struct {
 
 func NewAnalysisT() *AnalysisT {
 	return &AnalysisT{
-		recurseIter:         0,
-		recursorStack:       []spec.Schema{},
-		mutatedStack:        []*spec.Schema{},
+		recurseIter:   0,
+		recursorStack: []spec.Schema{},
+		mutatedStack:  []*spec.Schema{},
 	}
 }
 

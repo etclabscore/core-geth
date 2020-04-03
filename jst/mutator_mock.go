@@ -5,9 +5,10 @@
 package jst
 
 import (
+	reflect "reflect"
+
 	spec "github.com/go-openapi/spec"
 	gomock "github.com/golang/mock/gomock"
-	reflect "reflect"
 )
 
 // MockMutator is a mock of Mutator interface

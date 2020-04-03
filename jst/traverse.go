@@ -15,7 +15,7 @@ type AnalysisT struct {
 	schemaTitles        map[string]string
 
 	recurseIter   int
-	recursorStack []*spec.Schema
+	recursorStack []spec.Schema
 	mutatedStack  []*spec.Schema
 
 	/*
@@ -30,7 +30,7 @@ func NewAnalysisT() *AnalysisT {
 		OpenMetaDescription: "Analysisiser",
 		schemaTitles:        make(map[string]string),
 		recurseIter:         0,
-		recursorStack:       []*spec.Schema{},
+		recursorStack:       []spec.Schema{},
 		mutatedStack:        []*spec.Schema{},
 	}
 }
@@ -92,26 +92,11 @@ func schemasAreEquivalent(s1, s2 *spec.Schema) bool {
 	return reflect.DeepEqual(s1, s2)
 }
 
-func (a *AnalysisT) setHistory(sl []*spec.Schema, item *spec.Schema, index int) {
-	if len(sl) == 0 || sl == nil {
-		sl = []*spec.Schema{}
-	}
-	if len(sl)-1 >= index {
-		*sl[index] = *item
-		return
-	}
-	for len(sl)-1 < index {
-		sl = append(sl, nil)
-	}
-	sl[index] = item
-}
-
 // analysisOnNode runs a callback function on each leaf of a the JSON schema tree.
 // It will return the first error it encounters.
-func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) error) error {
+func (a *AnalysisT) WalkDepthFirst(sch *spec.Schema, onNode func(node *spec.Schema) error) error {
 
 	a.recurseIter++
-	iter := a.recurseIter
 
 	if sch == nil {
 		return errors.New("traverse called on nil schema")
@@ -119,37 +104,34 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 
 	// Keep a pristine copy of the value on the recurse stack.
 	// The incoming pointer value will be mutated.
-	cp := &spec.Schema{}
-	*cp = *sch
-
-	a.setHistory(a.recursorStack, cp, iter)
+	a.recursorStack = append(a.recursorStack, *mustReadSchema(mustWriteJSON(sch)))
 
 	final := func(s *spec.Schema) error {
 		err := onNode(s)
-		a.setHistory(a.mutatedStack, s, iter)
+		a.mutatedStack = append([]*spec.Schema{s}, a.mutatedStack...)
 		return err
 	}
 
 	// jsonschema slices.
 	for i := 0; i < len(sch.AnyOf); i++ {
-		a.Traverse(&sch.AnyOf[i], onNode)
+		a.WalkDepthFirst(&sch.AnyOf[i], onNode)
 	}
 	for i := 0; i < len(sch.AllOf); i++ {
-		a.Traverse(&sch.AllOf[i], onNode)
+		a.WalkDepthFirst(&sch.AllOf[i], onNode)
 	}
 	for i := 0; i < len(sch.OneOf); i++ {
-		a.Traverse(&sch.OneOf[i], onNode)
+		a.WalkDepthFirst(&sch.OneOf[i], onNode)
 	}
 
 	// jsonschemama maps
 	for k := range sch.Properties {
 		v := sch.Properties[k]
-		a.Traverse(&v, onNode)
+		a.WalkDepthFirst(&v, onNode)
 		sch.Properties[k] = v
 	}
 	for k := range sch.PatternProperties {
 		v := sch.PatternProperties[k]
-		a.Traverse(&v, onNode)
+		a.WalkDepthFirst(&v, onNode)
 		sch.PatternProperties[k] = v
 	}
 
@@ -159,10 +141,10 @@ func (a *AnalysisT) Traverse(sch *spec.Schema, onNode func(node *spec.Schema) er
 	}
 
 	if sch.Items.Schema != nil {
-		a.Traverse(sch.Items.Schema, onNode)
+		a.WalkDepthFirst(sch.Items.Schema, onNode)
 	} else {
 		for i := range sch.Items.Schemas {
-			a.Traverse(&sch.Items.Schemas[i], onNode)
+			a.WalkDepthFirst(&sch.Items.Schemas[i], onNode)
 		}
 	}
 

@@ -69,7 +69,7 @@ func traverseTest(t *testing.T, prop string, options *traverseTestOptions, sch *
 		registryUniq := make(map[string]*spec.Schema)
 		registryDupe := make(map[string]*spec.Schema)
 		if options.UniqueOnly {
-			a.Traverse(sch, func(s *spec.Schema) error {
+			a.WalkDepthFirst(sch, func(s *spec.Schema) error {
 				// If the key already exist in the registery
 				k := mustWriteJSON(s)
 				if _, ok := registryUniq[k]; ok {
@@ -82,7 +82,7 @@ func traverseTest(t *testing.T, prop string, options *traverseTestOptions, sch *
 			})
 		}
 
-		a.Traverse(sch, func(s *spec.Schema) error {
+		a.WalkDepthFirst(sch, func(s *spec.Schema) error {
 			if options.UniqueOnly {
 				_, ok := registryUniq[mustWriteJSON(s)]
 				if !ok {
@@ -161,7 +161,7 @@ func traverseTest(t *testing.T, prop string, options *traverseTestOptions, sch *
 //	}
 //}
 
-func TestAnalysisT_Traverse(t *testing.T) {
+func TestAnalysisT_WalkDepthFirst1(t *testing.T) {
 
 	type traverseTestsOptsExpect map[*int]*traverseTestOptions
 	uniqueOpts := &traverseTestOptions{UniqueOnly: true}
@@ -429,7 +429,7 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		fmt.Printf("mutation test '%s' Before @schema=\n%s\n", domain, mustWriteJSONIndent(s))
 
 		a := newAnalyst()
-		a.Traverse(s, mut)
+		a.WalkDepthFirst(s, mut)
 		fmt.Printf("mutation test '%s' After @schema=\n%s\n", domain, mustWriteJSONIndent(s))
 
 		// Checks.
@@ -543,7 +543,7 @@ func TestAnalysisT_Traverse(t *testing.T) {
 		a := NewAnalysisT()
 
 		// Pass 1: Collect the dictionaries of unique and duped schemas for the whole graph.
-		a.Traverse(anyOfSchema2, descriptionMutatorCollectUniq)
+		a.WalkDepthFirst(anyOfSchema2, descriptionMutatorCollectUniq)
 
 		// Pass 2: Run the mutation test using the -IfUniq mutator, expecting that
 		// only schemas identified in Pass 1 as unique will be mutated.
@@ -625,7 +625,7 @@ func TestAnalysisT_Traverse(t *testing.T) {
 
 		registry := make(map[string]*spec.Schema)
 
-		a.Traverse(s, func(s *spec.Schema) error {
+		a.WalkDepthFirst(s, func(s *spec.Schema) error {
 			registry[mustWriteJSON(s)] = s
 			return nil
 		})
@@ -640,7 +640,77 @@ func TestAnalysisT_Traverse(t *testing.T) {
 			n++
 		}
 	})
+
+	t.Run("walk order", func(t *testing.T) {
+		raw := `{
+		  "type": "object",
+		  "properties": {
+			"foo": {
+			  "type": "object",
+			  "properties": {
+				"bar": {
+				  "title": "baz"
+				}
+			  }
+			}
+		  }
+		}`
+
+		s := mustReadSchema(raw)
+		a := NewAnalysisT()
+
+		a.WalkDepthFirst(s, func(node *spec.Schema) error {
+			node.Description = "touched"
+			return nil
+		})
+
+		if l := len(a.recursorStack); l != 3 {
+			for _, s := range a.recursorStack {
+				fmt.Println(mustWriteJSON(s))
+			}
+			t.Fatal("bad recursor stack", l)
+		}
+		if len(a.recursorStack) != len(a.mutatedStack) {
+			for _, m := range a.mutatedStack {
+				fmt.Println(mustWriteJSON(m))
+			}
+			t.Fatal("bad mutated stack", len(a.mutatedStack))
+		}
+
+		wantEqual := func(s1, s2 *spec.Schema) {
+			fmt.Println(mustWriteJSON(s1), mustWriteJSON(s2))
+			if !schemasAreEquivalent(s1, s2) {
+				t.Error("not eq")
+			}
+		}
+		// Walk ordering.
+		for i, item := range a.recursorStack {
+			switch i {
+			case 0:
+				wantEqual(&item, mustReadSchema(raw))
+			case 1:
+				raw := `{
+						  "type": "object",
+						  "properties": {
+							"bar": {
+							  "title": "baz"
+							}
+						  }
+						}`
+				wantEqual(&item, mustReadSchema(raw))
+			case 2:
+				raw := `{"title": "baz"}`
+				wantEqual(&item, mustReadSchema(raw))
+			}
+		}
+
+		// Walk orig/mutations.
+		for i := range a.recursorStack {
+			fmt.Println(mustWriteJSON(a.recursorStack[i]), " => ", mustWriteJSON(a.mutatedStack[i]))
+		}
+	})
 }
+
 
 // TestDemoSchemaExpand is just an demonstration to stdout of what jsonschema.ExpandSchema does.
 func TestDemoSchemaExpand(t *testing.T) {

@@ -107,22 +107,31 @@ func (bn BlockNumber) Int64() int64 {
 	return (int64)(bn)
 }
 
+type BlockNumberOrHashT struct {
+	BlockNumber *BlockNumber `json:"blockNumber,omitempty" jsonschema:"oneof"`
+	BlockHash   *common.Hash `json:"blockHash,omitempty" jsonschema:"oneof"`
+}
+
 type BlockNumberOrHash struct {
-	BlockNumber      *BlockNumber `json:"blockNumber,omitempty"`
-	BlockHash        *common.Hash `json:"blockHash,omitempty"`
-	RequireCanonical bool         `json:"requireCanonical,omitempty"`
+	BlockNumberOrHash BlockNumberOrHashT // `jsonschema:"type=BlockNumberOrHash,title=BlockNumberOrHash"`
+	RequireCanonical  bool               `json:"requireCanonical,omitempty" jsonschema:"requireCanonical"`
 }
 
 func (bnh *BlockNumberOrHash) UnmarshalJSON(data []byte) error {
-	type erased BlockNumberOrHash
-	e := erased{}
+	//type erased BlockNumberOrHash
+	//e := erased{}
+	type oldBoH struct {
+		BlockNumberOrHashT
+		RequireCanonical bool `json:"requireCanonical,omitempty" jsonschema:"requireCanonical"`
+	}
+	e := oldBoH{}
 	err := json.Unmarshal(data, &e)
 	if err == nil {
 		if e.BlockNumber != nil && e.BlockHash != nil {
 			return fmt.Errorf("cannot specify both BlockHash and BlockNumber, choose one or the other")
 		}
-		bnh.BlockNumber = e.BlockNumber
-		bnh.BlockHash = e.BlockHash
+		bnh.BlockNumberOrHash.BlockNumber = e.BlockNumber
+		bnh.BlockNumberOrHash.BlockHash = e.BlockHash
 		bnh.RequireCanonical = e.RequireCanonical
 		return nil
 	}
@@ -134,15 +143,15 @@ func (bnh *BlockNumberOrHash) UnmarshalJSON(data []byte) error {
 	switch input {
 	case "earliest":
 		bn := EarliestBlockNumber
-		bnh.BlockNumber = &bn
+		bnh.BlockNumberOrHash.BlockNumber = &bn
 		return nil
 	case "latest":
 		bn := LatestBlockNumber
-		bnh.BlockNumber = &bn
+		bnh.BlockNumberOrHash.BlockNumber = &bn
 		return nil
 	case "pending":
 		bn := PendingBlockNumber
-		bnh.BlockNumber = &bn
+		bnh.BlockNumberOrHash.BlockNumber = &bn
 		return nil
 	default:
 		if len(input) == 66 {
@@ -151,7 +160,7 @@ func (bnh *BlockNumberOrHash) UnmarshalJSON(data []byte) error {
 			if err != nil {
 				return err
 			}
-			bnh.BlockHash = &hash
+			bnh.BlockNumberOrHash.BlockHash = &hash
 			return nil
 		} else {
 			blckNum, err := hexutil.DecodeUint64(input)
@@ -162,38 +171,42 @@ func (bnh *BlockNumberOrHash) UnmarshalJSON(data []byte) error {
 				return fmt.Errorf("blocknumber too high")
 			}
 			bn := BlockNumber(blckNum)
-			bnh.BlockNumber = &bn
+			bnh.BlockNumberOrHash.BlockNumber = &bn
 			return nil
 		}
 	}
 }
 
 func (bnh *BlockNumberOrHash) Number() (BlockNumber, bool) {
-	if bnh.BlockNumber != nil {
-		return *bnh.BlockNumber, true
+	if bnh.BlockNumberOrHash.BlockNumber != nil {
+		return *bnh.BlockNumberOrHash.BlockNumber, true
 	}
 	return BlockNumber(0), false
 }
 
 func (bnh *BlockNumberOrHash) Hash() (common.Hash, bool) {
-	if bnh.BlockHash != nil {
-		return *bnh.BlockHash, true
+	if bnh.BlockNumberOrHash.BlockHash != nil {
+		return *bnh.BlockNumberOrHash.BlockHash, true
 	}
 	return common.Hash{}, false
 }
 
 func BlockNumberOrHashWithNumber(blockNr BlockNumber) BlockNumberOrHash {
 	return BlockNumberOrHash{
-		BlockNumber:      &blockNr,
-		BlockHash:        nil,
+		BlockNumberOrHash: BlockNumberOrHashT{
+			BlockNumber: &blockNr,
+			BlockHash:   nil,
+		},
 		RequireCanonical: false,
 	}
 }
 
 func BlockNumberOrHashWithHash(hash common.Hash, canonical bool) BlockNumberOrHash {
 	return BlockNumberOrHash{
-		BlockNumber:      nil,
-		BlockHash:        &hash,
+		BlockNumberOrHash: BlockNumberOrHashT{
+			BlockNumber: nil,
+			BlockHash:   &hash,
+		},
 		RequireCanonical: canonical,
 	}
 }

@@ -269,7 +269,7 @@ func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (
 		Name:        name,
 		Tags:        []goopenrpcT.Tag{},
 		Summary:     fn.Doc.Text(),
-		Description: "", // fmt.Sprintf(`%s@%s:%d'`, rt.Name(), file, line),
+		Description: fmt.Sprintf("`%s`\n> [%s:%d][file://%s]", rt.Name(), file, line, file),
 		ExternalDocs: goopenrpcT.ExternalDocs{
 			Description: rt.Name(),
 			URL:         fmt.Sprintf("file://%s:%d", file, line),
@@ -392,7 +392,7 @@ func makeContentDescriptor(ty reflect.Type, field *ast.Field, ident argIdent) (g
 	cd.Description = field.Comment.Text()
 
 	rflctr := jsonschema.Reflector{
-		AllowAdditionalProperties:  false, // false,
+		AllowAdditionalProperties:  true, // false,
 		RequiredFromJSONSchemaTags: true,
 		ExpandedStruct:             false, // false, // false,
 		//IgnoredTypes:               []interface{}{chaninterface},
@@ -469,16 +469,16 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
           "description": "Hex representation of a Keccak 256 hash",
           "pattern": "^0x[a-fA-F\\d]{64}$"
         }`
-	blockNumberTagD := `{
-          "title": "blockNumberTag",
-          "type": "string",
-          "description": "The optional block height description",
-          "enum": [
-            "earliest",
-            "latest",
-            "pending"
-          ]
-        }`
+	//blockNumberTagD := `{
+    //      "title": "blockNumberTag",
+    //      "type": "string",
+    //      "description": "The optional block height description",
+    //      "enum": [
+    //        "earliest",
+    //        "latest",
+    //        "pending"
+    //      ]
+    //    }`
 
 	//s := jsonschema.Reflect(ethapi.Progress{})
 	//ethSyncingResultProgress, err := json.Marshal(s)
@@ -541,17 +541,17 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
           "pattern": "^0x([a-fA-F0-9]?)+$"
         }`},
 
-		{BlockNumberOrHash{}, fmt.Sprintf(`{
-		  "title": "blockNumberOrHash",
-		  "description": "Hex representation of a block number or hash",
-		  "oneOf": [%s, %s]
-		}`, commonHashD, integerD)},
+		//{BlockNumberOrHash{}, fmt.Sprintf(`{
+		//  "title": "blockNumberOrHash",
+		//  "description": "Hex representation of a block number or hash",
+		//  "oneOf": [%s, %s]
+		//}`, commonHashD, integerD)},
 
-		{BlockNumber(0), fmt.Sprintf(`{
-		  "title": "blockNumberOrTag",
-		  "description": "Block tag or hex representation of a block number",
-		  "oneOf": [%s, %s]
-		}`, commonHashD, blockNumberTagD)},
+		//{BlockNumber(0), fmt.Sprintf(`{
+		//  "title": "blockNumberOrTag",
+		//  "description": "Block tag or hex representation of a block number",
+		//  "oneOf": [%s, %s]
+		//}`, commonHashD, blockNumberTagD)},
 
 		//		{ethapi.EthSyncingResult{}, fmt.Sprintf(`{
 		//          "title": "ethSyncingResult",

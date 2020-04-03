@@ -6,14 +6,10 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/go-openapi/jsonreference"
 	"github.com/go-openapi/spec"
 )
 
 type AnalysisT struct {
-	OpenMetaDescription string
-	schemaTitles        map[string]string
-
 	recurseIter   int
 	recursorStack []spec.Schema
 	mutatedStack  []*spec.Schema
@@ -27,8 +23,6 @@ type AnalysisT struct {
 
 func NewAnalysisT() *AnalysisT {
 	return &AnalysisT{
-		OpenMetaDescription: "Analysisiser",
-		schemaTitles:        make(map[string]string),
 		recurseIter:         0,
 		recursorStack:       []spec.Schema{},
 		mutatedStack:        []*spec.Schema{},
@@ -58,24 +52,6 @@ func mustWriteJSONIndent(v interface{}) string {
 		panic(err.Error())
 	}
 	return string(b)
-}
-
-func (a *AnalysisT) SchemaAsReferenceSchema(sch spec.Schema) (refSchema spec.Schema, err error) {
-	b, _ := json.Marshal(sch)
-	titleKey, ok := a.schemaTitles[string(b)]
-	if !ok {
-		bb, _ := json.Marshal(sch)
-		return refSchema, fmt.Errorf("schema not available as reference: %s @ %v", string(b), string(bb))
-	}
-	refSchema.Ref = spec.Ref{
-		Ref: jsonreference.MustCreateRef("#/components/schemas/" + titleKey),
-	}
-	return
-}
-
-func (a *AnalysisT) RegisterSchema(sch spec.Schema, titleKeyer func(schema spec.Schema) string) {
-	b, _ := json.Marshal(sch)
-	a.schemaTitles[string(b)] = titleKeyer(sch)
 }
 
 func schemasAreEquivalent(s1, s2 *spec.Schema) bool {

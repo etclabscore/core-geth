@@ -30,6 +30,7 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/alecthomas/jsonschema"
 	"github.com/davecgh/go-spew/spew"
@@ -37,6 +38,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/jst"
+	"github.com/go-openapi/jsonreference"
 	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
@@ -46,6 +48,9 @@ func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 	if s.doc == nil {
 		s.doc = NewOpenRPCDescription(s.server)
 	}
+
+	spl := strings.Split(s.doc.Doc.Info.Version, "+")
+	s.doc.Doc.Info.Version = fmt.Sprintf("%s-%s-%d", spl[0], time.Now().Format(time.RFC3339), time.Now().Unix())
 
 	for module, list := range s.methods() {
 		if module == "rpc" {
@@ -155,16 +160,6 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 		return out
 	}
 
-	registerSchema := func(leaf spec.Schema) error {
-		a.RegisterSchema(leaf, uniqueKeyFn)
-		return nil
-	}
-
-	mustMarshalString := func(v interface{}) string {
-		b, _ := json.Marshal(v)
-		return string(b)
-	}
-
 	doc.Components.Schemas = make(map[string]spec.Schema)
 	for im := 0; im < len(doc.Methods); im++ {
 
@@ -172,13 +167,13 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 		fmt.Println(met.Name)
 
 		expander := func(sch *spec.Schema) error {
-			return spec.ExpandSchema(sch, nil, nil)
+			return spec.ExpandSchema(sch, sch, nil)
 		}
 
 		/*
-		removeDefinitions is a workaround to get rid of definitions at each schema,
-		instead of doing what we probably should which is updating the reference uri against
-		the document root
+			removeDefinitions is a workaround to get rid of definitions at each schema,
+			instead of doing what we probably should which is updating the reference uri against
+			the document root
 		*/
 		removeDefinitions := func(sch *spec.Schema) error {
 			sch.Definitions = nil
@@ -187,24 +182,16 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 
 		referencer := func(sch *spec.Schema) error {
 
-			err := registerSchema(*sch)
-			if err != nil {
-				fmt.Println("!!! ", err)
-				return err
+			schFingerprint := uniqueKeyFn(*sch)
+			doc.Components.Schemas[schFingerprint] = *sch
+			*sch = spec.Schema{
+				SchemaProps: spec.SchemaProps{
+					Ref: spec.Ref{
+						Ref: jsonreference.MustCreateRef("#/components/schemas/" + schFingerprint),
+					},
+				},
 			}
 
-			fmt.Println("   *", mustMarshalString(sch))
-
-			r, err := a.SchemaAsReferenceSchema(*sch)
-			if err != nil {
-				fmt.Println("error getting schema as ref-only schema")
-				return err
-			}
-
-			doc.Components.Schemas[uniqueKeyFn(*sch)] = *sch
-			*sch = r
-
-			fmt.Println("    @", mustMarshalString(sch))
 			return nil
 		}
 
@@ -217,16 +204,12 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 			a.WalkDepthFirst(&par.Schema, removeDefinitions)
 			a.WalkDepthFirst(&par.Schema, referencer)
 			met.Params[ip] = par
-			fmt.Println("   :", mustMarshalString(par))
 		}
 
 		// Result (single).
-		//fmt.Println(" > ", doc.Methods[im].Result.Name)
-
 		a.WalkDepthFirst(&met.Result.Schema, expander)
 		a.WalkDepthFirst(&met.Result.Schema, removeDefinitions)
 		a.WalkDepthFirst(&met.Result.Schema, referencer)
-		fmt.Println("   :", mustMarshalString(&met.Result))
 	}
 
 	return nil

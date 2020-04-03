@@ -677,7 +677,7 @@ func TestAnalysisT_WalkDepthFirst1(t *testing.T) {
 			t.Fatal("bad mutated stack", len(a.mutatedStack))
 		}
 
-		wantEqual := func(s1, s2 *spec.Schema) {
+		checkEquivalent := func(s1, s2 *spec.Schema) {
 			fmt.Println(mustWriteJSON(s1), mustWriteJSON(s2))
 			if !schemasAreEquivalent(s1, s2) {
 				t.Error("not eq")
@@ -687,7 +687,7 @@ func TestAnalysisT_WalkDepthFirst1(t *testing.T) {
 		for i, item := range a.recursorStack {
 			switch i {
 			case 0:
-				wantEqual(&item, mustReadSchema(raw))
+				checkEquivalent(&item, mustReadSchema(raw))
 			case 1:
 				raw := `{
 						  "type": "object",
@@ -697,10 +697,10 @@ func TestAnalysisT_WalkDepthFirst1(t *testing.T) {
 							}
 						  }
 						}`
-				wantEqual(&item, mustReadSchema(raw))
+				checkEquivalent(&item, mustReadSchema(raw))
 			case 2:
 				raw := `{"title": "baz"}`
-				wantEqual(&item, mustReadSchema(raw))
+				checkEquivalent(&item, mustReadSchema(raw))
 			}
 		}
 

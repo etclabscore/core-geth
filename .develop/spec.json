@@ -13,7 +13,7 @@
       "name": "Apache-2.0", 
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }, 
-    "version": "1.0.10"
+    "version": "1.0.10-2020-04-03T08:10:00-05:00-1585919400"
   }, 
   "servers": [
     {
@@ -239,7 +239,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.d10bd15c"
+          "$ref": "#/components/schemas/object.570d3f47"
         }
       }, 
       "deprecated": false, 
@@ -266,7 +266,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/array.a101ebe7"
+          "$ref": "#/components/schemas/array.bdb672ab"
         }
       }, 
       "deprecated": false, 
@@ -590,7 +590,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.9c4d2d6c"
+          "$ref": "#/components/schemas/object.0a697c7a"
         }
       }, 
       "deprecated": false, 
@@ -827,7 +827,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.7553db0a"
+          "$ref": "#/components/schemas/object.e8167fa2"
         }
       }, 
       "deprecated": false, 
@@ -881,7 +881,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.ddb45821"
+          "$ref": "#/components/schemas/object.d6fe203b"
         }
       }, 
       "deprecated": false, 
@@ -908,7 +908,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/array.45139c9e"
+          "$ref": "#/components/schemas/array.86a62f6d"
         }
       }, 
       "deprecated": false, 
@@ -1117,7 +1117,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.2358ed25"
+          "$ref": "#/components/schemas/object.dbb2b96f"
         }
       }, 
       "deprecated": false, 
@@ -1495,7 +1495,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.435231ef"
+            "$ref": "#/components/schemas/object.babd8695"
           }
         }
       ], 
@@ -1543,7 +1543,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.435231ef"
+            "$ref": "#/components/schemas/object.babd8695"
           }
         }
       ], 
@@ -1762,7 +1762,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.cf1621f5"
+          "$ref": "#/components/schemas/object.80e5dce9"
         }
       }, 
       "deprecated": false, 
@@ -1847,7 +1847,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.3fe18ad2"
+            "$ref": "#/components/schemas/object.adccda6a"
           }
         }
       ], 
@@ -1858,7 +1858,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/array.ad2900a6"
+          "$ref": "#/components/schemas/array.3da4fc30"
         }
       }, 
       "deprecated": false, 
@@ -1895,7 +1895,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.3fe18ad2"
+            "$ref": "#/components/schemas/object.adccda6a"
           }
         }
       ], 
@@ -1906,7 +1906,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/array.ad2900a6"
+          "$ref": "#/components/schemas/array.3da4fc30"
         }
       }, 
       "deprecated": false, 
@@ -1943,7 +1943,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.3fe18ad2"
+            "$ref": "#/components/schemas/object.adccda6a"
           }
         }
       ], 
@@ -1954,7 +1954,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/array.ad2900a6"
+          "$ref": "#/components/schemas/array.3da4fc30"
         }
       }, 
       "deprecated": false, 
@@ -1991,7 +1991,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.3fe18ad2"
+            "$ref": "#/components/schemas/object.adccda6a"
           }
         }
       ], 
@@ -2002,7 +2002,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/array.ad2900a6"
+          "$ref": "#/components/schemas/array.3da4fc30"
         }
       }, 
       "deprecated": false, 
@@ -2039,7 +2039,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.3fe18ad2"
+            "$ref": "#/components/schemas/object.adccda6a"
           }
         }
       ], 
@@ -2050,7 +2050,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/array.ad2900a6"
+          "$ref": "#/components/schemas/array.3da4fc30"
         }
       }, 
       "deprecated": false, 
@@ -2087,7 +2087,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.3fe18ad2"
+            "$ref": "#/components/schemas/object.adccda6a"
           }
         }
       ], 
@@ -2098,7 +2098,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.c00394cb"
+          "$ref": "#/components/schemas/object.7b67c1b1"
         }
       }, 
       "deprecated": false, 
@@ -2369,7 +2369,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.8a6a1bbe"
+            "$ref": "#/components/schemas/object.7404ae98"
           }
         }, 
         {
@@ -2389,7 +2389,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.e985f170"
+            "$ref": "#/components/schemas/object.b5e2dae2"
           }
         }
       ], 
@@ -2481,7 +2481,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.8a6a1bbe"
+            "$ref": "#/components/schemas/object.7404ae98"
           }
         }
       ], 
@@ -2546,7 +2546,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.0275cd79"
+            "$ref": "#/components/schemas/object.dab2caef"
           }
         }
       ], 
@@ -2557,7 +2557,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.9e2748ed"
+          "$ref": "#/components/schemas/object.37e89976"
         }
       }, 
       "deprecated": false, 
@@ -2680,7 +2680,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.3675d2cd"
+          "$ref": "#/components/schemas/object.0134db4e"
         }
       }, 
       "deprecated": false, 
@@ -2728,7 +2728,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.3675d2cd"
+          "$ref": "#/components/schemas/object.0134db4e"
         }
       }, 
       "deprecated": false, 
@@ -2928,7 +2928,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/array.0fb0edbd"
+          "$ref": "#/components/schemas/array.af06fdd1"
         }
       }, 
       "deprecated": false, 
@@ -2993,7 +2993,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.3675d2cd"
+          "$ref": "#/components/schemas/object.0134db4e"
         }
       }, 
       "deprecated": false, 
@@ -3031,7 +3031,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.3675d2cd"
+          "$ref": "#/components/schemas/object.0134db4e"
         }
       }, 
       "deprecated": false, 
@@ -3058,7 +3058,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.19f42991"
+            "$ref": "#/components/schemas/object.887c33c9"
           }
         }
       ], 
@@ -3069,7 +3069,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/array.0fb0edbd"
+          "$ref": "#/components/schemas/array.af06fdd1"
         }
       }, 
       "deprecated": false, 
@@ -3127,7 +3127,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.571a6a24"
+          "$ref": "#/components/schemas/object.cccb53c3"
         }
       }, 
       "deprecated": false, 
@@ -3367,7 +3367,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.f779a0c3"
+          "$ref": "#/components/schemas/object.52f8be7f"
         }
       }, 
       "deprecated": false, 
@@ -3415,7 +3415,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.f779a0c3"
+          "$ref": "#/components/schemas/object.52f8be7f"
         }
       }, 
       "deprecated": false, 
@@ -3453,7 +3453,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.f779a0c3"
+          "$ref": "#/components/schemas/object.52f8be7f"
         }
       }, 
       "deprecated": false, 
@@ -3539,7 +3539,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.3675d2cd"
+          "$ref": "#/components/schemas/object.0134db4e"
         }
       }, 
       "deprecated": false, 
@@ -3587,7 +3587,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.3675d2cd"
+          "$ref": "#/components/schemas/object.0134db4e"
         }
       }, 
       "deprecated": false, 
@@ -3635,7 +3635,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.3675d2cd"
+          "$ref": "#/components/schemas/object.0134db4e"
         }
       }, 
       "deprecated": false, 
@@ -3846,7 +3846,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.19f42991"
+            "$ref": "#/components/schemas/object.887c33c9"
           }
         }
       ], 
@@ -3911,7 +3911,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/array.ed8a5784"
+          "$ref": "#/components/schemas/array.6846651d"
         }
       }, 
       "deprecated": false, 
@@ -3965,7 +3965,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.0275cd79"
+            "$ref": "#/components/schemas/object.dab2caef"
           }
         }, 
         {
@@ -4061,7 +4061,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.0275cd79"
+            "$ref": "#/components/schemas/object.dab2caef"
           }
         }
       ], 
@@ -4147,7 +4147,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.0275cd79"
+            "$ref": "#/components/schemas/object.dab2caef"
           }
         }
       ], 
@@ -4158,7 +4158,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.9e2748ed"
+          "$ref": "#/components/schemas/object.37e89976"
         }
       }, 
       "deprecated": false, 
@@ -4291,7 +4291,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.dc828ae0"
+          "$ref": "#/components/schemas/object.dbf7a31d"
         }
       }, 
       "deprecated": false, 
@@ -4872,7 +4872,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.fc34dba6"
+          "$ref": "#/components/schemas/object.407c012e"
         }
       }, 
       "deprecated": false, 
@@ -5060,7 +5060,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/array.bc993abe"
+          "$ref": "#/components/schemas/array.b7903ece"
         }
       }, 
       "deprecated": false, 
@@ -5211,7 +5211,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.0275cd79"
+            "$ref": "#/components/schemas/object.dab2caef"
           }
         }, 
         {
@@ -5317,7 +5317,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.0275cd79"
+            "$ref": "#/components/schemas/object.dab2caef"
           }
         }, 
         {
@@ -5365,7 +5365,7 @@
           "required": false, 
           "deprecated": false, 
           "schema": {
-            "$ref": "#/components/schemas/object.0275cd79"
+            "$ref": "#/components/schemas/object.dab2caef"
           }
         }, 
         {
@@ -5396,7 +5396,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.9e2748ed"
+          "$ref": "#/components/schemas/object.37e89976"
         }
       }, 
       "deprecated": false, 
@@ -5529,7 +5529,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.e3b6191a"
+          "$ref": "#/components/schemas/object.40312dd0"
         }
       }, 
       "deprecated": false, 
@@ -5556,7 +5556,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.d523de72"
+          "$ref": "#/components/schemas/object.07ae319c"
         }
       }, 
       "deprecated": false, 
@@ -5583,7 +5583,7 @@
         "required": false, 
         "deprecated": false, 
         "schema": {
-          "$ref": "#/components/schemas/object.33a7dae0"
+          "$ref": "#/components/schemas/object.c79a510c"
         }
       }, 
       "deprecated": false, 
@@ -5706,10 +5706,10 @@
           "$ref": "#/components/schemas/string.address.a5a48ce4"
         }
       }, 
-      "array.0fb0edbd": {
+      "array.0e3e9b72": {
         "type": "array", 
         "items": {
-          "$ref": "#/components/schemas/object.281fbaa0"
+          "$ref": "#/components/schemas/object.407c012e"
         }
       }, 
       "array.1c86b5fa": {
@@ -5732,10 +5732,10 @@
           "$ref": "#/components/schemas/string.5b1cd571"
         }
       }, 
-      "array.31368a41": {
+      "array.3da4fc30": {
         "type": "array", 
         "items": {
-          "$ref": "#/components/schemas/object.e1230289"
+          "$ref": "#/components/schemas/object.b06ee337"
         }
       }, 
       "array.3da9f289": {
@@ -5744,42 +5744,22 @@
           "$ref": "#/components/schemas/string.keccak.3242e7ca"
         }
       }, 
-      "array.45139c9e": {
+      "array.6846651d": {
         "type": "array", 
         "items": {
-          "$ref": "#/components/schemas/object.45e9a542"
+          "$ref": "#/components/schemas/object.52f8be7f"
         }
       }, 
-      "array.5a781994": {
+      "array.86a62f6d": {
         "type": "array", 
         "items": {
-          "$ref": "#/components/schemas/object.fc34dba6"
+          "$ref": "#/components/schemas/object.cd66f793"
         }
       }, 
-      "array.6d894987": {
+      "array.af06fdd1": {
         "type": "array", 
         "items": {
-          "$ref": "#/components/schemas/object.ec74cade"
-        }
-      }, 
-      "array.a101ebe7": {
-        "type": "array", 
-        "items": {
-          "$ref": "#/components/schemas/object.8ab2623e"
-        }
-      }, 
-      "array.a4316aac": {
-        "type": "array", 
-        "maxItems": 61, 
-        "minItems": 61, 
-        "items": {
-          "$ref": "#/components/schemas/object.a87c20bb"
-        }
-      }, 
-      "array.ad2900a6": {
-        "type": "array", 
-        "items": {
-          "$ref": "#/components/schemas/object.de2f0ff7"
+          "$ref": "#/components/schemas/object.dfb5504c"
         }
       }, 
       "array.b036d5dd": {
@@ -5788,22 +5768,42 @@
           "$ref": "#/components/schemas/array.3da9f289"
         }
       }, 
-      "array.bc993abe": {
+      "array.b7903ece": {
         "type": "array", 
         "items": {
-          "$ref": "#/components/schemas/object.ad5352a7"
+          "$ref": "#/components/schemas/object.cd68e2d4"
         }
       }, 
-      "array.ed8a5784": {
+      "array.bdb672ab": {
         "type": "array", 
         "items": {
-          "$ref": "#/components/schemas/object.f779a0c3"
+          "$ref": "#/components/schemas/object.3c4a0133"
+        }
+      }, 
+      "array.c6230677": {
+        "type": "array", 
+        "items": {
+          "$ref": "#/components/schemas/object.c05366b4"
+        }
+      }, 
+      "array.cea91930": {
+        "type": "array", 
+        "items": {
+          "$ref": "#/components/schemas/object.f3a6b374"
         }
       }, 
       "array.f3a92465": {
         "type": "array", 
         "items": {
           "$ref": "#/components/schemas/string.c824b4e5"
+        }
+      }, 
+      "array.f86a6d0b": {
+        "type": "array", 
+        "maxItems": 61, 
+        "minItems": 61, 
+        "items": {
+          "$ref": "#/components/schemas/object.6748bb12"
         }
       }, 
       "bool_boolean.66977b29": {
@@ -5828,14 +5828,6 @@
         "type": "string", 
         "title": "keccak", 
         "pattern": "^0x[a-fA-F\\d]{64}$"
-      }, 
-      "ethProgress.df148835": {
-        "title": "ethProgress", 
-        "required": ["Progress"]
-      }, 
-      "ethSyncing.6eede07f": {
-        "title": "ethSyncing", 
-        "required": ["Syncing"]
       }, 
       "hexutil.Big_string.integer.e9fbc064": {
         "description": "github.com/ethereum/go-ethereum/common/hexutil:hexutil.Big", 
@@ -5876,1679 +5868,869 @@
       "number.caa7697b": {
         "type": "number"
       }, 
-      "object.0275cd79": {
-        "type": "object", 
-        "properties": {
-          "data": {
-            "description": "Field 'input' should be preferred", 
-            "type": "string", 
-            "title": "dataWord", 
-            "pattern": "^0x([a-fA-F\\d]{64})?$"
-          }, 
-          "from": {
-            "type": "string", 
-            "title": "address", 
-            "pattern": "^0x[a-fA-F\\d]{40}$"
-          }, 
-          "gas": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "gasPrice": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "input": {
-            "type": "string", 
-            "title": "dataWord", 
-            "pattern": "^0x([a-fA-F\\d]{64})?$"
-          }, 
-          "nonce": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "to": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "value": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.063520ac": {
-        "type": "object", 
-        "properties": {
-          "address": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "balance": {
-            "type": "string"
-          }, 
-          "code": {
-            "type": "string"
-          }, 
-          "codeHash": {
-            "type": "string"
-          }, 
-          "key": {
-            "type": "string", 
-            "title": "dataWord", 
-            "pattern": "^0x([a-fA-F\\d]{64})?$"
-          }, 
-          "nonce": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "root": {
-            "type": "string"
-          }, 
-          "storage": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "type": "string"
-              }
-            }
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.07187e8d": {
+      "object.0134db4e": {
         "type": "object", 
         "patternProperties": {
           ".*": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/components/schemas/3ef9ee5c"
           }
         }
       }, 
-      "object.19f42991": {
-        "type": "object", 
-        "properties": {
-          "Addresses": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/string.address.a5a48ce4"
-            }
-          }, 
-          "BlockHash": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "FromBlock": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "ToBlock": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "Topics": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/array.3da9f289"
-            }
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.2358ed25": {
-        "type": "object", 
-        "properties": {
-          "Alloc": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "BuckHashSys": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "BySize": {
-            "type": "array", 
-            "maxItems": 61, 
-            "minItems": 61, 
-            "items": {
-              "$ref": "#/components/schemas/object.a87c20bb"
-            }
-          }, 
-          "DebugGC": {
-            "type": "boolean"
-          }, 
-          "EnableGC": {
-            "type": "boolean"
-          }, 
-          "Frees": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "GCCPUFraction": {
-            "type": "number"
-          }, 
-          "GCSys": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "HeapAlloc": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "HeapIdle": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "HeapInuse": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "HeapObjects": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "HeapReleased": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "HeapSys": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "LastGC": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "Lookups": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "MCacheInuse": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "MCacheSys": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "MSpanInuse": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "MSpanSys": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "Mallocs": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "NextGC": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "NumForcedGC": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "NumGC": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "OtherSys": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "PauseEnd": {
-            "type": "array", 
-            "maxItems": 256, 
-            "minItems": 256, 
-            "items": {
-              "$ref": "#/components/schemas/string.integer.edb7ed14"
-            }
-          }, 
-          "PauseNs": {
-            "type": "array", 
-            "maxItems": 256, 
-            "minItems": 256, 
-            "items": {
-              "$ref": "#/components/schemas/string.integer.edb7ed14"
-            }
-          }, 
-          "PauseTotalNs": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "StackInuse": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "StackSys": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "Sys": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "TotalAlloc": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.281fbaa0": {
-        "type": "object", 
-        "properties": {
-          "address": {
-            "type": "string", 
-            "title": "address", 
-            "pattern": "^0x[a-fA-F\\d]{40}$"
-          }, 
-          "blockHash": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "blockNumber": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "data": {
-            "type": "string", 
-            "title": "bytes", 
-            "pattern": "^0x([a-fA-F0-9]?)+$"
-          }, 
-          "logIndex": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "removed": {
-            "type": "boolean"
-          }, 
-          "topics": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/string.keccak.3242e7ca"
-            }
-          }, 
-          "transactionHash": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "transactionIndex": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.33a7dae0": {
-        "type": "object", 
-        "patternProperties": {
-          ".*": {
-            "description": "Hex representation of the integer", 
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }
-        }
-      }, 
-      "object.3675d2cd": {
-        "type": "object", 
-        "patternProperties": {
-          ".*": {
-            "additionalProperties": true
-          }
-        }
-      }, 
-      "object.3fe18ad2": {
-        "type": "object", 
-        "properties": {
-          "Debug": {
-            "type": "boolean"
-          }, 
-          "DisableMemory": {
-            "type": "boolean"
-          }, 
-          "DisableStack": {
-            "type": "boolean"
-          }, 
-          "DisableStorage": {
-            "type": "boolean"
-          }, 
-          "Limit": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "Reexec": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "Timeout": {
-            "type": "string"
-          }, 
-          "Tracer": {
-            "type": "string"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.435231ef": {
-        "type": "object", 
-        "properties": {
-          "Debug": {
-            "type": "boolean"
-          }, 
-          "DisableMemory": {
-            "type": "boolean"
-          }, 
-          "DisableStack": {
-            "type": "boolean"
-          }, 
-          "DisableStorage": {
-            "type": "boolean"
-          }, 
-          "Limit": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "Reexec": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "TxHash": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.45e9a542": {
-        "type": "object", 
-        "properties": {
-          "block": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "additionalProperties": true
-              }
-            }
-          }, 
-          "hash": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "rlp": {
-            "type": "string"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.47942c40": {
+      "object.068731ee": {
         "type": "object", 
         "properties": {
           "inbound": {
-            "type": "boolean"
+            "$ref": "#/components/schemas/boolean.420dffc4"
           }, 
           "localAddress": {
-            "type": "string"
+            "$ref": "#/components/schemas/string.5b1cd571"
           }, 
           "remoteAddress": {
-            "type": "string"
+            "$ref": "#/components/schemas/string.5b1cd571"
           }, 
           "static": {
-            "type": "boolean"
+            "$ref": "#/components/schemas/boolean.420dffc4"
           }, 
           "trusted": {
-            "type": "boolean"
+            "$ref": "#/components/schemas/boolean.420dffc4"
           }
         }, 
         "additionalProperties": false
       }, 
-      "object.4c113942": {
-        "type": "object", 
-        "properties": {
-          "key": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "value": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.571a6a24": {
-        "type": "object", 
-        "properties": {
-          "accountProof": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/string.5b1cd571"
-            }
-          }, 
-          "address": {
-            "type": "string", 
-            "title": "address", 
-            "pattern": "^0x[a-fA-F\\d]{40}$"
-          }, 
-          "balance": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "codeHash": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "nonce": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "storageHash": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "storageProof": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/object.ec74cade"
-            }
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.5cb2c805": {
-        "type": "object", 
-        "properties": {
-          "discovery": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "listener": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.6ca817ca": {
-        "type": "object", 
-        "properties": {
-          "balance": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "code": {
-            "type": "string", 
-            "title": "dataWord", 
-            "pattern": "^0x([a-fA-F\\d]{64})?$"
-          }, 
-          "nonce": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "state": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "description": "Hex representation of a Keccak 256 hash", 
-                "type": "string", 
-                "title": "keccak", 
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-              }
-            }
-          }, 
-          "stateDiff": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "description": "Hex representation of a Keccak 256 hash", 
-                "type": "string", 
-                "title": "keccak", 
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-              }
-            }
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.7553db0a": {
-        "type": "object", 
-        "properties": {
-          "accounts": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "type": "object", 
-                "properties": {
-                  "address": {
-                    "type": "string", 
-                    "title": "keccak", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$"
-                  }, 
-                  "balance": {
-                    "type": "string"
-                  }, 
-                  "code": {
-                    "type": "string"
-                  }, 
-                  "codeHash": {
-                    "type": "string"
-                  }, 
-                  "key": {
-                    "type": "string", 
-                    "title": "dataWord", 
-                    "pattern": "^0x([a-fA-F\\d]{64})?$"
-                  }, 
-                  "nonce": {
-                    "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
-                  }, 
-                  "root": {
-                    "type": "string"
-                  }, 
-                  "storage": {
-                    "type": "object", 
-                    "patternProperties": {
-                      ".*": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }, 
-                "additionalProperties": false
-              }
-            }
-          }, 
-          "root": {
-            "type": "string"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.8a6a1bbe": {
-        "type": "object", 
-        "properties": {
-          "data": {
-            "type": "string", 
-            "title": "dataWord", 
-            "pattern": "^0x([a-fA-F\\d]{64})?$"
-          }, 
-          "from": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "gas": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "gasPrice": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "to": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "value": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.8ab2623e": {
-        "type": "object", 
-        "properties": {
-          "caps": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/string.5b1cd571"
-            }
-          }, 
-          "enode": {
-            "type": "string"
-          }, 
-          "enr": {
-            "type": "string"
-          }, 
-          "id": {
-            "type": "string"
-          }, 
-          "name": {
-            "type": "string"
-          }, 
-          "network": {
-            "type": "object", 
-            "properties": {
-              "inbound": {
-                "type": "boolean"
-              }, 
-              "localAddress": {
-                "type": "string"
-              }, 
-              "remoteAddress": {
-                "type": "string"
-              }, 
-              "static": {
-                "type": "boolean"
-              }, 
-              "trusted": {
-                "type": "boolean"
-              }
-            }, 
-            "additionalProperties": false
-          }, 
-          "protocols": {
-            "type": "object", 
-            "properties": {
-              "inbound": {
-                "type": "boolean"
-              }, 
-              "localAddress": {
-                "type": "string"
-              }, 
-              "remoteAddress": {
-                "type": "string"
-              }, 
-              "static": {
-                "type": "boolean"
-              }, 
-              "trusted": {
-                "type": "boolean"
-              }
-            }, 
-            "additionalProperties": false
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.9930ab61": {
+      "object.07ae319c": {
         "type": "object", 
         "patternProperties": {
           ".*": {
-            "type": "object", 
-            "properties": {
-              "address": {
-                "type": "string", 
-                "title": "keccak", 
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-              }, 
-              "balance": {
-                "type": "string"
-              }, 
-              "code": {
-                "type": "string"
-              }, 
-              "codeHash": {
-                "type": "string"
-              }, 
-              "key": {
-                "type": "string", 
-                "title": "dataWord", 
-                "pattern": "^0x([a-fA-F\\d]{64})?$"
-              }, 
-              "nonce": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "root": {
-                "type": "string"
-              }, 
-              "storage": {
-                "type": "object", 
-                "patternProperties": {
-                  ".*": {
-                    "type": "string"
-                  }
-                }
-              }
-            }, 
-            "additionalProperties": false
+            "$ref": "#/components/schemas/object.c6b1a918"
           }
         }
       }, 
-      "object.99b4fed2": {
-        "type": "object", 
-        "patternProperties": {
-          ".*": {
-            "type": "object", 
-            "properties": {
-              "key": {
-                "type": "string", 
-                "title": "keccak", 
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-              }, 
-              "value": {
-                "type": "string", 
-                "title": "keccak", 
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-              }
-            }, 
-            "additionalProperties": false
-          }
-        }
-      }, 
-      "object.9c4d2d6c": {
+      "object.0a697c7a": {
         "type": "object", 
         "properties": {
           "accounts": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "description": "Hex representation of a Keccak 256 hash POINTER", 
-                "type": "string", 
-                "title": "keccak", 
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-              }
-            }
+            "$ref": "#/components/schemas/object.f06f16ea"
           }, 
           "next": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
           }
         }, 
         "additionalProperties": false
       }, 
-      "object.9e2748ed": {
+      "object.0ea0002d": {
         "type": "object", 
         "properties": {
-          "raw": {
-            "type": "string", 
-            "title": "dataWord", 
-            "pattern": "^0x([a-fA-F\\d]{64})?$"
+          "balance": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
           }, 
-          "tx": {
-            "type": "object", 
-            "additionalProperties": false
+          "code": {
+            "$ref": "#/components/schemas/string.dataWord.e8659da6"
+          }, 
+          "nonce": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "state": {
+            "$ref": "#/components/schemas/object.301ae63f"
+          }, 
+          "stateDiff": {
+            "$ref": "#/components/schemas/object.301ae63f"
           }
         }, 
         "additionalProperties": false
       }, 
-      "object.a87c20bb": {
-        "type": "object", 
-        "properties": {
-          "Frees": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "Mallocs": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "Size": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.aaf76a54": {
-        "type": "object", 
-        "patternProperties": {
-          ".*": {
-            "description": "Hex representation of a Keccak 256 hash POINTER", 
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }
-        }
-      }, 
-      "object.ad5352a7": {
-        "type": "object", 
-        "properties": {
-          "accounts": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/object.fc34dba6"
-            }
-          }, 
-          "failure": {
-            "type": "string"
-          }, 
-          "status": {
-            "type": "string"
-          }, 
-          "url": {
-            "type": "string"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.b0d857a6": {
+      "object.1aff72d0": {
         "type": "object", 
         "properties": {
           "CurrentgBlock": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
           }, 
           "HighestgBlock": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
           }, 
           "KnownStates": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
           }, 
           "PulledStates": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
           }, 
           "StartingBlock": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
           }
         }, 
         "additionalProperties": false
       }, 
-      "object.bbfa3751": {
+      "object.301ae63f": {
         "type": "object", 
         "patternProperties": {
           ".*": {
-            "type": "string"
+            "$ref": "#/components/schemas/string.keccak.3242e7ca"
           }
         }
       }, 
-      "object.c00394cb": {
+      "object.37e89976": {
         "type": "object", 
         "properties": {
-          "failed": {
-            "type": "boolean"
+          "raw": {
+            "$ref": "#/components/schemas/string.dataWord.e8659da6"
+          }, 
+          "tx": {
+            "$ref": "#/components/schemas/object.d9873742"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.3938b1f8": {
+        "type": "object", 
+        "patternProperties": {
+          ".*": {
+            "$ref": "#/components/schemas/object.c59aedd5"
+          }
+        }
+      }, 
+      "object.3c4a0133": {
+        "type": "object", 
+        "properties": {
+          "caps": {
+            "$ref": "#/components/schemas/array.2800749e"
+          }, 
+          "enode": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "enr": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "id": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "name": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "network": {
+            "$ref": "#/components/schemas/object.068731ee"
+          }, 
+          "protocols": {
+            "$ref": "#/components/schemas/object.068731ee"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.40312dd0": {
+        "type": "object", 
+        "patternProperties": {
+          ".*": {
+            "$ref": "#/components/schemas/object.6040d586"
+          }
+        }
+      }, 
+      "object.407c012e": {
+        "type": "object", 
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/string.address.a5a48ce4"
+          }, 
+          "url": {
+            "$ref": "#/components/schemas/object.5a84eda8"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.52f8be7f": {
+        "type": "object", 
+        "properties": {
+          "blockHash": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "blockNumber": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "from": {
+            "$ref": "#/components/schemas/string.address.a5a48ce4"
           }, 
           "gas": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
           }, 
-          "returnValue": {
-            "type": "string"
+          "gasPrice": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
           }, 
-          "structLogs": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/object.e1230289"
-            }
+          "hash": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "input": {
+            "$ref": "#/components/schemas/string.dataWord.e8659da6"
+          }, 
+          "nonce": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "r": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "s": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "to": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "transactionIndex": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "v": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "value": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
           }
         }, 
         "additionalProperties": false
       }, 
-      "object.c5ee1429": {
-        "type": "object", 
-        "patternProperties": {
-          ".*": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "type": "object", 
-                "properties": {
-                  "blockHash": {
-                    "type": "string", 
-                    "title": "keccak", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$"
-                  }, 
-                  "blockNumber": {
-                    "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
-                  }, 
-                  "from": {
-                    "type": "string", 
-                    "title": "address", 
-                    "pattern": "^0x[a-fA-F\\d]{40}$"
-                  }, 
-                  "gas": {
-                    "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
-                  }, 
-                  "gasPrice": {
-                    "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
-                  }, 
-                  "hash": {
-                    "type": "string", 
-                    "title": "keccak", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$"
-                  }, 
-                  "input": {
-                    "type": "string", 
-                    "title": "dataWord", 
-                    "pattern": "^0x([a-fA-F\\d]{64})?$"
-                  }, 
-                  "nonce": {
-                    "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
-                  }, 
-                  "r": {
-                    "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
-                  }, 
-                  "s": {
-                    "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
-                  }, 
-                  "to": {
-                    "type": "string", 
-                    "title": "keccak", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$"
-                  }, 
-                  "transactionIndex": {
-                    "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
-                  }, 
-                  "v": {
-                    "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
-                  }, 
-                  "value": {
-                    "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
-                  }
-                }, 
-                "additionalProperties": false
-              }
-            }
-          }
-        }
-      }, 
-      "object.cf1621f5": {
-        "type": "object", 
-        "properties": {
-          "nextKey": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "storage": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "type": "object", 
-                "properties": {
-                  "key": {
-                    "type": "string", 
-                    "title": "keccak", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$"
-                  }, 
-                  "value": {
-                    "type": "string", 
-                    "title": "keccak", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$"
-                  }
-                }, 
-                "additionalProperties": false
-              }
-            }
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.d10bd15c": {
+      "object.570d3f47": {
         "type": "object", 
         "properties": {
           "enode": {
-            "type": "string"
+            "$ref": "#/components/schemas/string.5b1cd571"
           }, 
           "enr": {
-            "type": "string"
+            "$ref": "#/components/schemas/string.5b1cd571"
           }, 
           "id": {
-            "type": "string"
+            "$ref": "#/components/schemas/string.5b1cd571"
           }, 
           "ip": {
-            "type": "string"
+            "$ref": "#/components/schemas/string.5b1cd571"
           }, 
           "listenAddr": {
-            "type": "string"
+            "$ref": "#/components/schemas/string.5b1cd571"
           }, 
           "name": {
-            "type": "string"
+            "$ref": "#/components/schemas/string.5b1cd571"
           }, 
           "ports": {
-            "type": "object", 
-            "properties": {
-              "discovery": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "listener": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }
-            }, 
-            "additionalProperties": false
+            "$ref": "#/components/schemas/object.85323441"
           }, 
           "protocols": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "additionalProperties": true
-              }
-            }
+            "$ref": "#/components/schemas/object.0134db4e"
           }
         }, 
         "additionalProperties": false
       }, 
-      "object.d523de72": {
+      "object.5a84eda8": {
+        "type": "object", 
+        "properties": {
+          "Path": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "Scheme": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.6040d586": {
         "type": "object", 
         "patternProperties": {
           ".*": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "type": "object", 
-                "patternProperties": {
-                  ".*": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/schemas/object.70c4cc77"
           }
         }
       }, 
-      "object.d8156bd0": {
+      "object.6748bb12": {
+        "type": "object", 
+        "properties": {
+          "Frees": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "Mallocs": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "Size": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.70c4cc77": {
         "type": "object", 
         "patternProperties": {
           ".*": {
-            "description": "Hex representation of a Keccak 256 hash", 
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
+            "$ref": "#/components/schemas/object.52f8be7f"
           }
         }
+      }, 
+      "object.7404ae98": {
+        "type": "object", 
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/string.dataWord.e8659da6"
+          }, 
+          "from": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "gas": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "gasPrice": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "to": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "value": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.7b67c1b1": {
+        "type": "object", 
+        "properties": {
+          "failed": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }, 
+          "gas": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "returnValue": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "structLogs": {
+            "$ref": "#/components/schemas/array.c6230677"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.80e5dce9": {
+        "type": "object", 
+        "properties": {
+          "nextKey": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "storage": {
+            "$ref": "#/components/schemas/object.998d68fa"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.85323441": {
+        "type": "object", 
+        "properties": {
+          "discovery": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "listener": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.887c33c9": {
+        "type": "object", 
+        "properties": {
+          "Addresses": {
+            "$ref": "#/components/schemas/array.0e2ed272"
+          }, 
+          "BlockHash": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "FromBlock": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "ToBlock": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "Topics": {
+            "$ref": "#/components/schemas/array.b036d5dd"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.998d68fa": {
+        "type": "object", 
+        "patternProperties": {
+          ".*": {
+            "$ref": "#/components/schemas/object.a5375067"
+          }
+        }
+      }, 
+      "object.a5375067": {
+        "type": "object", 
+        "properties": {
+          "key": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "value": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.adccda6a": {
+        "type": "object", 
+        "properties": {
+          "Debug": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }, 
+          "DisableMemory": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }, 
+          "DisableStack": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }, 
+          "DisableStorage": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }, 
+          "Limit": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "Reexec": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "Timeout": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "Tracer": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.b06ee337": {
+        "type": "object", 
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "result": {
+            "$ref": "#/components/schemas/3ef9ee5c"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.b5e2dae2": {
+        "description": "*:", 
+        "type": "object", 
+        "patternProperties": {
+          ".*": {
+            "$ref": "#/components/schemas/object.0ea0002d"
+          }
+        }
+      }, 
+      "object.babd8695": {
+        "type": "object", 
+        "properties": {
+          "Debug": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }, 
+          "DisableMemory": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }, 
+          "DisableStack": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }, 
+          "DisableStorage": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }, 
+          "Limit": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "Reexec": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "TxHash": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.c018b64e": {
+        "type": "object", 
+        "patternProperties": {
+          ".*": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }
+        }
+      }, 
+      "object.c05366b4": {
+        "type": "object", 
+        "properties": {
+          "depth": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "error": {
+            "$ref": "#/components/schemas/3ef9ee5c"
+          }, 
+          "gas": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "gasCost": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "memory": {
+            "$ref": "#/components/schemas/array.2800749e"
+          }, 
+          "op": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "pc": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "stack": {
+            "$ref": "#/components/schemas/array.2800749e"
+          }, 
+          "storage": {
+            "$ref": "#/components/schemas/object.c018b64e"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.c59aedd5": {
+        "type": "object", 
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "balance": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "code": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "codeHash": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "key": {
+            "$ref": "#/components/schemas/string.dataWord.e8659da6"
+          }, 
+          "nonce": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "root": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "storage": {
+            "$ref": "#/components/schemas/object.c018b64e"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.c6b1a918": {
+        "type": "object", 
+        "patternProperties": {
+          ".*": {
+            "$ref": "#/components/schemas/object.c018b64e"
+          }
+        }
+      }, 
+      "object.c79a510c": {
+        "type": "object", 
+        "patternProperties": {
+          ".*": {
+            "$ref": "#/components/schemas/string.integer.edb7ed14"
+          }
+        }
+      }, 
+      "object.cccb53c3": {
+        "type": "object", 
+        "properties": {
+          "accountProof": {
+            "$ref": "#/components/schemas/array.2800749e"
+          }, 
+          "address": {
+            "$ref": "#/components/schemas/string.address.a5a48ce4"
+          }, 
+          "balance": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "codeHash": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "nonce": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "storageHash": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "storageProof": {
+            "$ref": "#/components/schemas/array.cea91930"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.cd66f793": {
+        "type": "object", 
+        "properties": {
+          "block": {
+            "$ref": "#/components/schemas/object.0134db4e"
+          }, 
+          "hash": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "rlp": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.cd68e2d4": {
+        "type": "object", 
+        "properties": {
+          "accounts": {
+            "$ref": "#/components/schemas/array.0e3e9b72"
+          }, 
+          "failure": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "status": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "url": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.d6fe203b": {
+        "type": "object", 
+        "properties": {
+          "LastGC": {
+            "$ref": "#/components/schemas/string.c824b4e5"
+          }, 
+          "NumGC": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "Pause": {
+            "$ref": "#/components/schemas/array.212c3507"
+          }, 
+          "PauseEnd": {
+            "$ref": "#/components/schemas/array.f3a92465"
+          }, 
+          "PauseQuantiles": {
+            "$ref": "#/components/schemas/array.212c3507"
+          }, 
+          "PauseTotal": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }
+        }, 
+        "additionalProperties": false
       }, 
       "object.d9873742": {
         "type": "object", 
         "additionalProperties": false
       }, 
-      "object.dc1bd448": {
+      "object.dab2caef": {
         "type": "object", 
-        "patternProperties": {
-          ".*": {
-            "type": "object", 
-            "properties": {
-              "blockHash": {
-                "type": "string", 
-                "title": "keccak", 
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-              }, 
-              "blockNumber": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "from": {
-                "type": "string", 
-                "title": "address", 
-                "pattern": "^0x[a-fA-F\\d]{40}$"
-              }, 
-              "gas": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "gasPrice": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "hash": {
-                "type": "string", 
-                "title": "keccak", 
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-              }, 
-              "input": {
-                "type": "string", 
-                "title": "dataWord", 
-                "pattern": "^0x([a-fA-F\\d]{64})?$"
-              }, 
-              "nonce": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "r": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "s": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "to": {
-                "type": "string", 
-                "title": "keccak", 
-                "pattern": "^0x[a-fA-F\\d]{64}$"
-              }, 
-              "transactionIndex": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "v": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "value": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }
-            }, 
-            "additionalProperties": false
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/string.dataWord.259d3594"
+          }, 
+          "from": {
+            "$ref": "#/components/schemas/string.address.a5a48ce4"
+          }, 
+          "gas": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "gasPrice": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "input": {
+            "$ref": "#/components/schemas/string.dataWord.e8659da6"
+          }, 
+          "nonce": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "to": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "value": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
           }
-        }
+        }, 
+        "additionalProperties": false
       }, 
-      "object.dc828ae0": {
+      "object.dbb2b96f": {
+        "type": "object", 
+        "properties": {
+          "Alloc": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "BuckHashSys": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "BySize": {
+            "$ref": "#/components/schemas/array.f86a6d0b"
+          }, 
+          "DebugGC": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }, 
+          "EnableGC": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }, 
+          "Frees": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "GCCPUFraction": {
+            "$ref": "#/components/schemas/number.caa7697b"
+          }, 
+          "GCSys": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "HeapAlloc": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "HeapIdle": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "HeapInuse": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "HeapObjects": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "HeapReleased": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "HeapSys": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "LastGC": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "Lookups": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "MCacheInuse": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "MCacheSys": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "MSpanInuse": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "MSpanSys": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "Mallocs": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "NextGC": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "NumForcedGC": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "NumGC": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "OtherSys": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "PauseEnd": {
+            "$ref": "#/components/schemas/array.1c86b5fa"
+          }, 
+          "PauseNs": {
+            "$ref": "#/components/schemas/array.1c86b5fa"
+          }, 
+          "PauseTotalNs": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "StackInuse": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "StackSys": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "Sys": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "TotalAlloc": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.dbf7a31d": {
         "type": "object", 
         "oneOf": [
           {
-            "$ref": "#/components/schemas/ethSyncing.6eede07f"
+            "$ref": "#/components/schemas/boolean.420dffc4"
           }, 
           {
-            "$ref": "#/components/schemas/ethProgress.df148835"
+            "$ref": "#/components/schemas/object.1aff72d0"
           }
         ], 
         "properties": {
           "Progress": {
-            "type": "object", 
-            "properties": {
-              "CurrentgBlock": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "HighestgBlock": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "KnownStates": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "PulledStates": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "StartingBlock": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }
-            }, 
-            "additionalProperties": false
+            "$ref": "#/components/schemas/object.1aff72d0"
           }, 
           "Syncing": {
-            "type": "boolean"
+            "$ref": "#/components/schemas/boolean.420dffc4"
           }
         }, 
         "additionalProperties": false
       }, 
-      "object.ddb45821": {
-        "type": "object", 
-        "properties": {
-          "LastGC": {
-            "type": "string", 
-            "format": "date-time"
-          }, 
-          "NumGC": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "Pause": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/string.integer.edb7ed14"
-            }
-          }, 
-          "PauseEnd": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/string.c824b4e5"
-            }
-          }, 
-          "PauseQuantiles": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/string.integer.edb7ed14"
-            }
-          }, 
-          "PauseTotal": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.de2f0ff7": {
-        "type": "object", 
-        "properties": {
-          "error": {
-            "type": "string"
-          }, 
-          "result": {
-            "additionalProperties": true
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.e1230289": {
-        "type": "object", 
-        "properties": {
-          "depth": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "error": {
-            "additionalProperties": true
-          }, 
-          "gas": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "gasCost": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "memory": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/string.5b1cd571"
-            }
-          }, 
-          "op": {
-            "type": "string"
-          }, 
-          "pc": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "stack": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/string.5b1cd571"
-            }
-          }, 
-          "storage": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "type": "string"
-              }
-            }
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.e3b6191a": {
-        "type": "object", 
-        "patternProperties": {
-          ".*": {
-            "type": "object", 
-            "patternProperties": {
-              ".*": {
-                "type": "object", 
-                "patternProperties": {
-                  ".*": {
-                    "type": "object", 
-                    "properties": {
-                      "blockHash": {
-                        "type": "string", 
-                        "title": "keccak", 
-                        "pattern": "^0x[a-fA-F\\d]{64}$"
-                      }, 
-                      "blockNumber": {
-                        "type": "string", 
-                        "title": "integer", 
-                        "pattern": "^0x[a-fA-F0-9]+$"
-                      }, 
-                      "from": {
-                        "type": "string", 
-                        "title": "address", 
-                        "pattern": "^0x[a-fA-F\\d]{40}$"
-                      }, 
-                      "gas": {
-                        "type": "string", 
-                        "title": "integer", 
-                        "pattern": "^0x[a-fA-F0-9]+$"
-                      }, 
-                      "gasPrice": {
-                        "type": "string", 
-                        "title": "integer", 
-                        "pattern": "^0x[a-fA-F0-9]+$"
-                      }, 
-                      "hash": {
-                        "type": "string", 
-                        "title": "keccak", 
-                        "pattern": "^0x[a-fA-F\\d]{64}$"
-                      }, 
-                      "input": {
-                        "type": "string", 
-                        "title": "dataWord", 
-                        "pattern": "^0x([a-fA-F\\d]{64})?$"
-                      }, 
-                      "nonce": {
-                        "type": "string", 
-                        "title": "integer", 
-                        "pattern": "^0x[a-fA-F0-9]+$"
-                      }, 
-                      "r": {
-                        "type": "string", 
-                        "title": "integer", 
-                        "pattern": "^0x[a-fA-F0-9]+$"
-                      }, 
-                      "s": {
-                        "type": "string", 
-                        "title": "integer", 
-                        "pattern": "^0x[a-fA-F0-9]+$"
-                      }, 
-                      "to": {
-                        "type": "string", 
-                        "title": "keccak", 
-                        "pattern": "^0x[a-fA-F\\d]{64}$"
-                      }, 
-                      "transactionIndex": {
-                        "type": "string", 
-                        "title": "integer", 
-                        "pattern": "^0x[a-fA-F0-9]+$"
-                      }, 
-                      "v": {
-                        "type": "string", 
-                        "title": "integer", 
-                        "pattern": "^0x[a-fA-F0-9]+$"
-                      }, 
-                      "value": {
-                        "type": "string", 
-                        "title": "integer", 
-                        "pattern": "^0x[a-fA-F0-9]+$"
-                      }
-                    }, 
-                    "additionalProperties": false
-                  }
-                }
-              }
-            }
-          }
-        }
-      }, 
-      "object.e985f170": {
-        "description": "*:", 
-        "type": "object", 
-        "patternProperties": {
-          ".*": {
-            "type": "object", 
-            "properties": {
-              "balance": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "code": {
-                "type": "string", 
-                "title": "dataWord", 
-                "pattern": "^0x([a-fA-F\\d]{64})?$"
-              }, 
-              "nonce": {
-                "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
-              }, 
-              "state": {
-                "type": "object", 
-                "patternProperties": {
-                  ".*": {
-                    "description": "Hex representation of a Keccak 256 hash", 
-                    "type": "string", 
-                    "title": "keccak", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$"
-                  }
-                }
-              }, 
-              "stateDiff": {
-                "type": "object", 
-                "patternProperties": {
-                  ".*": {
-                    "description": "Hex representation of a Keccak 256 hash", 
-                    "type": "string", 
-                    "title": "keccak", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$"
-                  }
-                }
-              }
-            }, 
-            "additionalProperties": false
-          }
-        }
-      }, 
-      "object.ea5c4bda": {
-        "type": "object", 
-        "properties": {
-          "Path": {
-            "type": "string"
-          }, 
-          "Scheme": {
-            "type": "string"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.ec74cade": {
-        "type": "object", 
-        "properties": {
-          "key": {
-            "type": "string"
-          }, 
-          "proof": {
-            "type": "array", 
-            "items": {
-              "$ref": "#/components/schemas/string.5b1cd571"
-            }
-          }, 
-          "value": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.f779a0c3": {
-        "type": "object", 
-        "properties": {
-          "blockHash": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "blockNumber": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "from": {
-            "type": "string", 
-            "title": "address", 
-            "pattern": "^0x[a-fA-F\\d]{40}$"
-          }, 
-          "gas": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "gasPrice": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "hash": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "input": {
-            "type": "string", 
-            "title": "dataWord", 
-            "pattern": "^0x([a-fA-F\\d]{64})?$"
-          }, 
-          "nonce": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "r": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "s": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "to": {
-            "type": "string", 
-            "title": "keccak", 
-            "pattern": "^0x[a-fA-F\\d]{64}$"
-          }, 
-          "transactionIndex": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "v": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }, 
-          "value": {
-            "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
-          }
-        }, 
-        "additionalProperties": false
-      }, 
-      "object.fc34dba6": {
+      "object.dfb5504c": {
         "type": "object", 
         "properties": {
           "address": {
-            "type": "string", 
-            "title": "address", 
-            "pattern": "^0x[a-fA-F\\d]{40}$"
+            "$ref": "#/components/schemas/string.address.a5a48ce4"
           }, 
-          "url": {
-            "type": "object", 
-            "properties": {
-              "Path": {
-                "type": "string"
-              }, 
-              "Scheme": {
-                "type": "string"
-              }
-            }, 
-            "additionalProperties": false
+          "blockHash": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "blockNumber": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "data": {
+            "$ref": "#/components/schemas/string.bytes.ad0f9edc"
+          }, 
+          "logIndex": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }, 
+          "removed": {
+            "$ref": "#/components/schemas/boolean.420dffc4"
+          }, 
+          "topics": {
+            "$ref": "#/components/schemas/array.3da9f289"
+          }, 
+          "transactionHash": {
+            "$ref": "#/components/schemas/string.keccak.8fa02b0f"
+          }, 
+          "transactionIndex": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.e8167fa2": {
+        "type": "object", 
+        "properties": {
+          "accounts": {
+            "$ref": "#/components/schemas/object.3938b1f8"
+          }, 
+          "root": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }
+        }, 
+        "additionalProperties": false
+      }, 
+      "object.f06f16ea": {
+        "type": "object", 
+        "patternProperties": {
+          ".*": {
+            "$ref": "#/components/schemas/string.keccak.bd2ff551"
+          }
+        }
+      }, 
+      "object.f3a6b374": {
+        "type": "object", 
+        "properties": {
+          "key": {
+            "$ref": "#/components/schemas/string.5b1cd571"
+          }, 
+          "proof": {
+            "$ref": "#/components/schemas/array.2800749e"
+          }, 
+          "value": {
+            "$ref": "#/components/schemas/string.integer.fe0a5094"
           }
         }, 
         "additionalProperties": false

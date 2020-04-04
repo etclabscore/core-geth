@@ -15,8 +15,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/etclabscore/go-jsonschema-traverse"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
-	"github.com/ethereum/go-ethereum/jst"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
@@ -271,7 +271,7 @@ func TestAnalysisOnNode(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	aa := jst.NewAnalysisT()
+	aa := go_jsonschema_traverse.NewAnalysisT()
 	err = aa.WalkDepthFirst(&schema, testOnNode)
 	if err != nil {
 		t.Error(err)

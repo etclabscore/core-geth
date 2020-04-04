@@ -37,10 +37,10 @@ import (
 
 	"github.com/alecthomas/jsonschema"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/etclabscore/go-jsonschema-traverse"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/jst"
 	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
@@ -53,7 +53,7 @@ const (
 )
 
 type DocumentDiscoverOpts struct {
-	Inline   bool
+	Inline          bool
 	SchemaMutations []MutateType
 	MethodBlackList []string
 }
@@ -66,8 +66,8 @@ type ServerProvider interface {
 
 type Document struct {
 	serverProvider ServerProvider
-	discoverOpts *DocumentDiscoverOpts
-	spec1 *goopenrpcT.OpenRPCSpec1
+	discoverOpts   *DocumentDiscoverOpts
+	spec1          *goopenrpcT.OpenRPCSpec1
 }
 
 func (d *Document) Document() *goopenrpcT.OpenRPCSpec1 {
@@ -92,7 +92,7 @@ func isDiscoverMethodBlacklisted(d *DocumentDiscoverOpts, name string) bool {
 	return false
 }
 
-func (d *Document) Discover() (doc *goopenrpcT.OpenRPCSpec1 , err error) {
+func (d *Document) Discover() (doc *goopenrpcT.OpenRPCSpec1, err error) {
 	if d == nil || d.serverProvider == nil {
 		return nil, errors.New("server provider undefined")
 	}
@@ -104,8 +104,8 @@ func (d *Document) Discover() (doc *goopenrpcT.OpenRPCSpec1 , err error) {
 	d.spec1.ExternalDocs = d.serverProvider.OpenRPCExternalDocs()
 
 	// Set version by runtime, after parse.
-		spl := strings.Split(d.spec1.Info.Version, "+")
-		d.spec1.Info.Version = fmt.Sprintf("%s-%s-%d", spl[0], time.Now().Format(time.RFC3339), time.Now().Unix())
+	spl := strings.Split(d.spec1.Info.Version, "+")
+	d.spec1.Info.Version = fmt.Sprintf("%s-%s-%d", spl[0], time.Now().Format(time.RFC3339), time.Now().Unix())
 
 	d.spec1.Methods = []goopenrpcT.Method{}
 	mets := d.serverProvider.Methods()
@@ -154,7 +154,7 @@ func expandSchemaMutation(s *spec.Schema) error {
 }
 
 func (d *Document) documentSchemaMutation(mut func(s *spec.Schema) error) {
-	a := jst.NewAnalysisT()
+	a := go_jsonschema_traverse.NewAnalysisT()
 	for i := 0; i < len(d.spec1.Methods); i++ {
 
 		met := d.spec1.Methods[i]
@@ -188,7 +188,6 @@ func (d *Document) documentRunSchemasMutation(id MutateType) {
 		d.documentSchemaMutation(removeDefinitionsFieldSchemaMutation)
 	}
 }
-
 
 func documentGetAstFunc(rcvr reflect.Value, fn reflect.Value, astFile *ast.File, rf *runtime.Func) *ast.FuncDecl {
 	rfName := runtimeFuncName(rf)
@@ -279,7 +278,6 @@ func NewSpec() *goopenrpcT.OpenRPCSpec1 {
 	}
 }
 
-
 func documentGetArgTypes(rcvr, val reflect.Value) (argTypes []reflect.Type) {
 	fntype := val.Type()
 	// Skip receiver and context.Context parameter (if present).
@@ -321,9 +319,9 @@ func documentMakeMethod(name string, rcvr reflect.Value, cb reflect.Value, rt *r
 	file, line := rt.FileLine(rt.Entry())
 
 	m := goopenrpcT.Method{
-		Name:        name,
-		Tags:        []goopenrpcT.Tag{},
-		Summary:     fn.Doc.Text(),
+		Name:    name,
+		Tags:    []goopenrpcT.Tag{},
+		Summary: fn.Doc.Text(),
 		//Description: fmt.Sprintf("```\n%s\n```", string(buf.Bytes())), // rt.Name(),
 		//  fmt.Sprintf("`%s`\n> [%s:%d][file://%s]", rt.Name(), file, line, file),
 		//Description: "some words",
@@ -426,7 +424,6 @@ func documentMakeMethod(name string, rcvr reflect.Value, cb reflect.Value, rt *r
 ---
 */
 
-
 //func (s *RPCService) Describe() (*goopenrpcT.OpenRPCSpec1, error) {
 //
 //	if s.doc == nil {
@@ -520,7 +517,7 @@ func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
 // Clean makes the openrpc validator happy.
 // FIXME: Name me something better/organize me better.
 func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
-	a := jst.NewAnalysisT()
+	a := go_jsonschema_traverse.NewAnalysisT()
 
 	//uniqueKeyFn := func(sch spec.Schema) string {
 	//	b, _ := json.Marshal(sch)
@@ -1103,7 +1100,6 @@ func getAstFunc(cb *callback, astFile *ast.File, rf *runtime.Func) *ast.FuncDecl
 		 => recvr= <*node.PublicAdminAPI Value> fn= PublicAdminAPI
 		 => recvr= <*eth.PrivateAdminAPI Value> fn= PrivateAdminAPI
 		*/
-
 
 		reRec := regexp.MustCompile(fnRecName + `\s`)
 		if !reRec.MatchString(cb.rcvr.String()) {

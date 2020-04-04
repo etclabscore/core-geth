@@ -312,7 +312,7 @@ func (n *Node) startInProc(apis []rpc.API) error {
 	// Register all the APIs exposed by the services
 	handler := rpc.NewServer()
 	for _, api := range apis {
-		if err := handler.RegisterName(api.Namespace, api.Service); err != nil {
+		if err := handler.RegisterReceiverWithName(api.Namespace, api.Service); err != nil {
 			return err
 		}
 		n.log.Debug("InProc registered", "namespace", api.Namespace)

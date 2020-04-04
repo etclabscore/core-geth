@@ -1,57 +1,32 @@
-// Copyright 2015 The go-ethereum Authors
-// This file is part of the go-ethereum library.
-//
-// The go-ethereum library is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// The go-ethereum library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
-
-package rpc
+package openrpc
 
 import (
 	"bufio"
-	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"net"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/ethereum/go-ethereum/internal/ethapi"
+	"github.com/ethereum/go-ethereum/jst"
+	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/go-openapi/spec"
+	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
 
-func TestServerRegisterName(t *testing.T) {
-	server := NewServer()
-	service := new(testService)
-
-	if err := server.RegisterReceiverWithName("test", service); err != nil {
-		t.Fatalf("%v", err)
-	}
-
-	if len(server.services.services) != 2 {
-		t.Fatalf("Expected 2 service entries, got %d", len(server.services.services))
-	}
-
-	svc, ok := server.services.services["test"]
-	if !ok {
-		t.Fatalf("Expected service calc to be registered")
-	}
-
-	wantCallbacks := 12
-	if len(svc.callbacks) != wantCallbacks {
-		t.Errorf("Expected %d callbacks for service 'service', got %d", wantCallbacks, len(svc.callbacks))
-	}
+func mustMarshalJSON(v interface{}) string {
+	b, _ := json.MarshalIndent(v, "", "    ")
+	return string(b)
 }
+
 
 func TestServer(t *testing.T) {
 	files, err := ioutil.ReadDir("testdata")
@@ -71,7 +46,7 @@ func TestServer(t *testing.T) {
 }
 
 func runTestScript(t *testing.T, file string) {
-	server := newTestServer()
+	server := rpc.NewServer()
 	content, err := ioutil.ReadFile(file)
 	if err != nil {
 		t.Fatal(err)
@@ -79,7 +54,7 @@ func runTestScript(t *testing.T, file string) {
 
 	clientConn, serverConn := net.Pipe()
 	defer clientConn.Close()
-	go server.ServeCodec(NewCodec(serverConn), 0)
+	go server.ServeCodec(rpc.NewCodec(serverConn), 0)
 	readbuf := bufio.NewReader(clientConn)
 	for _, line := range strings.Split(string(content), "\n") {
 		line = strings.TrimSpace(line)
@@ -113,48 +88,6 @@ func runTestScript(t *testing.T, file string) {
 	}
 }
 
-// This test checks that responses are delivered for very short-lived connections that
-// only carry a single request.
-func TestServerShortLivedConn(t *testing.T) {
-	server := newTestServer()
-	defer server.Stop()
-
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal("can't listen:", err)
-	}
-	defer listener.Close()
-	go server.ServeListener(listener)
-
-	var (
-		request  = `{"jsonrpc":"2.0","id":1,"method":"rpc_modules"}` + "\n"
-		wantResp = `{"jsonrpc":"2.0","id":1,"result":{"nftest":"1.0","rpc":"1.0","test":"1.0"}}` + "\n"
-		deadline = time.Now().Add(10 * time.Second)
-	)
-	for i := 0; i < 20; i++ {
-		conn, err := net.Dial("tcp", listener.Addr().String())
-		if err != nil {
-			t.Fatal("can't dial:", err)
-		}
-		defer conn.Close()
-		conn.SetDeadline(deadline)
-		// Write the request, then half-close the connection so the server stops reading.
-		conn.Write([]byte(request))
-		conn.(*net.TCPConn).CloseWrite()
-		// Now try to get the response.
-		buf := make([]byte, 2000)
-		n, err := conn.Read(buf)
-		if err != nil {
-			t.Fatal("read error:", err)
-		}
-		if !bytes.Equal(buf[:n], []byte(wantResp)) {
-			t.Fatalf("wrong response: %s", buf[:n])
-		}
-	}
-}
-
-
-
 type Pet struct {
 	Name         string
 	Age          int
@@ -181,14 +114,14 @@ func (s *PetStoreService) AddPet(p Pet) error {
 }
 
 func TestOpenRPCDiscover(t *testing.T) {
-	server := NewServer()
+	server := rpc.NewServer()
 	defer server.Stop()
 
 	//rpcService := &rpc.RPCService{server: server, doc: rpc.NewOpenRPCDescription(server)}
-	//err := server.RegisterReceiverWithName("eth", &ethapi.PublicBlockChainAPI{})
-	//if err != nil {
-	//	t.Fatal(err)
-	//}
+	err := server.RegisterReceiverWithName("eth", &ethapi.PublicBlockChainAPI{})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	store := &PetStoreService{
 		pets: []*Pet{
@@ -199,17 +132,16 @@ func TestOpenRPCDiscover(t *testing.T) {
 			},
 		},
 	}
-	err := server.RegisterReceiverWithName("store", store)
+	err = server.RegisterReceiverWithName("store", store)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	opts := &DocumentDiscoverOpts{
+	opts := &rpc.DocumentDiscoverOpts{
 		Inline:          false,
-		SchemaMutations: []MutateType{SchemaMutateType_Expand, SchemaMutateType_RemoveDefinitions},
-		MethodBlackList: []string{"^rpc_.*"},
+		SchemaMutations: []rpc.MutateType{rpc.SchemaMutateType_Expand, rpc.SchemaMutateType_RemoveDefinitions},
 	}
-	doc := Wrap(server, opts)
+	doc := rpc.Wrap(server, opts)
 	err = server.RegisterReceiverWithName("rpc", doc)
 	if err != nil {
 		t.Fatal(err)
@@ -232,6 +164,7 @@ func TestOpenRPCDiscover(t *testing.T) {
 		makeRequest(t, request, listener)
 	}
 
+
 }
 
 const maxReadSize = 1024*1024
@@ -251,10 +184,6 @@ func makeRequest(t *testing.T, request string, listener net.Listener) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	//fmt.Println(string(buf[:n]))
-	//fmt.Println()
-
 	pretty := make(map[string]interface{})
 	err = json.Unmarshal(buf[:n], &pretty)
 	if err != nil {
@@ -266,4 +195,91 @@ func makeRequest(t *testing.T, request string, listener net.Listener) {
 	}
 	fmt.Println(string(bufPretty))
 	fmt.Println()
+}
+
+
+
+// https://stackoverflow.com/questions/46904588/efficient-way-to-to-generate-a-random-hex-string-of-a-fixed-length-in-golang
+var src = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+// RandStringBytesMaskImprSrc returns a random hexadecimal string of length n.
+func RandStringBytesMaskImprSrc(n int) string {
+	b := make([]byte, (n+1)/2) // can be simplified to n/2 if n is always even
+
+	if _, err := src.Read(b); err != nil {
+		panic(err)
+	}
+
+	return hex.EncodeToString(b)[:n]
+}
+
+func TestOpenRPC_Analysis(t *testing.T) {
+	testSpecFile := filepath.Join("..", ".develop", "spec.json")
+	b, err := ioutil.ReadFile(testSpecFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	doc := &goopenrpcT.OpenRPCSpec1{}
+	err = json.Unmarshal(b, doc)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := rpc.Clean(doc); err != nil {
+		t.Fatal(err)
+	}
+
+	docbb, err := json.MarshalIndent(doc, "", "    ")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	//schemasbb, err := json.MarshalIndent(doc.Components.Schemas, "", "    ")
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
+
+	fmt.Println(string(docbb))
+
+	err = ioutil.WriteFile(filepath.Join("..", ".develop", "spec2.json"), docbb, os.ModePerm)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func testOnNode(node *spec.Schema) error {
+	b, err := json.MarshalIndent(node, "", "    ")
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(b))
+	return nil
+}
+
+func TestAnalysisOnNode(t *testing.T) {
+	schemaJSON := `
+{
+	"type": "object",
+	"properties": {
+		"foo": {}
+	}
+}`
+
+	schema := spec.Schema{}
+	err := json.Unmarshal([]byte(schemaJSON), &schema)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	aa := jst.NewAnalysisT()
+	err = aa.WalkDepthFirst(&schema, testOnNode)
+	if err != nil {
+		t.Error(err)
+	}
+
+	schema.Properties["foo"] = schema
+	err = aa.WalkDepthFirst(&schema, testOnNode)
+	if err != nil {
+		t.Error(err)
+	}
 }

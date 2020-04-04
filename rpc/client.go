@@ -225,12 +225,12 @@ func initClient(conn ServerCodec, idgen func() ID, services *serviceRegistry) *C
 	return c
 }
 
-// RegisterName creates a service for the given receiver type under the given name. When no
+// RegisterReceiverWithName creates a service for the given receiver type under the given name. When no
 // methods on the given receiver match the criteria to be either a RPC method or a
 // subscription an error is returned. Otherwise a new service is created and added to the
 // service collection this client provides to the server.
 func (c *Client) RegisterName(name string, receiver interface{}) error {
-	return c.services.registerName(name, receiver)
+	return c.services.registerReceiverWithName(name, receiver)
 }
 
 func (c *Client) nextID() json.RawMessage {

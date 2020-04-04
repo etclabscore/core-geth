@@ -24,13 +24,12 @@ import (
 	"io"
 	"io/ioutil"
 	"net"
-	"sort"
+	"reflect"
 	"strings"
 	"sync/atomic"
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
 
@@ -80,7 +79,7 @@ func NewServer() *Server {
 	// Register the default service providing meta information about the RPC service such
 	// as the services and methods it offers.
 	rpcService := &RPCService{server: server, doc: NewOpenRPCDescription(server)}
-	server.RegisterName(MetadataApi, rpcService)
+	server.RegisterReceiverWithName(MetadataApi, rpcService)
 	return server
 }
 
@@ -104,14 +103,15 @@ func NewServerWithListener(listener net.Listener) *Server {
 	} else if network == "ws" {
 		url = "ws:"
 	}
-	rpcService.doc.Doc.Servers = append(rpcService.doc.Doc.Servers, goopenrpcT.Server{
-		Name:        network,
-		URL:         url,
-		Summary:     "",
-		Description: params.VersionName + "/v" + params.VersionWithMeta,
-		Variables:   nil,
-	})
-	server.RegisterName(MetadataApi, rpcService)
+
+	//rpcService.doc.Doc.Servers = append(rpcService.doc.Doc.Servers, goopenrpcT.Server{
+	//	Name:        network,
+	//	URL:         url,
+	//	Summary:     "",
+	//	Description: params.VersionName + "/v" + params.VersionWithMeta,
+	//	Variables:   nil,
+	//})
+	server.RegisterReceiverWithName(MetadataApi, rpcService)
 	return server
 }
 
@@ -144,12 +144,12 @@ func (s *Server) SetOpenRPCSchemaRaw(schemaJSON string) error {
 	return nil
 }
 
-// RegisterName creates a service for the given receiver type under the given name. When no
+// RegisterReceiverWithName creates a service for the given receiver type under the given name. When no
 // methods on the given receiver match the criteria to be either a RPC method or a
 // subscription an error is returned. Otherwise a new service is created and added to the
 // service collection this server provides to clients.
-func (s *Server) RegisterName(name string, receiver interface{}) error {
-	return s.services.registerName(name, receiver)
+func (s *Server) RegisterReceiverWithName(name string, receiver interface{}) error {
+	return s.services.registerReceiverWithName(name, receiver)
 }
 
 // ServeCodec reads incoming requests from codec, calls the appropriate callback and writes
@@ -267,6 +267,74 @@ func (s *RPCService) methods() map[string][]string {
 	return methods
 }
 
+func (s *Server) Methods() (methods map[string][]reflect.Value) {
+
+	s.services.mu.Lock()
+	defer s.services.mu.Unlock()
+
+	methods = make(map[string][]reflect.Value)
+
+	mmethods := make(map[string][]string)
+	for name, ser := range s.services.services {
+		for s := range ser.callbacks {
+			_, ok := mmethods[name]
+			if !ok {
+				mmethods[name] = []string{s}
+			} else {
+				mmethods[name] = append(mmethods[name], s)
+			}
+		}
+	}
+
+	for module, list := range mmethods {
+		for _, methodName := range list {
+			fullName := strings.Join([]string{module, methodName}, serviceMethodSeparators[0])
+			method := s.services.services[module].callbacks[methodName]
+
+			// FIXME: Development only.
+			// There is a bug with the isPubSub method, it's not picking up #PublicEthAPI.eth_subscribeSyncStatus
+			// because the isPubSub conditionals are wrong or the method is wrong.
+			if method.isSubscribe || strings.Contains(fullName, subscribeMethodSuffix) {
+				continue
+			}
+
+			res := []reflect.Value{}
+			if method.rcvr.IsValid() {
+				res = append(res, method.rcvr)
+			}
+			res = append(res, method.fn)
+			methods[fullName] = []reflect.Value{}
+			methods[fullName] = append(methods[fullName], res...)
+		}
+	}
+	return
+}
+
+func (s *Server) OpenRPCInfo() goopenrpcT.Info {
+	return goopenrpcT.Info{
+		Title:          "Ethereum JSON-RPC",
+		Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
+		TermsOfService: "https://github.com/etclabscore/core-geth/blob/master/COPYING",
+		Contact: goopenrpcT.Contact{
+			Name:  "",
+			URL:   "",
+			Email: "",
+		},
+		License: goopenrpcT.License{
+			Name: "Apache-2.0",
+			URL:  "https://www.apache.org/licenses/LICENSE-2.0.html",
+		},
+		Version: "1.0.10",
+	}
+}
+
+func (s *Server) OpenRPCExternalDocs() goopenrpcT.ExternalDocs {
+	return goopenrpcT.ExternalDocs{
+		Description: "Source",
+		URL:         "https://github.com/etclabscore/core-geth",
+	}
+}
+
 func (s *RPCService) SetOpenRPCDiscoverDocument(documentPath string) error {
 	bs, err := ioutil.ReadFile(documentPath)
 	if err != nil {
@@ -351,165 +419,165 @@ type OpenRPCCheckUnderArg struct {
 //	}
 //	return describedDoc, nil
 //}
-
-func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
-	var err error
-	if s.server.OpenRPCSchemaRaw == "" {
-		return nil, errOpenRPCDiscoverUnavailable
-	}
-	referenceDoc := &goopenrpcT.OpenRPCSpec1{
-		Servers: []goopenrpcT.Server{},
-	}
-	err = json.Unmarshal([]byte(s.server.OpenRPCSchemaRaw), referenceDoc)
-	if err != nil {
-		log.Crit("openrpc json umarshal", "error", err)
-	}
-
-	describedDoc, err := s.Describe()
-	if err != nil {
-		return nil, err
-	}
-
-	check := &OpenRPCCheck{
-		Over:  []goopenrpcT.Method{},
-		Under: []goopenrpcT.Method{}, //[]OpenRPCCheckUnder{},
-	}
-
-	referenceSuper := func(reference, target *goopenrpcT.OpenRPCSpec1) (methods []goopenrpcT.Method) {
-	referenceLoop:
-		for _, r := range reference.Methods {
-			for _, t := range target.Methods {
-				if r.Name == t.Name {
-					continue referenceLoop
-				}
-			}
-			methods = append(methods, r)
-		}
-		return
-	}
-
-	check.Over = referenceSuper(referenceDoc, describedDoc)
-	check.Under = referenceSuper(describedDoc, referenceDoc)
-
-	//	// Audit documented doc methods vs. actual server availability
-	//	// This removes methods described in the OpenRPC JSON document
-	//	// which are not currently exposed on the server's API.
-	//	// This is done on the fly (as opposed to at servre init or doc setting)
-	//	// because it's possible that exposed APIs could be modified in proc.
-	//	docMethodsAvailable := []goopenrpcT.Method{}
-	//	serverMethodsAvailable := s.methods()
-	//
-	//	// Find Over methods.
-	//	// These are methods described in the document, but which are not available
-	//	// at the server.
-	//outer:
-	//	for _, m := range doc.Methods {
-	//		// Get the module/method name from the document.
-	//		methodName := m.Name
-	//		module, path, err := elementizeMethodName(methodName)
-	//		if err != nil {
-	//			return nil, err
-	//		}
-	//
-	//		// Check if the server has this module available.
-	//		paths, ok := serverMethodsAvailable[module]
-	//		if !ok {
-	//			check.Over = append(check.Over, methodName)
-	//			continue
-	//		}
-	//
-	//		// Check if the server has this module+path(=full method name).
-	//		for _, pa := range paths {
-	//			if pa == path {
-	//				docMethodsAvailable = append(docMethodsAvailable, m)
-	//				continue outer
-	//			}
-	//		}
-	//
-	//		// Were not continued over; path was not found.
-	//		check.Over = append(check.Over, methodName)
-	//	}
-
-	//
-	//copy(check.Under, described.Methods)
-	//
-	//for i, u := range check.Under {
-	//	for _, d := range docMethodsAvailable {
-	//		if u.Name == d.Name {
-	//			check.Under = append(check.Under[:i], check.Under[i+1:]...)
-	//		}
-	//	}
-	//}
-
-	// Find under methods.
-	// These are methods which are available on the server, but not described in the document.
-	//for mod, list := range check.Under {
-	//	if mod == "rpc" {
-	//		continue
-	//	}
-	//modmethodlistloop:
-	//	for _, item := range list {
-	//		name := strings.Join([]string{mod, item}, serviceMethodSeparators[0])
-	//		for _, m := range doc.Methods {
-	//			if m.Name == name {
-	//
-	//				continue modmethodlistloop
-	//			}
-	//		}
-	//		check.Under = append(check.Under, orpcM)
-	//	}
-	//}
-	//sort.Sort(check.Under)
-	sort.Slice(check.Over, func(i, j int) bool {
-		return check.Over[i].Name < check.Over[j].Name
-	})
-	sort.Slice(check.Under, func(i, j int) bool {
-		return check.Under[i].Name < check.Under[j].Name
-	})
-	return check, nil
-}
+//
+//func (s *RPCService) DescribeOpenRPC() (*OpenRPCCheck, error) {
+//	var err error
+//	if s.server.OpenRPCSchemaRaw == "" {
+//		return nil, errOpenRPCDiscoverUnavailable
+//	}
+//	referenceDoc := &goopenrpcT.OpenRPCSpec1{
+//		Servers: []goopenrpcT.Server{},
+//	}
+//	err = json.Unmarshal([]byte(s.server.OpenRPCSchemaRaw), referenceDoc)
+//	if err != nil {
+//		log.Crit("openrpc json umarshal", "error", err)
+//	}
+//
+//	describedDoc, err := s.Describe()
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	check := &OpenRPCCheck{
+//		Over:  []goopenrpcT.Method{},
+//		Under: []goopenrpcT.Method{}, //[]OpenRPCCheckUnder{},
+//	}
+//
+//	referenceSuper := func(reference, target *goopenrpcT.OpenRPCSpec1) (methods []goopenrpcT.Method) {
+//	referenceLoop:
+//		for _, r := range reference.Methods {
+//			for _, t := range target.Methods {
+//				if r.Name == t.Name {
+//					continue referenceLoop
+//				}
+//			}
+//			methods = append(methods, r)
+//		}
+//		return
+//	}
+//
+//	check.Over = referenceSuper(referenceDoc, describedDoc)
+//	check.Under = referenceSuper(describedDoc, referenceDoc)
+//
+//	//	// Audit documented doc methods vs. actual server availability
+//	//	// This removes methods described in the OpenRPC JSON document
+//	//	// which are not currently exposed on the server's API.
+//	//	// This is done on the fly (as opposed to at servre init or doc setting)
+//	//	// because it's possible that exposed APIs could be modified in proc.
+//	//	docMethodsAvailable := []goopenrpcT.Method{}
+//	//	serverMethodsAvailable := s.methods()
+//	//
+//	//	// Find Over methods.
+//	//	// These are methods described in the document, but which are not available
+//	//	// at the server.
+//	//outer:
+//	//	for _, m := range doc.Methods {
+//	//		// Get the module/method name from the document.
+//	//		methodName := m.Name
+//	//		module, path, err := elementizeMethodName(methodName)
+//	//		if err != nil {
+//	//			return nil, err
+//	//		}
+//	//
+//	//		// Check if the server has this module available.
+//	//		paths, ok := serverMethodsAvailable[module]
+//	//		if !ok {
+//	//			check.Over = append(check.Over, methodName)
+//	//			continue
+//	//		}
+//	//
+//	//		// Check if the server has this module+path(=full method name).
+//	//		for _, pa := range paths {
+//	//			if pa == path {
+//	//				docMethodsAvailable = append(docMethodsAvailable, m)
+//	//				continue outer
+//	//			}
+//	//		}
+//	//
+//	//		// Were not continued over; path was not found.
+//	//		check.Over = append(check.Over, methodName)
+//	//	}
+//
+//	//
+//	//copy(check.Under, described.Methods)
+//	//
+//	//for i, u := range check.Under {
+//	//	for _, d := range docMethodsAvailable {
+//	//		if u.Name == d.Name {
+//	//			check.Under = append(check.Under[:i], check.Under[i+1:]...)
+//	//		}
+//	//	}
+//	//}
+//
+//	// Find under methods.
+//	// These are methods which are available on the server, but not described in the document.
+//	//for mod, list := range check.Under {
+//	//	if mod == "rpc" {
+//	//		continue
+//	//	}
+//	//modmethodlistloop:
+//	//	for _, item := range list {
+//	//		name := strings.Join([]string{mod, item}, serviceMethodSeparators[0])
+//	//		for _, m := range doc.Methods {
+//	//			if m.Name == name {
+//	//
+//	//				continue modmethodlistloop
+//	//			}
+//	//		}
+//	//		check.Under = append(check.Under, orpcM)
+//	//	}
+//	//}
+//	//sort.Sort(check.Under)
+//	sort.Slice(check.Over, func(i, j int) bool {
+//		return check.Over[i].Name < check.Over[j].Name
+//	})
+//	sort.Slice(check.Under, func(i, j int) bool {
+//		return check.Under[i].Name < check.Under[j].Name
+//	})
+//	return check, nil
+//}
 
 // Discover returns a configured schema that is audited for actual server availability.
-// Only methods that the server makes available are included in the 'methods' array of
-// the discover schema. Components are not audited.
-func (s *RPCService) Discover() (schema *goopenrpcT.OpenRPCSpec1, err error) {
-	if s.server.OpenRPCSchemaRaw == "" {
-		return nil, errOpenRPCDiscoverUnavailable
-	}
-	schema = &goopenrpcT.OpenRPCSpec1{
-		Servers: []goopenrpcT.Server{},
-	}
-	err = json.Unmarshal([]byte(s.server.OpenRPCSchemaRaw), schema)
-	if err != nil {
-		log.Crit("openrpc json umarshal", "error", err)
-	}
-
-	// Audit documented schema methods vs. actual server availability
-	// This removes methods described in the OpenRPC JSON schema document
-	// which are not currently exposed on the server's API.
-	// This is done on the fly (as opposed to at servre init or schema setting)
-	// because it's possible that exposed APIs could be modified in proc.
-	schemaMethodsAvailable := []goopenrpcT.Method{}
-	serverMethodsAvailable := s.methods()
-
-	for _, m := range schema.Methods {
-		module, path, err := elementizeMethodName(m.Name)
-		if err != nil {
-			return nil, err
-		}
-		paths, ok := serverMethodsAvailable[module]
-		if !ok {
-			continue
-		}
-
-		// the module exists, does the path exist?
-		for _, pa := range paths {
-			if pa == path {
-				schemaMethodsAvailable = append(schemaMethodsAvailable, m)
-				break
-			}
-		}
-	}
-	schema.Methods = schemaMethodsAvailable
-	return
-}
+//// Only methods that the server makes available are included in the 'methods' array of
+//// the discover schema. Components are not audited.
+//func (s *RPCService) Discover() (schema *goopenrpcT.OpenRPCSpec1, err error) {
+//	if s.server.OpenRPCSchemaRaw == "" {
+//		return nil, errOpenRPCDiscoverUnavailable
+//	}
+//	schema = &goopenrpcT.OpenRPCSpec1{
+//		Servers: []goopenrpcT.Server{},
+//	}
+//	err = json.Unmarshal([]byte(s.server.OpenRPCSchemaRaw), schema)
+//	if err != nil {
+//		log.Crit("openrpc json umarshal", "error", err)
+//	}
+//
+//	// Audit documented schema methods vs. actual server availability
+//	// This removes methods described in the OpenRPC JSON schema document
+//	// which are not currently exposed on the server's API.
+//	// This is done on the fly (as opposed to at servre init or schema setting)
+//	// because it's possible that exposed APIs could be modified in proc.
+//	schemaMethodsAvailable := []goopenrpcT.Method{}
+//	serverMethodsAvailable := s.methods()
+//
+//	for _, m := range schema.Methods {
+//		module, path, err := elementizeMethodName(m.Name)
+//		if err != nil {
+//			return nil, err
+//		}
+//		paths, ok := serverMethodsAvailable[module]
+//		if !ok {
+//			continue
+//		}
+//
+//		// the module exists, does the path exist?
+//		for _, pa := range paths {
+//			if pa == path {
+//				schemaMethodsAvailable = append(schemaMethodsAvailable, m)
+//				break
+//			}
+//		}
+//	}
+//	schema.Methods = schemaMethodsAvailable
+//	return
+//}

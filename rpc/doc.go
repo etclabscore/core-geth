@@ -71,7 +71,7 @@ An example server which uses the JSON codec:
 
  calculator := new(CalculatorService)
  server := NewServer()
- server.RegisterName("calculator", calculator)
+ server.RegisterReceiverWithName("calculator", calculator)
  l, _ := net.ListenUnix("unix", &net.UnixAddr{Net: "unix", Name: "/tmp/calculator.sock"})
  server.ServeListener(l)
 

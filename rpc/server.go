@@ -298,13 +298,7 @@ func (s *Server) Methods() (methods map[string][]reflect.Value) {
 				continue
 			}
 
-			res := []reflect.Value{}
-			if method.rcvr.IsValid() {
-				res = append(res, method.rcvr)
-			}
-			res = append(res, method.fn)
-			methods[fullName] = []reflect.Value{}
-			methods[fullName] = append(methods[fullName], res...)
+			methods[fullName] = []reflect.Value{method.rcvr, method.fn}
 		}
 	}
 	return

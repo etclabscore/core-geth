@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/VictoriaMetrics/fastcache v1.5.4
-	github.com/alecthomas/jsonschema v0.0.0-20200217214135-7152f22193c9
+	github.com/alecthomas/jsonschema v0.0.2
 	github.com/aristanetworks/goarista v0.0.0-20170210015632-ea17b1a17847
 	github.com/aws/aws-sdk-go v1.25.48
 	github.com/btcsuite/btcd v0.0.0-20171128150713-2e60448ffcc6
@@ -17,11 +17,10 @@ require (
 	github.com/dop251/goja v0.0.0-20200219165308-d1232e640a87
 	github.com/edsrzf/mmap-go v0.0.0-20160512033002-935e0e8a636c
 	github.com/elastic/gosigar v0.8.1-0.20180330100440-37f05ff46ffa
-	github.com/etclabscore/go-jsonschema-traverse v0.0.0-00010101000000-000000000000
+	github.com/etclabscore/go-openrpc-reflect v0.0.15
 	github.com/fatih/color v1.6.0
 	github.com/fjl/memsize v0.0.0-20180418122429-ca190fb6ffbc
 	github.com/gballet/go-libpcsclite v0.0.0-20190607065134-2772fd86a8ff
-	github.com/go-openapi/spec v0.19.7
 	github.com/go-stack/stack v1.8.0
 	github.com/go-test/deep v1.0.4
 	github.com/golang/protobuf v1.3.2-0.20190517061210-b285ee9cfc6c
@@ -29,7 +28,7 @@ require (
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/gorilla/websocket v1.4.1
 	github.com/graph-gophers/graphql-go v0.0.0-20191115155744-f33e81362277
-	github.com/gregdhill/go-openrpc v0.0.0-20191115123255-ebc6f01c6db3
+	github.com/gregdhill/go-openrpc v0.0.1
 	github.com/hashicorp/golang-lru v0.0.0-20160813221303-0a025b7e63ad
 	github.com/huin/goupnp v0.0.0-20161224104101-679507af18f3
 	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334

@@ -23,6 +23,7 @@ import (
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/log"
+	go_openrpc_reflect "github.com/etclabscore/go-openrpc-reflect"
 )
 
 const MetadataApi = "rpc"
@@ -40,12 +41,17 @@ const (
 	OptionSubscriptions = 1 << iota // support pub sub
 )
 
+type OpenRPCDocument struct {
+	*go_openrpc_reflect.Document
+}
+
 // Server is an RPC server.
 type Server struct {
 	services serviceRegistry
 	idgen    func() ID
 	run      int32
 	codecs   mapset.Set
+	open     *OpenRPCDocument
 }
 
 // NewServer creates a new server instance with no registered handlers.
@@ -55,6 +61,7 @@ func NewServer() *Server {
 	// as the services and methods it offers.
 	rpcService := &RPCService{server}
 	server.RegisterName(MetadataApi, rpcService)
+
 	return server
 }
 

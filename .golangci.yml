@@ -49,3 +49,6 @@ issues:
     - path: cmd/faucet/
       linters:
         - deadcode
+    - path: rpc/gzip.go
+      linters:
+        - deadcode

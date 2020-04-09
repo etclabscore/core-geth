@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"reflect"
 	"strings"
@@ -30,6 +29,7 @@ import (
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/openrpc"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
 
@@ -78,7 +78,7 @@ func NewServer() *Server {
 
 	// Register the default service providing meta information about the RPC service such
 	// as the services and methods it offers.
-	rpcService := &RPCService{server: server, doc: NewOpenRPCDescription(server)}
+	rpcService := &RPCService{server: server, doc: openrpc.NewOpenRPCDescription(server)}
 	server.RegisterReceiverWithName(MetadataApi, rpcService)
 	return server
 }
@@ -93,7 +93,7 @@ func NewServerWithListener(listener net.Listener) *Server {
 
 	// Register the default service providing meta information about the RPC service such
 	// as the services and methods it offers.
-	rpcService := &RPCService{server: server, doc: NewOpenRPCDescription(server)}
+	rpcService := &RPCService{server: server, doc: openrpc.NewOpenRPCDescription(server)}
 	network := listener.Addr().Network()
 	url := listener.Addr().String()
 	if network == "tcp" || network == "udp" {
@@ -218,7 +218,7 @@ func (s *Server) Stop() {
 // e.g. gives information about the loaded modules.
 type RPCService struct {
 	server *Server
-	doc    *OpenRPCDescription
+	doc    *openrpc.OpenRPCDescription
 }
 
 // Modules returns the list of RPC services with their version number
@@ -302,40 +302,6 @@ func (s *Server) Methods() (methods map[string][]reflect.Value) {
 		}
 	}
 	return
-}
-
-func (s *Server) OpenRPCInfo() goopenrpcT.Info {
-	return goopenrpcT.Info{
-		Title:          "Ethereum JSON-RPC",
-		Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
-		TermsOfService: "https://github.com/etclabscore/core-geth/blob/master/COPYING",
-		Contact: goopenrpcT.Contact{
-			Name:  "",
-			URL:   "",
-			Email: "",
-		},
-		License: goopenrpcT.License{
-			Name: "Apache-2.0",
-			URL:  "https://www.apache.org/licenses/LICENSE-2.0.html",
-		},
-		Version: "1.0.10",
-	}
-}
-
-func (s *Server) OpenRPCExternalDocs() goopenrpcT.ExternalDocs {
-	return goopenrpcT.ExternalDocs{
-		Description: "Source",
-		URL:         "https://github.com/etclabscore/core-geth",
-	}
-}
-
-func (s *RPCService) SetOpenRPCDiscoverDocument(documentPath string) error {
-	bs, err := ioutil.ReadFile(documentPath)
-	if err != nil {
-		return err
-	}
-	doc := string(bs)
-	return s.server.SetOpenRPCSchemaRaw(doc)
 }
 
 type OpenRPCCheck struct {

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package rpc
+package openrpc
 
 import (
 	"bufio"
@@ -25,6 +25,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io/ioutil"
 	"log"
 	"math/big"
 	"os"
@@ -41,9 +42,46 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/go-openapi/spec"
 	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
+
+
+func (s *rpc.Server) OpenRPCInfo() goopenrpcT.Info {
+	return goopenrpcT.Info{
+		Title:          "Ethereum JSON-RPC",
+		Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
+		TermsOfService: "https://github.com/etclabscore/core-geth/blob/master/COPYING",
+		Contact: goopenrpcT.Contact{
+			Name:  "",
+			URL:   "",
+			Email: "",
+		},
+		License: goopenrpcT.License{
+			Name: "Apache-2.0",
+			URL:  "https://www.apache.org/licenses/LICENSE-2.0.html",
+		},
+		Version: "1.0.10",
+	}
+}
+
+func (s *rpc.Server) OpenRPCExternalDocs() goopenrpcT.ExternalDocs {
+	return goopenrpcT.ExternalDocs{
+		Description: "Source",
+		URL:         "https://github.com/etclabscore/core-geth",
+	}
+}
+
+func (s *rpc.RPCService) SetOpenRPCDiscoverDocument(documentPath string) error {
+	bs, err := ioutil.ReadFile(documentPath)
+	if err != nil {
+		return err
+	}
+	doc := string(bs)
+	return s.server.SetOpenRPCSchemaRaw(doc)
+}
+
 
 type MutateType string
 
@@ -285,7 +323,7 @@ func documentGetArgTypes(rcvr, val reflect.Value) (argTypes []reflect.Type) {
 	if rcvr.IsValid() && !rcvr.IsNil() {
 		firstArg++
 	}
-	if fntype.NumIn() > firstArg && fntype.In(firstArg) == contextType {
+	if fntype.NumIn() > firstArg && fntype.In(firstArg) == rpc.contextType {
 		firstArg++
 	}
 	// Add all remaining parameters.
@@ -312,7 +350,7 @@ func documentValHasContext(rcvr reflect.Value, val reflect.Value) bool {
 	if rcvr.IsValid() && !rcvr.IsNil() {
 		firstArg++
 	}
-	return fntype.NumIn() > firstArg && fntype.In(firstArg) == contextType
+	return fntype.NumIn() > firstArg && fntype.In(firstArg) == rpc.contextType
 }
 
 func documentMakeMethod(name string, rcvr reflect.Value, cb reflect.Value, rt *runtime.Func, fn *ast.FuncDecl) (goopenrpcT.Method, error) {
@@ -475,7 +513,7 @@ type OpenRPCDescription struct {
 	Doc *goopenrpcT.OpenRPCSpec1
 }
 
-func NewOpenRPCDescription(server *Server) *OpenRPCDescription {
+func NewOpenRPCDescription(server *rpc.Server) *OpenRPCDescription {
 	doc := &goopenrpcT.OpenRPCSpec1{
 		OpenRPC: "1.2.4",
 		Info: goopenrpcT.Info{
@@ -596,7 +634,7 @@ func Clean(doc *goopenrpcT.OpenRPCSpec1) error {
 	return nil
 }
 
-func (d *OpenRPCDescription) RegisterMethod(name string, cb *callback) error {
+func (d *OpenRPCDescription) RegisterMethod(name string, cb *rpc.callback) error {
 
 	cb.makeArgTypes()
 	cb.makeRetTypes()
@@ -641,7 +679,7 @@ func (a argIdent) Name() string {
 	return a.name
 }
 
-func makeMethod(name string, cb *callback, rt *runtime.Func, fn *ast.FuncDecl) (goopenrpcT.Method, error) {
+func makeMethod(name string, cb *rpc.callback, rt *runtime.Func, fn *ast.FuncDecl) (goopenrpcT.Method, error) {
 	file, line := rt.FileLine(rt.Entry())
 
 	//rt.Name()
@@ -964,11 +1002,11 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
           "pattern": "^0x([a-fA-F0-9]?)+$"
         }`},
 
-		{BlockNumber(0),
+		{rpc.BlockNumber(0),
 			blockNumberOrHashD,
 		},
 
-		{BlockNumberOrHash{}, fmt.Sprintf(`{
+		{rpc.BlockNumberOrHash{}, fmt.Sprintf(`{
 		  "title": "blockNumberOrHash",
 		  "oneOf": [
 			%s,
@@ -1057,7 +1095,7 @@ func OpenRPCJSONSchemaTypeMapper(r reflect.Type) *jsonschema.Type {
 	return nil
 }
 
-func getAstFunc(cb *callback, astFile *ast.File, rf *runtime.Func) *ast.FuncDecl {
+func getAstFunc(cb *rpc.callback, astFile *ast.File, rf *runtime.Func) *ast.FuncDecl {
 
 	rfName := runtimeFuncName(rf)
 	for _, decl := range astFile.Decls {

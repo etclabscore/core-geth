@@ -137,11 +137,11 @@ func TestOpenRPCDiscover(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	opts := &rpc.DocumentDiscoverOpts{
+	opts := &DocumentDiscoverOpts{
 		Inline:          false,
-		SchemaMutations: []rpc.MutateType{rpc.SchemaMutateType_Expand, rpc.SchemaMutateType_RemoveDefinitions},
+		SchemaMutations: []MutateType{SchemaMutateType_Expand, SchemaMutateType_RemoveDefinitions},
 	}
-	doc := rpc.Wrap(server, opts)
+	doc := Wrap(server, opts)
 	err = server.RegisterReceiverWithName("rpc", doc)
 	if err != nil {
 		t.Fatal(err)
@@ -225,7 +225,7 @@ func TestOpenRPC_Analysis(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := rpc.Clean(doc); err != nil {
+	if err := Clean(doc); err != nil {
 		t.Fatal(err)
 	}
 

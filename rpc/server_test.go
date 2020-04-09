@@ -28,6 +28,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/ethereum/go-ethereum/openrpc"
 )
 
 func TestServerRegisterName(t *testing.T) {
@@ -204,12 +206,12 @@ func TestOpenRPCDiscover(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	opts := &DocumentDiscoverOpts{
+	opts := &openrpc.DocumentDiscoverOpts{
 		Inline:          false,
-		SchemaMutations: []MutateType{SchemaMutateType_Expand, SchemaMutateType_RemoveDefinitions},
+		SchemaMutations: []openrpc.MutateType{openrpc.SchemaMutateType_Expand, openrpc.SchemaMutateType_RemoveDefinitions},
 		MethodBlackList: []string{"^rpc_.*"},
 	}
-	doc := Wrap(server, opts)
+	doc := openrpc.Wrap(server, opts)
 	err = server.RegisterReceiverWithName("rpc", doc)
 	if err != nil {
 		t.Fatal(err)

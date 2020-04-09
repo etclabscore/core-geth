@@ -92,8 +92,8 @@ github.com/etclabscore/go-jsonschema-walk v0.0.5 h1:onCqRkan6UYqxb2AfQCnrH3RDLxE
 github.com/etclabscore/go-jsonschema-walk v0.0.5/go.mod h1:ONvrTA7ocniep83ygMhbeTweRpaEIH8Ei/D/2OKgu6U=
 github.com/etclabscore/go-openrpc v0.0.1 h1:q+3HXSkP0FdEoamkEvqDn5CITAeFkoIJ3wnEC6mQFS8=
 github.com/etclabscore/go-openrpc v0.0.1/go.mod h1:a1eRkbhd3DYpRH2lnuUsVG+QMTI+v0hGnsis8C9hMrA=
-github.com/etclabscore/go-openrpc-reflect v0.0.15 h1:cexl6ezrAb5NfDGAJVwoeXsQJ9NZ/SZ+iR9UUrMMZNg=
-github.com/etclabscore/go-openrpc-reflect v0.0.15/go.mod h1:x0WuJn8p8Kku63g7K5z1P9OuyPfwJhPG6yNsUsj7cvM=
+github.com/etclabscore/go-openrpc-reflect v0.0.17 h1:Cwg1/RmXGMuEYG3IGKbAEDJycoxyg/LjMrhNEaY0HnE=
+github.com/etclabscore/go-openrpc-reflect v0.0.17/go.mod h1:x0WuJn8p8Kku63g7K5z1P9OuyPfwJhPG6yNsUsj7cvM=
 github.com/ethereum/go-ethereum v1.9.12/go.mod h1:PvsVkQmhZFx92Y+h2ylythYlheEDt/uBgFbl61Js/jo=
 github.com/fatih/color v1.3.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fatih/color v1.6.0 h1:66qjqZk8kalYAvDRtM1AdAJQI0tj4Wrue3Eq3B3pmFU=

@@ -19,11 +19,14 @@ package rpc
 import (
 	"context"
 	"io"
+	"net"
 	"sync/atomic"
 
 	mapset "github.com/deckarep/golang-set"
-	"github.com/ethereum/go-ethereum/log"
 	go_openrpc_reflect "github.com/etclabscore/go-openrpc-reflect"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/openrpc"
+	go_openrpc_types "github.com/gregdhill/go-openrpc/types"
 )
 
 const MetadataApi = "rpc"
@@ -43,15 +46,16 @@ const (
 
 type OpenRPCDocument struct {
 	*go_openrpc_reflect.Document
+	serviceDescriptor go_openrpc_reflect.ReceiverServiceDescriptor
 }
 
 // Server is an RPC server.
 type Server struct {
-	services serviceRegistry
-	idgen    func() ID
-	run      int32
-	codecs   mapset.Set
-	open     *OpenRPCDocument
+	services          serviceRegistry
+	idgen             func() ID
+	run               int32
+	codecs            mapset.Set
+	open              *OpenRPCDocument
 }
 
 // NewServer creates a new server instance with no registered handlers.
@@ -62,6 +66,40 @@ func NewServer() *Server {
 	rpcService := &RPCService{server}
 	server.RegisterName(MetadataApi, rpcService)
 
+	openrpcServerConfig := go_openrpc_reflect.ServerDescriptorT{
+		ServiceOpenRPCInfoFn: func() go_openrpc_types.Info {
+			return go_openrpc_types.Info{
+				Title:          "Ethereum JSON-RPC",
+				Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
+				TermsOfService: "https://github.com/etclabscore/core-geth/blob/master/COPYING",
+				Contact: go_openrpc_types.Contact{
+					Name:  "",
+					URL:   "",
+					Email: "",
+				},
+				License: go_openrpc_types.License{
+					Name: "Apache-2.0",
+					URL:  "https://www.apache.org/licenses/LICENSE-2.0.html",
+				},
+				Version: "1.0.10",
+			}
+		},
+		ServiceOpenRPCExternalDocsFn: func() *go_openrpc_types.ExternalDocs {
+			return &go_openrpc_types.ExternalDocs{
+				Description: "Source",
+				URL:         "https://github.com/etclabscore/core-geth",
+			}
+		},
+	}
+
+	serverDoc := go_openrpc_reflect.NewReflectDocument(&openrpcServerConfig)
+
+	rp := go_openrpc_reflect.EthereumRPCDescriptor
+	rp.ProviderParseOptions.TypeMapper = openrpc.OpenRPCJSONSchemaTypeMapper
+	server.open.serviceDescriptor = rp
+
+	server.RegisterName("rpc", serverDoc)
+
 	return server
 }
 
@@ -70,7 +108,16 @@ func NewServer() *Server {
 // subscription an error is returned. Otherwise a new service is created and added to the
 // service collection this server provides to clients.
 func (s *Server) RegisterName(name string, receiver interface{}) error {
-	return s.services.registerName(name, receiver)
+	err := s.services.registerName(name, receiver)
+	if err != nil {
+		return err
+	}
+	s.open.Reflector.RegisterReceiverWithName(name, receiver, s.open.serviceDescriptor)
+	return nil
+}
+
+func (s *Server) RegisterListener(name string, listener net.Listener) {
+	//
 }
 
 // ServeCodec reads incoming requests from codec, calls the appropriate callback and writes

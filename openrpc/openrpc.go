@@ -27,34 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/rpc"
-	goopenrpcT "github.com/gregdhill/go-openrpc/types"
 )
-
-
-func OpenRPCInfo() goopenrpcT.Info {
-	return goopenrpcT.Info{
-		Title:          "Ethereum JSON-RPC",
-		Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
-		TermsOfService: "https://github.com/etclabscore/core-geth/blob/master/COPYING",
-		Contact: goopenrpcT.Contact{
-			Name:  "",
-			URL:   "",
-			Email: "",
-		},
-		License: goopenrpcT.License{
-			Name: "Apache-2.0",
-			URL:  "https://www.apache.org/licenses/LICENSE-2.0.html",
-		},
-		Version: "1.0.10",
-	}
-}
-
-func OpenRPCExternalDocs() goopenrpcT.ExternalDocs {
-	return goopenrpcT.ExternalDocs{
-		Description: "Source",
-		URL:         "https://github.com/etclabscore/core-geth",
-	}
-}
 
 type schemaDictEntry struct {
 	t interface{}

@@ -86,6 +86,8 @@ github.com/edsrzf/mmap-go v0.0.0-20160512033002-935e0e8a636c h1:JHHhtb9XWJrGNMcr
 github.com/edsrzf/mmap-go v0.0.0-20160512033002-935e0e8a636c/go.mod h1:YO35OhQPt3KJa3ryjFM5Bs14WD66h8eGKpfaBNrHW5M=
 github.com/elastic/gosigar v0.8.1-0.20180330100440-37f05ff46ffa h1:XKAhUk/dtp+CV0VO6mhG2V7jA9vbcGcnYF/Ay9NjZrY=
 github.com/elastic/gosigar v0.8.1-0.20180330100440-37f05ff46ffa/go.mod h1:cdorVVzy1fhmEqmtgqkoE3bYtCfSCkVyjTyCIo22xvs=
+github.com/etclabscore/go-jsonschema-reflect v0.0.2 h1:4cVcR6pyHT+fdUhqUej9OvlQjo7IvdZZ57yXFLwp7Lk=
+github.com/etclabscore/go-jsonschema-reflect v0.0.2/go.mod h1:zNMg3LbT7+7+1sJl6meG0U55ipDR9d0RN0dYQ8V3uCs=
 github.com/etclabscore/go-jsonschema-walk v0.0.5 h1:onCqRkan6UYqxb2AfQCnrH3RDLxE7N1dsNBD99ruZ2A=
 github.com/etclabscore/go-jsonschema-walk v0.0.5/go.mod h1:ONvrTA7ocniep83ygMhbeTweRpaEIH8Ei/D/2OKgu6U=
 github.com/etclabscore/go-openrpc v0.0.1 h1:q+3HXSkP0FdEoamkEvqDn5CITAeFkoIJ3wnEC6mQFS8=

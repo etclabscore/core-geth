@@ -20,20 +20,17 @@ import (
 	"context"
 	"encoding/binary"
 	"errors"
-	"math/big"
 	"sync"
 	"time"
-
-	"github.com/ethereum/go-ethereum/common"
 )
 
 func newTestServer() *Server {
 	server := NewServer()
 	server.idgen = sequentialIDGenerator()
-	if err := server.RegisterReceiverWithName("test", new(testService)); err != nil {
+	if err := server.RegisterName("test", new(testService)); err != nil {
 		panic(err)
 	}
-	if err := server.RegisterReceiverWithName("nftest", new(notificationTestService)); err != nil {
+	if err := server.RegisterName("nftest", new(notificationTestService)); err != nil {
 		panic(err)
 	}
 	return server
@@ -80,6 +77,11 @@ func (s *testService) Sleep(ctx context.Context, duration time.Duration) {
 	time.Sleep(duration)
 }
 
+func (s *testService) Block(ctx context.Context) error {
+	<-ctx.Done()
+	return errors.New("context canceled in testservice_block")
+}
+
 func (s *testService) Rets() (string, error) {
 	return "", nil
 }
@@ -97,37 +99,6 @@ func (s *testService) InvalidRets3() (string, string, error) {
 	return "", "", nil
 }
 
-func (s *testService) GetRawBytes() ([]byte, error) {
-	return []byte("nickdust"), nil
-}
-
-func (s *testService) DoHash(myint int64) (myhash common.Hash, myerr error) {
-	return common.BigToHash(new(big.Int).SetInt64(myint)), nil
-}
-
-func (s *testService) DoHashOfPointer(mypint *int64) (myhash common.Hash, myerr error) {
-	return common.BigToHash(new(big.Int).SetInt64(*mypint)), nil
-}
-
-func (s *testService) DoHashPointer(myint int64) (myhash *common.Hash, myerr error) {
-	h := common.BigToHash(new(big.Int).SetInt64(myint))
-	return &h, nil
-}
-
-func (s *testService) AddPointers(a, b *uint64) uint64 {
-	if a == nil && b == nil {
-		return 0
-	}
-	if a == nil {
-		return *b
-	}
-	if b == nil {
-		return *a
-	}
-	return *a + *b
-}
-
-// CallMeBack is a test method that should be a callback.
 func (s *testService) CallMeBack(ctx context.Context, method string, args []interface{}) (interface{}, error) {
 	c, ok := ClientFromContext(ctx)
 	if !ok {

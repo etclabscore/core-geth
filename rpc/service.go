@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"reflect"
 	"runtime"
+	"strings"
 	"sync"
 	"unicode"
 
@@ -52,13 +53,12 @@ type callback struct {
 	fn          reflect.Value  // the function
 	rcvr        reflect.Value  // receiver object of method, set if fn is method
 	argTypes    []reflect.Type // input argument types
-	retTypes    []reflect.Type // return types
 	hasCtx      bool           // method's first argument is a context (not included in argTypes)
 	errPos      int            // err return idx, of -1 when method cannot return error
 	isSubscribe bool           // true if this is a subscription callback
 }
 
-func (r *serviceRegistry) registerReceiverWithName(name string, rcvr interface{}) error {
+func (r *serviceRegistry) registerName(name string, rcvr interface{}) error {
 	rcvrVal := reflect.ValueOf(rcvr)
 	if name == "" {
 		return fmt.Errorf("no service name for type %s", rcvrVal.Type().String())
@@ -94,13 +94,13 @@ func (r *serviceRegistry) registerReceiverWithName(name string, rcvr interface{}
 
 // callback returns the callback corresponding to the given RPC method name.
 func (r *serviceRegistry) callback(method string) *callback {
-	module, mthd, err := elementizeMethodName(method)
-	if err != nil {
+	elem := strings.SplitN(method, serviceMethodSeparator, 2)
+	if len(elem) != 2 {
 		return nil
 	}
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	return r.services[module].callbacks[mthd]
+	return r.services[elem[0]].callbacks[elem[1]]
 }
 
 // subscription returns a subscription callback in the given service.
@@ -177,16 +177,6 @@ func (c *callback) makeArgTypes() {
 	c.argTypes = make([]reflect.Type, fntype.NumIn()-firstArg)
 	for i := firstArg; i < fntype.NumIn(); i++ {
 		c.argTypes[i-firstArg] = fntype.In(i)
-	}
-}
-
-// makeRetTypes composes the argTypes list.
-func (c *callback) makeRetTypes() {
-	fntype := c.fn.Type()
-	// Add all remaining parameters.
-	c.retTypes = make([]reflect.Type, fntype.NumOut())
-	for i := 0; i < fntype.NumOut(); i++ {
-		c.retTypes[i] = fntype.Out(i)
 	}
 }
 

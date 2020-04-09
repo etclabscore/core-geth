@@ -1,4 +1,4 @@
-// Copyright 2018 The go-ethereum Authors
+// Copyright 2020 The go-ethereum Authors
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -17,26 +17,23 @@
 package rpc
 
 import (
-	"net"
+	"fmt"
 
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/metrics"
 )
 
-// StartIPCEndpoint starts an IPC endpoint.
-func StartIPCEndpoint(ipcEndpoint string, apis []API) (net.Listener, *Server, error) {
-	// Register all the APIs exposed by the services.
-	handler := NewServer()
-	for _, api := range apis {
-		if err := handler.RegisterName(api.Namespace, api.Service); err != nil {
-			return nil, nil, err
-		}
-		log.Debug("IPC registered", "namespace", api.Namespace)
+var (
+	rpcRequestGauge        = metrics.NewRegisteredGauge("rpc/requests", nil)
+	successfulRequestGauge = metrics.NewRegisteredGauge("rpc/success", nil)
+	failedReqeustGauge     = metrics.NewRegisteredGauge("rpc/failure", nil)
+	rpcServingTimer        = metrics.NewRegisteredTimer("rpc/duration/all", nil)
+)
+
+func newRPCServingTimer(method string, valid bool) metrics.Timer {
+	flag := "success"
+	if !valid {
+		flag = "failure"
 	}
-	// All APIs registered, start the IPC listener.
-	listener, err := ipcListen(ipcEndpoint)
-	if err != nil {
-		return nil, nil, err
-	}
-	go handler.ServeListener(listener)
-	return listener, handler, nil
+	m := fmt.Sprintf("rpc/duration/%s/%s", method, flag)
+	return metrics.GetOrRegisterTimer(m, nil)
 }

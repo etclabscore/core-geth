@@ -19,8 +19,6 @@ package rpc
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -28,15 +26,13 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/ethereum/go-ethereum/openrpc"
 )
 
 func TestServerRegisterName(t *testing.T) {
 	server := NewServer()
 	service := new(testService)
 
-	if err := server.RegisterReceiverWithName("test", service); err != nil {
+	if err := server.RegisterName("test", service); err != nil {
 		t.Fatalf("%v", err)
 	}
 
@@ -49,7 +45,7 @@ func TestServerRegisterName(t *testing.T) {
 		t.Fatalf("Expected service calc to be registered")
 	}
 
-	wantCallbacks := 12
+	wantCallbacks := 8
 	if len(svc.callbacks) != wantCallbacks {
 		t.Errorf("Expected %d callbacks for service 'service', got %d", wantCallbacks, len(svc.callbacks))
 	}
@@ -153,119 +149,4 @@ func TestServerShortLivedConn(t *testing.T) {
 			t.Fatalf("wrong response: %s", buf[:n])
 		}
 	}
-}
-
-
-
-type Pet struct {
-	Name         string
-	Age          int
-	Fluffy, Fast bool
-}
-
-type PetStoreService struct {
-	pets []*Pet
-}
-
-// GetPets returns all the pets the store has.
-func (s *PetStoreService) GetPets() ([]*Pet, error) {
-	// Returns all pets.
-	return s.pets, nil
-}
-
-// AddPet adds a pet to the store.
-func (s *PetStoreService) AddPet(p Pet) error {
-	if s.pets == nil {
-		s.pets = []*Pet{}
-	}
-	s.pets = append(s.pets, &p)
-	return nil
-}
-
-func TestOpenRPCDiscover(t *testing.T) {
-	server := NewServer()
-	defer server.Stop()
-
-	//rpcService := &rpc.RPCService{server: server, doc: rpc.NewOpenRPCDescription(server)}
-	//err := server.RegisterReceiverWithName("eth", &ethapi.PublicBlockChainAPI{})
-	//if err != nil {
-	//	t.Fatal(err)
-	//}
-
-	store := &PetStoreService{
-		pets: []*Pet{
-			{
-				Name:   "Lindy",
-				Age:    7,
-				Fluffy: true,
-			},
-		},
-	}
-	err := server.RegisterReceiverWithName("store", store)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	opts := &openrpc.DocumentDiscoverOpts{
-		Inline:          false,
-		SchemaMutations: []openrpc.MutateType{openrpc.SchemaMutateType_Expand, openrpc.SchemaMutateType_RemoveDefinitions},
-		MethodBlackList: []string{"^rpc_.*"},
-	}
-	doc := openrpc.Wrap(server, opts)
-	err = server.RegisterReceiverWithName("rpc", doc)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal("can't listen:", err)
-	}
-	defer listener.Close()
-	go server.ServeListener(listener)
-
-	requests := []string{
-		`{"jsonrpc":"2.0","id":1,"method":"rpc_modules"}` + "\n",
-		`{"jsonrpc":"2.0","id":1,"method":"rpc_discover"}` + "\n",
-	}
-
-
-	for _, request := range requests {
-		makeRequest(t, request, listener)
-	}
-
-}
-
-const maxReadSize = 1024*1024
-func makeRequest(t *testing.T, request string, listener net.Listener) {
-	deadline := time.Now().Add(10 * time.Second)
-	conn, err := net.Dial("tcp", listener.Addr().String())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer conn.Close()
-	conn.SetDeadline(deadline)
-	conn.Write([]byte(request))
-	conn.(*net.TCPConn).CloseWrite()
-
-	buf := make([]byte, maxReadSize)
-	n, err := conn.Read(buf)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	//fmt.Println(string(buf[:n]))
-	//fmt.Println()
-
-	pretty := make(map[string]interface{})
-	err = json.Unmarshal(buf[:n], &pretty)
-	if err != nil {
-		t.Fatal(err)
-	}
-	bufPretty, err := json.MarshalIndent(pretty, "", "  ")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(string(bufPretty))
-	fmt.Println()
 }

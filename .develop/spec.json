@@ -13,7 +13,7 @@
       "name": "Apache-2.0", 
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }, 
-    "version": "1.0.10-2020-04-09T17:42:06-05:00-1586472126"
+    "version": "1.0.10-2020-04-09T17:46:12-05:00-1586472372"
   }, 
   "servers": [], 
   "methods": [
@@ -7679,6 +7679,42 @@
     {
       "name": "eth_syncing", 
       "tags": [], 
+      "summary": "Syncing provides information when this nodes starts synchronising with the Ethereum network and when it's finished.\n", 
+      "description": "[https://github.com/ethereum/go-ethereum/blob/master/eth/downloader/api.go#L93](https://github.com/ethereum/go-ethereum/blob/master/eth/downloader/api.go#L93)\n```go\n// Syncing provides information when this nodes starts synchronising with the Ethereum network and when it's finished.\nfunc (api *PublicDownloaderAPI) Syncing(ctx context.Context) (*rpc.Subscription, error) {\n\tnotifier, supported := rpc.NotifierFromContext(ctx)\n\tif !supported {\n\t\treturn \u0026rpc.Subscription{}, rpc.ErrNotificationsUnsupported\n\t}\n\n\trpcSub := notifier.CreateSubscription()\n\n\tgo func() {\n\t\tstatuses := make(chan interface{})\n\t\tsub := api.SubscribeSyncStatus(statuses)\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase status := \u003c-statuses:\n\t\t\t\tnotifier.Notify(rpcSub.ID, status)\n\t\t\tcase \u003c-rpcSub.Err():\n\t\t\t\tsub.Unsubscribe()\n\t\t\t\treturn\n\t\t\tcase \u003c-notifier.Closed():\n\t\t\t\tsub.Unsubscribe()\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\n\treturn rpcSub, nil\n}\n```", 
+      "externalDocs": {
+        "description": "line=93", 
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/downloader/api.go"
+      }, 
+      "params": [], 
+      "result": {
+        "name": "*rpc.Subscription", 
+        "summary": "", 
+        "description": "`github.com/ethereum/go-ethereum/rpc.*Subscription`", 
+        "required": true, 
+        "deprecated": false, 
+        "schema": {
+          "oneOf": [
+            {
+              "description": "github.com/ethereum/go-ethereum/rpc.*Subscription", 
+              "type": "object", 
+              "title": "subscription-ptr"
+            }, 
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }, 
+      "deprecated": false, 
+      "servers": [], 
+      "errors": [], 
+      "links": [], 
+      "paramStructure": "by-position", 
+      "examples": []
+    }, 
+    {
+      "name": "eth_syncing", 
+      "tags": [], 
       "summary": "Syncing returns false in case the node is currently not syncing with the network. It can be up to date or has not\nyet received the latest block headers from its pears. In case it is synchronizing:\n- startingBlock: block number this node started to synchronise from\n- currentBlock:  block number this node is currently importing\n- highestBlock:  block number of the highest block header this node has received from peers\n- pulledStates:  number of state entries processed until now\n- knownStates:   number of known state entries that still need to be pulled\n", 
       "description": "[https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L106](https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L106)\n```go\n// Syncing returns false in case the node is currently not syncing with the network. It can be up to date or has not\n// yet received the latest block headers from its pears. In case it is synchronizing:\n// - startingBlock: block number this node started to synchronise from\n// - currentBlock:  block number this node is currently importing\n// - highestBlock:  block number of the highest block header this node has received from peers\n// - pulledStates:  number of state entries processed until now\n// - knownStates:   number of known state entries that still need to be pulled\nfunc (s *PublicEthereumAPI) Syncing() (EthSyncingResult, error) {\n\tprogress := s.b.Downloader().Progress()\n\n\tif progress.CurrentBlock \u003e= progress.HighestBlock {\n\t\tnot := EthSyncingResultSyncing(false)\n\t\treturn EthSyncingResult{Syncing: not}, nil\n\t}\n\n\treturn EthSyncingResult{\n\t\tSyncing:\ttrue,\n\t\tProgress: \u0026EthSyncingResultProgress{\n\t\t\thexutil.Uint64(progress.StartingBlock),\n\t\t\thexutil.Uint64(progress.CurrentBlock),\n\t\t\thexutil.Uint64(progress.HighestBlock),\n\t\t\thexutil.Uint64(progress.PulledStates),\n\t\t\thexutil.Uint64(progress.KnownStates),\n\t\t},\n\t}, nil\n}\n```", 
       "externalDocs": {
@@ -7769,42 +7805,6 @@
             }
           }, 
           "additionalProperties": false
-        }
-      }, 
-      "deprecated": false, 
-      "servers": [], 
-      "errors": [], 
-      "links": [], 
-      "paramStructure": "by-position", 
-      "examples": []
-    }, 
-    {
-      "name": "eth_syncing", 
-      "tags": [], 
-      "summary": "Syncing provides information when this nodes starts synchronising with the Ethereum network and when it's finished.\n", 
-      "description": "[https://github.com/ethereum/go-ethereum/blob/master/eth/downloader/api.go#L93](https://github.com/ethereum/go-ethereum/blob/master/eth/downloader/api.go#L93)\n```go\n// Syncing provides information when this nodes starts synchronising with the Ethereum network and when it's finished.\nfunc (api *PublicDownloaderAPI) Syncing(ctx context.Context) (*rpc.Subscription, error) {\n\tnotifier, supported := rpc.NotifierFromContext(ctx)\n\tif !supported {\n\t\treturn \u0026rpc.Subscription{}, rpc.ErrNotificationsUnsupported\n\t}\n\n\trpcSub := notifier.CreateSubscription()\n\n\tgo func() {\n\t\tstatuses := make(chan interface{})\n\t\tsub := api.SubscribeSyncStatus(statuses)\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase status := \u003c-statuses:\n\t\t\t\tnotifier.Notify(rpcSub.ID, status)\n\t\t\tcase \u003c-rpcSub.Err():\n\t\t\t\tsub.Unsubscribe()\n\t\t\t\treturn\n\t\t\tcase \u003c-notifier.Closed():\n\t\t\t\tsub.Unsubscribe()\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\n\treturn rpcSub, nil\n}\n```", 
-      "externalDocs": {
-        "description": "line=93", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/downloader/api.go"
-      }, 
-      "params": [], 
-      "result": {
-        "name": "*rpc.Subscription", 
-        "summary": "", 
-        "description": "`github.com/ethereum/go-ethereum/rpc.*Subscription`", 
-        "required": true, 
-        "deprecated": false, 
-        "schema": {
-          "oneOf": [
-            {
-              "description": "github.com/ethereum/go-ethereum/rpc.*Subscription", 
-              "type": "object", 
-              "title": "subscription-ptr"
-            }, 
-            {
-              "type": "null"
-            }
-          ]
         }
       }, 
       "deprecated": false, 

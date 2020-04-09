@@ -110,7 +110,7 @@ func (s *Server) initOpenRPC() {
 		serviceDescriptor: rp,
 	}
 
-	s.RegisterName("openrpc", s.open)
+	s.RegisterName("rpc", s.open)
 }
 
 // RegisterName creates a service for the given receiver type under the given name. When no

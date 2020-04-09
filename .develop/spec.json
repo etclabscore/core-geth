@@ -13,7 +13,7 @@
       "name": "Apache-2.0", 
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }, 
-    "version": "1.0.10-2020-04-09T11:16:26-05:00-1586448986"
+    "version": "1.0.10-2020-04-09T12:09:54-05:00-1586452194"
   }, 
   "servers": [], 
   "methods": [
@@ -2126,10 +2126,10 @@
           "required": true, 
           "deprecated": false, 
           "schema": {
-            "description": "Hex representation of the integer", 
+            "description": "Hex representation of a 256 bit unit of data", 
             "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
           }
         }
       ], 
@@ -3840,10 +3840,10 @@
         "required": true, 
         "deprecated": false, 
         "schema": {
-          "description": "Hex representation of the integer", 
+          "description": "Hex representation of a 256 bit unit of data", 
           "type": "string", 
-          "title": "integer", 
-          "pattern": "^0x[a-fA-F0-9]+$"
+          "title": "dataWord", 
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
         }
       }, 
       "deprecated": false, 
@@ -3884,8 +3884,8 @@
               }, 
               "gas": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "gasPrice": {
                 "type": "string", 
@@ -3992,8 +3992,8 @@
                       }, 
                       "nonce": {
                         "type": "string", 
-                        "title": "integer", 
-                        "pattern": "^0x[a-fA-F0-9]+$"
+                        "title": "dataWord", 
+                        "pattern": "^0x([a-fA-F\\d]{64})?$"
                       }, 
                       "state": {
                         "type": "object", 
@@ -4059,36 +4059,6 @@
     {
       "name": "eth_chainId", 
       "tags": [], 
-      "summary": "ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\n", 
-      "description": "```go\n// ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\nfunc (api *PublicEthereumAPI) ChainId() hexutil.Uint64 {\n\tchainID := new(big.Int)\n\tif config := api.e.blockchain.Config(); config.IsEnabled(config.GetEIP155Transition, api.e.blockchain.CurrentBlock().Number()) {\n\t\tchainID = config.GetChainID()\n\t}\n\treturn (hexutil.Uint64)(chainID.Uint64())\n}\n```", 
-      "externalDocs": {
-        "description": "line=70", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go"
-      }, 
-      "params": [], 
-      "result": {
-        "name": "hexutil.Uint64", 
-        "summary": "", 
-        "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Uint64\n```", 
-        "required": true, 
-        "deprecated": false, 
-        "schema": {
-          "description": "Hex representation of the integer", 
-          "type": "string", 
-          "title": "integer", 
-          "pattern": "^0x[a-fA-F0-9]+$"
-        }
-      }, 
-      "deprecated": false, 
-      "servers": [], 
-      "errors": [], 
-      "links": [], 
-      "paramStructure": "by-position", 
-      "examples": []
-    }, 
-    {
-      "name": "eth_chainId", 
-      "tags": [], 
       "summary": "ChainId returns the chainID value for transaction replay protection.\n", 
       "description": "```go\n// ChainId returns the chainID value for transaction replay protection.\nfunc (s *PublicBlockChainAPI) ChainId() *hexutil.Big {\n\treturn (*hexutil.Big)(s.b.ChainConfig().GetChainID())\n}\n```", 
       "externalDocs": {
@@ -4114,6 +4084,36 @@
               "type": "null"
             }
           ]
+        }
+      }, 
+      "deprecated": false, 
+      "servers": [], 
+      "errors": [], 
+      "links": [], 
+      "paramStructure": "by-position", 
+      "examples": []
+    }, 
+    {
+      "name": "eth_chainId", 
+      "tags": [], 
+      "summary": "ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\n", 
+      "description": "```go\n// ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\nfunc (api *PublicEthereumAPI) ChainId() hexutil.Uint64 {\n\tchainID := new(big.Int)\n\tif config := api.e.blockchain.Config(); config.IsEnabled(config.GetEIP155Transition, api.e.blockchain.CurrentBlock().Number()) {\n\t\tchainID = config.GetChainID()\n\t}\n\treturn (hexutil.Uint64)(chainID.Uint64())\n}\n```", 
+      "externalDocs": {
+        "description": "line=70", 
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go"
+      }, 
+      "params": [], 
+      "result": {
+        "name": "hexutil.Uint64", 
+        "summary": "", 
+        "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Uint64\n```", 
+        "required": true, 
+        "deprecated": false, 
+        "schema": {
+          "description": "Hex representation of a 256 bit unit of data", 
+          "type": "string", 
+          "title": "dataWord", 
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
         }
       }, 
       "deprecated": false, 
@@ -4184,8 +4184,8 @@
               }, 
               "gas": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "gasPrice": {
                 "type": "string", 
@@ -4214,10 +4214,10 @@
         "required": true, 
         "deprecated": false, 
         "schema": {
-          "description": "Hex representation of the integer", 
+          "description": "Hex representation of a 256 bit unit of data", 
           "type": "string", 
-          "title": "integer", 
-          "pattern": "^0x[a-fA-F0-9]+$"
+          "title": "dataWord", 
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
         }
       }, 
       "deprecated": false, 
@@ -4289,8 +4289,8 @@
               }, 
               "gas": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "gasPrice": {
                 "type": "string", 
@@ -4304,8 +4304,8 @@
               }, 
               "nonce": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "to": {
                 "type": "string", 
@@ -4663,10 +4663,10 @@
         "schema": {
           "oneOf": [
             {
-              "description": "Hex representation of the integer", 
+              "description": "Hex representation of a 256 bit unit of data", 
               "type": "string", 
-              "title": "integer", 
-              "pattern": "^0x[a-fA-F0-9]+$"
+              "title": "dataWord", 
+              "pattern": "^0x([a-fA-F\\d]{64})?$"
             }, 
             {
               "type": "null"
@@ -4725,10 +4725,10 @@
         "schema": {
           "oneOf": [
             {
-              "description": "Hex representation of the integer", 
+              "description": "Hex representation of a 256 bit unit of data", 
               "type": "string", 
-              "title": "integer", 
-              "pattern": "^0x[a-fA-F0-9]+$"
+              "title": "dataWord", 
+              "pattern": "^0x([a-fA-F\\d]{64})?$"
             }, 
             {
               "type": "null"
@@ -5397,8 +5397,8 @@
                 }, 
                 "nonce": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "storageHash": {
                   "type": "string", 
@@ -5474,10 +5474,10 @@
           "required": true, 
           "deprecated": false, 
           "schema": {
-            "description": "Hex representation of the integer", 
+            "description": "Hex representation of a 256 bit unit of data", 
             "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
           }
         }
       ], 
@@ -5549,10 +5549,10 @@
           "required": true, 
           "deprecated": false, 
           "schema": {
-            "description": "Hex representation of the integer", 
+            "description": "Hex representation of a 256 bit unit of data", 
             "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
           }
         }
       ], 
@@ -5785,10 +5785,10 @@
           "required": true, 
           "deprecated": false, 
           "schema": {
-            "description": "Hex representation of the integer", 
+            "description": "Hex representation of a 256 bit unit of data", 
             "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
           }
         }
       ], 
@@ -5820,8 +5820,8 @@
                 }, 
                 "gas": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "gasPrice": {
                   "type": "string", 
@@ -5840,8 +5840,8 @@
                 }, 
                 "nonce": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "r": {
                   "type": "string", 
@@ -5860,8 +5860,8 @@
                 }, 
                 "transactionIndex": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "v": {
                   "type": "string", 
@@ -5930,10 +5930,10 @@
           "required": true, 
           "deprecated": false, 
           "schema": {
-            "description": "Hex representation of the integer", 
+            "description": "Hex representation of a 256 bit unit of data", 
             "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
           }
         }
       ], 
@@ -5965,8 +5965,8 @@
                 }, 
                 "gas": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "gasPrice": {
                   "type": "string", 
@@ -5985,8 +5985,8 @@
                 }, 
                 "nonce": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "r": {
                   "type": "string", 
@@ -6005,8 +6005,8 @@
                 }, 
                 "transactionIndex": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "v": {
                   "type": "string", 
@@ -6086,8 +6086,8 @@
                 }, 
                 "gas": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "gasPrice": {
                   "type": "string", 
@@ -6106,8 +6106,8 @@
                 }, 
                 "nonce": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "r": {
                   "type": "string", 
@@ -6126,8 +6126,8 @@
                 }, 
                 "transactionIndex": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "v": {
                   "type": "string", 
@@ -6247,10 +6247,10 @@
         "schema": {
           "oneOf": [
             {
-              "description": "Hex representation of the integer", 
+              "description": "Hex representation of a 256 bit unit of data", 
               "type": "string", 
-              "title": "integer", 
-              "pattern": "^0x[a-fA-F0-9]+$"
+              "title": "dataWord", 
+              "pattern": "^0x([a-fA-F\\d]{64})?$"
             }, 
             {
               "type": "null"
@@ -6341,10 +6341,10 @@
           "required": true, 
           "deprecated": false, 
           "schema": {
-            "description": "Hex representation of the integer", 
+            "description": "Hex representation of a 256 bit unit of data", 
             "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
           }
         }
       ], 
@@ -6411,10 +6411,10 @@
           "required": true, 
           "deprecated": false, 
           "schema": {
-            "description": "Hex representation of the integer", 
+            "description": "Hex representation of a 256 bit unit of data", 
             "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
           }
         }
       ], 
@@ -6473,10 +6473,10 @@
         "schema": {
           "oneOf": [
             {
-              "description": "Hex representation of the integer", 
+              "description": "Hex representation of a 256 bit unit of data", 
               "type": "string", 
-              "title": "integer", 
-              "pattern": "^0x[a-fA-F0-9]+$"
+              "title": "dataWord", 
+              "pattern": "^0x([a-fA-F\\d]{64})?$"
             }, 
             {
               "type": "null"
@@ -6535,10 +6535,10 @@
         "schema": {
           "oneOf": [
             {
-              "description": "Hex representation of the integer", 
+              "description": "Hex representation of a 256 bit unit of data", 
               "type": "string", 
-              "title": "integer", 
-              "pattern": "^0x[a-fA-F0-9]+$"
+              "title": "dataWord", 
+              "pattern": "^0x([a-fA-F\\d]{64})?$"
             }, 
             {
               "type": "null"
@@ -6602,10 +6602,10 @@
         "required": true, 
         "deprecated": false, 
         "schema": {
-          "description": "Hex representation of the integer", 
+          "description": "Hex representation of a 256 bit unit of data", 
           "type": "string", 
-          "title": "integer", 
-          "pattern": "^0x[a-fA-F0-9]+$"
+          "title": "dataWord", 
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
         }
       }, 
       "deprecated": false, 
@@ -6973,8 +6973,8 @@
                   }, 
                   "gas": {
                     "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
+                    "title": "dataWord", 
+                    "pattern": "^0x([a-fA-F\\d]{64})?$"
                   }, 
                   "gasPrice": {
                     "type": "string", 
@@ -6993,8 +6993,8 @@
                   }, 
                   "nonce": {
                     "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
+                    "title": "dataWord", 
+                    "pattern": "^0x([a-fA-F\\d]{64})?$"
                   }, 
                   "r": {
                     "type": "string", 
@@ -7013,8 +7013,8 @@
                   }, 
                   "transactionIndex": {
                     "type": "string", 
-                    "title": "integer", 
-                    "pattern": "^0x[a-fA-F0-9]+$"
+                    "title": "dataWord", 
+                    "pattern": "^0x([a-fA-F\\d]{64})?$"
                   }, 
                   "v": {
                     "type": "string", 
@@ -7060,10 +7060,10 @@
         "required": true, 
         "deprecated": false, 
         "schema": {
-          "description": "Hex representation of the integer", 
+          "description": "Hex representation of a 256 bit unit of data", 
           "type": "string", 
-          "title": "integer", 
-          "pattern": "^0x[a-fA-F0-9]+$"
+          "title": "dataWord", 
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
         }
       }, 
       "deprecated": false, 
@@ -7105,8 +7105,8 @@
               }, 
               "gas": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "gasPrice": {
                 "type": "string", 
@@ -7120,8 +7120,8 @@
               }, 
               "nonce": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "to": {
                 "type": "string", 
@@ -7166,10 +7166,10 @@
           "schema": {
             "oneOf": [
               {
-                "description": "Hex representation of the integer", 
+                "description": "Hex representation of a 256 bit unit of data", 
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               {
                 "type": "null"
@@ -7281,8 +7281,8 @@
               }, 
               "gas": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "gasPrice": {
                 "type": "string", 
@@ -7296,8 +7296,8 @@
               }, 
               "nonce": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "to": {
                 "type": "string", 
@@ -7437,8 +7437,8 @@
               }, 
               "gas": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "gasPrice": {
                 "type": "string", 
@@ -7452,8 +7452,8 @@
               }, 
               "nonce": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "to": {
                 "type": "string", 
@@ -7523,10 +7523,10 @@
           "required": true, 
           "deprecated": false, 
           "schema": {
-            "description": "Hex representation of the integer", 
+            "description": "Hex representation of a 256 bit unit of data", 
             "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
           }
         }, 
         {
@@ -7740,28 +7740,28 @@
               "properties": {
                 "CurrentgBlock": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "HighestgBlock": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "KnownStates": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "PulledStates": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "StartingBlock": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }
               }, 
               "additionalProperties": false
@@ -7773,28 +7773,28 @@
               "properties": {
                 "CurrentgBlock": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "HighestgBlock": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "KnownStates": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "PulledStates": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }, 
                 "StartingBlock": {
                   "type": "string", 
-                  "title": "integer", 
-                  "pattern": "^0x[a-fA-F0-9]+$"
+                  "title": "dataWord", 
+                  "pattern": "^0x([a-fA-F\\d]{64})?$"
                 }
               }, 
               "additionalProperties": false
@@ -7933,10 +7933,10 @@
           "required": true, 
           "deprecated": false, 
           "schema": {
-            "description": "Hex representation of the integer", 
+            "description": "Hex representation of a 256 bit unit of data", 
             "type": "string", 
-            "title": "integer", 
-            "pattern": "^0x[a-fA-F0-9]+$"
+            "title": "dataWord", 
+            "pattern": "^0x([a-fA-F\\d]{64})?$"
           }
         }, 
         {
@@ -8354,10 +8354,10 @@
         "required": true, 
         "deprecated": false, 
         "schema": {
-          "description": "Hex representation of the integer", 
+          "description": "Hex representation of a 256 bit unit of data", 
           "type": "string", 
-          "title": "integer", 
-          "pattern": "^0x[a-fA-F0-9]+$"
+          "title": "dataWord", 
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
         }
       }, 
       "deprecated": false, 
@@ -8934,8 +8934,8 @@
               }, 
               "gas": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "gasPrice": {
                 "type": "string", 
@@ -8949,8 +8949,8 @@
               }, 
               "nonce": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "to": {
                 "type": "string", 
@@ -9112,8 +9112,8 @@
               }, 
               "gas": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "gasPrice": {
                 "type": "string", 
@@ -9127,8 +9127,8 @@
               }, 
               "nonce": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "to": {
                 "type": "string", 
@@ -9208,8 +9208,8 @@
               }, 
               "gas": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "gasPrice": {
                 "type": "string", 
@@ -9223,8 +9223,8 @@
               }, 
               "nonce": {
                 "type": "string", 
-                "title": "integer", 
-                "pattern": "^0x[a-fA-F0-9]+$"
+                "title": "dataWord", 
+                "pattern": "^0x([a-fA-F\\d]{64})?$"
               }, 
               "to": {
                 "type": "string", 
@@ -9499,8 +9499,8 @@
                         }, 
                         "gas": {
                           "type": "string", 
-                          "title": "integer", 
-                          "pattern": "^0x[a-fA-F0-9]+$"
+                          "title": "dataWord", 
+                          "pattern": "^0x([a-fA-F\\d]{64})?$"
                         }, 
                         "gasPrice": {
                           "type": "string", 
@@ -9519,8 +9519,8 @@
                         }, 
                         "nonce": {
                           "type": "string", 
-                          "title": "integer", 
-                          "pattern": "^0x[a-fA-F0-9]+$"
+                          "title": "dataWord", 
+                          "pattern": "^0x([a-fA-F\\d]{64})?$"
                         }, 
                         "r": {
                           "type": "string", 
@@ -9539,8 +9539,8 @@
                         }, 
                         "transactionIndex": {
                           "type": "string", 
-                          "title": "integer", 
-                          "pattern": "^0x[a-fA-F0-9]+$"
+                          "title": "dataWord", 
+                          "pattern": "^0x([a-fA-F\\d]{64})?$"
                         }, 
                         "v": {
                           "type": "string", 
@@ -9631,10 +9631,10 @@
           "type": "object", 
           "patternProperties": {
             ".*": {
-              "description": "Hex representation of the integer", 
+              "description": "Hex representation of a 256 bit unit of data", 
               "type": "string", 
-              "title": "integer", 
-              "pattern": "^0x[a-fA-F0-9]+$"
+              "title": "dataWord", 
+              "pattern": "^0x([a-fA-F\\d]{64})?$"
             }
           }
         }

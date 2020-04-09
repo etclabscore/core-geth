@@ -63,14 +63,18 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 	//	return nil
 	//}
 
+	var emptyInterface interface{}
+
 	// Second, handle other types.
 	// Use a slice instead of a map because it preserves order, as a logic safeguard/fallback.
 	dict := []schemaDictEntry{
 
+		{emptyInterface, fmt.Sprintf(`{
+			"oneOf": [{"additionalProperties": true}, {"type": "null"}]
+		}`)},
+
 		{new(big.Int), integerD},
 		{big.Int{}, integerD},
-		{new(hexutil.Big), integerD},
-		{hexutil.Big{}, integerD},
 
 		{types.BlockNonce{}, integerD},
 
@@ -96,6 +100,8 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 
 		{common.Hash{}, commonHashD},
 
+		{new(hexutil.Big), integerD},
+		{hexutil.Big{}, integerD},
 		{
 			hexutil.Bytes{}, `{
           "title": "dataWord",
@@ -105,6 +111,36 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
         }`},
 		{
 			new(hexutil.Bytes), `{
+          "title": "dataWord",
+          "type": "string",
+          "description": "Hex representation of a 256 bit unit of data",
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
+        }`},
+
+		{
+			hexutil.Uint(0), `{
+          "title": "dataWord",
+          "type": "string",
+          "description": "Hex representation of a 256 bit unit of data",
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
+        }`},
+		{
+			new(hexutil.Uint), `{
+          "title": "dataWord",
+          "type": "string",
+          "description": "Hex representation of a 256 bit unit of data",
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
+        }`},
+
+		{
+			hexutil.Uint64(0), `{
+          "title": "dataWord",
+          "type": "string",
+          "description": "Hex representation of a 256 bit unit of data",
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
+        }`},
+		{
+			new(hexutil.Uint64), `{
           "title": "dataWord",
           "type": "string",
           "description": "Hex representation of a 256 bit unit of data",

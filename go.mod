@@ -78,4 +78,6 @@ replace github.com/gregdhill/go-openrpc => github.com/etclabscore/go-openrpc v0.
 
 replace github.com/alecthomas/jsonschema => github.com/etclabscore/go-jsonschema-reflect v0.0.2
 
+replace github.com/etclabscore/go-openrpc-reflect => /home/ia/go/src/github.com/etclabscore/go-openrpc-reflect
+
 replace github.com/etclabscore/go-jsonschema-traverse => github.com/meowsbits/go-jsonschema-traverse v0.0.4

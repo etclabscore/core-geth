@@ -24,7 +24,7 @@ echo "Waiting 3 for geth to startup..."
 sleep 3
 
 # Save a copy of the generated openrpc document by HTTP RPC query.
-http --json POST http://localhost:8545 id:=$(date +%s) method='rpc_describe' params:='[]' | jj -p 'result' | tee "$(pwd)/.develop/spec.json"
+http --json POST http://localhost:8545 id:=$(date +%s) method='openrpc_discover' params:='[]' | jj -p 'result' | tee "$(pwd)/.develop/spec.json"
 
 echo
 echo "Geth log:"

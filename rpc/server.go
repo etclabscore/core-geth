@@ -25,7 +25,6 @@ import (
 	mapset "github.com/deckarep/golang-set"
 	go_openrpc_reflect "github.com/etclabscore/go-openrpc-reflect"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/openrpc"
 	go_openrpc_types "github.com/gregdhill/go-openrpc/types"
 )
 
@@ -51,22 +50,33 @@ type OpenRPCDocument struct {
 
 // Server is an RPC server.
 type Server struct {
-	services          serviceRegistry
-	idgen             func() ID
-	run               int32
-	codecs            mapset.Set
-	open              *OpenRPCDocument
+	services serviceRegistry
+	idgen    func() ID
+	run      int32
+	codecs   mapset.Set
+	open     *OpenRPCDocument
 }
 
 // NewServer creates a new server instance with no registered handlers.
 func NewServer() *Server {
 	server := &Server{idgen: randomIDGenerator(), codecs: mapset.NewSet(), run: 1}
+
+	server.initOpenRPC()
+
 	// Register the default service providing meta information about the RPC service such
 	// as the services and methods it offers.
 	rpcService := &RPCService{server}
 	server.RegisterName(MetadataApi, rpcService)
 
-	openrpcServerConfig := go_openrpc_reflect.ServerDescriptorT{
+	return server
+}
+
+func (s *Server) initOpenRPC() {
+
+	// TODO: Move this logic to the node/ package.
+	// This package should be just an rpc library, ergo contain nothing
+	// specific to the go-ethereum node case (expect the package import name, of course).
+	openrpcServerConfig := &go_openrpc_reflect.ServerDescriptorT{
 		ServiceOpenRPCInfoFn: func() go_openrpc_types.Info {
 			return go_openrpc_types.Info{
 				Title:          "Ethereum JSON-RPC",
@@ -92,15 +102,15 @@ func NewServer() *Server {
 		},
 	}
 
-	serverDoc := go_openrpc_reflect.NewReflectDocument(&openrpcServerConfig)
-
 	rp := go_openrpc_reflect.EthereumRPCDescriptor
-	rp.ProviderParseOptions.TypeMapper = openrpc.OpenRPCJSONSchemaTypeMapper
-	server.open.serviceDescriptor = rp
+	rp.ProviderParseOptions.TypeMapper = OpenRPCJSONSchemaTypeMapper
 
-	server.RegisterName("rpc", serverDoc)
+	s.open = &OpenRPCDocument{
+		Document:          go_openrpc_reflect.NewReflectDocument(openrpcServerConfig),
+		serviceDescriptor: rp,
+	}
 
-	return server
+	s.RegisterName("openrpc", s.open)
 }
 
 // RegisterName creates a service for the given receiver type under the given name. When no
@@ -112,7 +122,7 @@ func (s *Server) RegisterName(name string, receiver interface{}) error {
 	if err != nil {
 		return err
 	}
-	s.open.Reflector.RegisterReceiverWithName(name, receiver, s.open.serviceDescriptor)
+	s.open.Document.Reflector.RegisterReceiverWithName(name, receiver, s.open.serviceDescriptor)
 	return nil
 }
 

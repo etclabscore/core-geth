@@ -75,7 +75,7 @@ require (
 replace github.com/golang/lint v0.0.0-20190409202823-959b441ac422 => github.com/golang/lint v0.0.0-20190409202823-5614ed5bae6fb75893070bdc0996a68765fdd275
 
 // Use a local development version, managed as a submodule.
-replace github.com/gregdhill/go-openrpc => ./go-openrpc
+replace github.com/gregdhill/go-openrpc => github.com/etclabscore/go-openrpc v0.0.1
 
 replace github.com/alecthomas/jsonschema => ./jsonschema
 

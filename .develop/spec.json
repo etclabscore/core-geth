@@ -13,7 +13,7 @@
       "name": "Apache-2.0", 
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }, 
-    "version": "1.0.10-2020-04-09T08:34:33-05:00-1586439273"
+    "version": "1.0.10-2020-04-09T11:16:26-05:00-1586448986"
   }, 
   "servers": [], 
   "methods": [
@@ -256,7 +256,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{p2p NodeInfo}", 
+        "name": "*p2p.NodeInfo", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/p2p.*NodeInfo\n```", 
         "required": true, 
@@ -335,7 +335,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{rpc Subscription}", 
+        "name": "*rpc.Subscription", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/rpc.*Subscription\n```", 
         "required": true, 
@@ -371,7 +371,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=7936) \u003cnil\u003e %!s(*ast.StarExpr=\u0026{7938 0xc020f50ee0})}", 
+        "name": "[]*p2p.PeerInfo", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -997,7 +997,7 @@
       "summary": "ChaindbCompact flattens the entire key-value database into a single level,\nremoving all unused slots and merging all keys.\n", 
       "description": "```go\n// ChaindbCompact flattens the entire key-value database into a single level,\n// removing all unused slots and merging all keys.\nfunc (api *PrivateDebugAPI) ChaindbCompact() error {\n\tfor b := byte(0); b \u003c 255; b++ {\n\t\tlog.Info(\"Compacting chain database\", \"range\", fmt.Sprintf(\"0x%0.2X-0x%0.2X\", b, b+1))\n\t\tif err := api.b.ChainDb().Compact([]byte{b}, []byte{b + 1}); err != nil {\n\t\t\tlog.Error(\"Database compaction failed\", \"err\", err)\n\t\t\treturn err\n\t\t}\n\t}\n\treturn nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1786", 
+        "description": "line=1774", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [], 
@@ -1024,7 +1024,7 @@
       "summary": "ChaindbProperty returns leveldb properties of the key-value database.\n", 
       "description": "```go\n// ChaindbProperty returns leveldb properties of the key-value database.\nfunc (api *PrivateDebugAPI) ChaindbProperty(property string) (string, error) {\n\tif property == \"\" {\n\t\tproperty = \"leveldb.stats\"\n\t} else if !strings.HasPrefix(property, \"leveldb.\") {\n\t\tproperty = \"leveldb.\" + property\n\t}\n\treturn api.b.ChainDb().Stat(property)\n}\n```", 
       "externalDocs": {
-        "description": "line=1775", 
+        "description": "line=1763", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -1146,7 +1146,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{state Dump}", 
+        "name": "state.Dump", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/core/state.Dump\n```", 
         "required": true, 
@@ -1252,7 +1252,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{debug GCStats}", 
+        "name": "*debug.GCStats", 
         "summary": "", 
         "description": "```go\nruntime/debug.*GCStats\n```", 
         "required": true, 
@@ -1328,7 +1328,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=10727) \u003cnil\u003e %!s(*ast.StarExpr=\u0026{10729 0xc0a7a0ac20})}", 
+        "name": "[]*BadBlockArgs", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -1379,7 +1379,7 @@
       "summary": "GetBlockRlp retrieves the RLP encoded for of a single block.\n", 
       "description": "```go\n// GetBlockRlp retrieves the RLP encoded for of a single block.\nfunc (api *PublicDebugAPI) GetBlockRlp(ctx context.Context, number uint64) (string, error) {\n\tblock, _ := api.b.BlockByNumber(ctx, rpc.BlockNumber(number))\n\tif block == nil {\n\t\treturn \"\", fmt.Errorf(\"block #%d not found\", number)\n\t}\n\tencoded, err := rlp.EncodeToBytes(block)\n\tif err != nil {\n\t\treturn \"\", err\n\t}\n\treturn fmt.Sprintf(\"%x\", encoded), nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1693", 
+        "description": "line=1681", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -1460,7 +1460,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=16493) \u003cnil\u003e %!s(*ast.SelectorExpr=\u0026{0xc0a7affec0 0xc0a7affee0})}", 
+        "name": "[]common.Address", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -1533,7 +1533,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=15462) \u003cnil\u003e %!s(*ast.SelectorExpr=\u0026{0xc0a8137e20 0xc0a8137e40})}", 
+        "name": "[]common.Address", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -1624,7 +1624,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{runtime MemStats}", 
+        "name": "*runtime.MemStats", 
         "summary": "", 
         "description": "```go\nruntime.*MemStats\n```", 
         "required": true, 
@@ -1914,7 +1914,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Bytes}", 
+        "name": "hexutil.Bytes", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Bytes\n```", 
         "required": true, 
@@ -1946,7 +1946,7 @@
       "summary": "PrintBlock retrieves a block and returns its pretty printed form.\n", 
       "description": "```go\n// PrintBlock retrieves a block and returns its pretty printed form.\nfunc (api *PublicDebugAPI) PrintBlock(ctx context.Context, number uint64) (string, error) {\n\tblock, _ := api.b.BlockByNumber(ctx, rpc.BlockNumber(number))\n\tif block == nil {\n\t\treturn \"\", fmt.Errorf(\"block #%d not found\", number)\n\t}\n\treturn spew.Sdump(block), nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1745", 
+        "description": "line=1733", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -1988,7 +1988,7 @@
       "summary": "SeedHash retrieves the seed hash of a block.\n", 
       "description": "```go\n// SeedHash retrieves the seed hash of a block.\nfunc (api *PublicDebugAPI) SeedHash(ctx context.Context, number uint64) (string, error) {\n\tblock, _ := api.b.BlockByNumber(ctx, rpc.BlockNumber(number))\n\tif block == nil {\n\t\treturn \"\", fmt.Errorf(\"block #%d not found\", number)\n\t}\n\treturn fmt.Sprintf(\"0x%x\", ethash.SeedHash(number)), nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1754", 
+        "description": "line=1742", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -2115,7 +2115,7 @@
       "summary": "SetHead rewinds the head of the blockchain to a previous block.\n", 
       "description": "```go\n// SetHead rewinds the head of the blockchain to a previous block.\nfunc (api *PrivateDebugAPI) SetHead(number hexutil.Uint64) {\n\tapi.b.SetHead(uint64(number))\n}\n```", 
       "externalDocs": {
-        "description": "line=1798", 
+        "description": "line=1786", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -2291,7 +2291,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=15442) \u003cnil\u003e string}", 
+        "name": "[]string", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -2389,7 +2389,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=14901) \u003cnil\u003e string}", 
+        "name": "[]string", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -2682,7 +2682,7 @@
       "summary": "TestSignCliqueBlock fetches the given block number, and attempts to sign it as a clique header with the\ngiven address, returning the address of the recovered signature\n\nThis is a temporary method to debug the externalsigner integration,\nTODO: Remove this method when the integration is mature\n", 
       "description": "```go\n// TestSignCliqueBlock fetches the given block number, and attempts to sign it as a clique header with the\n// given address, returning the address of the recovered signature\n//\n// This is a temporary method to debug the externalsigner integration,\n// TODO: Remove this method when the integration is mature\nfunc (api *PublicDebugAPI) TestSignCliqueBlock(ctx context.Context, address common.Address, number uint64) (common.Address, error) {\n\tblock, _ := api.b.BlockByNumber(ctx, rpc.BlockNumber(number))\n\tif block == nil {\n\t\treturn common.Address{}, fmt.Errorf(\"block #%d not found\", number)\n\t}\n\theader := block.Header()\n\theader.Extra = make([]byte, 32+65)\n\tencoded := clique.CliqueRLP(header)\n\n\taccount := accounts.Account{Address: address}\n\twallet, err := api.b.AccountManager().Find(account)\n\tif err != nil {\n\t\treturn common.Address{}, err\n\t}\n\n\tsignature, err := wallet.SignData(account, accounts.MimetypeClique, encoded)\n\tif err != nil {\n\t\treturn common.Address{}, err\n\t}\n\tsealHash := clique.SealHash(header).Bytes()\n\tlog.Info(\"test signing of clique block\",\n\t\t\"Sealhash\", fmt.Sprintf(\"%x\", sealHash),\n\t\t\"signature\", fmt.Sprintf(\"%x\", signature))\n\tpubkey, err := crypto.Ecrecover(sealHash, signature)\n\tif err != nil {\n\t\treturn common.Address{}, err\n\t}\n\tvar signer common.Address\n\tcopy(signer[:], crypto.Keccak256(pubkey[1:])[12:])\n\n\treturn signer, nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1710", 
+        "description": "line=1698", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -2714,7 +2714,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{common Address}", 
+        "name": "common.Address", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common.Address\n```", 
         "required": true, 
@@ -2806,7 +2806,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=14379) \u003cnil\u003e %!s(*ast.StarExpr=\u0026{14381 0xc0a866c400})}", 
+        "name": "[]*txTraceResult", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -2921,7 +2921,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=13458) \u003cnil\u003e %!s(*ast.StarExpr=\u0026{13460 0xc0a8355420})}", 
+        "name": "[]*txTraceResult", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -3029,7 +3029,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=13048) \u003cnil\u003e %!s(*ast.StarExpr=\u0026{13050 0xc0a8b0db40})}", 
+        "name": "[]*txTraceResult", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -3148,7 +3148,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=12332) \u003cnil\u003e %!s(*ast.StarExpr=\u0026{12334 0xc0a7b838c0})}", 
+        "name": "[]*txTraceResult", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -3254,7 +3254,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=13914) \u003cnil\u003e %!s(*ast.StarExpr=\u0026{13916 0xc0a81bde20})}", 
+        "name": "[]*txTraceResult", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -3397,7 +3397,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{rpc Subscription}", 
+        "name": "*rpc.Subscription", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/rpc.*Subscription\n```", 
         "required": true, 
@@ -3495,7 +3495,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{ethapi ExecutionResult}", 
+        "name": "*ethapi.ExecutionResult", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/internal/ethapi.*ExecutionResult\n```", 
         "required": true, 
@@ -3795,7 +3795,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=7696) \u003cnil\u003e %!s(*ast.SelectorExpr=\u0026{0xc025766b80 0xc025766ba0})}", 
+        "name": "[]common.Address", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -3834,7 +3834,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{hexutil Uint64}", 
+        "name": "hexutil.Uint64", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Uint64\n```", 
         "required": true, 
@@ -3859,7 +3859,7 @@
       "summary": "Call executes the given transaction on the state for the given block number.\n\nAdditionally, the caller can specify a batch of contract for fields overriding.\n\nNote, this function doesn't make and changes in the state/blockchain and is\nuseful to execute and retrieve values.\n", 
       "description": "```go\n// Call executes the given transaction on the state for the given block number.\n//\n// Additionally, the caller can specify a batch of contract for fields overriding.\n//\n// Note, this function doesn't make and changes in the state/blockchain and is\n// useful to execute and retrieve values.\nfunc (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNrOrHash rpc.BlockNumberOrHash, overrides *map[common.Address]account) (hexutil.Bytes, error) {\n\tvar accounts map[common.Address]account\n\tif overrides != nil {\n\t\taccounts = *overrides\n\t}\n\tresult, _, _, err := DoCall(ctx, s.b, args, blockNrOrHash, accounts, vm.Config{}, 5*time.Second, s.b.RPCGasCap())\n\treturn (hexutil.Bytes)(result), err\n}\n```", 
       "externalDocs": {
-        "description": "line=904", 
+        "description": "line=900", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -4030,7 +4030,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Bytes}", 
+        "name": "hexutil.Bytes", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Bytes\n```", 
         "required": true, 
@@ -4059,6 +4059,36 @@
     {
       "name": "eth_chainId", 
       "tags": [], 
+      "summary": "ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\n", 
+      "description": "```go\n// ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\nfunc (api *PublicEthereumAPI) ChainId() hexutil.Uint64 {\n\tchainID := new(big.Int)\n\tif config := api.e.blockchain.Config(); config.IsEnabled(config.GetEIP155Transition, api.e.blockchain.CurrentBlock().Number()) {\n\t\tchainID = config.GetChainID()\n\t}\n\treturn (hexutil.Uint64)(chainID.Uint64())\n}\n```", 
+      "externalDocs": {
+        "description": "line=70", 
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go"
+      }, 
+      "params": [], 
+      "result": {
+        "name": "hexutil.Uint64", 
+        "summary": "", 
+        "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Uint64\n```", 
+        "required": true, 
+        "deprecated": false, 
+        "schema": {
+          "description": "Hex representation of the integer", 
+          "type": "string", 
+          "title": "integer", 
+          "pattern": "^0x[a-fA-F0-9]+$"
+        }
+      }, 
+      "deprecated": false, 
+      "servers": [], 
+      "errors": [], 
+      "links": [], 
+      "paramStructure": "by-position", 
+      "examples": []
+    }, 
+    {
+      "name": "eth_chainId", 
+      "tags": [], 
       "summary": "ChainId returns the chainID value for transaction replay protection.\n", 
       "description": "```go\n// ChainId returns the chainID value for transaction replay protection.\nfunc (s *PublicBlockChainAPI) ChainId() *hexutil.Big {\n\treturn (*hexutil.Big)(s.b.ChainConfig().GetChainID())\n}\n```", 
       "externalDocs": {
@@ -4067,7 +4097,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{hexutil Big}", 
+        "name": "*hexutil.Big", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.*Big\n```", 
         "required": true, 
@@ -4094,36 +4124,6 @@
       "examples": []
     }, 
     {
-      "name": "eth_chainId", 
-      "tags": [], 
-      "summary": "ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\n", 
-      "description": "```go\n// ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\nfunc (api *PublicEthereumAPI) ChainId() hexutil.Uint64 {\n\tchainID := new(big.Int)\n\tif config := api.e.blockchain.Config(); config.IsEnabled(config.GetEIP155Transition, api.e.blockchain.CurrentBlock().Number()) {\n\t\tchainID = config.GetChainID()\n\t}\n\treturn (hexutil.Uint64)(chainID.Uint64())\n}\n```", 
-      "externalDocs": {
-        "description": "line=70", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go"
-      }, 
-      "params": [], 
-      "result": {
-        "name": "\u0026{hexutil Uint64}", 
-        "summary": "", 
-        "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Uint64\n```", 
-        "required": true, 
-        "deprecated": false, 
-        "schema": {
-          "description": "Hex representation of the integer", 
-          "type": "string", 
-          "title": "integer", 
-          "pattern": "^0x[a-fA-F0-9]+$"
-        }
-      }, 
-      "deprecated": false, 
-      "servers": [], 
-      "errors": [], 
-      "links": [], 
-      "paramStructure": "by-position", 
-      "examples": []
-    }, 
-    {
       "name": "eth_coinbase", 
       "tags": [], 
       "summary": "Coinbase is the address that mining rewards will be send to (alias for Etherbase)\n", 
@@ -4134,7 +4134,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{common Address}", 
+        "name": "common.Address", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common.Address\n```", 
         "required": true, 
@@ -4159,7 +4159,7 @@
       "summary": "EstimateGas returns an estimate of the amount of gas needed to execute the\ngiven transaction against the current pending block.\n", 
       "description": "```go\n// EstimateGas returns an estimate of the amount of gas needed to execute the\n// given transaction against the current pending block.\nfunc (s *PublicBlockChainAPI) EstimateGas(ctx context.Context, args CallArgs) (hexutil.Uint64, error) {\n\tblockNrOrHash := rpc.BlockNumberOrHashWithNumber(rpc.PendingBlockNumber)\n\treturn DoEstimateGas(ctx, s.b, args, blockNrOrHash, s.b.RPCGasCap())\n}\n```", 
       "externalDocs": {
-        "description": "line=978", 
+        "description": "line=966", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -4208,7 +4208,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Uint64}", 
+        "name": "hexutil.Uint64", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Uint64\n```", 
         "required": true, 
@@ -4238,7 +4238,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{common Address}", 
+        "name": "common.Address", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common.Address\n```", 
         "required": true, 
@@ -4263,7 +4263,7 @@
       "summary": "FillTransaction fills the defaults (nonce, gas, gasPrice) on a given unsigned transaction,\nand returns it to the caller for further processing (signing + broadcast)\n", 
       "description": "```go\n// FillTransaction fills the defaults (nonce, gas, gasPrice) on a given unsigned transaction,\n// and returns it to the caller for further processing (signing + broadcast)\nfunc (s *PublicTransactionPoolAPI) FillTransaction(ctx context.Context, args SendTxArgs) (*SignTransactionResult, error) {\n\n\tif err := args.setDefaults(ctx, s.b); err != nil {\n\t\treturn nil, err\n\t}\n\n\ttx := args.toTransaction()\n\tdata, err := rlp.EncodeToBytes(tx)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\treturn \u0026SignTransactionResult{data, tx}, nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1527", 
+        "description": "line=1515", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -4323,7 +4323,7 @@
         }
       ], 
       "result": {
-        "name": "SignTransactionResult", 
+        "name": "*SignTransactionResult", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/internal/ethapi.*SignTransactionResult\n```", 
         "required": true, 
@@ -4369,7 +4369,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{hexutil Big}", 
+        "name": "*hexutil.Big", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.*Big\n```", 
         "required": true, 
@@ -4479,7 +4479,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Big}", 
+        "name": "*hexutil.Big", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.*Big\n```", 
         "required": true, 
@@ -4541,7 +4541,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=25006) string %!s(*ast.InterfaceType=\u0026{25017 0xc022ed2570 false})}", 
+        "name": "map[string]interface{}", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -4609,7 +4609,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=24313) string %!s(*ast.InterfaceType=\u0026{24324 0xc021bc8b70 false})}", 
+        "name": "map[string]interface{}", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -4636,7 +4636,7 @@
       "summary": "GetBlockTransactionCountByHash returns the number of transactions in the block with the given hash.\n", 
       "description": "```go\n// GetBlockTransactionCountByHash returns the number of transactions in the block with the given hash.\nfunc (s *PublicTransactionPoolAPI) GetBlockTransactionCountByHash(ctx context.Context, blockHash common.Hash) *hexutil.Uint {\n\tif block, _ := s.b.BlockByHash(ctx, blockHash); block != nil {\n\t\tn := hexutil.Uint(len(block.Transactions()))\n\t\treturn \u0026n\n\t}\n\treturn nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1228", 
+        "description": "line=1216", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -4655,7 +4655,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Uint}", 
+        "name": "*hexutil.Uint", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.*Uint\n```", 
         "required": true, 
@@ -4687,7 +4687,7 @@
       "summary": "GetBlockTransactionCountByNumber returns the number of transactions in the block with the given block number.\n", 
       "description": "```go\n// GetBlockTransactionCountByNumber returns the number of transactions in the block with the given block number.\nfunc (s *PublicTransactionPoolAPI) GetBlockTransactionCountByNumber(ctx context.Context, blockNr rpc.BlockNumber) *hexutil.Uint {\n\tif block, _ := s.b.BlockByNumber(ctx, blockNr); block != nil {\n\t\tn := hexutil.Uint(len(block.Transactions()))\n\t\treturn \u0026n\n\t}\n\treturn nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1219", 
+        "description": "line=1207", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -4717,7 +4717,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Uint}", 
+        "name": "*hexutil.Uint", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.*Uint\n```", 
         "required": true, 
@@ -4827,7 +4827,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Bytes}", 
+        "name": "hexutil.Bytes", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Bytes\n```", 
         "required": true, 
@@ -4876,7 +4876,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=12277) %!s(*ast.FieldList=\u0026{12286 [] 12287}) %!s(bool=false)}", 
+        "name": "interface{}", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -4915,7 +4915,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=10951) \u003cnil\u003e %!s(*ast.StarExpr=\u0026{10953 0xc0a71271a0})}", 
+        "name": "[]*types.Log", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -5046,7 +5046,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=23772) string %!s(*ast.InterfaceType=\u0026{23783 0xc022aeee40 false})}", 
+        "name": "map[string]interface{}", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -5103,7 +5103,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=23241) string %!s(*ast.InterfaceType=\u0026{23252 0xc021ff6960 false})}", 
+        "name": "map[string]interface{}", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -5184,7 +5184,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=9538) \u003cnil\u003e %!s(*ast.StarExpr=\u0026{9540 0xc0a75fde60})}", 
+        "name": "[]*types.Log", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -5364,7 +5364,7 @@
         }
       ], 
       "result": {
-        "name": "AccountResult", 
+        "name": "*AccountResult", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/internal/ethapi.*AccountResult\n```", 
         "required": true, 
@@ -5450,7 +5450,7 @@
       "summary": "GetRawTransactionByBlockHashAndIndex returns the bytes of the transaction for the given block hash and index.\n", 
       "description": "```go\n// GetRawTransactionByBlockHashAndIndex returns the bytes of the transaction for the given block hash and index.\nfunc (s *PublicTransactionPoolAPI) GetRawTransactionByBlockHashAndIndex(ctx context.Context, blockHash common.Hash, index hexutil.Uint) hexutil.Bytes {\n\tif block, _ := s.b.BlockByHash(ctx, blockHash); block != nil {\n\t\treturn newRPCRawTransactionFromBlockIndex(block, uint64(index))\n\t}\n\treturn nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1261", 
+        "description": "line=1249", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -5482,7 +5482,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Bytes}", 
+        "name": "hexutil.Bytes", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Bytes\n```", 
         "required": true, 
@@ -5514,7 +5514,7 @@
       "summary": "GetRawTransactionByBlockNumberAndIndex returns the bytes of the transaction for the given block number and index.\n", 
       "description": "```go\n// GetRawTransactionByBlockNumberAndIndex returns the bytes of the transaction for the given block number and index.\nfunc (s *PublicTransactionPoolAPI) GetRawTransactionByBlockNumberAndIndex(ctx context.Context, blockNr rpc.BlockNumber, index hexutil.Uint) hexutil.Bytes {\n\tif block, _ := s.b.BlockByNumber(ctx, blockNr); block != nil {\n\t\treturn newRPCRawTransactionFromBlockIndex(block, uint64(index))\n\t}\n\treturn nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1253", 
+        "description": "line=1241", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -5557,7 +5557,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Bytes}", 
+        "name": "hexutil.Bytes", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Bytes\n```", 
         "required": true, 
@@ -5589,7 +5589,7 @@
       "summary": "GetRawTransactionByHash returns the bytes of the transaction for the given hash.\n", 
       "description": "```go\n// GetRawTransactionByHash returns the bytes of the transaction for the given hash.\nfunc (s *PublicTransactionPoolAPI) GetRawTransactionByHash(ctx context.Context, hash common.Hash) (hexutil.Bytes, error) {\n\n\ttx, _, _, _, err := s.b.GetTransaction(ctx, hash)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tif tx == nil {\n\t\tif tx = s.b.GetPoolTransaction(hash); tx == nil {\n\n\t\t\treturn nil, nil\n\t\t}\n\t}\n\n\treturn rlp.EncodeToBytes(tx)\n}\n```", 
       "externalDocs": {
-        "description": "line=1307", 
+        "description": "line=1295", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -5608,7 +5608,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Bytes}", 
+        "name": "hexutil.Bytes", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Bytes\n```", 
         "required": true, 
@@ -5729,7 +5729,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Bytes}", 
+        "name": "hexutil.Bytes", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Bytes\n```", 
         "required": true, 
@@ -5761,7 +5761,7 @@
       "summary": "GetTransactionByBlockHashAndIndex returns the transaction for the given block hash and index.\n", 
       "description": "```go\n// GetTransactionByBlockHashAndIndex returns the transaction for the given block hash and index.\nfunc (s *PublicTransactionPoolAPI) GetTransactionByBlockHashAndIndex(ctx context.Context, blockHash common.Hash, index hexutil.Uint) *RPCTransaction {\n\tif block, _ := s.b.BlockByHash(ctx, blockHash); block != nil {\n\t\treturn newRPCTransactionFromBlockIndex(block, uint64(index))\n\t}\n\treturn nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1245", 
+        "description": "line=1233", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -5793,7 +5793,7 @@
         }
       ], 
       "result": {
-        "name": "RPCTransaction", 
+        "name": "*RPCTransaction", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/internal/ethapi.*RPCTransaction\n```", 
         "required": true, 
@@ -5895,7 +5895,7 @@
       "summary": "GetTransactionByBlockNumberAndIndex returns the transaction for the given block number and index.\n", 
       "description": "```go\n// GetTransactionByBlockNumberAndIndex returns the transaction for the given block number and index.\nfunc (s *PublicTransactionPoolAPI) GetTransactionByBlockNumberAndIndex(ctx context.Context, blockNr rpc.BlockNumber, index hexutil.Uint) *RPCTransaction {\n\tif block, _ := s.b.BlockByNumber(ctx, blockNr); block != nil {\n\t\treturn newRPCTransactionFromBlockIndex(block, uint64(index))\n\t}\n\treturn nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1237", 
+        "description": "line=1225", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -5938,7 +5938,7 @@
         }
       ], 
       "result": {
-        "name": "RPCTransaction", 
+        "name": "*RPCTransaction", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/internal/ethapi.*RPCTransaction\n```", 
         "required": true, 
@@ -6040,7 +6040,7 @@
       "summary": "GetTransactionByHash returns the transaction for the given hash\n", 
       "description": "```go\n// GetTransactionByHash returns the transaction for the given hash\nfunc (s *PublicTransactionPoolAPI) GetTransactionByHash(ctx context.Context, hash common.Hash) (*RPCTransaction, error) {\n\n\ttx, blockHash, blockNumber, index, err := s.b.GetTransaction(ctx, hash)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tif tx != nil {\n\t\treturn newRPCTransaction(tx, blockHash, blockNumber, index), nil\n\t}\n\n\tif tx := s.b.GetPoolTransaction(hash); tx != nil {\n\t\treturn newRPCPendingTransaction(tx), nil\n\t}\n\n\treturn nil, nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1288", 
+        "description": "line=1276", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -6059,7 +6059,7 @@
         }
       ], 
       "result": {
-        "name": "RPCTransaction", 
+        "name": "*RPCTransaction", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/internal/ethapi.*RPCTransaction\n```", 
         "required": true, 
@@ -6161,7 +6161,7 @@
       "summary": "GetTransactionCount returns the number of transactions the given address has sent for the given block number\n", 
       "description": "```go\n// GetTransactionCount returns the number of transactions the given address has sent for the given block number\nfunc (s *PublicTransactionPoolAPI) GetTransactionCount(ctx context.Context, address common.Address, blockNrOrHash rpc.BlockNumberOrHash) (*hexutil.Uint64, error) {\n\n\tif blockNr, ok := blockNrOrHash.Number(); ok \u0026\u0026 blockNr == rpc.PendingBlockNumber {\n\t\tnonce, err := s.b.GetPoolNonce(ctx, address)\n\t\tif err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t\treturn (*hexutil.Uint64)(\u0026nonce), nil\n\t}\n\n\tstate, _, err := s.b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)\n\tif state == nil || err != nil {\n\t\treturn nil, err\n\t}\n\tnonce := state.GetNonce(address)\n\treturn (*hexutil.Uint64)(\u0026nonce), state.Error()\n}\n```", 
       "externalDocs": {
-        "description": "line=1269", 
+        "description": "line=1257", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -6239,7 +6239,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Uint64}", 
+        "name": "*hexutil.Uint64", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.*Uint64\n```", 
         "required": true, 
@@ -6271,7 +6271,7 @@
       "summary": "GetTransactionReceipt returns the transaction receipt for the given transaction hash.\n", 
       "description": "```go\n// GetTransactionReceipt returns the transaction receipt for the given transaction hash.\nfunc (s *PublicTransactionPoolAPI) GetTransactionReceipt(ctx context.Context, hash common.Hash) (map[string]interface{}, error) {\n\ttx, blockHash, blockNumber, index := rawdb.ReadTransaction(s.b.ChainDb(), hash)\n\tif tx == nil {\n\t\treturn nil, nil\n\t}\n\treceipts, err := s.b.GetReceipts(ctx, blockHash)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tif len(receipts) \u003c= int(index) {\n\t\treturn nil, nil\n\t}\n\treceipt := receipts[index]\n\n\tvar signer types.Signer = types.FrontierSigner{}\n\tif tx.Protected() {\n\t\tsigner = types.NewEIP155Signer(tx.ChainId())\n\t}\n\tfrom, _ := types.Sender(signer, tx)\n\n\tfields := map[string]interface{}{\n\t\t\"blockHash\":\t\tblockHash,\n\t\t\"blockNumber\":\t\thexutil.Uint64(blockNumber),\n\t\t\"transactionHash\":\thash,\n\t\t\"transactionIndex\":\thexutil.Uint64(index),\n\t\t\"from\":\t\t\tfrom,\n\t\t\"to\":\t\t\ttx.To(),\n\t\t\"gasUsed\":\t\thexutil.Uint64(receipt.GasUsed),\n\t\t\"cumulativeGasUsed\":\thexutil.Uint64(receipt.CumulativeGasUsed),\n\t\t\"contractAddress\":\tnil,\n\t\t\"logs\":\t\t\treceipt.Logs,\n\t\t\"logsBloom\":\t\treceipt.Bloom,\n\t}\n\n\tif len(receipt.PostState) \u003e 0 {\n\t\tfields[\"root\"] = hexutil.Bytes(receipt.PostState)\n\t} else {\n\t\tfields[\"status\"] = hexutil.Uint(receipt.Status)\n\t}\n\tif receipt.Logs == nil {\n\t\tfields[\"logs\"] = [][]*types.Log{}\n\t}\n\n\tif receipt.ContractAddress != (common.Address{}) {\n\t\tfields[\"contractAddress\"] = receipt.ContractAddress\n\t}\n\treturn fields, nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1324", 
+        "description": "line=1312", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -6290,7 +6290,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=48950) string %!s(*ast.InterfaceType=\u0026{48961 0xc024198660 false})}", 
+        "name": "map[string]interface{}", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -6349,7 +6349,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=26278) string %!s(*ast.InterfaceType=\u0026{26289 0xc022104d20 false})}", 
+        "name": "map[string]interface{}", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -6419,7 +6419,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=25522) string %!s(*ast.InterfaceType=\u0026{25533 0xc022d97380 false})}", 
+        "name": "map[string]interface{}", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -6465,7 +6465,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Uint}", 
+        "name": "*hexutil.Uint", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.*Uint\n```", 
         "required": true, 
@@ -6527,7 +6527,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Uint}", 
+        "name": "*hexutil.Uint", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.*Uint\n```", 
         "required": true, 
@@ -6564,7 +6564,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=1506) %!s(*ast.BasicLit=\u0026{1507 5 4}) string}", 
+        "name": "[4]string", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -6596,7 +6596,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{hexutil Uint64}", 
+        "name": "hexutil.Uint64", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Uint64\n```", 
         "required": true, 
@@ -6675,7 +6675,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{rpc Subscription}", 
+        "name": "*rpc.Subscription", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/rpc.*Subscription\n```", 
         "required": true, 
@@ -6739,7 +6739,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{rpc ID}", 
+        "name": "rpc.ID", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/rpc.ID\n```", 
         "required": true, 
@@ -6816,7 +6816,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{rpc ID}", 
+        "name": "rpc.ID", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/rpc.ID\n```", 
         "required": true, 
@@ -6844,7 +6844,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{rpc Subscription}", 
+        "name": "*rpc.Subscription", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/rpc.*Subscription\n```", 
         "required": true, 
@@ -6880,7 +6880,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{rpc ID}", 
+        "name": "rpc.ID", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/rpc.ID\n```", 
         "required": true, 
@@ -6908,7 +6908,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{rpc Subscription}", 
+        "name": "*rpc.Subscription", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/rpc.*Subscription\n```", 
         "required": true, 
@@ -6939,12 +6939,12 @@
       "summary": "PendingTransactions returns the transactions that are in the transaction pool\nand have a from address that is one of the accounts this node manages.\n", 
       "description": "```go\n// PendingTransactions returns the transactions that are in the transaction pool\n// and have a from address that is one of the accounts this node manages.\nfunc (s *PublicTransactionPoolAPI) PendingTransactions() ([]*RPCTransaction, error) {\n\tpending, err := s.b.GetPoolTransactions()\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\taccounts := make(map[common.Address]struct{})\n\tfor _, wallet := range s.b.AccountManager().Wallets() {\n\t\tfor _, account := range wallet.Accounts() {\n\t\t\taccounts[account.Address] = struct{}{}\n\t\t}\n\t}\n\ttransactions := make([]*RPCTransaction, 0, len(pending))\n\tfor _, tx := range pending {\n\t\tvar signer types.Signer = types.HomesteadSigner{}\n\t\tif tx.Protected() {\n\t\t\tsigner = types.NewEIP155Signer(tx.ChainId())\n\t\t}\n\t\tfrom, _ := types.Sender(signer, tx)\n\t\tif _, exists := accounts[from]; exists {\n\t\t\ttransactions = append(transactions, newRPCPendingTransaction(tx))\n\t\t}\n\t}\n\treturn transactions, nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1611", 
+        "description": "line=1599", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=58674) \u003cnil\u003e %!s(*ast.StarExpr=\u0026{58676 0xc02482d8a0})}", 
+        "name": "[]*RPCTransaction", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -7054,7 +7054,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{hexutil Uint}", 
+        "name": "hexutil.Uint", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Uint\n```", 
         "required": true, 
@@ -7079,7 +7079,7 @@
       "summary": "Resend accepts an existing transaction and a new gas price and limit. It will remove\nthe given transaction from the pool and reinsert it with the new gas price and limit.\n", 
       "description": "```go\n// Resend accepts an existing transaction and a new gas price and limit. It will remove\n// the given transaction from the pool and reinsert it with the new gas price and limit.\nfunc (s *PublicTransactionPoolAPI) Resend(ctx context.Context, sendArgs SendTxArgs, gasPrice *hexutil.Big, gasLimit *hexutil.Uint64) (common.Hash, error) {\n\tif sendArgs.Nonce == nil {\n\t\treturn common.Hash{}, fmt.Errorf(\"missing transaction nonce in transaction spec\")\n\t}\n\tif err := sendArgs.setDefaults(ctx, s.b); err != nil {\n\t\treturn common.Hash{}, err\n\t}\n\tmatchTx := sendArgs.toTransaction()\n\tpending, err := s.b.GetPoolTransactions()\n\tif err != nil {\n\t\treturn common.Hash{}, err\n\t}\n\n\tfor _, p := range pending {\n\t\tvar signer types.Signer = types.HomesteadSigner{}\n\t\tif p.Protected() {\n\t\t\tsigner = types.NewEIP155Signer(p.ChainId())\n\t\t}\n\t\twantSigHash := signer.Hash(matchTx)\n\n\t\tif pFrom, err := types.Sender(signer, p); err == nil \u0026\u0026 pFrom == sendArgs.From \u0026\u0026 signer.Hash(p) == wantSigHash {\n\n\t\t\tif gasPrice != nil \u0026\u0026 (*big.Int)(gasPrice).Sign() != 0 {\n\t\t\t\tsendArgs.GasPrice = gasPrice\n\t\t\t}\n\t\t\tif gasLimit != nil \u0026\u0026 *gasLimit != 0 {\n\t\t\t\tsendArgs.Gas = gasLimit\n\t\t\t}\n\t\t\tsignedTx, err := s.sign(sendArgs.From, sendArgs.toTransaction())\n\t\t\tif err != nil {\n\t\t\t\treturn common.Hash{}, err\n\t\t\t}\n\t\t\tif err = s.b.SendTx(ctx, signedTx); err != nil {\n\t\t\t\treturn common.Hash{}, err\n\t\t\t}\n\t\t\treturn signedTx.Hash(), nil\n\t\t}\n\t}\n\n\treturn common.Hash{}, fmt.Errorf(\"transaction %#x not found\", matchTx.Hash())\n}\n```", 
       "externalDocs": {
-        "description": "line=1638", 
+        "description": "line=1626", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -7179,7 +7179,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{common Hash}", 
+        "name": "common.Hash", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common.Hash\n```", 
         "required": true, 
@@ -7204,7 +7204,7 @@
       "summary": "SendRawTransaction will add the signed transaction to the transaction pool.\nThe sender is responsible for signing the transaction and using the correct nonce.\n", 
       "description": "```go\n// SendRawTransaction will add the signed transaction to the transaction pool.\n// The sender is responsible for signing the transaction and using the correct nonce.\nfunc (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encodedTx hexutil.Bytes) (common.Hash, error) {\n\ttx := new(types.Transaction)\n\tif err := rlp.DecodeBytes(encodedTx, tx); err != nil {\n\t\treturn common.Hash{}, err\n\t}\n\treturn SubmitTransaction(ctx, s.b, tx)\n}\n```", 
       "externalDocs": {
-        "description": "line=1543", 
+        "description": "line=1531", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -7230,7 +7230,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{common Hash}", 
+        "name": "common.Hash", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common.Hash\n```", 
         "required": true, 
@@ -7255,7 +7255,7 @@
       "summary": "SendTransaction creates a transaction for the given argument, sign it and submit it to the\ntransaction pool.\n", 
       "description": "```go\n// SendTransaction creates a transaction for the given argument, sign it and submit it to the\n// transaction pool.\nfunc (s *PublicTransactionPoolAPI) SendTransaction(ctx context.Context, args SendTxArgs) (common.Hash, error) {\n\n\taccount := accounts.Account{Address: args.From}\n\n\twallet, err := s.b.AccountManager().Find(account)\n\tif err != nil {\n\t\treturn common.Hash{}, err\n\t}\n\n\tif args.Nonce == nil {\n\n\t\ts.nonceLock.LockAddr(args.From)\n\t\tdefer s.nonceLock.UnlockAddr(args.From)\n\t}\n\n\tif err := args.setDefaults(ctx, s.b); err != nil {\n\t\treturn common.Hash{}, err\n\t}\n\n\ttx := args.toTransaction()\n\n\tsigned, err := wallet.SignTx(account, tx, s.b.ChainConfig().GetChainID())\n\tif err != nil {\n\t\treturn common.Hash{}, err\n\t}\n\treturn SubmitTransaction(ctx, s.b, signed)\n}\n```", 
       "externalDocs": {
-        "description": "line=1495", 
+        "description": "line=1483", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -7315,7 +7315,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{common Hash}", 
+        "name": "common.Hash", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common.Hash\n```", 
         "required": true, 
@@ -7340,7 +7340,7 @@
       "summary": "Sign calculates an ECDSA signature for:\nkeccack256(\"\\x19Ethereum Signed Message:\\n\" + len(message) + message).\n\nNote, the produced signature conforms to the secp256k1 curve R, S and V values,\nwhere the V value will be 27 or 28 for legacy reasons.\n\nThe account associated with addr must be unlocked.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign\n", 
       "description": "```go\n// Sign calculates an ECDSA signature for:\n// keccack256(\"\\x19Ethereum Signed Message:\\n\" + len(message) + message).\n//\n// Note, the produced signature conforms to the secp256k1 curve R, S and V values,\n// where the V value will be 27 or 28 for legacy reasons.\n//\n// The account associated with addr must be unlocked.\n//\n// https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign\nfunc (s *PublicTransactionPoolAPI) Sign(addr common.Address, data hexutil.Bytes) (hexutil.Bytes, error) {\n\n\taccount := accounts.Account{Address: addr}\n\n\twallet, err := s.b.AccountManager().Find(account)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\n\tsignature, err := wallet.SignText(account, data)\n\tif err == nil {\n\t\tsignature[64] += 27\n\t}\n\treturn signature, err\n}\n```", 
       "externalDocs": {
-        "description": "line=1560", 
+        "description": "line=1548", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -7379,7 +7379,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Bytes}", 
+        "name": "hexutil.Bytes", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Bytes\n```", 
         "required": true, 
@@ -7411,7 +7411,7 @@
       "summary": "SignTransaction will sign the given transaction with the from account.\nThe node needs to have the private key of the account corresponding with\nthe given from address and it needs to be unlocked.\n", 
       "description": "```go\n// SignTransaction will sign the given transaction with the from account.\n// The node needs to have the private key of the account corresponding with\n// the given from address and it needs to be unlocked.\nfunc (s *PublicTransactionPoolAPI) SignTransaction(ctx context.Context, args SendTxArgs) (*SignTransactionResult, error) {\n\tif args.Gas == nil {\n\t\treturn nil, fmt.Errorf(\"gas not specified\")\n\t}\n\tif args.GasPrice == nil {\n\t\treturn nil, fmt.Errorf(\"gasPrice not specified\")\n\t}\n\tif args.Nonce == nil {\n\t\treturn nil, fmt.Errorf(\"nonce not specified\")\n\t}\n\tif err := args.setDefaults(ctx, s.b); err != nil {\n\t\treturn nil, err\n\t}\n\ttx, err := s.sign(args.From, args.toTransaction())\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tdata, err := rlp.EncodeToBytes(tx)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\treturn \u0026SignTransactionResult{data, tx}, nil\n}\n```", 
       "externalDocs": {
-        "description": "line=1585", 
+        "description": "line=1573", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [
@@ -7471,7 +7471,7 @@
         }
       ], 
       "result": {
-        "name": "SignTransactionResult", 
+        "name": "*SignTransactionResult", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/internal/ethapi.*SignTransactionResult\n```", 
         "required": true, 
@@ -7647,12 +7647,12 @@
           "deprecated": false, 
           "schema": {
             "type": "object", 
-            "title": "unknown"
+            "title": "\u003cunknown\u003e"
           }
         }
       ], 
       "result": {
-        "name": "SyncStatusSubscription", 
+        "name": "*SyncStatusSubscription", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/eth/downloader.*SyncStatusSubscription\n```", 
         "required": true, 
@@ -7662,6 +7662,42 @@
             {
               "type": "object", 
               "additionalProperties": false
+            }, 
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }, 
+      "deprecated": false, 
+      "servers": [], 
+      "errors": [], 
+      "links": [], 
+      "paramStructure": "by-position", 
+      "examples": []
+    }, 
+    {
+      "name": "eth_syncing", 
+      "tags": [], 
+      "summary": "Syncing provides information when this nodes starts synchronising with the Ethereum network and when it's finished.\n", 
+      "description": "```go\n// Syncing provides information when this nodes starts synchronising with the Ethereum network and when it's finished.\nfunc (api *PublicDownloaderAPI) Syncing(ctx context.Context) (*rpc.Subscription, error) {\n\tnotifier, supported := rpc.NotifierFromContext(ctx)\n\tif !supported {\n\t\treturn \u0026rpc.Subscription{}, rpc.ErrNotificationsUnsupported\n\t}\n\n\trpcSub := notifier.CreateSubscription()\n\n\tgo func() {\n\t\tstatuses := make(chan interface{})\n\t\tsub := api.SubscribeSyncStatus(statuses)\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase status := \u003c-statuses:\n\t\t\t\tnotifier.Notify(rpcSub.ID, status)\n\t\t\tcase \u003c-rpcSub.Err():\n\t\t\t\tsub.Unsubscribe()\n\t\t\t\treturn\n\t\t\tcase \u003c-notifier.Closed():\n\t\t\t\tsub.Unsubscribe()\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\n\treturn rpcSub, nil\n}\n```", 
+      "externalDocs": {
+        "description": "line=93", 
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/downloader/api.go"
+      }, 
+      "params": [], 
+      "result": {
+        "name": "*rpc.Subscription", 
+        "summary": "", 
+        "description": "```go\ngithub.com/ethereum/go-ethereum/rpc.*Subscription\n```", 
+        "required": true, 
+        "deprecated": false, 
+        "schema": {
+          "oneOf": [
+            {
+              "description": "github.com/ethereum/go-ethereum/rpc.*Subscription", 
+              "type": "object", 
+              "title": "subscription-ptr"
             }, 
             {
               "type": "null"
@@ -7779,42 +7815,6 @@
       "examples": []
     }, 
     {
-      "name": "eth_syncing", 
-      "tags": [], 
-      "summary": "Syncing provides information when this nodes starts synchronising with the Ethereum network and when it's finished.\n", 
-      "description": "```go\n// Syncing provides information when this nodes starts synchronising with the Ethereum network and when it's finished.\nfunc (api *PublicDownloaderAPI) Syncing(ctx context.Context) (*rpc.Subscription, error) {\n\tnotifier, supported := rpc.NotifierFromContext(ctx)\n\tif !supported {\n\t\treturn \u0026rpc.Subscription{}, rpc.ErrNotificationsUnsupported\n\t}\n\n\trpcSub := notifier.CreateSubscription()\n\n\tgo func() {\n\t\tstatuses := make(chan interface{})\n\t\tsub := api.SubscribeSyncStatus(statuses)\n\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase status := \u003c-statuses:\n\t\t\t\tnotifier.Notify(rpcSub.ID, status)\n\t\t\tcase \u003c-rpcSub.Err():\n\t\t\t\tsub.Unsubscribe()\n\t\t\t\treturn\n\t\t\tcase \u003c-notifier.Closed():\n\t\t\t\tsub.Unsubscribe()\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\n\treturn rpcSub, nil\n}\n```", 
-      "externalDocs": {
-        "description": "line=93", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/downloader/api.go"
-      }, 
-      "params": [], 
-      "result": {
-        "name": "\u0026{rpc Subscription}", 
-        "summary": "", 
-        "description": "```go\ngithub.com/ethereum/go-ethereum/rpc.*Subscription\n```", 
-        "required": true, 
-        "deprecated": false, 
-        "schema": {
-          "oneOf": [
-            {
-              "description": "github.com/ethereum/go-ethereum/rpc.*Subscription", 
-              "type": "object", 
-              "title": "subscription-ptr"
-            }, 
-            {
-              "type": "null"
-            }
-          ]
-        }
-      }, 
-      "deprecated": false, 
-      "servers": [], 
-      "errors": [], 
-      "links": [], 
-      "paramStructure": "by-position", 
-      "examples": []
-    }, 
-    {
       "name": "eth_uninstallFilter", 
       "tags": [], 
       "summary": "UninstallFilter removes the filter with the given filter id.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_uninstallfilter\n", 
@@ -7895,7 +7895,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=1506) %!s(*ast.BasicLit=\u0026{1507 5 4}) string}", 
+        "name": "[4]string", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -8315,7 +8315,7 @@
       "summary": "Listening returns an indication if the node is listening for network connections.\n", 
       "description": "```go\n// Listening returns an indication if the node is listening for network connections.\nfunc (s *PublicNetAPI) Listening() bool {\n\treturn true\n}\n```", 
       "externalDocs": {
-        "description": "line=1815", 
+        "description": "line=1803", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [], 
@@ -8343,12 +8343,12 @@
       "summary": "PeerCount returns the number of connected peers\n", 
       "description": "```go\n// PeerCount returns the number of connected peers\nfunc (s *PublicNetAPI) PeerCount() hexutil.Uint {\n\treturn hexutil.Uint(s.net.PeerCount())\n}\n```", 
       "externalDocs": {
-        "description": "line=1819", 
+        "description": "line=1807", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{hexutil Uint}", 
+        "name": "hexutil.Uint", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Uint\n```", 
         "required": true, 
@@ -8373,7 +8373,7 @@
       "summary": "Version returns the current ethereum protocol version.\n", 
       "description": "```go\n// Version returns the current ethereum protocol version.\nfunc (s *PublicNetAPI) Version() string {\n\treturn fmt.Sprintf(\"%d\", s.networkVersion)\n}\n```", 
       "externalDocs": {
-        "description": "line=1824", 
+        "description": "line=1812", 
         "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/internal/ethapi/api.go"
       }, 
       "params": [], 
@@ -8447,7 +8447,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{accounts Account}", 
+        "name": "accounts.Account", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/accounts.Account\n```", 
         "required": true, 
@@ -8535,7 +8535,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{common Address}", 
+        "name": "common.Address", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common.Address\n```", 
         "required": true, 
@@ -8588,7 +8588,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{common Address}", 
+        "name": "common.Address", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common.Address\n```", 
         "required": true, 
@@ -8658,7 +8658,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=8434) \u003cnil\u003e %!s(*ast.SelectorExpr=\u0026{0xc0a67c80e0 0xc0a67c8100})}", 
+        "name": "[]common.Address", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -8697,7 +8697,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=8939) \u003cnil\u003e rawWallet}", 
+        "name": "[]rawWallet", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -8826,7 +8826,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{common Address}", 
+        "name": "common.Address", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common.Address\n```", 
         "required": true, 
@@ -8979,7 +8979,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{common Hash}", 
+        "name": "common.Hash", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common.Hash\n```", 
         "required": true, 
@@ -9054,7 +9054,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Bytes}", 
+        "name": "hexutil.Bytes", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Bytes\n```", 
         "required": true, 
@@ -9157,7 +9157,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{common Hash}", 
+        "name": "common.Hash", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common.Hash\n```", 
         "required": true, 
@@ -9264,7 +9264,7 @@
         }
       ], 
       "result": {
-        "name": "SignTransactionResult", 
+        "name": "*SignTransactionResult", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/internal/ethapi.*SignTransactionResult\n```", 
         "required": true, 
@@ -9433,7 +9433,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=6292) string string}", 
+        "name": "map[string]string", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -9465,7 +9465,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=4920) string %!s(*ast.MapType=\u0026{4931 0xc024d8aa00 0xc024d8c300})}", 
+        "name": "map[string]map[string]map[string]*RPCTransaction", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -9580,7 +9580,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=6157) string %!s(*ast.MapType=\u0026{6168 0xc024fd8380 0xc024fd1320})}", 
+        "name": "map[string]map[string]map[string]string", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -9622,7 +9622,7 @@
       }, 
       "params": [], 
       "result": {
-        "name": "\u0026{%!s(token.Pos=5846) string %!s(*ast.SelectorExpr=\u0026{0xc024c893e0 0xc024c89400})}", 
+        "name": "map[string]hexutil.Uint", 
         "summary": "", 
         "description": "```go\n\n```", 
         "required": true, 
@@ -9706,7 +9706,7 @@
         }
       ], 
       "result": {
-        "name": "\u0026{hexutil Bytes}", 
+        "name": "hexutil.Bytes", 
         "summary": "", 
         "description": "```go\ngithub.com/ethereum/go-ethereum/common/hexutil.Bytes\n```", 
         "required": true, 

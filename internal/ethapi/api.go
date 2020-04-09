@@ -75,7 +75,7 @@ func (s *PublicEthereumAPI) ProtocolVersion() hexutil.Uint {
 }
 
 type EthSyncingResult struct {
-	Syncing  EthSyncingResultSyncing   `jsonschema:"oneof"`  // `jsonschema:"oneof_type=EthSyncingResultSyncing"`
+	Syncing  EthSyncingResultSyncing   `jsonschema:"oneof"` // `jsonschema:"oneof_type=EthSyncingResultSyncing"`
 	Progress *EthSyncingResultProgress `jsonschema:"oneof"` // `jsonschema:"oneof_type=EthSyncingResultProgress"`
 }
 

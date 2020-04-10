@@ -17,6 +17,7 @@
 package bind
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -1642,11 +1643,44 @@ func TestGolangBindings(t *testing.T) {
 		t.Fatalf("failed to convert binding test to modules: %v\n%s", err, out)
 	}
 	pwd, _ := os.Getwd()
-	replacer := exec.Command(gocmd, "mod", "edit", "-replace", "github.com/ethereum/go-ethereum="+filepath.Join(pwd, "..", "..", "..")) // Repo root
+	repoRoot := filepath.Join(pwd, "..", "..", "..")
+
+	replacer := exec.Command(gocmd, "mod", "edit", "-replace", "github.com/ethereum/go-ethereum="+repoRoot)
 	replacer.Dir = pkg
 	if out, err := replacer.CombinedOutput(); err != nil {
 		t.Fatalf("failed to replace binding test dependency to current source tree: %v\n%s", err, out)
 	}
+
+	// Scan the repo root (go-ethereum) go.mod file, and carry over
+	// any "replace" directive statements.
+	// This keeps this test from failing because of mismatch dependency types
+	// compared to the actual parent project.
+	rootGoMod, err := os.Open(filepath.Join(repoRoot, "go.mod"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	scnr := bufio.NewScanner(rootGoMod)
+	for scnr.Scan() {
+		line := scnr.Text()
+		if strings.HasPrefix(line, "replace ") {
+			// Dissemble the statement to usable bits and format.
+			line = strings.TrimPrefix(line, "replace ")
+			spl := strings.Split(line, "=>")
+			from, to := strings.TrimSpace(spl[0]), strings.TrimSpace(spl[1])
+			from, to = strings.Replace(from, " ", "@", 1), strings.Replace(to, " ", "@", 1)
+
+			// Make the 'go mod edit -replace' command.
+			replacer = exec.Command(gocmd, "mod", "edit", "-replace", from+"="+to)
+			replacer.Dir = pkg
+			if out, err := replacer.CombinedOutput(); err != nil {
+				t.Fatalf("failed to replace binding test dependency to current source tree: %v\n%s", err, out)
+			}
+		}
+	}
+	if err := scnr.Err(); err != nil {
+		t.Fatal(err)
+	}
+
 	// Test the entire package and report any failures
 	cmd := exec.Command(gocmd, "test", "-v", "-count", "1")
 	cmd.Dir = pkg

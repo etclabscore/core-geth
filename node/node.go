@@ -89,7 +89,7 @@ func newOpenRPCDocument(listener net.Listener) *OpenRPCDocument {
 	openrpcServerConfig := &go_openrpc_reflect.ServerDescriptorT{
 		ServiceOpenRPCInfoFn: func() go_openrpc_types.Info {
 			return go_openrpc_types.Info{
-				Title:          "Core-Geth Ethereum JSON-RPC: " +listener.Addr().Network() + ":" + listener.Addr().String(),
+				Title:          "Core-Geth Ethereum JSON-RPC: " + listener.Addr().Network() + ":" + listener.Addr().String(),
 				Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
 				TermsOfService: "https://github.com/etclabscore/core-geth/blob/master/COPYING",
 				Contact: go_openrpc_types.Contact{

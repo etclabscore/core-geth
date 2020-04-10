@@ -31,6 +31,7 @@ import (
 
 const (
 	vsn                      = "2.0"
+	serviceMethodSeparator   = "_"
 	subscribeMethodSuffix    = "_subscribe"
 	unsubscribeMethodSuffix  = "_unsubscribe"
 	notificationMethodSuffix = "_subscription"
@@ -38,20 +39,7 @@ const (
 	defaultWriteTimeout = 10 * time.Second // used if context has no deadline
 )
 
-var (
-	null                    = json.RawMessage("null")
-	serviceMethodSeparators = []string{"_", "."}
-	errInvalidMethodName    = errors.New("invalid method name")
-)
-
-func elementizeMethodName(methodName string) (module, method string, err error) {
-	for _, sep := range serviceMethodSeparators {
-		if s := strings.SplitN(methodName, sep, 2); len(s) == 2 {
-			return s[0], s[1], nil
-		}
-	}
-	return "", "", errInvalidMethodName
-}
+var null = json.RawMessage("null")
 
 type subscriptionResult struct {
 	ID     string          `json:"subscription"`
@@ -94,8 +82,8 @@ func (msg *jsonrpcMessage) isUnsubscribe() bool {
 }
 
 func (msg *jsonrpcMessage) namespace() string {
-	module, _, _ := elementizeMethodName(msg.Method)
-	return module // even if err != nil, empty string is returned so err can be ignored
+	elem := strings.SplitN(msg.Method, serviceMethodSeparator, 2)
+	return elem[0]
 }
 
 func (msg *jsonrpcMessage) String() string {

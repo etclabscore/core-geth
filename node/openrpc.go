@@ -13,6 +13,68 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
+const bytesD = `{
+"title": "bytes",
+"type": "string",
+"description": "Hex representation of a variable length byte array",
+"pattern": "^0x([a-fA-F0-9]?)+$"
+}`
+const integerD = `{
+          "title": "integer",
+          "type": "string",
+          "pattern": "^0x[a-fA-F0-9]+$",
+          "description": "Hex representation of the integer"
+        }`
+const commonAddressD = `{
+          "title": "keccak",
+          "type": "string",
+          "description": "Hex representation of a Keccak 256 hash POINTER",
+          "pattern": "^0x[a-fA-F\\d]{64}$"
+        }`
+const commonHashD = `{
+          "title": "keccak",
+          "type": "string",
+          "description": "Hex representation of a Keccak 256 hash",
+          "pattern": "^0x[a-fA-F\\d]{64}$"
+        }`
+const hexutilBytesD = `{
+          "title": "dataWord",
+          "type": "string",
+          "description": "Hex representation of some bytes",
+          "pattern": "^0x([a-fA-F\\d])+$"
+        }`
+const hexutilUintD = `{
+		"title": "uint",
+			"type": "string",
+			"description": "Hex representation of a uint",
+			"pattern": "^0x([a-fA-F\\d])+$"
+	}`
+const hexutilUint64D = `{
+          "title": "uint64",
+          "type": "string",
+          "description": "Hex representation of a uint64",
+          "pattern": "^0x([a-fA-F\\d])+$"
+        }`
+const blockNumberTagD = `{
+	     "title": "blockNumberTag",
+	     "type": "string",
+	     "description": "The optional block height description",
+	     "enum": [
+	       "earliest",
+	       "latest",
+	       "pending"
+	     ]
+	   }`
+
+var blockNumberOrHashD = fmt.Sprintf(`{
+          "oneOf": [
+            %s,
+            %s
+          ]
+        }`, blockNumberTagD, commonHashD)
+
+var emptyInterface interface{}
+
 // schemaDictEntry represents a type association passed to the jsonschema reflector.
 type schemaDictEntry struct {
 	example interface{}
@@ -32,102 +94,26 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 		return &js
 	}
 
-	integerD := `{
-          "title": "integer",
-          "type": "string",
-          "pattern": "^0x[a-fA-F0-9]+$",
-          "description": "Hex representation of the integer"
-        }`
-	commonAddressD := `{
-          "title": "keccak",
-          "type": "string",
-          "description": "Hex representation of a Keccak 256 hash POINTER",
-          "pattern": "^0x[a-fA-F\\d]{64}$"
-        }`
-	commonHashD := `{
-          "title": "keccak",
-          "type": "string",
-          "description": "Hex representation of a Keccak 256 hash",
-          "pattern": "^0x[a-fA-F\\d]{64}$"
-        }`
-	hexutilBytesD := `{
-          "title": "dataWord",
-          "type": "string",
-          "description": "Hex representation of some bytes",
-          "pattern": "^0x([a-fA-F\\d])+$"
-        }`
-	hexutilUintD := `{
-		"title": "uint",
-			"type": "string",
-			"description": "Hex representation of a uint",
-			"pattern": "^0x([a-fA-F\\d])+$"
-	}`
-	hexutilUint64D := `{
-          "title": "uint64",
-          "type": "string",
-          "description": "Hex representation of a uint64",
-          "pattern": "^0x([a-fA-F\\d])+$"
-        }`
-	blockNumberTagD := `{
-	     "title": "blockNumberTag",
-	     "type": "string",
-	     "description": "The optional block height description",
-	     "enum": [
-	       "earliest",
-	       "latest",
-	       "pending"
-	     ]
-	   }`
-
-	blockNumberOrHashD := fmt.Sprintf(`{
-          "oneOf": [
-            %s,
-            %s
-          ]
-        }`, blockNumberTagD, commonHashD)
-
-	var emptyInterface interface{}
+	if ty.Kind() == reflect.Ptr {
+		ty = ty.Elem()
+	}
 
 	// Second, handle other types.
 	// Use a slice instead of a map because it preserves order, as a logic safeguard/fallback.
 	dict := []schemaDictEntry{
-
 		{emptyInterface, fmt.Sprintf(`{
 			"oneOf": [{"additionalProperties": true}, {"type": "null"}]
 		}`)},
-
-		{new(big.Int), integerD},
+		{[]byte{}, bytesD},
 		{big.Int{}, integerD},
-
 		{types.BlockNonce{}, integerD},
-
-		{new(common.Address), commonAddressD},
 		{common.Address{}, commonAddressD},
-
-		{new(common.Hash), commonHashD},
 		{common.Hash{}, commonHashD},
-
-		{new(hexutil.Big), integerD},
 		{hexutil.Big{}, integerD},
-
 		{hexutil.Bytes{}, hexutilBytesD},
-		{new(hexutil.Bytes), hexutilBytesD},
-
 		{hexutil.Uint(0), hexutilUintD},
-		{new(hexutil.Uint), hexutilUintD},
-
 		{hexutil.Uint64(0), hexutilUint64D},
-		{new(hexutil.Uint64), hexutilUint64D},
-
-		{[]byte{}, `{
-          "title": "bytes",
-          "type": "string",
-          "description": "Hex representation of a variable length byte array",
-          "pattern": "^0x([a-fA-F0-9]?)+$"
-        }`},
-
 		{rpc.BlockNumber(0), blockNumberOrHashD},
-
 		{rpc.BlockNumberOrHash{}, fmt.Sprintf(`{
 		  "title": "blockNumberOrHash",
 		  "oneOf": [
@@ -148,14 +134,10 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 			}
 		  ]
 		}`, blockNumberOrHashD, blockNumberOrHashD)},
-
 		{rpc.Subscription{}, fmt.Sprintf(`{
 			"type": "object",
-			"title": "subscription"
-		}`)},
-		{new(rpc.Subscription), fmt.Sprintf(`{
-			"type": "object",
-			"title": "subscription-ptr"
+			"title": "Subscription",
+			"summary": ""
 		}`)},
 	}
 
@@ -165,10 +147,6 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 
 			return tt
 		}
-	}
-
-	if ty.Kind() == reflect.Ptr {
-		ty = ty.Elem()
 	}
 
 	// Handle primitive types in case there are generic cases

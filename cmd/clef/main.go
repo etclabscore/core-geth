@@ -539,18 +539,25 @@ func signer(c *cli.Context) error {
 		vhosts := splitAndTrim(c.GlobalString(utils.RPCVirtualHostsFlag.Name))
 		cors := splitAndTrim(c.GlobalString(utils.RPCCORSDomainFlag.Name))
 
+		srv := rpc.NewServer()
+		_, err := node.RegisterApisFromWhitelist(rpcAPI, []string{"account"}, srv, false)
+		if err != nil {
+			utils.Fatalf("Could not register API: %w", err)
+		}
+		handler := node.NewHTTPHandlerStack(srv, cors, vhosts)
+
 		// start http server
 		httpEndpoint := fmt.Sprintf("%s:%d", c.GlobalString(utils.RPCListenAddrFlag.Name), c.Int(rpcPortFlag.Name))
-		listener, _, err := rpc.StartHTTPEndpoint(httpEndpoint, rpcAPI, []string{"account"}, cors, vhosts, rpc.DefaultHTTPTimeouts)
+		listener, err := node.StartHTTPEndpoint(httpEndpoint, rpc.DefaultHTTPTimeouts, handler)
 		if err != nil {
 			utils.Fatalf("Could not start RPC api: %v", err)
 		}
-		extapiURL = fmt.Sprintf("http://%s", httpEndpoint)
+		extapiURL = fmt.Sprintf("http://%v/", listener.Addr())
 		log.Info("HTTP endpoint opened", "url", extapiURL)
 
 		defer func() {
 			listener.Close()
-			log.Info("HTTP endpoint closed", "url", httpEndpoint)
+			log.Info("HTTP endpoint closed", "url", extapiURL)
 		}()
 	}
 	if !c.GlobalBool(utils.IPCDisabledFlag.Name) {

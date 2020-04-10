@@ -13,11 +13,15 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
+// schemaDictEntry represents a type association passed to the jsonschema reflector.
 type schemaDictEntry struct {
-	t interface{}
-	j string
+	example interface{}
+	rawJson string
 }
 
+// OpenRPCJSONSchemaTypeMapper contains the application-specific type mapping
+// passed to the jsonschema reflector, used in generating a runtime representation
+// of specific API objects.
 func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 	unmarshalJSONToJSONSchemaType := func(input string) *jsonschema.Type {
 		var js jsonschema.Type
@@ -34,11 +38,35 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
           "pattern": "^0x[a-fA-F0-9]+$",
           "description": "Hex representation of the integer"
         }`
+	commonAddressD := `{
+          "title": "keccak",
+          "type": "string",
+          "description": "Hex representation of a Keccak 256 hash POINTER",
+          "pattern": "^0x[a-fA-F\\d]{64}$"
+        }`
 	commonHashD := `{
           "title": "keccak",
           "type": "string",
           "description": "Hex representation of a Keccak 256 hash",
           "pattern": "^0x[a-fA-F\\d]{64}$"
+        }`
+	hexutilBytesD := `{
+          "title": "dataWord",
+          "type": "string",
+          "description": "Hex representation of some bytes",
+          "pattern": "^0x([a-fA-F\\d])+$"
+        }`
+	hexutilUintD := `{
+		"title": "uint",
+			"type": "string",
+			"description": "Hex representation of a uint",
+			"pattern": "^0x([a-fA-F\\d])+$"
+	}`
+	hexutilUint64D := `{
+          "title": "uint64",
+          "type": "string",
+          "description": "Hex representation of a uint64",
+          "pattern": "^0x([a-fA-F\\d])+$"
         }`
 	blockNumberTagD := `{
 	     "title": "blockNumberTag",
@@ -58,12 +86,6 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
           ]
         }`, blockNumberTagD, commonHashD)
 
-	//s := jsonschema.Reflect(ethapi.Progress{})
-	//ethSyncingResultProgress, err := json.Marshal(s)
-	//if err != nil {
-	//	return nil
-	//}
-
 	var emptyInterface interface{}
 
 	// Second, handle other types.
@@ -79,74 +101,23 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 
 		{types.BlockNonce{}, integerD},
 
-		{new(common.Address), `{
-          "title": "keccak",
-          "type": "string",
-          "description": "Hex representation of a Keccak 256 hash POINTER",
-          "pattern": "^0x[a-fA-F\\d]{64}$"
-        }`},
+		{new(common.Address), commonAddressD},
+		{common.Address{}, commonAddressD},
 
-		{common.Address{}, `{
-          "title": "address",
-          "type": "string",
-          "pattern": "^0x[a-fA-F\\d]{40}$"
-        }`},
-
-		{new(common.Hash), `{
-          "title": "keccak",
-          "type": "string",
-          "description": "Hex representation of a Keccak 256 hash POINTER",
-          "pattern": "^0x[a-fA-F\\d]{64}$"
-        }`},
-
+		{new(common.Hash), commonHashD},
 		{common.Hash{}, commonHashD},
 
 		{new(hexutil.Big), integerD},
 		{hexutil.Big{}, integerD},
-		{
-			hexutil.Bytes{}, `{
-          "title": "dataWord",
-          "type": "string",
-          "description": "Hex representation of a 256 bit unit of data",
-          "pattern": "^0x([a-fA-F\\d]{64})?$"
-        }`},
-		{
-			new(hexutil.Bytes), `{
-          "title": "dataWord",
-          "type": "string",
-          "description": "Hex representation of a 256 bit unit of data",
-          "pattern": "^0x([a-fA-F\\d]{64})?$"
-        }`},
 
-		{
-			hexutil.Uint(0), `{
-          "title": "dataWord",
-          "type": "string",
-          "description": "Hex representation of a 256 bit unit of data",
-          "pattern": "^0x([a-fA-F\\d]{64})?$"
-        }`},
-		{
-			new(hexutil.Uint), `{
-          "title": "dataWord",
-          "type": "string",
-          "description": "Hex representation of a 256 bit unit of data",
-          "pattern": "^0x([a-fA-F\\d]{64})?$"
-        }`},
+		{hexutil.Bytes{}, hexutilBytesD},
+		{new(hexutil.Bytes), hexutilBytesD},
 
-		{
-			hexutil.Uint64(0), `{
-          "title": "dataWord",
-          "type": "string",
-          "description": "Hex representation of a 256 bit unit of data",
-          "pattern": "^0x([a-fA-F\\d]{64})?$"
-        }`},
-		{
-			new(hexutil.Uint64), `{
-          "title": "dataWord",
-          "type": "string",
-          "description": "Hex representation of a 256 bit unit of data",
-          "pattern": "^0x([a-fA-F\\d]{64})?$"
-        }`},
+		{hexutil.Uint(0), hexutilUintD},
+		{new(hexutil.Uint), hexutilUintD},
+
+		{hexutil.Uint64(0), hexutilUint64D},
+		{new(hexutil.Uint64), hexutilUint64D},
 
 		{[]byte{}, `{
           "title": "bytes",
@@ -155,9 +126,7 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
           "pattern": "^0x([a-fA-F0-9]?)+$"
         }`},
 
-		{rpc.BlockNumber(0),
-			blockNumberOrHashD,
-		},
+		{rpc.BlockNumber(0), blockNumberOrHashD},
 
 		{rpc.BlockNumberOrHash{}, fmt.Sprintf(`{
 		  "title": "blockNumberOrHash",
@@ -188,43 +157,11 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 			"type": "object",
 			"title": "subscription-ptr"
 		}`)},
-
-		//{
-		//	BlockNumber(0): blockNumberOrHashD,
-		//},
-
-		//{BlockNumberOrHash{}, fmt.Sprintf(`{
-		//  "title": "blockNumberOrHash",
-		//  "description": "Hex representation of a block number or hash",
-		//  "oneOf": [%s, %s]
-		//}`, commonHashD, integerD)},
-
-		//{BlockNumber(0), fmt.Sprintf(`{
-		//  "title": "blockNumberOrTag",
-		//  "description": "Block tag or hex representation of a block number",
-		//  "oneOf": [%s, %s]
-		//}`, commonHashD, blockNumberTagD)},
-
-		//		{ethapi.EthSyncingResult{}, fmt.Sprintf(`{
-		//          "title": "ethSyncingResult",
-		//		  "description": "Syncing returns false in case the node is currently not syncing with the network. It can be up to date or has not
-		//yet received the latest block headers from its pears. In case it is synchronizing:
-		//- startingBlock: block number this node started to synchronise from
-		//- currentBlock:  block number this node is currently importing
-		//- highestBlock:  block number of the highest block header this node has received from peers
-		//- pulledStates:  number of state entries processed until now
-		//- knownStates:   number of known state entries that still need to be pulled",
-		//		  "oneOf": [%s, %s]
-		//		}`, `{
-		//        "type": "boolean"
-		//      }`, `{"type": "object"}`)},
-
 	}
 
 	for _, d := range dict {
-		d := d
-		if reflect.TypeOf(d.t) == ty {
-			tt := unmarshalJSONToJSONSchemaType(d.j)
+		if reflect.TypeOf(d.example) == ty {
+			tt := unmarshalJSONToJSONSchemaType(d.rawJson)
 
 			return tt
 		}
@@ -234,28 +171,21 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 		ty = ty.Elem()
 	}
 
-	// First, handle primitives.
+	// Handle primitive types in case there are generic cases
+	// specific to our services.
 	switch ty.Kind() {
-	case reflect.Struct:
-
-	case reflect.Map,
-		reflect.Interface:
-	case reflect.Slice, reflect.Array:
-
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		// Return all integer types as the hex representation integer schemea.
 		ret := unmarshalJSONToJSONSchemaType(integerD)
 		return ret
-
+	case reflect.Struct:
+	case reflect.Map:
+	case reflect.Slice, reflect.Array:
 	case reflect.Float32, reflect.Float64:
-
 	case reflect.Bool:
-
 	case reflect.String:
-
-	case reflect.Ptr:
-
+	case reflect.Ptr, reflect.Interface:
 	default:
-		//log.Fatalf("met strange type %v", ty.Name())
 	}
 
 	return nil

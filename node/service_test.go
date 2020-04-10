@@ -41,7 +41,7 @@ func TestContextDatabases(t *testing.T) {
 	ctx := &ServiceContext{Config: Config{Name: "unit-test", DataDir: dir}}
 	db, err := ctx.OpenDatabase("persistent", 0, 0, "")
 	if err != nil {
-		t.Fatalf("failed to open persistent database: %v", err)
+		t.Fatalf("failed to ipcOpenRPC persistent database: %v", err)
 	}
 	db.Close()
 
@@ -52,7 +52,7 @@ func TestContextDatabases(t *testing.T) {
 	ctx = &ServiceContext{Config: Config{DataDir: ""}}
 	db, err = ctx.OpenDatabase("ephemeral", 0, 0, "")
 	if err != nil {
-		t.Fatalf("failed to open ephemeral database: %v", err)
+		t.Fatalf("failed to ipcOpenRPC ephemeral database: %v", err)
 	}
 	db.Close()
 

@@ -54,19 +54,21 @@ type Node struct {
 	serviceFuncs []ServiceConstructor     // Service constructors (in dependency order)
 	services     map[reflect.Type]Service // Currently running services
 
-	rpcAPIs       []rpc.API // List of APIs currently provided by the node
-	open          *OpenRPCDocument
+	rpcAPIs       []rpc.API   // List of APIs currently provided by the node
 	inprocHandler *rpc.Server // In-process RPC request handler to process the API requests
 
+	ipcOpenRPC  *OpenRPCDocument
 	ipcEndpoint string       // IPC endpoint to listen at (empty = IPC disabled)
 	ipcListener net.Listener // IPC RPC listener socket to serve API requests
 	ipcHandler  *rpc.Server  // IPC RPC request handler to process the API requests
 
+	httpOpenRPC   *OpenRPCDocument
 	httpEndpoint  string       // HTTP endpoint (interface + port) to listen at (empty = HTTP disabled)
 	httpWhitelist []string     // HTTP RPC modules to allow through this endpoint
 	httpListener  net.Listener // HTTP RPC listener socket to server API requests
 	httpHandler   *rpc.Server  // HTTP RPC request handler to process the API requests
 
+	wsOpenRPC  *OpenRPCDocument
 	wsEndpoint string       // Websocket endpoint (interface + port) to listen at (empty = websocket disabled)
 	wsListener net.Listener // Websocket RPC listener socket to server API requests
 	wsHandler  *rpc.Server  // Websocket RPC request handler to process the API requests
@@ -80,6 +82,49 @@ type Node struct {
 type OpenRPCDocument struct {
 	*go_openrpc_reflect.Document
 	serviceDescriptor go_openrpc_reflect.ReceiverServiceDescriptor
+}
+
+func newOpenRPCDocument(listener net.Listener) *OpenRPCDocument {
+	//listener.Addr().String()
+	openrpcServerConfig := &go_openrpc_reflect.ServerDescriptorT{
+		ServiceOpenRPCInfoFn: func() go_openrpc_types.Info {
+			return go_openrpc_types.Info{
+				Title:          "Core-Geth Ethereum JSON-RPC: " +listener.Addr().Network() + ":" + listener.Addr().String(),
+				Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
+				TermsOfService: "https://github.com/etclabscore/core-geth/blob/master/COPYING",
+				Contact: go_openrpc_types.Contact{
+					Name:  "",
+					URL:   "",
+					Email: "",
+				},
+				License: go_openrpc_types.License{
+					Name: "Apache-2.0",
+					URL:  "https://www.apache.org/licenses/LICENSE-2.0.html",
+				},
+				Version: "1.0.10",
+			}
+		},
+		ServiceOpenRPCExternalDocsFn: func() *go_openrpc_types.ExternalDocs {
+			return &go_openrpc_types.ExternalDocs{
+				Description: "Source",
+				URL:         "https://github.com/etclabscore/core-geth",
+			}
+		},
+	}
+
+	rp := go_openrpc_reflect.EthereumRPCDescriptor
+	rp.ProviderParseOptions.TypeMapper = OpenRPCJSONSchemaTypeMapper
+
+	return &OpenRPCDocument{
+		Document:          go_openrpc_reflect.NewReflectDocument(openrpcServerConfig),
+		serviceDescriptor: rp,
+	}
+}
+
+func (d *OpenRPCDocument) registerOpenRPCAPIs(apis []rpc.API) {
+	for _, api := range apis {
+		d.Document.Reflector.RegisterReceiverWithName(api.Namespace, api.Service, d.serviceDescriptor)
+	}
 }
 
 // New creates a new P2P node, ready for protocol registration.
@@ -151,48 +196,6 @@ func (n *Node) Close() error {
 	default:
 		return fmt.Errorf("%v", errs)
 	}
-}
-
-func (s *Node) initOpenRPC() {
-
-	// TODO: Move this logic to the node/ package.
-	// This package should be just an rpc library, ergo contain nothing
-	// specific to the go-ethereum node case (expect the package import name, of course).
-	openrpcServerConfig := &go_openrpc_reflect.ServerDescriptorT{
-		ServiceOpenRPCInfoFn: func() go_openrpc_types.Info {
-			return go_openrpc_types.Info{
-				Title:          "Ethereum JSON-RPC",
-				Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
-				TermsOfService: "https://github.com/etclabscore/core-geth/blob/master/COPYING",
-				Contact: go_openrpc_types.Contact{
-					Name:  "",
-					URL:   "",
-					Email: "",
-				},
-				License: go_openrpc_types.License{
-					Name: "Apache-2.0",
-					URL:  "https://www.apache.org/licenses/LICENSE-2.0.html",
-				},
-				Version: "1.0.10",
-			}
-		},
-		ServiceOpenRPCExternalDocsFn: func() *go_openrpc_types.ExternalDocs {
-			return &go_openrpc_types.ExternalDocs{
-				Description: "Source",
-				URL:         "https://github.com/etclabscore/core-geth",
-			}
-		},
-	}
-
-	rp := go_openrpc_reflect.EthereumRPCDescriptor
-	rp.ProviderParseOptions.TypeMapper = OpenRPCJSONSchemaTypeMapper
-
-	s.open = &OpenRPCDocument{
-		Document:          go_openrpc_reflect.NewReflectDocument(openrpcServerConfig),
-		serviceDescriptor: rp,
-	}
-
-	//s.RegisterName("rpc", s.open)
 }
 
 // Register injects a new service into the node's stack. The service created by
@@ -286,9 +289,6 @@ func (n *Node) Start() error {
 		started = append(started, kind)
 	}
 
-	// Initialise the openrpc struct.
-	n.initOpenRPC()
-
 	// Lastly, start the configured RPC interfaces
 	if err := n.startRPC(services); err != nil {
 		for _, service := range services {
@@ -328,12 +328,6 @@ func (n *Node) openDataDir() error {
 	return nil
 }
 
-func (n *Node) registerOpenRPCAPIS(apis []rpc.API) {
-	for _, api := range apis {
-		n.open.Document.Reflector.RegisterReceiverWithName(api.Namespace, api.Service, n.open.serviceDescriptor)
-	}
-}
-
 // startRPC is a helper method to start all the various RPC endpoints during node
 // startup. It's not meant to be called at any time afterwards as it makes certain
 // assumptions about the state of the node.
@@ -343,8 +337,6 @@ func (n *Node) startRPC(services map[reflect.Type]Service) error {
 	for _, service := range services {
 		apis = append(apis, service.APIs()...)
 	}
-	// Register the API documentation.
-	n.registerOpenRPCAPIS(apis)
 
 	// Start the various API endpoints, terminating all in case of errors
 	if err := n.startInProc(apis); err != nil {
@@ -405,8 +397,17 @@ func (n *Node) startIPC(apis []rpc.API) error {
 	if err != nil {
 		return err
 	}
+
+	// Register the API documentation.
+	n.ipcOpenRPC = newOpenRPCDocument(listener)
+	n.ipcOpenRPC.registerOpenRPCAPIs(apis)
+	if err := handler.RegisterName("rpc", n.ipcOpenRPC); err != nil {
+		return err
+	}
+
 	n.ipcListener = listener
 	n.ipcHandler = handler
+
 	n.log.Info("IPC endpoint opened", "url", n.ipcEndpoint)
 	return nil
 }
@@ -433,7 +434,7 @@ func (n *Node) startHTTP(endpoint string, apis []rpc.API, modules []string, cors
 	}
 	// register apis and create handler stack
 	srv := rpc.NewServer()
-	err := RegisterApisFromWhitelist(apis, modules, srv, false)
+	registeredAPIs, err := RegisterApisFromWhitelist(apis, modules, srv, false)
 	if err != nil {
 		return err
 	}
@@ -446,6 +447,14 @@ func (n *Node) startHTTP(endpoint string, apis []rpc.API, modules []string, cors
 	if err != nil {
 		return err
 	}
+
+	// Register the API documentation.
+	n.httpOpenRPC = newOpenRPCDocument(listener)
+	n.httpOpenRPC.registerOpenRPCAPIs(registeredAPIs)
+	if err := srv.RegisterName("rpc", n.httpOpenRPC); err != nil {
+		return err
+	}
+
 	n.log.Info("HTTP endpoint opened", "url", fmt.Sprintf("http://%v/", listener.Addr()),
 		"cors", strings.Join(cors, ","),
 		"vhosts", strings.Join(vhosts, ","))
@@ -483,7 +492,7 @@ func (n *Node) startWS(endpoint string, apis []rpc.API, modules []string, wsOrig
 
 	srv := rpc.NewServer()
 	handler := srv.WebsocketHandler(wsOrigins)
-	err := RegisterApisFromWhitelist(apis, modules, srv, exposeAll)
+	registeredAPIs, err := RegisterApisFromWhitelist(apis, modules, srv, exposeAll)
 	if err != nil {
 		return err
 	}
@@ -491,7 +500,15 @@ func (n *Node) startWS(endpoint string, apis []rpc.API, modules []string, wsOrig
 	if err != nil {
 		return err
 	}
+	// Register the API documentation.
+	n.wsOpenRPC = newOpenRPCDocument(listener)
+	n.wsOpenRPC.registerOpenRPCAPIs(registeredAPIs)
+	if err := srv.RegisterName("rpc", n.wsOpenRPC); err != nil {
+		return err
+	}
+
 	n.log.Info("WebSocket endpoint opened", "url", fmt.Sprintf("ws://%s", listener.Addr()))
+
 	// All listeners booted successfully
 	n.wsEndpoint = endpoint
 	n.wsListener = listener
@@ -753,7 +770,7 @@ func (n *Node) apis() []rpc.API {
 		}, {
 			Namespace: "rpc",
 			Version:   "1.0",
-			Service:   n.open,
+			Service:   n.ipcOpenRPC,
 			Public:    true,
 		},
 	}
@@ -761,7 +778,7 @@ func (n *Node) apis() []rpc.API {
 
 // RegisterApisFromWhitelist checks the given modules' availability, generates a whitelist based on the allowed modules,
 // and then registers all of the APIs exposed by the services.
-func RegisterApisFromWhitelist(apis []rpc.API, modules []string, srv *rpc.Server, exposeAll bool) error {
+func RegisterApisFromWhitelist(apis []rpc.API, modules []string, srv *rpc.Server, exposeAll bool) (registeredApis []rpc.API, err error) {
 	if bad, available := checkModuleAvailability(modules, apis); len(bad) > 0 {
 		log.Error("Unavailable modules in HTTP API list", "unavailable", bad, "available", available)
 	}
@@ -774,9 +791,10 @@ func RegisterApisFromWhitelist(apis []rpc.API, modules []string, srv *rpc.Server
 	for _, api := range apis {
 		if exposeAll || whitelist[api.Namespace] || (len(whitelist) == 0 && api.Public) {
 			if err := srv.RegisterName(api.Namespace, api.Service); err != nil {
-				return err
+				return registeredApis, err
 			}
+			registeredApis = append(registeredApis, api)
 		}
 	}
-	return nil
+	return registeredApis, nil
 }

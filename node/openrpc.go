@@ -1,4 +1,4 @@
-package rpc
+package node
 
 import (
 	"encoding/json"
@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/rpc"
 )
 
 type schemaDictEntry struct {
@@ -154,11 +155,11 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
           "pattern": "^0x([a-fA-F0-9]?)+$"
         }`},
 
-		{BlockNumber(0),
+		{rpc.BlockNumber(0),
 			blockNumberOrHashD,
 		},
 
-		{BlockNumberOrHash{}, fmt.Sprintf(`{
+		{rpc.BlockNumberOrHash{}, fmt.Sprintf(`{
 		  "title": "blockNumberOrHash",
 		  "oneOf": [
 			%s,
@@ -179,11 +180,11 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 		  ]
 		}`, blockNumberOrHashD, blockNumberOrHashD)},
 
-		{Subscription{}, fmt.Sprintf(`{
+		{rpc.Subscription{}, fmt.Sprintf(`{
 			"type": "object",
 			"title": "subscription"
 		}`)},
-		{new(Subscription), fmt.Sprintf(`{
+		{new(rpc.Subscription), fmt.Sprintf(`{
 			"type": "object",
 			"title": "subscription-ptr"
 		}`)},

@@ -13,7 +13,7 @@
       "name": "Apache-2.0", 
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }, 
-    "version": "1.0.10-2020-04-09T17:46:12-05:00-1586472372"
+    "version": "1.0.10-2020-04-10T05:25:45-05:00-1586514345"
   }, 
   "servers": [], 
   "methods": [
@@ -4059,36 +4059,6 @@
     {
       "name": "eth_chainId", 
       "tags": [], 
-      "summary": "ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\n", 
-      "description": "[https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L70](https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L70)\n```go\n// ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\nfunc (api *PublicEthereumAPI) ChainId() hexutil.Uint64 {\n\tchainID := new(big.Int)\n\tif config := api.e.blockchain.Config(); config.IsEnabled(config.GetEIP155Transition, api.e.blockchain.CurrentBlock().Number()) {\n\t\tchainID = config.GetChainID()\n\t}\n\treturn (hexutil.Uint64)(chainID.Uint64())\n}\n```", 
-      "externalDocs": {
-        "description": "line=70", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go"
-      }, 
-      "params": [], 
-      "result": {
-        "name": "hexutil.Uint64", 
-        "summary": "", 
-        "description": "`github.com/ethereum/go-ethereum/common/hexutil.Uint64`", 
-        "required": true, 
-        "deprecated": false, 
-        "schema": {
-          "description": "Hex representation of a 256 bit unit of data", 
-          "type": "string", 
-          "title": "dataWord", 
-          "pattern": "^0x([a-fA-F\\d]{64})?$"
-        }
-      }, 
-      "deprecated": false, 
-      "servers": [], 
-      "errors": [], 
-      "links": [], 
-      "paramStructure": "by-position", 
-      "examples": []
-    }, 
-    {
-      "name": "eth_chainId", 
-      "tags": [], 
       "summary": "ChainId returns the chainID value for transaction replay protection.\n", 
       "description": "[https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L547](https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L547)\n```go\n// ChainId returns the chainID value for transaction replay protection.\nfunc (s *PublicBlockChainAPI) ChainId() *hexutil.Big {\n\treturn (*hexutil.Big)(s.b.ChainConfig().GetChainID())\n}\n```", 
       "externalDocs": {
@@ -4114,6 +4084,36 @@
               "type": "null"
             }
           ]
+        }
+      }, 
+      "deprecated": false, 
+      "servers": [], 
+      "errors": [], 
+      "links": [], 
+      "paramStructure": "by-position", 
+      "examples": []
+    }, 
+    {
+      "name": "eth_chainId", 
+      "tags": [], 
+      "summary": "ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\n", 
+      "description": "[https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L70](https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L70)\n```go\n// ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.\nfunc (api *PublicEthereumAPI) ChainId() hexutil.Uint64 {\n\tchainID := new(big.Int)\n\tif config := api.e.blockchain.Config(); config.IsEnabled(config.GetEIP155Transition, api.e.blockchain.CurrentBlock().Number()) {\n\t\tchainID = config.GetChainID()\n\t}\n\treturn (hexutil.Uint64)(chainID.Uint64())\n}\n```", 
+      "externalDocs": {
+        "description": "line=70", 
+        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/eth/api.go"
+      }, 
+      "params": [], 
+      "result": {
+        "name": "hexutil.Uint64", 
+        "summary": "", 
+        "description": "`github.com/ethereum/go-ethereum/common/hexutil.Uint64`", 
+        "required": true, 
+        "deprecated": false, 
+        "schema": {
+          "description": "Hex representation of a 256 bit unit of data", 
+          "type": "string", 
+          "title": "dataWord", 
+          "pattern": "^0x([a-fA-F\\d]{64})?$"
         }
       }, 
       "deprecated": false, 
@@ -9413,38 +9413,6 @@
         "deprecated": false, 
         "schema": {
           "type": "null"
-        }
-      }, 
-      "deprecated": false, 
-      "servers": [], 
-      "errors": [], 
-      "links": [], 
-      "paramStructure": "by-position", 
-      "examples": []
-    }, 
-    {
-      "name": "rpc_modules", 
-      "tags": [], 
-      "summary": "Modules returns the list of RPC services with their version number\n", 
-      "description": "[https://github.com/ethereum/go-ethereum/blob/master/rpc/server.go#L202](https://github.com/ethereum/go-ethereum/blob/master/rpc/server.go#L202)\n```go\n// Modules returns the list of RPC services with their version number\nfunc (s *RPCService) Modules() map[string]string {\n\ts.server.services.mu.Lock()\n\tdefer s.server.services.mu.Unlock()\n\n\tmodules := make(map[string]string)\n\tfor name := range s.server.services.services {\n\t\tmodules[name] = \"1.0\"\n\t}\n\treturn modules\n}\n```", 
-      "externalDocs": {
-        "description": "line=202", 
-        "url": "file:///home/ia/go/src/github.com/ethereum/go-ethereum/rpc/server.go"
-      }, 
-      "params": [], 
-      "result": {
-        "name": "map[string]string", 
-        "summary": "", 
-        "description": "``", 
-        "required": true, 
-        "deprecated": false, 
-        "schema": {
-          "type": "object", 
-          "patternProperties": {
-            ".*": {
-              "type": "string"
-            }
-          }
         }
       }, 
       "deprecated": false, 

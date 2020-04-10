@@ -26,6 +26,7 @@ import (
 	"strings"
 	"sync"
 
+	go_openrpc_reflect "github.com/etclabscore/go-openrpc-reflect"
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -34,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/rpc"
+	go_openrpc_types "github.com/gregdhill/go-openrpc/types"
 	"github.com/prometheus/tsdb/fileutil"
 )
 
@@ -52,7 +54,8 @@ type Node struct {
 	serviceFuncs []ServiceConstructor     // Service constructors (in dependency order)
 	services     map[reflect.Type]Service // Currently running services
 
-	rpcAPIs       []rpc.API   // List of APIs currently provided by the node
+	rpcAPIs       []rpc.API // List of APIs currently provided by the node
+	open          *OpenRPCDocument
 	inprocHandler *rpc.Server // In-process RPC request handler to process the API requests
 
 	ipcEndpoint string       // IPC endpoint to listen at (empty = IPC disabled)
@@ -72,6 +75,11 @@ type Node struct {
 	lock sync.RWMutex
 
 	log log.Logger
+}
+
+type OpenRPCDocument struct {
+	*go_openrpc_reflect.Document
+	serviceDescriptor go_openrpc_reflect.ReceiverServiceDescriptor
 }
 
 // New creates a new P2P node, ready for protocol registration.
@@ -143,6 +151,48 @@ func (n *Node) Close() error {
 	default:
 		return fmt.Errorf("%v", errs)
 	}
+}
+
+func (s *Node) initOpenRPC() {
+
+	// TODO: Move this logic to the node/ package.
+	// This package should be just an rpc library, ergo contain nothing
+	// specific to the go-ethereum node case (expect the package import name, of course).
+	openrpcServerConfig := &go_openrpc_reflect.ServerDescriptorT{
+		ServiceOpenRPCInfoFn: func() go_openrpc_types.Info {
+			return go_openrpc_types.Info{
+				Title:          "Ethereum JSON-RPC",
+				Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
+				TermsOfService: "https://github.com/etclabscore/core-geth/blob/master/COPYING",
+				Contact: go_openrpc_types.Contact{
+					Name:  "",
+					URL:   "",
+					Email: "",
+				},
+				License: go_openrpc_types.License{
+					Name: "Apache-2.0",
+					URL:  "https://www.apache.org/licenses/LICENSE-2.0.html",
+				},
+				Version: "1.0.10",
+			}
+		},
+		ServiceOpenRPCExternalDocsFn: func() *go_openrpc_types.ExternalDocs {
+			return &go_openrpc_types.ExternalDocs{
+				Description: "Source",
+				URL:         "https://github.com/etclabscore/core-geth",
+			}
+		},
+	}
+
+	rp := go_openrpc_reflect.EthereumRPCDescriptor
+	rp.ProviderParseOptions.TypeMapper = OpenRPCJSONSchemaTypeMapper
+
+	s.open = &OpenRPCDocument{
+		Document:          go_openrpc_reflect.NewReflectDocument(openrpcServerConfig),
+		serviceDescriptor: rp,
+	}
+
+	//s.RegisterName("rpc", s.open)
 }
 
 // Register injects a new service into the node's stack. The service created by
@@ -235,6 +285,10 @@ func (n *Node) Start() error {
 		// Mark the service started for potential cleanup
 		started = append(started, kind)
 	}
+
+	// Initialise the openrpc struct.
+	n.initOpenRPC()
+
 	// Lastly, start the configured RPC interfaces
 	if err := n.startRPC(services); err != nil {
 		for _, service := range services {
@@ -274,6 +328,12 @@ func (n *Node) openDataDir() error {
 	return nil
 }
 
+func (n *Node) registerOpenRPCAPIS(apis []rpc.API) {
+	for _, api := range apis {
+		n.open.Document.Reflector.RegisterReceiverWithName(api.Namespace, api.Service, n.open.serviceDescriptor)
+	}
+}
+
 // startRPC is a helper method to start all the various RPC endpoints during node
 // startup. It's not meant to be called at any time afterwards as it makes certain
 // assumptions about the state of the node.
@@ -283,6 +343,9 @@ func (n *Node) startRPC(services map[reflect.Type]Service) error {
 	for _, service := range services {
 		apis = append(apis, service.APIs()...)
 	}
+	// Register the API documentation.
+	n.registerOpenRPCAPIS(apis)
+
 	// Start the various API endpoints, terminating all in case of errors
 	if err := n.startInProc(apis); err != nil {
 		return err
@@ -666,6 +729,7 @@ func (n *Node) ResolvePath(x string) string {
 }
 
 // apis returns the collection of RPC descriptors this node offers.
+// These are appended to by default.
 func (n *Node) apis() []rpc.API {
 	return []rpc.API{
 		{
@@ -685,6 +749,11 @@ func (n *Node) apis() []rpc.API {
 			Namespace: "web3",
 			Version:   "1.0",
 			Service:   NewPublicWeb3API(n),
+			Public:    true,
+		}, {
+			Namespace: "rpc",
+			Version:   "1.0",
+			Service:   n.open,
 			Public:    true,
 		},
 	}

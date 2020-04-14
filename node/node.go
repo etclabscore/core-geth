@@ -26,6 +26,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/alecthomas/jsonschema"
 	go_openrpc_reflect "github.com/etclabscore/go-openrpc-reflect"
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -35,7 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/rpc"
-	go_openrpc_types "github.com/gregdhill/go-openrpc/types"
+	"github.com/open-rpc/meta-schema"
 	"github.com/prometheus/tsdb/fileutil"
 )
 
@@ -81,49 +82,43 @@ type Node struct {
 
 type OpenRPCDocument struct {
 	*go_openrpc_reflect.Document
-	serviceDescriptor go_openrpc_reflect.ReceiverServiceDescriptor
 }
 
-func newOpenRPCDocument(listener net.Listener) *OpenRPCDocument {
-	//listener.Addr().String()
-	openrpcServerConfig := &go_openrpc_reflect.ServerDescriptorT{
-		ServiceOpenRPCInfoFn: func() go_openrpc_types.Info {
-			return go_openrpc_types.Info{
-				Title:          "Core-Geth Ethereum JSON-RPC: " + listener.Addr().Network() + ":" + listener.Addr().String(),
-				Description:    "This API lets you interact with an EVM-based client via JSON-RPC",
-				TermsOfService: "https://github.com/etclabscore/core-geth/blob/master/COPYING",
-				Contact: go_openrpc_types.Contact{
-					Name:  "",
-					URL:   "",
-					Email: "",
-				},
-				License: go_openrpc_types.License{
-					Name: "Apache-2.0",
-					URL:  "https://www.apache.org/licenses/LICENSE-2.0.html",
-				},
-				Version: "1.0.10",
+func newOpenRPCDocument() *OpenRPCDocument {
+	d := &go_openrpc_reflect.Document{}
+	d.WithMeta(go_openrpc_reflect.MetaT{
+		GetServersFn: func() func(listeners []net.Listener) (*meta_schema.Servers, error) {
+			return func(listeners []net.Listener) (*meta_schema.Servers, error) {
+				servers := []meta_schema.ServerObject{}
+				for _, listener := range listeners {
+					addr := listener.Addr().String()
+					network := listener.Addr().Network()
+					servers = append(servers, meta_schema.ServerObject{
+						Url:  (*meta_schema.ServerObjectUrl)(&addr),
+						Name: (*meta_schema.ServerObjectName)(&network),
+					})
+				}
+				return (*meta_schema.Servers)(&servers), nil
 			}
 		},
-		ServiceOpenRPCExternalDocsFn: func() *go_openrpc_types.ExternalDocs {
-			return &go_openrpc_types.ExternalDocs{
-				Description: "Source",
-				URL:         "https://github.com/etclabscore/core-geth",
-			}
+		GetInfoFn: func() (info *meta_schema.InfoObject) {
+			return nil
 		},
+		GetExternalDocsFn: func() (exdocs *meta_schema.ExternalDocumentationObject) {
+			return nil
+		},
+	})
+	appReflector := go_openrpc_reflect.EthereumReflectorT{}
+	appReflector.FnSchemaTypeMap = func() func(ty reflect.Type) *jsonschema.Type {
+		return OpenRPCJSONSchemaTypeMapper
 	}
-
-	rp := go_openrpc_reflect.EthereumRPCDescriptor
-	rp.ProviderParseOptions.TypeMapper = OpenRPCJSONSchemaTypeMapper
-
-	return &OpenRPCDocument{
-		Document:          go_openrpc_reflect.NewReflectDocument(openrpcServerConfig),
-		serviceDescriptor: rp,
-	}
+	d.WithReflector(appReflector)
+	return &OpenRPCDocument{d}
 }
 
 func (d *OpenRPCDocument) registerOpenRPCAPIs(apis []rpc.API) {
 	for _, api := range apis {
-		d.Document.Reflector.RegisterReceiverWithName(api.Namespace, api.Service, d.serviceDescriptor)
+		d.Document.RegisterReceiverName(api.Namespace, api.Service)
 	}
 }
 
@@ -399,9 +394,10 @@ func (n *Node) startIPC(apis []rpc.API) error {
 	}
 
 	// Register the API documentation.
-	n.ipcOpenRPC = newOpenRPCDocument(listener)
+	n.ipcOpenRPC = newOpenRPCDocument()
 	n.ipcOpenRPC.registerOpenRPCAPIs(apis)
-	if err := handler.RegisterName("rpc", n.ipcOpenRPC); err != nil {
+	n.ipcOpenRPC.RegisterListener(listener)
+	if err := handler.RegisterName("rpc", n.ipcOpenRPC.RPCDiscover(go_openrpc_reflect.Ethereum)); err != nil {
 		return err
 	}
 
@@ -449,9 +445,10 @@ func (n *Node) startHTTP(endpoint string, apis []rpc.API, modules []string, cors
 	}
 
 	// Register the API documentation.
-	n.httpOpenRPC = newOpenRPCDocument(listener)
+	n.httpOpenRPC = newOpenRPCDocument()
 	n.httpOpenRPC.registerOpenRPCAPIs(registeredAPIs)
-	if err := srv.RegisterName("rpc", n.httpOpenRPC); err != nil {
+	n.httpOpenRPC.RegisterListener(listener)
+	if err := srv.RegisterName("rpc", n.httpOpenRPC.RPCDiscover(go_openrpc_reflect.Ethereum)); err != nil {
 		return err
 	}
 
@@ -501,9 +498,10 @@ func (n *Node) startWS(endpoint string, apis []rpc.API, modules []string, wsOrig
 		return err
 	}
 	// Register the API documentation.
-	n.wsOpenRPC = newOpenRPCDocument(listener)
+	n.wsOpenRPC = newOpenRPCDocument()
 	n.wsOpenRPC.registerOpenRPCAPIs(registeredAPIs)
-	if err := srv.RegisterName("rpc", n.wsOpenRPC); err != nil {
+	n.wsOpenRPC.RegisterListener(listener)
+	if err := srv.RegisterName("rpc", n.wsOpenRPC.RPCDiscover(go_openrpc_reflect.Ethereum)); err != nil {
 		return err
 	}
 

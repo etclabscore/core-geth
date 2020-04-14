@@ -17,7 +17,7 @@ require (
 	github.com/dop251/goja v0.0.0-20200219165308-d1232e640a87
 	github.com/edsrzf/mmap-go v0.0.0-20160512033002-935e0e8a636c
 	github.com/elastic/gosigar v0.8.1-0.20180330100440-37f05ff46ffa
-	github.com/etclabscore/go-openrpc-reflect v0.0.20
+	github.com/etclabscore/go-openrpc-reflect v0.0.23
 	github.com/fatih/color v1.6.0
 	github.com/fjl/memsize v0.0.0-20180418122429-ca190fb6ffbc
 	github.com/gballet/go-libpcsclite v0.0.0-20190607065134-2772fd86a8ff
@@ -43,6 +43,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.2-0.20190409134802-7e037d187b0c
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
+	github.com/open-rpc/meta-schema v0.0.42
 	github.com/pborman/uuid v1.2.0
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/peterh/liner v1.1.1-0.20190123174540-a2c9a5303de7
@@ -55,7 +56,7 @@ require (
 	github.com/steakknife/bloomfilter v0.0.0-20180922174646-6819c0d2a570
 	github.com/stretchr/testify v1.4.0
 	github.com/syndtr/goleveldb v1.0.1-0.20190923125748-758128399b1d
-	github.com/tidwall/gjson v1.3.5
+	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.0
 	github.com/tyler-smith/go-bip39 v1.0.1-0.20181017060643-dbb3b84ba2ef
 	github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208
@@ -77,5 +78,7 @@ replace github.com/golang/lint v0.0.0-20190409202823-959b441ac422 => github.com/
 replace github.com/gregdhill/go-openrpc => github.com/etclabscore/go-openrpc v0.0.1
 
 replace github.com/alecthomas/jsonschema => github.com/etclabscore/go-jsonschema-reflect v0.0.2
+
+replace github.com/open-rpc/meta-schema => github.com/meowsbits/meta-schema v0.0.42
 
 // replace github.com/etclabscore/go-openrpc-reflect => /home/ia/go/src/github.com/etclabscore/go-openrpc-reflect

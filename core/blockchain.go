@@ -277,7 +277,7 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, chainConfig ctyp
 				hashes = append(hashes, rawdb.ReadCanonicalHash(bc.db, i))
 			}
 			bc.Rollback(hashes)
-			log.Warn("Truncate ancient chain", "from", previous, "to", low)
+			log.Warn("Truncated ancient chain", "from", previous, "to", low)
 		}
 	}
 	// Check the current state of the block hashes and make sure that we do not have any of the bad blocks in our chain
@@ -1705,11 +1705,10 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 		// Write the block to the chain and get the status.
 		substart = time.Now()
 		status, err := bc.writeBlockWithState(block, receipts, logs, statedb, false)
+		atomic.StoreUint32(&followupInterrupt, 1)
 		if err != nil {
-			atomic.StoreUint32(&followupInterrupt, 1)
 			return it.index, err
 		}
-		atomic.StoreUint32(&followupInterrupt, 1)
 
 		// Update the metrics touched during block commit
 		accountCommitTimer.Update(statedb.AccountCommits) // Account commits are complete, we can mark them
@@ -2010,6 +2009,7 @@ func (bc *BlockChain) reorg(oldBlock, newBlock *types.Block) error {
 		blockReorgDropMeter.Mark(int64(len(oldChain)))
 	} else {
 		log.Error("Impossible reorg, please file an issue", "oldnum", oldBlock.Number(), "oldhash", oldBlock.Hash(), "newnum", newBlock.Number(), "newhash", newBlock.Hash())
+		return fmt.Errorf("impossible reorg")
 	}
 	// Insert the new chain(except the head block(reverse order)),
 	// taking care of the proper incremental order.

@@ -31,26 +31,19 @@ func TestState(t *testing.T) {
 
 	st := new(testMatcher)
 
+	t.Parallel()
+
 	if *testEWASM != "" {
 		// When bugs with tests get resolved, we can revert the testing to use Parallel.
 		// Until then, let's stay serial. ... Let's get serial! MMmm.
 		// FIXME: For now, only run EWASM tests when the vm.ewasm flag is in use.
 		st.whitelist(`^stEWASM`)
 		if strings.Contains(*testEWASM, "hera") {
-
-			// Apparently these aren't failing anymore...?
-			//st.skipLoad(`^stEWASMTests/callSenderBalanceExceeds128Bits`)
-			//st.skipLoad(`^stEWASMTests/ecAddCallDataCopy`)
-
+			// Add any skips here.
 		} else if strings.Contains(*testEWASM, "ssvm") {
-			// Don't know if these pass or not for ssvm.
-			// Just copied directly from hera for the "benefit of the doubt."
-			//st.skipLoad(`^stEWASMTests/callSenderBalanceExceeds128Bits`)
-			//st.skipLoad(`^stEWASMTests/ecAddCallDataCopy`)
+			// Add any skips here.
 		}
-
 	} else {
-		t.Parallel()
 		// Long tests:
 		st.slow(`^stAttackTest/ContractCreationSpam`)
 		st.slow(`^stBadOpcode/badOpcodes`)

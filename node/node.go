@@ -58,18 +58,18 @@ type Node struct {
 	rpcAPIs       []rpc.API   // List of APIs currently provided by the node
 	inprocHandler *rpc.Server // In-process RPC request handler to process the API requests
 
-	ipcOpenRPC  *OpenRPCDocument
+	ipcOpenRPC  *go_openrpc_reflect.Document
 	ipcEndpoint string       // IPC endpoint to listen at (empty = IPC disabled)
 	ipcListener net.Listener // IPC RPC listener socket to serve API requests
 	ipcHandler  *rpc.Server  // IPC RPC request handler to process the API requests
 
-	httpOpenRPC   *OpenRPCDocument
+	httpOpenRPC   *go_openrpc_reflect.Document
 	httpEndpoint  string       // HTTP endpoint (interface + port) to listen at (empty = HTTP disabled)
 	httpWhitelist []string     // HTTP RPC modules to allow through this endpoint
 	httpListener  net.Listener // HTTP RPC listener socket to server API requests
 	httpHandler   *rpc.Server  // HTTP RPC request handler to process the API requests
 
-	wsOpenRPC  *OpenRPCDocument
+	wsOpenRPC  *go_openrpc_reflect.Document
 	wsEndpoint string       // Websocket endpoint (interface + port) to listen at (empty = websocket disabled)
 	wsListener net.Listener // Websocket RPC listener socket to server API requests
 	wsHandler  *rpc.Server  // Websocket RPC request handler to process the API requests
@@ -80,13 +80,10 @@ type Node struct {
 	log log.Logger
 }
 
-type OpenRPCDocument struct {
-	*go_openrpc_reflect.Document
-}
 
-func newOpenRPCDocument() *OpenRPCDocument {
+func newOpenRPCDocument() *go_openrpc_reflect.Document {
 	d := &go_openrpc_reflect.Document{}
-	d.WithMeta(go_openrpc_reflect.MetaT{
+	d.WithMeta(&go_openrpc_reflect.MetaT{
 		GetServersFn: func() func(listeners []net.Listener) (*meta_schema.Servers, error) {
 			return func(listeners []net.Listener) (*meta_schema.Servers, error) {
 				servers := []meta_schema.ServerObject{}
@@ -108,17 +105,17 @@ func newOpenRPCDocument() *OpenRPCDocument {
 			return nil
 		},
 	})
-	appReflector := go_openrpc_reflect.EthereumReflectorT{}
+	appReflector := &go_openrpc_reflect.EthereumReflectorT{}
 	appReflector.FnSchemaTypeMap = func() func(ty reflect.Type) *jsonschema.Type {
 		return OpenRPCJSONSchemaTypeMapper
 	}
 	d.WithReflector(appReflector)
-	return &OpenRPCDocument{d}
+	return d
 }
 
-func (d *OpenRPCDocument) registerOpenRPCAPIs(apis []rpc.API) {
+func registerOpenRPCAPIs(doc *go_openrpc_reflect.Document, apis []rpc.API) {
 	for _, api := range apis {
-		d.Document.RegisterReceiverName(api.Namespace, api.Service)
+		doc.RegisterReceiverName(api.Namespace, api.Service)
 	}
 }
 
@@ -395,7 +392,7 @@ func (n *Node) startIPC(apis []rpc.API) error {
 
 	// Register the API documentation.
 	n.ipcOpenRPC = newOpenRPCDocument()
-	n.ipcOpenRPC.registerOpenRPCAPIs(apis)
+	registerOpenRPCAPIs(n.ipcOpenRPC, apis)
 	n.ipcOpenRPC.RegisterListener(listener)
 	if err := handler.RegisterName("rpc", n.ipcOpenRPC.RPCDiscover(go_openrpc_reflect.Ethereum)); err != nil {
 		return err
@@ -446,7 +443,7 @@ func (n *Node) startHTTP(endpoint string, apis []rpc.API, modules []string, cors
 
 	// Register the API documentation.
 	n.httpOpenRPC = newOpenRPCDocument()
-	n.httpOpenRPC.registerOpenRPCAPIs(registeredAPIs)
+	registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
 	n.httpOpenRPC.RegisterListener(listener)
 	if err := srv.RegisterName("rpc", n.httpOpenRPC.RPCDiscover(go_openrpc_reflect.Ethereum)); err != nil {
 		return err
@@ -499,7 +496,7 @@ func (n *Node) startWS(endpoint string, apis []rpc.API, modules []string, wsOrig
 	}
 	// Register the API documentation.
 	n.wsOpenRPC = newOpenRPCDocument()
-	n.wsOpenRPC.registerOpenRPCAPIs(registeredAPIs)
+	registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
 	n.wsOpenRPC.RegisterListener(listener)
 	if err := srv.RegisterName("rpc", n.wsOpenRPC.RPCDiscover(go_openrpc_reflect.Ethereum)); err != nil {
 		return err

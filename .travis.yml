@@ -5,6 +5,12 @@ matrix:
   include:
   - os: linux
     dist: xenial
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-9
     go: 1.13.x
     script:
     - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install cmake g++ libboost-all-dev
@@ -12,6 +18,12 @@ matrix:
 
   - os: linux
     dist: xenial
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-9
     go: 1.13.x
     script:
     - go run build/ci.go install
@@ -42,8 +54,11 @@ matrix:
       submodules: false # avoid cloning ethereum/tests
     addons:
       apt:
+        sources:
+          - ubuntu-toolchain-r-test
         packages:
           - gcc-multilib
+          - g++-9
     script:
       # Switch over GCC to cross compilation (breaks 386, hence why do it here only)
       - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-arm-linux-gnueabi libc6-dev-armel-cross gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross

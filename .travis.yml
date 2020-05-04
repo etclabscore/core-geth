@@ -5,20 +5,9 @@ matrix:
   include:
   - os: linux
     dist: xenial
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++-9
-    env:
-      - CC=gcc-9
-      - CXX=g++-9
     go: 1.13.x
     script:
     - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install cmake libboost-all-dev
-    - $CC --version
-    - $CXX --version
     - make test-evmc
 
   - os: linux

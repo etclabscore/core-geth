@@ -19,7 +19,7 @@ require (
 	github.com/edsrzf/mmap-go v0.0.0-20160512033002-935e0e8a636c
 	github.com/elastic/gosigar v0.8.1-0.20180330100440-37f05ff46ffa
 	github.com/emicklei/proto v1.9.0 // indirect
-	github.com/etclabscore/go-openrpc-reflect v0.0.26
+	github.com/etclabscore/go-openrpc-reflect v0.0.27
 	github.com/fatih/color v1.6.0
 	github.com/fjl/memsize v0.0.0-20180418122429-ca190fb6ffbc
 	github.com/gballet/go-libpcsclite v0.0.0-20190607065134-2772fd86a8ff
@@ -85,6 +85,7 @@ replace github.com/gregdhill/go-openrpc => github.com/etclabscore/go-openrpc v0.
 
 replace github.com/alecthomas/jsonschema => github.com/etclabscore/go-jsonschema-reflect v0.0.2
 
-replace github.com/open-rpc/meta-schema => github.com/meowsbits/meta-schema v0.0.42
+// replace github.com/open-rpc/meta-schema => github.com/meowsbits/meta-schema v0.0.42
+replace github.com/open-rpc/meta-schema => /home/ia/dev/open-rpc/meta-schema
 
-// replace github.com/etclabscore/go-openrpc-reflect => /home/ia/go/src/github.com/etclabscore/go-openrpc-reflect
+replace github.com/etclabscore/go-openrpc-reflect => /home/ia/go/src/github.com/etclabscore/go-openrpc-reflect

@@ -1,4 +1,4 @@
-language: go/
+language: go
 go_import_path: github.com/ethereum/go-ethereum
 sudo: false
 matrix:

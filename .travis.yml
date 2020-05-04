@@ -15,8 +15,8 @@ matrix:
       - CC=${CC:-cc} CXX=${CXX:-cpp}
     go: 1.13.x
     script:
-    - echo CC: $CC
-    - echo CXX: $CXX
+    - echo "CC: ${CC}"
+    - echo "CXX: ${CXX}"
     - $CC --version
     - $CXX --version
     - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install cmake g++ libboost-all-dev
@@ -36,8 +36,8 @@ matrix:
     script:
     - go build -v ./evmc/bindings/go/evmc
     - go env
-    - echo CC: $CC
-    - echo CXX: $CXX
+    - echo "CC: ${CC}"
+    - echo "CXX: ${CXX}"
     - $CC --version
     - $CXX --version
     - gcc --version

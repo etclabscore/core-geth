@@ -12,9 +12,13 @@ matrix:
         packages:
           - g++-9
     env:
-      - CC=gcc-9 CXX=g++-9
+      - CC=${CC:-cc} CXX=${CXX:-cpp}
     go: 1.13.x
     script:
+    - echo CC: $CC
+    - echo CXX: $CXX
+    - $CC --version
+    - $CXX --version
     - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install cmake g++ libboost-all-dev
     - make test-evmc
 
@@ -27,14 +31,18 @@ matrix:
         packages:
           - g++-9
     env:
-      - CC=gcc-9 CXX=g++-9
+      - CC=${CC:-cc} CXX=${CXX:-cpp}
     go: 1.13.x
     script:
     - go build -v ./evmc/bindings/go/evmc
     - go env
+    - echo CC: $CC
+    - echo CXX: $CXX
+    - $CC --version
+    - $CXX --version
     - gcc --version
-    #- go generate -v ./evmc/bindings/go/evmc
-    #- ls -lh ./evmc/bindings/go/evmc/*.so
+    - go generate -v ./evmc/bindings/go/evmc
+    - ls -lh ./evmc/bindings/go/evmc/*.so
     - go run build/ci.go install
     - travis_wait 60 go run build/ci.go test
     - make test-multigeth
@@ -58,7 +66,7 @@ matrix:
     sudo: required
     go: 1.13.x
     env:
-      - CC=gcc-9 CXX=g++-9 ARMv5
+      - CC=${CC:-cc} CXX=${CXX:-cpp} ARMv5
     git:
       submodules: false # avoid cloning ethereum/tests
     addons:

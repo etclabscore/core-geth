@@ -30,8 +30,9 @@ matrix:
       - CC=gcc-9 CXX=g++-9
     go: 1.13.x
     script:
+    - go generate -v ./evmc/bindings/go/evmc/
+    - ls -lh ./evmc/bindings/go/evmc/*.so
     - go run build/ci.go install
-    - cd evmc/bindings/go/evmc/ && go generate; cd -
     - travis_wait 60 go run build/ci.go test
     - make test-multigeth
     before_deploy:

@@ -122,15 +122,7 @@ func (host *hostContext) SetStorage(addr common.Address, key common.Hash, value 
 	original := host.env.StateDB.GetCommittedState(addr, key)
 
 	host.env.StateDB.SetState(addr, key, value)
-
-	/*
-		hasEIP2200 := host.env.ChainConfig().IsIstanbul(host.env.BlockNumber)
-		hasNetStorageCostEIP := hasEIP2200 ||
-			(host.env.ChainConfig().IsConstantinople(host.env.BlockNumber) &&
-				!host.env.ChainConfig().IsPetersburg(host.env.BlockNumber))
-		if !hasNetStorageCostEIP {
-	*/
-
+	
 	// Here's a great example of one of the limits of our (core-geth) current chainconfig interface model.
 	// Should we handle the logic here about historic-featuro logic (which really is nice, because when reading the strange-incantation implemations, it's nice to see why it is),
 	// or should we handle the question where we handle the rest of the questions like this, since this logic is

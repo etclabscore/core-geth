@@ -35,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/internal/debug"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/open-rpc/meta-schema"
 	"github.com/prometheus/tsdb/fileutil"
@@ -80,7 +81,6 @@ type Node struct {
 	log log.Logger
 }
 
-
 func newOpenRPCDocument() *go_openrpc_reflect.Document {
 	d := &go_openrpc_reflect.Document{}
 	d.WithMeta(&go_openrpc_reflect.MetaT{
@@ -99,10 +99,16 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 			}
 		},
 		GetInfoFn: func() (info *meta_schema.InfoObject) {
-			return nil
+			info = &meta_schema.InfoObject{}
+			title := "Core-Geth RPC API"
+			info.Title = (*meta_schema.InfoObjectProperties)(&title)
+
+			version := params.VersionWithMeta
+			info.Version = (*meta_schema.InfoObjectVersion)(&version)
+			return info
 		},
 		GetExternalDocsFn: func() (exdocs *meta_schema.ExternalDocumentationObject) {
-			return nil
+			return nil // FIXME
 		},
 	})
 	appReflector := &go_openrpc_reflect.EthereumReflectorT{}

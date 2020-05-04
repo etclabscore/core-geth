@@ -76,7 +76,7 @@ matrix:
       # manually get one of the sumbodules
       - git submodule update --init evmc
       # Switch over GCC to cross compilation (breaks 386, hence why do it here only)
-      - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-9-arm-linux-gnueabi libc6-dev-armel-cross gcc-9-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-9-aarch64-linux-gnu libc6-dev-arm64-cross
+      - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-arm-linux-gnueabi libc6-dev-armel-cross gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross
       - sudo ln -s /usr/include/asm-generic /usr/include/asm
       - GOPATH=~/go_arm GOARM=5 go run build/ci.go install -arch arm -cc arm-linux-gnueabi-gcc
     before_deploy:

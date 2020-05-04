@@ -180,9 +180,6 @@ func (t *StateTest) Run(subtest StateSubtest, vmconfig vm.Config) (*state.StateD
 	// N.B: We need to do this in a two-step process, because the first Commit takes care
 	// of suicides, and we need to touch the coinbase _after_ it has potentially suicided.
 	if root != common.Hash(post.Root) {
-		//statedb.Reset(common.Hash{})
-		//dump := statedb.Dump(false, false, false)
-		//return statedb, fmt.Errorf("post state root mismatch: got %x, want %x\nstatedb.dump=\n%s", root, post.Root, string(dump))
 		return statedb, fmt.Errorf("post state root mismatch: got %x, want %x", root, post.Root)
 	}
 	if logs := rlpHash(statedb.Logs()); logs != common.Hash(post.Logs) {

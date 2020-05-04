@@ -29,15 +29,18 @@ matrix:
         packages:
           - g++-9
     env:
-      - CC=${CC:-gcc} CXX=${CXX:-g++}
+      - CC=gcc-9
+      - CXX=g++-9
     go: 1.13.x
     script:
-    - go build -v ./evmc/bindings/go/evmc
     - go env
     - $CC --version
     - $CXX --version
     - gcc --version
-    - go generate -v ./evmc/bindings/go/evmc
+    - go build -v ./evmc/bindings/go/evmc
+    - cd evmc/bindings/go/evmc
+    - gcc -fPIC -shared ../../../examples/example_vm/example_vm.c -I../../../include -o example_vm.so
+    - cd ../../../..
     - ls -lh ./evmc/bindings/go/evmc/*.so
     - go run build/ci.go install
     - travis_wait 60 go run build/ci.go test

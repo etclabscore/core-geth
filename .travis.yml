@@ -15,11 +15,11 @@ matrix:
       - CC=${CC:-cc} CXX=${CXX:-cpp}
     go: 1.13.x
     script:
+    - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install cmake g++ libboost-all-dev
     - echo "CC: ${CC}"
     - echo "CXX: ${CXX}"
     - $CC --version
     - $CXX --version
-    - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install cmake g++ libboost-all-dev
     - make test-evmc
 
   - os: linux

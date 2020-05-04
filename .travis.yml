@@ -29,7 +29,7 @@ matrix:
         packages:
           - g++-9
     env:
-      - CC=${CC:-cc} CXX=${CXX:-cpp}
+      - CC=${CC:-gcc} CXX=${CXX:-g++}
     go: 1.13.x
     script:
     - go build -v ./evmc/bindings/go/evmc

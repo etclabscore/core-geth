@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -33,30 +32,21 @@ func TestState(t *testing.T) {
 
 	t.Parallel()
 
-	if *testEWASM != "" {
-		// When bugs with tests get resolved, we can revert the testing to use Parallel.
-		// Until then, let's stay serial. ... Let's get serial! MMmm.
-		// FIXME: For now, only run EWASM tests when the vm.ewasm flag is in use.
-		st.whitelist(`^stEWASM`)
-		if strings.Contains(*testEWASM, "hera") {
-			// Add any skips here.
-		} else if strings.Contains(*testEWASM, "ssvm") {
-			// Add any skips here.
-		}
-	} else {
-		// Long tests:
-		st.slow(`^stAttackTest/ContractCreationSpam`)
-		st.slow(`^stBadOpcode/badOpcodes`)
-		st.slow(`^stPreCompiledContracts/modexp`)
-		st.slow(`^stQuadraticComplexityTest/`)
-		st.slow(`^stStaticCall/static_Call50000`)
-		st.slow(`^stStaticCall/static_Return50000`)
-		st.slow(`^stStaticCall/static_Call1MB`)
-		st.slow(`^stSystemOperationsTest/CallRecursiveBomb`)
-		st.slow(`^stTransactionTest/Opcodes_TransactionInit`)
+	// Long tests:
+	st.slow(`^stAttackTest/ContractCreationSpam`)
+	st.slow(`^stBadOpcode/badOpcodes`)
+	st.slow(`^stPreCompiledContracts/modexp`)
+	st.slow(`^stQuadraticComplexityTest/`)
+	st.slow(`^stStaticCall/static_Call50000`)
+	st.slow(`^stStaticCall/static_Return50000`)
+	st.slow(`^stStaticCall/static_Call1MB`)
+	st.slow(`^stSystemOperationsTest/CallRecursiveBomb`)
+	st.slow(`^stTransactionTest/Opcodes_TransactionInit`)
 
-		// Very time consuming
-		st.skipLoad(`^stTimeConsuming/`)
+	// Very time consuming
+	st.skipLoad(`^stTimeConsuming/`)
+
+	if *testEWASM == "" {
 		st.skipLoad(`^stEWASM`)
 	}
 

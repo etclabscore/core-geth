@@ -88,7 +88,7 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 			return func(listeners []net.Listener) (*meta_schema.Servers, error) {
 				servers := []meta_schema.ServerObject{}
 				for _, listener := range listeners {
-					addr := listener.Addr().String()
+					addr := "http://" + listener.Addr().String()
 					network := listener.Addr().Network()
 					servers = append(servers, meta_schema.ServerObject{
 						Url:  (*meta_schema.ServerObjectUrl)(&addr),

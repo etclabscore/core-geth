@@ -62,7 +62,7 @@ matrix:
     sudo: required
     go: 1.13.x
     env:
-      - CC=${CC:-cc} CXX=${CXX:-cpp} ARMv5
+      - CC=${CC:-gcc} CXX=${CXX:-g++} ARMv5
     git:
       submodules: false # avoid cloning ethereum/tests
     addons:

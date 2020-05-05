@@ -167,6 +167,7 @@ var (
 		Usage: "Network identifier (integer, 1=Frontier, 2=Morden (disused), 3=Ropsten, 4=Rinkeby, 6=Kotti)",
 		Value: eth.DefaultConfig.NetworkId,
 	}
+
 	ClassicFlag = cli.BoolFlag{
 		Name:  "classic",
 		Usage: "Ethereum Classic network: pre-configured Ethereum Classic mainnet",
@@ -207,6 +208,7 @@ var (
 		Name:  "dev",
 		Usage: "Ephemeral proof-of-authority network with a pre-funded developer account, mining enabled",
 	}
+
 	DeveloperPeriodFlag = cli.IntFlag{
 		Name:  "dev.period",
 		Usage: "Block period to use in developer mode (0 = mine only if transaction pending)",
@@ -760,25 +762,18 @@ var (
 // then a subdirectory of the specified datadir will be used.
 func MakeDataDir(ctx *cli.Context) string {
 
-	// TODO: meowsbits
-
 	if path := ctx.GlobalString(DataDirFlag.Name); path != "" {
+
+		// Maintain compatibility with older Geth configurations storing the
+		// Ropsten database in `testnet` instead of `ropsten`.
 		if ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name) {
-			// Maintain compatibility with older Geth configurations storing the
-			// Ropsten database in `testnet` instead of `ropsten`.
 			legacyPath := filepath.Join(path, "testnet")
 			if _, err := os.Stat(legacyPath); !os.IsNotExist(err) {
 				return legacyPath
+			} else {
+				return filepath.Join(path, "ropsten")
 			}
-			return filepath.Join(path, "ropsten")
 		}
-		if ctx.GlobalBool(RinkebyFlag.Name) {
-			return filepath.Join(path, "rinkeby")
-		}
-		if ctx.GlobalBool(GoerliFlag.Name) {
-			return filepath.Join(path, "goerli")
-		}
-		//return path
 		return dataDirPathForCtxChainConfig(ctx, path)
 	}
 	Fatalf("Cannot determine default data directory, please set manually (--%s)", DataDirFlag.Name)
@@ -1294,7 +1289,7 @@ func setSmartCard(ctx *cli.Context, cfg *node.Config) {
 func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) string {
 	switch {
 	case ctx.GlobalBool(RopstenFlag.Name):
-		return filepath.Join(baseDataDirPath, "testnet")
+		return filepath.Join(baseDataDirPath, "ropsten")
 	case ctx.GlobalBool(ClassicFlag.Name):
 		return filepath.Join(baseDataDirPath, "classic")
 	case ctx.GlobalBool(MordorFlag.Name):
@@ -1319,28 +1314,29 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 	switch {
 	case ctx.GlobalIsSet(DataDirFlag.Name):
 		cfg.DataDir = ctx.GlobalString(DataDirFlag.Name)
+
 	case ctx.GlobalBool(DeveloperFlag.Name):
 		cfg.DataDir = "" // unless explicitly requested, use memory databases
+
 	case (ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name)) && cfg.DataDir == node.DefaultDataDir():
+
 		// Maintain compatibility with older Geth configurations storing the
 		// Ropsten database in `testnet` instead of `ropsten`.
 		legacyPath := filepath.Join(node.DefaultDataDir(), "testnet")
+
 		if _, err := os.Stat(legacyPath); !os.IsNotExist(err) {
+
 			log.Warn("Using the deprecated `testnet` datadir. Future versions will store the Ropsten chain in `ropsten`.")
 			cfg.DataDir = legacyPath
 		} else {
+
 			cfg.DataDir = filepath.Join(node.DefaultDataDir(), "ropsten")
+
 		}
-	case ctx.GlobalBool(RinkebyFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "rinkeby")
-	case ctx.GlobalBool(GoerliFlag.Name) && cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "goerli")
+
 	case cfg.DataDir == node.DefaultDataDir():
-	}
-
-	// TODO: meowsbits
-
 		cfg.DataDir = dataDirPathForCtxChainConfig(ctx, node.DefaultDataDir())
+	}
 }
 
 func setGPO(ctx *cli.Context, cfg *gasprice.Config) {

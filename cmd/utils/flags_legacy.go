@@ -87,7 +87,7 @@ var (
 	// (Deprecated April 2020)
 	LegacyTestnetFlag = cli.BoolFlag{ // TODO(q9f): Remove after Ropsten is discontinued.
 		Name:  "testnet",
-		Usage: "Pre-configured test network (Deprecated: Please choose one of --goerli, --rinkeby, or --ropsten.)",
+		Usage: "Pre-configured test network (Deprecated: Please choose one of --kotti, --mordor, --goerli, --rinkeby, or --ropsten.)",
 	}
 	LegacyRPCEnabledFlag = cli.BoolFlag{
 		Name:  "rpc",

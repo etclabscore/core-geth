@@ -33,7 +33,7 @@ func MainnetGenesis() string {
 
 // RopstenGenesis returns the JSON spec to use for the Ropsten test network.
 func RopstenGenesis() string {
-	enc, err := json.Marshal(params.DefaultTestnetGenesisBlock())
+	enc, err := json.Marshal(params.DefaultRopstenGenesisBlock())
 	if err != nil {
 		panic(err)
 	}

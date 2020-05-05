@@ -134,7 +134,7 @@ func TestDifficultyGen(t *testing.T) {
 			// file first as a dependency for test generation.
 			specref, done := wroteNewChainConfigs[associateForkName]
 			if !done {
-				genesis := params.DefaultTestnetGenesisBlock()
+				genesis := params.DefaultRopstenGenesisBlock()
 				genesis.Config = conf
 
 				pspec, err := tconvert.NewParityChainSpec(associateForkName, genesis, []string{})

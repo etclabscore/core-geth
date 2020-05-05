@@ -217,7 +217,7 @@ func main() {
 			},
 			{
 				*testnetFlag,
-				params.DefaultTestnetGenesisBlock(),
+				params.DefaultRopstenGenesisBlock(),
 				params.TestnetBootnodes,
 			},
 			{

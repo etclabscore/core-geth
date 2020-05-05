@@ -1,4 +1,4 @@
-name: EVMC Tests
+name: EVMC
 
 on:
   push:

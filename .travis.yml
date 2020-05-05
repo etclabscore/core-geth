@@ -117,6 +117,7 @@ matrix:
     git:
       submodules: false
     script:
+    - git submodule update --init evmc
     - go get ./...
     - go run build/ci.go install
     - go run build/ci.go lint

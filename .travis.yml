@@ -55,10 +55,10 @@ matrix:
           - ubuntu-toolchain-r-test
         packages:
           - gcc-multilib
-          - g++-9
+#          - g++-9
     env:
-      - CC=gcc-9
-      - CXX=g++-9
+#      - CC=gcc-9
+#      - CXX=g++-9
     script:
       # manually get one of the sumbodules
       - git submodule update --init evmc

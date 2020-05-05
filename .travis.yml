@@ -47,8 +47,6 @@ matrix:
     dist: xenial
     sudo: required
     go: 1.13.x
-    env:
-      - CC=${CC:-gcc} CXX=${CXX:-g++} ARMv5
     git:
       submodules: false # avoid cloning ethereum/tests
     addons:
@@ -58,6 +56,9 @@ matrix:
         packages:
           - gcc-multilib
           - g++-9
+    env:
+      - CC=gcc-9
+      - CXX=g++-9
     script:
       # manually get one of the sumbodules
       - git submodule update --init evmc

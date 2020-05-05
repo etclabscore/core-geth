@@ -134,7 +134,7 @@ func gasSStore(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySi
 
 	// Enforce sufficient gas left, per EIP1706, guarding against reentrancy attacks.
 	if contract.Gas <= vars.CallStipend && evm.chainConfig.IsEnabled(evm.chainConfig.GetEIP1706Transition, evm.BlockNumber) {
-		return 0, errGasLeftTooLow
+		return 0, ErrOutOfGas
 	}
 	value := common.BigToHash(y)
 	if current == value { // noop (1)
@@ -296,7 +296,7 @@ func gasCreate2(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memoryS
 		return 0, ErrGasUintOverflow
 	}
 	if wordGas, overflow = math.SafeMul(toWordSize(wordGas), vars.Sha3WordGas); overflow {
-		return 0, errGasUintOverflow
+		return 0, ErrGasUintOverflow
 	}
 	if gas, overflow = math.SafeAdd(gas, wordGas); overflow {
 		return 0, ErrGasUintOverflow

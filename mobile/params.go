@@ -51,7 +51,7 @@ func RinkebyGenesis() string {
 
 // GoerliGenesis returns the JSON spec to use for the Goerli test network
 func GoerliGenesis() string {
-	enc, err := json.Marshal(core.DefaultGoerliGenesisBlock())
+	enc, err := json.Marshal(params.DefaultGoerliGenesisBlock())
 	if err != nil {
 		panic(err)
 	}

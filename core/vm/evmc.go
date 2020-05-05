@@ -303,10 +303,7 @@ func getRevision(env *EVM) evmc.Revision {
 	// This is an example of choosing to use an "abstracted" idea
 	// about chain config, where I'm choosing to prioritize "indicative" features
 	// as identifiers for Fork-Feature-Groups. Note that this is very different
-	// than using Feature-complete sets to assert "did Forkage." I may not be
-	// correct here (ie it may not 'correctly' translate to the EVMC logic. This
-	// is why building interoperable tools is annoying; there's no API... yet).
-	// eg. What does your Istanbul mean?
+	// than using Feature-complete sets to assert "did Forkage."
 	case conf.IsEnabled(conf.GetEIP1884Transition, n):
 		return evmc.Istanbul
 	case conf.IsEnabled(conf.GetEIP1283DisableTransition, n):
@@ -315,7 +312,7 @@ func getRevision(env *EVM) evmc.Revision {
 		return evmc.Constantinople
 	case conf.IsEnabled(conf.GetEIP198Transition, n):
 		return evmc.Byzantium
-	case conf.IsEnabled(conf.GetEIP155Transition, n): // It might be 161abc. Can never keep them straight.
+	case conf.IsEnabled(conf.GetEIP155Transition, n):
 		return evmc.SpuriousDragon
 	case conf.IsEnabled(conf.GetEIP150Transition, n):
 		return evmc.TangerineWhistle

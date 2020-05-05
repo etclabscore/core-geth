@@ -54,7 +54,7 @@ func (p *statePrefetcher) Prefetch(block *types.Block, statedb *state.StateDB, c
 		gaspool = new(GasPool).AddGas(block.GasLimit())
 	)
 	// Iterate over and process the individual transactions
-	byzantium := p.config.IsByzantium(block.Number())
+	byzantium := p.config.IsEnabled(p.config.GetEIP161abcTransition, block.Number())
 	for i, tx := range block.Transactions() {
 		// If block precaching was interrupted, abort
 		if interrupt != nil && atomic.LoadUint32(interrupt) == 1 {

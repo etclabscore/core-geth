@@ -308,9 +308,7 @@ func prepare(ctx *cli.Context) {
 		log.Info("Starting Geth on Ethereum mainnet...")
 	}
 
-
 	// TODO:meowsbits
-
 
 	// If we're a full node on mainnet without --cache specified, bump default cache allowance
 	if ctx.GlobalString(utils.SyncModeFlag.Name) != "light" && !ctx.GlobalIsSet(utils.CacheFlag.Name) && !ctx.GlobalIsSet(utils.NetworkIdFlag.Name) {

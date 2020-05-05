@@ -990,12 +990,12 @@ var logCode = common.Hex2Bytes("60606040525b7f24ec1d3ff24c2f6ff210738839dbc339cd
 // when the chain reorganizes.
 func TestLogRebirth(t *testing.T) {
 	var (
-		key1, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
+		key1, _       = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		addr1         = crypto.PubkeyToAddress(key1.PublicKey)
 		db            = rawdb.NewMemoryDatabase()
-		gspec       = &genesisT.Genesis{Config: params.TestChainConfig, Alloc: genesisT.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
-		genesis     = MustCommitGenesis(db, gspec)
-		signer      = types.NewEIP155Signer(gspec.Config.GetChainID())
+		gspec         = &genesisT.Genesis{Config: params.TestChainConfig, Alloc: genesisT.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
+		genesis       = MustCommitGenesis(db, gspec)
+		signer        = types.NewEIP155Signer(gspec.Config.GetChainID())
 		engine        = ethash.NewFaker()
 		blockchain, _ = NewBlockChain(db, nil, gspec.Config, engine, vm.Config{}, nil)
 	)
@@ -1056,9 +1056,9 @@ func TestSideLogRebirth(t *testing.T) {
 		key1, _       = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		addr1         = crypto.PubkeyToAddress(key1.PublicKey)
 		db            = rawdb.NewMemoryDatabase()
-		gspec    = &genesisT.Genesis{Config: params.TestChainConfig, Alloc: genesisT.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
-		genesis  = MustCommitGenesis(db, gspec)
-		signer   = types.NewEIP155Signer(gspec.Config.GetChainID())
+		gspec         = &genesisT.Genesis{Config: params.TestChainConfig, Alloc: genesisT.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
+		genesis       = MustCommitGenesis(db, gspec)
+		signer        = types.NewEIP155Signer(gspec.Config.GetChainID())
 		blockchain, _ = NewBlockChain(db, nil, gspec.Config, ethash.NewFaker(), vm.Config{}, nil)
 	)
 	defer blockchain.Stop()

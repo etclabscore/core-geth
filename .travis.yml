@@ -117,4 +117,5 @@ matrix:
     git:
       submodules: false
     script:
+    - go get ./...
     - go run build/ci.go lint

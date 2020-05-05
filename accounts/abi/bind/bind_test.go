@@ -1622,14 +1622,14 @@ var bindTests = []struct {
 	
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/core"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 			"github.com/ethereum/go-ethereum/crypto"
 	   `,
 		`
 			key, _ := crypto.GenerateKey()
 			addr := crypto.PubkeyToAddress(key.PublicKey)
 	
-			sim := backends.NewSimulatedBackend(core.GenesisAlloc{addr: {Balance: big.NewInt(1000000000)}}, 1000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{addr: {Balance: big.NewInt(1000000000)}}, 1000000)
 			defer sim.Close()
 	
 			opts := bind.NewKeyedTransactor(key)

@@ -374,7 +374,7 @@ func TestSimulatedBackend_EstimateGas(t *testing.T) {
 	addr := crypto.PubkeyToAddress(key.PublicKey)
 	opts := bind.NewKeyedTransactor(key)
 
-	sim := NewSimulatedBackend(genesisT.GenesisAlloc{addr: {Balance: big.NewInt(params.Ether)}}, 10000000)
+	sim := NewSimulatedBackend(genesisT.GenesisAlloc{addr: {Balance: big.NewInt(vars.Ether)}}, 10000000)
 	defer sim.Close()
 
 	parsed, _ := abi.JSON(strings.NewReader(contractAbi))

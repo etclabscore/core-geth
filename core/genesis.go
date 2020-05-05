@@ -46,7 +46,7 @@ import (
 // error is a *params.ConfigCompatError and the new, unwritten config is returned.
 //
 // The returned chain configuration is never nil.
-func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {	if genesis != nil && genesis.Config == nil {
+func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
@@ -95,7 +95,7 @@ func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.Cha
 	}
 
 	// Get the existing chain configuration.
-	newcfg := genesis.configOrDefault(genesis, stored)
+	newcfg := configOrDefault(genesis, stored)
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {
 		log.Warn("Found genesis block without chain config")

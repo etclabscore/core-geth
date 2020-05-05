@@ -21,7 +21,6 @@ import (
 	"reflect"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/math"
 )
 
 var (
@@ -37,8 +36,3 @@ var (
 	int64T    = reflect.TypeOf(int64(0))
 	addressT  = reflect.TypeOf(common.Address{})
 )
-
-// U256 converts a big Int into a 256bit EVM number.
-func U256(n *big.Int) []byte {
-	return math.PaddedBigBytes(math.U256(n), 32)
-}

@@ -118,4 +118,5 @@ matrix:
       submodules: false
     script:
     - go get ./...
+    - go run build/ci.go install
     - go run build/ci.go lint

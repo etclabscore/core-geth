@@ -158,7 +158,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 		gasPrice:          config.Miner.GasPrice,
 		etherbase:         config.Miner.Etherbase,
 		bloomRequests:     make(chan chan *bloombits.Retrieval),
-		bloomIndexer:      NewBloomIndexer(chainDb, params.BloomBitsBlocks, params.BloomConfirms),
+		bloomIndexer:      NewBloomIndexer(chainDb, vars.BloomBitsBlocks, vars.BloomConfirms),
 	}
 
 	bcVersion := rawdb.ReadDatabaseVersion(chainDb)

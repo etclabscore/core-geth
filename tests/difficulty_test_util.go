@@ -49,8 +49,8 @@ var (
 )
 
 var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
-	"Ropsten":  params.TestnetChainConfig,
-	"Morden":   params.TestnetChainConfig,
+	"Ropsten":  params.RopstenChainConfig,
+	"Morden":   params.RopstenChainConfig,
 	"Frontier": &goethereum.ChainConfig{},
 	"Homestead": &goethereum.ChainConfig{
 		Ethash:         new(ctypes.EthashConfig),

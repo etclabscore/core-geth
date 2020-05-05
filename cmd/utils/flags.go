@@ -167,10 +167,6 @@ var (
 		Usage: "Network identifier (integer, 1=Frontier, 2=Morden (disused), 3=Ropsten, 4=Rinkeby, 6=Kotti)",
 		Value: eth.DefaultConfig.NetworkId,
 	}
-	GoerliFlag = cli.BoolFlag{
-		Name:  "goerli",
-		Usage: "Görli network: pre-configured proof-of-authority test network",
-	}
 	ClassicFlag = cli.BoolFlag{
 		Name:  "classic",
 		Usage: "Ethereum Classic network: pre-configured Ethereum Classic mainnet",
@@ -194,6 +190,7 @@ var (
 	RopstenFlag = cli.BoolFlag{
 		Name:  "ropsten",
 		Usage: "Ropsten network: pre-configured proof-of-work test network",
+	}
 	KottiFlag = cli.BoolFlag{
 		Name:  "kotti",
 		Usage: "Kotti network: cross-client proof-of-authority test network",
@@ -765,8 +762,6 @@ func MakeDataDir(ctx *cli.Context) string {
 
 	// TODO: meowsbits
 
-
-	}
 	if path := ctx.GlobalString(DataDirFlag.Name); path != "" {
 		if ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name) {
 			// Maintain compatibility with older Geth configurations storing the
@@ -783,7 +778,7 @@ func MakeDataDir(ctx *cli.Context) string {
 		if ctx.GlobalBool(GoerliFlag.Name) {
 			return filepath.Join(path, "goerli")
 		}
-		return path
+		//return path
 		return dataDirPathForCtxChainConfig(ctx, path)
 	}
 	Fatalf("Cannot determine default data directory, please set manually (--%s)", DataDirFlag.Name)
@@ -1298,7 +1293,7 @@ func setSmartCard(ctx *cli.Context, cfg *node.Config) {
 
 func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) string {
 	switch {
-	case ctx.GlobalBool(TestnetFlag.Name):
+	case ctx.GlobalBool(RopstenFlag.Name):
 		return filepath.Join(baseDataDirPath, "testnet")
 	case ctx.GlobalBool(ClassicFlag.Name):
 		return filepath.Join(baseDataDirPath, "classic")
@@ -1644,13 +1639,13 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.
 	switch {
-	case ctx.GlobalBool(TestnetFlag.Name):
-		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.TestnetGenesisHash])
+	case ctx.GlobalBool(RopstenFlag.Name):
+		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.RopstenGenesisHash])
 	case ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name):
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 3
 		}
-		cfg.Genesis = core.DefaultRopstenGenesisBlock()
+		cfg.Genesis = params.DefaultRopstenGenesisBlock()
 		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.RopstenGenesisHash])
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.RinkebyGenesisHash])
@@ -1689,7 +1684,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		}
 		log.Info("Using developer account", "address", developer.Address)
 
-		cfg.Genesis = core.DeveloperGenesisBlock(uint64(ctx.GlobalInt(DeveloperPeriodFlag.Name)), developer.Address)
+		cfg.Genesis = params.DeveloperGenesisBlock(uint64(ctx.GlobalInt(DeveloperPeriodFlag.Name)), developer.Address)
 		if !ctx.GlobalIsSet(MinerGasPriceFlag.Name) && !ctx.GlobalIsSet(LegacyMinerGasPriceFlag.Name) {
 			cfg.Miner.GasPrice = big.NewInt(1)
 		}
@@ -1847,7 +1842,7 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 	case ctx.GlobalBool(EthersocialFlag.Name):
 		genesis = params.DefaultEthersocialGenesisBlock()
 	case ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name):
-		genesis = core.DefaultRopstenGenesisBlock()
+		genesis = params.DefaultRopstenGenesisBlock()
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		genesis = params.DefaultRinkebyGenesisBlock()
 	case ctx.GlobalBool(KottiFlag.Name):

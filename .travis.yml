@@ -111,15 +111,9 @@ matrix:
 
   - os: linux
     dist: xenial
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++-9
     go: 1.13.x
     env:
-      - CC=gcc-9 CXX=g++-9 lint
+      - lint
     git:
       submodules: false
     script:

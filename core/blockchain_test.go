@@ -990,6 +990,7 @@ var logCode = common.Hex2Bytes("60606040525b7f24ec1d3ff24c2f6ff210738839dbc339cd
 // when the chain reorganizes.
 func TestLogRebirth(t *testing.T) {
 	var (
+		key1, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		addr1         = crypto.PubkeyToAddress(key1.PublicKey)
 		db            = rawdb.NewMemoryDatabase()
 		gspec       = &genesisT.Genesis{Config: params.TestChainConfig, Alloc: genesisT.GenesisAlloc{addr1: {Balance: big.NewInt(10000000000000)}}}
@@ -2368,9 +2369,9 @@ func TestDeleteRecreateSlots(t *testing.T) {
 	aa := crypto.CreateAddress2(bb, [32]byte{}, initHash[:])
 	t.Logf("Destination address: %x\n", aa)
 
-	gspec := &Genesis{
+	gspec := &genesisT.Genesis{
 		Config: params.TestChainConfig,
-		Alloc: GenesisAlloc{
+		Alloc: genesisT.GenesisAlloc{
 			address: {Balance: funds},
 			// The address 0xAAAAA selfdestructs if called
 			aa: {
@@ -2387,7 +2388,7 @@ func TestDeleteRecreateSlots(t *testing.T) {
 			},
 		},
 	}
-	genesis := gspec.MustCommit(db)
+	genesis := MustCommitGenesis(db, gspec)
 
 	blocks, _ := GenerateChain(params.TestChainConfig, genesis, engine, db, 1, func(i int, b *BlockGen) {
 		b.SetCoinbase(common.Address{1})
@@ -2402,7 +2403,7 @@ func TestDeleteRecreateSlots(t *testing.T) {
 	})
 	// Import the canonical chain
 	diskdb := rawdb.NewMemoryDatabase()
-	gspec.MustCommit(diskdb)
+	MustCommitGenesis(diskdb, gspec)
 	chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{
 		Debug:  true,
 		Tracer: vm.NewJSONLogger(nil, os.Stdout),
@@ -2453,9 +2454,9 @@ func TestDeleteRecreateAccount(t *testing.T) {
 	aaStorage[common.HexToHash("01")] = common.HexToHash("01")
 	aaStorage[common.HexToHash("02")] = common.HexToHash("02")
 
-	gspec := &Genesis{
+	gspec := &genesisT.Genesis{
 		Config: params.TestChainConfig,
-		Alloc: GenesisAlloc{
+		Alloc: genesisT.GenesisAlloc{
 			address: {Balance: funds},
 			// The address 0xAAAAA selfdestructs if called
 			aa: {
@@ -2467,7 +2468,7 @@ func TestDeleteRecreateAccount(t *testing.T) {
 			},
 		},
 	}
-	genesis := gspec.MustCommit(db)
+	genesis := MustCommitGenesis(db, gspec)
 
 	blocks, _ := GenerateChain(params.TestChainConfig, genesis, engine, db, 1, func(i int, b *BlockGen) {
 		b.SetCoinbase(common.Address{1})
@@ -2482,7 +2483,7 @@ func TestDeleteRecreateAccount(t *testing.T) {
 	})
 	// Import the canonical chain
 	diskdb := rawdb.NewMemoryDatabase()
-	gspec.MustCommit(diskdb)
+	MustCommitGenesis(diskdb, gspec)
 	chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{
 		Debug:  true,
 		Tracer: vm.NewJSONLogger(nil, os.Stdout),
@@ -2572,9 +2573,9 @@ func TestDeleteRecreateSlotsAcrossManyBlocks(t *testing.T) {
 	initHash := crypto.Keccak256Hash(initCode)
 	aa := crypto.CreateAddress2(bb, [32]byte{}, initHash[:])
 	t.Logf("Destination address: %x\n", aa)
-	gspec := &Genesis{
+	gspec := &genesisT.Genesis{
 		Config: params.TestChainConfig,
-		Alloc: GenesisAlloc{
+		Alloc: genesisT.GenesisAlloc{
 			address: {Balance: funds},
 			// The address 0xAAAAA selfdestructs if called
 			aa: {
@@ -2591,7 +2592,7 @@ func TestDeleteRecreateSlotsAcrossManyBlocks(t *testing.T) {
 			},
 		},
 	}
-	genesis := gspec.MustCommit(db)
+	genesis := MustCommitGenesis(db, gspec)
 	var nonce uint64
 
 	type expectation struct {
@@ -2655,7 +2656,7 @@ func TestDeleteRecreateSlotsAcrossManyBlocks(t *testing.T) {
 	})
 	// Import the canonical chain
 	diskdb := rawdb.NewMemoryDatabase()
-	gspec.MustCommit(diskdb)
+	MustCommitGenesis(diskdb, gspec)
 	chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{
 		//Debug:  true,
 		//Tracer: vm.NewJSONLogger(nil, os.Stdout),
@@ -2763,9 +2764,9 @@ func TestInitThenFailCreateContract(t *testing.T) {
 	aa := crypto.CreateAddress2(bb, [32]byte{}, initHash[:])
 	t.Logf("Destination address: %x\n", aa)
 
-	gspec := &Genesis{
+	gspec := &genesisT.Genesis{
 		Config: params.TestChainConfig,
-		Alloc: GenesisAlloc{
+		Alloc: genesisT.GenesisAlloc{
 			address: {Balance: funds},
 			// The address aa has some funds
 			aa: {Balance: big.NewInt(100000)},
@@ -2776,7 +2777,7 @@ func TestInitThenFailCreateContract(t *testing.T) {
 			},
 		},
 	}
-	genesis := gspec.MustCommit(db)
+	genesis := MustCommitGenesis(db, gspec)
 	nonce := uint64(0)
 	blocks, _ := GenerateChain(params.TestChainConfig, genesis, engine, db, 4, func(i int, b *BlockGen) {
 		b.SetCoinbase(common.Address{1})
@@ -2789,7 +2790,7 @@ func TestInitThenFailCreateContract(t *testing.T) {
 
 	// Import the canonical chain
 	diskdb := rawdb.NewMemoryDatabase()
-	gspec.MustCommit(diskdb)
+	MustCommitGenesis(diskdb, gspec)
 	chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{
 		//Debug:  true,
 		//Tracer: vm.NewJSONLogger(nil, os.Stdout),

@@ -114,7 +114,7 @@ func faucetDirFromConfig(chainConfig ctypes.ChainConfigurator) string {
 		params.SocialChainConfig:      "social",
 		params.EthersocialChainConfig: "ethersocial",
 		params.MixChainConfig:         "mix",
-		params.TestnetChainConfig:     "testnet",
+		params.RopstenChainConfig:     "ropsten",
 		params.RinkebyChainConfig:     "rinkeby",
 		params.GoerliChainConfig:      "goerli",
 		params.KottiChainConfig:       "kotti",
@@ -218,7 +218,7 @@ func main() {
 			{
 				*testnetFlag,
 				params.DefaultRopstenGenesisBlock(),
-				params.TestnetBootnodes,
+				params.RopstenBootnodes,
 			},
 			{
 				*rinkebyFlag,

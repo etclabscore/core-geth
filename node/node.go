@@ -17,12 +17,15 @@
 package node
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"go/ast"
 	"net"
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -59,6 +62,11 @@ type Node struct {
 	rpcAPIs       []rpc.API   // List of APIs currently provided by the node
 	inprocHandler *rpc.Server // In-process RPC request handler to process the API requests
 
+	// NOTE: Registering the openrpc Document(s) as a field(s) of the Node
+	// is NOT required, it just gives the Node instance access to the document
+	// for possible editing or direct access later (past instantiation).
+	// If modifying the document past Node instantiation is not required,
+	// the document can be instantiated as a one-off adjacent to handler definition.
 	ipcOpenRPC  *go_openrpc_reflect.Document
 	ipcEndpoint string       // IPC endpoint to listen at (empty = IPC disabled)
 	ipcListener net.Listener // IPC RPC listener socket to serve API requests
@@ -81,8 +89,28 @@ type Node struct {
 	log log.Logger
 }
 
+// RPCDiscoveryService defines a receiver type used for RPC discovery by reflection.
+type RPCDiscoveryService struct {
+	d *go_openrpc_reflect.Document
+}
+
+// Discover exposes a Discover method to the RPC receiver registration.
+func (r *RPCDiscoveryService) Discover() (*meta_schema.OpenrpcDocument, error) {
+	return r.d.Discover()
+}
+
+// newOpenRPCDocument returns a Document configured with application-specific logic.
 func newOpenRPCDocument() *go_openrpc_reflect.Document {
 	d := &go_openrpc_reflect.Document{}
+
+	// Register "Meta" document fields.
+	// These include getters for
+	// - Servers object
+	// - Info object
+	// - ExternalDocs object
+	//
+	// These objects represent server-specific data that cannot be
+	// reflected.
 	d.WithMeta(&go_openrpc_reflect.MetaT{
 		GetServersFn: func() func(listeners []net.Listener) (*meta_schema.Servers, error) {
 			return func(listeners []net.Listener) (*meta_schema.Servers, error) {
@@ -111,14 +139,83 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 			return nil // FIXME
 		},
 	})
+
+	// Use a provided Ethereum default configuration as a base.
 	appReflector := &go_openrpc_reflect.EthereumReflectorT{}
+
+	// Install overrides for the json schema->type map fn used by the jsonschema reflect package.
 	appReflector.FnSchemaTypeMap = func() func(ty reflect.Type) *jsonschema.Type {
 		return OpenRPCJSONSchemaTypeMapper
 	}
+
+	// Install an override for method eligibility to exclude subscription methods.
+	// The majority of this logic is taken from the go_openrpc_reflect package configuration default,
+	// with the clause commented 'Custom' noting the custom logic.
+	var errType = reflect.TypeOf((*error)(nil)).Elem()
+	var contextType = reflect.TypeOf((*context.Context)(nil)).Elem()
+	appReflector.FnIsMethodEligible = func(method reflect.Method) bool {
+
+		// Method must be exported.
+		if method.PkgPath != "" {
+			return false
+		}
+
+		// Custom: skip methods with 1 argument of context.Context.
+		// We'll consider these methods subscription methods,
+		// and they are not well supported by OpenRPC.
+		if method.Type.NumIn() == 2 {
+			if method.Type.In(1) == contextType {
+				return false
+			}
+		}
+
+		// Verify return types. The function must return at most one error
+		// and/or one other non-error value.
+		outs := make([]reflect.Type, method.Func.Type().NumOut())
+		for i := 0; i < method.Func.Type().NumOut(); i++ {
+			outs[i] = method.Func.Type().Out(i)
+		}
+		isErrorType := func(ty reflect.Type) bool {
+			return ty == errType
+		}
+
+		// If an error is returned, it must be the last returned value.
+		switch {
+		case len(outs) > 2:
+			return false
+		case len(outs) == 1 && isErrorType(outs[0]):
+			return true
+		case len(outs) == 2:
+			if isErrorType(outs[0]) || !isErrorType(outs[1]) {
+				return false
+			}
+		}
+		return true
+	}
+
+	appReflector.FnGetContentDescriptorName = func(r reflect.Value, m reflect.Method, field *ast.Field) (string, error) {
+		fs := expandedFieldNamesFromList([]*ast.Field{field})
+		name := fs[0].Names[0].Name
+		name = strings.ReplaceAll(name, ".", "")
+		name = strings.ReplaceAll(name, "*", "")
+		name = strings.ReplaceAll(name, "[", "")
+		name = strings.ReplaceAll(name, "]", "")
+		name = strings.ReplaceAll(name, "{", "")
+		name = strings.ReplaceAll(name, "}", "")
+		name = strings.ReplaceAll(name, "-", "")
+		if regexp.MustCompile(`(?m)^\d`).MatchString(name) {
+			name = "num" + name
+		}
+		return name, nil
+	}
+
+	// Finally, register the configured reflector to the document.
 	d.WithReflector(appReflector)
 	return d
 }
 
+// registerOpenRPCAPIs provides a convenience logic that is reused
+// congruent to the rpc package receiver registrations.
 func registerOpenRPCAPIs(doc *go_openrpc_reflect.Document, apis []rpc.API) {
 	for _, api := range apis {
 		doc.RegisterReceiverName(api.Namespace, api.Service)
@@ -400,7 +497,9 @@ func (n *Node) startIPC(apis []rpc.API) error {
 	n.ipcOpenRPC = newOpenRPCDocument()
 	registerOpenRPCAPIs(n.ipcOpenRPC, apis)
 	n.ipcOpenRPC.RegisterListener(listener)
-	if err := handler.RegisterName("rpc", n.ipcOpenRPC.RPCDiscover(go_openrpc_reflect.Ethereum)); err != nil {
+	if err := handler.RegisterName("rpc", &RPCDiscoveryService{
+		d: n.ipcOpenRPC,
+	}); err != nil {
 		return err
 	}
 
@@ -448,10 +547,21 @@ func (n *Node) startHTTP(endpoint string, apis []rpc.API, modules []string, cors
 	}
 
 	// Register the API documentation.
-	n.httpOpenRPC = newOpenRPCDocument()
-	registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
-	n.httpOpenRPC.RegisterListener(listener)
-	if err := srv.RegisterName("rpc", n.httpOpenRPC.RPCDiscover(go_openrpc_reflect.Ethereum)); err != nil {
+	doc := newOpenRPCDocument()
+
+	registerOpenRPCAPIs(doc, registeredAPIs)
+
+	doc.RegisterListener(listener)
+
+	rpcDiscoverService := &RPCDiscoveryService{
+		d: doc,
+	}
+
+	// If desired, register the discovery service to itself.
+	// This will install rpc_discover as a method in the OpenRPC document.
+	// doc.RegisterReceiverName("rpc", rpcDiscoverService)
+
+	if err := srv.RegisterName("rpc", rpcDiscoverService); err != nil {
 		return err
 	}
 
@@ -504,7 +614,9 @@ func (n *Node) startWS(endpoint string, apis []rpc.API, modules []string, wsOrig
 	n.wsOpenRPC = newOpenRPCDocument()
 	registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
 	n.wsOpenRPC.RegisterListener(listener)
-	if err := srv.RegisterName("rpc", n.wsOpenRPC.RPCDiscover(go_openrpc_reflect.Ethereum)); err != nil {
+	if err := srv.RegisterName("rpc", &RPCDiscoveryService{
+		d: n.wsOpenRPC,
+	}); err != nil {
 		return err
 	}
 
@@ -767,11 +879,6 @@ func (n *Node) apis() []rpc.API {
 			Namespace: "web3",
 			Version:   "1.0",
 			Service:   NewPublicWeb3API(n),
-			Public:    true,
-		}, {
-			Namespace: "rpc",
-			Version:   "1.0",
-			Service:   n.ipcOpenRPC,
 			Public:    true,
 		},
 	}

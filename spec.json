@@ -198,7 +198,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "*p2p.NodeInfo", 
+        "name": "p2pNodeInfo", 
         "description": "*p2p.NodeInfo", 
         "summary": "", 
         "schema": {
@@ -241,7 +241,8 @@
             "protocols": {
               "patternProperties": {
                 ".*": {
-                  "additionalProperties": {}
+                  "additionalProperties": {}, 
+                  "type": "object"
                 }
               }, 
               "type": "object"
@@ -259,36 +260,13 @@
       }
     }, 
     {
-      "name": "admin_peerEvents", 
-      "description": "```go\nfunc (api *PrivateAdminAPI) PeerEvents(ctx context.Context) (*rpc.Subscription, error) {\n\tserver := api.node.Server()\n\tif server == nil {\n\t\treturn nil, ErrNodeStopped\n\t}\n\tnotifier, supported := rpc.NotifierFromContext(ctx)\n\tif !supported {\n\t\treturn nil, rpc.ErrNotificationsUnsupported\n\t}\n\trpcSub := notifier.CreateSubscription()\n\tgo func() {\n\t\tevents := make(chan *p2p.PeerEvent)\n\t\tsub := server.SubscribeEvents(events)\n\t\tdefer sub.Unsubscribe()\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase event := \u003c-events:\n\t\t\t\tnotifier.Notify(rpcSub.ID, event)\n\t\t\tcase \u003c-sub.Err():\n\t\t\t\treturn\n\t\t\tcase \u003c-rpcSub.Err():\n\t\t\t\treturn\n\t\t\tcase \u003c-notifier.Closed():\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\treturn rpcSub, nil\n}// PeerEvents creates an RPC subscription which receives peer events from the\n// node's p2p.Server\n\n```", 
-      "summary": "PeerEvents creates an RPC subscription which receives peer events from the\nnode's p2p.Server\n", 
-      "paramStructure": "by-position", 
-      "params": [], 
-      "result": {
-        "name": "*rpc.Subscription", 
-        "description": "*rpc.Subscription", 
-        "summary": "", 
-        "schema": {
-          "title": "Subscription", 
-          "type": "object"
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/node/api.go#L109"
-      }
-    }, 
-    {
       "name": "admin_peers", 
       "description": "```go\nfunc (api *PublicAdminAPI) Peers() ([ // Peers retrieves all the information we know about each individual peer at the\n// protocol granularity.\n]*p2p.PeerInfo, error) {\n\tserver := api.node.Server()\n\tif server == nil {\n\t\treturn nil, ErrNodeStopped\n\t}\n\treturn server.PeersInfo(), nil\n}\n```", 
       "summary": "Peers retrieves all the information we know about each individual peer at the\nprotocol granularity.\n", 
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "[]*p2p.PeerInfo", 
+        "name": "p2pPeerInfo", 
         "description": "[]*p2p.PeerInfo", 
         "summary": "", 
         "schema": {
@@ -784,7 +762,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1747"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1748"
       }
     }, 
     {
@@ -817,7 +795,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1736"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1737"
       }
     }, 
     {
@@ -876,17 +854,18 @@
           "description": "rpc.BlockNumber", 
           "summary": "", 
           "schema": {
+            "title": "blockNumberIdentifier", 
             "oneOf": [
               {
                 "title": "blockNumberTag", 
-                "description": "The optional block height description", 
+                "description": "The block height description", 
                 "enum": ["earliest", "latest", "pending"], 
                 "type": "string"
               }, 
               {
-                "title": "keccak", 
-                "description": "Hex representation of a Keccak 256 hash", 
-                "pattern": "^0x[a-fA-F\\d]{64}$", 
+                "title": "uint64", 
+                "description": "Hex representation of a uint64", 
+                "pattern": "^0x([a-fA-F\\d])+$", 
                 "type": "string"
               }
             ]
@@ -896,7 +875,7 @@
         }
       ], 
       "result": {
-        "name": "state.Dump", 
+        "name": "stateDump", 
         "description": "state.Dump", 
         "summary": "", 
         "schema": {
@@ -991,7 +970,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "*debug.GCStats", 
+        "name": "debugGCStats", 
         "description": "*debug.GCStats", 
         "summary": "", 
         "schema": {
@@ -1049,50 +1028,6 @@
       }
     }, 
     {
-      "name": "debug_getBadBlocks", 
-      "description": "```go\nfunc (api *PrivateDebugAPI) GetBadBlocks(ctx context.Context) ([ // GetBadBlocks returns a list of the last 'bad blocks' that the client has seen on the network\n// and returns them as a JSON list of block-hashes\n]*BadBlockArgs, error) {\n\tblocks := api.eth.BlockChain().BadBlocks()\n\tresults := make([]*BadBlockArgs, len(blocks))\n\tvar err error\n\tfor i, block := range blocks {\n\t\tresults[i] = \u0026BadBlockArgs{Hash: block.Hash()}\n\t\tif rlpBytes, err := rlp.EncodeToBytes(block); err != nil {\n\t\t\tresults[i].RLP = err.Error()\n\t\t} else {\n\t\t\tresults[i].RLP = fmt.Sprintf(\"0x%x\", rlpBytes)\n\t\t}\n\t\tif results[i].Block, err = ethapi.RPCMarshalBlock(block, true, true); err != nil {\n\t\t\tresults[i].Block = map[string]interface{}{\"error\": err.Error()}\n\t\t}\n\t}\n\treturn results, nil\n}\n```", 
-      "summary": "GetBadBlocks returns a list of the last 'bad blocks' that the client has seen on the network\nand returns them as a JSON list of block-hashes\n", 
-      "paramStructure": "by-position", 
-      "params": [], 
-      "result": {
-        "name": "[]*BadBlockArgs", 
-        "description": "[]*BadBlockArgs", 
-        "summary": "", 
-        "schema": {
-          "items": {
-            "additionalProperties": {}, 
-            "properties": {
-              "block": {
-                "patternProperties": {
-                  ".*": {
-                    "additionalProperties": {}
-                  }
-                }, 
-                "type": "object"
-              }, 
-              "hash": {
-                "pattern": "^0x[a-fA-F\\d]{64}$", 
-                "title": "keccak", 
-                "type": "string"
-              }, 
-              "rlp": {
-                "type": "string"
-              }
-            }, 
-            "type": "object"
-          }, 
-          "type": "array"
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L333"
-      }
-    }, 
-    {
       "name": "debug_getBlockRlp", 
       "description": "```go\nfunc (api *PublicDebugAPI) GetBlockRlp(ctx context.Context, number uint64) (string, error) {\n\tblock, _ := api.b.BlockByNumber(ctx, rpc.BlockNumber(number))\n\tif block == nil {\n\t\treturn \"\", fmt.Errorf(\"block #%d not found\", number)\n\t}\n\tencoded, err := rlp.EncodeToBytes(block)\n\tif err != nil {\n\t\treturn \"\", err\n\t}\n\treturn fmt.Sprintf(\"%x\", encoded), nil\n}// GetBlockRlp retrieves the RLP encoded for of a single block.\n\n```", 
       "summary": "GetBlockRlp retrieves the RLP encoded for of a single block.\n", 
@@ -1125,7 +1060,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1654"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1655"
       }
     }, 
     {
@@ -1162,7 +1097,7 @@
         }
       ], 
       "result": {
-        "name": "[]common.Address", 
+        "name": "commonAddress", 
         "description": "[]common.Address", 
         "summary": "", 
         "schema": {
@@ -1217,7 +1152,7 @@
         }
       ], 
       "result": {
-        "name": "[]common.Address", 
+        "name": "commonAddress", 
         "description": "[]common.Address", 
         "summary": "", 
         "schema": {
@@ -1290,7 +1225,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "*runtime.MemStats", 
+        "name": "runtimeMemStats", 
         "description": "*runtime.MemStats", 
         "summary": "", 
         "schema": {
@@ -1561,7 +1496,7 @@
         }
       ], 
       "result": {
-        "name": "hexutil.Bytes", 
+        "name": "hexutilBytes", 
         "description": "hexutil.Bytes", 
         "summary": "", 
         "schema": {
@@ -1612,7 +1547,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1706"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1707"
       }
     }, 
     {
@@ -1648,7 +1583,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1715"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1716"
       }
     }, 
     {
@@ -1757,7 +1692,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1759"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1760"
       }
     }, 
     {
@@ -1878,7 +1813,7 @@
         }
       ], 
       "result": {
-        "name": "[]string", 
+        "name": "string", 
         "description": "[]string", 
         "summary": "", 
         "schema": {
@@ -1957,7 +1892,7 @@
         }
       ], 
       "result": {
-        "name": "[]string", 
+        "name": "string", 
         "description": "[]string", 
         "summary": "", 
         "schema": {
@@ -2232,7 +2167,7 @@
         }
       ], 
       "result": {
-        "name": "common.Address", 
+        "name": "commonAddress", 
         "description": "common.Address", 
         "summary": "", 
         "schema": {
@@ -2247,7 +2182,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1671"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1672"
       }
     }, 
     {
@@ -2312,7 +2247,7 @@
         }
       ], 
       "result": {
-        "name": "[]*txTraceResult", 
+        "name": "txTraceResult", 
         "description": "[]*txTraceResult", 
         "summary": "", 
         "schema": {
@@ -2323,7 +2258,8 @@
                 "type": "string"
               }, 
               "result": {
-                "additionalProperties": {}
+                "additionalProperties": {}, 
+                "type": "object"
               }
             }, 
             "type": "object"
@@ -2401,7 +2337,7 @@
         }
       ], 
       "result": {
-        "name": "[]*txTraceResult", 
+        "name": "txTraceResult", 
         "description": "[]*txTraceResult", 
         "summary": "", 
         "schema": {
@@ -2412,7 +2348,8 @@
                 "type": "string"
               }, 
               "result": {
-                "additionalProperties": {}
+                "additionalProperties": {}, 
+                "type": "object"
               }
             }, 
             "type": "object"
@@ -2490,7 +2427,7 @@
         }
       ], 
       "result": {
-        "name": "[]*txTraceResult", 
+        "name": "txTraceResult", 
         "description": "[]*txTraceResult", 
         "summary": "", 
         "schema": {
@@ -2501,7 +2438,8 @@
                 "type": "string"
               }, 
               "result": {
-                "additionalProperties": {}
+                "additionalProperties": {}, 
+                "type": "object"
               }
             }, 
             "type": "object"
@@ -2528,17 +2466,18 @@
           "description": "rpc.BlockNumber", 
           "summary": "", 
           "schema": {
+            "title": "blockNumberIdentifier", 
             "oneOf": [
               {
                 "title": "blockNumberTag", 
-                "description": "The optional block height description", 
+                "description": "The block height description", 
                 "enum": ["earliest", "latest", "pending"], 
                 "type": "string"
               }, 
               {
-                "title": "keccak", 
-                "description": "Hex representation of a Keccak 256 hash", 
-                "pattern": "^0x[a-fA-F\\d]{64}$", 
+                "title": "uint64", 
+                "description": "Hex representation of a uint64", 
+                "pattern": "^0x([a-fA-F\\d])+$", 
                 "type": "string"
               }
             ]
@@ -2589,7 +2528,7 @@
         }
       ], 
       "result": {
-        "name": "[]*txTraceResult", 
+        "name": "txTraceResult", 
         "description": "[]*txTraceResult", 
         "summary": "", 
         "schema": {
@@ -2600,7 +2539,8 @@
                 "type": "string"
               }, 
               "result": {
-                "additionalProperties": {}
+                "additionalProperties": {}, 
+                "type": "object"
               }
             }, 
             "type": "object"
@@ -2675,7 +2615,7 @@
         }
       ], 
       "result": {
-        "name": "[]*txTraceResult", 
+        "name": "txTraceResult", 
         "description": "[]*txTraceResult", 
         "summary": "", 
         "schema": {
@@ -2686,7 +2626,8 @@
                 "type": "string"
               }, 
               "result": {
-                "additionalProperties": {}
+                "additionalProperties": {}, 
+                "type": "object"
               }
             }, 
             "type": "object"
@@ -2713,17 +2654,18 @@
           "description": "rpc.BlockNumber", 
           "summary": "", 
           "schema": {
+            "title": "blockNumberIdentifier", 
             "oneOf": [
               {
                 "title": "blockNumberTag", 
-                "description": "The optional block height description", 
+                "description": "The block height description", 
                 "enum": ["earliest", "latest", "pending"], 
                 "type": "string"
               }, 
               {
-                "title": "keccak", 
-                "description": "Hex representation of a Keccak 256 hash", 
-                "pattern": "^0x[a-fA-F\\d]{64}$", 
+                "title": "uint64", 
+                "description": "Hex representation of a uint64", 
+                "pattern": "^0x([a-fA-F\\d])+$", 
                 "type": "string"
               }
             ]
@@ -2736,17 +2678,18 @@
           "description": "rpc.BlockNumber", 
           "summary": "", 
           "schema": {
+            "title": "blockNumberIdentifier", 
             "oneOf": [
               {
                 "title": "blockNumberTag", 
-                "description": "The optional block height description", 
+                "description": "The block height description", 
                 "enum": ["earliest", "latest", "pending"], 
                 "type": "string"
               }, 
               {
-                "title": "keccak", 
-                "description": "Hex representation of a Keccak 256 hash", 
-                "pattern": "^0x[a-fA-F\\d]{64}$", 
+                "title": "uint64", 
+                "description": "Hex representation of a uint64", 
+                "pattern": "^0x([a-fA-F\\d])+$", 
                 "type": "string"
               }
             ]
@@ -2797,7 +2740,7 @@
         }
       ], 
       "result": {
-        "name": "*rpc.Subscription", 
+        "name": "rpcSubscription", 
         "description": "*rpc.Subscription", 
         "summary": "", 
         "schema": {
@@ -2875,11 +2818,12 @@
         }
       ], 
       "result": {
-        "name": "interface{}", 
+        "name": "interface", 
         "description": "interface{}", 
         "summary": "", 
         "schema": {
-          "additionalProperties": {}
+          "additionalProperties": {}, 
+          "type": "object"
         }, 
         "required": true, 
         "deprecated": false
@@ -3060,7 +3004,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "[]common.Address", 
+        "name": "commonAddress", 
         "description": "[]common.Address", 
         "summary": "", 
         "schema": {
@@ -3088,7 +3032,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "hexutil.Uint64", 
+        "name": "hexutilUint64", 
         "description": "hexutil.Uint64", 
         "summary": "", 
         "schema": {
@@ -3103,7 +3047,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L525"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L526"
       }
     }, 
     {
@@ -3160,20 +3104,20 @@
           "description": "rpc.BlockNumberOrHash", 
           "summary": "", 
           "schema": {
-            "title": "blockNumberOrHash", 
             "oneOf": [
               {
+                "title": "blockNumberIdentifier", 
                 "oneOf": [
                   {
                     "title": "blockNumberTag", 
-                    "description": "The optional block height description", 
+                    "description": "The block height description", 
                     "enum": ["earliest", "latest", "pending"], 
                     "type": "string"
                   }, 
                   {
-                    "title": "keccak", 
-                    "description": "Hex representation of a Keccak 256 hash", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$", 
+                    "title": "uint64", 
+                    "description": "Hex representation of a uint64", 
+                    "pattern": "^0x([a-fA-F\\d])+$", 
                     "type": "string"
                   }
                 ]
@@ -3181,20 +3125,10 @@
               {
                 "allOf": [
                   {
-                    "oneOf": [
-                      {
-                        "title": "blockNumberTag", 
-                        "description": "The optional block height description", 
-                        "enum": ["earliest", "latest", "pending"], 
-                        "type": "string"
-                      }, 
-                      {
-                        "title": "keccak", 
-                        "description": "Hex representation of a Keccak 256 hash", 
-                        "pattern": "^0x[a-fA-F\\d]{64}$", 
-                        "type": "string"
-                      }
-                    ]
+                    "title": "keccak", 
+                    "description": "Hex representation of a Keccak 256 hash", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$", 
+                    "type": "string"
                   }, 
                   {
                     "required": ["requireCanonical"], 
@@ -3270,7 +3204,7 @@
         }
       ], 
       "result": {
-        "name": "hexutil.Bytes", 
+        "name": "hexutilBytes", 
         "description": "hexutil.Bytes", 
         "summary": "", 
         "schema": {
@@ -3285,7 +3219,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L873"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L874"
       }
     }, 
     {
@@ -3295,7 +3229,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "hexutil.Uint64", 
+        "name": "hexutilUint64", 
         "description": "hexutil.Uint64", 
         "summary": "", 
         "schema": {
@@ -3314,38 +3248,13 @@
       }
     }, 
     {
-      "name": "eth_chainId", 
-      "description": "```go\nfunc (s *PublicBlockChainAPI) ChainId() *hexutil.Big {\n\treturn (*hexutil.Big)(s.b.ChainConfig().GetChainID())\n}// ChainId returns the chainID value for transaction replay protection.\n\n```", 
-      "summary": "ChainId returns the chainID value for transaction replay protection.\n", 
-      "paramStructure": "by-position", 
-      "params": [], 
-      "result": {
-        "name": "*hexutil.Big", 
-        "description": "*hexutil.Big", 
-        "summary": "", 
-        "schema": {
-          "title": "integer", 
-          "description": "Hex representation of the integer", 
-          "pattern": "^0x[a-fA-F0-9]+$", 
-          "type": "string"
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L520"
-      }
-    }, 
-    {
       "name": "eth_coinbase", 
       "description": "```go\nfunc (api *PublicEthereumAPI) Coinbase() (common.Address, error) {\n\treturn api.Etherbase()\n}// Coinbase is the address that mining rewards will be send to (alias for Etherbase)\n\n```", 
       "summary": "Coinbase is the address that mining rewards will be send to (alias for Etherbase)\n", 
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "common.Address", 
+        "name": "commonAddress", 
         "description": "common.Address", 
         "summary": "", 
         "schema": {
@@ -3414,7 +3323,7 @@
         }
       ], 
       "result": {
-        "name": "hexutil.Uint64", 
+        "name": "hexutilUint64", 
         "description": "hexutil.Uint64", 
         "summary": "", 
         "schema": {
@@ -3429,7 +3338,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L939"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L940"
       }
     }, 
     {
@@ -3439,7 +3348,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "common.Address", 
+        "name": "commonAddress", 
         "description": "common.Address", 
         "summary": "", 
         "schema": {
@@ -3518,7 +3427,7 @@
         }
       ], 
       "result": {
-        "name": "*SignTransactionResult", 
+        "name": "SignTransactionResult", 
         "description": "*SignTransactionResult", 
         "summary": "", 
         "schema": {
@@ -3542,32 +3451,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1488"
-      }
-    }, 
-    {
-      "name": "eth_gasPrice", 
-      "description": "```go\nfunc (s *PublicEthereumAPI) GasPrice(ctx context.Context) (*hexutil.Big, error) {\n\tprice, err := s.b.SuggestPrice(ctx)\n\treturn (*hexutil.Big)(price), err\n}// GasPrice returns a suggestion for a gas price.\n\n```", 
-      "summary": "GasPrice returns a suggestion for a gas price.\n", 
-      "paramStructure": "by-position", 
-      "params": [], 
-      "result": {
-        "name": "*hexutil.Big", 
-        "description": "*hexutil.Big", 
-        "summary": "", 
-        "schema": {
-          "title": "integer", 
-          "description": "Hex representation of the integer", 
-          "pattern": "^0x[a-fA-F0-9]+$", 
-          "type": "string"
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L66"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1489"
       }
     }, 
     {
@@ -3594,20 +3478,20 @@
           "description": "rpc.BlockNumberOrHash", 
           "summary": "", 
           "schema": {
-            "title": "blockNumberOrHash", 
             "oneOf": [
               {
+                "title": "blockNumberIdentifier", 
                 "oneOf": [
                   {
                     "title": "blockNumberTag", 
-                    "description": "The optional block height description", 
+                    "description": "The block height description", 
                     "enum": ["earliest", "latest", "pending"], 
                     "type": "string"
                   }, 
                   {
-                    "title": "keccak", 
-                    "description": "Hex representation of a Keccak 256 hash", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$", 
+                    "title": "uint64", 
+                    "description": "Hex representation of a uint64", 
+                    "pattern": "^0x([a-fA-F\\d])+$", 
                     "type": "string"
                   }
                 ]
@@ -3615,20 +3499,10 @@
               {
                 "allOf": [
                   {
-                    "oneOf": [
-                      {
-                        "title": "blockNumberTag", 
-                        "description": "The optional block height description", 
-                        "enum": ["earliest", "latest", "pending"], 
-                        "type": "string"
-                      }, 
-                      {
-                        "title": "keccak", 
-                        "description": "Hex representation of a Keccak 256 hash", 
-                        "pattern": "^0x[a-fA-F\\d]{64}$", 
-                        "type": "string"
-                      }
-                    ]
+                    "title": "keccak", 
+                    "description": "Hex representation of a Keccak 256 hash", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$", 
+                    "type": "string"
                   }, 
                   {
                     "required": ["requireCanonical"], 
@@ -3649,7 +3523,7 @@
         }
       ], 
       "result": {
-        "name": "*hexutil.Big", 
+        "name": "hexutilBig", 
         "description": "*hexutil.Big", 
         "summary": "", 
         "schema": {
@@ -3664,7 +3538,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L533"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L534"
       }
     }, 
     {
@@ -3698,13 +3572,14 @@
         }
       ], 
       "result": {
-        "name": "map[string]interface{}", 
+        "name": "mapstringinterface", 
         "description": "map[string]interface{}", 
         "summary": "", 
         "schema": {
           "patternProperties": {
             ".*": {
-              "additionalProperties": {}
+              "additionalProperties": {}, 
+              "type": "object"
             }
           }, 
           "type": "object"
@@ -3715,7 +3590,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L656"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L657"
       }
     }, 
     {
@@ -3729,17 +3604,18 @@
           "description": "rpc.BlockNumber", 
           "summary": "", 
           "schema": {
+            "title": "blockNumberIdentifier", 
             "oneOf": [
               {
                 "title": "blockNumberTag", 
-                "description": "The optional block height description", 
+                "description": "The block height description", 
                 "enum": ["earliest", "latest", "pending"], 
                 "type": "string"
               }, 
               {
-                "title": "keccak", 
-                "description": "Hex representation of a Keccak 256 hash", 
-                "pattern": "^0x[a-fA-F\\d]{64}$", 
+                "title": "uint64", 
+                "description": "Hex representation of a uint64", 
+                "pattern": "^0x([a-fA-F\\d])+$", 
                 "type": "string"
               }
             ]
@@ -3759,13 +3635,14 @@
         }
       ], 
       "result": {
-        "name": "map[string]interface{}", 
+        "name": "mapstringinterface", 
         "description": "map[string]interface{}", 
         "summary": "", 
         "schema": {
           "patternProperties": {
             ".*": {
-              "additionalProperties": {}
+              "additionalProperties": {}, 
+              "type": "object"
             }
           }, 
           "type": "object"
@@ -3776,7 +3653,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L639"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L640"
       }
     }, 
     {
@@ -3800,7 +3677,7 @@
         }
       ], 
       "result": {
-        "name": "*hexutil.Uint", 
+        "name": "hexutilUint", 
         "description": "*hexutil.Uint", 
         "summary": "", 
         "schema": {
@@ -3815,7 +3692,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1189"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1190"
       }
     }, 
     {
@@ -3829,17 +3706,18 @@
           "description": "rpc.BlockNumber", 
           "summary": "", 
           "schema": {
+            "title": "blockNumberIdentifier", 
             "oneOf": [
               {
                 "title": "blockNumberTag", 
-                "description": "The optional block height description", 
+                "description": "The block height description", 
                 "enum": ["earliest", "latest", "pending"], 
                 "type": "string"
               }, 
               {
-                "title": "keccak", 
-                "description": "Hex representation of a Keccak 256 hash", 
-                "pattern": "^0x[a-fA-F\\d]{64}$", 
+                "title": "uint64", 
+                "description": "Hex representation of a uint64", 
+                "pattern": "^0x([a-fA-F\\d])+$", 
                 "type": "string"
               }
             ]
@@ -3849,7 +3727,7 @@
         }
       ], 
       "result": {
-        "name": "*hexutil.Uint", 
+        "name": "hexutilUint", 
         "description": "*hexutil.Uint", 
         "summary": "", 
         "schema": {
@@ -3864,7 +3742,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1180"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1181"
       }
     }, 
     {
@@ -3891,20 +3769,20 @@
           "description": "rpc.BlockNumberOrHash", 
           "summary": "", 
           "schema": {
-            "title": "blockNumberOrHash", 
             "oneOf": [
               {
+                "title": "blockNumberIdentifier", 
                 "oneOf": [
                   {
                     "title": "blockNumberTag", 
-                    "description": "The optional block height description", 
+                    "description": "The block height description", 
                     "enum": ["earliest", "latest", "pending"], 
                     "type": "string"
                   }, 
                   {
-                    "title": "keccak", 
-                    "description": "Hex representation of a Keccak 256 hash", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$", 
+                    "title": "uint64", 
+                    "description": "Hex representation of a uint64", 
+                    "pattern": "^0x([a-fA-F\\d])+$", 
                     "type": "string"
                   }
                 ]
@@ -3912,20 +3790,10 @@
               {
                 "allOf": [
                   {
-                    "oneOf": [
-                      {
-                        "title": "blockNumberTag", 
-                        "description": "The optional block height description", 
-                        "enum": ["earliest", "latest", "pending"], 
-                        "type": "string"
-                      }, 
-                      {
-                        "title": "keccak", 
-                        "description": "Hex representation of a Keccak 256 hash", 
-                        "pattern": "^0x[a-fA-F\\d]{64}$", 
-                        "type": "string"
-                      }
-                    ]
+                    "title": "keccak", 
+                    "description": "Hex representation of a Keccak 256 hash", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$", 
+                    "type": "string"
                   }, 
                   {
                     "required": ["requireCanonical"], 
@@ -3946,7 +3814,7 @@
         }
       ], 
       "result": {
-        "name": "hexutil.Bytes", 
+        "name": "hexutilBytes", 
         "description": "hexutil.Bytes", 
         "summary": "", 
         "schema": {
@@ -3961,7 +3829,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L715"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L716"
       }
     }, 
     {
@@ -3982,11 +3850,12 @@
         }
       ], 
       "result": {
-        "name": "interface{}", 
+        "name": "interface", 
         "description": "interface{}", 
         "summary": "", 
         "schema": {
-          "additionalProperties": {}
+          "additionalProperties": {}, 
+          "type": "object"
         }, 
         "required": true, 
         "deprecated": false
@@ -4015,7 +3884,7 @@
         }
       ], 
       "result": {
-        "name": "[]*types.Log", 
+        "name": "typesLog", 
         "description": "[]*types.Log", 
         "summary": "", 
         "schema": {
@@ -4129,13 +3998,14 @@
         }
       ], 
       "result": {
-        "name": "map[string]interface{}", 
+        "name": "mapstringinterface", 
         "description": "map[string]interface{}", 
         "summary": "", 
         "schema": {
           "patternProperties": {
             ".*": {
-              "additionalProperties": {}
+              "additionalProperties": {}, 
+              "type": "object"
             }
           }, 
           "type": "object"
@@ -4146,7 +4016,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L626"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L627"
       }
     }, 
     {
@@ -4160,17 +4030,18 @@
           "description": "rpc.BlockNumber", 
           "summary": "", 
           "schema": {
+            "title": "blockNumberIdentifier", 
             "oneOf": [
               {
                 "title": "blockNumberTag", 
-                "description": "The optional block height description", 
+                "description": "The block height description", 
                 "enum": ["earliest", "latest", "pending"], 
                 "type": "string"
               }, 
               {
-                "title": "keccak", 
-                "description": "Hex representation of a Keccak 256 hash", 
-                "pattern": "^0x[a-fA-F\\d]{64}$", 
+                "title": "uint64", 
+                "description": "Hex representation of a uint64", 
+                "pattern": "^0x([a-fA-F\\d])+$", 
                 "type": "string"
               }
             ]
@@ -4180,13 +4051,14 @@
         }
       ], 
       "result": {
-        "name": "map[string]interface{}", 
+        "name": "mapstringinterface", 
         "description": "map[string]interface{}", 
         "summary": "", 
         "schema": {
           "patternProperties": {
             ".*": {
-              "additionalProperties": {}
+              "additionalProperties": {}, 
+              "type": "object"
             }
           }, 
           "type": "object"
@@ -4197,7 +4069,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L610"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L611"
       }
     }, 
     {
@@ -4257,7 +4129,7 @@
         }
       ], 
       "result": {
-        "name": "[]*types.Log", 
+        "name": "typesLog", 
         "description": "[]*types.Log", 
         "summary": "", 
         "schema": {
@@ -4362,20 +4234,20 @@
           "description": "rpc.BlockNumberOrHash", 
           "summary": "", 
           "schema": {
-            "title": "blockNumberOrHash", 
             "oneOf": [
               {
+                "title": "blockNumberIdentifier", 
                 "oneOf": [
                   {
                     "title": "blockNumberTag", 
-                    "description": "The optional block height description", 
+                    "description": "The block height description", 
                     "enum": ["earliest", "latest", "pending"], 
                     "type": "string"
                   }, 
                   {
-                    "title": "keccak", 
-                    "description": "Hex representation of a Keccak 256 hash", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$", 
+                    "title": "uint64", 
+                    "description": "Hex representation of a uint64", 
+                    "pattern": "^0x([a-fA-F\\d])+$", 
                     "type": "string"
                   }
                 ]
@@ -4383,20 +4255,10 @@
               {
                 "allOf": [
                   {
-                    "oneOf": [
-                      {
-                        "title": "blockNumberTag", 
-                        "description": "The optional block height description", 
-                        "enum": ["earliest", "latest", "pending"], 
-                        "type": "string"
-                      }, 
-                      {
-                        "title": "keccak", 
-                        "description": "Hex representation of a Keccak 256 hash", 
-                        "pattern": "^0x[a-fA-F\\d]{64}$", 
-                        "type": "string"
-                      }
-                    ]
+                    "title": "keccak", 
+                    "description": "Hex representation of a Keccak 256 hash", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$", 
+                    "type": "string"
                   }, 
                   {
                     "required": ["requireCanonical"], 
@@ -4417,7 +4279,7 @@
         }
       ], 
       "result": {
-        "name": "*AccountResult", 
+        "name": "AccountResult", 
         "description": "*AccountResult", 
         "summary": "", 
         "schema": {
@@ -4486,7 +4348,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L558"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L559"
       }
     }, 
     {
@@ -4523,7 +4385,7 @@
         }
       ], 
       "result": {
-        "name": "hexutil.Bytes", 
+        "name": "hexutilBytes", 
         "description": "hexutil.Bytes", 
         "summary": "", 
         "schema": {
@@ -4538,7 +4400,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1222"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1223"
       }
     }, 
     {
@@ -4552,17 +4414,18 @@
           "description": "rpc.BlockNumber", 
           "summary": "", 
           "schema": {
+            "title": "blockNumberIdentifier", 
             "oneOf": [
               {
                 "title": "blockNumberTag", 
-                "description": "The optional block height description", 
+                "description": "The block height description", 
                 "enum": ["earliest", "latest", "pending"], 
                 "type": "string"
               }, 
               {
-                "title": "keccak", 
-                "description": "Hex representation of a Keccak 256 hash", 
-                "pattern": "^0x[a-fA-F\\d]{64}$", 
+                "title": "uint64", 
+                "description": "Hex representation of a uint64", 
+                "pattern": "^0x([a-fA-F\\d])+$", 
                 "type": "string"
               }
             ]
@@ -4585,7 +4448,7 @@
         }
       ], 
       "result": {
-        "name": "hexutil.Bytes", 
+        "name": "hexutilBytes", 
         "description": "hexutil.Bytes", 
         "summary": "", 
         "schema": {
@@ -4600,7 +4463,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1214"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1215"
       }
     }, 
     {
@@ -4624,7 +4487,7 @@
         }
       ], 
       "result": {
-        "name": "hexutil.Bytes", 
+        "name": "hexutilBytes", 
         "description": "hexutil.Bytes", 
         "summary": "", 
         "schema": {
@@ -4639,7 +4502,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1268"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1269"
       }
     }, 
     {
@@ -4676,20 +4539,20 @@
           "description": "rpc.BlockNumberOrHash", 
           "summary": "", 
           "schema": {
-            "title": "blockNumberOrHash", 
             "oneOf": [
               {
+                "title": "blockNumberIdentifier", 
                 "oneOf": [
                   {
                     "title": "blockNumberTag", 
-                    "description": "The optional block height description", 
+                    "description": "The block height description", 
                     "enum": ["earliest", "latest", "pending"], 
                     "type": "string"
                   }, 
                   {
-                    "title": "keccak", 
-                    "description": "Hex representation of a Keccak 256 hash", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$", 
+                    "title": "uint64", 
+                    "description": "Hex representation of a uint64", 
+                    "pattern": "^0x([a-fA-F\\d])+$", 
                     "type": "string"
                   }
                 ]
@@ -4697,20 +4560,10 @@
               {
                 "allOf": [
                   {
-                    "oneOf": [
-                      {
-                        "title": "blockNumberTag", 
-                        "description": "The optional block height description", 
-                        "enum": ["earliest", "latest", "pending"], 
-                        "type": "string"
-                      }, 
-                      {
-                        "title": "keccak", 
-                        "description": "Hex representation of a Keccak 256 hash", 
-                        "pattern": "^0x[a-fA-F\\d]{64}$", 
-                        "type": "string"
-                      }
-                    ]
+                    "title": "keccak", 
+                    "description": "Hex representation of a Keccak 256 hash", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$", 
+                    "type": "string"
                   }, 
                   {
                     "required": ["requireCanonical"], 
@@ -4731,7 +4584,7 @@
         }
       ], 
       "result": {
-        "name": "hexutil.Bytes", 
+        "name": "hexutilBytes", 
         "description": "hexutil.Bytes", 
         "summary": "", 
         "schema": {
@@ -4746,7 +4599,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L727"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L728"
       }
     }, 
     {
@@ -4783,7 +4636,7 @@
         }
       ], 
       "result": {
-        "name": "*RPCTransaction", 
+        "name": "RPCTransaction", 
         "description": "*RPCTransaction", 
         "summary": "", 
         "schema": {
@@ -4868,7 +4721,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1206"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1207"
       }
     }, 
     {
@@ -4882,17 +4735,18 @@
           "description": "rpc.BlockNumber", 
           "summary": "", 
           "schema": {
+            "title": "blockNumberIdentifier", 
             "oneOf": [
               {
                 "title": "blockNumberTag", 
-                "description": "The optional block height description", 
+                "description": "The block height description", 
                 "enum": ["earliest", "latest", "pending"], 
                 "type": "string"
               }, 
               {
-                "title": "keccak", 
-                "description": "Hex representation of a Keccak 256 hash", 
-                "pattern": "^0x[a-fA-F\\d]{64}$", 
+                "title": "uint64", 
+                "description": "Hex representation of a uint64", 
+                "pattern": "^0x([a-fA-F\\d])+$", 
                 "type": "string"
               }
             ]
@@ -4915,7 +4769,7 @@
         }
       ], 
       "result": {
-        "name": "*RPCTransaction", 
+        "name": "RPCTransaction", 
         "description": "*RPCTransaction", 
         "summary": "", 
         "schema": {
@@ -5000,7 +4854,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1198"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1199"
       }
     }, 
     {
@@ -5024,7 +4878,7 @@
         }
       ], 
       "result": {
-        "name": "*RPCTransaction", 
+        "name": "RPCTransaction", 
         "description": "*RPCTransaction", 
         "summary": "", 
         "schema": {
@@ -5109,7 +4963,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1249"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1250"
       }
     }, 
     {
@@ -5136,20 +4990,20 @@
           "description": "rpc.BlockNumberOrHash", 
           "summary": "", 
           "schema": {
-            "title": "blockNumberOrHash", 
             "oneOf": [
               {
+                "title": "blockNumberIdentifier", 
                 "oneOf": [
                   {
                     "title": "blockNumberTag", 
-                    "description": "The optional block height description", 
+                    "description": "The block height description", 
                     "enum": ["earliest", "latest", "pending"], 
                     "type": "string"
                   }, 
                   {
-                    "title": "keccak", 
-                    "description": "Hex representation of a Keccak 256 hash", 
-                    "pattern": "^0x[a-fA-F\\d]{64}$", 
+                    "title": "uint64", 
+                    "description": "Hex representation of a uint64", 
+                    "pattern": "^0x([a-fA-F\\d])+$", 
                     "type": "string"
                   }
                 ]
@@ -5157,20 +5011,10 @@
               {
                 "allOf": [
                   {
-                    "oneOf": [
-                      {
-                        "title": "blockNumberTag", 
-                        "description": "The optional block height description", 
-                        "enum": ["earliest", "latest", "pending"], 
-                        "type": "string"
-                      }, 
-                      {
-                        "title": "keccak", 
-                        "description": "Hex representation of a Keccak 256 hash", 
-                        "pattern": "^0x[a-fA-F\\d]{64}$", 
-                        "type": "string"
-                      }
-                    ]
+                    "title": "keccak", 
+                    "description": "Hex representation of a Keccak 256 hash", 
+                    "pattern": "^0x[a-fA-F\\d]{64}$", 
+                    "type": "string"
                   }, 
                   {
                     "required": ["requireCanonical"], 
@@ -5191,7 +5035,7 @@
         }
       ], 
       "result": {
-        "name": "*hexutil.Uint64", 
+        "name": "hexutilUint64", 
         "description": "*hexutil.Uint64", 
         "summary": "", 
         "schema": {
@@ -5206,7 +5050,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1230"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1231"
       }
     }, 
     {
@@ -5230,13 +5074,14 @@
         }
       ], 
       "result": {
-        "name": "map[string]interface{}", 
+        "name": "mapstringinterface", 
         "description": "map[string]interface{}", 
         "summary": "", 
         "schema": {
           "patternProperties": {
             ".*": {
-              "additionalProperties": {}
+              "additionalProperties": {}, 
+              "type": "object"
             }
           }, 
           "type": "object"
@@ -5247,7 +5092,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1285"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1286"
       }
     }, 
     {
@@ -5284,13 +5129,14 @@
         }
       ], 
       "result": {
-        "name": "map[string]interface{}", 
+        "name": "mapstringinterface", 
         "description": "map[string]interface{}", 
         "summary": "", 
         "schema": {
           "patternProperties": {
             ".*": {
-              "additionalProperties": {}
+              "additionalProperties": {}, 
+              "type": "object"
             }
           }, 
           "type": "object"
@@ -5301,7 +5147,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L682"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L683"
       }
     }, 
     {
@@ -5315,17 +5161,18 @@
           "description": "rpc.BlockNumber", 
           "summary": "", 
           "schema": {
+            "title": "blockNumberIdentifier", 
             "oneOf": [
               {
                 "title": "blockNumberTag", 
-                "description": "The optional block height description", 
+                "description": "The block height description", 
                 "enum": ["earliest", "latest", "pending"], 
                 "type": "string"
               }, 
               {
-                "title": "keccak", 
-                "description": "Hex representation of a Keccak 256 hash", 
-                "pattern": "^0x[a-fA-F\\d]{64}$", 
+                "title": "uint64", 
+                "description": "Hex representation of a uint64", 
+                "pattern": "^0x([a-fA-F\\d])+$", 
                 "type": "string"
               }
             ]
@@ -5348,13 +5195,14 @@
         }
       ], 
       "result": {
-        "name": "map[string]interface{}", 
+        "name": "mapstringinterface", 
         "description": "map[string]interface{}", 
         "summary": "", 
         "schema": {
           "patternProperties": {
             ".*": {
-              "additionalProperties": {}
+              "additionalProperties": {}, 
+              "type": "object"
             }
           }, 
           "type": "object"
@@ -5365,7 +5213,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L666"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L667"
       }
     }, 
     {
@@ -5389,7 +5237,7 @@
         }
       ], 
       "result": {
-        "name": "*hexutil.Uint", 
+        "name": "hexutilUint", 
         "description": "*hexutil.Uint", 
         "summary": "", 
         "schema": {
@@ -5404,7 +5252,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L706"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L707"
       }
     }, 
     {
@@ -5418,17 +5266,18 @@
           "description": "rpc.BlockNumber", 
           "summary": "", 
           "schema": {
+            "title": "blockNumberIdentifier", 
             "oneOf": [
               {
                 "title": "blockNumberTag", 
-                "description": "The optional block height description", 
+                "description": "The block height description", 
                 "enum": ["earliest", "latest", "pending"], 
                 "type": "string"
               }, 
               {
-                "title": "keccak", 
-                "description": "Hex representation of a Keccak 256 hash", 
-                "pattern": "^0x[a-fA-F\\d]{64}$", 
+                "title": "uint64", 
+                "description": "Hex representation of a uint64", 
+                "pattern": "^0x([a-fA-F\\d])+$", 
                 "type": "string"
               }
             ]
@@ -5438,7 +5287,7 @@
         }
       ], 
       "result": {
-        "name": "*hexutil.Uint", 
+        "name": "hexutilUint", 
         "description": "*hexutil.Uint", 
         "summary": "", 
         "schema": {
@@ -5453,7 +5302,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L697"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L698"
       }
     }, 
     {
@@ -5463,7 +5312,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "[4]string", 
+        "name": "num4string", 
         "description": "[4]string", 
         "summary": "", 
         "schema": {
@@ -5490,7 +5339,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "hexutil.Uint64", 
+        "name": "hexutilUint64", 
         "description": "hexutil.Uint64", 
         "summary": "", 
         "schema": {
@@ -5565,7 +5414,7 @@
         }
       ], 
       "result": {
-        "name": "*rpc.Subscription", 
+        "name": "rpcSubscription", 
         "description": "*rpc.Subscription", 
         "summary": "", 
         "schema": {
@@ -5610,7 +5459,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "rpc.ID", 
+        "name": "rpcID", 
         "description": "rpc.ID", 
         "summary": "", 
         "schema": {
@@ -5682,7 +5531,7 @@
         }
       ], 
       "result": {
-        "name": "rpc.ID", 
+        "name": "rpcID", 
         "description": "rpc.ID", 
         "summary": "", 
         "schema": {
@@ -5698,36 +5547,13 @@
       }
     }, 
     {
-      "name": "eth_newHeads", 
-      "description": "```go\nfunc (api *PublicFilterAPI) NewHeads(ctx context.Context) (*rpc.Subscription, error) {\n\tnotifier, supported := rpc.NotifierFromContext(ctx)\n\tif !supported {\n\t\treturn \u0026rpc.Subscription{}, rpc.ErrNotificationsUnsupported\n\t}\n\trpcSub := notifier.CreateSubscription()\n\tgo func() {\n\t\theaders := make(chan *types.Header)\n\t\theadersSub := api.events.SubscribeNewHeads(headers)\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase h := \u003c-headers:\n\t\t\t\tnotifier.Notify(rpcSub.ID, h)\n\t\t\tcase \u003c-rpcSub.Err():\n\t\t\t\theadersSub.Unsubscribe()\n\t\t\t\treturn\n\t\t\tcase \u003c-notifier.Closed():\n\t\t\t\theadersSub.Unsubscribe()\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\treturn rpcSub, nil\n}// NewHeads send a notification each time a new (header) block is appended to the chain.\n\n```", 
-      "summary": "NewHeads send a notification each time a new (header) block is appended to the chain.\n", 
-      "paramStructure": "by-position", 
-      "params": [], 
-      "result": {
-        "name": "*rpc.Subscription", 
-        "description": "*rpc.Subscription", 
-        "summary": "", 
-        "schema": {
-          "title": "Subscription", 
-          "type": "object"
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/eth/filters/api.go#L206"
-      }
-    }, 
-    {
       "name": "eth_newPendingTransactionFilter", 
       "description": "```go\nfunc (api *PublicFilterAPI) NewPendingTransactionFilter() rpc.ID {\n\tvar (\n\t\tpendingTxs\t= make(chan [ // NewPendingTransactionFilter creates a filter that fetches pending transaction hashes\n\t\t// as transactions enter the pending state.\n\t\t//\n\t\t// It is part of the filter package because this filter can be used through the\n\t\t// `eth_getFilterChanges` polling method that is also used for log filters.\n\t\t//\n\t\t// https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_newpendingtransactionfilter\n\t\t]common.Hash)\n\t\tpendingTxSub\t= api.events.SubscribePendingTxs(pendingTxs)\n\t)\n\tapi.filtersMu.Lock()\n\tapi.filters[pendingTxSub.ID] = \u0026filter{typ: PendingTransactionsSubscription, deadline: time.NewTimer(deadline), hashes: make([]common.Hash, 0), s: pendingTxSub}\n\tapi.filtersMu.Unlock()\n\tgo func() {\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase ph := \u003c-pendingTxs:\n\t\t\t\tapi.filtersMu.Lock()\n\t\t\t\tif f, found := api.filters[pendingTxSub.ID]; found {\n\t\t\t\t\tf.hashes = append(f.hashes, ph...)\n\t\t\t\t}\n\t\t\t\tapi.filtersMu.Unlock()\n\t\t\tcase \u003c-pendingTxSub.Err():\n\t\t\t\tapi.filtersMu.Lock()\n\t\t\t\tdelete(api.filters, pendingTxSub.ID)\n\t\t\t\tapi.filtersMu.Unlock()\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\treturn pendingTxSub.ID\n}\n```", 
       "summary": "NewPendingTransactionFilter creates a filter that fetches pending transaction hashes\nas transactions enter the pending state.\n\nIt is part of the filter package because this filter can be used through the\n`eth_getFilterChanges` polling method that is also used for log filters.\n\nhttps://github.com/ethereum/wiki/wiki/JSON-RPC#eth_newpendingtransactionfilter\n", 
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "rpc.ID", 
+        "name": "rpcID", 
         "description": "rpc.ID", 
         "summary": "", 
         "schema": {
@@ -5743,36 +5569,13 @@
       }
     }, 
     {
-      "name": "eth_newPendingTransactions", 
-      "description": "```go\nfunc (api *PublicFilterAPI) NewPendingTransactions(ctx context.Context) (*rpc.Subscription, error) {\n\tnotifier, supported := rpc.NotifierFromContext(ctx)\n\tif !supported {\n\t\treturn \u0026rpc.Subscription{}, rpc.ErrNotificationsUnsupported\n\t}\n\trpcSub := notifier.CreateSubscription()\n\tgo func() {\n\t\ttxHashes := make(chan [ // NewPendingTransactions creates a subscription that is triggered each time a transaction\n\t\t// enters the transaction pool and was signed from one of the transactions this nodes manages.\n\t\t]common.Hash, 128)\n\t\tpendingTxSub := api.events.SubscribePendingTxs(txHashes)\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase hashes := \u003c-txHashes:\n\t\t\t\tfor _, h := range hashes {\n\t\t\t\t\tnotifier.Notify(rpcSub.ID, h)\n\t\t\t\t}\n\t\t\tcase \u003c-rpcSub.Err():\n\t\t\t\tpendingTxSub.Unsubscribe()\n\t\t\t\treturn\n\t\t\tcase \u003c-notifier.Closed():\n\t\t\t\tpendingTxSub.Unsubscribe()\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\treturn rpcSub, nil\n}\n```", 
-      "summary": "NewPendingTransactions creates a subscription that is triggered each time a transaction\nenters the transaction pool and was signed from one of the transactions this nodes manages.\n", 
-      "paramStructure": "by-position", 
-      "params": [], 
-      "result": {
-        "name": "*rpc.Subscription", 
-        "description": "*rpc.Subscription", 
-        "summary": "", 
-        "schema": {
-          "title": "Subscription", 
-          "type": "object"
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/eth/filters/api.go#L137"
-      }
-    }, 
-    {
       "name": "eth_pendingTransactions", 
       "description": "```go\nfunc (s *PublicTransactionPoolAPI) PendingTransactions() ([ // PendingTransactions returns the transactions that are in the transaction pool\n// and have a from address that is one of the accounts this node manages.\n]*RPCTransaction, error) {\n\tpending, err := s.b.GetPoolTransactions()\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\taccounts := make(map[common.Address]struct{})\n\tfor _, wallet := range s.b.AccountManager().Wallets() {\n\t\tfor _, account := range wallet.Accounts() {\n\t\t\taccounts[account.Address] = struct{}{}\n\t\t}\n\t}\n\ttransactions := make([]*RPCTransaction, 0, len(pending))\n\tfor _, tx := range pending {\n\t\tvar signer types.Signer = types.HomesteadSigner{}\n\t\tif tx.Protected() {\n\t\t\tsigner = types.NewEIP155Signer(tx.ChainId())\n\t\t}\n\t\tfrom, _ := types.Sender(signer, tx)\n\t\tif _, exists := accounts[from]; exists {\n\t\t\ttransactions = append(transactions, newRPCPendingTransaction(tx))\n\t\t}\n\t}\n\treturn transactions, nil\n}\n```", 
       "summary": "PendingTransactions returns the transactions that are in the transaction pool\nand have a from address that is one of the accounts this node manages.\n", 
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "[]*RPCTransaction", 
+        "name": "RPCTransaction", 
         "description": "[]*RPCTransaction", 
         "summary": "", 
         "schema": {
@@ -5860,7 +5663,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1572"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1573"
       }
     }, 
     {
@@ -5870,7 +5673,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "hexutil.Uint", 
+        "name": "hexutilUint", 
         "description": "hexutil.Uint", 
         "summary": "", 
         "schema": {
@@ -5975,7 +5778,7 @@
         }
       ], 
       "result": {
-        "name": "common.Hash", 
+        "name": "commonHash", 
         "description": "common.Hash", 
         "summary": "", 
         "schema": {
@@ -5990,7 +5793,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1599"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1600"
       }
     }, 
     {
@@ -6014,7 +5817,7 @@
         }
       ], 
       "result": {
-        "name": "common.Hash", 
+        "name": "commonHash", 
         "description": "common.Hash", 
         "summary": "", 
         "schema": {
@@ -6029,7 +5832,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1504"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1505"
       }
     }, 
     {
@@ -6093,7 +5896,7 @@
         }
       ], 
       "result": {
-        "name": "common.Hash", 
+        "name": "commonHash", 
         "description": "common.Hash", 
         "summary": "", 
         "schema": {
@@ -6108,7 +5911,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1456"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1457"
       }
     }, 
     {
@@ -6145,7 +5948,7 @@
         }
       ], 
       "result": {
-        "name": "hexutil.Bytes", 
+        "name": "hexutilBytes", 
         "description": "hexutil.Bytes", 
         "summary": "", 
         "schema": {
@@ -6160,7 +5963,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1521"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1522"
       }
     }, 
     {
@@ -6224,7 +6027,7 @@
         }
       ], 
       "result": {
-        "name": "*SignTransactionResult", 
+        "name": "SignTransactionResult", 
         "description": "*SignTransactionResult", 
         "summary": "", 
         "schema": {
@@ -6248,7 +6051,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1546"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1547"
       }
     }, 
     {
@@ -6373,7 +6176,7 @@
           "description": "chan interface{}", 
           "summary": "", 
           "schema": {
-            "title": "unsupported-type-by-jsonschema", 
+            "title": "typeUnsupportedByJSONSchema", 
             "type": "object"
           }, 
           "required": true, 
@@ -6381,7 +6184,7 @@
         }
       ], 
       "result": {
-        "name": "*SyncStatusSubscription", 
+        "name": "SyncStatusSubscription", 
         "description": "*SyncStatusSubscription", 
         "summary": "", 
         "schema": {
@@ -6404,33 +6207,11 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "interface{}", 
+        "name": "interface", 
         "description": "interface{}", 
         "summary": "", 
         "schema": {
-          "additionalProperties": {}
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L83"
-      }
-    }, 
-    {
-      "name": "eth_syncing", 
-      "description": "```go\nfunc (api *PublicDownloaderAPI) Syncing(ctx context.Context) (*rpc.Subscription, error) {\n\tnotifier, supported := rpc.NotifierFromContext(ctx)\n\tif !supported {\n\t\treturn \u0026rpc.Subscription{}, rpc.ErrNotificationsUnsupported\n\t}\n\trpcSub := notifier.CreateSubscription()\n\tgo func() {\n\t\tstatuses := make(chan interface{})\n\t\tsub := api.SubscribeSyncStatus(statuses)\n\t\tfor {\n\t\t\tselect {\n\t\t\tcase status := \u003c-statuses:\n\t\t\t\tnotifier.Notify(rpcSub.ID, status)\n\t\t\tcase \u003c-rpcSub.Err():\n\t\t\t\tsub.Unsubscribe()\n\t\t\t\treturn\n\t\t\tcase \u003c-notifier.Closed():\n\t\t\t\tsub.Unsubscribe()\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\treturn rpcSub, nil\n}// Syncing provides information when this nodes starts synchronising with the Ethereum network and when it's finished.\n\n```", 
-      "summary": "Syncing provides information when this nodes starts synchronising with the Ethereum network and when it's finished.\n", 
-      "paramStructure": "by-position", 
-      "params": [], 
-      "result": {
-        "name": "*rpc.Subscription", 
-        "description": "*rpc.Subscription", 
-        "summary": "", 
-        "schema": {
-          "title": "Subscription", 
+          "additionalProperties": {}, 
           "type": "object"
         }, 
         "required": true, 
@@ -6439,7 +6220,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/eth/downloader/api.go#L93"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L83"
       }
     }, 
     {
@@ -6507,7 +6288,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "[4]string", 
+        "name": "num4string", 
         "description": "[4]string", 
         "summary": "", 
         "schema": {
@@ -6878,7 +6659,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1776"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1777"
       }
     }, 
     {
@@ -6888,7 +6669,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "hexutil.Uint", 
+        "name": "hexutilUint", 
         "description": "hexutil.Uint", 
         "summary": "", 
         "schema": {
@@ -6903,7 +6684,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1780"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1781"
       }
     }, 
     {
@@ -6925,7 +6706,7 @@
       "deprecated": false, 
       "externalDocs": {
         "description": "Github remote link", 
-        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1785"
+        "url": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1786"
       }
     }, 
     {
@@ -6966,7 +6747,7 @@
         }
       ], 
       "result": {
-        "name": "accounts.Account", 
+        "name": "accountsAccount", 
         "description": "accounts.Account", 
         "summary": "", 
         "schema": {
@@ -7035,7 +6816,7 @@
         }
       ], 
       "result": {
-        "name": "common.Address", 
+        "name": "commonAddress", 
         "description": "common.Address", 
         "summary": "", 
         "schema": {
@@ -7081,7 +6862,7 @@
         }
       ], 
       "result": {
-        "name": "common.Address", 
+        "name": "commonAddress", 
         "description": "common.Address", 
         "summary": "", 
         "schema": {
@@ -7139,7 +6920,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "[]common.Address", 
+        "name": "commonAddress", 
         "description": "[]common.Address", 
         "summary": "", 
         "schema": {
@@ -7167,7 +6948,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "[]rawWallet", 
+        "name": "rawWallet", 
         "description": "[]rawWallet", 
         "summary": "", 
         "schema": {
@@ -7277,7 +7058,7 @@
         }
       ], 
       "result": {
-        "name": "common.Address", 
+        "name": "commonAddress", 
         "description": "common.Address", 
         "summary": "", 
         "schema": {
@@ -7408,7 +7189,7 @@
         }
       ], 
       "result": {
-        "name": "common.Hash", 
+        "name": "commonHash", 
         "description": "common.Hash", 
         "summary": "", 
         "schema": {
@@ -7470,7 +7251,7 @@
         }
       ], 
       "result": {
-        "name": "hexutil.Bytes", 
+        "name": "hexutilBytes", 
         "description": "hexutil.Bytes", 
         "summary": "", 
         "schema": {
@@ -7559,7 +7340,7 @@
         }
       ], 
       "result": {
-        "name": "common.Hash", 
+        "name": "commonHash", 
         "description": "common.Hash", 
         "summary": "", 
         "schema": {
@@ -7648,7 +7429,7 @@
         }
       ], 
       "result": {
-        "name": "*SignTransactionResult", 
+        "name": "SignTransactionResult", 
         "description": "*SignTransactionResult", 
         "summary": "", 
         "schema": {
@@ -7777,978 +7558,13 @@
       }
     }, 
     {
-      "name": "rpc_discover", 
-      "description": "```go\nfunc (d *Document) Discover() (*meta_schema.OpenrpcDocument, error) {\n\tif d.meta == nil {\n\t\treturn nil, fmt.Errorf(\"meta: %v\", errMissingInterface)\n\t}\n\topenRPCDocumentVersion := meta_schema.OpenrpcEnum0\n\tout := \u0026meta_schema.OpenrpcDocument{Openrpc: \u0026openRPCDocumentVersion, Info: d.meta.GetInfo()(), ExternalDocs: d.meta.GetExternalDocs()()}\n\tgetServersFn := d.meta.GetServers()\n\tservers, err := getServersFn(d.listeners)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tout.Servers = servers\n\tif d.reflector == nil {\n\t\treturn out, nil\n\t}\n\tif d.receivers == nil || len(d.receivers) == 0 {\n\t\treturn out, nil\n\t}\n\tmethods := []meta_schema.MethodObject{}\n\tfor i, rec := range d.receivers {\n\t\tname := d.receiverNames[i]\n\t\tms, err := d.reflector.ReceiverMethods(name, rec)\n\t\tif err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t\tmethods = append(methods, ms...)\n\t}\n\tsort.Slice(methods, func(i, j int) bool {\n\t\treturn *methods[i].Name \u003c *methods[j].Name\n\t})\n\tm := meta_schema.Methods(methods)\n\tout.Methods = \u0026m\n\treturn out, nil\n}\n```", 
-      "summary": "", 
-      "paramStructure": "by-position", 
-      "params": [], 
-      "result": {
-        "name": "*meta_schema.OpenrpcDocument", 
-        "description": "*meta_schema.OpenrpcDocument", 
-        "summary": "", 
-        "schema": {
-          "additionalProperties": {}, 
-          "properties": {
-            "components": {
-              "additionalProperties": {}, 
-              "properties": {
-                "contentDescriptors": {
-                  "patternProperties": {
-                    ".*": {
-                      "additionalProperties": {}
-                    }
-                  }, 
-                  "type": "object"
-                }, 
-                "errors": {
-                  "patternProperties": {
-                    ".*": {
-                      "additionalProperties": {}
-                    }
-                  }, 
-                  "type": "object"
-                }, 
-                "examplePairings": {
-                  "patternProperties": {
-                    ".*": {
-                      "additionalProperties": {}
-                    }
-                  }, 
-                  "type": "object"
-                }, 
-                "examples": {
-                  "patternProperties": {
-                    ".*": {
-                      "additionalProperties": {}
-                    }
-                  }, 
-                  "type": "object"
-                }, 
-                "links": {
-                  "patternProperties": {
-                    ".*": {
-                      "additionalProperties": {}
-                    }
-                  }, 
-                  "type": "object"
-                }, 
-                "schemas": {
-                  "patternProperties": {
-                    ".*": {
-                      "additionalProperties": {}
-                    }
-                  }, 
-                  "type": "object"
-                }, 
-                "tags": {
-                  "patternProperties": {
-                    ".*": {
-                      "additionalProperties": {}
-                    }
-                  }, 
-                  "type": "object"
-                }
-              }, 
-              "type": "object"
-            }, 
-            "externalDocs": {
-              "additionalProperties": {}, 
-              "properties": {
-                "description": {
-                  "type": "string"
-                }, 
-                "url": {
-                  "type": "string"
-                }
-              }, 
-              "type": "object"
-            }, 
-            "info": {
-              "additionalProperties": {}, 
-              "properties": {
-                "contact": {
-                  "additionalProperties": {}, 
-                  "properties": {
-                    "email": {
-                      "type": "string"
-                    }, 
-                    "name": {
-                      "type": "string"
-                    }, 
-                    "url": {
-                      "type": "string"
-                    }
-                  }, 
-                  "type": "object"
-                }, 
-                "description": {
-                  "type": "string"
-                }, 
-                "license": {
-                  "additionalProperties": {}, 
-                  "properties": {
-                    "name": {
-                      "type": "string"
-                    }, 
-                    "url": {
-                      "type": "string"
-                    }
-                  }, 
-                  "type": "object"
-                }, 
-                "termsOfService": {
-                  "type": "string"
-                }, 
-                "title": {
-                  "type": "string"
-                }, 
-                "version": {
-                  "type": "string"
-                }
-              }, 
-              "type": "object"
-            }, 
-            "methods": {
-              "items": {
-                "additionalProperties": {}, 
-                "properties": {
-                  "deprecated": {
-                    "type": "boolean"
-                  }, 
-                  "description": {
-                    "type": "string"
-                  }, 
-                  "errors": {
-                    "items": {
-                      "additionalProperties": {}, 
-                      "properties": {
-                        "ErrorObject": {
-                          "additionalProperties": {}, 
-                          "properties": {
-                            "code": {
-                              "pattern": "^0x[a-fA-F0-9]+$", 
-                              "title": "integer", 
-                              "type": "string"
-                            }, 
-                            "data": {
-                              "additionalProperties": {}
-                            }, 
-                            "message": {
-                              "type": "string"
-                            }
-                          }, 
-                          "type": "object"
-                        }, 
-                        "ReferenceObject": {
-                          "additionalProperties": {}, 
-                          "properties": {
-                            "$ref": {
-                              "type": "string"
-                            }
-                          }, 
-                          "type": "object"
-                        }
-                      }, 
-                      "type": "object"
-                    }, 
-                    "type": "array"
-                  }, 
-                  "examples": {
-                    "items": {
-                      "additionalProperties": {}, 
-                      "properties": {
-                        "ExamplePairingObject": {
-                          "additionalProperties": {}, 
-                          "properties": {
-                            "description": {
-                              "type": "string"
-                            }, 
-                            "name": {
-                              "type": "string"
-                            }, 
-                            "params": {
-                              "items": {
-                                "additionalProperties": {}, 
-                                "properties": {
-                                  "ExampleObject": {
-                                    "additionalProperties": {}, 
-                                    "properties": {
-                                      "description": {
-                                        "type": "string"
-                                      }, 
-                                      "name": {
-                                        "type": "string"
-                                      }, 
-                                      "summary": {
-                                        "type": "string"
-                                      }, 
-                                      "value": {
-                                        "additionalProperties": {}
-                                      }
-                                    }, 
-                                    "type": "object"
-                                  }, 
-                                  "ReferenceObject": {
-                                    "additionalProperties": {}, 
-                                    "properties": {
-                                      "$ref": {
-                                        "type": "string"
-                                      }
-                                    }, 
-                                    "type": "object"
-                                  }
-                                }, 
-                                "type": "object"
-                              }, 
-                              "type": "array"
-                            }, 
-                            "result": {
-                              "additionalProperties": {}, 
-                              "properties": {
-                                "ExampleObject": {
-                                  "additionalProperties": {}, 
-                                  "properties": {
-                                    "description": {
-                                      "type": "string"
-                                    }, 
-                                    "name": {
-                                      "type": "string"
-                                    }, 
-                                    "summary": {
-                                      "type": "string"
-                                    }, 
-                                    "value": {
-                                      "additionalProperties": {}
-                                    }
-                                  }, 
-                                  "type": "object"
-                                }, 
-                                "ReferenceObject": {
-                                  "additionalProperties": {}, 
-                                  "properties": {
-                                    "$ref": {
-                                      "type": "string"
-                                    }
-                                  }, 
-                                  "type": "object"
-                                }
-                              }, 
-                              "type": "object"
-                            }
-                          }, 
-                          "type": "object"
-                        }, 
-                        "ReferenceObject": {
-                          "additionalProperties": {}, 
-                          "properties": {
-                            "$ref": {
-                              "type": "string"
-                            }
-                          }, 
-                          "type": "object"
-                        }
-                      }, 
-                      "type": "object"
-                    }, 
-                    "type": "array"
-                  }, 
-                  "externalDocs": {
-                    "additionalProperties": {}, 
-                    "properties": {
-                      "description": {
-                        "type": "string"
-                      }, 
-                      "url": {
-                        "type": "string"
-                      }
-                    }, 
-                    "type": "object"
-                  }, 
-                  "links": {
-                    "items": {
-                      "additionalProperties": {}, 
-                      "properties": {
-                        "LinkObject": {
-                          "additionalProperties": {}, 
-                          "properties": {
-                            "description": {
-                              "type": "string"
-                            }, 
-                            "method": {
-                              "type": "string"
-                            }, 
-                            "name": {
-                              "type": "string"
-                            }, 
-                            "params": {
-                              "additionalProperties": {}
-                            }, 
-                            "server": {
-                              "additionalProperties": {}, 
-                              "properties": {
-                                "description": {
-                                  "type": "string"
-                                }, 
-                                "name": {
-                                  "type": "string"
-                                }, 
-                                "summary": {
-                                  "type": "string"
-                                }, 
-                                "url": {
-                                  "type": "string"
-                                }, 
-                                "variables": {
-                                  "patternProperties": {
-                                    ".*": {
-                                      "additionalProperties": {}
-                                    }
-                                  }, 
-                                  "type": "object"
-                                }
-                              }, 
-                              "type": "object"
-                            }, 
-                            "summary": {
-                              "type": "string"
-                            }
-                          }, 
-                          "type": "object"
-                        }, 
-                        "ReferenceObject": {
-                          "additionalProperties": {}, 
-                          "properties": {
-                            "$ref": {
-                              "type": "string"
-                            }
-                          }, 
-                          "type": "object"
-                        }
-                      }, 
-                      "type": "object"
-                    }, 
-                    "type": "array"
-                  }, 
-                  "name": {
-                    "type": "string"
-                  }, 
-                  "paramStructure": {
-                    "type": "string"
-                  }, 
-                  "params": {
-                    "items": {
-                      "additionalProperties": {}, 
-                      "properties": {
-                        "ContentDescriptorObject": {
-                          "additionalProperties": {}, 
-                          "properties": {
-                            "deprecated": {
-                              "type": "boolean"
-                            }, 
-                            "description": {
-                              "type": "string"
-                            }, 
-                            "name": {
-                              "type": "string"
-                            }, 
-                            "required": {
-                              "type": "boolean"
-                            }, 
-                            "schema": {
-                              "additionalProperties": {}, 
-                              "properties": {
-                                "$comment": {
-                                  "type": "string"
-                                }, 
-                                "$id": {
-                                  "type": "string"
-                                }, 
-                                "$ref": {
-                                  "type": "string"
-                                }, 
-                                "$schema": {
-                                  "type": "string"
-                                }, 
-                                "additionalItems": {}, 
-                                "additionalProperties": {}, 
-                                "allOf": {
-                                  "items": {}, 
-                                  "type": "array"
-                                }, 
-                                "anyOf": {
-                                  "items": {}, 
-                                  "type": "array"
-                                }, 
-                                "const": {
-                                  "additionalProperties": {}
-                                }, 
-                                "contains": {}, 
-                                "contentEncoding": {
-                                  "type": "string"
-                                }, 
-                                "contentMediaType": {
-                                  "type": "string"
-                                }, 
-                                "default": {
-                                  "additionalProperties": {}
-                                }, 
-                                "definitions": {
-                                  "patternProperties": {
-                                    ".*": {
-                                      "additionalProperties": {}
-                                    }
-                                  }, 
-                                  "type": "object"
-                                }, 
-                                "dependencies": {
-                                  "patternProperties": {
-                                    ".*": {
-                                      "additionalProperties": {}
-                                    }
-                                  }, 
-                                  "type": "object"
-                                }, 
-                                "description": {
-                                  "type": "string"
-                                }, 
-                                "else": {}, 
-                                "enum": {
-                                  "items": {
-                                    "additionalProperties": {}
-                                  }, 
-                                  "type": "array"
-                                }, 
-                                "examples": {
-                                  "items": {
-                                    "additionalProperties": {}
-                                  }, 
-                                  "type": "array"
-                                }, 
-                                "exclusiveMaximum": {
-                                  "type": "number"
-                                }, 
-                                "exclusiveMinimum": {
-                                  "type": "number"
-                                }, 
-                                "format": {
-                                  "type": "string"
-                                }, 
-                                "if": {}, 
-                                "items": {
-                                  "additionalProperties": {}, 
-                                  "properties": {
-                                    "JSONSchema": {}, 
-                                    "UnorderedSetOfJSONSchemawrpyYBUS": {
-                                      "items": {}, 
-                                      "type": "array"
-                                    }
-                                  }, 
-                                  "type": "object"
-                                }, 
-                                "maxItems": {
-                                  "pattern": "^0x[a-fA-F0-9]+$", 
-                                  "title": "integer", 
-                                  "type": "string"
-                                }, 
-                                "maxLength": {
-                                  "pattern": "^0x[a-fA-F0-9]+$", 
-                                  "title": "integer", 
-                                  "type": "string"
-                                }, 
-                                "maxProperties": {
-                                  "pattern": "^0x[a-fA-F0-9]+$", 
-                                  "title": "integer", 
-                                  "type": "string"
-                                }, 
-                                "maximum": {
-                                  "type": "number"
-                                }, 
-                                "minItems": {
-                                  "pattern": "^0x[a-fA-F0-9]+$", 
-                                  "title": "integer", 
-                                  "type": "string"
-                                }, 
-                                "minLength": {
-                                  "patternProperties": {
-                                    ".*": {
-                                      "additionalProperties": {}
-                                    }
-                                  }, 
-                                  "type": "object"
-                                }, 
-                                "minProperties": {
-                                  "pattern": "^0x[a-fA-F0-9]+$", 
-                                  "title": "integer", 
-                                  "type": "string"
-                                }, 
-                                "minimum": {
-                                  "type": "number"
-                                }, 
-                                "multipleOf": {
-                                  "type": "number"
-                                }, 
-                                "not": {}, 
-                                "oneOf": {
-                                  "items": {}, 
-                                  "type": "array"
-                                }, 
-                                "pattern": {
-                                  "type": "string"
-                                }, 
-                                "patternProperties": {
-                                  "patternProperties": {
-                                    ".*": {
-                                      "additionalProperties": {}
-                                    }
-                                  }, 
-                                  "type": "object"
-                                }, 
-                                "properties": {
-                                  "patternProperties": {
-                                    ".*": {
-                                      "additionalProperties": {}
-                                    }
-                                  }, 
-                                  "type": "object"
-                                }, 
-                                "propertyNames": {}, 
-                                "readOnly": {
-                                  "type": "boolean"
-                                }, 
-                                "required": {
-                                  "items": {
-                                    "type": "string"
-                                  }, 
-                                  "type": "array"
-                                }, 
-                                "then": {}, 
-                                "title": {
-                                  "type": "string"
-                                }, 
-                                "type": {
-                                  "additionalProperties": {}, 
-                                  "properties": {
-                                    "Any17L18NF5": {
-                                      "additionalProperties": {}
-                                    }, 
-                                    "UnorderedSetOfAny17L18NF5VWcS9ROi": {
-                                      "items": {
-                                        "additionalProperties": {}
-                                      }, 
-                                      "type": "array"
-                                    }
-                                  }, 
-                                  "type": "object"
-                                }, 
-                                "uniqueItems": {
-                                  "type": "boolean"
-                                }, 
-                                "writeOnly": {
-                                  "type": "boolean"
-                                }
-                              }, 
-                              "type": "object"
-                            }, 
-                            "summary": {
-                              "type": "string"
-                            }
-                          }, 
-                          "type": "object"
-                        }, 
-                        "ReferenceObject": {
-                          "additionalProperties": {}, 
-                          "properties": {
-                            "$ref": {
-                              "type": "string"
-                            }
-                          }, 
-                          "type": "object"
-                        }
-                      }, 
-                      "type": "object"
-                    }, 
-                    "type": "array"
-                  }, 
-                  "result": {
-                    "additionalProperties": {}, 
-                    "properties": {
-                      "ContentDescriptorObject": {
-                        "additionalProperties": {}, 
-                        "properties": {
-                          "deprecated": {
-                            "type": "boolean"
-                          }, 
-                          "description": {
-                            "type": "string"
-                          }, 
-                          "name": {
-                            "type": "string"
-                          }, 
-                          "required": {
-                            "type": "boolean"
-                          }, 
-                          "schema": {
-                            "$schema": "http://json-schema.org/draft-04/schema"
-                          }, 
-                          "summary": {
-                            "type": "string"
-                          }
-                        }, 
-                        "type": "object"
-                      }, 
-                      "ReferenceObject": {
-                        "additionalProperties": {}, 
-                        "properties": {
-                          "$ref": {
-                            "type": "string"
-                          }
-                        }, 
-                        "type": "object"
-                      }
-                    }, 
-                    "type": "object"
-                  }, 
-                  "servers": {
-                    "items": {
-                      "additionalProperties": {}, 
-                      "properties": {
-                        "description": {
-                          "type": "string"
-                        }, 
-                        "name": {
-                          "type": "string"
-                        }, 
-                        "summary": {
-                          "type": "string"
-                        }, 
-                        "url": {
-                          "type": "string"
-                        }, 
-                        "variables": {
-                          "patternProperties": {
-                            ".*": {
-                              "additionalProperties": {}
-                            }
-                          }, 
-                          "type": "object"
-                        }
-                      }, 
-                      "type": "object"
-                    }, 
-                    "type": "array"
-                  }, 
-                  "summary": {
-                    "type": "string"
-                  }, 
-                  "tags": {
-                    "items": {
-                      "additionalProperties": {}, 
-                      "properties": {
-                        "ReferenceObject": {
-                          "additionalProperties": {}, 
-                          "properties": {
-                            "$ref": {
-                              "type": "string"
-                            }
-                          }, 
-                          "type": "object"
-                        }, 
-                        "TagObject": {
-                          "additionalProperties": {}, 
-                          "properties": {
-                            "description": {
-                              "type": "string"
-                            }, 
-                            "externalDocs": {
-                              "additionalProperties": {}, 
-                              "properties": {
-                                "description": {
-                                  "type": "string"
-                                }, 
-                                "url": {
-                                  "type": "string"
-                                }
-                              }, 
-                              "type": "object"
-                            }, 
-                            "name": {
-                              "type": "string"
-                            }
-                          }, 
-                          "type": "object"
-                        }
-                      }, 
-                      "type": "object"
-                    }, 
-                    "type": "array"
-                  }
-                }, 
-                "type": "object"
-              }, 
-              "type": "array"
-            }, 
-            "openrpc": {
-              "type": "string"
-            }, 
-            "servers": {
-              "items": {
-                "additionalProperties": {}, 
-                "properties": {
-                  "description": {
-                    "type": "string"
-                  }, 
-                  "name": {
-                    "type": "string"
-                  }, 
-                  "summary": {
-                    "type": "string"
-                  }, 
-                  "url": {
-                    "type": "string"
-                  }, 
-                  "variables": {
-                    "patternProperties": {
-                      ".*": {
-                        "additionalProperties": {}
-                      }
-                    }, 
-                    "type": "object"
-                  }
-                }, 
-                "type": "object"
-              }, 
-              "type": "array"
-            }
-          }, 
-          "type": "object"
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/etclabscore/go-openrpc-reflect/blob/master/document.go#L174"
-      }
-    }, 
-    {
-      "name": "rpc_rPCDiscover", 
-      "description": "```go\nfunc (d *Document) RPCDiscover(kind Service) (receiver interface{}) {\n\tswitch kind {\n\tcase Standard:\n\t\treturn \u0026RPC{d}\n\tcase Ethereum:\n\t\treturn \u0026RPCEthereum{d}\n\t}\n\treturn nil\n}\n```", 
-      "summary": "", 
-      "paramStructure": "by-position", 
-      "params": [
-        {
-          "name": "kind", 
-          "description": "Service", 
-          "summary": "", 
-          "schema": {
-            "title": "integer", 
-            "description": "Hex representation of the integer", 
-            "pattern": "^0x[a-fA-F0-9]+$", 
-            "type": "string"
-          }, 
-          "required": true, 
-          "deprecated": false
-        }
-      ], 
-      "result": {
-        "name": "receiver", 
-        "description": "interface{}", 
-        "summary": "", 
-        "schema": {
-          "additionalProperties": {}
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/etclabscore/go-openrpc-reflect/blob/master/document.go#L130"
-      }
-    }, 
-    {
-      "name": "rpc_registerListener", 
-      "description": "```go\nfunc (d *Document) RegisterListener(listener net.Listener) {\n\tif d.listeners == nil {\n\t\td.listeners = []net.Listener{}\n\t}\n\td.listeners = append(d.listeners, listener)\n}\n```", 
-      "summary": "", 
-      "paramStructure": "by-position", 
-      "params": [
-        {
-          "name": "listener", 
-          "description": "net.Listener", 
-          "summary": "", 
-          "schema": {
-            "additionalProperties": {}
-          }, 
-          "required": true, 
-          "deprecated": false
-        }
-      ], 
-      "result": {
-        "name": "Null", 
-        "description": "Null", 
-        "schema": {
-          "type": "null"
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/etclabscore/go-openrpc-reflect/blob/master/document.go#L155"
-      }
-    }, 
-    {
-      "name": "rpc_registerReceiver", 
-      "description": "```go\nfunc (d *Document) RegisterReceiver(receiver interface{}) {\n\td.RegisterReceiverName(\"\", receiver)\n}\n```", 
-      "summary": "", 
-      "paramStructure": "by-position", 
-      "params": [
-        {
-          "name": "receiver", 
-          "description": "interface{}", 
-          "summary": "", 
-          "schema": {
-            "additionalProperties": {}
-          }, 
-          "required": true, 
-          "deprecated": false
-        }
-      ], 
-      "result": {
-        "name": "Null", 
-        "description": "Null", 
-        "schema": {
-          "type": "null"
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/etclabscore/go-openrpc-reflect/blob/master/document.go#L140"
-      }
-    }, 
-    {
-      "name": "rpc_registerReceiverName", 
-      "description": "```go\nfunc (d *Document) RegisterReceiverName(name string, receiver interface{}) {\n\tif d.receivers == nil {\n\t\td.receivers = []interface{}{}\n\t}\n\tif d.receiverNames == nil {\n\t\td.receiverNames = []string{}\n\t}\n\td.receiverNames = append(d.receiverNames, name)\n\td.receivers = append(d.receivers, receiver)\n}\n```", 
-      "summary": "", 
-      "paramStructure": "by-position", 
-      "params": [
-        {
-          "name": "name", 
-          "description": "string", 
-          "summary": "", 
-          "schema": {
-            "type": "string"
-          }, 
-          "required": true, 
-          "deprecated": false
-        }, 
-        {
-          "name": "receiver", 
-          "description": "interface{}", 
-          "summary": "", 
-          "schema": {
-            "additionalProperties": {}
-          }, 
-          "required": true, 
-          "deprecated": false
-        }
-      ], 
-      "result": {
-        "name": "Null", 
-        "description": "Null", 
-        "schema": {
-          "type": "null"
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/etclabscore/go-openrpc-reflect/blob/master/document.go#L144"
-      }
-    }, 
-    {
-      "name": "rpc_withMeta", 
-      "description": "```go\nfunc (d *Document) WithMeta(meta MetaRegisterer) *Document {\n\td.meta = meta\n\treturn d\n}\n```", 
-      "summary": "", 
-      "paramStructure": "by-position", 
-      "params": [
-        {
-          "name": "meta", 
-          "description": "MetaRegisterer", 
-          "summary": "", 
-          "schema": {
-            "additionalProperties": {}
-          }, 
-          "required": true, 
-          "deprecated": false
-        }
-      ], 
-      "result": {
-        "name": "*Document", 
-        "description": "*Document", 
-        "summary": "", 
-        "schema": {
-          "additionalProperties": {}, 
-          "type": "object"
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/etclabscore/go-openrpc-reflect/blob/master/document.go#L162"
-      }
-    }, 
-    {
-      "name": "rpc_withReflector", 
-      "description": "```go\nfunc (d *Document) WithReflector(reflector ReceiverRegisterer) *Document {\n\td.reflector = reflector\n\treturn d\n}\n```", 
-      "summary": "", 
-      "paramStructure": "by-position", 
-      "params": [
-        {
-          "name": "reflector", 
-          "description": "ReceiverRegisterer", 
-          "summary": "", 
-          "schema": {
-            "additionalProperties": {}
-          }, 
-          "required": true, 
-          "deprecated": false
-        }
-      ], 
-      "result": {
-        "name": "*Document", 
-        "description": "*Document", 
-        "summary": "", 
-        "schema": {
-          "additionalProperties": {}, 
-          "type": "object"
-        }, 
-        "required": true, 
-        "deprecated": false
-      }, 
-      "deprecated": false, 
-      "externalDocs": {
-        "description": "Github remote link", 
-        "url": "https://github.com/etclabscore/go-openrpc-reflect/blob/master/document.go#L167"
-      }
-    }, 
-    {
       "name": "txpool_content", 
       "description": "```go\nfunc (s *PublicTxPoolAPI) Content() map // Content returns the transactions contained within the transaction pool.\n[string]map[string]map[string]*RPCTransaction {\n\tcontent := map[string]map[string]map[string]*RPCTransaction{\"pending\": make(map[string]map[string]*RPCTransaction), \"queued\": make(map[string]map[string]*RPCTransaction)}\n\tpending, queue := s.b.TxPoolContent()\n\tfor account, txs := range pending {\n\t\tdump := make(map[string]*RPCTransaction)\n\t\tfor _, tx := range txs {\n\t\t\tdump[fmt.Sprintf(\"%d\", tx.Nonce())] = newRPCPendingTransaction(tx)\n\t\t}\n\t\tcontent[\"pending\"][account.Hex()] = dump\n\t}\n\tfor account, txs := range queue {\n\t\tdump := make(map[string]*RPCTransaction)\n\t\tfor _, tx := range txs {\n\t\t\tdump[fmt.Sprintf(\"%d\", tx.Nonce())] = newRPCPendingTransaction(tx)\n\t\t}\n\t\tcontent[\"queued\"][account.Hex()] = dump\n\t}\n\treturn content\n}\n```", 
       "summary": "Content returns the transactions contained within the transaction pool.\n", 
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "map[string]map[string]map[string]*RPCTransaction", 
+        "name": "mapstringmapstringmapstringRPCTransaction", 
         "description": "map[string]map[string]map[string]*RPCTransaction", 
         "summary": "", 
         "schema": {
@@ -8858,7 +7674,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "map[string]map[string]map[string]string", 
+        "name": "mapstringmapstringmapstringstring", 
         "description": "map[string]map[string]map[string]string", 
         "summary": "", 
         "schema": {
@@ -8895,7 +7711,7 @@
       "paramStructure": "by-position", 
       "params": [], 
       "result": {
-        "name": "map[string]hexutil.Uint", 
+        "name": "mapstringhexutilUint", 
         "description": "map[string]hexutil.Uint", 
         "summary": "", 
         "schema": {
@@ -8961,7 +7777,7 @@
         }
       ], 
       "result": {
-        "name": "hexutil.Bytes", 
+        "name": "hexutilBytes", 
         "description": "hexutil.Bytes", 
         "summary": "", 
         "schema": {

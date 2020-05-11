@@ -1,8 +1,12 @@
 package node
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"go/ast"
+	"go/printer"
+	"go/token"
 	"math/big"
 	"reflect"
 
@@ -98,12 +102,16 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 		ty = ty.Elem()
 	}
 
+	if ty == reflect.TypeOf((*interface{})(nil)).Elem() {
+		return &jsonschema.Type{Type: "object", AdditionalProperties: []byte("true")}
+	}
+
 	// Second, handle other types.
 	// Use a slice instead of a map because it preserves order, as a logic safeguard/fallback.
 	dict := []schemaDictEntry{
-		{emptyInterface, fmt.Sprintf(`{
-			"oneOf": [{"additionalProperties": true}, {"type": "null"}]
-		}`)},
+		//{interface{}{}, fmt.Sprintf(`{
+		//	"oneOf": [{"additionalProperties": true}, {"type": "null"}]
+		//}`)},
 		{[]byte{}, bytesD},
 		{big.Int{}, integerD},
 		{types.BlockNonce{}, integerD},
@@ -167,4 +175,52 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 	}
 
 	return nil
+}
+
+func expandedFieldNamesFromList(in []*ast.Field) (out []*ast.Field) {
+	expandedFields := []*ast.Field{}
+	for _, f := range in {
+		expandedFields = append(expandedFields, fieldsWithNames(f)...)
+	}
+	return expandedFields
+}
+
+// fieldsWithNames expands a field (either parameter or result, in this case) to
+// fields which all have at least one name, or at least one field with one name.
+// This handles unnamed fields, and fields declared using multiple names with one type.
+// Unnamed fields are assigned a name that is the 'printed' identity of the field Type,
+// eg. int -> int, bool -> bool
+func fieldsWithNames(f *ast.Field) (fields []*ast.Field) {
+	if f == nil {
+		return nil
+	}
+
+	if len(f.Names) == 0 {
+		fields = append(fields, &ast.Field{
+			Doc:     f.Doc,
+			Names:   []*ast.Ident{{Name: printIdentField(f)}},
+			Type:    f.Type,
+			Tag:     f.Tag,
+			Comment: f.Comment,
+		})
+		return
+	}
+	for _, ident := range f.Names {
+		fields = append(fields, &ast.Field{
+			Doc:     f.Doc,
+			Names:   []*ast.Ident{ident},
+			Type:    f.Type,
+			Tag:     f.Tag,
+			Comment: f.Comment,
+		})
+	}
+	return
+}
+
+func printIdentField(f *ast.Field) string {
+	b := []byte{}
+	buf := bytes.NewBuffer(b)
+	fs := token.NewFileSet()
+	printer.Fprint(buf, fs, f.Type.(ast.Node))
+	return buf.String()
 }

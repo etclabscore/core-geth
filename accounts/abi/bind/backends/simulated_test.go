@@ -471,7 +471,7 @@ func TestSimulatedBackend_EstimateGasWithPrice(t *testing.T) {
 	key, _ := crypto.GenerateKey()
 	addr := crypto.PubkeyToAddress(key.PublicKey)
 
-	sim := NewSimulatedBackend(core.GenesisAlloc{addr: {Balance: big.NewInt(params.Ether*2 + 2e17)}}, 10000000)
+	sim := NewSimulatedBackend(genesisT.GenesisAlloc{addr: {Balance: big.NewInt(vars.Ether*2 + 2e17)}}, 10000000)
 	defer sim.Close()
 
 	receipant := common.HexToAddress("deadbeef")

@@ -62,20 +62,37 @@ const hexutilUint64D = `{
 const blockNumberTagD = `{
 	     "title": "blockNumberTag",
 	     "type": "string",
-	     "description": "The optional block height description",
+	     "description": "The block height description",
 	     "enum": [
 	       "earliest",
 	       "latest",
 	       "pending"
 	     ]
-	   }`
+		}`
+
+var blockNumberD = fmt.Sprintf(`{
+		"title": "blockNumberIdentifier",
+		"oneOf": [%s, %s]
+		}`, blockNumberTagD, hexutilUint64D)
+
+const requireCanonicalD = `{
+		  "type": "object",
+		  "properties": {
+			"requireCanonical": {
+			  "type": "boolean"
+			}
+		  },
+		  "additionalProperties": false
+		}`
 
 var blockNumberOrHashD = fmt.Sprintf(`{
           "oneOf": [
             %s,
-            %s
+            {
+				"allOf": [%s, %s]
+			}
           ]
-        }`, blockNumberTagD, commonHashD)
+        }`, blockNumberD, commonHashD, requireCanonicalD)
 
 var emptyInterface interface{}
 
@@ -121,27 +138,9 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 		{hexutil.Bytes{}, hexutilBytesD},
 		{hexutil.Uint(0), hexutilUintD},
 		{hexutil.Uint64(0), hexutilUint64D},
-		{rpc.BlockNumber(0), blockNumberOrHashD},
-		{rpc.BlockNumberOrHash{}, fmt.Sprintf(`{
-		  "title": "blockNumberOrHash",
-		  "oneOf": [
-			%s,
-			{
-			  "allOf": [
-				%s,
-				{
-				  "type": "object",
-				  "properties": {
-					"requireCanonical": {
-					  "type": "boolean"
-					}
-				  },
-				  "additionalProperties": false
-				}
-			  ]
-			}
-		  ]
-		}`, blockNumberOrHashD, blockNumberOrHashD)},
+		{rpc.BlockNumber(0), blockNumberD},
+		{rpc.BlockNumberOrHash{}, blockNumberOrHashD},
+
 		{rpc.Subscription{}, fmt.Sprintf(`{
 			"type": "object",
 			"title": "Subscription",

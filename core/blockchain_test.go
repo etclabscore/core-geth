@@ -2184,7 +2184,7 @@ func TestTransactionIndices(t *testing.T) {
 	ancientDb, err = rawdb.NewDatabaseWithFreezer(rawdb.NewMemoryDatabase(), frdir, "")
 	if err != nil {
 		t.Fatalf("failed to create temp freezer db: %v", err)
-	MustCommitGenesis(ancientDb, gspec)
+		MustCommitGenesis(ancientDb, gspec)
 	}
 
 	limit = []uint64{0, 64 /* drop stale */, 32 /* shorten history */, 64 /* extend history */, 0 /* restore all */}

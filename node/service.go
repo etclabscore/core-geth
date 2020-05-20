@@ -17,6 +17,7 @@
 package node
 
 import (
+	"fmt"
 	"path/filepath"
 	"reflect"
 
@@ -46,6 +47,31 @@ func (ctx *ServiceContext) OpenDatabase(name string, cache int, handles int, nam
 		return rawdb.NewMemoryDatabase(), nil
 	}
 	return rawdb.NewLevelDBDatabase(ctx.Config.ResolvePath(name), cache, handles, namespace)
+}
+
+// OpenDatabaseWithFreezer opens an existing database with the given name (or
+// creates one if no previous can be found) from within the node's data directory,
+// also attaching a chain freezer to it that moves ancient chain data from the
+// database to immutable append-only files. If the node is an ephemeral one, a
+// memory database is returned.
+func (ctx *ServiceContext) OpenDatabaseWithFreezerRemote(name string, cache int, handles int, freezer string, namespace string) (ethdb.Database, error) {
+
+	fmt.Println("openning the FREEZA via rawdb p1")
+	if ctx.Config.DataDir == "" {
+		return rawdb.NewMemoryDatabase(), nil
+	}
+
+	root := ctx.Config.ResolvePath(name)
+	fmt.Println("openning the FREEZA via rawdb p1.5")
+
+	switch {
+	case freezer == "":
+		freezer = filepath.Join(root, "ancient")
+	case !filepath.IsAbs(freezer):
+		freezer = ctx.Config.ResolvePath(freezer)
+	}
+	fmt.Println("openning the FREEZA via rawdb p2")
+	return rawdb.NewLevelDBDatabaseWithFreezerRemote(root, cache, handles, freezer, namespace)
 }
 
 // OpenDatabaseWithFreezer opens an existing database with the given name (or

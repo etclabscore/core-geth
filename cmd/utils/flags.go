@@ -400,6 +400,10 @@ var (
 		Usage: "Maximum amount of time non-executable transaction are queued",
 		Value: eth.DefaultConfig.TxPool.Lifetime,
 	}
+	FreezerRemoteFlag = cli.BoolFlag{
+		Name:  "freezer.remote",
+		Usage: "Use a remote freezer",
+	}
 	// Performance tuning settings
 	CacheFlag = cli.IntFlag{
 		Name:  "cache",
@@ -1611,6 +1615,9 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	cfg.DatabaseHandles = makeDatabaseHandles()
 	if ctx.GlobalIsSet(AncientFlag.Name) {
 		cfg.DatabaseFreezer = ctx.GlobalString(AncientFlag.Name)
+		if ctx.GlobalBool(FreezerRemoteFlag.Name) {
+			cfg.DatabaseFreezerRemote = ctx.GlobalString(AncientFlag.Name)
+		}
 	}
 
 	if gcmode := ctx.GlobalString(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {
@@ -1881,14 +1888,21 @@ func SplitTagsFlag(tagsFlag string) map[string]string {
 // MakeChainDatabase open an LevelDB using the flags passed to the client and will hard crash if it fails.
 func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 	var (
-		cache   = ctx.GlobalInt(CacheFlag.Name) * ctx.GlobalInt(CacheDatabaseFlag.Name) / 100
-		handles = makeDatabaseHandles()
+		cache                  = ctx.GlobalInt(CacheFlag.Name) * ctx.GlobalInt(CacheDatabaseFlag.Name) / 100
+		handles                = makeDatabaseHandles()
+		err     error          = nil
+		chainDb ethdb.Database = nil
 	)
+
 	name := "chaindata"
 	if ctx.GlobalString(SyncModeFlag.Name) == "light" {
 		name = "lightchaindata"
 	}
-	chainDb, err := stack.OpenDatabaseWithFreezer(name, cache, handles, ctx.GlobalString(AncientFlag.Name), "")
+	if ctx.GlobalBool(FreezerRemoteFlag.Name) {
+		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientFlag.Name), "")
+	} else {
+		chainDb, err = stack.OpenDatabaseWithFreezer(name, cache, handles, ctx.GlobalString(AncientFlag.Name), "")
+	}
 	if err != nil {
 		Fatalf("Could not open database: %v", err)
 	}

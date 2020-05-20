@@ -146,10 +146,10 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 
 	// Assemble the Ethereum object
 	if config.DatabaseFreezerRemote != "" {
-		fmt.Println("OPENINGING THE FREEZA")
+		//fmt.Println("OPENINGING THE FREEZA") // @zcstarr/DEBUG
 		chainDb, err = ctx.OpenDatabaseWithFreezerRemote("chaindata", config.DatabaseCache, config.DatabaseHandles, config.DatabaseFreezer, "eth/db/chaindata/")
 	} else {
-		fmt.Println("OPENINGING THE FREEZER DATABASE")
+		//fmt.Println("OPENINGING THE FREEZER DATABASE") // @zcstarr/DEBUG
 		chainDb, err = ctx.OpenDatabaseWithFreezer("chaindata", config.DatabaseCache, config.DatabaseHandles, config.DatabaseFreezer, "eth/db/chaindata/")
 	}
 	if err != nil {

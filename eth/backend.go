@@ -120,8 +120,8 @@ func (s *Ethereum) SetContractBackend(backend bind.ContractBackend) {
 func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 	// Ensure configuration values are compatible and sane
 	var (
-		chainDb ethdb.Database = nil
-		err     error          = nil
+		chainDb ethdb.Database
+		err     error
 	)
 	if config.SyncMode == downloader.LightSync {
 		return nil, errors.New("can't run eth.Ethereum in light sync mode, use les.LightEthereum")

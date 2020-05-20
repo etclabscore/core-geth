@@ -1888,10 +1888,10 @@ func SplitTagsFlag(tagsFlag string) map[string]string {
 // MakeChainDatabase open an LevelDB using the flags passed to the client and will hard crash if it fails.
 func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 	var (
-		cache                  = ctx.GlobalInt(CacheFlag.Name) * ctx.GlobalInt(CacheDatabaseFlag.Name) / 100
-		handles                = makeDatabaseHandles()
-		err     error          = nil
-		chainDb ethdb.Database = nil
+		cache   = ctx.GlobalInt(CacheFlag.Name) * ctx.GlobalInt(CacheDatabaseFlag.Name) / 100
+		handles = makeDatabaseHandles()
+		err     error
+		chainDb ethdb.Database
 	)
 
 	name := "chaindata"

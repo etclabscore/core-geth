@@ -165,7 +165,7 @@ func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerStr string, nam
 
 	// Freezer is consistent with the key-value database, permit combining the two
 	*/
-	go frdb.freeze(db)
+	go freeze(db, frdb, frdb.quit)
 
 	return &freezerdb{
 		KeyValueStore: db,
@@ -234,7 +234,7 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 	}
 
 	// Freezer is consistent with the key-value database, permit combining the two
-	go frdb.freeze(db)
+	go freeze(db, frdb, frdb.quit)
 
 	return &freezerdb{
 		KeyValueStore: db,

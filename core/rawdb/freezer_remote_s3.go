@@ -68,8 +68,11 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 
 	f := &freezerRemoteS3{
 		namespace: namespace,
-		log:       log.New("remote", "s3"),
 		quit:      make(chan struct{}),
+		readMeter: readMeter,
+		writeMeter: writeMeter,
+		sizeGauge: sizeGauge,
+		log:       log.New("remote", "s3"),
 	}
 
 	f.log.Info("New session", "region", awsDefaultRegion)

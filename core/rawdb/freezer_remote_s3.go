@@ -54,7 +54,7 @@ type freezerRemoteS3 struct {
 }
 
 func awsKeyRLP(number uint64) string {
-	return fmt.Sprintf("%d.rlp", number)
+	return fmt.Sprintf("%09d.rlp", number)
 }
 
 func (f *freezerRemoteS3) bucketName(kind string) string {

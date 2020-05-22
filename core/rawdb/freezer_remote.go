@@ -170,7 +170,7 @@ func (f *freezerRemote) TruncateAncients(items uint64) error {
 
 // sync flushes all data tables to disk.
 func (f *freezerRemote) Sync() error {
-	return f.Sync()
+	return f.service.Sync()
 }
 
 // repair truncates all data tables to the same length.

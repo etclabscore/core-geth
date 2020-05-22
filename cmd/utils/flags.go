@@ -150,6 +150,16 @@ var (
 		Name:  "datadir.ancient",
 		Usage: "Data directory for ancient chain segments (default = inside chaindata)",
 	}
+	AncientRemoteFlag = cli.StringFlag{
+		Name:  "datadir.ancient.remote",
+		Usage: "Use a remote freezer (options = [s3]). Incomptabile with --datadir.ancient",
+		Value: "",
+	}
+	AncientRemoteNamespaceFlag = cli.StringFlag{
+		Name:  "datadir.ancient.remote.namespace",
+		Usage: "Namespace for remote storage, eg parent bucket name (default: <chainId>-<genesisHash> if using a default --chain, otherwise '' for custom chains)",
+		Value: "",
+	}
 	KeyStoreDirFlag = DirectoryFlag{
 		Name:  "keystore",
 		Usage: "Directory for the keystore (default = inside the datadir)",
@@ -399,10 +409,6 @@ var (
 		Name:  "txpool.lifetime",
 		Usage: "Maximum amount of time non-executable transaction are queued",
 		Value: eth.DefaultConfig.TxPool.Lifetime,
-	}
-	FreezerRemoteFlag = cli.BoolFlag{
-		Name:  "freezer.remote",
-		Usage: "Use a remote freezer",
 	}
 	// Performance tuning settings
 	CacheFlag = cli.IntFlag{
@@ -1594,6 +1600,9 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Ancient tx indices pruning is not available for les server now
 	// since light client relies on the server for transaction status query.
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, TxLookupLimitFlag)
+
+	CheckExclusive(ctx, AncientFlag, AncientRemoteFlag)
+
 	var ks *keystore.KeyStore
 	if keystores := stack.AccountManager().Backends(keystore.KeyStoreType); len(keystores) > 0 {
 		ks = keystores[0].(*keystore.KeyStore)
@@ -1615,8 +1624,14 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	cfg.DatabaseHandles = makeDatabaseHandles()
 	if ctx.GlobalIsSet(AncientFlag.Name) {
 		cfg.DatabaseFreezer = ctx.GlobalString(AncientFlag.Name)
-		if ctx.GlobalBool(FreezerRemoteFlag.Name) {
-			cfg.DatabaseFreezerRemote = ctx.GlobalString(AncientFlag.Name)
+	}
+	if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
+		cfg.DatabaseFreezerRemote = ctx.GlobalString(AncientRemoteFlag.Name)
+		cfg.DatabaseFreezerRemoteNamespace = "geth-remote"
+		if gen := genesisForCtxChainConfig(ctx); gen != nil {
+			chainId := gen.GetChainID()
+			hash := core.GenesisToBlock(gen, nil).Hash()
+			cfg.DatabaseFreezerRemoteNamespace = fmt.Sprintf("%d-%s", chainId, hash.Hex()[:8])
 		}
 	}
 
@@ -1898,8 +1913,19 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 	if ctx.GlobalString(SyncModeFlag.Name) == "light" {
 		name = "lightchaindata"
 	}
-	if ctx.GlobalBool(FreezerRemoteFlag.Name) {
-		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientFlag.Name), "")
+	if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
+
+		namespace := ctx.GlobalString(AncientRemoteNamespaceFlag.Name)
+		if namespace == "" {
+			gen := genesisForCtxChainConfig(ctx)
+			if gen != nil {
+				chainId := gen.GetChainID()
+				hash := core.GenesisToBlock(gen, nil).Hash()
+				namespace = fmt.Sprintf("%v-%s", chainId, hash.Hex())
+			}
+		}
+
+		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientRemoteFlag.Name), namespace)
 	} else {
 		chainDb, err = stack.OpenDatabaseWithFreezer(name, cache, handles, ctx.GlobalString(AncientFlag.Name), "")
 	}

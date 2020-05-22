@@ -1,0 +1,1452 @@
+INFO [05-22|09:27:27.600] Starting Geth on Ethereum mainnet... 
+INFO [05-22|09:27:27.600] Bumping default cache on mainnet         provided=1024 updated=4096
+DEBUG[05-22|09:27:27.600] Sanitizing Go's GC trigger               percent=25
+INFO [05-22|09:27:27.602] Maximum peer count                       ETH=50 LES=0 total=50
+INFO [05-22|09:27:27.602] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+DEBUG[05-22|09:27:27.602] FS scan times                            list="46.1µs" set=453ns diff=821ns
+TRACE[05-22|09:27:27.602] Started watching keystore folder         path=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop/keystore
+INFO [05-22|09:27:27.778] Persisted trie from memory database      nodes=12356 size=1.78MiB time=29.813245ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+INFO [05-22|09:27:27.785] Starting peer-to-peer node               instance=CoreGeth/v1.11.5-unstable-9e76d153-20200522/linux-amd64/go1.13.5
+INFO [05-22|09:27:27.785] Allocated trie memory caches             clean=614.00MiB dirty=1024.00MiB
+INFO [05-22|09:27:27.785] Allocated cache and file handles         database=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop/geth/chaindata cache=2.00GiB handles=524288
+INFO [05-22|09:27:27.996] New remote freezer                       freezer=s3 namespace=61-0xd4e567
+INFO [05-22|09:27:27.996] New session                              remote=s3 region=us-west-1
+INFO [05-22|09:27:27.996] Creating bucket if not exists            remote=s3 bucket=meta
+DEBUG[05-22|09:27:28.902] Bucket exists                            remote=s3 kind=meta
+INFO [05-22|09:27:28.902] Creating bucket if not exists            remote=s3 bucket=hashes
+DEBUG[05-22|09:27:29.823] Bucket exists                            remote=s3 kind=hashes
+INFO [05-22|09:27:29.823] Creating bucket if not exists            remote=s3 bucket=headers
+DEBUG[05-22|09:27:31.199] Bucket exists                            remote=s3 kind=headers
+INFO [05-22|09:27:31.199] Creating bucket if not exists            remote=s3 bucket=bodies
+DEBUG[05-22|09:27:32.034] Bucket exists                            remote=s3 kind=bodies
+INFO [05-22|09:27:32.034] Creating bucket if not exists            remote=s3 bucket=receipts
+DEBUG[05-22|09:27:32.863] Bucket exists                            remote=s3 kind=receipts
+INFO [05-22|09:27:32.863] Creating bucket if not exists            remote=s3 bucket=diffs
+DEBUG[05-22|09:27:33.695] Bucket exists                            remote=s3 kind=diffs
+DEBUG[05-22|09:27:33.804] Current full block not old enough        number=0 hash="d4e567…cb8fa3" delay=90000
+INFO [05-22|09:27:34.214] Persisted trie from memory database      nodes=12356 size=1.78MiB time=20.198585ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+INFO [05-22|09:27:34.214] Found stored genesis block               config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
+INFO [05-22|09:27:34.215] Initialised chain configuration          config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
+INFO [05-22|09:27:34.215] Disk storage enabled for ethash caches   dir=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop/geth/ethash count=3
+INFO [05-22|09:27:34.215] Disk storage enabled for ethash DAGs     dir=/home/ia/.ethash count=2
+INFO [05-22|09:27:34.215] Initialising Ethereum protocol           versions="[65 64 63]" network=1 dbversion=7
+INFO [05-22|09:27:34.995] Loaded most recent local header          number=0 hash="d4e567…cb8fa3" td=17179869184 age=51y1mo2w
+INFO [05-22|09:27:34.995] Loaded most recent local full block      number=0 hash="d4e567…cb8fa3" td=17179869184 age=51y1mo2w
+INFO [05-22|09:27:34.995] Loaded most recent local fast block      number=0 hash="d4e567…cb8fa3" td=17179869184 age=51y1mo2w
+DEBUG[05-22|09:27:34.995] Reinjecting stale transactions           count=0
+INFO [05-22|09:27:34.996] Loaded local transaction journal         transactions=0 dropped=0
+INFO [05-22|09:27:34.997] Regenerated local transaction journal    transactions=0 accounts=0
+INFO [05-22|09:27:35.214] Allocated fast sync bloom                size=1.60GiB
+DEBUG[05-22|09:27:35.215] Recalculated downloader QoS values       rtt=20s confidence=1.000 ttl=1m0s
+INFO [05-22|09:27:35.224] Initialized fast sync bloom              items=12356 errorrate=0.000 elapsed=9.840ms
+DEBUG[05-22|09:27:35.300] UDP listener up                          addr=[::]:30303
+DEBUG[05-22|09:27:35.300] TCP listener up                          addr=[::]:30303
+TRACE[05-22|09:27:35.313] Found seed node in database              id=1969d3adf6797e93 addr=159.203.56.33:30303 age=42m16.313798825s
+INFO [05-22|09:27:35.314] New local node record                    seq=12 id=4c3daeb748b6fd57 ip=24.207.216.46 udp=30303 tcp=30303
+TRACE[05-22|09:27:35.314] Found seed node in database              id=6b90fe1510fa42c6 addr=18.205.66.229:30303 age=441710h27m35.314448092s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=3064061e8cb4d357 addr=162.243.55.45:30303 age=441710h27m35.314465236s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=a43b89f22ae65701 addr=104.237.131.102:30303 age=441710h27m35.314477426s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=3becf3f13b090bcc addr=18.130.93.66:30303    age=441710h27m35.314490598s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=9359cec51ae10cdb addr=178.62.238.75:30303   age=441710h27m35.314503384s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=b6965dca741f86f0 addr=188.166.163.187:30303 age=45m34.314515721s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=d916ecf8224301e4 addr=46.101.78.44:30303    age=41m54.314527977s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=f5fb164a5c76dbb5 addr=68.183.99.5:30303     age=41m54.314539403s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=d4731bcf672459cc addr=206.189.68.191:30303  age=41m54.314552494s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=22ec854117125934 addr=159.89.169.103:30303  age=40m36.314566451s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=04a037eabb45f18c addr=178.128.55.119:30303  age=45m37.314578956s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=1887e1b2b420425c addr=35.187.57.94:30303    age=441710h27m35.314592837s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=0970decfe54cafed addr=54.148.165.1:30303    age=441710h27m35.314607369s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=27f254a8da5a1168 addr=54.148.165.1:30304    age=441710h27m35.314623244s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=5efdf1b54d7b1f22 addr=51.141.115.3:30303    age=441710h27m35.314637079s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=2ebda3f64fa1612a addr=123.57.29.99:30303    age=441710h27m35.314650419s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=a597d00dd290d704 addr=47.108.52.30:30303    age=441710h27m35.314663481s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=bd1203ac725a8910 addr=47.240.106.205:30303  age=42m15.314676028s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=51b59fdee3fc3ac3 addr=101.133.229.66:30303  age=441710h27m35.314688608s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=059fce3b4d826ceb addr=47.115.150.90:30303   age=441710h27m35.314701855s
+TRACE[05-22|09:27:35.314] Found seed node in database              id=9e7ec22592c457be addr=47.91.30.48:30303     age=25m50.314715517s
+TRACE[05-22|09:27:35.314] Starting p2p dial                        id=6b90fe1510fa42c6 ip=18.205.66.229 flag=dyndial
+INFO [05-22|09:27:35.314] Started P2P networking                   self=enode://7acf881a98ef041320390d0cf70a793c5de6c739ada7714250a15ca2fede21bb1391f5acab1aa046328569d65f04d3e36b4314780243bdcec9008833f70f1d02@24.207.216.46:30303
+DEBUG[05-22|09:27:35.314] InProc registered                        namespace=admin
+DEBUG[05-22|09:27:35.314] InProc registered                        namespace=admin
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=debug
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=web3
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=eth
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=eth
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=eth
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=txpool
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=debug
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=debug
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=eth
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=personal
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=eth
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=ethash
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=eth
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=eth
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=eth
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=miner
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=eth
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=admin
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=debug
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=debug
+DEBUG[05-22|09:27:35.315] InProc registered                        namespace=net
+DEBUG[05-22|09:27:35.315] IPC registered                           namespace=admin
+DEBUG[05-22|09:27:35.315] IPC registered                           namespace=admin
+DEBUG[05-22|09:27:35.315] IPC registered                           namespace=debug
+DEBUG[05-22|09:27:35.315] IPC registered                           namespace=web3
+DEBUG[05-22|09:27:35.315] IPC registered                           namespace=eth
+DEBUG[05-22|09:27:35.315] IPC registered                           namespace=eth
+DEBUG[05-22|09:27:35.315] IPC registered                           namespace=eth
+DEBUG[05-22|09:27:35.315] IPC registered                           namespace=txpool
+DEBUG[05-22|09:27:35.315] IPC registered                           namespace=debug
+DEBUG[05-22|09:27:35.315] IPC registered                           namespace=debug
+DEBUG[05-22|09:27:35.315] IPC registered                           namespace=eth
+DEBUG[05-22|09:27:35.316] IPC registered                           namespace=personal
+DEBUG[05-22|09:27:35.316] IPC registered                           namespace=eth
+DEBUG[05-22|09:27:35.316] IPC registered                           namespace=ethash
+DEBUG[05-22|09:27:35.316] IPC registered                           namespace=eth
+DEBUG[05-22|09:27:35.316] IPC registered                           namespace=eth
+DEBUG[05-22|09:27:35.316] IPC registered                           namespace=eth
+DEBUG[05-22|09:27:35.316] IPC registered                           namespace=miner
+DEBUG[05-22|09:27:35.316] IPC registered                           namespace=eth
+DEBUG[05-22|09:27:35.316] IPC registered                           namespace=admin
+DEBUG[05-22|09:27:35.316] IPC registered                           namespace=debug
+DEBUG[05-22|09:27:35.316] IPC registered                           namespace=debug
+DEBUG[05-22|09:27:35.316] IPC registered                           namespace=net
+DEBUG[05-22|09:27:35.316] RPC server shutting down 
+DEBUG[05-22|09:27:35.316] Reset ancient limit to zero 
+INFO [05-22|09:27:35.316] Ethereum protocol stopped 
+INFO [05-22|09:27:35.316] Transaction pool stopped 
+INFO [05-22|09:27:35.316] Blockchain stopped 
+TRACE[05-22|09:27:35.316] Ethash remote sealer is exiting 
+INFO [05-22|09:27:35.319] Mapped network port                      proto=tcp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
+TRACE[05-22|09:27:35.328] Found seed node in database              id=1969d3adf6797e93 addr=159.203.56.33:30303   age=42m16.328373886s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=6b90fe1510fa42c6 addr=18.205.66.229:30303   age=441710h27m35.328406019s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=3064061e8cb4d357 addr=162.243.55.45:30303   age=441710h27m35.328422186s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=a43b89f22ae65701 addr=104.237.131.102:30303 age=441710h27m35.328433306s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=3becf3f13b090bcc addr=18.130.93.66:30303    age=441710h27m35.328444912s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=9359cec51ae10cdb addr=178.62.238.75:30303   age=441710h27m35.328459442s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=b6965dca741f86f0 addr=188.166.163.187:30303 age=45m34.328469965s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=d916ecf8224301e4 addr=46.101.78.44:30303    age=41m54.328479481s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=f5fb164a5c76dbb5 addr=68.183.99.5:30303     age=41m54.328492133s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=d4731bcf672459cc addr=206.189.68.191:30303  age=41m54.328502485s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=22ec854117125934 addr=159.89.169.103:30303  age=40m36.328513577s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=04a037eabb45f18c addr=178.128.55.119:30303  age=45m37.328524252s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=1887e1b2b420425c addr=35.187.57.94:30303    age=441710h27m35.328535s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=0970decfe54cafed addr=54.148.165.1:30303    age=441710h27m35.328547834s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=27f254a8da5a1168 addr=54.148.165.1:30304    age=441710h27m35.328560566s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=5efdf1b54d7b1f22 addr=51.141.115.3:30303    age=441710h27m35.328571898s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=2ebda3f64fa1612a addr=123.57.29.99:30303    age=441710h27m35.328583731s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=a597d00dd290d704 addr=47.108.52.30:30303    age=441710h27m35.328593745s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=bd1203ac725a8910 addr=47.240.106.205:30303  age=42m15.328604582s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=51b59fdee3fc3ac3 addr=101.133.229.66:30303  age=441710h27m35.328615748s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=059fce3b4d826ceb addr=47.115.150.90:30303   age=441710h27m35.328626515s
+TRACE[05-22|09:27:35.328] Found seed node in database              id=9e7ec22592c457be addr=47.91.30.48:30303     age=25m50.328636608s
+TRACE[05-22|09:27:35.328] >> PING/v4                               id=6b90fe1510fa42c6 addr=18.205.66.229:30303   err=nil
+TRACE[05-22|09:27:35.328] >> PING/v4                               id=5efdf1b54d7b1f22 addr=51.141.115.3:30303    err=nil
+TRACE[05-22|09:27:35.328] >> PING/v4                               id=51b59fdee3fc3ac3 addr=101.133.229.66:30303  err=nil
+INFO [05-22|09:27:35.334] Mapped network port                      proto=udp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
+TRACE[05-22|09:27:35.405] >> PING/v4                               id=6b90fe1510fa42c6 addr=18.205.66.229:30303   err=nil
+TRACE[05-22|09:27:35.442] Updating DNS discovery root              tree=all.classic.blockd.info err=nil
+TRACE[05-22|09:27:35.517] DNS discovery lookup                     name=FDXN3SN67NA5DKA4J2GOK7BVQI.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:35.590] DNS discovery lookup                     name=AXPPUU3RDJ3CRZTTOZNJN2DUYI.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:35.816] DNS discovery lookup                     name=6BFA5577BKEDLKUXDJOC77B2A4.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:35.890] DNS discovery lookup                     name=QSQMYT477GRVHP27IFHJZ52OQA.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:35.892] Starting p2p dial                        id=7534189079ff8157 ip=176.99.5.24   flag=dyndial
+TRACE[05-22|09:27:35.892] Starting p2p dial                        id=51b59fdee3fc3ac3 ip=101.133.229.66 flag=dyndial
+DEBUG[05-22|09:27:35.905] Removed dead node                        b=14 id=6b90fe1510fa42c6 ip=18.205.66.229  checks=0
+TRACE[05-22|09:27:35.968] DNS discovery lookup                     name=7BUOJ2C7KH5VAUBJ45YKT2QY34.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:35.969] Starting p2p dial                        id=9288866babfc9dc9 ip=47.108.90.49   flag=dyndial
+TRACE[05-22|09:27:35.969] Starting p2p dial                        id=5efdf1b54d7b1f22 ip=51.141.115.3   flag=dyndial
+TRACE[05-22|09:27:36.241] DNS discovery lookup                     name=EVGJWDX3BQDIIMJ27PKJCUPMDE.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:36.319] DNS discovery lookup                     name=ILYPY5I5TRFWFBRXLKRBE4WSDE.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:36.320] Starting p2p dial                        id=af3088c58015431e ip=176.9.47.5     flag=dyndial
+TRACE[05-22|09:27:36.320] Starting p2p dial                        id=27f254a8da5a1168 ip=54.148.165.1   flag=dyndial
+TRACE[05-22|09:27:36.330] >> FINDNODE/v4                           id=51b59fdee3fc3ac3 addr=101.133.229.66:30303  err=nil
+TRACE[05-22|09:27:36.330] >> FINDNODE/v4                           id=6b90fe1510fa42c6 addr=18.205.66.229:30303   err=nil
+TRACE[05-22|09:27:36.330] >> FINDNODE/v4                           id=5efdf1b54d7b1f22 addr=51.141.115.3:30303    err=nil
+TRACE[05-22|09:27:36.395] DNS discovery lookup                     name=TXCWY5BYKVKRXIWNWVBB55QSNA.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:36.395] Starting p2p dial                        id=803bd01590144cee ip=144.202.99.17  flag=dyndial
+TRACE[05-22|09:27:36.395] Starting p2p dial                        id=22ec854117125934 ip=159.89.169.103 flag=dyndial
+TRACE[05-22|09:27:36.459] Failed p2p handshake                     id=7534189079ff8157 addr=176.99.5.24:32335     conn=dyndial err="too many peers"
+TRACE[05-22|09:27:36.475] DNS discovery lookup                     name=3IPL3EHL2BLHPEVLMERWRATC2A.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:36.476] Starting p2p dial                        id=a57a5b5c10808c91 ip=91.226.113.105 flag=dyndial
+TRACE[05-22|09:27:36.477] Starting p2p dial                        id=2ebda3f64fa1612a ip=123.57.29.99   flag=dyndial
+TRACE[05-22|09:27:36.551] DNS discovery lookup                     name=ALONBCAGUW5JLHFA2DRYHUZSQY.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:36.552] Starting p2p dial                        id=7dda8c1777927c91 ip=125.141.247.41 flag=dyndial
+TRACE[05-22|09:27:36.552] Starting p2p dial                        id=3064061e8cb4d357 ip=162.243.55.45  flag=dyndial
+TRACE[05-22|09:27:36.626] DNS discovery lookup                     name=BQNGSTFSRZ76GKLD6NXE6YVQL4.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:36.627] Starting p2p dial                        id=8ccf393a60de428b ip=3.21.232.176   flag=dyndial
+TRACE[05-22|09:27:36.627] Starting p2p dial                        id=3becf3f13b090bcc ip=18.130.93.66   flag=dyndial
+TRACE[05-22|09:27:36.634] Failed p2p handshake                     id=803bd01590144cee addr=144.202.99.17:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:36.701] DNS discovery lookup                     name=NTJRLB37SEBKNLGQ4AEFAUAOQM.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:36.702] Starting p2p dial                        id=816fd1e0a54d6909 ip=3.220.169.52   flag=dyndial
+TRACE[05-22|09:27:36.703] Starting p2p dial                        id=04a037eabb45f18c ip=178.128.55.119 flag=dyndial
+TRACE[05-22|09:27:36.763] Failed p2p handshake                     id=af3088c58015431e addr=176.9.47.5:30303      conn=dyndial err="too many peers"
+TRACE[05-22|09:27:36.786] DNS discovery lookup                     name=7AZZRMU4N7NPG57HZ6ZF43E344.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:36.787] Starting p2p dial                        id=9e0d12023acfa185 ip=112.213.103.98 flag=dyndial
+TRACE[05-22|09:27:36.787] Starting p2p dial                        id=059fce3b4d826ceb ip=47.115.150.90  flag=dyndial
+TRACE[05-22|09:27:36.829] Findnode failed                          id=6b90fe1510fa42c6 failcount=10 results=0 err="RPC timeout"
+TRACE[05-22|09:27:36.830] Too many findnode failures, dropping     id=6b90fe1510fa42c6 failcount=10
+TRACE[05-22|09:27:36.830] Findnode failed                          id=5efdf1b54d7b1f22 failcount=10 results=0 err="RPC timeout"
+TRACE[05-22|09:27:36.830] Too many findnode failures, dropping     id=5efdf1b54d7b1f22 failcount=10
+TRACE[05-22|09:27:36.830] Findnode failed                          id=51b59fdee3fc3ac3 failcount=11 results=0 err="RPC timeout"
+TRACE[05-22|09:27:36.830] Too many findnode failures, dropping     id=51b59fdee3fc3ac3 failcount=11
+TRACE[05-22|09:27:36.831] >> PING/v4                               id=0970decfe54cafed addr=54.148.165.1:30303    err=nil
+TRACE[05-22|09:27:36.831] >> FINDNODE/v4                           id=04a037eabb45f18c addr=178.128.55.119:30303  err=nil
+TRACE[05-22|09:27:36.831] >> PING/v4                               id=059fce3b4d826ceb addr=47.115.150.90:30303   err=nil
+TRACE[05-22|09:27:36.877] Failed p2p handshake                     id=8ccf393a60de428b addr=3.21.232.176:30303    conn=dyndial err="too many peers"
+TRACE[05-22|09:27:36.947] Failed p2p handshake                     id=a57a5b5c10808c91 addr=91.226.113.105:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:36.993] Failed p2p handshake                     id=7dda8c1777927c91 addr=125.141.247.41:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:37.004] Failed p2p handshake                     id=816fd1e0a54d6909 addr=3.220.169.52:30303    conn=dyndial err="too many peers"
+TRACE[05-22|09:27:37.039] DNS discovery lookup                     name=6LUSOFBQ4NUEQSTCJ6ERQ3QXOI.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:37.065] << PING/v4                               id=04a037eabb45f18c addr=178.128.55.119:30303  err=nil
+TRACE[05-22|09:27:37.065] >> PONG/v4                               id=04a037eabb45f18c addr=178.128.55.119:30303  err=nil
+TRACE[05-22|09:27:37.285] Failed p2p handshake                     id=9e0d12023acfa185 addr=112.213.103.98:30303  conn=dyndial err="too many peers"
+DEBUG[05-22|09:27:37.313] Adding p2p peer                          peercount=1 id=3becf3f13b090bcc conn=dyndial addr=18.130.93.66:30303    name=Parity-Ethereum/v2.5...
+TRACE[05-22|09:27:37.313] Starting protocol eth/63                 id=3becf3f13b090bcc conn=dyndial
+TRACE[05-22|09:27:37.313] Protocol eth/63 failed                   id=3becf3f13b090bcc conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:37.313] Removing p2p peer                        peercount=0 id=3becf3f13b090bcc duration="166.59µs" req=false err="client quitting"
+TRACE[05-22|09:27:37.329] << NEIGHBORS/v4                          id=04a037eabb45f18c addr=178.128.55.119:30303  err=nil
+TRACE[05-22|09:27:37.330] << NEIGHBORS/v4                          id=04a037eabb45f18c addr=178.128.55.119:30303  err=nil
+TRACE[05-22|09:27:37.330] >> FINDNODE/v4                           id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+DEBUG[05-22|09:27:37.349] Adding p2p peer                          peercount=1 id=22ec854117125934 conn=dyndial addr=159.89.169.103:30303  name=OpenEthereum/v3.0.0-...
+TRACE[05-22|09:27:37.349] Starting protocol eth/64                 id=22ec854117125934 conn=dyndial
+TRACE[05-22|09:27:37.349] Protocol eth/64 failed                   id=22ec854117125934 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:37.349] Removing p2p peer                        peercount=0 id=22ec854117125934 duration="385.088µs" req=false err="client quitting"
+DEBUG[05-22|09:27:37.451] Adding p2p peer                          peercount=1 id=04a037eabb45f18c conn=dyndial addr=178.128.55.119:30303  name=OpenEthereum/v3.0.0-...
+TRACE[05-22|09:27:37.451] Starting protocol eth/64                 id=04a037eabb45f18c conn=dyndial
+TRACE[05-22|09:27:37.451] Protocol eth/64 failed                   id=04a037eabb45f18c conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:37.451] Removing p2p peer                        peercount=0 id=04a037eabb45f18c duration="717.569µs" req=false err="client quitting"
+TRACE[05-22|09:27:37.525] DNS discovery lookup                     name=HXZQ4RX3UQYHBYDOTUUJUA7KF4.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:37.711] >> PING/v4                               id=4ca734b5564b6126 addr=95.217.196.206:1561   err=nil
+TRACE[05-22|09:27:37.712] DNS discovery lookup                     name=TPEKLIJF3G6EJSYFIP3QS35HN4.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:37.712] Starting p2p dial                        id=7f41eebda9bd10d3 ip=51.159.56.86   flag=dyndial
+TRACE[05-22|09:27:37.712] Starting p2p dial                        id=0970decfe54cafed ip=54.148.165.1   flag=dyndial
+TRACE[05-22|09:27:37.831] Findnode failed                          id=4c3bcc6a8ede288b failcount=3  results=0 err="RPC timeout"
+TRACE[05-22|09:27:37.831] >> FINDNODE/v4                           id=4c34c5756599cad6 addr=207.180.212.145:30305 err=nil
+TRACE[05-22|09:27:37.832] >> FINDNODE/v4                           id=0970decfe54cafed addr=54.148.165.1:30303    err=nil
+TRACE[05-22|09:27:37.832] >> FINDNODE/v4                           id=059fce3b4d826ceb addr=47.115.150.90:30303   err=nil
+TRACE[05-22|09:27:38.042] DNS discovery lookup                     name=AWVBFFN2ST3SQZFSS5QTQA44YM.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:38.043] Starting p2p dial                        id=dcf8d9e707edd4a1 ip=88.99.0.106    flag=dyndial
+TRACE[05-22|09:27:38.043] Starting p2p dial                        id=1887e1b2b420425c ip=35.187.57.94   flag=dyndial
+DEBUG[05-22|09:27:38.211] Removed dead node                        b=8  id=4ca734b5564b6126 ip=95.217.196.206 checks=0
+TRACE[05-22|09:27:38.267] Failed p2p handshake                     id=7f41eebda9bd10d3 addr=51.159.56.86:30375    conn=dyndial err="too many peers"
+TRACE[05-22|09:27:38.271] << NEIGHBORS/v4                          id=4c34c5756599cad6 addr=207.180.212.145:30305 err=nil
+TRACE[05-22|09:27:38.273] << NEIGHBORS/v4                          id=4c34c5756599cad6 addr=207.180.212.145:30305 err=nil
+TRACE[05-22|09:27:38.274] >> FINDNODE/v4                           id=4c21f2835361484c addr=88.198.39.164:30303   err=nil
+TRACE[05-22|09:27:38.331] Findnode failed                          id=0970decfe54cafed failcount=7  results=0 err="RPC timeout"
+TRACE[05-22|09:27:38.331] Too many findnode failures, dropping     id=0970decfe54cafed failcount=7
+TRACE[05-22|09:27:38.332] >> FINDNODE/v4                           id=4c215784e0b2b587 addr=94.130.163.244:30303  err=nil
+TRACE[05-22|09:27:38.332] Findnode failed                          id=059fce3b4d826ceb failcount=8  results=0 err="RPC timeout"
+TRACE[05-22|09:27:38.332] Too many findnode failures, dropping     id=059fce3b4d826ceb failcount=8
+TRACE[05-22|09:27:38.332] >> PING/v4                               id=4c23244115a487ac addr=52.196.144.241:30303  err=nil
+TRACE[05-22|09:27:38.375] DNS discovery lookup                     name=UIBIP3SREFVSRQ4BLJS2UGHWBM.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:38.375] Starting p2p dial                        id=f138ae5b211264f7 ip=80.66.80.203   flag=dyndial
+TRACE[05-22|09:27:38.376] Starting p2p dial                        id=1969d3adf6797e93 ip=159.203.56.33  flag=dyndial
+TRACE[05-22|09:27:38.495] Failed p2p handshake                     id=dcf8d9e707edd4a1 addr=88.99.0.106:30303     conn=dyndial err="too many peers"
+TRACE[05-22|09:27:38.500] << NEIGHBORS/v4                          id=4c21f2835361484c addr=88.198.39.164:30303   err=nil
+TRACE[05-22|09:27:38.502] Dial error                               id=1969d3adf6797e93 addr=159.203.56.33:30303   conn=dyndial err="connect: connection refused"
+TRACE[05-22|09:27:38.502] << NEIGHBORS/v4                          id=4c21f2835361484c addr=88.198.39.164:30303   err=nil
+TRACE[05-22|09:27:38.503] >> PING/v4                               id=4c38e6461e2d9986 addr=3.91.43.28:31494      err=nil
+TRACE[05-22|09:27:38.549] << PING/v4                               id=4c215784e0b2b587 addr=94.130.163.244:30303  err=nil
+TRACE[05-22|09:27:38.549] >> PONG/v4                               id=4c215784e0b2b587 addr=94.130.163.244:30303  err=nil
+TRACE[05-22|09:27:38.770] << NEIGHBORS/v4                          id=4c215784e0b2b587 addr=94.130.163.244:30303  err=nil
+TRACE[05-22|09:27:38.772] << NEIGHBORS/v4                          id=4c215784e0b2b587 addr=94.130.163.244:30303  err=nil
+TRACE[05-22|09:27:38.773] >> PING/v4                               id=4c3d1d29c7a9b0de addr=114.229.35.111:60620  err=nil
+TRACE[05-22|09:27:38.861] DNS discovery lookup                     name=LYYALOIDM6FZJKJPDLAOSSWYEU.all.classic.blockd.info err=nil
+DEBUG[05-22|09:27:38.948] Adding p2p peer                          peercount=1 id=f138ae5b211264f7 conn=dyndial addr=80.66.80.203:30321    name=MultiGeth/etc.icanmi...
+TRACE[05-22|09:27:38.948] Starting protocol eth/65                 id=f138ae5b211264f7 conn=dyndial
+TRACE[05-22|09:27:38.948] Protocol eth/65 failed                   id=f138ae5b211264f7 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:38.948] Removing p2p peer                        peercount=0 id=f138ae5b211264f7 duration="740.466µs" req=false err="client quitting"
+TRACE[05-22|09:27:39.054] DNS discovery lookup                     name=27NM44NR6XC444FSIY73H7XRJQ.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:39.054] Starting p2p dial                        id=e232ea428b64a5ab ip=52.194.13.139  flag=dyndial
+TRACE[05-22|09:27:39.054] Starting p2p dial                        id=f5fb164a5c76dbb5 ip=68.183.99.5    flag=dyndial
+TRACE[05-22|09:27:39.333] >> FINDNODE/v4                           id=4c23244115a487ac addr=52.196.144.241:30303  err=nil
+TRACE[05-22|09:27:39.380] DNS discovery lookup                     name=7SOVO2YO5WV6JNG62WZ2QPMBXQ.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:39.382] Starting p2p dial                        id=8e3ffbea6029f4f7 ip=54.38.81.80    flag=dyndial
+TRACE[05-22|09:27:39.382] Starting p2p dial                        id=d4731bcf672459cc ip=206.189.68.191 flag=dyndial
+TRACE[05-22|09:27:39.504] >> FINDNODE/v4                           id=4c38e6461e2d9986 addr=3.91.43.28:31494      err=nil
+TRACE[05-22|09:27:39.545] Failed p2p handshake                     id=e232ea428b64a5ab addr=52.194.13.139:30313   conn=dyndial err="too many peers"
+DEBUG[05-22|09:27:39.580] Adding p2p peer                          peercount=1 id=f5fb164a5c76dbb5 conn=dyndial addr=68.183.99.5:30303     name=OpenEthereum/v3.0.0-...
+TRACE[05-22|09:27:39.580] Starting protocol eth/64                 id=f5fb164a5c76dbb5 conn=dyndial
+TRACE[05-22|09:27:39.580] Protocol eth/64 failed                   id=f5fb164a5c76dbb5 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:39.581] Removing p2p peer                        peercount=0 id=f5fb164a5c76dbb5 duration=1.008ms     req=false err="client quitting"
+DEBUG[05-22|09:27:39.695] Adding p2p peer                          peercount=1 id=d4731bcf672459cc conn=dyndial addr=206.189.68.191:30303  name=OpenEthereum/v3.0.0-...
+TRACE[05-22|09:27:39.695] Starting protocol eth/64                 id=d4731bcf672459cc conn=dyndial
+TRACE[05-22|09:27:39.696] Protocol eth/64 failed                   id=d4731bcf672459cc conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:39.696] Removing p2p peer                        peercount=0 id=d4731bcf672459cc duration="830.409µs" req=false err="client quitting"
+TRACE[05-22|09:27:39.710] DNS discovery lookup                     name=4FV6SFY3VABHRL7LZ7J6KBMAWM.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:39.711] Starting p2p dial                        id=cbcdce9ed6658a30 ip=125.141.247.21 flag=dyndial
+TRACE[05-22|09:27:39.711] Starting p2p dial                        id=d916ecf8224301e4 ip=46.101.78.44   flag=dyndial
+TRACE[05-22|09:27:39.711] >> PING/v4                               id=6b90fe1510fa42c6 addr=18.205.66.229:30303   err=nil
+TRACE[05-22|09:27:39.711] >> PING/v4                               id=51b59fdee3fc3ac3 addr=101.133.229.66:30303  err=nil
+TRACE[05-22|09:27:39.712] >> PING/v4                               id=5efdf1b54d7b1f22 addr=51.141.115.3:30303    err=nil
+TRACE[05-22|09:27:39.774] >> FINDNODE/v4                           id=4c3d1d29c7a9b0de addr=114.229.35.111:60620  err=nil
+TRACE[05-22|09:27:39.833] Findnode failed                          id=4c23244115a487ac failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:39.834] >> PING/v4                               id=4c3cae9e5e262635 addr=219.159.92.35:60608   err=nil
+TRACE[05-22|09:27:39.837] Failed p2p handshake                     id=8e3ffbea6029f4f7 addr=54.38.81.80:30304     conn=dyndial err="too many peers"
+TRACE[05-22|09:27:40.004] Findnode failed                          id=4c38e6461e2d9986 failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:40.005] >> PING/v4                               id=4c3cbdaa3a9dcab9 addr=159.89.228.225:30303  err=nil
+TRACE[05-22|09:27:40.048] DNS discovery lookup                     name=LXQD5X4EQJWFGOVIWPTVIZF5UU.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:40.049] Starting p2p dial                        id=6f74c4a9838b47a5 ip=66.42.66.14    flag=dyndial
+TRACE[05-22|09:27:40.153] Failed p2p handshake                     id=cbcdce9ed6658a30 addr=125.141.247.21:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:40.274] Findnode failed                          id=4c3d1d29c7a9b0de failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:40.275] >> PING/v4                               id=4c3cca2dc28eceb5 addr=27.202.227.58:60606   err=nil
+DEBUG[05-22|09:27:40.347] Adding p2p peer                          peercount=1 id=d916ecf8224301e4 conn=dyndial addr=46.101.78.44:30303    name=OpenEthereum/v3.0.0-...
+TRACE[05-22|09:27:40.347] Starting protocol eth/64                 id=d916ecf8224301e4 conn=dyndial
+TRACE[05-22|09:27:40.347] Protocol eth/64 failed                   id=d916ecf8224301e4 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:40.348] Removing p2p peer                        peercount=0 id=d916ecf8224301e4 duration="885.81µs"  req=false err="client quitting"
+TRACE[05-22|09:27:40.383] DNS discovery lookup                     name=KNBKLBTDOCHYG4LX4F5BB27CYI.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:40.394] Failed p2p handshake                     id=6f74c4a9838b47a5 addr=66.42.66.14:30303     conn=dyndial err="too many peers"
+TRACE[05-22|09:27:40.713] >> FINDNODE/v4                           id=5efdf1b54d7b1f22 addr=51.141.115.3:30303    err=nil
+TRACE[05-22|09:27:40.713] >> FINDNODE/v4                           id=51b59fdee3fc3ac3 addr=101.133.229.66:30303  err=nil
+TRACE[05-22|09:27:40.713] >> FINDNODE/v4                           id=6b90fe1510fa42c6 addr=18.205.66.229:30303   err=nil
+TRACE[05-22|09:27:40.835] >> FINDNODE/v4                           id=4c3cae9e5e262635 addr=219.159.92.35:60608   err=nil
+TRACE[05-22|09:27:41.006] >> FINDNODE/v4                           id=4c3cbdaa3a9dcab9 addr=159.89.228.225:30303  err=nil
+TRACE[05-22|09:27:41.212] Findnode failed                          id=5efdf1b54d7b1f22 failcount=11 results=0 err="RPC timeout"
+TRACE[05-22|09:27:41.212] Too many findnode failures, dropping     id=5efdf1b54d7b1f22 failcount=11
+TRACE[05-22|09:27:41.212] Findnode failed                          id=6b90fe1510fa42c6 failcount=11 results=0 err="RPC timeout"
+TRACE[05-22|09:27:41.212] Too many findnode failures, dropping     id=6b90fe1510fa42c6 failcount=11
+TRACE[05-22|09:27:41.212] Findnode failed                          id=51b59fdee3fc3ac3 failcount=12 results=0 err="RPC timeout"
+TRACE[05-22|09:27:41.212] Too many findnode failures, dropping     id=51b59fdee3fc3ac3 failcount=12
+TRACE[05-22|09:27:41.213] >> PING/v4                               id=27f254a8da5a1168 addr=54.148.165.1:30304    err=nil
+TRACE[05-22|09:27:41.213] >> PING/v4                               id=2ebda3f64fa1612a addr=123.57.29.99:30303    err=nil
+TRACE[05-22|09:27:41.213] >> FINDNODE/v4                           id=22ec854117125934 addr=159.89.169.103:30303  err=nil
+TRACE[05-22|09:27:41.276] >> FINDNODE/v4                           id=4c3cca2dc28eceb5 addr=27.202.227.58:60606   err=nil
+TRACE[05-22|09:27:41.335] Findnode failed                          id=4c3cae9e5e262635 failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:41.335] >> PING/v4                               id=4c3c1bd557bc429a addr=58.57.154.116:60606   err=nil
+TRACE[05-22|09:27:41.506] Findnode failed                          id=4c3cbdaa3a9dcab9 failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:41.506] >> PING/v4                               id=4c3fa14f89c18814 addr=219.159.93.69:60606   err=nil
+TRACE[05-22|09:27:41.535] << PING/v4                               id=22ec854117125934 addr=159.89.169.103:30303  err=nil
+TRACE[05-22|09:27:41.536] >> PONG/v4                               id=22ec854117125934 addr=159.89.169.103:30303  err=nil
+TRACE[05-22|09:27:41.713] Findnode failed                          id=22ec854117125934 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:41.713] >> PING/v4                               id=3064061e8cb4d357 addr=162.243.55.45:30303   err=nil
+TRACE[05-22|09:27:41.776] Findnode failed                          id=4c3cca2dc28eceb5 failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:41.776] >> PING/v4                               id=4c3f9f9733fffce6 addr=94.79.55.28:30000     err=nil
+TRACE[05-22|09:27:41.867] << NEIGHBORS/v4                          id=22ec854117125934 addr=159.89.169.103:30303  err="unsolicited reply"
+TRACE[05-22|09:27:41.867] << NEIGHBORS/v4                          id=22ec854117125934 addr=159.89.169.103:30303  err="unsolicited reply"
+TRACE[05-22|09:27:42.213] >> FINDNODE/v4                           id=2ebda3f64fa1612a addr=123.57.29.99:30303    err=nil
+TRACE[05-22|09:27:42.213] >> FINDNODE/v4                           id=27f254a8da5a1168 addr=54.148.165.1:30304    err=nil
+TRACE[05-22|09:27:42.336] >> FINDNODE/v4                           id=4c3c1bd557bc429a addr=58.57.154.116:60606   err=nil
+TRACE[05-22|09:27:42.507] >> FINDNODE/v4                           id=4c3fa14f89c18814 addr=219.159.93.69:60606   err=nil
+TRACE[05-22|09:27:42.713] Findnode failed                          id=2ebda3f64fa1612a failcount=5  results=0 err="RPC timeout"
+TRACE[05-22|09:27:42.713] Too many findnode failures, dropping     id=2ebda3f64fa1612a failcount=5
+TRACE[05-22|09:27:42.713] Findnode failed                          id=27f254a8da5a1168 failcount=5  results=0 err="RPC timeout"
+TRACE[05-22|09:27:42.713] Too many findnode failures, dropping     id=27f254a8da5a1168 failcount=5
+TRACE[05-22|09:27:42.713] >> FINDNODE/v4                           id=3064061e8cb4d357 addr=162.243.55.45:30303   err=nil
+TRACE[05-22|09:27:42.713] >> FINDNODE/v4                           id=04a037eabb45f18c addr=178.128.55.119:30303  err=nil
+TRACE[05-22|09:27:42.713] >> PING/v4                               id=3becf3f13b090bcc addr=18.130.93.66:30303    err=nil
+TRACE[05-22|09:27:42.776] >> FINDNODE/v4                           id=4c3f9f9733fffce6 addr=94.79.55.28:30000     err=nil
+TRACE[05-22|09:27:42.836] Findnode failed                          id=4c3c1bd557bc429a failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:42.836] >> PING/v4                               id=4c3fed89fc7560e3 addr=222.174.125.139:50505 err=nil
+TRACE[05-22|09:27:42.934] << PONG/v4                               id=3becf3f13b090bcc addr=18.130.93.66:30303    err=nil
+TRACE[05-22|09:27:42.947] << NEIGHBORS/v4                          id=04a037eabb45f18c addr=178.128.55.119:30303  err=nil
+TRACE[05-22|09:27:42.948] << NEIGHBORS/v4                          id=04a037eabb45f18c addr=178.128.55.119:30303  err=nil
+TRACE[05-22|09:27:42.948] Starting p2p dial                        id=649b975db0ab378c ip=188.166.122.49 flag=dyndial
+TRACE[05-22|09:27:42.948] Starting p2p dial                        id=f244a6329a7e4e4b ip=139.99.62.138  flag=dyndial
+TRACE[05-22|09:27:42.948] Starting p2p dial                        id=648de168b39999af ip=47.113.127.69  flag=dyndial
+TRACE[05-22|09:27:43.007] Findnode failed                          id=4c3fa14f89c18814 failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:43.007] >> PING/v4                               id=4c3ff4b8e370e642 addr=58.57.154.171:60606   err=nil
+TRACE[05-22|09:27:43.033] DNS discovery lookup                     name=3KBO33ID4QOVFPHWPQRSJRUKWU.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:43.033] Starting p2p dial                        id=9c3448bb748311f6 ip=54.87.176.226  flag=dyndial
+TRACE[05-22|09:27:43.033] Starting p2p dial                        id=6481bf3ce29d1f12 ip=63.251.173.4   flag=dyndial
+TRACE[05-22|09:27:43.107] Dial error                               id=6481bf3ce29d1f12 addr=63.251.173.4:30303    conn=dyndial err="connect: connection refused"
+TRACE[05-22|09:27:43.114] DNS discovery lookup                     name=P7AVWBOFSWPC7WNO3KUKNDWROA.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:43.114] Starting p2p dial                        id=a02d88df5432f17b ip=176.99.5.24    flag=dyndial
+TRACE[05-22|09:27:43.114] Starting p2p dial                        id=64842aad4b12d932 ip=108.160.141.69 flag=dyndial
+TRACE[05-22|09:27:43.191] DNS discovery lookup                     name=7G4QIQW5RBPPXPKK6CDCFDLUO4.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:43.192] Starting p2p dial                        id=bdef1b106162067b ip=91.146.94.30   flag=dyndial
+TRACE[05-22|09:27:43.192] Starting p2p dial                        id=64befb3075a19d30 ip=198.199.105.12 flag=dyndial
+TRACE[05-22|09:27:43.213] Findnode failed                          id=3064061e8cb4d357 failcount=3  results=0 err="RPC timeout"
+TRACE[05-22|09:27:43.269] DNS discovery lookup                     name=WONMROHG5VPAMIK5SDOTGT36JA.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:43.269] Starting p2p dial                        id=c56b2fc3020fd5ba ip=39.98.188.152  flag=dyndial
+TRACE[05-22|09:27:43.269] Starting p2p dial                        id=64b04e7fd1774591 ip=18.156.71.74   flag=dyndial
+TRACE[05-22|09:27:43.276] Findnode failed                          id=4c3f9f9733fffce6 failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:43.277] >> PING/v4                               id=4c3f2daf0c9c6cc9 addr=27.202.227.75:50505   err=nil
+DEBUG[05-22|09:27:43.319] Adding p2p peer                          peercount=1 id=9c3448bb748311f6 conn=dyndial addr=54.87.176.226:30303   name=Geth/v1.9.7-stable-a...
+TRACE[05-22|09:27:43.319] Starting protocol eth/64                 id=9c3448bb748311f6 conn=dyndial
+TRACE[05-22|09:27:43.319] Protocol eth/64 failed                   id=9c3448bb748311f6 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:43.319] Removing p2p peer                        peercount=0 id=9c3448bb748311f6 duration="170.661µs" req=false err="client quitting"
+TRACE[05-22|09:27:43.342] DNS discovery lookup                     name=HZKFP57SVGFIB2P247J2JFMALI.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:43.342] Starting p2p dial                        id=969a17b885c4dfdc ip=13.125.238.228 flag=dyndial
+TRACE[05-22|09:27:43.342] Starting p2p dial                        id=64ae0b32a5d38712 ip=34.255.41.88   flag=dyndial
+DEBUG[05-22|09:27:43.390] Adding p2p peer                          peercount=1 id=64befb3075a19d30 conn=dyndial addr=198.199.105.12:30303  name=Geth/v1.8.23-stable-...
+TRACE[05-22|09:27:43.391] Starting protocol eth/63                 id=64befb3075a19d30 conn=dyndial
+TRACE[05-22|09:27:43.391] Protocol eth/63 failed                   id=64befb3075a19d30 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:43.391] Removing p2p peer                        peercount=0 id=64befb3075a19d30 duration="170.587µs" req=false err="client quitting"
+TRACE[05-22|09:27:43.416] DNS discovery lookup                     name=3KIJHABULLKV3ZEOKJVFDJOMOM.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:43.417] Starting p2p dial                        id=f6f5007080bdd076 ip=185.89.237.189 flag=dyndial
+TRACE[05-22|09:27:43.417] Starting p2p dial                        id=64a63027f2f441d1 ip=149.129.99.203 flag=dyndial
+TRACE[05-22|09:27:43.434] >> FINDNODE/v4                           id=3becf3f13b090bcc addr=18.130.93.66:30303    err=nil
+DEBUG[05-22|09:27:43.454] Adding p2p peer                          peercount=1 id=64842aad4b12d932 conn=dyndial addr=108.160.141.69:30311  name=Geth-EtherCore/v1.9....
+TRACE[05-22|09:27:43.454] Starting protocol eth/65                 id=64842aad4b12d932 conn=dyndial
+TRACE[05-22|09:27:43.454] Protocol eth/65 failed                   id=64842aad4b12d932 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:43.454] Removing p2p peer                        peercount=0 id=64842aad4b12d932 duration="214.607µs" req=false err="client quitting"
+TRACE[05-22|09:27:43.461] Failed p2p handshake                     id=f244a6329a7e4e4b addr=139.99.62.138:40305   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:43.505] DNS discovery lookup                     name=YF6LNBFPHNPRJ2VRETHAQ55YL4.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:43.505] Starting p2p dial                        id=9ef18a36a42bdeb2 ip=144.217.66.227 flag=dyndial
+TRACE[05-22|09:27:43.505] Starting p2p dial                        id=64d0dedb1128af01 ip=34.238.176.132 flag=dyndial
+TRACE[05-22|09:27:43.580] DNS discovery lookup                     name=KFQPLY64OYNXRVTJN36TLBBOEE.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:43.581] Starting p2p dial                        id=d40becdf12075c7e ip=216.83.58.78   flag=dyndial
+TRACE[05-22|09:27:43.581] Starting p2p dial                        id=64c61149881c7cf3 ip=18.217.11.161  flag=dyndial
+TRACE[05-22|09:27:43.654] << PING/v4                               id=3becf3f13b090bcc addr=18.130.93.66:30303    err=nil
+TRACE[05-22|09:27:43.655] >> PONG/v4                               id=3becf3f13b090bcc addr=18.130.93.66:30303    err=nil
+TRACE[05-22|09:27:43.656] DNS discovery lookup                     name=FZZ6YZZ4JCXBM2YTMHRJLGECFY.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:43.656] Starting p2p dial                        id=aec2ae02a66be632 ip=51.75.146.173  flag=dyndial
+TRACE[05-22|09:27:43.657] Starting p2p dial                        id=64fd808c625cda0b ip=35.221.175.164 flag=dyndial
+TRACE[05-22|09:27:43.667] Failed p2p handshake                     id=a02d88df5432f17b addr=176.99.5.24:30303     conn=dyndial err="too many peers"
+TRACE[05-22|09:27:43.704] Failed p2p handshake                     id=bdef1b106162067b addr=91.146.94.30:30303    conn=dyndial err="too many peers"
+TRACE[05-22|09:27:43.773] Failed p2p handshake                     id=969a17b885c4dfdc addr=13.125.238.228:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:43.791] Failed p2p handshake                     id=9ef18a36a42bdeb2 addr=144.217.66.227:30267  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:43.837] >> FINDNODE/v4                           id=4c3fed89fc7560e3 addr=222.174.125.139:50505 err=nil
+DEBUG[05-22|09:27:43.838] Adding p2p peer                          peercount=1 id=64c61149881c7cf3 conn=dyndial addr=18.217.11.161:30303   name=Geth/v1.8.4-stable-2...
+TRACE[05-22|09:27:43.838] Starting protocol eth/63                 id=64c61149881c7cf3 conn=dyndial
+TRACE[05-22|09:27:43.838] Protocol eth/63 failed                   id=64c61149881c7cf3 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:43.838] Removing p2p peer                        peercount=0 id=64c61149881c7cf3 duration="318.757µs" req=false err="client quitting"
+TRACE[05-22|09:27:43.879] << NEIGHBORS/v4                          id=3becf3f13b090bcc addr=18.130.93.66:30303    err=nil
+TRACE[05-22|09:27:43.880] << NEIGHBORS/v4                          id=3becf3f13b090bcc addr=18.130.93.66:30303    err=nil
+TRACE[05-22|09:27:43.885] DNS discovery lookup                     name=3CLDVN6LNBMWYA4GFQIDLZF3RA.all.classic.blockd.info err=nil
+DEBUG[05-22|09:27:43.912] Adding p2p peer                          peercount=1 id=64a63027f2f441d1 conn=dyndial addr=149.129.99.203:59005  name=gvc/v0.2.4-stable/li...
+TRACE[05-22|09:27:43.912] Starting protocol eth/63                 id=64a63027f2f441d1 conn=dyndial
+TRACE[05-22|09:27:43.912] Protocol eth/63 failed                   id=64a63027f2f441d1 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:43.912] Removing p2p peer                        peercount=0 id=64a63027f2f441d1 duration="574.338µs" req=false err="client quitting"
+TRACE[05-22|09:27:43.937] Failed p2p handshake                     id=f6f5007080bdd076 addr=185.89.237.189:30303  conn=dyndial err="too many peers"
+DEBUG[05-22|09:27:43.937] Adding p2p peer                          peercount=1 id=64d0dedb1128af01 conn=dyndial addr=34.238.176.132:30303  name=Parity-Ethereum/v2.7...
+TRACE[05-22|09:27:43.937] Starting protocol eth/63                 id=64d0dedb1128af01 conn=dyndial
+TRACE[05-22|09:27:43.937] Protocol eth/63 failed                   id=64d0dedb1128af01 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:43.938] Removing p2p peer                        peercount=0 id=64d0dedb1128af01 duration="765.26µs"  req=false err="client quitting"
+DEBUG[05-22|09:27:43.964] Adding p2p peer                          peercount=1 id=64b04e7fd1774591 conn=dyndial addr=18.156.71.74:30303    name=Parity-Ethereum/v2.2...
+TRACE[05-22|09:27:43.964] Starting protocol eth/63                 id=64b04e7fd1774591 conn=dyndial
+TRACE[05-22|09:27:43.964] Protocol eth/63 failed                   id=64b04e7fd1774591 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:43.965] Removing p2p peer                        peercount=0 id=64b04e7fd1774591 duration="664.348µs" req=false err="client quitting"
+TRACE[05-22|09:27:44.008] >> FINDNODE/v4                           id=4c3ff4b8e370e642 addr=58.57.154.171:60606   err=nil
+TRACE[05-22|09:27:44.048] DNS discovery lookup                     name=4XHPUNX4UEZY24RWDOWOXD2QD4.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:44.049] Starting p2p dial                        id=32293fabfc2c02e8 ip=51.89.96.115   flag=dyndial
+TRACE[05-22|09:27:44.050] Starting p2p dial                        id=64ffbef8a4129bfc ip=3.133.136.84   flag=dyndial
+TRACE[05-22|09:27:44.077] Failed p2p handshake                     id=d40becdf12075c7e addr=216.83.58.78:30303    conn=dyndial err="too many peers"
+DEBUG[05-22|09:27:44.120] Adding p2p peer                          peercount=1 id=aec2ae02a66be632 conn=dyndial addr=51.75.146.173:30311   name=MultiGeth/v1.9.16-st...
+TRACE[05-22|09:27:44.120] Starting protocol eth/65                 id=aec2ae02a66be632 conn=dyndial
+TRACE[05-22|09:27:44.120] Protocol eth/65 failed                   id=aec2ae02a66be632 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:44.121] Removing p2p peer                        peercount=0 id=aec2ae02a66be632 duration="664.519µs" req=false err="client quitting"
+TRACE[05-22|09:27:44.277] >> FINDNODE/v4                           id=4c3f2daf0c9c6cc9 addr=27.202.227.75:50505   err=nil
+TRACE[05-22|09:27:44.337] Findnode failed                          id=4c3fed89fc7560e3 failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:44.338] >> PING/v4                               id=4c3ebd16d8187e29 addr=219.159.92.35:60608   err=nil
+TRACE[05-22|09:27:44.380] DNS discovery lookup                     name=2VG6TDNWOOZCQMGGQEVTT5QWHE.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:44.380] Starting p2p dial                        id=c823e47e7fe23c97 ip=216.83.55.56   flag=dyndial
+TRACE[05-22|09:27:44.381] Starting p2p dial                        id=64e35bb748f9ad48 ip=54.38.55.42    flag=dyndial
+DEBUG[05-22|09:27:44.463] Adding p2p peer                          peercount=1 id=64ffbef8a4129bfc conn=dyndial addr=3.133.136.84:30303    name=Parity-Ethereum/v2.7...
+TRACE[05-22|09:27:44.464] Starting protocol eth/63                 id=64ffbef8a4129bfc conn=dyndial
+TRACE[05-22|09:27:44.464] Protocol eth/63 failed                   id=64ffbef8a4129bfc conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:44.464] Removing p2p peer                        peercount=0 id=64ffbef8a4129bfc duration="623.207µs" req=false err="client quitting"
+TRACE[05-22|09:27:44.508] Findnode failed                          id=4c3ff4b8e370e642 failcount=3  results=0 err="RPC timeout"
+TRACE[05-22|09:27:44.509] >> PING/v4                               id=4c3efeff775a1bf8 addr=222.174.125.139:50505 err=nil
+TRACE[05-22|09:27:44.509] Failed p2p handshake                     id=32293fabfc2c02e8 addr=51.89.96.115:40305    conn=dyndial err="too many peers"
+TRACE[05-22|09:27:44.711] DNS discovery lookup                     name=77EQSKFFGHKJH55J2LR3C3XVC4.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:44.712] Starting p2p dial                        id=f89ef445ca2dfc34 ip=54.255.179.216 flag=dyndial
+TRACE[05-22|09:27:44.712] Starting p2p dial                        id=64039bacd764163a ip=13.124.176.105 flag=dyndial
+TRACE[05-22|09:27:44.777] Findnode failed                          id=4c3f2daf0c9c6cc9 failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:44.778] >> PING/v4                               id=4c3ed20db2dbfbf0 addr=89.31.78.28:28657     err=nil
+TRACE[05-22|09:27:44.886] Failed p2p handshake                     id=64e35bb748f9ad48 addr=54.38.55.42:28657     conn=dyndial err="too many peers"
+TRACE[05-22|09:27:44.891] Failed p2p handshake                     id=c823e47e7fe23c97 addr=216.83.55.56:30303    conn=dyndial err="too many peers"
+TRACE[05-22|09:27:45.047] DNS discovery lookup                     name=GKTAZNIW46MWE24ECVI7KWAWJA.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:45.048] Starting p2p dial                        id=f3972a8cf07c1150 ip=147.135.10.88  flag=dyndial
+TRACE[05-22|09:27:45.048] Starting p2p dial                        id=6431caddce032059 ip=31.186.100.62  flag=dyndial
+TRACE[05-22|09:27:45.140] Failed p2p handshake                     id=64039bacd764163a addr=13.124.176.105:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:45.230] Failed p2p handshake                     id=f89ef445ca2dfc34 addr=54.255.179.216:30416  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:45.339] >> FINDNODE/v4                           id=4c3ebd16d8187e29 addr=219.159.92.35:60608   err=nil
+TRACE[05-22|09:27:45.354] Failed p2p handshake                     id=f3972a8cf07c1150 addr=147.135.10.88:40306   conn=dyndial err="too many peers"
+INFO [05-22|09:27:45.354] Looking for peers                        peercount=0 tried=45 static=0
+TRACE[05-22|09:27:45.380] DNS discovery lookup                     name=OGS7TW7FYLQQU4KQMEWAJHSUQM.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:45.381] Starting p2p dial                        id=ab552c59133ef085 ip=149.28.246.247 flag=dyndial
+TRACE[05-22|09:27:45.382] Starting p2p dial                        id=64291cc5daa38311 ip=88.99.2.95     flag=dyndial
+TRACE[05-22|09:27:45.383] >> PING/v4                               id=648de168b39999af addr=47.113.127.69:30333   err=nil
+TRACE[05-22|09:27:45.383] >> PING/v4                               id=649b975db0ab378c addr=188.166.122.49:30303  err=nil
+TRACE[05-22|09:27:45.510] >> FINDNODE/v4                           id=4c3efeff775a1bf8 addr=222.174.125.139:50505 err=nil
+DEBUG[05-22|09:27:45.592] Adding p2p peer                          peercount=1 id=6431caddce032059 conn=dyndial addr=31.186.100.62:32101   name=Geth/v1.9.11-stable-...
+TRACE[05-22|09:27:45.592] Starting protocol eth/65                 id=6431caddce032059 conn=dyndial
+TRACE[05-22|09:27:45.592] Protocol eth/65 failed                   id=6431caddce032059 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:45.593] Removing p2p peer                        peercount=0 id=6431caddce032059 duration="738.363µs" req=false err="client quitting"
+DEBUG[05-22|09:27:45.656] Adding p2p peer                          peercount=1 id=ab552c59133ef085 conn=dyndial addr=149.28.246.247:30303  name=Geth/v1.9.15-unstabl...
+TRACE[05-22|09:27:45.656] Starting protocol eth/65                 id=ab552c59133ef085 conn=dyndial
+TRACE[05-22|09:27:45.656] Protocol eth/65 failed                   id=ab552c59133ef085 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:45.656] Removing p2p peer                        peercount=0 id=ab552c59133ef085 duration="310.311µs" req=false err="client quitting"
+TRACE[05-22|09:27:45.713] DNS discovery lookup                     name=DGSBXII3II7MBGY5BXXVR75Z6Y.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:45.714] Starting p2p dial                        id=2fe62fc45183723f ip=171.15.16.35   flag=dyndial
+TRACE[05-22|09:27:45.714] Starting p2p dial                        id=64b0bcb9a18a04e4 ip=113.246.183.123 flag=dyndial
+TRACE[05-22|09:27:45.780] >> FINDNODE/v4                           id=4c3ed20db2dbfbf0 addr=89.31.78.28:28657     err=nil
+DEBUG[05-22|09:27:45.822] Adding p2p peer                          peercount=1 id=64291cc5daa38311 conn=dyndial addr=88.99.2.95:9054       name=MultiGeth/v1.9.15-st...
+TRACE[05-22|09:27:45.823] Starting protocol eth/65                 id=64291cc5daa38311 conn=dyndial
+TRACE[05-22|09:27:45.823] Protocol eth/65 failed                   id=64291cc5daa38311 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:45.823] Removing p2p peer                        peercount=0 id=64291cc5daa38311 duration="738.95µs"  req=false err="client quitting"
+TRACE[05-22|09:27:45.839] Findnode failed                          id=4c3ebd16d8187e29 failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:45.840] >> PING/v4                               id=4c3e6abf2155b14d addr=27.202.227.58:50505   err=nil
+TRACE[05-22|09:27:46.010] Findnode failed                          id=4c3efeff775a1bf8 failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:46.011] >> PING/v4                               id=4c3e5dd7e27227a0 addr=219.159.95.246:60608  err=nil
+TRACE[05-22|09:27:46.042] DNS discovery lookup                     name=GU347UIOWJNF65I2A2PKZ4ECOE.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:46.043] Starting p2p dial                        id=92396af831851606 ip=3.249.244.107   flag=dyndial
+TRACE[05-22|09:27:46.043] Starting p2p dial                        id=64185baca70858a5 ip=83.237.105.118  flag=dyndial
+TRACE[05-22|09:27:46.280] Findnode failed                          id=4c3ed20db2dbfbf0 failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:46.280] >> PING/v4                               id=4c396bc57db23e14 addr=94.79.55.28:30000     err=nil
+TRACE[05-22|09:27:46.379] DNS discovery lookup                     name=MD7P6MOFVWHV2RWRCD3ORSCXAM.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:46.380] Discarding dial candidate                id=2ebda3f64fa1612a ip=123.57.29.99    reason="already dialing"
+TRACE[05-22|09:27:46.380] Starting p2p dial                        id=640ae72b3e4c1b54 ip=134.175.53.165  flag=dyndial
+TRACE[05-22|09:27:46.384] >> FINDNODE/v4                           id=649b975db0ab378c addr=188.166.122.49:30303  err=nil
+TRACE[05-22|09:27:46.384] >> FINDNODE/v4                           id=648de168b39999af addr=47.113.127.69:30333   err=nil
+TRACE[05-22|09:27:46.540] >> PING/v4                               id=4c396bc57db23e14 addr=94.79.55.28:30000     err=nil
+TRACE[05-22|09:27:46.545] Failed p2p handshake                     id=92396af831851606 addr=3.249.244.107:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:46.708] DNS discovery lookup                     name=TZ4BXTMH3XQ26RRJIADVLMIOHY.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:46.708] Starting p2p dial                        id=b5e32c84b178759a ip=8.210.12.4      flag=dyndial
+TRACE[05-22|09:27:46.709] Starting p2p dial                        id=6436f644a35fc3ac ip=58.243.201.57   flag=dyndial
+TRACE[05-22|09:27:46.841] >> FINDNODE/v4                           id=4c3e6abf2155b14d addr=27.202.227.58:50505   err=nil
+TRACE[05-22|09:27:46.884] Findnode failed                          id=649b975db0ab378c failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:46.884] Findnode failed                          id=648de168b39999af failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:47.012] >> FINDNODE/v4                           id=4c3e5dd7e27227a0 addr=219.159.95.246:60608  err=nil
+DEBUG[05-22|09:27:47.040] Removed dead node                        b=3  id=4c396bc57db23e14 ip=94.79.55.28     checks=0
+TRACE[05-22|09:27:47.042] DNS discovery lookup                     name=EZJCGB5NBMK2J6GF72RQUTTN6U.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:47.043] Starting p2p dial                        id=8a020e1363edea06 ip=76.217.31.121   flag=dyndial
+TRACE[05-22|09:27:47.043] Starting p2p dial                        id=642c6d34ed3b7784 ip=149.28.138.244  flag=dyndial
+TRACE[05-22|09:27:47.044] >> PING/v4                               id=64befb3075a19d30 addr=198.199.105.12:30303  err=nil
+TRACE[05-22|09:27:47.045] >> PING/v4                               id=6481bf3ce29d1f12 addr=63.251.173.4:30303    err=nil
+TRACE[05-22|09:27:47.045] >> PING/v4                               id=64842aad4b12d932 addr=108.160.141.69:30311  err=nil
+TRACE[05-22|09:27:47.142] << PONG/v4                               id=64befb3075a19d30 addr=198.199.105.12:30303  err=nil
+TRACE[05-22|09:27:47.143] << PING/v4                               id=64befb3075a19d30 addr=198.199.105.12:30303  err=nil
+TRACE[05-22|09:27:47.144] >> PONG/v4                               id=64befb3075a19d30 addr=198.199.105.12:30303  err=nil
+TRACE[05-22|09:27:47.218] << PONG/v4                               id=64842aad4b12d932 addr=108.160.141.69:30311  err=nil
+TRACE[05-22|09:27:47.220] << PING/v4                               id=64842aad4b12d932 addr=108.160.141.69:30311  err=nil
+TRACE[05-22|09:27:47.221] >> PONG/v4                               id=64842aad4b12d932 addr=108.160.141.69:30311  err=nil
+TRACE[05-22|09:27:47.221] Failed p2p handshake                     id=b5e32c84b178759a addr=8.210.12.4:20202      conn=dyndial err="too many peers"
+TRACE[05-22|09:27:47.282] >> FINDNODE/v4                           id=4c396bc57db23e14 addr=94.79.55.28:30000     err=nil
+TRACE[05-22|09:27:47.306] Failed p2p handshake                     id=8a020e1363edea06 addr=76.217.31.121:30304   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:47.341] Findnode failed                          id=4c3e6abf2155b14d failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:47.374] DNS discovery lookup                     name=RMP6M7ALFQYUWNE5MH473JA5ZI.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:47.375] Starting p2p dial                        id=8167a1788fe32cf9 ip=35.223.246.26   flag=dyndial
+TRACE[05-22|09:27:47.512] Findnode failed                          id=4c3e5dd7e27227a0 failcount=2  results=0 err="RPC timeout"
+DEBUG[05-22|09:27:47.616] Adding p2p peer                          peercount=1 id=8167a1788fe32cf9 conn=dyndial addr=35.223.246.26:30303   name=Geth/v1.9.14-stable-...
+TRACE[05-22|09:27:47.616] Starting protocol eth/65                 id=8167a1788fe32cf9 conn=dyndial
+TRACE[05-22|09:27:47.616] Protocol eth/65 failed                   id=8167a1788fe32cf9 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:47.616] Removing p2p peer                        peercount=0 id=8167a1788fe32cf9 duration="169.902µs" req=false err="client quitting"
+TRACE[05-22|09:27:47.642] >> FINDNODE/v4                           id=64befb3075a19d30 addr=198.199.105.12:30303  err=nil
+TRACE[05-22|09:27:47.709] DNS discovery lookup                     name=VN6YS4W757GPIPLUOI6X7HEWWE.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:47.717] Rejected peer                            id=642c6d34ed3b7784 addr=149.28.138.244:30303  conn=dyndial err="useless peer"
+TRACE[05-22|09:27:47.719] >> FINDNODE/v4                           id=64842aad4b12d932 addr=108.160.141.69:30311  err=nil
+TRACE[05-22|09:27:47.747] << NEIGHBORS/v4                          id=64befb3075a19d30 addr=198.199.105.12:30303  err=nil
+TRACE[05-22|09:27:47.750] << NEIGHBORS/v4                          id=64befb3075a19d30 addr=198.199.105.12:30303  err=nil
+TRACE[05-22|09:27:47.751] Starting p2p dial                        id=645bef131a899162 ip=207.180.246.218 flag=dyndial
+TRACE[05-22|09:27:47.751] Starting p2p dial                        id=f353283ce18ab4e4 ip=176.99.5.24     flag=dyndial
+TRACE[05-22|09:27:47.751] Starting p2p dial                        id=6454c24813587236 ip=95.217.96.90    flag=dyndial
+TRACE[05-22|09:27:47.781] Findnode failed                          id=4c396bc57db23e14 failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:27:47.782] >> PING/v4                               id=d916ecf8224301e4 addr=46.101.78.44:30303    err=nil
+TRACE[05-22|09:27:47.782] >> FINDNODE/v4                           id=f5fb164a5c76dbb5 addr=68.183.99.5:30303     err=nil
+TRACE[05-22|09:27:47.783] >> FINDNODE/v4                           id=d4731bcf672459cc addr=206.189.68.191:30303  err=nil
+TRACE[05-22|09:27:47.882] << PING/v4                               id=d4731bcf672459cc addr=206.189.68.191:30303  err=nil
+TRACE[05-22|09:27:47.883] >> PONG/v4                               id=d4731bcf672459cc addr=206.189.68.191:30303  err=nil
+TRACE[05-22|09:27:47.905] << NEIGHBORS/v4                          id=64842aad4b12d932 addr=108.160.141.69:30311  err=nil
+TRACE[05-22|09:27:47.908] << NEIGHBORS/v4                          id=64842aad4b12d932 addr=108.160.141.69:30311  err=nil
+TRACE[05-22|09:27:47.929] << PING/v4                               id=f5fb164a5c76dbb5 addr=68.183.99.5:30303     err=nil
+TRACE[05-22|09:27:47.930] >> PONG/v4                               id=f5fb164a5c76dbb5 addr=68.183.99.5:30303     err=nil
+TRACE[05-22|09:27:47.981] << NEIGHBORS/v4                          id=d4731bcf672459cc addr=206.189.68.191:30303  err=nil
+TRACE[05-22|09:27:47.982] << NEIGHBORS/v4                          id=d4731bcf672459cc addr=206.189.68.191:30303  err=nil
+TRACE[05-22|09:27:47.982] >> PING/v4                               id=f40086d48ed37d6d addr=35.181.140.221:30303  err=nil
+TRACE[05-22|09:27:47.990] << PONG/v4                               id=d916ecf8224301e4 addr=46.101.78.44:30303    err=nil
+TRACE[05-22|09:27:48.040] DNS discovery lookup                     name=UMRL6QESLUWA2XPMG5TBQEUZYU.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:48.041] Starting p2p dial                        id=ebabc75935718f19 ip=176.119.82.177  flag=dyndial
+TRACE[05-22|09:27:48.041] Starting p2p dial                        id=6475be38cfe1d24a ip=116.202.237.156 flag=dyndial
+TRACE[05-22|09:27:48.045] >> FINDNODE/v4                           id=6481bf3ce29d1f12 addr=63.251.173.4:30303    err=nil
+TRACE[05-22|09:27:48.074] << NEIGHBORS/v4                          id=f5fb164a5c76dbb5 addr=68.183.99.5:30303     err=nil
+TRACE[05-22|09:27:48.075] << NEIGHBORS/v4                          id=f5fb164a5c76dbb5 addr=68.183.99.5:30303     err=nil
+TRACE[05-22|09:27:48.076] >> PING/v4                               id=f400373b5a982169 addr=162.0.226.10:30305    err=nil
+TRACE[05-22|09:27:48.209] << PONG/v4                               id=f40086d48ed37d6d addr=35.181.140.221:30303  err=nil
+DEBUG[05-22|09:27:48.262] Adding p2p peer                          peercount=1 id=6454c24813587236 conn=dyndial addr=95.217.96.90:30303    name=Pirl/v1.9.12-v7-mast...
+TRACE[05-22|09:27:48.262] Starting protocol eth/65                 id=6454c24813587236 conn=dyndial
+TRACE[05-22|09:27:48.262] Protocol eth/65 failed                   id=6454c24813587236 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:48.262] Removing p2p peer                        peercount=0 id=6454c24813587236 duration="178.293µs" req=false err="client quitting"
+TRACE[05-22|09:27:48.313] Failed p2p handshake                     id=f353283ce18ab4e4 addr=176.99.5.24:37335     conn=dyndial err="too many peers"
+TRACE[05-22|09:27:48.373] DNS discovery lookup                     name=K7XFMUT3OGGFK7QNQQPMMSDTRQ.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:48.374] Starting p2p dial                        id=89b484ab62213298 ip=88.112.69.230   flag=dyndial
+TRACE[05-22|09:27:48.374] Starting p2p dial                        id=647714fdbaa01e2f ip=3.16.78.212     flag=dyndial
+TRACE[05-22|09:27:48.491] >> FINDNODE/v4                           id=d916ecf8224301e4 addr=46.101.78.44:30303    err=nil
+TRACE[05-22|09:27:48.500] Failed p2p handshake                     id=6475be38cfe1d24a addr=116.202.237.156:30303 conn=dyndial err="too many peers"
+TRACE[05-22|09:27:48.546] Findnode failed                          id=6481bf3ce29d1f12 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:48.604] Failed p2p handshake                     id=ebabc75935718f19 addr=176.119.82.177:30304  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:48.699] << PING/v4                               id=d916ecf8224301e4 addr=46.101.78.44:30303    err=nil
+TRACE[05-22|09:27:48.700] >> PONG/v4                               id=d916ecf8224301e4 addr=46.101.78.44:30303    err=nil
+TRACE[05-22|09:27:48.710] >> FINDNODE/v4                           id=f40086d48ed37d6d addr=35.181.140.221:30303  err=nil
+TRACE[05-22|09:27:48.714] DNS discovery lookup                     name=2UEBLPSYVUZJ656V54UIRJG4JU.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:48.715] Starting p2p dial                        id=abc5edaba0988991 ip=121.127.234.206 flag=dyndial
+TRACE[05-22|09:27:48.715] Starting p2p dial                        id=646a69c2347c33ee ip=149.56.143.205  flag=dyndial
+DEBUG[05-22|09:27:48.817] Adding p2p peer                          peercount=1 id=647714fdbaa01e2f conn=dyndial addr=3.16.78.212:30303     name=besu/PegaSys/v1.4.5/...
+TRACE[05-22|09:27:48.817] Starting protocol eth/64                 id=647714fdbaa01e2f conn=dyndial
+TRACE[05-22|09:27:48.817] Protocol eth/64 failed                   id=647714fdbaa01e2f conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:48.818] Removing p2p peer                        peercount=0 id=647714fdbaa01e2f duration="787.052µs" req=true  err="too many peers"
+TRACE[05-22|09:27:48.869] Failed p2p handshake                     id=89b484ab62213298 addr=88.112.69.230:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:48.912] << NEIGHBORS/v4                          id=d916ecf8224301e4 addr=46.101.78.44:30303    err=nil
+TRACE[05-22|09:27:48.914] << NEIGHBORS/v4                          id=d916ecf8224301e4 addr=46.101.78.44:30303    err=nil
+TRACE[05-22|09:27:48.915] >> PING/v4                               id=f40ebfd50446f4c1 addr=167.71.38.55:30303    err=nil
+TRACE[05-22|09:27:48.940] << PING/v4                               id=f40086d48ed37d6d addr=35.181.140.221:30303  err=nil
+TRACE[05-22|09:27:48.941] >> PONG/v4                               id=f40086d48ed37d6d addr=35.181.140.221:30303  err=nil
+DEBUG[05-22|09:27:49.000] Adding p2p peer                          peercount=1 id=646a69c2347c33ee conn=dyndial addr=149.56.143.205:40303  name=Mix-Geth/v1.8.21-sta...
+TRACE[05-22|09:27:49.000] Starting protocol eth/63                 id=646a69c2347c33ee conn=dyndial
+TRACE[05-22|09:27:49.000] Protocol eth/63 failed                   id=646a69c2347c33ee conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:49.000] Removing p2p peer                        peercount=0 id=646a69c2347c33ee duration="297.052µs" req=false err="client quitting"
+TRACE[05-22|09:27:49.047] DNS discovery lookup                     name=QJBD2TEQWZVYZSJRHTDOMHBK4I.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:49.049] Starting p2p dial                        id=fdf538adcd0ac755 ip=52.71.9.43      flag=dyndial
+TRACE[05-22|09:27:49.049] Starting p2p dial                        id=65946e4cf5ea8c7b ip=159.89.51.242   flag=dyndial
+TRACE[05-22|09:27:49.077] >> FINDNODE/v4                           id=f400373b5a982169 addr=162.0.226.10:30305    err=nil
+TRACE[05-22|09:27:49.140] << PONG/v4                               id=f40ebfd50446f4c1 addr=167.71.38.55:30303    err=nil
+TRACE[05-22|09:27:49.165] Failed p2p handshake                     id=abc5edaba0988991 addr=121.127.234.206:30303 conn=dyndial err="too many peers"
+TRACE[05-22|09:27:49.172] << NEIGHBORS/v4                          id=f40086d48ed37d6d addr=35.181.140.221:30303  err=nil
+TRACE[05-22|09:27:49.174] << NEIGHBORS/v4                          id=f40086d48ed37d6d addr=35.181.140.221:30303  err=nil
+DEBUG[05-22|09:27:49.174] IP exceeds bucket limit                  ip=219.159.92.187
+DEBUG[05-22|09:27:49.174] IP exceeds bucket limit                  ip=58.57.154.172
+DEBUG[05-22|09:27:49.174] IP exceeds bucket limit                  ip=58.57.154.172
+DEBUG[05-22|09:27:49.174] IP exceeds bucket limit                  ip=58.57.154.171
+TRACE[05-22|09:27:49.175] >> PING/v4                               id=f406eda8cefe9c06 addr=219.159.92.187:60608  err=nil
+DEBUG[05-22|09:27:49.279] Adding p2p peer                          peercount=1 id=645bef131a899162 conn=dyndial addr=207.180.246.218:30303 name=Pirl/v1.9.12-v7-mast...
+TRACE[05-22|09:27:49.279] Starting protocol eth/65                 id=645bef131a899162 conn=dyndial
+TRACE[05-22|09:27:49.279] Protocol eth/65 failed                   id=645bef131a899162 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:49.280] Removing p2p peer                        peercount=0 id=645bef131a899162 duration="758.785µs" req=false err="client quitting"
+TRACE[05-22|09:27:49.369] Failed p2p handshake                     id=fdf538adcd0ac755 addr=52.71.9.43:30303      conn=dyndial err="too many peers"
+TRACE[05-22|09:27:49.374] DNS discovery lookup                     name=GCJEGKXCV2QF54OZP3FJ5KTR2A.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:49.375] Starting p2p dial                        id=a534ff9e66da5392 ip=34.90.33.51     flag=dyndial
+TRACE[05-22|09:27:49.375] Starting p2p dial                        id=658b2b886b673854 ip=150.95.137.46   flag=dyndial
+TRACE[05-22|09:27:49.476] Rejected peer                            id=65946e4cf5ea8c7b addr=159.89.51.242:30303   conn=dyndial err="useless peer"
+TRACE[05-22|09:27:49.578] Findnode failed                          id=f400373b5a982169 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:49.579] >> PING/v4                               id=f407449fa6489b0d addr=27.202.212.232:50505  err=nil
+TRACE[05-22|09:27:49.641] >> FINDNODE/v4                           id=f40ebfd50446f4c1 addr=167.71.38.55:30303    err=nil
+TRACE[05-22|09:27:49.724] DNS discovery lookup                     name=44MGVLBTICKIA3HAKMLIACAQQQ.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:49.725] Starting p2p dial                        id=de5fe479f3ba8433 ip=154.48.254.138  flag=dyndial
+TRACE[05-22|09:27:49.725] Starting p2p dial                        id=658fa4a87274e699 ip=68.183.218.209  flag=dyndial
+TRACE[05-22|09:27:49.734] >> PING/v4                               id=4c38e6461e2d9986 addr=3.91.43.28:31494      err=nil
+TRACE[05-22|09:27:49.745] Rejected peer                            id=658b2b886b673854 addr=150.95.137.46:30303   conn=dyndial err="useless peer"
+TRACE[05-22|09:27:49.817] Failed p2p handshake                     id=a534ff9e66da5392 addr=34.90.33.51:30303     conn=dyndial err="too many peers"
+TRACE[05-22|09:27:49.880] << PING/v4                               id=f40ebfd50446f4c1 addr=167.71.38.55:30303    err=nil
+TRACE[05-22|09:27:49.881] >> PONG/v4                               id=f40ebfd50446f4c1 addr=167.71.38.55:30303    err=nil
+TRACE[05-22|09:27:50.045] DNS discovery lookup                     name=B2576GFOFKT7Y3IDSWT2GJC6XI.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:50.045] Starting p2p dial                        id=a597d00dd290d704 ip=47.108.52.30    flag=dyndial
+TRACE[05-22|09:27:50.045] Starting p2p dial                        id=65bb2ca4eb967f2b ip=52.52.198.191   flag=dyndial
+TRACE[05-22|09:27:50.109] << NEIGHBORS/v4                          id=f40ebfd50446f4c1 addr=167.71.38.55:30303    err=nil
+TRACE[05-22|09:27:50.111] << NEIGHBORS/v4                          id=f40ebfd50446f4c1 addr=167.71.38.55:30303    err=nil
+DEBUG[05-22|09:27:50.111] IP exceeds bucket limit                  ip=219.159.92.187
+DEBUG[05-22|09:27:50.111] IP exceeds bucket limit                  ip=219.159.94.98
+DEBUG[05-22|09:27:50.111] IP exceeds bucket limit                  ip=58.57.154.172
+DEBUG[05-22|09:27:50.111] IP exceeds bucket limit                  ip=219.159.92.187
+TRACE[05-22|09:27:50.112] >> PING/v4                               id=f4048add64f45b15 addr=160.176.69.215:29166  err=nil
+TRACE[05-22|09:27:50.176] >> FINDNODE/v4                           id=f406eda8cefe9c06 addr=219.159.92.187:60608  err=nil
+DEBUG[05-22|09:27:50.200] Adding p2p peer                          peercount=1 id=658fa4a87274e699 conn=dyndial addr=68.183.218.209:30303  name=Geth/v1.9.0-unstable...
+TRACE[05-22|09:27:50.200] Starting protocol eth/63                 id=658fa4a87274e699 conn=dyndial
+TRACE[05-22|09:27:50.200] Protocol eth/63 failed                   id=658fa4a87274e699 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:50.201] Removing p2p peer                        peercount=0 id=658fa4a87274e699 duration="732.557µs" req=false err="client quitting"
+TRACE[05-22|09:27:50.226] Failed p2p handshake                     id=de5fe479f3ba8433 addr=154.48.254.138:8888   conn=dyndial err="too many peers"
+DEBUG[05-22|09:27:50.234] Removed dead node                        b=3  id=4c38e6461e2d9986 ip=3.91.43.28      checks=0
+TRACE[05-22|09:27:50.239] Rejected peer                            id=65bb2ca4eb967f2b addr=52.52.198.191:36000   conn=dyndial err="useless peer"
+TRACE[05-22|09:27:50.315] Dial error                               id=6b90fe1510fa42c6 addr=18.205.66.229:30303   conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:50.379] DNS discovery lookup                     name=76ATUYDATNOSYJNXNUGA5AR5AI.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:50.380] Starting p2p dial                        id=319d484c2bd82c30 ip=51.159.56.86    flag=dyndial
+TRACE[05-22|09:27:50.380] Starting p2p dial                        id=65a85ba59f33725b ip=104.209.239.73  flag=dyndial
+TRACE[05-22|09:27:50.381] >> PING/v4                               id=64b0bcb9a18a04e4 addr=113.246.183.123:42248 err=nil
+TRACE[05-22|09:27:50.580] >> FINDNODE/v4                           id=f407449fa6489b0d addr=27.202.212.232:50505  err=nil
+TRACE[05-22|09:27:50.676] Findnode failed                          id=f406eda8cefe9c06 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:50.677] >> PING/v4                               id=f404e3d400244d13 addr=219.159.92.187:60608  err=nil
+TRACE[05-22|09:27:50.689] Failed p2p handshake                     id=65a85ba59f33725b addr=104.209.239.73:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:50.708] DNS discovery lookup                     name=DQGVRYTG6IFQRI3I5E7UYKFBOU.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:50.709] Starting p2p dial                        id=97827cdf7424d6a1 ip=37.187.226.146  flag=dyndial
+TRACE[05-22|09:27:50.710] Starting p2p dial                        id=6494e4fc5bcd9e3c ip=95.111.13.56    flag=dyndial
+TRACE[05-22|09:27:50.829] Failed p2p handshake                     id=319d484c2bd82c30 addr=51.159.56.86:30365    conn=dyndial err="too many peers"
+TRACE[05-22|09:27:50.892] Dial error                               id=51b59fdee3fc3ac3 addr=101.133.229.66:30303  conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:50.970] Dial error                               id=9288866babfc9dc9 addr=47.108.90.49:30303    conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:50.970] Dial error                               id=5efdf1b54d7b1f22 addr=51.141.115.3:30303    conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:51.040] DNS discovery lookup                     name=NP447D772GCX5K6ELPLKRIH56M.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:51.041] Starting p2p dial                        id=b3b83d32a7e8c104 ip=176.9.51.216    flag=dyndial
+TRACE[05-22|09:27:51.042] Starting p2p dial                        id=6488a81c257d09db ip=13.94.241.95    flag=dyndial
+TRACE[05-22|09:27:51.080] Findnode failed                          id=f407449fa6489b0d failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:51.080] >> PING/v4                               id=f404d9276a6dd3d4 addr=219.159.92.187:60608  err=nil
+TRACE[05-22|09:27:51.113] >> FINDNODE/v4                           id=f4048add64f45b15 addr=160.176.69.215:29166  err=nil
+TRACE[05-22|09:27:51.321] Dial error                               id=27f254a8da5a1168 addr=54.148.165.1:30304    conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:51.378] DNS discovery lookup                     name=HDE3LM57KX4O3KJV7PLWXOPEFA.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:51.378] Starting p2p dial                        id=ded227e67fef888e ip=176.99.5.24     flag=dyndial
+TRACE[05-22|09:27:51.378] Starting p2p dial                        id=647bdb5ea580b7a2 ip=18.195.248.100  flag=dyndial
+TRACE[05-22|09:27:51.378] >> PING/v4                               id=6488a81c257d09db addr=13.94.241.95:1059     err=nil
+TRACE[05-22|09:27:51.378] >> PING/v4                               id=6494e4fc5bcd9e3c addr=95.111.13.56:30303    err=nil
+TRACE[05-22|09:27:51.380] Failed p2p handshake                     id=97827cdf7424d6a1 addr=37.187.226.146:30415  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:51.381] >> FINDNODE/v4                           id=64b0bcb9a18a04e4 addr=113.246.183.123:42248 err=nil
+TRACE[05-22|09:27:51.477] Dial error                               id=2ebda3f64fa1612a addr=123.57.29.99:30303    conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:51.477] Failed p2p handshake                     id=b3b83d32a7e8c104 addr=176.9.51.216:30375    conn=dyndial err="too many peers"
+TRACE[05-22|09:27:51.553] Dial error                               id=3064061e8cb4d357 addr=162.243.55.45:30303   conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:51.613] Findnode failed                          id=f4048add64f45b15 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:51.613] >> PING/v4                               id=f4042c141acc4f61 addr=219.159.94.76:60606   err=nil
+TRACE[05-22|09:27:51.678] >> FINDNODE/v4                           id=f404e3d400244d13 addr=219.159.92.187:60608  err=nil
+TRACE[05-22|09:27:51.706] DNS discovery lookup                     name=MP54R5BZ2KI56IGEWR4FCUJ25Y.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:51.707] Starting p2p dial                        id=aec77a15184725b0 ip=81.91.189.241   flag=dyndial
+TRACE[05-22|09:27:51.787] Dial error                               id=059fce3b4d826ceb addr=47.115.150.90:30303   conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:51.881] Findnode failed                          id=64b0bcb9a18a04e4 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:51.882] >> PING/v4                               id=64b04e7fd1774591 addr=18.156.71.74:30303    err=nil
+TRACE[05-22|09:27:51.928] Failed p2p handshake                     id=ded227e67fef888e addr=176.99.5.24:37735     conn=dyndial err="too many peers"
+TRACE[05-22|09:27:52.049] DNS discovery lookup                     name=JKL4IENGP7LF2RUU7DMKHXKHDI.all.classic.blockd.info err=nil
+DEBUG[05-22|09:27:52.051] Adding p2p peer                          peercount=1 id=647bdb5ea580b7a2 conn=dyndial addr=18.195.248.100:30303  name=Parity-Ethereum/v2.6...
+TRACE[05-22|09:27:52.051] Starting protocol eth/63                 id=647bdb5ea580b7a2 conn=dyndial
+TRACE[05-22|09:27:52.051] Protocol eth/63 failed                   id=647bdb5ea580b7a2 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:52.051] Removing p2p peer                        peercount=0 id=647bdb5ea580b7a2 duration="196.927µs" req=false err="client quitting"
+TRACE[05-22|09:27:52.081] >> FINDNODE/v4                           id=f404d9276a6dd3d4 addr=219.159.92.187:60608  err=nil
+TRACE[05-22|09:27:52.128] << PONG/v4                               id=64b04e7fd1774591 addr=18.156.71.74:30303    err=nil
+TRACE[05-22|09:27:52.178] Findnode failed                          id=f404e3d400244d13 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:52.178] >> PING/v4                               id=f40471034ac34488 addr=94.130.224.29:30303   err=nil
+TRACE[05-22|09:27:52.292] Failed p2p handshake                     id=aec77a15184725b0 addr=81.91.189.241:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:52.379] >> FINDNODE/v4                           id=6488a81c257d09db addr=13.94.241.95:1059     err=nil
+TRACE[05-22|09:27:52.379] >> FINDNODE/v4                           id=6494e4fc5bcd9e3c addr=95.111.13.56:30303    err=nil
+TRACE[05-22|09:27:52.581] Findnode failed                          id=f404d9276a6dd3d4 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:52.581] >> PING/v4                               id=f405a9a52b5031c6 addr=222.174.125.139:60606 err=nil
+TRACE[05-22|09:27:52.613] >> FINDNODE/v4                           id=f4042c141acc4f61 addr=219.159.94.76:60606   err=nil
+TRACE[05-22|09:27:52.629] >> FINDNODE/v4                           id=64b04e7fd1774591 addr=18.156.71.74:30303    err=nil
+TRACE[05-22|09:27:52.712] Dial error                               id=0970decfe54cafed addr=54.148.165.1:30303    conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:52.860] << PING/v4                               id=64b04e7fd1774591 addr=18.156.71.74:30303    err=nil
+TRACE[05-22|09:27:52.860] >> PONG/v4                               id=64b04e7fd1774591 addr=18.156.71.74:30303    err=nil
+TRACE[05-22|09:27:52.879] Findnode failed                          id=6488a81c257d09db failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:52.879] Findnode failed                          id=6494e4fc5bcd9e3c failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:52.879] >> PING/v4                               id=64ae0b32a5d38712 addr=34.255.41.88:30303    err=nil
+TRACE[05-22|09:27:52.879] >> PING/v4                               id=64a63027f2f441d1 addr=149.129.99.203:59005  err=nil
+TRACE[05-22|09:27:52.985] >> PING/v4                               id=4c34c5756599cad6 addr=207.180.212.145:30305 err=nil
+TRACE[05-22|09:27:53.043] Dial error                               id=1887e1b2b420425c addr=35.187.57.94:30303    conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:53.090] Invalid neighbor node received           ip=35.187.103.96   addr=18.156.71.74:30303    err="low port"
+TRACE[05-22|09:27:53.090] << NEIGHBORS/v4                          id=64b04e7fd1774591 addr=18.156.71.74:30303    err=nil
+TRACE[05-22|09:27:53.090] << NEIGHBORS/v4                          id=64b04e7fd1774591 addr=18.156.71.74:30303    err=nil
+TRACE[05-22|09:27:53.090] Starting p2p dial                        id=649d7b11ef94d829 ip=122.51.168.92   flag=dyndial
+TRACE[05-22|09:27:53.090] Starting p2p dial                        id=4f3e8a7671a92d35 ip=18.179.210.113  flag=dyndial
+TRACE[05-22|09:27:53.091] Starting p2p dial                        id=64934e87b1349108 ip=122.152.197.101 flag=dyndial
+TRACE[05-22|09:27:53.113] Findnode failed                          id=f4042c141acc4f61 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:53.114] >> PING/v4                               id=f4050aba27e18c90 addr=219.159.94.76:60608   err=nil
+TRACE[05-22|09:27:53.121] << PONG/v4                               id=64a63027f2f441d1 addr=149.129.99.203:59005  err=nil
+TRACE[05-22|09:27:53.122] << PING/v4                               id=64a63027f2f441d1 addr=149.129.99.203:59005  err=nil
+TRACE[05-22|09:27:53.122] >> PONG/v4                               id=64a63027f2f441d1 addr=149.129.99.203:59005  err=nil
+TRACE[05-22|09:27:53.165] DNS discovery lookup                     name=CFNLWTYOPRXVWFJB24RFIJZ64Y.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:53.166] Starting p2p dial                        id=e32f2ba35613e0e6 ip=78.24.28.249    flag=dyndial
+TRACE[05-22|09:27:53.166] Starting p2p dial                        id=6492cea07be6576a ip=122.51.70.214   flag=dyndial
+TRACE[05-22|09:27:53.178] >> FINDNODE/v4                           id=f40471034ac34488 addr=94.130.224.29:30303   err=nil
+TRACE[05-22|09:27:53.214] << PONG/v4                               id=4c34c5756599cad6 addr=207.180.212.145:30305 err=nil
+TRACE[05-22|09:27:53.215] >> ENRREQUEST/v4                         id=4c34c5756599cad6 addr=207.180.212.145:30305 err=nil
+TRACE[05-22|09:27:53.246] DNS discovery lookup                     name=HPQ2T5AL5NEEZ2EF64RHP2M2HY.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:53.246] Starting p2p dial                        id=ffea5a30fa145f97 ip=3.227.247.163   flag=dyndial
+TRACE[05-22|09:27:53.246] Starting p2p dial                        id=648c1a4063cb7158 ip=52.20.201.63    flag=dyndial
+TRACE[05-22|09:27:53.325] DNS discovery lookup                     name=FPHAKPPIO6STYHJRD6MQFD3BZA.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:53.325] Starting p2p dial                        id=3380d474f413952e ip=109.70.186.50   flag=dyndial
+TRACE[05-22|09:27:53.325] Starting p2p dial                        id=6480cddaa72fe248 ip=80.137.216.209  flag=dyndial
+TRACE[05-22|09:27:53.407] DNS discovery lookup                     name=YAVSGWBX5FQV2PXJO2J7ZANIQI.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:53.408] Starting p2p dial                        id=ae0e7c0bbf2d3ea2 ip=47.91.212.133   flag=dyndial
+TRACE[05-22|09:27:53.408] Starting p2p dial                        id=648028dea247ac5d ip=112.65.166.66   flag=dyndial
+TRACE[05-22|09:27:53.470] << ENRRESPONSE/v4                        id=4c34c5756599cad6 addr=207.180.212.145:30305 err=nil
+DEBUG[05-22|09:27:53.470] Revalidated node                         b=4  id=4c34c5756599cad6 checks=1
+TRACE[05-22|09:27:53.530] Failed RLPx handshake                    addr=52.20.201.63:30303    conn=dyndial err=EOF
+TRACE[05-22|09:27:53.564] Failed p2p handshake                     id=4f3e8a7671a92d35 addr=18.179.210.113:30303  conn=dyndial err="too many peers"
+DEBUG[05-22|09:27:53.574] Adding p2p peer                          peercount=1 id=ffea5a30fa145f97 conn=dyndial addr=3.227.247.163:30303   name=Geth/v1.9.14-stable-...
+TRACE[05-22|09:27:53.574] Starting protocol eth/65                 id=ffea5a30fa145f97 conn=dyndial
+TRACE[05-22|09:27:53.574] Protocol eth/65 failed                   id=ffea5a30fa145f97 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:53.574] Removing p2p peer                        peercount=0 id=ffea5a30fa145f97 duration="421.516µs" req=false err="client quitting"
+TRACE[05-22|09:27:53.582] >> FINDNODE/v4                           id=f405a9a52b5031c6 addr=222.174.125.139:60606 err=nil
+TRACE[05-22|09:27:53.622] >> FINDNODE/v4                           id=64a63027f2f441d1 addr=149.129.99.203:59005  err=nil
+TRACE[05-22|09:27:53.679] Findnode failed                          id=f40471034ac34488 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:53.680] >> PING/v4                               id=f402af30f3e8c020 addr=58.57.154.114:50505   err=nil
+DEBUG[05-22|09:27:53.686] Adding p2p peer                          peercount=1 id=e32f2ba35613e0e6 conn=dyndial addr=78.24.28.249:30303    name=MultiGeth/v1.9.15-st...
+TRACE[05-22|09:27:53.686] Starting protocol eth/65                 id=e32f2ba35613e0e6 conn=dyndial
+TRACE[05-22|09:27:53.686] Protocol eth/65 failed                   id=e32f2ba35613e0e6 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:53.686] Removing p2p peer                        peercount=0 id=e32f2ba35613e0e6 duration="557.072µs" req=false err="client quitting"
+TRACE[05-22|09:27:53.708] DNS discovery lookup                     name=V73QG5QZNVK2SS2EH4ZSSANKXM.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:53.708] Starting p2p dial                        id=c4c4fb854b037c47 ip=5.189.147.71    flag=dyndial
+TRACE[05-22|09:27:53.709] Starting p2p dial                        id=64aa66a3cc002bc7 ip=94.199.101.25   flag=dyndial
+TRACE[05-22|09:27:53.709] >> PING/v4                               id=649d7b11ef94d829 addr=122.51.168.92:20182   err=nil
+TRACE[05-22|09:27:53.818] Dial error                               id=64aa66a3cc002bc7 addr=94.199.101.25:30305   conn=dyndial err="connect: no route to host"
+TRACE[05-22|09:27:53.877] << NEIGHBORS/v4                          id=64a63027f2f441d1 addr=149.129.99.203:59005  err=nil
+TRACE[05-22|09:27:53.879] << NEIGHBORS/v4                          id=64a63027f2f441d1 addr=149.129.99.203:59005  err=nil
+TRACE[05-22|09:27:53.880] >> FINDNODE/v4                           id=64ae0b32a5d38712 addr=34.255.41.88:30303    err=nil
+TRACE[05-22|09:27:53.914] Failed p2p handshake                     id=3380d474f413952e addr=109.70.186.50:30445   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:53.919] Failed p2p handshake                     id=ae0e7c0bbf2d3ea2 addr=47.91.212.133:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:54.054] DNS discovery lookup                     name=IZVAGBER7KFSWHH2DG7A4IXEA4.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:54.055] Starting p2p dial                        id=3e0cfab894233711 ip=182.139.173.190 flag=dyndial
+TRACE[05-22|09:27:54.055] Starting p2p dial                        id=64ec6fb8cc8a40f9 ip=35.197.129.206  flag=dyndial
+TRACE[05-22|09:27:54.082] Findnode failed                          id=f405a9a52b5031c6 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:54.083] >> PING/v4                               id=f40222eecb25f0e5 addr=58.57.154.116:60606   err=nil
+TRACE[05-22|09:27:54.114] >> FINDNODE/v4                           id=f4050aba27e18c90 addr=219.159.94.76:60608   err=nil
+TRACE[05-22|09:27:54.380] Findnode failed                          id=64ae0b32a5d38712 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:54.382] DNS discovery lookup                     name=ZEEREFVLDLM4PWYHMM7BWYMBDU.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:54.383] Starting p2p dial                        id=38266c4fc9f994c2 ip=159.203.56.33   flag=dyndial
+TRACE[05-22|09:27:54.383] Starting p2p dial                        id=65b84f192b9bc1bc ip=3.126.58.129    flag=dyndial
+TRACE[05-22|09:27:54.384] >> PING/v4                               id=64934e87b1349108 addr=122.152.197.101:20182 err=nil
+TRACE[05-22|09:27:54.384] >> PING/v4                               id=6492cea07be6576a addr=122.51.70.214:20182   err=nil
+TRACE[05-22|09:27:54.615] Findnode failed                          id=f4050aba27e18c90 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:54.615] >> PING/v4                               id=f40201d07ea2dce0 addr=222.174.125.139:60606 err=nil
+TRACE[05-22|09:27:54.646] Failed p2p handshake                     id=38266c4fc9f994c2 addr=159.203.56.33:30307   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:54.681] >> FINDNODE/v4                           id=f402af30f3e8c020 addr=58.57.154.114:50505   err=nil
+TRACE[05-22|09:27:54.710] >> FINDNODE/v4                           id=649d7b11ef94d829 addr=122.51.168.92:20182   err=nil
+TRACE[05-22|09:27:54.717] DNS discovery lookup                     name=NYJOBYKCVEIKIIM2BY5X3CXHA4.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:54.717] Starting p2p dial                        id=310d0482af5ad094 ip=35.231.211.98   flag=dyndial
+TRACE[05-22|09:27:54.788] >> PING/v4                               id=4c3c1bd557bc429a addr=58.57.154.116:60606   err=nil
+TRACE[05-22|09:27:54.868] Failed p2p handshake                     id=65b84f192b9bc1bc addr=3.126.58.129:30403    conn=dyndial err="too many peers"
+TRACE[05-22|09:27:55.036] Failed p2p handshake                     id=310d0482af5ad094 addr=35.231.211.98:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:55.052] DNS discovery lookup                     name=V4RFVBM4NYXD3M2R4DIC7RXHR4.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:55.084] >> FINDNODE/v4                           id=f40222eecb25f0e5 addr=58.57.154.116:60606   err=nil
+TRACE[05-22|09:27:55.181] Findnode failed                          id=f402af30f3e8c020 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:55.182] >> PING/v4                               id=f40261c7c6879b87 addr=58.57.154.172:50505   err=nil
+TRACE[05-22|09:27:55.210] Findnode failed                          id=649d7b11ef94d829 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:55.211] >> PING/v4                               id=648c1a4063cb7158 addr=52.20.201.63:30303    err=nil
+DEBUG[05-22|09:27:55.288] Removed dead node                        b=1  id=4c3c1bd557bc429a ip=58.57.154.116   checks=0
+TRACE[05-22|09:27:55.367] Failed p2p handshake                     id=c4c4fb854b037c47 addr=5.189.147.71:30303    conn=dyndial err="too many peers"
+INFO [05-22|09:27:55.368] Looking for peers                        peercount=0 tried=52 static=0
+TRACE[05-22|09:27:55.368] << PONG/v4                               id=6c22c1d87e918381 addr=52.20.201.63:30303    err="unsolicited reply"
+TRACE[05-22|09:27:55.386] >> FINDNODE/v4                           id=6492cea07be6576a addr=122.51.70.214:20182   err=nil
+TRACE[05-22|09:27:55.386] >> FINDNODE/v4                           id=64934e87b1349108 addr=122.152.197.101:20182 err=nil
+TRACE[05-22|09:27:55.584] Findnode failed                          id=f40222eecb25f0e5 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:55.585] >> PING/v4                               id=f403859b3a3fe04e addr=219.159.94.98:60608   err=nil
+TRACE[05-22|09:27:55.600] >> PING/v4                               id=4ccb6dc4b4055110 addr=47.114.103.69:30332   err=nil
+TRACE[05-22|09:27:55.617] >> FINDNODE/v4                           id=f40201d07ea2dce0 addr=222.174.125.139:60606 err=nil
+TRACE[05-22|09:27:55.885] Findnode failed                          id=64934e87b1349108 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:55.886] Findnode failed                          id=6492cea07be6576a failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:55.886] >> PING/v4                               id=6480cddaa72fe248 addr=80.137.216.209:30303  err=nil
+TRACE[05-22|09:27:55.887] >> PING/v4                               id=648028dea247ac5d addr=112.65.166.66:30303   err=nil
+DEBUG[05-22|09:27:56.100] Removed dead node                        b=8  id=4ccb6dc4b4055110 ip=47.114.103.69   checks=0
+TRACE[05-22|09:27:56.117] Findnode failed                          id=f40201d07ea2dce0 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:56.117] >> PING/v4                               id=f403dc0a192072a6 addr=27.202.33.220:50505   err=nil
+TRACE[05-22|09:27:56.182] >> FINDNODE/v4                           id=f40261c7c6879b87 addr=58.57.154.172:50505   err=nil
+TRACE[05-22|09:27:56.212] >> FINDNODE/v4                           id=648c1a4063cb7158 addr=52.20.201.63:30303    err=nil
+TRACE[05-22|09:27:56.495] << PING/v4                               id=6c22c1d87e918381 addr=52.20.201.63:30303    err=nil
+TRACE[05-22|09:27:56.495] >> PONG/v4                               id=6c22c1d87e918381 addr=52.20.201.63:30303    err=nil
+TRACE[05-22|09:27:56.496] >> PING/v4                               id=6c22c1d87e918381 addr=52.20.201.63:30303    err=nil
+TRACE[05-22|09:27:56.586] >> FINDNODE/v4                           id=f403859b3a3fe04e addr=219.159.94.98:60608   err=nil
+TRACE[05-22|09:27:56.651] << NEIGHBORS/v4                          id=6c22c1d87e918381 addr=52.20.201.63:30303    err="unsolicited reply"
+TRACE[05-22|09:27:56.652] << NEIGHBORS/v4                          id=6c22c1d87e918381 addr=52.20.201.63:30303    err="unsolicited reply"
+TRACE[05-22|09:27:56.656] << PONG/v4                               id=6c22c1d87e918381 addr=52.20.201.63:30303    err=nil
+TRACE[05-22|09:27:56.683] Findnode failed                          id=f40261c7c6879b87 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:56.683] >> PING/v4                               id=f403c5eb1b3b6f55 addr=58.57.154.172:50505   err=nil
+TRACE[05-22|09:27:56.712] Findnode failed                          id=648c1a4063cb7158 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:56.713] >> PING/v4                               id=64aa66a3cc002bc7 addr=94.199.101.25:30305   err=nil
+TRACE[05-22|09:27:56.888] >> FINDNODE/v4                           id=6480cddaa72fe248 addr=80.137.216.209:30303  err=nil
+TRACE[05-22|09:27:56.888] >> FINDNODE/v4                           id=648028dea247ac5d addr=112.65.166.66:30303   err=nil
+TRACE[05-22|09:27:57.086] Findnode failed                          id=f403859b3a3fe04e failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:57.119] >> FINDNODE/v4                           id=f403dc0a192072a6 addr=27.202.33.220:50505   err=nil
+TRACE[05-22|09:27:57.388] Findnode failed                          id=6480cddaa72fe248 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:57.388] Findnode failed                          id=648028dea247ac5d failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:57.618] Findnode failed                          id=f403dc0a192072a6 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:57.684] >> FINDNODE/v4                           id=f403c5eb1b3b6f55 addr=58.57.154.172:50505   err=nil
+TRACE[05-22|09:27:57.713] >> FINDNODE/v4                           id=64aa66a3cc002bc7 addr=94.199.101.25:30305   err=nil
+TRACE[05-22|09:27:57.948] Dial error                               id=649b975db0ab378c addr=188.166.122.49:30303  conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:57.948] Dial error                               id=648de168b39999af addr=47.113.127.69:30333   conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:58.184] Findnode failed                          id=f403c5eb1b3b6f55 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:58.185] >> PING/v4                               id=f41d523feff34f60 addr=178.209.35.17:30305   err=nil
+TRACE[05-22|09:27:58.186] >> PING/v4                               id=f41e0f81346cb948 addr=51.158.190.99:30426   err=nil
+TRACE[05-22|09:27:58.186] >> FINDNODE/v4                           id=f5fb164a5c76dbb5 addr=68.183.99.5:30303     err=nil
+TRACE[05-22|09:27:58.213] Findnode failed                          id=64aa66a3cc002bc7 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:27:58.214] Discarding dial candidate                id=3becf3f13b090bcc ip=18.130.93.66    reason="recently dialed"
+TRACE[05-22|09:27:58.214] Starting p2p dial                        id=4df6cc1a1e1e2f2f ip=139.99.62.138   flag=dyndial
+TRACE[05-22|09:27:58.214] Discarding dial candidate                id=3064061e8cb4d357 ip=162.243.55.45   reason="recently dialed"
+TRACE[05-22|09:27:58.269] Dial error                               id=c56b2fc3020fd5ba addr=39.98.188.152:30303   conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:58.296] DNS discovery lookup                     name=JISQESGUFUSYNGGVCKEHJQVS2M.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:58.297] Starting p2p dial                        id=ff3e0f5147c1d4bf ip=45.63.23.186    flag=dyndial
+TRACE[05-22|09:27:58.297] Discarding dial candidate                id=22ec854117125934 ip=159.89.169.103  reason="recently dialed"
+TRACE[05-22|09:27:58.329] << NEIGHBORS/v4                          id=f5fb164a5c76dbb5 addr=68.183.99.5:30303     err=nil
+TRACE[05-22|09:27:58.331] << NEIGHBORS/v4                          id=f5fb164a5c76dbb5 addr=68.183.99.5:30303     err=nil
+TRACE[05-22|09:27:58.331] >> PING/v4                               id=f9f9a237283d2527 addr=155.138.211.174:30303 err=nil
+TRACE[05-22|09:27:58.343] Dial error                               id=64ae0b32a5d38712 addr=34.255.41.88:30303    conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:58.402] DNS discovery lookup                     name=FCTGZT55JVQDOFYFWN5CTRVAKM.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:58.403] Starting p2p dial                        id=e727e18e71336cff ip=141.134.112.212 flag=dyndial
+TRACE[05-22|09:27:58.403] Discarding dial candidate                id=1969d3adf6797e93 ip=159.203.56.33   reason="recently dialed"
+TRACE[05-22|09:27:58.538] DNS discovery lookup                     name=GAWRY2HVO2AX2NC4PLLRFTEFOI.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:58.539] Starting p2p dial                        id=de7efb4d057880ff ip=206.189.64.158  flag=dyndial
+TRACE[05-22|09:27:58.539] Discarding dial candidate                id=1887e1b2b420425c ip=35.187.57.94    reason="recently dialed"
+TRACE[05-22|09:27:58.585] << PONG/v4                               id=f9f9a237283d2527 addr=155.138.211.174:30303 err=nil
+TRACE[05-22|09:27:58.586] << PING/v4                               id=f9f9a237283d2527 addr=155.138.211.174:30303 err=nil
+TRACE[05-22|09:27:58.586] >> PONG/v4                               id=f9f9a237283d2527 addr=155.138.211.174:30303 err=nil
+TRACE[05-22|09:27:58.628] DNS discovery lookup                     name=IWYIW5CQBB4AFQPRNRIJMKKRIE.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:58.629] Starting p2p dial                        id=af40bd1504211737 ip=45.76.45.12     flag=dyndial
+TRACE[05-22|09:27:58.629] Discarding dial candidate                id=04a037eabb45f18c ip=178.128.55.119  reason="recently dialed"
+TRACE[05-22|09:27:58.657] Dial error                               id=64fd808c625cda0b addr=35.221.175.164:30303  conn=dyndial err="i/o timeout"
+TRACE[05-22|09:27:58.666] << PONG/v4                               id=f41d523feff34f60 addr=178.209.35.17:30305   err=nil
+TRACE[05-22|09:27:58.707] Failed p2p handshake                     id=ff3e0f5147c1d4bf addr=45.63.23.186:30303    conn=dyndial err="too many peers"
+TRACE[05-22|09:27:58.710] DNS discovery lookup                     name=64OKEZ53S7PU2NLG5DAADVWR6M.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:58.711] Starting p2p dial                        id=9e7ec22592c457be ip=47.91.30.48     flag=dyndial
+TRACE[05-22|09:27:58.711] Discarding dial candidate                id=64a63027f2f441d1 ip=149.129.99.203  reason="recently dialed"
+TRACE[05-22|09:27:58.737] Failed p2p handshake                     id=de7efb4d057880ff addr=206.189.64.158:30301  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:58.788] DNS discovery lookup                     name=3TFLWSYNDYXFBXTCAKWGKEVPEI.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:58.788] Starting p2p dial                        id=fa8dad544eb6f6c7 ip=80.66.80.221    flag=dyndial
+TRACE[05-22|09:27:58.788] Discarding dial candidate                id=64ae0b32a5d38712 ip=34.255.41.88    reason="recently dialed"
+TRACE[05-22|09:27:58.794] Failed p2p handshake                     id=4df6cc1a1e1e2f2f addr=139.99.62.138:40306   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:58.868] DNS discovery lookup                     name=7VUMWQHKVFTG7D5CWVX4OVVOWE.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:58.870] Starting p2p dial                        id=3a7174100f51c466 ip=109.229.182.75  flag=dyndial
+TRACE[05-22|09:27:58.870] Discarding dial candidate                id=64b04e7fd1774591 ip=18.156.71.74    reason="recently dialed"
+TRACE[05-22|09:27:58.943] DNS discovery lookup                     name=F6ZVZR6MNJ6SRTTVE7XUZLPDYM.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:58.944] Starting p2p dial                        id=bf685f3e8becc7e7 ip=145.239.232.114 flag=dyndial
+TRACE[05-22|09:27:58.944] Discarding dial candidate                id=64befb3075a19d30 ip=198.199.105.12  reason="recently dialed"
+TRACE[05-22|09:27:58.970] Failed p2p handshake                     id=e727e18e71336cff addr=141.134.112.212:30303 conn=dyndial err="too many peers"
+TRACE[05-22|09:27:59.020] DNS discovery lookup                     name=BWCKVCXLTMXNYWRCYRDQAVLUWQ.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:59.020] Starting p2p dial                        id=d5648900df781d39 ip=88.208.57.212   flag=dyndial
+TRACE[05-22|09:27:59.020] Discarding dial candidate                id=64842aad4b12d932 ip=108.160.141.69  reason="recently dialed"
+TRACE[05-22|09:27:59.068] Failed p2p handshake                     id=9e7ec22592c457be addr=47.91.30.48:30303     conn=dyndial err="too many peers"
+TRACE[05-22|09:27:59.085] >> FINDNODE/v4                           id=f9f9a237283d2527 addr=155.138.211.174:30303 err=nil
+TRACE[05-22|09:27:59.091] Failed p2p handshake                     id=af40bd1504211737 addr=45.76.45.12:30303     conn=dyndial err="too many peers"
+TRACE[05-22|09:27:59.167] >> FINDNODE/v4                           id=f41d523feff34f60 addr=178.209.35.17:30305   err=nil
+TRACE[05-22|09:27:59.187] >> FINDNODE/v4                           id=f41e0f81346cb948 addr=51.158.190.99:30426   err=nil
+TRACE[05-22|09:27:59.219] << NEIGHBORS/v4                          id=f9f9a237283d2527 addr=155.138.211.174:30303 err=nil
+TRACE[05-22|09:27:59.221] << NEIGHBORS/v4                          id=f9f9a237283d2527 addr=155.138.211.174:30303 err=nil
+TRACE[05-22|09:27:59.222] >> PING/v4                               id=f9d50fbb63c09114 addr=172.104.49.105:27303  err=nil
+TRACE[05-22|09:27:59.245] DNS discovery lookup                     name=EYNLIQ4VG626UWOSXGOF3QX2BE.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:59.330] DNS discovery lookup                     name=DX6BBDYEDZPOEFPFS5W2LZZYPY.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:59.331] Starting p2p dial                        id=da58475b812f82c6 ip=195.201.163.75  flag=dyndial
+TRACE[05-22|09:27:59.331] Discarding dial candidate                id=6481bf3ce29d1f12 ip=63.251.173.4    reason="recently dialed"
+DEBUG[05-22|09:27:59.348] Adding p2p peer                          peercount=1 id=fa8dad544eb6f6c7 conn=dyndial addr=80.66.80.221:30321    name=MultiGeth/etc.icanmi...
+TRACE[05-22|09:27:59.349] Starting protocol eth/65                 id=fa8dad544eb6f6c7 conn=dyndial
+TRACE[05-22|09:27:59.349] Protocol eth/65 failed                   id=fa8dad544eb6f6c7 conn=dyndial err="client quitting"
+DEBUG[05-22|09:27:59.349] Removing p2p peer                        peercount=0 id=fa8dad544eb6f6c7 duration="891.154µs" req=false err="client quitting"
+TRACE[05-22|09:27:59.407] << PING/v4                               id=f41d523feff34f60 addr=178.209.35.17:30305   err=nil
+TRACE[05-22|09:27:59.408] >> PONG/v4                               id=f41d523feff34f60 addr=178.209.35.17:30305   err=nil
+TRACE[05-22|09:27:59.409] Failed p2p handshake                     id=bf685f3e8becc7e7 addr=145.239.232.114:30190 conn=dyndial err="too many peers"
+TRACE[05-22|09:27:59.410] DNS discovery lookup                     name=5GYXI2UWLO5HSE7CPBCKP2GTFE.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:59.411] Starting p2p dial                        id=3c08874dfb1029e6 ip=3.215.79.137    flag=dyndial
+TRACE[05-22|09:27:59.411] Discarding dial candidate                id=648de168b39999af ip=47.113.127.69   reason="recently dialed"
+TRACE[05-22|09:27:59.420] << PING/v4                               id=f41e0f81346cb948 addr=51.158.190.99:30426   err=nil
+TRACE[05-22|09:27:59.420] >> PONG/v4                               id=f41e0f81346cb948 addr=51.158.190.99:30426   err=nil
+TRACE[05-22|09:27:59.421] >> PING/v4                               id=f41e0f81346cb948 addr=51.158.190.99:30426   err=nil
+TRACE[05-22|09:27:59.490] Failed p2p handshake                     id=d5648900df781d39 addr=88.208.57.212:30304   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:59.495] DNS discovery lookup                     name=GLOGHZ3NBQCMRZH5DFOLUK5MDU.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:59.496] Starting p2p dial                        id=c613ca9ea6aa4ae1 ip=142.4.213.133   flag=dyndial
+TRACE[05-22|09:27:59.496] Discarding dial candidate                id=649b975db0ab378c ip=188.166.122.49  reason="recently dialed"
+TRACE[05-22|09:27:59.497] << PONG/v4                               id=f9d50fbb63c09114 addr=172.104.49.105:27303  err=nil
+TRACE[05-22|09:27:59.500] Failed p2p handshake                     id=3a7174100f51c466 addr=109.229.182.75:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:59.656] << NEIGHBORS/v4                          id=f41e0f81346cb948 addr=51.158.190.99:30426   err=nil
+TRACE[05-22|09:27:59.658] << NEIGHBORS/v4                          id=f41e0f81346cb948 addr=51.158.190.99:30426   err=nil
+TRACE[05-22|09:27:59.658] << PONG/v4                               id=f41e0f81346cb948 addr=51.158.190.99:30426   err=nil
+TRACE[05-22|09:27:59.659] >> PING/v4                               id=f9cef9b4c51bfa91 addr=35.180.58.0:1301      err=nil
+TRACE[05-22|09:27:59.663] << NEIGHBORS/v4                          id=f41d523feff34f60 addr=178.209.35.17:30305   err=nil
+TRACE[05-22|09:27:59.664] Invalid neighbor node received           ip=114.67.105.84   addr=178.209.35.17:30305   err="low port"
+TRACE[05-22|09:27:59.664] << NEIGHBORS/v4                          id=f41d523feff34f60 addr=178.209.35.17:30305   err=nil
+TRACE[05-22|09:27:59.665] >> PING/v4                               id=f9d356dab07d1c29 addr=49.233.11.171:40440   err=nil
+TRACE[05-22|09:27:59.700] Failed p2p handshake                     id=3c08874dfb1029e6 addr=3.215.79.137:30303    conn=dyndial err="too many peers"
+TRACE[05-22|09:27:59.708] DNS discovery lookup                     name=UI7VLWN73NSZQVPYD2MCHTKIRA.all.classic.blockd.info err=nil
+TRACE[05-22|09:27:59.709] Starting p2p dial                        id=997e0f7a0422f08d ip=47.93.114.242   flag=dyndial
+TRACE[05-22|09:27:59.709] Discarding dial candidate                id=64e35bb748f9ad48 ip=54.38.55.42     reason="recently dialed"
+TRACE[05-22|09:27:59.782] Failed p2p handshake                     id=da58475b812f82c6 addr=195.201.163.75:30304  conn=dyndial err="too many peers"
+TRACE[05-22|09:27:59.793] Failed p2p handshake                     id=c613ca9ea6aa4ae1 addr=142.4.213.133:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:27:59.883] << PONG/v4                               id=f9cef9b4c51bfa91 addr=35.180.58.0:1301      err=nil
+TRACE[05-22|09:27:59.884] << PING/v4                               id=f9cef9b4c51bfa91 addr=35.180.58.0:1301      err=nil
+TRACE[05-22|09:27:59.885] >> PONG/v4                               id=f9cef9b4c51bfa91 addr=35.180.58.0:1301      err=nil
+TRACE[05-22|09:27:59.998] >> FINDNODE/v4                           id=f9d50fbb63c09114 addr=172.104.49.105:27303  err=nil
+TRACE[05-22|09:28:00.187] DNS discovery lookup                     name=K34F74FZFTJZ6DZMQ7XPZJWMJ4.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:00.274] << PING/v4                               id=f9d50fbb63c09114 addr=172.104.49.105:27303  err=nil
+TRACE[05-22|09:28:00.274] >> PONG/v4                               id=f9d50fbb63c09114 addr=172.104.49.105:27303  err=nil
+TRACE[05-22|09:28:00.383] DNS discovery lookup                     name=CQY5S62SZ5VKLG6CT5WW26Q5VU.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:00.384] >> FINDNODE/v4                           id=f9cef9b4c51bfa91 addr=35.180.58.0:1301      err=nil
+TRACE[05-22|09:28:00.384] Starting p2p dial                        id=2831e5a2550313cd ip=185.12.95.178   flag=dyndial
+TRACE[05-22|09:28:00.384] Discarding dial candidate                id=64ffbef8a4129bfc ip=3.133.136.84    reason="recently dialed"
+TRACE[05-22|09:28:00.384] >> FINDNODE/v4                           id=22ec854117125934 addr=159.89.169.103:30303  err=nil
+TRACE[05-22|09:28:00.385] >> FINDNODE/v4                           id=3becf3f13b090bcc addr=18.130.93.66:30303    err=nil
+TRACE[05-22|09:28:00.385] >> PING/v4                               id=3064061e8cb4d357 addr=162.243.55.45:30303   err=nil
+TRACE[05-22|09:28:00.498] Findnode failed                          id=f9d50fbb63c09114 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:00.499] >> PING/v4                               id=f9d188f9048a8754 addr=82.64.158.44:30312    err=nil
+TRACE[05-22|09:28:00.555] << NEIGHBORS/v4                          id=f9d50fbb63c09114 addr=172.104.49.105:27303  err="unsolicited reply"
+TRACE[05-22|09:28:00.555] << NEIGHBORS/v4                          id=f9d50fbb63c09114 addr=172.104.49.105:27303  err="unsolicited reply"
+TRACE[05-22|09:28:00.607] << NEIGHBORS/v4                          id=f9cef9b4c51bfa91 addr=35.180.58.0:1301      err=nil
+TRACE[05-22|09:28:00.608] << NEIGHBORS/v4                          id=f9cef9b4c51bfa91 addr=35.180.58.0:1301      err=nil
+TRACE[05-22|09:28:00.608] >> PING/v4                               id=f9ed46ab3f49e9ce addr=213.167.79.40:30304   err=nil
+TRACE[05-22|09:28:00.611] << NEIGHBORS/v4                          id=3becf3f13b090bcc addr=18.130.93.66:30303    err=nil
+TRACE[05-22|09:28:00.611] << NEIGHBORS/v4                          id=3becf3f13b090bcc addr=18.130.93.66:30303    err=nil
+TRACE[05-22|09:28:00.666] >> FINDNODE/v4                           id=f9d356dab07d1c29 addr=49.233.11.171:40440   err=nil
+TRACE[05-22|09:28:00.706] DNS discovery lookup                     name=HJL3EB55CL2XNCD24WGIAS5HOA.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:00.708] Starting p2p dial                        id=ca0f8fea097f7acf ip=91.205.145.149  flag=dyndial
+TRACE[05-22|09:28:00.708] Starting p2p dial                        id=3ba769a81b0094ab ip=178.238.233.73  flag=dyndial
+TRACE[05-22|09:28:00.715] Dial error                               id=2fe62fc45183723f addr=171.15.16.35:30303    conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:00.715] Dial error                               id=64b0bcb9a18a04e4 addr=113.246.183.123:42248 conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:00.730] << NEIGHBORS/v4                          id=22ec854117125934 addr=159.89.169.103:30303  err=nil
+TRACE[05-22|09:28:00.730] << NEIGHBORS/v4                          id=22ec854117125934 addr=159.89.169.103:30303  err=nil
+TRACE[05-22|09:28:00.754] << PONG/v4                               id=f9d188f9048a8754 addr=82.64.158.44:30312    err=nil
+TRACE[05-22|09:28:00.756] << PING/v4                               id=f9d188f9048a8754 addr=82.64.158.44:30312    err=nil
+TRACE[05-22|09:28:00.756] >> PONG/v4                               id=f9d188f9048a8754 addr=82.64.158.44:30312    err=nil
+TRACE[05-22|09:28:00.833] << PONG/v4                               id=f9ed46ab3f49e9ce addr=213.167.79.40:30304   err=nil
+TRACE[05-22|09:28:00.925] Failed p2p handshake                     id=2831e5a2550313cd addr=185.12.95.178:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:01.044] Dial error                               id=64185baca70858a5 addr=83.237.105.118:30303  conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:01.045] DNS discovery lookup                     name=G32FCFOXML6JYH2UYGNZYRZ4IM.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:01.045] Discarding dial candidate                id=059fce3b4d826ceb ip=47.115.150.90   reason="recently dialed"
+TRACE[05-22|09:28:01.045] Starting p2p dial                        id=3ba1ddedba637ac5 ip=45.67.229.249   flag=dyndial
+TRACE[05-22|09:28:01.166] Findnode failed                          id=f9d356dab07d1c29 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:01.166] >> PING/v4                               id=f9eb4ac9f6fdded3 addr=142.234.200.112:30303 err=nil
+DEBUG[05-22|09:28:01.214] Adding p2p peer                          peercount=1 id=3ba769a81b0094ab conn=dyndial addr=178.238.233.73:30303  name=gonex/v3.0.8-unstabl...
+TRACE[05-22|09:28:01.214] Starting protocol eth/64                 id=3ba769a81b0094ab conn=dyndial
+TRACE[05-22|09:28:01.214] Protocol eth/64 failed                   id=3ba769a81b0094ab conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:01.214] Removing p2p peer                        peercount=0 id=3ba769a81b0094ab duration="217.719µs" req=false err="client quitting"
+TRACE[05-22|09:28:01.254] >> FINDNODE/v4                           id=f9d188f9048a8754 addr=82.64.158.44:30312    err=nil
+TRACE[05-22|09:28:01.262] Failed p2p handshake                     id=ca0f8fea097f7acf addr=91.205.145.149:30003  conn=dyndial err="too many peers"
+TRACE[05-22|09:28:01.320] << PONG/v4                               id=f9eb4ac9f6fdded3 addr=142.234.200.112:30303 err=nil
+TRACE[05-22|09:28:01.331] << PING/v4                               id=f9eb4ac9f6fdded3 addr=142.234.200.112:30303 err=nil
+TRACE[05-22|09:28:01.332] >> PONG/v4                               id=f9eb4ac9f6fdded3 addr=142.234.200.112:30303 err=nil
+TRACE[05-22|09:28:01.333] >> FINDNODE/v4                           id=f9ed46ab3f49e9ce addr=213.167.79.40:30304   err=nil
+TRACE[05-22|09:28:01.380] DNS discovery lookup                     name=4VUFZ33Q2YWVNUWMNFALZJBWKQ.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:01.380] Starting p2p dial                        id=7b925d95a67a28c2 ip=199.247.11.220  flag=dyndial
+TRACE[05-22|09:28:01.380] Starting p2p dial                        id=3baf4f586e4a7ac1 ip=45.146.41.14    flag=dyndial
+TRACE[05-22|09:28:01.381] Dial error                               id=640ae72b3e4c1b54 addr=134.175.53.165:20182  conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:01.386] >> FINDNODE/v4                           id=3064061e8cb4d357 addr=162.243.55.45:30303   err=nil
+TRACE[05-22|09:28:01.511] << NEIGHBORS/v4                          id=f9d188f9048a8754 addr=82.64.158.44:30312    err=nil
+TRACE[05-22|09:28:01.511] << NEIGHBORS/v4                          id=f9d188f9048a8754 addr=82.64.158.44:30312    err=nil
+TRACE[05-22|09:28:01.512] >> PING/v4                               id=f9e641aac307f1c3 addr=99.80.181.153:30301   err=nil
+DEBUG[05-22|09:28:01.622] Adding p2p peer                          peercount=1 id=3ba1ddedba637ac5 conn=dyndial addr=45.67.229.249:30303   name=MultiGeth/v1.9.16-st...
+TRACE[05-22|09:28:01.622] Starting protocol eth/65                 id=3ba1ddedba637ac5 conn=dyndial
+TRACE[05-22|09:28:01.622] Protocol eth/65 failed                   id=3ba1ddedba637ac5 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:01.622] Removing p2p peer                        peercount=0 id=3ba1ddedba637ac5 duration="183.072µs" req=false err="client quitting"
+TRACE[05-22|09:28:01.709] Dial error                               id=6436f644a35fc3ac addr=58.243.201.57:30333   conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:01.715] DNS discovery lookup                     name=7AR4PSZUQ3A6O5BKJWBNY7ZO7U.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:01.716] Starting p2p dial                        id=5232de366137b447 ip=91.152.122.32   flag=dyndial
+TRACE[05-22|09:28:01.716] Starting p2p dial                        id=3baac27d95504394 ip=47.112.224.230  flag=dyndial
+TRACE[05-22|09:28:01.737] >> PING/v4                               id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+TRACE[05-22|09:28:01.751] << PONG/v4                               id=f9e641aac307f1c3 addr=99.80.181.153:30301   err=nil
+TRACE[05-22|09:28:01.752] << PING/v4                               id=f9e641aac307f1c3 addr=99.80.181.153:30301   err=nil
+TRACE[05-22|09:28:01.752] >> PONG/v4                               id=f9e641aac307f1c3 addr=99.80.181.153:30301   err=nil
+TRACE[05-22|09:28:01.820] >> FINDNODE/v4                           id=f9eb4ac9f6fdded3 addr=142.234.200.112:30303 err=nil
+TRACE[05-22|09:28:01.832] Failed p2p handshake                     id=7b925d95a67a28c2 addr=199.247.11.220:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:28:01.834] Findnode failed                          id=f9ed46ab3f49e9ce failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:01.834] >> PING/v4                               id=f99530c55fb1691c addr=13.125.17.127:30303   err=nil
+TRACE[05-22|09:28:01.869] Failed p2p handshake                     id=3baf4f586e4a7ac1 addr=45.146.41.14:30303    conn=dyndial err="too many peers"
+TRACE[05-22|09:28:01.886] Findnode failed                          id=3064061e8cb4d357 failcount=4  results=0 err="RPC timeout"
+TRACE[05-22|09:28:01.980] << NEIGHBORS/v4                          id=f9eb4ac9f6fdded3 addr=142.234.200.112:30303 err=nil
+TRACE[05-22|09:28:01.980] << NEIGHBORS/v4                          id=f9eb4ac9f6fdded3 addr=142.234.200.112:30303 err=nil
+TRACE[05-22|09:28:01.980] >> PING/v4                               id=f990f3423d2886ae addr=167.172.178.40:30302  err=nil
+TRACE[05-22|09:28:02.041] DNS discovery lookup                     name=4R7WC47U2F6FQE5U7MI4US5RQQ.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:02.041] Starting p2p dial                        id=05d41875a7c3fa28 ip=35.222.47.30    flag=dyndial
+TRACE[05-22|09:28:02.042] Starting p2p dial                        id=3baae26dd4fa6007 ip=195.201.245.47  flag=dyndial
+TRACE[05-22|09:28:02.143] << PONG/v4                               id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+TRACE[05-22|09:28:02.143] >> ENRREQUEST/v4                         id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+TRACE[05-22|09:28:02.144] << PING/v4                               id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+TRACE[05-22|09:28:02.144] >> PONG/v4                               id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+TRACE[05-22|09:28:02.205] << PONG/v4                               id=f990f3423d2886ae addr=167.172.178.40:30302  err=nil
+TRACE[05-22|09:28:02.252] >> FINDNODE/v4                           id=f9e641aac307f1c3 addr=99.80.181.153:30301   err=nil
+DEBUG[05-22|09:28:02.269] Adding p2p peer                          peercount=1 id=05d41875a7c3fa28 conn=dyndial addr=35.222.47.30:30303    name=Geth/v1.9.14-stable-...
+TRACE[05-22|09:28:02.269] Starting protocol eth/65                 id=05d41875a7c3fa28 conn=dyndial
+TRACE[05-22|09:28:02.269] Protocol eth/65 failed                   id=05d41875a7c3fa28 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:02.269] Removing p2p peer                        peercount=0 id=05d41875a7c3fa28 duration="160.176µs" req=false err="client quitting"
+DEBUG[05-22|09:28:02.293] Adding p2p peer                          peercount=1 id=5232de366137b447 conn=dyndial addr=91.152.122.32:30303   name=MultiGeth/v1.9.15-un...
+TRACE[05-22|09:28:02.293] Starting protocol eth/65                 id=5232de366137b447 conn=dyndial
+TRACE[05-22|09:28:02.293] Protocol eth/65 failed                   id=5232de366137b447 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:02.294] Removing p2p peer                        peercount=0 id=5232de366137b447 duration="211.867µs" req=false err="client quitting"
+TRACE[05-22|09:28:02.381] DNS discovery lookup                     name=S6TWDSJ24VKQM3MCECAA6BF3R4.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:02.381] Starting p2p dial                        id=bd1203ac725a8910 ip=47.240.106.205  flag=dyndial
+TRACE[05-22|09:28:02.381] Starting p2p dial                        id=3bb258318061811a ip=134.175.81.52   flag=dyndial
+TRACE[05-22|09:28:02.487] Invalid neighbor node received           ip=114.67.105.84   addr=99.80.181.153:30301   err="low port"
+TRACE[05-22|09:28:02.487] << NEIGHBORS/v4                          id=f9e641aac307f1c3 addr=99.80.181.153:30301   err=nil
+TRACE[05-22|09:28:02.488] << NEIGHBORS/v4                          id=f9e641aac307f1c3 addr=99.80.181.153:30301   err=nil
+TRACE[05-22|09:28:02.488] >> PING/v4                               id=f98f29f09679b394 addr=212.24.103.123:30303  err=nil
+TRACE[05-22|09:28:02.495] Failed p2p handshake                     id=3baae26dd4fa6007 addr=195.201.245.47:30301  conn=dyndial err="too many peers"
+DEBUG[05-22|09:28:02.643] ENR request failed                       id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err="RPC timeout"
+DEBUG[05-22|09:28:02.644] Revalidated node                         b=3  id=4c3bcc6a8ede288b checks=1
+TRACE[05-22|09:28:02.705] >> FINDNODE/v4                           id=f990f3423d2886ae addr=167.172.178.40:30302  err=nil
+TRACE[05-22|09:28:02.711] DNS discovery lookup                     name=37E3CUTYCXJ2OSXATLYTAZUAUQ.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:02.711] Discarding dial candidate                id=51b59fdee3fc3ac3 ip=101.133.229.66  reason="recently dialed"
+TRACE[05-22|09:28:02.711] Starting p2p dial                        id=3bb1a6d0b32b9a09 ip=113.196.66.76   flag=dyndial
+TRACE[05-22|09:28:02.745] << PONG/v4                               id=f98f29f09679b394 addr=212.24.103.123:30303  err=nil
+TRACE[05-22|09:28:02.746] << PING/v4                               id=f98f29f09679b394 addr=212.24.103.123:30303  err=nil
+TRACE[05-22|09:28:02.746] >> PONG/v4                               id=f98f29f09679b394 addr=212.24.103.123:30303  err=nil
+TRACE[05-22|09:28:02.834] >> FINDNODE/v4                           id=f99530c55fb1691c addr=13.125.17.127:30303   err=nil
+TRACE[05-22|09:28:02.874] Failed p2p handshake                     id=bd1203ac725a8910 addr=47.240.106.205:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:28:02.935] << PING/v4                               id=f990f3423d2886ae addr=167.172.178.40:30302  err=nil
+TRACE[05-22|09:28:02.935] >> PONG/v4                               id=f990f3423d2886ae addr=167.172.178.40:30302  err=nil
+TRACE[05-22|09:28:02.936] Dial error                               id=3bb1a6d0b32b9a09 addr=113.196.66.76:5000    conn=dyndial err="connect: connection refused"
+TRACE[05-22|09:28:03.040] DNS discovery lookup                     name=MJB5AJNORUMH5JDTM7ZYPHRRX4.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:03.040] Starting p2p dial                        id=2567949d4d24be03 ip=165.22.108.187  flag=dyndial
+TRACE[05-22|09:28:03.040] Starting p2p dial                        id=3bb9c64acf538dc7 ip=3.235.177.186   flag=dyndial
+TRACE[05-22|09:28:03.157] << NEIGHBORS/v4                          id=f990f3423d2886ae addr=167.172.178.40:30302  err=nil
+TRACE[05-22|09:28:03.158] << NEIGHBORS/v4                          id=f990f3423d2886ae addr=167.172.178.40:30302  err=nil
+DEBUG[05-22|09:28:03.158] IP exceeds bucket limit                  ip=219.159.95.158
+TRACE[05-22|09:28:03.159] >> PING/v4                               id=f9db9d8906e751b9 addr=27.202.42.78:50505    err=nil
+TRACE[05-22|09:28:03.245] >> FINDNODE/v4                           id=f98f29f09679b394 addr=212.24.103.123:30303  err=nil
+TRACE[05-22|09:28:03.334] Findnode failed                          id=f99530c55fb1691c failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:03.335] >> PING/v4                               id=f9d92e98f0d02e89 addr=66.253.183.238:30304  err=nil
+TRACE[05-22|09:28:03.373] DNS discovery lookup                     name=RABTSH26JM3L2C7ZPURM2FOMBY.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:03.374] Starting p2p dial                        id=60fe495070bbea6d ip=47.107.33.75    flag=dyndial
+TRACE[05-22|09:28:03.374] Starting p2p dial                        id=3b84658c6a6794f9 ip=193.169.240.112 flag=dyndial
+DEBUG[05-22|09:28:03.467] Adding p2p peer                          peercount=1 id=3bb9c64acf538dc7 conn=dyndial addr=3.235.177.186:30303   name=Parity-Ethereum/v2.7...
+TRACE[05-22|09:28:03.467] Starting protocol eth/63                 id=3bb9c64acf538dc7 conn=dyndial
+TRACE[05-22|09:28:03.467] Protocol eth/63 failed                   id=3bb9c64acf538dc7 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:03.467] Removing p2p peer                        peercount=0 id=3bb9c64acf538dc7 duration="180.808µs" req=false err="client quitting"
+TRACE[05-22|09:28:03.502] << NEIGHBORS/v4                          id=f98f29f09679b394 addr=212.24.103.123:30303  err=nil
+TRACE[05-22|09:28:03.503] << NEIGHBORS/v4                          id=f98f29f09679b394 addr=212.24.103.123:30303  err=nil
+TRACE[05-22|09:28:03.503] >> PING/v4                               id=f9d6b71e42162122 addr=49.233.93.2:20182     err=nil
+TRACE[05-22|09:28:03.715] DNS discovery lookup                     name=TFG7RSY4WGMI7OLNM5BM3Q722E.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:03.715] Starting p2p dial                        id=4066de47634f293e ip=185.197.162.25  flag=dyndial
+TRACE[05-22|09:28:03.716] Starting p2p dial                        id=3b84f4e47e8f446b ip=47.75.33.33     flag=dyndial
+TRACE[05-22|09:28:03.904] Failed p2p handshake                     id=2567949d4d24be03 addr=165.22.108.187:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:28:03.911] Failed p2p handshake                     id=3b84658c6a6794f9 addr=193.169.240.112:30303 conn=dyndial err="too many peers"
+TRACE[05-22|09:28:04.044] DNS discovery lookup                     name=TNMG46RRUQ7GK5WLQA4QYHOKYA.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:04.046] Starting p2p dial                        id=2ab747516ad802e1 ip=138.68.8.225    flag=dyndial
+TRACE[05-22|09:28:04.046] Starting p2p dial                        id=3b80eb4995e7bb8f ip=104.219.42.148  flag=dyndial
+TRACE[05-22|09:28:04.159] >> FINDNODE/v4                           id=f9db9d8906e751b9 addr=27.202.42.78:50505    err=nil
+TRACE[05-22|09:28:04.211] Rejected peer                            id=3b84f4e47e8f446b addr=47.75.33.33:30322     conn=dyndial err="useless peer"
+TRACE[05-22|09:28:04.239] Failed p2p handshake                     id=2ab747516ad802e1 addr=138.68.8.225:30301    conn=dyndial err="too many peers"
+TRACE[05-22|09:28:04.299] Failed p2p handshake                     id=3b80eb4995e7bb8f addr=104.219.42.148:30304  conn=dyndial err="too many peers"
+TRACE[05-22|09:28:04.336] >> FINDNODE/v4                           id=f9d92e98f0d02e89 addr=66.253.183.238:30304  err=nil
+TRACE[05-22|09:28:04.409] DNS discovery lookup                     name=SP7XFZVMZOH7GFA7ATUGG3FWKI.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:04.410] Starting p2p dial                        id=50c44565366c8639 ip=203.66.168.31   flag=dyndial
+TRACE[05-22|09:28:04.410] Starting p2p dial                        id=3b8dce8b53d2655f ip=47.74.213.68    flag=dyndial
+TRACE[05-22|09:28:04.429] << PING/v4                               id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+TRACE[05-22|09:28:04.430] >> PONG/v4                               id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+TRACE[05-22|09:28:04.504] >> FINDNODE/v4                           id=f9d6b71e42162122 addr=49.233.93.2:20182     err=nil
+TRACE[05-22|09:28:04.660] Findnode failed                          id=f9db9d8906e751b9 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:04.661] >> PING/v4                               id=f9d47cac4f2d9b75 addr=219.159.95.158:60606  err=nil
+TRACE[05-22|09:28:04.711] DNS discovery lookup                     name=FPPRX6CWEWYR5S6YJ2JQGSXYPI.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:04.712] Starting p2p dial                        id=15875244d62d5d2f ip=207.148.9.130   flag=dyndial
+TRACE[05-22|09:28:04.712] Starting p2p dial                        id=3b8b770e71e978e6 ip=52.29.109.18    flag=dyndial
+TRACE[05-22|09:28:04.814] << ENRREQUEST/v4                         id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+TRACE[05-22|09:28:04.815] >> ENRRESPONSE/v4                        id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+TRACE[05-22|09:28:04.836] Findnode failed                          id=f9d92e98f0d02e89 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:04.837] >> PING/v4                               id=f9d3cb665ef60a8d addr=159.89.228.225:30303  err=nil
+DEBUG[05-22|09:28:04.924] Adding p2p peer                          peercount=1 id=50c44565366c8639 conn=dyndial addr=203.66.168.31:30304   name=Geth/v1.9.12-unstabl...
+TRACE[05-22|09:28:04.924] Starting protocol eth/65                 id=50c44565366c8639 conn=dyndial
+TRACE[05-22|09:28:04.924] Protocol eth/65 failed                   id=50c44565366c8639 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:04.924] Removing p2p peer                        peercount=0 id=50c44565366c8639 duration="667.32µs"  req=false err="client quitting"
+TRACE[05-22|09:28:05.004] Findnode failed                          id=f9d6b71e42162122 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:05.005] >> PING/v4                               id=f9d17485727d70cd addr=219.159.95.158:60608  err=nil
+TRACE[05-22|09:28:05.018] Failed p2p handshake                     id=15875244d62d5d2f addr=207.148.9.130:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:05.045] DNS discovery lookup                     name=T5R3BE3UNM2QQ3Q4DP3AXQCP4M.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:05.045] Dial error                               id=a597d00dd290d704 addr=47.108.52.30:30303    conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:05.046] Starting p2p dial                        id=b3114f4207d17c71 ip=54.36.178.147   flag=dyndial
+TRACE[05-22|09:28:05.046] Starting p2p dial                        id=3b880a53edbf8574 ip=18.184.201.79   flag=dyndial
+DEBUG[05-22|09:28:05.236] Adding p2p peer                          peercount=1 id=3b8b770e71e978e6 conn=dyndial addr=52.29.109.18:30303    name=Geth/v1.9.10-stable-...
+TRACE[05-22|09:28:05.237] Starting protocol eth/64                 id=3b8b770e71e978e6 conn=dyndial
+TRACE[05-22|09:28:05.237] Protocol eth/64 failed                   id=3b8b770e71e978e6 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:05.237] Removing p2p peer                        peercount=0 id=3b8b770e71e978e6 duration="712.391µs" req=false err="client quitting"
+TRACE[05-22|09:28:05.373] DNS discovery lookup                     name=PV567XNY4II7MTKG3GYOK3IMLA.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:05.374] Starting p2p dial                        id=26275c15daadff78 ip=103.140.229.102 flag=dyndial
+INFO [05-22|09:28:05.374] Looking for peers                        peercount=0 tried=44 static=0
+TRACE[05-22|09:28:05.374] Starting p2p dial                        id=3b88e84f02a6a1b0 ip=207.180.203.122 flag=dyndial
+TRACE[05-22|09:28:05.494] Failed p2p handshake                     id=b3114f4207d17c71 addr=54.36.178.147:38337   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:05.661] >> FINDNODE/v4                           id=f9d47cac4f2d9b75 addr=219.159.95.158:60606  err=nil
+TRACE[05-22|09:28:05.710] Dial error                               id=6494e4fc5bcd9e3c addr=95.111.13.56:30303    conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:05.717] DNS discovery lookup                     name=W6KGDLAKUJG5XDVASN3HK6XMQA.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:05.717] Starting p2p dial                        id=13eafe0b66f457e8 ip=103.101.52.12   flag=dyndial
+TRACE[05-22|09:28:05.718] Starting p2p dial                        id=3b937b8532b84109 ip=47.56.192.120   flag=dyndial
+TRACE[05-22|09:28:05.718] >> PING/v4                               id=3ba769a81b0094ab addr=178.238.233.73:30303  err=nil
+DEBUG[05-22|09:28:05.727] Adding p2p peer                          peercount=1 id=3b880a53edbf8574 conn=dyndial addr=18.184.201.79:30303   name=Parity-Ethereum/v2.5...
+TRACE[05-22|09:28:05.727] Starting protocol eth/63                 id=3b880a53edbf8574 conn=dyndial
+TRACE[05-22|09:28:05.727] Protocol eth/63 failed                   id=3b880a53edbf8574 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:05.727] Removing p2p peer                        peercount=0 id=3b880a53edbf8574 duration="533.958µs" req=false err="client quitting"
+TRACE[05-22|09:28:05.838] >> FINDNODE/v4                           id=f9d3cb665ef60a8d addr=159.89.228.225:30303  err=nil
+DEBUG[05-22|09:28:05.868] Adding p2p peer                          peercount=1 id=26275c15daadff78 conn=dyndial addr=103.140.229.102:30303 name=Geth/v1.9.9-stable-0...
+TRACE[05-22|09:28:05.868] Starting protocol eth/64                 id=26275c15daadff78 conn=dyndial
+TRACE[05-22|09:28:05.868] Protocol eth/64 failed                   id=26275c15daadff78 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:05.868] Removing p2p peer                        peercount=0 id=26275c15daadff78 duration="658.833µs" req=false err="client quitting"
+TRACE[05-22|09:28:05.886] Failed p2p handshake                     id=3b88e84f02a6a1b0 addr=207.180.203.122:30303 conn=dyndial err="too many peers"
+TRACE[05-22|09:28:05.964] << PONG/v4                               id=3ba769a81b0094ab addr=178.238.233.73:30303  err=nil
+TRACE[05-22|09:28:05.966] << PING/v4                               id=3ba769a81b0094ab addr=178.238.233.73:30303  err=nil
+TRACE[05-22|09:28:05.967] >> PONG/v4                               id=3ba769a81b0094ab addr=178.238.233.73:30303  err=nil
+TRACE[05-22|09:28:06.006] >> FINDNODE/v4                           id=f9d17485727d70cd addr=219.159.95.158:60608  err=nil
+TRACE[05-22|09:28:06.042] Dial error                               id=6488a81c257d09db addr=13.94.241.95:30303    conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:06.044] DNS discovery lookup                     name=ZQRGLJLANDQLVRGGOG3W4ELCIA.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:06.045] Starting p2p dial                        id=3a12e6d4db158ef4 ip=3.15.222.183    flag=dyndial
+TRACE[05-22|09:28:06.045] Starting p2p dial                        id=3b938df64238936b ip=60.12.3.174     flag=dyndial
+TRACE[05-22|09:28:06.162] Findnode failed                          id=f9d47cac4f2d9b75 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:06.163] >> PING/v4                               id=f9cecea562e5449a addr=58.57.154.116:50505   err=nil
+TRACE[05-22|09:28:06.308] Failed p2p handshake                     id=3a12e6d4db158ef4 addr=3.15.222.183:30303    conn=dyndial err="too many peers"
+TRACE[05-22|09:28:06.338] Findnode failed                          id=f9d3cb665ef60a8d failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:06.339] >> PING/v4                               id=f9cd2fa44c94583a addr=2.220.75.151:30305    err=nil
+TRACE[05-22|09:28:06.383] DNS discovery lookup                     name=2QAEVHGASFYMQGWEDHO3CDVXXA.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:06.383] Starting p2p dial                        id=24344441444fe4ea ip=95.217.36.126   flag=dyndial
+TRACE[05-22|09:28:06.383] Starting p2p dial                        id=3b923e0028ed5c95 ip=145.239.255.230 flag=dyndial
+TRACE[05-22|09:28:06.419] Failed p2p handshake                     id=13eafe0b66f457e8 addr=103.101.52.12:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:06.465] >> FINDNODE/v4                           id=3ba769a81b0094ab addr=178.238.233.73:30303  err=nil
+TRACE[05-22|09:28:06.506] Findnode failed                          id=f9d17485727d70cd failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:06.506] >> PING/v4                               id=f9c917c5054b5e32 addr=125.124.23.69:60606   err=nil
+TRACE[05-22|09:28:06.711] << NEIGHBORS/v4                          id=3ba769a81b0094ab addr=178.238.233.73:30303  err=nil
+TRACE[05-22|09:28:06.713] << NEIGHBORS/v4                          id=3ba769a81b0094ab addr=178.238.233.73:30303  err=nil
+TRACE[05-22|09:28:06.715] DNS discovery lookup                     name=ELXDJLRSZHISO7YREJZOF2F5Q4.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:06.716] Starting p2p dial                        id=62be3149406a8502 ip=45.79.140.184   flag=dyndial
+TRACE[05-22|09:28:06.717] Starting p2p dial                        id=3b9e3a967cec35e2 ip=167.86.124.232  flag=dyndial
+DEBUG[05-22|09:28:06.823] Adding p2p peer                          peercount=1 id=3b923e0028ed5c95 conn=dyndial addr=145.239.255.230:30305 name=Geth/v1.9.12-stable-...
+TRACE[05-22|09:28:06.823] Starting protocol eth/65                 id=3b923e0028ed5c95 conn=dyndial
+TRACE[05-22|09:28:06.823] Protocol eth/65 failed                   id=3b923e0028ed5c95 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:06.823] Removing p2p peer                        peercount=0 id=3b923e0028ed5c95 duration="347.532µs" req=false err="client quitting"
+TRACE[05-22|09:28:06.887] Failed p2p handshake                     id=24344441444fe4ea addr=95.217.36.126:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:07.025] Failed p2p handshake                     id=62be3149406a8502 addr=45.79.140.184:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:07.045] DNS discovery lookup                     name=JHXCMBLSI6YIUIXD5ZWVXIMNL4.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:07.046] Starting p2p dial                        id=1481fdf594d123a9 ip=51.81.242.83    flag=dyndial
+TRACE[05-22|09:28:07.046] Starting p2p dial                        id=3b9ab15b79f8eb76 ip=18.197.62.247   flag=dyndial
+TRACE[05-22|09:28:07.164] >> FINDNODE/v4                           id=f9cecea562e5449a addr=58.57.154.116:50505   err=nil
+DEBUG[05-22|09:28:07.202] Adding p2p peer                          peercount=1 id=3b9e3a967cec35e2 conn=dyndial addr=167.86.124.232:30303  name=Pirl/v1.9.12-v7-mast...
+TRACE[05-22|09:28:07.202] Starting protocol eth/65                 id=3b9e3a967cec35e2 conn=dyndial
+TRACE[05-22|09:28:07.202] Protocol eth/65 failed                   id=3b9e3a967cec35e2 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:07.202] Removing p2p peer                        peercount=0 id=3b9e3a967cec35e2 duration="640.328µs" req=false err="client quitting"
+DEBUG[05-22|09:28:07.217] Adding p2p peer                          peercount=1 id=1481fdf594d123a9 conn=dyndial addr=51.81.242.83:30303    name=MultiGeth/v1.9.15-st...
+TRACE[05-22|09:28:07.217] Starting protocol eth/65                 id=1481fdf594d123a9 conn=dyndial
+TRACE[05-22|09:28:07.217] Protocol eth/65 failed                   id=1481fdf594d123a9 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:07.218] Removing p2p peer                        peercount=0 id=1481fdf594d123a9 duration="667.564µs" req=false err="client quitting"
+TRACE[05-22|09:28:07.340] >> FINDNODE/v4                           id=f9cd2fa44c94583a addr=2.220.75.151:30305    err=nil
+TRACE[05-22|09:28:07.392] DNS discovery lookup                     name=TBRWEQNVJV6UEDDKWUQTIQJSPA.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:07.393] Starting p2p dial                        id=79cb6deb39a9e907 ip=80.211.78.187   flag=dyndial
+TRACE[05-22|09:28:07.394] Starting p2p dial                        id=3b98135f9f9b14bd ip=209.126.69.62   flag=dyndial
+TRACE[05-22|09:28:07.507] >> FINDNODE/v4                           id=f9c917c5054b5e32 addr=125.124.23.69:60606   err=nil
+TRACE[05-22|09:28:07.519] Failed p2p handshake                     id=3b9ab15b79f8eb76 addr=18.197.62.247:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:07.637] Dial error                               id=79cb6deb39a9e907 addr=80.211.78.187:30303   conn=dyndial err="connect: connection refused"
+TRACE[05-22|09:28:07.664] Findnode failed                          id=f9cecea562e5449a failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:07.664] >> PING/v4                               id=f9c6e1c036f7bc30 addr=219.159.95.158:60606  err=nil
+TRACE[05-22|09:28:07.710] DNS discovery lookup                     name=HU24KKTMGWVC7KGC5QGTHU3KRI.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:07.710] Starting p2p dial                        id=09f0ec7cfd449b56 ip=51.89.96.115    flag=dyndial
+TRACE[05-22|09:28:07.710] Starting p2p dial                        id=3be2664725886869 ip=167.86.71.35    flag=dyndial
+TRACE[05-22|09:28:07.710] >> PING/v4                               id=3baf4f586e4a7ac1 addr=45.146.41.14:30303    err=nil
+TRACE[05-22|09:28:07.710] >> PING/v4                               id=3ba1ddedba637ac5 addr=45.67.229.249:30303   err=nil
+DEBUG[05-22|09:28:07.798] Adding p2p peer                          peercount=1 id=3b98135f9f9b14bd conn=dyndial addr=209.126.69.62:30303   name=Parity-Ethereum/v2.4...
+TRACE[05-22|09:28:07.798] Starting protocol eth/63                 id=3b98135f9f9b14bd conn=dyndial
+TRACE[05-22|09:28:07.798] Protocol eth/63 failed                   id=3b98135f9f9b14bd conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:07.798] Removing p2p peer                        peercount=0 id=3b98135f9f9b14bd duration="453.828µs" req=false err="client quitting"
+TRACE[05-22|09:28:07.840] Findnode failed                          id=f9cd2fa44c94583a failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:07.840] >> PING/v4                               id=f9c7da9c6b1975b3 addr=27.202.226.227:50505  err=nil
+TRACE[05-22|09:28:07.960] << PONG/v4                               id=3baf4f586e4a7ac1 addr=45.146.41.14:30303    err=nil
+TRACE[05-22|09:28:07.961] << PING/v4                               id=3baf4f586e4a7ac1 addr=45.146.41.14:30303    err=nil
+TRACE[05-22|09:28:07.962] >> PONG/v4                               id=3baf4f586e4a7ac1 addr=45.146.41.14:30303    err=nil
+TRACE[05-22|09:28:07.994] << PONG/v4                               id=3ba1ddedba637ac5 addr=45.67.229.249:30303   err=nil
+TRACE[05-22|09:28:07.996] << PING/v4                               id=3ba1ddedba637ac5 addr=45.67.229.249:30303   err=nil
+TRACE[05-22|09:28:07.996] >> PONG/v4                               id=3ba1ddedba637ac5 addr=45.67.229.249:30303   err=nil
+TRACE[05-22|09:28:08.007] Findnode failed                          id=f9c917c5054b5e32 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:08.008] >> PING/v4                               id=f9c52ff9adfb2032 addr=222.174.125.138:50505 err=nil
+TRACE[05-22|09:28:08.049] DNS discovery lookup                     name=BWOPIZ5REOQ2XVWP46KIHIEQ6Q.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:08.050] Starting p2p dial                        id=57967e993e7ab8d2 ip=155.138.147.53  flag=dyndial
+TRACE[05-22|09:28:08.050] Starting p2p dial                        id=3bf9b4cda817ea6b ip=51.68.155.176   flag=dyndial
+TRACE[05-22|09:28:08.091] Dial error                               id=64934e87b1349108 addr=122.152.197.101:20182 conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:08.091] Dial error                               id=649d7b11ef94d829 addr=122.51.168.92:20182   conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:08.166] Dial error                               id=6492cea07be6576a addr=122.51.70.214:20182   conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:08.270] Failed p2p handshake                     id=09f0ec7cfd449b56 addr=51.89.96.115:40306    conn=dyndial err="too many peers"
+TRACE[05-22|09:28:08.272] Failed p2p handshake                     id=3be2664725886869 addr=167.86.71.35:28657    conn=dyndial err="too many peers"
+TRACE[05-22|09:28:08.325] Dial error                               id=6480cddaa72fe248 addr=80.137.216.209:30303  conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:08.378] DNS discovery lookup                     name=JXVGEUI3YYZAUO6GA4XB2J3N7A.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:08.379] Starting p2p dial                        id=31e3e63fac2bae7d ip=147.135.10.88   flag=dyndial
+TRACE[05-22|09:28:08.380] Starting p2p dial                        id=3b3fc9b2b9a0d9c2 ip=51.158.191.43   flag=dyndial
+TRACE[05-22|09:28:08.408] Dial error                               id=648028dea247ac5d addr=112.65.166.66:30303   conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:08.461] >> FINDNODE/v4                           id=3baf4f586e4a7ac1 addr=45.146.41.14:30303    err=nil
+TRACE[05-22|09:28:08.465] Failed p2p handshake                     id=57967e993e7ab8d2 addr=155.138.147.53:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:28:08.495] >> FINDNODE/v4                           id=3ba1ddedba637ac5 addr=45.67.229.249:30303   err=nil
+TRACE[05-22|09:28:08.665] >> FINDNODE/v4                           id=f9c6e1c036f7bc30 addr=219.159.95.158:60606  err=nil
+TRACE[05-22|09:28:08.678] Failed p2p handshake                     id=31e3e63fac2bae7d addr=147.135.10.88:40305   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:08.710] << NEIGHBORS/v4                          id=3baf4f586e4a7ac1 addr=45.146.41.14:30303    err=nil
+TRACE[05-22|09:28:08.711] DNS discovery lookup                     name=DOXJV5CLGXJFIC3WX5VS2LBYJM.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:08.712] << NEIGHBORS/v4                          id=3baf4f586e4a7ac1 addr=45.146.41.14:30303    err=nil
+TRACE[05-22|09:28:08.713] Starting p2p dial                        id=371e9c0aa0296e93 ip=209.222.30.174  flag=dyndial
+TRACE[05-22|09:28:08.713] Starting p2p dial                        id=3b0d49d1d872e13f ip=178.62.224.247  flag=dyndial
+TRACE[05-22|09:28:08.724] >> PING/v4                               id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+TRACE[05-22|09:28:08.804] << NEIGHBORS/v4                          id=3ba1ddedba637ac5 addr=45.67.229.249:30303   err=nil
+TRACE[05-22|09:28:08.806] << NEIGHBORS/v4                          id=3ba1ddedba637ac5 addr=45.67.229.249:30303   err=nil
+DEBUG[05-22|09:28:08.817] Adding p2p peer                          peercount=1 id=3bf9b4cda817ea6b conn=dyndial addr=51.68.155.176:30303   name=Parity-Ethereum/v2.5...
+TRACE[05-22|09:28:08.817] Starting protocol eth/63                 id=3bf9b4cda817ea6b conn=dyndial
+TRACE[05-22|09:28:08.817] Protocol eth/63 failed                   id=3bf9b4cda817ea6b conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:08.817] Removing p2p peer                        peercount=0 id=3bf9b4cda817ea6b duration="847.179µs" req=false err="client quitting"
+TRACE[05-22|09:28:08.842] >> FINDNODE/v4                           id=f9c7da9c6b1975b3 addr=27.202.226.227:50505  err=nil
+DEBUG[05-22|09:28:08.843] Adding p2p peer                          peercount=1 id=3b3fc9b2b9a0d9c2 conn=dyndial addr=51.158.191.43:41235   name=CoreGeth/v1.11.3-uns...
+TRACE[05-22|09:28:08.843] Starting protocol eth/65                 id=3b3fc9b2b9a0d9c2 conn=dyndial
+TRACE[05-22|09:28:08.843] Protocol eth/65 failed                   id=3b3fc9b2b9a0d9c2 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:08.843] Removing p2p peer                        peercount=0 id=3b3fc9b2b9a0d9c2 duration="404.246µs" req=false err="client quitting"
+TRACE[05-22|09:28:09.009] >> FINDNODE/v4                           id=f9c52ff9adfb2032 addr=222.174.125.138:50505 err=nil
+TRACE[05-22|09:28:09.021] << PONG/v4                               id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+TRACE[05-22|09:28:09.022] >> ENRREQUEST/v4                         id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+TRACE[05-22|09:28:09.054] DNS discovery lookup                     name=Y2XFYCGZJAE6AD7GLI2GADY7VY.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:09.055] Starting p2p dial                        id=5555d4395cbd1bd4 ip=34.237.137.216  flag=dyndial
+TRACE[05-22|09:28:09.055] Starting p2p dial                        id=3b09c36d4141285c ip=85.10.196.57    flag=dyndial
+TRACE[05-22|09:28:09.056] Dial error                               id=64ec6fb8cc8a40f9 addr=35.197.129.206:30303  conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:09.056] Dial error                               id=3e0cfab894233711 addr=182.139.173.190:30303 conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:09.155] Failed p2p handshake                     id=371e9c0aa0296e93 addr=209.222.30.174:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:28:09.165] Findnode failed                          id=f9c6e1c036f7bc30 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:09.274] Dial error                               id=3b09c36d4141285c addr=85.10.196.57:30304    conn=dyndial err="connect: connection refused"
+TRACE[05-22|09:28:09.332] << ENRRESPONSE/v4                        id=4c3bcc6a8ede288b addr=27.124.45.212:30303   err=nil
+DEBUG[05-22|09:28:09.333] Revalidated node                         b=3  id=4c3bcc6a8ede288b checks=2
+TRACE[05-22|09:28:09.341] Findnode failed                          id=f9c7da9c6b1975b3 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:09.346] Failed p2p handshake                     id=5555d4395cbd1bd4 addr=34.237.137.216:30303  conn=dyndial err="too many peers"
+TRACE[05-22|09:28:09.386] DNS discovery lookup                     name=BXL4EXRGHF2FERHNBG6WXDC3WA.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:09.387] Starting p2p dial                        id=6f50d1a4d330e605 ip=54.36.109.13    flag=dyndial
+TRACE[05-22|09:28:09.388] Starting p2p dial                        id=3b1538ef6f8abe58 ip=52.56.160.179   flag=dyndial
+TRACE[05-22|09:28:09.391] Rejected peer                            id=3b0d49d1d872e13f addr=178.62.224.247:30303  conn=dyndial err="useless peer"
+TRACE[05-22|09:28:09.509] Findnode failed                          id=f9c52ff9adfb2032 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:09.510] >> FINDNODE/v4                           id=4c215784e0b2b587 addr=94.130.163.244:30303  err=nil
+TRACE[05-22|09:28:09.510] >> FINDNODE/v4                           id=4c21f2835361484c addr=88.198.39.164:30303   err=nil
+TRACE[05-22|09:28:09.510] >> PING/v4                               id=4c2d98046ea5865b addr=18.136.240.71:30303   err=nil
+TRACE[05-22|09:28:09.709] DNS discovery lookup                     name=L62HJHSVZGJ5MG655D4CQB4R24.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:09.709] Starting p2p dial                        id=45e93df4e9aa7f2c ip=188.134.79.216  flag=dyndial
+TRACE[05-22|09:28:09.710] Starting p2p dial                        id=3b1fde0ab7eea746 ip=149.5.29.122    flag=dyndial
+TRACE[05-22|09:28:09.731] << NEIGHBORS/v4                          id=4c21f2835361484c addr=88.198.39.164:30303   err=nil
+TRACE[05-22|09:28:09.732] << NEIGHBORS/v4                          id=4c21f2835361484c addr=88.198.39.164:30303   err=nil
+TRACE[05-22|09:28:09.732] << PING/v4                               id=4c215784e0b2b587 addr=94.130.163.244:30303  err=nil
+TRACE[05-22|09:28:09.733] >> PING/v4                               id=4f2a00d85b4363a3 addr=212.237.28.211:30305  err=nil
+TRACE[05-22|09:28:09.733] >> PONG/v4                               id=4c215784e0b2b587 addr=94.130.163.244:30303  err=nil
+TRACE[05-22|09:28:09.803] Failed p2p handshake                     id=3b1538ef6f8abe58 addr=52.56.160.179:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:09.856] Failed p2p handshake                     id=6f50d1a4d330e605 addr=54.36.109.13:30469    conn=dyndial err="too many peers"
+TRACE[05-22|09:28:09.955] << NEIGHBORS/v4                          id=4c215784e0b2b587 addr=94.130.163.244:30303  err=nil
+TRACE[05-22|09:28:09.956] << NEIGHBORS/v4                          id=4c215784e0b2b587 addr=94.130.163.244:30303  err=nil
+DEBUG[05-22|09:28:09.956] IP exceeds bucket limit                  ip=58.57.154.114
+TRACE[05-22|09:28:09.956] >> PING/v4                               id=4e2917f98fc3c42e addr=37.1.200.82:30303     err=nil
+TRACE[05-22|09:28:10.034] << PONG/v4                               id=4f2a00d85b4363a3 addr=212.237.28.211:30305  err=nil
+TRACE[05-22|09:28:10.035] << PING/v4                               id=4f2a00d85b4363a3 addr=212.237.28.211:30305  err=nil
+TRACE[05-22|09:28:10.036] >> PONG/v4                               id=4f2a00d85b4363a3 addr=212.237.28.211:30305  err=nil
+TRACE[05-22|09:28:10.056] DNS discovery lookup                     name=5XQ6C52LHVI2L7C6FGGIVICNUE.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:10.058] Starting p2p dial                        id=ef0a5a39930fb78e ip=18.218.27.185   flag=dyndial
+TRACE[05-22|09:28:10.058] Starting p2p dial                        id=3b73a02751e467dc ip=45.55.206.157   flag=dyndial
+TRACE[05-22|09:28:10.173] << PONG/v4                               id=4e2917f98fc3c42e addr=37.1.200.82:30303     err=nil
+TRACE[05-22|09:28:10.174] << PING/v4                               id=4e2917f98fc3c42e addr=37.1.200.82:30303     err=nil
+TRACE[05-22|09:28:10.175] >> PONG/v4                               id=4e2917f98fc3c42e addr=37.1.200.82:30303     err=nil
+DEBUG[05-22|09:28:10.184] Adding p2p peer                          peercount=1 id=3b1fde0ab7eea746 conn=dyndial addr=149.5.29.122:30303    name=Pirl/v1.9.12-v7-mast...
+TRACE[05-22|09:28:10.184] Starting protocol eth/65                 id=3b1fde0ab7eea746 conn=dyndial
+TRACE[05-22|09:28:10.184] Protocol eth/65 failed                   id=3b1fde0ab7eea746 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:10.185] Removing p2p peer                        peercount=0 id=3b1fde0ab7eea746 duration="607.184µs" req=false err="client quitting"
+TRACE[05-22|09:28:10.239] Failed p2p handshake                     id=45e93df4e9aa7f2c addr=188.134.79.216:30190  conn=dyndial err="too many peers"
+TRACE[05-22|09:28:10.319] Failed p2p handshake                     id=ef0a5a39930fb78e addr=18.218.27.185:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:10.351] Failed p2p handshake                     id=3b73a02751e467dc addr=45.55.206.157:30388   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:10.375] DNS discovery lookup                     name=HOJF5CHORJQFQAI23KCQCXB3G4.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:10.376] Starting p2p dial                        id=1d31cdccb43efd74 ip=144.217.66.227  flag=dyndial
+TRACE[05-22|09:28:10.376] Starting p2p dial                        id=3b7263bc62ac6991 ip=103.225.11.69   flag=dyndial
+TRACE[05-22|09:28:10.376] >> PING/v4                               id=3baac27d95504394 addr=47.112.224.230:30303  err=nil
+TRACE[05-22|09:28:10.511] >> FINDNODE/v4                           id=4c2d98046ea5865b addr=18.136.240.71:30303   err=nil
+TRACE[05-22|09:28:10.512] Dial error                               id=1d31cdccb43efd74 addr=144.217.66.227:30590  conn=dyndial err="connect: connection refused"
+TRACE[05-22|09:28:10.535] >> FINDNODE/v4                           id=4f2a00d85b4363a3 addr=212.237.28.211:30305  err=nil
+TRACE[05-22|09:28:10.674] >> FINDNODE/v4                           id=4e2917f98fc3c42e addr=37.1.200.82:30303     err=nil
+TRACE[05-22|09:28:10.715] DNS discovery lookup                     name=KB6FR5TDNKZ25UDCFHSVYS33UA.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:10.716] Starting p2p dial                        id=61ad27668f1bebee ip=188.166.87.46   flag=dyndial
+TRACE[05-22|09:28:10.716] Starting p2p dial                        id=3bf7c162acaa4421 ip=128.75.184.233  flag=dyndial
+TRACE[05-22|09:28:10.741] >> PING/v4                               id=4c55f731ce872af4 addr=49.233.173.229:20182  err=nil
+TRACE[05-22|09:28:10.795] Failed p2p handshake                     id=3b7263bc62ac6991 addr=103.225.11.69:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:10.801] << NEIGHBORS/v4                          id=4f2a00d85b4363a3 addr=212.237.28.211:30305  err=nil
+TRACE[05-22|09:28:10.801] << NEIGHBORS/v4                          id=4f2a00d85b4363a3 addr=212.237.28.211:30305  err=nil
+TRACE[05-22|09:28:10.802] >> PING/v4                               id=4e2ab84f3ffd5daa addr=47.74.246.80:30303    err=nil
+TRACE[05-22|09:28:10.897] << NEIGHBORS/v4                          id=4e2917f98fc3c42e addr=37.1.200.82:30303     err=nil
+TRACE[05-22|09:28:10.899] << NEIGHBORS/v4                          id=4e2917f98fc3c42e addr=37.1.200.82:30303     err=nil
+TRACE[05-22|09:28:10.900] >> PING/v4                               id=4e2bf317828577e3 addr=222.174.125.138:60606 err=nil
+TRACE[05-22|09:28:11.011] Findnode failed                          id=4c2d98046ea5865b failcount=2  results=0 err="RPC timeout"
+TRACE[05-22|09:28:11.013] >> PING/v4                               id=4e2bcbb596f98c93 addr=125.124.203.36:60606  err=nil
+TRACE[05-22|09:28:11.043] DNS discovery lookup                     name=75HOTVHV4CO5M64V5LXDGZZJEM.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:11.043] Starting p2p dial                        id=5287845eca4d7121 ip=95.237.75.153   flag=dyndial
+TRACE[05-22|09:28:11.043] Starting p2p dial                        id=3bd21354ec40713f ip=101.207.224.48  flag=dyndial
+TRACE[05-22|09:28:11.185] Failed p2p handshake                     id=61ad27668f1bebee addr=188.166.87.46:30303   conn=dyndial err="too many peers"
+DEBUG[05-22|09:28:11.241] Removed dead node                        b=7  id=4c55f731ce872af4 ip=49.233.173.229  checks=0
+DEBUG[05-22|09:28:11.296] Adding p2p peer                          peercount=1 id=3bf7c162acaa4421 conn=dyndial addr=128.75.184.233:30303  name=Geth/v1.9.12-stable-...
+TRACE[05-22|09:28:11.296] Starting protocol eth/65                 id=3bf7c162acaa4421 conn=dyndial
+TRACE[05-22|09:28:11.296] Protocol eth/65 failed                   id=3bf7c162acaa4421 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:11.296] Removing p2p peer                        peercount=0 id=3bf7c162acaa4421 duration="174.961µs" req=false err="client quitting"
+TRACE[05-22|09:28:11.376] DNS discovery lookup                     name=DHMBVYOE2IORYTUUEMSA34Z5AI.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:11.376] Starting p2p dial                        id=0a086ed5dbd0c659 ip=5.158.124.83    flag=dyndial
+TRACE[05-22|09:28:11.376] Starting p2p dial                        id=3bd16b1c69f7edbe ip=119.23.46.14    flag=dyndial
+TRACE[05-22|09:28:11.377] >> FINDNODE/v4                           id=3baac27d95504394 addr=47.112.224.230:30303  err=nil
+TRACE[05-22|09:28:11.709] DNS discovery lookup                     name=RTSMT3XZKF3PBRNEO4D7UCQYVI.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:11.709] Starting p2p dial                        id=b4067279bd9247c5 ip=176.117.17.92   flag=dyndial
+TRACE[05-22|09:28:11.709] Starting p2p dial                        id=3b7d99afc7b4412a ip=52.236.131.123  flag=dyndial
+TRACE[05-22|09:28:11.709] >> PING/v4                               id=3baae26dd4fa6007 addr=195.201.245.47:30301  err=nil
+TRACE[05-22|09:28:11.802] >> FINDNODE/v4                           id=4e2ab84f3ffd5daa addr=47.74.246.80:30303    err=nil
+TRACE[05-22|09:28:11.877] Findnode failed                          id=3baac27d95504394 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:11.900] >> FINDNODE/v4                           id=4e2bf317828577e3 addr=222.174.125.138:60606 err=nil
+TRACE[05-22|09:28:11.935] << PONG/v4                               id=3baae26dd4fa6007 addr=195.201.245.47:30301  err=nil
+TRACE[05-22|09:28:11.936] << PING/v4                               id=3baae26dd4fa6007 addr=195.201.245.47:30301  err=nil
+TRACE[05-22|09:28:11.936] >> PONG/v4                               id=3baae26dd4fa6007 addr=195.201.245.47:30301  err=nil
+TRACE[05-22|09:28:12.013] >> FINDNODE/v4                           id=4e2bcbb596f98c93 addr=125.124.203.36:60606  err=nil
+TRACE[05-22|09:28:12.041] Failed p2p handshake                     id=0a086ed5dbd0c659 addr=5.158.124.83:30303    conn=dyndial err="too many peers"
+TRACE[05-22|09:28:12.046] DNS discovery lookup                     name=QTVACEVZ7WANME2VWIWU5LRJKI.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:12.046] Starting p2p dial                        id=e3c444b39f07d92b ip=47.106.221.44   flag=dyndial
+TRACE[05-22|09:28:12.046] Starting p2p dial                        id=3b9b5fac25628b70 ip=106.54.24.249   flag=dyndial
+TRACE[05-22|09:28:12.302] Findnode failed                          id=4e2ab84f3ffd5daa failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:12.303] >> PING/v4                               id=4e2c5529380ab74f addr=58.57.154.171:50505   err=nil
+TRACE[05-22|09:28:12.339] Failed p2p handshake                     id=b4067279bd9247c5 addr=176.117.17.92:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:12.372] DNS discovery lookup                     name=XOHVZ6XH6CUILHQGNGLVBPXLTA.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:12.372] Starting p2p dial                        id=11e378664cab4ce9 ip=80.84.176.109   flag=dyndial
+TRACE[05-22|09:28:12.372] Starting p2p dial                        id=3b799857edfad7d2 ip=112.124.29.133  flag=dyndial
+DEBUG[05-22|09:28:12.394] Adding p2p peer                          peercount=1 id=3b7d99afc7b4412a conn=dyndial addr=52.236.131.123:30304  name=Parity-Ethereum/v2.5...
+TRACE[05-22|09:28:12.394] Starting protocol eth/63                 id=3b7d99afc7b4412a conn=dyndial
+TRACE[05-22|09:28:12.394] Protocol eth/63 failed                   id=3b7d99afc7b4412a conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:12.394] Removing p2p peer                        peercount=0 id=3b7d99afc7b4412a duration="204.884µs" req=false err="client quitting"
+TRACE[05-22|09:28:12.400] Findnode failed                          id=4e2bf317828577e3 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:12.401] >> PING/v4                               id=4e2e75432365c0f1 addr=47.56.165.99:30303    err=nil
+TRACE[05-22|09:28:12.436] >> FINDNODE/v4                           id=3baae26dd4fa6007 addr=195.201.245.47:30301  err=nil
+TRACE[05-22|09:28:12.513] Findnode failed                          id=4e2bcbb596f98c93 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:12.514] >> PING/v4                               id=4e2e4cb33dd0ab33 addr=18.212.247.252:30303  err=nil
+TRACE[05-22|09:28:12.661] << NEIGHBORS/v4                          id=3baae26dd4fa6007 addr=195.201.245.47:30301  err=nil
+TRACE[05-22|09:28:12.661] << NEIGHBORS/v4                          id=3baae26dd4fa6007 addr=195.201.245.47:30301  err=nil
+TRACE[05-22|09:28:12.709] DNS discovery lookup                     name=MAO77FD22RVTUCLQDB3MQVS44A.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:12.710] Starting p2p dial                        id=1b8bc68a27ff106d ip=149.202.208.187 flag=dyndial
+TRACE[05-22|09:28:12.710] Starting p2p dial                        id=3aa3bb2d88a66671 ip=207.180.250.109 flag=dyndial
+TRACE[05-22|09:28:12.903] Failed p2p handshake                     id=11e378664cab4ce9 addr=80.84.176.109:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:13.041] DNS discovery lookup                     name=UHF5IAPD6RKASENK4B43ZYXWRQ.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:13.042] Starting p2p dial                        id=104aaf494b1b166c ip=45.76.89.52     flag=dyndial
+TRACE[05-22|09:28:13.042] Starting p2p dial                        id=3ab0b045036faa46 ip=162.213.254.150 flag=dyndial
+TRACE[05-22|09:28:13.167] Failed p2p handshake                     id=1b8bc68a27ff106d addr=149.202.208.187:30303 conn=dyndial err="too many peers"
+DEBUG[05-22|09:28:13.169] Adding p2p peer                          peercount=1 id=3aa3bb2d88a66671 conn=dyndial addr=207.180.250.109:30303 name=Pirl/v1.9.12-v7-mast...
+TRACE[05-22|09:28:13.169] Starting protocol eth/65                 id=3aa3bb2d88a66671 conn=dyndial
+TRACE[05-22|09:28:13.170] Protocol eth/65 failed                   id=3aa3bb2d88a66671 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:13.170] Removing p2p peer                        peercount=0 id=3aa3bb2d88a66671 duration="169.462µs" req=false err="client quitting"
+TRACE[05-22|09:28:13.275] Failed p2p handshake                     id=3ab0b045036faa46 addr=162.213.254.150:30303 conn=dyndial err="too many peers"
+TRACE[05-22|09:28:13.303] >> FINDNODE/v4                           id=4e2c5529380ab74f addr=58.57.154.171:50505   err=nil
+TRACE[05-22|09:28:13.379] DNS discovery lookup                     name=H3NDOWANIU3Y3YGD6RHCANN4SA.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:13.379] Starting p2p dial                        id=5ca0830ff76b67d9 ip=68.63.30.210    flag=dyndial
+TRACE[05-22|09:28:13.379] Starting p2p dial                        id=3a9a55564299d743 ip=149.56.143.200  flag=dyndial
+TRACE[05-22|09:28:13.401] >> FINDNODE/v4                           id=4e2e75432365c0f1 addr=47.56.165.99:30303    err=nil
+TRACE[05-22|09:28:13.490] Failed p2p handshake                     id=104aaf494b1b166c addr=45.76.89.52:30303     conn=dyndial err="too many peers"
+TRACE[05-22|09:28:13.514] >> FINDNODE/v4                           id=4e2e4cb33dd0ab33 addr=18.212.247.252:30303  err=nil
+DEBUG[05-22|09:28:13.660] Adding p2p peer                          peercount=1 id=3a9a55564299d743 conn=dyndial addr=149.56.143.200:30305  name=Geth/v1.3.0-Ether1-K...
+TRACE[05-22|09:28:13.660] Starting protocol eth/64                 id=3a9a55564299d743 conn=dyndial
+TRACE[05-22|09:28:13.660] Protocol eth/64 failed                   id=3a9a55564299d743 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:13.660] Removing p2p peer                        peercount=0 id=3a9a55564299d743 duration="221.315µs" req=false err="client quitting"
+TRACE[05-22|09:28:13.709] DNS discovery lookup                     name=5VILJMKZFUTYROFIAJ7ME2GHLA.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:13.710] Starting p2p dial                        id=1456194a8f04044e ip=109.254.181.214 flag=dyndial
+TRACE[05-22|09:28:13.710] Starting p2p dial                        id=3af15c37fe4de61e ip=103.235.247.140 flag=dyndial
+TRACE[05-22|09:28:13.710] >> PING/v4                               id=3bb258318061811a addr=134.175.81.52:20182   err=nil
+TRACE[05-22|09:28:13.710] >> PING/v4                               id=3bb1a6d0b32b9a09 addr=113.196.66.76:5000    err=nil
+TRACE[05-22|09:28:13.744] Failed p2p handshake                     id=5ca0830ff76b67d9 addr=68.63.30.210:30303    conn=dyndial err="too many peers"
+TRACE[05-22|09:28:13.803] Findnode failed                          id=4e2c5529380ab74f failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:13.804] >> PING/v4                               id=4e2f4078648f1309 addr=222.174.125.138:50505 err=nil
+TRACE[05-22|09:28:13.901] Findnode failed                          id=4e2e75432365c0f1 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:13.901] >> PING/v4                               id=4e2ff1ab43925b04 addr=219.159.92.187:60606  err=nil
+TRACE[05-22|09:28:14.014] Findnode failed                          id=4e2e4cb33dd0ab33 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:14.014] >> PING/v4                               id=4e21f96c1cbc72f7 addr=18.200.187.192:30303  err=nil
+TRACE[05-22|09:28:14.046] DNS discovery lookup                     name=BBANFXKFYOYPAJB7SXPP43RKXU.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:14.047] Starting p2p dial                        id=5b01b363b1765639 ip=104.233.161.239 flag=dyndial
+TRACE[05-22|09:28:14.047] Starting p2p dial                        id=3aab95e88cd8072f ip=35.198.201.68   flag=dyndial
+TRACE[05-22|09:28:14.304] << PONG/v4                               id=4e21f96c1cbc72f7 addr=18.200.187.192:30303  err=nil
+TRACE[05-22|09:28:14.307] Failed p2p handshake                     id=1456194a8f04044e addr=109.254.181.214:30303 conn=dyndial err="too many peers"
+TRACE[05-22|09:28:14.384] DNS discovery lookup                     name=73BU2YQMTNTOK5Z7AAJH5YZXMI.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:14.385] Starting p2p dial                        id=61b47b276dd8da13 ip=117.18.6.118    flag=dyndial
+TRACE[05-22|09:28:14.385] Starting p2p dial                        id=3a9f5aefd46f0cc8 ip=80.86.87.211    flag=dyndial
+TRACE[05-22|09:28:14.386] >> PING/v4                               id=3bb9c64acf538dc7 addr=3.235.177.186:30303   err=nil
+TRACE[05-22|09:28:14.533] << PONG/v4                               id=3bb9c64acf538dc7 addr=3.235.177.186:30303   err=nil
+TRACE[05-22|09:28:14.578] Failed p2p handshake                     id=5b01b363b1765639 addr=104.233.161.239:30303 conn=dyndial err="too many peers"
+TRACE[05-22|09:28:14.708] DNS discovery lookup                     name=WOQOFLIPMF222MDWBXHQEC5NT4.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:14.708] Starting p2p dial                        id=4fc3b6a7fb2b66af ip=52.198.169.28   flag=dyndial
+TRACE[05-22|09:28:14.709] Dial error                               id=997e0f7a0422f08d addr=47.93.114.242:30303   conn=dyndial err="i/o timeout"
+TRACE[05-22|09:28:14.711] >> FINDNODE/v4                           id=3bb258318061811a addr=134.175.81.52:20182   err=nil
+TRACE[05-22|09:28:14.711] >> FINDNODE/v4                           id=3bb1a6d0b32b9a09 addr=113.196.66.76:5000    err=nil
+DEBUG[05-22|09:28:14.801] Adding p2p peer                          peercount=1 id=3aab95e88cd8072f conn=dyndial addr=35.198.201.68:30303   name=Parity-Ethereum/v2.7...
+TRACE[05-22|09:28:14.801] Starting protocol eth/63                 id=3aab95e88cd8072f conn=dyndial
+TRACE[05-22|09:28:14.801] Protocol eth/63 failed                   id=3aab95e88cd8072f conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:14.801] Removing p2p peer                        peercount=0 id=3aab95e88cd8072f duration="615.098µs" req=false err="client quitting"
+TRACE[05-22|09:28:14.805] >> FINDNODE/v4                           id=4e21f96c1cbc72f7 addr=18.200.187.192:30303  err=nil
+TRACE[05-22|09:28:14.805] >> FINDNODE/v4                           id=4e2f4078648f1309 addr=222.174.125.138:50505 err=nil
+DEBUG[05-22|09:28:14.843] Adding p2p peer                          peercount=1 id=61b47b276dd8da13 conn=dyndial addr=117.18.6.118:30304    name=Geth/v1.9.13-stable-...
+TRACE[05-22|09:28:14.844] Starting protocol eth/65                 id=61b47b276dd8da13 conn=dyndial
+TRACE[05-22|09:28:14.844] Protocol eth/65 failed                   id=61b47b276dd8da13 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:14.844] Removing p2p peer                        peercount=0 id=61b47b276dd8da13 duration="628.699µs" req=false err="client quitting"
+DEBUG[05-22|09:28:14.857] Adding p2p peer                          peercount=1 id=3a9f5aefd46f0cc8 conn=dyndial addr=80.86.87.211:30305    name=Geth/v1.3.0-Ether1_M...
+TRACE[05-22|09:28:14.857] Starting protocol eth/64                 id=3a9f5aefd46f0cc8 conn=dyndial
+TRACE[05-22|09:28:14.858] Protocol eth/64 failed                   id=3a9f5aefd46f0cc8 conn=dyndial err="client quitting"
+DEBUG[05-22|09:28:14.858] Removing p2p peer                        peercount=0 id=3a9f5aefd46f0cc8 duration="558.121µs" req=false err="client quitting"
+TRACE[05-22|09:28:14.902] >> FINDNODE/v4                           id=4e2ff1ab43925b04 addr=219.159.92.187:60606  err=nil
+TRACE[05-22|09:28:15.034] >> FINDNODE/v4                           id=3bb9c64acf538dc7 addr=3.235.177.186:30303   err=nil
+TRACE[05-22|09:28:15.035] << PING/v4                               id=4e21f96c1cbc72f7 addr=18.200.187.192:30303  err=nil
+TRACE[05-22|09:28:15.036] >> PONG/v4                               id=4e21f96c1cbc72f7 addr=18.200.187.192:30303  err=nil
+TRACE[05-22|09:28:15.041] DNS discovery lookup                     name=YGF3IZKJTYNPHWATXNSB5FU46Y.all.classic.blockd.info err=nil
+TRACE[05-22|09:28:15.197] Failed p2p handshake                     id=4fc3b6a7fb2b66af addr=52.198.169.28:30303   conn=dyndial err="too many peers"
+TRACE[05-22|09:28:15.211] Findnode failed                          id=3bb258318061811a failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:15.212] Findnode failed                          id=3bb1a6d0b32b9a09 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:15.213] >> PING/v4                               id=3b84f4e47e8f446b addr=47.75.33.33:30322     err=nil
+TRACE[05-22|09:28:15.213] >> PING/v4                               id=3b84658c6a6794f9 addr=193.169.240.112:30303 err=nil
+TRACE[05-22|09:28:15.269] << NEIGHBORS/v4                          id=4e21f96c1cbc72f7 addr=18.200.187.192:30303  err=nil
+TRACE[05-22|09:28:15.270] << NEIGHBORS/v4                          id=4e21f96c1cbc72f7 addr=18.200.187.192:30303  err=nil
+DEBUG[05-22|09:28:15.270] IP exceeds bucket limit                  ip=219.159.92.187
+DEBUG[05-22|09:28:15.270] IP exceeds bucket limit                  ip=159.89.228.225
+DEBUG[05-22|09:28:15.270] IP exceeds bucket limit                  ip=219.159.92.35
+DEBUG[05-22|09:28:15.270] IP exceeds bucket limit                  ip=219.159.92.187
+TRACE[05-22|09:28:15.271] >> PING/v4                               id=4e2849f1f3030f23 addr=219.159.92.35:60606   err=nil
+TRACE[05-22|09:28:15.305] Findnode failed                          id=4e2f4078648f1309 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:15.306] >> PING/v4                               id=4e297de2ced02943 addr=219.159.93.204:60608  err=nil
+TRACE[05-22|09:28:15.403] Findnode failed                          id=4e2ff1ab43925b04 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:15.404] >> PING/v4                               id=4e2919217557c953 addr=219.159.92.187:60606  err=nil
+TRACE[05-22|09:28:15.458] << PONG/v4                               id=3b84f4e47e8f446b addr=47.75.33.33:30322     err=nil
+TRACE[05-22|09:28:15.461] << PING/v4                               id=3b84f4e47e8f446b addr=47.75.33.33:30322     err=nil
+TRACE[05-22|09:28:15.461] >> PONG/v4                               id=3b84f4e47e8f446b addr=47.75.33.33:30322     err=nil
+TRACE[05-22|09:28:15.481] << PONG/v4                               id=3b84658c6a6794f9 addr=193.169.240.112:30303 err=nil
+TRACE[05-22|09:28:15.483] << PING/v4                               id=3b84658c6a6794f9 addr=193.169.240.112:30303 err=nil
+TRACE[05-22|09:28:15.484] >> PONG/v4                               id=3b84658c6a6794f9 addr=193.169.240.112:30303 err=nil
+TRACE[05-22|09:28:15.534] Findnode failed                          id=3bb9c64acf538dc7 failcount=1  results=0 err="RPC timeout"
+TRACE[05-22|09:28:15.534] >> PING/v4                               id=3b80eb4995e7bb8f addr=104.219.42.148:30304  err=nil
+TRACE[05-22|09:28:15.659] << PONG/v4                               id=3b80eb4995e7bb8f addr=104.219.42.148:30304  err=nil
+TRACE[05-22|09:28:15.660] << PING/v4                               id=3b80eb4995e7bb8f addr=104.219.42.148:30304  err=nil
+TRACE[05-22|09:28:15.661] >> PONG/v4                               id=3b80eb4995e7bb8f addr=104.219.42.148:30304  err=nil
+TRACE[05-22|09:28:15.959] >> FINDNODE/v4                           id=3b84f4e47e8f446b addr=47.75.33.33:30322     err=nil
+TRACE[05-22|09:28:15.982] >> FINDNODE/v4                           id=3b84658c6a6794f9 addr=193.169.240.112:30303 err=nil

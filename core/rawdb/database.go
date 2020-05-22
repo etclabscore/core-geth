@@ -107,9 +107,11 @@ func NewDatabase(db ethdb.KeyValueStore) ethdb.Database {
 // storage.
 func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerStr string, namespace string) (ethdb.Database, error) {
 	// Create the idle freezer instance
-	fmt.Println(" NEW REMOTE FREEZA")
+	log.Info("New remote freezer", "freezer", freezerStr, "namespace", namespace)
+
 	frdb, err := newFreezerRemote(freezerStr, namespace)
 	if err != nil {
+		log.Error("NewDatabaseWithFreezerRemote error", "error", err)
 		return nil, err
 	}
 	// Since the freezer can be stored separately from the user's key-value database,
@@ -268,7 +270,7 @@ func NewLevelDBDatabase(file string, cache int, handles int, namespace string) (
 // NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a
 // freezer moving immutable chain segments into cold storage.
 func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, freezer string, namespace string) (ethdb.Database, error) {
-	kvdb, err := leveldb.New(file, cache, handles, namespace)
+	kvdb, err := leveldb.New(file, cache, handles, "eth/db/chaindata")
 	if err != nil {
 		return nil, err
 	}

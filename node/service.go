@@ -17,7 +17,6 @@
 package node
 
 import (
-	"fmt"
 	"path/filepath"
 	"reflect"
 
@@ -56,21 +55,14 @@ func (ctx *ServiceContext) OpenDatabase(name string, cache int, handles int, nam
 // memory database is returned.
 func (ctx *ServiceContext) OpenDatabaseWithFreezerRemote(name string, cache int, handles int, freezer string, namespace string) (ethdb.Database, error) {
 
-	fmt.Println("openning the FREEZA via rawdb p1")
+	//fmt.Println("openning the FREEZA via rawdb p1")
 	if ctx.Config.DataDir == "" {
 		return rawdb.NewMemoryDatabase(), nil
 	}
 
 	root := ctx.Config.ResolvePath(name)
-	fmt.Println("openning the FREEZA via rawdb p1.5")
+	//fmt.Println("openning the FREEZA via rawdb p1.5")
 
-	switch {
-	case freezer == "":
-		freezer = filepath.Join(root, "ancient")
-	case !filepath.IsAbs(freezer):
-		freezer = ctx.Config.ResolvePath(freezer)
-	}
-	fmt.Println("openning the FREEZA via rawdb p2")
 	return rawdb.NewLevelDBDatabaseWithFreezerRemote(root, cache, handles, freezer, namespace)
 }
 

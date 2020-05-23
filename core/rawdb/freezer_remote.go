@@ -111,12 +111,19 @@ func newFreezerRemote(freezerStr string, namespace string) (*freezerRemote, erro
 // Close terminates the chain freezer, unmapping all the data files.
 func (f *freezerRemote) Close() error {
 	f.quit <- struct{}{}
+	err := f.service.Sync()
+	if err != nil {
+		return err
+	}
 	return f.service.Close()
 }
 
 // HasAncient returns an indicator whether the specified ancient data exists
 // in the freezer.
 func (f *freezerRemote) HasAncient(kind string, number uint64) (bool, error) {
+	if atomic.LoadUint64(&f.frozen) <= number {
+		return false, nil
+	}
 	return f.service.HasAncient(kind, number)
 }
 

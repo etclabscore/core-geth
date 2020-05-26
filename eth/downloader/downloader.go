@@ -904,17 +904,17 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, remoteHeight ui
 				arrived = true
 
 				// Modify the search interval based on the response
-				h := headers[0].Hash()
+				hash = headers[0].Hash()
 				n := headers[0].Number.Uint64()
 
 				var known bool
 				switch d.mode {
 				case FullSync:
-					known = d.blockchain.HasBlock(h, n)
+					known = d.blockchain.HasBlock(hash, n)
 				case FastSync:
-					known = d.blockchain.HasFastBlock(h, n)
+					known = d.blockchain.HasFastBlock(hash, n)
 				case LightSync:
-					known = d.lightchain.HasHeader(h, n)
+					known = d.lightchain.HasHeader(hash, n)
 				default:
 					log.Crit("unknown sync mode", "mode", d.mode)
 				}
@@ -922,13 +922,12 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, remoteHeight ui
 					end = check
 					break
 				}
-				header := d.lightchain.GetHeaderByHash(h) // Independent of sync mode, header surely exists
+				header := d.lightchain.GetHeaderByHash(hash) // Independent of sync mode, header surely exists
 				if header.Number.Uint64() != check {
 					p.log.Debug("Received non requested header", "number", header.Number, "hash", header.Hash(), "request", check)
 					return 0, errBadPeer
 				}
 				start = check
-				hash = h
 
 			case <-timeout:
 				p.log.Debug("Waiting for search header timed out", "elapsed", ttl)

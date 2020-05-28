@@ -28,7 +28,7 @@ var (
 	SocialGenesisHash = common.HexToHash("0xba8314d5c2ebddaf58eb882b364b27cbfa4d3402dacd32b60986754ac25cfe8d")
 
 	// SocialChainConfig is the chain parameters to run a node on the Ethereum Social main network.
-	SocialChainConfig = &multigeth.MultiGethChainConfig{
+	SocialChainConfig = &multigeth.CoreGethChainConfig{
 		ChainID:           big.NewInt(28),
 		EIP2FBlock:        big.NewInt(0),
 		EIP7FBlock:        big.NewInt(0),

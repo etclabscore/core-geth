@@ -25,7 +25,7 @@ import (
 
 var (
 	// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
-	ClassicChainConfig = &multigeth.MultiGethChainConfig{
+	ClassicChainConfig = &multigeth.CoreGethChainConfig{
 		NetworkID: 1,
 		Ethash:    new(ctypes.EthashConfig),
 		ChainID:   big.NewInt(61),

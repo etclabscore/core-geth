@@ -44,7 +44,7 @@ func unmarshalChainSpec(format string, data []byte) (conf ctypes.Configurator, e
 	if format == "geth" {
 		d.Config = &goethereum.ChainConfig{}
 	} else if format == "multigeth" {
-		d.Config = &multigeth.MultiGethChainConfig{}
+		d.Config = &multigeth.CoreGethChainConfig{}
 	} else {
 		panic("impossible")
 	}

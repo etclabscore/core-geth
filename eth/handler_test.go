@@ -476,7 +476,7 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 	// Initialize a chain and generate a fake CHT if checkpointing is enabled
 	var (
 		db     = rawdb.NewMemoryDatabase()
-		config = new(multigeth.MultiGethChainConfig)
+		config = new(multigeth.CoreGethChainConfig)
 	)
 	core.MustCommitGenesis(db, &genesisT.Genesis{Config: config}) // Commit genesis block
 	// If checkpointing is enabled, create and inject a fake CHT and the corresponding
@@ -577,7 +577,7 @@ func testBroadcastBlock(t *testing.T, totalPeers, broadcastExpected int) {
 		evmux   = new(event.TypeMux)
 		pow     = ethash.NewFaker()
 		db      = rawdb.NewMemoryDatabase()
-		config  = &multigeth.MultiGethChainConfig{}
+		config  = &multigeth.CoreGethChainConfig{}
 		gspec   = &genesisT.Genesis{Config: config}
 		genesis = core.MustCommitGenesis(db, gspec)
 	)
@@ -638,7 +638,7 @@ func TestBroadcastMalformedBlock(t *testing.T) {
 	var (
 		engine  = ethash.NewFaker()
 		db      = rawdb.NewMemoryDatabase()
-		config  = &multigeth.MultiGethChainConfig{}
+		config  = &multigeth.CoreGethChainConfig{}
 		gspec   = &genesisT.Genesis{Config: config}
 		genesis = core.MustCommitGenesis(db, gspec)
 	)

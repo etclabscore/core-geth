@@ -177,7 +177,7 @@ func (tm *testMatcher) findConfig(name string) (ctypes.ChainConfigurator, string
 		}
 	}
 	log.Println("using empty config", name)
-	return new(multigeth.MultiGethChainConfig), ""
+	return new(multigeth.CoreGethChainConfig), ""
 }
 
 // checkFailure checks whether a failure is expected.

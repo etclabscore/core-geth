@@ -34,7 +34,7 @@ func TestUnmarshalChainConfigurator(t *testing.T) {
 		},
 		{
 			filepath.Join("..", "testdata", "stureby_multigeth.json"),
-			&multigeth.MultiGethChainConfig{},
+			&multigeth.CoreGethChainConfig{},
 		},
 	}
 
@@ -243,14 +243,14 @@ func TestUnmarshalChainConfigurator2(t *testing.T) {
 		{
 			versionid: "v198",
 			raw:       cc_v198_a,
-			wantType:  reflect.TypeOf(&multigeth.MultiGethChainConfig{}),
+			wantType:  reflect.TypeOf(&multigeth.CoreGethChainConfig{}),
 		},
 		{
 			versionid: "v199",
 			// Same same as v198; would like to use a real "latest" runtime marshaled config,
 			// but this will at least enable a test of a::a.
 			raw:      cc_v198_a,
-			wantType: reflect.TypeOf(&multigeth.MultiGethChainConfig{}),
+			wantType: reflect.TypeOf(&multigeth.CoreGethChainConfig{}),
 		},
 		// FIXME
 		//{
@@ -259,7 +259,7 @@ func TestUnmarshalChainConfigurator2(t *testing.T) {
 		//		b, _ := json.MarshalIndent(params.ClassicChainConfig, "", "    ")
 		//		return string(b)
 		//	}(),
-		//	wantType: reflect.TypeOf(&multigeth.MultiGethChainConfig{}),
+		//	wantType: reflect.TypeOf(&multigeth.CoreGethChainConfig{}),
 		//},
 	}
 

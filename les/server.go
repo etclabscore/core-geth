@@ -98,7 +98,7 @@ func NewLesServer(e *eth.Ethereum, config *eth.Config) (*LesServer, error) {
 	// Set up checkpoint oracle.
 	oracle := config.CheckpointOracle
 	if oracle == nil {
-		if p, ok := e.BlockChain().Config().(*multigeth.MultiGethChainConfig); ok {
+		if p, ok := e.BlockChain().Config().(*multigeth.CoreGethChainConfig); ok {
 			oracle = p.TrustedCheckpointOracle
 		} else if p, ok := e.BlockChain().Config().(*goethereum.ChainConfig); ok {
 			oracle = p.TrustedCheckpointOracle

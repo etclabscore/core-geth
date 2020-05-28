@@ -8,7 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
-var testConfig = &MultiGethChainConfig{
+var testConfig = &CoreGethChainConfig{
 	NetworkID:  1,
 	Ethash:     new(ctypes.EthashConfig),
 	ChainID:    big.NewInt(61),
@@ -44,7 +44,7 @@ var testConfig = &MultiGethChainConfig{
 	},
 }
 
-func TestMultiGethChainConfig_String(t *testing.T) {
+func TestCoreGethChainConfig_String(t *testing.T) {
 	t.Skip("(noop) development use only")
 	t.Log(testConfig.String())
 }

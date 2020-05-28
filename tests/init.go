@@ -59,7 +59,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		EIP158Block:    big.NewInt(0),
 		ByzantiumBlock: big.NewInt(0),
 	},
-	"ETC_Atlantis": &multigeth.MultiGethChainConfig{
+	"ETC_Atlantis": &multigeth.CoreGethChainConfig{
 		NetworkID:          1,
 		Ethash:             new(ctypes.EthashConfig),
 		ChainID:            big.NewInt(61),
@@ -111,7 +111,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ConstantinopleBlock: big.NewInt(0),
 		PetersburgBlock:     big.NewInt(0),
 	},
-	"ETC_Agharta": &multigeth.MultiGethChainConfig{
+	"ETC_Agharta": &multigeth.CoreGethChainConfig{
 		NetworkID:          1,
 		Ethash:             new(ctypes.EthashConfig),
 		ChainID:            big.NewInt(61),

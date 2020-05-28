@@ -113,10 +113,10 @@ func readConfigFromSpecFile(name string) (spec ctypes.ChainConfigurator, sha1sum
 func init() {
 
 	if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_MULTIGETH_KEY) != "" {
-		log.Println("converting to MultiGeth Chain Config data type.")
+		log.Println("converting to CoreGeth Chain Config data type.")
 
 		for i, config := range Forks {
-			mgc := &multigeth.MultiGethChainConfig{}
+			mgc := &multigeth.CoreGethChainConfig{}
 			if err := confp.Convert(config, mgc); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
@@ -124,7 +124,7 @@ func init() {
 		}
 
 		for k, v := range difficultyChainConfigurations {
-			mgc := &multigeth.MultiGethChainConfig{}
+			mgc := &multigeth.CoreGethChainConfig{}
 			if err := confp.Convert(v, mgc); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
@@ -201,7 +201,7 @@ func init() {
 	}
 }
 
-//func convertMetaForkBlocksToFeatures(config *paramtypes.MultiGethChainConfig) {
+//func convertMetaForkBlocksToFeatures(config *paramtypes.CoreGethChainConfig) {
 //	if config.HomesteadBlock != nil {
 //		config.EIP2FBlock = config.HomesteadBlock
 //		config.EIP7FBlock = config.HomesteadBlock

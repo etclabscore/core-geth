@@ -26,12 +26,12 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
-// MultiGethChainConfig is the core config which determines the blockchain settings.
+// CoreGethChainConfig is the core config which determines the blockchain settings.
 //
-// MultiGethChainConfig is stored in the database on a per block basis. This means
+// CoreGethChainConfig is stored in the database on a per block basis. This means
 // that any network, identified by its genesis block, can have its own
 // set of configuration options.
-type MultiGethChainConfig struct {
+type CoreGethChainConfig struct {
 	// Some of the following fields are left commented because it's useful to see pairings,
 	// both for reference and edification.
 	// They show a difference between the upstream configuration data type (goethereum.ChainConfig) and this one.
@@ -188,7 +188,7 @@ type MultiGethChainConfig struct {
 }
 
 // String implements the fmt.Stringer interface.
-func (c *MultiGethChainConfig) String() string {
+func (c *CoreGethChainConfig) String() string {
 	var engine interface{}
 	switch {
 	case c.Ethash != nil:

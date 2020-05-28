@@ -24,7 +24,7 @@ var (
 	chainspecFormatTypes = map[string]ctypes.Configurator{
 		"parity": &parity.ParityChainSpec{},
 		"multigeth": &genesisT.Genesis{
-			Config: &multigeth.MultiGethChainConfig{},
+			Config: &multigeth.CoreGethChainConfig{},
 		},
 		"geth": &genesisT.Genesis{
 			Config: &goethereum.ChainConfig{},

@@ -55,48 +55,48 @@ func setBig(i *big.Int, u *uint64) *big.Int {
 	return i
 }
 
-func (c *MultiGethChainConfig) ensureExistingRewardSchedule() {
+func (c *CoreGethChainConfig) ensureExistingRewardSchedule() {
 	if c.BlockRewardSchedule == nil {
 		c.BlockRewardSchedule = ctypes.Uint64BigMapEncodesHex{}
 	}
 }
 
-func (c *MultiGethChainConfig) ensureExistingDifficultySchedule() {
+func (c *CoreGethChainConfig) ensureExistingDifficultySchedule() {
 	if c.DifficultyBombDelaySchedule == nil {
 		c.DifficultyBombDelaySchedule = ctypes.Uint64BigMapEncodesHex{}
 	}
 }
 
-func (c *MultiGethChainConfig) GetAccountStartNonce() *uint64 {
+func (c *CoreGethChainConfig) GetAccountStartNonce() *uint64 {
 	return internal.GlobalConfigurator().GetAccountStartNonce()
 }
-func (c *MultiGethChainConfig) SetAccountStartNonce(n *uint64) error {
+func (c *CoreGethChainConfig) SetAccountStartNonce(n *uint64) error {
 	return internal.GlobalConfigurator().SetAccountStartNonce(n)
 }
-func (c *MultiGethChainConfig) GetMaximumExtraDataSize() *uint64 {
+func (c *CoreGethChainConfig) GetMaximumExtraDataSize() *uint64 {
 	return internal.GlobalConfigurator().GetMaximumExtraDataSize()
 }
-func (c *MultiGethChainConfig) SetMaximumExtraDataSize(n *uint64) error {
+func (c *CoreGethChainConfig) SetMaximumExtraDataSize(n *uint64) error {
 	return internal.GlobalConfigurator().SetMaximumExtraDataSize(n)
 }
-func (c *MultiGethChainConfig) GetMinGasLimit() *uint64 {
+func (c *CoreGethChainConfig) GetMinGasLimit() *uint64 {
 	return internal.GlobalConfigurator().GetMinGasLimit()
 }
-func (c *MultiGethChainConfig) SetMinGasLimit(n *uint64) error {
+func (c *CoreGethChainConfig) SetMinGasLimit(n *uint64) error {
 	return internal.GlobalConfigurator().SetMinGasLimit(n)
 }
-func (c *MultiGethChainConfig) GetGasLimitBoundDivisor() *uint64 {
+func (c *CoreGethChainConfig) GetGasLimitBoundDivisor() *uint64 {
 	return internal.GlobalConfigurator().GetGasLimitBoundDivisor()
 }
-func (c *MultiGethChainConfig) SetGasLimitBoundDivisor(n *uint64) error {
+func (c *CoreGethChainConfig) SetGasLimitBoundDivisor(n *uint64) error {
 	return internal.GlobalConfigurator().SetGasLimitBoundDivisor(n)
 }
 
-func (c *MultiGethChainConfig) GetNetworkID() *uint64 {
+func (c *CoreGethChainConfig) GetNetworkID() *uint64 {
 	return newU64(c.NetworkID)
 }
 
-func (c *MultiGethChainConfig) SetNetworkID(n *uint64) error {
+func (c *CoreGethChainConfig) SetNetworkID(n *uint64) error {
 	if n == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -104,275 +104,275 @@ func (c *MultiGethChainConfig) SetNetworkID(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetChainID() *big.Int {
+func (c *CoreGethChainConfig) GetChainID() *big.Int {
 	return c.ChainID
 }
 
-func (c *MultiGethChainConfig) SetChainID(n *big.Int) error {
+func (c *CoreGethChainConfig) SetChainID(n *big.Int) error {
 	c.ChainID = n
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetMaxCodeSize() *uint64 {
+func (c *CoreGethChainConfig) GetMaxCodeSize() *uint64 {
 	return internal.GlobalConfigurator().GetMaxCodeSize()
 }
-func (c *MultiGethChainConfig) SetMaxCodeSize(n *uint64) error {
+func (c *CoreGethChainConfig) SetMaxCodeSize(n *uint64) error {
 	return internal.GlobalConfigurator().SetMaxCodeSize(n)
 }
 
-func (c *MultiGethChainConfig) GetEIP7Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP7Transition() *uint64 {
 	return bigNewU64(c.EIP7FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP7Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP7Transition(n *uint64) error {
 	c.EIP7FBlock = setBig(c.EIP7FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP150Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP150Transition() *uint64 {
 	return bigNewU64(c.EIP150Block)
 }
 
-func (c *MultiGethChainConfig) SetEIP150Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP150Transition(n *uint64) error {
 	c.EIP150Block = setBig(c.EIP150Block, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP152Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP152Transition() *uint64 {
 	return bigNewU64(c.EIP152FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP152Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP152Transition(n *uint64) error {
 	c.EIP152FBlock = setBig(c.EIP152FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP160Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP160Transition() *uint64 {
 	return bigNewU64(c.EIP160FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP160Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP160Transition(n *uint64) error {
 	c.EIP160FBlock = setBig(c.EIP160FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP161dTransition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP161dTransition() *uint64 {
 	return bigNewU64(c.EIP161FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP161dTransition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP161dTransition(n *uint64) error {
 	c.EIP161FBlock = setBig(c.EIP161FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP161abcTransition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP161abcTransition() *uint64 {
 	return bigNewU64(c.EIP161FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP161abcTransition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP161abcTransition(n *uint64) error {
 	c.EIP161FBlock = setBig(c.EIP161FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP170Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP170Transition() *uint64 {
 	return bigNewU64(c.EIP170FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP170Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP170Transition(n *uint64) error {
 	c.EIP170FBlock = setBig(c.EIP170FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP155Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP155Transition() *uint64 {
 	return bigNewU64(c.EIP155Block)
 }
 
-func (c *MultiGethChainConfig) SetEIP155Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP155Transition(n *uint64) error {
 	c.EIP155Block = setBig(c.EIP155Block, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP140Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP140Transition() *uint64 {
 	return bigNewU64(c.EIP140FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP140Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP140Transition(n *uint64) error {
 	c.EIP140FBlock = setBig(c.EIP140FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP198Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP198Transition() *uint64 {
 	return bigNewU64(c.EIP198FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP198Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP198Transition(n *uint64) error {
 	c.EIP198FBlock = setBig(c.EIP198FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP211Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP211Transition() *uint64 {
 	return bigNewU64(c.EIP211FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP211Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP211Transition(n *uint64) error {
 	c.EIP211FBlock = setBig(c.EIP211FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP212Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP212Transition() *uint64 {
 	return bigNewU64(c.EIP212FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP212Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP212Transition(n *uint64) error {
 	c.EIP212FBlock = setBig(c.EIP212FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP213Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP213Transition() *uint64 {
 	return bigNewU64(c.EIP213FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP213Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP213Transition(n *uint64) error {
 	c.EIP213FBlock = setBig(c.EIP213FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP214Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP214Transition() *uint64 {
 	return bigNewU64(c.EIP214FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP214Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP214Transition(n *uint64) error {
 	c.EIP214FBlock = setBig(c.EIP214FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP658Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP658Transition() *uint64 {
 	return bigNewU64(c.EIP658FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP658Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP658Transition(n *uint64) error {
 	c.EIP658FBlock = setBig(c.EIP658FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP145Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP145Transition() *uint64 {
 	return bigNewU64(c.EIP145FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP145Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP145Transition(n *uint64) error {
 	c.EIP145FBlock = setBig(c.EIP145FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP1014Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP1014Transition() *uint64 {
 	return bigNewU64(c.EIP1014FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP1014Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP1014Transition(n *uint64) error {
 	c.EIP1014FBlock = setBig(c.EIP1014FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP1052Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP1052Transition() *uint64 {
 	return bigNewU64(c.EIP1052FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP1052Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP1052Transition(n *uint64) error {
 	c.EIP1052FBlock = setBig(c.EIP1052FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP1283Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP1283Transition() *uint64 {
 	return bigNewU64(c.EIP1283FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP1283Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP1283Transition(n *uint64) error {
 	c.EIP1283FBlock = setBig(c.EIP1283FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP1283DisableTransition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP1283DisableTransition() *uint64 {
 	return bigNewU64(c.PetersburgBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP1283DisableTransition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP1283DisableTransition(n *uint64) error {
 	c.PetersburgBlock = setBig(c.PetersburgBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP1108Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP1108Transition() *uint64 {
 	return bigNewU64(c.EIP1108FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP1108Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP1108Transition(n *uint64) error {
 	c.EIP1108FBlock = setBig(c.EIP1108FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP2200Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP2200Transition() *uint64 {
 	return bigNewU64(c.EIP2200FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP2200Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP2200Transition(n *uint64) error {
 	c.EIP2200FBlock = setBig(c.EIP2200FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP2200DisableTransition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP2200DisableTransition() *uint64 {
 	return bigNewU64(c.EIP2200DisableFBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP2200DisableTransition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP2200DisableTransition(n *uint64) error {
 	c.EIP2200DisableFBlock = setBig(c.EIP2200DisableFBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP1344Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP1344Transition() *uint64 {
 	return bigNewU64(c.EIP1344FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP1344Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP1344Transition(n *uint64) error {
 	c.EIP1344FBlock = setBig(c.EIP1344FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP1884Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP1884Transition() *uint64 {
 	return bigNewU64(c.EIP1884FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP1884Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP1884Transition(n *uint64) error {
 	c.EIP1884FBlock = setBig(c.EIP1884FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP2028Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP2028Transition() *uint64 {
 	return bigNewU64(c.EIP2028FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP2028Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP2028Transition(n *uint64) error {
 	c.EIP2028FBlock = setBig(c.EIP2028FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetECIP1080Transition() *uint64 {
+func (c *CoreGethChainConfig) GetECIP1080Transition() *uint64 {
 	return bigNewU64(c.ECIP1080FBlock)
 }
 
-func (c *MultiGethChainConfig) SetECIP1080Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetECIP1080Transition(n *uint64) error {
 	c.ECIP1080FBlock = setBig(c.ECIP1080FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEIP1706Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP1706Transition() *uint64 {
 	return bigNewU64(c.EIP1706FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEIP1706Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP1706Transition(n *uint64) error {
 	c.EIP1706FBlock = setBig(c.EIP1706FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
+func (c *CoreGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {
 		return false
@@ -380,7 +380,7 @@ func (c *MultiGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	return big.NewInt(int64(*f)).Cmp(n) <= 0
 }
 
-func (c *MultiGethChainConfig) GetForkCanonHash(n uint64) common.Hash {
+func (c *CoreGethChainConfig) GetForkCanonHash(n uint64) common.Hash {
 	if c.RequireBlockHashes == nil {
 		return common.Hash{}
 	}
@@ -392,7 +392,7 @@ func (c *MultiGethChainConfig) GetForkCanonHash(n uint64) common.Hash {
 	return common.Hash{}
 }
 
-func (c *MultiGethChainConfig) SetForkCanonHash(n uint64, h common.Hash) error {
+func (c *CoreGethChainConfig) SetForkCanonHash(n uint64, h common.Hash) error {
 	if c.RequireBlockHashes == nil {
 		c.RequireBlockHashes = make(map[uint64]common.Hash)
 	}
@@ -400,11 +400,11 @@ func (c *MultiGethChainConfig) SetForkCanonHash(n uint64, h common.Hash) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetForkCanonHashes() map[uint64]common.Hash {
+func (c *CoreGethChainConfig) GetForkCanonHashes() map[uint64]common.Hash {
 	return c.RequireBlockHashes
 }
 
-func (c *MultiGethChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT {
+func (c *CoreGethChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT {
 	if c.Ethash != nil {
 		return ctypes.ConsensusEngineT_Ethash
 	}
@@ -414,7 +414,7 @@ func (c *MultiGethChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT 
 	return ctypes.ConsensusEngineT_Unknown
 }
 
-func (c *MultiGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
+func (c *CoreGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
 	switch t {
 	case ctypes.ConsensusEngineT_Ethash:
 		c.Ethash = new(ctypes.EthashConfig)
@@ -427,56 +427,56 @@ func (c *MultiGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngi
 	}
 }
 
-func (c *MultiGethChainConfig) GetEthashMinimumDifficulty() *big.Int {
+func (c *CoreGethChainConfig) GetEthashMinimumDifficulty() *big.Int {
 	return internal.GlobalConfigurator().GetEthashMinimumDifficulty()
 }
-func (c *MultiGethChainConfig) SetEthashMinimumDifficulty(i *big.Int) error {
+func (c *CoreGethChainConfig) SetEthashMinimumDifficulty(i *big.Int) error {
 	return internal.GlobalConfigurator().SetEthashMinimumDifficulty(i)
 }
 
-func (c *MultiGethChainConfig) GetEthashDifficultyBoundDivisor() *big.Int {
+func (c *CoreGethChainConfig) GetEthashDifficultyBoundDivisor() *big.Int {
 	return internal.GlobalConfigurator().GetEthashDifficultyBoundDivisor()
 }
 
-func (c *MultiGethChainConfig) SetEthashDifficultyBoundDivisor(i *big.Int) error {
+func (c *CoreGethChainConfig) SetEthashDifficultyBoundDivisor(i *big.Int) error {
 	return internal.GlobalConfigurator().SetEthashDifficultyBoundDivisor(i)
 }
 
-func (c *MultiGethChainConfig) GetEthashDurationLimit() *big.Int {
+func (c *CoreGethChainConfig) GetEthashDurationLimit() *big.Int {
 	return internal.GlobalConfigurator().GetEthashDurationLimit()
 }
 
-func (c *MultiGethChainConfig) SetEthashDurationLimit(i *big.Int) error {
+func (c *CoreGethChainConfig) SetEthashDurationLimit(i *big.Int) error {
 	return internal.GlobalConfigurator().SetEthashDurationLimit(i)
 }
 
-func (c *MultiGethChainConfig) GetEthashHomesteadTransition() *uint64 {
+func (c *CoreGethChainConfig) GetEthashHomesteadTransition() *uint64 {
 	if c.EIP2FBlock == nil || c.EIP7FBlock == nil {
 		return nil
 	}
 	return bigNewU64(math.BigMax(c.EIP2FBlock, c.EIP7FBlock))
 }
 
-func (c *MultiGethChainConfig) SetEthashHomesteadTransition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEthashHomesteadTransition(n *uint64) error {
 	c.EIP2FBlock = setBig(c.EIP2FBlock, n)
 	c.EIP7FBlock = setBig(c.EIP7FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashEIP2Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEthashEIP2Transition() *uint64 {
 	return bigNewU64(c.EIP2FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEthashEIP2Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEthashEIP2Transition(n *uint64) error {
 	c.EIP2FBlock = setBig(c.EIP2FBlock, n)
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashEIP779Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEthashEIP779Transition() *uint64 {
 	return bigNewU64(c.DAOForkBlock)
 }
 
-func (c *MultiGethChainConfig) SetEthashEIP779Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEthashEIP779Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -484,7 +484,7 @@ func (c *MultiGethChainConfig) SetEthashEIP779Transition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashEIP649Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEthashEIP649Transition() *uint64 {
 	if c.eip649FInferred {
 		return bigNewU64(c.EIP649FBlock)
 	}
@@ -505,7 +505,7 @@ func (c *MultiGethChainConfig) GetEthashEIP649Transition() *uint64 {
 	return diffN
 }
 
-func (c *MultiGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -526,7 +526,7 @@ func (c *MultiGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashEIP1234Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEthashEIP1234Transition() *uint64 {
 	if c.eip1234FInferred {
 		return bigNewU64(c.EIP1234FBlock)
 	}
@@ -547,7 +547,7 @@ func (c *MultiGethChainConfig) GetEthashEIP1234Transition() *uint64 {
 	return diffN
 }
 
-func (c *MultiGethChainConfig) SetEthashEIP1234Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -569,7 +569,7 @@ func (c *MultiGethChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashEIP2384Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEthashEIP2384Transition() *uint64 {
 	if c.eip2384Inferred {
 		return bigNewU64(c.EIP2384FBlock)
 	}
@@ -585,7 +585,7 @@ func (c *MultiGethChainConfig) GetEthashEIP2384Transition() *uint64 {
 	return diffN
 }
 
-func (c *MultiGethChainConfig) SetEthashEIP2384Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEthashEIP2384Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -603,11 +603,11 @@ func (c *MultiGethChainConfig) SetEthashEIP2384Transition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashECIP1010PauseTransition() *uint64 {
+func (c *CoreGethChainConfig) GetEthashECIP1010PauseTransition() *uint64 {
 	return bigNewU64(c.ECIP1010PauseBlock)
 }
 
-func (c *MultiGethChainConfig) SetEthashECIP1010PauseTransition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEthashECIP1010PauseTransition(n *uint64) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -620,7 +620,7 @@ func (c *MultiGethChainConfig) SetEthashECIP1010PauseTransition(n *uint64) error
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashECIP1010ContinueTransition() *uint64 {
+func (c *CoreGethChainConfig) GetEthashECIP1010ContinueTransition() *uint64 {
 	if c.ECIP1010PauseBlock == nil {
 		return nil
 	}
@@ -631,7 +631,7 @@ func (c *MultiGethChainConfig) GetEthashECIP1010ContinueTransition() *uint64 {
 	return bigNewU64(new(big.Int).Add(c.ECIP1010PauseBlock, c.ECIP1010Length))
 }
 
-func (c *MultiGethChainConfig) SetEthashECIP1010ContinueTransition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEthashECIP1010ContinueTransition(n *uint64) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -647,11 +647,11 @@ func (c *MultiGethChainConfig) SetEthashECIP1010ContinueTransition(n *uint64) er
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashECIP1017Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEthashECIP1017Transition() *uint64 {
 	return bigNewU64(c.ECIP1017FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEthashECIP1017Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEthashECIP1017Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -659,11 +659,11 @@ func (c *MultiGethChainConfig) SetEthashECIP1017Transition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashECIP1017EraRounds() *uint64 {
+func (c *CoreGethChainConfig) GetEthashECIP1017EraRounds() *uint64 {
 	return bigNewU64(c.ECIP1017EraRounds)
 }
 
-func (c *MultiGethChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
+func (c *CoreGethChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -671,11 +671,11 @@ func (c *MultiGethChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashEIP100BTransition() *uint64 {
+func (c *CoreGethChainConfig) GetEthashEIP100BTransition() *uint64 {
 	return bigNewU64(c.EIP100FBlock)
 }
 
-func (c *MultiGethChainConfig) SetEthashEIP100BTransition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEthashEIP100BTransition(n *uint64) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -683,11 +683,11 @@ func (c *MultiGethChainConfig) SetEthashEIP100BTransition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashECIP1041Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEthashECIP1041Transition() *uint64 {
 	return bigNewU64(c.DisposalBlock)
 }
 
-func (c *MultiGethChainConfig) SetEthashECIP1041Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEthashECIP1041Transition(n *uint64) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -695,11 +695,11 @@ func (c *MultiGethChainConfig) SetEthashECIP1041Transition(n *uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
+func (c *CoreGethChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	return c.DifficultyBombDelaySchedule
 }
 
-func (c *MultiGethChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint64BigMapEncodesHex) error {
+func (c *CoreGethChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint64BigMapEncodesHex) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -707,11 +707,11 @@ func (c *MultiGethChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uin
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
+func (c *CoreGethChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
 	return c.BlockRewardSchedule
 }
 
-func (c *MultiGethChainConfig) SetEthashBlockRewardSchedule(m ctypes.Uint64BigMapEncodesHex) error {
+func (c *CoreGethChainConfig) SetEthashBlockRewardSchedule(m ctypes.Uint64BigMapEncodesHex) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -719,14 +719,14 @@ func (c *MultiGethChainConfig) SetEthashBlockRewardSchedule(m ctypes.Uint64BigMa
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetCliquePeriod() uint64 {
+func (c *CoreGethChainConfig) GetCliquePeriod() uint64 {
 	if c.Clique == nil {
 		return 0
 	}
 	return c.Clique.Period
 }
 
-func (c *MultiGethChainConfig) SetCliquePeriod(n uint64) error {
+func (c *CoreGethChainConfig) SetCliquePeriod(n uint64) error {
 	if c.Clique == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
@@ -734,14 +734,14 @@ func (c *MultiGethChainConfig) SetCliquePeriod(n uint64) error {
 	return nil
 }
 
-func (c *MultiGethChainConfig) GetCliqueEpoch() uint64 {
+func (c *CoreGethChainConfig) GetCliqueEpoch() uint64 {
 	if c.Clique == nil {
 		return 0
 	}
 	return c.Clique.Epoch
 }
 
-func (c *MultiGethChainConfig) SetCliqueEpoch(n uint64) error {
+func (c *CoreGethChainConfig) SetCliqueEpoch(n uint64) error {
 	if c.Clique == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}

@@ -60,7 +60,7 @@ func Test_UnmarshalJSON(t *testing.T) {
 		case "parity":
 			p := &parity.ParityChainSpec{}
 			mustOpenF(t, f, p)
-			_, err := tconvert.ParityConfigToMultiGethGenesis(p)
+			_, err := tconvert.ParityConfigToCoreGethGenesis(p)
 			if err != nil {
 				t.Error(err)
 			}
@@ -94,10 +94,10 @@ func TestIdentical(t *testing.T) {
 		"NetworkID",
 	}
 	configs := []ctypes.ChainConfigurator{
-		&multigeth.MultiGethChainConfig{},
+		&multigeth.CoreGethChainConfig{},
 		&goethereum.ChainConfig{},
 		&parity.ParityChainSpec{},
-		&multigeth.MultiGethChainConfig{}, // Complete combination test set.
+		&multigeth.CoreGethChainConfig{}, // Complete combination test set.
 	}
 	for i := range configs {
 		if i == 0 {
@@ -130,7 +130,7 @@ func TestConfiguratorImplementationsSatisfied(t *testing.T) {
 
 	for _, ty := range []interface{}{
 		&goethereum.ChainConfig{},
-		&multigeth.MultiGethChainConfig{},
+		&multigeth.CoreGethChainConfig{},
 	} {
 		_ = ty.(ctypes.ChainConfigurator)
 	}

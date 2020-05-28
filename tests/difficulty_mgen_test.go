@@ -37,12 +37,12 @@ import (
 var outNDJSONFile = filepath.Join(difficultyTestDir, "mgen_difficulty.ndjson")
 
 func TestDifficultyGen(t *testing.T) {
-	generateTests := os.Getenv(MG_GENERATE_DIFFICULTY_TESTS_KEY) != ""
+	generateTests := os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) != ""
 
 	if !generateTests {
 		t.Skip()
 	}
-	if os.Getenv(MG_CHAINCONFIG_CHAINSPECS_PARITY_KEY) == "" {
+	if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_PARITY_KEY) == "" {
 		t.Fatal("Must run test generation with JSON file chain configurations.")
 	}
 

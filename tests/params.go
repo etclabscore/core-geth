@@ -112,7 +112,7 @@ func readConfigFromSpecFile(name string) (spec ctypes.ChainConfigurator, sha1sum
 
 func init() {
 
-	if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_MULTIGETH_KEY) != "" {
+	if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_COREGETH_KEY) != "" {
 		log.Println("converting to CoreGeth Chain Config data type.")
 
 		for i, config := range Forks {
@@ -131,7 +131,7 @@ func init() {
 			difficultyChainConfigurations[k] = mgc
 		}
 
-	} else if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_MULTIGETHV0_KEY) != "" {
+	} else if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_MULTIGETHV0_KEY) != "" {
 		log.Println("converting to MultiGethV0 data type.")
 
 		for i, config := range Forks {
@@ -150,7 +150,7 @@ func init() {
 			difficultyChainConfigurations[k] = pspec
 		}
 
-	} else if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_PARITY_KEY) != "" {
+	} else if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_PARITY_KEY) != "" {
 		log.Println("converting to Parity data type.")
 
 		for i, config := range Forks {
@@ -169,7 +169,7 @@ func init() {
 			difficultyChainConfigurations[k] = pspec
 		}
 
-	} else if os.Getenv(MG_CHAINCONFIG_CHAINSPECS_PARITY_KEY) != "" {
+	} else if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_PARITY_KEY) != "" {
 		log.Println("Setting chain configurations from Parity chainspecs")
 
 		for k, v := range MapForkNameChainspecFileState {
@@ -189,7 +189,7 @@ func init() {
 
 		for k, v := range mapForkNameChainspecFileDifficulty {
 			config, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
-			if os.IsNotExist(err) && os.Getenv(MG_GENERATE_DIFFICULTY_TESTS_KEY) != "" {
+			if os.IsNotExist(err) && os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) != "" {
 				log.Println("Will generate chainspec file for", k, v)
 			} else if len(sha1sum) == 0 {
 				panic("zero sum game")

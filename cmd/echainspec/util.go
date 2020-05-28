@@ -33,7 +33,7 @@ func unmarshalChainSpec(format string, data []byte) (conf ctypes.Configurator, e
 		return
 	}
 	// Logic in params/types/gen_genesis.go already "auto-magically"
-	// handles genesis Config unmarshaling, and IT PREFERS MULTIGETH,
+	// handles genesis Config unmarshaling, and IT PREFERS COREGETH,
 	// and the two data types are not mutually exclusive (are overlapping).
 	// So we need to redo custom unmarshaling logic to enforce data type
 	// preference based on passed format value.

@@ -43,32 +43,32 @@ test-coregeth-features: test-coregeth-features-parity test-coregeth-features-cor
 
 test-coregeth-features-parity:
 	@echo "Testing fork/feature/datatype implementation; equivalence - PARITY."
-	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_PARITY=on go test -count=1 ./tests
+	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_PARITY=on go test -count=1 ./tests
 
 test-coregeth-features-coregeth:
 	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETH."
-	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETH=on go test -count=1 ./tests
+	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETH=on go test -count=1 ./tests
 
 test-coregeth-features-multigethv0:
 	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETHv0."
-	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETHV0=on go test -count=1 ./tests
+	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETHV0=on go test -count=1 ./tests
 
 test-coregeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
 	@echo "Testing Parity JSON chainspec equivalence."
-	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on go test -count=1 ./tests
+	env COREGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on go test -count=1 ./tests
 
 tests-generate: tests-generate-state tests-generate-difficulty ## Generate all tests.
 
 tests-generate-state: ## Generate state tests.
 	@echo "Generating state tests."
-	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on \
-	env MULTIGETH_TESTS_GENERATE_STATE_TESTS=on \
+	env COREGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on \
+	env COREGETH_TESTS_GENERATE_STATE_TESTS=on \
 	go run build/ci.go test -v ./tests -run TestGenState
 
 tests-generate-difficulty: ## Generate difficulty tests.
 	@echo "Generating difficulty tests."
-	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on \
-	env MULTIGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
+	env COREGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on \
+	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
 	go run build/ci.go test -v ./tests -run TestDifficultyGen
 
 lint: ## Run linters.

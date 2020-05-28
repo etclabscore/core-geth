@@ -9,7 +9,7 @@ matrix:
     script:
     - go run build/ci.go install
     - travis_wait 60 go run build/ci.go test
-    - make test-multigeth
+    - make test-coregeth
     before_deploy:
     - sh build/deploy.sh
     deploy:

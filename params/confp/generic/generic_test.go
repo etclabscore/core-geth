@@ -10,9 +10,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/confp"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/multigethv0"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
@@ -34,7 +34,7 @@ func TestUnmarshalChainConfigurator(t *testing.T) {
 		},
 		{
 			filepath.Join("..", "testdata", "stureby_multigeth.json"),
-			&multigeth.CoreGethChainConfig{},
+			&coregeth.CoreGethChainConfig{},
 		},
 	}
 
@@ -243,14 +243,14 @@ func TestUnmarshalChainConfigurator2(t *testing.T) {
 		{
 			versionid: "v198",
 			raw:       cc_v198_a,
-			wantType:  reflect.TypeOf(&multigeth.CoreGethChainConfig{}),
+			wantType:  reflect.TypeOf(&coregeth.CoreGethChainConfig{}),
 		},
 		{
 			versionid: "v199",
 			// Same same as v198; would like to use a real "latest" runtime marshaled config,
 			// but this will at least enable a test of a::a.
 			raw:      cc_v198_a,
-			wantType: reflect.TypeOf(&multigeth.CoreGethChainConfig{}),
+			wantType: reflect.TypeOf(&coregeth.CoreGethChainConfig{}),
 		},
 		// FIXME
 		//{

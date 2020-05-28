@@ -6,10 +6,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -44,7 +44,7 @@ func unmarshalChainSpec(format string, data []byte) (conf ctypes.Configurator, e
 	if format == "geth" {
 		d.Config = &goethereum.ChainConfig{}
 	} else if format == "multigeth" {
-		d.Config = &multigeth.CoreGethChainConfig{}
+		d.Config = &coregeth.CoreGethChainConfig{}
 	} else {
 		panic("impossible")
 	}

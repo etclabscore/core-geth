@@ -9,10 +9,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/multigethv0"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 	"gopkg.in/urfave/cli.v1"
@@ -24,7 +24,7 @@ var gitDate = ""
 var (
 	chainspecFormatTypes = map[string]ctypes.Configurator{
 		"coregeth": &genesisT.Genesis{
-			Config: &multigeth.CoreGethChainConfig{},
+			Config: &coregeth.CoreGethChainConfig{},
 		},
 		"multigeth": &genesisT.Genesis{
 			Config: &multigethv0.ChainConfig{},

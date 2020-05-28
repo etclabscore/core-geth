@@ -1,4 +1,4 @@
-package multigeth
+package coregeth
 
 import (
 	"math/big"

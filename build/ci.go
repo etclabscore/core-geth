@@ -96,11 +96,11 @@ var (
 			Description: "Ethereum bootnode.",
 		},
 		{
-			BinaryName: "echaindb",
+			BinaryName:  "echaindb",
 			Description: "Developer utility to inspect and manage the chain database",
 		},
 		{
-			BinaryName: "echainspec",
+			BinaryName:  "echainspec",
 			Description: "Developer utility to manage chain external chain configuration",
 		},
 		{

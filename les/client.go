@@ -45,8 +45,8 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params/confp"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -121,7 +121,7 @@ func New(ctx *node.ServiceContext, config *eth.Config) (*LightEthereum, error) {
 
 	checkpoint := config.Checkpoint
 	if checkpoint == nil {
-		if p, ok := chainConfig.(*multigeth.CoreGethChainConfig); ok {
+		if p, ok := chainConfig.(*coregeth.CoreGethChainConfig); ok {
 			checkpoint = p.TrustedCheckpoint
 		} else if p, ok := chainConfig.(*goethereum.ChainConfig); ok {
 			checkpoint = p.TrustedCheckpoint
@@ -138,7 +138,7 @@ func New(ctx *node.ServiceContext, config *eth.Config) (*LightEthereum, error) {
 	// Set up checkpoint oracle.
 	oracle := config.CheckpointOracle
 	if oracle == nil {
-		if p, ok := chainConfig.(*multigeth.CoreGethChainConfig); ok {
+		if p, ok := chainConfig.(*coregeth.CoreGethChainConfig); ok {
 			oracle = p.TrustedCheckpointOracle
 		} else if p, ok := chainConfig.(*goethereum.ChainConfig); ok {
 			oracle = p.TrustedCheckpointOracle

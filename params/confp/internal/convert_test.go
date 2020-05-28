@@ -28,10 +28,10 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types/aleth"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -94,10 +94,10 @@ func TestIdentical(t *testing.T) {
 		"NetworkID",
 	}
 	configs := []ctypes.ChainConfigurator{
-		&multigeth.CoreGethChainConfig{},
+		&coregeth.CoreGethChainConfig{},
 		&goethereum.ChainConfig{},
 		&parity.ParityChainSpec{},
-		&multigeth.CoreGethChainConfig{}, // Complete combination test set.
+		&coregeth.CoreGethChainConfig{}, // Complete combination test set.
 	}
 	for i := range configs {
 		if i == 0 {
@@ -130,7 +130,7 @@ func TestConfiguratorImplementationsSatisfied(t *testing.T) {
 
 	for _, ty := range []interface{}{
 		&goethereum.ChainConfig{},
-		&multigeth.CoreGethChainConfig{},
+		&coregeth.CoreGethChainConfig{},
 	} {
 		_ = ty.(ctypes.ChainConfigurator)
 	}

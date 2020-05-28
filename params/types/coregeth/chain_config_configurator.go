@@ -24,7 +24,7 @@ while the specs use a max value (eg 3m, 5m, 9m). The model's difficulty bomb del
 method SetValueForHeight which is used for this.
 */
 
-package multigeth
+package coregeth
 
 import (
 	"math/big"

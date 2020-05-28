@@ -21,8 +21,8 @@ import (
 	"errors"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/pyethereum"
 )
 
@@ -30,7 +30,7 @@ import (
 // chain specification format.
 func NewPyEthereumGenesisSpec(network string, genesis *genesisT.Genesis) (*pyethereum.PyEthereumGenesisSpec, error) {
 	// Only ethash is currently supported between go-ethereum and pyethereum
-	if genesis.Config.(*multigeth.CoreGethChainConfig).Ethash == nil {
+	if genesis.Config.(*coregeth.CoreGethChainConfig).Ethash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
 	spec := &pyethereum.PyEthereumGenesisSpec{

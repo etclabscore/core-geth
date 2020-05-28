@@ -22,9 +22,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/confp"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/multigethv0"
 )
 
@@ -81,8 +81,8 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored: &multigeth.CoreGethChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
-			new:    &multigeth.CoreGethChainConfig{EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
+			stored: &coregeth.CoreGethChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
+			new:    &coregeth.CoreGethChainConfig{EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
 			head:   25,
 			wantErr: &confp.ConfigCompatError{
 				What:         "EIP100F fork block",
@@ -93,13 +93,13 @@ func TestCheckCompatible(t *testing.T) {
 		},
 		{
 			stored:  &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
-			new:     &multigeth.CoreGethChainConfig{EIP211FBlock: big.NewInt(26)},
+			new:     &coregeth.CoreGethChainConfig{EIP211FBlock: big.NewInt(26)},
 			head:    25,
 			wantErr: nil,
 		},
 		{
 			stored:  &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
-			new:     &multigeth.CoreGethChainConfig{EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
+			new:     &coregeth.CoreGethChainConfig{EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
 			head:    25,
 			wantErr: nil,
 		},
@@ -160,7 +160,7 @@ func TestCheckCompatible(t *testing.T) {
 				return c
 			}(),
 			new: func() ctypes.ChainConfigurator {
-				c := &multigeth.CoreGethChainConfig{
+				c := &coregeth.CoreGethChainConfig{
 					DAOForkBlock: nil,
 				}
 				return c
@@ -171,7 +171,7 @@ func TestCheckCompatible(t *testing.T) {
 		{
 			// v1.9.5 -> v1.9.7
 			stored: func() ctypes.ChainConfigurator {
-				c := &multigeth.CoreGethChainConfig{}
+				c := &coregeth.CoreGethChainConfig{}
 				*c = *ClassicChainConfig
 				c.SetEIP145Transition(nil)
 				c.SetEIP1014Transition(nil)
@@ -191,7 +191,7 @@ func TestCheckCompatible(t *testing.T) {
 		{
 			// v1.9.6 -> v1.9.7
 			stored: func() ctypes.ChainConfigurator {
-				c := &multigeth.CoreGethChainConfig{}
+				c := &coregeth.CoreGethChainConfig{}
 				*c = *ClassicChainConfig
 				c.SetEIP152Transition(nil)
 				c.SetEIP1108Transition(nil)
@@ -208,7 +208,7 @@ func TestCheckCompatible(t *testing.T) {
 		{
 			stored: MainnetChainConfig,
 			new: func() ctypes.ChainConfigurator {
-				c := &multigeth.CoreGethChainConfig{}
+				c := &coregeth.CoreGethChainConfig{}
 				err := confp.Convert(MainnetChainConfig, c)
 				if err != nil {
 					panic(err)

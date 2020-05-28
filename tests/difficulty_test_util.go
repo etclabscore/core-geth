@@ -26,9 +26,9 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 //go:generate [gencodec -type DifficultyTest -field-override difficultyTestMarshaling -out gen_difficultytest.go]
@@ -69,7 +69,7 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 		ConstantinopleBlock: big.NewInt(0),
 	},
 	"difficulty.json": mainnetChainConfig,
-	"ETC_Atlantis": &multigeth.CoreGethChainConfig{
+	"ETC_Atlantis": &coregeth.CoreGethChainConfig{
 		Ethash:        new(ctypes.EthashConfig),
 		EIP100FBlock:  big.NewInt(0),
 		EIP140FBlock:  big.NewInt(0),
@@ -81,7 +81,7 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 		EIP658FBlock:  big.NewInt(0),
 		DisposalBlock: big.NewInt(0),
 	},
-	"ETC_Agharta": &multigeth.CoreGethChainConfig{
+	"ETC_Agharta": &coregeth.CoreGethChainConfig{
 		Ethash:        new(ctypes.EthashConfig),
 		EIP100FBlock:  big.NewInt(0),
 		EIP140FBlock:  big.NewInt(0),

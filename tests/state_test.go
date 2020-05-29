@@ -27,7 +27,7 @@ import (
 )
 
 func TestState(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	st := new(testMatcher)
 	// Long tests:
@@ -65,11 +65,6 @@ func TestState(t *testing.T) {
 				subtest := subtest
 				key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
 				name := name + "/" + key
-
-				if subtest.Fork == "Berlin" {
-					t.Skip(name, "!Berlin")
-					continue
-				}
 
 				t.Run(key+"/trie", func(t *testing.T) {
 					withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {

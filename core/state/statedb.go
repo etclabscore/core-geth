@@ -728,12 +728,6 @@ func (s *StateDB) GetRefund() uint64 {
 // into the tries just yet. Only IntermediateRoot or Commit will do that.
 // NOTE: EIP161d
 func (s *StateDB) Finalise(deleteEmptyObjects bool) {
-	if (s == nil) {
-		panic("nil state")
-	}
-	if s.journal == nil {
-		panic("nil journal")
-	}
 	for addr := range s.journal.dirties {
 		obj, exist := s.stateObjects[addr]
 		if !exist {

@@ -107,7 +107,7 @@ type testMatcher struct {
 	failpat      []testFailure
 	skiploadpat  []*regexp.Regexp
 	slowpat      []*regexp.Regexp
-	whitelistpat *regexp.Regexp
+	whitelistpat []*regexp.Regexp
 }
 
 type testConfig struct {
@@ -139,7 +139,7 @@ func (tm *testMatcher) fails(pattern string, reason string) {
 }
 
 func (tm *testMatcher) whitelist(pattern string) {
-	tm.whitelistpat = regexp.MustCompile(pattern)
+	tm.whitelistpat = append(tm.whitelistpat, regexp.MustCompile(pattern))
 }
 
 // config defines chain config for tests matching the pattern.
@@ -234,10 +234,17 @@ func (tm *testMatcher) runTestFile(t *testing.T, path, name string, runTest inte
 	if r, _ := tm.findSkip(name); r != "" {
 		t.Skip(r)
 	}
-	if tm.whitelistpat != nil {
-		if !tm.whitelistpat.MatchString(name) {
-			t.Skip("Skipped by whitelist")
+	didMatch := len(tm.whitelistpat) == 0
+	if len(tm.whitelistpat) > 0 {
+		for _, v := range tm.whitelistpat {
+			if v.MatchString(name) {
+				didMatch = true
+				break
+			}
 		}
+	}
+	if !didMatch {
+		t.Skip("Skipped by whitelist")
 	}
 	//t.Parallel()
 

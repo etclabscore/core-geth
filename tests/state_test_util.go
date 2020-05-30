@@ -371,11 +371,11 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	n, err := MyTransmitter.client.TxpoolPending(MyTransmitter.ctx)
 
 	//n, err := MyTransmitter.client.PendingTransactionCount(MyTransmitter.ctx)
-	for ; err == nil && n > 500; n, err = MyTransmitter.client.TxpoolPending(MyTransmitter.ctx) {
+	for ; err == nil && n > 1000; n, err = MyTransmitter.client.TxpoolPending(MyTransmitter.ctx) {
 		fmt.Println("Txpool pending len=", n, "(sleeping)")
 		time.Sleep(time.Second)
 	}
-	for ; err == nil && n > 500; n, err = MyTransmitter.client.TxpoolQueued(MyTransmitter.ctx) {
+	for ; err == nil && n > 1000; n, err = MyTransmitter.client.TxpoolQueued(MyTransmitter.ctx) {
 		fmt.Println("Txpool queued len=", n, "(sleeping)")
 		time.Sleep(time.Second)
 	}
@@ -429,6 +429,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 
 		tx := types.NewMessage(MyTransmitter.sender, nil, 0, new(big.Int), gas, big.NewInt(vars.GWei), st.Code, false)
 
+		fmt.Println("PRE", t.Name, subtest.Fork, subtest.Index, preAccount.Hex(), common.Bytes2Hex(tx.Data()))
 		MyTransmitter.wg.Add(1)
 		txHash, err := MyTransmitter.SendMessage(tx)
 		if err != nil {
@@ -454,6 +455,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 			gas = 8000000
 		}
 
+		fmt.Println("TX", t.Name, subtest.Fork, subtest.Index, common.Bytes2Hex(msg.Data()))
 		tx := types.NewMessage(MyTransmitter.sender, nil, 0, new(big.Int), gas, big.NewInt(vars.GWei), msg.Data(), false)
 		MyTransmitter.wg.Add(1)
 		txHash, err := MyTransmitter.SendMessage(tx)

@@ -91,10 +91,17 @@ func (tm *testMatcher) runTestFileNDJSON(t *testing.T, path, name string, runTes
 	if r, _ := tm.findSkip(name); r != "" {
 		t.Skip(r)
 	}
-	if tm.whitelistpat != nil {
-		if !tm.whitelistpat.MatchString(name) {
-			t.Skip("Skipped by whitelist")
+	didMatch := len(tm.whitelistpat) == 0
+	if len(tm.whitelistpat) > 0 {
+		for _, v := range tm.whitelistpat {
+			if v.MatchString(name) {
+				didMatch = true
+				break
+			}
 		}
+	}
+	if !didMatch {
+		t.Skip("Skipped by whitelist")
 	}
 	t.Parallel()
 

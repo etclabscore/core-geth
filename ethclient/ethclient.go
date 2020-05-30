@@ -61,6 +61,24 @@ func (ec *Client) Close() {
 
 // Blockchain Access
 
+func (ec *Client) TxpoolPending(ctx context.Context) (uint, error) {
+	var result = make(map[string]hexutil.Uint)
+	err := ec.c.CallContext(ctx, &result, "txpool_status")
+	if err != nil {
+		return 0, err
+	}
+	return uint(result["pending"]), nil
+}
+
+func (ec *Client) TxpoolQueued(ctx context.Context) (uint, error) {
+	var result = make(map[string]hexutil.Uint)
+	err := ec.c.CallContext(ctx, &result, "txpool_status")
+	if err != nil {
+		return 0, err
+	}
+	return uint(result["queued"]), nil
+}
+
 // ChainId retrieves the current chain ID for transaction replay protection.
 func (ec *Client) ChainID(ctx context.Context) (*big.Int, error) {
 	var result hexutil.Big

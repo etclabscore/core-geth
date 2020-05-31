@@ -17,4 +17,3 @@ func TestClassicDAO(t *testing.T) {
 		}
 	}
 }
-

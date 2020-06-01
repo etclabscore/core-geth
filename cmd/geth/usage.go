@@ -72,7 +72,6 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.NoUSBFlag,
 			utils.SmartCardDaemonPathFlag,
 			utils.NetworkIdFlag,
-			utils.TestnetFlag,
 			utils.ClassicFlag,
 			utils.MordorFlag,
 			utils.SocialFlag,
@@ -81,9 +80,12 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.RinkebyFlag,
 			utils.KottiFlag,
 			utils.GoerliFlag,
+			utils.RinkebyFlag,
+			utils.RopstenFlag,
 			utils.SyncModeFlag,
 			utils.ExitWhenSyncedFlag,
 			utils.GCModeFlag,
+			utils.TxLookupLimitFlag,
 			utils.EthStatsURLFlag,
 			utils.IdentityFlag,
 			utils.LightKDFFlag,
@@ -115,9 +117,11 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.EthashCacheDirFlag,
 			utils.EthashCachesInMemoryFlag,
 			utils.EthashCachesOnDiskFlag,
+			utils.EthashCachesLockMmapFlag,
 			utils.EthashDatasetDirFlag,
 			utils.EthashDatasetsInMemoryFlag,
 			utils.EthashDatasetsOnDiskFlag,
+			utils.EthashDatasetsLockMmapFlag,
 		},
 	},
 	{
@@ -143,6 +147,7 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.CacheDatabaseFlag,
 			utils.CacheTrieFlag,
 			utils.CacheGCFlag,
+			utils.CacheSnapshotFlag,
 			utils.CacheNoPrefetchFlag,
 		},
 	},
@@ -160,13 +165,12 @@ var AppHelpFlagGroups = []flagGroup{
 		Flags: []cli.Flag{
 			utils.IPCDisabledFlag,
 			utils.IPCPathFlag,
-			utils.RPCEnabledFlag,
-			utils.RPCListenAddrFlag,
-			utils.RPCPortFlag,
-			utils.RPCApiFlag,
-			utils.RPCGlobalGasCap,
-			utils.RPCCORSDomainFlag,
-			utils.RPCVirtualHostsFlag,
+			utils.HTTPEnabledFlag,
+			utils.HTTPListenAddrFlag,
+			utils.HTTPPortFlag,
+			utils.HTTPApiFlag,
+			utils.HTTPCORSDomainFlag,
+			utils.HTTPVirtualHostsFlag,
 			utils.WSEnabledFlag,
 			utils.WSListenAddrFlag,
 			utils.WSPortFlag,
@@ -177,6 +181,7 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.GraphQLPortFlag,
 			utils.GraphQLCORSDomainFlag,
 			utils.GraphQLVirtualHostsFlag,
+			utils.RPCGlobalGasCap,
 			utils.JSpathFlag,
 			utils.ExecFlag,
 			utils.PreloadJSFlag,
@@ -186,8 +191,8 @@ var AppHelpFlagGroups = []flagGroup{
 		Name: "NETWORKING",
 		Flags: []cli.Flag{
 			utils.BootnodesFlag,
-			utils.BootnodesV4Flag,
-			utils.BootnodesV5Flag,
+			utils.LegacyBootnodesV4Flag,
+			utils.LegacyBootnodesV5Flag,
 			utils.DNSDiscoveryFlag,
 			utils.ListenPortFlag,
 			utils.MaxPeersFlag,
@@ -246,19 +251,28 @@ var AppHelpFlagGroups = []flagGroup{
 		Flags: whisperFlags,
 	},
 	{
-		Name: "DEPRECATED",
-		Flags: []cli.Flag{
-			utils.LightLegacyServFlag,
-			utils.LightLegacyPeersFlag,
-			utils.MinerLegacyThreadsFlag,
-			utils.MinerLegacyGasTargetFlag,
-			utils.MinerLegacyGasPriceFlag,
-			utils.MinerLegacyEtherbaseFlag,
-			utils.MinerLegacyExtraDataFlag,
-		},
+		Name: "ALIASED (deprecated)",
+		Flags: append([]cli.Flag{
+			utils.LegacyRPCEnabledFlag,
+			utils.LegacyRPCListenAddrFlag,
+			utils.LegacyRPCPortFlag,
+			utils.LegacyRPCCORSDomainFlag,
+			utils.LegacyRPCVirtualHostsFlag,
+			utils.LegacyRPCApiFlag,
+			utils.LegacyWSListenAddrFlag,
+			utils.LegacyWSPortFlag,
+			utils.LegacyWSAllowedOriginsFlag,
+			utils.LegacyWSApiFlag,
+			utils.LegacyGpoBlocksFlag,
+			utils.LegacyGpoPercentileFlag,
+		}, debug.DeprecatedFlags...),
 	},
 	{
 		Name: "MISC",
+		Flags: []cli.Flag{
+			utils.SnapshotFlag,
+			cli.HelpFlag,
+		},
 	},
 }
 
@@ -316,10 +330,17 @@ func init() {
 					categorized[flag.String()] = struct{}{}
 				}
 			}
+			deprecated := make(map[string]struct{})
+			for _, flag := range utils.DeprecatedFlags {
+				deprecated[flag.String()] = struct{}{}
+			}
+			// Only add uncategorized flags if they are not deprecated
 			var uncategorized []cli.Flag
 			for _, flag := range data.(*cli.App).Flags {
 				if _, ok := categorized[flag.String()]; !ok {
-					uncategorized = append(uncategorized, flag)
+					if _, ok := deprecated[flag.String()]; !ok {
+						uncategorized = append(uncategorized, flag)
+					}
 				}
 			}
 			if len(uncategorized) > 0 {

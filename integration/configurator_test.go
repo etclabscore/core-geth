@@ -185,7 +185,7 @@ func TestParityGeneses(t *testing.T) {
 		},
 		{
 			"ropsten.json",
-			params.DefaultTestnetGenesisBlock(),
+			params.DefaultRopstenGenesisBlock(),
 		},
 		{
 			"kotti.json",

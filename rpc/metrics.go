@@ -1,4 +1,4 @@
-// Copyright 2015 The go-ethereum Authors
+// Copyright 2020 The go-ethereum Authors
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -14,20 +14,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package abi
+package rpc
 
 import (
-	"bytes"
-	"math/big"
-	"testing"
+	"fmt"
+
+	"github.com/ethereum/go-ethereum/metrics"
 )
 
-func TestNumberTypes(t *testing.T) {
-	ubytes := make([]byte, 32)
-	ubytes[31] = 1
+var (
+	rpcRequestGauge        = metrics.NewRegisteredGauge("rpc/requests", nil)
+	successfulRequestGauge = metrics.NewRegisteredGauge("rpc/success", nil)
+	failedReqeustGauge     = metrics.NewRegisteredGauge("rpc/failure", nil)
+	rpcServingTimer        = metrics.NewRegisteredTimer("rpc/duration/all", nil)
+)
 
-	unsigned := U256(big.NewInt(1))
-	if !bytes.Equal(unsigned, ubytes) {
-		t.Errorf("expected %x got %x", ubytes, unsigned)
+func newRPCServingTimer(method string, valid bool) metrics.Timer {
+	flag := "success"
+	if !valid {
+		flag = "failure"
 	}
+	m := fmt.Sprintf("rpc/duration/%s/%s", method, flag)
+	return metrics.GetOrRegisterTimer(m, nil)
 }

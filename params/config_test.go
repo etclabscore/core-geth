@@ -308,3 +308,19 @@ func TestClassicIs649(t *testing.T) {
 		t.Fatal("classic config doesn't support 649; difficulty bomb was disposed of")
 	}
 }
+
+func TestFoundationIsEIP779(t *testing.T) {
+	blockNumbers := []*big.Int{
+		big.NewInt(0),
+		big.NewInt(1_920_000),
+		big.NewInt(10_000_000),
+	}
+	for _, bn := range blockNumbers {
+		if bn.Cmp(big.NewInt(0)) > 0 && !MainnetChainConfig.IsEnabled(MainnetChainConfig.GetEthashEIP779Transition, bn) {
+			t.Fatal("bad")
+		}
+		if *MainnetChainConfig.GetEthashEIP779Transition() != 1_920_000 {
+			t.Fatal("bad")
+		}
+	}
+}

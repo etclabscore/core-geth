@@ -17,7 +17,6 @@
 package vm
 
 import (
-	"errors"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -25,14 +24,11 @@ import (
 )
 
 type (
-	executionFunc func(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error)
+	executionFunc func(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([]byte, error)
 	gasFunc       func(*EVM, *Contract, *Stack, *Memory, uint64) (uint64, error) // last parameter is the requested memory size as a uint64
 	// memorySizeFunc returns the required size, and whether the operation overflowed a uint64
 	memorySizeFunc func(*Stack) (size uint64, overflow bool)
 )
-
-var errGasUintOverflow = errors.New("gas uint64 overflow")
-var errGasLeftTooLow = errors.New("insufficient gas left")
 
 type operation struct {
 	// execute is the operation function

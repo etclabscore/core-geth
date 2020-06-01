@@ -37,10 +37,10 @@ func DefaultGenesisBlock() *genesisT.Genesis {
 	}
 }
 
-// DefaultTestnetGenesisBlock returns the Ropsten network genesis block.
-func DefaultTestnetGenesisBlock() *genesisT.Genesis {
+// DefaultRopstenGenesisBlock returns the Ropsten network genesis block.
+func DefaultRopstenGenesisBlock() *genesisT.Genesis {
 	return &genesisT.Genesis{
-		Config:     TestnetChainConfig,
+		Config:     RopstenChainConfig,
 		Nonce:      66,
 		ExtraData:  hexutil.MustDecode("0x3535353535353535353535353535353535353535353535353535353535353535"),
 		GasLimit:   16777216,

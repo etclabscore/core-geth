@@ -150,7 +150,7 @@ func init() {
 			difficultyChainConfigurations[k] = pspec
 		}
 
-	} else if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_PARITY_KEY) != "" {
+	} else if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_OPENETHEREUM_KEY) != "" {
 		log.Println("converting to Parity data type.")
 
 		for i, config := range Forks {
@@ -169,7 +169,7 @@ func init() {
 			difficultyChainConfigurations[k] = pspec
 		}
 
-	} else if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_PARITY_KEY) != "" {
+	} else if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_OPENETHEREUM_KEY) != "" {
 		log.Println("Setting chain configurations from Parity chainspecs")
 
 		for k, v := range MapForkNameChainspecFileState {

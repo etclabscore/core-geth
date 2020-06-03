@@ -18,11 +18,18 @@ package forkid
 
 import (
 	"bytes"
+	"fmt"
 	"math"
+	"math/big"
+	"os"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/confp"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 )
@@ -164,26 +171,15 @@ func TestCreation(t *testing.T) {
 			params.KottiGenesisHash,
 			[]testcase{
 				{0, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
-				{1, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
-				{2, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
-				{3, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
-				{9, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
-				{10, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
 				{716616, ID{Hash: checksumToBytes(0x0550152e), Next: 716617}},
 				{716617, ID{Hash: checksumToBytes(0xa3270822), Next: 1705549}},
 				{716618, ID{Hash: checksumToBytes(0xa3270822), Next: 1705549}},
 				{1705548, ID{Hash: checksumToBytes(0xa3270822), Next: 1705549}},
-				{1705549, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2000000}},
-				{1705550, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2000000}},
-				{1999999, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2000000}},
-				{2000000, ID{Hash: checksumToBytes(0x7faf51b5), Next: 2200013}},
-				{2000001, ID{Hash: checksumToBytes(0x7faf51b5), Next: 2200013}},
-				{2200012, ID{Hash: checksumToBytes(0x7faf51b5), Next: 2200013}},
-				{2200013, ID{Hash: checksumToBytes(0x595e180d), Next: 5000000}},
-				{2200014, ID{Hash: checksumToBytes(0x595e180d), Next: 5000000}},
-				{4999999, ID{Hash: checksumToBytes(0x595e180d), Next: 5000000}},
-				{5000000, ID{Hash: checksumToBytes(0xb5407fd6), Next: 0}},
-				{5000001, ID{Hash: checksumToBytes(0xb5407fd6), Next: 0}},
+				{1705549, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2200013}},
+				{1705550, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2200013}},
+				{2200012, ID{Hash: checksumToBytes(0x8f3698e0), Next: 2200013}},
+				{2200013, ID{Hash: checksumToBytes(0x6f402821), Next: 0}},
+				{2200014, ID{Hash: checksumToBytes(0x6f402821), Next: 0}},
 			},
 		},
 		{
@@ -318,7 +314,7 @@ func TestEncoding(t *testing.T) {
 
 func TestGatherForks(t *testing.T) {
 	cases := []struct {
-		name string
+		name   string
 		config ctypes.ChainConfigurator
 		wantNs []uint64
 	}{
@@ -365,5 +361,109 @@ func TestGatherForks(t *testing.T) {
 				}
 			}
 		}
+	}
+}
+
+// TestGenerateSpecificationCases generates markdown formatted specification
+// for network forkid values.
+func TestGenerateSpecificationCases(t *testing.T) {
+	if os.Getenv("COREGETH_GENERATE_FORKID_TEST_CASES") == "" {
+		t.Skip()
+	}
+	type testCaseJSON struct {
+		ChainConfig *coregeth.CoreGethChainConfig `json:"geth_chain_config"`
+		GenesisHash common.Hash                   `json:"genesis_hash"`
+		Head        uint64                        `json:"head"`
+		ForkHash    common.Hash                   `json:"fork_hash"`
+		ForkNext    uint64                        `json:"fork_next"`
+		ForkIDRLP   common.Hash                   `json:"fork_id_rlp"`
+	}
+
+	generatedCases := []*testCaseJSON{}
+
+	tests := []struct {
+		name        string
+		config      ctypes.ChainConfigurator
+		genesisHash common.Hash
+	}{
+		{"Ethereum Classic Mainnet (ETC)",
+			params.ClassicChainConfig,
+			params.MainnetGenesisHash,
+		},
+		{
+			"Kotti",
+			params.KottiChainConfig,
+			params.KottiGenesisHash,
+		},
+		{
+			"Mordor",
+			params.MordorChainConfig,
+			params.MordorGenesisHash,
+		},
+		{
+			"Morden",
+			&coregeth.CoreGethChainConfig{
+				Ethash:            &ctypes.EthashConfig{},
+				EIP2FBlock:        big.NewInt(494000),
+				EIP150Block:       big.NewInt(1783000),
+				EIP155Block:       big.NewInt(1915000),
+				ECIP1017FBlock:    big.NewInt(2000000),
+				ECIP1017EraRounds: big.NewInt(2000000),
+				DisposalBlock:     big.NewInt(2300000),
+				EIP198FBlock:      big.NewInt(4729274), // Atlantis
+				EIP1052FBlock:     big.NewInt(5000381), // Agharta
+			},
+			common.HexToHash("0cd786a2425d16f152c658316c423e6ce1181e15c3295826d7c9904cba9ce303"),
+		},
+	}
+	for _, tt := range tests {
+		cs := []uint64{0}
+		for _, f := range gatherForks(tt.config) {
+			cs = append(cs, f-1, f, f+1)
+		}
+		fmt.Printf("##### %s\n", tt.name)
+		fmt.Println()
+		fmt.Printf("- Genesis Hash: `0x%x`\n", tt.genesisHash)
+		forks := gatherForks(tt.config)
+		forksS := []string{}
+		for _, fi := range forks {
+			forksS = append(forksS, strconv.Itoa(int(fi)))
+		}
+		fmt.Printf("- Forks: `%s`\n", strings.Join(forksS, "`,`"))
+		fmt.Println()
+		fmt.Println("| Head Block Number | `FORK_HASH` | `FORK_NEXT` | RLP Encoded (Hex) |")
+		fmt.Println("| --- | --- | --- | --- |")
+		for _, c := range cs {
+			id := newID(tt.config, tt.genesisHash, c)
+			isCanonical := false
+			for _, fi := range forks {
+				if c == fi {
+					isCanonical = true
+				}
+			}
+			r, _ := rlp.EncodeToBytes(id)
+			if isCanonical {
+				fmt.Printf("| __head=%d__ | FORK_HASH=%x | FORK_NEXT=%d | %x |\n", c, id.Hash, id.Next, r)
+
+			} else {
+				fmt.Printf("| head=%d | FORK_HASH=%x | FORK_NEXT=%d | %x |\n", c, id.Hash, id.Next, r)
+			}
+
+			gethConfig := &coregeth.CoreGethChainConfig{}
+			err := confp.Convert(tt.config, gethConfig)
+			if err != nil {
+				t.Fatal(err)
+			}
+			generatedCases = append(generatedCases, &testCaseJSON{
+				ChainConfig: gethConfig,
+				GenesisHash: tt.genesisHash,
+				Head:        c,
+				ForkHash:    common.BytesToHash(id.Hash[:]),
+				ForkNext:    id.Next,
+				ForkIDRLP:   common.BytesToHash(r),
+			})
+		}
+		fmt.Println()
+		fmt.Println()
 	}
 }

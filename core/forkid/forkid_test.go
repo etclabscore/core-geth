@@ -318,16 +318,29 @@ func TestEncoding(t *testing.T) {
 
 func TestGatherForks(t *testing.T) {
 	cases := []struct {
+		name string
 		config ctypes.ChainConfigurator
 		wantNs []uint64
 	}{
 		{
+			"classic",
 			params.ClassicChainConfig,
 			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000, 10500839},
 		},
 		{
+			"mainnet",
 			params.MainnetChainConfig,
 			[]uint64{1150000, 1920000, 2463000, 2675000, 4370000, 7280000, 9069000, 9200000},
+		},
+		{
+			"mordor",
+			params.MordorChainConfig,
+			[]uint64{301_243, 999_983},
+		},
+		{
+			"kotti",
+			params.KottiChainConfig,
+			[]uint64{716_617, 1_705_549, 2_200_013},
 		},
 	}
 	sliceContains := func(sl []uint64, u uint64) bool {
@@ -338,17 +351,17 @@ func TestGatherForks(t *testing.T) {
 		}
 		return false
 	}
-	for ci, c := range cases {
+	for _, c := range cases {
 		gotForkNs := gatherForks(c.config)
 		if len(gotForkNs) != len(c.wantNs) {
 			for _, n := range c.wantNs {
 				if !sliceContains(gotForkNs, n) {
-					t.Errorf("config.i=%d missing wanted fork at block number: %d", ci, n)
+					t.Errorf("config=%s missing wanted fork at block number: %d", c.name, n)
 				}
 			}
 			for _, n := range gotForkNs {
 				if !sliceContains(c.wantNs, n) {
-					t.Errorf("config.i=%d gathered unwanted fork at block number: %d", ci, n)
+					t.Errorf("config=%s gathered unwanted fork at block number: %d", c.name, n)
 				}
 			}
 		}

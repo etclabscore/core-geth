@@ -71,13 +71,6 @@ var (
 		EIP2028FBlock: big.NewInt(2_200_013),
 		EIP2200FBlock: big.NewInt(2_200_013), // RePetersburg (== re-1283)
 
-		ECIP1017FBlock:    big.NewInt(5000000),
-		ECIP1017EraRounds: big.NewInt(5000000),
-
-		DisposalBlock:      big.NewInt(0),
-		ECIP1010PauseBlock: big.NewInt(0),
-		ECIP1010Length:     big.NewInt(2000000),
-
 		RequireBlockHashes: map[uint64]common.Hash{
 			0: KottiGenesisHash,
 			/*

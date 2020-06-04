@@ -477,6 +477,15 @@ func (c *ParityChainSpec) SetEIP1706Transition(n *uint64) error {
 	return nil
 }
 
+func (c *ParityChainSpec) GetEIP2537Transition() *uint64 {
+	return c.Params.EIP2537Transition.Uint64P() // FIXME when+if upstream implements
+}
+
+func (c *ParityChainSpec) SetEIP2537Transition(n *uint64) error {
+	c.Params.EIP2537Transition = new(ParityU64).SetUint64(n)
+	return nil
+}
+
 func (spec *ParityChainSpec) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

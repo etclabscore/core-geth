@@ -120,6 +120,8 @@ type ProtocolSpecifier interface {
 	SetECIP1080Transition(n *uint64) error
 	GetEIP1706Transition() *uint64
 	SetEIP1706Transition(n *uint64) error
+	GetEIP2537Transition() *uint64
+	SetEIP2537Transition(n *uint64) error
 }
 
 type Forker interface {

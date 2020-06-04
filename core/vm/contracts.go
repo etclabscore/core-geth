@@ -81,31 +81,19 @@ func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int)
 	if config.IsEnabled(config.GetEIP152Transition, bn) {
 		precompileds[common.BytesToAddress([]byte{9})] = &blake2F{}
 	}
+	if config.IsEnabled(config.GetEIP2537Transition, bn) {
+		precompileds[common.BytesToAddress([]byte{10})] = &bls12381G1Add{}
+		precompileds[common.BytesToAddress([]byte{11})] = &bls12381G1Mul{}
+		precompileds[common.BytesToAddress([]byte{12})] = &bls12381G1MultiExp{}
+		precompileds[common.BytesToAddress([]byte{13})] = &bls12381G2Add{}
+		precompileds[common.BytesToAddress([]byte{14})] = &bls12381G2Mul{}
+		precompileds[common.BytesToAddress([]byte{15})] = &bls12381G2MultiExp{}
+		precompileds[common.BytesToAddress([]byte{16})] = &bls12381Pairing{}
+		precompileds[common.BytesToAddress([]byte{17})] = &bls12381MapG1{}
+		precompileds[common.BytesToAddress([]byte{18})] = &bls12381MapG2{}
+	}
 
 	return precompileds
-}
-
-// PrecompiledContractsYoloV1 contains the default set of pre-compiled Ethereum
-// contracts used in the Yolo v1 test release.
-var PrecompiledContractsYoloV1 = map[common.Address]PrecompiledContract{
-	common.BytesToAddress([]byte{1}):  &ecrecover{},
-	common.BytesToAddress([]byte{2}):  &sha256hash{},
-	common.BytesToAddress([]byte{3}):  &ripemd160hash{},
-	common.BytesToAddress([]byte{4}):  &dataCopy{},
-	common.BytesToAddress([]byte{5}):  &bigModExp{},
-	common.BytesToAddress([]byte{6}):  &bn256AddIstanbul{},
-	common.BytesToAddress([]byte{7}):  &bn256ScalarMulIstanbul{},
-	common.BytesToAddress([]byte{8}):  &bn256PairingIstanbul{},
-	common.BytesToAddress([]byte{9}):  &blake2F{},
-	common.BytesToAddress([]byte{10}): &bls12381G1Add{},
-	common.BytesToAddress([]byte{11}): &bls12381G1Mul{},
-	common.BytesToAddress([]byte{12}): &bls12381G1MultiExp{},
-	common.BytesToAddress([]byte{13}): &bls12381G2Add{},
-	common.BytesToAddress([]byte{14}): &bls12381G2Mul{},
-	common.BytesToAddress([]byte{15}): &bls12381G2MultiExp{},
-	common.BytesToAddress([]byte{16}): &bls12381Pairing{},
-	common.BytesToAddress([]byte{17}): &bls12381MapG1{},
-	common.BytesToAddress([]byte{18}): &bls12381MapG2{},
 }
 
 // RunPrecompiledContract runs and evaluates the output of a precompiled contract.

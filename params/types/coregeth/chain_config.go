@@ -162,6 +162,9 @@ type CoreGethChainConfig struct {
 	// https://eips.ethereum.org/EIPS/eip-1706
 	EIP1706FBlock *big.Int `json:"eip1706FBlock,omitempty"`
 
+	// https://github.com/ethereum/EIPs/pull/2537: BLS12-381 curve operations
+	EIP2537FBlock *big.Int `json:"eip2315FBlock,omitempty"`
+
 	//EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block

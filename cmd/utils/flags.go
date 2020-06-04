@@ -1677,7 +1677,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 133519467574833 // "yolov1"
 		}
-		cfg.Genesis = core.DefaultYoloV1GenesisBlock()
+		cfg.Genesis = params.DefaultYoloV1GenesisBlock()
 	default:
 		if cfg.NetworkId == 1 {
 			setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.MainnetGenesisHash])
@@ -1880,7 +1880,7 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 	case ctx.GlobalBool(GoerliFlag.Name):
 		genesis = params.DefaultGoerliGenesisBlock()
 	case ctx.GlobalBool(YoloV1Flag.Name):
-		genesis = core.DefaultYoloV1GenesisBlock()
+		genesis = params.DefaultYoloV1GenesisBlock()
 	}
 	return genesis
 }

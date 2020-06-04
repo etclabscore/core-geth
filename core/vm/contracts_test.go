@@ -45,8 +45,6 @@ type precompiledFailureTest struct {
 	Name          string
 }
 
-var allPrecompiles = PrecompiledContractsYoloV1
-
 // EIP-152 test vectors
 var blake2FMalformedInputTests = []precompiledFailureTest{
 	{
@@ -72,9 +70,6 @@ var blake2FMalformedInputTests = []precompiledFailureTest{
 }
 
 func testPrecompiled(addr string, test precompiledTest, t *testing.T) {
-
-	// TODO(meowsbits) : update precomps/config for yolo
-
 	p := PrecompiledContractsForConfig(params.AllEthashProtocolChanges, big.NewInt(0))[common.HexToAddress(addr)]
 	in := common.Hex2Bytes(test.Input)
 	contract := NewContract(AccountRef(common.HexToAddress("1337")),

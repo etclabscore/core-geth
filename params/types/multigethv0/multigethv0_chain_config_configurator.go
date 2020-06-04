@@ -385,6 +385,18 @@ func (c *ChainConfig) SetEIP1706Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
+func (c *ChainConfig) GetEIP2537Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEIP2537Transition(n *uint64) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
+
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

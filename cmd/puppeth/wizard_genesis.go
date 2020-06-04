@@ -240,8 +240,8 @@ func (w *wizard) manageGenesis() {
 		w.conf.Genesis.Config.SetEIP145Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP145Transition()))
 
 		fmt.Println()
-		fmt.Printf("Which block should YOLOv1 come into effect? (default = %v)\n", w.conf.Genesis.Config.YoloV1Block)
-		w.conf.Genesis.Config.YoloV1Block = w.readDefaultBigInt(w.conf.Genesis.Config.YoloV1Block)
+		fmt.Printf("Which block should YOLOv1 (EIP2537) come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP2537Transition())
+		w.conf.Genesis.Config.SetEIP2537Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP2537Transition()))
 
 		out, _ := json.MarshalIndent(w.conf.Genesis.Config, "", "  ")
 		fmt.Printf("Chain configuration updated:\n\n%s\n", out)

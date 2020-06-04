@@ -29,7 +29,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/console"
+	"github.com/ethereum/go-ethereum/console/prompt"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
@@ -169,6 +169,7 @@ The export-preimages command export hash preimages to an RLP encoded stream`,
 			utils.RinkebyFlag,
 			utils.TxLookupLimitFlag,
 			utils.GoerliFlag,
+			utils.YoloV1Flag,
 			utils.LegacyTestnetFlag,
 			utils.KottiFlag,
 		},
@@ -219,6 +220,7 @@ Use "ethereum dump 0" to dump the genesis block.`,
 			utils.RopstenFlag,
 			utils.RinkebyFlag,
 			utils.GoerliFlag,
+			utils.YoloV1Flag,
 			utils.LegacyTestnetFlag,
 			utils.SyncModeFlag,
 		},
@@ -533,7 +535,7 @@ func removeDB(ctx *cli.Context) error {
 // confirmAndRemoveDB prompts the user for a last confirmation and removes the
 // folder if accepted.
 func confirmAndRemoveDB(database string, kind string) {
-	confirm, err := console.Stdin.PromptConfirm(fmt.Sprintf("Remove %s (%s)?", kind, database))
+	confirm, err := prompt.Stdin.PromptConfirm(fmt.Sprintf("Remove %s (%s)?", kind, database))
 	switch {
 	case err != nil:
 		utils.Fatalf("%v", err)

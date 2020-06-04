@@ -30,6 +30,7 @@ var (
 	RopstenGenesisHash = common.HexToHash("0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d")
 	RinkebyGenesisHash = common.HexToHash("0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177")
 	GoerliGenesisHash  = common.HexToHash("0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a")
+	YoloV1GenesisHash  = common.HexToHash("0xc3fd235071f24f93865b0850bd2a2119b30f7224d18a0e34c7bbf549ad7e3d36")
 )
 
 // TrustedCheckpoints associates each known checkpoint with the genesis hash of
@@ -145,6 +146,7 @@ var (
 		ConstantinopleBlock:     big.NewInt(3660663),
 		PetersburgBlock:         big.NewInt(4321234),
 		IstanbulBlock:           big.NewInt(5435345),
+		MuirGlacierBlock:    nil,
 		TrustedCheckpoint:       RinkebyTrustedCheckpoint,
 		TrustedCheckpointOracle: RinkebyCheckpointOracle,
 		Clique: &ctypes.CliqueConfig{
@@ -186,6 +188,7 @@ var (
 		ConstantinopleBlock:     big.NewInt(0),
 		PetersburgBlock:         big.NewInt(0),
 		IstanbulBlock:           big.NewInt(1561651),
+		MuirGlacierBlock:    nil,
 		TrustedCheckpoint:       GoerliTrustedCheckpoint,
 		TrustedCheckpointOracle: GoerliCheckpointOracle,
 		Clique: &ctypes.CliqueConfig{
@@ -215,6 +218,27 @@ var (
 		Threshold: 2,
 	}
 
+	// YoloV1ChainConfig contains the chain parameters to run a node on the YOLOv1 test network.
+	YoloV1ChainConfig = &goethereum.ChainConfig{
+		ChainID:             big.NewInt(133519467574833),
+		HomesteadBlock:      big.NewInt(0),
+		DAOForkBlock:        nil,
+		DAOForkSupport:      true,
+		EIP150Block:         big.NewInt(0),
+		EIP155Block:         big.NewInt(0),
+		EIP158Block:         big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		PetersburgBlock:     big.NewInt(0),
+		IstanbulBlock:       big.NewInt(0),
+		MuirGlacierBlock:    nil,
+		YoloV1Block:         big.NewInt(0),
+		Clique: &ctypes.CliqueConfig{
+			Period: 15,
+			Epoch:  30000,
+		},
+	}
+
 	// AllEthashProtocolChanges contains every protocol change (EIPs) introduced
 	// and accepted by the Ethereum core developers into the Ethash consensus.
 	//
@@ -233,6 +257,8 @@ var (
 		ConstantinopleBlock:     big.NewInt(0),
 		PetersburgBlock:         big.NewInt(0),
 		IstanbulBlock:           big.NewInt(0),
+		MuirGlacierBlock: big.NewInt(0),
+		YoloV1Block: big.NewInt(0),
 		EWASMBlock:              nil,
 		Ethash:                  new(ctypes.EthashConfig),
 		Clique:                  nil,

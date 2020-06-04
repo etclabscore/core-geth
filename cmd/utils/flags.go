@@ -184,6 +184,10 @@ var (
 		Name:  "ethersocial",
 		Usage: "Ethersocial network: pre-configured Ethersocial mainnet",
 	}
+	YoloV1Flag = cli.BoolFlag{
+		Name:  "yolov1",
+		Usage: "YOLOv1 network: pre-configured proof-of-authority shortlived test network.",
+	}
 	RinkebyFlag = cli.BoolFlag{
 		Name:  "rinkeby",
 		Usage: "Rinkeby network: pre-configured proof-of-authority test network",
@@ -208,7 +212,6 @@ var (
 		Name:  "dev",
 		Usage: "Ephemeral proof-of-authority network with a pre-funded developer account, mining enabled",
 	}
-
 	DeveloperPeriodFlag = cli.IntFlag{
 		Name:  "dev.period",
 		Usage: "Block period to use in developer mode (0 = mine only if transaction pending)",
@@ -837,6 +840,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.KottiBootnodes
 	case ctx.GlobalBool(GoerliFlag.Name):
 		urls = params.GoerliBootnodes
+	case ctx.GlobalBool(YoloV1Flag.Name):
+		urls = params.YoloV1Bootnodes
 	case cfg.BootstrapNodes != nil:
 		return // already set, don't apply defaults.
 	}
@@ -857,6 +862,9 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 // setBootstrapNodesV5 creates a list of bootstrap nodes from the command line
 // flags, reverting to pre-configured ones if none have been specified.
 func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
+
+	// TODO(meowsbits)
+
 	urls := params.MainnetBootnodes
 	switch {
 	case ctx.GlobalIsSet(BootnodesFlag.Name) || ctx.GlobalIsSet(LegacyBootnodesV5Flag.Name):
@@ -873,6 +881,8 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.KottiBootnodes
 	case ctx.GlobalBool(GoerliFlag.Name):
 		urls = params.GoerliBootnodes
+	case ctx.GlobalBool(YoloV1Flag.Name):
+		urls = params.YoloV1Bootnodes
 	case cfg.BootstrapNodesV5 != nil:
 		return // already set, don't apply defaults.
 	}
@@ -1303,7 +1313,9 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "kotti")
 	case ctx.GlobalBool(GoerliFlag.Name):
 		return filepath.Join(baseDataDirPath, "goerli")
-	}
+	case ctx.GlobalBool(YoloV1Flag.Name):
+		return filepath.Join(baseDataDirPath, "yolo-v1")
+}
 	return baseDataDirPath
 }
 
@@ -1540,7 +1552,8 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node, cfg *whisper.Config) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, DeveloperFlag, LegacyTestnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag)
+	// TODO(meowsbits)
+	CheckExclusive(ctx, DeveloperFlag, LegacyTestnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV1Flag)
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	CheckExclusive(ctx, GCModeFlag, "archive", TxLookupLimitFlag)
@@ -1562,6 +1575,10 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 
 	if ctx.GlobalIsSet(SyncModeFlag.Name) {
 		cfg.SyncMode = *GlobalTextMarshaler(ctx, SyncModeFlag.Name).(*downloader.SyncMode)
+	}
+	// TODO(meowsbits) is this right?
+	if ctx.GlobalIsSet(NetworkIdFlag.Name) {
+		cfg.NetworkId = ctx.GlobalUint64(NetworkIdFlag.Name)
 	}
 	if ctx.GlobalIsSet(CacheFlag.Name) || ctx.GlobalIsSet(CacheDatabaseFlag.Name) {
 		cfg.DatabaseCache = ctx.GlobalInt(CacheFlag.Name) * ctx.GlobalInt(CacheDatabaseFlag.Name) / 100
@@ -1639,8 +1656,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.
 	switch {
-	case ctx.GlobalBool(RopstenFlag.Name):
-		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.RopstenGenesisHash])
+	// TODO(meowsbits): note fixed; duplicate Ropsten case
 	case ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name):
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 3
@@ -1657,6 +1673,11 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		setDNSDiscoveryDefaults(cfg, params.KottiDNSNetwork1)
 	case ctx.GlobalBool(MordorFlag.Name):
 		setDNSDiscoveryDefaults(cfg, params.MordorDNSNetwork1)
+	case ctx.GlobalBool(YoloV1Flag.Name):
+		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
+			cfg.NetworkId = 133519467574833 // "yolov1"
+		}
+		cfg.Genesis = core.DefaultYoloV1GenesisBlock()
 	default:
 		if cfg.NetworkId == 1 {
 			setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.MainnetGenesisHash])
@@ -1693,11 +1714,20 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 
 // setDNSDiscoveryDefaults configures DNS discovery with the given URL if
 // no URLs are set.
-func setDNSDiscoveryDefaults(cfg *eth.Config, url string) {
+func setDNSDiscoveryDefaults(cfg *eth.Config, genesis common.Hash) {
 	if cfg.DiscoveryURLs != nil {
-		return
+		return // already set through flags/config
 	}
-	cfg.DiscoveryURLs = []string{url}
+
+	// TODO(meowsbits): fixme
+
+	protocol := "all"
+	if cfg.SyncMode == downloader.LightSync {
+		protocol = "les"
+	}
+	if url := params.KnownDNSNetwork(genesis, protocol); url != "" {
+		cfg.DiscoveryURLs = []string{url}
+	}
 }
 
 // RegisterEthService adds an Ethereum client to the stack.
@@ -1849,6 +1879,8 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 		genesis = params.DefaultKottiGenesisBlock()
 	case ctx.GlobalBool(GoerliFlag.Name):
 		genesis = params.DefaultGoerliGenesisBlock()
+	case ctx.GlobalBool(YoloV1Flag.Name):
+		genesis = core.DefaultYoloV1GenesisBlock()
 	}
 	return genesis
 }

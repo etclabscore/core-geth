@@ -154,10 +154,8 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 		return params.MordorChainConfig
 	case ghash == params.RopstenGenesisHash:
 		return params.RopstenChainConfig
-	case ghash == params.RinkebyGenesisHash:
-		return params.RinkebyChainConfig
-	case ghash == params.GoerliGenesisHash:
-		return params.GoerliChainConfig
+	case ghash == params.YoloV1GenesisHash:
+		return params.YoloV1ChainConfig
 	default:
 		return params.AllEthashProtocolChanges
 	}

@@ -546,7 +546,7 @@ type bls12381G1Add struct{}
 
 // RequiredGas returns the gas required to execute the pre-compiled contract.
 func (c *bls12381G1Add) RequiredGas(input []byte) uint64 {
-	return params.Bls12381G1AddGas
+	return vars.Bls12381G1AddGas
 }
 
 func (c *bls12381G1Add) Run(input []byte) ([]byte, error) {
@@ -584,7 +584,7 @@ type bls12381G1Mul struct{}
 
 // RequiredGas returns the gas required to execute the pre-compiled contract.
 func (c *bls12381G1Mul) RequiredGas(input []byte) uint64 {
-	return params.Bls12381G1MulGas
+	return vars.Bls12381G1MulGas
 }
 
 func (c *bls12381G1Mul) Run(input []byte) ([]byte, error) {
@@ -627,13 +627,13 @@ func (c *bls12381G1MultiExp) RequiredGas(input []byte) uint64 {
 		return 0
 	}
 	// Lookup discount value for G1 point, scalar value pair length
-	maxDiscountLen := len(params.Bls12381MultiExpDiscountTable)
+	maxDiscountLen := len(vars.Bls12381MultiExpDiscountTable)
 	if k > maxDiscountLen {
 		k = maxDiscountLen
 	}
-	discount := params.Bls12381MultiExpDiscountTable[k-1]
+	discount := vars.Bls12381MultiExpDiscountTable[k-1]
 	// Calculate gas and return the result
-	return (uint64(k) * params.Bls12381G1MulGas * discount) / 1000
+	return (uint64(k) * vars.Bls12381G1MulGas * discount) / 1000
 }
 
 func (c *bls12381G1MultiExp) Run(input []byte) ([]byte, error) {
@@ -676,7 +676,7 @@ type bls12381G2Add struct{}
 
 // RequiredGas returns the gas required to execute the pre-compiled contract.
 func (c *bls12381G2Add) RequiredGas(input []byte) uint64 {
-	return params.Bls12381G2AddGas
+	return vars.Bls12381G2AddGas
 }
 
 func (c *bls12381G2Add) Run(input []byte) ([]byte, error) {
@@ -714,7 +714,7 @@ type bls12381G2Mul struct{}
 
 // RequiredGas returns the gas required to execute the pre-compiled contract.
 func (c *bls12381G2Mul) RequiredGas(input []byte) uint64 {
-	return params.Bls12381G2MulGas
+	return vars.Bls12381G2MulGas
 }
 
 func (c *bls12381G2Mul) Run(input []byte) ([]byte, error) {
@@ -757,13 +757,13 @@ func (c *bls12381G2MultiExp) RequiredGas(input []byte) uint64 {
 		return 0
 	}
 	// Lookup discount value for G2 point, scalar value pair length
-	maxDiscountLen := len(params.Bls12381MultiExpDiscountTable)
+	maxDiscountLen := len(vars.Bls12381MultiExpDiscountTable)
 	if k > maxDiscountLen {
 		k = maxDiscountLen
 	}
-	discount := params.Bls12381MultiExpDiscountTable[k-1]
+	discount := vars.Bls12381MultiExpDiscountTable[k-1]
 	// Calculate gas and return the result
-	return (uint64(k) * params.Bls12381G2MulGas * discount) / 1000
+	return (uint64(k) * vars.Bls12381G2MulGas * discount) / 1000
 }
 
 func (c *bls12381G2MultiExp) Run(input []byte) ([]byte, error) {
@@ -806,7 +806,7 @@ type bls12381Pairing struct{}
 
 // RequiredGas returns the gas required to execute the pre-compiled contract.
 func (c *bls12381Pairing) RequiredGas(input []byte) uint64 {
-	return params.Bls12381PairingBaseGas + uint64(len(input)/384)*params.Bls12381PairingPerPairGas
+	return vars.Bls12381PairingBaseGas + uint64(len(input)/384)*vars.Bls12381PairingPerPairGas
 }
 
 func (c *bls12381Pairing) Run(input []byte) ([]byte, error) {
@@ -885,7 +885,7 @@ type bls12381MapG1 struct{}
 
 // RequiredGas returns the gas required to execute the pre-compiled contract.
 func (c *bls12381MapG1) RequiredGas(input []byte) uint64 {
-	return params.Bls12381MapG1Gas
+	return vars.Bls12381MapG1Gas
 }
 
 func (c *bls12381MapG1) Run(input []byte) ([]byte, error) {
@@ -920,7 +920,7 @@ type bls12381MapG2 struct{}
 
 // RequiredGas returns the gas required to execute the pre-compiled contract.
 func (c *bls12381MapG2) RequiredGas(input []byte) uint64 {
-	return params.Bls12381MapG2Gas
+	return vars.Bls12381MapG2Gas
 }
 
 func (c *bls12381MapG2) Run(input []byte) ([]byte, error) {

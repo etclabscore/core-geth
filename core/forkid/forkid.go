@@ -45,7 +45,7 @@ var (
 // Blockchain defines all necessary method to build a forkID.
 type Blockchain interface {
 	// Config retrieves the chain's fork configuration.
-	Config() *params.ChainConfig
+	Config() ctypes.ChainConfigurator
 
 	// Genesis retrieves the chain's genesis block.
 	Genesis() *types.Block

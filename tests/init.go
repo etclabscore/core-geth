@@ -213,7 +213,8 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(5),
 	},
-	"YOLOv1": {
+	"YOLOv1": &goethereum.ChainConfig{
+		Clique:              new(ctypes.CliqueConfig),
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),

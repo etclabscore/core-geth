@@ -1656,23 +1656,22 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.
 	switch {
-	// TODO(meowsbits): note fixed; duplicate Ropsten case
 	case ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name):
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 3
 		}
 		cfg.Genesis = params.DefaultRopstenGenesisBlock()
-		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.RopstenGenesisHash])
+		setDNSDiscoveryDefaults(cfg, params.RopstenGenesisHash)
 	case ctx.GlobalBool(RinkebyFlag.Name):
-		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.RinkebyGenesisHash])
+		setDNSDiscoveryDefaults(cfg, params.RinkebyGenesisHash)
 	case ctx.GlobalBool(GoerliFlag.Name):
-		setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.GoerliGenesisHash])
+		setDNSDiscoveryDefaults(cfg, params.GoerliGenesisHash)
 	case ctx.GlobalBool(ClassicFlag.Name):
-		setDNSDiscoveryDefaults(cfg, params.ClassicDNSNetwork1)
+		setDNSDiscoveryDefaults2(cfg, params.ClassicDNSNetwork1)
 	case ctx.GlobalBool(KottiFlag.Name):
-		setDNSDiscoveryDefaults(cfg, params.KottiDNSNetwork1)
+		setDNSDiscoveryDefaults2(cfg, params.KottiDNSNetwork1)
 	case ctx.GlobalBool(MordorFlag.Name):
-		setDNSDiscoveryDefaults(cfg, params.MordorDNSNetwork1)
+		setDNSDiscoveryDefaults2(cfg, params.MordorDNSNetwork1)
 	case ctx.GlobalBool(YoloV1Flag.Name):
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 133519467574833 // "yolov1"
@@ -1680,7 +1679,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		cfg.Genesis = params.DefaultYoloV1GenesisBlock()
 	default:
 		if cfg.NetworkId == 1 {
-			setDNSDiscoveryDefaults(cfg, params.KnownDNSNetworks[params.MainnetGenesisHash])
+			setDNSDiscoveryDefaults(cfg, params.MainnetGenesisHash)
 		}
 	}
 
@@ -1712,14 +1711,22 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	}
 }
 
+func setDNSDiscoveryDefaults2(cfg *eth.Config, url string) {
+	if cfg.DiscoveryURLs != nil {
+		return
+	}
+	if cfg.SyncMode == downloader.LightSync {
+		url = strings.Replace(url, "@all.", "@les.", 1)
+	}
+	cfg.DiscoveryURLs = []string{url}
+}
+
 // setDNSDiscoveryDefaults configures DNS discovery with the given URL if
 // no URLs are set.
 func setDNSDiscoveryDefaults(cfg *eth.Config, genesis common.Hash) {
 	if cfg.DiscoveryURLs != nil {
 		return // already set through flags/config
 	}
-
-	// TODO(meowsbits): fixme
 
 	protocol := "all"
 	if cfg.SyncMode == downloader.LightSync {

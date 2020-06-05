@@ -1671,11 +1671,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		setDNSDiscoveryDefaults2(cfg, params.KottiDNSNetwork1)
 	case ctx.GlobalBool(MordorFlag.Name):
 		setDNSDiscoveryDefaults2(cfg, params.MordorDNSNetwork1)
-	case ctx.GlobalBool(YoloV1Flag.Name):
-		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = 133519467574833 // "yolov1"
-		}
-		cfg.Genesis = params.DefaultYoloV1GenesisBlock()
 	default:
 		if cfg.NetworkId == 1 {
 			setDNSDiscoveryDefaults(cfg, params.MainnetGenesisHash)

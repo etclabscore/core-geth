@@ -154,7 +154,7 @@ func TestCheckCompatible(t *testing.T) {
 		{
 			stored: func() ctypes.ChainConfigurator {
 				c := &goethereum.ChainConfig{
-					Ethash: new(ctypes.EthashConfig),
+					Ethash:         new(ctypes.EthashConfig),
 					DAOForkBlock:   big.NewInt(3),
 					DAOForkSupport: false,
 				}
@@ -162,7 +162,7 @@ func TestCheckCompatible(t *testing.T) {
 			}(),
 			new: func() ctypes.ChainConfigurator {
 				c := &coregeth.CoreGethChainConfig{
-					Ethash: new(ctypes.EthashConfig),
+					Ethash:       new(ctypes.EthashConfig),
 					DAOForkBlock: nil,
 				}
 				return c

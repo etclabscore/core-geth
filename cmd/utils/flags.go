@@ -1314,7 +1314,7 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "goerli")
 	case ctx.GlobalBool(YoloV1Flag.Name):
 		return filepath.Join(baseDataDirPath, "yolo-v1")
-}
+	}
 	return baseDataDirPath
 }
 

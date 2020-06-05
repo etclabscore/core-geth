@@ -773,7 +773,9 @@ func MakeDataDir(ctx *cli.Context) string {
 		}
 		return dataDirPathForCtxChainConfig(ctx, path)
 	}
-	Fatalf("Cannot determine default data directory, please set manually (--%s)", DataDirFlag.Name)
+	if !ctx.GlobalIsSet(DataDirFlag.Name) {
+		Fatalf("Cannot determine default data directory, please set manually (--%s)", DataDirFlag.Name)
+	}
 	return ""
 }
 
@@ -1322,7 +1324,9 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 func setDataDir(ctx *cli.Context, cfg *node.Config) {
 	switch {
 	case ctx.GlobalIsSet(DataDirFlag.Name):
-		cfg.DataDir = ctx.GlobalString(DataDirFlag.Name)
+		val := ctx.GlobalString(DataDirFlag.Name)
+		log.Info("Using custom datadir", "dir", val)
+		cfg.DataDir = val
 
 	case ctx.GlobalBool(DeveloperFlag.Name):
 		cfg.DataDir = "" // unless explicitly requested, use memory databases

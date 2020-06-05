@@ -196,6 +196,9 @@ func expandPath(p string) string {
 			p = home + p[1:]
 		}
 	}
+	if p == "" {
+		return p
+	}
 	return path.Clean(os.ExpandEnv(p))
 }
 

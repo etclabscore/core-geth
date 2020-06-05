@@ -96,11 +96,15 @@ func New(config Config) (*Console, error) {
 		prompt:   config.Prompt,
 		prompter: config.Prompter,
 		printer:  config.Printer,
-		histPath: filepath.Join(config.DataDir, HistoryFile),
 	}
-	if err := os.MkdirAll(config.DataDir, 0700); err != nil {
-		return nil, err
+	// histPath: filepath.Join(config.DataDir, HistoryFile),
+	if config.DataDir != "" {
+		console.histPath = filepath.Join(config.DataDir, HistoryFile)
+		if err := os.MkdirAll(config.DataDir, 0700); err != nil {
+			return nil, err
+		}
 	}
+
 	if err := console.init(config.Preload); err != nil {
 		return nil, err
 	}
@@ -140,11 +144,13 @@ func (c *Console) init(preload []string) error {
 
 	// Configure the input prompter for history and tab completion.
 	if c.prompter != nil {
-		if content, err := ioutil.ReadFile(c.histPath); err != nil {
-			c.prompter.SetHistory(nil)
-		} else {
-			c.history = strings.Split(string(content), "\n")
-			c.prompter.SetHistory(c.history)
+		if c.histPath != "" {
+			if content, err := ioutil.ReadFile(c.histPath); err != nil {
+				c.prompter.SetHistory(nil)
+			} else {
+				c.history = strings.Split(string(content), "\n")
+				c.prompter.SetHistory(c.history)
+			}
 		}
 		c.prompter.SetWordCompleter(c.AutoCompleteInput)
 	}
@@ -250,6 +256,9 @@ func (c *Console) initPersonal(vm *goja.Runtime, bridge *bridge) {
 func (c *Console) clearHistory() {
 	c.history = nil
 	c.prompter.ClearHistory()
+	if c.histPath == "" {
+		return
+	}
 	if err := os.Remove(c.histPath); err != nil {
 		fmt.Fprintln(c.printer, "can't delete history file:", err)
 	} else {
@@ -474,11 +483,13 @@ func (c *Console) Execute(path string) error {
 
 // Stop cleans up the console and terminates the runtime environment.
 func (c *Console) Stop(graceful bool) error {
-	if err := ioutil.WriteFile(c.histPath, []byte(strings.Join(c.history, "\n")), 0600); err != nil {
-		return err
-	}
-	if err := os.Chmod(c.histPath, 0600); err != nil { // Force 0600, even if it was different previously
-		return err
+	if c.histPath != "" {
+		if err := ioutil.WriteFile(c.histPath, []byte(strings.Join(c.history, "\n")), 0600); err != nil {
+			return err
+		}
+		if err := os.Chmod(c.histPath, 0600); err != nil { // Force 0600, even if it was different previously
+			return err
+		}
 	}
 	c.jsre.Stop(graceful)
 	return nil

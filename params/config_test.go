@@ -42,14 +42,14 @@ func TestCheckCompatible(t *testing.T) {
 		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 0, wantErr: nil},
 		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 100, wantErr: nil},
 		{
-			stored:  &goethereum.ChainConfig{EIP150Block: big.NewInt(10)},
-			new:     &goethereum.ChainConfig{EIP150Block: big.NewInt(20)},
+			stored:  &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), EIP150Block: big.NewInt(10)},
+			new:     &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), EIP150Block: big.NewInt(20)},
 			head:    9,
 			wantErr: nil,
 		},
 		{
 			stored: AllEthashProtocolChanges,
-			new:    &goethereum.ChainConfig{HomesteadBlock: nil},
+			new:    &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: nil},
 			head:   3,
 			wantErr: &confp.ConfigCompatError{
 				What:         "Homestead fork block",
@@ -60,7 +60,7 @@ func TestCheckCompatible(t *testing.T) {
 		},
 		{
 			stored: AllEthashProtocolChanges,
-			new:    &goethereum.ChainConfig{HomesteadBlock: big.NewInt(1)},
+			new:    &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: big.NewInt(1)},
 			head:   3,
 			wantErr: &confp.ConfigCompatError{
 				What:         "Homestead fork block",
@@ -70,8 +70,8 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored: &goethereum.ChainConfig{HomesteadBlock: big.NewInt(30), EIP150Block: big.NewInt(10)},
-			new:    &goethereum.ChainConfig{HomesteadBlock: big.NewInt(25), EIP150Block: big.NewInt(20)},
+			stored: &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: big.NewInt(30), EIP150Block: big.NewInt(10)},
+			new:    &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: big.NewInt(25), EIP150Block: big.NewInt(20)},
 			head:   25,
 			wantErr: &confp.ConfigCompatError{
 				What:         "EIP150 fork block",
@@ -81,8 +81,8 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored: &coregeth.CoreGethChainConfig{EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
-			new:    &coregeth.CoreGethChainConfig{EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
+			stored: &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
+			new:    &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
 			head:   25,
 			wantErr: &confp.ConfigCompatError{
 				What:         "EIP100F fork block",
@@ -92,14 +92,14 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored:  &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
-			new:     &coregeth.CoreGethChainConfig{EIP211FBlock: big.NewInt(26)},
+			stored:  &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), ByzantiumBlock: big.NewInt(30)},
+			new:     &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP211FBlock: big.NewInt(26)},
 			head:    25,
 			wantErr: nil,
 		},
 		{
-			stored:  &goethereum.ChainConfig{ByzantiumBlock: big.NewInt(30)},
-			new:     &coregeth.CoreGethChainConfig{EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
+			stored:  &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), ByzantiumBlock: big.NewInt(30)},
+			new:     &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
 			head:    25,
 			wantErr: nil,
 		},
@@ -154,6 +154,7 @@ func TestCheckCompatible(t *testing.T) {
 		{
 			stored: func() ctypes.ChainConfigurator {
 				c := &goethereum.ChainConfig{
+					Ethash: new(ctypes.EthashConfig),
 					DAOForkBlock:   big.NewInt(3),
 					DAOForkSupport: false,
 				}
@@ -161,6 +162,7 @@ func TestCheckCompatible(t *testing.T) {
 			}(),
 			new: func() ctypes.ChainConfigurator {
 				c := &coregeth.CoreGethChainConfig{
+					Ethash: new(ctypes.EthashConfig),
 					DAOForkBlock: nil,
 				}
 				return c

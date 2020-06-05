@@ -88,19 +88,18 @@ func TestEquivalent_Features(t *testing.T) {
 			t.Fatal("unknown consensus mg")
 		}
 
-		err = confp.Equivalent(oconf, mg)
-		if err != nil {
+		nicelog := func(n *uint64) interface{} {
+			if n == nil {
+				return "nil"
+			}
+			return *n
+		}
+		debuglog := func(a, b ctypes.ChainConfigurator) {
 
 			// Debugging log lines.
-			t.Log("--------------------")
-			t.Errorf("%s oconf/mg err: %v", name, err) // With error.
+			t.Log("o", oconf.GetConsensusEngineType())
+			t.Log("m", mg.GetConsensusEngineType())
 
-			nicelog := func(n *uint64) interface{} {
-				if n == nil {
-					return "nil"
-				}
-				return *n
-			}
 			t.Log("o 649", nicelog(oconf.GetEthashEIP649Transition()))
 			t.Log("m 649", nicelog(mg.GetEthashEIP649Transition()))
 			t.Log("o 1234", nicelog(oconf.GetEthashEIP1234Transition()))
@@ -113,6 +112,18 @@ func TestEquivalent_Features(t *testing.T) {
 			} else {
 				t.Log(name, "649T", v)
 			}
+
+			t.Log("--------------------")
+			j, _ := json.MarshalIndent(oconf, "", "    ")
+			t.Log(string(j))
+			j, _ = json.MarshalIndent(mg, "", "    ")
+			t.Log(string(j))
+		}
+
+		err = confp.Equivalent(oconf, mg)
+		if err != nil {
+			t.Errorf("Equivalence: %s oconf/mg err: %v", name, err) // With error.
+			debuglog(oconf, mg)
 		}
 
 		pc := &parity.ParityChainSpec{}
@@ -123,9 +134,10 @@ func TestEquivalent_Features(t *testing.T) {
 
 		mustValidate(pc)
 
-		err = confp.Equivalent(mg, pc)
+		err = confp.Equivalent(oconf, pc)
 		if err != nil {
-			t.Errorf("%s oconf/p err: %v", name, err)
+			t.Errorf("Equivalence: %s oconf/pc err: %v", name, err)
+			debuglog(oconf, pc)
 		}
 	}
 }

@@ -438,6 +438,7 @@ func (c *CoreGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngin
 }
 
 func (c *CoreGethChainConfig) GetEthashMinimumDifficulty() *big.Int {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	return internal.GlobalConfigurator().GetEthashMinimumDifficulty()
 }
 func (c *CoreGethChainConfig) SetEthashMinimumDifficulty(i *big.Int) error {
@@ -445,6 +446,7 @@ func (c *CoreGethChainConfig) SetEthashMinimumDifficulty(i *big.Int) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashDifficultyBoundDivisor() *big.Int {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	return internal.GlobalConfigurator().GetEthashDifficultyBoundDivisor()
 }
 
@@ -453,6 +455,7 @@ func (c *CoreGethChainConfig) SetEthashDifficultyBoundDivisor(i *big.Int) error 
 }
 
 func (c *CoreGethChainConfig) GetEthashDurationLimit() *big.Int {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	return internal.GlobalConfigurator().GetEthashDurationLimit()
 }
 
@@ -461,6 +464,7 @@ func (c *CoreGethChainConfig) SetEthashDurationLimit(i *big.Int) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashHomesteadTransition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	if c.EIP2FBlock == nil || c.EIP7FBlock == nil {
 		return nil
 	}
@@ -474,6 +478,7 @@ func (c *CoreGethChainConfig) SetEthashHomesteadTransition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashEIP2Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	return bigNewU64(c.EIP2FBlock)
 }
 
@@ -483,6 +488,7 @@ func (c *CoreGethChainConfig) SetEthashEIP2Transition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashEIP779Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	return bigNewU64(c.DAOForkBlock)
 }
 
@@ -495,6 +501,7 @@ func (c *CoreGethChainConfig) SetEthashEIP779Transition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashEIP649Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	if c.eip649FInferred {
 		return bigNewU64(c.EIP649FBlock)
 	}
@@ -537,6 +544,7 @@ func (c *CoreGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashEIP1234Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	if c.eip1234FInferred {
 		return bigNewU64(c.EIP1234FBlock)
 	}
@@ -580,6 +588,7 @@ func (c *CoreGethChainConfig) SetEthashEIP1234Transition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashEIP2384Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	if c.eip2384Inferred {
 		return bigNewU64(c.EIP2384FBlock)
 	}
@@ -614,6 +623,7 @@ func (c *CoreGethChainConfig) SetEthashEIP2384Transition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashECIP1010PauseTransition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	return bigNewU64(c.ECIP1010PauseBlock)
 }
 
@@ -631,6 +641,7 @@ func (c *CoreGethChainConfig) SetEthashECIP1010PauseTransition(n *uint64) error 
 }
 
 func (c *CoreGethChainConfig) GetEthashECIP1010ContinueTransition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	if c.ECIP1010PauseBlock == nil {
 		return nil
 	}
@@ -658,6 +669,7 @@ func (c *CoreGethChainConfig) SetEthashECIP1010ContinueTransition(n *uint64) err
 }
 
 func (c *CoreGethChainConfig) GetEthashECIP1017Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	return bigNewU64(c.ECIP1017FBlock)
 }
 
@@ -670,6 +682,7 @@ func (c *CoreGethChainConfig) SetEthashECIP1017Transition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashECIP1017EraRounds() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	return bigNewU64(c.ECIP1017EraRounds)
 }
 
@@ -682,6 +695,7 @@ func (c *CoreGethChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashEIP100BTransition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	return bigNewU64(c.EIP100FBlock)
 }
 
@@ -694,6 +708,7 @@ func (c *CoreGethChainConfig) SetEthashEIP100BTransition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashECIP1041Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	return bigNewU64(c.DisposalBlock)
 }
 
@@ -706,6 +721,7 @@ func (c *CoreGethChainConfig) SetEthashECIP1041Transition(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	return c.DifficultyBombDelaySchedule
 }
 
@@ -718,6 +734,7 @@ func (c *CoreGethChainConfig) SetEthashDifficultyBombDelaySchedule(m ctypes.Uint
 }
 
 func (c *CoreGethChainConfig) GetEthashBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash { return nil }
 	return c.BlockRewardSchedule
 }
 

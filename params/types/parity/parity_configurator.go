@@ -29,8 +29,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
-var parityZero = &ParityChainSpec{}
-
 func (spec *ParityChainSpec) ensureExistingRewardSchedule() {
 	if spec.Engine.Ethash.Params.BlockReward == nil {
 		spec.Engine.Ethash.Params.BlockReward = ctypes.Uint64BigValOrMapHex{}

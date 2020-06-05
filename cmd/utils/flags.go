@@ -1683,7 +1683,9 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	}
 
 	if ctx.GlobalBool(DeveloperFlag.Name) {
-		cfg.NetworkId = 1337
+		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
+			cfg.NetworkId = 1337
+		}
 
 		// Create new developer account or reuse existing one
 		var (

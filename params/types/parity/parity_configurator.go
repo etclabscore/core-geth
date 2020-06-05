@@ -536,8 +536,15 @@ func (spec *ParityChainSpec) GetConsensusEngineType() ctypes.ConsensusEngineT {
 func (spec *ParityChainSpec) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
 	switch t {
 	case ctypes.ConsensusEngineT_Ethash:
+		if spec.GetEthashMinimumDifficulty() == nil {
+			spec.SetEthashMinimumDifficulty(vars.MinimumDifficulty)
+		}
 		return nil
 	case ctypes.ConsensusEngineT_Clique:
+		if spec.Engine.Clique.Params.Period == nil {
+			spec.SetCliqueEpoch(30000)
+			spec.SetCliquePeriod(0)
+		}
 		return nil
 	default:
 		return ctypes.ErrUnsupportedConfigFatal

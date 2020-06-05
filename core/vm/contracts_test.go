@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"math/big"
 	"testing"
 
@@ -69,8 +70,23 @@ var blake2FMalformedInputTests = []precompiledFailureTest{
 	},
 }
 
+// allPrecompileds overrides the AllEthashProtocolChanges config.
+// YoloV1 includes EIP2537.
+// This config is Clique-based, for one.
+// For two, the chain feature isn't installed in all CliqueChainConfigs either.
+// So we override to ALL of the precompileds gathered, however hacky it may be.
+var allPrecompileds = func() map[common.Address]PrecompiledContract {
+	conf := params.AllEthashProtocolChanges
+	zero := uint64(0)
+	err := conf.SetEIP2537Transition(&zero)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return PrecompiledContractsForConfig(conf, big.NewInt(0))
+}()
+
 func testPrecompiled(addr string, test precompiledTest, t *testing.T) {
-	p := PrecompiledContractsForConfig(params.AllEthashProtocolChanges, big.NewInt(0))[common.HexToAddress(addr)]
+	p := allPrecompileds[common.HexToAddress(addr)]
 	in := common.Hex2Bytes(test.Input)
 	contract := NewContract(AccountRef(common.HexToAddress("1337")),
 		nil, new(big.Int), p.RequiredGas(in))
@@ -89,7 +105,7 @@ func testPrecompiled(addr string, test precompiledTest, t *testing.T) {
 }
 
 func testPrecompiledOOG(addr string, test precompiledTest, t *testing.T) {
-	p := PrecompiledContractsForConfig(params.AllEthashProtocolChanges, big.NewInt(0))[common.HexToAddress(addr)]
+	p := allPrecompileds[common.HexToAddress(addr)]
 	in := common.Hex2Bytes(test.Input)
 	contract := NewContract(AccountRef(common.HexToAddress("1337")),
 		nil, new(big.Int), p.RequiredGas(in)-1)
@@ -107,7 +123,7 @@ func testPrecompiledOOG(addr string, test precompiledTest, t *testing.T) {
 }
 
 func testPrecompiledFailure(addr string, test precompiledFailureTest, t *testing.T) {
-	p := PrecompiledContractsForConfig(params.AllEthashProtocolChanges, big.NewInt(0))[common.HexToAddress(addr)]
+	p := allPrecompileds[common.HexToAddress(addr)]
 	in := common.Hex2Bytes(test.Input)
 	contract := NewContract(AccountRef(common.HexToAddress("31337")),
 		nil, new(big.Int), p.RequiredGas(in))
@@ -218,7 +234,7 @@ func benchmarkPrecompiled(addr string, test precompiledTest, bench *testing.B) {
 	if test.NoBenchmark {
 		return
 	}
-	p := PrecompiledContractsForConfig(params.AllEthashProtocolChanges, big.NewInt(0))[common.HexToAddress(addr)]
+	p := allPrecompileds[common.HexToAddress(addr)]
 	in := common.Hex2Bytes(test.Input)
 	reqGas := p.RequiredGas(in)
 	contract := NewContract(AccountRef(common.HexToAddress("1337")),

@@ -164,10 +164,9 @@ var (
 	}
 	NetworkIdFlag = cli.Uint64Flag{
 		Name:  "networkid",
-		Usage: "Network identifier (integer, 1=Frontier, 2=Morden (disused), 3=Ropsten, 4=Rinkeby, 6=Kotti)",
+		Usage: "Network identifier (integer, 1=Mainnet, 2=Morden (disused), 3=Ropsten, 4=Rinkeby, 5=Goerli, 6=Kotti, YoloV1=133519467574833, developer=1337)",
 		Value: eth.DefaultConfig.NetworkId,
 	}
-
 	ClassicFlag = cli.BoolFlag{
 		Name:  "classic",
 		Usage: "Ethereum Classic network: pre-configured Ethereum Classic mainnet",

@@ -37,12 +37,11 @@ import (
 )
 
 const (
-	awsMetaBucketName = "meta"
 	awsDefaultRegion  = "us-west-1"
 )
 
 var (
-	awsMainBucketName = fmt.Sprintf("v%d", params.VersionMajor)
+	awsMainBucketName = fmt.Sprintf("%s-v%d", params.VersionName, params.VersionMajor)
 )
 
 type freezerRemoteS3 struct {
@@ -67,8 +66,8 @@ func awsKeyRLPJSON(number uint64) string {
 	return fmt.Sprintf("%09d.rlp.json", number)
 }
 
-func (f *freezerRemoteS3) bucketName(kind string) string {
-	return fmt.Sprintf("geth-%s-%s", f.namespace, kind)
+func (f *freezerRemoteS3) bucketName() string {
+	return fmt.Sprintf("%s-v%d-%s", params.VersionName, params.VersionMajor, f.namespace)
 }
 
 type AncientObjectS3 struct {
@@ -122,13 +121,12 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 	// Create buckets per the schema, where each bucket is prefixed with the namespace
 	// and suffixed with the schema Kind.
 	for _, kind := range []string{
-		awsMetaBucketName,
 		awsMainBucketName, // All 'table' data is stored together in coerced JSON blobs.
 	} {
 		start := time.Now()
 		f.log.Info("Creating bucket if not exists", "bucket", kind)
 		result, err := f.service.CreateBucket(&s3.CreateBucketInput{
-			Bucket: aws.String(f.bucketName(kind)),
+			Bucket: aws.String(f.bucketName()),
 		})
 		if err != nil {
 			if aerr, ok := err.(awserr.Error); ok {
@@ -141,7 +139,7 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 			return f, err
 		}
 		err = f.service.WaitUntilBucketExists(&s3.HeadBucketInput{
-			Bucket: aws.String(f.bucketName(kind)),
+			Bucket: aws.String(f.bucketName()),
 		})
 		if err != nil {
 			return f, err
@@ -170,7 +168,7 @@ func (f *freezerRemoteS3) HasAncient(kind string, number uint64) (bool, error) {
 	}
 	key := awsKeyRLPJSON(number)
 	result, err := f.service.ListObjects(&s3.ListObjectsInput{
-		Bucket:  aws.String(f.bucketName(awsMainBucketName)),
+		Bucket:  aws.String(f.bucketName()),
 		MaxKeys: aws.Int64(1),
 		Prefix:  aws.String(key),
 	})
@@ -214,7 +212,7 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 	buf := aws.NewWriteAtBuffer([]byte{})
 	downloader := s3manager.NewDownloader(f.session)
 	_, err := downloader.Download(buf, &s3.GetObjectInput{
-		Bucket: aws.String(f.bucketName(awsMainBucketName)),
+		Bucket: aws.String(f.bucketName()),
 		Key:    aws.String(key),
 	})
 	if err != nil {
@@ -241,7 +239,7 @@ func (f *freezerRemoteS3) Ancients() (uint64, error) {
 		return atomic.LoadUint64(f.frozen), nil
 	}
 	result, err := f.service.GetObject(&s3.GetObjectInput{
-		Bucket: aws.String(f.bucketName(awsMetaBucketName)),
+		Bucket: aws.String(f.bucketName()),
 		Key:    aws.String("index-marker"),
 	})
 	if err != nil {
@@ -275,7 +273,7 @@ func (f *freezerRemoteS3) setIndexMarker(number uint64) error {
 	numberStr := strconv.FormatUint(number, 10)
 	reader := bytes.NewReader([]byte(numberStr))
 	_, err := f.service.PutObject(&s3.PutObjectInput{
-		Bucket: aws.String(f.bucketName(awsMetaBucketName)),
+		Bucket: aws.String(f.bucketName()),
 		Key:    aws.String("index-marker"),
 		Body:   reader,
 	})
@@ -305,7 +303,7 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 		return err
 	}
 	uploadObj := s3manager.BatchUploadObject{Object: &s3manager.UploadInput{
-		Bucket: aws.String(f.bucketName(awsMainBucketName)),
+		Bucket: aws.String(f.bucketName()),
 		Key:    aws.String(awsKeyRLPJSON(number)),
 		Body:   bytes.NewReader(b),
 	}}
@@ -336,7 +334,7 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	f.log.Info("Truncating ancients", "ancients", n, "target", items, "delta", n-items)
 	start := time.Now()
 	list := &s3.ListObjectsInput{
-		Bucket:  aws.String(f.bucketName(awsMainBucketName)),
+		Bucket:  aws.String(f.bucketName()),
 		Marker: aws.String(awsKeyRLPJSON(items)),
 	}
 	iter := s3manager.NewDeleteListIterator(f.service, list)

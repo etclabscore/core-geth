@@ -21,4 +21,5 @@ package tests
 var writeDifficultyTestsReferencePairs = map[string]string{
 	"Byzantium":      "ETC_Atlantis",
 	"Constantinople": "ETC_Agharta",
+	"EIP2384":        "ETC_Phoenix",
 }

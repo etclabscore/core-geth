@@ -27,6 +27,7 @@ import (
 var writeStateTestsReferencePairs = map[string]string{
 	"Byzantium":         "ETC_Atlantis",
 	"ConstantinopleFix": "ETC_Agharta",
+	"Istanbul":          "ETC_Phoenix",
 }
 
 // RunSetPost runs the state subtest for a given config, and writes the resulting

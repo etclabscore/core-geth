@@ -1627,11 +1627,9 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	}
 	if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
 		cfg.DatabaseFreezerRemote = ctx.GlobalString(AncientRemoteFlag.Name)
-		cfg.DatabaseFreezerRemoteNamespace = "geth-remote"
-		if gen := genesisForCtxChainConfig(ctx); gen != nil {
-			chainId := gen.GetChainID()
-			hash := core.GenesisToBlock(gen, nil).Hash()
-			cfg.DatabaseFreezerRemoteNamespace = fmt.Sprintf("%d-%s", chainId, hash.Hex()[:8])
+		cfg.DatabaseFreezerRemoteNamespace = ctx.GlobalString(AncientRemoteNamespaceFlag.Name)
+		if cfg.DatabaseFreezerRemote == "s3" && cfg.DatabaseFreezerRemoteNamespace == "" {
+			Fatalf("missing remote namespace, use --%s to set (bucket names must be unique)", AncientRemoteNamespaceFlag.Name)
 		}
 	}
 

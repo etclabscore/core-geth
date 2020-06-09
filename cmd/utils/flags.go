@@ -157,7 +157,7 @@ var (
 	}
 	AncientRemoteNamespaceFlag = cli.StringFlag{
 		Name:  "datadir.ancient.remote.namespace",
-		Usage: "Namespace for remote storage, eg parent bucket name (default: <chainId>-<genesisHash> if using a default --chain, otherwise '' for custom chains)",
+		Usage: "Namespace for remote storage, eg. S3 bucket name. Use will vary by remote provider.",
 		Value: "",
 	}
 	KeyStoreDirFlag = DirectoryFlag{
@@ -1914,10 +1914,12 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 		name = "lightchaindata"
 	}
 	if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
-
-		namespace := ctx.GlobalString(AncientRemoteNamespaceFlag.Name)
-		if namespace == "" {
-			Fatalf("missing remote namespace, use --%s to set (bucket names must be unique)", AncientRemoteNamespaceFlag.Name)
+		namespace := ""
+		if ctx.GlobalString(AncientRemoteFlag.Name) == "s3" {
+			namespace = ctx.GlobalString(AncientRemoteNamespaceFlag.Name)
+			if namespace == "" {
+				Fatalf("missing remote namespace, use --%s to set (bucket names must be unique)", AncientRemoteNamespaceFlag.Name)
+			}
 		}
 
 		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientRemoteFlag.Name), namespace)

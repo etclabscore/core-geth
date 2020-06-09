@@ -83,8 +83,9 @@ func fromAwsKey(key string) (kind string, number uint64) {
 	return
 }
 
+// TODO: this is superfluous now; bucket names must be user-configured
 func (f *freezerRemoteS3) bucketName() string {
-	return fmt.Sprintf("%s-v%d-%s", params.VersionName, params.VersionMajor, f.namespace)
+	return fmt.Sprintf("%s", f.namespace)
 }
 
 // newFreezer creates a chain freezer that moves ancient chain data into

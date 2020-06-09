@@ -35,10 +35,6 @@ import (
 	"github.com/ethereum/go-ethereum/metrics"
 )
 
-const (
-	awsDefaultRegion = "us-west-1"
-)
-
 type freezerRemoteS3 struct {
 	session *session.Session
 	service *s3.S3
@@ -127,12 +123,20 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 		log:            log.New("remote", "s3"),
 	}
 
-	f.log.Info("New session", "region", awsDefaultRegion)
-	f.session, err = session.NewSession(&aws.Config{Region: aws.String(awsDefaultRegion)})
+	/*
+	By default NewSession will only load credentials from the shared credentials file (~/.aws/credentials).
+	If the AWS_SDK_LOAD_CONFIG environment variable is set to a truthy value the Session will be created from the
+	configuration values from the shared config (~/.aws/config) and shared credentials (~/.aws/credentials) files.
+	Using the NewSessionWithOptions with SharedConfigState set to SharedConfigEnable will create the session as if the
+	AWS_SDK_LOAD_CONFIG environment variable was set.
+	> https://docs.aws.amazon.com/sdk-for-go/api/aws/session/
+	 */
+	f.session, err = session.NewSession()
 	if err != nil {
 		f.log.Info("Session", "err", err)
 		return nil, err
 	}
+	f.log.Info("New session", "region", f.session.Config.Region)
 	f.service = s3.New(f.session)
 
 	// Create buckets per the schema, where each bucket is prefixed with the namespace

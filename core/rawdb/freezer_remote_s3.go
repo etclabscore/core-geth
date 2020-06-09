@@ -47,11 +47,13 @@ type freezerRemoteS3 struct {
 	writeMeter metrics.Meter // Meter for measuring the effective amount of data written
 	sizeGauge  metrics.Gauge // Gauge for tracking the combined size of all freezer tables
 
+	uploader   *s3manager.Uploader
+	downloader *s3manager.Downloader
+
 	backlogUploads []s3manager.BatchUploadObject
 	pending        map[string][]byte
 	pendingMu      sync.Mutex
-
-	pendingCopy map[string][]byte
+	pendingCopy    map[string][]byte
 
 	frozen *uint64
 
@@ -124,13 +126,13 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 	}
 
 	/*
-	By default NewSession will only load credentials from the shared credentials file (~/.aws/credentials).
-	If the AWS_SDK_LOAD_CONFIG environment variable is set to a truthy value the Session will be created from the
-	configuration values from the shared config (~/.aws/config) and shared credentials (~/.aws/credentials) files.
-	Using the NewSessionWithOptions with SharedConfigState set to SharedConfigEnable will create the session as if the
-	AWS_SDK_LOAD_CONFIG environment variable was set.
-	> https://docs.aws.amazon.com/sdk-for-go/api/aws/session/
-	 */
+		By default NewSession will only load credentials from the shared credentials file (~/.aws/credentials).
+		If the AWS_SDK_LOAD_CONFIG environment variable is set to a truthy value the Session will be created from the
+		configuration values from the shared config (~/.aws/config) and shared credentials (~/.aws/credentials) files.
+		Using the NewSessionWithOptions with SharedConfigState set to SharedConfigEnable will create the session as if the
+		AWS_SDK_LOAD_CONFIG environment variable was set.
+		> https://docs.aws.amazon.com/sdk-for-go/api/aws/session/
+	*/
 	f.session, err = session.NewSession()
 	if err != nil {
 		f.log.Info("Session", "err", err)
@@ -145,6 +147,11 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 	if err != nil {
 		return f, err
 	}
+
+	f.uploader = s3manager.NewUploader(f.session)
+	f.uploader.Concurrency = 10
+
+	f.downloader = s3manager.NewDownloader(f.session)
 
 	n, _ := f.Ancients()
 	f.frozen = &n
@@ -200,8 +207,7 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 	// Take from remote
 	key := awsKeyRLP(kind, number)
 	buf := aws.NewWriteAtBuffer([]byte{})
-	downloader := s3manager.NewDownloader(f.session)
-	_, err := downloader.Download(buf, &s3.GetObjectInput{
+	_, err := f.downloader.Download(buf, &s3.GetObjectInput{
 		Bucket: aws.String(f.bucketName()),
 		Key:    aws.String(key),
 	})
@@ -381,12 +387,11 @@ func (f *freezerRemoteS3) Sync() error {
 	f.pendingCopy = f.pending
 	f.pending = make(map[string][]byte)
 
-	f.log.Info("Syncing ancients", "backlog", lenBacklog)
+	f.log.Info("Syncing ancients", "backlog.blocks", lenBacklog/5) // /5 for each table
 	start := time.Now()
-	uploader := s3manager.NewUploader(f.session)
-	uploader.Concurrency = 10
+
 	iter := &s3manager.UploadObjectsIterator{Objects: f.backlogUploads}
-	err := uploader.UploadWithIterator(aws.BackgroundContext(), iter)
+	err := f.uploader.UploadWithIterator(aws.BackgroundContext(), iter)
 	if err != nil {
 		f.pending = f.pendingCopy
 		f.pendingCopy = make(map[string][]byte)
@@ -394,7 +399,7 @@ func (f *freezerRemoteS3) Sync() error {
 	}
 	f.backlogUploads = []s3manager.BatchUploadObject{}
 	elapsed := time.Since(start)
-	blocksPerSecond := fmt.Sprintf("%0.2f", float64(lenBacklog)/elapsed.Seconds())
+	blocksPerSecond := fmt.Sprintf("%0.2f", float64(lenBacklog)/5/elapsed.Seconds())
 	err = f.setIndexMarker(atomic.LoadUint64(f.frozen))
 	if err != nil {
 		f.pending = f.pendingCopy
@@ -404,7 +409,7 @@ func (f *freezerRemoteS3) Sync() error {
 	f.pendingCopy = make(map[string][]byte)
 	f.pending = make(map[string][]byte)
 
-	f.log.Info("Finished syncing ancients", "backlog", lenBacklog, "elapsed", elapsed, "bps", blocksPerSecond)
+	f.log.Info("Finished syncing ancients", "backlog", lenBacklog/5, "elapsed", elapsed, "bps", blocksPerSecond)
 
 	return err
 }

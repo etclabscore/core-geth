@@ -18,10 +18,10 @@ package rawdb
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -37,7 +37,7 @@ import (
 )
 
 const (
-	awsDefaultRegion  = "us-west-1"
+	awsDefaultRegion = "us-west-1"
 )
 
 var (
@@ -57,42 +57,34 @@ type freezerRemoteS3 struct {
 	sizeGauge  metrics.Gauge // Gauge for tracking the combined size of all freezer tables
 
 	backlogUploads []s3manager.BatchUploadObject
+	pending        map[string][]byte
+	pendingMu      sync.Mutex
+
+	pendingCopy map[string][]byte
+
 	frozen         *uint64
 
 	log log.Logger
 }
 
-func awsKeyRLPJSON(number uint64) string {
-	return fmt.Sprintf("%09d.rlp.json", number)
+func awsKeyRLP(kind string, number uint64) string {
+	return fmt.Sprintf("%s/%09d.rlp", kind, number)
+}
+
+func fromAwsKey(key string) (kind string, number uint64) {
+	k := strings.TrimSuffix(key, ".rlp")
+	spl := strings.Split(k, "/")
+	kind = spl[0]
+	var err error
+	number, _ = strconv.ParseUint(spl[1], 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	return
 }
 
 func (f *freezerRemoteS3) bucketName() string {
 	return fmt.Sprintf("%s-v%d-%s", params.VersionName, params.VersionMajor, f.namespace)
-}
-
-type AncientObjectS3 struct {
-	Hash       []byte `json:"hash"`
-	Header     []byte `json:"header"`
-	Bodies     []byte `json:"bodies"`
-	Receipt    []byte `json:"receipt"`
-	Difficulty []byte `json:"difficulty"`
-}
-
-func (o *AncientObjectS3) GetKind(kind string) []byte {
-	switch kind {
-	case freezerHashTable:
-		return o.Hash
-	case freezerHeaderTable:
-		return o.Header
-	case freezerBodiesTable:
-		return o.Bodies
-	case freezerReceiptTable:
-		return o.Receipt
-	case freezerDifficultyTable:
-		return o.Difficulty
-	default:
-		panic("unknown kind")
-	}
 }
 
 // newFreezer creates a chain freezer that moves ancient chain data into
@@ -166,7 +158,7 @@ func (f *freezerRemoteS3) HasAncient(kind string, number uint64) (bool, error) {
 	if atomic.LoadUint64(f.frozen) <= number {
 		return false, nil
 	}
-	key := awsKeyRLPJSON(number)
+	key := awsKeyRLP(kind, number)
 	result, err := f.service.ListObjects(&s3.ListObjectsInput{
 		Bucket:  aws.String(f.bucketName()),
 		MaxKeys: aws.Int64(1),
@@ -190,25 +182,16 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 	if atomic.LoadUint64(f.frozen) <= number {
 		return nil, nil
 	}
-	backlogLen := uint64(len(f.backlogUploads))
-	if remoteHeight := atomic.LoadUint64(f.frozen) - backlogLen; remoteHeight <= number {
-		// Take from backlog
-		backlogIndex := number - remoteHeight
-		obj := f.backlogUploads[backlogIndex]
-		b, err := ioutil.ReadAll(obj.Object.Body)
-		obj.Object.Body = bytes.NewReader(b)
-		if err != nil {
-			return nil, err
-		}
-		o := &AncientObjectS3{}
-		err = json.Unmarshal(b, o)
-		if err != nil {
-			return nil, err
-		}
-		return o.GetKind(kind), nil
+
+	f.pendingMu.Lock()
+	if v, ok := f.pending[awsKeyRLP(kind, number)]; ok {
+		f.pendingMu.Unlock()
+		return v, nil
 	}
+	f.pendingMu.Unlock()
+
 	// Take from remote
-	key := awsKeyRLPJSON(number)
+	key := awsKeyRLP(kind, number)
 	buf := aws.NewWriteAtBuffer([]byte{})
 	downloader := s3manager.NewDownloader(f.session)
 	_, err := downloader.Download(buf, &s3.GetObjectInput{
@@ -225,12 +208,7 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 		f.log.Error("Download error", "method", "Ancient", "error", err, "kind", kind, "key", key, "number", number)
 		return nil, err
 	}
-	obj := &AncientObjectS3{}
-	err = json.Unmarshal(buf.Bytes(), obj)
-	if err != nil {
-		return nil, err
-	}
-	return obj.GetKind(kind), nil
+	return buf.Bytes(), nil
 }
 
 // Ancients returns the length of the frozen items.
@@ -291,23 +269,24 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
-	obj := &AncientObjectS3{
-		Hash:       hash,
-		Header:     header,
-		Bodies:     body,
-		Receipt:    receipts,
-		Difficulty: td,
+	for _, v := range []struct{
+		kind string
+		val []byte
+	}{
+		{"hash", hash},
+		{"header", header},
+		{"body", body},
+		{"receipts", receipts},
+		{"td", td},
+	} {
+		uploadObj := s3manager.BatchUploadObject{Object: &s3manager.UploadInput{
+			Bucket: aws.String(f.bucketName()),
+			Key:    aws.String(awsKeyRLP(v.kind, number)),
+			Body:   bytes.NewReader(v.val),
+		}}
+		f.backlogUploads = append(f.backlogUploads, uploadObj)
 	}
-	b, err := json.Marshal(obj)
-	if err != nil {
-		return err
-	}
-	uploadObj := s3manager.BatchUploadObject{Object: &s3manager.UploadInput{
-		Bucket: aws.String(f.bucketName()),
-		Key:    aws.String(awsKeyRLPJSON(number)),
-		Body:   bytes.NewReader(b),
-	}}
-	f.backlogUploads = append(f.backlogUploads, uploadObj)
+
 	atomic.AddUint64(f.frozen, 1)
 
 	return nil
@@ -323,24 +302,54 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	defer f.mu.Unlock()
 
 	n := atomic.LoadUint64(f.frozen)
-	backlogLen := uint64(len(f.backlogUploads))
-	if n - backlogLen <= items {
-		index := items - (n-backlogLen)
-		f.backlogUploads = f.backlogUploads[:index]
+
+	foundPending := false
+	f.pendingMu.Lock()
+
+	for k := range f.pending {
+		_, num := fromAwsKey(k)
+		// Since items is length of items, we compare == to items as well; numbers at or above
+		// this value indicate outside of range since length is 0 indexed.
+		if num >= items {
+			foundPending = true
+			delete(f.pending, k)
+		}
+	}
+	for i, v := range f.backlogUploads {
+		_, num := fromAwsKey(*v.Object.Key)
+		if num >= items {
+			f.backlogUploads = append(f.backlogUploads[:i], f.backlogUploads[i+1:]...)
+		}
+	}
+	// If we found the len in the pending map, that means it hasn't been uploaded yet.
+	if foundPending {
 		atomic.StoreUint64(f.frozen, items)
+		f.pendingMu.Unlock()
 		return nil
 	}
+	f.pendingMu.Unlock()
 
 	f.log.Info("Truncating ancients", "ancients", n, "target", items, "delta", n-items)
 	start := time.Now()
-	list := &s3.ListObjectsInput{
-		Bucket:  aws.String(f.bucketName()),
-		Marker: aws.String(awsKeyRLPJSON(items)),
-	}
-	iter := s3manager.NewDeleteListIterator(f.service, list)
-	batcher := s3manager.NewBatchDeleteWithClient(f.service)
-	if err := batcher.Delete(aws.BackgroundContext(), iter); err != nil {
-		return err
+
+	for _, v := range []struct{
+		kind string
+	}{
+		{"hash"},
+		{"header"},
+		{"body"},
+		{"receipts"},
+		{"td"},
+	} {
+		list := &s3.ListObjectsInput{
+			Bucket: aws.String(f.bucketName()),
+			Marker: aws.String(awsKeyRLP(v.kind, items)),
+		}
+		iter := s3manager.NewDeleteListIterator(f.service, list)
+		batcher := s3manager.NewBatchDeleteWithClient(f.service)
+		if err := batcher.Delete(aws.BackgroundContext(), iter); err != nil {
+			return err
+		}
 	}
 
 	err := f.setIndexMarker(items)
@@ -358,6 +367,10 @@ func (f *freezerRemoteS3) Sync() error {
 	if lenBacklog == 0 {
 		return nil
 	}
+
+	f.pendingCopy = f.pending
+	f.pending = make(map[string][]byte)
+
 	f.log.Info("Syncing ancients", "backlog", lenBacklog)
 	start := time.Now()
 	uploader := s3manager.NewUploader(f.session)
@@ -365,16 +378,23 @@ func (f *freezerRemoteS3) Sync() error {
 	iter := &s3manager.UploadObjectsIterator{Objects: f.backlogUploads}
 	err := uploader.UploadWithIterator(aws.BackgroundContext(), iter)
 	if err != nil {
+		f.pending = f.pendingCopy
+		f.pendingCopy = make(map[string][]byte)
 		return err
 	}
 	f.backlogUploads = []s3manager.BatchUploadObject{}
 	elapsed := time.Since(start)
-	blocksPerSecond := fmt.Sprintf("%0.2f", float64(lenBacklog) / elapsed.Seconds())
-	f.log.Info("Finished syncing ancients", "backlog", lenBacklog, "elapsed", elapsed, "bps", blocksPerSecond)
+	blocksPerSecond := fmt.Sprintf("%0.2f", float64(lenBacklog)/elapsed.Seconds())
 	err = f.setIndexMarker(atomic.LoadUint64(f.frozen))
 	if err != nil {
+		f.pending = f.pendingCopy
+		f.pendingCopy = make(map[string][]byte)
 		return err
 	}
+	f.pendingCopy = make(map[string][]byte)
+	f.pending = make(map[string][]byte)
+
+	f.log.Info("Finished syncing ancients", "backlog", lenBacklog, "elapsed", elapsed, "bps", blocksPerSecond)
 
 	return err
 }

@@ -276,11 +276,11 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 		kind string
 		val  []byte
 	}{
-		{"hash", hash},
-		{"header", header},
-		{"body", body},
-		{"receipts", receipts},
-		{"td", td},
+		{freezerHashTable, hash},
+		{freezerHeaderTable, header},
+		{freezerBodiesTable, body},
+		{freezerReceiptTable, receipts},
+		{freezerDifficultyTable, td},
 	} {
 		f.pendingMu.Lock()
 		f.pending[awsKeyRLP(v.kind, number)] = v.val

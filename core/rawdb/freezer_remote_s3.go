@@ -57,7 +57,7 @@ type freezerRemoteS3 struct {
 
 	pendingCopy map[string][]byte
 
-	frozen         *uint64
+	frozen *uint64
 
 	log log.Logger
 }
@@ -122,6 +122,8 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 		writeMeter:     writeMeter,
 		sizeGauge:      sizeGauge,
 		backlogUploads: []s3manager.BatchUploadObject{},
+		pending:        make(map[string][]byte),
+		pendingCopy:    make(map[string][]byte),
 		log:            log.New("remote", "s3"),
 	}
 
@@ -270,9 +272,9 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
-	for _, v := range []struct{
+	for _, v := range []struct {
 		kind string
-		val []byte
+		val  []byte
 	}{
 		{"hash", hash},
 		{"header", header},
@@ -336,7 +338,7 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	f.log.Info("Truncating ancients", "ancients", n, "target", items, "delta", n-items)
 	start := time.Now()
 
-	for _, v := range []struct{
+	for _, v := range []struct {
 		kind string
 	}{
 		{"hash"},

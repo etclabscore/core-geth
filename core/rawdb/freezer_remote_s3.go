@@ -33,15 +33,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/params"
 )
 
 const (
 	awsDefaultRegion = "us-west-1"
-)
-
-var (
-	awsMainBucketName = fmt.Sprintf("%s-v%d", params.VersionName, params.VersionMajor)
 )
 
 type freezerRemoteS3 struct {
@@ -88,6 +83,33 @@ func (f *freezerRemoteS3) bucketName() string {
 	return fmt.Sprintf("%s", f.namespace)
 }
 
+func (f *freezerRemoteS3) initializeBucket() error {
+	bucketName := f.bucketName()
+	start := time.Now()
+	f.log.Info("Creating bucket if not exists", "bucket", bucketName)
+	result, err := f.service.CreateBucket(&s3.CreateBucketInput{
+		Bucket: aws.String(f.bucketName()),
+	})
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case s3.ErrCodeBucketAlreadyExists, s3.ErrCodeBucketAlreadyOwnedByYou:
+				f.log.Debug("Bucket exists", "kind", bucketName)
+				return nil
+			}
+		}
+		return err
+	}
+	err = f.service.WaitUntilBucketExists(&s3.HeadBucketInput{
+		Bucket: aws.String(f.bucketName()),
+	})
+	if err != nil {
+		return err
+	}
+	f.log.Info("Bucket created", "kind", bucketName, "bucket", result.Location, "elapsed", time.Since(start))
+	return nil
+}
+
 // newFreezer creates a chain freezer that moves ancient chain data into
 // append-only flat file containers.
 func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, sizeGauge metrics.Gauge) (*freezerRemoteS3, error) {
@@ -113,31 +135,9 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 
 	// Create buckets per the schema, where each bucket is prefixed with the namespace
 	// and suffixed with the schema Kind.
-	for _, kind := range []string{
-		awsMainBucketName, // All 'table' data is stored together in coerced JSON blobs.
-	} {
-		start := time.Now()
-		f.log.Info("Creating bucket if not exists", "bucket", kind)
-		result, err := f.service.CreateBucket(&s3.CreateBucketInput{
-			Bucket: aws.String(f.bucketName()),
-		})
-		if err != nil {
-			if aerr, ok := err.(awserr.Error); ok {
-				switch aerr.Code() {
-				case s3.ErrCodeBucketAlreadyExists, s3.ErrCodeBucketAlreadyOwnedByYou:
-					f.log.Debug("Bucket exists", "kind", kind)
-					continue
-				}
-			}
-			return f, err
-		}
-		err = f.service.WaitUntilBucketExists(&s3.HeadBucketInput{
-			Bucket: aws.String(f.bucketName()),
-		})
-		if err != nil {
-			return f, err
-		}
-		f.log.Info("Bucket created", "kind", kind, "bucket", result.Location, "elapsed", time.Since(start))
+	err = f.initializeBucket()
+	if err != nil {
+		return f, err
 	}
 
 	n, _ := f.Ancients()

@@ -185,11 +185,11 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 	}
 
 	f.pendingMu.Lock()
-	if v, ok := f.pending[awsKeyRLP(kind, number)]; ok {
-		f.pendingMu.Unlock()
+	v, ok := f.pending[awsKeyRLP(kind, number)]
+	f.pendingMu.Unlock()
+	if ok {
 		return v, nil
 	}
-	f.pendingMu.Unlock()
 
 	// Take from remote
 	key := awsKeyRLP(kind, number)
@@ -280,6 +280,9 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 		{"receipts", receipts},
 		{"td", td},
 	} {
+		f.pendingMu.Lock()
+		f.pending[awsKeyRLP(v.kind, number)] = v.val
+		f.pendingMu.Unlock()
 		uploadObj := s3manager.BatchUploadObject{Object: &s3manager.UploadInput{
 			Bucket: aws.String(f.bucketName()),
 			Key:    aws.String(awsKeyRLP(v.kind, number)),

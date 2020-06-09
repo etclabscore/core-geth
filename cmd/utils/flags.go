@@ -1917,12 +1917,7 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 
 		namespace := ctx.GlobalString(AncientRemoteNamespaceFlag.Name)
 		if namespace == "" {
-			gen := genesisForCtxChainConfig(ctx)
-			if gen != nil {
-				chainId := gen.GetChainID()
-				hash := core.GenesisToBlock(gen, nil).Hash()
-				namespace = fmt.Sprintf("%v-%s", chainId, hash.Hex())
-			}
+			Fatalf("missing remote namespace, use --%s to set (bucket names must be unique)", AncientRemoteNamespaceFlag.Name)
 		}
 
 		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientRemoteFlag.Name), namespace)

@@ -1624,8 +1624,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	cfg.DatabaseHandles = makeDatabaseHandles()
 	if ctx.GlobalIsSet(AncientFlag.Name) {
 		cfg.DatabaseFreezer = ctx.GlobalString(AncientFlag.Name)
-	}
-	if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
+	} else if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
 		cfg.DatabaseFreezerRemote = ctx.GlobalString(AncientRemoteFlag.Name)
 		cfg.DatabaseFreezerRemoteNamespace = ctx.GlobalString(AncientRemoteNamespaceFlag.Name)
 		if cfg.DatabaseFreezerRemote == "s3" && cfg.DatabaseFreezerRemoteNamespace == "" {

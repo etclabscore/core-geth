@@ -334,7 +334,11 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	for i, v := range f.backlogUploads {
 		_, num := fromAwsKey(*v.Object.Key)
 		if num >= items {
-			f.backlogUploads = append(f.backlogUploads[:i], f.backlogUploads[i+1:]...)
+			if i == len(f.backlogUploads) {
+				f.backlogUploads = f.backlogUploads[:i]
+			} else {
+				f.backlogUploads = append(f.backlogUploads[:i], f.backlogUploads[i+1:]...)
+			}
 		}
 	}
 	// If we found the len in the pending map, that means it hasn't been uploaded yet.

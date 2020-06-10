@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -56,6 +57,8 @@ var defaultChainspecValues = map[string]ctypes.Configurator{
 	"social":      params.DefaultSocialGenesisBlock(),
 	"ethersocial": params.DefaultEthersocialGenesisBlock(),
 	"mix":         params.DefaultMixGenesisBlock(),
+
+	"dev": params.DeveloperGenesisBlock(1, common.HexToAddress("0xf6d7e4e39f35a0b8f61dd0a24a2dc92a3a5e0b01")),
 }
 
 var defaultChainspecNames = func() []string {

@@ -334,7 +334,7 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	for i, v := range f.backlogUploads {
 		_, num := fromAwsKey(*v.Object.Key)
 		if num >= items {
-			if i == len(f.backlogUploads) {
+			if i == len(f.backlogUploads) - 1 {
 				f.backlogUploads = f.backlogUploads[:i]
 			} else {
 				f.backlogUploads = append(f.backlogUploads[:i], f.backlogUploads[i+1:]...)

@@ -35,20 +35,20 @@ func TestState(t *testing.T) {
 
 	st := new(testMatcher)
 	// Long tests:
-	st.whitelist(`^stAttackTest/ContractCreationSpam`)
-	st.whitelist(`^stBadOpcode/badOpcodes`)
-	st.whitelist(`^stPreCompiledContracts/modexp`)
-	st.whitelist(`^stQuadraticComplexityTest/`)
-	st.whitelist(`^stStaticCall/static_Call50000`)
-	st.whitelist(`^stStaticCall/static_Return50000`)
-	st.whitelist(`^stSystemOperationsTest/CallRecursiveBomb`)
-	st.whitelist(`^stTransactionTest/Opcodes_TransactionInit`)
+	// st.whitelist(`^stAttackTest/ContractCreationSpam`)
+	// st.whitelist(`^stBadOpcode/badOpcodes`)
+	// st.whitelist(`^stPreCompiledContracts/modexp`)
+	// st.whitelist(`^stQuadraticComplexityTest/`)
+	// st.whitelist(`^stStaticCall/static_Call50000`)
+	// st.whitelist(`^stStaticCall/static_Return50000`)
+	// st.whitelist(`^stSystemOperationsTest/CallRecursiveBomb`)
+	// st.whitelist(`^stTransactionTest/Opcodes_TransactionInit`)
 
 	// Very time consuming
-	st.whitelist(`^stTimeConsuming/`)
+	// st.whitelist(`^stTimeConsuming/`)
 
 	// Uses 1GB RAM per tested fork
-	st.whitelist(`^stStaticCall/static_Call1MB`)
+	// st.whitelist(`^stStaticCall/static_Call1MB`)
 
 	// Broken tests:
 	// Expected failures:

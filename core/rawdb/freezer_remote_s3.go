@@ -512,15 +512,15 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 		return err
 	}
 
-	// truncate cache
 	f.truncateCache(items)
 
-	if len(f.cache) > 0 {
-		err = f.pushCache()
-		if err != nil {
-			return err
-		}
-	}
+	// "On the next Sync" should do it.
+	// if len(f.cache) > 0 {
+	// 	err = f.pushCache()
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
 
 	err = f.setIndexMarker(items)
 	if err != nil {

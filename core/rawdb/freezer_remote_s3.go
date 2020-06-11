@@ -183,8 +183,8 @@ func (f *freezerRemoteS3) initializeBucket() error {
 	return nil
 }
 
-func (f *freezerRemoteS3) initCache(n uint64) error {
-	f.log.Info("Initializing cache", "n", n)
+func (f *freezerRemoteS3) pullCache(n uint64) error {
+	f.log.Info("Pulling cache", "n", n)
 
 	key := f.objectKeyForN(n)
 	buf := aws.NewWriteAtBuffer([]byte{})
@@ -199,7 +199,7 @@ func (f *freezerRemoteS3) initCache(n uint64) error {
 				return errOutOfBounds
 			}
 		}
-		f.log.Error("Download error", "method", "initCache", "error", err, "key", key)
+		f.log.Error("Download error", "method", "pullCache", "error", err, "key", key)
 		return err
 	}
 	target := []AncientObjectS3{}
@@ -209,10 +209,15 @@ func (f *freezerRemoteS3) initCache(n uint64) error {
 	}
 	for _, v := range target {
 		n := v.Header.Number.Uint64()
-		f.cacheS = append(f.cacheS, n)
+		if sliceIndexOf(f.cacheS, n) < 0 {
+			f.cacheS = append(f.cacheS, n)
+		}
 		f.cache[n] = v
 	}
-	f.log.Info("Finished initializing cache", "n", n, "size", len(f.cache))
+	sort.Slice(f.cacheS, func(i, j int) bool {
+		return f.cacheS[i] < f.cacheS[j]
+	})
+	f.log.Info("Finished pulling cache", "n", n, "size", len(f.cache))
 	if f.cacheS[0] % f.objectGroupSize != 0 {
 		panic(fmt.Sprintf("cache does not begin at mod: n=%d (mod=%d)", f.cacheS[0], f.cacheS[0] % f.objectGroupSize))
 	}
@@ -277,7 +282,7 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 	f.frozen = &n
 
 	if n > 0 {
-		err = f.initCache(n)
+		err = f.pullCache(n)
 		if err != nil {
 			return f, err
 		}
@@ -421,12 +426,17 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
-	o, err := NewAncientObjectS3(hash, header, body, receipts, td)
-	if err != nil {
-		return err
+	if sliceIndexOf(f.cacheS, number) < 0 {
+		o, err := NewAncientObjectS3(hash, header, body, receipts, td)
+		if err != nil {
+			return err
+		}
+		f.cache[number] = *o
+		f.cacheS = append(f.cacheS, number)
+		sort.Slice(f.cacheS, func(i, j int) bool {
+			return f.cacheS[i] < f.cacheS[j]
+		})
 	}
-	f.cache[number] = *o
-	f.cacheS = append(f.cacheS, number)
 
 	if f.cacheS[0] % f.objectGroupSize != 0 {
 		panic(fmt.Sprintf("cache does not begin at mod: n=%d (mod=%d)", f.cacheS[0], f.cacheS[0] % f.objectGroupSize))

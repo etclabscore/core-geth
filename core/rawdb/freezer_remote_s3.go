@@ -141,8 +141,10 @@ func (o *AncientObjectS3) RLPBytesForKind(kind string) []byte {
 	}
 }
 
-func awsKeyRLP(number uint64) string {
-	return fmt.Sprintf("%09d.json", number)
+func awsKeyBlock(number uint64) string {
+	// Keep blocks in a dir.
+	// This namespaces the resource, separating it from the 'index-marker' object.
+	return fmt.Sprintf("blocks/%09d.json", number)
 }
 
 // TODO: this is superfluous now; bucket names must be user-configured
@@ -239,7 +241,7 @@ func (f *freezerRemoteS3) HasAncient(kind string, number uint64) (bool, error) {
 	if atomic.LoadUint64(f.frozen) <= number {
 		return false, nil
 	}
-	key := awsKeyRLP(number)
+	key := awsKeyBlock(number)
 	result, err := f.service.ListObjects(&s3.ListObjectsInput{
 		Bucket:  aws.String(f.bucketName()),
 		MaxKeys: aws.Int64(1),
@@ -282,7 +284,7 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 	}
 
 	// Take from remote
-	key := awsKeyRLP(number)
+	key := awsKeyBlock(number)
 	buf := aws.NewWriteAtBuffer([]byte{})
 	_, err := f.downloader.Download(buf, &s3.GetObjectInput{
 		Bucket: aws.String(f.bucketName()),
@@ -370,7 +372,7 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 
 	uploadObj := s3manager.BatchUploadObject{Object: &s3manager.UploadInput{
 		Bucket: aws.String(f.bucketName()),
-		Key:    aws.String(awsKeyRLP(number)),
+		Key:    aws.String(awsKeyBlock(number)),
 		Body:   bytes.NewReader(b),
 	}}
 	f.backlogUploads = append(f.backlogUploads, uploadObj)
@@ -408,7 +410,7 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 
 	list := &s3.ListObjectsInput{
 		Bucket: aws.String(f.bucketName()),
-		Marker: aws.String(awsKeyRLP(items)),
+		Marker: aws.String(awsKeyBlock(items)),
 	}
 	iter := s3manager.NewDeleteListIterator(f.service, list)
 	batcher := s3manager.NewBatchDeleteWithClient(f.service)

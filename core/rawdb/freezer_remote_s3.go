@@ -23,7 +23,6 @@ import (
 	"io/ioutil"
 	"math/big"
 	"strconv"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -147,15 +146,6 @@ func (o *AncientObjectS3) RLPBytesForKind(kind string) []byte {
 
 func awsKeyRLP(number uint64) string {
 	return fmt.Sprintf("%09d.json", number)
-}
-
-func numberFromAwsKey(key string) (uint64) {
-	k := strings.TrimSuffix(key, ".json")
-	number, err := strconv.ParseUint(k, 10, 64)
-	if err != nil {
-		panic(err)
-	}
-	return number
 }
 
 // TODO: this is superfluous now; bucket names must be user-configured

@@ -36,3 +36,25 @@ func TestHashRLPCodec(t *testing.T) {
 	}
 	log.Println(h2.Hex())
 }
+
+func TestBlockKeying(t *testing.T) {
+	m := 32
+	n := 17
+	mod := n % m
+	div := n / m
+	t.Log(mod)
+	t.Log(div)
+	t.Log(n * div + mod)
+}
+
+func TestIndexThing(t *testing.T) {
+	a := []int{1, 2, 3}
+	t.Log(a[:0])
+}
+
+func TestSpliceBackwards(t *testing.T) {
+	a := []int{1, 2, 3, 4, 5}
+	mod := 3
+	rem := len(a) % mod
+	t.Log(a[len(a)-rem:])
+}

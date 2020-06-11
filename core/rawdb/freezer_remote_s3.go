@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/big"
+	"os"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -54,9 +55,11 @@ type freezerRemoteS3 struct {
 	uploader   *s3manager.Uploader
 	downloader *s3manager.Downloader
 
-	backlogUploads []s3manager.BatchUploadObject
+	frozen          *uint64 // the length of the frozen blocks (next appended must == val)
+	objectGroupSize uint64  // how many blocks to include in a single S3 object
 
-	frozen *uint64
+	retrieved map[uint64]AncientObjectS3
+	cache     []AncientObjectS3
 
 	log log.Logger
 }
@@ -69,7 +72,7 @@ type AncientObjectS3 struct {
 	Difficulty *big.Int                   `json:"difficulty"`
 }
 
-func NewAncientObjectS3JSONBytes(hashB, headerB, bodyB, receiptsB, difficultyB []byte) ([]byte, error) {
+func NewAncientObjectS3(hashB, headerB, bodyB, receiptsB, difficultyB []byte) (*AncientObjectS3, error) {
 	var err error
 
 	hash := common.BytesToHash(hashB)
@@ -94,18 +97,13 @@ func NewAncientObjectS3JSONBytes(hashB, headerB, bodyB, receiptsB, difficultyB [
 	if err != nil {
 		return nil, err
 	}
-	o := &AncientObjectS3{
+	return &AncientObjectS3{
 		Hash:       hash,
 		Header:     header,
 		Body:       body,
 		Receipts:   receipts,
 		Difficulty: difficulty,
-	}
-	b, err := json.Marshal(o)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
+	}, nil
 }
 
 func (o *AncientObjectS3) RLPBytesForKind(kind string) []byte {
@@ -147,6 +145,10 @@ func awsKeyBlock(number uint64) string {
 	return fmt.Sprintf("blocks/%09d.json", number)
 }
 
+func (f *freezerRemoteS3) objectKeyForN(n uint64) string {
+	return awsKeyBlock(n / f.objectGroupSize)
+}
+
 // TODO: this is superfluous now; bucket names must be user-configured
 func (f *freezerRemoteS3) bucketName() string {
 	return fmt.Sprintf("%s", f.namespace)
@@ -155,7 +157,7 @@ func (f *freezerRemoteS3) bucketName() string {
 func (f *freezerRemoteS3) initializeBucket() error {
 	bucketName := f.bucketName()
 	start := time.Now()
-	f.log.Info("Creating bucket if not exists", "bucket", bucketName)
+	f.log.Info("Creating bucket if not exists", "name", bucketName)
 	result, err := f.service.CreateBucket(&s3.CreateBucketInput{
 		Bucket: aws.String(f.bucketName()),
 	})
@@ -163,7 +165,7 @@ func (f *freezerRemoteS3) initializeBucket() error {
 		if aerr, ok := err.(awserr.Error); ok {
 			switch aerr.Code() {
 			case s3.ErrCodeBucketAlreadyExists, s3.ErrCodeBucketAlreadyOwnedByYou:
-				f.log.Debug("Bucket exists", "kind", bucketName)
+				f.log.Debug("Bucket exists", "name", bucketName)
 				return nil
 			}
 		}
@@ -175,7 +177,33 @@ func (f *freezerRemoteS3) initializeBucket() error {
 	if err != nil {
 		return err
 	}
-	f.log.Info("Bucket created", "kind", bucketName, "bucket", result.Location, "elapsed", time.Since(start))
+	f.log.Info("Bucket created", "name", bucketName, "result", result.String(), "elapsed", time.Since(start))
+	return nil
+}
+
+func (f *freezerRemoteS3) initCache(n uint64) error {
+	f.log.Info("Initializing cache", "n", n)
+	key := f.objectKeyForN(n)
+	buf := aws.NewWriteAtBuffer([]byte{})
+	_, err := f.downloader.Download(buf, &s3.GetObjectInput{
+		Bucket: aws.String(f.bucketName()),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case s3.ErrCodeNoSuchKey:
+				return errOutOfBounds
+			}
+		}
+		f.log.Error("Download error", "method", "initCache", "error", err, "key", key)
+		return err
+	}
+	err = json.Unmarshal(buf.Bytes(), &f.cache)
+	if err != nil {
+		return err
+	}
+	f.log.Info("Finished initializing cache")
 	return nil
 }
 
@@ -184,14 +212,24 @@ func (f *freezerRemoteS3) initializeBucket() error {
 func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, sizeGauge metrics.Gauge) (*freezerRemoteS3, error) {
 	var err error
 
+	freezerGroups := uint64(32)
+	if v := os.Getenv("GETH_FREEZER_S3_GROUP_OBJECTS"); v != "" {
+		i, err := strconv.ParseUint(v, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		freezerGroups = i
+	}
 	f := &freezerRemoteS3{
-		namespace:      namespace,
-		quit:           make(chan struct{}),
-		readMeter:      readMeter,
-		writeMeter:     writeMeter,
-		sizeGauge:      sizeGauge,
-		backlogUploads: []s3manager.BatchUploadObject{},
-		log:            log.New("remote", "s3"),
+		namespace:       namespace,
+		quit:            make(chan struct{}),
+		readMeter:       readMeter,
+		writeMeter:      writeMeter,
+		sizeGauge:       sizeGauge,
+		objectGroupSize: freezerGroups,
+		retrieved:       make(map[uint64]AncientObjectS3),
+		cache:           []AncientObjectS3{},
+		log:             log.New("remote", "s3"),
 	}
 
 	/*
@@ -225,6 +263,13 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 	n, _ := f.Ancients()
 	f.frozen = &n
 
+	if n > 0 {
+		err = f.initCache(n)
+		if err != nil {
+			return f, err
+		}
+	}
+
 	return f, nil
 }
 
@@ -238,26 +283,12 @@ func (f *freezerRemoteS3) Close() error {
 // HasAncient returns an indicator whether the specified ancient data exists
 // in the freezer.
 func (f *freezerRemoteS3) HasAncient(kind string, number uint64) (bool, error) {
-	if atomic.LoadUint64(f.frozen) <= number {
-		return false, nil
-	}
-	key := awsKeyBlock(number)
-	result, err := f.service.ListObjects(&s3.ListObjectsInput{
-		Bucket:  aws.String(f.bucketName()),
-		MaxKeys: aws.Int64(1),
-		Prefix:  aws.String(key),
-	})
+	v, err := f.Ancient(kind, number)
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case s3.ErrCodeNoSuchKey:
-				return false, nil
-			}
-		}
-		f.log.Error("ListObjects error", "method", "HasAncient", "error", err, "key", key)
 		return false, err
 	}
-	return len(result.Contents) > 0, nil
+
+	return v != nil, nil
 }
 
 // Ancient retrieves an ancient binary blob from the append-only immutable files.
@@ -265,26 +296,19 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 	if atomic.LoadUint64(f.frozen) <= number {
 		return nil, nil
 	}
-	o := &AncientObjectS3{}
-	backlogLen := uint64(len(f.backlogUploads))
+	backlogLen := uint64(len(f.cache))
 	if remoteHeight := atomic.LoadUint64(f.frozen) - backlogLen; remoteHeight <= number {
 		// Take from backlog
 		backlogIndex := number - remoteHeight
-		obj := f.backlogUploads[backlogIndex]
-		b, err := ioutil.ReadAll(obj.Object.Body)
-		obj.Object.Body = bytes.NewReader(b) // reset reader
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(b, o)
-		if err != nil {
-			return nil, err
-		}
+		o := &f.cache[backlogIndex]
 		return o.RLPBytesForKind(kind), nil
+	}
+	if v, ok := f.retrieved[number]; ok {
+		return v.RLPBytesForKind(kind), nil
 	}
 
 	// Take from remote
-	key := awsKeyBlock(number)
+	key := f.objectKeyForN(number)
 	buf := aws.NewWriteAtBuffer([]byte{})
 	_, err := f.downloader.Download(buf, &s3.GetObjectInput{
 		Bucket: aws.String(f.bucketName()),
@@ -300,11 +324,17 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 		f.log.Error("Download error", "method", "Ancient", "error", err, "kind", kind, "key", key, "number", number)
 		return nil, err
 	}
-	err = json.Unmarshal(buf.Bytes(), o)
+	target := []AncientObjectS3{}
+	err = json.Unmarshal(buf.Bytes(), &target)
 	if err != nil {
 		return nil, err
 	}
-	return o.RLPBytesForKind(kind), nil
+	f.retrieved = map[uint64]AncientObjectS3{}
+	start := number - (number % f.objectGroupSize)
+	for i, v := range target {
+		f.retrieved[start+uint64(i)] = v
+	}
+	return target[number%f.objectGroupSize].RLPBytesForKind(kind), nil
 }
 
 // Ancients returns the length of the frozen items.
@@ -312,6 +342,7 @@ func (f *freezerRemoteS3) Ancients() (uint64, error) {
 	if f.frozen != nil {
 		return atomic.LoadUint64(f.frozen), nil
 	}
+	f.log.Info("Retrieving ancients number")
 	result, err := f.service.GetObject(&s3.GetObjectInput{
 		Bucket: aws.String(f.bucketName()),
 		Key:    aws.String("index-marker"),
@@ -330,7 +361,9 @@ func (f *freezerRemoteS3) Ancients() (uint64, error) {
 	if err != nil {
 		return 0, err
 	}
-	return strconv.ParseUint(string(contents), 10, 64)
+	i, err := strconv.ParseUint(string(contents), 10, 64)
+	f.log.Info("Finished retrieving ancients num", "n", i)
+	return i, err
 }
 
 // AncientSize returns the ancient size of the specified category.
@@ -365,17 +398,12 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
-	b, err := NewAncientObjectS3JSONBytes(hash, header, body, receipts, td)
+	o, err := NewAncientObjectS3(hash, header, body, receipts, td)
 	if err != nil {
 		return err
 	}
 
-	uploadObj := s3manager.BatchUploadObject{Object: &s3manager.UploadInput{
-		Bucket: aws.String(f.bucketName()),
-		Key:    aws.String(awsKeyBlock(number)),
-		Body:   bytes.NewReader(b),
-	}}
-	f.backlogUploads = append(f.backlogUploads, uploadObj)
+	f.cache = append(f.cache, *o)
 
 	atomic.AddUint64(f.frozen, 1)
 
@@ -394,31 +422,59 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	n := atomic.LoadUint64(f.frozen)
 
 	// Case where truncation only effects backlogs
-	backlogLen := uint64(len(f.backlogUploads))
-	if n - backlogLen <= items {
+	backlogLen := uint64(len(f.cache))
+	if n-backlogLen <= items {
 		index := items - (n - backlogLen)
-		f.backlogUploads = f.backlogUploads[:index]
+		f.cache = f.cache[:index]
 		atomic.StoreUint64(f.frozen, items)
 		return nil
 	}
 
 	// Case where truncate depth is below backlog
-	f.backlogUploads = []s3manager.BatchUploadObject{} // reset backlog
+	//
+	// First, download the latest group object into cache.
+	key := f.objectKeyForN(items - 1)
+	buf := aws.NewWriteAtBuffer([]byte{})
+	_, err := f.downloader.Download(buf, &s3.GetObjectInput{
+		Bucket: aws.String(f.bucketName()),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case s3.ErrCodeNoSuchKey:
+				return errOutOfBounds
+			}
+		}
+		f.log.Error("Download error", "method", "TruncateAncients", "error", err, "key", key, "items", items)
+		return err
+	}
+	err = json.Unmarshal(buf.Bytes(), &f.cache)
+	if err != nil {
+		return err
+	}
+	// Truncating the cache to the remainder number of items
+	f.cache = f.cache[:(items % f.objectGroupSize)]
 
+	// Now truncate all remote data from the latest grouped object and beyond.
+	// Noting that this can remove data from the remote that is actually antecedent to the
+	// desired truncation level, since we have to use the groups.
+	// That's why we pulled the object into the cache first; on the next Sync, the un-truncated
+	// blocks will be pushed back up to the remote.
 	f.log.Info("Truncating ancients", "ancients", n, "target", items, "delta", n-items)
 	start := time.Now()
 
 	list := &s3.ListObjectsInput{
 		Bucket: aws.String(f.bucketName()),
-		Marker: aws.String(awsKeyBlock(items)),
+		Marker: aws.String(f.objectKeyForN(items)),
 	}
 	iter := s3manager.NewDeleteListIterator(f.service, list)
 	batcher := s3manager.NewBatchDeleteWithClient(f.service)
 	if err := batcher.Delete(aws.BackgroundContext(), iter); err != nil {
-			return err
-		}
+		return err
+	}
 
-	err := f.setIndexMarker(items)
+	err = f.setIndexMarker(items)
 	if err != nil {
 		return err
 	}
@@ -429,21 +485,51 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 
 // sync flushes all data tables to disk.
 func (f *freezerRemoteS3) Sync() error {
-	lenBacklog := len(f.backlogUploads)
+	lenBacklog := len(f.cache)
 	if lenBacklog == 0 {
 		return nil
 	}
 
+	var err error
+
 	f.log.Info("Syncing ancients", "backlog.blocks", lenBacklog)
 	start := time.Now()
 
-	iter := &s3manager.UploadObjectsIterator{Objects: f.backlogUploads}
-	err := f.uploader.UploadWithIterator(aws.BackgroundContext(), iter)
+	lenCache := len(f.cache)
+	cacheStartN := atomic.LoadUint64(f.frozen) - 1 - uint64(lenCache)
+
+	set := []AncientObjectS3{}
+	uploads := []s3manager.BatchUploadObject{}
+	for i, v := range f.cache {
+
+		set = append(set, v)
+
+		// finalize upload object if we have the group-by number in the set, or if the item is the last
+		if uint64(len(set)) == f.objectGroupSize || i == lenCache-1 {
+			// seal upload object
+			b, err := json.Marshal(set)
+			if err != nil {
+				return err
+			}
+			set = []AncientObjectS3{}
+			uploads = append(uploads, s3manager.BatchUploadObject{
+				Object: &s3manager.UploadInput{
+					Bucket: aws.String(f.bucketName()),
+					Key:    aws.String(f.objectKeyForN(cacheStartN + uint64(i))),
+					Body:   bytes.NewReader(b),
+				},
+			})
+		}
+	}
+
+	iter := &s3manager.UploadObjectsIterator{Objects: uploads}
+	err = f.uploader.UploadWithIterator(aws.BackgroundContext(), iter)
 	if err != nil {
 		return err
 	}
-
-	f.backlogUploads = []s3manager.BatchUploadObject{}
+	rem := uint64(len(f.cache)) % f.objectGroupSize
+	// splice first n groups, leaving mod leftovers
+	f.cache = f.cache[uint64(len(f.cache))-rem:]
 
 	elapsed := time.Since(start)
 	blocksPerSecond := fmt.Sprintf("%0.2f", float64(lenBacklog)/elapsed.Seconds())

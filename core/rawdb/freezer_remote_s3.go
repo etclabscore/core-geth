@@ -183,6 +183,9 @@ func (f *freezerRemoteS3) initializeBucket() error {
 
 func (f *freezerRemoteS3) initCache(n uint64) error {
 	f.log.Info("Initializing cache", "n", n)
+	if (n+1)%f.objectGroupSize == 0 {
+		return nil
+	}
 	key := f.objectKeyForN(n)
 	buf := aws.NewWriteAtBuffer([]byte{})
 	_, err := f.downloader.Download(buf, &s3.GetObjectInput{
@@ -296,13 +299,13 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 	if atomic.LoadUint64(f.frozen) <= number {
 		return nil, nil
 	}
-	// backlogLen := uint64(len(f.cache))
-	// if remoteHeight := atomic.LoadUint64(f.frozen) - backlogLen; remoteHeight <= number {
-	// 	// Take from backlog
-	// 	backlogIndex := number - remoteHeight
-	// 	o := &f.cache[backlogIndex]
-	// 	return o.RLPBytesForKind(kind), nil
-	// }
+	backlogLen := uint64(len(f.cache))
+	if remoteHeight := atomic.LoadUint64(f.frozen) - backlogLen; remoteHeight <= number {
+		// Take from backlog
+		backlogIndex := number - remoteHeight
+		o := &f.cache[backlogIndex]
+		return o.RLPBytesForKind(kind), nil
+	}
 	if v, ok := f.retrieved[number]; ok {
 		return v.RLPBytesForKind(kind), nil
 	}
@@ -421,42 +424,36 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
+	var err error
 	n := atomic.LoadUint64(f.frozen)
 
-	// Case where truncation only effects backlogs
-	backlogLen := uint64(len(f.cache))
-	if n-backlogLen <= items {
-		index := items - (n - backlogLen)
-		f.cache = f.cache[:index]
-		atomic.StoreUint64(f.frozen, items)
-		return nil
-	}
+	f.cache = []AncientObjectS3{}
 
-	// Case where truncate depth is below backlog
-	//
 	// First, download the latest group object into cache.
-	key := f.objectKeyForN(items)
-	buf := aws.NewWriteAtBuffer([]byte{})
-	_, err := f.downloader.Download(buf, &s3.GetObjectInput{
-		Bucket: aws.String(f.bucketName()),
-		Key:    aws.String(key),
-	})
-	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case s3.ErrCodeNoSuchKey:
-				return errOutOfBounds
+	if items % f.objectGroupSize != 0 {
+		key := f.objectKeyForN(items)
+		buf := aws.NewWriteAtBuffer([]byte{})
+		_, err = f.downloader.Download(buf, &s3.GetObjectInput{
+			Bucket: aws.String(f.bucketName()),
+			Key:    aws.String(key),
+		})
+		if err != nil {
+			if aerr, ok := err.(awserr.Error); ok {
+				switch aerr.Code() {
+				case s3.ErrCodeNoSuchKey:
+					return errOutOfBounds
+				}
 			}
+			f.log.Error("Download error", "method", "TruncateAncients", "error", err, "key", key, "items", items)
+			return err
 		}
-		f.log.Error("Download error", "method", "TruncateAncients", "error", err, "key", key, "items", items)
-		return err
+		err = json.Unmarshal(buf.Bytes(), &f.cache)
+		if err != nil {
+			return err
+		}
+		// Truncating the cache to the remainder number of items
+		f.cache = f.cache[:(items % f.objectGroupSize)]
 	}
-	err = json.Unmarshal(buf.Bytes(), &f.cache)
-	if err != nil {
-		return err
-	}
-	// Truncating the cache to the remainder number of items
-	f.cache = f.cache[:(items % f.objectGroupSize)]
 
 	// Now truncate all remote data from the latest grouped object and beyond.
 	// Noting that this can remove data from the remote that is actually antecedent to the
@@ -482,9 +479,11 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	}
 	atomic.StoreUint64(f.frozen, items)
 
-	err = f.pushCache()
-	if err != nil {
-		return err
+	if len(f.cache) > 0 {
+		err = f.pushCache()
+		if err != nil {
+			return err
+		}
 	}
 
 	f.log.Info("Finished truncating ancients", "elapsed", time.Since(start))
@@ -526,7 +525,7 @@ func (f *freezerRemoteS3) pushCache() error {
 	}
 	rem := uint64(len(f.cache)) % f.objectGroupSize
 	// splice first n groups, leaving mod leftovers
-	f.cache = f.cache[uint64(len(f.cache))-rem:]
+	f.cache = f.cache[uint64(len(f.cache)-1)-rem:]
 	f.retrieved = map[uint64]AncientObjectS3{}
 	return nil
 }

@@ -72,11 +72,8 @@ type AncientObjectS3 struct {
 func NewAncientObjectS3JSONBytes(hashB, headerB, bodyB, receiptsB, difficultyB []byte) ([]byte, error) {
 	var err error
 
-	hash := common.Hash{}
-	err = rlp.DecodeBytes(hashB, &hash)
-	if err != nil {
-		return nil, err
-	}
+	hash := common.BytesToHash(hashB)
+
 	header := &types.Header{}
 	err = rlp.DecodeBytes(headerB, header)
 	if err != nil {
@@ -88,7 +85,7 @@ func NewAncientObjectS3JSONBytes(hashB, headerB, bodyB, receiptsB, difficultyB [
 		return nil, err
 	}
 	receipts := []*types.ReceiptForStorage{}
-	err = rlp.DecodeBytes(receiptsB, receipts)
+	err = rlp.DecodeBytes(receiptsB, &receipts)
 	if err != nil {
 		return nil, err
 	}

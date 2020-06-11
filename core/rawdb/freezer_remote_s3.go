@@ -338,13 +338,15 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 		return nil, err
 	}
 	f.retrieved = map[uint64]AncientObjectS3{}
-	start := (number / f.objectGroupSize) * f.objectGroupSize
-	for i, v := range target {
-		f.retrieved[start+uint64(i)] = v
+	o := &AncientObjectS3{}
+	for _, v := range target {
+		n := v.Header.Number.Uint64()
+		f.retrieved[n] = v
+		if n == number {
+			*o = v
+		}
 	}
-	o := f.retrieved[number]
-	oo := &o
-	return oo.RLPBytesForKind(kind), nil
+	return o.RLPBytesForKind(kind), nil
 }
 
 // Ancients returns the length of the frozen items.
@@ -485,18 +487,18 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 		return err
 	}
 
-	err = f.setIndexMarker(items)
-	if err != nil {
-		return err
-	}
-	atomic.StoreUint64(f.frozen, items)
-
 	if len(f.cache) > 0 {
 		err = f.pushCache()
 		if err != nil {
 			return err
 		}
 	}
+
+	err = f.setIndexMarker(items)
+	if err != nil {
+		return err
+	}
+	atomic.StoreUint64(f.frozen, items)
 
 	f.log.Info("Finished truncating ancients", "elapsed", time.Since(start))
 	return nil

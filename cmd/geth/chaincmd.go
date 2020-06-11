@@ -80,6 +80,9 @@ The dumpgenesis command dumps the genesis block configuration in JSON format to 
 		ArgsUsage: "<filename> (<filename 2> ... <filename N>) ",
 		Flags: []cli.Flag{
 			utils.DataDirFlag,
+			utils.AncientFlag,
+			utils.AncientRemoteFlag,
+			utils.AncientRemoteNamespaceFlag,
 			utils.CacheFlag,
 			utils.SyncModeFlag,
 			utils.GCModeFlag,

@@ -1,31 +1,26 @@
 env GO111MODULE=on go run build/ci.go install
->>> /home/ia/go1.14.3.linux-amd64/bin/go install -ldflags -X main.gitCommit=f2cab69d65bcbbd334b32527f6efa90008b3a7ef -X main.gitDate=20200611 -v ./...
-INFO [06-11|16:54:28.282] Starting Geth on Ethereum Classic... 
-INFO [06-11|16:54:28.282] Bumping default cache on mainnet         provided=1024 updated=4096
-INFO [06-11|16:54:28.284] Maximum peer count                       ETH=50 LES=0 total=50
-INFO [06-11|16:54:28.284] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
-INFO [06-11|16:54:28.307] Starting peer-to-peer node               instance=CoreGeth/v1.11.6-unstable-f2cab69d-20200611/linux-amd64/go1.14.3
-INFO [06-11|16:54:28.307] Allocated trie memory caches             clean=614.00MiB dirty=1024.00MiB
-INFO [06-11|16:54:28.307] Allocated cache and file handles         database=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/chaindata cache=2.00GiB handles=524288
-INFO [06-11|16:54:28.506] New remote freezer                       freezer=s3 namespace=coregeth-classic-parasail
-INFO [06-11|16:54:28.506] New session                              remote=s3 region=0xc0001c2f40
-INFO [06-11|16:54:28.506] Creating bucket if not exists            remote=s3 name=coregeth-classic-parasail
-INFO [06-11|16:54:28.903] Bucket created                           remote=s3 name=coregeth-classic-parasail result="{\n  Location: \"/coregeth-classic-parasail\"\n}" elapsed=396.805885ms
-INFO [06-11|16:54:28.903] Retrieving ancients number               remote=s3
-INFO [06-11|16:54:28.963] Finished retrieving ancients num         remote=s3 n=21832
-INFO [06-11|16:54:28.963] Pulling cache                            remote=s3 n=21832
-INFO [06-11|16:54:29.064] Finished pulling cache                   remote=s3 n=21832 size=32
-DEBUG[06-11|16:54:29.065] Current full block hash unavailable 
-INFO [06-11|16:54:29.276] Persisted trie from memory database      nodes=12356 size=1.78MiB time=26.134315ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
-INFO [06-11|16:54:29.444] Persisted trie from memory database      nodes=12356 size=1.78MiB time=43.652815ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
-INFO [06-11|16:54:29.444] Initialised chain configuration          config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
-INFO [06-11|16:54:29.444] Disk storage enabled for ethash caches   dir=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/ethash count=3
-INFO [06-11|16:54:29.445] Disk storage enabled for ethash DAGs     dir=/home/ia/.ethash count=2
-INFO [06-11|16:54:29.445] Initialising Ethereum protocol           versions="[65 64 63]" network=1 dbversion=<nil>
-WARN [06-11|16:54:29.445] Upgrade blockchain database version      from=<nil> to=7
-INFO [06-11|16:54:30.476] Initializing database from freezer       total=21832 number=480 hash="d841a5…81c088" elapsed=1.031s
-INFO [06-11|16:54:38.476] Initializing database from freezer       total=21832 number=4000 hash="36df27…56a795" elapsed=9.031s
-INFO [06-11|16:54:46.497] Initializing database from freezer       total=21832 number=7424 hash="019315…273bf2" elapsed=17.052s
-INFO [06-11|16:54:54.556] Initializing database from freezer       total=21832 number=10400 hash="14b1b4…598196" elapsed=25.111s
-INFO [06-11|16:55:02.883] Initializing database from freezer       total=21832 number=13120 hash="57272c…abaae1" elapsed=33.438s
-INFO [06-11|16:55:10.932] Initializing database from freezer       total=21832 number=16064 hash="1998d0…3de157" elapsed=41.487s
+>>> /home/ia/go1.14.3.linux-amd64/bin/go install -ldflags -X main.gitCommit=0458dd39be90578ccff139d60b5b0d14f09e3897 -X main.gitDate=20200611 -v ./...
+INFO [06-11|17:04:18.375] Starting Geth on Ethereum Classic... 
+INFO [06-11|17:04:18.375] Bumping default cache on mainnet         provided=1024 updated=4096
+INFO [06-11|17:04:18.377] Maximum peer count                       ETH=50 LES=0 total=50
+INFO [06-11|17:04:18.377] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+INFO [06-11|17:04:18.397] Starting peer-to-peer node               instance=CoreGeth/v1.11.6-unstable-0458dd39-20200611/linux-amd64/go1.14.3
+INFO [06-11|17:04:18.397] Allocated trie memory caches             clean=614.00MiB dirty=1024.00MiB
+INFO [06-11|17:04:18.397] Allocated cache and file handles         database=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/chaindata cache=2.00GiB handles=524288
+INFO [06-11|17:04:18.478] New remote freezer                       freezer=s3 namespace=coregeth-classic-parasail
+INFO [06-11|17:04:18.478] New session                              remote=s3 region=0xc0001c0f50
+INFO [06-11|17:04:18.478] Creating bucket if not exists            remote=s3 name=coregeth-classic-parasail
+INFO [06-11|17:04:18.872] Bucket created                           remote=s3 name=coregeth-classic-parasail result="{\n  Location: \"/coregeth-classic-parasail\"\n}" elapsed=393.409756ms
+INFO [06-11|17:04:18.872] Retrieving ancients number               remote=s3
+INFO [06-11|17:04:18.933] Finished retrieving ancients num         remote=s3 n=34276
+INFO [06-11|17:04:18.933] Pulling cache                            remote=s3 n=34276
+INFO [06-11|17:04:19.038] Finished pulling cache                   remote=s3 n=34276 size=32
+DEBUG[06-11|17:04:19.038] Current full block hash unavailable 
+INFO [06-11|17:04:19.259] Persisted trie from memory database      nodes=12356 size=1.78MiB time=25.953982ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+INFO [06-11|17:04:19.410] Persisted trie from memory database      nodes=12356 size=1.78MiB time=38.280209ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+INFO [06-11|17:04:19.410] Initialised chain configuration          config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
+INFO [06-11|17:04:19.411] Disk storage enabled for ethash caches   dir=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/ethash count=3
+INFO [06-11|17:04:19.411] Disk storage enabled for ethash DAGs     dir=/home/ia/.ethash count=2
+INFO [06-11|17:04:19.411] Initialising Ethereum protocol           versions="[65 64 63]" network=1 dbversion=<nil>
+WARN [06-11|17:04:19.411] Upgrade blockchain database version      from=<nil> to=7
+INFO [06-11|17:04:20.461] Initializing database from freezer       total=34276 number=416 hash="9132b6…f2b7ac" elapsed=1.049s

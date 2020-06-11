@@ -56,11 +56,12 @@ type freezerRemoteS3 struct {
 	uploader   *s3manager.Uploader
 	downloader *s3manager.Downloader
 
-	frozen          *uint64 // the length of the frozen blocks (next appended must == val)
-	objectGroupSize uint64  // how many blocks to include in a single S3 object
+	frozen               *uint64 // the length of the frozen blocks (next appended must == val)
+	blockObjectGroupSize uint64  // how many blocks to include in a single S3 object
+	hashObjectGroupSize  uint64
 
-	retrieved     map[uint64]AncientObjectS3
-	retrievedLock sync.Mutex
+	retrievedBlocks map[uint64]AncientObjectS3
+	retrBlockLock   sync.Mutex
 
 	cache     map[uint64]AncientObjectS3
 	cacheS    []uint64
@@ -150,8 +151,16 @@ func awsKeyBlock(number uint64) string {
 	return fmt.Sprintf("blocks/%09d.json", number)
 }
 
-func (f *freezerRemoteS3) objectKeyForN(n uint64) string {
-	return awsKeyBlock((n / f.objectGroupSize) * f.objectGroupSize) // 0, 32, 64, 96, ...
+func awsKeyHash(number uint64) string {
+	return fmt.Sprintf("hashes/%09d.json", number)
+}
+
+func (f *freezerRemoteS3) blockObjectKeyForN(n uint64) string {
+	return awsKeyBlock((n / f.blockObjectGroupSize) * f.blockObjectGroupSize) // 0, 32, 64, 96, ...
+}
+
+func (f *freezerRemoteS3) hashObjectKeyForN(n uint64) string {
+	return awsKeyHash((n / f.hashObjectGroupSize) * f.hashObjectGroupSize)
 }
 
 // TODO: this is superfluous now; bucket names must be user-configured
@@ -187,7 +196,7 @@ func (f *freezerRemoteS3) initializeBucket() error {
 }
 
 func (f *freezerRemoteS3) downloadBlocksObject(n uint64) ([]AncientObjectS3, error) {
-	key := f.objectKeyForN(n)
+	key := f.blockObjectKeyForN(n)
 	buf := aws.NewWriteAtBuffer([]byte{})
 	_, err := f.downloader.Download(buf, &s3.GetObjectInput{
 		Bucket: aws.String(f.bucketName()),
@@ -209,16 +218,16 @@ func (f *freezerRemoteS3) downloadBlocksObject(n uint64) ([]AncientObjectS3, err
 		return nil, err
 	}
 	// sanity
-	if len(target) > 0 && target[0].Header.Number.Uint64()%f.objectGroupSize != 0 {
+	if len(target) > 0 && target[0].Header.Number.Uint64()%f.blockObjectGroupSize != 0 {
 		panic(fmt.Sprintf("object does not begin at mod: n=%d", target[0].Header.Number.Uint64()))
 	}
-	f.retrievedLock.Lock()
-	f.retrieved = map[uint64]AncientObjectS3{}
+	f.retrBlockLock.Lock()
+	f.retrievedBlocks = map[uint64]AncientObjectS3{}
 	for _, v := range target {
 		n := v.Header.Number.Uint64()
-		f.retrieved[n] = v
+		f.retrievedBlocks[n] = v
 	}
-	f.retrievedLock.Unlock()
+	f.retrBlockLock.Unlock()
 	return target, nil
 }
 
@@ -242,7 +251,7 @@ func (f *freezerRemoteS3) findCached(n uint64, kind string) ([]byte, bool) {
 	if v, ok := f.cache[n]; ok {
 		return v.RLPBytesForKind(kind), ok
 	}
-	if v, ok := f.retrieved[n]; ok {
+	if v, ok := f.retrievedBlocks[n]; ok {
 		return v.RLPBytesForKind(kind), ok
 	}
 	return nil, false
@@ -296,25 +305,34 @@ func (f *freezerRemoteS3) pullCache(n uint64) error {
 func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, sizeGauge metrics.Gauge) (*freezerRemoteS3, error) {
 	var err error
 
-	freezerGroups := uint64(32)
-	if v := os.Getenv("GETH_FREEZER_S3_GROUP_OBJECTS"); v != "" {
+	freezerBlockGroupSize := uint64(32)
+	freezerHashGroupSize := uint64(32 * 32 * 32)
+	if v := os.Getenv("GETH_FREEZER_S3_BLOCK_GROUP_SIZE"); v != "" {
 		i, err := strconv.ParseUint(v, 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		freezerGroups = i
+		freezerBlockGroupSize = i
+	}
+	if v := os.Getenv("GETH_FREEZER_S3_HASH_GROUP_SIZE"); v != "" {
+		i, err := strconv.ParseUint(v, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		freezerHashGroupSize = i
 	}
 	f := &freezerRemoteS3{
-		namespace:       namespace,
-		quit:            make(chan struct{}),
-		readMeter:       readMeter,
-		writeMeter:      writeMeter,
-		sizeGauge:       sizeGauge,
-		objectGroupSize: freezerGroups,
-		retrieved:       make(map[uint64]AncientObjectS3),
-		cache:           make(map[uint64]AncientObjectS3),
-		cacheS:          []uint64{},
-		log:             log.New("remote", "s3"),
+		namespace:            namespace,
+		quit:                 make(chan struct{}),
+		readMeter:            readMeter,
+		writeMeter:           writeMeter,
+		sizeGauge:            sizeGauge,
+		blockObjectGroupSize: freezerBlockGroupSize,
+		hashObjectGroupSize:  freezerHashGroupSize,
+		retrievedBlocks:      make(map[uint64]AncientObjectS3),
+		cache:                make(map[uint64]AncientObjectS3),
+		cacheS:               []uint64{},
+		log:                  log.New("remote", "s3"),
 	}
 
 	/*
@@ -392,9 +410,9 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 		return nil, err
 	}
 
-	f.retrievedLock.Lock()
-	o := f.retrieved[number]
-	f.retrievedLock.Unlock()
+	f.retrBlockLock.Lock()
+	o := f.retrievedBlocks[number]
+	f.retrBlockLock.Unlock()
 
 	if o.Hash == (common.Hash{}) {
 		fmt.Println("number", number, "kind", kind)
@@ -504,7 +522,7 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 
 	list := &s3.ListObjectsInput{
 		Bucket: aws.String(f.bucketName()),
-		Marker: aws.String(f.objectKeyForN(items)),
+		Marker: aws.String(f.blockObjectKeyForN(items)),
 	}
 	iter := s3manager.NewDeleteListIterator(f.service, list)
 	batcher := s3manager.NewBatchDeleteWithClient(f.service)
@@ -546,7 +564,7 @@ func (f *freezerRemoteS3) pushCache() error {
 		return nil
 	}
 
-	if f.cacheS[0]%f.objectGroupSize != 0 {
+	if f.cacheS[0]%f.blockObjectGroupSize != 0 {
 		err := f.pullCache(f.cacheS[0])
 		if err != nil {
 			return err
@@ -566,7 +584,7 @@ func (f *freezerRemoteS3) pushCache() error {
 		remainders = append(remainders, n)
 
 		// finalize upload object if we have the group-by number in the set, or if the item is the last
-		endGroup := (n+1)%f.objectGroupSize == 0
+		endGroup := (n+1)%f.blockObjectGroupSize == 0
 		if endGroup || i == len(f.cacheS)-1 {
 			// seal upload object
 			b, err := json.Marshal(set)
@@ -577,7 +595,7 @@ func (f *freezerRemoteS3) pushCache() error {
 			uploads = append(uploads, s3manager.BatchUploadObject{
 				Object: &s3manager.UploadInput{
 					Bucket: aws.String(f.bucketName()),
-					Key:    aws.String(f.objectKeyForN(n)),
+					Key:    aws.String(f.blockObjectKeyForN(n)),
 					Body:   bytes.NewReader(b),
 				},
 			})
@@ -595,9 +613,9 @@ func (f *freezerRemoteS3) pushCache() error {
 
 	f.spliceCacheLeaving(remainders)
 
-	f.retrievedLock.Lock()
-	f.retrieved = map[uint64]AncientObjectS3{}
-	f.retrievedLock.Unlock()
+	f.retrBlockLock.Lock()
+	f.retrievedBlocks = map[uint64]AncientObjectS3{}
+	f.retrBlockLock.Unlock()
 
 	return nil
 }

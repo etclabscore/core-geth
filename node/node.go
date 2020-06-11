@@ -656,6 +656,7 @@ func (n *Node) OpenDatabaseWithFreezerRemote(name string, cache, handles int, fr
 	root := n.config.ResolvePath(name)
 
 	switch {
+	case freezer == "s3": // noop
 	case freezer == "":
 		freezer = filepath.Join(root, "ancient")
 	case !filepath.IsAbs(freezer):

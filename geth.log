@@ -1,59 +1,278 @@
 env GO111MODULE=on go run build/ci.go install
->>> /home/ia/go1.14.3.linux-amd64/bin/go install -ldflags -X main.gitCommit=857a4c8fda9f755bb97dd1af86316397ce2e5a21 -X main.gitDate=20200611 -v ./...
-github.com/ethereum/go-ethereum/core/rawdb
-github.com/ethereum/go-ethereum/cmd/echaindb/cmd
-github.com/ethereum/go-ethereum/core/state/snapshot
-github.com/ethereum/go-ethereum/core
-github.com/ethereum/go-ethereum/core/vm/runtime
-github.com/ethereum/go-ethereum/eth/filters
-github.com/ethereum/go-ethereum/light
-github.com/ethereum/go-ethereum/eth/downloader
-github.com/ethereum/go-ethereum/tests
-github.com/ethereum/go-ethereum/internal/ethapi
-github.com/ethereum/go-ethereum/node
-github.com/ethereum/go-ethereum/accounts/abi/bind/backends
-github.com/ethereum/go-ethereum/graphql
-github.com/ethereum/go-ethereum/eth
-github.com/ethereum/go-ethereum/les
-github.com/ethereum/go-ethereum/cmd/utils
-github.com/ethereum/go-ethereum/cmd/evm
-github.com/ethereum/go-ethereum/cmd/geth
-INFO [06-11|14:14:41.905] Starting Geth on Ethereum Classic... 
-INFO [06-11|14:14:41.905] Bumping default cache on mainnet         provided=1024 updated=4096
-INFO [06-11|14:14:41.908] Maximum peer count                       ETH=50 LES=0 total=50
-INFO [06-11|14:14:41.908] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
-INFO [06-11|14:14:41.942] Starting peer-to-peer node               instance=CoreGeth/v1.11.6-unstable-857a4c8f-20200611/linux-amd64/go1.14.3
-INFO [06-11|14:14:41.942] Allocated trie memory caches             clean=614.00MiB dirty=1024.00MiB
-INFO [06-11|14:14:41.943] Allocated cache and file handles         database=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/chaindata cache=2.00GiB handles=524288
-INFO [06-11|14:14:42.038] New remote freezer                       freezer=s3 namespace=coregeth-classic-parasail
-INFO [06-11|14:14:42.039] New session                              remote=s3 region=0xc0001c0fd0
-INFO [06-11|14:14:42.039] Creating bucket if not exists            remote=s3 name=coregeth-classic-parasail
-INFO [06-11|14:14:42.446] Bucket created                           remote=s3 name=coregeth-classic-parasail result="{\n  Location: \"/coregeth-classic-parasail\"\n}" elapsed=407.272052ms
-INFO [06-11|14:14:42.446] Retrieving ancients number               remote=s3
-INFO [06-11|14:14:42.489] Finished retrieving ancients num         remote=s3 n=45568
-INFO [06-11|14:14:42.489] Initializing cache                       remote=s3 n=45568
-DEBUG[06-11|14:14:42.492] Current full block not old enough        number=0 hash="d4e567…cb8fa3" delay=90000
-INFO [06-11|14:14:42.717] Persisted trie from memory database      nodes=12356 size=1.78MiB time=24.643386ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
-INFO [06-11|14:14:42.718] Found stored genesis block               config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
-INFO [06-11|14:14:42.744] Initialised chain configuration          config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
-INFO [06-11|14:14:42.744] Disk storage enabled for ethash caches   dir=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/ethash count=3
-INFO [06-11|14:14:42.744] Disk storage enabled for ethash DAGs     dir=/home/ia/.ethash count=2
-INFO [06-11|14:14:42.744] Initialising Ethereum protocol           versions="[65 64 63]" network=1 dbversion=7
-INFO [06-11|14:14:43.289] Loaded most recent local header          number=90993 hash="bd3b4d…1d6f0e" td=136620040459222992 age=4y10mo3w
-INFO [06-11|14:14:43.289] Loaded most recent local full block      number=0     hash="d4e567…cb8fa3" td=17179869184        age=51y2mo4d
-INFO [06-11|14:14:43.289] Loaded most recent local fast block      number=45567 hash="481a4d…a18b48" td=41836664765144445  age=4y11mo18h
-DEBUG[06-11|14:14:43.289] Reinjecting stale transactions           count=0
-INFO [06-11|14:14:43.289] Upgrading chain index                    type=bloombits percentage=90
-INFO [06-11|14:14:43.289] Loaded local transaction journal         transactions=0 dropped=0
-TRACE[06-11|14:14:43.289] Processing new chain section             type=bloombits section=20
-INFO [06-11|14:14:43.290] Regenerated local transaction journal    transactions=0 accounts=0
-INFO [06-11|14:14:43.313] Allocated fast sync bloom                size=1.60GiB
-INFO [06-11|14:14:43.446] Mapped network port                      proto=tcp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
-INFO [06-11|14:14:43.454] Mapped network port                      proto=udp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
-INFO [06-11|14:14:43.501] New local node record                    seq=5 id=b88c999c5d67e33b ip=24.207.216.46 udp=30303 tcp=30303
-INFO [06-11|14:14:43.501] Started P2P networking                   self=enode://90c69ac7118154b1993c0c382991b97466997cf1051df8cb657755eb648507d9f31929315c8d549c4cfaabdfa196c364ca01a0cd15b0293e6b1b027f5f6f2c74@24.207.216.46:30303
-INFO [06-11|14:14:43.502] IPC endpoint opened                      url=/home/ia/.ethereum/geth.ipc
-TRACE[06-11|14:14:43.562] Processing new chain section             type=bloombits section=21
-INFO [06-11|14:14:43.734] Finished upgrading chain index           type=bloombits
-INFO [06-11|14:14:45.162] Initialized fast sync bloom              items=953628 errorrate=0.000 elapsed=1.848s
-INFO [06-11|14:14:46.625] Block synchronisation started 
+>>> /home/ia/go1.14.3.linux-amd64/bin/go install -ldflags -X main.gitCommit=4056fc10a01d7607cb66456eeee0f2da77105f65 -X main.gitDate=20200611 -v ./...
+INFO [06-11|15:48:26.150] Starting Geth on Ethereum Classic... 
+INFO [06-11|15:48:26.150] Bumping default cache on mainnet         provided=1024 updated=4096
+INFO [06-11|15:48:26.152] Maximum peer count                       ETH=50 LES=0 total=50
+INFO [06-11|15:48:26.152] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+INFO [06-11|15:48:26.169] Starting peer-to-peer node               instance=CoreGeth/v1.11.6-unstable-4056fc10-20200611/linux-amd64/go1.14.3
+INFO [06-11|15:48:26.169] Allocated trie memory caches             clean=614.00MiB dirty=1024.00MiB
+INFO [06-11|15:48:26.169] Allocated cache and file handles         database=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/chaindata cache=2.00GiB handles=524288
+INFO [06-11|15:48:26.256] New remote freezer                       freezer=s3 namespace=coregeth-classic-parasail
+INFO [06-11|15:48:26.257] New session                              remote=s3 region=0xc00007cbf0
+INFO [06-11|15:48:26.257] Creating bucket if not exists            remote=s3 name=coregeth-classic-parasail
+INFO [06-11|15:48:26.960] Bucket created                           remote=s3 name=coregeth-classic-parasail result="{\n  Location: \"/coregeth-classic-parasail\"\n}" elapsed=703.545601ms
+INFO [06-11|15:48:26.960] Retrieving ancients number               remote=s3
+INFO [06-11|15:48:27.010] Finished retrieving ancients num         remote=s3 n=3009
+INFO [06-11|15:48:27.010] Initializing cache                       remote=s3 n=3009
+INFO [06-11|15:48:27.160] Finished initializing cache              remote=s3 n=3009 size=32
+INFO [06-11|15:48:27.160] Downloading ancient(s)                   remote=s3 kind=hashes number=0 key=blocks/000000000.json
+DEBUG[06-11|15:48:27.160] Current full block hash unavailable 
+INFO [06-11|15:48:27.260] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:27.431] Persisted trie from memory database      nodes=12356 size=1.78MiB time=23.777853ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+INFO [06-11|15:48:27.578] Persisted trie from memory database      nodes=12356 size=1.78MiB time=39.675125ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+INFO [06-11|15:48:27.579] Initialised chain configuration          config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
+INFO [06-11|15:48:27.579] Disk storage enabled for ethash caches   dir=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/ethash count=3
+INFO [06-11|15:48:27.579] Disk storage enabled for ethash DAGs     dir=/home/ia/.ethash count=2
+INFO [06-11|15:48:27.579] Initialising Ethereum protocol           versions="[65 64 63]" network=1 dbversion=<nil>
+WARN [06-11|15:48:27.579] Upgrade blockchain database version      from=<nil> to=7
+INFO [06-11|15:48:27.579] Downloading ancient(s)                   remote=s3 kind=hashes number=32 key=blocks/000000032.json
+INFO [06-11|15:48:27.632] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:27.632] Downloading ancient(s)                   remote=s3 kind=hashes number=64 key=blocks/000000064.json
+INFO [06-11|15:48:27.703] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:27.703] Downloading ancient(s)                   remote=s3 kind=hashes number=96 key=blocks/000000096.json
+INFO [06-11|15:48:27.781] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:27.781] Downloading ancient(s)                   remote=s3 kind=hashes number=128 key=blocks/000000128.json
+INFO [06-11|15:48:28.167] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.168] Downloading ancient(s)                   remote=s3 kind=hashes number=160 key=blocks/000000160.json
+INFO [06-11|15:48:28.233] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.234] Downloading ancient(s)                   remote=s3 kind=hashes number=192 key=blocks/000000192.json
+INFO [06-11|15:48:28.298] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.299] Downloading ancient(s)                   remote=s3 kind=hashes number=224 key=blocks/000000224.json
+INFO [06-11|15:48:28.356] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.356] Downloading ancient(s)                   remote=s3 kind=hashes number=256 key=blocks/000000256.json
+INFO [06-11|15:48:28.408] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.408] Downloading ancient(s)                   remote=s3 kind=hashes number=288 key=blocks/000000288.json
+INFO [06-11|15:48:28.489] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.489] Downloading ancient(s)                   remote=s3 kind=hashes number=320 key=blocks/000000320.json
+INFO [06-11|15:48:28.549] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.549] Downloading ancient(s)                   remote=s3 kind=hashes number=352 key=blocks/000000352.json
+INFO [06-11|15:48:28.616] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.616] Initializing database from freezer       total=3009 number=352 hash="05fd21…e24431" elapsed=1.036s
+INFO [06-11|15:48:28.616] Downloading ancient(s)                   remote=s3 kind=hashes number=384 key=blocks/000000384.json
+INFO [06-11|15:48:28.709] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.709] Downloading ancient(s)                   remote=s3 kind=hashes number=416 key=blocks/000000416.json
+INFO [06-11|15:48:28.766] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.766] Downloading ancient(s)                   remote=s3 kind=hashes number=448 key=blocks/000000448.json
+INFO [06-11|15:48:28.822] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.822] Downloading ancient(s)                   remote=s3 kind=hashes number=480 key=blocks/000000480.json
+INFO [06-11|15:48:28.891] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.891] Downloading ancient(s)                   remote=s3 kind=hashes number=512 key=blocks/000000512.json
+INFO [06-11|15:48:28.946] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:28.947] Downloading ancient(s)                   remote=s3 kind=hashes number=544 key=blocks/000000544.json
+INFO [06-11|15:48:29.025] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.025] Downloading ancient(s)                   remote=s3 kind=hashes number=576 key=blocks/000000576.json
+INFO [06-11|15:48:29.079] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.079] Downloading ancient(s)                   remote=s3 kind=hashes number=608 key=blocks/000000608.json
+INFO [06-11|15:48:29.144] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.144] Downloading ancient(s)                   remote=s3 kind=hashes number=640 key=blocks/000000640.json
+INFO [06-11|15:48:29.199] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.199] Downloading ancient(s)                   remote=s3 kind=hashes number=672 key=blocks/000000672.json
+INFO [06-11|15:48:29.266] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.266] Downloading ancient(s)                   remote=s3 kind=hashes number=704 key=blocks/000000704.json
+INFO [06-11|15:48:29.324] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.324] Downloading ancient(s)                   remote=s3 kind=hashes number=736 key=blocks/000000736.json
+INFO [06-11|15:48:29.389] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.389] Downloading ancient(s)                   remote=s3 kind=hashes number=768 key=blocks/000000768.json
+INFO [06-11|15:48:29.447] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.447] Downloading ancient(s)                   remote=s3 kind=hashes number=800 key=blocks/000000800.json
+INFO [06-11|15:48:29.501] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.501] Downloading ancient(s)                   remote=s3 kind=hashes number=832 key=blocks/000000832.json
+INFO [06-11|15:48:29.568] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.568] Downloading ancient(s)                   remote=s3 kind=hashes number=864 key=blocks/000000864.json
+INFO [06-11|15:48:29.645] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.645] Downloading ancient(s)                   remote=s3 kind=hashes number=896 key=blocks/000000896.json
+INFO [06-11|15:48:29.710] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.710] Downloading ancient(s)                   remote=s3 kind=hashes number=928 key=blocks/000000928.json
+INFO [06-11|15:48:29.769] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.769] Downloading ancient(s)                   remote=s3 kind=hashes number=960 key=blocks/000000960.json
+INFO [06-11|15:48:29.830] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.830] Downloading ancient(s)                   remote=s3 kind=hashes number=992 key=blocks/000000992.json
+INFO [06-11|15:48:29.895] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.895] Downloading ancient(s)                   remote=s3 kind=hashes number=1024 key=blocks/000001024.json
+INFO [06-11|15:48:29.951] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:29.951] Downloading ancient(s)                   remote=s3 kind=hashes number=1056 key=blocks/000001056.json
+INFO [06-11|15:48:30.005] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.005] Downloading ancient(s)                   remote=s3 kind=hashes number=1088 key=blocks/000001088.json
+INFO [06-11|15:48:30.073] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.073] Downloading ancient(s)                   remote=s3 kind=hashes number=1120 key=blocks/000001120.json
+INFO [06-11|15:48:30.131] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.131] Downloading ancient(s)                   remote=s3 kind=hashes number=1152 key=blocks/000001152.json
+INFO [06-11|15:48:30.206] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.206] Downloading ancient(s)                   remote=s3 kind=hashes number=1184 key=blocks/000001184.json
+INFO [06-11|15:48:30.280] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.280] Downloading ancient(s)                   remote=s3 kind=hashes number=1216 key=blocks/000001216.json
+INFO [06-11|15:48:30.349] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.349] Downloading ancient(s)                   remote=s3 kind=hashes number=1248 key=blocks/000001248.json
+INFO [06-11|15:48:30.403] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.403] Downloading ancient(s)                   remote=s3 kind=hashes number=1280 key=blocks/000001280.json
+INFO [06-11|15:48:30.479] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.479] Downloading ancient(s)                   remote=s3 kind=hashes number=1312 key=blocks/000001312.json
+INFO [06-11|15:48:30.532] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.532] Downloading ancient(s)                   remote=s3 kind=hashes number=1344 key=blocks/000001344.json
+INFO [06-11|15:48:30.598] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.598] Downloading ancient(s)                   remote=s3 kind=hashes number=1376 key=blocks/000001376.json
+INFO [06-11|15:48:30.658] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.658] Downloading ancient(s)                   remote=s3 kind=hashes number=1408 key=blocks/000001408.json
+INFO [06-11|15:48:30.720] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.720] Downloading ancient(s)                   remote=s3 kind=hashes number=1440 key=blocks/000001440.json
+INFO [06-11|15:48:30.779] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.779] Downloading ancient(s)                   remote=s3 kind=hashes number=1472 key=blocks/000001472.json
+INFO [06-11|15:48:30.843] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.843] Downloading ancient(s)                   remote=s3 kind=hashes number=1504 key=blocks/000001504.json
+INFO [06-11|15:48:30.907] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.907] Downloading ancient(s)                   remote=s3 kind=hashes number=1536 key=blocks/000001536.json
+INFO [06-11|15:48:30.965] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:30.965] Downloading ancient(s)                   remote=s3 kind=hashes number=1568 key=blocks/000001568.json
+INFO [06-11|15:48:31.028] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:31.028] Downloading ancient(s)                   remote=s3 kind=hashes number=1600 key=blocks/000001600.json
+INFO [06-11|15:48:31.091] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:31.091] Downloading ancient(s)                   remote=s3 kind=hashes number=1632 key=blocks/000001632.json
+INFO [06-11|15:48:31.152] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:31.152] Downloading ancient(s)                   remote=s3 kind=hashes number=1664 key=blocks/000001664.json
+INFO [06-11|15:48:31.220] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:31.220] Downloading ancient(s)                   remote=s3 kind=hashes number=1696 key=blocks/000001696.json
+INFO [06-11|15:48:31.307] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:31.307] Downloading ancient(s)                   remote=s3 kind=hashes number=1728 key=blocks/000001728.json
+INFO [06-11|15:48:31.364] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:31.364] Downloading ancient(s)                   remote=s3 kind=hashes number=1760 key=blocks/000001760.json
+INFO [06-11|15:48:31.432] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:31.432] Downloading ancient(s)                   remote=s3 kind=hashes number=1792 key=blocks/000001792.json
+INFO [06-11|15:48:31.490] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:31.490] Downloading ancient(s)                   remote=s3 kind=hashes number=1824 key=blocks/000001824.json
+INFO [06-11|15:48:31.925] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:31.925] Downloading ancient(s)                   remote=s3 kind=hashes number=1856 key=blocks/000001856.json
+INFO [06-11|15:48:31.988] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:31.988] Downloading ancient(s)                   remote=s3 kind=hashes number=1888 key=blocks/000001888.json
+INFO [06-11|15:48:32.048] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.048] Downloading ancient(s)                   remote=s3 kind=hashes number=1920 key=blocks/000001920.json
+INFO [06-11|15:48:32.104] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.104] Downloading ancient(s)                   remote=s3 kind=hashes number=1952 key=blocks/000001952.json
+INFO [06-11|15:48:32.165] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.165] Downloading ancient(s)                   remote=s3 kind=hashes number=1984 key=blocks/000001984.json
+INFO [06-11|15:48:32.221] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.221] Downloading ancient(s)                   remote=s3 kind=hashes number=2016 key=blocks/000002016.json
+INFO [06-11|15:48:32.289] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.289] Downloading ancient(s)                   remote=s3 kind=hashes number=2048 key=blocks/000002048.json
+INFO [06-11|15:48:32.349] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.350] Downloading ancient(s)                   remote=s3 kind=hashes number=2080 key=blocks/000002080.json
+INFO [06-11|15:48:32.411] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.411] Downloading ancient(s)                   remote=s3 kind=hashes number=2112 key=blocks/000002112.json
+INFO [06-11|15:48:32.469] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.469] Downloading ancient(s)                   remote=s3 kind=hashes number=2144 key=blocks/000002144.json
+INFO [06-11|15:48:32.529] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.529] Downloading ancient(s)                   remote=s3 kind=hashes number=2176 key=blocks/000002176.json
+INFO [06-11|15:48:32.597] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.597] Downloading ancient(s)                   remote=s3 kind=hashes number=2208 key=blocks/000002208.json
+INFO [06-11|15:48:32.652] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.652] Downloading ancient(s)                   remote=s3 kind=hashes number=2240 key=blocks/000002240.json
+INFO [06-11|15:48:32.720] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.720] Downloading ancient(s)                   remote=s3 kind=hashes number=2272 key=blocks/000002272.json
+INFO [06-11|15:48:32.771] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.771] Downloading ancient(s)                   remote=s3 kind=hashes number=2304 key=blocks/000002304.json
+INFO [06-11|15:48:32.836] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.837] Downloading ancient(s)                   remote=s3 kind=hashes number=2336 key=blocks/000002336.json
+INFO [06-11|15:48:32.899] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.900] Downloading ancient(s)                   remote=s3 kind=hashes number=2368 key=blocks/000002368.json
+INFO [06-11|15:48:32.957] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:32.957] Downloading ancient(s)                   remote=s3 kind=hashes number=2400 key=blocks/000002400.json
+INFO [06-11|15:48:33.018] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.018] Downloading ancient(s)                   remote=s3 kind=hashes number=2432 key=blocks/000002432.json
+INFO [06-11|15:48:33.076] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.077] Downloading ancient(s)                   remote=s3 kind=hashes number=2464 key=blocks/000002464.json
+INFO [06-11|15:48:33.145] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.145] Downloading ancient(s)                   remote=s3 kind=hashes number=2496 key=blocks/000002496.json
+INFO [06-11|15:48:33.207] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.207] Downloading ancient(s)                   remote=s3 kind=hashes number=2528 key=blocks/000002528.json
+INFO [06-11|15:48:33.273] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.273] Downloading ancient(s)                   remote=s3 kind=hashes number=2560 key=blocks/000002560.json
+INFO [06-11|15:48:33.333] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.334] Downloading ancient(s)                   remote=s3 kind=hashes number=2592 key=blocks/000002592.json
+INFO [06-11|15:48:33.392] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.392] Downloading ancient(s)                   remote=s3 kind=hashes number=2624 key=blocks/000002624.json
+INFO [06-11|15:48:33.454] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.454] Downloading ancient(s)                   remote=s3 kind=hashes number=2656 key=blocks/000002656.json
+INFO [06-11|15:48:33.514] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.514] Downloading ancient(s)                   remote=s3 kind=hashes number=2688 key=blocks/000002688.json
+INFO [06-11|15:48:33.567] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.567] Downloading ancient(s)                   remote=s3 kind=hashes number=2720 key=blocks/000002720.json
+INFO [06-11|15:48:33.633] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.633] Downloading ancient(s)                   remote=s3 kind=hashes number=2752 key=blocks/000002752.json
+INFO [06-11|15:48:33.700] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.700] Downloading ancient(s)                   remote=s3 kind=hashes number=2784 key=blocks/000002784.json
+INFO [06-11|15:48:33.757] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.757] Downloading ancient(s)                   remote=s3 kind=hashes number=2816 key=blocks/000002816.json
+INFO [06-11|15:48:33.830] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.830] Downloading ancient(s)                   remote=s3 kind=hashes number=2848 key=blocks/000002848.json
+INFO [06-11|15:48:33.884] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.884] Downloading ancient(s)                   remote=s3 kind=hashes number=2880 key=blocks/000002880.json
+INFO [06-11|15:48:33.938] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:33.938] Downloading ancient(s)                   remote=s3 kind=hashes number=2912 key=blocks/000002912.json
+INFO [06-11|15:48:34.018] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:34.018] Downloading ancient(s)                   remote=s3 kind=hashes number=2944 key=blocks/000002944.json
+INFO [06-11|15:48:34.072] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:34.072] Downloading ancient(s)                   remote=s3 kind=hashes number=2976 key=blocks/000002976.json
+INFO [06-11|15:48:34.138] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:34.141] Initialized database from freezer        blocks=3009 elapsed=6.561s
+INFO [06-11|15:48:34.141] Downloading ancient(s)                   remote=s3 kind=diffs  number=0    key=blocks/000000000.json
+INFO [06-11|15:48:34.202] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:34.203] Loaded most recent local header          number=3008 hash="52c410…356bd2" td=116606206624600 age=4y11mo1w
+INFO [06-11|15:48:34.203] Loaded most recent local full block      number=0    hash="d4e567…cb8fa3" td=17179869184     age=51y2mo4d
+INFO [06-11|15:48:34.203] Loaded most recent local fast block      number=3008 hash="52c410…356bd2" td=116606206624600 age=4y11mo1w
+DEBUG[06-11|15:48:34.203] Reinjecting stale transactions           count=0
+INFO [06-11|15:48:34.203] Indexed transactions                     blocks=1    txs=0 tail=3008 elapsed="298.171µs"
+INFO [06-11|15:48:34.206] Regenerated local transaction journal    transactions=0 accounts=0
+INFO [06-11|15:48:34.250] Allocated fast sync bloom                size=1.60GiB
+INFO [06-11|15:48:34.352] Initialized fast sync bloom              items=12356 errorrate=0.000 elapsed=101.904ms
+INFO [06-11|15:48:34.367] New local node record                    seq=1 id=7574fdf24e9b29fa ip=127.0.0.1 udp=30303 tcp=30303
+INFO [06-11|15:48:34.367] Started P2P networking                   self=enode://ffdcaa72b06410427f2f5601b2b48eee5b9a83ffa7c77bf96cabb6ceaeb93ddada0ad69d0ac9ee8a44cf65d7e78629033a93db8f35c80e49a475bb6493af4b31@127.0.0.1:30303
+INFO [06-11|15:48:34.368] IPC endpoint opened                      url=/home/ia/.ethereum/geth.ipc
+INFO [06-11|15:48:34.383] Mapped network port                      proto=tcp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
+INFO [06-11|15:48:34.394] Mapped network port                      proto=udp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
+INFO [06-11|15:48:34.545] New local node record                    seq=2 id=7574fdf24e9b29fa ip=24.207.216.46 udp=30303 tcp=30303
+INFO [06-11|15:48:44.251] Block synchronisation started 
+INFO [06-11|15:48:44.368] Looking for peers                        peercount=5 tried=51 static=0
+INFO [06-11|15:48:46.504] Downloading ancient(s)                   remote=s3 kind=hashes number=2501 key=blocks/000002496.json
+INFO [06-11|15:48:46.825] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:47.341] Downloading ancient(s)                   remote=s3 kind=hashes number=2813 key=blocks/000002784.json
+INFO [06-11|15:48:47.453] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:47.623] Downloading ancient(s)                   remote=s3 kind=hashes number=2969 key=blocks/000002944.json
+INFO [06-11|15:48:47.684] Finished downloading ancient(s)          remote=s3 len=32
+INFO [06-11|15:48:50.730] Imported new block headers               count=192 elapsed=613.754ms    number=3200 hash="0b9762…1a804a" age=4y11mo1w
+INFO [06-11|15:48:50.732] Syncing ancients                         remote=s3 blocks=32
+INFO [06-11|15:48:50.748] Imported new block headers               count=192 elapsed=16.718ms     number=3392 hash="9bb8e5…2da1e9" age=4y11mo1w
+INFO [06-11|15:48:50.994] Imported new state entries               count=494 elapsed="1.896µs"    processed=494 pending=7905 retry=4 duplicate=0 unexpected=0
+INFO [06-11|15:48:51.026] Truncating ancients                      cacheS="[3009 3010]" items=3009
+panic: cache does not begin at mod: n=3009 (mod=1)
+	panic: cache does not begin at mod: n=3009 (mod=1)
+
+goroutine 1521 [running]:
+github.com/ethereum/go-ethereum/core/rawdb.(*freezerRemoteS3).TruncateAncients(0xc00042e240, 0xbc1, 0x0, 0x0)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/core/rawdb/freezer_remote_s3.go:454 +0x1862
+github.com/ethereum/go-ethereum/core/rawdb.(*freezerRemote).TruncateAncients(0xc000570000, 0xbc1, 0x0, 0x0)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/core/rawdb/freezer_remote.go:171 +0x4a
+github.com/ethereum/go-ethereum/core.(*BlockChain).truncateAncient(0xc0248c8000, 0xbc0, 0x0, 0xc02356c9c8)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/core/blockchain.go:1022 +0x81
+github.com/ethereum/go-ethereum/core.(*BlockChain).InsertReceiptChain.func2.1(0xc02356d1e0, 0xc0248c8000)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/core/blockchain.go:1114 +0x60
+panic(0x1285dc0, 0xc02510c090)
+	/home/ia/go1.14.3.linux-amd64/src/runtime/panic.go:969 +0x166
+github.com/ethereum/go-ethereum/core/rawdb.(*freezerRemoteS3).pushCache(0xc00042e240, 0x5ba939d86, 0x26ed380)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/core/rawdb/freezer_remote_s3.go:620 +0xbab
+github.com/ethereum/go-ethereum/core/rawdb.(*freezerRemoteS3).Sync(0xc00042e240, 0x0, 0x0)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/core/rawdb/freezer_remote_s3.go:643 +0x190
+github.com/ethereum/go-ethereum/core/rawdb.(*freezerRemote).Sync(0xc000570000, 0x0, 0x0)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/core/rawdb/freezer_remote.go:180 +0x34
+github.com/ethereum/go-ethereum/core.(*BlockChain).InsertReceiptChain.func2(0xc02780a260, 0x2, 0x2, 0xc027809980, 0x2, 0x2, 0x0, 0x0, 0x0)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/core/blockchain.go:1220 +0x17fb
+github.com/ethereum/go-ethereum/core.(*BlockChain).InsertReceiptChain(0xc0248c8000, 0xc02780a250, 0x2, 0x2, 0xc027809950, 0x2, 0x2, 0x9afa7d, 0x0, 0x0, ...)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/core/blockchain.go:1311 +0x1d72
+github.com/ethereum/go-ethereum/eth/downloader.(*Downloader).commitFastSyncData(0xc02356e1c0, 0xc02780a240, 0x2, 0x2, 0xc02239f030, 0xc02780a240, 0x2)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/eth/downloader/downloader.go:1770 +0x68c
+github.com/ethereum/go-ethereum/eth/downloader.(*Downloader).processFastSyncContent(0xc02356e1c0, 0xc020f546c0, 0x0, 0x0)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/eth/downloader/downloader.go:1693 +0x348
+github.com/ethereum/go-ethereum/eth/downloader.(*Downloader).syncWithPeer.func7(0x7feb7bcbbced4705, 0x1cd54c8d47c45f3d)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/eth/downloader/downloader.go:545 +0x33
+github.com/ethereum/go-ethereum/eth/downloader.(*Downloader).spawnSync.func1(0xc02356e1c0, 0xc0228759e0, 0xc022916be0)
+	/home/ia/go/src/github.com/ethereum/go-ethereum/eth/downloader/downloader.go:559 +0x5b
+created by github.com/ethereum/go-ethereum/eth/downloader.(*Downloader).spawnSync
+	/home/ia/go/src/github.com/ethereum/go-ethereum/eth/downloader/downloader.go:559 +0xaf

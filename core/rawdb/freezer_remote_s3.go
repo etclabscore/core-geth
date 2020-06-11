@@ -185,9 +185,7 @@ func (f *freezerRemoteS3) initializeBucket() error {
 
 func (f *freezerRemoteS3) initCache(n uint64) error {
 	f.log.Info("Initializing cache", "n", n)
-	if n%f.objectGroupSize == 0 {
-		return nil
-	}
+
 	key := f.objectKeyForN(n)
 	buf := aws.NewWriteAtBuffer([]byte{})
 	_, err := f.downloader.Download(buf, &s3.GetObjectInput{
@@ -214,7 +212,10 @@ func (f *freezerRemoteS3) initCache(n uint64) error {
 		f.cacheS = append(f.cacheS, n)
 		f.cache[n] = v
 	}
-	f.log.Info("Finished initializing cache")
+	f.log.Info("Finished initializing cache", "n", n, "size", len(f.cache))
+	if f.cacheS[0] % f.objectGroupSize != 0 {
+		panic(fmt.Sprintf("cache does not begin at mod: n=%d (mod=%d)", f.cacheS[0], f.cacheS[0] % f.objectGroupSize))
+	}
 	return nil
 }
 
@@ -315,8 +316,11 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 		return v.RLPBytesForKind(kind), nil
 	}
 
+
 	// Take from remote
 	key := f.objectKeyForN(number)
+	f.log.Info("Downloading ancient(s)", "kind", kind, "number", number, "key", key)
+
 	buf := aws.NewWriteAtBuffer([]byte{})
 	_, err := f.downloader.Download(buf, &s3.GetObjectInput{
 		Bucket: aws.String(f.bucketName()),
@@ -337,6 +341,7 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	f.log.Info("Finished downloading ancient(s)", "len", len(target))
 	f.retrieved = map[uint64]AncientObjectS3{}
 	o := &AncientObjectS3{}
 	for _, v := range target {
@@ -345,6 +350,12 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 		if n == number {
 			*o = v
 		}
+	}
+	if o.Hash == (common.Hash{}) {
+		j, _ := json.MarshalIndent(target, "", "    ")
+		fmt.Println("number", number, "kind", kind, "key", key)
+		fmt.Println(string(j))
+		panic("bad")
 	}
 	return o.RLPBytesForKind(kind), nil
 }
@@ -417,6 +428,10 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 	f.cache[number] = *o
 	f.cacheS = append(f.cacheS, number)
 
+	if f.cacheS[0] % f.objectGroupSize != 0 {
+		panic(fmt.Sprintf("cache does not begin at mod: n=%d (mod=%d)", f.cacheS[0], f.cacheS[0] % f.objectGroupSize))
+	}
+
 	atomic.AddUint64(f.frozen, 1)
 
 	return nil
@@ -432,42 +447,78 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	defer f.mu.Unlock()
 
 	var err error
+
+	log.Info("Truncating ancients", "cacheS", f.cacheS, "items", items)
+
+	if f.cacheS[0] % f.objectGroupSize != 0 {
+		panic(fmt.Sprintf("cache does not begin at mod: n=%d (mod=%d)", f.cacheS[0], f.cacheS[0] % f.objectGroupSize))
+	}
+
+	cachedAt := -1
+	for i, v := range f.cacheS {
+		if v >= items {
+			delete(f.cache, v)
+		}
+		if v == items {
+			cachedAt = i
+		}
+	}
+	if cachedAt >= 0 {
+		f.cacheS = f.cacheS[:cachedAt]
+		log.Info("Truncated cached ancients", "cacheS", f.cacheS)
+		err = f.setIndexMarker(items)
+		if err != nil {
+			return err
+		}
+		atomic.StoreUint64(f.frozen, items)
+		return nil
+	}
+
+	if f.cacheS[0] % f.objectGroupSize != 0 {
+		panic(fmt.Sprintf("cache does not begin at mod: n=%d (mod=%d)", f.cacheS[0], f.cacheS[0] % f.objectGroupSize))
+	}
+
 	n := atomic.LoadUint64(f.frozen)
 
 	// First, download the latest group object into a temporary cache.
-	key := f.objectKeyForN(items)
-	buf := aws.NewWriteAtBuffer([]byte{})
-	_, err = f.downloader.Download(buf, &s3.GetObjectInput{
-		Bucket: aws.String(f.bucketName()),
-		Key:    aws.String(key),
-	})
-	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case s3.ErrCodeNoSuchKey:
-				return errOutOfBounds
+	if items % f.objectGroupSize != 0 {
+		key := f.objectKeyForN(items)
+		buf := aws.NewWriteAtBuffer([]byte{})
+		_, err = f.downloader.Download(buf, &s3.GetObjectInput{
+			Bucket: aws.String(f.bucketName()),
+			Key:    aws.String(key),
+		})
+		if err != nil {
+			if aerr, ok := err.(awserr.Error); ok {
+				switch aerr.Code() {
+				case s3.ErrCodeNoSuchKey:
+					return errOutOfBounds
+				}
+			}
+			f.log.Error("Download error", "method", "TruncateAncients", "error", err, "key", key, "items", items)
+			return err
+		}
+		target := []AncientObjectS3{}
+		err = json.Unmarshal(buf.Bytes(), &target)
+		if err != nil {
+			return err
+		}
+		f.cache = map[uint64]AncientObjectS3{}
+		f.cacheS = []uint64{}
+		for _, t := range target {
+			n := t.Header.Number.Uint64()
+			if n < items {
+				f.cache[n] = t
+				f.cacheS = append(f.cacheS, n)
 			}
 		}
-		f.log.Error("Download error", "method", "TruncateAncients", "error", err, "key", key, "items", items)
-		return err
+		sort.Slice(f.cacheS, func(i, j int) bool {
+			return f.cacheS[i] < f.cacheS[j]
+		})
+	} else {
+		f.cache = map[uint64]AncientObjectS3{}
+		f.cacheS = []uint64{}
 	}
-	target := []AncientObjectS3{}
-	err = json.Unmarshal(buf.Bytes(), &target)
-	if err != nil {
-		return err
-	}
-	f.cache = map[uint64]AncientObjectS3{}
-	f.cacheS = []uint64{}
-	for _, t := range target {
-		n := t.Header.Number.Uint64()
-		if n < items {
-			f.cache[n] = t
-			f.cacheS = append(f.cacheS, n)
-		}
-	}
-	sort.Slice(f.cacheS, func(i, j int) bool {
-		return f.cacheS[i] < f.cacheS[j]
-	})
 
 	// Now truncate all remote data from the latest grouped object and beyond.
 	// Noting that this can remove data from the remote that is actually antecedent to the
@@ -518,6 +569,10 @@ func (f *freezerRemoteS3) pushCache() error {
 		return nil
 	}
 
+	if f.cacheS[0] % f.objectGroupSize != 0 {
+		panic(fmt.Sprintf("cache does not begin at mod: n=%d (mod=%d)", f.cacheS[0], f.cacheS[0] % f.objectGroupSize))
+	}
+
 	set := []AncientObjectS3{}
 	uploads := []s3manager.BatchUploadObject{}
 	remainders := []uint64{}
@@ -527,7 +582,8 @@ func (f *freezerRemoteS3) pushCache() error {
 		remainders = append(remainders, n)
 
 		// finalize upload object if we have the group-by number in the set, or if the item is the last
-		if uint64(len(set)) == f.objectGroupSize || i == len(f.cacheS)-1 {
+		endGroup := (n+1) % f.objectGroupSize == 0
+		if endGroup || i == len(f.cacheS)-1 {
 			// seal upload object
 			b, err := json.Marshal(set)
 			if err != nil {
@@ -542,8 +598,8 @@ func (f *freezerRemoteS3) pushCache() error {
 				},
 			})
 		}
-		if uint64(len(set)) == f.objectGroupSize {
-			remainders = []uint64{}
+		if endGroup {
+			remainders = remainders[:0]
 		}
 	}
 
@@ -558,7 +614,11 @@ func (f *freezerRemoteS3) pushCache() error {
 			delete(f.cache, n)
 		}
 	}
-	copy(f.cacheS, remainders)
+	f.cacheS = remainders
+
+	if f.cacheS[0] % f.objectGroupSize != 0 {
+		panic(fmt.Sprintf("cache does not begin at mod: n=%d (mod=%d)", f.cacheS[0], f.cacheS[0] % f.objectGroupSize))
+	}
 
 	f.retrieved = map[uint64]AncientObjectS3{}
 
@@ -571,6 +631,9 @@ func (f *freezerRemoteS3) Sync() error {
 	if lenCache == 0 {
 		return nil
 	}
+
+	f.mu.Lock()
+	defer f.mu.Unlock()
 
 	var err error
 

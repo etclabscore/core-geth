@@ -334,7 +334,11 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 	for i, v := range target {
 		f.retrieved[start+uint64(i)] = v
 	}
-	return target[number%f.objectGroupSize].RLPBytesForKind(kind), nil
+	i := number%f.objectGroupSize
+	if i > uint64(len(target)) - 1 {
+		return nil, errOutOfBounds
+	}
+	return target[i].RLPBytesForKind(kind), nil
 }
 
 // Ancients returns the length of the frozen items.
@@ -496,7 +500,7 @@ func (f *freezerRemoteS3) Sync() error {
 	start := time.Now()
 
 	lenCache := len(f.cache)
-	cacheStartN := atomic.LoadUint64(f.frozen) - 1 - uint64(lenCache)
+	cacheStartN := atomic.LoadUint64(f.frozen) - uint64(lenCache)
 
 	set := []AncientObjectS3{}
 	uploads := []s3manager.BatchUploadObject{}

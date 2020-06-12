@@ -1,6 +1,8 @@
 package rawdb
 
 import (
+	"bytes"
+	"encoding/json"
 	"log"
 	"math/big"
 	"testing"
@@ -57,4 +59,18 @@ func TestSpliceBackwards(t *testing.T) {
 	mod := 3
 	rem := len(a) % mod
 	t.Log(a[len(a)-rem:])
+}
+
+func Test30kHashes(t *testing.T) {
+	n := 32*32*32
+	hashes := make([]common.Hash, n)
+	for i := 0; i < n; i++ {
+		hashes[i] = common.HexToHash("0xbadface")
+	}
+	b, err := json.Marshal(hashes)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c := bytes.Count(b, []byte(""))
+	t.Log(c)
 }

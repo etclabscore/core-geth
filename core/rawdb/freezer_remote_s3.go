@@ -277,17 +277,24 @@ func (f *freezerRemoteS3) appendCaches(a AncientObjectS3) {
 }
 
 func (f *freezerRemoteS3) findCached(n uint64, kind string) ([]byte, bool) {
-	f.cacheLock.Lock()
-	defer f.cacheLock.Unlock()
 	if kind == freezerHashTable {
-		if v, ok := f.hashCache[n]; ok {
+		f.cacheLock.Lock()
+		v, ok := f.hashCache[n]
+		f.cacheLock.Unlock()
+		if ok {
 			return v.Bytes(), ok
 		}
 	}
-	if v, ok := f.blockCache[n]; ok {
+	f.cacheLock.Lock()
+	v, ok := f.blockCache[n]
+	f.cacheLock.Unlock()
+	if ok {
 		return v.RLPBytesForKind(kind), ok
 	}
-	if v, ok := f.retrievedBlocks[n]; ok {
+	f.retrievedBlockLock.Lock()
+	v, ok = f.retrievedBlocks[n]
+	f.retrievedBlockLock.Unlock()
+	if ok {
 		return v.RLPBytesForKind(kind), ok
 	}
 	return nil, false

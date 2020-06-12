@@ -61,6 +61,11 @@ func TestSpliceBackwards(t *testing.T) {
 	t.Log(a[len(a)-rem:])
 }
 
+func TestSlice(t *testing.T) {
+	a := []int{1, 2, 3, 4, 5}
+	t.Log(a[5:5])
+}
+
 func Test30kHashes(t *testing.T) {
 	n := 32*32*32
 	hashes := make([]common.Hash, n)

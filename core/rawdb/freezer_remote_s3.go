@@ -611,22 +611,22 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 
 	f.cacheLock.Lock()
 	_, blockok := f.blockCache[items]
+	f.cacheLock.Unlock()
 	if !blockok {
 		err = f.pullCache(items)
 		if err != nil {
-			f.cacheLock.Unlock()
 			return err
 		}
 	}
+	f.cacheLock.Lock()
 	_, hashok := f.hashCache[items]
+	f.cacheLock.Unlock()
 	if !hashok {
 		err = f.pullHashCache(items)
 		if err != nil {
-			f.cacheLock.Unlock()
 			return err
 		}
 	}
-	f.cacheLock.Unlock()
 
 	// Now truncate all remote data from the latest grouped object and beyond.
 	// Noting that this can remove data from the remote that is actually antecedent to the

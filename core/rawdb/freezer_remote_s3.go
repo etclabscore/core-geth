@@ -25,6 +25,7 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -548,8 +549,9 @@ func (f *freezerRemoteS3) Ancients() (uint64, error) {
 	if err != nil {
 		return 0, err
 	}
-	i, err := strconv.ParseUint(string(contents), 10, 64)
-	f.log.Info("Finished retrieving ancients num", "n", i)
+	s := strings.TrimSpace(string(contents))
+	i, err := strconv.ParseUint(s, 10, 64)
+	f.log.Info("Finished retrieving ancients num", "s", s, "n", i, "err?", err)
 	return i, err
 }
 

@@ -61,6 +61,11 @@ type freezerRemoteS3 struct {
 	blockObjectGroupSize uint64  // how many blocks to include in a single S3 object
 	hashObjectGroupSize  uint64
 
+	appendCacheBlocks *Cache
+	appendCacheHashes *Cache
+	getCacheBlocks    *Cache
+	getCacheHashes    *Cache
+
 	retrievedBlocks    map[uint64]AncientObjectS3
 	retrievedBlockLock sync.Mutex
 
@@ -147,6 +152,96 @@ func (o *AncientObjectS3) RLPBytesForKind(kind string) []byte {
 	default:
 		panic(fmt.Sprintf("unknown kind: %s", kind))
 	}
+}
+
+type Cache struct {
+	mu sync.Mutex
+	m  map[uint64]interface{}
+	sl []uint64
+}
+
+func NewCache() *Cache {
+	return &Cache{
+		m:  make(map[uint64]interface{}),
+		sl: []uint64{},
+	}
+}
+
+func (c *Cache) Reset() {
+	c.mu.Lock()
+	c.m = make(map[uint64]interface{})
+	c.sl = []uint64{}
+	c.mu.Unlock()
+}
+
+func (c *Cache) Set(start uint64, items []interface{}) {
+	c.mu.Lock()
+	c.sl = make([]uint64, len(items))
+	for i, v := range items {
+		n := start + uint64(i)
+		c.m[n] = v
+		c.sl[i] = n
+	}
+	c.mu.Unlock()
+}
+
+func (c *Cache) Add(n uint64, item interface{}) {
+	c.mu.Lock()
+	if _, ok := c.m[n]; ok {
+		return
+	}
+	c.m[n] = item
+	c.sl = append(c.sl, n)
+	if len(c.sl) > 1 {
+		// if out of order
+		if c.sl[len(c.sl)-2]+1 != c.sl[len(c.sl)-1] {
+			sort.Slice(c.sl, func(i, j int) bool {
+				return c.sl[i] < c.sl[j]
+			})
+		}
+	}
+	c.mu.Unlock()
+}
+
+func (c *Cache) Batch(offset, size uint64) interface{} {
+	c.mu.Lock()
+	s := []interface{}{}
+	for _, n := range c.sl[offset : offset+size] {
+		s = append(s, c.m[n])
+	}
+	c.mu.Unlock()
+	return s
+}
+
+func (c *Cache) TruncateAbove(n uint64) {
+	c.mu.Lock()
+	index := -1
+	for i, v := range c.sl {
+		if v >= n {
+			if index < 0 {
+				index = i
+			}
+			delete(c.m, v)
+		}
+	}
+	c.sl = c.sl[:index]
+	c.mu.Unlock()
+}
+
+func (c *Cache) Slice(first int) {
+	c.mu.Lock()
+	for _, v := range c.sl {
+		delete(c.m, v)
+	}
+	c.sl = c.sl[first:]
+	c.mu.Unlock()
+}
+
+func (c *Cache) Get(n uint64) (interface{}, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	v, ok := c.m[n]
+	return v, ok
 }
 
 func awsKeyBlock(number uint64) string {
@@ -404,6 +499,10 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 		sizeGauge:            sizeGauge,
 		blockObjectGroupSize: freezerBlockGroupSize,
 		hashObjectGroupSize:  freezerHashGroupSize,
+		appendCacheBlocks:    NewCache(),
+		appendCacheHashes:    NewCache(),
+		getCacheBlocks:       NewCache(),
+		getCacheHashes:       NewCache(),
 		retrievedBlocks:      make(map[uint64]AncientObjectS3),
 		blockCache:           make(map[uint64]AncientObjectS3),
 		blockCacheS:          []uint64{},

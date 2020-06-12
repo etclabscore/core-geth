@@ -690,22 +690,23 @@ func (f *freezerRemoteS3) pushHashCache() error {
 
 	set := []common.Hash{}
 	uploads := []s3manager.BatchUploadObject{}
-	dict := []uint64{}
+	dict := make([]uint64, len(f.hashCache)) // optimize with prealloc
 	remainders := []uint64{}
 
 	f.cacheLock.Lock()
-	defer f.cacheLock.Unlock()
-
+	i := 0
 	for k := range f.hashCache {
-		if sliceIndexOf(dict, k) < 0 {
-			dict = append(dict, k)
-		}
+		dict[i] = k
+		i++
 	}
+	f.cacheLock.Unlock()
 	sort.Slice(dict, func(i, j int) bool {
 		return dict[i] < dict[j]
 	})
 	for i, n := range dict {
+		f.cacheLock.Lock()
 		v := f.hashCache[n]
+		f.cacheLock.Unlock()
 		set = append(set, v)
 		remainders = append(remainders, n)
 
@@ -738,7 +739,9 @@ func (f *freezerRemoteS3) pushHashCache() error {
 
 	for _, v := range dict {
 		if sliceIndexOf(remainders, v) < 0 {
+			f.cacheLock.Lock()
 			delete(f.hashCache, v)
+			f.cacheLock.Unlock()
 		}
 	}
 	return nil

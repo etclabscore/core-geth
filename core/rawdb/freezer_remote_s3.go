@@ -18,6 +18,7 @@ package rawdb
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -42,8 +43,17 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
-var s3BlocksGroupSize = uint64(32 * 4)
+var s3BlocksGroupSize = uint64(32 * 32)
 var s3HashesGroupSize = uint64(32 * 32 * 32)
+
+type s3encodingT string
+
+const (
+	s3EncodeJSON   s3encodingT = ".json"
+	s3EncodeJSONGZ s3encodingT = ".json.gz"
+)
+
+var s3Encoding = s3EncodeJSONGZ
 
 // var errBadMod = errors.New("mod mismatch")
 
@@ -61,6 +71,9 @@ func init() {
 			panic(err)
 		}
 		s3HashesGroupSize = i
+	}
+	if v := os.Getenv("GETH_FREEZER_S3_ENCODING"); v != "" {
+		s3Encoding = s3encodingT(v)
 	}
 }
 
@@ -81,6 +94,7 @@ type freezerRemoteS3 struct {
 
 	frozen *uint64 // the length of the frozen blocks (next appended must == val)
 
+	encoding             s3encodingT
 	blockObjectGroupSize uint64 // how many blocks to include in a single S3 object
 	hashObjectGroupSize  uint64
 
@@ -302,11 +316,11 @@ func (c *cache) get(n uint64) (interface{}, bool) {
 func awsKeyBlock(number uint64) string {
 	// Keep blocks in a dir.
 	// This namespaces the resource, separating it from the 'index-marker' object.
-	return fmt.Sprintf("blocks/%09d.json", number)
+	return fmt.Sprintf("blocks/%09d%s", number, s3Encoding)
 }
 
 func awsKeyHash(number uint64) string {
-	return fmt.Sprintf("hashes/%09d.json", number)
+	return fmt.Sprintf("hashes/%09d%s", number, s3Encoding)
 }
 
 func (f *freezerRemoteS3) blockObjectKeyForN(n uint64) string {
@@ -367,7 +381,7 @@ func (f *freezerRemoteS3) downloadBlocksObject(n uint64) error {
 		return err
 	}
 	target := []AncientObjectS3{}
-	err = json.Unmarshal(buf.Bytes(), &target)
+	err = f.decodeObject(buf.Bytes(), &target)
 	if err != nil {
 		return err
 	}
@@ -403,7 +417,7 @@ func (f *freezerRemoteS3) downloadHashesObject(n uint64) error {
 		return err
 	}
 	target := []common.Hash{}
-	err = json.Unmarshal(buf.Bytes(), &target)
+	err = f.decodeObject(buf.Bytes(), &target)
 	if err != nil {
 		return err
 	}
@@ -463,18 +477,31 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 	var err error
 
 	f := &freezerRemoteS3{
-		namespace:            namespace,
-		quit:                 make(chan struct{}),
-		readMeter:            readMeter,
-		writeMeter:           writeMeter,
-		sizeGauge:            sizeGauge,
+		namespace:  namespace,
+		quit:       make(chan struct{}),
+		readMeter:  readMeter,
+		writeMeter: writeMeter,
+		sizeGauge:  sizeGauge,
+
+		// Globals for now. Should probably become CLI flags.
+		// Maybe Remote Freezers need a config struct.
 		blockObjectGroupSize: s3BlocksGroupSize,
 		hashObjectGroupSize:  s3HashesGroupSize,
-		wCacheBlocks:         newCache(),
-		wCacheHashes:         newCache(),
-		rCacheBlocks:         newCache(),
-		rCacheHashes:         newCache(),
-		log:                  log.New("remote", "s3"),
+
+		wCacheBlocks: newCache(),
+		wCacheHashes: newCache(),
+		rCacheBlocks: newCache(),
+		rCacheHashes: newCache(),
+		log:          log.New("remote", "s3"),
+	}
+
+	switch s3Encoding {
+	case s3EncodeJSONGZ:
+		f.encoding = s3EncodeJSONGZ
+	case s3EncodeJSON:
+		f.encoding = s3EncodeJSON
+	default:
+		return nil, fmt.Errorf("unknown encoding: %s", s3Encoding)
 	}
 
 	/*
@@ -739,18 +766,18 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 
 func (f *freezerRemoteS3) pushWCaches() error {
 	var err error
-	err = f.pushCacheBatch(f.wCacheBlocks, f.blockObjectGroupSize, f.blockObjectKeyForN, f.blockCacheBatchFn)
+	err = f.pushCacheBatch(f.wCacheBlocks, f.blockObjectGroupSize, f.blockObjectKeyForN, f.blockCacheBatchObjectFn)
 	if err != nil {
 		return err
 	}
-	err = f.pushCacheBatch(f.wCacheHashes, f.hashObjectGroupSize, f.hashObjectKeyForN, f.hashCacheBatchFn)
+	err = f.pushCacheBatch(f.wCacheHashes, f.hashObjectGroupSize, f.hashObjectKeyForN, f.hashCacheBatchObjectFn)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (f *freezerRemoteS3) pushCacheBatch(cache *cache, size uint64, keyFn func(uint64) string, setFn func([]interface{}) ([]byte, error)) error {
+func (f *freezerRemoteS3) pushCacheBatch(cache *cache, size uint64, keyFn func(uint64) string, batchObjFn func([]interface{}) (interface{})) error {
 	if cache.len() == 0 {
 		return nil
 	}
@@ -764,7 +791,7 @@ func (f *freezerRemoteS3) pushCacheBatch(cache *cache, size uint64, keyFn func(u
 			panic(fmt.Sprintf("bad mod: n=%d r=%d mod=%d len=%d", n, n%size, size, cache.len()))
 		}
 		batch := cache.batch(0, size)
-		b, err := setFn(batch)
+		b, err := f.encodeObject(batchObjFn(batch))
 		if err != nil {
 			return err
 		}
@@ -790,28 +817,58 @@ func (f *freezerRemoteS3) pushCacheBatch(cache *cache, size uint64, keyFn func(u
 	return nil
 }
 
-func (f *freezerRemoteS3) blockCacheBatchFn(items []interface{}) ([]byte, error) {
-	batchSet := make([]AncientObjectS3, len(items))
-	for i, v := range items {
-		batchSet[i] = v.(AncientObjectS3)
-	}
-	b, err := json.Marshal(batchSet)
+func (f *freezerRemoteS3) encodeObject(any interface{}) ([]byte, error) {
+	b, err := json.Marshal(any)
 	if err != nil {
 		return nil, err
+	}
+	if f.encoding == s3EncodeJSONGZ {
+		w := bytes.NewBuffer([]byte{})
+		gzW, _ := gzip.NewWriterLevel(w, gzip.BestCompression)
+		_, err = gzW.Write(b)
+		if err != nil {
+			gzW.Close()
+			return nil, err
+		}
+		gzW.Close()
+		b = w.Bytes()
 	}
 	return b, nil
 }
 
-func (f *freezerRemoteS3) hashCacheBatchFn(items []interface{}) ([]byte, error) {
+func (f *freezerRemoteS3) decodeObject(input []byte, target interface{}) error {
+	if f.encoding == s3EncodeJSONGZ {
+		r, err := gzip.NewReader(bytes.NewBuffer(input))
+		if err != nil {
+			return err
+		}
+		defer r.Close()
+		input, err = ioutil.ReadAll(r)
+		if err != nil {
+			return err
+		}
+	}
+	err := json.Unmarshal(input, target)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (f *freezerRemoteS3) blockCacheBatchObjectFn(items []interface{}) (interface{}) {
+	batchSet := make([]AncientObjectS3, len(items))
+	for i, v := range items {
+		batchSet[i] = v.(AncientObjectS3)
+	}
+	return batchSet
+}
+
+func (f *freezerRemoteS3) hashCacheBatchObjectFn(items []interface{}) (interface{}) {
 	batchSet := make([]common.Hash, len(items))
 	for i, v := range items {
 		batchSet[i] = v.(common.Hash)
 	}
-	b, err := json.Marshal(batchSet)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
+	return batchSet
 }
 
 // sync flushes all data tables to disk.

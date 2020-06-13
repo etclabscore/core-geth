@@ -42,8 +42,10 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
-var s3BlocksGroupSize = uint64(32)
+var s3BlocksGroupSize = uint64(32 * 4)
 var s3HashesGroupSize = uint64(32 * 32 * 32)
+
+// var errBadMod = errors.New("mod mismatch")
 
 func init() {
 	if v := os.Getenv("GETH_FREEZER_S3_BLOCK_GROUP_SIZE"); v != "" {
@@ -415,24 +417,6 @@ func (f *freezerRemoteS3) downloadHashesObject(n uint64) error {
 	return nil
 }
 
-func (f *freezerRemoteS3) findCached(n uint64, kind string) ([]byte, bool) {
-	if kind == freezerHashTable {
-		if v, ok := f.wCacheHashes.get(n); ok {
-			return v.(common.Hash).Bytes(), ok
-		}
-		if v, ok := f.rCacheHashes.get(n); ok {
-			return v.(common.Hash).Bytes(), ok
-		}
-	}
-	if v, ok := f.wCacheBlocks.get(n); ok {
-		return v.(AncientObjectS3).RLPBytesForKind(kind), ok
-	}
-	if v, ok := f.rCacheBlocks.get(n); ok {
-		return v.(AncientObjectS3).RLPBytesForKind(kind), ok
-	}
-	return nil, false
-}
-
 func (f *freezerRemoteS3) pullWCacheBlocks(n uint64) error {
 	f.log.Info("Pulling write blocks cache", "n", n)
 	err := f.downloadBlocksObject(n)
@@ -453,6 +437,24 @@ func (f *freezerRemoteS3) pullWCacheHashes(n uint64) error {
 	f.rCacheHashes.onto(f.wCacheHashes)
 	f.log.Info("Finished pulling hashes cache", "n", n, "size", f.wCacheHashes.len())
 	return nil
+}
+
+func (f *freezerRemoteS3) findCached(n uint64, kind string) ([]byte, bool) {
+	if kind == freezerHashTable {
+		if v, ok := f.wCacheHashes.get(n); ok {
+			return v.(common.Hash).Bytes(), ok
+		}
+		if v, ok := f.rCacheHashes.get(n); ok {
+			return v.(common.Hash).Bytes(), ok
+		}
+	}
+	if v, ok := f.wCacheBlocks.get(n); ok {
+		return v.(AncientObjectS3).RLPBytesForKind(kind), ok
+	}
+	if v, ok := f.rCacheBlocks.get(n); ok {
+		return v.(AncientObjectS3).RLPBytesForKind(kind), ok
+	}
+	return nil, false
 }
 
 // newFreezer creates a chain freezer that moves ancient chain data into
@@ -594,7 +596,7 @@ func (f *freezerRemoteS3) Ancients() (uint64, error) {
 	}
 	s := strings.TrimSpace(string(contents))
 	i, err := strconv.ParseUint(s, 10, 64)
-	f.log.Info("Finished retrieving ancients num", "s", s, "n", i, "err?", err)
+	f.log.Info("Finished retrieving ancients num", "s", s, "n", i, "err", err)
 	return i, err
 }
 
@@ -650,11 +652,11 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 //   Also make sure that the Marker is working as expected.
 func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 
-	n := atomic.LoadUint64(f.frozen)
-	f.log.Info("Truncating ancients", "frozen", n, "target", items, "delta", n-items)
-
 	f.mu.Lock()
 	defer f.mu.Unlock()
+
+	n := atomic.LoadUint64(f.frozen)
+	f.log.Info("Truncating ancients", "frozen", n, "target", items, "delta", n-items)
 
 	var err error
 
@@ -668,13 +670,18 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 		// So we need to download the corresponding target batch (clearing the current) and truncate that.
 		// The S3 delete iterator will delete all object at and above the target.
 		// Once the iterator finishes, the newly-truncated target batch will get pushes back up.
+		f.log.Warn("Target block below current batch")
+		f.wCacheBlocks.reset()
 		err = f.pullWCacheBlocks(items)
 		if err != nil {
 			return err
 		}
+
 	}
+
 	_, ok = f.wCacheHashes.get(items)
 	if !ok {
+		f.wCacheHashes.reset()
 		err = f.pullWCacheHashes(items)
 		if err != nil {
 			return err
@@ -719,7 +726,7 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	if err != nil {
 		return err
 	}
-	
+
 	err = f.setIndexMarker(items)
 	if err != nil {
 		return err
@@ -731,12 +738,31 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	return nil
 }
 
+func (f *freezerRemoteS3) pushWCaches() error {
+	var err error
+	err = f.pushCacheBatch(f.wCacheBlocks, f.blockObjectGroupSize, f.blockObjectKeyForN, f.blockCacheBatchFn)
+	if err != nil {
+		return err
+	}
+	err = f.pushCacheBatch(f.wCacheHashes, f.hashObjectGroupSize, f.hashObjectKeyForN, f.hashCacheBatchFn)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (f *freezerRemoteS3) pushCacheBatch(cache *cache, size uint64, keyFn func(uint64) string, setFn func([]interface{}) ([]byte, error)) error {
 	if cache.len() == 0 {
 		return nil
 	}
 	uploads := []s3manager.BatchUploadObject{}
 	n := cache.firstN()
+
+	// sanity
+	if n%size != 0 {
+		panic(fmt.Sprintf("bad mod: n=%d r=%d mod=%d len=%d", n, n%size, size, cache.len()))
+	}
+
 	offset := uint64(0)
 	batch := cache.batch(offset, size)
 	spliceFirstN := uint64(0)
@@ -770,62 +796,52 @@ func (f *freezerRemoteS3) pushCacheBatch(cache *cache, size uint64, keyFn func(u
 	return nil
 }
 
-func (f *freezerRemoteS3) pushWCaches() error {
-	var err error
-	if n := f.wCacheBlocks.firstN(); n % f.blockObjectGroupSize != 0 {
-		err = f.pullWCacheBlocks(n-f.blockObjectGroupSize)
-		if err != nil {
-			return err
+func (f *freezerRemoteS3) blockCacheBatchFn(items []interface{}) ([]byte, error) {
+	batchSet := make([]AncientObjectS3, len(items))
+	for i, v := range items {
+		batchSet[i] = v.(AncientObjectS3)
+	}
+	if len(batchSet) > 0 {
+		if n := batchSet[0].Header.Number.Uint64(); n % f.blockObjectGroupSize != 0 {
+			panic("bad mod")
 		}
 	}
-	err = f.pushCacheBatch(f.wCacheBlocks, f.blockObjectGroupSize, f.blockObjectKeyForN,
-		func(items []interface{}) ([]byte, error) {
-			batchSet := make([]AncientObjectS3, len(items))
-			for i, v := range items {
-				batchSet[i] = v.(AncientObjectS3)
-			}
-			b, err := json.Marshal(batchSet)
-			if err != nil {
-				return nil, err
-			}
-			return b, nil
-		})
+	b, err := json.Marshal(batchSet)
 	if err != nil {
-		return err
+		return nil, err
 	}
+	return b, nil
+}
 
-	if n := f.wCacheHashes.firstN(); n % f.hashObjectGroupSize != 0 {
-		err = f.pullWCacheHashes(n-f.hashObjectGroupSize)
-		if err != nil {
-			return err
-		}
+func (f *freezerRemoteS3) hashCacheBatchFn(items []interface{}) ([]byte, error) {
+	batchSet := make([]common.Hash, len(items))
+	for i, v := range items {
+		batchSet[i] = v.(common.Hash)
 	}
-	err = f.pushCacheBatch(f.wCacheHashes, f.hashObjectGroupSize, f.hashObjectKeyForN,
-		func(items []interface{}) ([]byte, error) {
-			batchSet := make([]common.Hash, len(items))
-			for i, v := range items {
-				batchSet[i] = v.(common.Hash)
-			}
-			b, err := json.Marshal(batchSet)
-			if err != nil {
-				return nil, err
-			}
-			return b, nil
-		})
+	b, err := json.Marshal(batchSet)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return b, nil
 }
 
 // sync flushes all data tables to disk.
 func (f *freezerRemoteS3) Sync() error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+
 	n := atomic.LoadUint64(f.frozen)
 	lenBlocks := f.wCacheBlocks.len()
 	f.log.Info("Syncing ancients", "frozen", n, "blocks", lenBlocks)
 
-	f.mu.Lock()
-	defer f.mu.Unlock()
+	if lenBlocks > 0 {
+		if r := f.wCacheBlocks.firstN() % f.blockObjectGroupSize; r != 0 {
+			f.log.Error("Wrong mod in cache", "len", lenBlocks, "n", f.wCacheBlocks.firstN(), "r", r)
+			f.wCacheBlocks.splice(r)
+			f.wCacheHashes.splice(r)
+			return nil
+		}
+	}
 
 	var err error
 	start := time.Now()

@@ -18,6 +18,7 @@ package rawdb
 
 import (
 	"log"
+	"sync"
 
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/metrics"
@@ -66,6 +67,7 @@ type freezerRemote struct {
 		instanceLock fileutil.Releaser        // File-system lock to prevent double opens
 	*/
 	service ethdb.AncientStore
+	mu sync.Mutex
 
 	quit chan struct{}
 }

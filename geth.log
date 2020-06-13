@@ -1,119 +1,86 @@
 env GO111MODULE=on go run build/ci.go install
->>> /home/ia/go1.14.3.linux-amd64/bin/go install -ldflags -X main.gitCommit=96c21948a4c8ed6227d425bf45c42f8170359de6 -X main.gitDate=20200611 -v ./...
-INFO [06-11|21:13:12.286] Starting Geth on Ethereum Classic... 
-INFO [06-11|21:13:12.286] Bumping default cache on mainnet         provided=1024 updated=4096
-INFO [06-11|21:13:12.288] Maximum peer count                       ETH=50 LES=0 total=50
-INFO [06-11|21:13:12.288] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
-INFO [06-11|21:13:12.308] Starting peer-to-peer node               instance=CoreGeth/v1.11.6-unstable-96c21948-20200611/linux-amd64/go1.14.3
-INFO [06-11|21:13:12.308] Allocated trie memory caches             clean=614.00MiB dirty=1024.00MiB
-INFO [06-11|21:13:12.308] Allocated cache and file handles         database=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/chaindata cache=2.00GiB handles=524288
-INFO [06-11|21:13:12.436] New remote freezer                       freezer=s3 namespace=coregeth-classic-parasail
-INFO [06-11|21:13:12.436] New session                              remote=s3 region=0xc000126690
-INFO [06-11|21:13:12.436] Creating bucket if not exists            remote=s3 name=coregeth-classic-parasail
-INFO [06-11|21:13:13.587] Bucket created                           remote=s3 name=coregeth-classic-parasail result="{\n  Location: \"/coregeth-classic-parasail\"\n}" elapsed=1.151040764s
-INFO [06-11|21:13:13.587] Retrieving ancients number               remote=s3
-INFO [06-11|21:13:13.638] Finished retrieving ancients num         remote=s3 n=49645
-INFO [06-11|21:13:13.638] Pulling cache                            remote=s3 n=49645
-INFO [06-11|21:13:13.775] Finished pulling cache                   remote=s3 n=49645 size=32
-INFO [06-11|21:13:13.775] Pulling hashcache                        remote=s3 n=49645
-INFO [06-11|21:13:14.037] Finished pulling hashcache               remote=s3 n=49645 size=16896
-DEBUG[06-11|21:13:14.037] Current full block hash unavailable 
-INFO [06-11|21:13:14.515] Persisted trie from memory database      nodes=12356 size=1.78MiB time=20.759267ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
-INFO [06-11|21:13:14.648] Persisted trie from memory database      nodes=12356 size=1.78MiB time=37.521946ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
-INFO [06-11|21:13:14.649] Initialised chain configuration          config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
-INFO [06-11|21:13:14.649] Disk storage enabled for ethash caches   dir=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/ethash count=3
-INFO [06-11|21:13:14.649] Disk storage enabled for ethash DAGs     dir=/home/ia/.ethash count=2
-INFO [06-11|21:13:14.649] Initialising Ethereum protocol           versions="[65 64 63]" network=1 dbversion=<nil>
-WARN [06-11|21:13:14.649] Upgrade blockchain database version      from=<nil> to=7
-INFO [06-11|21:13:14.723] Initialized database from freezer        blocks=49645 elapsed=73.436ms
-INFO [06-11|21:13:14.723] Loaded most recent local header          number=49644 hash="76671b…0dc664" td=47803636241618867 age=4y11mo6h
-INFO [06-11|21:13:14.723] Loaded most recent local full block      number=0     hash="d4e567…cb8fa3" td=17179869184       age=51y2mo5d
-INFO [06-11|21:13:14.723] Loaded most recent local fast block      number=49644 hash="76671b…0dc664" td=47803636241618867 age=4y11mo6h
-DEBUG[06-11|21:13:14.723] Reinjecting stale transactions           count=0
-INFO [06-11|21:13:14.723] Upgrading chain index                    type=bloombits percentage=0
-TRACE[06-11|21:13:14.723] Processing new chain section             type=bloombits section=0
-INFO [06-11|21:13:14.723] Indexed transactions                     blocks=1     txs=2 tail=49644 elapsed="84.583µs"
-INFO [06-11|21:13:14.724] Regenerated local transaction journal    transactions=0 accounts=0
-INFO [06-11|21:13:14.743] Allocated fast sync bloom                size=1.60GiB
-INFO [06-11|21:13:14.851] Initialized fast sync bloom              items=12356 errorrate=0.000 elapsed=107.608ms
-INFO [06-11|21:13:14.868] New local node record                    seq=1 id=d81d78c22f52d5fb ip=127.0.0.1 udp=30303 tcp=30303
-INFO [06-11|21:13:14.869] Started P2P networking                   self=enode://5d3834c78aaea4ae6f420a511878aa67e1d3fb86aa37783b67962bcb99d3c648f4ffa7c4d999e073f4382dfb6e550a12316aef51cba7d84a5ec2e5104d4b874c@127.0.0.1:30303
-INFO [06-11|21:13:14.870] IPC endpoint opened                      url=/home/ia/.ethereum/geth.ipc
-INFO [06-11|21:13:14.883] Mapped network port                      proto=tcp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
-INFO [06-11|21:13:14.892] Mapped network port                      proto=udp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
-INFO [06-11|21:13:14.898] New local node record                    seq=2 id=d81d78c22f52d5fb ip=24.207.216.46 udp=30303 tcp=30303
-INFO [06-11|21:13:19.060] Block synchronisation started 
-WARN [06-11|21:13:19.530] Synchronisation failed, dropping peer    peer=1b6f594e5f3c3031 err="action from bad peer ignored"
-INFO [06-11|21:13:25.480] Upgrading chain index                    type=bloombits percentage=8
-TRACE[06-11|21:13:25.480] Processing new chain section             type=bloombits section=1
-INFO [06-11|21:13:27.437] Imported new block headers               count=384 elapsed=640.241ms    number=50028 hash="d4b1a9…2e80f5" age=4y11mo4h
-INFO [06-11|21:13:27.440] Syncing ancients                         remote=s3 frozen=49647 blocks=32
-INFO [06-11|21:13:27.456] Imported new block headers               count=192 elapsed=16.396ms     number=50220 hash="12fdee…8d1ed7" age=4y11mo3h
-INFO [06-11|21:13:27.475] Imported new block headers               count=192 elapsed=17.265ms     number=50412 hash="eb1c26…d5a55d" age=4y11mo3h
-INFO [06-11|21:13:27.476] Imported new state entries               count=273 elapsed="1.25µs"     processed=273 pending=4369 retry=0 duplicate=0 unexpected=0
-INFO [06-11|21:13:28.289] Imported new state entries               count=409 elapsed="2.124µs"    processed=682 pending=10913 retry=0 duplicate=0 unexpected=0
-INFO [06-11|21:13:29.394] Imported new state entries               count=508 elapsed="3.678µs"    processed=1190 pending=19011 retry=6 duplicate=0 unexpected=0
-INFO [06-11|21:13:30.701] Imported new state entries               count=768 elapsed="143.74µs"   processed=1958 pending=22511 retry=2 duplicate=0 unexpected=0
-INFO [06-11|21:13:31.461] Setting index marker                     remote=s3 number=49647
-INFO [06-11|21:13:31.550] Finished syncing ancients                remote=s3 frozen=49647 blocks=32    elapsed=4.021116078s bps=7.96
-INFO [06-11|21:13:31.550] Imported new block receipts              count=2   elapsed=4.110s       number=49646 hash="aaa27b…96e101" age=4y11mo6h size=1.14KiB
-INFO [06-11|21:13:31.578] Syncing ancients                         remote=s3 frozen=50413 blocks=766
-INFO [06-11|21:13:31.578] Pulling cache                            remote=s3 n=49647
-INFO [06-11|21:13:31.686] Finished pulling cache                   remote=s3 n=49647 size=781
-INFO [06-11|21:13:31.936] Imported new state entries               count=1153 elapsed=2.193ms      processed=3111 pending=22061 retry=382 duplicate=0 unexpected=0
-INFO [06-11|21:13:32.824] Imported new state entries               count=768  elapsed=6.856ms      processed=3879 pending=21641 retry=7   duplicate=0 unexpected=0
-INFO [06-11|21:13:33.387] Imported new state entries               count=1152 elapsed=7.405ms      processed=5031 pending=21129 retry=2   duplicate=0 unexpected=0
-INFO [06-11|21:13:33.813] Imported new state entries               count=1039 elapsed=6.155ms      processed=6070 pending=20346 retry=2   duplicate=0 unexpected=0
-INFO [06-11|21:13:33.994] Imported new block headers               count=2048 elapsed=121.095ms    number=52460 hash="aa7557…b8af6e" age=4y10mo4w
-INFO [06-11|21:13:34.128] Imported new block headers               count=2048 elapsed=117.346ms    number=54508 hash="7b7519…c6f736" age=4y10mo4w
-INFO [06-11|21:13:34.265] Imported new block headers               count=2048 elapsed=121.867ms    number=56556 hash="3d04a5…789ed8" age=4y10mo4w
-INFO [06-11|21:13:34.406] Imported new block headers               count=2048 elapsed=122.297ms    number=58604 hash="c12ae7…a0d0e2" age=4y10mo4w
-INFO [06-11|21:13:34.557] Imported new block headers               count=2048 elapsed=133.580ms    number=60652 hash="c24d54…f509fd" age=4y10mo4w
-INFO [06-11|21:13:34.702] Imported new block headers               count=2048 elapsed=127.379ms    number=62700 hash="24824d…a7f561" age=4y10mo3w
-INFO [06-11|21:13:34.857] Imported new block headers               count=2048 elapsed=138.112ms    number=64748 hash="e2f46b…e430d7" age=4y10mo3w
-INFO [06-11|21:13:35.034] Imported new state entries               count=1071 elapsed=2.378ms      processed=7141 pending=20811 retry=4   duplicate=0 unexpected=0
-INFO [06-11|21:13:35.047] Imported new block headers               count=2048 elapsed=166.403ms    number=66796 hash="e8f6cc…c68ae0" age=4y10mo3w
-INFO [06-11|21:13:35.194] Imported new block headers               count=2048 elapsed=127.555ms    number=68844 hash="59d889…72cd2e" age=4y10mo3w
-INFO [06-11|21:13:35.342] Imported new block headers               count=2048 elapsed=127.796ms    number=70892 hash="eb6b78…28b8a2" age=4y10mo3w
-INFO [06-11|21:13:35.382] Imported new block headers               count=448  elapsed=29.724ms     number=71340 hash="a5fb70…895bdf" age=4y10mo3w
-INFO [06-11|21:13:35.841] Imported new state entries               count=1165 elapsed=6.982ms      processed=8306 pending=21533 retry=0   duplicate=0 unexpected=0
-INFO [06-11|21:13:36.697] Imported new state entries               count=1020 elapsed=7.511ms      processed=9326 pending=20858 retry=366 duplicate=0 unexpected=0
-INFO [06-11|21:13:37.548] Imported new state entries               count=759  elapsed=4.569ms      processed=10085 pending=21605 retry=695 duplicate=0 unexpected=0
-INFO [06-11|21:13:38.118] Imported new state entries               count=1005 elapsed=6.400ms      processed=11090 pending=21619 retry=0   duplicate=0 unexpected=0
-INFO [06-11|21:13:38.985] Imported new state entries               count=889  elapsed=7.172ms      processed=11979 pending=21288 retry=0   duplicate=0 unexpected=0
-INFO [06-11|21:13:39.720] Imported new state entries               count=785  elapsed=1.734ms      processed=12764 pending=22041 retry=2   duplicate=0 unexpected=0
-INFO [06-11|21:13:39.720] Setting index marker                     remote=s3 number=50413
-INFO [06-11|21:13:39.802] Finished syncing ancients                remote=s3 frozen=50413 blocks=766   elapsed=8.141550935s bps=94.09
-INFO [06-11|21:13:39.960] Imported new state entries               count=840  elapsed=7.119ms      processed=13604 pending=21389 retry=2   duplicate=0 unexpected=0
-INFO [06-11|21:13:39.985] Imported new block receipts              count=766  elapsed=8.427s       number=50412 hash="eb1c26…d5a55d" age=4y11mo3h size=508.71KiB
-INFO [06-11|21:13:40.095] Syncing ancients                         remote=s3 frozen=52072 blocks=1672
-INFO [06-11|21:13:41.062] Imported new state entries               count=1176 elapsed=10.300ms     processed=14780 pending=20627 retry=26  duplicate=0 unexpected=0
-INFO [06-11|21:13:41.186] Imported new state entries               count=766  elapsed=3.134ms      processed=15546 pending=22554 retry=4   duplicate=0 unexpected=0
-INFO [06-11|21:13:41.803] Imported new state entries               count=993  elapsed=4.868ms      processed=16539 pending=22010 retry=3   duplicate=0 unexpected=0
-INFO [06-11|21:13:41.927] Imported new state entries               count=853  elapsed=2.327ms      processed=17392 pending=21458 retry=2   duplicate=0 unexpected=0
-INFO [06-11|21:13:42.668] Imported new state entries               count=886  elapsed=2.544ms      processed=18278 pending=20900 retry=372 duplicate=0 unexpected=0
-INFO [06-11|21:13:43.199] Imported new state entries               count=836  elapsed=2.487ms      processed=19114 pending=20379 retry=2   duplicate=0 unexpected=0
-INFO [06-11|21:13:43.687] Imported new state entries               count=1044 elapsed=8.883ms      processed=20158 pending=20040 retry=127 duplicate=0 unexpected=0
-INFO [06-11|21:13:43.887] Imported new state entries               count=776  elapsed=4.648ms      processed=20934 pending=21406 retry=2   duplicate=0 unexpected=0
-INFO [06-11|21:13:44.652] Imported new state entries               count=1173 elapsed=9.978ms      processed=22107 pending=21880 retry=3   duplicate=0 unexpected=0
-INFO [06-11|21:13:44.994] Imported new state entries               count=714  elapsed=4.883ms      processed=22821 pending=22474 retry=507 duplicate=0 unexpected=0
-INFO [06-11|21:13:45.359] Imported new state entries               count=772  elapsed=2.673ms      processed=23593 pending=21902 retry=488 duplicate=0 unexpected=0
-INFO [06-11|21:13:45.889] Upgrading chain index                    type=bloombits percentage=16
-TRACE[06-11|21:13:45.889] Processing new chain section             type=bloombits section=2
-INFO [06-11|21:13:46.126] Imported new state entries               count=1247 elapsed=9.121ms      processed=24840 pending=21823 retry=228 duplicate=0 unexpected=0
-INFO [06-11|21:13:46.663] Imported new state entries               count=1038 elapsed=8.695ms      processed=25878 pending=22179 retry=4   duplicate=0 unexpected=0
-INFO [06-11|21:13:46.867] Imported new state entries               count=894  elapsed=8.586ms      processed=26772 pending=22093 retry=2   duplicate=0 unexpected=0
-INFO [06-11|21:13:47.187] Imported new state entries               count=791  elapsed=7.784ms      processed=27563 pending=21767 retry=315 duplicate=0 unexpected=0
-INFO [06-11|21:13:47.584] Imported new state entries               count=870  elapsed=9.883ms      processed=28433 pending=21911 retry=3   duplicate=0 unexpected=0
-INFO [06-11|21:13:48.255] Imported new state entries               count=1006 elapsed=8.659ms      processed=29439 pending=21620 retry=4   duplicate=0 unexpected=0
-INFO [06-11|21:13:48.396] Imported new state entries               count=1170 elapsed=10.200ms     processed=30609 pending=21497 retry=2   duplicate=0 unexpected=0
-INFO [06-11|21:13:48.963] Imported new state entries               count=922  elapsed=5.449ms      processed=31531 pending=23995 retry=0   duplicate=0 unexpected=0
-INFO [06-11|21:13:49.000] Imported new state entries               count=384  elapsed=1.218ms      processed=31915 pending=27978 retry=2   duplicate=0 unexpected=0
-INFO [06-11|21:13:49.832] Imported new state entries               count=1296 elapsed=9.960ms      processed=33211 pending=33222 retry=2   duplicate=0 unexpected=0
-INFO [06-11|21:13:50.220] Imported new state entries               count=1034 elapsed=2.334ms      processed=34245 pending=32824 retry=125 duplicate=0 unexpected=0
-INFO [06-11|21:13:50.456] Imported new block headers               count=2048 elapsed=132.818ms    number=73388 hash="56232c…a31e37" age=4y10mo3w
-INFO [06-11|21:13:50.519] Imported new block headers               count=832  elapsed=51.343ms     number=74220 hash="ed6070…36fef1" age=4y10mo3w
-INFO [06-11|21:13:50.594] Imported new state entries               count=889  elapsed=3.830ms      processed=35134 pending=34902 retry=2   duplicate=0 unexpected=0
-INFO [06-11|21:13:50.704] Imported new state entries               count=384  elapsed=1.673ms      processed=35518 pending=37553 retry=3   duplicate=0 unexpected=0
-INFO [06-11|21:13:51.107] Imported new state entries               count=1271 elapsed=7.912ms      processed=36789 pending=38274 retry=0   duplicate=0 unexpected=0
-INFO [06-11|21:13:51.874] Imported new state entries               count=1282 elapsed=2.237ms      processed=38071 pending=39249 retry=1   duplicate=0 unexpected=0
+>>> /home/ia/go1.14.3.linux-amd64/bin/go install -ldflags -X main.gitCommit=5882294005cf18e027fa8fcf938f48ae17d236bb -X main.gitDate=20200612 -v ./...
+INFO [06-12|18:51:01.489] Starting Geth on Ethereum Classic... 
+INFO [06-12|18:51:01.489] Bumping default cache on mainnet         provided=1024 updated=4096
+INFO [06-12|18:51:01.491] Maximum peer count                       ETH=50 LES=0 total=50
+INFO [06-12|18:51:01.491] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+INFO [06-12|18:51:01.500] Starting peer-to-peer node               instance=CoreGeth/v1.11.6-unstable-58822940-20200612/linux-amd64/go1.14.3
+INFO [06-12|18:51:01.500] Allocated trie memory caches             clean=614.00MiB dirty=1024.00MiB
+INFO [06-12|18:51:01.500] Allocated cache and file handles         database=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/chaindata cache=2.00GiB handles=524288
+INFO [06-12|18:51:02.341] New remote freezer                       freezer=s3 namespace=coregeth-classic-parasail
+INFO [06-12|18:51:02.341] New session                              remote=s3 region=us-east-1
+INFO [06-12|18:51:02.341] Creating bucket if not exists            remote=s3 name=coregeth-classic-parasail
+INFO [06-12|18:51:02.697] Bucket created                           remote=s3 name=coregeth-classic-parasail result="{\n  Location: \"/coregeth-classic-parasail\"\n}" elapsed=355.514473ms
+INFO [06-12|18:51:02.697] Retrieving ancients number               remote=s3
+INFO [06-12|18:51:02.750] Finished retrieving ancients num         remote=s3 s=18647 n=18647 err=nil
+INFO [06-12|18:51:02.750] Pulling write blocks cache               remote=s3 n=18647
+INFO [06-12|18:51:02.980] Finished pulling blocks cache            remote=s3 n=18647 size=128
+INFO [06-12|18:51:02.980] Pulling write hashes cache               remote=s3 n=18647
+INFO [06-12|18:51:12.845] Finished pulling hashes cache            remote=s3 n=18647 size=18647
+DEBUG[06-12|18:51:12.847] Current full block not old enough        number=0 hash="d4e567…cb8fa3" delay=90000
+INFO [06-12|18:51:13.353] Persisted trie from memory database      nodes=12356 size=1.78MiB time=18.646644ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+INFO [06-12|18:51:13.353] Found stored genesis block               config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
+INFO [06-12|18:51:13.354] Initialised chain configuration          config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
+INFO [06-12|18:51:13.354] Disk storage enabled for ethash caches   dir=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/ethash count=3
+INFO [06-12|18:51:13.354] Disk storage enabled for ethash DAGs     dir=/home/ia/.ethash count=2
+INFO [06-12|18:51:13.355] Initialising Ethereum protocol           versions="[65 64 63]" network=1 dbversion=7
+INFO [06-12|18:51:13.355] Loaded most recent local header          number=37824 hash="5358bb…94150e" td=31185287546551250 age=4y11mo3d
+INFO [06-12|18:51:13.356] Loaded most recent local full block      number=0     hash="d4e567…cb8fa3" td=17179869184       age=51y2mo5d
+INFO [06-12|18:51:13.356] Loaded most recent local fast block      number=18646 hash="a18c79…bfd0ec" td=9269472509940249  age=4y11mo1w
+DEBUG[06-12|18:51:13.356] Reinjecting stale transactions           count=0
+INFO [06-12|18:51:13.356] Upgrading chain index                    type=bloombits percentage=22
+TRACE[06-12|18:51:13.356] Processing new chain section             type=bloombits section=2
+INFO [06-12|18:51:13.356] Loaded local transaction journal         transactions=0 dropped=0
+INFO [06-12|18:51:13.357] Regenerated local transaction journal    transactions=0 accounts=0
+INFO [06-12|18:51:13.375] Allocated fast sync bloom                size=1.60GiB
+INFO [06-12|18:51:13.518] Mapped network port                      proto=tcp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
+INFO [06-12|18:51:13.531] Mapped network port                      proto=udp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
+INFO [06-12|18:51:13.802] New local node record                    seq=4 id=84022ca88126ebe4 ip=24.207.216.46 udp=30303 tcp=30303
+INFO [06-12|18:51:13.802] Started P2P networking                   self=enode://971d7f2835879244f6e21dd374eebc6a6a0dae92daf252042c37fb4c356ae5a4dca6519fb213762798488011d061d3566c374a1c5cfabdbb61a9b54ee1d23cc4@24.207.216.46:30303
+INFO [06-12|18:51:13.804] IPC endpoint opened                      url=/home/ia/.ethereum/geth.ipc
+INFO [06-12|18:51:13.978] Initialized fast sync bloom              items=353323 errorrate=0.000 elapsed=602.863ms
+INFO [06-12|18:51:16.172] Block synchronisation started 
+TRACE[06-12|18:51:17.226] Processing new chain section             type=bloombits section=3
+TRACE[06-12|18:51:20.708] Processing new chain section             type=bloombits section=4
+INFO [06-12|18:51:22.555] Upgrading chain index                    type=bloombits percentage=55
+TRACE[06-12|18:51:22.555] Processing new chain section             type=bloombits section=5
+TRACE[06-12|18:51:22.778] Processing new chain section             type=bloombits section=6
+TRACE[06-12|18:51:22.969] Processing new chain section             type=bloombits section=7
+TRACE[06-12|18:51:23.191] Processing new chain section             type=bloombits section=8
+INFO [06-12|18:51:23.304] Finished upgrading chain index           type=bloombits
+INFO [06-12|18:51:36.748] Imported new block headers               count=0    elapsed=42.641ms     number=20694 hash="c0ee73…9563df" age=4y11mo6d ignored=2048
+INFO [06-12|18:51:36.772] Syncing ancients                         remote=s3 frozen=18654 blocks=128
+INFO [06-12|18:51:36.819] Imported new block headers               count=0    elapsed=47.745ms     number=22742 hash="0b7cbb…d84686" age=4y11mo6d ignored=2048
+INFO [06-12|18:51:36.889] Imported new block headers               count=0    elapsed=46.165ms     number=24790 hash="87333d…09f779" age=4y11mo5d ignored=2048
+INFO [06-12|18:51:36.956] Imported new block headers               count=0    elapsed=41.470ms     number=26838 hash="ce3c1d…f6f7a6" age=4y11mo5d ignored=2048
+INFO [06-12|18:51:37.022] Imported new block headers               count=0    elapsed=41.768ms     number=28886 hash="025f11…4e43ba" age=4y11mo5d ignored=2048
+INFO [06-12|18:51:37.091] Imported new block headers               count=0    elapsed=44.390ms     number=30934 hash="3d9a73…8d6b93" age=4y11mo4d ignored=2048
+INFO [06-12|18:51:37.159] Imported new block headers               count=0    elapsed=43.077ms     number=32982 hash="3e5e53…f5efd1" age=4y11mo4d ignored=2048
+INFO [06-12|18:51:37.228] Imported new block headers               count=0    elapsed=42.673ms     number=35030 hash="e74736…75f41e" age=4y11mo4d ignored=2048
+INFO [06-12|18:51:37.300] Imported new block headers               count=0    elapsed=47.579ms     number=37078 hash="2bdb6f…e83337" age=4y11mo3d ignored=2048
+INFO [06-12|18:51:37.421] Imported new block headers               count=1302 elapsed=98.212ms     number=39126 hash="a8f5f0…90b780" age=4y11mo3d ignored=746
+INFO [06-12|18:51:37.577] Imported new block headers               count=2048 elapsed=131.648ms    number=41174 hash="750ba4…bc5f74" age=4y11mo2d
+INFO [06-12|18:51:37.732] Imported new block headers               count=2048 elapsed=130.928ms    number=43222 hash="5ac8f7…44f0e8" age=4y11mo2d
+INFO [06-12|18:51:38.404] Setting index marker                     remote=s3 number=18654
+INFO [06-12|18:51:38.462] Finished syncing ancients                remote=s3 frozen=18654 blocks=128 elapsed=1.631104034s bps=78.47
+INFO [06-12|18:51:38.705] Imported new block receipts              count=7    elapsed=1.932s       number=18653 hash="811cf4…9f3b16" age=4y11mo1w size=3.98KiB
+INFO [06-12|18:51:38.777] Syncing ancients                         remote=s3 frozen=20702 blocks=2048
+ERROR[06-12|18:51:38.778] Wrong mod in cache                       remote=s3 len=2048 n=18654 r=94
+INFO [06-12|18:51:38.883] Imported new block receipts              count=2048 elapsed=160.258ms    number=20701 hash="4ee594…78c8b5" age=4y11mo6d size=1.21MiB
+INFO [06-12|18:51:38.965] Syncing ancients                         remote=s3 frozen=22750 blocks=4002
+ERROR[06-12|18:51:38.965] Wrong mod in cache                       remote=s3 len=4002 n=18748 r=60
+INFO [06-12|18:51:39.096] Imported new block receipts              count=2048 elapsed=183.018ms    number=22749 hash="f17f81…f33280" age=4y11mo6d size=1.21MiB
+INFO [06-12|18:51:39.164] Syncing ancients                         remote=s3 frozen=24798 blocks=5990
+ERROR[06-12|18:51:39.164] Wrong mod in cache                       remote=s3 len=5990 n=18808 r=120
+INFO [06-12|18:51:39.309] Imported new block receipts              count=2048 elapsed=195.813ms    number=24797 hash="d8c562…f90709" age=4y11mo5d size=1.20MiB
+INFO [06-12|18:51:39.378] Syncing ancients                         remote=s3 frozen=26846 blocks=7918
+ERROR[06-12|18:51:39.378] Wrong mod in cache                       remote=s3 len=7918 n=18928 r=112
+INFO [06-12|18:51:39.525] Imported new block receipts              count=2048 elapsed=198.785ms    number=26845 hash="fa49aa…ca6224" age=4y11mo5d size=1.23MiB
+INFO [06-12|18:51:39.591] Syncing ancients                         remote=s3 frozen=28894 blocks=9854
+ERROR[06-12|18:51:39.591] Wrong mod in cache                       remote=s3 len=9854 n=19040 r=96
+INFO [06-12|18:51:39.754] Imported new block receipts              count=2048 elapsed=212.580ms    number=28893 hash="409e9e…f728d8" age=4y11mo5d size=1.22MiB
+INFO [06-12|18:51:39.818] Syncing ancients                         remote=s3 frozen=30942 blocks=11806
+ERROR[06-12|18:51:39.818] Wrong mod in cache                       remote=s3 len=11806 n=19136 r=64
+INFO [06-12|18:51:39.997] Imported new block receipts              count=2048 elapsed=226.788ms    number=30941 hash="c3c658…863416" age=4y11mo4d size=1.22MiB
+INFO [06-12|18:51:40.058] Syncing ancients                         remote=s3 frozen=32990 blocks=13790
+INFO [06-12|18:51:44.083] Imported new block headers               count=768  elapsed=58.905ms     number=43990 hash="bf5952…a359d8" age=4y11mo2d

@@ -3,6 +3,7 @@ package rawdb
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"math/big"
 	"testing"
@@ -63,7 +64,7 @@ func TestSpliceBackwards(t *testing.T) {
 
 func TestSlice(t *testing.T) {
 	a := []int{1, 2, 3, 4, 5}
-	t.Log(a[5:5])
+	t.Log(a[2:5])
 }
 
 func Test30kHashes(t *testing.T) {
@@ -78,4 +79,14 @@ func Test30kHashes(t *testing.T) {
 	}
 	c := bytes.Count(b, []byte(""))
 	t.Log(c)
+}
+
+func TestCache_TruncateFrom(t *testing.T) {
+	c := newCache()
+	for i := 0; i < 32; i++ {
+		c.add(uint64(i), fmt.Sprintf("n%d", i))
+	}
+	c.truncateFrom(32)
+	b := c.batch(0, 36)
+	t.Log(c.sl, b)
 }

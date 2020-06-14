@@ -359,7 +359,7 @@ func (f *freezerRemoteS3) initializeBucket() error {
 	if err != nil {
 		return err
 	}
-	f.log.Info("Bucket created", "name", bucketName, "result", result.String(), "elapsed", time.Since(start))
+	f.log.Info("Bucket created", "name", bucketName, "result", result.String(), "elapsed", common.PrettyDuration(time.Since(start)))
 	return nil
 }
 
@@ -760,7 +760,7 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 
 	atomic.StoreUint64(f.frozen, items)
 
-	f.log.Info("Finished truncating ancients", "elapsed", time.Since(start))
+	f.log.Info("Finished truncating ancients", "elapsed", common.PrettyDuration(time.Since(start)))
 	return nil
 }
 
@@ -920,7 +920,7 @@ func (f *freezerRemoteS3) Sync() error {
 		return err
 	}
 
-	f.log.Info("Finished syncing ancients", "frozen", n, "blocks", lenBlocks, "elapsed", elapsed, "bps", blocksPerSecond)
+	f.log.Info("Finished syncing ancients", "frozen", n, "blocks", lenBlocks, "elapsed", common.PrettyDuration(elapsed), "bps", blocksPerSecond)
 	f.mu.Unlock()
 	return err
 }

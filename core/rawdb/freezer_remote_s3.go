@@ -43,15 +43,17 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
-var s3BlocksGroupSize = uint64(32 * 32)
-var s3HashesGroupSize = uint64(32 * 32 * 32)
-
 const (
 	s3EncodeJSON   = ".json"
 	s3EncodeJSONGZ = ".json.gz"
 )
 
-var s3Encoding = s3EncodeJSONGZ
+var (
+	s3ROnly           = false
+	s3BlocksGroupSize = uint64(32 * 32)
+	s3HashesGroupSize = uint64(32 * 32 * 32)
+	s3Encoding        = s3EncodeJSONGZ
+)
 
 func init() {
 	if v := os.Getenv("GETH_FREEZER_S3_BLOCK_GROUP_SIZE"); v != "" {
@@ -71,6 +73,9 @@ func init() {
 	if v := os.Getenv("GETH_FREEZER_S3_ENCODING"); v != "" {
 		s3Encoding = v
 	}
+	if v := os.Getenv("GETH_FREEZER_S3_R_ONLY"); v != "" {
+		s3ROnly = true
+	}
 }
 
 type freezerRemoteS3 struct {
@@ -80,6 +85,8 @@ type freezerRemoteS3 struct {
 	namespace string
 	quit      chan struct{}
 	mu        sync.Mutex
+
+	readOnly bool
 
 	readMeter  metrics.Meter // Meter for measuring the effective amount of data read
 	writeMeter metrics.Meter // Meter for measuring the effective amount of data written
@@ -184,26 +191,18 @@ func (o AncientObjectS3) RLPBytesForKind(kind string) []byte {
 	}
 }
 
-func sliceIndexOf(sl []uint64, n uint64) int {
-	for i, s := range sl {
-		if s == n {
-			return i
-		}
-	}
-	return -1
-}
-
 type cache struct {
-	it *uint64
-	mu sync.Mutex
-	m  map[uint64]interface{}
-	sl []uint64
+	max int
+	mu  sync.Mutex
+	m   map[uint64]interface{}
+	sl  []uint64
 }
 
-func newCache() *cache {
+func newCache(max int) *cache {
 	return &cache{
-		m:  make(map[uint64]interface{}),
-		sl: []uint64{},
+		max: max,
+		m:   make(map[uint64]interface{}),
+		sl:  []uint64{},
 	}
 }
 
@@ -250,6 +249,11 @@ func (c *cache) add(n uint64, item interface{}) {
 			})
 		}
 	}
+	if c.max > 0 && c.len() > c.max {
+		c.mu.Unlock()
+		c.splice(1)
+		return
+	}
 	c.mu.Unlock()
 }
 
@@ -294,12 +298,10 @@ func (c *cache) splice(firstN uint64) {
 		c.mu.Unlock()
 		return
 	}
-	c.sl = c.sl[firstN:]
-	for k := range c.m {
-		if sliceIndexOf(c.sl, k) < 0 {
-			delete(c.m, k)
-		}
+	for _, v := range c.sl[:firstN] {
+		delete(c.m, v)
 	}
+	c.sl = c.sl[firstN:]
 	c.mu.Unlock()
 }
 
@@ -473,6 +475,13 @@ func (f *freezerRemoteS3) findCached(n uint64, kind string) ([]byte, bool) {
 func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, sizeGauge metrics.Gauge) (*freezerRemoteS3, error) {
 	var err error
 
+	cacheBlocksMax := 0
+	cacheHashesMax := 0
+	if s3ROnly {
+		cacheBlocksMax = int(s3BlocksGroupSize*2)
+		cacheHashesMax = int(s3HashesGroupSize*2)
+	}
+
 	f := &freezerRemoteS3{
 		namespace:  namespace,
 		quit:       make(chan struct{}),
@@ -480,15 +489,17 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 		writeMeter: writeMeter,
 		sizeGauge:  sizeGauge,
 
+		readOnly: s3ROnly,
+
 		// Globals for now. Should probably become CLI flags.
 		// Maybe Remote Freezers need a config struct.
 		blockObjectGroupSize: s3BlocksGroupSize,
 		hashObjectGroupSize:  s3HashesGroupSize,
 
-		wCacheBlocks: newCache(),
-		wCacheHashes: newCache(),
-		rCacheBlocks: newCache(),
-		rCacheHashes: newCache(),
+		wCacheBlocks: newCache(cacheBlocksMax),
+		wCacheHashes: newCache(cacheHashesMax),
+		rCacheBlocks: newCache(cacheBlocksMax),
+		rCacheHashes: newCache(cacheHashesMax),
 		log:          log.New("remote", "s3"),
 	}
 
@@ -580,7 +591,7 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 		if v, ok := f.rCacheHashes.get(number); ok {
 			return v.(common.Hash).Bytes(), nil
 		}
-		return nil, errOutOfBounds
+		return nil, fmt.Errorf("%w: #%d (%s)", errOutOfBounds, number, kind)
 	}
 
 	// Take from remote
@@ -591,7 +602,7 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 	if v, ok := f.rCacheBlocks.get(number); ok {
 		return v.(AncientObjectS3).RLPBytesForKind(kind), nil
 	}
-	return nil, errOutOfBounds
+	return nil, fmt.Errorf("%w: #%d (%s)", errOutOfBounds, number, kind)
 }
 
 // Ancients returns the length of the frozen items.
@@ -692,9 +703,11 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 
 	var err error
 
-	err = f.setIndexMarker(items)
-	if err != nil {
-		return err
+	if !f.readOnly {
+		err = f.setIndexMarker(items)
+		if err != nil {
+			return err
+		}
 	}
 
 	f.rCacheBlocks.reset()
@@ -725,6 +738,12 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 
 	f.wCacheBlocks.truncateFrom(items)
 	f.wCacheHashes.truncateFrom(items)
+
+	if f.readOnly {
+		atomic.StoreUint64(f.frozen, items)
+		f.log.Info("Finished truncating ancients", "elapsed", common.PrettyDuration(time.Since(start)))
+		return nil
+	}
 
 	err = f.pushWCaches()
 	if err != nil {
@@ -775,7 +794,7 @@ func (f *freezerRemoteS3) pushWCaches() error {
 	return nil
 }
 
-func (f *freezerRemoteS3) pushCacheBatch(cache *cache, size uint64, keyFn func(uint64) string, batchObjFn func([]interface{}) (interface{})) error {
+func (f *freezerRemoteS3) pushCacheBatch(cache *cache, size uint64, keyFn func(uint64) string, batchObjFn func([]interface{}) interface{}) error {
 	if cache.len() == 0 {
 		return nil
 	}
@@ -853,7 +872,7 @@ func (f *freezerRemoteS3) decodeObject(input []byte, target interface{}) error {
 	return nil
 }
 
-func (f *freezerRemoteS3) blockCacheBatchObjectFn(items []interface{}) (interface{}) {
+func (f *freezerRemoteS3) blockCacheBatchObjectFn(items []interface{}) interface{} {
 	batchSet := make([]AncientObjectS3, len(items))
 	for i, v := range items {
 		batchSet[i] = v.(AncientObjectS3)
@@ -861,7 +880,7 @@ func (f *freezerRemoteS3) blockCacheBatchObjectFn(items []interface{}) (interfac
 	return batchSet
 }
 
-func (f *freezerRemoteS3) hashCacheBatchObjectFn(items []interface{}) (interface{}) {
+func (f *freezerRemoteS3) hashCacheBatchObjectFn(items []interface{}) interface{} {
 	batchSet := make([]common.Hash, len(items))
 	for i, v := range items {
 		batchSet[i] = v.(common.Hash)
@@ -880,39 +899,41 @@ func (f *freezerRemoteS3) Sync() error {
 
 	var err error
 
-	if lenBlocks > 0 {
-		if r := f.wCacheBlocks.firstN() % f.blockObjectGroupSize; r != 0 {
-			f.log.Warn("Found out-of-order block cache", "n", f.wCacheBlocks.firstN())
-			err = f.pullWCacheBlocks(f.wCacheBlocks.firstN())
-			if err != nil {
+	if !f.readOnly {
+		if lenBlocks > 0 {
+			if r := f.wCacheBlocks.firstN() % f.blockObjectGroupSize; r != 0 {
+				f.log.Warn("Found out-of-order block cache", "n", f.wCacheBlocks.firstN())
+				err = f.pullWCacheBlocks(f.wCacheBlocks.firstN())
+				if err != nil {
+					f.mu.Unlock()
+					return err
+				}
 				f.mu.Unlock()
-				return err
+				return f.Sync()
 			}
-			f.mu.Unlock()
-			return f.Sync()
-		}
-		if r := f.wCacheHashes.firstN() % f.hashObjectGroupSize; r != 0 {
-			f.log.Warn("Found out-of-order hash cache", "n", f.wCacheHashes.firstN())
-			err = f.pullWCacheHashes(f.wCacheHashes.firstN())
-			if err != nil {
+			if r := f.wCacheHashes.firstN() % f.hashObjectGroupSize; r != 0 {
+				f.log.Warn("Found out-of-order hash cache", "n", f.wCacheHashes.firstN())
+				err = f.pullWCacheHashes(f.wCacheHashes.firstN())
+				if err != nil {
+					f.mu.Unlock()
+					return err
+				}
 				f.mu.Unlock()
-				return err
+				return f.Sync()
 			}
-			f.mu.Unlock()
-			return f.Sync()
 		}
-	}
 
-	err = f.pushWCaches()
-	if err != nil {
-		f.mu.Unlock()
-		return err
-	}
+		err = f.pushWCaches()
+		if err != nil {
+			f.mu.Unlock()
+			return err
+		}
 
-	err = f.setIndexMarker(atomic.LoadUint64(f.frozen))
-	if err != nil {
-		f.mu.Unlock()
-		return err
+		err = f.setIndexMarker(atomic.LoadUint64(f.frozen))
+		if err != nil {
+			f.mu.Unlock()
+			return err
+		}
 	}
 
 	elapsed := time.Since(start)

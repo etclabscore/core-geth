@@ -1,787 +1,795 @@
 env GO111MODULE=on go run build/ci.go install
->>> /home/ia/go1.14.3.linux-amd64/bin/go install -ldflags -X main.gitCommit=aa4a680f752546678c262df7186d9c888b7ede37 -X main.gitDate=20200613 -v ./...
-INFO [06-13|09:31:20.445] Starting Geth on Ethereum Classic... 
-INFO [06-13|09:31:20.445] Bumping default cache on mainnet         provided=1024 updated=4096
-INFO [06-13|09:31:20.447] Maximum peer count                       ETH=50 LES=0 total=50
-INFO [06-13|09:31:20.447] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
-INFO [06-13|09:31:20.457] Starting peer-to-peer node               instance=CoreGeth/v1.11.6-unstable-aa4a680f-20200613/linux-amd64/go1.14.3
-INFO [06-13|09:31:20.457] Allocated trie memory caches             clean=614.00MiB dirty=1024.00MiB
-INFO [06-13|09:31:20.457] Allocated cache and file handles         database=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/chaindata cache=2.00GiB handles=524288
-INFO [06-13|09:31:42.225] New remote freezer                       freezer=s3 namespace=coregeth-classic-parasail
-INFO [06-13|09:31:42.225] New session                              remote=s3 region=us-east-1
-INFO [06-13|09:31:42.225] Creating bucket if not exists            remote=s3 name=coregeth-classic-parasail
-INFO [06-13|09:31:42.674] Bucket created                           remote=s3 name=coregeth-classic-parasail result="{\n  Location: \"/coregeth-classic-parasail\"\n}" elapsed=448.216889ms
-INFO [06-13|09:31:42.674] Retrieving ancients number               remote=s3
-INFO [06-13|09:31:42.724] Finished retrieving ancients num         remote=s3 s=947809 n=947809 err=nil
-INFO [06-13|09:31:42.724] Pulling write blocks cache               remote=s3 n=947809
-INFO [06-13|09:31:43.213] Finished pulling blocks cache            remote=s3 n=947809 size=1024
-INFO [06-13|09:31:43.213] Pulling write hashes cache               remote=s3 n=947809
-INFO [06-13|09:32:12.882] Finished pulling hashes cache            remote=s3 n=947809 size=32353
-DEBUG[06-13|09:32:12.906] Current full block not old enough        number=0 hash="d4e567…cb8fa3" delay=90000
-INFO [06-13|09:32:13.685] Persisted trie from memory database      nodes=12356 size=1.78MiB time=18.813666ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
-INFO [06-13|09:32:13.686] Found stored genesis block               config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
-INFO [06-13|09:32:13.688] Initialised chain configuration          config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
-INFO [06-13|09:32:13.688] Disk storage enabled for ethash caches   dir=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/ethash count=3
-INFO [06-13|09:32:13.688] Disk storage enabled for ethash DAGs     dir=/home/ia/.ethash count=2
-INFO [06-13|09:32:13.689] Initialising Ethereum protocol           versions="[65 64 63]" network=1 dbversion=7
-INFO [06-13|09:32:13.691] Loaded most recent local header          number=993208 hash="7f65b5…750074" td=7053988590984183041 age=4y4mo3w
-INFO [06-13|09:32:13.691] Loaded most recent local full block      number=0      hash="d4e567…cb8fa3" td=17179869184         age=51y2mo6d
-INFO [06-13|09:32:13.691] Loaded most recent local fast block      number=947808 hash="b0167a…2a59b3" td=6539492807320569336 age=4y5mo1d
-DEBUG[06-13|09:32:13.691] Reinjecting stale transactions           count=0
-INFO [06-13|09:32:13.691] Upgrading chain index                    type=bloombits percentage=46
-INFO [06-13|09:32:13.692] Loaded local transaction journal         transactions=0 dropped=0
-INFO [06-13|09:32:13.693] Regenerated local transaction journal    transactions=0 accounts=0
-INFO [06-13|09:32:13.711] Allocated fast sync bloom                size=1.60GiB
-INFO [06-13|09:32:13.877] Mapped network port                      proto=tcp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
-INFO [06-13|09:32:13.881] New local node record                    seq=3 id=5a2a16b2ae669639 ip=24.207.216.46 udp=30303 tcp=30303
-INFO [06-13|09:32:13.882] Started P2P networking                   self=enode://17e335f4b35ac45760115f31da0701bfb1141a730a76209e47254732efd0fd4f94f98a9bdead4ecd69358b6c7ea772637105c4f143c9ab31d8bcf1a034f58bea@24.207.216.46:30303
-INFO [06-13|09:32:13.883] IPC endpoint opened                      url=/home/ia/.ethereum/geth.ipc
-INFO [06-13|09:32:13.887] Mapped network port                      proto=udp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
-TRACE[06-13|09:32:13.966] Processing new chain section             type=bloombits section=112
-TRACE[06-13|09:32:15.248] Processing new chain section             type=bloombits section=113
-TRACE[06-13|09:32:16.259] Processing new chain section             type=bloombits section=114
-INFO [06-13|09:32:16.861] Block synchronisation started 
-TRACE[06-13|09:32:17.284] Processing new chain section             type=bloombits section=115
-TRACE[06-13|09:32:18.248] Processing new chain section             type=bloombits section=116
-TRACE[06-13|09:32:19.341] Processing new chain section             type=bloombits section=117
-TRACE[06-13|09:32:20.706] Processing new chain section             type=bloombits section=118
-INFO [06-13|09:32:21.712] Initializing fast sync bloom             items=6097806 errorrate=0.000 elapsed=8.000s
-INFO [06-13|09:32:21.749] Upgrading chain index                    type=bloombits percentage=49
-TRACE[06-13|09:32:21.749] Processing new chain section             type=bloombits section=119
-TRACE[06-13|09:32:22.897] Processing new chain section             type=bloombits section=120
-INFO [06-13|09:32:23.050] Initialized fast sync bloom              items=7773710 errorrate=0.000 elapsed=9.338s
-TRACE[06-13|09:32:24.114] Processing new chain section             type=bloombits section=121
-TRACE[06-13|09:32:25.131] Processing new chain section             type=bloombits section=122
-INFO [06-13|09:32:25.534] Imported new block headers               count=0 elapsed=3.882ms      number=948000 hash="1e406d…6eac9b" age=4y5mo1d  ignored=192
-INFO [06-13|09:32:25.543] Imported new block headers               count=0 elapsed=3.647ms      number=948192 hash="350bb2…99ca75" age=4y5mo1d  ignored=192
-INFO [06-13|09:32:25.807] Syncing ancients                         remote=s3 frozen=947813 blocks=1024
-TRACE[06-13|09:32:26.293] Processing new chain section             type=bloombits section=123
-INFO [06-13|09:32:26.653] Imported new block headers               count=0 elapsed=20.306ms     number=949152 hash="7674c1…6dcab8" age=4y5mo1d  ignored=960
-TRACE[06-13|09:32:27.994] Processing new chain section             type=bloombits section=124
-INFO [06-13|09:32:28.416] Imported new block headers               count=0 elapsed=67.704ms     number=951200 hash="6a6d0b…a7d62e" age=4y5mo1d  ignored=2048
-INFO [06-13|09:32:28.502] Imported new block headers               count=0 elapsed=53.458ms     number=953248 hash="7508f9…544b1e" age=4y5mo21h ignored=2048
-INFO [06-13|09:32:28.596] Imported new block headers               count=0 elapsed=59.742ms     number=955296 hash="619a99…43df2b" age=4y5mo12h ignored=2048
-INFO [06-13|09:32:28.687] Imported new block headers               count=0 elapsed=59.615ms     number=957344 hash="607cb0…aaa8d9" age=4y5mo2h  ignored=2048
-INFO [06-13|09:32:28.790] Imported new block headers               count=0   elapsed=66.487ms     number=959328 hash="a410bd…0874f2" age=4y4mo4w  ignored=1984
-INFO [06-13|09:32:28.791] Setting index marker                     remote=s3 number=947813
-INFO [06-13|09:32:28.827] Imported new block headers               count=0   elapsed=18.324ms     number=960096 hash="f96550…0336c5" age=4y4mo4w  ignored=768
-INFO [06-13|09:32:28.892] Finished syncing ancients                remote=s3 frozen=947813 blocks=1024 elapsed=2.983791995s bps=343.19
-INFO [06-13|09:32:28.913] Imported new block headers               count=0   elapsed=60.222ms     number=962144 hash="16071f…48f590" age=4y4mo4w  ignored=2048
-INFO [06-13|09:32:29.222] Imported new block receipts              count=4   elapsed=3.416s       number=947812 hash="2bed89…379b71" age=4y5mo1d  size=16.27KiB
-INFO [06-13|09:32:29.241] Imported new block headers               count=0   elapsed=304.906ms    number=963360 hash="a616a4…77290d" age=4y4mo4w  ignored=1216
-TRACE[06-13|09:32:29.379] Processing new chain section             type=bloombits section=125
-INFO [06-13|09:32:29.380] Syncing ancients                         remote=s3 frozen=949861 blocks=2048
-WARN [06-13|09:32:29.380] Found out-of-order block cache           remote=s3 n=947813
-INFO [06-13|09:32:29.380] Pulling write blocks cache               remote=s3 n=947813
-INFO [06-13|09:32:29.733] Finished pulling blocks cache            remote=s3 n=947813 size=2661
-INFO [06-13|09:32:29.733] Syncing ancients                         remote=s3 frozen=949861 blocks=2661
-INFO [06-13|09:32:30.144] Imported new block headers               count=0   elapsed=67.677ms     number=965408 hash="b5f8eb…f79d22" age=4y4mo4w  ignored=2048
-INFO [06-13|09:32:30.173] Imported new block headers               count=0   elapsed=14.801ms     number=966048 hash="8fbff6…ede838" age=4y4mo4w  ignored=640
-INFO [06-13|09:32:30.502] Upgrading chain index                    type=bloombits percentage=52
-TRACE[06-13|09:32:30.502] Processing new chain section             type=bloombits section=126
-INFO [06-13|09:32:30.815] Imported new block headers               count=0   elapsed=50.023ms     number=968096 hash="033094…b83d4d" age=4y4mo3w  ignored=2048
-INFO [06-13|09:32:30.914] Imported new block headers               count=0   elapsed=53.965ms     number=970144 hash="1eeae9…915b3c" age=4y4mo3w  ignored=2048
-INFO [06-13|09:32:30.987] Imported new block headers               count=0   elapsed=47.509ms     number=971616 hash="7937f0…328a93" age=4y4mo3w  ignored=1472
-INFO [06-13|09:32:31.025] Imported new block headers               count=0   elapsed=16.896ms     number=972384 hash="005f74…5ffb58" age=4y4mo3w  ignored=768
-TRACE[06-13|09:32:31.530] Processing new chain section             type=bloombits section=127
-TRACE[06-13|09:32:32.968] Processing new chain section             type=bloombits section=128
-TRACE[06-13|09:32:34.322] Processing new chain section             type=bloombits section=129
-INFO [06-13|09:32:34.689] Setting index marker                     remote=s3 number=949861
-INFO [06-13|09:32:34.748] Finished syncing ancients                remote=s3 frozen=949861 blocks=2661 elapsed=4.955895939s bps=536.94
-INFO [06-13|09:32:35.106] Imported new block receipts              count=2048 elapsed=5.864s       number=949860 hash="8dfeb1…1e8127" age=4y5mo1d  size=2.90MiB
-INFO [06-13|09:32:35.261] Syncing ancients                         remote=s3 frozen=951909 blocks=2661
-TRACE[06-13|09:32:35.670] Processing new chain section             type=bloombits section=130
-TRACE[06-13|09:32:36.670] Processing new chain section             type=bloombits section=131
-TRACE[06-13|09:32:37.767] Processing new chain section             type=bloombits section=132
-INFO [06-13|09:32:38.862] Upgrading chain index                    type=bloombits percentage=54
-TRACE[06-13|09:32:38.862] Processing new chain section             type=bloombits section=133
-INFO [06-13|09:32:40.107] Setting index marker                     remote=s3 number=951909
-INFO [06-13|09:32:40.201] Finished syncing ancients                remote=s3 frozen=951909 blocks=2661 elapsed=4.845240374s bps=549.20
-TRACE[06-13|09:32:40.432] Processing new chain section             type=bloombits section=134
-INFO [06-13|09:32:40.450] Imported new block headers               count=0    elapsed=93.496ms     number=972960 hash="9bff5d…3a69be" age=4y4mo3w  ignored=576
-INFO [06-13|09:32:40.460] Imported new block headers               count=0    elapsed=4.715ms      number=973152 hash="e67362…11d6f0" age=4y4mo3w  ignored=192
-INFO [06-13|09:32:40.489] Imported new block receipts              count=2048 elapsed=5.367s       number=951908 hash="432c84…01c4f3" age=4y5mo1d  size=2.80MiB
-INFO [06-13|09:32:40.560] Imported new block headers               count=0    elapsed=8.995ms      number=973536 hash="bbee48…349572" age=4y4mo3w  ignored=384
-INFO [06-13|09:32:40.644] Syncing ancients                         remote=s3 frozen=953957 blocks=2661
-TRACE[06-13|09:32:41.410] Processing new chain section             type=bloombits section=135
-TRACE[06-13|09:32:42.601] Processing new chain section             type=bloombits section=136
-TRACE[06-13|09:32:44.118] Processing new chain section             type=bloombits section=137
-INFO [06-13|09:32:44.425] Setting index marker                     remote=s3 number=953957
-INFO [06-13|09:32:44.485] Finished syncing ancients                remote=s3 frozen=953957 blocks=2661 elapsed=3.781696464s bps=703.65
-INFO [06-13|09:32:44.793] Imported new block receipts              count=2048 elapsed=4.289s       number=953956 hash="cd0631…3a5503" age=4y5mo18h size=2.81MiB
-INFO [06-13|09:32:44.932] Syncing ancients                         remote=s3 frozen=956005 blocks=2661
-TRACE[06-13|09:32:45.247] Processing new chain section             type=bloombits section=138
-TRACE[06-13|09:32:46.334] Processing new chain section             type=bloombits section=139
-INFO [06-13|09:32:47.167] Imported new block headers               count=0    elapsed=7.893ms      number=973920 hash="1b0cec…557031" age=4y4mo3w  ignored=384
-INFO [06-13|09:32:47.534] Upgrading chain index                    type=bloombits percentage=57
-TRACE[06-13|09:32:47.534] Processing new chain section             type=bloombits section=140
-TRACE[06-13|09:32:48.699] Processing new chain section             type=bloombits section=141
-INFO [06-13|09:32:48.866] Setting index marker                     remote=s3 number=956005
-INFO [06-13|09:32:48.920] Finished syncing ancients                remote=s3 frozen=956005 blocks=2661 elapsed=3.933832532s bps=676.44
-INFO [06-13|09:32:49.328] Imported new block receipts              count=2048 elapsed=4.519s       number=956004 hash="dbaf40…70210e" age=4y5mo9h  size=2.82MiB
-INFO [06-13|09:32:49.486] Syncing ancients                         remote=s3 frozen=958053 blocks=2661
-TRACE[06-13|09:32:49.822] Processing new chain section             type=bloombits section=142
-TRACE[06-13|09:32:50.929] Processing new chain section             type=bloombits section=143
-TRACE[06-13|09:32:52.223] Processing new chain section             type=bloombits section=144
-INFO [06-13|09:32:53.934] Setting index marker                     remote=s3 number=958053
-INFO [06-13|09:32:53.989] Finished syncing ancients                remote=s3 frozen=958053 blocks=2661 elapsed=4.447598558s bps=598.30
-INFO [06-13|09:32:54.269] Imported new block receipts              count=2048 elapsed=4.924s       number=958052 hash="5a9182…81f75e" age=4y4mo4w  size=3.11MiB
-INFO [06-13|09:32:54.393] Syncing ancients                         remote=s3 frozen=959679 blocks=2239
-INFO [06-13|09:32:55.673] Upgrading chain index                    type=bloombits percentage=59
-TRACE[06-13|09:32:55.673] Processing new chain section             type=bloombits section=145
-INFO [06-13|09:32:58.137] Setting index marker                     remote=s3 number=959679
-INFO [06-13|09:32:58.200] Finished syncing ancients                remote=s3 frozen=959679 blocks=2239 elapsed=3.74371988s  bps=598.07
-TRACE[06-13|09:32:58.313] Processing new chain section             type=bloombits section=146
-INFO [06-13|09:32:58.660] Imported new block receipts              count=1626 elapsed=4.379s       number=959678 hash="de148f…f624a6" age=4y4mo4w  size=2.44MiB
-INFO [06-13|09:32:58.872] Syncing ancients                         remote=s3 frozen=961727 blocks=2239
-TRACE[06-13|09:32:59.636] Processing new chain section             type=bloombits section=147
-TRACE[06-13|09:33:00.798] Processing new chain section             type=bloombits section=148
-TRACE[06-13|09:33:01.816] Processing new chain section             type=bloombits section=149
-TRACE[06-13|09:33:02.957] Processing new chain section             type=bloombits section=150
-INFO [06-13|09:33:03.379] Setting index marker                     remote=s3 number=961727
-INFO [06-13|09:33:03.438] Finished syncing ancients                remote=s3 frozen=961727 blocks=2239 elapsed=4.506972247s bps=496.79
-INFO [06-13|09:33:03.739] Imported new block receipts              count=2048 elapsed=5.061s       number=961726 hash="b9d5b3…c1f786" age=4y4mo4w  size=2.90MiB
-INFO [06-13|09:33:04.160] Upgrading chain index                    type=bloombits percentage=62
-TRACE[06-13|09:33:04.160] Processing new chain section             type=bloombits section=151
-INFO [06-13|09:33:04.366] Imported new block headers               count=0    elapsed=92.340ms     number=975968 hash="9d1522…4dc2f5" age=4y4mo3w  ignored=2048
-INFO [06-13|09:33:04.449] Imported new block headers               count=0    elapsed=53.420ms     number=978016 hash="c91786…25a344" age=4y4mo3w  ignored=2048
-INFO [06-13|09:33:04.537] Imported new block headers               count=0    elapsed=55.095ms     number=980064 hash="ecc7c3…85dc2a" age=4y4mo3w  ignored=2048
-INFO [06-13|09:33:04.625] Imported new block headers               count=0    elapsed=54.100ms     number=982112 hash="fd8097…4b88c8" age=4y4mo3w  ignored=2048
-INFO [06-13|09:33:04.733] Imported new block headers               count=0    elapsed=66.943ms     number=984160 hash="bccc90…d0c466" age=4y4mo3w  ignored=2048
-INFO [06-13|09:33:04.774] Syncing ancients                         remote=s3 frozen=963775 blocks=2239
-INFO [06-13|09:33:04.832] Imported new block headers               count=0    elapsed=62.315ms     number=986208 hash="8e94fb…913819" age=4y4mo3w  ignored=2048
-INFO [06-13|09:33:04.927] Imported new block headers               count=0    elapsed=54.821ms     number=988256 hash="804d71…9abb96" age=4y4mo3w  ignored=2048
-INFO [06-13|09:33:05.009] Imported new block headers               count=0    elapsed=50.676ms     number=990304 hash="931887…b6b95f" age=4y4mo3w  ignored=2048
-INFO [06-13|09:33:05.116] Imported new block headers               count=0    elapsed=75.324ms     number=992352 hash="c4506f…b88461" age=4y4mo3w  ignored=2048
-TRACE[06-13|09:33:05.247] Processing new chain section             type=bloombits section=152
-INFO [06-13|09:33:05.248] Imported new block headers               count=1192 elapsed=103.294ms    number=994400 hash="a5261b…1d8405" age=4y4mo3w  ignored=856
-INFO [06-13|09:33:05.310] Imported new block headers               count=640  elapsed=49.443ms     number=995040 hash="03fa8b…e2ec91" age=4y4mo3w
-INFO [06-13|09:33:05.549] Imported new block headers               count=1920 elapsed=217.156ms    number=996960 hash="137850…25076c" age=4y4mo3w
-TRACE[06-13|09:33:06.513] Processing new chain section             type=bloombits section=153
-TRACE[06-13|09:33:07.865] Processing new chain section             type=bloombits section=154
-TRACE[06-13|09:33:08.921] Processing new chain section             type=bloombits section=155
-TRACE[06-13|09:33:09.914] Processing new chain section             type=bloombits section=156
-TRACE[06-13|09:33:10.893] Processing new chain section             type=bloombits section=157
-TRACE[06-13|09:33:11.919] Processing new chain section             type=bloombits section=158
-DEBUG[06-13|09:33:12.907] Current full block not old enough        number=0      hash="d4e567…cb8fa3" delay=90000
-INFO [06-13|09:33:13.028] Upgrading chain index                    type=bloombits percentage=65
-TRACE[06-13|09:33:13.028] Processing new chain section             type=bloombits section=159
-TRACE[06-13|09:33:18.531] Processing new chain section             type=bloombits section=160
-INFO [06-13|09:33:19.318] Setting index marker                     remote=s3 number=963775
-INFO [06-13|09:33:19.389] Finished syncing ancients                remote=s3 frozen=963775 blocks=2239 elapsed=14.543565619s bps=153.95
-INFO [06-13|09:33:20.644] Imported new block receipts              count=2048 elapsed=16.888s       number=963774 hash="ddf174…4a6735" age=4y4mo4w  size=20.97MiB
-INFO [06-13|09:33:20.779] Syncing ancients                         remote=s3 frozen=965823 blocks=2239
-INFO [06-13|09:33:21.487] Upgrading chain index                    type=bloombits percentage=66
-TRACE[06-13|09:33:21.487] Processing new chain section             type=bloombits section=161
-TRACE[06-13|09:33:23.108] Processing new chain section             type=bloombits section=162
-INFO [06-13|09:33:23.898] Imported new block headers               count=384  elapsed=42.635ms      number=997344 hash="b58daf…51fc4a" age=4y4mo3w
-INFO [06-13|09:33:23.935] Imported new block headers               count=384  elapsed=31.444ms      number=997728 hash="e0fc06…9d099b" age=4y4mo3w
-INFO [06-13|09:33:23.956] Imported new block headers               count=192  elapsed=16.847ms      number=997920 hash="875a1f…e5c174" age=4y4mo3w
-INFO [06-13|09:33:24.182] Imported new block headers               count=384  elapsed=51.879ms      number=998304 hash="ad45a6…f70f50" age=4y4mo3w
-INFO [06-13|09:33:24.525] Setting index marker                     remote=s3 number=965823
-INFO [06-13|09:33:24.600] Finished syncing ancients                remote=s3 frozen=965823 blocks=2239 elapsed=3.746054055s  bps=597.70
-TRACE[06-13|09:33:24.811] Processing new chain section             type=bloombits section=163
-INFO [06-13|09:33:25.399] Imported new block receipts              count=2048 elapsed=4.739s        number=965822 hash="503553…5fae97" age=4y4mo4w  size=2.53MiB
-INFO [06-13|09:33:25.568] Syncing ancients                         remote=s3 frozen=967871 blocks=2239
-TRACE[06-13|09:33:25.831] Processing new chain section             type=bloombits section=164
-TRACE[06-13|09:33:27.085] Processing new chain section             type=bloombits section=165
-TRACE[06-13|09:33:28.675] Processing new chain section             type=bloombits section=166
-INFO [06-13|09:33:29.375] Setting index marker                     remote=s3 number=967871
-INFO [06-13|09:33:29.460] Finished syncing ancients                remote=s3 frozen=967871 blocks=2239 elapsed=3.806636881s  bps=588.18
-INFO [06-13|09:33:29.777] Imported new block receipts              count=2048 elapsed=4.358s        number=967870 hash="b428f6…c55536" age=4y4mo4w  size=2.71MiB
-INFO [06-13|09:33:29.814] Upgrading chain index                    type=bloombits percentage=69
-TRACE[06-13|09:33:29.815] Processing new chain section             type=bloombits section=167
-INFO [06-13|09:33:29.924] Syncing ancients                         remote=s3 frozen=969919 blocks=2239
-TRACE[06-13|09:33:30.954] Processing new chain section             type=bloombits section=168
-INFO [06-13|09:33:34.110] Setting index marker                     remote=s3 number=969919
-INFO [06-13|09:33:34.194] Finished syncing ancients                remote=s3 frozen=969919 blocks=2239 elapsed=4.185765928s  bps=534.91
-TRACE[06-13|09:33:34.196] Processing new chain section             type=bloombits section=169
-INFO [06-13|09:33:34.557] Imported new block receipts              count=2048 elapsed=4.764s        number=969918 hash="1cdf80…dd0d6b" age=4y4mo3w  size=2.99MiB
-INFO [06-13|09:33:34.684] Syncing ancients                         remote=s3 frozen=971967 blocks=2239
-WARN [06-13|09:33:35.025] Rolled back headers                      count=2048 header=998304->996256 fast=969918->969918 block=0->0
-TRACE[06-13|09:33:35.751] Processing new chain section             type=bloombits section=170
-INFO [06-13|09:33:37.982] Upgrading chain index                    type=bloombits percentage=70
-TRACE[06-13|09:33:37.982] Processing new chain section             type=bloombits section=171
-INFO [06-13|09:33:38.041] Setting index marker                     remote=s3 number=971967
-INFO [06-13|09:33:38.120] Finished syncing ancients                remote=s3 frozen=971967 blocks=2239 elapsed=3.357252077s  bps=666.91
-INFO [06-13|09:33:38.359] Imported new block receipts              count=2048 elapsed=3.786s        number=971966 hash="356e64…501521" age=4y4mo3w  size=2.45MiB
-WARN [06-13|09:33:38.366] Synchronisation failed, dropping peer    peer=98075413f2e3783f err="retrieved hash chain is invalid: timeout"
-TRACE[06-13|09:33:39.164] Processing new chain section             type=bloombits section=172
-TRACE[06-13|09:33:40.363] Processing new chain section             type=bloombits section=173
-TRACE[06-13|09:33:41.561] Processing new chain section             type=bloombits section=174
-TRACE[06-13|09:33:42.687] Processing new chain section             type=bloombits section=175
-TRACE[06-13|09:33:43.836] Processing new chain section             type=bloombits section=176
-TRACE[06-13|09:33:45.332] Processing new chain section             type=bloombits section=177
-INFO [06-13|09:33:46.554] Upgrading chain index                    type=bloombits percentage=73
-TRACE[06-13|09:33:46.554] Processing new chain section             type=bloombits section=178
-INFO [06-13|09:33:47.010] Imported new block headers               count=0    elapsed=28.955ms      number=972734 hash="b8a066…46c519" age=4y4mo3w  ignored=768
-INFO [06-13|09:33:47.013] Syncing ancients                         remote=s3 frozen=971969 blocks=193
-INFO [06-13|09:33:47.043] Imported new block headers               count=0    elapsed=5.730ms       number=972926 hash="7a34ab…c61dd8" age=4y4mo3w  ignored=192
-INFO [06-13|09:33:47.249] Imported new block headers               count=0    elapsed=24.517ms      number=973310 hash="f6b071…6718fc" age=4y4mo3w  ignored=384
-INFO [06-13|09:33:47.627] Imported new block headers               count=0    elapsed=18.212ms      number=974078 hash="56b82c…6305ef" age=4y4mo3w  ignored=768
-INFO [06-13|09:33:48.596] Setting index marker                     remote=s3 number=971969
-INFO [06-13|09:33:48.658] Finished syncing ancients                remote=s3 frozen=971969 blocks=193  elapsed=1.582806035s  bps=121.94
-INFO [06-13|09:33:48.659] Imported new block receipts              count=2    elapsed=1.645s        number=971968 hash="397287…6e1597" age=4y4mo3w  size=1.13KiB
-INFO [06-13|09:33:48.659] Syncing ancients                         remote=s3 frozen=971972 blocks=196
-TRACE[06-13|09:33:48.720] Processing new chain section             type=bloombits section=179
-INFO [06-13|09:33:50.020] Setting index marker                     remote=s3 number=971972
-INFO [06-13|09:33:50.145] Finished syncing ancients                remote=s3 frozen=971972 blocks=196  elapsed=1.361276821s  bps=143.98
-INFO [06-13|09:33:50.145] Imported new block receipts              count=3    elapsed=1.486s        number=971971 hash="4ffcbf…9a224e" age=4y4mo3w  size=2.63KiB
-TRACE[06-13|09:33:51.308] Processing new chain section             type=bloombits section=180
-TRACE[06-13|09:33:52.688] Processing new chain section             type=bloombits section=181
-WARN [06-13|09:33:53.454] Synchronisation failed, dropping peer    peer=6426c99a07d90b84 err="retrieved hash chain is invalid: timeout"
-TRACE[06-13|09:33:54.006] Processing new chain section             type=bloombits section=182
-INFO [06-13|09:33:55.249] Upgrading chain index                    type=bloombits percentage=75
-TRACE[06-13|09:33:55.249] Processing new chain section             type=bloombits section=183
-TRACE[06-13|09:33:56.565] Processing new chain section             type=bloombits section=184
-TRACE[06-13|09:33:59.438] Processing new chain section             type=bloombits section=185
-TRACE[06-13|09:34:00.787] Processing new chain section             type=bloombits section=186
-TRACE[06-13|09:34:02.213] Processing new chain section             type=bloombits section=187
-INFO [06-13|09:34:02.477] Imported new block headers               count=0    elapsed=7.384ms       number=972355 hash="b6d759…0e84b2" age=4y4mo3w  ignored=384
-INFO [06-13|09:34:02.759] Syncing ancients                         remote=s3 frozen=971975 blocks=199
-INFO [06-13|09:34:04.138] Setting index marker                     remote=s3 number=971975
-INFO [06-13|09:34:04.189] Finished syncing ancients                remote=s3 frozen=971975 blocks=199  elapsed=1.378451095s  bps=144.36
-INFO [06-13|09:34:04.190] Imported new block receipts              count=3    elapsed=1.430s        number=971974 hash="c8a2e5…717da8" age=4y4mo3w  size=6.42KiB
-INFO [06-13|09:34:04.190] Syncing ancients                         remote=s3 frozen=971984 blocks=208
-INFO [06-13|09:34:04.891] Upgrading chain index                    type=bloombits percentage=77
-TRACE[06-13|09:34:04.891] Processing new chain section             type=bloombits section=188
-INFO [06-13|09:34:05.579] Imported new block headers               count=0    elapsed=29.616ms      number=973507 hash="724f10…26508c" age=4y4mo3w  ignored=1152
-INFO [06-13|09:34:05.847] Setting index marker                     remote=s3 number=971984
-INFO [06-13|09:34:05.916] Finished syncing ancients                remote=s3 frozen=971984 blocks=208  elapsed=1.656571757s  bps=125.56
-INFO [06-13|09:34:05.917] Imported new block receipts              count=9    elapsed=1.726s        number=971983 hash="4ea60b…373e16" age=4y4mo3w  size=7.88KiB
-INFO [06-13|09:34:07.425] Imported new block headers               count=0    elapsed=51.889ms      number=975555 hash="93616a…6610ab" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:07.466] Syncing ancients                         remote=s3 frozen=972904 blocks=1128
-INFO [06-13|09:34:07.499] Imported new block headers               count=0    elapsed=39.459ms      number=977155 hash="27ce7a…d3b366" age=4y4mo3w  ignored=1600
-INFO [06-13|09:34:07.581] Imported new block headers               count=0    elapsed=53.420ms      number=979203 hash="534012…e8516d" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:07.669] Imported new block headers               count=0    elapsed=55.755ms      number=981251 hash="95f620…2b6f60" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:07.762] Imported new block headers               count=0    elapsed=60.467ms      number=983299 hash="49805e…499f78" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:07.856] Imported new block headers               count=0    elapsed=59.935ms      number=985347 hash="f7fb76…1bfbe8" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:07.959] Imported new block headers               count=0    elapsed=74.279ms      number=987395 hash="f920ae…c47904" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:08.052] Imported new block headers               count=0    elapsed=57.195ms      number=989443 hash="470556…ecb389" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:08.152] Imported new block headers               count=0    elapsed=64.131ms      number=991491 hash="9603e6…a0f880" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:08.274] Imported new block headers               count=0    elapsed=79.994ms      number=993539 hash="fc4b93…8c019e" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:08.321] Imported new block headers               count=0    elapsed=27.981ms      number=995203 hash="a7db9f…fab25c" age=4y4mo3w  ignored=1664
-TRACE[06-13|09:34:08.364] Processing new chain section             type=bloombits section=189
-INFO [06-13|09:34:08.977] Imported new block headers               count=291  elapsed=39.502ms      number=996547 hash="1df6f8…965eaa" age=4y4mo3w  ignored=1053
-TRACE[06-13|09:34:09.953] Processing new chain section             type=bloombits section=190
-INFO [06-13|09:34:10.454] Setting index marker                     remote=s3 number=972904
-INFO [06-13|09:34:10.540] Finished syncing ancients                remote=s3 frozen=972904 blocks=1128 elapsed=2.988326453s  bps=377.47
-INFO [06-13|09:34:10.872] Imported new block receipts              count=920  elapsed=3.482s        number=972903 hash="f87f31…629a6f" age=4y4mo3w  size=1.34MiB
-INFO [06-13|09:34:11.050] Syncing ancients                         remote=s3 frozen=974952 blocks=2152
-TRACE[06-13|09:34:11.124] Processing new chain section             type=bloombits section=191
-TRACE[06-13|09:34:12.264] Processing new chain section             type=bloombits section=192
-INFO [06-13|09:34:12.802] Imported new block headers               count=192  elapsed=21.426ms      number=996739 hash="e4667e…65120b" age=4y4mo3w
-DEBUG[06-13|09:34:12.907] Current full block not old enough        number=0      hash="d4e567…cb8fa3" delay=90000
-INFO [06-13|09:34:12.964] Imported new block headers               count=768  elapsed=42.418ms      number=997507 hash="b4674b…21bc03" age=4y4mo3w
-INFO [06-13|09:34:12.979] Imported new block headers               count=192  elapsed=11.966ms      number=997699 hash="43999f…41ca66" age=4y4mo3w
-INFO [06-13|09:34:13.300] Imported new block headers               count=960  elapsed=65.346ms      number=998659 hash="28b7a6…cab9c5" age=4y4mo3w
-INFO [06-13|09:34:14.249] Upgrading chain index                    type=bloombits percentage=79
-TRACE[06-13|09:34:14.249] Processing new chain section             type=bloombits section=193
-INFO [06-13|09:34:14.432] Imported new block headers               count=2048 elapsed=150.963ms     number=1000707 hash="8b192a…53d127" age=4y4mo3w
-INFO [06-13|09:34:14.633] Imported new block headers               count=2048 elapsed=171.457ms     number=1002755 hash="e6d740…aa93ef" age=4y4mo3w
-INFO [06-13|09:34:14.655] Imported new block headers               count=128  elapsed=14.120ms      number=1002883 hash="b8f3ea…1688e7" age=4y4mo3w
-INFO [06-13|09:34:14.673] Imported new block headers               count=192  elapsed=15.813ms      number=1003075 hash="b88954…b3610f" age=4y4mo3w
-INFO [06-13|09:34:15.452] Setting index marker                     remote=s3 number=974952
-INFO [06-13|09:34:15.511] Finished syncing ancients                remote=s3 frozen=974952 blocks=2152 elapsed=4.401751712s  bps=488.90
-TRACE[06-13|09:34:15.622] Processing new chain section             type=bloombits section=194
-INFO [06-13|09:34:15.865] Imported new block receipts              count=2048 elapsed=4.976s        number=974951  hash="f23f5f…838584" age=4y4mo3w  size=2.86MiB
-INFO [06-13|09:34:16.021] Syncing ancients                         remote=s3 frozen=977000 blocks=2152
-INFO [06-13|09:34:16.389] Imported new block headers               count=2048 elapsed=189.620ms     number=1005123 hash="7c816c…1bed2a" age=4y4mo2w
-INFO [06-13|09:34:16.615] Imported new block headers               count=2048 elapsed=191.057ms     number=1007171 hash="d30e48…a45fce" age=4y4mo2w
-INFO [06-13|09:34:16.829] Imported new block headers               count=2048 elapsed=183.131ms     number=1009219 hash="9d72c9…91fb51" age=4y4mo2w
-INFO [06-13|09:34:17.050] Imported new block headers               count=2048 elapsed=184.107ms     number=1011267 hash="30f8a5…4dae29" age=4y4mo2w
-TRACE[06-13|09:34:17.101] Processing new chain section             type=bloombits section=195
-INFO [06-13|09:34:17.231] Imported new block headers               count=2048 elapsed=151.373ms     number=1013315 hash="605b96…55c681" age=4y4mo2w
-INFO [06-13|09:34:17.415] Imported new block headers               count=2048 elapsed=155.187ms     number=1015363 hash="063ad4…386195" age=4y4mo2w
-INFO [06-13|09:34:17.599] Imported new block headers               count=2048 elapsed=154.274ms     number=1017411 hash="5d9af7…7b857d" age=4y4mo2w
-INFO [06-13|09:34:17.776] Imported new block headers               count=2048 elapsed=151.734ms     number=1019459 hash="bc14c9…9f533d" age=4y4mo2w
-INFO [06-13|09:34:17.953] Imported new block headers               count=1664 elapsed=150.817ms     number=1021123 hash="99a08d…40e92a" age=4y4mo2w
-TRACE[06-13|09:34:19.750] Processing new chain section             type=bloombits section=196
-INFO [06-13|09:34:20.546] Setting index marker                     remote=s3 number=977000
-INFO [06-13|09:34:20.695] Finished syncing ancients                remote=s3 frozen=977000 blocks=2152 elapsed=4.524863689s  bps=475.59
-INFO [06-13|09:34:20.995] Imported new block receipts              count=2048 elapsed=5.110s        number=976999  hash="a202ad…3ab34a" age=4y4mo3w  size=2.50MiB
-INFO [06-13|09:34:21.155] Syncing ancients                         remote=s3 frozen=979048 blocks=2152
-TRACE[06-13|09:34:21.925] Processing new chain section             type=bloombits section=197
-INFO [06-13|09:34:21.983] Imported new block headers               count=192  elapsed=20.482ms      number=1021315 hash="75aaf7…bc5023" age=4y4mo2w
-INFO [06-13|09:34:25.707] Upgrading chain index                    type=bloombits percentage=81
-TRACE[06-13|09:34:25.707] Processing new chain section             type=bloombits section=198
-TRACE[06-13|09:34:27.292] Processing new chain section             type=bloombits section=199
-INFO [06-13|09:34:27.677] Setting index marker                     remote=s3 number=979048
-INFO [06-13|09:34:27.802] Finished syncing ancients                remote=s3 frozen=979048 blocks=2152 elapsed=6.522268061s  bps=329.95
-INFO [06-13|09:34:28.251] Imported new block receipts              count=2048 elapsed=7.241s        number=979047  hash="77261e…aebdbe" age=4y4mo3w  size=2.85MiB
-INFO [06-13|09:34:28.402] Syncing ancients                         remote=s3 frozen=981096 blocks=2152
-TRACE[06-13|09:34:28.763] Processing new chain section             type=bloombits section=200
-INFO [06-13|09:34:29.238] Imported new block headers               count=2048 elapsed=192.718ms     number=1023363 hash="9e92c5…dd6b98" age=4y4mo2w
-INFO [06-13|09:34:29.342] Imported new block headers               count=832  elapsed=87.103ms      number=1024195 hash="7040eb…a1366d" age=4y4mo2w
-TRACE[06-13|09:34:30.580] Processing new chain section             type=bloombits section=201
-TRACE[06-13|09:34:32.557] Processing new chain section             type=bloombits section=202
-INFO [06-13|09:34:33.799] Upgrading chain index                    type=bloombits percentage=83
-TRACE[06-13|09:34:33.799] Processing new chain section             type=bloombits section=203
-TRACE[06-13|09:34:35.229] Processing new chain section             type=bloombits section=204
-INFO [06-13|09:34:36.310] Setting index marker                     remote=s3 number=981096
-INFO [06-13|09:34:36.361] Finished syncing ancients                remote=s3 frozen=981096 blocks=2152 elapsed=7.907339474s  bps=272.15
-INFO [06-13|09:34:36.770] Imported new block receipts              count=2048 elapsed=8.503s        number=981095  hash="b4211d…885dee" age=4y4mo3w  size=2.59MiB
-INFO [06-13|09:34:36.932] Syncing ancients                         remote=s3 frozen=983144 blocks=2152
-TRACE[06-13|09:34:37.392] Processing new chain section             type=bloombits section=205
-INFO [06-13|09:34:37.547] Imported new block headers               count=2048 elapsed=156.512ms     number=1026243 hash="d9e1b5…11a0bb" age=4y4mo2w
-WARN [06-13|09:34:37.577] Rolled back headers                      count=2048 header=1026243->1024195 fast=981095->981095 block=0->0
-TRACE[06-13|09:34:40.480] Processing new chain section             type=bloombits section=206
-INFO [06-13|09:34:42.343] Upgrading chain index                    type=bloombits percentage=85
-TRACE[06-13|09:34:42.343] Processing new chain section             type=bloombits section=207
-TRACE[06-13|09:34:43.944] Processing new chain section             type=bloombits section=208
-INFO [06-13|09:34:45.010] Setting index marker                     remote=s3 number=983144
-INFO [06-13|09:34:45.071] Finished syncing ancients                remote=s3 frozen=983144 blocks=2152 elapsed=8.078323156s  bps=266.39
-INFO [06-13|09:34:45.477] Imported new block receipts              count=2048 elapsed=8.690s        number=983143  hash="50cc27…b82f9e" age=4y4mo3w  size=2.96MiB
-WARN [06-13|09:34:45.484] Synchronisation failed, dropping peer    peer=f50cb5ced45b332e err="action from bad peer ignored"
-TRACE[06-13|09:34:45.670] Processing new chain section             type=bloombits section=209
-TRACE[06-13|09:34:47.245] Processing new chain section             type=bloombits section=210
-TRACE[06-13|09:34:49.060] Processing new chain section             type=bloombits section=211
-INFO [06-13|09:34:51.417] Upgrading chain index                    type=bloombits percentage=87
-TRACE[06-13|09:34:51.417] Processing new chain section             type=bloombits section=212
-INFO [06-13|09:34:52.181] Imported new block headers               count=0    elapsed=3.806ms       number=983335  hash="06413f…81af10" age=4y4mo3w  ignored=192
-INFO [06-13|09:34:52.632] Imported new block headers               count=0    elapsed=30.383ms      number=984103  hash="e8db5b…26a6d2" age=4y4mo3w  ignored=768
-INFO [06-13|09:34:52.825] Imported new block headers               count=0    elapsed=3.958ms       number=984295  hash="bb1ae7…ef3138" age=4y4mo3w  ignored=192
-TRACE[06-13|09:34:53.416] Processing new chain section             type=bloombits section=213
-TRACE[06-13|09:34:55.000] Processing new chain section             type=bloombits section=214
-INFO [06-13|09:34:56.116] Syncing ancients                         remote=s3 frozen=983158 blocks=118
-INFO [06-13|09:34:56.175] Imported new block headers               count=0    elapsed=51.462ms      number=986343  hash="b301cf…82c12c" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:56.185] Imported new block headers               count=0    elapsed=1.917ms       number=986407  hash="82c6ec…9ce384" age=4y4mo3w  ignored=64
-TRACE[06-13|09:34:56.363] Processing new chain section             type=bloombits section=215
-INFO [06-13|09:34:56.781] Setting index marker                     remote=s3 number=983158
-INFO [06-13|09:34:56.857] Finished syncing ancients                remote=s3 frozen=983158 blocks=118  elapsed=664.115968ms  bps=177.68
-INFO [06-13|09:34:56.858] Imported new block receipts              count=14   elapsed=744.713ms     number=983157  hash="3e2171…11a08e" age=4y4mo3w  size=21.33KiB
-INFO [06-13|09:34:56.860] Syncing ancients                         remote=s3 frozen=983168 blocks=128
-WARN [06-13|09:34:57.165] Stalling state sync, dropping peer       peer=29f5de3fa1a99a16
-INFO [06-13|09:34:57.361] Setting index marker                     remote=s3 number=983168
-INFO [06-13|09:34:57.418] Finished syncing ancients                remote=s3 frozen=983168 blocks=128  elapsed=500.378925ms  bps=255.81
-INFO [06-13|09:34:57.418] Imported new block receipts              count=10   elapsed=558.957ms     number=983167  hash="cc60e2…42a944" age=4y4mo3w  size=11.88KiB
-INFO [06-13|09:34:57.423] Syncing ancients                         remote=s3 frozen=983237 blocks=197
-WARN [06-13|09:34:57.486] Stalling state sync, dropping peer       peer=cc418798a2f6307e
-INFO [06-13|09:34:57.957] Setting index marker                     remote=s3 number=983237
-INFO [06-13|09:34:58.017] Finished syncing ancients                remote=s3 frozen=983237 blocks=197  elapsed=534.18841ms   bps=368.78
-INFO [06-13|09:34:58.019] Imported new block receipts              count=69   elapsed=599.827ms     number=983236  hash="07b88f…02bd3a" age=4y4mo3w  size=92.64KiB
-INFO [06-13|09:34:58.170] Imported new block headers               count=0    elapsed=77.951ms      number=988455  hash="62aa63…ba6ca4" age=4y4mo3w  ignored=2048
-TRACE[06-13|09:34:58.271] Processing new chain section             type=bloombits section=216
-INFO [06-13|09:34:58.301] Imported new block headers               count=0    elapsed=77.333ms      number=990503  hash="35d4af…82879a" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:58.314] Imported new block headers               count=0    elapsed=3.488ms       number=990631  hash="a0a4fc…588272" age=4y4mo3w  ignored=128
-INFO [06-13|09:34:58.322] Imported new block headers               count=0    elapsed=5.259ms       number=990823  hash="21a106…7ee4e1" age=4y4mo3w  ignored=192
-INFO [06-13|09:34:58.338] Syncing ancients                         remote=s3 frozen=985107 blocks=2067
-INFO [06-13|09:34:58.427] Imported new block headers               count=0    elapsed=78.681ms      number=992871  hash="25a0c3…e160c5" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:58.489] Imported new block headers               count=0    elapsed=42.425ms      number=994919  hash="f8886d…da0f47" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:58.561] Imported new block headers               count=0    elapsed=44.806ms      number=996967  hash="3691bd…8d584e" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:58.636] Imported new block headers               count=0    elapsed=49.717ms      number=999015  hash="0b6bf7…0fa084" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:58.748] Imported new block headers               count=0    elapsed=81.952ms      number=1001063 hash="b3f123…4c7fd4" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:58.820] Imported new block headers               count=0    elapsed=47.057ms      number=1003111 hash="c2ed78…eaf56b" age=4y4mo3w  ignored=2048
-INFO [06-13|09:34:58.913] Imported new block headers               count=0    elapsed=61.284ms      number=1005159 hash="58f5d3…cb92ba" age=4y4mo2w  ignored=2048
-INFO [06-13|09:34:59.020] Imported new block headers               count=0    elapsed=64.187ms      number=1007207 hash="8845d5…10c6c1" age=4y4mo2w  ignored=2048
-INFO [06-13|09:34:59.051] Imported new block headers               count=0    elapsed=13.916ms      number=1007719 hash="c9354c…3da51d" age=4y4mo2w  ignored=512
-INFO [06-13|09:34:59.113] Imported new block headers               count=0    elapsed=4.526ms       number=1007911 hash="813984…9b4868" age=4y4mo2w  ignored=192
-INFO [06-13|09:34:59.290] Imported new block headers               count=0    elapsed=17.563ms      number=1008679 hash="b204c9…e6bc25" age=4y4mo2w  ignored=768
-INFO [06-13|09:35:00.459] Upgrading chain index                    type=bloombits percentage=89
-TRACE[06-13|09:35:00.459] Processing new chain section             type=bloombits section=217
-INFO [06-13|09:35:01.869] Imported new block headers               count=0    elapsed=40.767ms      number=1010727 hash="86b473…19c5cc" age=4y4mo2w  ignored=2048
-INFO [06-13|09:35:01.878] Imported new block headers               count=0    elapsed="990.844µs"   number=1010791 hash="244060…0d23b5" age=4y4mo2w  ignored=64
-TRACE[06-13|09:35:02.049] Processing new chain section             type=bloombits section=218
-INFO [06-13|09:35:02.802] Setting index marker                     remote=s3 number=985107
-INFO [06-13|09:35:02.866] Finished syncing ancients                remote=s3 frozen=985107 blocks=2067 elapsed=4.464426273s  bps=462.99
-INFO [06-13|09:35:03.181] Imported new block receipts              count=1870 elapsed=5.075s        number=985106  hash="da0381…cf49ff" age=4y4mo3w  size=2.69MiB
-INFO [06-13|09:35:03.358] Syncing ancients                         remote=s3 frozen=987155 blocks=2067
-TRACE[06-13|09:35:03.780] Processing new chain section             type=bloombits section=219
-INFO [06-13|09:35:05.259] Imported new block headers               count=0    elapsed=27.713ms      number=1012839 hash="462719…438311" age=4y4mo2w  ignored=2048
-INFO [06-13|09:35:05.308] Imported new block headers               count=0    elapsed=32.916ms      number=1014887 hash="6c40f8…1cab7e" age=4y4mo2w  ignored=2048
-INFO [06-13|09:35:05.361] Imported new block headers               count=0    elapsed=32.887ms      number=1016935 hash="bf9e7d…fd6fc3" age=4y4mo2w  ignored=2048
-INFO [06-13|09:35:05.410] Imported new block headers               count=0    elapsed=32.905ms      number=1018983 hash="0ce3e7…c3bcad" age=4y4mo2w  ignored=2048
-INFO [06-13|09:35:05.455] Imported new block headers               count=0    elapsed=28.092ms      number=1021031 hash="8ff69b…da8ea3" age=4y4mo2w  ignored=2048
-INFO [06-13|09:35:05.501] Imported new block headers               count=0    elapsed=29.410ms      number=1023079 hash="d1f6cd…3635d8" age=4y4mo2w  ignored=2048
-INFO [06-13|09:35:05.600] Imported new block headers               count=932  elapsed=81.190ms      number=1025127 hash="ff8cf2…6216ab" age=4y4mo2w  ignored=1116
-INFO [06-13|09:35:05.767] Imported new block headers               count=2048 elapsed=141.543ms     number=1027175 hash="877782…1910a1" age=4y4mo2w
-INFO [06-13|09:35:05.950] Imported new block headers               count=2048 elapsed=153.765ms     number=1029223 hash="f7dce9…9cac69" age=4y4mo2w
-INFO [06-13|09:35:06.135] Imported new block headers               count=2048 elapsed=153.697ms     number=1031271 hash="77a646…6953de" age=4y4mo2w
-INFO [06-13|09:35:07.190] Setting index marker                     remote=s3 number=987155
-INFO [06-13|09:35:07.247] Finished syncing ancients                remote=s3 frozen=987155 blocks=2067 elapsed=3.832196001s  bps=539.38
-INFO [06-13|09:35:07.546] Imported new block receipts              count=2048 elapsed=4.348s        number=987154  hash="6cd505…96c736" age=4y4mo3w  size=2.91MiB
-INFO [06-13|09:35:07.725] Syncing ancients                         remote=s3 frozen=989203 blocks=2067
-TRACE[06-13|09:35:07.790] Processing new chain section             type=bloombits section=220
-INFO [06-13|09:35:08.278] Imported new block headers               count=1024 elapsed=100.897ms     number=1032295 hash="17c0a5…05bdaf" age=4y4mo2w
-INFO [06-13|09:35:09.951] Upgrading chain index                    type=bloombits percentage=91
-TRACE[06-13|09:35:09.951] Processing new chain section             type=bloombits section=221
-TRACE[06-13|09:35:12.209] Processing new chain section             type=bloombits section=222
-INFO [06-13|09:35:12.893] Setting index marker                     remote=s3 number=989203
-DEBUG[06-13|09:35:12.908] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
-INFO [06-13|09:35:12.947] Finished syncing ancients                remote=s3 frozen=989203 blocks=2067 elapsed=5.168080947s  bps=399.96
-INFO [06-13|09:35:13.597] Imported new block receipts              count=2048 elapsed=6.036s        number=989202  hash="74e0be…0c3dfa" age=4y4mo3w  size=3.29MiB
-INFO [06-13|09:35:13.780] Syncing ancients                         remote=s3 frozen=991251 blocks=2067
-TRACE[06-13|09:35:14.207] Processing new chain section             type=bloombits section=223
-INFO [06-13|09:35:14.305] Imported new block headers               count=192  elapsed=19.807ms      number=1032487 hash="65e917…9acf2d" age=4y4mo2w
-TRACE[06-13|09:35:16.093] Processing new chain section             type=bloombits section=224
-TRACE[06-13|09:35:17.894] Processing new chain section             type=bloombits section=225
-INFO [06-13|09:35:19.485] Setting index marker                     remote=s3 number=991251
-INFO [06-13|09:35:19.548] Finished syncing ancients                remote=s3 frozen=991251 blocks=2067 elapsed=5.704945723s  bps=362.32
-INFO [06-13|09:35:19.576] Upgrading chain index                    type=bloombits percentage=93
-TRACE[06-13|09:35:19.576] Processing new chain section             type=bloombits section=226
-INFO [06-13|09:35:20.164] Imported new block receipts              count=2048 elapsed=6.550s        number=991250  hash="119bfb…2f5b1a" age=4y4mo3w  size=3.30MiB
-INFO [06-13|09:35:20.367] Syncing ancients                         remote=s3 frozen=993299 blocks=2067
-INFO [06-13|09:35:20.511] Imported new block headers               count=2048 elapsed=180.587ms     number=1034535 hash="86c980…5b3c0d" age=4y4mo2w
-INFO [06-13|09:35:20.725] Imported new block headers               count=2048 elapsed=176.229ms     number=1036583 hash="070b51…80cad8" age=4y4mo2w
-TRACE[06-13|09:35:21.243] Processing new chain section             type=bloombits section=227
-TRACE[06-13|09:35:22.947] Processing new chain section             type=bloombits section=228
-TRACE[06-13|09:35:24.413] Processing new chain section             type=bloombits section=229
-TRACE[06-13|09:35:25.759] Processing new chain section             type=bloombits section=230
-INFO [06-13|09:35:26.282] Setting index marker                     remote=s3 number=993299
-INFO [06-13|09:35:26.407] Finished syncing ancients                remote=s3 frozen=993299 blocks=2067 elapsed=5.915520836s  bps=349.42
-INFO [06-13|09:35:26.765] Imported new block receipts              count=2048 elapsed=6.582s        number=993298  hash="d6b2eb…bbb594" age=4y4mo3w  size=2.91MiB
-INFO [06-13|09:35:26.931] Syncing ancients                         remote=s3 frozen=995347 blocks=2067
-TRACE[06-13|09:35:27.083] Processing new chain section             type=bloombits section=231
-INFO [06-13|09:35:27.933] Imported new block headers               count=2048 elapsed=157.010ms     number=1038631 hash="a48df4…880fd5" age=4y4mo1w
-INFO [06-13|09:35:28.410] Upgrading chain index                    type=bloombits percentage=95
-TRACE[06-13|09:35:28.410] Processing new chain section             type=bloombits section=232
-TRACE[06-13|09:35:30.122] Processing new chain section             type=bloombits section=233
-TRACE[06-13|09:35:31.412] Processing new chain section             type=bloombits section=234
-TRACE[06-13|09:35:32.829] Processing new chain section             type=bloombits section=235
-TRACE[06-13|09:35:36.155] Processing new chain section             type=bloombits section=236
-INFO [06-13|09:35:36.300] Setting index marker                     remote=s3 number=995347
-INFO [06-13|09:35:36.356] Finished syncing ancients                remote=s3 frozen=995347 blocks=2067 elapsed=9.368661998s  bps=220.63
-INFO [06-13|09:35:36.701] Imported new block receipts              count=2048 elapsed=9.919s        number=995346  hash="b7d1cd…ddcfcb" age=4y4mo3w  size=3.51MiB
-INFO [06-13|09:35:36.856] Syncing ancients                         remote=s3 frozen=997395 blocks=2067
-INFO [06-13|09:35:37.179] Imported new block headers               count=2048 elapsed=179.801ms     number=1040679 hash="7feede…c4793e" age=4y4mo1w
-INFO [06-13|09:35:37.577] Upgrading chain index                    type=bloombits percentage=97
-TRACE[06-13|09:35:37.577] Processing new chain section             type=bloombits section=237
-TRACE[06-13|09:35:39.245] Processing new chain section             type=bloombits section=238
-TRACE[06-13|09:35:41.399] Processing new chain section             type=bloombits section=239
-INFO [06-13|09:35:41.728] Setting index marker                     remote=s3 number=997395
-INFO [06-13|09:35:41.790] Finished syncing ancients                remote=s3 frozen=997395 blocks=2067 elapsed=4.872135084s  bps=424.25
-INFO [06-13|09:35:42.086] Imported new block receipts              count=2048 elapsed=5.369s        number=997394  hash="d626de…dd3a56" age=4y4mo3w  size=3.36MiB
-INFO [06-13|09:35:42.242] Syncing ancients                         remote=s3 frozen=999443 blocks=2067
-INFO [06-13|09:35:42.417] Imported new block headers               count=2048 elapsed=208.979ms     number=1042727 hash="452104…bb593f" age=4y4mo1w
-TRACE[06-13|09:35:42.871] Processing new chain section             type=bloombits section=240
-TRACE[06-13|09:35:44.280] Processing new chain section             type=bloombits section=241
-INFO [06-13|09:35:45.802] Finished upgrading chain index           type=bloombits
-INFO [06-13|09:35:48.548] Setting index marker                     remote=s3 number=999443
-INFO [06-13|09:35:48.606] Finished syncing ancients                remote=s3 frozen=999443 blocks=2067 elapsed=6.306004903s  bps=327.78
-INFO [06-13|09:35:48.965] Imported new block receipts              count=2048 elapsed=6.863s        number=999442  hash="a5d34f…429e74" age=4y4mo3w  size=3.26MiB
-INFO [06-13|09:35:49.148] Syncing ancients                         remote=s3 frozen=1001491 blocks=2067
-INFO [06-13|09:35:49.670] Imported new block headers               count=2048 elapsed=193.991ms     number=1044775 hash="2eee6a…e33b93" age=4y4mo1w
-INFO [06-13|09:35:55.577] Setting index marker                     remote=s3 number=1001491
-INFO [06-13|09:35:55.645] Finished syncing ancients                remote=s3 frozen=1001491 blocks=2067 elapsed=6.42897369s   bps=321.51
-INFO [06-13|09:35:56.023] Imported new block receipts              count=2048 elapsed=7.039s        number=1001490 hash="8024f5…f46b4d" age=4y4mo3w  size=3.37MiB
-INFO [06-13|09:35:56.196] Syncing ancients                         remote=s3 frozen=1003539 blocks=2067
-INFO [06-13|09:35:56.866] Imported new block headers               count=2048 elapsed=165.016ms     number=1046823 hash="c9e181…d8d7ab" age=4y4mo1w
-INFO [06-13|09:36:01.176] Setting index marker                     remote=s3 number=1003539
-INFO [06-13|09:36:01.245] Finished syncing ancients                remote=s3 frozen=1003539 blocks=2067 elapsed=4.979736s     bps=415.08
-INFO [06-13|09:36:01.553] Imported new block receipts              count=2048 elapsed=5.514s        number=1003538 hash="1f3460…6bfe1b" age=4y4mo2w  size=2.94MiB
-INFO [06-13|09:36:01.679] Syncing ancients                         remote=s3 frozen=1005587 blocks=2067
-INFO [06-13|09:36:02.081] Imported new block headers               count=2048 elapsed=186.183ms     number=1048871 hash="44416e…630e01" age=4y4mo1w
-INFO [06-13|09:36:06.499] Setting index marker                     remote=s3 number=1005587
-INFO [06-13|09:36:06.585] Finished syncing ancients                remote=s3 frozen=1005587 blocks=2067 elapsed=4.819313504s  bps=428.90
-WARN [06-13|09:36:06.805] Stalling state sync, dropping peer       peer=cf58d6896694c350
-INFO [06-13|09:36:06.896] Imported new block receipts              count=2048 elapsed=5.327s        number=1005586 hash="bc6643…b7d80a" age=4y4mo2w  size=2.85MiB
-INFO [06-13|09:36:07.031] Syncing ancients                         remote=s3 frozen=1007635 blocks=2067
-INFO [06-13|09:36:07.320] Imported new block headers               count=2048 elapsed=207.773ms     number=1050919 hash="9b994f…768d0e" age=4y4mo1w
-INFO [06-13|09:36:12.076] Setting index marker                     remote=s3 number=1007635
-INFO [06-13|09:36:12.140] Finished syncing ancients                remote=s3 frozen=1007635 blocks=2067 elapsed=5.045218837s  bps=409.69
-INFO [06-13|09:36:12.652] Imported new block receipts              count=2048 elapsed=5.740s        number=1007634 hash="44abd4…ca654a" age=4y4mo2w  size=2.92MiB
-INFO [06-13|09:36:12.791] Syncing ancients                         remote=s3 frozen=1009683 blocks=2067
-DEBUG[06-13|09:36:12.908] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
-INFO [06-13|09:36:13.515] Imported new block headers               count=2048 elapsed=155.301ms     number=1052967 hash="e05a2c…db56ac" age=4y4mo1w
-INFO [06-13|09:36:17.596] Setting index marker                     remote=s3 number=1009683
-INFO [06-13|09:36:17.659] Finished syncing ancients                remote=s3 frozen=1009683 blocks=2067 elapsed=4.804829031s  bps=430.19
-INFO [06-13|09:36:18.061] Imported new block receipts              count=2048 elapsed=5.393s        number=1009682 hash="9c9112…31276d" age=4y4mo2w  size=2.99MiB
-INFO [06-13|09:36:18.179] Syncing ancients                         remote=s3 frozen=1011731 blocks=2067
-INFO [06-13|09:36:18.832] Imported new block headers               count=2048 elapsed=274.076ms     number=1055015 hash="8bf8b5…c52e5e" age=4y4mo1w
-INFO [06-13|09:36:22.371] Setting index marker                     remote=s3 number=1011731
-INFO [06-13|09:36:22.429] Finished syncing ancients                remote=s3 frozen=1011731 blocks=2067 elapsed=4.192461437s  bps=493.03
-INFO [06-13|09:36:22.817] Imported new block receipts              count=2048 elapsed=4.741s        number=1011730 hash="abcc92…dfca81" age=4y4mo2w  size=2.52MiB
-INFO [06-13|09:36:22.952] Syncing ancients                         remote=s3 frozen=1013779 blocks=2067
-INFO [06-13|09:36:23.997] Imported new block headers               count=1856 elapsed=136.750ms     number=1056871 hash="da5d45…27a692" age=4y4mo1w
-INFO [06-13|09:36:27.553] Setting index marker                     remote=s3 number=1013779
-INFO [06-13|09:36:27.624] Finished syncing ancients                remote=s3 frozen=1013779 blocks=2067 elapsed=4.600379798s  bps=449.31
-INFO [06-13|09:36:28.027] Imported new block receipts              count=2048 elapsed=5.194s        number=1013778 hash="7b9dcb…14e23e" age=4y4mo2w  size=2.94MiB
-INFO [06-13|09:36:28.158] Syncing ancients                         remote=s3 frozen=1015827 blocks=2067
-INFO [06-13|09:36:29.274] Imported new block headers               count=2048 elapsed=247.660ms     number=1058919 hash="2defcb…c2d829" age=4y4mo1w
-WARN [06-13|09:36:33.097] Stalling state sync, dropping peer       peer=997e0f7a0422f08d
-INFO [06-13|09:36:33.284] Setting index marker                     remote=s3 number=1015827
-INFO [06-13|09:36:33.345] Finished syncing ancients                remote=s3 frozen=1015827 blocks=2067 elapsed=5.125985487s  bps=403.24
-INFO [06-13|09:36:33.758] Imported new block receipts              count=2048 elapsed=5.715s        number=1015826 hash="28c86d…d03adb" age=4y4mo2w  size=2.99MiB
-INFO [06-13|09:36:33.912] Syncing ancients                         remote=s3 frozen=1017875 blocks=2067
-INFO [06-13|09:36:34.497] Imported new block headers               count=1984 elapsed=175.487ms     number=1060903 hash="1773ea…f2d001" age=4y4mo1w
-INFO [06-13|09:36:37.540] Setting index marker                     remote=s3 number=1017875
-INFO [06-13|09:36:37.607] Finished syncing ancients                remote=s3 frozen=1017875 blocks=2067 elapsed=3.627887505s  bps=569.75
-INFO [06-13|09:36:37.921] Imported new block receipts              count=2048 elapsed=4.148s        number=1017874 hash="196aee…bd5892" age=4y4mo2w  size=3.36MiB
-INFO [06-13|09:36:38.172] Syncing ancients                         remote=s3 frozen=1019923 blocks=2067
-INFO [06-13|09:36:38.728] Imported new block headers               count=2048 elapsed=201.578ms     number=1062951 hash="868694…800556" age=4y4mo1w
-INFO [06-13|09:36:44.428] Setting index marker                     remote=s3 number=1019923
-INFO [06-13|09:36:44.531] Finished syncing ancients                remote=s3 frozen=1019923 blocks=2067 elapsed=6.256420486s  bps=330.38
-INFO [06-13|09:36:44.892] Imported new block receipts              count=2048 elapsed=6.954s        number=1019922 hash="cf2668…501a0d" age=4y4mo2w  size=5.76MiB
-INFO [06-13|09:36:45.029] Syncing ancients                         remote=s3 frozen=1021971 blocks=2067
-INFO [06-13|09:36:45.951] Imported new block headers               count=2048 elapsed=187.486ms     number=1064999 hash="05563d…0a6be9" age=4y4mo1w
-INFO [06-13|09:36:48.655] Setting index marker                     remote=s3 number=1021971
-INFO [06-13|09:36:48.722] Finished syncing ancients                remote=s3 frozen=1021971 blocks=2067 elapsed=3.626192558s  bps=570.02
-INFO [06-13|09:36:49.030] Imported new block receipts              count=2048 elapsed=4.122s        number=1021970 hash="efd93e…5d47c8" age=4y4mo2w  size=2.57MiB
-INFO [06-13|09:36:49.177] Syncing ancients                         remote=s3 frozen=1024019 blocks=2067
-INFO [06-13|09:36:50.187] Imported new block headers               count=2048 elapsed=189.337ms     number=1067047 hash="c00156…750070" age=4y4mo1w
-INFO [06-13|09:36:53.232] Setting index marker                     remote=s3 number=1024019
-INFO [06-13|09:36:53.297] Finished syncing ancients                remote=s3 frozen=1024019 blocks=2067 elapsed=4.054592598s  bps=509.79
-INFO [06-13|09:36:53.634] Imported new block receipts              count=2048 elapsed=4.588s        number=1024018 hash="003e37…bcda24" age=4y4mo2w  size=3.23MiB
-INFO [06-13|09:36:53.770] Syncing ancients                         remote=s3 frozen=1026067 blocks=2067
-INFO [06-13|09:36:54.388] Imported new block headers               count=2048 elapsed=174.395ms     number=1069095 hash="c5180c…6a9007" age=4y4mo1w
-INFO [06-13|09:36:57.517] Setting index marker                     remote=s3 number=1026067
-INFO [06-13|09:36:57.607] Finished syncing ancients                remote=s3 frozen=1026067 blocks=2067 elapsed=3.747642862s  bps=551.55
-INFO [06-13|09:36:57.996] Imported new block receipts              count=2048 elapsed=4.347s        number=1026066 hash="1e0b25…ff2263" age=4y4mo2w  size=2.77MiB
-INFO [06-13|09:36:58.144] Syncing ancients                         remote=s3 frozen=1028115 blocks=2067
-INFO [06-13|09:36:58.641] Imported new block headers               count=2048 elapsed=219.281ms     number=1071143 hash="1e11f7…75a38d" age=4y4mo1w
-INFO [06-13|09:37:02.311] Setting index marker                     remote=s3 number=1028115
-INFO [06-13|09:37:02.371] Finished syncing ancients                remote=s3 frozen=1028115 blocks=2067 elapsed=4.166987636s  bps=496.04
-INFO [06-13|09:37:02.727] Imported new block receipts              count=2048 elapsed=4.713s        number=1028114 hash="404e77…ecee84" age=4y4mo2w  size=3.16MiB
-INFO [06-13|09:37:02.863] Syncing ancients                         remote=s3 frozen=1030163 blocks=2067
-INFO [06-13|09:37:03.851] Imported new block headers               count=2048 elapsed=169.380ms     number=1073191 hash="9a464b…15a1f0" age=4y4mo1w
-WARN [06-13|09:37:06.171] Stalling state sync, dropping peer       peer=3259017c89ea26cd
-INFO [06-13|09:37:07.396] Setting index marker                     remote=s3 number=1030163
-INFO [06-13|09:37:07.461] Finished syncing ancients                remote=s3 frozen=1030163 blocks=2067 elapsed=4.533038027s  bps=455.99
-INFO [06-13|09:37:07.743] Imported new block receipts              count=2048 elapsed=5.000s        number=1030162 hash="1c6002…a0f740" age=4y4mo2w  size=2.95MiB
-INFO [06-13|09:37:07.935] Syncing ancients                         remote=s3 frozen=1032211 blocks=2067
-INFO [06-13|09:37:08.099] Imported new block headers               count=2048 elapsed=203.348ms     number=1075239 hash="7d7a75…208d9c" age=4y4mo6d
-INFO [06-13|09:37:12.376] Setting index marker                     remote=s3 number=1032211
-INFO [06-13|09:37:12.456] Finished syncing ancients                remote=s3 frozen=1032211 blocks=2067 elapsed=4.441356429s  bps=465.40
-INFO [06-13|09:37:12.766] Imported new block receipts              count=2048 elapsed=5.005s        number=1032210 hash="210ea8…fef8c0" age=4y4mo2w  size=2.95MiB
-INFO [06-13|09:37:12.886] Syncing ancients                         remote=s3 frozen=1034259 blocks=2067
-DEBUG[06-13|09:37:12.909] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
-INFO [06-13|09:37:13.372] Imported new block headers               count=2048 elapsed=240.841ms     number=1077287 hash="3d6f5d…188c52" age=4y4mo6d
-INFO [06-13|09:37:16.717] Setting index marker                     remote=s3 number=1034259
-INFO [06-13|09:37:16.784] Finished syncing ancients                remote=s3 frozen=1034259 blocks=2067 elapsed=3.8315196s    bps=539.47
-INFO [06-13|09:37:17.105] Imported new block receipts              count=2048 elapsed=4.324s        number=1034258 hash="ff7be0…edbcfd" age=4y4mo2w  size=2.54MiB
-INFO [06-13|09:37:17.230] Syncing ancients                         remote=s3 frozen=1036307 blocks=2067
-INFO [06-13|09:37:17.575] Imported new block headers               count=2048 elapsed=173.852ms     number=1079335 hash="a21128…60edd9" age=4y4mo5d
-INFO [06-13|09:37:21.079] Setting index marker                     remote=s3 number=1036307
-INFO [06-13|09:37:21.139] Finished syncing ancients                remote=s3 frozen=1036307 blocks=2067 elapsed=3.848971081s  bps=537.03
-INFO [06-13|09:37:21.487] Imported new block receipts              count=2048 elapsed=4.366s        number=1036306 hash="a4fc6b…8f8394" age=4y4mo2w  size=2.59MiB
-INFO [06-13|09:37:21.663] Syncing ancients                         remote=s3 frozen=1038355 blocks=2067
-INFO [06-13|09:37:21.892] Imported new block headers               count=2048 elapsed=286.720ms     number=1081383 hash="222af4…dde25b" age=4y4mo5d
-INFO [06-13|09:37:25.927] Setting index marker                     remote=s3 number=1038355
-INFO [06-13|09:37:25.984] Finished syncing ancients                remote=s3 frozen=1038355 blocks=2067 elapsed=4.263979578s  bps=484.76
-INFO [06-13|09:37:26.347] Imported new block receipts              count=2048 elapsed=4.841s        number=1038354 hash="1c9e9b…57ced2" age=4y4mo1w  size=2.66MiB
-INFO [06-13|09:37:26.477] Syncing ancients                         remote=s3 frozen=1040403 blocks=2067
-INFO [06-13|09:37:26.912] Imported new block headers               count=64   elapsed=8.977ms       number=1081447 hash="ec8e93…544294" age=4y4mo5d
-INFO [06-13|09:37:30.641] Setting index marker                     remote=s3 number=1040403
-INFO [06-13|09:37:30.698] Finished syncing ancients                remote=s3 frozen=1040403 blocks=2067 elapsed=4.163590619s  bps=496.45
-INFO [06-13|09:37:32.050] Imported new block receipts              count=2048 elapsed=5.688s        number=1040402 hash="218fd2…204614" age=4y4mo1w  size=2.73MiB
-INFO [06-13|09:37:32.236] Syncing ancients                         remote=s3 frozen=1042451 blocks=2067
-WARN [06-13|09:37:32.901] Stalling state sync, dropping peer       peer=cc45d8848526f2fe
-INFO [06-13|09:37:33.120] Imported new block headers               count=2048 elapsed=187.597ms     number=1083495 hash="48f76f…cb9407" age=4y4mo4d
-INFO [06-13|09:37:33.310] Imported new block headers               count=2048 elapsed=163.501ms     number=1085543 hash="52b14f…cd5928" age=4y4mo4d
-INFO [06-13|09:37:37.101] Setting index marker                     remote=s3 number=1042451
-INFO [06-13|09:37:37.164] Finished syncing ancients                remote=s3 frozen=1042451 blocks=2067 elapsed=4.865390145s  bps=424.84
-INFO [06-13|09:37:37.804] Imported new block receipts              count=2048 elapsed=5.731s        number=1042450 hash="377d5a…6ea91f" age=4y4mo1w  size=2.88MiB
-INFO [06-13|09:37:37.959] Syncing ancients                         remote=s3 frozen=1044499 blocks=2067
-INFO [06-13|09:37:38.589] Imported new block headers               count=2048 elapsed=227.955ms     number=1087591 hash="f562d6…984141" age=4y4mo4d
-INFO [06-13|09:37:42.383] Setting index marker                     remote=s3 number=1044499
-INFO [06-13|09:37:42.448] Finished syncing ancients                remote=s3 frozen=1044499 blocks=2067 elapsed=4.424469219s  bps=467.17
-INFO [06-13|09:37:42.999] Imported new block receipts              count=2048 elapsed=5.178s        number=1044498 hash="90fa72…70fece" age=4y4mo1w  size=2.71MiB
-INFO [06-13|09:37:43.132] Syncing ancients                         remote=s3 frozen=1046547 blocks=2067
-INFO [06-13|09:37:43.777] Imported new block headers               count=2048 elapsed=160.370ms     number=1089639 hash="42cfe2…066359" age=4y4mo3d
-INFO [06-13|09:37:47.740] Setting index marker                     remote=s3 number=1046547
-INFO [06-13|09:37:47.802] Finished syncing ancients                remote=s3 frozen=1046547 blocks=2067 elapsed=4.608102581s  bps=448.56
-INFO [06-13|09:37:48.382] Imported new block receipts              count=2048 elapsed=5.367s        number=1046546 hash="a4dfc5…a59093" age=4y4mo1w  size=2.88MiB
-INFO [06-13|09:37:48.545] Syncing ancients                         remote=s3 frozen=1048595 blocks=2067
-INFO [06-13|09:37:49.016] Imported new block headers               count=2048 elapsed=208.450ms     number=1091687 hash="a0f57d…5cf71b" age=4y4mo3d
-INFO [06-13|09:37:53.704] Setting index marker                     remote=s3 number=1048595
-INFO [06-13|09:37:53.764] Finished syncing ancients                remote=s3 frozen=1048595 blocks=2067 elapsed=5.158340099s  bps=400.71
-INFO [06-13|09:37:54.270] Imported new block receipts              count=2048 elapsed=5.867s        number=1048594 hash="00e0dc…383b59" age=4y4mo1w  size=2.78MiB
-INFO [06-13|09:37:54.433] Syncing ancients                         remote=s3 frozen=1050643 blocks=2067
-INFO [06-13|09:37:55.222] Imported new block headers               count=2048 elapsed=171.955ms     number=1093735 hash="3dd3ed…4bd0f0" age=4y4mo2d
-INFO [06-13|09:37:58.609] Setting index marker                     remote=s3 number=1050643
-INFO [06-13|09:37:58.666] Finished syncing ancients                remote=s3 frozen=1050643 blocks=2067 elapsed=4.176065322s  bps=494.96
-INFO [06-13|09:37:59.069] Imported new block receipts              count=2048 elapsed=4.783s        number=1050642 hash="4b33ad…5cc20a" age=4y4mo1w  size=2.97MiB
-INFO [06-13|09:37:59.229] Syncing ancients                         remote=s3 frozen=1052691 blocks=2067
-INFO [06-13|09:37:59.464] Imported new block headers               count=2048 elapsed=209.220ms     number=1095783 hash="632919…89fa09" age=4y4mo2d
-INFO [06-13|09:38:02.475] Setting index marker                     remote=s3 number=1052691
-INFO [06-13|09:38:02.527] Finished syncing ancients                remote=s3 frozen=1052691 blocks=2067 elapsed=3.245407825s  bps=636.90
-WARN [06-13|09:38:02.806] Stalling state sync, dropping peer       peer=6955fcb86d6f29f9
-INFO [06-13|09:38:02.898] Imported new block receipts              count=2048 elapsed=3.807s        number=1052690 hash="8ee430…24f963" age=4y4mo1w  size=2.57MiB
-INFO [06-13|09:38:03.038] Syncing ancients                         remote=s3 frozen=1054739 blocks=2067
-INFO [06-13|09:38:03.689] Imported new block headers               count=2048 elapsed=195.774ms     number=1097831 hash="2e48b6…97ec41" age=4y4mo2d
-WARN [06-13|09:38:06.027] Stalling state sync, dropping peer       peer=6b81d5f4467ea267
-INFO [06-13|09:38:07.087] Setting index marker                     remote=s3 number=1054739
-INFO [06-13|09:38:07.146] Finished syncing ancients                remote=s3 frozen=1054739 blocks=2067 elapsed=4.048724801s  bps=510.53
-INFO [06-13|09:38:07.524] Imported new block receipts              count=2048 elapsed=4.610s        number=1054738 hash="952937…a4ed50" age=4y4mo1w  size=2.92MiB
-INFO [06-13|09:38:07.676] Syncing ancients                         remote=s3 frozen=1056787 blocks=2067
-INFO [06-13|09:38:07.897] Imported new block headers               count=2048 elapsed=164.037ms     number=1099879 hash="4eecad…9fde8f" age=4y4mo1d
-INFO [06-13|09:38:12.124] Setting index marker                     remote=s3 number=1056787
-INFO [06-13|09:38:12.185] Finished syncing ancients                remote=s3 frozen=1056787 blocks=2067 elapsed=4.448207633s  bps=464.68
-INFO [06-13|09:38:12.600] Imported new block receipts              count=2048 elapsed=5.055s        number=1056786 hash="f13c0f…9192c6" age=4y4mo1w  size=3.12MiB
-INFO [06-13|09:38:12.744] Syncing ancients                         remote=s3 frozen=1058835 blocks=2067
-DEBUG[06-13|09:38:12.909] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
-INFO [06-13|09:38:13.089] Imported new block headers               count=2048 elapsed=160.703ms     number=1101927 hash="479c0d…3ab940" age=4y4mo1d
-INFO [06-13|09:38:16.996] Setting index marker                     remote=s3 number=1058835
-INFO [06-13|09:38:17.071] Finished syncing ancients                remote=s3 frozen=1058835 blocks=2067 elapsed=4.252400703s  bps=486.08
-INFO [06-13|09:38:17.444] Imported new block receipts              count=2048 elapsed=4.829s        number=1058834 hash="da12d3…28db24" age=4y4mo1w  size=2.82MiB
-INFO [06-13|09:38:17.579] Syncing ancients                         remote=s3 frozen=1060883 blocks=2067
-INFO [06-13|09:38:18.299] Imported new block headers               count=2048 elapsed=173.163ms     number=1103975 hash="6045cf…03ad01" age=4y4mo22h
-INFO [06-13|09:38:22.310] Setting index marker                     remote=s3 number=1060883
-INFO [06-13|09:38:22.395] Finished syncing ancients                remote=s3 frozen=1060883 blocks=2067 elapsed=4.731594131s  bps=436.85
-INFO [06-13|09:38:22.790] Imported new block receipts              count=2048 elapsed=5.329s        number=1060882 hash="38c7ac…6d8c50" age=4y4mo1w  size=2.91MiB
-INFO [06-13|09:38:23.012] Syncing ancients                         remote=s3 frozen=1062931 blocks=2067
-INFO [06-13|09:38:23.510] Imported new block headers               count=2048 elapsed=180.482ms     number=1106023 hash="6e13a0…d21595" age=4y4mo12h
-INFO [06-13|09:38:28.266] Setting index marker                     remote=s3 number=1062931
-INFO [06-13|09:38:28.327] Finished syncing ancients                remote=s3 frozen=1062931 blocks=2067 elapsed=5.253396333s  bps=393.46
-INFO [06-13|09:38:28.678] Imported new block receipts              count=2048 elapsed=5.871s        number=1062930 hash="a28240…462252" age=4y4mo1w  size=5.10MiB
-INFO [06-13|09:38:28.854] Syncing ancients                         remote=s3 frozen=1064979 blocks=2067
-INFO [06-13|09:38:29.743] Imported new block headers               count=2048 elapsed=182.715ms     number=1108071 hash="43c729…0b24bd" age=4y4mo2h
-INFO [06-13|09:38:33.578] Setting index marker                     remote=s3 number=1064979
-INFO [06-13|09:38:33.639] Finished syncing ancients                remote=s3 frozen=1064979 blocks=2067 elapsed=4.724013339s  bps=437.55
-INFO [06-13|09:38:33.960] Imported new block receipts              count=2048 elapsed=5.261s        number=1064978 hash="40236a…390113" age=4y4mo1w  size=2.90MiB
-INFO [06-13|09:38:34.094] Syncing ancients                         remote=s3 frozen=1067027 blocks=2067
-INFO [06-13|09:38:34.967] Imported new block headers               count=2048 elapsed=183.547ms     number=1110119 hash="6536b2…8ebdeb" age=4y3mo4w
-WARN [06-13|09:38:36.752] Stalling state sync, dropping peer       peer=cc45d8848526f2fe
-INFO [06-13|09:38:38.502] Setting index marker                     remote=s3 number=1067027
-INFO [06-13|09:38:38.560] Finished syncing ancients                remote=s3 frozen=1067027 blocks=2067 elapsed=4.40756181s   bps=468.97
-INFO [06-13|09:38:38.975] Imported new block receipts              count=2048 elapsed=5.000s        number=1067026 hash="d58037…81c9fd" age=4y4mo1w  size=2.65MiB
-INFO [06-13|09:38:39.140] Syncing ancients                         remote=s3 frozen=1069075 blocks=2067
-INFO [06-13|09:38:40.192] Imported new block headers               count=2048 elapsed=179.361ms     number=1112167 hash="ad8ce4…f5f36c" age=4y3mo4w
-INFO [06-13|09:38:44.159] Setting index marker                     remote=s3 number=1069075
-INFO [06-13|09:38:44.224] Finished syncing ancients                remote=s3 frozen=1069075 blocks=2067 elapsed=5.018505424s  bps=411.88
-INFO [06-13|09:38:44.632] Imported new block receipts              count=2048 elapsed=5.641s        number=1069074 hash="45cd4a…b8174e" age=4y4mo1w  size=3.26MiB
-INFO [06-13|09:38:44.772] Syncing ancients                         remote=s3 frozen=1071123 blocks=2067
-INFO [06-13|09:38:45.416] Imported new block headers               count=2048 elapsed=195.517ms     number=1114215 hash="b432b0…024c51" age=4y3mo4w
-INFO [06-13|09:38:49.147] Setting index marker                     remote=s3 number=1071123
-INFO [06-13|09:38:49.255] Finished syncing ancients                remote=s3 frozen=1071123 blocks=2067 elapsed=4.374310899s  bps=472.53
-INFO [06-13|09:38:49.634] Imported new block receipts              count=2048 elapsed=4.982s        number=1071122 hash="819d23…4f2255" age=4y4mo1w  size=2.64MiB
-INFO [06-13|09:38:49.781] Syncing ancients                         remote=s3 frozen=1073171 blocks=2067
-INFO [06-13|09:38:50.645] Imported new block headers               count=2048 elapsed=183.509ms     number=1116263 hash="f6bc0b…4d8183" age=4y3mo4w
-WARN [06-13|09:38:53.485] Stalling state sync, dropping peer       peer=6b81d5f4467ea267
-INFO [06-13|09:38:53.961] Setting index marker                     remote=s3 number=1073171
-INFO [06-13|09:38:54.077] Finished syncing ancients                remote=s3 frozen=1073171 blocks=2067 elapsed=4.180539047s  bps=494.43
-INFO [06-13|09:38:54.406] Imported new block receipts              count=2048 elapsed=4.751s        number=1073170 hash="1dce26…dcf749" age=4y4mo1w  size=2.58MiB
-INFO [06-13|09:38:54.584] Syncing ancients                         remote=s3 frozen=1075219 blocks=2067
-INFO [06-13|09:38:54.949] Imported new block headers               count=2048 elapsed=243.827ms     number=1118311 hash="339f86…e49167" age=4y3mo4w
-INFO [06-13|09:39:00.670] Setting index marker                     remote=s3 number=1075219
-INFO [06-13|09:39:00.747] Finished syncing ancients                remote=s3 frozen=1075219 blocks=2067 elapsed=6.085789607s  bps=339.64
-INFO [06-13|09:39:01.630] Imported new block receipts              count=2048 elapsed=7.204s        number=1075218 hash="d5826f…e4890b" age=4y4mo6d  size=2.90MiB
-INFO [06-13|09:39:01.780] Syncing ancients                         remote=s3 frozen=1077267 blocks=2067
-INFO [06-13|09:39:02.175] Imported new block headers               count=2048 elapsed=196.521ms     number=1120359 hash="26ff26…61fcf3" age=4y3mo3w
-INFO [06-13|09:39:06.825] Setting index marker                     remote=s3 number=1077267
-INFO [06-13|09:39:06.885] Finished syncing ancients                remote=s3 frozen=1077267 blocks=2067 elapsed=5.044295604s  bps=409.77
-INFO [06-13|09:39:07.611] Imported new block receipts              count=2048 elapsed=5.965s        number=1077266 hash="deff03…3649e6" age=4y4mo6d  size=2.94MiB
-INFO [06-13|09:39:07.770] Syncing ancients                         remote=s3 frozen=1079315 blocks=2067
-WARN [06-13|09:39:08.186] Stalling state sync, dropping peer       peer=cc45d8848526f2fe
-INFO [06-13|09:39:08.427] Imported new block headers               count=2048 elapsed=203.465ms     number=1122407 hash="00f7b9…33f8d9" age=4y3mo3w
-DEBUG[06-13|09:39:12.909] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
-INFO [06-13|09:39:13.571] Setting index marker                     remote=s3 number=1079315
-INFO [06-13|09:39:13.628] Finished syncing ancients                remote=s3 frozen=1079315 blocks=2067 elapsed=5.801033354s  bps=356.32
-INFO [06-13|09:39:13.823] Imported new block receipts              count=2048 elapsed=6.196s        number=1079314 hash="6ea04b…3f99c1" age=4y4mo5d  size=3.03MiB
-INFO [06-13|09:39:13.978] Syncing ancients                         remote=s3 frozen=1081363 blocks=2067
-INFO [06-13|09:39:14.675] Imported new block headers               count=2048 elapsed=194.896ms     number=1124455 hash="083f96…750954" age=4y3mo3w
-INFO [06-13|09:39:19.372] Setting index marker                     remote=s3 number=1081363
-INFO [06-13|09:39:19.437] Finished syncing ancients                remote=s3 frozen=1081363 blocks=2067 elapsed=5.393622914s  bps=383.23
-INFO [06-13|09:39:20.041] Imported new block receipts              count=2048 elapsed=6.199s        number=1081362 hash="bdda96…8dc95e" age=4y4mo5d  size=2.77MiB
-INFO [06-13|09:39:20.183] Syncing ancients                         remote=s3 frozen=1083411 blocks=2067
-INFO [06-13|09:39:20.923] Imported new block headers               count=2048 elapsed=195.202ms     number=1126503 hash="deeb03…8a1674" age=4y3mo3w
-INFO [06-13|09:39:24.129] Setting index marker                     remote=s3 number=1083411
-INFO [06-13|09:39:24.194] Finished syncing ancients                remote=s3 frozen=1083411 blocks=2067 elapsed=3.946461199s  bps=523.76
-INFO [06-13|09:39:24.691] Imported new block receipts              count=2048 elapsed=4.634s        number=1083410 hash="7e83c5…94b932" age=4y4mo4d  size=2.86MiB
-INFO [06-13|09:39:24.872] Syncing ancients                         remote=s3 frozen=1085459 blocks=2067
-INFO [06-13|09:39:25.160] Imported new block headers               count=2048 elapsed=200.127ms     number=1128551 hash="8abf4e…8c4112" age=4y3mo3w
-INFO [06-13|09:39:29.885] Setting index marker                     remote=s3 number=1085459
-INFO [06-13|09:39:29.961] Finished syncing ancients                remote=s3 frozen=1085459 blocks=2067 elapsed=5.013501083s  bps=412.29
-INFO [06-13|09:39:30.460] Imported new block receipts              count=2048 elapsed=5.753s        number=1085458 hash="136c53…b47b16" age=4y4mo4d  size=3.37MiB
-INFO [06-13|09:39:30.624] Syncing ancients                         remote=s3 frozen=1087507 blocks=2067
-INFO [06-13|09:39:31.447] Imported new block headers               count=2048 elapsed=250.490ms     number=1130599 hash="c89bef…0cabca" age=4y3mo3w
-INFO [06-13|09:39:34.777] Setting index marker                     remote=s3 number=1087507
-INFO [06-13|09:39:34.840] Finished syncing ancients                remote=s3 frozen=1087507 blocks=2067 elapsed=4.153151637s  bps=497.69
-INFO [06-13|09:39:35.234] Imported new block receipts              count=2048 elapsed=4.758s        number=1087506 hash="43033a…c5ce11" age=4y4mo4d  size=2.98MiB
-INFO [06-13|09:39:35.396] Syncing ancients                         remote=s3 frozen=1089555 blocks=2067
-INFO [06-13|09:39:35.682] Imported new block headers               count=2048 elapsed=195.347ms     number=1132647 hash="e0bb19…e0b810" age=4y3mo3w
-INFO [06-13|09:39:40.253] Setting index marker                     remote=s3 number=1089555
-INFO [06-13|09:39:40.351] Finished syncing ancients                remote=s3 frozen=1089555 blocks=2067 elapsed=4.857770307s  bps=425.50
-INFO [06-13|09:39:40.797] Imported new block receipts              count=2048 elapsed=5.547s        number=1089554 hash="34b954…a05537" age=4y4mo3d  size=3.20MiB
-INFO [06-13|09:39:40.945] Syncing ancients                         remote=s3 frozen=1091603 blocks=2067
-INFO [06-13|09:39:41.906] Imported new block headers               count=2048 elapsed=187.572ms     number=1134695 hash="3c01d8…d56800" age=4y3mo3w
-INFO [06-13|09:39:45.442] Setting index marker                     remote=s3 number=1091603
-INFO [06-13|09:39:45.503] Finished syncing ancients                remote=s3 frozen=1091603 blocks=2067 elapsed=4.497348349s  bps=459.60
-INFO [06-13|09:39:45.939] Imported new block receipts              count=2048 elapsed=5.126s        number=1091602 hash="8de593…628e6c" age=4y4mo3d  size=3.15MiB
-INFO [06-13|09:39:46.087] Syncing ancients                         remote=s3 frozen=1093651 blocks=2067
-INFO [06-13|09:39:47.141] Imported new block headers               count=2048 elapsed=206.435ms     number=1136743 hash="ada173…7b0bbc" age=4y3mo3w
-INFO [06-13|09:39:50.721] Setting index marker                     remote=s3 number=1093651
-INFO [06-13|09:39:50.865] Finished syncing ancients                remote=s3 frozen=1093651 blocks=2067 elapsed=4.633892236s  bps=446.06
-INFO [06-13|09:39:51.296] Imported new block receipts              count=2048 elapsed=5.341s        number=1093650 hash="0b0382…fcd882" age=4y4mo2d  size=3.18MiB
-INFO [06-13|09:39:51.457] Syncing ancients                         remote=s3 frozen=1095699 blocks=2067
-INFO [06-13|09:39:52.369] Imported new block headers               count=2048 elapsed=200.158ms     number=1138791 hash="c2a1d2…0f489e" age=4y3mo3w
-INFO [06-13|09:39:56.589] Setting index marker                     remote=s3 number=1095699
-INFO [06-13|09:39:56.651] Finished syncing ancients                remote=s3 frozen=1095699 blocks=2067 elapsed=5.131350865s  bps=402.82
-INFO [06-13|09:39:57.076] Imported new block receipts              count=2048 elapsed=5.763s        number=1095698 hash="308a73…89bc73" age=4y4mo2d  size=3.27MiB
-INFO [06-13|09:39:57.238] Syncing ancients                         remote=s3 frozen=1097747 blocks=2067
-INFO [06-13|09:39:58.009] Imported new block headers               count=2048 elapsed=605.957ms     number=1140839 hash="3b74f0…241a10" age=4y3mo3w
-INFO [06-13|09:40:01.838] Setting index marker                     remote=s3 number=1097747
-INFO [06-13|09:40:01.960] Finished syncing ancients                remote=s3 frozen=1097747 blocks=2067 elapsed=4.599654137s  bps=449.38
-INFO [06-13|09:40:02.308] Imported new block receipts              count=2048 elapsed=5.212s        number=1097746 hash="474e1b…37dfce" age=4y4mo2d  size=3.16MiB
-INFO [06-13|09:40:02.464] Syncing ancients                         remote=s3 frozen=1099795 blocks=2067
-INFO [06-13|09:40:03.782] Imported new block headers               count=2048 elapsed=732.855ms     number=1142887 hash="504253…2bcb73" age=4y3mo3w
-INFO [06-13|09:40:07.585] Setting index marker                     remote=s3 number=1099795
-INFO [06-13|09:40:07.643] Finished syncing ancients                remote=s3 frozen=1099795 blocks=2067 elapsed=5.120538777s  bps=403.67
-INFO [06-13|09:40:08.522] Imported new block receipts              count=2048 elapsed=6.195s        number=1099794 hash="fc435e…69af28" age=4y4mo1d  size=3.03MiB
-INFO [06-13|09:40:09.272] Syncing ancients                         remote=s3 frozen=1101843 blocks=2067
-INFO [06-13|09:40:09.688] Imported new block headers               count=2048 elapsed=847.755ms     number=1144935 hash="ed2fae…c12cbd" age=4y3mo3w
-DEBUG[06-13|09:40:12.909] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
-INFO [06-13|09:40:14.848] Setting index marker                     remote=s3 number=1101843
-INFO [06-13|09:40:14.914] Finished syncing ancients                remote=s3 frozen=1101843 blocks=2067 elapsed=5.575830582s  bps=370.71
-INFO [06-13|09:40:15.379] Imported new block receipts              count=2048 elapsed=6.837s        number=1101842 hash="2256f9…a394e7" age=4y4mo1d  size=3.07MiB
-INFO [06-13|09:40:15.862] Syncing ancients                         remote=s3 frozen=1103891 blocks=2067
-INFO [06-13|09:40:16.305] Imported new block headers               count=2048 elapsed=569.174ms     number=1146983 hash="4f81e3…dbf6db" age=4y3mo3w
-INFO [06-13|09:40:21.353] Setting index marker                     remote=s3 number=1103891
-INFO [06-13|09:40:21.485] Finished syncing ancients                remote=s3 frozen=1103891 blocks=2067 elapsed=5.491642522s  bps=376.39
-INFO [06-13|09:40:21.949] Imported new block receipts              count=2048 elapsed=6.548s        number=1103890 hash="d51f63…f36f0d" age=4y4mo22h size=3.19MiB
-INFO [06-13|09:40:22.289] Syncing ancients                         remote=s3 frozen=1105939 blocks=2067
-INFO [06-13|09:40:23.086] Imported new block headers               count=2048 elapsed=748.558ms     number=1149031 hash="b7a3b4…a685b8" age=4y3mo3w
-WARN [06-13|09:40:26.804] Stalling state sync, dropping peer       peer=1c98a19d0005c7fe
-INFO [06-13|09:40:28.200] Setting index marker                     remote=s3 number=1105939
-INFO [06-13|09:40:28.262] Finished syncing ancients                remote=s3 frozen=1105939 blocks=2067 elapsed=5.911692628s  bps=349.65
-INFO [06-13|09:40:28.712] Imported new block receipts              count=2048 elapsed=6.745s        number=1105938 hash="220b48…935576" age=4y4mo13h size=3.46MiB
-INFO [06-13|09:40:29.035] Syncing ancients                         remote=s3 frozen=1107987 blocks=2067
-INFO [06-13|09:40:29.868] Imported new block headers               count=2048 elapsed=731.764ms     number=1151079 hash="caf6dd…7f8a90" age=4y3mo3w
-INFO [06-13|09:40:34.335] Setting index marker                     remote=s3 number=1107987
-INFO [06-13|09:40:34.400] Finished syncing ancients                remote=s3 frozen=1107987 blocks=2067 elapsed=5.29994206s   bps=390.00
-INFO [06-13|09:40:35.743] Imported new block receipts              count=2048 elapsed=7.011s        number=1107986 hash="0b598d…ce6d28" age=4y4mo3h  size=3.20MiB
-INFO [06-13|09:40:36.075] Syncing ancients                         remote=s3 frozen=1110035 blocks=2067
-INFO [06-13|09:40:36.782] Imported new block headers               count=2048 elapsed=873.626ms     number=1153127 hash="1cba7e…312ea4" age=4y3mo3w
-INFO [06-13|09:40:42.959] Setting index marker                     remote=s3 number=1110035
-INFO [06-13|09:40:43.022] Finished syncing ancients                remote=s3 frozen=1110035 blocks=2067 elapsed=6.884108571s  bps=300.26
-WARN [06-13|09:40:43.122] Stalling state sync, dropping peer       peer=6b81d5f4467ea267
-INFO [06-13|09:40:44.059] Imported new block receipts              count=2048 elapsed=8.300s        number=1110034 hash="1b820a…730195" age=4y3mo4w  size=5.33MiB
-INFO [06-13|09:40:44.267] Syncing ancients                         remote=s3 frozen=1112083 blocks=2067
-INFO [06-13|09:40:45.672] Imported new block headers               count=2048 elapsed=833.798ms     number=1155175 hash="6a7b51…1e0245" age=4y3mo2w
-INFO [06-13|09:40:49.583] Setting index marker                     remote=s3 number=1112083
-INFO [06-13|09:40:49.761] Finished syncing ancients                remote=s3 frozen=1112083 blocks=2067 elapsed=5.316229085s  bps=388.81
-INFO [06-13|09:40:50.408] Imported new block receipts              count=2048 elapsed=6.332s        number=1112082 hash="30773e…ae9250" age=4y3mo4w  size=2.85MiB
-INFO [06-13|09:40:50.586] Syncing ancients                         remote=s3 frozen=1114131 blocks=2067
-INFO [06-13|09:40:51.604] Imported new block headers               count=2048 elapsed=873.610ms     number=1157223 hash="f792b6…663a69" age=4y3mo2w
-INFO [06-13|09:40:56.571] Setting index marker                     remote=s3 number=1114131
-INFO [06-13|09:40:56.633] Finished syncing ancients                remote=s3 frozen=1114131 blocks=2067 elapsed=5.985312831s  bps=345.35
-INFO [06-13|09:40:57.135] Imported new block receipts              count=2048 elapsed=6.711s        number=1114130 hash="7461b1…6c99eb" age=4y3mo4w  size=3.10MiB
-INFO [06-13|09:40:57.369] Syncing ancients                         remote=s3 frozen=1116179 blocks=2067
-INFO [06-13|09:40:58.549] Imported new block headers               count=2048 elapsed=905.478ms     number=1159271 hash="607bcb…7f5a1c" age=4y3mo2w
-INFO [06-13|09:41:02.378] Setting index marker                     remote=s3 number=1116179
-INFO [06-13|09:41:02.433] Finished syncing ancients                remote=s3 frozen=1116179 blocks=2067 elapsed=5.008062007s  bps=412.73
-INFO [06-13|09:41:02.987] Imported new block receipts              count=2048 elapsed=5.836s        number=1116178 hash="0f732c…8ac700" age=4y3mo4w  size=3.39MiB
-INFO [06-13|09:41:03.189] Syncing ancients                         remote=s3 frozen=1118227 blocks=2067
-INFO [06-13|09:41:04.427] Imported new block headers               count=2048 elapsed=846.466ms     number=1161319 hash="d3d907…1630b4" age=4y3mo2w
-INFO [06-13|09:41:07.458] Setting index marker                     remote=s3 number=1118227
-INFO [06-13|09:41:07.566] Finished syncing ancients                remote=s3 frozen=1118227 blocks=2067 elapsed=4.269129214s  bps=484.17
-INFO [06-13|09:41:08.002] Imported new block receipts              count=2048 elapsed=4.995s        number=1118226 hash="edd634…ce0b7a" age=4y3mo4w  size=3.09MiB
-INFO [06-13|09:41:08.204] Syncing ancients                         remote=s3 frozen=1120275 blocks=2067
-INFO [06-13|09:41:09.395] Imported new block headers               count=2048 elapsed=889.936ms     number=1163367 hash="d02b96…a8f4a3" age=4y3mo2w
-INFO [06-13|09:41:12.572] Setting index marker                     remote=s3 number=1120275
-INFO [06-13|09:41:12.631] Finished syncing ancients                remote=s3 frozen=1120275 blocks=2067 elapsed=4.368382942s  bps=473.17
-DEBUG[06-13|09:41:12.966] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
-INFO [06-13|09:41:15.190] Imported new block receipts              count=2048 elapsed=7.172s        number=1120274 hash="b823e4…df661d" age=4y3mo3w  size=2.98MiB
-INFO [06-13|09:41:17.887] Syncing ancients                         remote=s3 frozen=1122323 blocks=2067
-INFO [06-13|09:41:21.733] Setting index marker                     remote=s3 number=1122323
-INFO [06-13|09:41:21.812] Finished syncing ancients                remote=s3 frozen=1122323 blocks=2067 elapsed=3.845528443s  bps=537.51
-INFO [06-13|09:41:37.142] Imported new block headers               count=2048 elapsed=21.704s       number=1165415 hash="09bdc4…820813" age=4y3mo2w
-INFO [06-13|09:41:38.244] Imported new block receipts              count=2048 elapsed=23.038s       number=1122322 hash="604471…126dbc" age=4y3mo3w  size=2.69MiB
-INFO [06-13|09:41:38.420] Syncing ancients                         remote=s3 frozen=1124371 blocks=2067
-WARN [06-13|09:41:38.681] Stalling state sync, dropping peer       peer=cc45d8848526f2fe
-INFO [06-13|09:41:39.418] Imported new block headers               count=2048 elapsed=245.513ms     number=1167463 hash="5ecbf4…cf326e" age=4y3mo2w
-INFO [06-13|09:41:43.675] Setting index marker                     remote=s3 number=1124371
-INFO [06-13|09:41:43.734] Finished syncing ancients                remote=s3 frozen=1124371 blocks=2067 elapsed=5.25427378s   bps=393.39
-INFO [06-13|09:41:44.542] Imported new block receipts              count=2048 elapsed=6.283s        number=1124370 hash="05e96f…eaddbe" age=4y3mo3w  size=3.41MiB
-INFO [06-13|09:41:44.726] Syncing ancients                         remote=s3 frozen=1126419 blocks=2067
-INFO [06-13|09:41:45.658] Imported new block headers               count=2048 elapsed=215.070ms     number=1169511 hash="1923e2…b9ba65" age=4y3mo2w
+>>> /home/ia/go1.14.3.linux-amd64/bin/go install -ldflags -X main.gitCommit=c8066602ae9304f76ef5d3bebb3e7c0c00093f0e -X main.gitDate=20200614 -v ./...
+github.com/ethereum/go-ethereum/core/rawdb
+github.com/ethereum/go-ethereum/cmd/echaindb/cmd
+github.com/ethereum/go-ethereum/core/state/snapshot
+github.com/ethereum/go-ethereum/core
+github.com/ethereum/go-ethereum/core/vm/runtime
+github.com/ethereum/go-ethereum/eth/filters
+github.com/ethereum/go-ethereum/light
+github.com/ethereum/go-ethereum/tests
+github.com/ethereum/go-ethereum/eth/downloader
+github.com/ethereum/go-ethereum/internal/ethapi
+github.com/ethereum/go-ethereum/node
+github.com/ethereum/go-ethereum/accounts/abi/bind/backends
+github.com/ethereum/go-ethereum/graphql
+github.com/ethereum/go-ethereum/eth
+github.com/ethereum/go-ethereum/les
+github.com/ethereum/go-ethereum/cmd/utils
+github.com/ethereum/go-ethereum/cmd/evm
+github.com/ethereum/go-ethereum/cmd/geth
+INFO [06-14|07:24:26.214] Starting Geth on Ethereum Classic... 
+INFO [06-14|07:24:26.214] Bumping default cache on mainnet         provided=1024 updated=4096
+INFO [06-14|07:24:26.216] Maximum peer count                       ETH=50 LES=0 total=50
+INFO [06-14|07:24:26.216] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+INFO [06-14|07:24:26.234] Starting peer-to-peer node               instance=CoreGeth/v1.11.6-unstable-c8066602-20200614/linux-amd64/go1.14.3
+INFO [06-14|07:24:26.234] Allocated trie memory caches             clean=614.00MiB dirty=1024.00MiB
+INFO [06-14|07:24:26.234] Allocated cache and file handles         database=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/chaindata cache=2.00GiB handles=524288
+INFO [06-14|07:24:26.323] New remote freezer                       freezer=s3 namespace=coregeth-classic-parasail
+INFO [06-14|07:24:26.323] New session                              remote=s3 region=us-east-1
+INFO [06-14|07:24:26.323] Creating bucket if not exists            remote=s3 name=coregeth-classic-parasail
+INFO [06-14|07:24:27.969] Bucket created                           remote=s3 name=coregeth-classic-parasail result="{\n  Location: \"/coregeth-classic-parasail\"\n}" elapsed=1.645s
+INFO [06-14|07:24:27.969] Retrieving ancients number               remote=s3
+INFO [06-14|07:24:28.237] Finished retrieving ancients num         remote=s3 s=10496929 n=10496929 err=nil
+INFO [06-14|07:24:28.237] Pulling write blocks cache               remote=s3 n=10496929
+INFO [06-14|07:24:30.278] Finished pulling blocks cache            remote=s3 n=10496929 size=929
+INFO [06-14|07:24:30.278] Pulling write hashes cache               remote=s3 n=10496929
+INFO [06-14|07:24:33.710] Finished pulling hashes cache            remote=s3 n=10496929 size=11169
+DEBUG[06-14|07:24:33.711] Current full block hash unavailable 
+INFO [06-14|07:24:34.794] Persisted trie from memory database      nodes=12356 size=1.78MiB time=20.827932ms gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+INFO [06-14|07:24:34.932] Persisted trie from memory database      nodes=12356 size=1.78MiB time=38.57523ms  gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+INFO [06-14|07:24:34.932] Initialised chain configuration          config="NetworkID: 1, ChainID: 61 Engine: ethash EIP1014: 9573000 EIP1052: 9573000 EIP1108: 10500839 EIP1344: 10500839 EIP140: 8772000 EIP145: 9573000 EIP150: 2500000 EIP152: 10500839 EIP155: 3000000 EIP160: 3000000 EIP161abc: 8772000 EIP161d: 8772000 EIP170: 8772000 EIP1884: 10500839 EIP198: 8772000 EIP2028: 10500839 EIP211: 8772000 EIP212: 8772000 EIP213: 8772000 EIP214: 8772000 EIP2200: 10500839 EIP658: 8772000 EIP7: 1150000 EthashECIP1010Continue: 5000000 EthashECIP1010Pause: 3000000 EthashECIP1017: 5000000 EthashECIP1041: 5900000 EthashEIP100B: 8772000 EthashEIP2: 1150000 EthashHomestead: 1150000 "
+INFO [06-14|07:24:34.933] Disk storage enabled for ethash caches   dir=/home/ia/SAMSUNG_T5/e/sandbox/remote-freezer-develop2/geth/ethash count=3
+INFO [06-14|07:24:34.933] Disk storage enabled for ethash DAGs     dir=/home/ia/.ethash count=2
+INFO [06-14|07:24:34.933] Initialising Ethereum protocol           versions="[65 64 63]" network=1 dbversion=<nil>
+WARN [06-14|07:24:34.933] Upgrade blockchain database version      from=<nil> to=7
+INFO [06-14|07:24:35.976] Initializing database from freezer       total=10496929 number=65536 hash="186b05…cb5a0a" elapsed=1.042s
+INFO [06-14|07:24:45.569] Initializing database from freezer       total=10496929 number=458752 hash="c4f3dc…d6bf22" elapsed=10.636s
+INFO [06-14|07:24:53.810] Initializing database from freezer       total=10496929 number=786432 hash="bbe08d…667e07" elapsed=18.876s
+INFO [06-14|07:25:02.087] Initializing database from freezer       total=10496929 number=1114112 hash="902dbb…80a5ae" elapsed=27.153s
+INFO [06-14|07:25:10.087] Initializing database from freezer       total=10496929 number=1459168 hash="c36710…480fd2" elapsed=35.153s
+INFO [06-14|07:25:18.358] Initializing database from freezer       total=10496929 number=1736704 hash="e5f8b8…b71d1e" elapsed=43.425s
+INFO [06-14|07:25:26.372] Initializing database from freezer       total=10496929 number=2073761 hash="83244f…81d515" elapsed=51.438s
+DEBUG[06-14|07:25:33.711] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:25:34.867] Initializing database from freezer       total=10496929 number=2326528 hash="be3241…970661" elapsed=59.934s
+INFO [06-14|07:25:43.018] Initializing database from freezer       total=10496929 number=2654208 hash="c4cd96…fbcb26" elapsed=1m8.084s
+INFO [06-14|07:25:51.516] Initializing database from freezer       total=10496929 number=2949120 hash="1d87d9…9dbb67" elapsed=1m16.582s
+INFO [06-14|07:25:59.785] Initializing database from freezer       total=10496929 number=3178496 hash="749d5b…673646" elapsed=1m24.852s
+INFO [06-14|07:26:08.047] Initializing database from freezer       total=10496929 number=3538944 hash="90bfef…96900f" elapsed=1m33.114s
+INFO [06-14|07:26:16.230] Initializing database from freezer       total=10496929 number=3866624 hash="90a05e…5736e9" elapsed=1m41.297s
+INFO [06-14|07:26:24.497] Initializing database from freezer       total=10496929 number=4194304 hash="38c1a2…6b5838" elapsed=1m49.564s
+INFO [06-14|07:26:33.218] Initializing database from freezer       total=10496929 number=4390912 hash="50e8c3…879f6d" elapsed=1m58.285s
+DEBUG[06-14|07:26:33.711] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:26:41.793] Initializing database from freezer       total=10496929 number=4653056 hash="a4db42…77b179" elapsed=2m6.860s
+INFO [06-14|07:26:49.860] Initializing database from freezer       total=10496929 number=4882432 hash="64b48b…847e7d" elapsed=2m14.927s
+INFO [06-14|07:26:58.597] Initializing database from freezer       total=10496929 number=5144576 hash="404512…9b9865" elapsed=2m23.664s
+INFO [06-14|07:27:09.093] Initializing database from freezer       total=10496929 number=5406720 hash="f5e34b…ecb467" elapsed=2m34.159s
+INFO [06-14|07:27:17.115] Initializing database from freezer       total=10496929 number=5619638 hash="3bcd52…49b725" elapsed=2m42.182s
+INFO [06-14|07:27:25.356] Initializing database from freezer       total=10496929 number=5767168 hash="d75cc7…063999" elapsed=2m50.423s
+INFO [06-14|07:27:33.481] Initializing database from freezer       total=10496929 number=5963776 hash="33cf3c…c9d8ea" elapsed=2m58.548s
+DEBUG[06-14|07:27:33.712] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:27:43.127] Initializing database from freezer       total=10496929 number=6193152 hash="8e3500…eef117" elapsed=3m8.194s
+INFO [06-14|07:28:02.056] Initializing database from freezer       total=10496929 number=6356992 hash="75d74f…58436e" elapsed=3m27.122s
+INFO [06-14|07:28:11.169] Initializing database from freezer       total=10496929 number=6455296 hash="037130…df344c" elapsed=3m36.236s
+INFO [06-14|07:28:19.190] Initializing database from freezer       total=10496929 number=6630917 hash="a86af8…7b9f57" elapsed=3m44.257s
+INFO [06-14|07:28:27.452] Initializing database from freezer       total=10496929 number=6881280 hash="aa794d…e41f57" elapsed=3m52.519s
+DEBUG[06-14|07:28:33.712] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:28:35.486] Initializing database from freezer       total=10496929 number=7130156 hash="b4d659…fb0c5c" elapsed=4m0.553s
+INFO [06-14|07:28:43.500] Initializing database from freezer       total=10496929 number=7360574 hash="926d59…c6aa44" elapsed=4m8.566s
+INFO [06-14|07:28:51.874] Initializing database from freezer       total=10496929 number=7536640 hash="63bdc7…0f089d" elapsed=4m16.940s
+INFO [06-14|07:29:00.675] Initializing database from freezer       total=10496929 number=7733248 hash="3961a4…2af70b" elapsed=4m25.742s
+INFO [06-14|07:29:09.240] Initializing database from freezer       total=10496929 number=7897088 hash="fd65b7…798a6b" elapsed=4m34.307s
+INFO [06-14|07:29:18.023] Initializing database from freezer       total=10496929 number=8060928 hash="e212ba…38b3e3" elapsed=4m43.090s
+INFO [06-14|07:29:26.831] Initializing database from freezer       total=10496929 number=8224768 hash="64bec9…e2c088" elapsed=4m51.897s
+DEBUG[06-14|07:29:33.713] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:29:34.858] Initializing database from freezer       total=10496929 number=8346251 hash="3e4a67…68a83f" elapsed=4m59.925s
+INFO [06-14|07:29:44.272] Initializing database from freezer       total=10496929 number=8421376 hash="d73d68…7116d2" elapsed=5m9.338s
+INFO [06-14|07:29:52.833] Initializing database from freezer       total=10496929 number=8585216 hash="3bac1c…41f900" elapsed=5m17.899s
+INFO [06-14|07:30:01.916] Initializing database from freezer       total=10496929 number=8749056 hash="3e9f93…b10800" elapsed=5m26.983s
+INFO [06-14|07:30:09.918] Initializing database from freezer       total=10496929 number=8947898 hash="49ea23…64aa85" elapsed=5m34.984s
+INFO [06-14|07:30:17.924] Initializing database from freezer       total=10496929 number=9142272 hash="365336…9c515a" elapsed=5m42.990s
+INFO [06-14|07:30:26.603] Initializing database from freezer       total=10496929 number=9404416 hash="bae233…9f4562" elapsed=5m51.670s
+DEBUG[06-14|07:30:33.713] Current full block not old enough        number=0       hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:30:36.276] Initializing database from freezer       total=10496929 number=9633792 hash="a09e36…06e6bd" elapsed=6m1.343s
+INFO [06-14|07:30:44.341] Initializing database from freezer       total=10496929 number=10027008 hash="f5cdbe…e0cf7e" elapsed=6m9.408s
+INFO [06-14|07:30:52.444] Initializing database from freezer       total=10496929 number=10420224 hash="2ea0b3…ee419e" elapsed=6m17.511s
+INFO [06-14|07:30:53.408] Initialized database from freezer        blocks=10496929 elapsed=6m18.474s
+INFO [06-14|07:30:53.408] Loaded most recent local header          number=10496928 hash="18db12…66a268" td=972110091845504658533 age=2w2h30m
+INFO [06-14|07:30:53.408] Loaded most recent local full block      number=0        hash="d4e567…cb8fa3" td=17179869184           age=51y2mo1w
+INFO [06-14|07:30:53.408] Loaded most recent local fast block      number=10496928 hash="18db12…66a268" td=972110091845504658533 age=2w2h30m
+DEBUG[06-14|07:30:53.408] Reinjecting stale transactions           count=0
+INFO [06-14|07:30:53.408] Upgrading chain index                    type=bloombits percentage=0
+TRACE[06-14|07:30:53.408] Processing new chain section             type=bloombits section=0
+INFO [06-14|07:30:53.409] Regenerated local transaction journal    transactions=0 accounts=0
+INFO [06-14|07:30:53.409] Indexed transactions                     blocks=1        txs=104 tail=10496928 elapsed="771.706µs"
+INFO [06-14|07:30:53.609] Allocated fast sync bloom                size=1.60GiB
+INFO [06-14|07:30:53.797] New local node record                    seq=1 id=96a44a0c375a2ab3 ip=127.0.0.1 udp=30303 tcp=30303
+INFO [06-14|07:30:53.797] Started P2P networking                   self=enode://c5a1cf20161a21960b0ec1af1fc1734f89a0e8a421ba989834c496b48203b5834c8c13e07c66f0f61e1883f2f3567ce6c0dcf45ca289a4ff27481254faa60110@127.0.0.1:30303
+INFO [06-14|07:30:53.798] IPC endpoint opened                      url=/home/ia/.ethereum/geth.ipc
+INFO [06-14|07:30:53.809] Mapped network port                      proto=tcp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
+INFO [06-14|07:30:53.818] Mapped network port                      proto=udp extport=30303 intport=30303 interface=NAT-PMP(192.168.0.1)
+INFO [06-14|07:30:54.247] New local node record                    seq=2 id=96a44a0c375a2ab3 ip=24.207.216.46 udp=30303 tcp=30303
+TRACE[06-14|07:30:55.419] Processing new chain section             type=bloombits section=1
+INFO [06-14|07:30:56.754] Initialized fast sync bloom              items=12356 errorrate=0.000 elapsed=3.145s
+TRACE[06-14|07:30:57.117] Processing new chain section             type=bloombits section=2
+INFO [06-14|07:30:59.889] Block synchronisation started 
+INFO [06-14|07:31:03.151] Upgrading chain index                    type=bloombits percentage=0
+TRACE[06-14|07:31:03.151] Processing new chain section             type=bloombits section=3
+TRACE[06-14|07:31:05.092] Processing new chain section             type=bloombits section=4
+TRACE[06-14|07:31:06.818] Processing new chain section             type=bloombits section=5
+TRACE[06-14|07:31:08.524] Processing new chain section             type=bloombits section=6
+TRACE[06-14|07:31:10.381] Processing new chain section             type=bloombits section=7
+INFO [06-14|07:31:12.131] Upgrading chain index                    type=bloombits percentage=0
+TRACE[06-14|07:31:12.131] Processing new chain section             type=bloombits section=8
+INFO [06-14|07:31:14.077] Looking for peers                        peercount=2 tried=50 static=0
+TRACE[06-14|07:31:14.574] Processing new chain section             type=bloombits section=9
+TRACE[06-14|07:31:16.307] Processing new chain section             type=bloombits section=10
+TRACE[06-14|07:31:18.029] Processing new chain section             type=bloombits section=11
+TRACE[06-14|07:31:20.023] Processing new chain section             type=bloombits section=12
+INFO [06-14|07:31:21.838] Upgrading chain index                    type=bloombits percentage=0
+TRACE[06-14|07:31:21.838] Processing new chain section             type=bloombits section=13
+TRACE[06-14|07:31:23.612] Processing new chain section             type=bloombits section=14
+INFO [06-14|07:31:24.137] Looking for peers                        peercount=0 tried=37 static=0
+TRACE[06-14|07:31:25.412] Processing new chain section             type=bloombits section=15
+TRACE[06-14|07:31:27.214] Processing new chain section             type=bloombits section=16
+TRACE[06-14|07:31:29.815] Processing new chain section             type=bloombits section=17
+INFO [06-14|07:31:31.575] Upgrading chain index                    type=bloombits percentage=0
+TRACE[06-14|07:31:31.575] Processing new chain section             type=bloombits section=18
+TRACE[06-14|07:31:33.306] Processing new chain section             type=bloombits section=19
+DEBUG[06-14|07:31:33.713] Current full block not old enough        number=0        hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:31:34.150] Looking for peers                        peercount=1 tried=58 static=0
+TRACE[06-14|07:31:35.299] Processing new chain section             type=bloombits section=20
+TRACE[06-14|07:31:37.106] Processing new chain section             type=bloombits section=21
+TRACE[06-14|07:31:39.041] Processing new chain section             type=bloombits section=22
+INFO [06-14|07:31:40.796] Upgrading chain index                    type=bloombits percentage=0
+TRACE[06-14|07:31:40.797] Processing new chain section             type=bloombits section=23
+TRACE[06-14|07:31:42.628] Processing new chain section             type=bloombits section=24
+INFO [06-14|07:31:44.153] Looking for peers                        peercount=1 tried=30 static=0
+TRACE[06-14|07:31:45.121] Processing new chain section             type=bloombits section=25
+TRACE[06-14|07:31:46.885] Processing new chain section             type=bloombits section=26
+INFO [06-14|07:31:48.829] Upgrading chain index                    type=bloombits percentage=1
+TRACE[06-14|07:31:48.829] Processing new chain section             type=bloombits section=27
+TRACE[06-14|07:31:50.596] Processing new chain section             type=bloombits section=28
+TRACE[06-14|07:31:52.452] Processing new chain section             type=bloombits section=29
+INFO [06-14|07:31:54.229] Looking for peers                        peercount=1 tried=39 static=0
+TRACE[06-14|07:31:54.294] Processing new chain section             type=bloombits section=30
+TRACE[06-14|07:31:56.109] Processing new chain section             type=bloombits section=31
+WARN [06-14|07:31:59.890] Synchronisation failed, dropping peer    peer=d4731bcf672459cc err=timeout
+INFO [06-14|07:32:00.919] Upgrading chain index                    type=bloombits percentage=1
+TRACE[06-14|07:32:00.919] Processing new chain section             type=bloombits section=32
+TRACE[06-14|07:32:03.471] Processing new chain section             type=bloombits section=33
+TRACE[06-14|07:32:05.235] Processing new chain section             type=bloombits section=34
+TRACE[06-14|07:32:07.054] Processing new chain section             type=bloombits section=35
+INFO [06-14|07:32:08.936] Upgrading chain index                    type=bloombits percentage=1
+TRACE[06-14|07:32:08.937] Processing new chain section             type=bloombits section=36
+TRACE[06-14|07:32:10.779] Processing new chain section             type=bloombits section=37
+TRACE[06-14|07:32:12.659] Processing new chain section             type=bloombits section=38
+TRACE[06-14|07:32:15.080] Processing new chain section             type=bloombits section=39
+INFO [06-14|07:32:17.810] Upgrading chain index                    type=bloombits percentage=1
+TRACE[06-14|07:32:17.810] Processing new chain section             type=bloombits section=40
+TRACE[06-14|07:32:25.049] Processing new chain section             type=bloombits section=41
+INFO [06-14|07:32:29.261] Upgrading chain index                    type=bloombits percentage=1
+TRACE[06-14|07:32:29.261] Processing new chain section             type=bloombits section=42
+INFO [06-14|07:32:32.449] Generating ethash verification cache     epoch=349 percentage=62 elapsed=3.000s
+TRACE[06-14|07:32:32.750] Processing new chain section             type=bloombits section=43
+DEBUG[06-14|07:32:33.714] Current full block not old enough        number=0        hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:32:34.584] Generated ethash verification cache      epoch=349 elapsed=5.135s
+INFO [06-14|07:32:34.757] Imported new block headers               count=1152 elapsed=5.348s      number=10498080 hash="3b3847…37a79a" age=1w6d22h
+INFO [06-14|07:32:34.798] Imported new block headers               count=384  elapsed=33.292ms    number=10498464 hash="80eba0…1a0778" age=1w6d21h
+INFO [06-14|07:32:35.434] Syncing ancients                         remote=s3 frozen=10496937 blocks=937
+INFO [06-14|07:32:35.434] Finished syncing ancients                remote=s3 frozen=10496937 blocks=937      elapsed=62ns        bps=15112903225.81
+INFO [06-14|07:32:35.435] Imported new block receipts              count=8    elapsed=1.247ms     number=10496936 hash="77f17b…88aac4" age=2w2h31m  size=10.48KiB
+TRACE[06-14|07:32:35.523] Processing new chain section             type=bloombits section=44
+INFO [06-14|07:32:35.796] Syncing ancients                         remote=s3 frozen=10496948 blocks=948
+INFO [06-14|07:32:35.796] Finished syncing ancients                remote=s3 frozen=10496948 blocks=948      elapsed=99ns        bps=9575757575.76
+INFO [06-14|07:32:35.797] Imported new block receipts              count=11   elapsed=1.987ms     number=10496947 hash="971195…fce836" age=2w2h26m  size=13.54KiB
+INFO [06-14|07:32:36.104] Syncing ancients                         remote=s3 frozen=10496970 blocks=970
+INFO [06-14|07:32:36.104] Finished syncing ancients                remote=s3 frozen=10496970 blocks=970      elapsed=372ns       bps=2607526881.72
+INFO [06-14|07:32:36.106] Imported new block receipts              count=22   elapsed=6.301ms     number=10496969 hash="ca2eb2…f6b7de" age=2w2h20m  size=25.67KiB
+INFO [06-14|07:32:36.619] Syncing ancients                         remote=s3 frozen=10497170 blocks=1170
+INFO [06-14|07:32:36.619] Finished syncing ancients                remote=s3 frozen=10497170 blocks=1170     elapsed=694ns       bps=1685878962.54
+INFO [06-14|07:32:36.622] Imported new block receipts              count=200  elapsed=18.303ms    number=10497169 hash="046ab5…521ad3" age=2w1h40m  size=211.09KiB
+INFO [06-14|07:32:36.828] Syncing ancients                         remote=s3 frozen=10497483 blocks=1483
+INFO [06-14|07:32:36.828] Finished syncing ancients                remote=s3 frozen=10497483 blocks=1483     elapsed=127ns       bps=11677165354.33
+INFO [06-14|07:32:36.831] Imported new block receipts              count=313  elapsed=21.397ms    number=10497482 hash="e12349…977282" age=2w35m16s size=360.34KiB
+INFO [06-14|07:32:36.986] Syncing ancients                         remote=s3 frozen=10497675 blocks=1675
+INFO [06-14|07:32:36.986] Finished syncing ancients                remote=s3 frozen=10497675 blocks=1675     elapsed=40ns        bps=41875000000.00
+INFO [06-14|07:32:36.987] Imported new block receipts              count=192  elapsed=11.556ms    number=10497674 hash="ba1cdf…ce4ecb" age=1w6d23h  size=262.54KiB
+INFO [06-14|07:32:37.117] Syncing ancients                         remote=s3 frozen=10497739 blocks=1739
+INFO [06-14|07:32:37.117] Finished syncing ancients                remote=s3 frozen=10497739 blocks=1739     elapsed=86ns        bps=20220930232.56
+INFO [06-14|07:32:37.118] Imported new block receipts              count=64   elapsed=3.598ms     number=10497738 hash="8ab894…c918f6" age=1w6d23h  size=67.58KiB
+INFO [06-14|07:32:37.669] Generating ethash verification cache     epoch=350 percentage=61 elapsed=3.000s
+INFO [06-14|07:32:38.720] Syncing ancients                         remote=s3 frozen=10498391 blocks=2048
+INFO [06-14|07:32:38.720] Finished syncing ancients                remote=s3 frozen=10498391 blocks=2048     elapsed=119ns       bps=17210084033.61
+INFO [06-14|07:32:38.726] Imported new block receipts              count=652  elapsed=50.799ms    number=10498390 hash="104768…4731f2" age=1w6d21h  size=882.70KiB
+INFO [06-14|07:32:38.785] Syncing ancients                         remote=s3 frozen=10498465 blocks=2048
+INFO [06-14|07:32:38.785] Finished syncing ancients                remote=s3 frozen=10498465 blocks=2048     elapsed=174ns       bps=11770114942.53
+INFO [06-14|07:32:38.787] Imported new block receipts              count=74   elapsed=12.648ms    number=10498464 hash="80eba0…1a0778" age=1w6d21h  size=78.72KiB
+INFO [06-14|07:32:39.298] Generated ethash verification cache      epoch=350 elapsed=4.630s
+INFO [06-14|07:32:39.469] Imported new block headers               count=2048 elapsed=4.491s      number=10500512 hash="1f5e53…d5e061" age=1w6d13h
+INFO [06-14|07:32:39.634] Imported new block headers               count=2048 elapsed=148.228ms   number=10502560 hash="3f7d4f…c2975a" age=1w6d5h
+INFO [06-14|07:32:39.740] Imported new block headers               count=1280 elapsed=91.620ms    number=10503840 hash="164f32…348cc8" age=1w6d47m
+INFO [06-14|07:32:39.781] Imported new block headers               count=384  elapsed=32.072ms    number=10504224 hash="02b595…a3e246" age=1w5d23h
+INFO [06-14|07:32:39.932] Imported new block headers               count=2048 elapsed=140.586ms   number=10506272 hash="431f2e…2c880f" age=1w5d15h
+INFO [06-14|07:32:39.954] Imported new block headers               count=64   elapsed=11.232ms    number=10506336 hash="d9b4b9…3691e9" age=1w5d15h
+INFO [06-14|07:32:39.989] Syncing ancients                         remote=s3 frozen=10498704 blocks=2048
+INFO [06-14|07:32:39.989] Finished syncing ancients                remote=s3 frozen=10498704 blocks=2048     elapsed=120ns       bps=17066666666.67
+INFO [06-14|07:32:40.021] Imported new block headers               count=576  elapsed=48.296ms    number=10506912 hash="061c8a…3dd16a" age=1w5d13h
+INFO [06-14|07:32:40.023] Imported new block receipts              count=239  elapsed=58.357ms    number=10498703 hash="c32b5a…9a21ad" age=1w6d20h  size=295.77KiB
+INFO [06-14|07:32:40.447] Syncing ancients                         remote=s3 frozen=10498954 blocks=2048
+INFO [06-14|07:32:40.447] Finished syncing ancients                remote=s3 frozen=10498954 blocks=2048     elapsed=83ns        bps=24674698795.18
+INFO [06-14|07:32:40.451] Imported new block receipts              count=250  elapsed=23.219ms    number=10498953 hash="065c8b…390001" age=1w6d19h  size=338.07KiB
+INFO [06-14|07:32:40.592] Syncing ancients                         remote=s3 frozen=10499212 blocks=2048
+INFO [06-14|07:32:40.592] Finished syncing ancients                remote=s3 frozen=10499212 blocks=2048     elapsed=116ns       bps=17655172413.79
+INFO [06-14|07:32:40.594] Imported new block receipts              count=258  elapsed=17.053ms    number=10499211 hash="34087a…7a9e1c" age=1w6d18h  size=322.52KiB
+INFO [06-14|07:32:40.776] Imported new block headers               count=384  elapsed=42.447ms    number=10507296 hash="995939…14693f" age=1w5d12h
+INFO [06-14|07:32:42.363] Generating ethash verification cache     epoch=351 percentage=84 elapsed=3.000s
+INFO [06-14|07:32:42.782] Generated ethash verification cache      epoch=351 elapsed=3.419s
+INFO [06-14|07:32:43.046] Upgrading chain index                    type=bloombits percentage=1
+TRACE[06-14|07:32:43.047] Processing new chain section             type=bloombits section=45
+INFO [06-14|07:32:47.369] Syncing ancients                         remote=s3 frozen=10500810 blocks=2048
+INFO [06-14|07:32:47.369] Finished syncing ancients                remote=s3 frozen=10500810 blocks=2048     elapsed=105ns       bps=19504761904.76
+INFO [06-14|07:32:47.400] Imported new block receipts              count=2048 elapsed=126.449ms   number=10501259 hash="5efbd5…59b771" age=1w6d10h  size=2.31MiB
+INFO [06-14|07:32:47.483] Imported new block receipts              count=843  elapsed=76.301ms    number=10502102 hash="92ec37…a3cb4c" age=1w6d7h   size=626.98KiB
+TRACE[06-14|07:32:47.836] Processing new chain section             type=bloombits section=46
+INFO [06-14|07:32:51.457] Upgrading chain index                    type=bloombits percentage=1
+TRACE[06-14|07:32:51.457] Processing new chain section             type=bloombits section=47
+TRACE[06-14|07:32:53.968] Processing new chain section             type=bloombits section=48
+INFO [06-14|07:32:56.621] Imported new block headers               count=1920 elapsed=149.526ms   number=10509216 hash="ecfe4a…541758" age=1w5d5h
+INFO [06-14|07:32:56.844] Imported new block headers               count=576  elapsed=52.233ms    number=10509792 hash="971993…97c787" age=1w5d3h
+INFO [06-14|07:32:56.844] Imported new block receipts              count=553  elapsed=68.200ms    number=10502655 hash="b30c47…3d9078" age=1w6d5h   size=372.72KiB
+INFO [06-14|07:32:56.984] Imported new block headers               count=1344 elapsed=85.820ms    number=10511136 hash="7b4d63…045096" age=1w4d22h
+INFO [06-14|07:32:57.205] Imported new block headers               count=2048 elapsed=151.155ms   number=10513184 hash="ac8748…d19732" age=1w4d15h
+INFO [06-14|07:32:57.352] Imported new block headers               count=2048 elapsed=127.072ms   number=10515232 hash="84021d…1d3dda" age=1w4d8h
+INFO [06-14|07:32:57.475] Imported new block headers               count=1664 elapsed=106.151ms   number=10516896 hash="e77480…f986bf" age=1w4d2h
+INFO [06-14|07:32:57.857] Imported new block receipts              count=2048 elapsed=74.234ms    number=10504703 hash="5fb2b7…97fade" age=1w5d21h  size=1.34MiB
+INFO [06-14|07:32:57.887] Imported new block receipts              count=593  elapsed=25.810ms    number=10505296 hash="e6795f…b4ce7d" age=1w5d19h  size=383.79KiB
+TRACE[06-14|07:32:58.021] Processing new chain section             type=bloombits section=49
+INFO [06-14|07:32:59.929] Upgrading chain index                    type=bloombits percentage=1
+TRACE[06-14|07:32:59.929] Processing new chain section             type=bloombits section=50
+TRACE[06-14|07:33:01.838] Processing new chain section             type=bloombits section=51
+INFO [06-14|07:33:03.144] Imported new block receipts              count=2048 elapsed=71.755ms    number=10507344 hash="b5f535…4ff5c2" age=1w5d12h  size=1.24MiB
+INFO [06-14|07:33:03.167] Imported new block receipts              count=483  elapsed=19.068ms    number=10507827 hash="359727…76c891" age=1w5d10h  size=407.71KiB
+TRACE[06-14|07:33:04.224] Processing new chain section             type=bloombits section=52
+INFO [06-14|07:33:06.663] Imported new block receipts              count=509  elapsed=24.435ms    number=10508336 hash="eedaad…0e6fae" age=1w5d8h   size=421.28KiB
+INFO [06-14|07:33:07.610] Imported new block headers               count=768  elapsed=54.451ms    number=10517664 hash="85f0fa…1dd205" age=1w3d23h
+TRACE[06-14|07:33:07.745] Processing new chain section             type=bloombits section=53
+INFO [06-14|07:33:08.686] Imported new block receipts              count=2048 elapsed=67.280ms    number=10510384 hash="53b637…4d6cc4" age=1w5d1h   size=1.56MiB
+INFO [06-14|07:33:08.699] Imported new block receipts              count=299  elapsed=10.678ms    number=10510683 hash="887e89…089cac" age=1w5d24m  size=219.04KiB
+INFO [06-14|07:33:10.324] Upgrading chain index                    type=bloombits percentage=2
+TRACE[06-14|07:33:10.324] Processing new chain section             type=bloombits section=54
+INFO [06-14|07:33:10.423] Imported new block receipts              count=2048 elapsed=63.450ms    number=10512731 hash="51a478…3dc740" age=1w4d17h  size=1.40MiB
+INFO [06-14|07:33:10.488] Imported new block receipts              count=1467 elapsed=53.637ms    number=10514198 hash="06631c…511a49" age=1w4d12h  size=1.22MiB
+INFO [06-14|07:33:10.712] Imported new block receipts              count=485  elapsed=16.108ms    number=10514683 hash="b9b0d4…a4cd0b" age=1w4d10h  size=329.87KiB
+INFO [06-14|07:33:12.395] Imported new block receipts              count=238  elapsed=7.790ms     number=10514921 hash="803be0…8293d7" age=1w4d9h   size=153.19KiB
+TRACE[06-14|07:33:12.869] Processing new chain section             type=bloombits section=55
+INFO [06-14|07:33:15.220] Imported new block receipts              count=2048 elapsed=66.871ms    number=10516969 hash="829d19…936947" age=1w4d2h   size=1.30MiB
+INFO [06-14|07:33:15.227] Imported new block receipts              count=121  elapsed=6.028ms     number=10517090 hash="b96ae5…c8e4c5" age=1w4d1h   size=122.36KiB
+TRACE[06-14|07:33:16.540] Processing new chain section             type=bloombits section=56
+INFO [06-14|07:33:21.010] Imported new block receipts              count=574  elapsed=24.697ms    number=10517664 hash="85f0fa…1dd205" age=1w3d23h  size=360.16KiB
+INFO [06-14|07:33:21.580] Imported new block headers               count=2048 elapsed=162.014ms   number=10519712 hash="919e7f…3b3163" age=1w3d16h
+INFO [06-14|07:33:21.710] Imported new block headers               count=1792 elapsed=111.969ms   number=10521504 hash="3b4ba6…be0a8a" age=1w3d9h
+INFO [06-14|07:33:22.701] Imported new block receipts              count=228  elapsed=11.524ms    number=10517892 hash="4a0c02…c2ba27" age=1w3d22h  size=170.63KiB
+INFO [06-14|07:33:23.064] Imported new block receipts              count=232  elapsed=8.539ms     number=10518124 hash="588f3a…a6fdd7" age=1w3d21h  size=133.31KiB
+INFO [06-14|07:33:24.270] Upgrading chain index                    type=bloombits percentage=2
+TRACE[06-14|07:33:24.270] Processing new chain section             type=bloombits section=57
+INFO [06-14|07:33:24.278] Imported new block receipts              count=228  elapsed=7.908ms     number=10518352 hash="56e20c…03a0e9" age=1w3d21h  size=179.64KiB
+INFO [06-14|07:33:27.398] Imported new block receipts              count=233  elapsed=10.602ms    number=10518585 hash="f28fae…565e7b" age=1w3d20h  size=239.04KiB
+INFO [06-14|07:33:28.342] Imported new block receipts              count=330  elapsed=12.971ms    number=10518915 hash="46575b…ffdb32" age=1w3d19h  size=182.37KiB
+TRACE[06-14|07:33:28.685] Processing new chain section             type=bloombits section=58
+INFO [06-14|07:33:29.031] Imported new block receipts              count=2048 elapsed=66.042ms    number=10520963 hash="3d0c50…e52716" age=1w3d11h  size=1.28MiB
+INFO [06-14|07:33:29.054] Imported new block receipts              count=541  elapsed=19.497ms    number=10521504 hash="3b4ba6…be0a8a" age=1w3d9h   size=379.46KiB
+INFO [06-14|07:33:29.342] Imported new block headers               count=384  elapsed=48.353ms    number=10521888 hash="bae95b…415bbb" age=1w3d8h
+INFO [06-14|07:33:30.198] Imported new block receipts              count=384  elapsed=22.579ms    number=10521888 hash="bae95b…415bbb" age=1w3d8h   size=326.62KiB
+TRACE[06-14|07:33:30.821] Processing new chain section             type=bloombits section=59
+INFO [06-14|07:33:33.122] Upgrading chain index                    type=bloombits percentage=2
+TRACE[06-14|07:33:33.122] Processing new chain section             type=bloombits section=60
+DEBUG[06-14|07:33:33.730] Current full block not old enough        number=0        hash="d4e567…cb8fa3" delay=90000
+TRACE[06-14|07:33:35.761] Processing new chain section             type=bloombits section=61
+TRACE[06-14|07:33:37.851] Processing new chain section             type=bloombits section=62
+INFO [06-14|07:33:42.281] Imported new block headers               count=2048 elapsed=125.337ms   number=10523936 hash="a382eb…dc14fe" age=1w3d52m
+INFO [06-14|07:33:42.430] Imported new block headers               count=2048 elapsed=128.639ms   number=10525984 hash="750622…ac70e1" age=1w2d17h
+INFO [06-14|07:33:42.579] Imported new block headers               count=2048 elapsed=129.926ms   number=10528032 hash="082827…3ab108" age=1w2d10h
+INFO [06-14|07:33:42.764] Imported new block headers               count=2048 elapsed=165.282ms   number=10530080 hash="e4f306…ec7004" age=1w2d2h
+INFO [06-14|07:33:42.929] Imported new block headers               count=2048 elapsed=145.312ms   number=10532128 hash="cb2321…e24654" age=1w1d19h
+INFO [06-14|07:33:42.956] Imported new block headers               count=128  elapsed=14.916ms    number=10532256 hash="b65daf…0a1e93" age=1w1d18h
+INFO [06-14|07:33:43.000] Imported new block headers               count=576  elapsed=39.601ms    number=10532832 hash="580b82…48eaa3" age=1w1d16h
+INFO [06-14|07:33:43.081] Imported new block receipts              count=262  elapsed=7.671ms     number=10522150 hash="1e2398…4ae12c" age=1w3d7h   size=142.31KiB
+INFO [06-14|07:33:43.145] Imported new block headers               count=576  elapsed=47.219ms    number=10533408 hash="fd12d1…d8900b" age=1w1d14h
+INFO [06-14|07:33:43.166] Imported new block receipts              count=247  elapsed=14.264ms    number=10522397 hash="c3d49b…4eb47c" age=1w3d6h   size=218.08KiB
+INFO [06-14|07:33:45.632] Generating ethash verification cache     epoch=352 percentage=92 elapsed=3.000s
+INFO [06-14|07:33:45.828] Generated ethash verification cache      epoch=352 elapsed=3.196s
+INFO [06-14|07:33:46.261] Upgrading chain index                    type=bloombits percentage=2
+TRACE[06-14|07:33:46.261] Processing new chain section             type=bloombits section=63
+INFO [06-14|07:33:47.525] Imported new block headers               count=2048 elapsed=167.784ms   number=10535456 hash="7d4d9f…b74033" age=1w1d7h
+INFO [06-14|07:33:47.570] Imported new block headers               count=448  elapsed=34.310ms    number=10535904 hash="f44de8…590d77" age=1w1d5h
+INFO [06-14|07:33:48.998] Imported new block receipts              count=1412 elapsed=53.568ms    number=10523809 hash="e2b0ed…d7e06c" age=1w3d1h   size=1.06MiB
+TRACE[06-14|07:33:51.759] Processing new chain section             type=bloombits section=64
+INFO [06-14|07:33:53.826] Imported new block receipts              count=1300 elapsed=55.038ms    number=10525109 hash="032ed4…53f870" age=1w2d20h  size=930.65KiB
+INFO [06-14|07:33:53.911] Imported new block receipts              count=2048 elapsed=68.896ms    number=10527157 hash="02d6c8…2721e7" age=1w2d13h  size=1.34MiB
+INFO [06-14|07:33:53.997] Imported new block receipts              count=2048 elapsed=71.128ms    number=10529205 hash="07b6c4…bbdc6e" age=1w2d5h   size=1.43MiB
+INFO [06-14|07:33:54.076] Imported new block receipts              count=1832 elapsed=64.641ms    number=10531037 hash="71c095…0d2776" age=1w1d23h  size=1.36MiB
+INFO [06-14|07:33:54.419] Imported new block receipts              count=467  elapsed=17.283ms    number=10531504 hash="05053a…6ef34a" age=1w1d21h  size=365.33KiB
+INFO [06-14|07:33:55.469] Upgrading chain index                    type=bloombits percentage=2
+TRACE[06-14|07:33:55.469] Processing new chain section             type=bloombits section=65
+INFO [06-14|07:33:56.267] Imported new block headers               count=2048 elapsed=165.942ms   number=10537952 hash="2f7669…8ccef1" age=1w22h20m
+INFO [06-14|07:33:56.267] Imported new block receipts              count=745  elapsed=192.436ms   number=10532249 hash="e73fc7…88f685" age=1w1d18h  size=577.55KiB
+INFO [06-14|07:33:56.426] Imported new block headers               count=2048 elapsed=139.900ms   number=10540000 hash="2b76b5…7cfe7c" age=1w15h31s
+INFO [06-14|07:33:56.617] Imported new block headers               count=2048 elapsed=165.235ms   number=10542048 hash="666172…7d29ad" age=1w7h37m
+INFO [06-14|07:33:56.724] Imported new block headers               count=1152 elapsed=91.624ms    number=10543200 hash="093b14…9aa799" age=1w3h21m
+INFO [06-14|07:33:56.856] Imported new block headers               count=384  elapsed=45.287ms    number=10543584 hash="a0d857…971e7a" age=1w1h58m
+INFO [06-14|07:33:57.248] Imported new block headers               count=192  elapsed=18.492ms    number=10543776 hash="2e3f38…deb597" age=1w1h10m
+INFO [06-14|07:33:57.360] Imported new block headers               count=384  elapsed=31.939ms    number=10544160 hash="01288c…c651bb" age=6d23h53m
+INFO [06-14|07:33:57.598] Imported new block receipts              count=2048 elapsed=74.754ms    number=10534297 hash="fec463…ad1bcd" age=1w1d11h  size=1.30MiB
+INFO [06-14|07:33:57.605] Imported new block receipts              count=188  elapsed=5.172ms     number=10534485 hash="065c49…15337a" age=1w1d10h  size=91.16KiB
+INFO [06-14|07:33:57.927] Imported new block headers               count=192  elapsed=53.636ms    number=10544352 hash="2adeec…a0d51f" age=6d23h14m
+INFO [06-14|07:33:57.975] Imported new block headers               count=384  elapsed=29.606ms    number=10544736 hash="c211dd…89ea10" age=6d21h47m
+TRACE[06-14|07:33:58.141] Processing new chain section             type=bloombits section=66
+INFO [06-14|07:33:58.417] Imported new block receipts              count=523  elapsed=29.378ms    number=10535008 hash="f6050c…cd1397" age=1w1d8h   size=621.71KiB
+INFO [06-14|07:33:58.458] Imported new block headers               count=192  elapsed=16.193ms    number=10544928 hash="05aaf6…8bccb9" age=6d21h5m
+INFO [06-14|07:33:58.554] Imported new block receipts              count=211  elapsed=8.927ms     number=10535219 hash="d14ff6…521d2d" age=1w1d8h   size=144.57KiB
+INFO [06-14|07:33:58.799] Imported new block headers               count=192  elapsed=25.253ms    number=10545120 hash="18533e…016799" age=6d20h23m
+INFO [06-14|07:33:58.959] Imported new block headers               count=192  elapsed=16.644ms    number=10545312 hash="a977ff…7328f9" age=6d19h39m
+INFO [06-14|07:33:59.492] Imported new block receipts              count=1537 elapsed=57.477ms    number=10536756 hash="11a162…010dae" age=1w1d2h   size=979.13KiB
+INFO [06-14|07:34:00.070] Imported new block receipts              count=527  elapsed=17.607ms    number=10537283 hash="76df85…407d89" age=1w1d43m  size=334.63KiB
+TRACE[06-14|07:34:00.132] Processing new chain section             type=bloombits section=67
+INFO [06-14|07:34:00.939] Imported new block receipts              count=510  elapsed=15.679ms    number=10537793 hash="2594b1…a57ab0" age=1w22h55m size=275.96KiB
+INFO [06-14|07:34:01.497] Imported new block receipts              count=1032 elapsed=34.351ms    number=10538825 hash="712335…fa8de0" age=1w19h16m size=653.57KiB
+TRACE[06-14|07:34:02.063] Processing new chain section             type=bloombits section=68
+INFO [06-14|07:34:02.273] Imported new block receipts              count=247  elapsed=11.929ms    number=10539072 hash="978af8…044465" age=1w18h21m size=109.14KiB
+INFO [06-14|07:34:03.093] Imported new block receipts              count=827  elapsed=37.483ms    number=10539899 hash="8fd8da…430e5b" age=1w15h24m size=542.33KiB
+INFO [06-14|07:34:03.473] Imported new block receipts              count=252  elapsed=7.815ms     number=10540151 hash="1e11af…e878f6" age=1w14h30m size=134.70KiB
+INFO [06-14|07:34:04.082] Upgrading chain index                    type=bloombits percentage=2
+TRACE[06-14|07:34:04.082] Processing new chain section             type=bloombits section=69
+INFO [06-14|07:34:04.960] Imported new block receipts              count=571  elapsed=22.463ms    number=10540722 hash="29c222…6c722c" age=1w12h35m size=333.27KiB
+INFO [06-14|07:34:05.038] Imported new block headers               count=768  elapsed=61.798ms    number=10546080 hash="af5e19…625f55" age=6d17h33s
+INFO [06-14|07:34:05.443] Imported new block receipts              count=268  elapsed=8.676ms     number=10540990 hash="a2af3f…e33083" age=1w11h33m size=136.63KiB
+TRACE[06-14|07:34:06.036] Processing new chain section             type=bloombits section=70
+INFO [06-14|07:34:06.480] Imported new block receipts              count=478  elapsed=19.733ms    number=10541468 hash="1f3970…066cab" age=1w9h47m  size=352.77KiB
+INFO [06-14|07:34:07.128] Imported new block receipts              count=530  elapsed=33.730ms    number=10541998 hash="5b54c1…bffd1c" age=1w7h45m  size=376.27KiB
+INFO [06-14|07:34:07.328] Imported new block receipts              count=537  elapsed=19.836ms    number=10542535 hash="446cce…032f95" age=1w5h47m  size=350.85KiB
+TRACE[06-14|07:34:08.009] Processing new chain section             type=bloombits section=71
+TRACE[06-14|07:34:11.767] Processing new chain section             type=bloombits section=72
+INFO [06-14|07:34:12.836] Imported new block receipts              count=2048 elapsed=74.820ms    number=10544583 hash="e5babd…3aa70f" age=6d22h17m size=1.27MiB
+INFO [06-14|07:34:12.877] Imported new block receipts              count=1081 elapsed=32.649ms    number=10545664 hash="f882da…99b070" age=6d18h24m size=627.11KiB
+INFO [06-14|07:34:14.057] Imported new block receipts              count=416  elapsed=14.701ms    number=10546080 hash="af5e19…625f55" age=6d17h42s size=264.73KiB
+INFO [06-14|07:34:14.638] Imported new block headers               count=192  elapsed=20.467ms    number=10546272 hash="ffd6d2…6f00ff" age=6d16h22m
+INFO [06-14|07:34:14.792] Imported new block headers               count=192  elapsed=50.054ms    number=10546464 hash="dac367…0ea997" age=6d15h40m
+INFO [06-14|07:34:15.448] Imported new block receipts              count=194  elapsed=6.965ms     number=10546274 hash="7073e3…87e317" age=6d16h22m size=89.19KiB
+INFO [06-14|07:34:15.629] Imported new block headers               count=192  elapsed=41.388ms    number=10546656 hash="a9131c…e5774e" age=6d15h19s
+INFO [06-14|07:34:16.110] Imported new block receipts              count=190  elapsed=14.997ms    number=10546464 hash="dac367…0ea997" age=6d15h40m size=176.13KiB
+INFO [06-14|07:34:16.136] Imported new block receipts              count=192  elapsed=15.250ms    number=10546656 hash="a9131c…e5774e" age=6d15h20s size=104.16KiB
+INFO [06-14|07:34:21.144] Upgrading chain index                    type=bloombits percentage=2
+TRACE[06-14|07:34:21.144] Processing new chain section             type=bloombits section=73
+INFO [06-14|07:34:21.835] Imported new block headers               count=2048 elapsed=137.934ms   number=10548704 hash="2e7692…2310c3" age=6d7h34m
+INFO [06-14|07:34:21.991] Imported new block headers               count=2048 elapsed=130.162ms   number=10550752 hash="5ba150…79c3cf" age=6d5m46s
+INFO [06-14|07:34:22.052] Imported new block headers               count=704  elapsed=49.748ms    number=10551456 hash="7fcfcc…1f2bf8" age=5d21h41m
+INFO [06-14|07:34:22.071] Imported new block headers               count=192  elapsed=14.773ms    number=10551648 hash="5ec134…82420a" age=5d21h52s
+INFO [06-14|07:34:22.360] Imported new block headers               count=192  elapsed=26.312ms    number=10551840 hash="979aa2…e84a42" age=5d20h19m
+INFO [06-14|07:34:22.723] Imported new block receipts              count=280  elapsed=7.741ms     number=10546936 hash="89ad6b…bbd915" age=6d13h58m size=127.33KiB
+INFO [06-14|07:34:22.850] Imported new block receipts              count=250  elapsed=9.895ms     number=10547186 hash="5e81e9…a04e3a" age=6d13h2m  size=180.83KiB
+INFO [06-14|07:34:22.919] Imported new block headers               count=576  elapsed=47.632ms    number=10552416 hash="be3d5e…6031b1" age=5d18h10m
+INFO [06-14|07:34:23.533] Imported new block headers               count=384  elapsed=48.557ms    number=10552800 hash="93aac5…6e83d0" age=5d16h49m
+INFO [06-14|07:34:24.608] Imported new block receipts              count=1061 elapsed=37.106ms    number=10548247 hash="a2855e…6b4e8c" age=6d9h13m  size=655.56KiB
+INFO [06-14|07:34:24.922] Imported new block receipts              count=553  elapsed=19.786ms    number=10548800 hash="ccadb0…bafbea" age=6d7h15m  size=343.49KiB
+INFO [06-14|07:34:25.484] Imported new block headers               count=1152 elapsed=90.572ms    number=10553952 hash="b7646b…26e58e" age=5d12h45m
+INFO [06-14|07:34:25.515] Imported new block headers               count=192  elapsed=18.863ms    number=10554144 hash="23d714…0c7012" age=5d12h7m
+INFO [06-14|07:34:25.885] Imported new block headers               count=192  elapsed=36.867ms    number=10554336 hash="624401…a9d104" age=5d11h20m
+INFO [06-14|07:34:26.835] Imported new block receipts              count=1574 elapsed=64.455ms    number=10550374 hash="866e30…aae729" age=6d1h27m  size=1.08MiB
+INFO [06-14|07:34:27.050] Imported new block receipts              count=500  elapsed=24.905ms    number=10550874 hash="73dbc3…db0094" age=5d23h40m size=282.12KiB
+INFO [06-14|07:34:27.148] Imported new block receipts              count=240  elapsed=22.889ms    number=10551114 hash="5f88f9…c3881f" age=5d22h47m size=221.21KiB
+TRACE[06-14|07:34:27.439] Processing new chain section             type=bloombits section=74
+INFO [06-14|07:34:27.615] Imported new block headers               count=1344 elapsed=87.167ms    number=10555680 hash="38f0a8…ba5e7f" age=5d6h31m
+INFO [06-14|07:34:27.740] Imported new block headers               count=192  elapsed=46.831ms    number=10555872 hash="1dc887…4acab9" age=5d5h45m
+INFO [06-14|07:34:28.051] Imported new block headers               count=192  elapsed=64.226ms    number=10556064 hash="9a3815…fe5898" age=5d5h1m
+INFO [06-14|07:34:28.463] Imported new block headers               count=192  elapsed=25.194ms    number=10556256 hash="1722aa…70ecd7" age=5d4h19m
+INFO [06-14|07:34:28.796] Imported new block receipts              count=1434 elapsed=61.108ms    number=10552548 hash="0284f6…3aa3f4" age=5d17h38m size=1.02MiB
+INFO [06-14|07:34:28.817] Imported new block receipts              count=229  elapsed=6.861ms     number=10552777 hash="983272…f19095" age=5d16h53m size=116.67KiB
+INFO [06-14|07:34:29.125] Imported new block receipts              count=257  elapsed=16.614ms    number=10553034 hash="89a0dd…e11a70" age=5d16h6m  size=202.17KiB
+INFO [06-14|07:34:29.353] Imported new block headers               count=960  elapsed=67.448ms    number=10557216 hash="a3fe83…6ee674" age=5d53m52s
+INFO [06-14|07:34:29.389] Imported new block headers               count=192  elapsed=16.161ms    number=10557408 hash="d8d08b…0c0848" age=5d10m12s
+INFO [06-14|07:34:29.828] Imported new block receipts              count=237  elapsed=8.725ms     number=10553271 hash="61889e…bcf76f" age=5d15h12m size=141.30KiB
+INFO [06-14|07:34:30.335] Imported new block receipts              count=741  elapsed=30.696ms    number=10554012 hash="8b9954…b913ae" age=5d12h33m size=497.56KiB
+INFO [06-14|07:34:30.476] Imported new block receipts              count=262  elapsed=10.043ms    number=10554274 hash="7c2953…6948ff" age=5d11h37m size=179.63KiB
+INFO [06-14|07:34:30.730] Imported new block headers               count=960  elapsed=61.930ms    number=10558368 hash="e610ef…e536ba" age=4d20h46m
+INFO [06-14|07:34:30.851] Imported new block headers               count=192  elapsed=51.621ms    number=10558560 hash="567288…df506a" age=4d20h5m
+INFO [06-14|07:34:31.204] Imported new block headers               count=192  elapsed=34.155ms    number=10558752 hash="214a50…49b7dd" age=4d19h23m
+INFO [06-14|07:34:31.516] Imported new block headers               count=192  elapsed=48.108ms    number=10558944 hash="f08633…d90d7f" age=4d18h38m
+INFO [06-14|07:34:32.090] Imported new block receipts              count=1283 elapsed=63.715ms    number=10555557 hash="da51f0…ac2945" age=5d6h57m  size=843.36KiB
+INFO [06-14|07:34:32.414] Imported new block headers               count=192  elapsed=19.354ms    number=10559136 hash="dd581f…f8bc98" age=4d17h56m
+INFO [06-14|07:34:32.799] Upgrading chain index                    type=bloombits percentage=2
+TRACE[06-14|07:34:32.799] Processing new chain section             type=bloombits section=75
+DEBUG[06-14|07:34:33.731] Current full block not old enough        number=0        hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:34:35.244] Imported new block headers               count=1344 elapsed=114.296ms   number=10560480 hash="caed6c…ef7a02" age=4d13h9m
+INFO [06-14|07:34:35.332] Imported new block headers               count=960  elapsed=75.134ms    number=10561440 hash="a00ed5…d294f4" age=4d9h38m
+INFO [06-14|07:34:35.493] Imported new block receipts              count=2048 elapsed=97.094ms    number=10557605 hash="756bdd…b10196" age=4d23h27m size=1.46MiB
+INFO [06-14|07:34:35.518] Imported new block receipts              count=522  elapsed=20.924ms    number=10558127 hash="af2284…6e3d1a" age=4d21h37m size=364.26KiB
+INFO [06-14|07:34:35.542] Imported new block receipts              count=492  elapsed=20.899ms    number=10558619 hash="c0873e…6b2129" age=4d19h52m size=345.80KiB
+INFO [06-14|07:34:35.611] Imported new block headers               count=576  elapsed=49.999ms    number=10562016 hash="38599c…5b7a05" age=4d7h18m
+INFO [06-14|07:34:36.417] Imported new block receipts              count=519  elapsed=21.152ms    number=10559138 hash="af66c0…09a387" age=4d17h56m size=398.24KiB
+INFO [06-14|07:34:36.759] Imported new block receipts              count=472  elapsed=21.427ms    number=10559610 hash="d5b374…037cde" age=4d16h21m size=361.93KiB
+TRACE[06-14|07:34:37.692] Processing new chain section             type=bloombits section=76
+INFO [06-14|07:34:38.377] Imported new block receipts              count=1275 elapsed=43.855ms    number=10560885 hash="8376f3…bd10d3" age=4d11h38m size=815.70KiB
+INFO [06-14|07:34:38.598] Imported new block receipts              count=567  elapsed=27.094ms    number=10561452 hash="e7cd45…6e99d3" age=4d9h36m  size=376.70KiB
+INFO [06-14|07:34:38.748] Imported new block receipts              count=237  elapsed=20.955ms    number=10561689 hash="a3de78…e9f91e" age=4d8h37m  size=190.29KiB
+INFO [06-14|07:34:38.955] Imported new block receipts              count=267  elapsed=22.804ms    number=10561956 hash="2a460a…7123a2" age=4d7h33m  size=136.30KiB
+INFO [06-14|07:34:39.300] Imported new block receipts              count=60   elapsed=13.786ms    number=10562016 hash="38599c…5b7a05" age=4d7h18m  size=51.21KiB
+TRACE[06-14|07:34:40.584] Processing new chain section             type=bloombits section=77
+INFO [06-14|07:34:41.873] Imported new block headers               count=2048 elapsed=154.650ms   number=10564064 hash="411297…f4d8a8" age=3d23h56m
+INFO [06-14|07:34:41.897] Imported new block receipts              count=1    elapsed=4.487ms     number=10562017 hash="e84dee…99ea87" age=4d7h18m  size=4.00B
+INFO [06-14|07:34:42.035] Imported new block headers               count=2048 elapsed=140.084ms   number=10566112 hash="2753bd…f220c2" age=3d16h36m
+INFO [06-14|07:34:42.148] Imported new block headers               count=1472 elapsed=96.912ms    number=10567584 hash="93295f…a03727" age=3d11h22m
+INFO [06-14|07:34:42.254] Imported new block headers               count=192  elapsed=17.168ms    number=10567776 hash="387b5b…27b961" age=3d10h41m
+INFO [06-14|07:34:42.441] Imported new block receipts              count=483  elapsed=20.937ms    number=10562500 hash="276bdd…2e6c1a" age=4d5h26m  size=348.50KiB
+INFO [06-14|07:34:42.608] Imported new block headers               count=192  elapsed=44.717ms    number=10567968 hash="0d55b6…c1c523" age=3d10h1m
+INFO [06-14|07:34:42.869] Imported new block headers               count=576  elapsed=37.359ms    number=10568544 hash="dad4c3…fa292b" age=3d7h57m
+INFO [06-14|07:34:43.177] Imported new block receipts              count=218  elapsed=10.550ms    number=10562718 hash="d80a22…e47dbb" age=4d4h38m  size=198.54KiB
+INFO [06-14|07:34:43.292] Upgrading chain index                    type=bloombits percentage=3
+TRACE[06-14|07:34:43.293] Processing new chain section             type=bloombits section=78
+INFO [06-14|07:34:43.635] Imported new block receipts              count=537  elapsed=26.080ms    number=10563255 hash="6cf5cc…3db918" age=4d2h44m  size=293.16KiB
+INFO [06-14|07:34:43.745] Imported new block headers               count=960  elapsed=72.046ms    number=10569504 hash="5e5f2c…61ee2e" age=3d4h31m
+INFO [06-14|07:34:44.074] Imported new block receipts              count=499  elapsed=23.206ms    number=10563754 hash="4ca12d…4ad254" age=4d58m7s  size=387.85KiB
+INFO [06-14|07:34:44.250] Imported new block receipts              count=448  elapsed=23.124ms    number=10564202 hash="00e327…960636" age=3d23h30m size=317.21KiB
+INFO [06-14|07:34:44.436] Imported new block headers               count=384  elapsed=66.151ms    number=10569888 hash="dee829…3ef56a" age=3d3h5m
+INFO [06-14|07:34:44.493] Imported new block receipts              count=227  elapsed=8.083ms     number=10564429 hash="0769b3…d2f1f5" age=3d22h40m size=154.65KiB
+INFO [06-14|07:34:44.573] Imported new block headers               count=192  elapsed=32.764ms    number=10570080 hash="b7685b…4851be" age=3d2h23m
+INFO [06-14|07:34:45.172] Imported new block headers               count=384  elapsed=38.220ms    number=10570464 hash="5eac27…5becfe" age=3d1h41s
+INFO [06-14|07:34:45.366] Imported new block headers               count=192  elapsed=48.331ms    number=10570656 hash="e04fa9…e4a4e3" age=3d20m51s
+INFO [06-14|07:34:45.366] Imported new block receipts              count=505  elapsed=50.732ms    number=10564934 hash="ad502f…db8f60" age=3d20h45m size=368.98KiB
+TRACE[06-14|07:34:45.763] Processing new chain section             type=bloombits section=79
+INFO [06-14|07:34:46.388] Imported new block receipts              count=671  elapsed=42.655ms    number=10565605 hash="046b9c…d204be" age=3d18h26m size=479.02KiB
+INFO [06-14|07:34:46.584] Imported new block receipts              count=484  elapsed=23.244ms    number=10566089 hash="f10080…4a368d" age=3d16h42m size=334.16KiB
+INFO [06-14|07:34:46.975] Imported new block receipts              count=228  elapsed=13.318ms    number=10566317 hash="9202cc…10c27a" age=3d15h54m size=128.38KiB
+INFO [06-14|07:34:47.842] Imported new block receipts              count=793  elapsed=39.367ms    number=10567110 hash="0871e1…02f77c" age=3d13h10m size=457.53KiB
+INFO [06-14|07:34:48.104] Imported new block receipts              count=582  elapsed=31.581ms    number=10567692 hash="62aa42…f38e8d" age=3d11h13s size=382.74KiB
+INFO [06-14|07:34:48.387] Imported new block receipts              count=263  elapsed=18.643ms    number=10567955 hash="2ec826…fd5738" age=3d10h4m  size=191.37KiB
+INFO [06-14|07:34:48.746] Imported new block receipts              count=250  elapsed=20.219ms    number=10568205 hash="501293…4d9422" age=3d9h10m  size=147.97KiB
+TRACE[06-14|07:34:48.944] Processing new chain section             type=bloombits section=80
+INFO [06-14|07:34:49.010] Imported new block receipts              count=269  elapsed=9.363ms     number=10568474 hash="99b876…610f9a" age=3d8h14m  size=153.21KiB
+INFO [06-14|07:34:49.111] Imported new block receipts              count=247  elapsed=33.809ms    number=10568721 hash="9b7e0a…87adfd" age=3d7h24m  size=227.48KiB
+INFO [06-14|07:34:49.383] Imported new block receipts              count=226  elapsed=13.874ms    number=10568947 hash="8f057b…657acd" age=3d6h35m  size=127.84KiB
+INFO [06-14|07:34:50.142] Imported new block headers               count=192  elapsed=57.637ms    number=10570848 hash="5b249d…4981b9" age=2d23h38m
+INFO [06-14|07:34:50.220] Imported new block headers               count=192  elapsed=21.969ms    number=10571040 hash="54e6d0…b4feb8" age=2d22h55m
+INFO [06-14|07:34:50.220] Imported new block receipts              count=788  elapsed=44.776ms    number=10569735 hash="b629a6…b03812" age=3d3h37m  size=527.61KiB
+INFO [06-14|07:34:50.422] Imported new block receipts              count=272  elapsed=12.324ms    number=10570007 hash="a1d92e…6ddcee" age=3d2h41m  size=198.04KiB
+INFO [06-14|07:34:50.881] Imported new block headers               count=384  elapsed=53.085ms    number=10571424 hash="5a39ac…af9cf5" age=2d21h36m
+INFO [06-14|07:34:50.899] Imported new block headers               count=192  elapsed=15.387ms    number=10571616 hash="9d6beb…ab4baf" age=2d20h53m
+INFO [06-14|07:34:51.156] Imported new block headers               count=192  elapsed=66.451ms    number=10571808 hash="8512b2…7ac024" age=2d20h8m
+INFO [06-14|07:34:51.342] Imported new block headers               count=192  elapsed=49.701ms    number=10572000 hash="df27e6…2c55be" age=2d19h32m
+INFO [06-14|07:34:51.447] Imported new block receipts              count=1033 elapsed=39.723ms    number=10571040 hash="54e6d0…b4feb8" age=2d22h55m size=700.67KiB
+INFO [06-14|07:34:51.548] Upgrading chain index                    type=bloombits percentage=3
+TRACE[06-14|07:34:51.548] Processing new chain section             type=bloombits section=81
+INFO [06-14|07:34:51.724] Imported new block receipts              count=6    elapsed="711.762µs" number=10571046 hash="415d03…a9824b" age=2d22h54m size=1.79KiB
+INFO [06-14|07:34:51.809] Imported new block headers               count=192  elapsed=15.405ms    number=10572192 hash="6fc05e…97b3c1" age=2d18h45m
+INFO [06-14|07:34:52.079] Imported new block headers               count=384  elapsed=53.430ms    number=10572576 hash="119f41…ca2f0b" age=2d17h25m
+INFO [06-14|07:34:52.389] Imported new block receipts              count=491  elapsed=18.462ms    number=10571537 hash="327d55…bbd2a9" age=2d21h11m size=311.02KiB
+TRACE[06-14|07:34:53.407] Processing new chain section             type=bloombits section=82
+TRACE[06-14|07:34:55.358] Processing new chain section             type=bloombits section=83
+INFO [06-14|07:34:56.066] Imported new block receipts              count=465  elapsed=20.580ms    number=10572002 hash="b820e4…99026a" age=2d19h31m size=321.85KiB
+INFO [06-14|07:34:57.174] Imported new block headers               count=2048 elapsed=131.148ms   number=10574624 hash="786497…8a4a49" age=2d10h6m
+TRACE[06-14|07:34:57.220] Processing new chain section             type=bloombits section=84
+INFO [06-14|07:34:57.298] Imported new block headers               count=1216 elapsed=110.188ms   number=10575840 hash="686839…c1d701" age=2d6h5m
+INFO [06-14|07:34:57.298] Imported new block receipts              count=575  elapsed=63.812ms    number=10572577 hash="8f1b5f…bde7eb" age=2d17h25m size=379.57KiB
+INFO [06-14|07:34:57.318] Imported new block headers               count=192  elapsed=14.870ms    number=10576032 hash="e91ce9…0f2c90" age=2d5h22m
+INFO [06-14|07:34:57.639] Imported new block headers               count=384  elapsed=38.566ms    number=10576416 hash="856375…f041ec" age=2d3h52m
+INFO [06-14|07:34:57.907] Imported new block receipts              count=510  elapsed=17.631ms    number=10573087 hash="da8e61…78836b" age=2d15h31m size=295.78KiB
+INFO [06-14|07:34:58.044] Imported new block headers               count=384  elapsed=28.575ms    number=10576800 hash="0004a4…0e3ef8" age=2d2h22m
+INFO [06-14|07:34:58.630] Imported new block headers               count=384  elapsed=72.577ms    number=10577184 hash="7218e3…25fbd4" age=2d1h35s
+INFO [06-14|07:34:58.876] Imported new block headers               count=192  elapsed=41.059ms    number=10577376 hash="474ecc…faac71" age=2d11m45s
+INFO [06-14|07:34:58.995] Imported new block receipts              count=547  elapsed=14.809ms    number=10573634 hash="c8961c…7a2eff" age=2d13h39m size=235.48KiB
+INFO [06-14|07:34:59.404] Imported new block receipts              count=507  elapsed=16.982ms    number=10574141 hash="82b66f…a53cb4" age=2d11h44m size=308.89KiB
+INFO [06-14|07:34:59.559] Upgrading chain index                    type=bloombits percentage=3
+TRACE[06-14|07:34:59.559] Processing new chain section             type=bloombits section=85
+INFO [06-14|07:34:59.855] Imported new block receipts              count=566  elapsed=25.309ms    number=10574707 hash="fe7d1c…567526" age=2d9h50m  size=346.99KiB
+INFO [06-14|07:35:00.269] Imported new block headers               count=1152 elapsed=86.602ms    number=10578528 hash="232c8d…d9c303" age=1d20h12m
+INFO [06-14|07:35:00.292] Imported new block headers               count=192  elapsed=16.683ms    number=10578720 hash="cd4131…ba0474" age=1d19h31m
+INFO [06-14|07:35:01.635] Imported new block receipts              count=2048 elapsed=78.440ms    number=10576755 hash="f2710a…4598b6" age=2d2h32m  size=1.19MiB
+INFO [06-14|07:35:01.638] Imported new block receipts              count=59   elapsed=1.698ms     number=10576814 hash="9d2108…f6c148" age=2d2h18m  size=36.46KiB
+TRACE[06-14|07:35:01.729] Processing new chain section             type=bloombits section=86
+INFO [06-14|07:35:01.923] Imported new block receipts              count=247  elapsed=14.049ms    number=10577061 hash="75e975…1430a5" age=2d1h26m  size=205.63KiB
+INFO [06-14|07:35:02.009] Imported new block receipts              count=234  elapsed=7.679ms     number=10577295 hash="03a7c4…48489d" age=2d35m30s size=125.50KiB
+INFO [06-14|07:35:02.301] Imported new block headers               count=1536 elapsed=106.138ms   number=10580256 hash="8f83f4…42d83e" age=1d13h59m
+INFO [06-14|07:35:02.330] Imported new block headers               count=192  elapsed=22.231ms    number=10580448 hash="081650…b664b0" age=1d13h20m
+INFO [06-14|07:35:02.391] Imported new block headers               count=192  elapsed=14.788ms    number=10580640 hash="f34026…9ae59e" age=1d12h36m
+INFO [06-14|07:35:03.019] Imported new block headers               count=192  elapsed=30.155ms    number=10580832 hash="b84a06…c35df0" age=1d11h55m
+TRACE[06-14|07:35:04.153] Processing new chain section             type=bloombits section=87
+INFO [06-14|07:35:04.229] Imported new block receipts              count=1475 elapsed=53.680ms    number=10578770 hash="a1936b…2642ed" age=1d19h24m size=949.46KiB
+INFO [06-14|07:35:04.335] Imported new block receipts              count=456  elapsed=29.303ms    number=10579226 hash="734e28…81974c" age=1d17h42m size=391.40KiB
+INFO [06-14|07:35:05.090] Imported new block headers               count=1536 elapsed=129.448ms   number=10582368 hash="5f6ac5…d52a2c" age=1d6h15m
+INFO [06-14|07:35:05.117] Imported new block headers               count=192  elapsed=19.331ms    number=10582560 hash="a5f117…8ca758" age=1d5h34m
+INFO [06-14|07:35:05.973] Imported new block receipts              count=1612 elapsed=59.373ms    number=10580838 hash="0550ba…be1767" age=1d11h54m size=976.57KiB
+TRACE[06-14|07:35:06.087] Processing new chain section             type=bloombits section=88
+INFO [06-14|07:35:06.257] Imported new block receipts              count=550  elapsed=30.143ms    number=10581388 hash="22c3d5…e45a72" age=1d9h53m  size=308.17KiB
+INFO [06-14|07:35:06.707] Imported new block receipts              count=521  elapsed=23.455ms    number=10581909 hash="760807…a2281b" age=1d8h5m   size=323.61KiB
+INFO [06-14|07:35:07.233] Imported new block headers               count=1728 elapsed=130.480ms   number=10584288 hash="bc1ae8…6fd7bc" age=23h27m2s
+INFO [06-14|07:35:07.427] Imported new block headers               count=384  elapsed=55.217ms    number=10584672 hash="66fc5f…4bb468" age=22h5m32s
+INFO [06-14|07:35:08.681] Upgrading chain index                    type=bloombits percentage=3
+TRACE[06-14|07:35:08.681] Processing new chain section             type=bloombits section=89
+INFO [06-14|07:35:09.753] Imported new block receipts              count=1755 elapsed=58.156ms    number=10583664 hash="ce3ab6…e2a73e" age=1d1h38m  size=1.02MiB
+INFO [06-14|07:35:10.649] Imported new block headers               count=1920 elapsed=120.718ms   number=10586592 hash="67af7e…5d69bc" age=15h8m21s
+INFO [06-14|07:35:10.969] Imported new block receipts              count=1008 elapsed=39.214ms    number=10584672 hash="66fc5f…4bb468" age=22h5m35s size=583.75KiB
+INFO [06-14|07:35:11.540] Imported new block receipts              count=545  elapsed=18.484ms    number=10585217 hash="1aaffa…7a2a25" age=19h55m29s size=323.20KiB
+TRACE[06-14|07:35:13.818] Processing new chain section             type=bloombits section=90
+INFO [06-14|07:35:16.588] Imported new block receipts              count=570  elapsed=23.211ms    number=10585787 hash="710761…13ad3d" age=17h51m51s size=329.33KiB
+INFO [06-14|07:35:16.982] Imported new block headers               count=1920 elapsed=140.137ms   number=10588512 hash="f7eee7…9e38ff" age=8h9m17s
+INFO [06-14|07:35:16.982] Imported new block receipts              count=805  elapsed=157.405ms   number=10586592 hash="67af7e…5d69bc" age=15h8m27s  size=458.63KiB
+INFO [06-14|07:35:16.991] Imported new block receipts              count=1    elapsed="269.206µs" number=10586593 hash="5a6970…8d577c" age=15h7m55s  size=4.00B
+INFO [06-14|07:35:18.018] Imported new block receipts              count=557  elapsed=19.577ms    number=10587150 hash="7ad472…5f64df" age=13h6m47s  size=293.89KiB
+WARN [06-14|07:35:18.515] Rolled back headers                      count=2048 header=10588512->10586464 fast=10587150->10586464 block=0->0
+WARN [06-14|07:35:18.515] Synchronisation failed, dropping peer    peer=cc45d8848526f2fe err="retrieved hash chain is invalid: timeout"
+INFO [06-14|07:35:19.400] Upgrading chain index                    type=bloombits percentage=3
+TRACE[06-14|07:35:19.400] Processing new chain section             type=bloombits section=91
+TRACE[06-14|07:35:21.840] Processing new chain section             type=bloombits section=92
+TRACE[06-14|07:35:24.008] Processing new chain section             type=bloombits section=93
+TRACE[06-14|07:35:26.138] Processing new chain section             type=bloombits section=94
+INFO [06-14|07:35:28.142] Upgrading chain index                    type=bloombits percentage=3
+TRACE[06-14|07:35:28.142] Processing new chain section             type=bloombits section=95
+TRACE[06-14|07:35:30.076] Processing new chain section             type=bloombits section=96
+DEBUG[06-14|07:35:33.731] Current full block not old enough        number=0        hash="d4e567…cb8fa3" delay=90000
+TRACE[06-14|07:35:35.302] Processing new chain section             type=bloombits section=97
+INFO [06-14|07:35:38.379] Disabling direct-ancient mode            origin=10586464 ancient=10500809
+INFO [06-14|07:35:38.490] Upgrading chain index                    type=bloombits percentage=3
+TRACE[06-14|07:35:38.490] Processing new chain section             type=bloombits section=98
+INFO [06-14|07:35:40.659] Imported new block headers               count=960  elapsed=67.122ms    number=10587424 hash="0ed18c…f69560" age=12h8m27s
+INFO [06-14|07:35:40.663] Imported new block receipts              count=0    elapsed="47.194µs"  number=10586470 hash="77ec5f…0d35d6" age=15h33m26s size=0.00B     ignored=6
+INFO [06-14|07:35:41.007] Imported new block headers               count=192  elapsed=12.601ms    number=10587616 hash="d1c535…c91132" age=11h23m5s
+INFO [06-14|07:35:41.062] Imported new block headers               count=192  elapsed=33.965ms    number=10587808 hash="31088c…0621f1" age=10h47m11s
+INFO [06-14|07:35:41.374] Imported new block receipts              count=0    elapsed="93.785µs"  number=10586474 hash="c032f5…c48d89" age=15h32m1s  size=0.00B     ignored=4
+TRACE[06-14|07:35:41.519] Processing new chain section             type=bloombits section=99
+INFO [06-14|07:35:41.748] Imported new block receipts              count=0    elapsed="235.95µs"  number=10586479 hash="e68d5e…cbe78a" age=15h31m1s  size=0.00B     ignored=5
+INFO [06-14|07:35:41.749] Imported new block receipts              count=0    elapsed="266.111µs" number=10586481 hash="7a27fc…95c12f" age=15h29m54s size=0.00B     ignored=2
+INFO [06-14|07:35:41.804] Imported new block headers               count=384  elapsed=50.479ms    number=10588192 hash="62acfa…26e9ba" age=9h22m43s
+INFO [06-14|07:35:42.070] Imported new block headers               count=384  elapsed=67.614ms    number=10588576 hash="9ff608…72c998" age=7h58m12s
+INFO [06-14|07:35:42.105] Imported new block headers               count=192  elapsed=25.694ms    number=10588768 hash="6b84ca…09c293" age=7h14m43s
+INFO [06-14|07:35:42.307] Imported new block receipts              count=0    elapsed="198.809µs" number=10586492 hash="38faac…c0b83e" age=15h27m47s size=0.00B     ignored=11
+INFO [06-14|07:35:42.714] Imported new block headers               count=192  elapsed=77.856ms    number=10588960 hash="ddea72…8a84e4" age=6h37m41s
+INFO [06-14|07:35:42.744] Imported new block headers               count=192  elapsed=23.519ms    number=10589152 hash="21d174…aca58b" age=5h56m30s
+INFO [06-14|07:35:42.845] Imported new block receipts              count=0    elapsed="217.66µs"  number=10586504 hash="96a246…5f5205" age=15h25m51s size=0.00B     ignored=12
+INFO [06-14|07:35:42.897] Imported new block receipts              count=0    elapsed="110.642µs" number=10586506 hash="2f62cb…cd1d8f" age=15h25m16s size=0.00B     ignored=2
+INFO [06-14|07:35:43.199] Imported new block receipts              count=0    elapsed="372.568µs" number=10586510 hash="4aec02…680f49" age=15h24m10s size=0.00B     ignored=4
+INFO [06-14|07:35:43.265] Imported new block headers               count=384  elapsed=55.080ms    number=10589536 hash="7a2ed6…5d9445" age=4h30m29s
+INFO [06-14|07:35:43.284] Imported new block headers               count=192  elapsed=16.373ms    number=10589728 hash="a70e68…8c553e" age=3h55m28s
+INFO [06-14|07:35:43.537] Imported new block receipts              count=0    elapsed="398.15µs"  number=10586519 hash="c91151…85c90e" age=15h21m47s size=0.00B     ignored=9
+INFO [06-14|07:35:43.617] Imported new block headers               count=384  elapsed=42.629ms    number=10590112 hash="da86eb…93681d" age=2h34m3s
+INFO [06-14|07:35:43.882] Imported new block receipts              count=0    elapsed="282.743µs" number=10586535 hash="3d9798…94583b" age=15h19m24s size=0.00B     ignored=16
+INFO [06-14|07:35:44.098] Imported new block receipts              count=0    elapsed="80.624µs"  number=10586543 hash="1ab48c…0ff4ef" age=15h18m39s size=0.00B     ignored=8
+INFO [06-14|07:35:44.098] Imported new block receipts              count=0    elapsed="119.08µs"  number=10586554 hash="81faf9…0e8356" age=15h15m58s size=0.00B     ignored=11
+INFO [06-14|07:35:44.131] Imported new block headers               count=384  elapsed=30.708ms    number=10590496 hash="af255b…d534aa" age=1h9m12s
+INFO [06-14|07:35:44.222] Imported new block headers               count=192  elapsed=15.927ms    number=10590688 hash="73f538…0f341d" age=29m1s
+INFO [06-14|07:35:44.332] Imported new block receipts              count=0    elapsed="203.208µs" number=10586576 hash="5fd8d1…a15b58" age=15h11m55s size=0.00B     ignored=22
+TRACE[06-14|07:35:44.450] Processing new chain section             type=bloombits section=100
+INFO [06-14|07:35:44.533] Imported new block receipts              count=0    elapsed="131.197µs" number=10586583 hash="451897…bc6de1" age=15h10m29s size=0.00B     ignored=7
+INFO [06-14|07:35:44.922] Imported new block receipts              count=0    elapsed="182.419µs" number=10586627 hash="f7dfa7…894f10" age=14h59m31s size=0.00B     ignored=44
+INFO [06-14|07:35:45.585] Imported new block receipts              count=0    elapsed="190.722µs" number=10586665 hash="35fa96…bbdd0f" age=14h51m6s  size=0.00B     ignored=38
+INFO [06-14|07:35:45.918] Imported new block receipts              count=0    elapsed="129.037µs" number=10586678 hash="18271d…c530c0" age=14h48m2s  size=0.00B     ignored=13
+INFO [06-14|07:35:45.949] Imported new block receipts              count=0    elapsed="132.556µs" number=10586700 hash="34eccc…df7e5c" age=14h42m27s size=0.00B     ignored=22
+INFO [06-14|07:35:45.986] Imported new block receipts              count=0    elapsed="224.066µs" number=10586723 hash="84a6b7…92007e" age=14h38m16s size=0.00B     ignored=23
+INFO [06-14|07:35:46.010] Imported new block receipts              count=0    elapsed="162.244µs" number=10586745 hash="30a54e…c215f2" age=14h33m25s size=0.00B     ignored=22
+INFO [06-14|07:35:46.345] Imported new block receipts              count=0    elapsed="212.772µs" number=10586764 hash="94526d…970698" age=14h29m7s  size=0.00B     ignored=19
+INFO [06-14|07:35:46.654] Imported new block receipts              count=0    elapsed=1.525ms     number=10586866 hash="72ffa2…5bbb6e" age=14h6m12s  size=0.00B     ignored=102
+INFO [06-14|07:35:47.333] Imported new block receipts              count=0    elapsed=1.243ms     number=10586949 hash="d66809…6cf69b" age=13h50m49s size=0.00B     ignored=83
+INFO [06-14|07:35:47.865] Imported new block receipts              count=112  elapsed=16.539ms    number=10587262 hash="e1f5c6…2e4162" age=12h43m46s size=74.16KiB  ignored=201
+INFO [06-14|07:35:48.244] Imported new block receipts              count=32   elapsed=10.823ms    number=10587294 hash="833056…3d0802" age=12h35m57s size=47.08KiB
+INFO [06-14|07:35:48.348] Imported new block headers               count=141  elapsed=97.575ms    number=10590829 hash="18b977…129507"
+INFO [06-14|07:35:48.851] Imported new block receipts              count=210  elapsed=10.253ms    number=10587504 hash="25ead4…dc7af7" age=11h48m36s size=123.02KiB
+INFO [06-14|07:35:48.913] Imported new block receipts              count=146  elapsed=12.729ms    number=10587650 hash="4d8cc3…18b18a" age=11h15m51s size=75.22KiB
+INFO [06-14|07:35:48.950] Upgrading chain index                    type=bloombits percentage=3
+TRACE[06-14|07:35:48.950] Processing new chain section             type=bloombits section=101
+INFO [06-14|07:35:49.528] Imported new block receipts              count=66   elapsed=6.998ms     number=10587716 hash="c16ceb…91b28d" age=11h2m53s  size=23.89KiB
+INFO [06-14|07:35:50.152] Imported new block receipts              count=325  elapsed=23.733ms    number=10588041 hash="32e023…e66e14" age=9h53m36s  size=221.35KiB
+INFO [06-14|07:35:50.529] Imported new block receipts              count=232  elapsed=24.008ms    number=10588273 hash="a480f8…f80301" age=9h4m31s   size=166.29KiB
+INFO [06-14|07:35:50.867] Imported new block receipts              count=110  elapsed=6.407ms     number=10588383 hash="17f5c4…d2e020" age=8h38m50s  size=47.65KiB
+INFO [06-14|07:35:51.040] Imported new block receipts              count=96   elapsed=7.003ms     number=10588479 hash="42faf5…ed6d0b" age=8h14m49s  size=57.33KiB
+INFO [06-14|07:35:51.210] Imported new block receipts              count=203  elapsed=9.282ms     number=10588682 hash="0f5c93…fc4726" age=7h34m20s  size=181.66KiB
+INFO [06-14|07:35:51.561] Imported new block receipts              count=142  elapsed=10.353ms    number=10588824 hash="6fe40f…b23b5e" age=7h3m32s   size=67.45KiB
+TRACE[06-14|07:35:51.961] Processing new chain section             type=bloombits section=102
+INFO [06-14|07:35:52.214] Imported new block receipts              count=262  elapsed=6.914ms     number=10589086 hash="4a3d06…fcb6e6" age=6h13m2s   size=111.88KiB
+INFO [06-14|07:35:52.425] Imported new block receipts              count=541  elapsed=32.817ms    number=10589627 hash="6ba14b…bdb5a3" age=4h15m2s   size=342.04KiB
+INFO [06-14|07:35:52.931] Imported new block receipts              count=197  elapsed=13.576ms    number=10589824 hash="b2621e…ead31b" age=3h31m33s  size=105.02KiB
+INFO [06-14|07:35:53.297] Imported new block headers               count=1    elapsed=10.420ms    number=10590830 hash="094b10…9749ad"
+INFO [06-14|07:35:53.342] Imported new block receipts              count=479  elapsed=29.636ms    number=10590303 hash="03970a…ce42cc" age=1h51m48s  size=285.97KiB
+INFO [06-14|07:35:53.666] Imported new block receipts              count=375  elapsed=21.164ms    number=10590678 hash="163816…9bb5b2" age=31m4s     size=267.35KiB
+INFO [06-14|07:35:53.725] Imported new block receipts              count=86   elapsed=7.495ms     number=10590764 hash="43a858…d70c80" age=13m29s    size=42.35KiB
+TRACE[06-14|07:35:54.927] Processing new chain section             type=bloombits section=103
+INFO [06-14|07:35:56.696] Imported new block headers               count=1    elapsed=9.603ms     number=10590831 hash="b2b0d6…abb6fb"
+INFO [06-14|07:36:03.260] Upgrading chain index                    type=bloombits percentage=4
+TRACE[06-14|07:36:03.260] Processing new chain section             type=bloombits section=104
+INFO [06-14|07:36:03.287] Imported new block headers               count=2    elapsed=11.627ms    number=10590833 hash="3b0a5e…acf439"
+TRACE[06-14|07:36:06.675] Processing new chain section             type=bloombits section=105
+TRACE[06-14|07:36:08.654] Processing new chain section             type=bloombits section=106
+TRACE[06-14|07:36:10.622] Processing new chain section             type=bloombits section=107
+INFO [06-14|07:36:13.774] Imported new block headers               count=1    elapsed=4.424ms     number=10590834 hash="730bd5…5b0524"
+INFO [06-14|07:36:16.175] Upgrading chain index                    type=bloombits percentage=4
+TRACE[06-14|07:36:16.176] Processing new chain section             type=bloombits section=108
+TRACE[06-14|07:36:18.930] Processing new chain section             type=bloombits section=109
+TRACE[06-14|07:36:21.721] Processing new chain section             type=bloombits section=110
+TRACE[06-14|07:36:24.154] Processing new chain section             type=bloombits section=111
+INFO [06-14|07:36:26.327] Upgrading chain index                    type=bloombits percentage=4
+TRACE[06-14|07:36:26.327] Processing new chain section             type=bloombits section=112
+TRACE[06-14|07:36:29.165] Processing new chain section             type=bloombits section=113
+DEBUG[06-14|07:36:33.732] Current full block not old enough        number=0        hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:36:35.933] Imported new block headers               count=2    elapsed=12.254ms    number=10590836 hash="e6021e…eb3b00"
+INFO [06-14|07:36:38.324] Upgrading chain index                    type=bloombits percentage=4
+TRACE[06-14|07:36:38.325] Processing new chain section             type=bloombits section=114
+TRACE[06-14|07:36:41.884] Processing new chain section             type=bloombits section=115
+TRACE[06-14|07:36:45.114] Processing new chain section             type=bloombits section=116
+INFO [06-14|07:36:48.716] Upgrading chain index                    type=bloombits percentage=4
+TRACE[06-14|07:36:48.716] Processing new chain section             type=bloombits section=117
+TRACE[06-14|07:36:52.240] Processing new chain section             type=bloombits section=118
+INFO [06-14|07:36:56.685] Imported new block headers               count=1    elapsed=10.638ms    number=10590837 hash="96fa9a…524e63"
+INFO [06-14|07:36:57.797] Upgrading chain index                    type=bloombits percentage=4
+TRACE[06-14|07:36:57.797] Processing new chain section             type=bloombits section=119
+INFO [06-14|07:37:00.069] Imported new block headers               count=1    elapsed=4.056ms     number=10590838 hash="413a4b…72e210"
+TRACE[06-14|07:37:03.607] Processing new chain section             type=bloombits section=120
+INFO [06-14|07:37:06.338] Upgrading chain index                    type=bloombits percentage=4
+TRACE[06-14|07:37:06.338] Processing new chain section             type=bloombits section=121
+TRACE[06-14|07:37:08.857] Processing new chain section             type=bloombits section=122
+TRACE[06-14|07:37:10.886] Processing new chain section             type=bloombits section=123
+TRACE[06-14|07:37:14.001] Processing new chain section             type=bloombits section=124
+INFO [06-14|07:37:18.603] Upgrading chain index                    type=bloombits percentage=4
+TRACE[06-14|07:37:18.603] Processing new chain section             type=bloombits section=125
+TRACE[06-14|07:37:22.497] Processing new chain section             type=bloombits section=126
+INFO [06-14|07:37:27.896] Upgrading chain index                    type=bloombits percentage=4
+TRACE[06-14|07:37:27.896] Processing new chain section             type=bloombits section=127
+DEBUG[06-14|07:37:33.733] Current full block not old enough        number=0        hash="d4e567…cb8fa3" delay=90000
+TRACE[06-14|07:37:35.275] Processing new chain section             type=bloombits section=128
+INFO [06-14|07:37:41.091] Upgrading chain index                    type=bloombits percentage=5
+TRACE[06-14|07:37:41.091] Processing new chain section             type=bloombits section=129
+TRACE[06-14|07:37:44.965] Processing new chain section             type=bloombits section=130
+TRACE[06-14|07:37:48.029] Processing new chain section             type=bloombits section=131
+INFO [06-14|07:37:50.216] Upgrading chain index                    type=bloombits percentage=5
+TRACE[06-14|07:37:50.216] Processing new chain section             type=bloombits section=132
+INFO [06-14|07:37:51.244] Imported new block headers               count=1    elapsed=10.563ms    number=10590839 hash="bf3cb4…7f9ec3" age=1m18s
+TRACE[06-14|07:37:52.755] Processing new chain section             type=bloombits section=133
+INFO [06-14|07:37:54.677] Imported new block headers               count=1    elapsed=10.742ms    number=10590840 hash="f3c176…cbb6b2" age=1m
+TRACE[06-14|07:37:55.399] Processing new chain section             type=bloombits section=134
+TRACE[06-14|07:37:58.140] Processing new chain section             type=bloombits section=135
+INFO [06-14|07:37:58.189] Imported new block headers               count=1    elapsed=9.942ms     number=10590841 hash="a56da1…cb0c7e"
+INFO [06-14|07:38:02.491] Upgrading chain index                    type=bloombits percentage=5
+TRACE[06-14|07:38:02.491] Processing new chain section             type=bloombits section=136
+INFO [06-14|07:38:10.512] Upgrading chain index                    type=bloombits percentage=5
+TRACE[06-14|07:38:10.512] Processing new chain section             type=bloombits section=137
+TRACE[06-14|07:38:15.337] Processing new chain section             type=bloombits section=138
+INFO [06-14|07:38:20.292] Upgrading chain index                    type=bloombits percentage=5
+TRACE[06-14|07:38:20.293] Processing new chain section             type=bloombits section=139
+TRACE[06-14|07:38:25.163] Processing new chain section             type=bloombits section=140
+INFO [06-14|07:38:29.476] Upgrading chain index                    type=bloombits percentage=5
+TRACE[06-14|07:38:29.476] Processing new chain section             type=bloombits section=141
+DEBUG[06-14|07:38:33.734] Current full block not old enough        number=0        hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:38:38.108] Upgrading chain index                    type=bloombits percentage=5
+TRACE[06-14|07:38:38.109] Processing new chain section             type=bloombits section=142
+WARN [06-14|07:38:40.574] Synchronisation failed, dropping peer    peer=cc45d8848526f2fe err="action from bad peer ignored"
+TRACE[06-14|07:38:42.822] Processing new chain section             type=bloombits section=143
+INFO [06-14|07:38:44.517] Disabling direct-ancient mode            origin=10590764 ancient=10500809
+TRACE[06-14|07:38:44.790] Processing new chain section             type=bloombits section=144
+INFO [06-14|07:38:44.902] Imported new block headers               count=1    elapsed=12.739ms    number=10590842 hash="111fb2…ef0e7e" ignored=77
+INFO [06-14|07:38:44.904] Imported new block receipts              count=1    elapsed="416.728µs" number=10590765 hash="bca1fa…22812e" age=16m14s    size=4.00B
+INFO [06-14|07:38:45.868] Imported new block receipts              count=13   elapsed=2.904ms     number=10590778 hash="27e7ad…4cd027" age=13m38s    size=12.30KiB
+INFO [06-14|07:38:47.462] Upgrading chain index                    type=bloombits percentage=5
+TRACE[06-14|07:38:47.462] Processing new chain section             type=bloombits section=145
+TRACE[06-14|07:38:49.426] Processing new chain section             type=bloombits section=146
+TRACE[06-14|07:38:51.579] Processing new chain section             type=bloombits section=147
+TRACE[06-14|07:38:54.063] Processing new chain section             type=bloombits section=148
+INFO [06-14|07:38:55.208] Imported new block headers               count=1    elapsed=4.230ms     number=10590843 hash="d7335e…6d7e21" age=1m2s
+INFO [06-14|07:38:58.107] Upgrading chain index                    type=bloombits percentage=5
+TRACE[06-14|07:38:58.107] Processing new chain section             type=bloombits section=149
+TRACE[06-14|07:39:00.056] Processing new chain section             type=bloombits section=150
+TRACE[06-14|07:39:02.313] Processing new chain section             type=bloombits section=151
+TRACE[06-14|07:39:04.753] Processing new chain section             type=bloombits section=152
+INFO [06-14|07:39:05.134] Imported new block headers               count=1    elapsed=4.234ms     number=10590844 hash="3a1646…756983" age=1m11s
+INFO [06-14|07:39:08.491] Upgrading chain index                    type=bloombits percentage=5
+TRACE[06-14|07:39:08.491] Processing new chain section             type=bloombits section=153
+INFO [06-14|07:39:08.846] Imported new block headers               count=1    elapsed=4.625ms     number=10590845 hash="1b6b99…4cadd9"
+TRACE[06-14|07:39:10.394] Processing new chain section             type=bloombits section=154
+INFO [06-14|07:39:12.354] Imported new block headers               count=2    elapsed=11.144ms    number=10590847 hash="f018e5…5ebb70"
+TRACE[06-14|07:39:14.007] Processing new chain section             type=bloombits section=155
+TRACE[06-14|07:39:15.899] Processing new chain section             type=bloombits section=156
+INFO [06-14|07:39:17.889] Upgrading chain index                    type=bloombits percentage=6
+TRACE[06-14|07:39:17.889] Processing new chain section             type=bloombits section=157
+TRACE[06-14|07:39:20.092] Processing new chain section             type=bloombits section=158
+TRACE[06-14|07:39:22.279] Processing new chain section             type=bloombits section=159
+TRACE[06-14|07:39:24.608] Processing new chain section             type=bloombits section=160
+INFO [06-14|07:39:28.073] Upgrading chain index                    type=bloombits percentage=6
+TRACE[06-14|07:39:28.073] Processing new chain section             type=bloombits section=161
+TRACE[06-14|07:39:30.233] Processing new chain section             type=bloombits section=162
+TRACE[06-14|07:39:32.722] Processing new chain section             type=bloombits section=163
+DEBUG[06-14|07:39:33.734] Current full block not old enough        number=0        hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:39:36.628] Upgrading chain index                    type=bloombits percentage=6
+TRACE[06-14|07:39:36.628] Processing new chain section             type=bloombits section=164
+TRACE[06-14|07:39:39.681] Processing new chain section             type=bloombits section=165
+TRACE[06-14|07:39:44.319] Processing new chain section             type=bloombits section=166
+INFO [06-14|07:39:50.133] Upgrading chain index                    type=bloombits percentage=6
+TRACE[06-14|07:39:50.133] Processing new chain section             type=bloombits section=167
+TRACE[06-14|07:39:55.000] Processing new chain section             type=bloombits section=168
+INFO [06-14|07:40:01.051] Imported new block headers               count=1    elapsed=10.881ms    number=10590848 hash="be3c90…df10a9"
+INFO [06-14|07:40:03.609] Upgrading chain index                    type=bloombits percentage=6
+TRACE[06-14|07:40:03.609] Processing new chain section             type=bloombits section=169
+INFO [06-14|07:40:07.753] Imported new block headers               count=1    elapsed=6.904ms     number=10590849 hash="a411d8…a7bdd5"
+INFO [06-14|07:40:12.831] Upgrading chain index                    type=bloombits percentage=6
+TRACE[06-14|07:40:12.831] Processing new chain section             type=bloombits section=170
+WARN [06-14|07:40:16.922] Stalling state sync, dropping peer       peer=d0a5277ef460b01d
+INFO [06-14|07:40:18.037] Imported new block headers               count=1    elapsed=4.082ms     number=10590850 hash="20fee3…631292" age=1m7s
+INFO [06-14|07:40:20.858] Upgrading chain index                    type=bloombits percentage=6
+TRACE[06-14|07:40:20.858] Processing new chain section             type=bloombits section=171
+INFO [06-14|07:40:25.201] Imported new block headers               count=1    elapsed=6.083ms     number=10590851 hash="b9fd4f…f94e50"
+TRACE[06-14|07:40:28.715] Processing new chain section             type=bloombits section=172
+INFO [06-14|07:40:32.895] Imported new block headers               count=1    elapsed=10.154ms    number=10590852 hash="ea0b9d…10681d"
+DEBUG[06-14|07:40:33.735] Current full block not old enough        number=0        hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:40:33.994] Upgrading chain index                    type=bloombits percentage=6
+TRACE[06-14|07:40:33.994] Processing new chain section             type=bloombits section=173
+TRACE[06-14|07:40:38.762] Processing new chain section             type=bloombits section=174
+INFO [06-14|07:40:42.061] Upgrading chain index                    type=bloombits percentage=6
+TRACE[06-14|07:40:42.061] Processing new chain section             type=bloombits section=175
+TRACE[06-14|07:40:45.655] Processing new chain section             type=bloombits section=176
+INFO [06-14|07:40:50.190] Upgrading chain index                    type=bloombits percentage=6
+TRACE[06-14|07:40:50.190] Processing new chain section             type=bloombits section=177
+INFO [06-14|07:40:50.670] Imported new block headers               count=2    elapsed=7.908ms     number=10590854 hash="249d97…7afe1d"
+TRACE[06-14|07:40:53.292] Processing new chain section             type=bloombits section=178
+INFO [06-14|07:40:57.367] Imported new block headers               count=1    elapsed=3.857ms     number=10590855 hash="dec2a4…1466b7"
+INFO [06-14|07:40:58.429] Upgrading chain index                    type=bloombits percentage=6
+TRACE[06-14|07:40:58.429] Processing new chain section             type=bloombits section=179
+TRACE[06-14|07:41:03.691] Processing new chain section             type=bloombits section=180
+INFO [06-14|07:41:04.525] Imported new block headers               count=2    elapsed=4.219ms     number=10590857 hash="db2c00…97e713"
+INFO [06-14|07:41:06.967] Upgrading chain index                    type=bloombits percentage=7
+TRACE[06-14|07:41:06.967] Processing new chain section             type=bloombits section=181
+TRACE[06-14|07:41:11.486] Processing new chain section             type=bloombits section=182
+INFO [06-14|07:41:16.766] Upgrading chain index                    type=bloombits percentage=7
+TRACE[06-14|07:41:16.766] Processing new chain section             type=bloombits section=183
+INFO [06-14|07:41:18.697] Imported new block headers               count=1    elapsed=3.932ms     number=10590858 hash="9b9e11…17d4c2"
+TRACE[06-14|07:41:19.421] Processing new chain section             type=bloombits section=184
+TRACE[06-14|07:41:23.886] Processing new chain section             type=bloombits section=185
+INFO [06-14|07:41:28.123] Upgrading chain index                    type=bloombits percentage=7
+TRACE[06-14|07:41:28.123] Processing new chain section             type=bloombits section=186
+TRACE[06-14|07:41:30.349] Processing new chain section             type=bloombits section=187
+INFO [06-14|07:41:32.543] Imported new block headers               count=2    elapsed=4.105ms     number=10590860 hash="f92918…370cf1"
+TRACE[06-14|07:41:32.759] Processing new chain section             type=bloombits section=188
+DEBUG[06-14|07:41:33.735] Current full block not old enough        number=0        hash="d4e567…cb8fa3" delay=90000
+INFO [06-14|07:41:36.825] Upgrading chain index                    type=bloombits percentage=7
+TRACE[06-14|07:41:36.826] Processing new chain section             type=bloombits section=189
+TRACE[06-14|07:41:39.278] Processing new chain section             type=bloombits section=190
+TRACE[06-14|07:41:41.539] Processing new chain section             type=bloombits section=191
+TRACE[06-14|07:41:43.994] Processing new chain section             type=bloombits section=192
+INFO [06-14|07:41:47.069] Upgrading chain index                    type=bloombits percentage=7
+TRACE[06-14|07:41:47.070] Processing new chain section             type=bloombits section=193
+TRACE[06-14|07:41:49.069] Processing new chain section             type=bloombits section=194
+TRACE[06-14|07:41:51.452] Processing new chain section             type=bloombits section=195
+TRACE[06-14|07:41:54.916] Processing new chain section             type=bloombits section=196
+INFO [06-14|07:42:00.450] Upgrading chain index                    type=bloombits percentage=7
+TRACE[06-14|07:42:00.450] Processing new chain section             type=bloombits section=197
+TRACE[06-14|07:42:05.828] Processing new chain section             type=bloombits section=198
+INFO [06-14|07:42:09.389] Upgrading chain index                    type=bloombits percentage=7
+TRACE[06-14|07:42:09.389] Processing new chain section             type=bloombits section=199
+TRACE[06-14|07:42:12.314] Processing new chain section             type=bloombits section=200
+INFO [06-14|07:42:19.490] Upgrading chain index                    type=bloombits percentage=7
+TRACE[06-14|07:42:19.490] Processing new chain section             type=bloombits section=201
+TRACE[06-14|07:42:23.065] Processing new chain section             type=bloombits section=202
+INFO [06-14|07:42:27.889] Upgrading chain index                    type=bloombits percentage=7
+TRACE[06-14|07:42:27.889] Processing new chain section             type=bloombits section=203
+TRACE[06-14|07:42:32.047] Processing new chain section             type=bloombits section=204
+DEBUG[06-14|07:42:33.735] Current full block not old enough        number=0        hash="d4e567…cb8fa3" delay=90000
+TRACE[06-14|07:42:35.710] Processing new chain section             type=bloombits section=205
+INFO [06-14|07:42:40.862] Upgrading chain index                    type=bloombits percentage=8
+TRACE[06-14|07:42:40.862] Processing new chain section             type=bloombits section=206
+INFO [06-14|07:42:41.826] Imported new block headers               count=2    elapsed=26.109ms    number=10590862 hash="9a7d59…6eebea" age=1m11s
+WARN [06-14|07:42:42.208] Stalling state sync, dropping peer       peer=e5bd1c9909d2c1e5
+TRACE[06-14|07:42:44.045] Processing new chain section             type=bloombits section=207
+INFO [06-14|07:42:52.236] Upgrading chain index                    type=bloombits percentage=8
+TRACE[06-14|07:42:52.237] Processing new chain section             type=bloombits section=208
+INFO [06-14|07:42:53.326] Imported new block headers               count=1    elapsed=7.180ms     number=10590863 hash="f9295b…4b82ce" age=1m22s
+TRACE[06-14|07:42:55.485] Processing new chain section             type=bloombits section=209
+INFO [06-14|07:42:56.748] Imported new block headers               count=2    elapsed=5.167ms     number=10590865 hash="b9357e…aee82c"
+TRACE[06-14|07:42:58.988] Processing new chain section             type=bloombits section=210
+INFO [06-14|07:43:00.263] Imported new block headers               count=1    elapsed=9.301ms     number=10590866 hash="987ae7…c648fd"
+INFO [06-14|07:43:01.360] Upgrading chain index                    type=bloombits percentage=8
+TRACE[06-14|07:43:01.360] Processing new chain section             type=bloombits section=211
+TRACE[06-14|07:43:05.132] Processing new chain section             type=bloombits section=212
+TRACE[06-14|07:43:07.709] Processing new chain section             type=bloombits section=213
+INFO [06-14|07:43:10.325] Upgrading chain index                    type=bloombits percentage=8
+TRACE[06-14|07:43:10.325] Processing new chain section             type=bloombits section=214
+TRACE[06-14|07:43:12.922] Processing new chain section             type=bloombits section=215
+INFO [06-14|07:43:15.274] Imported new block headers               count=1    elapsed=5.828ms     number=10590867 hash="00683e…89dd3e"
+TRACE[06-14|07:43:15.500] Processing new chain section             type=bloombits section=216
+INFO [06-14|07:43:18.514] Upgrading chain index                    type=bloombits percentage=8
+TRACE[06-14|07:43:18.514] Processing new chain section             type=bloombits section=217
+TRACE[06-14|07:43:20.989] Processing new chain section             type=bloombits section=218
+INFO [06-14|07:43:22.180] Imported new block headers               count=2    elapsed=8.092ms     number=10590869 hash="b694cd…cbce4b"

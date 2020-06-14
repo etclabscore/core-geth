@@ -46,16 +46,12 @@ import (
 var s3BlocksGroupSize = uint64(32 * 32)
 var s3HashesGroupSize = uint64(32 * 32 * 32)
 
-type s3encodingT string
-
 const (
-	s3EncodeJSON   s3encodingT = ".json"
-	s3EncodeJSONGZ s3encodingT = ".json.gz"
+	s3EncodeJSON   = ".json"
+	s3EncodeJSONGZ = ".json.gz"
 )
 
 var s3Encoding = s3EncodeJSONGZ
-
-// var errBadMod = errors.New("mod mismatch")
 
 func init() {
 	if v := os.Getenv("GETH_FREEZER_S3_BLOCK_GROUP_SIZE"); v != "" {
@@ -73,7 +69,7 @@ func init() {
 		s3HashesGroupSize = i
 	}
 	if v := os.Getenv("GETH_FREEZER_S3_ENCODING"); v != "" {
-		s3Encoding = s3encodingT(v)
+		s3Encoding = v
 	}
 }
 
@@ -94,7 +90,8 @@ type freezerRemoteS3 struct {
 
 	frozen *uint64 // the length of the frozen blocks (next appended must == val)
 
-	encoding             s3encodingT
+	// TODO: Reusable gzip r/w
+	encoding             string
 	blockObjectGroupSize uint64 // how many blocks to include in a single S3 object
 	hashObjectGroupSize  uint64
 

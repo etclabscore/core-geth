@@ -686,6 +686,13 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	f.log.Info("Truncating ancients", "frozen", n, "target", items, "delta", n-items)
 	start := time.Now()
 
+	// How this works:
+	// 0. Push the new index marker. If everything goes south from here, we'll just end up overwriting the truncated objects.
+	// 1. Ensure or get in cache the object group corresponding to the truncate height.
+	// 2. Truncate the cache.
+	// 3. Push the cache, overwriting the corresponding object on the remote.
+	// 4. Iteratively delete all subsequent objects above the truncated object (ie remove dangling objects).
+
 	var err error
 
 	err = f.setIndexMarker(items)
@@ -701,8 +708,7 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 		// We DON'T have in the write cache.
 		// This means that the target block is at least a batch below our current frozen level.
 		// So we need to download the corresponding target batch (clearing the current) and truncate that.
-		// The S3 delete iterator will delete all object at and above the target.
-		// Once the iterator finishes, the newly-truncated target batch will get pushes back up.
+		// The S3 delete iterator will delete all objects above the target.
 		f.log.Warn("Target block below current batch")
 		f.wCacheBlocks.reset()
 		err = f.pullWCacheBlocks(items)
@@ -728,12 +734,9 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 		return err
 	}
 
-	// Now truncate all remote data from the latest grouped object and beyond.
-	// Noting that this can remove data from the remote that is actually antecedent to the
-	// desired truncation level, since we have to use the groups.
-	// That's why we pulled the object into the cache first; on the next Sync, the un-truncated
-	// blocks will be pushed back up to the remote.
+	atomic.StoreUint64(f.frozen, items)
 
+	// Iteratively delete any dangling _above_ the current object.
 	marker := f.blockObjectKeyForN(items + f.blockObjectGroupSize)
 	log.Info("Deleting block objects", "marker", marker, "target", items)
 	list := &s3.ListObjectsInput{
@@ -757,8 +760,6 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	if err := batcher.Delete(aws.BackgroundContext(), iter); err != nil {
 		return err
 	}
-
-	atomic.StoreUint64(f.frozen, items)
 
 	f.log.Info("Finished truncating ancients", "elapsed", common.PrettyDuration(time.Since(start)))
 	return nil
@@ -911,14 +912,14 @@ func (f *freezerRemoteS3) Sync() error {
 		return err
 	}
 
-	elapsed := time.Since(start)
-	blocksPerSecond := fmt.Sprintf("%0.2f", float64(lenBlocks)/elapsed.Seconds())
-
 	err = f.setIndexMarker(atomic.LoadUint64(f.frozen))
 	if err != nil {
 		f.mu.Unlock()
 		return err
 	}
+
+	elapsed := time.Since(start)
+	blocksPerSecond := fmt.Sprintf("%0.2f", float64(lenBlocks)/elapsed.Seconds())
 
 	f.log.Info("Finished syncing ancients", "frozen", n, "blocks", lenBlocks, "elapsed", common.PrettyDuration(elapsed), "bps", blocksPerSecond)
 	f.mu.Unlock()

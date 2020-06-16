@@ -598,9 +598,6 @@ func (spec *ParityChainSpec) SetEthashHomesteadTransition(n *uint64) error {
 }
 
 func (spec *ParityChainSpec) GetEthashEIP2Transition() *uint64 {
-	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
-		return nil
-	}
 	return spec.Engine.Ethash.Params.HomesteadTransition.Uint64P()
 }
 

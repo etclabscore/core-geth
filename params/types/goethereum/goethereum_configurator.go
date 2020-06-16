@@ -497,9 +497,6 @@ func (c *ChainConfig) SetEthashHomesteadTransition(i *uint64) error {
 }
 
 func (c *ChainConfig) GetEthashEIP2Transition() *uint64 {
-	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
-		return nil
-	}
 	return bigNewU64(c.HomesteadBlock)
 }
 

@@ -37,9 +37,11 @@ test: all
 sync-parity-chainspecs:
 	./params/parity.json.d/sync-parity-remote.sh
 
-test-coregeth: test-coregeth-features test-coregeth-chainspecs ## Runs all tests specific to multi-geth.
+test-coregeth: test-coregeth-features test-coregeth-chainspecs test-coregeth-consensus ## Runs all tests specific to multi-geth.
 
-test-coregeth-features: test-coregeth-features-parity test-coregeth-features-coregeth test-coregeth-features-multigethv0 test-coregeth-features-clique-consensus ## Runs tests specific to multi-geth using Fork/Feature configs.
+test-coregeth-features: test-coregeth-features-parity test-coregeth-features-coregeth test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
+
+test-coregeth-consensus: test-coregeth-features-clique-consensus
 
 test-coregeth-features-parity:
 	@echo "Testing fork/feature/datatype implementation; equivalence - OPENETHEREUM."

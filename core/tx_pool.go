@@ -332,7 +332,7 @@ func (pool *TxPool) loop() {
 		// Handle ChainHeadEvent
 		case ev := <-pool.chainHeadCh:
 			if ev.Block != nil {
-				if pool.chainconfig.IsEnabled(pool.chainconfig.GetEthashEIP2Transition, ev.Block.Number()) {
+				if pool.chainconfig.IsEnabled(pool.chainconfig.GetEIP2Transition, ev.Block.Number()) {
 					pool.eip2f = true
 				}
 				if pool.chainconfig.IsEnabled(pool.chainconfig.GetEIP2028Transition, ev.Block.Number()) {

@@ -597,11 +597,11 @@ func (spec *ParityChainSpec) SetEthashHomesteadTransition(n *uint64) error {
 	return nil
 }
 
-func (spec *ParityChainSpec) GetEthashEIP2Transition() *uint64 {
+func (spec *ParityChainSpec) GetEIP2Transition() *uint64 {
 	return spec.Engine.Ethash.Params.HomesteadTransition.Uint64P()
 }
 
-func (spec *ParityChainSpec) SetEthashEIP2Transition(n *uint64) error {
+func (spec *ParityChainSpec) SetEIP2Transition(n *uint64) error {
 	spec.Engine.Ethash.Params.HomesteadTransition = new(ParityU64).SetUint64(n)
 	return nil
 }

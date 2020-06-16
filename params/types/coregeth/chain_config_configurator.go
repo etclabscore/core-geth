@@ -484,11 +484,11 @@ func (c *CoreGethChainConfig) SetEthashHomesteadTransition(n *uint64) error {
 	return nil
 }
 
-func (c *CoreGethChainConfig) GetEthashEIP2Transition() *uint64 {
+func (c *CoreGethChainConfig) GetEIP2Transition() *uint64 {
 	return bigNewU64(c.EIP2FBlock)
 }
 
-func (c *CoreGethChainConfig) SetEthashEIP2Transition(n *uint64) error {
+func (c *CoreGethChainConfig) SetEIP2Transition(n *uint64) error {
 	c.EIP2FBlock = setBig(c.EIP2FBlock, n)
 	return nil
 }

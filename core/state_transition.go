@@ -230,7 +230,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	}
 	msg := st.msg
 	sender := vm.AccountRef(msg.From())
-	eip2f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEthashEIP2Transition, st.evm.BlockNumber)
+	eip2f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2Transition, st.evm.BlockNumber)
 	eip2028f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2028Transition, st.evm.BlockNumber)
 	contractCreation := msg.To() == nil
 

@@ -496,11 +496,11 @@ func (c *ChainConfig) SetEthashHomesteadTransition(i *uint64) error {
 	return nil
 }
 
-func (c *ChainConfig) GetEthashEIP2Transition() *uint64 {
+func (c *ChainConfig) GetEIP2Transition() *uint64 {
 	return bigNewU64(c.HomesteadBlock)
 }
 
-func (c *ChainConfig) SetEthashEIP2Transition(i *uint64) error {
+func (c *ChainConfig) SetEIP2Transition(i *uint64) error {
 	c.HomesteadBlock = setBig(c.HomesteadBlock, i)
 	return nil
 }

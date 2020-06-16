@@ -69,8 +69,8 @@ type ProtocolSpecifier interface {
 	// It is a messy EIP, specifying diverse changes, like difficulty, intrinsic gas costs for contract creation,
 	// txpool management, and contract OoG handling.
 	// It is both Ethash-specific and _not_.
-	GetEthashEIP2Transition() *uint64
-	SetEthashEIP2Transition(n *uint64) error
+	GetEIP2Transition() *uint64
+	SetEIP2Transition(n *uint64) error
 
 	GetEIP7Transition() *uint64
 	SetEIP7Transition(n *uint64) error

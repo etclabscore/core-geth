@@ -39,7 +39,7 @@ sync-parity-chainspecs:
 
 test-coregeth: test-coregeth-features test-coregeth-chainspecs ## Runs all tests specific to multi-geth.
 
-test-coregeth-features: test-coregeth-features-parity test-coregeth-features-coregeth test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
+test-coregeth-features: test-coregeth-features-parity test-coregeth-features-coregeth test-coregeth-features-multigethv0 test-coregeth-features-clique-consensus ## Runs tests specific to multi-geth using Fork/Feature configs.
 
 test-coregeth-features-parity:
 	@echo "Testing fork/feature/datatype implementation; equivalence - OPENETHEREUM."
@@ -52,6 +52,10 @@ test-coregeth-features-coregeth:
 test-coregeth-features-multigethv0:
 	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETHv0."
 	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETHV0=on go test -count=1 ./tests
+
+test-coregeth-features-clique-consensus:
+	@echo "Testing fork/feature/datatype implementation; equivalence - Clique consensus"
+	env COREGETH_TESTS_CHAINCONFIG_CONSENSUS_EQUIVALENCE_CLIQUE=on go test -count=1 -run TestState ./tests ## Only run state tests here, since Blockchain tests will care about rewards, etc.
 
 test-coregeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
 	@echo "Testing Parity JSON chainspec equivalence."

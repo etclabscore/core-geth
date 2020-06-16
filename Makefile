@@ -32,7 +32,6 @@ ios:
 
 test: all
 	$(GORUN) build/ci.go test
-	go run build/ci.go test
 
 sync-parity-chainspecs:
 	./params/parity.json.d/sync-parity-remote.sh

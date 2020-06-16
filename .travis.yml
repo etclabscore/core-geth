@@ -6,10 +6,16 @@ matrix:
   - os: linux
     dist: xenial
     go: 1.14.x
+    env:
+      - COREGETH
+    script:
+    - make test-coregeth
+  - os: linux
+    dist: xenial
+    go: 1.14.x
     script:
     - go run build/ci.go install
     - travis_wait 60 go run build/ci.go test
-    - make test-coregeth
     before_deploy:
     - sh build/deploy.sh
     deploy:

@@ -47,8 +47,8 @@ test-coregeth-features-parity:
 	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_OPENETHEREUM=on go test -count=1 ./tests
 
 test-coregeth-features-coregeth:
-	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETH."
-	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETH=on go test -count=1 ./tests
+	@echo "Testing fork/feature/datatype implementation; equivalence - COREGETH."
+	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_COREGETH=on go test -count=1 ./tests
 
 test-coregeth-features-multigethv0:
 	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETHv0."

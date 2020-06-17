@@ -532,17 +532,29 @@ func (spec *ParityChainSpec) GetConsensusEngineType() ctypes.ConsensusEngineT {
 }
 
 func (spec *ParityChainSpec) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
+	var err error
 	switch t {
 	case ctypes.ConsensusEngineT_Ethash:
 		if spec.GetEthashMinimumDifficulty() == nil {
-			spec.SetEthashMinimumDifficulty(vars.MinimumDifficulty)
+			err = spec.SetEthashMinimumDifficulty(vars.MinimumDifficulty)
+			if err != nil {
+				return err
+			}
 		}
+		spec.Engine.Clique.Params.Period = nil
 		return nil
 	case ctypes.ConsensusEngineT_Clique:
 		if spec.Engine.Clique.Params.Period == nil {
-			spec.SetCliqueEpoch(30000)
-			spec.SetCliquePeriod(0)
+			err = spec.SetCliqueEpoch(30000)
+			if err != nil {
+				return err
+			}
+			err = spec.SetCliquePeriod(0)
+			if err != nil {
+				return err
+			}
 		}
+		spec.Engine.Ethash.Params.MinimumDifficulty = nil
 		return nil
 	default:
 		return ctypes.ErrUnsupportedConfigFatal
@@ -555,6 +567,7 @@ func (spec *ParityChainSpec) GetEthashMinimumDifficulty() *big.Int {
 
 func (spec *ParityChainSpec) SetEthashMinimumDifficulty(n *big.Int) error {
 	if n == nil {
+		spec.Engine.Ethash.Params.MinimumDifficulty = nil
 		return nil
 	}
 	spec.Engine.Ethash.Params.MinimumDifficulty = math.NewHexOrDecimal256(n.Int64())

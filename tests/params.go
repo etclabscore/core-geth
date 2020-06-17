@@ -201,20 +201,27 @@ func init() {
 	} else if os.Getenv(CG_CHAINCONFIG_CONSENSUS_EQ_CLIQUE) != "" {
 		log.Println("converting Istanbul config to Clique consensus engine")
 
-		c := Forks["Istanbul"]
-		err := c.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Clique)
-		if err != nil {
-			log.Fatal(err)
+		for _, c := range Forks {
+			if c.GetConsensusEngineType().IsEthash() {
+				err := c.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Clique)
+				if err != nil {
+					log.Fatal(err)
+				}
+				err = c.SetCliqueEpoch(30000)
+				if err != nil {
+					log.Fatal(err)
+				}
+				err = c.SetCliquePeriod(15)
+				if err != nil {
+					log.Fatal(err)
+				}
+			} else if c.GetConsensusEngineType().IsClique() {
+				err := c.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Ethash)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
 		}
-		err = c.SetCliqueEpoch(30000)
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = c.SetCliquePeriod(15)
-		if err != nil {
-			log.Fatal(err)
-		}
-
 	}
 }
 

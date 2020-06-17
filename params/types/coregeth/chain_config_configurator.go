@@ -427,9 +427,11 @@ func (c *CoreGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngin
 	switch t {
 	case ctypes.ConsensusEngineT_Ethash:
 		c.Ethash = new(ctypes.EthashConfig)
+		c.Clique = nil
 		return nil
 	case ctypes.ConsensusEngineT_Clique:
 		c.Clique = new(ctypes.CliqueConfig)
+		c.Ethash = nil
 		return nil
 	default:
 		return ctypes.ErrUnsupportedConfigFatal

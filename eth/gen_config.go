@@ -41,6 +41,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		TrieCleanCache          int
 		TrieDirtyCache          int
 		TrieTimeout             time.Duration
+		SnapshotCache           int
 		Miner                   miner.Config
 		Ethash                  ethash.Config
 		TxPool                  core.TxPoolConfig
@@ -50,6 +51,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		EWASMInterpreter        string
 		EVMInterpreter          string
 		RPCGasCap               *big.Int                       `toml:",omitempty"`
+		RPCTxFeeCap             float64                        `toml:",omitempty"`
 		Checkpoint              *ctypes.TrustedCheckpoint      `toml:",omitempty"`
 		CheckpointOracle        *ctypes.CheckpointOracleConfig `toml:",omitempty"`
 	}
@@ -76,6 +78,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.TrieCleanCache = c.TrieCleanCache
 	enc.TrieDirtyCache = c.TrieDirtyCache
 	enc.TrieTimeout = c.TrieTimeout
+	enc.SnapshotCache = c.SnapshotCache
 	enc.Miner = c.Miner
 	enc.Ethash = c.Ethash
 	enc.TxPool = c.TxPool
@@ -85,6 +88,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.EWASMInterpreter = c.EWASMInterpreter
 	enc.EVMInterpreter = c.EVMInterpreter
 	enc.RPCGasCap = c.RPCGasCap
+	enc.RPCTxFeeCap = c.RPCTxFeeCap
 	enc.Checkpoint = c.Checkpoint
 	enc.CheckpointOracle = c.CheckpointOracle
 	return &enc, nil
@@ -115,6 +119,7 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		TrieCleanCache          *int
 		TrieDirtyCache          *int
 		TrieTimeout             *time.Duration
+		SnapshotCache           *int
 		Miner                   *miner.Config
 		Ethash                  *ethash.Config
 		TxPool                  *core.TxPoolConfig
@@ -124,6 +129,7 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		EWASMInterpreter        *string
 		EVMInterpreter          *string
 		RPCGasCap               *big.Int                       `toml:",omitempty"`
+		RPCTxFeeCap             *float64                       `toml:",omitempty"`
 		Checkpoint              *ctypes.TrustedCheckpoint      `toml:",omitempty"`
 		CheckpointOracle        *ctypes.CheckpointOracleConfig `toml:",omitempty"`
 	}
@@ -197,6 +203,9 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	if dec.TrieTimeout != nil {
 		c.TrieTimeout = *dec.TrieTimeout
 	}
+	if dec.SnapshotCache != nil {
+		c.SnapshotCache = *dec.SnapshotCache
+	}
 	if dec.Miner != nil {
 		c.Miner = *dec.Miner
 	}
@@ -223,6 +232,9 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	}
 	if dec.RPCGasCap != nil {
 		c.RPCGasCap = dec.RPCGasCap
+	}
+	if dec.RPCTxFeeCap != nil {
+		c.RPCTxFeeCap = *dec.RPCTxFeeCap
 	}
 	if dec.Checkpoint != nil {
 		c.Checkpoint = dec.Checkpoint

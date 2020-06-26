@@ -478,8 +478,8 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 	cacheBlocksMax := 0
 	cacheHashesMax := 0
 	if s3ROnly {
-		cacheBlocksMax = int(s3BlocksGroupSize*2)
-		cacheHashesMax = int(s3HashesGroupSize*2)
+		cacheBlocksMax = int(s3BlocksGroupSize * 2)
+		cacheHashesMax = int(s3HashesGroupSize * 2)
 	}
 
 	f := &freezerRemoteS3{

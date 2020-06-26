@@ -67,14 +67,14 @@ type freezerRemote struct {
 		instanceLock fileutil.Releaser        // File-system lock to prevent double opens
 	*/
 	service ethdb.AncientStore
-	mu sync.Mutex
+	mu      sync.Mutex
 
 	quit chan struct{}
 }
 
 // newFreezer creates a chain freezer that moves ancient chain data into
 // append-only flat file containers.
-func newFreezerRemote(freezerStr string, namespace string) (*freezerRemote, error) {
+func newFreezerRemote(freezerStr string, namespace string, endpoint string) (*freezerRemote, error) {
 
 	// Create the initial freezer object
 	// TODO
@@ -91,6 +91,8 @@ func newFreezerRemote(freezerStr string, namespace string) (*freezerRemote, erro
 	}
 
 	switch freezerStr {
+	case "client":
+		freezer.service, err = NewExternalFreezerRemote("http://127.0.0.1:5000")
 	case "s3":
 		freezer.service, err = newFreezerRemoteS3(namespace, readMeter, writeMeter, sizeGauge)
 		if err != nil {

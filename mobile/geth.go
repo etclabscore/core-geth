@@ -168,6 +168,18 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 				config.EthereumNetworkID = 5
 			}
 		}
+		if config.EthereumGenesis == KottiGenesis() {
+			genesis.Config = params.KottiChainConfig
+			if config.EthereumNetworkID == 1 {
+				config.EthereumNetworkID = 6
+			}
+		}
+		if config.EthereumGenesis == MordorGenesis() {
+			genesis.Config = params.MordorChainConfig
+			if config.EthereumNetworkID == 1 {
+				config.EthereumNetworkID = 7
+			}
+		}
 	}
 	// Register the Ethereum protocol if requested
 	if config.EthereumEnabled {

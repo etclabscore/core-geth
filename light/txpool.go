@@ -328,7 +328,7 @@ func (pool *TxPool) setNewHead(head *types.Header) {
 	}
 	m, r := txc.getLists()
 	pool.relay.NewHead(pool.head, m, r)
-	pool.eip2f = pool.config.IsEnabled(pool.config.GetEthashEIP2Transition, head.Number)
+	pool.eip2f = pool.config.IsEnabled(pool.config.GetEIP2Transition, head.Number)
 
 	// Update fork indicator by next pending block number
 	next := new(big.Int).Add(head.Number, big.NewInt(1))

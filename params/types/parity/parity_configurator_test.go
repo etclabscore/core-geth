@@ -50,6 +50,7 @@ func TestParityChainSpec_GetSetUint64(t *testing.T) {
 	if spec.GetEthashHomesteadTransition() != nil {
 		t.Error("not nil")
 	}
+	spec.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Ethash)
 	fortyTwo := uint64(42)
 	spec.SetEthashHomesteadTransition(&fortyTwo)
 	if *spec.GetEthashHomesteadTransition() != fortyTwo {

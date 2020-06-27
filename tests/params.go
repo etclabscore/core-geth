@@ -26,8 +26,8 @@ import (
 	"path/filepath"
 
 	"github.com/ethereum/go-ethereum/params/confp"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/multigethv0"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
@@ -112,11 +112,11 @@ func readConfigFromSpecFile(name string) (spec ctypes.ChainConfigurator, sha1sum
 
 func init() {
 
-	if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_MULTIGETH_KEY) != "" {
-		log.Println("converting to MultiGeth Chain Config data type.")
+	if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_COREGETH_KEY) != "" {
+		log.Println("converting to CoreGeth Chain Config data type.")
 
 		for i, config := range Forks {
-			mgc := &multigeth.MultiGethChainConfig{}
+			mgc := &coregeth.CoreGethChainConfig{}
 			if err := confp.Convert(config, mgc); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
@@ -124,14 +124,14 @@ func init() {
 		}
 
 		for k, v := range difficultyChainConfigurations {
-			mgc := &multigeth.MultiGethChainConfig{}
+			mgc := &coregeth.CoreGethChainConfig{}
 			if err := confp.Convert(v, mgc); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = mgc
 		}
 
-	} else if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_MULTIGETHV0_KEY) != "" {
+	} else if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_MULTIGETHV0_KEY) != "" {
 		log.Println("converting to MultiGethV0 data type.")
 
 		for i, config := range Forks {
@@ -150,7 +150,7 @@ func init() {
 			difficultyChainConfigurations[k] = pspec
 		}
 
-	} else if os.Getenv(MG_CHAINCONFIG_FEATURE_EQ_PARITY_KEY) != "" {
+	} else if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_OPENETHEREUM_KEY) != "" {
 		log.Println("converting to Parity data type.")
 
 		for i, config := range Forks {
@@ -169,7 +169,7 @@ func init() {
 			difficultyChainConfigurations[k] = pspec
 		}
 
-	} else if os.Getenv(MG_CHAINCONFIG_CHAINSPECS_PARITY_KEY) != "" {
+	} else if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_OPENETHEREUM_KEY) != "" {
 		log.Println("Setting chain configurations from Parity chainspecs")
 
 		for k, v := range MapForkNameChainspecFileState {
@@ -189,7 +189,7 @@ func init() {
 
 		for k, v := range mapForkNameChainspecFileDifficulty {
 			config, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
-			if os.IsNotExist(err) && os.Getenv(MG_GENERATE_DIFFICULTY_TESTS_KEY) != "" {
+			if os.IsNotExist(err) && os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) != "" {
 				log.Println("Will generate chainspec file for", k, v)
 			} else if len(sha1sum) == 0 {
 				panic("zero sum game")
@@ -198,10 +198,34 @@ func init() {
 				difficultyChainConfigurations[k] = config
 			}
 		}
+	} else if os.Getenv(CG_CHAINCONFIG_CONSENSUS_EQ_CLIQUE) != "" {
+		log.Println("converting Istanbul config to Clique consensus engine")
+
+		for _, c := range Forks {
+			if c.GetConsensusEngineType().IsEthash() {
+				err := c.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Clique)
+				if err != nil {
+					log.Fatal(err)
+				}
+				err = c.SetCliqueEpoch(30000)
+				if err != nil {
+					log.Fatal(err)
+				}
+				err = c.SetCliquePeriod(15)
+				if err != nil {
+					log.Fatal(err)
+				}
+			} else if c.GetConsensusEngineType().IsClique() {
+				err := c.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Ethash)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+		}
 	}
 }
 
-//func convertMetaForkBlocksToFeatures(config *paramtypes.MultiGethChainConfig) {
+//func convertMetaForkBlocksToFeatures(config *paramtypes.CoreGethChainConfig) {
 //	if config.HomesteadBlock != nil {
 //		config.EIP2FBlock = config.HomesteadBlock
 //		config.EIP7FBlock = config.HomesteadBlock

@@ -96,11 +96,11 @@ var (
 			Description: "Ethereum bootnode.",
 		},
 		{
-			BinaryName: "echaindb",
+			BinaryName:  "echaindb",
 			Description: "Developer utility to inspect and manage the chain database",
 		},
 		{
-			BinaryName: "echainspec",
+			BinaryName:  "echainspec",
 			Description: "Developer utility to manage chain external chain configuration",
 		},
 		{
@@ -366,7 +366,7 @@ func doLint(cmdline []string) {
 
 // downloadLinter downloads and unpacks golangci-lint.
 func downloadLinter(cachedir string) string {
-	const version = "1.26.0"
+	const version = "1.27.0"
 
 	csdb := build.MustLoadChecksums("build/checksums.txt")
 	base := fmt.Sprintf("golangci-lint-%s-%s-%s", version, runtime.GOOS, runtime.GOARCH)

@@ -29,7 +29,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/console"
+	"github.com/ethereum/go-ethereum/console/prompt"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
@@ -160,17 +160,17 @@ The export-preimages command export hash preimages to an RLP encoded stream`,
 			utils.CacheFlag,
 			utils.SyncModeFlag,
 			utils.FakePoWFlag,
-			utils.RopstenFlag,
 			utils.ClassicFlag,
 			utils.MordorFlag,
+			utils.KottiFlag,
 			utils.SocialFlag,
 			utils.EthersocialFlag,
+			utils.LegacyTestnetFlag,
 			utils.RopstenFlag,
 			utils.RinkebyFlag,
-			utils.TxLookupLimitFlag,
 			utils.GoerliFlag,
-			utils.LegacyTestnetFlag,
-			utils.KottiFlag,
+			utils.YoloV1Flag,
+			utils.TxLookupLimitFlag,
 		},
 		Category: "BLOCKCHAIN COMMANDS",
 		Description: `
@@ -216,10 +216,16 @@ Use "ethereum dump 0" to dump the genesis block.`,
 			utils.DataDirFlag,
 			utils.AncientFlag,
 			utils.CacheFlag,
+			utils.ClassicFlag,
+			utils.MordorFlag,
+			utils.KottiFlag,
+			utils.SocialFlag,
+			utils.EthersocialFlag,
+			utils.LegacyTestnetFlag,
 			utils.RopstenFlag,
 			utils.RinkebyFlag,
 			utils.GoerliFlag,
-			utils.LegacyTestnetFlag,
+			utils.YoloV1Flag,
 			utils.SyncModeFlag,
 		},
 		Category: "BLOCKCHAIN COMMANDS",
@@ -309,13 +315,17 @@ func importChain(ctx *cli.Context) error {
 	// Import the chain
 	start := time.Now()
 
+	var importErr error
+
 	if len(ctx.Args()) == 1 {
 		if err := utils.ImportChain(chain, ctx.Args().First()); err != nil {
+			importErr = err
 			log.Error("Import error", "err", err)
 		}
 	} else {
 		for _, arg := range ctx.Args() {
 			if err := utils.ImportChain(chain, arg); err != nil {
+				importErr = err
 				log.Error("Import error", "file", arg, "err", err)
 			}
 		}
@@ -368,7 +378,7 @@ func importChain(ctx *cli.Context) error {
 		utils.Fatalf("Failed to read database iostats: %v", err)
 	}
 	fmt.Println(ioStats)
-	return nil
+	return importErr
 }
 
 func exportChain(ctx *cli.Context) error {
@@ -533,7 +543,7 @@ func removeDB(ctx *cli.Context) error {
 // confirmAndRemoveDB prompts the user for a last confirmation and removes the
 // folder if accepted.
 func confirmAndRemoveDB(database string, kind string) {
-	confirm, err := console.Stdin.PromptConfirm(fmt.Sprintf("Remove %s (%s)?", kind, database))
+	confirm, err := prompt.Stdin.PromptConfirm(fmt.Sprintf("Remove %s (%s)?", kind, database))
 	switch {
 	case err != nil:
 		utils.Fatalf("%v", err)

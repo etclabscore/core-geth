@@ -6,10 +6,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -33,7 +33,7 @@ func unmarshalChainSpec(format string, data []byte) (conf ctypes.Configurator, e
 		return
 	}
 	// Logic in params/types/gen_genesis.go already "auto-magically"
-	// handles genesis Config unmarshaling, and IT PREFERS MULTIGETH,
+	// handles genesis Config unmarshaling, and IT PREFERS COREGETH,
 	// and the two data types are not mutually exclusive (are overlapping).
 	// So we need to redo custom unmarshaling logic to enforce data type
 	// preference based on passed format value.
@@ -44,7 +44,7 @@ func unmarshalChainSpec(format string, data []byte) (conf ctypes.Configurator, e
 	if format == "geth" {
 		d.Config = &goethereum.ChainConfig{}
 	} else if format == "multigeth" {
-		d.Config = &multigeth.MultiGethChainConfig{}
+		d.Config = &coregeth.CoreGethChainConfig{}
 	} else {
 		panic("impossible")
 	}

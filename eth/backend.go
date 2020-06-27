@@ -51,9 +51,9 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enr"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -77,7 +77,7 @@ type Ethereum struct {
 	blockchain      *core.BlockChain
 	protocolManager *ProtocolManager
 	lesServer       LesServer
-	dialCandiates   enode.Iterator
+	dialCandidates  enode.Iterator
 
 	// DB interfaces
 	chainDb ethdb.Database // Block chain database
@@ -216,7 +216,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 	cacheLimit := cacheConfig.TrieCleanLimit + cacheConfig.TrieDirtyLimit + cacheConfig.SnapshotLimit
 	checkpoint := config.Checkpoint
 	if checkpoint == nil {
-		if p, ok := chainConfig.(*multigeth.MultiGethChainConfig); ok {
+		if p, ok := chainConfig.(*coregeth.CoreGethChainConfig); ok {
 			checkpoint = p.TrustedCheckpoint
 		} else if p, ok := chainConfig.(*goethereum.ChainConfig); ok {
 			checkpoint = p.TrustedCheckpoint
@@ -235,7 +235,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 	}
 	eth.APIBackend.gpo = gasprice.NewOracle(eth.APIBackend, gpoParams)
 
-	eth.dialCandiates, err = eth.setupDiscovery(&ctx.Config.P2P)
+	eth.dialCandidates, err = eth.setupDiscovery(&ctx.Config.P2P)
 	if err != nil {
 		return nil, err
 	}
@@ -535,7 +535,7 @@ func (s *Ethereum) Protocols() []p2p.Protocol {
 	for i, vsn := range ProtocolVersions {
 		protos[i] = s.protocolManager.makeProtocol(vsn)
 		protos[i].Attributes = []enr.Entry{s.currentEthEntry()}
-		protos[i].DialCandidates = s.dialCandiates
+		protos[i].DialCandidates = s.dialCandidates
 	}
 	if s.lesServer != nil {
 		protos = append(protos, s.lesServer.Protocols()...)

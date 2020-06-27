@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the multi-geth library. If not, see <http://www.gnu.org/licenses/>.
 
-package multigeth
+package coregeth
 
 import (
 	"fmt"
@@ -26,12 +26,12 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
-// MultiGethChainConfig is the core config which determines the blockchain settings.
+// CoreGethChainConfig is the core config which determines the blockchain settings.
 //
-// MultiGethChainConfig is stored in the database on a per block basis. This means
+// CoreGethChainConfig is stored in the database on a per block basis. This means
 // that any network, identified by its genesis block, can have its own
 // set of configuration options.
-type MultiGethChainConfig struct {
+type CoreGethChainConfig struct {
 	// Some of the following fields are left commented because it's useful to see pairings,
 	// both for reference and edification.
 	// They show a difference between the upstream configuration data type (goethereum.ChainConfig) and this one.
@@ -162,6 +162,9 @@ type MultiGethChainConfig struct {
 	// https://eips.ethereum.org/EIPS/eip-1706
 	EIP1706FBlock *big.Int `json:"eip1706FBlock,omitempty"`
 
+	// https://github.com/ethereum/EIPs/pull/2537: BLS12-381 curve operations
+	EIP2537FBlock *big.Int `json:"eip2315FBlock,omitempty"`
+
 	//EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block
@@ -188,7 +191,7 @@ type MultiGethChainConfig struct {
 }
 
 // String implements the fmt.Stringer interface.
-func (c *MultiGethChainConfig) String() string {
+func (c *CoreGethChainConfig) String() string {
 	var engine interface{}
 	switch {
 	case c.Ethash != nil:

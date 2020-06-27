@@ -64,6 +64,14 @@ type ProtocolSpecifier interface {
 	SetChainID(i *big.Int) error
 	GetMaxCodeSize() *uint64
 	SetMaxCodeSize(n *uint64) error
+
+	// Be careful with EIP2.
+	// It is a messy EIP, specifying diverse changes, like difficulty, intrinsic gas costs for contract creation,
+	// txpool management, and contract OoG handling.
+	// It is both Ethash-specific and _not_.
+	GetEIP2Transition() *uint64
+	SetEIP2Transition(n *uint64) error
+
 	GetEIP7Transition() *uint64
 	SetEIP7Transition(n *uint64) error
 	GetEIP150Transition() *uint64
@@ -120,6 +128,8 @@ type ProtocolSpecifier interface {
 	SetECIP1080Transition(n *uint64) error
 	GetEIP1706Transition() *uint64
 	SetEIP1706Transition(n *uint64) error
+	GetEIP2537Transition() *uint64
+	SetEIP2537Transition(n *uint64) error
 }
 
 type Forker interface {
@@ -150,8 +160,6 @@ type EthashConfigurator interface {
 	SetEthashDurationLimit(i *big.Int) error
 	GetEthashHomesteadTransition() *uint64
 	SetEthashHomesteadTransition(n *uint64) error
-	GetEthashEIP2Transition() *uint64
-	SetEthashEIP2Transition(n *uint64) error
 
 	// GetEthashEIP779Transition should return the block if the node wants the fork.
 	// Otherwise, nil should be returned.

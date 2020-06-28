@@ -22,7 +22,6 @@ pipeline {
                     steps {
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-kotti"
-                        sh "sha256sum --check <(echo 'd000df15854efa14fccc899913bff7c6b482fd1a5781d1b12c60ada5ae99d281 ${GETH_EXPORTS}/kotti.0-2544960.rlp.gz')"
                         sh "./build/bin/geth --kotti --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-kotti import ${GETH_EXPORTS}/kotti.0-2544960.rlp.gz"
                     }
                     post {
@@ -36,7 +35,6 @@ pipeline {
                     steps {
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-mordor"
-                        sh "sha256sum --check <(echo 'b101c6180c32457fd29ce3a5f58d4a08ff6a1af21a0ac3e4a5b5e4502531e066 ${GETH_EXPORTS}/mordor.0-1686858.rlp.gz')"
                         sh "./build/bin/geth --mordor --fakepow --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-mordor import ${GETH_EXPORTS}/mordor.0-1686858.rlp.gz"
                         sh "rm -rf ${GETH_DATADIR}"
                     }
@@ -51,7 +49,6 @@ pipeline {
                     steps {
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-goerli"
-                        sh "sha256sum --check <(echo 'de816468326e9ef16ee509b903948df3045cc2d2ee470a61fca9757042db9f35 ${GETH_EXPORTS}/goerli.0-2000000.rlp.gz')"
                         sh "./build/bin/geth --goerli --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-goerli import ${GETH_EXPORTS}/goerli.0-2000000.rlp.gz"
                     }
                     post {

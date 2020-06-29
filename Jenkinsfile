@@ -22,6 +22,7 @@ pipeline {
                     steps {
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-kotti"
+                        sh "shasum -a 256 -c ./tests/regression/shasums/kotti.0-2544960.rlp.gz.sha256"
                         sh "./build/bin/geth --kotti --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-kotti import ${GETH_EXPORTS}/kotti.0-2544960.rlp.gz"
                     }
                     post {
@@ -35,6 +36,7 @@ pipeline {
                     steps {
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-mordor"
+                        sh "shasum -a 256 -c ./tests/regression/shasums/mordor.0-1686858.rlp.gz.sha256"
                         sh "./build/bin/geth --mordor --fakepow --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-mordor import ${GETH_EXPORTS}/mordor.0-1686858.rlp.gz"
                         sh "rm -rf ${GETH_DATADIR}"
                     }
@@ -49,6 +51,7 @@ pipeline {
                     steps {
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-goerli"
+                        sh "shasum -a 256 -c ./tests/regression/shasums/goerli.0-2000000.rlp.gz.sha256"
                         sh "./build/bin/geth --goerli --cache=2048 --nocompaction --nousb --txlookuplimit=1 --datadir=${GETH_DATADIR}-goerli import ${GETH_EXPORTS}/goerli.0-2000000.rlp.gz"
                     }
                     post {

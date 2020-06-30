@@ -21,8 +21,8 @@ import (
 
 func testGenerateBlockAndImportCG(t *testing.T, chainConfig ctypes.ChainConfigurator, numBlocks int) {
 	var (
-		engine      consensus.Engine
-		db          = rawdb.NewMemoryDatabase()
+		engine consensus.Engine
+		db     = rawdb.NewMemoryDatabase()
 	)
 	if chainConfig.GetConsensusEngineType().IsClique() {
 		engine = clique.New(&ctypes.CliqueConfig{
@@ -73,19 +73,19 @@ func testGenerateBlockAndImportCG(t *testing.T, chainConfig ctypes.ChainConfigur
 }
 
 func TestGenerateBlockAndImport_CG1(t *testing.T) {
-	cases := []struct{
-		name string
-		conf ctypes.ChainConfigurator
+	cases := []struct {
+		name   string
+		conf   ctypes.ChainConfigurator
 		blocks int
 	}{
 		{
-			name: "all-ethash",
-			conf: params.AllEthashProtocolChanges,
+			name:   "all-ethash",
+			conf:   params.AllEthashProtocolChanges,
 			blocks: 5,
 		},
 		{
-			name: "all-clique",
-			conf: params.AllCliqueProtocolChanges,
+			name:   "all-clique",
+			conf:   params.AllCliqueProtocolChanges,
 			blocks: 5,
 		},
 		{

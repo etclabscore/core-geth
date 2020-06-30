@@ -902,8 +902,12 @@ func (w *worker) commitNewWork(interrupt *int32, noempty bool, timestamp int64) 
 	}
 	// Create the current work task and check any fork transitions needed
 	env := w.current
-	if w.chainConfig.IsEnabled(w.chainConfig.GetEthashEIP779Transition, header.Number) {
-		misc.ApplyDAOHardFork(env.state)
+	// Mutate the block and state according to any hard-fork specs
+	isDAOSupport := w.chainConfig.IsEnabled(w.chainConfig.GetEthashEIP779Transition, header.Number)
+	if isDAOSupport {
+		if daoNumber := w.chainConfig.GetEthashEIP779Transition(); daoNumber != nil && *daoNumber == header.Number.Uint64() {
+			misc.ApplyDAOHardFork(env.state)
+		}
 	}
 	// Accumulate the uncles for the current block
 	uncles := make([]*types.Header, 0, 2)

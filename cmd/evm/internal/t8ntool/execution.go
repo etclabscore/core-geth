@@ -39,7 +39,7 @@ import (
 )
 
 type Prestate struct {
-	Env stEnv             `json:"env"`
+	Env stEnv                 `json:"env"`
 	Pre genesisT.GenesisAlloc `json:"pre"`
 }
 

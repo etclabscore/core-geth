@@ -63,9 +63,9 @@ func (n *NumberedError) Code() int {
 }
 
 type input struct {
-	Alloc genesisT.GenesisAlloc  `json:"alloc,omitempty"`
-	Env   *stEnv             `json:"env,omitempty"`
-	Txs   types.Transactions `json:"txs,omitempty"`
+	Alloc genesisT.GenesisAlloc `json:"alloc,omitempty"`
+	Env   *stEnv                `json:"env,omitempty"`
+	Txs   types.Transactions    `json:"txs,omitempty"`
 }
 
 func Main(ctx *cli.Context) error {

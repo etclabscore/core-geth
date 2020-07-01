@@ -36,7 +36,11 @@ test: all
 sync-parity-chainspecs:
 	./params/parity.json.d/sync-parity-remote.sh
 
-test-coregeth: test-coregeth-features test-coregeth-chainspecs test-coregeth-consensus ## Runs all tests specific to multi-geth.
+test-coregeth: \
+ test-coregeth-regression-condensed \
+ test-coregeth-features \
+ test-coregeth-chainspecs \
+ test-coregeth-consensus ## Runs all tests specific to core-geth.
 
 test-coregeth-features: test-coregeth-features-parity test-coregeth-features-coregeth test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
 
@@ -61,6 +65,12 @@ test-coregeth-features-clique-consensus:
 test-coregeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
 	@echo "Testing Parity JSON chainspec equivalence."
 	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on go test -count=1 ./tests
+
+test-coregeth-regression-condensed: geth
+	@echo "Running condensed regression tests (imports) against simulated canonical blockchains."
+	./tests/regression/simulated/test.sh ./tests/regression/simulated/classic-condense-state/classic.conf.json ./tests/regression/simulated/classic-condense-state/export.rlp.gz
+	./tests/regression/simulated/test.sh ./tests/regression/simulated/foundation-condense-state/foundation.conf.json ./tests/regression/simulated/foundation-condense-state/export.rlp.gz
+	./tests/regression/simulated/test.sh ./tests/regression/simulated/foundation-condense-state-2/foundation.conf.json ./tests/regression/simulated/foundation-condense-state-2/export.rlp.gz
 
 tests-generate: tests-generate-state tests-generate-difficulty ## Generate all tests.
 

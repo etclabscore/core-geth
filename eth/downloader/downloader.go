@@ -465,7 +465,7 @@ func (d *Downloader) syncWithPeer(p *peerConnection, hash common.Hash, td *big.I
 
 	var origin = uint64(0)
 
-	if (d.mode != LightSync && d.blockchain.CurrentHeader().Number.Uint64() > 0) ||
+	if (SyncMode(d.mode) != LightSync && d.blockchain.CurrentHeader().Number.Uint64() > 0) ||
 		d.lightchain.CurrentHeader().Number.Uint64() > 0 {
 		origin, err = d.findAncestor(p, latest)
 		if err != nil {
@@ -849,7 +849,7 @@ func (d *Downloader) findAncestorSpanSearch(p *peerConnection, remoteHeight, loc
 				n := headers[i].Number.Uint64()
 
 				var known bool
-				switch mode {
+				switch SyncMode(d.mode) {
 				case FullSync:
 					known = d.blockchain.HasBlock(h, n)
 				case FastSync:
@@ -930,7 +930,7 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, remoteHeight ui
 				n := headers[0].Number.Uint64()
 
 				var known bool
-				switch mode {
+				switch SyncMode(d.mode) {
 				case FullSync:
 					known = d.blockchain.HasBlock(hash, n)
 				case FastSync:

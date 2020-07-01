@@ -24,12 +24,12 @@ import (
 	"os"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/tests"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -63,7 +63,7 @@ func (n *NumberedError) Code() int {
 }
 
 type input struct {
-	Alloc core.GenesisAlloc  `json:"alloc,omitempty"`
+	Alloc genesisT.GenesisAlloc  `json:"alloc,omitempty"`
 	Env   *stEnv             `json:"env,omitempty"`
 	Txs   types.Transactions `json:"txs,omitempty"`
 }
@@ -177,7 +177,7 @@ func Main(ctx *cli.Context) error {
 		Debug:  (tracer != nil),
 	}
 	// Construct the chainconfig
-	var chainConfig *params.ChainConfig
+	var chainConfig ctypes.ChainConfigurator
 	if cConf, extraEips, err := tests.GetChainConfig(ctx.String(ForknameFlag.Name)); err != nil {
 		return NewError(ErrorVMConfig, fmt.Errorf("Failed constructing chain configuration: %v", err))
 	} else {
@@ -185,7 +185,9 @@ func Main(ctx *cli.Context) error {
 		vmConfig.ExtraEips = extraEips
 	}
 	// Set the chain id
-	chainConfig.ChainID = big.NewInt(ctx.Int64(ChainIDFlag.Name))
+	if err := chainConfig.SetChainID(big.NewInt(ctx.Int64(ChainIDFlag.Name))); err != nil {
+		return err
+	}
 
 	// Run the test and aggregate the result
 	state, result, err := prestate.Apply(vmConfig, chainConfig, txs, ctx.Int64(RewardFlag.Name), getTracer)
@@ -200,7 +202,7 @@ func Main(ctx *cli.Context) error {
 
 }
 
-type Alloc map[common.Address]core.GenesisAccount
+type Alloc map[common.Address]genesisT.GenesisAccount
 
 func (g Alloc) OnRoot(common.Hash) {}
 
@@ -213,7 +215,7 @@ func (g Alloc) OnAccount(addr common.Address, dumpAccount state.DumpAccount) {
 			storage[k] = common.HexToHash(v)
 		}
 	}
-	genesisAccount := core.GenesisAccount{
+	genesisAccount := genesisT.GenesisAccount{
 		Code:    common.FromHex(dumpAccount.Code),
 		Storage: storage,
 		Balance: balance,

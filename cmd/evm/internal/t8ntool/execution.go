@@ -32,14 +32,15 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
 )
 
 type Prestate struct {
 	Env stEnv             `json:"env"`
-	Pre core.GenesisAlloc `json:"pre"`
+	Pre genesisT.GenesisAlloc `json:"pre"`
 }
 
 // ExecutionResult contains the execution status after running a state test, any
@@ -79,7 +80,7 @@ type stEnvMarshaling struct {
 }
 
 // Apply applies a set of transactions to a pre-state
-func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig *params.ChainConfig,
+func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigurator,
 	txs types.Transactions, miningReward int64,
 	getTracerFn func(txIndex int) (tracer vm.Tracer, err error)) (*state.StateDB, *ExecutionResult, error) {
 
@@ -122,10 +123,11 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig *params.ChainConfig,
 	}
 	// If DAO is supported/enabled, we need to handle it here. In geth 'proper', it's
 	// done in StateProcessor.Process(block, ...), right before transactions are applied.
-	if chainConfig.DAOForkSupport &&
-		chainConfig.DAOForkBlock != nil &&
-		chainConfig.DAOForkBlock.Cmp(new(big.Int).SetUint64(pre.Env.Number)) == 0 {
-		misc.ApplyDAOHardFork(statedb)
+	isDAOSupport := chainConfig.IsEnabled(chainConfig.GetEthashEIP779Transition, new(big.Int).SetUint64(pre.Env.Number))
+	if isDAOSupport {
+		if daoNumber := chainConfig.GetEthashEIP779Transition(); daoNumber != nil && *daoNumber == pre.Env.Number {
+			misc.ApplyDAOHardFork(statedb)
+		}
 	}
 
 	for i, tx := range txs {
@@ -163,10 +165,11 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig *params.ChainConfig,
 		// Create a new receipt for the transaction, storing the intermediate root and gas used by the tx
 		{
 			var root []byte
-			if chainConfig.IsByzantium(vmContext.BlockNumber) {
-				statedb.Finalise(true)
+			eip161d := chainConfig.IsEnabled(chainConfig.GetEIP161dTransition, vmContext.BlockNumber)
+			if chainConfig.IsEnabled(chainConfig.GetEIP658Transition, vmContext.BlockNumber) {
+				statedb.Finalise(eip161d)
 			} else {
-				root = statedb.IntermediateRoot(chainConfig.IsEIP158(vmContext.BlockNumber)).Bytes()
+				root = statedb.IntermediateRoot(eip161d).Bytes()
 			}
 
 			receipt := types.NewReceipt(root, msgResult.Failed(), gasUsed)
@@ -187,7 +190,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig *params.ChainConfig,
 		}
 		txIndex++
 	}
-	statedb.IntermediateRoot(chainConfig.IsEIP158(vmContext.BlockNumber))
+	statedb.IntermediateRoot(chainConfig.IsEnabled(chainConfig.GetEIP161dTransition, vmContext.BlockNumber))
 	// Add mining reward?
 	if miningReward > 0 {
 		// Add mining reward. The mining reward may be `0`, which only makes a difference in the cases
@@ -213,7 +216,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig *params.ChainConfig,
 		statedb.AddBalance(pre.Env.Coinbase, minerReward)
 	}
 	// Commit block
-	root, err := statedb.Commit(chainConfig.IsEIP158(vmContext.BlockNumber))
+	root, err := statedb.Commit(chainConfig.IsEnabled(chainConfig.GetEIP161dTransition, vmContext.BlockNumber))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Could not commit state: %v", err)
 		return nil, nil, NewError(ErrorEVM, fmt.Errorf("could not commit state: %v", err))
@@ -230,7 +233,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig *params.ChainConfig,
 	return statedb, execRs, nil
 }
 
-func MakePreState(db ethdb.Database, accounts core.GenesisAlloc) *state.StateDB {
+func MakePreState(db ethdb.Database, accounts genesisT.GenesisAlloc) *state.StateDB {
 	sdb := state.NewDatabase(db)
 	statedb, _ := state.New(common.Hash{}, sdb, nil)
 	for addr, a := range accounts {

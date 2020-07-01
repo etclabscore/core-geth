@@ -4,15 +4,17 @@ pipeline {
         GETH_EXPORTS = '/data/ethereum-exports'
         GETH_DATADIR = '/data/geth'
         GITHUB_NOTIFY_DESCRIPTION = 'Assert import of canonical chain data'
+        GITHUB_OWNER_NAME = env.GIT_URL.replaceFirst(/^.*\/([^\/]+?)\/.+\.git$/, '$1')
+        GITHUB_REPO_NAME = env.GIT_URL.replaceFirst(/^.*\/([^\/]+?).git$/, '$1')
     }
     stages {
         stage('Notify Github of Pending Jobs') {
             steps {
-                githubNotify context: 'Kotti Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
-                githubNotify context: 'Mordor Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
-                githubNotify context: 'Goerli Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
-                // githubNotify context: 'Classic Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
-                // githubNotify context: 'Foundation Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
+                githubNotify context: 'Kotti Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
+                githubNotify context: 'Mordor Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
+                githubNotify context: 'Goerli Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
+                // githubNotify context: 'Classic Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
+                // githubNotify context: 'Foundation Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'PENDING', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}"
             }
         }
         stage("Run Regression Tests") {
@@ -27,8 +29,8 @@ pipeline {
                     }
                     post {
                         always { sh "rm -rf ${GETH_DATADIR}-kotti" }
-                        success { githubNotify context: 'Kotti Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'SUCCESS', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
-                        unsuccessful { githubNotify context: 'Kotti Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
+                        success { githubNotify context: 'Kotti Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'SUCCESS', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
+                        unsuccessful { githubNotify context: 'Kotti Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
                     }
                 }
                 stage('Mordor') {
@@ -42,8 +44,8 @@ pipeline {
                     }
                     post {
                         always { sh "rm -rf ${GETH_DATADIR}-mordor" }
-                        success { githubNotify context: 'Mordor Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'SUCCESS', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
-                        unsuccessful { githubNotify context: 'Mordor Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
+                        success { githubNotify context: 'Mordor Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'SUCCESS', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
+                        unsuccessful { githubNotify context: 'Mordor Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
                     }
                 }
                 stage('Goerli') {
@@ -56,8 +58,8 @@ pipeline {
                     }
                     post {
                         always { sh "rm -rf ${GETH_DATADIR}-goerli" }
-                        success { githubNotify context: 'Goerli Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'SUCCESS', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
-                        unsuccessful { githubNotify context: 'Goerli Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
+                        success { githubNotify context: 'Goerli Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'SUCCESS', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
+                        unsuccessful { githubNotify context: 'Goerli Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
                     }
                 }
                 // Commented now because these take a looong time.
@@ -77,8 +79,8 @@ pipeline {
                 //     }
                 //     post {
                 //         always { sh "rm -rf ${GETH_DATADIR}-classic" }
-                //         success { githubNotify context: 'Classic Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'SUCCESS', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
-                //         unsuccessful { githubNotify context: 'Classic Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
+                //         success { githubNotify context: 'Classic Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'SUCCESS', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
+                //         unsuccessful { githubNotify context: 'Classic Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
                 //     }
                 // }
                 // stage('Foundation') {
@@ -90,8 +92,8 @@ pipeline {
                 //     }
                 //     post {
                 //         always { sh "rm -rf ${GETH_DATADIR}-foundation" }
-                //         success { githubNotify context: 'Foundation Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'SUCCESS', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
-                //         unsuccessful { githubNotify context: 'Foundation Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: 'etclabscore', repo: 'core-geth', credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
+                //         success { githubNotify context: 'Foundation Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'SUCCESS', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
+                //         unsuccessful { githubNotify context: 'Foundation Regression', description: "${GITHUB_NOTIFY_DESCRIPTION}", status: 'FAILURE', account: "${GITHUB_OWNER_NAME}", repo: "${GITHUB_REPO_NAME}", credentialsId: 'meowsbits-github-jenkins', sha: "${GIT_COMMIT}" }
                 //     }
                 // }
             }

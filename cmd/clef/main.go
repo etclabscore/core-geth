@@ -591,7 +591,7 @@ func signer(c *cli.Context) error {
 		cors := splitAndTrim(c.GlobalString(utils.HTTPCORSDomainFlag.Name))
 
 		srv := rpc.NewServer()
-		err := node.RegisterApisFromWhitelist(rpcAPI, []string{"account"}, srv, false)
+		_, err := node.RegisterApisFromWhitelist(rpcAPI, []string{"account"}, srv, false)
 		if err != nil {
 			utils.Fatalf("Could not register API: %w", err)
 		}

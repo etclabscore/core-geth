@@ -895,7 +895,7 @@ func retesteth(ctx *cli.Context) error {
 
 	// register apis and create handler stack
 	srv := rpc.NewServer()
-	err := node.RegisterApisFromWhitelist(rpcAPI, []string{"test", "eth", "debug", "web3"}, srv, false)
+	_, err := node.RegisterApisFromWhitelist(rpcAPI, []string{"test", "eth", "debug", "web3"}, srv, false)
 	if err != nil {
 		utils.Fatalf("Could not register RPC apis: %w", err)
 	}

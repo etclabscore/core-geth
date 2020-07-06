@@ -45,7 +45,7 @@ type CheckpointOracle struct {
 
 	checkMu              sync.Mutex                // Mutex to sync access to the fields below
 	lastCheckTime        time.Time                 // Time we last checked the checkpoint
-	lastCheckPoint        *ctypes.TrustedCheckpoint // The last stable checkpoint
+	lastCheckPoint       *ctypes.TrustedCheckpoint // The last stable checkpoint
 	lastCheckPointHeight uint64                    // The height of last stable checkpoint
 }
 

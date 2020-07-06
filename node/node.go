@@ -495,6 +495,15 @@ func (n *Node) startIPC(apis []rpc.API) error {
 	if err != nil {
 		return err
 	}
+	// Register the API documentation.
+	n.ipcOpenRPC = newOpenRPCDocument()
+	registerOpenRPCAPIs(n.ipcOpenRPC, apis)
+	n.ipcOpenRPC.RegisterListener(listener)
+	if err := handler.RegisterName("rpc", &RPCDiscoveryService{
+		d: n.ipcOpenRPC,
+	}); err != nil {
+		return err
+	}
 	n.ipcListener = listener
 	n.ipcHandler = handler
 	n.log.Info("IPC endpoint opened", "url", n.ipcEndpoint)

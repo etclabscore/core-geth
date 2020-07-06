@@ -854,7 +854,7 @@ func (n *Node) apis() []rpc.API {
 
 // RegisterApisFromWhitelist checks the given modules' availability, generates a whitelist based on the allowed modules,
 // and then registers all of the APIs exposed by the services.
-func RegisterApisFromWhitelist(apis []rpc.API, modules []string, srv *rpc.Server, exposeAll bool) error {
+func RegisterApisFromWhitelist(apis []rpc.API, modules []string, srv *rpc.Server, exposeAll bool) (registeredApis []rpc.API, err error) {
 	if bad, available := checkModuleAvailability(modules, apis); len(bad) > 0 {
 		log.Error("Unavailable modules in HTTP API list", "unavailable", bad, "available", available)
 	}
@@ -867,9 +867,10 @@ func RegisterApisFromWhitelist(apis []rpc.API, modules []string, srv *rpc.Server
 	for _, api := range apis {
 		if exposeAll || whitelist[api.Namespace] || (len(whitelist) == 0 && api.Public) {
 			if err := srv.RegisterName(api.Namespace, api.Service); err != nil {
-				return err
+				return registeredApis, err
 			}
+			registeredApis = append(registeredApis, api)
 		}
 	}
-	return nil
+	return registeredApis, nil
 }

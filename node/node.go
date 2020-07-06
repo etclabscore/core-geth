@@ -532,7 +532,7 @@ func (n *Node) startHTTP(endpoint string, apis []rpc.API, modules []string, cors
 	}
 	// register apis and create handler stack
 	srv := rpc.NewServer()
-	err := RegisterApisFromWhitelist(apis, modules, srv, false)
+	registeredAPIs, err := RegisterApisFromWhitelist(apis, modules, srv, false)
 	if err != nil {
 		return err
 	}
@@ -550,6 +550,15 @@ func (n *Node) startHTTP(endpoint string, apis []rpc.API, modules []string, cors
 		"vhosts", strings.Join(vhosts, ","))
 	if n.httpEndpoint == n.wsEndpoint {
 		n.log.Info("WebSocket endpoint opened", "url", fmt.Sprintf("ws://%v", addr))
+	}
+	// Register the API documentation.
+	doc := newOpenRPCDocument()
+	registerOpenRPCAPIs(doc, registeredAPIs)
+	rpcDiscoverService := &RPCDiscoveryService{
+		d: doc,
+	}
+	if err := srv.RegisterName("rpc", rpcDiscoverService); err != nil {
+		return err
 	}
 	// All listeners booted successfully
 	n.httpEndpoint = endpoint

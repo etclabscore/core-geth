@@ -552,10 +552,10 @@ func (n *Node) startHTTP(endpoint string, apis []rpc.API, modules []string, cors
 		n.log.Info("WebSocket endpoint opened", "url", fmt.Sprintf("ws://%v", addr))
 	}
 	// Register the API documentation.
-	doc := newOpenRPCDocument()
-	registerOpenRPCAPIs(doc, registeredAPIs)
+	n.httpOpenRPC = newOpenRPCDocument()
+	registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
 	rpcDiscoverService := &RPCDiscoveryService{
-		d: doc,
+		d: n.httpOpenRPC,
 	}
 	if err := srv.RegisterName("rpc", rpcDiscoverService); err != nil {
 		return err

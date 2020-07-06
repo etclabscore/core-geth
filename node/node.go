@@ -591,12 +591,18 @@ func (n *Node) startWS(endpoint string, apis []rpc.API, modules []string, wsOrig
 
 	srv := rpc.NewServer()
 	handler := srv.WebsocketHandler(wsOrigins)
-	err := RegisterApisFromWhitelist(apis, modules, srv, exposeAll)
+	registeredAPIs, err := RegisterApisFromWhitelist(apis, modules, srv, exposeAll)
 	if err != nil {
 		return err
 	}
 	httpServer, addr, err := startWSEndpoint(endpoint, handler)
 	if err != nil {
+		return err
+	}
+	n.wsOpenRPC = newOpenRPCDocument()
+	registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
+	rpcDiscoverService := &RPCDiscoveryService{d: n.wsOpenRPC}
+	if err := srv.RegisterName("rpc", rpcDiscoverService); err != nil {
 		return err
 	}
 	n.log.Info("WebSocket endpoint opened", "url", fmt.Sprintf("ws://%v", addr))

@@ -64,16 +64,24 @@ type Node struct {
 	rpcAPIs       []rpc.API   // List of APIs currently provided by the node
 	inprocHandler *rpc.Server // In-process RPC request handler to process the API requests
 
+	// NOTE: Registering the openrpc Document(s) as a field(s) of the Node
+	// is NOT required, it just gives the Node instance access to the document
+	// for possible editing or direct access later (past instantiation).
+	// If modifying the document past Node instantiation is not required,
+	// the document can be instantiated as a one-off adjacent to handler definition.
+	ipcOpenRPC  *go_openrpc_reflect.Document
 	ipcEndpoint string       // IPC endpoint to listen at (empty = IPC disabled)
 	ipcListener net.Listener // IPC RPC listener socket to serve API requests
 	ipcHandler  *rpc.Server  // IPC RPC request handler to process the API requests
 
+	httpOpenRPC   *go_openrpc_reflect.Document
 	httpEndpoint     string       // HTTP endpoint (interface + port) to listen at (empty = HTTP disabled)
 	httpWhitelist    []string     // HTTP RPC modules to allow through this endpoint
 	httpListenerAddr net.Addr     // Address of HTTP RPC listener socket serving API requests
 	httpServer       *http.Server // HTTP RPC HTTP server
 	httpHandler      *rpc.Server  // HTTP RPC request handler to process the API requests
 
+	wsOpenRPC  *go_openrpc_reflect.Document
 	wsEndpoint     string       // WebSocket endpoint (interface + port) to listen at (empty = WebSocket disabled)
 	wsListenerAddr net.Addr     // Address of WebSocket RPC listener socket serving API requests
 	wsHTTPServer   *http.Server // WebSocket RPC HTTP server

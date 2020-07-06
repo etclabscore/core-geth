@@ -35,6 +35,18 @@ import (
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
+// DefaultFullGPOConfig contains default gasprice oracle settings for full node.
+var DefaultFullGPOConfig = gasprice.Config{
+	Blocks:     20,
+	Percentile: 60,
+}
+
+// DefaultLightGPOConfig contains default gasprice oracle settings for light client.
+var DefaultLightGPOConfig = gasprice.Config{
+	Blocks:     2,
+	Percentile: 60,
+}
+
 // DefaultConfig contains default settings for use on the Ethereum main net.
 var DefaultConfig = Config{
 	SyncMode: downloader.FastSync,
@@ -61,11 +73,9 @@ var DefaultConfig = Config{
 		GasPrice: big.NewInt(vars.GWei),
 		Recommit: 3 * time.Second,
 	},
-	TxPool: core.DefaultTxPoolConfig,
-	GPO: gasprice.Config{
-		Blocks:     20,
-		Percentile: 60,
-	},
+	TxPool:      core.DefaultTxPoolConfig,
+	RPCGasCap:   25000000,
+	GPO:         DefaultFullGPOConfig,
 	RPCTxFeeCap: 1, // 1 ether
 }
 
@@ -160,7 +170,7 @@ type Config struct {
 	EVMInterpreter string
 
 	// RPCGasCap is the global gas cap for eth-call variants.
-	RPCGasCap *big.Int `toml:",omitempty"`
+	RPCGasCap uint64 `toml:",omitempty"`
 
 	// RPCTxFeeCap is the global transaction fee(price * gaslimit) cap for
 	// send-transction variants. The unit is ether.

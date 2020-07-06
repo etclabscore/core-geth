@@ -41,7 +41,7 @@ type CheckpointOracle struct {
 	contract *checkpointoracle.CheckpointOracle
 
 	running  int32                                 // Flag whether the contract backend is set or not
-	getLocal func(uint64) *ctypes.TrustedCheckpoint // Function used to retrieve local checkpoint
+	getLocal func(uint64) ctypes.TrustedCheckpoint // Function used to retrieve local checkpoint
 
 	checkMu              sync.Mutex                // Mutex to sync access to the fields below
 	lastCheckTime        time.Time                 // Time we last checked the checkpoint
@@ -50,7 +50,7 @@ type CheckpointOracle struct {
 }
 
 // New creates a checkpoint oracle handler with given configs and callback.
-func New(config *ctypes.CheckpointOracleConfig, getLocal func(uint64) *ctypes.TrustedCheckpoint) *CheckpointOracle {
+func New(config *ctypes.CheckpointOracleConfig, getLocal func(uint64) ctypes.TrustedCheckpoint) *CheckpointOracle {
 	if config == nil {
 		log.Info("Checkpoint registrar is not enabled")
 		return nil
@@ -118,8 +118,8 @@ func (oracle *CheckpointOracle) StableCheckpoint() (*ctypes.TrustedCheckpoint, u
 	if local.HashEqual(hash) {
 		oracle.lastCheckTime = time.Now()
 		oracle.lastCheckPointHeight = height.Uint64()
-		oracle.lastCheckPoint = local
-		return local, height.Uint64()
+		oracle.lastCheckPoint = &local
+		return &local, height.Uint64()
 	}
 	return nil, 0
 }

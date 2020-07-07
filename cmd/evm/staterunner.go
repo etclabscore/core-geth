@@ -54,8 +54,6 @@ type StatetestResult struct {
 	State *state.Dump `json:"state,omitempty"`
 }
 
-var errTestFailed = errors.New("at least one (sub)test failed")
-
 func stateTestCmd(ctx *cli.Context) error {
 	if len(ctx.Args().First()) == 0 {
 		return errors.New("path-to-test argument required")
@@ -101,8 +99,8 @@ func stateTestCmd(ctx *cli.Context) error {
 	}
 	// Iterate over all the tests, run them and aggregate the results
 	cfg := vm.Config{
-		Tracer: tracer,
-		Debug:  ctx.GlobalBool(DebugFlag.Name) || ctx.GlobalBool(MachineFlag.Name),
+		Tracer:           tracer,
+		Debug:            ctx.GlobalBool(DebugFlag.Name) || ctx.GlobalBool(MachineFlag.Name),
 		EWASMInterpreter: ctx.String(stateTestEVMCEWASMFlag.Name),
 	}
 	results := make([]StatetestResult, 0, len(tests))

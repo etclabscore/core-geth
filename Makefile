@@ -108,7 +108,7 @@ tests-generate-difficulty: ## Generate difficulty tests.
 lint: ## Run linters.
 	$(GORUN) build/ci.go lint
 
-clean:
+clean: clean-evmc
 	env GO111MODULE=on go clean -cache
 	rm -fr build/_workspace/pkg/ $(GOBIN)/*
 

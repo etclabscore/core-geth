@@ -36,6 +36,7 @@ matrix:
       - travis_wait 60 go run build/ci.go test
 
   - stage: build
+    if: type = pull_request
     os: linux
     arch: arm64
     dist: xenial

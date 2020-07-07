@@ -3,7 +3,7 @@
 set -e
 
 mkdir -p build/_workspace/SSVM/build/tools/ssvm-evmc/
-wget --no-check-certificate -O build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so https://github.com/second-state/SSVM/releases/download/0.5.0/libssvmEVMC-linux-x86_64.so
+wget -O build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so https://github.com/second-state/SSVM/releases/download/0.5.0/libssvmEVMC-linux-x86_64.so
 
 # The follow are steps that might be used to build the SSVM SO from source.
 # This library is only used for testing.

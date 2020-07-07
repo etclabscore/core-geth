@@ -1,9 +1,57 @@
 language: go
 go_import_path: github.com/ethereum/go-ethereum
 sudo: false
-matrix:
+jobs:
   include:
-  - os: linux
+
+  # Only test code linters on latest version of Go
+  - stage: lint
+    os: linux
+    dist: xenial
+    go: 1.14.x
+    env:
+      - lint
+    git:
+      submodules: false
+    script:
+      - git submodule update --init evmc
+      - go get ./...
+      - go run build/ci.go install
+      - go run build/ci.go lint
+
+  - stage: build
+    os: linux
+    dist: xenial
+    go: 1.14.x
+    env:
+      - COREGETH
+    script:
+    - make test-coregeth
+
+  - stage: build
+    os: linux
+    dist: xenial
+    go: 1.13.x
+    env:
+      - GO111MODULE=on
+    script:
+      - go run build/ci.go install
+      - travis_wait 60 go run build/ci.go test
+
+  - stage: build
+    if: type = pull_request
+    os: linux
+    arch: arm64
+    dist: xenial
+    go: 1.14.x
+    env:
+      - GO111MODULE=on
+    script:
+      - go run build/ci.go install
+      - travis_wait 60 go run build/ci.go test
+
+  - stage: build
+    os: linux
     dist: xenial
     go: 1.14.x
     addons:
@@ -13,14 +61,8 @@ matrix:
         packages:
           - g++-9
     env:
-      - CC=gcc-9
-      - CXX=g++-9
-      - COREGETH
-    script:
-    - make test-coregeth
-  - os: linux
-    dist: xenial
-    go: 1.14.x
+    - CC=gcc-9
+    - CXX=g++-9
     script:
     - go env
     - $CC --version
@@ -47,7 +89,9 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-  - os: linux
+
+  - stage: build
+    os: linux
     dist: xenial
     sudo: required
     go: 1.14.x
@@ -81,7 +125,9 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-  - os: osx
+
+  - stage: build
+    os: osx
     go: 1.14.x
     script:
     - echo "Increase the maximum number of open file descriptors on macOS"
@@ -108,15 +154,3 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-  - os: linux
-    dist: xenial
-    go: 1.14.x
-    env:
-    - lint
-    git:
-      submodules: false
-    script:
-    - git submodule update --init evmc
-    - go get ./...
-    - go run build/ci.go install
-    - go run build/ci.go lint

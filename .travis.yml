@@ -13,6 +13,15 @@ matrix:
 
   - os: linux
     dist: xenial
+    go: 1.13.x
+    env:
+      - GO111MODULE=on
+    script:
+      - go run build/ci.go install
+      - travis_wait 60 go run build/ci.go test
+
+  - os: linux
+    dist: xenial
     go: 1.14.x
     script:
     - go run build/ci.go install

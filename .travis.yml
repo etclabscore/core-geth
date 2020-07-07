@@ -3,7 +3,21 @@ go_import_path: github.com/ethereum/go-ethereum
 sudo: false
 matrix:
   include:
-  - os: linux
+
+  # Only test code linters on latest version of Go
+  - stage: lint
+    os: linux
+    dist: xenial
+    go: 1.14.x
+    env:
+      - lint
+    git:
+      submodules: false
+    script:
+      - go run build/ci.go lint
+
+  - stage: build
+    os: linux
     dist: xenial
     go: 1.14.x
     env:
@@ -11,7 +25,8 @@ matrix:
     script:
     - make test-coregeth
 
-  - os: linux
+  - stage: build
+    os: linux
     dist: xenial
     go: 1.13.x
     env:
@@ -20,7 +35,8 @@ matrix:
       - go run build/ci.go install
       - travis_wait 60 go run build/ci.go test
 
-  - os: linux
+  - stage: build
+    os: linux
     arch: arm64
     dist: xenial
     go: 1.14.x
@@ -30,7 +46,8 @@ matrix:
       - go run build/ci.go install
       - travis_wait 60 go run build/ci.go test
 
-  - os: linux
+  - stage: build
+    os: linux
     dist: xenial
     go: 1.14.x
     script:
@@ -51,7 +68,8 @@ matrix:
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
 
-  - os: linux
+  - stage: build
+    os: linux
     dist: xenial
     sudo: required
     go: 1.14.x
@@ -83,7 +101,8 @@ matrix:
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
 
-  - os: osx
+  - stage: build
+    os: osx
     go: 1.14.x
     script:
     - echo "Increase the maximum number of open file descriptors on macOS"
@@ -110,13 +129,3 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-
-  - os: linux
-    dist: xenial
-    go: 1.14.x
-    env:
-    - lint
-    git:
-      submodules: false
-    script:
-    - go run build/ci.go lint

@@ -1,7 +1,7 @@
 language: go
 go_import_path: github.com/ethereum/go-ethereum
 sudo: false
-matrix:
+jobs:
   include:
 
   # Only test code linters on latest version of Go

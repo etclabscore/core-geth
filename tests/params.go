@@ -25,7 +25,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
+	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/multigethv0"
@@ -75,6 +77,8 @@ var mapForkNameChainspecFileDifficulty = map[string]string{
 	"difficulty.json":   "difficulty_json_difficulty_test.json",
 	"ETC_Atlantis":      "classic_atlantis_difficulty_test.json",
 	"ETC_Agharta":       "classic_agharta_difficulty_test.json",
+	"EIP2384":           "eip2384_difficulty_test.json",
+	"ETC_Phoenix":       "classic_phoenix_difficulty_test.json",
 }
 
 func readConfigFromSpecFile(name string) (spec ctypes.ChainConfigurator, sha1sum []byte, err error) {
@@ -108,6 +112,33 @@ func readConfigFromSpecFile(name string) (spec ctypes.ChainConfigurator, sha1sum
 	}
 	bb := sha1.Sum(b)
 	return spec, bb[:], nil
+}
+
+func writeDifficultyConfigFile(conf ctypes.ChainConfigurator, forkName string) (string, [20]byte, error) {
+	genesis := params.DefaultRopstenGenesisBlock()
+	genesis.Config = conf
+
+	pspec, err := tconvert.NewParityChainSpec(forkName, genesis, []string{})
+	if err != nil {
+		return "", [20]byte{}, err
+	}
+	specFilepath, ok := mapForkNameChainspecFileDifficulty[forkName]
+	if !ok {
+		return "", [20]byte{}, fmt.Errorf("nonexisting chainspec JSON file path, ref/assoc config: %s", forkName)
+	}
+
+	b, err := json.MarshalIndent(pspec, "", "    ")
+	if err != nil {
+		return "", [20]byte{}, err
+	}
+
+	err = ioutil.WriteFile(filepath.Join("..", "params", "parity.json.d", specFilepath), b, os.ModePerm)
+	if err != nil {
+		return "", [20]byte{}, err
+	}
+
+	sum := sha1.Sum(b)
+	return specFilepath, sum, nil
 }
 
 func init() {
@@ -191,6 +222,17 @@ func init() {
 			config, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
 			if os.IsNotExist(err) && os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) != "" {
 				log.Println("Will generate chainspec file for", k, v)
+				conf := difficultyChainConfigurations[k]
+				_, sha, err := writeDifficultyConfigFile(conf, k)
+				if err != nil {
+					panic(fmt.Sprintf("error writing difficulty config file: %s: %s %v", k, v, err))
+				}
+				sha1sum := []byte{}
+				for _, v := range sha {
+					sha1sum = append(sha1sum, v)
+				}
+				chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
+				difficultyChainConfigurations[k] = conf
 			} else if len(sha1sum) == 0 {
 				panic("zero sum game")
 			} else {

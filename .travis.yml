@@ -10,6 +10,7 @@ matrix:
       - COREGETH
     script:
     - make test-coregeth
+
   - os: linux
     dist: xenial
     go: 1.14.x
@@ -30,6 +31,7 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
+
   - os: linux
     dist: xenial
     sudo: required
@@ -61,6 +63,7 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
+
   - os: osx
     go: 1.14.x
     script:
@@ -88,6 +91,7 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
+
   - os: linux
     dist: xenial
     go: 1.14.x

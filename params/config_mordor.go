@@ -19,13 +19,13 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 var (
 	// MordorChainConfig is the chain parameters to run a node on the Ethereum Classic Mordor test network (PoW).
-	MordorChainConfig = &multigeth.MultiGethChainConfig{
+	MordorChainConfig = &coregeth.CoreGethChainConfig{
 		NetworkID: 7,
 		ChainID:   big.NewInt(63),
 		Ethash:    new(ctypes.EthashConfig),

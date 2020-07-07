@@ -183,7 +183,7 @@ func (w *wizard) importGenesis() {
 	// Parse the genesis file and inject it successful
 	var genesis genesisT.Genesis
 	if err := json.NewDecoder(reader).Decode(&genesis); err != nil {
-		log.Error("Invalid genesis spec: %v", err)
+		log.Error("Invalid genesis spec", "err", err)
 		return
 	}
 	log.Info("Imported genesis block")
@@ -238,6 +238,10 @@ func (w *wizard) manageGenesis() {
 		fmt.Println()
 		fmt.Printf("Which block should Istanbul come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP145Transition())
 		w.conf.Genesis.Config.SetEIP145Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP145Transition()))
+
+		fmt.Println()
+		fmt.Printf("Which block should YOLOv1 (EIP2537) come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP2537Transition())
+		w.conf.Genesis.Config.SetEIP2537Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP2537Transition()))
 
 		out, _ := json.MarshalIndent(w.conf.Genesis.Config, "", "  ")
 		fmt.Printf("Chain configuration updated:\n\n%s\n", out)

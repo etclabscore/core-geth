@@ -536,6 +536,14 @@ func (g Genesis) SetEIP1706Transition(n *uint64) error {
 	return g.Config.SetEIP1706Transition(n)
 }
 
+func (g Genesis) GetEIP2537Transition() *uint64 {
+	return g.Config.GetEIP2537Transition()
+}
+
+func (g Genesis) SetEIP2537Transition(n *uint64) error {
+	return g.Config.SetEIP2537Transition(n)
+}
+
 func (g *Genesis) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	return g.Config.IsEnabled(fn, n)
 }
@@ -592,12 +600,12 @@ func (g *Genesis) SetEthashHomesteadTransition(n *uint64) error {
 	return g.Config.SetEthashHomesteadTransition(n)
 }
 
-func (g *Genesis) GetEthashEIP2Transition() *uint64 {
-	return g.Config.GetEthashEIP2Transition()
+func (g *Genesis) GetEIP2Transition() *uint64 {
+	return g.Config.GetEIP2Transition()
 }
 
-func (g *Genesis) SetEthashEIP2Transition(n *uint64) error {
-	return g.Config.SetEthashEIP2Transition(n)
+func (g *Genesis) SetEIP2Transition(n *uint64) error {
+	return g.Config.SetEIP2Transition(n)
 }
 
 func (g *Genesis) GetEthashEIP779Transition() *uint64 {

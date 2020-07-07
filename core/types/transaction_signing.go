@@ -44,7 +44,7 @@ func MakeSigner(config ctypes.ChainConfigurator, blockNumber *big.Int) Signer {
 	switch {
 	case config.IsEnabled(config.GetEIP155Transition, blockNumber):
 		signer = NewEIP155Signer(config.GetChainID())
-	case config.IsEnabled(config.GetEthashEIP2Transition, blockNumber):
+	case config.IsEnabled(config.GetEIP2Transition, blockNumber):
 		signer = HomesteadSigner{}
 	default:
 		signer = FrontierSigner{}

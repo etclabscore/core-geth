@@ -27,12 +27,13 @@ import (
 var writeStateTestsReferencePairs = map[string]string{
 	"Byzantium":         "ETC_Atlantis",
 	"ConstantinopleFix": "ETC_Agharta",
+	"Istanbul":          "ETC_Phoenix",
 }
 
 // RunSetPost runs the state subtest for a given config, and writes the resulting
 // state to the corresponding subtest post field.
 func (t *StateTest) RunSetPost(subtest StateSubtest, vmconfig vm.Config) error {
-	statedb, root, err := t.RunNoVerify(subtest, vmconfig)
+	_, statedb, root, err := t.RunNoVerify(subtest, vmconfig, false)
 	if err != nil {
 		return err
 	}

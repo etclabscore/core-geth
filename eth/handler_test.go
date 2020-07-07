@@ -35,9 +35,9 @@ import (
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -320,7 +320,7 @@ func testGetNodeData(t *testing.T, protocol int) {
 	// Fetch for now the entire chain db
 	hashes := []common.Hash{}
 
-	it := db.NewIterator()
+	it := db.NewIterator(nil, nil)
 	for it.Next() {
 		if key := it.Key(); len(key) == common.HashLength {
 			hashes = append(hashes, common.BytesToHash(key))
@@ -352,7 +352,7 @@ func testGetNodeData(t *testing.T, protocol int) {
 	}
 	accounts := []common.Address{testBank, acc1Addr, acc2Addr}
 	for i := uint64(0); i <= pm.blockchain.CurrentBlock().NumberU64(); i++ {
-		trie, _ := state.New(pm.blockchain.GetBlockByNumber(i).Root(), state.NewDatabase(statedb))
+		trie, _ := state.New(pm.blockchain.GetBlockByNumber(i).Root(), state.NewDatabase(statedb), nil)
 
 		for j, acc := range accounts {
 			state, _ := pm.blockchain.State()
@@ -476,7 +476,7 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 	// Initialize a chain and generate a fake CHT if checkpointing is enabled
 	var (
 		db     = rawdb.NewMemoryDatabase()
-		config = new(multigeth.MultiGethChainConfig)
+		config = new(coregeth.CoreGethChainConfig)
 	)
 	core.MustCommitGenesis(db, &genesisT.Genesis{Config: config}) // Commit genesis block
 	// If checkpointing is enabled, create and inject a fake CHT and the corresponding
@@ -494,7 +494,7 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 		}
 	}
 	// Create a checkpoint aware protocol manager
-	blockchain, err := core.NewBlockChain(db, nil, config, ethash.NewFaker(), vm.Config{}, nil)
+	blockchain, err := core.NewBlockChain(db, nil, config, ethash.NewFaker(), vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create new blockchain: %v", err)
 	}
@@ -577,11 +577,11 @@ func testBroadcastBlock(t *testing.T, totalPeers, broadcastExpected int) {
 		evmux   = new(event.TypeMux)
 		pow     = ethash.NewFaker()
 		db      = rawdb.NewMemoryDatabase()
-		config  = &multigeth.MultiGethChainConfig{}
+		config  = &coregeth.CoreGethChainConfig{}
 		gspec   = &genesisT.Genesis{Config: config}
 		genesis = core.MustCommitGenesis(db, gspec)
 	)
-	blockchain, err := core.NewBlockChain(db, nil, config, pow, vm.Config{}, nil)
+	blockchain, err := core.NewBlockChain(db, nil, config, pow, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create new blockchain: %v", err)
 	}
@@ -618,7 +618,7 @@ func testBroadcastBlock(t *testing.T, totalPeers, broadcastExpected int) {
 		case <-doneCh:
 			received++
 
-		case <-time.After(100 * time.Millisecond):
+		case <-time.After(time.Second):
 			if received != broadcastExpected {
 				t.Errorf("broadcast count mismatch: have %d, want %d", received, broadcastExpected)
 			}
@@ -638,11 +638,11 @@ func TestBroadcastMalformedBlock(t *testing.T) {
 	var (
 		engine  = ethash.NewFaker()
 		db      = rawdb.NewMemoryDatabase()
-		config  = &multigeth.MultiGethChainConfig{}
+		config  = &coregeth.CoreGethChainConfig{}
 		gspec   = &genesisT.Genesis{Config: config}
 		genesis = core.MustCommitGenesis(db, gspec)
 	)
-	blockchain, err := core.NewBlockChain(db, nil, config, engine, vm.Config{}, nil)
+	blockchain, err := core.NewBlockChain(db, nil, config, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create new blockchain: %v", err)
 	}

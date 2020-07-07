@@ -56,13 +56,14 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 		{[]string{"--classic", "--networkid", "42"}, 42, 61, params.MainnetGenesisHash.Hex()},
 
 		// All other possible --<chain> values.
-		{[]string{"--testnet"}, 3, 3, params.TestnetGenesisHash.Hex()},
+		{[]string{"--testnet"}, 3, 3, params.RopstenGenesisHash.Hex()},
 		{[]string{"--rinkeby"}, 4, 4, params.RinkebyGenesisHash.Hex()},
 		{[]string{"--goerli"}, 5, 5, params.GoerliGenesisHash.Hex()},
 		{[]string{"--kotti"}, 6, 6, params.KottiGenesisHash.Hex()},
 		{[]string{"--mordor"}, 7, 63, params.MordorGenesisHash.Hex()},
 		{[]string{"--social"}, 28, 28, params.SocialGenesisHash.Hex()},
 		{[]string{"--ethersocial"}, 1, 31102, params.EthersocialGenesisHash.Hex()},
+		{[]string{"--yolov1"}, 133519467574833, 133519467574833, params.YoloV1GenesisHash.Hex()},
 	}
 	for i, p := range chainIdentityCases {
 		t.Run(fmt.Sprintf("%d/%v/networkid", i, p.flags),
@@ -131,7 +132,7 @@ at block: 0 ({{niltime}})
 
 // Tests that a console can be attached to a running node via various means.
 func TestIPCAttachWelcome(t *testing.T) {
-	// Configure the instance for IPC attachement
+	// Configure the instance for IPC attachment
 	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
 	var ipc string
 	if runtime.GOOS == "windows" {

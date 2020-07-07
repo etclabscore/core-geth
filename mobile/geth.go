@@ -114,7 +114,7 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 	}
 
 	if config.PprofAddress != "" {
-		debug.StartPProf(config.PprofAddress)
+		debug.StartPProf(config.PprofAddress, true)
 	}
 
 	// Create the empty networking stack
@@ -146,6 +146,39 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 		genesis = new(genesisT.Genesis)
 		if err := json.Unmarshal([]byte(config.EthereumGenesis), genesis); err != nil {
 			return nil, fmt.Errorf("invalid genesis spec: %v", err)
+		}
+		// If we have the testnet, hard code the chain configs too
+		if config.EthereumGenesis == RopstenGenesis() {
+			genesis.Config = params.RopstenChainConfig
+			if config.EthereumNetworkID == 1 {
+				config.EthereumNetworkID = 3
+			}
+		}
+		// If we have the Rinkeby testnet, hard code the chain configs too
+		if config.EthereumGenesis == RinkebyGenesis() {
+			genesis.Config = params.RinkebyChainConfig
+			if config.EthereumNetworkID == 1 {
+				config.EthereumNetworkID = 4
+			}
+		}
+		// If we have the Goerli testnet, hard code the chain configs too
+		if config.EthereumGenesis == GoerliGenesis() {
+			genesis.Config = params.GoerliChainConfig
+			if config.EthereumNetworkID == 1 {
+				config.EthereumNetworkID = 5
+			}
+		}
+		if config.EthereumGenesis == KottiGenesis() {
+			genesis.Config = params.KottiChainConfig
+			if config.EthereumNetworkID == 1 {
+				config.EthereumNetworkID = 6
+			}
+		}
+		if config.EthereumGenesis == MordorGenesis() {
+			genesis.Config = params.MordorChainConfig
+			if config.EthereumNetworkID == 1 {
+				config.EthereumNetworkID = 7
+			}
 		}
 	}
 	// Register the Ethereum protocol if requested

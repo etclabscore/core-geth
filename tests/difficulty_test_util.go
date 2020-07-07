@@ -26,9 +26,9 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 //go:generate [gencodec -type DifficultyTest -field-override difficultyTestMarshaling -out gen_difficultytest.go]
@@ -49,8 +49,8 @@ var (
 )
 
 var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
-	"Ropsten":  params.TestnetChainConfig,
-	"Morden":   params.TestnetChainConfig,
+	"Ropsten":  params.RopstenChainConfig,
+	"Morden":   params.RopstenChainConfig,
 	"Frontier": &goethereum.ChainConfig{},
 	"Homestead": &goethereum.ChainConfig{
 		Ethash:         new(ctypes.EthashConfig),
@@ -69,7 +69,7 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 		ConstantinopleBlock: big.NewInt(0),
 	},
 	"difficulty.json": mainnetChainConfig,
-	"ETC_Atlantis": &multigeth.MultiGethChainConfig{
+	"ETC_Atlantis": &coregeth.CoreGethChainConfig{
 		Ethash:        new(ctypes.EthashConfig),
 		EIP100FBlock:  big.NewInt(0),
 		EIP140FBlock:  big.NewInt(0),
@@ -81,7 +81,7 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 		EIP658FBlock:  big.NewInt(0),
 		DisposalBlock: big.NewInt(0),
 	},
-	"ETC_Agharta": &multigeth.MultiGethChainConfig{
+	"ETC_Agharta": &coregeth.CoreGethChainConfig{
 		Ethash:        new(ctypes.EthashConfig),
 		EIP100FBlock:  big.NewInt(0),
 		EIP140FBlock:  big.NewInt(0),
@@ -104,6 +104,23 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 		ByzantiumBlock:      big.NewInt(0),
 		ConstantinopleBlock: big.NewInt(0),
 		MuirGlacierBlock:    big.NewInt(0),
+	},
+	"ETC_Phoenix": &coregeth.CoreGethChainConfig{
+		Ethash:        new(ctypes.EthashConfig),
+		EIP100FBlock:  big.NewInt(0),
+		EIP140FBlock:  big.NewInt(0),
+		EIP198FBlock:  big.NewInt(0),
+		EIP211FBlock:  big.NewInt(0),
+		EIP212FBlock:  big.NewInt(0),
+		EIP213FBlock:  big.NewInt(0),
+		EIP214FBlock:  big.NewInt(0),
+		EIP658FBlock:  big.NewInt(0),
+		EIP145FBlock:  big.NewInt(0),
+		EIP1014FBlock: big.NewInt(0),
+		EIP1052FBlock: big.NewInt(0),
+		EIP1283FBlock: big.NewInt(0),
+		EIP2200FBlock: big.NewInt(0), // Petersburg
+		DisposalBlock: big.NewInt(0),
 	},
 }
 

@@ -5,6 +5,7 @@ matrix:
   include:
   - os: linux
     dist: xenial
+    go: 1.14.x
     addons:
       apt:
         sources:
@@ -14,7 +15,12 @@ matrix:
     env:
       - CC=gcc-9
       - CXX=g++-9
-    go: 1.13.x
+      - COREGETH
+    script:
+    - make test-coregeth
+  - os: linux
+    dist: xenial
+    go: 1.14.x
     script:
     - go env
     - $CC --version
@@ -27,7 +33,6 @@ matrix:
     - ls -lh ./evmc/bindings/go/evmc/*.so
     - go run build/ci.go install
     - travis_wait 60 go run build/ci.go test
-    - make test-multigeth
     before_deploy:
     - sh build/deploy.sh
     deploy:
@@ -42,11 +47,12 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-
   - os: linux
     dist: xenial
     sudo: required
-    go: 1.13.x
+    go: 1.14.x
+    env:
+      - ARMv5
     git:
       submodules: false # avoid cloning ethereum/tests
     addons:
@@ -75,9 +81,8 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-
   - os: osx
-    go: 1.13.x
+    go: 1.14.x
     script:
     - echo "Increase the maximum number of open file descriptors on macOS"
     - NOFILE=20480
@@ -103,12 +108,11 @@ matrix:
         tags: true
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
-
   - os: linux
     dist: xenial
-    go: 1.13.x
+    go: 1.14.x
     env:
-      - lint
+    - lint
     git:
       submodules: false
     script:

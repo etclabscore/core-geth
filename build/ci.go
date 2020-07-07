@@ -96,11 +96,11 @@ var (
 			Description: "Ethereum bootnode.",
 		},
 		{
-			BinaryName: "echaindb",
+			BinaryName:  "echaindb",
 			Description: "Developer utility to inspect and manage the chain database",
 		},
 		{
-			BinaryName: "echainspec",
+			BinaryName:  "echainspec",
 			Description: "Developer utility to manage chain external chain configuration",
 		},
 		{
@@ -335,7 +335,7 @@ func doTest(cmdline []string) {
 	// Test a single package at a time. CI builders are slow
 	// and some tests run into timeouts under load.
 	gotest := goTool("test", buildFlags(env)...)
-	gotest.Args = append(gotest.Args, "-p", "1", "-timeout", "5m")
+	gotest.Args = append(gotest.Args, "-p", "1")
 	if *coverage {
 		gotest.Args = append(gotest.Args, "-covermode=atomic", "-cover")
 	}
@@ -359,14 +359,14 @@ func doLint(cmdline []string) {
 	}
 
 	linter := downloadLinter(*cachedir)
-	lflags := []string{"run", "--config", ".golangci.yml"}
+	lflags := []string{"run", "--timeout", "3m0s", "--config", ".golangci.yml"}
 	build.MustRunCommand(linter, append(lflags, packages...)...)
 	fmt.Println("You have achieved perfection.")
 }
 
 // downloadLinter downloads and unpacks golangci-lint.
 func downloadLinter(cachedir string) string {
-	const version = "1.22.2"
+	const version = "1.27.0"
 
 	csdb := build.MustLoadChecksums("build/checksums.txt")
 	base := fmt.Sprintf("golangci-lint-%s-%s-%s", version, runtime.GOOS, runtime.GOARCH)
@@ -1108,6 +1108,8 @@ func doPurge(cmdline []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Printf("Found %d blobs\n", len(blobs))
+
 	// Iterate over the blobs, collect and sort all unstable builds
 	for i := 0; i < len(blobs); i++ {
 		if !strings.Contains(blobs[i].Name, "unstable") {
@@ -1129,6 +1131,7 @@ func doPurge(cmdline []string) {
 			break
 		}
 	}
+	fmt.Printf("Deleting %d blobs\n", len(blobs))
 	// Delete all marked as such and return
 	if err := build.AzureBlobstoreDelete(auth, blobs); err != nil {
 		log.Fatal(err)

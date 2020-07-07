@@ -326,7 +326,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		out.Mul(parent_diff_over_dbd(parent), out)
 		out.Add(out, parent.Difficulty)
 
-	} else if config.IsEnabled(config.GetEthashEIP2Transition, next) {
+	} else if config.IsEnabled(config.GetEIP2Transition, next) {
 		// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.md
 		// algorithm:
 		// diff = (parent_diff +

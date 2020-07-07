@@ -23,7 +23,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/bloombits"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -46,7 +45,7 @@ type EthAPIBackend struct {
 	gpo           *gasprice.Oracle
 }
 
-// MultiGethChainConfig returns the active chain configuration.
+// ChainConfig returns the active chain configuration.
 func (b *EthAPIBackend) ChainConfig() ctypes.ChainConfigurator {
 	return b.eth.blockchain.Config()
 }
@@ -192,7 +191,6 @@ func (b *EthAPIBackend) GetTd(blockHash common.Hash) *big.Int {
 }
 
 func (b *EthAPIBackend) GetEVM(ctx context.Context, msg core.Message, state *state.StateDB, header *types.Header) (*vm.EVM, func() error, error) {
-	state.SetBalance(msg.From(), math.MaxBig256)
 	vmError := func() error { return nil }
 
 	context := core.NewEVMContext(msg, header, b.eth.BlockChain(), nil)
@@ -292,8 +290,12 @@ func (b *EthAPIBackend) ExtRPCEnabled() bool {
 	return b.extRPCEnabled
 }
 
-func (b *EthAPIBackend) RPCGasCap() *big.Int {
+func (b *EthAPIBackend) RPCGasCap() uint64 {
 	return b.eth.config.RPCGasCap
+}
+
+func (b *EthAPIBackend) RPCTxFeeCap() float64 {
+	return b.eth.config.RPCTxFeeCap
 }
 
 func (b *EthAPIBackend) BloomStatus() (uint64, uint64) {

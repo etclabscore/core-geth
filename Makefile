@@ -42,7 +42,11 @@ test: all evmc
 sync-parity-chainspecs:
 	./params/parity.json.d/sync-parity-remote.sh
 
-test-multigeth: test-multigeth-features test-multigeth-chainspecs ## Runs all tests specific to multi-geth.
+test-coregeth: \
+ test-coregeth-regression-condensed \
+ test-coregeth-features \
+ test-coregeth-chainspecs \
+ test-coregeth-consensus ## Runs all tests specific to core-geth.
 
 hera:
 	./build/hera.sh
@@ -57,36 +61,48 @@ test-evmc: hera ssvm
 clean-evmc:
 	rm -rf ./build/_workspace/hera ./build/_workspace/SSVM
 
-test-multigeth-features: test-multigeth-features-parity test-multigeth-features-multigeth test-multigeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
+test-coregeth-features: test-coregeth-features-parity test-coregeth-features-coregeth test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
 
-test-multigeth-features-parity:
-	@echo "Testing fork/feature/datatype implementation; equivalence - PARITY."
-	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_PARITY=on go test -count=1 ./tests
+test-coregeth-consensus: test-coregeth-features-clique-consensus
 
-test-multigeth-features-multigeth:
-	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETH."
-	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETH=on go test -count=1 ./tests
+test-coregeth-features-parity:
+	@echo "Testing fork/feature/datatype implementation; equivalence - OPENETHEREUM."
+	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_OPENETHEREUM=on go test -count=1 ./tests
 
-test-multigeth-features-multigethv0:
+test-coregeth-features-coregeth:
+	@echo "Testing fork/feature/datatype implementation; equivalence - COREGETH."
+	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_COREGETH=on go test -count=1 ./tests
+
+test-coregeth-features-multigethv0:
 	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETHv0."
-	env MULTIGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETHV0=on go test -count=1 ./tests
+	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETHV0=on go test -count=1 ./tests
 
-test-multigeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
+test-coregeth-features-clique-consensus:
+	@echo "Testing fork/feature/datatype implementation; equivalence - Clique consensus"
+	env COREGETH_TESTS_CHAINCONFIG_CONSENSUS_EQUIVALENCE_CLIQUE=on go test -count=1 -run TestState ./tests ## Only run state tests here, since Blockchain tests will care about rewards, etc.
+
+test-coregeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
 	@echo "Testing Parity JSON chainspec equivalence."
-	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on go test -count=1 ./tests
+	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on go test -count=1 ./tests
+
+test-coregeth-regression-condensed: geth
+	@echo "Running condensed regression tests (imports) against simulated canonical blockchains."
+	./tests/regression/simulated/test.sh ./tests/regression/simulated/classic-condense-state/classic.conf.json ./tests/regression/simulated/classic-condense-state/export.rlp.gz
+	./tests/regression/simulated/test.sh ./tests/regression/simulated/foundation-condense-state/foundation.conf.json ./tests/regression/simulated/foundation-condense-state/export.rlp.gz
+	./tests/regression/simulated/test.sh ./tests/regression/simulated/foundation-condense-state-2/foundation.conf.json ./tests/regression/simulated/foundation-condense-state-2/export.rlp.gz
 
 tests-generate: tests-generate-state tests-generate-difficulty ## Generate all tests.
 
 tests-generate-state: ## Generate state tests.
 	@echo "Generating state tests."
-	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on \
-	env MULTIGETH_TESTS_GENERATE_STATE_TESTS=on \
+	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on \
+	env COREGETH_TESTS_GENERATE_STATE_TESTS=on \
 	go run build/ci.go test -v ./tests -run TestGenState
 
 tests-generate-difficulty: ## Generate difficulty tests.
 	@echo "Generating difficulty tests."
-	env MULTIGETH_TESTS_CHAINCONFIG_PARITY_SPECS=on \
-	env MULTIGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
+	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on \
+	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
 	go run build/ci.go test -v ./tests -run TestDifficultyGen
 
 lint: ## Run linters.

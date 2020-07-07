@@ -40,9 +40,9 @@ func TestDefaultGenesisBlock(t *testing.T) {
 	if block.Hash() != params.MainnetGenesisHash {
 		t.Errorf("wrong mainnet genesis hash, got %v, want %v", block.Hash(), params.MainnetGenesisHash)
 	}
-	block = GenesisToBlock(params.DefaultTestnetGenesisBlock(), nil)
-	if block.Hash() != params.TestnetGenesisHash {
-		t.Errorf("wrong testnet genesis hash, got %v, want %v", block.Hash(), params.TestnetGenesisHash)
+	block = GenesisToBlock(params.DefaultRopstenGenesisBlock(), nil)
+	if block.Hash() != params.RopstenGenesisHash {
+		t.Errorf("wrong testnet genesis hash, got %v, want %v", block.Hash(), params.RopstenGenesisHash)
 	}
 }
 
@@ -66,7 +66,7 @@ func TestSetupGenesis(t *testing.T) {
 		wantErr    error
 	}{
 		{
-			name: "genesis without MultiGethChainConfig",
+			name: "genesis without ChainConfig",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
 				return SetupGenesisBlock(db, new(genesisT.Genesis))
 			},
@@ -103,11 +103,11 @@ func TestSetupGenesis(t *testing.T) {
 			name: "custom block in DB, genesis == testnet",
 			fn: func(db ethdb.Database) (ctypes.ChainConfigurator, common.Hash, error) {
 				MustCommitGenesis(db, &customg)
-				return SetupGenesisBlock(db, params.DefaultTestnetGenesisBlock())
+				return SetupGenesisBlock(db, params.DefaultRopstenGenesisBlock())
 			},
-			wantErr:    &genesisT.GenesisMismatchError{Stored: customghash, New: params.TestnetGenesisHash},
-			wantHash:   params.TestnetGenesisHash,
-			wantConfig: params.TestnetChainConfig,
+			wantErr:    &genesisT.GenesisMismatchError{Stored: customghash, New: params.RopstenGenesisHash},
+			wantHash:   params.RopstenGenesisHash,
+			wantConfig: params.RopstenChainConfig,
 		},
 		{
 			name: "compatible config in DB",
@@ -125,7 +125,7 @@ func TestSetupGenesis(t *testing.T) {
 				// Advance to block #4, past the homestead transition block of customg.
 				genesis := MustCommitGenesis(db, &oldcustomg)
 
-				bc, _ := NewBlockChain(db, nil, oldcustomg.Config, ethash.NewFullFaker(), vm.Config{}, nil)
+				bc, _ := NewBlockChain(db, nil, oldcustomg.Config, ethash.NewFullFaker(), vm.Config{}, nil, nil)
 				defer bc.Stop()
 
 				blocks, _ := GenerateChain(oldcustomg.Config, genesis, ethash.NewFaker(), db, 4, nil)
@@ -137,7 +137,7 @@ func TestSetupGenesis(t *testing.T) {
 			wantHash:   customghash,
 			wantConfig: customg.Config.(*goethereum.ChainConfig),
 			wantErr: &confp.ConfigCompatError{
-				What:         "incompatible fork value: GetEIP7Transition",
+				What:         "incompatible fork value: GetEIP2Transition",
 				StoredConfig: func() *uint64 { b := big.NewInt(2).Uint64(); return &b }(),
 				NewConfig:    func() *uint64 { b := big.NewInt(3).Uint64(); return &b }(),
 				RewindTo:     1,

@@ -1,0 +1,10 @@
+CoreGeth
+Version: 1.11.8-unstable
+Git Commit: 8d06f85078c207263d0c4119f54ad81cb6224913
+Git Commit Date: 20200630
+Architecture: amd64
+Protocol Versions: [65 64 63]
+Go Version: go1.14.3
+Operating System: linux
+GOPATH=/home/ia/go
+GOROOT=/home/ia/go1.14.3.linux-amd64

@@ -14,6 +14,7 @@ jobs:
     git:
       submodules: false
     script:
+      - git submodule update --init evmc # Since submodules:false to avoid tests/ clone.
       - make lint
 
   - stage: build

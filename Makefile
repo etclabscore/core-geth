@@ -28,7 +28,7 @@ evmc:
 	# Use child-dir (in submodule) custom Makefile to build needed example_vm.so file.
 	# Once finished, remove the adhoc Makefile.
 	> ./evmc/bindings/go/evmc/Makefile \
-	echo 'example_vm.so: \n\tgcc -fPIC -shared ../../../examples/example_vm/example_vm.c -I../../../include -o example_vm.so'
+	echo -e 'example_vm.so: \n\tgcc -fPIC -shared ../../../examples/example_vm/example_vm.c -I../../../include -o example_vm.so'
 	make -C ./evmc/bindings/go/evmc/ example_vm.so
 	rm -f ./evmc/bindings/go/evmc/Makefile
 

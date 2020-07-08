@@ -24,15 +24,7 @@ all:
 	$(GORUN) build/ci.go install
 
 evmc:
-	# Generate the bindings.
-	go generate ./evmc/bindings/go/evmc/
-#	# Establish an SO needed for tests.
-#	# Use a temporary adhoc Makefile located in a child-dir of the evmc submodule to build the required example_vm.so file.
-#	# Once finished, remove the adhoc Makefile.
-#	> ./evmc/bindings/go/evmc/Makefile \
-#	echo -e 'example_vm.so:\n\tgcc -fPIC -shared ../../../examples/example_vm/example_vm.c -I../../../include -o example_vm.so'
-#	make -C ./evmc/bindings/go/evmc/ example_vm.so
-#	rm -f ./evmc/bindings/go/evmc/Makefile
+	./build/evmc-example_vm.so.sh
 
 android:
 	$(GORUN) build/ci.go aar --local

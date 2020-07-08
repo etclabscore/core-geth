@@ -1,9 +1,8 @@
-package rawdb
+package main
 
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"math/big"
 	"testing"
@@ -47,7 +46,7 @@ func TestBlockKeying(t *testing.T) {
 	div := n / m
 	t.Log(mod)
 	t.Log(div)
-	t.Log(n * div + mod)
+	t.Log(n*div + mod)
 }
 
 func TestIndexThing(t *testing.T) {
@@ -68,7 +67,7 @@ func TestSlice(t *testing.T) {
 }
 
 func Test30kHashes(t *testing.T) {
-	n := 32*32*32
+	n := 32 * 32 * 32
 	hashes := make([]common.Hash, n)
 	for i := 0; i < n; i++ {
 		hashes[i] = common.HexToHash("0xbadface")
@@ -82,11 +81,12 @@ func Test30kHashes(t *testing.T) {
 }
 
 func TestCache_TruncateFrom(t *testing.T) {
-	c := newCache()
+	/*c := newCache()
 	for i := 0; i < 32; i++ {
 		c.add(uint64(i), fmt.Sprintf("n%d", i))
 	}
 	c.truncateFrom(32)
 	b := c.batch(0, 36)
 	t.Log(c.sl, b)
+	*/
 }

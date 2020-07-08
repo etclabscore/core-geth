@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
 )
 
@@ -13,7 +14,7 @@ type ExternalFreezerRemoteAPI interface {
 	Ancients(ctx context.Context) (uint64, error)
 	AncientSize(ctx context.Context, kind string) (uint64, error)
 
-	AppendAncient(ctx context.Context, number uint64, hash, header, body, receipt, td string)
+	AppendAncient(ctx context.Context, number uint64, hash, header, body, receipt, td string) error
 	TruncateAncients(ctx context.Context, n uint64) error
 	Sync(ctx context.Context) error
 	repair() error
@@ -21,13 +22,13 @@ type ExternalFreezerRemoteAPI interface {
 
 // FreezerRemoteAPI exposes a JSONRPC related API
 type FreezerRemoteAPI struct {
-	freezer *freezerRemote
+	freezer *FreezerRemote
 }
 
 // NewFreezerRemoteAPI exposes an endpoint to create a remote service
-func NewFreezerRemoteAPI(freezerStr string, namespace string) (*FreezerRemoteAPI, error) {
+func NewFreezerRemoteAPI(service ethdb.AncientStore) (*FreezerRemoteAPI, error) {
 	log.Info("constructing new freezer")
-	f, err := newFreezerRemote(freezerStr, namespace, "")
+	f, err := newFreezerRemoteServer(service)
 	if err != nil {
 		return nil, err
 	}

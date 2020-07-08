@@ -105,11 +105,11 @@ func NewDatabase(db ethdb.KeyValueStore) ethdb.Database {
 // NewDatabaseWithFreezerRemote creates a high level database on top of a given key-
 // value data store with a freezer moving immutable chain segments into cold
 // storage.
-func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerStr string, namespace string) (ethdb.Database, error) {
+func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerStr string, ipc bool) (ethdb.Database, error) {
 	// Create the idle freezer instance
-	log.Info("New remote freezer", "freezer", freezerStr, "namespace", namespace)
+	log.Info("New remote freezer", "freezer", freezerStr)
 
-	frdb, err := newFreezerRemote(freezerStr, namespace, "")
+	frdb, err := newFreezerRemoteClient(freezerStr, ipc)
 	if err != nil {
 		log.Error("NewDatabaseWithFreezerRemote error", "error", err)
 		return nil, err
@@ -269,12 +269,12 @@ func NewLevelDBDatabase(file string, cache int, handles int, namespace string) (
 
 // NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a
 // freezer moving immutable chain segments into cold storage.
-func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, freezer string, namespace string) (ethdb.Database, error) {
+func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, freezer string, ipc bool) (ethdb.Database, error) {
 	kvdb, err := leveldb.New(file, cache, handles, "eth/db/chaindata")
 	if err != nil {
 		return nil, err
 	}
-	frdb, err := NewDatabaseWithFreezerRemote(kvdb, freezer, namespace)
+	frdb, err := NewDatabaseWithFreezerRemote(kvdb, freezer, ipc)
 	if err != nil {
 		kvdb.Close()
 		return nil, err
@@ -398,7 +398,7 @@ func InspectDatabase(db ethdb.Database) error {
 	}
 	// Inspect append-only file store then.
 	ancients := []*common.StorageSize{&ancientHeaders, &ancientBodies, &ancientReceipts, &ancientHashes, &ancientTds}
-	for i, category := range []string{freezerHeaderTable, freezerBodiesTable, freezerReceiptTable, freezerHashTable, freezerDifficultyTable} {
+	for i, category := range []string{FreezerHeaderTable, FreezerBodiesTable, FreezerReceiptTable, FreezerHashTable, FreezerDifficultyTable} {
 		if size, err := db.AncientSize(category); err == nil {
 			*ancients[i] += common.StorageSize(size)
 			total += common.StorageSize(size)
@@ -449,7 +449,7 @@ func validateFreezerVsKV(freezerdb *freezer, db ethdb.KeyValueStore) error {
 			// If the freezer already contains something, ensure that the genesis blocks
 			// match, otherwise we might mix up freezers across chains and destroy both
 			// the freezer and the key-value store.
-			if frgenesis, _ := freezerdb.Ancient(freezerHashTable, 0); !bytes.Equal(kvgenesis, frgenesis) {
+			if frgenesis, _ := freezerdb.Ancient(FreezerHashTable, 0); !bytes.Equal(kvgenesis, frgenesis) {
 				return fmt.Errorf("genesis mismatch: %#x (leveldb) != %#x (ancients)", kvgenesis, frgenesis)
 			}
 			// Key-value store and freezer belong to the same network. Ensure that they
@@ -524,7 +524,7 @@ func truncateKVtoFreezer(freezerdb *freezer, db ethdb.KeyValueStore) {
 	}
 	log.Warn("Finished KV truncation")
 
-	data, _ := freezerdb.Ancient(freezerHashTable, n)
+	data, _ := freezerdb.Ancient(FreezerHashTable, n)
 	h := common.BytesToHash(data)
 
 	// If h is the empty common hash, then when the headHeaderHash gets read, whoever's reading it isn't going to like that.

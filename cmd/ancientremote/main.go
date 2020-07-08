@@ -10,7 +10,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/mattn/go-colorable"
@@ -29,6 +31,15 @@ var (
 		Usage: "HTTP-RPC server listening port",
 		Value: node.DefaultHTTPPort + 5,
 	}
+	namespaceFlag = cli.StringFlag{
+		Name:  "namespace",
+		Usage: "Namespace for remote storage, eg. S3 bucket name. Use will vary by remote provider.",
+	}
+
+	ipcPathFlag = utils.DirectoryFlag{
+		Name:  "ipcpath",
+		Usage: "Filename for IPC socket/pipe within the datadir (explicit paths escape it)",
+	}
 
 	app = cli.NewApp()
 )
@@ -39,8 +50,9 @@ func init() {
 	app.Flags = []cli.Flag{
 		rpcPortFlag,
 		logLevelFlag,
+		namespaceFlag,
+		ipcPathFlag,
 		utils.AncientRemoteFlag,
-		utils.AncientRemoteNamespaceFlag,
 		utils.HTTPListenAddrFlag,
 		utils.HTTPVirtualHostsFlag,
 		utils.HTTPEnabledFlag,
@@ -77,17 +89,30 @@ func remoteAncientStore(c *cli.Context) error {
 		return fmt.Errorf("invalid command: %q", args[0])
 	}
 	var (
-		api *rawdb.FreezerRemoteAPI //rawdb.ExternalFreezerRemoteAPI
+		api        *rawdb.FreezerRemoteAPI //rawdb.ExternalFreezerRemoteAPI
+		service    ethdb.AncientStore
+		err        error
+		readMeter  = metrics.NewRegisteredMeter("ancient.remote /read", nil)
+		writeMeter = metrics.NewRegisteredMeter("ancient.remote /write", nil)
+		sizeGauge  = metrics.NewRegisteredGauge("ancient.remote /size", nil)
 	)
-	namespace := c.GlobalString(utils.AncientRemoteNamespaceFlag.Name)
-	clientOption := c.GlobalString(utils.AncientRemoteFlag.Name)
+	utils.CheckExclusive(c, ipcPathFlag, rpcPortFlag)
+	//ipcpath := c.GlobalString(ipcPathFlag.Name)
+	namespace := c.GlobalString(namespaceFlag.Name)
+	if namespace == "" {
+		utils.Fatalf("Missing namespace please specify a namespace, with --naemspace")
+	}
+
 	if err := initialize(c); err != nil {
 		return err
 	}
-	api, err := rawdb.NewFreezerRemoteAPI(clientOption, namespace)
+
+	service, err = newFreezerRemoteS3(namespace, readMeter, writeMeter, sizeGauge)
+	api, err = rawdb.NewFreezerRemoteAPI(service)
 	if err != nil {
 		utils.Fatalf("Could not start freezer: %w", err)
 	}
+
 	rpcAPI := []rpc.API{
 		{
 			Namespace: "freezer",

@@ -649,20 +649,22 @@ func (n *Node) OpenDatabase(name string, cache, handles int, namespace string) (
 // also attaching a chain freezer to it that moves ancient chain data from the
 // database to immutable append-only files. If the node is an ephemeral one, a
 // memory database is returned.
-func (n *Node) OpenDatabaseWithFreezerRemote(name string, cache, handles int, freezer, namespace string) (ethdb.Database, error) {
+func (n *Node) OpenDatabaseWithFreezerRemote(name string, cache, handles int, freezer string, ipc bool) (ethdb.Database, error) {
 	if n.config.DataDir == "" {
 		return rawdb.NewMemoryDatabase(), nil
 	}
 	root := n.config.ResolvePath(name)
+	if ipc == true {
+		switch {
+		case freezer == "":
+			freezer = filepath.Join(root, "ancient.ipc")
+		case !filepath.IsAbs(freezer):
+			freezer = n.config.ResolvePath(freezer)
+		}
 
-	switch {
-	case freezer == "s3": // noop
-	case freezer == "":
-		freezer = filepath.Join(root, "ancient")
-	case !filepath.IsAbs(freezer):
-		freezer = n.config.ResolvePath(freezer)
 	}
-	return rawdb.NewLevelDBDatabaseWithFreezerRemote(root, cache, handles, freezer, namespace)
+
+	return rawdb.NewLevelDBDatabaseWithFreezerRemote(root, cache, handles, freezer, ipc)
 }
 
 // OpenDatabaseWithFreezer opens an existing database with the given name (or

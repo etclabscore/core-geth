@@ -14,12 +14,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package rawdb
+package main
 
 import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"math/big"
@@ -37,6 +38,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
@@ -49,10 +51,13 @@ const (
 )
 
 var (
-	s3ROnly           = false
-	s3BlocksGroupSize = uint64(32 * 32)
-	s3HashesGroupSize = uint64(32 * 32 * 32)
-	s3Encoding        = s3EncodeJSONGZ
+	s3ROnly              = false
+	s3BlocksGroupSize    = uint64(32 * 32)
+	s3HashesGroupSize    = uint64(32 * 32 * 32)
+	s3Encoding           = s3EncodeJSONGZ
+	errOutOfBounds       = errors.New("out of bounds")
+	errNotSupported      = errors.New("this operation is not supported")
+	errOutOrderInsertion = errors.New("the append operation is out-order")
 )
 
 func init() {
@@ -160,27 +165,27 @@ func NewAncientObjectS3(hashB, headerB, bodyB, receiptsB, difficultyB []byte) (A
 // for a given 'kind' on the block object.
 func (o AncientObjectS3) RLPBytesForKind(kind string) []byte {
 	switch kind {
-	case freezerHashTable:
+	case rawdb.FreezerHashTable:
 		return o.Hash.Bytes()
-	case freezerHeaderTable:
+	case rawdb.FreezerHeaderTable:
 		b, err := rlp.EncodeToBytes(o.Header)
 		if err != nil {
 			log.Crit("Failed to RLP encode block header", "err", err)
 		}
 		return b
-	case freezerBodiesTable:
+	case rawdb.FreezerBodiesTable:
 		b, err := rlp.EncodeToBytes(o.Body)
 		if err != nil {
 			log.Crit("Failed to RLP encode block body", "err", err)
 		}
 		return b
-	case freezerReceiptTable:
+	case rawdb.FreezerReceiptTable:
 		b, err := rlp.EncodeToBytes(o.Receipts)
 		if err != nil {
 			log.Crit("Failed to RLP encode block receipts", "err", err)
 		}
 		return b
-	case freezerDifficultyTable:
+	case rawdb.FreezerDifficultyTable:
 		b, err := rlp.EncodeToBytes(o.Difficulty)
 		if err != nil {
 			log.Crit("Failed to RLP encode block difficulty", "err", err)
@@ -453,7 +458,7 @@ func (f *freezerRemoteS3) pullWCacheHashes(n uint64) error {
 }
 
 func (f *freezerRemoteS3) findCached(n uint64, kind string) ([]byte, bool) {
-	if kind == freezerHashTable {
+	if kind == rawdb.FreezerHashTable {
 		if v, ok := f.wCacheHashes.get(n); ok {
 			return v.(common.Hash).Bytes(), ok
 		}
@@ -583,7 +588,7 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 		return v, nil
 	}
 
-	if kind == freezerHashTable {
+	if kind == rawdb.FreezerHashTable {
 		err := f.downloadHashesObject(number)
 		if err != nil {
 			return nil, err

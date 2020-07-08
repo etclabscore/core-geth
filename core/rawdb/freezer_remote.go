@@ -21,7 +21,6 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/metrics"
 )
 
 var (
@@ -49,14 +48,14 @@ const (
 //freezerBatchLimit = 30000
 )
 
-// freezer is an memory mapped append-only database to store immutable chain data
+// FreezerRemote is an memory mapped append-only database to store immutable chain data
 // into flat files:
 //
 // - The append only nature ensures that disk writes are minimized.
 // - The memory mapping ensures we can max out system memory for caching without
 //   reserving it for go-ethereum. This would also reduce the memory requirements
 //   of Geth, and thus also GC overhead.
-type freezerRemote struct {
+type FreezerRemote struct {
 	// WARNING: The `frozen` field is accessed atomically. On 32 bit platforms, only
 	// 64-bit aligned fields can be atomic. The struct is guaranteed to be so aligned,
 	// so take advantage of that (https://golang.org/pkg/sync/atomic/#pkg-note-BUG).
@@ -72,28 +71,59 @@ type freezerRemote struct {
 	quit chan struct{}
 }
 
+func newFreezerRemoteServer(service ethdb.AncientStore) (*FreezerRemote, error) {
+	return newFreezerRemoteService(service)
+}
+
+func newFreezerRemoteService(service ethdb.AncientStore) (*FreezerRemote, error) {
+	var err error
+	freezer := &FreezerRemote{
+		quit: make(chan struct{}),
+	}
+	freezer.service = service
+	_, err = freezer.service.Ancients()
+	if err != nil {
+		return freezer, err
+	}
+	return freezer, nil
+
+}
+
+func newFreezerRemoteClient(freezerStr string, ipc bool) (*FreezerRemote, error) {
+	service, err := NewExternalFreezerRemote(freezerStr, ipc)
+	if err != nil {
+		log.Fatalf("unsupported remote service provider: %s", freezerStr)
+	}
+	return newFreezerRemoteService(service)
+}
+
 // newFreezer creates a chain freezer that moves ancient chain data into
 // append-only flat file containers.
-func newFreezerRemote(freezerStr string, namespace string, endpoint string) (*freezerRemote, error) {
+func newFreezerRemote(freezerStr string, ipc bool) (*FreezerRemote, error) {
 
 	// Create the initial freezer object
 	// TODO
 	var (
-		err        error
-		readMeter  = metrics.NewRegisteredMeter("ancient.remote."+freezerStr+"/read", nil)
-		writeMeter = metrics.NewRegisteredMeter("ancient.remote."+freezerStr+"/write", nil)
-		sizeGauge  = metrics.NewRegisteredGauge("ancient.remote."+freezerStr+"/size", nil)
+		err error
 	)
 
 	// Open all the supported data tables
-	freezer := &freezerRemote{
+	freezer := &FreezerRemote{
 		quit: make(chan struct{}),
 	}
-
-	switch freezerStr {
-	case "client":
-		freezer.service, err = NewExternalFreezerRemote("http://127.0.0.1:5000")
-	case "s3":
+	freezer.service, err = NewExternalFreezerRemote(freezerStr, ipc)
+	if err != nil {
+		log.Fatalf("unsupported remote service provider: %s", freezerStr)
+	}
+	_, err = freezer.service.Ancients()
+	if err != nil {
+		return freezer, err
+	}
+	return freezer, nil
+	/*
+		switch freezerStr {
+		case "client":
+		/*case "s3":
 		freezer.service, err = newFreezerRemoteS3(namespace, readMeter, writeMeter, sizeGauge)
 		if err != nil {
 			return nil, err
@@ -103,37 +133,33 @@ func newFreezerRemote(freezerStr string, namespace string, endpoint string) (*fr
 		if err != nil {
 			return freezer, err
 		}
+	*/
 
-	default:
-		log.Fatalf("unsupported remote service provider: %s", freezerStr)
-	}
-
-	return freezer, nil
 }
 
 // Close terminates the chain freezer, unmapping all the data files.
-func (f *freezerRemote) Close() error {
+func (f *FreezerRemote) Close() error {
 	return f.service.Close()
 }
 
 // HasAncient returns an indicator whether the specified ancient data exists
 // in the freezer.
-func (f *freezerRemote) HasAncient(kind string, number uint64) (bool, error) {
+func (f *FreezerRemote) HasAncient(kind string, number uint64) (bool, error) {
 	return f.service.HasAncient(kind, number)
 }
 
 // Ancient retrieves an ancient binary blob from the append-only immutable files.
-func (f *freezerRemote) Ancient(kind string, number uint64) ([]byte, error) {
+func (f *FreezerRemote) Ancient(kind string, number uint64) ([]byte, error) {
 	return f.service.Ancient(kind, number)
 }
 
 // Ancients returns the length of the frozen items.
-func (f *freezerRemote) Ancients() (uint64, error) {
+func (f *FreezerRemote) Ancients() (uint64, error) {
 	return f.service.Ancients()
 }
 
 // AncientSize returns the ancient size of the specified category.
-func (f *freezerRemote) AncientSize(kind string) (uint64, error) {
+func (f *FreezerRemote) AncientSize(kind string) (uint64, error) {
 	return f.service.AncientSize(kind)
 }
 
@@ -145,22 +171,22 @@ func (f *freezerRemote) AncientSize(kind string) (uint64, error) {
 // the same time, we can get into the trouble.
 //
 // Note that the frozen marker is updated outside of the service calls.
-func (f *freezerRemote) AppendAncient(number uint64, hash, header, body, receipts, td []byte) (err error) {
+func (f *FreezerRemote) AppendAncient(number uint64, hash, header, body, receipts, td []byte) (err error) {
 	return f.service.AppendAncient(number, hash, header, body, receipts, td)
 }
 
 // Truncate discards any recent data above the provided threshold number.
-func (f *freezerRemote) TruncateAncients(items uint64) error {
+func (f *FreezerRemote) TruncateAncients(items uint64) error {
 	return f.service.TruncateAncients(items)
 }
 
 // sync flushes all data tables to disk.
-func (f *freezerRemote) Sync() error {
+func (f *FreezerRemote) Sync() error {
 	return f.service.Sync()
 }
 
 // repair truncates all data tables to the same length.
-func (f *freezerRemote) repair() error {
+func (f *FreezerRemote) repair() error {
 	/*min := uint64(math.MaxUint64)
 	for _, table := range f.tables {
 		items := atomic.LoadUint64(&table.items)

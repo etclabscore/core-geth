@@ -24,6 +24,7 @@ import (
 	"io"
 	"io/ioutil"
 	"math/big"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -152,13 +153,12 @@ var (
 	}
 	AncientRemoteFlag = cli.StringFlag{
 		Name:  "datadir.ancient.remote",
-		Usage: "Use a remote freezer (options = [s3]). Incomptabile with --datadir.ancient",
+		Usage: "Use a remote freezer (options = uri or file path). localhost Incomptabile with --datadir.ancient",
 		Value: "",
 	}
-	AncientRemoteNamespaceFlag = cli.StringFlag{
-		Name:  "datadir.ancient.remote.namespace",
-		Usage: "Namespace for remote storage, eg. S3 bucket name. Use will vary by remote provider.",
-		Value: "",
+	AncientRemoteIPCFlag = cli.BoolFlag{
+		Name:  "datadir.ancient.remote.ipc",
+		Usage: "Use a remote freezer (options = [http]). Incomptabile with --datadir.ancient. Use with remote",
 	}
 	KeyStoreDirFlag = DirectoryFlag{
 		Name:  "keystore",
@@ -1625,11 +1625,16 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	if ctx.GlobalIsSet(AncientFlag.Name) {
 		cfg.DatabaseFreezer = ctx.GlobalString(AncientFlag.Name)
 	} else if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
-		cfg.DatabaseFreezerRemote = ctx.GlobalString(AncientRemoteFlag.Name)
-		cfg.DatabaseFreezerRemoteNamespace = ctx.GlobalString(AncientRemoteNamespaceFlag.Name)
-		if cfg.DatabaseFreezerRemote == "s3" && cfg.DatabaseFreezerRemoteNamespace == "" {
-			Fatalf("missing remote namespace, use --%s to set (bucket names must be unique)", AncientRemoteNamespaceFlag.Name)
+		//TOOD parse URI here?
+		var ipc bool
+		remote := ctx.GlobalString(AncientRemoteFlag.Name)
+		if ipc := ctx.GlobalIsSet(AncientRemoteIPCFlag.Name); ipc == false {
+			if _, err := url.Parse(remote); err != nil {
+				Fatalf("-- %s Ancient remote flag must be in valid url format %s", remote, err.Error())
+			}
 		}
+		cfg.DatabaseFreezerRemoteIPC = ipc
+		cfg.DatabaseFreezerRemote = remote
 	}
 
 	if gcmode := ctx.GlobalString(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {
@@ -1911,15 +1916,7 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 		name = "lightchaindata"
 	}
 	if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
-		namespace := ""
-		if ctx.GlobalString(AncientRemoteFlag.Name) == "s3" {
-			namespace = ctx.GlobalString(AncientRemoteNamespaceFlag.Name)
-			if namespace == "" {
-				Fatalf("missing remote namespace, use --%s to set (bucket names must be unique)", AncientRemoteNamespaceFlag.Name)
-			}
-		}
-
-		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientRemoteFlag.Name), namespace)
+		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientRemoteFlag.Name), ctx.GlobalBool((AncientRemoteIPCFlag.Name)))
 	} else {
 		chainDb, err = stack.OpenDatabaseWithFreezer(name, cache, handles, ctx.GlobalString(AncientFlag.Name), "")
 	}

@@ -14,9 +14,6 @@ jobs:
     git:
       submodules: false
     script:
-      - git submodule update --init evmc
-      - go get ./...
-      - make all
       - make lint
 
   - stage: build
@@ -66,7 +63,6 @@ jobs:
     script:
     - make all
     - travis_wait 60 make test
-    - make test-evmc
     before_deploy:
     - sh build/deploy.sh
     deploy:

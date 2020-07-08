@@ -104,7 +104,7 @@ tests-generate-difficulty: ## Generate difficulty tests.
 	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
 	go run build/ci.go test -v ./tests -run TestDifficultyGen
 
-lint: all ## Run linters.
+lint: ## Run linters.
 	$(GORUN) build/ci.go lint
 
 clean: clean-evmc

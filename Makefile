@@ -20,7 +20,7 @@ geth: evmc
 	@echo "Done building."
 	@echo "Run \"$(GOBIN)/geth\" to launch geth."
 
-all: evmc
+all:
 	$(GORUN) build/ci.go install
 
 evmc:

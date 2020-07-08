@@ -14,12 +14,12 @@ GO ?= latest
 GORUN = env GO111MODULE=on go run
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-geth:
+geth: evmc
 	$(GORUN) build/ci.go install ./cmd/geth
 	@echo "Done building."
 	@echo "Run \"$(GOBIN)/geth\" to launch geth."
 
-all:
+all: evmc
 	$(GORUN) build/ci.go install
 
 evmc:

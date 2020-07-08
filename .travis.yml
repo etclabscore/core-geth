@@ -4,7 +4,7 @@ sudo: false
 jobs:
   include:
 
-  # Only test code linters on latest version of Go
+  # Run linter check. Only test code linters on latest version of Go.
   - stage: lint
     os: linux
     dist: xenial
@@ -17,6 +17,7 @@ jobs:
       - git submodule update --init evmc # Since submodules:false to avoid tests/ clone.
       - make lint
 
+  # Run core-geth -specific tests, proving regression-safety and config interoperability.
   - stage: build
     os: linux
     dist: xenial
@@ -26,6 +27,7 @@ jobs:
     script:
     - make test-coregeth
 
+  # Run build and tests against latest-1 Go version.
   - stage: build
     os: linux
     dist: xenial
@@ -36,6 +38,7 @@ jobs:
       - make all
       - travis_wait 60 make test
 
+  # Run build and tests on ARM64 on Pull Requests.
   - stage: build
     if: type = pull_request
     os: linux
@@ -48,6 +51,7 @@ jobs:
       - make all
       - travis_wait 60 make test
 
+  # Run build and tests with environment-aware possible artifact deployment.
   - stage: build
     os: linux
     dist: xenial
@@ -79,6 +83,7 @@ jobs:
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
 
+  # Run build on ARM5 with environment-aware possible artifact deployment.
   - stage: build
     os: linux
     dist: xenial
@@ -115,6 +120,7 @@ jobs:
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
 
+  #Run build on OSX with environment-aware possible artifact deployment.
   - stage: build
     os: osx
     go: 1.14.x

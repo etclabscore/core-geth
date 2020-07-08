@@ -64,9 +64,9 @@ jobs:
     - CC=gcc-9
     - CXX=g++-9
     script:
-    - go build -v ./evmc/bindings/go/evmc
     - make all
     - travis_wait 60 make test
+    - make test-evmc
     before_deploy:
     - sh build/deploy.sh
     deploy:

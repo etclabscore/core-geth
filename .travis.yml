@@ -16,8 +16,8 @@ jobs:
     script:
       - git submodule update --init evmc
       - go get ./...
-      - go run build/ci.go install
-      - go run build/ci.go lint
+      - make all
+      - make lint
 
   - stage: build
     os: linux
@@ -35,8 +35,8 @@ jobs:
     env:
       - GO111MODULE=on
     script:
-      - go run build/ci.go install
-      - travis_wait 60 go run build/ci.go test
+      - make all
+      - travis_wait 60 make test
 
   - stage: build
     if: type = pull_request
@@ -47,8 +47,8 @@ jobs:
     env:
       - GO111MODULE=on
     script:
-      - go run build/ci.go install
-      - travis_wait 60 go run build/ci.go test
+      - make all
+      - travis_wait 60 make test
 
   - stage: build
     os: linux
@@ -64,17 +64,9 @@ jobs:
     - CC=gcc-9
     - CXX=g++-9
     script:
-    - go env
-    - $CC --version
-    - $CXX --version
-    - gcc --version
     - go build -v ./evmc/bindings/go/evmc
-    - cd evmc/bindings/go/evmc
-    - gcc -fPIC -shared ../../../examples/example_vm/example_vm.c -I../../../include -o example_vm.so
-    - cd ../../../..
-    - ls -lh ./evmc/bindings/go/evmc/*.so
-    - go run build/ci.go install
-    - travis_wait 60 go run build/ci.go test
+    - make all
+    - travis_wait 60 make test
     before_deploy:
     - sh build/deploy.sh
     deploy:
@@ -139,7 +131,7 @@ jobs:
     - ulimit -S -n $NOFILE
     - ulimit -n
     - unset -f cd
-    - go run build/ci.go install
+    - make all
     before_deploy:
     - sh build/deploy.sh
     deploy:

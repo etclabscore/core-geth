@@ -25,6 +25,7 @@ all:
 
 evmc:
 	go generate ./evmc/bindings/go/evmc/
+	make -C evmc/bindings/go/evmc example_vm.so
 
 android:
 	$(GORUN) build/ci.go aar --local

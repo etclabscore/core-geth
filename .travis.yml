@@ -61,10 +61,10 @@ jobs:
         sources:
           - ubuntu-toolchain-r-test
         packages:
-          - g++-9
+          - g++
     env:
-    - CC=gcc-9
-    - CXX=g++-9
+    - CC=gcc
+    - CXX=g++
     script:
     - make all
     - travis_wait 60 make test

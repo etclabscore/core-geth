@@ -3,6 +3,7 @@
 # don't need to bother with make.
 
 .PHONY: all test clean
+.PHONY: evmc
 .PHONY: geth android ios geth-cross
 .PHONY: geth-linux geth-linux-386 geth-linux-amd64 geth-linux-mips64 geth-linux-mips64le
 .PHONY: geth-linux-arm geth-linux-arm-5 geth-linux-arm-6 geth-linux-arm-7 geth-linux-arm64
@@ -24,6 +25,12 @@ all: evmc
 
 evmc:
 	go generate ./evmc/bindings/go/evmc/
+	# Use child-dir (in submodule) custom Makefile to build needed example_vm.so file.
+	# Once finished, remove the adhoc Makefile.
+	> ./evmc/bindings/go/evmc/Makefile \
+	echo 'example_vm.so: \n\tgcc -fPIC -shared ../../../examples/example_vm/example_vm.c -I../../../include -o example_vm.so'
+	make -C ./evmc/bindings/go/evmc/ example_vm.so
+	rm -f ./evmc/bindings/go/evmc/Makefile
 
 android:
 	$(GORUN) build/ci.go aar --local
@@ -35,7 +42,7 @@ ios:
 	@echo "Done building."
 	@echo "Import \"$(GOBIN)/Geth.framework\" to use the library."
 
-test: all evmc
+test: evmc
 	$(GORUN) build/ci.go test
 
 sync-parity-chainspecs:

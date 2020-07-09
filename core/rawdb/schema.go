@@ -78,6 +78,22 @@ var (
 )
 
 const (
+
+	// FreezerRemoteHeaderTable indicates the name of the freezer header table.
+	FreezerRemoteHeaderTable = "headers"
+
+	// FreezerRemoteHashTable indicates the name of the freezer canonical hash table.
+	FreezerRemoteHashTable = "hashes"
+
+	// FreezerRemoteBodiesTable indicates the name of the freezer block body table.
+	FreezerRemoteBodiesTable = "bodies"
+
+	// FreezerRemoteReceiptTable indicates the name of the freezer receipts table.
+	FreezerRemoteReceiptTable = "receipts"
+
+	// FreezerRemoteDifficultyTable indicates the name of the freezer total difficulty table.
+	FreezerRemoteDifficultyTable = "diffs"
+
 	// freezerHeaderTable indicates the name of the freezer header table.
 	freezerHeaderTable = "headers"
 

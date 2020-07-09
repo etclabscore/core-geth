@@ -165,27 +165,27 @@ func NewAncientObjectS3(hashB, headerB, bodyB, receiptsB, difficultyB []byte) (A
 // for a given 'kind' on the block object.
 func (o AncientObjectS3) RLPBytesForKind(kind string) []byte {
 	switch kind {
-	case rawdb.FreezerHashTable:
+	case rawdb.FreezerRemoteHashTable:
 		return o.Hash.Bytes()
-	case rawdb.FreezerHeaderTable:
+	case rawdb.FreezerRemoteHeaderTable:
 		b, err := rlp.EncodeToBytes(o.Header)
 		if err != nil {
 			log.Crit("Failed to RLP encode block header", "err", err)
 		}
 		return b
-	case rawdb.FreezerBodiesTable:
+	case rawdb.FreezerRemoteBodiesTable:
 		b, err := rlp.EncodeToBytes(o.Body)
 		if err != nil {
 			log.Crit("Failed to RLP encode block body", "err", err)
 		}
 		return b
-	case rawdb.FreezerReceiptTable:
+	case rawdb.FreezerRemoteReceiptTable:
 		b, err := rlp.EncodeToBytes(o.Receipts)
 		if err != nil {
 			log.Crit("Failed to RLP encode block receipts", "err", err)
 		}
 		return b
-	case rawdb.FreezerDifficultyTable:
+	case rawdb.FreezerRemoteDifficultyTable:
 		b, err := rlp.EncodeToBytes(o.Difficulty)
 		if err != nil {
 			log.Crit("Failed to RLP encode block difficulty", "err", err)
@@ -458,7 +458,7 @@ func (f *freezerRemoteS3) pullWCacheHashes(n uint64) error {
 }
 
 func (f *freezerRemoteS3) findCached(n uint64, kind string) ([]byte, bool) {
-	if kind == rawdb.FreezerHashTable {
+	if kind == rawdb.FreezerRemoteHashTable {
 		if v, ok := f.wCacheHashes.get(n); ok {
 			return v.(common.Hash).Bytes(), ok
 		}
@@ -588,7 +588,7 @@ func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 		return v, nil
 	}
 
-	if kind == rawdb.FreezerHashTable {
+	if kind == rawdb.FreezerRemoteHashTable {
 		err := f.downloadHashesObject(number)
 		if err != nil {
 			return nil, err

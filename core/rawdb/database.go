@@ -398,7 +398,7 @@ func InspectDatabase(db ethdb.Database) error {
 	}
 	// Inspect append-only file store then.
 	ancients := []*common.StorageSize{&ancientHeaders, &ancientBodies, &ancientReceipts, &ancientHashes, &ancientTds}
-	for i, category := range []string{FreezerHeaderTable, FreezerBodiesTable, FreezerReceiptTable, FreezerHashTable, FreezerDifficultyTable} {
+	for i, category := range []string{freezerHeaderTable, freezerBodiesTable, freezerReceiptTable, freezerHashTable, freezerDifficultyTable} {
 		if size, err := db.AncientSize(category); err == nil {
 			*ancients[i] += common.StorageSize(size)
 			total += common.StorageSize(size)
@@ -449,7 +449,7 @@ func validateFreezerVsKV(freezerdb *freezer, db ethdb.KeyValueStore) error {
 			// If the freezer already contains something, ensure that the genesis blocks
 			// match, otherwise we might mix up freezers across chains and destroy both
 			// the freezer and the key-value store.
-			if frgenesis, _ := freezerdb.Ancient(FreezerHashTable, 0); !bytes.Equal(kvgenesis, frgenesis) {
+			if frgenesis, _ := freezerdb.Ancient(freezerHashTable, 0); !bytes.Equal(kvgenesis, frgenesis) {
 				return fmt.Errorf("genesis mismatch: %#x (leveldb) != %#x (ancients)", kvgenesis, frgenesis)
 			}
 			// Key-value store and freezer belong to the same network. Ensure that they
@@ -524,7 +524,7 @@ func truncateKVtoFreezer(freezerdb *freezer, db ethdb.KeyValueStore) {
 	}
 	log.Warn("Finished KV truncation")
 
-	data, _ := freezerdb.Ancient(FreezerHashTable, n)
+	data, _ := freezerdb.Ancient(freezerHashTable, n)
 	h := common.BytesToHash(data)
 
 	// If h is the empty common hash, then when the headHeaderHash gets read, whoever's reading it isn't going to like that.

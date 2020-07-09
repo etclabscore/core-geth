@@ -78,30 +78,30 @@ var (
 )
 
 const (
-	// FreezerHeaderTable indicates the name of the freezer header table.
-	FreezerHeaderTable = "headers"
+	// freezerHeaderTable indicates the name of the freezer header table.
+	freezerHeaderTable = "headers"
 
-	// FreezerHashTable indicates the name of the freezer canonical hash table.
-	FreezerHashTable = "hashes"
+	// freezerHashTable indicates the name of the freezer canonical hash table.
+	freezerHashTable = "hashes"
 
-	// FreezerBodiesTable indicates the name of the freezer block body table.
-	FreezerBodiesTable = "bodies"
+	// freezerBodiesTable indicates the name of the freezer block body table.
+	freezerBodiesTable = "bodies"
 
-	// FreezerReceiptTable indicates the name of the freezer receipts table.
-	FreezerReceiptTable = "receipts"
+	// freezerReceiptTable indicates the name of the freezer receipts table.
+	freezerReceiptTable = "receipts"
 
-	// FreezerDifficultyTable indicates the name of the freezer total difficulty table.
-	FreezerDifficultyTable = "diffs"
+	// freezerDifficultyTable indicates the name of the freezer total difficulty table.
+	freezerDifficultyTable = "diffs"
 )
 
 // freezerNoSnappy configures whether compression is disabled for the ancient-tables.
 // Hashes and difficulties don't compress well.
 var freezerNoSnappy = map[string]bool{
-	FreezerHeaderTable:     false,
-	FreezerHashTable:       true,
-	FreezerBodiesTable:     false,
-	FreezerReceiptTable:    false,
-	FreezerDifficultyTable: true,
+	freezerHeaderTable:     false,
+	freezerHashTable:       true,
+	freezerBodiesTable:     false,
+	freezerReceiptTable:    false,
+	freezerDifficultyTable: true,
 }
 
 // LegacyTxLookupEntry is the legacy TxLookupEntry definition with some unnecessary

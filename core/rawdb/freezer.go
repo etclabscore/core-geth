@@ -197,23 +197,23 @@ func (f *freezer) AppendAncient(number uint64, hash, header, body, receipts, td 
 		}
 	}()
 	// Inject all the components into the relevant data tables
-	if err := f.tables[FreezerHashTable].Append(f.frozen, hash[:]); err != nil {
+	if err := f.tables[freezerHashTable].Append(f.frozen, hash[:]); err != nil {
 		log.Error("Failed to append ancient hash", "number", f.frozen, "hash", hash, "err", err)
 		return err
 	}
-	if err := f.tables[FreezerHeaderTable].Append(f.frozen, header); err != nil {
+	if err := f.tables[freezerHeaderTable].Append(f.frozen, header); err != nil {
 		log.Error("Failed to append ancient header", "number", f.frozen, "hash", hash, "err", err)
 		return err
 	}
-	if err := f.tables[FreezerBodiesTable].Append(f.frozen, body); err != nil {
+	if err := f.tables[freezerBodiesTable].Append(f.frozen, body); err != nil {
 		log.Error("Failed to append ancient body", "number", f.frozen, "hash", hash, "err", err)
 		return err
 	}
-	if err := f.tables[FreezerReceiptTable].Append(f.frozen, receipts); err != nil {
+	if err := f.tables[freezerReceiptTable].Append(f.frozen, receipts); err != nil {
 		log.Error("Failed to append ancient receipts", "number", f.frozen, "hash", hash, "err", err)
 		return err
 	}
-	if err := f.tables[FreezerDifficultyTable].Append(f.frozen, td); err != nil {
+	if err := f.tables[freezerDifficultyTable].Append(f.frozen, td); err != nil {
 		log.Error("Failed to append ancient difficulty", "number", f.frozen, "hash", hash, "err", err)
 		return err
 	}

@@ -14,7 +14,6 @@ jobs:
     git:
       submodules: false
     script:
-      - git submodule update --init evmc # Since submodules:false to avoid tests/ clone.
       - make lint
 
   # Run core-geth -specific tests, proving regression-safety and config interoperability.
@@ -100,7 +99,6 @@ jobs:
         packages:
           - gcc-multilib
     script:
-      - git submodule update --init evmc
       # Switch over GCC to cross compilation (breaks 386, hence why do it here only)
       - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-arm-linux-gnueabi libc6-dev-armel-cross gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross
       - sudo ln -s /usr/include/asm-generic /usr/include/asm

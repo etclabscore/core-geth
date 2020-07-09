@@ -7,6 +7,7 @@ package evmc
 import (
 	"bytes"
 	"math/big"
+	"os"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -66,6 +67,9 @@ func (host *testHostContext) Call(kind CallKind,
 }
 
 func TestGetTxContext(t *testing.T) {
+	if _, err := os.Open(modulePath); os.IsNotExist(err) {
+		t.Skipf("skipping evmc test: file %s does not exist", modulePath)
+	}
 	vm, _ := Load(modulePath)
 	defer vm.Destroy()
 
@@ -91,6 +95,9 @@ func TestGetTxContext(t *testing.T) {
 }
 
 func TestCall(t *testing.T) {
+	if _, err := os.Open(modulePath); os.IsNotExist(err) {
+		t.Skipf("skipping evmc test: file %s does not exist", modulePath)
+	}
 	vm, _ := Load(modulePath)
 	defer vm.Destroy()
 

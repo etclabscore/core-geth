@@ -8,6 +8,7 @@ package evmc
 
 import (
 	"bytes"
+	"os"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -16,6 +17,9 @@ import (
 var modulePath = "./example_vm.so"
 
 func TestLoad(t *testing.T) {
+	if _, err := os.Open(modulePath); os.IsNotExist(err) {
+		t.Skipf("skipping evmc test: file %s does not exist", modulePath)
+	}
 	i, err := Load(modulePath)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -30,6 +34,9 @@ func TestLoad(t *testing.T) {
 }
 
 func TestLoadConfigure(t *testing.T) {
+	if _, err := os.Open(modulePath); os.IsNotExist(err) {
+		t.Skipf("skipping evmc test: file %s does not exist", modulePath)
+	}
 	i, err := LoadAndConfigure(modulePath)
 	if err != nil {
 		t.Fatal(err.Error())
@@ -44,6 +51,9 @@ func TestLoadConfigure(t *testing.T) {
 }
 
 func TestExecute(t *testing.T) {
+	if _, err := os.Open(modulePath); os.IsNotExist(err) {
+		t.Skipf("skipping evmc test: file %s does not exist", modulePath)
+	}
 	vm, _ := Load(modulePath)
 	defer vm.Destroy()
 

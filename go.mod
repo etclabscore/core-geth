@@ -27,7 +27,7 @@ require (
 	github.com/go-stack/stack v1.8.0
 	github.com/go-test/deep v1.0.5
 	github.com/golang/protobuf v1.3.2
-	github.com/golang/snappy v0.0.2-0.20190904063534-ff6b7dc882cf
+	github.com/golang/snappy v0.0.2-0.20200707131729-196ae77b8a26
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/gorilla/websocket v1.4.2
 	github.com/graph-gophers/graphql-go v0.0.0-20191115155744-f33e81362277

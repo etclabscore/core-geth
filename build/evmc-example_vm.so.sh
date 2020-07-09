@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 # Travis errors when trying to use the "normal" 'go generate' way of making this file.
 # I don't know why.

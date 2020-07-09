@@ -60,7 +60,7 @@ test-evmc: evmc/bindings/go/evmc/example_vm.so hera ssvm
 	go test -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so
 
 clean-evmc:
-	rm -rf ./build/_workspace/hera ./build/_workspace/SSVM
+	rm -rf evmc/bindings/go/evmc/example_vm.so ./build/_workspace/hera ./build/_workspace/SSVM
 
 test-coregeth-features: test-coregeth-features-parity test-coregeth-features-coregeth test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
 

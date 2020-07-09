@@ -23,9 +23,6 @@ geth:
 all:
 	$(GORUN) build/ci.go install
 
-evmc:
-	./build/evmc-example_vm.so.sh
-
 android:
 	$(GORUN) build/ci.go aar --local
 	@echo "Done building."
@@ -36,7 +33,7 @@ ios:
 	@echo "Done building."
 	@echo "Import \"$(GOBIN)/Geth.framework\" to use the library."
 
-test: evmc
+test:
 	$(GORUN) build/ci.go test
 
 sync-parity-chainspecs:
@@ -48,13 +45,17 @@ test-coregeth: \
  test-coregeth-chainspecs \
  test-coregeth-consensus ## Runs all tests specific to core-geth.
 
+evmc/bindings/go/evmc/example_vm.so:
+	./build/evmc-example_vm.so.sh
+
 hera:
 	./build/hera.sh
 
 ssvm:
 	./build/ssvm.sh
 
-test-evmc: hera ssvm
+test-evmc: evmc/bindings/go/evmc/example_vm.so hera ssvm
+	go test -count 1 ./evmc/...
 	go test -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/hera/build/src/libhera.so
 	go test -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so
 

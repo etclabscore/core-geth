@@ -563,8 +563,8 @@ func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, s
 
 // Close terminates the chain freezer, unmapping all the data files.
 func (f *freezerRemoteS3) Close() error {
-	f.quit <- struct{}{}
 	// I don't see any Close, Stop, or Quit methods for the AWS service.
+	f.quit <- struct{}{}
 	return nil
 }
 

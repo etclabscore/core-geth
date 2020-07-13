@@ -52,7 +52,6 @@ func (server *AncientServer) Stop() {
 
 func (server *AncientServer) Start() {
 	server.start()
-
 }
 
 func MakeServerConfig(c *cli.Context) AncientServerConfig {
@@ -92,48 +91,50 @@ func checkImplementsRemoteFreezerAPI(rpcAPIs []rpc.API) {
 	utils.Fatalf("Missing Ancient Store compliant API, please register a FreezerRemoteAPI service")
 }
 
+func newHTTPServer(cfg AncientServerConfig, srv *rpc.Server) AncientServer {
+	var (
+		httpServer *http.Server
+		addr       net.Addr
+		err        error
+		extapiURL  string
+	)
+	httpConfig := cfg.httpConfig
+	start := func() {
+		log.Info("Starting HTTP based Freezer service")
+		handler := node.NewHTTPHandlerStack(srv, httpConfig.cors, httpConfig.vhosts)
+		httpServer, addr, err = node.StartHTTPEndpoint(httpConfig.httpEndpoint, rpc.DefaultHTTPTimeouts, handler)
+		if err != nil {
+			utils.Fatalf("Could not start RPC api: %v", err)
+		}
+		extapiURL = fmt.Sprintf("http://%v/", addr)
+		log.Info("HTTP endpoint opened", "url", extapiURL)
+	}
+
+	stop := func() {
+		// Don't bother imposing a timeout here.
+		log.Info("Stopping HTTP based freezer service", "url", extapiURL)
+		httpServer.Shutdown(context.Background())
+		log.Info("HTTP endpoint closed", "url", extapiURL)
+	}
+
+	return AncientServer{cfg: &cfg, start: start, stop: stop}
+}
+
 // NewServer constructs an AncientServer from the AncientServerConfig
 func NewServer(cfg AncientServerConfig, rpcAPI []rpc.API, whitelist []string) AncientServer {
-	var (
-		stop  func()
-		start func()
-	)
+
+	srv := rpc.NewServer()
+	checkImplementsRemoteFreezerAPI(rpcAPI)
+	err := node.RegisterApisFromWhitelist(rpcAPI, whitelist, srv, false)
+	if err != nil {
+		utils.Fatalf("Could not register API: %w", err)
+	}
 
 	httpConfig := cfg.httpConfig
 	if httpConfig.httpEndpoint != "" {
-		var (
-			httpServer *http.Server
-			addr       net.Addr
-			err        error
-			extapiURL  string
-		)
-		srv := rpc.NewServer()
-		checkImplementsRemoteFreezerAPI(rpcAPI)
-		err = node.RegisterApisFromWhitelist(rpcAPI, whitelist, srv, false)
-		if err != nil {
-			utils.Fatalf("Could not register API: %w", err)
-		}
-
-		start = func() {
-			log.Info("Starting HTTP based Freezer service")
-			handler := node.NewHTTPHandlerStack(srv, httpConfig.cors, httpConfig.vhosts)
-			httpServer, addr, err = node.StartHTTPEndpoint(httpConfig.httpEndpoint, rpc.DefaultHTTPTimeouts, handler)
-			if err != nil {
-				utils.Fatalf("Could not start RPC api: %v", err)
-			}
-			extapiURL = fmt.Sprintf("http://%v/", addr)
-			log.Info("HTTP endpoint opened", "url", extapiURL)
-		}
-
-		stop = func() {
-			// Don't bother imposing a timeout here.
-			log.Info("Stopping HTTP based freezer service", "url", extapiURL)
-			httpServer.Shutdown(context.Background())
-			log.Info("HTTP endpoint closed", "url", extapiURL)
-		}
+		return newHTTPServer(cfg, srv)
 
 	}
-
-	return AncientServer{cfg: &cfg, stop: stop, start: start}
-
+	utils.Fatalf("Did not understand issue")
+	return AncientServer{}
 }

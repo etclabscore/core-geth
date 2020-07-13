@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/cmd/utils"
@@ -91,7 +93,7 @@ func checkImplementsRemoteFreezerAPI(rpcAPIs []rpc.API) {
 	utils.Fatalf("Missing Ancient Store compliant API, please register a FreezerRemoteAPI service")
 }
 
-func newHTTPServer(cfg AncientServerConfig, srv *rpc.Server) AncientServer {
+func newHTTPServer(cfg AncientServerConfig, rpcAPI []rpc.API, whitelist []string) AncientServer {
 	var (
 		httpServer *http.Server
 		addr       net.Addr
@@ -99,6 +101,11 @@ func newHTTPServer(cfg AncientServerConfig, srv *rpc.Server) AncientServer {
 		extapiURL  string
 	)
 	httpConfig := cfg.httpConfig
+	srv := rpc.NewServer()
+	err = node.RegisterApisFromWhitelist(rpcAPI, whitelist, srv, false)
+	if err != nil {
+		utils.Fatalf("Could not register API: %w", err)
+	}
 	start := func() {
 		log.Info("Starting HTTP based Freezer service")
 		handler := node.NewHTTPHandlerStack(srv, httpConfig.cors, httpConfig.vhosts)
@@ -120,21 +127,46 @@ func newHTTPServer(cfg AncientServerConfig, srv *rpc.Server) AncientServer {
 	return AncientServer{cfg: &cfg, start: start, stop: stop}
 }
 
+// ipcEndpoint resolves an IPC endpoint based on a configured value
+func ipcEndpoint(ipcPath string) string {
+	// On windows we can only use plain top-level pipes
+	if runtime.GOOS == "windows" {
+		if strings.HasPrefix(ipcPath, `\\.\pipe\`) {
+			return ipcPath
+		}
+		return `\\.\pipe\` + ipcPath
+	}
+	return ipcPath
+}
+
+func newIPCServer(cfg *AncientServerConfig, rpcAPI []rpc.API) AncientServer {
+	ipcPath := cfg.ipcPath
+	ipcapiURL := ipcEndpoint(ipcPath)
+	var (
+		listener net.Listener
+		err      error
+	)
+	start := func() {
+		listener, _, err = rpc.StartIPCEndpoint(ipcapiURL, rpcAPI)
+		if err != nil {
+			utils.Fatalf("Could not start IPC api: %v", err)
+		}
+		log.Info("IPC endpoint opened", "url", ipcapiURL)
+	}
+	stop := func() {
+		listener.Close()
+		log.Info("IPC endpoint closed", "url", ipcapiURL)
+	}
+	return AncientServer{cfg: cfg, start: start, stop: stop}
+}
+
 // NewServer constructs an AncientServer from the AncientServerConfig
 func NewServer(cfg AncientServerConfig, rpcAPI []rpc.API, whitelist []string) AncientServer {
 
-	srv := rpc.NewServer()
 	checkImplementsRemoteFreezerAPI(rpcAPI)
-	err := node.RegisterApisFromWhitelist(rpcAPI, whitelist, srv, false)
-	if err != nil {
-		utils.Fatalf("Could not register API: %w", err)
-	}
 
-	httpConfig := cfg.httpConfig
-	if httpConfig.httpEndpoint != "" {
-		return newHTTPServer(cfg, srv)
-
+	if cfg.httpConfig.httpEndpoint != "" {
+		return newHTTPServer(cfg, rpcAPI, whitelist)
 	}
-	utils.Fatalf("Did not understand issue")
-	return AncientServer{}
+	return newIPCServer(&cfg, rpcAPI)
 }

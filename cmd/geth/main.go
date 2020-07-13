@@ -68,6 +68,7 @@ var (
 		utils.DataDirFlag,
 		utils.AncientFlag,
 		utils.AncientRemoteFlag,
+		utils.AncientRemoteIPCFlag,
 		utils.KeyStoreDirFlag,
 		utils.ExternalSignerFlag,
 		utils.NoUSBFlag,

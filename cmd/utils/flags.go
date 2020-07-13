@@ -156,9 +156,9 @@ var (
 		Usage: "Use a remote freezer (options = uri or file path). localhost Incomptabile with --datadir.ancient",
 		Value: "",
 	}
-	AncientRemoteIPCFlag = cli.BoolFlag{
-		Name:  "datadir.ancient.remote.ipc",
-		Usage: "Use a remote freezer (options = [http]). Incomptabile with --datadir.ancient. Use with remote",
+	AncientRemoteIPCFlag = cli.StringFlag{
+		Name:  "datadir.ancient.remote.ipcpath",
+		Usage: "Use a remote freezer with ipc. Incomptabile with --datadir.ancient --datadir.ancient.remote as well . Use only datadir.ancient.remote.ipcpath",
 	}
 	KeyStoreDirFlag = DirectoryFlag{
 		Name:  "keystore",
@@ -1601,7 +1601,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// since light client relies on the server for transaction status query.
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, TxLookupLimitFlag)
 
-	CheckExclusive(ctx, AncientFlag, AncientRemoteFlag)
+	CheckExclusive(ctx, AncientFlag, AncientRemoteFlag, AncientRemoteIPCFlag)
 
 	var ks *keystore.KeyStore
 	if keystores := stack.AccountManager().Backends(keystore.KeyStoreType); len(keystores) > 0 {
@@ -1624,16 +1624,17 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	cfg.DatabaseHandles = makeDatabaseHandles()
 	if ctx.GlobalIsSet(AncientFlag.Name) {
 		cfg.DatabaseFreezer = ctx.GlobalString(AncientFlag.Name)
-	} else if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
-		//TOOD parse URI here?
-		var ipc bool
+	}
+	if ctx.GlobalIsSet(AncientRemoteIPCFlag.Name) {
+		ipcPath := ctx.GlobalString(AncientRemoteIPCFlag.Name)
+		cfg.DatabaseFreezerRemoteIPC = true
+		cfg.DatabaseFreezerRemote = ipcPath
+	}
+	if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
 		remote := ctx.GlobalString(AncientRemoteFlag.Name)
-		if ipc := ctx.GlobalIsSet(AncientRemoteIPCFlag.Name); ipc == false {
-			if _, err := url.Parse(remote); err != nil {
-				Fatalf("-- %s Ancient remote flag must be in valid url format %s", remote, err.Error())
-			}
+		if _, err := url.Parse(remote); err != nil {
+			Fatalf("-- %s Ancient remote flag must be in valid url format %s", remote, err.Error())
 		}
-		cfg.DatabaseFreezerRemoteIPC = ipc
 		cfg.DatabaseFreezerRemote = remote
 	}
 
@@ -1916,7 +1917,10 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 		name = "lightchaindata"
 	}
 	if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
-		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientRemoteFlag.Name), ctx.GlobalBool((AncientRemoteIPCFlag.Name)))
+		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientRemoteFlag.Name), false)
+	} else if ctx.GlobalIsSet(AncientRemoteIPCFlag.Name) {
+		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientRemoteIPCFlag.Name), true)
+
 	} else {
 		chainDb, err = stack.OpenDatabaseWithFreezer(name, cache, handles, ctx.GlobalString(AncientFlag.Name), "")
 	}

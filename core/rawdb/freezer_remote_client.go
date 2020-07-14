@@ -16,7 +16,6 @@ type ExternalRemoteFreezer struct {
 
 // NewExternalFreezerRemote constructs a rpc client to connect to a remote freezer
 func NewExternalFreezerRemote(endpoint string, ipc bool) (*ExternalRemoteFreezer, error) {
-	// TODO add support for IPC explicitly
 	client, err := rpc.Dial(endpoint)
 	if err != nil {
 		return nil, err

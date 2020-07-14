@@ -23,31 +23,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 )
 
-var (
-// errUnknownTable is returned if the user attempts to read from a table that is
-// not tracked by the freezer.
-//errUnknownTable = errors.New("unknown table")
-
-// errOutOrderInsertion is returned if the user attempts to inject out-of-order
-// binary blobs into the freezer.
-//errOutOrderInsertion = errors.New("the append operation is out-order")
-
-// errSymlinkDatadir is returned if the ancient directory specified by user
-// is a symbolic link.
-//	errSymlinkDatadir = errors.New("symbolic link datadir is not supported")
-)
-
-const (
-// freezerRecheckInterval is the frequency to check the key-value database for
-// chain progression that might permit new blocks to be frozen into immutable
-// storage.
-//	freezerRecheckInterval = time.Minute
-
-// freezerBatchLimit is the maximum number of blocks to freeze in one batch
-// before doing an fsync and deleting it from the key-value store.
-//freezerBatchLimit = 30000
-)
-
 // FreezerRemote is an memory mapped append-only database to store immutable chain data
 // into flat files:
 //
@@ -101,8 +76,6 @@ func newFreezerRemoteClient(freezerStr string, ipc bool) (*FreezerRemote, error)
 // append-only flat file containers.
 func newFreezerRemote(freezerStr string, ipc bool) (*FreezerRemote, error) {
 
-	// Create the initial freezer object
-	// TODO
 	var (
 		err error
 	)
@@ -120,21 +93,6 @@ func newFreezerRemote(freezerStr string, ipc bool) (*FreezerRemote, error) {
 		return freezer, err
 	}
 	return freezer, nil
-	/*
-		switch freezerStr {
-		case "client":
-		/*case "s3":
-		freezer.service, err = newFreezerRemoteS3(namespace, readMeter, writeMeter, sizeGauge)
-		if err != nil {
-			return nil, err
-		}
-
-		_, err := freezer.service.Ancients()
-		if err != nil {
-			return freezer, err
-		}
-	*/
-
 }
 
 // Close terminates the chain freezer, unmapping all the data files.

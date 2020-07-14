@@ -288,7 +288,7 @@ func (f *freezer) freeze(db ethdb.KeyValueStore) {
 			continue
 
 		case *number < vars.FullImmutabilityThreshold:
-			log.Debug("Current full block not old enough", "number", *number, "hash", hash, "delay", vars.ImmutabilityThreshold)
+			log.Debug("Current full block not old enough", "number", *number, "hash", hash, "delay", vars.FullImmutabilityThreshold)
 			backoff = true
 			continue
 

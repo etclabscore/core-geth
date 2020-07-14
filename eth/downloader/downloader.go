@@ -56,9 +56,9 @@ var (
 	qosConfidenceCap = 10   // Number of peers above which not to modify RTT confidence
 	qosTuningImpact  = 0.25 // Impact that a new tuning target has on the previous value
 
-	maxQueuedHeaders            = 32 * 1024                         // [eth/62] Maximum number of headers to queue for import (DOS protection)
-	maxHeadersProcess           = 2048                              // Number of header download results to import at once into the chain
-	maxResultsProcess           = 2048                              // Number of content download results to import at once into the chain
+	maxQueuedHeaders            = 32 * 1024                       // [eth/62] Maximum number of headers to queue for import (DOS protection)
+	maxHeadersProcess           = 2048                            // Number of header download results to import at once into the chain
+	maxResultsProcess           = 2048                            // Number of content download results to import at once into the chain
 	fullMaxForkAncestry  uint64 = vars.FullImmutabilityThreshold  // Maximum chain reorganisation (locally redeclared so tests can reduce it)
 	lightMaxForkAncestry uint64 = vars.LightImmutabilityThreshold // Maximum chain reorganisation (locally redeclared so tests can reduce it)
 

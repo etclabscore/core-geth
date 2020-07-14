@@ -14,34 +14,41 @@ import (
 )
 
 var (
+	// LogLevelFlag sets log level for server
 	LogLevelFlag = cli.IntFlag{
 		Name:  "loglevel",
 		Value: 4,
 		Usage: "log level to emit to the screen",
 	}
+	// RPCPortFlag sets port for http operation
 	RPCPortFlag = cli.IntFlag{
 		Name:  "rpcport",
 		Usage: "HTTP-RPC server listening port",
 		Value: 9797,
 	}
+	// IPCPathFlag sets ipc path for an ipc rpc server
 	IPCPathFlag = utils.DirectoryFlag{
 		Name:  "ipcpath",
 		Usage: "Filename for IPC socket/pipe within the datadir (explicit paths escape it)",
 	}
+	// HTTPEnabledFlag sets http enabled for rpc server
 	HTTPEnabledFlag = cli.BoolFlag{
 		Name:  "http",
 		Usage: "Enable the HTTP-RPC server",
 	}
+	// HTTPListenAddrFlag sets address http address to listen on
 	HTTPListenAddrFlag = cli.StringFlag{
 		Name:  "http.addr",
 		Usage: "HTTP-RPC server listening interface",
 		Value: "localhost",
 	}
+	// HTTPCORSDomainFlag sets corsdomain to accept if needed
 	HTTPCORSDomainFlag = cli.StringFlag{
 		Name:  "http.corsdomain",
 		Usage: "Comma separated list of domains from which to accept cross origin requests (browser enforced)",
 		Value: "",
 	}
+	// HTTPVirtualHostsFlag sets virtual hosts to accept if needed
 	HTTPVirtualHostsFlag = cli.StringFlag{
 		Name:  "http.vhosts",
 		Usage: "Comma separated list of virtual hostnames from which to accept requests (server enforced). Accepts '*' wildcard.",

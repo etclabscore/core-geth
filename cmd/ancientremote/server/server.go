@@ -25,6 +25,7 @@ var DefaultHTTPTimeouts = rpc.HTTPTimeouts{
 	IdleTimeout:  120 * time.Second,
 }
 
+// AncientHTTPServerConfig defines parameters and config options for HTTPRPCServer
 type AncientHTTPServerConfig struct {
 	vhosts       []string
 	cors         []string
@@ -32,16 +33,19 @@ type AncientHTTPServerConfig struct {
 	httpTimeout  rpc.HTTPTimeouts
 }
 
+// AncientServerConfig defines parameters and config options for AncientServer
 type AncientServerConfig struct {
 	ipcPath    string
 	httpConfig *AncientHTTPServerConfig
 }
 
+// AncientService is an interface to define what an AncientServer should publicly expose
 type AncientService interface {
 	Start()
 	Stop()
 }
 
+// AncientServer contains stop and start function for the server as well as reference to server config
 type AncientServer struct {
 	cfg   *AncientServerConfig
 	stop  func()
@@ -74,8 +78,8 @@ func MakeServerConfig(c *cli.Context) AncientServerConfig {
 	}
 	// TODO add check for ipcPath nil
 	return AncientServerConfig{
-		ipcPath,
-		&AncientHTTPServerConfig{
+		ipcPath: ipcPath,
+		httpConfig: &AncientHTTPServerConfig{
 			vhosts,
 			cors,
 			httpEndpoint,
@@ -160,7 +164,7 @@ func newIPCServer(cfg *AncientServerConfig, rpcAPI []rpc.API) AncientServer {
 	return AncientServer{cfg: cfg, start: start, stop: stop}
 }
 
-// NewServer constructs an AncientServer from the AncientServerConfig
+// NewServer constructs an AncientServer from the AncientServerConfig given rpcAPIs and whitelist
 func NewServer(cfg AncientServerConfig, rpcAPI []rpc.API, whitelist []string) AncientServer {
 
 	checkImplementsRemoteFreezerAPI(rpcAPI)

@@ -15,6 +15,7 @@ import (
 )
 
 var (
+	// NamespaceFlag sets namespace for S3 bucket
 	NamespaceFlag = cli.StringFlag{
 		Name:  "namespace",
 		Usage: "Namespace for remote storage, eg. S3 bucket name. Use will vary by remote provider.",
@@ -56,7 +57,7 @@ func createS3FreezerService(namespace string) (*rawdb.FreezerRemoteAPI, chan str
 	return api, service.quit
 }
 
-func CheckNamespaceArg(c *cli.Context) (namespace string) {
+func checkNamespaceArg(c *cli.Context) (namespace string) {
 	namespace = c.GlobalString(NamespaceFlag.Name)
 	if namespace == "" {
 		utils.Fatalf("Missing namespace please specify a namespace, with --namespace")
@@ -67,7 +68,7 @@ func CheckNamespaceArg(c *cli.Context) (namespace string) {
 func remoteAncientStore(c *cli.Context) error {
 
 	cfg := server.MakeServerConfig(c)
-	namespace := CheckNamespaceArg(c)
+	namespace := checkNamespaceArg(c)
 	api, quit := createS3FreezerService(namespace)
 	rpcAPI := []rpc.API{
 		{

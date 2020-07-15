@@ -17,7 +17,6 @@
 package rawdb
 
 import (
-	"log"
 	"sync"
 
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -58,14 +57,6 @@ func newFreezerRemoteService(service ethdb.AncientStore) (*FreezerRemote, error)
 	}
 	return freezer, nil
 
-}
-
-func newFreezerRemoteClient(freezerStr string, ipc bool) (*FreezerRemote, error) {
-	service, err := NewFreezerRemoteClient(freezerStr, ipc)
-	if err != nil {
-		log.Fatalf("unsupported remote service provider: %s", freezerStr)
-	}
-	return newFreezerRemoteService(service)
 }
 
 // Close terminates the chain freezer, unmapping all the data files.

@@ -1,24 +1,10 @@
 package rawdb
 
 import (
-	"context"
-
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
 )
-
-type ExternalFreezerRemoteAPI interface {
-	HasAncient(ctx context.Context, kind string, number uint64) (bool, error)
-	Ancient(ctx context.Context, kind string, number uint64) (string, error)
-	Ancients(ctx context.Context) (uint64, error)
-	AncientSize(ctx context.Context, kind string) (uint64, error)
-
-	AppendAncient(ctx context.Context, number uint64, hash, header, body, receipt, td string) error
-	TruncateAncients(ctx context.Context, n uint64) error
-	Sync(ctx context.Context) error
-	repair() error
-}
 
 // FreezerRemoteAPI exposes a JSONRPC related API
 type FreezerRemoteAPI struct {

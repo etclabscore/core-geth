@@ -13,8 +13,8 @@ type ExternalRemoteFreezer struct {
 	status   string
 }
 
-// NewFreezerRemoteClient constructs a rpc client to connect to a remote freezer
-func NewFreezerRemoteClient(endpoint string, ipc bool) (*ExternalRemoteFreezer, error) {
+// newFreezerRemoteClient constructs a rpc client to connect to a remote freezer
+func newFreezerRemoteClient(endpoint string, ipc bool) (*ExternalRemoteFreezer, error) {
 	client, err := rpc.Dial(endpoint)
 	if err != nil {
 		return nil, err

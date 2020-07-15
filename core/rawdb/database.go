@@ -109,7 +109,7 @@ func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerStr string, ipc
 	// Create the idle freezer instance
 	log.Info("New remote freezer", "freezer", freezerStr)
 
-	frdb, err := NewFreezerRemoteClient(freezerStr, ipc)
+	frdb, err := newFreezerRemoteClient(freezerStr, ipc)
 	if err != nil {
 		log.Error("NewDatabaseWithFreezerRemote error", "error", err)
 		return nil, err

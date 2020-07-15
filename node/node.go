@@ -654,7 +654,7 @@ func (n *Node) OpenDatabaseWithFreezerRemote(name string, cache, handles int, fr
 		return rawdb.NewMemoryDatabase(), nil
 	}
 	root := n.config.ResolvePath(name)
-	if ipc == true {
+	if ipc {
 		switch {
 		case freezer == "":
 			freezer = filepath.Join(root, "ancient.ipc")

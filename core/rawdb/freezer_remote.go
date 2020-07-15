@@ -46,10 +46,6 @@ type FreezerRemote struct {
 	quit chan struct{}
 }
 
-func newFreezerRemoteServer(service ethdb.AncientStore) (*FreezerRemote, error) {
-	return newFreezerRemoteService(service)
-}
-
 func newFreezerRemoteService(service ethdb.AncientStore) (*FreezerRemote, error) {
 	var err error
 	freezer := &FreezerRemote{

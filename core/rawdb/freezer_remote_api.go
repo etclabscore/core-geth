@@ -14,7 +14,7 @@ type FreezerRemoteAPI struct {
 // NewFreezerRemoteAPI exposes an endpoint to create a remote service
 func NewFreezerRemoteAPI(service ethdb.AncientStore) (*FreezerRemoteAPI, error) {
 	log.Info("constructing new freezer")
-	f, err := newFreezerRemoteServer(service)
+	f, err := newFreezerRemoteService(service)
 	if err != nil {
 		return nil, err
 	}

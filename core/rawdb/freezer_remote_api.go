@@ -25,10 +25,6 @@ func NewFreezerRemoteAPI(service ethdb.AncientStore) (*FreezerRemoteAPI, error) 
 	return &freezerAPI, nil
 }
 
-func (freezerRemoteAPI *FreezerRemoteAPI) pingVersion() string {
-	return "version 1"
-}
-
 // Close terminates the chain freezer.
 func (freezerRemoteAPI *FreezerRemoteAPI) Close() error {
 	return freezerRemoteAPI.freezer.Close()

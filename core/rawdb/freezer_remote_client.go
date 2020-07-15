@@ -10,7 +10,6 @@ import (
 // ExternalRemoteFreezer is rpc client functionality for a freezer
 type ExternalRemoteFreezer struct {
 	client   *rpc.Client
-	endpoint string
 	status   string
 }
 
@@ -23,7 +22,6 @@ func NewExternalFreezerRemote(endpoint string, ipc bool) (*ExternalRemoteFreezer
 
 	extfreezer := &ExternalRemoteFreezer{
 		client:   client,
-		endpoint: endpoint,
 	}
 
 	// Check if reachable

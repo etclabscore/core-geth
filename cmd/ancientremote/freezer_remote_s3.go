@@ -337,7 +337,7 @@ func (f *freezerRemoteS3) hashObjectKeyForN(n uint64) string {
 
 // TODO: this is superfluous now; bucket names must be user-configured
 func (f *freezerRemoteS3) bucketName() string {
-	return fmt.Sprintf("%s", f.namespace)
+	return f.namespace
 }
 
 func (f *freezerRemoteS3) initializeBucket() error {

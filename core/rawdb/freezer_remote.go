@@ -61,7 +61,7 @@ func newFreezerRemoteService(service ethdb.AncientStore) (*FreezerRemote, error)
 }
 
 func newFreezerRemoteClient(freezerStr string, ipc bool) (*FreezerRemote, error) {
-	service, err := NewExternalFreezerRemote(freezerStr, ipc)
+	service, err := NewFreezerRemoteClient(freezerStr, ipc)
 	if err != nil {
 		log.Fatalf("unsupported remote service provider: %s", freezerStr)
 	}

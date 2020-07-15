@@ -29,7 +29,7 @@ func (freezerRemoteAPI *FreezerRemoteAPI) pingVersion() string {
 	return "version 1"
 }
 
-// Close terminates the chain freezer, unmapping all the data files.
+// Close terminates the chain freezer.
 func (freezerRemoteAPI *FreezerRemoteAPI) Close() error {
 	return freezerRemoteAPI.freezer.Close()
 }
@@ -40,7 +40,7 @@ func (freezerRemoteAPI *FreezerRemoteAPI) HasAncient(kind string, number uint64)
 	return freezerRemoteAPI.freezer.HasAncient(kind, number)
 }
 
-// Ancient retrieves an ancient binary blob from the append-only immutable files.
+// Ancient retrieves an ancient block value as a string.
 func (freezerRemoteAPI *FreezerRemoteAPI) Ancient(kind string, number uint64) (string, error) {
 	ancient, err := freezerRemoteAPI.freezer.Ancient(kind, number)
 	if err != nil {
@@ -67,14 +67,6 @@ func (freezerRemoteAPI *FreezerRemoteAPI) AncientSize(kind string) (uint64, erro
 	return size, err
 }
 
-// AppendAncient injects all binary blobs belong to block at the end of the
-// append-only immutable table files.
-//
-// Notably, this function is lock free but kind of thread-safe. All out-of-order
-// injection will be rejected. But if two injections with same number happen at
-// the same time, we can get into the trouble.
-//
-// Note that the frozen marker is updated outside of the service calls.
 func (freezerRemoteAPI *FreezerRemoteAPI) AppendAncient(number uint64, hash, header, body, receipts, td string) (err error) {
 	var bHash, bHeader, bBody, bReceipts, bTd []byte
 	bHash, err = hexutil.Decode(hash)
@@ -102,7 +94,7 @@ func (freezerRemoteAPI *FreezerRemoteAPI) TruncateAncients(items uint64) error {
 	return freezerRemoteAPI.freezer.TruncateAncients(items)
 }
 
-// sync flushes all data tables to disk.
+// sync flushes data, either writing mem to disk, or sending remote requests.
 func (freezerRemoteAPI *FreezerRemoteAPI) Sync() error {
 	return freezerRemoteAPI.freezer.Sync()
 }

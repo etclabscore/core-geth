@@ -50,6 +50,9 @@ func createS3FreezerService(namespace string) (*rawdb.FreezerRemoteAPI, chan str
 	)
 
 	service, err = newFreezerRemoteS3(namespace, readMeter, writeMeter, sizeGauge)
+	if err != nil {
+		utils.Fatalf("Could not initialize S3 service: %w", err)
+	}
 	api, err = rawdb.NewFreezerRemoteAPI(service)
 	if err != nil {
 		utils.Fatalf("Could not start freezer: %w", err)

@@ -68,29 +68,6 @@ func newFreezerRemoteClient(freezerStr string, ipc bool) (*FreezerRemote, error)
 	return newFreezerRemoteService(service)
 }
 
-// newFreezer creates a chain freezer that moves ancient chain data into
-// append-only flat file containers.
-func newFreezerRemote(freezerStr string, ipc bool) (*FreezerRemote, error) {
-
-	var (
-		err error
-	)
-
-	// Open all the supported data tables
-	freezer := &FreezerRemote{
-		quit: make(chan struct{}),
-	}
-	freezer.service, err = NewExternalFreezerRemote(freezerStr, ipc)
-	if err != nil {
-		log.Fatalf("unsupported remote service provider: %s", freezerStr)
-	}
-	_, err = freezer.service.Ancients()
-	if err != nil {
-		return freezer, err
-	}
-	return freezer, nil
-}
-
 // Close terminates the chain freezer, unmapping all the data files.
 func (f *FreezerRemote) Close() error {
 	return f.service.Close()

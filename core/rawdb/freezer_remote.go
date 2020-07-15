@@ -115,22 +115,3 @@ func (f *FreezerRemote) TruncateAncients(items uint64) error {
 func (f *FreezerRemote) Sync() error {
 	return f.service.Sync()
 }
-
-// repair truncates all data tables to the same length.
-func (f *FreezerRemote) repair() error {
-	/*min := uint64(math.MaxUint64)
-	for _, table := range f.tables {
-		items := atomic.LoadUint64(&table.items)
-		if min > items {
-			min = items
-		}
-	}
-	for _, table := range f.tables {
-		if err := table.truncate(min); err != nil {
-			return err
-		}
-	}
-	atomic.StoreUint64(&f.frozen, min)
-	*/
-	return nil
-}

@@ -7,7 +7,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/cmd/ancientremote/server"
 	"github.com/ethereum/go-ethereum/cmd/utils"
-	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -39,9 +38,8 @@ func init() {
 	app.Action = remoteAncientStore
 }
 
-func createS3FreezerService(namespace string) (*rawdb.FreezerRemoteAPI, chan struct{}) {
+func createS3FreezerService(namespace string) (*freezerRemoteS3, chan struct{}) {
 	var (
-		api        *rawdb.FreezerRemoteAPI
 		service    *freezerRemoteS3
 		err        error
 		readMeter  = metrics.NewRegisteredMeter("ancient.remote /read", nil)
@@ -53,11 +51,7 @@ func createS3FreezerService(namespace string) (*rawdb.FreezerRemoteAPI, chan str
 	if err != nil {
 		utils.Fatalf("Could not initialize S3 service: %w", err)
 	}
-	api, err = rawdb.NewFreezerRemoteAPI(service)
-	if err != nil {
-		utils.Fatalf("Could not start freezer: %w", err)
-	}
-	return api, service.quit
+	return service, service.quit
 }
 
 func checkNamespaceArg(c *cli.Context) (namespace string) {

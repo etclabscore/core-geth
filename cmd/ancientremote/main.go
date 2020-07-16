@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"os/signal"
 
@@ -64,19 +65,43 @@ func checkNamespaceArg(c *cli.Context) (namespace string) {
 
 func remoteAncientStore(c *cli.Context) error {
 
-	cfg := server.MakeServerConfig(c)
 	namespace := checkNamespaceArg(c)
 	api, quit := createS3FreezerService(namespace)
-	rpcAPI := []rpc.API{
+
+	var (
+		rpcServer *rpc.Server
+		listener  net.Listener
+		err       error
+	)
+	rpcAPIs := []rpc.API{
 		{
 			Namespace: "freezer",
 			Public:    true,
 			Service:   api,
-			Version:   "1.0"},
+			Version:   "1.0",
+		},
 	}
 
-	srv := server.NewServer(cfg, rpcAPI, []string{"freezer"})
-	srv.Start()
+	if c.GlobalIsSet(server.IPCPathFlag.Name) {
+		listener, rpcServer, err = rpc.StartIPCEndpoint(c.GlobalString(server.IPCPathFlag.Name), rpcAPIs)
+	} else {
+		rpcServer = rpc.NewServer()
+		err = rpcServer.RegisterName("freezer", api)
+		if err != nil {
+			return err
+		}
+		endpoint := fmt.Sprintf("%s:%d", c.GlobalString(utils.HTTPListenAddrFlag.Name), c.Int(server.RPCPortFlag.Name))
+		listener, err = net.Listen("tcp", endpoint)
+		if err != nil {
+			return err
+		}
+	}
+
+	go func() {
+		if err := rpcServer.ServeListener(listener); err != nil {
+			log.Crit("exiting", "error", err)
+		}
+	}()
 
 	abortChan := make(chan os.Signal, 1)
 	signal.Notify(abortChan, os.Interrupt)
@@ -86,10 +111,10 @@ func remoteAncientStore(c *cli.Context) error {
 		select {
 		case sig := <-abortChan:
 			log.Info("Exiting...", "signal", sig)
-			srv.Stop()
+			rpcServer.Stop()
 		case <-quit:
 			log.Info("S3 connection closing")
-			srv.Stop()
+			rpcServer.Stop()
 		}
 	}()
 	return nil

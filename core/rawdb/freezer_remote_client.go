@@ -107,22 +107,3 @@ func (api *FreezerRemoteClient) Sync() error {
 	var res string
 	return api.client.Call(&res, "freezer_sync")
 }
-
-// repair truncates all data tables to the same length.
-func (api *FreezerRemoteClient) repair() error {
-	/*min := uint64(math.MaxUint64)
-	for _, table := range f.tables {
-		items := atomic.LoadUint64(&table.items)
-		if min > items {
-			min = items
-		}
-	}
-	for _, table := range f.tables {
-		if err := table.truncate(min); err != nil {
-			return err
-		}
-	}
-	atomic.StoreUint64(&f.frozen, min)
-	*/
-	return nil
-}

@@ -7,7 +7,10 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
-// FreezerRemoteClient is rpc client functionality for a freezer
+// FreezerRemoteClient is an RPC client implementing the interface of ethdb.AncientStore.
+// Rather than implementing storage business logic, the struct's methods delegate
+// the business logic to an external server that is responsible for managing the actual
+// ancient store logic.
 type FreezerRemoteClient struct {
 	client *rpc.Client
 	status string
@@ -41,9 +44,7 @@ func (api *FreezerRemoteClient) pingVersion() (string, error) {
 
 // Close terminates the chain freezer, unmapping all the data files.
 func (api *FreezerRemoteClient) Close() error {
-	var res string
-	err := api.client.Call(&res, "freezer_close")
-	return err
+	return api.client.Call(nil, "freezer_close")
 }
 
 // HasAncient returns an indicator whether the specified ancient data exists
@@ -56,25 +57,25 @@ func (api *FreezerRemoteClient) HasAncient(kind string, number uint64) (bool, er
 
 // Ancient retrieves an ancient binary blob from the append-only immutable files.
 func (api *FreezerRemoteClient) Ancient(kind string, number uint64) ([]byte, error) {
-	var res string
+	var res hexutil.Bytes
 	if err := api.client.Call(&res, "freezer_ancient", kind, number); err != nil {
 		return nil, err
 	}
-	return hexutil.Decode(res)
+	return res, nil
 }
 
 // Ancients returns the length of the frozen items.
 func (api *FreezerRemoteClient) Ancients() (uint64, error) {
-	var res uint64
+	var res hexutil.Uint64
 	err := api.client.Call(&res, "freezer_ancients")
-	return res, err
+	return res.Big().Uint64(), err
 }
 
 // AncientSize returns the ancient size of the specified category.
 func (api *FreezerRemoteClient) AncientSize(kind string) (uint64, error) {
-	var res uint64
+	var res hexutil.Uint64
 	err := api.client.Call(&res, "freezer_ancientSize", kind)
-	return res, err
+	return res.Big().Uint64(), err
 }
 
 // AppendAncient injects all binary blobs belong to block at the end of the
@@ -86,24 +87,21 @@ func (api *FreezerRemoteClient) AncientSize(kind string) (uint64, error) {
 //
 // Note that the frozen marker is updated outside of the service calls.
 func (api *FreezerRemoteClient) AppendAncient(number uint64, hash, header, body, receipts, td []byte) (err error) {
-	var res string
 	hexHash := hexutil.Encode(hash)
 	hexHeader := hexutil.Encode(header)
 	hexBody := hexutil.Encode(body)
 	hexReceipts := hexutil.Encode(receipts)
 	hexTd := hexutil.Encode(td)
-	err = api.client.Call(&res, "freezer_appendAncient", number, hexHash, hexHeader, hexBody, hexReceipts, hexTd)
+	err = api.client.Call(nil, "freezer_appendAncient", number, hexHash, hexHeader, hexBody, hexReceipts, hexTd)
 	return
 }
 
 // TruncateAncients discards any recent data above the provided threshold number.
 func (api *FreezerRemoteClient) TruncateAncients(items uint64) error {
-	var res string
-	return api.client.Call(&res, "freezer_truncateAncients", items)
+	return api.client.Call(nil, "freezer_truncateAncients", items)
 }
 
 // Sync flushes all data tables to disk.
 func (api *FreezerRemoteClient) Sync() error {
-	var res string
-	return api.client.Call(&res, "freezer_sync")
+	return api.client.Call(nil, "freezer_sync")
 }

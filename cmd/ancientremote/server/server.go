@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/cmd/utils"
-	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -88,15 +87,6 @@ func MakeServerConfig(c *cli.Context) AncientServerConfig {
 	}
 }
 
-func checkImplementsRemoteFreezerAPI(rpcAPIs []rpc.API) {
-	for _, api := range rpcAPIs {
-		if _, ok := api.Service.(*rawdb.FreezerRemoteAPI); ok {
-			return
-		}
-	}
-	utils.Fatalf("Missing Ancient Store compliant API, please register a FreezerRemoteAPI service")
-}
-
 func newHTTPServer(cfg AncientServerConfig, rpcAPI []rpc.API, whitelist []string) AncientServer {
 	var (
 		httpServer *http.Server
@@ -166,8 +156,6 @@ func newIPCServer(cfg *AncientServerConfig, rpcAPI []rpc.API) AncientServer {
 
 // NewServer constructs an AncientServer from the AncientServerConfig given rpcAPIs and whitelist
 func NewServer(cfg AncientServerConfig, rpcAPI []rpc.API, whitelist []string) AncientServer {
-
-	checkImplementsRemoteFreezerAPI(rpcAPI)
 
 	if cfg.httpConfig.httpEndpoint != "" {
 		return newHTTPServer(cfg, rpcAPI, whitelist)

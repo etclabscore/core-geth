@@ -57,25 +57,25 @@ func (api *FreezerRemoteClient) HasAncient(kind string, number uint64) (bool, er
 
 // Ancient retrieves an ancient binary blob from the append-only immutable files.
 func (api *FreezerRemoteClient) Ancient(kind string, number uint64) ([]byte, error) {
-	var res hexutil.Bytes
+	var res string
 	if err := api.client.Call(&res, "freezer_ancient", kind, number); err != nil {
 		return nil, err
 	}
-	return res, nil
+	return hexutil.Decode(res)
 }
 
 // Ancients returns the length of the frozen items.
 func (api *FreezerRemoteClient) Ancients() (uint64, error) {
-	var res hexutil.Uint64
+	var res uint64
 	err := api.client.Call(&res, "freezer_ancients")
-	return res.Big().Uint64(), err
+	return res, err
 }
 
 // AncientSize returns the ancient size of the specified category.
 func (api *FreezerRemoteClient) AncientSize(kind string) (uint64, error) {
-	var res hexutil.Uint64
+	var res uint64
 	err := api.client.Call(&res, "freezer_ancientSize", kind)
-	return res.Big().Uint64(), err
+	return res, err
 }
 
 // AppendAncient injects all binary blobs belong to block at the end of the

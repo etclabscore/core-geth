@@ -309,9 +309,6 @@ func checkMainnet(ctx *cli.Context) bool {
 	case ctx.GlobalIsSet(utils.DeveloperFlag.Name):
 		log.Info("Starting Geth in ephemeral dev mode...")
 
-	case ctx.GlobalIsSet(utils.ClassicFlag.Name):
-		log.Info("Starting Geth on Ethereum Classic...")
-
 	case ctx.GlobalIsSet(utils.MordorFlag.Name):
 		log.Info("Starting Geth on Mordor testnet...")
 
@@ -321,14 +318,21 @@ func checkMainnet(ctx *cli.Context) bool {
 	case ctx.GlobalIsSet(utils.YoloV1Flag.Name):
 		log.Info("Starting Geth on YoloV1 testnet...")
 
+	case ctx.GlobalIsSet(utils.ClassicFlag.Name):
+		log.Info("Starting Geth on Ethereum Classic...")
+		isMainnet = true
+
 	case ctx.GlobalIsSet(utils.SocialFlag.Name):
 		log.Info("Starting Geth on Social network...")
+		isMainnet = true
 
 	case ctx.GlobalIsSet(utils.EthersocialFlag.Name):
 		log.Info("Starting Geth on EtherSocial network...")
+		isMainnet = true
 
 	case ctx.GlobalIsSet(utils.MixFlag.Name):
 		log.Info("Starting Geth on Mix network...")
+		isMainnet = true
 
 	case !ctx.GlobalIsSet(utils.NetworkIdFlag.Name):
 		log.Info("Starting Geth on Ethereum mainnet...")

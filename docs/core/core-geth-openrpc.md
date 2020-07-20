@@ -1,16 +1,99 @@
 # Core-geth and Open-RPC
 
 Since ~~September 2019~~ Core-geth has implemented support for the Open-RPC service description endpoint
-`rpc_discover`. Querying this endpoint returns the user a service definition document defined and
-intended to be standardized at github.com/etclabscore/ethereum-json-rpc-specification.
+`rpc_discover`. Querying this endpoint returns the user a service definition document detailed at github.com/etclabscore/ethereum-json-rpc-specification.
 
-The definition there hopes to establish and codify the common ground between existing Ethereum Protocol provider
+This specification hopes to establish and codify the common ground between existing Ethereum Protocol provider
 implemenations (eg. ethereum/go-ethereum, etclabscore/core-geth, openethereum/openethereum), and in doing so,
 build a target specification for new providers to match when building their JSON-RPC APIs.
 
 The document details about 45 methods and their associated paramaters and results, defined as JSON Schemas.
 
-With a little weekend-hacking, it's very possible to build some super-convenient tools like the one I use below, `ethrpc`:
+Let's try it out:
+
+First, we'll start an ephemeral `geth` instance with `--http` JSON-RPC enabled. Then we'll `curl` the `rpc_discover` method and take a look at the response.
+
+```sh
+> ./build/bin/geth --dev --http console 2>/dev/null
+```
+
+```sh
+> curl -X POST -H 'Content-Type: application/json' --data '{"jsonrpc": "2.0","method":"rpc_discover","params":[],"id":71}' http://localhost:8545 > openrpc.json
+```
+
+```sh
+> cat openrpc.json | jq -r '.result' | head -20
+{
+  "openrpc": "1.0.0",
+  "info": {
+    "description": "This API lets you interact with an EVM-based client via JSON-RPC",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "title": "Ethereum JSON-RPC",
+    "version": "1.0.10"
+  },
+  "servers": [],
+  "methods": [
+    {
+      "description": "Returns the version of the current client",
+      "name": "web3_clientVersion",
+      "params": [],
+      "result": {
+        "description": "client version",
+        "name": "clientVersion",
+```
+
+```sh
+> cat openrpc.json | jq '.result.methods[].name'
+"web3_clientVersion"
+"web3_sha3"
+"net_listening"
+"net_peerCount"
+"net_version"
+"eth_blockNumber"
+"eth_call"
+"eth_chainId"
+"eth_coinbase"
+"eth_estimateGas"
+"eth_gasPrice"
+"eth_getBalance"
+"eth_getBlockByHash"
+"eth_getBlockByNumber"
+"eth_getBlockTransactionCountByHash"
+"eth_getBlockTransactionCountByNumber"
+"eth_getCode"
+"eth_getFilterChanges"
+"eth_getFilterLogs"
+"eth_getRawTransactionByHash"
+"eth_getRawTransactionByBlockHashAndIndex"
+"eth_getRawTransactionByBlockNumberAndIndex"
+"eth_getLogs"
+"eth_getStorageAt"
+"eth_getTransactionByBlockHashAndIndex"
+"eth_getTransactionByBlockNumberAndIndex"
+"eth_getTransactionByHash"
+"eth_getTransactionCount"
+"eth_getTransactionReceipt"
+"eth_getUncleByBlockHashAndIndex"
+"eth_getUncleByBlockNumberAndIndex"
+"eth_getUncleCountByBlockHash"
+"eth_getUncleCountByBlockNumber"
+"eth_getProof"
+"eth_hashrate"
+"eth_mining"
+"eth_newBlockFilter"
+"eth_newFilter"
+"eth_newPendingTransactionFilter"
+"eth_pendingTransactions"
+"eth_protocolVersion"
+"eth_sendRawTransaction"
+"eth_syncing"
+"eth_uninstallFilter"
+```
+
+With this information and a little weekend hacking, it's possible to build some convenient tools like the one I made and use below, `ethrpc`:
 
 ```
 > ethrpc | head -20
@@ -38,7 +121,7 @@ Usage:
   [...]
 ```
 
-It's not that fancy, but was a good exercise in working with the API definition document, and saves me a few quote-laden `curl`s. It has auto-complete and parameter validation, both of which I get essentially for free via, again, the Open-RPC API definition.
+It's not very fancy, but was a good exercise in working with the API definition document, and saves me a few quote-laden `curl`s. It has auto-complete and parameter validation, both of which I get essentially for free via, again, the Open-RPC API definition.
 
 
 ---
@@ -49,6 +132,5 @@ As it's currently implemented, core-geth provides the Open-RPC API definition by
 
 But serving a static document as a definition of an API has limits and risks, too. The document is static; if your API is able to toggle endpoint available (as core-geth can with `--http.api`), then it's possible for the document to include endpoints which are not actually available; likewise, core-geth has about 100 total methods, with only a little less than half of them documented in the service description (eg. `debug_` and `admin_` -prefixed endpoints, since these are not specificed to be standard across Ethereum Protocol Provider JSON-RPC APIs). Another potential limitation/risk is correctness; since the document had to have-been hand-rolled, there's a possibility of non-systemic bugs in the definition. Tools like validators and control-test suites can serve to minimize their probability, but as with anything human-determined, we shouldn't be 100% confident of correctness. Finally, although we don't often expect APIs to change once established (as core-geth's is), it does sometimes happen, and when it does, both the code and the corresponding documentation must be modified cooperatively since they're essentially independent mechanisms.
 
-In service of addressing these limits core-geth intends to supersede the static-document paradigm with a dynamically generated service description provided by the API itself via both build and runtime introspection. 
-
+In service of addressing these limits core-geth intends to supersede the static-document paradigm with a dynamically generated service description provided by the API itself via both build and runtime introspection.
 

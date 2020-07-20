@@ -1,17 +1,17 @@
 # Core-geth and Open-RPC
 
-Since ~~September 2019~~ Core-geth has implemented support for the Open-RPC service description endpoint
-`rpc_discover`. Querying this endpoint returns the user a service definition document detailed at github.com/etclabscore/ethereum-json-rpc-specification.
+Since January 2020 Core-geth has included support for the [Open-RPC](https://spec.open-rpc.org/) service description endpoint
+`rpc_discover`. Querying this endpoint returns the user a service definition document detailed at [etclabscore/ethereum-json-rpc-specification](https://github.com/etclabscore/ethereum-json-rpc-specification).
 
-This specification hopes to establish and codify the common ground between existing Ethereum Protocol provider
-implemenations (eg. ethereum/go-ethereum, etclabscore/core-geth, openethereum/openethereum), and in doing so,
-build a target specification for new providers to match when building their JSON-RPC APIs.
+This specification hopes to establish and codify the common ground between Ethereum Protocol provider
+implementations (eg. ethereum/go-ethereum, etclabscore/core-geth, openethereum/openethereum), and in doing so,
+establish a target specification for new providers to match when crafting compliant JSON-RPC APIs.
 
-The document details about 45 methods and their associated paramaters and results, defined as JSON Schemas.
+The document details 44 methods and their associated paramaters and results, defined as JSON Schemas. I find this document best viewed at the Open-RPC Playground, [here](https://playground.open-rpc.org/?schemaUrl=https://raw.githubusercontent.com/etclabscore/ethereum-json-rpc-specification/master/openrpc.json&uiSchema%5BappBar%5D%5Bui:input%5D=false). 
 
-Let's try it out:
+Let's take core-geth and open-rpc for a spin.
 
-First, we'll start an ephemeral `geth` instance with `--http` JSON-RPC enabled. Then we'll `curl` the `rpc_discover` method and take a look at the response.
+First, we'll start an ephemeral core-geth `geth` instance with `--http` JSON-RPC enabled. Then we'll `curl` the `rpc_discover` method and take a look at the response.
 
 ```sh
 > ./build/bin/geth --dev --http console 2>/dev/null
@@ -130,7 +130,12 @@ It's not very fancy, but was a good exercise in working with the API definition 
 
 As it's currently implemented, core-geth provides the Open-RPC API definition by handing the consumer a static document. This is the simplest possible way to get the document from source to query, and -- given an existing and adhered-to specification for this document (mentioned above) -- it works.
 
-But serving a static document as a definition of an API has limits and risks, too. The document is static; if your API is able to toggle endpoint available (as core-geth can with `--http.api`), then it's possible for the document to include endpoints which are not actually available; likewise, core-geth has about 100 total methods, with only a little less than half of them documented in the service description (eg. `debug_` and `admin_` -prefixed endpoints, since these are not specificed to be standard across Ethereum Protocol Provider JSON-RPC APIs). Another potential limitation/risk is correctness; since the document had to have-been hand-rolled, there's a possibility of non-systemic bugs in the definition. Tools like validators and control-test suites can serve to minimize their probability, but as with anything human-determined, we shouldn't be 100% confident of correctness. Finally, although we don't often expect APIs to change once established (as core-geth's is), it does sometimes happen, and when it does, both the code and the corresponding documentation must be modified cooperatively since they're essentially independent mechanisms.
+But serving a static document as a definition of an API has limits and risks, too. 
+- The document is static; if your API is able to toggle endpoint available (as core-geth can with `--http.api`), then it's possible for the document to include endpoints which are not actually available; likewise, core-geth has about 100 total methods, with only a little less than half of them documented in the service description (eg. `debug_` and `admin_` -prefixed endpoints, since these are not specificed to be standard across Ethereum Protocol Provider JSON-RPC APIs). 
+- Another potential limitation/risk is correctness; since the document had to have-been hand-rolled, there's a possibility of non-systemic bugs in the definition. Tools like validators and control-test suites can serve to minimize their probability, but as with anything human-determined, we shouldn't be 100% confident of correctness. 
+- Finally, although we don't expect APIs to change (often, or at all) once established, it does sometimes happen, and when it does, both the code and the corresponding documentation must be modified cooperatively since they're essentially independent mechanisms.
 
 In service of addressing these limits core-geth intends to supersede the static-document paradigm with a dynamically generated service description provided by the API itself via both build and runtime introspection.
+
+Work on this project at core-geth can be tracked at [this PR](https://github.com/etclabscore/core-geth/pull/137), which makes use of a new library [etclabscore/go-openrpc-reflect](https://github.com/etclabscore/go-openrpc-reflect).
 

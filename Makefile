@@ -33,7 +33,7 @@ ios:
 	@echo "Done building."
 	@echo "Import \"$(GOBIN)/Geth.framework\" to use the library."
 
-test:
+test: all
 	$(GORUN) build/ci.go test
 
 sync-parity-chainspecs:

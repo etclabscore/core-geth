@@ -102,7 +102,6 @@ const traceErrorLimit = 400000
 func withTrace(t *testing.T, gasLimit uint64, test func(vm.Config) error) {
 	// Use config from command line arguments.
 	config := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
-
 	err := test(config)
 	if err == nil {
 		return
@@ -110,24 +109,19 @@ func withTrace(t *testing.T, gasLimit uint64, test func(vm.Config) error) {
 
 	// Test failed, re-run with tracing enabled.
 	t.Error(err)
-
 	if gasLimit > traceErrorLimit {
 		t.Log("gas limit too high for EVM trace")
 		return
 	}
-
 	buf := new(bytes.Buffer)
 	w := bufio.NewWriter(buf)
 	tracer := vm.NewJSONLogger(&vm.LogConfig{DisableMemory: true}, w)
 	config.Debug, config.Tracer = true, tracer
-
 	err2 := test(config)
 	if !reflect.DeepEqual(err, err2) {
 		t.Errorf("different error for second run: %v", err2)
 	}
-
 	w.Flush()
-
 	if buf.Len() == 0 {
 		t.Log("no EVM operation logs generated")
 	} else {

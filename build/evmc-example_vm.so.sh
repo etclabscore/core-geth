@@ -1,11 +1,11 @@
-#!/usr/bin/env sh
+#!/bin/sh
 
 # Travis errors when trying to use the "normal" 'go generate' way of making this file.
 # I don't know why.
 
 set -x
 
-if [[ $CI == true ]] && [[ $TRAVIS == true ]]; then
+if [ "$CI" = "true" ] && [ "$TRAVIS" = "true" ]; then
 	echo "In Travis CI. Building SO with an adhoc Makefile."
 	# Use a temporary adhoc Makefile located in a child-dir of the evmc submodule to build the required example_vm.so file.
 	# Once finished, remove the adhoc Makefile.

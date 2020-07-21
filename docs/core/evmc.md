@@ -10,7 +10,7 @@ Options include EWASM and EVM shared object libraries, as follows:
 - `--vm.ewasm=<path/to/interpreter.so`
 - `--vm.evm=<path/to/interpreter.so`
 
-Only EVMC version __6__ is supported, which is compatible with the latest versions of Hera EWASM v0.2.5 and SSVM EWASM 0.5.0.
+Only EVMC __Version 6__ is supported, which is compatible with the versions of Hera EWASM <=v0.2.5 and SSVM EWASM >=0.5.0.
 
 This implementation may be tested by following the command defined in the Makefile as `evmc-test`, which
 tests the implementation against both of these mentioned EWASM libraries against the `/tests/` StateTest suite.
@@ -52,7 +52,7 @@ func getRevision(env *EVM) evmc.Revision {
 }
 ```
 
-As you can see, individual features -- like EIP1884 -- are translated as proxy signifiers for entire fork configurations
+As you can see, individual features, like EIP1884, are translated as proxy signifiers for entire fork configurations
 (in this case, an Istanbul-featured VM revision).
 This approach, rather than requiring a complete set of the compositional features for any of these given Ethereum forks,
 trades a descriptive 1:1 mapping for application flexibility. Pursuing a necessarily complete feature-set -> fork

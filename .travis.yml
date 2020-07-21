@@ -25,25 +25,6 @@ jobs:
     script:
     - make test-coregeth
 
-  # Run core-geth EVMC6 tests.
-  - stage: build
-    name: "Go1.14.x: make test-evmc (v6)"
-    os: linux
-    dist: xenial
-    go: 1.14.x
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++
-    env:
-      - CC=gcc
-      - CXX=g++
-    script:
-      - make all
-      - travis_wait 60 make test-evmc
-
   # Run build and tests against latest-1 Go version.
   - stage: build
     name: "Go1.13.x: make test"

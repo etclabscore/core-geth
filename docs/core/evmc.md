@@ -15,6 +15,8 @@ Only EVMC __Version 6__ is supported, which is compatible with the versions of H
 This implementation may be tested by following the command defined in the Makefile as `evmc-test`, which
 tests the implementation against both of these mentioned EWASM libraries against the `/tests/` StateTest suite.
 
+These tests run exclusively via Github Actions, configured at `.github/workflows/evmc.yml`.
+
 While core-geth supports highly granular EIP/ECIP/xIP chain feature configuration (ie fork feature configs),
 EVMC does not. EVMC only supports the Fork configurations supported by ethereum/go-ethereum (eg. Byzantium, Constantinople, &c). 
 Thus, the implementation at core-geth of EVMC requires a somewhat arbitrary mapping of granular features as keys toggling

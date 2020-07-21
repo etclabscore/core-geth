@@ -22,6 +22,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/ethereum/go-ethereum/evmc/bindings/go/evmc"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -128,29 +130,25 @@ type EVM struct {
 // only ever be used *once*.
 func NewEVM(ctx Context, statedb StateDB, chainConfig ctypes.ChainConfigurator, vmConfig Config) *EVM {
 	evm := &EVM{
-		Context:      ctx,
-		StateDB:      statedb,
-		vmConfig:     vmConfig,
-		chainConfig:  chainConfig,
-		interpreters: make([]Interpreter, 0, 1),
+		Context:     ctx,
+		StateDB:     statedb,
+		vmConfig:    vmConfig,
+		chainConfig: chainConfig,
+		// The list of interpreters, space reserved for both EVM and EWASM ones.
+		interpreters: make([]Interpreter, 0, 2),
 	}
 
-	//if chainConfig.IsEnabled(chainConfig.Getevm.BlockNumber) {
-	//	// to be implemented by EVM-C and Wagon PRs.
-	//	// if vmConfig.EWASMInterpreter != "" {
-	//	//  extIntOpts := strings.Split(vmConfig.EWASMInterpreter, ":")
-	//	//  path := extIntOpts[0]
-	//	//  options := []string{}
-	//	//  if len(extIntOpts) > 1 {
-	//	//    options = extIntOpts[1..]
-	//	//  }
-	//	//  evm.interpreters = append(evm.interpreters, NewEVMVCInterpreter(evm, vmConfig, options))
-	//	// } else {
-	//	// 	evm.interpreters = append(evm.interpreters, NewEWASMInterpreter(evm, vmConfig))
-	//	// }
-	//	panic("No supported ewasm interpreter yet.")
-	//}
+	// In some implementations, EWASM may be configured with a block number.
+	// In this implementation, the interpreter is configured globally instead.
+	if vmConfig.EWASMInterpreter != "" {
+		evm.interpreters = append(evm.interpreters, &EVMC{ewasmModule, evm, evmc.CapabilityEWASM, false})
+	}
 
+	if vmConfig.EVMInterpreter != "" {
+		evm.interpreters = append(evm.interpreters, &EVMC{evmModule, evm, evmc.CapabilityEVM1, false})
+	} else {
+		evm.interpreters = append(evm.interpreters, NewEVMInterpreter(evm, vmConfig))
+	}
 	// vmConfig.EVMInterpreter will be used by EVM-C, it won't be checked here
 	// as we always want to have the built-in EVM as the failover option.
 	evm.interpreters = append(evm.interpreters, NewEVMInterpreter(evm, vmConfig))

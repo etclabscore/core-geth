@@ -46,6 +46,23 @@ func TestState(t *testing.T) {
 	// Uses 1GB RAM per tested fork
 	st.skipLoad(`^stStaticCall/static_Call1MB`)
 
+	if *testEWASM == "" {
+		st.skipLoad(`^stEWASM`)
+	}
+	if *testEVM != "" {
+
+		// These fail because these forks were not supported at this version of the EVMOne .so.
+		// The EVMOne version (0.2.0) is the latest EVMC v6 compatible version.
+		st.skipFork("Constantinople") // Only support
+		st.skipFork("Istanbul")
+		st.skipFork("ETC_Phoenix")
+
+		// These tests are noted as SLOW above, and they fail against the EVMOne.so
+		// So (get it?), skip 'em.
+		st.skipLoad(`^stQuadraticComplexityTest/`)
+		st.skipLoad(`^stStaticCall/static_Call50000`)
+	}
+
 	// Broken tests:
 	// Expected failures:
 	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/0`, "bug in test")
@@ -61,7 +78,7 @@ func TestState(t *testing.T) {
 		legacyStateTestDir,
 	} {
 		st.walk(t, dir, func(t *testing.T, name string, test *StateTest) {
-			for _, subtest := range test.Subtests() {
+			for _, subtest := range test.Subtests(st.skipforkpat) {
 				subtest := subtest
 				key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
 				name := name + "/" + key
@@ -69,6 +86,9 @@ func TestState(t *testing.T) {
 				t.Run(key+"/trie", func(t *testing.T) {
 					withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
 						_, _, err := test.Run(subtest, vmconfig, false)
+						if err != nil && *testEWASM != "" {
+							err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
+						}
 						return st.checkFailure(t, name+"/trie", err)
 					})
 				})
@@ -77,6 +97,9 @@ func TestState(t *testing.T) {
 						snaps, statedb, err := test.Run(subtest, vmconfig, true)
 						if _, err := snaps.Journal(statedb.IntermediateRoot(false)); err != nil {
 							return err
+						}
+						if err != nil && *testEWASM != "" {
+							err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
 						}
 						return st.checkFailure(t, name+"/snap", err)
 					})

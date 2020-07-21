@@ -2,7 +2,9 @@
 # with Go source code. If you know what GOPATH is then you probably
 # don't need to bother with make.
 
-.PHONY: geth android ios geth-cross evm all test clean
+.PHONY: all test clean
+.PHONY: evmc
+.PHONY: geth android ios geth-cross
 .PHONY: geth-linux geth-linux-386 geth-linux-amd64 geth-linux-mips64 geth-linux-mips64le
 .PHONY: geth-linux-arm geth-linux-arm-5 geth-linux-arm-6 geth-linux-arm-7 geth-linux-arm64
 .PHONY: geth-darwin geth-darwin-386 geth-darwin-amd64
@@ -11,6 +13,7 @@
 GOBIN = ./build/bin
 GO ?= latest
 GORUN = env GO111MODULE=on go run
+ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 geth:
 	$(GORUN) build/ci.go install ./cmd/geth
@@ -41,6 +44,27 @@ test-coregeth: \
  test-coregeth-features \
  test-coregeth-chainspecs \
  test-coregeth-consensus ## Runs all tests specific to core-geth.
+
+evmc/bindings/go/evmc/example_vm.so:
+	./build/evmc-example_vm.so.sh
+
+hera:
+	./build/hera.sh
+
+ssvm:
+	./build/ssvm.sh
+
+evmone:
+	./build/evmone.sh
+
+test-evmc: evmc/bindings/go/evmc/example_vm.so hera ssvm evmone
+	go test -count 1 ./evmc/...
+	go test -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/hera/build/src/libhera.so
+	go test -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so
+	go test -count 1 ./tests -run TestState -evmc.evm=$(ROOT_DIR)/build/_workspace/evmone/lib/libevmone.so
+
+clean-evmc:
+	rm -rf evmc/bindings/go/evmc/example_vm.so ./build/_workspace/hera ./build/_workspace/SSVM ./build/_workspace/evmone
 
 test-coregeth-features: test-coregeth-features-parity test-coregeth-features-coregeth test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
 
@@ -89,7 +113,7 @@ tests-generate-difficulty: ## Generate difficulty tests.
 lint: ## Run linters.
 	$(GORUN) build/ci.go lint
 
-clean:
+clean: clean-evmc
 	env GO111MODULE=on go clean -cache
 	rm -fr build/_workspace/pkg/ $(GOBIN)/*
 

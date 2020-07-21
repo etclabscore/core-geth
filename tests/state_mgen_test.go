@@ -91,7 +91,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 
 	// For tests using a config that does not have an associated chainspec file,
 	// then generate that file.
-	for _, subtest := range test.Subtests() {
+	for _, subtest := range test.Subtests(nil) {
 		subtest := subtest
 		if _, ok := MapForkNameChainspecFileState[subtest.Fork]; !ok {
 			genesis := test.genesis(Forks[subtest.Fork])
@@ -114,7 +114,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		}
 	}
 
-	for _, subtest := range test.Subtests() {
+	for _, subtest := range test.Subtests(nil) {
 		subtest := subtest
 
 		// Only proceed with test forks which are destined for writing.

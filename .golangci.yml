@@ -9,6 +9,7 @@ run:
   skip-files:
     - core/genesis_alloc.go
     - params/alloc.go
+    - evmc/*
 
 linters:
   disable-all: true

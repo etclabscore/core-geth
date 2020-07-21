@@ -49,6 +49,18 @@ func TestState(t *testing.T) {
 	if *testEWASM == "" {
 		st.skipLoad(`^stEWASM`)
 	}
+	if *testEVM != "" {
+		// These fail because these forks were not supported at this version of the EVMOne .so.
+		// The EVMOne version (0.2.0) is the latest EVMC v6 compatible version.
+		st.skipFork("Constantinople") // Only support
+		st.skipFork("Istanbul")
+		st.skipFork("ETC_Phoenix")
+
+		// These tests are noted as SLOW above, and they fail against the EVMOne.so
+		// So (get it?), skip 'em.
+		st.skipLoad(`^stQuadraticComplexityTest/`)
+		st.skipLoad(`^stStaticCall/static_Call50000`)
+	}
 
 	// Broken tests:
 	// Expected failures:
@@ -69,6 +81,11 @@ func TestState(t *testing.T) {
 				subtest := subtest
 				key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
 				name := name + "/" + key
+
+				if st.findSkipFork(subtest.Fork) {
+					t.Skipf("skipping by skipFork: test=%s fork=%s", name, subtest.Fork)
+					continue
+				}
 
 				t.Run(key+"/trie", func(t *testing.T) {
 					withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {

@@ -120,6 +120,7 @@ type testMatcher struct {
 	failpat      []testFailure
 	skiploadpat  []*regexp.Regexp
 	slowpat      []*regexp.Regexp
+	skipforkpat  []*regexp.Regexp
 	whitelistpat *regexp.Regexp
 }
 
@@ -141,6 +142,11 @@ func (tm *testMatcher) slow(pattern string) {
 // skipLoad skips JSON loading of tests matching the pattern.
 func (tm *testMatcher) skipLoad(pattern string) {
 	tm.skiploadpat = append(tm.skiploadpat, regexp.MustCompile(pattern))
+}
+
+// skipFork skips subtests with fork configs matching the pattern.
+func (tm *testMatcher) skipFork(pattern string) {
+	tm.skipforkpat = append(tm.skipforkpat, regexp.MustCompile(pattern))
 }
 
 // fails adds an expected failure for tests matching the pattern.
@@ -179,6 +185,15 @@ func (tm *testMatcher) findSkip(name string) (reason string, skipload bool) {
 		}
 	}
 	return "", false
+}
+
+func (tm *testMatcher) findSkipFork(name string) (skipFork bool) {
+	for _, re := range tm.skipforkpat {
+		if re.MatchString(name) {
+			return  true
+		}
+	}
+	return  false
 }
 
 // findConfig returns the chain config matching defined patterns.

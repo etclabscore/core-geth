@@ -103,6 +103,7 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 		HomesteadBlock:      big.NewInt(0),
 		ByzantiumBlock:      big.NewInt(0),
 		ConstantinopleBlock: big.NewInt(0),
+		IstanbulBlock:       big.NewInt(0),
 		MuirGlacierBlock:    big.NewInt(0),
 	},
 	"ETC_Phoenix": &coregeth.CoreGethChainConfig{

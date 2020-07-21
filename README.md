@@ -142,7 +142,7 @@ $ sudo apt-get install -y build-essential
 Once the dependencies have been installed, it's time to clone and build the source:
 
 ```shell
-$ git clone --recurse-submodules -j$(nproc) https://github.com/etclabscore/core-geth.git
+$ git clone https://github.com/etclabscore/core-geth.git
 $ cd core-geth
 $ make all
 $ ./build/bin/geth --help

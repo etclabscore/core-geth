@@ -50,6 +50,7 @@ func TestState(t *testing.T) {
 		st.skipLoad(`^stEWASM`)
 	}
 	if *testEVM != "" {
+
 		// These fail because these forks were not supported at this version of the EVMOne .so.
 		// The EVMOne version (0.2.0) is the latest EVMC v6 compatible version.
 		st.skipFork("Constantinople") // Only support
@@ -77,15 +78,10 @@ func TestState(t *testing.T) {
 		legacyStateTestDir,
 	} {
 		st.walk(t, dir, func(t *testing.T, name string, test *StateTest) {
-			for _, subtest := range test.Subtests() {
+			for _, subtest := range test.Subtests(st.skipforkpat) {
 				subtest := subtest
 				key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
 				name := name + "/" + key
-
-				if st.findSkipFork(subtest.Fork) {
-					t.Skipf("skipping by skipFork: test=%s fork=%s", name, subtest.Fork)
-					continue
-				}
 
 				t.Run(key+"/trie", func(t *testing.T) {
 					withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {

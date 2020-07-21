@@ -187,15 +187,6 @@ func (tm *testMatcher) findSkip(name string) (reason string, skipload bool) {
 	return "", false
 }
 
-func (tm *testMatcher) findSkipFork(name string) (skipFork bool) {
-	for _, re := range tm.skipforkpat {
-		if re.MatchString(name) {
-			return  true
-		}
-	}
-	return  false
-}
-
 // findConfig returns the chain config matching defined patterns.
 func (tm *testMatcher) findConfig(name string) (ctypes.ChainConfigurator, string) {
 	// TODO(fjl): name can be derived from testing.T when min Go version is 1.8

@@ -105,7 +105,7 @@ func stateTestCmd(ctx *cli.Context) error {
 	}
 	results := make([]StatetestResult, 0, len(tests))
 	for key, test := range tests {
-		for _, st := range test.Subtests() {
+		for _, st := range test.Subtests(nil) {
 			// Run the test and aggregate the result
 			result := &StatetestResult{Name: key, Fork: st.Fork, Pass: true}
 			_, state, err := test.Run(st, cfg, false)

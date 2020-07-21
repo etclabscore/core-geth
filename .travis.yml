@@ -18,6 +18,7 @@ jobs:
 
   # Run core-geth -specific tests, proving regression-safety and config interoperability.
   - stage: build
+    name: "Test Core-Geth features"
     os: linux
     dist: xenial
     go: 1.14.x
@@ -28,6 +29,7 @@ jobs:
 
   # Run core-geth EVMC6 tests.
   - stage: build
+    name: "Test EVMCv6"
     os: linux
     dist: xenial
     go: 1.14.x
@@ -46,6 +48,7 @@ jobs:
 
   # Run build and tests against latest-1 Go version.
   - stage: build
+    name: "Test latest-1 Go version"
     os: linux
     dist: xenial
     go: 1.13.x
@@ -57,6 +60,7 @@ jobs:
 
   # Run build and tests on ARM64 on Pull Requests.
   - stage: build
+    name: "Test ARM64"
     if: type = pull_request
     os: linux
     arch: arm64
@@ -70,6 +74,7 @@ jobs:
 
   # Run build and tests with environment-aware possible artifact deployment.
   - stage: build
+    name: "Main build, test, and deploy"
     os: linux
     dist: xenial
     go: 1.14.x
@@ -93,6 +98,7 @@ jobs:
 
   # Run build on ARM5 with environment-aware possible artifact deployment.
   - stage: build
+    name: "ARM5 build and deploy"
     os: linux
     dist: xenial
     sudo: required
@@ -127,6 +133,7 @@ jobs:
 
   #Run build on OSX with environment-aware possible artifact deployment.
   - stage: build
+    name: "OSX build and deploy"
     os: osx
     go: 1.14.x
     script:

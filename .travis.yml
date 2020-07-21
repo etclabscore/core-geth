@@ -18,18 +18,16 @@ jobs:
 
   # Run core-geth -specific tests, proving regression-safety and config interoperability.
   - stage: build
-    name: "Test Core-Geth features"
+    name: "Go1.14.x: make test-coregeth"
     os: linux
     dist: xenial
     go: 1.14.x
-    env:
-      - COREGETH
     script:
     - make test-coregeth
 
   # Run core-geth EVMC6 tests.
   - stage: build
-    name: "Test EVMCv6"
+    name: "Go1.14.x: make test-evmc (v6)"
     os: linux
     dist: xenial
     go: 1.14.x
@@ -48,7 +46,7 @@ jobs:
 
   # Run build and tests against latest-1 Go version.
   - stage: build
-    name: "Test latest-1 Go version"
+    name: "Go1.13.x: make test"
     os: linux
     dist: xenial
     go: 1.13.x
@@ -60,7 +58,7 @@ jobs:
 
   # Run build and tests on ARM64 on Pull Requests.
   - stage: build
-    name: "Test ARM64"
+    name: "ARM64/Go1.14.x: make test"
     if: type = pull_request
     os: linux
     arch: arm64
@@ -74,7 +72,7 @@ jobs:
 
   # Run build and tests with environment-aware possible artifact deployment.
   - stage: build
-    name: "Main build, test, and deploy"
+    name: "Go1.14.x: make test && deploy"
     os: linux
     dist: xenial
     go: 1.14.x
@@ -98,7 +96,7 @@ jobs:
 
   # Run build on ARM5 with environment-aware possible artifact deployment.
   - stage: build
-    name: "ARM5 build and deploy"
+    name: "ARM5/Go1.14.x: go run build/ci.go install && deploy"
     os: linux
     dist: xenial
     sudo: required
@@ -133,7 +131,7 @@ jobs:
 
   #Run build on OSX with environment-aware possible artifact deployment.
   - stage: build
-    name: "OSX build and deploy"
+    name: "OSX/Go1.14.x: make all && deploy"
     os: osx
     go: 1.14.x
     script:

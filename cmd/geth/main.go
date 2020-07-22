@@ -195,6 +195,7 @@ var (
 		utils.LegacyWSAllowedOriginsFlag,
 		utils.IPCDisabledFlag,
 		utils.IPCPathFlag,
+		utils.IPCChmodFlag,
 		utils.InsecureUnlockAllowedFlag,
 		utils.RPCGlobalGasCap,
 		utils.RPCGlobalTxFeeCap,

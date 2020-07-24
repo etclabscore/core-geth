@@ -103,11 +103,11 @@ var (
 	ExtcodeSizeGasEIP150         uint64 = 700 // Cost of EXTCODESIZE after EIP 150 (Tangerine)
 	SloadGasFrontier             uint64 = 50
 	SloadGasEIP150               uint64 = 200
-	SloadGasEIP1884              uint64 = 800  // Cost of SLOAD after EIP 1884 (part of Istanbul)
-	SloadGasEIP2200              uint64 = 800  // Cost of SLOAD after EIP 2200 (part of Istanbul)
-	ExtcodeHashGasConstantinople uint64 = 400  // Cost of EXTCODEHASH (introduced in Constantinople)
-	ExtcodeHashGasEIP1884        uint64 = 700  // Cost of EXTCODEHASH after EIP 1884 (part in Istanbul)
-	SelfdestructGasEIP150        uint64 = 5000 // Cost of SELFDESTRUCT post EIP 150 (Tangerine)
+	SloadGasEIP1884              uint64 = 800             // Cost of SLOAD after EIP 1884 (part of Istanbul)
+	SloadGasEIP2200              uint64 = SloadGasEIP1884 // Cost of SLOAD after EIP 2200 (part of Istanbul).
+	ExtcodeHashGasConstantinople uint64 = 400             // Cost of EXTCODEHASH (introduced in Constantinople)
+	ExtcodeHashGasEIP1884        uint64 = 700             // Cost of EXTCODEHASH after EIP 1884 (part in Istanbul)
+	SelfdestructGasEIP150        uint64 = 5000            // Cost of SELFDESTRUCT post EIP 150 (Tangerine)
 
 	// EXP has a dynamic portion depending on the size of the exponent
 	ExpByteFrontier uint64 = 10 // was set to 10 in Frontier

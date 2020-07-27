@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var (
@@ -48,7 +49,7 @@ func makeChain(n int, seed byte, parent *types.Block, empty bool) ([]*types.Bloc
 		// Add one tx to every secondblock
 		if !empty && i%2 == 0 {
 			signer := types.MakeSigner(params.TestChainConfig, block.Number())
-			tx, err := types.SignTx(types.NewTransaction(block.TxNonce(testAddress), common.Address{seed}, big.NewInt(1000), params.TxGas, nil, nil), signer, testKey)
+			tx, err := types.SignTx(types.NewTransaction(block.TxNonce(testAddress), common.Address{seed}, big.NewInt(1000), vars.TxGas, nil, nil), signer, testKey)
 			if err != nil {
 				panic(err)
 			}

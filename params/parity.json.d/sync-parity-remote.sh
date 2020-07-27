@@ -29,11 +29,7 @@ specs=(
 	"goerli"
 	"rinkeby"
 	"ropsten"
-
-	"classic"
-	"mordor"
-	"kotti"
-
+	
 	"mix"
 	"musicoin"
 )

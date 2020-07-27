@@ -32,9 +32,6 @@ func init() {
 		server.LogLevelFlag,
 		server.IPCPathFlag,
 		server.HTTPListenAddrFlag,
-		server.HTTPVirtualHostsFlag,
-		server.HTTPEnabledFlag,
-		server.HTTPCORSDomainFlag,
 	}
 	app.Action = remoteAncientStore
 }

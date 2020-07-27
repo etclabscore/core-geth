@@ -18,10 +18,10 @@ import (
 )
 
 var (
-	// NamespaceFlag sets namespace for S3 bucket
-	NamespaceFlag = cli.StringFlag{
-		Name:  "namespace",
-		Usage: "Namespace for remote storage, eg. S3 bucket name. Use will vary by remote provider.",
+	// BucketNameFlag sets namespace for S3 bucket
+	BucketNameFlag = cli.StringFlag{
+		Name:  "bucket",
+		Usage: "S3 bucket name",
 	}
 	app = cli.NewApp()
 )
@@ -30,14 +30,14 @@ func init() {
 	app.Name = "AncientRemote"
 	app.Usage = "Ancient Remote Storage as a service"
 	app.Flags = []cli.Flag{
-		NamespaceFlag,
+		BucketNameFlag,
 		server.RPCPortFlag,
 		server.HTTPListenAddrFlag,
 	}
 	app.Action = remoteAncientStore
 }
 
-func createS3FreezerService(namespace string) (*freezerRemoteS3, chan struct{}) {
+func createS3FreezerService(bucketName string) (*freezerRemoteS3, chan struct{}) {
 	var (
 		service    *freezerRemoteS3
 		err        error
@@ -46,16 +46,16 @@ func createS3FreezerService(namespace string) (*freezerRemoteS3, chan struct{}) 
 		sizeGauge  = metrics.NewRegisteredGauge("ancient.remote /size", nil)
 	)
 
-	service, err = newFreezerRemoteS3(namespace, readMeter, writeMeter, sizeGauge)
+	service, err = newFreezerRemoteS3(bucketName, readMeter, writeMeter, sizeGauge)
 	if err != nil {
 		utils.Fatalf("Could not initialize S3 service: %w", err)
 	}
 	return service, service.quit
 }
 
-func checkNamespaceArg(c *cli.Context) (namespace string) {
-	namespace = c.GlobalString(NamespaceFlag.Name)
-	if namespace == "" {
+func checkNamespaceArg(c *cli.Context) (bucketName string) {
+	bucketName = c.GlobalString(BucketNameFlag.Name)
+	if bucketName == "" {
 		utils.Fatalf("Missing namespace please specify a namespace, with --namespace")
 	}
 	return

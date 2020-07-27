@@ -29,8 +29,6 @@ func init() {
 	app.Flags = []cli.Flag{
 		NamespaceFlag,
 		server.RPCPortFlag,
-		server.LogLevelFlag,
-		server.IPCPathFlag,
 		server.HTTPListenAddrFlag,
 	}
 	app.Action = remoteAncientStore

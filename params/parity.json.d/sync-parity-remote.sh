@@ -23,7 +23,7 @@ specs=(
 	"test-specs/constantinople_test"
 	"test-specs/constantinople_fix_test"
 	"test-specs/istanbul_test"
-	"test-specs/eip158_to_byzantiumat5_test.json"
+	"test-specs/eip158_to_byzantiumat5_test"
 
 	"foundation"
 	"goerli"

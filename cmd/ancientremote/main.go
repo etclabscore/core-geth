@@ -78,6 +78,8 @@ func remoteAncientStore(c *cli.Context) error {
 
 	setupLogFormat(c)
 	namespace := checkNamespaceArg(c)
+	utils.CheckExclusive(c, server.IPCPathFlag, server.HTTPListenAddrFlag.Name)
+
 	api, quit := createS3FreezerService(namespace)
 
 	var (
@@ -93,8 +95,6 @@ func remoteAncientStore(c *cli.Context) error {
 			Version:   "1.0",
 		},
 	}
-
-	utils.CheckExclusive(c, server.IPCPathFlag, server.HTTPListenAddrFlag.Name)
 
 	if c.GlobalIsSet(server.IPCPathFlag.Name) {
 		listener, rpcServer, err = rpc.StartIPCEndpoint(c.GlobalString(server.IPCPathFlag.Name), rpcAPIs)

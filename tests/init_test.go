@@ -32,18 +32,31 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 // Command line flags to configure the interpreters.
 var (
-	testEVM   = flag.String("vm.evm", "", "EVM configuration")
-	testEWASM = flag.String("vm.ewasm", "", "EWASM configuration")
+	// The API of this value => filepath<str/ing>,capabilities<k=v>,...
+	testEVM   = flag.String("evmc.evm", "", "EVMC EVM1 configuration")
+	testEWASM = flag.String("evmc.ewasm", "", "EVMC EWASM configuration")
 )
 
 func TestMain(m *testing.M) {
 	flag.Parse()
+
+	if *testEVM != "" {
+		log.Printf("Running tests with %s=%s", "evmc.evm", *testEVM)
+		vm.InitEVMCEVM(*testEVM)
+	}
+
+	if *testEWASM != "" {
+		log.Printf("Running tests with %s=%s", "evmc.ewasm", *testEWASM)
+		vm.InitEVMCEwasm(*testEWASM)
+	}
+
 	os.Exit(m.Run())
 }
 
@@ -107,6 +120,7 @@ type testMatcher struct {
 	failpat      []testFailure
 	skiploadpat  []*regexp.Regexp
 	slowpat      []*regexp.Regexp
+	skipforkpat  []*regexp.Regexp
 	whitelistpat *regexp.Regexp
 }
 
@@ -128,6 +142,11 @@ func (tm *testMatcher) slow(pattern string) {
 // skipLoad skips JSON loading of tests matching the pattern.
 func (tm *testMatcher) skipLoad(pattern string) {
 	tm.skiploadpat = append(tm.skiploadpat, regexp.MustCompile(pattern))
+}
+
+// skipFork skips subtests with fork configs matching the pattern.
+func (tm *testMatcher) skipFork(pattern string) {
+	tm.skipforkpat = append(tm.skipforkpat, regexp.MustCompile(pattern))
 }
 
 // fails adds an expected failure for tests matching the pattern.

@@ -2,14 +2,14 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/parity"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -41,12 +41,17 @@ func unmarshalChainSpec(format string, data []byte) (conf ctypes.Configurator, e
 		Config ctypes.ChainConfigurator `json:"config"`
 	}
 	var d dec
-	if format == "geth" {
-		d.Config = &goethereum.ChainConfig{}
-	} else if format == "multigeth" {
-		d.Config = &coregeth.CoreGethChainConfig{}
-	} else {
-		panic("impossible")
+	configurator, ok := chainspecFormatTypes[format]
+	if !ok {
+		return nil, fmt.Errorf("unknown chainspec format type: %v", format)
+	}
+	switch t := configurator.(type) {
+	case *genesisT.Genesis:
+		d.Config = t.Config
+	case *parity.ParityChainSpec:
+		// Don't need to do anything here; the Parity type already conforms to ChainConfigurator.
+	default:
+		return nil, fmt.Errorf("unhandled chainspec type: %v %v", format, t)
 	}
 	t := chainspecFormatTypes[format].(*genesisT.Genesis)
 	err = json.Unmarshal(data, &d)

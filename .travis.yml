@@ -4,7 +4,7 @@ sudo: false
 jobs:
   include:
 
-  # Only test code linters on latest version of Go
+  # Run linter check. Only test code linters on latest version of Go.
   - stage: lint
     os: linux
     dist: xenial
@@ -14,28 +14,32 @@ jobs:
     git:
       submodules: false
     script:
-      - go run build/ci.go lint
+      - make lint
 
+  # Run core-geth -specific tests, proving regression-safety and config interoperability.
   - stage: build
+    name: "Go1.14.x: make test-coregeth"
     os: linux
     dist: xenial
     go: 1.14.x
-    env:
-      - COREGETH
     script:
     - make test-coregeth
 
+  # Run build and tests against latest-1 Go version.
   - stage: build
+    name: "Go1.13.x: make test"
     os: linux
     dist: xenial
     go: 1.13.x
     env:
       - GO111MODULE=on
     script:
-      - go run build/ci.go install
-      - travis_wait 60 go run build/ci.go test
+      - make all
+      - travis_wait 60 make test
 
+  # Run build and tests on ARM64 on Pull Requests.
   - stage: build
+    name: "ARM64/Go1.14.x: make test"
     if: type = pull_request
     os: linux
     arch: arm64
@@ -44,16 +48,18 @@ jobs:
     env:
       - GO111MODULE=on
     script:
-      - go run build/ci.go install
-      - travis_wait 60 go run build/ci.go test
+      - make all
+      - travis_wait 60 make test
 
+  # Run build and tests with environment-aware possible artifact deployment.
   - stage: build
+    name: "Go1.14.x: make test && deploy"
     os: linux
     dist: xenial
     go: 1.14.x
     script:
-    - go run build/ci.go install
-    - travis_wait 60 go run build/ci.go test
+    - make all
+    - travis_wait 60 make test
     before_deploy:
     - sh build/deploy.sh
     deploy:
@@ -69,7 +75,9 @@ jobs:
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
 
+  # Run build on ARM5 with environment-aware possible artifact deployment.
   - stage: build
+    name: "ARM5/Go1.14.x: go run build/ci.go install && deploy"
     os: linux
     dist: xenial
     sudo: required
@@ -102,7 +110,9 @@ jobs:
       skip_cleanup: true
       tag_name: "$TRAVIS_TAG"
 
+  #Run build on OSX with environment-aware possible artifact deployment.
   - stage: build
+    name: "OSX/Go1.14.x: make all && deploy"
     os: osx
     go: 1.14.x
     script:
@@ -115,7 +125,7 @@ jobs:
     - ulimit -S -n $NOFILE
     - ulimit -n
     - unset -f cd
-    - go run build/ci.go install
+    - make all
     before_deploy:
     - sh build/deploy.sh
     deploy:

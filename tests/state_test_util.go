@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -165,9 +166,15 @@ func GetChainConfig(forkString string) (baseConfig ctypes.ChainConfigurator, eip
 }
 
 // Subtests returns all valid subtests of the test.
-func (t *StateTest) Subtests() []StateSubtest {
+func (t *StateTest) Subtests(skipForks []*regexp.Regexp) []StateSubtest {
 	var sub []StateSubtest
+outer:
 	for fork, pss := range t.json.Post {
+		for _, skip := range skipForks {
+			if skip.MatchString(fork) {
+				continue outer
+			}
+		}
 		for i := range pss {
 			sub = append(sub, StateSubtest{fork, i})
 		}
@@ -210,6 +217,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	}
 	context := core.NewEVMContext(msg, block.Header(), nil, &t.json.Env.Coinbase)
 	context.GetHash = vmTestBlockHash
+
 	evm := vm.NewEVM(context, statedb, config, vmconfig)
 
 	gaspool := new(core.GasPool)

@@ -36,6 +36,12 @@ var stateTestCommand = cli.Command{
 	Name:      "statetest",
 	Usage:     "executes the given state tests",
 	ArgsUsage: "<file>",
+	Flags:     []cli.Flag{stateTestEVMCEWASMFlag},
+}
+
+var stateTestEVMCEWASMFlag = cli.StringFlag{
+	Name:  "evmc.ewasm",
+	Usage: "EVMC EWASM configuration",
 }
 
 // StatetestResult contains the execution status after running a state test, any
@@ -57,10 +63,17 @@ func stateTestCmd(ctx *cli.Context) error {
 	glogger.Verbosity(log.Lvl(ctx.GlobalInt(VerbosityFlag.Name)))
 	log.Root().SetHandler(glogger)
 
+	if s := ctx.String(stateTestEVMCEWASMFlag.Name); s != "" {
+		log.Info("Running tests with %s=%s", "evmc.ewasm", s)
+		vm.InitEVMCEwasm(s)
+	}
+
 	// Configure the EVM logger
 	config := &vm.LogConfig{
-		DisableMemory: ctx.GlobalBool(DisableMemoryFlag.Name),
-		DisableStack:  ctx.GlobalBool(DisableStackFlag.Name),
+		DisableMemory:     ctx.GlobalBool(DisableMemoryFlag.Name),
+		DisableStack:      ctx.GlobalBool(DisableStackFlag.Name),
+		DisableStorage:    ctx.GlobalBool(DisableStorageFlag.Name),
+		DisableReturnData: ctx.GlobalBool(DisableReturnDataFlag.Name),
 	}
 	var (
 		tracer   vm.Tracer
@@ -88,12 +101,13 @@ func stateTestCmd(ctx *cli.Context) error {
 	}
 	// Iterate over all the tests, run them and aggregate the results
 	cfg := vm.Config{
-		Tracer: tracer,
-		Debug:  ctx.GlobalBool(DebugFlag.Name) || ctx.GlobalBool(MachineFlag.Name),
+		Tracer:           tracer,
+		Debug:            ctx.GlobalBool(DebugFlag.Name) || ctx.GlobalBool(MachineFlag.Name),
+		EWASMInterpreter: ctx.String(stateTestEVMCEWASMFlag.Name),
 	}
 	results := make([]StatetestResult, 0, len(tests))
 	for key, test := range tests {
-		for _, st := range test.Subtests() {
+		for _, st := range test.Subtests(nil) {
 			// Run the test and aggregate the result
 			result := &StatetestResult{Name: key, Fork: st.Fork, Pass: true}
 			_, state, err := test.Run(st, cfg, false)

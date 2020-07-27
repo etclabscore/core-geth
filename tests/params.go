@@ -58,8 +58,8 @@ var MapForkNameChainspecFileState = map[string]string{
 	"EIP158":               "eip161_test.json",
 	"Byzantium":            "byzantium_test.json",
 	"Constantinople":       "constantinople_test.json",
-	"ConstantinopleFix":    "st_peters_test.json",
-	"EIP158ToByzantiumAt5": "transition_test.json",
+	"ConstantinopleFix":    "constantinople_fix_test.json",
+	"EIP158ToByzantiumAt5": "eip158_to_byzantiumat5_test.json",
 	"Istanbul":             "istanbul_test.json",
 	"ETC_Atlantis":         "classic_atlantis_test.json",
 	"ETC_Agharta":          "classic_agharta_test.json",
@@ -210,7 +210,7 @@ func init() {
 				if wde != nil {
 					panic(wde)
 				}
-				panic(fmt.Sprintf("failed to find chainspec, wd: %s", wd))
+				panic(fmt.Sprintf("failed to find chainspec, wd: %s, config: %v/file: %v", wd, k, v))
 			} else if err != nil {
 				panic(err)
 			}

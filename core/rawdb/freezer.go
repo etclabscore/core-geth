@@ -292,13 +292,13 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 			backoff = true
 			continue
 
-		case *number < vars.ImmutabilityThreshold:
-			log.Debug("Current full block not old enough", "number", *number, "hash", hash, "delay", vars.ImmutabilityThreshold)
+		case *number < vars.FullImmutabilityThreshold:
+			log.Debug("Current full block not old enough", "number", *number, "hash", hash, "delay", vars.FullImmutabilityThreshold)
 			backoff = true
 			continue
 
-		case *number-vars.ImmutabilityThreshold <= numFrozen:
-			log.Debug("Ancient blocks frozen already", "number", *number, "hash", hash, "frozen", numFrozen)
+		case *number-vars.FullImmutabilityThreshold <= f.frozen:
+			log.Debug("Ancient blocks frozen already", "number", *number, "hash", hash, "frozen", f.frozen)
 			backoff = true
 			continue
 		}
@@ -309,9 +309,9 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 			continue
 		}
 		// Seems we have data ready to be frozen, process in usable batches
-		limit := *number - vars.ImmutabilityThreshold
-		if limit-numFrozen > freezerBatchLimit {
-			limit = numFrozen + freezerBatchLimit
+		limit := *number - vars.FullImmutabilityThreshold
+		if limit-f.frozen > freezerBatchLimit {
+			limit = f.frozen + freezerBatchLimit
 		}
 		var (
 			start    = time.Now()

@@ -40,10 +40,10 @@ sync-parity-chainspecs:
 	./params/parity.json.d/sync-parity-remote.sh
 
 test-coregeth: \
- test-coregeth-regression-condensed \
  test-coregeth-features \
  test-coregeth-chainspecs \
- test-coregeth-consensus ## Runs all tests specific to core-geth.
+ test-coregeth-consensus \
+ test-coregeth-regression-condensed ## Runs all tests specific to core-geth.
 
 # Generate the necessary shared object for EVMC unit tests.
 evmc/bindings/go/evmc/example_vm.so:

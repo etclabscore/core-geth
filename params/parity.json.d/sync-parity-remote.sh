@@ -14,25 +14,21 @@ if [[ ! $(pwd) =~ go-ethereum$ ]]; then
 fi
 
 specs=(
-	"frontier_test"
-	"homestead_test"
-	"eip150_test"
-	"eip161_test"
-	"eip210_test"
-	"byzantium_test"
-	"constantinople_test"
-	"st_peters_test"
-	"istanbul_test"
-	"transition_test"
+	"test-specs/frontier_test"
+	"test-specs/homestead_test"
+	"test-specs/eip150_test"
+	"test-specs/eip161_test"
+	"test-specs/eip210_test"
+	"test-specs/byzantium_test"
+	"test-specs/constantinople_test"
+	"test-specs/constantinople_fix_test"
+	"test-specs/istanbul_test"
+	"test-specs/eip158_to_byzantiumat5_test"
 
 	"foundation"
 	"goerli"
 	"rinkeby"
 	"ropsten"
-
-	"classic"
-	"mordor"
-	"kotti"
 
 	"mix"
 	"musicoin"
@@ -40,7 +36,7 @@ specs=(
 
 for spec_name in "${specs[@]}"; do
     echo "Fetching $spec_name..."
-	curl -q https://raw.githubusercontent.com/paritytech/parity-ethereum/master/ethcore/res/ethereum/"$spec_name".json > ./params/parity.json.d/"$spec_name".json
+	curl -q https://raw.githubusercontent.com/paritytech/parity-ethereum/master/ethcore/res/ethereum/"$spec_name".json > ./params/parity.json.d/"$(basename ${spec_name})".json
 done
 
 curl -q https://api.github.com/repos/paritytech/parity-ethereum/git/refs/heads/master | jq .object.sha | sed 's/"//g' > ./params/parity.json.d/commit.txt

@@ -17,6 +17,8 @@
 package parity
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common/math"
@@ -55,5 +57,51 @@ func TestParityChainSpec_GetSetUint64(t *testing.T) {
 	spec.SetEthashHomesteadTransition(&fortyTwo)
 	if *spec.GetEthashHomesteadTransition() != fortyTwo {
 		t.Error("not right answer")
+	}
+}
+
+func TestParityChainSpec_GetEIP2537(t *testing.T) {
+	specFile := "../../parity.json.d/foundation.json"
+	b, err := ioutil.ReadFile(specFile)
+	if err != nil {
+		t.Fatalf("read file: %v", err)
+	}
+	spec := &ParityChainSpec{}
+	err = json.Unmarshal(b, spec)
+	if err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	activateNumberRaw := "0x7fffffffffffff"
+	var activateNumber = new(math.HexOrDecimal256)
+	err = activateNumber.UnmarshalText([]byte(activateNumberRaw))
+	if err != nil {
+		t.Fatalf("unmarshal text: %v", err)
+	}
+	t.Logf("activate number: %v raw=%v", activateNumber.ToInt(), activateNumberRaw)
+
+	eip2537activation := spec.GetEIP2537Transition()
+	if eip2537activation == nil {
+		t.Fatal("nil activation")
+	}
+	if *eip2537activation != activateNumber.ToInt().Uint64() {
+		t.Fatal("wrong activation")
+	}
+}
+
+func TestParityChainSpec_SetEIP2537(t *testing.T) {
+	spec := &ParityChainSpec{}
+	activateAt := uint64(42)
+	err := spec.SetEIP2537Transition(&activateAt)
+	if err != nil {
+		t.Fatalf("set: %v", err)
+	}
+	got := spec.GetEIP2537Transition()
+	if got == nil || *got != activateAt {
+		b, err := json.MarshalIndent(spec, "", "    ")
+		if err != nil {
+			t.Fatalf("marshal: %v", err)
+		}
+		t.Log(string(b))
+		t.Fatalf("empty got")
 	}
 }

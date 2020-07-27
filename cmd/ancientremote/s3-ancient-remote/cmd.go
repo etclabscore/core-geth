@@ -1,7 +1,13 @@
 package main
 
 import (
+	"io"
+	"os"
+
 	"github.com/ethereum/go-ethereum/cmd/utils"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/mattn/go-colorable"
+	"github.com/mattn/go-isatty"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -30,3 +36,24 @@ var (
 		Value: "localhost",
 	}
 )
+
+func checkNamespaceArg(c *cli.Context) (bucketName string) {
+	bucketName = c.GlobalString(BucketNameFlag.Name)
+	if bucketName == "" {
+		utils.Fatalf("Missing namespace please specify a namespace, with --namespace")
+	}
+	return
+}
+
+func setupLogFormat(c *cli.Context) error {
+	// Set up the logger to print everything
+	logOutput := os.Stdout
+	usecolor := (isatty.IsTerminal(os.Stderr.Fd()) || isatty.IsCygwinTerminal(os.Stderr.Fd())) && os.Getenv("TERM") != "dumb"
+	output := io.Writer(logOutput)
+	if usecolor {
+		output = colorable.NewColorable(logOutput)
+	}
+	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(c.Int(LogLevelFlag.Name)), log.StreamHandler(output, log.TerminalFormat(usecolor))))
+
+	return nil
+}

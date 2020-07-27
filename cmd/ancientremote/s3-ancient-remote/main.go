@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/ethereum/go-ethereum/cmd/ancientremote/server"
 	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
@@ -31,8 +30,8 @@ func init() {
 	app.Usage = "S3 Ancient Remote Storage as a service"
 	app.Flags = []cli.Flag{
 		BucketNameFlag,
-		server.RPCPortFlag,
-		server.HTTPListenAddrFlag,
+		RPCPortFlag,
+		HTTPListenAddrFlag,
 	}
 	app.Action = remoteAncientStore
 }
@@ -78,7 +77,7 @@ func remoteAncientStore(c *cli.Context) error {
 
 	setupLogFormat(c)
 	namespace := checkNamespaceArg(c)
-	utils.CheckExclusive(c, server.IPCPathFlag, server.HTTPListenAddrFlag.Name)
+	utils.CheckExclusive(c, IPCPathFlag, HTTPListenAddrFlag.Name)
 
 	api, quit := createS3FreezerService(namespace)
 
@@ -96,15 +95,15 @@ func remoteAncientStore(c *cli.Context) error {
 		},
 	}
 
-	if c.GlobalIsSet(server.IPCPathFlag.Name) {
-		listener, rpcServer, err = rpc.StartIPCEndpoint(c.GlobalString(server.IPCPathFlag.Name), rpcAPIs)
+	if c.GlobalIsSet(IPCPathFlag.Name) {
+		listener, rpcServer, err = rpc.StartIPCEndpoint(c.GlobalString(IPCPathFlag.Name), rpcAPIs)
 	} else {
 		rpcServer = rpc.NewServer()
 		err = rpcServer.RegisterName("freezer", api)
 		if err != nil {
 			return err
 		}
-		endpoint := fmt.Sprintf("%s:%d", c.GlobalString(utils.HTTPListenAddrFlag.Name), c.Int(server.RPCPortFlag.Name))
+		endpoint := fmt.Sprintf("%s:%d", c.GlobalString(utils.HTTPListenAddrFlag.Name), c.Int(RPCPortFlag.Name))
 		listener, err = net.Listen("tcp", endpoint)
 		if err != nil {
 			return err

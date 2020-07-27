@@ -35,6 +35,12 @@ var (
 		Usage: "HTTP-RPC server listening interface",
 		Value: "localhost",
 	}
+
+	// BucketNameFlag sets namespace for S3 bucket
+	BucketNameFlag = cli.StringFlag{
+		Name:  "bucket",
+		Usage: "S3 bucket name",
+	}
 )
 
 func checkNamespaceArg(c *cli.Context) (bucketName string) {

@@ -82,6 +82,8 @@ func remoteAncientStore(c *cli.Context) error {
 		},
 	}
 
+	utils.CheckExclusive(c, server.IPCPathFlag, server.HTTPListenAddrFlag.Name)
+
 	if c.GlobalIsSet(server.IPCPathFlag.Name) {
 		listener, rpcServer, err = rpc.StartIPCEndpoint(c.GlobalString(server.IPCPathFlag.Name), rpcAPIs)
 	} else {

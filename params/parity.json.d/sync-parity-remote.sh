@@ -21,15 +21,15 @@ specs=(
 	"test-specs/eip210_test"
 	"test-specs/byzantium_test"
 	"test-specs/constantinople_test"
-	"test-specs/st_peters_test"
+	"test-specs/constantinople_fix_test"
 	"test-specs/istanbul_test"
-	"test-specs/transition_test"
+	"test-specs/eip158_to_byzantiumat5_test.json"
 
 	"foundation"
 	"goerli"
 	"rinkeby"
 	"ropsten"
-	
+
 	"mix"
 	"musicoin"
 )

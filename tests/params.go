@@ -210,7 +210,7 @@ func init() {
 				if wde != nil {
 					panic(wde)
 				}
-				panic(fmt.Sprintf("failed to find chainspec, wd: %s", wd))
+				panic(fmt.Sprintf("failed to find chainspec, wd: %s, config: %v/file: %v", wd, k, v))
 			} else if err != nil {
 				panic(err)
 			}

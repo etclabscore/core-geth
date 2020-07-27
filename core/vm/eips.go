@@ -107,7 +107,7 @@ func opChainID(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([
 
 // enable2200 applies EIP-2200 (Rebalance net-metered SSTORE)
 func enable2200(jt *JumpTable) {
-	// TODO(meowsbits): audit this
+	jt[SLOAD].constantGas = vars.SloadGasEIP2200
 	jt[SSTORE].dynamicGas = gasSStoreEIP2200
 }
 

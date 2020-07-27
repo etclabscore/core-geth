@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"os/signal"
@@ -11,6 +12,8 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/mattn/go-colorable"
+	"github.com/mattn/go-isatty"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -58,8 +61,22 @@ func checkNamespaceArg(c *cli.Context) (namespace string) {
 	return
 }
 
+func setupLogFormat(c *cli.Context) error {
+	// Set up the logger to print everything
+	logOutput := os.Stdout
+	usecolor := (isatty.IsTerminal(os.Stderr.Fd()) || isatty.IsCygwinTerminal(os.Stderr.Fd())) && os.Getenv("TERM") != "dumb"
+	output := io.Writer(logOutput)
+	if usecolor {
+		output = colorable.NewColorable(logOutput)
+	}
+	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(c.Int(server.LogLevelFlag.Name)), log.StreamHandler(output, log.TerminalFormat(usecolor))))
+
+	return nil
+}
+
 func remoteAncientStore(c *cli.Context) error {
 
+	setupLogFormat(c)
 	namespace := checkNamespaceArg(c)
 	api, quit := createS3FreezerService(namespace)
 

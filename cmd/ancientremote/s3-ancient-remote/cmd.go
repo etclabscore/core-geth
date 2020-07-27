@@ -1,10 +1,8 @@
-package server
+package main
 
 import (
-	"fmt"
 	"io"
 	"os"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/log"
@@ -31,30 +29,27 @@ var (
 		Name:  "ipcpath",
 		Usage: "Filename for IPC socket/pipe within the datadir (explicit paths escape it)",
 	}
-	// HTTPEnabledFlag sets http enabled for rpc server
-	HTTPEnabledFlag = cli.BoolFlag{
-		Name:  "http",
-		Usage: "Enable the HTTP-RPC server",
-	}
 	// HTTPListenAddrFlag sets address http address to listen on
 	HTTPListenAddrFlag = cli.StringFlag{
 		Name:  "http.addr",
 		Usage: "HTTP-RPC server listening interface",
 		Value: "localhost",
 	}
-	// HTTPCORSDomainFlag sets corsdomain to accept if needed
-	HTTPCORSDomainFlag = cli.StringFlag{
-		Name:  "http.corsdomain",
-		Usage: "Comma separated list of domains from which to accept cross origin requests (browser enforced)",
-		Value: "",
-	}
-	// HTTPVirtualHostsFlag sets virtual hosts to accept if needed
-	HTTPVirtualHostsFlag = cli.StringFlag{
-		Name:  "http.vhosts",
-		Usage: "Comma separated list of virtual hostnames from which to accept requests (server enforced). Accepts '*' wildcard.",
-		Value: strings.Join([]string{"localhost"}, ","),
+
+	// BucketNameFlag sets namespace for S3 bucket
+	BucketNameFlag = cli.StringFlag{
+		Name:  "bucket",
+		Usage: "S3 bucket name",
 	}
 )
+
+func checkNamespaceArg(c *cli.Context) (bucketName string) {
+	bucketName = c.GlobalString(BucketNameFlag.Name)
+	if bucketName == "" {
+		utils.Fatalf("Missing namespace please specify a namespace, with --namespace")
+	}
+	return
+}
 
 func setupLogFormat(c *cli.Context) error {
 	// Set up the logger to print everything
@@ -67,18 +62,4 @@ func setupLogFormat(c *cli.Context) error {
 	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(c.Int(LogLevelFlag.Name)), log.StreamHandler(output, log.TerminalFormat(usecolor))))
 
 	return nil
-}
-
-func getHTTPEndpoint(c *cli.Context) string {
-	return fmt.Sprintf("%s:%d", c.GlobalString(utils.HTTPListenAddrFlag.Name), c.Int(RPCPortFlag.Name))
-}
-
-// splitAndTrim splits input separated by a comma
-// and trims excessive white space from the substrings.
-func splitAndTrim(input string) []string {
-	result := strings.Split(input, ",")
-	for i, r := range result {
-		result[i] = strings.TrimSpace(r)
-	}
-	return result
 }

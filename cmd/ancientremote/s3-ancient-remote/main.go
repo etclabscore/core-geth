@@ -21,12 +21,13 @@ func init() {
 	app.Name = "S3AncientRemote"
 	app.Usage = "S3 Ancient Remote Storage as a service"
 	app.Flags = []cli.Flag{
+		LogLevelFlag,
 		BucketNameFlag,
 		IPCPathFlag,
 		RPCPortFlag,
 		HTTPListenAddrFlag,
 	}
-	app.Action = remoteAncientStore
+	app.Action = run
 }
 
 func createS3FreezerService(bucketName string) (*freezerRemoteS3, chan struct{}) {
@@ -45,15 +46,16 @@ func createS3FreezerService(bucketName string) (*freezerRemoteS3, chan struct{})
 	return service, service.quit
 }
 
-func remoteAncientStore(c *cli.Context) error {
+func run(c *cli.Context) error {
 
 	if err := setupLogFormat(c); err != nil {
 		return err
 	}
-	namespace := mustBucketName(c)
+	bucketName := mustBucketName(c)
 	utils.CheckExclusive(c, IPCPathFlag, HTTPListenAddrFlag.Name)
 
-	api, quit := createS3FreezerService(namespace)
+	log.Info("Creating freezer service", "bucket", bucketName)
+	api, quit := createS3FreezerService(bucketName)
 
 	var (
 		rpcServer *rpc.Server
@@ -70,7 +72,9 @@ func remoteAncientStore(c *cli.Context) error {
 	}
 
 	if c.GlobalIsSet(IPCPathFlag.Name) {
-		listener, rpcServer, err = rpc.StartIPCEndpoint(c.GlobalString(IPCPathFlag.Name), rpcAPIs)
+		endpoint := c.GlobalString(IPCPathFlag.Name)
+		log.Info("Using IPC", "endpoint", endpoint)
+		listener, rpcServer, err = rpc.StartIPCEndpoint(endpoint, rpcAPIs)
 	} else {
 		rpcServer = rpc.NewServer()
 		err = rpcServer.RegisterName("freezer", api)
@@ -78,6 +82,7 @@ func remoteAncientStore(c *cli.Context) error {
 			return err
 		}
 		endpoint := fmt.Sprintf("%s:%d", c.GlobalString(utils.HTTPListenAddrFlag.Name), c.Int(RPCPortFlag.Name))
+		log.Info("Using TCP", "endpoint", endpoint)
 		listener, err = net.Listen("tcp", endpoint)
 		if err != nil {
 			return err

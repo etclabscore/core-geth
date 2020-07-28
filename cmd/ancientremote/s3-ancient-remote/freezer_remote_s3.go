@@ -249,6 +249,8 @@ func (f *freezerRemoteS3) initializeBucket() error {
 
 func (f *freezerRemoteS3) downloadBlocksObject(n uint64) error {
 	key := f.blockObjectKeyForN(n)
+	f.log.Info("Downloading blocks object", "n", n, "key", key)
+
 	buf := aws.NewWriteAtBuffer([]byte{})
 	_, err := f.downloader.Download(buf, &s3.GetObjectInput{
 		Bucket: aws.String(f.bucketName()),
@@ -270,9 +272,13 @@ func (f *freezerRemoteS3) downloadBlocksObject(n uint64) error {
 		return err
 	}
 	if len(target) > 0 {
-		first := target[0].Header.Number.Uint64()
-		for i, v := range target {
-			f.rCacheBlocks.Add(first+uint64(i), v)
+		for _, v := range target {
+			// Ignore any persisted data above current frozen level.
+			// This is truncated data that hasn't been overwritten yet.
+			if v.Header.Number.Uint64() >= atomic.LoadUint64(f.frozen) {
+				continue
+			}
+			f.rCacheBlocks.Add(v.Header.Number.Uint64(), v)
 		}
 	}
 	return nil
@@ -280,6 +286,8 @@ func (f *freezerRemoteS3) downloadBlocksObject(n uint64) error {
 
 func (f *freezerRemoteS3) downloadHashesObject(n uint64) error {
 	key := f.hashObjectKeyForN(n)
+	f.log.Info("Downloading hashes object", "n", n, "key", key)
+
 	buf := aws.NewWriteAtBuffer([]byte{})
 	_, err := f.downloader.Download(buf, &s3.GetObjectInput{
 		Bucket: aws.String(f.bucketName()),
@@ -301,9 +309,15 @@ func (f *freezerRemoteS3) downloadHashesObject(n uint64) error {
 		return err
 	}
 	if len(target) > 0 {
-		first := (n / f.hashObjectGroupSize) * f.hashObjectGroupSize
+		first := n - (n % f.hashObjectGroupSize)
 		for i, v := range target {
-			f.rCacheHashes.Add(first+uint64(i), v)
+			n := first + uint64(i)
+			// Ignore any persisted data above current frozen level.
+			// This is truncated data that hasn't been overwritten yet.
+			if n >= atomic.LoadUint64(f.frozen) {
+				continue
+			}
+			f.rCacheHashes.Add(n, v)
 		}
 	}
 	return nil
@@ -360,19 +374,19 @@ func (f *freezerRemoteS3) findCached(n uint64, kind string) ([]byte, bool) {
 func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, sizeGauge metrics.Gauge) (*freezerRemoteS3, error) {
 	var err error
 
-	rBlockCache, err := lru.New(int(s3BlocksGroupSize) / 2)
+	rBlockCache, err := lru.New(int(s3BlocksGroupSize) * 8)
 	if err != nil {
 		return nil, err
 	}
-	rHashCache, err := lru.New(int(s3HashesGroupSize) / 2)
+	rHashCache, err := lru.New(int(s3HashesGroupSize) * 8)
 	if err != nil {
 		return nil, err
 	}
-	wBlockCache, err := lru.New(int(s3BlocksGroupSize) / 2)
+	wBlockCache, err := lru.New(int(s3BlocksGroupSize) * 8)
 	if err != nil {
 		return nil, err
 	}
-	wHashCache, err := lru.New(int(s3HashesGroupSize) / 2)
+	wHashCache, err := lru.New(int(s3HashesGroupSize) * 8)
 	if err != nil {
 		return nil, err
 	}
@@ -471,7 +485,7 @@ func (f *freezerRemoteS3) HasAncient(kind string, number uint64) (bool, error) {
 // Ancient retrieves an ancient binary blob from the append-only immutable files.
 func (f *freezerRemoteS3) Ancient(kind string, number uint64) ([]byte, error) {
 	if atomic.LoadUint64(f.frozen) <= number {
-		return nil, nil
+		return nil, nil // fmt.Errorf("%w: kind=%s number=%d", errOutOfBounds, kind, number)
 	}
 
 	if v, ok := f.findCached(number, kind); ok {
@@ -562,17 +576,23 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 	if atomic.LoadUint64(f.frozen) != number {
 		return errOutOrderInsertion
 	}
-	// f.log.Info("Appending ancient", "frozen", atomic.LoadUint64(f.frozen), "number", number)
+	if len(hash) == 0 || len(header) == 0 || len(body) == 0 || len(td) == 0 {
+		return fmt.Errorf("bad append value: hash=%v header=%v body=%v td=%v", hash, header, body, td)
+	}
+	f.log.Trace("Appending ancient", "frozen", atomic.LoadUint64(f.frozen), "number", number)
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	o, err := NewAncientObjectS3(hash, header, body, receipts, td)
 	if err != nil {
 		return err
 	}
+	// Append to both read and write caches.
+	f.rCacheHashes.Add(number, common.BytesToHash(hash))
+	f.rCacheBlocks.Add(number, o)
 	f.wCacheHashes.Add(number, common.BytesToHash(hash))
 	f.wCacheBlocks.Add(number, o)
 	atomic.AddUint64(f.frozen, 1)
-	// f.log.Info("Finished appending ancient", "frozen", atomic.LoadUint64(f.frozen), "number", number)
+	f.log.Trace("Finished appending ancient", "frozen", atomic.LoadUint64(f.frozen), "number", number)
 	return nil
 }
 
@@ -581,6 +601,9 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 //   ListObjects will only (dubiously? might return millions?) return the first 1000. Need to implement pagination.
 //   Also make sure that the Marker is working as expected.
 func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
+	if atomic.LoadUint64(f.frozen) <= items {
+		return nil
+	}
 
 	f.mu.Lock()
 	defer f.mu.Unlock()
@@ -592,15 +615,19 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	// How this works:
 	// Push the new index marker.
 	// All data above the truncation limit is allowed to persist, but will eventually be overwritten.
-
-	var err error
+	if !f.readOnly {
+		err := f.setIndexMarker(items)
+		if err != nil {
+			return err
+		}
+	}
 
 	for _, c := range []*lru.Cache{
 		f.rCacheBlocks,
 		f.rCacheHashes,
 		f.wCacheBlocks,
 		f.wCacheHashes,
-	}{
+	} {
 		keys := c.Keys()
 		for _, k := range keys {
 			if k.(uint64) >= items {
@@ -609,14 +636,8 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 		}
 	}
 
-	if !f.readOnly {
-		err = f.setIndexMarker(items)
-		if err != nil {
-			return err
-		}
-	}
-
 	atomic.StoreUint64(f.frozen, items)
+
 	f.log.Info("Finished truncating ancients", "elapsed", common.PrettyDuration(time.Since(start)))
 	return nil
 }
@@ -642,15 +663,11 @@ func cacheSortUint64Keys(cache *lru.Cache) []interface{} {
 	return keys
 }
 
-func cacheFirstN(cache *lru.Cache) uint64 {
-	keys := cacheSortUint64Keys(cache)
-	return keys[0].(uint64)
-}
-
 func cacheBatches(c *lru.Cache, batchSize uint64) (batches [][]uint64) {
 	keys := cacheSortUint64Keys(c)
 	batch := []uint64{}
 	for _, k := range keys {
+		// if k.(uint64) + 1 % batchSize == 0 {
 		if uint64(len(batch)) == batchSize {
 			batches = append(batches, batch)
 			batch = []uint64{}
@@ -667,24 +684,21 @@ func (f *freezerRemoteS3) pushCacheBatching(cache *lru.Cache, size uint64, keyFn
 	}
 	uploads := []s3manager.BatchUploadObject{}
 
-	
-	for {
-		if cache.Len() == 0 {
-			break
+	batches := cacheBatches(cache, size)
+	for _, batchKeys := range batches {
+		if len(batchKeys) == 0 {
+			continue // == break
 		}
-		keys := cacheSortUint64Keys(cache)
-		var n = cacheFirstN(cache)
-
+		n := batchKeys[0]
+		// insanity check
+		if n % size != 0 {
+			log.Crit("Non-mod batch leader", "n", n, "batch.len", len(batchKeys))
+		}
 		batch := []interface{}{}
-		batchKeys := []interface{}{}
-
-		for i := uint64(0); i < size && i < uint64(len(keys)); i++ {
-			k := keys[i]
-			v, _ := cache.Get(k)
+		for _, key := range batchKeys {
+			v, _ := cache.Get(key)
 			batch = append(batch, v)
-			batchKeys = append(batchKeys, k)
 		}
-
 		b, err := f.encodeObject(batchObjFn(batch))
 		if err != nil {
 			return err
@@ -696,21 +710,24 @@ func (f *freezerRemoteS3) pushCacheBatching(cache *lru.Cache, size uint64, keyFn
 				Body:   bytes.NewReader(b),
 			},
 		})
-
-		batchLen := uint64(len(batch))
-		if batchLen%size == 0 {
-			for _, k := range batchKeys {
-				cache.Remove(k)
-			}
-			continue
-		}
-		break
 	}
+
 	iter := &s3manager.UploadObjectsIterator{Objects: uploads}
 	err := f.uploader.UploadWithIterator(aws.BackgroundContext(), iter)
 	if err != nil {
 		return err
 	}
+
+	for _, batchKeys := range batches {
+		// Not a complete batch, don't delete.
+		if uint64(len(batchKeys)) != size {
+			continue
+		}
+		for _, key := range batchKeys {
+			cache.Remove(key)
+		}
+	}
+
 	return nil
 }
 
@@ -780,31 +797,6 @@ func (f *freezerRemoteS3) Sync() error {
 	var err error
 
 	if !f.readOnly {
-		if lenBlocks > 0 {
-			wCacheBlocksFirstN := cacheFirstN(f.wCacheBlocks)
-			if r := wCacheBlocksFirstN % f.blockObjectGroupSize; r != 0 {
-				f.log.Warn("Found out-of-order block cache", "n", wCacheBlocksFirstN)
-				err = f.pullWCacheBlocks(wCacheBlocksFirstN)
-				if err != nil {
-					f.mu.Unlock()
-					return err
-				}
-				f.mu.Unlock()
-				return f.Sync()
-			}
-			wCacheHashesFirstN := cacheFirstN(f.wCacheHashes)
-			if r := wCacheHashesFirstN % f.hashObjectGroupSize; r != 0 {
-				f.log.Warn("Found out-of-order hash cache", "n", wCacheHashesFirstN)
-				err = f.pullWCacheHashes(wCacheHashesFirstN)
-				if err != nil {
-					f.mu.Unlock()
-					return err
-				}
-				f.mu.Unlock()
-				return f.Sync()
-			}
-		}
-
 		err = f.pushWCaches()
 		if err != nil {
 			f.mu.Unlock()

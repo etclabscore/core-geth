@@ -111,12 +111,6 @@ func (api *FreezerRemoteClient) AncientSize(kind string) (uint64, error) {
 func (api *FreezerRemoteClient) AppendAncient(number uint64, hash, header, body, receipts, td []byte) (err error) {
 	api.mu.Lock()
 	defer api.mu.Unlock()
-	// hexHash := hexutil.Encode(hash)
-	// hexHeader := hexutil.Encode(header)
-	// hexBody := hexutil.Encode(body)
-	// hexReceipts := hexutil.Encode(receipts)
-	// hexTd := hexutil.Encode(td)
-	// return api.client.Call(nil, FreezerMethodAppendAncient, number, hexHash, hexHeader, hexBody, hexReceipts, hexTd)
 	return api.client.Call(nil, FreezerMethodAppendAncient, number, hash, header, body, receipts, td)
 }
 

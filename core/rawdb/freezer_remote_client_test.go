@@ -189,9 +189,6 @@ func TestClient1(t *testing.T) {
 				t.Fatalf("truncate: %v", err)
 			}
 		}
-		if i > 88 && i%88 == 0 {
-
-		}
 	}
 
 	head := uint64(0)

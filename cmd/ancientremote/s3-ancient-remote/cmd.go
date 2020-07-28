@@ -37,12 +37,12 @@ var (
 	}
 )
 
-func checkNamespaceArg(c *cli.Context) (bucketName string) {
+func mustBucketName(c *cli.Context) (bucketName string) {
 	bucketName = c.GlobalString(BucketNameFlag.Name)
 	if bucketName == "" {
 		utils.Fatalf("Missing namespace please specify a namespace, with --namespace")
 	}
-	return
+	return bucketName
 }
 
 func setupLogFormat(c *cli.Context) error {

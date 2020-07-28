@@ -103,8 +103,7 @@ func (api *FreezerRemoteClient) AppendAncient(number uint64, hash, header, body,
 	hexBody := hexutil.Encode(body)
 	hexReceipts := hexutil.Encode(receipts)
 	hexTd := hexutil.Encode(td)
-	err = api.client.Call(nil, FreezerMethodAppendAncient, number, hexHash, hexHeader, hexBody, hexReceipts, hexTd)
-	return
+	return api.client.Call(nil, FreezerMethodAppendAncient, number, hexHash, hexHeader, hexBody, hexReceipts, hexTd)
 }
 
 // TruncateAncients discards any recent data above the provided threshold number.

@@ -27,6 +27,7 @@ func init() {
 	app.Usage = "S3 Ancient Remote Storage as a service"
 	app.Flags = []cli.Flag{
 		BucketNameFlag,
+		IPCPathFlag,
 		RPCPortFlag,
 		HTTPListenAddrFlag,
 	}

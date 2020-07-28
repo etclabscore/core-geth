@@ -149,7 +149,7 @@ func NewAncientObjectS3(hashB, headerB, bodyB, receiptsB, difficultyB []byte) (A
 		return AncientObjectS3{}, fmt.Errorf("decode receipts: %w", err)
 	}
 	difficulty := new(big.Int)
-	err = rlp.DecodeBytes(difficultyB, difficulty)
+	err = rlp.Decode(bytes.NewReader(difficultyB), difficulty)
 	if err != nil {
 		return AncientObjectS3{}, fmt.Errorf("decode difficulty: %w", err)
 	}

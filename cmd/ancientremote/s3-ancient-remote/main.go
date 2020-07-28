@@ -14,11 +14,6 @@ import (
 )
 
 var (
-	// BucketNameFlag sets namespace for S3 bucket
-	BucketNameFlag = cli.StringFlag{
-		Name:  "bucket",
-		Usage: "S3 bucket name",
-	}
 	app = cli.NewApp()
 )
 
@@ -26,6 +21,7 @@ func init() {
 	app.Name = "S3AncientRemote"
 	app.Usage = "S3 Ancient Remote Storage as a service"
 	app.Flags = []cli.Flag{
+		IPCPathFlag,
 		BucketNameFlag,
 		RPCPortFlag,
 		HTTPListenAddrFlag,

@@ -9,7 +9,19 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rlp"
+	lru "github.com/hashicorp/golang-lru"
 )
+
+func TestCacheBatches(t *testing.T) {
+	c, _ := lru.New(32)
+	for i := 0; i < 10; i++ {
+		c.Add(uint64(i), "anything")
+	}
+	batches := cacheBatches(c, 2)
+	if len(batches) != 5 {
+		t.Fatalf("bad %d", len(batches))
+	}
+}
 
 func TestDifficultyRLPDecoding(t *testing.T) {
 	td := big.NewInt(42)

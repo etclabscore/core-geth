@@ -71,7 +71,7 @@ func (f *FreezerRemoteServerAPI) AncientSize(kind string) (uint64, error) {
 }
 
 func (f *FreezerRemoteServerAPI) AppendAncient(number uint64, hash, header, body, receipt, td []byte) error {
-	fmt.Println("mock server called", "method=AppendAncient", "number=", number)
+	fmt.Println("mock server called", "method=AppendAncient", "number=", number, "header", fmt.Sprintf("%x", header))
 	fieldNames := []string{FreezerRemoteHashTable, FreezerRemoteHeaderTable,
 		FreezerRemoteBodiesTable, FreezerRemoteReceiptTable, FreezerRemoteDifficultyTable}
 	fields := [][]byte{hash, header, body, receipt, td}

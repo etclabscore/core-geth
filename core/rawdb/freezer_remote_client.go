@@ -3,7 +3,6 @@ package rawdb
 import (
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -68,11 +67,11 @@ func (api *FreezerRemoteClient) HasAncient(kind string, number uint64) (bool, er
 
 // Ancient retrieves an ancient binary blob from the append-only immutable files.
 func (api *FreezerRemoteClient) Ancient(kind string, number uint64) ([]byte, error) {
-	var res string
+	res := []byte{}
 	if err := api.client.Call(&res, FreezerMethodAncient, kind, number); err != nil {
 		return nil, err
 	}
-	return hexutil.Decode(res)
+	return res, nil
 }
 
 // Ancients returns the length of the frozen items.
@@ -98,12 +97,13 @@ func (api *FreezerRemoteClient) AncientSize(kind string) (uint64, error) {
 //
 // Note that the frozen marker is updated outside of the service calls.
 func (api *FreezerRemoteClient) AppendAncient(number uint64, hash, header, body, receipts, td []byte) (err error) {
-	hexHash := hexutil.Encode(hash)
-	hexHeader := hexutil.Encode(header)
-	hexBody := hexutil.Encode(body)
-	hexReceipts := hexutil.Encode(receipts)
-	hexTd := hexutil.Encode(td)
-	return api.client.Call(nil, FreezerMethodAppendAncient, number, hexHash, hexHeader, hexBody, hexReceipts, hexTd)
+	// hexHash := hexutil.Encode(hash)
+	// hexHeader := hexutil.Encode(header)
+	// hexBody := hexutil.Encode(body)
+	// hexReceipts := hexutil.Encode(receipts)
+	// hexTd := hexutil.Encode(td)
+	// return api.client.Call(nil, FreezerMethodAppendAncient, number, hexHash, hexHeader, hexBody, hexReceipts, hexTd)
+	return api.client.Call(nil, FreezerMethodAppendAncient, number, hash, header, body, receipts, td)
 }
 
 // TruncateAncients discards any recent data above the provided threshold number.

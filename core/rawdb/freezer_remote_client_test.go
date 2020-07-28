@@ -17,7 +17,13 @@ import (
 // is that the client should expect the server API to hex encode EVERYTHING,
 // including the string values. Package hexutil does not have a corresponding type for this,
 // so it has to be done adhoc.
-type FreezerRemoteServerAPI struct {}
+type FreezerRemoteServerAPI struct {
+	store map[string][]byte
+}
+
+func NewFreezerRemoteServerAPI() *FreezerRemoteServerAPI {
+	return &FreezerRemoteServerAPI{store: make(map[string][]byte)}
+}
 
 func (f *FreezerRemoteServerAPI) HasAncient(kind string, number uint64) (bool, error) {
 	fmt.Println("mock server called", "method=HasAncient")
@@ -61,7 +67,7 @@ func (f *FreezerRemoteServerAPI) Close() error {
 
 func newTestServer(t *testing.T) *rpc.Server {
 	server := rpc.NewServer()
-	mockFreezerServer := new(FreezerRemoteServerAPI)
+	mockFreezerServer := NewFreezerRemoteServerAPI()
 	err := server.RegisterName("freezer",mockFreezerServer)
 	if err != nil {
 		t.Fatal(err)

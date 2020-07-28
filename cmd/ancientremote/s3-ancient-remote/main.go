@@ -14,11 +14,6 @@ import (
 )
 
 var (
-	// BucketNameFlag sets namespace for S3 bucket
-	BucketNameFlag = cli.StringFlag{
-		Name:  "bucket",
-		Usage: "S3 bucket name",
-	}
 	app = cli.NewApp()
 )
 

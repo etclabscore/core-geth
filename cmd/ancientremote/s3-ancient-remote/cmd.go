@@ -18,6 +18,11 @@ var (
 		Value: 4,
 		Usage: "log level to emit to the screen",
 	}
+	// BucketNameFlag sets namespace for S3 bucket
+	BucketNameFlag = cli.StringFlag{
+		Name:  "bucket",
+		Usage: "S3 bucket name (required)",
+	}
 	// RPCPortFlag sets port for http operation
 	RPCPortFlag = cli.IntFlag{
 		Name:  "rpcport",
@@ -40,7 +45,7 @@ var (
 func mustBucketName(c *cli.Context) (bucketName string) {
 	bucketName = c.GlobalString(BucketNameFlag.Name)
 	if bucketName == "" {
-		utils.Fatalf("Missing namespace please specify a namespace, with --namespace")
+		utils.Fatalf("Missing required option --%s", BucketNameFlag.Name)
 	}
 	return bucketName
 }

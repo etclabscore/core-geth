@@ -51,7 +51,9 @@ func createS3FreezerService(bucketName string) (*freezerRemoteS3, chan struct{})
 
 func remoteAncientStore(c *cli.Context) error {
 
-	setupLogFormat(c)
+	if err := setupLogFormat(c); err != nil {
+		return err
+	}
 	namespace := checkNamespaceArg(c)
 	utils.CheckExclusive(c, IPCPathFlag, HTTPListenAddrFlag.Name)
 

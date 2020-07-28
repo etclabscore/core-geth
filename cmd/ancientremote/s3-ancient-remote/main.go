@@ -90,8 +90,9 @@ func remoteAncientStore(c *cli.Context) error {
 	}
 
 	go func() {
+		log.Info("Serving listener", "listener", listener.Addr().String())
 		if err := rpcServer.ServeListener(listener); err != nil {
-			log.Crit("exiting", "error", err)
+			log.Crit("Exiting", "error", err)
 		}
 	}()
 
@@ -102,7 +103,7 @@ func remoteAncientStore(c *cli.Context) error {
 		// Don't bother imposing a timeout here.
 		select {
 		case sig := <-abortChan:
-			log.Info("Exiting...", "signal", sig)
+			log.Info("Got abort...", "signal", sig)
 			rpcServer.Stop()
 		case <-quit:
 			log.Info("S3 connection closing")

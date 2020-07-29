@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"math/big"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -25,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/rlp"
+	lru "github.com/hashicorp/golang-lru"
 )
 
 const (
@@ -102,10 +102,10 @@ type freezerRemoteStorj struct {
 	blockObjectGroupSize uint64 // how many blocks to include in a single S3 object
 	hashObjectGroupSize  uint64
 
-	wCacheBlocks *cache
-	wCacheHashes *cache
-	rCacheBlocks *cache
-	rCacheHashes *cache
+	wCacheBlocks *lru.Cache
+	wCacheHashes *lru.Cache
+	rCacheBlocks *lru.Cache
+	rCacheHashes *lru.Cache
 
 	log log.Logger
 }
@@ -191,127 +191,6 @@ func (o AncientObjectStorj) RLPBytesForKind(kind string) []byte {
 	}
 }
 
-type cache struct {
-	max int
-	mu  sync.Mutex
-	m   map[uint64]interface{}
-	sl  []uint64
-}
-
-func newCache(max int) *cache {
-	return &cache{
-		max: max,
-		m:   make(map[uint64]interface{}),
-		sl:  []uint64{},
-	}
-}
-
-func (c *cache) reset() {
-	c.mu.Lock()
-	c.m = make(map[uint64]interface{})
-	c.sl = []uint64{}
-	c.mu.Unlock()
-}
-
-func (c *cache) onto(c2 *cache) {
-	if len(c.sl) == 0 {
-		return
-	}
-	c.mu.Lock()
-	for k, v := range c.m {
-		c2.add(k, v)
-	}
-	c.mu.Unlock()
-}
-
-func (c *cache) len() int {
-	return len(c.sl)
-}
-
-// FirstN assumes the cache is not empty. Callers must ensure this.
-func (c *cache) firstN() uint64 {
-	return c.sl[0]
-}
-
-func (c *cache) add(n uint64, item interface{}) {
-	c.mu.Lock()
-	if _, ok := c.m[n]; ok {
-		c.mu.Unlock()
-		return
-	}
-	c.m[n] = item
-	c.sl = append(c.sl, n)
-	if len(c.sl) > 1 {
-		// if out of order
-		if c.sl[len(c.sl)-2]+1 != c.sl[len(c.sl)-1] {
-			sort.Slice(c.sl, func(i, j int) bool {
-				return c.sl[i] < c.sl[j]
-			})
-		}
-	}
-	if c.max > 0 && c.len() > c.max {
-		c.mu.Unlock()
-		c.splice(1)
-		return
-	}
-	c.mu.Unlock()
-}
-
-func (c *cache) batch(offset, size uint64) []interface{} {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	max := uint64(c.len())
-	if offset >= max {
-		return nil
-	}
-	s := []interface{}{}
-	end := offset + size
-	if end > max {
-		end = max
-	}
-	for _, n := range c.sl[offset:end] {
-		s = append(s, c.m[n])
-	}
-	return s
-}
-
-func (c *cache) truncateFrom(n uint64) {
-	c.mu.Lock()
-	index := -1
-	for i, v := range c.sl {
-		if v >= n {
-			if index < 0 {
-				index = i
-			}
-			delete(c.m, v)
-		}
-	}
-	if index >= 0 {
-		c.sl = c.sl[:index]
-	}
-	c.mu.Unlock()
-}
-
-func (c *cache) splice(firstN uint64) {
-	c.mu.Lock()
-	if firstN == 0 {
-		c.mu.Unlock()
-		return
-	}
-	for _, v := range c.sl[:firstN] {
-		delete(c.m, v)
-	}
-	c.sl = c.sl[firstN:]
-	c.mu.Unlock()
-}
-
-func (c *cache) get(n uint64) (interface{}, bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	v, ok := c.m[n]
-	return v, ok
-}
-
 func storjKeyBlock(number uint64) string {
 	// Keep blocks in a dir.
 	// This namespaces the resource, separating it from the 'index-marker' object.
@@ -361,15 +240,15 @@ func (f *freezerRemoteStorj) downloadBlocksObject(ctx context.Context, n uint64)
 	if err != nil {
 		return err
 	}
-	// sanity
+
 	if len(target) > 0 {
-		first := target[0].Header.Number.Uint64()
-		if first%f.blockObjectGroupSize != 0 {
-			panic(fmt.Sprintf("object does not begin at mod: n=%d", target[0].Header.Number.Uint64()))
-		}
-		f.rCacheBlocks.reset()
-		for i, v := range target {
-			f.rCacheBlocks.add(first+uint64(i), v)
+		for _, v := range target {
+			// Ignore any persisted data above current frozen level.
+			// This is truncated data that hasn't been overwritten yet.
+			if v.Header.Number.Uint64() >= atomic.LoadUint64(f.frozen) {
+				continue
+			}
+			f.rCacheBlocks.Add(v.Header.Number.Uint64(), v)
 		}
 	}
 	return nil
@@ -393,10 +272,15 @@ func (f *freezerRemoteStorj) downloadHashesObject(ctx context.Context, n uint64)
 		return err
 	}
 	if len(target) > 0 {
-		f.rCacheHashes.reset()
-		first := (n / f.hashObjectGroupSize) * f.hashObjectGroupSize
+		first := n - (n % f.hashObjectGroupSize)
 		for i, v := range target {
-			f.rCacheHashes.add(first+uint64(i), v)
+			n := first + uint64(i)
+			// Ignore any persisted data above current frozen level.
+			// This is truncated data that hasn't been overwritten yet.
+			if n >= atomic.LoadUint64(f.frozen) {
+				continue
+			}
+			f.rCacheHashes.Add(n, v)
 		}
 	}
 	return nil
@@ -408,8 +292,11 @@ func (f *freezerRemoteStorj) pullWCacheBlocks(ctx context.Context, n uint64) err
 	if err != nil {
 		return err
 	}
-	f.rCacheBlocks.onto(f.wCacheBlocks)
-	f.log.Info("Finished pulling blocks cache", "n", n, "size", f.wCacheBlocks.len())
+	for _, k := range f.rCacheBlocks.Keys() {
+		v, _ := f.rCacheBlocks.Get(k)
+		f.wCacheBlocks.Add(k, v)
+	}
+	f.log.Info("Finished pulling blocks cache", "n", n, "size", f.wCacheBlocks.Len())
 	return nil
 }
 
@@ -419,24 +306,27 @@ func (f *freezerRemoteStorj) pullWCacheHashes(ctx context.Context, n uint64) err
 	if err != nil {
 		return err
 	}
-	f.rCacheHashes.onto(f.wCacheHashes)
-	f.log.Info("Finished pulling hashes cache", "n", n, "size", f.wCacheHashes.len())
+	for _, k := range f.rCacheHashes.Keys() {
+		v, _ := f.rCacheHashes.Get(k)
+		f.wCacheHashes.Add(k, v)
+	}
+	f.log.Info("Finished pulling hashes cache", "n", n, "size", f.wCacheHashes.Len())
 	return nil
 }
 
 func (f *freezerRemoteStorj) findCached(n uint64, kind string) ([]byte, bool) {
 	if kind == rawdb.FreezerRemoteHashTable {
-		if v, ok := f.wCacheHashes.get(n); ok {
+		if v, ok := f.wCacheHashes.Get(n); ok {
 			return v.(common.Hash).Bytes(), ok
 		}
-		if v, ok := f.rCacheHashes.get(n); ok {
+		if v, ok := f.rCacheHashes.Get(n); ok {
 			return v.(common.Hash).Bytes(), ok
 		}
 	}
-	if v, ok := f.wCacheBlocks.get(n); ok {
+	if v, ok := f.wCacheBlocks.Get(n); ok {
 		return v.(AncientObjectStorj).RLPBytesForKind(kind), ok
 	}
-	if v, ok := f.rCacheBlocks.get(n); ok {
+	if v, ok := f.rCacheBlocks.Get(n); ok {
 		return v.(AncientObjectStorj).RLPBytesForKind(kind), ok
 	}
 	return nil, false
@@ -453,6 +343,23 @@ func newFreezerRemoteStorj(ctx context.Context, namespace string, access storjAc
 		cacheBlocksMax = int(storjBlocksGroupSize * 2)
 		cacheHashesMax = int(storjHashesGroupSize * 2)
 	}
+
+	rBlockCache, err := lru.New(int(storjBlocksGroupSize) * 8)
+	if err != nil {
+		return nil, err
+	}
+	rHashCache, err := lru.New(int(storjHashesGroupSize) * 8)
+	if err != nil {
+		return nil, err
+	}
+	wBlockCache, err := lru.New(int(storjBlocksGroupSize) * 8)
+	if err != nil {
+		return nil, err
+	}
+	wHashCache, err := lru.New(int(storjHashesGroupSize) * 8)
+	if err != nil {
+		return nil, err
+	}
 	f := &freezerRemoteStorj{
 		namespace:  namespace,
 		quit:       make(chan struct{}),
@@ -467,10 +374,10 @@ func newFreezerRemoteStorj(ctx context.Context, namespace string, access storjAc
 		blockObjectGroupSize: storjBlocksGroupSize,
 		hashObjectGroupSize:  storjHashesGroupSize,
 
-		wCacheBlocks: newCache(cacheBlocksMax),
-		wCacheHashes: newCache(cacheHashesMax),
-		rCacheBlocks: newCache(cacheBlocksMax),
-		rCacheHashes: newCache(cacheHashesMax),
+		wCacheBlocks: wBlockCache,
+		wCacheHashes: wHashCache,
+		rCacheBlocks: rBlockCache,
+		rCacheHashes: rHashCache,
 		log:          log.New("remote", "storj"),
 	}
 
@@ -521,7 +428,6 @@ func newFreezerRemoteStorj(ctx context.Context, namespace string, access storjAc
 		}
 	}
 
-	fmt.Println("Internally good ")
 	return f, nil
 }
 
@@ -557,7 +463,7 @@ func (f *freezerRemoteStorj) Ancient(ctx context.Context, kind string, number ui
 		if err != nil {
 			return nil, err
 		}
-		if v, ok := f.rCacheHashes.get(number); ok {
+		if v, ok := f.rCacheHashes.Get(number); ok {
 			return v.(common.Hash).Bytes(), nil
 		}
 		return nil, fmt.Errorf("%w: #%d (%s)", errOutOfBounds, number, kind)
@@ -568,7 +474,7 @@ func (f *freezerRemoteStorj) Ancient(ctx context.Context, kind string, number ui
 	if err != nil {
 		return nil, err
 	}
-	if v, ok := f.rCacheBlocks.get(number); ok {
+	if v, ok := f.rCacheBlocks.Get(number); ok {
 		return v.(AncientObjectStorj).RLPBytesForKind(kind), nil
 	}
 	return nil, fmt.Errorf("%w: #%d (%s)", errOutOfBounds, number, kind)
@@ -657,10 +563,14 @@ func (f *freezerRemoteStorj) AppendAncient(ctx context.Context, number uint64, h
 	o, err := NewAncientObjectStorj(hash, header, body, receipts, td)
 	if err != nil {
 		return err
-	}
-	f.wCacheHashes.add(number, common.BytesToHash(hash))
-	f.wCacheBlocks.add(number, o)
+	
+	// Append to both read and write caches.
+	f.rCacheHashes.Add(number, common.BytesToHash(hash))
+	f.rCacheBlocks.Add(number, o)
+	f.wCacheHashes.Add(number, common.BytesToHash(hash))
+	f.wCacheBlocks.Add(number, o)
 	atomic.AddUint64(f.frozen, 1)
+	f.log.Trace("Finished appending ancient", "frozen", atomic.LoadUint64(f.frozen), "number", number)
 	// f.log.Info("Finished appending ancient", "frozen", atomic.LoadUint64(f.frozen), "number", number)
 	return nil
 }

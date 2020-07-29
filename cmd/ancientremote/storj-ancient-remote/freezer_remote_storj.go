@@ -506,7 +506,7 @@ func newFreezerRemoteStorj(ctx context.Context, namespace string, access storjAc
 		return nil, fmt.Errorf("could not ensure bucket existence %v", err)
 	}
 
-	n, _ := f.Ancients(&ctx)
+	n, _ := f.Ancients(ctx)
 	f.frozen = &n
 
 	if n > 0 {
@@ -526,7 +526,7 @@ func newFreezerRemoteStorj(ctx context.Context, namespace string, access storjAc
 }
 
 // Close terminates the chain freezer, unmapping all the data files.
-func (f *freezerRemoteStorj) Close(ctx *context.Context) error {
+func (f *freezerRemoteStorj) Close(ctx context.Context) error {
 	// I don't see any Close, Stop, or Quit methods for the AWS service.
 	f.quit <- struct{}{}
 	return nil
@@ -534,7 +534,7 @@ func (f *freezerRemoteStorj) Close(ctx *context.Context) error {
 
 // HasAncient returns an indicator whether the specified ancient data exists
 // in the freezer.
-func (f *freezerRemoteStorj) HasAncient(ctx *context.Context, kind string, number uint64) (bool, error) {
+func (f *freezerRemoteStorj) HasAncient(ctx context.Context, kind string, number uint64) (bool, error) {
 	v, err := f.Ancient(ctx, kind, number)
 	if err != nil {
 		return false, err
@@ -543,7 +543,7 @@ func (f *freezerRemoteStorj) HasAncient(ctx *context.Context, kind string, numbe
 }
 
 // Ancient retrieves an ancient binary blob from the append-only immutable files.
-func (f *freezerRemoteStorj) Ancient(ctx *context.Context, kind string, number uint64) ([]byte, error) {
+func (f *freezerRemoteStorj) Ancient(ctx context.Context, kind string, number uint64) ([]byte, error) {
 	if atomic.LoadUint64(f.frozen) <= number {
 		return nil, nil
 	}
@@ -553,7 +553,7 @@ func (f *freezerRemoteStorj) Ancient(ctx *context.Context, kind string, number u
 	}
 
 	if kind == rawdb.FreezerRemoteHashTable {
-		err := f.downloadHashesObject(*ctx, number)
+		err := f.downloadHashesObject(ctx, number)
 		if err != nil {
 			return nil, err
 		}
@@ -564,7 +564,7 @@ func (f *freezerRemoteStorj) Ancient(ctx *context.Context, kind string, number u
 	}
 
 	// Take from remote
-	err := f.downloadBlocksObject(*ctx, number)
+	err := f.downloadBlocksObject(ctx, number)
 	if err != nil {
 		return nil, err
 	}
@@ -575,13 +575,13 @@ func (f *freezerRemoteStorj) Ancient(ctx *context.Context, kind string, number u
 }
 
 // Ancients returns the length of the frozen items.
-func (f *freezerRemoteStorj) Ancients(ctx *context.Context) (uint64, error) {
+func (f *freezerRemoteStorj) Ancients(ctx context.Context) (uint64, error) {
 	if f.frozen != nil {
 		return atomic.LoadUint64(f.frozen), nil
 	}
 	f.log.Info("Retrieving ancients number")
 	options := &uplink.DownloadOptions{Offset: 0, Length: -1}
-	result, err := f.service.DownloadObject(*ctx, f.bucketName(), indexMarker, options)
+	result, err := f.service.DownloadObject(ctx, f.bucketName(), indexMarker, options)
 	if err != nil {
 		f.log.Error("DownloadObject error", "method", "Ancients", "error", err)
 		return 0, err
@@ -597,7 +597,7 @@ func (f *freezerRemoteStorj) Ancients(ctx *context.Context) (uint64, error) {
 }
 
 // AncientSize returns the ancient size of the specified category.
-func (f *freezerRemoteStorj) AncientSize(ctx *context.Context, kind string) (uint64, error) {
+func (f *freezerRemoteStorj) AncientSize(ctx context.Context, kind string) (uint64, error) {
 	// TODO for Storj Go-SDK doesn't support this in a convenient way.
 	// This would require listing all objects in the bucket and summing their sizes.
 	// This method is only used in the InspectDatabase function, which isn't that
@@ -646,7 +646,7 @@ func (f *freezerRemoteStorj) setIndexMarker(ctx context.Context, number uint64) 
 // Notably, this function is lock free but kind of thread-safe. All out-of-order
 // injection will be rejected. But if two injections with same number happen at
 // the same time, we can get into the trouble.
-func (f *freezerRemoteStorj) AppendAncient(ctx *context.Context, number uint64, hash, header, body, receipts, td []byte) (err error) {
+func (f *freezerRemoteStorj) AppendAncient(ctx context.Context, number uint64, hash, header, body, receipts, td []byte) (err error) {
 	// Ensure the binary blobs we are appending is continuous with freezer.
 	if atomic.LoadUint64(f.frozen) != number {
 		return errOutOrderInsertion
@@ -669,7 +669,7 @@ func (f *freezerRemoteStorj) AppendAncient(ctx *context.Context, number uint64, 
 // TODO@meowsbits: handle pagination.
 //   ListObjects will only (dubiously? might return millions?) return the first 1000. Need to implement pagination.
 //   Also make sure that the Marker is working as expected.
-func (f *freezerRemoteStorj) TruncateAncients(ctx *context.Context, items uint64) error {
+func (f *freezerRemoteStorj) TruncateAncients(ctx context.Context, items uint64) error {
 
 	f.mu.Lock()
 	defer f.mu.Unlock()
@@ -688,7 +688,7 @@ func (f *freezerRemoteStorj) TruncateAncients(ctx *context.Context, items uint64
 	var err error
 
 	if !f.readOnly {
-		err = f.setIndexMarker(*ctx, items)
+		err = f.setIndexMarker(ctx, items)
 		if err != nil {
 			return err
 		}
@@ -705,7 +705,7 @@ func (f *freezerRemoteStorj) TruncateAncients(ctx *context.Context, items uint64
 		// The S3 delete iterator will delete all objects above the target.
 		f.log.Warn("Target block below current batch")
 		f.wCacheBlocks.reset()
-		err = f.pullWCacheBlocks(*ctx, items)
+		err = f.pullWCacheBlocks(ctx, items)
 		if err != nil {
 			return err
 		}
@@ -714,7 +714,7 @@ func (f *freezerRemoteStorj) TruncateAncients(ctx *context.Context, items uint64
 	_, ok = f.wCacheHashes.get(items)
 	if !ok {
 		f.wCacheHashes.reset()
-		err = f.pullWCacheHashes(*ctx, items)
+		err = f.pullWCacheHashes(ctx, items)
 		if err != nil {
 			return err
 		}
@@ -729,7 +729,7 @@ func (f *freezerRemoteStorj) TruncateAncients(ctx *context.Context, items uint64
 		return nil
 	}
 
-	err = f.pushWCaches(*ctx)
+	err = f.pushWCaches(ctx)
 	if err != nil {
 		return err
 	}
@@ -739,11 +739,11 @@ func (f *freezerRemoteStorj) TruncateAncients(ctx *context.Context, items uint64
 	// Iteratively delete any dangling _above_ the current object.
 	marker := f.blockObjectKeyForN(items + f.blockObjectGroupSize)
 	log.Info("Deleting block objects", "marker", marker, "target", items)
-	iter := f.service.ListObjects(*ctx, f.bucketName(), &uplink.ListObjectsOptions{Cursor: marker})
+	iter := f.service.ListObjects(ctx, f.bucketName(), &uplink.ListObjectsOptions{Cursor: marker})
 	// TODO might be really slow
 	for iter.Next() {
 		item := iter.Item()
-		_, err := f.service.DeleteObject(*ctx, f.bucketName(), item.Key)
+		_, err := f.service.DeleteObject(ctx, f.bucketName(), item.Key)
 		if err != nil {
 			return fmt.Errorf("Failure deleting block objects %w", err)
 		}
@@ -751,11 +751,11 @@ func (f *freezerRemoteStorj) TruncateAncients(ctx *context.Context, items uint64
 
 	marker = f.hashObjectKeyForN(items + f.hashObjectGroupSize)
 	log.Info("Deleting hash objects", "marker", marker, "target", items)
-	iter = f.service.ListObjects(*ctx, f.bucketName(), &uplink.ListObjectsOptions{Cursor: marker})
+	iter = f.service.ListObjects(ctx, f.bucketName(), &uplink.ListObjectsOptions{Cursor: marker})
 	// TODO might be really slow
 	for iter.Next() {
 		item := iter.Item()
-		_, err := f.service.DeleteObject(*ctx, f.bucketName(), item.Key)
+		_, err := f.service.DeleteObject(ctx, f.bucketName(), item.Key)
 		if err != nil {
 			return fmt.Errorf("Failure deleting hash objects %w", err)
 		}

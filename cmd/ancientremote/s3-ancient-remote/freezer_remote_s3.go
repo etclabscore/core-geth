@@ -612,11 +612,11 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
-	if atomic.LoadUint64(f.frozen) <= items {
+	n := atomic.LoadUint64(f.frozen)
+	if n <= items {
 		return nil
 	}
 
-	n := atomic.LoadUint64(f.frozen)
 	f.log.Info("Truncating ancients", "frozen", n, "target", items, "delta", n-items)
 	start := time.Now()
 

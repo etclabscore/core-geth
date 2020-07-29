@@ -11,16 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
-// FreezerRemoteServerAPI is essentially a mock struct on which methods
-// describing what the client expects the server to do.
-// These methods are 1:1 with ethdb.AncientStore, with the only modification(s)
-// being that all []byte and uint64 types are replaced with their hexutil counterparts.
-// This means that the client expects the remote ancient store server API to use
-// hex encoding in these cases.
-// Further, and what cannot be desribed with a skeleton mock like this,
-// is that the client should expect the server API to hex encode EVERYTHING,
-// including the string values. Package hexutil does not have a corresponding type for this,
-// so it has to be done adhoc.
+// FreezerRemoteServerAPI is a mock freezer server implementation.
 type FreezerRemoteServerAPI struct {
 	store map[string][]byte
 	count uint64

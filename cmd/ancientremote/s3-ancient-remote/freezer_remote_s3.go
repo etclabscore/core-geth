@@ -608,9 +608,6 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 }
 
 // TruncateAncients discards any recent data above the provided threshold number.
-// TODO@meowsbits: handle pagination.
-//   ListObjects will only (dubiously? might return millions?) return the first 1000. Need to implement pagination.
-//   Also make sure that the Marker is working as expected.
 func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
@@ -655,21 +652,21 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 
 // pushWCaches push write caches to S3,
 // chunking the caches into groups (sized by configuration)
-// and batching those put-object requests.
+// and s3-batching those put-object requests.
 func (f *freezerRemoteS3) pushWCaches() error {
 	var err error
-	err = f.pushCacheBatching(f.wCacheBlocks, f.blockObjectGroupSize, f.blockObjectKeyForN, f.blockCacheBatchObjectFn)
+	err = f.pushCacheGroups(f.wCacheBlocks, f.blockObjectGroupSize, f.blockObjectKeyForN, f.blockCacheGroupObjectFn)
 	if err != nil {
 		return err
 	}
-	err = f.pushCacheBatching(f.wCacheHashes, f.hashObjectGroupSize, f.hashObjectKeyForN, f.hashCacheBatchObjectFn)
+	err = f.pushCacheGroups(f.wCacheHashes, f.hashObjectGroupSize, f.hashObjectKeyForN, f.hashCacheGroupObjectFn)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// cacheSorteUint64Keys assumes that the cache uses exclusively uint64 keys,
+// cacheSortUint64Keys assumes that the cache uses exclusively uint64 keys,
 // and returns them in an ascending order.
 func cacheSortUint64Keys(cache *lru.Cache) []interface{} {
 	keys := cache.Keys()
@@ -679,46 +676,45 @@ func cacheSortUint64Keys(cache *lru.Cache) []interface{} {
 	return keys
 }
 
-// cacheBatches returns batches of sorted keys, where each
-// 'batch' (which is actually a bad name, should be 'group')
-// contains a maximum batchSize elements.
+// cacheKeyGroups returns groups of sorted keys, where each
+// group contains a maximum groupSize elements.
 // This is used for grouping write objects into respective S3-object groups.
-func cacheBatches(c *lru.Cache, batchSize uint64) (batches [][]uint64) {
+func cacheKeyGroups(c *lru.Cache, groupSize uint64) (groups [][]uint64) {
 	keys := cacheSortUint64Keys(c)
-	batch := []uint64{}
+	group := []uint64{}
 	for _, k := range keys {
-		if uint64(len(batch)) == batchSize {
-			batches = append(batches, batch)
-			batch = []uint64{}
+		if uint64(len(group)) == groupSize {
+			groups = append(groups, group)
+			group = []uint64{}
 		}
-		batch = append(batch, k.(uint64))
+		group = append(group, k.(uint64))
 	}
-	batches = append(batches, batch)
-	return batches
+	groups = append(groups, group)
+	return groups
 }
 
-func (f *freezerRemoteS3) pushCacheBatching(cache *lru.Cache, size uint64, keyFn func(uint64) string, batchObjFn func([]interface{}) interface{}) error {
+func (f *freezerRemoteS3) pushCacheGroups(cache *lru.Cache, size uint64, keyFn func(uint64) string, groupObjectFn func([]interface{}) interface{}) error {
 	if cache.Len() == 0 {
 		return nil
 	}
 	uploads := []s3manager.BatchUploadObject{}
 
-	batches := cacheBatches(cache, size)
-	for _, batchKeys := range batches {
-		if len(batchKeys) == 0 {
+	groups := cacheKeyGroups(cache, size)
+	for _, keyGroup := range groups {
+		if len(keyGroup) == 0 {
 			continue // == break
 		}
-		n := batchKeys[0]
+		n := keyGroup[0]
 		// insanity check
 		if n % size != 0 {
-			log.Crit("Non-mod batch leader", "n", n, "batch.len", len(batchKeys))
+			log.Crit("Non-mod group leader", "n", n, "object.len", len(keyGroup))
 		}
-		batch := []interface{}{}
-		for _, key := range batchKeys {
+		object := []interface{}{}
+		for _, key := range keyGroup {
 			v, _ := cache.Get(key)
-			batch = append(batch, v)
+			object = append(object, v)
 		}
-		b, err := f.encodeObject(batchObjFn(batch))
+		b, err := f.encodeObject(groupObjectFn(object))
 		if err != nil {
 			return err
 		}
@@ -737,12 +733,12 @@ func (f *freezerRemoteS3) pushCacheBatching(cache *lru.Cache, size uint64, keyFn
 		return err
 	}
 
-	for _, batchKeys := range batches {
-		// Not a complete batch, don't delete.
-		if uint64(len(batchKeys)) != size {
+	for _, keyGroup := range groups {
+		// Not a complete group (s3-object), don't delete.
+		if uint64(len(keyGroup)) != size {
 			continue
 		}
-		for _, key := range batchKeys {
+		for _, key := range keyGroup {
 			cache.Remove(key)
 		}
 	}
@@ -788,20 +784,20 @@ func (f *freezerRemoteS3) decodeObject(input []byte, target interface{}) error {
 	return nil
 }
 
-func (f *freezerRemoteS3) blockCacheBatchObjectFn(items []interface{}) interface{} {
-	batchSet := make([]AncientObjectS3, len(items))
+func (f *freezerRemoteS3) blockCacheGroupObjectFn(items []interface{}) interface{} {
+	group := make([]AncientObjectS3, len(items))
 	for i, v := range items {
-		batchSet[i] = v.(AncientObjectS3)
+		group[i] = v.(AncientObjectS3)
 	}
-	return batchSet
+	return group
 }
 
-func (f *freezerRemoteS3) hashCacheBatchObjectFn(items []interface{}) interface{} {
-	batchSet := make([]common.Hash, len(items))
+func (f *freezerRemoteS3) hashCacheGroupObjectFn(items []interface{}) interface{} {
+	group := make([]common.Hash, len(items))
 	for i, v := range items {
-		batchSet[i] = v.(common.Hash)
+		group[i] = v.(common.Hash)
 	}
-	return batchSet
+	return group
 }
 
 // Sync flushes all data tables to disk.

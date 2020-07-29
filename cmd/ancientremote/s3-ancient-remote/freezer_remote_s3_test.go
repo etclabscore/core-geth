@@ -17,7 +17,7 @@ func TestCacheBatches(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		c.Add(uint64(i), "anything")
 	}
-	batches := cacheBatches(c, 2)
+	batches := cacheKeyGroups(c, 2)
 	if len(batches) != 5 {
 		t.Fatalf("bad %d", len(batches))
 	}

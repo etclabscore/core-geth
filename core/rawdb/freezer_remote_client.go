@@ -1,32 +1,29 @@
 package rawdb
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
 // FreezerRemoteClient is an RPC client implementing the interface of ethdb.AncientStore.
-// Rather than implementing storage business logic, the struct's methods delegate
-// the business logic to an external server that is responsible for managing the actual
-// ancient store logic.
+// The struct's methods delegate the business logic to an external server
+// that is responsible for managing an actual ancient store.
 type FreezerRemoteClient struct {
 	client *rpc.Client
-	status string
 	quit   chan struct{}
-	mu sync.Mutex
+	mu     sync.Mutex
 }
 
 const (
-	FreezerMethodClose = "freezer_close"
-	FreezerMethodHasAncient = "freezer_hasAncient"
-	FreezerMethodAncient = "freezer_ancient"
-	FreezerMethodAncients = "freezer_ancients"
-	FreezerMethodAncientSize = "freezer_ancientSize"
-	FreezerMethodAppendAncient = "freezer_appendAncient"
+	FreezerMethodClose            = "freezer_close"
+	FreezerMethodHasAncient       = "freezer_hasAncient"
+	FreezerMethodAncient          = "freezer_ancient"
+	FreezerMethodAncients         = "freezer_ancients"
+	FreezerMethodAncientSize      = "freezer_ancientSize"
+	FreezerMethodAppendAncient    = "freezer_appendAncient"
 	FreezerMethodTruncateAncients = "freezer_truncateAncients"
-	FreezerMethodSync = "freezer_sync"
+	FreezerMethodSync             = "freezer_sync"
 )
 
 // newFreezerRemoteClient constructs a rpc client to connect to a remote freezer
@@ -35,23 +32,9 @@ func newFreezerRemoteClient(endpoint string, ipc bool) (*FreezerRemoteClient, er
 	if err != nil {
 		return nil, err
 	}
-
-	extFreezer := &FreezerRemoteClient{
+	return &FreezerRemoteClient{
 		client: client,
-	}
-
-	// Check if reachable
-	version, err := extFreezer.pingVersion()
-	if err != nil {
-		return nil, err
-	}
-	extFreezer.status = fmt.Sprintf("ok [version=%v]", version)
-	return extFreezer, nil
-}
-
-func (api *FreezerRemoteClient) pingVersion() (string, error) {
-
-	return "version 1", nil
+	}, nil
 }
 
 // Close terminates the chain freezer, unmapping all the data files.

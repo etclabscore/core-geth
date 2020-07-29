@@ -374,19 +374,32 @@ func (f *freezerRemoteS3) findCached(n uint64, kind string) ([]byte, bool) {
 func newFreezerRemoteS3(namespace string, readMeter, writeMeter metrics.Meter, sizeGauge metrics.Gauge) (*freezerRemoteS3, error) {
 	var err error
 
-	rBlockCache, err := lru.New(int(s3BlocksGroupSize) * 8)
+	// Set default cache sizes.
+	// Sizes reflect max number of entries in the cache.
+	// Cache size minimum must be greater than or equal to the group size * 2,
+	// and should not be lower than 2048 * 2 because of how the ancient store rhythm during sync is.
+	blockCacheSize := int(s3BlocksGroupSize)* 2
+	hashCacheSize := int(s3HashesGroupSize)* 2
+	if blockCacheSize < 2048 * 2 {
+		blockCacheSize = 2048 * 2
+	}
+	if hashCacheSize < 2048 * 2 {
+		hashCacheSize = 2048 * 2
+	}
+
+	rBlockCache, err := lru.New(blockCacheSize)
 	if err != nil {
 		return nil, err
 	}
-	rHashCache, err := lru.New(int(s3HashesGroupSize) * 8)
+	rHashCache, err := lru.New(hashCacheSize)
 	if err != nil {
 		return nil, err
 	}
-	wBlockCache, err := lru.New(int(s3BlocksGroupSize) * 8)
+	wBlockCache, err := lru.New(blockCacheSize)
 	if err != nil {
 		return nil, err
 	}
-	wHashCache, err := lru.New(int(s3HashesGroupSize) * 8)
+	wHashCache, err := lru.New(hashCacheSize)
 	if err != nil {
 		return nil, err
 	}
@@ -572,16 +585,14 @@ func (f *freezerRemoteS3) setIndexMarker(number uint64) error {
 // injection will be rejected. But if two injections with same number happen at
 // the same time, we can get into the trouble.
 func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, receipts, td []byte) (err error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
 	// Ensure the binary blobs we are appending is continuous with freezer.
 	if atomic.LoadUint64(f.frozen) != number {
 		return errOutOrderInsertion
 	}
-	if len(hash) == 0 || len(header) == 0 || len(body) == 0 || len(td) == 0 {
-		return fmt.Errorf("bad append value: hash=%v header=%v body=%v td=%v", hash, header, body, td)
-	}
 	f.log.Trace("Appending ancient", "frozen", atomic.LoadUint64(f.frozen), "number", number)
-	f.mu.Lock()
-	defer f.mu.Unlock()
+
 	o, err := NewAncientObjectS3(hash, header, body, receipts, td)
 	if err != nil {
 		return err
@@ -596,17 +607,17 @@ func (f *freezerRemoteS3) AppendAncient(number uint64, hash, header, body, recei
 	return nil
 }
 
-// Truncate discards any recent data above the provided threshold number.
+// TruncateAncients discards any recent data above the provided threshold number.
 // TODO@meowsbits: handle pagination.
 //   ListObjects will only (dubiously? might return millions?) return the first 1000. Need to implement pagination.
 //   Also make sure that the Marker is working as expected.
 func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+
 	if atomic.LoadUint64(f.frozen) <= items {
 		return nil
 	}
-
-	f.mu.Lock()
-	defer f.mu.Unlock()
 
 	n := atomic.LoadUint64(f.frozen)
 	f.log.Info("Truncating ancients", "frozen", n, "target", items, "delta", n-items)
@@ -642,6 +653,9 @@ func (f *freezerRemoteS3) TruncateAncients(items uint64) error {
 	return nil
 }
 
+// pushWCaches push write caches to S3,
+// chunking the caches into groups (sized by configuration)
+// and batching those put-object requests.
 func (f *freezerRemoteS3) pushWCaches() error {
 	var err error
 	err = f.pushCacheBatching(f.wCacheBlocks, f.blockObjectGroupSize, f.blockObjectKeyForN, f.blockCacheBatchObjectFn)
@@ -655,6 +669,8 @@ func (f *freezerRemoteS3) pushWCaches() error {
 	return nil
 }
 
+// cacheSorteUint64Keys assumes that the cache uses exclusively uint64 keys,
+// and returns them in an ascending order.
 func cacheSortUint64Keys(cache *lru.Cache) []interface{} {
 	keys := cache.Keys()
 	sort.Slice(keys, func(i, j int) bool {
@@ -663,11 +679,14 @@ func cacheSortUint64Keys(cache *lru.Cache) []interface{} {
 	return keys
 }
 
+// cacheBatches returns batches of sorted keys, where each
+// 'batch' (which is actually a bad name, should be 'group')
+// contains a maximum batchSize elements.
+// This is used for grouping write objects into respective S3-object groups.
 func cacheBatches(c *lru.Cache, batchSize uint64) (batches [][]uint64) {
 	keys := cacheSortUint64Keys(c)
 	batch := []uint64{}
 	for _, k := range keys {
-		// if k.(uint64) + 1 % batchSize == 0 {
 		if uint64(len(batch)) == batchSize {
 			batches = append(batches, batch)
 			batch = []uint64{}
@@ -785,9 +804,10 @@ func (f *freezerRemoteS3) hashCacheBatchObjectFn(items []interface{}) interface{
 	return batchSet
 }
 
-// sync flushes all data tables to disk.
+// Sync flushes all data tables to disk.
 func (f *freezerRemoteS3) Sync() error {
 	f.mu.Lock()
+	defer f.mu.Unlock()
 
 	n := atomic.LoadUint64(f.frozen)
 	lenBlocks := f.wCacheBlocks.Len()
@@ -799,13 +819,11 @@ func (f *freezerRemoteS3) Sync() error {
 	if !f.readOnly {
 		err = f.pushWCaches()
 		if err != nil {
-			f.mu.Unlock()
 			return err
 		}
 
 		err = f.setIndexMarker(atomic.LoadUint64(f.frozen))
 		if err != nil {
-			f.mu.Unlock()
 			return err
 		}
 	}
@@ -814,7 +832,6 @@ func (f *freezerRemoteS3) Sync() error {
 	blocksPerSecond := fmt.Sprintf("%0.2f", float64(lenBlocks)/elapsed.Seconds())
 
 	f.log.Info("Finished syncing ancients", "frozen", n, "blocks", lenBlocks, "elapsed", common.PrettyDuration(elapsed), "bps", blocksPerSecond)
-	f.mu.Unlock()
 	return err
 }
 

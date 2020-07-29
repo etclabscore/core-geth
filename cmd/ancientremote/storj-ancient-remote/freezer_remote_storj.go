@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"math/big"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -337,29 +338,36 @@ func (f *freezerRemoteStorj) findCached(n uint64, kind string) ([]byte, bool) {
 func newFreezerRemoteStorj(ctx context.Context, namespace string, access storjAccess, meter logMetrics) (*freezerRemoteStorj, error) {
 	var err error
 
-	cacheBlocksMax := 0
-	cacheHashesMax := 0
-	if storjROnly {
-		cacheBlocksMax = int(storjBlocksGroupSize * 2)
-		cacheHashesMax = int(storjHashesGroupSize * 2)
+	// Set default cache sizes.
+	// Sizes reflect max number of entries in the cache.
+	// Cache size minimum must be greater than or equal to the group size * 2,
+	// and should not be lower than 2048 * 2 because of how the ancient store rhythm during sync is.
+	blockCacheSize := int(storjBlocksGroupSize) * 2
+	hashCacheSize := int(storjHashesGroupSize) * 2
+	if blockCacheSize < 2048*2 {
+		blockCacheSize = 2048 * 2
+	}
+	if hashCacheSize < 2048*2 {
+		hashCacheSize = 2048 * 2
 	}
 
-	rBlockCache, err := lru.New(int(storjBlocksGroupSize) * 8)
+	rBlockCache, err := lru.New(blockCacheSize)
 	if err != nil {
 		return nil, err
 	}
-	rHashCache, err := lru.New(int(storjHashesGroupSize) * 8)
+	rHashCache, err := lru.New(hashCacheSize)
 	if err != nil {
 		return nil, err
 	}
-	wBlockCache, err := lru.New(int(storjBlocksGroupSize) * 8)
+	wBlockCache, err := lru.New(blockCacheSize)
 	if err != nil {
 		return nil, err
 	}
-	wHashCache, err := lru.New(int(storjHashesGroupSize) * 8)
+	wHashCache, err := lru.New(hashCacheSize)
 	if err != nil {
 		return nil, err
 	}
+
 	f := &freezerRemoteStorj{
 		namespace:  namespace,
 		quit:       make(chan struct{}),
@@ -389,15 +397,6 @@ func newFreezerRemoteStorj(ctx context.Context, namespace string, access storjAc
 	default:
 		return nil, fmt.Errorf("unknown encoding: %s", storjEncoding)
 	}
-
-	/*
-		By default NewSession will only load credentials from the shared credentials file (~/.aws/credentials).
-		If the AWS_SDK_LOAD_CONFIG environment variable is set to a truthy value the Session will be created from the
-		configuration values from the shared config (~/.aws/config) and shared credentials (~/.aws/credentials) files.
-		Using the NewSessionWithOptions with SharedConfigState set to SharedConfigEnable will create the session as if the
-		AWS_SDK_LOAD_CONFIG environment variable was set.
-		> https://docs.aws.amazon.com/sdk-for-go/api/aws/session/
-	*/
 
 	f.session, err = uplink.RequestAccessWithPassphrase(ctx, access.satellite, access.apiKey, access.passphrase)
 	if err != nil {
@@ -505,7 +504,7 @@ func (f *freezerRemoteStorj) Ancients(ctx context.Context) (uint64, error) {
 // AncientSize returns the ancient size of the specified category.
 func (f *freezerRemoteStorj) AncientSize(ctx context.Context, kind string) (uint64, error) {
 	// TODO for Storj Go-SDK doesn't support this in a convenient way.
-	// This would require listing all objects in the bucket and summing their sizes.
+	// This would might require listing all objects in the bucket and summing their sizes.
 	// This method is only used in the InspectDatabase function, which isn't that
 	// important.
 	return 0, errNotSupported
@@ -563,7 +562,8 @@ func (f *freezerRemoteStorj) AppendAncient(ctx context.Context, number uint64, h
 	o, err := NewAncientObjectStorj(hash, header, body, receipts, td)
 	if err != nil {
 		return err
-	
+	}
+
 	// Append to both read and write caches.
 	f.rCacheHashes.Add(number, common.BytesToHash(hash))
 	f.rCacheBlocks.Add(number, o)
@@ -571,31 +571,19 @@ func (f *freezerRemoteStorj) AppendAncient(ctx context.Context, number uint64, h
 	f.wCacheBlocks.Add(number, o)
 	atomic.AddUint64(f.frozen, 1)
 	f.log.Trace("Finished appending ancient", "frozen", atomic.LoadUint64(f.frozen), "number", number)
-	// f.log.Info("Finished appending ancient", "frozen", atomic.LoadUint64(f.frozen), "number", number)
 	return nil
 }
 
-// Truncate discards any recent data above the provided threshold number.
-// TODO@meowsbits: handle pagination.
-//   ListObjects will only (dubiously? might return millions?) return the first 1000. Need to implement pagination.
-//   Also make sure that the Marker is working as expected.
+// TruncateAncients discards any recent data above the provided threshold number.
 func (f *freezerRemoteStorj) TruncateAncients(ctx context.Context, items uint64) error {
 
+	var err error
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
 	n := atomic.LoadUint64(f.frozen)
 	f.log.Info("Truncating ancients", "frozen", n, "target", items, "delta", n-items)
 	start := time.Now()
-
-	// How this works:
-	// 0. Push the new index marker. If everything goes south from here, we'll just end up overwriting the truncated objects.
-	// 1. Ensure or get in cache the object group corresponding to the truncate height.
-	// 2. Truncate the cache.
-	// 3. Push the cache, overwriting the corresponding object on the remote.
-	// 4. Iteratively delete all subsequent objects above the truncated object (ie remove dangling objects).
-
-	var err error
 
 	if !f.readOnly {
 		err = f.setIndexMarker(ctx, items)
@@ -604,128 +592,106 @@ func (f *freezerRemoteStorj) TruncateAncients(ctx context.Context, items uint64)
 		}
 	}
 
-	f.rCacheBlocks.reset()
-	f.rCacheHashes.reset()
-
-	_, ok := f.wCacheBlocks.get(items)
-	if !ok {
-		// We DON'T have in the write cache.
-		// This means that the target block is at least a batch below our current frozen level.
-		// So we need to download the corresponding target batch (clearing the current) and truncate that.
-		// The S3 delete iterator will delete all objects above the target.
-		f.log.Warn("Target block below current batch")
-		f.wCacheBlocks.reset()
-		err = f.pullWCacheBlocks(ctx, items)
-		if err != nil {
-			return err
+	for _, c := range []*lru.Cache{
+		f.rCacheBlocks,
+		f.rCacheHashes,
+		f.wCacheBlocks,
+		f.wCacheHashes,
+	} {
+		keys := c.Keys()
+		for _, k := range keys {
+			if k.(uint64) >= items {
+				c.Remove(k)
+			}
 		}
-	}
-
-	_, ok = f.wCacheHashes.get(items)
-	if !ok {
-		f.wCacheHashes.reset()
-		err = f.pullWCacheHashes(ctx, items)
-		if err != nil {
-			return err
-		}
-	}
-
-	f.wCacheBlocks.truncateFrom(items)
-	f.wCacheHashes.truncateFrom(items)
-
-	if f.readOnly {
-		atomic.StoreUint64(f.frozen, items)
-		f.log.Info("Finished truncating ancients", "elapsed", common.PrettyDuration(time.Since(start)))
-		return nil
-	}
-
-	err = f.pushWCaches(ctx)
-	if err != nil {
-		return err
 	}
 
 	atomic.StoreUint64(f.frozen, items)
-
-	// Iteratively delete any dangling _above_ the current object.
-	marker := f.blockObjectKeyForN(items + f.blockObjectGroupSize)
-	log.Info("Deleting block objects", "marker", marker, "target", items)
-	iter := f.service.ListObjects(ctx, f.bucketName(), &uplink.ListObjectsOptions{Cursor: marker})
-	// TODO might be really slow
-	for iter.Next() {
-		item := iter.Item()
-		_, err := f.service.DeleteObject(ctx, f.bucketName(), item.Key)
-		if err != nil {
-			return fmt.Errorf("Failure deleting block objects %w", err)
-		}
-	}
-
-	marker = f.hashObjectKeyForN(items + f.hashObjectGroupSize)
-	log.Info("Deleting hash objects", "marker", marker, "target", items)
-	iter = f.service.ListObjects(ctx, f.bucketName(), &uplink.ListObjectsOptions{Cursor: marker})
-	// TODO might be really slow
-	for iter.Next() {
-		item := iter.Item()
-		_, err := f.service.DeleteObject(ctx, f.bucketName(), item.Key)
-		if err != nil {
-			return fmt.Errorf("Failure deleting hash objects %w", err)
-		}
-	}
-
 	f.log.Info("Finished truncating ancients", "elapsed", common.PrettyDuration(time.Since(start)))
 	return nil
 }
 
 func (f *freezerRemoteStorj) pushWCaches(ctx context.Context) error {
 	var err error
-	err = f.pushCacheBatch(ctx, f.wCacheBlocks, f.blockObjectGroupSize, f.blockObjectKeyForN, f.blockCacheBatchObjectFn)
+	err = f.pushCacheGroups(ctx, f.wCacheBlocks, f.blockObjectGroupSize, f.blockObjectKeyForN, f.blockCacheGroupObjectFn)
 	if err != nil {
 		return err
 	}
-	err = f.pushCacheBatch(ctx, f.wCacheHashes, f.hashObjectGroupSize, f.hashObjectKeyForN, f.hashCacheBatchObjectFn)
+	err = f.pushCacheGroups(ctx, f.wCacheHashes, f.hashObjectGroupSize, f.hashObjectKeyForN, f.hashCacheGroupObjectFn)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (f *freezerRemoteStorj) pushCacheBatch(ctx context.Context, cache *cache, size uint64, keyFn func(uint64) string, batchObjFn func([]interface{}) interface{}) error {
-	if cache.len() == 0 {
+// cacheSortUint64Keys assumes that the cache uses exclusively uint64 keys,
+// and returns them in an ascending order.
+func cacheSortUint64Keys(cache *lru.Cache) []interface{} {
+	keys := cache.Keys()
+	sort.Slice(keys, func(i, j int) bool {
+		return keys[i].(uint64) < keys[j].(uint64)
+	})
+	return keys
+}
+
+// cacheKeyGroups returns groups of sorted keys, where each
+// group contains a maximum groupSize elements.
+// This is used for grouping write objects into respective Storj-object groups.
+func cacheKeyGroups(c *lru.Cache, groupSize uint64) (groups [][]uint64) {
+	keys := cacheSortUint64Keys(c)
+	group := []uint64{}
+	for _, k := range keys {
+		if uint64(len(group)) == groupSize {
+			groups = append(groups, group)
+			group = []uint64{}
+		}
+		group = append(group, k.(uint64))
+	}
+	groups = append(groups, group)
+	return groups
+
+}
+
+// TODO here is where we would implement batching for writes
+func (f *freezerRemoteStorj) pushCacheGroups(ctx context.Context, cache *lru.Cache, size uint64, keyFn func(uint64) string, groupObjectFn func([]interface{}) interface{}) error {
+	if cache.Len() == 0 {
 		return nil
 	}
-	/*	var uploads []struct {
-		key  string
-		body []byte
-	}*/
-	for {
-		if cache.len() == 0 {
-			break
+	groups := cacheKeyGroups(cache, size)
+	for _, keyGroup := range groups {
+		if len(keyGroup) == 0 {
+			continue
 		}
-		var n = cache.firstN()
+		n := keyGroup[0]
 		if n%size != 0 {
-			panic(fmt.Sprintf("bad mod: n=%d r=%d mod=%d len=%d", n, n%size, size, cache.len()))
+			log.Crit("Non-mod group leader", "n", n, "object.len", len(keyGroup))
 		}
-		batch := cache.batch(0, size)
-		b, err := f.encodeObject(batchObjFn(batch))
+		object := []interface{}{}
+		for _, key := range keyGroup {
+			v, _ := cache.Get(key)
+			object = append(object, v)
+		}
+		b, err := f.encodeObject(groupObjectFn(object))
 		if err != nil {
 			return err
 		}
 
-		// TODO might be really slow
+		// TODO might be slow would implement this as a part of batch
 		err = f.uploadObject(ctx, keyFn(n), b)
 		if err != nil {
 			return err
 		}
-		// uploads = append(uploads, struct{key: keyFn(n), body: b})
-		batchLen := uint64(len(batch))
-		if batchLen%size == 0 {
-			cache.splice(size)
-		} else {
-			break
+	}
+
+	for _, keyGroup := range groups {
+		// Not a complete group (storj-object), don't delete.
+		if uint64(len(keyGroup)) != size {
+			continue
+		}
+		for _, key := range keyGroup {
+			cache.Remove(key)
 		}
 	}
-	// TODO might need an upload to be cancelled here if partial failure in batch upload if batched again
-	//iter := &s3manager.UploadObjectsIterator{Objects: uploads}
-	//err := f.uploader.UploadWithIterator(aws.BackgroundContext(), iter)
 
 	return nil
 }
@@ -768,7 +734,7 @@ func (f *freezerRemoteStorj) decodeObject(input []byte, target interface{}) erro
 	return nil
 }
 
-func (f *freezerRemoteStorj) blockCacheBatchObjectFn(items []interface{}) interface{} {
+func (f *freezerRemoteStorj) blockCacheGroupObjectFn(items []interface{}) interface{} {
 	batchSet := make([]AncientObjectStorj, len(items))
 	for i, v := range items {
 		batchSet[i] = v.(AncientObjectStorj)
@@ -776,7 +742,7 @@ func (f *freezerRemoteStorj) blockCacheBatchObjectFn(items []interface{}) interf
 	return batchSet
 }
 
-func (f *freezerRemoteStorj) hashCacheBatchObjectFn(items []interface{}) interface{} {
+func (f *freezerRemoteStorj) hashCacheGroupObjectFn(items []interface{}) interface{} {
 	batchSet := make([]common.Hash, len(items))
 	for i, v := range items {
 		batchSet[i] = v.(common.Hash)
@@ -787,47 +753,24 @@ func (f *freezerRemoteStorj) hashCacheBatchObjectFn(items []interface{}) interfa
 // sync flushes all data tables to disk.
 func (f *freezerRemoteStorj) Sync(ctx context.Context) error {
 	f.mu.Lock()
+	defer f.mu.Unlock()
 
 	n := atomic.LoadUint64(f.frozen)
-	lenBlocks := f.wCacheBlocks.len()
+	lenBlocks := f.wCacheBlocks.Len()
 	f.log.Info("Syncing ancients", "frozen", n, "blocks", lenBlocks)
 	start := time.Now()
 
 	var err error
 
 	if !f.readOnly {
-		if lenBlocks > 0 {
-			if r := f.wCacheBlocks.firstN() % f.blockObjectGroupSize; r != 0 {
-				f.log.Warn("Found out-of-order block cache", "n", f.wCacheBlocks.firstN())
-				err = f.pullWCacheBlocks(ctx, f.wCacheBlocks.firstN())
-				if err != nil {
-					f.mu.Unlock()
-					return err
-				}
-				f.mu.Unlock()
-				return f.Sync(ctx)
-			}
-			if r := f.wCacheHashes.firstN() % f.hashObjectGroupSize; r != 0 {
-				f.log.Warn("Found out-of-order hash cache", "n", f.wCacheHashes.firstN())
-				err = f.pullWCacheHashes(ctx, f.wCacheHashes.firstN())
-				if err != nil {
-					f.mu.Unlock()
-					return err
-				}
-				f.mu.Unlock()
-				return f.Sync(ctx)
-			}
-		}
 
 		err = f.pushWCaches(ctx)
 		if err != nil {
-			f.mu.Unlock()
 			return err
 		}
 
 		err = f.setIndexMarker(ctx, atomic.LoadUint64(f.frozen))
 		if err != nil {
-			f.mu.Unlock()
 			return err
 		}
 	}
@@ -836,6 +779,5 @@ func (f *freezerRemoteStorj) Sync(ctx context.Context) error {
 	blocksPerSecond := fmt.Sprintf("%0.2f", float64(lenBlocks)/elapsed.Seconds())
 
 	f.log.Info("Finished syncing ancients", "frozen", n, "blocks", lenBlocks, "elapsed", common.PrettyDuration(elapsed), "bps", blocksPerSecond)
-	f.mu.Unlock()
 	return err
 }

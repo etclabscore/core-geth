@@ -6,21 +6,24 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/cmd/ancient-store-mock/lib"
+	"github.com/ethereum/go-ethereum/cmd/ancient-store-mem/lib"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-  Use:   "ancient-remote-mock",
-  Short: "Mock remote ancient store application",
+  Use:   "ancient-store-mem",
+  Short: "Memory-backed remote ancient store application",
   Long: `Uses a memory-backed map to store ancient data.
+
+This application is intended for testing purposed only.
+Ancient data is stored ephemerally.
 
 Expects first and only argument to an IPC path, or, the directory
 in which a default 'mock-freezer.ipc' path should be created.
 
-Mock store logic may be imported and used in testing contexts as well.
+Package 'lib' logic may be imported and used in testing contexts as well.
 `,
   // Uncomment the following line if your bare application
   // has an action associated with it:

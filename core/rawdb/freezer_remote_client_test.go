@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/cmd/ancient-store-mock/lib"
+	"github.com/ethereum/go-ethereum/cmd/ancient-store-mem/lib"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 

@@ -166,7 +166,7 @@ func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 	ancient, _ := NewBlockChain(ancientDb, nil, gspec.Config, ethash.NewFaker(), vm.Config{}, nil, nil)
 	defer ancient.Stop()
 
-	ancientLimit := uint64(len(blocks)/2)
+	ancientLimit := uint64(len(blocks) / 2)
 
 	if n, err := ancient.InsertHeaderChain(headers, 1); err != nil {
 		t.Fatalf("failed to insert header %d: %v", n, err)
@@ -176,7 +176,7 @@ func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 	}
 
 	// Test a rollback, causing the ancient store to use the TruncateAncient method.
-	pinch := len(blocks)/4
+	pinch := len(blocks) / 4
 	rollbackHeaders := []common.Hash{}
 	for _, v := range headers[pinch:] {
 		rollbackHeaders = append(rollbackHeaders, v.Hash())

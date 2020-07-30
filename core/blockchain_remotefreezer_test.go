@@ -126,7 +126,7 @@ func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 	ipcPath, server := remoteIPCFreezerServer(t)
 	defer os.RemoveAll(filepath.Dir(ipcPath))
 	defer server.Stop()
-	ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath, true)
+	ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath)
 	if err != nil {
 		t.Fatalf("failed to create temp freezer db: %v", err)
 	}
@@ -197,7 +197,7 @@ func TestBlockchainRecovery_RemoteFreezer(t *testing.T) {
 	ipcPath, server := remoteIPCFreezerServer(t)
 	defer os.RemoveAll(filepath.Dir(ipcPath))
 	defer server.Stop()
-	ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath, true)
+	ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath)
 	if err != nil {
 		t.Fatalf("failed to create temp freezer db: %v", err)
 	}
@@ -252,7 +252,7 @@ func TestIncompleteAncientReceiptChainInsertion_RemoteFreezer(t *testing.T) {
 	ipcPath, server := remoteIPCFreezerServer(t)
 	defer os.RemoveAll(filepath.Dir(ipcPath))
 	defer server.Stop()
-	ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath, true)
+	ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath)
 	if err != nil {
 		t.Fatalf("failed to create temp freezer db: %v", err)
 	}
@@ -347,7 +347,7 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 	ipcPath, server := remoteIPCFreezerServer(t)
 	defer os.RemoveAll(filepath.Dir(ipcPath))
 	defer server.Stop()
-	ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath, true)
+	ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath)
 	if err != nil {
 		t.Fatalf("failed to create temp freezer db: %v", err)
 	}
@@ -375,7 +375,7 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 	// Init block chain with external ancients, check all needed indices has been indexed.
 	limit := []uint64{0, 32, 64, 128}
 	for _, l := range limit {
-		ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath, true)
+		ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath)
 		if err != nil {
 			t.Fatalf("failed to create temp freezer db: %v", err)
 		}
@@ -395,7 +395,7 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 	}
 
 	// Reconstruct a block chain which only reserves HEAD-64 tx indices
-	ancientDb, err = rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath, true)
+	ancientDb, err = rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath)
 	if err != nil {
 		t.Fatalf("failed to create temp freezer db: %v", err)
 	}
@@ -472,7 +472,7 @@ func TestSkipStaleTxIndicesInFastSync_RemoteFreezer(t *testing.T) {
 	ipcPath, server := remoteIPCFreezerServer(t)
 	defer os.RemoveAll(filepath.Dir(ipcPath))
 	defer server.Stop()
-	ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath, true)
+	ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), ipcPath)
 	if err != nil {
 		t.Fatalf("failed to create temp freezer db: %v", err)
 	}

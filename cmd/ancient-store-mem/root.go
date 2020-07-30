@@ -13,9 +13,9 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-  Use:   "ancient-store-mem",
-  Short: "Memory-backed remote ancient store application",
-  Long: `Uses a memory-backed map to store ancient data.
+	Use:   "ancient-store-mem",
+	Short: "Memory-backed remote ancient store application",
+	Long: `Uses a memory-backed map to store ancient data.
 
 This application is intended for testing purposed only.
 Ancient data is stored ephemerally.
@@ -25,46 +25,45 @@ in which a default 'mock-freezer.ipc' path should be created.
 
 Package 'lib' logic may be imported and used in testing contexts as well.
 `,
-  // Uncomment the following line if your bare application
-  // has an action associated with it:
-  	Run: func(cmd *cobra.Command, args []string) {
-  	  ipcPath := args[0]
-  	  fi, err := os.Stat(ipcPath)
-  	  if fi.IsDir() {
-  	    ipcPath = filepath.Join(ipcPath, "mock-freezer.ipc")
-      }
-  	  listener, server, err := rpc.StartIPCEndpoint(ipcPath, nil)
-      if err != nil {
-        log.Fatalln(err)
-      }
-      defer os.Remove(ipcPath)
-      mock := lib.NewMockFreezerRemoteServerAPI()
-      err = server.RegisterName("freezer", mock)
-      if err != nil {
-        log.Fatalln(err)
-      }
-      quit := make(chan bool, 1)
-      go func() {
-        log.Println("Serving", listener.Addr())
-        log.Fatalln(server.ServeListener(listener))
-      }()
-      <-quit
-    },
+	// Uncomment the following line if your bare application
+	// has an action associated with it:
+	Run: func(cmd *cobra.Command, args []string) {
+		ipcPath := args[0]
+		fi, err := os.Stat(ipcPath)
+		if fi.IsDir() {
+			ipcPath = filepath.Join(ipcPath, "mock-freezer.ipc")
+		}
+		listener, server, err := rpc.StartIPCEndpoint(ipcPath, nil)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer os.Remove(ipcPath)
+		mock := lib.NewMockFreezerRemoteServerAPI()
+		err = server.RegisterName("freezer", mock)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		quit := make(chan bool, 1)
+		go func() {
+			log.Println("Serving", listener.Addr())
+			log.Fatalln(server.ServeListener(listener))
+		}()
+		<-quit
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-  if err := rootCmd.Execute(); err != nil {
-    fmt.Println(err)
-    os.Exit(1)
-  }
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
 
 func init() {
 
-  // Cobra also supports local flags, which will only run
-  // when this action is called directly.
-  rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// Cobra also supports local flags, which will only run
+	// when this action is called directly.
+	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
-

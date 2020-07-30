@@ -9,16 +9,16 @@ import (
 )
 
 const (
-	freezerRemoteHashTable = "hashes"
-	freezerRemoteHeaderTable = "headers"
-	freezerRemoteBodiesTable = "bodies"
-	freezerRemoteReceiptTable = "receipts"
+	freezerRemoteHashTable       = "hashes"
+	freezerRemoteHeaderTable     = "headers"
+	freezerRemoteBodiesTable     = "bodies"
+	freezerRemoteReceiptTable    = "receipts"
 	freezerRemoteDifficultyTable = "diffs"
 )
 
 var (
 	errOutOfBounds = errors.New("out of bounds")
-	errOutOfOrder = errors.New("out of order")
+	errOutOfOrder  = errors.New("out of order")
 )
 
 // MockFreezerRemoteServerAPI is a mock freezer server implementation.
@@ -128,4 +128,3 @@ func (f *MockFreezerRemoteServerAPI) Close() error {
 	fmt.Println("mock server called", "method=Close")
 	return nil
 }
-

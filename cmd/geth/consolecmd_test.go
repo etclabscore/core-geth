@@ -67,6 +67,11 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 		{[]string{"--yolov1"}, 133519467574833, 133519467574833, params.YoloV1GenesisHash.Hex()},
 	}
 	for i, p := range chainIdentityCases {
+
+		// Disable networking, preventing false-negatives if in an environment without networking service
+		// or collisions with an existing geth service.
+		p.flags = append(p.flags, "--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none")
+
 		t.Run(fmt.Sprintf("%d/%v/networkid", i, p.flags),
 			consoleCmdStdoutTest(p.flags, "admin.nodeInfo.protocols.eth.network", p.networkId))
 		t.Run(fmt.Sprintf("%d/%v/chainid", i, p.flags),

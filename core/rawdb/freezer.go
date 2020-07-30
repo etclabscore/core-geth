@@ -257,11 +257,6 @@ func (f *freezer) Sync() error {
 func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}) {
 	nfdb := &nofreezedb{KeyValueStore: db}
 
-	numFrozen, err := f.Ancients()
-	if err != nil {
-		log.Crit("ancient db freeze", "error", err)
-	}
-
 	backoff := false
 	for {
 		select {
@@ -278,6 +273,7 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 				return
 			}
 		}
+
 		// Retrieve the freezing threshold.
 		hash := ReadHeadBlockHash(nfdb)
 		if hash == (common.Hash{}) {
@@ -285,6 +281,12 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 			backoff = true
 			continue
 		}
+
+		numFrozen, err := f.Ancients()
+		if err != nil {
+			log.Crit("ancient db freeze", "error", err)
+		}
+
 		number := ReadHeaderNumber(nfdb, hash)
 		switch {
 		case number == nil:
@@ -350,6 +352,7 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 			if err := f.AppendAncient(numFrozen, hash[:], header, body, receipts, td); err != nil {
 				break
 			}
+			numFrozen++ // Manually increment numFrozen (save a call)
 			ancients = append(ancients, hash)
 		}
 		// Batch of blocks have been frozen, flush them before wiping from leveldb

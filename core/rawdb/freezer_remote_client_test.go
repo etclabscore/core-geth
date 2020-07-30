@@ -10,7 +10,7 @@ import (
 
 func newTestServer(t *testing.T) *rpc.Server {
 	server := rpc.NewServer()
-	mockFreezerServer := lib.NewMockFreezerRemoteServerAPI()
+	mockFreezerServer := lib.NewMemFreezerRemoteServerAPI()
 	err := server.RegisterName("freezer", mockFreezerServer)
 	if err != nil {
 		t.Fatal(err)

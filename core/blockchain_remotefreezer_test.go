@@ -65,7 +65,7 @@ func testRPCRemoteFreezer(t *testing.T) (rpcFreezerEndpoint string, server *rpc.
 		if err != nil {
 			t.Fatal(err)
 		}
-		mock := lib.NewMockFreezerRemoteServerAPI()
+		mock := lib.NewMemFreezerRemoteServerAPI()
 		err = server.RegisterName("freezer", mock)
 		if err != nil {
 			t.Fatal(err)

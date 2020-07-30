@@ -21,29 +21,29 @@ var (
 	errOutOfOrder  = errors.New("out of order")
 )
 
-// MockFreezerRemoteServerAPI is a mock freezer server implementation.
-type MockFreezerRemoteServerAPI struct {
+// MemFreezerRemoteServerAPI is a mock freezer server implementation.
+type MemFreezerRemoteServerAPI struct {
 	store map[string][]byte
 	count uint64
 	mu    sync.Mutex
 }
 
-func NewMockFreezerRemoteServerAPI() *MockFreezerRemoteServerAPI {
-	return &MockFreezerRemoteServerAPI{store: make(map[string][]byte)}
+func NewMemFreezerRemoteServerAPI() *MemFreezerRemoteServerAPI {
+	return &MemFreezerRemoteServerAPI{store: make(map[string][]byte)}
 }
 
-func (r *MockFreezerRemoteServerAPI) storeKey(kind string, number uint64) string {
+func (r *MemFreezerRemoteServerAPI) storeKey(kind string, number uint64) string {
 	return fmt.Sprintf("%s-%d", kind, number)
 }
 
-func (f *MockFreezerRemoteServerAPI) Reset() {
+func (f *MemFreezerRemoteServerAPI) Reset() {
 	f.count = 0
 	f.mu.Lock()
 	f.store = make(map[string][]byte)
 	f.mu.Unlock()
 }
 
-func (f *MockFreezerRemoteServerAPI) HasAncient(kind string, number uint64) (bool, error) {
+func (f *MemFreezerRemoteServerAPI) HasAncient(kind string, number uint64) (bool, error) {
 	fmt.Println("mock server called", "method=HasAncient")
 	f.mu.Lock()
 	defer f.mu.Unlock()
@@ -51,7 +51,7 @@ func (f *MockFreezerRemoteServerAPI) HasAncient(kind string, number uint64) (boo
 	return ok, nil
 }
 
-func (f *MockFreezerRemoteServerAPI) Ancient(kind string, number uint64) ([]byte, error) {
+func (f *MemFreezerRemoteServerAPI) Ancient(kind string, number uint64) ([]byte, error) {
 	fmt.Println("mock server called", "method=Ancient")
 	f.mu.Lock()
 	defer f.mu.Unlock()
@@ -62,12 +62,12 @@ func (f *MockFreezerRemoteServerAPI) Ancient(kind string, number uint64) ([]byte
 	return v, nil
 }
 
-func (f *MockFreezerRemoteServerAPI) Ancients() (uint64, error) {
+func (f *MemFreezerRemoteServerAPI) Ancients() (uint64, error) {
 	fmt.Println("mock server called", "method=Ancients")
 	return f.count, nil
 }
 
-func (f *MockFreezerRemoteServerAPI) AncientSize(kind string) (uint64, error) {
+func (f *MemFreezerRemoteServerAPI) AncientSize(kind string) (uint64, error) {
 	fmt.Println("mock server called", "method=AncientSize")
 	sum := uint64(0)
 	for k, v := range f.store {
@@ -78,7 +78,7 @@ func (f *MockFreezerRemoteServerAPI) AncientSize(kind string) (uint64, error) {
 	return sum, nil
 }
 
-func (f *MockFreezerRemoteServerAPI) AppendAncient(number uint64, hash, header, body, receipt, td []byte) error {
+func (f *MemFreezerRemoteServerAPI) AppendAncient(number uint64, hash, header, body, receipt, td []byte) error {
 	fmt.Println("mock server called", "method=AppendAncient", "number=", number, "header", fmt.Sprintf("%x", header))
 	fieldNames := []string{
 		freezerRemoteHashTable,
@@ -101,7 +101,7 @@ func (f *MockFreezerRemoteServerAPI) AppendAncient(number uint64, hash, header, 
 	return nil
 }
 
-func (f *MockFreezerRemoteServerAPI) TruncateAncients(n uint64) error {
+func (f *MemFreezerRemoteServerAPI) TruncateAncients(n uint64) error {
 	fmt.Println("mock server called", "method=TruncateAncients")
 	f.count = n
 	f.mu.Lock()
@@ -119,12 +119,12 @@ func (f *MockFreezerRemoteServerAPI) TruncateAncients(n uint64) error {
 	return nil
 }
 
-func (f *MockFreezerRemoteServerAPI) Sync() error {
+func (f *MemFreezerRemoteServerAPI) Sync() error {
 	fmt.Println("mock server called", "method=Sync")
 	return nil
 }
 
-func (f *MockFreezerRemoteServerAPI) Close() error {
+func (f *MemFreezerRemoteServerAPI) Close() error {
 	fmt.Println("mock server called", "method=Close")
 	return nil
 }

@@ -25,8 +25,7 @@ in which a default 'mock-freezer.ipc' path should be created.
 
 Package 'lib' logic may be imported and used in testing contexts as well.
 `,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
+
 	Run: func(cmd *cobra.Command, args []string) {
 		ipcPath := args[0]
 		fi, err := os.Stat(ipcPath)
@@ -41,7 +40,7 @@ Package 'lib' logic may be imported and used in testing contexts as well.
 			log.Fatalln(err)
 		}
 		defer os.Remove(ipcPath)
-		mock := lib.NewMockFreezerRemoteServerAPI()
+		mock := lib.NewMemFreezerRemoteServerAPI()
 		err = server.RegisterName("freezer", mock)
 		if err != nil {
 			log.Fatalln(err)

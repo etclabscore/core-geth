@@ -53,7 +53,7 @@ func (ctx *ServiceContext) OpenDatabase(name string, cache int, handles int, nam
 // also attaching a chain freezer to it that moves ancient chain data from the
 // database to immutable append-only files. If the node is an ephemeral one, a
 // memory database is returned.
-func (ctx *ServiceContext) OpenDatabaseWithFreezerRemote(name string, cache int, handles int, freezer string, ipc bool) (ethdb.Database, error) {
+func (ctx *ServiceContext) OpenDatabaseWithFreezerRemote(name string, cache int, handles int, freezer string) (ethdb.Database, error) {
 
 	//fmt.Println("openning the FREEZA via rawdb p1")
 	if ctx.Config.DataDir == "" {
@@ -63,7 +63,7 @@ func (ctx *ServiceContext) OpenDatabaseWithFreezerRemote(name string, cache int,
 	root := ctx.Config.ResolvePath(name)
 	//fmt.Println("openning the FREEZA via rawdb p1.5")
 
-	return rawdb.NewLevelDBDatabaseWithFreezerRemote(root, cache, handles, freezer, ipc)
+	return rawdb.NewLevelDBDatabaseWithFreezerRemote(root, cache, handles, freezer)
 }
 
 // OpenDatabaseWithFreezer opens an existing database with the given name (or

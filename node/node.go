@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -649,22 +650,32 @@ func (n *Node) OpenDatabase(name string, cache, handles int, namespace string) (
 // also attaching a chain freezer to it that moves ancient chain data from the
 // database to immutable append-only files. If the node is an ephemeral one, a
 // memory database is returned.
-func (n *Node) OpenDatabaseWithFreezerRemote(name string, cache, handles int, freezer string, ipc bool) (ethdb.Database, error) {
+func (n *Node) OpenDatabaseWithFreezerRemote(name string, cache, handles int, freezer string) (ethdb.Database, error) {
 	if n.config.DataDir == "" {
 		return rawdb.NewMemoryDatabase(), nil
 	}
 	root := n.config.ResolvePath(name)
-	if ipc {
+	u, err := url.Parse(freezer)
+	if err != nil {
+		return nil, err
+	}
+	switch u.Scheme {
+	case "http", "https":
+	case "ws", "wss":
+	case "stdio":
+	case "":
+		// IPC
 		switch {
 		case freezer == "":
 			freezer = filepath.Join(root, "ancient.ipc")
 		case !filepath.IsAbs(freezer):
 			freezer = n.config.ResolvePath(freezer)
 		}
-
+	default:
+		return nil, fmt.Errorf("no known transport for URL scheme %q", u.Scheme)
 	}
 
-	return rawdb.NewLevelDBDatabaseWithFreezerRemote(root, cache, handles, freezer, ipc)
+	return rawdb.NewLevelDBDatabaseWithFreezerRemote(root, cache, handles, freezer)
 }
 
 // OpenDatabaseWithFreezer opens an existing database with the given name (or

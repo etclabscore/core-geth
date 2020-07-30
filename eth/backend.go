@@ -146,7 +146,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 
 	// Assemble the Ethereum object
 	if config.DatabaseFreezerRemote != "" {
-		chainDb, err = ctx.OpenDatabaseWithFreezerRemote("chaindata", config.DatabaseCache, config.DatabaseHandles, config.DatabaseFreezerRemote, config.DatabaseFreezerRemoteIPC)
+		chainDb, err = ctx.OpenDatabaseWithFreezerRemote("chaindata", config.DatabaseCache, config.DatabaseHandles, config.DatabaseFreezerRemote)
 	} else {
 		chainDb, err = ctx.OpenDatabaseWithFreezer("chaindata", config.DatabaseCache, config.DatabaseHandles, config.DatabaseFreezer, "eth/db/chaindata/")
 	}

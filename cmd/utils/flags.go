@@ -118,14 +118,10 @@ var (
 		Name:  "datadir.ancient",
 		Usage: "Data directory for ancient chain segments (default = inside chaindata)",
 	}
-	AncientRemoteFlag = cli.StringFlag{
-		Name:  "datadir.ancient.remote",
-		Usage: "Use a remote freezer (options = uri or file path). localhost Incomptabile with --datadir.ancient",
+	AncientRPCFlag = cli.StringFlag{
+		Name:  "ancient.rpc",
+		Usage: "Connect to a remote freezer via RPC. Value must an HTTP(S), WS(S), unix socket, or 'stdio' URL. Incompatible with --datadir.ancient",
 		Value: "",
-	}
-	AncientRemoteIPCFlag = cli.StringFlag{
-		Name:  "datadir.ancient.remote.ipcpath",
-		Usage: "Use a remote freezer with ipc. Incomptabile with --datadir.ancient --datadir.ancient.remote as well . Use only datadir.ancient.remote.ipcpath",
 	}
 	KeyStoreDirFlag = DirectoryFlag{
 		Name:  "keystore",
@@ -1575,7 +1571,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// since light client relies on the server for transaction status query.
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, TxLookupLimitFlag)
 
-	CheckExclusive(ctx, AncientFlag, AncientRemoteFlag, AncientRemoteIPCFlag)
+	CheckExclusive(ctx, AncientFlag, AncientRPCFlag)
 
 	var ks *keystore.KeyStore
 	if keystores := stack.AccountManager().Backends(keystore.KeyStoreType); len(keystores) > 0 {
@@ -1599,13 +1595,8 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	if ctx.GlobalIsSet(AncientFlag.Name) {
 		cfg.DatabaseFreezer = ctx.GlobalString(AncientFlag.Name)
 	}
-	if ctx.GlobalIsSet(AncientRemoteIPCFlag.Name) {
-		ipcPath := ctx.GlobalString(AncientRemoteIPCFlag.Name)
-		cfg.DatabaseFreezerRemoteIPC = true
-		cfg.DatabaseFreezerRemote = ipcPath
-	}
-	if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
-		remote := ctx.GlobalString(AncientRemoteFlag.Name)
+	if ctx.GlobalIsSet(AncientRPCFlag.Name) {
+		remote := ctx.GlobalString(AncientRPCFlag.Name)
 		if _, err := url.Parse(remote); err != nil {
 			Fatalf("-- %s Ancient remote flag must be in valid url format %s", remote, err.Error())
 		}
@@ -1913,11 +1904,8 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 	if ctx.GlobalString(SyncModeFlag.Name) == "light" {
 		name = "lightchaindata"
 	}
-	if ctx.GlobalIsSet(AncientRemoteFlag.Name) {
-		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientRemoteFlag.Name), false)
-	} else if ctx.GlobalIsSet(AncientRemoteIPCFlag.Name) {
-		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientRemoteIPCFlag.Name), true)
-
+	if ctx.GlobalIsSet(AncientRPCFlag.Name) {
+		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientRPCFlag.Name))
 	} else {
 		chainDb, err = stack.OpenDatabaseWithFreezer(name, cache, handles, ctx.GlobalString(AncientFlag.Name), "")
 	}

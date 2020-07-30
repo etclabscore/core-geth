@@ -141,7 +141,6 @@ type Config struct {
 	DatabaseCache            int
 	DatabaseFreezer          string
 	DatabaseFreezerRemote    string
-	DatabaseFreezerRemoteIPC bool
 
 	TrieCleanCache int
 	TrieDirtyCache int

@@ -105,11 +105,11 @@ func NewDatabase(db ethdb.KeyValueStore) ethdb.Database {
 // NewDatabaseWithFreezerRemote creates a high level database on top of a given key-
 // value data store with a freezer moving immutable chain segments into cold
 // storage.
-func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerStr string, ipc bool) (ethdb.Database, error) {
+func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerStr string) (ethdb.Database, error) {
 	// Create the idle freezer instance
 	log.Info("New remote freezer", "freezer", freezerStr)
 
-	frdb, err := newFreezerRemoteClient(freezerStr, ipc)
+	frdb, err := newFreezerRemoteClient(freezerStr)
 	if err != nil {
 		log.Error("NewDatabaseWithFreezerRemote error", "error", err)
 		return nil, err
@@ -269,12 +269,12 @@ func NewLevelDBDatabase(file string, cache int, handles int, namespace string) (
 
 // NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a
 // freezer moving immutable chain segments into cold storage.
-func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, freezer string, ipc bool) (ethdb.Database, error) {
+func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, freezer string) (ethdb.Database, error) {
 	kvdb, err := leveldb.New(file, cache, handles, "eth/db/chaindata")
 	if err != nil {
 		return nil, err
 	}
-	frdb, err := NewDatabaseWithFreezerRemote(kvdb, freezer, ipc)
+	frdb, err := NewDatabaseWithFreezerRemote(kvdb, freezer)
 	if err != nil {
 		kvdb.Close()
 		return nil, err

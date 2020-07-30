@@ -27,7 +27,7 @@ const (
 )
 
 // newFreezerRemoteClient constructs a rpc client to connect to a remote freezer
-func newFreezerRemoteClient(endpoint string, ipc bool) (*FreezerRemoteClient, error) {
+func newFreezerRemoteClient(endpoint string) (*FreezerRemoteClient, error) {
 	client, err := rpc.Dial(endpoint)
 	if err != nil {
 		return nil, err

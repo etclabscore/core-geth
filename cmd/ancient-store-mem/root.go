@@ -33,7 +33,7 @@ Package 'lib' logic may be imported and used in testing contexts as well.
 		if err != nil && !os.IsNotExist(err) {
 			log.Fatalln(err)
 		}
-		if fi.IsDir() {
+		if fi != nil && fi.IsDir() {
 			ipcPath = filepath.Join(ipcPath, "mock-freezer.ipc")
 		}
 		listener, server, err := rpc.StartIPCEndpoint(ipcPath, nil)

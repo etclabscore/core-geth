@@ -30,6 +30,9 @@ Package 'lib' logic may be imported and used in testing contexts as well.
 	Run: func(cmd *cobra.Command, args []string) {
 		ipcPath := args[0]
 		fi, err := os.Stat(ipcPath)
+		if err != nil && !os.IsNotExist(err) {
+			log.Fatalln(err)
+		}
 		if fi.IsDir() {
 			ipcPath = filepath.Join(ipcPath, "mock-freezer.ipc")
 		}

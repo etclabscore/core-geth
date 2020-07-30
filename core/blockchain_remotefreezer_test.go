@@ -154,6 +154,13 @@ func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 		defer server.Stop()
 	}
 	defer ancientDb.Close() // Cause the Close method to be called.
+	defer func() {
+		// A deferred truncation to 0 will allow a single freezer instance to
+		// handle multiple tests in serial.
+		if err := ancientDb.TruncateAncients(0); err != nil {
+			t.Fatalf("deferred truncate ancients error: %v", err)
+		}
+	}()
 
 	MustCommitGenesis(ancientDb, gspec)
 	ancient, _ := NewBlockChain(ancientDb, nil, gspec.Config, ethash.NewFaker(), vm.Config{}, nil, nil)
@@ -253,6 +260,13 @@ func TestBlockchainRecovery_RemoteFreezer(t *testing.T) {
 		defer server.Stop()
 	}
 	defer ancientDb.Close() // Cause the Close method to be called.
+	defer func() {
+		// A deferred truncation to 0 will allow a single freezer instance to
+		// handle multiple tests in serial.
+		if err := ancientDb.TruncateAncients(0); err != nil {
+			t.Fatalf("deferred truncate ancients error: %v", err)
+		}
+	}()
 
 	MustCommitGenesis(ancientDb, gspec)
 	ancient, _ := NewBlockChain(ancientDb, nil, gspec.Config, ethash.NewFaker(), vm.Config{}, nil, nil)
@@ -307,6 +321,13 @@ func TestIncompleteAncientReceiptChainInsertion_RemoteFreezer(t *testing.T) {
 		defer server.Stop()
 	}
 	defer ancientDb.Close() // Cause the Close method to be called.
+	defer func() {
+		// A deferred truncation to 0 will allow a single freezer instance to
+		// handle multiple tests in serial.
+		if err := ancientDb.TruncateAncients(0); err != nil {
+			t.Fatalf("deferred truncate ancients error: %v", err)
+		}
+	}()
 	MustCommitGenesis(ancientDb, gspec)
 	ancient, _ := NewBlockChain(ancientDb, nil, gspec.Config, ethash.NewFaker(), vm.Config{}, nil, nil)
 	defer ancient.Stop()
@@ -401,6 +422,13 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 		defer server.Stop()
 	}
 	defer ancientDb.Close() // Cause the Close method to be called.
+	defer func() {
+		// A deferred truncation to 0 will allow a single freezer instance to
+		// handle multiple tests in serial.
+		if err := ancientDb.TruncateAncients(0); err != nil {
+			t.Fatalf("deferred truncate ancients error: %v", err)
+		}
+	}()
 	MustCommitGenesis(ancientDb, gspec)
 
 	// Import all blocks into ancient db
@@ -525,6 +553,13 @@ func TestSkipStaleTxIndicesInFastSync_RemoteFreezer(t *testing.T) {
 		defer server.Stop()
 	}
 	defer ancientDb.Close() // Cause the Close method to be called.
+	defer func() {
+		// A deferred truncation to 0 will allow a single freezer instance to
+		// handle multiple tests in serial.
+		if err := ancientDb.TruncateAncients(0); err != nil {
+			t.Fatalf("deferred truncate ancients error: %v", err)
+		}
+	}()
 	MustCommitGenesis(ancientDb, gspec)
 
 	// Import all blocks into ancient db, only HEAD-32 indices are kept.

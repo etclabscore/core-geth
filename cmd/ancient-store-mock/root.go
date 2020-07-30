@@ -1,26 +1,27 @@
-package cmd
+package main
 
 import (
-  "fmt"
-  "log"
-  "os"
-  "path/filepath"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 
-  "github.com/ethereum/go-ethereum/cmd/ancientremote/mock-ancient-remote/lib"
-  "github.com/ethereum/go-ethereum/rpc"
-  "github.com/spf13/cobra"
+	"github.com/ethereum/go-ethereum/cmd/ancient-store-mock/lib"
+	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-  Use:   "mock-ancient-remote",
-  Short: "A brief description of your application",
-  Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+  Use:   "ancient-remote-mock",
+  Short: "Mock remote ancient store application",
+  Long: `Uses a memory-backed map to store ancient data.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Expects first and only argument to an IPC path, or, the directory
+in which a default 'mock-freezer.ipc' path should be created.
+
+Mock store logic may be imported and used in testing contexts as well.
+`,
   // Uncomment the following line if your bare application
   // has an action associated with it:
   	Run: func(cmd *cobra.Command, args []string) {

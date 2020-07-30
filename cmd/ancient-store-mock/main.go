@@ -15,8 +15,6 @@ limitations under the License.
 */
 package main
 
-import "github.com/ethereum/go-ethereum/cmd/ancientremote/mock-ancient-remote/cmd"
-
 func main() {
-  cmd.Execute()
+  Execute()
 }

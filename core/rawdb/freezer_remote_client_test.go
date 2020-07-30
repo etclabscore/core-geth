@@ -56,7 +56,7 @@ func TestClient1(t *testing.T) {
 		if err != nil {
 			t.Fatalf("ancient: %v", err)
 		}
-		if bytes.Compare([]byte{uint8(*head - 1)}, v) != 0 {
+		if !bytes.Equal([]byte{uint8(*head - 1)}, v) {
 			t.Fatalf("mismatch store value: want: %x, got: %x", []byte{uint8(*head)}, v)
 		}
 

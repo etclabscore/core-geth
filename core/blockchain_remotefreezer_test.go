@@ -42,14 +42,15 @@ import (
 // replacing the built in file-based ancient db with a remote one over IPC.
 
 var (
-	// testRPCFreezerURL = flag.String("ancient.rpc", "", "Configurable remote freezer server RPC endpoint")
+	// testRPCFreezerURL defines an optional environment variable that, if set,
+	// will be used in lieu of a default ephemeral remote freezer store.
 	testRPCFreezerURL = os.Getenv("GETH_ANCIENT_RPC")
 )
 
 // testRPCRemoteFreezer provides a configuration option to use an external
 // remote freezer server, or to default (with no configured flags) to a built in
 // ephemeral in-memory server over a temporary unix socket.
-// If an external URL is configured via --ancient.rpc, then the return value for 'server' will be nil.
+// If an external URL is configured the return value for 'server' will be nil.
 func testRPCRemoteFreezer(t *testing.T) (rpcFreezerEndpoint string, server *rpc.Server, ancientDB ethdb.Database) {
 	if testRPCFreezerURL == "" {
 		// If an external freezer server is not provided, spin up an ephemeral
@@ -88,6 +89,9 @@ func testRPCRemoteFreezer(t *testing.T) (rpcFreezerEndpoint string, server *rpc.
 
 // Tests that fast importing a block chain produces the same chain data as the
 // classical full block processing.
+// Extra steps have been added to this test compared to its sister TestFastVsFullChains
+// that ensure that the ancient store methods are completely exercised; eg. a rollback step is
+// used to call TruncateAncients.
 func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 	// Configure and generate a sample block chain
 	var (

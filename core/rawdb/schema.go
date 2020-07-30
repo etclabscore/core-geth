@@ -80,19 +80,34 @@ var (
 const (
 
 	// FreezerRemoteHeaderTable indicates the name of the freezer header table.
-	FreezerRemoteHeaderTable = "headers"
+	// This is an exported value for remote freezer servers to use if they want.
+	// It is equivalent to the corresponding private value,
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
+	FreezerRemoteHeaderTable = freezerHeaderTable
 
 	// FreezerRemoteHashTable indicates the name of the freezer canonical hash table.
-	FreezerRemoteHashTable = "hashes"
+	// This is an exported value for remote freezer servers to use if they want.
+	// It is equivalent to the corresponding private value,
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
+	FreezerRemoteHashTable = freezerHashTable
 
 	// FreezerRemoteBodiesTable indicates the name of the freezer block body table.
-	FreezerRemoteBodiesTable = "bodies"
+	// This is an exported value for remote freezer servers to use if they want.
+	// It is equivalent to the corresponding private value,
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
+	FreezerRemoteBodiesTable = freezerBodiesTable
 
 	// FreezerRemoteReceiptTable indicates the name of the freezer receipts table.
-	FreezerRemoteReceiptTable = "receipts"
+	// This is an exported value for remote freezer servers to use if they want.
+	// It is equivalent to the corresponding private value,
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
+	FreezerRemoteReceiptTable = freezerReceiptTable
 
 	// FreezerRemoteDifficultyTable indicates the name of the freezer total difficulty table.
-	FreezerRemoteDifficultyTable = "diffs"
+	// This is an exported value for remote freezer servers to use if they want.
+	// It is equivalent to the corresponding private value,
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
+	FreezerRemoteDifficultyTable = freezerDifficultyTable
 
 	// freezerHeaderTable indicates the name of the freezer header table.
 	freezerHeaderTable = "headers"

@@ -290,7 +290,6 @@ func TestIncompleteAncientReceiptChainInsertion_RemoteFreezer(t *testing.T) {
 	}
 }
 
-
 func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 	// Configure and generate a sample block chain
 	var (
@@ -415,7 +414,6 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 		chain.Stop()
 	}
 }
-
 
 func TestSkipStaleTxIndicesInFastSync_RemoteFreezer(t *testing.T) {
 	// Configure and generate a sample block chain

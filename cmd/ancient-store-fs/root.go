@@ -21,10 +21,10 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		var (
-			datadir string
+			datadir  string
 			listener net.Listener
-			server *rpc.Server
-			err error
+			server   *rpc.Server
+			err      error
 		)
 
 		listenAndServe := func() {

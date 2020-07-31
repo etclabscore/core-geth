@@ -505,7 +505,7 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to create tester chain: %v", err)
 		}
-		time.Sleep(50 * time.Millisecond) // Wait for indices initialisation
+		time.Sleep(150 * time.Millisecond) // Wait for indices initialisation
 		var tail uint64
 		if l != 0 {
 			tail = uint64(128) - l + 1
@@ -530,7 +530,7 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 			t.Fatalf("failed to create tester chain: %v", err)
 		}
 		chain.InsertChain(blocks2[i : i+1]) // Feed chain a higher block to trigger indices updater.
-		time.Sleep(50 * time.Millisecond)   // Wait for indices initialisation
+		time.Sleep(150 * time.Millisecond)  // Wait for indices initialisation
 		check(&tails[i], chain)
 		chain.Stop()
 	}

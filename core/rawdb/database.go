@@ -32,7 +32,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-// freezerdb is a database wrapper that enabled Freezer data retrievals.
+// freezerdb is a database wrapper that enabled freezer data retrievals.
 type freezerdb struct {
 	ethdb.KeyValueStore
 	ethdb.AncientStore
@@ -54,48 +54,48 @@ func (frdb *freezerdb) Close() error {
 	return nil
 }
 
-// nofreezedb is a database wrapper that disables Freezer data retrievals.
+// nofreezedb is a database wrapper that disables freezer data retrievals.
 type nofreezedb struct {
 	ethdb.KeyValueStore
 }
 
-// HasAncient returns an error as we don't have a backing chain Freezer.
+// HasAncient returns an error as we don't have a backing chain freezer.
 func (db *nofreezedb) HasAncient(kind string, number uint64) (bool, error) {
 	return false, errNotSupported
 }
 
-// Ancient returns an error as we don't have a backing chain Freezer.
+// Ancient returns an error as we don't have a backing chain freezer.
 func (db *nofreezedb) Ancient(kind string, number uint64) ([]byte, error) {
 	return nil, errNotSupported
 }
 
-// Ancients returns an error as we don't have a backing chain Freezer.
+// Ancients returns an error as we don't have a backing chain freezer.
 func (db *nofreezedb) Ancients() (uint64, error) {
 	return 0, errNotSupported
 }
 
-// AncientSize returns an error as we don't have a backing chain Freezer.
+// AncientSize returns an error as we don't have a backing chain freezer.
 func (db *nofreezedb) AncientSize(kind string) (uint64, error) {
 	return 0, errNotSupported
 }
 
-// AppendAncient returns an error as we don't have a backing chain Freezer.
+// AppendAncient returns an error as we don't have a backing chain freezer.
 func (db *nofreezedb) AppendAncient(number uint64, hash, header, body, receipts, td []byte) error {
 	return errNotSupported
 }
 
-// TruncateAncients returns an error as we don't have a backing chain Freezer.
+// TruncateAncients returns an error as we don't have a backing chain freezer.
 func (db *nofreezedb) TruncateAncients(items uint64) error {
 	return errNotSupported
 }
 
-// Sync returns an error as we don't have a backing chain Freezer.
+// Sync returns an error as we don't have a backing chain freezer.
 func (db *nofreezedb) Sync() error {
 	return errNotSupported
 }
 
 // NewDatabase creates a high level database on top of a given key-value data
-// store without a Freezer moving immutable chain segments into cold storage.
+// store without a freezer moving immutable chain segments into cold storage.
 func NewDatabase(db ethdb.KeyValueStore) ethdb.Database {
 	return &nofreezedb{
 		KeyValueStore: db,
@@ -103,44 +103,44 @@ func NewDatabase(db ethdb.KeyValueStore) ethdb.Database {
 }
 
 // NewDatabaseWithFreezerRemote creates a high level database on top of a given key-
-// value data store with a Freezer moving immutable chain segments into cold
+// value data store with a freezer moving immutable chain segments into cold
 // storage.
 func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerURL string) (ethdb.Database, error) {
-	// Create the idle Freezer instance
-	log.Info("New remote Freezer", "Freezer", freezerURL)
+	// Create the idle freezer instance
+	log.Info("New remote freezer", "freezer", freezerURL)
 
 	frdb, err := newFreezerRemoteClient(freezerURL)
 	if err != nil {
 		log.Error("NewDatabaseWithFreezerRemote error", "error", err)
 		return nil, err
 	}
-	// Since the Freezer can be stored separately from the user's key-value database,
+	// Since the freezer can be stored separately from the user's key-value database,
 	// there's a fairly high probability that the user requests invalid combinations
-	// of the Freezer and database. Ensure that we don't shoot ourselves in the foot
+	// of the freezer and database. Ensure that we don't shoot ourselves in the foot
 	// by serving up conflicting data, leading to both datastores getting corrupted.
 	//
-	//   - If both the Freezer and key-value store is empty (no genesis), we just
-	//     initialized a new empty Freezer, so everything's fine.
-	//   - If the key-value store is empty, but the Freezer is not, we need to make
-	//     sure the user's genesis matches the Freezer. That will be checked in the
+	//   - If both the freezer and key-value store is empty (no genesis), we just
+	//     initialized a new empty freezer, so everything's fine.
+	//   - If the key-value store is empty, but the freezer is not, we need to make
+	//     sure the user's genesis matches the freezer. That will be checked in the
 	//     blockchain, since we don't have the genesis block here (nor should we at
-	//     this point care, the key-value/Freezer combo is valid).
-	//   - If neither the key-value store nor the Freezer is empty, cross validate
+	//     this point care, the key-value/freezer combo is valid).
+	//   - If neither the key-value store nor the freezer is empty, cross validate
 	//     the genesis hashes to make sure they are compatible. If they are, also
-	//     ensure that there's no gap between the Freezer and sunsequently leveldb.
-	//   - If the key-value store is not empty, but the Freezer is we might just be
-	//     upgrading to the Freezer release, or we might have had a small chain and
+	//     ensure that there's no gap between the freezer and sunsequently leveldb.
+	//   - If the key-value store is not empty, but the freezer is we might just be
+	//     upgrading to the freezer release, or we might have had a small chain and
 	//     not frozen anything yet. Ensure that no blocks are missing yet from the
-	//     key-value store, since that would mean we already had an old Freezer.
+	//     key-value store, since that would mean we already had an old freezer.
 	/*validateErr := validateFreezerVsKV(frdb, db)
 	if validateErr != nil {
 
-		log.Warn("Freezer/KV validation error, attempting Freezer repair", "error", validateErr)
+		log.Warn("Freezer/KV validation error, attempting freezer repair", "error", validateErr)
 		if reperr := frdb.repair(); reperr != nil {
 			log.Warn("Freezer repair errored", "error", reperr)
 
 			// Repair did error, AND the validation errored, so return both together because that's double bad.
-			return nil, fmt.Errorf("Freezer/kv error=%v Freezer repair error=%v", validateErr, reperr)
+			return nil, fmt.Errorf("freezer/kv error=%v freezer repair error=%v", validateErr, reperr)
 		}
 
 		log.Warn("Freezer repair OK")
@@ -176,41 +176,41 @@ func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerURL string) (et
 }
 
 // NewDatabaseWithFreezer creates a high level database on top of a given key-
-// value data store with a Freezer moving immutable chain segments into cold
+// value data store with a freezer moving immutable chain segments into cold
 // storage.
 func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace string) (ethdb.Database, error) {
-	// Create the idle Freezer instance
-	frdb, err := NewFreezer(freezerStr, namespace)
+	// Create the idle freezer instance
+	frdb, err := newFreezer(freezerStr, namespace)
 	if err != nil {
 		return nil, err
 	}
-	// Since the Freezer can be stored separately from the user's key-value database,
+	// Since the freezer can be stored separately from the user's key-value database,
 	// there's a fairly high probability that the user requests invalid combinations
-	// of the Freezer and database. Ensure that we don't shoot ourselves in the foot
+	// of the freezer and database. Ensure that we don't shoot ourselves in the foot
 	// by serving up conflicting data, leading to both datastores getting corrupted.
 	//
-	//   - If both the Freezer and key-value store is empty (no genesis), we just
-	//     initialized a new empty Freezer, so everything's fine.
-	//   - If the key-value store is empty, but the Freezer is not, we need to make
-	//     sure the user's genesis matches the Freezer. That will be checked in the
+	//   - If both the freezer and key-value store is empty (no genesis), we just
+	//     initialized a new empty freezer, so everything's fine.
+	//   - If the key-value store is empty, but the freezer is not, we need to make
+	//     sure the user's genesis matches the freezer. That will be checked in the
 	//     blockchain, since we don't have the genesis block here (nor should we at
-	//     this point care, the key-value/Freezer combo is valid).
-	//   - If neither the key-value store nor the Freezer is empty, cross validate
+	//     this point care, the key-value/freezer combo is valid).
+	//   - If neither the key-value store nor the freezer is empty, cross validate
 	//     the genesis hashes to make sure they are compatible. If they are, also
-	//     ensure that there's no gap between the Freezer and sunsequently leveldb.
-	//   - If the key-value store is not empty, but the Freezer is we might just be
-	//     upgrading to the Freezer release, or we might have had a small chain and
+	//     ensure that there's no gap between the freezer and sunsequently leveldb.
+	//   - If the key-value store is not empty, but the freezer is we might just be
+	//     upgrading to the freezer release, or we might have had a small chain and
 	//     not frozen anything yet. Ensure that no blocks are missing yet from the
-	//     key-value store, since that would mean we already had an old Freezer.
+	//     key-value store, since that would mean we already had an old freezer.
 	validateErr := validateFreezerVsKV(frdb, db)
 	if validateErr != nil {
 
-		log.Warn("Freezer/KV validation error, attempting Freezer repair", "error", validateErr)
+		log.Warn("Freezer/KV validation error, attempting freezer repair", "error", validateErr)
 		if reperr := frdb.repair(); reperr != nil {
 			log.Warn("Freezer repair errored", "error", reperr)
 
 			// Repair did error, AND the validation errored, so return both together because that's double bad.
-			return nil, fmt.Errorf("Freezer/kv error=%v Freezer repair error=%v", validateErr, reperr)
+			return nil, fmt.Errorf("freezer/kv error=%v freezer repair error=%v", validateErr, reperr)
 		}
 
 		log.Warn("Freezer repair OK")
@@ -245,19 +245,19 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 }
 
 // NewMemoryDatabase creates an ephemeral in-memory key-value database without a
-// Freezer moving immutable chain segments into cold storage.
+// freezer moving immutable chain segments into cold storage.
 func NewMemoryDatabase() ethdb.Database {
 	return NewDatabase(memorydb.New())
 }
 
 // NewMemoryDatabaseWithCap creates an ephemeral in-memory key-value database
-// with an initial starting capacity, but without a Freezer moving immutable
+// with an initial starting capacity, but without a freezer moving immutable
 // chain segments into cold storage.
 func NewMemoryDatabaseWithCap(size int) ethdb.Database {
 	return NewDatabase(memorydb.NewWithCap(size))
 }
 
-// NewLevelDBDatabase creates a persistent key-value database without a Freezer
+// NewLevelDBDatabase creates a persistent key-value database without a freezer
 // moving immutable chain segments into cold storage.
 func NewLevelDBDatabase(file string, cache int, handles int, namespace string) (ethdb.Database, error) {
 	db, err := leveldb.New(file, cache, handles, namespace)
@@ -268,7 +268,7 @@ func NewLevelDBDatabase(file string, cache int, handles int, namespace string) (
 }
 
 // NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a
-// Freezer moving immutable chain segments into cold storage.
+// freezer moving immutable chain segments into cold storage.
 func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, freezerURL string) (ethdb.Database, error) {
 	kvdb, err := leveldb.New(file, cache, handles, "eth/db/chaindata")
 	if err != nil {
@@ -283,7 +283,7 @@ func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, fr
 }
 
 // NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a
-// Freezer moving immutable chain segments into cold storage.
+// freezer moving immutable chain segments into cold storage.
 func NewLevelDBDatabaseWithFreezer(file string, cache int, handles int, freezer string, namespace string) (ethdb.Database, error) {
 	kvdb, err := leveldb.New(file, cache, handles, namespace)
 	if err != nil {
@@ -440,37 +440,37 @@ func InspectDatabase(db ethdb.Database) error {
 	return nil
 }
 
-func validateFreezerVsKV(freezerdb *Freezer, db ethdb.KeyValueStore) error {
+func validateFreezerVsKV(freezerdb *freezer, db ethdb.KeyValueStore) error {
 	// If the genesis hash is empty, we have a new key-value store, so nothing to
 	// validate in this method. If, however, the genesis hash is not nil, compare
-	// it to the Freezer content.
+	// it to the freezer content.
 	if kvgenesis, _ := db.Get(headerHashKey(0)); len(kvgenesis) > 0 {
 		if frozen, _ := freezerdb.Ancients(); frozen > 0 {
-			// If the Freezer already contains something, ensure that the genesis blocks
+			// If the freezer already contains something, ensure that the genesis blocks
 			// match, otherwise we might mix up freezers across chains and destroy both
-			// the Freezer and the key-value store.
+			// the freezer and the key-value store.
 			frgenesis, err := freezerdb.Ancient(freezerHashTable, 0)
 			if err != nil {
 				return fmt.Errorf("failed to retrieve genesis from ancient %v", err)
 			} else if !bytes.Equal(kvgenesis, frgenesis) {
 				return fmt.Errorf("genesis mismatch: %#x (leveldb) != %#x (ancients)", kvgenesis, frgenesis)
 			}
-			// Key-value store and Freezer belong to the same network. Ensure that they
-			// are contiguous, otherwise we might end up with a non-functional Freezer.
+			// Key-value store and freezer belong to the same network. Ensure that they
+			// are contiguous, otherwise we might end up with a non-functional freezer.
 			if kvhash, _ := db.Get(headerHashKey(frozen)); len(kvhash) == 0 {
-				// Subsequent header after the Freezer limit is missing from the database.
+				// Subsequent header after the freezer limit is missing from the database.
 				// Reject startup is the database has a more recent head.
 				if headHeaderN := *ReadHeaderNumber(db, ReadHeadHeaderHash(db)); headHeaderN > frozen-1 {
 					return fmt.Errorf("gap (chaindb=#%d frozen=#%d) in the chain between ancients and leveldb", headHeaderN, frozen)
 				}
-				// Database contains only older data than the Freezer, this happens if the
-				// state was wiped and reinited from an existing Freezer.
+				// Database contains only older data than the freezer, this happens if the
+				// state was wiped and reinited from an existing freezer.
 			}
-			// Otherwise, key-value store continues where the Freezer left off, all is fine.
-			// We might have duplicate blocks (crash after Freezer write but before key-value
+			// Otherwise, key-value store continues where the freezer left off, all is fine.
+			// We might have duplicate blocks (crash after freezer write but before key-value
 			// store deletion, but that's fine).
 		} else {
-			// If the Freezer is empty, ensure nothing was moved yet from the key-value
+			// If the freezer is empty, ensure nothing was moved yet from the key-value
 			// store, otherwise we'll end up missing data. We check block #1 to decide
 			// if we froze anything previously or not, but do take care of databases with
 			// only the genesis block.
@@ -480,16 +480,16 @@ func validateFreezerVsKV(freezerdb *Freezer, db ethdb.KeyValueStore) error {
 				if kvblob, _ := db.Get(headerHashKey(1)); len(kvblob) == 0 {
 					return errors.New("ancient chain segments already extracted, please set --datadir.ancient to the correct path")
 				}
-				// Block #1 is still in the database, we're allowed to init a new Freezer.
+				// Block #1 is still in the database, we're allowed to init a new freezer.
 			}
 			// Otherwise, the head header is still the genesis, we're allowed to init a new
-			// Freezer.
+			// freezer.
 		}
 	}
 	return nil
 }
 
-func truncateKVtoFreezer(freezerdb *Freezer, db ethdb.KeyValueStore) {
+func truncateKVtoFreezer(freezerdb *freezer, db ethdb.KeyValueStore) {
 	hhh := ReadHeadHeaderHash(db)
 	n := *ReadHeaderNumber(db, hhh)
 	frozen, _ := freezerdb.Ancients()
@@ -514,7 +514,7 @@ func truncateKVtoFreezer(freezerdb *Freezer, db ethdb.KeyValueStore) {
 	log.Warn("Head fast", "number", headFast, "hash", headFastHash)
 	log.Warn("Head full", "number", headFull, "hash", headFullHash)
 
-	log.Warn("Persistent Freezer/KV gap: Truncating KV database to Freezer height", "ancients", frozen, "kv.head_header_number", n, "kv.head_header_hash", hhh)
+	log.Warn("Persistent Freezer/KV gap: Truncating KV database to freezer height", "ancients", frozen, "kv.head_header_number", n, "kv.head_header_hash", hhh)
 
 	for ; n > frozen-1 && n != 0; n-- {
 		for _, hash := range ReadAllHashes(db, n) {

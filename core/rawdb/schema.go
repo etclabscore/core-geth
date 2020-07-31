@@ -79,49 +79,49 @@ var (
 
 const (
 
-	// FreezerRemoteHeaderTable indicates the name of the Freezer header table.
-	// This is an exported value for remote Freezer servers to use if they want.
+	// FreezerRemoteHeaderTable indicates the name of the freezer header table.
+	// This is an exported value for remote freezer servers to use if they want.
 	// It is equivalent to the corresponding private value,
-	// and exists only to minimize code differentiation from the built-in Freezer implementation.
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
 	FreezerRemoteHeaderTable = freezerHeaderTable
 
-	// FreezerRemoteHashTable indicates the name of the Freezer canonical hash table.
-	// This is an exported value for remote Freezer servers to use if they want.
+	// FreezerRemoteHashTable indicates the name of the freezer canonical hash table.
+	// This is an exported value for remote freezer servers to use if they want.
 	// It is equivalent to the corresponding private value,
-	// and exists only to minimize code differentiation from the built-in Freezer implementation.
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
 	FreezerRemoteHashTable = freezerHashTable
 
-	// FreezerRemoteBodiesTable indicates the name of the Freezer block body table.
-	// This is an exported value for remote Freezer servers to use if they want.
+	// FreezerRemoteBodiesTable indicates the name of the freezer block body table.
+	// This is an exported value for remote freezer servers to use if they want.
 	// It is equivalent to the corresponding private value,
-	// and exists only to minimize code differentiation from the built-in Freezer implementation.
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
 	FreezerRemoteBodiesTable = freezerBodiesTable
 
-	// FreezerRemoteReceiptTable indicates the name of the Freezer receipts table.
-	// This is an exported value for remote Freezer servers to use if they want.
+	// FreezerRemoteReceiptTable indicates the name of the freezer receipts table.
+	// This is an exported value for remote freezer servers to use if they want.
 	// It is equivalent to the corresponding private value,
-	// and exists only to minimize code differentiation from the built-in Freezer implementation.
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
 	FreezerRemoteReceiptTable = freezerReceiptTable
 
-	// FreezerRemoteDifficultyTable indicates the name of the Freezer total difficulty table.
-	// This is an exported value for remote Freezer servers to use if they want.
+	// FreezerRemoteDifficultyTable indicates the name of the freezer total difficulty table.
+	// This is an exported value for remote freezer servers to use if they want.
 	// It is equivalent to the corresponding private value,
-	// and exists only to minimize code differentiation from the built-in Freezer implementation.
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
 	FreezerRemoteDifficultyTable = freezerDifficultyTable
 
-	// freezerHeaderTable indicates the name of the Freezer header table.
+	// freezerHeaderTable indicates the name of the freezer header table.
 	freezerHeaderTable = "headers"
 
-	// freezerHashTable indicates the name of the Freezer canonical hash table.
+	// freezerHashTable indicates the name of the freezer canonical hash table.
 	freezerHashTable = "hashes"
 
-	// freezerBodiesTable indicates the name of the Freezer block body table.
+	// freezerBodiesTable indicates the name of the freezer block body table.
 	freezerBodiesTable = "bodies"
 
-	// freezerReceiptTable indicates the name of the Freezer receipts table.
+	// freezerReceiptTable indicates the name of the freezer receipts table.
 	freezerReceiptTable = "receipts"
 
-	// freezerDifficultyTable indicates the name of the Freezer total difficulty table.
+	// freezerDifficultyTable indicates the name of the freezer total difficulty table.
 	freezerDifficultyTable = "diffs"
 )
 

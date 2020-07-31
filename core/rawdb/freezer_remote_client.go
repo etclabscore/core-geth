@@ -26,7 +26,7 @@ const (
 	FreezerMethodSync             = "freezer_sync"
 )
 
-// newFreezerRemoteClient constructs a rpc client to connect to a remote Freezer
+// newFreezerRemoteClient constructs a rpc client to connect to a remote freezer
 func newFreezerRemoteClient(endpoint string) (*FreezerRemoteClient, error) {
 	client, err := rpc.Dial(endpoint)
 	if err != nil {
@@ -37,7 +37,7 @@ func newFreezerRemoteClient(endpoint string) (*FreezerRemoteClient, error) {
 	}, nil
 }
 
-// Close terminates the chain Freezer, unmapping all the data files.
+// Close terminates the chain freezer, unmapping all the data files.
 func (api *FreezerRemoteClient) Close() error {
 	api.mu.Lock()
 	defer api.mu.Unlock()
@@ -45,7 +45,7 @@ func (api *FreezerRemoteClient) Close() error {
 }
 
 // HasAncient returns an indicator whether the specified ancient data exists
-// in the Freezer.
+// in the freezer.
 func (api *FreezerRemoteClient) HasAncient(kind string, number uint64) (bool, error) {
 	api.mu.Lock()
 	defer api.mu.Unlock()

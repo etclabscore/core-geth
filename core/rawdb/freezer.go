@@ -35,11 +35,11 @@ import (
 
 var (
 	// errUnknownTable is returned if the user attempts to read from a table that is
-	// not tracked by the Freezer.
+	// not tracked by the freezer.
 	errUnknownTable = errors.New("unknown table")
 
 	// errOutOrderInsertion is returned if the user attempts to inject out-of-order
-	// binary blobs into the Freezer.
+	// binary blobs into the freezer.
 	errOutOrderInsertion = errors.New("the append operation is out-order")
 
 	// errSymlinkDatadir is returned if the ancient directory specified by user
@@ -58,14 +58,14 @@ const (
 	freezerBatchLimit = 30000
 )
 
-// Freezer is an memory mapped append-only database to store immutable chain data
+// freezer is an memory mapped append-only database to store immutable chain data
 // into flat files:
 //
 // - The append only nature ensures that disk writes are minimized.
 // - The memory mapping ensures we can max out system memory for caching without
 //   reserving it for go-ethereum. This would also reduce the memory requirements
 //   of Geth, and thus also GC overhead.
-type Freezer struct {
+type freezer struct {
 	// WARNING: The `frozen` field is accessed atomically. On 32 bit platforms, only
 	// 64-bit aligned fields can be atomic. The struct is guaranteed to be so aligned,
 	// so take advantage of that (https://golang.org/pkg/sync/atomic/#pkg-note-BUG).
@@ -76,10 +76,10 @@ type Freezer struct {
 	quit         chan struct{}
 }
 
-// NewFreezer creates a chain Freezer that moves ancient chain data into
+// newFreezer creates a chain freezer that moves ancient chain data into
 // append-only flat file containers.
-func NewFreezer(datadir string, namespace string) (*Freezer, error) {
-	// Create the initial Freezer object
+func newFreezer(datadir string, namespace string) (*freezer, error) {
+	// Create the initial freezer object
 	var (
 		readMeter  = metrics.NewRegisteredMeter(namespace+"ancient/read", nil)
 		writeMeter = metrics.NewRegisteredMeter(namespace+"ancient/write", nil)
@@ -99,7 +99,7 @@ func NewFreezer(datadir string, namespace string) (*Freezer, error) {
 		return nil, err
 	}
 	// Open all the supported data tables
-	freezer := &Freezer{
+	freezer := &freezer{
 		tables:       make(map[string]*freezerTable),
 		instanceLock: lock,
 		quit:         make(chan struct{}),
@@ -126,8 +126,8 @@ func NewFreezer(datadir string, namespace string) (*Freezer, error) {
 	return freezer, nil
 }
 
-// Close terminates the chain Freezer, unmapping all the data files.
-func (f *Freezer) Close() error {
+// Close terminates the chain freezer, unmapping all the data files.
+func (f *freezer) Close() error {
 	f.quit <- struct{}{}
 	var errs []error
 	for _, table := range f.tables {
@@ -145,8 +145,8 @@ func (f *Freezer) Close() error {
 }
 
 // HasAncient returns an indicator whether the specified ancient data exists
-// in the Freezer.
-func (f *Freezer) HasAncient(kind string, number uint64) (bool, error) {
+// in the freezer.
+func (f *freezer) HasAncient(kind string, number uint64) (bool, error) {
 	if table := f.tables[kind]; table != nil {
 		return table.has(number), nil
 	}
@@ -154,7 +154,7 @@ func (f *Freezer) HasAncient(kind string, number uint64) (bool, error) {
 }
 
 // Ancient retrieves an ancient binary blob from the append-only immutable files.
-func (f *Freezer) Ancient(kind string, number uint64) ([]byte, error) {
+func (f *freezer) Ancient(kind string, number uint64) ([]byte, error) {
 	if table := f.tables[kind]; table != nil {
 		return table.Retrieve(number)
 	}
@@ -162,12 +162,12 @@ func (f *Freezer) Ancient(kind string, number uint64) ([]byte, error) {
 }
 
 // Ancients returns the length of the frozen items.
-func (f *Freezer) Ancients() (uint64, error) {
+func (f *freezer) Ancients() (uint64, error) {
 	return atomic.LoadUint64(&f.frozen), nil
 }
 
 // AncientSize returns the ancient size of the specified category.
-func (f *Freezer) AncientSize(kind string) (uint64, error) {
+func (f *freezer) AncientSize(kind string) (uint64, error) {
 	if table := f.tables[kind]; table != nil {
 		return table.size()
 	}
@@ -180,8 +180,8 @@ func (f *Freezer) AncientSize(kind string) (uint64, error) {
 // Notably, this function is lock free but kind of thread-safe. All out-of-order
 // injection will be rejected. But if two injections with same number happen at
 // the same time, we can get into the trouble.
-func (f *Freezer) AppendAncient(number uint64, hash, header, body, receipts, td []byte) (err error) {
-	// Ensure the binary blobs we are appending is continuous with Freezer.
+func (f *freezer) AppendAncient(number uint64, hash, header, body, receipts, td []byte) (err error) {
+	// Ensure the binary blobs we are appending is continuous with freezer.
 	if atomic.LoadUint64(&f.frozen) != number {
 		return errOutOrderInsertion
 	}
@@ -191,7 +191,7 @@ func (f *Freezer) AppendAncient(number uint64, hash, header, body, receipts, td 
 		if err != nil {
 			rerr := f.repair()
 			if rerr != nil {
-				log.Crit("Failed to repair Freezer", "err", rerr)
+				log.Crit("Failed to repair freezer", "err", rerr)
 			}
 			log.Info("Append ancient failed", "number", number, "err", err)
 		}
@@ -222,7 +222,7 @@ func (f *Freezer) AppendAncient(number uint64, hash, header, body, receipts, td 
 }
 
 // Truncate discards any recent data above the provided threshold number.
-func (f *Freezer) TruncateAncients(items uint64) error {
+func (f *freezer) TruncateAncients(items uint64) error {
 	if atomic.LoadUint64(&f.frozen) <= items {
 		return nil
 	}
@@ -236,7 +236,7 @@ func (f *Freezer) TruncateAncients(items uint64) error {
 }
 
 // sync flushes all data tables to disk.
-func (f *Freezer) Sync() error {
+func (f *freezer) Sync() error {
 	var errs []error
 	for _, table := range f.tables {
 		if err := table.Sync(); err != nil {
@@ -250,7 +250,7 @@ func (f *Freezer) Sync() error {
 }
 
 // freeze is a background thread that periodically checks the blockchain for any
-// import progress and moves ancient data from the fast database into the Freezer.
+// import progress and moves ancient data from the fast database into the freezer.
 //
 // This functionality is deliberately broken off from block importing to avoid
 // incurring additional data shuffling delays on block propagation.
@@ -401,7 +401,7 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 }
 
 // repair truncates all data tables to the same length.
-func (f *Freezer) repair() error {
+func (f *freezer) repair() error {
 	min := uint64(math.MaxUint64)
 	for _, table := range f.tables {
 		items := atomic.LoadUint64(&table.items)

@@ -35,7 +35,7 @@ func ReadCanonicalHash(db ethdb.Reader, number uint64) common.Hash {
 	data, _ := db.Ancient(freezerHashTable, number)
 	if len(data) == 0 {
 		data, _ = db.Get(headerHashKey(number))
-		// In the background Freezer is moving data from leveldb to flatten files.
+		// In the background freezer is moving data from leveldb to flatten files.
 		// So during the first check for ancient db, the data is not yet in there,
 		// but when we reach into leveldb, the data was already moved. That would
 		// result in a not found error.
@@ -256,7 +256,7 @@ func ReadHeaderRLP(db ethdb.Reader, hash common.Hash, number uint64) rlp.RawValu
 	if len(data) > 0 {
 		return data
 	}
-	// In the background Freezer is moving data from leveldb to flatten files.
+	// In the background freezer is moving data from leveldb to flatten files.
 	// So during the first check for ancient db, the data is not yet in there,
 	// but when we reach into leveldb, the data was already moved. That would
 	// result in a not found error.
@@ -346,7 +346,7 @@ func ReadBodyRLP(db ethdb.Reader, hash common.Hash, number uint64) rlp.RawValue 
 	if len(data) > 0 {
 		return data
 	}
-	// In the background Freezer is moving data from leveldb to flatten files.
+	// In the background freezer is moving data from leveldb to flatten files.
 	// So during the first check for ancient db, the data is not yet in there,
 	// but when we reach into leveldb, the data was already moved. That would
 	// result in a not found error.
@@ -368,7 +368,7 @@ func ReadCanonicalBodyRLP(db ethdb.Reader, number uint64) rlp.RawValue {
 	if len(data) == 0 {
 		// Need to get the hash
 		data, _ = db.Get(blockBodyKey(number, ReadCanonicalHash(db, number)))
-		// In the background Freezer is moving data from leveldb to flatten files.
+		// In the background freezer is moving data from leveldb to flatten files.
 		// So during the first check for ancient db, the data is not yet in there,
 		// but when we reach into leveldb, the data was already moved. That would
 		// result in a not found error.
@@ -444,7 +444,7 @@ func ReadTdRLP(db ethdb.Reader, hash common.Hash, number uint64) rlp.RawValue {
 	if len(data) > 0 {
 		return data
 	}
-	// In the background Freezer is moving data from leveldb to flatten files.
+	// In the background freezer is moving data from leveldb to flatten files.
 	// So during the first check for ancient db, the data is not yet in there,
 	// but when we reach into leveldb, the data was already moved. That would
 	// result in a not found error.
@@ -519,7 +519,7 @@ func ReadReceiptsRLP(db ethdb.Reader, hash common.Hash, number uint64) rlp.RawVa
 	if len(data) > 0 {
 		return data
 	}
-	// In the background Freezer is moving data from leveldb to flatten files.
+	// In the background freezer is moving data from leveldb to flatten files.
 	// So during the first check for ancient db, the data is not yet in there,
 	// but when we reach into leveldb, the data was already moved. That would
 	// result in a not found error.

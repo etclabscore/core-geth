@@ -154,9 +154,9 @@ func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 	// Freezer style fast import the chain.
 	freezerRPCEndpoint, server, ancientDb := testRPCRemoteFreezer(t)
 	if n, err := ancientDb.Ancients(); err != nil {
-		t.Fatal("ancients: %v")
+		t.Fatalf("ancients: %v", err)
 	} else if n != 0 {
-		t.Log("truncating pre-existing ancients from: %d (truncating to 0)", n)
+		t.Logf("truncating pre-existing ancients from: %d (truncating to 0)", n)
 		err = ancientDb.TruncateAncients(0)
 		if err != nil {
 			t.Fatalf("truncate ancients: %v", err)
@@ -269,9 +269,9 @@ func TestBlockchainRecovery_RemoteFreezer(t *testing.T) {
 	// Freezer style fast import the chain.
 	freezerRPCEndpoint, server, ancientDb := testRPCRemoteFreezer(t)
 	if n, err := ancientDb.Ancients(); err != nil {
-		t.Fatal("ancients: %v")
+		t.Fatalf("ancients: %v", err)
 	} else if n != 0 {
-		t.Log("truncating pre-existing ancients from: %d (truncating to 0)", n)
+		t.Logf("truncating pre-existing ancients from: %d (truncating to 0)", n)
 		err = ancientDb.TruncateAncients(0)
 		if err != nil {
 			t.Fatalf("truncate ancients: %v", err)
@@ -339,9 +339,9 @@ func TestIncompleteAncientReceiptChainInsertion_RemoteFreezer(t *testing.T) {
 	// Import the chain as a ancient-first node and ensure all pointers are updated
 	freezerRPCEndpoint, server, ancientDb := testRPCRemoteFreezer(t)
 	if n, err := ancientDb.Ancients(); err != nil {
-		t.Fatal("ancients: %v")
+		t.Fatalf("ancients: %v", err)
 	} else if n != 0 {
-		t.Log("truncating pre-existing ancients from: %d (truncating to 0)", n)
+		t.Logf("truncating pre-existing ancients from: %d (truncating to 0)", n)
 		err = ancientDb.TruncateAncients(0)
 		if err != nil {
 			t.Fatalf("truncate ancients: %v", err)
@@ -449,9 +449,9 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 	}
 	freezerRPCEndpoint, server, ancientDb := testRPCRemoteFreezer(t)
 	if n, err := ancientDb.Ancients(); err != nil {
-		t.Fatal("ancients: %v")
+		t.Fatalf("ancients: %v", err)
 	} else if n != 0 {
-		t.Log("truncating pre-existing ancients from: %d (truncating to 0)", n)
+		t.Logf("truncating pre-existing ancients from: %d (truncating to 0)", n)
 		err = ancientDb.TruncateAncients(0)
 		if err != nil {
 			t.Fatalf("truncate ancients: %v", err)
@@ -589,9 +589,9 @@ func TestSkipStaleTxIndicesInFastSync_RemoteFreezer(t *testing.T) {
 
 	freezerRPCEndpoint, server, ancientDb := testRPCRemoteFreezer(t)
 	if n, err := ancientDb.Ancients(); err != nil {
-		t.Fatal("ancients: %v")
+		t.Fatalf("ancients: %v", err)
 	} else if n != 0 {
-		t.Log("truncating pre-existing ancients from: %d (truncating to 0)", n)
+		t.Logf("truncating pre-existing ancients from: %d (truncating to 0)", n)
 		err = ancientDb.TruncateAncients(0)
 		if err != nil {
 			t.Fatalf("truncate ancients: %v", err)

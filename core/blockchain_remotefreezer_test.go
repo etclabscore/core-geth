@@ -419,7 +419,10 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 		if tail == nil && stored != nil {
 			t.Fatalf("Oldest indexded block mismatch, want nil, have %d", *stored)
 		}
-		if tail != nil && *stored != *tail {
+		if tail != nil && stored == nil {
+			t.Fatalf("Oldest indexed block mismatch, want %d, have nil", tail)
+		}
+		if tail != nil && stored != nil && *stored != *tail {
 			t.Fatalf("Oldest indexded block mismatch, want %d, have %d", *tail, *stored)
 		}
 		if tail != nil {

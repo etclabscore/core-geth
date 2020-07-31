@@ -366,7 +366,7 @@ func TestAncientStorage(t *testing.T) {
 	// Freezer style fast import the chain.
 	frdir, err := ioutil.TempDir("", "")
 	if err != nil {
-		t.Fatalf("failed to create temp freezer dir: %v", err)
+		t.Fatalf("failed to create temp Freezer dir: %v", err)
 	}
 	defer os.Remove(frdir)
 

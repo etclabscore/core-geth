@@ -84,7 +84,7 @@ func TestFreezerBasics(t *testing.T) {
 	}
 }
 
-// TestFreezerBasicsClosing tests same as TestFreezerBasics, but also closes and reopens the freezer between
+// TestFreezerBasicsClosing tests same as TestFreezerBasics, but also closes and reopens the Freezer between
 // every operation
 func TestFreezerBasicsClosing(t *testing.T) {
 	t.Parallel()
@@ -633,7 +633,7 @@ func TestOffset(t *testing.T) {
 // TODO (?)
 // - test that if we remove several head-files, aswell as data last data-file,
 //   the index is truncated accordingly
-// Right now, the freezer would fail on these conditions:
+// Right now, the Freezer would fail on these conditions:
 // 1. have data files d0, d1, d2, d3
 // 2. remove d2,d3
 //

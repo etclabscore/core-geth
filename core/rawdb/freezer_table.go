@@ -34,11 +34,11 @@ import (
 
 var (
 	// errClosed is returned if an operation attempts to read from or write to the
-	// freezer table after it has already been closed.
+	// Freezer table after it has already been closed.
 	errClosed = errors.New("closed")
 
 	// errOutOfBounds is returned if the item requested is not contained within the
-	// freezer table.
+	// Freezer table.
 	errOutOfBounds = errors.New("out of bounds")
 
 	// errNotSupported is returned if the database doesn't support the required operation.
@@ -70,7 +70,7 @@ func (i *indexEntry) marshallBinary() []byte {
 	return b
 }
 
-// freezerTable represents a single chained data table within the freezer (e.g. blocks).
+// freezerTable represents a single chained data table within the Freezer (e.g. blocks).
 // It consists of a data file (snappy encoded arbitrary data blobs) and an indexEntry
 // file (uncompressed 64 bit indices into the data file).
 type freezerTable struct {
@@ -97,18 +97,18 @@ type freezerTable struct {
 	headBytes  uint32        // Number of bytes written to the head file
 	readMeter  metrics.Meter // Meter for measuring the effective amount of data read
 	writeMeter metrics.Meter // Meter for measuring the effective amount of data written
-	sizeGauge  metrics.Gauge // Gauge for tracking the combined size of all freezer tables
+	sizeGauge  metrics.Gauge // Gauge for tracking the combined size of all Freezer tables
 
 	logger log.Logger   // Logger with database path and table name ambedded
 	lock   sync.RWMutex // Mutex protecting the data file descriptors
 }
 
-// newTable opens a freezer table with default settings - 2G files
+// newTable opens a Freezer table with default settings - 2G files
 func newTable(path string, name string, readMeter metrics.Meter, writeMeter metrics.Meter, sizeGauge metrics.Gauge, disableSnappy bool) (*freezerTable, error) {
 	return newCustomTable(path, name, readMeter, writeMeter, sizeGauge, 2*1000*1000*1000, disableSnappy)
 }
 
-// openFreezerFileForAppend opens a freezer table file and seeks to the end
+// openFreezerFileForAppend opens a Freezer table file and seeks to the end
 func openFreezerFileForAppend(filename string) (*os.File, error) {
 	// Open the file without the O_APPEND flag
 	// because it has differing behaviour during Truncate operations
@@ -124,17 +124,17 @@ func openFreezerFileForAppend(filename string) (*os.File, error) {
 	return file, nil
 }
 
-// openFreezerFileForReadOnly opens a freezer table file for read only access
+// openFreezerFileForReadOnly opens a Freezer table file for read only access
 func openFreezerFileForReadOnly(filename string) (*os.File, error) {
 	return os.OpenFile(filename, os.O_RDONLY, 0644)
 }
 
-// openFreezerFileTruncated opens a freezer table making sure it is truncated
+// openFreezerFileTruncated opens a Freezer table making sure it is truncated
 func openFreezerFileTruncated(filename string) (*os.File, error) {
 	return os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 }
 
-// truncateFreezerFile resizes a freezer table file and seeks to the end
+// truncateFreezerFile resizes a Freezer table file and seeks to the end
 func truncateFreezerFile(file *os.File, size int64) error {
 	if err := file.Truncate(size); err != nil {
 		return err
@@ -146,7 +146,7 @@ func truncateFreezerFile(file *os.File, size int64) error {
 	return nil
 }
 
-// newCustomTable opens a freezer table, creating the data and index files if they are
+// newCustomTable opens a Freezer table, creating the data and index files if they are
 // non existent. Both files are truncated to the shortest common length to ensure
 // they don't go out of sync.
 func newCustomTable(path string, name string, readMeter metrics.Meter, writeMeter metrics.Meter, sizeGauge metrics.Gauge, maxFilesize uint32, noCompression bool) (*freezerTable, error) {
@@ -302,11 +302,11 @@ func (t *freezerTable) repair() error {
 	if err := t.preopen(); err != nil {
 		return err
 	}
-	t.logger.Debug("Chain freezer table opened", "items", t.items, "size", common.StorageSize(t.headBytes))
+	t.logger.Debug("Chain Freezer table opened", "items", t.items, "size", common.StorageSize(t.headBytes))
 	return nil
 }
 
-// preopen opens all files that the freezer will need. This method should be called from an init-context,
+// preopen opens all files that the Freezer will need. This method should be called from an init-context,
 // since it assumes that it doesn't have to bother with locking
 // The rationale for doing preopen is to not have to do it from within Retrieve, thus not needing to ever
 // obtain a write-lock within Retrieve.
@@ -339,7 +339,7 @@ func (t *freezerTable) truncate(items uint64) error {
 		return err
 	}
 	// Something's out of sync, truncate the table's offset index
-	t.logger.Warn("Truncating freezer table", "items", t.items, "limit", items)
+	t.logger.Warn("Truncating Freezer table", "items", t.items, "limit", items)
 	if err := truncateFreezerFile(t.index, int64(items+1)*indexEntrySize); err != nil {
 		return err
 	}
@@ -448,7 +448,7 @@ func (t *freezerTable) releaseFilesAfter(num uint32, remove bool) {
 	}
 }
 
-// Append injects a binary blob at the end of the freezer table. The item number
+// Append injects a binary blob at the end of the Freezer table. The item number
 // is a precautionary parameter to ensure data correctness, but the table will
 // reject already existing data.
 //
@@ -533,7 +533,7 @@ func (t *freezerTable) getBounds(item uint64) (uint32, uint32, uint32, error) {
 		}
 		startIdx.unmarshalBinary(buffer)
 	} else {
-		// Special case if we're reading the first item in the freezer. We assume that
+		// Special case if we're reading the first item in the Freezer. We assume that
 		// the first item always start from zero(regarding the deletion, we
 		// only support deletion by files, so that the assumption is held).
 		// This means we can use the first item metadata to carry information about
@@ -593,12 +593,12 @@ func (t *freezerTable) Retrieve(item uint64) ([]byte, error) {
 }
 
 // has returns an indicator whether the specified number data
-// exists in the freezer table.
+// exists in the Freezer table.
 func (t *freezerTable) has(number uint64) bool {
 	return atomic.LoadUint64(&t.items) > number
 }
 
-// size returns the total data size in the freezer table.
+// size returns the total data size in the Freezer table.
 func (t *freezerTable) size() (uint64, error) {
 	t.lock.RLock()
 	defer t.lock.RUnlock()
@@ -606,7 +606,7 @@ func (t *freezerTable) size() (uint64, error) {
 	return t.sizeNolock()
 }
 
-// sizeNolock returns the total data size in the freezer table without obtaining
+// sizeNolock returns the total data size in the Freezer table without obtaining
 // the mutex first.
 func (t *freezerTable) sizeNolock() (uint64, error) {
 	stat, err := t.index.Stat()

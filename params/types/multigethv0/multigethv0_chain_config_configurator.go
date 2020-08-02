@@ -125,7 +125,10 @@ func (c *ChainConfig) SetEIP152Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP160Transition() *uint64 {
-	return bigNewU64(c.EIP160Block)
+	if c.EIP160Block != nil {
+		return bigNewU64(c.EIP160Block)
+	}
+	return bigNewU64(c.EIP158Block)
 }
 
 func (c *ChainConfig) SetEIP160Transition(n *uint64) error {

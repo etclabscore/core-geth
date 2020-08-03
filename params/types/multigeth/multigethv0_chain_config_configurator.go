@@ -1,4 +1,4 @@
-package multigethv0
+package multigeth
 
 import (
 	"math/big"
@@ -26,19 +26,6 @@ func setBig(i *big.Int, u *uint64) *big.Int {
 	}
 	i = big.NewInt(int64(*u))
 	return i
-}
-
-func bigMax(a, b *big.Int) *big.Int {
-	if a == nil {
-		return b
-	}
-	if b == nil {
-		return a
-	}
-	if a.Cmp(b) > 0 {
-		return a
-	}
-	return b
 }
 
 func (c *ChainConfig) GetAccountStartNonce() *uint64 {
@@ -76,6 +63,9 @@ func (c *ChainConfig) GetNetworkID() *uint64 {
 	if c.NetworkID != 0 {
 		return &c.NetworkID
 	}
+	if c.ChainID != nil {
+		return newU64(c.ChainID.Uint64())
+	}
 	return newU64(vars.DefaultNetworkID)
 }
 
@@ -108,11 +98,11 @@ func (c *ChainConfig) SetMaxCodeSize(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP7Transition() *uint64 {
-	return bigNewU64(bigMax(c.HomesteadBlock, c.EIP7FBlock))
+	return bigNewU64(c.HomesteadBlock)
 }
 
 func (c *ChainConfig) SetEIP7Transition(n *uint64) error {
-	c.EIP7FBlock = setBig(c.EIP7FBlock, n)
+	c.HomesteadBlock = setBig(c.HomesteadBlock, n)
 	return nil
 }
 
@@ -135,15 +125,49 @@ func (c *ChainConfig) SetEIP152Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP160Transition() *uint64 {
-	return bigNewU64(c.EIP160FBlock) // Not tangled with EIP158.
+	if c.EIP160Block != nil {
+		return bigNewU64(c.EIP160Block)
+	}
+	return bigNewU64(c.EIP158Block)
 }
 
 func (c *ChainConfig) SetEIP160Transition(n *uint64) error {
-	c.EIP160FBlock = setBig(c.EIP160FBlock, n)
+	c.EIP160Block = setBig(c.EIP160Block, n)
 	return nil
 }
 
+// GetEIP161dTransition gets the EIP161d transition.
+// The configurator interface only supports single-event OFF-ON switches,
+// making the support of OFF-ON-OFF-ON switches, as multi-geth does, impossible.
+// The logic below _attempts_ to provide a reasonable inference, but
+// should not be trusted blindly, if at all.
+// At the time of writing, this configuration option at multi-geth is in
+// use exclusively for the Ellaism network.
+/*
+https://github.com/multi-geth/multi-geth/blob/954b47d05dca919eaa15993b159ed90abcd8f071/params/config.go#L570
+func (c *ChainConfig) IsEIP161(num *big.Int) bool {
+	if isForked(c.EIP161ReenableBlock, num) {
+		return true
+	}
+
+	if isForked(c.EIP161DisableBlock, num) {
+		return false
+	}
+
+	if isForked(c.ByzantiumBlock, num) {
+		return true
+	}
+
+	return false
+}
+*/
 func (c *ChainConfig) GetEIP161dTransition() *uint64 {
+	if c.EIP161DisableBlock != nil {
+		if c.EIP161ReenableBlock != nil {
+			return bigNewU64(c.EIP161ReenableBlock)
+		}
+		return nil
+	}
 	return bigNewU64(c.EIP158Block)
 }
 
@@ -153,6 +177,12 @@ func (c *ChainConfig) SetEIP161dTransition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP161abcTransition() *uint64 {
+	if c.EIP161DisableBlock != nil {
+		if c.EIP161ReenableBlock != nil {
+			return bigNewU64(c.EIP161ReenableBlock)
+		}
+		return nil
+	}
 	return bigNewU64(c.EIP158Block)
 }
 
@@ -162,11 +192,11 @@ func (c *ChainConfig) SetEIP161abcTransition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP170Transition() *uint64 {
-	return bigNewU64(bigMax(c.EIP170FBlock, c.EIP158Block))
+	return bigNewU64(c.EIP158Block)
 }
 
 func (c *ChainConfig) SetEIP170Transition(n *uint64) error {
-	c.EIP170FBlock = setBig(c.EIP170FBlock, n)
+	c.EIP158Block = setBig(c.EIP158Block, n)
 	return nil
 }
 
@@ -180,113 +210,114 @@ func (c *ChainConfig) SetEIP155Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP140Transition() *uint64 {
-	return bigNewU64(bigMax(c.ByzantiumBlock, c.EIP140FBlock))
+	return bigNewU64(c.ByzantiumBlock)
 }
 
 func (c *ChainConfig) SetEIP140Transition(n *uint64) error {
-	c.EIP140FBlock = setBig(c.EIP140FBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
+
 func (c *ChainConfig) GetEIP198Transition() *uint64 {
-	return bigNewU64(bigMax(c.EIP198FBlock, c.ByzantiumBlock))
+	return bigNewU64(c.ByzantiumBlock)
 }
 
 func (c *ChainConfig) SetEIP198Transition(n *uint64) error {
-	c.EIP198FBlock = setBig(c.EIP198FBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
 func (c *ChainConfig) GetEIP211Transition() *uint64 {
-	return bigNewU64(bigMax(c.EIP211FBlock, c.ByzantiumBlock))
+	return bigNewU64(c.ByzantiumBlock)
 }
 
 func (c *ChainConfig) SetEIP211Transition(n *uint64) error {
-	c.EIP211FBlock = setBig(c.EIP211FBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
 func (c *ChainConfig) GetEIP212Transition() *uint64 {
-	return bigNewU64(bigMax(c.EIP212FBlock, c.ByzantiumBlock))
+	return bigNewU64(c.ByzantiumBlock)
 }
 
 func (c *ChainConfig) SetEIP212Transition(n *uint64) error {
-	c.EIP212FBlock = setBig(c.EIP212FBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
 func (c *ChainConfig) GetEIP213Transition() *uint64 {
-	return bigNewU64(bigMax(c.EIP213FBlock, c.ByzantiumBlock))
+	return bigNewU64(c.ByzantiumBlock)
 }
 
 func (c *ChainConfig) SetEIP213Transition(n *uint64) error {
-	c.EIP213FBlock = setBig(c.EIP213FBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
 func (c *ChainConfig) GetEIP214Transition() *uint64 {
-	return bigNewU64(bigMax(c.EIP214FBlock, c.ByzantiumBlock))
+	return bigNewU64(c.ByzantiumBlock)
 }
 
 func (c *ChainConfig) SetEIP214Transition(n *uint64) error {
-	c.EIP214FBlock = setBig(c.EIP214FBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
 func (c *ChainConfig) GetEIP658Transition() *uint64 {
-	return bigNewU64(bigMax(c.EIP658FBlock, c.ByzantiumBlock))
+	return bigNewU64(c.ByzantiumBlock)
 }
 
 func (c *ChainConfig) SetEIP658Transition(n *uint64) error {
-	c.EIP658FBlock = setBig(c.EIP658FBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
 func (c *ChainConfig) GetEIP145Transition() *uint64 {
-	return bigNewU64(bigMax(c.EIP145FBlock, c.ConstantinopleBlock))
+	return bigNewU64(c.ConstantinopleBlock)
 }
 
 func (c *ChainConfig) SetEIP145Transition(n *uint64) error {
-	c.EIP145FBlock = setBig(c.EIP145FBlock, n)
+	c.ConstantinopleBlock = setBig(c.ConstantinopleBlock, n)
 	return nil
 }
 
 func (c *ChainConfig) GetEIP1014Transition() *uint64 {
-	return bigNewU64(bigMax(c.EIP1014FBlock, c.ConstantinopleBlock))
+	return bigNewU64(c.ConstantinopleBlock)
 }
 
 func (c *ChainConfig) SetEIP1014Transition(n *uint64) error {
-	c.EIP1014FBlock = setBig(c.EIP1014FBlock, n)
+	c.ConstantinopleBlock = setBig(c.ConstantinopleBlock, n)
 	return nil
 }
 
 func (c *ChainConfig) GetEIP1052Transition() *uint64 {
-	return bigNewU64(bigMax(c.EIP1052FBlock, c.ConstantinopleBlock))
+	return bigNewU64(c.ConstantinopleBlock)
 }
 
 func (c *ChainConfig) SetEIP1052Transition(n *uint64) error {
-	c.EIP1052FBlock = setBig(c.EIP1052FBlock, n)
+	c.ConstantinopleBlock = setBig(c.ConstantinopleBlock, n)
 	return nil
 }
 
 func (c *ChainConfig) GetEIP1283Transition() *uint64 {
-	x := bigMax(c.EIP1283FBlock, c.ConstantinopleBlock)
-	dis := c.PetersburgBlock
-	if x != nil && dis != nil {
-		if dis.Cmp(x) == 0 {
+	if c.ConstantinopleBlock != nil && c.PetersburgBlock != nil {
+		if c.ConstantinopleBlock.Cmp(c.PetersburgBlock) == 0 {
 			return nil
 		}
 	}
-	return bigNewU64(x)
+	return bigNewU64(c.ConstantinopleBlock)
 }
 
 func (c *ChainConfig) SetEIP1283Transition(n *uint64) error {
-	c.EIP1283FBlock = setBig(c.EIP1283FBlock, n)
+	c.ConstantinopleBlock = setBig(c.ConstantinopleBlock, n)
 	return nil
 }
 
 func (c *ChainConfig) GetEIP1283DisableTransition() *uint64 {
-	if c.EIP1283FBlock == nil {
-		return nil
+	if c.ConstantinopleBlock != nil && c.PetersburgBlock != nil {
+		if c.ConstantinopleBlock.Cmp(c.PetersburgBlock) == 0 {
+			return nil
+		}
 	}
 	return bigNewU64(c.PetersburgBlock)
 }
@@ -335,17 +366,6 @@ func (c *ChainConfig) SetEIP1344Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP1884Transition() *uint64 {
-	i := c.IstanbulBlock
-	if i == nil {
-		return nil
-	}
-	d := c.EIP1884DisableFBlock
-	if d == nil {
-		return bigNewU64(c.IstanbulBlock)
-	}
-	if d.Cmp(i) >= 0 {
-		return nil
-	}
 	return bigNewU64(c.IstanbulBlock)
 }
 
@@ -474,28 +494,32 @@ func (c *ChainConfig) SetEthashDurationLimit(i *big.Int) error {
 	return internal.GlobalConfigurator().SetEthashDurationLimit(i)
 }
 
+// NOTE: Checking for if c.Ethash == nil is a consideration.
+// If set, settings are strictly enforced, and can avoid misconfiguration.
+// If not, settings are more lenient, and allow for more shorthand testing.
+// For the current implementation I have chosen to USE the nil check
+// for Set_ methods, and to abstain for Get_ methods.
+// This allows for shorthand-initialized structs, eg. for testing,
+// but refuses un-strict Conversion methods.
+
 func (c *ChainConfig) GetEthashHomesteadTransition() *uint64 {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
-	if c.EIP2FBlock != nil && c.EIP7FBlock != nil {
-		return bigNewU64(bigMax(c.EIP2FBlock, c.EIP7FBlock))
-	}
 	return bigNewU64(c.HomesteadBlock)
 }
 
-func (c *ChainConfig) SetEthashHomesteadTransition(n *uint64) error {
-	c.EIP2FBlock = setBig(c.EIP2FBlock, n)
-	c.EIP7FBlock = setBig(c.EIP7FBlock, n)
+func (c *ChainConfig) SetEthashHomesteadTransition(i *uint64) error {
+	c.HomesteadBlock = setBig(c.HomesteadBlock, i)
 	return nil
 }
 
 func (c *ChainConfig) GetEIP2Transition() *uint64 {
-	return bigNewU64(bigMax(c.EIP2FBlock, c.HomesteadBlock))
+	return bigNewU64(c.HomesteadBlock)
 }
 
-func (c *ChainConfig) SetEIP2Transition(n *uint64) error {
-	c.EIP2FBlock = setBig(c.EIP2FBlock, n)
+func (c *ChainConfig) SetEIP2Transition(i *uint64) error {
+	c.HomesteadBlock = setBig(c.HomesteadBlock, i)
 	return nil
 }
 
@@ -528,18 +552,25 @@ func (c *ChainConfig) GetEthashEIP649Transition() *uint64 {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
-	x := bigMax(c.EIP649FBlock, c.ByzantiumBlock)
-	dis := c.DisposalBlock
-	if x != nil && dis != nil {
-		if dis.Cmp(x) <= 0 {
+	if c.ByzantiumBlock != nil && c.DisposalBlock != nil {
+		if c.DisposalBlock.Cmp(c.ByzantiumBlock) <= 0 {
 			return nil
 		}
 	}
-	return bigNewU64(x)
+	return bigNewU64(c.ByzantiumBlock)
 }
 
 func (c *ChainConfig) SetEthashEIP649Transition(n *uint64) error {
-	c.EIP649FBlock = setBig(c.EIP649FBlock, n)
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	if n == nil {
+		return nil
+	}
+	if c.DisposalBlock != nil && c.DisposalBlock.Uint64() <= *n {
+		return nil
+	}
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, n)
 	return nil
 }
 
@@ -547,18 +578,25 @@ func (c *ChainConfig) GetEthashEIP1234Transition() *uint64 {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
-	x := bigMax(c.EIP1234FBlock, c.ConstantinopleBlock)
-	dis := c.DisposalBlock
-	if x != nil && dis != nil {
-		if dis.Cmp(x) <= 0 {
+	if c.ConstantinopleBlock != nil && c.DisposalBlock != nil {
+		if c.DisposalBlock.Cmp(c.ConstantinopleBlock) <= 0 {
 			return nil
 		}
 	}
-	return bigNewU64(x)
+	return bigNewU64(c.ConstantinopleBlock)
 }
 
 func (c *ChainConfig) SetEthashEIP1234Transition(n *uint64) error {
-	c.EIP1234FBlock = setBig(c.EIP1234FBlock, n)
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	if n == nil {
+		return nil
+	}
+	if c.DisposalBlock != nil && c.DisposalBlock.Uint64() <= *n {
+		return nil
+	}
+	c.ConstantinopleBlock = setBig(c.ConstantinopleBlock, n)
 	return nil
 }
 
@@ -629,11 +667,11 @@ func (c *ChainConfig) GetEthashECIP1017Transition() *uint64 {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
-	return bigNewU64(c.ECIP1017EraRounds)
+	return bigNewU64(c.ECIP1017EraBlock)
 }
 
 func (c *ChainConfig) SetEthashECIP1017Transition(n *uint64) error {
-	c.ECIP1017EraRounds = setBig(c.ECIP1017EraRounds, n)
+	c.ECIP1017EraBlock = setBig(c.ECIP1017EraBlock, n)
 	return nil
 }
 
@@ -641,11 +679,11 @@ func (c *ChainConfig) GetEthashECIP1017EraRounds() *uint64 {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
-	return bigNewU64(c.ECIP1017EraRounds)
+	return bigNewU64(c.ECIP1017EraBlock)
 }
 
 func (c *ChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
-	c.ECIP1017EraRounds = setBig(c.ECIP1017EraRounds, n)
+	c.ECIP1017EraBlock = setBig(c.ECIP1017EraBlock, n)
 	return nil
 }
 
@@ -653,20 +691,14 @@ func (c *ChainConfig) GetEthashEIP100BTransition() *uint64 {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
-	// Because the Ethereum Foundation network (and client... and tests) assume that if Constantinople
-	// is activated, then Byzantium must be (have been) as well.
-	x := bigMax(c.EIP100FBlock, c.ByzantiumBlock)
-	if x != nil {
-		return bigNewU64(x)
-	}
-	return bigNewU64(bigMax(c.EIP100FBlock, c.ConstantinopleBlock))
+	return bigNewU64(c.ByzantiumBlock)
 }
 
-func (c *ChainConfig) SetEthashEIP100BTransition(n *uint64) error {
+func (c *ChainConfig) SetEthashEIP100BTransition(i *uint64) error {
 	if c.Ethash == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
-	c.EIP100FBlock = setBig(c.EIP100FBlock, n)
+	c.ByzantiumBlock = setBig(c.ByzantiumBlock, i)
 	return nil
 }
 

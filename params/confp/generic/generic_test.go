@@ -13,7 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigethv0"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -68,28 +68,25 @@ result:
 		}
 	}
 
-	om := &multigethv0.ChainConfig{
-		ChainID:              big.NewInt(61),
-		HomesteadBlock:       big.NewInt(1150000),
-		DAOForkBlock:         big.NewInt(1920000),
-		DAOForkSupport:       false,
-		EIP150Block:          big.NewInt(2500000),
-		EIP150Hash:           common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
-		EIP155Block:          big.NewInt(3000000),
-		EIP158Block:          big.NewInt(8772000),
-		ByzantiumBlock:       big.NewInt(8772000),
-		DisposalBlock:        big.NewInt(5900000),
-		SocialBlock:          nil,
-		EthersocialBlock:     nil,
-		ConstantinopleBlock:  big.NewInt(9573000),
-		PetersburgBlock:      big.NewInt(9573000),
-		IstanbulBlock:        big.NewInt(10500839),
-		EIP1884DisableFBlock: big.NewInt(10500839),
-		ECIP1017EraRounds:    big.NewInt(5000000),
-		EIP160FBlock:         big.NewInt(3000000),
-		ECIP1010PauseBlock:   big.NewInt(3000000),
-		ECIP1010Length:       big.NewInt(2000000),
-		Ethash:               new(ctypes.EthashConfig),
+	om := &multigeth.ChainConfig{
+		ChainID:             big.NewInt(61),
+		HomesteadBlock:      big.NewInt(1150000),
+		DAOForkBlock:        big.NewInt(1920000),
+		DAOForkSupport:      false,
+		EIP150Block:         big.NewInt(2500000),
+		EIP150Hash:          common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
+		EIP155Block:         big.NewInt(3000000),
+		EIP158Block:         big.NewInt(8772000),
+		ByzantiumBlock:      big.NewInt(8772000),
+		DisposalBlock:       big.NewInt(5900000),
+		ConstantinopleBlock: big.NewInt(9573000),
+		PetersburgBlock:     big.NewInt(9573000),
+		IstanbulBlock:       big.NewInt(10500839),
+		ECIP1017EraBlock:    big.NewInt(5000000),
+		EIP160Block:         big.NewInt(3000000),
+		ECIP1010PauseBlock:  big.NewInt(3000000),
+		ECIP1010Length:      big.NewInt(2000000),
+		Ethash:              new(ctypes.EthashConfig),
 	}
 
 	b, err := json.MarshalIndent(om, "", "    ")
@@ -101,8 +98,8 @@ result:
 	if err != nil {
 		t.Fatal(err)
 	}
-	if reflect.TypeOf(got) != reflect.TypeOf(&multigethv0.ChainConfig{}) {
-		t.Fatalf("mismatch, want: %v, got: %v", reflect.TypeOf(&multigethv0.ChainConfig{}), reflect.TypeOf(got))
+	if reflect.TypeOf(got) != reflect.TypeOf(&multigeth.ChainConfig{}) {
+		t.Fatalf("mismatch, want: %v, got: %v", reflect.TypeOf(&multigeth.ChainConfig{}), reflect.TypeOf(got))
 	}
 
 	if tr := got.GetEIP7Transition(); tr == nil || *tr != 1150000 {
@@ -157,7 +154,7 @@ var cc_v196_a = `{
   "ecip1010PauseBlock": 3000000,
   "ecip1010Length": 2000000,
   "ecip1017FBlock": 5000000,
-  "ecip1017EraRounds": 5000000,
+  "ecip1017EraBlock": 5000000,
   "disposalBlock": 5900000
 }
 `
@@ -179,7 +176,7 @@ var cc_v197_a = `{
   "istanbulBlock": 10500839,
   "ecip1010PauseBlock": 3000000,
   "ecip1010Length": 2000000,
-  "ecip1017EraRounds": 5000000,
+  "ecip1017EraBlock": 5000000,
   "disposalBlock": 5900000,
   "ethash": {},
   "trustedCheckpoint": null,
@@ -233,12 +230,12 @@ func TestUnmarshalChainConfigurator2(t *testing.T) {
 		{
 			versionid: "v196",
 			raw:       cc_v196_a,
-			wantType:  reflect.TypeOf(&multigethv0.ChainConfig{}),
+			wantType:  reflect.TypeOf(&multigeth.ChainConfig{}),
 		},
 		{
 			versionid: "v197",
 			raw:       cc_v197_a,
-			wantType:  reflect.TypeOf(&multigethv0.ChainConfig{}),
+			wantType:  reflect.TypeOf(&multigeth.ChainConfig{}),
 		},
 		{
 			versionid: "v198",

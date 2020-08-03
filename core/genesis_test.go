@@ -29,7 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/multigethv0"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 func TestSetupGenesisBlock(t *testing.T) {
@@ -71,28 +71,26 @@ func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 
 	// Setup a genesis mocking <=v1.9.6, aka "old".
 	genA := params.DefaultGenesisBlock()
-	genA.Config = &multigethv0.ChainConfig{
-		ChainID:              big.NewInt(61),
-		HomesteadBlock:       big.NewInt(1150000),
-		DAOForkBlock:         big.NewInt(1920000),
-		DAOForkSupport:       false,
-		EIP150Block:          big.NewInt(2500000),
-		EIP150Hash:           common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
-		EIP155Block:          big.NewInt(3000000),
-		EIP158Block:          big.NewInt(8772000),
-		ByzantiumBlock:       big.NewInt(8772000),
-		DisposalBlock:        big.NewInt(5900000),
-		SocialBlock:          nil,
-		EthersocialBlock:     nil,
-		ConstantinopleBlock:  big.NewInt(9573000),
-		PetersburgBlock:      big.NewInt(9573000),
-		IstanbulBlock:        big.NewInt(10500839),
-		EIP1884DisableFBlock: big.NewInt(10500839),
-		ECIP1017EraRounds:    big.NewInt(5000000),
-		EIP160FBlock:         big.NewInt(3000000),
-		ECIP1010PauseBlock:   big.NewInt(3000000),
-		ECIP1010Length:       big.NewInt(2000000),
-		Ethash:               new(ctypes.EthashConfig),
+	genA.Config = &multigeth.ChainConfig{
+		NetworkID:           1,
+		ChainID:             big.NewInt(61),
+		HomesteadBlock:      big.NewInt(1150000),
+		DAOForkBlock:        big.NewInt(1920000),
+		DAOForkSupport:      false,
+		EIP150Block:         big.NewInt(2500000),
+		EIP150Hash:          common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
+		EIP155Block:         big.NewInt(3000000),
+		EIP158Block:         big.NewInt(8772000),
+		ByzantiumBlock:      big.NewInt(8772000),
+		DisposalBlock:       big.NewInt(5900000),
+		ConstantinopleBlock: big.NewInt(9573000),
+		PetersburgBlock:     big.NewInt(9573000),
+		IstanbulBlock:       big.NewInt(10500839),
+		ECIP1017EraBlock:    big.NewInt(5000000),
+		EIP160Block:         big.NewInt(3000000),
+		ECIP1010PauseBlock:  big.NewInt(3000000),
+		ECIP1010Length:      big.NewInt(2000000),
+		Ethash:              new(ctypes.EthashConfig),
 	}
 
 	// Set it up.
@@ -185,8 +183,7 @@ func TestSetupGenesisBlock2(t *testing.T) {
   "EIP2200FBlock": null,
   "ecip1010PauseBlock": 3000000,
   "ecip1010Length": 2000000,
-  "ecip1017FBlock": 5000000,
-  "ecip1017EraRounds": 5000000,
+  "ecip1017EraBlock": 5000000,
   "disposalBlock": 5900000
 }
 `
@@ -256,7 +253,7 @@ func TestSetupGenesisBlock2(t *testing.T) {
 	if storedConf == nil {
 		t.Fatal("nil stored conf")
 	}
-	wantType := reflect.TypeOf(&multigethv0.ChainConfig{})
+	wantType := reflect.TypeOf(&multigeth.ChainConfig{})
 	if reflect.TypeOf(storedConf) != wantType {
 		t.Fatalf("mismatch, want: %v, got: %v", wantType, reflect.TypeOf(storedConf))
 	}

@@ -1,4 +1,4 @@
-package multigethv0
+package multigeth
 
 import (
 	"math/big"

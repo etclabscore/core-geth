@@ -13,7 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigethv0"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -68,7 +68,7 @@ result:
 		}
 	}
 
-	om := &multigethv0.ChainConfig{
+	om := &multigeth.ChainConfig{
 		ChainID:             big.NewInt(61),
 		HomesteadBlock:      big.NewInt(1150000),
 		DAOForkBlock:        big.NewInt(1920000),
@@ -98,8 +98,8 @@ result:
 	if err != nil {
 		t.Fatal(err)
 	}
-	if reflect.TypeOf(got) != reflect.TypeOf(&multigethv0.ChainConfig{}) {
-		t.Fatalf("mismatch, want: %v, got: %v", reflect.TypeOf(&multigethv0.ChainConfig{}), reflect.TypeOf(got))
+	if reflect.TypeOf(got) != reflect.TypeOf(&multigeth.ChainConfig{}) {
+		t.Fatalf("mismatch, want: %v, got: %v", reflect.TypeOf(&multigeth.ChainConfig{}), reflect.TypeOf(got))
 	}
 
 	if tr := got.GetEIP7Transition(); tr == nil || *tr != 1150000 {
@@ -230,12 +230,12 @@ func TestUnmarshalChainConfigurator2(t *testing.T) {
 		{
 			versionid: "v196",
 			raw:       cc_v196_a,
-			wantType:  reflect.TypeOf(&multigethv0.ChainConfig{}),
+			wantType:  reflect.TypeOf(&multigeth.ChainConfig{}),
 		},
 		{
 			versionid: "v197",
 			raw:       cc_v197_a,
-			wantType:  reflect.TypeOf(&multigethv0.ChainConfig{}),
+			wantType:  reflect.TypeOf(&multigeth.ChainConfig{}),
 		},
 		{
 			versionid: "v198",

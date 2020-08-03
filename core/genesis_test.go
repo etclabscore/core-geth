@@ -29,7 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/multigethv0"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 func TestSetupGenesisBlock(t *testing.T) {
@@ -71,7 +71,7 @@ func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 
 	// Setup a genesis mocking <=v1.9.6, aka "old".
 	genA := params.DefaultGenesisBlock()
-	genA.Config = &multigethv0.ChainConfig{
+	genA.Config = &multigeth.ChainConfig{
 		NetworkID:           1,
 		ChainID:             big.NewInt(61),
 		HomesteadBlock:      big.NewInt(1150000),
@@ -253,7 +253,7 @@ func TestSetupGenesisBlock2(t *testing.T) {
 	if storedConf == nil {
 		t.Fatal("nil stored conf")
 	}
-	wantType := reflect.TypeOf(&multigethv0.ChainConfig{})
+	wantType := reflect.TypeOf(&multigeth.ChainConfig{})
 	if reflect.TypeOf(storedConf) != wantType {
 		t.Fatalf("mismatch, want: %v, got: %v", wantType, reflect.TypeOf(storedConf))
 	}

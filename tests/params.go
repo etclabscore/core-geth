@@ -30,7 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/multigethv0"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
@@ -166,7 +166,7 @@ func init() {
 		log.Println("converting to MultiGethV0 data type.")
 
 		for i, config := range Forks {
-			pspec := &multigethv0.ChainConfig{}
+			pspec := &multigeth.ChainConfig{}
 			if err := confp.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
@@ -174,7 +174,7 @@ func init() {
 		}
 
 		for k, v := range difficultyChainConfigurations {
-			pspec := &multigethv0.ChainConfig{}
+			pspec := &multigeth.ChainConfig{}
 			if err := confp.Convert(v, pspec); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}

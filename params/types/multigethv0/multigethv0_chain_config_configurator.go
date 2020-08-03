@@ -136,7 +136,38 @@ func (c *ChainConfig) SetEIP160Transition(n *uint64) error {
 	return nil
 }
 
+// GetEIP161dTransition gets the EIP161d transition.
+// The configurator interface only supports single-event OFF-ON switches,
+// making the support of OFF-ON-OFF-ON switches, as multi-geth does, impossible.
+// The logic below _attempts_ to provide a reasonable inference, but
+// should not be trusted blindly, if at all.
+// At the time of writing, this configuration option at multi-geth is in
+// use exclusively for the Ellaism network.
+/*
+https://github.com/multi-geth/multi-geth/blob/954b47d05dca919eaa15993b159ed90abcd8f071/params/config.go#L570
+func (c *ChainConfig) IsEIP161(num *big.Int) bool {
+	if isForked(c.EIP161ReenableBlock, num) {
+		return true
+	}
+
+	if isForked(c.EIP161DisableBlock, num) {
+		return false
+	}
+
+	if isForked(c.ByzantiumBlock, num) {
+		return true
+	}
+
+	return false
+}
+*/
 func (c *ChainConfig) GetEIP161dTransition() *uint64 {
+	if c.EIP161DisableBlock != nil {
+		if c.EIP161ReenableBlock != nil {
+			return bigNewU64(c.EIP161ReenableBlock)
+		}
+		return nil
+	}
 	return bigNewU64(c.EIP158Block)
 }
 
@@ -146,6 +177,12 @@ func (c *ChainConfig) SetEIP161dTransition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP161abcTransition() *uint64 {
+	if c.EIP161DisableBlock != nil {
+		if c.EIP161ReenableBlock != nil {
+			return bigNewU64(c.EIP161ReenableBlock)
+		}
+		return nil
+	}
 	return bigNewU64(c.EIP158Block)
 }
 

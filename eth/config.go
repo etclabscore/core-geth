@@ -136,10 +136,11 @@ type Config struct {
 	UltraLightOnlyAnnounce bool     `toml:",omitempty"` // Whether to only announce headers, or also serve them
 
 	// Database options
-	SkipBcVersionCheck bool `toml:"-"`
-	DatabaseHandles    int  `toml:"-"`
-	DatabaseCache      int
-	DatabaseFreezer    string
+	SkipBcVersionCheck    bool `toml:"-"`
+	DatabaseHandles       int  `toml:"-"`
+	DatabaseCache         int
+	DatabaseFreezer       string
+	DatabaseFreezerRemote string
 
 	TrieCleanCache int
 	TrieDirtyCache int

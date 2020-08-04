@@ -102,6 +102,79 @@ func NewDatabase(db ethdb.KeyValueStore) ethdb.Database {
 	}
 }
 
+// NewDatabaseWithFreezerRemote creates a high level database on top of a given key-
+// value data store with a freezer moving immutable chain segments into cold
+// storage.
+func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerURL string) (ethdb.Database, error) {
+	// Create the idle freezer instance
+	log.Info("New remote freezer", "freezer", freezerURL)
+
+	frdb, err := newFreezerRemoteClient(freezerURL)
+	if err != nil {
+		log.Error("NewDatabaseWithFreezerRemote error", "error", err)
+		return nil, err
+	}
+	// Since the freezer can be stored separately from the user's key-value database,
+	// there's a fairly high probability that the user requests invalid combinations
+	// of the freezer and database. Ensure that we don't shoot ourselves in the foot
+	// by serving up conflicting data, leading to both datastores getting corrupted.
+	//
+	//   - If both the freezer and key-value store is empty (no genesis), we just
+	//     initialized a new empty freezer, so everything's fine.
+	//   - If the key-value store is empty, but the freezer is not, we need to make
+	//     sure the user's genesis matches the freezer. That will be checked in the
+	//     blockchain, since we don't have the genesis block here (nor should we at
+	//     this point care, the key-value/freezer combo is valid).
+	//   - If neither the key-value store nor the freezer is empty, cross validate
+	//     the genesis hashes to make sure they are compatible. If they are, also
+	//     ensure that there's no gap between the freezer and sunsequently leveldb.
+	//   - If the key-value store is not empty, but the freezer is we might just be
+	//     upgrading to the freezer release, or we might have had a small chain and
+	//     not frozen anything yet. Ensure that no blocks are missing yet from the
+	//     key-value store, since that would mean we already had an old freezer.
+	/*validateErr := validateFreezerVsKV(frdb, db)
+	if validateErr != nil {
+
+		log.Warn("Freezer/KV validation error, attempting freezer repair", "error", validateErr)
+		if reperr := frdb.repair(); reperr != nil {
+			log.Warn("Freezer repair errored", "error", reperr)
+
+			// Repair did error, AND the validation errored, so return both together because that's double bad.
+			return nil, fmt.Errorf("freezer/kv error=%v freezer repair error=%v", validateErr, reperr)
+		}
+
+		log.Warn("Freezer repair OK")
+
+		truncateKVtoFreezer(frdb, db)
+
+		// Re-validate the ancient/kv dbs.
+		// If still a gap, try removing the kv data back to the ancient level.
+		validateErr = validateFreezerVsKV(frdb, db)
+	}
+
+	if validateErr != nil && strings.Contains(validateErr.Error(), "gap") {
+		// Re-validate again.
+		validateErr = validateFreezerVsKV(frdb, db)
+	} else if validateErr != nil {
+		return nil, validateErr
+	}
+
+	if validateErr != nil {
+		// If this fails, there's nothing left for us to do.
+		log.Warn("KV truncation failed to resuscitate Freezer/KV db gap.")
+		return nil, validateErr
+	}
+
+	// Freezer is consistent with the key-value database, permit combining the two
+	*/
+	go freeze(db, frdb, frdb.quit)
+
+	return &freezerdb{
+		KeyValueStore: db,
+		AncientStore:  frdb,
+	}, nil
+}
+
 // NewDatabaseWithFreezer creates a high level database on top of a given key-
 // value data store with a freezer moving immutable chain segments into cold
 // storage.
@@ -163,7 +236,7 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 	}
 
 	// Freezer is consistent with the key-value database, permit combining the two
-	go frdb.freeze(db)
+	go freeze(db, frdb, frdb.quit)
 
 	return &freezerdb{
 		KeyValueStore: db,
@@ -192,6 +265,21 @@ func NewLevelDBDatabase(file string, cache int, handles int, namespace string) (
 		return nil, err
 	}
 	return NewDatabase(db), nil
+}
+
+// NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a
+// freezer moving immutable chain segments into cold storage.
+func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, freezerURL string) (ethdb.Database, error) {
+	kvdb, err := leveldb.New(file, cache, handles, "eth/db/chaindata")
+	if err != nil {
+		return nil, err
+	}
+	frdb, err := NewDatabaseWithFreezerRemote(kvdb, freezerURL)
+	if err != nil {
+		kvdb.Close()
+		return nil, err
+	}
+	return frdb, nil
 }
 
 // NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a

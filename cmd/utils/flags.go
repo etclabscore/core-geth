@@ -24,6 +24,7 @@ import (
 	"io"
 	"io/ioutil"
 	"math/big"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -116,6 +117,11 @@ var (
 	AncientFlag = DirectoryFlag{
 		Name:  "datadir.ancient",
 		Usage: "Data directory for ancient chain segments (default = inside chaindata)",
+	}
+	AncientRPCFlag = cli.StringFlag{
+		Name:  "ancient.rpc",
+		Usage: "Connect to a remote freezer via RPC. Value must an HTTP(S), WS(S), unix socket, or 'stdio' URL. Incompatible with --datadir.ancient",
+		Value: "",
 	}
 	KeyStoreDirFlag = DirectoryFlag{
 		Name:  "keystore",
@@ -1564,6 +1570,9 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Ancient tx indices pruning is not available for les server now
 	// since light client relies on the server for transaction status query.
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, TxLookupLimitFlag)
+
+	CheckExclusive(ctx, AncientFlag, AncientRPCFlag)
+
 	var ks *keystore.KeyStore
 	if keystores := stack.AccountManager().Backends(keystore.KeyStoreType); len(keystores) > 0 {
 		ks = keystores[0].(*keystore.KeyStore)
@@ -1585,6 +1594,13 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	cfg.DatabaseHandles = makeDatabaseHandles()
 	if ctx.GlobalIsSet(AncientFlag.Name) {
 		cfg.DatabaseFreezer = ctx.GlobalString(AncientFlag.Name)
+	}
+	if ctx.GlobalIsSet(AncientRPCFlag.Name) {
+		remote := ctx.GlobalString(AncientRPCFlag.Name)
+		if _, err := url.Parse(remote); err != nil {
+			Fatalf("-- %s Ancient remote flag must be in valid url format %s", remote, err.Error())
+		}
+		cfg.DatabaseFreezerRemote = remote
 	}
 
 	if gcmode := ctx.GlobalString(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {
@@ -1883,11 +1899,14 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 		err     error
 		chainDb ethdb.Database
 	)
+
+	name := "chaindata"
 	if ctx.GlobalString(SyncModeFlag.Name) == "light" {
-		name := "lightchaindata"
-		chainDb, err = stack.OpenDatabase(name, cache, handles, "")
+		name = "lightchaindata"
+	}
+	if ctx.GlobalIsSet(AncientRPCFlag.Name) {
+		chainDb, err = stack.OpenDatabaseWithFreezerRemote(name, cache, handles, ctx.GlobalString(AncientRPCFlag.Name))
 	} else {
-		name := "chaindata"
 		chainDb, err = stack.OpenDatabaseWithFreezer(name, cache, handles, ctx.GlobalString(AncientFlag.Name), "")
 	}
 	if err != nil {

@@ -617,6 +617,15 @@ func (c *ChainConfig) GetEthashECIP1010PauseTransition() *uint64 {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
+
+	// Disable ECIP1010 (difficulty bomb delay) if
+	// concurrent with or preceded by the difficulty bomb disposal.
+	// This case only happens on testnets, where these protocol changes are squashed to genesis, eg. Mordor.
+	if c.DisposalBlock != nil && c.ECIP1010PauseBlock != nil {
+		if c.DisposalBlock.Cmp(c.ECIP1010PauseBlock) <= 0 {
+			return nil
+		}
+	}
 	return bigNewU64(c.ECIP1010PauseBlock)
 }
 
@@ -643,6 +652,15 @@ func (c *ChainConfig) GetEthashECIP1010ContinueTransition() *uint64 {
 	if c.ECIP1010Length == nil {
 		return nil
 	}
+
+	// Disable ECIP1010 (difficulty bomb delay) if
+	// concurrent with or preceded by the difficulty bomb disposal.
+	// This case only happens on testnets, where these protocol changes are squashed to genesis, eg. Mordor.
+	if c.DisposalBlock != nil {
+		if c.DisposalBlock.Cmp(c.ECIP1010PauseBlock) <= 0 {
+			return nil
+		}
+	}
 	// transition = pause + length
 	return bigNewU64(new(big.Int).Add(c.ECIP1010PauseBlock, c.ECIP1010Length))
 }
@@ -666,6 +684,21 @@ func (c *ChainConfig) SetEthashECIP1010ContinueTransition(n *uint64) error {
 func (c *ChainConfig) GetEthashECIP1017Transition() *uint64 {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
+	}
+
+	// Multi-geth does not support transition vs. round logic,
+	// so we have to assume that if the block is set that that will
+	// incidentally define transition and rounds, where they are equal.
+	// This is a coincidental equivalence on the ETC chain and Mordor,
+	// where eg. transition=5M and rounds=5M, so activation
+	// at 5M OR 0 are equivalent.
+
+	// Manual override for Mordor test network, where the core-geth chain config
+	// (https://github.com/eth-classic/mordor) specifies genesis activation with
+	// 2M rounds. Multi-geth does not support this configuration, so we have to hack it in.
+	if c.GetChainID() != nil && c.GetChainID().Uint64() == 63 &&
+		c.ECIP1017EraBlock != nil && c.ECIP1017EraBlock.Uint64() == 2_000_000 {
+		return bigNewU64(big.NewInt(0))
 	}
 	return bigNewU64(c.ECIP1017EraBlock)
 }

@@ -48,7 +48,7 @@ func (ctx *ServiceContext) OpenDatabase(name string, cache int, handles int, nam
 	return rawdb.NewLevelDBDatabase(ctx.Config.ResolvePath(name), cache, handles, namespace)
 }
 
-// OpenDatabaseWithFreezer opens an existing database with the given name (or
+// OpenDatabaseWithFreezerRemote opens an existing database with the given name (or
 // creates one if no previous can be found) from within the node's data directory,
 // also attaching a chain freezer to it that moves ancient chain data from the
 // database to immutable append-only files. If the node is an ephemeral one, a

@@ -254,13 +254,13 @@ func (f *freezer) Sync() error {
 //
 // This functionality is deliberately broken off from block importing to avoid
 // incurring additional data shuffling delays on block propagation.
-func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}) {
+func (f *freezer) freeze(db ethdb.KeyValueStore) {
 	nfdb := &nofreezedb{KeyValueStore: db}
 
 	backoff := false
 	for {
 		select {
-		case <-quitChan:
+		case <-f.quit:
 			log.Info("Freezer shutting down")
 			return
 		default:
@@ -269,11 +269,10 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 			select {
 			case <-time.NewTimer(freezerRecheckInterval).C:
 				backoff = false
-			case <-quitChan:
+			case <-f.quit:
 				return
 			}
 		}
-
 		// Retrieve the freezing threshold.
 		hash := ReadHeadBlockHash(nfdb)
 		if hash == (common.Hash{}) {
@@ -281,12 +280,6 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 			backoff = true
 			continue
 		}
-
-		numFrozen, err := f.Ancients()
-		if err != nil {
-			log.Crit("ancient db freeze", "error", err)
-		}
-
 		number := ReadHeaderNumber(nfdb, hash)
 		switch {
 		case number == nil:
@@ -299,8 +292,8 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 			backoff = true
 			continue
 
-		case *number-vars.FullImmutabilityThreshold <= numFrozen:
-			log.Debug("Ancient blocks frozen already", "number", *number, "hash", hash, "frozen", numFrozen)
+		case *number-vars.FullImmutabilityThreshold <= f.frozen:
+			log.Debug("Ancient blocks frozen already", "number", *number, "hash", hash, "frozen", f.frozen)
 			backoff = true
 			continue
 		}
@@ -312,47 +305,46 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 		}
 		// Seems we have data ready to be frozen, process in usable batches
 		limit := *number - vars.FullImmutabilityThreshold
-		if limit-numFrozen > freezerBatchLimit {
-			limit = numFrozen + freezerBatchLimit
+		if limit-f.frozen > freezerBatchLimit {
+			limit = f.frozen + freezerBatchLimit
 		}
 		var (
 			start    = time.Now()
-			first    = numFrozen
-			ancients = make([]common.Hash, 0, limit-numFrozen)
+			first    = f.frozen
+			ancients = make([]common.Hash, 0, limit-f.frozen)
 		)
-		for numFrozen < limit {
+		for f.frozen < limit {
 			// Retrieves all the components of the canonical block
-			hash := ReadCanonicalHash(nfdb, numFrozen)
+			hash := ReadCanonicalHash(nfdb, f.frozen)
 			if hash == (common.Hash{}) {
-				log.Error("Canonical hash missing, can't freeze", "number", numFrozen)
+				log.Error("Canonical hash missing, can't freeze", "number", f.frozen)
 				break
 			}
-			header := ReadHeaderRLP(nfdb, hash, numFrozen)
+			header := ReadHeaderRLP(nfdb, hash, f.frozen)
 			if len(header) == 0 {
-				log.Error("Block header missing, can't freeze", "number", numFrozen, "hash", hash)
+				log.Error("Block header missing, can't freeze", "number", f.frozen, "hash", hash)
 				break
 			}
-			body := ReadBodyRLP(nfdb, hash, numFrozen)
+			body := ReadBodyRLP(nfdb, hash, f.frozen)
 			if len(body) == 0 {
-				log.Error("Block body missing, can't freeze", "number", numFrozen, "hash", hash)
+				log.Error("Block body missing, can't freeze", "number", f.frozen, "hash", hash)
 				break
 			}
-			receipts := ReadReceiptsRLP(nfdb, hash, numFrozen)
+			receipts := ReadReceiptsRLP(nfdb, hash, f.frozen)
 			if len(receipts) == 0 {
-				log.Error("Block receipts missing, can't freeze", "number", numFrozen, "hash", hash)
+				log.Error("Block receipts missing, can't freeze", "number", f.frozen, "hash", hash)
 				break
 			}
-			td := ReadTdRLP(nfdb, hash, numFrozen)
+			td := ReadTdRLP(nfdb, hash, f.frozen)
 			if len(td) == 0 {
-				log.Error("Total difficulty missing, can't freeze", "number", numFrozen, "hash", hash)
+				log.Error("Total difficulty missing, can't freeze", "number", f.frozen, "hash", hash)
 				break
 			}
-			log.Trace("Deep froze ancient block", "number", numFrozen, "hash", hash)
+			log.Trace("Deep froze ancient block", "number", f.frozen, "hash", hash)
 			// Inject all the components into the relevant data tables
-			if err := f.AppendAncient(numFrozen, hash[:], header, body, receipts, td); err != nil {
+			if err := f.AppendAncient(f.frozen, hash[:], header, body, receipts, td); err != nil {
 				break
 			}
-			numFrozen++ // Manually increment numFrozen (save a call)
 			ancients = append(ancients, hash)
 		}
 		// Batch of blocks have been frozen, flush them before wiping from leveldb
@@ -373,7 +365,7 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 		}
 		batch.Reset()
 		// Wipe out side chain also.
-		for number := first; number < numFrozen; number++ {
+		for number := first; number < f.frozen; number++ {
 			// Always keep the genesis block in active database
 			if number != 0 {
 				for _, hash := range ReadAllHashes(db, number) {
@@ -386,7 +378,7 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 		}
 		// Log something friendly for the user
 		context := []interface{}{
-			"blocks", numFrozen - first, "elapsed", common.PrettyDuration(time.Since(start)), "number", numFrozen - 1,
+			"blocks", f.frozen - first, "elapsed", common.PrettyDuration(time.Since(start)), "number", f.frozen - 1,
 		}
 		if n := len(ancients); n > 0 {
 			context = append(context, []interface{}{"hash", ancients[n-1]}...)
@@ -394,7 +386,7 @@ func freeze(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}
 		log.Info("Deep froze chain segment", context...)
 
 		// Avoid database thrashing with tiny writes
-		if numFrozen-first < freezerBatchLimit {
+		if f.frozen-first < freezerBatchLimit {
 			backoff = true
 		}
 	}

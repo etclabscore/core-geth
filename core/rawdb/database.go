@@ -176,7 +176,8 @@ func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerURL string) (et
 				// Key-value store contains more data than the genesis block, make sure we
 				// didn't freeze anything yet.
 				if kvblob, _ := db.Get(headerHashKey(1)); len(kvblob) == 0 {
-					return nil, errors.New("ancient chain segments already extracted, please set --datadir.ancient to the correct path")
+					return nil, errors.New(`ancient chain segments already extracted from KV, but freezer is empty.
+Please set --ancient.rpc to the correct path, and/or review the remote freezer's contents and state.`)
 				}
 				// Block #1 is still in the database, we're allowed to init a new feezer
 			}

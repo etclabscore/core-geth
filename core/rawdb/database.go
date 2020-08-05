@@ -114,6 +114,16 @@ func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerURL string) (et
 		log.Error("NewDatabaseWithFreezerRemote error", "error", err)
 		return nil, err
 	}
+	// Core-Geth: The validation below is the original and contemporary upstream
+	// ethereum/go-ethereum implementation of validations in NewDatabaseWithFreezer. Core-Geth's
+	// implementation of the "standard" (built-in FS) freezer initialization has been
+	// upgraded to attempt recovery in case an ancient/kv gap is detected, as you can see below.
+	// This recovery-if-invalid logic is not echoed below in the case of a remote freezer
+	// to limit complexity and stresses on the external implementation, while providing at a loud
+	// complaint if db states are determined invalid.
+	//
+	// Original comment:
+	//
 	// Since the freezer can be stored separately from the user's key-value database,
 	// there's a fairly high probability that the user requests invalid combinations
 	// of the freezer and database. Ensure that we don't shoot ourselves in the foot
@@ -132,41 +142,49 @@ func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerURL string) (et
 	//     upgrading to the freezer release, or we might have had a small chain and
 	//     not frozen anything yet. Ensure that no blocks are missing yet from the
 	//     key-value store, since that would mean we already had an old freezer.
-	/*validateErr := validateFreezerVsKV(frdb, db)
-	if validateErr != nil {
-
-		log.Warn("Freezer/KV validation error, attempting freezer repair", "error", validateErr)
-		if reperr := frdb.repair(); reperr != nil {
-			log.Warn("Freezer repair errored", "error", reperr)
-
-			// Repair did error, AND the validation errored, so return both together because that's double bad.
-			return nil, fmt.Errorf("freezer/kv error=%v freezer repair error=%v", validateErr, reperr)
+	if kvgenesis, _ := db.Get(headerHashKey(0)); len(kvgenesis) > 0 {
+		if frozen, _ := frdb.Ancients(); frozen > 0 {
+			// If the freezer already contains something, ensure that the genesis blocks
+			// match, otherwise we might mix up freezers across chains and destroy both
+			// the freezer and the key-value store.
+			frgenesis, err := frdb.Ancient(freezerHashTable, 0)
+			if err != nil {
+				return nil, fmt.Errorf("failed to retrieve genesis from ancient %v", err)
+			} else if !bytes.Equal(kvgenesis, frgenesis) {
+				return nil, fmt.Errorf("genesis mismatch: %#x (leveldb) != %#x (ancients)", kvgenesis, frgenesis)
+			}
+			// Key-value store and freezer belong to the same network. Ensure that they
+			// are contiguous, otherwise we might end up with a non-functional freezer.
+			if kvhash, _ := db.Get(headerHashKey(frozen)); len(kvhash) == 0 {
+				// Subsequent header after the freezer limit is missing from the database.
+				// Reject startup is the database has a more recent head.
+				if *ReadHeaderNumber(db, ReadHeadHeaderHash(db)) > frozen-1 {
+					return nil, fmt.Errorf("gap (#%d) in the chain between ancients and leveldb", frozen)
+				}
+				// Database contains only older data than the freezer, this happens if the
+				// state was wiped and reinited from an existing freezer.
+			}
+			// Otherwise, key-value store continues where the freezer left off, all is fine.
+			// We might have duplicate blocks (crash after freezer write but before key-value
+			// store deletion, but that's fine).
+		} else {
+			// If the freezer is empty, ensure nothing was moved yet from the key-value
+			// store, otherwise we'll end up missing data. We check block #1 to decide
+			// if we froze anything previously or not, but do take care of databases with
+			// only the genesis block.
+			if ReadHeadHeaderHash(db) != common.BytesToHash(kvgenesis) {
+				// Key-value store contains more data than the genesis block, make sure we
+				// didn't freeze anything yet.
+				if kvblob, _ := db.Get(headerHashKey(1)); len(kvblob) == 0 {
+					return nil, errors.New("ancient chain segments already extracted, please set --datadir.ancient to the correct path")
+				}
+				// Block #1 is still in the database, we're allowed to init a new feezer
+			}
+			// Otherwise, the head header is still the genesis, we're allowed to init a new
+			// feezer.
 		}
-
-		log.Warn("Freezer repair OK")
-
-		truncateKVtoFreezer(frdb, db)
-
-		// Re-validate the ancient/kv dbs.
-		// If still a gap, try removing the kv data back to the ancient level.
-		validateErr = validateFreezerVsKV(frdb, db)
 	}
-
-	if validateErr != nil && strings.Contains(validateErr.Error(), "gap") {
-		// Re-validate again.
-		validateErr = validateFreezerVsKV(frdb, db)
-	} else if validateErr != nil {
-		return nil, validateErr
-	}
-
-	if validateErr != nil {
-		// If this fails, there's nothing left for us to do.
-		log.Warn("KV truncation failed to resuscitate Freezer/KV db gap.")
-		return nil, validateErr
-	}
-
 	// Freezer is consistent with the key-value database, permit combining the two
-	*/
 	go freeze(db, frdb, frdb.quit)
 
 	return &freezerdb{

@@ -23,7 +23,6 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"os"
 	"reflect"
 	"runtime"
@@ -34,20 +33,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/log"
 )
-
-func TestParseRawURL(t *testing.T) {
-	ipcPath := "/home/travis/geth.ipc"
-	httpPath := "http://127.0.0.1:8545"
-	wsPath := "wss://example.org"
-
-	for _, v := range []string{ipcPath, httpPath, wsPath} {
-		u, err := url.Parse(v)
-		if err != nil {
-			t.Fatal(err)
-		}
-		t.Log(u.Scheme)
-	}
-}
 
 func TestClientRequest(t *testing.T) {
 	server := newTestServer()

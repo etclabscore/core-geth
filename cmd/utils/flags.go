@@ -24,7 +24,6 @@ import (
 	"io"
 	"io/ioutil"
 	"math/big"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -1596,11 +1595,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		cfg.DatabaseFreezer = ctx.GlobalString(AncientFlag.Name)
 	}
 	if ctx.GlobalIsSet(AncientRPCFlag.Name) {
-		remote := ctx.GlobalString(AncientRPCFlag.Name)
-		if _, err := url.Parse(remote); err != nil {
-			Fatalf("-- %s Ancient remote flag must be in valid url format %s", remote, err.Error())
-		}
-		cfg.DatabaseFreezerRemote = remote
+		cfg.DatabaseFreezerRemote = ctx.GlobalString(AncientRPCFlag.Name)
 	}
 
 	if gcmode := ctx.GlobalString(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {

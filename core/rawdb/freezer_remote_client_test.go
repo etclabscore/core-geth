@@ -87,4 +87,12 @@ func TestClient1(t *testing.T) {
 	for i := 0; i < 1000; i++ {
 		ancientTestProgram(&head, i)
 	}
+
+	n, err := frClient.Ancients()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != 670 {
+		t.Fatalf("got: %d, want: 670", n)
+	}
 }

@@ -65,6 +65,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 	whisper "github.com/ethereum/go-ethereum/whisper/whisperv6"
 	pcsclite "github.com/gballet/go-libpcsclite"
@@ -239,6 +240,16 @@ var (
 	WhitelistFlag = cli.StringFlag{
 		Name:  "whitelist",
 		Usage: "Comma separated block number-to-hash mappings to enforce (<number>=<hash>)",
+	}
+	ImmutabilityThresholdFullFlag = cli.Int64Flag{
+		Name:  "immutabilitythreshold.full",
+		Usage: "Full Immutability Threshold is the number of blocks after which a chain segment is considered immutable (i.e. soft finality).",
+		Value: int64(vars.FullImmutabilityThreshold),
+	}
+	ImmutabilityThresholdLightFlag = cli.Int64Flag{
+		Name:  "immutabilitythreshold.light",
+		Usage: "Light Immutability Threshold is the number of blocks after which a header chain segment is considered immutable for light client (i.e. soft finality)",
+		Value: int64(vars.LightImmutabilityThreshold),
 	}
 	// Light server and client settings
 	LightServeFlag = cli.IntFlag{
@@ -1499,6 +1510,26 @@ func setWhitelist(ctx *cli.Context, cfg *eth.Config) {
 	}
 }
 
+func setImmutabilityThresholds(ctx *cli.Context) {
+	if ctx.GlobalIsSet(ImmutabilityThresholdFullFlag.Name) {
+		v := ctx.GlobalInt64(ImmutabilityThresholdFullFlag.Name)
+		if v < 0 {
+			Fatalf("immutability threshold must be greater than or equal to 0")
+		}
+		// Type conversion will fail if type max exceeded. That's a far-edge case and not worth handling.
+		vars.FullImmutabilityThreshold = uint64(v)
+		log.Info("Using configured full immutability threshold", "threshold", vars.FullImmutabilityThreshold)
+	}
+	if ctx.GlobalIsSet(ImmutabilityThresholdLightFlag.Name) {
+		v := ctx.GlobalInt64(ImmutabilityThresholdLightFlag.Name)
+		if v < 0 {
+			Fatalf("immutability threshold must be greater than or equal to 0")
+		}
+		vars.LightImmutabilityThreshold = uint64(v)
+		log.Info("Using configured light immutability threshold", "threshold", vars.LightImmutabilityThreshold)
+	}
+}
+
 // CheckExclusive verifies that only a single instance of the provided flags was
 // set by the user. Each flag might optionally be followed by a string type to
 // specialize it further.
@@ -1574,6 +1605,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	setEthash(ctx, cfg)
 	setMiner(ctx, &cfg.Miner)
 	setWhitelist(ctx, cfg)
+	setImmutabilityThresholds(ctx)
 	setLes(ctx, cfg)
 
 	if ctx.GlobalIsSet(SyncModeFlag.Name) {

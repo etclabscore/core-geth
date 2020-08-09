@@ -108,8 +108,6 @@ var (
 		utils.UltraLightFractionFlag,
 		utils.UltraLightOnlyAnnounceFlag,
 		utils.WhitelistFlag,
-		utils.ImmutabilityThresholdFullFlag,
-		utils.ImmutabilityThresholdLightFlag,
 		utils.CacheFlag,
 		utils.CacheDatabaseFlag,
 		utils.CacheTrieFlag,

@@ -268,7 +268,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 	},
 	// This specification is subject to change, but is for now identical to YOLOv1
 	// for cross-client testing purposes
-	"Berlin": {
+	"Berlin": &goethereum.ChainConfig{
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),

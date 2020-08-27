@@ -15,10 +15,10 @@ import (
 // The struct's methods delegate the business logic to an external server
 // that is responsible for managing an actual ancient store.
 type FreezerRemoteClient struct {
-	client *rpc.Client
-	quit   chan struct{}
-	threshold uint64 // Number of recent blocks not to freeze (params.FullImmutabilityThreshold apart from tests)
-	trigger chan chan struct{} // Manual blocking freeze trigger, test determinism
+	client    *rpc.Client
+	quit      chan struct{}
+	threshold uint64             // Number of recent blocks not to freeze (params.FullImmutabilityThreshold apart from tests)
+	trigger   chan chan struct{} // Manual blocking freeze trigger, test determinism
 	closeOnce sync.Once
 }
 
@@ -40,10 +40,10 @@ func newFreezerRemoteClient(endpoint string) (*FreezerRemoteClient, error) {
 		return nil, err
 	}
 	return &FreezerRemoteClient{
-		client: client,
+		client:    client,
 		threshold: vars.FullImmutabilityThreshold,
-		quit:         make(chan struct{}),
-		trigger:      make(chan chan struct{}),
+		quit:      make(chan struct{}),
+		trigger:   make(chan chan struct{}),
 	}, nil
 }
 

@@ -106,7 +106,7 @@ func newFreezer(datadir string, namespace string) (*freezer, error) {
 	}
 	// Open all the supported data tables
 	freezer := &freezer{
-		threshold:    params.FullImmutabilityThreshold,
+		threshold:    vars.FullImmutabilityThreshold,
 		tables:       make(map[string]*freezerTable),
 		instanceLock: lock,
 		trigger:      make(chan chan struct{}),

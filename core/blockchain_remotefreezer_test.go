@@ -190,18 +190,16 @@ func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 	}
 
 	// Test a rollback, causing the ancient store to use the TruncateAncient method.
-	pinch := len(blocks) / 4
-	rollbackHeaders := []common.Hash{}
-	for _, v := range headers[pinch:] {
-		rollbackHeaders = append(rollbackHeaders, v.Hash())
+	if err := ancient.SetHead(0); err != nil {
+		t.Fatalf("set head err: %v", err)
 	}
-	ancient.SetHead(headers[pinch].Number.Uint64())
 
 	// Reinsert the rolled-back headers and receipts.
-	if n, err := ancient.InsertHeaderChain(headers[pinch:], 1); err != nil {
-		t.Fatalf("failed to insert header %d: %v", n, err)
+	if n, err := ancient.InsertHeaderChain(headers, 1); err != nil {
+		t.Log(ancient.CurrentHeader().Number.Uint64())
+		t.Fatalf("failed to insert header %d (#%d): %v", n, headers[n].Number.Uint64(), err)
 	}
-	if n, err := ancient.InsertReceiptChain(blocks[pinch:], receipts, ancientLimit); err != nil {
+	if n, err := ancient.InsertReceiptChain(blocks, receipts, ancientLimit); err != nil {
 		t.Fatalf("failed to insert receipt %d: %v", n, err)
 	}
 

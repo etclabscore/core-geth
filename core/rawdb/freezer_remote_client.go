@@ -1,6 +1,7 @@
 package rawdb
 
 import (
+	"sync"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -16,6 +17,9 @@ import (
 type FreezerRemoteClient struct {
 	client *rpc.Client
 	quit   chan struct{}
+	threshold uint64 // Number of recent blocks not to freeze (params.FullImmutabilityThreshold apart from tests)
+	trigger chan chan struct{} // Manual blocking freeze trigger, test determinism
+	closeOnce sync.Once
 }
 
 const (
@@ -37,6 +41,9 @@ func newFreezerRemoteClient(endpoint string) (*FreezerRemoteClient, error) {
 	}
 	return &FreezerRemoteClient{
 		client: client,
+		threshold: vars.FullImmutabilityThreshold,
+		quit:         make(chan struct{}),
+		trigger:      make(chan chan struct{}),
 	}, nil
 }
 
@@ -110,10 +117,13 @@ func (api *FreezerRemoteClient) Sync() error {
 // to exist unmodified and untouched by the remote freezer client, which demands
 // a slightly different signature, and uses the freezer.Ancients() method instead
 // of direct access to the atomic freezer.frozen field.
-func freezeRemote(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan struct{}) {
+func freezeRemote(db ethdb.KeyValueStore, f ethdb.AncientStore, threshold uint64, quitChan chan struct{}, triggerChanChan chan chan struct{}) {
 	nfdb := &nofreezedb{KeyValueStore: db}
 
-	backoff := false
+	var (
+		backoff   bool
+		triggered chan struct{} // Used in tests
+	)
 	for {
 		select {
 		case <-quitChan:
@@ -122,14 +132,20 @@ func freezeRemote(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan st
 		default:
 		}
 		if backoff {
+			// If we were doing a manual trigger, notify it
+			if triggered != nil {
+				triggered <- struct{}{}
+				triggered = nil
+			}
 			select {
 			case <-time.NewTimer(freezerRecheckInterval).C:
+				backoff = false
+			case triggered = <-triggerChanChan:
 				backoff = false
 			case <-quitChan:
 				return
 			}
 		}
-
 		// Retrieve the freezing threshold.
 		hash := ReadHeadBlockHash(nfdb)
 		if hash == (common.Hash{}) {
@@ -137,25 +153,25 @@ func freezeRemote(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan st
 			backoff = true
 			continue
 		}
-
 		numFrozen, err := f.Ancients()
 		if err != nil {
 			log.Crit("ancient db freeze", "error", err)
 		}
-
 		number := ReadHeaderNumber(nfdb, hash)
+		// threshold := atomic.LoadUint64(&f.threshold)
+
 		switch {
 		case number == nil:
 			log.Error("Current full block number unavailable", "hash", hash)
 			backoff = true
 			continue
 
-		case *number < vars.FullImmutabilityThreshold:
-			log.Debug("Current full block not old enough", "number", *number, "hash", hash, "delay", vars.FullImmutabilityThreshold)
+		case *number < threshold:
+			log.Debug("Current full block not old enough", "number", *number, "hash", hash, "delay", threshold)
 			backoff = true
 			continue
 
-		case *number-vars.FullImmutabilityThreshold <= numFrozen:
+		case *number-threshold <= numFrozen:
 			log.Debug("Ancient blocks frozen already", "number", *number, "hash", hash, "frozen", numFrozen)
 			backoff = true
 			continue
@@ -167,7 +183,7 @@ func freezeRemote(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan st
 			continue
 		}
 		// Seems we have data ready to be frozen, process in usable batches
-		limit := *number - vars.FullImmutabilityThreshold
+		limit := *number - threshold
 		if limit-numFrozen > freezerBatchLimit {
 			limit = numFrozen + freezerBatchLimit
 		}
@@ -176,7 +192,7 @@ func freezeRemote(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan st
 			first    = numFrozen
 			ancients = make([]common.Hash, 0, limit-numFrozen)
 		)
-		for numFrozen < limit {
+		for numFrozen <= limit {
 			// Retrieves all the components of the canonical block
 			hash := ReadCanonicalHash(nfdb, numFrozen)
 			if hash == (common.Hash{}) {
@@ -208,7 +224,6 @@ func freezeRemote(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan st
 			if err := f.AppendAncient(numFrozen, hash[:], header, body, receipts, td); err != nil {
 				break
 			}
-			numFrozen++ // Manually increment numFrozen (save a call)
 			ancients = append(ancients, hash)
 		}
 		// Batch of blocks have been frozen, flush them before wiping from leveldb
@@ -228,17 +243,56 @@ func freezeRemote(db ethdb.KeyValueStore, f ethdb.AncientStore, quitChan chan st
 			log.Crit("Failed to delete frozen canonical blocks", "err", err)
 		}
 		batch.Reset()
-		// Wipe out side chain also.
+
+		// Wipe out side chains also and track dangling side chians
+		var dangling []common.Hash
 		for number := first; number < numFrozen; number++ {
 			// Always keep the genesis block in active database
 			if number != 0 {
-				for _, hash := range ReadAllHashes(db, number) {
+				dangling = ReadAllHashes(db, number)
+				for _, hash := range dangling {
+					log.Trace("Deleting side chain", "number", number, "hash", hash)
 					DeleteBlock(batch, hash, number)
 				}
 			}
 		}
 		if err := batch.Write(); err != nil {
 			log.Crit("Failed to delete frozen side blocks", "err", err)
+		}
+		batch.Reset()
+
+		// Step into the future and delete and dangling side chains
+		if numFrozen > 0 {
+			tip := numFrozen
+			for len(dangling) > 0 {
+				drop := make(map[common.Hash]struct{})
+				for _, hash := range dangling {
+					log.Debug("Dangling parent from freezer", "number", tip-1, "hash", hash)
+					drop[hash] = struct{}{}
+				}
+				children := ReadAllHashes(db, tip)
+				for i := 0; i < len(children); i++ {
+					// Dig up the child and ensure it's dangling
+					child := ReadHeader(nfdb, children[i], tip)
+					if child == nil {
+						log.Error("Missing dangling header", "number", tip, "hash", children[i])
+						continue
+					}
+					if _, ok := drop[child.ParentHash]; !ok {
+						children = append(children[:i], children[i+1:]...)
+						i--
+						continue
+					}
+					// Delete all block data associated with the child
+					log.Debug("Deleting dangling block", "number", tip, "hash", children[i], "parent", child.ParentHash)
+					DeleteBlock(batch, children[i], tip)
+				}
+				dangling = children
+				tip++
+			}
+			if err := batch.Write(); err != nil {
+				log.Crit("Failed to delete dangling side blocks", "err", err)
+			}
 		}
 		// Log something friendly for the user
 		context := []interface{}{

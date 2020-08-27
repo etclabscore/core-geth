@@ -299,6 +299,7 @@ func (f *freezer) freeze(db ethdb.KeyValueStore) {
 			backoff = true
 			continue
 		}
+		//here
 		number := ReadHeaderNumber(nfdb, hash)
 		threshold := atomic.LoadUint64(&f.threshold)
 

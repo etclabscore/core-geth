@@ -60,7 +60,7 @@ func (f *MemFreezerRemoteServerAPI) Reset() {
 }
 
 func (f *MemFreezerRemoteServerAPI) HasAncient(kind string, number uint64) (bool, error) {
-	fmt.Println("mock server called", "method=HasAncient")
+	// fmt.Println("mock server called", "method=HasAncient")
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	_, ok := f.store[f.storeKey(kind, number)]
@@ -68,7 +68,7 @@ func (f *MemFreezerRemoteServerAPI) HasAncient(kind string, number uint64) (bool
 }
 
 func (f *MemFreezerRemoteServerAPI) Ancient(kind string, number uint64) ([]byte, error) {
-	fmt.Println("mock server called", "method=Ancient")
+	// fmt.Println("mock server called", "method=Ancient")
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	v, ok := f.store[f.storeKey(kind, number)]
@@ -79,12 +79,12 @@ func (f *MemFreezerRemoteServerAPI) Ancient(kind string, number uint64) ([]byte,
 }
 
 func (f *MemFreezerRemoteServerAPI) Ancients() (uint64, error) {
-	fmt.Println("mock server called", "method=Ancients")
+	// fmt.Println("mock server called", "method=Ancients")
 	return f.count, nil
 }
 
 func (f *MemFreezerRemoteServerAPI) AncientSize(kind string) (uint64, error) {
-	fmt.Println("mock server called", "method=AncientSize")
+	// fmt.Println("mock server called", "method=AncientSize")
 	sum := uint64(0)
 	for k, v := range f.store {
 		if strings.HasPrefix(k, kind) {
@@ -95,7 +95,7 @@ func (f *MemFreezerRemoteServerAPI) AncientSize(kind string) (uint64, error) {
 }
 
 func (f *MemFreezerRemoteServerAPI) AppendAncient(number uint64, hash, header, body, receipt, td []byte) error {
-	fmt.Println("mock server called", "method=AppendAncient", "number=", number, "header", fmt.Sprintf("%x", header))
+	// fmt.Println("mock server called", "method=AppendAncient", "number=", number, "header", fmt.Sprintf("%x", header))
 	fieldNames := []string{
 		freezerRemoteHashTable,
 		freezerRemoteHeaderTable,
@@ -118,7 +118,7 @@ func (f *MemFreezerRemoteServerAPI) AppendAncient(number uint64, hash, header, b
 }
 
 func (f *MemFreezerRemoteServerAPI) TruncateAncients(n uint64) error {
-	fmt.Println("mock server called", "method=TruncateAncients")
+	// fmt.Println("mock server called", "method=TruncateAncients")
 	f.count = n
 	f.mu.Lock()
 	defer f.mu.Unlock()
@@ -136,11 +136,11 @@ func (f *MemFreezerRemoteServerAPI) TruncateAncients(n uint64) error {
 }
 
 func (f *MemFreezerRemoteServerAPI) Sync() error {
-	fmt.Println("mock server called", "method=Sync")
+	// fmt.Println("mock server called", "method=Sync")
 	return nil
 }
 
 func (f *MemFreezerRemoteServerAPI) Close() error {
-	fmt.Println("mock server called", "method=Close")
+	// fmt.Println("mock server called", "method=Close")
 	return nil
 }

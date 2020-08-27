@@ -203,7 +203,7 @@ Please set --ancient.rpc to the correct path, and/or review the remote freezer's
 		}
 	}
 	// Freezer is consistent with the key-value database, permit combining the two
-	go freezeRemote(db, frdb, frdb.quit)
+	go freezeRemote(db, frdb, frdb.threshold, frdb.quit, frdb.trigger)
 
 	return &freezerdb{
 		KeyValueStore: db,

@@ -274,6 +274,7 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, chainConfig ctyp
 		if frozen > 0 {
 			txIndexBlock = frozen
 		}
+		bc.writeHeadBlock(bc.genesisBlock)
 	}
 	if err := bc.loadLastState(); err != nil {
 		return nil, err
@@ -374,8 +375,11 @@ func (bc *BlockChain) GetVMConfig() *vm.Config {
 // into node seamlessly.
 func (bc *BlockChain) empty() bool {
 	genesis := bc.genesisBlock.Hash()
-	for _, hash := range []common.Hash{rawdb.ReadHeadBlockHash(bc.db), rawdb.ReadHeadHeaderHash(bc.db), rawdb.ReadHeadFastBlockHash(bc.db)} {
-		if hash != genesis {
+	for _, hash := range []common.Hash{
+		rawdb.ReadHeadBlockHash(bc.db),
+		rawdb.ReadHeadHeaderHash(bc.db),
+		rawdb.ReadHeadFastBlockHash(bc.db)} {
+		if hash != (common.Hash{}) && hash != genesis {
 			return false
 		}
 	}

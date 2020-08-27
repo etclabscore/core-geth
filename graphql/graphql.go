@@ -1045,7 +1045,7 @@ func (r *Resolver) ProtocolVersion(ctx context.Context) (int32, error) {
 }
 
 func (r *Resolver) ChainID(ctx context.Context) (hexutil.Big, error) {
-	return hexutil.Big(*r.backend.ChainConfig().ChainID), nil
+	return hexutil.Big(*r.backend.ChainConfig().GetChainID()), nil
 }
 
 // SyncState represents the synchronisation status returned from the `syncing` accessor.

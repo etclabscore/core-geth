@@ -225,7 +225,6 @@ func preimageKey(hash common.Hash) []byte {
 	return append(preimagePrefix, hash.Bytes()...)
 }
 
-
 // codeKey = codePrefix + hash
 func codeKey(hash common.Hash) []byte {
 	return append(codePrefix, hash.Bytes()...)
@@ -239,7 +238,6 @@ func IsCodeKey(key []byte) (bool, []byte) {
 	}
 	return false, nil
 }
-
 
 // ConfigKey = ConfigPrefix + hash
 func ConfigKey(hash common.Hash) []byte {

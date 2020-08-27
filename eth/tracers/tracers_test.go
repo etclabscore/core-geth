@@ -39,7 +39,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/tests"
-	"github.com/go-test/deep"
 )
 
 // To generate a new callTracer test, copy paste the makeTest method below into

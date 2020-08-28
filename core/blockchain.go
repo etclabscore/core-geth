@@ -274,7 +274,10 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, chainConfig ctyp
 		if frozen > 0 {
 			txIndexBlock = frozen
 		}
-		bc.writeHeadBlock(bc.genesisBlock)
+		// loadLastState and other steps below assume that CurrentBlock is not nil.
+		if bc.CurrentBlock() == nil {
+			bc.writeHeadBlock(bc.genesisBlock)
+		}
 	}
 	if err := bc.loadLastState(); err != nil {
 		return nil, err

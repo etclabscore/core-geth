@@ -2200,20 +2200,32 @@ func (bc *BlockChain) getReorgData(oldBlock, newBlock *types.Block) *reorgData {
 	}
 }
 
-// EnableArtificialFinality enables and disable artifical finality features for the blockchain.
+// EnableArtificialFinality enables and disable artificial finality features for the blockchain.
 // Currently toggled features include:
 // - ECBP11355-MESS: modified exponential subject scoring
 //
 // This level of activation works BELOW the chain configuration for any of the
 // potential features. eg. If ECBP11355 is not activated at the chain config x block number,
 // then calling bc.EnableArtificialFinality(true) will be a noop.
-// The method may be called idempotently.
-func (bc *BlockChain) EnableArtificialFinality(enable bool) {
+// The method is idempotent.
+func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interface{}) {
+	// Store enable/disable value regardless of config activation.
+	var statusLog string
 	if enable {
+		statusLog = "Enabled"
 		atomic.StoreInt32(&bc.artificialFinalityEnabled, 1)
 	} else {
+		statusLog = "Disabled"
 		atomic.StoreInt32(&bc.artificialFinalityEnabled, 0)
 	}
+	configActivated := bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP11355Transition, bc.CurrentHeader().Number)
+	logFn := log.Debug // Deactivated
+	if configActivated && enable {
+		logFn = log.Info // Activated and enabled
+	} else if configActivated && !enable {
+		logFn = log.Warn // Activated and disabled
+	}
+	logFn(fmt.Sprintf("%s artificial finality features", statusLog), logValues...)
 }
 
 func (bc *BlockChain) IsArtificialFinalityEnabled() bool {

@@ -44,7 +44,7 @@ var (
 	// minArtificialFinalityPeers defines the minimum number of peers our node must be connected
 	// to in order to enable artificial finality features.
 	// A minimum number of peer connections mitigates the risk of lower-powered eclipse attacks.
-	minArtificialFinalityPeers       = defaultMinSyncPeers * 2
+	minArtificialFinalityPeers = defaultMinSyncPeers * 2
 
 	// artificialFinalitySafetyInterval defines the interval at which the local head is checked for staleness.
 	// If the head is found to be stale across this interval, artificial finality features are disabled.
@@ -82,8 +82,7 @@ func (pm *ProtocolManager) artificialFinalitySafetyLoop() {
 				}
 				// Else, it hasn't changed, which means we've been at the same
 				// header for the whole timer interval time.
-				log.Warn("Disabling artificial finality", "reason", "stale safety interval", "interval", artificialFinalitySafetyInterval)
-				pm.blockchain.EnableArtificialFinality(false)
+				pm.blockchain.EnableArtificialFinality(false, "reason", "stale safety interval", "interval", artificialFinalitySafetyInterval)
 			} else {
 				lastHead = 0 // reset
 			}
@@ -299,8 +298,7 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 	}
 	if cs.pm.peers.Len() < minArtificialFinalityPeers {
 		if cs.pm.blockchain.IsArtificialFinalityEnabled() {
-			log.Warn("Disabling artificial finality", "reason", "low peers", "peers", cs.pm.peers.Len())
-			cs.pm.blockchain.EnableArtificialFinality(false)
+			cs.pm.blockchain.EnableArtificialFinality(false, "reason", "low peers", "peers", cs.pm.peers.Len())
 		}
 	}
 	if cs.pm.peers.Len() < minPeers {
@@ -319,8 +317,7 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 		if op.mode == downloader.FullSync &&
 			cs.pm.peers.Len() >= minArtificialFinalityPeers &&
 			!cs.pm.blockchain.IsArtificialFinalityEnabled() {
-			log.Info("Enabling artificial finality features", "reason", "synced", "peers", cs.pm.peers.Len())
-			cs.pm.blockchain.EnableArtificialFinality(true)
+			cs.pm.blockchain.EnableArtificialFinality(true, "reason", "synced", "peers", cs.pm.peers.Len())
 		}
 		return nil // We're in sync.
 	}

@@ -64,6 +64,8 @@ type txsync struct {
 // and should disable the permapoint feature in case that's keeping
 // us on a dead chain.
 func (pm *ProtocolManager) artificialFinalitySafetyLoop() {
+	defer pm.wg.Done()
+
 	t := time.NewTicker(artificialFinalitySafetyInterval)
 	defer t.Stop()
 

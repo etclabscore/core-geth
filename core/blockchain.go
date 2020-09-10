@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math"
 	"math/big"
 	mrand "math/rand"
 	"sort"
@@ -202,8 +201,6 @@ type BlockChain struct {
 	running       int32          // 0 if chain is running, 1 when stopped
 	procInterrupt int32          // interrupt signaler for block processing
 
-	artificialFinalityEnabled int32 // toggles artificial finality features
-
 	engine     consensus.Engine
 	validator  Validator  // Block and state validator interface
 	prefetcher Prefetcher // Block state prefetcher interface
@@ -213,6 +210,8 @@ type BlockChain struct {
 	badBlocks       *lru.Cache                     // Bad block cache
 	shouldPreserve  func(*types.Block) bool        // Function used to determine whether should preserve the given block.
 	terminateInsert func(common.Hash, uint64) bool // Testing hook used to terminate ancient receipt chain insertion.
+
+	artificialFinalityEnabled int32 // toggles artificial finality features
 }
 
 // NewBlockChain returns a fully initialised block chain using information
@@ -2198,66 +2197,6 @@ func (bc *BlockChain) getReorgData(oldBlock, newBlock *types.Block) *reorgData {
 		deletedLogs: deletedLogs,
 		rebirthLogs: rebirthLogs,
 	}
-}
-
-// EnableArtificialFinality enables and disable artificial finality features for the blockchain.
-// Currently toggled features include:
-// - ECBP11355-MESS: modified exponential subject scoring
-//
-// This level of activation works BELOW the chain configuration for any of the
-// potential features. eg. If ECBP11355 is not activated at the chain config x block number,
-// then calling bc.EnableArtificialFinality(true) will be a noop.
-// The method is idempotent.
-func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interface{}) {
-	// Store enable/disable value regardless of config activation.
-	var statusLog string
-	if enable {
-		statusLog = "Enabled"
-		atomic.StoreInt32(&bc.artificialFinalityEnabled, 1)
-	} else {
-		statusLog = "Disabled"
-		atomic.StoreInt32(&bc.artificialFinalityEnabled, 0)
-	}
-	configActivated := bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP11355Transition, bc.CurrentHeader().Number)
-	logFn := log.Debug // Deactivated
-	if configActivated && enable {
-		logFn = log.Info // Activated and enabled
-	} else if configActivated && !enable {
-		logFn = log.Warn // Activated and disabled
-	}
-	logFn(fmt.Sprintf("%s artificial finality features", statusLog), logValues...)
-}
-
-func (bc *BlockChain) IsArtificialFinalityEnabled() bool {
-	return atomic.LoadInt32(&bc.artificialFinalityEnabled) == 1
-}
-
-// errReorgFinality represents an error caused by artificial finality mechanisms.
-var errReorgFinality = errors.New("finality-enforced invalid new chain")
-
-// ecpb11355 implements the "MESS" artificial finality mechanism
-// "Modified Exponential Subject Scoring" used to prefer known chain segments
-// over later-to-come counterparts, especially proposed segments stretching far into the past.
-func (bc *BlockChain) ecbp11355(commonAncestor, current, proposed *types.Header) error {
-	commonAncestorTD := bc.GetTd(commonAncestor.Hash(), commonAncestor.Number.Uint64())
-
-	proposedParentTD := bc.GetTd(proposed.ParentHash, proposed.Number.Uint64()-1)
-	proposedTD := new(big.Int).Add(proposed.Difficulty, proposedParentTD)
-
-	localTD := bc.GetTd(current.Hash(), current.Number.Uint64())
-
-	tdRatio, _ := new(big.Float).Quo(
-		new(big.Float).SetInt(new(big.Int).Sub(proposedTD, commonAncestorTD)),
-		new(big.Float).SetInt(new(big.Int).Sub(localTD, commonAncestorTD)),
-	).Float64()
-
-	antiGravity := math.Pow(1.0001, float64(proposed.Time-commonAncestor.Time))
-
-	if tdRatio < antiGravity {
-		// Using "b/a" here as "'B' chain vs. 'A' chain", where A is original (current), and B is proposed (new).
-		return fmt.Errorf("%w: ECPB11355-MESS: td.b/a(%0.3f) < antigravity(%0.3f)", errReorgFinality, tdRatio, antiGravity)
-	}
-	return nil
 }
 
 // reorg takes two blocks, an old chain and a new chain and will reconstruct the

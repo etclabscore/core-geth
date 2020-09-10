@@ -19,19 +19,19 @@ func TestBlockChain_AF_ECBP11355(t *testing.T) {
 		easyOffset, hardOffset int64
 		hardGetsHead, accepted bool
 	}{
-		// Hard has insufficient total difficulty / length.
+		// Hard has insufficient total difficulty / length and is rejected.
 		{
 			5000, 7500, 2500,
-			60, 1,
+			50, -9,
 			false, false,
 		},
-		// Hard has insufficient total difficulty / length.
+		// Hard has sufficient total difficulty / length and is accepted.
 		{
 			1000, 7, 995,
-			60, 9,
-			false, false,
+			60, 0,
+			true, true,
 		},
-		// Hard has sufficient total difficulty / length to be accepted and set as head.
+		// Hard has sufficient total difficulty / length and is accepted.
 		{
 			1000, 7, 995,
 			60, 7,
@@ -43,11 +43,137 @@ func TestBlockChain_AF_ECBP11355(t *testing.T) {
 			30, 1,
 			true, true,
 		},
+		// Hard has sufficient total difficulty / length and is accepted.
+		{
+			500, 3, 497,
+			0, -8,
+			true, true,
+		},
+		// Hard has sufficient total difficulty / length and is accepted.
+		{
+			500, 4, 496,
+			0, -9,
+			true, true,
+		},
+		// Hard has sufficient total difficulty / length and is accepted.
+		{
+			500, 5, 495,
+			0, -9,
+			true, true,
+		},
+		// Hard has sufficient total difficulty / length and is accepted.
+		{
+			500, 6, 494,
+			0, -9,
+			true, true,
+		},
+		// Hard has sufficient total difficulty / length and is accepted.
+		{
+			500, 7, 493,
+			0, -9,
+			true, true,
+		},
+		// Hard has sufficient total difficulty / length and is accepted.
+		{
+			500, 8, 492,
+			0, -9,
+			true, true,
+		},
+		// Hard has sufficient total difficulty / length and is accepted.
+		{
+			500, 9, 491,
+			0, -9,
+			true, true,
+		},
+		// Hard has sufficient total difficulty / length and is accepted.
+		{
+			500, 12, 488,
+			0, -9,
+			true, true,
+		},
+		// Hard has sufficient total difficulty / length and is accepted.
+		{
+			500, 20, 480,
+			0, -9,
+			true, true,
+		},
+		// Hard has sufficient total difficulty / length and is accepted.
+		{
+			500, 40, 460,
+			0, -9,
+			true, true,
+		},
+		// Hard has sufficient total difficulty / length and is accepted.
+		{
+			500, 60, 440,
+			0, -9,
+			true, true,
+		},
+		// Hard has insufficient total difficulty / length and is rejected.
+		{
+			500, 80, 420,
+			0, -9,
+			false, false,
+		},
+		// Hard has insufficient total difficulty / length and is rejected.
+		{
+			500, 80, 420,
+			7, -9,
+			false, false,
+		},
+		// Hard has insufficient total difficulty / length and is rejected.
+		{
+			500, 80, 420,
+			17, -9,
+			false, false,
+		},
+		// Hard has sufficient total difficulty / length and is accepted.
+		{
+			500, 80, 420,
+			47, -9,
+			true, true,
+		},
+		// Hard has insufficient total difficulty / length and is rejected.
+		{
+			500, 80, 420,
+			47, -8,
+			false, false,
+		},
+		// Hard has insufficient total difficulty / length and is rejected.
+		{
+			500, 80, 420,
+			17, -8,
+			false, false,
+		},
+		// Hard has insufficient total difficulty / length and is rejected.
+		{
+			500, 80, 420,
+			7, -8,
+			false, false,
+		},
+		// Hard has insufficient total difficulty / length and is rejected.
+		{
+			500, 80, 420,
+			0, -8,
+			false, false,
+		},
+		// Hard has insufficient total difficulty / length and is rejected.
+		{
+			500, 40, 460,
+			0, -7,
+			false, false,
+		},
+		// Hard has insufficient total difficulty / length and is rejected.
+		{
+			500, 14, 486,
+			0, -7,
+			false, false,
+		},
 		// Hard is accepted, but does not have greater total difficulty,
 		// and is not set as the chain head.
 		{
 			1000, 1, 900,
-			60, 1,
+			60, -9,
 			false, true,
 		},
 	}

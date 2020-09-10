@@ -19,8 +19,10 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 var (
@@ -83,4 +85,76 @@ var (
 	DisinflationRateQuotient = big.NewInt(4)      // Disinflation rate quotient for ECIP1017
 	DisinflationRateDivisor  = big.NewInt(5)      // Disinflation rate divisor for ECIP1017
 	ExpDiffPeriod            = big.NewInt(100000) // Exponential diff period for diff bomb & ECIP1010
+
+	MessNetConfig = &coregeth.CoreGethChainConfig{
+		NetworkID: 1,
+		Ethash:    new(ctypes.EthashConfig),
+		ChainID:   big.NewInt(6161),
+
+		EIP2FBlock: big.NewInt(1),
+		EIP7FBlock: big.NewInt(1),
+
+		DAOForkBlock: nil,
+
+		EIP150Block: big.NewInt(2),
+
+		EIP155Block:  big.NewInt(3),
+		EIP160FBlock: big.NewInt(3),
+
+		// EIP158~
+		EIP161FBlock: big.NewInt(8),
+		EIP170FBlock: big.NewInt(8),
+
+		// Byzantium eq
+		EIP100FBlock: big.NewInt(8),
+		EIP140FBlock: big.NewInt(8),
+		EIP198FBlock: big.NewInt(8),
+		EIP211FBlock: big.NewInt(8),
+		EIP212FBlock: big.NewInt(8),
+		EIP213FBlock: big.NewInt(8),
+		EIP214FBlock: big.NewInt(8),
+		EIP658FBlock: big.NewInt(8),
+
+		// Constantinople eq, aka Agharta
+		EIP145FBlock:  big.NewInt(9),
+		EIP1014FBlock: big.NewInt(9),
+		EIP1052FBlock: big.NewInt(9),
+
+		// Istanbul eq, aka Phoenix
+		// ECIP-1088
+		EIP152FBlock:  big.NewInt(10),
+		EIP1108FBlock: big.NewInt(10),
+		EIP1344FBlock: big.NewInt(10),
+		EIP1884FBlock: big.NewInt(10),
+		EIP2028FBlock: big.NewInt(10),
+		EIP2200FBlock: big.NewInt(10), // RePetersburg (=~ re-1283)
+
+		DisposalBlock:      big.NewInt(5),
+		ECIP1017FBlock:     big.NewInt(5),
+		ECIP1017EraRounds:  big.NewInt(5000),
+		ECIP1010PauseBlock: big.NewInt(3),
+		ECIP1010Length:     big.NewInt(2),
+		ECBP11355FBlock:    big.NewInt(11),
+	}
+
 )
+
+func DefaultMessNetGenesisBlock() *genesisT.Genesis {
+	return &genesisT.Genesis{
+		Config:     MessNetConfig,
+		Timestamp:  1598650845,
+		ExtraData:  hexutil.MustDecode("0x4235353535353535353535353535353535353535353535353535353535353535"),
+		GasLimit:   10485760,
+		Difficulty: big.NewInt(37103392657464),
+		Alloc: map[common.Address]genesisT.GenesisAccount{
+			common.BytesToAddress([]byte{1}): {Balance: big.NewInt(1)}, // ECRecover
+			common.BytesToAddress([]byte{2}): {Balance: big.NewInt(1)}, // SHA256
+			common.BytesToAddress([]byte{3}): {Balance: big.NewInt(1)}, // RIPEMD
+			common.BytesToAddress([]byte{4}): {Balance: big.NewInt(1)}, // Identity
+			common.BytesToAddress([]byte{5}): {Balance: big.NewInt(1)}, // ModExp
+			common.BytesToAddress([]byte{6}): {Balance: big.NewInt(1)}, // ECAdd
+			common.BytesToAddress([]byte{7}): {Balance: big.NewInt(1)}, // ECScalarMul
+			common.BytesToAddress([]byte{8}): {Balance: big.NewInt(1)}, // ECPairing
+		},
+	}
+}

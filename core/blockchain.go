@@ -1549,9 +1549,20 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 	if reorg {
 		// Reorganise the chain if the parent is not the head block
 		d := bc.getReorgData(currentBlock, block)
-		if d.err == nil {
+		if d.err != nil {
+			// Will ALWAYS return the/an error, since the data.err field is non-nil.
+			// We leave the error to the reorg method to handle, if it wants to wrap it or log it or whatever.
+			if err := bc.reorg(d); err != nil {
+				return NonStatTy, err
+			}
+		}
+
+		// Reorg data error was nil.
+		// Proceed with further reorg arbitration.
+		if bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP11355Transition, currentBlock.Number()) {
 			d.err = bc.ecbp11355(d.commonBlock.Header(), currentBlock.Header(), block.Header())
 		}
+
 		if err := bc.reorg(d); err != nil {
 			return NonStatTy, err
 		}

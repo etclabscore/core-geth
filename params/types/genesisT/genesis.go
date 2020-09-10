@@ -528,20 +528,28 @@ func (g *Genesis) SetECIP1080Transition(n *uint64) error {
 	return g.Config.SetECIP1080Transition(n)
 }
 
-func (g Genesis) GetEIP1706Transition() *uint64 {
+func (g *Genesis) GetEIP1706Transition() *uint64 {
 	return g.Config.GetEIP1706Transition()
 }
 
-func (g Genesis) SetEIP1706Transition(n *uint64) error {
+func (g *Genesis) SetEIP1706Transition(n *uint64) error {
 	return g.Config.SetEIP1706Transition(n)
 }
 
-func (g Genesis) GetEIP2537Transition() *uint64 {
+func (g *Genesis) GetEIP2537Transition() *uint64 {
 	return g.Config.GetEIP2537Transition()
 }
 
-func (g Genesis) SetEIP2537Transition(n *uint64) error {
+func (g *Genesis) SetEIP2537Transition(n *uint64) error {
 	return g.Config.SetEIP2537Transition(n)
+}
+
+func (g *Genesis) GetECBP11355Transition() *uint64 {
+	return g.Config.GetECBP11355Transition()
+}
+
+func (g *Genesis) SetECBP11355Transition(n *uint64) error {
+	return g.Config.SetECBP11355Transition(n)
 }
 
 func (g *Genesis) IsEnabled(fn func() *uint64, n *big.Int) bool {

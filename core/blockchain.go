@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"math/big"
 	mrand "math/rand"
 	"sort"
@@ -1543,12 +1544,19 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 	}
 	status = CanonStatTy
 	discontiguousBlocks := block.ParentHash() != currentBlock.Hash()
-	if reorg && discontiguousBlocks {
+	reorg = reorg && discontiguousBlocks
+
+	if reorg {
 		// Reorganise the chain if the parent is not the head block
 		d := bc.getReorgData(currentBlock, block)
+		if d.err == nil {
+			d.err = bc.ecbp11355(d.commonBlock.Header(), currentBlock.Header(), block.Header())
+		}
 		if err := bc.reorg(d); err != nil {
 			return NonStatTy, err
 		}
+		// Status is (remains) canon; reorg succeeded.
+
 	} else if discontiguousBlocks {
 		status = SideStatTy
 	}
@@ -2179,9 +2187,40 @@ func (bc *BlockChain) getReorgData(oldBlock, newBlock *types.Block) *reorgData {
 	}
 }
 
+// errReorgFinality represents an error caused by artificial finality mechanisms.
+var errReorgFinality = errors.New("finality-enforced invalid new chain")
+
+// ecpb11355 implements the "MESS" artificial finality mechanism
+// "Modified Exponential Subject Scoring" used to prefer known chain segments
+// over later-to-come counterparts, especially proposed segments stretching far into the past.
+func (bc *BlockChain) ecbp11355(commonAncestor, current, proposed *types.Header) error {
+	commonAncestorTD := bc.GetTd(commonAncestor.Hash(), commonAncestor.Number.Uint64())
+
+	proposedParentTD := bc.GetTd(proposed.ParentHash, proposed.Number.Uint64()-1)
+	proposedTD := new(big.Int).Add(proposed.Difficulty, proposedParentTD)
+
+	localTD := bc.GetTd(current.Hash(), current.Number.Uint64())
+
+	tdRatio, _ := new(big.Float).Quo(
+		new(big.Float).SetInt(new(big.Int).Sub(proposedTD, commonAncestorTD)),
+		new(big.Float).SetInt(new(big.Int).Sub(localTD, commonAncestorTD)),
+	).Float64()
+
+	antiGravity := math.Pow(1.0001, float64(proposed.Time-commonAncestor.Time))
+
+	if tdRatio < antiGravity {
+		// Using "b/a" here as "'B' chain vs. 'A' chain", where A is original (current), and B is proposed (new).
+		return fmt.Errorf("%w: ECPB11355-MESS: td.b/a(%0.3f) < antigravity(%0.3f)", errReorgFinality, tdRatio, antiGravity)
+	}
+	return nil
+}
+
 // reorg takes two blocks, an old chain and a new chain and will reconstruct the
 // blocks and inserts them to be part of the new canonical chain and accumulates
 // potential missing transactions and post an event about them.
+// If reorgData passed contains an a non-nil error, the method is expect to return it immediately.
+// This kind-of-strange pattern is in place to allow the function to issue "special case" warning logs
+// consistent with its behavior prior to refactoring.
 func (bc *BlockChain) reorg(data *reorgData) error {
 	if data.err != nil {
 		if data.err == errReorgImpossible {

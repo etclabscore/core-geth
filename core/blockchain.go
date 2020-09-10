@@ -2297,6 +2297,7 @@ func (bc *BlockChain) reorg(data *reorgData) error {
 		"drop", len(data.oldChain), "dropfrom", data.oldChain[0].Hash(), "add", len(data.newChain), "addfrom", data.newChain[0].Hash())
 	blockReorgAddMeter.Mark(int64(len(data.newChain)))
 	blockReorgDropMeter.Mark(int64(len(data.oldChain)))
+	blockReorgMeter.Mark(1)
 
 	// Insert the new chain(except the head block(reverse order)),
 	// taking care of the proper incremental order.

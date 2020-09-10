@@ -69,7 +69,7 @@ func (bc *BlockChain) ecbp11355(commonAncestor, current, proposed *types.Header)
 
 	if tdRatio < antiGravity {
 		// Using "b/a" here as "'B' chain vs. 'A' chain", where A is original (current), and B is proposed (new).
-		return fmt.Errorf("%w: ECPB11355-MESS: td.b/a(%0.4f) < antigravity(%0.4f)", errReorgFinality, tdRatio, antiGravity)
+		return fmt.Errorf("%w: ECPB11355-MESS: td.b/a(%0.5f) < antigravity(%0.5f)", errReorgFinality, tdRatio, antiGravity)
 	}
 	return nil
 }

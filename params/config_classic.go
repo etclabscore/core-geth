@@ -136,7 +136,6 @@ var (
 		ECIP1010Length:     big.NewInt(2),
 		ECBP11355FBlock:    big.NewInt(11),
 	}
-
 )
 
 func DefaultMessNetGenesisBlock() *genesisT.Genesis {

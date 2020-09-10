@@ -14,10 +14,10 @@ import (
 
 func TestBlockChain_AF_ECBP11355(t *testing.T) {
 
-	cases := []struct{
+	cases := []struct {
 		easyLen, hardLen, commonAncestorN int
-		easyOffset, hardOffset int64
-		hardGetsHead, accepted bool
+		easyOffset, hardOffset            int64
+		hardGetsHead, accepted            bool
 	}{
 		// Hard has insufficient total difficulty / length and is rejected.
 		{

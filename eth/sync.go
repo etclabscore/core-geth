@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 const (
@@ -39,9 +40,57 @@ const (
 	txsyncPackSize = 100 * 1024
 )
 
+var (
+	// minArtificialFinalityPeers defines the minimum number of peers our node must be connected
+	// to in order to enable artificial finality features.
+	// A minimum number of peer connections mitigates the risk of lower-powered eclipse attacks.
+	minArtificialFinalityPeers       = defaultMinSyncPeers * 2
+
+	// artificialFinalitySafetyInterval defines the interval at which the local head is checked for staleness.
+	// If the head is found to be stale across this interval, artificial finality features are disabled.
+	// This prevents an abandoned victim of an eclipse attack from being forever destitute.
+	artificialFinalitySafetyInterval = time.Second * time.Duration(10*vars.DurationLimit.Uint64())
+)
+
 type txsync struct {
 	p   *peer
 	txs []*types.Transaction
+}
+
+// artificialFinalitySafetyLoop compares our local head across timer intervals.
+// If it changes, assuming the interval is sufficiently long,
+// it means we're syncing ok: there has been a steady flow of blocks.
+// If it doesn't change, it means that we've stalled syncing for some reason,
+// and should disable the permapoint feature in case that's keeping
+// us on a dead chain.
+func (pm *ProtocolManager) artificialFinalitySafetyLoop() {
+	t := time.NewTicker(artificialFinalitySafetyInterval)
+	defer t.Stop()
+
+	var lastHead uint64
+
+	for {
+		select {
+		case <-t.C:
+			if pm.blockchain.IsArtificialFinalityEnabled() {
+				// Get the latest header we have.
+				n := pm.blockchain.CurrentHeader().Number.Uint64()
+				// If it has changed, we haven't gone stale or dark.
+				if lastHead != n {
+					lastHead = n
+					continue
+				}
+				// Else, it hasn't changed, which means we've been at the same
+				// header for the whole timer interval time.
+				log.Warn("Disabling artificial finality", "reason", "stale safety interval", "interval", artificialFinalitySafetyInterval)
+				pm.blockchain.EnableArtificialFinality(false)
+			} else {
+				lastHead = 0 // reset
+			}
+		case <-pm.quitSync:
+			return
+		}
+	}
 }
 
 // syncTransactions starts sending all currently pending transactions to the given peer.
@@ -248,6 +297,12 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 	} else if minPeers > cs.pm.maxPeers {
 		minPeers = cs.pm.maxPeers
 	}
+	if cs.pm.peers.Len() < minArtificialFinalityPeers {
+		if cs.pm.blockchain.IsArtificialFinalityEnabled() {
+			log.Warn("Disabling artificial finality", "reason", "low peers", "peers", cs.pm.peers.Len())
+			cs.pm.blockchain.EnableArtificialFinality(false)
+		}
+	}
 	if cs.pm.peers.Len() < minPeers {
 		return nil
 	}
@@ -260,6 +315,13 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 	mode, ourTD := cs.modeAndLocalHead()
 	op := peerToSyncOp(mode, peer)
 	if op.td.Cmp(ourTD) <= 0 {
+		// Enable artificial finality if parameters if should.
+		if op.mode == downloader.FullSync &&
+			cs.pm.peers.Len() >= minArtificialFinalityPeers &&
+			!cs.pm.blockchain.IsArtificialFinalityEnabled() {
+			log.Info("Enabling artificial finality features", "reason", "synced", "peers", cs.pm.peers.Len())
+			cs.pm.blockchain.EnableArtificialFinality(true)
+		}
 		return nil // We're in sync.
 	}
 	return op

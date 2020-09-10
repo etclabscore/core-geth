@@ -50,7 +50,7 @@ func (bc *BlockChain) IsArtificialFinalityEnabled() bool {
 }
 
 // ecpb11355 implements the "MESS" artificial finality mechanism
-// "Modified Exponential Subject Scoring" used to prefer known chain segments
+// "Modified Exponential Subjective Scoring" used to prefer known chain segments
 // over later-to-come counterparts, especially proposed segments stretching far into the past.
 func (bc *BlockChain) ecbp11355(commonAncestor, current, proposed *types.Header) error {
 	commonAncestorTD := bc.GetTd(commonAncestor.Hash(), commonAncestor.Number.Uint64())

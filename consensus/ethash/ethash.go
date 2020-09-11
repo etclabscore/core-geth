@@ -502,6 +502,22 @@ const (
 	ModeFullFake
 )
 
+func (m Mode) String() string {
+	switch m {
+	case ModeNormal:
+		return "Normal"
+	case ModeShared:
+		return "Shared"
+	case ModeTest:
+		return "Test"
+	case ModeFake:
+		return "Fake"
+	case ModeFullFake:
+		return "FullFake"
+	}
+	return "unknown"
+}
+
 // Config are the configuration parameters of the ethash.
 type Config struct {
 	CacheDir         string

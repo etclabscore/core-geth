@@ -33,12 +33,13 @@ func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interfa
 		statusLog = "Disabled"
 		atomic.StoreInt32(&bc.artificialFinalityEnabled, 0)
 	}
-	configActivated := bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP11355Transition, bc.CurrentHeader().Number)
-	logFn := log.Debug // Deactivated
-	if configActivated && enable {
+	if !bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP11355Transition, bc.CurrentHeader().Number) {
+		// Don't log anything if the config hasn't enabled it yet.
+		return
+	}
+	logFn := log.Warn // Deactivated and enabled
+	if enable {
 		logFn = log.Info // Activated and enabled
-	} else if configActivated && !enable {
-		logFn = log.Warn // Activated and disabled
 	}
 	logFn(fmt.Sprintf("%s artificial finality features", statusLog), logValues...)
 }

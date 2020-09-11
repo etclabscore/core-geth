@@ -1662,7 +1662,11 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 	senderCacher.recoverFromBlocks(types.MakeSigner(bc.chainConfig, chain[0].Number()), chain)
 
 	var (
-		stats     = insertStats{startTime: mclock.Now()}
+		stats = insertStats{
+			startTime: mclock.Now(),
+			artificialFinality: bc.IsArtificialFinalityEnabled() &&
+				bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP11355Transition, bc.CurrentBlock().Number()),
+		}
 		lastCanon *types.Block
 	)
 	// Fire a single chain head event if we've progressed the chain

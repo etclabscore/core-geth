@@ -314,7 +314,7 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 }
 
 func TestEcbp11355AGSinusoidalA(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		in, out float64
 	}{
 		{0, 1},
@@ -322,7 +322,7 @@ func TestEcbp11355AGSinusoidalA(t *testing.T) {
 	}
 	tolerance := 0.0000001
 	for i, c := range cases {
-		if got := ecbp11355AGSinusoidalA(c.in); got < c.out - tolerance || got > c.out + tolerance {
+		if got := ecbp11355AGSinusoidalA(c.in); got < c.out-tolerance || got > c.out+tolerance {
 			t.Fatalf("%d: in: %0.6f want: %0.6f got: %0.6f", i, c.in, c.out, got)
 		}
 	}

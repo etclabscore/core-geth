@@ -31,6 +31,14 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 )
 
+func TestSealFakeDelay(t *testing.T) {
+	e := &Ethash{threads: 10}
+	for i := 0; i < 20; i++ {
+		d := e.makeFakeDelay()
+		t.Log(d)
+	}
+}
+
 // Tests whether remote HTTP servers are correctly notified of new work.
 func TestRemoteNotify(t *testing.T) {
 	// Start a simple web server to capture notifications.

@@ -73,14 +73,6 @@ func (bc *BlockChain) ecbp11355(commonAncestor, current, proposed *types.Header)
 		new(big.Float).SetInt(new(big.Int).Sub(localTD, commonAncestorTD)),
 	).Float64()
 
-	// See comment at ecbp11355AGSameSameShallowOK.
-	// If this condition runs, the reorg check will already have
-	// passed a coin toss (combined with selfish preference) for acceptance.
-	if tdRatio == 1 &&
-		proposed.Number.Uint64() - current.Number.Uint64() <= 3 {
-		return nil
-	}
-
 	x := float64(proposed.Time-commonAncestor.Time)
 	antiGravity := ecbp11355AGSinusoidalA(x)
 

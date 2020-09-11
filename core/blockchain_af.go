@@ -7,7 +7,6 @@ import (
 	"math/big"
 	"math/rand"
 	"sync/atomic"
-	"time"
 
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
@@ -15,10 +14,6 @@ import (
 
 // errReorgFinality represents an error caused by artificial finality mechanisms.
 var errReorgFinality = errors.New("finality-enforced invalid new chain")
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 // EnableArtificialFinality enables and disable artificial finality features for the blockchain.
 // Currently toggled features include:
@@ -73,7 +68,7 @@ func (bc *BlockChain) ecbp11355(commonAncestor, current, proposed *types.Header)
 		new(big.Float).SetInt(new(big.Int).Sub(localTD, commonAncestorTD)),
 	).Float64()
 
-	x := float64(proposed.Time-commonAncestor.Time)
+	x := float64(proposed.Time - commonAncestor.Time)
 	antiGravity := ecbp11355AGSinusoidalA(x)
 
 	if tdRatio < antiGravity {
@@ -82,6 +77,25 @@ func (bc *BlockChain) ecbp11355(commonAncestor, current, proposed *types.Header)
 		return fmt.Errorf("%w: ECPB11355-MESS: td.B/A%0.6f < antigravity%0.6f (under=%0.6f)", errReorgFinality, tdRatio, antiGravity, underpoweredBy)
 	}
 	return nil
+}
+
+/*
+ecbp11355AGSinusoidalA is a sinusoidal function.
+
+OPTION 3: Yet slower takeoff, yet steeper eventual ascent. Has a differentiable ceiling transition.
+h(x)=15 sin((x+12000 π)/(8000))+15+1
+
+*/
+func ecbp11355AGSinusoidalA(x float64) (antiGravity float64) {
+	ampl := float64(15)   // amplitude
+	pDiv := float64(8000) // period divisor
+	phaseShift := math.Pi * (pDiv * 1.5)
+	peakX := math.Pi * pDiv // x value of first sin peak where x > 0
+	if x > peakX {
+		// Cause the x value to limit to the x value of the first peak of the sin wave (ceiling).
+		x = peakX
+	}
+	return (ampl * math.Sin((x+phaseShift)/pDiv)) + ampl + 1
 }
 
 // ecbp11355AGSameSameShallowOK is an allowance arbitration function for chain segments
@@ -105,30 +119,11 @@ func ecbp11355AGSameSameShallowOK(tdRatio float64, proposed, commonAncestor *typ
 }
 
 /*
-ecbp11355AGSinusoidalA is a sinusoidal function.
-
-OPTION 3: Yet slower takeoff, yet steeper eventual ascent. Has a differentiable ceiling.
-h(x)=15 sin((x+12000 π)/(8000))+15+1
-
-*/
-func ecbp11355AGSinusoidalA(x float64) (antiGravity float64) {
-	ampl := float64(15) // amplitude
-	pDiv := float64(8000) // period divisor
-	phaseShift := math.Pi * (pDiv*1.5)
-	peakX := math.Pi * pDiv // x value of first sin peak where x > 0
-	if x > peakX {
-		// Cause the x value to limit to the x value of the first peak of the sin wave (ceiling).
-		x = peakX
-	}
-	return (ampl * math.Sin((x+phaseShift)/pDiv)) + ampl + 1
-}
-
-/*
 ecbp11355AGExpB is an exponential function with x as a base (and rationalized exponent).
 
 OPTION 2: Slightly slower takeoff, steeper eventual ascent
 g(x)=x^(x*0.00002)
- */
+*/
 func ecbp11355AGExpB(x float64) (antiGravity float64) {
 	return math.Pow(x, x*0.00002)
 }

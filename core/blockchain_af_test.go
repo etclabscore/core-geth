@@ -236,7 +236,7 @@ func TestBlockChain_AF_ECBP11355(t *testing.T) {
 }
 
 func TestBlockChain_GenerateMESSPlot(t *testing.T) {
-	t.Skip("Test plots graph of chain acceptance for visualization.")
+	t.Skip("This test plots graph of chain acceptance for visualization.")
 
 	easyLen := 200
 	maxHardLen := 100
@@ -310,5 +310,20 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 	baseTitle := fmt.Sprintf("Accept/Reject Reorgs: Relative Time (Difficulty) over Proposed Segment Length (%d-block original chain)", easyLen)
 	generatePlot(baseTitle, "reorgs-MESS.png")
 	yuckyGlobalTestEnableMess = false
-	generatePlot("WITHOUT MESS: " + baseTitle, "reorgs-noMESS.png")
+	generatePlot("WITHOUT MESS: "+baseTitle, "reorgs-noMESS.png")
+}
+
+func TestEcbp11355AGSinusoidalA(t *testing.T) {
+	cases := []struct{
+		in, out float64
+	}{
+		{0, 1},
+		{25132, 31},
+	}
+	tolerance := 0.0000001
+	for i, c := range cases {
+		if got := ecbp11355AGSinusoidalA(c.in); got < c.out - tolerance || got > c.out + tolerance {
+			t.Fatalf("%d: in: %0.6f want: %0.6f got: %0.6f", i, c.in, c.out, got)
+		}
+	}
 }

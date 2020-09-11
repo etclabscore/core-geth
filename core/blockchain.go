@@ -1543,35 +1543,29 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 			reorg = !currentPreserve && (blockPreserve || mrand.Float64() < 0.5)
 		}
 	}
-	status = CanonStatTy
-	discontiguousBlocks := block.ParentHash() != currentBlock.Hash()
-	reorg = reorg && discontiguousBlocks
 
 	if reorg {
-		// Reorganise the chain if the parent is not the head block
-		d := bc.getReorgData(currentBlock, block)
-		if d.err != nil {
-			// Will ALWAYS return the/an error, since the data.err field is non-nil.
+		if block.ParentHash() != currentBlock.Hash() {
+			// Reorganise the chain if the parent is not the head block
+			d := bc.getReorgData(currentBlock, block)
+			if d.err == nil {
+				// Reorg data error was nil.
+				// Proceed with further reorg arbitration.
+				if bc.IsArtificialFinalityEnabled() && bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP11355Transition, currentBlock.Number()) {
+					d.err = bc.ecbp11355(d.commonBlock.Header(), currentBlock.Header(), block.Header())
+				}
+			}
 			// We leave the error to the reorg method to handle, if it wants to wrap it or log it or whatever.
 			if err := bc.reorg(d); err != nil {
 				return NonStatTy, err
 			}
 		}
-
-		// Reorg data error was nil.
-		// Proceed with further reorg arbitration.
-		if bc.IsArtificialFinalityEnabled() && bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP11355Transition, currentBlock.Number()) {
-			d.err = bc.ecbp11355(d.commonBlock.Header(), currentBlock.Header(), block.Header())
-		}
-
-		if err := bc.reorg(d); err != nil {
-			return NonStatTy, err
-		}
-		// Status is (remains) canon; reorg succeeded.
-
-	} else if discontiguousBlocks {
+		// Status is canon; reorg succeeded.
+		status = CanonStatTy
+	} else {
 		status = SideStatTy
 	}
+
 	// Set new head.
 	if status == CanonStatTy {
 		bc.writeHeadBlock(block)
@@ -2203,6 +2197,8 @@ func (bc *BlockChain) getReorgData(oldBlock, newBlock *types.Block) *reorgData {
 // blocks and inserts them to be part of the new canonical chain and accumulates
 // potential missing transactions and post an event about them.
 // If reorgData passed contains an a non-nil error, the method is expect to return it immediately.
+// reorgData is NOT expected to ever return an error of its own, since reorg arbitration
+// should happen externally.
 // This kind-of-strange pattern is in place to allow the function to issue "special case" warning logs
 // consistent with its behavior prior to refactoring.
 func (bc *BlockChain) reorg(data *reorgData) error {

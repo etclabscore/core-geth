@@ -252,8 +252,14 @@ func Forks(conf ctypes.ChainConfigurator) []uint64 {
 	var forks []uint64
 	var forksM = make(map[uint64]struct{}) // Will key for uniqueness as fork numbers are appended to slice.
 
-	transitions, _ := Transitions(conf)
-	for _, tr := range transitions {
+	transitions, names := Transitions(conf)
+	for i, tr := range transitions {
+		name := names[i]
+		// Skip "Best Practice"-namespaced transition names, assuming
+		// these will not be enforced as hardforks.
+		if strings.Contains(name, "BP") {
+			continue
+		}
 		// Extract the fork rule block number and aggregate it
 		response := tr()
 		if response == nil ||

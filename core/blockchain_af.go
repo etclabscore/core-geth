@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 	"math/big"
-	"math/rand"
 	"sync/atomic"
 
 	"github.com/ethereum/go-ethereum/core/types"
@@ -69,7 +68,20 @@ func (bc *BlockChain) ecbp11355(commonAncestor, current, proposed *types.Header)
 		new(big.Float).SetInt(new(big.Int).Sub(localTD, commonAncestorTD)),
 	).Float64()
 
+	// Time span diff.
+	// The minimum value is 1.
 	x := float64(proposed.Time - commonAncestor.Time)
+
+	// Commented now is a potential way to "soften" the acceptance while
+	// still avoiding discrete acceptance boundaries. In the case that ecpb11355 introduces
+	// unacceptable network inefficiency, this (or something similar) may be an option.
+	// // Accept with diminishing probability in the case of equivalent total difficulty.
+	// // Remember that the equivalent total difficulty case has ALREADY
+	// // passed one coin toss.
+	// if tdRatio == 1 && rand.Float64() < (1/x) {
+	// 	return nil
+	// }
+
 	antiGravity := ecbp11355AGSinusoidalA(x)
 
 	if tdRatio < antiGravity {
@@ -97,26 +109,6 @@ func ecbp11355AGSinusoidalA(x float64) (antiGravity float64) {
 		x = peakX
 	}
 	return (ampl * math.Sin((x+phaseShift)/pDiv)) + ampl + 1
-}
-
-// ecbp11355AGSameSameShallowOK is an allowance arbitration function for chain segments
-// of equal total difficulty using probability weighted toward short segments.
-// Removing the probability and simply using a short cap may also work fine.
-// If the unmoderated MESS algorithm turns out to generate an undesirable uncle rate,
-// this may be a good solution.
-func ecbp11355AGSameSameShallowOK(tdRatio float64, proposed, commonAncestor *types.Header) bool {
-	if tdRatio == 1 {
-		// If the segment is short and TD ratio is 1, make acceptance a probability,
-		// weighting toward short segments.
-		length := float64(proposed.Number.Uint64() - commonAncestor.Number.Uint64())
-		if length <= 4 {
-			r := 1 / (length + 1)
-			if rand.Float64() < r {
-				return true
-			}
-		}
-	}
-	return false
 }
 
 /*

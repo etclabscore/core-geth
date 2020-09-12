@@ -145,6 +145,7 @@ var (
 		utils.DeveloperFlag,
 		utils.DeveloperPeriodFlag,
 		utils.ClassicFlag,
+		utils.MessNetFlag,
 		utils.MordorFlag,
 		utils.SocialFlag,
 		utils.MixFlag,
@@ -313,6 +314,9 @@ func checkMainnet(ctx *cli.Context) bool {
 
 	case ctx.GlobalIsSet(utils.ClassicFlag.Name):
 		log.Info("Starting Geth on Ethereum Classic...")
+
+	case ctx.GlobalIsSet(utils.MessNetFlag.Name):
+		log.Info("Starting Geth on MessNet...")
 
 	case ctx.GlobalIsSet(utils.MordorFlag.Name):
 		log.Info("Starting Geth on Mordor testnet...")

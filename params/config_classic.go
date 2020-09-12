@@ -87,7 +87,7 @@ var (
 	ExpDiffPeriod            = big.NewInt(100000) // Exponential diff period for diff bomb & ECIP1010
 
 	MessNetConfig = &coregeth.CoreGethChainConfig{
-		NetworkID: 1,
+		NetworkID: 6161,
 		Ethash:    new(ctypes.EthashConfig),
 		ChainID:   big.NewInt(6161),
 

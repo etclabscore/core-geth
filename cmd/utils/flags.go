@@ -136,7 +136,7 @@ var (
 	}
 	NetworkIdFlag = cli.Uint64Flag{
 		Name:  "networkid",
-		Usage: "Network identifier (integer, 1=Mainnet, 2=Morden (disused), 3=Ropsten, 4=Rinkeby, 5=Goerli, 6=Kotti, YoloV1=133519467574833, developer=1337)",
+		Usage: "Network identifier (integer, 1=Mainnet, 2=Morden (disused), 3=Ropsten, 4=Rinkeby, 5=Goerli, 6=Kotti, YoloV1=133519467574833, 6161=MessNet, developer=1337)",
 		Value: eth.DefaultConfig.NetworkId,
 	}
 	ClassicFlag = cli.BoolFlag{
@@ -178,6 +178,10 @@ var (
 	GoerliFlag = cli.BoolFlag{
 		Name:  "goerli",
 		Usage: "Görli network: pre-configured proof-of-authority test network",
+	}
+	MessNetFlag = cli.BoolFlag{
+		Name:  "messnet",
+		Usage: "MESS network: temporary dedicated test network for MESS testing",
 	}
 	DeveloperFlag = cli.BoolFlag{
 		Name:  "dev",
@@ -1299,6 +1303,8 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "ropsten")
 	case ctx.GlobalBool(ClassicFlag.Name):
 		return filepath.Join(baseDataDirPath, "classic")
+	case ctx.GlobalBool(MessNetFlag.Name):
+		return filepath.Join(baseDataDirPath, "messnet")
 	case ctx.GlobalBool(MordorFlag.Name):
 		return filepath.Join(baseDataDirPath, "mordor")
 	case ctx.GlobalBool(SocialFlag.Name):
@@ -1560,7 +1566,7 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node, cfg *whisper.Config) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, DeveloperFlag, LegacyTestnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV1Flag, ClassicFlag, KottiFlag, MordorFlag, EthersocialFlag, SocialFlag)
+	CheckExclusive(ctx, DeveloperFlag, LegacyTestnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV1Flag, ClassicFlag, KottiFlag, MordorFlag, EthersocialFlag, SocialFlag, MessNetFlag)
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	CheckExclusive(ctx, GCModeFlag, "archive", TxLookupLimitFlag)
@@ -1908,6 +1914,8 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 	switch {
 	case ctx.GlobalBool(ClassicFlag.Name):
 		genesis = params.DefaultClassicGenesisBlock()
+	case ctx.GlobalBool(MessNetFlag.Name):
+		genesis = params.DefaultMessNetGenesisBlock()
 	case ctx.GlobalBool(MordorFlag.Name):
 		genesis = params.DefaultMordorGenesisBlock()
 	case ctx.GlobalBool(SocialFlag.Name):

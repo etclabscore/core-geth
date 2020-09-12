@@ -65,6 +65,7 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 		{[]string{"--social"}, 28, 28, params.SocialGenesisHash.Hex()},
 		{[]string{"--ethersocial"}, 1, 31102, params.EthersocialGenesisHash.Hex()},
 		{[]string{"--yolov1"}, 133519467574833, 133519467574833, params.YoloV1GenesisHash.Hex()},
+		{[]string{"--messnet"}, 6161, 6161, "0xb2957ab683ae69176b2eb7858f2baedb93752cb7cb45284529d543eebe20652e"},
 	}
 	for i, p := range chainIdentityCases {
 

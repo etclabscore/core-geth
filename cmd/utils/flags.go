@@ -1469,6 +1469,10 @@ func setEthashCacheDir(ctx *cli.Context, cfg *eth.Config) {
 }
 
 func setEthash(ctx *cli.Context, cfg *eth.Config) {
+	if ctx.GlobalBool(FakePoWFlag.Name) {
+		cfg.Ethash.PowMode = ethash.ModeFake
+	}
+
 	// ECIP-1099
 	setEthashCacheDir(ctx, cfg)
 	setEthashDatasetDir(ctx, cfg)

@@ -22,6 +22,7 @@ import (
 	"math/big"
 	"net/http"
 	"net/http/httptest"
+	"sort"
 	"testing"
 	"time"
 
@@ -32,10 +33,20 @@ import (
 )
 
 func TestSealFakeDelay(t *testing.T) {
-	e := &Ethash{threads: 10}
-	for i := 0; i < 20; i++ {
-		d := e.makeFakeDelay()
-		t.Log(d)
+	cases := []int{
+		3, 10, 19, 33,
+	}
+	for _, c := range cases {
+		e := &Ethash{threads: c} // "threads" is actually the desired MEAN (lambda) of the Poisson distribution
+		got := []float64{}
+		for i := 0; i < 20; i++ {
+			d := e.makeFakeDelay()
+			got = append(got, d)
+		}
+		sort.Slice(got, func(i, j int) bool {
+			return got[i] < got[j]
+		})
+		t.Logf("ethash.threads,lamda=%2d %v", c, got)
 	}
 }
 

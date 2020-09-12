@@ -82,7 +82,7 @@ func newAgeth() *ageth {
 
 	gethArgs := []string{
 		"--messnet",
-		"--ecbp1100", "9999",
+		// "--ecbp1100", "9999",
 		"--datadir", datadir,
 		"--keystore", ks,
 		"--fakepow",
@@ -96,6 +96,11 @@ func newAgeth() *ageth {
 		"--ethash.dagsondisk", "0",
 		"--ethash.cachesinmem", "0",
 		"--ethash.cachesondisk", "0",
+
+		"--metrics",
+		"--metrics.influxdb",
+		"--metrics.influxdb.database", "db0",
+
 		// "--nodiscover",
 		// "--mine", "--miner.threads", "0",
 		// "--vmodule=eth/*=5,p2p=5,core/*=5",

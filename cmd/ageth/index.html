@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html>
+
+<!-- The latest attacks have been 3, 4, and 7k blocks.
+A 400-block limit, assuming the attacker has the capital for 7k blocks, means that they could mount an attack 15-20 times attempting the partition the network, and
+-->
+
+<head>
+    <meta charset='utf-8'>
+    <title>Chain View</title>
+    <style>
+        #blockgraph {
+            /*border-top: 1px dashed lightgray;*/
+        }
+        .axis {
+            font: 8px sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #555;
+            shape-rendering: crispEdges;
+        }
+        .axis path.domain {
+            stroke: #fff;
+        }
+        .xaxis.text {
+            color: #666666;
+        }
+        .distribution-label {
+            color: #555555;
+            font: 8px sans-serif;
+        }
+        #metadata {
+            display: block;
+            position: absolute;
+            z-index: 1000;
+        }
+        p.info {
+            font: 8px sans-serif;
+            margin-block-end: 0;
+        }
+    </style>
+</head>
+
+<body>
+<div id="metadata">
+    <p class="info">
+        tick=<span id="latest-tick">x</span>&nbsp;/&nbsp;
+        block=<span id="latest-block-number">0</span>
+    </p>
+</div>
+<svg id="nodegraph"></svg>
+<p class="info">Ratio block difficulty sum by etherbase (global, not canonical)</p>
+<svg id="etherbasedifficultygraph"></svg>
+<svg id="blockgraph"></svg>
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script>
+    // Adjust this value to change how many blocks (depth-wise) are shown in the history
+    // presented by the block graph (stacks of blocks on bottom).
+    // A value of 100 will show the last 100 blocks, using the greatest overall height
+    // as the top.
+    const numBlocksShow = 200;
+    const nodeMaxRadius = 6;
+
+    const elLatestTick = document.getElementById("latest-tick");
+    const elLatestBlock = document.getElementById("latest-block-number");
+
+    // Global logic vars. Don't touch.
+    var greatestBlock = -1;
+    var firstBlock = -1;
+    var blockGraphLookup = {};
+    var blockGraphData = [];
+    var nodeNames = [];
+
+    var etherbaseColorScheme = d3.schemeCategory10
+        .concat(d3.schemeAccent)
+        .concat(d3.schemePaired)
+        .concat(d3.schemeTableau10);
+
+    // Node and block graphs use same dimensions.
+    const width = 666,
+        height = 380; // 420;
+
+    // Etherbase-difficulty graph.
+
+    // Force graph stuff.
+
+    const forceGraphSVG = d3.select('svg#nodegraph')
+        .attr("viewBox", [0, 0, width, height]);
+
+    const simulation = d3.forceSimulation()
+        .force("charge", d3.forceManyBody().strength(-200))
+        .force("link", d3.forceLink().id(d => d.name).distance(20))
+        .force("x", d3.forceX())
+        .force("y", d3.forceY())
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .on("tick", ticked);
+
+    let link = forceGraphSVG.append("g")
+        .attr("stroke", "#eee")
+        .attr("stroke-width", 1)
+        .selectAll("line");
+
+    let node = forceGraphSVG.append("g")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 2)
+        .selectAll("circle");
+
+    function ticked() {
+        // node.attr("cx", d => d.x)
+        //     .attr("cy", d => d.y)
+
+        // Keep loner nodes from falling off the visible range SVG.
+        node.attr("cx", function(d) { return d.x = Math.max(nodeMaxRadius*2, Math.min(width - nodeMaxRadius*2, d.x)); })
+            .attr("cy", function(d) { return d.y = Math.max(nodeMaxRadius*2, Math.min(height - nodeMaxRadius*2, d.y)); })
+
+        link.attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
+    }
+
+    var etherbases = [];
+    var etherbaseGreatestBlocks = {};
+
+    var etherbaseColor = function(base) {
+        var i = etherbases.indexOf(base);
+        if (i < 0) {
+            i = etherbases.length;
+            etherbases.push(base);
+        }
+        let c = etherbaseColorScheme[i];
+        if (i >= etherbaseColorScheme.length) {
+            c = "#" + base.substring(0,6);
+        }
+        return c; // "#" + d.headBase;
+    }
+
+    var color = function (d) {
+        let c = etherbaseColor(d.headBase);
+        if (d.headNum < etherbaseGreatestBlocks[d.headBase]) {
+            c += "66";
+        }
+        return c; // "#" + d.headBase;
+    };
+    var minerColor = function (d) {
+        if (d.headMiner) {
+            return color(d) + "99";
+        }
+        return "#fff";
+    }
+    var minerRadius = function (d) {
+        if (d.headMiner && d.headHash !== "000000") {
+            return nodeMaxRadius;
+        }
+        return nodeMaxRadius * 2 / 3;
+    }
+
+    function updateForceSimulation(nodes, links) {
+        node = node
+            .data(nodes, d => d.name)
+            .join(
+                enter => enter
+                    .append("circle")
+                    .attr("r", d => minerRadius(d))
+                    .attr("fill", d => color(d))
+                    .attr("stroke", d => minerColor(d))
+                ,
+                update => update
+                    .attr("r", d => minerRadius(d))
+                    .attr("fill", d => color(d))
+                    .attr("stroke", d => minerColor(d))
+                ,
+                exit => exit
+                    .remove()
+            );
+
+        link = link
+            .data(links, d => [d.source, d.target])
+            .join(
+                enter => enter
+                    .append("line"),
+                exit => exit
+                    .remove()
+            );
+
+        simulation.nodes(nodes);
+        simulation.force("link").links(links);
+        simulation.alpha(0.1).restart();
+    }
+
+    // Block graph stuff.
+
+    const blockGraphMargin = {
+        top: 50,
+        bottom: 5,
+        left: 0,
+        right: 0,
+    };
+    const blockGraphHeight = height * 2; // Let's make it tall... the better to see history with.
+    const blockRectHeight = (blockGraphHeight - blockGraphMargin.bottom - blockGraphMargin.top) / numBlocksShow;
+
+    // These x,y are just placeholders, they will be reassigned as needed.
+    var blockGraphX = d3.scaleBand()
+        .domain([])
+        .range([blockGraphMargin.left, width - blockGraphMargin.right])
+        .padding(0.1);
+    var blockGraphY = d3.scaleLinear()
+        .domain([0, 400])
+        .range([blockGraphMargin.top, blockGraphHeight - blockGraphMargin.bottom - blockGraphMargin.top]);
+
+    const blockGraphSVG = d3.select('svg#blockgraph')
+        .attr("viewBox", [0, 0, width, blockGraphHeight]);
+
+    let blockGraphRect = blockGraphSVG.append("g")
+        // .attr("stroke", "#aaa")
+        .attr("stroke-width", 2)
+        .selectAll("rect");
+
+    var blockGraphXAxis = d3.axisTop().tickSize(0)
+        .scale(blockGraphX);
+
+    blockGraphSVG.append("g")
+        .attr("class", "axis")
+        // .attr("transform", "translate(0," + (blockGraphHeight - blockGraphMargin.bottom) + ")")
+        .attr("transform", "translate(0," + (blockGraphMargin.top - 1) + ")")
+        .call(blockGraphXAxis);
+
+    // Etherbase distribution stuff.
+
+    const etherbaseDistHeight = height/numBlocksShow;
+    const etherbaseDistWidth = width;
+    const etherbaseDistMargin = {
+        top: 25,
+        left: 5,
+        right: 5,
+        bottom: 15,
+    }
+    const etherbaseDifficultyBarSVG = d3.select("svg#etherbasedifficultygraph")
+        .attr("viewBox", [0, 0, etherbaseDistWidth, etherbaseDistHeight+etherbaseDistMargin.top+etherbaseDistMargin.bottom]);
+
+    let etherbaseDistRect = etherbaseDifficultyBarSVG.append("g")
+        .attr("stroke-width", 2)
+        .selectAll("rect");
+
+    let etherbaseDistText = etherbaseDifficultyBarSVG.append("g")
+        .selectAll("text");
+
+    let etherbaseDistX = d3.scaleLinear()
+        .domain([0, 1])
+        .range([etherbaseDistMargin.left, etherbaseDistWidth - etherbaseDistMargin.right - etherbaseDistMargin.left]);
+
+    var xAxisEtherbaseDist = d3.axisTop()
+        .scale(etherbaseDistX)
+        .ticks(10);
+
+    etherbaseDifficultyBarSVG.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + etherbaseDistMargin.top +")")
+        .call(xAxisEtherbaseDist)
+        .append("text")
+        .attr("y", etherbaseDistMargin.top)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end");
+        // .text("");
+
+    function updateEtherbaseDistGraph() {
+        etherbaseDistText = etherbaseDistText
+            .data(etherbaseDistributionData)
+            .join(
+                enter => enter
+                    .append("text")
+                    .attr("class", "distribution-label")
+                    .attr("x", (d) => {
+                        return etherbaseDistX(d["blockGraphX"]);
+                    })
+                    .attr("y", (d) => {
+                        return etherbaseDistMargin.top + 2 + etherbaseDistHeight + 8;
+                    })
+                    .text(d => {
+                        return `${Math.floor(d.share * 100)}%`;
+                    })
+                ,
+                update => update
+                    .attr("x", (d) => {
+                        return etherbaseDistX(d["blockGraphX"]);
+                    })
+                    .text(d => {
+                        return `${Math.floor(d.share * 100)}%`;
+                    })
+                ,
+                exit => exit.remove()
+            )
+        etherbaseDistRect = etherbaseDistRect
+            .data(etherbaseDistributionData)
+            .join(
+                enter => enter
+                    .append("rect")
+                    .attr("x", (d) => {
+                        return etherbaseDistX(d["blockGraphX"]);
+                    })
+                    .attr("y", (d) => {
+                        return etherbaseDistMargin.top + 2;
+                    })
+                    .attr("fill", (d) => etherbaseColor(d.base))
+                    .attr("height", etherbaseDistHeight)
+                    .attr("width", d => {
+                        return etherbaseDistX(d.share);
+                    }),
+                update => update
+                    .attr("x", (d) => {
+                        return etherbaseDistX(d["blockGraphX"]);
+                    })
+                    .attr("y", (d) => {
+                        return etherbaseDistMargin.top + 2;
+                    })
+                    .attr("fill", (d) => etherbaseColor(d.base))
+                    .attr("height", etherbaseDistHeight)
+                    .attr("width", d => {
+                        return etherbaseDistX(d.share);
+                    }),
+                exit => exit.remove(),
+            )
+    }
+
+    let canonicalChain = {};
+
+    let globalDifficultySum = 0;
+    let etherbaseDistributionLookup = {};
+    let etherbaseDistributionData = [];
+
+    function pushCanonicalChain(n) {
+        if (typeof canonicalChain[n.headNum] === "undefined") {
+            canonicalChain[n.headNum] = [n.headBase];
+
+        } else if (canonicalChain[n.headNum].indexOf(n.headBase) === -1) {
+            canonicalChain[n.headNum].push(n.headBase)
+
+        } else {
+            // Seen.
+            return;
+        }
+
+        if (typeof etherbaseDistributionLookup[n.headBase] === "undefined") {
+            etherbaseDistributionLookup[n.headBase] = n.headD;
+        } else {
+            etherbaseDistributionLookup[n.headBase] += n.headD;
+        }
+        globalDifficultySum += n.headD;
+
+        const ebases = Object.keys(etherbaseDistributionLookup);
+        etherbaseDistributionData = [];
+        for (var i = 0; i < ebases.length; i++) {
+            etherbaseDistributionData.push({
+                base: ebases[i],
+                share: etherbaseDistributionLookup[ebases[i]] / globalDifficultySum
+            });
+        }
+        etherbaseDistributionData = etherbaseDistributionData.sort(function(a, b) {
+            if (a.share > b.share) return -1
+            if (a.share < b.share) return 1;
+            return 0;
+        })
+        let running = 0;
+        for (var i = 0; i < etherbaseDistributionData.length; i++) {
+            etherbaseDistributionData[i]["blockGraphX"] = running;
+            running += etherbaseDistributionData[i].share;
+        }
+        updateEtherbaseDistGraph();
+    }
+
+    function doUpdateNodeData(n) {
+        if (n.headHash === "000000") {
+            return;
+        }
+
+        // Update etherbase:blockNumber greatest dict.
+        if (typeof etherbaseGreatestBlocks[n.headBase] === "undefined") {
+            etherbaseGreatestBlocks[n.headBase] = n.headNum;
+        } else if (n.headNum > etherbaseGreatestBlocks[n.headBase]) {
+            etherbaseGreatestBlocks[n.headBase] = n.headNum;
+        }
+
+        let lookup = blockGraphLookup[n.name];
+        let index = 0;
+        if (typeof lookup === "undefined") {
+            blockGraphLookup[n.name] = {};
+            blockGraphLookup[n.name][n.headNum] = [n.headHash];
+        } else if (lookup[n.headNum] === null || typeof lookup[n.headNum] === "undefined") {
+            // New block for this node/number; create the array.
+            lookup[n.headNum] = [n.headHash];
+        } else if (lookup[n.headNum].indexOf(n.headHash) === -1) {
+            // Forked block for this node/number; push to the array,
+            // setting the index for the global data store based on this lookup.
+            index = lookup[n.headNum].length;
+            lookup[n.headNum].push(n.headHash);
+        } else {
+            // Else, this is a same node/number head (already seen).
+            return;
+        }
+        pushCanonicalChain(n);
+        blockGraphData.push({
+            id: `${n.name}-${n.headNum}-${index}`,
+            name: n.name,
+            number: n.headNum,
+            hash: n.headHash,
+            base: n.headBase,
+            index: index,
+            indexes: index + 1,
+        })
+        if (index > 0) {
+            index--;
+            for (; index >= 0; index--) {
+                let wantId = `${n.name}-${n.headNum}-${index}`;
+                for (var j = 0; j < blockGraphData.length; j++) {
+                    if (blockGraphData[j].id === wantId) {
+                        blockGraphData[j].indexes++;
+                    }
+                }
+            }
+        }
+    }
+
+    function resetGlobalData() {
+        blockGraphLookup = {};
+        blockGraphData = [];
+        etherbases = [];
+        canonicalChain = {};
+        globalDifficultySum = 0;
+        etherbaseDistributionLookup = {};
+        etherbaseDistributionData = [];
+        greatestBlock = -1;
+        firstBlock = -1;
+        blockGraphLookup = {};
+        blockGraphData = [];
+        nodeNames = [];
+        etherbaseGreatestBlocks = {};
+
+    }
+
+    function updateBlockGraphData(nodes, n) {
+        let nodeNameChange = false;
+        let newNodeNames = nodes.map(d => d.name).sort();
+        for (var i = 0; i < nodeNames.length; i++) {
+            // Check for removed nodes.
+            if (newNodeNames.indexOf(nodeNames[i]) < 0) {
+                // Remove all information from nodes that are no longer included
+                // in the nodes list.
+                nodeNameChange = true;
+                delete blockGraphLookup[nodeNames[i]];
+                for (var j = 0; j < blockGraphData.length; j++) {
+                    if (blockGraphData[j].name === nodeNames[i]) {
+                        blockGraphData.splice(j, 1);
+                    }
+                }
+            }
+        }
+        if (nodeNameChange || newNodeNames.length != nodeNames.length) {
+            nodeNames = [].concat(newNodeNames);
+            blockGraphX = blockGraphX.domain(nodeNames);
+            blockGraphSVG.select(".axis").call(blockGraphXAxis);
+            blockGraphSVG.selectAll("text")
+                .style("text-anchor", "start")
+                .attr("class", "xaxis text")
+                .attr("transform", function(d) {
+                    // These commented lines work for bottom axis, since transformation
+                    // needs to happen using the label itself.
+                    // Top axis rotates labels from text start, so no issue.
+                    // let x = this.getBBox().height * -1.5;
+                    // return "translate(" + x + "," + this.getBBox().width + ")rotate(-90)";
+                    let x = 0;
+                    return "translate(" + x + ",-4)rotate(-90)";
+                })
+                .attr("dy", ".71em");
+        }
+
+        // Rotate the graph, keeping the latest blocks.
+        // Uncommenting this allows the blocks to stack from bottom, then roll when
+        // they max out the space.
+        // if (greatestBlock > firstBlock + numBlocksShow) {
+            blockGraphY = blockGraphY.domain([greatestBlock, greatestBlock - numBlocksShow]);
+            for (var i = 0; i < blockGraphData.length; i++) {
+                if (blockGraphData[i].number < greatestBlock - numBlocksShow) {
+                    blockGraphData.splice(i, 1);
+                }
+            }
+        // }
+
+        // Manage the data stores.
+        if (typeof n === "undefined") {
+            for (var i = 0; i < nodes.length; i++) {
+                let n = nodes[i];
+                doUpdateNodeData(n);
+            }
+        } else {
+            doUpdateNodeData(n);
+        }
+    }
+
+    function getFill(d) {
+        let c = etherbaseColor(d.base);
+        if (d.number < etherbaseGreatestBlocks[d.base]) {
+            c += "66";
+        }
+        return c; // "#" + d.headBase;
+    }
+
+    function updateBlockGraph() {
+        blockGraphRect = blockGraphRect
+            .data(blockGraphData, d => d.id)
+            .join(
+                enter => enter
+                    .append("rect")
+                    .attr("x", (d) => {
+                        let div = blockGraphX.bandwidth(d) / (d.indexes);
+                        return blockGraphX(d.name) + (div * (d.index));
+                    })
+                    .attr("y", (d) => {
+                        return blockGraphY(d.number) //  + blockRectHeight + 1;
+                    })
+                    .attr("fill", (d) => getFill(d))
+                    .attr("height", (blockRectHeight / 1.1) - 1)
+                    .attr("width", d => {
+                        return (blockGraphX.bandwidth(d) / (d.indexes)) - 1
+                    }),
+                update => update
+                    .attr("x", (d) => {
+                        let div = blockGraphX.bandwidth(d) / (d.indexes);
+                        return blockGraphX(d.name) + (div * (d.index));
+                    })
+                    .attr("y", (d) => {
+                        return blockGraphY(d.number) //  + blockRectHeight + 1;
+                    })
+                    .attr("fill", (d) => getFill(d))
+                    .attr("height", (blockRectHeight / 1.1) - 1)
+                    .attr("width", d => {
+                        return (blockGraphX.bandwidth(d) / (d.indexes)) - 1
+                    }),
+                exit => exit.remove(),
+            )
+    }
+    // Terminate the force layout when this cell re-runs.
+    // invalidation.then(() => simulation.stop());
+    function update({nodes, links}) {
+        // Make a shallow copy to protect against mutation, while
+        // recycling old nodes to preserve position and velocity.
+        const old = new Map(node.data().map(d => [d.name, d]));
+        nodes = nodes.map(d => Object.assign(old.get(d.name) || {}, d));
+        links = links.map(d => Object.assign({}, d));
+
+        let max = d3.max(nodes.map(d => d.headNum));
+        if (firstBlock < 0) {
+            let min = d3.min(nodes.map(d => d.headNum));
+            if (min > 0) firstBlock = min;
+        };
+        if (max > greatestBlock) {
+            greatestBlock = max;
+            elLatestBlock.textContent = greatestBlock;
+        }
+
+        // Update network force graph
+        updateBlockGraphData(nodes);
+        updateForceSimulation(nodes, links);
+        updateBlockGraph(nodes);
+    }
+
+    let tick = 0;
+    let once = 0;
+    // let lastData = "";
+    function handleWSData(data) {
+        let ddata = JSON.parse(data);
+        switch (ddata["type"]) {
+            case "state":
+                if (once === 0) {
+                    console.log(JSON.stringify(ddata.payload));
+                    once++;
+                }
+                // let comp = JSON.stringify({nodes: ddata.payload.nodes, links: ddata.payload.links});
+                // if (comp === lastData) {
+                //     return;
+                // }
+                // lastData = comp;
+                if (typeof ddata.payload.tick !== "undefined") {
+                    elLatestTick.textContent = ddata.payload.tick;
+                    if (ddata.payload.tick < tick) {
+                        console.log("Resetting");
+                        resetGlobalData();
+                        // blockGraphSVG.selectAll("*").remove();
+                    }
+                    tick = ddata.payload.tick;
+                }
+                update(ddata.payload);
+        }
+    }
+
+    function initWS() {
+        var socket = new WebSocket("ws://localhost:8008/ws");
+
+        socket.onopen = function () {
+            console.log("Websocket is open");
+        };
+        socket.onmessage = function (e) {
+            let start = new Date();
+            handleWSData(e.data);
+            let end = new Date();
+            let diff = end - start; // ms
+            socket.send(JSON.stringify({
+                took: diff
+            }));
+        }
+        socket.onclose = function () {
+            console.log("Websocket is closed");
+            setTimeout(function() {
+                initWS();
+            }, 1000);
+        }
+
+        return socket;
+    }
+
+    initWS();
+
+</script>
+</body>
+
+</html>
+

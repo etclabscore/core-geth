@@ -416,11 +416,11 @@ func (c *ChainConfig) SetEIP2537Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
-func (c *ChainConfig) GetECBP11355Transition() *uint64 {
+func (c *ChainConfig) GetECBP1100Transition() *uint64 {
 	return nil
 }
 
-func (c *ChainConfig) SetECBP11355Transition(n *uint64) error {
+func (c *ChainConfig) SetECBP1100Transition(n *uint64) error {
 	if n == nil {
 		return nil
 	}

@@ -1551,8 +1551,8 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 			if d.err == nil {
 				// Reorg data error was nil.
 				// Proceed with further reorg arbitration.
-				if bc.IsArtificialFinalityEnabled() && bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP11355Transition, currentBlock.Number()) {
-					d.err = bc.ecbp11355(d.commonBlock.Header(), currentBlock.Header(), block.Header())
+				if bc.IsArtificialFinalityEnabled() && bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, currentBlock.Number()) {
+					d.err = bc.ecbp1100(d.commonBlock.Header(), currentBlock.Header(), block.Header())
 				}
 			}
 			// We leave the error to the reorg method to handle, if it wants to wrap it or log it or whatever.
@@ -1665,7 +1665,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 		stats = insertStats{
 			startTime: mclock.Now(),
 			artificialFinality: bc.IsArtificialFinalityEnabled() &&
-				bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP11355Transition, bc.CurrentBlock().Number()),
+				bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, bc.CurrentBlock().Number()),
 		}
 		lastCanon *types.Block
 	)

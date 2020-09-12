@@ -60,7 +60,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.IdentityFlag,
 			utils.LightKDFFlag,
 			utils.WhitelistFlag,
-			utils.ECBP11355Flag,
+			utils.ECBP1100Flag,
 		},
 	},
 	{

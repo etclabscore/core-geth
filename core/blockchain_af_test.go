@@ -54,7 +54,7 @@ func runMESSTest(t *testing.T, easyL, hardL, caN int, easyT, hardT int64) (hardH
 	return
 }
 
-func TestBlockChain_AF_ECBP11355(t *testing.T) {
+func TestBlockChain_AF_ECBP1100(t *testing.T) {
 	yuckyGlobalTestEnableMess = true
 	defer func() {
 		yuckyGlobalTestEnableMess = false
@@ -313,7 +313,7 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 	generatePlot("WITHOUT MESS: "+baseTitle, "reorgs-noMESS.png")
 }
 
-func TestEcbp11355AGSinusoidalA(t *testing.T) {
+func TestEcbp1100AGSinusoidalA(t *testing.T) {
 	cases := []struct {
 		in, out float64
 	}{
@@ -322,7 +322,7 @@ func TestEcbp11355AGSinusoidalA(t *testing.T) {
 	}
 	tolerance := 0.0000001
 	for i, c := range cases {
-		if got := ecbp11355AGSinusoidalA(c.in); got < c.out-tolerance || got > c.out+tolerance {
+		if got := ecbp1100AGSinusoidalA(c.in); got < c.out-tolerance || got > c.out+tolerance {
 			t.Fatalf("%d: in: %0.6f want: %0.6f got: %0.6f", i, c.in, c.out, got)
 		}
 	}

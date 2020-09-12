@@ -166,7 +166,7 @@ var (
 		utils.LegacyGpoPercentileFlag,
 		utils.EWASMInterpreterFlag,
 		utils.EVMInterpreterFlag,
-		utils.ECBP11355Flag,
+		utils.ECBP1100Flag,
 		configFileFlag,
 	}
 

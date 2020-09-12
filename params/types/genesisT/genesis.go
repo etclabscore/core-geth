@@ -544,12 +544,12 @@ func (g *Genesis) SetEIP2537Transition(n *uint64) error {
 	return g.Config.SetEIP2537Transition(n)
 }
 
-func (g *Genesis) GetECBP11355Transition() *uint64 {
-	return g.Config.GetECBP11355Transition()
+func (g *Genesis) GetECBP1100Transition() *uint64 {
+	return g.Config.GetECBP1100Transition()
 }
 
-func (g *Genesis) SetECBP11355Transition(n *uint64) error {
-	return g.Config.SetECBP11355Transition(n)
+func (g *Genesis) SetECBP1100Transition(n *uint64) error {
+	return g.Config.SetECBP1100Transition(n)
 }
 
 func (g *Genesis) IsEnabled(fn func() *uint64, n *big.Int) bool {

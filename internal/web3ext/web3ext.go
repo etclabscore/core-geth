@@ -182,8 +182,8 @@ web3._extend({
 			params: 1
 		}),
 		new web3._extend.Method({
-			name: 'ecbp11355',
-			call: 'admin_ecbp11355',
+			name: 'ecbp1100',
+			call: 'admin_ecbp1100',
 			params: 1
 		}),
 		new web3._extend.Method({

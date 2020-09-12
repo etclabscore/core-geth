@@ -749,9 +749,9 @@ var (
 		Usage: "External EVM configuration (default = built-in interpreter)",
 		Value: "",
 	}
-	ECBP11355Flag = cli.Uint64Flag{
-		Name:  "ecbp11355",
-		Usage: "Configure ECBP-11355 (MESS) block activation number",
+	ECBP1100Flag = cli.Uint64Flag{
+		Name:  "ecbp1100",
+		Usage: "Configure ECBP-1100 (MESS) block activation number",
 	}
 )
 
@@ -1669,10 +1669,10 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		cfg.Genesis = gen
 	}
 	// Handle temporary chain configuration override cases.
-	if ctx.GlobalIsSet(ECBP11355Flag.Name) {
-		n := ctx.GlobalUint64(ECBP11355Flag.Name)
-		if err := cfg.Genesis.Config.SetECBP11355Transition(&n); err != nil {
-			Fatalf("Failed to set ECBP-11355 activation number: %v", err)
+	if ctx.GlobalIsSet(ECBP1100Flag.Name) {
+		n := ctx.GlobalUint64(ECBP1100Flag.Name)
+		if err := cfg.Genesis.Config.SetECBP1100Transition(&n); err != nil {
+			Fatalf("Failed to set ECBP-1100 activation number: %v", err)
 		}
 	}
 

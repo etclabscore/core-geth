@@ -381,12 +381,12 @@ func (c *CoreGethChainConfig) SetEIP2537Transition(n *uint64) error {
 	return nil
 }
 
-func (c *CoreGethChainConfig) GetECBP11355Transition() *uint64 {
-	return bigNewU64(c.ECBP11355FBlock)
+func (c *CoreGethChainConfig) GetECBP1100Transition() *uint64 {
+	return bigNewU64(c.ECBP1100FBlock)
 }
 
-func (c *CoreGethChainConfig) SetECBP11355Transition(n *uint64) error {
-	c.ECBP11355FBlock = setBig(c.ECBP11355FBlock, n)
+func (c *CoreGethChainConfig) SetECBP1100Transition(n *uint64) error {
+	c.ECBP1100FBlock = setBig(c.ECBP1100FBlock, n)
 	return nil
 }
 

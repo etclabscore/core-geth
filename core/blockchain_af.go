@@ -16,10 +16,10 @@ var errReorgFinality = errors.New("finality-enforced invalid new chain")
 
 // EnableArtificialFinality enables and disable artificial finality features for the blockchain.
 // Currently toggled features include:
-// - ECBP11355-MESS: modified exponential subject scoring
+// - ECBP1100-MESS: modified exponential subject scoring
 //
 // This level of activation works BELOW the chain configuration for any of the
-// potential features. eg. If ECBP11355 is not activated at the chain config x block number,
+// potential features. eg. If ECBP1100 is not activated at the chain config x block number,
 // then calling bc.EnableArtificialFinality(true) will be a noop.
 // The method is idempotent.
 func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interface{}) {
@@ -32,7 +32,7 @@ func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interfa
 		statusLog = "Disabled"
 		atomic.StoreInt32(&bc.artificialFinalityEnabled, 0)
 	}
-	if !bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP11355Transition, bc.CurrentHeader().Number) {
+	if !bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, bc.CurrentHeader().Number) {
 		// Don't log anything if the config hasn't enabled it yet.
 		return
 	}
@@ -50,10 +50,10 @@ func (bc *BlockChain) IsArtificialFinalityEnabled() bool {
 	return atomic.LoadInt32(&bc.artificialFinalityEnabled) == 1
 }
 
-// ecpb11355 implements the "MESS" artificial finality mechanism
+// ecpb1100 implements the "MESS" artificial finality mechanism
 // "Modified Exponential Subjective Scoring" used to prefer known chain segments
 // over later-to-come counterparts, especially proposed segments stretching far into the past.
-func (bc *BlockChain) ecbp11355(commonAncestor, current, proposed *types.Header) error {
+func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) error {
 
 	// Get the total difficulty ratio of the proposed chain segment over the existing one.
 	commonAncestorTD := bc.GetTd(commonAncestor.Hash(), commonAncestor.Number.Uint64())
@@ -73,7 +73,7 @@ func (bc *BlockChain) ecbp11355(commonAncestor, current, proposed *types.Header)
 	x := float64(proposed.Time - commonAncestor.Time)
 
 	// Commented now is a potential way to "soften" the acceptance while
-	// still avoiding discrete acceptance boundaries. In the case that ecpb11355 introduces
+	// still avoiding discrete acceptance boundaries. In the case that ecpb1100 introduces
 	// unacceptable network inefficiency, this (or something similar) may be an option.
 	// // Accept with diminishing probability in the case of equivalent total difficulty.
 	// // Remember that the equivalent total difficulty case has ALREADY
@@ -82,24 +82,24 @@ func (bc *BlockChain) ecbp11355(commonAncestor, current, proposed *types.Header)
 	// 	return nil
 	// }
 
-	antiGravity := ecbp11355AGSinusoidalA(x)
+	antiGravity := ecbp1100AGSinusoidalA(x)
 
 	if tdRatio < antiGravity {
 		// Using "b/a" here as "'B' chain vs. 'A' chain", where A is original (current), and B is proposed (new).
 		underpoweredBy := tdRatio / antiGravity
-		return fmt.Errorf("%w: ECPB11355-MESS: td.B/A%0.6f < antigravity%0.6f (under=%0.6f)", errReorgFinality, tdRatio, antiGravity, underpoweredBy)
+		return fmt.Errorf("%w: ECPB1100-MESS: td.B/A%0.6f < antigravity%0.6f (under=%0.6f)", errReorgFinality, tdRatio, antiGravity, underpoweredBy)
 	}
 	return nil
 }
 
 /*
-ecbp11355AGSinusoidalA is a sinusoidal function.
+ecbp1100AGSinusoidalA is a sinusoidal function.
 
 OPTION 3: Yet slower takeoff, yet steeper eventual ascent. Has a differentiable ceiling transition.
 h(x)=15 sin((x+12000 π)/(8000))+15+1
 
 */
-func ecbp11355AGSinusoidalA(x float64) (antiGravity float64) {
+func ecbp1100AGSinusoidalA(x float64) (antiGravity float64) {
 	ampl := float64(15)   // amplitude
 	pDiv := float64(8000) // period divisor
 	phaseShift := math.Pi * (pDiv * 1.5)
@@ -112,17 +112,17 @@ func ecbp11355AGSinusoidalA(x float64) (antiGravity float64) {
 }
 
 /*
-ecbp11355AGExpB is an exponential function with x as a base (and rationalized exponent).
+ecbp1100AGExpB is an exponential function with x as a base (and rationalized exponent).
 
 OPTION 2: Slightly slower takeoff, steeper eventual ascent
 g(x)=x^(x*0.00002)
 */
-func ecbp11355AGExpB(x float64) (antiGravity float64) {
+func ecbp1100AGExpB(x float64) (antiGravity float64) {
 	return math.Pow(x, x*0.00002)
 }
 
 /*
-ecbp11355AGExpA is an exponential function with x as exponent.
+ecbp1100AGExpA is an exponential function with x as exponent.
 
 This was (one of?) Vitalik's "original" specs:
 > 1.0001 ** (number of seconds between when S1 was received and when S2 was received)
@@ -133,6 +133,6 @@ This was (one of?) Vitalik's "original" specs:
 OPTION 1 (Original ESS)
 f(x)=1.0001^(x)
 */
-func ecbp11355AGExpA(x float64) (antiGravity float64) {
+func ecbp1100AGExpA(x float64) (antiGravity float64) {
 	return math.Pow(1.0001, x)
 }

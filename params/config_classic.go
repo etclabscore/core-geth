@@ -75,7 +75,7 @@ var (
 		ECIP1017EraRounds:  big.NewInt(5000000),
 		ECIP1010PauseBlock: big.NewInt(3000000),
 		ECIP1010Length:     big.NewInt(2000000),
-		ECBP11355FBlock:    big.NewInt(11242400), // ETA 20 Sept 2020, ~1500 UTC
+		ECBP11355FBlock:    nil, // big.NewInt(11295300), // Tentative: ETA 28 Sept 2020, ~1500 UTC
 		RequireBlockHashes: map[uint64]common.Hash{
 			1920000: common.HexToHash("0x94365e3a8c0b35089c1d1195081fe7489b528a84b22199c916180db8b28ade7f"),
 			2500000: common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),

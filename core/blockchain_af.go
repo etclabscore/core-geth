@@ -6,7 +6,9 @@ import (
 	"math"
 	"math/big"
 	"sync/atomic"
+	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 )
@@ -50,11 +52,9 @@ func (bc *BlockChain) IsArtificialFinalityEnabled() bool {
 	return atomic.LoadInt32(&bc.artificialFinalityEnabled) == 1
 }
 
-// ecpb1100 implements the "MESS" artificial finality mechanism
-// "Modified Exponential Subjective Scoring" used to prefer known chain segments
-// over later-to-come counterparts, especially proposed segments stretching far into the past.
-func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) error {
-
+// getTDRatio is a helper function returning the total difficulty ratio of
+// proposed over current chain segments.
+func (bc *BlockChain) getTDRatio(commonAncestor, current, proposed *types.Header) float64 {
 	// Get the total difficulty ratio of the proposed chain segment over the existing one.
 	commonAncestorTD := bc.GetTd(commonAncestor.Hash(), commonAncestor.Number.Uint64())
 
@@ -67,13 +67,22 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 		new(big.Float).SetInt(new(big.Int).Sub(proposedTD, commonAncestorTD)),
 		new(big.Float).SetInt(new(big.Int).Sub(localTD, commonAncestorTD)),
 	).Float64()
+	return tdRatio
+}
+
+// ecbp1100 implements the "MESS" artificial finality mechanism
+// "Modified Exponential Subjective Scoring" used to prefer known chain segments
+// over later-to-come counterparts, especially proposed segments stretching far into the past.
+func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) error {
+
+	tdRatio := bc.getTDRatio(commonAncestor, current, proposed)
 
 	// Time span diff.
 	// The minimum value is 1.
 	x := float64(proposed.Time - commonAncestor.Time)
 
 	// Commented now is a potential way to "soften" the acceptance while
-	// still avoiding discrete acceptance boundaries. In the case that ecpb1100 introduces
+	// still avoiding discrete acceptance boundaries. In the case that ecbp1100 introduces
 	// unacceptable network inefficiency, this (or something similar) may be an option.
 	// // Accept with diminishing probability in the case of equivalent total difficulty.
 	// // Remember that the equivalent total difficulty case has ALREADY
@@ -86,9 +95,19 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 
 	if tdRatio < antiGravity {
 		// Using "b/a" here as "'B' chain vs. 'A' chain", where A is original (current), and B is proposed (new).
-		underpoweredBy := tdRatio / antiGravity
-		return fmt.Errorf("%w: ECPB1100-MESS: td.B/A%0.6f < antigravity%0.6f (under=%0.6f)", errReorgFinality, tdRatio, antiGravity, underpoweredBy)
+		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v blocks=%d td.B/A=%0.6f < antigravity=%0.6f`,
+			errReorgFinality,
+			common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)), proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
+			tdRatio, antiGravity,
+		)
 	}
+	log.Info("ECBP1100-MESS 🔓",
+		"status", "accepted",
+		"age", common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
+		"blocks", proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
+		"td.B/A", tdRatio,
+		"antigravity", antiGravity,
+	)
 	return nil
 }
 

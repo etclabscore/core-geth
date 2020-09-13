@@ -32,9 +32,9 @@ func scenario1(eventChan chan interface{}) {
 	// Configurable
 	numberOfGoodGuys := 20
 	numberOfGoodGuyMiners := 4
-	eachGoodGuyMiningPower := 7
+	eachGoodGuyMiningPower := 9
 	badGuyMiningPower := 3
-	badGuyWaitsUntilNAboveGoodGuys := uint64(10)
+	badGuyWaitsUntilNAboveGoodGuys := uint64(100)
 	goodGuysPeerTarget := (numberOfGoodGuys / 2)
 
 	badGuy := newAgeth()

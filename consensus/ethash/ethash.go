@@ -380,16 +380,14 @@ func (d *dataset) finalizer() {
 
 // MakeCache generates a new ethash cache and optionally stores it to disk.
 func MakeCache(block uint64, dir string) {
-	epoch := uint64(calcEpoch(block))
-	epochLength := calcEpochLength(block)
+	epoch, epochLength := calcEpoch(block)
 	c := cache{epoch: epoch, epochLength: epochLength}
 	c.generate(dir, math.MaxInt32, false, false)
 }
 
 // MakeDataset generates a new ethash dataset and optionally stores it to disk.
 func MakeDataset(block uint64, dir string) {
-	epoch := uint64(calcEpoch(block))
-	epochLength := calcEpochLength(block)
+	epoch, epochLength := calcEpoch(block)
 	d := dataset{epoch: epoch, epochLength: epochLength}
 	d.generate(dir, math.MaxInt32, false, false)
 }
@@ -559,8 +557,7 @@ func (ethash *Ethash) Close() error {
 // by first checking against a list of in-memory caches, then against caches
 // stored on disk, and finally generating one if none can be found.
 func (ethash *Ethash) cache(block uint64) *cache {
-	epoch := uint64(calcEpoch(block))
-	epochLength := calcEpochLength(block)
+	epoch, epochLength := calcEpoch(block)
 	currentI, futureI := ethash.caches.get(epoch, epochLength)
 	current := currentI.(*cache)
 
@@ -583,8 +580,7 @@ func (ethash *Ethash) cache(block uint64) *cache {
 // generates on a background thread.
 func (ethash *Ethash) dataset(block uint64, async bool) *dataset {
 	// Retrieve the requested ethash dataset
-	epoch := uint64(calcEpoch(block))
-	epochLength := calcEpochLength(block)
+	epoch, epochLength := calcEpoch(block)
 	currentI, futureI := ethash.datasets.get(epoch, epochLength)
 	current := currentI.(*dataset)
 

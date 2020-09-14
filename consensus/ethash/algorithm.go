@@ -64,20 +64,20 @@ func calcEpochLength(block uint64) uint64 {
 }
 
 // calcEpoch returns the epoch for a given block number (ECIP-1099)
-func calcEpoch(block uint64) int {
+func calcEpoch(block uint64) (uint64, uint64) {
 	epochLength := calcEpochLength(block)
-	epoch := int(block / epochLength)
-	return epoch
+	epoch := block / epochLength
+	return epoch, epochLength
 }
 
 // cacheSize returns the size of the ethash verification cache that belongs to a certain
 // block number.
 func cacheSize(block uint64) uint64 {
-	epoch := calcEpoch(block)
+	epoch, _ := calcEpoch(block)
 	if epoch < maxEpoch {
-		return cacheSizes[epoch]
+		return cacheSizes[int(epoch)]
 	}
-	return calcCacheSize(epoch)
+	return calcCacheSize(int(epoch))
 }
 
 // calcCacheSize calculates the cache size for epoch. The cache size grows linearly,
@@ -94,11 +94,11 @@ func calcCacheSize(epoch int) uint64 {
 // datasetSize returns the size of the ethash mining dataset that belongs to a certain
 // block number.
 func datasetSize(block uint64) uint64 {
-	epoch := calcEpoch(block)
+	epoch, _ := calcEpoch(block)
 	if epoch < maxEpoch {
-		return datasetSizes[epoch]
+		return datasetSizes[int(epoch)]
 	}
-	return calcDatasetSize(epoch)
+	return calcDatasetSize(int(epoch))
 }
 
 // calcDatasetSize calculates the dataset size for epoch. The dataset size grows linearly,

@@ -155,7 +155,7 @@ func memoryMapAndGenerate(path string, size uint64, lock bool, generator func(bu
 // lru tracks caches or datasets by their last use time, keeping at most N of them.
 type lru struct {
 	what string
-	new  func(epoch uint64) interface{}
+	new  func(epoch uint64, epochLength uint64) interface{}
 	mu   sync.Mutex
 	// Items are kept in a LRU cache, but there is a special case:
 	// We always keep an item for (highest seen epoch) + 1 as the 'future item'.
@@ -166,7 +166,7 @@ type lru struct {
 
 // newlru create a new least-recently-used cache for either the verification caches
 // or the mining datasets.
-func newlru(what string, maxItems int, new func(epoch uint64) interface{}) *lru {
+func newlru(what string, maxItems int, new func(epoch uint64, epochLength uint64) interface{}) *lru {
 	if maxItems <= 0 {
 		maxItems = 1
 	}
@@ -179,7 +179,7 @@ func newlru(what string, maxItems int, new func(epoch uint64) interface{}) *lru 
 // get retrieves or creates an item for the given epoch. The first return value is always
 // non-nil. The second return value is non-nil if lru thinks that an item will be useful in
 // the near future.
-func (lru *lru) get(epoch uint64) (item, future interface{}) {
+func (lru *lru) get(epoch uint64, epochLength uint64) (item, future interface{}) {
 	lru.mu.Lock()
 	defer lru.mu.Unlock()
 
@@ -190,14 +190,14 @@ func (lru *lru) get(epoch uint64) (item, future interface{}) {
 			item = lru.futureItem
 		} else {
 			log.Trace("Requiring new ethash "+lru.what, "epoch", epoch)
-			item = lru.new(epoch)
+			item = lru.new(epoch, epochLength)
 		}
 		lru.cache.Add(epoch, item)
 	}
 	// Update the 'future item' if epoch is larger than previously seen.
 	if epoch < maxEpoch-1 && lru.future < epoch+1 {
 		log.Trace("Requiring new future ethash "+lru.what, "epoch", epoch+1)
-		future = lru.new(epoch + 1)
+		future = lru.new(epoch+1, epochLength)
 		lru.future = epoch + 1
 		lru.futureItem = future
 	}
@@ -216,8 +216,8 @@ type cache struct {
 
 // newCache creates a new ethash verification cache and returns it as a plain Go
 // interface to be usable in an LRU cache.
-func newCache(epoch uint64) interface{} {
-	return &cache{epoch: epoch, epochLength: 30000} // TODO - iquidus
+func newCache(epoch uint64, epochLength uint64) interface{} {
+	return &cache{epoch: epoch, epochLength: epochLength}
 }
 
 // generate ensures that the cache content is generated before use.
@@ -294,8 +294,8 @@ type dataset struct {
 
 // newDataset creates a new ethash mining dataset and returns it as a plain Go
 // interface to be usable in an LRU cache.
-func newDataset(epoch uint64) interface{} {
-	return &dataset{epoch: epoch, epochLength: 30000} // TODO - iquidus
+func newDataset(epoch uint64, epochLength uint64) interface{} {
+	return &dataset{epoch: epoch, epochLength: epochLength}
 }
 
 // generate ensures that the dataset content is generated before use.
@@ -560,7 +560,8 @@ func (ethash *Ethash) Close() error {
 // stored on disk, and finally generating one if none can be found.
 func (ethash *Ethash) cache(block uint64) *cache {
 	epoch := uint64(calcEpoch(block))
-	currentI, futureI := ethash.caches.get(epoch)
+	epochLength := calcEpochLength(block)
+	currentI, futureI := ethash.caches.get(epoch, epochLength)
 	current := currentI.(*cache)
 
 	// Wait for generation finish.
@@ -583,7 +584,8 @@ func (ethash *Ethash) cache(block uint64) *cache {
 func (ethash *Ethash) dataset(block uint64, async bool) *dataset {
 	// Retrieve the requested ethash dataset
 	epoch := uint64(calcEpoch(block))
-	currentI, futureI := ethash.datasets.get(epoch)
+	epochLength := calcEpochLength(block)
+	currentI, futureI := ethash.datasets.get(epoch, epochLength)
 	current := currentI.(*dataset)
 
 	// If async is specified, generate everything in a background thread

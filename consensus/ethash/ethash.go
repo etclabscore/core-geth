@@ -217,7 +217,7 @@ type cache struct {
 // newCache creates a new ethash verification cache and returns it as a plain Go
 // interface to be usable in an LRU cache.
 func newCache(epoch uint64) interface{} {
-	return &cache{epoch: epoch}
+	return &cache{epoch: epoch, epochLength: 30000} // TODO - iquidus
 }
 
 // generate ensures that the cache content is generated before use.
@@ -295,7 +295,7 @@ type dataset struct {
 // newDataset creates a new ethash mining dataset and returns it as a plain Go
 // interface to be usable in an LRU cache.
 func newDataset(epoch uint64) interface{} {
-	return &dataset{epoch: epoch}
+	return &dataset{epoch: epoch, epochLength: 30000} // TODO - iquidus
 }
 
 // generate ensures that the dataset content is generated before use.

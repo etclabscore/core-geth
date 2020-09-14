@@ -231,7 +231,7 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		// If we don't store anything on disk, generate and return.
 		if dir == "" {
 			c.cache = make([]uint32, size/4)
-			generateCache(c.cache, c.epoch, seed)
+			generateCache(c.cache, c.epoch, c.epochLength, seed)
 			return
 		}
 		// Disk storage is needed, this will get fancy
@@ -256,12 +256,12 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		logger.Debug("Failed to load old ethash cache", "err", err)
 
 		// No previous cache available, create a new cache file to fill
-		c.dump, c.mmap, c.cache, err = memoryMapAndGenerate(path, size, lock, func(buffer []uint32) { generateCache(buffer, c.epoch, seed) })
+		c.dump, c.mmap, c.cache, err = memoryMapAndGenerate(path, size, lock, func(buffer []uint32) { generateCache(buffer, c.epoch, c.epochLength, seed) })
 		if err != nil {
 			logger.Error("Failed to generate mapped ethash cache", "err", err)
 
 			c.cache = make([]uint32, size/4)
-			generateCache(c.cache, c.epoch, seed)
+			generateCache(c.cache, c.epoch, c.epochLength, seed)
 		}
 		// Iterate over all previous instances and delete old ones
 		for ep := int(c.epoch) - limit; ep >= 0; ep-- {
@@ -314,10 +314,10 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		// If we don't store anything on disk, generate and return
 		if dir == "" {
 			cache := make([]uint32, csize/4)
-			generateCache(cache, d.epoch, seed)
+			generateCache(cache, d.epoch, d.epochLength, seed)
 
 			d.dataset = make([]uint32, dsize/4)
-			generateDataset(d.dataset, d.epoch, cache)
+			generateDataset(d.dataset, d.epoch, d.epochLength, cache)
 
 			return
 		}
@@ -344,14 +344,14 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 
 		// No previous dataset available, create a new dataset file to fill
 		cache := make([]uint32, csize/4)
-		generateCache(cache, d.epoch, seed)
+		generateCache(cache, d.epoch, d.epochLength, seed)
 
-		d.dump, d.mmap, d.dataset, err = memoryMapAndGenerate(path, dsize, lock, func(buffer []uint32) { generateDataset(buffer, d.epoch, cache) })
+		d.dump, d.mmap, d.dataset, err = memoryMapAndGenerate(path, dsize, lock, func(buffer []uint32) { generateDataset(buffer, d.epoch, d.epochLength, cache) })
 		if err != nil {
 			logger.Error("Failed to generate mapped ethash dataset", "err", err)
 
 			d.dataset = make([]uint32, dsize/2)
-			generateDataset(d.dataset, d.epoch, cache)
+			generateDataset(d.dataset, d.epoch, d.epochLength, cache)
 		}
 		// Iterate over all previous instances and delete old ones
 		for ep := int(d.epoch) - limit; ep >= 0; ep-- {

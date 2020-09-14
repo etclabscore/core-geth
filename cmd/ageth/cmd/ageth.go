@@ -29,18 +29,18 @@ import (
 )
 
 type ageth struct {
-	name              string
-	ipcpath           string
-	command           *exec.Cmd
-	proc              *os.Process
-	log               log.Logger
-	logr              io.ReadCloser
-	client            *rpc.Client
-	eclient           *ethclient.Client
-	newheadChan       chan *types.Header
-	latestBlock       *types.Block
-	headsub           ethereum.Subscription
-	errChan           chan error
+	name        string
+	rpcEndpoint string
+	command     *exec.Cmd
+	proc        *os.Process
+	log         log.Logger
+	logr        io.ReadCloser
+	client      *rpc.Client
+	eclient     *ethclient.Client
+	newheadChan chan *types.Header
+	latestBlock *types.Block
+	headsub     ethereum.Subscription
+	errChan     chan error
 	eventChan         chan interface{}
 	enode             string
 	mining            int
@@ -53,20 +53,8 @@ type ageth struct {
 	quitChan          chan struct{}
 }
 
-func newAgeth() *ageth {
-
-	// ID
-	var name = faker.Name().FirstName()
-	if len(runningRegistry) == 0 {
-		name = "Aarchimedes"
-	}
-	for !nameIsValid(name) {
-		name = faker.Name().FirstName()
-	}
-
-	ipcpath := filepath.Join(os.TempDir(), fmt.Sprintf("ageth-%d.ipc", rand.Int()))
-
-	datadir := filepath.Join(os.TempDir(), "ageth", name)
+func mustStartGethInstance(id string) (*exec.Cmd, io.ReadCloser, string) {
+	datadir := filepath.Join(os.TempDir(), "ageth", id)
 	os.MkdirAll(datadir, os.ModePerm)
 
 	ks := filepath.Join(datadir, "keystore")
@@ -80,6 +68,8 @@ func newAgeth() *ageth {
 		llog.Fatal(err)
 	}
 
+	ipcpath := filepath.Join(os.TempDir(), fmt.Sprintf("ageth-%d.ipc", rand.Int()))
+
 	gethArgs := []string{
 		"--messnet",
 		// "--ecbp1100", "9999",
@@ -87,7 +77,7 @@ func newAgeth() *ageth {
 		"--keystore", ks,
 		"--fakepow",
 		"--syncmode", "full",
-		"--ipcpath", ipcpath,
+		"--rpcEndpoint", ipcpath,
 		"--port", "0",
 		"--maxpeers", "25",
 		"--debug",
@@ -112,6 +102,21 @@ func newAgeth() *ageth {
 	if err != nil {
 		log.Crit("stderr pipe", "error", err)
 	}
+	return geth, p, ipcpath
+}
+
+// newAgeth returns a wrapped geth "ageth".
+// If the rpcEndpoint parameter is empty, a geth instance will be started.
+func newAgeth(rpcEndpoint string) *ageth {
+
+	// ID
+	var name = faker.Name().FirstName()
+	if len(runningRegistry) == 0 {
+		name = "Aarchimedes"
+	}
+	for !nameIsValid(name) {
+		name = faker.Name().FirstName()
+	}
 
 	enodeNamesMu.Lock()
 	enodeNames[name] = ""
@@ -121,9 +126,9 @@ func newAgeth() *ageth {
 	}
 	a := &ageth{
 		name:        name,
-		command:     geth,
-		ipcpath:     ipcpath,
-		logr:        p,
+		// command:     geth,
+		// rpcEndpoint:     rpcEndpoint,
+		// logr:        p,
 		newheadChan: make(chan *types.Header),
 		errChan:     make(chan error),
 		peers:       newAgethSet(),
@@ -131,6 +136,10 @@ func newAgeth() *ageth {
 		quitChan:    make(chan struct{}, 100),
 	}
 	a.log = log.Root().New("source", a.name)
+
+	if rpcEndpoint == "" {
+		a.command, a.logr, a.rpcEndpoint = mustStartGethInstance(name)
+	}
 
 	return a
 }
@@ -190,7 +199,7 @@ func (a *ageth) stop() {
 		a.log.Crit("stop geth", "error", err)
 	}
 	delete(enodeNames, a.name)
-	os.Remove(a.ipcpath)
+	os.Remove(a.rpcEndpoint)
 	for i := 0; i < 100; i++ {
 		a.quitChan <- struct{}{}
 	}
@@ -257,13 +266,13 @@ func (a *ageth) run() {
 	}
 	a.log.Info("IPC started")
 
-	cl, err := rpc.DialIPC(context.Background(), a.ipcpath)
+	cl, err := rpc.DialIPC(context.Background(), a.rpcEndpoint)
 	if err != nil {
 		log.Crit("rpc client", "error", err)
 	}
 	a.client = cl
 
-	ecl, err := ethclient.Dial(a.ipcpath)
+	ecl, err := ethclient.Dial(a.rpcEndpoint)
 	if err != nil {
 		log.Crit("dial ethclient", "error", err)
 	}

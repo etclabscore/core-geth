@@ -1,0 +1,709 @@
+Aarchimedes: INFO [09-14|16:31:17.254|geth/main.go:319] Starting Geth on MessNet... 
+Aarchimedes: INFO [09-14|16:31:17.254|cmd/utils/flags.go:1840] Enabling metrics collection 
+Aarchimedes: INFO [09-14|16:31:17.254|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Aarchimedes: INFO [09-14|16:31:17.255|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Aarchimedes: INFO [09-14|16:31:17.255|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Aarchimedes: INFO [09-14|16:31:17.255|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Aarchimedes: INFO [09-14|16:31:17.255|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Aarchimedes: INFO [09-14|16:31:17.255|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Aarchimedes/geth/chaindata cache=512.00MiB handles=524288
+Aarchimedes: INFO [09-14|16:31:17.291|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Aarchimedes/geth/chaindata/ancient
+Aarchimedes: INFO [09-14|16:31:17.291|core/genesis.go:61]          Writing custom genesis block 
+Aarchimedes: INFO [09-14|16:31:17.292|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="67.548µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Aarchimedes: INFO [09-14|16:31:17.292|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Aarchimedes: INFO [09-14|16:31:17.292|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Aarchimedes: WARN [09-14|16:31:17.292|eth/backend.go:271]          Ethash used in fake mode 
+Aarchimedes: INFO [09-14|16:31:17.292|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Aarchimedes: WARN [09-14|16:31:17.292|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Aarchimedes: INFO [09-14|16:31:17.293|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Aarchimedes: INFO [09-14|16:31:17.293|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Aarchimedes: INFO [09-14|16:31:17.293|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Aarchimedes: INFO [09-14|16:31:17.293|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Aarchimedes: INFO [09-14|16:31:17.294|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Aarchimedes: INFO [09-14|16:31:17.305|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=c2f88eb86aa6b5a2 ip=127.0.0.1 udp=41131 tcp=41131
+Aarchimedes: INFO [09-14|16:31:17.305|p2p/server.go:695]           Started P2P networking                   self=enode://a4edbfcc9a0ec46dcefdc67301e888ab77fcc75d4d346d67af3487fd4298e61b730ddc40b2dd4c6c471784a55a6e8b63df6fac93e1e384b5a8aca86485d13ee1@127.0.0.1:41131
+Aarchimedes: INFO [09-14|16:31:17.306|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-4869964628118949247.ipc
+Aarchimedes: INFO [09-14|16:31:17.307|eth/backend.go:451]          Updated mining threads                   threads=3
+Aarchimedes: INFO [09-14|16:31:17.307|core/tx_pool.go:434]         Transaction pool price threshold updated price=1000000000
+Aarchimedes: INFO [09-14|16:31:17.307|eth/backend.go:372]          Etherbase automatically configured       address=0x393E3556B1d57915DbdaE8617412559341B94d78
+Aarchimedes: INFO [09-14|16:31:17.307|miner/worker.go:1000]        Commit new mining work                   number=1 sealhash="d397eb…ece104" uncles=0 txs=0 gas=0 fees=0 elapsed="116.986µs"
+Aarchimedes: INFO [09-14|16:31:17.321|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=41131 intport=41131 interface=NAT-PMP(192.168.86.1)
+Aarchimedes: INFO [09-14|16:31:17.332|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=41131 intport=41131 interface=NAT-PMP(192.168.86.1)
+Aarchimedes: INFO [09-14|16:31:17.371|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=c2f88eb86aa6b5a2 ip=75.134.144.252 udp=41131 tcp=41131
+Aarchimedes: INFO [09-14|16:31:19.308|miner/worker.go:624]         Successfully sealed new block            number=1 sealhash="d397eb…ece104" hash="f73777…18a03c" elapsed=2.000s
+Aarchimedes: INFO [09-14|16:31:19.308|miner/unconfirmed.go:85]     🔨 mined potential block                  number=1 hash="f73777…18a03c"
+Aarchimedes: INFO [09-14|16:31:19.309|miner/worker.go:1000]        Commit new mining work                   number=2 sealhash="d8c1b9…b2bfe1" uncles=0 txs=0 gas=0 fees=0 elapsed="125.882µs"
+Aarchimedes: INFO [09-14|16:31:19.493|p2p/enode/localnode.go:284]  New local node record                    seq=3 id=c2f88eb86aa6b5a2 ip=75.134.144.252 udp=41131 tcp=41131
+Aarchimedes: INFO [09-14|16:31:21.309|miner/worker.go:624]         Successfully sealed new block            number=2 sealhash="d8c1b9…b2bfe1" hash="3dd789…e73811" elapsed=2.000s
+Aarchimedes: INFO [09-14|16:31:21.309|miner/unconfirmed.go:85]     🔨 mined potential block                  number=2 hash="3dd789…e73811"
+Aarchimedes: INFO [09-14|16:31:21.310|miner/worker.go:1000]        Commit new mining work                   number=3 sealhash="2ba911…99832b" uncles=0 txs=0 gas=0 fees=0 elapsed="145.802µs"
+Aarchimedes: INFO [09-14|16:31:21.341|p2p/enode/localnode.go:284]  New local node record                    seq=4 id=c2f88eb86aa6b5a2 ip=75.134.144.252 udp=41131 tcp=41131
+Isom       : INFO [09-14|16:31:22.329|geth/main.go:319] Starting Geth on MessNet... 
+Isom       : INFO [09-14|16:31:22.330|cmd/utils/flags.go:1840] Enabling metrics collection 
+Isom       : INFO [09-14|16:31:22.330|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Isom       : INFO [09-14|16:31:22.331|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Isom       : INFO [09-14|16:31:22.331|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Isom       : INFO [09-14|16:31:22.331|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Isom       : INFO [09-14|16:31:22.331|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Isom       : INFO [09-14|16:31:22.331|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Isom/geth/chaindata cache=512.00MiB handles=524288
+Isom       : INFO [09-14|16:31:22.368|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Isom/geth/chaindata/ancient
+Isom       : INFO [09-14|16:31:22.369|core/genesis.go:61]          Writing custom genesis block 
+Isom       : INFO [09-14|16:31:22.369|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="115.705µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Isom       : INFO [09-14|16:31:22.370|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Isom       : INFO [09-14|16:31:22.370|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Isom       : WARN [09-14|16:31:22.370|eth/backend.go:271]          Ethash used in fake mode 
+Isom       : INFO [09-14|16:31:22.370|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Isom       : WARN [09-14|16:31:22.370|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Isom       : INFO [09-14|16:31:22.371|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Isom       : INFO [09-14|16:31:22.371|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Isom       : INFO [09-14|16:31:22.371|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Isom       : INFO [09-14|16:31:22.371|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Isom       : INFO [09-14|16:31:22.373|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Isom       : INFO [09-14|16:31:22.384|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=942215c92c8e7449 ip=127.0.0.1 udp=38453 tcp=38453
+Isom       : INFO [09-14|16:31:22.386|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-5545051905195931157.ipc
+Isom       : INFO [09-14|16:31:22.386|p2p/server.go:695]           Started P2P networking                   self=enode://59e4aba7e4ec53d5f4b7d88d55409e3514a9a2fb8c00bedd29d05ee65a484bd0712ca84c4e2ef59d57d4b8fada9ed885b0eee8c5c68a9105bab8c7c301dbf86e@127.0.0.1:38453
+Isom       : INFO [09-14|16:31:22.402|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=38453 intport=38453 interface=NAT-PMP(192.168.86.1)
+Isom       : INFO [09-14|16:31:22.416|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=38453 intport=38453 interface=NAT-PMP(192.168.86.1)
+Isom       : INFO [09-14|16:31:22.446|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=942215c92c8e7449 ip=75.134.144.252 udp=38453 tcp=38453
+Cornell    : INFO [09-14|16:31:22.704|geth/main.go:319] Starting Geth on MessNet... 
+Cornell    : INFO [09-14|16:31:22.705|cmd/utils/flags.go:1840] Enabling metrics collection 
+Cornell    : INFO [09-14|16:31:22.705|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Cornell    : INFO [09-14|16:31:22.706|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Cornell    : INFO [09-14|16:31:22.706|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Cornell    : INFO [09-14|16:31:22.707|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Cornell    : INFO [09-14|16:31:22.707|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Cornell    : INFO [09-14|16:31:22.707|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Cornell/geth/chaindata cache=512.00MiB handles=524288
+Darrel     : INFO [09-14|16:31:22.726|geth/main.go:319] Starting Geth on MessNet... 
+Darrel     : INFO [09-14|16:31:22.726|cmd/utils/flags.go:1840] Enabling metrics collection 
+Darrel     : INFO [09-14|16:31:22.726|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Darrel     : INFO [09-14|16:31:22.727|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Darrel     : INFO [09-14|16:31:22.727|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Darrel     : INFO [09-14|16:31:22.728|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Darrel     : INFO [09-14|16:31:22.728|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Darrel     : INFO [09-14|16:31:22.728|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Darrel/geth/chaindata cache=512.00MiB handles=524288
+Cornell    : INFO [09-14|16:31:22.740|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Cornell/geth/chaindata/ancient
+Cornell    : INFO [09-14|16:31:22.740|core/genesis.go:61]          Writing custom genesis block 
+Cornell    : INFO [09-14|16:31:22.740|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="102.123µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Cornell    : INFO [09-14|16:31:22.741|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Cornell    : INFO [09-14|16:31:22.741|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Cornell    : WARN [09-14|16:31:22.741|eth/backend.go:271]          Ethash used in fake mode 
+Cornell    : INFO [09-14|16:31:22.741|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Cornell    : WARN [09-14|16:31:22.741|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Cornell    : INFO [09-14|16:31:22.743|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Cornell    : INFO [09-14|16:31:22.743|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Cornell    : INFO [09-14|16:31:22.743|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Cornell    : INFO [09-14|16:31:22.743|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Cornell    : INFO [09-14|16:31:22.745|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Cornell    : INFO [09-14|16:31:22.763|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=cf7656442074963e ip=127.0.0.1 udp=45777 tcp=45777
+Cornell    : INFO [09-14|16:31:22.765|p2p/server.go:695]           Started P2P networking                   self=enode://041d30a1e0fb8cb825b502b224125a86ff850b922c5828dcd176d616c9bcffc86b5932a091fba790fab351bf4b58f548b274d078f1622b52f79906d228f2d5b0@127.0.0.1:45777
+Cornell    : INFO [09-14|16:31:22.766|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-4602216382541343391.ipc
+Darrel     : INFO [09-14|16:31:22.787|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Darrel/geth/chaindata/ancient
+Darrel     : INFO [09-14|16:31:22.787|core/genesis.go:61]          Writing custom genesis block 
+Darrel     : INFO [09-14|16:31:22.788|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="133.864µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Darrel     : INFO [09-14|16:31:22.788|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Darrel     : INFO [09-14|16:31:22.789|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Darrel     : WARN [09-14|16:31:22.789|eth/backend.go:271]          Ethash used in fake mode 
+Darrel     : INFO [09-14|16:31:22.789|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Darrel     : WARN [09-14|16:31:22.789|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Darrel     : INFO [09-14|16:31:22.790|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Darrel     : INFO [09-14|16:31:22.790|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Darrel     : INFO [09-14|16:31:22.790|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Darrel     : INFO [09-14|16:31:22.790|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Cornell    : INFO [09-14|16:31:22.778|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=45777 intport=45777 interface=NAT-PMP(192.168.86.1)
+Cornell    : INFO [09-14|16:31:22.793|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=45777 intport=45777 interface=NAT-PMP(192.168.86.1)
+Darrel     : INFO [09-14|16:31:22.792|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Darrel     : INFO [09-14|16:31:22.808|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=f3790f76bfad2e43 ip=127.0.0.1 udp=44037 tcp=44037
+Darrel     : INFO [09-14|16:31:22.810|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-2114896999893725725.ipc
+Darrel     : INFO [09-14|16:31:22.810|p2p/server.go:695]           Started P2P networking                   self=enode://dcc81516d062ce81e06df39569242d1bafaeb3e71274acbf312fc7cf0eb82de053ed6ef1e623bf81b83174bfe566d90c4329196f30a3cd0212ab4ddd33d53e83@127.0.0.1:44037
+Darrel     : INFO [09-14|16:31:22.829|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=44037 intport=44037 interface=NAT-PMP(192.168.86.1)
+Cornell    : INFO [09-14|16:31:22.830|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=cf7656442074963e ip=75.134.144.252 udp=45777 tcp=45777
+Darrel     : INFO [09-14|16:31:22.835|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=44037 intport=44037 interface=NAT-PMP(192.168.86.1)
+Darrel     : INFO [09-14|16:31:22.870|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=f3790f76bfad2e43 ip=75.134.144.252 udp=44037 tcp=44037
+Sidney     : INFO [09-14|16:31:22.857|geth/main.go:319] Starting Geth on MessNet... 
+Sidney     : INFO [09-14|16:31:22.857|cmd/utils/flags.go:1840] Enabling metrics collection 
+Sidney     : INFO [09-14|16:31:22.857|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Sidney     : INFO [09-14|16:31:22.858|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Sidney     : INFO [09-14|16:31:22.859|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Sidney     : INFO [09-14|16:31:22.859|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Sidney     : INFO [09-14|16:31:22.859|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Sidney     : INFO [09-14|16:31:22.859|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Sidney/geth/chaindata cache=512.00MiB handles=524288
+Sidney     : INFO [09-14|16:31:22.892|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Sidney/geth/chaindata/ancient
+Sidney     : INFO [09-14|16:31:22.892|core/genesis.go:61]          Writing custom genesis block 
+Sidney     : INFO [09-14|16:31:22.902|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="173.229µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Sidney     : INFO [09-14|16:31:22.903|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Sidney     : INFO [09-14|16:31:22.903|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Sidney     : WARN [09-14|16:31:22.903|eth/backend.go:271]          Ethash used in fake mode 
+Sidney     : INFO [09-14|16:31:22.904|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Sidney     : WARN [09-14|16:31:22.904|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Sidney     : INFO [09-14|16:31:22.904|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Sidney     : INFO [09-14|16:31:22.904|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Sidney     : INFO [09-14|16:31:22.904|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Sidney     : INFO [09-14|16:31:22.905|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Sidney     : INFO [09-14|16:31:22.907|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Sidney     : INFO [09-14|16:31:22.925|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=a11ae21440f44a2e ip=127.0.0.1 udp=41275 tcp=41275
+Sidney     : INFO [09-14|16:31:22.926|p2p/server.go:695]           Started P2P networking                   self=enode://b2142d600749a9f2a19b9db656ce4c132bdf0d52f89f81f008bd29db72298142b17c3ac49a7d74061734412b0da3346e6e487c228b96e358365dee27ffdf3ae3@127.0.0.1:41275
+Sidney     : INFO [09-14|16:31:22.928|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-3523428728264688459.ipc
+Chanelle   : INFO [09-14|16:31:22.931|geth/main.go:319] Starting Geth on MessNet... 
+Chanelle   : INFO [09-14|16:31:22.931|cmd/utils/flags.go:1840] Enabling metrics collection 
+Chanelle   : INFO [09-14|16:31:22.931|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Chanelle   : INFO [09-14|16:31:22.932|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Chanelle   : INFO [09-14|16:31:22.932|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Chanelle   : INFO [09-14|16:31:22.933|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Chanelle   : INFO [09-14|16:31:22.933|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Chanelle   : INFO [09-14|16:31:22.933|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Chanelle/geth/chaindata cache=512.00MiB handles=524288
+Cleveland  : INFO [09-14|16:31:22.938|geth/main.go:319] Starting Geth on MessNet... 
+Cleveland  : INFO [09-14|16:31:22.948|cmd/utils/flags.go:1840] Enabling metrics collection 
+Cleveland  : INFO [09-14|16:31:22.948|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Cleveland  : INFO [09-14|16:31:22.950|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Cleveland  : INFO [09-14|16:31:22.950|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Sidney     : INFO [09-14|16:31:22.944|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=41275 intport=41275 interface=NAT-PMP(192.168.86.1)
+Sidney     : INFO [09-14|16:31:22.945|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=41275 intport=41275 interface=NAT-PMP(192.168.86.1)
+Cleveland  : INFO [09-14|16:31:22.951|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Cleveland  : INFO [09-14|16:31:22.957|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Cleveland  : INFO [09-14|16:31:22.957|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Cleveland/geth/chaindata cache=512.00MiB handles=524288
+Chanelle   : INFO [09-14|16:31:22.973|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Chanelle/geth/chaindata/ancient
+Chanelle   : INFO [09-14|16:31:22.973|core/genesis.go:61]          Writing custom genesis block 
+Chanelle   : INFO [09-14|16:31:22.974|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="128.703µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Chanelle   : INFO [09-14|16:31:22.974|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Chanelle   : INFO [09-14|16:31:22.975|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Chanelle   : WARN [09-14|16:31:22.975|eth/backend.go:271]          Ethash used in fake mode 
+Chanelle   : INFO [09-14|16:31:22.975|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Chanelle   : WARN [09-14|16:31:22.975|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Chanelle   : INFO [09-14|16:31:22.976|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Chanelle   : INFO [09-14|16:31:22.976|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Chanelle   : INFO [09-14|16:31:22.976|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Chanelle   : INFO [09-14|16:31:22.976|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Chanelle   : INFO [09-14|16:31:22.978|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Gail       : INFO [09-14|16:31:22.973|geth/main.go:319] Starting Geth on MessNet... 
+Gail       : INFO [09-14|16:31:22.973|cmd/utils/flags.go:1840] Enabling metrics collection 
+Gail       : INFO [09-14|16:31:22.974|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Gail       : INFO [09-14|16:31:22.975|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Gail       : INFO [09-14|16:31:22.975|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Gail       : INFO [09-14|16:31:22.976|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Gail       : INFO [09-14|16:31:22.976|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Gail       : INFO [09-14|16:31:22.976|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Gail/geth/chaindata cache=512.00MiB handles=524288
+Sidney     : INFO [09-14|16:31:22.984|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=a11ae21440f44a2e ip=75.134.144.252 udp=41275 tcp=41275
+Maxwell    : INFO [09-14|16:31:23.016|geth/main.go:319] Starting Geth on MessNet... 
+Maxwell    : INFO [09-14|16:31:23.016|cmd/utils/flags.go:1840] Enabling metrics collection 
+Maxwell    : INFO [09-14|16:31:23.016|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Maxwell    : INFO [09-14|16:31:23.017|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Maxwell    : INFO [09-14|16:31:23.017|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Maxwell    : INFO [09-14|16:31:23.018|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Maxwell    : INFO [09-14|16:31:23.018|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Maxwell    : INFO [09-14|16:31:23.018|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Maxwell/geth/chaindata cache=512.00MiB handles=524288
+Chanelle   : INFO [09-14|16:31:23.008|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=c35328cdbb474ea5 ip=127.0.0.1 udp=36505 tcp=36505
+Chanelle   : INFO [09-14|16:31:23.010|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-3780168666638159184.ipc
+Chanelle   : INFO [09-14|16:31:23.011|p2p/server.go:695]           Started P2P networking                   self=enode://5ea5c30d71404ac0b18c1cc226e5f19b4885adc1db2772d20677663653149effdd4cd88260c614eaab61d99c888af93a8f8f87294bb3817e162429b9f3735ea2@127.0.0.1:36505
+Cleveland  : INFO [09-14|16:31:23.044|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Cleveland/geth/chaindata/ancient
+Cleveland  : INFO [09-14|16:31:23.044|core/genesis.go:61]          Writing custom genesis block 
+Cleveland  : INFO [09-14|16:31:23.045|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="96.743µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Cleveland  : INFO [09-14|16:31:23.045|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Cleveland  : INFO [09-14|16:31:23.046|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Cleveland  : WARN [09-14|16:31:23.046|eth/backend.go:271]          Ethash used in fake mode 
+Cleveland  : INFO [09-14|16:31:23.046|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Cleveland  : WARN [09-14|16:31:23.046|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Cleveland  : INFO [09-14|16:31:23.053|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Cleveland  : INFO [09-14|16:31:23.054|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Cleveland  : INFO [09-14|16:31:23.054|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Cleveland  : INFO [09-14|16:31:23.054|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Cleveland  : INFO [09-14|16:31:23.055|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Haven      : INFO [09-14|16:31:23.047|geth/main.go:319] Starting Geth on MessNet... 
+Haven      : INFO [09-14|16:31:23.048|cmd/utils/flags.go:1840] Enabling metrics collection 
+Haven      : INFO [09-14|16:31:23.048|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Haven      : INFO [09-14|16:31:23.054|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Haven      : INFO [09-14|16:31:23.054|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Haven      : INFO [09-14|16:31:23.054|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Haven      : INFO [09-14|16:31:23.054|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Haven      : INFO [09-14|16:31:23.054|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Haven/geth/chaindata cache=512.00MiB handles=524288
+Sidney     : INFO [09-14|16:31:23.036|eth/backend.go:451]          Updated mining threads                   threads=9
+Sidney     : INFO [09-14|16:31:23.036|core/tx_pool.go:434]         Transaction pool price threshold updated price=1000000000
+Sidney     : INFO [09-14|16:31:23.036|eth/backend.go:372]          Etherbase automatically configured       address=0x3a48170486A5318A4b4aE34cE7d5b78b3f852A2b
+Sidney     : INFO [09-14|16:31:23.037|miner/worker.go:1000]        Commit new mining work                   number=1 sealhash="49a2c0…ec8a86" uncles=0 txs=0 gas=0 fees=0 elapsed="139.601µs"
+Quinton    : INFO [09-14|16:31:23.063|geth/main.go:319] Starting Geth on MessNet... 
+Quinton    : INFO [09-14|16:31:23.063|cmd/utils/flags.go:1840] Enabling metrics collection 
+Quinton    : INFO [09-14|16:31:23.063|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Quinton    : INFO [09-14|16:31:23.064|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Quinton    : INFO [09-14|16:31:23.064|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Quinton    : INFO [09-14|16:31:23.065|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Quinton    : INFO [09-14|16:31:23.065|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Quinton    : INFO [09-14|16:31:23.065|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Quinton/geth/chaindata cache=512.00MiB handles=524288
+Cleveland  : INFO [09-14|16:31:23.081|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=ce88409d4db3828e ip=127.0.0.1 udp=41179 tcp=41179
+Cleveland  : INFO [09-14|16:31:23.083|p2p/server.go:695]           Started P2P networking                   self=enode://c3f732759c8f29ac92b48d81708c11aa9f07ff39b6ffc4f32553edfac2416d7719da62c53f645948945a83edebf811831743a1bc33b3309059d071736c798c3c@127.0.0.1:41179
+Cleveland  : INFO [09-14|16:31:23.083|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-5331462875306343512.ipc
+Gail       : INFO [09-14|16:31:23.053|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Gail/geth/chaindata/ancient
+Gail       : INFO [09-14|16:31:23.053|core/genesis.go:61]          Writing custom genesis block 
+Gail       : INFO [09-14|16:31:23.054|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="101.957µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Gail       : INFO [09-14|16:31:23.054|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Gail       : INFO [09-14|16:31:23.054|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Gail       : WARN [09-14|16:31:23.055|eth/backend.go:271]          Ethash used in fake mode 
+Gail       : INFO [09-14|16:31:23.055|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Gail       : WARN [09-14|16:31:23.055|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Gail       : INFO [09-14|16:31:23.055|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Gail       : INFO [09-14|16:31:23.055|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Gail       : INFO [09-14|16:31:23.055|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Gail       : INFO [09-14|16:31:23.055|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Gail       : INFO [09-14|16:31:23.057|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Gail       : INFO [09-14|16:31:23.082|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=3a1a75e8b384704a ip=127.0.0.1 udp=33983 tcp=33983
+Gail       : INFO [09-14|16:31:23.084|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-4581725226746880454.ipc
+Gail       : INFO [09-14|16:31:23.084|p2p/server.go:695]           Started P2P networking                   self=enode://9f3fb846dcbfc5d494ce191d9736ad6078f4ec86b17df257d7a855d2133d9a06240bb31427506af3e86613ec55cf02bc22ae8cfe40f67f07a8b3a4e73c734b2a@127.0.0.1:33983
+Chanelle   : INFO [09-14|16:31:23.025|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=36505 intport=36505 interface=NAT-PMP(192.168.86.1)
+Chanelle   : INFO [09-14|16:31:23.031|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=36505 intport=36505 interface=NAT-PMP(192.168.86.1)
+Chanelle   : INFO [09-14|16:31:23.071|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=c35328cdbb474ea5 ip=75.134.144.252 udp=36505 tcp=36505
+Stefanie   : INFO [09-14|16:31:23.095|geth/main.go:319] Starting Geth on MessNet... 
+Stefanie   : INFO [09-14|16:31:23.095|cmd/utils/flags.go:1840] Enabling metrics collection 
+Stefanie   : INFO [09-14|16:31:23.095|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Stefanie   : INFO [09-14|16:31:23.096|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Stefanie   : INFO [09-14|16:31:23.096|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Stefanie   : INFO [09-14|16:31:23.097|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Stefanie   : INFO [09-14|16:31:23.097|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Stefanie   : INFO [09-14|16:31:23.097|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Stefanie/geth/chaindata cache=512.00MiB handles=524288
+Maxwell    : INFO [09-14|16:31:23.089|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Maxwell/geth/chaindata/ancient
+Maxwell    : INFO [09-14|16:31:23.090|core/genesis.go:61]          Writing custom genesis block 
+Maxwell    : INFO [09-14|16:31:23.090|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="238.822µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Maxwell    : INFO [09-14|16:31:23.091|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Maxwell    : INFO [09-14|16:31:23.091|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Maxwell    : WARN [09-14|16:31:23.092|eth/backend.go:271]          Ethash used in fake mode 
+Maxwell    : INFO [09-14|16:31:23.092|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Maxwell    : WARN [09-14|16:31:23.092|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Maxwell    : INFO [09-14|16:31:23.092|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Maxwell    : INFO [09-14|16:31:23.092|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Maxwell    : INFO [09-14|16:31:23.092|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Maxwell    : INFO [09-14|16:31:23.093|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Maxwell    : INFO [09-14|16:31:23.095|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Cleveland  : INFO [09-14|16:31:23.096|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=41179 intport=41179 interface=NAT-PMP(192.168.86.1)
+Cleveland  : INFO [09-14|16:31:23.104|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=41179 intport=41179 interface=NAT-PMP(192.168.86.1)
+Gail       : INFO [09-14|16:31:23.112|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=33983 intport=33983 interface=NAT-PMP(192.168.86.1)
+Gail       : INFO [09-14|16:31:23.118|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=33983 intport=33983 interface=NAT-PMP(192.168.86.1)
+Haven      : INFO [09-14|16:31:23.112|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Haven/geth/chaindata/ancient
+Haven      : INFO [09-14|16:31:23.113|core/genesis.go:61]          Writing custom genesis block 
+Haven      : INFO [09-14|16:31:23.113|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="98.033µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Haven      : INFO [09-14|16:31:23.114|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Haven      : INFO [09-14|16:31:23.114|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Haven      : WARN [09-14|16:31:23.114|eth/backend.go:271]          Ethash used in fake mode 
+Haven      : INFO [09-14|16:31:23.114|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Haven      : WARN [09-14|16:31:23.114|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Haven      : INFO [09-14|16:31:23.118|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Haven      : INFO [09-14|16:31:23.118|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Haven      : INFO [09-14|16:31:23.118|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Haven      : INFO [09-14|16:31:23.119|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Haven      : INFO [09-14|16:31:23.131|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Maxwell    : INFO [09-14|16:31:23.130|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=277f78c78ccbf757 ip=127.0.0.1 udp=44795 tcp=44795
+Maxwell    : INFO [09-14|16:31:23.130|p2p/server.go:695]           Started P2P networking                   self=enode://a6e5bd962cfa927fb935d12a54bdcaab6d8c02cb0d5f1b6e50818e6ce0d188394fc4567b25843b04709f3ac006514736d906478626926d8c30c0ec24cd13a836@127.0.0.1:44795
+Quinton    : INFO [09-14|16:31:23.123|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Quinton/geth/chaindata/ancient
+Quinton    : INFO [09-14|16:31:23.124|core/genesis.go:61]          Writing custom genesis block 
+Quinton    : INFO [09-14|16:31:23.125|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="652.746µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Quinton    : INFO [09-14|16:31:23.125|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Quinton    : INFO [09-14|16:31:23.126|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Quinton    : WARN [09-14|16:31:23.126|eth/backend.go:271]          Ethash used in fake mode 
+Quinton    : INFO [09-14|16:31:23.126|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Quinton    : WARN [09-14|16:31:23.126|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Quinton    : INFO [09-14|16:31:23.127|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Quinton    : INFO [09-14|16:31:23.127|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Quinton    : INFO [09-14|16:31:23.127|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Quinton    : INFO [09-14|16:31:23.127|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Quinton    : INFO [09-14|16:31:23.129|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Maxwell    : INFO [09-14|16:31:23.132|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-8979317683466414432.ipc
+Allie      : INFO [09-14|16:31:23.136|geth/main.go:319] Starting Geth on MessNet... 
+Allie      : INFO [09-14|16:31:23.136|cmd/utils/flags.go:1840] Enabling metrics collection 
+Allie      : INFO [09-14|16:31:23.136|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Allie      : INFO [09-14|16:31:23.137|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Allie      : INFO [09-14|16:31:23.137|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Allie      : INFO [09-14|16:31:23.138|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Allie      : INFO [09-14|16:31:23.138|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Allie      : INFO [09-14|16:31:23.138|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Allie/geth/chaindata cache=512.00MiB handles=524288
+Cleveland  : INFO [09-14|16:31:23.148|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=ce88409d4db3828e ip=75.134.144.252 udp=41179 tcp=41179
+Maxwell    : INFO [09-14|16:31:23.145|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=44795 intport=44795 interface=NAT-PMP(192.168.86.1)
+Maxwell    : INFO [09-14|16:31:23.149|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=44795 intport=44795 interface=NAT-PMP(192.168.86.1)
+Haven      : INFO [09-14|16:31:23.169|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=7994aa4ef37d865a ip=127.0.0.1 udp=37481 tcp=37481
+Haven      : INFO [09-14|16:31:23.170|p2p/server.go:695]           Started P2P networking                   self=enode://9f52c51357d61a983e2e2a854926ba08f2cbe1c139084ff70cdc17ef724e8601dc4f1d231f2d3aa30fad3474ec5aacd147d2d77b72e9096aaebf43055c6ca338@127.0.0.1:37481
+Haven      : INFO [09-14|16:31:23.171|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-8577056348101810320.ipc
+Quinton    : INFO [09-14|16:31:23.164|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=eb42212ca4309aa2 ip=127.0.0.1 udp=36941 tcp=36941
+Quinton    : INFO [09-14|16:31:23.166|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-1392676712705563219.ipc
+Quinton    : INFO [09-14|16:31:23.166|p2p/server.go:695]           Started P2P networking                   self=enode://c16134ad92711b90b9f1948d17f2d635c5c6b612df5379da0f587dfe298f135db3cacc92602a427ef1eb8b5a042c8cc047c3db762583da7848fe547985e55a0c@127.0.0.1:36941
+Quinton    : INFO [09-14|16:31:23.172|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=eb42212ca4309aa2 ip=75.134.144.252 udp=36941 tcp=36941
+Quinton    : INFO [09-14|16:31:23.179|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=36941 intport=36941 interface=NAT-PMP(192.168.86.1)
+Quinton    : INFO [09-14|16:31:23.189|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=36941 intport=36941 interface=NAT-PMP(192.168.86.1)
+Stefanie   : INFO [09-14|16:31:23.155|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Stefanie/geth/chaindata/ancient
+Stefanie   : INFO [09-14|16:31:23.155|core/genesis.go:61]          Writing custom genesis block 
+Stefanie   : INFO [09-14|16:31:23.155|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="105.979µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Stefanie   : INFO [09-14|16:31:23.156|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Stefanie   : INFO [09-14|16:31:23.156|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Stefanie   : WARN [09-14|16:31:23.156|eth/backend.go:271]          Ethash used in fake mode 
+Stefanie   : INFO [09-14|16:31:23.156|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Stefanie   : WARN [09-14|16:31:23.156|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Stefanie   : INFO [09-14|16:31:23.157|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Stefanie   : INFO [09-14|16:31:23.157|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Stefanie   : INFO [09-14|16:31:23.157|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Stefanie   : INFO [09-14|16:31:23.157|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Stefanie   : INFO [09-14|16:31:23.159|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Stefanie   : INFO [09-14|16:31:23.181|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=12e146e5687358f3 ip=127.0.0.1 udp=38019 tcp=38019
+Stefanie   : INFO [09-14|16:31:23.183|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-2826989810744765029.ipc
+Stefanie   : INFO [09-14|16:31:23.184|p2p/server.go:695]           Started P2P networking                   self=enode://52a693b19994d570e82700fcedeccc5e284e4d0ef66c11ca01a10805f4e995c9e979dfbee67712b7c86a4a710c082b94869c4bd8c1dbe65b890017bfb38b0e3e@127.0.0.1:38019
+Allie      : INFO [09-14|16:31:23.193|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Allie/geth/chaindata/ancient
+Allie      : INFO [09-14|16:31:23.193|core/genesis.go:61]          Writing custom genesis block 
+Allie      : INFO [09-14|16:31:23.199|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="103.586µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Allie      : INFO [09-14|16:31:23.200|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Allie      : INFO [09-14|16:31:23.200|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Allie      : WARN [09-14|16:31:23.201|eth/backend.go:271]          Ethash used in fake mode 
+Allie      : INFO [09-14|16:31:23.201|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Allie      : WARN [09-14|16:31:23.201|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Allie      : INFO [09-14|16:31:23.201|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Allie      : INFO [09-14|16:31:23.201|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Allie      : INFO [09-14|16:31:23.201|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Allie      : INFO [09-14|16:31:23.202|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Allie      : INFO [09-14|16:31:23.204|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Haven      : INFO [09-14|16:31:23.206|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=37481 intport=37481 interface=NAT-PMP(192.168.86.1)
+Haven      : INFO [09-14|16:31:23.214|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=37481 intport=37481 interface=NAT-PMP(192.168.86.1)
+Maxwell    : INFO [09-14|16:31:23.185|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=277f78c78ccbf757 ip=75.134.144.252 udp=44795 tcp=44795
+Gail       : INFO [09-14|16:31:23.222|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=3a1a75e8b384704a ip=75.134.144.252 udp=33983 tcp=33983
+Stefanie   : INFO [09-14|16:31:23.222|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=38019 intport=38019 interface=NAT-PMP(192.168.86.1)
+Dante      : INFO [09-14|16:31:23.215|geth/main.go:319] Starting Geth on MessNet... 
+Dante      : INFO [09-14|16:31:23.215|cmd/utils/flags.go:1840] Enabling metrics collection 
+Dante      : INFO [09-14|16:31:23.215|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Dante      : INFO [09-14|16:31:23.216|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Dante      : INFO [09-14|16:31:23.216|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Dante      : INFO [09-14|16:31:23.217|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Dante      : INFO [09-14|16:31:23.217|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Dante      : INFO [09-14|16:31:23.217|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Dante/geth/chaindata cache=512.00MiB handles=524288
+Adriel     : INFO [09-14|16:31:23.234|geth/main.go:319] Starting Geth on MessNet... 
+Adriel     : INFO [09-14|16:31:23.235|cmd/utils/flags.go:1840] Enabling metrics collection 
+Adriel     : INFO [09-14|16:31:23.235|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Adriel     : INFO [09-14|16:31:23.236|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Adriel     : INFO [09-14|16:31:23.236|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Adriel     : INFO [09-14|16:31:23.236|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Adriel     : INFO [09-14|16:31:23.236|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Adriel     : INFO [09-14|16:31:23.236|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Adriel/geth/chaindata cache=512.00MiB handles=524288
+Allie      : INFO [09-14|16:31:23.227|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=20e6cfde377a7171 ip=127.0.0.1 udp=34899 tcp=34899
+Allie      : INFO [09-14|16:31:23.228|p2p/server.go:695]           Started P2P networking                   self=enode://522237f8ffd9cd9749b549aca3edd5121192bfa248facbace1f3e6ea62b4a84294f7420b4e2411900f247ddeee6cc2a3a8a9a19f76fb8528be5666550716e4f8@127.0.0.1:34899
+Allie      : INFO [09-14|16:31:23.231|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-4230664549429330217.ipc
+Allie      : INFO [09-14|16:31:23.247|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=34899 intport=34899 interface=NAT-PMP(192.168.86.1)
+Allie      : INFO [09-14|16:31:23.255|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=34899 intport=34899 interface=NAT-PMP(192.168.86.1)
+Stefanie   : INFO [09-14|16:31:23.235|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=38019 intport=38019 interface=NAT-PMP(192.168.86.1)
+Haven      : INFO [09-14|16:31:23.242|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=7994aa4ef37d865a ip=75.134.144.252 udp=37481 tcp=37481
+Lucile     : INFO [09-14|16:31:23.258|geth/main.go:319] Starting Geth on MessNet... 
+Lucile     : INFO [09-14|16:31:23.259|cmd/utils/flags.go:1840] Enabling metrics collection 
+Lucile     : INFO [09-14|16:31:23.259|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Lucile     : INFO [09-14|16:31:23.260|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Lucile     : INFO [09-14|16:31:23.260|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Lucile     : INFO [09-14|16:31:23.263|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Lucile     : INFO [09-14|16:31:23.263|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Rhianna    : INFO [09-14|16:31:23.266|geth/main.go:319] Starting Geth on MessNet... 
+Rhianna    : INFO [09-14|16:31:23.267|cmd/utils/flags.go:1840] Enabling metrics collection 
+Rhianna    : INFO [09-14|16:31:23.267|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Lucile     : INFO [09-14|16:31:23.263|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Lucile/geth/chaindata cache=512.00MiB handles=524288
+Rhianna    : INFO [09-14|16:31:23.268|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Rhianna    : INFO [09-14|16:31:23.268|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Rhianna    : INFO [09-14|16:31:23.270|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Rhianna    : INFO [09-14|16:31:23.270|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Rhianna    : INFO [09-14|16:31:23.270|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Rhianna/geth/chaindata cache=512.00MiB handles=524288
+Edythe     : INFO [09-14|16:31:23.302|geth/main.go:319] Starting Geth on MessNet... 
+Edythe     : INFO [09-14|16:31:23.303|cmd/utils/flags.go:1840] Enabling metrics collection 
+Edythe     : INFO [09-14|16:31:23.303|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Edythe     : INFO [09-14|16:31:23.304|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Edythe     : INFO [09-14|16:31:23.304|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Edythe     : INFO [09-14|16:31:23.306|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Edythe     : INFO [09-14|16:31:23.306|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Edythe     : INFO [09-14|16:31:23.306|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Edythe/geth/chaindata cache=512.00MiB handles=524288
+Adriel     : INFO [09-14|16:31:23.293|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Adriel/geth/chaindata/ancient
+Adriel     : INFO [09-14|16:31:23.293|core/genesis.go:61]          Writing custom genesis block 
+Adriel     : INFO [09-14|16:31:23.293|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="114.396µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Adriel     : INFO [09-14|16:31:23.294|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Adriel     : INFO [09-14|16:31:23.294|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Adriel     : WARN [09-14|16:31:23.294|eth/backend.go:271]          Ethash used in fake mode 
+Adriel     : INFO [09-14|16:31:23.294|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Adriel     : WARN [09-14|16:31:23.294|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Adriel     : INFO [09-14|16:31:23.295|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Adriel     : INFO [09-14|16:31:23.295|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Adriel     : INFO [09-14|16:31:23.295|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Adriel     : INFO [09-14|16:31:23.295|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Adriel     : INFO [09-14|16:31:23.298|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Adriel     : INFO [09-14|16:31:23.321|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=bdfbfad36d0182b9 ip=127.0.0.1 udp=35329 tcp=35329
+Adriel     : INFO [09-14|16:31:23.321|p2p/server.go:695]           Started P2P networking                   self=enode://9c7a28ea4a2dde5b3aaed30d896849e16c3455b52524d31d16a9b98ec32ce5a0dacd8785a0ce589e2ae947ea1c17af766b73f146124ddb2255109a6ad02ebe2c@127.0.0.1:35329
+Adriel     : INFO [09-14|16:31:23.324|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-1644738515646976832.ipc
+Aarchimedes: INFO [09-14|16:31:23.310|miner/worker.go:624]         Successfully sealed new block            number=3 sealhash="2ba911…99832b" hash="d14f66…d6fab1" elapsed=2.000s
+Aarchimedes: INFO [09-14|16:31:23.310|miner/unconfirmed.go:85]     🔨 mined potential block                  number=3 hash="d14f66…d6fab1"
+Aarchimedes: INFO [09-14|16:31:23.311|miner/worker.go:1000]        Commit new mining work                   number=4 sealhash="69cae4…b79912" uncles=0 txs=0 gas=0 fees=0 elapsed="157.003µs"
+Stefanie   : INFO [09-14|16:31:23.278|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=12e146e5687358f3 ip=75.134.144.252 udp=38019 tcp=38019
+Dante      : INFO [09-14|16:31:23.283|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Dante/geth/chaindata/ancient
+Dante      : INFO [09-14|16:31:23.284|core/genesis.go:61]          Writing custom genesis block 
+Dante      : INFO [09-14|16:31:23.284|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="96.62µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Dante      : INFO [09-14|16:31:23.285|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Dante      : INFO [09-14|16:31:23.285|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Dante      : WARN [09-14|16:31:23.285|eth/backend.go:271]          Ethash used in fake mode 
+Dante      : INFO [09-14|16:31:23.285|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Dante      : WARN [09-14|16:31:23.285|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Dante      : INFO [09-14|16:31:23.286|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Dante      : INFO [09-14|16:31:23.286|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Dante      : INFO [09-14|16:31:23.286|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Dante      : INFO [09-14|16:31:23.286|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Dante      : INFO [09-14|16:31:23.289|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Dante      : INFO [09-14|16:31:23.311|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=0673c088802a1003 ip=127.0.0.1 udp=45315 tcp=45315
+Dante      : INFO [09-14|16:31:23.312|p2p/server.go:695]           Started P2P networking                   self=enode://188550b003dde7b5a19da8675f6994380fed6e86aa40ec7931adce7a5f532a9d039efbf2d5cd7510f24f7265ee41e9a49cfa66d16f25e7542a0e4866da84241e@127.0.0.1:45315
+Dante      : INFO [09-14|16:31:23.313|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-7339969463912382212.ipc
+Dante      : INFO [09-14|16:31:23.338|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=45315 intport=45315 interface=NAT-PMP(192.168.86.1)
+Allie      : INFO [09-14|16:31:23.317|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=20e6cfde377a7171 ip=75.134.144.252 udp=34899 tcp=34899
+Rhianna    : INFO [09-14|16:31:23.328|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Rhianna/geth/chaindata/ancient
+Rhianna    : INFO [09-14|16:31:23.328|core/genesis.go:61]          Writing custom genesis block 
+Rhianna    : INFO [09-14|16:31:23.329|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="109.831µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Rhianna    : INFO [09-14|16:31:23.330|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Rhianna    : INFO [09-14|16:31:23.330|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Rhianna    : WARN [09-14|16:31:23.330|eth/backend.go:271]          Ethash used in fake mode 
+Rhianna    : INFO [09-14|16:31:23.330|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Rhianna    : WARN [09-14|16:31:23.330|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Rhianna    : INFO [09-14|16:31:23.331|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Rhianna    : INFO [09-14|16:31:23.331|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Rhianna    : INFO [09-14|16:31:23.331|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Rhianna    : INFO [09-14|16:31:23.332|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Rhianna    : INFO [09-14|16:31:23.334|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Rhianna    : INFO [09-14|16:31:23.354|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=5840098c4c62689e ip=127.0.0.1 udp=42499 tcp=42499
+Rhianna    : INFO [09-14|16:31:23.356|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-3940144580614097127.ipc
+Rhianna    : INFO [09-14|16:31:23.356|p2p/server.go:695]           Started P2P networking                   self=enode://1bab5f4731d065ecde8b3ed8cfcc85151b473f900765fd13b41598573e5b6151d9d0ee35effc25f8d1cd0c656dbc79a62659002dd3187849d4ab5c5bc57270a2@127.0.0.1:42499
+Shaylee    : INFO [09-14|16:31:23.359|geth/main.go:319] Starting Geth on MessNet... 
+Shaylee    : INFO [09-14|16:31:23.359|cmd/utils/flags.go:1840] Enabling metrics collection 
+Dante      : INFO [09-14|16:31:23.356|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=45315 intport=45315 interface=NAT-PMP(192.168.86.1)
+Dante      : INFO [09-14|16:31:23.370|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=0673c088802a1003 ip=75.134.144.252 udp=45315 tcp=45315
+Shaylee    : INFO [09-14|16:31:23.359|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Shaylee    : INFO [09-14|16:31:23.361|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Shaylee    : INFO [09-14|16:31:23.361|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Shaylee    : INFO [09-14|16:31:23.364|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Shaylee    : INFO [09-14|16:31:23.364|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Shaylee    : INFO [09-14|16:31:23.364|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Shaylee/geth/chaindata cache=512.00MiB handles=524288
+Lucile     : INFO [09-14|16:31:23.339|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Lucile/geth/chaindata/ancient
+Lucile     : INFO [09-14|16:31:23.339|core/genesis.go:61]          Writing custom genesis block 
+Lucile     : INFO [09-14|16:31:23.340|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="103.538µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Lucile     : INFO [09-14|16:31:23.340|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Lucile     : INFO [09-14|16:31:23.340|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Lucile     : WARN [09-14|16:31:23.341|eth/backend.go:271]          Ethash used in fake mode 
+Lucile     : INFO [09-14|16:31:23.341|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Lucile     : WARN [09-14|16:31:23.341|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Lucile     : INFO [09-14|16:31:23.342|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Lucile     : INFO [09-14|16:31:23.342|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Lucile     : INFO [09-14|16:31:23.342|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Lucile     : INFO [09-14|16:31:23.342|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Lucile     : INFO [09-14|16:31:23.344|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Lucile     : INFO [09-14|16:31:23.381|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=8f06182ebd278944 ip=127.0.0.1 udp=37031 tcp=37031
+Lucile     : INFO [09-14|16:31:23.382|p2p/server.go:695]           Started P2P networking                   self=enode://f52616907051830266c0801e3b5a46323712561cc3aadda3af99850fab99be785a5d1e88e4705d09f1cca38f36fec450c1245f15eb08e93dfd9f747e1a2f8f0d@127.0.0.1:37031
+Lucile     : INFO [09-14|16:31:23.387|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-8137389287868554031.ipc
+Edythe     : INFO [09-14|16:31:23.377|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Edythe/geth/chaindata/ancient
+Edythe     : INFO [09-14|16:31:23.377|core/genesis.go:61]          Writing custom genesis block 
+Edythe     : INFO [09-14|16:31:23.378|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="101.837µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Edythe     : INFO [09-14|16:31:23.378|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Edythe     : INFO [09-14|16:31:23.378|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Edythe     : WARN [09-14|16:31:23.379|eth/backend.go:271]          Ethash used in fake mode 
+Edythe     : INFO [09-14|16:31:23.379|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Edythe     : WARN [09-14|16:31:23.379|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Edythe     : INFO [09-14|16:31:23.379|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Edythe     : INFO [09-14|16:31:23.380|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Edythe     : INFO [09-14|16:31:23.380|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Edythe     : INFO [09-14|16:31:23.380|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Edythe     : INFO [09-14|16:31:23.382|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Edythe     : INFO [09-14|16:31:23.410|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=0e5629b8cb839773 ip=127.0.0.1 udp=40467 tcp=40467
+Edythe     : INFO [09-14|16:31:23.411|p2p/server.go:695]           Started P2P networking                   self=enode://0ff769f97b1de6f411fd305beaa6b6b1d99a7be3d42e2b7c80b4952d88117b31231eb3ccffc231858eee11831ee5feb5182643e510021ab2e9f388954d44c633@127.0.0.1:40467
+Edythe     : INFO [09-14|16:31:23.412|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-1009854691772967811.ipc
+Adriel     : INFO [09-14|16:31:23.371|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=35329 intport=35329 interface=NAT-PMP(192.168.86.1)
+Adriel     : INFO [09-14|16:31:23.378|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=35329 intport=35329 interface=NAT-PMP(192.168.86.1)
+Adriel     : INFO [09-14|16:31:23.388|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=bdfbfad36d0182b9 ip=75.134.144.252 udp=35329 tcp=35329
+Rhianna    : INFO [09-14|16:31:23.394|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=42499 intport=42499 interface=NAT-PMP(192.168.86.1)
+Rhianna    : INFO [09-14|16:31:23.402|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=42499 intport=42499 interface=NAT-PMP(192.168.86.1)
+Rhianna    : INFO [09-14|16:31:23.415|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=5840098c4c62689e ip=75.134.144.252 udp=42499 tcp=42499
+Brittany   : INFO [09-14|16:31:23.380|geth/main.go:319] Starting Geth on MessNet... 
+Brittany   : INFO [09-14|16:31:23.380|cmd/utils/flags.go:1840] Enabling metrics collection 
+Brittany   : INFO [09-14|16:31:23.381|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Brittany   : INFO [09-14|16:31:23.386|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Brittany   : INFO [09-14|16:31:23.387|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Brittany   : INFO [09-14|16:31:23.387|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Brittany   : INFO [09-14|16:31:23.387|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Brittany   : INFO [09-14|16:31:23.387|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Brittany/geth/chaindata cache=512.00MiB handles=524288
+Jazmin     : INFO [09-14|16:31:23.383|geth/main.go:319] Starting Geth on MessNet... 
+Jazmin     : INFO [09-14|16:31:23.383|cmd/utils/flags.go:1840] Enabling metrics collection 
+Jazmin     : INFO [09-14|16:31:23.383|cmd/utils/flags.go:1853] Enabling metrics export to InfluxDB 
+Jazmin     : INFO [09-14|16:31:23.384|cmd/utils/flags.go:1215] Maximum peer count                       ETH=25 LES=0 total=25
+Jazmin     : INFO [09-14|16:31:23.384|cmd/utils/flags.go:1289] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+Jazmin     : INFO [09-14|16:31:23.385|cmd/utils/flags.go:1658] Set global gas cap                       cap=25000000
+Jazmin     : INFO [09-14|16:31:23.385|eth/backend.go:123]      Allocated trie memory caches             clean=256.00MiB dirty=256.00MiB
+Jazmin     : INFO [09-14|16:31:23.385|ethdb/leveldb/leveldb.go:95] Allocated cache and file handles         database=/tmp/ageth/Jazmin/geth/chaindata cache=512.00MiB handles=524288
+Jazmin     : INFO [09-14|16:31:23.447|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Jazmin/geth/chaindata/ancient
+Jazmin     : INFO [09-14|16:31:23.447|core/genesis.go:61]          Writing custom genesis block 
+Jazmin     : INFO [09-14|16:31:23.448|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="104.018µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Jazmin     : INFO [09-14|16:31:23.448|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Jazmin     : INFO [09-14|16:31:23.449|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Jazmin     : WARN [09-14|16:31:23.449|eth/backend.go:271]          Ethash used in fake mode 
+Jazmin     : INFO [09-14|16:31:23.449|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Jazmin     : WARN [09-14|16:31:23.449|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Jazmin     : INFO [09-14|16:31:23.450|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Jazmin     : INFO [09-14|16:31:23.450|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Jazmin     : INFO [09-14|16:31:23.450|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Jazmin     : INFO [09-14|16:31:23.450|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Jazmin     : INFO [09-14|16:31:23.452|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Lucile     : INFO [09-14|16:31:23.418|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=37031 intport=37031 interface=NAT-PMP(192.168.86.1)
+Lucile     : INFO [09-14|16:31:23.429|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=37031 intport=37031 interface=NAT-PMP(192.168.86.1)
+Lucile     : INFO [09-14|16:31:23.448|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=8f06182ebd278944 ip=75.134.144.252 udp=37031 tcp=37031
+Aarchimedes: INFO [09-14|16:31:23.434|p2p/enode/localnode.go:284]  New local node record                    seq=5 id=c2f88eb86aa6b5a2 ip=75.134.144.252 udp=41131 tcp=41131
+Edythe     : INFO [09-14|16:31:23.444|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=40467 intport=40467 interface=NAT-PMP(192.168.86.1)
+Edythe     : INFO [09-14|16:31:23.452|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=40467 intport=40467 interface=NAT-PMP(192.168.86.1)
+Edythe     : INFO [09-14|16:31:23.479|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=0e5629b8cb839773 ip=75.134.144.252 udp=40467 tcp=40467
+Brittany   : INFO [09-14|16:31:23.457|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Brittany/geth/chaindata/ancient
+Brittany   : INFO [09-14|16:31:23.457|core/genesis.go:61]          Writing custom genesis block 
+Brittany   : INFO [09-14|16:31:23.458|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="102.322µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Brittany   : INFO [09-14|16:31:23.458|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Brittany   : INFO [09-14|16:31:23.459|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Brittany   : WARN [09-14|16:31:23.459|eth/backend.go:271]          Ethash used in fake mode 
+Brittany   : INFO [09-14|16:31:23.459|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Brittany   : WARN [09-14|16:31:23.459|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Brittany   : INFO [09-14|16:31:23.460|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Brittany   : INFO [09-14|16:31:23.460|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Brittany   : INFO [09-14|16:31:23.460|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Brittany   : INFO [09-14|16:31:23.460|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Brittany   : INFO [09-14|16:31:23.462|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Brittany   : INFO [09-14|16:31:23.483|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=246c530ff28d1ca9 ip=127.0.0.1 udp=45431 tcp=45431
+Brittany   : INFO [09-14|16:31:23.484|p2p/server.go:695]           Started P2P networking                   self=enode://98dfeb8d3a1312cc8263c04fb89c6f30bb461f7731a7b41fbb024a6646031e61d0f278ed977b4640d89abb94e05f5c27c17bf26fdfa39bb32dfe790db33f696b@127.0.0.1:45431
+Brittany   : INFO [09-14|16:31:23.485|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-5465096566640640519.ipc
+Shaylee    : INFO [09-14|16:31:23.440|core/rawdb/freezer.go:133]   Opened ancient database                  database=/tmp/ageth/Shaylee/geth/chaindata/ancient
+Shaylee    : INFO [09-14|16:31:23.440|core/genesis.go:61]          Writing custom genesis block 
+Shaylee    : INFO [09-14|16:31:23.441|trie/database.go:717]        Persisted trie from memory database      nodes=10 size=1.46KiB time="92.429µs" gcnodes=0 gcsize=0.00B gctime=0s livenodes=1 livesize=0.00B
+Shaylee    : INFO [09-14|16:31:23.441|core/genesis.go:67]          Wrote custom genesis block OK            config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Shaylee    : INFO [09-14|16:31:23.442|eth/backend.go:138]          Initialised chain configuration          config="NetworkID: 6161, ChainID: 6161 Engine: ethash ECBP1100: 11 EIP1014: 9 EIP1052: 9 EIP1108: 10 EIP1344: 10 EIP140: 8 EIP145: 9 EIP150: 2 EIP152: 10 EIP155: 3 EIP160: 3 EIP161abc: 8 EIP161d: 8 EIP170: 8 EIP1884: 10 EIP198: 8 EIP2028: 10 EIP211: 8 EIP212: 8 EIP213: 8 EIP214: 8 EIP2200: 10 EIP2: 1 EIP658: 8 EIP7: 1 EthashECIP1010Continue: 5 EthashECIP1010Pause: 3 EthashECIP1017: 5 EthashECIP1041: 5 EthashEIP100B: 8 EthashHomestead: 1 "
+Shaylee    : WARN [09-14|16:31:23.442|eth/backend.go:271]          Ethash used in fake mode 
+Shaylee    : INFO [09-14|16:31:23.442|eth/backend.go:160]          Initialising Ethereum protocol           versions="[65 64 63]" network=6161 dbversion=<nil>
+Shaylee    : WARN [09-14|16:31:23.442|eth/backend.go:166]          Upgrade blockchain database version      from=<nil> to=8
+Shaylee    : INFO [09-14|16:31:23.443|core/blockchain.go:441]      Loaded most recent local header          number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Shaylee    : INFO [09-14|16:31:23.443|core/blockchain.go:442]      Loaded most recent local full block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Shaylee    : INFO [09-14|16:31:23.443|core/blockchain.go:443]      Loaded most recent local fast block      number=0 hash="b2957a…20652e" td=37103392657464 age=2w2d23h
+Shaylee    : INFO [09-14|16:31:23.443|core/tx_journal.go:166]      Regenerated local transaction journal    transactions=0 accounts=0
+Shaylee    : INFO [09-14|16:31:23.445|node/node.go:252]            Starting peer-to-peer node               instance=CoreGeth/v1.11.14-rc-messnet-1+-f0c5e0c8-20200914/linux-amd64/go1.15
+Shaylee    : INFO [09-14|16:31:23.465|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=e730b51f65934a75 ip=127.0.0.1 udp=41329 tcp=41329
+Shaylee    : INFO [09-14|16:31:23.467|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-5735302516274322637.ipc
+Shaylee    : INFO [09-14|16:31:23.467|p2p/server.go:695]           Started P2P networking                   self=enode://bbc1246e5c9e1c15791de394ae9acfe2ba97c277b4d0452ec0afdbeae1959e3b7d0282fb6a44fa3a638b1cd98d9483938e2020a2a1a5cea05236e403ac29fbe5@127.0.0.1:41329
+Shaylee    : INFO [09-14|16:31:23.495|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=41329 intport=41329 interface=NAT-PMP(192.168.86.1)
+Jazmin     : INFO [09-14|16:31:23.474|p2p/enode/localnode.go:284]  New local node record                    seq=1 id=3c6fb83f55235ba2 ip=127.0.0.1 udp=35625 tcp=35625
+Jazmin     : INFO [09-14|16:31:23.475|p2p/server.go:695]           Started P2P networking                   self=enode://e7dbbce3a09ac52f06819c1adde626c78aa28ce14f737261b3a2582ca86b90515426bb353c08b4bc33a0e8a2cf2788fdbc409e31996d86d1de2efc123bdc3952@127.0.0.1:35625
+Jazmin     : INFO [09-14|16:31:23.475|node/rpcstack.go:453]        IPC endpoint opened                      url=/tmp/ageth-1874752554000350699.ipc
+Jazmin     : INFO [09-14|16:31:23.515|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=35625 intport=35625 interface=NAT-PMP(192.168.86.1)
+Haven      : INFO [09-14|16:31:23.478|eth/backend.go:451]          Updated mining threads                   threads=9
+Haven      : INFO [09-14|16:31:23.478|core/tx_pool.go:434]         Transaction pool price threshold updated price=1000000000
+Haven      : INFO [09-14|16:31:23.478|eth/backend.go:372]          Etherbase automatically configured       address=0x24485dCA329a686BfBF5e42c34f68f50aA7B5331
+Haven      : INFO [09-14|16:31:23.478|miner/worker.go:1000]        Commit new mining work                   number=1 sealhash="76e74e…a2753f" uncles=0 txs=0 gas=0 fees=0 elapsed="153.965µs"
+Shaylee    : INFO [09-14|16:31:23.502|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=41329 intport=41329 interface=NAT-PMP(192.168.86.1)
+Shaylee    : INFO [09-14|16:31:23.534|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=e730b51f65934a75 ip=75.134.144.252 udp=41329 tcp=41329
+Jazmin     : INFO [09-14|16:31:23.523|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=35625 intport=35625 interface=NAT-PMP(192.168.86.1)
+Jazmin     : INFO [09-14|16:31:23.547|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=3c6fb83f55235ba2 ip=75.134.144.252 udp=35625 tcp=35625
+Brittany   : INFO [09-14|16:31:23.535|p2p/nat/nat.go:110]          Mapped network port                      proto=tcp extport=45431 intport=45431 interface=NAT-PMP(192.168.86.1)
+Brittany   : INFO [09-14|16:31:23.547|p2p/nat/nat.go:110]          Mapped network port                      proto=udp extport=45431 intport=45431 interface=NAT-PMP(192.168.86.1)
+Brittany   : INFO [09-14|16:31:23.576|p2p/enode/localnode.go:284]  New local node record                    seq=2 id=246c530ff28d1ca9 ip=75.134.144.252 udp=45431 tcp=45431
+Dante      : INFO [09-14|16:31:23.869|eth/backend.go:451]          Updated mining threads                   threads=9
+Dante      : INFO [09-14|16:31:23.869|core/tx_pool.go:434]         Transaction pool price threshold updated price=1000000000
+Dante      : INFO [09-14|16:31:23.869|eth/backend.go:372]          Etherbase automatically configured       address=0x4a913fF780cf5deee4BafFb969df0828f5ea9617
+Dante      : INFO [09-14|16:31:23.869|miner/worker.go:1000]        Commit new mining work                   number=1 sealhash="4c5690…5df6b7" uncles=0 txs=0 gas=0 fees=0 elapsed="130.75µs"
+Shaylee    : INFO [09-14|16:31:24.358|eth/backend.go:451]          Updated mining threads                   threads=9
+Shaylee    : INFO [09-14|16:31:24.358|core/tx_pool.go:434]         Transaction pool price threshold updated price=1000000000
+Shaylee    : INFO [09-14|16:31:24.358|eth/backend.go:372]          Etherbase automatically configured       address=0x32960c631711C7B583b4Fa7dAabc210cc07764eF
+Shaylee    : INFO [09-14|16:31:24.358|miner/worker.go:1000]        Commit new mining work                   number=1 sealhash="211c02…891422" uncles=0 txs=0 gas=0 fees=0 elapsed="172.298µs"
+Aarchimedes: INFO [09-14|16:31:26.312|miner/worker.go:624]         Successfully sealed new block            number=4 sealhash="69cae4…b79912" hash="9f50ba…b81f9b" elapsed=3.000s
+Aarchimedes: INFO [09-14|16:31:26.312|miner/unconfirmed.go:85]     🔨 mined potential block                  number=4 hash="9f50ba…b81f9b"
+Aarchimedes: INFO [09-14|16:31:26.312|miner/worker.go:1000]        Commit new mining work                   number=5 sealhash="345f5c…a65665" uncles=0 txs=0 gas=0 fees=0 elapsed="137.007µs"
+Aarchimedes: INFO [09-14|16:31:27.776|p2p/dial.go:339]             Looking for peers                        peercount=0 tried=85 static=0
+Quinton    : INFO [09-14|16:31:28.044|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="605.899µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Adriel     : INFO [09-14|16:31:28.043|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="625.119µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Darrel     : INFO [09-14|16:31:28.044|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="426.888µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Darrel     : INFO [09-14|16:31:28.056|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=f3790f76bfad2e43 ip=75.134.144.252 udp=44037 tcp=44037
+Allie      : INFO [09-14|16:31:28.044|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed=2.939ms mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Rhianna    : INFO [09-14|16:31:28.042|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="601.151µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Lucile     : INFO [09-14|16:31:28.042|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="634.513µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Lucile     : INFO [09-14|16:31:28.056|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=8f06182ebd278944 ip=75.134.144.252 udp=37031 tcp=37031
+Isom       : INFO [09-14|16:31:28.042|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="396.503µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Cleveland  : INFO [09-14|16:31:28.041|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="643.103µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Stefanie   : INFO [09-14|16:31:28.041|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="775.694µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Cornell    : INFO [09-14|16:31:28.041|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="765.144µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Gail       : INFO [09-14|16:31:28.040|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="317.788µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Gail       : INFO [09-14|16:31:28.065|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=3a1a75e8b384704a ip=75.134.144.252 udp=33983 tcp=33983
+Chanelle   : INFO [09-14|16:31:28.039|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="516.428µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Dante      : INFO [09-14|16:31:28.041|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="651.099µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Dante      : INFO [09-14|16:31:28.042|miner/worker.go:1000]         Commit new mining work                   number=2 sealhash="29854b…7a8559" uncles=0 txs=0 gas=0 fees=0 elapsed="101.961µs"
+Sidney     : INFO [09-14|16:31:28.037|miner/worker.go:624]         Successfully sealed new block            number=1 sealhash="49a2c0…ec8a86" hash="f4042c…6766c7" elapsed=5.000s
+Sidney     : INFO [09-14|16:31:28.037|miner/unconfirmed.go:85]     🔨 mined potential block                  number=1 hash="f4042c…6766c7"
+Sidney     : INFO [09-14|16:31:28.038|miner/worker.go:1000]        Commit new mining work                   number=2 sealhash="f51bce…9105fa" uncles=0 txs=0 gas=0 fees=0 elapsed="138.581µs"
+Haven      : INFO [09-14|16:31:28.046|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="510.596µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Haven      : INFO [09-14|16:31:28.047|miner/worker.go:1000]         Commit new mining work                   number=2 sealhash="39437b…9ce7fa" uncles=0 txs=0 gas=0 fees=0 elapsed="152.117µs"
+Brittany   : INFO [09-14|16:31:28.046|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="691.31µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Edythe     : INFO [09-14|16:31:28.044|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="660.667µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Maxwell    : INFO [09-14|16:31:28.044|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="538.032µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Allie      : INFO [09-14|16:31:28.085|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=20e6cfde377a7171 ip=75.134.144.252 udp=34899 tcp=34899
+Cornell    : INFO [09-14|16:31:28.085|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=cf7656442074963e ip=75.134.144.252 udp=45777 tcp=45777
+Rhianna    : INFO [09-14|16:31:28.089|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=5840098c4c62689e ip=75.134.144.252 udp=42499 tcp=42499
+Cleveland  : INFO [09-14|16:31:28.089|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=ce88409d4db3828e ip=75.134.144.252 udp=41179 tcp=41179
+Dante      : INFO [09-14|16:31:28.126|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=0673c088802a1003 ip=75.134.144.252 udp=45315 tcp=45315
+Haven      : INFO [09-14|16:31:28.142|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=7994aa4ef37d865a ip=75.134.144.252 udp=37481 tcp=37481
+Stefanie   : INFO [09-14|16:31:28.139|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=12e146e5687358f3 ip=75.134.144.252 udp=38019 tcp=38019
+Adriel     : INFO [09-14|16:31:28.157|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=bdfbfad36d0182b9 ip=75.134.144.252 udp=35329 tcp=35329
+Isom       : INFO [09-14|16:31:28.154|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=942215c92c8e7449 ip=75.134.144.252 udp=38453 tcp=38453
+Sidney     : INFO [09-14|16:31:28.153|p2p/enode/localnode.go:284]  New local node record                    seq=3 id=a11ae21440f44a2e ip=75.134.144.252 udp=41275 tcp=41275
+Edythe     : INFO [09-14|16:31:28.246|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=0e5629b8cb839773 ip=75.134.144.252 udp=40467 tcp=40467
+Quinton    : INFO [09-14|16:31:28.255|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=eb42212ca4309aa2 ip=75.134.144.252 udp=36941 tcp=36941
+Chanelle   : INFO [09-14|16:31:28.305|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=c35328cdbb474ea5 ip=75.134.144.252 udp=36505 tcp=36505
+Maxwell    : INFO [09-14|16:31:28.324|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=277f78c78ccbf757 ip=75.134.144.252 udp=44795 tcp=44795
+Jazmin     : INFO [09-14|16:31:28.541|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="405.649µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Jazmin     : INFO [09-14|16:31:28.552|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=3c6fb83f55235ba2 ip=75.134.144.252 udp=35625 tcp=35625
+Shaylee    : INFO [09-14|16:31:28.542|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="379.564µs" mgasps=0.000 number=1 hash="f4042c…6766c7" dirty=1.03KiB
+Shaylee    : INFO [09-14|16:31:28.543|miner/worker.go:1000]         Commit new mining work                   number=2 sealhash="89335d…853740" uncles=0 txs=0 gas=0 fees=0 elapsed="115.33µs"
+Shaylee    : INFO [09-14|16:31:28.683|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=e730b51f65934a75 ip=75.134.144.252 udp=41329 tcp=41329
+Brittany   : INFO [09-14|16:31:28.812|p2p/enode/localnode.go:284]   New local node record                    seq=3 id=246c530ff28d1ca9 ip=75.134.144.252 udp=45431 tcp=45431
+Aarchimedes: INFO [09-14|16:31:31.312|miner/worker.go:624]         Successfully sealed new block            number=5 sealhash="345f5c…a65665" hash="618177…215510" elapsed=5.000s
+Aarchimedes: INFO [09-14|16:31:31.312|miner/unconfirmed.go:85]     🔨 mined potential block                  number=5 hash="618177…215510"
+Aarchimedes: INFO [09-14|16:31:31.313|miner/worker.go:1000]        Commit new mining work                   number=6 sealhash="2da9a7…36d622" uncles=0 txs=0 gas=0 fees=0 elapsed="155.799µs"
+Aarchimedes: INFO [09-14|16:31:31.357|p2p/enode/localnode.go:284]  New local node record                    seq=6 id=c2f88eb86aa6b5a2 ip=75.134.144.252 udp=41131 tcp=41131
+Cornell    : INFO [09-14|16:31:32.764|p2p/dial.go:339]              Looking for peers                        peercount=8 tried=112 static=0
+Darrel     : INFO [09-14|16:31:32.906|p2p/dial.go:339]              Looking for peers                        peercount=9 tried=95 static=1
+Chanelle   : INFO [09-14|16:31:33.067|p2p/dial.go:339]              Looking for peers                        peercount=7 tried=80 static=2
+Cleveland  : INFO [09-14|16:31:33.199|p2p/dial.go:339]              Looking for peers                        peercount=8 tried=104 static=1
+Isom       : INFO [09-14|16:31:34.362|p2p/dial.go:339]              Looking for peers                        peercount=6 tried=108 static=0
+Aarchimedes: INFO [09-14|16:31:35.313|miner/worker.go:624]         Successfully sealed new block            number=6 sealhash="2da9a7…36d622" hash="d7b2a5…1e6191" elapsed=4.000s
+Aarchimedes: INFO [09-14|16:31:35.313|miner/unconfirmed.go:85]     🔨 mined potential block                  number=6 hash="d7b2a5…1e6191"
+Aarchimedes: INFO [09-14|16:31:35.313|miner/worker.go:1000]        Commit new mining work                   number=7 sealhash="90c106…abc9b3" uncles=0 txs=0 gas=0 fees=0 elapsed="169.798µs"
+Sidney     : INFO [09-14|16:31:38.038|miner/worker.go:624]         Successfully sealed new block            number=2 sealhash="f51bce…9105fa" hash="245df2…ab42ad" elapsed=10.000s
+Sidney     : INFO [09-14|16:31:38.039|miner/unconfirmed.go:85]     🔨 mined potential block                  number=2 hash="245df2…ab42ad"
+Sidney     : INFO [09-14|16:31:38.039|miner/worker.go:1000]        Commit new mining work                   number=3 sealhash="862407…f9b002" uncles=0 txs=0 gas=0 fees=0 elapsed="141.502µs"
+Chanelle   : INFO [09-14|16:31:38.041|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="547.75µs"  mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Dante      : INFO [09-14|16:31:38.041|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="571.46µs"  mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Dante      : INFO [09-14|16:31:38.042|miner/worker.go:1000]         Commit new mining work                   number=3 sealhash="fdbbaa…faafbf" uncles=0 txs=0 gas=0 fees=0 elapsed="134.812µs"
+Allie      : INFO [09-14|16:31:38.041|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="684.344µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Gail       : INFO [09-14|16:31:38.041|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="590.952µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Haven      : INFO [09-14|16:31:38.040|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="549.996µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Haven      : INFO [09-14|16:31:38.041|miner/worker.go:1000]         Commit new mining work                   number=3 sealhash="5432c5…f964b3" uncles=0 txs=0 gas=0 fees=0 elapsed="126.265µs"
+Stefanie   : INFO [09-14|16:31:38.042|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="663.113µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Adriel     : INFO [09-14|16:31:38.042|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="565.98µs"  mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Rhianna    : INFO [09-14|16:31:38.047|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="409.711µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Lucile     : INFO [09-14|16:31:38.047|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="318.341µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Brittany   : INFO [09-14|16:31:38.046|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed=1.573ms    mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Maxwell    : INFO [09-14|16:31:38.046|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="537.692µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Maxwell    : INFO [09-14|16:31:38.051|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=277f78c78ccbf757 ip=75.134.144.252 udp=44795 tcp=44795
+Cleveland  : INFO [09-14|16:31:38.046|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="507.967µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Darrel     : INFO [09-14|16:31:38.045|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed=1.438ms     mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Cornell    : INFO [09-14|16:31:38.045|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="296.357µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Isom       : INFO [09-14|16:31:38.045|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="446.433µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Edythe     : INFO [09-14|16:31:38.043|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="972.136µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Shaylee    : INFO [09-14|16:31:38.043|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="498.509µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Shaylee    : INFO [09-14|16:31:38.044|miner/worker.go:1000]         Commit new mining work                   number=3 sealhash="ab967d…bedd7b" uncles=0 txs=0 gas=0 fees=0 elapsed="142.929µs"
+Quinton    : INFO [09-14|16:31:38.048|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="326.423µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Darrel     : INFO [09-14|16:31:38.071|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=f3790f76bfad2e43 ip=75.134.144.252 udp=44037 tcp=44037
+Jazmin     : INFO [09-14|16:31:38.043|core/blockchain_insert.go:79] Imported new chain segment               blocks=1 txs=0 mgas=0.000 elapsed="584.136µs" mgasps=0.000 number=2 hash="245df2…ab42ad" dirty=1.84KiB
+Edythe     : INFO [09-14|16:31:38.120|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=0e5629b8cb839773 ip=75.134.144.252 udp=40467 tcp=40467
+Sidney     : INFO [09-14|16:31:38.115|p2p/enode/localnode.go:284]  New local node record                    seq=4 id=a11ae21440f44a2e ip=75.134.144.252 udp=41275 tcp=41275
+Gail       : INFO [09-14|16:31:38.090|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=3a1a75e8b384704a ip=75.134.144.252 udp=33983 tcp=33983
+Allie      : INFO [09-14|16:31:38.089|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=20e6cfde377a7171 ip=75.134.144.252 udp=34899 tcp=34899
+Cleveland  : INFO [09-14|16:31:38.109|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=ce88409d4db3828e ip=75.134.144.252 udp=41179 tcp=41179
+Shaylee    : INFO [09-14|16:31:38.153|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=e730b51f65934a75 ip=75.134.144.252 udp=41329 tcp=41329
+Stefanie   : INFO [09-14|16:31:38.126|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=12e146e5687358f3 ip=75.134.144.252 udp=38019 tcp=38019
+Quinton    : INFO [09-14|16:31:38.181|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=eb42212ca4309aa2 ip=75.134.144.252 udp=36941 tcp=36941
+Chanelle   : INFO [09-14|16:31:38.180|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=c35328cdbb474ea5 ip=75.134.144.252 udp=36505 tcp=36505
+Jazmin     : INFO [09-14|16:31:38.268|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=3c6fb83f55235ba2 ip=75.134.144.252 udp=35625 tcp=35625
+Rhianna    : INFO [09-14|16:31:38.213|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=5840098c4c62689e ip=75.134.144.252 udp=42499 tcp=42499
+Adriel     : INFO [09-14|16:31:38.215|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=bdfbfad36d0182b9 ip=75.134.144.252 udp=35329 tcp=35329
+Aarchimedes: INFO [09-14|16:31:38.314|miner/worker.go:624]         Successfully sealed new block            number=7 sealhash="90c106…abc9b3" hash="9fc427…8b9b6b" elapsed=3.000s
+Aarchimedes: INFO [09-14|16:31:38.314|miner/unconfirmed.go:85]     🔨 mined potential block                  number=7 hash="9fc427…8b9b6b"
+Aarchimedes: INFO [09-14|16:31:38.315|miner/worker.go:1000]        Commit new mining work                   number=8 sealhash="e8939e…886091" uncles=0 txs=0 gas=0 fees=0 elapsed="144.608µs"
+Cornell    : INFO [09-14|16:31:38.344|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=cf7656442074963e ip=75.134.144.252 udp=45777 tcp=45777
+Haven      : INFO [09-14|16:31:38.366|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=7994aa4ef37d865a ip=75.134.144.252 udp=37481 tcp=37481
+Brittany   : INFO [09-14|16:31:38.339|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=246c530ff28d1ca9 ip=75.134.144.252 udp=45431 tcp=45431
+Dante      : INFO [09-14|16:31:38.471|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=0673c088802a1003 ip=75.134.144.252 udp=45315 tcp=45315
+Lucile     : INFO [09-14|16:31:38.479|p2p/enode/localnode.go:284]   New local node record                    seq=4 id=8f06182ebd278944 ip=75.134.144.252 udp=37031 tcp=37031
+Stefanie   : INFO [09-14|16:31:38.527|p2p/dial.go:339]              Looking for peers                        peercount=13 tried=107 static=2
+Sidney     : INFO [09-14|16:31:39.181|p2p/dial.go:339]             Looking for peers                        peercount=8 tried=91 static=1

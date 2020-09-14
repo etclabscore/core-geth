@@ -229,6 +229,18 @@ to quickly create a Cobra application.`,
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
+
+			payload := getWorldView(world)
+			payload.Tick = globalTick
+			globalTick++
+			err = ws.WriteJSON(Event{
+				Typ:     "state",
+				Payload: payload,
+			})
+			if err != nil {
+				log.Debug("Write WS event errored", "error", err)
+			}
+
 			debounce := time.NewTicker(300 * time.Millisecond)
 			defer debounce.Stop()
 			didEvent := false

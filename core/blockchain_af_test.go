@@ -327,3 +327,248 @@ func TestEcbp1100AGSinusoidalA(t *testing.T) {
 		}
 	}
 }
+
+func TestBlockChain_AF_Difficulty(t *testing.T) {
+	// Generate the original common chain segment and the two competing forks
+	engine := ethash.NewFaker()
+
+	db := rawdb.NewMemoryDatabase()
+	genesis := params.DefaultMessNetGenesisBlock()
+	genesis.Timestamp = 1
+	genesisB := MustCommitGenesis(db, genesis)
+
+	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer chain.Stop()
+	// chain.EnableArtificialFinality(yuckyGlobalTestEnableMess)
+
+	cases := []struct {
+		easyLen, hardLen, commonAncestorN int
+		easyOffset, hardOffset            int64
+		hardGetsHead, accepted            bool
+	}{
+		// {
+		// 	1000, 800, 200,
+		// 	10, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	1000, 800, 200,
+		// 	60, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	10000, 8000, 2000,
+		// 	60, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	20000, 18000, 2000,
+		// 	10, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	20000, 18000, 2000,
+		// 	60, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	10000, 8000, 2000,
+		// 	10, 20,
+		// 	true, true,
+		// },
+
+
+		// {
+		// 	1000, 1, 999,
+		// 	10, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	1000, 10, 990,
+		// 	10, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	1000, 100, 900,
+		// 	10, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	1000, 200, 800,
+		// 	10, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	1000, 500, 500,
+		// 	10, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	1000, 999, 1,
+		// 	10, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	5000, 4000, 1000,
+		// 	10, 1,
+		// 	true, true,
+		// },
+
+		{
+			10000, 9000, 1000,
+			10, 1,
+			true, true,
+		},
+
+		{
+			7000, 6500, 500,
+			10, 1,
+			true, true,
+		},
+
+		// {
+		// 	100, 90, 10,
+		// 	10, 1,
+		// 	true, true,
+		// },
+	}
+
+	// poissonTime := func(b *BlockGen, seconds int64) {
+	// 	poisson := distuv.Poisson{Lambda: float64(seconds)}
+	// 	r := poisson.Rand()
+	// 	if r < 1 {
+	// 		r = 1
+	// 	}
+	// 	if r > float64(seconds) * 1.5 {
+	// 		r = float64(seconds)
+	// 	}
+	// 	chainreader := &fakeChainReader{config: b.config}
+	// 	b.header.Time = b.parent.Time() + uint64(r)
+	// 	b.header.Difficulty = b.engine.CalcDifficulty(chainreader, b.header.Time, b.parent.Header())
+	// 	for err := b.engine.VerifyHeader(chainreader, b.header, false);
+	// 		err != nil && err != consensus.ErrUnknownAncestor && b.header.Time > b.parent.Header().Time; {
+	// 		t.Log(err)
+	// 		r -= 1
+	// 		b.header.Time = b.parent.Time() + uint64(r)
+	// 		b.header.Difficulty = b.engine.CalcDifficulty(chainreader, b.header.Time, b.parent.Header())
+	// 	}
+	// }
+
+	for i, c := range cases {
+
+		chain.Reset()
+		easy, _ := GenerateChain(genesis.Config, genesisB, engine, db, c.easyLen, func(i int, b *BlockGen) {
+			b.SetNonce(types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64))))
+			// poissonTime(b, c.easyOffset)
+			b.OffsetTime(c.easyOffset - 10)
+		})
+		commonAncestor := easy[c.commonAncestorN-1]
+		hard, _ := GenerateChain(genesis.Config, commonAncestor, engine, db, c.hardLen, func(i int, b *BlockGen) {
+			b.SetNonce(types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64))))
+			// poissonTime(b, c.hardOffset)
+			b.OffsetTime(c.hardOffset - 10)
+		})
+		if _, err := chain.InsertChain(easy); err != nil {
+			t.Fatal(err)
+		}
+		_, err := chain.InsertChain(hard)
+		hardHead := chain.CurrentBlock().Hash() == hard[len(hard)-1].Hash()
+
+		commons := plotter.XYs{}
+		easys := plotter.XYs{}
+		hards := plotter.XYs{}
+		tdrs := plotter.XYs{}
+		antigravities := plotter.XYs{}
+		antigravities2 := plotter.XYs{}
+		for i := 0; i < c.easyLen; i++ {
+			td := chain.GetTd(easy[i].Hash(), easy[i].NumberU64())
+			point := plotter.XY{X: float64(easy[i].NumberU64()), Y: float64(td.Uint64())}
+			if i <= c.commonAncestorN {
+				commons = append(commons, point)
+			} else {
+				easys = append(easys, point)
+			}
+		}
+		// td ratios
+		for i := 0; i < c.hardLen; i++ {
+			td := chain.GetTd(hard[i].Hash(), hard[i].NumberU64())
+			point := plotter.XY{X: float64(hard[i].NumberU64()), Y: float64(td.Uint64())}
+			hards = append(hards, point)
+
+			ee := c.commonAncestorN+i
+			y := chain.getTDRatio(commonAncestor.Header(), easy[ee].Header(), hard[i].Header())
+
+			ecbp := ecbp1100AGSinusoidalA(float64(hard[i].Header().Time - commonAncestor.Header().Time))
+			ecbp2 := ecbp1100AGExpA(float64(hard[i].Header().Time - commonAncestor.Header().Time))
+			t.Log(y, ecbp, ecbp2)
+
+			tdrs = append(tdrs, plotter.XY{X: float64(hard[i].NumberU64()), Y: y})
+			antigravities = append(antigravities, plotter.XY{X: float64(hard[i].NumberU64()), Y: ecbp})
+			antigravities2 = append(antigravities2, plotter.XY{X: float64(hard[i].NumberU64()), Y: ecbp2})
+		}
+		scatterCommons, _ := plotter.NewScatter(commons)
+		scatterEasys, _ := plotter.NewScatter(easys)
+		scatterHards, _ := plotter.NewScatter(hards)
+
+		scatterTDRs, _ := plotter.NewScatter(tdrs)
+		scatterAntigravities, _ := plotter.NewScatter(antigravities)
+		scatterAntigravities2, _ := plotter.NewScatter(antigravities2)
+
+		scatterCommons.Color = color.RGBA{R: 190, G: 197, B: 236, A: 255}
+		scatterCommons.Shape = draw.CircleGlyph{}
+		scatterCommons.Radius = 2
+		scatterEasys.Color = color.RGBA{R: 152, G: 236, B: 161, A: 255} // green
+		scatterEasys.Shape = draw.CircleGlyph{}
+		scatterEasys.Radius = 2
+		scatterHards.Color = color.RGBA{R: 236, G: 106, B: 94, A: 255}
+		scatterHards.Shape = draw.CircleGlyph{}
+		scatterHards.Radius = 2
+
+		p, err := plot.New()
+		if err != nil {
+			log.Panic(err)
+		}
+		p.Add(scatterCommons)
+		p.Legend.Add("Commons", scatterCommons)
+		p.Add(scatterEasys)
+		p.Legend.Add("Easys", scatterEasys)
+		p.Add(scatterHards)
+		p.Legend.Add("Hards", scatterHards)
+		p.Title.Text = fmt.Sprintf("TD easy=%d hard=%d", c.easyOffset, c.hardOffset)
+		p.Save(1000, 600, fmt.Sprintf("plot-td-%d-%d-%d-%d-%d.png", c.easyLen, c.commonAncestorN, c.hardLen, c.easyOffset, c.hardOffset))
+
+		p, err = plot.New()
+		if err != nil {
+			log.Panic(err)
+		}
+		scatterTDRs.Color = color.RGBA{R: 236, G: 106, B: 94, A: 255} // red
+		scatterTDRs.Radius = 1
+		scatterTDRs.Shape = draw.PyramidGlyph{}
+		p.Add(scatterTDRs)
+
+		scatterAntigravities.Color = color.RGBA{R: 190, G: 197, B: 236, A: 255} // blue
+		scatterAntigravities.Radius = 1
+		scatterAntigravities.Shape = draw.PlusGlyph{}
+		p.Add(scatterAntigravities)
+
+		scatterAntigravities2.Color = color.RGBA{R: 152, G: 236, B: 161, A: 255} // green
+		scatterAntigravities2.Radius = 1
+		scatterAntigravities2.Shape = draw.PlusGlyph{}
+		p.Add(scatterAntigravities2)
+
+		p.Title.Text = fmt.Sprintf("TD Ratio easy=%d hard=%d", c.easyOffset, c.hardOffset)
+		p.Save(1000, 600, fmt.Sprintf("plot-td-ratio-%d-%d-%d-%d-%d.png", c.easyLen, c.commonAncestorN, c.hardLen, c.easyOffset, c.hardOffset))
+
+
+		if (err != nil && c.accepted) || (err == nil && !c.accepted) || (hardHead != c.hardGetsHead) {
+			t.Errorf("case=%d [easy=%d hard=%d ca=%d eo=%d ho=%d] want.accepted=%v want.hardHead=%v got.hardHead=%v err=%v",
+				i,
+				c.easyLen, c.hardLen, c.commonAncestorN, c.easyOffset, c.hardOffset,
+				c.accepted, c.hardGetsHead, hardHead, err)
+		}
+	}
+
+}

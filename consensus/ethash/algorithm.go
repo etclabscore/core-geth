@@ -39,7 +39,8 @@ const (
 	datasetGrowthBytes = 1 << 23 // Dataset growth per epoch
 	cacheInitBytes     = 1 << 24 // Bytes in cache at genesis
 	cacheGrowthBytes   = 1 << 17 // Cache growth per epoch
-	epochLength        = 30000   // Blocks per epoch
+	oldEpochLength     = 30000   // Blocks per epoch pre ECIP-1099 activation
+	newEpochLength     = 60000   // Blocks per epoch post ECIP-1099 activation
 	mixBytes           = 128     // Width of mix
 	hashBytes          = 64      // Hash length in bytes
 	hashWords          = 16      // Number of 32 bit ints in a hash
@@ -48,10 +49,31 @@ const (
 	loopAccesses       = 64      // Number of accesses in hashimoto loop
 )
 
+// Activation block for ECIP-1099 (etchash)
+// mainnet: 11460000
+// mordor: 2340000
+// TODO: Move to chain configs - iquidus
+const ecip1099Block = uint64(11460000)
+
+// calcEpochLength returns the epoch length for a given block number (ECIP-1099)
+func calcEpochLength(block uint64) uint64 {
+	if block < ecip1099Block {
+		return oldEpochLength
+	}
+	return newEpochLength
+}
+
+// calcEpoch returns the epoch for a given block number (ECIP-1099)
+func calcEpoch(block uint64) int {
+	epochLength := calcEpochLength(block)
+	epoch := int(block / epochLength)
+	return epoch
+}
+
 // cacheSize returns the size of the ethash verification cache that belongs to a certain
 // block number.
 func cacheSize(block uint64) uint64 {
-	epoch := int(block / epochLength)
+	epoch := calcEpoch(block)
 	if epoch < maxEpoch {
 		return cacheSizes[epoch]
 	}
@@ -72,7 +94,7 @@ func calcCacheSize(epoch int) uint64 {
 // datasetSize returns the size of the ethash mining dataset that belongs to a certain
 // block number.
 func datasetSize(block uint64) uint64 {
-	epoch := int(block / epochLength)
+	epoch := calcEpoch(block)
 	if epoch < maxEpoch {
 		return datasetSizes[epoch]
 	}
@@ -120,11 +142,11 @@ func makeHasher(h hash.Hash) hasher {
 // dataset.
 func seedHash(block uint64) []byte {
 	seed := make([]byte, 32)
-	if block < epochLength {
+	if block < oldEpochLength {
 		return seed
 	}
 	keccak256 := makeHasher(sha3.NewLegacyKeccak256())
-	for i := 0; i < int(block/epochLength); i++ {
+	for i := 0; i < int(block/oldEpochLength); i++ {
 		keccak256(seed, seed)
 	}
 	return seed

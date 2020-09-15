@@ -9,6 +9,7 @@ import (
 	llog "log"
 	"math/big"
 	"math/rand"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -53,7 +54,7 @@ type ageth struct {
 	quitChan          chan struct{}
 }
 
-func mustStartGethInstance(id string) (*exec.Cmd, io.ReadCloser, string) {
+func mustStartGethInstance(gethPath, id string) (*exec.Cmd, io.ReadCloser, string) {
 	datadir := filepath.Join(os.TempDir(), "ageth", id)
 	os.MkdirAll(datadir, os.ModePerm)
 
@@ -113,6 +114,7 @@ func newAgeth(rpcEndpoint string) *ageth {
 
 	// ID
 	var name = faker.Name().FirstName()
+
 	if len(runningRegistry) == 0 {
 		name = "Aarchimedes"
 	}
@@ -140,8 +142,10 @@ func newAgeth(rpcEndpoint string) *ageth {
 	}
 	a.log = log.Root().New("source", a.name)
 
-	if rpcEndpoint == "" {
-		a.command, a.logr, a.rpcEndpoint = mustStartGethInstance(name)
+	u, _ := url.Parse(rpcEndpoint)
+	isLocal := u.Scheme == ""
+	if isLocal {
+		a.command, a.logr, a.rpcEndpoint = mustStartGethInstance(rpcEndpoint, name)
 	}
 
 	return a

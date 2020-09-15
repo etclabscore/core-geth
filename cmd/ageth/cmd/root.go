@@ -24,8 +24,6 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"os/exec"
-	"path/filepath"
 	"sync"
 	"time"
 
@@ -105,8 +103,6 @@ func getAgethByEnode(en string) *ageth {
 	return nil
 }
 
-var gethPath = "./build/bin/geth" // "/home/ia/go/src/github.com/ethereum/go-ethereum/build/bin/geth"
-
 // since geth can/should add and remove peers sovereignly, as well as manually,
 // we'll only send notifications that some peer event happened. It is up
 // to the reporter to provide a global state of connections.
@@ -157,37 +153,16 @@ to quickly create a Cobra application.`,
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if len(args) > 0 {
-			gethPath = args[0]
-		}
-
-		var reportsDir string
-		if reportToFS {
-			reportsDir = filepath.Join("reports", fmt.Sprintf("%d", time.Now().Unix()))
-			err := os.MkdirAll(reportsDir, os.ModePerm)
-			if err != nil {
-				llog.Fatal(err)
-			}
-			gethVersionCmd := exec.Command(gethPath, "version")
-			gethVersionBytes, err := gethVersionCmd.CombinedOutput()
-			if err != nil {
-				llog.Fatal(err)
-			}
-			err = ioutil.WriteFile(filepath.Join(reportsDir, "metadata.txt"), gethVersionBytes, os.ModePerm)
-			if err != nil {
-				llog.Fatal(err)
-			}
-		}
-
 		// "Global"s, don't touch.
 		wsEventChan := make(chan interface{}, 10000)
 		reportEventChan := make(chan interface{})
+		globalState := getWorldView(world)
 		defer close(wsEventChan)
 
 		go func() {
 			var fi *os.File
-			if reportToFS {
-				fi, err := os.OpenFile(filepath.Join(reportsDir, "log.txt"), os.O_CREATE|os.O_RDWR, os.ModePerm)
+			if reportToFS != "" {
+				fi, err := os.OpenFile(reportToFS, os.O_CREATE|os.O_RDWR, os.ModePerm)
 				if err != nil {
 					llog.Fatal(err)
 				}
@@ -202,10 +177,11 @@ to quickly create a Cobra application.`,
 						// log.Warn("failed to write event")
 					}
 
-					if reportToFS {
+					globalState = getWorldView(world)
+
+					if reportToFS != "" {
 						// write to stable storage
-						state := getWorldView(world)
-						b, err := json.Marshal(state)
+						b, err := json.Marshal(globalState)
 						if err != nil {
 							llog.Fatal(err)
 						}
@@ -230,7 +206,7 @@ to quickly create a Cobra application.`,
 				return
 			}
 
-			payload := getWorldView(world)
+			payload := globalState
 			payload.Tick = globalTick
 			globalTick++
 			err = ws.WriteJSON(Event{
@@ -263,8 +239,8 @@ to quickly create a Cobra application.`,
 						continue
 					}
 					mean, _ := stats.Mean(tookData)
-					if mean < 10 {
-						mean = 10
+					if mean < 50 {
+						mean = 50
 					}
 					tookData = []float64{}
 					log.Debug("Update ticker interval", "interval.ms", mean)
@@ -281,7 +257,7 @@ to quickly create a Cobra application.`,
 				select {
 				case <-debounce.C:
 					if didEvent {
-						payload := getWorldView(world)
+						payload := globalState
 						payload.Tick = globalTick
 						globalTick++
 						err := ws.WriteJSON(Event{
@@ -295,19 +271,6 @@ to quickly create a Cobra application.`,
 					}
 				case <-wsEventChan:
 					didEvent = true
-					// On any event, just send out the whole global state.
-					// Surely this isn't as efficient as can be, but saves me headaches,
-					// and it's not _that_ much data.
-					// payload := getWorldView(world)
-					// payload.Tick = globalTick
-					// globalTick++
-					// err := ws.WriteJSON(Event{
-					// 	Typ:     "state",
-					// 	Payload: payload,
-					// })
-					// if err != nil {
-					// 	log.Debug("Write WS event errored", "error", err)
-					// }
 				default:
 				}
 			}
@@ -372,7 +335,7 @@ func Execute() {
 	}
 }
 
-var reportToFS bool
+var reportToFS string
 
 func init() {
 	cobra.OnInitialize(initConfig)
@@ -385,7 +348,7 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolVarP(&reportToFS, "report", "p", false, "Write a report to a timestamped directory")
+	rootCmd.Flags().StringVarP(&reportToFS, "report", "p", "", "Write reporting logs to a given file")
 }
 
 // initConfig reads in config file and ENV variables if set.

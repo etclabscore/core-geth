@@ -246,8 +246,8 @@ to quickly create a Cobra application.`,
 						continue
 					}
 					mean, _ := stats.Mean(tookData)
-					if mean < 300 {
-						mean = 300
+					if mean < 100 {
+						mean = 100
 					}
 					tookData = []float64{}
 					log.Debug("Update ticker interval", "interval.ms", mean)

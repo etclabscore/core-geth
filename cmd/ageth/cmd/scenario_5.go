@@ -21,25 +21,26 @@ func scenario5(nodes *agethSet) {
 	badGuy.run()
 	badGuy.startMining(5)
 
-	goodGuys := nodes.subset(1, world.len())
+	goodGuys := nodes.subset(1, nodes.len())
 
-	// iterate number of desired guys, with the index actually tracking
-	// the world set though.
-	// no safety checks to make sure the world is providing us with enough
-	// guys because this whole thing Austin is probably going to overwrite.
-	for i := 0; i < goodGuys.len(); i++ {
-		go func(i int) {
-			guy := goodGuys.indexed(i)
-			guy.run()
-			if goodGuys.len() > 0 {
-				for j := 0; j < goodGuys.len()/2; j++ {
-					guy.addPeer(goodGuys.random())
+	setupGoodGuys := func() {
+		// iterate number of desired guys, with the index actually tracking
+		// the world set though.
+		// no safety checks to make sure the world is providing us with enough
+		// guys because this whole thing Austin is probably going to overwrite.
+		for i := 0; i < goodGuys.len(); i++ {
+				guy := goodGuys.indexed(i)
+				guy.run()
+				if i > 0 {
+					// Connect them all to each other.
+					for j := 0; j < i; j++ {
+						guy.addPeer(goodGuys.indexed(j))
+					}
 				}
-			}
-			if i < goodGuys.len()/3 {
-				guy.startMining(13)
-			}
-		}(i)
+				if i < goodGuys.len()/3 {
+					guy.startMining(13)
+				}
+		}
 	}
 
 	// badGuyAttack assumes that the bad guy is disconnected from the network (original sin).
@@ -104,9 +105,9 @@ func scenario5(nodes *agethSet) {
 			}
 		}
 	}
-	time.Sleep(time.Duration(5+rand.Int31n(25)) * time.Second)
+	// time.Sleep(time.Duration(5+rand.Int31n(25)) * time.Second)
+	setupGoodGuys()
 	for {
-		if !goodGuys.ready() { continue }
 		badGuyAttack()
 		time.Sleep(time.Duration(rand.Int31n(10)) * time.Second)
 	}

@@ -147,7 +147,7 @@ func newAgeth(rpcEndpoint string) *ageth {
 		log.Info("Starting local geth", "name", name, "executable", rpcEndpoint)
 		a.command, a.logr, a.rpcEndpointOrExecutablePath = mustStartGethInstance(rpcEndpoint, name)
 	} else {
-		log.Info("Connecting to remote geth", "name", name, "endpoint", rpcEndpoint)
+		log.Info("Will connect with remote geth", "name", name, "endpoint", rpcEndpoint)
 		// a.rpcEndpointOrExecutablePath = rpcEndpoint
 	}
 	a.log = log.Root().New("source", a.name, "at", a.rpcEndpointOrExecutablePath)
@@ -493,7 +493,7 @@ func (a *ageth) addPeer(b *ageth) {
 	if !a.peers.push(b) {
 		return
 	}
-	a.log.Debug("Add peer", "target", b.name, "status", ok)
+	a.log.Info("Add peer", "target", b.name, "enode", b.enode, "status", ok)
 	if a.eventChan != nil {
 		a.eventChan <- eventPeer{}
 	}

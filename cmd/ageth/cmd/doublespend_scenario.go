@@ -36,23 +36,24 @@ func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float
       nextMiner.startMining(hashtime)
     }
     log.Info("Started miners")
-    time.Sleep(30)
+    time.Sleep(30 * time.Second)
     blockNumber := nodes.headMax()
     for {
       if nodes.headMax() > blockNumber + 5 {
         break
       }
-      time.Sleep(1)
+      time.Sleep(1 * time.Second)
     }
     log.Info("Starting attacker")
-    badGuy.setPeerCount(0)
+    // badGuy.setPeerCount(0)
+    resumePeering := badGuy.refusePeers()
     forkBlock := badGuy.block()
     badGuy.startMining(blockTime / 2)
 
     // Once a second, check to see if the bad guy's block difficulty has
     // reached the target
     for uint64(float64(forkBlock.difficulty) * difficultyRatio) >= badGuy.block().difficulty && badGuy.block().number < forkBlock.number + attackBlocks {
-      time.Sleep(1)
+      time.Sleep(1 * time.Second)
     }
     log.Info("Attacker reached target difficulty")
     // The target difficulty has been reached. Mining at blockTime will keep it
@@ -61,19 +62,20 @@ func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float
       badGuy.startMining(blockTime)
     }
     for badGuy.block().number < forkBlock.number + attackBlocks {
-      time.Sleep(1)
+      time.Sleep(1 * time.Second)
     }
     log.Info("Attacker mined %v blocks", attackBlocks)
     finalAttackBlock := badGuy.block()
     badGuy.stopMining()
-    badGuy.setPeerCount(25)
+    // badGuy.setPeerCount(25)
+    resumePeering()
     for badGuy.getPeerCount() < 5 {
       // Sleep until the badguy has found 5 peers
-      time.Sleep(1)
+      time.Sleep(1 * time.Second)
     }
 
     // Sleep another 30 seconds for blocks to propagate
-    time.Sleep(30)
+    time.Sleep(30 * time.Second)
 
     b, err := badGuy.eclient.BlockByNumber(context.Background(), big.NewInt(int64(finalAttackBlock.number)))
     if err != nil {

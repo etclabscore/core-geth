@@ -631,3 +631,27 @@ func (a *ageth) getPeerCount() int64 {
 	a.client.CallContext(context.Background(), &result, "net_peerCount")
 	return result.ToInt().Int64()
 }
+
+func (a *ageth) refusePeers() func() {
+	quit := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-quit:
+				returns
+			default:
+			}
+			peers := []*p2p.PeerInfo{}
+			err := a.client.Call(&peers, "admin_peers")
+			if err != nil {
+				a.log.Crit("admin_peers errored", "error", err)
+			}
+			for _, peer := range peers {
+				var result interface{}
+				err := a.client.Call(&result, "admin_removePeer", peer.Enode)
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
+	}()
+	return func() { quit <- struct{}{} }
+}

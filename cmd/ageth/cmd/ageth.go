@@ -9,11 +9,11 @@ import (
 	llog "log"
 	"math/big"
 	"math/rand"
-	"net"
 	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -25,6 +25,7 @@ import (
 	log "github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/rpc"
 	"syreclabs.com/go/faker"
 )
@@ -241,21 +242,6 @@ func (a *ageth) stop() {
 	close(a.quitChan)
 }
 
-// Get preferred outbound ip of this machine
-func getOutboundIP() net.IP {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
-	if err != nil {
-		llog.Fatal(err)
-	}
-	defer conn.Close()
-
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-
-	llog.Println("Got local IP", localAddr.IP.String())
-
-	return localAddr.IP
-}
-
 // run is idempotent.
 // It should be called whenever you first want to startLocal using the ageth.
 // It will startLocal the instance if it's not already started.
@@ -344,16 +330,22 @@ func (a *ageth) run() {
 	n := enode.MustParse(nodeInfoRes.Enode)
 	nv4 := n.URLv4()
 	if !a.isLocal() {
-		// if you're running "remote" geths locally on your computer, there may
-		// be issues when you try to add them as peers.
-		//
-		// remote endpoint, need to swap public ip for 127.0.0.1 if same as LAN
-		// local := getOutboundIP() // this doesn't work for me.... hm...
-		// if local.Equal(n.IP()) /*&& !netutil.IsLAN(n.IP())*/ {
-		// 	b := []byte(nv4)
-		// 	b = regexp.MustCompile(`[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}`).ReplaceAll(b, []byte("127.0.0.1"))
-		// 	nv4 = string(b)
-		// }
+		iface, err := nat.Parse("pmp")
+		if err != nil {
+			a.log.Crit("Parse gateway errored", "error", err)
+		}
+		extIp, err := iface.ExternalIP()
+		if err != nil {
+			a.log.Crit("External IP errored", "error", err)
+		}
+
+		a.log.Warn("Testing swap local/external tcp pmp", "ext", extIp.String(), "local", n.IP().String())
+
+		if extIp.Equal(n.IP()) {
+			b := []byte(nv4)
+			b = regexp.MustCompile(`[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}`).ReplaceAll(b, []byte("127.0.0.1"))
+			nv4 = string(b)
+		}
 	}
 	a.log.Info("Assigned self enode", "enode", nv4)
 	a.enode = nv4

@@ -7,7 +7,7 @@ A 400-block limit, assuming the attacker has the capital for 7k blocks, means th
 
 <head>
     <meta charset='utf-8'>
-    <title>Chain View</title>
+    <title>MESSNet Observe</title>
     <style>
         #blockgraph {
             /*border-top: 1px dashed lightgray;*/
@@ -15,7 +15,6 @@ A 400-block limit, assuming the attacker has the capital for 7k blocks, means th
         .axis {
             font: 8px sans-serif;
         }
-
         .axis path,
         .axis line {
             fill: none;
@@ -41,20 +40,60 @@ A 400-block limit, assuming the attacker has the capital for 7k blocks, means th
             font: 8px sans-serif;
             margin-block-end: 0;
         }
+        .container {
+            margin: auto;
+            max-width: 95vw;
+        }
+        .nodegraph-wrapper {
+            max-width: 1200px;
+            margin: auto;
+        }
+        .fancy-font {
+            font-family: 'Accanthis ADF Std';
+        }
     </style>
 </head>
 
 <body>
+<p style=""><span style="float:right; text-align: right; max-width: 42vw;">
+        <span style="">M</span>
+        <span style="">E</span>
+        <span style="">S</span>
+        <span style="">S</span>
+        <span style="">N</span>
+        <span style="">E</span>
+        <span style="">T</span>&nbsp;
+
+        <!--<span style="color: orangered;">M</span>-->
+        <!--<span style="color: dodgerblue;">E</span>-->
+        <!--<span style="color: dodgerblue;">S</span>-->
+        <!--<span style="color: dodgerblue;">S</span>-->
+        <!--<span style="color: gold;">N</span>-->
+        <!--<span style="color: gold;">E</span>-->
+        <!--<span style="color: gold;">T</span>&nbsp;-->
+
+        <br>
+        <span style="font-size: 0.9em; color: gray;">Visualization of an adhoc testnet implementing Ethereum Classic's
+            <a href="https://github.com/ethereumclassic/ECIPs/pull/373">MESS Security Feature</a>
+            enduring repeated and diverse attacks by an indefatigable adversary.</span>
+    </span>Ageth&nbsp;<b>Observe</b></p>
+
 <div id="metadata">
     <p class="info">
         tick=<span id="latest-tick">x</span>&nbsp;/&nbsp;
         block=<span id="latest-block-number">0</span>
     </p>
 </div>
-<svg id="nodegraph"></svg>
-<p class="info">Ratio block difficulty sum by etherbase (global, not canonical)</p>
-<svg id="etherbasedifficultygraph"></svg>
-<svg id="blockgraph"></svg>
+<div class="container">
+    <div class="nodegraph-wrapper">
+        <svg id="nodegraph"></svg>
+    </div>
+    <div class="col-md">
+        <p class="info">Ratio block difficulty sum by etherbase (global, not canonical)</p>
+        <svg id="etherbasedifficultygraph"></svg>
+        <svg id="blockgraph"></svg>
+    </div>
+</div>
 <script src="https://d3js.org/d3.v6.min.js"></script>
 <script>
     // Adjust this value to change how many blocks (depth-wise) are shown in the history
@@ -81,7 +120,7 @@ A 400-block limit, assuming the attacker has the capital for 7k blocks, means th
 
     // Node and block graphs use same dimensions.
     const width = 666,
-        height = 380; // 420;
+        height = 420;
 
     // Etherbase-difficulty graph.
 

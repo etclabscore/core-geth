@@ -10,7 +10,7 @@ import (
 
 func scenario4(eventChan chan interface{}) {
 	goodGuys := newAgethSet()
-	badGuy := newAgeth()
+	badGuy := newAgeth("")
 	badGuy.eventChan = eventChan
 		badGuy.run()
 		badGuy.startMining(10)
@@ -26,7 +26,7 @@ func scenario4(eventChan chan interface{}) {
 
 	for i := 0; i < numberOfGoodGuys; i++ {
 		go func(i int) {
-			guy := newAgeth()
+			guy := newAgeth("")
 			guy.eventChan = eventChan
 			guy.run()
 			if world.len() > 0 {

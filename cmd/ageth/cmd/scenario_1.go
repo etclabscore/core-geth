@@ -37,7 +37,7 @@ func scenario1(eventChan chan interface{}) {
 	badGuyWaitsUntilNAboveGoodGuys := uint64(100)
 	goodGuysPeerTarget := (numberOfGoodGuys / 2)
 
-	badGuy := newAgeth()
+	badGuy := newAgeth("")
 	badGuy.eventChan = eventChan
 	badGuy.behaviorsInterval = 60 * time.Second
 	badGuy.behaviors = append(badGuy.behaviors, func() {
@@ -56,7 +56,7 @@ func scenario1(eventChan chan interface{}) {
 
 	for i := 0; i < numberOfGoodGuys; i++ {
 		go func(i int) {
-			guy := newAgeth()
+			guy := newAgeth("")
 			guy.eventChan = eventChan
 			guy.run()
 			if goodGuys.len() > 0 {
@@ -65,7 +65,6 @@ func scenario1(eventChan chan interface{}) {
 				}
 			}
 			if i < numberOfGoodGuyMiners {
-				log.Info("Start mining", guy.name)
 				guy.startMining(eachGoodGuyMiningPower)
 			}
 			goodGuys.push(guy)

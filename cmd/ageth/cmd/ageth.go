@@ -29,18 +29,18 @@ import (
 )
 
 type ageth struct {
-	name        string
-	rpcEndpoint string
-	command     *exec.Cmd
-	proc        *os.Process
-	log         log.Logger
-	logr        io.ReadCloser
-	client      *rpc.Client
-	eclient     *ethclient.Client
-	newheadChan chan *types.Header
-	latestBlock *types.Block
-	headsub     ethereum.Subscription
-	errChan     chan error
+	name              string
+	rpcEndpoint       string
+	command           *exec.Cmd
+	proc              *os.Process
+	log               log.Logger
+	logr              io.ReadCloser
+	client            *rpc.Client
+	eclient           *ethclient.Client
+	newheadChan       chan *types.Header
+	latestBlock       *types.Block
+	headsub           ethereum.Subscription
+	errChan           chan error
 	eventChan         chan interface{}
 	enode             string
 	mining            int
@@ -77,7 +77,7 @@ func mustStartGethInstance(id string) (*exec.Cmd, io.ReadCloser, string) {
 		"--keystore", ks,
 		"--fakepow",
 		"--syncmode", "full",
-		"--rpcEndpoint", ipcpath,
+		"--ipcpath", ipcpath,
 		"--port", "0",
 		"--maxpeers", "25",
 		"--debug",
@@ -87,14 +87,16 @@ func mustStartGethInstance(id string) (*exec.Cmd, io.ReadCloser, string) {
 		"--ethash.cachesinmem", "0",
 		"--ethash.cachesondisk", "0",
 
+		// "--nodiscover",
+
 		"--metrics",
 		"--metrics.influxdb",
 		"--metrics.influxdb.database", "db0",
 
-		// "--nodiscover",
+		"--nodiscover",
 		// "--mine", "--miner.threads", "0",
 		// "--vmodule=eth/*=5,p2p=5,core/*=5",
-		// "--verbosity", "5",
+		"--verbosity", "3",
 
 	}
 	geth := exec.Command(gethPath, gethArgs...)
@@ -125,10 +127,11 @@ func newAgeth(rpcEndpoint string) *ageth {
 		longestName = len(name)
 	}
 	a := &ageth{
-		name:        name,
+		name: name,
+		// These variables will be set depending if the node is local or remote (currently conventionalized as ipc or not).
 		// command:     geth,
-		// rpcEndpoint:     rpcEndpoint,
 		// logr:        p,
+		// rpcEndpoint:     rpcEndpoint,
 		newheadChan: make(chan *types.Header),
 		errChan:     make(chan error),
 		peers:       newAgethSet(),
@@ -172,6 +175,9 @@ func (a *ageth) block() block {
 }
 
 func (a *ageth) start() {
+	if a.command == nil {
+		return
+	}
 	err := a.command.Start()
 	if err != nil {
 		a.log.Crit("start geth", "error", err)
@@ -199,47 +205,42 @@ func (a *ageth) stop() {
 		a.log.Crit("stop geth", "error", err)
 	}
 	delete(enodeNames, a.name)
-	os.Remove(a.rpcEndpoint)
+	os.Remove(a.rpcEndpoint) // this will fail if the path isn't an FS path. so ignore the error
+
+	// Send a stupid number of quits to the quit channel to close all goroutines.
+	//
 	for i := 0; i < 100; i++ {
 		a.quitChan <- struct{}{}
 	}
+	close(a.quitChan)
 }
 
 func (a *ageth) run() {
 	a.log.Info("Running ageth", "name", a.name)
 	var ready bool
+
 	a.start()
-	go func() {
-		buf := bufio.NewScanner(a.logr)
-		for buf.Scan() {
-			text := buf.Text()
-			// Un/comment me to stream verbose geth logs on stdout.
-			// String repeater is poor mans columnar alignment.
-			fmt.Printf("%s%s: %s\n", a.name, strings.Repeat(" ", longestName-len(a.name)), text)
 
-			// Wait for geth's IPC to initialize.
-			if strings.Contains(text, "IPC endpoint opened") {
-				ready = true
+	if a.command != nil {
+		go func() {
+			buf := bufio.NewScanner(a.logr)
+			for buf.Scan() {
+				text := buf.Text()
+
+				// Un/comment me to stream verbose geth logs on stdout.
+				// String repeater is poor mans columnar alignment.
+				fmt.Printf("%s%s: %s\n", a.name, strings.Repeat(" ", longestName-len(a.name)), text)
+
+				// Wait for geth's IPC to initialize.
+				if strings.Contains(text, "IPC endpoint opened") {
+					time.Sleep(3*time.Second)
+					ready = true
+				}
 			}
-
-			// Parse and assign ageth's enode from logs.
-			if strings.Contains(text, "self=") {
-				ee := regexp.MustCompile(`enode[a-zA-Z0-9\.\?=\:@\/]+`).FindString(text)
-				a.log.Info("Found enode", "enode", ee)
-
-				n := enode.MustParse(ee)
-				a.enode = n.URLv4()
-
-				enodeNamesMu.Lock()
-				enodeNames[a.name] = a.enode
-				enodeNamesMu.Unlock()
-
-				regMu.Lock()
-				runningRegistry[a.enode] = a
-				regMu.Unlock()
-			}
-		}
-	}()
+		}()
+	} else {
+		ready = true
+	}
 	go func() {
 		for {
 			select {
@@ -261,12 +262,13 @@ func (a *ageth) run() {
 		}
 	}()
 
-	a.log.Info("Waiting for IPC to start")
+	a.log.Info("Waiting for things to be ready")
 	for !ready {
 	}
-	a.log.Info("IPC started")
+	a.log.Info("Ageth ready")
 
-	cl, err := rpc.DialIPC(context.Background(), a.rpcEndpoint)
+	// Set up RPC clients.
+	cl, err := rpc.Dial(a.rpcEndpoint)
 	if err != nil {
 		log.Crit("rpc client", "error", err)
 	}
@@ -277,6 +279,35 @@ func (a *ageth) run() {
 		log.Crit("dial ethclient", "error", err)
 	}
 	a.eclient = ecl
+
+	// Get self enode information
+	nodeInfoRes := p2p.NodeInfo{}
+	err = a.client.Call(&nodeInfoRes, "admin_nodeInfo")
+	if err != nil {
+		a.log.Crit("admin_nodeInfo errored", "error", err)
+	}
+
+	n := enode.MustParse(nodeInfoRes.Enode)
+	nv4 := n.URLv4()
+	if a.command != nil {
+		// is local, swap public ip for local
+		b := []byte(nv4)
+		b = regexp.MustCompile(`[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}`).ReplaceAll(b, []byte("127.0.0.1"))
+		nv4 = string(b)
+	}
+	a.log.Info("Assigned self enode", "enode", nv4)
+	a.enode = nv4
+
+	// Register self enode information to global map
+	enodeNamesMu.Lock()
+	enodeNames[a.name] = a.enode
+	enodeNamesMu.Unlock()
+
+	regMu.Lock()
+	runningRegistry[a.enode] = a
+	regMu.Unlock()
+
+	// Subscribe to the client's new head
 	sub, err := a.eclient.SubscribeNewHead(context.Background(), a.newheadChan)
 	if err != nil {
 		a.log.Crit("subscribe new head", "error", err)

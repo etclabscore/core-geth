@@ -22,7 +22,7 @@ func scenario3(eventChan chan interface{}) {
 	numberOfMinions := 20
 
 	for i := 0; i < numberOfBadGuys; i++ {
-		badGuy := newAgeth()
+		badGuy := newAgeth("")
 		badGuy.eventChan = eventChan
 		badGuy.run()
 		badGuy.startMining(eachBadGuyMiningPower)
@@ -31,7 +31,7 @@ func scenario3(eventChan chan interface{}) {
 	}
 	for i := 0; i < numberOfGoodGuys; i++ {
 		go func(i int) {
-			guy := newAgeth()
+			guy := newAgeth("")
 			guy.eventChan = eventChan
 			guy.run()
 			// guy.withStandardPeerChurn(goodGuysPeerTarget, goodGuys)

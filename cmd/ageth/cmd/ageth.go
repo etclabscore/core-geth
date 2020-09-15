@@ -621,3 +621,13 @@ func (a *ageth) setHead(head *types.Block) {
 func (a *ageth) onNewHead(head *types.Block) {
 
 }
+
+func (a *ageth) setPeerCount(count int) {
+	// Need an RPC call for this to work
+}
+
+func (a *ageth) getPeerCount() int64 {
+	var result hexutil.Big
+	a.client.CallContext(context.Background(), &result, "net_peerCount")
+	return result.ToInt().Int64()
+}

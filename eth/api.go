@@ -277,6 +277,7 @@ func (api *PrivateAdminAPI) MaxPeers(n int) (bool, error) {
 		api.eth.protocolManager.removePeer(p.id)
 	}
 	return true, nil
+}
 func (api *PrivateAdminAPI) Ecbp1100(blockNr rpc.BlockNumber) (bool, error) {
 	i := uint64(blockNr.Int64())
 	err := api.eth.blockchain.Config().SetECBP1100Transition(&i)

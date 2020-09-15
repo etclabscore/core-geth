@@ -145,6 +145,8 @@ func newAgeth(rpcEndpoint string) *ageth {
 	isLocal := u.Scheme == ""
 	if isLocal {
 		a.command, a.logr, a.rpcEndpointOrExecutablePath = mustStartGethInstance(rpcEndpoint, name)
+	} else {
+		a.rpcEndpointOrExecutablePath = rpcEndpoint
 	}
 	a.log = log.Root().New("source", a.name, "at", a.rpcEndpointOrExecutablePath)
 
@@ -357,7 +359,7 @@ func (a *ageth) run() {
 				a.errChan <- err
 			case <-a.quitChan:
 				return
-			default:
+			// default:
 			}
 		}
 	}()
@@ -368,7 +370,7 @@ func (a *ageth) run() {
 				a.log.Error("errored", "error", e)
 			case <-a.quitChan:
 				return
-			default:
+			// default:
 			}
 		}
 	}()
@@ -633,25 +635,14 @@ func (a *ageth) getPeerCount() int64 {
 }
 
 func (a *ageth) refusePeers() func() {
-	quit := make(chan struct{})
-	go func() {
-		for {
-			select {
-			case <-quit:
-				returns
-			default:
-			}
-			peers := []*p2p.PeerInfo{}
-			err := a.client.Call(&peers, "admin_peers")
-			if err != nil {
-				a.log.Crit("admin_peers errored", "error", err)
-			}
-			for _, peer := range peers {
-				var result interface{}
-				err := a.client.Call(&result, "admin_removePeer", peer.Enode)
-			}
-			time.Sleep(100 * time.Millisecond)
+	peers := []*p2p.PeerInfo{}
+	a.client.Call(&peers, "admin_peers")
+	var result interface{}
+	a.client.Call(&result, "admin_maxPeers", 0)
+	return func() {
+		a.client.Call(&result, "admin_maxPeers", 10)
+		for _, peer := range peers {
+			a.client.Call(&result, "admin_addPeer", peer.Enode)
 		}
-	}()
-	return func() { quit <- struct{}{} }
+	}
 }

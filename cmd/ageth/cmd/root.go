@@ -29,6 +29,8 @@ import (
 	"os"
 	"sync"
 	"time"
+	// _ "net/http/pprof"
+
 
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p/enode"
@@ -196,7 +198,7 @@ to quickly create a Cobra application.`,
 						}
 					}
 
-				default:
+				// default:
 				}
 			}
 		}()
@@ -276,7 +278,7 @@ to quickly create a Cobra application.`,
 					}
 				case <-wsEventChan:
 					didEvent = true
-				default:
+				// default:
 				}
 			}
 		})
@@ -342,12 +344,14 @@ to quickly create a Cobra application.`,
 		for _, e := range listEndpoints {
 			g := newAgeth(e)
 			g.eventChan = reportEventChan
+			g.run()
 			world.push(g)
 		}
 
 		for {
 			for i, s := range []scenario{
-				scenario5,
+				scenarioGenerator(13, 25, 1.5),
+				stabilize,
 			}{
 				log.Info("Running scenario", "index", i)
 				globalTick = 0

@@ -18,9 +18,14 @@ type finalReport struct {
   Nodes map[string]common.Hash
 }
 
+func stabilize(nodes *agethSet) {
+  for len(nodes.distinctChains()) > 1 {
+    time.Sleep(30)
+  }
+}
 
-func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float64) func(*agethSet) error {
-  return func(nodes *agethSet) error {
+func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float64) func(*agethSet) {
+  return func(nodes *agethSet) {
     // Setup
     for _, node := range nodes.all() {
       node.startMining(blockTime * 3 / 2)
@@ -109,9 +114,9 @@ func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float
       report.Nodes[node.name] = node.block().hash
     }
     data, err := json.Marshal(report)
-    if err != nil { return err }
+    if err != nil { log.Error("Error marshalling final report", "err", err) }
     os.Stdout.Write(data)
     os.Stdout.WriteString("\n")
-    return nil
+    badGuy.truncateHead(forkBlock.number) // Reset badGuy to the fork block
   }
 }

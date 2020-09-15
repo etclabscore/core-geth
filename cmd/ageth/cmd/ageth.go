@@ -9,11 +9,11 @@ import (
 	llog "log"
 	"math/big"
 	"math/rand"
+	"net"
 	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"time"
 
@@ -241,6 +241,21 @@ func (a *ageth) stop() {
 	close(a.quitChan)
 }
 
+// Get preferred outbound ip of this machine
+func getOutboundIP() net.IP {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		llog.Fatal(err)
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+
+	llog.Println("Got local IP", localAddr.IP.String())
+
+	return localAddr.IP
+}
+
 // run is idempotent.
 // It should be called whenever you first want to startLocal using the ageth.
 // It will startLocal the instance if it's not already started.
@@ -328,11 +343,17 @@ func (a *ageth) run() {
 
 	n := enode.MustParse(nodeInfoRes.Enode)
 	nv4 := n.URLv4()
-	if a.command != nil {
-		// is local, swap public ip for local
-		b := []byte(nv4)
-		b = regexp.MustCompile(`[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}`).ReplaceAll(b, []byte("127.0.0.1"))
-		nv4 = string(b)
+	if !a.isLocal() {
+		// if you're running "remote" geths locally on your computer, there may
+		// be issues when you try to add them as peers.
+		//
+		// remote endpoint, need to swap public ip for 127.0.0.1 if same as LAN
+		// local := getOutboundIP() // this doesn't work for me.... hm...
+		// if local.Equal(n.IP()) /*&& !netutil.IsLAN(n.IP())*/ {
+		// 	b := []byte(nv4)
+		// 	b = regexp.MustCompile(`[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}`).ReplaceAll(b, []byte("127.0.0.1"))
+		// 	nv4 = string(b)
+		// }
 	}
 	a.log.Info("Assigned self enode", "enode", nv4)
 	a.enode = nv4

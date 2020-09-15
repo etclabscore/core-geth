@@ -133,18 +133,22 @@ func newAgeth(rpcEndpoint string) *ageth {
 		// These variables will be set depending if the node is local or remote (currently conventionalized as ipc or not).
 		// command:     geth,
 		// logr:        p,
-		// rpcEndpointOrExecutablePath:     rpcEndpointOrExecutablePath,
-		newheadChan: make(chan *types.Header),
-		errChan:     make(chan error),
-		peers:       newAgethSet(),
-		td:          big.NewInt(0),
-		quitChan:    make(chan struct{}, 100),
+		rpcEndpointOrExecutablePath: rpcEndpoint,
+		newheadChan:                 make(chan *types.Header),
+		errChan:                     make(chan error),
+		peers:                       newAgethSet(),
+		td:                          big.NewInt(0),
+		quitChan:                    make(chan struct{}, 100),
 	}
 
 	u, _ := url.Parse(rpcEndpoint)
 	isLocal := u.Scheme == ""
 	if isLocal {
+		log.Info("Starting local geth", "name", name, "executable", rpcEndpoint)
 		a.command, a.logr, a.rpcEndpointOrExecutablePath = mustStartGethInstance(rpcEndpoint, name)
+	} else {
+		log.Info("Connecting to remote geth", "name", name, "endpoint", rpcEndpoint)
+		// a.rpcEndpointOrExecutablePath = rpcEndpoint
 	}
 	a.log = log.Root().New("source", a.name, "at", a.rpcEndpointOrExecutablePath)
 
@@ -342,8 +346,6 @@ func (a *ageth) run() {
 	runningRegistry[a.enode] = a
 	regMu.Unlock()
 
-
-
 	// Subscribe to the client's new head
 	sub, err := a.eclient.SubscribeNewHead(context.Background(), a.newheadChan)
 	if err != nil {
@@ -485,7 +487,7 @@ func (a *ageth) addPeer(b *ageth) {
 	var ok bool
 	err := a.client.Call(&ok, "admin_addPeer", b.enode)
 	if err != nil {
-		a.log.Error("admin_addPeer", "error", err)
+		a.log.Error("admin_addPeer", "error", err, "enode value", b.enode)
 		return
 	}
 	if !a.peers.push(b) {

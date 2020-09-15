@@ -36,7 +36,7 @@ This example redirects `ageth`'s stdout to a logfile. If ageth is running local 
 will be the aggregated logs of all the geths she's running.
 If `ageth` is using remote geths, this is unnecessary; she doesn't have access to remote logs and her stdout will be empty.
 
-- [ ] TODO: Handle log placement better. The test `scenarios` will produce their own logs, which probably should go to
+- [ ] TODO: Handle log placement better. The test `scenarios` will produce their own logs/reports, which probably should go to
 stdout. This will collide with the local geth logs, if any.
 
 ### "Endpoint" definitions
@@ -77,7 +77,7 @@ As above, if you have this :point_up: in a file `ageth-endpoints.txt`, you'll us
 OR
 
 ```sh
-cat ageth-endpoints | ./build/bin/ageth
+cat ageth-endpoints.txt | ./build/bin/ageth
 ```
 
 ### Writing scenarios

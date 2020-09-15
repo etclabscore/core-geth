@@ -27,6 +27,8 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"reflect"
+	"runtime"
 	"sync"
 	"time"
 
@@ -159,7 +161,7 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// "Global"s, don't touch.
-		reportEventChan := make(chan interface{}) // this is what the geths get
+		reportEventChan := make(chan interface{})    // this is what the geths get
 		wsEventChan := make(chan interface{}, 10000) // it gets passed to wsEventChan for web ui
 		globalState := getWorldView(world)
 		defer close(wsEventChan)
@@ -329,7 +331,11 @@ to quickly create a Cobra application.`,
 		}
 		scanner := bufio.NewScanner(readFrom)
 		for scanner.Scan() {
-			listEndpoints = append(listEndpoints, scanner.Text())
+			ep := scanner.Text()
+			if ep == "" {
+				continue
+			}
+			listEndpoints = append(listEndpoints, ep)
 		}
 		if err := scanner.Err(); err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, bufio.ErrTooLong) {
 			llog.Fatal(err)
@@ -345,13 +351,21 @@ to quickly create a Cobra application.`,
 			world.push(g)
 		}
 
-		for {
-			for i, s := range []scenario{
-				scenario5,
-			}{
-				log.Info("Running scenario", "index", i)
+		scenarios := []scenario{
+			scenario5,
+		}
+		for /*..ev..er...*/ {
+			for i, s := range scenarios {
+				log.Info("Running scenario", "index", i, "scenarios.len", len(scenarios),
+					"name", runtime.FuncForPC(reflect.ValueOf(s).Pointer()).Name())
 				globalTick = 0
 				s(world)
+				// Note that the loop assumes no responsibility for tear down.
+				// Each scenario needs to be responsible for getting the nodes
+				// in the initial state they want them in without any assumptions
+				// about what that might be.
+				// This also means that any local geths left running at the end of a scenario
+				// will still be running.
 			}
 		}
 	},

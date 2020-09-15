@@ -30,28 +30,29 @@ import (
 )
 
 type ageth struct {
-	name              string
-	rpcEndpoint       string
-	command           *exec.Cmd
-	proc              *os.Process
-	log               log.Logger
-	logr              io.ReadCloser
-	client            *rpc.Client
-	eclient           *ethclient.Client
-	newheadChan       chan *types.Header
-	latestBlock       *types.Block
-	headsub           ethereum.Subscription
-	errChan           chan error
-	eventChan         chan interface{}
-	enode             string
-	mining            int
-	peers             *agethSet
-	coinbase          common.Address
-	behaviorsInterval time.Duration
-	behaviors         []func()
-	td                *big.Int
-	isMining          bool
-	quitChan          chan struct{}
+	name                        string
+	rpcEndpointOrExecutablePath string
+	command                     *exec.Cmd
+	proc                        *os.Process
+	log                         log.Logger
+	logr                        io.ReadCloser
+	client                      *rpc.Client
+	eclient                     *ethclient.Client
+	newheadChan                 chan *types.Header
+	latestBlock                 *types.Block
+	headsub                     ethereum.Subscription
+	errChan                     chan error
+	eventChan                   chan interface{}
+	enode                       string
+	mining                      int
+	peers                       *agethSet
+	coinbase                    common.Address
+	behaviorsInterval           time.Duration
+	behaviors                   []func(self *ageth)
+	td                          *big.Int
+	isMining                    bool
+	quitChan                    chan struct{}
+	online                      bool
 }
 
 func mustStartGethInstance(gethPath, id string) (*exec.Cmd, io.ReadCloser, string) {
@@ -98,7 +99,6 @@ func mustStartGethInstance(gethPath, id string) (*exec.Cmd, io.ReadCloser, strin
 		// "--mine", "--miner.threads", "0",
 		// "--vmodule=eth/*=5,p2p=5,core/*=5",
 		"--verbosity", "3",
-
 	}
 	geth := exec.Command(gethPath, gethArgs...)
 	p, err := geth.StderrPipe()
@@ -109,7 +109,7 @@ func mustStartGethInstance(gethPath, id string) (*exec.Cmd, io.ReadCloser, strin
 }
 
 // newAgeth returns a wrapped geth "ageth".
-// If the rpcEndpoint parameter is empty, a geth instance will be started.
+// If the rpcEndpointOrExecutablePath parameter is empty, a geth instance will be started.
 func newAgeth(rpcEndpoint string) *ageth {
 
 	// ID
@@ -133,20 +133,20 @@ func newAgeth(rpcEndpoint string) *ageth {
 		// These variables will be set depending if the node is local or remote (currently conventionalized as ipc or not).
 		// command:     geth,
 		// logr:        p,
-		// rpcEndpoint:     rpcEndpoint,
+		// rpcEndpointOrExecutablePath:     rpcEndpointOrExecutablePath,
 		newheadChan: make(chan *types.Header),
 		errChan:     make(chan error),
 		peers:       newAgethSet(),
 		td:          big.NewInt(0),
 		quitChan:    make(chan struct{}, 100),
 	}
-	a.log = log.Root().New("source", a.name)
 
 	u, _ := url.Parse(rpcEndpoint)
 	isLocal := u.Scheme == ""
 	if isLocal {
-		a.command, a.logr, a.rpcEndpoint = mustStartGethInstance(rpcEndpoint, name)
+		a.command, a.logr, a.rpcEndpointOrExecutablePath = mustStartGethInstance(rpcEndpoint, name)
 	}
+	a.log = log.Root().New("source", a.name, "at", a.rpcEndpointOrExecutablePath)
 
 	return a
 }
@@ -158,6 +158,15 @@ type block struct {
 	difficulty uint64
 	td         *big.Int
 	parentHash common.Hash
+}
+
+func (a *ageth) isLocal() bool {
+	u, _ := url.Parse(a.rpcEndpointOrExecutablePath)
+	return u.Scheme == ""
+}
+
+func (a *ageth) isRunning() bool {
+	return a.client != nil
 }
 
 var big0 = big.NewInt(0)
@@ -178,18 +187,28 @@ func (a *ageth) block() block {
 	}
 }
 
-func (a *ageth) start() {
-	if a.command == nil {
+// startLocal starts a local instance.
+// Scenarios should not call this themselves, it is handled exclusively by run().
+// If (accidentally) called on a remote instance, nothing happens.
+func (a *ageth) startLocal() {
+	if !a.isLocal() {
+		a.log.Warn("Noop to startLocal remote instance")
 		return
 	}
 	err := a.command.Start()
 	if err != nil {
-		a.log.Crit("start geth", "error", err)
+		a.log.Crit("startLocal geth", "error", err)
 	}
 	a.proc = a.command.Process
 }
 
+// stop shuts down a local instance.
+// If called on a remote instance, nothing happens.
 func (a *ageth) stop() {
+	if !a.isLocal() {
+		a.log.Error("Can't stop remote geth instance")
+		return
+	}
 	a.log.Info("Stopping ageth", "name", a.name)
 	if a.eventChan != nil {
 		a.eventChan <- eventNode{
@@ -209,8 +228,7 @@ func (a *ageth) stop() {
 		a.log.Crit("stop geth", "error", err)
 	}
 	delete(enodeNames, a.name)
-	os.Remove(a.rpcEndpoint) // this will fail if the path isn't an FS path. so ignore the error
-
+	os.Remove(a.rpcEndpointOrExecutablePath) // this will fail if the path isn't an FS path. so ignore the error
 	// Send a stupid number of quits to the quit channel to close all goroutines.
 	//
 	for i := 0; i < 100; i++ {
@@ -219,13 +237,25 @@ func (a *ageth) stop() {
 	close(a.quitChan)
 }
 
+// run is idempotent.
+// It should be called whenever you first want to startLocal using the ageth.
+// It will startLocal the instance if it's not already started.
 func (a *ageth) run() {
-	a.log.Info("Running ageth", "name", a.name)
+
+	if a.isRunning() {
+		a.log.Warn("Already running")
+		return
+	}
+
+	defer func() {
+		a.online = true
+	}()
+
 	var ready bool
 
-	a.start()
-
-	if a.command != nil {
+	if a.isLocal() {
+		a.log.Info("Running ageth", "name", a.name)
+		a.startLocal()
 		go func() {
 			buf := bufio.NewScanner(a.logr)
 			for buf.Scan() {
@@ -237,7 +267,7 @@ func (a *ageth) run() {
 
 				// Wait for geth's IPC to initialize.
 				if strings.Contains(text, "IPC endpoint opened") {
-					time.Sleep(3*time.Second)
+					time.Sleep(3 * time.Second)
 					ready = true
 				}
 			}
@@ -245,6 +275,7 @@ func (a *ageth) run() {
 	} else {
 		ready = true
 	}
+
 	go func() {
 		for {
 			select {
@@ -272,13 +303,13 @@ func (a *ageth) run() {
 	a.log.Info("Ageth ready")
 
 	// Set up RPC clients.
-	cl, err := rpc.Dial(a.rpcEndpoint)
+	cl, err := rpc.Dial(a.rpcEndpointOrExecutablePath)
 	if err != nil {
 		log.Crit("rpc client", "error", err)
 	}
 	a.client = cl
 
-	ecl, err := ethclient.Dial(a.rpcEndpoint)
+	ecl, err := ethclient.Dial(a.rpcEndpointOrExecutablePath)
 	if err != nil {
 		log.Crit("dial ethclient", "error", err)
 	}
@@ -310,6 +341,8 @@ func (a *ageth) run() {
 	regMu.Lock()
 	runningRegistry[a.enode] = a
 	regMu.Unlock()
+
+
 
 	// Subscribe to the client's new head
 	sub, err := a.eclient.SubscribeNewHead(context.Background(), a.newheadChan)
@@ -353,18 +386,19 @@ func (a *ageth) run() {
 	}()
 
 	go func() {
-		if len(a.behaviors) == 0 {
-			return
-		}
 		for {
 			select {
 			case <-a.quitChan:
 				return
 			default:
 			}
+			if len(a.behaviors) == 0 {
+				time.Sleep(time.Second)
+				continue
+			}
 			time.Sleep(a.behaviorsInterval)
 			for _, f := range a.behaviors {
-				f()
+				f(a)
 			}
 		}
 	}()
@@ -460,6 +494,12 @@ func (a *ageth) addPeer(b *ageth) {
 	a.log.Debug("Add peer", "target", b.name, "status", ok)
 	if a.eventChan != nil {
 		a.eventChan <- eventPeer{}
+	}
+}
+
+func (a *ageth) addPeers(s *agethSet) {
+	for i := 0; i < s.len(); i++ {
+		a.addPeer(s.indexed(i))
 	}
 }
 

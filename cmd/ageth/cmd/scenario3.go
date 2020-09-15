@@ -6,7 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 )
 
-func scenario3(eventChan chan interface{}) {
+func scenario3(world *agethSet) {
 	goodGuys := newAgethSet()
 	badGuys := newAgethSet()
 
@@ -22,8 +22,7 @@ func scenario3(eventChan chan interface{}) {
 	numberOfMinions := 20
 
 	for i := 0; i < numberOfBadGuys; i++ {
-		badGuy := newAgeth("")
-		badGuy.eventChan = eventChan
+		badGuy := world.all()[i]
 		badGuy.run()
 		badGuy.startMining(eachBadGuyMiningPower)
 		world.push(badGuy)
@@ -31,8 +30,7 @@ func scenario3(eventChan chan interface{}) {
 	}
 	for i := 0; i < numberOfGoodGuys; i++ {
 		go func(i int) {
-			guy := newAgeth("")
-			guy.eventChan = eventChan
+			guy := world.all()[i + numberOfBadGuys] // just offset the index given the afore badguys looper
 			guy.run()
 			// guy.withStandardPeerChurn(goodGuysPeerTarget, goodGuys)
 			if goodGuys.len() > 0 {
@@ -44,11 +42,11 @@ func scenario3(eventChan chan interface{}) {
 				log.Info("Start mining", guy.name)
 				guy.startMining(eachGoodGuyMiningPower)
 				guy.behaviorsInterval = 5*time.Second
-				guy.behaviors = append(guy.behaviors, func() {
-					if guy.peers.len() < 3 {
-						guy.stopMining()
-					} else if !guy.isMining {
-						guy.startMining(eachGoodGuyMiningPower)
+				guy.behaviors = append(guy.behaviors, func(self *ageth) {
+					if self.peers.len() < 3 {
+						self.stopMining()
+					} else if !self.isMining {
+						self.startMining(eachGoodGuyMiningPower)
 					}
 				})
 			}

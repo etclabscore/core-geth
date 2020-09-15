@@ -8,10 +8,9 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 )
 
-func scenario4(eventChan chan interface{}) {
+func scenario4(world *agethSet) {
 	goodGuys := newAgethSet()
-	badGuy := newAgeth("")
-	badGuy.eventChan = eventChan
+	badGuy := world.all()[0]
 		badGuy.run()
 		badGuy.startMining(10)
 		world.push(badGuy)
@@ -24,10 +23,9 @@ func scenario4(eventChan chan interface{}) {
 	minions := newAgethSet() // these will be selected from good goodGuys, but will "report" to badGuy
 	numberOfMinions := 20
 
-	for i := 0; i < numberOfGoodGuys; i++ {
+	for i := 1; i < numberOfGoodGuys; i++ {
 		go func(i int) {
-			guy := newAgeth("")
-			guy.eventChan = eventChan
+			guy := world.all()[i]
 			guy.run()
 			if world.len() > 0 {
 				for j := 0; j < world.len()/2; j++ {

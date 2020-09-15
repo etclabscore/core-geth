@@ -16,7 +16,10 @@ limitations under the License.
 package cmd
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -135,6 +138,8 @@ type Event struct {
 	Payload interface{} `json:"payload"`
 }
 
+type scenario func(nodes *agethSet)
+
 // "Global"s, don't touch.
 var world = newAgethSet()
 var globalTick = 0
@@ -154,8 +159,8 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// "Global"s, don't touch.
-		wsEventChan := make(chan interface{}, 10000)
-		reportEventChan := make(chan interface{})
+		reportEventChan := make(chan interface{}) // this is what the geths get
+		wsEventChan := make(chan interface{}, 10000) // it gets passed to wsEventChan for web ui
 		globalState := getWorldView(world)
 		defer close(wsEventChan)
 
@@ -239,8 +244,8 @@ to quickly create a Cobra application.`,
 						continue
 					}
 					mean, _ := stats.Mean(tookData)
-					if mean < 50 {
-						mean = 50
+					if mean < 300 {
+						mean = 300
 					}
 					tookData = []float64{}
 					log.Debug("Update ticker interval", "interval.ms", mean)
@@ -309,20 +314,46 @@ to quickly create a Cobra application.`,
 			}
 		}()
 
-		scenario1(reportEventChan)
-
-		for {
-			globalTick = 0
-			// scenario2(reportEventChan)
-			// scenario3(reportEventChan)
-			// scenario4(reportEventChan)
-			for _, g := range world.all() {
-				g.stop()
-				g = nil // KILLL
+		listEndpoints := []string{}
+		var readFrom io.Reader
+		if endpointsFile != "" {
+			log.Info("Reading endpoints from file", "file", endpointsFile)
+			b, err := ioutil.ReadFile(endpointsFile)
+			if err != nil {
+				llog.Fatal(err)
 			}
-			world = newAgethSet()
+			readFrom = bytes.NewBuffer(b)
+		} else {
+			log.Info("Reading endpoints from stdin...")
+			readFrom = os.Stdin
+		}
+		scanner := bufio.NewScanner(readFrom)
+		for scanner.Scan() {
+			listEndpoints = append(listEndpoints, scanner.Text())
+		}
+		if err := scanner.Err(); err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, bufio.ErrTooLong) {
+			llog.Fatal(err)
+		}
+		log.Info("Read endpoints", "length", len(listEndpoints))
+		if len(listEndpoints) == 0 {
+			log.Crit("No endpoints found")
 		}
 
+		for _, e := range listEndpoints {
+			g := newAgeth(e)
+			g.eventChan = reportEventChan
+			world.push(g)
+		}
+
+		for {
+			for i, s := range []scenario{
+				scenario5,
+			}{
+				log.Info("Running scenario", "index", i)
+				globalTick = 0
+				s(world)
+			}
+		}
 	},
 }
 
@@ -336,6 +367,7 @@ func Execute() {
 }
 
 var reportToFS string
+var endpointsFile string
 
 func init() {
 	cobra.OnInitialize(initConfig)
@@ -349,6 +381,7 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().StringVarP(&reportToFS, "report", "p", "", "Write reporting logs to a given file")
+	rootCmd.Flags().StringVarP(&endpointsFile, "endpoints", "f", "", "Read newline-deliminted endpoints from this file")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -360,30 +393,3 @@ func initConfig() {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 }
-
-/*
-	// alice := newAgeth()
-	// alice.run()
-	// alice.startMining(1)
-	// go func() {
-	// 	for alice.latestBlock == nil || alice.latestBlock.NumberU64() < 100 {
-	// 		time.Sleep(1 * time.Second)
-	// 	}
-	// 	alice.stopMining()
-	// }()
-	//
-	// bob := newAgeth()
-	// bob.run()
-	//
-	// time.Sleep(15 * time.Second)
-	// bob.startMining(1)
-	// time.Sleep(5*time.Second)
-	//
-	// bob.addPeer(alice)
-	//
-	// time.Sleep(100 * time.Second)
-	//
-	// alice.stop()
-	// bob.stop()
-
-*/

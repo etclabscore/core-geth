@@ -150,7 +150,7 @@ func goodGuyBasicChurn(goodGuys *agethSet, goodGuysPeerTarget int) {
 }
 
 
-func scenario2(eventChan chan interface{}) {
+func scenario2(world *agethSet) {
 	goodGuys := newAgethSet()
 	numberOfGoodGuys := 20
 	numberOfGoodGuyMiners := 3
@@ -163,16 +163,14 @@ func scenario2(eventChan chan interface{}) {
 	goodGuysPeerTarget := (numberOfGoodGuys / 2)
 	// badGuyWaitsUntilNAboveGoodGuys := uint64(10)
 
-	badGuy := newAgeth("")
-	badGuy.eventChan = eventChan
+	badGuy := world.all()[0]
 	badGuy.run()
 	badGuy.startMining(badGuyMiningPower)
 	world.push(badGuy)
 
-	for i := 0; i < numberOfGoodGuys; i++ {
+	for i := 1; i <= numberOfGoodGuys; i++ {
 		go func(i int) {
-			guy := newAgeth("")
-			guy.eventChan = eventChan
+			guy := world.all()[i]
 			guy.run()
 			if goodGuys.len() > 0 {
 				for j := 0; j < goodGuys.len()/2; j++ {
@@ -183,11 +181,11 @@ func scenario2(eventChan chan interface{}) {
 				log.Info("Start mining", guy.name)
 				guy.startMining(eachGoodGuyMiningPower)
 				guy.behaviorsInterval = 5*time.Second
-				guy.behaviors = append(guy.behaviors, func() {
-					if guy.peers.len() < 3 {
-						guy.stopMining()
-					} else if !guy.isMining {
-						guy.startMining(eachGoodGuyMiningPower)
+				guy.behaviors = append(guy.behaviors, func(self *ageth) {
+					if self.peers.len() < 3 {
+						self.stopMining()
+					} else if !self.isMining {
+						self.startMining(eachGoodGuyMiningPower)
 					}
 				})
 			}

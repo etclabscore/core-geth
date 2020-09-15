@@ -18,6 +18,15 @@ func newAgethSet() *agethSet {
 	}
 }
 
+func (a *agethSet) ready() bool {
+	for _, g := range a.all() {
+		if !g.online {
+			return false
+		}
+	}
+	return true
+}
+
 func (s *agethSet) contains(a *ageth) bool {
 	for _, g := range s.ageths {
 		if g.name == a.name {
@@ -70,6 +79,16 @@ func (s *agethSet) random() *ageth {
 	return s.ageths[rand.Intn(len(s.ageths))]
 }
 
+func (s *agethSet) randomN(rate float64) *agethSet {
+	ret := newAgethSet()
+	for _, a := range s.all() {
+		if rand.Float64() < rate {
+			ret.push(a)
+		}
+	}
+	return ret
+}
+
 func (s *agethSet) headMax() uint64 {
 	m := uint64(0)
 	for _, g := range s.ageths {
@@ -104,4 +123,29 @@ func (s *agethSet) headBlock() *types.Block {
 		}
 	}
 	return nil
+}
+
+func (s *agethSet) indexed(i int) *ageth {
+	if i >= len(s.all()) {
+		return nil
+	}
+	return s.all()[i]
+}
+
+func (s *agethSet) subset(inclusiveStartIndex, nonInclusiveEndIndex int) *agethSet {
+	newSet := newAgethSet()
+	for i := inclusiveStartIndex; i < nonInclusiveEndIndex; i++ {
+		newSet.push(s.indexed(i))
+	}
+	return newSet
+}
+
+func (s *agethSet) where(cond func(g *ageth) bool) *agethSet {
+	ret := newAgethSet()
+	for _, a := range s.ageths {
+		if cond(a) {
+			ret.push(a)
+		}
+	}
+	return ret
 }

@@ -128,7 +128,7 @@ to quickly create a Cobra application.`,
 			}
 		})
 
-		// start server
+		// startLocal server
 		go func() {
 			log.Info("Ready to play at http://localhost:8008 ▶")
 			if err := http.ListenAndServe(":8008", nil); err != nil {

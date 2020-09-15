@@ -25,7 +25,7 @@ import (
     - This will go on forever.
 */
 
-func scenario1(eventChan chan interface{}) {
+func scenario1(world *agethSet) {
 	// "Global"s, don't touch.
 	goodGuys := newAgethSet()
 
@@ -37,16 +37,15 @@ func scenario1(eventChan chan interface{}) {
 	badGuyWaitsUntilNAboveGoodGuys := uint64(100)
 	goodGuysPeerTarget := (numberOfGoodGuys / 2)
 
-	badGuy := newAgeth("")
-	badGuy.eventChan = eventChan
+	badGuy := world.all()[0]
 	badGuy.behaviorsInterval = 60 * time.Second
-	badGuy.behaviors = append(badGuy.behaviors, func() {
-		if badGuy.block().number > goodGuys.headMax()+(badGuyWaitsUntilNAboveGoodGuys*3) {
-			badGuy.log.Warn("Bad guy too far ahead of herd")
-			badGuy.stopMining()
-		} else if !badGuy.isMining && badGuy.block().number < goodGuys.headMax()+(badGuyWaitsUntilNAboveGoodGuys*2) {
-			badGuy.log.Warn("Bad guy back with herd")
-			badGuy.startMining(badGuyMiningPower)
+	badGuy.behaviors = append(badGuy.behaviors, func(self *ageth) {
+		if self.block().number > goodGuys.headMax()+(badGuyWaitsUntilNAboveGoodGuys*3) {
+			self.log.Warn("Bad guy too far ahead of herd")
+			self.stopMining()
+		} else if !self.isMining && self.block().number < goodGuys.headMax()+(badGuyWaitsUntilNAboveGoodGuys*2) {
+			self.log.Warn("Bad guy back with herd")
+			self.startMining(badGuyMiningPower)
 		}
 	})
 	badGuy.run()
@@ -54,10 +53,13 @@ func scenario1(eventChan chan interface{}) {
 	badGuy.startMining(badGuyMiningPower)
 	world.push(badGuy)
 
-	for i := 0; i < numberOfGoodGuys; i++ {
+	// iterate number of desired guys, with the index actually tracking
+	// the world set though.
+	// no safety checks to make sure the world is providing us with enough
+	// guys because this whole thing Austin is probably going to overwrite.
+	for i := 1; i <= numberOfGoodGuys; i++ {
 		go func(i int) {
-			guy := newAgeth("")
-			guy.eventChan = eventChan
+			guy := world.all()[i]
 			guy.run()
 			if goodGuys.len() > 0 {
 				for j := 0; j < goodGuys.len()/2; j++ {
@@ -102,6 +104,7 @@ func scenario1(eventChan chan interface{}) {
 			}
 
 		}
+
 		addGuys()
 
 		timeout := time.NewTimer(60 * time.Second)

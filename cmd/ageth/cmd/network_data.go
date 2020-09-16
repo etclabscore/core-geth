@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/p2p/enode"
 )
 
 type Node struct {
@@ -105,6 +106,41 @@ func (n *NetworkGraphData) UnmarshalJSON(bytes []byte) error {
 	return nil
 }
 
+// func getWorldView(set *agethSet) NetworkGraphData {
+// 	nodes := []Node{}
+// 	links := []Link{}
+// 	for _, l := range set.ageths {
+// 		if l.name == "" {
+// 			log.Error("empty name?!", "ageth", l)
+// 			continue
+// 		}
+// 		nodes = append(nodes, Node{
+// 			Name:      l.name,
+// 			HeadHash:  l.block().hash.Hex()[2:8],
+// 			HeadNum:   l.block().number,
+// 			HeadBase:  l.block().coinbase.Hex()[2:8],
+// 			HeadMiner: l.block().coinbase == l.coinbase,
+// 			HeadD:     l.block().difficulty,
+// 			HeadTD:    l.td.Uint64(),
+// 		})
+// 		// make a map of recorded connections; we
+// 		// only need to record peers in one direction
+// 		unilateralMap := map[string]bool{}
+// 		for _, p := range l.peers.all() {
+// 			// check if connection already recorded
+// 			if _, ok := unilateralMap[p.name+l.name]; ok {
+// 				continue
+// 			}
+// 			unilateralMap[l.name+p.name] = true
+// 			links = append(links, Link{
+// 				Source: l.name,
+// 				Target: p.name,
+// 			})
+// 		}
+// 	}
+// 	return NetworkGraphData{Nodes: nodes, Links: links}
+// }
+
 func getWorldView(set *agethSet) NetworkGraphData {
 	nodes := []Node{}
 	links := []Link{}
@@ -113,8 +149,10 @@ func getWorldView(set *agethSet) NetworkGraphData {
 			log.Error("empty name?!", "ageth", l)
 			continue
 		}
+		name := enode.MustParse(l.enode).IP().String()
 		nodes = append(nodes, Node{
-			Name:      l.name,
+			// Name:      l.name,
+			Name:      name,
 			HeadHash:  l.block().hash.Hex()[2:8],
 			HeadNum:   l.block().number,
 			HeadBase:  l.block().coinbase.Hex()[2:8],
@@ -126,16 +164,23 @@ func getWorldView(set *agethSet) NetworkGraphData {
 		// only need to record peers in one direction
 		unilateralMap := map[string]bool{}
 		for _, p := range l.peers.all() {
+			pname := enode.MustParse(p.enode).IP().String()
 			// check if connection already recorded
-			if _, ok := unilateralMap[p.name+l.name]; ok {
+			if _, ok := unilateralMap[pname+name]; ok {
 				continue
 			}
-			unilateralMap[l.name+p.name] = true
+			unilateralMap[name+pname] = true
 			links = append(links, Link{
-				Source: l.name,
-				Target: p.name,
+				Source: name,
+				Target: pname,
 			})
 		}
 	}
 	return NetworkGraphData{Nodes: nodes, Links: links}
 }
+
+/*
+
+
+
+ */

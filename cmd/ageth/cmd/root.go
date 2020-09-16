@@ -33,14 +33,12 @@ import (
 	"time"
 	// _ "net/http/pprof"
 
-
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	_ "github.com/ethereum/go-ethereum/statik"
 	"github.com/gorilla/websocket"
 	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-isatty"
-	"github.com/montanaflynn/stats"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -231,33 +229,33 @@ to quickly create a Cobra application.`,
 			didEvent := false
 			lastWSState := NetworkGraphData{}
 
-			tookData := []float64{}
+			// tookData := []float64{}
 			quit := false
-			go func() {
-				for !quit {
-					took := struct {
-						Took int32 `json:"took"`
-					}{}
-					err = ws.ReadJSON(&took)
-					if err != nil {
-						log.Debug("WS read took message errored", "error", err)
-						time.Sleep(time.Second)
-						continue
-					}
-					tookData = append(tookData, float64(took.Took))
-					if len(tookData) < 10 {
-						continue
-					}
-					mean, _ := stats.Mean(tookData)
-					if mean < 100 {
-						mean = 100
-					}
-					tookData = []float64{}
-					log.Debug("Update ticker interval", "interval.ms", mean)
-					debounce.Stop()
-					debounce = time.NewTicker(time.Duration(mean) * time.Millisecond)
-				}
-			}()
+			// go func() {
+			// 	for !quit {
+			// 		took := struct {
+			// 			Took int32 `json:"took"`
+			// 		}{}
+			// 		err = ws.ReadJSON(&took)
+			// 		if err != nil {
+			// 			log.Debug("WS read took message errored", "error", err)
+			// 			time.Sleep(time.Second)
+			// 			continue
+			// 		}
+			// 		tookData = append(tookData, float64(took.Took))
+			// 		if len(tookData) < 10 {
+			// 			continue
+			// 		}
+			// 		mean, _ := stats.Mean(tookData)
+			// 		if mean < 100 {
+			// 			mean = 100
+			// 		}
+			// 		tookData = []float64{}
+			// 		log.Debug("Update ticker interval", "interval.ms", mean)
+			// 		debounce.Stop()
+			// 		debounce = time.NewTicker(time.Duration(mean) * time.Millisecond)
+			// 	}
+			// }()
 
 			defer func() {
 				quit = true

@@ -556,10 +556,8 @@ func (a *ageth) refreshPeers() {
 	incomingSet := newAgethSet()
 	for _, r := range res {
 		n := enode.MustParse(r.Enode)
-		if n.IP().IsLoopback() || n.IP().IsLinkLocalUnicast() || n.IP().IsLinkLocalMulticast() {
-			nn := getAgethByEnode(n.URLv4())
-			incomingSet.push(nn)
-		}
+		nn := getAgethByEnode(n.URLv4())
+		incomingSet.push(nn)
 	}
 	a.peers = incomingSet
 	if a.eventChan != nil {

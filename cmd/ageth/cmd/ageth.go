@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/ioutil"
 	llog "log"
-	"math/big"
 	"math/rand"
 	"net"
 	"net/url"
@@ -51,7 +50,8 @@ type ageth struct {
 	coinbase                    common.Address
 	behaviorsInterval           time.Duration
 	behaviors                   []func(self *ageth)
-	td                          *big.Int
+	td                          uint64
+	tdhash                      common.Hash
 	isMining                    bool
 	quitChan                    chan struct{}
 	online                      bool
@@ -139,7 +139,7 @@ func newAgeth(rpcEndpoint string) *ageth {
 		newheadChan:                 make(chan *types.Header),
 		errChan:                     make(chan error),
 		peers:                       newAgethSet(),
-		td:                          big.NewInt(0),
+		td:                          0,
 		quitChan:                    make(chan struct{}, 100),
 	}
 
@@ -162,7 +162,7 @@ type block struct {
 	hash       common.Hash
 	coinbase   common.Address
 	difficulty uint64
-	td         *big.Int
+	td         uint64
 	parentHash common.Hash
 }
 
@@ -175,12 +175,11 @@ func (a *ageth) isRunning() bool {
 	return a.client != nil
 }
 
-var big0 = big.NewInt(0)
 
 func (a *ageth) block() block {
 	if a.latestBlock == nil {
 		return block{
-			number: 0, hash: common.Hash{}, coinbase: common.Address{}, td: big0, parentHash: common.Hash{}, difficulty: 0,
+			number: 0, hash: common.Hash{}, coinbase: common.Address{}, td: 0, parentHash: common.Hash{}, difficulty: 0,
 		}
 	}
 	return block{
@@ -224,7 +223,7 @@ func (a *ageth) stop() {
 				HeadNum:   a.block().number,
 				HeadMiner: a.block().coinbase == a.coinbase,
 				HeadD:     a.block().difficulty,
-				HeadTD:    a.td.Uint64(),
+				HeadTD:    a.td,
 			},
 			Up: false,
 		}
@@ -468,6 +467,24 @@ func (a *ageth) stopMining() {
 	a.isMining = false
 }
 
+type tdstruct struct {
+	TotalDifficulty hexutil.Uint64 `json:"totalDifficulty"`
+}
+
+func (a *ageth) getTd() uint64 {
+	if a.tdhash == a.latestBlock.Hash() {
+		return a.td
+	}
+	td := tdstruct{}
+	if err := a.client.Call(&td, "eth_getBlockByHash", a.latestBlock.Hash(), false); err != nil {
+		a.log.Error("error getting td", "err", err)
+	}
+	a.td = uint64(td.TotalDifficulty)
+	a.tdhash = a.latestBlock.Hash()
+	return a.td
+
+}
+
 func lookupNameByEnode(enode string) string {
 	enodeNamesMu.Lock()
 	defer enodeNamesMu.Unlock()
@@ -604,7 +621,7 @@ func (a *ageth) setHead(head *types.Block) {
 				HeadNum:   a.block().number,
 				HeadMiner: a.block().coinbase == a.coinbase,
 				HeadD:     a.block().difficulty,
-				HeadTD:    a.td.Uint64(),
+				HeadTD:    a.td,
 			},
 			Up: true,
 		}:

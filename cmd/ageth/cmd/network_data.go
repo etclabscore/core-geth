@@ -158,7 +158,7 @@ func getWorldView(set *agethSet) NetworkGraphData {
 			HeadBase:  l.block().coinbase.Hex()[2:8],
 			HeadMiner: l.block().coinbase == l.coinbase,
 			HeadD:     l.block().difficulty,
-			HeadTD:    l.td.Uint64(),
+			HeadTD:    l.td,
 		})
 		// make a map of recorded connections; we
 		// only need to record peers in one direction

@@ -57,7 +57,7 @@ func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float
     }
     log.Info("Starting attacker")
     // badGuy.setPeerCount(0)
-    resumePeering := badGuy.refusePeers(10)
+    resumePeering := badGuy.refusePeers(100)
     forkBlock := badGuy.block()
     badGuy.startMining(blockTime / 2)
 
@@ -92,6 +92,7 @@ func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float
     resumePeering()
     for badGuy.getPeerCount() < 5 {
       // Sleep until the badguy has found 5 peers
+      badGuy.addPeers(bigMiners) // Aggressively try to add the miners. NOTE that this represents an attacker sophisticated enough to identify and target miners.
       time.Sleep(1 * time.Second)
     }
 

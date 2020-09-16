@@ -9,6 +9,7 @@ import (
 	llog "log"
 	"math/big"
 	"math/rand"
+	"net"
 	"net/url"
 	"os"
 	"os/exec"
@@ -329,24 +330,6 @@ func (a *ageth) run() {
 
 	n := enode.MustParse(nodeInfoRes.Enode)
 	nv4 := n.URLv4()
-	if !a.isLocal() {
-		iface, err := nat.Parse("pmp")
-		if err != nil {
-			a.log.Crit("Parse gateway errored", "error", err)
-		}
-		extIp, err := iface.ExternalIP()
-		if err != nil {
-			a.log.Crit("External IP errored", "error", err)
-		}
-
-		a.log.Warn("Testing swap local/external tcp pmp", "ext", extIp.String(), "local", n.IP().String())
-
-		if extIp.Equal(n.IP()) {
-			b := []byte(nv4)
-			b = regexp.MustCompile(`[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}`).ReplaceAll(b, []byte("127.0.0.1"))
-			nv4 = string(b)
-		}
-	}
 	a.log.Info("Assigned self enode", "enode", nv4)
 	a.enode = nv4
 
@@ -372,7 +355,7 @@ func (a *ageth) run() {
 				a.errChan <- err
 			case <-a.quitChan:
 				return
-			// default:
+				// default:
 			}
 		}
 	}()
@@ -383,7 +366,7 @@ func (a *ageth) run() {
 				a.log.Error("errored", "error", e)
 			case <-a.quitChan:
 				return
-			// default:
+				// default:
 			}
 		}
 	}()
@@ -496,11 +479,35 @@ func lookupNameByEnode(enode string) string {
 	return ""
 }
 
+var machineNATExtIP *net.IP
+
+func translateEnodeIPIfLocal(en string) string {
+	if machineNATExtIP == nil {
+		iface, err := nat.Parse("pmp")
+		if err != nil {
+			log.Crit("Parse gateway errored", "error", err)
+		}
+		extIp, err := iface.ExternalIP()
+		if err != nil {
+			log.Crit("External IP errored", "error", err)
+		}
+		machineNATExtIP = &extIp
+	}
+	e := enode.MustParse(en)
+	if (*machineNATExtIP).Equal(e.IP()) {
+		b := []byte(en)
+		b = regexp.MustCompile(`[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}`).ReplaceAll(b, []byte("127.0.0.1"))
+		en = string(b)
+	}
+	return en
+}
+
 func (a *ageth) addPeer(b *ageth) {
 	var ok bool
-	err := a.client.Call(&ok, "admin_addPeer", b.enode)
+	translatedIP := translateEnodeIPIfLocal(b.enode)
+	err := a.client.Call(&ok, "admin_addPeer", translatedIP)
 	if err != nil {
-		a.log.Error("admin_addPeer", "error", err, "enode value", b.enode)
+		a.log.Error("admin_addPeer", "error", err, "enode", translatedIP)
 		return
 	}
 	if !a.peers.push(b) {
@@ -520,9 +527,10 @@ func (a *ageth) addPeers(s *agethSet) {
 
 func (a *ageth) removePeer(b *ageth) {
 	var ok bool
-	err := a.client.Call(&ok, "admin_removePeer", b.enode)
+	translatedIP := translateEnodeIPIfLocal(b.enode)
+	err := a.client.Call(&ok, "admin_removePeer", translatedIP)
 	if err != nil {
-		a.log.Error("admin_removePeer", "error", err)
+		a.log.Error("admin_removePeer", "error", err, "enode", translatedIP)
 		return
 	}
 	a.peers.remove(b)
@@ -545,33 +553,15 @@ func (a *ageth) refreshPeers() {
 		a.log.Error("admin_peers", "error", err)
 		return
 	}
-	// a.peers.ageths = []*ageth{} // clear
 	incomingSet := newAgethSet()
 	for _, r := range res {
 		n := enode.MustParse(r.Enode)
 		if n.IP().IsLoopback() || n.IP().IsLinkLocalUnicast() || n.IP().IsLinkLocalMulticast() {
 			nn := getAgethByEnode(n.URLv4())
 			incomingSet.push(nn)
-			if nn == nil {
-				s := []string{}
-				for k := range runningRegistry {
-					s = append(s, k)
-				}
-				ss := strings.Join(s, "\n")
-				log.Crit("Bad enode parsing (nonexist peer)", "enode", n, "running", ss)
-			}
-			// if !a.peers.contains(nn) {
-			// 	a.peers.push(nn)
-			// }
 		}
 	}
 	a.peers = incomingSet
-	// for _, p := range a.peers.all() {
-	// 	nn := getAgethByEnode(p.enode)
-	// 	if !incomingSet.contains(nn) {
-	// 		a.peers.remove(nn)
-	// 	}
-	// }
 	if a.eventChan != nil {
 		a.eventChan <- eventPeer{}
 	}
@@ -579,13 +569,6 @@ func (a *ageth) refreshPeers() {
 
 func (a *ageth) updateSelfStats() {
 	a.refreshPeers()
-	// a.getHeadManually()
-	// err := a.client.Call(&a.isMining, "eth_mining")
-	// if err != nil {
-	// 	a.log.Error("eth_mining", "error", err)
-	// 	return
-	// }
-	// a.log.Info("Status", "is_mining", a.isMining)
 }
 
 func (a *ageth) getHeadManually() {

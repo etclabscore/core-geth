@@ -175,6 +175,7 @@ to quickly create a Cobra application.`,
 				}
 				defer fi.Close()
 			}
+			lastReport := time.Now()
 			for {
 				select {
 				case event := <-reportEventChan:
@@ -188,6 +189,10 @@ to quickly create a Cobra application.`,
 
 					if reportToFS != "" {
 						// write to stable storage
+						if time.Since(lastReport) < time.Second {
+							continue
+						}
+						lastReport = time.Now()
 						b, err := json.Marshal(globalState)
 						if err != nil {
 							llog.Fatal(err)

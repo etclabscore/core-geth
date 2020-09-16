@@ -46,6 +46,15 @@ func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float
       nextMiner.startMining(hashtime)
     }
     log.Info("Started miners")
+
+    // Ensure nodes have SOME view of a network
+    minimumPeerCount := int64(2)
+    for _, n := range nodes.all() {
+      for n.getPeerCount() < minimumPeerCount {
+        n.addPeer(nodes.random())
+      }
+    }
+
     time.Sleep(30 * time.Second)
     blockNumber := nodes.headMax() // grab current block number after 30s spin up
     for {

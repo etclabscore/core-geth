@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"context"
 	"math/rand"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/montanaflynn/stats"
@@ -16,6 +18,15 @@ func newAgethSet() *agethSet {
 	return &agethSet{
 		ageths: []*ageth{},
 	}
+}
+
+func (s *agethSet) get(name string) *ageth {
+	for _, g := range s.ageths {
+		if g.name == name {
+			return g
+		}
+	}
+	return nil
 }
 
 func (a *agethSet) ready() bool {
@@ -56,6 +67,12 @@ func (s *agethSet) push(a *ageth) bool {
 	}
 	s.ageths = append(s.ageths, a)
 	return true
+}
+
+func (s *agethSet) union(s2 *agethSet) *agethSet {
+	ns := &agethSet{ ageths: s.ageths[:] }
+	for _, a := range s2.all() { ns.push(a) }
+	return ns
 }
 
 func (s *agethSet) remove(a *ageth) (ok bool) {
@@ -123,6 +140,59 @@ func (s *agethSet) headBlock() *types.Block {
 		}
 	}
 	return nil
+}
+
+func (s *agethSet) distinctChains() []common.Hash {
+	headNodeMap := make(map[common.Hash]*agethSet)
+	for _, a := range s.ageths {
+		head := a.block()
+		if _, ok := headNodeMap[head.hash]; !ok {
+			headNodeMap[head.hash] = newAgethSet()
+		}
+		headNodeMap[head.hash].push(a)
+	}
+	knownHeads := make([]common.Hash, len(headNodeMap))
+	i := 0
+	for hash := range headNodeMap {
+		knownHeads[i] = hash
+		i++
+	}
+	distinctHeads := map[common.Hash]struct{}{}
+	for i, hasha := range knownHeads {
+		for _, hashb := range knownHeads[i:] {
+			isReorg, latest := isReorg(hasha, hashb, headNodeMap[hasha], headNodeMap[hashb])
+			if isReorg {
+				distinctHeads[hasha] = struct{}{}
+				distinctHeads[hashb] = struct{}{}
+			} else {
+				distinctHeads[latest] = struct{}{}
+			}
+		}
+	}
+	distinctHeadList := make([]common.Hash, len(distinctHeads))
+	j := 0
+	for hash := range distinctHeads {
+		distinctHeadList[j] = hash
+		j++
+	}
+	return distinctHeadList
+}
+
+
+func isReorg(a, b common.Hash, aSet, bSet *agethSet) (bool, common.Hash) {
+	if a == b { return false, a }
+	blocka, err := aSet.random().eclient.BlockByHash(context.Background(), a)
+	for err != nil { blocka, err = aSet.random().eclient.BlockByHash(context.Background(), a) }
+	blockb, err := bSet.random().eclient.BlockByHash(context.Background(), b)
+	for err != nil { blockb, err = bSet.random().eclient.BlockByHash(context.Background(), b) }
+	if blocka.NumberU64() > blockb.NumberU64() {
+		block, err := aSet.random().eclient.BlockByNumber(context.Background(), blockb.Number())
+		for err != nil { block, err = aSet.random().eclient.BlockByNumber(context.Background(), blockb.Number()) }
+		return block.Hash() != blockb.Hash(), blocka.Hash()
+	}
+	block, err := bSet.random().eclient.BlockByNumber(context.Background(), blocka.Number())
+	for err != nil { block, err = bSet.random().eclient.BlockByNumber(context.Background(), blocka.Number()) }
+	return block.Hash() != blocka.Hash(), blockb.Hash()
 }
 
 func (s *agethSet) indexed(i int) *ageth {

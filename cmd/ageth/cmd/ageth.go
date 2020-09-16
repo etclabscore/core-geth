@@ -149,7 +149,7 @@ func newAgeth(rpcEndpoint string) *ageth {
 		a.command, a.logr, a.rpcEndpointOrExecutablePath = mustStartGethInstance(rpcEndpoint, name)
 	} else {
 		log.Info("Will connect with remote geth", "name", name, "endpoint", rpcEndpoint)
-		// a.rpcEndpointOrExecutablePath = rpcEndpoint
+		a.rpcEndpointOrExecutablePath = rpcEndpoint
 	}
 	a.log = log.Root().New("source", a.name, "at", a.rpcEndpointOrExecutablePath)
 
@@ -372,7 +372,7 @@ func (a *ageth) run() {
 				a.errChan <- err
 			case <-a.quitChan:
 				return
-			default:
+			// default:
 			}
 		}
 	}()
@@ -383,7 +383,7 @@ func (a *ageth) run() {
 				a.log.Error("errored", "error", e)
 			case <-a.quitChan:
 				return
-			default:
+			// default:
 			}
 		}
 	}()
@@ -635,4 +635,27 @@ func (a *ageth) setHead(head *types.Block) {
 
 func (a *ageth) onNewHead(head *types.Block) {
 
+}
+
+func (a *ageth) setPeerCount(count int) {
+	// Need an RPC call for this to work
+}
+
+func (a *ageth) getPeerCount() int64 {
+	var result hexutil.Big
+	a.client.CallContext(context.Background(), &result, "net_peerCount")
+	return result.ToInt().Int64()
+}
+
+func (a *ageth) refusePeers() func() {
+	peers := []*p2p.PeerInfo{}
+	a.client.Call(&peers, "admin_peers")
+	var result interface{}
+	a.client.Call(&result, "admin_maxPeers", 0)
+	return func() {
+		a.client.Call(&result, "admin_maxPeers", 10)
+		for _, peer := range peers {
+			a.client.Call(&result, "admin_addPeer", peer.Enode)
+		}
+	}
 }

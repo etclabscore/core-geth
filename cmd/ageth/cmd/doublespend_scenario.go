@@ -25,10 +25,14 @@ func stabilize(nodes *agethSet) {
   badGuy := nodes.indexed(0) // NOTE: Assumes badguy will always be [0]
   goodGuys := nodes.where(func(a *ageth) bool { return a.name != badGuy.name })
   badGuy.truncateHead(goodGuys.headMax())
+  minimumPeerCount := int64(2)
   for _, node := range nodes.all() {
     node.stopMining()
     var result interface{}
     node.client.Call(&result, "admin_maxPeers", 20)
+    for n.getPeerCount() < minimumPeerCount {
+      n.addPeer(nodes.random())
+    }
   }
   goodGuys.random().startMining(13)
   for len(nodes.distinctChains()) > 1 {

@@ -647,13 +647,16 @@ func (a *ageth) getPeerCount() int64 {
 	return result.ToInt().Int64()
 }
 
-func (a *ageth) refusePeers() func() {
+// refusePeers sets maxPeers to 0 (and drops all connected peers).
+// It returns a function that has kept the original peers in a closure
+// so that they may be added on resume peering.
+func (a *ageth) refusePeers(resumeWithMaxPeers int) (resumePeers func()) {
 	peers := []*p2p.PeerInfo{}
 	a.client.Call(&peers, "admin_peers")
 	var result interface{}
 	a.client.Call(&result, "admin_maxPeers", 0)
 	return func() {
-		a.client.Call(&result, "admin_maxPeers", 10)
+		a.client.Call(&result, "admin_maxPeers", resumeWithMaxPeers)
 		for _, peer := range peers {
 			a.client.Call(&result, "admin_addPeer", peer.Enode)
 		}

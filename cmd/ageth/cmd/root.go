@@ -354,11 +354,13 @@ to quickly create a Cobra application.`,
 			world.push(g)
 		}
 
+		scenarios := []scenario{
+			scenarioGenerator(13, 25, 1.5),
+			stabilize,
+		}
+
 		for {
-			for i, s := range []scenario{
-				scenarioGenerator(13, 25, 1.5),
-				stabilize,
-			}{
+			for i, s := range scenarios {
 				log.Info("Running scenario", "index", i, "scenarios.len", len(scenarios),
 					"name", runtime.FuncForPC(reflect.ValueOf(s).Pointer()).Name())
 				globalTick = 0

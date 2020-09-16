@@ -17,24 +17,37 @@ type finalReport struct {
   Unconverted int
   DistinctChains []common.Hash
   Nodes map[string]common.Hash
+  AttackerShouldWin bool
+  AttackerWon bool
 }
 
 func stabilize(nodes *agethSet) {
+  badGuy := nodes.indexed(0) // NOTE: Assumes badguy will always be [0]
+  goodGuys := nodes.where(func(a *ageth) bool { return a.name != badGuy.name })
+  badGuy.truncateHead(goodGuys.headMax())
+  for _, node := range nodes.all() {
+    node.stopMining()
+    var result interface{}
+    node.client.Call(&result, "admin_maxPeers", 20)
+  }
+  goodGuys.random().startMining(13)
   for len(nodes.distinctChains()) > 1 {
     time.Sleep(30)
   }
 }
 
-func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float64) func(*agethSet) {
+func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Duration, difficultyRatio, miningRatio float64, attackerShouldWin bool) func(*agethSet) {
   return func(nodes *agethSet) {
     // Setup
 
     // Start all nodes mining at 150% of the blocktime. They will be the long tail of small miners.
-    for _, node := range nodes.all() {
+    for i, node := range nodes.all() {
       node.startMining(blockTime * 3 / 2)
+      if i > int(float64(len(nodes.all())) * miningRatio) { break }
     }
     bigMiners := newAgethSet()
     badGuy := nodes.indexed(0) // NOTE: Assumes badguy will always be [0]
+    goodGuys := nodes.where(func(a *ageth) bool { return a.name != badGuy.name })
 
     // Simulate the small proportion of "whale" miners, whose block times will be nearer the target time.
     hashtimes := []int{blockTime, blockTime * 12/10, blockTime * 12/10, blockTime * 14/10, blockTime * 14/10}
@@ -43,6 +56,7 @@ func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float
       for nextMiner.name == badGuy.name || bigMiners.contains(nextMiner) {
         nextMiner = nodes.random()
       }
+      bigMiners.push(nextMiner)
       nextMiner.startMining(hashtime)
     }
     log.Info("Started miners")
@@ -69,16 +83,18 @@ func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float
     resumePeering := badGuy.refusePeers(100)
     forkBlock := badGuy.block()
     badGuy.startMining(blockTime / 2)
+    attackStartTime := time.Now()
 
     // Once a second, check to see if the bad guy's block difficulty has
     // reached the target.
     for {
-      if badGuy.block().difficulty > uint64(float64(forkBlock.difficulty) * difficultyRatio) {
+      targetDifficulty := uint64(float64(goodGuys.headBlock().Difficulty().Uint64()) * difficultyRatio)
+      if badGuy.block().difficulty > targetDifficulty {
         log.Info("Attacker reached target relative difficulty ratio", "target ratio", difficultyRatio)
         break
       }
-      if badGuy.block().number > forkBlock.number + attackBlocks {
-        log.Info("Attacker mined attack blocks allowance", "blocks", attackBlocks)
+      if time.Since(attackStartTime) > attackDuration {
+        log.Info("Attacker reached time limit without reaching target difficulty", "blocks", badGuy.block().number - forkBlock.number, "difficulty", badGuy.block().difficulty, "target", targetDifficulty)
         break
       }
       time.Sleep(time.Second)
@@ -87,26 +103,34 @@ func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float
     // The target difficulty or chain length has been reached.
     // If target difficulty was reached before the desired number of attack blocks,
     // mining at blockTime will keep it roughly in place until the desired number of attack blocks is produced.
-    for badGuy.block().number < forkBlock.number + attackBlocks {
+    badGuy.startMining(blockTime)
+    for time.Since(attackStartTime) < attackDuration {
       if !badGuy.isMining {
         badGuy.startMining(blockTime)
       }
       time.Sleep(1 * time.Second)
     }
 
-    log.Info("Attacker mined %v blocks", attackBlocks)
     finalAttackBlock := badGuy.block()
+    log.Info("Attacker done mining", "mined", finalAttackBlock.number - forkBlock.number)
     badGuy.stopMining()
     // badGuy.setPeerCount(25)
     resumePeering()
-    for badGuy.getPeerCount() < 5 {
-      // Sleep until the badguy has found 5 peers
-      badGuy.addPeers(bigMiners) // Aggressively try to add the miners. NOTE that this represents an attacker sophisticated enough to identify and target miners.
-      time.Sleep(1 * time.Second)
-    }
+    scenarioEnded := false
+    defer func() { scenarioEnded = true }()
+    attackMiners := make(chan struct{})
+    go func() {
+      for !scenarioEnded {
+        // Sleep until the badguy has found 5 peers
+        badGuy.addPeers(bigMiners) // Aggressively try to add the miners. NOTE that this represents an attacker sophisticated enough to identify and target miners.
+        if badGuy.getPeerCount() >= 5 { attackMiners <- struct{}{} }
+        time.Sleep(1 * time.Second)
+      }
+    }()
+    <- attackMiners
+    time.Sleep(stabilizeDuration)
 
-    // Sleep another 30 seconds for blocks to propagate
-    time.Sleep(30 * time.Second)
+
 
     b, err := badGuy.eclient.BlockByNumber(context.Background(), big.NewInt(int64(finalAttackBlock.number)))
     if err != nil {
@@ -116,15 +140,20 @@ func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float
       log.Info("Even the attacker gave up their block")
     }
 
+    forkBlockPlusOne, err := badGuy.eclient.BlockByNumber(context.Background(), big.NewInt(int64(forkBlock.number + 1)))
+    if err != nil {
+      log.Error("Error getting forkBlock + 1", "err", err)
+    }
+
     convertedNodes := 0
     unconvertedNodes := 0
-    for _, node := range nodes.all()[1:] {
-      b, err := node.eclient.BlockByNumber(context.Background(), big.NewInt(int64(finalAttackBlock.number)))
+    for _, node := range goodGuys.all() {
+      b, err := node.eclient.BlockByNumber(context.Background(), forkBlockPlusOne.Number())
       if err != nil {
-        log.Error("Error getting block", "blockno", finalAttackBlock.number, "node", node.name)
+        log.Error("Error getting block", "blockno", finalAttackBlock.number, "node", node.name, "err", err)
         continue
       }
-      if b.Hash() == finalAttackBlock.hash {
+      if b.Hash() == forkBlockPlusOne.Hash() {
         convertedNodes++
       } else {
         unconvertedNodes++
@@ -135,6 +164,8 @@ func scenarioGenerator(blockTime int, attackBlocks uint64, difficultyRatio float
       Unconverted: unconvertedNodes,
       DistinctChains: nodes.distinctChains(),
       Nodes: make(map[string]common.Hash),
+      AttackerShouldWin: attackerShouldWin,
+      AttackerWon: unconvertedNodes == 0,
     }
     for _, node := range nodes.all() {
       report.Nodes[node.name] = node.block().hash

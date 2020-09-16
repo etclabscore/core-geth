@@ -513,7 +513,7 @@ func (a *ageth) addPeer(b *ageth) {
 	if !a.peers.push(b) {
 		return
 	}
-	a.log.Info("Add peer", "target", b.name, "enode", b.enode, "status", ok)
+	a.log.Debug("Add peer", "target", b.name, "enode", b.enode, "status", ok)
 	if a.eventChan != nil {
 		a.eventChan <- eventPeer{}
 	}

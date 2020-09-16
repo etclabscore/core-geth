@@ -372,29 +372,29 @@ to quickly create a Cobra application.`,
 		}
 
 		scenarios := []scenario{
-			scenarioGenerator(13, 25, 1.5),
-			stabilize,
+			scenarioGenerator(13, 10 * time.Minute, 10 * time.Minute, 1.1, .666, true),
+			scenarioGenerator(13, 10 * time.Minute, 10 * time.Minute, 1.02, .666, false),
 		}
 
 		// Comment me to run the test(s).
 		// Leave me to use ageth as just an observer.
-		q := make(chan struct{})
-		<-q
+		// q := make(chan struct{})
+		// <-q
 
-		for {
-			for i, s := range scenarios {
-				log.Info("Running scenario", "index", i, "scenarios.len", len(scenarios),
-					"name", runtime.FuncForPC(reflect.ValueOf(s).Pointer()).Name())
-				globalTick = 0
-				s(world)
-				// Note that the loop assumes no responsibility for tear down.
-				// Each scenario needs to be responsible for getting the nodes
-				// in the initial state they want them in without any assumptions
-				// about what that might be.
-				// This also means that any local geths left running at the end of a scenario
-				// will still be running.
-			}
+		for i, s := range scenarios {
+			log.Info("Running scenario", "index", i, "scenarios.len", len(scenarios),
+				"name", runtime.FuncForPC(reflect.ValueOf(s).Pointer()).Name())
+			globalTick = 0
+			stabilize(world)
+			s(world)
+			// Note that the loop assumes no responsibility for tear down.
+			// Each scenario needs to be responsible for getting the nodes
+			// in the initial state they want them in without any assumptions
+			// about what that might be.
+			// This also means that any local geths left running at the end of a scenario
+			// will still be running.
 		}
+		stabilize(world)
 	},
 }
 

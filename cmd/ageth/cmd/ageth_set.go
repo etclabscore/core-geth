@@ -159,7 +159,8 @@ func (s *agethSet) distinctChains() []common.Hash {
 	}
 	distinctHeads := map[common.Hash]struct{}{}
 	for i, hasha := range knownHeads {
-		for _, hashb := range knownHeads[i:] {
+		if i == len(knownHeads) - 1 { break }
+		for _, hashb := range knownHeads[i+1:] {
 			isReorg, latest := isReorg(hasha, hashb, headNodeMap[hasha], headNodeMap[hashb])
 			if isReorg {
 				distinctHeads[hasha] = struct{}{}
@@ -185,14 +186,24 @@ func isReorg(a, b common.Hash, aSet, bSet *agethSet) (bool, common.Hash) {
 	for err != nil { blocka, err = aSet.random().eclient.BlockByHash(context.Background(), a) }
 	blockb, err := bSet.random().eclient.BlockByHash(context.Background(), b)
 	for err != nil { blockb, err = bSet.random().eclient.BlockByHash(context.Background(), b) }
+
+	if blocka.NumberU64() == blockb.NumberU64() { return true, blocka.Hash() }
+
+	var higherBlock, lowerBlock *types.Block
+	var higherSet *agethSet
+
 	if blocka.NumberU64() > blockb.NumberU64() {
-		block, err := aSet.random().eclient.BlockByNumber(context.Background(), blockb.Number())
-		for err != nil { block, err = aSet.random().eclient.BlockByNumber(context.Background(), blockb.Number()) }
-		return block.Hash() != blockb.Hash(), blocka.Hash()
+		higherBlock = blocka
+		lowerBlock = blockb
+		higherSet = aSet
+	} else {
+		higherBlock = blockb
+		lowerBlock = blocka
+		higherSet = bSet
 	}
-	block, err := bSet.random().eclient.BlockByNumber(context.Background(), blocka.Number())
-	for err != nil { block, err = bSet.random().eclient.BlockByNumber(context.Background(), blocka.Number()) }
-	return block.Hash() != blocka.Hash(), blockb.Hash()
+	block, err := higherSet.random().eclient.BlockByNumber(context.Background(), lowerBlock.Number())
+	for err != nil { block, err = higherSet.random().eclient.BlockByNumber(context.Background(), lowerBlock.Number()) }
+	return block.Hash() != lowerBlock.Hash(), higherBlock.Hash()
 }
 
 func (s *agethSet) indexed(i int) *ageth {

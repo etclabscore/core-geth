@@ -229,6 +229,7 @@ to quickly create a Cobra application.`,
 			debounce := time.NewTicker(300 * time.Millisecond)
 			defer debounce.Stop()
 			didEvent := false
+			lastWSState := NetworkGraphData{}
 
 			tookData := []float64{}
 			quit := false
@@ -279,7 +280,25 @@ to quickly create a Cobra application.`,
 						didEvent = false
 					}
 				case <-wsEventChan:
-					didEvent = true
+					// The world's ugliest dedupery
+					// to avoid sending websocket events for equivalent states.
+					isDupe := true
+					if len(lastWSState.Nodes) != len(globalState.Nodes) {
+						isDupe = false
+					}
+					if isDupe && len(lastWSState.Links) != len(globalState.Links) {
+						isDupe = false
+					}
+					if isDupe {
+						b, _ := json.Marshal(lastWSState)
+						b2, _ := json.Marshal(globalState)
+						cb, cb2 := bytes.NewBuffer([]byte{}), bytes.NewBuffer([]byte{})
+						json.Compact(cb, b)
+						json.Compact(cb2, b2)
+						isDupe = bytes.Equal(cb.Bytes(), cb2.Bytes())
+					}
+					didEvent = !isDupe
+					lastWSState = globalState
 				// default:
 				}
 			}
@@ -358,6 +377,11 @@ to quickly create a Cobra application.`,
 			scenarioGenerator(13, 25, 1.5),
 			stabilize,
 		}
+
+		// Comment me to run the test(s).
+		// Leave me to use ageth as just an observer.
+		q := make(chan struct{})
+		<-q
 
 		for {
 			for i, s := range scenarios {

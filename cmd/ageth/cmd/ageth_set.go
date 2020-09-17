@@ -233,6 +233,12 @@ func (s *agethSet) subset(inclusiveStartIndex, nonInclusiveEndIndex int) *agethS
 	return newSet
 }
 
+func (s *agethSet) forEach(fn func(i int, a *ageth)) {
+	for i, a := range s.ageths {
+		fn(i, a)
+	}
+}
+
 func (s *agethSet) where(cond func(g *ageth) bool) *agethSet {
 	ret := newAgethSet()
 	for _, a := range s.ageths {

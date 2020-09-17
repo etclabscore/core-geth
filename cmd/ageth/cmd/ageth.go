@@ -55,6 +55,7 @@ type ageth struct {
 	isMining                    bool
 	quitChan                    chan struct{}
 	online                      bool
+	onHeadCallbacks             []func(*ageth, *types.Block)
 }
 
 func mustStartGethInstance(gethPath, id string) (*exec.Cmd, io.ReadCloser, string) {
@@ -174,7 +175,6 @@ func (a *ageth) isLocal() bool {
 func (a *ageth) isRunning() bool {
 	return a.client != nil
 }
-
 
 func (a *ageth) block() block {
 	if a.latestBlock == nil {
@@ -439,6 +439,14 @@ func (a *ageth) withStandardPeerChurn(targetPeers int, peerSet *agethSet) {
 	}()
 }
 
+func (a *ageth) registerNewHeadCallback(fn func(*ageth, *types.Block)) {
+	a.onHeadCallbacks = append(a.onHeadCallbacks, fn)
+}
+
+func (a *ageth) purgeNewHeadCallbacks() {
+	a.onHeadCallbacks = nil
+}
+
 func (a *ageth) startMining(n int) {
 	a.log.Info("Start mining", "threads", n)
 	var ok bool
@@ -448,9 +456,11 @@ func (a *ageth) startMining(n int) {
 	}
 	a.mining = n
 	a.isMining = true
-	err = a.client.Call(&a.coinbase, "eth_coinbase")
-	if err != nil {
-		a.log.Crit("eth_coinbase", "error", err)
+	if a.coinbase == (common.Address{}) {
+		err = a.client.Call(&a.coinbase, "eth_coinbase")
+		if err != nil {
+			a.log.Crit("eth_coinbase", "error", err)
+		}
 	}
 	a.log.Info("Start mining")
 }
@@ -612,6 +622,11 @@ func (a *ageth) truncateHead(n uint64) {
 
 func (a *ageth) setHead(head *types.Block) {
 	a.latestBlock = head
+	if len(a.onHeadCallbacks) != 0 {
+		for _, cb := range a.onHeadCallbacks {
+			cb(a, head)
+		}
+	}
 	if a.eventChan != nil {
 		select {
 		case a.eventChan <- eventNode{

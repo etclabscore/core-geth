@@ -403,8 +403,13 @@ to quickly create a Cobra application.`,
 			world.push(g)
 		}
 
-		// Comment me to run the test(s).
-		// Leave me to use ageth as just an observer.
+		// If --read-only=true (which it IS, BY DEFAULT, this is where
+		// the flow will stop.
+		// You must use an explicit:
+		//
+		//   ageth --read-only=false
+		//
+		// to proceed, and to run the scenarios below.
 		if readOnly {
 			q := make(chan struct{})
 			<-q

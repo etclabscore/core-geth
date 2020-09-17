@@ -157,20 +157,20 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 		},
 		// Hard has insufficient total difficulty / length and is rejected.
 		{
-			500, 200, 300,
+			500, 250, 250,
 			0, -9,
 			false, false,
 		},
 		// Hard has insufficient total difficulty / length and is rejected.
 		{
-			500, 200, 300,
+			500, 250, 250,
 			7, -9,
 			false, false,
 		},
 		// Hard has insufficient total difficulty / length and is rejected.
 		{
-			500, 200, 300,
-			17, -9,
+			500, 300, 200,
+			13, -9,
 			false, false,
 		},
 		// Hard has sufficient total difficulty / length and is accepted.

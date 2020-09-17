@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	emath "github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 )
@@ -75,41 +76,68 @@ func (bc *BlockChain) getTDRatio(commonAncestor, current, proposed *types.Header
 // over later-to-come counterparts, especially proposed segments stretching far into the past.
 func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) error {
 
-	tdRatio := bc.getTDRatio(commonAncestor, current, proposed)
+	// Get the total difficulties of the proposed chain segment and the existing one.
+	commonAncestorTD := bc.GetTd(commonAncestor.Hash(), commonAncestor.Number.Uint64())
+	proposedParentTD := bc.GetTd(proposed.ParentHash, proposed.Number.Uint64()-1)
+	proposedTD := new(big.Int).Add(proposed.Difficulty, proposedParentTD)
+	localTD := bc.GetTd(current.Hash(), current.Number.Uint64())
 
-	// Time span diff.
-	// The minimum value is 1.
-	x := float64(proposed.Time - commonAncestor.Time)
+	// if proposed_subchain_td * CURVE_FUNCTION_DENOMINATOR < get_curve_function_numerator(proposed.Time - commonAncestor.Time) * local_subchain_td.
+	proposedSubchainTD := new(big.Int).Sub(proposedTD, commonAncestorTD)
+	localSubchainTD := new(big.Int).Sub(localTD, commonAncestorTD)
 
-	// Commented now is a potential way to "soften" the acceptance while
-	// still avoiding discrete acceptance boundaries. In the case that ecbp1100 introduces
-	// unacceptable network inefficiency, this (or something similar) may be an option.
-	// // Accept with diminishing probability in the case of equivalent total difficulty.
-	// // Remember that the equivalent total difficulty case has ALREADY
-	// // passed one coin toss.
-	// if tdRatio == 1 && rand.Float64() < (1/x) {
-	// 	return nil
-	// }
+	got := proposedSubchainTD.Int64() * ecbp1100PolynomialVCurveFunctionDenominator
+	want := ecbp1100PolynomialV(int64(proposed.Time - commonAncestor.Time)) * localSubchainTD.Int64()
 
-	antiGravity := ecbp1100AGSinusoidalA(x)
-
-	if tdRatio < antiGravity {
-		// Using "b/a" here as "'B' chain vs. 'A' chain", where A is original (current), and B is proposed (new).
-		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v blocks=%d td.B/A=%0.6f < antigravity=%0.6f`,
+	if got < want {
+		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v blocks=%d rat=%0.6f`,
 			errReorgFinality,
 			common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)), proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
-			tdRatio, antiGravity,
+			float64(got) / float64(want),
 		)
 	}
 	log.Info("ECBP1100-MESS 🔓",
 		"status", "accepted",
 		"age", common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
 		"blocks", proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
-		"td.B/A", tdRatio,
-		"antigravity", antiGravity,
+		"rat", float64(got) / float64(want),
 	)
 	return nil
 }
+
+/*
+ecbp1100PolynomialV is a cubic function that looks a lot like Option 3's sin function,
+but adds the benefit that the calculation can be done with integers (instead of yucky floating points).
+> https://github.com/ethereumclassic/ECIPs/issues/374#issuecomment-694156719
+
+CURVE_FUNCTION_DENOMINATOR = 128
+
+def get_curve_function_numerator(time_delta: int) -> int:
+    xcap = 25132 # = floor(8000*pi)
+    ampl = 15
+    height = CURVE_FUNCTION_DENOMINATOR * (ampl * 2)
+    if x > xcap:
+        x = xcap
+    # The sine approximator `y = 3*x**2 - 2*x**3` rescaled to the desired height and width
+    return CURVE_FUNCTION_DENOMINATOR + (3 * x**2 - 2 * x**3 // xcap) * height // xcap ** 2
+
+
+The if tdRatio < antiGravity check would then be
+
+if proposed_subchain_td * CURVE_FUNCTION_DENOMINATOR < get_curve_function_numerator(proposed.Time - commonAncestor.Time) * local_subchain_td.
+*/
+func ecbp1100PolynomialV(x int64) int64 {
+	if x > ecbp1100PolynomialVXCap {
+		x = ecbp1100PolynomialVXCap
+	}
+	return ecbp1100PolynomialVCurveFunctionDenominator +
+		((3 * emath.BigPow(int64(x), 2).Int64()) - (2 * emath.BigPow(int64(x), 3).Int64() / ecbp1100PolynomialVXCap)) *
+		ecbp1100PolynomialVHeight / (emath.BigPow(ecbp1100PolynomialVXCap, 2).Int64())
+}
+var ecbp1100PolynomialVCurveFunctionDenominator = int64(128)
+var ecbp1100PolynomialVXCap = int64(25132)
+var ecbp1100PolynomialVAmpl = int64(15)
+var ecbp1100PolynomialVHeight = ecbp1100PolynomialVCurveFunctionDenominator * ecbp1100PolynomialVAmpl * 2
 
 /*
 ecbp1100AGSinusoidalA is a sinusoidal function.

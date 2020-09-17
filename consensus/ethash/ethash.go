@@ -48,7 +48,7 @@ var (
 	two256 = new(big.Int).Exp(big.NewInt(2), big.NewInt(256), big.NewInt(0))
 
 	// sharedEthash is a full instance that can be shared between multiple users.
-	sharedEthash = New(Config{"", 3, 0, false, "", 1, 0, false, ModeNormal, nil}, nil, false)
+	sharedEthash = New(Config{"", 3, 0, false, "", 1, 0, false, ModeNormal, nil, nil}, nil, false)
 
 	// algorithmRevision is the data structure version used for file naming.
 	algorithmRevision = 23
@@ -223,7 +223,7 @@ func newCache(epoch uint64, epochLength uint64) interface{} {
 // generate ensures that the cache content is generated before use.
 func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 	c.once.Do(func() {
-		size := cacheSize(c.epoch*c.epochLength + 1)
+		size := cacheSize(c.epoch*c.epochLength+1, c.epoch)
 		seed := seedHash(c.epoch*c.epochLength + 1)
 		if test {
 			size = 1024
@@ -304,8 +304,8 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		// Mark the dataset generated after we're done. This is needed for remote
 		defer atomic.StoreUint32(&d.done, 1)
 
-		csize := cacheSize(d.epoch*d.epochLength + 1)
-		dsize := datasetSize(d.epoch*d.epochLength + 1)
+		csize := cacheSize(d.epoch*d.epochLength+1, d.epoch)
+		dsize := datasetSize(d.epoch*d.epochLength+1, d.epoch)
 		seed := seedHash(d.epoch*d.epochLength + 1)
 		if test {
 			csize = 1024
@@ -379,15 +379,15 @@ func (d *dataset) finalizer() {
 }
 
 // MakeCache generates a new ethash cache and optionally stores it to disk.
-func MakeCache(block uint64, dir string) {
-	epoch, epochLength := calcEpoch(block)
+func MakeCache(block uint64, epochLength uint64, dir string) {
+	epoch := calcEpoch(block, epochLength)
 	c := cache{epoch: epoch, epochLength: epochLength}
 	c.generate(dir, math.MaxInt32, false, false)
 }
 
 // MakeDataset generates a new ethash dataset and optionally stores it to disk.
-func MakeDataset(block uint64, dir string) {
-	epoch, epochLength := calcEpoch(block)
+func MakeDataset(block uint64, epochLength uint64, dir string) {
+	epoch := calcEpoch(block, epochLength)
 	d := dataset{epoch: epoch, epochLength: epochLength}
 	d.generate(dir, math.MaxInt32, false, false)
 }
@@ -416,6 +416,8 @@ type Config struct {
 	PowMode          Mode
 
 	Log log.Logger `toml:"-"`
+	// ECIP-1099
+	EtchashOnBlock *uint64
 }
 
 // Ethash is a consensus engine based on proof-of-work implementing the ethash
@@ -557,7 +559,8 @@ func (ethash *Ethash) Close() error {
 // by first checking against a list of in-memory caches, then against caches
 // stored on disk, and finally generating one if none can be found.
 func (ethash *Ethash) cache(block uint64) *cache {
-	epoch, epochLength := calcEpoch(block)
+	epochLength := calcEpochLength(block, ethash.config.EtchashOnBlock)
+	epoch := calcEpoch(block, epochLength)
 	currentI, futureI := ethash.caches.get(epoch, epochLength)
 	current := currentI.(*cache)
 
@@ -580,7 +583,8 @@ func (ethash *Ethash) cache(block uint64) *cache {
 // generates on a background thread.
 func (ethash *Ethash) dataset(block uint64, async bool) *dataset {
 	// Retrieve the requested ethash dataset
-	epoch, epochLength := calcEpoch(block)
+	epochLength := calcEpochLength(block, ethash.config.EtchashOnBlock)
+	epoch := calcEpoch(block, epochLength)
 	currentI, futureI := ethash.datasets.get(epoch, epochLength)
 	current := currentI.(*dataset)
 

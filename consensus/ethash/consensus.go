@@ -502,8 +502,9 @@ func (ethash *Ethash) verifySeal(chain consensus.ChainHeaderReader, header *type
 	// If slow-but-light PoW verification was requested (or DAG not yet ready), use an ethash cache
 	if !fulldag {
 		cache := ethash.cache(number)
-
-		size := datasetSize(number)
+		epochLength := calcEpochLength(number, ethash.config.EtchashOnBlock)
+		epoch := calcEpoch(number, epochLength)
+		size := datasetSize(number, epoch)
 		if ethash.config.PowMode == ModeTest {
 			size = 32 * 1024
 		}

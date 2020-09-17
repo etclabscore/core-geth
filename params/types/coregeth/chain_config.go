@@ -173,6 +173,8 @@ type CoreGethChainConfig struct {
 	ECIP1017EraRounds  *big.Int `json:"ecip1017EraRounds,omitempty"` // ECIP1017 era rounds
 	ECIP1080FBlock     *big.Int `json:"ecip1080FBlock,omitempty"`
 
+	ECIP1099FBlock *big.Int `json:"ecip1099FBlock,omitempty"` // ECIP1099 etchash HF block
+
 	DisposalBlock    *big.Int `json:"disposalBlock,omitempty"`    // Bomb disposal HF block
 	SocialBlock      *big.Int `json:"socialBlock,omitempty"`      // Ethereum Social Reward block
 	EthersocialBlock *big.Int `json:"ethersocialBlock,omitempty"` // Ethersocial Reward block

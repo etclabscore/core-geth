@@ -47,44 +47,39 @@ const (
 	datasetParents     = 256     // Number of parents of each dataset element
 	cacheRounds        = 3       // Number of rounds in cache production
 	loopAccesses       = 64      // Number of accesses in hashimoto loop
+	maxEpoch           = 2048    // Max Epoch for included tables
 )
 
-// Activation block for ECIP-1099 (etchash)
-// mainnet: 11460000
-// mordor: 2340000
-// TODO: Move to chain configs - iquidus
-const ecip1099Block = uint64(11460000)
-
 // calcEpochLength returns the epoch length for a given block number (ECIP-1099)
-func calcEpochLength(block uint64) uint64 {
-	if block < ecip1099Block {
-		return oldEpochLength
+func calcEpochLength(block uint64, ecip1099FBlock *uint64) uint64 {
+	if ecip1099FBlock != nil {
+		if block >= *ecip1099FBlock {
+			return newEpochLength
+		}
 	}
-	return newEpochLength
+	return oldEpochLength
 }
 
 // calcEpoch returns the epoch for a given block number (ECIP-1099)
-func calcEpoch(block uint64) (uint64, uint64) {
-	epochLength := calcEpochLength(block)
+func calcEpoch(block uint64, epochLength uint64) uint64 {
 	epoch := block / epochLength
-	return epoch, epochLength
+	return epoch
 }
 
 // cacheSize returns the size of the ethash verification cache that belongs to a certain
 // block number.
-func cacheSize(block uint64) uint64 {
-	epoch, _ := calcEpoch(block)
+func cacheSize(block uint64, epoch uint64) uint64 {
 	if epoch < maxEpoch {
 		return cacheSizes[int(epoch)]
 	}
-	return calcCacheSize(int(epoch))
+	return calcCacheSize(epoch)
 }
 
 // calcCacheSize calculates the cache size for epoch. The cache size grows linearly,
 // however, we always take the highest prime below the linearly growing threshold in order
 // to reduce the risk of accidental regularities leading to cyclic behavior.
-func calcCacheSize(epoch int) uint64 {
-	size := cacheInitBytes + cacheGrowthBytes*uint64(epoch) - hashBytes
+func calcCacheSize(epoch uint64) uint64 {
+	size := cacheInitBytes + cacheGrowthBytes*epoch - hashBytes
 	for !new(big.Int).SetUint64(size / hashBytes).ProbablyPrime(1) { // Always accurate for n < 2^64
 		size -= 2 * hashBytes
 	}
@@ -93,19 +88,18 @@ func calcCacheSize(epoch int) uint64 {
 
 // datasetSize returns the size of the ethash mining dataset that belongs to a certain
 // block number.
-func datasetSize(block uint64) uint64 {
-	epoch, _ := calcEpoch(block)
+func datasetSize(block uint64, epoch uint64) uint64 {
 	if epoch < maxEpoch {
 		return datasetSizes[int(epoch)]
 	}
-	return calcDatasetSize(int(epoch))
+	return calcDatasetSize(epoch)
 }
 
 // calcDatasetSize calculates the dataset size for epoch. The dataset size grows linearly,
 // however, we always take the highest prime below the linearly growing threshold in order
 // to reduce the risk of accidental regularities leading to cyclic behavior.
-func calcDatasetSize(epoch int) uint64 {
-	size := datasetInitBytes + datasetGrowthBytes*uint64(epoch) - mixBytes
+func calcDatasetSize(epoch uint64) uint64 {
+	size := datasetInitBytes + datasetGrowthBytes*epoch - mixBytes
 	for !new(big.Int).SetUint64(size / mixBytes).ProbablyPrime(1) { // Always accurate for n < 2^64
 		size -= 2 * mixBytes
 	}
@@ -421,8 +415,6 @@ func hashimotoFull(dataset []uint32, hash []byte, nonce uint64) ([]byte, []byte)
 	}
 	return hashimoto(hash, nonce, uint64(len(dataset))*4, lookup)
 }
-
-const maxEpoch = 2048
 
 // datasetSizes is a lookup table for the ethash dataset size for the first 2048
 // epochs (i.e. 61440000 blocks).

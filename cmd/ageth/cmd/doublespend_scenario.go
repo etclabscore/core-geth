@@ -40,7 +40,7 @@ func stabilize(nodes *agethSet) {
   }
 }
 
-func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Duration, targetDifficultyRatio, miningRatio float64, attackerShouldWin bool) func(*agethSet) {
+func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Duration, targetTotalDifficultyRatio, miningRatio float64, attackerShouldWin bool) func(*agethSet) {
   return func(nodes *agethSet) {
     // Setup
 
@@ -92,18 +92,21 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
 
     // Once a second, check to see if the bad guy's block difficulty has
     // reached the target.
-    lastChainRatio := 0.0
+    lastChainRatioTD := 0.0
     badGuyBlockTime := blockTime / 2
     for {
       bestPeer := goodGuys.peerMax()
       if bestPeer == nil { continue }
-      chainRatio := float64(badGuy.getTd() - forkBlockTd) / float64(bestPeer.getTd() - forkBlockTd)
-      if chainRatio != lastChainRatio {
+
+      // Get the total difficulty ratio of the forked chain / majority chain.
+      chainRatioTD := float64(badGuy.getTd() - forkBlockTd) / float64(bestPeer.getTd() - forkBlockTd)
+
+      if chainRatioTD != lastChainRatioTD {
         // The ratio has changed, adjust mining power
-        if chainRatio < targetDifficultyRatio {
+        if chainRatioTD < targetTotalDifficultyRatio {
           // We're behind the target ratio. We need to mine faster
           badGuyBlockTime--
-        } else if chainRatio > targetDifficultyRatio {
+        } else if chainRatioTD > targetTotalDifficultyRatio {
           // We're above the target ratio, we can mine slower.
           badGuyBlockTime++
         }

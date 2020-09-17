@@ -116,11 +116,14 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
         } else {
           badGuy.startMining(badGuyBlockTime)
         }
-        lastChainRatio = chainRatio
+        lastChainRatioTD = chainRatioTD
       }
-      targetDifficulty := uint64(float64(goodGuys.headBlock().Difficulty().Uint64()) * targetDifficultyRatio)
+
       if time.Since(attackStartTime) > attackDuration {
-        log.Info("Attacker reached time limit without reaching target difficulty", "blocks", badGuy.block().number - forkBlock.number, "difficulty", badGuy.block().difficulty, "target", targetDifficulty)
+        log.Info("Attacker reached time limit",
+          "blocks", badGuy.block().number - forkBlock.number,
+          "difficulty", badGuy.block().difficulty,
+          "tdratio.target", targetTotalDifficultyRatio, "tdratio.actual", chainRatioTD)
         break
       }
       time.Sleep(time.Second)

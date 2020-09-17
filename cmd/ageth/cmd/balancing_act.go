@@ -43,6 +43,23 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		nodes.forEach(func(i int, a *ageth) {
 			a.stopMining()
 			a.setMaxPeers(100)
+			var res bool
+			a.client.Call(&res, "admin_ecbp1100", 9999999999)
+		})
+		time.Sleep(1 * time.Minute)
+	outer:
+		for {
+			for _, n := range nodes.all() {
+				if n.block().number != nodes.headMax() {
+					time.Sleep(10 * time.Second)
+					continue outer
+				}
+			}
+			break
+		}
+		nodes.forEach(func(i int, a *ageth) {
+			var res bool
+			a.client.Call(&res, "admin_ecbp1100", 1)
 		})
 
 		scenarioDone := false
@@ -91,9 +108,9 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 				wantRatio = ecbp1100AGSinusoidalA(float64(h.Time() - forkedBlockTime))
 			}
 			if balance > wantRatio+tdRatioTolerance {
-				self.stopMining()
+				self.startMining(42)
 			} else if balance < wantRatio-tdRatioTolerance {
-				self.startMining(1)
+				self.startMining(2)
 			} else {
 				self.startMining(normalBlockTime)
 			}

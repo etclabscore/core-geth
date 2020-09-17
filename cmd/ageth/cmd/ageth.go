@@ -463,7 +463,6 @@ func (a *ageth) startMining(n int) {
 			a.log.Crit("eth_coinbase", "error", err)
 		}
 	}
-	a.log.Info("Start mining")
 }
 
 func (a *ageth) stopMining() {
@@ -473,7 +472,6 @@ func (a *ageth) stopMining() {
 	if err != nil {
 		a.log.Crit("miner_stop", "error", err)
 	}
-	a.log.Info("Stop mining")
 	a.mining = 0
 	a.isMining = false
 }
@@ -597,7 +595,7 @@ func (a *ageth) updateSelfStats() {
 	a.refreshPeers()
 }
 
-func (a *ageth) getHeadManually() {
+func (a *ageth) setHeadManually() {
 	b, err := a.eclient.BlockByNumber(context.Background(), nil)
 	if err != nil {
 		a.log.Error("get block by number [nil=latest]", "error", err)
@@ -619,6 +617,7 @@ func (a *ageth) truncateHead(n uint64) {
 	if err != nil {
 		a.log.Error("debug_setHead", "error", err)
 	}
+	a.setHeadManually()
 }
 
 func (a *ageth) setHead(head *types.Block) {
@@ -674,7 +673,7 @@ func (a *ageth) onNewHead(head *types.Block) {
 func (a *ageth) setMaxPeers(count int) {
 	var result bool
 	err := a.client.Call(&result, "admin_maxPeers", count)
-	if err == nil {
+	if err != nil {
 		a.log.Error("admin_maxPeers errored", "error", err)
 	}
 }

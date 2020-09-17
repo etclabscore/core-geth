@@ -206,138 +206,140 @@ to quickly create a Cobra application.`,
 		}()
 
 		// HTTP/WS stuff.
-		http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-			ws, err := upgrader.Upgrade(w, r, nil)
-			if err != nil {
-				log.Error("WS errored", "error", err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-
-			log.Info("Websocket connection", "remote.addr", r.RemoteAddr)
-
-			payload := globalState
-			payload.Tick = globalTick
-			globalTick++
-			err = ws.WriteJSON(Event{
-				Typ:     "state",
-				Payload: payload,
-			})
-			if err != nil {
-				log.Debug("Write WS event errored", "error", err)
-			}
-
-			debounce := time.NewTicker(300 * time.Millisecond)
-			defer debounce.Stop()
-			didEvent := false
-			lastWSState := NetworkGraphData{}
-
-			// tookData := []float64{}
-			quit := false
-			// go func() {
-			// 	for !quit {
-			// 		took := struct {
-			// 			Took int32 `json:"took"`
-			// 		}{}
-			// 		err = ws.ReadJSON(&took)
-			// 		if err != nil {
-			// 			log.Debug("WS read took message errored", "error", err)
-			// 			time.Sleep(time.Second)
-			// 			continue
-			// 		}
-			// 		tookData = append(tookData, float64(took.Took))
-			// 		if len(tookData) < 10 {
-			// 			continue
-			// 		}
-			// 		mean, _ := stats.Mean(tookData)
-			// 		if mean < 100 {
-			// 			mean = 100
-			// 		}
-			// 		tookData = []float64{}
-			// 		log.Debug("Update ticker interval", "interval.ms", mean)
-			// 		debounce.Stop()
-			// 		debounce = time.NewTicker(time.Duration(mean) * time.Millisecond)
-			// 	}
-			// }()
-
-			defer func() {
-				quit = true
-				ws.Close()
-			}()
-			for {
-				select {
-				case <-debounce.C:
-					if didEvent {
-						payload := globalState
-						payload.Tick = globalTick
-						globalTick++
-						err := ws.WriteJSON(Event{
-							Typ:     "state",
-							Payload: payload,
-						})
-						if err != nil {
-							log.Debug("Write WS event errored", "error", err)
-						}
-						didEvent = false
-					}
-				case <-wsEventChan:
-					// The world's ugliest dedupery
-					// to avoid sending websocket events for equivalent states.
-					isDupe := true
-					if len(lastWSState.Nodes) != len(globalState.Nodes) {
-						isDupe = false
-					}
-					if isDupe && len(lastWSState.Links) != len(globalState.Links) {
-						isDupe = false
-					}
-					if isDupe {
-						b, _ := json.Marshal(lastWSState)
-						b2, _ := json.Marshal(globalState)
-						cb, cb2 := bytes.NewBuffer([]byte{}), bytes.NewBuffer([]byte{})
-						json.Compact(cb, b)
-						json.Compact(cb2, b2)
-						isDupe = bytes.Equal(cb.Bytes(), cb2.Bytes())
-					}
-					didEvent = !isDupe
-					lastWSState = globalState
-				// default:
+		if httpAddr != "" {
+			http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Access-Control-Allow-Origin", "*")
+				ws, err := upgrader.Upgrade(w, r, nil)
+				if err != nil {
+					log.Error("WS errored", "error", err)
+					w.WriteHeader(http.StatusInternalServerError)
+					return
 				}
-			}
-		})
-		http.HandleFunc("/state", func(writer http.ResponseWriter, request *http.Request) {
-			endpoint(world)(writer, request)
-		})
-		statikFS, err := fs.New()
-		if err != nil {
-			llog.Fatal(err)
-		}
-		http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-			enableCors(writer)
-			r, err := statikFS.Open("/index.html")
+
+				log.Info("Websocket connection", "remote.addr", r.RemoteAddr)
+
+				payload := globalState
+				payload.Tick = globalTick
+				globalTick++
+				err = ws.WriteJSON(Event{
+					Typ:     "state",
+					Payload: payload,
+				})
+				if err != nil {
+					log.Debug("Write WS event errored", "error", err)
+				}
+
+				debounce := time.NewTicker(300 * time.Millisecond)
+				defer debounce.Stop()
+				didEvent := false
+				lastWSState := NetworkGraphData{}
+
+				// tookData := []float64{}
+				quit := false
+				// go func() {
+				// 	for !quit {
+				// 		took := struct {
+				// 			Took int32 `json:"took"`
+				// 		}{}
+				// 		err = ws.ReadJSON(&took)
+				// 		if err != nil {
+				// 			log.Debug("WS read took message errored", "error", err)
+				// 			time.Sleep(time.Second)
+				// 			continue
+				// 		}
+				// 		tookData = append(tookData, float64(took.Took))
+				// 		if len(tookData) < 10 {
+				// 			continue
+				// 		}
+				// 		mean, _ := stats.Mean(tookData)
+				// 		if mean < 100 {
+				// 			mean = 100
+				// 		}
+				// 		tookData = []float64{}
+				// 		log.Debug("Update ticker interval", "interval.ms", mean)
+				// 		debounce.Stop()
+				// 		debounce = time.NewTicker(time.Duration(mean) * time.Millisecond)
+				// 	}
+				// }()
+
+				defer func() {
+					quit = true
+					ws.Close()
+				}()
+				for {
+					select {
+					case <-debounce.C:
+						if didEvent {
+							payload := globalState
+							payload.Tick = globalTick
+							globalTick++
+							err := ws.WriteJSON(Event{
+								Typ:     "state",
+								Payload: payload,
+							})
+							if err != nil {
+								log.Debug("Write WS event errored", "error", err)
+							}
+							didEvent = false
+						}
+					case <-wsEventChan:
+						// The world's ugliest dedupery
+						// to avoid sending websocket events for equivalent states.
+						isDupe := true
+						if len(lastWSState.Nodes) != len(globalState.Nodes) {
+							isDupe = false
+						}
+						if isDupe && len(lastWSState.Links) != len(globalState.Links) {
+							isDupe = false
+						}
+						if isDupe {
+							b, _ := json.Marshal(lastWSState)
+							b2, _ := json.Marshal(globalState)
+							cb, cb2 := bytes.NewBuffer([]byte{}), bytes.NewBuffer([]byte{})
+							json.Compact(cb, b)
+							json.Compact(cb2, b2)
+							isDupe = bytes.Equal(cb.Bytes(), cb2.Bytes())
+						}
+						didEvent = !isDupe
+						lastWSState = globalState
+						// default:
+					}
+				}
+			})
+			http.HandleFunc("/state", func(writer http.ResponseWriter, request *http.Request) {
+				endpoint(world)(writer, request)
+			})
+			statikFS, err := fs.New()
 			if err != nil {
-				log.Error("Open index.html errored", "error", err)
-				writer.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			b, err := ioutil.ReadAll(r)
-			if err != nil {
-				log.Error("Read index.html errored", "error", err)
-				writer.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			_, err = writer.Write(b)
-			if err != nil {
-				log.Error("Write index.html errored", "error", err)
-				writer.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-		})
-		go func() {
-			if err := http.ListenAndServe(httpAddr, nil); err != nil {
 				llog.Fatal(err)
 			}
-		}()
+			http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+				enableCors(writer)
+				r, err := statikFS.Open("/index.html")
+				if err != nil {
+					log.Error("Open index.html errored", "error", err)
+					writer.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				b, err := ioutil.ReadAll(r)
+				if err != nil {
+					log.Error("Read index.html errored", "error", err)
+					writer.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				_, err = writer.Write(b)
+				if err != nil {
+					log.Error("Write index.html errored", "error", err)
+					writer.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+			})
+			go func() {
+				if err := http.ListenAndServe(httpAddr, nil); err != nil {
+					llog.Fatal(err)
+				}
+			}()
+		}
 
 		listEndpoints := []string{}
 		var readFrom io.Reader

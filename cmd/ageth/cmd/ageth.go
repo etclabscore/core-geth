@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	llog "log"
+	"math/big"
 	"math/rand"
 	"net"
 	"net/url"
@@ -646,12 +647,36 @@ func (a *ageth) setHead(head *types.Block) {
 	}
 }
 
+func (a *ageth) sameChainAs(b *ageth) bool {
+	if a.block().hash == b.block().hash {
+		return true
+	}
+	if a.block().number == b.block().number {
+		return false
+	}
+	compare := func(x, y *ageth) bool {
+		b, _ := y.eclient.BlockByNumber(context.Background(), big.NewInt(int64(x.block().number)))
+		if b == nil {
+			return false
+		}
+		return x.block().hash == b.Hash()
+	}
+	if a.block().number < b.block().number {
+		return compare(a, b)
+	}
+	return compare(b, a)
+}
+
 func (a *ageth) onNewHead(head *types.Block) {
 
 }
 
-func (a *ageth) setPeerCount(count int) {
-	// Need an RPC call for this to work
+func (a *ageth) setMaxPeers(count int) {
+	var result bool
+	err := a.client.Call(&result, "admin_maxPeers", count)
+	if err == nil {
+		a.log.Error("admin_maxPeers errored", "error", err)
+	}
 }
 
 func (a *ageth) getPeerCount() int64 {
@@ -667,9 +692,9 @@ func (a *ageth) refusePeers(resumeWithMaxPeers int) (resumePeers func()) {
 	peers := []*p2p.PeerInfo{}
 	a.client.Call(&peers, "admin_peers")
 	var result interface{}
-	a.client.Call(&result, "admin_maxPeers", 0)
+	a.setMaxPeers(0)
 	return func() {
-		a.client.Call(&result, "admin_maxPeers", resumeWithMaxPeers)
+		a.setMaxPeers(resumeWithMaxPeers)
 		for _, peer := range peers {
 			a.client.Call(&result, "admin_addPeer", peer.Enode)
 		}

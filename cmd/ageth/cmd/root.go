@@ -411,8 +411,14 @@ to quickly create a Cobra application.`,
 		}
 
 		scenarios := []scenario{
-			scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.13, .666, true),
-			scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.02, .666, false),
+			generateScenarioPartitioning(false, 3*time.Minute),
+			generateScenarioPartitioning(false, 3*time.Minute),
+			generateScenarioPartitioning(false, 3*time.Minute),
+			generateScenarioPartitioning(true, 15*time.Minute),
+			generateScenarioPartitioning(true, 15*time.Minute),
+
+			// scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.13, .666, true),
+			// scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.02, .666, false),
 
 			// scenarioGenerator(13, 34 * time.Minute, 10 * time.Minute, 1.55, .666, true),
 			// scenarioGenerator(13, 34 * time.Minute, 10 * time.Minute, 1.45, .666, false),

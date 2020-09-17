@@ -218,6 +218,8 @@ to quickly create a Cobra application.`,
 				return
 			}
 
+			log.Info("Websocket connection", "remote.addr", r.RemoteAddr)
+
 			payload := globalState
 			payload.Tick = globalTick
 			globalTick++

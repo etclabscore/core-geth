@@ -17,6 +17,8 @@ type finalReport struct {
   Unconverted int
   DistinctChains []common.Hash
   Nodes map[string]common.Hash
+  DifficultyRatio float64
+  TargetDifficultyRatio float64
   AttackerShouldWin bool
   AttackerWon bool
 }
@@ -34,13 +36,16 @@ func stabilize(nodes *agethSet) {
       node.addPeer(nodes.random())
     }
   }
-  goodGuys.random().startMining(30) // Start single miner at a slow pace.
+  goodGuys.random().startMining(13)
   for len(nodes.distinctChains()) > 1 {
     time.Sleep(30)
   }
+  for badGuy.block().number < goodGuys.headMax() {
+    time.Sleep(5)
+  }
 }
 
-func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Duration, targetTotalDifficultyRatio, miningRatio float64, attackerShouldWin bool) func(*agethSet) {
+func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Duration, targetDifficultyRatio, miningRatio float64, attackerShouldWin bool) func(*agethSet) {
   return func(nodes *agethSet) {
     // Setup
 
@@ -90,88 +95,77 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
     badGuy.startMining(blockTime / 2)
     attackStartTime := time.Now()
 
-    // Once a second, check to see if the bad guy's block difficulty has
-    // reached the target.
-    lastChainRatioTD := 0.0
-    badGuyBlockTime := blockTime / 2
-    for {
-      bestPeer := goodGuys.peerMax()
-      if bestPeer == nil { continue }
-
-      // Get the total difficulty ratio of the forked chain / majority chain.
-      chainRatioTD := float64(badGuy.getTd() - forkBlockTd) / float64(bestPeer.getTd() - forkBlockTd)
-
-      if chainRatioTD != lastChainRatioTD {
-        // The ratio has changed, adjust mining power
-        if chainRatioTD < targetTotalDifficultyRatio {
-          // We're behind the target ratio. We need to mine faster
-          badGuyBlockTime--
-        } else if chainRatioTD > targetTotalDifficultyRatio {
-          // We're above the target ratio, we can mine slower.
-          badGuyBlockTime++
-        }
-        if badGuyBlockTime < 1 {
-          // We can't mine that fast.
-          badGuyBlockTime = 1
-        } else {
-          badGuy.startMining(badGuyBlockTime)
-        }
-        lastChainRatioTD = chainRatioTD
+      // Once a second, check to see if the bad guy's block difficulty has
+      // reached the target.
+      lastChainRatio := 0.0
+      badGuyBlockTime := blockTime / 2
+      for {
+          bestPeer := goodGuys.peerMax()
+          if bestPeer == nil { continue }
+          chainRatio := float64(badGuy.getTd() - forkBlockTd) / float64(bestPeer.getTd() - forkBlockTd)
+          if chainRatio != lastChainRatio {
+              // The ratio has changed, adjust mining power
+              if chainRatio < targetDifficultyRatio {
+                  // We're behind the target ratio. We need to mine faster
+                  badGuyBlockTime--
+                  if badGuyBlockTime > blockTime {
+                      // The tides have turned and we're behind where we should be. Get
+                      // back in line quickly, rather than one block at a time.
+                      badGuyBlockTime = blockTime
+                  }
+              } else if chainRatio > targetDifficultyRatio {
+                  // We're above the target ratio, we can mine slower.
+                  badGuyBlockTime++
+                  if badGuyBlockTime < blockTime / 2 {
+                      // We're mining way too fast. Slam on the breaks
+                      badGuyBlockTime = blockTime / 2
+                  }
+              }
+              if badGuyBlockTime < 1 {
+                  // We can't mine that fast.
+                  badGuyBlockTime = 1
+              } else {
+                  badGuy.startMining(badGuyBlockTime)
+              }
+              lastChainRatio = chainRatio
+          }
+          if time.Since(attackStartTime) > attackDuration {
+              log.Info("Attacker reached time limit", "blocks", badGuy.block().number - forkBlock.number, "difficulty", badGuy.block().difficulty, "chainRatio", chainRatio, "targetRatio", targetDifficultyRatio)
+              break
+          }
+          time.Sleep(time.Second)
       }
 
-      if time.Since(attackStartTime) > attackDuration {
-        log.Info("Attacker reached time limit",
-          "blocks", badGuy.block().number - forkBlock.number,
-          "difficulty", badGuy.block().difficulty,
-          "tdratio.target", targetTotalDifficultyRatio, "tdratio.actual", chainRatioTD)
-        break
+      finalAttackBlock := badGuy.block()
+      forkBlockPlusOne, err := badGuy.eclient.BlockByNumber(context.Background(), big.NewInt(int64(forkBlock.number + 1)))
+      if err != nil {
+          log.Error("Error getting forkBlock + 1", "err", err)
       }
+      log.Info("Attacker done mining", "mined", finalAttackBlock.number - forkBlock.number, "attackerhash", finalAttackBlock.hash)
+      badGuy.stopMining()
+      // badGuy.setPeerCount(25)
+      resumePeering()
+      scenarioEnded := false
+      defer func() { scenarioEnded = true }()
+      attackMiners := make(chan struct{})
+      go func() {
+          for !scenarioEnded {
+              // Sleep until the badguy has found 5 peers
+              badGuy.addPeers(bigMiners) // Aggressively try to add the miners. NOTE that this represents an attacker sophisticated enough to identify and target miners.
+              if badGuy.getPeerCount() >= 5 { attackMiners <- struct{}{} }
+              time.Sleep(1 * time.Second)
+          }
+      }()
+      <- attackMiners
+      time.Sleep(stabilizeDuration)
 
-      time.Sleep(time.Second)
-    }
 
-    finalAttackBlock := badGuy.block()
-    log.Info("Attacker done mining", "mined", finalAttackBlock.number - forkBlock.number)
-    badGuy.stopMining()
-
-    // Control: make sure bigMiners (at least) have sufficient peers
-    // for MESS to be activated (>=10).
-    log.Info("Controlling for good guys big miners to have a minimum num of peers", "minimum", 12)
-    for _, bigMiner := range bigMiners.all() {
-      for bigMiner.peers.len() < 12 {
-        friend := goodGuys.random()
-        bigMiner.log.Warn("Big miner low on peers", "count", bigMiner.peers.len(), "add", friend.name)
-        bigMiner.addPeer(friend)
-      }
-    }
-
-    // badGuy.setPeerCount(25)
-    resumePeering()
-    scenarioEnded := false
-    defer func() { scenarioEnded = true }()
-    attackMiners := make(chan struct{})
-    go func() {
-      for !scenarioEnded {
-        // Sleep until the badguy has found 5 peers
-        badGuy.addPeers(bigMiners) // Aggressively try to add the miners. NOTE that this represents an attacker sophisticated enough to identify and target miners.
-        if badGuy.getPeerCount() >= 5 { attackMiners <- struct{}{} }
-        time.Sleep(1 * time.Second)
-      }
-    }()
-    <- attackMiners
-    time.Sleep(stabilizeDuration)
-
-    b, err := badGuy.eclient.BlockByNumber(context.Background(), big.NewInt(int64(finalAttackBlock.number)))
+      b, err := badGuy.eclient.BlockByNumber(context.Background(), big.NewInt(int64(finalAttackBlock.number)))
     if err != nil {
       log.Error("Error getting block", "blockno", finalAttackBlock.number, "node", badGuy.name)
     }
     if b.Hash() != finalAttackBlock.hash {
       log.Info("Even the attacker gave up their block")
-    }
-
-    forkBlockPlusOne, err := badGuy.eclient.BlockByNumber(context.Background(), big.NewInt(int64(forkBlock.number + 1)))
-    if err != nil {
-      log.Error("Error getting forkBlock + 1", "err", err)
     }
 
     convertedNodes := 0
@@ -193,6 +187,8 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
       Unconverted: unconvertedNodes,
       DistinctChains: nodes.distinctChains(),
       Nodes: make(map[string]common.Hash),
+      DifficultyRatio: lastChainRatio,
+      TargetDifficultyRatio: targetDifficultyRatio,
       AttackerShouldWin: attackerShouldWin,
       AttackerWon: unconvertedNodes == 0,
     }

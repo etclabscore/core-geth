@@ -178,7 +178,6 @@ to quickly create a Cobra application.`,
 			} else if reportToStdout {
 				writer = os.Stdout
 			}
-			lastReport := time.Now()
 			for {
 				select {
 				case event := <-reportEventChan:
@@ -192,10 +191,6 @@ to quickly create a Cobra application.`,
 
 					if writer != nil {
 						// write to stable storage
-						if time.Since(lastReport) < time.Second {
-							continue
-						}
-						lastReport = time.Now()
 						b, err := json.Marshal(globalState)
 						if err != nil {
 							llog.Fatal(err)
@@ -416,11 +411,23 @@ to quickly create a Cobra application.`,
 		}
 
 		scenarios := []scenario{
-			scenarioGenerator(13, 10 * time.Minute, 10 * time.Minute, 1.1, .666, true),
-			scenarioGenerator(13, 10 * time.Minute, 10 * time.Minute, 1.02, .666, false),
+			scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.13, .666, true),
+			scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.02, .666, false),
 
-			scenarioGenerator(13, 5 *time.Hour, 10 * time.Minute, 26.0, .666, false),
-			scenarioGenerator(13, 5 *time.Hour, 10 * time.Minute, 20.0, .666, false),
+			// scenarioGenerator(13, 34 * time.Minute, 10 * time.Minute, 1.55, .666, true),
+			// scenarioGenerator(13, 34 * time.Minute, 10 * time.Minute, 1.45, .666, false),
+			//
+			// scenarioGenerator(13, 49 * time.Minute, 10 * time.Minute, 2.1, .666, true),
+			// scenarioGenerator(13, 49 * time.Minute, 10 * time.Minute, 1.9, .666, false),
+			//
+			// scenarioGenerator(13, 70 * time.Minute, 10 * time.Minute, 3.14, .666, true),
+			// scenarioGenerator(13, 70 * time.Minute, 10 * time.Minute, 2.9, .666, false),
+			//
+			// scenarioGenerator(13, 86 * time.Minute, 10 * time.Minute, 4.15, .666, true),
+			// scenarioGenerator(13, 86 * time.Minute, 10 * time.Minute, 3.9, .666, false),
+			//
+			// scenarioGenerator(13, 100 * time.Minute, 10 * time.Minute, 5.17, .666, true),
+			// scenarioGenerator(13, 100 * time.Minute, 10 * time.Minute, 4.87, .666, false),
 
 		}
 

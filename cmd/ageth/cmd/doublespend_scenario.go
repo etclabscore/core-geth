@@ -34,7 +34,7 @@ func stabilize(nodes *agethSet) {
       node.addPeer(nodes.random())
     }
   }
-  goodGuys.random().startMining(13)
+  goodGuys.random().startMining(30) // Start single miner at a slow pace.
   for len(nodes.distinctChains()) > 1 {
     time.Sleep(30)
   }

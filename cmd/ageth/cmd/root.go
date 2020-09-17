@@ -335,7 +335,7 @@ to quickly create a Cobra application.`,
 			}
 		})
 		go func() {
-			if err := http.ListenAndServe(":8008", nil); err != nil {
+			if err := http.ListenAndServe(httpAddr, nil); err != nil {
 				llog.Fatal(err)
 			}
 		}()
@@ -369,22 +369,30 @@ to quickly create a Cobra application.`,
 			log.Crit("No endpoints found")
 		}
 
+		wg := sync.WaitGroup{}
+		wg.Add(len(listEndpoints))
 		for _, e := range listEndpoints {
-			g := newAgeth(e)
-			g.eventChan = reportEventChan
-			g.run()
-			world.push(g)
+			go func(endpoint string) {
+				g := newAgeth(e)
+				g.eventChan = reportEventChan
+				g.run()
+				world.push(g)
+				wg.Done()
+			}(e)
+		}
+		wg.Wait()
+
+		// Comment me to run the test(s).
+		// Leave me to use ageth as just an observer.
+		if readOnly {
+			q := make(chan struct{})
+			<-q
 		}
 
 		scenarios := []scenario{
 			scenarioGenerator(13, 10 * time.Minute, 10 * time.Minute, 1.1, .666, true),
 			scenarioGenerator(13, 10 * time.Minute, 10 * time.Minute, 1.02, .666, false),
 		}
-
-		// Comment me to run the test(s).
-		// Leave me to use ageth as just an observer.
-		// q := make(chan struct{})
-		// <-q
 
 		for i, s := range scenarios {
 			log.Info("Running scenario", "index", i, "scenarios.len", len(scenarios),
@@ -414,6 +422,8 @@ func Execute() {
 
 var reportToFS string
 var endpointsFile string
+var httpAddr string
+var readOnly bool
 
 func init() {
 	cobra.OnInitialize(initConfig)
@@ -426,8 +436,10 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().StringVarP(&reportToFS, "report", "p", "", "Write reporting logs to a given file")
+	rootCmd.Flags().StringVarP(&reportToFS, "report", "r", "", "Write reporting logs to a given file")
 	rootCmd.Flags().StringVarP(&endpointsFile, "endpoints", "f", "", "Read newline-deliminted endpoints from this file")
+	rootCmd.Flags().StringVarP(&httpAddr, "http", "p", "", "Serve http at endpoint")
+	rootCmd.Flags().BoolVarP(&readOnly, "read-only", "o", true, "Read only (dont run scenarios)")
 }
 
 // initConfig reads in config file and ENV variables if set.

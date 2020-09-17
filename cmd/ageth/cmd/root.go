@@ -167,13 +167,16 @@ to quickly create a Cobra application.`,
 		defer close(wsEventChan)
 
 		go func() {
-			var fi *os.File
+			var writer io.Writer
 			if reportToFS != "" {
 				fi, err := os.OpenFile(reportToFS, os.O_CREATE|os.O_RDWR, os.ModePerm)
 				if err != nil {
 					llog.Fatal(err)
 				}
+				writer = fi
 				defer fi.Close()
+			} else if reportToStdout {
+				writer = os.Stdout
 			}
 			lastReport := time.Now()
 			for {
@@ -187,7 +190,7 @@ to quickly create a Cobra application.`,
 
 					globalState = getWorldView(world)
 
-					if reportToFS != "" {
+					if writer != nil {
 						// write to stable storage
 						if time.Since(lastReport) < time.Second {
 							continue
@@ -197,12 +200,11 @@ to quickly create a Cobra application.`,
 						if err != nil {
 							llog.Fatal(err)
 						}
-						_, err = fi.Write(b)
+						_, err = writer.Write(b)
 						if err != nil {
 							llog.Fatal(err)
 						}
 					}
-
 				// default:
 				}
 			}
@@ -444,6 +446,7 @@ func Execute() {
 }
 
 var reportToFS string
+var reportToStdout bool
 var endpointsFile string
 var httpAddr string
 var readOnly bool
@@ -460,6 +463,7 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().StringVarP(&reportToFS, "report", "r", "", "Write reporting logs to a given file")
+	rootCmd.Flags().BoolVarP(&reportToStdout, "events-stdout", "e", false, "Write reporting logs to stdoutput")
 	rootCmd.Flags().StringVarP(&endpointsFile, "endpoints", "f", "", "Read newline-deliminted endpoints from this file")
 	rootCmd.Flags().StringVarP(&httpAddr, "http", "p", "", "Serve http at endpoint")
 	rootCmd.Flags().BoolVarP(&readOnly, "read-only", "o", true, "Read only (dont run scenarios)")

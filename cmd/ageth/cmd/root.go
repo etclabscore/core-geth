@@ -369,18 +369,35 @@ to quickly create a Cobra application.`,
 			log.Crit("No endpoints found")
 		}
 
-		wg := sync.WaitGroup{}
-		wg.Add(len(listEndpoints))
-		for _, e := range listEndpoints {
-			go func(endpoint string) {
-				g := newAgeth(e)
-				g.eventChan = reportEventChan
-				g.run()
-				world.push(g)
+		agethEndpointCh := make(chan string)
+		agethCh := make(chan *ageth)
+
+		go func() {
+			for _, e := range listEndpoints {
+				agethEndpointCh <- e
+			}
+			close(agethEndpointCh)
+		}()
+		var wg sync.WaitGroup
+		for i := 0; i < 10; i++ {
+			wg.Add(1)
+			go func(wg *sync.WaitGroup) {
+				for e := range agethEndpointCh {
+					g := newAgeth(e)
+					g.eventChan = reportEventChan
+					g.run()
+					agethCh <- g
+				}
 				wg.Done()
-			}(e)
+			}(&wg)
 		}
-		wg.Wait()
+		go func(wg *sync.WaitGroup) {
+			wg.Wait()
+			close(agethCh)
+		}(&wg)
+		for g := range agethCh {
+			world.push(g)
+		}
 
 		// Comment me to run the test(s).
 		// Leave me to use ageth as just an observer.
@@ -392,6 +409,10 @@ to quickly create a Cobra application.`,
 		scenarios := []scenario{
 			scenarioGenerator(13, 10 * time.Minute, 10 * time.Minute, 1.1, .666, true),
 			scenarioGenerator(13, 10 * time.Minute, 10 * time.Minute, 1.02, .666, false),
+
+			scenarioGenerator(13, 5 *time.Hour, 10 * time.Minute, 26.0, .666, false),
+			scenarioGenerator(13, 5 *time.Hour, 10 * time.Minute, 20.0, .666, false),
+
 		}
 
 		for i, s := range scenarios {

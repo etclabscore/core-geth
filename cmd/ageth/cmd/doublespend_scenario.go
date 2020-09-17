@@ -30,8 +30,8 @@ func stabilize(nodes *agethSet) {
     node.stopMining()
     var result interface{}
     node.client.Call(&result, "admin_maxPeers", 20)
-    for n.getPeerCount() < minimumPeerCount {
-      n.addPeer(nodes.random())
+    for node.getPeerCount() < minimumPeerCount {
+      node.addPeer(nodes.random())
     }
   }
   goodGuys.random().startMining(13)
@@ -40,7 +40,7 @@ func stabilize(nodes *agethSet) {
   }
 }
 
-func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Duration, difficultyRatio, miningRatio float64, attackerShouldWin bool) func(*agethSet) {
+func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Duration, targetDifficultyRatio, miningRatio float64, attackerShouldWin bool) func(*agethSet) {
   return func(nodes *agethSet) {
     // Setup
 
@@ -86,33 +86,41 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
     // badGuy.setPeerCount(0)
     resumePeering := badGuy.refusePeers(100)
     forkBlock := badGuy.block()
+    forkBlockTd := badGuy.getTd()
     badGuy.startMining(blockTime / 2)
     attackStartTime := time.Now()
 
     // Once a second, check to see if the bad guy's block difficulty has
     // reached the target.
+    lastChainRatio := 0.0
+    badGuyBlockTime := blockTime / 2
     for {
-      targetDifficulty := uint64(float64(goodGuys.headBlock().Difficulty().Uint64()) * difficultyRatio)
-      if badGuy.block().difficulty > targetDifficulty {
-        log.Info("Attacker reached target relative difficulty ratio", "target ratio", difficultyRatio)
-        break
+      bestPeer := goodGuys.peerMax()
+      if bestPeer == nil { continue }
+      chainRatio := float64(badGuy.getTd() - forkBlockTd) / float64(bestPeer.getTd() - forkBlockTd)
+      if chainRatio != lastChainRatio {
+        // The ratio has changed, adjust mining power
+        if chainRatio < targetDifficultyRatio {
+          // We're behind the target ratio. We need to mine faster
+          badGuyBlockTime--
+        } else if chainRatio > targetDifficultyRatio {
+          // We're above the target ratio, we can mine slower.
+          badGuyBlockTime++
+        }
+        if badGuyBlockTime < 1 {
+          // We can't mine that fast.
+          badGuyBlockTime = 1
+        } else {
+          badGuy.startMining(badGuyBlockTime)
+        }
+        lastChainRatio = chainRatio
       }
+      targetDifficulty := uint64(float64(goodGuys.headBlock().Difficulty().Uint64()) * targetDifficultyRatio)
       if time.Since(attackStartTime) > attackDuration {
         log.Info("Attacker reached time limit without reaching target difficulty", "blocks", badGuy.block().number - forkBlock.number, "difficulty", badGuy.block().difficulty, "target", targetDifficulty)
         break
       }
       time.Sleep(time.Second)
-    }
-
-    // The target difficulty or chain length has been reached.
-    // If target difficulty was reached before the desired number of attack blocks,
-    // mining at blockTime will keep it roughly in place until the desired number of attack blocks is produced.
-    badGuy.startMining(blockTime)
-    for time.Since(attackStartTime) < attackDuration {
-      if !badGuy.isMining {
-        badGuy.startMining(blockTime)
-      }
-      time.Sleep(1 * time.Second)
     }
 
     finalAttackBlock := badGuy.block()

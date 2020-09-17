@@ -136,13 +136,29 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
       time.Sleep(time.Second)
     }
 
-    finalAttackBlock := badGuy.block()
+
     forkBlockPlusOne, err := badGuy.eclient.BlockByNumber(context.Background(), big.NewInt(int64(forkBlock.number + 1)))
     if err != nil {
       log.Error("Error getting forkBlock + 1", "err", err)
     }
-    log.Info("Attacker done mining", "mined", finalAttackBlock.number - forkBlock.number, "attackerhash", finalAttackBlock.hash)
     badGuy.stopMining()
+    finalAttackBlock := badGuy.block()
+    log.Info("Attacker done mining", "mined", finalAttackBlock.number - forkBlock.number, "attackerhash", finalAttackBlock.hash)
+
+
+    // Control: make sure bigMiners (at least) have sufficient peers
+    // for MESS to be activated (>=10).
+    go func() {
+      log.Info("Controlling for good guys big miners to have a minimum num of peers", "minimum", 12)
+      for _, bigMiner := range bigMiners.all() {
+        for bigMiner.peers.len() < 12 {
+          friend := goodGuys.random()
+          bigMiner.log.Warn("Big miner low on peers", "count", bigMiner.peers.len(), "add", friend.name)
+          bigMiner.addPeer(friend)
+        }
+      }
+    }()
+
     // badGuy.setPeerCount(25)
     resumePeering()
     scenarioEnded := false

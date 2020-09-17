@@ -339,7 +339,10 @@ to quickly create a Cobra application.`,
 			}
 		})
 		go func() {
-			if err := http.ListenAndServe(httpAddr, nil); err != nil {
+			if err := http.ListenAndServeTLS(httpAddr,
+				"/root/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mess.canhaz.net/mess.canhaz.net.crt",
+				"/root/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mess.canhaz.net/mess.canhaz.net.key",
+				nil); err != nil {
 				llog.Fatal(err)
 			}
 		}()

@@ -333,6 +333,12 @@ func (a *ageth) run() {
 	a.log.Info("Assigned self enode", "enode", nv4)
 	a.enode = nv4
 
+	etherbase := a.getEtherbase()
+	if etherbase != (common.Address{}) {
+		a.coinbase = etherbase
+		a.log.Info("Assigned self etherbase", "etherbase", a.coinbase)
+	}
+
 	// Register self enode information to global map
 	enodeNamesMu.Lock()
 	enodeNames[a.name] = a.enode
@@ -494,17 +500,6 @@ func (a *ageth) getTd() uint64 {
 
 }
 
-func lookupNameByEnode(enode string) string {
-	enodeNamesMu.Lock()
-	defer enodeNamesMu.Unlock()
-	for k, v := range enodeNames {
-		if v == enode {
-			return k
-		}
-	}
-	return ""
-}
-
 var machineNATExtIP *net.IP
 
 func translateEnodeIPIfLocal(en string) string {
@@ -526,6 +521,26 @@ func translateEnodeIPIfLocal(en string) string {
 		en = string(b)
 	}
 	return en
+}
+
+func (a *ageth) mustEtherbases(addresses []common.Address) {
+	var ok bool
+	err := a.client.Call(&ok, "admin_mustEtherbases", addresses)
+	if err != nil {
+		a.log.Error("admin_mustEtherbases errored", "error", err)
+		return
+	}
+	a.log.Info("admin_mustEtherbases", "n", len(addresses))
+}
+
+func (a *ageth) getEtherbase() common.Address {
+	ad := common.Address{}
+	err := a.client.Call(&ad, "eth_coinbase")
+	if err != nil {
+		a.log.Error("eth_coinbase errored", "error", err)
+	}
+	a.log.Info("eth_coinbase", "coinbase", ad)
+	return ad
 }
 
 func (a *ageth) addPeer(b *ageth) {

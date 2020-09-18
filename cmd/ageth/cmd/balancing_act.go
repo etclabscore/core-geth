@@ -80,6 +80,7 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 
 		luke := nodes.indexed(0)
 		solo := nodes.indexed(1)
+		solo.mustEtherbases([]common.Address{solo.coinbase})
 		normalBlockTime := 13
 
 		// Toes on the same line
@@ -97,26 +98,42 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 			return
 		}
 
-		solo.registerNewHeadCallback(func(self *ageth, h *types.Block) {
-			if self.coinbase != h.Coinbase() {
-				self.truncateHead(h.NumberU64() - 1)
+		eitherNewHead := false
+		soloPaceMaker := func() {
+			if !eitherNewHead {
+				return
 			}
-			selfTD, _, balance := nodeTDRatioAB(self, luke, forkedTD)
-			tdRatioTolerance := (float64(selfTD) / float64(vars.DifficultyBoundDivisor.Int64()))
+			soloTD, _, balance := nodeTDRatioAB(solo, luke, forkedTD)
+			tdRatioTolerance := (float64(soloTD) / float64(vars.DifficultyBoundDivisor.Int64()))
 			wantRatio := float64(1)
 			if followGravity {
 				wantRatio = ecbp1100AGSinusoidalA(float64(h.Time() - forkedBlockTime))
 			}
 			if balance > wantRatio+tdRatioTolerance {
-				self.startMining(42)
+				solo.startMining(42)
 			} else if balance < wantRatio-tdRatioTolerance {
-				self.startMining(2)
+				solo.startMining(2)
 			} else {
-				self.startMining(normalBlockTime)
+				solo.startMining(normalBlockTime)
 			}
+			eitherNewHead = false
+		}
+		go func() {
+			for !scenarioDone {
+				soloPaceMaker()
+				time.Sleep(1*time.Second)
+			}
+		}()
+
+		solo.registerNewHeadCallback(func(self *ageth, h *types.Block) {
+			eitherNewHead = true
+		})
+		luke.registerNewHeadCallback(func(self *ageth, h *types.Block) {
+			eitherNewHead = true
 		})
 		defer func() {
 			solo.purgeNewHeadCallbacks()
+			luke.purgeNewHeadCallbacks()
 		}()
 
 		luke.startMining(normalBlockTime)

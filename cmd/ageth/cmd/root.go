@@ -161,54 +161,19 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// "Global"s, don't touch.
-		reportEventChan := make(chan interface{})    // this is what the geths get
+		reportEventChan := make(chan interface{}) // this is what the geths get
 		globalState := getWorldView(world)
 		programQuitting := make(chan struct{})
 
 		wsEventChan := make(chan interface{}, 10000) // it gets passed to wsEventChan for web ui
 		defer close(wsEventChan)
 
+		stateChan := make(chan NetworkGraphData)
+
+		go runEventing(reportEventChan, wsEventChan, programQuitting, stateChan)
 		go func() {
-			var writer io.Writer
-			if reportToFS != "" {
-				fi, err := os.OpenFile(reportToFS, os.O_CREATE|os.O_RDWR, os.ModePerm)
-				if err != nil {
-					llog.Fatal(err)
-				}
-				writer = fi
-				defer fi.Close()
-			} else if reportToStdout {
-				writer = os.Stdout
-			}
-			lastReport := time.Now()
-			for {
-				select {
-				case event := <-reportEventChan:
-					select {
-					case wsEventChan <- event: // forward to ws
-					default:
-						// log.Warn("failed to write event")
-					}
-
-					globalState = getWorldView(world)
-
-					if writer != nil {
-						// write to stable storage
-						if time.Since(lastReport) < time.Second {
-							continue
-						}
-						lastReport = time.Now()
-						b, err := json.Marshal(globalState)
-						if err != nil {
-							llog.Fatal(err)
-						}
-						_, err = writer.Write(b)
-						if err != nil {
-							llog.Fatal(err)
-						}
-					}
-				// default:
-				}
+			for s := range stateChan {
+				globalState = s
 			}
 		}()
 
@@ -332,6 +297,57 @@ to quickly create a Cobra application.`,
 		}
 		stabilize(world)
 	},
+}
+
+func runEventing(reportEventChan, wsEventChan chan interface{}, quitChan chan struct{}, stateChan chan NetworkGraphData) {
+	var writer io.Writer
+	if reportToFS != "" {
+		fi, err := os.OpenFile(reportToFS, os.O_CREATE|os.O_RDWR, os.ModePerm)
+		if err != nil {
+			llog.Fatal(err)
+		}
+		writer = fi
+		defer fi.Close()
+	} else if reportToStdout {
+		writer = os.Stdout
+	}
+	lastReport := time.Now()
+	for {
+		select {
+		case <-quitChan:
+			close(stateChan)
+			return
+		case event := <-reportEventChan:
+			select {
+			case wsEventChan <- event: // forward to ws
+			default:
+				// log.Warn("failed to write event")
+			}
+
+			gs := getWorldView(world)
+			select {
+			case stateChan <- gs:
+			default:
+			}
+
+			if writer != nil {
+				// write to stable storage
+				if time.Since(lastReport) < time.Second {
+					continue
+				}
+				lastReport = time.Now()
+				b, err := json.Marshal(gs)
+				if err != nil {
+					llog.Fatal(err)
+				}
+				_, err = writer.Write(b)
+				if err != nil {
+					llog.Fatal(err)
+				}
+			}
+			// default:
+		}
+	}
 }
 
 func runWeb(reportEventChan chan interface{}, quitChan chan struct{}, globalState func() NetworkGraphData) {

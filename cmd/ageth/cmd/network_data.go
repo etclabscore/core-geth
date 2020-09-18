@@ -149,7 +149,10 @@ func getWorldView(set *agethSet) NetworkGraphData {
 			log.Error("empty name?!", "ageth", l)
 			continue
 		}
-		name := enode.MustParse(l.enode).IP().String()
+		name := l.name
+		if !humanNames {
+			name = enode.MustParse(l.enode).IP().String()
+		}
 		nodes = append(nodes, Node{
 			// Name:      l.name,
 			Name:      name,
@@ -164,7 +167,10 @@ func getWorldView(set *agethSet) NetworkGraphData {
 		// only need to record peers in one direction
 		unilateralMap := map[string]bool{}
 		for _, p := range l.peers.all() {
-			pname := enode.MustParse(p.enode).IP().String()
+			pname := p.name
+			if !humanNames {
+				pname = enode.MustParse(p.enode).IP().String()
+			}
 			// check if connection already recorded
 			if _, ok := unilateralMap[pname+name]; ok {
 				continue

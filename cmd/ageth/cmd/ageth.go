@@ -94,13 +94,12 @@ func mustStartGethInstance(gethPath, id string) (*exec.Cmd, io.ReadCloser, strin
 		"--ethash.cachesinmem", "0",
 		"--ethash.cachesondisk", "0",
 
-		// "--nodiscover",
+		"--nodiscover",
 
 		"--metrics",
 		"--metrics.influxdb",
 		"--metrics.influxdb.database", "db0",
 
-		"--nodiscover",
 		// "--mine", "--miner.threads", "0",
 		// "--vmodule=eth/*=5,p2p=5,core/*=5",
 		"--verbosity", "3",
@@ -482,9 +481,10 @@ func (a *ageth) getTd() uint64 {
 	if a.tdhash == a.latestBlock.Hash() {
 		return a.td
 	}
-	var td *tdstruct
-	if err := a.client.Call(td, "eth_getBlockByHash", a.latestBlock.Hash(), false); err != nil {
+	var td = tdstruct{}
+	if err := a.client.Call(&td, "eth_getBlockByHash", a.latestBlock.Hash(), false); err != nil {
 		a.log.Error("error getting td", "err", err)
+		return 0
 	}
 	a.td = uint64(td.TotalDifficulty)
 	a.tdhash = a.latestBlock.Hash()

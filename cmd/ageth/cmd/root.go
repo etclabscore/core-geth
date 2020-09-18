@@ -505,6 +505,7 @@ func Execute() {
 	}
 }
 
+var humanNames bool
 var tls bool
 var reportToFS string
 var reportToStdout bool
@@ -529,6 +530,7 @@ func init() {
 	rootCmd.Flags().BoolVarP(&readOnly, "read-only", "o", true, "Read only (dont run scenarios)")
 	rootCmd.Flags().StringVarP(&httpAddr, "http", "p", "", "Serve http at endpoint")
 	rootCmd.Flags().BoolVarP(&tls, "tls", "s", false, "Use HTTPS/TLS for websocket and http server")
+	rootCmd.Flags().BoolVarP(&humanNames, "human-names", "n", false, "Use human names for network graph data reports")
 }
 
 // initConfig reads in config file and ENV variables if set.

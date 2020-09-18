@@ -14,6 +14,9 @@ import (
 
 func nodeTDRatioAB(a, b *ageth, commonBlockTD uint64) (tdA, tdB uint64, ratio float64) {
 	tdA, tdB = a.getTd(), b.getTd()
+	if tdB == 0 {
+		return tdA, 0, 0
+	}
 	return tdA, tdB, (float64(tdA) - float64(commonBlockTD)) / (float64(tdB) / float64(commonBlockTD))
 }
 
@@ -39,6 +42,8 @@ func ecbp1100AGSinusoidalA(x float64) (antiGravity float64) {
 func generateScenarioPartitioning(followGravity bool, duration time.Duration) func(set *agethSet) {
 	return func(nodes *agethSet) {
 
+		log.Info("Running partitioning scenario")
+
 		// tabula rasa
 		nodes.forEach(func(i int, a *ageth) {
 			a.stopMining()
@@ -46,17 +51,19 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 			var res bool
 			a.client.Call(&res, "admin_ecbp1100", 9999999999)
 		})
+		log.Info("Waiting for the dust to settle")
 		time.Sleep(1 * time.Minute)
-	outer:
-		for {
-			for _, n := range nodes.all() {
-				if n.block().number != nodes.headMax() {
-					time.Sleep(10 * time.Second)
-					continue outer
-				}
-			}
-			break
-		}
+		// outer:
+		// 	for {
+		// 		for _, n := range nodes.all() {
+		// 			if n.block().number != nodes.headMax() {
+		// 				time.Sleep(10 * time.Second)
+		// 				continue outer
+		// 			}
+		// 		}
+		// 		break
+		// 	}
+
 		nodes.forEach(func(i int, a *ageth) {
 			var res bool
 			a.client.Call(&res, "admin_ecbp1100", 1)
@@ -69,7 +76,7 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		go func() {
 			for !scenarioDone {
 				nodes.forEach(func(i int, a *ageth) {
-					for a.peers.len() < 15 {
+					if a.peers.len() < 15 {
 						a.addPeer(nodes.where(func(g *ageth) bool {
 							return g.name != a.name
 						}).random())
@@ -79,7 +86,10 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		}()
 
 		luke := nodes.indexed(0)
+		luke.log.Info("I'm Luke")
 		solo := nodes.indexed(1)
+		solo.log.Info("I'm Solo")
+
 		solo.mustEtherbases([]common.Address{solo.coinbase})
 		normalBlockTime := 13
 
@@ -121,7 +131,7 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		go func() {
 			for !scenarioDone {
 				soloPaceMaker()
-				time.Sleep(1*time.Second)
+				time.Sleep(1 * time.Second)
 			}
 		}()
 

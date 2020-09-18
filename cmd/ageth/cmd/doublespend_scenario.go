@@ -24,6 +24,7 @@ type finalReport struct {
 }
 
 func stabilize(nodes *agethSet) {
+	log.Warn("Running stabilizer")
 	badGuy := nodes.indexed(0) // NOTE: Assumes badguy will always be [0]
 	goodGuys := nodes.where(func(a *ageth) bool { return a.name != badGuy.name })
 	badGuy.truncateHead(goodGuys.headMax())
@@ -37,12 +38,12 @@ func stabilize(nodes *agethSet) {
 		}
 	}
 	goodGuys.random().startMining(13)
-	for len(nodes.distinctChains()) > 1 {
-		time.Sleep(30)
-	}
-	for badGuy.block().number < goodGuys.headMax() {
-		time.Sleep(5)
-	}
+	// for len(nodes.distinctChains()) > 1 {
+	// 	time.Sleep(30)
+	// }
+	// for badGuy.block().number < goodGuys.headMax() {
+	// 	time.Sleep(5)
+	// }
 }
 
 func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Duration, targetDifficultyRatio, miningRatio float64, attackerShouldWin bool) func(*agethSet) {

@@ -391,7 +391,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 		inner = ethash.NewFaker()
 	case "Ethash":
 		inner = ethash.New(ethash.Config{
-			CacheDir:         "ethash",
+			CacheDir:         "etchash",
 			CachesInMem:      2,
 			CachesOnDisk:     3,
 			CachesLockMmap:   false,

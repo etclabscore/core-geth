@@ -640,7 +640,9 @@ A 400-block limit, assuming the attacker has the capital for 7k blocks, means th
         // var socket = new WebSocket("wss://167.71.189.162:8008/ws");
         // var socket = new WebSocket("ws://localhost:8008/ws");
         // var socket = new WebSocket("ws://127.0.0.1:8008/ws");
-        var socket = new WebSocket("wss://mess.canhaz.net:8008/ws");
+
+        // var socket = new WebSocket("wss://mess.canhaz.net:8008/ws");
+        var socket = new WebSocket("ws://127.0.0.1:8003/ws");
 
         socket.onopen = function () {
             console.log("Websocket is open");

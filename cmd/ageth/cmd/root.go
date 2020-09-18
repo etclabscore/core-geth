@@ -162,8 +162,10 @@ to quickly create a Cobra application.`,
 
 		// "Global"s, don't touch.
 		reportEventChan := make(chan interface{})    // this is what the geths get
-		wsEventChan := make(chan interface{}, 10000) // it gets passed to wsEventChan for web ui
 		globalState := getWorldView(world)
+		programQuitting := make(chan struct{})
+
+		wsEventChan := make(chan interface{}, 10000) // it gets passed to wsEventChan for web ui
 		defer close(wsEventChan)
 
 		go func() {
@@ -212,141 +214,9 @@ to quickly create a Cobra application.`,
 
 		// HTTP/WS stuff.
 		if httpAddr != "" {
-			http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Access-Control-Allow-Origin", "*")
-				ws, err := upgrader.Upgrade(w, r, nil)
-				if err != nil {
-					log.Error("WS errored", "error", err)
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-
-				log.Info("Websocket connection", "remote.addr", r.RemoteAddr)
-
-				payload := globalState
-				payload.Tick = globalTick
-				globalTick++
-				err = ws.WriteJSON(Event{
-					Typ:     "state",
-					Payload: payload,
-				})
-				if err != nil {
-					log.Debug("Write WS event errored", "error", err)
-				}
-
-				debounce := time.NewTicker(300 * time.Millisecond)
-				defer debounce.Stop()
-				didEvent := false
-				lastWSState := NetworkGraphData{}
-
-				// tookData := []float64{}
-				quit := false
-				// go func() {
-				// 	for !quit {
-				// 		took := struct {
-				// 			Took int32 `json:"took"`
-				// 		}{}
-				// 		err = ws.ReadJSON(&took)
-				// 		if err != nil {
-				// 			log.Debug("WS read took message errored", "error", err)
-				// 			time.Sleep(time.Second)
-				// 			continue
-				// 		}
-				// 		tookData = append(tookData, float64(took.Took))
-				// 		if len(tookData) < 10 {
-				// 			continue
-				// 		}
-				// 		mean, _ := stats.Mean(tookData)
-				// 		if mean < 100 {
-				// 			mean = 100
-				// 		}
-				// 		tookData = []float64{}
-				// 		log.Debug("Update ticker interval", "interval.ms", mean)
-				// 		debounce.Stop()
-				// 		debounce = time.NewTicker(time.Duration(mean) * time.Millisecond)
-				// 	}
-				// }()
-
-				defer func() {
-					quit = true
-					ws.Close()
-				}()
-				for {
-					select {
-					case <-debounce.C:
-						if didEvent {
-							payload := globalState
-							payload.Tick = globalTick
-							globalTick++
-							err := ws.WriteJSON(Event{
-								Typ:     "state",
-								Payload: payload,
-							})
-							if err != nil {
-								log.Debug("Write WS event errored", "error", err)
-							}
-							didEvent = false
-						}
-					case <-wsEventChan:
-						// The world's ugliest dedupery
-						// to avoid sending websocket events for equivalent states.
-						isDupe := true
-						if len(lastWSState.Nodes) != len(globalState.Nodes) {
-							isDupe = false
-						}
-						if isDupe && len(lastWSState.Links) != len(globalState.Links) {
-							isDupe = false
-						}
-						if isDupe {
-							b, _ := json.Marshal(lastWSState)
-							b2, _ := json.Marshal(globalState)
-							cb, cb2 := bytes.NewBuffer([]byte{}), bytes.NewBuffer([]byte{})
-							json.Compact(cb, b)
-							json.Compact(cb2, b2)
-							isDupe = bytes.Equal(cb.Bytes(), cb2.Bytes())
-						}
-						didEvent = !isDupe
-						lastWSState = globalState
-						// default:
-					}
-				}
+			go runWeb(wsEventChan, programQuitting, func() NetworkGraphData {
+				return globalState
 			})
-			http.HandleFunc("/state", func(writer http.ResponseWriter, request *http.Request) {
-				endpoint(world)(writer, request)
-			})
-			statikFS, err := fs.New()
-			if err != nil {
-				llog.Fatal(err)
-			}
-			http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-				enableCors(writer)
-				r, err := statikFS.Open("/index.html")
-				if err != nil {
-					log.Error("Open index.html errored", "error", err)
-					writer.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				b, err := ioutil.ReadAll(r)
-				if err != nil {
-					log.Error("Read index.html errored", "error", err)
-					writer.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				_, err = writer.Write(b)
-				if err != nil {
-					log.Error("Write index.html errored", "error", err)
-					writer.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-			})
-			go func() {
-				if err := http.ListenAndServeTLS(httpAddr,
-					"/root/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mess.canhaz.net/mess.canhaz.net.crt",
-					"/root/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mess.canhaz.net/mess.canhaz.net.key",
-					nil); err != nil {
-					llog.Fatal(err)
-				}
-			}()
 		}
 
 		listEndpoints := []string{}
@@ -464,6 +334,153 @@ to quickly create a Cobra application.`,
 	},
 }
 
+func runWeb(reportEventChan chan interface{}, quitChan chan struct{}, globalState func() NetworkGraphData) {
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		ws, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			log.Error("WS errored", "error", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		log.Info("Websocket connection", "remote.addr", r.RemoteAddr)
+
+		payload := globalState()
+		payload.Tick = globalTick
+		globalTick++
+		err = ws.WriteJSON(Event{
+			Typ:     "state",
+			Payload: payload,
+		})
+		if err != nil {
+			log.Debug("Write WS event errored", "error", err)
+		}
+
+		debounce := time.NewTicker(300 * time.Millisecond)
+		defer debounce.Stop()
+		didEvent := false
+		lastWSState := NetworkGraphData{}
+
+		// tookData := []float64{}
+		quit := false
+		// go func() {
+		// 	for !quit {
+		// 		took := struct {
+		// 			Took int32 `json:"took"`
+		// 		}{}
+		// 		err = ws.ReadJSON(&took)
+		// 		if err != nil {
+		// 			log.Debug("WS read took message errored", "error", err)
+		// 			time.Sleep(time.Second)
+		// 			continue
+		// 		}
+		// 		tookData = append(tookData, float64(took.Took))
+		// 		if len(tookData) < 10 {
+		// 			continue
+		// 		}
+		// 		mean, _ := stats.Mean(tookData)
+		// 		if mean < 100 {
+		// 			mean = 100
+		// 		}
+		// 		tookData = []float64{}
+		// 		log.Debug("Update ticker interval", "interval.ms", mean)
+		// 		debounce.Stop()
+		// 		debounce = time.NewTicker(time.Duration(mean) * time.Millisecond)
+		// 	}
+		// }()
+
+		defer func() {
+			quit = true
+			ws.Close()
+		}()
+		for {
+			select {
+			case <-debounce.C:
+				if didEvent {
+					payload := globalState()
+					payload.Tick = globalTick
+					globalTick++
+					err := ws.WriteJSON(Event{
+						Typ:     "state",
+						Payload: payload,
+					})
+					if err != nil {
+						log.Debug("Write WS event errored", "error", err)
+					}
+					didEvent = false
+				}
+			case <-reportEventChan:
+				// The world's ugliest dedupery
+				// to avoid sending websocket events for equivalent states.
+				isDupe := true
+				if len(lastWSState.Nodes) != len(globalState().Nodes) {
+					isDupe = false
+				}
+				if isDupe && len(lastWSState.Links) != len(globalState().Links) {
+					isDupe = false
+				}
+				if isDupe {
+					b, _ := json.Marshal(lastWSState)
+					b2, _ := json.Marshal(globalState)
+					cb, cb2 := bytes.NewBuffer([]byte{}), bytes.NewBuffer([]byte{})
+					json.Compact(cb, b)
+					json.Compact(cb2, b2)
+					isDupe = bytes.Equal(cb.Bytes(), cb2.Bytes())
+				}
+				didEvent = !isDupe
+				lastWSState = globalState()
+				// default:
+			}
+		}
+	})
+	http.HandleFunc("/state", func(writer http.ResponseWriter, request *http.Request) {
+		endpoint(world)(writer, request)
+	})
+	statikFS, err := fs.New()
+	if err != nil {
+		llog.Fatal(err)
+	}
+	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		enableCors(writer)
+		r, err := statikFS.Open("/index.html")
+		if err != nil {
+			log.Error("Open index.html errored", "error", err)
+			writer.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		b, err := ioutil.ReadAll(r)
+		if err != nil {
+			log.Error("Read index.html errored", "error", err)
+			writer.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		_, err = writer.Write(b)
+		if err != nil {
+			log.Error("Write index.html errored", "error", err)
+			writer.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	})
+	go func() {
+		if !tls {
+			log.Info("Serving HTTP", "addr", httpAddr)
+			if err := http.ListenAndServe(httpAddr, nil); err != nil {
+				llog.Fatal(err)
+			}
+		} else {
+			log.Info("Serving HTTPS", "addr", httpAddr)
+			if err := http.ListenAndServeTLS(httpAddr,
+				"/root/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mess.canhaz.net/mess.canhaz.net.crt",
+				"/root/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mess.canhaz.net/mess.canhaz.net.key",
+				nil); err != nil {
+				llog.Fatal(err)
+			}
+		}
+	}()
+	<-quitChan
+}
+
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
@@ -473,6 +490,7 @@ func Execute() {
 	}
 }
 
+var tls bool
 var reportToFS string
 var reportToStdout bool
 var endpointsFile string
@@ -493,8 +511,9 @@ func init() {
 	rootCmd.Flags().StringVarP(&reportToFS, "report", "r", "", "Write reporting logs to a given file")
 	rootCmd.Flags().BoolVarP(&reportToStdout, "events-stdout", "e", false, "Write reporting logs to stdoutput")
 	rootCmd.Flags().StringVarP(&endpointsFile, "endpoints", "f", "", "Read newline-deliminted endpoints from this file")
-	rootCmd.Flags().StringVarP(&httpAddr, "http", "p", "", "Serve http at endpoint")
 	rootCmd.Flags().BoolVarP(&readOnly, "read-only", "o", true, "Read only (dont run scenarios)")
+	rootCmd.Flags().StringVarP(&httpAddr, "http", "p", "", "Serve http at endpoint")
+	rootCmd.Flags().BoolVarP(&tls, "tls", "s", false, "Use HTTPS/TLS for websocket and http server")
 }
 
 // initConfig reads in config file and ENV variables if set.

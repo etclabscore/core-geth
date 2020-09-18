@@ -608,19 +608,19 @@ func (a *ageth) updateSelfStats() {
 }
 
 func (a *ageth) getHeadManually() {
-	var head *types.Header
-	err := a.client.Call(head, "eth_getBlockByNumber", "latest", false)
+	head := types.Header{}
+	err := a.client.Call(&head, "eth_getBlockByNumber", "latest", false)
 	if err != nil {
 		a.log.Error("get block by number [nil=latest]", "error", err)
 	}
-	if head == nil {
+	if head.Number == nil {
 		a.log.Warn("No latest block")
 		return
 	}
 	if head.Hash() == a.block().hash {
 		return
 	}
-	a.setHead(head)
+	a.setHead(&head)
 }
 
 func (a *ageth) truncateHead(n uint64) {

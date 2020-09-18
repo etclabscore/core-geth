@@ -9,7 +9,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func nodeTDRatioAB(a, b *ageth, commonBlockTD uint64) (tdA, tdB uint64, ratio float64) {
@@ -52,7 +51,7 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 			a.client.Call(&res, "admin_ecbp1100", 9999999999)
 		})
 		log.Info("Waiting for the dust to settle")
-		time.Sleep(1 * time.Minute)
+		time.Sleep(10 * time.Second)
 		// outer:
 		// 	for {
 		// 		for _, n := range nodes.all() {
@@ -86,9 +85,9 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		}()
 
 		luke := nodes.indexed(0)
-		luke.log.Info("I'm Luke")
+		luke.log.Info("== Luke ==")
 		solo := nodes.indexed(1)
-		solo.log.Info("I'm Solo")
+		solo.log.Info("== Solo ==")
 
 		solo.mustEtherbases([]common.Address{solo.coinbase})
 		normalBlockTime := 13
@@ -109,19 +108,21 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		}
 
 		eitherNewHead := false
-		soloPaceMaker := func() {
+		soloPaceMaker := func(solo, luke *ageth, forkedTd uint64) {
 			if !eitherNewHead {
 				return
 			}
-			soloTD, _, balance := nodeTDRatioAB(solo, luke, forkedTD)
-			tdRatioTolerance := (float64(soloTD) / float64(vars.DifficultyBoundDivisor.Int64()))
+			_, _, balance := nodeTDRatioAB(solo, luke, forkedTD)
+			tdRatioTolerance := float64(1/2048) //(float64(soloTD) / float64(vars.DifficultyBoundDivisor.Int64())) / float64(soloTD)
 			wantRatio := float64(1)
 			if followGravity {
 				wantRatio = ecbp1100AGSinusoidalA(float64(solo.latestBlock.Time - forkedBlockTime))
 			}
 			if balance > wantRatio+tdRatioTolerance {
+				log.Warn("Solo above balance", "want", wantRatio, "got", balance)
 				solo.startMining(42)
 			} else if balance < wantRatio-tdRatioTolerance {
+				log.Warn("Solo below balance", "want", wantRatio, "got", balance)
 				solo.startMining(2)
 			} else {
 				solo.startMining(normalBlockTime)
@@ -130,7 +131,7 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		}
 		go func() {
 			for !scenarioDone {
-				soloPaceMaker()
+				soloPaceMaker(solo, luke, forkedTD)
 				time.Sleep(1 * time.Second)
 			}
 		}()

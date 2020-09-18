@@ -116,6 +116,16 @@ func (s *agethSet) headMax() uint64 {
 	return m
 }
 
+func (s *agethSet) headMin() uint64 {
+	m := uint64(0)
+	for _, g := range s.ageths {
+		if m == 0 || g.block().number < m {
+			m = g.block().number
+		}
+	}
+	return m
+}
+
 func (s *agethSet) peerMax() *ageth {
 	var peer *ageth
 	m := uint64(0)

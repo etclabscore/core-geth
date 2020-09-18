@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -482,10 +483,12 @@ func (a *ageth) getTd() uint64 {
 		return a.td
 	}
 	var td = tdstruct{}
-	if err := a.client.Call(&td, "eth_getBlockByHash", a.latestBlock.Hash(), false); err != nil {
+	if err := a.client.Call(&td, "eth_getBlockByHash", a.latestBlock.Hash(), true); err != nil {
 		a.log.Error("error getting td", "err", err)
 		return 0
 	}
+	data, _ := json.MarshalIndent(td, "", "    ")
+	log.Info("Got td", "data", string(data))
 	a.td = uint64(td.TotalDifficulty)
 	a.tdhash = a.latestBlock.Hash()
 	a.setHead(&td.Header)
@@ -518,12 +521,12 @@ func translateEnodeIPIfLocal(en string) string {
 
 func (a *ageth) mustEtherbases(addresses []common.Address) {
 	var ok bool
-	err := a.client.Call(&ok, "admin_mustEtherbases", addresses)
+	err := a.client.Call(&ok, "miner_mustEtherbases", addresses)
 	if err != nil {
-		a.log.Error("admin_mustEtherbases errored", "error", err)
+		a.log.Error("miner_mustEtherbases errored", "error", err)
 		return
 	}
-	a.log.Info("admin_mustEtherbases", "n", len(addresses))
+	a.log.Info("miner_mustEtherbases", "n", len(addresses))
 }
 
 func (a *ageth) getEtherbase() common.Address {

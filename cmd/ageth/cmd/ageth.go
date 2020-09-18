@@ -474,7 +474,7 @@ func (a *ageth) stopMining() {
 }
 
 type tdstruct struct {
-	types.Header
+	// types.Header
 	TotalDifficulty hexutil.Uint64 `json:"totalDifficulty"`
 }
 
@@ -483,15 +483,27 @@ func (a *ageth) getTd() uint64 {
 		return a.td
 	}
 	var td = tdstruct{}
-	if err := a.client.Call(&td, "eth_getBlockByHash", a.latestBlock.Hash(), true); err != nil {
+	var js = json.RawMessage{}
+	if err := a.client.Call(&js, "eth_getBlockByHash", a.latestBlock.Hash(), true); err != nil {
 		a.log.Error("error getting td", "err", err)
 		return 0
 	}
-	data, _ := json.MarshalIndent(td, "", "    ")
-	log.Info("Got td", "data", string(data))
+	err := json.Unmarshal(js, &td)
+	if err != nil {
+		a.log.Error("Error unmarshaling to td struct", "error", err)
+		return 0
+	}
+	header := &types.Header{}
+	err = json.Unmarshal(js, header)
+	if err != nil {
+		a.log.Error("Error unmarshaling to header", "error", err)
+		return 0
+	}
+	// data, _ := json.MarshalIndent(td, "", "    ")
+	// log.Info("Got td", "data", string(data))
 	a.td = uint64(td.TotalDifficulty)
 	a.tdhash = a.latestBlock.Hash()
-	a.setHead(&td.Header)
+	a.setHead(header)
 	return a.td
 
 }

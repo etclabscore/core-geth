@@ -13,10 +13,10 @@ import (
 
 func nodeTDRatioAB(a, b *ageth, commonBlockTD uint64) (tdA, tdB uint64, ratio float64) {
 	tdA, tdB = a.getTd(), b.getTd()
-	if tdB == 0 {
-		return tdA, 0, 0
+	if tdA == 0 || tdB == 0 {
+		return 0, 0, 0
 	}
-	return tdA, tdB, (float64(tdA) - float64(commonBlockTD)) / (float64(tdB) / float64(commonBlockTD))
+	return tdA, tdB, (float64(tdA) - float64(commonBlockTD)) / (float64(tdB) - float64(commonBlockTD))
 }
 
 /*
@@ -90,7 +90,7 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		solo.log.Info("== Solo ==")
 
 		solo.mustEtherbases([]common.Address{solo.coinbase})
-		normalBlockTime := 13
+		normalBlockTime := 9
 
 		// Toes on the same line
 		if luke.block().number > solo.block().number {
@@ -118,11 +118,12 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 			if followGravity {
 				wantRatio = ecbp1100AGSinusoidalA(float64(solo.latestBlock.Time - forkedBlockTime))
 			}
-			if balance > wantRatio+tdRatioTolerance {
-				log.Warn("Solo above balance", "want", wantRatio, "got", balance)
+			upper, lower := wantRatio + tdRatioTolerance,  wantRatio - tdRatioTolerance
+			if balance > upper {
+				log.Warn("Solo above balance", "want", wantRatio, "upper", upper, "got", balance)
 				solo.startMining(42)
-			} else if balance < wantRatio-tdRatioTolerance {
-				log.Warn("Solo below balance", "want", wantRatio, "got", balance)
+			} else if balance < lower {
+				log.Warn("Solo below balance", "want", wantRatio, "lower", lower, "got", balance)
 				solo.startMining(2)
 			} else {
 				solo.startMining(normalBlockTime)

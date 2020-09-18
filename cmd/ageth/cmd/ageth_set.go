@@ -235,6 +235,10 @@ func (s *agethSet) indexed(i int) *ageth {
 	return s.all()[i]
 }
 
+func (s *agethSet) dexedni(i int) *ageth {
+	return s.all()[s.len()-1-i]
+}
+
 func (s *agethSet) subset(inclusiveStartIndex, nonInclusiveEndIndex int) *agethSet {
 	newSet := newAgethSet()
 	for i := inclusiveStartIndex; i < nonInclusiveEndIndex; i++ {

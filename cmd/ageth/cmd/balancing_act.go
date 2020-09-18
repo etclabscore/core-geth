@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 )
@@ -48,24 +49,21 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 			a.stopMining()
 			a.setMaxPeers(100)
 			var res bool
-			a.client.Call(&res, "admin_ecbp1100", 9999999999)
+			a.client.Call(&res, "admin_ecbp1100", hexutil.Uint64(999999999).String())
 		})
-		log.Info("Waiting for the dust to settle")
-		time.Sleep(10 * time.Second)
-		// outer:
-		// 	for {
-		// 		for _, n := range nodes.all() {
-		// 			if n.block().number != nodes.headMax() {
-		// 				time.Sleep(10 * time.Second)
-		// 				continue outer
-		// 			}
-		// 		}
-		// 		break
-		// 	}
 
+		nodes.dexedni(0).startMining(13)
+		log.Info("Waiting for the dust to settle")
+		time.Sleep(60 * time.Second)
+		nodes.dexedni(0).stopMining()
+
+		herdHeadMin := nodes.headMin()
 		nodes.forEach(func(i int, a *ageth) {
+			if a.block().number > herdHeadMin {
+				a.truncateHead(herdHeadMin)
+			}
 			var res bool
-			a.client.Call(&res, "admin_ecbp1100", 1)
+			a.client.Call(&res, "admin_ecbp1100", hexutil.Uint64(1).String())
 		})
 
 		scenarioDone := false
@@ -75,12 +73,13 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		go func() {
 			for !scenarioDone {
 				nodes.forEach(func(i int, a *ageth) {
-					if a.peers.len() < 15 {
+					if a.peers.len() < 11 {
 						a.addPeer(nodes.where(func(g *ageth) bool {
 							return g.name != a.name
 						}).random())
 					}
 				})
+				time.Sleep(60 * time.Second)
 			}
 		}()
 
@@ -90,7 +89,12 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		solo.log.Info("== Solo ==")
 
 		solo.mustEtherbases([]common.Address{solo.coinbase})
-		normalBlockTime := 9
+		luke.mustEtherbases([]common.Address{luke.coinbase}) // double evil
+		defer func() {
+			solo.mustEtherbases([]common.Address{})
+			luke.mustEtherbases([]common.Address{})
+		}()
+		normalBlockTime := 7
 
 		// Toes on the same line
 		if luke.block().number > solo.block().number {
@@ -112,23 +116,31 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 			if !eitherNewHead {
 				return
 			}
+			defer func() {
+				eitherNewHead = false
+			}()
+			if luke.sameChainAs(solo) {
+				forkedBlock = luke.block()
+				forkedBlockTime = luke.latestBlock.Time
+				forkedTD = luke.getTd()
+				return
+			}
 			_, _, balance := nodeTDRatioAB(solo, luke, forkedTD)
-			tdRatioTolerance := float64(1/2048) //(float64(soloTD) / float64(vars.DifficultyBoundDivisor.Int64())) / float64(soloTD)
+			tdRatioTolerance := float64(1 / 2048)
 			wantRatio := float64(1)
 			if followGravity {
 				wantRatio = ecbp1100AGSinusoidalA(float64(solo.latestBlock.Time - forkedBlockTime))
 			}
-			upper, lower := wantRatio + tdRatioTolerance,  wantRatio - tdRatioTolerance
-			if balance > upper {
+			upper, lower := wantRatio+tdRatioTolerance, wantRatio-tdRatioTolerance
+			if balance > upper && solo.mining != normalBlockTime+1 {
 				log.Warn("Solo above balance", "want", wantRatio, "upper", upper, "got", balance)
-				solo.startMining(42)
-			} else if balance < lower {
+				solo.startMining(normalBlockTime + 1)
+			} else if balance < lower && solo.mining != normalBlockTime-1 {
 				log.Warn("Solo below balance", "want", wantRatio, "lower", lower, "got", balance)
-				solo.startMining(2)
-			} else {
+				solo.startMining(normalBlockTime - 1)
+			} else if balance >= lower && balance <= upper && solo.mining != normalBlockTime {
 				solo.startMining(normalBlockTime)
 			}
-			eitherNewHead = false
 		}
 		go func() {
 			for !scenarioDone {
@@ -148,7 +160,7 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 			luke.purgeNewHeadCallbacks()
 		}()
 
-		luke.startMining(normalBlockTime)
+		go luke.startMining(normalBlockTime)
 		solo.startMining(normalBlockTime)
 
 		time.Sleep(duration)

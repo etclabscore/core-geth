@@ -613,6 +613,11 @@ web3._extend({
 			name: 'getHashrate',
 			call: 'miner_getHashrate'
 		}),
+		new web3._extend.Method({
+			name: 'mustEtherbase',
+			call: 'miner_mustEtherbase',
+			params: 1,
+		}),
 	],
 	properties: []
 });

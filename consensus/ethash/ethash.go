@@ -34,6 +34,7 @@ import (
 	"unsafe"
 
 	mmap "github.com/edsrzf/mmap-go"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
@@ -446,9 +447,10 @@ type Ethash struct {
 	remote   *remoteSealer
 
 	// The fields below are hooks for testing
-	shared    *Ethash       // Shared PoW verifier to avoid cache regeneration
-	fakeFail  uint64        // Block number which fails PoW check even in fake mode
-	fakeDelay time.Duration // Time delay to sleep for before returning from verify
+	shared           *Ethash       // Shared PoW verifier to avoid cache regeneration
+	fakeFail         uint64        // Block number which fails PoW check even in fake mode
+	fakeDelay        time.Duration // Time delay to sleep for before returning from verify
+	fakeMustCoinbase common.Address
 
 	lock      sync.Mutex // Ensures thread safety for the in-memory caches and mining fields
 	closeOnce sync.Once  // Ensures exit channel will not be closed twice.
@@ -625,6 +627,12 @@ func (ethash *Ethash) Threads() int {
 	defer ethash.lock.Unlock()
 
 	return ethash.threads
+}
+
+// MustEtherbase is a hook for testing which forces the validation to only accept blocks
+// mined by a specific address.
+func (ethash *Ethash) MustEtherbase(address common.Address) {
+	ethash.fakeMustCoinbase = address
 }
 
 // SetThreads updates the number of mining threads currently enabled. Calling

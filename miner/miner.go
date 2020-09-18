@@ -120,6 +120,10 @@ func (miner *Miner) update() {
 	}
 }
 
+func (miner *Miner) Engine() consensus.Engine {
+	return miner.engine
+}
+
 func (miner *Miner) Start(coinbase common.Address) {
 	atomic.StoreInt32(&miner.shouldStart, 1)
 	miner.SetEtherbase(coinbase)

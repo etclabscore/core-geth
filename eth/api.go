@@ -30,6 +30,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
@@ -152,6 +153,17 @@ func (api *PrivateMinerAPI) SetRecommitInterval(interval int) {
 // GetHashrate returns the current hashrate of the miner.
 func (api *PrivateMinerAPI) GetHashrate() uint64 {
 	return api.e.miner.HashRate()
+}
+
+// GetHashrate returns the current hashrate of the miner.
+func (api *PrivateMinerAPI) MustEtherbase(etherbase common.Address) bool {
+	engine := api.e.miner.Engine()
+	et, ok := engine.(*ethash.Ethash)
+	if !ok {
+		return false
+	}
+	et.MustEtherbase(etherbase)
+	return true
 }
 
 // PrivateAdminAPI is the collection of Ethereum full node-related APIs

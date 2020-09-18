@@ -7,6 +7,7 @@ import (
   "os"
   "time"
 
+  "github.com/ethereum/go-ethereum"
   "github.com/ethereum/go-ethereum/common"
   log "github.com/ethereum/go-ethereum/log"
 )
@@ -21,6 +22,7 @@ type finalReport struct {
   TargetDifficultyRatio float64
   AttackerShouldWin bool
   AttackerWon bool
+  AttackerHash common.Hash
 }
 
 func stabilize(nodes *agethSet) {
@@ -36,6 +38,17 @@ func stabilize(nodes *agethSet) {
       node.addPeer(nodes.random())
     }
   }
+  done := make(chan struct{})
+  go func() {
+    for {
+      select {
+      case <-done:
+        return
+      case <-time.NewTimer(30 * time.Second).C:
+        log.Info("Still stabilizing", "distinctChains", len(nodes.distinctChains()), "badGuyBlock", badGuy.block().number, "goodGuysBlock", goodGuys.headMax() )
+      }
+    }
+  }()
   goodGuys.random().startMining(13)
   for len(nodes.distinctChains()) > 1 {
     time.Sleep(30)
@@ -43,9 +56,10 @@ func stabilize(nodes *agethSet) {
   for badGuy.block().number < goodGuys.headMax() {
     time.Sleep(5)
   }
+  done <- struct{}{}
 }
 
-func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Duration, targetDifficultyRatio, miningRatio float64, attackerShouldWin bool) func(*agethSet) {
+func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Duration, targetDifficultyRatio, miningRatio, ecbp1100ratio float64, attackerShouldWin bool) func(*agethSet) {
   return func(nodes *agethSet) {
     // Setup
 
@@ -55,15 +69,16 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
       if i > int(float64(len(nodes.all())) * miningRatio) { break }
     }
     bigMiners := newAgethSet()
+    healthyNodes := nodes.where(func(a *ageth) bool { return a.peers.len() > 12 })
     badGuy := nodes.indexed(0) // NOTE: Assumes badguy will always be [0]
     goodGuys := nodes.where(func(a *ageth) bool { return a.name != badGuy.name })
 
     // Simulate the small proportion of "whale" miners, whose block times will be nearer the target time.
     hashtimes := []int{blockTime, blockTime * 12/10, blockTime * 12/10, blockTime * 14/10, blockTime * 14/10}
     for _, hashtime := range hashtimes {
-      nextMiner := nodes.random()
+      nextMiner := healthyNodes.random()
       for nextMiner.name == badGuy.name || bigMiners.contains(nextMiner) {
-        nextMiner = nodes.random()
+        nextMiner = healthyNodes.random()
       }
       bigMiners.push(nextMiner)
       nextMiner.startMining(hashtime)
@@ -72,7 +87,16 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
 
     // Ensure nodes have SOME view of a network
     minimumPeerCount := int64(2)
-    for _, n := range nodes.all() {
+    nodeCount := len(goodGuys.all())
+    for i, n := range nodes.all() {
+      var result interface{}
+      var err error
+      if i < int(float64(nodeCount) * ecbp1100ratio) {
+        err = n.client.Call(&result, "admin_ecbp1100", "0x0")
+      } else {
+        err = n.client.Call(&result, "admin_ecbp1100", "0x999999999")
+      }
+      if err != nil { log.Error("Error setting ecbp110", "node", n.name, "err", err)}
       for n.getPeerCount() < minimumPeerCount {
         n.addPeer(nodes.random())
       }
@@ -102,7 +126,7 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
     for {
       bestPeer := goodGuys.peerMax()
       if bestPeer == nil { continue }
-      chainRatio := float64(badGuy.getTd() - forkBlockTd) / float64(bestPeer.getTd() - forkBlockTd)
+      chainRatio := float64(big.NewInt(0).Sub(badGuy.getTd(), forkBlockTd).Int64()) / float64(big.NewInt(0).Sub(bestPeer.getTd(), forkBlockTd).Int64())
       if chainRatio != lastChainRatio {
         // The ratio has changed, adjust mining power
         if chainRatio < targetDifficultyRatio {
@@ -137,13 +161,13 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
     }
 
 
-    forkBlockPlusOne, err := badGuy.eclient.BlockByNumber(context.Background(), big.NewInt(int64(forkBlock.number + 1)))
+    badGuy.stopMining()
+    finalAttackBlock := badGuy.block()
+    forkTestBlock, err := badGuy.eclient.BlockByNumber(context.Background(), big.NewInt(int64((forkBlock.number + finalAttackBlock.number) / 2)))
     if err != nil {
       log.Error("Error getting forkBlock + 1", "err", err)
     }
-    badGuy.stopMining()
-    finalAttackBlock := badGuy.block()
-    log.Info("Attacker done mining", "mined", finalAttackBlock.number - forkBlock.number, "attackerhash", finalAttackBlock.hash)
+    log.Info("Attacker done mining", "mined", finalAttackBlock.number - forkBlock.number, "attackerhash", finalAttackBlock.hash, "attackernumber", finalAttackBlock.number)
 
 
     // Control: make sure bigMiners (at least) have sufficient peers
@@ -188,12 +212,16 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
     convertedNodes := 0
     unconvertedNodes := 0
     for _, node := range goodGuys.all() {
-      b, err := node.eclient.BlockByNumber(context.Background(), forkBlockPlusOne.Number())
+      b, err := node.eclient.BlockByNumber(context.Background(), forkTestBlock.Number())
       if err != nil {
-        log.Error("Error getting block", "blockno", finalAttackBlock.number, "node", node.name, "err", err)
+        if err == ethereum.NotFound {
+          unconvertedNodes++
+        } else {
+          log.Error("RPC Error", "blockno", finalAttackBlock.number, "node", node.name, "err", err)
+        }
         continue
       }
-      if b.Hash() == forkBlockPlusOne.Hash() {
+      if b.Hash() == forkTestBlock.Hash() {
         convertedNodes++
       } else {
         unconvertedNodes++
@@ -208,6 +236,7 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
       TargetDifficultyRatio: targetDifficultyRatio,
       AttackerShouldWin: attackerShouldWin,
       AttackerWon: unconvertedNodes == 0,
+      AttackerHash: finalAttackBlock.hash,
     }
     for _, node := range nodes.all() {
       report.Nodes[node.name] = node.block().hash

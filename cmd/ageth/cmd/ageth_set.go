@@ -144,7 +144,7 @@ func (s *agethSet) headMode() uint64 {
 	return uint64(mode[0])
 }
 
-func (s *agethSet) headBlock() *types.Block {
+func (s *agethSet) headHeader() *types.Header {
 	greatestN := s.headMax()
 	for _, g := range s.ageths {
 		if g.block().number == greatestN {

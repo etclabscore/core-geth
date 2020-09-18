@@ -91,7 +91,7 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		}
 
 		forkedBlock := luke.block()
-		forkedBlockTime := luke.latestBlock.Time()
+		forkedBlockTime := luke.latestBlock.Time
 		forkedTD := luke.getTd()
 		if forkedTD != solo.getTd() || forkedBlock.number != solo.block().number {
 			log.Error("The force is strong but not impossibly strong")
@@ -107,7 +107,7 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 			tdRatioTolerance := (float64(soloTD) / float64(vars.DifficultyBoundDivisor.Int64()))
 			wantRatio := float64(1)
 			if followGravity {
-				wantRatio = ecbp1100AGSinusoidalA(float64(h.Time() - forkedBlockTime))
+				wantRatio = ecbp1100AGSinusoidalA(float64(solo.latestBlock.Time - forkedBlockTime))
 			}
 			if balance > wantRatio+tdRatioTolerance {
 				solo.startMining(42)
@@ -125,10 +125,10 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 			}
 		}()
 
-		solo.registerNewHeadCallback(func(self *ageth, h *types.Block) {
+		solo.registerNewHeadCallback(func(self *ageth, h *types.Header) {
 			eitherNewHead = true
 		})
-		luke.registerNewHeadCallback(func(self *ageth, h *types.Block) {
+		luke.registerNewHeadCallback(func(self *ageth, h *types.Header) {
 			eitherNewHead = true
 		})
 		defer func() {

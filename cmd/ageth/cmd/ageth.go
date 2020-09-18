@@ -57,7 +57,7 @@ type ageth struct {
 	isMining                    bool
 	quitChan                    chan struct{}
 	online                      bool
-	onHeadCallbacks             []func(*ageth, *types.Block)
+	onHeadCallbacks             []func(*ageth, *types.Header)
 }
 
 func mustStartGethInstance(gethPath, id string) (*exec.Cmd, io.ReadCloser, string) {
@@ -437,7 +437,7 @@ func (a *ageth) withStandardPeerChurn(targetPeers int, peerSet *agethSet) {
 	}()
 }
 
-func (a *ageth) registerNewHeadCallback(fn func(*ageth, *types.Block)) {
+func (a *ageth) registerNewHeadCallback(fn func(*ageth, *types.Header)) {
 	a.onHeadCallbacks = append(a.onHeadCallbacks, fn)
 }
 
@@ -474,6 +474,7 @@ func (a *ageth) stopMining() {
 }
 
 type tdstruct struct {
+	types.Header
 	TotalDifficulty hexutil.Uint64 `json:"totalDifficulty"`
 }
 
@@ -481,12 +482,13 @@ func (a *ageth) getTd() uint64 {
 	if a.tdhash == a.latestBlock.Hash() {
 		return a.td
 	}
-	td := tdstruct{}
-	if err := a.client.Call(&td, "eth_getBlockByHash", a.latestBlock.Hash(), false); err != nil {
+	var td *tdstruct
+	if err := a.client.Call(td, "eth_getBlockByHash", a.latestBlock.Hash(), false); err != nil {
 		a.log.Error("error getting td", "err", err)
 	}
 	a.td = uint64(td.TotalDifficulty)
 	a.tdhash = a.latestBlock.Hash()
+	a.setHead(&td.Header)
 	return a.td
 
 }
@@ -628,7 +630,7 @@ func (a *ageth) truncateHead(n uint64) {
 	if err != nil {
 		a.log.Error("debug_setHead", "error", err)
 	}
-	a.setHeadManually()
+	a.getHeadManually()
 }
 
 func (a *ageth) setHead(head *types.Header) {

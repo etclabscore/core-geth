@@ -30,14 +30,14 @@ func stabilize(nodes *agethSet) {
   goodGuys := nodes.where(func(a *ageth) bool { return a.name != badGuy.name })
   badGuy.truncateHead(goodGuys.headMax())
   minimumPeerCount := int64(2)
-  for _, node := range nodes.all() {
+  nodes.eachParallel(func (node *ageth) {
     node.stopMining()
     var result interface{}
     node.client.Call(&result, "admin_maxPeers", 20)
     for node.getPeerCount() < minimumPeerCount {
       node.addPeer(nodes.random())
     }
-  }
+  })
   done := make(chan struct{})
   go func() {
     for {
@@ -121,15 +121,15 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
 
     // Once a second, check to see if the bad guy's block difficulty has
     // reached the target.
-    lastChainRatio := 0.0
+    lastChainRatio := big.NewFloat(0)
     badGuyBlockTime := blockTime / 2
     for {
       bestPeer := goodGuys.peerMax()
       if bestPeer == nil { continue }
-      chainRatio := float64(big.NewInt(0).Sub(badGuy.getTd(), forkBlockTd).Int64()) / float64(big.NewInt(0).Sub(bestPeer.getTd(), forkBlockTd).Int64())
-      if chainRatio != lastChainRatio {
+      chainRatio := big.NewFloat(0).Quo(big.NewFloat(0).SetInt(big.NewInt(0).Sub(badGuy.getTd(), forkBlockTd)), big.NewFloat(0).SetInt(big.NewInt(0).Sub(bestPeer.getTd(), forkBlockTd)))
+      if chainRatio.Cmp(lastChainRatio) != 0 {
         // The ratio has changed, adjust mining power
-        if chainRatio < targetDifficultyRatio {
+        if chainRatio.Cmp(big.NewFloat(targetDifficultyRatio)) < 0  {
           // We're behind the target ratio. We need to mine faster
           badGuyBlockTime--
           if badGuyBlockTime > blockTime {
@@ -137,7 +137,7 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
             // back in line quickly, rather than one block at a time.
             badGuyBlockTime = blockTime
           }
-        } else if chainRatio > targetDifficultyRatio {
+        } else if chainRatio.Cmp(big.NewFloat(targetDifficultyRatio)) > 0 {
           // We're above the target ratio, we can mine slower.
           badGuyBlockTime++
           if badGuyBlockTime < blockTime / 2 {
@@ -227,12 +227,13 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
         unconvertedNodes++
       }
     }
+    difficultyRatio, _ := lastChainRatio.Float64()
     report := &finalReport{
       Converted: convertedNodes,
       Unconverted: unconvertedNodes,
       DistinctChains: nodes.distinctChains(),
       Nodes: make(map[string]common.Hash),
-      DifficultyRatio: lastChainRatio,
+      DifficultyRatio: difficultyRatio,
       TargetDifficultyRatio: targetDifficultyRatio,
       AttackerShouldWin: attackerShouldWin,
       AttackerWon: unconvertedNodes == 0,

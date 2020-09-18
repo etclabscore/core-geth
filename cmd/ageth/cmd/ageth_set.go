@@ -8,6 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/montanaflynn/stats"
+	"sync"
 )
 
 type agethSet struct {
@@ -73,6 +74,25 @@ func (s *agethSet) union(s2 *agethSet) *agethSet {
 	ns := &agethSet{ ageths: s.ageths[:] }
 	for _, a := range s2.all() { ns.push(a) }
 	return ns
+}
+
+func (s *agethSet) eachParallel(fn func(a *ageth)) {
+	var wg sync.WaitGroup
+	agethCh := make(chan *ageth)
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func(wg *sync.WaitGroup) {
+			for a := range agethCh {
+				fn(a)
+			}
+			wg.Done()
+		}(&wg)
+	}
+	for _, a := range s.all() {
+		agethCh <- a
+	}
+	close(agethCh)
+	wg.Wait()
 }
 
 func (s *agethSet) remove(a *ageth) (ok bool) {

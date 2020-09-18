@@ -473,6 +473,7 @@ type tdstruct struct {
 }
 
 func (a *ageth) getTd() *big.Int {
+	if a.latestBlock == nil { return big.NewInt(0) }
 	if a.tdhash == a.latestBlock.Hash() {
 		return a.td
 	}

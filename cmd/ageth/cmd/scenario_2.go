@@ -49,7 +49,7 @@ func badGuyAttack(badGuy *ageth, goodGuys, minions *agethSet, badGuyMiningPower,
 	log.Info("Bad guy waiting permapoint")
 	var perma *types.Block
 	for perma == nil {
-		head := minions.headBlock()
+		head := minions.headHeader()
 		if head == nil {
 			continue
 		}
@@ -60,7 +60,7 @@ func badGuyAttack(badGuy *ageth, goodGuys, minions *agethSet, badGuyMiningPower,
 	log.Info("Bad guy waiting flashpoint")
 	var flash *types.Block
 	for flash == nil {
-		head := minions.headBlock()
+		head := minions.headHeader()
 		if head == nil {
 			continue
 		}

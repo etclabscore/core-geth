@@ -178,6 +178,7 @@ to quickly create a Cobra application.`,
 			} else if reportToStdout {
 				writer = os.Stdout
 			}
+			lastReport := time.Now()
 			for {
 				select {
 				case event := <-reportEventChan:
@@ -191,6 +192,10 @@ to quickly create a Cobra application.`,
 
 					if writer != nil {
 						// write to stable storage
+						if time.Since(lastReport) < time.Second {
+							continue
+						}
+						lastReport = time.Now()
 						b, err := json.Marshal(globalState)
 						if err != nil {
 							llog.Fatal(err)
@@ -335,7 +340,10 @@ to quickly create a Cobra application.`,
 				}
 			})
 			go func() {
-				if err := http.ListenAndServe(httpAddr, nil); err != nil {
+				if err := http.ListenAndServeTLS(httpAddr,
+					"/root/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mess.canhaz.net/mess.canhaz.net.crt",
+					"/root/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mess.canhaz.net/mess.canhaz.net.key",
+					nil); err != nil {
 					llog.Fatal(err)
 				}
 			}()

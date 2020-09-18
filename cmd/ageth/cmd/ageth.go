@@ -41,7 +41,8 @@ type ageth struct {
 	client                      *rpc.Client
 	eclient                     *ethclient.Client
 	newheadChan                 chan *types.Header
-	latestBlock                 *types.Block
+	latestBlock                 *types.Header
+	latestBlockUpdatedAt        time.Time
 	headsub                     ethereum.Subscription
 	errChan                     chan error
 	eventChan                   chan interface{}
@@ -184,12 +185,12 @@ func (a *ageth) block() block {
 		}
 	}
 	return block{
-		number:     a.latestBlock.NumberU64(),
+		number:     a.latestBlock.Number.Uint64(),
 		hash:       a.latestBlock.Hash(),
-		coinbase:   a.latestBlock.Coinbase(),
-		difficulty: a.latestBlock.Difficulty().Uint64(),
+		coinbase:   a.latestBlock.Coinbase,
+		difficulty: a.latestBlock.Difficulty.Uint64(),
 		td:         a.td,
-		parentHash: a.latestBlock.ParentHash(),
+		parentHash: a.latestBlock.ParentHash,
 	}
 }
 
@@ -286,17 +287,7 @@ func (a *ageth) run() {
 		for {
 			select {
 			case h := <-a.newheadChan:
-				b, err := a.eclient.BlockByHash(context.Background(), h.Hash())
-				if err != nil {
-					a.log.Error("get block by hash", "error", err)
-				}
-				if b == nil || h.Hash() == (common.Hash{}) {
-					continue
-				}
-				if b.Hash() == a.block().hash {
-					continue
-				}
-				a.setHead(b)
+				a.setHead(h)
 			case <-a.quitChan:
 				return
 			}
@@ -608,21 +599,26 @@ func (a *ageth) refreshPeers() {
 
 func (a *ageth) updateSelfStats() {
 	a.refreshPeers()
+
+	if time.Since(a.latestBlockUpdatedAt) > 1*time.Minute {
+		a.getHeadManually()
+	}
 }
 
-func (a *ageth) setHeadManually() {
-	b, err := a.eclient.BlockByNumber(context.Background(), nil)
+func (a *ageth) getHeadManually() {
+	var head *types.Header
+	err := a.client.Call(head, "eth_getBlockByNumber", "latest", false)
 	if err != nil {
 		a.log.Error("get block by number [nil=latest]", "error", err)
 	}
-	if b == nil {
+	if head == nil {
 		a.log.Warn("No latest block")
 		return
 	}
-	if b.Hash() == a.block().hash {
+	if head.Hash() == a.block().hash {
 		return
 	}
-	a.setHead(b)
+	a.setHead(head)
 }
 
 func (a *ageth) truncateHead(n uint64) {
@@ -635,13 +631,14 @@ func (a *ageth) truncateHead(n uint64) {
 	a.setHeadManually()
 }
 
-func (a *ageth) setHead(head *types.Block) {
+func (a *ageth) setHead(head *types.Header) {
 	a.latestBlock = head
 	if len(a.onHeadCallbacks) != 0 {
 		for _, cb := range a.onHeadCallbacks {
 			cb(a, head)
 		}
 	}
+	a.latestBlockUpdatedAt = time.Now()
 	if a.eventChan != nil {
 		select {
 		case a.eventChan <- eventNode{

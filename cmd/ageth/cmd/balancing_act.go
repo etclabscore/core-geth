@@ -39,7 +39,7 @@ func ecbp1100AGSinusoidalA(x float64) (antiGravity float64) {
 	return (ampl * math.Sin((x+phaseShift)/pDiv)) + ampl + 1
 }
 
-func generateScenarioPartitioning(followGravity bool, duration time.Duration) func(set *agethSet) {
+func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration time.Duration) func(set *agethSet) {
 	return func(nodes *agethSet) {
 
 		log.Info("Running partitioning scenario")
@@ -52,8 +52,25 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 			a.client.Call(&res, "admin_ecbp1100", hexutil.Uint64(999999999).String())
 		})
 
+		luke := nodes.indexed(0)
+		luke.log.Info("== Luke ==")
+		solo := nodes.indexed(1)
+		solo.log.Info("== Solo ==")
+
+		if !luke.sameChainAs(solo) {
+			log.Warn("Luke and Solo on different chains", "action", "truncate to genesis")
+			luke.truncateHead(0)
+			solo.truncateHead(0)
+		}
+
+		log.Info("Asserting protagonist sync")
+		herdMax := nodes.headMax()
+		for luke.block().number < herdMax || solo.block().number < herdMax {
+			time.Sleep(10 * time.Second)
+		}
+
+		log.Info("Running pace car...")
 		nodes.dexedni(0).startMining(13)
-		log.Info("Waiting for the dust to settle")
 		time.Sleep(60 * time.Second)
 		nodes.dexedni(0).stopMining()
 
@@ -73,20 +90,14 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		go func() {
 			for !scenarioDone {
 				nodes.forEach(func(i int, a *ageth) {
-					if a.peers.len() < 11 {
+					if a.peers.len() < 15 {
 						a.addPeer(nodes.where(func(g *ageth) bool {
 							return g.name != a.name
 						}).random())
 					}
 				})
-				time.Sleep(60 * time.Second)
 			}
 		}()
-
-		luke := nodes.indexed(0)
-		luke.log.Info("== Luke ==")
-		solo := nodes.indexed(1)
-		solo.log.Info("== Solo ==")
 
 		solo.mustEtherbases([]common.Address{solo.coinbase})
 		luke.mustEtherbases([]common.Address{luke.coinbase}) // double evil
@@ -94,7 +105,7 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 			solo.mustEtherbases([]common.Address{})
 			luke.mustEtherbases([]common.Address{})
 		}()
-		normalBlockTime := 7
+		normalBlockTime := 13
 
 		// Toes on the same line
 		if luke.block().number > solo.block().number {
@@ -132,15 +143,24 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 				wantRatio = ecbp1100AGSinusoidalA(float64(solo.latestBlock.Time - forkedBlockTime))
 			}
 			upper, lower := wantRatio+tdRatioTolerance, wantRatio-tdRatioTolerance
-			if balance > upper && solo.mining != normalBlockTime+1 {
-				log.Warn("Solo above balance", "want", wantRatio, "upper", upper, "got", balance)
-				solo.startMining(normalBlockTime + 1)
-			} else if balance < lower && solo.mining != normalBlockTime-1 {
-				log.Warn("Solo below balance", "want", wantRatio, "lower", lower, "got", balance)
-				solo.startMining(normalBlockTime - 1)
-			} else if balance >= lower && balance <= upper && solo.mining != normalBlockTime {
-				solo.startMining(normalBlockTime)
+			if balance >= lower && balance <= upper {
+				return
 			}
+			mineAtInterval, ivalMax, ivalMin := solo.mining, normalBlockTime+1, normalBlockTime-1
+			if balance < lower {
+				mineAtInterval--
+			} else if balance > upper {
+				mineAtInterval++
+			}
+			if mineAtInterval < ivalMin {
+				mineAtInterval = ivalMin
+			} else if mineAtInterval > ivalMax {
+				mineAtInterval = ivalMax
+			}
+			if mineAtInterval == solo.mining {
+				return
+			}
+			solo.startMining(mineAtInterval)
 		}
 		go func() {
 			for !scenarioDone {
@@ -163,7 +183,36 @@ func generateScenarioPartitioning(followGravity bool, duration time.Duration) fu
 		go luke.startMining(normalBlockTime)
 		solo.startMining(normalBlockTime)
 
-		time.Sleep(duration)
+		start := time.Now()
+		for {
+			limitRatio := ecbp1100AGSinusoidalA(float64(solo.latestBlock.Time - forkedBlockTime))
+			_, _, balance := nodeTDRatioAB(solo, luke, forkedTD)
+			tlog := log.Info
+			soloTD := solo.getTd()
+			unitTDRat := 1 + (float64(solo.latestBlock.Difficulty.Uint64()) / (float64(soloTD) - float64(forkedTD)))
+			if unitTDRat < limitRatio {
+				/*
+				IF WE COMPARE BALANCE,
+				THIS WILL ALWAYS BE TRUE BECAUSE BALANCE IS SUPPOSED TO BE 1:1!
+				WHAT WE WANT TO MEASURE IS __MARGINAL__ TOTAL DIFFICULTY: ie.
+				the TotalDifficulty ratio of Solo's current block (proposed) over his last block (current).
+				Once this delta proportion passes below the antigravity ratio, then
+				we can be confident that people are pretty much where they're gonna stay.
+				 */
+				log.Warn("SoloTD/LukeTD ratio beneath antigravity", "antigravity", limitRatio, "S/L", balance)
+				tlog = log.Warn
+				if time.Since(start) > minDuration {
+					break
+				}
+			}
+			if time.Since(start) > maxDuration {
+				break
+			}
+			tlog("Status", "fork.number", forkedBlock.number, "fork.age", common.PrettyAge(time.Unix(int64(forkedBlockTime), 0)), "unit.rate" ,unitTDRat , "antigravity", limitRatio, "S/L", balance)
+			time.Sleep(10 * time.Second)
+		}
+
+		time.Sleep(10*time.Minute)
 
 		_, _, resultingTDRatio := nodeTDRatioAB(luke, solo, forkedBlock.number)
 

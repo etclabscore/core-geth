@@ -27,7 +27,9 @@ func stabilize(nodes *agethSet) {
 	log.Warn("Running stabilizer")
 	badGuy := nodes.indexed(0) // NOTE: Assumes badguy will always be [0]
 	goodGuys := nodes.where(func(a *ageth) bool { return a.name != badGuy.name })
-	badGuy.truncateHead(goodGuys.headMax())
+	if !badGuy.sameChainAs(goodGuys.random()) {
+		badGuy.truncateHead(0)
+	}
 	minimumPeerCount := int64(2)
 	for _, node := range nodes.all() {
 		node.stopMining()

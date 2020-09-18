@@ -144,7 +144,6 @@ type scenario func(nodes *agethSet)
 
 // "Global"s, don't touch.
 var world = newAgethSet()
-var globalTick = 0
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -285,7 +284,6 @@ to quickly create a Cobra application.`,
 		for i, s := range scenarios {
 			log.Info("Running scenario", "index", i, "scenarios.len", len(scenarios),
 				"name", runtime.FuncForPC(reflect.ValueOf(s).Pointer()).Name())
-			globalTick = 0
 			stabilize(world)
 			s(world)
 			// Note that the loop assumes no responsibility for tear down.
@@ -352,6 +350,7 @@ func runEventing(reportEventChan, wsEventChan chan interface{}, quitChan chan st
 
 func runWeb(reportEventChan chan interface{}, quitChan chan struct{}, globalState func() NetworkGraphData) {
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		var globalTick = 0
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -364,7 +363,6 @@ func runWeb(reportEventChan chan interface{}, quitChan chan struct{}, globalStat
 
 		payload := globalState()
 		payload.Tick = globalTick
-		globalTick++
 		err = ws.WriteJSON(Event{
 			Typ:     "state",
 			Payload: payload,
@@ -372,6 +370,7 @@ func runWeb(reportEventChan chan interface{}, quitChan chan struct{}, globalStat
 		if err != nil {
 			log.Debug("Write WS event errored", "error", err)
 		}
+		globalTick++
 
 		debounce := time.NewTicker(300 * time.Millisecond)
 		defer debounce.Stop()

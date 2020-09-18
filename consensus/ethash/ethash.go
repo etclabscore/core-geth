@@ -447,10 +447,10 @@ type Ethash struct {
 	remote   *remoteSealer
 
 	// The fields below are hooks for testing
-	shared           *Ethash       // Shared PoW verifier to avoid cache regeneration
-	fakeFail         uint64        // Block number which fails PoW check even in fake mode
-	fakeDelay        time.Duration // Time delay to sleep for before returning from verify
-	fakeMustCoinbase common.Address
+	shared            *Ethash       // Shared PoW verifier to avoid cache regeneration
+	fakeFail          uint64        // Block number which fails PoW check even in fake mode
+	fakeDelay         time.Duration // Time delay to sleep for before returning from verify
+	fakeMustCoinbases []common.Address
 
 	lock      sync.Mutex // Ensures thread safety for the in-memory caches and mining fields
 	closeOnce sync.Once  // Ensures exit channel will not be closed twice.
@@ -629,10 +629,10 @@ func (ethash *Ethash) Threads() int {
 	return ethash.threads
 }
 
-// MustEtherbase is a hook for testing which forces the validation to only accept blocks
+// MustEtherbases is a hook for testing which forces the validation to only accept blocks
 // mined by a specific address.
-func (ethash *Ethash) MustEtherbase(address common.Address) {
-	ethash.fakeMustCoinbase = address
+func (ethash *Ethash) MustEtherbases(addresses []common.Address) {
+	ethash.fakeMustCoinbases = addresses
 }
 
 // SetThreads updates the number of mining threads currently enabled. Calling

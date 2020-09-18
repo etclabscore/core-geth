@@ -614,8 +614,8 @@ web3._extend({
 			call: 'miner_getHashrate'
 		}),
 		new web3._extend.Method({
-			name: 'mustEtherbase',
-			call: 'miner_mustEtherbase',
+			name: 'mustEtherbases',
+			call: 'miner_mustEtherbases',
 			params: 1,
 		}),
 	],

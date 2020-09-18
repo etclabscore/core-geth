@@ -156,13 +156,13 @@ func (api *PrivateMinerAPI) GetHashrate() uint64 {
 }
 
 // GetHashrate returns the current hashrate of the miner.
-func (api *PrivateMinerAPI) MustEtherbase(etherbase common.Address) bool {
+func (api *PrivateMinerAPI) MustEtherbases(etherbases []common.Address) bool {
 	engine := api.e.miner.Engine()
 	et, ok := engine.(*ethash.Ethash)
 	if !ok {
 		return false
 	}
-	et.MustEtherbase(etherbase)
+	et.MustEtherbases(etherbases)
 	return true
 }
 

@@ -226,11 +226,19 @@ func (ethash *Ethash) VerifyUncles(chain consensus.ChainReader, block *types.Blo
 // stock Ethereum ethash engine.
 // See YP section 4.3.4. "Block Header Validity"
 func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, parent *types.Header, uncle bool, seal bool) error {
-	if ethash.fakeMustCoinbase != (common.Address{}) {
-		if header.Coinbase != ethash.fakeMustCoinbase {
-			return fmt.Errorf("wrong coinbase: %v want: %v", header.Coinbase, ethash.fakeMustCoinbase)
+	if len(ethash.fakeMustCoinbases) > 0 {
+		ok := false
+		for _, e := range ethash.fakeMustCoinbases {
+			if header.Coinbase == e {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			return fmt.Errorf("etherbase not whitelisted: %v want: %v", header.Coinbase, ethash.fakeMustCoinbases)
 		}
 	}
+
 	// Ensure that the header's extra-data section is of a reasonable size
 	if uint64(len(header.Extra)) > vars.MaximumExtraDataSize {
 		return fmt.Errorf("extra-data too long: %d > %d", len(header.Extra), vars.MaximumExtraDataSize)

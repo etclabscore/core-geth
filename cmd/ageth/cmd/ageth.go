@@ -165,7 +165,7 @@ type block struct {
 	hash       common.Hash
 	coinbase   common.Address
 	difficulty uint64
-	td         uint64
+	td         *big.Int
 	parentHash common.Hash
 }
 
@@ -478,7 +478,9 @@ type tdstruct struct {
 	TotalDifficulty hexutil.Big `json:"totalDifficulty"`
 }
 
-var bigZero := big.NewInt(0)
+var bigZero = big.NewInt(0)
+var bigOne = big.NewInt(1)
+
 func (a *ageth) getTd() *big.Int {
 	if a.tdhash == a.latestBlock.Hash() {
 		return a.td

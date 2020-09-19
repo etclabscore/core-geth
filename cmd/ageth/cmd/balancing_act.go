@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"math/big"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -12,12 +13,16 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 )
 
-func nodeTDRatioAB(a, b *ageth, commonBlockTD uint64) (tdA, tdB uint64, ratio float64) {
+func nodeTDRatioAB(a, b *ageth, commonBlockTD *big.Int) (tdA, tdB *big.Int, ratio float64) {
 	tdA, tdB = a.getTd(), b.getTd()
-	if tdA == 0 || tdB == 0 {
-		return 0, 0, 0
+	if tdA.Cmp(bigZero) == 0 || tdB.Cmp(bigZero) == 0 {
+		return bigZero, bigZero, 0
 	}
-	return tdA, tdB, (float64(tdA) - float64(commonBlockTD)) / (float64(tdB) - float64(commonBlockTD))
+	r, _ := new(big.Float).Quo(
+		new(big.Float).Sub(new(big.Float).SetInt(tdA), new(big.Float).SetInt(commonBlockTD)),
+		new(big.Float).Sub(new(big.Float).SetInt(tdB), new(big.Float).SetInt(commonBlockTD)),
+	).Float64()
+	return tdA, tdB, r
 }
 
 /*
@@ -123,7 +128,7 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 		}
 
 		eitherNewHead := false
-		soloPaceMaker := func(solo, luke *ageth, forkedTd uint64) {
+		soloPaceMaker := func(solo, luke *ageth, forkedTd *big.Int) {
 			if !eitherNewHead {
 				return
 			}
@@ -188,9 +193,20 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 			limitRatio := ecbp1100AGSinusoidalA(float64(solo.latestBlock.Time - forkedBlockTime))
 			_, _, balance := nodeTDRatioAB(solo, luke, forkedTD)
 			tlog := log.Info
+
+			/*
 			soloTD := solo.getTd()
 			unitTDRat := 1 + (float64(solo.latestBlock.Difficulty.Uint64()) / (float64(soloTD) - float64(forkedTD)))
-			if unitTDRat < limitRatio {
+			*/
+
+			unitTDRat := new(big.Float).Quo(
+				new(big.Float).SetInt(solo.latestBlock.Difficulty),
+				new(big.Float).SetInt(new(big.Int).Sub(solo.getTd(), forkedTD)),
+				)
+			unitTDRat.Add(new(big.Float).SetInt(bigOne), unitTDRat)
+
+			// if unitTDRat < limitRatio {
+			if unitTDRat.Cmp(new(big.Float).SetFloat64(limitRatio)) < 0 {
 				/*
 				IF WE COMPARE BALANCE,
 				THIS WILL ALWAYS BE TRUE BECAUSE BALANCE IS SUPPOSED TO BE 1:1!
@@ -214,7 +230,7 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 
 		time.Sleep(10*time.Minute)
 
-		_, _, resultingTDRatio := nodeTDRatioAB(luke, solo, forkedBlock.number)
+		_, _, resultingTDRatio := nodeTDRatioAB(luke, solo, new(big.Int).SetUint64(forkedBlock.number))
 
 		if luke.sameChainAs(solo) {
 			log.Error("Test failed; Luke is on the dark the side :(")

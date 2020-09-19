@@ -26,6 +26,7 @@ import (
 	llog "log"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"os"
 	"reflect"
 	"runtime"
@@ -261,7 +262,8 @@ to quickly create a Cobra application.`,
 
 			// generateScenarioPartitioning(true, 45*time.Minute),
 
-			scenarioGenerator(13, 15 * time.Minute, 2 * time.Minute, 1.02, .666, 1, false),
+			scenarioGenerator(13, 15 * time.Minute, 2 * time.Minute, 1.06, .666, 1, false),
+			scenarioGenerator(13, 15 * time.Minute, 2 * time.Minute, 1.20, .666, 1, false),
 
 			// scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.13, .666, 1, true),
 			// scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.02, .666, 1, false), // 24
@@ -474,6 +476,13 @@ func runWeb(reportEventChan chan interface{}, quitChan chan struct{}, globalStat
 			writer.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		u, _ := url.Parse("ws://127.0.0.1"+httpAddr)
+		u.Path = "ws"
+		if tls {
+			u.Scheme = "wss"
+			u.Host = "mess.canhaz.net"
+		}
+		b = bytes.Replace(b, []byte("WEBSOCKET_URL"), []byte(u.String()), 1)
 		_, err = writer.Write(b)
 		if err != nil {
 			log.Error("Write index.html errored", "error", err)

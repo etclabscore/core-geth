@@ -48,14 +48,16 @@ func ecbp1100AGSinusoidalA(x float64) (antiGravity float64) {
 	return (ampl * math.Sin((x+phaseShift)/pDiv)) + ampl + 1
 }
 
-// var badGuyPacemakerLast common.Hash
-func badGuyPacemaker(badGuy, honestGuy *ageth, wantRatio float64, forkedTD *big.Int, forkedTime uint64) {
-	// if badGuy.block().hash == badGuyPacemakerLast {
-	// 	return
-	// }
-	// badGuyPacemakerLast = badGuy.block().hash
+var badGuyPacemakerLast common.Hash
+var goodGuyPacemakerLast common.Hash
+func badGuyPacemaker(badGuy, goodGuy *ageth, wantRatio float64, forkedTD *big.Int, forkedTime uint64) {
+	if badGuy.block().hash == badGuyPacemakerLast && goodGuy.block().hash == goodGuyPacemakerLast {
+		return
+	}
+	badGuyPacemakerLast = badGuy.block().hash
+	goodGuyPacemakerLast = goodGuy.block().hash
 
-	segA, segB, balance := nodeTDRatioAB(badGuy, honestGuy, forkedTD)
+	segA, segB, balance := nodeTDRatioAB(badGuy, goodGuy, forkedTD)
 
 	tdRatioTolerance := float64(1 / 2048)
 	upper, lower := wantRatio+tdRatioTolerance, wantRatio-tdRatioTolerance
@@ -82,6 +84,7 @@ func badGuyPacemaker(badGuy, honestGuy *ageth, wantRatio float64, forkedTD *big.
 			bestDifference.Set(difference)
 		}
 	}
+	bestTimeOffset = (uint64(badGuy.mining) + bestTimeOffset) / 2
 	if int(bestTimeOffset) == badGuy.mining {
 		return
 	}
@@ -230,7 +233,7 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 				THIS WILL ALWAYS BE TRUE BECAUSE BALANCE IS SUPPOSED TO BE 1:1!
 				WHAT WE WANT TO MEASURE IS __MARGINAL__ TOTAL DIFFICULTY: ie.
 				the TotalDifficulty ratio of Solo's current block (proposed) over his last block (current).
-				Once this delta proportion passes below the antigravity ratio, then
+				Once this rate of growth passes below the antigravity ratio, then
 				we can be confident that people are pretty much where they're gonna stay.
 				 */
 				log.Warn("SoloTD/LukeTD ratio beneath antigravity", "antigravity", limitRatio, "S/L", balance)

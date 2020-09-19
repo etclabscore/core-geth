@@ -167,6 +167,7 @@ type block struct {
 	difficulty uint64
 	td         *big.Int
 	parentHash common.Hash
+	time       uint64
 }
 
 func (a *ageth) isLocal() bool {
@@ -181,7 +182,13 @@ func (a *ageth) isRunning() bool {
 func (a *ageth) block() block {
 	if a.latestBlock == nil {
 		return block{
-			number: 0, hash: common.Hash{}, coinbase: common.Address{}, td: big.NewInt(0), parentHash: common.Hash{}, difficulty: 0,
+			number:     0,
+			hash:       common.Hash{},
+			coinbase:   common.Address{},
+			td:         big.NewInt(0),
+			parentHash: common.Hash{},
+			difficulty: 0,
+			time:       0,
 		}
 	}
 	return block{
@@ -191,6 +198,7 @@ func (a *ageth) block() block {
 		difficulty: a.latestBlock.Difficulty.Uint64(),
 		td:         a.td,
 		parentHash: a.latestBlock.ParentHash,
+		time:       a.latestBlock.Time,
 	}
 }
 
@@ -502,8 +510,6 @@ func (a *ageth) getTd() *big.Int {
 		a.log.Error("Error unmarshaling to header", "error", err)
 		return bigZero
 	}
-	// data, _ := json.MarshalIndent(td, "", "    ")
-	// log.Info("Got td", "data", string(data))
 	a.td = td.TotalDifficulty.ToInt()
 	a.tdhash = a.latestBlock.Hash()
 	a.setHead(header)

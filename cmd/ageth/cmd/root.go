@@ -255,10 +255,13 @@ to quickly create a Cobra application.`,
 		}
 
 		scenarios := []scenario{
-			generateScenarioPartitioning(false, 3*60*time.Second, 30*60*time.Second),
-			generateScenarioPartitioning(false, 3*60*time.Second, 30*60*time.Second),
-			generateScenarioPartitioning(false, 3*60*time.Second, 30*60*time.Second),
+			// generateScenarioPartitioning(false, 3*60*time.Second, 30*60*time.Second),
+			// generateScenarioPartitioning(false, 3*60*time.Second, 30*60*time.Second),
+			// generateScenarioPartitioning(false, 3*60*time.Second, 30*60*time.Second),
+
 			// generateScenarioPartitioning(true, 45*time.Minute),
+
+			scenarioGenerator(13, 15 * time.Minute, 2 * time.Minute, 1.02, .666, 1, false),
 
 			// scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.13, .666, 1, true),
 			// scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.02, .666, 1, false), // 24
@@ -285,7 +288,7 @@ to quickly create a Cobra application.`,
 		for i, s := range scenarios {
 			log.Info("Running scenario", "index", i, "scenarios.len", len(scenarios),
 				"name", runtime.FuncForPC(reflect.ValueOf(s).Pointer()).Name())
-			stabilize(world)
+			// stabilize(world)
 			s(world)
 			// Note that the loop assumes no responsibility for tear down.
 			// Each scenario needs to be responsible for getting the nodes

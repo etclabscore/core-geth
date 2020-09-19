@@ -9,20 +9,24 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params"
 )
 
-func nodeTDRatioAB(a, b *ageth, commonBlockTD *big.Int) (tdA, tdB *big.Int, ratio float64) {
-	tdA, tdB = a.getTd(), b.getTd()
+func nodeTDRatioAB(a, b *ageth, commonBlockTD *big.Int) (segmentTDA, segmentTDB *big.Int, ratio float64) {
+	tdA, tdB := a.getTd(), b.getTd()
 	if tdA.Cmp(bigZero) == 0 || tdB.Cmp(bigZero) == 0 {
-		return bigZero, bigZero, 0
+		return bigOne, bigOne, 0
 	}
-	r, _ := new(big.Float).Quo(
-		new(big.Float).Sub(new(big.Float).SetInt(tdA), new(big.Float).SetInt(commonBlockTD)),
-		new(big.Float).Sub(new(big.Float).SetInt(tdB), new(big.Float).SetInt(commonBlockTD)),
+	segmentTDA = new(big.Int).Sub(tdA, commonBlockTD)
+	segmentTDB = new(big.Int).Sub(tdB, commonBlockTD)
+	ratio, _ = new(big.Float).Quo(
+		new(big.Float).SetInt(segmentTDA),
+		new(big.Float).SetInt(segmentTDB),
 	).Float64()
-	return tdA, tdB, r
+	return
 }
 
 /*
@@ -42,6 +46,46 @@ func ecbp1100AGSinusoidalA(x float64) (antiGravity float64) {
 		x = peakX
 	}
 	return (ampl * math.Sin((x+phaseShift)/pDiv)) + ampl + 1
+}
+
+// var badGuyPacemakerLast common.Hash
+func badGuyPacemaker(badGuy, honestGuy *ageth, wantRatio float64, forkedTD *big.Int, forkedTime uint64) {
+	// if badGuy.block().hash == badGuyPacemakerLast {
+	// 	return
+	// }
+	// badGuyPacemakerLast = badGuy.block().hash
+
+	segA, segB, balance := nodeTDRatioAB(badGuy, honestGuy, forkedTD)
+
+	tdRatioTolerance := float64(1 / 2048)
+	upper, lower := wantRatio+tdRatioTolerance, wantRatio-tdRatioTolerance
+
+	constant := 13
+	if balance >= lower && balance <= upper {
+		if badGuy.mining != constant {
+			badGuy.startMining(constant)
+		}
+		return
+	}
+	// badGuy current TD + x = ratio * goodGuy
+	want := new(big.Float).Mul(new(big.Float).SetInt(segB), new(big.Float).SetFloat64(wantRatio))
+	wantBig, _ := want.Int(nil)
+	wantUnitDifficulty := new(big.Int).Sub(wantBig, segA)
+	bestDifference := big.NewInt(math.MaxInt64)
+	bestTimeOffset := uint64(0)
+	for i := uint64(42); i >= 3; i-- {
+		difficulty := ethash.CalcDifficulty(params.MessNetConfig, badGuy.block().time + i, badGuy.latestBlock)
+		difference := difficulty.Sub(difficulty, wantUnitDifficulty)
+		difference.Abs(difference)
+		if difference.Cmp(bestDifference) <= 0 {
+			bestTimeOffset = i
+			bestDifference.Set(difference)
+		}
+	}
+	if int(bestTimeOffset) == badGuy.mining {
+		return
+	}
+	badGuy.startMining(int(bestTimeOffset))
 }
 
 func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration time.Duration) func(set *agethSet) {
@@ -128,48 +172,22 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 		}
 
 		eitherNewHead := false
-		soloPaceMaker := func(solo, luke *ageth, forkedTd *big.Int) {
-			if !eitherNewHead {
-				return
-			}
-			defer func() {
-				eitherNewHead = false
-			}()
-			if luke.sameChainAs(solo) {
-				forkedBlock = luke.block()
-				forkedBlockTime = luke.latestBlock.Time
-				forkedTD = luke.getTd()
-				return
-			}
-			_, _, balance := nodeTDRatioAB(solo, luke, forkedTD)
-			tdRatioTolerance := float64(1 / 2048)
-			wantRatio := float64(1)
-			if followGravity {
-				wantRatio = ecbp1100AGSinusoidalA(float64(solo.latestBlock.Time - forkedBlockTime))
-			}
-			upper, lower := wantRatio+tdRatioTolerance, wantRatio-tdRatioTolerance
-			if balance >= lower && balance <= upper {
-				return
-			}
-			mineAtInterval, ivalMax, ivalMin := solo.mining, normalBlockTime+1, normalBlockTime-1
-			if balance < lower {
-				mineAtInterval--
-			} else if balance > upper {
-				mineAtInterval++
-			}
-			if mineAtInterval < ivalMin {
-				mineAtInterval = ivalMin
-			} else if mineAtInterval > ivalMax {
-				mineAtInterval = ivalMax
-			}
-			if mineAtInterval == solo.mining {
-				return
-			}
-			solo.startMining(mineAtInterval)
-		}
 		go func() {
 			for !scenarioDone {
-				soloPaceMaker(solo, luke, forkedTD)
+				if eitherNewHead {
+					if luke.sameChainAs(solo) {
+						forkedBlock = luke.block()
+						forkedBlockTime = luke.latestBlock.Time
+						forkedTD = luke.getTd()
+					} else {
+						wantRatio := float64(1)
+						if followGravity {
+							wantRatio = ecbp1100AGSinusoidalA(float64(solo.latestBlock.Time - forkedBlockTime))
+						}
+						badGuyPacemaker(solo, luke, wantRatio, forkedTD, forkedBlockTime)
+						eitherNewHead = false
+					}
+				}
 				time.Sleep(1 * time.Second)
 			}
 		}()

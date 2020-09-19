@@ -53,7 +53,7 @@ type ageth struct {
 	coinbase                    common.Address
 	behaviorsInterval           time.Duration
 	behaviors                   []func(self *ageth)
-	td                          uint64
+	td                          *big.Int
 	tdhash                      common.Hash
 	isMining                    bool
 	quitChan                    chan struct{}
@@ -142,7 +142,7 @@ func newAgeth(rpcEndpoint string) *ageth {
 		newheadChan:                 make(chan *types.Header),
 		errChan:                     make(chan error),
 		peers:                       newAgethSet(),
-		td:                          0,
+		td:                          big.NewInt(0),
 		quitChan:                    make(chan struct{}, 100),
 	}
 
@@ -181,7 +181,7 @@ func (a *ageth) isRunning() bool {
 func (a *ageth) block() block {
 	if a.latestBlock == nil {
 		return block{
-			number: 0, hash: common.Hash{}, coinbase: common.Address{}, td: 0, parentHash: common.Hash{}, difficulty: 0,
+			number: 0, hash: common.Hash{}, coinbase: common.Address{}, td: big.NewInt(0), parentHash: common.Hash{}, difficulty: 0,
 		}
 	}
 	return block{
@@ -475,10 +475,11 @@ func (a *ageth) stopMining() {
 
 type tdstruct struct {
 	// types.Header
-	TotalDifficulty hexutil.Uint64 `json:"totalDifficulty"`
+	TotalDifficulty hexutil.Big `json:"totalDifficulty"`
 }
 
-func (a *ageth) getTd() uint64 {
+var bigZero := big.NewInt(0)
+func (a *ageth) getTd() *big.Int {
 	if a.tdhash == a.latestBlock.Hash() {
 		return a.td
 	}
@@ -486,22 +487,22 @@ func (a *ageth) getTd() uint64 {
 	var js = json.RawMessage{}
 	if err := a.client.Call(&js, "eth_getBlockByHash", a.latestBlock.Hash(), true); err != nil {
 		a.log.Error("error getting td", "err", err)
-		return 0
+		return bigZero
 	}
 	err := json.Unmarshal(js, &td)
 	if err != nil {
 		a.log.Error("Error unmarshaling to td struct", "error", err)
-		return 0
+		return bigZero
 	}
 	header := &types.Header{}
 	err = json.Unmarshal(js, header)
 	if err != nil {
 		a.log.Error("Error unmarshaling to header", "error", err)
-		return 0
+		return bigZero
 	}
 	// data, _ := json.MarshalIndent(td, "", "    ")
 	// log.Info("Got td", "data", string(data))
-	a.td = uint64(td.TotalDifficulty)
+	a.td = td.TotalDifficulty.ToInt()
 	a.tdhash = a.latestBlock.Hash()
 	a.setHead(header)
 	return a.td
@@ -518,7 +519,8 @@ func translateEnodeIPIfLocal(en string) string {
 		}
 		extIp, err := iface.ExternalIP()
 		if err != nil {
-			log.Crit("External IP errored", "error", err)
+			log.Error("External IP errored", "error", err, "en", en)
+			return en
 		}
 		machineNATExtIP = &extIp
 	}

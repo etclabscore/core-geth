@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"encoding/json"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 type Node struct {
@@ -14,7 +16,7 @@ type Node struct {
 	HeadBase  string `json:"headBase"`
 	HeadMiner bool   `json:"headMiner"`
 	HeadD     uint64 `json:"headD"` // Difficulty
-	HeadTD    uint64 `json:"headTD"`
+	HeadTD    *big.Int `json:"headTD"`
 }
 
 func (n *Node) UnmarshalJSON(bytes []byte) error {
@@ -35,8 +37,8 @@ func (n *Node) UnmarshalJSON(bytes []byte) error {
 
 		HeadD uint64 `json:"headD` // Difficulty
 
-		HeadTD uint64 `json:"headTD"`
-		TD     uint64 `json:"td"`
+		HeadTD *hexutil.Big `json:"headTD"`
+		TD     *hexutil.Big `json:"td"`
 	}{}
 	err := json.Unmarshal(bytes, &im)
 	if err != nil {
@@ -68,9 +70,9 @@ func (n *Node) UnmarshalJSON(bytes []byte) error {
 
 	n.HeadD = im.HeadD
 
-	n.HeadTD = im.HeadTD
-	if im.TD != 0 {
-		n.HeadTD = im.TD
+	n.HeadTD = im.HeadTD.ToInt()
+	if big.NewInt(0).Cmp(im.TD.ToInt()) == 0 {
+		n.HeadTD = im.TD.ToInt()
 	}
 	return nil
 }

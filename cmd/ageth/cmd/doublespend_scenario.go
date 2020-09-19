@@ -129,7 +129,13 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
     for {
       bestPeer := goodGuys.peerMax()
       if bestPeer == nil { continue }
-      chainRatio := big.NewFloat(0).Quo(big.NewFloat(0).SetInt(big.NewInt(0).Sub(badGuy.getTd(), forkBlockTd)), big.NewFloat(0).SetInt(big.NewInt(0).Sub(bestPeer.getTd(), forkBlockTd)))
+      if bestPeer.getTd().Cmp(forkBlockTd) <= 0 {
+        continue
+      }
+      chainRatio := big.NewFloat(0).Quo(
+        big.NewFloat(0).SetInt(big.NewInt(0).Sub(badGuy.getTd(), forkBlockTd)),
+        big.NewFloat(0).SetInt(big.NewInt(0).Sub(bestPeer.getTd(), forkBlockTd)),
+        )
       if chainRatio.Cmp(lastChainRatio) != 0 {
         // The ratio has changed, adjust mining power
         if chainRatio.Cmp(big.NewFloat(targetDifficultyRatio)) < 0  {

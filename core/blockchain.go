@@ -1551,7 +1551,12 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 			if d.err == nil {
 				// Reorg data error was nil.
 				// Proceed with further reorg arbitration.
-				if bc.IsArtificialFinalityEnabled() && bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, currentBlock.Number()) {
+
+				// If the node is mining and trying to insert their own block, we want to allow that.
+				minerOwn := bc.shouldPreserve != nil && bc.shouldPreserve(block)
+				if (bc.shouldPreserve == nil || !minerOwn) &&
+					bc.IsArtificialFinalityEnabled() &&
+					bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, currentBlock.Number()) {
 					d.err = bc.ecbp1100(d.commonBlock.Header(), currentBlock.Header(), block.Header())
 				}
 			}

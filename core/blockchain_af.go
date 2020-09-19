@@ -74,7 +74,6 @@ func (bc *BlockChain) getTDRatio(commonAncestor, current, proposed *types.Header
 // "Modified Exponential Subjective Scoring" used to prefer known chain segments
 // over later-to-come counterparts, especially proposed segments stretching far into the past.
 func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) error {
-
 	tdRatio := bc.getTDRatio(commonAncestor, current, proposed)
 
 	// Time span diff.
@@ -95,9 +94,11 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 
 	if tdRatio < antiGravity {
 		// Using "b/a" here as "'B' chain vs. 'A' chain", where A is original (current), and B is proposed (new).
-		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v blocks=%d td.B/A=%0.6f < antigravity=%0.6f`,
+		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v blocks=%d current=%d proposed=%d td.B/A=%0.6f < antigravity=%0.6f`,
 			errReorgFinality,
-			common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)), proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
+			common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
+			proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
+			current.Number.Uint64(), proposed.Number.Uint64(),
 			tdRatio, antiGravity,
 		)
 	}
@@ -105,6 +106,8 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 		"status", "accepted",
 		"age", common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
 		"blocks", proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
+		"current", current.Number.Uint64(),
+		"proposed", proposed.Number.Uint64(),
 		"td.B/A", tdRatio,
 		"antigravity", antiGravity,
 	)

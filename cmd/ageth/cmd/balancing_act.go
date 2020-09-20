@@ -167,6 +167,12 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 			}
 		}()
 
+		log.Info("Running pace car...")
+		nodes.dexedni(0).startMining(10)
+		time.Sleep(60 * time.Second)
+		nodes.dexedni(0).stopMining()
+		log.Info("Pace car leaving track")
+
 		if !luke.sameChainAs(solo) {
 			log.Warn("Luke and Solo on different chains", "action", "truncate to genesis")
 			luke.truncateHead(0)
@@ -178,17 +184,12 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 			time.Sleep(10 * time.Second)
 		}
 
-		log.Info("Running pace car...")
-		nodes.dexedni(0).startMining(10)
-		time.Sleep(60 * time.Second)
-		nodes.dexedni(0).stopMining()
-		log.Info("Pace car leaving track")
-
 		herdHeadMin := nodes.headMin()
 		nodes.forEach(func(i int, a *ageth) {
 			if a.block().number > herdHeadMin {
 				a.truncateHead(herdHeadMin)
 			}
+			// MAKE SURE ECBP1100 IS TURNED ON
 			var res bool
 			a.client.Call(&res, "admin_ecbp1100", hexutil.Uint64(1).String())
 		})

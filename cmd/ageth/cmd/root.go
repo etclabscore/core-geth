@@ -229,7 +229,9 @@ to quickly create a Cobra application.`,
 				for e := range agethEndpointCh {
 					g := newAgeth(e)
 					g.eventChan = reportEventChan
-					g.run()
+					if err := g.run(); err != nil {
+						log.Error("Running ageth errorer", "error", err)
+					}
 					agethCh <- g
 				}
 				wg.Done()
@@ -240,7 +242,9 @@ to quickly create a Cobra application.`,
 			close(agethCh)
 		}(&wg)
 		for g := range agethCh {
-			world.push(g)
+			if g.client != nil {
+				world.push(g)
+			}
 		}
 
 		// If --read-only=true (which it IS, BY DEFAULT, this is where

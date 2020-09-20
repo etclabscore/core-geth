@@ -255,11 +255,11 @@ func (a *ageth) stop() {
 // run is idempotent.
 // It should be called whenever you first want to startLocal using the ageth.
 // It will startLocal the instance if it's not already started.
-func (a *ageth) run() {
+func (a *ageth) run() error {
 
 	if a.isRunning() {
 		a.log.Warn("Already running")
-		return
+		return nil
 	}
 
 	defer func() {
@@ -310,13 +310,15 @@ func (a *ageth) run() {
 	// Set up RPC clients.
 	cl, err := rpc.Dial(a.rpcEndpointOrExecutablePath)
 	if err != nil {
-		log.Crit("rpc client", "error", err)
+		log.Error("rpc client", "error", err)
+		return err
 	}
 	a.client = cl
 
 	ecl, err := ethclient.Dial(a.rpcEndpointOrExecutablePath)
 	if err != nil {
-		log.Crit("dial ethclient", "error", err)
+		log.Error("dial ethclient", "error", err)
+		return err
 	}
 	a.eclient = ecl
 
@@ -324,7 +326,8 @@ func (a *ageth) run() {
 	nodeInfoRes := p2p.NodeInfo{}
 	err = a.client.Call(&nodeInfoRes, "admin_nodeInfo")
 	if err != nil {
-		a.log.Crit("admin_nodeInfo errored", "error", err)
+		a.log.Error("admin_nodeInfo errored", "error", err)
+		return err
 	}
 
 	n := enode.MustParse(nodeInfoRes.Enode)
@@ -405,6 +408,7 @@ func (a *ageth) run() {
 			}
 		}
 	}()
+	return nil
 }
 
 func (a *ageth) withStandardPeerChurn(targetPeers int, peerSet *agethSet) {

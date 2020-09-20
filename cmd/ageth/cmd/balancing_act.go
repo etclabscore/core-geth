@@ -59,7 +59,7 @@ func badGuyPacemaker(badGuy, goodGuy *ageth, wantRatio float64, forkedTD *big.In
 
 	segA, segB, balance := nodeTDRatioAB(badGuy, goodGuy, forkedTD)
 
-	tdRatioTolerance := float64(1 / 2048)
+	tdRatioTolerance := float64(1 / 100)
 	upper, lower := wantRatio+tdRatioTolerance, wantRatio-tdRatioTolerance
 
 	constant := 13
@@ -69,21 +69,33 @@ func badGuyPacemaker(badGuy, goodGuy *ageth, wantRatio float64, forkedTD *big.In
 		}
 		return
 	}
-	// badGuy current TD + x = ratio * goodGuy
+
+	// Good guys' segment * targetRatio, eg. 42000000 * 1.02
 	want := new(big.Float).Mul(new(big.Float).SetInt(segB), new(big.Float).SetFloat64(wantRatio))
-	wantBig, _ := want.Int(nil)
+	wantBig, _ := want.Int(nil) // as big
+
+	// Difference between target segment difficulty and current segment difficulty
 	wantUnitDifficulty := new(big.Int).Sub(wantBig, segA)
+
 	bestDifference := big.NewInt(math.MaxInt64)
 	bestTimeOffset := uint64(0)
+
 	for i := uint64(42); i >= 3; i-- {
+		// Sample the would-be difficulty for a range of block times.
 		difficulty := ethash.CalcDifficulty(params.MessNetConfig, badGuy.block().time + i, badGuy.latestBlock)
+
+		// Compare this sample with desired.
 		difference := difficulty.Sub(difficulty, wantUnitDifficulty)
-		difference.Abs(difference)
+		difference.Abs(difference) // As absolute value.
+
+		// If it's the closest to the target unit block difficulty that would yield
+		// the closest to the overall chain segment ratio, peg it.
 		if difference.Cmp(bestDifference) <= 0 {
 			bestTimeOffset = i
 			bestDifference.Set(difference)
 		}
 	}
+	// Nudge the block time toward that.
 	bestTimeOffset = (uint64(badGuy.mining) + bestTimeOffset) / 2
 	if int(bestTimeOffset) == badGuy.mining {
 		return

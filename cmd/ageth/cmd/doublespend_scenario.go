@@ -9,6 +9,7 @@ import (
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	log "github.com/ethereum/go-ethereum/log"
 )
 
@@ -42,6 +43,8 @@ func stabilize(nodes *agethSet) {
 		for node.getPeerCount() < minimumPeerCount {
 			node.addPeer(nodes.random())
 		}
+		var res bool
+		node.client.Call(&res, "admin_ecbp1100", hexutil.Uint64(9999999999).String())
 	})
 	done := make(chan struct{})
 	go func() {
@@ -54,13 +57,17 @@ func stabilize(nodes *agethSet) {
 			}
 		}
 	}()
-	goodGuys.random().startMining(13)
+	goodGuys.random().startMining(100)
 	for len(nodes.distinctChains()) > 1 {
 		time.Sleep(30)
 	}
 	for badGuy.block().number < goodGuys.headMax() {
 		time.Sleep(5)
 	}
+	nodes.eachParallel(func(a *ageth) {
+		var res bool
+		a.client.Call(&res, "admin_ecbp1100", hexutil.Uint64(1).String())
+	})
 	done <- struct{}{}
 }
 

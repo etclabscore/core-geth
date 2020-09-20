@@ -265,7 +265,6 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 		defer func() {
 			luke.stopMining()
 			solo.stopMining()
-			nodes.dexedni(0).startMining(100)
 		}()
 
 		start := time.Now()

@@ -303,7 +303,7 @@ to quickly create a Cobra application.`,
 			// This also means that any local geths left running at the end of a scenario
 			// will still be running.
 		}
-		// stabilize(world)
+		stabilize(world)
 	},
 }
 

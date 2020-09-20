@@ -5,6 +5,7 @@ import (
 	"image/color"
 	"log"
 	"math"
+	"math/big"
 	"math/rand"
 	"testing"
 
@@ -334,7 +335,7 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 
 	db := rawdb.NewMemoryDatabase()
 	genesis := params.DefaultMessNetGenesisBlock()
-	genesis.Timestamp = 1
+	// genesis.Timestamp = 1
 	genesisB := MustCommitGenesis(db, genesis)
 
 	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
@@ -342,7 +343,7 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer chain.Stop()
-	// chain.EnableArtificialFinality(yuckyGlobalTestEnableMess)
+	chain.EnableArtificialFinality(true)
 
 	cases := []struct {
 		easyLen, hardLen, commonAncestorN int
@@ -380,7 +381,6 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 		// 	true, true,
 		// },
 
-
 		// {
 		// 	1000, 1, 999,
 		// 	10, 1,
@@ -417,23 +417,86 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 		// 	true, true,
 		// },
 
-		{
-			10000, 9000, 1000,
-			10, 1,
-			true, true,
-		},
-
-		{
-			7000, 6500, 500,
-			10, 1,
-			true, true,
-		},
+		// {
+		// 	10000, 9000, 1000,
+		// 	10, 1,
+		// 	true, true,
+		// },
+		//
+		// {
+		// 	7000, 6500, 500,
+		// 	10, 1,
+		// 	true, true,
+		// },
 
 		// {
 		// 	100, 90, 10,
 		// 	10, 1,
 		// 	true, true,
 		// },
+
+		// {
+		// 	1000, 1, 999,
+		// 	10, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	1000, 2, 998,
+		// 	10, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	1000, 3, 997,
+		// 	10, 1,
+		// 	true, true,
+		// },
+		// {
+		// 	1000, 1, 999,
+		// 	10, 8,
+		// 	true, true,
+		// },
+
+		{
+			1000, 50, 950,
+			10, 9,
+			false, false,
+		},
+		{
+			1000, 100, 900,
+			10, 8,
+			false, false,
+		},
+		{
+			1000, 100, 900,
+			10, 7,
+			false, false,
+		},
+		{
+			1000, 50, 950,
+			10, 5,
+			true, true,
+		},
+		{
+			1000, 50, 950,
+			10, 3,
+			true, true,
+		},
+		//5
+		{
+			1000, 100, 900,
+			10, 3,
+			false, false,
+		},
+		{
+			1000, 200, 800,
+			10, 3,
+			false, false,
+		},
+		{
+			1000, 200, 800,
+			10, 1,
+			false, false,
+		},
 	}
 
 	// poissonTime := func(b *BlockGen, seconds int64) {
@@ -457,15 +520,23 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 	// 	}
 	// }
 
+	type ratioComparison struct {
+		tdRatio float64
+		penalty float64
+	}
+	gotRatioComparisons := []ratioComparison{}
+
 	for i, c := range cases {
 
-		chain.Reset()
+		if err := chain.Reset(); err != nil {
+			t.Fatal(err)
+		}
 		easy, _ := GenerateChain(genesis.Config, genesisB, engine, db, c.easyLen, func(i int, b *BlockGen) {
 			b.SetNonce(types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64))))
 			// poissonTime(b, c.easyOffset)
 			b.OffsetTime(c.easyOffset - 10)
 		})
-		commonAncestor := easy[c.commonAncestorN-1]
+		commonAncestor := easy[c.commonAncestorN - 1]
 		hard, _ := GenerateChain(genesis.Config, commonAncestor, engine, db, c.hardLen, func(i int, b *BlockGen) {
 			b.SetNonce(types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64))))
 			// poissonTime(b, c.hardOffset)
@@ -474,7 +545,7 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 		if _, err := chain.InsertChain(easy); err != nil {
 			t.Fatal(err)
 		}
-		_, err := chain.InsertChain(hard)
+		n, err := chain.InsertChain(hard)
 		hardHead := chain.CurrentBlock().Hash() == hard[len(hard)-1].Hash()
 
 		commons := plotter.XYs{}
@@ -483,6 +554,9 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 		tdrs := plotter.XYs{}
 		antigravities := plotter.XYs{}
 		antigravities2 := plotter.XYs{}
+
+		balance := plotter.XYs{}
+
 		for i := 0; i < c.easyLen; i++ {
 			td := chain.GetTd(easy[i].Hash(), easy[i].NumberU64())
 			point := plotter.XY{X: float64(easy[i].NumberU64()), Y: float64(td.Uint64())}
@@ -493,21 +567,58 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 			}
 		}
 		// td ratios
-		for i := 0; i < c.hardLen; i++ {
-			td := chain.GetTd(hard[i].Hash(), hard[i].NumberU64())
-			point := plotter.XY{X: float64(hard[i].NumberU64()), Y: float64(td.Uint64())}
-			hards = append(hards, point)
+		// for j := 0; j < c.hardLen; j++ {
+		for j := 0; j < n; j++ {
 
-			ee := c.commonAncestorN+i
-			y := chain.getTDRatio(commonAncestor.Header(), easy[ee].Header(), hard[i].Header())
+			td := chain.GetTd(hard[j].Hash(), hard[j].NumberU64())
+			if td != nil {
+				point := plotter.XY{X: float64(hard[j].NumberU64()), Y: float64(td.Uint64())}
+				hards = append(hards, point)
+			}
 
-			ecbp := ecbp1100AGSinusoidalA(float64(hard[i].Header().Time - commonAncestor.Header().Time))
-			ecbp2 := ecbp1100AGExpA(float64(hard[i].Header().Time - commonAncestor.Header().Time))
-			t.Log(y, ecbp, ecbp2)
+			if commonAncestor.NumberU64() != uint64(c.commonAncestorN) {
+				t.Fatalf("bad test common=%d easy=%d can=%d", commonAncestor.NumberU64(), c.easyLen, c.commonAncestorN)
+			}
 
-			tdrs = append(tdrs, plotter.XY{X: float64(hard[i].NumberU64()), Y: y})
-			antigravities = append(antigravities, plotter.XY{X: float64(hard[i].NumberU64()), Y: ecbp})
-			antigravities2 = append(antigravities2, plotter.XY{X: float64(hard[i].NumberU64()), Y: ecbp2})
+			ee := c.commonAncestorN + j
+			easyHeader := easy[ee].Header()
+			hardHeader := hard[j].Header()
+			if easyHeader.Number.Uint64() != hardHeader.Number.Uint64() {
+				t.Fatalf("bad test easyheader=%d hardheader=%d", easyHeader.Number.Uint64(), hardHeader.Number.Uint64())
+			}
+
+			/*
+			HERE LIES THE RUB (IN MY GRAPHS).
+
+
+			 */
+			// y := chain.getTDRatio(commonAncestor.Header(), easyHeader, hardHeader) // <- unit x unit
+
+			// y := chain.getTDRatio(commonAncestor.Header(), easy[c.easyLen-1].Header(), hardHeader)
+
+			y := chain.getTDRatio(commonAncestor.Header(), chain.CurrentHeader(), hardHeader)
+
+			if j == 0 {
+				t.Logf("case=%d first.hard.tdr=%v", i, y)
+			}
+
+			ecbp := ecbp1100AGSinusoidalA(float64(hardHeader.Time - commonAncestor.Header().Time))
+
+			if j == n - 1 {
+				gotRatioComparisons = append(gotRatioComparisons, ratioComparison{
+					tdRatio: y, penalty: ecbp,
+				})
+			}
+
+			// Exploring alternative penalty functions.
+			ecbp2 := ecbp1100AGExpA(float64(hardHeader.Time - commonAncestor.Header().Time))
+			// t.Log(y, ecbp, ecbp2)
+
+			tdrs = append(tdrs, plotter.XY{X: float64(hard[j].NumberU64()), Y: y})
+			antigravities = append(antigravities, plotter.XY{X: float64(hard[j].NumberU64()), Y: ecbp})
+			antigravities2 = append(antigravities2, plotter.XY{X: float64(hard[j].NumberU64()), Y: ecbp2})
+
+			balance = append(balance, plotter.XY{X: float64(hardHeader.Number.Uint64()), Y: y - ecbp})
 		}
 		scatterCommons, _ := plotter.NewScatter(commons)
 		scatterEasys, _ := plotter.NewScatter(easys)
@@ -516,6 +627,7 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 		scatterTDRs, _ := plotter.NewScatter(tdrs)
 		scatterAntigravities, _ := plotter.NewScatter(antigravities)
 		scatterAntigravities2, _ := plotter.NewScatter(antigravities2)
+		balanceScatter, _ := plotter.NewScatter(balance)
 
 		scatterCommons.Color = color.RGBA{R: 190, G: 197, B: 236, A: 255}
 		scatterCommons.Shape = draw.CircleGlyph{}
@@ -527,9 +639,9 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 		scatterHards.Shape = draw.CircleGlyph{}
 		scatterHards.Radius = 2
 
-		p, err := plot.New()
-		if err != nil {
-			log.Panic(err)
+		p, perr := plot.New()
+		if perr != nil {
+			log.Panic(perr)
 		}
 		p.Add(scatterCommons)
 		p.Legend.Add("Commons", scatterCommons)
@@ -540,35 +652,89 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 		p.Title.Text = fmt.Sprintf("TD easy=%d hard=%d", c.easyOffset, c.hardOffset)
 		p.Save(1000, 600, fmt.Sprintf("plot-td-%d-%d-%d-%d-%d.png", c.easyLen, c.commonAncestorN, c.hardLen, c.easyOffset, c.hardOffset))
 
-		p, err = plot.New()
-		if err != nil {
-			log.Panic(err)
+		p, perr = plot.New()
+		if perr != nil {
+			log.Panic(perr)
 		}
+
 		scatterTDRs.Color = color.RGBA{R: 236, G: 106, B: 94, A: 255} // red
-		scatterTDRs.Radius = 1
+		scatterTDRs.Radius = 3
 		scatterTDRs.Shape = draw.PyramidGlyph{}
 		p.Add(scatterTDRs)
+		p.Legend.Add("TD Ratio", scatterTDRs)
 
 		scatterAntigravities.Color = color.RGBA{R: 190, G: 197, B: 236, A: 255} // blue
-		scatterAntigravities.Radius = 1
+		scatterAntigravities.Radius = 3
 		scatterAntigravities.Shape = draw.PlusGlyph{}
 		p.Add(scatterAntigravities)
+		p.Legend.Add("(Anti)Gravity Penalty", scatterAntigravities)
 
 		scatterAntigravities2.Color = color.RGBA{R: 152, G: 236, B: 161, A: 255} // green
-		scatterAntigravities2.Radius = 1
+		scatterAntigravities2.Radius = 3
 		scatterAntigravities2.Shape = draw.PlusGlyph{}
-		p.Add(scatterAntigravities2)
+		// p.Add(scatterAntigravities2)
+		// p.Legend.Add("(Anti)Gravity Penalty (Alternate)", scatterAntigravities2)
 
 		p.Title.Text = fmt.Sprintf("TD Ratio easy=%d hard=%d", c.easyOffset, c.hardOffset)
 		p.Save(1000, 600, fmt.Sprintf("plot-td-ratio-%d-%d-%d-%d-%d.png", c.easyLen, c.commonAncestorN, c.hardLen, c.easyOffset, c.hardOffset))
 
+		p, perr = plot.New()
+		if perr != nil {
+			log.Panic(perr)
+		}
+		p.Title.Text = fmt.Sprintf("TD Ratio - Antigravity Penalty easy=%d hard=%d", c.easyOffset, c.hardOffset)
+		balanceScatter.Color = color.RGBA{R: 235, G: 92, B: 236, A: 255} // purple
+		balanceScatter.Radius = 3
+		balanceScatter.Shape = draw.PlusGlyph{}
+		p.Add(balanceScatter)
+		p.Legend.Add("TDR - Penalty", balanceScatter)
+		p.Save(1000, 600, fmt.Sprintf("plot-td-ratio-diff-%d-%d-%d-%d-%d.png", c.easyLen, c.commonAncestorN, c.hardLen, c.easyOffset, c.hardOffset))
 
 		if (err != nil && c.accepted) || (err == nil && !c.accepted) || (hardHead != c.hardGetsHead) {
-			t.Errorf("case=%d [easy=%d hard=%d ca=%d eo=%d ho=%d] want.accepted=%v want.hardHead=%v got.hardHead=%v err=%v",
+			compared := gotRatioComparisons[i]
+			t.Errorf(`case=%d [easy=%d hard=%d ca=%d eo=%d ho=%d] want.accepted=%v want.hardHead=%v got.hardHead=%v err=%v
+got.tdr=%v got.pen=%v`,
 				i,
 				c.easyLen, c.hardLen, c.commonAncestorN, c.easyOffset, c.hardOffset,
-				c.accepted, c.hardGetsHead, hardHead, err)
+				c.accepted, c.hardGetsHead, hardHead, err, compared.tdRatio, compared.penalty)
 		}
 	}
+
+}
+
+func TestGenerateChainTargetingHashrate(t *testing.T) {
+	engine := ethash.NewFaker()
+
+	db := rawdb.NewMemoryDatabase()
+	genesis := params.DefaultMessNetGenesisBlock()
+	// genesis.Timestamp = 1
+	genesisB := MustCommitGenesis(db, genesis)
+
+	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer chain.Stop()
+	chain.EnableArtificialFinality(true)
+
+
+	easy, _ := GenerateChain(genesis.Config, genesisB, engine, db, 1000, func(i int, gen *BlockGen) {
+		gen.OffsetTime(0)
+	})
+	if _, err := chain.InsertChain(easy); err != nil {
+		t.Fatal(err)
+	}
+	firstDifficulty := chain.CurrentHeader().Difficulty
+	targetDifficultyRatio := big.NewInt(2)
+	targetDifficulty := new(big.Int).Div(firstDifficulty, targetDifficultyRatio)
+	for chain.CurrentHeader().Difficulty.Cmp(targetDifficulty) > 0 {
+		next , _ := GenerateChain(genesis.Config, chain.CurrentBlock(), engine, db, 1, func(i int, gen *BlockGen) {
+			gen.OffsetTime(8) // 8: (=10+8=18>(13+4=17).. // minimum value over stable range
+		})
+		if _, err := chain.InsertChain(next); err != nil {
+			t.Fatal(err)
+		}
+	}
+	t.Log(chain.CurrentBlock().Number())
 
 }

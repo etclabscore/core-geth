@@ -73,7 +73,7 @@ func badGuyPacemaker(badGuy, goodGuy *ageth, wantRatio float64, forkedTD *big.In
 		return
 	}
 
-	minInt, maxInt := constant-1, constant+1
+	minInt, maxInt := constant-2, constant+2
 	target := badGuy.mining
 	if balance > upper {
 		target++
@@ -213,7 +213,7 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 		solo.getHeadManually()
 		forkedBlock := luke.block()
 		forkedBlockTime := luke.latestBlock.Time
-		forkedTD := luke.getTd()
+		forkedTD := new(big.Int).Set(luke.getTd())
 		for trials := 0; trials < 3; trials++ {
 			if forkedTD.Cmp(solo.getTd()) != 0 || forkedBlock.number != solo.block().number {
 				time.Sleep(2*time.Second)

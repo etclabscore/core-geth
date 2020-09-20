@@ -1422,6 +1422,19 @@ func (bc *BlockChain) writeKnownBlock(block *types.Block) error {
 	current := bc.CurrentBlock()
 	if block.ParentHash() != current.Hash() {
 		d := bc.getReorgData(current, block)
+		if d.err == nil {
+			// Reorg data error was nil.
+			// Proceed with further reorg arbitration.
+
+			// If the node is mining and trying to insert their own block, we want to allow that.
+			minerOwn := bc.shouldPreserve != nil && bc.shouldPreserve(block)
+			if (bc.shouldPreserve == nil || !minerOwn) &&
+				bc.IsArtificialFinalityEnabled() &&
+				bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, current.Number()) {
+
+				d.err = bc.ecbp1100(d.commonBlock.Header(), current.Header(), block.Header())
+			}
+		}
 		if err := bc.reorg(d); err != nil {
 			return err
 		}

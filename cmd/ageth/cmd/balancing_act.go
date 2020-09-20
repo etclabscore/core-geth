@@ -9,10 +9,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
 )
 
 func nodeTDRatioAB(a, b *ageth, commonBlockTD *big.Int) (segmentTDA, segmentTDB *big.Int, ratio float64) {
@@ -22,6 +20,10 @@ func nodeTDRatioAB(a, b *ageth, commonBlockTD *big.Int) (segmentTDA, segmentTDB 
 	}
 	segmentTDA = new(big.Int).Sub(tdA, commonBlockTD)
 	segmentTDB = new(big.Int).Sub(tdB, commonBlockTD)
+	if segmentTDB.Cmp(bigZero) == 0 || segmentTDA.Cmp(bigZero) == 0 {
+		ratio = 1
+		return
+	}
 	ratio, _ = new(big.Float).Quo(
 		new(big.Float).SetInt(segmentTDA),
 		new(big.Float).SetInt(segmentTDB),
@@ -57,12 +59,13 @@ func badGuyPacemaker(badGuy, goodGuy *ageth, wantRatio float64, forkedTD *big.In
 	badGuyPacemakerLast = badGuy.block().hash
 	goodGuyPacemakerLast = goodGuy.block().hash
 
-	segA, segB, balance := nodeTDRatioAB(badGuy, goodGuy, forkedTD)
+	// segA, segB, balance := nodeTDRatioAB(badGuy, goodGuy, forkedTD)
+	_, _, balance := nodeTDRatioAB(badGuy, goodGuy, forkedTD)
 
 	tdRatioTolerance := float64(1 / 100)
 	upper, lower := wantRatio+tdRatioTolerance, wantRatio-tdRatioTolerance
 
-	constant := 13
+	constant := 10
 	if balance >= lower && balance <= upper {
 		if badGuy.mining != constant {
 			badGuy.startMining(constant)
@@ -70,37 +73,56 @@ func badGuyPacemaker(badGuy, goodGuy *ageth, wantRatio float64, forkedTD *big.In
 		return
 	}
 
-	// Good guys' segment * targetRatio, eg. 42000000 * 1.02
-	want := new(big.Float).Mul(new(big.Float).SetInt(segB), new(big.Float).SetFloat64(wantRatio))
-	wantBig, _ := want.Int(nil) // as big
-
-	// Difference between target segment difficulty and current segment difficulty
-	wantUnitDifficulty := new(big.Int).Sub(wantBig, segA)
-
-	bestDifference := big.NewInt(math.MaxInt64)
-	bestTimeOffset := uint64(0)
-
-	for i := uint64(42); i >= 3; i-- {
-		// Sample the would-be difficulty for a range of block times.
-		difficulty := ethash.CalcDifficulty(params.MessNetConfig, badGuy.block().time + i, badGuy.latestBlock)
-
-		// Compare this sample with desired.
-		difference := difficulty.Sub(difficulty, wantUnitDifficulty)
-		difference.Abs(difference) // As absolute value.
-
-		// If it's the closest to the target unit block difficulty that would yield
-		// the closest to the overall chain segment ratio, peg it.
-		if difference.Cmp(bestDifference) <= 0 {
-			bestTimeOffset = i
-			bestDifference.Set(difference)
-		}
+	minInt, maxInt := constant-1, constant+1
+	target := badGuy.mining
+	if balance > upper {
+		target++
+	} else if balance < lower {
+		target--
 	}
-	// Nudge the block time toward that.
-	bestTimeOffset = (uint64(badGuy.mining) + bestTimeOffset) / 2
-	if int(bestTimeOffset) == badGuy.mining {
-		return
+	if target > maxInt {
+		target = maxInt
+	} else if target < minInt {
+		target = minInt
 	}
-	badGuy.startMining(int(bestTimeOffset))
+	if target != badGuy.mining {
+		badGuy.startMining(target)
+	}
+
+	/*
+	PROBABLY OVERENGINEERED
+	 */
+	// // Good guys' segment * targetRatio, eg. 42000000 * 1.02
+	// want := new(big.Float).Mul(new(big.Float).SetInt(segB), new(big.Float).SetFloat64(wantRatio))
+	// wantBig, _ := want.Int(nil) // as big
+	//
+	// // Difference between target segment difficulty and current segment difficulty
+	// wantUnitDifficulty := new(big.Int).Sub(wantBig, segA)
+	//
+	// bestDifference := big.NewInt(math.MaxInt64)
+	// bestTimeOffset := uint64(0)
+	//
+	// for i := uint64(42); i >= 3; i-- {
+	// 	// Sample the would-be difficulty for a range of block times.
+	// 	difficulty := ethash.CalcDifficulty(params.MessNetConfig, badGuy.block().time + i, badGuy.latestBlock)
+	//
+	// 	// Compare this sample with desired.
+	// 	difference := difficulty.Sub(difficulty, wantUnitDifficulty)
+	// 	difference.Abs(difference) // As absolute value.
+	//
+	// 	// If it's the closest to the target unit block difficulty that would yield
+	// 	// the closest to the overall chain segment ratio, peg it.
+	// 	if difference.Cmp(bestDifference) <= 0 {
+	// 		bestTimeOffset = i
+	// 		bestDifference.Set(difference)
+	// 	}
+	// }
+	// // Nudge the block time toward that.
+	// bestTimeOffset = (uint64(badGuy.mining) + bestTimeOffset) / 2
+	// if int(bestTimeOffset) == badGuy.mining {
+	// 	return
+	// }
+	// badGuy.startMining(int(bestTimeOffset))
 }
 
 func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration time.Duration) func(set *agethSet) {
@@ -109,17 +131,41 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 		log.Info("Running partitioning scenario")
 
 		// tabula rasa
-		nodes.forEach(func(i int, a *ageth) {
+		nodes.eachParallel(func(a *ageth) {
 			a.stopMining()
-			a.setMaxPeers(100)
+			a.setMaxPeers(25)
+			if a.peers.len() < 15 {
+				a.addPeer(nodes.where(func(g *ageth) bool {
+					return g.name != a.name
+				}).random())
+			}
 			var res bool
 			a.client.Call(&res, "admin_ecbp1100", hexutil.Uint64(999999999).String())
 		})
 
-		luke := nodes.indexed(0)
-		luke.log.Info("== Luke ==")
-		solo := nodes.indexed(1)
+		solo := nodes.indexed(0)
 		solo.log.Info("== Solo ==")
+		luke := nodes.indexed(1)
+		luke.log.Info("== Luke ==")
+
+		scenarioDone := false
+		defer func() {
+			scenarioDone = true
+		}()
+		go func() {
+			for !scenarioDone {
+				nodes.forEach(func(i int, a *ageth) {
+					if a.peers.len() < 15 {
+						etal := nodes.where(func(g *ageth) bool {
+							return g.name != a.name
+						})
+						if etal.len() > 0 {
+							a.addPeer(etal.random())
+						}
+					}
+				})
+			}
+		}()
 
 		if !luke.sameChainAs(solo) {
 			log.Warn("Luke and Solo on different chains", "action", "truncate to genesis")
@@ -127,16 +173,16 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 			solo.truncateHead(0)
 		}
 
-		log.Info("Asserting protagonist sync")
-		herdMax := nodes.headMax()
-		for luke.block().number < herdMax || solo.block().number < herdMax {
+		for luke.syncing() || solo.syncing() {
+			log.Info("Asserting protagonist sync", "luke.syncing", luke.syncing(), "solo.syncing", solo.syncing())
 			time.Sleep(10 * time.Second)
 		}
 
 		log.Info("Running pace car...")
-		nodes.dexedni(0).startMining(13)
+		nodes.dexedni(0).startMining(10)
 		time.Sleep(60 * time.Second)
 		nodes.dexedni(0).stopMining()
+		log.Info("Pace car leaving track")
 
 		herdHeadMin := nodes.headMin()
 		nodes.forEach(func(i int, a *ageth) {
@@ -147,29 +193,13 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 			a.client.Call(&res, "admin_ecbp1100", hexutil.Uint64(1).String())
 		})
 
-		scenarioDone := false
-		defer func() {
-			scenarioDone = true
-		}()
-		go func() {
-			for !scenarioDone {
-				nodes.forEach(func(i int, a *ageth) {
-					if a.peers.len() < 15 {
-						a.addPeer(nodes.where(func(g *ageth) bool {
-							return g.name != a.name
-						}).random())
-					}
-				})
-			}
-		}()
-
 		solo.mustEtherbases([]common.Address{solo.coinbase})
 		luke.mustEtherbases([]common.Address{luke.coinbase}) // double evil
 		defer func() {
 			solo.mustEtherbases([]common.Address{})
 			luke.mustEtherbases([]common.Address{})
 		}()
-		normalBlockTime := 13
+		normalBlockTime := 10
 
 		// Toes on the same line
 		if luke.block().number > solo.block().number {
@@ -178,22 +208,32 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 			solo.truncateHead(luke.block().number)
 		}
 
+		luke.getHeadManually()
+		solo.getHeadManually()
 		forkedBlock := luke.block()
 		forkedBlockTime := luke.latestBlock.Time
 		forkedTD := luke.getTd()
-		if forkedTD != solo.getTd() || forkedBlock.number != solo.block().number {
-			log.Error("The force is strong but not impossibly strong")
-			return
+		for trials := 0; trials < 3; trials++ {
+			if forkedTD.Cmp(solo.getTd()) != 0 || forkedBlock.number != solo.block().number {
+				time.Sleep(2*time.Second)
+			} else {
+				break
+			}
+			if trials == 2 {
+				log.Error("Force imbalance", "solo.td", solo.getTd(), "solo.number", solo.block().number,
+					"luke.td", luke.getTd(), "luke.number", luke.block().number)
+				return
+			}
 		}
 
 		eitherNewHead := false
 		go func() {
 			for !scenarioDone {
 				if eitherNewHead {
-					if luke.sameChainAs(solo) {
+					if luke.sameChainAs(solo) || forkedBlock.number == 0 {
 						forkedBlock = luke.block()
 						forkedBlockTime = luke.latestBlock.Time
-						forkedTD = luke.getTd()
+						forkedTD.Set(luke.getTd())
 					} else {
 						wantRatio := float64(1)
 						if followGravity {
@@ -260,8 +300,6 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 			tlog("Status", "fork.number", forkedBlock.number, "fork.age", common.PrettyAge(time.Unix(int64(forkedBlockTime), 0)), "unit.rate" ,unitTDRat , "antigravity", limitRatio, "S/L", balance)
 			time.Sleep(10 * time.Second)
 		}
-
-		time.Sleep(10*time.Minute)
 
 		_, _, resultingTDRatio := nodeTDRatioAB(luke, solo, new(big.Int).SetUint64(forkedBlock.number))
 

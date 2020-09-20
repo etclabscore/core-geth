@@ -223,7 +223,7 @@ to quickly create a Cobra application.`,
 			close(agethEndpointCh)
 		}()
 		var wg sync.WaitGroup
-		for i := 0; i < 10; i++ {
+		for i := 0; i < runtime.NumCPU(); i++ {
 			wg.Add(1)
 			go func(wg *sync.WaitGroup) {
 				for e := range agethEndpointCh {
@@ -260,14 +260,14 @@ to quickly create a Cobra application.`,
 		}
 
 		scenarios := []scenario{
-			// generateScenarioPartitioning(false, 3*60*time.Second, 30*60*time.Second),
-			// generateScenarioPartitioning(false, 3*60*time.Second, 30*60*time.Second),
-			// generateScenarioPartitioning(false, 3*60*time.Second, 30*60*time.Second),
+			generateScenarioPartitioning(false, 10*60*time.Second, 30*60*time.Second),
+			generateScenarioPartitioning(false, 10*60*time.Second, 30*60*time.Second),
+			generateScenarioPartitioning(false, 10*60*time.Second, 30*60*time.Second),
 
 			// generateScenarioPartitioning(true, 45*time.Minute),
 
-			scenarioGenerator(13, 15 * time.Minute, 2 * time.Minute, 1.06, .666, 1, false),
-			scenarioGenerator(13, 15 * time.Minute, 2 * time.Minute, 1.20, .666, 1, false),
+			// scenarioGenerator(13, 15 * time.Minute, 2 * time.Minute, 1.06, .666, 1, false),
+			// scenarioGenerator(13, 15 * time.Minute, 2 * time.Minute, 1.20, .666, 1, false),
 
 			// scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.13, .666, 1, true),
 			// scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.02, .666, 1, false), // 24

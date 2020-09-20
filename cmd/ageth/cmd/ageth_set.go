@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"math/rand"
+	"runtime"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -79,7 +80,7 @@ func (s *agethSet) union(s2 *agethSet) *agethSet {
 func (s *agethSet) eachParallel(fn func(a *ageth)) {
 	var wg sync.WaitGroup
 	agethCh := make(chan *ageth)
-	for i := 0; i < 10; i++ {
+	for i := 0; i < runtime.NumCPU(); i++ {
 		wg.Add(1)
 		go func(wg *sync.WaitGroup) {
 			for a := range agethCh {

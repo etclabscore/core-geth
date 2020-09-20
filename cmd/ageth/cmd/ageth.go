@@ -305,18 +305,20 @@ func (a *ageth) run() error {
 	a.log.Info("Waiting for things to be ready")
 	for !ready {
 	}
-	a.log.Info("Ageth ready")
 
 	// Set up RPC clients.
-	cl, err := rpc.Dial(a.rpcEndpointOrExecutablePath)
+	ccontext, cancelFn := context.WithTimeout(context.Background(), 10*time.Second)
+	cl, err := rpc.DialContext(ccontext, a.rpcEndpointOrExecutablePath)
 	if err != nil {
+		cancelFn()
 		log.Error("rpc client", "error", err)
 		return err
 	}
 	a.client = cl
 
-	ecl, err := ethclient.Dial(a.rpcEndpointOrExecutablePath)
+	ecl, err := ethclient.DialContext(ccontext, a.rpcEndpointOrExecutablePath)
 	if err != nil {
+		cancelFn()
 		log.Error("dial ethclient", "error", err)
 		return err
 	}
@@ -326,9 +328,12 @@ func (a *ageth) run() error {
 	nodeInfoRes := p2p.NodeInfo{}
 	err = a.client.Call(&nodeInfoRes, "admin_nodeInfo")
 	if err != nil {
+		cancelFn()
 		a.log.Error("admin_nodeInfo errored", "error", err)
 		return err
 	}
+
+	a.log.Info("Ageth ready")
 
 	n := enode.MustParse(nodeInfoRes.Enode)
 	nv4 := n.URLv4()
@@ -519,6 +524,18 @@ func (a *ageth) getTd() *big.Int {
 	a.setHead(header)
 	return a.td
 
+}
+
+func (a *ageth) syncing() bool {
+	sp, err := a.eclient.SyncProgress(context.Background())
+	if err != nil {
+		a.log.Error("Sync progress errored", "error", err)
+		return true
+	}
+	if sp == nil {
+		return false
+	}
+	return true
 }
 
 var machineNATExtIP *net.IP

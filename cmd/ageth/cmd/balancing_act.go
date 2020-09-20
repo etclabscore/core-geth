@@ -184,6 +184,7 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 			time.Sleep(10 * time.Second)
 		}
 
+		time.Sleep(5*time.Second)
 		herdHeadMin := nodes.headMin()
 		nodes.forEach(func(i int, a *ageth) {
 			if a.block().number > herdHeadMin {
@@ -195,7 +196,7 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 		})
 
 		solo.mustEtherbases([]common.Address{solo.coinbase})
-		luke.mustEtherbases([]common.Address{luke.coinbase}) // double evil
+		// luke.mustEtherbases([]common.Address{luke.coinbase}) // double evil
 		defer func() {
 			solo.mustEtherbases([]common.Address{})
 			luke.mustEtherbases([]common.Address{})
@@ -261,6 +262,11 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 
 		go luke.startMining(normalBlockTime)
 		solo.startMining(normalBlockTime)
+		defer func() {
+			luke.stopMining()
+			solo.stopMining()
+			nodes.dexedni(0).startMining(100)
+		}()
 
 		start := time.Now()
 		for {

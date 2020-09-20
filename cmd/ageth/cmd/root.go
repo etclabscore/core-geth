@@ -260,9 +260,9 @@ to quickly create a Cobra application.`,
 		}
 
 		scenarios := []scenario{
-			generateScenarioPartitioning(false, 30*60*time.Second, 60*60*time.Second),
-			generateScenarioPartitioning(false, 30*60*time.Second, 60*60*time.Second),
-			generateScenarioPartitioning(false, 30*60*time.Second, 60*60*time.Second),
+			generateScenarioPartitioning(false, 20*60*time.Second, 40*60*time.Second),
+			generateScenarioPartitioning(false, 20*60*time.Second, 40*60*time.Second),
+			generateScenarioPartitioning(false, 20*60*time.Second, 40*60*time.Second),
 
 			// generateScenarioPartitioning(true, 45*time.Minute),
 
@@ -303,7 +303,7 @@ to quickly create a Cobra application.`,
 			// This also means that any local geths left running at the end of a scenario
 			// will still be running.
 		}
-		stabilize(world)
+		// stabilize(world)
 	},
 }
 

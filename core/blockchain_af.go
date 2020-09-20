@@ -94,10 +94,12 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 
 	if tdRatio < antiGravity {
 		// Using "b/a" here as "'B' chain vs. 'A' chain", where A is original (current), and B is proposed (new).
-		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v blocks=%d current=%d proposed=%d td.B/A=%0.6f < antigravity=%0.6f`,
+		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v current.span=%v proposed.span=%v common.bno=%d current.bno=%d proposed.bno=%d tdratio=%0.6f < antigravity=%0.6f`,
 			errReorgFinality,
 			common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
-			proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
+			common.PrettyDuration(time.Duration(current.Time - commonAncestor.Time)*time.Second),
+			common.PrettyDuration(time.Duration(int32(x))*time.Second),
+			commonAncestor.Number.Uint64(),
 			current.Number.Uint64(), proposed.Number.Uint64(),
 			tdRatio, antiGravity,
 		)
@@ -105,10 +107,12 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 	log.Info("ECBP1100-MESS 🔓",
 		"status", "accepted",
 		"age", common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
-		"blocks", proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
-		"current", current.Number.Uint64(),
-		"proposed", proposed.Number.Uint64(),
-		"td.B/A", tdRatio,
+		"current.span", common.PrettyDuration(time.Duration(current.Time - commonAncestor.Time)*time.Second),
+		"proposed.span", common.PrettyDuration(time.Duration(int32(x))*time.Second),
+		"common.bno", commonAncestor.Number.Uint64(),
+		"current.bno", current.Number.Uint64(),
+		"proposed.bno", proposed.Number.Uint64(),
+		"tdratio", tdRatio,
 		"antigravity", antiGravity,
 	)
 	return nil

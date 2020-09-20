@@ -260,9 +260,9 @@ to quickly create a Cobra application.`,
 		}
 
 		scenarios := []scenario{
-			generateScenarioPartitioning(false, 10*60*time.Second, 30*60*time.Second),
-			generateScenarioPartitioning(false, 10*60*time.Second, 30*60*time.Second),
-			generateScenarioPartitioning(false, 10*60*time.Second, 30*60*time.Second),
+			generateScenarioPartitioning(false, 30*60*time.Second, 60*60*time.Second),
+			generateScenarioPartitioning(false, 30*60*time.Second, 60*60*time.Second),
+			generateScenarioPartitioning(false, 30*60*time.Second, 60*60*time.Second),
 
 			// generateScenarioPartitioning(true, 45*time.Minute),
 

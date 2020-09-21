@@ -144,22 +144,38 @@ func ecbp1100PolynomialV(x *big.Int) *big.Int {
 
 	// height // xcap ** 2
 	p := new(big.Int).Exp(ecbp1100PolynomialVXCap, big2, big0)
+	pu := p.Uint64()
+	log.Warn("debug", "value", pu)
 	p.Div(ecbp1100PolynomialVHeight, p)
 
 	// 3 * x**2
 	m := new(big.Int).Exp(xcp, big2, big0)
 	m.Mul(big3, m)
+	mmu := m.Uint64()
+	log.Warn("debug", "value", mmu)
 
 	// 2 * x**3 // xcap
 	n := new(big.Int).Exp(xcp, big3, big0)
+	// 64
 	n.Div(n, ecbp1100PolynomialVXCap)
 	n.Mul(big2, n)
+	nu := n.Uint64()
+	log.Warn("debug", "value", nu)
 
 	// (3 * x**2 - 2 * x**3 // xcap)
+	mmm, nnn := m.Uint64(), n.Uint64()
+	log.Warn("debug", mmm ,nnn)
+	newm := new(big.Int).Sub(m, n)
+	newmu := newm.Uint64()
+	log.Warn("debug", newmu)
 	m.Sub(m, n)
+	mu := m.Uint64()
+	log.Warn("debug", "value", mu)
 
 	// (3 * x**2 - 2 * x**3 // xcap) * height // xcap ** 2
 	m.Mul(m, p)
+	mu = m.Uint64()
+	log.Warn("debug", "value", mu)
 
 	// CURVE_FUNCTION_DENOMINATOR + (3 * x**2 - 2 * x**3 // xcap) * height // xcap ** 2
 	m.Add(ecbp1100PolynomialVCurveFunctionDenominator, m)

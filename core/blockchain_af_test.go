@@ -414,3 +414,9 @@ func TestPlot_ecbp1100PolynomialV(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestEcbp1100PolynomialV(t *testing.T) {
+	x := big.NewInt(4)
+	y := ecbp1100PolynomialV(x)
+	t.Log(y)
+}

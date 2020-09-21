@@ -327,3 +327,46 @@ func TestEcbp1100AGSinusoidalA(t *testing.T) {
 		}
 	}
 }
+
+/*
+TestAFKnownBlock tests that AF functionality works for chain re-insertions.
+
+Chain re-insertions use BlockChain.writeKnownBlock, where first-pass insertions
+will hit writeBlockWithState.
+
+AF needs to be implemented at both sites to prevent re-proposed chains from sidestepping
+the AF criteria.
+ */
+func TestAFKnownBlock(t *testing.T) {
+	engine := ethash.NewFaker()
+
+	db := rawdb.NewMemoryDatabase()
+	genesis := params.DefaultMessNetGenesisBlock()
+	// genesis.Timestamp = 1
+	genesisB := MustCommitGenesis(db, genesis)
+
+	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer chain.Stop()
+	chain.EnableArtificialFinality(true)
+
+	easy, _ := GenerateChain(genesis.Config, genesisB, engine, db, 1000, func(i int, gen *BlockGen) {
+		gen.OffsetTime(0)
+	})
+	easyN, err := chain.InsertChain(easy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	hard, _ := GenerateChain(genesis.Config, easy[easyN-100], engine, db, 100, func(i int, gen *BlockGen) {
+		gen.OffsetTime(-7)
+	})
+	if _, err := chain.InsertChain(hard); err == nil {
+		t.Error("hard 1 inserted")
+	}
+	if _, err := chain.InsertChain(hard); err == nil {
+		t.Error("hard 2 inserted")
+	}
+}
+

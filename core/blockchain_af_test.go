@@ -65,6 +65,7 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 		easyOffset, hardOffset            int64
 		hardGetsHead, accepted            bool
 	}{
+		// INDEX=0
 		// Hard has insufficient total difficulty / length and is rejected.
 		{
 			5000, 7500, 2500,
@@ -95,6 +96,7 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 			0, -8,
 			true, true,
 		},
+		// INDEX=5
 		// Hard has sufficient total difficulty / length and is accepted.
 		{
 			500, 4, 496,
@@ -125,6 +127,7 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 			0, -9,
 			true, true,
 		},
+		// INDEX=10
 		// Hard has sufficient total difficulty / length and is accepted.
 		{
 			500, 9, 491,
@@ -155,6 +158,7 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 			0, -9,
 			true, true,
 		},
+		// // INDEX=15
 		// Hard has insufficient total difficulty / length and is rejected.
 		{
 			500, 250, 250,
@@ -185,6 +189,7 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 			47, -8,
 			false, false,
 		},
+		// // INDEX=20
 		// Hard has insufficient total difficulty / length and is rejected.
 		{
 			500, 200, 300,
@@ -216,6 +221,7 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 			60, -9,
 			false, true,
 		},
+		// INDEX=25
 		// Hard is shorter, but sufficiently heavier chain, is accepted.
 		{
 			500, 100, 390,
@@ -331,7 +337,7 @@ func TestEcbp1100AGSinusoidalA(t *testing.T) {
 /*
 TestAFKnownBlock tests that AF functionality works for chain re-insertions.
 
-Chain re-insertions use BlockChain.writeKnownBlock, where first-pass insertions
+Chain re-insertions use BlockChain.writeKnownBlockAsHead, where first-pass insertions
 will hit writeBlockWithState.
 
 AF needs to be implemented at both sites to prevent re-proposed chains from sidestepping
@@ -379,3 +385,31 @@ func TestAFKnownBlock(t *testing.T) {
 	}
 }
 
+// func TestPlot_ecbp1100PolynomialV(t *testing.T) {
+// 	p, err := plot.New()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	p.Title.Text = "Functions"
+// 	p.X.Label.Text = "X"
+// 	p.Y.Label.Text = "Y"
+//
+// 	poly := plotter.NewFunction(func(f float64) float64 {
+// 		n := big.NewInt(int64(f))
+// 		y := ecbp1100PolynomialV(n)
+// 		ff, _ := new(big.Float).SetInt(y).Float64()
+// 		return ff
+// 		// ff := ecbp1100PolynomialV(int64(f))
+// 		// return float64(ff)
+// 	})
+// 	p.Add(poly)
+//
+// 	p.X.Min = 0
+// 	p.X.Max = 25000
+// 	p.Y.Min = 0
+// 	p.Y.Max = 300
+//
+// 	if err := p.Save(1000, 1000, "ecbp1100-polynomial.png"); err != nil {
+// 		t.Fatal(err)
+// 	}
+// }

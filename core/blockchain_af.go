@@ -89,21 +89,38 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 	got := proposedSubchainTD.Int64() * ecbp1100PolynomialVCurveFunctionDenominator
 	want := ecbp1100PolynomialV(int64(proposed.Time - commonAncestor.Time)) * localSubchainTD.Int64()
 
+	prettyRatio := float64(got) / float64(want)
+
 	if got < want {
 		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v blocks=%d rat=%0.6f`,
 			errReorgFinality,
 			common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)), proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
-			float64(got) / float64(want),
+			prettyRatio,
 		)
 	}
 	log.Info("ECBP1100-MESS 🔓",
 		"status", "accepted",
 		"age", common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
 		"blocks", proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
-		"rat", float64(got) / float64(want),
+		"rat", prettyRatio,
 	)
 	return nil
 }
+
+/*
+	xBig := big.NewInt(int64(proposed.Time - commonAncestor.Time))
+	eq := ecbp1100PolynomialV(xBig)
+	want := eq.Mul(eq, localSubchainTD)
+
+	got := new(big.Int).Mul(proposedSubchainTD, ecbp1100PolynomialVCurveFunctionDenominator)
+
+	prettyRatio, _ := new(big.Float).Quo(
+		new(big.Float).SetInt(got),
+		new(big.Float).SetInt(want),
+		).Float64()
+
+	if got.Cmp(want) < 0 {
+ */
 
 /*
 ecbp1100PolynomialV is a cubic function that looks a lot like Option 3's sin function,
@@ -126,6 +143,61 @@ The if tdRatio < antiGravity check would then be
 
 if proposed_subchain_td * CURVE_FUNCTION_DENOMINATOR < get_curve_function_numerator(proposed.Time - commonAncestor.Time) * local_subchain_td.
 */
+
+
+// func ecbp1100PolynomialV(x *big.Int) *big.Int {
+//
+// 	// Make a copy; do not mutate argument value.
+//
+// 	// if x > xcap:
+// 	//    x = xcap
+// 	xcp := emath.BigMin(x, ecbp1100PolynomialVXCap)
+//
+// 	// height // xcap ** 2
+// 	p := new(big.Int).Exp(ecbp1100PolynomialVXCap, big2, big0)
+// 	p.Div(ecbp1100PolynomialVHeight, p)
+//
+// 	// 3 * x**2
+// 	m := new(big.Int).Exp(xcp, big2, big0)
+// 	m.Mul(big3, m)
+//
+// 	// 2 * x**3 // xcap
+// 	n := new(big.Int).Exp(xcp, big3, big0)
+// 	n.Div(n, ecbp1100PolynomialVXCap)
+// 	n.Mul(big2, n)
+//
+// 	// (3 * x**2 - 2 * x**3 // xcap)
+// 	m.Sub(m, n)
+//
+// 	// (3 * x**2 - 2 * x**3 // xcap) * height // xcap ** 2
+// 	m.Mul(m, p)
+//
+// 	// CURVE_FUNCTION_DENOMINATOR + (3 * x**2 - 2 * x**3 // xcap) * height // xcap ** 2
+// 	m.Add(ecbp1100PolynomialVCurveFunctionDenominator, m)
+//
+// 	return m
+// }
+//
+// var big0 = big.NewInt(0)
+// var big2 = big.NewInt(2)
+// var big3 = big.NewInt(3)
+//
+// // ecbp1100PolynomialVCurveFunctionDenominator
+// // CURVE_FUNCTION_DENOMINATOR = 128
+// var ecbp1100PolynomialVCurveFunctionDenominator = big.NewInt(128)
+//
+// // ecbp1100PolynomialVXCap
+// // xcap = 25132 # = floor(8000*pi)
+// var ecbp1100PolynomialVXCap = big.NewInt(25132)
+//
+// // ecbp1100PolynomialVAmpl
+// // ampl = 15
+// var ecbp1100PolynomialVAmpl = big.NewInt(15)
+//
+// // ecbp1100PolynomialVHeight
+// // height = CURVE_FUNCTION_DENOMINATOR * (ampl * 2)
+// var ecbp1100PolynomialVHeight = new(big.Int).Mul(new(big.Int).Mul(ecbp1100PolynomialVCurveFunctionDenominator, ecbp1100PolynomialVAmpl), big2)
+
 func ecbp1100PolynomialV(x int64) int64 {
 	if x > ecbp1100PolynomialVXCap {
 		x = ecbp1100PolynomialVXCap
@@ -183,3 +255,4 @@ f(x)=1.0001^(x)
 func ecbp1100AGExpA(x float64) (antiGravity float64) {
 	return math.Pow(1.0001, x)
 }
+

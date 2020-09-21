@@ -1557,7 +1557,7 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 				// Proceed with further reorg arbitration.
 				if bc.IsArtificialFinalityEnabled() && bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, currentBlock.Number()) {
 					if err := bc.ecbp1100(d.commonBlock.Header(), currentBlock.Header(), block.Header()); err != nil {
-						log.Warn("Hurrumph", "AF-MESS.error", err)
+						log.Warn("Reorg disallowed", "error", err)
 						canonicalDisallowed = true
 					}
 				}
@@ -1742,7 +1742,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 							bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, current.Number()) {
 
 							if err := bc.ecbp1100(reorgData.commonBlock.Header(), current.Header(), block.Header()); err != nil {
-								log.Warn("Hurrumph 2", "writeKnownBlockAsHead.ECBP1100.MESS", "did error", err)
+								log.Warn("Reorg disallowed", "error", err)
 								finalityDisallowed = true
 							}
 						}

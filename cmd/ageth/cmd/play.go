@@ -71,6 +71,7 @@ to quickly create a Cobra application.`,
 					log.Warn("Scan failed to parse network graphic data from line", "line", string(line))
 				}
 
+
 				log.Info("Scanned", "line", lineN)
 				if n.Tick == 0 {
 					n.Tick = lineN

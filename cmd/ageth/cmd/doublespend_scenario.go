@@ -12,6 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core/types"
 	log "github.com/ethereum/go-ethereum/log"
 )
 
@@ -43,34 +44,58 @@ func stabilize2(nodes *agethSet) {
 		for a.getPeerCount() < 3 {
 			a.addPeer(nodes.random())
 		}
+		a.mustEtherbases([]common.Address{})
 		var res bool
 		a.client.Call(&res, "admin_ecbp1100", hexutil.Uint64(9999999999).String())
 	})
 
-	nodes.dexedni(0).startMining(60)
+	pacing := nodes.dexedni(0)
 
-	chains := nodes.chains()
+	// Note that this DOES NOT GET TURNED OFF.
+	// Since this may be the last function called, we want to leave one miner mining
+	// slowly to eventually depress the hashrate/difficulty values.
+	// Scenarios are responsible for turning mining off at the beginning of
+	// their run as desired.
+	pacing.startMining(60)
+
+	pacingNewHeadC := make(chan *types.Header)
+	pacing.registerNewHeadCallback(func(a *ageth, header *types.Header) {
+		select {
+		case pacingNewHeadC <- header:
+		default:
+		}
+	})
+	defer pacing.purgeNewHeadCallbacks()
 
 	done := make(chan struct{})
 	go func() {
+		chains := nodes.chains()
+		logStatus := func(status string) {
+			printChains := []string{}
+			for _, c := range chains {
+				printChains = append(printChains, fmt.Sprintf("block=%d: nodes=%d", c.headMax(), c.len()))
+			}
+			log.Info(status, "chains", strings.Join(printChains, ", "), "head.max", nodes.headMax(), "head.min", nodes.headMin())
+		}
 		for {
 			select {
-			case <-done:
-				return
-			case <-time.NewTimer(30 * time.Second).C:
-				printChains := []string{}
-				for _, c := range chains {
-					printChains = append(printChains, fmt.Sprintf("block=%d: nodes=%d", c.headMax(), c.len()))
+			case <-pacingNewHeadC:
+
+				assumePropagationTime := 5 * time.Second
+				time.Sleep(assumePropagationTime)
+
+				chains = nodes.chains()
+				if len(chains) == 1 {
+					logStatus("Done stabilizing")
+					done <- struct{}{}
+					return
 				}
-				log.Info("Still stabilizing", "chains", strings.Join(printChains, ", "), "head.max", nodes.headMax(), "head.min", nodes.headMin())
+			case <-time.NewTimer(30 * time.Second).C:
+				logStatus("Still stabilizing")
 			}
 		}
 	}()
-
-	for len(chains) > 1 {
-		time.Sleep(30*time.Second)
-		chains = nodes.chains()
-	}
+	<-done
 }
 
 func stabilize(nodes *agethSet) {
@@ -216,34 +241,34 @@ func scenarioGenerator(blockTime int, attackDuration, stabilizeDuration time.Dur
 				continue
 			}
 			chainRatio := big.NewFloat(0).Quo(
-			  big.NewFloat(0).SetInt(big.NewInt(0).Sub(badGuy.getTd(), forkBlockTd)),
-			  big.NewFloat(0).SetInt(big.NewInt(0).Sub(bestPeer.getTd(), forkBlockTd)),
-			  )
+				big.NewFloat(0).SetInt(big.NewInt(0).Sub(badGuy.getTd(), forkBlockTd)),
+				big.NewFloat(0).SetInt(big.NewInt(0).Sub(bestPeer.getTd(), forkBlockTd)),
+			)
 			if chainRatio.Cmp(lastChainRatio) != 0 {
-			  // The ratio has changed, adjust mining power
-			  if chainRatio.Cmp(big.NewFloat(targetDifficultyRatio)) < 0  {
-			    // We're behind the target ratio. We need to mine faster
-			    badGuyBlockTime--
-			    if badGuyBlockTime > blockTime {
-			      // The tides have turned and we're behind where we should be. Get
-			      // back in line quickly, rather than one block at a time.
-			      badGuyBlockTime = blockTime
-			    }
-			  } else if chainRatio.Cmp(big.NewFloat(targetDifficultyRatio)) > 0 {
-			    // We're above the target ratio, we can mine slower.
-			    badGuyBlockTime++
-			    if badGuyBlockTime < blockTime / 2 {
-			      // We're mining way too fast. Slam on the breaks
-			      badGuyBlockTime = blockTime / 2
-			    }
-			  }
-			  if badGuyBlockTime < 1 {
-			    // We can't mine that fast.
-			    badGuyBlockTime = 1
-			  } else {
-			    badGuy.startMining(badGuyBlockTime)
-			  }
-			  lastChainRatio = chainRatio
+				// The ratio has changed, adjust mining power
+				if chainRatio.Cmp(big.NewFloat(targetDifficultyRatio)) < 0 {
+					// We're behind the target ratio. We need to mine faster
+					badGuyBlockTime--
+					if badGuyBlockTime > blockTime {
+						// The tides have turned and we're behind where we should be. Get
+						// back in line quickly, rather than one block at a time.
+						badGuyBlockTime = blockTime
+					}
+				} else if chainRatio.Cmp(big.NewFloat(targetDifficultyRatio)) > 0 {
+					// We're above the target ratio, we can mine slower.
+					badGuyBlockTime++
+					if badGuyBlockTime < blockTime/2 {
+						// We're mining way too fast. Slam on the breaks
+						badGuyBlockTime = blockTime / 2
+					}
+				}
+				if badGuyBlockTime < 1 {
+					// We can't mine that fast.
+					badGuyBlockTime = 1
+				} else {
+					badGuy.startMining(badGuyBlockTime)
+				}
+				lastChainRatio = chainRatio
 			}
 			if time.Since(attackStartTime) > attackDuration {
 				_, _, chainRatio := nodeTDRatioAB(badGuy, goodGuys.peerMax(), forkBlockTd)

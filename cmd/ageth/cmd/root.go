@@ -356,6 +356,10 @@ func runEventing(reportEventChan, wsEventChan chan interface{}, quitChan chan st
 				if err != nil {
 					llog.Fatal(err)
 				}
+				_, err = writer.Write([]byte("\n"))
+				if err != nil {
+					llog.Fatal(err)
+				}
 			}
 			// default:
 		}

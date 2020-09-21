@@ -222,6 +222,29 @@ func (s *agethSet) distinctChains() []common.Hash {
 	return distinctHeadList
 }
 
+func (s *agethSet) chains() []*agethSet {
+	first := newAgethSet()
+	first.push(s.indexed(0))
+	out := []*agethSet{first}
+	for i := 1; i < s.len(); i++ {
+		didMatch := false
+		inner:
+		for j := 0; j < len(out); j++ {
+			if s.indexed(i).sameChainAs(out[j].indexed(0)) {
+				didMatch = true
+				out[j].push(s.indexed(i))
+				break inner
+			}
+		}
+		if !didMatch {
+			ns := newAgethSet()
+			ns.push(s.indexed(i))
+			out = append(out, ns)
+		}
+	}
+	return out
+}
+
 
 func isReorg(a, b common.Hash, aSet, bSet *agethSet) (bool, common.Hash) {
 	if a == b { return false, a }

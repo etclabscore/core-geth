@@ -3,8 +3,10 @@ package cmd
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"math/big"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum"
@@ -23,6 +25,52 @@ type finalReport struct {
 	AttackerShouldWin     bool
 	AttackerWon           bool
 	AttackerHash          common.Hash
+}
+
+func stabilize2(nodes *agethSet) {
+	log.Warn("Stabilizing network")
+	defer func() {
+		nodes.eachParallel(func(a *ageth) {
+			var res bool
+			a.client.Call(&res, "admin_ecbp1100", hexutil.Uint64(11).String())
+		})
+		log.Warn("Done stabilizing network")
+	}()
+
+	nodes.eachParallel(func(a *ageth) {
+		a.stopMining()
+		a.setMaxPeers(25)
+		for a.getPeerCount() < 3 {
+			a.addPeer(nodes.random())
+		}
+		var res bool
+		a.client.Call(&res, "admin_ecbp1100", hexutil.Uint64(9999999999).String())
+	})
+
+	nodes.dexedni(0).startMining(60)
+
+	chains := nodes.chains()
+
+	done := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			case <-time.NewTimer(30 * time.Second).C:
+				printChains := []string{}
+				for _, c := range chains {
+					printChains = append(printChains, fmt.Sprintf("block=%d: nodes=%d", c.headMax(), c.len()))
+				}
+				log.Info("Still stabilizing", "chains", strings.Join(printChains, ", "), "head.max", nodes.headMax(), "head.min", nodes.headMin())
+			}
+		}
+	}()
+
+	for len(chains) > 1 {
+		time.Sleep(30*time.Second)
+		chains = nodes.chains()
+	}
 }
 
 func stabilize(nodes *agethSet) {
@@ -61,7 +109,7 @@ func stabilize(nodes *agethSet) {
 	for len(nodes.distinctChains()) > 1 {
 		time.Sleep(30)
 	}
-	for badGuy.block().number < goodGuys.headMax() {
+	for badGuy.syncing() {
 		time.Sleep(5)
 	}
 	nodes.eachParallel(func(a *ageth) {

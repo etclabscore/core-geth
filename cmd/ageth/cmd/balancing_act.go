@@ -9,8 +9,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 func nodeTDRatioAB(a, b *ageth, commonBlockTD *big.Int) (segmentTDA, segmentTDB *big.Int, ratio float64) {
@@ -59,8 +61,8 @@ func badGuyPacemaker(badGuy, goodGuy *ageth, wantRatio float64, forkedTD *big.In
 	badGuyPacemakerLast = badGuy.block().hash
 	goodGuyPacemakerLast = goodGuy.block().hash
 
-	// segA, segB, balance := nodeTDRatioAB(badGuy, goodGuy, forkedTD)
-	_, _, balance := nodeTDRatioAB(badGuy, goodGuy, forkedTD)
+	segA, segB, balance := nodeTDRatioAB(badGuy, goodGuy, forkedTD)
+	// _, _, balance := nodeTDRatioAB(badGuy, goodGuy, forkedTD)
 
 	tdRatioTolerance := float64(1 / 100)
 	upper, lower := wantRatio+tdRatioTolerance, wantRatio-tdRatioTolerance
@@ -73,56 +75,56 @@ func badGuyPacemaker(badGuy, goodGuy *ageth, wantRatio float64, forkedTD *big.In
 		return
 	}
 
-	minInt, maxInt := constant-2, constant+2
-	target := badGuy.mining
-	if balance > upper {
-		target++
-	} else if balance < lower {
-		target--
-	}
-	if target > maxInt {
-		target = maxInt
-	} else if target < minInt {
-		target = minInt
-	}
-	if target != badGuy.mining {
-		badGuy.startMining(target)
-	}
+	// minInt, maxInt := constant-2, constant+2
+	// target := badGuy.mining
+	// if balance > upper {
+	// 	target++
+	// } else if balance < lower {
+	// 	target--
+	// }
+	// if target > maxInt {
+	// 	target = maxInt
+	// } else if target < minInt {
+	// 	target = minInt
+	// }
+	// if target != badGuy.mining {
+	// 	badGuy.startMining(target)
+	// }
 
 	/*
 	PROBABLY OVERENGINEERED
 	 */
-	// // Good guys' segment * targetRatio, eg. 42000000 * 1.02
-	// want := new(big.Float).Mul(new(big.Float).SetInt(segB), new(big.Float).SetFloat64(wantRatio))
-	// wantBig, _ := want.Int(nil) // as big
-	//
-	// // Difference between target segment difficulty and current segment difficulty
-	// wantUnitDifficulty := new(big.Int).Sub(wantBig, segA)
-	//
-	// bestDifference := big.NewInt(math.MaxInt64)
-	// bestTimeOffset := uint64(0)
-	//
-	// for i := uint64(42); i >= 3; i-- {
-	// 	// Sample the would-be difficulty for a range of block times.
-	// 	difficulty := ethash.CalcDifficulty(params.MessNetConfig, badGuy.block().time + i, badGuy.latestBlock)
-	//
-	// 	// Compare this sample with desired.
-	// 	difference := difficulty.Sub(difficulty, wantUnitDifficulty)
-	// 	difference.Abs(difference) // As absolute value.
-	//
-	// 	// If it's the closest to the target unit block difficulty that would yield
-	// 	// the closest to the overall chain segment ratio, peg it.
-	// 	if difference.Cmp(bestDifference) <= 0 {
-	// 		bestTimeOffset = i
-	// 		bestDifference.Set(difference)
-	// 	}
-	// }
-	// // Nudge the block time toward that.
-	// bestTimeOffset = (uint64(badGuy.mining) + bestTimeOffset) / 2
-	// if int(bestTimeOffset) == badGuy.mining {
-	// 	return
-	// }
-	// badGuy.startMining(int(bestTimeOffset))
+	// Good guys' segment * targetRatio, eg. 42000000 * 1.02
+	want := new(big.Float).Mul(new(big.Float).SetInt(segB), new(big.Float).SetFloat64(wantRatio))
+	wantBig, _ := want.Int(nil) // as big
+
+	// Difference between target segment difficulty and current segment difficulty
+	wantUnitDifficulty := new(big.Int).Sub(wantBig, segA)
+
+	bestDifference := big.NewInt(math.MaxInt64)
+	bestTimeOffset := uint64(0)
+
+	for i := uint64(42); i >= 3; i-- {
+		// Sample the would-be difficulty for a range of block times.
+		difficulty := ethash.CalcDifficulty(params.MessNetConfig, badGuy.block().time + i, badGuy.latestBlock)
+
+		// Compare this sample with desired.
+		difference := difficulty.Sub(difficulty, wantUnitDifficulty)
+		difference.Abs(difference) // As absolute value.
+
+		// If it's the closest to the target unit block difficulty that would yield
+		// the closest to the overall chain segment ratio, peg it.
+		if difference.Cmp(bestDifference) <= 0 {
+			bestTimeOffset = i
+			bestDifference.Set(difference)
+		}
+	}
+	// Nudge the block time toward that.
+	bestTimeOffset = (uint64(badGuy.mining) + bestTimeOffset) / 2
+	if int(bestTimeOffset) == badGuy.mining {
+		return
+	}
+	badGuy.startMining(int(bestTimeOffset))
 }
 
 func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration time.Duration) func(set *agethSet) {
@@ -185,11 +187,11 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 		}
 
 		time.Sleep(5*time.Second)
-		herdHeadMin := nodes.headMin()
-		nodes.forEach(func(i int, a *ageth) {
-			if a.block().number > herdHeadMin {
-				a.truncateHead(herdHeadMin)
-			}
+		// herdHeadMin := nodes.headMin()
+		nodes.eachParallel(func(a *ageth) {
+			// if a.block().number > herdHeadMin {
+			// 	a.truncateHead(herdHeadMin)
+			// }
 			// MAKE SURE ECBP1100 IS TURNED ON
 			var res bool
 			a.client.Call(&res, "admin_ecbp1100", hexutil.Uint64(1).String())
@@ -229,6 +231,7 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 		}
 
 		eitherNewHead := false
+		wantRatio := float64(1)
 		go func() {
 			for !scenarioDone {
 				if eitherNewHead {
@@ -237,7 +240,6 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 						forkedBlockTime = luke.latestBlock.Time
 						forkedTD.Set(luke.getTd())
 					} else {
-						wantRatio := float64(1)
 						if followGravity {
 							wantRatio = ecbp1100AGSinusoidalA(float64(solo.latestBlock.Time - forkedBlockTime))
 						}
@@ -307,6 +309,8 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 			time.Sleep(10 * time.Second)
 		}
 
+		log.Info("Done with main loop", "action", "collect results")
+
 		_, _, resultingTDRatio := nodeTDRatioAB(luke, solo, new(big.Int).SetUint64(forkedBlock.number))
 
 		if luke.sameChainAs(solo) {
@@ -331,7 +335,7 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 			DistinctChains:        distinctChains,
 			Nodes:                 make(map[string]common.Hash),
 			DifficultyRatio:       resultingTDRatio,
-			TargetDifficultyRatio: 1,
+			TargetDifficultyRatio: wantRatio,
 			AttackerShouldWin:     false,
 			AttackerWon:           len(distinctChains) == 2,
 		}

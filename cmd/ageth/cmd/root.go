@@ -260,9 +260,13 @@ to quickly create a Cobra application.`,
 		}
 
 		scenarios := []scenario{
-			generateScenarioPartitioning(false, 20*60*time.Second, 40*60*time.Second),
-			generateScenarioPartitioning(false, 20*60*time.Second, 40*60*time.Second),
-			generateScenarioPartitioning(false, 20*60*time.Second, 40*60*time.Second),
+			// generateScenarioPartitioning(false, 20*60*time.Second, 40*60*time.Second),
+			// generateScenarioPartitioning(false, 20*60*time.Second, 40*60*time.Second),
+			// generateScenarioPartitioning(false, 20*60*time.Second, 40*60*time.Second),
+
+			generateScenarioPartitioning(true, 10*60*time.Second, 20*60*time.Second),
+			generateScenarioPartitioning(true, 10*60*time.Second, 20*60*time.Second),
+			generateScenarioPartitioning(true, 10*60*time.Second, 20*60*time.Second),
 
 			// generateScenarioPartitioning(true, 45*time.Minute),
 
@@ -294,7 +298,7 @@ to quickly create a Cobra application.`,
 		for i, s := range scenarios {
 			log.Info("Running scenario", "index", i, "scenarios.len", len(scenarios),
 				"name", runtime.FuncForPC(reflect.ValueOf(s).Pointer()).Name())
-			// stabilize(world)
+			stabilize2(world)
 			s(world)
 			// Note that the loop assumes no responsibility for tear down.
 			// Each scenario needs to be responsible for getting the nodes
@@ -303,7 +307,7 @@ to quickly create a Cobra application.`,
 			// This also means that any local geths left running at the end of a scenario
 			// will still be running.
 		}
-		stabilize(world)
+		stabilize2(world)
 	},
 }
 

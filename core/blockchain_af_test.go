@@ -359,14 +359,23 @@ func TestAFKnownBlock(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	hard, _ := GenerateChain(genesis.Config, easy[easyN-100], engine, db, 100, func(i int, gen *BlockGen) {
+	hard, _ := GenerateChain(genesis.Config, easy[easyN-300], engine, db, 300, func(i int, gen *BlockGen) {
 		gen.OffsetTime(-7)
 	})
-	if _, err := chain.InsertChain(hard); err == nil {
-		t.Error("hard 1 inserted")
+	// writeBlockWithState
+	if _, err := chain.InsertChain(hard); err != nil {
+		t.Error("hard 1 not inserted (should be side)")
 	}
-	if _, err := chain.InsertChain(hard); err == nil {
-		t.Error("hard 2 inserted")
+	// writeKnownBlockAsHead
+	if _, err := chain.InsertChain(hard); err != nil {
+		t.Error("hard 2 inserted (will have 'ignored' known blocks, and never tried a reorg)")
+	}
+	hardHeadHash := hard[len(hard)-1].Hash()
+	if chain.CurrentBlock().Hash() == hardHeadHash {
+		t.Fatal("hard block got chain head, should be side")
+	}
+	if h := chain.GetHeaderByHash(hardHeadHash); h == nil {
+		t.Fatal("missing hard block (should be imported as side, but still available)")
 	}
 }
 

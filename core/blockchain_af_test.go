@@ -536,7 +536,7 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 			// poissonTime(b, c.easyOffset)
 			b.OffsetTime(c.easyOffset - 10)
 		})
-		commonAncestor := easy[c.commonAncestorN - 1]
+		commonAncestor := easy[c.commonAncestorN-1]
 		hard, _ := GenerateChain(genesis.Config, commonAncestor, engine, db, c.hardLen, func(i int, b *BlockGen) {
 			b.SetNonce(types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64))))
 			// poissonTime(b, c.hardOffset)
@@ -588,10 +588,10 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 			}
 
 			/*
-			HERE LIES THE RUB (IN MY GRAPHS).
+				HERE LIES THE RUB (IN MY GRAPHS).
 
 
-			 */
+			*/
 			// y := chain.getTDRatio(commonAncestor.Header(), easyHeader, hardHeader) // <- unit x unit
 
 			// y := chain.getTDRatio(commonAncestor.Header(), easy[c.easyLen-1].Header(), hardHeader)
@@ -604,7 +604,7 @@ func TestBlockChain_AF_Difficulty(t *testing.T) {
 
 			ecbp := ecbp1100AGSinusoidalA(float64(hardHeader.Time - commonAncestor.Header().Time))
 
-			if j == n - 1 {
+			if j == n-1 {
 				gotRatioComparisons = append(gotRatioComparisons, ratioComparison{
 					tdRatio: y, penalty: ecbp,
 				})
@@ -717,7 +717,6 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 	defer chain.Stop()
 	chain.EnableArtificialFinality(true)
 
-
 	easy, _ := GenerateChain(genesis.Config, genesisB, engine, db, 1000, func(i int, gen *BlockGen) {
 		gen.OffsetTime(0)
 	})
@@ -728,7 +727,7 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 	targetDifficultyRatio := big.NewInt(2)
 	targetDifficulty := new(big.Int).Div(firstDifficulty, targetDifficultyRatio)
 	for chain.CurrentHeader().Difficulty.Cmp(targetDifficulty) > 0 {
-		next , _ := GenerateChain(genesis.Config, chain.CurrentBlock(), engine, db, 1, func(i int, gen *BlockGen) {
+		next, _ := GenerateChain(genesis.Config, chain.CurrentBlock(), engine, db, 1, func(i int, gen *BlockGen) {
 			gen.OffsetTime(8) // 8: (=10+8=18>(13+4=17).. // minimum value over stable range
 		})
 		if _, err := chain.InsertChain(next); err != nil {
@@ -736,5 +735,46 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 		}
 	}
 	t.Log(chain.CurrentBlock().Number())
+}
 
+/*
+TestAFKnownBlock tests that AF functionality works for chain re-insertions.
+
+Chain re-insertions use BlockChain.writeKnownBlock, where first-pass insertions
+will hit writeBlockWithState.
+
+AF needs to be implemented at both sites to prevent re-proposed chains from sidestepping
+the AF criteria.
+ */
+func TestAFKnownBlock(t *testing.T) {
+	engine := ethash.NewFaker()
+
+	db := rawdb.NewMemoryDatabase()
+	genesis := params.DefaultMessNetGenesisBlock()
+	// genesis.Timestamp = 1
+	genesisB := MustCommitGenesis(db, genesis)
+
+	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer chain.Stop()
+	chain.EnableArtificialFinality(true)
+
+	easy, _ := GenerateChain(genesis.Config, genesisB, engine, db, 1000, func(i int, gen *BlockGen) {
+		gen.OffsetTime(0)
+	})
+	easyN, err := chain.InsertChain(easy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	hard, _ := GenerateChain(genesis.Config, easy[easyN-100], engine, db, 100, func(i int, gen *BlockGen) {
+		gen.OffsetTime(-7)
+	})
+	if _, err := chain.InsertChain(hard); err == nil {
+		t.Error("hard 1 inserted")
+	}
+	if _, err := chain.InsertChain(hard); err == nil {
+		t.Error("hard 2 inserted")
+	}
 }

@@ -56,6 +56,7 @@ func runMESSTest(t *testing.T, easyL, hardL, caN int, easyT, hardT int64) (hardH
 }
 
 func TestBlockChain_AF_ECBP1100(t *testing.T) {
+	t.Skip("These have been disused as of the sinusoidal -> cubic change.")
 	yuckyGlobalTestEnableMess = true
 	defer func() {
 		yuckyGlobalTestEnableMess = false
@@ -66,6 +67,7 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 		easyOffset, hardOffset            int64
 		hardGetsHead, accepted            bool
 	}{
+		// INDEX=0
 		// Hard has insufficient total difficulty / length and is rejected.
 		{
 			5000, 7500, 2500,
@@ -96,6 +98,7 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 			0, -8,
 			true, true,
 		},
+		// INDEX=5
 		// Hard has sufficient total difficulty / length and is accepted.
 		{
 			500, 4, 496,
@@ -126,6 +129,7 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 			0, -9,
 			true, true,
 		},
+		// INDEX=10
 		// Hard has sufficient total difficulty / length and is accepted.
 		{
 			500, 9, 491,
@@ -156,22 +160,23 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 			0, -9,
 			true, true,
 		},
+		// // INDEX=15
 		// Hard has insufficient total difficulty / length and is rejected.
 		{
-			500, 200, 300,
+			500, 250, 250,
 			0, -9,
 			false, false,
 		},
 		// Hard has insufficient total difficulty / length and is rejected.
 		{
-			500, 200, 300,
+			500, 250, 250,
 			7, -9,
 			false, false,
 		},
 		// Hard has insufficient total difficulty / length and is rejected.
 		{
-			500, 200, 300,
-			17, -9,
+			500, 300, 200,
+			13, -9,
 			false, false,
 		},
 		// Hard has sufficient total difficulty / length and is accepted.
@@ -186,6 +191,7 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 			47, -8,
 			false, false,
 		},
+		// // INDEX=20
 		// Hard has insufficient total difficulty / length and is rejected.
 		{
 			500, 200, 300,
@@ -217,10 +223,81 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 			60, -9,
 			false, true,
 		},
+		// INDEX=25
 		// Hard is shorter, but sufficiently heavier chain, is accepted.
 		{
 			500, 100, 390,
 			60, -9,
+			true, true,
+		},
+	}
+
+	for i, c := range cases {
+		hardHead, err := runMESSTest(t, c.easyLen, c.hardLen, c.commonAncestorN, c.easyOffset, c.hardOffset)
+		if (err != nil && c.accepted) || (err == nil && !c.accepted) || (hardHead != c.hardGetsHead) {
+			t.Errorf("case=%d [easy=%d hard=%d ca=%d eo=%d ho=%d] want.accepted=%v want.hardHead=%v got.hardHead=%v err=%v",
+				i,
+				c.easyLen, c.hardLen, c.commonAncestorN, c.easyOffset, c.hardOffset,
+				c.accepted, c.hardGetsHead, hardHead, err)
+		}
+	}
+}
+
+func TestBlockChain_AF_ECBP1100_2(t *testing.T) {
+	yuckyGlobalTestEnableMess = true
+	defer func() {
+		yuckyGlobalTestEnableMess = false
+	}()
+
+	cases := []struct {
+		easyLen, hardLen, commonAncestorN int
+		easyOffset, hardOffset            int64
+		hardGetsHead, accepted            bool
+	}{
+		// Random coin tosses involved for equivalent difficulty.
+		// {
+		// 	1000, 1, 999,
+		// 	0, 0, // -1 offset => 10-1=9 same child difficulty
+		// 	false, true,
+		// },
+		// {
+		// 	1000, 3, 997,
+		// 	0, 0, // -1 offset => 10-1=9 same child difficulty
+		// 	false, true,
+		// },
+		// {
+		// 	1000, 10, 990,
+		// 	0, 0, // -1 offset => 10-1=9 same child difficulty
+		// 	false, true,
+		// },
+		{
+			1000, 1, 999,
+			0, -2, // better difficulty
+			true, true,
+		},
+		{
+			1000, 25, 975,
+			0, -2, // better difficulty
+			true, true,
+		},
+		{
+			1000, 30, 970,
+			0, -2, // better difficulty
+			false, true,
+		},
+		{
+			1000, 50, 950,
+			0, -5,
+			true, true,
+		},
+		{
+			1000, 50, 950,
+			0, -1,
+			false, true,
+		},
+		{
+			1000, 999, 1,
+			0, -9,
 			true, true,
 		},
 	}
@@ -329,7 +406,128 @@ func TestEcbp1100AGSinusoidalA(t *testing.T) {
 	}
 }
 
-func TestBlockChain_AF_Difficulty(t *testing.T) {
+/*
+TestAFKnownBlock tests that AF functionality works for chain re-insertions.
+
+Chain re-insertions use BlockChain.writeKnownBlockAsHead, where first-pass insertions
+will hit writeBlockWithState.
+
+AF needs to be implemented at both sites to prevent re-proposed chains from sidestepping
+the AF criteria.
+ */
+func TestAFKnownBlock(t *testing.T) {
+	engine := ethash.NewFaker()
+
+	db := rawdb.NewMemoryDatabase()
+	genesis := params.DefaultMessNetGenesisBlock()
+	// genesis.Timestamp = 1
+	genesisB := MustCommitGenesis(db, genesis)
+
+	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer chain.Stop()
+	chain.EnableArtificialFinality(true)
+
+	easy, _ := GenerateChain(genesis.Config, genesisB, engine, db, 1000, func(i int, gen *BlockGen) {
+		gen.OffsetTime(0)
+	})
+	easyN, err := chain.InsertChain(easy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	hard, _ := GenerateChain(genesis.Config, easy[easyN-300], engine, db, 300, func(i int, gen *BlockGen) {
+		gen.OffsetTime(-7)
+	})
+	// writeBlockWithState
+	if _, err := chain.InsertChain(hard); err != nil {
+		t.Error("hard 1 not inserted (should be side)")
+	}
+	// writeKnownBlockAsHead
+	if _, err := chain.InsertChain(hard); err != nil {
+		t.Error("hard 2 inserted (will have 'ignored' known blocks, and never tried a reorg)")
+	}
+	hardHeadHash := hard[len(hard)-1].Hash()
+	if chain.CurrentBlock().Hash() == hardHeadHash {
+		t.Fatal("hard block got chain head, should be side")
+	}
+	if h := chain.GetHeaderByHash(hardHeadHash); h == nil {
+		t.Fatal("missing hard block (should be imported as side, but still available)")
+	}
+}
+
+func TestPlot_ecbp1100PolynomialV(t *testing.T) {
+	p, err := plot.New()
+	if err != nil {
+		panic(err)
+	}
+	p.Title.Text = "Functions"
+	p.X.Label.Text = "X"
+	p.Y.Label.Text = "Y"
+
+	poly := plotter.NewFunction(func(f float64) float64 {
+		n := big.NewInt(int64(f))
+		y := ecbp1100PolynomialV(n)
+		ff, _ := new(big.Float).SetInt(y).Float64()
+		return ff
+	})
+	p.Add(poly)
+
+	p.X.Min = 0
+	p.X.Max = 100000
+	p.Y.Min = 0
+	p.Y.Max = 5000
+
+	if err := p.Save(1000, 1000, "ecbp1100-polynomial.png"); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestEcbp1100PolynomialV(t *testing.T) {
+	t.Log(
+		ecbp1100PolynomialV(big.NewInt(99)),
+		ecbp1100PolynomialV(big.NewInt(999)),
+		ecbp1100PolynomialV(big.NewInt(99999)))
+}
+
+func TestGenerateChainTargetingHashrate(t *testing.T) {
+	engine := ethash.NewFaker()
+
+	db := rawdb.NewMemoryDatabase()
+	genesis := params.DefaultMessNetGenesisBlock()
+	// genesis.Timestamp = 1
+	genesisB := MustCommitGenesis(db, genesis)
+
+	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer chain.Stop()
+	chain.EnableArtificialFinality(true)
+
+	easy, _ := GenerateChain(genesis.Config, genesisB, engine, db, 1000, func(i int, gen *BlockGen) {
+		gen.OffsetTime(0)
+	})
+	if _, err := chain.InsertChain(easy); err != nil {
+		t.Fatal(err)
+	}
+	firstDifficulty := chain.CurrentHeader().Difficulty
+	targetDifficultyRatio := big.NewInt(2)
+	targetDifficulty := new(big.Int).Div(firstDifficulty, targetDifficultyRatio)
+	for chain.CurrentHeader().Difficulty.Cmp(targetDifficulty) > 0 {
+		next, _ := GenerateChain(genesis.Config, chain.CurrentBlock(), engine, db, 1, func(i int, gen *BlockGen) {
+			gen.OffsetTime(8) // 8: (=10+8=18>(13+4=17).. // minimum value over stable range
+		})
+		if _, err := chain.InsertChain(next); err != nil {
+			t.Fatal(err)
+		}
+	}
+	t.Log(chain.CurrentBlock().Number())
+}
+
+
+func TestBlockChain_AF_Difficulty_Develop(t *testing.T) {
 	// Generate the original common chain segment and the two competing forks
 	engine := ethash.NewFaker()
 
@@ -700,81 +898,4 @@ got.tdr=%v got.pen=%v`,
 		}
 	}
 
-}
-
-func TestGenerateChainTargetingHashrate(t *testing.T) {
-	engine := ethash.NewFaker()
-
-	db := rawdb.NewMemoryDatabase()
-	genesis := params.DefaultMessNetGenesisBlock()
-	// genesis.Timestamp = 1
-	genesisB := MustCommitGenesis(db, genesis)
-
-	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer chain.Stop()
-	chain.EnableArtificialFinality(true)
-
-	easy, _ := GenerateChain(genesis.Config, genesisB, engine, db, 1000, func(i int, gen *BlockGen) {
-		gen.OffsetTime(0)
-	})
-	if _, err := chain.InsertChain(easy); err != nil {
-		t.Fatal(err)
-	}
-	firstDifficulty := chain.CurrentHeader().Difficulty
-	targetDifficultyRatio := big.NewInt(2)
-	targetDifficulty := new(big.Int).Div(firstDifficulty, targetDifficultyRatio)
-	for chain.CurrentHeader().Difficulty.Cmp(targetDifficulty) > 0 {
-		next, _ := GenerateChain(genesis.Config, chain.CurrentBlock(), engine, db, 1, func(i int, gen *BlockGen) {
-			gen.OffsetTime(8) // 8: (=10+8=18>(13+4=17).. // minimum value over stable range
-		})
-		if _, err := chain.InsertChain(next); err != nil {
-			t.Fatal(err)
-		}
-	}
-	t.Log(chain.CurrentBlock().Number())
-}
-
-/*
-TestAFKnownBlock tests that AF functionality works for chain re-insertions.
-
-Chain re-insertions use BlockChain.writeKnownBlock, where first-pass insertions
-will hit writeBlockWithState.
-
-AF needs to be implemented at both sites to prevent re-proposed chains from sidestepping
-the AF criteria.
- */
-func TestAFKnownBlock(t *testing.T) {
-	engine := ethash.NewFaker()
-
-	db := rawdb.NewMemoryDatabase()
-	genesis := params.DefaultMessNetGenesisBlock()
-	// genesis.Timestamp = 1
-	genesisB := MustCommitGenesis(db, genesis)
-
-	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer chain.Stop()
-	chain.EnableArtificialFinality(true)
-
-	easy, _ := GenerateChain(genesis.Config, genesisB, engine, db, 1000, func(i int, gen *BlockGen) {
-		gen.OffsetTime(0)
-	})
-	easyN, err := chain.InsertChain(easy)
-	if err != nil {
-		t.Fatal(err)
-	}
-	hard, _ := GenerateChain(genesis.Config, easy[easyN-100], engine, db, 100, func(i int, gen *BlockGen) {
-		gen.OffsetTime(-7)
-	})
-	if _, err := chain.InsertChain(hard); err == nil {
-		t.Error("hard 1 inserted")
-	}
-	if _, err := chain.InsertChain(hard); err == nil {
-		t.Error("hard 2 inserted")
-	}
 }

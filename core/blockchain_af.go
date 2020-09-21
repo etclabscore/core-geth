@@ -138,49 +138,49 @@ func ecbp1100PolynomialV(x *big.Int) *big.Int {
 
 	// Make a copy; do not mutate argument value.
 
+	dlog := func(i *big.Int) {
+		iu := i.Int64()
+		log.Warn("debug", "value", iu)
+	}
+
 	// if x > xcap:
 	//    x = xcap
 	xcp := emath.BigMin(x, ecbp1100PolynomialVXCap)
+	dlog(xcp)
 
 	// height // xcap ** 2
-	p := new(big.Int).Exp(ecbp1100PolynomialVXCap, big2, big0)
-	pu := p.Uint64()
-	log.Warn("debug", "value", pu)
-	p.Div(ecbp1100PolynomialVHeight, p)
+	p := new(big.Int).Exp(ecbp1100PolynomialVXCap, big2, nil)
+	dlog(p)
+	pp := new(big.Int).Div(ecbp1100PolynomialVHeight, p)
+	dlog(p)
 
 	// 3 * x**2
-	m := new(big.Int).Exp(xcp, big2, big0)
-	m.Mul(big3, m)
-	mmu := m.Uint64()
-	log.Warn("debug", "value", mmu)
+	m := new(big.Int).Exp(xcp, big2, nil)
+	dlog(m)
+	mm := new(big.Int).Mul(big3, m)
+	dlog(mm)
 
 	// 2 * x**3 // xcap
-	n := new(big.Int).Exp(xcp, big3, big0)
-	// 64
-	n.Div(n, ecbp1100PolynomialVXCap)
+	n := new(big.Int).Exp(xcp, big3, nil)
+	dlog(n)
 	n.Mul(big2, n)
-	nu := n.Uint64()
-	log.Warn("debug", "value", nu)
+	dlog(n)
+	n.Div(n, ecbp1100PolynomialVXCap)
+	dlog(n)
 
 	// (3 * x**2 - 2 * x**3 // xcap)
-	mmm, nnn := m.Uint64(), n.Uint64()
-	log.Warn("debug", mmm ,nnn)
-	newm := new(big.Int).Sub(m, n)
-	newmu := newm.Uint64()
-	log.Warn("debug", newmu)
-	m.Sub(m, n)
-	mu := m.Uint64()
-	log.Warn("debug", "value", mu)
+	newm := new(big.Int).Sub(mm, n)
+	dlog(newm)
 
 	// (3 * x**2 - 2 * x**3 // xcap) * height // xcap ** 2
-	m.Mul(m, p)
-	mu = m.Uint64()
-	log.Warn("debug", "value", mu)
+	newnewm := new(big.Int).Mul(newm, pp)
+	dlog(newnewm)
 
 	// CURVE_FUNCTION_DENOMINATOR + (3 * x**2 - 2 * x**3 // xcap) * height // xcap ** 2
-	m.Add(ecbp1100PolynomialVCurveFunctionDenominator, m)
+	newnewnewm := new(big.Int).Add(ecbp1100PolynomialVCurveFunctionDenominator, newm)
+	dlog(newnewnewm)
 
-	return m
+	return newnewnewm
 }
 
 var big0 = big.NewInt(0)

@@ -5,6 +5,7 @@ import (
 	"image/color"
 	"log"
 	"math"
+	"math/big"
 	"math/rand"
 	"testing"
 
@@ -385,31 +386,31 @@ func TestAFKnownBlock(t *testing.T) {
 	}
 }
 
-// func TestPlot_ecbp1100PolynomialV(t *testing.T) {
-// 	p, err := plot.New()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	p.Title.Text = "Functions"
-// 	p.X.Label.Text = "X"
-// 	p.Y.Label.Text = "Y"
-//
-// 	poly := plotter.NewFunction(func(f float64) float64 {
-// 		n := big.NewInt(int64(f))
-// 		y := ecbp1100PolynomialV(n)
-// 		ff, _ := new(big.Float).SetInt(y).Float64()
-// 		return ff
-// 		// ff := ecbp1100PolynomialV(int64(f))
-// 		// return float64(ff)
-// 	})
-// 	p.Add(poly)
-//
-// 	p.X.Min = 0
-// 	p.X.Max = 25000
-// 	p.Y.Min = 0
-// 	p.Y.Max = 300
-//
-// 	if err := p.Save(1000, 1000, "ecbp1100-polynomial.png"); err != nil {
-// 		t.Fatal(err)
-// 	}
-// }
+func TestPlot_ecbp1100PolynomialV(t *testing.T) {
+	p, err := plot.New()
+	if err != nil {
+		panic(err)
+	}
+	p.Title.Text = "Functions"
+	p.X.Label.Text = "X"
+	p.Y.Label.Text = "Y"
+
+	poly := plotter.NewFunction(func(f float64) float64 {
+		n := big.NewInt(int64(f))
+		y := ecbp1100PolynomialV(n)
+		ff, _ := new(big.Float).SetInt(y).Float64()
+		return ff
+		// ff := ecbp1100PolynomialV(int64(f))
+		// return float64(ff)
+	})
+	p.Add(poly)
+
+	p.X.Min = 0
+	p.X.Max = 25000
+	p.Y.Min = 0
+	p.Y.Max = 300
+
+	if err := p.Save(1000, 1000, "ecbp1100-polynomial.png"); err != nil {
+		t.Fatal(err)
+	}
+}

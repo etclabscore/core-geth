@@ -332,7 +332,7 @@ func generateScenarioPartitioning(followGravity bool, minDuration, maxDuration t
 			Nodes:                 make(map[string]common.Hash),
 			DifficultyRatio:       resultingTDRatio,
 			TargetDifficultyRatio: 1,
-			AttackerShouldWin:     true,
+			AttackerShouldWin:     false,
 			AttackerWon:           len(distinctChains) == 2,
 		}
 		for _, node := range nodes.all() {

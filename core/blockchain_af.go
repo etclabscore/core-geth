@@ -177,7 +177,7 @@ func ecbp1100PolynomialV(x *big.Int) *big.Int {
 	dlog(newnewm)
 
 	// CURVE_FUNCTION_DENOMINATOR + (3 * x**2 - 2 * x**3 // xcap) * height // xcap ** 2
-	newnewnewm := new(big.Int).Add(ecbp1100PolynomialVCurveFunctionDenominator, newm)
+	newnewnewm := new(big.Int).Add(ecbp1100PolynomialVCurveFunctionDenominator, newnewm)
 	dlog(newnewnewm)
 
 	return newnewnewm

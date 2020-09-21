@@ -528,6 +528,7 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 
 
 func TestBlockChain_AF_Difficulty_Develop(t *testing.T) {
+	t.Skip("Development version of tests with plotter")
 	// Generate the original common chain segment and the two competing forks
 	engine := ethash.NewFaker()
 

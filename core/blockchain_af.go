@@ -138,49 +138,40 @@ func ecbp1100PolynomialV(x *big.Int) *big.Int {
 
 	// Make a copy; do not mutate argument value.
 
-	dlog := func(i *big.Int) {
-		iu := i.Int64()
-		log.Warn("debug", "value", iu)
-	}
-
 	// if x > xcap:
 	//    x = xcap
-	xcp := emath.BigMin(x, ecbp1100PolynomialVXCap)
-	dlog(xcp)
+	xA := big.NewInt(0)
+	xA.Set(emath.BigMin(x, ecbp1100PolynomialVXCap))
 
-	// height // xcap ** 2
-	p := new(big.Int).Exp(ecbp1100PolynomialVXCap, big2, nil)
-	dlog(p)
-	pp := new(big.Int).Div(ecbp1100PolynomialVHeight, p)
-	dlog(p)
+	xB := big.NewInt(0)
+	xB.Set(emath.BigMin(x, ecbp1100PolynomialVXCap))
+
+	out := big.NewInt(0)
 
 	// 3 * x**2
-	m := new(big.Int).Exp(xcp, big2, nil)
-	dlog(m)
-	mm := new(big.Int).Mul(big3, m)
-	dlog(mm)
+	xA.Exp(xA, big2, nil)
+	xA.Mul(xA, big3)
 
-	// 2 * x**3 // xcap
-	n := new(big.Int).Exp(xcp, big3, nil)
-	dlog(n)
-	n.Mul(big2, n)
-	dlog(n)
-	n.Div(n, ecbp1100PolynomialVXCap)
-	dlog(n)
+	// 3 * x**2 // xcap
+	xB.Exp(xB, big3, nil)
+	xB.Mul(xB, big2)
+	xB.Div(xB, ecbp1100PolynomialVXCap)
 
 	// (3 * x**2 - 2 * x**3 // xcap)
-	newm := new(big.Int).Sub(mm, n)
-	dlog(newm)
+	out.Sub(xA, xB)
+
+	// // (3 * x**2 - 2 * x**3 // xcap) * height
+	out.Mul(out, ecbp1100PolynomialVHeight)
+
+	// xcap ** 2
+	xcap2 := new(big.Int).Exp(ecbp1100PolynomialVXCap, big2, nil)
 
 	// (3 * x**2 - 2 * x**3 // xcap) * height // xcap ** 2
-	newnewm := new(big.Int).Mul(newm, pp)
-	dlog(newnewm)
+	out.Div(out, xcap2)
 
 	// CURVE_FUNCTION_DENOMINATOR + (3 * x**2 - 2 * x**3 // xcap) * height // xcap ** 2
-	newnewnewm := new(big.Int).Add(ecbp1100PolynomialVCurveFunctionDenominator, newnewm)
-	dlog(newnewnewm)
-
-	return newnewnewm
+	out.Add(out, ecbp1100PolynomialVCurveFunctionDenominator)
+	return out
 }
 
 var big0 = big.NewInt(0)

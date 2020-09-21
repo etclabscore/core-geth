@@ -56,6 +56,7 @@ func runMESSTest(t *testing.T, easyL, hardL, caN int, easyT, hardT int64) (hardH
 }
 
 func TestBlockChain_AF_ECBP1100(t *testing.T) {
+	t.Skip("These have been disused as of the sinusoidal -> cubic change.")
 	yuckyGlobalTestEnableMess = true
 	defer func() {
 		yuckyGlobalTestEnableMess = false
@@ -242,6 +243,76 @@ func TestBlockChain_AF_ECBP1100(t *testing.T) {
 	}
 }
 
+func TestBlockChain_AF_ECBP1100_2(t *testing.T) {
+	yuckyGlobalTestEnableMess = true
+	defer func() {
+		yuckyGlobalTestEnableMess = false
+	}()
+
+	cases := []struct {
+		easyLen, hardLen, commonAncestorN int
+		easyOffset, hardOffset            int64
+		hardGetsHead, accepted            bool
+	}{
+		// Random coin tosses involved for equivalent difficulty.
+		// {
+		// 	1000, 1, 999,
+		// 	0, 0, // -1 offset => 10-1=9 same child difficulty
+		// 	false, true,
+		// },
+		// {
+		// 	1000, 3, 997,
+		// 	0, 0, // -1 offset => 10-1=9 same child difficulty
+		// 	false, true,
+		// },
+		// {
+		// 	1000, 10, 990,
+		// 	0, 0, // -1 offset => 10-1=9 same child difficulty
+		// 	false, true,
+		// },
+		{
+			1000, 1, 999,
+			0, -2, // better difficulty
+			true, true,
+		},
+		{
+			1000, 25, 975,
+			0, -2, // better difficulty
+			true, true,
+		},
+		{
+			1000, 30, 970,
+			0, -2, // better difficulty
+			false, true,
+		},
+		{
+			1000, 50, 950,
+			0, -5,
+			true, true,
+		},
+		{
+			1000, 50, 950,
+			0, -1,
+			false, true,
+		},
+		{
+			1000, 999, 1,
+			0, -9,
+			true, true,
+		},
+	}
+
+	for i, c := range cases {
+		hardHead, err := runMESSTest(t, c.easyLen, c.hardLen, c.commonAncestorN, c.easyOffset, c.hardOffset)
+		if (err != nil && c.accepted) || (err == nil && !c.accepted) || (hardHead != c.hardGetsHead) {
+			t.Errorf("case=%d [easy=%d hard=%d ca=%d eo=%d ho=%d] want.accepted=%v want.hardHead=%v got.hardHead=%v err=%v",
+				i,
+				c.easyLen, c.hardLen, c.commonAncestorN, c.easyOffset, c.hardOffset,
+				c.accepted, c.hardGetsHead, hardHead, err)
+		}
+	}
+}
+
 func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 	t.Skip("This test plots graph of chain acceptance for visualization.")
 
@@ -400,15 +471,13 @@ func TestPlot_ecbp1100PolynomialV(t *testing.T) {
 		y := ecbp1100PolynomialV(n)
 		ff, _ := new(big.Float).SetInt(y).Float64()
 		return ff
-		// ff := ecbp1100PolynomialV(int64(f))
-		// return float64(ff)
 	})
 	p.Add(poly)
 
 	p.X.Min = 0
-	p.X.Max = 25000
+	p.X.Max = 100000
 	p.Y.Min = 0
-	p.Y.Max = 300
+	p.Y.Max = 5000
 
 	if err := p.Save(1000, 1000, "ecbp1100-polynomial.png"); err != nil {
 		t.Fatal(err)
@@ -416,7 +485,8 @@ func TestPlot_ecbp1100PolynomialV(t *testing.T) {
 }
 
 func TestEcbp1100PolynomialV(t *testing.T) {
-	x := big.NewInt(50)
-	y := ecbp1100PolynomialV(x)
-	t.Log(y)
+	t.Log(
+		ecbp1100PolynomialV(big.NewInt(99)),
+		ecbp1100PolynomialV(big.NewInt(999)),
+		ecbp1100PolynomialV(big.NewInt(99999)))
 }

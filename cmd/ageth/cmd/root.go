@@ -274,8 +274,8 @@ to quickly create a Cobra application.`,
 			// scenarioGenerator(13, 15 * time.Minute, 2 * time.Minute, 1.06, .666, 1, false),
 			// scenarioGenerator(13, 15 * time.Minute, 2 * time.Minute, 1.20, .666, 1, false),
 
-			scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.13, .666, 1, true),
-			// scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.02, .666, 1, false), // 24
+			// scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.13, .666, 1, true),
+			scenarioGenerator(13, 10 * time.Minute, 2 * time.Minute, 1.02, .666, 1, false), // 24
 			//
 			// scenarioGenerator(13, 34 * time.Minute, 10 * time.Minute, 1.55, .666, 1, true),
 

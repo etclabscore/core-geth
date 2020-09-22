@@ -35,29 +35,29 @@ import (
 )
 
 const (
-	datasetInitBytes   = 1 << 30 // Bytes in dataset at genesis
-	datasetGrowthBytes = 1 << 23 // Dataset growth per epoch
-	cacheInitBytes     = 1 << 24 // Bytes in cache at genesis
-	cacheGrowthBytes   = 1 << 17 // Cache growth per epoch
-	oldEpochLength     = 30000   // Blocks per epoch pre ECIP-1099 activation
-	newEpochLength     = 60000   // Blocks per epoch post ECIP-1099 activation
-	mixBytes           = 128     // Width of mix
-	hashBytes          = 64      // Hash length in bytes
-	hashWords          = 16      // Number of 32 bit ints in a hash
-	datasetParents     = 256     // Number of parents of each dataset element
-	cacheRounds        = 3       // Number of rounds in cache production
-	loopAccesses       = 64      // Number of accesses in hashimoto loop
-	maxEpoch           = 2048    // Max Epoch for included tables
+	datasetInitBytes    = 1 << 30 // Bytes in dataset at genesis
+	datasetGrowthBytes  = 1 << 23 // Dataset growth per epoch
+	cacheInitBytes      = 1 << 24 // Bytes in cache at genesis
+	cacheGrowthBytes    = 1 << 17 // Cache growth per epoch
+	epochLengthDefault  = 30000   // Default epoch length (blocks per epoch)
+	epochLengthECIP1099 = 60000   // Blocks per epoch if ECIP-1099 is activated
+	mixBytes            = 128     // Width of mix
+	hashBytes           = 64      // Hash length in bytes
+	hashWords           = 16      // Number of 32 bit ints in a hash
+	datasetParents      = 256     // Number of parents of each dataset element
+	cacheRounds         = 3       // Number of rounds in cache production
+	loopAccesses        = 64      // Number of accesses in hashimoto loop
+	maxEpoch            = 2048    // Max Epoch for included tables
 )
 
 // calcEpochLength returns the epoch length for a given block number (ECIP-1099)
 func calcEpochLength(block uint64, ecip1099FBlock *uint64) uint64 {
 	if ecip1099FBlock != nil {
 		if block >= *ecip1099FBlock {
-			return newEpochLength
+			return epochLengthECIP1099
 		}
 	}
-	return oldEpochLength
+	return epochLengthDefault
 }
 
 // calcEpoch returns the epoch for a given block number (ECIP-1099)
@@ -136,11 +136,11 @@ func makeHasher(h hash.Hash) hasher {
 // dataset.
 func seedHash(block uint64) []byte {
 	seed := make([]byte, 32)
-	if block < oldEpochLength {
+	if block < epochLengthDefault {
 		return seed
 	}
 	keccak256 := makeHasher(sha3.NewLegacyKeccak256())
-	for i := 0; i < int(block/oldEpochLength); i++ {
+	for i := 0; i < int(block/epochLengthDefault); i++ {
 		keccak256(seed, seed)
 	}
 	return seed

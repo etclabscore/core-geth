@@ -417,7 +417,7 @@ type Config struct {
 
 	Log log.Logger `toml:"-"`
 	// ECIP-1099
-	EtchashOnBlock *uint64
+	ECIP1099Block *uint64
 }
 
 // Ethash is a consensus engine based on proof-of-work implementing the ethash
@@ -559,7 +559,7 @@ func (ethash *Ethash) Close() error {
 // by first checking against a list of in-memory caches, then against caches
 // stored on disk, and finally generating one if none can be found.
 func (ethash *Ethash) cache(block uint64) *cache {
-	epochLength := calcEpochLength(block, ethash.config.EtchashOnBlock)
+	epochLength := calcEpochLength(block, ethash.config.ECIP1099Block)
 	epoch := calcEpoch(block, epochLength)
 	currentI, futureI := ethash.caches.get(epoch, epochLength)
 	current := currentI.(*cache)
@@ -583,7 +583,7 @@ func (ethash *Ethash) cache(block uint64) *cache {
 // generates on a background thread.
 func (ethash *Ethash) dataset(block uint64, async bool) *dataset {
 	// Retrieve the requested ethash dataset
-	epochLength := calcEpochLength(block, ethash.config.EtchashOnBlock)
+	epochLength := calcEpochLength(block, ethash.config.ECIP1099Block)
 	epoch := calcEpoch(block, epochLength)
 	currentI, futureI := ethash.datasets.get(epoch, epochLength)
 	current := currentI.(*dataset)

@@ -1949,7 +1949,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 				DatasetsInMem:    eth.DefaultConfig.Ethash.DatasetsInMem,
 				DatasetsOnDisk:   eth.DefaultConfig.Ethash.DatasetsOnDisk,
 				DatasetsLockMmap: eth.DefaultConfig.Ethash.DatasetsLockMmap,
-				EtchashOnBlock:   config.GetEthashECIP1099Transition(),
+				ECIP1099Block:   config.GetEthashECIP1099Transition(),
 			}, nil, false)
 		}
 	}

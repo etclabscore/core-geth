@@ -35,8 +35,6 @@ import (
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/core/types"
 	"gonum.org/v1/gonum/stat/distuv"
-
-	exrand "golang.org/x/exp/rand"
 )
 
 const (
@@ -59,7 +57,6 @@ var (
 func (ethash *Ethash) makeFakeDelay() float64 {
 	p := distuv.Poisson{
 		Lambda: float64(ethash.Threads()),
-		Src: exrand.NewSource(uint64(time.Now().UnixNano())),
 	}
 	return p.Rand()
 }

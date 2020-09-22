@@ -550,13 +550,13 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().StringVarP(&reportToFS, "report", "r", "", "Write reporting logs to a given file")
-	rootCmd.Flags().BoolVarP(&reportToStdout, "events-stdout", "e", false, "Write reporting logs to stdoutput")
-	rootCmd.Flags().StringVarP(&endpointsFile, "endpoints", "f", "", "Read newline-deliminted endpoints from this file")
-	rootCmd.Flags().BoolVarP(&readOnly, "read-only", "o", true, "Read only (dont run scenarios)")
-	rootCmd.Flags().StringVarP(&httpAddr, "http", "p", "", "Serve http at endpoint")
-	rootCmd.Flags().BoolVarP(&tls, "tls", "s", false, "Use HTTPS/TLS for websocket and http server")
-	rootCmd.Flags().BoolVarP(&humanNames, "human-names", "n", false, "Use human names for network graph data reports")
+	rootCmd.PersistentFlags().StringVarP(&reportToFS, "report", "r", "", "Write reporting logs to a given file")
+	rootCmd.PersistentFlags().BoolVarP(&reportToStdout, "events-stdout", "e", false, "Write reporting logs to stdoutput")
+	rootCmd.PersistentFlags().StringVarP(&endpointsFile, "endpoints", "f", "", "Read newline-deliminted endpoints from this file")
+	rootCmd.PersistentFlags().BoolVarP(&readOnly, "read-only", "o", true, "Read only (dont run scenarios)")
+	rootCmd.PersistentFlags().StringVarP(&httpAddr, "http", "p", "", "Serve http at endpoint")
+	rootCmd.PersistentFlags().BoolVarP(&tls, "tls", "s", false, "Use HTTPS/TLS for websocket and http server")
+	rootCmd.PersistentFlags().BoolVarP(&humanNames, "human-names", "n", false, "Use human names for network graph data reports")
 }
 
 // initConfig reads in config file and ENV variables if set.

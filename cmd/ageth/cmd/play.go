@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -44,9 +45,14 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		var target io.Reader
+		getTarget := func() io.Reader {
+			return target
+		}
 
 		// HTTP/WS stuff.
 		http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+			log.Info("Websocket connected", "connection", r.RemoteAddr)
+
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 			ws, err := upgrader.Upgrade(w, r, nil)
 			if err != nil {
@@ -56,7 +62,7 @@ to quickly create a Cobra application.`,
 			}
 			defer ws.Close()
 
-			scanner := bufio.NewScanner(target)
+			scanner := bufio.NewScanner(getTarget())
 			//adjust the capacity to your need (max characters in line)
 			const maxCapacity = 1024*1024*8
 			buf := make([]byte, maxCapacity)
@@ -66,13 +72,14 @@ to quickly create a Cobra application.`,
 			for scanner.Scan() {
 				n := NetworkGraphData{}
 				line := scanner.Bytes()
-				err = json.Unmarshal(line, &n)
+				l := json.RawMessage(line)
+				err = json.Unmarshal(l, &n)
 				if err != nil {
-					log.Warn("Scan failed to parse network graphic data from line", "line", string(line))
+					log.Error("Scan failed to parse network graphic data from line", "line", lineN, "error", err)
+				} else {
+					log.Info("Scanned", "line", lineN)
 				}
 
-
-				log.Info("Scanned", "line", lineN)
 				if n.Tick == 0 {
 					n.Tick = lineN
 				}
@@ -121,6 +128,12 @@ to quickly create a Cobra application.`,
 				writer.WriteHeader(http.StatusInternalServerError)
 				return
 			}
+
+			// Only support local servitude.
+			u, _ := url.Parse("ws://127.0.0.1"+httpAddr)
+			u.Path = "ws"
+			b = bytes.Replace(b, []byte("WEBSOCKET_URL"), []byte(u.String()), 1)
+
 			_, err = writer.Write(b)
 			if err != nil {
 				log.Error("Write index.html errored", "error", err)
@@ -131,8 +144,8 @@ to quickly create a Cobra application.`,
 
 		// startLocal server
 		go func() {
-			log.Info("Ready to play at http://localhost:8008 ▶")
-			if err := http.ListenAndServe(":8008", nil); err != nil {
+			log.Info("Ready to play ▶", "addr", httpAddr)
+			if err := http.ListenAndServe(httpAddr, nil); err != nil {
 				llog.Fatal(err)
 			}
 		}()

@@ -6,16 +6,15 @@ import (
 
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 type Node struct {
-	Name      string `json:"name"`
-	HeadHash  string `json:"headHash"`
-	HeadNum   uint64 `json:"headNum"`
-	HeadBase  string `json:"headBase"`
-	HeadMiner bool   `json:"headMiner"`
-	HeadD     uint64 `json:"headD"` // Difficulty
+	Name      string   `json:"name"`
+	HeadHash  string   `json:"headHash"`
+	HeadNum   uint64   `json:"headNum"`
+	HeadBase  string   `json:"headBase"`
+	HeadMiner bool     `json:"headMiner"`
+	HeadD     uint64   `json:"headD"` // Difficulty
 	HeadTD    *big.Int `json:"headTD"`
 }
 
@@ -37,8 +36,10 @@ func (n *Node) UnmarshalJSON(bytes []byte) error {
 
 		HeadD uint64 `json:"headD` // Difficulty
 
-		HeadTD *hexutil.Big `json:"headTD"`
-		TD     *hexutil.Big `json:"td"`
+		// HeadTD *hexutil.Big `json:"headTD"`
+		// TD     *hexutil.Big `json:"td"`
+		HeadTD *big.Int `json:"headTD"`
+		TD     *big.Int `json:"td"`
 	}{}
 	err := json.Unmarshal(bytes, &im)
 	if err != nil {
@@ -69,11 +70,12 @@ func (n *Node) UnmarshalJSON(bytes []byte) error {
 	}
 
 	n.HeadD = im.HeadD
+	n.HeadTD = im.HeadTD
 
-	n.HeadTD = im.HeadTD.ToInt()
-	if big.NewInt(0).Cmp(im.TD.ToInt()) == 0 {
-		n.HeadTD = im.TD.ToInt()
-	}
+	// n.HeadTD = im.HeadTD.ToInt()
+	// if big.NewInt(0).Cmp(im.TD.ToInt()) == 0 {
+	// 	n.HeadTD = im.TD.ToInt()
+	// }
 	return nil
 }
 

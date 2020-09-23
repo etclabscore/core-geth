@@ -86,21 +86,37 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 	proposedSubchainTD := new(big.Int).Sub(proposedTD, commonAncestorTD)
 	localSubchainTD := new(big.Int).Sub(localTD, commonAncestorTD)
 
-	got := proposedSubchainTD.Int64() * ecbp1100PolynomialVCurveFunctionDenominator
-	want := ecbp1100PolynomialV(int64(proposed.Time - commonAncestor.Time)) * localSubchainTD.Int64()
+	xBig := big.NewInt(int64(proposed.Time - commonAncestor.Time))
+	eq := ecbp1100PolynomialV(xBig)
+	want := eq.Mul(eq, localSubchainTD)
 
-	if got < want {
-		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v blocks=%d rat=%0.6f`,
+	got := new(big.Int).Mul(proposedSubchainTD, ecbp1100PolynomialVCurveFunctionDenominator)
+
+	prettyRatio, _ := new(big.Float).Quo(
+		new(big.Float).SetInt(got),
+		new(big.Float).SetInt(want),
+	).Float64()
+
+	if got.Cmp(want) < 0 {
+		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v current.span=%v proposed.span=%v common.bno=%d current.bno=%d proposed.bno=%d tdr/gravity=%0.6f`,
 			errReorgFinality,
-			common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)), proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
-			float64(got) / float64(want),
+			common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
+			common.PrettyDuration(time.Duration(current.Time - commonAncestor.Time)*time.Second),
+			common.PrettyDuration(time.Duration(int32(xBig.Uint64()))*time.Second),
+			commonAncestor.Number.Uint64(),
+			current.Number.Uint64(), proposed.Number.Uint64(),
+			prettyRatio,
 		)
 	}
 	log.Info("ECBP1100-MESS 🔓",
 		"status", "accepted",
 		"age", common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
-		"blocks", proposed.Number.Uint64()-commonAncestor.Number.Uint64(),
-		"rat", float64(got) / float64(want),
+		"current.span", common.PrettyDuration(time.Duration(current.Time - commonAncestor.Time)*time.Second),
+		"proposed.span", common.PrettyDuration(time.Duration(int32(xBig.Uint64()))*time.Second),
+		"common.bno", commonAncestor.Number.Uint64(),
+		"current.bno", current.Number.Uint64(),
+		"proposed.bno", proposed.Number.Uint64(),
+		"tdr/gravity", prettyRatio,
 	)
 	return nil
 }
@@ -126,18 +142,78 @@ The if tdRatio < antiGravity check would then be
 
 if proposed_subchain_td * CURVE_FUNCTION_DENOMINATOR < get_curve_function_numerator(proposed.Time - commonAncestor.Time) * local_subchain_td.
 */
-func ecbp1100PolynomialV(x int64) int64 {
-	if x > ecbp1100PolynomialVXCap {
-		x = ecbp1100PolynomialVXCap
-	}
-	return ecbp1100PolynomialVCurveFunctionDenominator +
-		((3 * emath.BigPow(int64(x), 2).Int64()) - (2 * emath.BigPow(int64(x), 3).Int64() / ecbp1100PolynomialVXCap)) *
-		ecbp1100PolynomialVHeight / (emath.BigPow(ecbp1100PolynomialVXCap, 2).Int64())
+func ecbp1100PolynomialV(x *big.Int) *big.Int {
+
+	// Make a copy; do not mutate argument value.
+
+	// if x > xcap:
+	//    x = xcap
+	xA := big.NewInt(0)
+	xA.Set(emath.BigMin(x, ecbp1100PolynomialVXCap))
+
+	xB := big.NewInt(0)
+	xB.Set(emath.BigMin(x, ecbp1100PolynomialVXCap))
+
+	out := big.NewInt(0)
+
+	// 3 * x**2
+	xA.Exp(xA, big2, nil)
+	xA.Mul(xA, big3)
+
+	// 3 * x**2 // xcap
+	xB.Exp(xB, big3, nil)
+	xB.Mul(xB, big2)
+	xB.Div(xB, ecbp1100PolynomialVXCap)
+
+	// (3 * x**2 - 2 * x**3 // xcap)
+	out.Sub(xA, xB)
+
+	// // (3 * x**2 - 2 * x**3 // xcap) * height
+	out.Mul(out, ecbp1100PolynomialVHeight)
+
+	// xcap ** 2
+	xcap2 := new(big.Int).Exp(ecbp1100PolynomialVXCap, big2, nil)
+
+	// (3 * x**2 - 2 * x**3 // xcap) * height // xcap ** 2
+	out.Div(out, xcap2)
+
+	// CURVE_FUNCTION_DENOMINATOR + (3 * x**2 - 2 * x**3 // xcap) * height // xcap ** 2
+	out.Add(out, ecbp1100PolynomialVCurveFunctionDenominator)
+	return out
 }
-var ecbp1100PolynomialVCurveFunctionDenominator = int64(128)
-var ecbp1100PolynomialVXCap = int64(25132)
-var ecbp1100PolynomialVAmpl = int64(15)
-var ecbp1100PolynomialVHeight = ecbp1100PolynomialVCurveFunctionDenominator * ecbp1100PolynomialVAmpl * 2
+
+var big0 = big.NewInt(0)
+var big2 = big.NewInt(2)
+var big3 = big.NewInt(3)
+
+// ecbp1100PolynomialVCurveFunctionDenominator
+// CURVE_FUNCTION_DENOMINATOR = 128
+var ecbp1100PolynomialVCurveFunctionDenominator = big.NewInt(128)
+
+// ecbp1100PolynomialVXCap
+// xcap = 25132 # = floor(8000*pi)
+var ecbp1100PolynomialVXCap = big.NewInt(25132)
+
+// ecbp1100PolynomialVAmpl
+// ampl = 15
+var ecbp1100PolynomialVAmpl = big.NewInt(15)
+
+// ecbp1100PolynomialVHeight
+// height = CURVE_FUNCTION_DENOMINATOR * (ampl * 2)
+var ecbp1100PolynomialVHeight = new(big.Int).Mul(new(big.Int).Mul(ecbp1100PolynomialVCurveFunctionDenominator, ecbp1100PolynomialVAmpl), big2)
+
+// func ecbp1100PolynomialV(x int64) int64 {
+// 	if x > ecbp1100PolynomialVXCap {
+// 		x = ecbp1100PolynomialVXCap
+// 	}
+// 	return ecbp1100PolynomialVCurveFunctionDenominator +
+// 		((3 * emath.BigPow(int64(x), 2).Int64()) - (2 * emath.BigPow(int64(x), 3).Int64() / ecbp1100PolynomialVXCap)) *
+// 		ecbp1100PolynomialVHeight / (emath.BigPow(ecbp1100PolynomialVXCap, 2).Int64())
+// }
+// var ecbp1100PolynomialVCurveFunctionDenominator = int64(128)
+// var ecbp1100PolynomialVXCap = int64(25132)
+// var ecbp1100PolynomialVAmpl = int64(15)
+// var ecbp1100PolynomialVHeight = ecbp1100PolynomialVCurveFunctionDenominator * ecbp1100PolynomialVAmpl * 2
 
 /*
 ecbp1100AGSinusoidalA is a sinusoidal function.
@@ -183,3 +259,4 @@ f(x)=1.0001^(x)
 func ecbp1100AGExpA(x float64) (antiGravity float64) {
 	return math.Pow(1.0001, x)
 }
+

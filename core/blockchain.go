@@ -1413,28 +1413,16 @@ func (bc *BlockChain) writeBlockWithoutState(block *types.Block, td *big.Int) (e
 	return nil
 }
 
-// writeKnownBlock updates the head block flag with a known block
+// writeKnownBlockAsHead updates the head block flag with a known block
 // and introduces chain reorg if necessary.
-func (bc *BlockChain) writeKnownBlock(block *types.Block) error {
+// In ethereum/go-ethereum this is called writeKnownBlock. Same logic, better name.
+func (bc *BlockChain) writeKnownBlockAsHead(block *types.Block) error {
 	bc.wg.Add(1)
 	defer bc.wg.Done()
 
 	current := bc.CurrentBlock()
 	if block.ParentHash() != current.Hash() {
 		d := bc.getReorgData(current, block)
-		if d.err == nil {
-			// Reorg data error was nil.
-			// Proceed with further reorg arbitration.
-
-			// If the node is mining and trying to insert their own block, we want to allow that.
-			minerOwn := bc.shouldPreserve != nil && bc.shouldPreserve(block)
-			if (bc.shouldPreserve == nil || !minerOwn) &&
-				bc.IsArtificialFinalityEnabled() &&
-				bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, current.Number()) {
-
-				d.err = bc.ecbp1100(d.commonBlock.Header(), current.Header(), block.Header())
-			}
-		}
 		if err := bc.reorg(d); err != nil {
 			return err
 		}
@@ -1558,6 +1546,9 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 	}
 
 	if reorg {
+		// If code reaches AF check, and it does not error, canonical status will be allowed (not disallowed).
+		canonicalDisallowed := false
+
 		if block.ParentHash() != currentBlock.Hash() {
 			// Reorganise the chain if the parent is not the head block
 			d := bc.getReorgData(currentBlock, block)
@@ -1565,16 +1556,25 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 				// Reorg data error was nil.
 				// Proceed with further reorg arbitration.
 				if bc.IsArtificialFinalityEnabled() && bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, currentBlock.Number()) {
-					d.err = bc.ecbp1100(d.commonBlock.Header(), currentBlock.Header(), block.Header())
+					if err := bc.ecbp1100(d.commonBlock.Header(), currentBlock.Header(), block.Header()); err != nil {
+						log.Warn("Reorg disallowed", "error", err)
+						canonicalDisallowed = true
+					}
 				}
 			}
-			// We leave the error to the reorg method to handle, if it wants to wrap it or log it or whatever.
-			if err := bc.reorg(d); err != nil {
-				return NonStatTy, err
+			// If there is an error, we leave it to the reorg method to handle, if it wants to wrap it or log it or whatever.
+			if !canonicalDisallowed {
+				if err := bc.reorg(d); err != nil {
+					return NonStatTy, err
+				}
 			}
 		}
 		// Status is canon; reorg succeeded.
-		status = CanonStatTy
+		if !canonicalDisallowed {
+			status = CanonStatTy
+		} else {
+			status = SideStatTy
+		}
 	} else {
 		status = SideStatTy
 	}
@@ -1717,15 +1717,53 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 			externTd = bc.GetTd(block.ParentHash(), block.NumberU64()-1) // The first block can't be nil
 		)
 		for block != nil && err == ErrKnownBlock {
+			finalityDisallowed := false
 			externTd = new(big.Int).Add(externTd, block.Difficulty())
 			if localTd.Cmp(externTd) < 0 {
-				break
+				// Have found a known block with GREATER THAN local total difficulty.
+				// Do not ignore this block, and as such, do not continue inserter iteration.
+
+				// Check if known block write will cause a reorg.
+				if block.ParentHash() != current.Hash() {
+					reorgData := bc.getReorgData(current, block)
+					if reorgData.err == nil {
+						// If the reorgData is NOT nil, we know that the writeKnownBlockAsHead -> reorg
+						// logic will return the error.
+						// We let that part of the flow handle that error.
+						// We're only concerned with the non-error case, where the reorg
+						// will be permitted.
+
+						// It will. That means we are on a different chain currently.
+						// Check if artificial finality forbids the reorganization,
+						// effectively overriding the simple (original) TD comparison check.
+						minerOwn := bc.shouldPreserve != nil && bc.shouldPreserve(block)
+						if (bc.shouldPreserve == nil || !minerOwn) &&
+							bc.IsArtificialFinalityEnabled() &&
+							bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, current.Number()) {
+
+							if err := bc.ecbp1100(reorgData.commonBlock.Header(), current.Header(), block.Header()); err != nil {
+								log.Warn("Reorg disallowed", "error", err)
+								finalityDisallowed = true
+							}
+						}
+					}
+				}
+				if !finalityDisallowed {
+					break
+				}
+				// finalityDisallowed == true
+				// Total difficulty was greater, but that condition has been overridden by the artificial
+				// finality check. Continue like nothing happened.
 			}
+
+			// Local vs. External total difficulty was less than or equal.
+			// This block is deep in our chain and is not a head contender.
 			log.Debug("Ignoring already known block", "number", block.Number(), "hash", block.Hash())
 			stats.ignored++
 
 			block, err = it.next()
 		}
+
 		// The remaining blocks are still known blocks, the only scenario here is:
 		// During the fast sync, the pivot point is already submitted but rollback
 		// happens. Then node resets the head full block to a lower height via `rollback`
@@ -1735,8 +1773,9 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 		// `insertChain` while a part of them have higher total difficulty than current
 		// head full block(new pivot point).
 		for block != nil && err == ErrKnownBlock {
+
 			log.Debug("Writing previously known block", "number", block.Number(), "hash", block.Hash())
-			if err := bc.writeKnownBlock(block); err != nil {
+			if err := bc.writeKnownBlockAsHead(block); err != nil {
 				return it.index, err
 			}
 			lastCanon = block
@@ -1813,7 +1852,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 				log.Error("Please file an issue, skip known block execution without receipt",
 					"hash", block.Hash(), "number", block.NumberU64())
 			}
-			if err := bc.writeKnownBlock(block); err != nil {
+			if err := bc.writeKnownBlockAsHead(block); err != nil {
 				return it.index, err
 			}
 			stats.processed++

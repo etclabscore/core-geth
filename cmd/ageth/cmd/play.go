@@ -62,37 +62,50 @@ to quickly create a Cobra application.`,
 			}
 			defer ws.Close()
 
+			payload := NetworkGraphData{
+				Nodes: []Node{},
+				Links: []Link{},
+			}
+			payload.Tick = 0
+			err = ws.WriteJSON(Event{
+				Typ:     "state",
+				Payload: payload,
+			})
+			if err != nil {
+				log.Debug("Write WS event errored", "error", err)
+			}
+
 			scanner := bufio.NewScanner(getTarget())
 			//adjust the capacity to your need (max characters in line)
 			const maxCapacity = 1024*1024*8
 			buf := make([]byte, maxCapacity)
 			scanner.Buffer(buf, maxCapacity)
 
-			lineN := 0
+			lineN := 1
 			for scanner.Scan() {
 				n := NetworkGraphData{}
 				line := scanner.Bytes()
-				l := json.RawMessage(line)
-				err = json.Unmarshal(l, &n)
+				// l := json.RawMessage(line)
+				err = json.Unmarshal(line, &n)
 				if err != nil {
 					log.Error("Scan failed to parse network graphic data from line", "line", lineN, "error", err)
 				} else {
 					log.Info("Scanned", "line", lineN)
+
+					err := ws.WriteJSON(Event{
+						Typ:     "state",
+						Payload: n,
+					})
+					if err != nil {
+						log.Warn("Write WS event errored", "error", err)
+					}
+					if n.Tick == 0 {
+						n.Tick = lineN
+					}
+
 				}
 
-				if n.Tick == 0 {
-					n.Tick = lineN
-				}
-
-				err := ws.WriteJSON(Event{
-					Typ:     "state",
-					Payload: n,
-				})
-				if err != nil {
-					log.Warn("Write WS event errored", "error", err)
-				}
-
-				time.Sleep(50*time.Millisecond)
+				time.Sleep(150*time.Millisecond)
 				lineN++
 			}
 		})

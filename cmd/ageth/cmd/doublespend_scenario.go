@@ -56,7 +56,8 @@ func stabilize2(nodes *agethSet) {
 	// slowly to eventually depress the hashrate/difficulty values.
 	// Scenarios are responsible for turning mining off at the beginning of
 	// their run as desired.
-	pacing.startMining(60)
+	pacing.startMining(10)
+	defer pacing.startMining(60)
 
 	pacingNewHeadC := make(chan *types.Header)
 	pacing.registerNewHeadCallback(func(a *ageth, header *types.Header) {
@@ -85,7 +86,7 @@ func stabilize2(nodes *agethSet) {
 				time.Sleep(assumePropagationTime)
 
 				chains = nodes.chains()
-				if len(chains) == 1 {
+				if len(chains) == 1 && nodes.headMin() > 1 {
 					logStatus("Done stabilizing")
 					done <- struct{}{}
 					return

@@ -98,8 +98,8 @@ func mustStartGethInstance(gethPath, id string) (*exec.Cmd, io.ReadCloser, strin
 		"--nodiscover",
 
 		"--metrics",
-		"--metrics.influxdb",
-		"--metrics.influxdb.database", "db0",
+		// "--metrics.influxdb",
+		// "--metrics.influxdb.database", "db0",
 
 		// "--mine", "--miner.threads", "0",
 		// "--vmodule=eth/*=5,p2p=5,core/*=5",

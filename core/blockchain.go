@@ -1575,6 +1575,7 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 							"current.bno", currentBlock.Number().Uint64(), "current.hash", currentBlock.Hash(),
 							"proposed.bno", block.Number().Uint64(), "proposed.hash", block.Hash(),
 						)
+					}
 				}
 			}
 			// We leave the error to the reorg method to handle, if it wants to wrap it or log it or whatever.

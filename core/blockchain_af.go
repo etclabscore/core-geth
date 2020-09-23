@@ -101,7 +101,7 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v current.span=%v proposed.span=%v tdr/gravity=%0.6f common.bno=%d common.hash=%s current.bno=%d current.hash=%s proposed.bno=%d proposed.hash=%s`,
 			errReorgFinality,
 			common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
-			common.PrettyDuration(time.Duration(current.Time - commonAncestor.Time)*time.Second),
+			common.PrettyDuration(time.Duration(current.Time-commonAncestor.Time)*time.Second),
 			common.PrettyDuration(time.Duration(int32(xBig.Uint64()))*time.Second),
 			prettyRatio,
 			commonAncestor.Number.Uint64(), commonAncestor.Hash().Hex(),
@@ -173,7 +173,6 @@ func ecbp1100PolynomialV(x *big.Int) *big.Int {
 	return out
 }
 
-var big0 = big.NewInt(0)
 var big2 = big.NewInt(2)
 var big3 = big.NewInt(3)
 
@@ -195,15 +194,16 @@ var ecbp1100PolynomialVHeight = new(big.Int).Mul(new(big.Int).Mul(ecbp1100Polyno
 
 /*
 ecbp1100PolynomialVI64 is an int64 implementation of ecbp1100PolynomialV.
- */
+*/
 func ecbp1100PolynomialVI64(x int64) int64 {
 	if x > ecbp1100PolynomialVXCapI64 {
 		x = ecbp1100PolynomialVXCapI64
 	}
 	return ecbp1100PolynomialVCurveFunctionDenominatorI64 +
-		((3 * emath.BigPow(int64(x), 2).Int64()) - (2 * emath.BigPow(int64(x), 3).Int64() / ecbp1100PolynomialVXCapI64)) *
-		ecbp1100PolynomialVHeightI64 / (emath.BigPow(ecbp1100PolynomialVXCapI64, 2).Int64())
+		((3*emath.BigPow(x, 2).Int64())-(2*emath.BigPow(x, 3).Int64()/ecbp1100PolynomialVXCapI64))*
+			ecbp1100PolynomialVHeightI64/(emath.BigPow(ecbp1100PolynomialVXCapI64, 2).Int64())
 }
+
 var ecbp1100PolynomialVCurveFunctionDenominatorI64 = int64(128)
 var ecbp1100PolynomialVXCapI64 = int64(25132)
 var ecbp1100PolynomialVAmplI64 = int64(15)
@@ -253,4 +253,3 @@ f(x)=1.0001^(x)
 func ecbp1100AGExpA(x float64) (antiGravity float64) {
 	return math.Pow(1.0001, x)
 }
-

@@ -440,7 +440,7 @@ will hit writeBlockWithState.
 
 AF needs to be implemented at both sites to prevent re-proposed chains from sidestepping
 the AF criteria.
- */
+*/
 func TestAFKnownBlock(t *testing.T) {
 	engine := ethash.NewFaker()
 
@@ -556,7 +556,6 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 	}
 	t.Log(chain.CurrentBlock().Number())
 }
-
 
 func TestBlockChain_AF_Difficulty_Develop(t *testing.T) {
 	t.Skip("Development version of tests with plotter")

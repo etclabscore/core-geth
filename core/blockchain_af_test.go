@@ -300,6 +300,32 @@ func TestBlockChain_AF_ECBP1100_2(t *testing.T) {
 			0, -9,
 			true, true,
 		},
+		{
+			1000, 999, 1,
+			0, -8,
+			false, true,
+		},
+		{
+			1000, 500, 500,
+			0, -8,
+			true, true,
+		},
+		{
+			1000, 500, 500,
+			0, -7,
+			false, true,
+		},
+		{
+			1000, 300, 700,
+			0, -7,
+			false, true,
+		},
+		// Will pass, takes a long time.
+		// {
+		// 	5000, 4000, 1000,
+		// 	0, -9,
+		// 	true, true,
+		// },
 	}
 
 	for i, c := range cases {

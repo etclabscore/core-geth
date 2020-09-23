@@ -86,7 +86,7 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 	proposedSubchainTD := new(big.Int).Sub(proposedTD, commonAncestorTD)
 	localSubchainTD := new(big.Int).Sub(localTD, commonAncestorTD)
 
-	xBig := big.NewInt(int64(proposed.Time - commonAncestor.Time))
+	xBig := big.NewInt(int64(current.Time - commonAncestor.Time))
 	eq := ecbp1100PolynomialV(xBig)
 	want := eq.Mul(eq, localSubchainTD)
 

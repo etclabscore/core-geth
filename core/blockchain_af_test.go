@@ -340,10 +340,10 @@ func TestBlockChain_AF_ECBP1100_2(t *testing.T) {
 }
 
 func TestBlockChain_GenerateMESSPlot(t *testing.T) {
-	t.Skip("This test plots graph of chain acceptance for visualization.")
+	// t.Skip("This test plots graph of chain acceptance for visualization.")
 
-	easyLen := 200
-	maxHardLen := 100
+	easyLen := 500
+	maxHardLen := 400
 
 	generatePlot := func(title, fileName string) {
 		p, err := plot.New()
@@ -352,7 +352,7 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 		}
 		p.Title.Text = title
 		p.X.Label.Text = "Block Depth"
-		p.Y.Label.Text = "Relative Block Time Delta (10 seconds + y)"
+		p.Y.Label.Text = "Mode Block Time Offset (10 seconds + y)"
 
 		accepteds := plotter.XYs{}
 		rejecteds := plotter.XYs{}
@@ -414,7 +414,7 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 	baseTitle := fmt.Sprintf("Accept/Reject Reorgs: Relative Time (Difficulty) over Proposed Segment Length (%d-block original chain)", easyLen)
 	generatePlot(baseTitle, "reorgs-MESS.png")
 	yuckyGlobalTestEnableMess = false
-	generatePlot("WITHOUT MESS: "+baseTitle, "reorgs-noMESS.png")
+	// generatePlot("WITHOUT MESS: "+baseTitle, "reorgs-noMESS.png")
 }
 
 func TestEcbp1100AGSinusoidalA(t *testing.T) {

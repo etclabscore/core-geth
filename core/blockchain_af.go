@@ -98,26 +98,17 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 	).Float64()
 
 	if got.Cmp(want) < 0 {
-		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v current.span=%v proposed.span=%v common.bno=%d current.bno=%d proposed.bno=%d tdr/gravity=%0.6f`,
+		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v current.span=%v proposed.span=%v tdr/gravity=%0.6f common.bno=%d common.hash=%s current.bno=%d current.hash=%s proposed.bno=%d proposed.hash=%s`,
 			errReorgFinality,
 			common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
 			common.PrettyDuration(time.Duration(current.Time - commonAncestor.Time)*time.Second),
 			common.PrettyDuration(time.Duration(int32(xBig.Uint64()))*time.Second),
-			commonAncestor.Number.Uint64(),
-			current.Number.Uint64(), proposed.Number.Uint64(),
 			prettyRatio,
+			commonAncestor.Number.Uint64(), commonAncestor.Hash().Hex(),
+			current.Number.Uint64(), current.Hash().Hex(),
+			proposed.Number.Uint64(), proposed.Hash().Hex(),
 		)
 	}
-	log.Info("ECBP1100-MESS 🔓",
-		"status", "accepted",
-		"age", common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
-		"current.span", common.PrettyDuration(time.Duration(current.Time - commonAncestor.Time)*time.Second),
-		"proposed.span", common.PrettyDuration(time.Duration(int32(xBig.Uint64()))*time.Second),
-		"common.bno", commonAncestor.Number.Uint64(),
-		"current.bno", current.Number.Uint64(),
-		"proposed.bno", proposed.Number.Uint64(),
-		"tdr/gravity", prettyRatio,
-	)
 	return nil
 }
 

@@ -314,7 +314,7 @@ func TestBlockChain_AF_ECBP1100_2(t *testing.T) {
 }
 
 func TestBlockChain_GenerateMESSPlot(t *testing.T) {
-	t.Skip("This test plots graph of chain acceptance for visualization.")
+	// t.Skip("This test plots graph of chain acceptance for visualization.")
 
 	easyLen := 200
 	maxHardLen := 100
@@ -462,7 +462,7 @@ func TestPlot_ecbp1100PolynomialV(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	p.Title.Text = "Functions"
+	p.Title.Text = "ECBP1100 Polynomial Curve Function"
 	p.X.Label.Text = "X"
 	p.Y.Label.Text = "Y"
 
@@ -475,9 +475,12 @@ func TestPlot_ecbp1100PolynomialV(t *testing.T) {
 	p.Add(poly)
 
 	p.X.Min = 0
-	p.X.Max = 100000
+	p.X.Max = 30000
 	p.Y.Min = 0
 	p.Y.Max = 5000
+
+	p.Y.Label.Text = "Antigravity imposition"
+	p.X.Label.Text = "Seconds difference between local head and proposed common ancestor"
 
 	if err := p.Save(1000, 1000, "ecbp1100-polynomial.png"); err != nil {
 		t.Fatal(err)

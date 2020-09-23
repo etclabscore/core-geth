@@ -1562,12 +1562,26 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 					bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, currentBlock.Number()) {
 
 					if err := bc.ecbp1100(d.commonBlock.Header(), currentBlock.Header(), block.Header()); err != nil {
-						log.Warn("Reorg disallowed", "error", err)
+
 						canonicalDisallowed = true
+						log.Warn("Reorg disallowed", "error", err)
+
+					} else if len(d.oldChain) > 3 {
+
+						// Reorg is allowed, only log the MESS line if old chain is longer than normal.
+						log.Info("ECBP1100-MESS 🔓",
+							"status", "accepted",
+							"age", common.PrettyAge(time.Unix(int64(d.commonBlock.Time()), 0)),
+							"current.span", common.PrettyDuration(time.Duration(currentBlock.Time()-d.commonBlock.Time())*time.Second),
+							"proposed.span", common.PrettyDuration(time.Duration(int32(block.Time()))*time.Second),
+							"common.bno", d.commonBlock.Number().Uint64(), "common.hash", d.commonBlock.Hash(),
+							"current.bno", currentBlock.Number().Uint64(), "current.hash", currentBlock.Hash(),
+							"proposed.bno", block.Number().Uint64(), "proposed.hash", block.Hash(),
+						)
 					}
 				}
 			}
-			// If there is an error, we leave it to the reorg method to handle, if it wants to wrap it or log it or whatever.
+			// If there was a reorg(data) error, we leave it to the reorg method to handle, if it wants to wrap it or log it or whatever.
 			if !canonicalDisallowed {
 				if err := bc.reorg(d); err != nil {
 					return NonStatTy, err
@@ -1722,7 +1736,12 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 			externTd = bc.GetTd(block.ParentHash(), block.NumberU64()-1) // The first block can't be nil
 		)
 		for block != nil && err == ErrKnownBlock {
-			finalityDisallowed := false
+
+			// canonicalDisallowed is set to true if the total difficulty is greater than
+			// our local head, but the segment fails to meet the criteria required by any artificial finality features,
+			// namely that it requires a reorg (parent != current) and does not meet an inflated difficulty ratio.
+			canonicalDisallowed := false
+
 			externTd = new(big.Int).Add(externTd, block.Difficulty())
 			if localTd.Cmp(externTd) < 0 {
 				// Have found a known block with GREATER THAN local total difficulty.
@@ -1747,16 +1766,18 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 							bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, current.Number()) {
 
 							if err := bc.ecbp1100(reorgData.commonBlock.Header(), current.Header(), block.Header()); err != nil {
-								log.Warn("Reorg disallowed", "error", err)
-								finalityDisallowed = true
+
+								canonicalDisallowed = true
+								log.Trace("Reorg disallowed", "error", err)
+
 							}
 						}
 					}
 				}
-				if !finalityDisallowed {
+				if !canonicalDisallowed {
 					break
 				}
-				// finalityDisallowed == true
+				// canonicalDisallowed == true
 				// Total difficulty was greater, but that condition has been overridden by the artificial
 				// finality check. Continue like nothing happened.
 			}

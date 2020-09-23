@@ -9,11 +9,13 @@ import (
 	"math/rand"
 	"testing"
 
+	emath "github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
@@ -413,6 +415,196 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 	}()
 	baseTitle := fmt.Sprintf("Accept/Reject Reorgs: Relative Time (Difficulty) over Proposed Segment Length (%d-block original chain)", easyLen)
 	generatePlot(baseTitle, "reorgs-MESS.png")
+	yuckyGlobalTestEnableMess = false
+	// generatePlot("WITHOUT MESS: "+baseTitle, "reorgs-noMESS.png")
+}
+
+// Some weird constants to avoid constant memory allocs for them.
+var (
+	bigMinus99 = big.NewInt(-99)
+	big1       = big.NewInt(1)
+)
+
+func TestBlockChain_GenerateMESSPlot_2(t *testing.T) {
+	// t.Skip("This test plots graph of chain acceptance for visualization.")
+
+	easyLen := uint64(2000)
+	maxHardLen := uint64(1900)
+
+	totalDifficulty := func(segment []*big.Int) *big.Int {
+		out := big.NewInt(0)
+		for _, b := range segment {
+			out.Add(out, b)
+		}
+		return out
+	}
+
+	generatePlot := func(title, fileName string, useProposedSpan bool) {
+		p, err := plot.New()
+		if err != nil {
+			log.Panic(err)
+		}
+		p.Title.Text = title
+		p.X.Label.Text = "Block Depth"
+		p.Y.Label.Text = "Mode Block Time Offset (10 seconds + y)"
+
+		accepteds := plotter.XYs{}
+		rejecteds := plotter.XYs{}
+		sides := plotter.XYs{}
+
+		/*
+			need:
+			- array of block difficulties as big.Ints
+				: determined by time offsets, and initial time
+		*/
+
+		generateDifficultySet := func(initDifficulty *big.Int, offset uint64, length int) []*big.Int {
+			parentDiff := new(big.Int).Set(initDifficulty)
+			outset := []*big.Int{}
+			for i := 0; i < length; i++ {
+				// https://github.com/ethereum/EIPs/issues/100
+				// algorithm:
+				// diff = (parent_diff +
+				//         (parent_diff / 2048 * max((2 if len(parent.uncles) else 1) - ((timestamp - parent.timestamp) // 9), -99))
+				//        ) + 2^(periodCount - 2)
+				out := new(big.Int)
+				out.Div(new(big.Int).SetUint64(offset), vars.EIP100FDifficultyIncrementDivisor)
+
+				// if parent.UncleHash == types.EmptyUncleHash {
+				// 	out.Sub(big1, out)
+				// } else {
+				// 	out.Sub(big2, out)
+				// }
+				out.Sub(big1, out)
+
+				out.Set(emath.BigMax(out, bigMinus99))
+
+				out.Mul(new(big.Int).Div(parentDiff, vars.DifficultyBoundDivisor), out)
+				out.Add(out, parentDiff)
+
+				// after adjustment and before bomb
+				out.Set(emath.BigMax(out, vars.MinimumDifficulty))
+
+				parentDiff.Set(out) // set for next iteration
+
+				outset = append(outset, out)
+			}
+			return outset
+		}
+
+		easy := generateDifficultySet(
+			params.DefaultMessNetGenesisBlock().Difficulty,
+			uint64(10),
+			int(easyLen),
+		)
+
+		for proposedBlocksLen := uint64(1); proposedBlocksLen <= maxHardLen; proposedBlocksLen++ {
+			for hardOffset := uint64(1); hardOffset <= 18; hardOffset++ {
+				fmt.Println("running", proposedBlocksLen, hardOffset)
+
+				// hard generates the proposed subchain
+				easyOffset := uint64(10)
+				hardOffset := uint64(hardOffset)
+
+				// fitBlocks accounts for the number of blocks
+				// produceable in a time span when you're making
+				// them faster (10 blocks in 10 seconds with 1-second offsets,
+				// vs 1 block in 10 seconds with 10-second offset)
+				fitBlocks := easyOffset / hardOffset // 10:1 => 10, 10:2 => 5
+				if fitBlocks == 0 {
+					fitBlocks = uint64(proposedBlocksLen) // hard.len
+				} else {
+					fitBlocks = uint64(proposedBlocksLen) / fitBlocks
+				}
+
+				hard := generateDifficultySet(
+					// easy[len(easy)-proposedBlocksLen], // offset = hard.len / fitBlocks
+					easy[uint64(len(easy))-proposedBlocksLen], // offset = hard.len / fitBlocks
+					hardOffset,
+					int(proposedBlocksLen),
+				)
+
+				// localTD := totalDifficulty(easy[len(easy)-proposedBlocksLen:])
+				// localTD := totalDifficulty(easy)
+
+				overwrittenEasyBlocks := fitBlocks
+				if overwrittenEasyBlocks > easyOffset *proposedBlocksLen {
+					overwrittenEasyBlocks = easyOffset * proposedBlocksLen
+				}
+
+				localTD := totalDifficulty(easy[uint64(len(easy))-overwrittenEasyBlocks:])
+				propTD := totalDifficulty(hard)
+
+				localSpan := int64(overwrittenEasyBlocks * 10)
+				xBig := big.NewInt(localSpan)
+				if useProposedSpan {
+					propSpan := int64(proposedBlocksLen * hardOffset)
+					xBig = big.NewInt(propSpan)
+				}
+
+				eq := ecbp1100PolynomialV(xBig)
+
+				want := eq.Mul(eq, localTD)
+
+				got := new(big.Int).Mul(propTD, ecbp1100PolynomialVCurveFunctionDenominator)
+
+				nogo := got.Cmp(want) < 0
+
+				point := plotter.XY{X: float64(proposedBlocksLen), Y: float64(hardOffset)}
+
+				ok := true
+				if localTD.Cmp(propTD) == 0 && rand.Float64() < 0.5 {
+					ok = false
+				}
+				ok = ok && !nogo
+
+				// ok := eyalSirer || !nogo
+				if nogo {
+					// Would be side chain
+					sides = append(sides, point)
+				} else {
+					accepteds = append(accepteds, point)
+				}
+			}
+		}
+
+		scatterAccept, _ := plotter.NewScatter(accepteds)
+		scatterReject, _ := plotter.NewScatter(rejecteds)
+		scatterSide, _ := plotter.NewScatter(sides)
+
+		pixelWidth := vg.Length(maxHardLen * 110 / 100)
+
+		scatterAccept.Color = color.RGBA{R: 0, G: 200, B: 11, A: 255}
+		scatterAccept.Shape = draw.BoxGlyph{}
+		scatterAccept.Radius = vg.Length((float64(pixelWidth) / float64(maxHardLen)) * 2 / 3)
+		scatterReject.Color = color.RGBA{R: 236, G: 106, B: 94, A: 255}
+		scatterReject.Shape = draw.BoxGlyph{}
+		scatterReject.Radius = vg.Length((float64(pixelWidth) / float64(maxHardLen)) * 2 / 3)
+		scatterSide.Color = color.RGBA{R: 190, G: 197, B: 236, A: 255}
+		scatterSide.Shape = draw.BoxGlyph{}
+		scatterSide.Radius = vg.Length((float64(pixelWidth) / float64(maxHardLen)) * 2 / 3)
+
+		p.Add(scatterAccept)
+		p.Legend.Add("Accepted", scatterAccept)
+		p.Add(scatterReject)
+		p.Legend.Add("Rejected", scatterReject)
+		p.Add(scatterSide)
+		p.Legend.Add("Sidechained", scatterSide)
+
+		p.Legend.YOffs = -30
+
+		err = p.Save(pixelWidth, 200, fileName)
+		if err != nil {
+			log.Panic(err)
+		}
+	}
+	yuckyGlobalTestEnableMess = true
+	defer func() {
+		yuckyGlobalTestEnableMess = false
+	}()
+	baseTitle := fmt.Sprintf("Accept/Reject Reorgs: Relative Time (Difficulty) over Proposed Segment Length (%d-block original chain)", easyLen)
+	generatePlot(baseTitle, "reorgs-fast-localspan-MESS.png", false)
+	generatePlot(baseTitle, "reorgs-fast-proposedspan-MESS.png", true)
 	yuckyGlobalTestEnableMess = false
 	// generatePlot("WITHOUT MESS: "+baseTitle, "reorgs-noMESS.png")
 }

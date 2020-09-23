@@ -314,7 +314,7 @@ func TestBlockChain_AF_ECBP1100_2(t *testing.T) {
 }
 
 func TestBlockChain_GenerateMESSPlot(t *testing.T) {
-	// t.Skip("This test plots graph of chain acceptance for visualization.")
+	t.Skip("This test plots graph of chain acceptance for visualization.")
 
 	easyLen := 200
 	maxHardLen := 100
@@ -458,6 +458,7 @@ func TestAFKnownBlock(t *testing.T) {
 }
 
 func TestPlot_ecbp1100PolynomialV(t *testing.T) {
+	t.Skip("This test plots a graph of the ECBP1100 polynomial curve.")
 	p, err := plot.New()
 	if err != nil {
 		panic(err)
@@ -495,6 +496,7 @@ func TestEcbp1100PolynomialV(t *testing.T) {
 }
 
 func TestGenerateChainTargetingHashrate(t *testing.T) {
+	t.Skip("A development test to play with difficulty steps.")
 	engine := ethash.NewFaker()
 
 	db := rawdb.NewMemoryDatabase()

@@ -1546,9 +1546,6 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 	}
 
 	if reorg {
-		// If code reaches AF check, and it does not error, canonical status will be allowed (not disallowed).
-		canonicalDisallowed := false
-
 		if block.ParentHash() != currentBlock.Hash() {
 			// Reorganise the chain if the parent is not the head block
 			d := bc.getReorgData(currentBlock, block)
@@ -1557,7 +1554,7 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 				// Proceed with further reorg arbitration.
 				// If the node is mining and trying to insert their own block, we want to allow that (do not override miners).
 				minerOwn := bc.shouldPreserve != nil && bc.shouldPreserve(block)
-				if (bc.shouldPreserve == nil || !minerOwn) &&
+				if !minerOwn &&
 					bc.IsArtificialFinalityEnabled() &&
 					bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, currentBlock.Number()) {
 
@@ -1566,7 +1563,7 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 						canonicalDisallowed = true
 						log.Warn("Reorg disallowed", "error", err)
 
-					} else if len(d.oldChain) > 3 {
+					} else if len(d.oldChain) > 2 {
 
 						// Reorg is allowed, only log the MESS line if old chain is longer than normal.
 						log.Info("ECBP1100-MESS 🔓",
@@ -1578,22 +1575,15 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 							"current.bno", currentBlock.Number().Uint64(), "current.hash", currentBlock.Hash(),
 							"proposed.bno", block.Number().Uint64(), "proposed.hash", block.Hash(),
 						)
-					}
 				}
 			}
-			// If there was a reorg(data) error, we leave it to the reorg method to handle, if it wants to wrap it or log it or whatever.
-			if !canonicalDisallowed {
-				if err := bc.reorg(d); err != nil {
-					return NonStatTy, err
-				}
+			// We leave the error to the reorg method to handle, if it wants to wrap it or log it or whatever.
+			if err := bc.reorg(d); err != nil {
+				return NonStatTy, err
 			}
 		}
 		// Status is canon; reorg succeeded.
-		if !canonicalDisallowed {
-			status = CanonStatTy
-		} else {
-			status = SideStatTy
-		}
+		status = CanonStatTy
 	} else {
 		status = SideStatTy
 	}
@@ -1761,7 +1751,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 						// Check if artificial finality forbids the reorganization,
 						// effectively overriding the simple (original) TD comparison check.
 						minerOwn := bc.shouldPreserve != nil && bc.shouldPreserve(block)
-						if (bc.shouldPreserve == nil || !minerOwn) &&
+						if !minerOwn &&
 							bc.IsArtificialFinalityEnabled() &&
 							bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, current.Number()) {
 

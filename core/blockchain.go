@@ -1546,6 +1546,9 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 	}
 
 	if reorg {
+		// If code reaches AF check, and it does not error, canonical status will be allowed (not disallowed).
+		canonicalDisallowed := false
+
 		if block.ParentHash() != currentBlock.Hash() {
 			// Reorganise the chain if the parent is not the head block
 			d := bc.getReorgData(currentBlock, block)
@@ -1578,13 +1581,19 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 					}
 				}
 			}
-			// We leave the error to the reorg method to handle, if it wants to wrap it or log it or whatever.
-			if err := bc.reorg(d); err != nil {
-				return NonStatTy, err
+			// If there was a reorg(data) error, we leave it to the reorg method to handle, if it wants to wrap it or log it or whatever.
+			if !canonicalDisallowed {
+				if err := bc.reorg(d); err != nil {
+					return NonStatTy, err
+				}
 			}
 		}
 		// Status is canon; reorg succeeded.
-		status = CanonStatTy
+		if !canonicalDisallowed {
+			status = CanonStatTy
+		} else {
+			status = SideStatTy
+		}
 	} else {
 		status = SideStatTy
 	}

@@ -1557,7 +1557,7 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 				// Proceed with further reorg arbitration.
 				// If the node is mining and trying to insert their own block, we want to allow that (do not override miners).
 				minerOwn := bc.shouldPreserve != nil && bc.shouldPreserve(block)
-				if (bc.shouldPreserve == nil || !minerOwn) &&
+				if !minerOwn &&
 					bc.IsArtificialFinalityEnabled() &&
 					bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, currentBlock.Number()) {
 
@@ -1761,7 +1761,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 						// Check if artificial finality forbids the reorganization,
 						// effectively overriding the simple (original) TD comparison check.
 						minerOwn := bc.shouldPreserve != nil && bc.shouldPreserve(block)
-						if (bc.shouldPreserve == nil || !minerOwn) &&
+						if !minerOwn &&
 							bc.IsArtificialFinalityEnabled() &&
 							bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, current.Number()) {
 

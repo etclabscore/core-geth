@@ -1566,7 +1566,7 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 						canonicalDisallowed = true
 						log.Warn("Reorg disallowed", "error", err)
 
-					} else if len(d.oldChain) > 3 {
+					} else if len(d.oldChain) > 2 {
 
 						// Reorg is allowed, only log the MESS line if old chain is longer than normal.
 						log.Info("ECBP1100-MESS 🔓",

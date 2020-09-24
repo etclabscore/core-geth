@@ -49,7 +49,7 @@ var (
 	// artificialFinalitySafetyInterval defines the interval at which the local head is checked for staleness.
 	// If the head is found to be stale across this interval, artificial finality features are disabled.
 	// This prevents an abandoned victim of an eclipse attack from being forever destitute.
-	artificialFinalitySafetyInterval = time.Second * time.Duration(10*vars.DurationLimit.Uint64())
+	artificialFinalitySafetyInterval = time.Second * time.Duration(30*vars.DurationLimit.Uint64())
 )
 
 type txsync struct {

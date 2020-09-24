@@ -1948,7 +1948,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 		engine = ethash.NewFaker()
 		if !ctx.GlobalBool(FakePoWFlag.Name) {
 			datasetDir := stack.ResolvePath(eth.DefaultConfig.Ethash.DatasetDir)
-			ecip1099Block = config.GetEthashECIP1099Transition()
+			ecip1099Block := config.GetEthashECIP1099Transition()
 			// check if ECIP-1099 is configured for this chain
 			if ecip1099Block != nil {
 				// ECIP-1099 is set, use etchash dir for DAGs instead

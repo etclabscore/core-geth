@@ -92,12 +92,11 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 
 	got := new(big.Int).Mul(proposedSubchainTD, ecbp1100PolynomialVCurveFunctionDenominator)
 
-	prettyRatio, _ := new(big.Float).Quo(
-		new(big.Float).SetInt(got),
-		new(big.Float).SetInt(want),
-	).Float64()
-
 	if got.Cmp(want) < 0 {
+		prettyRatio, _ := new(big.Float).Quo(
+			new(big.Float).SetInt(got),
+			new(big.Float).SetInt(want),
+		).Float64()
 		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v current.span=%v proposed.span=%v tdr/gravity=%0.6f common.bno=%d common.hash=%s current.bno=%d current.hash=%s proposed.bno=%d proposed.hash=%s`,
 			errReorgFinality,
 			common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),

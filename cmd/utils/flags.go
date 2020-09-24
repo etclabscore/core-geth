@@ -24,7 +24,9 @@ import (
 	"io/ioutil"
 	"math/big"
 	"os"
+	"os/user"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -1945,16 +1947,40 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 	} else {
 		engine = ethash.NewFaker()
 		if !ctx.GlobalBool(FakePoWFlag.Name) {
+			datasetDir := stack.ResolvePath(eth.DefaultConfig.Ethash.DatasetDir)
+			ecip1099Block = config.GetEthashECIP1099Transition()
+			// check if ECIP-1099 is configured for this chain
+			if ecip1099Block != nil {
+				// ECIP-1099 is set, use etchash dir for DAGs instead
+				home := os.Getenv("HOME")
+				if home == "" {
+					if user, err := user.Current(); err == nil {
+						home = user.HomeDir
+					}
+				}
+				if runtime.GOOS == "darwin" {
+					datasetDir = filepath.Join(home, "Library", "Etchash")
+				} else if runtime.GOOS == "windows" {
+					localappdata := os.Getenv("LOCALAPPDATA")
+					if localappdata != "" {
+						datasetDir = filepath.Join(localappdata, "Etchash")
+					} else {
+						datasetDir = filepath.Join(home, "AppData", "Local", "Etchash")
+					}
+				} else {
+					datasetDir = filepath.Join(home, ".etchash")
+				}
+			}
 			engine = ethash.New(ethash.Config{
 				CacheDir:         stack.ResolvePath(eth.DefaultConfig.Ethash.CacheDir),
 				CachesInMem:      eth.DefaultConfig.Ethash.CachesInMem,
 				CachesOnDisk:     eth.DefaultConfig.Ethash.CachesOnDisk,
 				CachesLockMmap:   eth.DefaultConfig.Ethash.CachesLockMmap,
-				DatasetDir:       stack.ResolvePath(eth.DefaultConfig.Ethash.DatasetDir),
+				DatasetDir:       datasetDir,
 				DatasetsInMem:    eth.DefaultConfig.Ethash.DatasetsInMem,
 				DatasetsOnDisk:   eth.DefaultConfig.Ethash.DatasetsOnDisk,
 				DatasetsLockMmap: eth.DefaultConfig.Ethash.DatasetsLockMmap,
-				ECIP1099Block:    config.GetEthashECIP1099Transition(),
+				ECIP1099Block:    ecip1099Block,
 			}, nil, false)
 		}
 	}

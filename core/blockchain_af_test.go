@@ -18,6 +18,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/vars"
+	exrand "golang.org/x/exp/rand"
+	"gonum.org/v1/gonum/stat/distuv"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
@@ -94,6 +96,67 @@ func runMESSTest2(t *testing.T, easyL, hardL, caN int, easyT, hardT int64) (hard
 	_, err = chain.InsertChain(hard)
 	hardHead = chain.CurrentBlock().Hash() == hard[len(hard)-1].Hash()
 	return
+}
+
+func TestBlockChain_AF_ECBP1100_NormalLimit(t *testing.T) {
+	// Generate the original common chain segment and the two competing forks
+	engine := ethash.NewFaker()
+
+	db := rawdb.NewMemoryDatabase()
+	genesis := params.DefaultMessNetGenesisBlock()
+	genesisB := MustCommitGenesis(db, genesis)
+
+	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer chain.Stop()
+	chain.EnableArtificialFinality(true)
+
+	withPoisson := false
+	poisson := distuv.Poisson{Lambda: 13, Src: exrand.NewSource(uint64(time.Now().UnixNano()))}
+	easy, _ := GenerateChain(genesis.Config, genesisB, engine, db, 1000, func(i int, b *BlockGen) {
+		b.SetNonce(types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64))))
+
+		if withPoisson {
+			b.OffsetTime(int64(poisson.Rand())-10)
+		} else {
+			b.OffsetTime(17)
+		}
+	})
+
+	for i := 1; ; i++ {
+		chain.Reset()
+		if _, err := chain.InsertChain(easy); err != nil {
+			t.Fatal(err)
+		}
+
+		commonAncestor := easy[len(easy)-i-1]
+		hard, _ := GenerateChain(genesis.Config, commonAncestor, engine, db, i, func(it int, b *BlockGen) {
+			b.SetNonce(types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64))))
+			// MAY CHANGEME to use different marginal difficulty weights
+			// Using 'if it == 0' installs 1 block having greater difficulty,
+			// using 'if it < 2' installs 2 blocks having greater difficulty, etc.
+			if it < 1 {
+				b.OffsetTime(-2)
+			} else {
+				b.OffsetTime(3)
+			}
+		})
+		hardHead := hard[len(hard)-1]
+		t.Log(i, len(easy), chain.CurrentBlock().NumberU64(), commonAncestor.NumberU64(), len(hard), hardHead.NumberU64())
+
+		n, err := chain.InsertChain(hard)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+		if chain.CurrentBlock().Hash() != hardHead.Hash() {
+			t.Log(n, i)
+			break
+		}
+
+	}
 }
 
 func TestBlockChain_AF_ECBP1100(t *testing.T) {
@@ -290,140 +353,116 @@ func TestBlockChain_AF_ECBP1100_2(t *testing.T) {
 		yuckyGlobalTestEnableMess = false
 	}()
 
+	offsetGreaterDifficulty, offsetSameDifficulty, offsetWorseDifficulty := /* 1..8 = -9..-2 */ int64(-2) /* 9..17 = -1..8 */, int64(0) /* 18..*/, int64(8)
+
 	cases := []struct {
 		easyLen, hardLen, commonAncestorN int
 		easyOffset, hardOffset            int64
 		hardGetsHead, accepted            bool
 	}{
-		// Random coin tosses involved for equivalent difficulty.
-		// {
-		// 	1000, 1, 999,
-		// 	0, 0, // -1 offset => 10-1=9 same child difficulty
-		// 	false, true,
-		// },
-		// {
-		// 	1000, 3, 997,
-		// 	0, 0, // -1 offset => 10-1=9 same child difficulty
-		// 	false, true,
-		// },
-		// {
-		// 	1000, 5, 995,
-		// 	0, 0, // -1 offset => 10-1=9 same child difficulty
-		// 	false, true,
-		// },
-		// {
-		// 	1000, 10, 990,
-		// 	0, 1, // -1 offset => 10-1=9 same child difficulty
-		// 	false, true,
-		// },
-		// {
-		// 	1000, 10, 990,
-		// 	0, 1, // -1 offset => 10-1=9 same child difficulty
-		// 	false, true,
-		// },
-		// {
-		// 	1000, 10, 990,
-		// 	0, 1, // -1 offset => 10-1=9 same child difficulty
-		// 	false, true,
-		// },
+		// NOTE: Random coin tosses involved for equivalent difficulty.
+		// Short trials for those are skipped.
+
+		{
+			1000, 30, 970,
+			0, offsetSameDifficulty, // same difficulty
+			false, true,
+		},
 
 		{
 			1000, 1, 999,
-			0, 8, // worse! difficulty
+			0, offsetWorseDifficulty, // worse! difficulty
 			false, true,
 		},
 		{
 			1000, 1, 999,
-			0, -2, // better difficulty
+			0, offsetGreaterDifficulty, // better difficulty
 			true, true,
 		},
 		{
 			1000, 5, 995,
-			0, -7, // better difficulty
+			0, offsetGreaterDifficulty,
 			true, true,
 		},
 		{
 			1000, 25, 975,
-			0, -2, // better difficulty
+			0, offsetGreaterDifficulty,
 			false, true,
 		},
 		{
 			1000, 30, 970,
-			0, -2, // better difficulty
+			0, offsetGreaterDifficulty,
 			false, true,
 		},
 		{
 			1000, 50, 950,
-			0, -5,
+			0, offsetGreaterDifficulty,
 			false, true,
 		},
 		{
 			1000, 50, 950,
-			0, -9,
+			0, offsetGreaterDifficulty,
 			false, true,
 		},
 		{
 			1000, 1000, 900,
-			0, -9,
+			0, offsetGreaterDifficulty,
 			true, true,
 		},
 		{
 			1000, 2000, 800,
-			0, -9,
+			0, offsetGreaterDifficulty,
 			true, true,
 		},
 		{
 			1000, 2000, 700,
-			0, -9,
+			0, offsetGreaterDifficulty,
 			true, true,
 		},
 		{
 			1000, 2000, 700,
-			0, -7,
+			0, offsetGreaterDifficulty,
 			true, true,
 		},
 		{
 			1000, 999, 1,
-			0, -9,
+			0, offsetGreaterDifficulty,
 			false, true,
 		},
 		{
 			1000, 999, 1,
-			0, -8,
+			0, offsetGreaterDifficulty,
 			false, true,
 		},
 		{
 			1000, 500, 500,
-			0, -8,
+			0, offsetGreaterDifficulty,
 			false, true,
 		},
 		{
 			1000, 500, 500,
-			0, -9,
+			0, offsetGreaterDifficulty,
 			false, true,
 		},
 		{
 			1000, 300, 700,
-			0, -7,
+			0, offsetGreaterDifficulty,
 			false, true,
 		},
 		{
 			1000, 600, 700,
-			0, -7,
+			0, offsetGreaterDifficulty,
 			true, true,
 		},
 		// Will pass, takes a long time.
 		// {
 		// 	5000, 4000, 1000,
-		// 	0, -9,
+		// 	0, -2,
 		// 	true, true,
 		// },
 	}
 
 	for i, c := range cases {
-		if i > 4 {
-			break
-		}
 		hardHead, err, hard, easy := runMESSTest2(t, c.easyLen, c.hardLen, c.commonAncestorN, c.easyOffset, c.hardOffset)
 
 		ee, hh := easy[len(easy)-1], hard[len(hard)-1]
@@ -436,7 +475,7 @@ func TestBlockChain_AF_ECBP1100_2(t *testing.T) {
 			i,
 			c.easyLen, c.hardLen, c.commonAncestorN, c.easyOffset, c.hardOffset,
 			rat,
-			common.PrettyDuration(time.Second * time.Duration(10 * (c.easyLen - c.commonAncestorN))),
+			common.PrettyDuration(time.Second*time.Duration(10*(c.easyLen-c.commonAncestorN))),
 			c.hardGetsHead, hardHead, err)
 
 		if (err != nil && c.accepted) || (err == nil && !c.accepted) || (hardHead != c.hardGetsHead) {
@@ -450,10 +489,10 @@ func TestBlockChain_AF_ECBP1100_2(t *testing.T) {
 func TestDifficultyDelta(t *testing.T) {
 
 	parent := &types.Header{
-		Number: big.NewInt(1_000_000),
+		Number:     big.NewInt(1_000_000),
 		Difficulty: params.DefaultMessNetGenesisBlock().Difficulty,
-		Time: uint64(time.Now().Unix()),
-		UncleHash: types.EmptyUncleHash,
+		Time:       uint64(time.Now().Unix()),
+		UncleHash:  types.EmptyUncleHash,
 	}
 
 	data := plotter.XYs{}
@@ -569,7 +608,6 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 	// generateDepthPlot("WITHOUT MESS: "+baseTitle, "reorgs-noMESS.png")
 }
 
-
 func TestBlockChain_GenerateMESSPlot_1point5(t *testing.T) {
 	// t.Skip("This test plots graph of chain acceptance for visualization.")
 
@@ -589,7 +627,7 @@ func TestBlockChain_GenerateMESSPlot_1point5(t *testing.T) {
 		rejecteds := plotter.XYs{}
 		sides := plotter.XYs{}
 
-		for i := 1; i <= maxHardLen; i+=10 {
+		for i := 1; i <= maxHardLen; i += 10 {
 			for j := -9; j <= 8; j++ {
 				fmt.Println("running", i, j)
 				hardHead, err := runMESSTest(t, easyLen, i, easyLen-i, 0, int64(j))
@@ -651,7 +689,6 @@ func TestBlockChain_GenerateMESSPlot_1point5(t *testing.T) {
 	yuckyGlobalTestEnableMess = false
 	// generateDepthPlot("WITHOUT MESS: "+baseTitle, "reorgs-noMESS.png")
 }
-
 
 func TestBlockChain_GenerateMESSPlot_2(t *testing.T) {
 	// t.Skip("This test plots graph of chain acceptance for visualization.")
@@ -1021,15 +1058,15 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 
 func TestNecessaryHashrateMESSAttack(t *testing.T) {
 	/*
-100: 1x
-300: 2x
-500: 5x
-1000: 16x
-2000: 31x
-	 */
+	100: 1x
+	300: 2x
+	500: 5x
+	1000: 16x
+	2000: 31x
+	*/
 
 	for _, span := range []uint64{100, 300, 500, 1000, 2000} {
-		n := ecbp1100PolynomialV(new(big.Int).SetUint64(span*13)) // / 128
+		n := ecbp1100PolynomialV(new(big.Int).SetUint64(span * 13)) // / 128
 		n.Div(n, ecbp1100PolynomialVCurveFunctionDenominator)
 		t.Log(span, n)
 	}

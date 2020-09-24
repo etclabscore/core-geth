@@ -428,13 +428,14 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 var (
 	bigMinus99 = big.NewInt(-99)
 	big1       = big.NewInt(1)
+	big0       = big.NewInt(0)
 )
 
 func TestBlockChain_GenerateMESSPlot_2(t *testing.T) {
 	// t.Skip("This test plots graph of chain acceptance for visualization.")
 
 	localBlockTime := uint64(10)
-	baseTotalSpanSeconds := localBlockTime * 1000        // ie 1000 blocks at 10 seconds each
+	baseTotalSpanSeconds := localBlockTime * 5000        // ie 1000 blocks at 10 seconds each
 	reorgSpanSecondsMax := baseTotalSpanSeconds * 9 / 10 // how far back our proposed reorg is going to go
 
 	baseBlockLen := baseTotalSpanSeconds / localBlockTime
@@ -447,40 +448,31 @@ func TestBlockChain_GenerateMESSPlot_2(t *testing.T) {
 		return out
 	}
 
-	generatePlot := func(title, fileName string, useProposedSpan bool) {
-		p, err := plot.New()
-		if err != nil {
-			log.Panic(err)
-		}
-		p.Title.Text = title
-		p.Y.Label.Text = "Block Depth"
-		p.X.Label.Text = "Mode Block Time Offset (10 seconds + y)"
-
-		accepteds := plotter.XYs{}
-		rejecteds := plotter.XYs{}
-		sides := plotter.XYs{}
-
+	generatePlots := func(title, fileName string, useProposedSpan bool) {
 
 		// - duration: how long the chain should span in seconds
 		// - maxDifficulty: maximimum difficulty allowed per block (eg as relative hashrate)
 		generateDifficultySet := func(initDifficulty, maxDifficulty *big.Int, duration int64) []*big.Int {
 
-			if maxDifficulty == nil {
-				maxDifficulty = big.NewInt(math.MaxInt64)
-			}
-
 			parentDiff := new(big.Int).Set(initDifficulty)
-			blockTime := uint64(1)
+
+			blockTime := uint64(1) // aggressor
+			isBase := maxDifficulty.Cmp(big0) == 0
+			if isBase {
+				// base
+				blockTime = localBlockTime
+			}
 
 			outset := []*big.Int{}
 			for duration > 0 {
 
 				// parent difficulty met the max (allowed hashrate fulfilled)
-				if parentDiff.Cmp(maxDifficulty) >= 0 {
+				// keep block difficulty constant while still creating blocks as quickly as possible
+				if !isBase && parentDiff.Cmp(maxDifficulty) >= 0 {
 					blockTime = 9
 				}
 				duration -= int64(blockTime)
-				
+
 				// https://github.com/ethereum/EIPs/issues/100
 				// algorithm:
 				// diff = (parent_diff +
@@ -511,50 +503,52 @@ func TestBlockChain_GenerateMESSPlot_2(t *testing.T) {
 			return outset
 		}
 
-		easy := generateDifficultySet(
+		localSegment := generateDifficultySet(
 			params.DefaultMessNetGenesisBlock().Difficulty,
-			nil,
-			uint64(10),
+			big0,
+			int64(baseTotalSpanSeconds),
 		)
 
-		for proposedSpanSeconds := uint64(1); proposedSpanSeconds <= reorgSpanSecondsMax; proposedSpanSeconds++ {
-			for hardTime := uint64(1); hardTime <= 18; hardTime++ {
-				// fmt.Println("running", proposedSpanSeconds, hardTime)
+		for hashRateRel := uint64(1); hashRateRel <= 33; hashRateRel++ {
+			p, err := plot.New()
+			if err != nil {
+				log.Panic(err)
+			}
+			p.Title.Text = title
+			p.Y.Label.Text = "Block Depth in Seconds"
+			p.X.Label.Text = "Antagonist Hashrate"
 
-				// fitBlocks accounts for the number of blocks
-				// produceable in a time span when you're making
-				// them faster (10 blocks in 10 seconds with 1-second offsets,
-				// vs 1 block in 10 seconds with 10-second offset)
-				fitBlocks := easyOffset / hardTime // 10:1 => 10, 10:2 => 5
-				if fitBlocks == 0 {
-					fitBlocks = uint64(proposedSpanSeconds) // hard.len
-				} else {
-					fitBlocks = uint64(proposedSpanSeconds) / fitBlocks
-				}
+			accepteds := plotter.XYs{}
+			rejecteds := plotter.XYs{}
+			sides := plotter.XYs{}
+			for proposedSpanSeconds := localBlockTime; proposedSpanSeconds <= reorgSpanSecondsMax; proposedSpanSeconds += localBlockTime {
 
-				hard := generateDifficultySet(
-					// easy[len(easy)-proposedSpanSeconds], // offset = hard.len / fitBlocks
-					easy[uint64(len(easy))-proposedSpanSeconds], // offset = hard.len / fitBlocks
-					nil,
-					hardTime,
+				// find common ancestor using the proposed span of seconds
+				// localBlockOffset from the head of the localSegment chain
+				localBlockOffset := proposedSpanSeconds / localBlockTime
+
+				// common ancestor => difficulty is only symbolic; since the
+				// local segment uses constant 10 difficulty-stable times, every
+				// block has the same difficulty. so we could use any difficulty from the local segment.
+				commonAncestorIndex := uint64(len(localSegment)) - localBlockOffset
+				commonAncestorDifficulty := localSegment[commonAncestorIndex]
+				maxDifficulty := new(big.Int).Mul(new(big.Int).SetUint64(hashRateRel), commonAncestorDifficulty)
+
+				proposedSegment := generateDifficultySet(
+					// localSegment[len(localSegment)-proposedSpanSeconds], // localBlockOffset = proposedSegment.len / fitBlocks
+					commonAncestorDifficulty, // localBlockOffset = proposedSegment.len / fitBlocks
+					maxDifficulty,
+					int64(proposedSpanSeconds),
 				)
 
-				// localTD := segmentTotalDifficulty(easy[len(easy)-proposedSpanSeconds:])
-				// localTD := segmentTotalDifficulty(easy)
+				localSegment := localSegment[uint64(len(localSegment))-localBlockOffset:]
+				localTD := segmentTotalDifficulty(localSegment)
+				propTD := segmentTotalDifficulty(proposedSegment)
 
-				overwrittenEasyBlocks := fitBlocks
-				if overwrittenEasyBlocks > easyOffset *proposedSpanSeconds {
-					overwrittenEasyBlocks = easyOffset * proposedSpanSeconds
-				}
-
-				localTD := segmentTotalDifficulty(easy[uint64(len(easy))-overwrittenEasyBlocks-1:])
-				// localTD := segmentTotalDifficulty(easy[uint64(len(easy))-proposedSpanSeconds-1:])
-				propTD := segmentTotalDifficulty(hard)
-
-				localSpan := int64(overwrittenEasyBlocks * 10)
+				localSpan := int64(localBlockOffset * localBlockTime)
 				xBig := big.NewInt(localSpan)
 				if useProposedSpan {
-					propSpan := int64(proposedSpanSeconds * hardTime)
+					propSpan := int64(proposedSpanSeconds)
 					xBig = big.NewInt(propSpan)
 				}
 
@@ -566,10 +560,10 @@ func TestBlockChain_GenerateMESSPlot_2(t *testing.T) {
 
 				nogo := got.Cmp(want) < 0
 
-				point := plotter.XY{Y: -float64(proposedSpanSeconds), X: float64(hardTime)}
+				point := plotter.XY{Y: -float64(proposedSpanSeconds), X: float64(hashRateRel)}
 
 				reorg := propTD.Cmp(localTD) > 0
-				if localTD.Cmp(propTD) == 0 && proposedSpanSeconds == overwrittenEasyBlocks && rand.Float64() < 0.5 {
+				if localTD.Cmp(propTD) == 0 && len(localSegment) == len(proposedSegment) && rand.Float64() < 0.5 {
 					reorg = true
 				}
 
@@ -587,47 +581,48 @@ func TestBlockChain_GenerateMESSPlot_2(t *testing.T) {
 					accepteds = append(accepteds, point)
 				}
 			}
-		}
 
-		scatterAccept, _ := plotter.NewScatter(accepteds)
-		scatterReject, _ := plotter.NewScatter(rejecteds)
-		scatterSide, _ := plotter.NewScatter(sides)
+			scatterAccept, _ := plotter.NewScatter(accepteds)
+			scatterReject, _ := plotter.NewScatter(rejecteds)
+			scatterSide, _ := plotter.NewScatter(sides)
 
-		pixelWidth := vg.Length(reorgSpanSecondsMax * 110 / 100)
+			pixelWidth := vg.Length(reorgSpanSecondsMax / localBlockTime * 110 / 100)
 
-		scatterAccept.Color = color.RGBA{R: 0, G: 200, B: 11, A: 255}
-		scatterAccept.Shape = draw.BoxGlyph{}
-		scatterAccept.Radius = vg.Length((float64(pixelWidth) / float64(reorgSpanSecondsMax)) * 2 / 3)
-		scatterReject.Color = color.RGBA{R: 236, G: 106, B: 94, A: 255}
-		scatterReject.Shape = draw.BoxGlyph{}
-		scatterReject.Radius = vg.Length((float64(pixelWidth) / float64(reorgSpanSecondsMax)) * 2 / 3)
-		scatterSide.Color = color.RGBA{R: 220, G: 227, B: 246, A: 255}
-		scatterSide.Shape = draw.BoxGlyph{}
-		scatterSide.Radius = vg.Length((float64(pixelWidth) / float64(reorgSpanSecondsMax)) * 2 / 3)
+			scatterAccept.Color = color.RGBA{R: 0, G: 200, B: 11, A: 255}
+			scatterAccept.Shape = draw.BoxGlyph{}
+			scatterAccept.Radius = vg.Length((float64(pixelWidth) / float64(reorgSpanSecondsMax/localBlockTime)) * 2 / 3)
+			scatterReject.Color = color.RGBA{R: 236, G: 106, B: 94, A: 255}
+			scatterReject.Shape = draw.BoxGlyph{}
+			scatterReject.Radius = vg.Length((float64(pixelWidth) / float64(reorgSpanSecondsMax/localBlockTime)) * 2 / 3)
+			scatterSide.Color = color.RGBA{R: 220, G: 227, B: 246, A: 255}
+			scatterSide.Shape = draw.BoxGlyph{}
+			scatterSide.Radius = vg.Length((float64(pixelWidth) / float64(reorgSpanSecondsMax/localBlockTime)) * 2 / 3)
 
-		p.Add(scatterAccept)
-		p.Add(scatterReject)
-		p.Add(scatterSide)
+			p.Add(scatterAccept)
+			p.Add(scatterReject)
+			p.Add(scatterSide)
 
-		// p.Legend.Add("Accepted", scatterAccept)
-		// p.Legend.Add("Rejected", scatterReject)
-		// p.Legend.Add("Sidechained", scatterSide)
-		// p.Legend.YOffs = -30
+			// p.Legend.Add("Accepted", scatterAccept)
+			// p.Legend.Add("Rejected", scatterReject)
+			// p.Legend.Add("Sidechained", scatterSide)
+			// p.Legend.YOffs = -30
 
-		err = p.Save(600 ,pixelWidth, fileName)
-		if err != nil {
-			log.Panic(err)
+			err = p.Save(600, pixelWidth, fmt.Sprintf("%s.png", fileName))
+			if err != nil {
+				log.Panic(err)
+			}
+
 		}
 	}
 	yuckyGlobalTestEnableMess = true
 	defer func() {
 		yuckyGlobalTestEnableMess = false
 	}()
-	baseTitle := fmt.Sprintf("Accept/Reject Reorgs: Relative Time (Difficulty) over Proposed Segment Length (%d-block original chain)", baseBlockLen)
-	generatePlot(baseTitle, "reorgs-fast-localspan-MESS.png", false)
-	// generatePlot(baseTitle, "reorgs-fast-proposedspan-MESS.png", true)
+	baseTitle := fmt.Sprintf("Accept/Ignore Reorgs: Depth in Seconds over Mean Block Times: (%d-block original chain)", baseBlockLen)
+	generatePlots(baseTitle, "reorgs-fast-localspan-MESS", false)
+	// generatePlots(baseTitle, "reorgs-fast-proposedspan-MESS.png", true)
 	yuckyGlobalTestEnableMess = false
-	// generatePlot("WITHOUT MESS: "+baseTitle, "reorgs-noMESS.png")
+	// generatePlots("WITHOUT MESS: "+baseTitle, "reorgs-noMESS.png")
 }
 
 func TestEcbp1100AGSinusoidalA(t *testing.T) {

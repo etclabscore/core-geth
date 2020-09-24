@@ -44,7 +44,7 @@ var (
 	// minArtificialFinalityPeers defines the minimum number of peers our node must be connected
 	// to in order to enable artificial finality features.
 	// A minimum number of peer connections mitigates the risk of lower-powered eclipse attacks.
-	minArtificialFinalityPeers = defaultMinSyncPeers * 2
+	minArtificialFinalityPeers = defaultMinSyncPeers
 
 	// artificialFinalitySafetyInterval defines the interval at which the local head is checked for staleness.
 	// If the head is found to be stale across this interval, artificial finality features are disabled.

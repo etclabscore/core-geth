@@ -305,8 +305,6 @@ to quickly create a Cobra application.`,
 			// Each scenario needs to be responsible for getting the nodes
 			// in the initial state they want them in without any assumptions
 			// about what that might be.
-			// This also means that any local geths left running at the end of a scenario
-			// will still be running.
 		}
 		stabilize2(world)
 	},

@@ -307,10 +307,31 @@ func TestBlockChain_AF_ECBP1100_2(t *testing.T) {
 		// 	false, true,
 		// },
 		// {
-		// 	1000, 10, 990,
+		// 	1000, 5, 995,
 		// 	0, 0, // -1 offset => 10-1=9 same child difficulty
 		// 	false, true,
 		// },
+		// {
+		// 	1000, 10, 990,
+		// 	0, 1, // -1 offset => 10-1=9 same child difficulty
+		// 	false, true,
+		// },
+		// {
+		// 	1000, 10, 990,
+		// 	0, 1, // -1 offset => 10-1=9 same child difficulty
+		// 	false, true,
+		// },
+		// {
+		// 	1000, 10, 990,
+		// 	0, 1, // -1 offset => 10-1=9 same child difficulty
+		// 	false, true,
+		// },
+
+		{
+			1000, 1, 999,
+			0, 8, // worse! difficulty
+			false, true,
+		},
 		{
 			1000, 1, 999,
 			0, -2, // better difficulty
@@ -378,13 +399,18 @@ func TestBlockChain_AF_ECBP1100_2(t *testing.T) {
 		},
 		{
 			1000, 500, 500,
-			0, -7,
+			0, -9,
 			false, true,
 		},
 		{
 			1000, 300, 700,
 			0, -7,
 			false, true,
+		},
+		{
+			1000, 600, 700,
+			0, -7,
+			true, true,
 		},
 		// Will pass, takes a long time.
 		// {
@@ -395,6 +421,9 @@ func TestBlockChain_AF_ECBP1100_2(t *testing.T) {
 	}
 
 	for i, c := range cases {
+		if i > 4 {
+			break
+		}
 		hardHead, err, hard, easy := runMESSTest2(t, c.easyLen, c.hardLen, c.commonAncestorN, c.easyOffset, c.hardOffset)
 
 		ee, hh := easy[len(easy)-1], hard[len(hard)-1]
@@ -429,7 +458,7 @@ func TestDifficultyDelta(t *testing.T) {
 
 	data := plotter.XYs{}
 
-	for i := uint64(1); i <= 1000; i++ {
+	for i := uint64(1); i <= 60; i++ {
 		nextTime := parent.Time + i
 		d := ethash.CalcDifficulty(params.MessNetConfig, nextTime, parent)
 
@@ -539,6 +568,90 @@ func TestBlockChain_GenerateMESSPlot(t *testing.T) {
 	yuckyGlobalTestEnableMess = false
 	// generateDepthPlot("WITHOUT MESS: "+baseTitle, "reorgs-noMESS.png")
 }
+
+
+func TestBlockChain_GenerateMESSPlot_1point5(t *testing.T) {
+	// t.Skip("This test plots graph of chain acceptance for visualization.")
+
+	easyLen := 1000
+	maxHardLen := 900
+
+	generatePlot := func(title, fileName string) {
+		p, err := plot.New()
+		if err != nil {
+			log.Panic(err)
+		}
+		p.Title.Text = title
+		p.X.Label.Text = "Block Depth"
+		p.Y.Label.Text = "Mode Block Time Offset (10 seconds + y)"
+
+		accepteds := plotter.XYs{}
+		rejecteds := plotter.XYs{}
+		sides := plotter.XYs{}
+
+		for i := 1; i <= maxHardLen; i+=10 {
+			for j := -9; j <= 8; j++ {
+				fmt.Println("running", i, j)
+				hardHead, err := runMESSTest(t, easyLen, i, easyLen-i, 0, int64(j))
+				point := plotter.XY{X: float64(i), Y: float64(j)}
+				if err == nil && hardHead {
+					accepteds = append(accepteds, point)
+				} else if err == nil && !hardHead {
+					sides = append(sides, point)
+				} else if err != nil {
+					rejecteds = append(rejecteds, point)
+				}
+
+				if err != nil {
+					t.Log(err)
+				}
+
+				// if j < -2 && i > 20 && err == nil && !hardHead {
+				// 	continue outer
+				// }
+			}
+		}
+
+		scatterAccept, _ := plotter.NewScatter(accepteds)
+		scatterReject, _ := plotter.NewScatter(rejecteds)
+		scatterSide, _ := plotter.NewScatter(sides)
+
+		pixelWidth := vg.Length(1000)
+
+		scatterAccept.Color = color.RGBA{R: 152, G: 236, B: 161, A: 255}
+		scatterAccept.Shape = draw.BoxGlyph{}
+		scatterAccept.Radius = vg.Length((float64(pixelWidth) / float64(maxHardLen)) * 2 / 3)
+		scatterReject.Color = color.RGBA{R: 236, G: 106, B: 94, A: 255}
+		scatterReject.Shape = draw.BoxGlyph{}
+		scatterReject.Radius = vg.Length((float64(pixelWidth) / float64(maxHardLen)) * 2 / 3)
+		scatterSide.Color = color.RGBA{R: 190, G: 197, B: 236, A: 255}
+		scatterSide.Shape = draw.BoxGlyph{}
+		scatterSide.Radius = vg.Length((float64(pixelWidth) / float64(maxHardLen)) * 2 / 3)
+
+		p.Add(scatterAccept)
+		p.Legend.Add("Accepted", scatterAccept)
+		p.Add(scatterReject)
+		p.Legend.Add("Rejected", scatterReject)
+		p.Add(scatterSide)
+		p.Legend.Add("Sidechained", scatterSide)
+
+		p.Legend.YOffs = -30
+
+		err = p.Save(pixelWidth, 300, fileName)
+		if err != nil {
+			log.Panic(err)
+		}
+	}
+	yuckyGlobalTestEnableMess = true
+	defer func() {
+		yuckyGlobalTestEnableMess = false
+	}()
+	baseTitle := fmt.Sprintf("Accept/Reject Reorgs: Relative Time (Difficulty) over Proposed Segment Length (%d-block original chain)", easyLen)
+	generatePlot(baseTitle, "reorgs-MESS-1.5.png")
+	yuckyGlobalTestEnableMess = false
+	// generateDepthPlot("WITHOUT MESS: "+baseTitle, "reorgs-noMESS.png")
+}
+
 
 func TestBlockChain_GenerateMESSPlot_2(t *testing.T) {
 	// t.Skip("This test plots graph of chain acceptance for visualization.")
@@ -872,8 +985,21 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 		if _, err := chain.InsertChain(next); err != nil {
 			t.Fatal(err)
 		}
-		f, _ := new(big.Float).SetInt(next[0].Difficulty()).Float64()
-		data = append(data, plotter.XY{X: float64(next[0].NumberU64()), Y: f})
+
+		// f, _ := new(big.Float).SetInt(next[0].Difficulty()).Float64()
+		// data = append(data, plotter.XY{X: float64(next[0].NumberU64()), Y: f})
+
+		rat1, _ := new(big.Float).Quo(
+			new(big.Float).SetInt(next[0].Difficulty()),
+			new(big.Float).SetInt(targetDifficulty),
+		).Float64()
+
+		// rat, _ := new(big.Float).Quo(
+		// 	new(big.Float).SetInt(next[0].Difficulty()),
+		// 	new(big.Float).SetInt(targetDifficultyRatio),
+		// ).Float64()
+
+		data = append(data, plotter.XY{X: float64(next[0].NumberU64()), Y: rat1})
 	}
 	t.Log(chain.CurrentBlock().Number())
 
@@ -881,7 +1007,7 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 	if err != nil {
 		log.Panic(err)
 	}
-	p.Title.Text = "Block Difficulty Toward Target"
+	p.Title.Text = fmt.Sprintf("Block Difficulty Toward Target: %dx", targetDifficultyRatio.Uint64())
 	p.X.Label.Text = "Block Number"
 	p.Y.Label.Text = "Difficulty"
 
@@ -890,6 +1016,22 @@ func TestGenerateChainTargetingHashrate(t *testing.T) {
 
 	if err := p.Save(800, 600, "difficulty-toward-target.png"); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestNecessaryHashrateMESSAttack(t *testing.T) {
+	/*
+100: 1x
+300: 2x
+500: 5x
+1000: 16x
+2000: 31x
+	 */
+
+	for _, span := range []uint64{100, 300, 500, 1000, 2000} {
+		n := ecbp1100PolynomialV(new(big.Int).SetUint64(span*13)) // / 128
+		n.Div(n, ecbp1100PolynomialVCurveFunctionDenominator)
+		t.Log(span, n)
 	}
 }
 

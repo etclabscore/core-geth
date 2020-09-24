@@ -81,6 +81,7 @@ var (
 		utils.EthashDatasetsInMemoryFlag,
 		utils.EthashDatasetsOnDiskFlag,
 		utils.EthashDatasetsLockMmapFlag,
+		utils.EthashEpochLengthFlag,
 		utils.TxPoolLocalsFlag,
 		utils.TxPoolNoLocalsFlag,
 		utils.TxPoolJournalFlag,

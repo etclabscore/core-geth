@@ -35,8 +35,11 @@ var (
 		Action:    utils.MigrateFlags(makecache),
 		Name:      "makecache",
 		Usage:     "Generate ethash verification cache (for testing)",
-		ArgsUsage: "<blockNum> <epochLength> <outputDir>",
-		Category:  "MISCELLANEOUS COMMANDS",
+		ArgsUsage: "<blockNum> <outputDir>",
+		Flags: []cli.Flag{
+			utils.EthashEpochLengthFlag,
+		},
+		Category: "MISCELLANEOUS COMMANDS",
 		Description: `
 The makecache command generates an ethash cache in <outputDir>.
 
@@ -48,8 +51,11 @@ Regular users do not need to execute it.
 		Action:    utils.MigrateFlags(makedag),
 		Name:      "makedag",
 		Usage:     "Generate ethash mining DAG (for testing)",
-		ArgsUsage: "<blockNum> <epochLength> <outputDir>",
-		Category:  "MISCELLANEOUS COMMANDS",
+		ArgsUsage: "<blockNum> <outputDir>",
+		Flags: []cli.Flag{
+			utils.EthashEpochLengthFlag,
+		},
+		Category: "MISCELLANEOUS COMMANDS",
 		Description: `
 The makedag command generates an ethash DAG in <outputDir>.
 
@@ -79,18 +85,17 @@ The output of this command is supposed to be machine-readable.
 // makecache generates an ethash verification cache into the provided folder.
 func makecache(ctx *cli.Context) error {
 	args := ctx.Args()
-	if len(args) != 3 {
-		utils.Fatalf(`Usage: geth makecache <block number> <epoch length> <outputdir>`)
+	if len(args) != 2 {
+		utils.Fatalf(`Usage: geth makecache <block number> <outputdir>`)
 	}
 	block, err := strconv.ParseUint(args[0], 0, 64)
 	if err != nil {
 		utils.Fatalf("Invalid block number: %v", err)
 	}
-	epochLength, err := strconv.ParseUint(args[1], 0, 64)
-	if err != nil {
-		utils.Fatalf("Invalid epoch length: %v", err)
-	}
-	ethash.MakeCache(block, epochLength, args[2])
+
+	epochLength := ctx.Uint64(utils.EthashEpochLengthFlag.Name)
+
+	ethash.MakeCache(block, epochLength, args[1])
 
 	return nil
 }
@@ -98,18 +103,17 @@ func makecache(ctx *cli.Context) error {
 // makedag generates an ethash mining DAG into the provided folder.
 func makedag(ctx *cli.Context) error {
 	args := ctx.Args()
-	if len(args) != 3 {
-		utils.Fatalf(`Usage: geth makedag <block number> <epoch length> <outputdir>`)
+	if len(args) != 2 {
+		utils.Fatalf(`Usage: geth makedag <block number> <outputdir>`)
 	}
 	block, err := strconv.ParseUint(args[0], 0, 64)
 	if err != nil {
 		utils.Fatalf("Invalid block number: %v", err)
 	}
-	epochLength, err := strconv.ParseUint(args[1], 0, 64)
-	if err != nil {
-		utils.Fatalf("Invalid epoch length: %v", err)
-	}
-	ethash.MakeDataset(block, epochLength, args[2])
+
+	epochLength := ctx.Uint64(utils.EthashEpochLengthFlag.Name)
+
+	ethash.MakeDataset(block, epochLength, args[1])
 
 	return nil
 }

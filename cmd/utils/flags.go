@@ -1947,7 +1947,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 	} else {
 		engine = ethash.NewFaker()
 		if !ctx.GlobalBool(FakePoWFlag.Name) {
-			datasetDir := stack.ResolvePath(eth.DefaultConfig.Ethash.DatasetDir)
+			datasetDir := eth.DefaultConfig.Ethash.DatasetDir
 			ecip1099Block := config.GetEthashECIP1099Transition()
 			// check if ECIP-1099 is configured for this chain
 			if ecip1099Block != nil {
@@ -1976,7 +1976,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 				CachesInMem:      eth.DefaultConfig.Ethash.CachesInMem,
 				CachesOnDisk:     eth.DefaultConfig.Ethash.CachesOnDisk,
 				CachesLockMmap:   eth.DefaultConfig.Ethash.CachesLockMmap,
-				DatasetDir:       datasetDir,
+				DatasetDir:       stack.ResolvePath(datasetDir),
 				DatasetsInMem:    eth.DefaultConfig.Ethash.DatasetsInMem,
 				DatasetsOnDisk:   eth.DefaultConfig.Ethash.DatasetsOnDisk,
 				DatasetsLockMmap: eth.DefaultConfig.Ethash.DatasetsLockMmap,

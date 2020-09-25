@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	emath "github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 )
@@ -138,11 +137,15 @@ func ecbp1100PolynomialV(x *big.Int) *big.Int {
 
 	// if x > xcap:
 	//    x = xcap
-	xA := big.NewInt(0)
-	xA.Set(emath.BigMin(x, ecbp1100PolynomialVXCap))
+	xA := new(big.Int).Set(x)
+	if xA.Cmp(ecbp1100PolynomialVXCap) > 0 {
+		xA.Set(ecbp1100PolynomialVXCap)
+	}
 
-	xB := big.NewInt(0)
-	xB.Set(emath.BigMin(x, ecbp1100PolynomialVXCap))
+	xB := new(big.Int).Set(x)
+	if xB.Cmp(ecbp1100PolynomialVXCap) > 0 {
+		xB.Set(ecbp1100PolynomialVXCap)
+	}
 
 	out := big.NewInt(0)
 
@@ -190,23 +193,6 @@ var ecbp1100PolynomialVAmpl = big.NewInt(15)
 // ecbp1100PolynomialVHeight
 // height = CURVE_FUNCTION_DENOMINATOR * (ampl * 2)
 var ecbp1100PolynomialVHeight = new(big.Int).Mul(new(big.Int).Mul(ecbp1100PolynomialVCurveFunctionDenominator, ecbp1100PolynomialVAmpl), big2)
-
-/*
-ecbp1100PolynomialVI64 is an int64 implementation of ecbp1100PolynomialV.
-*/
-func ecbp1100PolynomialVI64(x int64) int64 {
-	if x > ecbp1100PolynomialVXCapI64 {
-		x = ecbp1100PolynomialVXCapI64
-	}
-	return ecbp1100PolynomialVCurveFunctionDenominatorI64 +
-		((3*emath.BigPow(x, 2).Int64())-(2*emath.BigPow(x, 3).Int64()/ecbp1100PolynomialVXCapI64))*
-			ecbp1100PolynomialVHeightI64/(emath.BigPow(ecbp1100PolynomialVXCapI64, 2).Int64())
-}
-
-var ecbp1100PolynomialVCurveFunctionDenominatorI64 = int64(128)
-var ecbp1100PolynomialVXCapI64 = int64(25132)
-var ecbp1100PolynomialVAmplI64 = int64(15)
-var ecbp1100PolynomialVHeightI64 = ecbp1100PolynomialVCurveFunctionDenominatorI64 * ecbp1100PolynomialVAmplI64 * 2
 
 /*
 ecbp1100AGSinusoidalA is a sinusoidal function.

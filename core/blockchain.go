@@ -1571,7 +1571,7 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 							"status", "accepted",
 							"age", common.PrettyAge(time.Unix(int64(d.commonBlock.Time()), 0)),
 							"current.span", common.PrettyDuration(time.Duration(currentBlock.Time()-d.commonBlock.Time())*time.Second),
-							"proposed.span", common.PrettyDuration(time.Duration(int32(block.Time()))*time.Second),
+							"proposed.span", common.PrettyDuration(time.Duration(block.Time()-d.commonBlock.Time())*time.Second),
 							"common.bno", d.commonBlock.Number().Uint64(), "common.hash", d.commonBlock.Hash(),
 							"current.bno", currentBlock.Number().Uint64(), "current.hash", currentBlock.Hash(),
 							"proposed.bno", block.Number().Uint64(), "proposed.hash", block.Hash(),

@@ -326,7 +326,7 @@ var (
 	EthashEpochLengthFlag = cli.Int64Flag{
 		Name:  "epoch.length",
 		Usage: "Sets epoch length for makecache & makedag commands",
-		Value: 30000, // TODO - iquidus
+		Value: 30000,
 	}
 	// Transaction pool settings
 	TxPoolLocalsFlag = cli.StringFlag{
@@ -1417,13 +1417,41 @@ func setTxPool(ctx *cli.Context, cfg *core.TxPoolConfig) {
 	}
 }
 
+func setEthashDatasetDir(ctx *cli.Context, cfg *eth.Config) {
+	switch {
+	case ctx.GlobalIsSet(EthashDatasetDirFlag.Name):
+		cfg.Ethash.DatasetDir = ctx.GlobalString(EthashDatasetDirFlag.Name)
+
+	case (ctx.GlobalBool(ClassicFlag.Name) || ctx.GlobalBool(MordorFlag.Name)) && cfg.Ethash.DatasetDir == eth.DefaultConfig.Ethash.DatasetDir:
+		// ECIP-1099 is set, use etchash dir for DAGs instead
+		home := os.Getenv("HOME")
+		if home == "" {
+			if user, err := user.Current(); err == nil {
+				home = user.HomeDir
+			}
+		}
+		if runtime.GOOS == "darwin" {
+			cfg.Ethash.DatasetDir = filepath.Join(home, "Library", "Etchash")
+		} else if runtime.GOOS == "windows" {
+			localappdata := os.Getenv("LOCALAPPDATA")
+			if localappdata != "" {
+				cfg.Ethash.DatasetDir = filepath.Join(localappdata, "Etchash")
+			} else {
+				cfg.Ethash.DatasetDir = filepath.Join(home, "AppData", "Local", "Etchash")
+			}
+		} else {
+			cfg.Ethash.DatasetDir = filepath.Join(home, ".etchash")
+		}
+	}
+}
+
 func setEthash(ctx *cli.Context, cfg *eth.Config) {
 	if ctx.GlobalIsSet(EthashCacheDirFlag.Name) {
 		cfg.Ethash.CacheDir = ctx.GlobalString(EthashCacheDirFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashDatasetDirFlag.Name) {
-		cfg.Ethash.DatasetDir = ctx.GlobalString(EthashDatasetDirFlag.Name)
-	}
+	// ECIP-1099
+	setEthashDatasetDir(ctx, cfg)
+
 	if ctx.GlobalIsSet(EthashCachesInMemoryFlag.Name) {
 		cfg.Ethash.CachesInMem = ctx.GlobalInt(EthashCachesInMemoryFlag.Name)
 	}
@@ -1947,40 +1975,16 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 	} else {
 		engine = ethash.NewFaker()
 		if !ctx.GlobalBool(FakePoWFlag.Name) {
-			datasetDir := eth.DefaultConfig.Ethash.DatasetDir
-			ecip1099Block := config.GetEthashECIP1099Transition()
-			// check if ECIP-1099 is configured for this chain
-			if ecip1099Block != nil {
-				// ECIP-1099 is set, use etchash dir for DAGs instead
-				home := os.Getenv("HOME")
-				if home == "" {
-					if user, err := user.Current(); err == nil {
-						home = user.HomeDir
-					}
-				}
-				if runtime.GOOS == "darwin" {
-					datasetDir = filepath.Join(home, "Library", "Etchash")
-				} else if runtime.GOOS == "windows" {
-					localappdata := os.Getenv("LOCALAPPDATA")
-					if localappdata != "" {
-						datasetDir = filepath.Join(localappdata, "Etchash")
-					} else {
-						datasetDir = filepath.Join(home, "AppData", "Local", "Etchash")
-					}
-				} else {
-					datasetDir = filepath.Join(home, ".etchash")
-				}
-			}
 			engine = ethash.New(ethash.Config{
 				CacheDir:         stack.ResolvePath(eth.DefaultConfig.Ethash.CacheDir),
 				CachesInMem:      eth.DefaultConfig.Ethash.CachesInMem,
 				CachesOnDisk:     eth.DefaultConfig.Ethash.CachesOnDisk,
 				CachesLockMmap:   eth.DefaultConfig.Ethash.CachesLockMmap,
-				DatasetDir:       stack.ResolvePath(datasetDir),
+				DatasetDir:       stack.ResolvePath(eth.DefaultConfig.Ethash.DatasetDir),
 				DatasetsInMem:    eth.DefaultConfig.Ethash.DatasetsInMem,
 				DatasetsOnDisk:   eth.DefaultConfig.Ethash.DatasetsOnDisk,
 				DatasetsLockMmap: eth.DefaultConfig.Ethash.DatasetsLockMmap,
-				ECIP1099Block:    ecip1099Block,
+				ECIP1099Block:    config.GetEthashECIP1099Transition(),
 			}, nil, false)
 		}
 	}

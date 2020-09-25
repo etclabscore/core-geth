@@ -17,7 +17,6 @@
 package eth
 
 import (
-	"fmt"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -90,8 +89,8 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 	// b.chainSync.forced = true
 
 	io1, io2 := p2p.MsgPipe()
-	go a.handle(a.newPeer(65, p2p.NewPeer(enode.ID{}, fmt.Sprintf("peer-b"), nil), io2, a.txpool.Get))
-	go b.handle(b.newPeer(65, p2p.NewPeer(enode.ID{}, fmt.Sprintf("peer-a"), nil), io1, b.txpool.Get))
+	go a.handle(a.newPeer(65, p2p.NewPeer(enode.ID{}, "peer-b", nil), io2, a.txpool.Get))
+	go b.handle(b.newPeer(65, p2p.NewPeer(enode.ID{}, "peer-a", nil), io1, b.txpool.Get))
 	time.Sleep(250 * time.Millisecond)
 
 	op := peerToSyncOp(downloader.FullSync, b.peers.BestPeer())

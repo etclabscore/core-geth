@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 func TestFastSyncDisabling63(t *testing.T) { testFastSyncDisabling(t, 63) }
@@ -121,5 +122,11 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 	}
 	if b.blockchain.IsArtificialFinalityEnabled() {
 		t.Error("AF not disabled")
+	}
+}
+
+func TestArtificialFinalitySafetyLoopTimeComparison(t *testing.T) {
+	if !(time.Since(time.Unix(int64(params.DefaultMessNetGenesisBlock().Timestamp), 0)) > artificialFinalitySafetyInterval) {
+		t.Fatal("bad unit logic!")
 	}
 }

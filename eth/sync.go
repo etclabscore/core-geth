@@ -69,24 +69,16 @@ func (pm *ProtocolManager) artificialFinalitySafetyLoop() {
 	t := time.NewTicker(artificialFinalitySafetyInterval)
 	defer t.Stop()
 
-	var lastHead uint64
-
 	for {
 		select {
 		case <-t.C:
 			if pm.blockchain.IsArtificialFinalityEnabled() {
-				// Get the latest header we have.
-				n := pm.blockchain.CurrentHeader().Number.Uint64()
-				// If it has changed, we haven't gone stale or dark.
-				if lastHead != n {
-					lastHead = n
-					continue
+				// Check if your chain has grown stale.
+				// If it has, disable artificial finality, we could be on an attacker's
+				// chain getting starved.
+				if time.Since(time.Unix(int64(pm.blockchain.CurrentHeader().Time), 0)) > artificialFinalitySafetyInterval {
+					pm.blockchain.EnableArtificialFinality(false, "reason", "stale safety interval", "interval", artificialFinalitySafetyInterval)
 				}
-				// Else, it hasn't changed, which means we've been at the same
-				// header for the whole timer interval time.
-				pm.blockchain.EnableArtificialFinality(false, "reason", "stale safety interval", "interval", artificialFinalitySafetyInterval)
-			} else {
-				lastHead = 0 // reset
 			}
 		case <-pm.quitSync:
 			return

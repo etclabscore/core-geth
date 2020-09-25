@@ -267,6 +267,10 @@ func (pm *ProtocolManager) Start(maxPeers int) {
 	pm.wg.Add(2)
 	go pm.chainSync.loop()
 	go pm.txsyncLoop64() // TODO(karalabe): Legacy initial tx echange, drop with eth/64.
+
+	// start artificial finality safety loop
+	pm.wg.Add(1)
+	go pm.artificialFinalitySafetyLoop()
 }
 
 func (pm *ProtocolManager) Stop() {

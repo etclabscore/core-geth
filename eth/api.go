@@ -264,6 +264,15 @@ func (api *PrivateAdminAPI) ImportChain(file string) (bool, error) {
 	return true, nil
 }
 
+func (api *PrivateAdminAPI) Ecbp1100(blockNr rpc.BlockNumber) (bool, error) {
+	i := uint64(blockNr.Int64())
+	err := api.eth.blockchain.Config().SetECBP1100Transition(&i)
+	return api.eth.blockchain.IsArtificialFinalityEnabled() &&
+		api.eth.blockchain.Config().IsEnabled(
+			api.eth.blockchain.Config().GetECBP1100Transition,
+			api.eth.blockchain.CurrentBlock().Number()), err
+}
+
 // PublicDebugAPI is the collection of Ethereum full node APIs exposed
 // over the public debugging endpoint.
 type PublicDebugAPI struct {

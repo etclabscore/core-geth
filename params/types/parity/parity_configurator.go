@@ -624,6 +624,17 @@ func (spec *ParityChainSpec) SetEIP2537Transition(n *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetECBP1100Transition() *uint64 {
+	return nil
+}
+
+func (spec *ParityChainSpec) SetECBP1100Transition(n *uint64) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
 func (spec *ParityChainSpec) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

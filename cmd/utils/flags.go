@@ -756,6 +756,10 @@ var (
 		Usage: "External EVM configuration (default = built-in interpreter)",
 		Value: "",
 	}
+	ECBP1100Flag = cli.Uint64Flag{
+		Name:  "ecbp1100",
+		Usage: "Configure ECBP-1100 (MESS) block activation number",
+	}
 )
 
 // MakeDataDir retrieves the currently requested data directory, terminating
@@ -1698,6 +1702,13 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Override genesis configuration if a --<chain> flag.
 	if gen := genesisForCtxChainConfig(ctx); gen != nil {
 		cfg.Genesis = gen
+	}
+	// Handle temporary chain configuration override cases.
+	if ctx.GlobalIsSet(ECBP1100Flag.Name) {
+		n := ctx.GlobalUint64(ECBP1100Flag.Name)
+		if err := cfg.Genesis.Config.SetECBP1100Transition(&n); err != nil {
+			Fatalf("Failed to set ECBP-1100 activation number: %v", err)
+		}
 	}
 
 	// Establish NetworkID.

@@ -50,3 +50,6 @@ issues:
     - path: cmd/faucet/
       linters:
         - deadcode
+    - path: core/blockchain_af.go
+      linters:
+        - deadcode

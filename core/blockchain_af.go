@@ -129,7 +129,7 @@ def get_curve_function_numerator(time_delta: int) -> int:
 
 The if tdRatio < antiGravity check would then be
 
-if proposed_subchain_td * CURVE_FUNCTION_DENOMINATOR < get_curve_function_numerator(proposed.Time - commonAncestor.Time) * local_subchain_td.
+if proposed_subchain_td * CURVE_FUNCTION_DENOMINATOR < get_curve_function_numerator(current.Time - commonAncestor.Time) * local_subchain_td.
 */
 func ecbp1100PolynomialV(x *big.Int) *big.Int {
 

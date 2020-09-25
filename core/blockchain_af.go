@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	emath "github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 )
@@ -92,12 +91,11 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 
 	got := new(big.Int).Mul(proposedSubchainTD, ecbp1100PolynomialVCurveFunctionDenominator)
 
-	prettyRatio, _ := new(big.Float).Quo(
-		new(big.Float).SetInt(got),
-		new(big.Float).SetInt(want),
-	).Float64()
-
 	if got.Cmp(want) < 0 {
+		prettyRatio, _ := new(big.Float).Quo(
+			new(big.Float).SetInt(got),
+			new(big.Float).SetInt(want),
+		).Float64()
 		return fmt.Errorf(`%w: ECBP1100-MESS 🔒 status=rejected age=%v current.span=%v proposed.span=%v tdr/gravity=%0.6f common.bno=%d common.hash=%s current.bno=%d current.hash=%s proposed.bno=%d proposed.hash=%s`,
 			errReorgFinality,
 			common.PrettyAge(time.Unix(int64(commonAncestor.Time), 0)),
@@ -131,7 +129,7 @@ def get_curve_function_numerator(time_delta: int) -> int:
 
 The if tdRatio < antiGravity check would then be
 
-if proposed_subchain_td * CURVE_FUNCTION_DENOMINATOR < get_curve_function_numerator(proposed.Time - commonAncestor.Time) * local_subchain_td.
+if proposed_subchain_td * CURVE_FUNCTION_DENOMINATOR < get_curve_function_numerator(current.Time - commonAncestor.Time) * local_subchain_td.
 */
 func ecbp1100PolynomialV(x *big.Int) *big.Int {
 
@@ -139,11 +137,15 @@ func ecbp1100PolynomialV(x *big.Int) *big.Int {
 
 	// if x > xcap:
 	//    x = xcap
-	xA := big.NewInt(0)
-	xA.Set(emath.BigMin(x, ecbp1100PolynomialVXCap))
+	xA := new(big.Int).Set(x)
+	if xA.Cmp(ecbp1100PolynomialVXCap) > 0 {
+		xA.Set(ecbp1100PolynomialVXCap)
+	}
 
-	xB := big.NewInt(0)
-	xB.Set(emath.BigMin(x, ecbp1100PolynomialVXCap))
+	xB := new(big.Int).Set(x)
+	if xB.Cmp(ecbp1100PolynomialVXCap) > 0 {
+		xB.Set(ecbp1100PolynomialVXCap)
+	}
 
 	out := big.NewInt(0)
 
@@ -191,23 +193,6 @@ var ecbp1100PolynomialVAmpl = big.NewInt(15)
 // ecbp1100PolynomialVHeight
 // height = CURVE_FUNCTION_DENOMINATOR * (ampl * 2)
 var ecbp1100PolynomialVHeight = new(big.Int).Mul(new(big.Int).Mul(ecbp1100PolynomialVCurveFunctionDenominator, ecbp1100PolynomialVAmpl), big2)
-
-/*
-ecbp1100PolynomialVI64 is an int64 implementation of ecbp1100PolynomialV.
-*/
-func ecbp1100PolynomialVI64(x int64) int64 {
-	if x > ecbp1100PolynomialVXCapI64 {
-		x = ecbp1100PolynomialVXCapI64
-	}
-	return ecbp1100PolynomialVCurveFunctionDenominatorI64 +
-		((3*emath.BigPow(x, 2).Int64())-(2*emath.BigPow(x, 3).Int64()/ecbp1100PolynomialVXCapI64))*
-			ecbp1100PolynomialVHeightI64/(emath.BigPow(ecbp1100PolynomialVXCapI64, 2).Int64())
-}
-
-var ecbp1100PolynomialVCurveFunctionDenominatorI64 = int64(128)
-var ecbp1100PolynomialVXCapI64 = int64(25132)
-var ecbp1100PolynomialVAmplI64 = int64(15)
-var ecbp1100PolynomialVHeightI64 = ecbp1100PolynomialVCurveFunctionDenominatorI64 * ecbp1100PolynomialVAmplI64 * 2
 
 /*
 ecbp1100AGSinusoidalA is a sinusoidal function.

@@ -392,14 +392,12 @@ func (c *ChainConfig) SetEIP2537Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetECBP1100Transition() *uint64 {
-	return nil
+	return bigNewU64(c.ecbp1100Transition)
 }
 
 func (c *ChainConfig) SetECBP1100Transition(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	return ctypes.ErrUnsupportedConfigFatal
+	c.ecbp1100Transition = setBig(c.ecbp1100Transition, n)
+	return nil
 }
 
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {

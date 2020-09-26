@@ -278,12 +278,19 @@ func TestCheckCompatible(t *testing.T) {
 			head:    9700000,
 			wantErr: nil,
 		},
-		{
-			stored:  &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30)},
-			new:     &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30), PetersburgBlock: big.NewInt(30)},
-			head:    40,
-			wantErr: nil,
-		},
+		// https://github.com/ethereum/go-ethereum/pull/21473
+		// This is to enable private chains running on older Geth release 1.8.27 with Constantinople fork enabled (but not Petersburg) to apply Petersburg retroactively when upgrading to Geth 1.9.
+		// ... but @meowsbits thinks this isn't reasonable.
+		// This is allowance would presume that the private chains were unaffected by the constantinople vs. petersburg
+		// changes, and were safe to retroactively set the config. I do not understand how this is allowed or even desireable...
+		// Are the configs equivalent? No. Do we have any observables in place to ensure that the chain data will not be
+		// retroactively corrupted? No.
+		// {
+		// 	stored:  &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30)},
+		// 	new:     &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30), PetersburgBlock: big.NewInt(30)},
+		// 	head:    40,
+		// 	wantErr: nil,
+		// },
 		{
 			stored: &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30)},
 			new:    &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30), PetersburgBlock: big.NewInt(31)},

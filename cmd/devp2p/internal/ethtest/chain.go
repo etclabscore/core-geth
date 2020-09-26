@@ -10,16 +10,16 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/forkid"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
 type Chain struct {
 	blocks      []*types.Block
-	chainConfig *params.ChainConfig
+	chainConfig ctypes.ChainConfigurator
 }
 
 func (c *Chain) WriteTo(writer io.Writer) error {
@@ -56,10 +56,10 @@ func (c *Chain) Shorten(height int) *Chain {
 	blocks := make([]*types.Block, height)
 	copy(blocks, c.blocks[:height])
 
-	config := *c.chainConfig
+	config := c.chainConfig
 	return &Chain{
 		blocks:      blocks,
-		chainConfig: &config,
+		chainConfig: config,
 	}
 }
 
@@ -101,7 +101,7 @@ func loadChain(chainfile string, genesis string) (*Chain, error) {
 	if err != nil {
 		return nil, err
 	}
-	var gen core.Genesis
+	var gen genesisT.Genesis
 	if err := json.Unmarshal(chainConfig, &gen); err != nil {
 		return nil, err
 	}

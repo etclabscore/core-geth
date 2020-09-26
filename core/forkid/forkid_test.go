@@ -434,7 +434,7 @@ func TestGenerateSpecificationCases(t *testing.T) {
 		fmt.Println("| Head Block Number | `FORK_HASH` | `FORK_NEXT` | RLP Encoded (Hex) |")
 		fmt.Println("| --- | --- | --- | --- |")
 		for _, c := range cs {
-			id := newID(tt.config, tt.genesisHash, c)
+			id := NewID(tt.config, tt.genesisHash, c)
 			isCanonical := false
 			for _, fi := range forks {
 				if c == fi {

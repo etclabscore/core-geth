@@ -282,7 +282,7 @@ func TestCheckCompatible(t *testing.T) {
 		// This is to enable private chains running on older Geth release 1.8.27 with Constantinople fork enabled (but not Petersburg) to apply Petersburg retroactively when upgrading to Geth 1.9.
 		// ... but @meowsbits thinks this isn't reasonable.
 		// This is allowance would presume that the private chains were unaffected by the constantinople vs. petersburg
-		// changes, and were safe to retroactively set the config. I do not understand how this is allowed or even desireable...
+		// changes, and were safe to retroactively set the config. I do not understand how this is allowed or even desirable...
 		// Are the configs equivalent? No. Do we have any observables in place to ensure that the chain data will not be
 		// retroactively corrupted? No.
 		// {

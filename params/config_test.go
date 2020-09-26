@@ -278,6 +278,23 @@ func TestCheckCompatible(t *testing.T) {
 			head:    9700000,
 			wantErr: nil,
 		},
+		{
+			stored:  &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30)},
+			new:     &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30), PetersburgBlock: big.NewInt(30)},
+			head:    40,
+			wantErr: nil,
+		},
+		{
+			stored: &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30)},
+			new:    &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30), PetersburgBlock: big.NewInt(31)},
+			head:   40,
+			wantErr: &confp.ConfigCompatError{
+				What:         "Petersburg fork block",
+				StoredConfig: nil,
+				NewConfig:    uint64P(big.NewInt(31).Uint64()),
+				RewindTo:     30,
+			},
+		},
 	}
 
 	for _, test := range tests {

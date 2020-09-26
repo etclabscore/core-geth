@@ -20,6 +20,7 @@ import (
 )
 
 func testGenerateBlockAndImportCG(t *testing.T, chainConfig ctypes.ChainConfigurator, numBlocks int) {
+	t.Parallel()
 	var (
 		engine consensus.Engine
 		db     = rawdb.NewMemoryDatabase()

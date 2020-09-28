@@ -173,7 +173,7 @@ type CoreGethChainConfig struct {
 	ECIP1017EraRounds  *big.Int `json:"ecip1017EraRounds,omitempty"` // ECIP1017 era rounds
 	ECIP1080FBlock     *big.Int `json:"ecip1080FBlock,omitempty"`
 
-  ECIP1099FBlock *big.Int `json:"ecip1099FBlock,omitempty"` // ECIP1099 etchash HF block
+	ECIP1099FBlock *big.Int `json:"ecip1099FBlock,omitempty"` // ECIP1099 etchash HF block
 	ECBP1100FBlock *big.Int `json:"ecbp1100FBlock,omitempty"` // ECBP1100:MESS artificial finality
 
 	DisposalBlock    *big.Int `json:"disposalBlock,omitempty"`    // Bomb disposal HF block

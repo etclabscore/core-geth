@@ -809,6 +809,7 @@ func (ps *peerSet) BestPeer() *peer {
 	return bestPeer
 }
 
+// WorstPeer retrieves the known peer with the currently lowest total difficulty.
 func (ps *peerSet) WorstPeer() *peer {
 	ps.lock.RLock()
 	defer ps.lock.RUnlock()

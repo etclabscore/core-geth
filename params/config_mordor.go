@@ -66,6 +66,8 @@ var (
 		EIP2028FBlock: big.NewInt(999_983),
 		EIP2200FBlock: big.NewInt(999_983), // RePetersburg (== re-1283)
 
+		ECIP1099FBlock: big.NewInt(2_520_000), // Etchash
+
 		DisposalBlock:      big.NewInt(0),
 		ECIP1017FBlock:     big.NewInt(0),
 		ECIP1017EraRounds:  big.NewInt(2000000),

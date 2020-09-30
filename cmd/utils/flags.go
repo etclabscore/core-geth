@@ -24,7 +24,9 @@ import (
 	"io/ioutil"
 	"math/big"
 	"os"
+	"os/user"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -320,6 +322,11 @@ var (
 	EthashDatasetsLockMmapFlag = cli.BoolFlag{
 		Name:  "ethash.dagslockmmap",
 		Usage: "Lock memory maps for recent ethash mining DAGs",
+	}
+	EthashEpochLengthFlag = cli.Int64Flag{
+		Name:  "epoch.length",
+		Usage: "Sets epoch length for makecache & makedag commands",
+		Value: 30000,
 	}
 	// Transaction pool settings
 	TxPoolLocalsFlag = cli.StringFlag{
@@ -1414,13 +1421,41 @@ func setTxPool(ctx *cli.Context, cfg *core.TxPoolConfig) {
 	}
 }
 
+func setEthashDatasetDir(ctx *cli.Context, cfg *eth.Config) {
+	switch {
+	case ctx.GlobalIsSet(EthashDatasetDirFlag.Name):
+		cfg.Ethash.DatasetDir = ctx.GlobalString(EthashDatasetDirFlag.Name)
+
+	case (ctx.GlobalBool(ClassicFlag.Name) || ctx.GlobalBool(MordorFlag.Name)) && cfg.Ethash.DatasetDir == eth.DefaultConfig.Ethash.DatasetDir:
+		// ECIP-1099 is set, use etchash dir for DAGs instead
+		home := os.Getenv("HOME")
+		if home == "" {
+			if user, err := user.Current(); err == nil {
+				home = user.HomeDir
+			}
+		}
+		if runtime.GOOS == "darwin" {
+			cfg.Ethash.DatasetDir = filepath.Join(home, "Library", "Etchash")
+		} else if runtime.GOOS == "windows" {
+			localappdata := os.Getenv("LOCALAPPDATA")
+			if localappdata != "" {
+				cfg.Ethash.DatasetDir = filepath.Join(localappdata, "Etchash")
+			} else {
+				cfg.Ethash.DatasetDir = filepath.Join(home, "AppData", "Local", "Etchash")
+			}
+		} else {
+			cfg.Ethash.DatasetDir = filepath.Join(home, ".etchash")
+		}
+	}
+}
+
 func setEthash(ctx *cli.Context, cfg *eth.Config) {
 	if ctx.GlobalIsSet(EthashCacheDirFlag.Name) {
 		cfg.Ethash.CacheDir = ctx.GlobalString(EthashCacheDirFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashDatasetDirFlag.Name) {
-		cfg.Ethash.DatasetDir = ctx.GlobalString(EthashDatasetDirFlag.Name)
-	}
+	// ECIP-1099
+	setEthashDatasetDir(ctx, cfg)
+
 	if ctx.GlobalIsSet(EthashCachesInMemoryFlag.Name) {
 		cfg.Ethash.CachesInMem = ctx.GlobalInt(EthashCachesInMemoryFlag.Name)
 	}
@@ -1960,6 +1995,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 				DatasetsInMem:    eth.DefaultConfig.Ethash.DatasetsInMem,
 				DatasetsOnDisk:   eth.DefaultConfig.Ethash.DatasetsOnDisk,
 				DatasetsLockMmap: eth.DefaultConfig.Ethash.DatasetsLockMmap,
+				ECIP1099Block:    config.GetEthashECIP1099Transition(),
 			}, nil, false)
 		}
 	}

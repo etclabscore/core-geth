@@ -45,12 +45,12 @@ func prepare(dest []uint32, src []byte) {
 func TestSizeCalculations(t *testing.T) {
 	// Verify all the cache and dataset sizes from the lookup table.
 	for epoch, want := range cacheSizes {
-		if size := calcCacheSize(epoch); size != want {
+		if size := calcCacheSize(uint64(epoch)); size != want {
 			t.Errorf("cache %d: cache size mismatch: have %d, want %d", epoch, size, want)
 		}
 	}
 	for epoch, want := range datasetSizes {
-		if size := calcDatasetSize(epoch); size != want {
+		if size := calcDatasetSize(uint64(epoch)); size != want {
 			t.Errorf("dataset %d: dataset size mismatch: have %d, want %d", epoch, size, want)
 		}
 	}
@@ -108,7 +108,7 @@ func TestCacheGeneration(t *testing.T) {
 	}
 	for i, tt := range tests {
 		cache := make([]uint32, tt.size/4)
-		generateCache(cache, tt.epoch, seedHash(tt.epoch*epochLength+1))
+		generateCache(cache, tt.epoch, epochLengthDefault, seedHash(tt.epoch*epochLengthDefault+1))
 
 		want := make([]uint32, tt.size/4)
 		prepare(want, tt.cache)
@@ -648,10 +648,10 @@ func TestDatasetGeneration(t *testing.T) {
 	}
 	for i, tt := range tests {
 		cache := make([]uint32, tt.cacheSize/4)
-		generateCache(cache, tt.epoch, seedHash(tt.epoch*epochLength+1))
+		generateCache(cache, tt.epoch, epochLengthDefault, seedHash(tt.epoch*epochLengthDefault+1))
 
 		dataset := make([]uint32, tt.datasetSize/4)
-		generateDataset(dataset, tt.epoch, cache)
+		generateDataset(dataset, tt.epoch, epochLengthDefault, cache)
 
 		want := make([]uint32, tt.datasetSize/4)
 		prepare(want, tt.dataset)
@@ -667,10 +667,10 @@ func TestDatasetGeneration(t *testing.T) {
 func TestHashimoto(t *testing.T) {
 	// Create the verification cache and mining dataset
 	cache := make([]uint32, 1024/4)
-	generateCache(cache, 0, make([]byte, 32))
+	generateCache(cache, 0, epochLengthDefault, make([]byte, 32))
 
 	dataset := make([]uint32, 32*1024/4)
-	generateDataset(dataset, 0, cache)
+	generateDataset(dataset, 0, epochLengthDefault, cache)
 
 	// Create a block to verify
 	hash := hexutil.MustDecode("0xc9149cc0386e689d789a1c2f3d5d169a61a6218ed30e74414dc736e442ef3d1f")
@@ -729,7 +729,7 @@ func TestConcurrentDiskCacheGeneration(t *testing.T) {
 
 		go func(idx int) {
 			defer pend.Done()
-			ethash := New(Config{cachedir, 0, 1, false, "", 0, 0, false, ModeNormal, nil}, nil, false)
+			ethash := New(Config{cachedir, 0, 1, false, "", 0, 0, false, ModeNormal, nil, nil}, nil, false)
 			defer ethash.Close()
 			if err := ethash.VerifySeal(nil, block.Header()); err != nil {
 				t.Errorf("proc %d: block verification failed: %v", idx, err)
@@ -742,43 +742,43 @@ func TestConcurrentDiskCacheGeneration(t *testing.T) {
 // Benchmarks the cache generation performance.
 func BenchmarkCacheGeneration(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		cache := make([]uint32, cacheSize(1)/4)
-		generateCache(cache, 0, make([]byte, 32))
+		cache := make([]uint32, cacheSize(1, 0)/4)
+		generateCache(cache, 0, epochLengthDefault, make([]byte, 32))
 	}
 }
 
 // Benchmarks the dataset (small) generation performance.
 func BenchmarkSmallDatasetGeneration(b *testing.B) {
 	cache := make([]uint32, 65536/4)
-	generateCache(cache, 0, make([]byte, 32))
+	generateCache(cache, 0, epochLengthDefault, make([]byte, 32))
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		dataset := make([]uint32, 32*65536/4)
-		generateDataset(dataset, 0, cache)
+		generateDataset(dataset, 0, epochLengthDefault, cache)
 	}
 }
 
 // Benchmarks the light verification performance.
 func BenchmarkHashimotoLight(b *testing.B) {
-	cache := make([]uint32, cacheSize(1)/4)
-	generateCache(cache, 0, make([]byte, 32))
+	cache := make([]uint32, cacheSize(1, 0)/4)
+	generateCache(cache, 0, epochLengthDefault, make([]byte, 32))
 
 	hash := hexutil.MustDecode("0xc9149cc0386e689d789a1c2f3d5d169a61a6218ed30e74414dc736e442ef3d1f")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		hashimotoLight(datasetSize(1), cache, hash, 0)
+		hashimotoLight(datasetSize(1, 0), cache, hash, 0)
 	}
 }
 
 // Benchmarks the full (small) verification performance.
 func BenchmarkHashimotoFullSmall(b *testing.B) {
 	cache := make([]uint32, 65536/4)
-	generateCache(cache, 0, make([]byte, 32))
+	generateCache(cache, 0, epochLengthDefault, make([]byte, 32))
 
 	dataset := make([]uint32, 32*65536/4)
-	generateDataset(dataset, 0, cache)
+	generateDataset(dataset, epochLengthDefault, 0, cache)
 
 	hash := hexutil.MustDecode("0xc9149cc0386e689d789a1c2f3d5d169a61a6218ed30e74414dc736e442ef3d1f")
 

@@ -286,6 +286,7 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 			DatasetsInMem:    config.DatasetsInMem,
 			DatasetsOnDisk:   config.DatasetsOnDisk,
 			DatasetsLockMmap: config.DatasetsLockMmap,
+			ECIP1099Block:    chainConfig.GetEthashECIP1099Transition(),
 		}, notify, noverify)
 		engine.SetThreads(-1) // Disable CPU mining
 		return engine

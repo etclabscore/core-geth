@@ -398,6 +398,7 @@ func (api *RetestethAPI) SetChainParams(ctx context.Context, chainParams ChainPa
 			DatasetsInMem:    1,
 			DatasetsOnDisk:   2,
 			DatasetsLockMmap: false,
+			ECIP1099Block:    api.chainConfig.GetEthashECIP1099Transition(),
 		}, nil, false)
 	default:
 		return false, fmt.Errorf("unrecognised seal engine: %s", chainParams.SealEngine)

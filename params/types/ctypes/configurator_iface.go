@@ -187,6 +187,8 @@ type EthashConfigurator interface {
 	SetEthashEIP100BTransition(n *uint64) error
 	GetEthashECIP1041Transition() *uint64
 	SetEthashECIP1041Transition(n *uint64) error
+	GetEthashECIP1099Transition() *uint64
+	SetEthashECIP1099Transition(n *uint64) error
 
 	GetEthashDifficultyBombDelaySchedule() Uint64BigMapEncodesHex
 	SetEthashDifficultyBombDelaySchedule(m Uint64BigMapEncodesHex) error

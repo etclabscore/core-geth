@@ -162,7 +162,6 @@ func TestCreation(t *testing.T) {
 				{9573001, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
 				{10500838, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
 				{10500839, ID{Hash: checksumToBytes(0x9007bfcc), Next: 0}},
-				{10500840, ID{Hash: checksumToBytes(0x9007bfcc), Next: 0}},
 			},
 		},
 		{
@@ -197,8 +196,10 @@ func TestCreation(t *testing.T) {
 				{301243, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
 				{301244, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
 				{999982, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
-				{999983, ID{Hash: checksumToBytes(0xf42f5539), Next: 0}},
-				{999984, ID{Hash: checksumToBytes(0xf42f5539), Next: 0}},
+				{999983, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
+				{999984, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
+				{2_519_999, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
+				{2_520_000, ID{Hash: checksumToBytes(0x66b5c286), Next: 0}},
 			},
 		},
 	}
@@ -331,7 +332,7 @@ func TestGatherForks(t *testing.T) {
 		{
 			"mordor",
 			params.MordorChainConfig,
-			[]uint64{301_243, 999_983},
+			[]uint64{301_243, 999_983, 2_520_000},
 		},
 		{
 			"kotti",

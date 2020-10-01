@@ -130,8 +130,8 @@ func TestNewSimulatedBackend(t *testing.T) {
 		t.Errorf("expected sim blockchain config to equal params.AllEthashProtocolChanges, got %v", sim.config)
 	}
 
-	statedb, _ := sim.blockchain.State()
-	bal := statedb.GetBalance(testAddr)
+	stateDB, _ := sim.blockchain.State()
+	bal := stateDB.GetBalance(testAddr)
 	if bal.Cmp(expectedBal) != 0 {
 		t.Errorf("expected balance for test address not received. expected: %v actual: %v", expectedBal, bal)
 	}
@@ -522,7 +522,7 @@ func TestSimulatedBackend_EstimateGasWithPrice(t *testing.T) {
 	sim := NewSimulatedBackend(genesisT.GenesisAlloc{addr: {Balance: big.NewInt(vars.Ether*2 + 2e17)}}, 10000000)
 	defer sim.Close()
 
-	receipant := common.HexToAddress("deadbeef")
+	recipient := common.HexToAddress("deadbeef")
 	var cases = []struct {
 		name        string
 		message     ethereum.CallMsg
@@ -531,7 +531,7 @@ func TestSimulatedBackend_EstimateGasWithPrice(t *testing.T) {
 	}{
 		{"EstimateWithoutPrice", ethereum.CallMsg{
 			From:     addr,
-			To:       &receipant,
+			To:       &recipient,
 			Gas:      0,
 			GasPrice: big.NewInt(0),
 			Value:    big.NewInt(1000),
@@ -540,7 +540,7 @@ func TestSimulatedBackend_EstimateGasWithPrice(t *testing.T) {
 
 		{"EstimateWithPrice", ethereum.CallMsg{
 			From:     addr,
-			To:       &receipant,
+			To:       &recipient,
 			Gas:      0,
 			GasPrice: big.NewInt(1000),
 			Value:    big.NewInt(1000),
@@ -549,7 +549,7 @@ func TestSimulatedBackend_EstimateGasWithPrice(t *testing.T) {
 
 		{"EstimateWithVeryHighPrice", ethereum.CallMsg{
 			From:     addr,
-			To:       &receipant,
+			To:       &recipient,
 			Gas:      0,
 			GasPrice: big.NewInt(1e14), // gascost = 2.1ether
 			Value:    big.NewInt(1e17), // the remaining balance for fee is 2.1ether
@@ -558,7 +558,7 @@ func TestSimulatedBackend_EstimateGasWithPrice(t *testing.T) {
 
 		{"EstimateWithSuperhighPrice", ethereum.CallMsg{
 			From:     addr,
-			To:       &receipant,
+			To:       &recipient,
 			Gas:      0,
 			GasPrice: big.NewInt(2e14), // gascost = 4.2ether
 			Value:    big.NewInt(1000),

@@ -36,7 +36,6 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
-	whisper "github.com/ethereum/go-ethereum/whisper/whisperv6"
 )
 
 // NodeConfig represents the collection of configuration values to fine tune the Geth
@@ -72,9 +71,6 @@ type NodeConfig struct {
 	// It has the form "nodename:secret@host:port"
 	EthereumNetStats string
 
-	// WhisperEnabled specifies whether the node should run the Whisper protocol.
-	WhisperEnabled bool
-
 	// Listening address of pprof server.
 	PprofAddress string
 }
@@ -93,6 +89,22 @@ var defaultNodeConfig = &NodeConfig{
 func NewNodeConfig() *NodeConfig {
 	config := *defaultNodeConfig
 	return &config
+}
+
+// AddBootstrapNode adds an additional bootstrap node to the node config.
+func (conf *NodeConfig) AddBootstrapNode(node *Enode) {
+	conf.BootstrapNodes.Append(node)
+}
+
+// EncodeJSON encodes a NodeConfig into a JSON data dump.
+func (conf *NodeConfig) EncodeJSON() (string, error) {
+	data, err := json.Marshal(conf)
+	return string(data), err
+}
+
+// String returns a printable representation of the node config.
+func (conf *NodeConfig) String() string {
+	return encodeOrError(conf)
 }
 
 // Node represents a Geth Ethereum node instance.
@@ -197,12 +209,6 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 			if err := ethstats.New(rawStack, lesBackend.ApiBackend, lesBackend.Engine(), config.EthereumNetStats); err != nil {
 				return nil, fmt.Errorf("netstats init: %v", err)
 			}
-		}
-	}
-	// Register the Whisper protocol if requested
-	if config.WhisperEnabled {
-		if _, err := whisper.New(rawStack, &whisper.DefaultConfig); err != nil {
-			return nil, fmt.Errorf("whisper init: %v", err)
 		}
 	}
 	return &Node{rawStack}, nil

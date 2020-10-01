@@ -205,8 +205,8 @@ func TestCreation(t *testing.T) {
 	}
 	for i, tt := range tests {
 		for j, ttt := range tt.cases {
-			if have := newID(tt.config, tt.genesis, ttt.head); have != ttt.want {
-				t.Errorf("test %d, case %d, name: %s, head: %d: fork ID mismatch: have %x, want %x", i, j, tt.name, ttt.head, have, ttt.want)
+			if have := NewID(tt.config, tt.genesis, ttt.head); have != ttt.want {
+				t.Errorf("test %d, case %d: fork ID mismatch: have %x, want %x", i, j, have, ttt.want)
 			}
 		}
 	}
@@ -435,7 +435,7 @@ func TestGenerateSpecificationCases(t *testing.T) {
 		fmt.Println("| Head Block Number | `FORK_HASH` | `FORK_NEXT` | RLP Encoded (Hex) |")
 		fmt.Println("| --- | --- | --- | --- |")
 		for _, c := range cs {
-			id := newID(tt.config, tt.genesisHash, c)
+			id := NewID(tt.config, tt.genesisHash, c)
 			isCanonical := false
 			for _, fi := range forks {
 				if c == fi {

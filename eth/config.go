@@ -189,4 +189,7 @@ type Config struct {
 
 	// CheckpointOracle is the configuration for checkpoint oracle.
 	CheckpointOracle *ctypes.CheckpointOracleConfig `toml:",omitempty"`
+
+	// Manual configuration field for ECBP1100 activation number. Used for modifying genesis config via CLI flag.
+	ECBP1100 *big.Int
 }

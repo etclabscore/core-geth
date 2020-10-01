@@ -34,6 +34,10 @@ import (
 	"github.com/ethereum/go-ethereum/trie"
 )
 
+func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
+	return SetupGenesisBlockWithOverride(db, genesis, nil)
+}
+
 // SetupGenesisBlock writes or updates the genesis block in db.
 // The block that will be used is:
 //
@@ -47,7 +51,7 @@ import (
 // error is a *params.ConfigCompatError and the new, unwritten config is returned.
 //
 // The returned chain configuration is never nil.
-func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, ecbp1100 *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
@@ -60,6 +64,14 @@ func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.Cha
 		} else {
 			log.Info("Writing custom genesis block")
 		}
+
+		if ecbp1100 != nil {
+			n := ecbp1100.Uint64()
+			if err := genesis.SetECBP1100Transition(&n); err != nil {
+				return genesis, stored, err
+			}
+		}
+
 		block, err := CommitGenesis(genesis, db)
 		if err != nil {
 			return genesis.Config, common.Hash{}, err
@@ -97,6 +109,14 @@ func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.Cha
 
 	// Get the existing chain configuration.
 	newcfg := configOrDefault(genesis, stored)
+
+	if ecbp1100 != nil {
+		n := ecbp1100.Uint64()
+		if err := newcfg.SetECBP1100Transition(&n); err != nil {
+			return newcfg, stored, err
+		}
+	}
+
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {
 		log.Warn("Found genesis block without chain config")

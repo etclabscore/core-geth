@@ -766,6 +766,18 @@ web3._extend({
 	property: 'trace',
 	methods: [
 		new web3._extend.Method({
+			name: 'traceBlockByNumber',
+			call: 'trace_traceBlockByNumber',
+			params: 2,
+			inputFormatter: [null, null]
+		}),
+		new web3._extend.Method({
+			name: 'traceBlock',
+			call: 'trace_traceBlock',
+			params: 2,
+			inputFormatter: [null, null]
+		}),
+		new web3._extend.Method({
 			name: 'traceTransaction',
 			call: 'trace_traceTransaction',
 			params: 2,

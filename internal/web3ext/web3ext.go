@@ -31,6 +31,7 @@ var Modules = map[string]string{
 	"rpc":        RpcJs,
 	"shh":        ShhJs,
 	"swarmfs":    SwarmfsJs,
+	"trace":      TraceJs,
 	"txpool":     TxpoolJs,
 	"les":        LESJs,
 	"lespay":     LESPayJs,
@@ -757,6 +758,21 @@ web3._extend({
 			params: 0
 		}),
 	]
+});
+`
+
+const TraceJs = `
+web3._extend({
+	property: 'trace',
+	methods: [
+		new web3._extend.Method({
+			name: 'traceTransaction',
+			call: 'trace_traceTransaction',
+			params: 2,
+			inputFormatter: [null, null]
+		}),
+	],
+	properties: []
 });
 `
 

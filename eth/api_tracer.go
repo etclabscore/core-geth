@@ -388,10 +388,10 @@ func (api *PrivateDebugAPI) TraceBlockByNumber(ctx context.Context, number rpc.B
 	return traceBlockByNumber(ctx, api.eth, number, config)
 }
 
-// TraceBlock returns the structured logs created during the execution of
+// Block returns the structured logs created during the execution of
 // EVM and returns them as a JSON object.
 // The correct name will be TraceBlockByNumber, though we want to be compatible with OpenEthereum trace module.
-func (api *PrivateTraceAPI) TraceBlock(ctx context.Context, number rpc.BlockNumber, config *TraceConfig) ([]*txTraceResult, error) {
+func (api *PrivateTraceAPI) Block(ctx context.Context, number rpc.BlockNumber, config *TraceConfig) ([]*txTraceResult, error) {
 	config = setConfigTracerToOpenEthereum(config)
 	return traceBlockByNumber(ctx, api.eth, number, config)
 }
@@ -769,9 +769,9 @@ func (api *PrivateDebugAPI) TraceTransaction(ctx context.Context, hash common.Ha
 	return traceTransaction(ctx, api.eth, hash, config)
 }
 
-// TraceTransaction returns the structured logs created during the execution of EVM
+// Transaction returns the structured logs created during the execution of EVM
 // and returns them as a JSON object.
-func (api *PrivateTraceAPI) TraceTransaction(ctx context.Context, hash common.Hash, config *TraceConfig) (interface{}, error) {
+func (api *PrivateTraceAPI) Transaction(ctx context.Context, hash common.Hash, config *TraceConfig) (interface{}, error) {
 	config = setConfigTracerToOpenEthereum(config)
 	return traceTransaction(ctx, api.eth, hash, config)
 }

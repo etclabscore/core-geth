@@ -924,3 +924,9 @@ func computeTxEnv(eth *Ethereum, block *types.Block, txIndex int, reexec uint64)
 func (api *PrivateDebugAPI) computeTxEnv(block *types.Block, txIndex int, reexec uint64) (core.Message, vm.Context, *state.StateDB, error) {
 	return computeTxEnv(api.eth, block, txIndex, reexec)
 }
+
+func (api *PrivateTraceAPI) Filter(ctx context.Context, args ethapi.CallArgs, config *TraceConfig) ([]*txTraceResult, error) {
+	config = setConfigTracerToOpenEthereum(config)
+	fmt.Printf("args: %#v\n", args)
+	return nil, nil
+}

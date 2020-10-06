@@ -777,6 +777,12 @@ web3._extend({
 			params: 2,
 			inputFormatter: [null, null]
 		}),
+		new web3._extend.Method({
+			name: 'filter',
+			call: 'trace_filter',
+			params: 2,
+			inputFormatter: [null, null]
+		}),
 	],
 	properties: []
 });

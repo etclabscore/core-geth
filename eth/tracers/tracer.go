@@ -541,6 +541,13 @@ func (jst *Tracer) CaptureStart(from common.Address, to common.Address, create b
 	return nil
 }
 
+func (jst *Tracer) CaptureExtraContext(inputs map[string]interface{}) error {
+	for key, val := range inputs {
+		jst.ctx[key] = val
+	}
+	return nil
+}
+
 // CaptureState implements the Tracer interface to trace a single step of VM execution.
 func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, memory *vm.Memory, stack *vm.Stack, rStack *vm.ReturnStack, rdata []byte, contract *vm.Contract, depth int, err error) error {
 	if jst.err == nil {

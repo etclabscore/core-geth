@@ -95,8 +95,9 @@ type blockTraceResult struct {
 // txTraceTask represents a single transaction trace task when an entire block
 // is being traced.
 type txTraceTask struct {
-	statedb *state.StateDB // Intermediate state prepped for tracing
-	index   int            // Transaction offset in the block
+	statedb          *state.StateDB // Intermediate state prepped for tracing
+	index            int            // Transaction offset in the block
+	taskExtraContext map[string]interface{}
 }
 
 // setConfigTracerToOpenEthereum forces the Tracer to the OpenEthereum one
@@ -219,7 +220,7 @@ func (api *PrivateDebugAPI) traceChain(ctx context.Context, start, end *types.Bl
 					msg, _ := tx.AsMessage(signer)
 					vmctx := core.NewEVMContext(msg, task.block.Header(), api.eth.blockchain, nil)
 
-					res, err := traceTx(ctx, api.eth, msg, vmctx, task.statedb, config)
+					res, err := traceTx(ctx, api.eth, msg, vmctx, task.statedb, nil, config)
 					if err != nil {
 						task.results[i] = &txTraceResult{Error: err.Error()}
 						log.Warn("Tracing failed", "hash", tx.Hash(), "block", task.block.NumberU64(), "err", err)
@@ -513,7 +514,7 @@ func traceBlock(ctx context.Context, eth *Ethereum, block *types.Block, config *
 				msg, _ := txs[task.index].AsMessage(signer)
 				vmctx := core.NewEVMContext(msg, block.Header(), eth.blockchain, nil)
 
-				res, err := traceTx(ctx, eth, msg, vmctx, task.statedb, config)
+				res, err := traceTx(ctx, eth, msg, vmctx, task.statedb, task.taskExtraContext, config)
 				if err != nil {
 					results[task.index] = &txTraceResult{Error: err.Error()}
 					continue
@@ -525,8 +526,14 @@ func traceBlock(ctx context.Context, eth *Ethereum, block *types.Block, config *
 	// Feed the transactions into the tracers and return
 	var failed error
 	for i, tx := range txs {
+		taskExtraContext := map[string]interface{}{
+			"blockHash":           block.Hash().Hex(),
+			"transactionHash":     tx.Hash().Hex(),
+			"transactionPosition": uint64(i),
+		}
+
 		// Send the trace task over for execution
-		jobs <- &txTraceTask{statedb: statedb.Copy(), index: i}
+		jobs <- &txTraceTask{statedb: statedb.Copy(), index: i, taskExtraContext: taskExtraContext}
 
 		// Generate the next state snapshot fast without tracing
 		msg, _ := tx.AsMessage(signer)
@@ -759,8 +766,15 @@ func traceTransaction(ctx context.Context, eth *Ethereum, hash common.Hash, conf
 	if err != nil {
 		return nil, err
 	}
+
+	taskExtraContext := map[string]interface{}{
+		"blockHash":           blockHash.Hex(),
+		"transactionHash":     tx.Hash().Hex(),
+		"transactionPosition": uint64(index),
+	}
+
 	// Trace the transaction and return
-	return traceTx(ctx, eth, msg, vmctx, statedb, config)
+	return traceTx(ctx, eth, msg, vmctx, statedb, taskExtraContext, config)
 }
 
 // TraceTransaction returns the structured logs created during the execution of EVM
@@ -813,7 +827,7 @@ func (api *PrivateDebugAPI) TraceCall(ctx context.Context, args ethapi.CallArgs,
 // traceTx configures a new tracer according to the provided configuration, and
 // executes the given message in the provided environment. The return value will
 // be tracer dependent.
-func traceTx(ctx context.Context, eth *Ethereum, message core.Message, vmctx vm.Context, statedb *state.StateDB, config *TraceConfig) (interface{}, error) {
+func traceTx(ctx context.Context, eth *Ethereum, message core.Message, vmctx vm.Context, statedb *state.StateDB, extraContext map[string]interface{}, config *TraceConfig) (interface{}, error) {
 	// Assemble the structured logger or the JavaScript tracer
 	var (
 		tracer vm.Tracer
@@ -839,6 +853,10 @@ func traceTx(ctx context.Context, eth *Ethereum, message core.Message, vmctx vm.
 			tracer.(*tracers.Tracer).Stop(errors.New("execution timeout"))
 		}()
 		defer cancel()
+
+		if extraContext != nil {
+			tracer.(*tracers.Tracer).CaptureExtraContext(extraContext)
+		}
 
 	case config == nil:
 		tracer = vm.NewStructLogger(nil)
@@ -880,7 +898,7 @@ func traceTx(ctx context.Context, eth *Ethereum, message core.Message, vmctx vm.
 // executes the given message in the provided environment. The return value will
 // be tracer dependent.
 func (api *PrivateDebugAPI) traceTx(ctx context.Context, message core.Message, vmctx vm.Context, statedb *state.StateDB, config *TraceConfig) (interface{}, error) {
-	return traceTx(ctx, api.eth, message, vmctx, statedb, config)
+	return traceTx(ctx, api.eth, message, vmctx, statedb, nil, config)
 }
 
 // computeTxEnv returns the execution environment of a certain transaction.

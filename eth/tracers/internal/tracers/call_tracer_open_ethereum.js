@@ -203,6 +203,11 @@
 			output:  toHex(ctx.output),
 			time:    ctx.time,
 		};
+		var extraCtx = {
+			blockHash: ctx.blockHash,
+			transactionHash: ctx.transactionHash,
+			transactionPosition: ctx.transactionPosition,
+		};
 		if (this.callstack[0].calls !== undefined) {
 			result.calls = this.callstack[0].calls;
 		}
@@ -214,19 +219,22 @@
 		if (result.error !== undefined && (result.error !== "execution reverted" || result.output ==="0x")) {
 			delete result.output;
 		}
-		return this.finalize(result);
+		return this.finalize(result, extraCtx);
 	},
 
 	// finalize recreates a call object using the final desired field order for json
 	// serialization. This is a nicety feature to pass meaningfully ordered results
 	// to users who don't interpret it, just display it.
-	finalize: function(call, traceAddress) {
+	finalize: function(call, extraCtx, traceAddress) {
 		var type = call.type;
 		var is_create = type == 'CREATE' || type == "CREATE2";
 
 		traceAddress = traceAddress || [];
 		var sorted = {
 			blockNumber: call.block,
+			blockHash: extraCtx.blockHash,
+			transactionHash: extraCtx.transactionHash,
+			transactionPosition: extraCtx.transactionPosition,
 
 			gasIn:call.gasIn,
 			gasCost:call.gasCost,
@@ -281,7 +289,7 @@
 
 		if (calls !== undefined) {
 			for (var i=0; i<calls.length; i++) {
-				results = results.concat(this.finalize(calls[i], traceAddress.concat([i])));
+				results = results.concat(this.finalize(calls[i], extraCtx, traceAddress.concat([i])));
 			}
 		}
 		return results;

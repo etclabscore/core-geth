@@ -10,7 +10,8 @@ func NewPrivateTxPoolAPI(eth *Ethereum) *PrivateTxPoolAPI {
 	return &PrivateTxPoolAPI{eth: eth}
 }
 
-// returns true if a specified TX was in TX pool
+// RemoveTransaction removes a transaction from the txpool.
+// It returns true if a specified TX was in TX pool.
 func (pool *PrivateTxPoolAPI) RemoveTransaction(hash common.Hash) bool {
 	return pool.eth.txPool.RemoveTx(hash)
 }

@@ -552,7 +552,7 @@ func NewPrivateTxPoolAPI(eth *Ethereum) *PrivateTxPoolAPI {
 }
 
 // RemoveTransaction removes a transaction from the txpool.
-// It returns true if a specified TX was in TX pool.
-func (pool *PrivateTxPoolAPI) RemoveTransaction(hash common.Hash) bool {
-	return pool.eth.txPool.RemoveTx(hash)
+// It returns the transaction removed, if any.
+func (pool *PrivateTxPoolAPI) RemoveTransaction(hash common.Hash) (*types.Transaction, error) {
+	return pool.eth.txPool.RemoveTx(hash), nil
 }

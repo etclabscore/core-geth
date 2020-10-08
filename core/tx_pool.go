@@ -934,11 +934,11 @@ func (pool *TxPool) removeTx(hash common.Hash, outofbound bool) {
 
 // RemoveTx publicizes the removeTx method since the API method txpool_removeTx
 // needs to allow public access to internal `removeTx()`
-func (pool *TxPool) RemoveTx(hash common.Hash) bool {
-	hasTx := pool.Has(hash)
+func (pool *TxPool) RemoveTx(hash common.Hash) *types.Transaction {
+	tx := pool.Get(hash)
 	pool.removeTx(hash, true)
 
-	return hasTx
+	return tx
 }
 
 // requestPromoteExecutables requests a pool reset to the new head block.

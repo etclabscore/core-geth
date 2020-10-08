@@ -763,7 +763,13 @@ web3._extend({
 const TxpoolJs = `
 web3._extend({
 	property: 'txpool',
-	methods: [],
+	methods: [
+		new web3._extend.Method({
+			name: 'removeTransaction',
+			call: 'txpool_removeTransaction',
+			params: 1
+		}),
+	],
 	properties:
 	[
 		new web3._extend.Property({

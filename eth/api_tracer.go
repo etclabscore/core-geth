@@ -100,17 +100,6 @@ type txTraceTask struct {
 	taskExtraContext map[string]interface{}
 }
 
-// setConfigTracerToOpenEthereum forces the Tracer to the OpenEthereum one
-func setConfigTracerToOpenEthereum(config *TraceConfig) *TraceConfig {
-	if config == nil {
-		config = &TraceConfig{}
-	}
-
-	tracer := "callTracerOpenEthereum"
-	config.Tracer = &tracer
-	return config
-}
-
 // TraceChain returns the structured logs created during the execution of EVM
 // between two blocks (excluding start) and returns them as a JSON object.
 func (api *PrivateDebugAPI) TraceChain(ctx context.Context, start, end rpc.BlockNumber, config *TraceConfig) (*rpc.Subscription, error) {
@@ -386,14 +375,6 @@ func traceBlockByNumber(ctx context.Context, eth *Ethereum, number rpc.BlockNumb
 // TraceBlockByNumber returns the structured logs created during the execution of
 // EVM and returns them as a JSON object.
 func (api *PrivateDebugAPI) TraceBlockByNumber(ctx context.Context, number rpc.BlockNumber, config *TraceConfig) ([]*txTraceResult, error) {
-	return traceBlockByNumber(ctx, api.eth, number, config)
-}
-
-// Block returns the structured logs created during the execution of
-// EVM and returns them as a JSON object.
-// The correct name will be TraceBlockByNumber, though we want to be compatible with OpenEthereum trace module.
-func (api *PrivateTraceAPI) Block(ctx context.Context, number rpc.BlockNumber, config *TraceConfig) ([]*txTraceResult, error) {
-	config = setConfigTracerToOpenEthereum(config)
 	return traceBlockByNumber(ctx, api.eth, number, config)
 }
 
@@ -783,13 +764,6 @@ func (api *PrivateDebugAPI) TraceTransaction(ctx context.Context, hash common.Ha
 	return traceTransaction(ctx, api.eth, hash, config)
 }
 
-// Transaction returns the structured logs created during the execution of EVM
-// and returns them as a JSON object.
-func (api *PrivateTraceAPI) Transaction(ctx context.Context, hash common.Hash, config *TraceConfig) (interface{}, error) {
-	config = setConfigTracerToOpenEthereum(config)
-	return traceTransaction(ctx, api.eth, hash, config)
-}
-
 // TraceCall lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
@@ -941,10 +915,4 @@ func computeTxEnv(eth *Ethereum, block *types.Block, txIndex int, reexec uint64)
 
 func (api *PrivateDebugAPI) computeTxEnv(block *types.Block, txIndex int, reexec uint64) (core.Message, vm.Context, *state.StateDB, error) {
 	return computeTxEnv(api.eth, block, txIndex, reexec)
-}
-
-func (api *PrivateTraceAPI) Filter(ctx context.Context, args ethapi.CallArgs, config *TraceConfig) ([]*txTraceResult, error) {
-	config = setConfigTracerToOpenEthereum(config)
-	fmt.Printf("args: %#v\n", args)
-	return nil, nil
 }

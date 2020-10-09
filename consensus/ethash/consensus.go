@@ -587,28 +587,43 @@ var (
 // AccumulateRewards credits the coinbase of the given block with the mining
 // reward. The total reward consists of the static block reward and rewards for
 // included uncles. The coinbase of each uncle block is also rewarded.
-func accumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+// func AccumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+func AccumulateRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*big.Int, []*big.Int) {
 	if config.IsEnabled(config.GetEthashECIP1017Transition, header.Number) {
-		ecip1017BlockReward(config, state, header, uncles)
-		return
+		return ecip1017BlockReward(config, header, uncles)
 	}
 
 	blockReward := ctypes.EthashBlockReward(config, header.Number)
 
 	// Accumulate the rewards for the miner and any included uncles
+	uncleRewards := make([]*big.Int, len(uncles))
 	reward := new(big.Int).Set(blockReward)
 	r := new(big.Int)
-	for _, uncle := range uncles {
+	for i, uncle := range uncles {
 		r.Add(uncle.Number, big8)
 		r.Sub(r, header.Number)
 		r.Mul(r, blockReward)
 		r.Div(r, big8)
-		state.AddBalance(uncle.Coinbase, r)
+
+		ur := new(big.Int).Set(r)
+		uncleRewards[i] = ur
 
 		r.Div(blockReward, big32)
 		reward.Add(reward, r)
 	}
-	state.AddBalance(header.Coinbase, reward)
+
+	return reward, uncleRewards
+}
+
+// accumulateRewards retreives rewards for a block and applies them to the coinbase accounts for miner and uncle miners
+func accumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+	minerReward, uncleRewards := AccumulateRewards(config, header, uncles)
+	for i, uncle := range uncles {
+		if i < len(uncleRewards) {
+			state.AddBalance(uncle.Coinbase, uncleRewards[i])
+		}
+	}
+	state.AddBalance(header.Coinbase, minerReward)
 }
 
 // As of "Era 2" (zero-index era 1), uncle miners and winners are rewarded equally for each included block.

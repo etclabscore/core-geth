@@ -205,6 +205,7 @@
 		};
 		var extraCtx = {
 			blockHash: ctx.blockHash,
+			blockNumber: ctx.blockNumber,
 			transactionHash: ctx.transactionHash,
 			transactionPosition: ctx.transactionPosition,
 		};
@@ -231,28 +232,21 @@
 
 		traceAddress = traceAddress || [];
 		var sorted = {
-			blockNumber: call.block,
-			blockHash: extraCtx.blockHash,
-			transactionHash: extraCtx.transactionHash,
-			transactionPosition: extraCtx.transactionPosition,
-
-			gasIn:call.gasIn,
-			gasCost:call.gasCost,
-			outOff:call.outOff,
-			outLen:call.outLen,
-
-			type:    type.toLowerCase(),
 			action: {
+				callType:       !is_create ? type.toLowerCase() : undefined,
 				from:           call.from,
+				gas:            call.gas,
+				init:           is_create ? call.input : undefined,
+				input:          !is_create ? call.input : undefined,
 				to:             !is_create ? call.to : undefined,
 				value:          call.value,
-				gas:            call.gas,
-				input:          !is_create ? call.input : undefined,
-				callType:       !is_create ? type.toLowerCase() : undefined,
-
-				init:           is_create ? call.input : undefined,
 				creationMethod: is_create ? type.toLowerCase() : undefined,
 			},
+			blockHash: extraCtx.blockHash,
+			blockNumber: typeof call.block !== 'undefined' ? call.block : extraCtx.blockNumber,
+
+			error:   call.error,
+
 			result : {
 				gasUsed: call.gasUsed,
 				output:  !is_create ? call.output : undefined,
@@ -260,11 +254,14 @@
 				address: is_create ? call.to : undefined,
 				code :   is_create ? call.output : undefined,
 			},
-			error:   call.error,
 
 			subtraces: 0,
 			traceAddress: traceAddress,
 
+			transactionHash: extraCtx.transactionHash,
+			transactionPosition: extraCtx.transactionPosition,
+
+			type:    type.toLowerCase(),
 			time:    call.time,
 		}
 

@@ -508,6 +508,7 @@ func traceBlock(ctx context.Context, eth *Ethereum, block *types.Block, config *
 	var failed error
 	for i, tx := range txs {
 		taskExtraContext := map[string]interface{}{
+			"blockNumber":         block.NumberU64(),
 			"blockHash":           block.Hash().Hex(),
 			"transactionHash":     tx.Hash().Hex(),
 			"transactionPosition": uint64(i),
@@ -749,6 +750,7 @@ func traceTransaction(ctx context.Context, eth *Ethereum, hash common.Hash, conf
 	}
 
 	taskExtraContext := map[string]interface{}{
+		"blockNumber":         block.NumberU64(),
 		"blockHash":           blockHash.Hex(),
 		"transactionHash":     tx.Hash().Hex(),
 		"transactionPosition": uint64(index),

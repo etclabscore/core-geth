@@ -159,7 +159,7 @@ func (api *PrivateTraceAPI) Block(ctx context.Context, number rpc.BlockNumber, c
 		return nil, err
 	}
 
-	results := make([]interface{}, 0, len(traceResults)+1+len(traceUncleRewards))
+	results := []interface{}{}
 
 	for _, result := range traceResults {
 		var tmp []interface{}

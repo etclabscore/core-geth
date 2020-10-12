@@ -243,7 +243,7 @@
 				creationMethod: is_create ? type.toLowerCase() : undefined,
 			},
 			blockHash: extraCtx.blockHash,
-			blockNumber: typeof call.block !== 'undefined' ? call.block : extraCtx.blockNumber,
+			blockNumber: call.block || extraCtx.blockNumber,
 
 			error:   call.error,
 

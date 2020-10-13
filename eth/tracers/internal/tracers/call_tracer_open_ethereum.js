@@ -24,6 +24,13 @@
 	// an inner call.
 	descended: false,
 
+	oe_error_mapping: {
+		"contract creation code storage out of gas": "Out of gas",
+		"out of gas": "Out of gas",
+		"invalid jump destination": "Bad jump destination",
+		"execution reverted": "Reverted",
+	},
+
 	// step is invoked for every opcode that the VM executes.
 	step: function(log, db) {
 		// Capture any errors immediately
@@ -269,6 +276,16 @@
 
 			type:    type.toLowerCase(),
 			time:    call.time,
+		}
+
+		if (sorted.error !== undefined) {
+			if (this.oe_error_mapping.hasOwnProperty(sorted.error)) {
+				sorted.error = this.oe_error_mapping[sorted.error];
+				delete sorted.result;
+			} else if (sorted.error.indexOf('invalid opcode:') > -1) {
+				sorted.error = "Bad instruction";
+				delete sorted.result;
+			}
 		}
 
 		for (var key in sorted) {

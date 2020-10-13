@@ -241,18 +241,26 @@
 	// to users who don't interpret it, just display it.
 	finalize: function(call, extraCtx, traceAddress) {
 		var type = call.type;
-		var is_create = type == 'CREATE' || type == "CREATE2";
+		var is_create = type == "CREATE" || type == "CREATE2";
+		var is_selfdestruct = type == "SELFDESTRUCT";
+
+		if (is_selfdestruct) {
+			type = 'SUICIDE'
+		}
 
 		traceAddress = traceAddress || [];
 		var sorted = {
 			action: {
-				callType:       !is_create ? type.toLowerCase() : undefined,
-				from:           call.from,
+				callType:       !is_create && !is_selfdestruct ? type.toLowerCase() : undefined,
+				from:           !is_selfdestruct ? call.from : undefined,
 				gas:            call.gas,
 				init:           is_create ? call.input : undefined,
 				input:          !is_create ? call.input : undefined,
-				to:             !is_create ? call.to : undefined,
-				value:          call.value,
+				to:             !is_create && !is_selfdestruct ? call.to : undefined,
+				value:          !is_selfdestruct ? call.value : undefined,
+				address:        is_selfdestruct ? call.from : undefined,
+				refundAddress:  is_selfdestruct ? call.to : undefined,
+				balance:        is_selfdestruct ? call.value : undefined,
 				creationMethod: is_create ? type.toLowerCase() : undefined,
 			},
 			blockHash: extraCtx.blockHash,
@@ -260,12 +268,12 @@
 
 			error:   call.error,
 
-			result : {
+			result: {
 				gasUsed: call.gasUsed,
 				output:  !is_create ? call.output : undefined,
 
 				address: is_create ? call.to : undefined,
-				code :   is_create ? call.output : undefined,
+				code:   is_create ? call.output : undefined,
 			},
 
 			subtraces: 0,
@@ -276,6 +284,10 @@
 
 			type:    type.toLowerCase(),
 			time:    call.time,
+		}
+
+		if (is_selfdestruct) {
+			sorted.result = null
 		}
 
 		if (sorted.error !== undefined) {
@@ -289,7 +301,7 @@
 		}
 
 		for (var key in sorted) {
-			if (sorted[key] === 'object') {
+			if (sorted[key] === "object") {
 				for (var nested_key in sorted[key]) {
 					if (sorted[key][nested_key] === undefined) {
 						delete sorted[key][nested_key];
@@ -302,7 +314,7 @@
 
 		var calls = call.calls;
 		if (calls !== undefined) {
-			sorted['subtraces'] = calls.length;
+			sorted["subtraces"] = calls.length;
 		}
 
 		var results = [sorted];

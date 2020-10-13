@@ -93,6 +93,12 @@
 			if (op != 'DELEGATECALL' && op != 'STATICCALL') {
 				call.value = '0x' + log.stack.peek(2).toString(16);
 			}
+
+			// Hacky way to handle the 2300 stipend, this should be handle outside trace most probably
+			if ((op == 'CALL' || op == 'CALLCODE') && call.input == '0x') {
+				call.gas = 2300;
+			}
+
 			this.callstack.push(call);
 			this.descended = true
 			return;

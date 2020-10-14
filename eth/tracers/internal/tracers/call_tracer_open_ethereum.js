@@ -152,6 +152,12 @@
 					call.output = toHex(db.getCode(toAddress(ret.toString(16))));
 				} else if (typeof call.error === "undefined") {
 					call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
+
+					if (typeof call.gas !== "undefined" && call.gasUsed === '0x' + bigInt(call.gas).toString(16)) {
+						call.error = "out of gas";
+					} else {
+						return;
+					}
 				}
 			} else {
 				// If the call was a contract call, retrieve the gas usage and output
@@ -169,6 +175,13 @@
 					call.output = toHex(log.memory.slice(call.outOff, call.outOff + call.outLen));
 				} else if (typeof call.error === "undefined") {
 					call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
+
+					if (typeof call.gas !== "undefined" && call.gasUsed === '0x' + bigInt(call.gas).toString(16)) {
+						call.error = "out of gas";
+					} else {
+						return;
+					}
+				}
 				}
 				delete call.gasIn; delete call.gasCost;
 				delete call.outOff; delete call.outLen;
@@ -176,6 +189,7 @@
 			if (typeof call.gas !== "undefined") {
 				call.gas = '0x' + bigInt(call.gas).toString(16);
 			}
+
 			// Inject the call into the previous one
 			var left = this.callstack.length;
 			if (typeof this.callstack[left-1].calls === "undefined") {

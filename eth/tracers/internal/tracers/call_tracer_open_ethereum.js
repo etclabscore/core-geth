@@ -27,8 +27,14 @@
 	oeErrorMapping: {
 		"contract creation code storage out of gas": "Out of gas",
 		"out of gas": "Out of gas",
+		"gas uint64 overflow": "Out of gas",
 		"invalid jump destination": "Bad jump destination",
 		"execution reverted": "Reverted",
+	},
+
+	oeErrorMappingStartingWith: {
+		"invalid opcode:": "Bad instruction",
+		"stack underflow": "Stack underflow",
 	},
 
 	// step is invoked for every opcode that the VM executes.
@@ -272,9 +278,13 @@
 			if (this.oeErrorMapping.hasOwnProperty(sorted.error)) {
 				sorted.error = this.oeErrorMapping[sorted.error];
 				delete sorted.result;
-			} else if (sorted.error.indexOf('invalid opcode:') > -1) {
-				sorted.error = "Bad instruction";
-				delete sorted.result;
+			} else {
+				for (var searchKey in this.oeErrorMappingStartingWith) {
+					if (this.oeErrorMappingStartingWith.hasOwnProperty(searchKey) && sorted.error.indexOf(searchKey) > -1) {
+						sorted.error = this.oeErrorMappingStartingWith[searchKey];
+						delete sorted.result;
+					}
+				}
 			}
 		}
 

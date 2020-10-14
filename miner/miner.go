@@ -129,8 +129,8 @@ func (miner *Miner) update() {
 				events.Unsubscribe()
 			}
 		case addr := <-miner.startCh:
+			miner.SetEtherbase(addr)
 			if !isDownloading {
-				miner.SetEtherbase(addr)
 				miner.worker.start()
 			}
 			miningRequested = true

@@ -112,10 +112,6 @@
 				call.value = '0x' + log.stack.peek(2).toString(16);
 			}
 
-			// Hacky way to handle the 2300 stipend, this should be handle outside trace most probably
-			if ((op == 'CALL' || op == 'CALLCODE') && call.input == '0x') {
-				call.gas = 2300;
-			}
 
 			this.callstack.push(call);
 			this.descended = true
@@ -158,7 +154,13 @@
 			} else {
 				// If the call was a contract call, retrieve the gas usage and output
 				if (typeof call.gas !== "undefined") {
-					call.gasUsed = '0x' + bigInt(call.gasIn - call.gasCost + call.gas - log.getGas()).toString(16);
+					var gasUsed = bigInt(call.gasIn - call.gasCost + call.gas - log.getGas());
+					if (gasUsed.compare(0) >= 0) {
+						call.gasUsed = '0x' + gasUsed.toString(16);
+					}
+				} else {
+					call.gas = bigInt(call.gasIn - call.gasCost - log.getGas()).abs();
+					call.gasUsed = '0x0';
 				}
 				var ret = log.stack.peek(0);
 				if (!ret.equals(0)) {

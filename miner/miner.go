@@ -80,8 +80,10 @@ func New(eth Backend, config *Config, chainConfig ctypes.ChainConfigurator, mux 
 	return miner
 }
 
-// update handles miner start/stop/exit events, as well as a temporary subscription to downloader events.
-// Downloader events are used to pause and restart mining pending a successful sync operation.
+// update keeps track of the downloader events. Please be aware that this is a one shot type of update loop.
+// It's entered once and as soon as `Done` or `Failed` has been broadcasted the events are unregistered and
+// the loop is exited. This to prevent a major security vuln where external parties can DOS you with blocks
+// and halt your mining operation for as long as the DOS continues.
 func (miner *Miner) update() {
 	events := miner.mux.Subscribe(downloader.StartEvent{}, downloader.DoneEvent{}, downloader.FailedEvent{})
 	defer func() {

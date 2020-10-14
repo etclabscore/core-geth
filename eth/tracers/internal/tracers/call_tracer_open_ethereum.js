@@ -110,6 +110,8 @@
 
 			if (op != 'DELEGATECALL' && op != 'STATICCALL') {
 				call.value = '0x' + log.stack.peek(2).toString(16);
+			} else if (op == 'DELEGATECALL') {
+				call.value = '0x0';
 			}
 
 
@@ -263,7 +265,7 @@
 			data = this.callResult(call);
 
 			// update after callResult so as it affects only the root type
-			if (call.type == "CALLCODE") {
+			if (call.type == "CALLCODE" || call.type == 'DELEGATECALL' || call.type == 'STATICCALL') {
 				call.type = "CALL";
 			}
 		}
@@ -349,11 +351,11 @@
 				value:     call.value,              // Transfered Value
 				gas:       call.gas,                // Gas
 				input:     call.input,              // Input data
-				callType: call.type.toLowerCase(),  // The type of the call
+				callType:  call.type.toLowerCase(), // The type of the call
 			},
 			result: {
 				gasUsed: call.gasUsed,  // Gas used
-				output:   call.output,  // Output bytes
+				output:  call.output,   // Output bytes
 			}
 		}
 	},
@@ -362,7 +364,7 @@
 		return {
 			action: {
 				address:        call.from,   // Address
-				refundAddress: call.to,     // Refund address
+				refundAddress:  call.to,     // Refund address
 				balance:        call.value,  // Balance
 			},
 			result: null

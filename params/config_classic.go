@@ -16,7 +16,6 @@
 package params
 
 import (
-	"math"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -71,7 +70,7 @@ var (
 		EIP2028FBlock: big.NewInt(10_500_839),
 		EIP2200FBlock: big.NewInt(10_500_839), // RePetersburg (=~ re-1283)
 
-		ECIP1099FBlock: big.NewInt(math.MaxInt64), // Etchash (planned for block 11_700_000)
+		ECIP1099FBlock: big.NewInt(11_700_000), // Etchash (DAG size limit)
 
 		DisposalBlock:      big.NewInt(5900000),
 		ECIP1017FBlock:     big.NewInt(5000000),

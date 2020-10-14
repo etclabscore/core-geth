@@ -110,8 +110,6 @@
 
 			if (op != 'DELEGATECALL' && op != 'STATICCALL') {
 				call.value = '0x' + log.stack.peek(2).toString(16);
-			} else if (op == 'DELEGATECALL') {
-				call.value = '0x0';
 			}
 
 
@@ -342,7 +340,14 @@
 
 		if (typeof calls !== "undefined") {
 			for (var i=0; i<calls.length; i++) {
-				results = results.concat(this.finalize(calls[i], extraCtx, traceAddress.concat([i])));
+				var childCall = calls[i];
+
+				// Delegatecall uses the value from parent
+				if (childCall.type == 'DELEGATECALL' && typeof childCall.value === "undefined") {
+					childCall.value = call.value;
+				}
+
+				results = results.concat(this.finalize(childCall, extraCtx, traceAddress.concat([i])));
 			}
 		}
 		return results;

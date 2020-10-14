@@ -238,54 +238,34 @@
 	// serialization. This is a nicety feature to pass meaningfully ordered results
 	// to users who don't interpret it, just display it.
 	finalize: function(call, extraCtx, traceAddress) {
-		var type = call.type;
-		var is_create = type == "CREATE" || type == "CREATE2";
-		var is_selfdestruct = type == "SELFDESTRUCT";
+		var data;
+		if (call.type == "CREATE" || call.type == "CREATE2") {
+			data = this.createResult(call);
+		} else if (call.type == "SELFDESTRUCT") {
+			call.type = "SUICIDE";
+			data = this.suicideResult(call);
+		} else {
+			data = this.callResult(call);
 
-		if (is_selfdestruct) {
-			type = 'SUICIDE'
+			// update after callResult so as it affects only the root type
+			if (call.type == "CALLCODE") {
+				call.type = "CALL";
+			}
 		}
 
 		traceAddress = traceAddress || [];
 		var sorted = {
-			action: {
-				callType:       !is_create && !is_selfdestruct ? type.toLowerCase() : undefined,
-				from:           !is_selfdestruct ? call.from : undefined,
-				gas:            call.gas,
-				init:           is_create ? call.input : undefined,
-				input:          !is_create ? call.input : undefined,
-				to:             !is_create && !is_selfdestruct ? call.to : undefined,
-				value:          !is_selfdestruct ? call.value : undefined,
-				address:        is_selfdestruct ? call.from : undefined,
-				refundAddress:  is_selfdestruct ? call.to : undefined,
-				balance:        is_selfdestruct ? call.value : undefined,
-				creationMethod: is_create ? type.toLowerCase() : undefined,
-			},
-			blockHash: extraCtx.blockHash,
-			blockNumber: call.block || extraCtx.blockNumber,
-
-			error:   call.error,
-
-			result: {
-				gasUsed: call.gasUsed,
-				output:  !is_create ? call.output : undefined,
-
-				address: is_create ? call.to : undefined,
-				code:   is_create ? call.output : undefined,
-			},
-
-			subtraces: 0,
+			type: call.type.toLowerCase(),
+			action: data.action,
+			result: data.result,
+			error: call.error,
 			traceAddress: traceAddress,
-
-			transactionHash: extraCtx.transactionHash,
+			subtraces: 0,
 			transactionPosition: extraCtx.transactionPosition,
-
-			type:    type.toLowerCase(),
-			time:    call.time,
-		}
-
-		if (is_selfdestruct) {
-			sorted.result = null
+			transactionHash: extraCtx.transactionHash,
+			blockNumber: call.block || extraCtx.blockNumber,
+			blockHash: extraCtx.blockHash,
+			time: call.time,
 		}
 
 		if (typeof sorted.error !== "undefined") {
@@ -323,5 +303,50 @@
 			}
 		}
 		return results;
+	},
+
+	createResult: function(call) {
+		return {
+			action: {
+				from:           call.from,                // Sender
+				value:          call.value,               // Value
+				gas:            call.gas,                 // Gas
+				init:           call.input,               // Initialization code
+				creationMethod: call.type.toLowerCase(),  // Create Type
+			},
+			result: {
+				gasUsed:  call.gasUsed,  // Gas used
+				code:     call.output,   // Code
+				address:  call.to,       // Assigned address
+			}
+		}
+	},
+
+	callResult: function(call) {
+		return {
+			action: {
+				from:      call.from,               // Sender
+				to:        call.to,                 // Recipient
+				value:     call.value,              // Transfered Value
+				gas:       call.gas,                // Gas
+				input:     call.input,              // Input data
+				callType: call.type.toLowerCase(),  // The type of the call
+			},
+			result: {
+				gasUsed: call.gasUsed,  // Gas used
+				output:   call.output,  // Output bytes
+			}
+		}
+	},
+
+	suicideResult: function(call) {
+		return {
+			action: {
+				address:        call.from,   // Address
+				refundAddress: call.to,     // Refund address
+				balance:        call.value,  // Balance
+			},
+			result: null
+		}
 	}
 }

@@ -279,6 +279,9 @@
 		var data;
 		if (call.type == "CREATE" || call.type == "CREATE2") {
 			data = this.createResult(call);
+
+			// update after callResult so as it affects only the root type
+			call.type = "CREATE";
 		} else if (call.type == "SELFDESTRUCT") {
 			call.type = "SUICIDE";
 			data = this.suicideResult(call);

@@ -35,7 +35,7 @@
 	step: function(log, db) {
 		// Capture any errors immediately
 		var error = log.getError();
-		if (error !== undefined) {
+		if (typeof error !== "undefined") {
 			this.fault(log, db);
 			return;
 		}
@@ -65,7 +65,7 @@
 		// If a contract is being self destructed, gather that as a subcall too
 		if (syscall && op == 'SELFDESTRUCT') {
 			var left = this.callstack.length;
-			if (this.callstack[left-1].calls === undefined) {
+			if (typeof this.callstack[left-1].calls === "undefined") {
 				this.callstack[left-1].calls = [];
 			}
 			this.callstack[left-1].calls.push({type: op});
@@ -141,29 +141,29 @@
 				if (!ret.equals(0)) {
 					call.to     = toHex(toAddress(ret.toString(16)));
 					call.output = toHex(db.getCode(toAddress(ret.toString(16))));
-				} else if (call.error === undefined) {
+				} else if (typeof call.error === "undefined") {
 					call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
 				}
 			} else {
 				// If the call was a contract call, retrieve the gas usage and output
-				if (call.gas !== undefined) {
+				if (typeof call.gas !== "undefined") {
 					call.gasUsed = '0x' + bigInt(call.gasIn - call.gasCost + call.gas - log.getGas()).toString(16);
 				}
 				var ret = log.stack.peek(0);
 				if (!ret.equals(0)) {
 					call.output = toHex(log.memory.slice(call.outOff, call.outOff + call.outLen));
-				} else if (call.error === undefined) {
+				} else if (typeof call.error === "undefined") {
 					call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
 				}
 				delete call.gasIn; delete call.gasCost;
 				delete call.outOff; delete call.outLen;
 			}
-			if (call.gas !== undefined) {
+			if (typeof call.gas !== "undefined") {
 				call.gas = '0x' + bigInt(call.gas).toString(16);
 			}
 			// Inject the call into the previous one
 			var left = this.callstack.length;
-			if (this.callstack[left-1].calls === undefined) {
+			if (typeof this.callstack[left-1].calls === "undefined") {
 				this.callstack[left-1].calls = [];
 			}
 			this.callstack[left-1].calls.push(call);
@@ -173,7 +173,7 @@
 	// fault is invoked when the actual execution of an opcode fails.
 	fault: function(log, db) {
 		// If the topmost call already reverted, don't handle the additional fault again
-		if (this.callstack[this.callstack.length - 1].error !== undefined) {
+		if (typeof this.callstack[this.callstack.length - 1].error !== "undefined") {
 			return;
 		}
 		// Pop off the just failed call
@@ -181,7 +181,7 @@
 		call.error = log.getError();
 
 		// Consume all available gas and clean any leftovers
-		if (call.gas !== undefined) {
+		if (typeof call.gas !== "undefined") {
 			call.gas = '0x' + bigInt(call.gas).toString(16);
 			call.gasUsed = call.gas
 		}
@@ -191,7 +191,7 @@
 		// Flatten the failed call into its parent
 		var left = this.callstack.length;
 		if (left > 0) {
-			if (this.callstack[left-1].calls === undefined) {
+			if (typeof this.callstack[left-1].calls === "undefined") {
 				this.callstack[left-1].calls = [];
 			}
 			this.callstack[left-1].calls.push(call);
@@ -222,15 +222,15 @@
 			transactionHash: ctx.transactionHash,
 			transactionPosition: ctx.transactionPosition,
 		};
-		if (this.callstack[0].calls !== undefined) {
+		if (typeof this.callstack[0].calls !== "undefined") {
 			result.calls = this.callstack[0].calls;
 		}
-		if (this.callstack[0].error !== undefined) {
+		if (typeof this.callstack[0].error !== "undefined") {
 			result.error = this.callstack[0].error;
-		} else if (ctx.error !== undefined) {
+		} else if (typeof ctx.error !== "undefined") {
 			result.error = ctx.error;
 		}
-		if (result.error !== undefined && (result.error !== "execution reverted" || result.output ==="0x")) {
+		if (typeof result.error !== "undefined" && (result.error !== "execution reverted" || result.output ==="0x")) {
 			delete result.output;
 		}
 		return this.finalize(result, extraCtx);
@@ -290,9 +290,9 @@
 			sorted.result = null
 		}
 
-		if (sorted.error !== undefined) {
 			if (this.oe_error_mapping.hasOwnProperty(sorted.error)) {
 				sorted.error = this.oe_error_mapping[sorted.error];
+		if (typeof sorted.error !== "undefined") {
 				delete sorted.result;
 			} else if (sorted.error.indexOf('invalid opcode:') > -1) {
 				sorted.error = "Bad instruction";
@@ -301,25 +301,25 @@
 		}
 
 		for (var key in sorted) {
-			if (sorted[key] === "object") {
+			if (typeof sorted[key] === "object") {
 				for (var nested_key in sorted[key]) {
-					if (sorted[key][nested_key] === undefined) {
+					if (typeof sorted[key][nested_key] === "undefined") {
 						delete sorted[key][nested_key];
 					}
 				}
-			} else if (sorted[key] === undefined) {
+			} else if (typeof sorted[key] === "undefined") {
 				delete sorted[key];
 			}
 		}
 
 		var calls = call.calls;
-		if (calls !== undefined) {
+		if (typeof calls !== "undefined") {
 			sorted["subtraces"] = calls.length;
 		}
 
 		var results = [sorted];
 
-		if (calls !== undefined) {
+		if (typeof calls !== "undefined") {
 			for (var i=0; i<calls.length; i++) {
 				results = results.concat(this.finalize(calls[i], extraCtx, traceAddress.concat([i])));
 			}

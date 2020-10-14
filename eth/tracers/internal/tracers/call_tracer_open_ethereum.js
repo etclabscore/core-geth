@@ -28,6 +28,7 @@
 		"contract creation code storage out of gas": "Out of gas",
 		"out of gas": "Out of gas",
 		"gas uint64 overflow": "Out of gas",
+		"max code size exceeded": "Out of gas",
 		"invalid jump destination": "Bad jump destination",
 		"execution reverted": "Reverted",
 	},

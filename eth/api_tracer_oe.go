@@ -31,34 +31,23 @@ import (
 
 // OpenEthereumTrace A trace in the desired format (Parity/OpenEtherum) See: https://openethereum.github.io/wiki/JSONRPC-trace-module
 type OpenEthereumTrace struct {
-	// Do not change the ordering of these fields -- allows for easier comparison with other clients
-	Action              TraceAction  `json:"action"`
-	BlockHash           *common.Hash `json:"blockHash"`
-	BlockNumber         uint64       `json:"blockNumber"`
-	Error               string       `json:"error,omitempty"`
-	Result              interface{}  `json:"result"`
-	Subtraces           int          `json:"subtraces"`
-	TraceAddress        []int        `json:"traceAddress"`
-	TransactionHash     *common.Hash `json:"transactionHash"`
-	TransactionPosition *uint64      `json:"transactionPosition"`
-	Type                string       `json:"type"`
+	Action              TraceRewardAction `json:"action"`
+	BlockHash           *common.Hash      `json:"blockHash"`
+	BlockNumber         uint64            `json:"blockNumber"`
+	Error               string            `json:"error,omitempty"`
+	Result              interface{}       `json:"result"`
+	Subtraces           int               `json:"subtraces"`
+	TraceAddress        []int             `json:"traceAddress"`
+	TransactionHash     *common.Hash      `json:"transactionHash"`
+	TransactionPosition *uint64           `json:"transactionPosition"`
+	Type                string            `json:"type"`
 }
 
-// TraceAction A parity formatted trace action
-type TraceAction struct {
-	// Do not change the ordering of these fields -- allows for easier comparison with other clients
-	Author         *common.Address `json:"author,omitempty"`
-	RewardType     string          `json:"rewardType,omitempty"`
-	SelfDestructed string          `json:"address,omitempty"`
-	Balance        *hexutil.Big    `json:"balance,omitempty"`
-	CallType       string          `json:"callType,omitempty"`
-	From           *common.Address `json:"from,omitempty"`
-	Gas            hexutil.Uint64  `json:"gas,omitempty"`
-	Init           string          `json:"init,omitempty"`
-	Input          hexutil.Bytes   `json:"input,omitempty"`
-	RefundAddress  *common.Address `json:"refundAddress,omitempty"`
-	To             *common.Address `json:"to,omitempty"`
-	Value          *hexutil.Big    `json:"value,omitempty"`
+// TraceRewardAction An OpenEthereum formatted trace reward action
+type TraceRewardAction struct {
+	Value      *hexutil.Big    `json:"value,omitempty"`
+	Author     *common.Address `json:"author,omitempty"`
+	RewardType string          `json:"rewardType,omitempty"`
 }
 
 // setConfigTracerToOpenEthereum forces the Tracer to the OpenEthereum one
@@ -80,15 +69,15 @@ func traceBlockReward(ctx context.Context, eth *Ethereum, block *types.Block, co
 	blockHash := block.Hash()
 
 	tr := &OpenEthereumTrace{
-		Action: TraceAction{
+		Type: "reward",
+		Action: TraceRewardAction{
+			Value:      (*hexutil.Big)(minerReward),
 			Author:     &coinbase,
 			RewardType: "block",
-			Value:      (*hexutil.Big)(minerReward),
 		},
+		TraceAddress: []int{},
 		BlockHash:    &blockHash,
 		BlockNumber:  block.NumberU64(),
-		TraceAddress: []int{},
-		Type:         "reward",
 	}
 
 	return tr, nil
@@ -106,15 +95,15 @@ func traceBlockUncleRewards(ctx context.Context, eth *Ethereum, block *types.Blo
 			coinbase := uncle.Coinbase
 
 			results[i] = &OpenEthereumTrace{
-				Action: TraceAction{
+				Type: "reward",
+				Action: TraceRewardAction{
+					Value:      (*hexutil.Big)(uncleRewards[i]),
 					Author:     &coinbase,
 					RewardType: "uncle",
-					Value:      (*hexutil.Big)(uncleRewards[i]),
 				},
-				BlockHash:    &blockHash,
-				BlockNumber:  block.NumberU64(),
 				TraceAddress: []int{},
-				Type:         "reward",
+				BlockNumber:  block.NumberU64(),
+				BlockHash:    &blockHash,
 			}
 		}
 	}

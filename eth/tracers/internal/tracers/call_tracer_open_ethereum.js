@@ -158,7 +158,7 @@
 					}
 				}
 			} else {
-				var what = false;
+				var isDynamicGas = false;
 
 				// If the call was a contract call, retrieve the gas usage and output
 				if (typeof call.gas !== "undefined") {
@@ -169,7 +169,7 @@
 				} else {
 					call.gas = bigInt(call.gasIn - call.gasCost - log.getGas()).abs();
 					call.gasUsed = '0x0';
-					what = true;
+					isDynamicGas = true;
 				}
 
 				var ret = log.stack.peek(0);
@@ -185,7 +185,7 @@
 					}
 				}
 
-				if (what) {
+				if (isDynamicGas) {
 					call.output = '0x';
 				}
 

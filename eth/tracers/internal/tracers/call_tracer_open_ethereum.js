@@ -160,6 +160,8 @@
 					}
 				}
 			} else {
+				var what = false;
+
 				// If the call was a contract call, retrieve the gas usage and output
 				if (typeof call.gas !== "undefined") {
 					var gasUsed = bigInt(call.gasIn - call.gasCost + call.gas - log.getGas());
@@ -169,7 +171,9 @@
 				} else {
 					call.gas = bigInt(call.gasIn - call.gasCost - log.getGas()).abs();
 					call.gasUsed = '0x0';
+					what = true;
 				}
+
 				var ret = log.stack.peek(0);
 				if (!ret.equals(0)) {
 					call.output = toHex(log.memory.slice(call.outOff, call.outOff + call.outLen));
@@ -182,7 +186,11 @@
 						return;
 					}
 				}
+
+				if (what) {
+					call.output = '0x';
 				}
+
 				delete call.gasIn; delete call.gasCost;
 				delete call.outOff; delete call.outLen;
 			}

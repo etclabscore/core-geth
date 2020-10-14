@@ -80,8 +80,6 @@
 			}
 			var off = (op == 'DELEGATECALL' || op == 'STATICCALL' ? 0 : 1);
 
-			for (i=0; i < 10; i++){
-			}
 			var inOff = log.stack.peek(2 + off).valueOf();
 			var inEnd = inOff + log.stack.peek(3 + off).valueOf();
 

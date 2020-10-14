@@ -24,7 +24,7 @@
 	// an inner call.
 	descended: false,
 
-	oe_error_mapping: {
+	oeErrorMapping: {
 		"contract creation code storage out of gas": "Out of gas",
 		"out of gas": "Out of gas",
 		"invalid jump destination": "Bad jump destination",
@@ -290,9 +290,9 @@
 			sorted.result = null
 		}
 
-			if (this.oe_error_mapping.hasOwnProperty(sorted.error)) {
-				sorted.error = this.oe_error_mapping[sorted.error];
 		if (typeof sorted.error !== "undefined") {
+			if (this.oeErrorMapping.hasOwnProperty(sorted.error)) {
+				sorted.error = this.oeErrorMapping[sorted.error];
 				delete sorted.result;
 			} else if (sorted.error.indexOf('invalid opcode:') > -1) {
 				sorted.error = "Bad instruction";

@@ -179,7 +179,7 @@ func newlru(what string, maxItems int, new func(epoch uint64, epochLength uint64
 // get retrieves or creates an item for the given epoch. The first return value is always
 // non-nil. The second return value is non-nil if lru thinks that an item will be useful in
 // the near future.
-func (lru *lru) get(epoch uint64, epochLength uint64) (item, future interface{}) {
+func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (item, future interface{}) {
 	lru.mu.Lock()
 	defer lru.mu.Unlock()
 
@@ -194,11 +194,23 @@ func (lru *lru) get(epoch uint64, epochLength uint64) (item, future interface{})
 		}
 		lru.cache.Add(epoch, item)
 	}
+
+	// Ensure pre-generation handles ecip-1099 changeover correctly
+	var nextEpoch = epoch + 1
+	var nextEpochLength = epochLength
+	if ecip1099FBlock != nil {
+		nextEpochBlock := nextEpoch * epochLength
+		if nextEpochBlock == *ecip1099FBlock && epochLength == epochLengthDefault {
+			nextEpoch = nextEpoch / 2
+			nextEpochLength = epochLengthECIP1099
+		}
+	}
+
 	// Update the 'future item' if epoch is larger than previously seen.
-	if epoch < maxEpoch-1 && lru.future < epoch+1 {
-		log.Trace("Requiring new future ethash "+lru.what, "epoch", epoch+1)
-		future = lru.new(epoch+1, epochLength)
-		lru.future = epoch + 1
+	if epoch < maxEpoch-1 && lru.future < nextEpoch {
+		log.Trace("Requiring new future ethash "+lru.what, "epoch", nextEpoch)
+		future = lru.new(nextEpoch, nextEpochLength)
+		lru.future = nextEpoch
 		lru.futureItem = future
 	}
 	return item, future
@@ -561,7 +573,7 @@ func (ethash *Ethash) Close() error {
 func (ethash *Ethash) cache(block uint64) *cache {
 	epochLength := calcEpochLength(block, ethash.config.ECIP1099Block)
 	epoch := calcEpoch(block, epochLength)
-	currentI, futureI := ethash.caches.get(epoch, epochLength)
+	currentI, futureI := ethash.caches.get(epoch, epochLength, ethash.config.ECIP1099Block)
 	current := currentI.(*cache)
 
 	// Wait for generation finish.
@@ -585,7 +597,7 @@ func (ethash *Ethash) dataset(block uint64, async bool) *dataset {
 	// Retrieve the requested ethash dataset
 	epochLength := calcEpochLength(block, ethash.config.ECIP1099Block)
 	epoch := calcEpoch(block, epochLength)
-	currentI, futureI := ethash.datasets.get(epoch, epochLength)
+	currentI, futureI := ethash.datasets.get(epoch, epochLength, ethash.config.ECIP1099Block)
 	current := currentI.(*dataset)
 
 	// If async is specified, generate everything in a background thread

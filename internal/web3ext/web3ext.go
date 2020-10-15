@@ -766,7 +766,7 @@ web3._extend({
 	methods: [
 		new web3._extend.Method({
 			name: 'removeTransaction',
-			call: 'txpool_removeTransaction',
+			call: 'debug_removeTransaction',
 			params: 1
 		}),
 	],

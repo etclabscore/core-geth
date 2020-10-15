@@ -543,16 +543,8 @@ func (api *PrivateDebugAPI) getModifiedAccounts(startBlock, endBlock *types.Bloc
 	return dirty, nil
 }
 
-type PrivateTxPoolAPI struct {
-	eth *Ethereum
-}
-
-func NewPrivateTxPoolAPI(eth *Ethereum) *PrivateTxPoolAPI {
-	return &PrivateTxPoolAPI{eth: eth}
-}
-
 // RemoveTransaction removes a transaction from the txpool.
 // It returns the transaction removed, if any.
-func (pool *PrivateTxPoolAPI) RemoveTransaction(hash common.Hash) (*types.Transaction, error) {
-	return pool.eth.txPool.RemoveTx(hash), nil
+func (api *PrivateDebugAPI) RemoveTransaction(hash common.Hash) (*types.Transaction, error) {
+	return api.eth.txPool.RemoveTx(hash), nil
 }

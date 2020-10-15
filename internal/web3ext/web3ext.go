@@ -473,6 +473,11 @@ web3._extend({
 			call: 'debug_freezeClient',
 			params: 1,
 		}),
+		new web3._extend.Method({
+			name: 'removePendingTransaction',
+			call: 'debug_removePendingTransaction',
+			params: 1
+		}),
 	],
 	properties: []
 });
@@ -763,13 +768,7 @@ web3._extend({
 const TxpoolJs = `
 web3._extend({
 	property: 'txpool',
-	methods: [
-		new web3._extend.Method({
-			name: 'removeTransaction',
-			call: 'debug_removeTransaction',
-			params: 1
-		}),
-	],
+	methods: [],
 	properties:
 	[
 		new web3._extend.Property({

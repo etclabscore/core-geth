@@ -545,6 +545,6 @@ func (api *PrivateDebugAPI) getModifiedAccounts(startBlock, endBlock *types.Bloc
 
 // RemoveTransaction removes a transaction from the txpool.
 // It returns the transaction removed, if any.
-func (api *PrivateDebugAPI) RemoveTransaction(hash common.Hash) (*types.Transaction, error) {
+func (api *PrivateDebugAPI) RemovePendingTransaction(hash common.Hash) (*types.Transaction, error) {
 	return api.eth.txPool.RemoveTx(hash), nil
 }

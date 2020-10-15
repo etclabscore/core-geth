@@ -43,11 +43,11 @@ func prepare(dest []uint32, src []byte) {
 // Tests whether calcEpoch returns the correct epoch
 func TestCalcEpoch(t *testing.T) {
 	blockNum := uint64(120000)
-	want := uint64(blockNum / epochLengthDefault)
+	want := blockNum / epochLengthDefault
 	if epoch := calcEpoch(blockNum, epochLengthDefault); epoch != want {
 		t.Errorf("epoch: epoch mismatch: have %d, want %d", epoch, want)
 	}
-	want = uint64(blockNum / epochLengthECIP1099)
+	want = blockNum / epochLengthECIP1099
 	if epoch := calcEpoch(blockNum, epochLengthECIP1099); epoch != want {
 		t.Errorf("epoch: epoch mismatch: have %d, want %d", epoch, want)
 	}
@@ -56,7 +56,7 @@ func TestCalcEpoch(t *testing.T) {
 // Tests whether calcEpochLength returns the correct epoch length
 func TestCalcEpochLength(t *testing.T) {
 	ecip1099FBlock := uint64(2520000) // mordor
-	epochLength := calcEpochLength(uint64(ecip1099FBlock-1), &ecip1099FBlock)
+	epochLength := calcEpochLength(ecip1099FBlock-1, &ecip1099FBlock)
 	if epochLength != epochLengthDefault {
 		t.Errorf("epoch: length mismatch: have %d, want %d", epochLength, epochLengthDefault)
 	}

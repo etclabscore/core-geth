@@ -18,6 +18,7 @@ package ethash
 
 import (
 	"io/ioutil"
+	"math"
 	"math/big"
 	"math/rand"
 	"os"
@@ -29,6 +30,56 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 )
+
+// Tests caches get sets correct future
+func TestCachesGet(t *testing.T) {
+	ethashA := NewTester(nil, false)
+	defer ethashA.Close()
+
+	ethashB := NewTester(nil, false)
+	defer ethashB.Close()
+
+	ethashC := NewTester(nil, false)
+	defer ethashC.Close()
+
+	var (
+		epoch             uint64 = 83
+		ecip1099Block     uint64 = 2520000
+		nextEpochDefault  uint64 = 84
+		nextEpochECIP1099 uint64 = 42
+		maxUint64         uint64 = math.MaxUint64
+	)
+	// test without ecip-1099 enabled
+	currentIA, futureIA := ethashA.caches.get(epoch, epochLengthDefault, &maxUint64)
+	currentA := currentIA.(*cache)
+	if currentA.epoch != epoch {
+		t.Errorf("cache: current epoch mismatch: have %d, want %d", currentA.epoch, epoch)
+	}
+	futureA := futureIA.(*cache)
+	if futureA.epoch != nextEpochDefault {
+		t.Errorf("cache: future epoch mismatch: have %d, want %d", futureA.epoch, nextEpochDefault)
+	}
+	// test activation boundary of ecip-1099
+	currentIB, futureIB := ethashB.caches.get(epoch, epochLengthDefault, &ecip1099Block)
+	currentB := currentIB.(*cache)
+	if currentB.epoch != epoch {
+		t.Errorf("cache: current epoch mismatch: have %d, want %d", currentB.epoch, epoch)
+	}
+	futureB := futureIB.(*cache)
+	if futureB.epoch != nextEpochECIP1099 {
+		t.Errorf("cache: future epoch mismatch: have %d, want %d", futureB.epoch, nextEpochECIP1099)
+	}
+	// test post ecip-1099 activation
+	currentIC, futureIC := ethashC.caches.get(nextEpochECIP1099, epochLengthECIP1099, &ecip1099Block)
+	currentC := currentIC.(*cache)
+	if currentC.epoch != nextEpochECIP1099 {
+		t.Errorf("cache: current epoch mismatch: have %d, want %d", currentC.epoch, nextEpochECIP1099)
+	}
+	futureC := futureIC.(*cache)
+	if futureC.epoch != nextEpochECIP1099+1 {
+		t.Errorf("cache: future epoch mismatch: have %d, want %d", futureC.epoch, nextEpochECIP1099+1)
+	}
+}
 
 // Tests that ethash works correctly in test mode.
 func TestTestMode(t *testing.T) {

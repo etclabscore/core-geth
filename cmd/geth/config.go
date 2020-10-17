@@ -195,6 +195,15 @@ func dumpConfig(ctx *cli.Context) error {
 		comment += "# Note: this config doesn't contain the genesis block.\n\n"
 	}
 
+	// HACK(meowsbits):
+	// The Ethash Config uses a nil-able field ECIP1099Block. The toml marshaler fails
+	// when trying to marshal the nil value.
+	// To fix this, if the value is nil, set it to a functionally equitable, but non-nil, value.
+	if cfg.Eth.Ethash.ECIP1099Block == nil {
+		max := uint64(math.MaxUint64)
+		cfg.Eth.Ethash.ECIP1099Block = &max
+	}
+
 	out, err := tomlSettings.Marshal(&cfg)
 	if err != nil {
 		return err

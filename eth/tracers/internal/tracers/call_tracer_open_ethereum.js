@@ -223,6 +223,8 @@
 		if (typeof call.gas !== "undefined") {
 			call.gas = '0x' + bigInt(call.gas).toString(16);
 			call.gasUsed = call.gas
+		} else if (call.error === "out of gas") {
+			call.gas = "0x0";
 		}
 		delete call.gasIn; delete call.gasCost;
 		delete call.outOff; delete call.outLen;

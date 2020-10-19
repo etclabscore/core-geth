@@ -31,16 +31,11 @@ import (
 
 // OpenEthereumTrace A trace in the desired format (Parity/OpenEtherum) See: https://openethereum.github.io/wiki/JSONRPC-trace-module
 type OpenEthereumTrace struct {
-	Action              TraceRewardAction `json:"action"`
-	BlockHash           *common.Hash      `json:"blockHash"`
-	BlockNumber         uint64            `json:"blockNumber"`
-	Error               string            `json:"error,omitempty"`
-	Result              interface{}       `json:"result"`
-	Subtraces           int               `json:"subtraces"`
-	TraceAddress        []int             `json:"traceAddress"`
-	TransactionHash     *common.Hash      `json:"transactionHash"`
-	TransactionPosition *uint64           `json:"transactionPosition"`
-	Type                string            `json:"type"`
+	Action       TraceRewardAction `json:"action"`
+	BlockHash    common.Hash       `json:"blockHash"`
+	BlockNumber  uint64            `json:"blockNumber"`
+	TraceAddress []int             `json:"traceAddress"`
+	Type         string            `json:"type"`
 }
 
 // TraceRewardAction An OpenEthereum formatted trace reward action
@@ -66,7 +61,6 @@ func traceBlockReward(ctx context.Context, eth *Ethereum, block *types.Block, co
 	minerReward, _ := ethash.AccumulateRewards(chainConfig, block.Header(), block.Uncles())
 
 	coinbase := block.Coinbase()
-	blockHash := block.Hash()
 
 	tr := &OpenEthereumTrace{
 		Type: "reward",
@@ -76,7 +70,7 @@ func traceBlockReward(ctx context.Context, eth *Ethereum, block *types.Block, co
 			RewardType: "block",
 		},
 		TraceAddress: []int{},
-		BlockHash:    &blockHash,
+		BlockHash:    block.Hash(),
 		BlockNumber:  block.NumberU64(),
 	}
 
@@ -86,8 +80,6 @@ func traceBlockReward(ctx context.Context, eth *Ethereum, block *types.Block, co
 func traceBlockUncleRewards(ctx context.Context, eth *Ethereum, block *types.Block, config *TraceConfig) ([]*OpenEthereumTrace, error) {
 	chainConfig := eth.blockchain.Config()
 	_, uncleRewards := ethash.AccumulateRewards(chainConfig, block.Header(), block.Uncles())
-
-	blockHash := block.Hash()
 
 	results := make([]*OpenEthereumTrace, len(uncleRewards))
 	for i, uncle := range block.Uncles() {
@@ -103,7 +95,7 @@ func traceBlockUncleRewards(ctx context.Context, eth *Ethereum, block *types.Blo
 				},
 				TraceAddress: []int{},
 				BlockNumber:  block.NumberU64(),
-				BlockHash:    &blockHash,
+				BlockHash:    block.Hash(),
 			}
 		}
 	}

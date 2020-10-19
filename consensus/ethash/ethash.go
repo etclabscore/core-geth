@@ -429,7 +429,7 @@ type Config struct {
 
 	Log log.Logger `toml:"-"`
 	// ECIP-1099
-	ECIP1099Block *uint64
+	ECIP1099Block *uint64 `toml:"-"`
 }
 
 // Ethash is a consensus engine based on proof-of-work implementing the ethash

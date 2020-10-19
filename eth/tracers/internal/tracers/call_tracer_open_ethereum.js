@@ -138,6 +138,12 @@
 			this.callstack[this.callstack.length - 1].error = "execution reverted";
 			return;
 		}
+		if (syscall && op == "RETURN") {
+			var outOff = log.stack.peek(0).valueOf();
+			var outLen = log.stack.peek(1).valueOf();
+
+			this.callstack[this.callstack.length - 1].output = toHex(log.memory.slice(outOff, outOff + outLen));
+			return;
 		if (log.getDepth() == this.callstack.length - 1) {
 			// Pop off the last call and get the execution results
 			var call = this.callstack.pop();
@@ -150,7 +156,6 @@
 				var ret = log.stack.peek(0);
 				if (!ret.equals(0)) {
 					call.to     = toHex(toAddress(ret.toString(16)));
-					call.output = toHex(db.getCode(toAddress(ret.toString(16))));
 				} else if (typeof call.error === "undefined") {
 					call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
 
@@ -176,9 +181,7 @@
 				}
 
 				var ret = log.stack.peek(0);
-				if (!ret.equals(0)) {
-					call.output = toHex(log.memory.slice(call.outOff, call.outOff + call.outLen));
-				} else if (typeof call.error === "undefined") {
+				if (ret.equals(0) && typeof call.error === "undefined") {
 					call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
 
 					if (typeof call.gas !== "undefined" && call.gasUsed === '0x' + bigInt(call.gas).toString(16)) {

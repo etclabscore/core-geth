@@ -52,7 +52,7 @@
 			var op = log.op.toString();
 		}
 		// If a new contract is being created, add to the call stack
-		if (syscall && (op == 'CREATE' || op == "CREATE2")) {
+		if (syscall && (op == "CREATE" || op == "CREATE2")) {
 			var inOff = log.stack.peek(1).valueOf();
 			var inEnd = inOff + log.stack.peek(2).valueOf();
 
@@ -63,14 +63,14 @@
 				input:   toHex(log.memory.slice(inOff, inEnd)),
 				gasIn:   log.getGas(),
 				gasCost: log.getCost(),
-				value:   '0x' + log.stack.peek(0).toString(16)
+				value:   "0x" + log.stack.peek(0).toString(16)
 			};
 			this.callstack.push(call);
-			this.descended = true
+			this.descended = true;
 			return;
 		}
 		// If a contract is being self destructed, gather that as a subcall too
-		if (syscall && op == 'SELFDESTRUCT') {
+		if (syscall && op == "SELFDESTRUCT") {
 			var left = this.callstack.length;
 			if (typeof this.callstack[left-1].calls === "undefined") {
 				this.callstack[left-1].calls = [];
@@ -81,18 +81,18 @@
 				to:      toHex(toAddress(log.stack.peek(0).toString(16))),
 				gasIn:   log.getGas(),
 				gasCost: log.getCost(),
-				value:   '0x' + db.getBalance(log.contract.getAddress()).toString(16)
+				value:   "0x" + db.getBalance(log.contract.getAddress()).toString(16)
 			});
-			return
+			return;
 		}
 		// If a new method invocation is being done, add to the call stack
-		if (syscall && (op == 'CALL' || op == 'CALLCODE' || op == 'DELEGATECALL' || op == 'STATICCALL')) {
+		if (syscall && (op == "CALL" || op == "CALLCODE" || op == "DELEGATECALL" || op == "STATICCALL")) {
 			// Skip any pre-compile invocations, those are just fancy opcodes
 			var to = toAddress(log.stack.peek(1).toString(16));
 			if (isPrecompiled(to)) {
 				return
 			}
-			var off = (op == 'DELEGATECALL' || op == 'STATICCALL' ? 0 : 1);
+			var off = (op == "DELEGATECALL" || op == "STATICCALL" ? 0 : 1);
 
 			var inOff = log.stack.peek(2 + off).valueOf();
 			var inEnd = inOff + log.stack.peek(3 + off).valueOf();
@@ -109,13 +109,13 @@
 				outLen:  log.stack.peek(5 + off).valueOf()
 			};
 
-			if (op != 'DELEGATECALL' && op != 'STATICCALL') {
-				call.value = '0x' + log.stack.peek(2).toString(16);
+			if (op != "DELEGATECALL" && op != "STATICCALL") {
+				call.value = "0x" + log.stack.peek(2).toString(16);
+
 			}
 
-
 			this.callstack.push(call);
-			this.descended = true
+			this.descended = true;
 			return;
 		}
 		// If we've just descended into an inner call, retrieve it's true allowance. We
@@ -132,7 +132,7 @@
 			this.descended = false;
 		}
 		// If an existing call is returning, pop off the call stack
-		if (syscall && op == 'REVERT') {
+		if (syscall && op == "REVERT") {
 			this.callstack[this.callstack.length - 1].error = "execution reverted";
 			return;
 		}
@@ -289,7 +289,7 @@
 			data = this.callResult(call);
 
 			// update after callResult so as it affects only the root type
-			if (call.type == "CALLCODE" || call.type == 'DELEGATECALL' || call.type == 'STATICCALL') {
+			if (call.type == "CALLCODE" || call.type == "DELEGATECALL" || call.type == "STATICCALL") {
 				call.type = "CALL";
 			}
 		}

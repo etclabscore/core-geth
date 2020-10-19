@@ -112,6 +112,8 @@
 			if (op != "DELEGATECALL" && op != "STATICCALL") {
 				call.value = "0x" + log.stack.peek(2).toString(16);
 
+			} else if (op == "STATICCALL") {
+				call.value = "0x0";
 			}
 
 			this.callstack.push(call);

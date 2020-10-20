@@ -266,27 +266,42 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		var err error
 		c.dump, c.mmap, c.cache, err = memoryMap(path, lock)
 		if err == nil {
-			// we need cache as []byte
 			buf := make([]byte, len(c.cache)*4)
-			for i, v := range c.cache {
-				binary.LittleEndian.PutUint32(buf[i*4:], v)
-			}
-			// hash the cache so we can check for bad caches (WIP) TODO - iquidus
-			digest := crypto.Keccak256(buf)
-			hash := common.ToHex(digest)
-			logger.Info("Loaded old ethash cache from disk", "path", path, "hash", hash)
-			if c.epoch == 42 && c.epochLength == epochLengthECIP1099 { // ECIP-1099 is active
-				var want = "0x36617f5d4d40076a67c328b31baf3e9c6de9d6d87f105b3fdac2a59c77b8d0c4" // mordor 42
-				if hash != want {                                                               // x = 4
-					logger.Crit("BAD CACHE", "want", want, "have", hash)
-					panic(fmt.Sprintf("Remove %s then restart geth", path))
+			if isLittleEndian() {
+				for i, v := range c.cache {
+					binary.LittleEndian.PutUint32(buf[i*4:], v)
+				}
+			} else {
+				for i, v := range c.cache {
+					binary.BigEndian.PutUint32(buf[i*4:], v)
 				}
 			}
-			return
+			// hash the cache so we can check for bad caches
+			digest := crypto.Keccak256(buf)
+			hash := common.ToHex(digest)
+			logger.Debug("Loaded old ethash cache from disk", "path", path, "hash", hash)
+			if c.epochLength == epochLengthECIP1099 {
+				// we need cache as []byte
+				var badCache string
+				if c.epoch == 42 { // mordor
+					badCache = "0xafa2a00911843b0a67314614e629d9e550ef74da4dca2215c475a0f93333aedc" // keccak256
+				}
+				if c.epoch == 195 { // classic mainnet
+					badCache = "0x5794130ea9e433185214fb4032edbd3473499267e197d9003a6a1a5bd300b3e5" // keccak256
+				}
+				if hash == badCache {
+					logger.Warn("BAD CACHE", "path", path, "hash", hash)
+				} else {
+					return
+				}
+			} else {
+				logger.Debug("Loaded old ethash cache from disk")
+				return
+			}
 		}
 		logger.Debug("Failed to load old ethash cache", "err", err)
 
-		// No previous cache available, create a new cache file to fill
+		// No usable previous cache available, create a new cache file to fill
 		c.dump, c.mmap, c.cache, err = memoryMapAndGenerate(path, size, lock, func(buffer []uint32) { generateCache(buffer, c.epoch, c.epochLength, seed) })
 		if err != nil {
 			logger.Error("Failed to generate mapped ethash cache", "err", err)

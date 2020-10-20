@@ -1457,11 +1457,20 @@ func setEthashDatasetDir(ctx *cli.Context, cfg *eth.Config) {
 	}
 }
 
-func setEthash(ctx *cli.Context, cfg *eth.Config) {
-	if ctx.GlobalIsSet(EthashCacheDirFlag.Name) {
+func setEthashCacheDir(ctx *cli.Context, cfg *eth.Config) {
+	switch {
+	case ctx.GlobalIsSet(EthashCacheDirFlag.Name):
 		cfg.Ethash.CacheDir = ctx.GlobalString(EthashCacheDirFlag.Name)
+
+	case (ctx.GlobalBool(ClassicFlag.Name) || ctx.GlobalBool(MordorFlag.Name)) && cfg.Ethash.CacheDir == eth.DefaultConfig.Ethash.CacheDir:
+		// ECIP-1099 is set, use etchash dir for caches instead
+		cfg.Ethash.CacheDir = "etchash"
 	}
+}
+
+func setEthash(ctx *cli.Context, cfg *eth.Config) {
 	// ECIP-1099
+	setEthashCacheDir(ctx, cfg)
 	setEthashDatasetDir(ctx, cfg)
 
 	if ctx.GlobalIsSet(EthashCachesInMemoryFlag.Name) {

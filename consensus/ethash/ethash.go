@@ -67,6 +67,21 @@ func isLittleEndian() bool {
 	return *(*byte)(unsafe.Pointer(&n)) == 0x04
 }
 
+// uint32Array2ByteArray returns the bytes represented by uint32 array c
+func uint32Array2ByteArray(c []uint32) []byte {
+	buf := make([]byte, len(c)*4)
+	if isLittleEndian() {
+		for i, v := range c {
+			binary.LittleEndian.PutUint32(buf[i*4:], v)
+		}
+	} else {
+		for i, v := range c {
+			binary.BigEndian.PutUint32(buf[i*4:], v)
+		}
+	}
+	return buf
+}
+
 // memoryMap tries to memory map a file of uint32s for read only access.
 func memoryMap(path string, lock bool) (*os.File, mmap.MMap, []uint32, error) {
 	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
@@ -266,22 +281,15 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		var err error
 		c.dump, c.mmap, c.cache, err = memoryMap(path, lock)
 		if err == nil {
-			buf := make([]byte, len(c.cache)*4)
-			if isLittleEndian() {
-				for i, v := range c.cache {
-					binary.LittleEndian.PutUint32(buf[i*4:], v)
-				}
-			} else {
-				for i, v := range c.cache {
-					binary.BigEndian.PutUint32(buf[i*4:], v)
-				}
-			}
-			// hash the cache so we can check for bad caches
-			digest := crypto.Keccak256(buf)
+			// Hash (keccak256) the cache
+			bytes := uint32Array2ByteArray(c.cache)
+			digest := crypto.Keccak256(bytes)
 			hash := common.ToHex(digest)
+
 			logger.Debug("Loaded old ethash cache from disk", "path", path, "hash", hash)
+
+			// Check for bad caches at ecip-1099 transitions
 			if c.epochLength == epochLengthECIP1099 {
-				// we need cache as []byte
 				var badCache string
 				if c.epoch == 42 { // mordor
 					badCache = "0xafa2a00911843b0a67314614e629d9e550ef74da4dca2215c475a0f93333aedc" // keccak256
@@ -289,13 +297,15 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 				if c.epoch == 195 { // classic mainnet
 					badCache = "0x5794130ea9e433185214fb4032edbd3473499267e197d9003a6a1a5bd300b3e5" // keccak256
 				}
+				// check if cache is bad
 				if hash == badCache {
-					logger.Warn("BAD CACHE", "path", path, "hash", hash)
+					// cache is bad. Set err, then continue as if cache could not be read from disk.
+					err = fmt.Errorf("Cache with hash %s has been flagged as a bad cache for epoch %d", hash, c.epoch)
 				} else {
+					// cache is good
 					return
 				}
 			} else {
-				logger.Debug("Loaded old ethash cache from disk")
 				return
 			}
 		}

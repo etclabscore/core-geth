@@ -31,11 +31,16 @@ import (
 
 // OpenEthereumTrace A trace in the desired format (Parity/OpenEtherum) See: https://openethereum.github.io/wiki/JSONRPC-trace-module
 type OpenEthereumTrace struct {
-	Action       TraceRewardAction `json:"action"`
-	BlockHash    common.Hash       `json:"blockHash"`
-	BlockNumber  uint64            `json:"blockNumber"`
-	TraceAddress []int             `json:"traceAddress"`
-	Type         string            `json:"type"`
+	Action              TraceRewardAction `json:"action"`
+	BlockHash           common.Hash       `json:"blockHash"`
+	BlockNumber         uint64            `json:"blockNumber"`
+	Error               string            `json:"error,omitempty"`
+	Result              interface{}       `json:"result"`
+	Subtraces           int               `json:"subtraces"`
+	TraceAddress        []int             `json:"traceAddress"`
+	TransactionHash     *common.Hash      `json:"transactionHash"`
+	TransactionPosition *uint64           `json:"transactionPosition"`
+	Type                string            `json:"type"`
 }
 
 // TraceRewardAction An OpenEthereum formatted trace reward action

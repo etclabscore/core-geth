@@ -24,13 +24,13 @@ You can find some historical discussions on versioning at the following links.
   and artifacts will not be generated.
 - [ ] `git checkout release/v1.11.16`
 - [ ] Edit `params/version.go` making the necessary changes to version information. (To `-stable` version.) _Gotcha:_ make sure this passes linting, too.
-- [ ] `git commit -S -s -m "bump version from v1.11.15-unstable to v1.11.16-stable"`
+- [ ] `git commit -S -s -m "bump version from v1.11.16-unstable to v1.11.16-stable"`
 - [ ] `git tag -S -a v1.11.16`
 - [ ] `git push etclabscore v1.11.16`
   > Push the tag to the remote. I like to do it this way because it triggers the tagged version on CI before the branch/PR version,
   expediting artifact delivery.
 - [ ] Edit `params/version.go` making the necessary changes to version information. (To `-unstable` version.)
-- [ ] `git commit -S -s -m "bump version from v1.11.15-unstable to v1.11.17-unstable"`
+- [ ] `git commit -S -s -m "bump version from v1.11.16-stable to v1.11.17-unstable"`
 - [ ] `git push etclabscore`
   > Push the branch. This will get PR'd, eg. https://github.com/etclabscore/core-geth/pull/197
 - [ ] Draft a new release, following the existing patterns for naming and notes. https://github.com/etclabscore/core-geth/releases/new

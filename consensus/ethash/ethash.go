@@ -681,6 +681,11 @@ func (ethash *Ethash) dataset(block uint64, async bool) *dataset {
 	currentI, futureI := ethash.datasets.get(epoch, epochLength, ethash.config.ECIP1099Block)
 	current := currentI.(*dataset)
 
+	// set async false if ecip-1099 transition in case of regeneratiion bad DAG on disk
+	if epochLength == epochLengthECIP1099 && (epoch == 42 || epoch == 195) {
+		async = false
+	}
+
 	// If async is specified, generate everything in a background thread
 	if async && !current.generated() {
 		go func() {

@@ -265,26 +265,29 @@ func newCache(epoch uint64, epochLength uint64) interface{} {
 // isBadCache checks a given caches/datsets keccak256 hash against bad caches (ecip-1099)
 // this is incase the client has already written non-ecip1099 caches to disk,
 // instead of blindly trusting as seedhashes/filename match, compare checksums.
-func isBadCache(epoch uint64, epochLength uint64, data []uint32) (bool, string) {
+func isBadCache(epoch uint64, epochLength uint64, data []uint32, checksum bool) (bool, string) {
 	// Check for bad caches/datasets at ecip-1099 transitions
-	if epochLength == epochLengthECIP1099 {
+	if epochLength == epochLengthECIP1099 || checksum {
 		var badCache string
 		var badDataset string
 		var hash string
 
 		if epoch == 42 { // mordor
-			hash = uint32Array2Keccak256(data)
+			checksum = true
 			// bad cache generated using: geth makecache 2520001 [path] --epoch.length=30000
 			badCache = "0xafa2a00911843b0a67314614e629d9e550ef74da4dca2215c475a0f93333aedc"
 			// bad dataset generated using: geth makedag 2520001 [path] --epoch.length=30000
 			badDataset = "0xc07d08a9f8a2b5af0e87f68c8df9eaf28d7cef2ae3fe86d8c306d9139861c15f"
 		}
 		if epoch == 195 { // classic mainnet
-			hash = uint32Array2Keccak256(data)
+			checksum = true
 			// bad cache generated using: geth makecache 11700001 [path] --epoch.length=30000
 			badCache = "0x5794130ea9e433185214fb4032edbd3473499267e197d9003a6a1a5bd300b3e5"
 			// bad dataset generated using: geth makedag 11700001 [path] --epoch.length=30000
 			badDataset = "0x9d90f9777150c0a9ed94ae17839e246d3fb0042e8d97903e3a7bf87357cef656"
+		}
+		if checksum {
+			hash = uint32Array2Keccak256(data)
 		}
 		// check if cache is bad
 		if hash != "" && (hash == badCache || hash == badDataset) {
@@ -299,7 +302,7 @@ func isBadCache(epoch uint64, epochLength uint64, data []uint32) (bool, string) 
 }
 
 // generate ensures that the cache content is generated before use.
-func (c *cache) generate(dir string, limit int, lock bool, test bool) {
+func (c *cache) generate(dir string, limit int, lock bool, test bool, checksum bool) {
 	c.once.Do(func() {
 		size := cacheSize(c.epoch*c.epochLength+1, c.epoch)
 		seed := seedHash(c.epoch*c.epochLength + 1)
@@ -328,11 +331,16 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		var err error
 		c.dump, c.mmap, c.cache, err = memoryMap(path, lock)
 		if err == nil {
-			logger.Debug("Loaded old ethash cache from disk")
-			isBad, hash := isBadCache(c.epoch, c.epochLength, c.cache)
+			isBad, hash := isBadCache(c.epoch, c.epochLength, c.cache, checksum)
+			if checksum {
+				logger.Info("Checksum'd new ethash dataset", "path", path, "hash", hash)
+			} else {
+				logger.Debug("Loaded old ethash cache from disk")
+			}
 			if isBad {
 				// cache is bad. Set err, then continue as if cache could not be read from disk.
 				err = fmt.Errorf("Cache with hash %s has been flagged as bad", hash)
+				logger.Error("Bad cache on disk", "path", path, "hash", hash)
 			} else {
 				return
 			}
@@ -383,7 +391,7 @@ func newDataset(epoch uint64, epochLength uint64) interface{} {
 }
 
 // generate ensures that the dataset content is generated before use.
-func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
+func (d *dataset) generate(dir string, limit int, lock bool, test bool, checksum bool) {
 	d.once.Do(func() {
 		// Mark the dataset generated after we're done. This is needed for remote
 		defer atomic.StoreUint32(&d.done, 1)
@@ -421,8 +429,12 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		var err error
 		d.dump, d.mmap, d.dataset, err = memoryMap(path, lock)
 		if err == nil {
-			logger.Debug("Loaded old ethash dataset from disk", "path", path)
-			isBad, hash := isBadCache(d.epoch, d.epochLength, d.dataset)
+			isBad, hash := isBadCache(d.epoch, d.epochLength, d.dataset, checksum)
+			if checksum {
+				logger.Info("Checksum'd new ethash dataset", "path", path, "hash", hash)
+			} else {
+				logger.Debug("Loaded old ethash dataset from disk")
+			}
 			if isBad {
 				// dataset is bad. Continue as if cache could not be read from disk.
 				err = fmt.Errorf("Dataset with hash %s has been flagged as bad", hash)
@@ -475,14 +487,21 @@ func (d *dataset) finalizer() {
 func MakeCache(block uint64, epochLength uint64, dir string) {
 	epoch := calcEpoch(block, epochLength)
 	c := cache{epoch: epoch, epochLength: epochLength}
-	c.generate(dir, math.MaxInt32, false, false)
+	c.generate(dir, math.MaxInt32, false, false, false)
+	// call again so generated cache is read from disk and checksum'd
+	c2 := cache{epoch: epoch, epochLength: epochLength}
+	c2.generate(dir, math.MaxInt32, false, false, true)
 }
 
 // MakeDataset generates a new ethash dataset and optionally stores it to disk.
 func MakeDataset(block uint64, epochLength uint64, dir string) {
 	epoch := calcEpoch(block, epochLength)
 	d := dataset{epoch: epoch, epochLength: epochLength}
-	d.generate(dir, math.MaxInt32, false, false)
+	d.generate(dir, math.MaxInt32, false, false, false)
+
+	d2 := dataset{epoch: epoch, epochLength: epochLength}
+	// call again so generated DAG is read from disk and checksum'd
+	d2.generate(dir, math.MaxInt32, false, false, true)
 }
 
 // Mode defines the type and amount of PoW verification an ethash engine makes.
@@ -658,12 +677,12 @@ func (ethash *Ethash) cache(block uint64) *cache {
 	current := currentI.(*cache)
 
 	// Wait for generation finish.
-	current.generate(ethash.config.CacheDir, ethash.config.CachesOnDisk, ethash.config.CachesLockMmap, ethash.config.PowMode == ModeTest)
+	current.generate(ethash.config.CacheDir, ethash.config.CachesOnDisk, ethash.config.CachesLockMmap, ethash.config.PowMode == ModeTest, false)
 
 	// If we need a new future cache, now's a good time to regenerate it.
 	if futureI != nil {
 		future := futureI.(*cache)
-		go future.generate(ethash.config.CacheDir, ethash.config.CachesOnDisk, ethash.config.CachesLockMmap, ethash.config.PowMode == ModeTest)
+		go future.generate(ethash.config.CacheDir, ethash.config.CachesOnDisk, ethash.config.CachesLockMmap, ethash.config.PowMode == ModeTest, false)
 	}
 	return current
 }
@@ -681,7 +700,7 @@ func (ethash *Ethash) dataset(block uint64, async bool) *dataset {
 	currentI, futureI := ethash.datasets.get(epoch, epochLength, ethash.config.ECIP1099Block)
 	current := currentI.(*dataset)
 
-	// set async false if ecip-1099 transition in case of regeneratiion bad DAG on disk
+	// set async false if ecip-1099 transition in case of regeneratiion bad DAG
 	if epochLength == epochLengthECIP1099 && (epoch == 42 || epoch == 195) {
 		async = false
 	}
@@ -689,20 +708,20 @@ func (ethash *Ethash) dataset(block uint64, async bool) *dataset {
 	// If async is specified, generate everything in a background thread
 	if async && !current.generated() {
 		go func() {
-			current.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.DatasetsLockMmap, ethash.config.PowMode == ModeTest)
+			current.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.DatasetsLockMmap, ethash.config.PowMode == ModeTest, false)
 
 			if futureI != nil {
 				future := futureI.(*dataset)
-				future.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.DatasetsLockMmap, ethash.config.PowMode == ModeTest)
+				future.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.DatasetsLockMmap, ethash.config.PowMode == ModeTest, false)
 			}
 		}()
 	} else {
 		// Either blocking generation was requested, or already done
-		current.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.DatasetsLockMmap, ethash.config.PowMode == ModeTest)
+		current.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.DatasetsLockMmap, ethash.config.PowMode == ModeTest, false)
 
 		if futureI != nil {
 			future := futureI.(*dataset)
-			go future.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.DatasetsLockMmap, ethash.config.PowMode == ModeTest)
+			go future.generate(ethash.config.DatasetDir, ethash.config.DatasetsOnDisk, ethash.config.DatasetsLockMmap, ethash.config.PowMode == ModeTest, false)
 		}
 	}
 	return current

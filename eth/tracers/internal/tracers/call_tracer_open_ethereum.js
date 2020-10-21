@@ -31,6 +31,7 @@
 		"max code size exceeded": "Out of gas",
 		"invalid jump destination": "Bad jump destination",
 		"execution reverted": "Reverted",
+		"return data out of bounds": "Out of bounds",
 	},
 
 	oeErrorMappingStartingWith: {

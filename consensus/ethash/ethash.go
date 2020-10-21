@@ -428,7 +428,7 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 				err = fmt.Errorf("Dataset with hash %s has been flagged as bad", hash)
 				// regenerating DAG is a intensive process, we should let the user know
 				// why it's happening.
-				logger.Error("Bad DAG on disk", "path", path)
+				logger.Error("Bad DAG on disk", "path", path, "hash", hash)
 			} else {
 				return
 			}

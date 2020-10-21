@@ -82,6 +82,17 @@ func uint32Array2ByteArray(c []uint32) []byte {
 	return buf
 }
 
+// bytes2Keccak256 returns the keccak256 hash as a hex string (0x prefixed)
+// for a given uint32 array (cache/dataset)
+func uint32Array2Keccak256(data []uint32) string {
+	// convert to bytes
+	bytes := uint32Array2ByteArray(data)
+	// hash with keccak256
+	digest := crypto.Keccak256(bytes)
+	// return hex string
+	return common.ToHex(digest)
+}
+
 // memoryMap tries to memory map a file of uint32s for read only access.
 func memoryMap(path string, lock bool) (*os.File, mmap.MMap, []uint32, error) {
 	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
@@ -251,6 +262,33 @@ func newCache(epoch uint64, epochLength uint64) interface{} {
 	return &cache{epoch: epoch, epochLength: epochLength}
 }
 
+// isBadCache checks a given caches keccak256 hash against bad caches (ecip-1099)
+// this is incase the client has already written non-ecip1099 caches to disk,
+// instead of blindly trusting as seedhashes/filename match, compare checksums.
+func isBadCache(epoch uint64, epochLength uint64, hash string) bool {
+	// Check for bad caches at ecip-1099 transitions
+	if epochLength == epochLengthECIP1099 {
+		var badCache string
+		if epoch == 42 { // mordor
+			// bad cache generated using: geth makecache 2520001 --epoch.length=30000
+			badCache = "0xafa2a00911843b0a67314614e629d9e550ef74da4dca2215c475a0f93333aedc" // keccak256
+		}
+		if epoch == 195 { // classic mainnet
+			// bad cache generated using: geth makecache 11700001 --epoch.length=30000
+			badCache = "0x5794130ea9e433185214fb4032edbd3473499267e197d9003a6a1a5bd300b3e5" // keccak256
+		}
+		// check if cache is bad
+		if hash == badCache {
+			// cache is bad.
+			return true
+		}
+		// cache is good
+		return false
+	}
+	// cache is not ecip-1099 enabled
+	return false
+}
+
 // generate ensures that the cache content is generated before use.
 func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 	c.once.Do(func() {
@@ -281,30 +319,11 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		var err error
 		c.dump, c.mmap, c.cache, err = memoryMap(path, lock)
 		if err == nil {
-			// Hash (keccak256) the cache
-			bytes := uint32Array2ByteArray(c.cache)
-			digest := crypto.Keccak256(bytes)
-			hash := common.ToHex(digest)
-
+			hash := uint32Array2Keccak256(c.cache)
 			logger.Debug("Loaded old ethash cache from disk", "path", path, "hash", hash)
-
-			// Check for bad caches at ecip-1099 transitions
-			if c.epochLength == epochLengthECIP1099 {
-				var badCache string
-				if c.epoch == 42 { // mordor
-					badCache = "0xafa2a00911843b0a67314614e629d9e550ef74da4dca2215c475a0f93333aedc" // keccak256
-				}
-				if c.epoch == 195 { // classic mainnet
-					badCache = "0x5794130ea9e433185214fb4032edbd3473499267e197d9003a6a1a5bd300b3e5" // keccak256
-				}
-				// check if cache is bad
-				if hash == badCache {
-					// cache is bad. Set err, then continue as if cache could not be read from disk.
-					err = fmt.Errorf("Cache with hash %s has been flagged as a bad cache for epoch %d", hash, c.epoch)
-				} else {
-					// cache is good
-					return
-				}
+			if isBadCache(c.epoch, c.epochLength, hash) {
+				// cache is bad. Set err, then continue as if cache could not be read from disk.
+				err = fmt.Errorf("Cache with hash %s has been flagged as a bad for epoch %d. Attempting to regenerate", hash, c.epoch)
 			} else {
 				return
 			}

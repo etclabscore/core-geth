@@ -266,20 +266,25 @@ func newCache(epoch uint64, epochLength uint64) interface{} {
 // this is incase the client has already written non-ecip1099 caches to disk,
 // instead of blindly trusting as seedhashes/filename match, compare checksums.
 func isBadCache(epoch uint64, epochLength uint64, hash string) bool {
-	// Check for bad caches at ecip-1099 transitions
+	// Check for bad caches/datasets at ecip-1099 transitions
 	if epochLength == epochLengthECIP1099 {
 		var badCache string
+		var badDataset string
 		if epoch == 42 { // mordor
-			// bad cache generated using: geth makecache 2520001 --epoch.length=30000
-			badCache = "0xafa2a00911843b0a67314614e629d9e550ef74da4dca2215c475a0f93333aedc" // keccak256
+			// bad cache generated using: geth makecache 2520001 [path] --epoch.length=30000
+			badCache = "0xafa2a00911843b0a67314614e629d9e550ef74da4dca2215c475a0f93333aedc"
+			// bad dataset generated using: geth makedag 2520001 [path] --epoch.length=30000
+			badDataset = "0xc07d08a9f8a2b5af0e87f68c8df9eaf28d7cef2ae3fe86d8c306d9139861c15f"
 		}
 		if epoch == 195 { // classic mainnet
-			// bad cache generated using: geth makecache 11700001 --epoch.length=30000
-			badCache = "0x5794130ea9e433185214fb4032edbd3473499267e197d9003a6a1a5bd300b3e5" // keccak256
+			// bad cache generated using: geth makecache 11700001 [path] --epoch.length=30000
+			badCache = "0x5794130ea9e433185214fb4032edbd3473499267e197d9003a6a1a5bd300b3e5"
+			// bad dataset generated using: geth makedag 11700001 [path] --epoch.length=30000
+			badDataset = "0x9d90f9777150c0a9ed94ae17839e246d3fb0042e8d97903e3a7bf87357cef656"
 		}
 		// check if cache is bad
-		if hash == badCache {
-			// cache is bad.
+		if hash == badCache || hash == badDataset {
+			// cache/dataset is bad.
 			return true
 		}
 		// cache is good
@@ -323,7 +328,7 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 			logger.Debug("Loaded old ethash cache from disk", "path", path, "hash", hash)
 			if isBadCache(c.epoch, c.epochLength, hash) {
 				// cache is bad. Set err, then continue as if cache could not be read from disk.
-				err = fmt.Errorf("Cache with hash %s has been flagged as a bad for epoch %d. Attempting to regenerate", hash, c.epoch)
+				err = fmt.Errorf("Cache with hash %s has been flagged as bad", hash)
 			} else {
 				return
 			}
@@ -410,14 +415,26 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 
 		// Try to load the file from disk and memory map it
 		var err error
+		var hash string
+		var regenerating = false
 		d.dump, d.mmap, d.dataset, err = memoryMap(path, lock)
 		if err == nil {
-			logger.Debug("Loaded old ethash dataset from disk")
-			return
+			hash = uint32Array2Keccak256(d.dataset)
+			logger.Info("Loaded old ethash dataset from disk", "path", path, "hash", hash)
+			if isBadCache(d.epoch, d.epochLength, hash) {
+				// dataset is bad. Set err, then continue as if cache could not be read from disk.
+				err = fmt.Errorf("Dataset with hash %s has been flagged as bad", hash)
+				regenerating = true
+			} else {
+				return
+			}
 		}
 		logger.Debug("Failed to load old ethash dataset", "err", err)
-
-		// No previous dataset available, create a new dataset file to fill
+		if regenerating {
+			// let the miner know why DAG is being regenerated
+			logger.Error("Bad DAG on disk", "path", path, "hash", hash)
+		}
+		// No usable previous dataset available, create a new dataset file to fill
 		cache := make([]uint32, csize/4)
 		generateCache(cache, d.epoch, d.epochLength, seed)
 

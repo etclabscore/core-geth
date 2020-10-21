@@ -144,6 +144,7 @@
 
 			this.callstack[this.callstack.length - 1].output = toHex(log.memory.slice(outOff, outOff + outLen));
 			return;
+		}
 		if (log.getDepth() == this.callstack.length - 1) {
 			// Pop off the last call and get the execution results
 			var call = this.callstack.pop();

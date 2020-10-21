@@ -18,6 +18,7 @@
 package ethash
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"math"
@@ -34,7 +35,9 @@ import (
 	"unsafe"
 
 	mmap "github.com/edsrzf/mmap-go"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -64,12 +67,39 @@ func isLittleEndian() bool {
 	return *(*byte)(unsafe.Pointer(&n)) == 0x04
 }
 
+// uint32Array2ByteArray returns the bytes represented by uint32 array c
+func uint32Array2ByteArray(c []uint32) []byte {
+	buf := make([]byte, len(c)*4)
+	if isLittleEndian() {
+		for i, v := range c {
+			binary.LittleEndian.PutUint32(buf[i*4:], v)
+		}
+	} else {
+		for i, v := range c {
+			binary.BigEndian.PutUint32(buf[i*4:], v)
+		}
+	}
+	return buf
+}
+
+// bytes2Keccak256 returns the keccak256 hash as a hex string (0x prefixed)
+// for a given uint32 array (cache/dataset)
+func uint32Array2Keccak256(data []uint32) string {
+	// convert to bytes
+	bytes := uint32Array2ByteArray(data)
+	// hash with keccak256
+	digest := crypto.Keccak256(bytes)
+	// return hex string
+	return common.ToHex(digest)
+}
+
 // memoryMap tries to memory map a file of uint32s for read only access.
 func memoryMap(path string, lock bool) (*os.File, mmap.MMap, []uint32, error) {
 	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
 	if err != nil {
 		return nil, nil, nil, err
 	}
+
 	mem, buffer, err := memoryMapFile(file, false)
 	if err != nil {
 		file.Close()
@@ -232,6 +262,42 @@ func newCache(epoch uint64, epochLength uint64) interface{} {
 	return &cache{epoch: epoch, epochLength: epochLength}
 }
 
+// isBadCache checks a given caches/datsets keccak256 hash against bad caches (ecip-1099)
+// this is incase the client has already written non-ecip1099 caches to disk,
+// instead of blindly trusting as seedhashes/filename match, compare checksums.
+func isBadCache(epoch uint64, epochLength uint64, data []uint32) (bool, string) {
+	// Check for bad caches/datasets at ecip-1099 transitions
+	if epochLength == epochLengthECIP1099 {
+		var badCache string
+		var badDataset string
+		var hash string
+
+		if epoch == 42 { // mordor
+			hash = uint32Array2Keccak256(data)
+			// bad cache generated using: geth makecache 2520001 [path] --epoch.length=30000
+			badCache = "0xafa2a00911843b0a67314614e629d9e550ef74da4dca2215c475a0f93333aedc"
+			// bad dataset generated using: geth makedag 2520001 [path] --epoch.length=30000
+			badDataset = "0xc07d08a9f8a2b5af0e87f68c8df9eaf28d7cef2ae3fe86d8c306d9139861c15f"
+		}
+		if epoch == 195 { // classic mainnet
+			hash = uint32Array2Keccak256(data)
+			// bad cache generated using: geth makecache 11700001 [path] --epoch.length=30000
+			badCache = "0x5794130ea9e433185214fb4032edbd3473499267e197d9003a6a1a5bd300b3e5"
+			// bad dataset generated using: geth makedag 11700001 [path] --epoch.length=30000
+			badDataset = "0x9d90f9777150c0a9ed94ae17839e246d3fb0042e8d97903e3a7bf87357cef656"
+		}
+		// check if cache is bad
+		if hash != "" && (hash == badCache || hash == badDataset) {
+			// cache/dataset is bad.
+			return true, hash
+		}
+		// cache is good
+		return false, hash
+	}
+	// cache is not ecip-1099 enabled
+	return false, ""
+}
+
 // generate ensures that the cache content is generated before use.
 func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 	c.once.Do(func() {
@@ -263,11 +329,17 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		c.dump, c.mmap, c.cache, err = memoryMap(path, lock)
 		if err == nil {
 			logger.Debug("Loaded old ethash cache from disk")
-			return
+			isBad, hash := isBadCache(c.epoch, c.epochLength, c.cache)
+			if isBad {
+				// cache is bad. Set err, then continue as if cache could not be read from disk.
+				err = fmt.Errorf("Cache with hash %s has been flagged as bad", hash)
+			} else {
+				return
+			}
 		}
 		logger.Debug("Failed to load old ethash cache", "err", err)
 
-		// No previous cache available, create a new cache file to fill
+		// No usable previous cache available, create a new cache file to fill
 		c.dump, c.mmap, c.cache, err = memoryMapAndGenerate(path, size, lock, func(buffer []uint32) { generateCache(buffer, c.epoch, c.epochLength, seed) })
 		if err != nil {
 			logger.Error("Failed to generate mapped ethash cache", "err", err)
@@ -349,12 +421,21 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		var err error
 		d.dump, d.mmap, d.dataset, err = memoryMap(path, lock)
 		if err == nil {
-			logger.Debug("Loaded old ethash dataset from disk")
-			return
+			logger.Debug("Loaded old ethash dataset from disk", "path", path)
+			isBad, hash := isBadCache(d.epoch, d.epochLength, d.dataset)
+			if isBad {
+				// dataset is bad. Continue as if cache could not be read from disk.
+				err = fmt.Errorf("Dataset with hash %s has been flagged as bad", hash)
+				// regenerating DAG is a intensive process, we should let the user know
+				// why it's happening.
+				logger.Error("Bad DAG on disk", "path", path, "hash", hash)
+			} else {
+				return
+			}
 		}
 		logger.Debug("Failed to load old ethash dataset", "err", err)
 
-		// No previous dataset available, create a new dataset file to fill
+		// No usable previous dataset available, create a new dataset file to fill
 		cache := make([]uint32, csize/4)
 		generateCache(cache, d.epoch, d.epochLength, seed)
 
@@ -599,6 +680,11 @@ func (ethash *Ethash) dataset(block uint64, async bool) *dataset {
 	epoch := calcEpoch(block, epochLength)
 	currentI, futureI := ethash.datasets.get(epoch, epochLength, ethash.config.ECIP1099Block)
 	current := currentI.(*dataset)
+
+	// set async false if ecip-1099 transition in case of regeneratiion bad DAG on disk
+	if epochLength == epochLengthECIP1099 && (epoch == 42 || epoch == 195) {
+		async = false
+	}
 
 	// If async is specified, generate everything in a background thread
 	if async && !current.generated() {

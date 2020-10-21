@@ -225,7 +225,14 @@
 		if (typeof call.gas !== "undefined") {
 			call.gas = '0x' + bigInt(call.gas).toString(16);
 			call.gasUsed = call.gas
-		} else if (call.error === "out of gas") {
+		} else {
+			// Retrieve gas true allowance from the inner call.
+			// We need to extract if from within the call as there may be funky gas dynamics
+			// with regard to requested and actually given gas (2300 stipend, 63/64 rule).
+			call.gas = '0x' + bigInt(log.getGas()).toString(16);
+		}
+
+		if (call.error === "out of gas" && typeof call.gas === "undefined") {
 			call.gas = "0x0";
 		}
 		delete call.gasIn; delete call.gasCost;

@@ -50,7 +50,7 @@ type TraceRewardAction struct {
 	RewardType string          `json:"rewardType,omitempty"`
 }
 
-// setConfigTracerToOpenEthereum forces the Tracer to the OpenEthereum one, mutating the argument value.
+// setConfigTracerToOpenEthereum forces the Tracer to the OpenEthereum one
 func setConfigTracerToOpenEthereum(config *TraceConfig) *TraceConfig {
 	if config == nil {
 		config = &TraceConfig{}
@@ -167,12 +167,12 @@ func (api *PrivateTraceAPI) Block(ctx context.Context, number rpc.BlockNumber, c
 // Transaction returns the structured logs created during the execution of EVM
 // and returns them as a JSON object.
 func (api *PrivateTraceAPI) Transaction(ctx context.Context, hash common.Hash, config *TraceConfig) (interface{}, error) {
-	setConfigTracerToOpenEthereum(config)
+	config = setConfigTracerToOpenEthereum(config)
 	return traceTransaction(ctx, api.eth, hash, config)
 }
 
 func (api *PrivateTraceAPI) Filter(ctx context.Context, args ethapi.CallArgs, config *TraceConfig) ([]*txTraceResult, error) {
-	setConfigTracerToOpenEthereum(config)
+	config = setConfigTracerToOpenEthereum(config)
 	fmt.Printf("args: %#v\n", args)
 	return nil, nil
 }

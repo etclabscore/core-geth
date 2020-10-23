@@ -18,7 +18,6 @@ package tests
 
 import (
 	"bytes"
-	"crypto/sha1"
 	"encoding/json"
 	"io/ioutil"
 	"math/big"
@@ -29,8 +28,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -90,14 +87,14 @@ func TestDifficultyGen(t *testing.T) {
 			return
 		}
 		if err := dt.checkFailure(t, name, test.Run(cfg)); err != nil {
-			t.Error(err)
+			t.Fatalf("failed to run difficulty test, err=%v", err)
 		} else {
 
 			// Collect all paired tests and originals.
 			// The output file will yield ALL tests, not just newly-generated ones.
 			specFile, ok := chainspecRefsDifficulty[key]
 			if !ok {
-				t.Fatal("missing spec ref for", specFile)
+				t.Fatalf("missing spec ref; key=%s file=%s", key, specFile)
 			}
 			test.Chainspec = specFile
 			test.Name = strings.ReplaceAll(name, ".json", "")
@@ -124,7 +121,7 @@ func TestDifficultyGen(t *testing.T) {
 
 			conf, ok := difficultyChainConfigurations[associateForkName]
 			if !ok {
-				panic("generating config associated failed; no existing Go chain config found")
+				t.Fatalf("config association failed; no existing Go chain config found: %s", associateForkName)
 			}
 
 			// If associated chainspec file has not been written at least once, write it.
@@ -133,30 +130,12 @@ func TestDifficultyGen(t *testing.T) {
 			// generator write the spec along with the tests to save the hurdle of manually building the chain spec
 			// file first as a dependency for test generation.
 			specref, done := wroteNewChainConfigs[associateForkName]
-			if !done {
-				genesis := params.DefaultRopstenGenesisBlock()
-				genesis.Config = conf
-
-				pspec, err := tconvert.NewParityChainSpec(associateForkName, genesis, []string{})
+			if !done || specFile.Filename == "" {
+				t.Logf("Writing chain spec file: %s", forkName)
+				specFilepath, sum, err := writeDifficultyConfigFile(conf, associateForkName)
 				if err != nil {
-					t.Fatal(err)
+					t.Fatalf("could not write difficulty file, err=%v", err)
 				}
-				specFilepath, ok := mapForkNameChainspecFileDifficulty[associateForkName]
-				if !ok {
-					t.Fatal("nonexisting chainspec JSON file path, ref/assoc config: ", forkName, associateForkName)
-				}
-
-				b, err := json.MarshalIndent(pspec, "", "    ")
-				if err != nil {
-					t.Fatal(err)
-				}
-
-				err = ioutil.WriteFile(paritySpecPath(specFilepath), b, os.ModePerm)
-				if err != nil {
-					t.Fatal(err)
-				}
-
-				sum := sha1.Sum(b)
 				specref = chainspecRef{
 					Filename: specFilepath,
 					Sha1Sum:  sum[:],

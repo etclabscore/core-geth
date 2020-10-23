@@ -25,7 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigethv0"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 )
 
 func uint64P(n uint64) *uint64 {
@@ -221,7 +221,7 @@ func TestCheckCompatible(t *testing.T) {
 		{
 			stored: func() ctypes.ChainConfigurator {
 				// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
-				c := &multigethv0.ChainConfig{
+				c := &multigeth.ChainConfig{
 					ChainID:             big.NewInt(61),
 					HomesteadBlock:      big.NewInt(1150000),
 					DAOForkBlock:        big.NewInt(1920000),
@@ -232,15 +232,13 @@ func TestCheckCompatible(t *testing.T) {
 					EIP158Block:         big.NewInt(8772000),
 					ByzantiumBlock:      big.NewInt(8772000),
 					DisposalBlock:       big.NewInt(5900000),
-					SocialBlock:         nil,
-					EthersocialBlock:    nil,
 					ConstantinopleBlock: big.NewInt(9573000),
 					PetersburgBlock:     big.NewInt(9573000),
 					// As if client hasn't upgraded config to latest fork.
 					//IstanbulBlock:       big.NewInt(10500839),
 					//EIP1884DisableFBlock:big.NewInt(10500839),
-					ECIP1017EraRounds:  big.NewInt(5000000),
-					EIP160FBlock:       big.NewInt(3000000),
+					ECIP1017EraBlock:   big.NewInt(5000000),
+					EIP160Block:        big.NewInt(3000000),
 					ECIP1010PauseBlock: big.NewInt(3000000),
 					ECIP1010Length:     big.NewInt(2000000),
 					Ethash:             new(ctypes.EthashConfig),
@@ -254,34 +252,55 @@ func TestCheckCompatible(t *testing.T) {
 		{
 			stored: func() ctypes.ChainConfigurator {
 				// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
-				c := &multigethv0.ChainConfig{
-					ChainID:              big.NewInt(61),
-					HomesteadBlock:       big.NewInt(1150000),
-					DAOForkBlock:         big.NewInt(1920000),
-					DAOForkSupport:       false,
-					EIP150Block:          big.NewInt(2500000),
-					EIP150Hash:           common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
-					EIP155Block:          big.NewInt(3000000),
-					EIP158Block:          big.NewInt(8772000),
-					ByzantiumBlock:       big.NewInt(8772000),
-					DisposalBlock:        big.NewInt(5900000),
-					SocialBlock:          nil,
-					EthersocialBlock:     nil,
-					ConstantinopleBlock:  big.NewInt(9573000),
-					PetersburgBlock:      big.NewInt(9573000),
-					IstanbulBlock:        big.NewInt(10500839),
-					EIP1884DisableFBlock: big.NewInt(10500839),
-					ECIP1017EraRounds:    big.NewInt(5000000),
-					EIP160FBlock:         big.NewInt(3000000),
-					ECIP1010PauseBlock:   big.NewInt(3000000),
-					ECIP1010Length:       big.NewInt(2000000),
-					Ethash:               new(ctypes.EthashConfig),
+				c := &multigeth.ChainConfig{
+					ChainID:             big.NewInt(61),
+					HomesteadBlock:      big.NewInt(1150000),
+					DAOForkBlock:        big.NewInt(1920000),
+					DAOForkSupport:      false,
+					EIP150Block:         big.NewInt(2500000),
+					EIP150Hash:          common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),
+					EIP155Block:         big.NewInt(3000000),
+					EIP158Block:         big.NewInt(8772000),
+					ByzantiumBlock:      big.NewInt(8772000),
+					DisposalBlock:       big.NewInt(5900000),
+					ConstantinopleBlock: big.NewInt(9573000),
+					PetersburgBlock:     big.NewInt(9573000),
+					IstanbulBlock:       big.NewInt(10500839),
+					ECIP1017EraBlock:    big.NewInt(5000000),
+					EIP160Block:         big.NewInt(3000000),
+					ECIP1010PauseBlock:  big.NewInt(3000000),
+					ECIP1010Length:      big.NewInt(2000000),
+					Ethash:              new(ctypes.EthashConfig),
 				}
 				return c
 			}(),
 			new:     ClassicChainConfig,
 			head:    9700000,
 			wantErr: nil,
+		},
+		// https://github.com/ethereum/go-ethereum/pull/21473
+		// This is to enable private chains running on older Geth release 1.8.27 with Constantinople fork enabled (but not Petersburg) to apply Petersburg retroactively when upgrading to Geth 1.9.
+		// ... but @meowsbits thinks this isn't reasonable.
+		// This is allowance would presume that the private chains were unaffected by the constantinople vs. petersburg
+		// changes, and were safe to retroactively set the config. I do not understand how this is allowed or even desirable...
+		// Are the configs equivalent? No. Do we have any observables in place to ensure that the chain data will not be
+		// retroactively corrupted? No.
+		// {
+		// 	stored:  &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30)},
+		// 	new:     &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30), PetersburgBlock: big.NewInt(30)},
+		// 	head:    40,
+		// 	wantErr: nil,
+		// },
+		{
+			stored: &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30)},
+			new:    &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30), PetersburgBlock: big.NewInt(31)},
+			head:   40,
+			wantErr: &confp.ConfigCompatError{
+				What:         "Petersburg fork block",
+				StoredConfig: nil,
+				NewConfig:    uint64P(big.NewInt(31).Uint64()),
+				RewindTo:     30,
+			},
 		},
 	}
 

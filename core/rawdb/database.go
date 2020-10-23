@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -52,6 +53,22 @@ func (frdb *freezerdb) Close() error {
 		return fmt.Errorf("%v", errs)
 	}
 	return nil
+}
+
+// Freeze is a helper method used for external testing to trigger and block until
+// a freeze cycle completes, without having to sleep for a minute to trigger the
+// automatic background run.
+func (frdb *freezerdb) Freeze(threshold uint64) {
+	// Set the freezer threshold to a temporary value
+	defer func(old uint64) {
+		atomic.StoreUint64(&frdb.AncientStore.(*freezer).threshold, old)
+	}(atomic.LoadUint64(&frdb.AncientStore.(*freezer).threshold))
+	atomic.StoreUint64(&frdb.AncientStore.(*freezer).threshold, threshold)
+
+	// Trigger a freeze cycle and block until it's done
+	trigger := make(chan struct{}, 1)
+	frdb.AncientStore.(*freezer).trigger <- trigger
+	<-trigger
 }
 
 // nofreezedb is a database wrapper that disables freezer data retrievals.
@@ -100,6 +117,98 @@ func NewDatabase(db ethdb.KeyValueStore) ethdb.Database {
 	return &nofreezedb{
 		KeyValueStore: db,
 	}
+}
+
+// NewDatabaseWithFreezerRemote creates a high level database on top of a given key-
+// value data store with a freezer moving immutable chain segments into cold
+// storage.
+func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerURL string) (ethdb.Database, error) {
+	// Create the idle freezer instance
+	log.Info("New remote freezer", "freezer", freezerURL)
+
+	frdb, err := newFreezerRemoteClient(freezerURL)
+	if err != nil {
+		log.Error("NewDatabaseWithFreezerRemote error", "error", err)
+		return nil, err
+	}
+	// Core-Geth: The validation below is the original and contemporary upstream
+	// ethereum/go-ethereum implementation of validations in NewDatabaseWithFreezer. Core-Geth's
+	// implementation of the "standard" (built-in FS) freezer initialization has been
+	// upgraded to attempt recovery in case an ancient/kv gap is detected, as you can see below.
+	// This recovery-if-invalid logic is not echoed below in the case of a remote freezer
+	// to limit complexity and stresses on the external implementation, while providing at a loud
+	// complaint if db states are determined invalid.
+	//
+	// Original comment:
+	//
+	// Since the freezer can be stored separately from the user's key-value database,
+	// there's a fairly high probability that the user requests invalid combinations
+	// of the freezer and database. Ensure that we don't shoot ourselves in the foot
+	// by serving up conflicting data, leading to both datastores getting corrupted.
+	//
+	//   - If both the freezer and key-value store is empty (no genesis), we just
+	//     initialized a new empty freezer, so everything's fine.
+	//   - If the key-value store is empty, but the freezer is not, we need to make
+	//     sure the user's genesis matches the freezer. That will be checked in the
+	//     blockchain, since we don't have the genesis block here (nor should we at
+	//     this point care, the key-value/freezer combo is valid).
+	//   - If neither the key-value store nor the freezer is empty, cross validate
+	//     the genesis hashes to make sure they are compatible. If they are, also
+	//     ensure that there's no gap between the freezer and sunsequently leveldb.
+	//   - If the key-value store is not empty, but the freezer is we might just be
+	//     upgrading to the freezer release, or we might have had a small chain and
+	//     not frozen anything yet. Ensure that no blocks are missing yet from the
+	//     key-value store, since that would mean we already had an old freezer.
+	if kvgenesis, _ := db.Get(headerHashKey(0)); len(kvgenesis) > 0 {
+		if frozen, _ := frdb.Ancients(); frozen > 0 {
+			// If the freezer already contains something, ensure that the genesis blocks
+			// match, otherwise we might mix up freezers across chains and destroy both
+			// the freezer and the key-value store.
+			frgenesis, err := frdb.Ancient(freezerHashTable, 0)
+			if err != nil {
+				return nil, fmt.Errorf("failed to retrieve genesis from ancient %v", err)
+			} else if !bytes.Equal(kvgenesis, frgenesis) {
+				return nil, fmt.Errorf("genesis mismatch: %#x (leveldb) != %#x (ancients)", kvgenesis, frgenesis)
+			}
+			// Key-value store and freezer belong to the same network. Ensure that they
+			// are contiguous, otherwise we might end up with a non-functional freezer.
+			if kvhash, _ := db.Get(headerHashKey(frozen)); len(kvhash) == 0 {
+				// Subsequent header after the freezer limit is missing from the database.
+				// Reject startup is the database has a more recent head.
+				if *ReadHeaderNumber(db, ReadHeadHeaderHash(db)) > frozen-1 {
+					return nil, fmt.Errorf("gap (#%d) in the chain between ancients and leveldb", frozen)
+				}
+				// Database contains only older data than the freezer, this happens if the
+				// state was wiped and reinited from an existing freezer.
+			}
+			// Otherwise, key-value store continues where the freezer left off, all is fine.
+			// We might have duplicate blocks (crash after freezer write but before key-value
+			// store deletion, but that's fine).
+		} else {
+			// If the freezer is empty, ensure nothing was moved yet from the key-value
+			// store, otherwise we'll end up missing data. We check block #1 to decide
+			// if we froze anything previously or not, but do take care of databases with
+			// only the genesis block.
+			if ReadHeadHeaderHash(db) != common.BytesToHash(kvgenesis) {
+				// Key-value store contains more data than the genesis block, make sure we
+				// didn't freeze anything yet.
+				if kvblob, _ := db.Get(headerHashKey(1)); len(kvblob) == 0 {
+					return nil, errors.New(`ancient chain segments already extracted from KV, but freezer is empty.
+Please set --ancient.rpc to the correct path, and/or review the remote freezer's contents and state.`)
+				}
+				// Block #1 is still in the database, we're allowed to init a new feezer
+			}
+			// Otherwise, the head header is still the genesis, we're allowed to init a new
+			// feezer.
+		}
+	}
+	// Freezer is consistent with the key-value database, permit combining the two
+	go freezeRemote(db, frdb, frdb.threshold, frdb.quit, frdb.trigger)
+
+	return &freezerdb{
+		KeyValueStore: db,
+		AncientStore:  frdb,
+	}, nil
 }
 
 // NewDatabaseWithFreezer creates a high level database on top of a given key-
@@ -196,6 +305,21 @@ func NewLevelDBDatabase(file string, cache int, handles int, namespace string) (
 
 // NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a
 // freezer moving immutable chain segments into cold storage.
+func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, freezerURL string) (ethdb.Database, error) {
+	kvdb, err := leveldb.New(file, cache, handles, "eth/db/chaindata")
+	if err != nil {
+		return nil, err
+	}
+	frdb, err := NewDatabaseWithFreezerRemote(kvdb, freezerURL)
+	if err != nil {
+		kvdb.Close()
+		return nil, err
+	}
+	return frdb, nil
+}
+
+// NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a
+// freezer moving immutable chain segments into cold storage.
 func NewLevelDBDatabaseWithFreezer(file string, cache int, handles int, freezer string, namespace string) (ethdb.Database, error) {
 	kvdb, err := leveldb.New(file, cache, handles, namespace)
 	if err != nil {
@@ -207,6 +331,36 @@ func NewLevelDBDatabaseWithFreezer(file string, cache int, handles int, freezer 
 		return nil, err
 	}
 	return frdb, nil
+}
+
+type counter uint64
+
+func (c counter) String() string {
+	return fmt.Sprintf("%d", c)
+}
+
+func (c counter) Percentage(current uint64) string {
+	return fmt.Sprintf("%d", current*100/uint64(c))
+}
+
+// stat stores sizes and count for a parameter
+type stat struct {
+	size  common.StorageSize
+	count counter
+}
+
+// Add size to the stat and increase the counter by 1
+func (s *stat) Add(size common.StorageSize) {
+	s.size += size
+	s.count++
+}
+
+func (s *stat) Size() string {
+	return s.size.String()
+}
+
+func (s *stat) Count() string {
+	return s.count.String()
 }
 
 // InspectDatabase traverses the entire database and checks the size
@@ -221,35 +375,38 @@ func InspectDatabase(db ethdb.Database) error {
 		logged = time.Now()
 
 		// Key-value store statistics
-		total           common.StorageSize
-		headerSize      common.StorageSize
-		bodySize        common.StorageSize
-		receiptSize     common.StorageSize
-		tdSize          common.StorageSize
-		numHashPairing  common.StorageSize
-		hashNumPairing  common.StorageSize
-		trieSize        common.StorageSize
-		txlookupSize    common.StorageSize
-		accountSnapSize common.StorageSize
-		storageSnapSize common.StorageSize
-		preimageSize    common.StorageSize
-		bloomBitsSize   common.StorageSize
-		cliqueSnapsSize common.StorageSize
+		headers         stat
+		bodies          stat
+		receipts        stat
+		tds             stat
+		numHashPairings stat
+		hashNumPairings stat
+		tries           stat
+		codes           stat
+		txLookups       stat
+		accountSnaps    stat
+		storageSnaps    stat
+		preimages       stat
+		bloomBits       stat
+		cliqueSnaps     stat
 
 		// Ancient store statistics
-		ancientHeaders  common.StorageSize
-		ancientBodies   common.StorageSize
-		ancientReceipts common.StorageSize
-		ancientHashes   common.StorageSize
-		ancientTds      common.StorageSize
+		ancientHeadersSize  common.StorageSize
+		ancientBodiesSize   common.StorageSize
+		ancientReceiptsSize common.StorageSize
+		ancientTdsSize      common.StorageSize
+		ancientHashesSize   common.StorageSize
 
 		// Les statistic
-		chtTrieNodes   common.StorageSize
-		bloomTrieNodes common.StorageSize
+		chtTrieNodes   stat
+		bloomTrieNodes stat
 
 		// Meta- and unaccounted data
-		metadata    common.StorageSize
-		unaccounted common.StorageSize
+		metadata    stat
+		unaccounted stat
+
+		// Totals
+		total common.StorageSize
 	)
 	// Inspect key-value database first.
 	for it.Next() {
@@ -259,96 +416,105 @@ func InspectDatabase(db ethdb.Database) error {
 		)
 		total += size
 		switch {
-		case bytes.HasPrefix(key, headerPrefix) && bytes.HasSuffix(key, headerTDSuffix):
-			tdSize += size
-		case bytes.HasPrefix(key, headerPrefix) && bytes.HasSuffix(key, headerHashSuffix):
-			numHashPairing += size
 		case bytes.HasPrefix(key, headerPrefix) && len(key) == (len(headerPrefix)+8+common.HashLength):
-			headerSize += size
-		case bytes.HasPrefix(key, headerNumberPrefix) && len(key) == (len(headerNumberPrefix)+common.HashLength):
-			hashNumPairing += size
+			headers.Add(size)
 		case bytes.HasPrefix(key, blockBodyPrefix) && len(key) == (len(blockBodyPrefix)+8+common.HashLength):
-			bodySize += size
+			bodies.Add(size)
 		case bytes.HasPrefix(key, blockReceiptsPrefix) && len(key) == (len(blockReceiptsPrefix)+8+common.HashLength):
-			receiptSize += size
-		case bytes.HasPrefix(key, txLookupPrefix) && len(key) == (len(txLookupPrefix)+common.HashLength):
-			txlookupSize += size
-		case bytes.HasPrefix(key, SnapshotAccountPrefix) && len(key) == (len(SnapshotAccountPrefix)+common.HashLength):
-			accountSnapSize += size
-		case bytes.HasPrefix(key, SnapshotStoragePrefix) && len(key) == (len(SnapshotStoragePrefix)+2*common.HashLength):
-			storageSnapSize += size
-		case bytes.HasPrefix(key, preimagePrefix) && len(key) == (len(preimagePrefix)+common.HashLength):
-			preimageSize += size
-		case bytes.HasPrefix(key, bloomBitsPrefix) && len(key) == (len(bloomBitsPrefix)+10+common.HashLength):
-			bloomBitsSize += size
-		case bytes.HasPrefix(key, []byte("clique-")) && len(key) == 7+common.HashLength:
-			cliqueSnapsSize += size
-		case bytes.HasPrefix(key, []byte("cht-")) && len(key) == 4+common.HashLength:
-			chtTrieNodes += size
-		case bytes.HasPrefix(key, []byte("blt-")) && len(key) == 4+common.HashLength:
-			bloomTrieNodes += size
+			receipts.Add(size)
+		case bytes.HasPrefix(key, headerPrefix) && bytes.HasSuffix(key, headerTDSuffix):
+			tds.Add(size)
+		case bytes.HasPrefix(key, headerPrefix) && bytes.HasSuffix(key, headerHashSuffix):
+			numHashPairings.Add(size)
+		case bytes.HasPrefix(key, headerNumberPrefix) && len(key) == (len(headerNumberPrefix)+common.HashLength):
+			hashNumPairings.Add(size)
 		case len(key) == common.HashLength:
-			trieSize += size
+			tries.Add(size)
+		case bytes.HasPrefix(key, codePrefix) && len(key) == len(codePrefix)+common.HashLength:
+			codes.Add(size)
+		case bytes.HasPrefix(key, txLookupPrefix) && len(key) == (len(txLookupPrefix)+common.HashLength):
+			txLookups.Add(size)
+		case bytes.HasPrefix(key, SnapshotAccountPrefix) && len(key) == (len(SnapshotAccountPrefix)+common.HashLength):
+			accountSnaps.Add(size)
+		case bytes.HasPrefix(key, SnapshotStoragePrefix) && len(key) == (len(SnapshotStoragePrefix)+2*common.HashLength):
+			storageSnaps.Add(size)
+		case bytes.HasPrefix(key, preimagePrefix) && len(key) == (len(preimagePrefix)+common.HashLength):
+			preimages.Add(size)
+		case bytes.HasPrefix(key, bloomBitsPrefix) && len(key) == (len(bloomBitsPrefix)+10+common.HashLength):
+			bloomBits.Add(size)
+		case bytes.HasPrefix(key, []byte("clique-")) && len(key) == 7+common.HashLength:
+			cliqueSnaps.Add(size)
+		case bytes.HasPrefix(key, []byte("cht-")) && len(key) == 4+common.HashLength:
+			chtTrieNodes.Add(size)
+		case bytes.HasPrefix(key, []byte("blt-")) && len(key) == 4+common.HashLength:
+			bloomTrieNodes.Add(size)
 		default:
 			var accounted bool
 			for _, meta := range [][]byte{databaseVerisionKey, headHeaderKey, headBlockKey, headFastBlockKey, fastTrieProgressKey} {
 				if bytes.Equal(key, meta) {
-					metadata += size
+					metadata.Add(size)
 					accounted = true
 					break
 				}
 			}
 			if !accounted {
-				unaccounted += size
+				unaccounted.Add(size)
 			}
 		}
-		count += 1
+		count++
 		if count%1000 == 0 && time.Since(logged) > 8*time.Second {
 			log.Info("Inspecting database", "count", count, "elapsed", common.PrettyDuration(time.Since(start)))
 			logged = time.Now()
 		}
 	}
 	// Inspect append-only file store then.
-	ancients := []*common.StorageSize{&ancientHeaders, &ancientBodies, &ancientReceipts, &ancientHashes, &ancientTds}
+	ancientSizes := []*common.StorageSize{&ancientHeadersSize, &ancientBodiesSize, &ancientReceiptsSize, &ancientHashesSize, &ancientTdsSize}
 	for i, category := range []string{freezerHeaderTable, freezerBodiesTable, freezerReceiptTable, freezerHashTable, freezerDifficultyTable} {
 		if size, err := db.AncientSize(category); err == nil {
-			*ancients[i] += common.StorageSize(size)
+			*ancientSizes[i] += common.StorageSize(size)
 			total += common.StorageSize(size)
 		}
 	}
+	// Get number of ancient rows inside the freezer
+	ancients := counter(0)
+	if count, err := db.Ancients(); err == nil {
+		ancients = counter(count)
+	}
 	// Display the database statistic.
 	stats := [][]string{
-		{"Key-Value store", "Headers", headerSize.String()},
-		{"Key-Value store", "Bodies", bodySize.String()},
-		{"Key-Value store", "Receipts", receiptSize.String()},
-		{"Key-Value store", "Difficulties", tdSize.String()},
-		{"Key-Value store", "Block number->hash", numHashPairing.String()},
-		{"Key-Value store", "Block hash->number", hashNumPairing.String()},
-		{"Key-Value store", "Transaction index", txlookupSize.String()},
-		{"Key-Value store", "Bloombit index", bloomBitsSize.String()},
-		{"Key-Value store", "Trie nodes", trieSize.String()},
-		{"Key-Value store", "Trie preimages", preimageSize.String()},
-		{"Key-Value store", "Account snapshot", accountSnapSize.String()},
-		{"Key-Value store", "Storage snapshot", storageSnapSize.String()},
-		{"Key-Value store", "Clique snapshots", cliqueSnapsSize.String()},
-		{"Key-Value store", "Singleton metadata", metadata.String()},
-		{"Ancient store", "Headers", ancientHeaders.String()},
-		{"Ancient store", "Bodies", ancientBodies.String()},
-		{"Ancient store", "Receipts", ancientReceipts.String()},
-		{"Ancient store", "Difficulties", ancientTds.String()},
-		{"Ancient store", "Block number->hash", ancientHashes.String()},
-		{"Light client", "CHT trie nodes", chtTrieNodes.String()},
-		{"Light client", "Bloom trie nodes", bloomTrieNodes.String()},
+		{"Key-Value store", "Headers", headers.Size(), headers.Count()},
+		{"Key-Value store", "Bodies", bodies.Size(), bodies.Count()},
+		{"Key-Value store", "Receipt lists", receipts.Size(), receipts.Count()},
+		{"Key-Value store", "Difficulties", tds.Size(), tds.Count()},
+		{"Key-Value store", "Block number->hash", numHashPairings.Size(), numHashPairings.Count()},
+		{"Key-Value store", "Block hash->number", hashNumPairings.Size(), hashNumPairings.Count()},
+		{"Key-Value store", "Transaction index", txLookups.Size(), txLookups.Count()},
+		{"Key-Value store", "Bloombit index", bloomBits.Size(), bloomBits.Count()},
+		{"Key-Value store", "Contract codes", codes.Size(), codes.Count()},
+		{"Key-Value store", "Trie nodes", tries.Size(), tries.Count()},
+		{"Key-Value store", "Trie preimages", preimages.Size(), preimages.Count()},
+		{"Key-Value store", "Account snapshot", accountSnaps.Size(), accountSnaps.Count()},
+		{"Key-Value store", "Storage snapshot", storageSnaps.Size(), storageSnaps.Count()},
+		{"Key-Value store", "Clique snapshots", cliqueSnaps.Size(), cliqueSnaps.Count()},
+		{"Key-Value store", "Singleton metadata", metadata.Size(), metadata.Count()},
+		{"Ancient store", "Headers", ancientHeadersSize.String(), ancients.String()},
+		{"Ancient store", "Bodies", ancientBodiesSize.String(), ancients.String()},
+		{"Ancient store", "Receipt lists", ancientReceiptsSize.String(), ancients.String()},
+		{"Ancient store", "Difficulties", ancientTdsSize.String(), ancients.String()},
+		{"Ancient store", "Block number->hash", ancientHashesSize.String(), ancients.String()},
+		{"Light client", "CHT trie nodes", chtTrieNodes.Size(), chtTrieNodes.Count()},
+		{"Light client", "Bloom trie nodes", bloomTrieNodes.Size(), bloomTrieNodes.Count()},
 	}
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Database", "Category", "Size"})
-	table.SetFooter([]string{"", "Total", total.String()})
+	table.SetHeader([]string{"Database", "Category", "Size", "Items"})
+	table.SetFooter([]string{"", "Total", total.String(), " "})
 	table.AppendBulk(stats)
 	table.Render()
 
-	if unaccounted > 0 {
-		log.Error("Database contains unaccounted data", "size", unaccounted)
+	if unaccounted.size > 0 {
+		log.Error("Database contains unaccounted data", "size", unaccounted.size, "count", unaccounted.count)
 	}
+
 	return nil
 }
 
@@ -361,7 +527,10 @@ func validateFreezerVsKV(freezerdb *freezer, db ethdb.KeyValueStore) error {
 			// If the freezer already contains something, ensure that the genesis blocks
 			// match, otherwise we might mix up freezers across chains and destroy both
 			// the freezer and the key-value store.
-			if frgenesis, _ := freezerdb.Ancient(freezerHashTable, 0); !bytes.Equal(kvgenesis, frgenesis) {
+			frgenesis, err := freezerdb.Ancient(freezerHashTable, 0)
+			if err != nil {
+				return fmt.Errorf("failed to retrieve genesis from ancient %v", err)
+			} else if !bytes.Equal(kvgenesis, frgenesis) {
 				return fmt.Errorf("genesis mismatch: %#x (leveldb) != %#x (ancients)", kvgenesis, frgenesis)
 			}
 			// Key-value store and freezer belong to the same network. Ensure that they

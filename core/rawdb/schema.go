@@ -18,6 +18,7 @@
 package rawdb
 
 import (
+	"bytes"
 	"encoding/binary"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -37,6 +38,9 @@ var (
 
 	// headFastBlockKey tracks the latest known incomplete block's hash during fast sync.
 	headFastBlockKey = []byte("LastFast")
+
+	// lastPivotKey tracks the last pivot block used by fast sync (to reenable on sethead).
+	lastPivotKey = []byte("LastPivot")
 
 	// fastTrieProgressKey tracks the number of trie entries imported during fast sync.
 	fastTrieProgressKey = []byte("TrieSync")
@@ -66,6 +70,7 @@ var (
 	bloomBitsPrefix       = []byte("B") // bloomBitsPrefix + bit (uint16 big endian) + section (uint64 big endian) + hash -> bloom bits
 	SnapshotAccountPrefix = []byte("a") // SnapshotAccountPrefix + account hash -> account trie value
 	SnapshotStoragePrefix = []byte("o") // SnapshotStoragePrefix + account hash + storage hash -> storage trie value
+	codePrefix            = []byte("c") // codePrefix + code hash -> account code
 
 	preimagePrefix = []byte("secure-key-")      // preimagePrefix + hash -> preimage
 	ConfigPrefix   = []byte("ethereum-config-") // config prefix for the db
@@ -78,6 +83,37 @@ var (
 )
 
 const (
+
+	// FreezerRemoteHeaderTable indicates the name of the freezer header table.
+	// This is an exported value for remote freezer servers to use if they want.
+	// It is equivalent to the corresponding private value,
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
+	FreezerRemoteHeaderTable = freezerHeaderTable
+
+	// FreezerRemoteHashTable indicates the name of the freezer canonical hash table.
+	// This is an exported value for remote freezer servers to use if they want.
+	// It is equivalent to the corresponding private value,
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
+	FreezerRemoteHashTable = freezerHashTable
+
+	// FreezerRemoteBodiesTable indicates the name of the freezer block body table.
+	// This is an exported value for remote freezer servers to use if they want.
+	// It is equivalent to the corresponding private value,
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
+	FreezerRemoteBodiesTable = freezerBodiesTable
+
+	// FreezerRemoteReceiptTable indicates the name of the freezer receipts table.
+	// This is an exported value for remote freezer servers to use if they want.
+	// It is equivalent to the corresponding private value,
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
+	FreezerRemoteReceiptTable = freezerReceiptTable
+
+	// FreezerRemoteDifficultyTable indicates the name of the freezer total difficulty table.
+	// This is an exported value for remote freezer servers to use if they want.
+	// It is equivalent to the corresponding private value,
+	// and exists only to minimize code differentiation from the built-in freezer implementation.
+	FreezerRemoteDifficultyTable = freezerDifficultyTable
+
 	// freezerHeaderTable indicates the name of the freezer header table.
 	freezerHeaderTable = "headers"
 
@@ -187,6 +223,20 @@ func bloomBitsKey(bit uint, section uint64, hash common.Hash) []byte {
 // preimageKey = preimagePrefix + hash
 func preimageKey(hash common.Hash) []byte {
 	return append(preimagePrefix, hash.Bytes()...)
+}
+
+// codeKey = codePrefix + hash
+func codeKey(hash common.Hash) []byte {
+	return append(codePrefix, hash.Bytes()...)
+}
+
+// IsCodeKey reports whether the given byte slice is the key of contract code,
+// if so return the raw code hash as well.
+func IsCodeKey(key []byte) (bool, []byte) {
+	if bytes.HasPrefix(key, codePrefix) && len(key) == common.HashLength+len(codePrefix) {
+		return true, key[len(codePrefix):]
+	}
+	return false, nil
 }
 
 // ConfigKey = ConfigPrefix + hash

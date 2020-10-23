@@ -130,6 +130,8 @@ type ProtocolSpecifier interface {
 	SetEIP1706Transition(n *uint64) error
 	GetEIP2537Transition() *uint64
 	SetEIP2537Transition(n *uint64) error
+	GetECBP1100Transition() *uint64
+	SetECBP1100Transition(n *uint64) error
 }
 
 type Forker interface {
@@ -185,6 +187,8 @@ type EthashConfigurator interface {
 	SetEthashEIP100BTransition(n *uint64) error
 	GetEthashECIP1041Transition() *uint64
 	SetEthashECIP1041Transition(n *uint64) error
+	GetEthashECIP1099Transition() *uint64
+	SetEthashECIP1099Transition(n *uint64) error
 
 	GetEthashDifficultyBombDelaySchedule() Uint64BigMapEncodesHex
 	SetEthashDifficultyBombDelaySchedule(m Uint64BigMapEncodesHex) error

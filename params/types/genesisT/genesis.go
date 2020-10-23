@@ -528,20 +528,28 @@ func (g *Genesis) SetECIP1080Transition(n *uint64) error {
 	return g.Config.SetECIP1080Transition(n)
 }
 
-func (g Genesis) GetEIP1706Transition() *uint64 {
+func (g *Genesis) GetEIP1706Transition() *uint64 {
 	return g.Config.GetEIP1706Transition()
 }
 
-func (g Genesis) SetEIP1706Transition(n *uint64) error {
+func (g *Genesis) SetEIP1706Transition(n *uint64) error {
 	return g.Config.SetEIP1706Transition(n)
 }
 
-func (g Genesis) GetEIP2537Transition() *uint64 {
+func (g *Genesis) GetEIP2537Transition() *uint64 {
 	return g.Config.GetEIP2537Transition()
 }
 
-func (g Genesis) SetEIP2537Transition(n *uint64) error {
+func (g *Genesis) SetEIP2537Transition(n *uint64) error {
 	return g.Config.SetEIP2537Transition(n)
+}
+
+func (g *Genesis) GetECBP1100Transition() *uint64 {
+	return g.Config.GetECBP1100Transition()
+}
+
+func (g *Genesis) SetECBP1100Transition(n *uint64) error {
+	return g.Config.SetECBP1100Transition(n)
 }
 
 func (g *Genesis) IsEnabled(fn func() *uint64, n *big.Int) bool {
@@ -686,6 +694,14 @@ func (g *Genesis) GetEthashECIP1041Transition() *uint64 {
 
 func (g *Genesis) SetEthashECIP1041Transition(n *uint64) error {
 	return g.Config.SetEthashECIP1041Transition(n)
+}
+
+func (g *Genesis) GetEthashECIP1099Transition() *uint64 {
+	return g.Config.GetEthashECIP1099Transition()
+}
+
+func (g *Genesis) SetEthashECIP1099Transition(n *uint64) error {
+	return g.Config.SetEthashECIP1099Transition(n)
 }
 
 func (g *Genesis) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {

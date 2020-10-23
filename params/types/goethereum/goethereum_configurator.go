@@ -391,6 +391,15 @@ func (c *ChainConfig) SetEIP2537Transition(n *uint64) error {
 	return nil
 }
 
+func (c *ChainConfig) GetECBP1100Transition() *uint64 {
+	return bigNewU64(c.ecbp1100Transition)
+}
+
+func (c *ChainConfig) SetECBP1100Transition(n *uint64) error {
+	c.ecbp1100Transition = setBig(c.ecbp1100Transition, n)
+	return nil
+}
+
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {
@@ -657,6 +666,20 @@ func (c *ChainConfig) GetEthashECIP1041Transition() *uint64 {
 
 func (c *ChainConfig) SetEthashECIP1041Transition(i *uint64) error {
 	if i == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
+func (c *ChainConfig) GetEthashECIP1099Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEthashECIP1099Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	if n == nil {
 		return nil
 	}
 	return ctypes.ErrUnsupportedConfigFatal

@@ -459,31 +459,180 @@ func (spec *ParityChainSpec) SetEIP1108Transition(n *uint64) error {
 	return nil
 }
 
-func (c *ParityChainSpec) GetECIP1080Transition() *uint64 {
-	return c.Params.ECIP1080Transition.Uint64P()
+func (spec *ParityChainSpec) GetECIP1080Transition() *uint64 {
+	return spec.Params.ECIP1080Transition.Uint64P()
 }
 
-func (c *ParityChainSpec) SetECIP1080Transition(n *uint64) error {
-	c.Params.ECIP1080Transition = new(ParityU64).SetUint64(n)
+func (spec *ParityChainSpec) SetECIP1080Transition(n *uint64) error {
+	spec.Params.ECIP1080Transition = new(ParityU64).SetUint64(n)
 	return nil
 }
 
-func (c *ParityChainSpec) GetEIP1706Transition() *uint64 {
-	return c.Params.EIP1706Transition.Uint64P() // FIXME when+if upstream implements
+func (spec *ParityChainSpec) GetEIP1706Transition() *uint64 {
+	return spec.Params.EIP1706Transition.Uint64P() // FIXME when+if upstream implements
 }
 
-func (c *ParityChainSpec) SetEIP1706Transition(n *uint64) error {
-	c.Params.EIP1706Transition = new(ParityU64).SetUint64(n)
+func (spec *ParityChainSpec) SetEIP1706Transition(n *uint64) error {
+	spec.Params.EIP1706Transition = new(ParityU64).SetUint64(n)
 	return nil
 }
 
-func (c *ParityChainSpec) GetEIP2537Transition() *uint64 {
-	return c.Params.EIP2537Transition.Uint64P() // FIXME when+if upstream implements
+// GetEIP2537Transition returns the EIP2537 activation, if any.
+// https://eips.ethereum.org/EIPS/eip-2537
+func (spec *ParityChainSpec) GetEIP2537Transition() *uint64 {
+	var eip2537Precompiles = map[string]*uint64{
+		"bls12_381_g1_add": spec.GetPrecompile(common.BytesToAddress([]byte{0xa}),
+			ParityChainSpecPricing{
+				BLS12ConstOperation: &ParityChainSpecBLS12ConstOperationPricing{
+					Price: 600,
+				},
+			}).Uint64P(),
+		"bls12_381_g1_mul": spec.GetPrecompile(common.BytesToAddress([]byte{0xb}),
+			ParityChainSpecPricing{
+				BLS12ConstOperation: &ParityChainSpecBLS12ConstOperationPricing{
+					Price: 12000,
+				},
+			}).Uint64P(),
+		"bls12_381_g1_multiexp": spec.GetPrecompile(common.BytesToAddress([]byte{0xc}),
+			ParityChainSpecPricing{
+				BLS12G1MultiExp: &ParityChainSpecBLS12MultiExpPricing{
+					Base: 12000,
+				},
+			}).Uint64P(),
+		"bls12_381_g2_add": spec.GetPrecompile(common.BytesToAddress([]byte{0xd}),
+			ParityChainSpecPricing{
+				BLS12ConstOperation: &ParityChainSpecBLS12ConstOperationPricing{
+					Price: 4500,
+				},
+			}).Uint64P(),
+		"bls12_381_g2_mul": spec.GetPrecompile(common.BytesToAddress([]byte{0xe}),
+			ParityChainSpecPricing{
+				BLS12ConstOperation: &ParityChainSpecBLS12ConstOperationPricing{
+					Price: 55000,
+				},
+			}).Uint64P(),
+		"bls12_381_g2_multiexp": spec.GetPrecompile(common.BytesToAddress([]byte{0xf}),
+			ParityChainSpecPricing{
+				BLS12G2MultiExp: &ParityChainSpecBLS12MultiExpPricing{
+					Base: 55000,
+				},
+			}).Uint64P(),
+		"bls12_381_pairing": spec.GetPrecompile(common.BytesToAddress([]byte{0x10}),
+			ParityChainSpecPricing{
+				BLS12Pairing: &ParityChainSpecBLS12PairingPricing{
+					Base: 115000,
+					Pair: 23000,
+				},
+			}).Uint64P(),
+		"bls12_381_fp_to_g1": spec.GetPrecompile(common.BytesToAddress([]byte{0x11}),
+			ParityChainSpecPricing{
+				BLS12ConstOperation: &ParityChainSpecBLS12ConstOperationPricing{
+					Price: 5500,
+				},
+			}).Uint64P(),
+		"bls12_381_fp2_to_g2": spec.GetPrecompile(common.BytesToAddress([]byte{0x12}),
+			ParityChainSpecPricing{
+				BLS12ConstOperation: &ParityChainSpecBLS12ConstOperationPricing{
+					Price: 110000,
+				},
+			}).Uint64P(),
+	}
+
+	var activation *uint64
+	for _, v := range eip2537Precompiles {
+		if v == nil {
+			return nil
+		}
+		if activation == nil {
+			activation = v
+			continue
+		}
+		if *v != *activation {
+			return nil
+		}
+	}
+	return activation
 }
 
-func (c *ParityChainSpec) SetEIP2537Transition(n *uint64) error {
-	c.Params.EIP2537Transition = new(ParityU64).SetUint64(n)
+func (spec *ParityChainSpec) SetEIP2537Transition(n *uint64) error {
+	type setter struct {
+		name    string
+		pricing ParityChainSpecPricing
+	}
+	var eip2537Precompiles = []setter{
+		{"bls12_381_g1_add",
+			ParityChainSpecPricing{
+				BLS12ConstOperation: &ParityChainSpecBLS12ConstOperationPricing{
+					Price: 600,
+				},
+			}},
+		{"bls12_381_g1_mul",
+			ParityChainSpecPricing{
+				BLS12ConstOperation: &ParityChainSpecBLS12ConstOperationPricing{
+					Price: 12000,
+				},
+			}},
+		{"bls12_381_g1_multiexp",
+			ParityChainSpecPricing{
+				BLS12G1MultiExp: &ParityChainSpecBLS12MultiExpPricing{
+					Base: 12000,
+				},
+			}},
+		{"bls12_381_g2_add",
+			ParityChainSpecPricing{
+				BLS12ConstOperation: &ParityChainSpecBLS12ConstOperationPricing{
+					Price: 4500,
+				},
+			}},
+		{"bls12_381_g2_mul",
+			ParityChainSpecPricing{
+				BLS12ConstOperation: &ParityChainSpecBLS12ConstOperationPricing{
+					Price: 55000,
+				},
+			}},
+		{"bls12_381_g2_multiexp",
+			ParityChainSpecPricing{
+				BLS12G2MultiExp: &ParityChainSpecBLS12MultiExpPricing{
+					Base: 55000,
+				},
+			}},
+		{"bls12_381_pairing",
+			ParityChainSpecPricing{
+				BLS12Pairing: &ParityChainSpecBLS12PairingPricing{
+					Base: 115000,
+					Pair: 23000,
+				},
+			}},
+		{"bls12_381_fp_to_g1",
+			ParityChainSpecPricing{
+				BLS12ConstOperation: &ParityChainSpecBLS12ConstOperationPricing{
+					Price: 5500,
+				},
+			}},
+		{"bls12_381_fp2_to_g2",
+			ParityChainSpecPricing{
+				BLS12ConstOperation: &ParityChainSpecBLS12ConstOperationPricing{
+					Price: 110000,
+				},
+			}},
+	}
+
+	var addr uint8 = 0xa // EIP2537 BLS precompiles occupy 0xa:0x12 (9 total)
+	for i, v := range eip2537Precompiles {
+		spec.SetPrecompile2(common.BytesToAddress([]byte{addr + uint8(i)}), v.name, n, v.pricing)
+	}
 	return nil
+}
+
+func (spec *ParityChainSpec) GetECBP1100Transition() *uint64 {
+	return nil
+}
+
+func (spec *ParityChainSpec) SetECBP1100Transition(n *uint64) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
 }
 
 func (spec *ParityChainSpec) IsEnabled(fn func() *uint64, n *big.Int) bool {
@@ -823,6 +972,17 @@ func (spec *ParityChainSpec) GetEthashECIP1041Transition() *uint64 {
 func (spec *ParityChainSpec) SetEthashECIP1041Transition(n *uint64) error {
 	spec.Engine.Ethash.Params.BombDefuseTransition = new(ParityU64).SetUint64(n)
 	return nil
+}
+
+func (spec *ParityChainSpec) GetEthashECIP1099Transition() *uint64 {
+	return nil
+}
+
+func (spec *ParityChainSpec) SetEthashECIP1099Transition(n *uint64) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
 }
 
 func (spec *ParityChainSpec) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {

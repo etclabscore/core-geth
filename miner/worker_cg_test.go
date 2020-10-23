@@ -20,11 +20,18 @@ import (
 )
 
 func testGenerateBlockAndImportCG(t *testing.T, chainConfig ctypes.ChainConfigurator, numBlocks int) {
+	t.Parallel()
 	var (
 		engine consensus.Engine
 		db     = rawdb.NewMemoryDatabase()
 	)
 	if chainConfig.GetConsensusEngineType().IsClique() {
+		// We need to ensure that the clique period is 0 (blocks created per tx) or 1 to avoid using a "dirty" period
+		// with a greater time, which would cause the test to timeout.
+		if chainConfig.GetCliquePeriod() != 0 {
+			t.Logf("adjusting clique chain config: was: %d, want: %d", chainConfig.GetCliquePeriod(), 0)
+			chainConfig.SetCliquePeriod(0)
+		}
 		engine = clique.New(&ctypes.CliqueConfig{
 			Period: chainConfig.GetCliquePeriod(),
 			Epoch:  chainConfig.GetCliqueEpoch(),
@@ -67,7 +74,7 @@ func testGenerateBlockAndImportCG(t *testing.T, chainConfig ctypes.ChainConfigur
 				t.Fatalf("failed to insert new mined block %d: %v", block.NumberU64(), err)
 			}
 		case <-time.After(3 * time.Second): // Worker needs 1s to include new changes.
-			t.Fatalf("timeout")
+			t.Fatalf("timeout: %d", i)
 		}
 	}
 }

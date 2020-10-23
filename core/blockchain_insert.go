@@ -31,6 +31,7 @@ type insertStats struct {
 	usedGas                    uint64
 	lastIndex                  int
 	startTime                  mclock.AbsTime
+	artificialFinality         bool
 }
 
 // statsReportLimit is the time limit during import and export after which we
@@ -71,6 +72,10 @@ func (st *insertStats) report(chain []*types.Block, index int, dirty common.Stor
 		if st.ignored > 0 {
 			context = append(context, []interface{}{"ignored", st.ignored}...)
 		}
+		if st.artificialFinality {
+			context = append(context, []interface{}{"af", st.artificialFinality}...)
+		}
+
 		log.Info("Imported new chain segment", context...)
 
 		// Bump the stats reported to the next section

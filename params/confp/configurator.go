@@ -21,11 +21,30 @@ import (
 	"math"
 	"math/big"
 	"reflect"
+	"regexp"
 	"sort"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
+
+var (
+	// compatibleProtocolNameSchemes define matchable naming schemes used by configuration methods
+	// that are not incompatible with configuration either having or lacking them.
+	compatibleProtocolNameSchemes = []string{
+		"ECBP", // "Ethereum Classic Best Practice"
+		"EBP",  // "Ethereum Best Practice"
+	}
+)
+
+func nameSignalsCompatibility(name string) bool {
+	for _, s := range compatibleProtocolNameSchemes {
+		if regexp.MustCompile(s).MatchString(name) {
+			return true
+		}
+	}
+	return false
+}
 
 // ConfigCompatError is raised if the locally-stored blockchain is initialised with a
 // ChainConfig that would alter the past.
@@ -98,8 +117,8 @@ func IsEmpty(anything interface{}) bool {
 func IsValid(conf ctypes.ChainConfigurator, head *uint64) *ConfigValidError {
 
 	// head-agnostic logic
-	if conf.GetNetworkID() == nil || *conf.GetNetworkID() == 0 {
-		return NewValidErr("NetworkID cannot be empty nor zero", ">=0", conf.GetNetworkID())
+	if conf.GetNetworkID() == nil {
+		return NewValidErr("NetworkID cannot be nil", "!=nil", conf.GetNetworkID())
 	}
 	if head == nil {
 		return nil
@@ -133,6 +152,11 @@ func compatible(head *uint64, a, b ctypes.ChainConfigurator) *ConfigCompatError 
 	aFns, aNames := Transitions(a)
 	bFns, _ := Transitions(b)
 	for i, afn := range aFns {
+		// Skip cross-compatible namespaced transition names, assuming
+		// these will not be enforced as hardforks.
+		if nameSignalsCompatibility(aNames[i]) {
+			continue
+		}
 		if err := func(c1, c2, head *uint64) *ConfigCompatError {
 			if isForkIncompatible(c1, c2, head) {
 				return NewCompatError("incompatible fork value: "+aNames[i], c1, c2)
@@ -252,8 +276,13 @@ func Forks(conf ctypes.ChainConfigurator) []uint64 {
 	var forks []uint64
 	var forksM = make(map[uint64]struct{}) // Will key for uniqueness as fork numbers are appended to slice.
 
-	transitions, _ := Transitions(conf)
-	for _, tr := range transitions {
+	transitions, names := Transitions(conf)
+	for i, tr := range transitions {
+		// Skip cross-compatible namespaced transition names, assuming
+		// these will not be enforced as hardforks.
+		if nameSignalsCompatibility(names[i]) {
+			continue
+		}
 		// Extract the fork rule block number and aggregate it
 		response := tr()
 		if response == nil ||

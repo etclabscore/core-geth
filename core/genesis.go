@@ -31,7 +31,12 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/ethereum/go-ethereum/trie"
 )
+
+func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
+	return SetupGenesisBlockWithOverride(db, genesis, nil)
+}
 
 // SetupGenesisBlock writes or updates the genesis block in db.
 // The block that will be used is:
@@ -46,7 +51,7 @@ import (
 // error is a *params.ConfigCompatError and the new, unwritten config is returned.
 //
 // The returned chain configuration is never nil.
-func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, ecbp1100 *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
@@ -59,6 +64,14 @@ func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.Cha
 		} else {
 			log.Info("Writing custom genesis block")
 		}
+
+		if ecbp1100 != nil {
+			n := ecbp1100.Uint64()
+			if err := genesis.SetECBP1100Transition(&n); err != nil {
+				return genesis, stored, err
+			}
+		}
+
 		block, err := CommitGenesis(genesis, db)
 		if err != nil {
 			return genesis.Config, common.Hash{}, err
@@ -70,7 +83,7 @@ func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.Cha
 	// We have the genesis block in database(perhaps in ancient database)
 	// but the corresponding state is missing.
 	header := rawdb.ReadHeader(db, stored, 0)
-	if _, err := state.New(header.Root, state.NewDatabaseWithCache(db, 0), nil); err != nil {
+	if _, err := state.New(header.Root, state.NewDatabaseWithCache(db, 0, ""), nil); err != nil {
 		if genesis == nil {
 			genesis = params.DefaultGenesisBlock()
 		}
@@ -96,6 +109,14 @@ func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.Cha
 
 	// Get the existing chain configuration.
 	newcfg := configOrDefault(genesis, stored)
+
+	if ecbp1100 != nil {
+		n := ecbp1100.Uint64()
+		if err := newcfg.SetECBP1100Transition(&n); err != nil {
+			return newcfg, stored, err
+		}
+	}
+
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {
 		log.Warn("Found genesis block without chain config")
@@ -197,9 +218,9 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 		head.Difficulty = vars.GenesisDifficulty
 	}
 	statedb.Commit(false)
-	statedb.Database().TrieDB().Commit(root, true)
+	statedb.Database().TrieDB().Commit(root, true, nil)
 
-	return types.NewBlock(head, nil, nil, nil)
+	return types.NewBlock(head, nil, nil, nil, new(trie.Trie))
 }
 
 // CommitGenesis writes the block and state of a genesis specification to the database.

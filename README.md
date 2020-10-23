@@ -1,4 +1,3 @@
-
 ## CoreGeth: An Ethereum Protocol Provider
 
 > An [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) downstream effort to make the Ethereum Protocol accessible and extensible for a diverse ecosystem.
@@ -84,7 +83,7 @@ This will start `geth` in fast-sync mode with a DB memory allowance of 1GB just 
 above command does.  It will also create a persistent volume in your `$LOCAL_DATADIR` for
 saving your blockchain, as well as map the default devp2p and JSON-RPC API ports.
 
-Do not forget `--rpcaddr 0.0.0.0`, if you want to access RPC from other containers
+Do not forget `--http.addr 0.0.0.0`, if you want to access RPC from other containers
 and/or hosts. By default, `geth` binds to the local interface and RPC endpoints is not
 accessible from the outside.
 
@@ -139,7 +138,7 @@ $ sudo apt-get install -y build-essential
 
 #### Source
 
-Once the dependencies are installed, it's time to clone and build the source:
+Once the dependencies have been installed, it's time to clone and build the source:
 
 ```shell
 $ git clone https://github.com/etclabscore/core-geth.git

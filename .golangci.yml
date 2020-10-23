@@ -9,6 +9,7 @@ run:
   skip-files:
     - core/genesis_alloc.go
     - params/alloc.go
+    - evmc/*
 
 linters:
   disable-all: true
@@ -47,5 +48,8 @@ issues:
       linters:
         - goconst
     - path: cmd/faucet/
+      linters:
+        - deadcode
+    - path: core/blockchain_af.go
       linters:
         - deadcode

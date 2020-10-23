@@ -19,13 +19,17 @@ environment:
 install:
   - git submodule update --init
   - rmdir C:\go /s /q
-  - appveyor DownloadFile https://dl.google.com/go/go1.14.2.windows-%GETH_ARCH%.zip
-  - 7z x go1.14.2.windows-%GETH_ARCH%.zip -y -oC:\ > NUL
+  - appveyor DownloadFile https://dl.google.com/go/go1.15.windows-%GETH_ARCH%.zip
+  - 7z x go1.15.windows-%GETH_ARCH%.zip -y -oC:\ > NUL
   - go version
   - gcc --version
 
 build_script:
   - ps: $env:VERSION = "$(git describe --always)"
+  - copy /Y evmc\include\evmc\evmc.h evmc\bindings\go\evmc\evmc.h
+  - copy /Y evmc\include\evmc\helpers.h evmc\bindings\go\evmc\helpers.h
+  - copy /Y evmc\include\evmc\loader.h evmc\bindings\go\evmc\loader.h
+  - copy /Y evmc\lib\loader\loader.c evmc\bindings\go\evmc\loader.c
   - go run build\ci.go install
   - 7z a core-geth-win64-%VERSION%.zip .\build\bin\geth.exe
   - ps: Get-FileHash core-geth-win64-$env:VERSION.zip -Algorithm SHA256

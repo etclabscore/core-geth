@@ -106,6 +106,23 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 		IstanbulBlock:       big.NewInt(0),
 		MuirGlacierBlock:    big.NewInt(0),
 	},
+	"ETC_Phoenix": &coregeth.CoreGethChainConfig{
+		Ethash:        new(ctypes.EthashConfig),
+		EIP100FBlock:  big.NewInt(0),
+		EIP140FBlock:  big.NewInt(0),
+		EIP198FBlock:  big.NewInt(0),
+		EIP211FBlock:  big.NewInt(0),
+		EIP212FBlock:  big.NewInt(0),
+		EIP213FBlock:  big.NewInt(0),
+		EIP214FBlock:  big.NewInt(0),
+		EIP658FBlock:  big.NewInt(0),
+		EIP145FBlock:  big.NewInt(0),
+		EIP1014FBlock: big.NewInt(0),
+		EIP1052FBlock: big.NewInt(0),
+		EIP1283FBlock: big.NewInt(0),
+		EIP2200FBlock: big.NewInt(0), // Petersburg
+		DisposalBlock: big.NewInt(0),
+	},
 }
 
 type DifficultyTest struct {

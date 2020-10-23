@@ -32,7 +32,7 @@ import (
 )
 
 const (
-	ipcAPIs  = "admin:1.0 debug:1.0 eth:1.0 ethash:1.0 miner:1.0 net:1.0 personal:1.0 rpc:1.0 shh:1.0 txpool:1.0 web3:1.0"
+	ipcAPIs  = "admin:1.0 debug:1.0 eth:1.0 ethash:1.0 miner:1.0 net:1.0 personal:1.0 rpc:1.0 txpool:1.0 web3:1.0"
 	httpAPIs = "eth:1.0 net:1.0 rpc:1.0 web3:1.0"
 )
 
@@ -57,6 +57,7 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 
 		// All other possible --<chain> values.
 		{[]string{"--testnet"}, 3, 3, params.RopstenGenesisHash.Hex()},
+		{[]string{"--ropsten"}, 3, 3, params.RopstenGenesisHash.Hex()},
 		{[]string{"--rinkeby"}, 4, 4, params.RinkebyGenesisHash.Hex()},
 		{[]string{"--goerli"}, 5, 5, params.GoerliGenesisHash.Hex()},
 		{[]string{"--kotti"}, 6, 6, params.KottiGenesisHash.Hex()},
@@ -66,6 +67,11 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 		{[]string{"--yolov1"}, 133519467574833, 133519467574833, params.YoloV1GenesisHash.Hex()},
 	}
 	for i, p := range chainIdentityCases {
+
+		// Disable networking, preventing false-negatives if in an environment without networking service
+		// or collisions with an existing geth service.
+		p.flags = append(p.flags, "--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none")
+
 		t.Run(fmt.Sprintf("%d/%v/networkid", i, p.flags),
 			consoleCmdStdoutTest(p.flags, "admin.nodeInfo.protocols.eth.network", p.networkId))
 		t.Run(fmt.Sprintf("%d/%v/chainid", i, p.flags),
@@ -93,7 +99,7 @@ func TestConsoleWelcome(t *testing.T) {
 	// Start a geth console, make sure it's cleaned up and terminate the console
 	geth := runGeth(t,
 		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--shh",
+		"--etherbase", coinbase,
 		"console")
 
 	// Gather all the infos the welcome message needs to contain
@@ -142,11 +148,9 @@ func TestIPCAttachWelcome(t *testing.T) {
 		defer os.RemoveAll(ws)
 		ipc = filepath.Join(ws, "geth.ipc")
 	}
-	// Note: we need --shh because testAttachWelcome checks for default
-	// list of ipc modules and shh is included there.
 	geth := runGeth(t,
 		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--shh", "--ipcpath", ipc)
+		"--etherbase", coinbase, "--ipcpath", ipc)
 
 	defer func() {
 		geth.Interrupt()
@@ -163,7 +167,7 @@ func TestHTTPAttachWelcome(t *testing.T) {
 	port := strconv.Itoa(trulyRandInt(1024, 65536)) // Yeah, sometimes this will fail, sorry :P
 	geth := runGeth(t,
 		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--rpc", "--rpcport", port)
+		"--etherbase", coinbase, "--http", "--http.port", port)
 	defer func() {
 		geth.Interrupt()
 		geth.ExpectExit()
@@ -180,7 +184,7 @@ func TestWSAttachWelcome(t *testing.T) {
 
 	geth := runGeth(t,
 		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--ws", "--wsport", port)
+		"--etherbase", coinbase, "--ws", "--ws.port", port)
 	defer func() {
 		geth.Interrupt()
 		geth.ExpectExit()

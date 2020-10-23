@@ -161,8 +161,11 @@ func TestCreation(t *testing.T) {
 				{9573000, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
 				{9573001, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
 				{10500838, ID{Hash: checksumToBytes(0x7ba22882), Next: 10500839}},
-				{10500839, ID{Hash: checksumToBytes(0x9007bfcc), Next: 0}},
-				{10500840, ID{Hash: checksumToBytes(0x9007bfcc), Next: 0}},
+				{10500839, ID{Hash: checksumToBytes(0x9007bfcc), Next: 11_700_000}},
+				{10500840, ID{Hash: checksumToBytes(0x9007bfcc), Next: 11_700_000}},
+				{11_699_999, ID{Hash: checksumToBytes(0x9007bfcc), Next: 11_700_000}},
+				{11_700_000, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 0}},
+				{11_700_001, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 0}},
 			},
 		},
 		{
@@ -197,15 +200,17 @@ func TestCreation(t *testing.T) {
 				{301243, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
 				{301244, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
 				{999982, ID{Hash: checksumToBytes(0x604f6ee1), Next: 999983}},
-				{999983, ID{Hash: checksumToBytes(0xf42f5539), Next: 0}},
-				{999984, ID{Hash: checksumToBytes(0xf42f5539), Next: 0}},
+				{999983, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
+				{999984, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
+				{2_519_999, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
+				{2_520_000, ID{Hash: checksumToBytes(0x66b5c286), Next: 0}},
 			},
 		},
 	}
 	for i, tt := range tests {
 		for j, ttt := range tt.cases {
-			if have := newID(tt.config, tt.genesis, ttt.head); have != ttt.want {
-				t.Errorf("test %d, case %d, name: %s, head: %d: fork ID mismatch: have %x, want %x", i, j, tt.name, ttt.head, have, ttt.want)
+			if have := NewID(tt.config, tt.genesis, ttt.head); have != ttt.want {
+				t.Errorf("test %d, case %d: fork ID mismatch: have %x, want %x", i, j, have, ttt.want)
 			}
 		}
 	}
@@ -321,7 +326,7 @@ func TestGatherForks(t *testing.T) {
 		{
 			"classic",
 			params.ClassicChainConfig,
-			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000, 10500839},
+			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000, 10500839, 11_700_000},
 		},
 		{
 			"mainnet",
@@ -331,7 +336,7 @@ func TestGatherForks(t *testing.T) {
 		{
 			"mordor",
 			params.MordorChainConfig,
-			[]uint64{301_243, 999_983},
+			[]uint64{301_243, 999_983, 2_520_000},
 		},
 		{
 			"kotti",
@@ -434,7 +439,7 @@ func TestGenerateSpecificationCases(t *testing.T) {
 		fmt.Println("| Head Block Number | `FORK_HASH` | `FORK_NEXT` | RLP Encoded (Hex) |")
 		fmt.Println("| --- | --- | --- | --- |")
 		for _, c := range cs {
-			id := newID(tt.config, tt.genesisHash, c)
+			id := NewID(tt.config, tt.genesisHash, c)
 			isCanonical := false
 			for _, fi := range forks {
 				if c == fi {

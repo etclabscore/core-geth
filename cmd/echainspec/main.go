@@ -13,7 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigethv0"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -27,7 +27,7 @@ var (
 			Config: &coregeth.CoreGethChainConfig{},
 		},
 		"multigeth": &genesisT.Genesis{
-			Config: &multigethv0.ChainConfig{},
+			Config: &multigeth.ChainConfig{},
 		},
 		"geth": &genesisT.Genesis{
 			Config: &goethereum.ChainConfig{},

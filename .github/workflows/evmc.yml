@@ -1,0 +1,38 @@
+name: EVMC
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+    name: EWASM State Tests
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.13
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+          git submodule update --init --recursive
+          go get golang.org/x/mobile/cmd/gomobile
+          gomobile init
+
+      - name: Build
+        run: |
+          make all
+
+      - name: Test EVMC
+        run: |
+          make test-evmc

@@ -69,8 +69,8 @@ type Node struct {
 	databases map[*closeTrackingDB]struct{} // All open databases
 
 	ipcOpenRPC  *go_openrpc_reflect.Document
-	httpOpenRPC   *go_openrpc_reflect.Document
-	wsOpenRPC  *go_openrpc_reflect.Document
+	httpOpenRPC *go_openrpc_reflect.Document
+	wsOpenRPC   *go_openrpc_reflect.Document
 }
 
 const (
@@ -78,7 +78,6 @@ const (
 	runningState
 	closedState
 )
-
 
 // RPCDiscoveryService defines a receiver type used for RPC discovery by reflection.
 type RPCDiscoveryService struct {
@@ -482,6 +481,15 @@ func (n *Node) startRPC() error {
 		if err := n.ipc.start(n.rpcAPIs); err != nil {
 			return err
 		}
+		// Register the API documentation.
+		n.ipcOpenRPC = newOpenRPCDocument()
+		registerOpenRPCAPIs(n.ipcOpenRPC, n.rpcAPIs)
+		n.ipcOpenRPC.RegisterListener(n.ipc.listener)
+		if err := n.ipc.srv.RegisterName("rpc", &RPCDiscoveryService{
+			d: n.ipcOpenRPC,
+		}); err != nil {
+			return err
+		}
 	}
 
 	// Configure HTTP.
@@ -496,15 +504,19 @@ func (n *Node) startRPC() error {
 		}
 		if err := n.http.enableRPC(n.rpcAPIs, config); err != nil {
 			return err
-	}
-	// Register the API documentation.
-	n.ipcOpenRPC = newOpenRPCDocument()
-	registerOpenRPCAPIs(n.ipcOpenRPC, apis)
-	n.ipcOpenRPC.RegisterListener(listener)
-	if err := handler.RegisterName("rpc", &RPCDiscoveryService{
-		d: n.ipcOpenRPC,
-	}); err != nil {
-		return err
+		}
+
+		n.httpOpenRPC = newOpenRPCDocument()
+		h := n.http.httpHandler.Load().(*rpcHandler)
+		registeredAPIs, err := RegisterApisFromWhitelistReturning(n.rpcAPIs, n.config.HTTPModules, h.server, false)
+		if err != nil {
+			return err
+		}
+
+		registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
+		n.httpOpenRPC.RegisterListener(n.http.listener)
+		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpOpenRPC}); err != nil {
+			return err
 		}
 	}
 
@@ -519,6 +531,18 @@ func (n *Node) startRPC() error {
 			return err
 		}
 		if err := server.enableWS(n.rpcAPIs, config); err != nil {
+			return err
+		}
+
+		n.wsOpenRPC = newOpenRPCDocument()
+		h := n.ws.httpHandler.Load().(*rpcHandler)
+		registeredAPIs, err := RegisterApisFromWhitelistReturning(n.rpcAPIs, n.config.WSModules, h.server, false)
+		if err != nil {
+			return err
+		}
+		registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
+		n.wsOpenRPC.RegisterListener(n.ws.listener)
+		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsOpenRPC}); err != nil {
 			return err
 		}
 	}
@@ -795,7 +819,7 @@ func (n *Node) closeDatabases() (errors []error) {
 
 // RegisterApisFromWhitelist checks the given modules' availability, generates a whitelist based on the allowed modules,
 // and then registers all of the APIs exposed by the services.
-func RegisterApisFromWhitelist(apis []rpc.API, modules []string, srv *rpc.Server, exposeAll bool) (registeredApis []rpc.API, err error) {
+func RegisterApisFromWhitelistReturning(apis []rpc.API, modules []string, srv *rpc.Server, exposeAll bool) (registeredApis []rpc.API, err error) {
 	if bad, available := checkModuleAvailability(modules, apis); len(bad) > 0 {
 		log.Error("Unavailable modules in HTTP API list", "unavailable", bad, "available", available)
 	}

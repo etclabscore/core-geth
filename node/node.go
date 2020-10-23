@@ -404,6 +404,7 @@ func (n *Node) startNetworking() error {
 		n.stopRPC()
 		n.server.Stop()
 	}
+	err = n.setupOpenRPC()
 	return err
 }
 
@@ -468,6 +469,54 @@ func (n *Node) closeDataDir() {
 	}
 }
 
+func (n *Node) setupOpenRPC() error {
+	if n.ipc.endpoint != "" {
+		// Register the API documentation.
+		n.ipcOpenRPC = newOpenRPCDocument()
+		registerOpenRPCAPIs(n.ipcOpenRPC, n.rpcAPIs)
+		n.ipcOpenRPC.RegisterListener(n.ipc.listener)
+		if err := n.ipc.srv.RegisterName("rpc", &RPCDiscoveryService{
+			d: n.ipcOpenRPC,
+		}); err != nil {
+			return err
+		}
+	}
+	if n.config.HTTPHost != "" {
+		n.httpOpenRPC = newOpenRPCDocument()
+		h := n.http.httpHandler.Load().(*rpcHandler)
+		registeredAPIs, err := RegisterApisFromWhitelistReturning(n.rpcAPIs, n.config.HTTPModules, h.server, false)
+		if err != nil {
+			return err
+		}
+
+		registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
+		listener := n.http.listener
+		// for listener == nil || time.Since(start) > 5*time.Second {
+		// }
+		// if listener == nil {
+		// 	log.Crit("nil listener")
+		// }
+		n.httpOpenRPC.RegisterListener(listener)
+		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpOpenRPC}); err != nil {
+			return err
+		}
+	}
+	if n.config.WSHost != "" {
+		n.wsOpenRPC = newOpenRPCDocument()
+		h := n.ws.httpHandler.Load().(*rpcHandler)
+		registeredAPIs, err := RegisterApisFromWhitelistReturning(n.rpcAPIs, n.config.WSModules, h.server, false)
+		if err != nil {
+			return err
+		}
+		registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
+		n.wsOpenRPC.RegisterListener(n.ws.listener)
+		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsOpenRPC}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // configureRPC is a helper method to configure all the various RPC endpoints during node
 // startup. It's not meant to be called at any time afterwards as it makes certain
 // assumptions about the state of the node.
@@ -479,15 +528,6 @@ func (n *Node) startRPC() error {
 	// Configure IPC.
 	if n.ipc.endpoint != "" {
 		if err := n.ipc.start(n.rpcAPIs); err != nil {
-			return err
-		}
-		// Register the API documentation.
-		n.ipcOpenRPC = newOpenRPCDocument()
-		registerOpenRPCAPIs(n.ipcOpenRPC, n.rpcAPIs)
-		n.ipcOpenRPC.RegisterListener(n.ipc.listener)
-		if err := n.ipc.srv.RegisterName("rpc", &RPCDiscoveryService{
-			d: n.ipcOpenRPC,
-		}); err != nil {
 			return err
 		}
 	}
@@ -505,19 +545,6 @@ func (n *Node) startRPC() error {
 		if err := n.http.enableRPC(n.rpcAPIs, config); err != nil {
 			return err
 		}
-
-		n.httpOpenRPC = newOpenRPCDocument()
-		h := n.http.httpHandler.Load().(*rpcHandler)
-		registeredAPIs, err := RegisterApisFromWhitelistReturning(n.rpcAPIs, n.config.HTTPModules, h.server, false)
-		if err != nil {
-			return err
-		}
-
-		registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
-		n.httpOpenRPC.RegisterListener(n.http.listener)
-		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpOpenRPC}); err != nil {
-			return err
-		}
 	}
 
 	// Configure WebSocket.
@@ -531,18 +558,6 @@ func (n *Node) startRPC() error {
 			return err
 		}
 		if err := server.enableWS(n.rpcAPIs, config); err != nil {
-			return err
-		}
-
-		n.wsOpenRPC = newOpenRPCDocument()
-		h := n.ws.httpHandler.Load().(*rpcHandler)
-		registeredAPIs, err := RegisterApisFromWhitelistReturning(n.rpcAPIs, n.config.WSModules, h.server, false)
-		if err != nil {
-			return err
-		}
-		registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
-		n.wsOpenRPC.RegisterListener(n.ws.listener)
-		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsOpenRPC}); err != nil {
 			return err
 		}
 	}

@@ -491,11 +491,6 @@ func (n *Node) setupOpenRPC() error {
 
 		registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
 		listener := n.http.listener
-		// for listener == nil || time.Since(start) > 5*time.Second {
-		// }
-		// if listener == nil {
-		// 	log.Crit("nil listener")
-		// }
 		n.httpOpenRPC.RegisterListener(listener)
 		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpOpenRPC}); err != nil {
 			return err

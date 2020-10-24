@@ -25,6 +25,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -45,6 +46,20 @@ func testNodeConfig() *Config {
 		Name: "test node",
 		P2P:  p2p.Config{PrivateKey: testNodeKey},
 	}
+}
+
+func TestFuncForPC(t *testing.T) {
+	n := new(privateAdminAPI)
+	ty := reflect.TypeOf(n)
+	for i := 0; i < ty.NumMethod(); i++ {
+		meth := ty.Method(i)
+		f := runtime.FuncForPC(meth.Func.Pointer())
+		t.Log("name", f.Name(), "entry", f.Entry())
+		fil, lin := f.FileLine(f.Entry())
+		t.Log("file", fil, "line", lin)
+		t.Log("----------------------------")
+	}
+	t.Fatal()
 }
 
 // Tests that an empty protocol stack can be closed more than once.

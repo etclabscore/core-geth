@@ -484,11 +484,7 @@ func (n *Node) setupOpenRPC() error {
 	if n.config.HTTPHost != "" {
 		n.httpOpenRPC = newOpenRPCDocument()
 		h := n.http.httpHandler.Load().(*rpcHandler)
-		registeredAPIs, err := RegisterApisFromWhitelistReturning(n.rpcAPIs, n.config.HTTPModules, h.server, false)
-		if err != nil {
-			return err
-		}
-
+		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.HTTPModules, false)
 		registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
 		listener := n.http.listener
 		n.httpOpenRPC.RegisterListener(listener)
@@ -499,10 +495,7 @@ func (n *Node) setupOpenRPC() error {
 	if n.config.WSHost != "" {
 		n.wsOpenRPC = newOpenRPCDocument()
 		h := n.ws.httpHandler.Load().(*rpcHandler)
-		registeredAPIs, err := RegisterApisFromWhitelistReturning(n.rpcAPIs, n.config.WSModules, h.server, false)
-		if err != nil {
-			return err
-		}
+		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.WSModules, false)
 		registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
 		n.wsOpenRPC.RegisterListener(n.ws.listener)
 		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsOpenRPC}); err != nil {
@@ -827,9 +820,9 @@ func (n *Node) closeDatabases() (errors []error) {
 	return errors
 }
 
-// RegisterApisFromWhitelist checks the given modules' availability, generates a whitelist based on the allowed modules,
-// and then registers all of the APIs exposed by the services.
-func RegisterApisFromWhitelistReturning(apis []rpc.API, modules []string, srv *rpc.Server, exposeAll bool) (registeredApis []rpc.API, err error) {
+// GetAPIsByWhitelist checks the given modules' availability, generates a whitelist based on the allowed modules.
+// It just returns this list. This function is used by OpenRPC to register available APIs by service.
+func GetAPIsByWhitelist(apis []rpc.API, modules []string, exposeAll bool) (registeredApis []rpc.API) {
 	if bad, available := checkModuleAvailability(modules, apis); len(bad) > 0 {
 		log.Error("Unavailable modules in HTTP API list", "unavailable", bad, "available", available)
 	}
@@ -841,11 +834,14 @@ func RegisterApisFromWhitelistReturning(apis []rpc.API, modules []string, srv *r
 	// Register all the APIs exposed by the services
 	for _, api := range apis {
 		if exposeAll || whitelist[api.Namespace] || (len(whitelist) == 0 && api.Public) {
-			if err := srv.RegisterName(api.Namespace, api.Service); err != nil {
-				return registeredApis, err
-			}
+			// This is what the function DOES NOT do (relative to its sister function, RegisterAPIsFromWhitelist).
+			/*
+				if err := srv.RegisterName(api.Namespace, api.Service); err != nil {
+					return registeredApis, err
+				}
+			*/
 			registeredApis = append(registeredApis, api)
 		}
 	}
-	return registeredApis, nil
+	return registeredApis
 }

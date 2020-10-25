@@ -17,6 +17,7 @@
 package node
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -24,13 +25,16 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"reflect"
 	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/rpc"
 
@@ -48,18 +52,24 @@ func testNodeConfig() *Config {
 	}
 }
 
+// TestFuncForPC is a sanity-check PoC demonstrating runtime caller/frame/pc availability and functionality.
+// TODO(meowsbits) Remove this, it's debug only.
 func TestFuncForPC(t *testing.T) {
-	n := new(privateAdminAPI)
-	ty := reflect.TypeOf(n)
-	for i := 0; i < ty.NumMethod(); i++ {
-		meth := ty.Method(i)
-		f := runtime.FuncForPC(meth.Func.Pointer())
-		t.Log("name", f.Name(), "entry", f.Entry())
-		fil, lin := f.FileLine(f.Entry())
-		t.Log("file", fil, "line", lin)
-		t.Log("----------------------------")
+	services := []interface{}{
+		new(privateAdminAPI),
+		new(ethapi.PublicAccountAPI),
 	}
-	t.Fatal()
+	for _, n := range services {
+		ty := reflect.TypeOf(n)
+		for i := 0; i < ty.NumMethod(); i++ {
+			meth := ty.Method(i)
+			f := runtime.FuncForPC(meth.Func.Pointer())
+			t.Log("fname", f.Name(), "mname", meth.Name, "entry", f.Entry())
+			fil, lin := f.FileLine(f.Entry())
+			t.Log("file", fil, "line", lin)
+			t.Log("----------------------------")
+		}
+	}
 }
 
 // Tests that an empty protocol stack can be closed more than once.
@@ -165,6 +175,48 @@ func TestRegisterProtocols(t *testing.T) {
 		if !containsAPI(stack.rpcAPIs, api) {
 			t.Fatalf("api %v was not successfully registered", api)
 		}
+	}
+}
+
+// TestRegisterProtocols_OpenRPC tests whether a running stack adequately responds to rpc_discover.
+func TestRegisterProtocols_OpenRPC(t *testing.T) {
+	stack, err := New(testNodeConfig())
+	if err != nil {
+		t.Fatalf("failed to create protocol stack: %v", err)
+	}
+	defer stack.Close()
+
+	datadir := filepath.Join(os.TempDir(), "node-test")
+	defer os.RemoveAll(datadir)
+
+	stack.config = &DefaultConfig
+	stack.config.HTTPHost = DefaultHTTPHost
+	stack.config.DataDir = datadir
+
+	if err := stack.Start(); err != nil {
+		t.Fatal(err)
+	}
+	defer stack.Close()
+
+	time.Sleep(5*time.Second)
+
+	client, err := rpc.Dial("http://localhost:8545")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer client.Close()
+
+	res := make(map[string]interface{})
+	err = client.Call(&res, "rpc_discover")
+	if err != nil {
+		t.Errorf("client call: %v", err)
+	}
+
+	b, _ := json.MarshalIndent(res, "", "    ")
+
+	t.Log("response", string(b))
+	if res["info"].(map[string]interface{})["title"].(string) != "Core-Geth RPC API" {
+		t.Fatal("bad")
 	}
 }
 

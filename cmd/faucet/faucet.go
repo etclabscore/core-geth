@@ -363,7 +363,6 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 	cfg.SyncMode = downloader.LightSync
 	cfg.NetworkId = network
 	cfg.Genesis = genesis
-	utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
 	switch genesis {
 	case params.DefaultClassicGenesisBlock():
 		utils.SetDNSDiscoveryDefaults2(&cfg, params.ClassicDNSNetwork1)
@@ -371,6 +370,8 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 		utils.SetDNSDiscoveryDefaults2(&cfg, params.KottiDNSNetwork1)
 	case params.DefaultMordorGenesisBlock():
 		utils.SetDNSDiscoveryDefaults2(&cfg, params.MordorDNSNetwork1)
+	default:
+		utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
 	}
 	lesBackend, err := les.New(stack, &cfg)
 	if err != nil {

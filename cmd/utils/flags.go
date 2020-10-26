@@ -1727,11 +1727,11 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	case ctx.GlobalBool(GoerliFlag.Name):
 		SetDNSDiscoveryDefaults(cfg, params.GoerliGenesisHash)
 	case ctx.GlobalBool(ClassicFlag.Name):
-		setDNSDiscoveryDefaults2(cfg, params.ClassicDNSNetwork1)
+		SetDNSDiscoveryDefaults2(cfg, params.ClassicDNSNetwork1)
 	case ctx.GlobalBool(KottiFlag.Name):
-		setDNSDiscoveryDefaults2(cfg, params.KottiDNSNetwork1)
+		SetDNSDiscoveryDefaults2(cfg, params.KottiDNSNetwork1)
 	case ctx.GlobalBool(MordorFlag.Name):
-		setDNSDiscoveryDefaults2(cfg, params.MordorDNSNetwork1)
+		SetDNSDiscoveryDefaults2(cfg, params.MordorDNSNetwork1)
 	default:
 		if cfg.NetworkId == 1 {
 			SetDNSDiscoveryDefaults(cfg, params.MainnetGenesisHash)
@@ -1788,7 +1788,8 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	}
 }
 
-func setDNSDiscoveryDefaults2(cfg *eth.Config, url string) {
+// SetDNSDiscoveryDefaults2 configures DNS discovery with the given URL if no URLs are set.
+func SetDNSDiscoveryDefaults2(cfg *eth.Config, url string) {
 	if cfg.DiscoveryURLs != nil {
 		return
 	}

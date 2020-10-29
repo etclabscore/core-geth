@@ -599,11 +599,8 @@ func opCreate(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([]
 		value        = callContext.stack.pop()
 		offset, size = callContext.stack.pop(), callContext.stack.pop()
 		input        = callContext.memory.GetCopy(int64(offset.Uint64()), int64(size.Uint64()))
-		gas          = callContext.contract.Gas
+		gas          = interpreter.evm.callGasTemp
 	)
-	if interpreter.evm.ChainConfig().IsEnabled(interpreter.evm.chainConfig.GetEIP150Transition, interpreter.evm.BlockNumber) {
-		gas -= gas / 64
-	}
 	// reuse size int for stackvalue
 	stackvalue := size
 
@@ -641,12 +638,8 @@ func opCreate2(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([
 		offset, size = callContext.stack.pop(), callContext.stack.pop()
 		salt         = callContext.stack.pop()
 		input        = callContext.memory.GetCopy(int64(offset.Uint64()), int64(size.Uint64()))
-		gas          = callContext.contract.Gas
+		gas          = interpreter.evm.callGasTemp
 	)
-
-	// Apply EIP150
-	gas -= gas / 64
-	callContext.contract.UseGas(gas)
 	// reuse size int for stackvalue
 	stackvalue := size
 	//TODO: use uint256.Int instead of converting with toBig()

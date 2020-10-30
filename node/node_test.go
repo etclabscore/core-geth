@@ -17,7 +17,6 @@
 package node
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -30,7 +29,6 @@ import (
 	"runtime"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -198,8 +196,6 @@ func TestRegisterProtocols_OpenRPC(t *testing.T) {
 	}
 	defer stack.Close()
 
-	time.Sleep(5*time.Second)
-
 	client, err := rpc.Dial("http://localhost:8545")
 	if err != nil {
 		t.Fatal(err)
@@ -212,9 +208,9 @@ func TestRegisterProtocols_OpenRPC(t *testing.T) {
 		t.Errorf("client call: %v", err)
 	}
 
-	b, _ := json.MarshalIndent(res, "", "    ")
+	// b, _ := json.MarshalIndent(res, "", "    ")
+	// t.Log("response", string(b))
 
-	t.Log("response", string(b))
 	if res["info"].(map[string]interface{})["title"].(string) != "Core-Geth RPC API" {
 		t.Fatal("bad")
 	}

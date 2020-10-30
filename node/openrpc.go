@@ -94,8 +94,6 @@ var blockNumberOrHashD = fmt.Sprintf(`{
           ]
         }`, blockNumberD, commonHashD, requireCanonicalD)
 
-var emptyInterface interface{}
-
 // schemaDictEntry represents a type association passed to the jsonschema reflector.
 type schemaDictEntry struct {
 	example interface{}

@@ -131,6 +131,8 @@ github.com/etclabscore/go-openrpc-reflect v0.0.31 h1:cqTZefi/ayr4azVS1ebvFpkrQt6
 github.com/etclabscore/go-openrpc-reflect v0.0.31/go.mod h1:u0gJCVptf39zzvLn1W/TdoeuPQ+Usz1eo5dCc9/DZLE=
 github.com/etclabscore/go-openrpc-reflect v0.0.33 h1:i0yEu6reW9OnNVAkcjwP5p1PF7CJkjoB9ulUnLlcLYg=
 github.com/etclabscore/go-openrpc-reflect v0.0.33/go.mod h1:8T6cTRgbqWdJaaNDUrRlJ4/fQWuonE41rbVsg4KVVzk=
+github.com/etclabscore/go-openrpc-reflect v0.0.34 h1:++IsfuK+3J4s+DTWqiyj7HscojPxy3KFV4ZU8vhiQBQ=
+github.com/etclabscore/go-openrpc-reflect v0.0.34/go.mod h1:XgVhDkb6BeOtc4qf04k4K6lNI5gpcEYrAPgB8GGnIJc=
 github.com/ethereum/go-ethereum v1.9.12/go.mod h1:PvsVkQmhZFx92Y+h2ylythYlheEDt/uBgFbl61Js/jo=
 github.com/fatih/color v1.3.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
@@ -376,6 +378,8 @@ github.com/onsi/gomega v1.10.1 h1:o0+MgICZLuZ7xjH7Vx6zS/zcu93/BEp1VwkIW1mEXCE=
 github.com/onsi/gomega v1.10.1/go.mod h1:iN09h71vgCQne3DLsj+A5owkum+a2tYe+TOCB1ybHNo=
 github.com/open-rpc/meta-schema v0.0.0-20201023174056-aa7982132ac2 h1:CZdjAV/ghy0wIj7naJOKmEHuoRet33uG928daDXcjms=
 github.com/open-rpc/meta-schema v0.0.0-20201023174056-aa7982132ac2/go.mod h1:Ag6rSXkHIckQmjFBCweJEEt1mrTPBv8b9W4aU/NQWfI=
+github.com/open-rpc/meta-schema v0.0.0-20201029221707-1b72ef2ea333 h1:CznVS40zms0Dj5he4ERo+fRPtO0qxUk8lA8Xu3ddet0=
+github.com/open-rpc/meta-schema v0.0.0-20201029221707-1b72ef2ea333/go.mod h1:Ag6rSXkHIckQmjFBCweJEEt1mrTPBv8b9W4aU/NQWfI=
 github.com/opentracing/opentracing-go v1.1.0 h1:pWlfV3Bxv7k65HYwkikxat0+s3pV4bsqf19k25Ur8rU=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=

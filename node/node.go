@@ -494,7 +494,7 @@ func (n *Node) setupOpenRPC() error {
 	}
 	if n.config.WSHost != "" {
 		n.wsOpenRPC = newOpenRPCDocument()
-		h := n.ws.httpHandler.Load().(*rpcHandler)
+		h := n.ws.wsHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.WSModules, false)
 		registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
 		n.wsOpenRPC.RegisterListener(n.ws.listener)

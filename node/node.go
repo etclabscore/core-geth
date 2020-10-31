@@ -470,7 +470,7 @@ func (n *Node) closeDataDir() {
 }
 
 func (n *Node) setupOpenRPC() error {
-	if n.ipc.endpoint != "" {
+	if n.ipc.listener != nil {
 		// Register the API documentation.
 		n.ipcOpenRPC = newOpenRPCDocument()
 		registerOpenRPCAPIs(n.ipcOpenRPC, n.rpcAPIs)
@@ -481,18 +481,17 @@ func (n *Node) setupOpenRPC() error {
 			return err
 		}
 	}
-	if n.config.HTTPHost != "" {
+	if n.http.listener != nil {
 		n.httpOpenRPC = newOpenRPCDocument()
 		h := n.http.httpHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.HTTPModules, false)
 		registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
-		listener := n.http.listener
-		n.httpOpenRPC.RegisterListener(listener)
+		n.httpOpenRPC.RegisterListener(n.http.listener)
 		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpOpenRPC}); err != nil {
 			return err
 		}
 	}
-	if n.config.WSHost != "" {
+	if n.ws.listener != nil {
 		n.wsOpenRPC = newOpenRPCDocument()
 		h := n.ws.wsHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.WSModules, false)

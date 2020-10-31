@@ -207,7 +207,7 @@ func (api *privateAdminAPI) StartRPC(host *string, port *int, cors *string, apis
 	if err := api.node.http.setListenAddr(*host, *port); err != nil {
 		return false, err
 	}
-	if err := api.node.http.enableRPC(api.node.rpcAPIs, config); err != nil {
+	if err := api.node.http.enableHTTP(api.node.rpcAPIs, config); err != nil {
 		return false, err
 	}
 	if err := api.node.http.start(); err != nil {

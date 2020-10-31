@@ -40,6 +40,11 @@
 		"stack underflow": "Stack underflow",
 	},
 
+	isObjectEmpty: function(obj) {
+		for (var x in obj) { return false; }
+		return true;
+	},
+
 	// step is invoked for every opcode that the VM executes.
 	step: function(log, db) {
 		// Capture any errors immediately
@@ -273,6 +278,12 @@
 			transactionHash: ctx.transactionHash,
 			transactionPosition: ctx.transactionPosition,
 		};
+		// when this.descended remains true and first item in callstack is an empty object
+		// drop the first item, in order to handle edge cases in the step() loop.
+		// example edge case: contract init code "0x605a600053600160006001f0ff00", search in testdata
+		if (this.descended && this.callstack.length > 1 && this.isObjectEmpty(this.callstack[0])) {
+			this.callstack.shift();
+		}
 		if (typeof this.callstack[0].calls !== "undefined") {
 			result.calls = this.callstack[0].calls;
 		}

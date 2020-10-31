@@ -32,6 +32,7 @@
 		"invalid jump destination": "Bad jump destination",
 		"execution reverted": "Reverted",
 		"return data out of bounds": "Out of bounds",
+		"stack limit reached 1024 (1023)": "Out of stack",
 	},
 
 	oeErrorMappingStartingWith: {

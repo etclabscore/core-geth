@@ -481,7 +481,7 @@ func (n *Node) setupOpenRPC() error {
 			return err
 		}
 	}
-	if n.http.httpAllowed() {
+	if n.http.rpcAllowed() {
 		n.httpOpenRPC = newOpenRPCDocument()
 		h := n.http.httpHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.HTTPModules, false)
@@ -530,7 +530,7 @@ func (n *Node) startRPC() error {
 		if err := n.http.setListenAddr(n.config.HTTPHost, n.config.HTTPPort); err != nil {
 			return err
 		}
-		if err := n.http.enableHTTP(n.rpcAPIs, config); err != nil {
+		if err := n.http.enableRPC(n.rpcAPIs, config); err != nil {
 			return err
 		}
 	}

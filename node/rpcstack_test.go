@@ -78,7 +78,7 @@ func createAndStartServer(t *testing.T, conf httpConfig, ws bool, wsConf wsConfi
 
 	srv := newHTTPServer(testlog.Logger(t, log.LvlDebug), rpc.DefaultHTTPTimeouts)
 
-	assert.NoError(t, srv.enableHTTP(nil, conf))
+	assert.NoError(t, srv.enableRPC(nil, conf))
 	if ws {
 		assert.NoError(t, srv.enableWS(nil, wsConf))
 	}

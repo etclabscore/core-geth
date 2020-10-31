@@ -141,7 +141,7 @@ func (h *httpServer) start() error {
 	go h.server.Serve(listener)
 
 	// if server is websocket only, return after logging
-	if h.wsAllowed() && !h.httpAllowed() {
+	if h.wsAllowed() && !h.rpcAllowed() {
 		h.log.Info("WebSocket enabled", "url", fmt.Sprintf("ws://%v", listener.Addr()))
 		return nil
 	}
@@ -224,12 +224,12 @@ func (h *httpServer) doStop() {
 	h.server, h.listener = nil, nil
 }
 
-// enableHTTP turns on JSON-RPC over HTTP on the server.
-func (h *httpServer) enableHTTP(apis []rpc.API, config httpConfig) error {
+// enableRPC turns on JSON-RPC over HTTP on the server.
+func (h *httpServer) enableRPC(apis []rpc.API, config httpConfig) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	if h.httpAllowed() {
+	if h.rpcAllowed() {
 		return fmt.Errorf("JSON-RPC over HTTP is already enabled")
 	}
 
@@ -284,7 +284,7 @@ func (h *httpServer) stopWS() {
 	defer h.mu.Unlock()
 
 	if h.disableWS() {
-		if !h.httpAllowed() {
+		if !h.rpcAllowed() {
 			h.doStop()
 		}
 	}
@@ -300,8 +300,8 @@ func (h *httpServer) disableWS() bool {
 	return ws != nil
 }
 
-// httpAllowed returns true when JSON-RPC over HTTP is enabled.
-func (h *httpServer) httpAllowed() bool {
+// rpcAllowed returns true when JSON-RPC over HTTP is enabled.
+func (h *httpServer) rpcAllowed() bool {
 	return h.httpHandler.Load().(*rpcHandler) != nil
 }
 

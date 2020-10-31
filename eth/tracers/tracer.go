@@ -305,6 +305,7 @@ type Tracer struct {
 	availableGasValue *uint   // Swappable gas value wrapped by a log accessor
 	costValue         *uint   // Swappable cost value wrapped by a log accessor
 	depthValue        *uint   // Swappable depth value wrapped by a log accessor
+	returnData        *[]byte // Swappable return data wrapped by a log accessor
 	errorValue        *string // Swappable error value wrapped by a log accessor
 	refundValue       *uint   // Swappable refund value wrapped by a log accessor
 
@@ -336,6 +337,7 @@ func New(code string) (*Tracer, error) {
 		availableGasValue: new(uint),
 		costValue:         new(uint),
 		depthValue:        new(uint),
+		returnData:        new([]byte),
 		refundValue:       new(uint),
 	}
 	// Set up builtins for this environment
@@ -481,6 +483,13 @@ func New(code string) (*Tracer, error) {
 	tracer.vm.PushGoFunction(func(ctx *duktape.Context) int { ctx.PushUint(*tracer.depthValue); return 1 })
 	tracer.vm.PutPropString(logObject, "getDepth")
 
+	tracer.vm.PushGoFunction(func(ctx *duktape.Context) int {
+		ptr := ctx.PushFixedBuffer(len(*tracer.returnData))
+		copy(makeSlice(ptr, uint(len(*tracer.returnData))), *tracer.returnData)
+		return 1
+	})
+	tracer.vm.PutPropString(logObject, "getReturnData")
+
 	tracer.vm.PushGoFunction(func(ctx *duktape.Context) int { ctx.PushUint(*tracer.refundValue); return 1 })
 	tracer.vm.PutPropString(logObject, "getRefund")
 
@@ -577,6 +586,7 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, avail
 		*jst.availableGasValue = uint(availableGas)
 		*jst.costValue = uint(cost)
 		*jst.depthValue = uint(depth)
+		*jst.returnData = rdata
 		*jst.refundValue = uint(env.StateDB.GetRefund())
 
 		jst.errorValue = nil

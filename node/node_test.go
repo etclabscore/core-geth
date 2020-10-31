@@ -256,6 +256,11 @@ func TestRegisterProtocols_OpenRPC_WS(t *testing.T) {
 	// b, _ := json.MarshalIndent(res, "", "    ")
 	// t.Log("response", string(b))
 
+	if _, ok := res["info"]; !ok {
+		t.Fatal("no response")
+		return
+	}
+
 	if res["info"].(map[string]interface{})["title"].(string) != "Core-Geth RPC API" {
 		t.Fatal("bad")
 	}

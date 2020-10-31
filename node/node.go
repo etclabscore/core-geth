@@ -481,7 +481,7 @@ func (n *Node) setupOpenRPC() error {
 			return err
 		}
 	}
-	if n.http.listener != nil {
+	if n.http.httpAllowed() {
 		n.httpOpenRPC = newOpenRPCDocument()
 		h := n.http.httpHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.HTTPModules, false)
@@ -491,12 +491,13 @@ func (n *Node) setupOpenRPC() error {
 			return err
 		}
 	}
-	if n.ws.listener != nil {
+	wsServer := n.wsServerForPort(n.config.WSPort)
+	if wsServer.wsAllowed() {
 		n.wsOpenRPC = newOpenRPCDocument()
-		h := n.ws.wsHandler.Load().(*rpcHandler)
+		h := wsServer.wsHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.WSModules, false)
 		registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
-		n.wsOpenRPC.RegisterListener(n.ws.listener)
+		n.wsOpenRPC.RegisterListener(wsServer.listener)
 		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsOpenRPC}); err != nil {
 			return err
 		}

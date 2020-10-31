@@ -300,12 +300,13 @@ type Tracer struct {
 	contractWrapper *contractWrapper // Wrapper around the contract object
 	dbWrapper       *dbWrapper       // Wrapper around the VM environment
 
-	pcValue     *uint   // Swappable pc value wrapped by a log accessor
-	gasValue    *uint   // Swappable gas value wrapped by a log accessor
-	costValue   *uint   // Swappable cost value wrapped by a log accessor
-	depthValue  *uint   // Swappable depth value wrapped by a log accessor
-	errorValue  *string // Swappable error value wrapped by a log accessor
-	refundValue *uint   // Swappable refund value wrapped by a log accessor
+	pcValue           *uint   // Swappable pc value wrapped by a log accessor
+	gasValue          *uint   // Swappable gas value wrapped by a log accessor
+	availableGasValue *uint   // Swappable gas value wrapped by a log accessor
+	costValue         *uint   // Swappable cost value wrapped by a log accessor
+	depthValue        *uint   // Swappable depth value wrapped by a log accessor
+	errorValue        *string // Swappable error value wrapped by a log accessor
+	refundValue       *uint   // Swappable refund value wrapped by a log accessor
 
 	ctx map[string]interface{} // Transaction context gathered throughout execution
 	err error                  // Error, if one has occurred
@@ -323,18 +324,19 @@ func New(code string) (*Tracer, error) {
 		code = tracer
 	}
 	tracer := &Tracer{
-		vm:              duktape.New(),
-		ctx:             make(map[string]interface{}),
-		opWrapper:       new(opWrapper),
-		stackWrapper:    new(stackWrapper),
-		memoryWrapper:   new(memoryWrapper),
-		contractWrapper: new(contractWrapper),
-		dbWrapper:       new(dbWrapper),
-		pcValue:         new(uint),
-		gasValue:        new(uint),
-		costValue:       new(uint),
-		depthValue:      new(uint),
-		refundValue:     new(uint),
+		vm:                duktape.New(),
+		ctx:               make(map[string]interface{}),
+		opWrapper:         new(opWrapper),
+		stackWrapper:      new(stackWrapper),
+		memoryWrapper:     new(memoryWrapper),
+		contractWrapper:   new(contractWrapper),
+		dbWrapper:         new(dbWrapper),
+		pcValue:           new(uint),
+		gasValue:          new(uint),
+		availableGasValue: new(uint),
+		costValue:         new(uint),
+		depthValue:        new(uint),
+		refundValue:       new(uint),
 	}
 	// Set up builtins for this environment
 	tracer.vm.PushGlobalGoFunction("toHex", func(ctx *duktape.Context) int {
@@ -470,6 +472,9 @@ func New(code string) (*Tracer, error) {
 	tracer.vm.PushGoFunction(func(ctx *duktape.Context) int { ctx.PushUint(*tracer.gasValue); return 1 })
 	tracer.vm.PutPropString(logObject, "getGas")
 
+	tracer.vm.PushGoFunction(func(ctx *duktape.Context) int { ctx.PushUint(*tracer.availableGasValue); return 1 })
+	tracer.vm.PutPropString(logObject, "getAvailableGas")
+
 	tracer.vm.PushGoFunction(func(ctx *duktape.Context) int { ctx.PushUint(*tracer.costValue); return 1 })
 	tracer.vm.PutPropString(logObject, "getCost")
 
@@ -569,6 +574,7 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, avail
 
 		*jst.pcValue = uint(pc)
 		*jst.gasValue = uint(gas)
+		*jst.availableGasValue = uint(availableGas)
 		*jst.costValue = uint(cost)
 		*jst.depthValue = uint(depth)
 		*jst.refundValue = uint(env.StateDB.GetRefund())

@@ -186,13 +186,13 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 	appReflector.FnGetContentDescriptorName = func(r reflect.Value, m reflect.Method, field *ast.Field) (string, error) {
 		fs := expandedFieldNamesFromList([]*ast.Field{field})
 		name := fs[0].Names[0].Name
-		name = strings.ReplaceAll(name, ".", "")
-		name = strings.ReplaceAll(name, "*", "")
-		name = strings.ReplaceAll(name, "[", "")
-		name = strings.ReplaceAll(name, "]", "")
-		name = strings.ReplaceAll(name, "{", "")
-		name = strings.ReplaceAll(name, "}", "")
-		name = strings.ReplaceAll(name, "-", "")
+		// removeChars are characters that look like code.
+		// Shane doesn't like these because they might be weird for generated clients to use
+		// as variable/field names (eg for params-by-name stuff).
+		removeChars := ".*[]{}-"
+		for _, c := range strings.Split(removeChars, "") {
+			name = strings.ReplaceAll(name, c, "")
+		}
 		if regexp.MustCompile(`(?m)^\d`).MatchString(name) {
 			name = "num" + name
 		}

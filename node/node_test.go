@@ -17,6 +17,7 @@
 package node
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -29,6 +30,7 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -177,7 +179,7 @@ func TestRegisterProtocols(t *testing.T) {
 }
 
 // TestRegisterProtocols_OpenRPC tests whether a running stack adequately responds to rpc_discover.
-func TestRegisterProtocols_OpenRPC(t *testing.T) {
+func TestRegisterProtocols_OpenRPC_HTTP(t *testing.T) {
 	stack, err := New(testNodeConfig())
 	if err != nil {
 		t.Fatalf("failed to create protocol stack: %v", err)
@@ -204,6 +206,49 @@ func TestRegisterProtocols_OpenRPC(t *testing.T) {
 
 	res := make(map[string]interface{})
 	err = client.Call(&res, "rpc_discover")
+	if err != nil {
+		t.Errorf("client call: %v", err)
+	}
+
+	// b, _ := json.MarshalIndent(res, "", "    ")
+	// t.Log("response", string(b))
+
+	if res["info"].(map[string]interface{})["title"].(string) != "Core-Geth RPC API" {
+		t.Fatal("bad")
+	}
+}
+
+// TestRegisterProtocols_OpenRPC tests whether a running stack adequately responds to rpc_discover.
+func TestRegisterProtocols_OpenRPC_WS(t *testing.T) {
+	stack, err := New(testNodeConfig())
+	if err != nil {
+		t.Fatalf("failed to create protocol stack: %v", err)
+	}
+	defer stack.Close()
+
+	datadir := filepath.Join(os.TempDir(), "node-test")
+	defer os.RemoveAll(datadir)
+
+	stack.config = &DefaultConfig
+	stack.config.WSHost = DefaultWSHost
+	stack.config.WSPort = DefaultWSPort
+	stack.config.DataDir = datadir
+
+	if err := stack.Start(); err != nil {
+		t.Fatal(err)
+	}
+	defer stack.Close()
+
+	client, err := rpc.Dial("ws://localhost:8546")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer client.Close()
+
+	res := make(map[string]interface{})
+	ctx, cancelFn := context.WithTimeout(context.Background(), time.Second)
+	defer cancelFn()
+	err = client.CallContext(ctx, &res, "rpc_discover")
 	if err != nil {
 		t.Errorf("client call: %v", err)
 	}

@@ -99,7 +99,7 @@
 			var to = toAddress(log.stack.peek(1).toString(16));
 
 			// Skip any pre-compile invocations, those are just fancy opcodes
-			if (isPrecompiled(to) && op == "CALL") {
+			if (isPrecompiled(to) && (op == "CALL" || op == "STATICCALL")) {
 				return;
 			}
 			var off = (op == "DELEGATECALL" || op == "STATICCALL" ? 0 : 1);
@@ -153,7 +153,6 @@
 			}
 			this.descended = false;
 		}
-		// If an existing call is returning, pop off the call stack
 		if (syscall && op == "REVERT") {
 			this.callstack[this.callstack.length - 1].error = "execution reverted";
 			return;
@@ -183,8 +182,9 @@
 				} else if (typeof call.error === "undefined") {
 					if (typeof call.gas !== "undefined" && gasUsed.compare(bigInt(call.gas)) >= 0) {
 						call.error = "out of gas";
-					} else {			
+					} else {
 						call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
+						return;
 					}
 				}
 			} else {
@@ -221,7 +221,6 @@
 						}
 					}
 				}
-
 
 				delete call.outOff; delete call.outLen;
 			}

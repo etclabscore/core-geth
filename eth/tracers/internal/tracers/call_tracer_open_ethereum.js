@@ -33,6 +33,7 @@
 		"execution reverted": "Reverted",
 		"return data out of bounds": "Out of bounds",
 		"stack limit reached 1024 (1023)": "Out of stack",
+		"precompiled failed": "Built-in failed",
 	},
 
 	oeErrorMappingStartingWith: {
@@ -212,7 +213,9 @@
 						}
 					}
 				} else if (typeof call.error === "undefined") {
-					if (typeof call.gas !== "undefined" && call.gasUsed === '0x' + bigInt(call.gas).toString(16)) {
+					if (isPrecompiled(toAddress(call.to)) && call.type == "CALLCODE") {
+						call.error = "precompiled failed"; // Parity compatible
+					} else if (typeof call.gas !== "undefined" && call.gasUsed === '0x' + bigInt(call.gas).toString(16)) {
 						call.error = "out of gas";
 					} else {
 						call.error = "internal failure"; // TODO(karalabe): surface these faults somehow

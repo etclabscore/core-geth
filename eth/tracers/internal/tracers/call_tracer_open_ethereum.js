@@ -78,6 +78,7 @@
 			return;
 		}
 		// If a contract is being self destructed, gather that as a subcall too
+		// NOTE: Keep it above the this.descended if check
 		if (syscall && op == "SELFDESTRUCT") {
 			var left = this.callstack.length;
 			if (typeof this.callstack[left-1].calls === "undefined") {
@@ -95,10 +96,11 @@
 		}
 		// If a new method invocation is being done, add to the call stack
 		if (syscall && (op == "CALL" || op == "CALLCODE" || op == "DELEGATECALL" || op == "STATICCALL")) {
-			// Skip any pre-compile invocations, those are just fancy opcodes
 			var to = toAddress(log.stack.peek(1).toString(16));
-			if (isPrecompiled(to)) {
-				return
+
+			// Skip any pre-compile invocations, those are just fancy opcodes
+			if (isPrecompiled(to) && op == "CALL") {
+				return;
 			}
 			var off = (op == "DELEGATECALL" || op == "STATICCALL" ? 0 : 1);
 
@@ -157,10 +159,11 @@
 			return;
 		}
 		if (syscall && op == "RETURN") {
-			var outOff = log.stack.peek(0).valueOf();
-			var outLen = log.stack.peek(1).valueOf();
-
-			this.callstack[this.callstack.length - 1].output = toHex(log.memory.slice(outOff, outOff + outLen));
+			if (log.getDepth() == this.callstack.length) {
+				var outOff = log.stack.peek(0).valueOf();
+				var outLen = log.stack.peek(1).valueOf();
+				this.callstack[this.callstack.length - 1].output = toHex(log.memory.slice(outOff, outOff + outLen));
+			}
 			return;
 		}
 		if (log.getDepth() == this.callstack.length - 1) {
@@ -176,13 +179,12 @@
 				var ret = log.stack.peek(0);
 				if (!ret.equals(0)) {
 					call.to     = toHex(toAddress(ret.toString(16)));
+					call.output = toHex(db.getCode(toAddress(ret.toString(16))));
 				} else if (typeof call.error === "undefined") {
-					call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
-
-					if (typeof call.gas !== "undefined" && call.gasUsed === '0x' + bigInt(call.gas).toString(16)) {
+					if (typeof call.gas !== "undefined" && gasUsed.compare(bigInt(call.gas)) >= 0) {
 						call.error = "out of gas";
-					} else {
-						return;
+					} else {			
+						call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
 					}
 				}
 			} else {
@@ -213,13 +215,13 @@
 					if (typeof call.gas !== "undefined" && call.gasUsed === '0x' + bigInt(call.gas).toString(16)) {
 						call.error = "out of gas";
 					} else {
-						return;
+						call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
+						if (call.type == "CALL" || call.type == "CALLCODE") {
+							return;
+						}
 					}
 				}
 
-				if (typeof call.output === "undefined") {
-					call.output = '0x';
-				}
 
 				delete call.outOff; delete call.outLen;
 			}
@@ -229,10 +231,11 @@
 
 			// Inject the call into the previous one
 			var left = this.callstack.length;
-			if (typeof this.callstack[left-1].calls === "undefined") {
-				this.callstack[left-1].calls = [];
+			left = left > 0 ? left-1 :left;
+			if (typeof this.callstack[left].calls === "undefined") {
+				this.callstack[left].calls = [];
 			}
-			this.callstack[left-1].calls.push(call);
+			this.callstack[left].calls.push(call);
 		}
 	},
 
@@ -392,7 +395,7 @@
 				var childCall = calls[i];
 
 				// Delegatecall uses the value from parent
-				if (childCall.type == 'DELEGATECALL' && typeof childCall.value === "undefined") {
+				if ((childCall.type == "DELEGATECALL" || childCall.type == "STATICCALL") && typeof childCall.value === "undefined") {
 					childCall.value = call.value;
 				}
 

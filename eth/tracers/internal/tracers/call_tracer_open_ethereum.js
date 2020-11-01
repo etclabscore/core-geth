@@ -68,6 +68,7 @@
 				type:    op,
 				from:    toHex(log.contract.getAddress()),
 				input:   toHex(log.memory.slice(inOff, inEnd)),
+				gas:     log.getAvailableGas(),
 				gasIn:   log.getGas(),
 				gasCost: log.getCost(),
 				value:   "0x" + log.stack.peek(0).toString(16)
@@ -110,15 +111,22 @@
 				from:    toHex(log.contract.getAddress()),
 				to:      toHex(to),
 				input:   toHex(log.memory.slice(inOff, inEnd)),
+				gas:     log.getAvailableGas(),
 				gasIn:   log.getGas(),
 				gasCost: log.getCost(),
 				outOff:  log.stack.peek(4 + off).valueOf(),
 				outLen:  log.stack.peek(5 + off).valueOf()
 			};
 
-			if (op != "DELEGATECALL" && op != "STATICCALL") {
-				call.value = "0x" + log.stack.peek(2).toString(16);
+			if (op == "CALL" || op == "CALLCODE") {
+				var value = log.stack.peek(2);
+				call.value = "0x" + value.toString(16);
 
+				// Add stipend (only CALL|CALLCODE when value > 0)
+				// TODO: reading gas from next opcode is safer if stipend value changes
+				if (value > 0) {
+					call.gas = bigInt(call.gas + 2300);
+				}
 			} else if (op == "STATICCALL") {
 				call.value = "0x0";
 			}
@@ -132,7 +140,10 @@
 		// with regard to requested and actually given gas (2300 stipend, 63/64 rule).
 		if (this.descended) {
 			if (log.getDepth() >= this.callstack.length) {
-				this.callstack[this.callstack.length - 1].gas = log.getGas();
+				var call = this.callstack[this.callstack.length - 1];
+				if (typeof call.gas === "undefined") {
+					call.gas = log.getGas();
+				}
 			} else {
 				// TODO(karalabe): The call was made to a plain account. We currently don't
 				// have access to the true gas amount inside the call and so any amount will
@@ -156,9 +167,10 @@
 			// Pop off the last call and get the execution results
 			var call = this.callstack.pop();
 
-			if (call.type == 'CREATE' || call.type == "CREATE2") {
+			if (call.type == "CREATE" || call.type == "CREATE2") {
 				// If the call was a CREATE, retrieve the contract address and output code
-				call.gasUsed = '0x' + bigInt(call.gasIn - call.gasCost - log.getGas()).toString(16);
+				var gasUsed = bigInt(call.gas - (log.getGas() - (call.gasIn - call.gasCost)));
+				call.gasUsed = "0x" + gasUsed.toString(16);
 				delete call.gasIn; delete call.gasCost;
 
 				var ret = log.stack.peek(0);
@@ -177,14 +189,9 @@
 
 				// If the call was a contract call, retrieve the gas usage and output
 				if (typeof call.gas !== "undefined") {
-					var gasUsed = bigInt(call.gasIn - call.gasCost + call.gas - log.getGas());
-					if (gasUsed.compare(0) >= 0) {
-						call.gasUsed = '0x' + gasUsed.toString(16);
-					}
-				} else {
-					call.gas = bigInt(call.gasIn - call.gasCost - log.getGas()).abs();
-					call.gasUsed = '0x0';
+					call.gasUsed = "0x" + bigInt(call.gasIn - call.gasCost + call.gas - log.getGas()).toString(16);
 				}
+				delete call.gasIn; delete call.gasCost;
 
 				var ret = log.stack.peek(0);
 				if (ret.equals(0) && typeof call.error === "undefined") {
@@ -201,7 +208,6 @@
 					call.output = '0x';
 				}
 
-				delete call.gasIn; delete call.gasCost;
 				delete call.outOff; delete call.outLen;
 			}
 			if (typeof call.gas !== "undefined") {

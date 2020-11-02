@@ -176,8 +176,7 @@
 
 			if (call.type == "CREATE" || call.type == "CREATE2") {
 				// If the call was a CREATE, retrieve the contract address and output code
-				var gasUsed = bigInt(call.gas - (log.getGas() - (call.gasIn - call.gasCost)));
-				call.gasUsed = "0x" + gasUsed.toString(16);
+				call.gasUsed = "0x" + bigInt(call.gas - (log.getGas() - (call.gasIn - call.gasCost))).toString(16);
 				delete call.gasIn; delete call.gasCost;
 
 				var ret = log.stack.peek(0);
@@ -192,12 +191,12 @@
 						}
 						call.error = opError;
 					} else {
+						// NOTE(ziogachr): we should reach this else anymore
 						call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
 						return;
 					}
 				}
 			} else {
-
 				// If the call was a contract call, retrieve the gas usage and output
 				if (typeof call.gas !== "undefined") {
 					call.gasUsed = "0x" + bigInt(call.gasIn - call.gasCost + call.gas - log.getGas()).toString(16);
@@ -208,7 +207,6 @@
 				if (!ret.equals(0)) {
 					if (typeof call.output === "undefined" || call.output === "0x") {
 						call.output = toHex(log.getReturnData());
-
 					}
 				} else if (typeof call.error === "undefined") {
 					var opError = log.getCallError();
@@ -222,6 +220,7 @@
 							call.error = opError;
 						}
 					} else {
+						// NOTE(ziogachr): we should reach this else anymore
 						call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
 					}
 				}

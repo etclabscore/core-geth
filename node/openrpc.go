@@ -19,6 +19,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/eth/filters"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rpc"
 	meta_schema "github.com/open-rpc/meta-schema"
@@ -83,11 +84,6 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 		return OpenRPCJSONSchemaTypeMapper
 	}
 
-	// Install an override for method eligibility to exclude subscription methods.
-	// The majority of this logic is taken from the go_openrpc_reflect package configuration default,
-	// with the clause commented 'Custom' noting the custom logic.
-	var errType = reflect.TypeOf((*error)(nil)).Elem()
-	var contextType = reflect.TypeOf((*context.Context)(nil)).Elem()
 	appReflector.FnIsMethodEligible = func(method reflect.Method) bool {
 
 		// Method must be exported.
@@ -95,23 +91,11 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 			return false
 		}
 
-		// Custom: skip methods with 1 argument of context.Context.
-		// We'll consider these methods subscription methods,
-		// and they are not well supported by OpenRPC.
-		if method.Type.NumIn() == 2 {
-			if method.Type.In(1) == contextType {
-				return false
-			}
-		}
-
 		// Verify return types. The function must return at most one error
 		// and/or one other non-error value.
 		outs := make([]reflect.Type, method.Func.Type().NumOut())
 		for i := 0; i < method.Func.Type().NumOut(); i++ {
 			outs[i] = method.Func.Type().Out(i)
-		}
-		isErrorType := func(ty reflect.Type) bool {
-			return ty == errType
 		}
 
 		// If an error is returned, it must be the last returned value.
@@ -149,11 +133,33 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 	return d
 }
 
+
+/*
+The following struct RPCSubscription and RPCSubscription.Unsubscribe method
+are documentation-only mocks to represent the otherwise invisible (un-reflected)
+method.
+It is appended to the OpenRPC document when the eth/api/filters.PublicFilterAPI receiver
+is registered.
+ */
+type RPCSubscription struct {}
+
+// Unsubscribe terminates an existing subscription by ID.
+func (sub *RPCSubscription) Unsubscribe(id rpc.ID) (error) {
+	return nil
+}
+
 // registerOpenRPCAPIs provides a convenience logic that is reused
 // congruent to the rpc package receiver registrations.
 func registerOpenRPCAPIs(doc *go_openrpc_reflect.Document, apis []rpc.API) {
 	for _, api := range apis {
 		doc.RegisterReceiverName(api.Namespace, api.Service)
+
+		// Append a mock interface for the eth_unsubscribe method, which
+		// would otherwise not occur in the document.
+		switch api.Service.(type) {
+		case *filters.PublicFilterAPI:
+			doc.RegisterReceiverName("eth", &RPCSubscription{})
+		}
 	}
 }
 
@@ -208,6 +214,12 @@ const blockNumberTagD = `{
 	       "latest",
 	       "pending"
 	     ]
+		}`
+
+const rpcSubscriptionIDD = `{
+		"title": "subscriptionID",
+		"type": "string",
+		"description": "Subscription identifier"
 		}`
 
 var blockNumberD = fmt.Sprintf(`{
@@ -278,6 +290,7 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 		{hexutil.Uint64(0), hexutilUint64D},
 		{rpc.BlockNumber(0), blockNumberD},
 		{rpc.BlockNumberOrHash{}, blockNumberOrHashD},
+		{rpc.Subscription{}, rpcSubscriptionIDD},
 
 		{rpc.Subscription{}, `{
 			"type": "object",
@@ -360,4 +373,48 @@ func printIdentField(f *ast.Field) string {
 	fs := token.NewFileSet()
 	printer.Fprint(buf, fs, f.Type.(ast.Node))
 	return buf.String()
+}
+
+var (
+	contextType      = reflect.TypeOf((*context.Context)(nil)).Elem()
+	errorType        = reflect.TypeOf((*error)(nil)).Elem()
+	subscriptionType = reflect.TypeOf(rpc.Subscription{})
+	stringType       = reflect.TypeOf("")
+)
+
+// Is t context.Context or *context.Context?
+func isContextType(t reflect.Type) bool {
+	for t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	return t == contextType
+}
+
+// Is t Subscription or *Subscription?
+func isSubscriptionType(t reflect.Type) bool {
+	for t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	return t == subscriptionType
+}
+
+// Does t satisfy the error interface?
+func isErrorType(t reflect.Type) bool {
+	for t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	return t.Implements(errorType)
+}
+
+// isPubSub tests whether the given method has as as first argument a context.Context and
+// returns the pair (Subscription, error).
+// This function is taken directly from rpc/service.go.
+func isPubSub(methodType reflect.Type) bool {
+	// numIn(0) is the receiver type
+	if methodType.NumIn() < 2 || methodType.NumOut() != 2 {
+		return false
+	}
+	return isContextType(methodType.In(1)) &&
+		isSubscriptionType(methodType.Out(0)) &&
+		isErrorType(methodType.Out(1))
 }

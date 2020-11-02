@@ -302,7 +302,7 @@ type Tracer struct {
 
 	pcValue           *uint   // Swappable pc value wrapped by a log accessor
 	gasValue          *uint   // Swappable gas value wrapped by a log accessor
-	availableGasValue *uint   // Swappable gas value wrapped by a log accessor
+	availableGasValue *uint   // Swappable available gas value for this specific call wrapped by a log accessor
 	costValue         *uint   // Swappable cost value wrapped by a log accessor
 	depthValue        *uint   // Swappable depth value wrapped by a log accessor
 	returnData        *[]byte // Swappable return data wrapped by a log accessor

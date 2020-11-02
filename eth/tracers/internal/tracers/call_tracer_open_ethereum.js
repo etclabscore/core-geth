@@ -207,18 +207,8 @@
 				var ret = log.stack.peek(0);
 				if (!ret.equals(0)) {
 					if (typeof call.output === "undefined" || call.output === "0x") {
-						var outLen = call.outLen;
-						var rdata = log.getReturnData();
-						if (typeof rdata !== "undefined") {
-							outLen = Math.min(outLen, rdata.length);
-						}
-						call.output = toHex(log.memory.slice(call.outOff, call.outOff + outLen));
+						call.output = toHex(log.getReturnData());
 
-						// TODO(ziogaschr): Remove the equals(0) check, assumption from Parity
-						var unprefixedOutput = call.output.slice(2);
-						if (!unprefixedOutput || unprefixedOutput === '' || bigInt(unprefixedOutput, 16).equals(0)) {
-							call.output = '0x';
-						}
 					}
 				} else if (typeof call.error === "undefined") {
 					var opError = log.getCallError();

@@ -41,6 +41,10 @@
 		"stack underflow": "Stack underflow",
 	},
 
+	oeSkipTracesForErrors: [
+		"insufficient balance for transfer"
+	],
+
 	isObjectEmpty: function(obj) {
 		for (var x in obj) { return false; }
 		return true;
@@ -181,8 +185,12 @@
 					call.to     = toHex(toAddress(ret.toString(16)));
 					call.output = toHex(db.getCode(toAddress(ret.toString(16))));
 				} else if (typeof call.error === "undefined") {
-					if (typeof call.gas !== "undefined" && gasUsed.compare(bigInt(call.gas)) >= 0) {
-						call.error = "out of gas";
+					var opError = log.getCallError();
+					if (typeof opError !== "undefined") {
+						if (this.oeSkipTracesForErrors.indexOf(opError) > -1) {
+							return;
+						}
+						call.error = opError;
 					} else {
 						call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
 						return;
@@ -213,15 +221,18 @@
 						}
 					}
 				} else if (typeof call.error === "undefined") {
-					if (isPrecompiled(toAddress(call.to)) && call.type == "CALLCODE") {
-						call.error = "precompiled failed"; // Parity compatible
-					} else if (typeof call.gas !== "undefined" && call.gasUsed === '0x' + bigInt(call.gas).toString(16)) {
-						call.error = "out of gas";
-					} else {
-						call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
-						if (call.type == "CALL" || call.type == "CALLCODE") {
+					var opError = log.getCallError();
+					if (typeof opError !== "undefined") {
+						if (this.oeSkipTracesForErrors.indexOf(opError) > -1) {
 							return;
 						}
+						if (isPrecompiled(toAddress(call.to)) && opError !== "out of gas") {
+							call.error = "precompiled failed"; // Parity compatible
+						} else {
+							call.error = opError;
+						}
+					} else {
+						call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
 					}
 				}
 
@@ -250,6 +261,14 @@
 		// Pop off the just failed call
 		var call = this.callstack.pop();
 		call.error = log.getError();
+
+		var opError = log.getCallError();
+		if (typeof opError !== "undefined") {
+			if (this.oeSkipTracesForErrors.indexOf(opError) > -1) {
+				return;
+			}
+			call.error = opError;
+		}
 
 		// Consume all available gas and clean any leftovers
 		if (typeof call.gas !== "undefined") {

@@ -29,8 +29,8 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
-// OpenEthereumTrace A trace in the desired format (Parity/OpenEtherum) See: https://openethereum.github.io/wiki/JSONRPC-trace-module
-type OpenEthereumTrace struct {
+// ParityTrace A trace in the desired format (Parity/OpenEtherum) See: https://Parity.github.io/wiki/JSONRPC-trace-module
+type ParityTrace struct {
 	Action              TraceRewardAction `json:"action"`
 	BlockHash           common.Hash       `json:"blockHash"`
 	BlockNumber         uint64            `json:"blockNumber"`
@@ -43,31 +43,31 @@ type OpenEthereumTrace struct {
 	Type                string            `json:"type"`
 }
 
-// TraceRewardAction An OpenEthereum formatted trace reward action
+// TraceRewardAction An Parity formatted trace reward action
 type TraceRewardAction struct {
 	Value      *hexutil.Big    `json:"value,omitempty"`
 	Author     *common.Address `json:"author,omitempty"`
 	RewardType string          `json:"rewardType,omitempty"`
 }
 
-// setConfigTracerToOpenEthereum forces the Tracer to the OpenEthereum one
-func setConfigTracerToOpenEthereum(config *TraceConfig) *TraceConfig {
+// setConfigTracerToParity forces the Tracer to the Parity one
+func setConfigTracerToParity(config *TraceConfig) *TraceConfig {
 	if config == nil {
 		config = &TraceConfig{}
 	}
 
-	tracer := "callTracerOpenEthereum"
+	tracer := "callTracerParity"
 	config.Tracer = &tracer
 	return config
 }
 
-func traceBlockReward(ctx context.Context, eth *Ethereum, block *types.Block, config *TraceConfig) (*OpenEthereumTrace, error) {
+func traceBlockReward(ctx context.Context, eth *Ethereum, block *types.Block, config *TraceConfig) (*ParityTrace, error) {
 	chainConfig := eth.blockchain.Config()
 	minerReward, _ := ethash.AccumulateRewards(chainConfig, block.Header(), block.Uncles())
 
 	coinbase := block.Coinbase()
 
-	tr := &OpenEthereumTrace{
+	tr := &ParityTrace{
 		Type: "reward",
 		Action: TraceRewardAction{
 			Value:      (*hexutil.Big)(minerReward),
@@ -82,16 +82,16 @@ func traceBlockReward(ctx context.Context, eth *Ethereum, block *types.Block, co
 	return tr, nil
 }
 
-func traceBlockUncleRewards(ctx context.Context, eth *Ethereum, block *types.Block, config *TraceConfig) ([]*OpenEthereumTrace, error) {
+func traceBlockUncleRewards(ctx context.Context, eth *Ethereum, block *types.Block, config *TraceConfig) ([]*ParityTrace, error) {
 	chainConfig := eth.blockchain.Config()
 	_, uncleRewards := ethash.AccumulateRewards(chainConfig, block.Header(), block.Uncles())
 
-	results := make([]*OpenEthereumTrace, len(uncleRewards))
+	results := make([]*ParityTrace, len(uncleRewards))
 	for i, uncle := range block.Uncles() {
 		if i < len(uncleRewards) {
 			coinbase := uncle.Coinbase
 
-			results[i] = &OpenEthereumTrace{
+			results[i] = &ParityTrace{
 				Type: "reward",
 				Action: TraceRewardAction{
 					Value:      (*hexutil.Big)(uncleRewards[i]),
@@ -110,7 +110,7 @@ func traceBlockUncleRewards(ctx context.Context, eth *Ethereum, block *types.Blo
 
 // Block returns the structured logs created during the execution of
 // EVM and returns them as a JSON object.
-// The correct name will be TraceBlockByNumber, though we want to be compatible with OpenEthereum trace module.
+// The correct name will be TraceBlockByNumber, though we want to be compatible with Parity trace module.
 func (api *PrivateTraceAPI) Block(ctx context.Context, number rpc.BlockNumber, config *TraceConfig) ([]interface{}, error) {
 	// Fetch the block that we want to trace
 	var block *types.Block
@@ -128,7 +128,7 @@ func (api *PrivateTraceAPI) Block(ctx context.Context, number rpc.BlockNumber, c
 		return nil, fmt.Errorf("block #%d not found", number)
 	}
 
-	config = setConfigTracerToOpenEthereum(config)
+	config = setConfigTracerToParity(config)
 
 	traceResults, err := traceBlockByNumber(ctx, api.eth, number, config)
 	if err != nil {
@@ -167,12 +167,12 @@ func (api *PrivateTraceAPI) Block(ctx context.Context, number rpc.BlockNumber, c
 // Transaction returns the structured logs created during the execution of EVM
 // and returns them as a JSON object.
 func (api *PrivateTraceAPI) Transaction(ctx context.Context, hash common.Hash, config *TraceConfig) (interface{}, error) {
-	config = setConfigTracerToOpenEthereum(config)
+	config = setConfigTracerToParity(config)
 	return traceTransaction(ctx, api.eth, hash, config)
 }
 
 func (api *PrivateTraceAPI) Filter(ctx context.Context, args ethapi.CallArgs, config *TraceConfig) ([]*txTraceResult, error) {
-	config = setConfigTracerToOpenEthereum(config)
+	config = setConfigTracerToParity(config)
 	fmt.Printf("args: %#v\n", args)
 	return nil, nil
 }

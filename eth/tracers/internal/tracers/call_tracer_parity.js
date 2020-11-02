@@ -24,7 +24,7 @@
 	// an inner call.
 	descended: false,
 
-	oeErrorMapping: {
+	parityErrorMapping: {
 		"contract creation code storage out of gas": "Out of gas",
 		"out of gas": "Out of gas",
 		"gas uint64 overflow": "Out of gas",
@@ -36,12 +36,12 @@
 		"precompiled failed": "Built-in failed",
 	},
 
-	oeErrorMappingStartingWith: {
+	parityErrorMappingStartingWith: {
 		"invalid opcode:": "Bad instruction",
 		"stack underflow": "Stack underflow",
 	},
 
-	oeSkipTracesForErrors: [
+	paritySkipTracesForErrors: [
 		"insufficient balance for transfer"
 	],
 
@@ -186,7 +186,7 @@
 				} else if (typeof call.error === "undefined") {
 					var opError = log.getCallError();
 					if (typeof opError !== "undefined") {
-						if (this.oeSkipTracesForErrors.indexOf(opError) > -1) {
+						if (this.paritySkipTracesForErrors.indexOf(opError) > -1) {
 							return;
 						}
 						call.error = opError;
@@ -211,7 +211,7 @@
 				} else if (typeof call.error === "undefined") {
 					var opError = log.getCallError();
 					if (typeof opError !== "undefined") {
-						if (this.oeSkipTracesForErrors.indexOf(opError) > -1) {
+						if (this.paritySkipTracesForErrors.indexOf(opError) > -1) {
 							return;
 						}
 						if (isPrecompiled(toAddress(call.to)) && opError !== "out of gas") {
@@ -253,7 +253,7 @@
 
 		var opError = log.getCallError();
 		if (typeof opError !== "undefined") {
-			if (this.oeSkipTracesForErrors.indexOf(opError) > -1) {
+			if (this.paritySkipTracesForErrors.indexOf(opError) > -1) {
 				return;
 			}
 			call.error = opError;
@@ -368,13 +368,13 @@
 		}
 
 		if (typeof sorted.error !== "undefined") {
-			if (this.oeErrorMapping.hasOwnProperty(sorted.error)) {
-				sorted.error = this.oeErrorMapping[sorted.error];
+			if (this.parityErrorMapping.hasOwnProperty(sorted.error)) {
+				sorted.error = this.parityErrorMapping[sorted.error];
 				delete sorted.result;
 			} else {
-				for (var searchKey in this.oeErrorMappingStartingWith) {
-					if (this.oeErrorMappingStartingWith.hasOwnProperty(searchKey) && sorted.error.indexOf(searchKey) > -1) {
-						sorted.error = this.oeErrorMappingStartingWith[searchKey];
+				for (var searchKey in this.parityErrorMappingStartingWith) {
+					if (this.parityErrorMappingStartingWith.hasOwnProperty(searchKey) && sorted.error.indexOf(searchKey) > -1) {
+						sorted.error = this.parityErrorMappingStartingWith[searchKey];
 						delete sorted.result;
 					}
 				}

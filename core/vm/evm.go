@@ -125,6 +125,9 @@ type EVM struct {
 	// available gas is calculated in gasCall* according to the 63/64 rule and later
 	// applied in opCall*.
 	callGasTemp uint64
+	// callErrorTemp holds any errors caused during the execution of system opcodes (0xf0)
+	// NOTE: it's being used only for tracers
+	CallErrorTemp error
 }
 
 // NewEVM returns a new EVM. The returned EVM is not thread safe and should

@@ -307,6 +307,7 @@ type Tracer struct {
 	depthValue        *uint   // Swappable depth value wrapped by a log accessor
 	returnData        *[]byte // Swappable return data wrapped by a log accessor
 	errorValue        *string // Swappable error value wrapped by a log accessor
+	opErrorValue      *string // Swappable error value for this specific call wrapped by a log accessor. NOTE: the error is for the previous call trace
 	refundValue       *uint   // Swappable refund value wrapped by a log accessor
 
 	ctx map[string]interface{} // Transaction context gathered throughout execution
@@ -494,6 +495,16 @@ func New(code string) (*Tracer, error) {
 	tracer.vm.PutPropString(logObject, "getRefund")
 
 	tracer.vm.PushGoFunction(func(ctx *duktape.Context) int {
+		if tracer.opErrorValue != nil {
+			ctx.PushString(*tracer.opErrorValue)
+		} else {
+			ctx.PushUndefined()
+		}
+		return 1
+	})
+	tracer.vm.PutPropString(logObject, "getCallError")
+
+	tracer.vm.PushGoFunction(func(ctx *duktape.Context) int {
 		if tracer.errorValue != nil {
 			ctx.PushString(*tracer.errorValue)
 		} else {
@@ -589,6 +600,13 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, avail
 		*jst.returnData = rdata
 		*jst.refundValue = uint(env.StateDB.GetRefund())
 
+		jst.opErrorValue = nil
+		if env.CallErrorTemp != nil {
+			jst.opErrorValue = new(string)
+			*jst.opErrorValue = env.CallErrorTemp.Error()
+
+			env.CallErrorTemp = nil // clean temp error storage, for debug tracing
+		}
 		jst.errorValue = nil
 		if err != nil {
 			jst.errorValue = new(string)

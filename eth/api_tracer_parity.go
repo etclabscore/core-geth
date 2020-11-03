@@ -172,7 +172,6 @@ func (api *PrivateTraceAPI) Transaction(ctx context.Context, hash common.Hash, c
 }
 
 func (api *PrivateTraceAPI) Filter(ctx context.Context, args ethapi.CallArgs, config *TraceConfig) ([]*txTraceResult, error) {
-	config = setConfigTracerToParity(config)
-	fmt.Printf("args: %#v\n", args)
+	// config = setConfigTracerToParity(config)
 	return nil, nil
 }

@@ -160,11 +160,10 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		pc   = uint64(0) // program counter
 		cost uint64
 		// copies used by tracer
-		pcCopy           uint64 // needed for the deferred Tracer
-		gasCopy          uint64 // for Tracer to log gas remaining before execution
-		availableGasCopy uint64 // for Tracer to log gas available for the current call
-		logged           bool   // deferred Tracer should ignore already logged steps
-		res              []byte // result of the opcode execution function
+		pcCopy  uint64 // needed for the deferred Tracer
+		gasCopy uint64 // for Tracer to log gas remaining before execution
+		logged  bool   // deferred Tracer should ignore already logged steps
+		res     []byte // result of the opcode execution function
 	)
 	// Don't move this deferrred function, it's placed before the capturestate-deferred method,
 	// so that it get's executed _after_: the capturestate needs the stacks before
@@ -179,7 +178,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		defer func() {
 			if err != nil {
 				if !logged {
-					in.cfg.Tracer.CaptureState(in.evm, pcCopy, op, gasCopy, availableGasCopy, cost, mem, stack, returns, in.returnData, contract, in.evm.depth, err)
+					in.cfg.Tracer.CaptureState(in.evm, pcCopy, op, gasCopy, in.evm.callGasTemp, cost, mem, stack, returns, in.returnData, contract, in.evm.depth, err)
 				} else {
 					in.cfg.Tracer.CaptureFault(in.evm, pcCopy, op, gasCopy, cost, mem, stack, returns, contract, in.evm.depth, err)
 				}
@@ -247,10 +246,13 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 				return nil, ErrGasUintOverflow
 			}
 		}
+
+		// Clean up the callGasTemp on every iteration, as you never know how it might be used in the future, causing false positives
+		in.evm.callGasTemp = 0
+
 		// Dynamic portion of gas
 		// consume the gas and return an error if not enough gas is available.
 		// cost is explicitly set so that the capture state defer method can get the proper cost
-		availableGasCopy = 0
 		if operation.dynamicGas != nil {
 			var dynamicCost uint64
 			dynamicCost, err = operation.dynamicGas(in.evm, contract, stack, mem, memorySize)
@@ -258,15 +260,13 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 			if err != nil || !contract.UseGas(dynamicCost) {
 				return nil, ErrOutOfGas
 			}
-			// Available gas for this call, must be called after operation.dynamicGas. For debug tracing
-			availableGasCopy = in.evm.callGasTemp
 		}
 		if memorySize > 0 {
 			mem.Resize(memorySize)
 		}
 
 		if in.cfg.Debug {
-			in.cfg.Tracer.CaptureState(in.evm, pc, op, gasCopy, availableGasCopy, cost, mem, stack, returns, in.returnData, contract, in.evm.depth, err)
+			in.cfg.Tracer.CaptureState(in.evm, pc, op, gasCopy, in.evm.callGasTemp, cost, mem, stack, returns, in.returnData, contract, in.evm.depth, err)
 			logged = true
 		}
 

@@ -543,6 +543,12 @@ func (api *PrivateDebugAPI) getModifiedAccounts(startBlock, endBlock *types.Bloc
 	return dirty, nil
 }
 
+// RemovePendingTransaction removes a transaction from the txpool.
+// It returns the transaction removed, if any.
+func (api *PrivateDebugAPI) RemovePendingTransaction(hash common.Hash) (*types.Transaction, error) {
+	return api.eth.txPool.RemoveTx(hash), nil
+}
+
 // PrivateTraceAPI is the collection of Ethereum full node APIs exposed over
 // the private debugging endpoint.
 type PrivateTraceAPI struct {

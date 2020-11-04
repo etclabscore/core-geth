@@ -160,6 +160,8 @@
 		}
 		if (syscall && op == "REVERT") {
 			this.callstack[this.callstack.length - 1].error = "execution reverted";
+
+			// TODO(ziogaschr): read the output from stack as it contains the error passed from the contract developer
 			return;
 		}
 		if (syscall && op == "RETURN") {

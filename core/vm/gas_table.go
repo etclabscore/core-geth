@@ -22,7 +22,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/params/vars"
-	"github.com/holiman/uint256"
 )
 
 // memoryGasCost calculates the quadratic gas for memory expansion. It does so
@@ -296,7 +295,7 @@ func gasCreate(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySi
 	if overflow {
 		return 0, ErrGasUintOverflow
 	}
-	evm.callGasTemp, err = callGas(evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP150Transition, evm.BlockNumber), remainingGasTemp, 0, new(uint256.Int).SetUint64(remainingGasTemp))
+	evm.callGasTemp, err = createGasEip150(evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP150Transition, evm.BlockNumber), remainingGasTemp)
 	if err != nil {
 		return 0, err
 	}
@@ -325,7 +324,7 @@ func gasCreate2(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memoryS
 	if overflow {
 		return 0, ErrGasUintOverflow
 	}
-	evm.callGasTemp, err = callGas(evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP150Transition, evm.BlockNumber), remainingGasTemp, 0, new(uint256.Int).SetUint64(remainingGasTemp))
+	evm.callGasTemp, err = createGasEip150(evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP150Transition, evm.BlockNumber), remainingGasTemp)
 	if err != nil {
 		return 0, err
 	}

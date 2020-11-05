@@ -584,11 +584,10 @@ var (
 	big32 = big.NewInt(32)
 )
 
-// AccumulateRewards credits the coinbase of the given block with the mining
-// reward. The total reward consists of the static block reward and rewards for
-// included uncles. The coinbase of each uncle block is also rewarded.
-// func AccumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
-func AccumulateRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*big.Int, []*big.Int) {
+// GetRewards calculates the mining reward.
+// The total reward consists of the static block reward and rewards for
+// included uncles. The coinbase of each uncle block is also calculated.
+func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*big.Int, []*big.Int) {
 	if config.IsEnabled(config.GetEthashECIP1017Transition, header.Number) {
 		return ecip1017BlockReward(config, header, uncles)
 	}
@@ -615,9 +614,10 @@ func AccumulateRewards(config ctypes.ChainConfigurator, header *types.Header, un
 	return reward, uncleRewards
 }
 
-// accumulateRewards retreives rewards for a block and applies them to the coinbase accounts for miner and uncle miners
+// accumulateRewards credits the coinbase of the given block with the mining
+// reward. The coinbase of each uncle block is also rewarded.
 func accumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
-	minerReward, uncleRewards := AccumulateRewards(config, header, uncles)
+	minerReward, uncleRewards := GetRewards(config, header, uncles)
 	for i, uncle := range uncles {
 		if i < len(uncleRewards) {
 			state.AddBalance(uncle.Coinbase, uncleRewards[i])

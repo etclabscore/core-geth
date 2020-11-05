@@ -574,7 +574,7 @@ func (jst *Tracer) CaptureExtraContext(inputs map[string]interface{}) error {
 }
 
 // CaptureState implements the Tracer interface to trace a single step of VM execution.
-func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, availableGas, cost uint64, memory *vm.Memory, stack *vm.Stack, rStack *vm.ReturnStack, rdata []byte, contract *vm.Contract, depth int, err error) error {
+func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, memory *vm.Memory, stack *vm.Stack, rStack *vm.ReturnStack, rdata []byte, contract *vm.Contract, depth int, err error) error {
 	if jst.err == nil {
 		// Initialize the context if it wasn't done yet
 		if !jst.inited {
@@ -594,7 +594,7 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, avail
 
 		*jst.pcValue = uint(pc)
 		*jst.gasValue = uint(gas)
-		*jst.availableGasValue = uint(availableGas)
+		*jst.availableGasValue = uint(env.CallGasTemp)
 		*jst.costValue = uint(cost)
 		*jst.depthValue = uint(depth)
 		*jst.returnData = rdata

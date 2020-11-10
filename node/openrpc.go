@@ -91,6 +91,16 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 			return false
 		}
 
+		// Exclude methods that handle subscriptions, but do so without adhering to the conventional code pattern.
+		// Eg. *filters.PublicFiltersAPI.SubscribeNewHeads handles eth_subscribe("newHeads"), but there
+		// isn't a method called `eth_subscribeNewHeads`. So we blacklist all these methods and use
+		// the mock subscription receiver type RPCSubscription.
+		// This pattern matches all strings that start with Subscribe and are suffixed with a non-zero
+		// number of A-z characters.
+		if regexp.MustCompile(`^Subscribe[A-Za-z]+`).MatchString(method.Name) {
+			return false
+		}
+
 		// Verify return types. The function must return at most one error
 		// and/or one other non-error value.
 		outs := make([]reflect.Type, method.Func.Type().NumOut())
@@ -133,19 +143,29 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 	return d
 }
 
-
 /*
 The following struct RPCSubscription and RPCSubscription.Unsubscribe method
 are documentation-only mocks to represent the otherwise invisible (un-reflected)
 method.
 It is appended to the OpenRPC document when the eth/api/filters.PublicFilterAPI receiver
 is registered.
- */
-type RPCSubscription struct {}
+*/
+type RPCSubscription struct{}
 
 // Unsubscribe terminates an existing subscription by ID.
-func (sub *RPCSubscription) Unsubscribe(id rpc.ID) (error) {
+func (sub *RPCSubscription) Unsubscribe(id rpc.ID) error {
+	// This is a mock function, not the real one.
 	return nil
+}
+
+type RPCSubscriptionParamsName string
+type RPCSubscriptionParamsOptions struct{}
+
+// Subscribe creates a subscription to an event channel.
+// Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
+func (sub *RPCSubscription) Subscribe(subscriptionName RPCSubscriptionParamsName, subscriptionOptions RPCSubscriptionParamsOptions) (subscriptionID rpc.ID, err error) {
+	// This is a mock function, not the real one.
+	return
 }
 
 // registerOpenRPCAPIs provides a convenience logic that is reused
@@ -246,6 +266,13 @@ var blockNumberOrHashD = fmt.Sprintf(`{
           ]
         }`, blockNumberD, commonHashD, requireCanonicalD)
 
+var rpcSubscriptionParamsNameD = fmt.Sprintf(`{
+		"type": "string",
+		"enum": ["newHeads", "logs", "newPendingTransactions", "syncing"]
+	}`)
+
+var rpcSubscriptionParamsOptionD = fmt.Sprintf(`{"additionalProperties": true}`)
+
 // schemaDictEntry represents a type association passed to the jsonschema reflector.
 type schemaDictEntry struct {
 	example interface{}
@@ -291,12 +318,8 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 		{rpc.BlockNumber(0), blockNumberD},
 		{rpc.BlockNumberOrHash{}, blockNumberOrHashD},
 		{rpc.Subscription{}, rpcSubscriptionIDD},
-
-		{rpc.Subscription{}, `{
-			"type": "object",
-			"title": "Subscription",
-			"summary": ""
-		}`},
+		{RPCSubscriptionParamsName(""), rpcSubscriptionParamsNameD},
+		{RPCSubscriptionParamsOptions{}, rpcSubscriptionParamsOptionD},
 	}
 
 	for _, d := range dict {

@@ -184,13 +184,16 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 	vmenv := NewEnv(cfg)
 
 	sender := cfg.State.GetOrNewStateObject(cfg.Origin)
-	if cfg.ChainConfig.IsYoloV2(vmenv.BlockNumber) {
-		cfg.State.AddAddressToAccessList(cfg.Origin)
-		cfg.State.AddAddressToAccessList(address)
-		for _, addr := range vmenv.ActivePrecompiles() {
-			cfg.State.AddAddressToAccessList(addr)
+	// TODO(meowsbits): re: EIP2929
+	/*
+		if cfg.ChainConfig.IsYoloV2(vmenv.BlockNumber) {
+			cfg.State.AddAddressToAccessList(cfg.Origin)
+			cfg.State.AddAddressToAccessList(address)
+			for _, addr := range vmenv.ActivePrecompiles() {
+				cfg.State.AddAddressToAccessList(addr)
+			}
 		}
-	}
+	*/
 
 	// Call the code with the given configuration.
 	ret, leftOverGas, err := vmenv.Call(

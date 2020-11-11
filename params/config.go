@@ -219,7 +219,7 @@ var (
 		Threshold: 2,
 	}
 
-	// YoloV1ChainConfig contains the chain parameters to run a node on the YOLOv1 test network.
+	// YoloV2ChainConfig contains the chain parameters to run a node on the YOLOv1 test network.
 	YoloV2ChainConfig = &goethereum.ChainConfig{
 		ChainID:             big.NewInt(133519467574833),
 		HomesteadBlock:      big.NewInt(0),

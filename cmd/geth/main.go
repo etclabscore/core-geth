@@ -322,7 +322,7 @@ func checkMainnet(ctx *cli.Context) bool {
 		log.Info("Starting Geth on Kotti testnet...")
 
 	case ctx.GlobalIsSet(utils.YoloV2Flag.Name):
-		log.Info("Starting Geth on YoloV1 testnet...")
+		log.Info("Starting Geth on YoloV2 testnet...")
 
 	case ctx.GlobalIsSet(utils.SocialFlag.Name):
 		log.Info("Starting Geth on Social network...")

@@ -1958,7 +1958,7 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 	case ctx.GlobalBool(GoerliFlag.Name):
 		genesis = params.DefaultGoerliGenesisBlock()
 	case ctx.GlobalBool(YoloV2Flag.Name):
-		genesis = params.DefaultYoloV1GenesisBlock()
+		genesis = params.DefaultYoloV2GenesisBlock()
 	}
 	return genesis
 }

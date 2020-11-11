@@ -153,12 +153,15 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 		vmenv  = NewEnv(cfg)
 		sender = vm.AccountRef(cfg.Origin)
 	)
-	if cfg.ChainConfig.IsYoloV2(vmenv.BlockNumber) {
-		cfg.State.AddAddressToAccessList(cfg.Origin)
-		for _, addr := range vmenv.ActivePrecompiles() {
-			cfg.State.AddAddressToAccessList(addr)
+	// TODO(meowsbits): re: EIP2929
+	/*
+		if cfg.ChainConfig.IsYoloV2(vmenv.BlockNumber) {
+			cfg.State.AddAddressToAccessList(cfg.Origin)
+			for _, addr := range vmenv.ActivePrecompiles() {
+				cfg.State.AddAddressToAccessList(addr)
+			}
 		}
-	}
+	*/
 
 	// Call the code with the given configuration.
 	code, address, leftOverGas, err := vmenv.Create(

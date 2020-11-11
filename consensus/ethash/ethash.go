@@ -90,7 +90,7 @@ func uint32Array2Keccak256(data []uint32) string {
 	// hash with keccak256
 	digest := crypto.Keccak256(bytes)
 	// return hex string
-	return common.ToHex(digest)
+	return common.Bytes2Hex(digest)
 }
 
 // memoryMap tries to memory map a file of uint32s for read only access.

@@ -30,7 +30,7 @@ build_script:
   - copy /Y evmc\include\evmc\helpers.h evmc\bindings\go\evmc\helpers.h
   - copy /Y evmc\include\evmc\loader.h evmc\bindings\go\evmc\loader.h
   - copy /Y evmc\lib\loader\loader.c evmc\bindings\go\evmc\loader.c
-  - go run build\ci.go install
+  - go run build\ci.go install -dlgo
   - 7z a core-geth-win64-%VERSION%.zip .\build\bin\geth.exe
   - ps: Get-FileHash core-geth-win64-$env:VERSION.zip -Algorithm SHA256
   - ps: Get-FileHash core-geth-win64-$env:VERSION.zip -Algorithm SHA256 | Out-File core-geth-win64-$env:VERSION.zip.sha256

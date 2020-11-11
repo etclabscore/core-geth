@@ -32,6 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 // snapshotTest is a test case for snapshot recovery. It can be used for
@@ -626,7 +627,7 @@ func testSnapshot(t *testing.T, tt *snapshotTest) {
 
 	// Initialize a fresh chain
 	var (
-		genesis = new(Genesis).MustCommit(db)
+		genesis = MustCommitGenesis(db, new(genesisT.Genesis))
 		engine  = ethash.NewFullFaker()
 		gendb   = rawdb.NewMemoryDatabase()
 

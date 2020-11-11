@@ -278,8 +278,12 @@ var blockNumberOrHashD = fmt.Sprintf(`{
         }`, blockNumberD, commonHashD, requireCanonicalD)
 
 var rpcSubscriptionParamsNameD = fmt.Sprintf(`{
-		"type": "string",
-		"enum": ["newHeads", "logs", "newPendingTransactions", "syncing"]
+		"oneOf": [
+			{"type": "string", "const": "newHeads", "description": "Fires a notification each time a new header is appended to the chain, including chain reorganizations."},
+			{"type": "string", "const": "logs", "description": "Returns logs that are included in new imported blocks and match the given filter criteria."},
+			{"type": "string", "const": "newPendingTransactions", "description": "Returns the hash for all transactions that are added to the pending state and are signed with a key that is available in the node."},
+			{"type": "string", "const": "syncing", "description": "Indicates when the node starts or stops synchronizing. The result can either be a boolean indicating that the synchronization has started (true), finished (false) or an object with various progress indicators."}
+		]
 	}`)
 
 var rpcSubscriptionParamsOptionD = fmt.Sprintf(`{"additionalProperties": true}`)

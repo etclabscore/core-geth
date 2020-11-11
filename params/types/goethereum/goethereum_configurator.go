@@ -383,11 +383,11 @@ func (c *ChainConfig) SetEIP1706Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2537Transition() *uint64 {
-	return bigNewU64(c.YoloV1Block)
+	return bigNewU64(c.YoloV2Block)
 }
 
 func (c *ChainConfig) SetEIP2537Transition(n *uint64) error {
-	c.YoloV1Block = setBig(c.YoloV1Block, n)
+	c.YoloV2Block = setBig(c.YoloV2Block, n)
 	return nil
 }
 

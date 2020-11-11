@@ -31,6 +31,8 @@ import (
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/ethdb/memorydb"
 	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/trie"
 )
 
@@ -243,7 +245,10 @@ func createMiner(t *testing.T) (*Miner, *event.TypeMux) {
 		t.Fatalf("can't create new chain config: %v", err)
 	}
 	// Create consensus engine
-	engine := clique.New(chainConfig.Clique, chainDB)
+	engine := clique.New(&ctypes.CliqueConfig{
+		Period: chainConfig.GetCliquePeriod(),
+		Epoch:  chainConfig.GetCliqueEpoch(),
+	}, chainDB)
 	// Create Ethereum backend
 	bc, err := core.NewBlockChain(chainDB, nil, chainConfig, engine, vm.Config{}, nil, nil)
 	if err != nil {

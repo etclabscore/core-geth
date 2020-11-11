@@ -38,7 +38,6 @@ import (
 	"github.com/ethereum/go-ethereum/eth/tracers"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
@@ -598,6 +597,11 @@ func (api *PrivateDebugAPI) standardTraceBlockToFile(ctx context.Context, block 
 	// Therefore, it's perfectly valid to specify `"futureForkBlock": 0`, to enable `futureFork`
 
 	if config != nil && config.Overrides != nil {
+
+		// TODO(meowsbits): FIXME.
+
+		/*
+		
 		// Copy the config, to not screw up the main config
 		// Note: the Clique-part is _not_ deep copied
 		chainConfigCopy := new(params.ChainConfig)
@@ -607,6 +611,8 @@ func (api *PrivateDebugAPI) standardTraceBlockToFile(ctx context.Context, block 
 			chainConfig.YoloV2Block = yolov2
 			canon = false
 		}
+
+		 */
 	}
 	for i, tx := range block.Transactions() {
 		// Prepare the trasaction for un-traced execution

@@ -29,7 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 var errTraceLimitReached = errors.New("the number of logs reached the specified limit")
@@ -55,7 +55,7 @@ type LogConfig struct {
 	Debug             bool // print output during capture end
 	Limit             int  // maximum length of output, but zero means unlimited
 	// Chain overrides, can be used to execute a trace using future fork rules
-	Overrides *params.ChainConfig `json:"overrides,omitempty"`
+	Overrides ctypes.ChainConfigurator `json:"overrides,omitempty"`
 }
 
 //go:generate gencodec -type StructLog -field-override structLogMarshaling -out gen_structlog.go

@@ -232,8 +232,8 @@ func (w *wizard) manageGenesis() {
 			w.conf.Genesis.Config.SetEIP1283DisableTransition(w.conf.Genesis.Config.GetEthashEIP1234Transition())
 		}
 		fmt.Println()
-		fmt.Printf("Which block should Petersburg come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP1283DisableTransition())
-		w.conf.Genesis.Config.SetEIP1283DisableTransition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP1283DisableTransition()))
+		fmt.Printf("Which block should Petersburg come into effect? (default = %v)\n", w.conf.Genesis.Config.PetersburgBlock)
+		w.conf.Genesis.Config.PetersburgBlock = w.readDefaultBigInt(w.conf.Genesis.Config.PetersburgBlock)
 
 		fmt.Println()
 		fmt.Printf("Which block should Istanbul come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP145Transition())

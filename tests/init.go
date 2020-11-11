@@ -253,7 +253,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(5),
 	},
-	"YOLOv1": &goethereum.ChainConfig{
+	"YOLOv2": &goethereum.ChainConfig{
 		Clique:              new(ctypes.CliqueConfig),
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
@@ -264,9 +264,9 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ConstantinopleBlock: big.NewInt(0),
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(0),
-		YoloV1Block:         big.NewInt(0),
+		YoloV2Block:         big.NewInt(0),
 	},
-	// This specification is subject to change, but is for now identical to YOLOv1
+	// This specification is subject to change, but is for now identical to YOLOv2
 	// for cross-client testing purposes
 	"Berlin": &goethereum.ChainConfig{
 		ChainID:             big.NewInt(1),
@@ -278,7 +278,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ConstantinopleBlock: big.NewInt(0),
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(0),
-		YoloV1Block:         big.NewInt(0),
+		YoloV2Block:         big.NewInt(0),
 	},
 }
 

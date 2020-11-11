@@ -30,7 +30,8 @@ var (
 	RopstenGenesisHash = common.HexToHash("0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d")
 	RinkebyGenesisHash = common.HexToHash("0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177")
 	GoerliGenesisHash  = common.HexToHash("0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a")
-	YoloV1GenesisHash  = common.HexToHash("0xc3fd235071f24f93865b0850bd2a2119b30f7224d18a0e34c7bbf549ad7e3d36")
+	// TODO: update with yolov2 values
+	YoloV2GenesisHash = common.HexToHash("0x498a7239036dd2cd09e2bb8a80922b78632017958c332b42044c250d603a8a3e")
 )
 
 // TrustedCheckpoints associates each known checkpoint with the genesis hash of
@@ -219,7 +220,7 @@ var (
 	}
 
 	// YoloV1ChainConfig contains the chain parameters to run a node on the YOLOv1 test network.
-	YoloV1ChainConfig = &goethereum.ChainConfig{
+	YoloV2ChainConfig = &goethereum.ChainConfig{
 		ChainID:             big.NewInt(133519467574833),
 		HomesteadBlock:      big.NewInt(0),
 		DAOForkBlock:        nil,
@@ -232,7 +233,7 @@ var (
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(0),
 		MuirGlacierBlock:    nil,
-		YoloV1Block:         big.NewInt(0),
+		YoloV2Block:         big.NewInt(0),
 		Clique: &ctypes.CliqueConfig{
 			Period: 15,
 			Epoch:  30000,
@@ -258,7 +259,7 @@ var (
 		PetersburgBlock:         big.NewInt(0),
 		IstanbulBlock:           big.NewInt(0),
 		MuirGlacierBlock:        nil,
-		YoloV1Block:             nil,
+		YoloV2Block:             nil,
 		EWASMBlock:              nil,
 		Ethash:                  new(ctypes.EthashConfig),
 		Clique:                  nil,
@@ -316,7 +317,7 @@ var (
 			IstanbulBlock       *big.Int `json:"istanbulBlock,omitempty"`       // Istanbul switch block (nil = no fork, 0 = already on istanbul)
 			MuirGlacierBlock    *big.Int `json:"muirGlacierBlock,omitempty"`    // Eip-2384 (bomb delay) switch block (nil = no fork, 0 = already activated)
 
-			YoloV1Block *big.Int `json:"yoloV1Block,omitempty"` // YOLO v1: https://github.com/ethereum/EIPs/pull/2657 (Ephemeral testnet)
+	YoloV2Block *big.Int `json:"yoloV2Block,omitempty"` // YOLO v1: https://github.com/ethereum/EIPs/pull/2657 (Ephemeral testnet)
 			EWASMBlock  *big.Int `json:"ewasmBlock,omitempty"`  // EWASM switch block (nil = no fork, 0 = already activated)
 
 			// Various consensus engines

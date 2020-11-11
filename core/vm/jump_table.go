@@ -179,6 +179,19 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 		enable2200(&instructionSet) // Net metered SSTORE - https://eips.ethereum.org/EIPS/eip-2200
 	}
 
+	// TODO(meowsbits):
+	/*
+	// newYoloV2InstructionSet creates an instructionset containing
+	// - "EIP-2315: Simple Subroutines"
+	// - "EIP-2929: Gas cost increases for state access opcodes"
+	func newYoloV2InstructionSet() JumpTable {
+		instructionSet := newIstanbulInstructionSet()
+		enable2315(&instructionSet) // Subroutines - https://eips.ethereum.org/EIPS/eip-2315
+		enable2929(&instructionSet) // Access lists for trie accesses https://eips.ethereum.org/EIPS/eip-2929
+		return instructionSet
+	}
+	 */
+
 	return instructionSet
 }
 

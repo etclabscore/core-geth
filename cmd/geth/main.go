@@ -154,7 +154,7 @@ var (
 		utils.RinkebyFlag,
 		utils.KottiFlag,
 		utils.GoerliFlag,
-		utils.YoloV1Flag,
+		utils.YoloV2Flag,
 		utils.VMEnableDebugFlag,
 		utils.NetworkIdFlag,
 		utils.EthStatsURLFlag,

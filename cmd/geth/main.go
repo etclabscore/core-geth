@@ -321,7 +321,7 @@ func checkMainnet(ctx *cli.Context) bool {
 	case ctx.GlobalIsSet(utils.KottiFlag.Name):
 		log.Info("Starting Geth on Kotti testnet...")
 
-	case ctx.GlobalIsSet(utils.YoloV1Flag.Name):
+	case ctx.GlobalIsSet(utils.YoloV2Flag.Name):
 		log.Info("Starting Geth on YoloV1 testnet...")
 
 	case ctx.GlobalIsSet(utils.SocialFlag.Name):

@@ -113,14 +113,17 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 		vmenv   = NewEnv(cfg)
 		sender  = vm.AccountRef(cfg.Origin)
 	)
-	if cfg.ChainConfig.IsYoloV2(vmenv.BlockNumber) {
-		cfg.State.AddAddressToAccessList(cfg.Origin)
-		cfg.State.AddAddressToAccessList(address)
-		for _, addr := range vmenv.ActivePrecompiles() {
-			cfg.State.AddAddressToAccessList(addr)
-			cfg.State.AddAddressToAccessList(addr)
+	// TODO(meowsbits): re: EIP2929
+	/*
+		if cfg.ChainConfig.IsYoloV2(vmenv.BlockNumber) {
+			cfg.State.AddAddressToAccessList(cfg.Origin)
+			cfg.State.AddAddressToAccessList(address)
+			for _, addr := range vmenv.ActivePrecompiles() {
+				cfg.State.AddAddressToAccessList(addr)
+				cfg.State.AddAddressToAccessList(addr)
+			}
 		}
-	}
+	*/
 	cfg.State.CreateAccount(address)
 	// set the receiver's (the executing contract) code for execution.
 	cfg.State.SetCode(address, code)

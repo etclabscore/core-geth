@@ -170,11 +170,10 @@ func (sub *RPCSubscription) Unsubscribe(id rpc.ID) error {
 }
 
 type RPCSubscriptionParamsName string
-type RPCSubscriptionParamsOptions struct{}
 
 // Subscribe creates a subscription to an event channel.
 // Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
-func (sub *RPCSubscription) Subscribe(subscriptionName RPCSubscriptionParamsName, subscriptionOptions *RPCSubscriptionParamsOptions) (subscriptionID rpc.ID, err error) {
+func (sub *RPCSubscription) Subscribe(subscriptionName RPCSubscriptionParamsName, subscriptionOptions interface{}) (subscriptionID rpc.ID, err error) {
 	// This is a mock function, not the real one.
 	return
 }
@@ -286,8 +285,6 @@ var rpcSubscriptionParamsNameD = fmt.Sprintf(`{
 		]
 	}`)
 
-var rpcSubscriptionParamsOptionD = fmt.Sprintf(`{"additionalProperties": true}`)
-
 // schemaDictEntry represents a type association passed to the jsonschema reflector.
 type schemaDictEntry struct {
 	example interface{}
@@ -312,15 +309,12 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 	}
 
 	if ty == reflect.TypeOf((*interface{})(nil)).Elem() {
-		return &jsonschema.Type{Type: "object", AdditionalProperties: []byte("true")}
+		return &jsonschema.Type{AdditionalProperties: []byte("true")}
 	}
 
 	// Second, handle other types.
 	// Use a slice instead of a map because it preserves order, as a logic safeguard/fallback.
 	dict := []schemaDictEntry{
-		//{interface{}{}, fmt.Sprintf(`{
-		//	"oneOf": [{"additionalProperties": true}, {"type": "null"}]
-		//}`)},
 		{[]byte{}, bytesD},
 		{big.Int{}, integerD},
 		{types.BlockNonce{}, integerD},
@@ -334,7 +328,6 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 		{rpc.BlockNumberOrHash{}, blockNumberOrHashD},
 		{rpc.Subscription{}, rpcSubscriptionIDD},
 		{RPCSubscriptionParamsName(""), rpcSubscriptionParamsNameD},
-		{RPCSubscriptionParamsOptions{}, rpcSubscriptionParamsOptionD},
 	}
 
 	for _, d := range dict {

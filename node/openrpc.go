@@ -13,6 +13,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/alecthomas/jsonschema"
 	go_openrpc_reflect "github.com/etclabscore/go-openrpc-reflect"
@@ -67,7 +68,7 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 			title := "Core-Geth RPC API"
 			info.Title = (*meta_schema.InfoObjectProperties)(&title)
 
-			version := params.VersionWithMeta
+			version := params.VersionWithMeta + "/generated-at:" + time.Now().Format(time.RFC3339)
 			info.Version = (*meta_schema.InfoObjectVersion)(&version)
 			return info
 		},
@@ -138,6 +139,16 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 		return name, nil
 	}
 
+	appReflector.FnGetContentDescriptorRequired = func(r reflect.Value, m reflect.Method, field *ast.Field) (bool, error) {
+		// Custom handling for eth_subscribe optional second parameter (depends on channel).
+		if m.Name == "Subscribe" && len(field.Names) > 0 && field.Names[0].Name == "subscriptionOptions" {
+			return false, nil
+		}
+
+		// Otherwise return the default.
+		return go_openrpc_reflect.EthereumReflector.GetContentDescriptorRequired(r, m, field)
+	}
+
 	// Finally, register the configured reflector to the document.
 	d.WithReflector(appReflector)
 	return d
@@ -163,7 +174,7 @@ type RPCSubscriptionParamsOptions struct{}
 
 // Subscribe creates a subscription to an event channel.
 // Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
-func (sub *RPCSubscription) Subscribe(subscriptionName RPCSubscriptionParamsName, subscriptionOptions RPCSubscriptionParamsOptions) (subscriptionID rpc.ID, err error) {
+func (sub *RPCSubscription) Subscribe(subscriptionName RPCSubscriptionParamsName, subscriptionOptions *RPCSubscriptionParamsOptions) (subscriptionID rpc.ID, err error) {
 	// This is a mock function, not the real one.
 	return
 }

@@ -493,12 +493,12 @@ var (
 		Name:  "allow-insecure-unlock",
 		Usage: "Allow insecure account unlocking when account-related RPCs are exposed by http",
 	}
-	RPCGlobalGasCap = cli.Uint64Flag{
+	RPCGlobalGasCapFlag = cli.Uint64Flag{
 		Name:  "rpc.gascap",
 		Usage: "Sets a cap on gas that can be used in eth_call/estimateGas (0=infinite)",
 		Value: eth.DefaultConfig.RPCGasCap,
 	}
-	RPCGlobalTxFeeCap = cli.Float64Flag{
+	RPCGlobalTxFeeCapFlag = cli.Float64Flag{
 		Name:  "rpc.txfeecap",
 		Usage: "Sets a cap on transaction fee (in ether) that can be sent via the RPC APIs (0 = no cap)",
 		Value: eth.DefaultConfig.RPCTxFeeCap,
@@ -1691,16 +1691,16 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		cfg.EVMInterpreter = ctx.GlobalString(EVMInterpreterFlag.Name)
 		vm.InitEVMCEVM(cfg.EVMInterpreter)
 	}
-	if ctx.GlobalIsSet(RPCGlobalGasCap.Name) {
-		cfg.RPCGasCap = ctx.GlobalUint64(RPCGlobalGasCap.Name)
+	if ctx.GlobalIsSet(RPCGlobalGasCapFlag.Name) {
+		cfg.RPCGasCap = ctx.GlobalUint64(RPCGlobalGasCapFlag.Name)
 	}
 	if cfg.RPCGasCap != 0 {
 		log.Info("Set global gas cap", "cap", cfg.RPCGasCap)
 	} else {
 		log.Info("Global gas cap disabled")
 	}
-	if ctx.GlobalIsSet(RPCGlobalTxFeeCap.Name) {
-		cfg.RPCTxFeeCap = ctx.GlobalFloat64(RPCGlobalTxFeeCap.Name)
+	if ctx.GlobalIsSet(RPCGlobalTxFeeCapFlag.Name) {
+		cfg.RPCTxFeeCap = ctx.GlobalFloat64(RPCGlobalTxFeeCapFlag.Name)
 	}
 	if ctx.GlobalIsSet(DNSDiscoveryFlag.Name) {
 		urls := ctx.GlobalString(DNSDiscoveryFlag.Name)
@@ -1730,20 +1730,20 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	switch {
 	case ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name):
 		cfg.Genesis = params.DefaultRopstenGenesisBlock()
-		setDNSDiscoveryDefaults(cfg, params.RopstenGenesisHash)
+		SetDNSDiscoveryDefaults(cfg, params.RopstenGenesisHash)
 	case ctx.GlobalBool(RinkebyFlag.Name):
-		setDNSDiscoveryDefaults(cfg, params.RinkebyGenesisHash)
+		SetDNSDiscoveryDefaults(cfg, params.RinkebyGenesisHash)
 	case ctx.GlobalBool(GoerliFlag.Name):
-		setDNSDiscoveryDefaults(cfg, params.GoerliGenesisHash)
+		SetDNSDiscoveryDefaults(cfg, params.GoerliGenesisHash)
 	case ctx.GlobalBool(ClassicFlag.Name):
-		setDNSDiscoveryDefaults2(cfg, params.ClassicDNSNetwork1)
+		SetDNSDiscoveryDefaults2(cfg, params.ClassicDNSNetwork1)
 	case ctx.GlobalBool(KottiFlag.Name):
-		setDNSDiscoveryDefaults2(cfg, params.KottiDNSNetwork1)
+		SetDNSDiscoveryDefaults2(cfg, params.KottiDNSNetwork1)
 	case ctx.GlobalBool(MordorFlag.Name):
-		setDNSDiscoveryDefaults2(cfg, params.MordorDNSNetwork1)
+		SetDNSDiscoveryDefaults2(cfg, params.MordorDNSNetwork1)
 	default:
 		if cfg.NetworkId == 1 {
-			setDNSDiscoveryDefaults(cfg, params.MainnetGenesisHash)
+			SetDNSDiscoveryDefaults(cfg, params.MainnetGenesisHash)
 		}
 	}
 
@@ -1797,7 +1797,8 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	}
 }
 
-func setDNSDiscoveryDefaults2(cfg *eth.Config, url string) {
+// SetDNSDiscoveryDefaults2 configures DNS discovery with the given URL if no URLs are set.
+func SetDNSDiscoveryDefaults2(cfg *eth.Config, url string) {
 	if cfg.DiscoveryURLs != nil {
 		return
 	}
@@ -1807,9 +1808,9 @@ func setDNSDiscoveryDefaults2(cfg *eth.Config, url string) {
 	cfg.DiscoveryURLs = []string{url}
 }
 
-// setDNSDiscoveryDefaults configures DNS discovery with the given URL if
+// SetDNSDiscoveryDefaults configures DNS discovery with the given URL if
 // no URLs are set.
-func setDNSDiscoveryDefaults(cfg *eth.Config, genesis common.Hash) {
+func SetDNSDiscoveryDefaults(cfg *eth.Config, genesis common.Hash) {
 	if cfg.DiscoveryURLs != nil {
 		return // already set through flags/config
 	}

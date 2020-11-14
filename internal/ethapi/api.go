@@ -1147,6 +1147,42 @@ func RPCMarshalHeader(head *types.Header) map[string]interface{} {
 	}
 }
 
+type RPCMarshalHeaderT struct {
+	Number           *hexutil.Big      `json:"number"`
+	Hash             *common.Hash      `json:"hash,omitempty"` // Pending will be nil
+	ParentHash       common.Hash       `json:"parent_hash"`
+	Nonce            *types.BlockNonce `json:"nonce,omitempty"` // Pending will be nil
+	MixHash          common.Hash       `json:"mixHash"`
+	Sha3Uncles       common.Hash       `json:"sha3Uncles"`
+	LogsBloom        types.Bloom       `json:"logsBloom"`
+	StateRoot        common.Hash       `json:"stateRoot"`
+	Miner            *common.Address   `json:"miner,omitempty"` // Pending will be nil
+	Difficulty       *hexutil.Big      `json:"difficulty"`
+	TotalDifficulty  *hexutil.Big      `json:"totalDifficulty"`
+	ExtraData        hexutil.Bytes     `json:"extraData"`
+	Size             hexutil.Uint64    `json:"size"`
+	GasLimit         hexutil.Uint64    `json:"gasLimit"`
+	GasUsed          hexutil.Uint64    `json:"gasUsed"`
+	Timestamp        hexutil.Uint64    `json:"timestamp"`
+	TransactionsRoot common.Hash       `json:"transactionsRoot"`
+	ReceiptsRoot     common.Hash       `json:"receiptsRoot"`
+}
+
+func (h *RPCMarshalHeaderT) SetAsPending() {
+	h.Hash = nil
+	h.Nonce = nil
+	h.Miner = nil
+}
+
+type RPCMarshalBlockT struct {
+	RPCMarshalHeaderT
+	Transactions []interface{} `json:",omitempty"`
+	Uncles       []common.Hash `json:",omitempty"`
+
+	inclTx bool
+	fullTx bool
+}
+
 // RPCMarshalBlock converts the given block to the RPC output which depends on fullTx. If inclTx is true transactions are
 // returned. When fullTx is true the returned block contains full transaction details, otherwise it will only contain
 // transaction hashes.

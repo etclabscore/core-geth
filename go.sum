@@ -133,6 +133,8 @@ github.com/etclabscore/go-openrpc-reflect v0.0.33 h1:i0yEu6reW9OnNVAkcjwP5p1PF7C
 github.com/etclabscore/go-openrpc-reflect v0.0.33/go.mod h1:8T6cTRgbqWdJaaNDUrRlJ4/fQWuonE41rbVsg4KVVzk=
 github.com/etclabscore/go-openrpc-reflect v0.0.34 h1:++IsfuK+3J4s+DTWqiyj7HscojPxy3KFV4ZU8vhiQBQ=
 github.com/etclabscore/go-openrpc-reflect v0.0.34/go.mod h1:XgVhDkb6BeOtc4qf04k4K6lNI5gpcEYrAPgB8GGnIJc=
+github.com/etclabscore/go-openrpc-reflect v0.0.35 h1:BHr8JJtMB46eVVc3sAUuLH3s9YFp8KsBEm3VkRF6mGY=
+github.com/etclabscore/go-openrpc-reflect v0.0.35/go.mod h1:XgVhDkb6BeOtc4qf04k4K6lNI5gpcEYrAPgB8GGnIJc=
 github.com/ethereum/go-ethereum v1.9.12/go.mod h1:PvsVkQmhZFx92Y+h2ylythYlheEDt/uBgFbl61Js/jo=
 github.com/fatih/color v1.3.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=

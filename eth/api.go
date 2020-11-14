@@ -332,9 +332,9 @@ func (api *PrivateDebugAPI) Preimage(ctx context.Context, hash common.Hash) (hex
 
 // BadBlockArgs represents the entries in the list returned when bad blocks are queried.
 type BadBlockArgs struct {
-	Hash  common.Hash            `json:"hash"`
-	Block map[string]interface{} `json:"block"`
-	RLP   string                 `json:"rlp"`
+	Hash  common.Hash              `json:"hash"`
+	Block *ethapi.RPCMarshalBlockT `json:"block"`
+	RLP   string                   `json:"rlp"`
 }
 
 // GetBadBlocks returns a list of the last 'bad blocks' that the client has seen on the network
@@ -354,7 +354,7 @@ func (api *PrivateDebugAPI) GetBadBlocks(ctx context.Context) ([]*BadBlockArgs, 
 			results[i].RLP = fmt.Sprintf("0x%x", rlpBytes)
 		}
 		if results[i].Block, err = ethapi.RPCMarshalBlock(block, true, true); err != nil {
-			results[i].Block = map[string]interface{}{"error": err.Error()}
+			results[i].Block = &ethapi.RPCMarshalBlockT{Error: err.Error()}
 		}
 	}
 	return results, nil

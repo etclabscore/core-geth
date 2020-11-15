@@ -1199,11 +1199,11 @@ func NewRPCMarshalHeaderTFromHeader(header *types.Header) *RPCMarshalHeaderT {
 // If the hash is unavailable (ie in Pending state), the value will be 0.
 func (s *PublicBlockChainAPI) RPCMarshalHeaderTSetTotalDifficulty(ctx context.Context, header *RPCMarshalHeaderT) {
 	hash := header.Hash
-	if hash != nil {
+	if hash == nil {
 		c := common.Hash{}
 		hash = &c
 	}
-	header.TotalDifficulty = (*hexutil.Big)(s.b.GetTd(ctx, *header.Hash))
+	header.TotalDifficulty = (*hexutil.Big)(s.b.GetTd(ctx, *hash))
 }
 
 // SetAsPending sets fields that must be nil for pending headers and blocks.

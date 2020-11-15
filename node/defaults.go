@@ -48,4 +48,3 @@ var DefaultConfig = Config{
 		NAT:        nat.Any(),
 	},
 }
-

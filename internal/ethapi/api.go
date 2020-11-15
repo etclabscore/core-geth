@@ -633,7 +633,7 @@ func (s *PublicBlockChainAPI) GetHeaderByNumber(ctx context.Context, number rpc.
 		response := s.rpcMarshalHeader(ctx, header)
 		if number == rpc.PendingBlockNumber {
 			// Pending header need to nil out a few fields
-			response.SetAsPending()
+			response.setAsPending()
 		}
 		return response, err
 	}
@@ -660,7 +660,7 @@ func (s *PublicBlockChainAPI) GetBlockByNumber(ctx context.Context, number rpc.B
 		response, err := s.rpcMarshalBlock(ctx, block, true, fullTx)
 		if err == nil && number == rpc.PendingBlockNumber {
 			// Pending blocks need to nil out a few fields
-			response.SetAsPending()
+			response.setAsPending()
 		}
 		return response, err
 	}
@@ -1195,9 +1195,9 @@ func NewRPCMarshalHeaderTFromHeader(header *types.Header) *RPCMarshalHeaderT {
 	}
 }
 
-// RPCMarshalHeaderTSetTotalDifficulty sets the total difficulty field for RPC response headers.
+// rpcMarshalHeaderTSetTotalDifficulty sets the total difficulty field for RPC response headers.
 // If the hash is unavailable (ie in Pending state), the value will be 0.
-func (s *PublicBlockChainAPI) RPCMarshalHeaderTSetTotalDifficulty(ctx context.Context, header *RPCMarshalHeaderT) {
+func (s *PublicBlockChainAPI) rpcMarshalHeaderTSetTotalDifficulty(ctx context.Context, header *RPCMarshalHeaderT) {
 	hash := header.Hash
 	if hash == nil {
 		c := common.Hash{}
@@ -1206,8 +1206,8 @@ func (s *PublicBlockChainAPI) RPCMarshalHeaderTSetTotalDifficulty(ctx context.Co
 	header.TotalDifficulty = (*hexutil.Big)(s.b.GetTd(ctx, *hash))
 }
 
-// SetAsPending sets fields that must be nil for pending headers and blocks.
-func (h *RPCMarshalHeaderT) SetAsPending() {
+// setAsPending sets fields that must be nil for pending headers and blocks.
+func (h *RPCMarshalHeaderT) setAsPending() {
 	h.Hash = nil
 	h.Nonce = nil
 	h.Miner = nil
@@ -1297,7 +1297,7 @@ func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool) (*RPCMarshalB
 // a `PublicBlockchainAPI`.
 func (s *PublicBlockChainAPI) rpcMarshalHeader(ctx context.Context, header *types.Header) *RPCMarshalHeaderT {
 	fields := NewRPCMarshalHeaderTFromHeader(header)
-	s.RPCMarshalHeaderTSetTotalDifficulty(ctx, fields)
+	s.rpcMarshalHeaderTSetTotalDifficulty(ctx, fields)
 	return fields
 }
 
@@ -1309,7 +1309,7 @@ func (s *PublicBlockChainAPI) rpcMarshalBlock(ctx context.Context, b *types.Bloc
 		return nil, err
 	}
 	if inclTx {
-		s.RPCMarshalHeaderTSetTotalDifficulty(ctx, fields.RPCMarshalHeaderT)
+		s.rpcMarshalHeaderTSetTotalDifficulty(ctx, fields.RPCMarshalHeaderT)
 	}
 	return fields, err
 }

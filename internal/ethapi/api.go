@@ -1148,7 +1148,7 @@ func RPCMarshalHeader(head *types.Header) map[string]interface{} {
 type RPCMarshalHeaderT struct {
 	Number           *hexutil.Big      `json:"number"`
 	Hash             *common.Hash      `json:"hash,omitempty"` // Pending will be nil
-	ParentHash       common.Hash       `json:"parent_hash"`
+	ParentHash       common.Hash       `json:"parentHash"`
 	Nonce            *types.BlockNonce `json:"nonce,omitempty"` // Pending will be nil
 	MixHash          common.Hash       `json:"mixHash"`
 	Sha3Uncles       common.Hash       `json:"sha3Uncles"`

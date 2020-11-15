@@ -133,7 +133,8 @@ func makeHasher(h hash.Hash) hasher {
 }
 
 // seedHash is the seed to use for generating a verification cache and the mining
-// dataset.
+// dataset. The block number passed should be pre-rounded to an epoch boundary + 1
+// e.g: epoch * epochLength + 1
 func seedHash(block uint64) []byte {
 	seed := make([]byte, 32)
 	if block < epochLengthDefault {

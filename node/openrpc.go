@@ -98,8 +98,20 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 		// the mock subscription receiver type RPCSubscription.
 		// This pattern matches all strings that start with Subscribe and are suffixed with a non-zero
 		// number of A-z characters.
-		if regexp.MustCompile(`^Subscribe[A-Za-z]+`).MatchString(method.Name) {
+		if isPubSub(method.Type) {
+			// This catches MOST of them (except SubscribeSyncStatus)
 			return false
+		}
+		// Reject all methods that use a channel in the their argument params.
+		// This causes SubscribeSyncStatus to be rejected.
+		for i := 0; i < method.Func.Type().NumIn(); i++ {
+			in := method.Func.Type().In(i)
+			for in.Kind() == reflect.Ptr {
+				in = in.Elem()
+			}
+			if in.Kind() == reflect.Chan {
+				return false
+			}
 		}
 
 		// Verify return types. The function must return at most one error

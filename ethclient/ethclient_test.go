@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	meta_schema "github.com/open-rpc/meta-schema"
 )
 
 // Verify that Client implements the ethereum interfaces.
@@ -367,5 +368,23 @@ func TestBlockNumber(t *testing.T) {
 	}
 	if blockNumber != 1 {
 		t.Fatalf("BlockNumber returned wrong number: %d", blockNumber)
+	}
+}
+
+func TestRPCDiscover(t *testing.T) {
+	backend, _ := newTestBackend(t)
+	client, _ := backend.Attach()
+	defer backend.Close()
+	defer client.Close()
+
+	var res meta_schema.OpenrpcDocument
+	err := client.Call(&res, "rpc.discover")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	numberOfExistingMethods := 151
+	if l := len(*res.Methods); l != numberOfExistingMethods {
+		t.Fatalf("got: %d, want: %d", l, numberOfExistingMethods)
 	}
 }

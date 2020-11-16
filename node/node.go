@@ -61,9 +61,10 @@ type Node struct {
 
 	databases map[*closeTrackingDB]struct{} // All open databases
 
-	ipcOpenRPC  *go_openrpc_reflect.Document
-	httpOpenRPC *go_openrpc_reflect.Document
-	wsOpenRPC   *go_openrpc_reflect.Document
+	inprocOpenRPC *go_openrpc_reflect.Document
+	ipcOpenRPC    *go_openrpc_reflect.Document
+	httpOpenRPC   *go_openrpc_reflect.Document
+	wsOpenRPC     *go_openrpc_reflect.Document
 }
 
 const (
@@ -330,6 +331,14 @@ func (n *Node) closeDataDir() {
 }
 
 func (n *Node) setupOpenRPC() error {
+
+	// In-proc RPC is always available. It's created and assigned in the Node.New construction.
+	n.inprocOpenRPC = newOpenRPCDocument()
+	registerOpenRPCAPIs(n.inprocOpenRPC, n.rpcAPIs)
+	if err := n.inprocHandler.RegisterName("rpc", &RPCDiscoveryService{d: n.inprocOpenRPC}); err != nil {
+		return err
+	}
+
 	if n.ipc.listener != nil {
 		// Register the API documentation.
 		n.ipcOpenRPC = newOpenRPCDocument()

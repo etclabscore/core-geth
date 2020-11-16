@@ -824,6 +824,7 @@ func (pool *TxPool) addTxs(txs []*types.Transaction, local, sync bool) []error {
 			nilSlot++
 		}
 		errs[nilSlot] = err
+		nilSlot++
 	}
 	// Reorg the pool internals if needed and return
 	done := pool.requestPromoteExecutables(dirtyAddrs)
@@ -930,6 +931,15 @@ func (pool *TxPool) removeTx(hash common.Hash, outofbound bool) {
 			delete(pool.beats, addr)
 		}
 	}
+}
+
+// RemoveTx publicizes the removeTx method since the API method txpool_removeTx
+// needs to allow public access to internal `removeTx()`
+func (pool *TxPool) RemoveTx(hash common.Hash) *types.Transaction {
+	tx := pool.Get(hash)
+	pool.removeTx(hash, true)
+
+	return tx
 }
 
 // requestPromoteExecutables requests a pool reset to the new head block.

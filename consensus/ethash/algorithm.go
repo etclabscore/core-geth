@@ -133,7 +133,8 @@ func makeHasher(h hash.Hash) hasher {
 }
 
 // seedHash is the seed to use for generating a verification cache and the mining
-// dataset.
+// dataset. The block number passed should be pre-rounded to an epoch boundary + 1
+// e.g: epoch * epochLength + 1
 func seedHash(block uint64) []byte {
 	seed := make([]byte, 32)
 	if block < epochLengthDefault {
@@ -320,16 +321,16 @@ func generateDataset(dest []uint32, epoch uint64, epochLength uint64, cache []ui
 			keccak512 := makeHasher(sha3.NewLegacyKeccak512())
 
 			// Calculate the data segment this thread should generate
-			batch := uint32((size + hashBytes*uint64(threads) - 1) / (hashBytes * uint64(threads)))
-			first := uint32(id) * batch
+			batch := (size + hashBytes*uint64(threads) - 1) / (hashBytes * uint64(threads))
+			first := uint64(id) * batch
 			limit := first + batch
-			if limit > uint32(size/hashBytes) {
-				limit = uint32(size / hashBytes)
+			if limit > size/hashBytes {
+				limit = size / hashBytes
 			}
 			// Calculate the dataset segment
 			percent := uint32(size / hashBytes / 100)
 			for index := first; index < limit; index++ {
-				item := generateDatasetItem(cache, index, keccak512)
+				item := generateDatasetItem(cache, uint32(index), keccak512)
 				if swapped {
 					swap(item)
 				}

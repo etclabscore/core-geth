@@ -308,7 +308,7 @@ func isBadCache(epoch uint64, epochLength uint64, data []uint32) (bool, string) 
 // generate ensures that the cache content is generated before use.
 func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 	c.once.Do(func() {
-		size := cacheSize(c.epoch*c.epochLength+1, c.epoch)
+		size := cacheSize(c.epoch)
 		seed := seedHash(c.epoch*c.epochLength + 1)
 		if test {
 			size = 1024
@@ -395,8 +395,8 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		// Mark the dataset generated after we're done. This is needed for remote
 		defer atomic.StoreUint32(&d.done, 1)
 
-		csize := cacheSize(d.epoch*d.epochLength+1, d.epoch)
-		dsize := datasetSize(d.epoch*d.epochLength+1, d.epoch)
+		csize := cacheSize(d.epoch)
+		dsize := datasetSize(d.epoch)
 		seed := seedHash(d.epoch*d.epochLength + 1)
 		if test {
 			csize = 1024

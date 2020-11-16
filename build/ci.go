@@ -239,7 +239,11 @@ func doInstall(cmdline []string) {
 		if runtime.GOARCH == "arm64" {
 			goinstall.Args = append(goinstall.Args, "-p", "1")
 		}
-		goinstall.Args = append(goinstall.Args, "-trimpath")
+		// TODO(meowsbits): The -trimpath flag is commented because it breaks openrpc discovery, for which
+		// reflection/AST-parsing gets broken when paths are not full.
+		// Is there a better solve for this? Can we just turn reflection off for the geth build?
+		// See -trimpath comment line 255, too.
+		// goinstall.Args = append(goinstall.Args, "-trimpath")
 		goinstall.Args = append(goinstall.Args, "-v")
 		goinstall.Args = append(goinstall.Args, packages...)
 		build.MustRun(goinstall)
@@ -248,7 +252,7 @@ func doInstall(cmdline []string) {
 
 	// Seems we are cross compiling, work around forbidden GOBIN
 	goinstall := goToolArch(*arch, *cc, "install", buildFlags(env)...)
-	goinstall.Args = append(goinstall.Args, "-trimpath")
+	// goinstall.Args = append(goinstall.Args, "-trimpath")
 	goinstall.Args = append(goinstall.Args, "-v")
 	goinstall.Args = append(goinstall.Args, []string{"-buildmode", "archive"}...)
 	goinstall.Args = append(goinstall.Args, packages...)

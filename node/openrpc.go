@@ -36,46 +36,56 @@ func (r *RPCDiscoveryService) Discover() (*meta_schema.OpenrpcDocument, error) {
 	return r.d.Discover()
 }
 
+// sharedMetaRegisterer defines common metadata to all possible servers.
+// Register "Meta" document fields.
+// These include getters for
+// - Servers object
+// - Info object
+// - ExternalDocs object
+//
+// These objects represent server-specific data that cannot be
+// reflected.
+var sharedMetaRegisterer = &go_openrpc_reflect.MetaT{
+	GetInfoFn: func() (info *meta_schema.InfoObject) {
+		info = &meta_schema.InfoObject{}
+		title := "Core-Geth RPC API"
+		info.Title = (*meta_schema.InfoObjectProperties)(&title)
+
+		version := params.VersionWithMeta + "/generated-at:" + time.Now().Format(time.RFC3339)
+		info.Version = (*meta_schema.InfoObjectVersion)(&version)
+		return info
+	},
+	GetExternalDocsFn: func() (exdocs *meta_schema.ExternalDocumentationObject) {
+		return nil // FIXME
+	},
+}
+
+// metaRegistererForURL is a convenience function used to define the Server(s) information
+// for a given listener, in this case organized by transport (ws, http, ipc).
+// Since we can't get the protocol scheme from the net.Listener itself, we have to define this for each
+// transport-specific document.
+func metaRegistererForURL(scheme string) *go_openrpc_reflect.MetaT {
+	var metaRegisterer = *sharedMetaRegisterer
+	metaRegisterer.GetServersFn = func() func(listeners []net.Listener) (*meta_schema.Servers, error) {
+		return func(listeners []net.Listener) (*meta_schema.Servers, error) {
+			servers := []meta_schema.ServerObject{}
+			for _, listener := range listeners {
+				url := scheme + listener.Addr().String()
+				network := listener.Addr().Network()
+				servers = append(servers, meta_schema.ServerObject{
+					Url:  (*meta_schema.ServerObjectUrl)(&url),
+					Name: (*meta_schema.ServerObjectName)(&network),
+				})
+			}
+			return (*meta_schema.Servers)(&servers), nil
+		}
+	}
+	return &metaRegisterer
+}
+
 // newOpenRPCDocument returns a Document configured with application-specific logic.
 func newOpenRPCDocument() *go_openrpc_reflect.Document {
 	d := &go_openrpc_reflect.Document{}
-
-	// Register "Meta" document fields.
-	// These include getters for
-	// - Servers object
-	// - Info object
-	// - ExternalDocs object
-	//
-	// These objects represent server-specific data that cannot be
-	// reflected.
-	d.WithMeta(&go_openrpc_reflect.MetaT{
-		GetServersFn: func() func(listeners []net.Listener) (*meta_schema.Servers, error) {
-			return func(listeners []net.Listener) (*meta_schema.Servers, error) {
-				servers := []meta_schema.ServerObject{}
-				for _, listener := range listeners {
-					addr := "http://" + listener.Addr().String()
-					network := listener.Addr().Network()
-					servers = append(servers, meta_schema.ServerObject{
-						Url:  (*meta_schema.ServerObjectUrl)(&addr),
-						Name: (*meta_schema.ServerObjectName)(&network),
-					})
-				}
-				return (*meta_schema.Servers)(&servers), nil
-			}
-		},
-		GetInfoFn: func() (info *meta_schema.InfoObject) {
-			info = &meta_schema.InfoObject{}
-			title := "Core-Geth RPC API"
-			info.Title = (*meta_schema.InfoObjectProperties)(&title)
-
-			version := params.VersionWithMeta + "/generated-at:" + time.Now().Format(time.RFC3339)
-			info.Version = (*meta_schema.InfoObjectVersion)(&version)
-			return info
-		},
-		GetExternalDocsFn: func() (exdocs *meta_schema.ExternalDocumentationObject) {
-			return nil // FIXME
-		},
-	})
 
 	// Use a provided Ethereum default configuration as a base.
 	appReflector := &go_openrpc_reflect.EthereumReflectorT{}

@@ -338,6 +338,7 @@ func (n *Node) setupOpenRPC() error {
 	if err := n.inprocHandler.RegisterName("rpc", &RPCDiscoveryService{d: n.inprocOpenRPC}); err != nil {
 		return err
 	}
+	n.inprocOpenRPC.WithMeta(metaRegistererForURL(""))
 
 	if n.ipc.listener != nil {
 		// Register the API documentation.
@@ -349,6 +350,7 @@ func (n *Node) setupOpenRPC() error {
 		}); err != nil {
 			return err
 		}
+		n.ipcOpenRPC.WithMeta(metaRegistererForURL(""))
 	}
 	if n.http.rpcAllowed() {
 		n.httpOpenRPC = newOpenRPCDocument()
@@ -359,6 +361,7 @@ func (n *Node) setupOpenRPC() error {
 		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpOpenRPC}); err != nil {
 			return err
 		}
+		n.httpOpenRPC.WithMeta(metaRegistererForURL("http://"))
 	}
 	wsServer := n.wsServerForPort(n.config.WSPort)
 	if wsServer.wsAllowed() {
@@ -370,6 +373,7 @@ func (n *Node) setupOpenRPC() error {
 		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsOpenRPC}); err != nil {
 			return err
 		}
+		n.wsOpenRPC.WithMeta(metaRegistererForURL("ws://"))
 	}
 	return nil
 }

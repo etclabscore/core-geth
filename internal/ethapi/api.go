@@ -1856,12 +1856,14 @@ func (api *PublicDebugAPI) PrintBlock(ctx context.Context, number uint64) (strin
 }
 
 // SeedHash retrieves the seed hash of a block.
-func (api *PublicDebugAPI) SeedHash(ctx context.Context, number uint64, epochLength uint64) (string, error) {
+func (api *PublicDebugAPI) SeedHash(ctx context.Context, number uint64) (string, error) {
 	block, _ := api.b.BlockByNumber(ctx, rpc.BlockNumber(number))
 	if block == nil {
 		return "", fmt.Errorf("block #%d not found", number)
 	}
-	epoch := number / epochLength
+	ecip1099FBlock := api.b.ChainConfig().GetEthashECIP1099Transition()
+	epochLength := ethash.CalcEpochLength(number, ecip1099FBlock)
+	epoch := ethash.CalcEpoch(number, epochLength)
 	return fmt.Sprintf("0x%x", ethash.SeedHash(epoch, epochLength)), nil
 }
 

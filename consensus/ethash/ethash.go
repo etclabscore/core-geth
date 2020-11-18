@@ -792,3 +792,13 @@ func (ethash *Ethash) APIs(chain consensus.ChainHeaderReader) []rpc.API {
 func SeedHash(epoch uint64, epochLength uint64) []byte {
 	return seedHash(epoch, epochLength)
 }
+
+// CalcEpochLength returns the epoch length for a given block number (ECIP-1099)
+func CalcEpochLength(block uint64, ecip1099FBlock *uint64) uint64 {
+	return calcEpochLength(block, ecip1099FBlock)
+}
+
+// CalcEpoch returns the epoch for a given block number (ECIP-1099)
+func CalcEpoch(block uint64, epochLength uint64) uint64 {
+	return calcEpoch(block, epochLength)
+}

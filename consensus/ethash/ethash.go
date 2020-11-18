@@ -35,7 +35,7 @@ import (
 	"unsafe"
 
 	mmap "github.com/edsrzf/mmap-go"
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
@@ -90,7 +90,7 @@ func uint32Array2Keccak256(data []uint32) string {
 	// hash with keccak256
 	digest := crypto.Keccak256(bytes)
 	// return hex string
-	return common.ToHex(digest)
+	return hexutil.Encode(digest)
 }
 
 // memoryMap tries to memory map a file of uint32s for read only access.
@@ -284,7 +284,14 @@ func isBadCache(epoch uint64, epochLength uint64, data []uint32) (bool, string) 
 			// bad cache generated using: geth makecache 11700001 [path] --epoch.length=30000
 			badCache = "0x5794130ea9e433185214fb4032edbd3473499267e197d9003a6a1a5bd300b3e5"
 			// bad dataset generated using: geth makedag 11700001 [path] --epoch.length=30000
-			badDataset = "0x9d90f9777150c0a9ed94ae17839e246d3fb0042e8d97903e3a7bf87357cef656"
+			badDataset = "0xe9cc9df33ee6de075558fb07fd67d59068a9751c36c6e9ae38163f6da90a2240"
+		}
+		if epoch == 196 { // classic mainnet
+			hash = uint32Array2Keccak256(data)
+			// bad cache generated using: geth makecache 11760001 [path] --epoch.length=30000
+			badCache = "0x4a37ee8c8cb4f75c05e23369cadeec7a6ed7386226a629794a733e0249d92d5f"
+			// bad dataset generated using: geth makedag 11760001 [path] --epoch.length=30000
+			badDataset = "0xf281b059ce535a7c146c00ada26114406bc08a9657bf9147542f92f9f9f08bf2"
 		}
 		// check if cache is bad
 		if hash != "" && (hash == badCache || hash == badDataset) {

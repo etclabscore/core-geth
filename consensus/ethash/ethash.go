@@ -301,8 +301,9 @@ func isBadCache(epoch uint64, epochLength uint64, data []uint32) (bool, string) 
 // generate ensures that the cache content is generated before use.
 func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 	c.once.Do(func() {
-		size := cacheSize(c.epoch*c.epochLength+1, c.epoch)
-		seed := seedHash(c.epoch*c.epochLength + 1)
+		epochStartBlock := calcEpochBlock(c.epoch, c.epochLength)
+		size := cacheSize(epochStartBlock, c.epoch)
+		seed := seedHash(epochStartBlock)
 		if test {
 			size = 1024
 		}
@@ -349,7 +350,7 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		}
 		// Iterate over all previous instances and delete old ones
 		for ep := int(c.epoch) - limit; ep >= 0; ep-- {
-			seed := seedHash(uint64(ep)*c.epochLength + 1)
+			seed := seedHash(calcEpochBlock(uint64(ep), c.epochLength))
 			path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
 			os.Remove(path)
 		}
@@ -387,10 +388,10 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 	d.once.Do(func() {
 		// Mark the dataset generated after we're done. This is needed for remote
 		defer atomic.StoreUint32(&d.done, 1)
-
-		csize := cacheSize(d.epoch*d.epochLength+1, d.epoch)
-		dsize := datasetSize(d.epoch*d.epochLength+1, d.epoch)
-		seed := seedHash(d.epoch*d.epochLength + 1)
+		epochStartBlock := calcEpochBlock(d.epoch, d.epochLength)
+		csize := cacheSize(epochStartBlock, d.epoch)
+		dsize := datasetSize(epochStartBlock, d.epoch)
+		seed := seedHash(epochStartBlock)
 		if test {
 			csize = 1024
 			dsize = 32 * 1024
@@ -448,7 +449,7 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		}
 		// Iterate over all previous instances and delete old ones
 		for ep := int(d.epoch) - limit; ep >= 0; ep-- {
-			seed := seedHash(uint64(ep)*d.epochLength + 1)
+			seed := seedHash(calcEpochBlock(uint64(ep), d.epochLength))
 			path := filepath.Join(dir, fmt.Sprintf("full-R%d-%x%s", algorithmRevision, seed[:8], endian))
 			os.Remove(path)
 		}

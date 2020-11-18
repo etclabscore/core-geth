@@ -66,6 +66,11 @@ func calcEpoch(block uint64, epochLength uint64) uint64 {
 	return epoch
 }
 
+// calcEpochBlock returns the epoch start block for a given epoch (ECIP-1099)
+func calcEpochBlock(epoch uint64, epochLength uint64) uint64 {
+	return epoch*epochLength + 1
+}
+
 // cacheSize returns the size of the ethash verification cache that belongs to a certain
 // block number.
 func cacheSize(block uint64, epoch uint64) uint64 {
@@ -134,7 +139,7 @@ func makeHasher(h hash.Hash) hasher {
 
 // seedHash is the seed to use for generating a verification cache and the mining
 // dataset. The block number passed should be pre-rounded to an epoch boundary + 1
-// e.g: epoch * epochLength + 1
+// e.g: seedHash(calcEpochBlock(epoch, epochLength))
 func seedHash(block uint64) []byte {
 	seed := make([]byte, 32)
 	if block < epochLengthDefault {

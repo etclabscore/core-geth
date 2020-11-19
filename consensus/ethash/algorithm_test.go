@@ -134,7 +134,7 @@ func TestCacheGeneration(t *testing.T) {
 	}
 	for i, tt := range tests {
 		cache := make([]uint32, tt.size/4)
-		generateCache(cache, tt.epoch, epochLengthDefault, seedHash(tt.epoch*epochLengthDefault+1))
+		generateCache(cache, tt.epoch, epochLengthDefault, seedHash(tt.epoch, epochLengthDefault))
 
 		want := make([]uint32, tt.size/4)
 		prepare(want, tt.cache)
@@ -674,7 +674,7 @@ func TestDatasetGeneration(t *testing.T) {
 	}
 	for i, tt := range tests {
 		cache := make([]uint32, tt.cacheSize/4)
-		generateCache(cache, tt.epoch, epochLengthDefault, seedHash(tt.epoch*epochLengthDefault+1))
+		generateCache(cache, tt.epoch, epochLengthDefault, seedHash(tt.epoch, epochLengthDefault))
 
 		dataset := make([]uint32, tt.datasetSize/4)
 		generateDataset(dataset, tt.epoch, epochLengthDefault, cache)

@@ -27,6 +27,7 @@ import (
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -386,5 +387,66 @@ func TestRPCDiscover(t *testing.T) {
 	numberOfExistingMethods := 151
 	if l := len(*res.Methods); l != numberOfExistingMethods {
 		t.Fatalf("got: %d, want: %d", l, numberOfExistingMethods)
+	}
+}
+
+// mustNewTestBackend is the same logic as newTestBackend(t *testing.T) but without the testing.T argument.
+// This function is used exclusively for the benchmarking tests, and will panic if it encounters an error.
+func mustNewTestBackend() (*node.Node, []*types.Block) {
+	// Generate test chain.
+	genesis, blocks := generateTestChain()
+	// Create node
+	n, err := node.New(&node.Config{})
+	if err != nil {
+		panic(fmt.Sprintf("can't create new node: %v", err))
+	}
+	// Create Ethereum Service
+	config := &eth.Config{Genesis: genesis}
+	config.Ethash.PowMode = ethash.ModeFake
+	ethservice, err := eth.New(n, config)
+	if err != nil {
+		panic(fmt.Sprintf("can't create new ethereum service: %v", err))
+	}
+	// Import the test chain.
+	if err := n.Start(); err != nil {
+		panic(fmt.Sprintf("can't start test node: %v", err))
+	}
+	if _, err := ethservice.BlockChain().InsertChain(blocks[1:]); err != nil {
+		panic(fmt.Sprintf("can't import test blocks: %v", err))
+	}
+	return n, blocks
+}
+
+// BenchmarkRPC_Discover shows that rpc.discover by reflection is slow.
+func BenchmarkRPC_Discover(b *testing.B) {
+	backend, _ := mustNewTestBackend()
+	client, _ := backend.Attach()
+	defer backend.Close()
+	defer client.Close()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		var res meta_schema.OpenrpcDocument
+		err := client.Call(&res, "rpc.discover")
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// BenchmarkRPC_BlockNumber shows that eth_blockNumber is a lot faster than rpc.discover.
+func BenchmarkRPC_BlockNumber(b *testing.B) {
+	backend, _ := mustNewTestBackend()
+	client, _ := backend.Attach()
+	defer backend.Close()
+	defer client.Close()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		var res hexutil.Uint64
+		err := client.Call(&res, "eth_blockNumber")
+		if err != nil {
+			b.Fatalf("unexpected error: %v", err)
+		}
 	}
 }

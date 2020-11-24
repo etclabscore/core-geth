@@ -66,9 +66,14 @@ func calcEpoch(block uint64, epochLength uint64) uint64 {
 	return epoch
 }
 
+// calcEpochBlock returns the epoch start block for a given epoch (ECIP-1099)
+func calcEpochBlock(epoch uint64, epochLength uint64) uint64 {
+	return epoch*epochLength + 1
+}
+
 // cacheSize returns the size of the ethash verification cache that belongs to a certain
 // block number.
-func cacheSize(block uint64, epoch uint64) uint64 {
+func cacheSize(epoch uint64) uint64 {
 	if epoch < maxEpoch {
 		return cacheSizes[int(epoch)]
 	}
@@ -88,7 +93,7 @@ func calcCacheSize(epoch uint64) uint64 {
 
 // datasetSize returns the size of the ethash mining dataset that belongs to a certain
 // block number.
-func datasetSize(block uint64, epoch uint64) uint64 {
+func datasetSize(epoch uint64) uint64 {
 	if epoch < maxEpoch {
 		return datasetSizes[int(epoch)]
 	}
@@ -133,12 +138,16 @@ func makeHasher(h hash.Hash) hasher {
 }
 
 // seedHash is the seed to use for generating a verification cache and the mining
-// dataset.
-func seedHash(block uint64) []byte {
+// dataset. The block number passed should be pre-rounded to an epoch boundary + 1
+// e.g: seedHash(calcEpochBlock(epoch, epochLength))
+func seedHash(epoch uint64, epochLength uint64) []byte {
+	block := calcEpochBlock(epoch, epochLength)
+
 	seed := make([]byte, 32)
 	if block < epochLengthDefault {
 		return seed
 	}
+
 	keccak256 := makeHasher(sha3.NewLegacyKeccak256())
 	for i := 0; i < int(block/epochLengthDefault); i++ {
 		keccak256(seed, seed)

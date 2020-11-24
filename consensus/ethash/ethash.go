@@ -284,7 +284,14 @@ func isBadCache(epoch uint64, epochLength uint64, data []uint32) (bool, string) 
 			// bad cache generated using: geth makecache 11700001 [path] --epoch.length=30000
 			badCache = "0x5794130ea9e433185214fb4032edbd3473499267e197d9003a6a1a5bd300b3e5"
 			// bad dataset generated using: geth makedag 11700001 [path] --epoch.length=30000
-			badDataset = "0x9d90f9777150c0a9ed94ae17839e246d3fb0042e8d97903e3a7bf87357cef656"
+			badDataset = "0xe9cc9df33ee6de075558fb07fd67d59068a9751c36c6e9ae38163f6da90a2240"
+		}
+		if epoch == 196 { // classic mainnet
+			hash = uint32Array2Keccak256(data)
+			// bad cache generated using: geth makecache 11760001 [path] --epoch.length=30000
+			badCache = "0x4a37ee8c8cb4f75c05e23369cadeec7a6ed7386226a629794a733e0249d92d5f"
+			// bad dataset generated using: geth makedag 11760001 [path] --epoch.length=30000
+			badDataset = "0xf281b059ce535a7c146c00ada26114406bc08a9657bf9147542f92f9f9f08bf2"
 		}
 		// check if cache is bad
 		if hash != "" && (hash == badCache || hash == badDataset) {
@@ -301,8 +308,8 @@ func isBadCache(epoch uint64, epochLength uint64, data []uint32) (bool, string) 
 // generate ensures that the cache content is generated before use.
 func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 	c.once.Do(func() {
-		size := cacheSize(c.epoch*c.epochLength+1, c.epoch)
-		seed := seedHash(c.epoch*c.epochLength + 1)
+		size := cacheSize(c.epoch)
+		seed := seedHash(c.epoch, c.epochLength)
 		if test {
 			size = 1024
 		}
@@ -349,7 +356,7 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		}
 		// Iterate over all previous instances and delete old ones
 		for ep := int(c.epoch) - limit; ep >= 0; ep-- {
-			seed := seedHash(uint64(ep)*c.epochLength + 1)
+			seed := seedHash(uint64(ep), c.epochLength)
 			path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
 			os.Remove(path)
 		}
@@ -387,10 +394,9 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 	d.once.Do(func() {
 		// Mark the dataset generated after we're done. This is needed for remote
 		defer atomic.StoreUint32(&d.done, 1)
-
-		csize := cacheSize(d.epoch*d.epochLength+1, d.epoch)
-		dsize := datasetSize(d.epoch*d.epochLength+1, d.epoch)
-		seed := seedHash(d.epoch*d.epochLength + 1)
+		csize := cacheSize(d.epoch)
+		dsize := datasetSize(d.epoch)
+		seed := seedHash(d.epoch, d.epochLength)
 		if test {
 			csize = 1024
 			dsize = 32 * 1024
@@ -448,7 +454,7 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		}
 		// Iterate over all previous instances and delete old ones
 		for ep := int(d.epoch) - limit; ep >= 0; ep-- {
-			seed := seedHash(uint64(ep)*d.epochLength + 1)
+			seed := seedHash(uint64(ep), d.epochLength)
 			path := filepath.Join(dir, fmt.Sprintf("full-R%d-%x%s", algorithmRevision, seed[:8], endian))
 			os.Remove(path)
 		}
@@ -783,6 +789,16 @@ func (ethash *Ethash) APIs(chain consensus.ChainHeaderReader) []rpc.API {
 
 // SeedHash is the seed to use for generating a verification cache and the mining
 // dataset.
-func SeedHash(block uint64) []byte {
-	return seedHash(block)
+func SeedHash(epoch uint64, epochLength uint64) []byte {
+	return seedHash(epoch, epochLength)
+}
+
+// CalcEpochLength returns the epoch length for a given block number (ECIP-1099)
+func CalcEpochLength(block uint64, ecip1099FBlock *uint64) uint64 {
+	return calcEpochLength(block, ecip1099FBlock)
+}
+
+// CalcEpoch returns the epoch for a given block number (ECIP-1099)
+func CalcEpoch(block uint64, epochLength uint64) uint64 {
+	return calcEpoch(block, epochLength)
 }

@@ -504,7 +504,7 @@ func (ethash *Ethash) verifySeal(chain consensus.ChainHeaderReader, header *type
 		cache := ethash.cache(number)
 		epochLength := calcEpochLength(number, ethash.config.ECIP1099Block)
 		epoch := calcEpoch(number, epochLength)
-		size := datasetSize(number, epoch)
+		size := datasetSize(epoch)
 		if ethash.config.PowMode == ModeTest {
 			size = 32 * 1024
 		}

@@ -134,7 +134,7 @@ func TestCacheGeneration(t *testing.T) {
 	}
 	for i, tt := range tests {
 		cache := make([]uint32, tt.size/4)
-		generateCache(cache, tt.epoch, epochLengthDefault, seedHash(tt.epoch*epochLengthDefault+1))
+		generateCache(cache, tt.epoch, epochLengthDefault, seedHash(tt.epoch, epochLengthDefault))
 
 		want := make([]uint32, tt.size/4)
 		prepare(want, tt.cache)
@@ -674,7 +674,7 @@ func TestDatasetGeneration(t *testing.T) {
 	}
 	for i, tt := range tests {
 		cache := make([]uint32, tt.cacheSize/4)
-		generateCache(cache, tt.epoch, epochLengthDefault, seedHash(tt.epoch*epochLengthDefault+1))
+		generateCache(cache, tt.epoch, epochLengthDefault, seedHash(tt.epoch, epochLengthDefault))
 
 		dataset := make([]uint32, tt.datasetSize/4)
 		generateDataset(dataset, tt.epoch, epochLengthDefault, cache)
@@ -768,7 +768,7 @@ func TestConcurrentDiskCacheGeneration(t *testing.T) {
 // Benchmarks the cache generation performance.
 func BenchmarkCacheGeneration(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		cache := make([]uint32, cacheSize(1, 0)/4)
+		cache := make([]uint32, cacheSize(0)/4)
 		generateCache(cache, 0, epochLengthDefault, make([]byte, 32))
 	}
 }
@@ -787,14 +787,14 @@ func BenchmarkSmallDatasetGeneration(b *testing.B) {
 
 // Benchmarks the light verification performance.
 func BenchmarkHashimotoLight(b *testing.B) {
-	cache := make([]uint32, cacheSize(1, 0)/4)
+	cache := make([]uint32, cacheSize(0)/4)
 	generateCache(cache, 0, epochLengthDefault, make([]byte, 32))
 
 	hash := hexutil.MustDecode("0xc9149cc0386e689d789a1c2f3d5d169a61a6218ed30e74414dc736e442ef3d1f")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		hashimotoLight(datasetSize(1, 0), cache, hash, 0)
+		hashimotoLight(datasetSize(0), cache, hash, 0)
 	}
 }
 

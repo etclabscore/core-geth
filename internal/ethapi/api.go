@@ -1971,7 +1971,10 @@ func (api *PublicDebugAPI) SeedHash(ctx context.Context, number uint64) (string,
 	if block == nil {
 		return "", fmt.Errorf("block #%d not found", number)
 	}
-	return fmt.Sprintf("0x%x", ethash.SeedHash(number)), nil
+	ecip1099FBlock := api.b.ChainConfig().GetEthashECIP1099Transition()
+	epochLength := ethash.CalcEpochLength(number, ecip1099FBlock)
+	epoch := ethash.CalcEpoch(number, epochLength)
+	return fmt.Sprintf("0x%x", ethash.SeedHash(epoch, epochLength)), nil
 }
 
 // PrivateDebugAPI is the collection of Ethereum APIs exposed over the private

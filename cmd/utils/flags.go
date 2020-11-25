@@ -1827,13 +1827,13 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		}
 		log.Info("Using developer account", "address", developer.Address)
 
-		isPoWNetwork := ctx.GlobalBool(DeveloperEthashFlag.Name)
-		if isPoWNetwork {
+		useEthash := ctx.GlobalBool(DeveloperEthashFlag.Name)
+		if useEthash {
 			cfg.Ethash.PowMode = ethash.ModeFake
 		}
 
 		// Create a new developer genesis block or reuse existing one
-		cfg.Genesis = params.DeveloperGenesisBlock(uint64(ctx.GlobalInt(DeveloperPeriodFlag.Name)), developer.Address, isPoWNetwork)
+		cfg.Genesis = params.DeveloperGenesisBlock(uint64(ctx.GlobalInt(DeveloperPeriodFlag.Name)), developer.Address, useEthash)
 		if ctx.GlobalIsSet(DataDirFlag.Name) {
 			// Check if we have an already initialized chain and fall back to
 			// that if so. Otherwise we need to generate a new genesis spec.

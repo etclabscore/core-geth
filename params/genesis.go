@@ -23,6 +23,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 // DefaultGenesisBlock returns the Ethereum main net genesis block.
@@ -86,14 +87,19 @@ func DefaultYoloV1GenesisBlock() *genesisT.Genesis {
 
 // DeveloperGenesisBlock returns the 'geth --dev' genesis block. Note, this must
 // be seeded with the
-func DeveloperGenesisBlock(period uint64, faucet common.Address) *genesisT.Genesis {
+func DeveloperGenesisBlock(period uint64, faucet common.Address, useEthash bool) *genesisT.Genesis {
 	// Override the default period to the user requested one
-	config := *AllCliqueProtocolChanges
-	config.Clique.Period = period
+	var config *goethereum.ChainConfig
+	if useEthash {
+		config = AllEthashProtocolChanges
+	} else {
+		config = AllCliqueProtocolChanges
+		config.Clique.Period = period
+	}
 
 	// Assemble and return the genesis with the precompiles and faucet pre-funded
 	return &genesisT.Genesis{
-		Config:     &config,
+		Config:     config,
 		ExtraData:  append(append(make([]byte, 32), faucet[:]...), make([]byte, crypto.SignatureLength)...),
 		GasLimit:   6283185,
 		Difficulty: big.NewInt(1),

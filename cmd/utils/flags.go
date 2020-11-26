@@ -1757,12 +1757,10 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 
 		// sort protocol version desceding
 		sort.Slice(cfg.ProtocolVersions, func(i, j int) bool { return cfg.ProtocolVersions[i] > cfg.ProtocolVersions[j] })
-		fmt.Printf("ProtocolVersions: %#v\n", cfg.ProtocolVersions)
 	}
 
 	// set default protocol versions
 	if len(cfg.ProtocolVersions) == 0 {
-		fmt.Printf("default ProtocolVersions: %#v\n", cfg.ProtocolVersions)
 		cfg.ProtocolVersions = eth.DefaultProtocolVersions
 	}
 

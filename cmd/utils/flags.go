@@ -143,7 +143,7 @@ var (
 		Value: eth.DefaultConfig.NetworkId,
 	}
 	EthProtocolsFlag = cli.StringFlag{
-		Name:  "ethprotocols",
+		Name:  "eth.protocols",
 		Usage: "Sets the Ethereum Protocol versions (65|64|63) (default=65,64,63)",
 		Value: "",
 	}

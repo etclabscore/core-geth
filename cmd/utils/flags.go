@@ -27,7 +27,6 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
-	"sort"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -144,7 +143,7 @@ var (
 	}
 	EthProtocolsFlag = cli.StringFlag{
 		Name:  "eth.protocols",
-		Usage: "Sets the Ethereum Protocol versions (65|64|63) (default=65,64,63)",
+		Usage: "Sets the Ethereum Protocol versions (65|64|63) (default = 65,64,63 first is primary)",
 		Value: "",
 	}
 	ClassicFlag = cli.BoolFlag{
@@ -1749,14 +1748,13 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 				}
 
 				if !isValid {
-					Fatalf("--%s must be one of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.DefaultProtocolVersions)), ","))
+					Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.DefaultProtocolVersions)), ","))
 				}
 				cfg.ProtocolVersions = append(cfg.ProtocolVersions, uint(version))
 			}
+		} else {
+			Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.DefaultProtocolVersions)), ","))
 		}
-
-		// sort protocol version desceding
-		sort.Slice(cfg.ProtocolVersions, func(i, j int) bool { return cfg.ProtocolVersions[i] > cfg.ProtocolVersions[j] })
 	}
 
 	// set default protocol versions

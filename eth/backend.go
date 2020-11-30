@@ -157,7 +157,7 @@ func New(stack *node.Node, config *Config) (*Ethereum, error) {
 	if bcVersion != nil {
 		dbVer = fmt.Sprintf("%d", *bcVersion)
 	}
-	log.Info("Initialising Ethereum protocol", "versions", ProtocolVersions, "network", config.NetworkId, "dbversion", dbVer)
+	log.Info("Initialising Ethereum protocol", "versions", config.ProtocolVersions, "network", config.NetworkId, "dbversion", dbVer)
 
 	if !config.SkipBcVersionCheck {
 		if bcVersion != nil && *bcVersion > core.BlockChainVersion {
@@ -514,7 +514,7 @@ func (s *Ethereum) EventMux() *event.TypeMux           { return s.eventMux }
 func (s *Ethereum) Engine() consensus.Engine           { return s.engine }
 func (s *Ethereum) ChainDb() ethdb.Database            { return s.chainDb }
 func (s *Ethereum) IsListening() bool                  { return true } // Always listening
-func (s *Ethereum) EthVersion() int                    { return int(ProtocolVersions[0]) }
+func (s *Ethereum) EthVersion() int                    { return int(s.config.ProtocolVersions[0]) }
 func (s *Ethereum) NetVersion() uint64                 { return s.networkID }
 func (s *Ethereum) Downloader() *downloader.Downloader { return s.protocolManager.downloader }
 func (s *Ethereum) Synced() bool                       { return atomic.LoadUint32(&s.protocolManager.acceptTxs) == 1 }
@@ -524,8 +524,8 @@ func (s *Ethereum) BloomIndexer() *core.ChainIndexer   { return s.bloomIndexer }
 // Protocols returns all the currently configured
 // network protocols to start.
 func (s *Ethereum) Protocols() []p2p.Protocol {
-	protos := make([]p2p.Protocol, len(ProtocolVersions))
-	for i, vsn := range ProtocolVersions {
+	protos := make([]p2p.Protocol, len(s.config.ProtocolVersions))
+	for i, vsn := range s.config.ProtocolVersions {
 		protos[i] = s.protocolManager.makeProtocol(vsn)
 		protos[i].Attributes = []enr.Entry{s.currentEthEntry()}
 		protos[i].DialCandidates = s.dialCandidates

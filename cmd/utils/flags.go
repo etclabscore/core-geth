@@ -141,6 +141,11 @@ var (
 		Usage: "Explicitly set network id (integer)(For testnets: use --ropsten, --rinkeby, --goerli, --kotti, --mordor, --yolov1 instead)",
 		Value: eth.DefaultConfig.NetworkId,
 	}
+	EthProtocolsFlag = cli.StringFlag{
+		Name:  "eth.protocols",
+		Usage: "Sets the Ethereum Protocol versions (65|64|63) (default = 65,64,63 first is primary)",
+		Value: "",
+	}
 	ClassicFlag = cli.BoolFlag{
 		Name:  "classic",
 		Usage: "Ethereum Classic network: pre-configured Ethereum Classic mainnet",
@@ -1724,6 +1729,44 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		cfg.NetworkId = ctx.GlobalUint64(NetworkIdFlag.Name)
 	} else if cfg.Genesis != nil {
 		cfg.NetworkId = *cfg.Genesis.GetNetworkID()
+	}
+
+	if ctx.GlobalIsSet(EthProtocolsFlag.Name) {
+		protocolVersions := SplitAndTrim(ctx.GlobalString(EthProtocolsFlag.Name))
+		if len(protocolVersions) == 0 {
+			Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.DefaultProtocolVersions)), ","))
+		}
+
+		seenVersions := map[uint]interface{}{}
+		for _, versionString := range protocolVersions {
+			version, err := strconv.ParseUint(versionString, 10, 0)
+			if err != nil {
+				Fatalf("--%s has invalid value \"%v\" with error: %v", EthProtocolsFlag.Name, versionString, err)
+			}
+
+			if _, duplicate := seenVersions[uint(version)]; duplicate {
+				Fatalf("--%s has duplicate version of %v", EthProtocolsFlag.Name, versionString)
+			}
+
+			isValid := false
+			for _, proto := range eth.DefaultProtocolVersions {
+				if proto == uint(version) {
+					isValid = true
+					seenVersions[uint(version)] = nil
+					break
+				}
+			}
+
+			if !isValid {
+				Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.DefaultProtocolVersions)), ","))
+			}
+			cfg.ProtocolVersions = append(cfg.ProtocolVersions, uint(version))
+		}
+	}
+
+	// set default protocol versions
+	if len(cfg.ProtocolVersions) == 0 {
+		cfg.ProtocolVersions = eth.DefaultProtocolVersions
 	}
 
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.

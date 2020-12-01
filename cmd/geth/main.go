@@ -511,6 +511,9 @@ func startNode(ctx *cli.Context, stack *node.Node, backend ethapi.Backend) {
 			threads = ctx.GlobalInt(utils.LegacyMinerThreadsFlag.Name)
 			log.Warn("The flag --minerthreads is deprecated and will be removed in the future, please use --miner.threads")
 		}
+		if threads == 0 && ctx.GlobalBool(utils.DeveloperFlag.Name) {
+			threads = 1
+		}
 		if err := ethBackend.StartMining(threads); err != nil {
 			utils.Fatalf("Failed to start mining: %v", err)
 		}

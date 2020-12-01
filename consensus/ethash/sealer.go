@@ -34,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/core/types"
+	exprand "golang.org/x/exp/rand"
 	"gonum.org/v1/gonum/stat/distuv"
 )
 
@@ -57,6 +58,7 @@ var (
 func (ethash *Ethash) makePoissonFakeDelay() float64 {
 	p := distuv.Poisson{
 		Lambda: float64(ethash.Threads()),
+		Src:    exprand.NewSource(uint64(time.Now().UnixNano())),
 	}
 	return p.Rand()
 }

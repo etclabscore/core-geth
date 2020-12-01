@@ -145,7 +145,7 @@ var (
 		utils.EthProtocolsFlag,
 		utils.DeveloperFlag,
 		utils.DeveloperPeriodFlag,
-		utils.DeveloperEthashFlag,
+		utils.DeveloperPoWFlag,
 		utils.ClassicFlag,
 		utils.MordorFlag,
 		utils.SocialFlag,

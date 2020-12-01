@@ -194,8 +194,8 @@ var (
 		Name:  "dev.period",
 		Usage: "Block period for proof-of-authority network to use in developer mode (0 = mine only if transaction pending)",
 	}
-	DeveloperEthashFlag = cli.BoolFlag{
-		Name:  "dev.ethash",
+	DeveloperPoWFlag = cli.BoolFlag{
+		Name:  "dev.pow",
 		Usage: "Ephemeral proof-of-work network with a pre-funded developer account, mining enabled",
 	}
 	IdentityFlag = cli.StringFlag{
@@ -1827,7 +1827,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		}
 		log.Info("Using developer account", "address", developer.Address)
 
-		useEthash := ctx.GlobalBool(DeveloperEthashFlag.Name)
+		useEthash := ctx.GlobalBool(DeveloperPoWFlag.Name)
 		if useEthash {
 			cfg.Ethash.PowMode = ethash.ModeFake
 		}

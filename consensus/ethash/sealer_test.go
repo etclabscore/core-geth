@@ -32,7 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 )
 
-func TestSealFakeDelay(t *testing.T) {
+func TestSealFakePoisson(t *testing.T) {
 	cases := []int{
 		3, 10, 19, 33,
 	}
@@ -40,7 +40,7 @@ func TestSealFakeDelay(t *testing.T) {
 		e := &Ethash{threads: c} // "threads" is actually the desired MEAN (lambda) of the Poisson distribution
 		got := []float64{}
 		for i := 0; i < 20; i++ {
-			d := e.makeFakeDelay()
+			d := e.makePoissonFakeDelay()
 			got = append(got, d)
 		}
 		sort.Slice(got, func(i, j int) bool {

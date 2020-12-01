@@ -499,6 +499,7 @@ const (
 	ModeShared
 	ModeTest
 	ModeFake
+	ModePoissonFake
 	ModeFullFake
 )
 
@@ -512,6 +513,8 @@ func (m Mode) String() string {
 		return "Test"
 	case ModeFake:
 		return "Fake"
+	case ModePoissonFake:
+		return "PoissonFake"
 	case ModeFullFake:
 		return "FullFake"
 	}

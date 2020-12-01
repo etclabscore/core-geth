@@ -47,14 +47,14 @@ var (
 	errInvalidSealResult = errors.New("invalid or stale proof-of-work solution")
 )
 
-// makeFakeDelay uses the ethash.threads value as a mean time (lambda)
+// makePoissonFakeDelay uses the ethash.threads value as a mean time (lambda)
 // for a Poisson distribution, returning a random value from
 // that discrete function. I think a Poisson distribution probably
 // fairly accurately models real world block times.
 // Note that this is a hacky way to use ethash.threads since
 // lower values will yield faster blocks, but it saves having
 // to add or modify any more code than necessary.
-func (ethash *Ethash) makeFakeDelay() float64 {
+func (ethash *Ethash) makePoissonFakeDelay() float64 {
 	p := distuv.Poisson{
 		Lambda: float64(ethash.Threads()),
 	}
@@ -65,8 +65,16 @@ func (ethash *Ethash) makeFakeDelay() float64 {
 // the block's difficulty requirements.
 func (ethash *Ethash) Seal(chain consensus.ChainHeaderReader, block *types.Block, results chan<- *types.Block, stop <-chan struct{}) error {
 	// If we're running a fake PoW, simply return a 0 nonce immediately
-	faking := ethash.config.PowMode == ModeFake || ethash.config.PowMode == ModeFullFake
-	if faking {
+	if ethash.config.PowMode == ModeFake || ethash.config.PowMode == ModeFullFake {
+		header := block.Header()
+		header.Nonce, header.MixDigest = types.BlockNonce{}, common.Hash{}
+		select {
+		case results <- block.WithSeal(header):
+		default:
+			ethash.config.Log.Warn("Sealing result is not read by miner", "mode", "fake", "sealhash", ethash.SealHash(block.Header()))
+		}
+		return nil
+	} else if ethash.config.PowMode == ModePoissonFake {
 		go func(header *types.Header) {
 			// Assign random (but non-zero) values to header nonce and mix.
 			header.Nonce = types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64)))
@@ -74,7 +82,7 @@ func (ethash *Ethash) Seal(chain consensus.ChainHeaderReader, block *types.Block
 			header.MixDigest = common.BytesToHash(b)
 
 			// Wait some amount of time.
-			timeout := time.NewTimer(time.Duration(ethash.makeFakeDelay()) * time.Second)
+			timeout := time.NewTimer(time.Duration(ethash.makePoissonFakeDelay()) * time.Second)
 			defer timeout.Stop()
 
 			select {

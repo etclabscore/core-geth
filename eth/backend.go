@@ -270,6 +270,9 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 	case ethash.ModeFake:
 		log.Warn("Ethash used in fake mode")
 		return ethash.NewFaker()
+	case ethash.ModePoissonFake:
+		log.Warn("Ethash used in fake Poisson mode")
+		return ethash.NewPoissonFaker()
 	case ethash.ModeTest:
 		log.Warn("Ethash used in test mode")
 		return ethash.NewTester(nil, noverify)

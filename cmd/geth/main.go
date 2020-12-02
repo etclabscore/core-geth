@@ -161,6 +161,7 @@ var (
 		utils.NetworkIdFlag,
 		utils.EthStatsURLFlag,
 		utils.FakePoWFlag,
+		utils.FakePoWPoissonFlag,
 		utils.NoCompactionFlag,
 		utils.GpoBlocksFlag,
 		utils.LegacyGpoBlocksFlag,

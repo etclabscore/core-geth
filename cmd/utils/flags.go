@@ -521,6 +521,10 @@ var (
 		Name:  "fakepow",
 		Usage: "Disables proof-of-work verification",
 	}
+	FakePoWPoissonFlag = cli.BoolFlag{
+		Name:  "fakepow.poisson",
+		Usage: "Disables proof-of-work verification and adds mining delay (Poisson) based on --miner.threads",
+	}
 	NoCompactionFlag = cli.BoolFlag{
 		Name:  "nocompaction",
 		Usage: "Disables db compaction after import",
@@ -1484,6 +1488,8 @@ func setEthash(ctx *cli.Context, cfg *eth.Config) {
 
 	if ctx.GlobalBool(FakePoWFlag.Name) {
 		cfg.Ethash.PowMode = ethash.ModeFake
+	} else if ctx.GlobalBool(FakePoWPoissonFlag.Name) {
+		cfg.Ethash.PowMode = ethash.ModePoissonFake
 	}
 	if ctx.GlobalIsSet(EthashCachesInMemoryFlag.Name) {
 		cfg.Ethash.CachesInMem = ctx.GlobalInt(EthashCachesInMemoryFlag.Name)
@@ -1629,6 +1635,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 
 	CheckExclusive(ctx, AncientFlag, AncientRPCFlag)
 	CheckExclusive(ctx, DeveloperPoWFlag, DeveloperPeriodFlag)
+	CheckExclusive(ctx, FakePoWFlag, FakePoWPoissonFlag)
 
 	var ks *keystore.KeyStore
 	if keystores := stack.AccountManager().Backends(keystore.KeyStoreType); len(keystores) > 0 {
@@ -2037,7 +2044,9 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 		}, chainDb)
 	} else {
 		engine = ethash.NewFaker()
-		if !ctx.GlobalBool(FakePoWFlag.Name) {
+		if ctx.GlobalBool(FakePoWPoissonFlag.Name) {
+			engine = ethash.NewPoissonFaker()
+		} else if !ctx.GlobalBool(FakePoWFlag.Name) {
 			engine = ethash.New(ethash.Config{
 				CacheDir:         stack.ResolvePath(eth.DefaultConfig.Ethash.CacheDir),
 				CachesInMem:      eth.DefaultConfig.Ethash.CachesInMem,

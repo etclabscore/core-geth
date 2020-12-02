@@ -642,6 +642,18 @@ func NewFakeDelayer(delay time.Duration) *Ethash {
 	}
 }
 
+// NewPoissonFaker creates a ethash consensus engine with a fake PoW scheme that
+// accepts all blocks as valid, but delays mining by some time based on miner.threads, though
+// they still have to conform to the Ethereum consensus rules.
+func NewPoissonFaker() *Ethash {
+	return &Ethash{
+		config: Config{
+			PowMode: ModePoissonFake,
+			Log:     log.Root(),
+		},
+	}
+}
+
 // NewFullFaker creates an ethash consensus engine with a full fake scheme that
 // accepts all blocks as valid, without checking any consensus rules whatsoever.
 func NewFullFaker() *Ethash {

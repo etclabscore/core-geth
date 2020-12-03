@@ -176,6 +176,14 @@ type CoreGethChainConfig struct {
 	ECIP1099FBlock *big.Int `json:"ecip1099FBlock,omitempty"` // ECIP1099 etchash HF block
 	ECBP1100FBlock *big.Int `json:"ecbp1100FBlock,omitempty"` // ECBP1100:MESS artificial finality
 
+	// EIP-2315: Simple Subroutines
+	// https://eips.ethereum.org/EIPS/eip-2315
+	EIP2315FBlock *big.Int `json:"eip2315FBlock,omitempty"`
+
+	// EIP-2929: Gas cost increases for state access opcodes
+	// https://eips.ethereum.org/EIPS/eip-2929
+	EIP2929FBlock *big.Int `json:"eip2929FBlock,omitempty"`
+
 	DisposalBlock    *big.Int `json:"disposalBlock,omitempty"`    // Bomb disposal HF block
 	SocialBlock      *big.Int `json:"socialBlock,omitempty"`      // Ethereum Social Reward block
 	EthersocialBlock *big.Int `json:"ethersocialBlock,omitempty"` // Ethersocial Reward block

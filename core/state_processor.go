@@ -99,19 +99,16 @@ func ApplyTransaction(config ctypes.ChainConfigurator, bc ChainContext, author *
 	// about the transaction and calling mechanisms.
 	vmenv := vm.NewEVM(context, statedb, config, cfg)
 
-	// TODO(meowsbits): re: YoloV2, EIP2929.
-	/*
-		if config.IsYoloV2(header.Number) {
-			statedb.AddAddressToAccessList(msg.From())
-			if dst := msg.To(); dst != nil {
-				statedb.AddAddressToAccessList(*dst)
-				// If it's a create-tx, the destination will be added inside evm.create
-			}
-			for _, addr := range vmenv.ActivePrecompiles() {
-				statedb.AddAddressToAccessList(addr)
-			}
+	if config.IsEnabled(config.GetEIP2929Transition, header.Number) {
+		statedb.AddAddressToAccessList(msg.From())
+		if dst := msg.To(); dst != nil {
+			statedb.AddAddressToAccessList(*dst)
+			// If it's a create-tx, the destination will be added inside evm.create
 		}
-	*/
+		for addr := range vm.PrecompiledContractsForConfig(config, header.Number) {
+			statedb.AddAddressToAccessList(addr)
+		}
+	}
 
 	// Apply the transaction to the current state (included in the env)
 	result, err := ApplyMessage(vmenv, msg, gp)

@@ -427,27 +427,22 @@ func (c *ChainConfig) SetECBP1100Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
-// TODO(ziogaschr): check EIP2315, EIP2929 support for multigeth
 func (c *ChainConfig) GetEIP2315Transition() *uint64 {
-	return nil
+	return bigNewU64(c.YoloV2Block)
 }
 
 func (c *ChainConfig) SetEIP2315Transition(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	return ctypes.ErrUnsupportedConfigFatal
-}
-
-func (c *ChainConfig) GetEIP2929Transition() *uint64 {
+	c.YoloV2Block = setBig(c.YoloV2Block, n)
 	return nil
 }
 
+func (c *ChainConfig) GetEIP2929Transition() *uint64 {
+	return bigNewU64(c.YoloV2Block)
+}
+
 func (c *ChainConfig) SetEIP2929Transition(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	return ctypes.ErrUnsupportedConfigFatal
+	c.YoloV2Block = setBig(c.YoloV2Block, n)
+	return nil
 }
 
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {

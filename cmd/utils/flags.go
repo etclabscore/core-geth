@@ -138,7 +138,7 @@ var (
 	}
 	NetworkIdFlag = cli.Uint64Flag{
 		Name:  "networkid",
-		Usage: "Explicitly set network id (integer)(For testnets: use --ropsten, --rinkeby, --goerli, --kotti, --mordor, --yolov1 instead)",
+		Usage: "Explicitly set network id (integer)(For testnets: use --ropsten, --rinkeby, --goerli, --kotti, --mordor, --yolov2 instead)",
 		Value: eth.DefaultConfig.NetworkId,
 	}
 	ClassicFlag = cli.BoolFlag{

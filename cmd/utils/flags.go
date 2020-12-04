@@ -1486,9 +1486,7 @@ func setEthash(ctx *cli.Context, cfg *eth.Config) {
 	setEthashCacheDir(ctx, cfg)
 	setEthashDatasetDir(ctx, cfg)
 
-	if ctx.GlobalBool(FakePoWFlag.Name) {
-		cfg.Ethash.PowMode = ethash.ModeFake
-	} else if ctx.GlobalBool(FakePoWPoissonFlag.Name) {
+	if ctx.GlobalBool(FakePoWPoissonFlag.Name) {
 		cfg.Ethash.PowMode = ethash.ModePoissonFake
 	}
 	if ctx.GlobalIsSet(EthashCachesInMemoryFlag.Name) {
@@ -1634,7 +1632,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, TxLookupLimitFlag)
 
 	CheckExclusive(ctx, AncientFlag, AncientRPCFlag)
-	CheckExclusive(ctx, DeveloperPoWFlag, DeveloperPeriodFlag)
+	CheckExclusive(ctx, DeveloperPoWFlag, DeveloperPeriodFlag, FakePoWFlag)
 	CheckExclusive(ctx, FakePoWFlag, FakePoWPoissonFlag)
 
 	var ks *keystore.KeyStore

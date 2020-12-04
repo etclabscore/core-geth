@@ -220,19 +220,16 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 
 	evm := vm.NewEVM(context, statedb, config, vmconfig)
 
-	// TODO(meowsbits): re: EIP2929
-	/*
-		if config.IsYoloV2(context.BlockNumber) {
-			statedb.AddAddressToAccessList(msg.From())
-			if dst := msg.To(); dst != nil {
-				statedb.AddAddressToAccessList(*dst)
-				// If it's a create-tx, the destination will be added inside evm.create
-			}
-			for _, addr := range evm.ActivePrecompiles() {
-				statedb.AddAddressToAccessList(addr)
-			}
+	if config.IsEnabled(config.GetEIP2929Transition, block.Number()) {
+		statedb.AddAddressToAccessList(msg.From())
+		if dst := msg.To(); dst != nil {
+			statedb.AddAddressToAccessList(*dst)
+			// If it's a create-tx, the destination will be added inside evm.create
 		}
-	*/
+		for addr := range vm.PrecompiledContractsForConfig(config, block.Number()) {
+			statedb.AddAddressToAccessList(addr)
+		}
+	}
 	gaspool := new(core.GasPool)
 	gaspool.AddGas(block.GasLimit())
 	snapshot := statedb.Snapshot()

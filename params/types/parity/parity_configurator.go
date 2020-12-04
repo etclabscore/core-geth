@@ -995,14 +995,12 @@ func (spec *ParityChainSpec) SetEIP2315Transition(i *uint64) error {
 }
 
 func (spec *ParityChainSpec) GetEIP2929Transition() *uint64 {
-	return nil
+	return spec.Params.EIP2929Transition.Uint64P()
 }
 
 func (spec *ParityChainSpec) SetEIP2929Transition(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	return ctypes.ErrUnsupportedConfigFatal
+	spec.Params.EIP2929Transition = new(ParityU64).SetUint64(n)
+	return nil
 }
 
 func (spec *ParityChainSpec) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {

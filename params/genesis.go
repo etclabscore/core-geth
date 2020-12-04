@@ -22,8 +22,11 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // DefaultGenesisBlock returns the Ethereum main net genesis block.
@@ -88,13 +91,76 @@ func DefaultYoloV1GenesisBlock() *genesisT.Genesis {
 // DeveloperGenesisBlock returns the 'geth --dev' genesis block. Note, this must
 // be seeded with the
 func DeveloperGenesisBlock(period uint64, faucet common.Address, useEthash bool) *genesisT.Genesis {
-	// Override the default period to the user requested one
-	var config *goethereum.ChainConfig
-	if useEthash {
-		config = AllEthashProtocolChanges
-	} else {
-		config = AllCliqueProtocolChanges
+	if !useEthash {
+		// Make a copy to avoid unpredicted contamination.
+		config := &goethereum.ChainConfig{}
+		*config = *AllCliqueProtocolChanges
+
+		// Override the default period to the user requested one
 		config.Clique.Period = period
+		// Assemble and return the genesis with the precompiles and faucet pre-funded
+		return &genesisT.Genesis{
+			Config:     config,
+			ExtraData:  append(append(make([]byte, 32), faucet[:]...), make([]byte, crypto.SignatureLength)...),
+			GasLimit:   6283185,
+			Difficulty: big.NewInt(1),
+			Alloc: map[common.Address]genesisT.GenesisAccount{
+				common.BytesToAddress([]byte{1}): {Balance: big.NewInt(1)}, // ECRecover
+				common.BytesToAddress([]byte{2}): {Balance: big.NewInt(1)}, // SHA256
+				common.BytesToAddress([]byte{3}): {Balance: big.NewInt(1)}, // RIPEMD
+				common.BytesToAddress([]byte{4}): {Balance: big.NewInt(1)}, // Identity
+				common.BytesToAddress([]byte{5}): {Balance: big.NewInt(1)}, // ModExp
+				common.BytesToAddress([]byte{6}): {Balance: big.NewInt(1)}, // ECAdd
+				common.BytesToAddress([]byte{7}): {Balance: big.NewInt(1)}, // ECScalarMul
+				common.BytesToAddress([]byte{8}): {Balance: big.NewInt(1)}, // ECPairing
+				faucet:                           {Balance: new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), 256), big.NewInt(9))},
+			},
+		}
+	}
+
+	// Use an ETC equivalent of AllEthashProtocolChanges.
+	// This will allow initial permanent disposal of the difficulty bomb,
+	// and we'll override the monetary policy block reward schedule to be a non-occurring.
+	//
+	// This was originally intended to be as follows, but import cycles prevent it.
+	// Leaving here to show provenance of initial configuration value.
+	// config := &coregeth.CoreGethChainConfig{}
+	// *config = *tests.Forks["ETC_Phoenix"].(*coregeth.CoreGethChainConfig)
+	config := &coregeth.CoreGethChainConfig{
+		NetworkID:          AllCliqueProtocolChanges.GetChainID().Uint64(), // Use network and chain IDs equivalent to Clique configuration, ie 1337.
+		Ethash:             new(ctypes.EthashConfig),
+		ChainID:            AllCliqueProtocolChanges.GetChainID(),
+		EIP2FBlock:         big.NewInt(0),
+		EIP7FBlock:         big.NewInt(0),
+		EIP150Block:        big.NewInt(0),
+		EIP155Block:        big.NewInt(0),
+		EIP160FBlock:       big.NewInt(0),
+		EIP161FBlock:       big.NewInt(0),
+		EIP170FBlock:       big.NewInt(0),
+		EIP100FBlock:       big.NewInt(0),
+		EIP140FBlock:       big.NewInt(0),
+		EIP198FBlock:       big.NewInt(0),
+		EIP211FBlock:       big.NewInt(0),
+		EIP212FBlock:       big.NewInt(0),
+		EIP213FBlock:       big.NewInt(0),
+		EIP214FBlock:       big.NewInt(0),
+		EIP658FBlock:       big.NewInt(0),
+		EIP145FBlock:       big.NewInt(0),
+		EIP1014FBlock:      big.NewInt(0),
+		EIP1052FBlock:      big.NewInt(0),
+		EIP1283FBlock:      big.NewInt(0),
+		PetersburgBlock:    big.NewInt(0),
+		EIP152FBlock:       big.NewInt(0),
+		EIP1108FBlock:      big.NewInt(0),
+		EIP1344FBlock:      big.NewInt(0),
+		EIP1884FBlock:      big.NewInt(0),
+		EIP2028FBlock:      big.NewInt(0),
+		EIP2200FBlock:      big.NewInt(0),
+		DisposalBlock:      big.NewInt(0),
+		ECIP1017FBlock:     nil, // disable block reward disinflation
+		ECIP1017EraRounds:  nil, // ^
+		ECIP1010PauseBlock: nil, // no need for difficulty bomb delay (see disposal block)
+		ECIP1010Length:     nil, // ^
 	}
 
 	// Assemble and return the genesis with the precompiles and faucet pre-funded
@@ -102,7 +168,7 @@ func DeveloperGenesisBlock(period uint64, faucet common.Address, useEthash bool)
 		Config:     config,
 		ExtraData:  append(append(make([]byte, 32), faucet[:]...), make([]byte, crypto.SignatureLength)...),
 		GasLimit:   6283185,
-		Difficulty: big.NewInt(1),
+		Difficulty: vars.MinimumDifficulty,
 		Alloc: map[common.Address]genesisT.GenesisAccount{
 			common.BytesToAddress([]byte{1}): {Balance: big.NewInt(1)}, // ECRecover
 			common.BytesToAddress([]byte{2}): {Balance: big.NewInt(1)}, // SHA256

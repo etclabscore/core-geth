@@ -81,6 +81,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 		Flags: []cli.Flag{
 			utils.DeveloperFlag,
 			utils.DeveloperPeriodFlag,
+			utils.DeveloperPoWFlag,
 		},
 	},
 	{
@@ -214,6 +215,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 		Name: "LOGGING AND DEBUGGING",
 		Flags: append([]cli.Flag{
 			utils.FakePoWFlag,
+			utils.FakePoWPoissonFlag,
 			utils.NoCompactionFlag,
 		}, debug.Flags...),
 	},

@@ -192,7 +192,11 @@ var (
 	}
 	DeveloperPeriodFlag = cli.IntFlag{
 		Name:  "dev.period",
-		Usage: "Block period to use in developer mode (0 = mine only if transaction pending)",
+		Usage: "Block period for proof-of-authority network to use in developer mode (0 = mine only if transaction pending)",
+	}
+	DeveloperPoWFlag = cli.BoolFlag{
+		Name:  "dev.pow",
+		Usage: "Ephemeral proof-of-work network with a pre-funded developer account, mining enabled",
 	}
 	IdentityFlag = cli.StringFlag{
 		Name:  "identity",
@@ -516,6 +520,10 @@ var (
 	FakePoWFlag = cli.BoolFlag{
 		Name:  "fakepow",
 		Usage: "Disables proof-of-work verification",
+	}
+	FakePoWPoissonFlag = cli.BoolFlag{
+		Name:  "fakepow.poisson",
+		Usage: "Disables proof-of-work verification and adds mining delay (Poisson) based on --miner.threads",
 	}
 	NoCompactionFlag = cli.BoolFlag{
 		Name:  "nocompaction",
@@ -1252,7 +1260,7 @@ func SetP2PConfig(ctx *cli.Context, cfg *p2p.Config) {
 		cfg.NetRestrict = list
 	}
 
-	if ctx.GlobalBool(DeveloperFlag.Name) {
+	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) {
 		// --dev mode can't use p2p networking.
 		cfg.MaxPeers = 0
 		cfg.ListenAddr = ":0"
@@ -1341,7 +1349,7 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 	case ctx.GlobalIsSet(DataDirFlag.Name):
 		cfg.DataDir = ctx.GlobalString(DataDirFlag.Name)
 
-	case ctx.GlobalBool(DeveloperFlag.Name):
+	case ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name):
 		cfg.DataDir = "" // unless explicitly requested, use memory databases
 
 	case (ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name)) && cfg.DataDir == node.DefaultDataDir():
@@ -1478,6 +1486,9 @@ func setEthash(ctx *cli.Context, cfg *eth.Config) {
 	setEthashCacheDir(ctx, cfg)
 	setEthashDatasetDir(ctx, cfg)
 
+	if ctx.GlobalBool(FakePoWPoissonFlag.Name) {
+		cfg.Ethash.PowMode = ethash.ModePoissonFake
+	}
 	if ctx.GlobalIsSet(EthashCachesInMemoryFlag.Name) {
 		cfg.Ethash.CachesInMem = ctx.GlobalInt(EthashCachesInMemoryFlag.Name)
 	}
@@ -1611,9 +1622,9 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, DeveloperFlag, LegacyTestnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV1Flag, ClassicFlag, KottiFlag, MordorFlag, EthersocialFlag, SocialFlag)
+	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, LegacyTestnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV1Flag, ClassicFlag, KottiFlag, MordorFlag, EthersocialFlag, SocialFlag)
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, SyncModeFlag, "light")
-	CheckExclusive(ctx, DeveloperFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
+	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	CheckExclusive(ctx, GCModeFlag, "archive", TxLookupLimitFlag)
 	// todo(rjl493456442) make it available for les server
 	// Ancient tx indices pruning is not available for les server now
@@ -1621,6 +1632,8 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, TxLookupLimitFlag)
 
 	CheckExclusive(ctx, AncientFlag, AncientRPCFlag)
+	CheckExclusive(ctx, DeveloperPoWFlag, DeveloperPeriodFlag, FakePoWFlag)
+	CheckExclusive(ctx, FakePoWFlag, FakePoWPoissonFlag)
 
 	var ks *keystore.KeyStore
 	if keystores := stack.AccountManager().Backends(keystore.KeyStoreType); len(keystores) > 0 {
@@ -1790,7 +1803,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		}
 	}
 
-	if ctx.GlobalBool(DeveloperFlag.Name) {
+	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) {
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 1337
 		}
@@ -1824,7 +1837,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		log.Info("Using developer account", "address", developer.Address)
 
 		// Create a new developer genesis block or reuse existing one
-		cfg.Genesis = params.DeveloperGenesisBlock(uint64(ctx.GlobalInt(DeveloperPeriodFlag.Name)), developer.Address)
+		cfg.Genesis = params.DeveloperGenesisBlock(uint64(ctx.GlobalInt(DeveloperPeriodFlag.Name)), developer.Address, ctx.GlobalBool(DeveloperPoWFlag.Name))
 		if ctx.GlobalIsSet(DataDirFlag.Name) {
 			// Check if we have an already initialized chain and fall back to
 			// that if so. Otherwise we need to generate a new genesis spec.
@@ -2007,7 +2020,7 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 }
 
 func MakeGenesis(ctx *cli.Context) *genesisT.Genesis {
-	if ctx.GlobalBool(DeveloperFlag.Name) {
+	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) {
 		Fatalf("Developer chains are ephemeral")
 	}
 	return genesisForCtxChainConfig(ctx)
@@ -2029,7 +2042,9 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 		}, chainDb)
 	} else {
 		engine = ethash.NewFaker()
-		if !ctx.GlobalBool(FakePoWFlag.Name) {
+		if ctx.GlobalBool(FakePoWPoissonFlag.Name) {
+			engine = ethash.NewPoissonFaker()
+		} else if !ctx.GlobalBool(FakePoWFlag.Name) {
 			engine = ethash.New(ethash.Config{
 				CacheDir:         stack.ResolvePath(eth.DefaultConfig.Ethash.CacheDir),
 				CachesInMem:      eth.DefaultConfig.Ethash.CachesInMem,

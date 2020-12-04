@@ -39,12 +39,14 @@ import (
 var DefaultFullGPOConfig = gasprice.Config{
 	Blocks:     20,
 	Percentile: 60,
+	MaxPrice:   gasprice.DefaultMaxPrice,
 }
 
 // DefaultLightGPOConfig contains default gasprice oracle settings for light client.
 var DefaultLightGPOConfig = gasprice.Config{
 	Blocks:     2,
 	Percentile: 60,
+	MaxPrice:   gasprice.DefaultMaxPrice,
 }
 
 // DefaultConfig contains default settings for use on the Ethereum main net.
@@ -110,8 +112,9 @@ type Config struct {
 	Genesis *genesisT.Genesis `toml:",omitempty"`
 
 	// Protocol options
-	NetworkId uint64 // Network ID to use for selecting peers to connect to
-	SyncMode  downloader.SyncMode
+	NetworkId        uint64 // Network ID to use for selecting peers to connect to
+	ProtocolVersions []uint // Protocol versions are the supported versions of the eth protocol (first is primary).
+	SyncMode         downloader.SyncMode
 
 	// This can be set to list of enrtree:// URLs which will be queried for
 	// for nodes to connect to.
@@ -187,4 +190,7 @@ type Config struct {
 
 	// CheckpointOracle is the configuration for checkpoint oracle.
 	CheckpointOracle *ctypes.CheckpointOracleConfig `toml:",omitempty"`
+
+	// Manual configuration field for ECBP1100 activation number. Used for modifying genesis config via CLI flag.
+	ECBP1100 *big.Int
 }

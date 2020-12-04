@@ -34,6 +34,8 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/core/types"
+	exprand "golang.org/x/exp/rand"
+	"gonum.org/v1/gonum/stat/distuv"
 )
 
 const (
@@ -45,6 +47,21 @@ var (
 	errNoMiningWork      = errors.New("no mining work available yet")
 	errInvalidSealResult = errors.New("invalid or stale proof-of-work solution")
 )
+
+// makePoissonFakeDelay uses the ethash.threads value as a mean time (lambda)
+// for a Poisson distribution, returning a random value from
+// that discrete function. I think a Poisson distribution probably
+// fairly accurately models real world block times.
+// Note that this is a hacky way to use ethash.threads since
+// lower values will yield faster blocks, but it saves having
+// to add or modify any more code than necessary.
+func (ethash *Ethash) makePoissonFakeDelay() float64 {
+	p := distuv.Poisson{
+		Lambda: float64(ethash.Threads()),
+		Src:    exprand.NewSource(uint64(time.Now().UnixNano())),
+	}
+	return p.Rand()
+}
 
 // Seal implements consensus.Engine, attempting to find a nonce that satisfies
 // the block's difficulty requirements.
@@ -58,6 +75,35 @@ func (ethash *Ethash) Seal(chain consensus.ChainHeaderReader, block *types.Block
 		default:
 			ethash.config.Log.Warn("Sealing result is not read by miner", "mode", "fake", "sealhash", ethash.SealHash(block.Header()))
 		}
+		return nil
+	} else if ethash.config.PowMode == ModePoissonFake {
+		go func(header *types.Header) {
+			// Assign random (but non-zero) values to header nonce and mix.
+			header.Nonce = types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64)))
+			b, _ := header.Nonce.MarshalText()
+			header.MixDigest = common.BytesToHash(b)
+
+			// Wait some amount of time.
+			timeout := time.NewTimer(time.Duration(ethash.makePoissonFakeDelay()) * time.Second)
+			defer timeout.Stop()
+
+			select {
+			case <-stop:
+				return
+			case <-ethash.update:
+				timeout.Stop()
+				if err := ethash.Seal(chain, block, results, stop); err != nil {
+					ethash.config.Log.Error("Failed to restart sealing after update", "err", err)
+				}
+			case <-timeout.C:
+				// Send the results when the timeout expires.
+				select {
+				case results <- block.WithSeal(header):
+				default:
+					ethash.config.Log.Warn("Sealing result is not read by miner", "mode", "fake", "sealhash", ethash.SealHash(block.Header()))
+				}
+			}
+		}(block.Header())
 		return nil
 	}
 	// If we're running a shared PoW, delegate sealing to it
@@ -344,8 +390,10 @@ func (s *remoteSealer) loop() {
 //   result[3], hex encoded block number
 func (s *remoteSealer) makeWork(block *types.Block) {
 	hash := s.ethash.SealHash(block.Header())
+	epochLength := calcEpochLength(block.NumberU64(), s.ethash.config.ECIP1099Block)
+	epoch := calcEpoch(block.NumberU64(), epochLength)
 	s.currentWork[0] = hash.Hex()
-	s.currentWork[1] = common.BytesToHash(SeedHash(block.NumberU64())).Hex()
+	s.currentWork[1] = common.BytesToHash(SeedHash(epoch, epochLength)).Hex()
 	s.currentWork[2] = common.BytesToHash(new(big.Int).Div(two256, block.Difficulty()).Bytes()).Hex()
 	s.currentWork[3] = hexutil.EncodeBig(block.Number())
 

@@ -60,6 +60,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.IdentityFlag,
 			utils.LightKDFFlag,
 			utils.WhitelistFlag,
+			utils.ECBP1100Flag,
 		},
 	},
 	{
@@ -80,6 +81,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 		Flags: []cli.Flag{
 			utils.DeveloperFlag,
 			utils.DeveloperPeriodFlag,
+			utils.DeveloperPoWFlag,
 		},
 	},
 	{
@@ -152,8 +154,8 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.GraphQLEnabledFlag,
 			utils.GraphQLCORSDomainFlag,
 			utils.GraphQLVirtualHostsFlag,
-			utils.RPCGlobalGasCap,
-			utils.RPCGlobalTxFeeCap,
+			utils.RPCGlobalGasCapFlag,
+			utils.RPCGlobalTxFeeCapFlag,
 			utils.JSpathFlag,
 			utils.ExecFlag,
 			utils.PreloadJSFlag,
@@ -166,6 +168,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.LegacyBootnodesV4Flag,
 			utils.LegacyBootnodesV5Flag,
 			utils.DNSDiscoveryFlag,
+			utils.EthProtocolsFlag,
 			utils.ListenPortFlag,
 			utils.MaxPeersFlag,
 			utils.MaxPendingPeersFlag,
@@ -197,6 +200,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 		Flags: []cli.Flag{
 			utils.GpoBlocksFlag,
 			utils.GpoPercentileFlag,
+			utils.GpoMaxGasPriceFlag,
 		},
 	},
 	{
@@ -211,6 +215,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 		Name: "LOGGING AND DEBUGGING",
 		Flags: append([]cli.Flag{
 			utils.FakePoWFlag,
+			utils.FakePoWPoissonFlag,
 			utils.NoCompactionFlag,
 		}, debug.Flags...),
 	},
@@ -219,7 +224,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 		Flags: metricsFlags,
 	},
 	{
-		Name:  "WHISPER (EXPERIMENTAL)",
+		Name:  "WHISPER (deprecated)",
 		Flags: whisperFlags,
 	},
 	{

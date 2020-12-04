@@ -60,7 +60,7 @@ jobs:
     env:
       - GO111MODULE=on
     script:
-      - make all
+      - go run build/ci.go install -dlgo
       - travis_wait 60 make test
 
   # Run build and tests with environment-aware possible artifact deployment.
@@ -71,7 +71,7 @@ jobs:
     dist: xenial
     go: 1.15.x
     script:
-    - make all
+    - go run build/ci.go install -dlgo
     - travis_wait 60 make test
     before_deploy:
     - sh build/deploy.sh
@@ -108,7 +108,7 @@ jobs:
       # Switch over GCC to cross compilation (breaks 386, hence why do it here only)
       - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-arm-linux-gnueabi libc6-dev-armel-cross gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross
       - sudo ln -s /usr/include/asm-generic /usr/include/asm
-      - GOPATH=~/go_arm GOARM=5 go run build/ci.go install -arch arm -cc arm-linux-gnueabi-gcc
+      - GOPATH=~/go_arm GOARM=5 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc
     before_deploy:
       - sh build/deploy_arm.sh
     deploy:
@@ -140,7 +140,7 @@ jobs:
     - ulimit -S -n $NOFILE
     - ulimit -n
     - unset -f cd
-    - make all
+    - go run build/ci.go install -dlgo
     before_deploy:
     - sh build/deploy.sh
     deploy:

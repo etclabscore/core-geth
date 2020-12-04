@@ -264,6 +264,15 @@ func (api *PrivateAdminAPI) ImportChain(file string) (bool, error) {
 	return true, nil
 }
 
+func (api *PrivateAdminAPI) Ecbp1100(blockNr rpc.BlockNumber) (bool, error) {
+	i := uint64(blockNr.Int64())
+	err := api.eth.blockchain.Config().SetECBP1100Transition(&i)
+	return api.eth.blockchain.IsArtificialFinalityEnabled() &&
+		api.eth.blockchain.Config().IsEnabled(
+			api.eth.blockchain.Config().GetECBP1100Transition,
+			api.eth.blockchain.CurrentBlock().Number()), err
+}
+
 // MaxPeers sets the maximum peer limit for the protocol manager and the p2p server.
 func (api *PrivateAdminAPI) MaxPeers(n int) (bool, error) {
 	api.eth.protocolManager.maxPeers = n
@@ -427,7 +436,12 @@ type storageEntry struct {
 
 // StorageRangeAt returns the storage at the given block height and transaction index.
 func (api *PrivateDebugAPI) StorageRangeAt(blockHash common.Hash, txIndex int, contractAddress common.Address, keyStart hexutil.Bytes, maxResult int) (StorageRangeResult, error) {
-	_, _, statedb, err := api.computeTxEnv(blockHash, txIndex, 0)
+	// Retrieve the block
+	block := api.eth.blockchain.GetBlockByHash(blockHash)
+	if block == nil {
+		return StorageRangeResult{}, fmt.Errorf("block %#x not found", blockHash)
+	}
+	_, _, statedb, err := api.computeTxEnv(block, txIndex, 0)
 	if err != nil {
 		return StorageRangeResult{}, err
 	}
@@ -542,4 +556,22 @@ func (api *PrivateDebugAPI) getModifiedAccounts(startBlock, endBlock *types.Bloc
 		dirty = append(dirty, common.BytesToAddress(key))
 	}
 	return dirty, nil
+}
+
+// RemovePendingTransaction removes a transaction from the txpool.
+// It returns the transaction removed, if any.
+func (api *PrivateDebugAPI) RemovePendingTransaction(hash common.Hash) (*types.Transaction, error) {
+	return api.eth.txPool.RemoveTx(hash), nil
+}
+
+// PrivateTraceAPI is the collection of Ethereum full node APIs exposed over
+// the private debugging endpoint.
+type PrivateTraceAPI struct {
+	eth *Ethereum
+}
+
+// NewPrivateTraceAPI creates a new API definition for the full node-related
+// private debug methods of the Ethereum service.
+func NewPrivateTraceAPI(eth *Ethereum) *PrivateTraceAPI {
+	return &PrivateTraceAPI{eth: eth}
 }

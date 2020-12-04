@@ -44,7 +44,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/downloader"
@@ -188,17 +190,17 @@ func main() {
 			{
 				*foundationFlag,
 				params.DefaultGenesisBlock(),
-				params.MainnetBootnodes,
+				nil,
 			},
 			{
 				*classicFlag,
 				params.DefaultClassicGenesisBlock(),
-				params.ClassicBootnodes,
+				nil,
 			},
 			{
 				*mordorFlag,
 				params.DefaultMordorGenesisBlock(),
-				params.MordorBootnodes,
+				nil,
 			},
 			{
 				*socialFlag,
@@ -218,22 +220,22 @@ func main() {
 			{
 				*testnetFlag,
 				params.DefaultRopstenGenesisBlock(),
-				params.RopstenBootnodes,
+				nil,
 			},
 			{
 				*rinkebyFlag,
 				params.DefaultRinkebyGenesisBlock(),
-				params.RinkebyBootnodes,
+				nil,
 			},
 			{
 				*kottiFlag,
 				params.DefaultKottiGenesisBlock(),
-				params.KottiBootnodes,
+				nil,
 			},
 			{
 				*goerliFlag,
 				params.DefaultGoerliGenesisBlock(),
-				params.GoerliBootnodes,
+				nil,
 			},
 		}
 
@@ -361,6 +363,16 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 	cfg.SyncMode = downloader.LightSync
 	cfg.NetworkId = network
 	cfg.Genesis = genesis
+	switch genesis {
+	case params.DefaultClassicGenesisBlock():
+		utils.SetDNSDiscoveryDefaults2(&cfg, params.ClassicDNSNetwork1)
+	case params.DefaultKottiGenesisBlock():
+		utils.SetDNSDiscoveryDefaults2(&cfg, params.KottiDNSNetwork1)
+	case params.DefaultMordorGenesisBlock():
+		utils.SetDNSDiscoveryDefaults2(&cfg, params.MordorDNSNetwork1)
+	default:
+		utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
+	}
 	lesBackend, err := les.New(stack, &cfg)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to register the Ethereum service: %w", err)

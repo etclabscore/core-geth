@@ -624,6 +624,17 @@ func (spec *ParityChainSpec) SetEIP2537Transition(n *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetECBP1100Transition() *uint64 {
+	return nil
+}
+
+func (spec *ParityChainSpec) SetECBP1100Transition(n *uint64) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
 func (spec *ParityChainSpec) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {
@@ -961,6 +972,17 @@ func (spec *ParityChainSpec) GetEthashECIP1041Transition() *uint64 {
 func (spec *ParityChainSpec) SetEthashECIP1041Transition(n *uint64) error {
 	spec.Engine.Ethash.Params.BombDefuseTransition = new(ParityU64).SetUint64(n)
 	return nil
+}
+
+func (spec *ParityChainSpec) GetEthashECIP1099Transition() *uint64 {
+	return nil
+}
+
+func (spec *ParityChainSpec) SetEthashECIP1099Transition(n *uint64) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
 }
 
 func (spec *ParityChainSpec) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {

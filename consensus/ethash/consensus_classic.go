@@ -18,13 +18,12 @@ package ethash
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
-func ecip1017BlockReward(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+func ecip1017BlockReward(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*big.Int, []*big.Int) {
 	blockReward := vars.FrontierBlockReward
 
 	// Ensure value 'era' is configured.
@@ -33,13 +32,15 @@ func ecip1017BlockReward(config ctypes.ChainConfigurator, state *state.StateDB, 
 	wr := GetBlockWinnerRewardByEra(era, blockReward)                    // wr "winner reward". 5, 4, 3.2, 2.56, ...
 	wurs := GetBlockWinnerRewardForUnclesByEra(era, uncles, blockReward) // wurs "winner uncle rewards"
 	wr.Add(wr, wurs)
-	state.AddBalance(header.Coinbase, wr) // $$
 
 	// Reward uncle miners.
-	for _, uncle := range uncles {
+	uncleRewards := make([]*big.Int, len(uncles))
+	for i, uncle := range uncles {
 		ur := GetBlockUncleRewardByEra(era, header, uncle, blockReward)
-		state.AddBalance(uncle.Coinbase, ur) // $$
+		uncleRewards[i] = ur
 	}
+
+	return wr, uncleRewards
 }
 
 func ecip1010Explosion(config ctypes.ChainConfigurator, next *big.Int, exPeriodRef *big.Int) {

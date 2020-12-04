@@ -1695,13 +1695,17 @@ func TestGolangBindings(t *testing.T) {
 	if !common.FileExist(gocmd) {
 		t.Skip("go sdk not found for testing")
 	}
+	// Create a temporary workspace for the test suite
+	ws, err := ioutil.TempDir("", "binding-test")
+	if err != nil {
+		t.Fatalf("failed to create temporary workspace: %v", err)
+	}
+	//defer os.RemoveAll(ws)
 
-	pkg := "bindtest"
-	if err := os.MkdirAll(pkg, 0700); err != nil {
+	pkg := filepath.Join(ws, "bindtest")
+	if err = os.MkdirAll(pkg, 0700); err != nil {
 		t.Fatalf("failed to create package: %v", err)
 	}
-	defer os.RemoveAll(pkg)
-
 	// Generate the test suite for all the contracts
 	for i, tt := range bindTests {
 		var types []string

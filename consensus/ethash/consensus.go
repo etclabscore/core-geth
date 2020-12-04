@@ -463,7 +463,7 @@ func (ethash *Ethash) VerifySeal(chain consensus.ChainHeaderReader, header *type
 // to make remote mining fast.
 func (ethash *Ethash) verifySeal(chain consensus.ChainHeaderReader, header *types.Header, fulldag bool) error {
 	// If we're running a fake PoW, accept any seal as valid
-	if ethash.config.PowMode == ModeFake || ethash.config.PowMode == ModeFullFake {
+	if ethash.config.PowMode == ModeFake || ethash.config.PowMode == ModePoissonFake || ethash.config.PowMode == ModeFullFake {
 		time.Sleep(ethash.fakeDelay)
 		if ethash.fakeFail == header.Number.Uint64() {
 			return errInvalidPoW
@@ -502,8 +502,9 @@ func (ethash *Ethash) verifySeal(chain consensus.ChainHeaderReader, header *type
 	// If slow-but-light PoW verification was requested (or DAG not yet ready), use an ethash cache
 	if !fulldag {
 		cache := ethash.cache(number)
-
-		size := datasetSize(number)
+		epochLength := calcEpochLength(number, ethash.config.ECIP1099Block)
+		epoch := calcEpoch(number, epochLength)
+		size := datasetSize(epoch)
 		if ethash.config.PowMode == ModeTest {
 			size = 32 * 1024
 		}
@@ -583,31 +584,44 @@ var (
 	big32 = big.NewInt(32)
 )
 
-// AccumulateRewards credits the coinbase of the given block with the mining
-// reward. The total reward consists of the static block reward and rewards for
-// included uncles. The coinbase of each uncle block is also rewarded.
-func accumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+// GetRewards calculates the mining reward.
+// The total reward consists of the static block reward and rewards for
+// included uncles. The coinbase of each uncle block is also calculated.
+func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*big.Int, []*big.Int) {
 	if config.IsEnabled(config.GetEthashECIP1017Transition, header.Number) {
-		ecip1017BlockReward(config, state, header, uncles)
-		return
+		return ecip1017BlockReward(config, header, uncles)
 	}
 
 	blockReward := ctypes.EthashBlockReward(config, header.Number)
 
 	// Accumulate the rewards for the miner and any included uncles
+	uncleRewards := make([]*big.Int, len(uncles))
 	reward := new(big.Int).Set(blockReward)
 	r := new(big.Int)
-	for _, uncle := range uncles {
+	for i, uncle := range uncles {
 		r.Add(uncle.Number, big8)
 		r.Sub(r, header.Number)
 		r.Mul(r, blockReward)
 		r.Div(r, big8)
-		state.AddBalance(uncle.Coinbase, r)
+
+		ur := new(big.Int).Set(r)
+		uncleRewards[i] = ur
 
 		r.Div(blockReward, big32)
 		reward.Add(reward, r)
 	}
-	state.AddBalance(header.Coinbase, reward)
+
+	return reward, uncleRewards
+}
+
+// accumulateRewards credits the coinbase of the given block with the mining
+// reward. The coinbase of each uncle block is also rewarded.
+func accumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
+	minerReward, uncleRewards := GetRewards(config, header, uncles)
+	for i, uncle := range uncles {
+		state.AddBalance(uncle.Coinbase, uncleRewards[i])
+	}
+	state.AddBalance(header.Coinbase, minerReward)
 }
 
 // As of "Era 2" (zero-index era 1), uncle miners and winners are rewarded equally for each included block.

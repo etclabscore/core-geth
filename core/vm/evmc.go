@@ -152,8 +152,8 @@ func (host *hostContext) SetStorage(addr common.Address, key common.Hash, value 
 	cleanRefund := vars.NetSstoreResetRefund
 
 	if hasEIP2200 {
-		resetClearRefund = vars.SstoreInitRefundEIP2200
-		cleanRefund = vars.SstoreCleanRefundEIP2200
+		resetClearRefund = vars.SstoreSetGasEIP2200 - vars.SloadGasEIP2200 // 19200
+		cleanRefund = vars.SstoreResetGasEIP2200 - vars.SloadGasEIP2200 // 4200
 	}
 
 	if original == current {

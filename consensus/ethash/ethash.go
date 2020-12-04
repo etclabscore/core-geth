@@ -18,6 +18,7 @@
 package ethash
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"math"
@@ -34,7 +35,9 @@ import (
 	"unsafe"
 
 	mmap "github.com/edsrzf/mmap-go"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -48,7 +51,7 @@ var (
 	two256 = new(big.Int).Exp(big.NewInt(2), big.NewInt(256), big.NewInt(0))
 
 	// sharedEthash is a full instance that can be shared between multiple users.
-	sharedEthash = New(Config{"", 3, 0, false, "", 1, 0, false, ModeNormal, nil}, nil, false)
+	sharedEthash = New(Config{"", 3, 0, false, "", 1, 0, false, ModeNormal, nil, nil}, nil, false)
 
 	// algorithmRevision is the data structure version used for file naming.
 	algorithmRevision = 23
@@ -64,12 +67,39 @@ func isLittleEndian() bool {
 	return *(*byte)(unsafe.Pointer(&n)) == 0x04
 }
 
+// uint32Array2ByteArray returns the bytes represented by uint32 array c
+func uint32Array2ByteArray(c []uint32) []byte {
+	buf := make([]byte, len(c)*4)
+	if isLittleEndian() {
+		for i, v := range c {
+			binary.LittleEndian.PutUint32(buf[i*4:], v)
+		}
+	} else {
+		for i, v := range c {
+			binary.BigEndian.PutUint32(buf[i*4:], v)
+		}
+	}
+	return buf
+}
+
+// bytes2Keccak256 returns the keccak256 hash as a hex string (0x prefixed)
+// for a given uint32 array (cache/dataset)
+func uint32Array2Keccak256(data []uint32) string {
+	// convert to bytes
+	bytes := uint32Array2ByteArray(data)
+	// hash with keccak256
+	digest := crypto.Keccak256(bytes)
+	// return hex string
+	return hexutil.Encode(digest)
+}
+
 // memoryMap tries to memory map a file of uint32s for read only access.
 func memoryMap(path string, lock bool) (*os.File, mmap.MMap, []uint32, error) {
 	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
 	if err != nil {
 		return nil, nil, nil, err
 	}
+
 	mem, buffer, err := memoryMapFile(file, false)
 	if err != nil {
 		file.Close()
@@ -155,7 +185,7 @@ func memoryMapAndGenerate(path string, size uint64, lock bool, generator func(bu
 // lru tracks caches or datasets by their last use time, keeping at most N of them.
 type lru struct {
 	what string
-	new  func(epoch uint64) interface{}
+	new  func(epoch uint64, epochLength uint64) interface{}
 	mu   sync.Mutex
 	// Items are kept in a LRU cache, but there is a special case:
 	// We always keep an item for (highest seen epoch) + 1 as the 'future item'.
@@ -166,7 +196,7 @@ type lru struct {
 
 // newlru create a new least-recently-used cache for either the verification caches
 // or the mining datasets.
-func newlru(what string, maxItems int, new func(epoch uint64) interface{}) *lru {
+func newlru(what string, maxItems int, new func(epoch uint64, epochLength uint64) interface{}) *lru {
 	if maxItems <= 0 {
 		maxItems = 1
 	}
@@ -179,7 +209,7 @@ func newlru(what string, maxItems int, new func(epoch uint64) interface{}) *lru 
 // get retrieves or creates an item for the given epoch. The first return value is always
 // non-nil. The second return value is non-nil if lru thinks that an item will be useful in
 // the near future.
-func (lru *lru) get(epoch uint64) (item, future interface{}) {
+func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (item, future interface{}) {
 	lru.mu.Lock()
 	defer lru.mu.Unlock()
 
@@ -190,15 +220,27 @@ func (lru *lru) get(epoch uint64) (item, future interface{}) {
 			item = lru.futureItem
 		} else {
 			log.Trace("Requiring new ethash "+lru.what, "epoch", epoch)
-			item = lru.new(epoch)
+			item = lru.new(epoch, epochLength)
 		}
 		lru.cache.Add(epoch, item)
 	}
+
+	// Ensure pre-generation handles ecip-1099 changeover correctly
+	var nextEpoch = epoch + 1
+	var nextEpochLength = epochLength
+	if ecip1099FBlock != nil {
+		nextEpochBlock := nextEpoch * epochLength
+		if nextEpochBlock == *ecip1099FBlock && epochLength == epochLengthDefault {
+			nextEpoch = nextEpoch / 2
+			nextEpochLength = epochLengthECIP1099
+		}
+	}
+
 	// Update the 'future item' if epoch is larger than previously seen.
-	if epoch < maxEpoch-1 && lru.future < epoch+1 {
-		log.Trace("Requiring new future ethash "+lru.what, "epoch", epoch+1)
-		future = lru.new(epoch + 1)
-		lru.future = epoch + 1
+	if epoch < maxEpoch-1 && lru.future < nextEpoch {
+		log.Trace("Requiring new future ethash "+lru.what, "epoch", nextEpoch)
+		future = lru.new(nextEpoch, nextEpochLength)
+		lru.future = nextEpoch
 		lru.futureItem = future
 	}
 	return item, future
@@ -206,31 +248,75 @@ func (lru *lru) get(epoch uint64) (item, future interface{}) {
 
 // cache wraps an ethash cache with some metadata to allow easier concurrent use.
 type cache struct {
-	epoch uint64    // Epoch for which this cache is relevant
-	dump  *os.File  // File descriptor of the memory mapped cache
-	mmap  mmap.MMap // Memory map itself to unmap before releasing
-	cache []uint32  // The actual cache data content (may be memory mapped)
-	once  sync.Once // Ensures the cache is generated only once
+	epoch       uint64    // Epoch for which this cache is relevant
+	epochLength uint64    // Epoch length (ECIP-1099)
+	dump        *os.File  // File descriptor of the memory mapped cache
+	mmap        mmap.MMap // Memory map itself to unmap before releasing
+	cache       []uint32  // The actual cache data content (may be memory mapped)
+	once        sync.Once // Ensures the cache is generated only once
 }
 
 // newCache creates a new ethash verification cache and returns it as a plain Go
 // interface to be usable in an LRU cache.
-func newCache(epoch uint64) interface{} {
-	return &cache{epoch: epoch}
+func newCache(epoch uint64, epochLength uint64) interface{} {
+	return &cache{epoch: epoch, epochLength: epochLength}
+}
+
+// isBadCache checks a given caches/datsets keccak256 hash against bad caches (ecip-1099)
+// this is incase the client has already written non-ecip1099 caches to disk,
+// instead of blindly trusting as seedhashes/filename match, compare checksums.
+func isBadCache(epoch uint64, epochLength uint64, data []uint32) (bool, string) {
+	// Check for bad caches/datasets at ecip-1099 transitions
+	if epochLength == epochLengthECIP1099 {
+		var badCache string
+		var badDataset string
+		var hash string
+
+		if epoch == 42 { // mordor
+			hash = uint32Array2Keccak256(data)
+			// bad cache generated using: geth makecache 2520001 [path] --epoch.length=30000
+			badCache = "0xafa2a00911843b0a67314614e629d9e550ef74da4dca2215c475a0f93333aedc"
+			// bad dataset generated using: geth makedag 2520001 [path] --epoch.length=30000
+			badDataset = "0xc07d08a9f8a2b5af0e87f68c8df9eaf28d7cef2ae3fe86d8c306d9139861c15f"
+		}
+		if epoch == 195 { // classic mainnet
+			hash = uint32Array2Keccak256(data)
+			// bad cache generated using: geth makecache 11700001 [path] --epoch.length=30000
+			badCache = "0x5794130ea9e433185214fb4032edbd3473499267e197d9003a6a1a5bd300b3e5"
+			// bad dataset generated using: geth makedag 11700001 [path] --epoch.length=30000
+			badDataset = "0xe9cc9df33ee6de075558fb07fd67d59068a9751c36c6e9ae38163f6da90a2240"
+		}
+		if epoch == 196 { // classic mainnet
+			hash = uint32Array2Keccak256(data)
+			// bad cache generated using: geth makecache 11760001 [path] --epoch.length=30000
+			badCache = "0x4a37ee8c8cb4f75c05e23369cadeec7a6ed7386226a629794a733e0249d92d5f"
+			// bad dataset generated using: geth makedag 11760001 [path] --epoch.length=30000
+			badDataset = "0xf281b059ce535a7c146c00ada26114406bc08a9657bf9147542f92f9f9f08bf2"
+		}
+		// check if cache is bad
+		if hash != "" && (hash == badCache || hash == badDataset) {
+			// cache/dataset is bad.
+			return true, hash
+		}
+		// cache is good
+		return false, hash
+	}
+	// cache is not ecip-1099 enabled
+	return false, ""
 }
 
 // generate ensures that the cache content is generated before use.
 func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 	c.once.Do(func() {
-		size := cacheSize(c.epoch*epochLength + 1)
-		seed := seedHash(c.epoch*epochLength + 1)
+		size := cacheSize(c.epoch)
+		seed := seedHash(c.epoch, c.epochLength)
 		if test {
 			size = 1024
 		}
 		// If we don't store anything on disk, generate and return.
 		if dir == "" {
 			c.cache = make([]uint32, size/4)
-			generateCache(c.cache, c.epoch, seed)
+			generateCache(c.cache, c.epoch, c.epochLength, seed)
 			return
 		}
 		// Disk storage is needed, this will get fancy
@@ -250,21 +336,27 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		c.dump, c.mmap, c.cache, err = memoryMap(path, lock)
 		if err == nil {
 			logger.Debug("Loaded old ethash cache from disk")
-			return
+			isBad, hash := isBadCache(c.epoch, c.epochLength, c.cache)
+			if isBad {
+				// cache is bad. Set err, then continue as if cache could not be read from disk.
+				err = fmt.Errorf("Cache with hash %s has been flagged as bad", hash)
+			} else {
+				return
+			}
 		}
 		logger.Debug("Failed to load old ethash cache", "err", err)
 
-		// No previous cache available, create a new cache file to fill
-		c.dump, c.mmap, c.cache, err = memoryMapAndGenerate(path, size, lock, func(buffer []uint32) { generateCache(buffer, c.epoch, seed) })
+		// No usable previous cache available, create a new cache file to fill
+		c.dump, c.mmap, c.cache, err = memoryMapAndGenerate(path, size, lock, func(buffer []uint32) { generateCache(buffer, c.epoch, c.epochLength, seed) })
 		if err != nil {
 			logger.Error("Failed to generate mapped ethash cache", "err", err)
 
 			c.cache = make([]uint32, size/4)
-			generateCache(c.cache, c.epoch, seed)
+			generateCache(c.cache, c.epoch, c.epochLength, seed)
 		}
 		// Iterate over all previous instances and delete old ones
 		for ep := int(c.epoch) - limit; ep >= 0; ep-- {
-			seed := seedHash(uint64(ep)*epochLength + 1)
+			seed := seedHash(uint64(ep), c.epochLength)
 			path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
 			os.Remove(path)
 		}
@@ -282,18 +374,19 @@ func (c *cache) finalizer() {
 
 // dataset wraps an ethash dataset with some metadata to allow easier concurrent use.
 type dataset struct {
-	epoch   uint64    // Epoch for which this cache is relevant
-	dump    *os.File  // File descriptor of the memory mapped cache
-	mmap    mmap.MMap // Memory map itself to unmap before releasing
-	dataset []uint32  // The actual cache data content
-	once    sync.Once // Ensures the cache is generated only once
-	done    uint32    // Atomic flag to determine generation status
+	epoch       uint64    // Epoch for which this cache is relevant
+	epochLength uint64    // Epoch length (ECIP-1099)
+	dump        *os.File  // File descriptor of the memory mapped cache
+	mmap        mmap.MMap // Memory map itself to unmap before releasing
+	dataset     []uint32  // The actual cache data content
+	once        sync.Once // Ensures the cache is generated only once
+	done        uint32    // Atomic flag to determine generation status
 }
 
 // newDataset creates a new ethash mining dataset and returns it as a plain Go
 // interface to be usable in an LRU cache.
-func newDataset(epoch uint64) interface{} {
-	return &dataset{epoch: epoch}
+func newDataset(epoch uint64, epochLength uint64) interface{} {
+	return &dataset{epoch: epoch, epochLength: epochLength}
 }
 
 // generate ensures that the dataset content is generated before use.
@@ -301,10 +394,9 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 	d.once.Do(func() {
 		// Mark the dataset generated after we're done. This is needed for remote
 		defer atomic.StoreUint32(&d.done, 1)
-
-		csize := cacheSize(d.epoch*epochLength + 1)
-		dsize := datasetSize(d.epoch*epochLength + 1)
-		seed := seedHash(d.epoch*epochLength + 1)
+		csize := cacheSize(d.epoch)
+		dsize := datasetSize(d.epoch)
+		seed := seedHash(d.epoch, d.epochLength)
 		if test {
 			csize = 1024
 			dsize = 32 * 1024
@@ -312,10 +404,10 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		// If we don't store anything on disk, generate and return
 		if dir == "" {
 			cache := make([]uint32, csize/4)
-			generateCache(cache, d.epoch, seed)
+			generateCache(cache, d.epoch, d.epochLength, seed)
 
 			d.dataset = make([]uint32, dsize/4)
-			generateDataset(d.dataset, d.epoch, cache)
+			generateDataset(d.dataset, d.epoch, d.epochLength, cache)
 
 			return
 		}
@@ -335,25 +427,34 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		var err error
 		d.dump, d.mmap, d.dataset, err = memoryMap(path, lock)
 		if err == nil {
-			logger.Debug("Loaded old ethash dataset from disk")
-			return
+			logger.Debug("Loaded old ethash dataset from disk", "path", path)
+			isBad, hash := isBadCache(d.epoch, d.epochLength, d.dataset)
+			if isBad {
+				// dataset is bad. Continue as if cache could not be read from disk.
+				err = fmt.Errorf("Dataset with hash %s has been flagged as bad", hash)
+				// regenerating DAG is a intensive process, we should let the user know
+				// why it's happening.
+				logger.Error("Bad DAG on disk", "path", path, "hash", hash)
+			} else {
+				return
+			}
 		}
 		logger.Debug("Failed to load old ethash dataset", "err", err)
 
-		// No previous dataset available, create a new dataset file to fill
+		// No usable previous dataset available, create a new dataset file to fill
 		cache := make([]uint32, csize/4)
-		generateCache(cache, d.epoch, seed)
+		generateCache(cache, d.epoch, d.epochLength, seed)
 
-		d.dump, d.mmap, d.dataset, err = memoryMapAndGenerate(path, dsize, lock, func(buffer []uint32) { generateDataset(buffer, d.epoch, cache) })
+		d.dump, d.mmap, d.dataset, err = memoryMapAndGenerate(path, dsize, lock, func(buffer []uint32) { generateDataset(buffer, d.epoch, d.epochLength, cache) })
 		if err != nil {
 			logger.Error("Failed to generate mapped ethash dataset", "err", err)
 
 			d.dataset = make([]uint32, dsize/2)
-			generateDataset(d.dataset, d.epoch, cache)
+			generateDataset(d.dataset, d.epoch, d.epochLength, cache)
 		}
 		// Iterate over all previous instances and delete old ones
 		for ep := int(d.epoch) - limit; ep >= 0; ep-- {
-			seed := seedHash(uint64(ep)*epochLength + 1)
+			seed := seedHash(uint64(ep), d.epochLength)
 			path := filepath.Join(dir, fmt.Sprintf("full-R%d-%x%s", algorithmRevision, seed[:8], endian))
 			os.Remove(path)
 		}
@@ -377,14 +478,16 @@ func (d *dataset) finalizer() {
 }
 
 // MakeCache generates a new ethash cache and optionally stores it to disk.
-func MakeCache(block uint64, dir string) {
-	c := cache{epoch: block / epochLength}
+func MakeCache(block uint64, epochLength uint64, dir string) {
+	epoch := calcEpoch(block, epochLength)
+	c := cache{epoch: epoch, epochLength: epochLength}
 	c.generate(dir, math.MaxInt32, false, false)
 }
 
 // MakeDataset generates a new ethash dataset and optionally stores it to disk.
-func MakeDataset(block uint64, dir string) {
-	d := dataset{epoch: block / epochLength}
+func MakeDataset(block uint64, epochLength uint64, dir string) {
+	epoch := calcEpoch(block, epochLength)
+	d := dataset{epoch: epoch, epochLength: epochLength}
 	d.generate(dir, math.MaxInt32, false, false)
 }
 
@@ -396,8 +499,27 @@ const (
 	ModeShared
 	ModeTest
 	ModeFake
+	ModePoissonFake
 	ModeFullFake
 )
+
+func (m Mode) String() string {
+	switch m {
+	case ModeNormal:
+		return "Normal"
+	case ModeShared:
+		return "Shared"
+	case ModeTest:
+		return "Test"
+	case ModeFake:
+		return "Fake"
+	case ModePoissonFake:
+		return "PoissonFake"
+	case ModeFullFake:
+		return "FullFake"
+	}
+	return "unknown"
+}
 
 // Config are the configuration parameters of the ethash.
 type Config struct {
@@ -412,6 +534,8 @@ type Config struct {
 	PowMode          Mode
 
 	Log log.Logger `toml:"-"`
+	// ECIP-1099
+	ECIP1099Block *uint64 `toml:"-"`
 }
 
 // Ethash is a consensus engine based on proof-of-work implementing the ethash
@@ -518,6 +642,18 @@ func NewFakeDelayer(delay time.Duration) *Ethash {
 	}
 }
 
+// NewPoissonFaker creates a ethash consensus engine with a fake PoW scheme that
+// accepts all blocks as valid, but delays mining by some time based on miner.threads, though
+// they still have to conform to the Ethereum consensus rules.
+func NewPoissonFaker() *Ethash {
+	return &Ethash{
+		config: Config{
+			PowMode: ModePoissonFake,
+			Log:     log.Root(),
+		},
+	}
+}
+
 // NewFullFaker creates an ethash consensus engine with a full fake scheme that
 // accepts all blocks as valid, without checking any consensus rules whatsoever.
 func NewFullFaker() *Ethash {
@@ -553,8 +689,9 @@ func (ethash *Ethash) Close() error {
 // by first checking against a list of in-memory caches, then against caches
 // stored on disk, and finally generating one if none can be found.
 func (ethash *Ethash) cache(block uint64) *cache {
-	epoch := block / epochLength
-	currentI, futureI := ethash.caches.get(epoch)
+	epochLength := calcEpochLength(block, ethash.config.ECIP1099Block)
+	epoch := calcEpoch(block, epochLength)
+	currentI, futureI := ethash.caches.get(epoch, epochLength, ethash.config.ECIP1099Block)
 	current := currentI.(*cache)
 
 	// Wait for generation finish.
@@ -576,9 +713,15 @@ func (ethash *Ethash) cache(block uint64) *cache {
 // generates on a background thread.
 func (ethash *Ethash) dataset(block uint64, async bool) *dataset {
 	// Retrieve the requested ethash dataset
-	epoch := block / epochLength
-	currentI, futureI := ethash.datasets.get(epoch)
+	epochLength := calcEpochLength(block, ethash.config.ECIP1099Block)
+	epoch := calcEpoch(block, epochLength)
+	currentI, futureI := ethash.datasets.get(epoch, epochLength, ethash.config.ECIP1099Block)
 	current := currentI.(*dataset)
+
+	// set async false if ecip-1099 transition in case of regeneratiion bad DAG on disk
+	if epochLength == epochLengthECIP1099 && (epoch == 42 || epoch == 195) {
+		async = false
+	}
 
 	// If async is specified, generate everything in a background thread
 	if async && !current.generated() {
@@ -677,6 +820,16 @@ func (ethash *Ethash) APIs(chain consensus.ChainHeaderReader) []rpc.API {
 
 // SeedHash is the seed to use for generating a verification cache and the mining
 // dataset.
-func SeedHash(block uint64) []byte {
-	return seedHash(block)
+func SeedHash(epoch uint64, epochLength uint64) []byte {
+	return seedHash(epoch, epochLength)
+}
+
+// CalcEpochLength returns the epoch length for a given block number (ECIP-1099)
+func CalcEpochLength(block uint64, ecip1099FBlock *uint64) uint64 {
+	return calcEpochLength(block, ecip1099FBlock)
+}
+
+// CalcEpoch returns the epoch for a given block number (ECIP-1099)
+func CalcEpoch(block uint64, epochLength uint64) uint64 {
+	return calcEpoch(block, epochLength)
 }

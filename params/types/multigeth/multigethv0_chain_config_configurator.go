@@ -416,6 +416,17 @@ func (c *ChainConfig) SetEIP2537Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
+func (c *ChainConfig) GetECBP1100Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetECBP1100Transition(n *uint64) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {
@@ -748,6 +759,20 @@ func (c *ChainConfig) SetEthashECIP1041Transition(n *uint64) error {
 	}
 	c.DisposalBlock = setBig(c.DisposalBlock, n)
 	return nil
+}
+
+func (c *ChainConfig) GetEthashECIP1099Transition() *uint64 {
+	return nil
+}
+
+func (c *ChainConfig) SetEthashECIP1099Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
 }
 
 func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {

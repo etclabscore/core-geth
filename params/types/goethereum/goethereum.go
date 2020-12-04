@@ -70,6 +70,9 @@ type ChainConfig struct {
 
 	EIP1706Transition  *big.Int `json:"-"`
 	ECIP1080Transition *big.Int `json:"-"`
+
+	// Cache types for use with testing, but will not show up in config API.
+	ecbp1100Transition *big.Int
 }
 
 // String implements the fmt.Stringer interface.

@@ -136,7 +136,7 @@ func TestEquivalent_Features(t *testing.T) {
 		}
 		paritySupports := func(forkName string) bool {
 			for _, s := range parityUnsupportedForks {
-				if strings.Contains(strings.ToLower(s), "yolo") {
+				if strings.Contains(strings.ToLower(forkName), s) {
 					return false
 				}
 			}

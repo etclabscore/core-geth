@@ -603,18 +603,6 @@ func (api *PrivateDebugAPI) standardTraceBlockToFile(ctx context.Context, block 
 		chainConfigCopy := new(ctypes.ChainConfigurator)
 		*chainConfigCopy = chainConfig
 		chainConfig = *chainConfigCopy
-		if eip2315 := config.Overrides.GetEIP2315Transition(); eip2315 != nil {
-			if err := chainConfig.SetEIP2315Transition(eip2315); err != nil {
-				return nil, err
-			}
-			canon = false
-		}
-		if eip2537 := config.Overrides.GetEIP2537Transition(); eip2537 != nil {
-			if err := chainConfig.SetEIP2537Transition(eip2537); err != nil {
-				return nil, err
-			}
-			canon = false
-		}
 		if eip2929 := config.Overrides.GetEIP2929Transition(); eip2929 != nil {
 			if err := chainConfig.SetEIP2929Transition(eip2929); err != nil {
 				return nil, err

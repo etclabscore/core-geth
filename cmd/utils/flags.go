@@ -24,7 +24,6 @@ import (
 	"io/ioutil"
 	"math/big"
 	"os"
-	"os/user"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -1449,12 +1448,7 @@ func setEthashDatasetDir(ctx *cli.Context, cfg *eth.Config) {
 
 	case (ctx.GlobalBool(ClassicFlag.Name) || ctx.GlobalBool(MordorFlag.Name)) && cfg.Ethash.DatasetDir == eth.DefaultConfig.Ethash.DatasetDir:
 		// ECIP-1099 is set, use etchash dir for DAGs instead
-		home := os.Getenv("HOME")
-		if home == "" {
-			if user, err := user.Current(); err == nil {
-				home = user.HomeDir
-			}
-		}
+		home := HomeDir()
 		if runtime.GOOS == "darwin" {
 			cfg.Ethash.DatasetDir = filepath.Join(home, "Library", "Etchash")
 		} else if runtime.GOOS == "windows" {

@@ -400,6 +400,24 @@ func (c *ChainConfig) SetECBP1100Transition(n *uint64) error {
 	return nil
 }
 
+func (c *ChainConfig) GetEIP2315Transition() *uint64 {
+	return bigNewU64(c.YoloV2Block)
+}
+
+func (c *ChainConfig) SetEIP2315Transition(n *uint64) error {
+	c.YoloV2Block = setBig(c.YoloV2Block, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEIP2929Transition() *uint64 {
+	return bigNewU64(c.YoloV2Block)
+}
+
+func (c *ChainConfig) SetEIP2929Transition(n *uint64) error {
+	c.YoloV2Block = setBig(c.YoloV2Block, n)
+	return nil
+}
+
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

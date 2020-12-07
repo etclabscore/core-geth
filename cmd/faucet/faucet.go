@@ -272,7 +272,7 @@ func main() {
 	log.Info("configured chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", fmt.Sprintf("%v", genesis.Config))
 
 	// Convert the bootnodes to internal enode representations
-	for _, boot := range strings.Split(*bootFlag, ",") {
+	for _, boot := range utils.SplitAndTrim(*bootFlag) {
 		if url, err := discv5.ParseNode(boot); err == nil {
 			enodes = append(enodes, url)
 		} else {

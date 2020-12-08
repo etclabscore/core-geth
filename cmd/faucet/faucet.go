@@ -363,16 +363,19 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 	cfg.SyncMode = downloader.LightSync
 	cfg.NetworkId = network
 	cfg.Genesis = genesis
-	switch genesis {
-	case params.DefaultClassicGenesisBlock():
-		utils.SetDNSDiscoveryDefaults2(&cfg, params.ClassicDNSNetwork1)
-	case params.DefaultKottiGenesisBlock():
+	switch core.GenesisToBlock(genesis, nil).Hash() {
+	case params.MainnetGenesisHash:
+		if genesis.GetChainID().Uint64() == params.DefaultClassicGenesisBlock().GetChainID().Uint64() {
+			utils.SetDNSDiscoveryDefaults2(&cfg, params.ClassicDNSNetwork1)
+		}
+	case params.KottiGenesisHash:
 		utils.SetDNSDiscoveryDefaults2(&cfg, params.KottiDNSNetwork1)
-	case params.DefaultMordorGenesisBlock():
+	case params.MordorGenesisHash:
 		utils.SetDNSDiscoveryDefaults2(&cfg, params.MordorDNSNetwork1)
 	default:
 		utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
 	}
+	log.Info("Config discovery", "urls", cfg.DiscoveryURLs)
 	lesBackend, err := les.New(stack, &cfg)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to register the Ethereum service: %w", err)
@@ -391,6 +394,7 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 	for _, boot := range enodes {
 		old, err := enode.Parse(enode.ValidSchemes, boot.String())
 		if err == nil {
+			log.Info("Manually adding bootnode", "enode", old.String())
 			stack.Server().AddPeer(old)
 		}
 	}

@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"reflect"
 	"runtime"
 	"sync"
 	"time"
@@ -598,13 +599,24 @@ func (api *PrivateDebugAPI) standardTraceBlockToFile(ctx context.Context, block 
 	// Therefore, it's perfectly valid to specify `"futureForkBlock": 0`, to enable `futureFork`
 
 	if config != nil && config.Overrides != nil {
-		// Copy the config, to not screw up the main config
-		// Note: the Clique-part is _not_ deep copied
-		chainConfigCopy := new(ctypes.ChainConfigurator)
-		*chainConfigCopy = chainConfig
-		chainConfig = *chainConfigCopy
-		if eip2929 := config.Overrides.GetEIP2929Transition(); eip2929 != nil {
-			if err := chainConfig.SetEIP2929Transition(eip2929); err != nil {
+
+		overrideEIP2929 := config.Overrides.GetEIP2929Transition()
+		existingEIP2929 := chainConfig.GetEIP2929Transition()
+
+		// We only need to make a copy if this transition is actually going to be overridden.
+		// This very ugly logic assumes that testing value equivalence 4 times is cheaper than copying an arbitrary
+		// (and probably biggish) interface value unnecessarily.
+		if (overrideEIP2929 == nil && existingEIP2929 != nil) ||
+			(overrideEIP2929 != nil && existingEIP2929 == nil) ||
+			(overrideEIP2929 != nil && existingEIP2929 != nil && *overrideEIP2929 != *existingEIP2929) {
+
+			// Copy the config, to not screw up the main config
+			// Note: the Clique-part is _not_ deep copied
+
+			// We know that the underlying configurator value will always be a pointer.
+			chainConfig = reflect.New(reflect.ValueOf(chainConfig).Elem().Type()).Interface().(ctypes.ChainConfigurator)
+
+			if err := chainConfig.SetEIP2929Transition(overrideEIP2929); err != nil {
 				return nil, err
 			}
 			canon = false

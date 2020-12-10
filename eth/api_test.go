@@ -236,14 +236,12 @@ func TestCloneChainConfigForTracing(t *testing.T) {
 	cc := getChainConfiguratorForTesting("mordor")
 
 	// Copy it, way #2.
-	var c2 ctypes.ChainConfigurator
-	c2 = reflect.New(reflect.ValueOf(cc).Elem().Type()).Interface().(ctypes.ChainConfigurator)
-	cc = c2
+	cc = reflect.New(reflect.ValueOf(cc).Elem().Type()).Interface().(ctypes.ChainConfigurator)
 
 	_ = cc.SetChainID(big.NewInt(42))
 
-	assert.Equal(t, uint64(63), params.MordorChainConfig.GetChainID().Uint64(), "way 2")  // original unmutated
-	assert.Equal(t, uint64(42), cc.GetChainID().Uint64(), "way 2")  // copy mutated
+	assert.Equal(t, uint64(63), params.MordorChainConfig.GetChainID().Uint64(), "way 2") // original unmutated
+	assert.Equal(t, uint64(42), cc.GetChainID().Uint64(), "way 2")                       // copy mutated
 }
 
 // BenchmarkCopyConfiguratorInterface and BenchmarkTestValueEquivalenceAlot

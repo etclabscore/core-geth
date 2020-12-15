@@ -121,6 +121,52 @@ type callTracerTest struct {
 	Result  *callTrace        `json:"result"`
 }
 
+// callTraceParity is the result of a callTracerParity run.
+type callTraceParity struct {
+	Action              callTraceParityAction `json:"action"`
+	BlockHash           *common.Hash          `json:"blockHash,omitempty"`
+	BlockNumber         uint64                `json:"blockNumber"`
+	Error               string                `json:"error,omitempty"`
+	Result              callTraceParityResult `json:"result"`
+	Subtraces           int                   `json:"subtraces"`
+	TraceAddress        []int                 `json:"traceAddress"`
+	TransactionHash     *common.Hash          `json:"transactionHash,omitempty"`
+	TransactionPosition *uint64               `json:"transactionPosition,omitempty"`
+	Type                string                `json:"type"`
+	Time                string                `json:"-"`
+}
+
+type callTraceParityAction struct {
+	Author         *common.Address `json:"author,omitempty"`
+	RewardType     *string         `json:"rewardType,omitempty"`
+	SelfDestructed *common.Address `json:"address,omitempty"`
+	Balance        *hexutil.Big    `json:"balance,omitempty"`
+	CallType       string          `json:"callType,omitempty"`
+	CreationMethod string          `json:"creationMethod,omitempty"`
+	From           common.Address  `json:"from,omitempty"`
+	Gas            hexutil.Uint64  `json:"gas,omitempty"`
+	Init           *hexutil.Bytes  `json:"init,omitempty"`
+	Input          *hexutil.Bytes  `json:"input,omitempty"`
+	RefundAddress  *common.Address `json:"refundAddress,omitempty"`
+	To             common.Address  `json:"to,omitempty"`
+	Value          hexutil.Big     `json:"value,omitempty"`
+}
+
+type callTraceParityResult struct {
+	Address *common.Address `json:"address,omitempty"`
+	Code    *hexutil.Bytes  `json:"code,omitempty"`
+	GasUsed hexutil.Uint64  `json:"gasUsed,omitempty"`
+	Output  hexutil.Bytes   `json:"output,omitempty"`
+}
+
+// callTracerParityTest defines a single test to check the call tracer against.
+type callTracerParityTest struct {
+	Genesis *genesisT.Genesis  `json:"genesis"`
+	Context *callContext       `json:"context"`
+	Input   string             `json:"input"`
+	Result  *[]callTraceParity `json:"result"`
+}
+
 func TestPrestateTracerCreate2(t *testing.T) {
 	unsignedTx := types.NewTransaction(1, common.HexToAddress("0x00000000000000000000000000000000deadbeef"),
 		new(big.Int), 5000000, big.NewInt(1), []byte{})
@@ -286,6 +332,106 @@ func TestCallTracer(t *testing.T) {
 func jsonEqual(x, y interface{}) bool {
 	xTrace := new(callTrace)
 	yTrace := new(callTrace)
+	if xj, err := json.Marshal(x); err == nil {
+		json.Unmarshal(xj, xTrace)
+	} else {
+		return false
+	}
+	if yj, err := json.Marshal(y); err == nil {
+		json.Unmarshal(yj, yTrace)
+	} else {
+		return false
+	}
+	return reflect.DeepEqual(xTrace, yTrace)
+}
+
+// Iterates over all the input-output datasets in the tracer parity test harness and
+// runs the JavaScript tracers against them.
+func TestCallTracerParity(t *testing.T) {
+	files, err := ioutil.ReadDir("testdata")
+	if err != nil {
+		t.Fatalf("failed to retrieve tracer test suite: %v", err)
+	}
+	for _, file := range files {
+		if !strings.HasPrefix(file.Name(), "parity_call_tracer_") {
+			continue
+		}
+		file := file // capture range variable
+		t.Run(camel(strings.TrimSuffix(strings.TrimPrefix(file.Name(), "parity_call_tracer_"), ".json")), func(t *testing.T) {
+			t.Parallel()
+
+			// Call tracer test found, read if from disk
+			blob, err := ioutil.ReadFile(filepath.Join("testdata", file.Name()))
+			if err != nil {
+				t.Fatalf("failed to read testcase: %v", err)
+			}
+			test := new(callTracerParityTest)
+			if err := json.Unmarshal(blob, test); err != nil {
+				t.Fatalf("failed to parse testcase: %v", err)
+			}
+			// Configure a blockchain with the given prestate
+			tx := new(types.Transaction)
+			if err := rlp.DecodeBytes(common.FromHex(test.Input), tx); err != nil {
+				t.Fatalf("failed to parse testcase input: %v", err)
+			}
+			signer := types.MakeSigner(test.Genesis.Config, new(big.Int).SetUint64(uint64(test.Context.Number)))
+			origin, _ := signer.Sender(tx)
+
+			context := vm.Context{
+				CanTransfer: core.CanTransfer,
+				Transfer:    core.Transfer,
+				Origin:      origin,
+				Coinbase:    test.Context.Miner,
+				BlockNumber: new(big.Int).SetUint64(uint64(test.Context.Number)),
+				Time:        new(big.Int).SetUint64(uint64(test.Context.Time)),
+				Difficulty:  (*big.Int)(test.Context.Difficulty),
+				GasLimit:    uint64(test.Context.GasLimit),
+				GasPrice:    tx.GasPrice(),
+			}
+			_, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false)
+
+			// Create the tracer, the EVM environment and run it
+			tracer, err := New("callTracerParity")
+			if err != nil {
+				t.Fatalf("failed to create call tracer: %v", err)
+			}
+			evm := vm.NewEVM(context, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
+
+			msg, err := tx.AsMessage(signer)
+			if err != nil {
+				t.Fatalf("failed to prepare transaction for tracing: %v", err)
+			}
+			st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(tx.Gas()))
+
+			if _, err = st.TransitionDb(); err != nil {
+				t.Fatalf("failed to execute transaction: %v", err)
+			}
+			// Retrieve the trace result and compare against the etalon
+			res, err := tracer.GetResult()
+			if err != nil {
+				t.Fatalf("failed to retrieve trace result: %v", err)
+			}
+			ret := new([]callTraceParity)
+			if err := json.Unmarshal(res, ret); err != nil {
+				t.Fatalf("failed to unmarshal trace result: %v", err)
+			}
+
+			if !jsonEqualParity(ret, test.Result) {
+				// uncomment this for easier debugging
+				// have, _ := json.MarshalIndent(ret, "", " ")
+				// want, _ := json.MarshalIndent(test.Result, "", " ")
+				// t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
+				t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
+			}
+		})
+	}
+}
+
+// jsonEqual is similar to reflect.DeepEqual, but does a 'bounce' via json prior to
+// comparison
+func jsonEqualParity(x, y interface{}) bool {
+	xTrace := new([]callTraceParity)
+	yTrace := new([]callTraceParity)
 	if xj, err := json.Marshal(x); err == nil {
 		json.Unmarshal(xj, xTrace)
 	} else {

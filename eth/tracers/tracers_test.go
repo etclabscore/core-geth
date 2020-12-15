@@ -47,7 +47,7 @@ import (
 /*
 // makeTest generates a callTracer test by running a prestate reassembled and a
 // call trace run, assembling all the gathered information into a test case.
-var makeTest = function(tx, rewind) {
+var makeTest = function(tx, reexec) {
   // Generate the genesis block from the block, transaction and prestate data
   var block   = eth.getBlock(eth.getTransaction(tx).blockHash);
   var genesis = eth.getBlock(block.parentHash);
@@ -66,14 +66,14 @@ var makeTest = function(tx, rewind) {
   genesis.number    = genesis.number.toString();
   genesis.timestamp = genesis.timestamp.toString();
 
-  genesis.alloc = debug.traceTransaction(tx, {tracer: "prestateTracer", rewind: rewind});
+  genesis.alloc = debug.traceTransaction(tx, {tracer: "prestateTracer", reexec: reexec});
   for (var key in genesis.alloc) {
     genesis.alloc[key].nonce = genesis.alloc[key].nonce.toString();
   }
   genesis.config = admin.nodeInfo.protocols.eth.config;
 
   // Generate the call trace and produce the test input
-  var result = debug.traceTransaction(tx, {tracer: "callTracer", rewind: rewind});
+  var result = debug.traceTransaction(tx, {tracer: "callTracer", reexec: reexec});
   delete result.time;
 
   console.log(JSON.stringify({

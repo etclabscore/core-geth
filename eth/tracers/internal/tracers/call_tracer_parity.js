@@ -20,6 +20,10 @@
 	// callstack is the current recursive call stack of the EVM execution.
 	callstack: [{}],
 
+	// getCallstackLength (optional) is used for optimisation reasons, checking from within go
+	// if the `step` method has to be called for a VM opcode.
+	getCallstackLength: function() {return this.callstack.length;},
+
 	// descended tracks whether we've just descended from an outer transaction into
 	// an inner call.
 	descended: false,

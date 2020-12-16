@@ -17,6 +17,10 @@
 // noopTracer is just the barebone boilerplate code required from a JavaScript
 // object to be usable as a transaction tracer.
 {
+	// isStepNeeded (optional) is used for optimisation reasons, checking if JS context
+	// needs to be loaded and step method to be called for current opcode.
+	isStepNeeded: function(log) { return true; },
+
 	// step is invoked for every opcode that the VM executes.
 	step: function(log, db) { },
 

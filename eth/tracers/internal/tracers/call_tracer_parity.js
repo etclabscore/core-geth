@@ -50,6 +50,25 @@
 		return true;
 	},
 
+	isStepSuccessor: false,
+
+	// isStepNeeded (optional) is used for optimisation reasons, checking if JS context
+	// needs to be loaded and step method to be called for current opcode.
+	isStepNeeded: function(log) {
+		// We only care about system opcodes
+		if ((log.op.toNumber() & 0xf0) == 0xf0) {
+			this.isStepSuccessor = true;
+			return true;
+		} else if (this.isStepSuccessor) {
+			this.isStepSuccessor = false;
+			return true;
+		} else if (log.getDepth() == this.callstack.length - 1) {
+			this.isStepSuccessor = false;
+			return true;
+		}
+		return false;
+	},
+
 	// step is invoked for every opcode that the VM executes.
 	step: function(log, db) {
 		// Capture any errors immediately

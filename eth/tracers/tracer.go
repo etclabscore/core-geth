@@ -315,6 +315,8 @@ type Tracer struct {
 
 	interrupt uint32 // Atomic flag to signal execution interruption
 	reason    error  // Textual reason for the interruption
+
+	supportsStepPrecheck bool // Checks wether tracer supports `isStepNeeded` method for preflight checks on `step` method need per VM opcode
 }
 
 // New instantiates a new tracer instance. code specifies a Javascript snippet,
@@ -433,6 +435,10 @@ func New(code string) (*Tracer, error) {
 	}
 	tracer.tracerObject = 0 // yeah, nice, eval can't return the index itself
 
+	if tracer.vm.GetPropString(tracer.tracerObject, "isStepNeeded") {
+		tracer.supportsStepPrecheck = true
+	}
+	tracer.vm.Pop()
 	if !tracer.vm.GetPropString(tracer.tracerObject, "step") {
 		return nil, fmt.Errorf("trace object must expose a function step()")
 	}
@@ -587,6 +593,31 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 			return nil
 		}
 		jst.opWrapper.op = op
+		*jst.depthValue = uint(depth)
+		jst.opErrorValue = nil
+		jst.errorValue = nil
+
+		// Check JS tracer's support for pre-checking wether `step` method has to be called
+		if jst.supportsStepPrecheck {
+			jst.vm.PushString("isStepNeeded")
+			jst.vm.GetPropString(jst.stateObject, "log")
+			code := jst.vm.PcallProp(jst.tracerObject, 1)
+			if code != 0 {
+				err := jst.vm.SafeToString(-1)
+				jst.vm.Pop()
+
+				jst.err = wrapError("step", errors.New(err))
+				return nil
+			}
+
+			pass := jst.vm.GetBoolean(-1)
+			jst.vm.Pop()
+
+			if !pass {
+				return nil
+			}
+		}
+
 		jst.stackWrapper.stack = stack
 		jst.memoryWrapper.memory = memory
 		jst.contractWrapper.contract = contract
@@ -596,18 +627,15 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 		*jst.gasValue = uint(gas)
 		*jst.availableGasValue = uint(env.CallGasTemp)
 		*jst.costValue = uint(cost)
-		*jst.depthValue = uint(depth)
 		*jst.returnData = rdata
 		*jst.refundValue = uint(env.StateDB.GetRefund())
 
-		jst.opErrorValue = nil
 		if env.CallErrorTemp != nil {
 			jst.opErrorValue = new(string)
 			*jst.opErrorValue = env.CallErrorTemp.Error()
 
 			env.CallErrorTemp = nil // clean temp error storage, for debug tracing
 		}
-		jst.errorValue = nil
 		if err != nil {
 			jst.errorValue = new(string)
 			*jst.errorValue = err.Error()

@@ -594,8 +594,6 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 		}
 		jst.opWrapper.op = op
 		*jst.depthValue = uint(depth)
-		jst.opErrorValue = nil
-		jst.errorValue = nil
 
 		// Check JS tracer's support for pre-checking wether `step` method has to be called
 		if jst.supportsStepPrecheck {
@@ -630,12 +628,14 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 		*jst.returnData = rdata
 		*jst.refundValue = uint(env.StateDB.GetRefund())
 
+		jst.opErrorValue = nil
 		if env.CallErrorTemp != nil {
 			jst.opErrorValue = new(string)
 			*jst.opErrorValue = env.CallErrorTemp.Error()
 
 			env.CallErrorTemp = nil // clean temp error storage, for debug tracing
 		}
+		jst.errorValue = nil
 		if err != nil {
 			jst.errorValue = new(string)
 			*jst.errorValue = err.Error()
@@ -652,6 +652,10 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 // while running an opcode.
 func (jst *Tracer) CaptureFault(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, memory *vm.Memory, stack *vm.Stack, rStack *vm.ReturnStack, contract *vm.Contract, depth int, err error) error {
 	if jst.err == nil {
+		// clean up op error when CaptureFault is being called directly
+		jst.opErrorValue = nil
+		env.CallErrorTemp = nil // clean temp error storage, for debug tracing
+
 		// Apart from the error, everything matches the previous invocation
 		jst.errorValue = new(string)
 		*jst.errorValue = err.Error()

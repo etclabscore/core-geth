@@ -598,6 +598,7 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 		}
 
 		// Checks wether tracer supports `getCallstackLength` method in order to achieve optimal performance for call_tracer*
+		// in which case it checks if the call to `step` method has to be made, as the duktape prop call is an expensive operation
 		if jst.supportsStepPerfOptimisations {
 			run := false
 

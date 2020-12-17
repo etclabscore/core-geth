@@ -125,14 +125,14 @@ type callTracerTest struct {
 // callTraceParity is the result of a callTracerParity run.
 type callTraceParity struct {
 	Action              callTraceParityAction `json:"action"`
-	BlockHash           *common.Hash          `json:"blockHash,omitempty"`
-	BlockNumber         uint64                `json:"blockNumber"`
+	BlockHash           *common.Hash          `json:"-"`
+	BlockNumber         uint64                `json:"-"`
 	Error               string                `json:"error,omitempty"`
 	Result              callTraceParityResult `json:"result"`
 	Subtraces           int                   `json:"subtraces"`
 	TraceAddress        []int                 `json:"traceAddress"`
-	TransactionHash     *common.Hash          `json:"transactionHash,omitempty"`
-	TransactionPosition *uint64               `json:"transactionPosition,omitempty"`
+	TransactionHash     *common.Hash          `json:"-"`
+	TransactionPosition *uint64               `json:"-"`
 	Type                string                `json:"type"`
 	Time                string                `json:"-"`
 }

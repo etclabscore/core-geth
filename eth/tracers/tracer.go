@@ -593,7 +593,31 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 			return nil
 		}
 		jst.opWrapper.op = op
+		jst.stackWrapper.stack = stack
+		jst.memoryWrapper.memory = memory
+		jst.contractWrapper.contract = contract
+		jst.dbWrapper.db = env.StateDB
+
+		*jst.pcValue = uint(pc)
+		*jst.gasValue = uint(gas)
+		*jst.availableGasValue = uint(env.CallGasTemp)
+		*jst.costValue = uint(cost)
 		*jst.depthValue = uint(depth)
+		*jst.returnData = rdata
+		*jst.refundValue = uint(env.StateDB.GetRefund())
+
+		jst.opErrorValue = nil
+		if env.CallErrorTemp != nil {
+			jst.opErrorValue = new(string)
+			*jst.opErrorValue = env.CallErrorTemp.Error()
+
+			env.CallErrorTemp = nil // clean temp error storage, for debug tracing
+		}
+		jst.errorValue = nil
+		if err != nil {
+			jst.errorValue = new(string)
+			*jst.errorValue = err.Error()
+		}
 
 		// Check JS tracer's support for pre-checking wether `step` method has to be called
 		if jst.supportsStepPrecheck {
@@ -616,30 +640,6 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 			}
 		}
 
-		jst.stackWrapper.stack = stack
-		jst.memoryWrapper.memory = memory
-		jst.contractWrapper.contract = contract
-		jst.dbWrapper.db = env.StateDB
-
-		*jst.pcValue = uint(pc)
-		*jst.gasValue = uint(gas)
-		*jst.availableGasValue = uint(env.CallGasTemp)
-		*jst.costValue = uint(cost)
-		*jst.returnData = rdata
-		*jst.refundValue = uint(env.StateDB.GetRefund())
-
-		jst.opErrorValue = nil
-		if env.CallErrorTemp != nil {
-			jst.opErrorValue = new(string)
-			*jst.opErrorValue = env.CallErrorTemp.Error()
-
-			env.CallErrorTemp = nil // clean temp error storage, for debug tracing
-		}
-		jst.errorValue = nil
-		if err != nil {
-			jst.errorValue = new(string)
-			*jst.errorValue = err.Error()
-		}
 		_, err := jst.call("step", "log", "db")
 		if err != nil {
 			jst.err = wrapError("step", err)

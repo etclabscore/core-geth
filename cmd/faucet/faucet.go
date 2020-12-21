@@ -77,7 +77,8 @@ var (
 	rinkebyFlag     = flag.Bool("chain.rinkeby", false, "Configure genesis and bootnodes for rinkeby chain defaults")
 	goerliFlag      = flag.Bool("chain.goerli", false, "Configure genesis and bootnodes for goerli chain defaults")
 
-	fastFlag = flag.Bool("fast", false, "Use fast syncmode=fast instead of LES")
+	fastSyncFlag = flag.Bool("syncmode.fast", false, "Use fast syncmode=fast instead of LES")
+	datadirFlag  = flag.String("datadir", "", "Use a custom datadir")
 
 	genesisFlag = flag.String("genesis", "", "Genesis json file to seed the chain with")
 	apiPortFlag = flag.Int("apiport", 8080, "Listener port for the HTTP API connection")
@@ -112,6 +113,9 @@ var (
 
 func faucetDirFromConfig(chainConfig ctypes.ChainConfigurator) string {
 	datadir := filepath.Join(os.Getenv("HOME"), ".faucet")
+	if *datadirFlag != "" {
+		datadir = *datadirFlag
+	}
 	for conf, suff := range map[ctypes.ChainConfigurator]string{
 		params.MainnetChainConfig:     "",
 		params.ClassicChainConfig:     "classic",
@@ -365,7 +369,7 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 	// Assemble the Ethereum light client protocol
 	cfg := eth.DefaultConfig
 	cfg.SyncMode = downloader.LightSync
-	if *fastFlag {
+	if *fastSyncFlag {
 		cfg.SyncMode = downloader.FastSync
 		cfg.ProtocolVersions = eth.DefaultProtocolVersions
 	}
@@ -386,7 +390,7 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 	log.Info("Config discovery", "urls", cfg.DiscoveryURLs)
 	var lesBackend *les.LightEthereum
 	var fastBackend *eth.Ethereum
-	if *fastFlag {
+	if *fastSyncFlag {
 		fastBackend, err = eth.New(stack, &cfg)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to register the Ethereum service: %w", err)
@@ -400,7 +404,7 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 
 	// Assemble the ethstats monitoring and reporting service'
 	if stats != "" {
-		if *fastFlag {
+		if *fastSyncFlag {
 			if err := ethstats.New(stack, fastBackend.APIBackend, fastBackend.Engine(), stats); err != nil {
 				return nil, err
 			}
@@ -760,8 +764,8 @@ func (f *faucet) loop() {
 		for head := range update {
 			// New chain head arrived, query the current stats and stream to clients
 			timestamp := time.Unix(int64(head.Time), 0)
-			if time.Since(timestamp) > time.Hour {
-				log.Warn("Skipping faucet refresh, head too old", "number", head.Number, "hash", head.Hash(), "age", common.PrettyAge(timestamp))
+			if age := time.Since(timestamp); age > time.Hour {
+				log.Trace("Skipping faucet refresh, head too old", "number", head.Number, "hash", head.Hash(), "age", common.PrettyAge(timestamp))
 				continue
 			}
 			if err := f.refresh(head); err != nil {

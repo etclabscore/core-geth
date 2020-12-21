@@ -35,7 +35,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -51,8 +50,6 @@ import (
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/ethereum/go-ethereum/ethstats"
-	"github.com/ethereum/go-ethereum/les"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/p2p"
@@ -76,13 +73,18 @@ var (
 	testnetFlag     = flag.Bool("chain.testnet", false, "Configure genesis and bootnodes for testnet chain defaults")
 	rinkebyFlag     = flag.Bool("chain.rinkeby", false, "Configure genesis and bootnodes for rinkeby chain defaults")
 	goerliFlag      = flag.Bool("chain.goerli", false, "Configure genesis and bootnodes for goerli chain defaults")
+	attachFlag      = flag.String("attach", "", "Attach to an IPC or WS endpoint")
 
 	genesisFlag = flag.String("genesis", "", "Genesis json file to seed the chain with")
 	apiPortFlag = flag.Int("apiport", 8080, "Listener port for the HTTP API connection")
 	ethPortFlag = flag.Int("ethport", 30303, "Listener port for the devp2p connection")
 	bootFlag    = flag.String("bootnodes", "", "Comma separated bootnode enode URLs to seed with")
 	netFlag     = flag.Uint64("network", 0, "Network ID to use for the Ethereum protocol")
-	statsFlag   = flag.String("ethstats", "", "Ethstats network monitoring auth string")
+
+	// FIXME(meowsbits): Commented because support has been temporarily removed during WIP.
+	// The ethstats package is dependent on having access to a *node.Node and a backend implementation.
+	// IMO these needs should be met by access to an API rather than a full stack (eg. needs a downloader.Downloader... really?).
+	// statsFlag   = flag.String("ethstats", "", "Ethstats network monitoring auth string")
 
 	netnameFlag = flag.String("faucet.name", "", "Network name to assign to the faucet")
 	payoutFlag  = flag.Int("faucet.amount", 1, "Number of Ethers to pay out per user request")
@@ -108,25 +110,80 @@ var (
 	gitDate   = "" // Git commit date YYYYMMDD of the release (set via linker flags)
 )
 
-func faucetDirFromConfig(chainConfig ctypes.ChainConfigurator) string {
+func faucetDirFromChainID(chainID uint64) string {
 	datadir := filepath.Join(os.Getenv("HOME"), ".faucet")
-	for conf, suff := range map[ctypes.ChainConfigurator]string{
-		params.MainnetChainConfig:     "",
-		params.ClassicChainConfig:     "classic",
-		params.SocialChainConfig:      "social",
-		params.EthersocialChainConfig: "ethersocial",
-		params.MixChainConfig:         "mix",
-		params.RopstenChainConfig:     "ropsten",
-		params.RinkebyChainConfig:     "rinkeby",
-		params.GoerliChainConfig:      "goerli",
-		params.KottiChainConfig:       "kotti",
-		params.MordorChainConfig:      "mordor",
-	} {
-		if reflect.DeepEqual(chainConfig, conf) && suff != "" {
-			datadir = filepath.Join(datadir, suff)
-		}
+	switch chainID {
+	case params.MainnetChainConfig.GetChainID().Uint64():
+		return filepath.Join(datadir, "")
+	case params.ClassicChainConfig.GetChainID().Uint64():
+		return filepath.Join(datadir, "classic")
+	case params.SocialChainConfig.GetChainID().Uint64():
+		return filepath.Join(datadir, "social")
+	case params.EthersocialChainConfig.GetChainID().Uint64():
+		return filepath.Join(datadir, "ethersocial")
+	case params.MixChainConfig.GetChainID().Uint64():
+		return filepath.Join(datadir, "mix")
+	case params.RopstenChainConfig.GetChainID().Uint64():
+		return filepath.Join(datadir, "ropsten")
+	case params.RinkebyChainConfig.GetChainID().Uint64():
+		return filepath.Join(datadir, "rinkeby")
+	case params.GoerliChainConfig.GetChainID().Uint64():
+		return filepath.Join(datadir, "goerli")
+	case params.KottiChainConfig.GetChainID().Uint64():
+		return filepath.Join(datadir, "kotti")
+	case params.MordorChainConfig.GetChainID().Uint64():
+		return filepath.Join(datadir, "mordor")
 	}
 	return datadir
+}
+
+func parseChainFlags() (gs *genesisT.Genesis, bs string, netid uint64) {
+	var configs = []struct {
+		flag bool
+		gs   *genesisT.Genesis
+		bs   []string
+	}{
+		{*foundationFlag, params.DefaultGenesisBlock(), nil},
+		{*classicFlag, params.DefaultClassicGenesisBlock(), nil},
+		{*mordorFlag, params.DefaultMordorGenesisBlock(), nil},
+		{*socialFlag, params.DefaultSocialGenesisBlock(), params.SocialBootnodes},
+		{*ethersocialFlag, params.DefaultEthersocialGenesisBlock(), params.EthersocialBootnodes},
+		{*mixFlag, params.DefaultMixGenesisBlock(), params.MixBootnodes},
+		{*testnetFlag, params.DefaultRopstenGenesisBlock(), nil},
+		{*rinkebyFlag, params.DefaultRinkebyGenesisBlock(), nil},
+		{*kottiFlag, params.DefaultKottiGenesisBlock(), nil},
+		{*goerliFlag, params.DefaultGoerliGenesisBlock(), nil},
+	}
+
+	var bss []string
+	for _, conf := range configs {
+		if conf.flag {
+			gs, bss, netid = conf.gs, conf.bs, *conf.gs.Config.GetNetworkID()
+			break
+		}
+	}
+	if len(bss) > 0 {
+		bs = strings.Join(bss, ",")
+	}
+
+	// allow overrides
+	if *genesisFlag != "" {
+		blob, err := ioutil.ReadFile(*genesisFlag)
+		if err != nil {
+			log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
+		}
+		gs = new(genesisT.Genesis)
+		if err = json.Unmarshal(blob, gs); err != nil {
+			log.Crit("Failed to parse genesis block json", "err", err)
+		}
+	}
+	if *bootFlag != "" {
+		bs = *bootFlag
+	}
+	if *netFlag != 0 {
+		netid = *netFlag
+	}
+	return
 }
 
 func main() {
@@ -176,107 +233,36 @@ func main() {
 	if err != nil {
 		log.Crit("Failed to render the faucet template", "err", err)
 	}
+
 	// Load and parse the genesis block requested by the user
 	var genesis *genesisT.Genesis
 	var enodes []*discv5.Node
 	var blob []byte
 
-	genesis, *bootFlag, *netFlag = func() (gs *genesisT.Genesis, bs string, netid uint64) {
-		var configs = []struct {
-			flag bool
-			gs   *genesisT.Genesis
-			bs   []string
-		}{
-			{
-				*foundationFlag,
-				params.DefaultGenesisBlock(),
-				nil,
-			},
-			{
-				*classicFlag,
-				params.DefaultClassicGenesisBlock(),
-				nil,
-			},
-			{
-				*mordorFlag,
-				params.DefaultMordorGenesisBlock(),
-				nil,
-			},
-			{
-				*socialFlag,
-				params.DefaultSocialGenesisBlock(),
-				params.SocialBootnodes,
-			},
-			{
-				*ethersocialFlag,
-				params.DefaultEthersocialGenesisBlock(),
-				params.EthersocialBootnodes,
-			},
-			{
-				*mixFlag,
-				params.DefaultMixGenesisBlock(),
-				params.MixBootnodes,
-			},
-			{
-				*testnetFlag,
-				params.DefaultRopstenGenesisBlock(),
-				nil,
-			},
-			{
-				*rinkebyFlag,
-				params.DefaultRinkebyGenesisBlock(),
-				nil,
-			},
-			{
-				*kottiFlag,
-				params.DefaultKottiGenesisBlock(),
-				nil,
-			},
-			{
-				*goerliFlag,
-				params.DefaultGoerliGenesisBlock(),
-				nil,
-			},
-		}
+	// client will be used if the faucet is attaching. If not it won't be touched.
+	var client *ethclient.Client
 
-		var bss []string
-		for _, conf := range configs {
-			if conf.flag {
-				gs, bss, netid = conf.gs, conf.bs, *conf.gs.Config.GetNetworkID()
-				break
+	genesis, *bootFlag, *netFlag = parseChainFlags()
+
+	if genesis != nil && attachFlag != nil {
+		log.Crit("Cannot use genesis and attach options simultaneously")
+	}
+
+	if genesis != nil {
+		log.Info("configured chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", fmt.Sprintf("%v", genesis.Config))
+
+		// Convert the bootnodes to internal enode representations
+		for _, boot := range strings.Split(*bootFlag, ",") {
+			if url, err := discv5.ParseNode(boot); err == nil {
+				enodes = append(enodes, url)
+			} else {
+				log.Error("Failed to parse bootnode URL", "url", boot, "err", err)
 			}
 		}
-		if len(bss) > 0 {
-			bs = strings.Join(bss, ",")
-		}
-
-		// allow overrides
-		if *genesisFlag != "" {
-			blob, err = ioutil.ReadFile(*genesisFlag)
-			if err != nil {
-				log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
-			}
-			gs = new(genesisT.Genesis)
-			if err = json.Unmarshal(blob, gs); err != nil {
-				log.Crit("Failed to parse genesis block json", "err", err)
-			}
-		}
-		if *bootFlag != "" {
-			bs = *bootFlag
-		}
-		if *netFlag != 0 {
-			netid = *netFlag
-		}
-		return
-	}()
-	log.Info("configured chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", fmt.Sprintf("%v", genesis.Config))
-
-	// Convert the bootnodes to internal enode representations
-	for _, boot := range strings.Split(*bootFlag, ",") {
-		if url, err := discv5.ParseNode(boot); err == nil {
-			enodes = append(enodes, url)
-		} else {
-			log.Error("Failed to parse bootnode URL", "url", boot, "err", err)
+	} else {
+		client, err = ethclient.DialContext(context.Background(), *attachFlag)
+		if err != nil {
+			log.Crit("Failed to connect to client", "error", err)
 		}
 	}
 
@@ -286,7 +272,26 @@ func main() {
 	}
 	pass := strings.TrimSuffix(string(blob), "\n")
 
-	ks := keystore.NewKeyStore(filepath.Join(faucetDirFromConfig(genesis.Config), "keys"), keystore.StandardScryptN, keystore.StandardScryptP)
+	// Get the chain id from the genesis or the designated API.
+	// We'll use this to infer the keystore and chain data directories.
+	// NOTE: Relying on having chain id immediately available may be fragile.
+	// IRC eth_chainId can possibly not return the configured value until the block activating the chain id EIP155 is reached.
+	// See the difference in implementation between ethapi/api.go and eth/api.go #ChainID() methods.
+	// There's an issue open about this somewhere at ethereum/xxx.
+	// This could be resolved by creating a -chainid flag to use as a fallback.
+	chainID := uint64(0)
+	if genesis != nil {
+		chainID = genesis.GetChainID().Uint64()
+	} else {
+		cid, err := client.ChainID(context.Background())
+		if err != nil {
+			log.Crit("Failed to get chain id from client", "error", err)
+		}
+		chainID = cid.Uint64()
+	}
+
+	keystorePath := filepath.Join(faucetDirFromChainID(chainID), "keys")
+	ks := keystore.NewKeyStore(keystorePath, keystore.StandardScryptN, keystore.StandardScryptP)
 	if blob, err = ioutil.ReadFile(*accJSONFlag); err != nil {
 		log.Crit("Failed to read account key contents", "file", *accJSONFlag, "err", err)
 	}
@@ -297,12 +302,31 @@ func main() {
 	if err := ks.Unlock(acc, pass); err != nil {
 		log.Crit("Failed to unlock faucet signer account", "err", err)
 	}
+
 	// Assemble and start the faucet light service
-	faucet, err := newFaucet(genesis, *ethPortFlag, enodes, *netFlag, *statsFlag, ks, website.Bytes())
+	// faucet, err := newFaucet(genesis, *ethPortFlag, enodes, *netFlag, *statsFlag, ks, website.Bytes())
+	faucet, err := newFaucet(ks, website.Bytes())
 	if err != nil {
 		log.Crit("Failed to start faucet", "err", err)
 	}
 	defer faucet.close()
+
+	if genesis != nil {
+		err = faucet.startStack(genesis, *ethPortFlag, enodes, *netFlag)
+		if err != nil {
+			log.Crit("Failed to start to stack", "error", err)
+		}
+	} else {
+		faucet.client = client
+	}
+
+	// See commented ethStats flag for why this is commented.
+	// Assemble the ethstats monitoring and reporting service'
+	// if *statsFlag != "" {
+	// 	if err := ethstats.New(stack, lesBackend.ApiBackend, ethstats.HeaderAuthorGetterT{}, *statsFlag); err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	if err := faucet.listenAndServe(*apiPortFlag); err != nil {
 		log.Crit("Failed to launch faucet API", "err", err)
@@ -339,12 +363,13 @@ type faucet struct {
 	lock sync.RWMutex // Lock protecting the faucet's internals
 }
 
-func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, network uint64, stats string, ks *keystore.KeyStore, index []byte) (*faucet, error) {
+// startStack starts the node stack, ensures peering, and assigns the respective ethclient to the faucet.
+func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, network uint64) error {
 	// Assemble the raw devp2p protocol stack
 	stack, err := node.New(&node.Config{
 		Name:    "MultiFaucet",
 		Version: params.VersionWithCommit(gitCommit, gitDate),
-		DataDir: faucetDirFromConfig(genesis.Config),
+		DataDir: faucetDirFromChainID(genesis.Config.GetChainID().Uint64()),
 		P2P: p2p.Config{
 			NAT:              nat.Any(),
 			NoDiscovery:      true,
@@ -355,7 +380,7 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 		},
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// Assemble the Ethereum light client protocol
@@ -363,6 +388,8 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 	cfg.SyncMode = downloader.LightSync
 	cfg.NetworkId = network
 	cfg.Genesis = genesis
+
+	// NOTE This is broken, fixed with https://github.com/etclabscore/core-geth/pull/249.
 	switch genesis {
 	case params.DefaultClassicGenesisBlock():
 		utils.SetDNSDiscoveryDefaults2(&cfg, params.ClassicDNSNetwork1)
@@ -373,20 +400,18 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 	default:
 		utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
 	}
-	lesBackend, err := les.New(stack, &cfg)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to register the Ethereum service: %w", err)
-	}
 
-	// Assemble the ethstats monitoring and reporting service'
-	if stats != "" {
-		if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), stats); err != nil {
-			return nil, err
+	// Commented because this was only used to pass to the ethstats constructor.
+	/*
+		lesBackend, err := les.New(stack, &cfg)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to register the Ethereum service: %w", err)
 		}
-	}
+	*/
+
 	// Boot up the client and ensure it connects to bootnodes
 	if err := stack.Start(); err != nil {
-		return nil, err
+		return err
 	}
 	for _, boot := range enodes {
 		old, err := enode.Parse(enode.ValidSchemes, boot.String())
@@ -398,25 +423,34 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 	api, err := stack.Attach()
 	if err != nil {
 		stack.Close()
-		return nil, err
+		return err
 	}
-	client := ethclient.NewClient(api)
+	f.stack = stack
+	f.client = ethclient.NewClient(api)
+	return nil
+}
 
-	return &faucet{
-		config:   genesis.Config,
-		stack:    stack,
-		client:   client,
+func newFaucet(ks *keystore.KeyStore, index []byte) (*faucet, error) {
+	f := &faucet{
+		// config:   genesis.Config,
+		// stack:    stack,
+		// client:   client,
 		index:    index,
 		keystore: ks,
 		account:  ks.Accounts()[0],
 		timeouts: make(map[string]time.Time),
 		update:   make(chan struct{}, 1),
-	}, nil
+	}
+	return f, nil
 }
 
 // close terminates the Ethereum connection and tears down the faucet.
 func (f *faucet) close() error {
-	return f.stack.Close()
+	if f.stack != nil {
+		return f.stack.Close()
+	}
+	f.client.Close()
+	return nil
 }
 
 // listenAndServe registers the HTTP handlers for the faucet and boots it up
@@ -492,10 +526,15 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 	f.lock.RLock()
 	reqs := f.reqs
 	f.lock.RUnlock()
+	peerCount, err := f.client.PeerCount(context.Background())
+	if err != nil {
+		log.Warn("Failed to get peer count", "error", err)
+		return
+	}
 	if err = send(conn, map[string]interface{}{
 		"funds":    new(big.Int).Div(balance, ether),
 		"funded":   nonce,
-		"peers":    f.stack.Server().PeerCount(),
+		"peers":    peerCount,
 		"requests": reqs,
 	}, 3*time.Second); err != nil {
 		log.Warn("Failed to send initial stats to client", "err", err)
@@ -623,7 +662,15 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 			amount = new(big.Int).Div(amount, new(big.Int).Exp(big.NewInt(2), big.NewInt(int64(msg.Tier)), nil))
 
 			tx := types.NewTransaction(f.nonce+uint64(len(f.reqs)), address, amount, 21000, f.price, nil)
-			signed, err := f.keystore.SignTx(f.account, tx, f.config.GetChainID())
+
+			// FIXME(meowsbits): Getting the chain id more than once is redundant and can be optimized.
+			chainId, err := f.client.ChainID(context.Background())
+			if err != nil {
+				log.Warn("Failed to get chain id", "error", err)
+				return
+			}
+
+			signed, err := f.keystore.SignTx(f.account, tx, chainId)
 			if err != nil {
 				f.lock.Unlock()
 				if err = sendError(conn, err); err != nil {
@@ -746,13 +793,17 @@ func (f *faucet) loop() {
 			log.Info("Updated faucet state", "number", head.Number, "hash", head.Hash(), "age", common.PrettyAge(timestamp), "balance", f.balance, "nonce", f.nonce, "price", f.price)
 
 			balance := new(big.Int).Div(f.balance, ether)
-			peers := f.stack.Server().PeerCount()
+			peerCount, err := f.client.PeerCount(context.Background())
+			if err != nil {
+				log.Warn("Failed to get peer count", "error", err)
+				continue
+			}
 
 			for _, conn := range f.conns {
 				if err := send(conn, map[string]interface{}{
 					"funds":    balance,
 					"funded":   f.nonce,
-					"peers":    peers,
+					"peers":    peerCount,
 					"requests": f.reqs,
 				}, time.Second); err != nil {
 					log.Warn("Failed to send stats to client", "err", err)

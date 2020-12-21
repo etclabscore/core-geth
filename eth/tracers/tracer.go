@@ -315,6 +315,10 @@ type Tracer struct {
 
 	interrupt uint32 // Atomic flag to signal execution interruption
 	reason    error  // Textual reason for the interruption
+
+	supportsStepPerfOptimisations bool  // Checks wether tracer supports `getCallstackLength` method in order to achieve optimal performance for call_tracer*
+	handleNextOpCode              bool  // Flag for step prechecker, instructing that next VM opcode has to be proccessed in `step` method
+	callTracerCallstackLength     *uint // Holds the current callstack length for call tracers, which can be compared with VM depth
 }
 
 // New instantiates a new tracer instance. code specifies a Javascript snippet,
@@ -326,20 +330,21 @@ func New(code string) (*Tracer, error) {
 		code = tracer
 	}
 	tracer := &Tracer{
-		vm:                duktape.New(),
-		ctx:               make(map[string]interface{}),
-		opWrapper:         new(opWrapper),
-		stackWrapper:      new(stackWrapper),
-		memoryWrapper:     new(memoryWrapper),
-		contractWrapper:   new(contractWrapper),
-		dbWrapper:         new(dbWrapper),
-		pcValue:           new(uint),
-		gasValue:          new(uint),
-		availableGasValue: new(uint),
-		costValue:         new(uint),
-		depthValue:        new(uint),
-		returnData:        new([]byte),
-		refundValue:       new(uint),
+		vm:                        duktape.New(),
+		ctx:                       make(map[string]interface{}),
+		opWrapper:                 new(opWrapper),
+		stackWrapper:              new(stackWrapper),
+		memoryWrapper:             new(memoryWrapper),
+		contractWrapper:           new(contractWrapper),
+		dbWrapper:                 new(dbWrapper),
+		pcValue:                   new(uint),
+		gasValue:                  new(uint),
+		availableGasValue:         new(uint),
+		costValue:                 new(uint),
+		depthValue:                new(uint),
+		returnData:                new([]byte),
+		refundValue:               new(uint),
+		callTracerCallstackLength: new(uint),
 	}
 	// Set up builtins for this environment
 	tracer.vm.PushGlobalGoFunction("toHex", func(ctx *duktape.Context) int {
@@ -432,6 +437,11 @@ func New(code string) (*Tracer, error) {
 		return nil, err
 	}
 	tracer.tracerObject = 0 // yeah, nice, eval can't return the index itself
+
+	if tracer.vm.GetPropString(tracer.tracerObject, "getCallstackLength") {
+		tracer.supportsStepPerfOptimisations = true
+	}
+	tracer.vm.Pop()
 
 	if !tracer.vm.GetPropString(tracer.tracerObject, "step") {
 		return nil, fmt.Errorf("trace object must expose a function step()")
@@ -586,6 +596,7 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 			jst.err = jst.reason
 			return nil
 		}
+
 		jst.opWrapper.op = op
 		jst.stackWrapper.stack = stack
 		jst.memoryWrapper.memory = memory
@@ -612,6 +623,44 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 			jst.errorValue = new(string)
 			*jst.errorValue = err.Error()
 		}
+
+		// Checks wether tracer supports `getCallstackLength` method in order to achieve optimal performance for call_tracer*
+		// in which case it checks if the call to `step` method has to be made, as the duktape prop call is an expensive operation
+		if jst.supportsStepPerfOptimisations {
+			run := false
+
+			if jst.callTracerCallstackLength == nil {
+				jst.vm.PushString("getCallstackLength")
+				code := jst.vm.PcallProp(jst.tracerObject, 0)
+				if code != 0 {
+					jst.vm.Pop()
+					err := jst.vm.SafeToString(-1)
+					jst.err = wrapError("step", errors.New(err))
+					return nil
+				}
+
+				jst.callTracerCallstackLength = new(uint)
+				*jst.callTracerCallstackLength = jst.vm.GetUint(-1)
+				jst.vm.Pop()
+			}
+
+			if *jst.callTracerCallstackLength-1 == uint(depth) {
+				run = true
+			} else if jst.handleNextOpCode {
+				jst.handleNextOpCode = false
+				run = true
+			} else if op&0xf0 == 0xf0 {
+				jst.handleNextOpCode = true
+				run = true
+			}
+
+			if !run {
+				return nil
+			} else {
+				jst.callTracerCallstackLength = nil
+			}
+		}
+
 		_, err := jst.call("step", "log", "db")
 		if err != nil {
 			jst.err = wrapError("step", err)
@@ -624,6 +673,10 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 // while running an opcode.
 func (jst *Tracer) CaptureFault(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, memory *vm.Memory, stack *vm.Stack, rStack *vm.ReturnStack, contract *vm.Contract, depth int, err error) error {
 	if jst.err == nil {
+		// clean up op error when CaptureFault is being called directly
+		jst.opErrorValue = nil
+		env.CallErrorTemp = nil // clean temp error storage, for debug tracing
+
 		// Apart from the error, everything matches the previous invocation
 		jst.errorValue = new(string)
 		*jst.errorValue = err.Error()

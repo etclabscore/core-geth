@@ -61,6 +61,7 @@ const (
 
 // backend encompasses the bare-minimum functionality needed for ethstats reporting
 type backend interface {
+	ProtocolVersion() int
 	SubscribeChainHeadEvent(ch chan<- core.ChainHeadEvent) event.Subscription
 	SubscribeNewTxsEvent(ch chan<- core.NewTxsEvent) event.Subscription
 	CurrentHeader() *types.Header
@@ -468,7 +469,7 @@ func (s *Service) login(conn *connWrapper) error {
 	var network, protocol string
 	if info := infos.Protocols["eth"]; info != nil {
 		network = fmt.Sprintf("%d", info.(*eth.NodeInfo).Network)
-		protocol = fmt.Sprintf("eth/%d", eth.ProtocolVersions[0])
+		protocol = fmt.Sprintf("eth/%d", s.backend.ProtocolVersion())
 	} else {
 		network = fmt.Sprintf("%d", infos.Protocols["les"].(*les.NodeInfo).Network)
 		protocol = fmt.Sprintf("les/%d", les.ClientProtocolVersions[0])

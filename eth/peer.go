@@ -809,6 +809,23 @@ func (ps *peerSet) BestPeer() *peer {
 	return bestPeer
 }
 
+// WorstPeer retrieves the known peer with the currently lowest total difficulty.
+func (ps *peerSet) WorstPeer() *peer {
+	ps.lock.RLock()
+	defer ps.lock.RUnlock()
+
+	var (
+		worstPeer *peer
+		worstTD   *big.Int
+	)
+	for _, p := range ps.peers {
+		if _, td := p.Head(); worstPeer == nil || td.Cmp(worstTD) < 0 {
+			worstPeer, worstTD = p, td
+		}
+	}
+	return worstPeer
+}
+
 // Close disconnects all peers.
 // No new peers can be registered after Close has returned.
 func (ps *peerSet) Close() {

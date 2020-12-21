@@ -179,7 +179,8 @@ The export-preimages command export hash preimages to an RLP encoded stream`,
 		},
 		Category: "BLOCKCHAIN COMMANDS",
 		Description: `
-The first argument must be the directory containing the blockchain to download from`,
+The first argument must be the chaindata directory containing the blockchain to download from.
+The second argument must be the ancient chain directory path.`,
 	}
 	removedbCommand = cli.Command{
 		Action:    utils.MigrateFlags(removeDB),

@@ -239,7 +239,7 @@ func createMiner(t *testing.T) (*Miner, *event.TypeMux) {
 	// Create chainConfig
 	memdb := memorydb.New()
 	chainDB := rawdb.NewDatabase(memdb)
-	genesis := params.DeveloperGenesisBlock(15, common.HexToAddress("12345"))
+	genesis := params.DeveloperGenesisBlock(15, common.HexToAddress("12345"), false)
 	chainConfig, _, err := core.SetupGenesisBlock(chainDB, genesis)
 	if err != nil {
 		t.Fatalf("can't create new chain config: %v", err)

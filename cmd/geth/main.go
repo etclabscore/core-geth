@@ -142,8 +142,10 @@ var (
 		utils.NodeKeyFileFlag,
 		utils.NodeKeyHexFlag,
 		utils.DNSDiscoveryFlag,
+		utils.EthProtocolsFlag,
 		utils.DeveloperFlag,
 		utils.DeveloperPeriodFlag,
+		utils.DeveloperPoWFlag,
 		utils.ClassicFlag,
 		utils.MordorFlag,
 		utils.SocialFlag,
@@ -159,6 +161,7 @@ var (
 		utils.NetworkIdFlag,
 		utils.EthStatsURLFlag,
 		utils.FakePoWFlag,
+		utils.FakePoWPoissonFlag,
 		utils.NoCompactionFlag,
 		utils.GpoBlocksFlag,
 		utils.LegacyGpoBlocksFlag,
@@ -310,7 +313,10 @@ func checkMainnet(ctx *cli.Context) bool {
 		log.Info("Starting Geth on Görli testnet...")
 
 	case ctx.GlobalIsSet(utils.DeveloperFlag.Name):
-		log.Info("Starting Geth in ephemeral dev mode...")
+		log.Info("Starting Geth in ephemeral proof-of-authority network dev mode...")
+
+	case ctx.GlobalIsSet(utils.DeveloperPoWFlag.Name):
+		log.Info("Starting Geth in ephemeral proof-of-work network dev mode...")
 
 	case ctx.GlobalIsSet(utils.ClassicFlag.Name):
 		log.Info("Starting Geth on Ethereum Classic...")
@@ -487,7 +493,8 @@ func startNode(ctx *cli.Context, stack *node.Node, backend ethapi.Backend) {
 	}
 
 	// Start auxiliary services if enabled
-	if ctx.GlobalBool(utils.MiningEnabledFlag.Name) || ctx.GlobalBool(utils.DeveloperFlag.Name) {
+	isDeveloperMode := ctx.GlobalBool(utils.DeveloperFlag.Name) || ctx.GlobalBool(utils.DeveloperPoWFlag.Name)
+	if ctx.GlobalBool(utils.MiningEnabledFlag.Name) || isDeveloperMode {
 		// Mining only makes sense if a full Ethereum node is running
 		if ctx.GlobalString(utils.SyncModeFlag.Name) == "light" {
 			utils.Fatalf("Light clients do not support mining")
@@ -508,6 +515,9 @@ func startNode(ctx *cli.Context, stack *node.Node, backend ethapi.Backend) {
 		if ctx.GlobalIsSet(utils.LegacyMinerThreadsFlag.Name) && !ctx.GlobalIsSet(utils.MinerThreadsFlag.Name) {
 			threads = ctx.GlobalInt(utils.LegacyMinerThreadsFlag.Name)
 			log.Warn("The flag --minerthreads is deprecated and will be removed in the future, please use --miner.threads")
+		}
+		if isDeveloperMode && !ctx.GlobalIsSet(utils.MinerThreadsFlag.Name) && !ctx.GlobalIsSet(utils.LegacyMinerThreadsFlag.Name) {
+			threads = 1
 		}
 		if err := ethBackend.StartMining(threads); err != nil {
 			utils.Fatalf("Failed to start mining: %v", err)

@@ -273,6 +273,21 @@ func (api *PrivateAdminAPI) Ecbp1100(blockNr rpc.BlockNumber) (bool, error) {
 			api.eth.blockchain.CurrentBlock().Number()), err
 }
 
+// MaxPeers sets the maximum peer limit for the protocol manager and the p2p server.
+func (api *PrivateAdminAPI) MaxPeers(n int) (bool, error) {
+	api.eth.protocolManager.maxPeers = n
+	api.eth.p2pServer.MaxPeers = n
+
+	for i := api.eth.protocolManager.peers.Len(); i > n; i = api.eth.protocolManager.peers.Len() {
+		p := api.eth.protocolManager.peers.WorstPeer()
+		if p == nil {
+			break
+		}
+		api.eth.protocolManager.removePeer(p.id)
+	}
+	return true, nil
+}
+
 // PublicDebugAPI is the collection of Ethereum full node APIs exposed
 // over the public debugging endpoint.
 type PublicDebugAPI struct {

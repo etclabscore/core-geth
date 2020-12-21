@@ -183,6 +183,11 @@ web3._extend({
 			params: 1
 		}),
 		new web3._extend.Method({
+			name: 'maxPeers',
+			call: 'admin_maxPeers',
+			params: 1
+		}),
+		new web3._extend.Method({
 			name: 'ecbp1100',
 			call: 'admin_ecbp1100',
 			params: 1

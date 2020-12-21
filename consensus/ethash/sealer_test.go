@@ -22,6 +22,7 @@ import (
 	"math/big"
 	"net/http"
 	"net/http/httptest"
+	"sort"
 	"testing"
 	"time"
 
@@ -30,6 +31,24 @@ import (
 	"github.com/ethereum/go-ethereum/internal/testlog"
 	"github.com/ethereum/go-ethereum/log"
 )
+
+func TestSealFakePoisson(t *testing.T) {
+	cases := []int{
+		3, 10, 19, 33,
+	}
+	for _, c := range cases {
+		e := &Ethash{threads: c} // "threads" is actually the desired MEAN (lambda) of the Poisson distribution
+		got := []float64{}
+		for i := 0; i < 20; i++ {
+			d := e.makePoissonFakeDelay()
+			got = append(got, d)
+		}
+		sort.Slice(got, func(i, j int) bool {
+			return got[i] < got[j]
+		})
+		t.Logf("ethash.threads,lamda=%2d %v", c, got)
+	}
+}
 
 // Tests whether remote HTTP servers are correctly notified of new work.
 func TestRemoteNotify(t *testing.T) {
@@ -62,7 +81,8 @@ func TestRemoteNotify(t *testing.T) {
 		if want := ethash.SealHash(header).Hex(); work[0] != want {
 			t.Errorf("work packet hash mismatch: have %s, want %s", work[0], want)
 		}
-		if want := common.BytesToHash(SeedHash(header.Number.Uint64())).Hex(); work[1] != want {
+		epoch := calcEpoch(header.Number.Uint64(), epochLengthDefault)
+		if want := common.BytesToHash(SeedHash(epoch, epochLengthDefault)).Hex(); work[1] != want {
 			t.Errorf("work packet seed mismatch: have %s, want %s", work[1], want)
 		}
 		target := new(big.Int).Div(new(big.Int).Lsh(big.NewInt(1), 256), header.Difficulty)

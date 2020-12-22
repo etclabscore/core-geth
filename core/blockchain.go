@@ -23,6 +23,7 @@ import (
 	"io"
 	"math/big"
 	mrand "math/rand"
+	"runtime"
 	"sort"
 	"sync"
 	"sync/atomic"
@@ -394,6 +395,11 @@ func (bc *BlockChain) empty() bool {
 // loadLastState loads the last known chain state from the database. This method
 // assumes that the chain manager mutex is held.
 func (bc *BlockChain) loadLastState() error {
+	_, fi, li, ok := runtime.Caller(1)
+	if !ok {
+		return errors.New("could not grok caller")
+	}
+	log.Info("Loading blockchain last state", "caller", fmt.Sprintf("%s:%d", fi, li))
 	// Restore the last known head block
 	head := rawdb.ReadHeadBlockHash(bc.db)
 	if head == (common.Hash{}) {
@@ -501,6 +507,7 @@ func (bc *BlockChain) SetHead(head uint64) error {
 			if newHeadFastBlock == nil {
 				newHeadFastBlock = bc.genesisBlock
 			}
+			log.Warn("DEBUG(meowsbits): SetHead:WriteHeadFastBlockHash", "number", header.Number.Uint64(), "headFastBlock.num", newHeadFastBlock.NumberU64())
 			rawdb.WriteHeadFastBlockHash(db, newHeadFastBlock.Hash())
 
 			// Degrade the chain markers if they are explicitly reverted.
@@ -546,7 +553,10 @@ func (bc *BlockChain) SetHead(head uint64) error {
 	// touching the header chain altogether, unless the freezer is broken
 	if block := bc.CurrentBlock(); block.NumberU64() == head {
 		if target, force := updateFn(bc.db, block.Header()); force {
+			log.Warn("Rewinding blockchain", "force", force, "target", head)
 			bc.hc.SetHead(target, updateFn, delFn)
+		} else {
+			log.Warn("Skipping blockchain rewind", "reason", "SetHead was only called as a chain reparation method", "head", head)
 		}
 	} else {
 		// Rewind the chain to the requested head and keep going backwards until a
@@ -1139,8 +1149,16 @@ func (bc *BlockChain) InsertReceiptChain(blockChain types.Blocks, receiptChain [
 				}
 			}
 		}()
+		// ancientsN, err := bc.db.Ancients()
+		// if err != nil {
+		// 	return 0, err
+		// }
 		var deleted []*numberHash
 		for i, block := range blockChain {
+			// if block.NumberU64() < ancientsN {
+			// 	log.Warn("Skipping ancients write","reason", "block number below stored ancients level", "block.num", block.NumberU64(), "ancients", ancientsN)
+			// 	continue
+			// }
 			// Short circuit insertion if shutting down or processing failed
 			if bc.insertStopped() {
 				return 0, errInsertionInterrupted

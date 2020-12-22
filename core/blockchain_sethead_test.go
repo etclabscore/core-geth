@@ -1749,15 +1749,32 @@ func TestFastSyncSetHeadTo1(t *testing.T) {
 	testSetHead(t, &rewindTest{
 		canonicalBlocks:    192,
 		sidechainBlocks:    0,
-		freezeThreshold:    16, // Send blocks direct-to-freezer (no threshold)
+		freezeThreshold:    0, // Send blocks direct-to-freezer (no threshold)
 		commitBlock:        0,
 		pivotBlock:         uint64ptr(10387969),
 		setheadBlock:       1, // Rewind to 1
 		expCanonicalBlocks: 1,
 		expSidechainBlocks: 0,
-		expFrozen:          1, // Genesis
+		expFrozen:          2, // Genesis
 		expHeadHeader:      1,
 		expHeadFastBlock:   1,
+		expHeadBlock:       0,
+	})
+}
+
+func TestFastSyncSetHeadTo16(t *testing.T) {
+	testSetHead(t, &rewindTest{
+		canonicalBlocks:    192,
+		sidechainBlocks:    0,
+		freezeThreshold:    16, // Send blocks direct-to-freezer (no threshold)
+		commitBlock:        0,
+		pivotBlock:         uint64ptr(10387969),
+		setheadBlock:       16, // Rewind to 1
+		expCanonicalBlocks: 16,
+		expSidechainBlocks: 0,
+		expFrozen:          17, // Genesis
+		expHeadHeader:      16,
+		expHeadFastBlock:   16,
 		expHeadBlock:       0,
 	})
 }
@@ -1832,6 +1849,7 @@ func testSetHead(t *testing.T, tt *rewindTest) {
 	}
 	// Set the head of the chain back to the requested number
 	chain.SetHead(tt.setheadBlock)
+	chain.loadLastState()
 
 	// Iterate over all the remaining blocks and ensure there are no gaps
 	verifyNoGaps(t, chain, true, canonblocks)

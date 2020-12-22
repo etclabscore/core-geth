@@ -191,19 +191,10 @@ func (f *freezer) AncientSize(kind string) (uint64, error) {
 // injection will be rejected. But if two injections with same number happen at
 // the same time, we can get into the trouble.
 func (f *freezer) AppendAncient(number uint64, hash, header, body, receipts, td []byte) (err error) {
-
 	// Ensure the binary blobs we are appending is continuous with freezer.
-	if frozen := atomic.LoadUint64(&f.frozen); frozen < number {
-		// Have to return an error here because other would gape.
-		return fmt.Errorf("%w: ancients=%d", errOutOrderInsertion, frozen)
-	} else if frozen > number {
-		// If we already have this block frozen, ignore.
-		// Truncate is used exclusively and explicitly to remove reverted canonical data,
-		// so if we are trying to store an ancient block that we already have it just means
-		// that we're doing redundant, non-mutating work.
-		return nil
+	if atomic.LoadUint64(&f.frozen) != number {
+		return errOutOrderInsertion
 	}
-
 	// Rollback all inserted data if any insertion below failed to ensure
 	// the tables won't out of sync.
 	defer func() {

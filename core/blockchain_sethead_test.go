@@ -1745,13 +1745,13 @@ func TestLongReorgedFastSyncingDeepSetHead(t *testing.T) {
 	})
 }
 
-func TestSetHeadTo1(t *testing.T) {
+func TestFastSyncSetHeadTo1(t *testing.T) {
 	testSetHead(t, &rewindTest{
-		canonicalBlocks:    24,
+		canonicalBlocks:    192,
 		sidechainBlocks:    0,
-		freezeThreshold:    0, // Send blocks direct-to-freezer (no threshold)
+		freezeThreshold:    16, // Send blocks direct-to-freezer (no threshold)
 		commitBlock:        0,
-		pivotBlock:         nil,
+		pivotBlock:         uint64ptr(10387969),
 		setheadBlock:       1, // Rewind to 1
 		expCanonicalBlocks: 1,
 		expSidechainBlocks: 0,

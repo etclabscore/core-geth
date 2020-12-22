@@ -40,7 +40,7 @@ import (
 type rewindTest struct {
 	canonicalBlocks int     // Number of blocks to generate for the canonical chain (heavier)
 	sidechainBlocks int     // Number of blocks to generate for the side chain (lighter)
-	freezeThreshold uint64  // Block number until which to move things into the freezer
+	freezeThreshold uint64  // Block number after which to move things into the freezer
 	commitBlock     uint64  // Block number for which to commit the state to disk
 	pivotBlock      *uint64 // Pivot block number in case of fast sync
 
@@ -1741,6 +1741,23 @@ func TestLongReorgedFastSyncingDeepSetHead(t *testing.T) {
 		expFrozen:          7,
 		expHeadHeader:      6,
 		expHeadFastBlock:   6,
+		expHeadBlock:       0,
+	})
+}
+
+func TestSetHeadTo1(t *testing.T) {
+	testSetHead(t, &rewindTest{
+		canonicalBlocks:    24,
+		sidechainBlocks:    0,
+		freezeThreshold:    0, // Send blocks direct-to-freezer (no threshold)
+		commitBlock:        0,
+		pivotBlock:         nil,
+		setheadBlock:       1, // Rewind to 1
+		expCanonicalBlocks: 1,
+		expSidechainBlocks: 0,
+		expFrozen:          1, // Genesis
+		expHeadHeader:      1,
+		expHeadFastBlock:   1,
 		expHeadBlock:       0,
 	})
 }

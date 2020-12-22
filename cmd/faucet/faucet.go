@@ -293,6 +293,8 @@ func main() {
 	acc, err := ks.Import(blob, pass, pass)
 	if err != nil && err != keystore.ErrAccountAlreadyExists {
 		log.Crit("Failed to import faucet signer account", "err", err)
+	} else if err == nil {
+		log.Info("Imported faucet signer account", "address", acc.Address)
 	}
 	if err := ks.Unlock(acc, pass); err != nil {
 		log.Crit("Failed to unlock faucet signer account", "err", err)

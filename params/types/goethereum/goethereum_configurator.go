@@ -383,11 +383,11 @@ func (c *ChainConfig) SetEIP1706Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2537Transition() *uint64 {
-	return bigNewU64(c.YoloV1Block)
+	return bigNewU64(c.YoloV2Block)
 }
 
 func (c *ChainConfig) SetEIP2537Transition(n *uint64) error {
-	c.YoloV1Block = setBig(c.YoloV1Block, n)
+	c.YoloV2Block = setBig(c.YoloV2Block, n)
 	return nil
 }
 
@@ -397,6 +397,24 @@ func (c *ChainConfig) GetECBP1100Transition() *uint64 {
 
 func (c *ChainConfig) SetECBP1100Transition(n *uint64) error {
 	c.ecbp1100Transition = setBig(c.ecbp1100Transition, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEIP2315Transition() *uint64 {
+	return bigNewU64(c.YoloV2Block)
+}
+
+func (c *ChainConfig) SetEIP2315Transition(n *uint64) error {
+	c.YoloV2Block = setBig(c.YoloV2Block, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEIP2929Transition() *uint64 {
+	return bigNewU64(c.YoloV2Block)
+}
+
+func (c *ChainConfig) SetEIP2929Transition(n *uint64) error {
+	c.YoloV2Block = setBig(c.YoloV2Block, n)
 	return nil
 }
 

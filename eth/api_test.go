@@ -29,6 +29,9 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/stretchr/testify/assert"
 )
 
 var dumper = spew.ConfigState{Indent: "    "}
@@ -198,6 +201,68 @@ func TestStorageRangeAt(t *testing.T) {
 		if !reflect.DeepEqual(result, test.want) {
 			t.Fatalf("wrong result for range 0x%x.., limit %d:\ngot %s\nwant %s",
 				test.start, test.limit, dumper.Sdump(result), dumper.Sdump(&test.want))
+		}
+	}
+}
+
+func getChainConfiguratorForTesting(name string) ctypes.ChainConfigurator {
+	switch name {
+	case "mordor":
+		return params.MordorChainConfig
+	case "classic":
+		return params.ClassicChainConfig
+	default:
+		return params.MainnetChainConfig
+	}
+}
+
+// TestCloneChainConfigForTracing test code sanity for two different ways of copying a ctypes.ChainConfigurator interface.
+// I just want to make sure that I'm not messing with reflect incorrectly.
+// The first way fails.
+func TestCloneChainConfigForTracing(t *testing.T) {
+	c := getChainConfiguratorForTesting("classic")
+
+	// Copy it, way #1.
+	cCopy := new(ctypes.ChainConfigurator)
+	*cCopy = c
+	c = *cCopy
+	_ = c.SetChainID(big.NewInt(42))
+
+	assert.NotEqual(t, uint64(61), params.ClassicChainConfig.GetChainID().Uint64(), "way 1") // original mutated, but shouldn't be!
+	assert.Equal(t, uint64(42), c.GetChainID().Uint64(), "way 1")                            // copy mutated, as expected
+
+	params.ClassicChainConfig.SetChainID(big.NewInt(61)) // reset the value in case the config is ever reused in scope.
+
+	cc := getChainConfiguratorForTesting("mordor")
+
+	// Copy it, way #2.
+	cc = reflect.New(reflect.ValueOf(cc).Elem().Type()).Interface().(ctypes.ChainConfigurator)
+
+	_ = cc.SetChainID(big.NewInt(42))
+
+	assert.Equal(t, uint64(63), params.MordorChainConfig.GetChainID().Uint64(), "way 2") // original unmutated
+	assert.Equal(t, uint64(42), cc.GetChainID().Uint64(), "way 2")                       // copy mutated
+}
+
+// BenchmarkCopyConfiguratorInterface and BenchmarkTestValueEquivalenceAlot
+// show that it's worthwhile to do the ugly equivalence testing (as in BenchmarkTestValueEquivalenceAlot) on chain config Override logic for the tracer.
+// BenchmarkCopyConfiguratorInterface gets about 183 ns/op on my machine.
+func BenchmarkCopyConfiguratorInterface(b *testing.B) {
+	chainConfig := ctypes.ChainConfigurator(params.ClassicChainConfig)
+	for i := 0; i < b.N; i++ {
+		chainConfig = reflect.New(reflect.ValueOf(chainConfig).Elem().Type()).Interface().(ctypes.ChainConfigurator)
+	}
+}
+
+// BenchmarkTestValueEquivalenceAlot gets about 1.5 ns/op on my machine.
+func BenchmarkTestValueEquivalenceAlot(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		overrideEIP2929 := params.ClassicChainConfig.GetEIP2929Transition()
+		existingEIP2929 := params.YoloV2ChainConfig.GetEIP2929Transition()
+		if (overrideEIP2929 == nil && existingEIP2929 != nil) ||
+			(overrideEIP2929 != nil && existingEIP2929 == nil) ||
+			(overrideEIP2929 != nil && existingEIP2929 != nil && *overrideEIP2929 != *existingEIP2929) {
+			// nothing
 		}
 	}
 }

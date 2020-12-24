@@ -73,7 +73,7 @@ var blake2FMalformedInputTests = []precompiledFailureTest{
 }
 
 // allPrecompileds overrides the AllEthashProtocolChanges config.
-// YoloV1 includes EIP2537.
+// YoloV2 includes EIP2537.
 // This config is Clique-based, for one.
 // For two, the chain feature isn't installed in all CliqueChainConfigs either.
 // So we override to ALL of the precompileds gathered, however hacky it may be.

@@ -156,7 +156,7 @@ var (
 		utils.RinkebyFlag,
 		utils.KottiFlag,
 		utils.GoerliFlag,
-		utils.YoloV1Flag,
+		utils.YoloV2Flag,
 		utils.VMEnableDebugFlag,
 		utils.NetworkIdFlag,
 		utils.EthStatsURLFlag,
@@ -327,8 +327,8 @@ func checkMainnet(ctx *cli.Context) bool {
 	case ctx.GlobalIsSet(utils.KottiFlag.Name):
 		log.Info("Starting Geth on Kotti testnet...")
 
-	case ctx.GlobalIsSet(utils.YoloV1Flag.Name):
-		log.Info("Starting Geth on YoloV1 testnet...")
+	case ctx.GlobalIsSet(utils.YoloV2Flag.Name):
+		log.Info("Starting Geth on YoloV2 testnet...")
 
 	case ctx.GlobalIsSet(utils.SocialFlag.Name):
 		log.Info("Starting Geth on Social network...")

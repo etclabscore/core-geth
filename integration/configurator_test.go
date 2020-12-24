@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
@@ -124,6 +125,25 @@ func TestEquivalent_Features(t *testing.T) {
 		if err != nil {
 			t.Errorf("Equivalence: %s oconf/mg err: %v", name, err) // With error.
 			debuglog(oconf, mg)
+		}
+
+		// EIP2929 is unsupported by Parity (https://docs.google.com/spreadsheets/d/1BomvS0hjc88eTfx1b8Ufa6KYS3vMEb2c8TQ5HJWx2lc/edit#gid=408811124),
+		// which means they cannot support the following forks.
+		// So skip the Parity equivalence checks for them.
+		parityUnsupportedForks := []string{
+			"yolo",
+			"berlin",
+		}
+		paritySupports := func(forkName string) bool {
+			for _, s := range parityUnsupportedForks {
+				if strings.Contains(strings.ToLower(forkName), s) {
+					return false
+				}
+			}
+			return true
+		}
+		if !paritySupports(name) {
+			continue
 		}
 
 		pc := &parity.ParityChainSpec{}

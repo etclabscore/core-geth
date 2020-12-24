@@ -64,11 +64,15 @@ require (
 	github.com/tyler-smith/go-bip39 v1.0.1-0.20181017060643-dbb3b84ba2ef
 	github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
-	golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f
+	golang.org/x/exp v0.0.0-20191030013958-a1ab85dbe136
+	golang.org/x/net v0.0.0-20200822124328-c89045814202 // indirect
+	golang.org/x/sys v0.0.0-20200824131525-c12d262b63d8
 	golang.org/x/text v0.3.3
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
+	gonum.org/v1/gonum v0.8.1
 	gonum.org/v1/plot v0.8.0
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20200619000410-60c24ae608a6
 	gopkg.in/urfave/cli.v1 v1.20.0
+	gotest.tools v2.2.0+incompatible // indirect
 )

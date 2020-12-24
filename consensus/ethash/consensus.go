@@ -463,7 +463,7 @@ func (ethash *Ethash) VerifySeal(chain consensus.ChainHeaderReader, header *type
 // to make remote mining fast.
 func (ethash *Ethash) verifySeal(chain consensus.ChainHeaderReader, header *types.Header, fulldag bool) error {
 	// If we're running a fake PoW, accept any seal as valid
-	if ethash.config.PowMode == ModeFake || ethash.config.PowMode == ModeFullFake {
+	if ethash.config.PowMode == ModeFake || ethash.config.PowMode == ModePoissonFake || ethash.config.PowMode == ModeFullFake {
 		time.Sleep(ethash.fakeDelay)
 		if ethash.fakeFail == header.Number.Uint64() {
 			return errInvalidPoW

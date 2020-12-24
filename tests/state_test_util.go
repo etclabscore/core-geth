@@ -220,6 +220,16 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 
 	evm := vm.NewEVM(context, statedb, config, vmconfig)
 
+	if config.IsEnabled(config.GetEIP2929Transition, block.Number()) {
+		statedb.AddAddressToAccessList(msg.From())
+		if dst := msg.To(); dst != nil {
+			statedb.AddAddressToAccessList(*dst)
+			// If it's a create-tx, the destination will be added inside evm.create
+		}
+		for addr := range vm.PrecompiledContractsForConfig(config, block.Number()) {
+			statedb.AddAddressToAccessList(addr)
+		}
+	}
 	gaspool := new(core.GasPool)
 	gaspool.AddGas(block.GasLimit())
 	snapshot := statedb.Snapshot()
@@ -259,7 +269,7 @@ func MakePreState(db ethdb.Database, accounts genesisT.GenesisAlloc, snapshotter
 
 	var snaps *snapshot.Tree
 	if snapshotter {
-		snaps = snapshot.New(db, sdb.TrieDB(), 1, root, false)
+		snaps = snapshot.New(db, sdb.TrieDB(), 1, root, false, false)
 	}
 	statedb, _ = state.New(root, sdb, snaps)
 	return snaps, statedb

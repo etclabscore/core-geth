@@ -30,7 +30,8 @@ var (
 	RopstenGenesisHash = common.HexToHash("0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d")
 	RinkebyGenesisHash = common.HexToHash("0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177")
 	GoerliGenesisHash  = common.HexToHash("0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a")
-	YoloV1GenesisHash  = common.HexToHash("0xc3fd235071f24f93865b0850bd2a2119b30f7224d18a0e34c7bbf549ad7e3d36")
+	// TODO: update with yolov2 values
+	YoloV2GenesisHash = common.HexToHash("0xc3fd235071f24f93865b0850bd2a2119b30f7224d18a0e34c7bbf549ad7e3d36")
 )
 
 // TrustedCheckpoints associates each known checkpoint with the genesis hash of
@@ -218,9 +219,9 @@ var (
 		Threshold: 2,
 	}
 
-	// YoloV1ChainConfig contains the chain parameters to run a node on the YOLOv1 test network.
-	YoloV1ChainConfig = &goethereum.ChainConfig{
-		ChainID:             big.NewInt(133519467574833),
+	// YoloV2ChainConfig contains the chain parameters to run a node on the YOLOv2 test network.
+	YoloV2ChainConfig = &goethereum.ChainConfig{
+		ChainID:             big.NewInt(133519467574834),
 		HomesteadBlock:      big.NewInt(0),
 		DAOForkBlock:        nil,
 		DAOForkSupport:      true,
@@ -232,7 +233,7 @@ var (
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(0),
 		MuirGlacierBlock:    nil,
-		YoloV1Block:         big.NewInt(0),
+		YoloV2Block:         big.NewInt(0),
 		Clique: &ctypes.CliqueConfig{
 			Period: 15,
 			Epoch:  30000,
@@ -258,7 +259,7 @@ var (
 		PetersburgBlock:         big.NewInt(0),
 		IstanbulBlock:           big.NewInt(0),
 		MuirGlacierBlock:        nil,
-		YoloV1Block:             nil,
+		YoloV2Block:             nil,
 		EWASMBlock:              nil,
 		Ethash:                  new(ctypes.EthashConfig),
 		Clique:                  nil,
@@ -267,62 +268,62 @@ var (
 	}
 
 	/*
-		https://github.com/ethereum/go-ethereum/blob/master/params/config.go#L242
+			https://github.com/ethereum/go-ethereum/blob/master/params/config.go#L242
 
-			AllEthashProtocolChanges = &ChainConfig{
-			big.NewInt(1337),
-			big.NewInt(0),
-			nil,
-			false,
-			big.NewInt(0),
-			common.Hash{},
-			big.NewInt(0),
-			big.NewInt(0),
-			big.NewInt(0),
-			big.NewInt(0),
-			big.NewInt(0),
-			big.NewInt(0),
-			nil,
-			nil,
-			nil,
-			new(EthashConfig),
-			nil
+				AllEthashProtocolChanges = &ChainConfig{
+				big.NewInt(1337),
+				big.NewInt(0),
+				nil,
+				false,
+				big.NewInt(0),
+				common.Hash{},
+				big.NewInt(0),
+				big.NewInt(0),
+				big.NewInt(0),
+				big.NewInt(0),
+				big.NewInt(0),
+				big.NewInt(0),
+				nil,
+				nil,
+				nil,
+				new(EthashConfig),
+				nil
+				}
+
+
+			// ChainConfig is the core config which determines the blockchain settings.
+			//
+			// ChainConfig is stored in the database on a per block basis. This means
+			// that any network, identified by its genesis block, can have its own
+			// set of configuration options.
+			type ChainConfig struct {
+				ChainID *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
+
+				HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)
+
+				DAOForkBlock   *big.Int `json:"daoForkBlock,omitempty"`   // TheDAO hard-fork switch block (nil = no fork)
+				DAOForkSupport bool     `json:"daoForkSupport,omitempty"` // Whether the nodes supports or opposes the DAO hard-fork
+
+				// EIP150 implements the Gas price changes (https://github.com/ethereum/EIPs/issues/150)
+				EIP150Block *big.Int    `json:"eip150Block,omitempty"` // EIP150 HF block (nil = no fork)
+				EIP150Hash  common.Hash `json:"eip150Hash,omitempty"`  // EIP150 HF hash (needed for header only clients as only gas pricing changed)
+
+				EIP155Block *big.Int `json:"eip155Block,omitempty"` // EIP155 HF block
+				EIP158Block *big.Int `json:"eip158Block,omitempty"` // EIP158 HF block
+
+				ByzantiumBlock      *big.Int `json:"byzantiumBlock,omitempty"`      // Byzantium switch block (nil = no fork, 0 = already on byzantium)
+				ConstantinopleBlock *big.Int `json:"constantinopleBlock,omitempty"` // Constantinople switch block (nil = no fork, 0 = already activated)
+				PetersburgBlock     *big.Int `json:"petersburgBlock,omitempty"`     // Petersburg switch block (nil = same as Constantinople)
+				IstanbulBlock       *big.Int `json:"istanbulBlock,omitempty"`       // Istanbul switch block (nil = no fork, 0 = already on istanbul)
+				MuirGlacierBlock    *big.Int `json:"muirGlacierBlock,omitempty"`    // Eip-2384 (bomb delay) switch block (nil = no fork, 0 = already activated)
+
+		YoloV2Block *big.Int `json:"yoloV2Block,omitempty"` // YOLO v1: https://github.com/ethereum/EIPs/pull/2657 (Ephemeral testnet)
+				EWASMBlock  *big.Int `json:"ewasmBlock,omitempty"`  // EWASM switch block (nil = no fork, 0 = already activated)
+
+				// Various consensus engines
+				Ethash *EthashConfig `json:"ethash,omitempty"`
+				Clique *CliqueConfig `json:"clique,omitempty"`
 			}
-
-
-		// ChainConfig is the core config which determines the blockchain settings.
-		//
-		// ChainConfig is stored in the database on a per block basis. This means
-		// that any network, identified by its genesis block, can have its own
-		// set of configuration options.
-		type ChainConfig struct {
-			ChainID *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
-
-			HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)
-
-			DAOForkBlock   *big.Int `json:"daoForkBlock,omitempty"`   // TheDAO hard-fork switch block (nil = no fork)
-			DAOForkSupport bool     `json:"daoForkSupport,omitempty"` // Whether the nodes supports or opposes the DAO hard-fork
-
-			// EIP150 implements the Gas price changes (https://github.com/ethereum/EIPs/issues/150)
-			EIP150Block *big.Int    `json:"eip150Block,omitempty"` // EIP150 HF block (nil = no fork)
-			EIP150Hash  common.Hash `json:"eip150Hash,omitempty"`  // EIP150 HF hash (needed for header only clients as only gas pricing changed)
-
-			EIP155Block *big.Int `json:"eip155Block,omitempty"` // EIP155 HF block
-			EIP158Block *big.Int `json:"eip158Block,omitempty"` // EIP158 HF block
-
-			ByzantiumBlock      *big.Int `json:"byzantiumBlock,omitempty"`      // Byzantium switch block (nil = no fork, 0 = already on byzantium)
-			ConstantinopleBlock *big.Int `json:"constantinopleBlock,omitempty"` // Constantinople switch block (nil = no fork, 0 = already activated)
-			PetersburgBlock     *big.Int `json:"petersburgBlock,omitempty"`     // Petersburg switch block (nil = same as Constantinople)
-			IstanbulBlock       *big.Int `json:"istanbulBlock,omitempty"`       // Istanbul switch block (nil = no fork, 0 = already on istanbul)
-			MuirGlacierBlock    *big.Int `json:"muirGlacierBlock,omitempty"`    // Eip-2384 (bomb delay) switch block (nil = no fork, 0 = already activated)
-
-			YoloV1Block *big.Int `json:"yoloV1Block,omitempty"` // YOLO v1: https://github.com/ethereum/EIPs/pull/2657 (Ephemeral testnet)
-			EWASMBlock  *big.Int `json:"ewasmBlock,omitempty"`  // EWASM switch block (nil = no fork, 0 = already activated)
-
-			// Various consensus engines
-			Ethash *EthashConfig `json:"ethash,omitempty"`
-			Clique *CliqueConfig `json:"clique,omitempty"`
-		}
 	*/
 
 	// AllCliqueProtocolChanges contains every protocol change (EIPs) introduced

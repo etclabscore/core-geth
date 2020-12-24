@@ -149,6 +149,17 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigura
 		vmContext.Origin = msg.From()
 
 		evm := vm.NewEVM(vmContext, statedb, chainConfig, vmConfig)
+		if chainConfig.IsEnabled(chainConfig.GetEIP2929Transition, vmContext.BlockNumber) {
+			statedb.AddAddressToAccessList(msg.From())
+			if dst := msg.To(); dst != nil {
+				statedb.AddAddressToAccessList(*dst)
+				// If it's a create-tx, the destination will be added inside evm.create
+			}
+			for addr := range vm.PrecompiledContractsForConfig(chainConfig, vmContext.BlockNumber) {
+				statedb.AddAddressToAccessList(addr)
+			}
+		}
+
 		snapshot := statedb.Snapshot()
 		// (ret []byte, usedGas uint64, failed bool, err error)
 		msgResult, err := core.ApplyMessage(evm, msg, gaspool)

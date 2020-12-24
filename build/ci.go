@@ -144,11 +144,11 @@ var (
 	// Note: artful is unsupported because it was officially deprecated on Launchpad.
 	// Note: cosmic is unsupported because it was officially deprecated on Launchpad.
 	// Note: disco is unsupported because it was officially deprecated on Launchpad.
+	// Note: eoan is unsupported because it was officially deprecated on Launchpad.
 	debDistroGoBoots = map[string]string{
 		"trusty": "golang-1.11",
 		"xenial": "golang-go",
 		"bionic": "golang-go",
-		"eoan":   "golang-go",
 		"focal":  "golang-go",
 		"groovy": "golang-go",
 	}
@@ -1054,7 +1054,7 @@ func doXCodeFramework(cmdline []string) {
 	if *deploy != "" {
 		meta := newPodMetadata(env, archive)
 		build.Render("build/pod.podspec", "Geth.podspec", 0755, meta)
-		build.MustRunCommand("pod", *deploy, "push", "Geth.podspec", "--allow-warnings", "--verbose")
+		build.MustRunCommand("pod", *deploy, "push", "Geth.podspec", "--allow-warnings")
 	}
 }
 

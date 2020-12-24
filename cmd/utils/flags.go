@@ -24,7 +24,6 @@ import (
 	"io/ioutil"
 	"math/big"
 	"os"
-	"os/user"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -139,8 +138,13 @@ var (
 	}
 	NetworkIdFlag = cli.Uint64Flag{
 		Name:  "networkid",
-		Usage: "Explicitly set network id (integer)(For testnets: use --ropsten, --rinkeby, --goerli, --kotti, --mordor, --yolov1 instead)",
+		Usage: "Explicitly set network id (integer)(For testnets: use --ropsten, --rinkeby, --goerli, --kotti, --mordor, --yolov2 instead)",
 		Value: eth.DefaultConfig.NetworkId,
+	}
+	EthProtocolsFlag = cli.StringFlag{
+		Name:  "eth.protocols",
+		Usage: "Sets the Ethereum Protocol versions (65|64|63) (default = 65,64,63 first is primary)",
+		Value: "",
 	}
 	ClassicFlag = cli.BoolFlag{
 		Name:  "classic",
@@ -158,9 +162,9 @@ var (
 		Name:  "ethersocial",
 		Usage: "Ethersocial network: pre-configured Ethersocial mainnet",
 	}
-	YoloV1Flag = cli.BoolFlag{
-		Name:  "yolov1",
-		Usage: "YOLOv1 network: pre-configured proof-of-authority shortlived test network.",
+	YoloV2Flag = cli.BoolFlag{
+		Name:  "yolov2",
+		Usage: "YOLOv2 network: pre-configured proof-of-authority shortlived test network.",
 	}
 	RinkebyFlag = cli.BoolFlag{
 		Name:  "rinkeby",
@@ -188,7 +192,11 @@ var (
 	}
 	DeveloperPeriodFlag = cli.IntFlag{
 		Name:  "dev.period",
-		Usage: "Block period to use in developer mode (0 = mine only if transaction pending)",
+		Usage: "Block period for proof-of-authority network to use in developer mode (0 = mine only if transaction pending)",
+	}
+	DeveloperPoWFlag = cli.BoolFlag{
+		Name:  "dev.pow",
+		Usage: "Ephemeral proof-of-work network with a pre-funded developer account, mining enabled",
 	}
 	IdentityFlag = cli.StringFlag{
 		Name:  "identity",
@@ -512,6 +520,10 @@ var (
 	FakePoWFlag = cli.BoolFlag{
 		Name:  "fakepow",
 		Usage: "Disables proof-of-work verification",
+	}
+	FakePoWPoissonFlag = cli.BoolFlag{
+		Name:  "fakepow.poisson",
+		Usage: "Disables proof-of-work verification and adds mining delay (Poisson) based on --miner.threads",
 	}
 	NoCompactionFlag = cli.BoolFlag{
 		Name:  "nocompaction",
@@ -854,8 +866,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.KottiBootnodes
 	case ctx.GlobalBool(GoerliFlag.Name):
 		urls = params.GoerliBootnodes
-	case ctx.GlobalBool(YoloV1Flag.Name):
-		urls = params.YoloV1Bootnodes
+	case ctx.GlobalBool(YoloV2Flag.Name):
+		urls = params.YoloV2Bootnodes
 	case cfg.BootstrapNodes != nil:
 		return // already set, don't apply defaults.
 	}
@@ -896,8 +908,8 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.KottiBootnodes
 	case ctx.GlobalBool(GoerliFlag.Name):
 		urls = params.GoerliBootnodes
-	case ctx.GlobalBool(YoloV1Flag.Name):
-		urls = params.YoloV1Bootnodes
+	case ctx.GlobalBool(YoloV2Flag.Name):
+		urls = params.YoloV2Bootnodes
 	case cfg.BootstrapNodesV5 != nil:
 		return // already set, don't apply defaults.
 	}
@@ -1248,7 +1260,7 @@ func SetP2PConfig(ctx *cli.Context, cfg *p2p.Config) {
 		cfg.NetRestrict = list
 	}
 
-	if ctx.GlobalBool(DeveloperFlag.Name) {
+	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) {
 		// --dev mode can't use p2p networking.
 		cfg.MaxPeers = 0
 		cfg.ListenAddr = ":0"
@@ -1326,8 +1338,8 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "kotti")
 	case ctx.GlobalBool(GoerliFlag.Name):
 		return filepath.Join(baseDataDirPath, "goerli")
-	case ctx.GlobalBool(YoloV1Flag.Name):
-		return filepath.Join(baseDataDirPath, "yolo-v1")
+	case ctx.GlobalBool(YoloV2Flag.Name):
+		return filepath.Join(baseDataDirPath, "yolo-v2")
 	}
 	return baseDataDirPath
 }
@@ -1337,7 +1349,7 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 	case ctx.GlobalIsSet(DataDirFlag.Name):
 		cfg.DataDir = ctx.GlobalString(DataDirFlag.Name)
 
-	case ctx.GlobalBool(DeveloperFlag.Name):
+	case ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name):
 		cfg.DataDir = "" // unless explicitly requested, use memory databases
 
 	case (ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name)) && cfg.DataDir == vars.DefaultDataDir():
@@ -1437,12 +1449,7 @@ func setEthashDatasetDir(ctx *cli.Context, cfg *eth.Config) {
 
 	case (ctx.GlobalBool(ClassicFlag.Name) || ctx.GlobalBool(MordorFlag.Name)) && cfg.Ethash.DatasetDir == eth.DefaultConfig.Ethash.DatasetDir:
 		// ECIP-1099 is set, use etchash dir for DAGs instead
-		home := os.Getenv("HOME")
-		if home == "" {
-			if user, err := user.Current(); err == nil {
-				home = user.HomeDir
-			}
-		}
+		home := HomeDir()
 		if runtime.GOOS == "darwin" {
 			cfg.Ethash.DatasetDir = filepath.Join(home, "Library", "Etchash")
 		} else if runtime.GOOS == "windows" {
@@ -1474,6 +1481,9 @@ func setEthash(ctx *cli.Context, cfg *eth.Config) {
 	setEthashCacheDir(ctx, cfg)
 	setEthashDatasetDir(ctx, cfg)
 
+	if ctx.GlobalBool(FakePoWPoissonFlag.Name) {
+		cfg.Ethash.PowMode = ethash.ModePoissonFake
+	}
 	if ctx.GlobalIsSet(EthashCachesInMemoryFlag.Name) {
 		cfg.Ethash.CachesInMem = ctx.GlobalInt(EthashCachesInMemoryFlag.Name)
 	}
@@ -1607,9 +1617,9 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, DeveloperFlag, LegacyTestnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV1Flag, ClassicFlag, KottiFlag, MordorFlag, EthersocialFlag, SocialFlag)
+	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, LegacyTestnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV2Flag, ClassicFlag, KottiFlag, MordorFlag, EthersocialFlag, SocialFlag)
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, SyncModeFlag, "light")
-	CheckExclusive(ctx, DeveloperFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
+	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	CheckExclusive(ctx, GCModeFlag, "archive", TxLookupLimitFlag)
 	// todo(rjl493456442) make it available for les server
 	// Ancient tx indices pruning is not available for les server now
@@ -1617,6 +1627,8 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, TxLookupLimitFlag)
 
 	CheckExclusive(ctx, AncientFlag, AncientRPCFlag)
+	CheckExclusive(ctx, DeveloperPoWFlag, DeveloperPeriodFlag, FakePoWFlag)
+	CheckExclusive(ctx, FakePoWFlag, FakePoWPoissonFlag)
 
 	var ks *keystore.KeyStore
 	if keystores := stack.AccountManager().Backends(keystore.KeyStoreType); len(keystores) > 0 {
@@ -1727,6 +1739,44 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		cfg.NetworkId = *cfg.Genesis.GetNetworkID()
 	}
 
+	if ctx.GlobalIsSet(EthProtocolsFlag.Name) {
+		protocolVersions := SplitAndTrim(ctx.GlobalString(EthProtocolsFlag.Name))
+		if len(protocolVersions) == 0 {
+			Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.DefaultProtocolVersions)), ","))
+		}
+
+		seenVersions := map[uint]interface{}{}
+		for _, versionString := range protocolVersions {
+			version, err := strconv.ParseUint(versionString, 10, 0)
+			if err != nil {
+				Fatalf("--%s has invalid value \"%v\" with error: %v", EthProtocolsFlag.Name, versionString, err)
+			}
+
+			if _, duplicate := seenVersions[uint(version)]; duplicate {
+				Fatalf("--%s has duplicate version of %v", EthProtocolsFlag.Name, versionString)
+			}
+
+			isValid := false
+			for _, proto := range eth.DefaultProtocolVersions {
+				if proto == uint(version) {
+					isValid = true
+					seenVersions[uint(version)] = nil
+					break
+				}
+			}
+
+			if !isValid {
+				Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.DefaultProtocolVersions)), ","))
+			}
+			cfg.ProtocolVersions = append(cfg.ProtocolVersions, uint(version))
+		}
+	}
+
+	// set default protocol versions
+	if len(cfg.ProtocolVersions) == 0 {
+		cfg.ProtocolVersions = eth.DefaultProtocolVersions
+	}
+
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.
 	switch {
 	case ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name):
@@ -1748,7 +1798,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		}
 	}
 
-	if ctx.GlobalBool(DeveloperFlag.Name) {
+	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) {
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 1337
 		}
@@ -1782,7 +1832,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		log.Info("Using developer account", "address", developer.Address)
 
 		// Create a new developer genesis block or reuse existing one
-		cfg.Genesis = params.DeveloperGenesisBlock(uint64(ctx.GlobalInt(DeveloperPeriodFlag.Name)), developer.Address)
+		cfg.Genesis = params.DeveloperGenesisBlock(uint64(ctx.GlobalInt(DeveloperPeriodFlag.Name)), developer.Address, ctx.GlobalBool(DeveloperPoWFlag.Name))
 		if ctx.GlobalIsSet(DataDirFlag.Name) {
 			// Check if we have an already initialized chain and fall back to
 			// that if so. Otherwise we need to generate a new genesis spec.
@@ -1958,14 +2008,14 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 		genesis = params.DefaultKottiGenesisBlock()
 	case ctx.GlobalBool(GoerliFlag.Name):
 		genesis = params.DefaultGoerliGenesisBlock()
-	case ctx.GlobalBool(YoloV1Flag.Name):
-		genesis = params.DefaultYoloV1GenesisBlock()
+	case ctx.GlobalBool(YoloV2Flag.Name):
+		genesis = params.DefaultYoloV2GenesisBlock()
 	}
 	return genesis
 }
 
 func MakeGenesis(ctx *cli.Context) *genesisT.Genesis {
-	if ctx.GlobalBool(DeveloperFlag.Name) {
+	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) {
 		Fatalf("Developer chains are ephemeral")
 	}
 	return genesisForCtxChainConfig(ctx)
@@ -1987,7 +2037,9 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 		}, chainDb)
 	} else {
 		engine = ethash.NewFaker()
-		if !ctx.GlobalBool(FakePoWFlag.Name) {
+		if ctx.GlobalBool(FakePoWPoissonFlag.Name) {
+			engine = ethash.NewPoissonFaker()
+		} else if !ctx.GlobalBool(FakePoWFlag.Name) {
 			engine = ethash.New(ethash.Config{
 				CacheDir:         stack.ResolvePath(eth.DefaultConfig.Ethash.CacheDir),
 				CachesInMem:      eth.DefaultConfig.Ethash.CachesInMem,

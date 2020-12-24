@@ -20,6 +20,10 @@
 	// callstack is the current recursive call stack of the EVM execution.
 	callstack: [{}],
 
+	// getCallstackLength (optional) is used for optimisation reasons, checking from within go
+	// if the `step` method has to be called for a VM opcode.
+	getCallstackLength: function() {return this.callstack.length;},
+
 	// descended tracks whether we've just descended from an outer transaction into
 	// an inner call.
 	descended: false,
@@ -54,7 +58,7 @@
 	step: function(log, db) {
 		// Capture any errors immediately
 		var error = log.getError();
-		if (typeof error !== "undefined") {
+		if (error !== undefined) {
 			this.fault(log, db);
 			return;
 		}
@@ -86,7 +90,7 @@
 		// NOTE: Keep it above the this.descended if check
 		if (syscall && op == "SELFDESTRUCT") {
 			var left = this.callstack.length;
-			if (typeof this.callstack[left-1].calls === "undefined") {
+			if (this.callstack[left-1].calls === undefined) {
 				this.callstack[left-1].calls = [];
 			}
 			this.callstack[left-1].calls.push({
@@ -148,7 +152,7 @@
 		if (this.descended) {
 			if (log.getDepth() >= this.callstack.length) {
 				var call = this.callstack[this.callstack.length - 1];
-				if (typeof call.gas === "undefined") {
+				if (call.gas === undefined) {
 					call.gas = log.getGas();
 				}
 			} else {
@@ -185,9 +189,9 @@
 				if (!ret.equals(0)) {
 					call.to     = toHex(toAddress(ret.toString(16)));
 					call.output = toHex(db.getCode(toAddress(ret.toString(16))));
-				} else if (typeof call.error === "undefined") {
+				} else if (call.error === undefined) {
 					var opError = log.getCallError();
-					if (typeof opError !== "undefined") {
+					if (opError !== undefined) {
 						if (this.paritySkipTracesForErrors.indexOf(opError) > -1) {
 							return;
 						}
@@ -200,19 +204,19 @@
 				}
 			} else {
 				// If the call was a contract call, retrieve the gas usage and output
-				if (typeof call.gas !== "undefined") {
+				if (call.gas !== undefined) {
 					call.gasUsed = "0x" + bigInt(call.gasIn - call.gasCost + call.gas - log.getGas()).toString(16);
 				}
 				delete call.gasIn; delete call.gasCost;
 
 				var ret = log.stack.peek(0);
 				if (!ret.equals(0)) {
-					if (typeof call.output === "undefined" || call.output === "0x") {
+					if (call.output === undefined || call.output === "0x") {
 						call.output = toHex(log.getReturnData());
 					}
-				} else if (typeof call.error === "undefined") {
+				} else if (call.error === undefined) {
 					var opError = log.getCallError();
-					if (typeof opError !== "undefined") {
+					if (opError !== undefined) {
 						if (this.paritySkipTracesForErrors.indexOf(opError) > -1) {
 							return;
 						}
@@ -229,14 +233,14 @@
 
 				delete call.outOff; delete call.outLen;
 			}
-			if (typeof call.gas !== "undefined") {
+			if (call.gas !== undefined) {
 				call.gas = '0x' + bigInt(call.gas).toString(16);
 			}
 
 			// Inject the call into the previous one
 			var left = this.callstack.length;
-			left = left > 0 ? left-1 :left;
-			if (typeof this.callstack[left].calls === "undefined") {
+			left = left > 0 ? left-1 : left;
+			if (this.callstack[left].calls === undefined) {
 				this.callstack[left].calls = [];
 			}
 			this.callstack[left].calls.push(call);
@@ -246,7 +250,7 @@
 	// fault is invoked when the actual execution of an opcode fails.
 	fault: function(log, db) {
 		// If the topmost call already reverted, don't handle the additional fault again
-		if (typeof this.callstack[this.callstack.length - 1].error !== "undefined") {
+		if (this.callstack[this.callstack.length - 1].error !== undefined) {
 			return;
 		}
 		// Pop off the just failed call
@@ -254,7 +258,7 @@
 		call.error = log.getError();
 
 		var opError = log.getCallError();
-		if (typeof opError !== "undefined") {
+		if (opError !== undefined) {
 			if (this.paritySkipTracesForErrors.indexOf(opError) > -1) {
 				return;
 			}
@@ -262,7 +266,7 @@
 		}
 
 		// Consume all available gas and clean any leftovers
-		if (typeof call.gas !== "undefined") {
+		if (call.gas !== undefined) {
 			call.gas = '0x' + bigInt(call.gas).toString(16);
 			call.gasUsed = call.gas
 		} else {
@@ -272,7 +276,7 @@
 			call.gas = '0x' + bigInt(log.getGas()).toString(16);
 		}
 
-		if (call.error === "out of gas" && typeof call.gas === "undefined") {
+		if (call.error === "out of gas" && call.gas === undefined) {
 			call.gas = "0x0";
 		}
 		delete call.gasIn; delete call.gasCost;
@@ -281,7 +285,7 @@
 		// Flatten the failed call into its parent
 		var left = this.callstack.length;
 		if (left > 0) {
-			if (typeof this.callstack[left-1].calls === "undefined") {
+			if (this.callstack[left-1].calls === undefined) {
 				this.callstack[left-1].calls = [];
 			}
 			this.callstack[left-1].calls.push(call);
@@ -318,15 +322,15 @@
 		if (this.descended && this.callstack.length > 1 && this.isObjectEmpty(this.callstack[0])) {
 			this.callstack.shift();
 		}
-		if (typeof this.callstack[0].calls !== "undefined") {
+		if (this.callstack[0].calls !== undefined) {
 			result.calls = this.callstack[0].calls;
 		}
-		if (typeof this.callstack[0].error !== "undefined") {
+		if (this.callstack[0].error !== undefined) {
 			result.error = this.callstack[0].error;
-		} else if (typeof ctx.error !== "undefined") {
+		} else if (ctx.error !== undefined) {
 			result.error = ctx.error;
 		}
-		if (typeof result.error !== "undefined" && (result.error !== "execution reverted" || result.output ==="0x")) {
+		if (result.error !== undefined && (result.error !== "execution reverted" || result.output ==="0x")) {
 			delete result.output;
 		}
 		return this.finalize(result, extraCtx);
@@ -369,7 +373,7 @@
 			time: call.time,
 		}
 
-		if (typeof sorted.error !== "undefined") {
+		if (sorted.error !== undefined) {
 			if (this.parityErrorMapping.hasOwnProperty(sorted.error)) {
 				sorted.error = this.parityErrorMapping[sorted.error];
 				delete sorted.result;
@@ -386,23 +390,23 @@
 		for (var key in sorted) {
 			if (typeof sorted[key] === "object") {
 				for (var nested_key in sorted[key]) {
-					if (typeof sorted[key][nested_key] === "undefined") {
+					if (sorted[key][nested_key] === undefined) {
 						delete sorted[key][nested_key];
 					}
 				}
-			} else if (typeof sorted[key] === "undefined") {
+			} else if (sorted[key] === undefined) {
 				delete sorted[key];
 			}
 		}
 
 		var calls = call.calls;
-		if (typeof calls !== "undefined") {
+		if (calls !== undefined) {
 			sorted["subtraces"] = calls.length;
 		}
 
 		var results = [sorted];
 
-		if (typeof calls !== "undefined") {
+		if (calls !== undefined) {
 			for (var i=0; i<calls.length; i++) {
 				var childCall = calls[i];
 

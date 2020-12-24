@@ -499,8 +499,27 @@ const (
 	ModeShared
 	ModeTest
 	ModeFake
+	ModePoissonFake
 	ModeFullFake
 )
+
+func (m Mode) String() string {
+	switch m {
+	case ModeNormal:
+		return "Normal"
+	case ModeShared:
+		return "Shared"
+	case ModeTest:
+		return "Test"
+	case ModeFake:
+		return "Fake"
+	case ModePoissonFake:
+		return "PoissonFake"
+	case ModeFullFake:
+		return "FullFake"
+	}
+	return "unknown"
+}
 
 // Config are the configuration parameters of the ethash.
 type Config struct {
@@ -620,6 +639,18 @@ func NewFakeDelayer(delay time.Duration) *Ethash {
 			Log:     log.Root(),
 		},
 		fakeDelay: delay,
+	}
+}
+
+// NewPoissonFaker creates a ethash consensus engine with a fake PoW scheme that
+// accepts all blocks as valid, but delays mining by some time based on miner.threads, though
+// they still have to conform to the Ethereum consensus rules.
+func NewPoissonFaker() *Ethash {
+	return &Ethash{
+		config: Config{
+			PowMode: ModePoissonFake,
+			Log:     log.Root(),
+		},
 	}
 }
 

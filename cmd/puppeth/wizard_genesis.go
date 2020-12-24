@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -201,47 +202,57 @@ func (w *wizard) manageGenesis() {
 	fmt.Println(" 2. Export genesis configurations")
 	fmt.Println(" 3. Remove genesis configuration")
 
+	// sanitizeUint64P safeguards against taking the value of a potential nil address.
+	// In case a nil is passed, the max integer value is returned, which in the chain configuration context
+	// is functionally equivalent to being unset.
+	sanitizeUint64P := func(n *uint64) uint64 {
+		if n == nil {
+			return math.MaxUint64
+		}
+		return *n
+	}
+
 	choice := w.read()
 	switch choice {
 	case "1":
 		// Fork rule updating requested, iterate over each fork
 		fmt.Println()
-		fmt.Printf("Which block should Homestead come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEthashHomesteadTransition())
-		w.conf.Genesis.Config.SetEthashHomesteadTransition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEthashHomesteadTransition()))
+		fmt.Printf("Which block should Homestead come into effect? (default = %v)\n", sanitizeUint64P(w.conf.Genesis.Config.GetEthashHomesteadTransition()))
+		w.conf.Genesis.Config.SetEthashHomesteadTransition(w.readDefaultUint64P(sanitizeUint64P(w.conf.Genesis.Config.GetEthashHomesteadTransition())))
 
 		fmt.Println()
-		fmt.Printf("Which block should EIP150 (Tangerine Whistle) come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP150Transition())
-		w.conf.Genesis.Config.SetEIP150Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP150Transition()))
+		fmt.Printf("Which block should EIP150 (Tangerine Whistle) come into effect? (default = %v)\n", sanitizeUint64P(w.conf.Genesis.Config.GetEIP150Transition()))
+		w.conf.Genesis.Config.SetEIP150Transition(w.readDefaultUint64P(sanitizeUint64P(w.conf.Genesis.Config.GetEIP150Transition())))
 
 		fmt.Println()
-		fmt.Printf("Which block should EIP155 (Spurious Dragon) come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP155Transition())
-		w.conf.Genesis.Config.SetEIP155Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP155Transition()))
+		fmt.Printf("Which block should EIP155 (Spurious Dragon) come into effect? (default = %v)\n", sanitizeUint64P(w.conf.Genesis.Config.GetEIP155Transition()))
+		w.conf.Genesis.Config.SetEIP155Transition(w.readDefaultUint64P(sanitizeUint64P(w.conf.Genesis.Config.GetEIP155Transition())))
 
 		fmt.Println()
-		fmt.Printf("Which block should EIP158/161 (also Spurious Dragon) come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP161dTransition())
-		w.conf.Genesis.Config.SetEIP161dTransition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP161dTransition()))
+		fmt.Printf("Which block should EIP158/161 (also Spurious Dragon) come into effect? (default = %v)\n", sanitizeUint64P(w.conf.Genesis.Config.GetEIP161dTransition()))
+		w.conf.Genesis.Config.SetEIP161dTransition(w.readDefaultUint64P(sanitizeUint64P(w.conf.Genesis.Config.GetEIP161dTransition())))
 
 		fmt.Println()
-		fmt.Printf("Which block should Byzantium come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEthashEIP649Transition())
-		w.conf.Genesis.Config.SetEthashEIP649Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEthashEIP649Transition()))
+		fmt.Printf("Which block should Byzantium come into effect? (default = %v)\n", sanitizeUint64P(w.conf.Genesis.Config.GetEthashEIP649Transition()))
+		w.conf.Genesis.Config.SetEthashEIP649Transition(w.readDefaultUint64P(sanitizeUint64P(w.conf.Genesis.Config.GetEthashEIP649Transition())))
 
 		fmt.Println()
-		fmt.Printf("Which block should Constantinople come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEthashEIP1234Transition())
-		w.conf.Genesis.Config.SetEthashEIP1234Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEthashEIP1234Transition()))
+		fmt.Printf("Which block should Constantinople come into effect? (default = %v)\n", sanitizeUint64P(w.conf.Genesis.Config.GetEthashEIP1234Transition()))
+		w.conf.Genesis.Config.SetEthashEIP1234Transition(w.readDefaultUint64P(sanitizeUint64P(w.conf.Genesis.Config.GetEthashEIP1234Transition())))
 		if w.conf.Genesis.Config.GetEIP1283DisableTransition() == nil {
-			w.conf.Genesis.Config.SetEIP1283DisableTransition(w.conf.Genesis.Config.GetEthashEIP1234Transition())
+			w.conf.Genesis.Config.SetEIP1283DisableTransition(w.conf.Genesis.Config.GetEIP1283DisableTransition())
 		}
 		fmt.Println()
-		fmt.Printf("Which block should Petersburg come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP1283DisableTransition())
-		w.conf.Genesis.Config.SetEIP1283DisableTransition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP1283DisableTransition()))
+		fmt.Printf("Which block should Petersburg come into effect? (default = %v)\n", sanitizeUint64P(w.conf.Genesis.Config.GetEIP1283DisableTransition()))
+		w.conf.Genesis.Config.SetEIP1283DisableTransition(w.readDefaultUint64P(sanitizeUint64P(w.conf.Genesis.Config.GetEIP1283DisableTransition())))
 
 		fmt.Println()
-		fmt.Printf("Which block should Istanbul come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP145Transition())
-		w.conf.Genesis.Config.SetEIP145Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP145Transition()))
+		fmt.Printf("Which block should Istanbul come into effect? (default = %v)\n", sanitizeUint64P(w.conf.Genesis.Config.GetEIP145Transition()))
+		w.conf.Genesis.Config.SetEIP145Transition(w.readDefaultUint64P(sanitizeUint64P(w.conf.Genesis.Config.GetEIP145Transition())))
 
 		fmt.Println()
-		fmt.Printf("Which block should YOLOv1 (EIP2537) come into effect? (default = %v)\n", w.conf.Genesis.Config.GetEIP2537Transition())
-		w.conf.Genesis.Config.SetEIP2537Transition(w.readDefaultUint64P(*w.conf.Genesis.Config.GetEIP2537Transition()))
+		fmt.Printf("Which block should YOLOv2 come into effect? (default = %v)\n", sanitizeUint64P(w.conf.Genesis.Config.GetEIP2929Transition()))
+		w.conf.Genesis.Config.SetEIP2929Transition(w.readDefaultUint64P(sanitizeUint64P(w.conf.Genesis.Config.GetEIP2929Transition())))
 
 		out, _ := json.MarshalIndent(w.conf.Genesis.Config, "", "  ")
 		fmt.Printf("Chain configuration updated:\n\n%s\n", out)

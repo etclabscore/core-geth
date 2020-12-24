@@ -390,6 +390,24 @@ func (c *CoreGethChainConfig) SetECBP1100Transition(n *uint64) error {
 	return nil
 }
 
+func (c *CoreGethChainConfig) GetEIP2315Transition() *uint64 {
+	return bigNewU64(c.EIP2315FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP2315Transition(n *uint64) error {
+	c.EIP2315FBlock = setBig(c.EIP2315FBlock, n)
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetEIP2929Transition() *uint64 {
+	return bigNewU64(c.EIP2929FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP2929Transition(n *uint64) error {
+	c.EIP2929FBlock = setBig(c.EIP2929FBlock, n)
+	return nil
+}
+
 func (c *CoreGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

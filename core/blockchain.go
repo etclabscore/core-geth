@@ -1207,6 +1207,15 @@ func (bc *BlockChain) InsertReceiptChain(blockChain types.Blocks, receiptChain [
 				}
 			}
 		}()
+		// Get the initial ancients level.
+		// If the condition is met of the inserting block number being below
+		// the ancient level, it will happen immediately since the blockChain slice
+		// is ordered and linked.
+		// This is why we only need to get this value once, and don't have to update it.
+		ancientsN, err := bc.db.Ancients()
+		if err != nil {
+			return 0, err
+		}
 		var deleted []*numberHash
 		for i, block := range blockChain {
 			// Short circuit insertion if shutting down or processing failed
@@ -1220,6 +1229,14 @@ func (bc *BlockChain) InsertReceiptChain(blockChain types.Blocks, receiptChain [
 			// Short circuit if the owner header is unknown
 			if !bc.HasHeader(block.Hash(), block.NumberU64()) {
 				return i, fmt.Errorf("containing header #%d [%x…] unknown", block.Number(), block.Hash().Bytes()[:4])
+			}
+			// Check the current ancient level against the attempted import.
+			// Short circuit if the ancient level is at or above this block.
+			// Note that instead of using a 'continue', the returning short circuit is expected to call the deferred
+			// function truncating the ancient store to the appropriate level. This ensures no gaping or corrupted
+			// ancient data is allowed.
+			if block.NumberU64() < ancientsN {
+				return i, fmt.Errorf("block below ancient level: block=%d ancients=%d", block.NumberU64(), ancientsN)
 			}
 			var (
 				start  = time.Now()

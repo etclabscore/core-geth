@@ -86,7 +86,7 @@ type fullNodeBackend interface {
 type Service struct {
 	server  *p2p.Server // Peer-to-peer server to retrieve networking infos
 	backend backend
-	engine consensus.Engine // Consensus engine to retrieve variadic block fields
+	engine  consensus.Engine // Consensus engine to retrieve variadic block fields
 
 	node string // Name of the node to display on the monitoring page
 	pass string // Password to authorize access to the monitoring page

@@ -248,7 +248,7 @@ func main() {
 
 	genesis, *bootFlag, *netFlag = parseChainFlags()
 
-	if genesis != nil && attachFlag != nil {
+	if genesis != nil && *attachFlag != "" {
 		log.Crit("Cannot use genesis and attach options simultaneously")
 	}
 

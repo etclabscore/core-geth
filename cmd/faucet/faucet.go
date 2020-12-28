@@ -282,7 +282,7 @@ func main() {
 	genesis, *bootFlag, *netFlag = parseChainFlags()
 
 	if genesis != nil {
-		log.Info("configured chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", fmt.Sprintf("%v", genesis.Config))
+		log.Info("Using chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", fmt.Sprintf("%v", genesis.Config))
 
 		// Convert the bootnodes to internal enode representations
 		for _, boot := range utils.SplitAndTrim(*bootFlag) {
@@ -293,6 +293,7 @@ func main() {
 			}
 		}
 	} else {
+		log.Info("Attaching faucet to running client")
 		client, err = ethclient.DialContext(context.Background(), *attachFlag)
 		if err != nil {
 			log.Crit("Failed to connect to client", "error", err)
@@ -342,11 +343,12 @@ func main() {
 	// faucet, err := newFaucet(genesis, *ethPortFlag, enodes, *netFlag, *statsFlag, ks, website.Bytes())
 	faucet, err := newFaucet(ks, website.Bytes())
 	if err != nil {
-		log.Crit("Failed to start faucet", "err", err)
+		log.Crit("Failed to construct faucet", "err", err)
 	}
 	defer faucet.close()
 
 	if genesis != nil {
+		log.Info("Starting faucet client stack")
 		err = faucet.startStack(genesis, *ethPortFlag, enodes, *netFlag)
 		if err != nil {
 			log.Crit("Failed to start to stack", "error", err)

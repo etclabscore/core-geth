@@ -100,6 +100,19 @@ var (
 	logFlag    = flag.Int("loglevel", 3, "Log level to use for Ethereum and the faucet")
 )
 
+var chainFlags = []*bool{
+	foundationFlag,
+	classicFlag,
+	mordorFlag,
+	kottiFlag,
+	socialFlag,
+	ethersocialFlag,
+	mixFlag,
+	testnetFlag,
+	rinkebyFlag,
+	goerliFlag,
+}
+
 var (
 	ether = new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)
 )
@@ -185,15 +198,32 @@ func parseChainFlags() (gs *genesisT.Genesis, bs string, netid uint64) {
 	return
 }
 
+// auditFlagUse ensures that exclusive/incompatible flag values are not set.
+// If invalid use if found, the program exits with log.Crit.
+func auditFlagUse() {
+	if *statsFlag != "" && *attachFlag != "" {
+		log.Crit("flags are incompatible", "flags", []string{"ethstats", "attach"}, "values", []*string{statsFlag, attachFlag})
+	}
+	var activeChainFlag *bool
+	for _, f := range chainFlags {
+		if *f {
+			if activeChainFlag != nil {
+				log.Crit("cannot use two -chain.* flags simultaneously")
+			}
+			activeChainFlag = f
+		}
+	}
+	if activeChainFlag != nil && *attachFlag != "" {
+		log.Crit("cannot use -chain.* with -attach")
+	}
+}
+
 func main() {
 	// Parse the flags and set up the logger to print everything requested
 	flag.Parse()
 	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(*logFlag), log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 
-	// Audit flag use.
-	if *statsFlag != "" && *attachFlag != "" {
-		log.Crit("flags are incompatible", "flags", []string{"ethstats", "attach"}, "values", []*string{statsFlag, attachFlag})
-	}
+	auditFlagUse()
 
 	// Construct the payout tiers
 	amounts := make([]string, *tiersFlag)
@@ -247,10 +277,6 @@ func main() {
 	var client *ethclient.Client
 
 	genesis, *bootFlag, *netFlag = parseChainFlags()
-
-	if genesis != nil && *attachFlag != "" {
-		log.Crit("Cannot use genesis and attach options simultaneously")
-	}
 
 	if genesis != nil {
 		log.Info("configured chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", fmt.Sprintf("%v", genesis.Config))

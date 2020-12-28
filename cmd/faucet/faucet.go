@@ -216,6 +216,9 @@ func auditFlagUse() {
 	if activeChainFlag != nil && *attachFlag != "" {
 		log.Crit("cannot use -chain.* with -attach")
 	}
+	if *genesisFlag != "" && *attachFlag != "" {
+		log.Crit("cannot use -genesis flag with -attach")
+	}
 }
 
 func main() {

@@ -32,8 +32,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/mclock"
-	"github.com/ethereum/go-ethereum/consensus/clique"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/eth"
@@ -82,35 +81,6 @@ type fullNodeBackend interface {
 	SuggestPrice(ctx context.Context) (*big.Int, error)
 }
 
-// HeaderAuthorGetter is established to take the place of the previously demanded consensus.Engine type.
-// Requiring an entire consensus engine interface for this one method is overkill.
-type HeaderAuthorGetter interface {
-	Author(header *types.Header) (common.Address, error)
-}
-
-// HeaderAuthorGetterT implements the HeaderAuthorGetter interface.
-// It may be used if the ethstats impelementation doesn't have access to an implementation otherwise.
-type HeaderAuthorGetterT struct{}
-
-// Author gets the author of a header differentially if the header is from a Clique or Ethash-based chain.
-// It makes the assumption that Clique chains will not set the Mix field and that Ethash chains will.
-// Currently the Mix field is "reserved" for the Clique engines, from consensus/clique/consensus.go#verifyHeader:
-/*
-	// Ensure that the mix digest is zero as we don't have fork protection currently
-	if header.MixDigest != (common.Hash{}) {
-		return errInvalidMixDigest
-	}
- */
-func (ag HeaderAuthorGetterT) Author(header *types.Header) (common.Address, error) {
-	// Mix is reserved and currently unused on Clique.
-	if header.MixDigest == (common.Hash{}) {
-		c := &clique.Clique{}
-		return c.Author(header)
-	}
-	e := &ethash.Ethash{}
-	return e.Author(header)
-}
-
 // Service implements an Ethereum netstats reporting daemon that pushes local
 // chain statistics up to a monitoring server.
 type Service struct {
@@ -118,7 +88,7 @@ type Service struct {
 	server  *p2p.Server // Peer-to-peer server to retrieve networking infos
 	backend backend
 
-	engine  HeaderAuthorGetter // Consensus engine to retrieve variadic block fields
+	engine consensus.Engine // Consensus engine to retrieve variadic block fields
 
 	node string // Name of the node to display on the monitoring page
 	pass string // Password to authorize access to the monitoring page
@@ -199,7 +169,7 @@ func parseEthstatsURL(url string) (parts []string, err error) {
 }
 
 // New returns a monitoring service ready for stats reporting.
-func New(node *node.Node, backend backend, engine HeaderAuthorGetter, url string) error {
+func New(node *node.Node, backend backend, engine consensus.Engine, url string) error {
 	parts, err := parseEthstatsURL(url)
 	if err != nil {
 		return err

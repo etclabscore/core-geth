@@ -84,10 +84,8 @@ type fullNodeBackend interface {
 // Service implements an Ethereum netstats reporting daemon that pushes local
 // chain statistics up to a monitoring server.
 type Service struct {
-	// TODO: Abstract these types to use an API instead of arbitrary library types.
 	server  *p2p.Server // Peer-to-peer server to retrieve networking infos
 	backend backend
-
 	engine consensus.Engine // Consensus engine to retrieve variadic block fields
 
 	node string // Name of the node to display on the monitoring page

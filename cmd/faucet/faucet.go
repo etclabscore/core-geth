@@ -400,7 +400,7 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 		Version: params.VersionWithCommit(gitCommit, gitDate),
 		DataDir: faucetDirFromChainID(genesis.Config.GetChainID().Uint64()),
 		P2P: p2p.Config{
-			NAT:              nat.Any(),
+			NAT: nat.Any(),
 			// NoDiscovery is DISABLED to allow the node the find peers without relying on manually configured bootnodes.
 			// NoDiscovery:      true,
 			DiscoveryV5:      true,

@@ -137,7 +137,7 @@ var (
 	}
 	NetworkIdFlag = cli.Uint64Flag{
 		Name:  "networkid",
-		Usage: "Explicitly set network id (integer)(For testnets: use --ropsten, --rinkeby, --goerli, --kotti, --mordor, --yolov1 instead)",
+		Usage: "Explicitly set network id (integer)(For testnets: use --ropsten, --rinkeby, --goerli, --kotti, --mordor, --yolov2 instead)",
 		Value: eth.DefaultConfig.NetworkId,
 	}
 	EthProtocolsFlag = cli.StringFlag{
@@ -161,9 +161,9 @@ var (
 		Name:  "ethersocial",
 		Usage: "Ethersocial network: pre-configured Ethersocial mainnet",
 	}
-	YoloV1Flag = cli.BoolFlag{
-		Name:  "yolov1",
-		Usage: "YOLOv1 network: pre-configured proof-of-authority shortlived test network.",
+	YoloV2Flag = cli.BoolFlag{
+		Name:  "yolov2",
+		Usage: "YOLOv2 network: pre-configured proof-of-authority shortlived test network.",
 	}
 	RinkebyFlag = cli.BoolFlag{
 		Name:  "rinkeby",
@@ -865,8 +865,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.KottiBootnodes
 	case ctx.GlobalBool(GoerliFlag.Name):
 		urls = params.GoerliBootnodes
-	case ctx.GlobalBool(YoloV1Flag.Name):
-		urls = params.YoloV1Bootnodes
+	case ctx.GlobalBool(YoloV2Flag.Name):
+		urls = params.YoloV2Bootnodes
 	case cfg.BootstrapNodes != nil:
 		return // already set, don't apply defaults.
 	}
@@ -907,8 +907,8 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.KottiBootnodes
 	case ctx.GlobalBool(GoerliFlag.Name):
 		urls = params.GoerliBootnodes
-	case ctx.GlobalBool(YoloV1Flag.Name):
-		urls = params.YoloV1Bootnodes
+	case ctx.GlobalBool(YoloV2Flag.Name):
+		urls = params.YoloV2Bootnodes
 	case cfg.BootstrapNodesV5 != nil:
 		return // already set, don't apply defaults.
 	}
@@ -1337,8 +1337,8 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "kotti")
 	case ctx.GlobalBool(GoerliFlag.Name):
 		return filepath.Join(baseDataDirPath, "goerli")
-	case ctx.GlobalBool(YoloV1Flag.Name):
-		return filepath.Join(baseDataDirPath, "yolo-v1")
+	case ctx.GlobalBool(YoloV2Flag.Name):
+		return filepath.Join(baseDataDirPath, "yolo-v2")
 	}
 	return baseDataDirPath
 }
@@ -1616,7 +1616,7 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, LegacyTestnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV1Flag, ClassicFlag, KottiFlag, MordorFlag, EthersocialFlag, SocialFlag)
+	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, LegacyTestnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV2Flag, ClassicFlag, KottiFlag, MordorFlag, EthersocialFlag, SocialFlag)
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	CheckExclusive(ctx, GCModeFlag, "archive", TxLookupLimitFlag)
@@ -2007,8 +2007,8 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 		genesis = params.DefaultKottiGenesisBlock()
 	case ctx.GlobalBool(GoerliFlag.Name):
 		genesis = params.DefaultGoerliGenesisBlock()
-	case ctx.GlobalBool(YoloV1Flag.Name):
-		genesis = params.DefaultYoloV1GenesisBlock()
+	case ctx.GlobalBool(YoloV2Flag.Name):
+		genesis = params.DefaultYoloV2GenesisBlock()
 	}
 	return genesis
 }

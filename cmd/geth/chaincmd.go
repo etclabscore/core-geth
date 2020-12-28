@@ -173,13 +173,14 @@ The export-preimages command export hash preimages to an RLP encoded stream`,
 			utils.EthersocialFlag,
 			utils.RinkebyFlag,
 			utils.GoerliFlag,
-			utils.YoloV1Flag,
 			utils.TxLookupLimitFlag,
+			utils.YoloV2Flag,
+			utils.LegacyTestnetFlag,
 		},
 		Category: "BLOCKCHAIN COMMANDS",
 		Description: `
 The first argument must be the chaindata directory containing the blockchain to download from.
-The second argument must be the ancient chain directory path.`,
+The second argument can be the ancient chain directory path (default = inside chaindata).`,
 	}
 	removedbCommand = cli.Command{
 		Action:    utils.MigrateFlags(removeDB),
@@ -230,7 +231,8 @@ Use "ethereum dump 0" to dump the genesis block.`,
 			utils.RopstenFlag,
 			utils.RinkebyFlag,
 			utils.GoerliFlag,
-			utils.YoloV1Flag,
+			utils.YoloV2Flag,
+			utils.LegacyTestnetFlag,
 			utils.SyncModeFlag,
 		},
 		Category: "BLOCKCHAIN COMMANDS",
@@ -463,8 +465,11 @@ func copyDb(ctx *cli.Context) error {
 	if len(ctx.Args()) < 1 {
 		utils.Fatalf("Source chaindata directory path argument missing")
 	}
-	if len(ctx.Args()) < 2 {
-		utils.Fatalf("Source ancient chain directory path argument missing")
+	root := ctx.Args().First()
+	freezer := filepath.Join(root, "ancient")
+	// Ancient freeer path can be set as a second argument
+	if len(ctx.Args()) == 2 {
+		freezer = ctx.Args().Get(1)
 	}
 	// Initialize a new chain for the running node to sync into
 	stack, _ := makeConfigNode(ctx)
@@ -480,7 +485,7 @@ func copyDb(ctx *cli.Context) error {
 	dl := downloader.New(0, chainDb, syncBloom, new(event.TypeMux), chain, nil, nil)
 
 	// Create a source peer to satisfy downloader requests from
-	db, err := rawdb.NewLevelDBDatabaseWithFreezer(ctx.Args().First(), ctx.GlobalInt(utils.CacheFlag.Name)/2, 256, ctx.Args().Get(1), "")
+	db, err := rawdb.NewLevelDBDatabaseWithFreezer(root, ctx.GlobalInt(utils.CacheFlag.Name)/2, 256, freezer, "")
 	if err != nil {
 		return err
 	}

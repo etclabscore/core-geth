@@ -985,6 +985,26 @@ func (spec *ParityChainSpec) SetEthashECIP1099Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
+func (spec *ParityChainSpec) GetEIP2315Transition() *uint64 {
+	return spec.Params.EIP2315Transition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP2315Transition(i *uint64) error {
+	spec.Params.EIP2315Transition = new(ParityU64).SetUint64(i)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP2929Transition() *uint64 {
+	return nil
+}
+
+func (spec *ParityChainSpec) SetEIP2929Transition(n *uint64) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
 func (spec *ParityChainSpec) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil

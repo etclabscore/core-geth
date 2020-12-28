@@ -56,7 +56,7 @@ var defaultChainspecValues = map[string]ctypes.Configurator{
 	"ropsten":    params.DefaultRopstenGenesisBlock(),
 	"rinkeby":    params.DefaultRinkebyGenesisBlock(),
 	"goerli":     params.DefaultGoerliGenesisBlock(),
-	"yolov1":     params.DefaultYoloV1GenesisBlock(),
+	"yolov2":     params.DefaultYoloV2GenesisBlock(),
 
 	"social":      params.DefaultSocialGenesisBlock(),
 	"ethersocial": params.DefaultEthersocialGenesisBlock(),
@@ -167,8 +167,8 @@ USAGE:
 
 - Reading and writing chain configurations:
 
-	The default behavior is to act as a configuration reader and writer (and implicit converter). 
-	To establish a target configuration to read, you can either 
+	The default behavior is to act as a configuration reader and writer (and implicit converter).
+	To establish a target configuration to read, you can either
 		1. Pass in a chain configuration externally, or
 		2. Use one of the builtin defaults.
 
@@ -204,11 +204,11 @@ EXAMPLES:
 		> {{.Name}} --inputf parity --file my-parity-spec.json --outputf [geth|coregeth]
 
 	Print a default Ethereum Classic network chain configuration in coregeth format:
-	
+
 		> {{.Name}} --default classic --outputf coregeth
 
 	Validate a default Kotti network chain configuration for block #3000000:
-	
+
 		> {{.Name}} --default kotti validate 3000000
 
 VERSION:

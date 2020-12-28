@@ -98,6 +98,18 @@ func ApplyTransaction(config ctypes.ChainConfigurator, bc ChainContext, author *
 	// Create a new environment which holds all relevant information
 	// about the transaction and calling mechanisms.
 	vmenv := vm.NewEVM(context, statedb, config, cfg)
+
+	if config.IsEnabled(config.GetEIP2929Transition, header.Number) {
+		statedb.AddAddressToAccessList(msg.From())
+		if dst := msg.To(); dst != nil {
+			statedb.AddAddressToAccessList(*dst)
+			// If it's a create-tx, the destination will be added inside evm.create
+		}
+		for addr := range vm.PrecompiledContractsForConfig(config, header.Number) {
+			statedb.AddAddressToAccessList(addr)
+		}
+	}
+
 	// Apply the transaction to the current state (included in the env)
 	result, err := ApplyMessage(vmenv, msg, gp)
 	if err != nil {

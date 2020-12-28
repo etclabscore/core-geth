@@ -252,7 +252,7 @@ func main() {
 		log.Info("configured chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", fmt.Sprintf("%v", genesis.Config))
 
 		// Convert the bootnodes to internal enode representations
-		for _, boot := range strings.Split(*bootFlag, ",") {
+	for _, boot := range utils.SplitAndTrim(*bootFlag) {
 			if url, err := discv5.ParseNode(boot); err == nil {
 				enodes = append(enodes, url)
 			} else {
@@ -298,6 +298,8 @@ func main() {
 	acc, err := ks.Import(blob, pass, pass)
 	if err != nil && err != keystore.ErrAccountAlreadyExists {
 		log.Crit("Failed to import faucet signer account", "err", err)
+	} else if err == nil {
+		log.Info("Imported faucet signer account", "address", acc.Address)
 	}
 	if err := ks.Unlock(acc, pass); err != nil {
 		log.Crit("Failed to unlock faucet signer account", "err", err)
@@ -388,21 +390,21 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 	cfg.SyncMode = downloader.LightSync
 	cfg.NetworkId = network
 	cfg.Genesis = genesis
-
-	// NOTE This is broken, fixed with https://github.com/etclabscore/core-geth/pull/249.
-	switch genesis {
-	case params.DefaultClassicGenesisBlock():
-		utils.SetDNSDiscoveryDefaults2(&cfg, params.ClassicDNSNetwork1)
-	case params.DefaultKottiGenesisBlock():
+	switch core.GenesisToBlock(genesis, nil).Hash() {
+	case params.MainnetGenesisHash:
+		if genesis.GetChainID().Uint64() == params.DefaultClassicGenesisBlock().GetChainID().Uint64() {
+			utils.SetDNSDiscoveryDefaults2(&cfg, params.ClassicDNSNetwork1)
+		}
+	case params.KottiGenesisHash:
 		utils.SetDNSDiscoveryDefaults2(&cfg, params.KottiDNSNetwork1)
-	case params.DefaultMordorGenesisBlock():
+	case params.MordorGenesisHash:
 		utils.SetDNSDiscoveryDefaults2(&cfg, params.MordorDNSNetwork1)
 	default:
 		utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
 	}
 
-	// Commented because this was only used to pass to the ethstats constructor.
 	/*
+	log.Info("Config discovery", "urls", cfg.DiscoveryURLs)
 		lesBackend, err := les.New(stack, &cfg)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to register the Ethereum service: %w", err)
@@ -416,6 +418,7 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 	for _, boot := range enodes {
 		old, err := enode.Parse(enode.ValidSchemes, boot.String())
 		if err == nil {
+			log.Info("Manually adding bootnode", "enode", old.String())
 			stack.Server().AddPeer(old)
 		}
 	}

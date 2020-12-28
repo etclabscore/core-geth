@@ -77,7 +77,7 @@ var (
 	rinkebyFlag     = flag.Bool("chain.rinkeby", false, "Configure genesis and bootnodes for rinkeby chain defaults")
 	goerliFlag      = flag.Bool("chain.goerli", false, "Configure genesis and bootnodes for goerli chain defaults")
 
-	fastSyncFlag = flag.Bool("syncmode.fast", false, "Use fast syncmode=fast instead of LES")
+	syncmodeFlag = flag.String("syncmode", "light", "Configure sync mode for faucet's client")
 	datadirFlag  = flag.String("datadir", "", "Use a custom datadir")
 
 	genesisFlag = flag.String("genesis", "", "Genesis json file to seed the chain with")
@@ -369,8 +369,11 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 	// Assemble the Ethereum light client protocol
 	cfg := eth.DefaultConfig
 	cfg.SyncMode = downloader.LightSync
-	if *fastSyncFlag {
+	if *syncmodeFlag == "fast" {
 		cfg.SyncMode = downloader.FastSync
+		cfg.ProtocolVersions = eth.DefaultProtocolVersions
+	} else if *syncmodeFlag == "full" {
+		cfg.SyncMode = downloader.FullSync
 		cfg.ProtocolVersions = eth.DefaultProtocolVersions
 	}
 	cfg.NetworkId = network
@@ -389,9 +392,9 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 	}
 	log.Info("Config discovery", "urls", cfg.DiscoveryURLs)
 	var lesBackend *les.LightEthereum
-	var fastBackend *eth.Ethereum
-	if *fastSyncFlag {
-		fastBackend, err = eth.New(stack, &cfg)
+	var ethBackend *eth.Ethereum
+	if *syncmodeFlag == "fast" || *syncmodeFlag == "full" {
+		ethBackend, err = eth.New(stack, &cfg)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to register the Ethereum service: %w", err)
 		}
@@ -404,8 +407,8 @@ func newFaucet(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, netwo
 
 	// Assemble the ethstats monitoring and reporting service'
 	if stats != "" {
-		if *fastSyncFlag {
-			if err := ethstats.New(stack, fastBackend.APIBackend, fastBackend.Engine(), stats); err != nil {
+		if *syncmodeFlag == "fast" || *syncmodeFlag == "full" {
+			if err := ethstats.New(stack, ethBackend.APIBackend, ethBackend.Engine(), stats); err != nil {
 				return nil, err
 			}
 		} else {

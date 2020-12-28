@@ -50,6 +50,8 @@ import (
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/ethstats"
+	"github.com/ethereum/go-ethereum/les"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/p2p"
@@ -81,10 +83,7 @@ var (
 	bootFlag    = flag.String("bootnodes", "", "Comma separated bootnode enode URLs to seed with")
 	netFlag     = flag.Uint64("network", 0, "Network ID to use for the Ethereum protocol")
 
-	// FIXME(meowsbits): Commented because support has been temporarily removed during WIP.
-	// The ethstats package is dependent on having access to a *node.Node and a backend implementation.
-	// IMO these needs should be met by access to an API rather than a full stack (eg. needs a downloader.Downloader... really?).
-	// statsFlag   = flag.String("ethstats", "", "Ethstats network monitoring auth string")
+	statsFlag = flag.String("ethstats", "", "Ethstats network monitoring auth string")
 
 	netnameFlag = flag.String("faucet.name", "", "Network name to assign to the faucet")
 	payoutFlag  = flag.Int("faucet.amount", 1, "Number of Ethers to pay out per user request")
@@ -191,6 +190,11 @@ func main() {
 	flag.Parse()
 	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(*logFlag), log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 
+	// Audit flag use.
+	if *statsFlag != "" && *attachFlag != "" {
+		log.Crit("flags are incompatible", "flags", []string{"ethstats", "attach"}, "values", []*string{statsFlag, attachFlag})
+	}
+
 	// Construct the payout tiers
 	amounts := make([]string, *tiersFlag)
 	periods := make([]string, *tiersFlag)
@@ -252,7 +256,7 @@ func main() {
 		log.Info("configured chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", fmt.Sprintf("%v", genesis.Config))
 
 		// Convert the bootnodes to internal enode representations
-	for _, boot := range utils.SplitAndTrim(*bootFlag) {
+		for _, boot := range utils.SplitAndTrim(*bootFlag) {
 			if url, err := discv5.ParseNode(boot); err == nil {
 				enodes = append(enodes, url)
 			} else {
@@ -322,14 +326,6 @@ func main() {
 		faucet.client = client
 	}
 
-	// See commented ethStats flag for why this is commented.
-	// Assemble the ethstats monitoring and reporting service'
-	// if *statsFlag != "" {
-	// 	if err := ethstats.New(stack, lesBackend.ApiBackend, ethstats.HeaderAuthorGetterT{}, *statsFlag); err != nil {
-	// 		return nil, err
-	// 	}
-	// }
-
 	if err := faucet.listenAndServe(*apiPortFlag); err != nil {
 		log.Crit("Failed to launch faucet API", "err", err)
 	}
@@ -394,6 +390,8 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 	case params.MainnetGenesisHash:
 		if genesis.GetChainID().Uint64() == params.DefaultClassicGenesisBlock().GetChainID().Uint64() {
 			utils.SetDNSDiscoveryDefaults2(&cfg, params.ClassicDNSNetwork1)
+		} else {
+			utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
 		}
 	case params.KottiGenesisHash:
 		utils.SetDNSDiscoveryDefaults2(&cfg, params.KottiDNSNetwork1)
@@ -403,13 +401,19 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 		utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
 	}
 
-	/*
 	log.Info("Config discovery", "urls", cfg.DiscoveryURLs)
-		lesBackend, err := les.New(stack, &cfg)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to register the Ethereum service: %w", err)
+
+	lesBackend, err := les.New(stack, &cfg)
+	if err != nil {
+		return fmt.Errorf("Failed to register the Ethereum service: %w", err)
+	}
+
+	// Assemble the ethstats monitoring and reporting service'
+	if *statsFlag != "" {
+		if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), *statsFlag); err != nil {
+			return err
 		}
-	*/
+	}
 
 	// Boot up the client and ensure it connects to bootnodes
 	if err := stack.Start(); err != nil {

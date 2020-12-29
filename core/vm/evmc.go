@@ -98,8 +98,8 @@ type hostContext struct {
 }
 
 func (host *hostContext) AccountExists(addr common.Address) bool {
-	// if host.env.ChainConfig().IsEIP158(host.env.BlockNumber) {
-	if host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP161dTransition, host.env.BlockNumber) {
+	// if host.env.ChainConfig().IsEIP158(host.env.Context.BlockNumber) {
+	if host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP161dTransition, host.env.Context.BlockNumber) {
 		if !host.env.StateDB.Empty(addr) {
 			return true
 		}
@@ -129,8 +129,8 @@ func (host *hostContext) SetStorage(addr common.Address, key common.Hash, value 
 	// or should we handle the question where we handle the rest of the questions like this, since this logic is
 	// REALLY logic that belongs to the abstract idea of a chainconfiguration (aka chainconfig), which makes sense
 	// but depends on ECIPs having steadier and more predictable logic.
-	hasEIP2200 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP2200Transition, host.env.BlockNumber)
-	hasEIP1884 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP1884Transition, host.env.BlockNumber)
+	hasEIP2200 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP2200Transition, host.env.Context.BlockNumber)
+	hasEIP1884 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP1884Transition, host.env.Context.BlockNumber)
 
 	// Here's an example where to me, it makes sense to use individual EIPs in the code...
 	// when they don't specify each other in the spec.
@@ -215,19 +215,19 @@ func (host *hostContext) GetTxContext() evmc.TxContext {
 	return evmc.TxContext{
 		GasPrice:   common.BigToHash(host.env.GasPrice),
 		Origin:     host.env.Origin,
-		Coinbase:   host.env.Coinbase,
-		Number:     host.env.BlockNumber.Int64(),
-		Timestamp:  host.env.Time.Int64(),
-		GasLimit:   int64(host.env.GasLimit),
-		Difficulty: common.BigToHash(host.env.Difficulty),
+		Coinbase:   host.env.Context.Coinbase,
+		Number:     host.env.Context.BlockNumber.Int64(),
+		Timestamp:  host.env.Context.Time.Int64(),
+		GasLimit:   int64(host.env.Context.GasLimit),
+		Difficulty: common.BigToHash(host.env.Context.Difficulty),
 		//ChainID:    common.BigToHash(host.env.chainConfig.GetChainID()),
 	}
 }
 
 func (host *hostContext) GetBlockHash(number int64) common.Hash {
-	b := host.env.BlockNumber.Int64()
+	b := host.env.Context.BlockNumber.Int64()
 	if number >= (b-256) && number < b {
-		return host.env.GetHash(uint64(number))
+		return host.env.Context.GetHash(uint64(number))
 	}
 	return common.Hash{}
 }
@@ -237,7 +237,7 @@ func (host *hostContext) EmitLog(addr common.Address, topics []common.Hash, data
 		Address:     addr,
 		Topics:      topics,
 		Data:        data,
-		BlockNumber: host.env.BlockNumber.Uint64(),
+		BlockNumber: host.env.Context.BlockNumber.Uint64(),
 	})
 }
 
@@ -262,7 +262,7 @@ func (host *hostContext) Call(kind evmc.CallKind,
 	case evmc.Create:
 		var createOutput []byte
 		createOutput, createAddr, gasLeftU, err = host.env.Create(host.contract, input, gasU, value)
-		isHomestead := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP7Transition, host.env.BlockNumber)
+		isHomestead := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP7Transition, host.env.Context.BlockNumber)
 		if !isHomestead && err == ErrCodeStoreOutOfGas {
 			err = nil
 		}
@@ -300,7 +300,7 @@ func (host *hostContext) Call(kind evmc.CallKind,
 
 // getRevision translates ChainConfig's HF block information into EVMC revision.
 func getRevision(env *EVM) evmc.Revision {
-	n := env.BlockNumber
+	n := env.Context.BlockNumber
 	conf := env.ChainConfig()
 	switch {
 	// This is an example of choosing to use an "abstracted" idea

@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 type testServerPeerSub struct {
@@ -98,9 +99,9 @@ func TestPeerSubscription(t *testing.T) {
 
 type fakeChain struct{}
 
-func (f *fakeChain) Config() *params.ChainConfig { return params.MainnetChainConfig }
+func (f *fakeChain) Config() ctypes.ChainConfigurator { return params.MainnetChainConfig }
 func (f *fakeChain) Genesis() *types.Block {
-	return core.DefaultGenesisBlock().ToBlock(rawdb.NewMemoryDatabase())
+	return core.MustCommitGenesis(rawdb.NewMemoryDatabase(), params.DefaultGenesisBlock())
 }
 func (f *fakeChain) CurrentHeader() *types.Header { return &types.Header{Number: big.NewInt(10000000)} }
 

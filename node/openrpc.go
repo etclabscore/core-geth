@@ -132,11 +132,15 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 		}
 
 		// If an error is returned, it must be the last returned value.
+		// Example methods are following:
+		// - OK: func a() error
+		// - OK: func b() (int, error)
+		// - OK: func c() int
+		// - OK: func d()
+		// - NOTOK: func e() (error, int)
 		switch {
 		case len(outs) > 2:
 			return false
-		case len(outs) == 1 && isErrorType(outs[0]):
-			return true
 		case len(outs) == 2:
 			if isErrorType(outs[0]) || !isErrorType(outs[1]) {
 				return false

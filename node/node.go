@@ -34,6 +34,8 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/prometheus/tsdb/fileutil"
+
+	go_openrpc_reflect "github.com/etclabscore/go-openrpc-reflect"
 )
 
 // Node is a container on which services can be registered.
@@ -58,6 +60,11 @@ type Node struct {
 	inprocHandler *rpc.Server // In-process RPC request handler to process the API requests
 
 	databases map[*closeTrackingDB]struct{} // All open databases
+
+	inprocOpenRPC *go_openrpc_reflect.Document
+	ipcOpenRPC    *go_openrpc_reflect.Document
+	httpOpenRPC   *go_openrpc_reflect.Document
+	wsOpenRPC     *go_openrpc_reflect.Document
 }
 
 const (
@@ -258,6 +265,7 @@ func (n *Node) startNetworking() error {
 		n.stopRPC()
 		n.server.Stop()
 	}
+	err = n.setupOpenRPC()
 	return err
 }
 
@@ -320,6 +328,54 @@ func (n *Node) closeDataDir() {
 		}
 		n.dirLock = nil
 	}
+}
+
+func (n *Node) setupOpenRPC() error {
+
+	// In-proc RPC is always available. It's created and assigned in the Node.New construction.
+	n.inprocOpenRPC = newOpenRPCDocument()
+	registerOpenRPCAPIs(n.inprocOpenRPC, n.rpcAPIs)
+	if err := n.inprocHandler.RegisterName("rpc", &RPCDiscoveryService{d: n.inprocOpenRPC}); err != nil {
+		return err
+	}
+	n.inprocOpenRPC.WithMeta(metaRegistererForURL(""))
+
+	if n.ipc.listener != nil {
+		// Register the API documentation.
+		n.ipcOpenRPC = newOpenRPCDocument()
+		registerOpenRPCAPIs(n.ipcOpenRPC, n.rpcAPIs)
+		n.ipcOpenRPC.RegisterListener(n.ipc.listener)
+		if err := n.ipc.srv.RegisterName("rpc", &RPCDiscoveryService{
+			d: n.ipcOpenRPC,
+		}); err != nil {
+			return err
+		}
+		n.ipcOpenRPC.WithMeta(metaRegistererForURL(""))
+	}
+	if n.http.rpcAllowed() {
+		n.httpOpenRPC = newOpenRPCDocument()
+		h := n.http.httpHandler.Load().(*rpcHandler)
+		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.HTTPModules, false)
+		registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
+		n.httpOpenRPC.RegisterListener(n.http.listener)
+		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpOpenRPC}); err != nil {
+			return err
+		}
+		n.httpOpenRPC.WithMeta(metaRegistererForURL("http://"))
+	}
+	wsServer := n.wsServerForPort(n.config.WSPort)
+	if wsServer.wsAllowed() {
+		n.wsOpenRPC = newOpenRPCDocument()
+		h := wsServer.wsHandler.Load().(*rpcHandler)
+		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.WSModules, false)
+		registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
+		n.wsOpenRPC.RegisterListener(wsServer.listener)
+		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsOpenRPC}); err != nil {
+			return err
+		}
+		n.wsOpenRPC.WithMeta(metaRegistererForURL("ws://"))
+	}
+	return nil
 }
 
 // configureRPC is a helper method to configure all the various RPC endpoints during node
@@ -635,4 +691,30 @@ func (n *Node) closeDatabases() (errors []error) {
 		}
 	}
 	return errors
+}
+
+// GetAPIsByWhitelist checks the given modules' availability, generates a whitelist based on the allowed modules.
+// It just returns this list. This function is used by OpenRPC to register available APIs by service.
+func GetAPIsByWhitelist(apis []rpc.API, modules []string, exposeAll bool) (registeredApis []rpc.API) {
+	if bad, available := checkModuleAvailability(modules, apis); len(bad) > 0 {
+		log.Error("Unavailable modules in HTTP API list", "unavailable", bad, "available", available)
+	}
+	// Generate the whitelist based on the allowed modules
+	whitelist := make(map[string]bool)
+	for _, module := range modules {
+		whitelist[module] = true
+	}
+	// Register all the APIs exposed by the services
+	for _, api := range apis {
+		if exposeAll || whitelist[api.Namespace] || (len(whitelist) == 0 && api.Public) {
+			// This is what the function DOES NOT do (relative to its sister function, RegisterAPIsFromWhitelist).
+			/*
+				if err := srv.RegisterName(api.Namespace, api.Service); err != nil {
+					return registeredApis, err
+				}
+			*/
+			registeredApis = append(registeredApis, api)
+		}
+	}
+	return registeredApis
 }

@@ -67,6 +67,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 	pcsclite "github.com/gballet/go-libpcsclite"
 	cli "gopkg.in/urfave/cli.v1"
 )
@@ -111,7 +112,7 @@ var (
 	DataDirFlag = DirectoryFlag{
 		Name:  "datadir",
 		Usage: "Data directory for the databases and keystore",
-		Value: DirectoryString(node.DefaultDataDir()),
+		Value: DirectoryString(vars.DefaultDataDir()),
 	}
 	AncientFlag = DirectoryFlag{
 		Name:  "datadir.ancient",
@@ -1351,11 +1352,11 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 	case ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name):
 		cfg.DataDir = "" // unless explicitly requested, use memory databases
 
-	case (ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name)) && cfg.DataDir == node.DefaultDataDir():
+	case (ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name)) && cfg.DataDir == vars.DefaultDataDir():
 
 		// Maintain compatibility with older Geth configurations storing the
 		// Ropsten database in `testnet` instead of `ropsten`.
-		legacyPath := filepath.Join(node.DefaultDataDir(), "testnet")
+		legacyPath := filepath.Join(vars.DefaultDataDir(), "testnet")
 
 		if _, err := os.Stat(legacyPath); !os.IsNotExist(err) {
 
@@ -1363,12 +1364,12 @@ func setDataDir(ctx *cli.Context, cfg *node.Config) {
 			cfg.DataDir = legacyPath
 		} else {
 
-			cfg.DataDir = filepath.Join(node.DefaultDataDir(), "ropsten")
+			cfg.DataDir = filepath.Join(vars.DefaultDataDir(), "ropsten")
 
 		}
 
-	case cfg.DataDir == node.DefaultDataDir():
-		cfg.DataDir = dataDirPathForCtxChainConfig(ctx, node.DefaultDataDir())
+	case cfg.DataDir == vars.DefaultDataDir():
+		cfg.DataDir = dataDirPathForCtxChainConfig(ctx, vars.DefaultDataDir())
 	}
 }
 

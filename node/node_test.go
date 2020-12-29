@@ -27,14 +27,12 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"runtime"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/rpc"
 
@@ -49,26 +47,6 @@ func testNodeConfig() *Config {
 	return &Config{
 		Name: "test node",
 		P2P:  p2p.Config{PrivateKey: testNodeKey},
-	}
-}
-
-// TestFuncForPC is a sanity-check PoC demonstrating runtime caller/frame/pc availability and functionality.
-// TODO(meowsbits) Remove this, it's debug only.
-func TestFuncForPC(t *testing.T) {
-	services := []interface{}{
-		new(privateAdminAPI),
-		new(ethapi.PublicAccountAPI),
-	}
-	for _, n := range services {
-		ty := reflect.TypeOf(n)
-		for i := 0; i < ty.NumMethod(); i++ {
-			meth := ty.Method(i)
-			f := runtime.FuncForPC(meth.Func.Pointer())
-			t.Log("fname", f.Name(), "mname", meth.Name, "entry", f.Entry())
-			fil, lin := f.FileLine(f.Entry())
-			t.Log("file", fil, "line", lin)
-			t.Log("----------------------------")
-		}
 	}
 }
 

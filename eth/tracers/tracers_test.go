@@ -367,16 +367,18 @@ func callTracerParityTestRunner(filename string) error {
 	signer := types.MakeSigner(test.Genesis.Config, new(big.Int).SetUint64(uint64(test.Context.Number)))
 	origin, _ := signer.Sender(tx)
 
-	context := vm.Context{
+	txContext := vm.TxContext{
+		Origin:   origin,
+		GasPrice: tx.GasPrice(),
+	}
+	context := vm.BlockContext{
 		CanTransfer: core.CanTransfer,
 		Transfer:    core.Transfer,
-		Origin:      origin,
 		Coinbase:    test.Context.Miner,
 		BlockNumber: new(big.Int).SetUint64(uint64(test.Context.Number)),
 		Time:        new(big.Int).SetUint64(uint64(test.Context.Time)),
 		Difficulty:  (*big.Int)(test.Context.Difficulty),
 		GasLimit:    uint64(test.Context.GasLimit),
-		GasPrice:    tx.GasPrice(),
 	}
 	_, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false)
 
@@ -385,7 +387,7 @@ func callTracerParityTestRunner(filename string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create call tracer: %v", err)
 	}
-	evm := vm.NewEVM(context, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
+	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
 
 	msg, err := tx.AsMessage(signer)
 	if err != nil {

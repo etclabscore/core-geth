@@ -60,7 +60,7 @@ func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int)
 		precompileds[k] = v
 	}
 	if config.IsEnabled(config.GetEIP198Transition, bn) {
-		precompileds[common.BytesToAddress([]byte{5})] = &bigModExp{eip2565: false},
+		precompileds[common.BytesToAddress([]byte{5})] = &bigModExp{eip2565: false}
 	}
 	if config.IsEnabled(config.GetEIP213Transition, bn) {
 		if config.IsEnabled(config.GetEIP1108Transition, bn) {

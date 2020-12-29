@@ -78,7 +78,6 @@ var (
 		executablePath("echainspec"),
 		executablePath("evm"),
 		executablePath("geth"),
-		executablePath("puppeth"),
 		executablePath("rlpdump"),
 		executablePath("clef"),
 	}
@@ -108,10 +107,6 @@ var (
 		{
 			BinaryName:  "geth",
 			Description: "Ethereum CLI client.",
-		},
-		{
-			BinaryName:  "puppeth",
-			Description: "Ethereum private network manager.",
 		},
 		{
 			BinaryName:  "rlpdump",

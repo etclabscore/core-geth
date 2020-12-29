@@ -18,7 +18,7 @@
 Package tconvert and included logic should be removed eventually.
 
 It represents vestigial constructions for converting between chain configuration
-data types. I believe all functions are used only in the cmd/puppeth package.
+data types.
 
 These functions should be replaced in their occurrences with `convert.Convert` logic instead,
 and then this package can die.

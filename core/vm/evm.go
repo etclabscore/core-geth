@@ -46,7 +46,7 @@ type (
 )
 
 func (evm *EVM) precompile(addr common.Address) (PrecompiledContract, bool) {
-	var precompiles = PrecompiledContractsForConfig(evm.ChainConfig(), evm.BlockNumber)
+	var precompiles = PrecompiledContractsForConfig(evm.ChainConfig(), evm.Context.BlockNumber)
 	p, ok := precompiles[addr]
 	return p, ok
 }
@@ -208,7 +208,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	p, isPrecompile := evm.precompile(addr)
 
 	if !evm.StateDB.Exist(addr) {
-		if !isPrecompile && evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP161abcTransition, evm.BlockNumber) && value.Sign() == 0 {
+		if !isPrecompile && evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP161abcTransition, evm.Context.BlockNumber) && value.Sign() == 0 {
 			// Calling a non existing account, don't do anything, but ping the tracer
 			if evm.vmConfig.Debug && evm.depth == 0 {
 				evm.vmConfig.Tracer.CaptureStart(caller.Address(), addr, false, input, gas, value)
@@ -419,7 +419,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 
 	// We add this to the access list _before_ taking a snapshot. Even if the creation fails,
 	// the access-list change should not be rolled back
-	if evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP2929Transition, evm.BlockNumber) {
+	if evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP2929Transition, evm.Context.BlockNumber) {
 		evm.StateDB.AddAddressToAccessList(address)
 	}
 
@@ -431,7 +431,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 	// Create a new account on the state
 	snapshot := evm.StateDB.Snapshot()
 	evm.StateDB.CreateAccount(address)
-	if evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP161abcTransition, evm.BlockNumber) {
+	if evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP161abcTransition, evm.Context.BlockNumber) {
 		evm.StateDB.SetNonce(address, 1)
 	}
 	evm.Context.Transfer(evm.StateDB, caller.Address(), address, value)
@@ -453,7 +453,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 	ret, err := run(evm, contract, nil, false)
 
 	// check whether the max code size has been exceeded
-	maxCodeSizeExceeded := evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP170Transition, evm.BlockNumber) && uint64(len(ret)) > vars.MaxCodeSize
+	maxCodeSizeExceeded := evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP170Transition, evm.Context.BlockNumber) && uint64(len(ret)) > vars.MaxCodeSize
 	// if the contract creation ran successfully and no errors were returned
 	// calculate the gas required to store the code. If the code could not
 	// be stored due to not enough gas set an error and let it be handled
@@ -470,7 +470,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 	// When an error was returned by the EVM or when setting the creation code
 	// above we revert to the snapshot and consume any gas remaining. Additionally
 	// when we're in homestead this also counts for code storage gas errors.
-	if maxCodeSizeExceeded || (err != nil && (evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP2Transition, evm.BlockNumber) || err != ErrCodeStoreOutOfGas)) {
+	if maxCodeSizeExceeded || (err != nil && (evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP2Transition, evm.Context.BlockNumber) || err != ErrCodeStoreOutOfGas)) {
 		evm.StateDB.RevertToSnapshot(snapshot)
 		if err != ErrExecutionReverted {
 			contract.UseGas(contract.Gas)

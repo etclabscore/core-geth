@@ -83,6 +83,33 @@ func metaRegistererForURL(scheme string) *go_openrpc_reflect.MetaT {
 	return &metaRegisterer
 }
 
+// eligibleReturnSignature verifies return types for receiver methods.
+// The function must return at most one error and/or one other non-error value.
+func eligibleReturnSignature(method reflect.Method) bool {
+	outs := make([]reflect.Type, method.Func.Type().NumOut())
+	for i := 0; i < method.Func.Type().NumOut(); i++ {
+		outs[i] = method.Func.Type().Out(i)
+	}
+
+	// If an error is returned, it must be the last returned value.
+	// Example methods are following:
+	// - OK: func a() error
+	// - OK: func b() (int, error)
+	// - OK: func c() int
+	// - OK: func d()
+	// - NOTOK: func e() (error, int)
+	// - NOTOK: func f() (int, int, error)
+	switch {
+	case len(outs) > 2:
+		return false
+	case len(outs) == 2:
+		if isErrorType(outs[0]) || !isErrorType(outs[1]) {
+			return false
+		}
+	}
+	return true
+}
+
 // newOpenRPCDocument returns a Document configured with application-specific logic.
 func newOpenRPCDocument() *go_openrpc_reflect.Document {
 	d := &go_openrpc_reflect.Document{}
@@ -126,27 +153,7 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 
 		// Verify return types. The function must return at most one error
 		// and/or one other non-error value.
-		outs := make([]reflect.Type, method.Func.Type().NumOut())
-		for i := 0; i < method.Func.Type().NumOut(); i++ {
-			outs[i] = method.Func.Type().Out(i)
-		}
-
-		// If an error is returned, it must be the last returned value.
-		// Example methods are following:
-		// - OK: func a() error
-		// - OK: func b() (int, error)
-		// - OK: func c() int
-		// - OK: func d()
-		// - NOTOK: func e() (error, int)
-		switch {
-		case len(outs) > 2:
-			return false
-		case len(outs) == 2:
-			if isErrorType(outs[0]) || !isErrorType(outs[1]) {
-				return false
-			}
-		}
-		return true
+		return eligibleReturnSignature(method)
 	}
 
 	appReflector.FnGetContentDescriptorName = func(r reflect.Value, m reflect.Method, field *ast.Field) (string, error) {

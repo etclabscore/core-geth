@@ -122,28 +122,29 @@ var (
 	gitDate   = "" // Git commit date YYYYMMDD of the release (set via linker flags)
 )
 
-func faucetDirFromChainID(chainID uint64) string {
+func faucetDirFromChainIndicators(chainID uint64, genesisHash common.Hash) string {
 	datadir := filepath.Join(os.Getenv("HOME"), ".faucet")
-	switch chainID {
-	case params.MainnetChainConfig.GetChainID().Uint64():
+	switch genesisHash {
+	case params.MainnetGenesisHash:
+		if chainID == params.ClassicChainConfig.GetChainID().Uint64() {
+			return filepath.Join(datadir, "classic")
+		}
 		return filepath.Join(datadir, "")
-	case params.ClassicChainConfig.GetChainID().Uint64():
-		return filepath.Join(datadir, "classic")
-	case params.SocialChainConfig.GetChainID().Uint64():
+	case params.SocialGenesisHash:
 		return filepath.Join(datadir, "social")
-	case params.EthersocialChainConfig.GetChainID().Uint64():
+	case params.EthersocialGenesisHash:
 		return filepath.Join(datadir, "ethersocial")
-	case params.MixChainConfig.GetChainID().Uint64():
+	case params.MixGenesisHash:
 		return filepath.Join(datadir, "mix")
-	case params.RopstenChainConfig.GetChainID().Uint64():
+	case params.RopstenGenesisHash:
 		return filepath.Join(datadir, "ropsten")
-	case params.RinkebyChainConfig.GetChainID().Uint64():
+	case params.RinkebyGenesisHash:
 		return filepath.Join(datadir, "rinkeby")
-	case params.GoerliChainConfig.GetChainID().Uint64():
+	case params.GoerliGenesisHash:
 		return filepath.Join(datadir, "goerli")
-	case params.KottiChainConfig.GetChainID().Uint64():
+	case params.KottiGenesisHash:
 		return filepath.Join(datadir, "kotti")
-	case params.MordorChainConfig.GetChainID().Uint64():
+	case params.MordorGenesisHash:
 		return filepath.Join(datadir, "mordor")
 	}
 	return datadir
@@ -314,17 +315,24 @@ func main() {
 	// There's an issue open about this somewhere at ethereum/xxx.
 	// This could be resolved by creating a -chainid flag to use as a fallback.
 	chainID := uint64(0)
+	var genesisHash common.Hash
 	if genesis != nil {
 		chainID = genesis.GetChainID().Uint64()
+		genesisHash = core.GenesisToBlock(genesis, nil).Hash()
 	} else {
 		cid, err := client.ChainID(context.Background())
 		if err != nil {
 			log.Crit("Failed to get chain id from client", "error", err)
 		}
+		genesisBlock, err := client.BlockByNumber(context.Background(), big.NewInt(0))
+		if err != nil {
+			log.Crit("Failed to get genesis block from client", "error", err)
+		}
 		chainID = cid.Uint64()
+		genesisHash = genesisBlock.Hash()
 	}
 
-	keystorePath := filepath.Join(faucetDirFromChainID(chainID), "keys")
+	keystorePath := filepath.Join(faucetDirFromChainIndicators(chainID, genesisHash), "keys")
 	ks := keystore.NewKeyStore(keystorePath, keystore.StandardScryptN, keystore.StandardScryptP)
 	if blob, err = ioutil.ReadFile(*accJSONFlag); err != nil {
 		log.Crit("Failed to read account key contents", "file", *accJSONFlag, "err", err)
@@ -394,11 +402,14 @@ type faucet struct {
 
 // startStack starts the node stack, ensures peering, and assigns the respective ethclient to the faucet.
 func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, network uint64) error {
+
+	genesisHash := core.GenesisToBlock(genesis, nil).Hash()
+
 	// Assemble the raw devp2p protocol stack
 	stack, err := node.New(&node.Config{
 		Name:    "MultiFaucet",
 		Version: params.VersionWithCommit(gitCommit, gitDate),
-		DataDir: faucetDirFromChainID(genesis.Config.GetChainID().Uint64()),
+		DataDir: faucetDirFromChainIndicators(genesis.Config.GetChainID().Uint64(), genesisHash),
 		P2P: p2p.Config{
 			NAT: nat.Any(),
 			// NoDiscovery is DISABLED to allow the node the find peers without relying on manually configured bootnodes.
@@ -418,7 +429,7 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 	cfg.SyncMode = downloader.LightSync
 	cfg.NetworkId = network
 	cfg.Genesis = genesis
-	switch core.GenesisToBlock(genesis, nil).Hash() {
+	switch genesisHash {
 	case params.MainnetGenesisHash:
 		if genesis.GetChainID().Uint64() == params.DefaultClassicGenesisBlock().GetChainID().Uint64() {
 			utils.SetDNSDiscoveryDefaults2(&cfg, params.ClassicDNSNetwork1)

@@ -26,10 +26,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -144,7 +144,7 @@ func createNode(t *testing.T, gqlEnabled bool) *node.Node {
 func createGQLService(t *testing.T, stack *node.Node, endpoint string) {
 	// create backend (use a config which is light on mem consumption)
 	ethConf := &eth.Config{
-		Genesis: core.DeveloperGenesisBlock(15, common.Address{}),
+		Genesis: params.DeveloperGenesisBlock(15, common.Address{}, true),
 		Miner: miner.Config{
 			Etherbase: common.HexToAddress("0xaabb"),
 		},

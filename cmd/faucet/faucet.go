@@ -75,7 +75,9 @@ var (
 	testnetFlag     = flag.Bool("chain.testnet", false, "Configure genesis and bootnodes for testnet chain defaults")
 	rinkebyFlag     = flag.Bool("chain.rinkeby", false, "Configure genesis and bootnodes for rinkeby chain defaults")
 	goerliFlag      = flag.Bool("chain.goerli", false, "Configure genesis and bootnodes for goerli chain defaults")
-	attachFlag      = flag.String("attach", "", "Attach to an IPC or WS endpoint")
+
+	attachFlag    = flag.String("attach", "", "Attach to an IPC or WS endpoint")
+	attachChainID = flag.Int64("attach.chainid", 0, "Configure fallback chain id value for use in attach mode (used if target does not have value available yet).")
 
 	genesisFlag = flag.String("genesis", "", "Genesis json file to seed the chain with")
 	apiPortFlag = flag.Int("apiport", 8080, "Listener port for the HTTP API connection")
@@ -314,6 +316,8 @@ func main() {
 	// See the difference in implementation between ethapi/api.go and eth/api.go #ChainID() methods.
 	// There's an issue open about this somewhere at ethereum/xxx.
 	// This could be resolved by creating a -chainid flag to use as a fallback.
+	// NOTE(meowsbits): chainID and genesisHash are ONLY used as input for configuring the
+	// default data directory. This logic must be bypassed when and if a -datadir flag were in use.
 	chainID := uint64(0)
 	var genesisHash common.Hash
 	if genesis != nil {
@@ -330,6 +334,15 @@ func main() {
 		}
 		chainID = cid.Uint64()
 		genesisHash = genesisBlock.Hash()
+
+		// ChainID is only REQUIRED to disambiguate ETH/ETC chains.
+		if chainID == 0 && genesisHash == params.MainnetGenesisHash {
+			if *attachChainID == 0 {
+				// Exit with error if disambiguating fallback is unset.
+				log.Crit("Ambiguous/unavailable chain identity", "recommended solution", "use -attach.chainid to configure a fallback or wait until target client is synced past EIP155 block height")
+			}
+			chainID = uint64(*attachChainID)
+		}
 	}
 
 	keystorePath := filepath.Join(faucetDirFromChainIndicators(chainID, genesisHash), "keys")

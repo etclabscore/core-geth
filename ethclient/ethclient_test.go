@@ -384,9 +384,37 @@ func TestRPCDiscover(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	numberOfExistingMethods := 151
-	if l := len(*res.Methods); l != numberOfExistingMethods {
-		t.Fatalf("got: %d, want: %d", l, numberOfExistingMethods)
+	sliceContains := func(sl []string, str string) bool {
+		for _, s := range sl {
+			if str == s {
+				return true
+			}
+		}
+		return false
+	}
+
+	methodNamesSlice := func() (names []string) {
+		for _, m := range *res.Methods {
+			names = append(names, string(*m.Name))
+		}
+		return
+	}()
+
+	over, under := []string{}, []string{}
+
+	for _, name := range methodNamesSlice {
+		if !sliceContains(allRPCMethods, name) {
+			under = append(under, name)
+		}
+	}
+	for _, name := range allRPCMethods {
+		if !sliceContains(methodNamesSlice, name) {
+			over = append(over, name)
+		}
+	}
+
+	if len(over) > 0 || len(under) > 0 {
+		t.Fatalf("over: %v, under: %v", over, under)
 	}
 }
 
@@ -449,4 +477,160 @@ func BenchmarkRPC_BlockNumber(b *testing.B) {
 			b.Fatalf("unexpected error: %v", err)
 		}
 	}
+}
+
+// allRPCMethods lists all methods exposed over JSONRPC.
+var allRPCMethods = []string{
+	"admin_addPeer",
+	"admin_addTrustedPeer",
+	"admin_datadir",
+	"admin_ecbp1100",
+	"admin_exportChain",
+	"admin_importChain",
+	"admin_maxPeers",
+	"admin_nodeInfo",
+	"admin_peers",
+	"admin_removePeer",
+	"admin_removeTrustedPeer",
+	"admin_startRPC",
+	"admin_startWS",
+	"admin_stopRPC",
+	"admin_stopWS",
+	"debug_accountRange",
+	"debug_backtraceAt",
+	"debug_blockProfile",
+	"debug_chaindbCompact",
+	"debug_chaindbProperty",
+	"debug_cpuProfile",
+	"debug_dumpBlock",
+	"debug_freeOSMemory",
+	"debug_gcStats",
+	"debug_getBadBlocks",
+	"debug_getBlockRlp",
+	"debug_getModifiedAccountsByHash",
+	"debug_getModifiedAccountsByNumber",
+	"debug_goTrace",
+	"debug_memStats",
+	"debug_mutexProfile",
+	"debug_preimage",
+	"debug_printBlock",
+	"debug_removePendingTransaction",
+	"debug_seedHash",
+	"debug_setBlockProfileRate",
+	"debug_setGCPercent",
+	"debug_setHead",
+	"debug_setMutexProfileFraction",
+	"debug_stacks",
+	"debug_standardTraceBadBlockToFile",
+	"debug_standardTraceBlockToFile",
+	"debug_startCPUProfile",
+	"debug_startGoTrace",
+	"debug_stopCPUProfile",
+	"debug_stopGoTrace",
+	"debug_storageRangeAt",
+	"debug_testSignCliqueBlock",
+	"debug_traceBadBlock",
+	"debug_traceBlock",
+	"debug_traceBlockByHash",
+	"debug_traceBlockByNumber",
+	"debug_traceBlockFromFile",
+	"debug_traceCall",
+	"debug_traceTransaction",
+	"debug_verbosity",
+	"debug_vmodule",
+	"debug_writeBlockProfile",
+	"debug_writeMemProfile",
+	"debug_writeMutexProfile",
+	"eth_accounts",
+	"eth_blockNumber",
+	"eth_call",
+	"eth_chainId",
+	"eth_chainId",
+	"eth_coinbase",
+	"eth_estimateGas",
+	"eth_etherbase",
+	"eth_fillTransaction",
+	"eth_gasPrice",
+	"eth_getBalance",
+	"eth_getBlockByHash",
+	"eth_getBlockByNumber",
+	"eth_getBlockTransactionCountByHash",
+	"eth_getBlockTransactionCountByNumber",
+	"eth_getCode",
+	"eth_getFilterChanges",
+	"eth_getFilterLogs",
+	"eth_getHashrate",
+	"eth_getHeaderByHash",
+	"eth_getHeaderByNumber",
+	"eth_getLogs",
+	"eth_getProof",
+	"eth_getRawTransactionByBlockHashAndIndex",
+	"eth_getRawTransactionByBlockNumberAndIndex",
+	"eth_getRawTransactionByHash",
+	"eth_getStorageAt",
+	"eth_getTransactionByBlockHashAndIndex",
+	"eth_getTransactionByBlockNumberAndIndex",
+	"eth_getTransactionByHash",
+	"eth_getTransactionCount",
+	"eth_getTransactionReceipt",
+	"eth_getUncleByBlockHashAndIndex",
+	"eth_getUncleByBlockNumberAndIndex",
+	"eth_getUncleCountByBlockHash",
+	"eth_getUncleCountByBlockNumber",
+	"eth_getWork",
+	"eth_hashrate",
+	"eth_mining",
+	"eth_newBlockFilter",
+	"eth_newFilter",
+	"eth_newPendingTransactionFilter",
+	"eth_pendingTransactions",
+	"eth_protocolVersion",
+	"eth_resend",
+	"eth_sendRawTransaction",
+	"eth_sendTransaction",
+	"eth_sign",
+	"eth_signTransaction",
+	"eth_submitHashRate",
+	"eth_submitWork",
+	"eth_subscribe",
+	"eth_syncing",
+	"eth_uninstallFilter",
+	"eth_unsubscribe",
+	"ethash_getHashrate",
+	"ethash_getWork",
+	"ethash_submitHashRate",
+	"ethash_submitWork",
+	"miner_getHashrate",
+	"miner_setEtherbase",
+	"miner_setExtra",
+	"miner_setGasPrice",
+	"miner_setRecommitInterval",
+	"miner_start",
+	"miner_stop",
+	"net_listening",
+	"net_peerCount",
+	"net_version",
+	"personal_deriveAccount",
+	"personal_ecRecover",
+	"personal_importRawKey",
+	"personal_initializeWallet",
+	"personal_listAccounts",
+	"personal_listWallets",
+	"personal_lockAccount",
+	"personal_newAccount",
+	"personal_openWallet",
+	"personal_sendTransaction",
+	"personal_sign",
+	"personal_signAndSendTransaction",
+	"personal_signTransaction",
+	"personal_unlockAccount",
+	"personal_unpair",
+	"trace_block",
+	"trace_filter",
+	"trace_transaction",
+	"txpool_content",
+	"txpool_inspect",
+	"txpool_status",
+	"web3_clientVersion",
+	"web3_sha3",
 }

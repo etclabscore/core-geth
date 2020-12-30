@@ -297,6 +297,10 @@ func (hc *HeaderChain) writeHeaders(headers []*types.Header) (result *headerWrit
 }
 
 func (hc *HeaderChain) ValidateHeaderChain(chain []*types.Header, checkFreq int) (int, error) {
+	// Sanity check for nil header for the first header (loop begins at index 1).
+	if len(chain) > 0 && chain[0] == nil {
+		return 0, fmt.Errorf("header was nil")
+	}
 	// Do a sanity check that the provided chain is actually ordered and linked
 	for i := 1; i < len(chain); i++ {
 		if chain[i] == nil {

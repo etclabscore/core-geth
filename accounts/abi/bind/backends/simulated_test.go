@@ -33,7 +33,9 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -122,12 +124,16 @@ func TestNewSimulatedBackend(t *testing.T) {
 	sim := simTestBackend(testAddr)
 	defer sim.Close()
 
-	if sim.config != params.AllEthashProtocolChanges {
-		t.Errorf("expected sim config to equal params.AllEthashProtocolChanges, got %v", sim.config)
+	wantConfig := &goethereum.ChainConfig{}
+	*wantConfig = *params.AllEthashProtocolChanges
+	wantConfig.SetChainID(big.NewInt(1337))
+
+	if err := confp.Equivalent(sim.config, wantConfig); err != nil {
+		t.Errorf("expected sim config to equal params.AllEthashProtocolChanges, got %v, err: %v", sim.config, err)
 	}
 
-	if sim.blockchain.Config() != params.AllEthashProtocolChanges {
-		t.Errorf("expected sim blockchain config to equal params.AllEthashProtocolChanges, got %v", sim.config)
+	if err := confp.Equivalent(sim.blockchain.Config(), wantConfig); err != nil {
+		t.Errorf("expected sim blockchain config to equal params.AllEthashProtocolChanges, got %v, err: %v", sim.config, err)
 	}
 
 	stateDB, _ := sim.blockchain.State()

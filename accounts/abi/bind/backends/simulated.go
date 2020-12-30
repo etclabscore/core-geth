@@ -44,6 +44,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -79,7 +80,10 @@ type SimulatedBackend struct {
 // and uses a simulated blockchain for testing purposes.
 // A simulated backend always uses chainID 1337.
 func NewSimulatedBackendWithDatabase(database ethdb.Database, alloc genesisT.GenesisAlloc, gasLimit uint64) *SimulatedBackend {
-	genesis := genesisT.Genesis{Config: params.AllEthashProtocolChanges, GasLimit: gasLimit, Alloc: alloc}
+	conf := &goethereum.ChainConfig{}
+	*conf = *params.AllEthashProtocolChanges
+	conf.SetChainID(big.NewInt(1337))
+	genesis := genesisT.Genesis{Config: conf, GasLimit: gasLimit, Alloc: alloc}
 	core.MustCommitGenesis(database, &genesis)
 	blockchain, _ := core.NewBlockChain(database, nil, genesis.Config, ethash.NewFaker(), vm.Config{}, nil, nil)
 

@@ -47,6 +47,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/signer/core"
@@ -89,7 +90,7 @@ var (
 	}
 	keystoreFlag = cli.StringFlag{
 		Name:  "keystore",
-		Value: filepath.Join(node.DefaultDataDir(), "keystore"),
+		Value: filepath.Join(vars.DefaultDataDir(), "keystore"),
 		Usage: "Directory for the keystore",
 	}
 	configdirFlag = cli.StringFlag{

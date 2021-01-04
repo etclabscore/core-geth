@@ -19,6 +19,7 @@ package ethapi
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -626,15 +627,13 @@ func (s *PublicBlockChainAPI) GetProof(ctx context.Context, address common.Addre
 // GetHeaderByNumber returns the requested canonical block header.
 // * When blockNr is -1 the chain head is returned.
 // * When blockNr is -2 the pending chain head is returned.
-func (s *PublicBlockChainAPI) GetHeaderByNumber(ctx context.Context, number rpc.BlockNumber) (map[string]interface{}, error) {
+func (s *PublicBlockChainAPI) GetHeaderByNumber(ctx context.Context, number rpc.BlockNumber) (*RPCMarshalHeaderT, error) {
 	header, err := s.b.HeaderByNumber(ctx, number)
 	if header != nil && err == nil {
 		response := s.rpcMarshalHeader(ctx, header)
 		if number == rpc.PendingBlockNumber {
 			// Pending header need to nil out a few fields
-			for _, field := range []string{"hash", "nonce", "miner"} {
-				response[field] = nil
-			}
+			response.setAsPending()
 		}
 		return response, err
 	}
@@ -642,7 +641,7 @@ func (s *PublicBlockChainAPI) GetHeaderByNumber(ctx context.Context, number rpc.
 }
 
 // GetHeaderByHash returns the requested header by hash.
-func (s *PublicBlockChainAPI) GetHeaderByHash(ctx context.Context, hash common.Hash) map[string]interface{} {
+func (s *PublicBlockChainAPI) GetHeaderByHash(ctx context.Context, hash common.Hash) *RPCMarshalHeaderT {
 	header, _ := s.b.HeaderByHash(ctx, hash)
 	if header != nil {
 		return s.rpcMarshalHeader(ctx, header)
@@ -655,15 +654,13 @@ func (s *PublicBlockChainAPI) GetHeaderByHash(ctx context.Context, hash common.H
 // * When blockNr is -2 the pending chain head is returned.
 // * When fullTx is true all transactions in the block are returned, otherwise
 //   only the transaction hash is returned.
-func (s *PublicBlockChainAPI) GetBlockByNumber(ctx context.Context, number rpc.BlockNumber, fullTx bool) (map[string]interface{}, error) {
+func (s *PublicBlockChainAPI) GetBlockByNumber(ctx context.Context, number rpc.BlockNumber, fullTx bool) (*RPCMarshalBlockT, error) {
 	block, err := s.b.BlockByNumber(ctx, number)
 	if block != nil && err == nil {
 		response, err := s.rpcMarshalBlock(ctx, block, true, fullTx)
 		if err == nil && number == rpc.PendingBlockNumber {
 			// Pending blocks need to nil out a few fields
-			for _, field := range []string{"hash", "nonce", "miner"} {
-				response[field] = nil
-			}
+			response.setAsPending()
 		}
 		return response, err
 	}
@@ -672,7 +669,7 @@ func (s *PublicBlockChainAPI) GetBlockByNumber(ctx context.Context, number rpc.B
 
 // GetBlockByHash returns the requested block. When fullTx is true all transactions in the block are returned in full
 // detail, otherwise only the transaction hash is returned.
-func (s *PublicBlockChainAPI) GetBlockByHash(ctx context.Context, hash common.Hash, fullTx bool) (map[string]interface{}, error) {
+func (s *PublicBlockChainAPI) GetBlockByHash(ctx context.Context, hash common.Hash, fullTx bool) (*RPCMarshalBlockT, error) {
 	block, err := s.b.BlockByHash(ctx, hash)
 	if block != nil {
 		return s.rpcMarshalBlock(ctx, block, true, fullTx)
@@ -682,7 +679,7 @@ func (s *PublicBlockChainAPI) GetBlockByHash(ctx context.Context, hash common.Ha
 
 // GetUncleByBlockNumberAndIndex returns the uncle block for the given block hash and index. When fullTx is true
 // all transactions in the block are returned in full detail, otherwise only the transaction hash is returned.
-func (s *PublicBlockChainAPI) GetUncleByBlockNumberAndIndex(ctx context.Context, blockNr rpc.BlockNumber, index hexutil.Uint) (map[string]interface{}, error) {
+func (s *PublicBlockChainAPI) GetUncleByBlockNumberAndIndex(ctx context.Context, blockNr rpc.BlockNumber, index hexutil.Uint) (*RPCMarshalBlockT, error) {
 	block, err := s.b.BlockByNumber(ctx, blockNr)
 	if block != nil {
 		uncles := block.Uncles()
@@ -698,7 +695,7 @@ func (s *PublicBlockChainAPI) GetUncleByBlockNumberAndIndex(ctx context.Context,
 
 // GetUncleByBlockHashAndIndex returns the uncle block for the given block hash and index. When fullTx is true
 // all transactions in the block are returned in full detail, otherwise only the transaction hash is returned.
-func (s *PublicBlockChainAPI) GetUncleByBlockHashAndIndex(ctx context.Context, blockHash common.Hash, index hexutil.Uint) (map[string]interface{}, error) {
+func (s *PublicBlockChainAPI) GetUncleByBlockHashAndIndex(ctx context.Context, blockHash common.Hash, index hexutil.Uint) (*RPCMarshalBlockT, error) {
 	block, err := s.b.BlockByHash(ctx, blockHash)
 	if block != nil {
 		uncles := block.Uncles()
@@ -1147,12 +1144,125 @@ func RPCMarshalHeader(head *types.Header) map[string]interface{} {
 	}
 }
 
+// RPCMarshalHeaderT defines the RPC marshaling type for block headers.
+type RPCMarshalHeaderT struct {
+	Number           *hexutil.Big      `json:"number"`
+	Hash             *common.Hash      `json:"hash,omitempty"` // Pending will be nil
+	ParentHash       common.Hash       `json:"parentHash"`
+	Nonce            *types.BlockNonce `json:"nonce,omitempty"` // Pending will be nil
+	MixHash          common.Hash       `json:"mixHash"`
+	Sha3Uncles       common.Hash       `json:"sha3Uncles"`
+	LogsBloom        types.Bloom       `json:"logsBloom"`
+	StateRoot        common.Hash       `json:"stateRoot"`
+	Miner            *common.Address   `json:"miner,omitempty"` // Pending will be nil
+	Difficulty       *hexutil.Big      `json:"difficulty"`
+	TotalDifficulty  *hexutil.Big      `json:"totalDifficulty"`
+	ExtraData        hexutil.Bytes     `json:"extraData"`
+	Size             hexutil.Uint64    `json:"size"`
+	GasLimit         hexutil.Uint64    `json:"gasLimit"`
+	GasUsed          hexutil.Uint64    `json:"gasUsed"`
+	Timestamp        hexutil.Uint64    `json:"timestamp"`
+	TransactionsRoot common.Hash       `json:"transactionsRoot"`
+	ReceiptsRoot     common.Hash       `json:"receiptsRoot"`
+}
+
+// NewRPCMarshalHeaderTFromHeader constructs a new RPCMarshalHeaderT struct from a given header.
+// The returned value shall be used as a response value for the relevant header-returning RPC methods.
+func NewRPCMarshalHeaderTFromHeader(header *types.Header) *RPCMarshalHeaderT {
+	hash := header.Hash()
+	nonce := header.Nonce
+	miner := header.Coinbase
+
+	return &RPCMarshalHeaderT{
+		Number:           (*hexutil.Big)(header.Number),
+		Hash:             &hash,
+		ParentHash:       header.ParentHash,
+		Nonce:            &nonce,
+		MixHash:          header.MixDigest,
+		Sha3Uncles:       header.UncleHash,
+		LogsBloom:        header.Bloom,
+		StateRoot:        header.Root,
+		Miner:            &miner,
+		Difficulty:       (*hexutil.Big)(header.Difficulty),
+		TotalDifficulty:  nil,
+		ExtraData:        header.Extra,
+		Size:             hexutil.Uint64(header.Size()),
+		GasLimit:         hexutil.Uint64(header.GasLimit),
+		GasUsed:          hexutil.Uint64(header.GasUsed),
+		Timestamp:        hexutil.Uint64(header.Time),
+		TransactionsRoot: header.TxHash,
+		ReceiptsRoot:     header.ReceiptHash,
+	}
+}
+
+// rpcMarshalHeaderTSetTotalDifficulty sets the total difficulty field for RPC response headers.
+// If the hash is unavailable (ie in Pending state), the value will be 0.
+func (s *PublicBlockChainAPI) rpcMarshalHeaderTSetTotalDifficulty(ctx context.Context, header *RPCMarshalHeaderT) {
+	hash := header.Hash
+	if hash == nil {
+		c := common.Hash{}
+		hash = &c
+	}
+	header.TotalDifficulty = (*hexutil.Big)(s.b.GetTd(ctx, *hash))
+}
+
+// setAsPending sets fields that must be nil for pending headers and blocks.
+func (h *RPCMarshalHeaderT) setAsPending() {
+	h.Hash = nil
+	h.Nonce = nil
+	h.Miner = nil
+}
+
+// RPCMarshalBlockT is a type handling RPC serialization for types.Block.
+type RPCMarshalBlockT struct {
+	*RPCMarshalHeaderT
+	Transactions []interface{} `json:"transactions,omitempty"`
+	Uncles       []common.Hash `json:"uncles,omitempty"`
+
+	Error string `json:"error,omitempty"`
+
+	inclTx bool
+	fullTx bool
+}
+
+// RPCMarshalBlockTIR is the intermediate representation of RPCMarshalBlockT.
+// This exists to avoid a circular reference when overriding the json marshaling interface.
+// RPCMarshalHeaderT is an embedded struct.
+type RPCMarshalBlockTIR struct {
+	*RPCMarshalHeaderT
+	Transactions []interface{} `json:"transactions,omitempty"`
+	Uncles       []common.Hash `json:"uncles,omitempty"`
+
+	Error string `json:"error,omitempty"`
+
+	inclTx bool
+	fullTx bool
+}
+
+// MarshalJSON marshals JSON for RPCMarshalBlockT.
+// If an error is present on the struct, an object with only the error is returned.
+// This logic follows the established logic at eth/api.go's handling of bad blocks.
+func (b *RPCMarshalBlockT) MarshalJSON() ([]byte, error) {
+	if b.Error != "" {
+		return json.Marshal(map[string]interface{}{"error": b.Error})
+	}
+	ir := &RPCMarshalBlockTIR{
+		RPCMarshalHeaderT: b.RPCMarshalHeaderT,
+		Transactions:      b.Transactions,
+		Uncles:            b.Uncles,
+		Error:             "",
+		inclTx:            b.inclTx,
+		fullTx:            b.fullTx,
+	}
+	return json.Marshal(ir)
+}
+
 // RPCMarshalBlock converts the given block to the RPC output which depends on fullTx. If inclTx is true transactions are
 // returned. When fullTx is true the returned block contains full transaction details, otherwise it will only contain
 // transaction hashes.
-func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool) (map[string]interface{}, error) {
-	fields := RPCMarshalHeader(block.Header())
-	fields["size"] = hexutil.Uint64(block.Size())
+func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool) (*RPCMarshalBlockT, error) {
+	fields := &RPCMarshalBlockT{RPCMarshalHeaderT: NewRPCMarshalHeaderTFromHeader(block.Header())}
+	fields.Size = hexutil.Uint64(block.Size())
 
 	if inclTx {
 		formatTx := func(tx *types.Transaction) (interface{}, error) {
@@ -1171,35 +1281,35 @@ func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool) (map[string]i
 				return nil, err
 			}
 		}
-		fields["transactions"] = transactions
+		fields.Transactions = transactions
 	}
 	uncles := block.Uncles()
 	uncleHashes := make([]common.Hash, len(uncles))
 	for i, uncle := range uncles {
 		uncleHashes[i] = uncle.Hash()
 	}
-	fields["uncles"] = uncleHashes
+	fields.Uncles = uncleHashes
 
 	return fields, nil
 }
 
 // rpcMarshalHeader uses the generalized output filler, then adds the total difficulty field, which requires
 // a `PublicBlockchainAPI`.
-func (s *PublicBlockChainAPI) rpcMarshalHeader(ctx context.Context, header *types.Header) map[string]interface{} {
-	fields := RPCMarshalHeader(header)
-	fields["totalDifficulty"] = (*hexutil.Big)(s.b.GetTd(ctx, header.Hash()))
+func (s *PublicBlockChainAPI) rpcMarshalHeader(ctx context.Context, header *types.Header) *RPCMarshalHeaderT {
+	fields := NewRPCMarshalHeaderTFromHeader(header)
+	s.rpcMarshalHeaderTSetTotalDifficulty(ctx, fields)
 	return fields
 }
 
 // rpcMarshalBlock uses the generalized output filler, then adds the total difficulty field, which requires
 // a `PublicBlockchainAPI`.
-func (s *PublicBlockChainAPI) rpcMarshalBlock(ctx context.Context, b *types.Block, inclTx bool, fullTx bool) (map[string]interface{}, error) {
+func (s *PublicBlockChainAPI) rpcMarshalBlock(ctx context.Context, b *types.Block, inclTx bool, fullTx bool) (*RPCMarshalBlockT, error) {
 	fields, err := RPCMarshalBlock(b, inclTx, fullTx)
 	if err != nil {
 		return nil, err
 	}
 	if inclTx {
-		fields["totalDifficulty"] = (*hexutil.Big)(s.b.GetTd(ctx, b.Hash()))
+		s.rpcMarshalHeaderTSetTotalDifficulty(ctx, fields.RPCMarshalHeaderT)
 	}
 	return fields, err
 }

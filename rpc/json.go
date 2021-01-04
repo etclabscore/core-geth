@@ -44,6 +44,14 @@ var (
 	errInvalidMethodName    = errors.New("invalid method name")
 )
 
+// elementizeMethodName parses a full method name (eg. "eth_syncing") into
+// - module
+// - method (name)
+// It uses the serviceMethodSeparators to split the original value into these pieces.
+// It uses these separators in the order they are defined, returning the first positive result,
+// where a positive result is defined as having split the original value into 2 values.
+// This means that method names SHOULD NOT use '_' or '.' (or any other separator value) in the name
+// unless it's being used as a separator.
 func elementizeMethodName(methodName string) (module, method string, err error) {
 	for _, sep := range serviceMethodSeparators {
 		if s := strings.SplitN(methodName, sep, 2); len(s) == 2 {

@@ -547,3 +547,12 @@ func toCallArg(msg ethereum.CallMsg) interface{} {
 	}
 	return arg
 }
+
+func (ec *Client) PeerCount(ctx context.Context) (uint64, error) {
+	var res hexutil.Uint64
+	err := ec.c.CallContext(ctx, &res, "net_peerCount")
+	if err != nil {
+		return 0, err
+	}
+	return uint64(res), nil
+}

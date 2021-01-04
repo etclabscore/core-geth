@@ -228,6 +228,19 @@ func auditFlagUse() {
 	if *genesisFlag != "" && *attachFlag != "" {
 		log.Crit("cannot use -genesis flag with -attach")
 	}
+	if *syncmodeFlag != "" {
+		allowedModes := []string{"light", "fast", "full"}
+		var ok bool
+		for _, mode := range allowedModes {
+			if mode == *syncmodeFlag {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			log.Crit("invalid value for -syncmode", "value", *syncmodeFlag, "allowed", allowedModes)
+		}
+	}
 }
 
 func main() {
@@ -445,16 +458,24 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 
 	// Assemble the Ethereum light client protocol
 	cfg := eth.DefaultConfig
-	cfg.SyncMode = downloader.LightSync
-	if *syncmodeFlag == "fast" {
-		cfg.SyncMode = downloader.FastSync
-		cfg.ProtocolVersions = eth.DefaultProtocolVersions
-	} else if *syncmodeFlag == "full" {
-		cfg.SyncMode = downloader.FullSync
-		cfg.ProtocolVersions = eth.DefaultProtocolVersions
-	}
 	cfg.NetworkId = network
 	cfg.Genesis = genesis
+
+	switch *syncmodeFlag {
+	case "light":
+		cfg.SyncMode = downloader.LightSync
+	case "fast":
+		cfg.SyncMode = downloader.FastSync
+		cfg.ProtocolVersions = eth.DefaultProtocolVersions
+	case "full":
+		cfg.SyncMode = downloader.FullSync
+		cfg.ProtocolVersions = eth.DefaultProtocolVersions
+	default:
+		panic("impossible to reach, this should be handled in the auditFlagUse function")
+	}
+
+	// Note that we have to set the discovery configs AFTER establishing the configuration
+	// sync mode because discovery setting depend on light vs. fast/full.
 	switch genesisHash {
 	case params.MainnetGenesisHash:
 		if genesis.GetChainID().Uint64() == params.DefaultClassicGenesisBlock().GetChainID().Uint64() {
@@ -469,33 +490,29 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 	default:
 		utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
 	}
-
 	log.Info("Config discovery", "urls", cfg.DiscoveryURLs)
 
-	var lesBackend *les.LightEthereum
-	var ethBackend *eth.Ethereum
-	if *syncmodeFlag == "fast" || *syncmodeFlag == "full" {
-		ethBackend, err = eth.New(stack, &cfg)
-		if err != nil {
-			return fmt.Errorf("Failed to register the Ethereum service: %w", err)
-		}
-	} else {
-		lesBackend, err = les.New(stack, &cfg)
-		if err != nil {
-			return fmt.Errorf("Failed to register the Ethereum service: %w", err)
-		}
-	}
-
-	// Assemble the ethstats monitoring and reporting service'
+	// Establish the backend and enable stats reporting if configured to do so.
 	if *statsFlag != "" {
-		if *syncmodeFlag == "fast" || *syncmodeFlag == "full" {
-			if err := ethstats.New(stack, ethBackend.APIBackend, ethBackend.Engine(), *statsFlag); err != nil {
-				return err
+		switch *syncmodeFlag {
+		case "light":
+			lesBackend, err := les.New(stack, &cfg)
+			if err != nil {
+				return fmt.Errorf("Failed to register the Ethereum service: %w", err)
 			}
-		} else {
 			if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), *statsFlag); err != nil {
 				return err
 			}
+		case "fast", "full":
+			ethBackend, err := eth.New(stack, &cfg)
+			if err != nil {
+				return fmt.Errorf("Failed to register the Ethereum service: %w", err)
+			}
+			if err := ethstats.New(stack, ethBackend.APIBackend, ethBackend.Engine(), *statsFlag); err != nil {
+				return err
+			}
+		default:
+			panic("impossible to reach, this should be handled in the auditFlagUse function")
 		}
 	}
 

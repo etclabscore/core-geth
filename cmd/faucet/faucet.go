@@ -477,30 +477,28 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 	if *syncmodeFlag == "fast" || *syncmodeFlag == "full" {
 		ethBackend, err = eth.New(stack, &cfg)
 		if err != nil {
-		return fmt.Errorf("Failed to register the Ethereum service: %w", err)
+			return fmt.Errorf("Failed to register the Ethereum service: %w", err)
 		}
 	} else {
 		lesBackend, err = les.New(stack, &cfg)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to register the Ethereum service: %w", err)
+			return fmt.Errorf("Failed to register the Ethereum service: %w", err)
 		}
 	}
 
 	// Assemble the ethstats monitoring and reporting service'
 	if *statsFlag != "" {
-		if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), *statsFlag); err != nil {
-			return err
-	if stats != "" {
 		if *syncmodeFlag == "fast" || *syncmodeFlag == "full" {
-			if err := ethstats.New(stack, ethBackend.APIBackend, ethBackend.Engine(), stats); err != nil {
-				return nil, err
+			if err := ethstats.New(stack, ethBackend.APIBackend, ethBackend.Engine(), *statsFlag); err != nil {
+				return err
 			}
 		} else {
-			if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), stats); err != nil {
-				return nil, err
+			if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), *statsFlag); err != nil {
+				return err
 			}
 		}
 	}
+
 	// Boot up the client and ensure it connects to bootnodes
 	if err := stack.Start(); err != nil {
 		return err

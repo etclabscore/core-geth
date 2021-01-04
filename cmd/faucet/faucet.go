@@ -76,13 +76,11 @@ var (
 	rinkebyFlag     = flag.Bool("chain.rinkeby", false, "Configure genesis and bootnodes for rinkeby chain defaults")
 	goerliFlag      = flag.Bool("chain.goerli", false, "Configure genesis and bootnodes for goerli chain defaults")
 
-<<<<<<< HEAD
-	syncmodeFlag = flag.String("syncmode", "light", "Configure sync mode for faucet's client")
-	datadirFlag  = flag.String("datadir", "", "Use a custom datadir")
-=======
 	attachFlag    = flag.String("attach", "", "Attach to an IPC or WS endpoint")
 	attachChainID = flag.Int64("attach.chainid", 0, "Configure fallback chain id value for use in attach mode (used if target does not have value available yet).")
->>>>>>> master
+
+	syncmodeFlag = flag.String("syncmode", "light", "Configure sync mode for faucet's client")
+	datadirFlag  = flag.String("datadir", "", "Use a custom datadir")
 
 	genesisFlag = flag.String("genesis", "", "Genesis json file to seed the chain with")
 	apiPortFlag = flag.Int("apiport", 8080, "Listener port for the HTTP API connection")
@@ -131,26 +129,9 @@ var (
 
 func faucetDirFromChainIndicators(chainID uint64, genesisHash common.Hash) string {
 	datadir := filepath.Join(os.Getenv("HOME"), ".faucet")
-<<<<<<< HEAD
 	if *datadirFlag != "" {
 		datadir = *datadirFlag
 	}
-	for conf, suff := range map[ctypes.ChainConfigurator]string{
-		params.MainnetChainConfig:     "",
-		params.ClassicChainConfig:     "classic",
-		params.SocialChainConfig:      "social",
-		params.EthersocialChainConfig: "ethersocial",
-		params.MixChainConfig:         "mix",
-		params.RopstenChainConfig:     "ropsten",
-		params.RinkebyChainConfig:     "rinkeby",
-		params.GoerliChainConfig:      "goerli",
-		params.KottiChainConfig:       "kotti",
-		params.MordorChainConfig:      "mordor",
-	} {
-		if reflect.DeepEqual(chainConfig, conf) && suff != "" {
-			datadir = filepath.Join(datadir, suff)
-		}
-=======
 	switch genesisHash {
 	case params.MainnetGenesisHash:
 		if chainID == params.ClassicChainConfig.GetChainID().Uint64() {
@@ -173,7 +154,6 @@ func faucetDirFromChainIndicators(chainID uint64, genesisHash common.Hash) strin
 		return filepath.Join(datadir, "kotti")
 	case params.MordorGenesisHash:
 		return filepath.Join(datadir, "mordor")
->>>>>>> master
 	}
 	return datadir
 }
@@ -491,13 +471,13 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 	}
 
 	log.Info("Config discovery", "urls", cfg.DiscoveryURLs)
-<<<<<<< HEAD
+
 	var lesBackend *les.LightEthereum
 	var ethBackend *eth.Ethereum
 	if *syncmodeFlag == "fast" || *syncmodeFlag == "full" {
 		ethBackend, err = eth.New(stack, &cfg)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to register the Ethereum service: %w", err)
+		return fmt.Errorf("Failed to register the Ethereum service: %w", err)
 		}
 	} else {
 		lesBackend, err = les.New(stack, &cfg)
@@ -507,6 +487,9 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 	}
 
 	// Assemble the ethstats monitoring and reporting service'
+	if *statsFlag != "" {
+		if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), *statsFlag); err != nil {
+			return err
 	if stats != "" {
 		if *syncmodeFlag == "fast" || *syncmodeFlag == "full" {
 			if err := ethstats.New(stack, ethBackend.APIBackend, ethBackend.Engine(), stats); err != nil {
@@ -516,21 +499,8 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 			if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), stats); err != nil {
 				return nil, err
 			}
-=======
-
-	lesBackend, err := les.New(stack, &cfg)
-	if err != nil {
-		return fmt.Errorf("Failed to register the Ethereum service: %w", err)
-	}
-
-	// Assemble the ethstats monitoring and reporting service'
-	if *statsFlag != "" {
-		if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), *statsFlag); err != nil {
-			return err
->>>>>>> master
 		}
 	}
-
 	// Boot up the client and ensure it connects to bootnodes
 	if err := stack.Start(); err != nil {
 		return err

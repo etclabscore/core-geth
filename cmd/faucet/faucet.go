@@ -79,6 +79,9 @@ var (
 	attachFlag    = flag.String("attach", "", "Attach to an IPC or WS endpoint")
 	attachChainID = flag.Int64("attach.chainid", 0, "Configure fallback chain id value for use in attach mode (used if target does not have value available yet).")
 
+	syncmodeFlag = flag.String("syncmode", "light", "Configure sync mode for faucet's client")
+	datadirFlag  = flag.String("datadir", "", "Use a custom datadir")
+
 	genesisFlag = flag.String("genesis", "", "Genesis json file to seed the chain with")
 	apiPortFlag = flag.Int("apiport", 8080, "Listener port for the HTTP API connection")
 	ethPortFlag = flag.Int("ethport", 30303, "Listener port for the devp2p connection")
@@ -126,6 +129,9 @@ var (
 
 func faucetDirFromChainIndicators(chainID uint64, genesisHash common.Hash) string {
 	datadir := filepath.Join(os.Getenv("HOME"), ".faucet")
+	if *datadirFlag != "" {
+		datadir = *datadirFlag
+	}
 	switch genesisHash {
 	case params.MainnetGenesisHash:
 		if chainID == params.ClassicChainConfig.GetChainID().Uint64() {
@@ -224,6 +230,19 @@ func auditFlagUse(genesis *genesisT.Genesis) {
 	}
 	if *genesisFlag != "" && *attachFlag != "" {
 		log.Crit("cannot use -genesis flag with -attach")
+	}
+	if *syncmodeFlag != "" {
+		allowedModes := []string{"light", "fast", "full"}
+		var ok bool
+		for _, mode := range allowedModes {
+			if mode == *syncmodeFlag {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			log.Crit("invalid value for -syncmode", "value", *syncmodeFlag, "allowed", allowedModes)
+		}
 	}
 }
 
@@ -441,9 +460,24 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 
 	// Assemble the Ethereum light client protocol
 	cfg := eth.DefaultConfig
-	cfg.SyncMode = downloader.LightSync
 	cfg.NetworkId = network
 	cfg.Genesis = genesis
+
+	switch *syncmodeFlag {
+	case "light":
+		cfg.SyncMode = downloader.LightSync
+	case "fast":
+		cfg.SyncMode = downloader.FastSync
+		cfg.ProtocolVersions = eth.DefaultProtocolVersions
+	case "full":
+		cfg.SyncMode = downloader.FullSync
+		cfg.ProtocolVersions = eth.DefaultProtocolVersions
+	default:
+		panic("impossible to reach, this should be handled in the auditFlagUse function")
+	}
+
+	// Note that we have to set the discovery configs AFTER establishing the configuration
+	// sync mode because discovery setting depend on light vs. fast/full.
 	switch genesisHash {
 	case params.MainnetGenesisHash:
 		if genesis.GetChainID().Uint64() == params.DefaultClassicGenesisBlock().GetChainID().Uint64() {
@@ -458,18 +492,29 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 	default:
 		utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
 	}
-
 	log.Info("Config discovery", "urls", cfg.DiscoveryURLs)
 
-	lesBackend, err := les.New(stack, &cfg)
-	if err != nil {
-		return fmt.Errorf("Failed to register the Ethereum service: %w", err)
-	}
-
-	// Assemble the ethstats monitoring and reporting service'
+	// Establish the backend and enable stats reporting if configured to do so.
 	if *statsFlag != "" {
-		if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), *statsFlag); err != nil {
-			return err
+		switch *syncmodeFlag {
+		case "light":
+			lesBackend, err := les.New(stack, &cfg)
+			if err != nil {
+				return fmt.Errorf("Failed to register the Ethereum service: %w", err)
+			}
+			if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), *statsFlag); err != nil {
+				return err
+			}
+		case "fast", "full":
+			ethBackend, err := eth.New(stack, &cfg)
+			if err != nil {
+				return fmt.Errorf("Failed to register the Ethereum service: %w", err)
+			}
+			if err := ethstats.New(stack, ethBackend.APIBackend, ethBackend.Engine(), *statsFlag); err != nil {
+				return err
+			}
+		default:
+			panic("impossible to reach, this should be handled in the auditFlagUse function")
 		}
 	}
 
@@ -845,8 +890,8 @@ func (f *faucet) loop() {
 		for head := range update {
 			// New chain head arrived, query the current stats and stream to clients
 			timestamp := time.Unix(int64(head.Time), 0)
-			if time.Since(timestamp) > time.Hour {
-				log.Warn("Skipping faucet refresh, head too old", "number", head.Number, "hash", head.Hash(), "age", common.PrettyAge(timestamp))
+			if age := time.Since(timestamp); age > time.Hour {
+				log.Trace("Skipping faucet refresh, head too old", "number", head.Number, "hash", head.Hash(), "age", common.PrettyAge(timestamp))
 				continue
 			}
 			if err := f.refresh(head); err != nil {

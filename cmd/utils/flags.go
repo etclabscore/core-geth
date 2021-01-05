@@ -150,6 +150,10 @@ var (
 		Name:  "classic",
 		Usage: "Ethereum Classic network: pre-configured Ethereum Classic mainnet",
 	}
+	MainnetFlag = cli.BoolFlag{
+		Name:  "mainnet",
+		Usage: "Ethereum mainnet: pre-configured Ethereum mainnet",
+	}
 	YoloV2Flag = cli.BoolFlag{
 		Name:  "yolov2",
 		Usage: "YOLOv2 network: pre-configured proof-of-authority shortlived test network.",
@@ -1597,7 +1601,7 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, LegacyTestnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV2Flag, ClassicFlag, KottiFlag, MordorFlag)
+	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, LegacyTestnetFlag, MainnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV2Flag, ClassicFlag, KottiFlag, MordorFlag)
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	CheckExclusive(ctx, GCModeFlag, "archive", TxLookupLimitFlag)
@@ -1759,8 +1763,12 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.
 	switch {
+	case ctx.GlobalBool(MainnetFlag.Name):
+		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
+			cfg.NetworkId = 1
+		}
+		SetDNSDiscoveryDefaults(cfg, params.MainnetGenesisHash)
 	case ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name):
-		cfg.Genesis = params.DefaultRopstenGenesisBlock()
 		SetDNSDiscoveryDefaults(cfg, params.RopstenGenesisHash)
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		SetDNSDiscoveryDefaults(cfg, params.RinkebyGenesisHash)
@@ -1970,6 +1978,8 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 	var genesis *genesisT.Genesis
 	switch {
+	case ctx.GlobalBool(MainnetFlag.Name):
+		genesis = params.DefaultGenesisBlock()
 	case ctx.GlobalBool(ClassicFlag.Name):
 		genesis = params.DefaultClassicGenesisBlock()
 	case ctx.GlobalBool(MordorFlag.Name):

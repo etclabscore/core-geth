@@ -203,7 +203,10 @@ func parseChainFlags() (gs *genesisT.Genesis, bs string, netid uint64) {
 
 // auditFlagUse ensures that exclusive/incompatible flag values are not set.
 // If invalid use if found, the program exits with log.Crit.
-func auditFlagUse() {
+func auditFlagUse(genesis *genesisT.Genesis) {
+	if genesis == nil && *attachFlag == "" {
+		log.Crit("no -chain.<identity> configured and no attach target; use either -chain.<identity> or -attach.")
+	}
 	if *statsFlag != "" && *attachFlag != "" {
 		log.Crit("flags are incompatible", "flags", []string{"ethstats", "attach"}, "values", []*string{statsFlag, attachFlag})
 	}
@@ -229,7 +232,16 @@ func main() {
 	flag.Parse()
 	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(*logFlag), log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 
-	auditFlagUse()
+	// Load and parse the genesis block requested by the user
+	var genesis *genesisT.Genesis
+	var enodes []*discv5.Node
+	var blob []byte
+
+	// client will be used if the faucet is attaching. If not it won't be touched.
+	var client *ethclient.Client
+
+	genesis, *bootFlag, *netFlag = parseChainFlags()
+	auditFlagUse(genesis)
 
 	// Construct the payout tiers
 	amounts := make([]string, *tiersFlag)
@@ -273,16 +285,6 @@ func main() {
 	if err != nil {
 		log.Crit("Failed to render the faucet template", "err", err)
 	}
-
-	// Load and parse the genesis block requested by the user
-	var genesis *genesisT.Genesis
-	var enodes []*discv5.Node
-	var blob []byte
-
-	// client will be used if the faucet is attaching. If not it won't be touched.
-	var client *ethclient.Client
-
-	genesis, *bootFlag, *netFlag = parseChainFlags()
 
 	if genesis != nil {
 		log.Info("Using chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", fmt.Sprintf("%v", genesis.Config))

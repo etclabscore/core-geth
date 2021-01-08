@@ -35,6 +35,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -209,28 +210,77 @@ func parseChainFlags() (gs *genesisT.Genesis, bs string, netid uint64) {
 
 // auditFlagUse ensures that exclusive/incompatible flag values are not set.
 // If invalid use if found, the program exits with log.Crit.
-func auditFlagUse(genesis *genesisT.Genesis) {
-	if genesis == nil && *attachFlag == "" {
-		log.Crit("no -chain.<identity> configured and no attach target; use either -chain.<identity> or -attach.")
-	}
-	if *statsFlag != "" && *attachFlag != "" {
-		log.Crit("flags are incompatible", "flags", []string{"ethstats", "attach"}, "values", []*string{statsFlag, attachFlag})
-	}
-	var activeChainFlag *bool
+func auditFlagUse() {
+	var (
+		ffalse          = false
+		activeChainFlag = &ffalse
+	)
 	for _, f := range chainFlags {
 		if *f {
-			if activeChainFlag != nil {
+			if *activeChainFlag {
 				log.Crit("cannot use two -chain.* flags simultaneously")
 			}
 			activeChainFlag = f
 		}
 	}
-	if activeChainFlag != nil && *attachFlag != "" {
-		log.Crit("cannot use -chain.* with -attach")
+
+	if !*activeChainFlag && *genesisFlag == "" && *attachFlag == "" {
+		log.Crit("missing chain configuration option; use one of -chain.<identity>, -genesis, or -attach")
 	}
-	if *genesisFlag != "" && *attachFlag != "" {
-		log.Crit("cannot use -genesis flag with -attach")
+
+	type fflag struct {
+		name  string
+		value interface{}
 	}
+	exclusiveOrCrit := func(a, b fflag) {
+		didSetOne := false
+		for _, f := range []fflag{a, b} {
+			isSet := false
+			switch t := f.value.(type) {
+			case *string:
+				isSet = *t != ""
+			case *bool:
+				isSet = *t
+			case bool:
+				isSet = t
+			case *int64:
+				isSet = *t != 0
+			case *uint64:
+				isSet = *t != 0
+			case *int:
+				isSet = *t != 0
+			default:
+				panic(fmt.Sprintf("unhandled flag type case: %v %t %s", t, t, f.name))
+			}
+			if didSetOne && isSet {
+				var av, bv interface{}
+				av = a.value
+				bv = b.value
+				if reflect.TypeOf(a.value).Kind() == reflect.Ptr {
+					av = reflect.ValueOf(a.value).Elem()
+				}
+				if reflect.TypeOf(b.value).Kind() == reflect.Ptr {
+					bv = reflect.ValueOf(b.value).Elem()
+				}
+				log.Crit("flags are exclusive", "flags", []string{a.name, b.name}, "values", []interface{}{av, bv})
+			}
+			didSetOne = isSet
+		}
+	}
+	for _, exclusivePair := range [][]fflag{
+		{{"attach", attachFlag}, {"chain.<identity>", activeChainFlag}},
+		{{"attach", attachFlag}, {"genesis", genesisFlag}},
+		{{"attach", attachFlag}, {"ethstats", statsFlag}},
+		{{"attach", attachFlag}, {"network", netFlag}},
+		{{"attach", attachFlag}, {"bootnodes", bootFlag}},
+	} {
+		exclusiveOrCrit(exclusivePair[0], exclusivePair[1])
+	}
+
+	if *attachFlag == "" && *attachChainID != 0 {
+		log.Crit("must use -attach when using -attach.chainid")
+	}
+
 	if *syncmodeFlag != "" {
 		allowedModes := []string{"light", "fast", "full"}
 		var ok bool
@@ -251,6 +301,8 @@ func main() {
 	flag.Parse()
 	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(*logFlag), log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 
+	auditFlagUse()
+
 	// Load and parse the genesis block requested by the user
 	var genesis *genesisT.Genesis
 	var enodes []*discv5.Node
@@ -258,9 +310,7 @@ func main() {
 
 	// client will be used if the faucet is attaching. If not it won't be touched.
 	var client *ethclient.Client
-
 	genesis, *bootFlag, *netFlag = parseChainFlags()
-	auditFlagUse(genesis)
 
 	// Construct the payout tiers
 	amounts := make([]string, *tiersFlag)

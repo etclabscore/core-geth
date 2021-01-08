@@ -484,16 +484,58 @@ type faucet struct {
 	lock sync.RWMutex // Lock protecting the faucet's internals
 }
 
+const (
+	multiFaucetNodeName = "MultiFaucet"
+	coreFaucetNodeName  = "CoreFaucet"
+)
+
+// migrateFaucetDirectory moves an existing "MultiFaucet" directory to the new "CoreFaucet".
+// It only returns an error if the migration is attempted and fails.
+// If no 'old' directory is found to migrate (ie DNE), it returns nil (no error).
+func migrateFaucetDirectory(faucetDataDir string) error {
+	oldFaucetNodePath := filepath.Join(faucetDataDir, multiFaucetNodeName)
+	targetFaucetNodePath := filepath.Join(faucetDataDir, coreFaucetNodeName)
+
+	log.Info("Checking datadir migration", "datadir", faucetDataDir)
+
+	d, err := os.Stat(oldFaucetNodePath)
+	if err != nil && os.IsNotExist(err) {
+		// This is an expected positive error.
+		return nil
+	}
+	if err == nil && d.IsDir() {
+
+		// Path exists and is a directory.
+		log.Warn("Found existing 'MultiFaucet' directory, migrating", "old", oldFaucetNodePath, "new", targetFaucetNodePath)
+		if err := os.Rename(oldFaucetNodePath, targetFaucetNodePath); err != nil {
+			return err
+		}
+		return nil
+	}
+	if err == nil && !d.IsDir() {
+		return errors.New("expected a directory at faucet node datadir path, found non-directory")
+	}
+	// Return any error which is not expected, eg. bad permissions.
+	return err
+}
+
 // startStack starts the node stack, ensures peering, and assigns the respective ethclient to the faucet.
 func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, network uint64) error {
 
 	genesisHash := core.GenesisToBlock(genesis, nil).Hash()
 
+	faucetDataDir := faucetDirFromChainIndicators(genesis.Config.GetChainID().Uint64(), genesisHash)
+
+	// Handle renaming of existing directory from old name to new name.
+	if err := migrateFaucetDirectory(faucetDataDir); err != nil {
+		log.Crit("Migration handling of faucet datadir failed", "error", err)
+	}
+
 	// Assemble the raw devp2p protocol stack
 	stack, err := node.New(&node.Config{
-		Name:    "MultiFaucet",
+		Name:    coreFaucetNodeName,
 		Version: params.VersionWithCommit(gitCommit, gitDate),
-		DataDir: faucetDirFromChainIndicators(genesis.Config.GetChainID().Uint64(), genesisHash),
+		DataDir: faucetDataDir,
 		P2P: p2p.Config{
 			NAT: nat.Any(),
 			// NoDiscovery is DISABLED to allow the node the find peers without relying on manually configured bootnodes.

@@ -271,7 +271,6 @@ func auditFlagUse() {
 		{{"attach", attachFlag}, {"chain.<identity>", activeChainFlag}},
 		{{"attach", attachFlag}, {"genesis", genesisFlag}},
 		{{"attach", attachFlag}, {"ethstats", statsFlag}},
-		{{"attach", attachFlag}, {"ethport", ethPortFlag}},
 		{{"attach", attachFlag}, {"network", netFlag}},
 		{{"attach", attachFlag}, {"bootnodes", bootFlag}},
 	} {

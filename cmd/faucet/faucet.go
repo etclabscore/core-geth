@@ -545,27 +545,29 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 	log.Info("Config discovery", "urls", cfg.DiscoveryURLs)
 
 	// Establish the backend and enable stats reporting if configured to do so.
-	if *statsFlag != "" {
-		switch *syncmodeFlag {
-		case "light":
-			lesBackend, err := les.New(stack, &cfg)
-			if err != nil {
-				return fmt.Errorf("Failed to register the Ethereum service: %w", err)
-			}
+	switch *syncmodeFlag {
+	case "light":
+		lesBackend, err := les.New(stack, &cfg)
+		if err != nil {
+			return fmt.Errorf("Failed to register the Ethereum service: %w", err)
+		}
+		if *statsFlag != "" {
 			if err := ethstats.New(stack, lesBackend.ApiBackend, lesBackend.Engine(), *statsFlag); err != nil {
 				return err
 			}
-		case "fast", "full":
-			ethBackend, err := eth.New(stack, &cfg)
-			if err != nil {
-				return fmt.Errorf("Failed to register the Ethereum service: %w", err)
-			}
+		}
+	case "fast", "full":
+		ethBackend, err := eth.New(stack, &cfg)
+		if err != nil {
+			return fmt.Errorf("Failed to register the Ethereum service: %w", err)
+		}
+		if *statsFlag != "" {
 			if err := ethstats.New(stack, ethBackend.APIBackend, ethBackend.Engine(), *statsFlag); err != nil {
 				return err
 			}
-		default:
-			panic("impossible to reach, this should be handled in the auditFlagUse function")
 		}
+	default:
+		panic("impossible to reach, this should be handled in the auditFlagUse function")
 	}
 
 	// Boot up the client and ensure it connects to bootnodes

@@ -1,6 +1,11 @@
-# Networking
+---
+hide:
+  - toc        # Hide table of contents
+---
 
-### Programmatically interfacing `geth` nodes
+# JSON-RPC APIs
+
+## Programmatically interfacing `geth` nodes
 
 As a developer, sooner rather than later you'll want to start interacting with `geth` and the
 Ethereum network via your own programs and not manually through the console. To aid

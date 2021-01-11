@@ -72,9 +72,10 @@ nav:
   - Core:
     - All tools: core/alltools.md
     - CLI: core/run-cli.md
-    - OpenRPC API: core/jsonrpc-api.md
     - EVMC: core/evmc.md
-    - Networking: core/networking.md
+  - APIs:
+    - JSON-RPC: apis/jsonrpc-apis.md
+    - OpenRPC: apis/openrpc.md
   - Developers:
     - Versioning: developers/versioning.md
     - New release: developers/create-new-release.md

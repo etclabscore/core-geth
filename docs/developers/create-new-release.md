@@ -1,4 +1,9 @@
-## Developers: How to make a release
+---
+hide:
+  - toc        # Hide table of contents
+---
+
+# Developers: How to make a release
 
 - [ ] Decide what the new version should be. In this example, __`v1.11.16[-stable]`__ will be used.
 - [ ] `git checkout master`

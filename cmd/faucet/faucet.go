@@ -1042,6 +1042,10 @@ func (f *faucet) loop() {
 				}
 			}
 			f.lock.RUnlock()
+		case err := <-sub.Err():
+			if *attachFlag != "" {
+				log.Crit("Connection with the attached client has been lost", "err", err)
+			}
 		}
 	}
 }

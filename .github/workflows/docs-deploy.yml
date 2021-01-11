@@ -9,6 +9,7 @@ on:
     paths:
       - mkdocs.yml
       - docs/**
+      - requirements-mkdocs.txt
   pull_request:
     branches:
       - master

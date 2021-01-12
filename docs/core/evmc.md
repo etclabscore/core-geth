@@ -1,3 +1,8 @@
+---
+hide:
+  - toc        # Hide table of contents
+---
+
 # Running Geth with an External VM
 
 Geth supports the [EVMC](https://github.com/ethereum/evmc/) VM connector API version 6 as an experimental feature.
@@ -18,7 +23,7 @@ tests the implementation against both of these mentioned EWASM libraries against
 These tests run exclusively via Github Actions, configured at `.github/workflows/evmc.yml`.
 
 While core-geth supports highly granular EIP/ECIP/xIP chain feature configuration (ie fork feature configs),
-EVMC does not. EVMC only supports the Fork configurations supported by ethereum/go-ethereum (eg. Byzantium, Constantinople, &c). 
+EVMC does not. EVMC only supports the Fork configurations supported by ethereum/go-ethereum (eg. Byzantium, Constantinople, &c).
 Thus, the implementation at core-geth of EVMC requires a somewhat arbitrary mapping of granular features as keys toggling
 entire Ethereum fork configurations.
 

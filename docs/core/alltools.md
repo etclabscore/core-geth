@@ -1,3 +1,8 @@
+---
+hide:
+  - toc        # Hide table of contents
+---
+
 ## Executables
 
 The go-ethereum project comes with several wrappers/executables found in the `cmd`

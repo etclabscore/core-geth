@@ -1,0 +1,83 @@
+# Project information
+site_name: CoreGeth Documentation
+site_description: Documentation for CoreGeth Ethereum Protocol Provider
+site_url: https://etclabscore.github.io/core-geth/
+site_author: CoreGeth Team
+
+# Repository
+repo_name: etclabscore/core-geth
+repo_url: https://github.com/etclabscore/core-geth
+edit_uri: edit/master/docs/
+
+# Copyright
+copyright: 'Copyright &copy; 2021 etclabscore/core-geth and ethereum/go-ethereum authors; see <a href="https://github.com/etclabscore/core-geth/tree/master/COPYING" target="_">COPYING file</a> - All rights reserved'
+
+# Configuration
+theme:
+  # https://github.com/squidfunk/mkdocs-material/tree/master/src
+  name: material
+  logo: img/favicon.png
+  favicon: img/favicon.png
+  language: en
+
+  palette:
+    scheme: slate
+    primary: black
+    accent: green
+
+  icon:
+    repo: fontawesome/brands/github
+
+  # Don't include MkDocs' JavaScript
+  include_search_page: false
+
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.expand
+    - navigation.sections
+    # - navigation.instant
+
+use_directory_urls: true
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+  - git-revision-date-localized:
+      type: timeago
+
+# Extensions
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - codehilite
+  - def_list
+  # - meta
+  - smarty
+  - toc:
+      permalink: true
+  - pymdownx.emoji
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.magiclink:
+      repo_url_shortener: true
+      repo_url_shorthand: true
+      social_url_shorthand: true
+
+# Page tree
+nav:
+  - Home: index.md
+  - Core:
+    - All tools: core/alltools.md
+    - CLI: core/run-cli.md
+    - EVMC: core/evmc.md
+  - APIs:
+    - JSON-RPC: apis/jsonrpc-apis.md
+    - OpenRPC: apis/openrpc.md
+  - Developers:
+    - Versioning: developers/versioning.md
+    - New release: developers/create-new-release.md
+  - Tutorials:
+    - Setup private network: tutorials/private-network.md

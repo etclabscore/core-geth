@@ -1,0 +1,35 @@
+name: Publish docs via GitHub Pages
+
+# Controls when the action will run.
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - mkdocs.yml
+      - docs/**
+      - requirements-mkdocs.txt
+  pull_request:
+    branches:
+      - master
+      - main
+    paths:
+      - mkdocs.yml
+      - docs/**
+      - requirements-mkdocs.txt
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Deploy docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - run: pip install -r requirements-mkdocs.txt
+      - run: mkdocs gh-deploy --force

@@ -266,7 +266,7 @@ func (api *PublicFilterAPI) NewHeads(ctx context.Context) (*rpc.Subscription, er
 	return rpcSub, nil
 }
 
-// NewHeads send a notification each time a new (header) block is appended to the chain.
+// NewSideHeads send a notification each time a new non-canonical (header) block is written to the database.
 func (api *PublicFilterAPI) NewSideHeads(ctx context.Context) (*rpc.Subscription, error) {
 	notifier, supported := rpc.NotifierFromContext(ctx)
 	if !supported {

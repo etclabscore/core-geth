@@ -282,7 +282,7 @@ func TestDiscoverCompliesOpenRPCSpec(t *testing.T) {
 	schemaLoader.Draft = gojsonschema.Draft7 // force schema version
 	schemaLoader.AutoDetect = false
 
-	openRPCSpecFile := "file://./open-rpc-meta-schema-1.14.0.json"
+	openRPCSpecFile := "file://./testdata/open-rpc-meta-schema-1.14.0.json"
 	schema, err := schemaLoader.Compile(gojsonschema.NewReferenceLoader(openRPCSpecFile))
 
 	documentLoader := gojsonschema.NewGoLoader(res)

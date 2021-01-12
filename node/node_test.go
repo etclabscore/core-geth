@@ -35,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/xeipuuv/gojsonschema"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -241,6 +242,61 @@ func TestRegisterProtocols_OpenRPC_WS(t *testing.T) {
 
 	if res["info"].(map[string]interface{})["title"].(string) != "Core-Geth RPC API" {
 		t.Fatal("bad")
+	}
+}
+
+func TestDiscoverCompliesOpenRPCSpec(t *testing.T) {
+	stack, err := New(testNodeConfig())
+	if err != nil {
+		t.Fatalf("failed to create protocol stack: %v", err)
+	}
+	defer stack.Close()
+
+	datadir := filepath.Join(os.TempDir(), "node-test")
+	defer os.RemoveAll(datadir)
+
+	stack.config = &DefaultConfig
+	stack.config.HTTPHost = DefaultHTTPHost
+	// enable all available APIs
+	stack.config.HTTPModules = []string{"admin", "debug", "eth", "ethash", "miner", "net", "personal", "rpc", "trace", "txpool", "web3"}
+	stack.config.DataDir = datadir
+
+	if err := stack.Start(); err != nil {
+		t.Fatal(err)
+	}
+	defer stack.Close()
+
+	client, err := rpc.Dial("http://localhost:8545")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer client.Close()
+
+	res := make(map[string]interface{})
+	err = client.Call(&res, "rpc_discover")
+	if err != nil {
+		t.Errorf("client call: %v", err)
+	}
+
+	openRPCSpecURL := "https://github.com/open-rpc/meta-schema/releases/download/1.14.0/open-rpc-meta-schema.json"
+
+	schemaLoader := gojsonschema.NewSchemaLoader()
+	schemaLoader.Draft = gojsonschema.Draft7 // force schema version
+	schemaLoader.AutoDetect = false
+	schema, err := schemaLoader.Compile(gojsonschema.NewReferenceLoader(openRPCSpecURL))
+
+	documentLoader := gojsonschema.NewGoLoader(res)
+
+	result, err := schema.Validate(documentLoader)
+	if err != nil {
+		t.Errorf("failed to validate OpenRPC schema: %v", err)
+	}
+
+	if !result.Valid() {
+		for _, desc := range result.Errors() {
+			fmt.Printf("- %s\n", desc)
+		}
+		t.Fatal("the OpenRPC discovery document is not compliant with spec")
 	}
 }
 

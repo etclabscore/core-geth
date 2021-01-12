@@ -278,12 +278,12 @@ func TestDiscoverCompliesOpenRPCSpec(t *testing.T) {
 		t.Errorf("client call: %v", err)
 	}
 
-	openRPCSpecURL := "https://github.com/open-rpc/meta-schema/releases/download/1.14.0/open-rpc-meta-schema.json"
-
 	schemaLoader := gojsonschema.NewSchemaLoader()
 	schemaLoader.Draft = gojsonschema.Draft7 // force schema version
 	schemaLoader.AutoDetect = false
-	schema, err := schemaLoader.Compile(gojsonschema.NewReferenceLoader(openRPCSpecURL))
+
+	openRPCSpecFile := "file://./open-rpc-meta-schema-1.14.0.json"
+	schema, err := schemaLoader.Compile(gojsonschema.NewReferenceLoader(openRPCSpecFile))
 
 	documentLoader := gojsonschema.NewGoLoader(res)
 

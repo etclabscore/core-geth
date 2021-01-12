@@ -236,7 +236,6 @@ func (api *PublicFilterAPI) NewSideBlockFilter() rpc.ID {
 	return headerSub.ID
 }
 
-
 // NewHeads send a notification each time a new (header) block is appended to the chain.
 func (api *PublicFilterAPI) NewHeads(ctx context.Context) (*rpc.Subscription, error) {
 	notifier, supported := rpc.NotifierFromContext(ctx)

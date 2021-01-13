@@ -50,6 +50,12 @@ Ellaism users are asked to switch to
 
 <a name="configuration-capable">2</a>: Network not supported by default, but network configuration is possible. Make a PR!
 
+## Documentation
+
+- CoreGeth documentation is available [here](https://etclabscore.github.io/core-geth). 
+- Further go-ethereum documentation about can be found [here](https://geth.ethereum.org/docs/). 
+- Developers interested in writing documentation, please find documentation about documentation [here](./docs/developers/documentation.md). 
+
 ## Install
 
 ### Pre-built executable

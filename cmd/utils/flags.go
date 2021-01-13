@@ -779,6 +779,16 @@ var (
 		Usage: "Configure ECBP-1100 (MESS) block activation number",
 		Value: math.MaxUint64,
 	}
+	ECBP1100MinPeersFlag = cli.IntFlag{
+		Name:  "ecbp1100.peers.floor",
+		Usage: "Configure ECBP-1100 (MESS) minimum peer disable limit (below which ECBP1100 will be disabled)",
+		Value: -1,
+	}
+	ECBP1100StaleHeadFlag = cli.DurationFlag{
+		Name:  "ecbp1100.stalehead.ceiling",
+		Usage: "Configure ECBP-1100 (MESS) stale head disable limit (above which ECBP1100 will be disabled)",
+		Value: time.Duration(0),
+	}
 )
 
 // MakeDataDir retrieves the currently requested data directory, terminating

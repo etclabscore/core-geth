@@ -214,6 +214,16 @@ func New(stack *node.Node, config *Config) (*Ethereum, error) {
 	if eth.protocolManager, err = NewProtocolManager(chainConfig, checkpoint, config.SyncMode, config.NetworkId, eth.eventMux, eth.txPool, eth.engine, eth.blockchain, chainDb, cacheLimit, config.Whitelist); err != nil {
 		return nil, err
 	}
+	// Handle configuration overrides for artificial finality features, setting corresponding package globals.
+	if config.ECBP1100MinPeers != nil {
+		log.Warn("Overriding ECBP1100 (MESS) minimum peers requirement", "original", minArtificialFinalityPeers, "target", *config.ECBP1100MinPeers)
+		minArtificialFinalityPeers = *config.ECBP1100MinPeers
+	}
+	if config.ECBP1100StaleHead != nil {
+		log.Warn("Overriding ECBP1100 (MESS) stale head ceiling limit", "original", artificialFinalitySafetyInterval, "target", *config.ECBP1100StaleHead)
+		artificialFinalitySafetyInterval = *config.ECBP1100StaleHead
+	}
+
 	eth.miner = miner.New(eth, &config.Miner, chainConfig, eth.EventMux(), eth.engine, eth.isLocalBlock)
 	eth.miner.SetExtra(makeExtraData(config.Miner.ExtraData))
 

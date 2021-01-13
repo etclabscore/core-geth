@@ -193,4 +193,10 @@ type Config struct {
 
 	// Manual configuration field for ECBP1100 activation number. Used for modifying genesis config via CLI flag.
 	ECBP1100 *big.Int
+
+	// Minimum peer limit at which ECBP1100 will be disabled.
+	ECBP1100MinPeers *int `toml:",omitempty"`
+
+	// Window at which, if the chain's canonical head is unchanged, ECBP1100 will be disabled.
+	ECBP1100StaleHead *time.Duration `toml:",omitempty"`
 }

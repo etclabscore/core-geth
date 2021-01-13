@@ -170,6 +170,16 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 			cfg.Eth.ECBP1100 = new(big.Int).SetUint64(n)
 		}
 	}
+	if ctx.GlobalIsSet(utils.ECBP1100MinPeersFlag.Name) {
+		if n := ctx.GlobalInt(utils.ECBP1100MinPeersFlag.Name); n != -1 {
+			cfg.Eth.ECBP1100MinPeers = &n
+		}
+	}
+	if ctx.GlobalIsSet(utils.ECBP1100StaleHeadFlag.Name) {
+		if d := ctx.GlobalDuration(utils.ECBP1100StaleHeadFlag.Name); d.Seconds() != 0 {
+			cfg.Eth.ECBP1100StaleHead = &d
+		}
+	}
 
 	backend := utils.RegisterEthService(stack, &cfg.Eth)
 

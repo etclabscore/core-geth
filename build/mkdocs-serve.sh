@@ -4,7 +4,6 @@
 # MkDocs generates a static site from the markdown files in docs/.
 
 py_command=python
-pip_command="${py_command} -m pip"
 
 setup_py_command() {
 	if [ -z $(which ${py_command}) ]; then
@@ -17,6 +16,7 @@ setup_py_command() {
 	fi
 }
 setup_py_command
+pip_command="${py_command} -m pip"
 
 set -ex
 ${py_command} --version

@@ -245,10 +245,10 @@ func TestRegisterProtocols_OpenRPC_WS(t *testing.T) {
 	}
 }
 
-func TestDiscoverCompliesOpenRPCSpec(t *testing.T) {
+func discoverCompliesOpenRPCSpecTestRunner(specDefinition string) error {
 	stack, err := New(testNodeConfig())
 	if err != nil {
-		t.Fatalf("failed to create protocol stack: %v", err)
+		return fmt.Errorf("failed to create protocol stack: %v", err)
 	}
 	defer stack.Close()
 
@@ -262,41 +262,63 @@ func TestDiscoverCompliesOpenRPCSpec(t *testing.T) {
 	stack.config.DataDir = datadir
 
 	if err := stack.Start(); err != nil {
-		t.Fatal(err)
+		return fmt.Errorf("failed to start protocol stack: %v", err)
 	}
 	defer stack.Close()
 
 	client, err := rpc.Dial("http://localhost:8545")
 	if err != nil {
-		t.Fatal(err)
+		return fmt.Errorf("failed to create RPC client: %v", err)
 	}
 	defer client.Close()
 
 	res := make(map[string]interface{})
 	err = client.Call(&res, "rpc_discover")
 	if err != nil {
-		t.Errorf("client call: %v", err)
+		return fmt.Errorf("client call: %v", err)
 	}
 
 	schemaLoader := gojsonschema.NewSchemaLoader()
 	schemaLoader.Draft = gojsonschema.Draft7 // force schema version
 	schemaLoader.AutoDetect = false
 
-	openRPCSpecFile := "file://./testdata/open-rpc-meta-schema-1.14.0.json"
-	schema, err := schemaLoader.Compile(gojsonschema.NewReferenceLoader(openRPCSpecFile))
+	schema, err := schemaLoader.Compile(gojsonschema.NewReferenceLoader(specDefinition))
 
 	documentLoader := gojsonschema.NewGoLoader(res)
 
 	result, err := schema.Validate(documentLoader)
 	if err != nil {
-		t.Errorf("failed to validate OpenRPC schema: %v", err)
+		return fmt.Errorf("failed to validate OpenRPC schema: %v", err)
 	}
 
 	if !result.Valid() {
 		for _, desc := range result.Errors() {
 			fmt.Printf("- %s\n", desc)
 		}
-		t.Fatal("the OpenRPC discovery document is not compliant with spec")
+		return fmt.Errorf("the OpenRPC discovery document is not compliant with spec")
+	}
+	return nil
+}
+
+// TestOpenRPCMetaSchemaSpec tests compliance of discovery endpoint with the OpenRPC spec stored locally
+func TestOpenRPCMetaSchemaSpec(t *testing.T) {
+	openRPCSpecFile := "file://./testdata/open-rpc-meta-schema-1.14.0.json"
+	if err := discoverCompliesOpenRPCSpecTestRunner(openRPCSpecFile); err != nil {
+		t.Fatal(err)
+	}
+}
+
+var openRPCSpecLatestTestEnvVarName = "COREGETH_OPENRPC_LATEST_SPEC_ENDPOINT"
+
+// TestOpenRPCMetaSchemaSpecLatest tests compliance of discovery endpoint with the OpenRPC latest spec loaded remotelly as set in the CI
+func TestOpenRPCMetaSchemaSpecLatest(t *testing.T) {
+	openRPCSpecLatestEndpoint := os.Getenv(openRPCSpecLatestTestEnvVarName)
+	if os.Getenv("CI") == "" || openRPCSpecLatestEndpoint == "" {
+		t.Skip()
+	}
+
+	if err := discoverCompliesOpenRPCSpecTestRunner(openRPCSpecLatestEndpoint); err != nil {
+		t.Fatal(err)
 	}
 }
 

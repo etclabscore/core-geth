@@ -21,7 +21,7 @@ Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-
 
 ## Network/provider comparison
 
-Networks supported by the respective go-ethereum packaged `geth` program.
+Networks supported by the respective core-geth packaged `geth` program.
 
 | Ticker | Consensus         | Network                               | core-geth                                                | ethereum/go-ethereum |
 | ---    | ---               | ---                                   | ---                                                      | ---                  |
@@ -30,8 +30,8 @@ Networks supported by the respective go-ethereum packaged `geth` program.
 | ETSC   | :zap:             | Ethereum Social                       | :heavy_check_mark:                                       |                      |
 | ESN    | :zap:             | EtherSocial                           | :heavy_check_mark:                                       |                      |
 | MIX    | :zap:             | Mix                                   | :heavy_check_mark:                                       |                      |
-| ELLA   | :zap:             | Ellaism                               | :no_entry_sign:<sup>[1](#ellaism-footnote)</sup>         |                      |
-| MUSIC  | :zap:             | Musicoin                              | :open_file_folder:<sup>[2](#configuration-capable)</sup> |                      |
+| ELLA   | :zap:             | Ellaism                               | :no_entry_sign:<sup>[^1]</sup>         |                      |
+| MUSIC  | :zap:             | Musicoin                              | :open_file_folder:<sup>[^2]</sup> |                      |
 | -      | :zap: :handshake: | Private chains                        | :heavy_check_mark:                                       | :heavy_check_mark:   |
 |        | :zap:             | Mordor (Geth+Parity ETH PoW Testnet)  | :heavy_check_mark:                                       |                      |
 |        | :zap:             | Morden (Geth+Parity ETH PoW Testnet)  |                                                          |                      |
@@ -46,11 +46,11 @@ Networks supported by the respective go-ethereum packaged `geth` program.
 - :zap: = __Proof of Work__
 - :handshake: = __Proof of Authority__
 
-<a name="ellaism-footnote">1</a>: This is originally an [Ellaism
+[^1]: This is originally an [Ellaism
 Project](https://github.com/ellaism). However, A [recent hard
 fork](https://github.com/ellaism/specs/blob/master/specs/2018-0003-wasm-hardfork.md)
 makes Ellaism not feasible to support with go-ethereum any more. Existing
 Ellaism users are asked to switch to
 [Parity](https://github.com/paritytech/parity).
 
-<a name="configuration-capable">2</a>: Network not supported by default, but network configuration is possible. Make a PR!
+[^2]: Network not supported by default, but network configuration is possible. Make a PR!

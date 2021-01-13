@@ -42,6 +42,7 @@ use_directory_urls: true
 
 plugins:
   - search
+  - macros
   - minify:
       minify_html: true
   - git-revision-date-localized:
@@ -54,6 +55,7 @@ markdown_extensions:
   - attr_list
   - codehilite
   - def_list
+  - footnotes
   # - meta
   - smarty
   - toc:
@@ -65,6 +67,8 @@ markdown_extensions:
       repo_url_shortener: true
       repo_url_shorthand: true
       social_url_shorthand: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
 
 # Page tree
 nav:
@@ -82,3 +86,6 @@ nav:
     - New release: developers/create-new-release.md
   - Tutorials:
     - Setup private network: tutorials/private-network.md
+
+extra:
+  openrpc_latest_schema_endpoint: https://gist.githubusercontent.com/ziogaschr/c51916d70ca5304bb3e3abf4dcd518ca/raw/8079eafd8de6436bd3e4ab6c9df0db64c25cd1a6/core-geth_rpc-discovery_1.11.21-unstable.json

@@ -46,5 +46,5 @@ CoreGeth supports [OpenRPC's Service Discovery method](https://spec.open-rpc.org
     [...]
     ```
 
-!!! Tip Better represantation of the discovery result at the OpenRPC playground
+!!! Tip Better representation of the discovery result at the OpenRPC playground
     You can see an example use case of the discovery service in the respective [OpenRPC Playground](https://playground.open-rpc.org/?schemaUrl={{ openrpc_latest_schema_endpoint }}){: target=_blank }.

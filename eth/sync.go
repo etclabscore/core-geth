@@ -66,14 +66,6 @@ type txsync struct {
 func (pm *ProtocolManager) artificialFinalitySafetyLoop() {
 	defer pm.wg.Done()
 
-	// Short circuit if configuration overrides are present to permanently
-	// enable or disable artificial finality features.
-	// This isn't strictly-speaking necessary since the toggle will be a noop if the state is forced,
-	// but returning early spares the additional goroutine.
-	if pm.blockchain.EnableArtificialFinalityStateIsForced() {
-		return
-	}
-
 	t := time.NewTicker(artificialFinalitySafetyInterval)
 	defer t.Stop()
 

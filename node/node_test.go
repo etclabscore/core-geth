@@ -18,6 +18,7 @@ package node
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -245,7 +246,8 @@ func TestRegisterProtocols_OpenRPC_WS(t *testing.T) {
 	}
 }
 
-func TestDiscoverCompliesOpenRPCSpec(t *testing.T) {
+// TestOpenRPCMetaSchemaSpec tests compliance of discovery endpoint with the OpenRPC spec stored locally
+func TestOpenRPCMetaSchemaSpec(t *testing.T) {
 	stack, err := New(testNodeConfig())
 	if err != nil {
 		t.Fatalf("failed to create protocol stack: %v", err)
@@ -297,6 +299,48 @@ func TestDiscoverCompliesOpenRPCSpec(t *testing.T) {
 			fmt.Printf("- %s\n", desc)
 		}
 		t.Fatal("the OpenRPC discovery document is not compliant with spec")
+	}
+}
+
+// Suggested latest endpoint to be used is
+// COREGETH_OPENRPC_LATEST_SPEC_ENDPOINT=https://github.com/open-rpc/meta-schema/releases/latest/download/open-rpc-meta-schema.json
+var openRPCSpecLatestTestEnvVarName = "COREGETH_OPENRPC_LATEST_SPEC_ENDPOINT"
+
+// TestOpenRPCMetaSchemaSpecLatest compares local JSON spec file with the latest JSON spec published remotelly,
+// so as we keep the local file in sync
+func TestOpenRPCMetaSchemaSpecLatest(t *testing.T) {
+	openRPCSpecLatestEndpoint := os.Getenv(openRPCSpecLatestTestEnvVarName)
+	if os.Getenv("CI") == "" || openRPCSpecLatestEndpoint == "" {
+		t.Skip()
+	}
+
+	client := &http.Client{}
+	resp, err := client.Get(openRPCSpecLatestEndpoint)
+	if err != nil {
+		t.Fatalf("failed to fetch latest spec JSON: %v", err)
+	}
+	defer resp.Body.Close()
+
+	dec := json.NewDecoder(resp.Body)
+
+	var latestSpec interface{}
+	if err := dec.Decode(&latestSpec); err != nil {
+		t.Fatalf("failed to decode latest spec JSON: %v", err)
+	}
+
+	localJSONFilePath := "./testdata/open-rpc-meta-schema-1.14.0.json"
+	localJSONFile, err := ioutil.ReadFile(localJSONFilePath)
+	if err != nil {
+		t.Fatalf("failed to load local spec JSON file: %v", err)
+	}
+
+	var localSpec interface{}
+	if err := json.Unmarshal([]byte(localJSONFile), &localSpec); err != nil {
+		t.Fatalf("failed to unmarshal local JSON spec: %v", err)
+	}
+
+	if !reflect.DeepEqual(latestSpec, localSpec) {
+		t.Fatalf("Local OpenRPC Schema (%v) is not updated to the latest one (%v)", localJSONFilePath, openRPCSpecLatestEndpoint)
 	}
 }
 

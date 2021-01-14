@@ -178,7 +178,7 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 			t := false
 			cfg.Eth.ECBP1100StateOverride = &t
 		} else {
-			log.Crit("invalid value for flag: --%s; use [on|off]", utils.ECBP1100ForceFlag.Name)
+			log.Crit("invalid value for flag", "flag", utils.ECBP1100ForceFlag.Name, "got", value, "want", []string{"on", "off"})
 		}
 	}
 

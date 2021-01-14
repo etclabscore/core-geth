@@ -24,6 +24,12 @@ func (bc *BlockChain) EnableArtificialFinalityForce(n int32) {
 	atomic.StoreInt32(bc.artificialFinalityOverride, n)
 }
 
+// EnableArtificialFinalityStateIsForced return true if artificial finality features have been
+// overridden to be EITHER always-on or always-off.
+func (bc *BlockChain) EnableArtificialFinalityStateIsForced() bool {
+	return bc.artificialFinalityOverride != nil
+}
+
 // EnableArtificialFinality enables and disable artificial finality features for the blockchain.
 // Currently toggled features include:
 // - ECBP1100-MESS: modified exponential subject scoring

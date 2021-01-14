@@ -42,7 +42,7 @@ You'll need to use your own programming environments' capabilities (libraries, t
 connect via HTTP, WS or IPC to a `geth` node configured with the above flags and you'll
 need to speak [JSON-RPC](https://www.jsonrpc.org/specification) on all transports. You
 can reuse the same connection for multiple requests!
-Here you can check the available [JSON-RPC calls](https://playground.open-rpc.org/?schemaUrl={{ openrpc_latest_schema_endpoint }}){: target=_blank }.
+Here you can check the available [JSON-RPC calls](https://playground.open-rpc.org/?schemaUrl=https://gist.githubusercontent.com/ziogaschr/c51916d70ca5304bb3e3abf4dcd518ca/raw/8079eafd8de6436bd3e4ab6c9df0db64c25cd1a6/core-geth_rpc-discovery_1.11.21-unstable.json).
 
 !!! attention
     Please understand the security implications of opening up an HTTP/WS based

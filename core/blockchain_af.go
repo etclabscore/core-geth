@@ -29,10 +29,10 @@ func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interfa
 	var statusLog string
 	if enable {
 		statusLog = "Enabled"
-		atomic.StoreInt32(&bc.artificialFinalityEnabled, 1)
+		atomic.StoreInt32(&bc.artificialFinalityEnabledStatus, 1)
 	} else {
 		statusLog = "Disabled"
-		atomic.StoreInt32(&bc.artificialFinalityEnabled, 0)
+		atomic.StoreInt32(&bc.artificialFinalityEnabledStatus, 0)
 	}
 	if !bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, bc.CurrentHeader().Number) {
 		// Don't log anything if the config hasn't enabled it yet.
@@ -49,7 +49,7 @@ func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interfa
 // finality feature setting.
 // This status is agnostic of feature activation by chain configuration.
 func (bc *BlockChain) IsArtificialFinalityEnabled() bool {
-	return atomic.LoadInt32(&bc.artificialFinalityEnabled) == 1
+	return atomic.LoadInt32(&bc.artificialFinalityEnabledStatus) == 1
 }
 
 // getTDRatio is a helper function returning the total difficulty ratio of

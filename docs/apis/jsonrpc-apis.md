@@ -49,4 +49,4 @@ Here you can check the available [JSON-RPC calls](https://playground.open-rpc.or
     transport before doing so! Hackers on the internet are actively trying to subvert
     Ethereum nodes with exposed APIs! Further, all browser tabs can access locally
     running web servers, so malicious web pages could try to subvert locally available
-    APIs!**
+    APIs!

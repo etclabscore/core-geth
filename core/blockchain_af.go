@@ -20,10 +20,8 @@ var errReorgFinality = errors.New("finality-enforced invalid new chain")
 // n  = 1 : ON
 // n != 1 : OFF
 func (bc *BlockChain) EnableArtificialFinalityForce(n int32) {
-	forceOn := n == 1
-	log.Warn("Force-enabling ECBP1100 (MESS)", "auto-shutoffs", forceOn)
-	atomic.StoreInt32(&bc.artificialFinalityForce, n)
-	atomic.StoreInt32(&bc.artificialFinalityEnabledStatus, n)
+	log.Warn("Forcing ECBP1100 (MESS) state", "enabled", n == 1)
+	atomic.StoreInt32(bc.artificialFinalityOverride, n)
 }
 
 // EnableArtificialFinality enables and disable artificial finality features for the blockchain.
@@ -35,8 +33,8 @@ func (bc *BlockChain) EnableArtificialFinalityForce(n int32) {
 // then calling bc.EnableArtificialFinality(true) will be a noop.
 // The method is idempotent.
 func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interface{}) {
-	// Short circuit if AF is forced on.
-	if atomic.LoadInt32(&bc.artificialFinalityForce) == 1 {
+	// Short circuit if AF state is overridden.
+	if bc.artificialFinalityOverride != nil {
 		return
 	}
 
@@ -64,6 +62,9 @@ func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interfa
 // finality feature setting.
 // This status is agnostic of feature activation by chain configuration.
 func (bc *BlockChain) IsArtificialFinalityEnabled() bool {
+	if bc.artificialFinalityOverride != nil {
+		return atomic.LoadInt32(bc.artificialFinalityOverride) == 1
+	}
 	return atomic.LoadInt32(&bc.artificialFinalityEnabledStatus) == 1
 }
 

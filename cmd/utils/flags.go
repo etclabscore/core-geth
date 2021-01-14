@@ -779,9 +779,10 @@ var (
 		Usage: "Configure ECBP-1100 (MESS) block activation number",
 		Value: math.MaxUint64,
 	}
-	ECBP1100NoDisableFlag = cli.BoolTFlag{
-		Name:  "ecbp1100.nodisable",
-		Usage: "Force ECBP-1100 (MESS) enablement; disables min peers and head stale shutoffs",
+	ECBP1100NoDisableFlag = cli.StringFlag{
+		Name:  "ecbp1100.force",
+		Usage: "Force ECBP-1100 (MESS) state; valid values are: [on|off] ('on' yields always-on state, disabling auto-shutoff mechanisms; 'off' disables feature entirely)",
+		Value: "",
 	}
 )
 

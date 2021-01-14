@@ -195,6 +195,10 @@ func New(stack *node.Node, config *Config) (*Ethereum, error) {
 		rawdb.WriteChainConfig(chainDb, genesisHash, chainConfig)
 	}
 	eth.bloomIndexer.Start(eth.blockchain)
+	// Handle artificial finality config override cases.
+	if config.ECBP1100NoDisable {
+		eth.blockchain.EnableArtificialFinalityForce(1)
+	}
 
 	if config.TxPool.Journal != "" {
 		config.TxPool.Journal = stack.ResolvePath(config.TxPool.Journal)

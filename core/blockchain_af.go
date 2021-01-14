@@ -16,6 +16,16 @@ import (
 // errReorgFinality represents an error caused by artificial finality mechanisms.
 var errReorgFinality = errors.New("finality-enforced invalid new chain")
 
+// EnableArtificialFinalityForce overrides toggling of AF features, forcing it on.
+// n  = 1 : ON
+// n != 1 : OFF
+func (bc *BlockChain) EnableArtificialFinalityForce(n int32) {
+	forceOn := n == 1
+	log.Warn("Force-enabling ECBP1100 (MESS)", "auto-shutoffs", forceOn)
+	atomic.StoreInt32(&bc.artificialFinalityForce, n)
+	atomic.StoreInt32(&bc.artificialFinalityEnabledStatus, n)
+}
+
 // EnableArtificialFinality enables and disable artificial finality features for the blockchain.
 // Currently toggled features include:
 // - ECBP1100-MESS: modified exponential subject scoring
@@ -25,6 +35,11 @@ var errReorgFinality = errors.New("finality-enforced invalid new chain")
 // then calling bc.EnableArtificialFinality(true) will be a noop.
 // The method is idempotent.
 func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interface{}) {
+	// Short circuit if AF is forced on.
+	if atomic.LoadInt32(&bc.artificialFinalityForce) == 1 {
+		return
+	}
+
 	// Store enable/disable value regardless of config activation.
 	var statusLog string
 	if enable {

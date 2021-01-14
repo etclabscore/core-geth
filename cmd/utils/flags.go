@@ -779,6 +779,10 @@ var (
 		Usage: "Configure ECBP-1100 (MESS) block activation number",
 		Value: math.MaxUint64,
 	}
+	ECBP1100NoDisableFlag = cli.BoolTFlag{
+		Name:  "ecbp1100.nodisable",
+		Usage: "Force ECBP-1100 (MESS) enablement; disables min peers and head stale shutoffs",
+	}
 )
 
 // MakeDataDir retrieves the currently requested data directory, terminating

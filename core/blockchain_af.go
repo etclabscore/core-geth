@@ -21,6 +21,7 @@ var errReorgFinality = errors.New("finality-enforced invalid new chain")
 // n != 1 : OFF
 func (bc *BlockChain) EnableArtificialFinalityForce(n int32) {
 	log.Warn("Forcing ECBP1100 (MESS) state", "enabled", n == 1)
+	bc.artificialFinalityOverride = new(int32)
 	atomic.StoreInt32(bc.artificialFinalityOverride, n)
 }
 

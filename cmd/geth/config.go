@@ -170,15 +170,15 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 			cfg.Eth.ECBP1100 = new(big.Int).SetUint64(n)
 		}
 	}
-	if ctx.GlobalIsSet(utils.ECBP1100NoDisableFlag.Name) {
-		if value := ctx.GlobalString(utils.ECBP1100NoDisableFlag.Name); value == "on" {
+	if ctx.GlobalIsSet(utils.ECBP1100ForceFlag.Name) {
+		if value := ctx.GlobalString(utils.ECBP1100ForceFlag.Name); value == "on" {
 			t := true
 			cfg.Eth.ECBP1100StateOverride = &t
 		} else if value == "off" {
 			t := false
 			cfg.Eth.ECBP1100StateOverride = &t
 		} else {
-			log.Crit("invalid value for flag: --%s; use [on|off]", utils.ECBP1100NoDisableFlag.Name)
+			log.Crit("invalid value for flag: --%s; use [on|off]", utils.ECBP1100ForceFlag.Name)
 		}
 	}
 

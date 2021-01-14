@@ -169,7 +169,7 @@ var (
 		utils.EWASMInterpreterFlag,
 		utils.EVMInterpreterFlag,
 		utils.ECBP1100Flag,
-		utils.ECBP1100NoDisableFlag,
+		utils.ECBP1100ForceFlag,
 		configFileFlag,
 	}
 

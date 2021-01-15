@@ -171,14 +171,8 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 		}
 	}
 	if ctx.GlobalIsSet(utils.ECBP1100ForceFlag.Name) {
-		if value := ctx.GlobalString(utils.ECBP1100ForceFlag.Name); value == "on" {
-			t := true
-			cfg.Eth.ECBP1100StateOverride = &t
-		} else if value == "off" {
-			t := false
-			cfg.Eth.ECBP1100StateOverride = &t
-		} else {
-			log.Crit("invalid value for flag", "flag", utils.ECBP1100ForceFlag.Name, "got", value, "want", []string{"on", "off"})
+		if enable := ctx.GlobalBool(utils.ECBP1100ForceFlag.Name); enable {
+			cfg.Eth.ECBP1100StateOverride = &enable
 		}
 	}
 

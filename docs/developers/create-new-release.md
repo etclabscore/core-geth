@@ -23,13 +23,17 @@ hide:
 - [ ] `git push etclabscore`
   > Push the branch. This will get PR'd, eg. https://github.com/etclabscore/core-geth/pull/197
 - [ ] Draft a new release, following the existing patterns for naming and notes. https://github.com/etclabscore/core-geth/releases/new
-  > - Define the tag the release should be associated with (eg `v1.11.16`).
-  > - Linux, OSX, and Windows artifacts will be uploaded automatically to this release draft by the CI jobs. There should be CI-generated 16 assets total.
-  > - __NOTE__ If the release is not drafted manually, it will be automatically drafted by the CI.
+    - Define the tag the release should be associated with (eg `v1.11.16`).
+    - Linux, OSX, and Windows artifacts will be uploaded automatically to this release draft by the CI jobs. There should be CI-generated 16 assets total.
+
+        !!! Note
+
+            If the release is not drafted manually, it will be automatically drafted by the CI.
+
 - [ ] Await a complete set of uploaded artifacts. If artifacts fail to upload due to issue with the CI jobs, review
   those jobs to determine if their failure(s) is OK, restarting them if so.
 - [ ] Once artifacts have been uploaded and the release draft reviewed by one other person for the following, it's time to publish!
-  + proofreading
-  + artifact fingerprint verification
-  + notes content approval
+    + proofreading
+    + artifact fingerprint verification
+    + notes content approval
 - [ ] Once the release is published, merge the associated PR bumping versions.

@@ -8,6 +8,8 @@ hide:
 [![OpenRPC](https://img.shields.io/static/v1.svg?label=OpenRPC&message=1.14.0&color=blue)](#openrpc-discovery)
 [![API Reference](https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/68747470733a2f2f676f646f632e6f72672f6769746875622e636f6d2f676f6c616e672f6764646f3f7374617475732e737667)](https://godoc.org/github.com/etclabscore/core-geth)
 [![Go Report Card](https://goreportcard.com/badge/github.com/etclabscore/core-geth)](https://goreportcard.com/report/github.com/etclabscore/core-geth)
+[![Travis](https://travis-ci.org/etclabscore/core-geth.svg?branch=master)](https://travis-ci.org/etclabscore/core-geth)
+[![Gitter](https://badges.gitter.im/core-geth/community.svg)](https://gitter.im/core-geth/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 > An [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) downstream effort to make the Ethereum Protocol accessible and extensible for a diverse ecosystem.
 
@@ -19,7 +21,7 @@ Upstream development from [ethereum/go-ethereum](https://github.com/ethereum/go-
 
 ## Network/provider comparison
 
-Networks supported by the respective go-ethereum packaged `geth` program.
+Networks supported by the respective core-geth packaged `geth` program.
 
 | Ticker | Consensus         | Network                               | core-geth                                                | ethereum/go-ethereum |
 | ---    | ---               | ---                                   | ---                                                      | ---                  |
@@ -44,11 +46,13 @@ Networks supported by the respective go-ethereum packaged `geth` program.
 - :zap: = __Proof of Work__
 - :handshake: = __Proof of Authority__
 
-<a name="ellaism-footnote">1</a>: This is originally an [Ellaism
+---
+
+> <a name="ellaism-footnote">1</a>: This is originally an [Ellaism
 Project](https://github.com/ellaism). However, A [recent hard
 fork](https://github.com/ellaism/specs/blob/master/specs/2018-0003-wasm-hardfork.md)
 makes Ellaism not feasible to support with go-ethereum any more. Existing
 Ellaism users are asked to switch to
 [Parity](https://github.com/paritytech/parity).
 
-<a name="configuration-capable">2</a>: Network not supported by default, but network configuration is possible. Make a PR!
+> <a name="configuration-capable">2</a>: Network not supported by default, but network configuration is possible. Make a PR!

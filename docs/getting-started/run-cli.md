@@ -1,7 +1,9 @@
 ## Running `geth`
 
 !!! tip "Use for Ethereum mainnet"
+
     While `core-geth` is mainly used for the Ethereum Classic network, you can use it for Ethereum mainnet and other [supported networks](/#networkprovider-comparison) as well.
+
 ### Fast node on an Ethereum Classic network
 
 By far the most common scenario is people wanting to simply interact with the Ethereum
@@ -52,6 +54,7 @@ Specifying the `--mordor` flag, however, will reconfigure your `geth` instance a
    network, which uses different P2P bootnodes, different network IDs and genesis states.
 
 !!! Note
+
     Although there are some internal protective measures to prevent transactions from
     crossing over between the classic network and test network, you should make sure to always
     use separate accounts for play-money and real-money. Unless you manually move
@@ -75,6 +78,7 @@ $ geth --your-favourite-flags dumpconfig
 ```
 
 !!! Note
+
     This works only with `geth` v1.6.0 and above.*
 
 ## Command-line Options

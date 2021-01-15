@@ -196,12 +196,10 @@ func New(stack *node.Node, config *Config) (*Ethereum, error) {
 	}
 	eth.bloomIndexer.Start(eth.blockchain)
 	// Handle artificial finality config override cases.
-	if config.ECBP1100StateOverride != nil {
-		stateOn := int32(1)
-		if !*config.ECBP1100StateOverride {
-			stateOn = 0
+	if config.ECBP1100NoDisable != nil {
+		if *config.ECBP1100NoDisable {
+			eth.blockchain.ArtificialFinalityNoDisable(1)
 		}
-		eth.blockchain.EnableArtificialFinalityForce(stateOn)
 	}
 
 	if config.TxPool.Journal != "" {

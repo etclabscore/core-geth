@@ -779,9 +779,9 @@ var (
 		Usage: "Configure ECBP-1100 (MESS) block activation number",
 		Value: math.MaxUint64,
 	}
-	ECBP1100ForceFlag = cli.BoolFlag{
-		Name:  "ecbp1100.force",
-		Usage: "Force ECBP-1100 (MESS) state; ('on' yields always-on state, disabling auto-shutoff mechanisms)",
+	ECBP1100NoDisableFlag = cli.BoolFlag{
+		Name:  "ecbp1100.nodisable",
+		Usage: "Short-circuit ECBP-1100 (MESS) disable mechanisms; (yields a permanent-once-activated state, deactivating auto-shutoff mechanisms)",
 	}
 )
 

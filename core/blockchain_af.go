@@ -16,19 +16,13 @@ import (
 // errReorgFinality represents an error caused by artificial finality mechanisms.
 var errReorgFinality = errors.New("finality-enforced invalid new chain")
 
-// EnableArtificialFinalityForce overrides toggling of AF features, forcing it on.
+// ArtificialFinalityNoDisable overrides toggling of AF features, forcing it on.
 // n  = 1 : ON
 // n != 1 : OFF
-func (bc *BlockChain) EnableArtificialFinalityForce(n int32) {
-	log.Warn("Forcing ECBP1100 (MESS) state", "enabled", n == 1)
-	bc.artificialFinalityOverride = new(int32)
-	atomic.StoreInt32(bc.artificialFinalityOverride, n)
-}
-
-// EnableArtificialFinalityStateIsForced return true if artificial finality features have been
-// overridden to be EITHER always-on or always-off.
-func (bc *BlockChain) EnableArtificialFinalityStateIsForced() bool {
-	return bc.artificialFinalityOverride != nil
+func (bc *BlockChain) ArtificialFinalityNoDisable(n int32) {
+	log.Warn("Deactivating ECBP1100 (MESS) disablers", "always on", true)
+	bc.artificialFinalityNoDisable = new(int32)
+	atomic.StoreInt32(bc.artificialFinalityNoDisable, n)
 }
 
 // EnableArtificialFinality enables and disable artificial finality features for the blockchain.
@@ -40,8 +34,10 @@ func (bc *BlockChain) EnableArtificialFinalityStateIsForced() bool {
 // then calling bc.EnableArtificialFinality(true) will be a noop.
 // The method is idempotent.
 func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interface{}) {
-	// Short circuit if AF state is overridden.
-	if bc.artificialFinalityOverride != nil {
+	// Short circuit if AF state is enabled and nodisable=true.
+	if bc.artificialFinalityNoDisable != nil && atomic.LoadInt32(bc.artificialFinalityNoDisable) == 1 &&
+		bc.IsArtificialFinalityEnabled() && !enable {
+		log.Warn("Preventing disable artificial finality", "enabled", true, "nodisable", true)
 		return
 	}
 
@@ -69,9 +65,6 @@ func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interfa
 // finality feature setting.
 // This status is agnostic of feature activation by chain configuration.
 func (bc *BlockChain) IsArtificialFinalityEnabled() bool {
-	if bc.artificialFinalityOverride != nil {
-		return atomic.LoadInt32(bc.artificialFinalityOverride) == 1
-	}
 	return atomic.LoadInt32(&bc.artificialFinalityEnabledStatus) == 1
 }
 

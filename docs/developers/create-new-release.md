@@ -27,6 +27,7 @@ hide:
     - Linux, OSX, and Windows artifacts will be uploaded automatically to this release draft by the CI jobs. There should be CI-generated 16 assets total.
 
         !!! Note
+
             If the release is not drafted manually, it will be automatically drafted by the CI.
 
 - [ ] Await a complete set of uploaded artifacts. If artifacts fail to upload due to issue with the CI jobs, review

@@ -75,6 +75,7 @@ replace the displayed IP address information (most probably `[::]`) with your ex
 accessible IP to get the actual `enode` URL.
 
 !!! Note
+
     You could also use a full-fledged `geth` node as a bootnode, but it's the less recommended way.
 
 #### Starting up your member nodes
@@ -90,6 +91,7 @@ $ geth --datadir=path/to/custom/data/folder --bootnodes=<bootnode-enode-url-from
 ```
 
 !!! Note
+
     Since your network will be completely cut off from the main and test networks, you'll
     also need to configure a miner to process transactions and create new blocks for you.
 

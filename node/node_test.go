@@ -286,6 +286,9 @@ func TestOpenRPCMetaSchemaSpec(t *testing.T) {
 
 	openRPCSpecFile := "file://./testdata/open-rpc-meta-schema-1.14.0.json"
 	schema, err := schemaLoader.Compile(gojsonschema.NewReferenceLoader(openRPCSpecFile))
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	documentLoader := gojsonschema.NewGoLoader(res)
 
@@ -306,7 +309,7 @@ func TestOpenRPCMetaSchemaSpec(t *testing.T) {
 // COREGETH_OPENRPC_LATEST_SPEC_ENDPOINT=https://github.com/open-rpc/meta-schema/releases/latest/download/open-rpc-meta-schema.json
 var openRPCSpecLatestTestEnvVarName = "COREGETH_OPENRPC_LATEST_SPEC_ENDPOINT"
 
-// TestOpenRPCMetaSchemaSpecLatest compares local JSON spec file with the latest JSON spec published remotelly,
+// TestOpenRPCMetaSchemaSpecLatest compares local JSON spec file with the latest JSON spec published remotely,
 // so as we keep the local file in sync
 func TestOpenRPCMetaSchemaSpecLatest(t *testing.T) {
 	openRPCSpecLatestEndpoint := os.Getenv(openRPCSpecLatestTestEnvVarName)
@@ -335,7 +338,7 @@ func TestOpenRPCMetaSchemaSpecLatest(t *testing.T) {
 	}
 
 	var localSpec interface{}
-	if err := json.Unmarshal([]byte(localJSONFile), &localSpec); err != nil {
+	if err := json.Unmarshal(localJSONFile, &localSpec); err != nil {
 		t.Fatalf("failed to unmarshal local JSON spec: %v", err)
 	}
 

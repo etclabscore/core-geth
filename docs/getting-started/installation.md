@@ -1,3 +1,10 @@
+---
+title: Installation
+---
+
+!!! tip "Build from Source"
+    Instructions to build from source can be found [here](/developers/build-from-source/).
+
 ## Pre-built executable
 
 If you just want to download and run `geth` or any of the other tools here, this is the quickest and simplest way.

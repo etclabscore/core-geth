@@ -3,7 +3,7 @@ hide:
   - toc        # Hide table of contents
 ---
 
-# JSON-RPC APIs
+# Using JSON-RPC APIs
 
 ## Programmatically interfacing `geth` nodes
 

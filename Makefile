@@ -131,6 +131,9 @@ clean: clean-evmc
 mkdocs-serve: ## Serve generated documentation (during development)
 	@build/mkdocs-serve.sh
 
+docs-generate: ## Generate JSON RPC API documentation from the OpenRPC service discovery document.
+	env COREGETH_GEN_OPENRPC_DOCS=on go test -count=1 -run BuildStatic ./ethclient
+
 # The devtools target installs tools required for 'go generate'.
 # You need to put $GOBIN (or $GOPATH/bin) in your PATH to use 'go generate'.
 

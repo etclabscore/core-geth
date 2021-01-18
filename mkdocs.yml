@@ -54,6 +54,7 @@ markdown_extensions:
   - attr_list
   - codehilite
   - def_list
+  - footnotes
   # - meta
   - smarty
   - toc:
@@ -65,18 +66,23 @@ markdown_extensions:
       repo_url_shortener: true
       repo_url_shorthand: true
       social_url_shorthand: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
 
 # Page tree
 nav:
   - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - CLI: getting-started/run-cli.md
   - Core:
     - All tools: core/alltools.md
-    - CLI: core/run-cli.md
     - EVMC: core/evmc.md
   - APIs:
     - JSON-RPC: apis/jsonrpc-apis.md
     - OpenRPC: apis/openrpc.md
   - Developers:
+    - Build from source: developers/build-from-source.md
     - Documentation: developers/documentation.md
     - Versioning: developers/versioning.md
     - New release: developers/create-new-release.md

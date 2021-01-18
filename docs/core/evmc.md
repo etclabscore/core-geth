@@ -27,7 +27,7 @@ EVMC does not. EVMC only supports the Fork configurations supported by ethereum/
 Thus, the implementation at core-geth of EVMC requires a somewhat arbitrary mapping of granular features as keys toggling
 entire Ethereum fork configurations.
 
-The following code snippet, taken from `./core/vm/evmc.go`, handles this translation.
+The following code snippet, taken from [`./core/vm/evmc.go`](https://github.com/etclabscore/core-geth/blob/master/core/vm/evmc.go#L301-L327), handles this translation.
 
 ```go
 // getRevision translates ChainConfig's HF block information into EVMC revision.

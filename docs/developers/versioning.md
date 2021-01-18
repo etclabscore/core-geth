@@ -10,8 +10,11 @@ it can be expected that a major version bump would be accompanied by an entirely
 
 Tagged versions use the suffix `-stable` and untagged versions (ie everything else) uses the `-unstable` suffix.
 
-You can find some historical discussions on versioning at the following links.
-- https://github.com/etclabscore/core-geth/pull/29#issuecomment-588977383
-- https://github.com/etclabscore/multi-geth-fork/issues/153
-- https://github.com/etclabscore/core-geth/pull/30#issuecomment-591979271
-- https://github.com/etclabscore/core-geth/issues/83
+!!! Seealso "See also"
+
+    You can find some historical discussions on versioning at the following links.
+
+    - https://github.com/etclabscore/core-geth/pull/29#issuecomment-588977383
+    - https://github.com/etclabscore/multi-geth-fork/issues/153
+    - https://github.com/etclabscore/core-geth/pull/30#issuecomment-591979271
+    - https://github.com/etclabscore/core-geth/issues/83

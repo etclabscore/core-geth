@@ -139,7 +139,7 @@ func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
 
 	oMinAFPeers := minArtificialFinalityPeers
 	defer func() {
-		// Clean up after, resetting global default to original valu.
+		// Clean up after, resetting global default to original value.
 		minArtificialFinalityPeers = oMinAFPeers
 	}()
 	minArtificialFinalityPeers = 1
@@ -189,7 +189,7 @@ func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
 	}
 	if !b.blockchain.IsArtificialFinalityEnabled() {
 		t.Error(`AF not enabled;
-The AF disable mechanism triggered by the minimum peers floor should have been short-circuited, 
+The AF disable mechanism triggered by the minimum peers floor should have been short-circuited,
 preventing AF disablement on this sync op (with the minArtificialFinalityPeers value set to > 1 (defaultMinSyncPeers = 5)),
 and the number of peers 'a' is connected with being only 1.)`)
 	}

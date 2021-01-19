@@ -312,6 +312,7 @@ var blockNumberOrHashD = fmt.Sprintf(`{
 var rpcSubscriptionParamsNameD = `{
 		"oneOf": [
 			{"type": "string", "enum": ["newHeads"], "description": "Fires a notification each time a new header is appended to the chain, including chain reorganizations."},
+			{"type": "string", "enum": ["newSideHeads"], "description": "Fires a notification each time a new header is appended to the non-canonical (side) chain, including chain reorganizations."},
 			{"type": "string", "enum": ["logs"], "description": "Returns logs that are included in new imported blocks and match the given filter criteria."},
 			{"type": "string", "enum": ["newPendingTransactions"], "description": "Returns the hash for all transactions that are added to the pending state and are signed with a key that is available in the node."},
 			{"type": "string", "enum": ["syncing"], "description": "Indicates when the node starts or stops synchronizing. The result can either be a boolean indicating that the synchronization has started (true), finished (false) or an object with various progress indicators."}

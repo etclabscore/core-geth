@@ -677,6 +677,33 @@ func (b *SimulatedBackend) SubscribeNewHead(ctx context.Context, ch chan<- *type
 	}), nil
 }
 
+// SubscribeNewHead returns an event subscription for a new header imported as non-canonical (side status).
+func (b *SimulatedBackend) SubscribeNewSideHead(ctx context.Context, ch chan<- *types.Header) (ethereum.Subscription, error) {
+	// subscribe to a new head
+	sink := make(chan *types.Header)
+	sub := b.events.SubscribeNewSideHeads(sink)
+
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case head := <-sink:
+				select {
+				case ch <- head:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
 // AdjustTime adds a time shift to the simulated clock.
 // It can only be called on empty blocks.
 func (b *SimulatedBackend) AdjustTime(adjustment time.Duration) error {
@@ -768,6 +795,10 @@ func (fb *filterBackend) SubscribeNewTxsEvent(ch chan<- core.NewTxsEvent) event.
 
 func (fb *filterBackend) SubscribeChainEvent(ch chan<- core.ChainEvent) event.Subscription {
 	return fb.bc.SubscribeChainEvent(ch)
+}
+
+func (fb *filterBackend) SubscribeChainSideEvent(ch chan<- core.ChainSideEvent) event.Subscription {
+	return fb.bc.SubscribeChainSideEvent(ch)
 }
 
 func (fb *filterBackend) SubscribeRemovedLogsEvent(ch chan<- core.RemovedLogsEvent) event.Subscription {

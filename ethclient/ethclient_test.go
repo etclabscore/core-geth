@@ -725,6 +725,7 @@ var allRPCMethods = []string{
 	"eth_hashrate",
 	"eth_mining",
 	"eth_newBlockFilter",
+	"eth_newSideBlockFilter",
 	"eth_newFilter",
 	"eth_newPendingTransactionFilter",
 	"eth_pendingTransactions",

@@ -212,7 +212,8 @@ type BlockChain struct {
 	terminateInsert    func(common.Hash, uint64) bool // Testing hook used to terminate ancient receipt chain insertion.
 	writeLegacyJournal bool                           // Testing flag used to flush the snapshot journal in legacy format.
 
-	artificialFinalityEnabled int32 // toggles artificial finality features
+	artificialFinalityNoDisable     *int32 // manual override prevents disabling artificial finality feature activation
+	artificialFinalityEnabledStatus int32  // toggles artificial finality features; will be always 1 if artificialFinalityForce=1
 }
 
 // NewBlockChain returns a fully initialised block chain using information

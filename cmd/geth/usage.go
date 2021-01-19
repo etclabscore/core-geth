@@ -61,6 +61,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.LightKDFFlag,
 			utils.WhitelistFlag,
 			utils.ECBP1100Flag,
+			utils.ECBP1100NoDisableFlag,
 		},
 	},
 	{

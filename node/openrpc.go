@@ -182,6 +182,21 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 		return go_openrpc_reflect.EthereumReflector.GetContentDescriptorRequired(r, m, field)
 	}
 
+	appReflector.FnGetMethodExternalDocs = func(r reflect.Value, m reflect.Method, funcDecl *ast.FuncDecl) (*meta_schema.ExternalDocumentationObject, error) {
+		standard := go_openrpc_reflect.StandardReflector
+		got, err := standard.GetMethodExternalDocs(r, m, funcDecl)
+		if err != nil {
+			return nil, err
+		}
+		if got.Url == nil {
+			return got, nil
+		}
+		// Replace links to go-ethereum repo with current core-geth one
+		newLink := meta_schema.ExternalDocumentationObjectUrl(strings.Replace(string(*got.Url), "github.com/ethereum/go-ethereum", "github.com/etclabscore/core-geth", 1))
+		got.Url = &newLink
+		return got, nil
+	}
+
 	// Finally, register the configured reflector to the document.
 	d.WithReflector(appReflector)
 	return d

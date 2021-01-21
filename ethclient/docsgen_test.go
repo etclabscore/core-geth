@@ -158,7 +158,7 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 
 {{ .Summary }}
 
-__Params ({{ .Params | len }})__
+#### Params ({{ .Params | len }})
 {{ if gt (.Params | len) 0 }}
 {{ if eq $methodmap.paramStructure "by-position" }}Parameters must be given _by position_.{{ else if eq $methodmap.paramStructure "by-name" }}Parameters must be given _by name_.{{ end }}  
 {{ range $index, $param := .Params }}
@@ -169,7 +169,7 @@ __{{ sum $index 1 }}:__ {{ template "contentDescTpl" $parammap }}
 _None_
 {{- end}}
 
-__Result__
+#### Result
 
 {{ if .Result -}}
 {{ $result := .Result | tomap }}

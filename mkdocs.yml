@@ -38,6 +38,9 @@ theme:
     - navigation.sections
     # - navigation.instant
 
+extra_css:
+  - assets/css/extra.css
+
 use_directory_urls: true
 
 plugins:

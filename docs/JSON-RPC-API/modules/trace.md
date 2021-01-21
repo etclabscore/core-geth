@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T13:33:54-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -22,7 +22,7 @@ EVM and returns them as a JSON object.
 The correct name will be TraceBlockByNumber, though we want to be compatible with Parity trace module.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -37,12 +37,13 @@ number <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
+	- title: `blockNumberIdentifier`
 	- oneOf: 
 
+			- enum: earliest, latest, pending
 			- type: string
 			- title: `blockNumberTag`
 			- description: `The block height description`
-			- enum: earliest, latest, pending
 
 
 			- title: `uint64`
@@ -51,7 +52,6 @@ number <code>rpc.BlockNumber</code>
 			- type: string
 
 
-	- title: `blockNumberIdentifier`
 
 
 	```
@@ -101,10 +101,13 @@ config <code>*TraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- overrides: 
-			- additionalProperties: `true`
+		- Timeout: 
+			- type: `string`
 
-		- DisableMemory: 
+		- Tracer: 
+			- type: `string`
+
+		- DisableReturnData: 
 			- type: `boolean`
 
 		- DisableStack: 
@@ -114,26 +117,23 @@ config <code>*TraceConfig</code>
 			- type: `boolean`
 
 		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- Timeout: 
-			- type: `string`
-
 		- Debug: 
 			- type: `boolean`
 
-		- DisableReturnData: 
+		- DisableMemory: 
 			- type: `boolean`
 
-		- Tracer: 
-			- type: `string`
+		- overrides: 
+			- additionalProperties: `true`
 
 
 	- type: object
@@ -192,7 +192,7 @@ config <code>*TraceConfig</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -307,7 +307,7 @@ func (api *PrivateTraceAPI) Block(ctx context.Context, number rpc.BlockNumber, c
 
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -324,6 +324,21 @@ args <code>ethapi.CallArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- data: 
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
@@ -337,21 +352,6 @@ args <code>ethapi.CallArgs</code>
 		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-			- type: `string`
-
-		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- from: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- gas: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
 			- type: `string`
 
 
@@ -416,24 +416,12 @@ config <code>*TraceConfig</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
-		- Limit: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- Tracer: 
-			- type: `string`
-
-		- DisableStack: 
-			- type: `boolean`
-
 		- DisableStorage: 
 			- type: `boolean`
 
-		- Reexec: 
+		- Limit: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -441,8 +429,8 @@ config <code>*TraceConfig</code>
 		- Timeout: 
 			- type: `string`
 
-		- overrides: 
-			- additionalProperties: `true`
+		- Tracer: 
+			- type: `string`
 
 		- Debug: 
 			- type: `boolean`
@@ -453,7 +441,19 @@ config <code>*TraceConfig</code>
 		- DisableReturnData: 
 			- type: `boolean`
 
+		- DisableStack: 
+			- type: `boolean`
 
+		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
+
+
+	- type: object
 
 
 	```
@@ -509,7 +509,7 @@ config <code>*TraceConfig</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -524,16 +524,16 @@ txTraceResult <code>[]*txTraceResult</code>
 	
 	- items: 
 
-			- additionalProperties: `false`
 			- properties: 
-				- error: 
-					- type: `string`
-
 				- result: 
 					- additionalProperties: `true`
 
+				- error: 
+					- type: `string`
+
 
 			- type: object
+			- additionalProperties: `false`
 
 
 	- type: array
@@ -605,7 +605,7 @@ Transaction returns the structured logs created during the execution of EVM
 and returns them as a JSON object.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -656,30 +656,10 @@ config <code>*TraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- Debug: 
-			- type: `boolean`
-
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableStack: 
-			- type: `boolean`
-
-		- Limit: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- Timeout: 
-			- type: `string`
-
-		- overrides: 
-			- additionalProperties: `true`
-
 		- DisableReturnData: 
 			- type: `boolean`
 
-		- DisableStorage: 
+		- DisableStack: 
 			- type: `boolean`
 
 		- Reexec: 
@@ -687,7 +667,27 @@ config <code>*TraceConfig</code>
 			- title: `integer`
 			- type: `string`
 
+		- Timeout: 
+			- type: `string`
+
+		- Debug: 
+			- type: `boolean`
+
+		- DisableMemory: 
+			- type: `boolean`
+
 		- Tracer: 
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
+
+		- DisableStorage: 
+			- type: `boolean`
+
+		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 
@@ -747,7 +747,7 @@ config <code>*TraceConfig</code>
 
 
 
-__Result__
+#### Result
 
 
 

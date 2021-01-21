@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T13:33:54-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -20,11 +20,11 @@
 GetHashrate returns the current hashrate for local CPU miner and remote miner.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -38,10 +38,10 @@ __Result__
 
 	``` Schema
 	
+	- type: string
 	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
 
 
 	```
@@ -103,11 +103,11 @@ The work package consists of 3 strings:
   result[3] - hex encoded block number
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -120,7 +120,6 @@ num4string <code>[4]string</code>
 
 	``` Schema
 	
-	- minItems: `4`
 	- type: array
 	- items: 
 
@@ -128,6 +127,7 @@ num4string <code>[4]string</code>
 
 
 	- maxItems: `4`
+	- minItems: `4`
 
 
 	```
@@ -217,7 +217,7 @@ It accepts the miner hash rate and an identifier which must be unique
 between nodes.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -266,10 +266,10 @@ id <code>common.Hash</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -291,7 +291,7 @@ id <code>common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -356,7 +356,7 @@ It returns an indication if the work was accepted.
 Note either an invalid solution, a stale work a non-existent work will return false.
 
 
-__Params (3)__
+#### Params (3)
 
 Parameters must be given _by position_.  
 
@@ -439,10 +439,10 @@ digest <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
+	- title: `keccak`
 
 
 	```
@@ -464,7 +464,7 @@ digest <code>common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 

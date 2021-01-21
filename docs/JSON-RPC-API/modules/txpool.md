@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T13:33:54-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -20,11 +20,11 @@
 Content returns the transactions contained within the transaction pool.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -45,52 +45,62 @@ mapstringmapstringmapstringRPCTransaction <code>map[string]map[string]map[string
 						- .*: 
 							- additionalProperties: `false`
 							- properties: 
-								- r: 
+								- blockNumber: 
 									- pattern: `^0x[a-fA-F0-9]+$`
 									- title: `integer`
 									- type: `string`
+
+								- r: 
+									- type: `string`
+									- pattern: `^0x[a-fA-F0-9]+$`
+									- title: `integer`
 
 								- s: 
 									- title: `integer`
 									- type: `string`
 									- pattern: `^0x[a-fA-F0-9]+$`
 
-								- to: 
-									- type: `string`
-									- pattern: `^0x[a-fA-F\d]{64}$`
-									- title: `keccak`
-
-								- gas: 
-									- type: `string`
-									- pattern: `^0x([a-fA-F\d])+$`
-									- title: `uint64`
-
-								- blockNumber: 
-									- pattern: `^0x[a-fA-F0-9]+$`
-									- title: `integer`
-									- type: `string`
-
 								- blockHash: 
 									- pattern: `^0x[a-fA-F\d]{64}$`
 									- title: `keccak`
 									- type: `string`
 
-								- nonce: 
+								- gasPrice: 
+									- pattern: `^0x[a-fA-F0-9]+$`
+									- title: `integer`
 									- type: `string`
+
+								- nonce: 
 									- pattern: `^0x([a-fA-F\d])+$`
 									- title: `uint64`
+									- type: `string`
 
 								- transactionIndex: 
 									- title: `uint64`
 									- type: `string`
 									- pattern: `^0x([a-fA-F\d])+$`
 
-								- value: 
-									- title: `integer`
+								- from: 
+									- pattern: `^0x[a-fA-F\d]{64}$`
+									- title: `keccak`
 									- type: `string`
-									- pattern: `^0x[a-fA-F0-9]+$`
 
-								- gasPrice: 
+								- gas: 
+									- pattern: `^0x([a-fA-F\d])+$`
+									- title: `uint64`
+									- type: `string`
+
+								- input: 
+									- pattern: `^0x([a-fA-F\d])+$`
+									- title: `dataWord`
+									- type: `string`
+
+								- to: 
+									- pattern: `^0x[a-fA-F\d]{64}$`
+									- title: `keccak`
+									- type: `string`
+
+								- value: 
 									- pattern: `^0x[a-fA-F0-9]+$`
 									- title: `integer`
 									- type: `string`
@@ -100,20 +110,10 @@ mapstringmapstringmapstringRPCTransaction <code>map[string]map[string]map[string
 									- title: `keccak`
 									- type: `string`
 
-								- input: 
-									- type: `string`
-									- pattern: `^0x([a-fA-F\d])+$`
-									- title: `dataWord`
-
 								- v: 
-									- pattern: `^0x[a-fA-F0-9]+$`
 									- title: `integer`
 									- type: `string`
-
-								- from: 
-									- pattern: `^0x[a-fA-F\d]{64}$`
-									- title: `keccak`
-									- type: `string`
+									- pattern: `^0x[a-fA-F0-9]+$`
 
 
 							- type: `object`
@@ -283,11 +283,11 @@ Inspect retrieves the content of the transaction pool and flattens it into an
 easily inspectable list.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -304,12 +304,12 @@ mapstringmapstringmapstringstring <code>map[string]map[string]map[string]string<
 		- .*: 
 			- patternProperties: 
 				- .*: 
-					- type: `object`
 					- patternProperties: 
 						- .*: 
 							- type: `string`
 
 
+					- type: `object`
 
 
 			- type: `object`
@@ -407,11 +407,11 @@ func (s *PublicTxPoolAPI) Inspect() map // Inspect retrieves the content of the 
 Status returns the number of pending and queued transaction in the pool.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 

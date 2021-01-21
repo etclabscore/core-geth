@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T13:33:54-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -20,11 +20,11 @@
 ClientVersion returns the node name
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -73,7 +73,7 @@ Sha3 applies the ethereum sha3 implementation on the input.
 It assumes the input is hex encoded.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -113,7 +113,7 @@ input <code>hexutil.Bytes</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -127,10 +127,10 @@ __Result__
 
 	``` Schema
 	
-	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `dataWord`
 	- description: `Hex representation of some bytes`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```

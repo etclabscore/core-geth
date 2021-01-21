@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T13:33:54-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -20,11 +20,11 @@
 Accounts returns the collection of accounts this node manages
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -37,6 +37,7 @@ commonAddress <code>[]common.Address</code>
 
 	``` Schema
 	
+	- type: array
 	- items: 
 
 			- title: `keccak`
@@ -45,7 +46,6 @@ commonAddress <code>[]common.Address</code>
 			- type: string
 
 
-	- type: array
 
 
 	```
@@ -108,11 +108,11 @@ func (s *PublicAccountAPI) Accounts() [ // Accounts returns the collection of ac
 BlockNumber returns the block number of the chain head.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -126,10 +126,10 @@ __Result__
 
 	``` Schema
 	
-	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `uint64`
 	- description: `Hex representation of a uint64`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -191,7 +191,7 @@ Note, this function doesn't make and changes in the state/blockchain and is
 useful to execute and retrieve values.
 
 
-__Params (3)__
+#### Params (3)
 
 Parameters must be given _by position_.  
 
@@ -208,6 +208,11 @@ args <code>CallArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- value: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- data: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
@@ -229,13 +234,8 @@ args <code>CallArgs</code>
 			- type: `string`
 
 		- to: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
-
-		- value: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
 			- type: `string`
 
 
@@ -311,13 +311,7 @@ overrides <code>*map[common.Address]account</code>
 	
 	- patternProperties: 
 		- .*: 
-			- additionalProperties: `false`
 			- properties: 
-				- code: 
-					- pattern: `^0x([a-fA-F\d])+$`
-					- title: `dataWord`
-					- type: `string`
-
 				- nonce: 
 					- pattern: `^0x([a-fA-F\d])+$`
 					- title: `uint64`
@@ -326,10 +320,10 @@ overrides <code>*map[common.Address]account</code>
 				- state: 
 					- patternProperties: 
 						- .*: 
-							- description: `Hex representation of a Keccak 256 hash`
-							- pattern: `^0x[a-fA-F\d]{64}$`
 							- title: `keccak`
 							- type: `string`
+							- description: `Hex representation of a Keccak 256 hash`
+							- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 					- type: `object`
@@ -337,10 +331,10 @@ overrides <code>*map[common.Address]account</code>
 				- stateDiff: 
 					- patternProperties: 
 						- .*: 
-							- description: `Hex representation of a Keccak 256 hash`
 							- pattern: `^0x[a-fA-F\d]{64}$`
 							- title: `keccak`
 							- type: `string`
+							- description: `Hex representation of a Keccak 256 hash`
 
 
 					- type: `object`
@@ -350,8 +344,14 @@ overrides <code>*map[common.Address]account</code>
 					- title: `integer`
 					- type: `string`
 
+				- code: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `dataWord`
+					- type: `string`
+
 
 			- type: `object`
+			- additionalProperties: `false`
 
 
 	- type: object
@@ -418,7 +418,7 @@ overrides <code>*map[common.Address]account</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -432,10 +432,10 @@ __Result__
 
 	``` Schema
 	
+	- type: string
 	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 
 
 	```
@@ -507,11 +507,11 @@ func (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNrOr
 ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -588,11 +588,11 @@ func (api *PublicEthereumAPI) ChainId() hexutil.Uint64 {
 ChainId returns the chainID value for transaction replay protection.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -606,10 +606,10 @@ __Result__
 
 	``` Schema
 	
-	- type: string
 	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- type: string
 
 
 	```
@@ -665,11 +665,11 @@ func (s *PublicBlockChainAPI) ChainId() *hexutil.Big {
 Coinbase is the address that mining rewards will be send to (alias for Etherbase)
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -683,10 +683,10 @@ __Result__
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -743,7 +743,7 @@ EstimateGas returns an estimate of the amount of gas needed to execute the
 given transaction against the current pending block.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -760,15 +760,10 @@ args <code>CallArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- gas: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
 		- gasPrice: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
 
 		- to: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
@@ -776,19 +771,24 @@ args <code>CallArgs</code>
 			- type: `string`
 
 		- value: 
-			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- data: 
-			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
+			- type: `string`
 
 		- from: 
 			- title: `keccak`
 			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
+
+		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
 
 
 	- type: object
@@ -852,7 +852,7 @@ blockNrOrHash <code>*rpc.BlockNumberOrHash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -866,10 +866,10 @@ __Result__
 
 	``` Schema
 	
-	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `uint64`
 	- description: `Hex representation of a uint64`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -930,11 +930,11 @@ func (s *PublicBlockChainAPI) EstimateGas(ctx context.Context, args CallArgs, bl
 Etherbase is the address that mining rewards will be send to
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -948,10 +948,10 @@ __Result__
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -1008,7 +1008,7 @@ FillTransaction fills the defaults (nonce, gas, gasPrice) on a given unsigned tr
 and returns it to the caller for further processing (signing + broadcast)
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -1023,12 +1023,18 @@ args <code>SendTxArgs</code>
 
 	``` Schema
 	
+	- type: object
 	- additionalProperties: `false`
 	- properties: 
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
 		- to: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
 
 		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -1036,14 +1042,14 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
 
 		- from: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
-			- type: `string`
 
 		- gas: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -1051,22 +1057,16 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- gasPrice: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-			- type: `string`
 
 		- input: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
-
-		- nonce: 
-			- title: `uint64`
-			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 
 
-	- type: object
 
 
 	```
@@ -1128,7 +1128,7 @@ args <code>SendTxArgs</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1145,9 +1145,9 @@ __Result__
 	- additionalProperties: `false`
 	- properties: 
 		- raw: 
-			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
+			- type: `string`
 
 		- tx: 
 			- additionalProperties: `false`
@@ -1228,11 +1228,11 @@ func (s *PublicTransactionPoolAPI) FillTransaction(ctx context.Context, args Sen
 GasPrice returns a suggestion for a gas price.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -1246,10 +1246,10 @@ __Result__
 
 	``` Schema
 	
+	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
-	- title: `integer`
 
 
 	```
@@ -1308,7 +1308,7 @@ given block number. The rpc.LatestBlockNumber and rpc.PendingBlockNumber meta
 block numbers are also allowed.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -1323,10 +1323,10 @@ address <code>common.Address</code>
 
 	``` Schema
 	
+	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 
 
 	```
@@ -1357,7 +1357,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1437,7 +1437,7 @@ GetBlockByHash returns the requested block. When fullTx is true all transactions
 detail, otherwise only the transaction hash is returned.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -1452,10 +1452,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
+	- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 	```
@@ -1486,7 +1486,7 @@ fullTx <code>bool</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1502,54 +1502,9 @@ __Result__
 	
 	- additionalProperties: `false`
 	- properties: 
-		- totalDifficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- transactionsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- hash: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
-		- mixHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- miner: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- number: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- parentHash: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
-		- receiptsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- size: 
+		- gasLimit: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
-			- type: `string`
-
-		- extraData: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
 			- type: `string`
 
 		- logsBloom: 
@@ -1563,9 +1518,56 @@ __Result__
 			- minItems: `256`
 			- type: `array`
 
+		- number: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- receiptsRoot: 
+			- title: `keccak`
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+
+		- sha3Uncles: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- uncles: 
+			- items: 
+				- description: `Hex representation of a Keccak 256 hash`
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+				- type: `string`
+
+			- type: `array`
+
+		- error: 
+			- type: `string`
+
 		- gasUsed: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
+			- type: `string`
+
+		- totalDifficulty: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+
+		- difficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- miner: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- mixHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
 		- nonce: 
@@ -1573,14 +1575,19 @@ __Result__
 			- title: `integer`
 			- type: `string`
 
-		- sha3Uncles: 
+		- parentHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
 		- stateRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+
+		- timestamp: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
 		- transactions: 
@@ -1589,32 +1596,25 @@ __Result__
 
 			- type: `array`
 
-		- difficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
+		- transactionsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
-		- gasLimit: 
+		- extraData: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- hash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- size: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-
-		- uncles: 
-			- items: 
-				- type: `string`
-				- description: `Hex representation of a Keccak 256 hash`
-				- pattern: `^0x[a-fA-F\d]{64}$`
-				- title: `keccak`
-
-			- type: `array`
-
-		- error: 
-			- type: `string`
-
-		- timestamp: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
 
 
 	- type: object
@@ -1796,7 +1796,7 @@ GetBlockByNumber returns the requested canonical block.
   only the transaction hash is returned.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -1814,16 +1814,16 @@ number <code>rpc.BlockNumber</code>
 	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- title: `blockNumberTag`
-			- description: `The block height description`
 			- enum: earliest, latest, pending
 			- type: string
+			- title: `blockNumberTag`
+			- description: `The block height description`
 
 
-			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- type: string
+			- title: `uint64`
 
 
 
@@ -1873,7 +1873,7 @@ fullTx <code>bool</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1887,110 +1887,41 @@ __Result__
 
 	``` Schema
 	
+	- additionalProperties: `false`
 	- properties: 
+		- miner: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+
+		- parentHash: 
+			- title: `keccak`
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+
 		- timestamp: 
+			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
-			- type: `string`
 
-		- extraData: 
-			- title: `dataWord`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- gasUsed: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- nonce: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- receiptsRoot: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- size: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- stateRoot: 
+		- transactionsRoot: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
-
-		- error: 
-			- type: `string`
-
-		- gasLimit: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-
-		- hash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- number: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- totalDifficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- transactions: 
-			- items: 
-				- additionalProperties: `true`
-
-			- type: `array`
 
 		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- logsBloom: 
-			- items: 
-				- description: `Hex representation of the integer`
-				- pattern: `^0x[a-fA-F0-9]+$`
-				- title: `integer`
-				- type: `string`
-
-			- maxItems: `256`
-			- minItems: `256`
-			- type: `array`
-
 		- mixHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
-		- parentHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- miner: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- sha3Uncles: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- transactionsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
+		- nonce: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- uncles: 
@@ -2002,9 +1933,78 @@ __Result__
 
 			- type: `array`
 
+		- error: 
+			- type: `string`
+
+		- hash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- receiptsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- size: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- stateRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- gasLimit: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
+		- gasUsed: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- logsBloom: 
+			- items: 
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
+				- description: `Hex representation of the integer`
+
+			- maxItems: `256`
+			- minItems: `256`
+			- type: `array`
+
+		- number: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- sha3Uncles: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- totalDifficulty: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+
+		- transactions: 
+			- items: 
+				- additionalProperties: `true`
+
+			- type: `array`
+
+		- extraData: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
 
 	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -2186,7 +2186,7 @@ func (s *PublicBlockChainAPI) GetBlockByNumber(ctx context.Context, number rpc.B
 GetBlockTransactionCountByHash returns the number of transactions in the block with the given hash.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -2201,10 +2201,10 @@ blockHash <code>common.Hash</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -2226,7 +2226,7 @@ blockHash <code>common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -2303,7 +2303,7 @@ func (s *PublicTransactionPoolAPI) GetBlockTransactionCountByHash(ctx context.Co
 GetBlockTransactionCountByNumber returns the number of transactions in the block with the given block number.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -2321,10 +2321,10 @@ blockNr <code>rpc.BlockNumber</code>
 	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- type: string
 			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
+			- type: string
 
 
 			- title: `uint64`
@@ -2371,7 +2371,7 @@ blockNr <code>rpc.BlockNumber</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -2385,10 +2385,10 @@ __Result__
 
 	``` Schema
 	
-	- type: string
-	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
+	- title: `uint`
 
 
 	```
@@ -2448,7 +2448,7 @@ func (s *PublicTransactionPoolAPI) GetBlockTransactionCountByNumber(ctx context.
 GetCode returns the code stored at the given address in the state for the given block number.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -2463,10 +2463,10 @@ address <code>common.Address</code>
 
 	``` Schema
 	
-	- title: `keccak`
-	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
+	- title: `keccak`
+	- description: `Hex representation of a Keccak 256 hash POINTER`
 
 
 	```
@@ -2497,7 +2497,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -2511,10 +2511,10 @@ __Result__
 
 	``` Schema
 	
-	- type: string
 	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -2581,7 +2581,7 @@ For pending transaction and block filters the result is []common.Hash.
 https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterchanges
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -2596,7 +2596,7 @@ id <code>rpc.ID</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -2670,7 +2670,7 @@ If the filter could not be found an empty array of logs is returned.
 https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterlogs
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -2685,7 +2685,7 @@ id <code>rpc.ID</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -2700,18 +2700,35 @@ typesLog <code>[]*types.Log</code>
 	
 	- items: 
 
-			- type: object
 			- additionalProperties: `false`
 			- properties: 
-				- blockNumber: 
-					- title: `integer`
-					- type: `string`
-					- pattern: `^0x[a-fA-F0-9]+$`
-
 				- data: 
 					- pattern: `^0x([a-fA-F0-9]?)+$`
 					- title: `bytes`
 					- type: `string`
+
+				- transactionHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- blockNumber: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- blockHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- logIndex: 
+					- title: `integer`
+					- type: `string`
+					- pattern: `^0x[a-fA-F0-9]+$`
+
+				- removed: 
+					- type: `boolean`
 
 				- topics: 
 					- items: 
@@ -2722,35 +2739,18 @@ typesLog <code>[]*types.Log</code>
 
 					- type: `array`
 
-				- removed: 
-					- type: `boolean`
-
-				- transactionHash: 
-					- type: `string`
-					- pattern: `^0x[a-fA-F\d]{64}$`
-					- title: `keccak`
-
 				- transactionIndex: 
-					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
 					- type: `string`
+					- pattern: `^0x[a-fA-F0-9]+$`
 
 				- address: 
-					- type: `string`
-					- pattern: `^0x[a-fA-F\d]{64}$`
-					- title: `keccak`
-
-				- blockHash: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
 					- type: `string`
 
-				- logIndex: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-					- type: `string`
 
-
+			- type: object
 
 
 	- type: array
@@ -2890,11 +2890,11 @@ func (api *PublicFilterAPI) GetFilterLogs(ctx context.Context, id rpc.ID) ([ // 
 GetHashrate returns the current hashrate for local CPU miner and remote miner.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -2908,10 +2908,10 @@ __Result__
 
 	``` Schema
 	
+	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
-	- title: `integer`
 
 
 	```
@@ -2967,7 +2967,7 @@ func (api *API) GetHashrate() uint64 {
 GetHeaderByHash returns the requested header by hash.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -3007,7 +3007,7 @@ hash <code>common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -3023,12 +3023,12 @@ __Result__
 	
 	- additionalProperties: `false`
 	- properties: 
-		- size: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
+		- hash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
-		- sha3Uncles: 
+		- mixHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
@@ -3038,14 +3038,14 @@ __Result__
 			- title: `dataWord`
 			- type: `string`
 
+		- gasLimit: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
 		- gasUsed: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
-			- type: `string`
-
-		- mixHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
 			- type: `string`
 
 		- transactionsRoot: 
@@ -3053,37 +3053,37 @@ __Result__
 			- title: `keccak`
 			- type: `string`
 
-		- difficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- hash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
+		- miner: 
 			- title: `keccak`
 			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
 
 		- number: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- receiptsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
+		- timestamp: 
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 
-		- gasLimit: 
+		- size: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
 
-		- miner: 
+		- stateRoot: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
-		- nonce: 
+		- totalDifficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -3093,20 +3093,10 @@ __Result__
 			- title: `keccak`
 			- type: `string`
 
-		- stateRoot: 
+		- receiptsRoot: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
-			- type: `string`
-
-		- timestamp: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- totalDifficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
 
 		- logsBloom: 
 			- type: `array`
@@ -3118,6 +3108,16 @@ __Result__
 
 			- maxItems: `256`
 			- minItems: `256`
+
+		- nonce: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- sha3Uncles: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
 
 
 	- type: object
@@ -3278,7 +3278,7 @@ GetHeaderByNumber returns the requested canonical block header.
 * When blockNr is -2 the pending chain head is returned.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -3293,12 +3293,13 @@ number <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
+	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- title: `blockNumberTag`
-			- description: `The block height description`
 			- enum: earliest, latest, pending
 			- type: string
+			- title: `blockNumberTag`
+			- description: `The block height description`
 
 
 			- title: `uint64`
@@ -3307,7 +3308,6 @@ number <code>rpc.BlockNumber</code>
 			- type: string
 
 
-	- title: `blockNumberIdentifier`
 
 
 	```
@@ -3346,7 +3346,7 @@ number <code>rpc.BlockNumber</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -3360,54 +3360,13 @@ __Result__
 
 	``` Schema
 	
-	- additionalProperties: `false`
 	- properties: 
-		- gasUsed: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- nonce: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- number: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- sha3Uncles: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- size: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- timestamp: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
 		- gasLimit: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
-		- hash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- stateRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- transactionsRoot: 
+		- miner: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
@@ -3417,49 +3376,90 @@ __Result__
 			- title: `keccak`
 			- type: `string`
 
-		- totalDifficulty: 
+		- parentHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
 
-		- difficulty: 
-			- title: `integer`
+		- size: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- extraData: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
-
-		- logsBloom: 
-			- items: 
-				- description: `Hex representation of the integer`
-				- pattern: `^0x[a-fA-F0-9]+$`
-				- title: `integer`
-				- type: `string`
-
-			- maxItems: `256`
-			- minItems: `256`
-			- type: `array`
-
-		- miner: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- parentHash: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
+			- pattern: `^0x([a-fA-F\d])+$`
 
 		- receiptsRoot: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
+		- sha3Uncles: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- transactionsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- logsBloom: 
+			- items: 
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
+				- description: `Hex representation of the integer`
+
+			- maxItems: `256`
+			- minItems: `256`
+			- type: `array`
+
+		- nonce: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- stateRoot: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+
+		- totalDifficulty: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- difficulty: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- gasUsed: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- hash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- number: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- timestamp: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
 
 	- type: object
+	- additionalProperties: `false`
 
 
 	```
@@ -3623,7 +3623,7 @@ GetLogs returns logs matching the given argument that are stored within the stat
 https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getlogs
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -3638,14 +3638,13 @@ crit <code>FilterCriteria</code>
 
 	``` Schema
 	
-	- additionalProperties: `false`
 	- properties: 
 		- Addresses: 
 			- items: 
+				- type: `string`
 				- description: `Hex representation of a Keccak 256 hash POINTER`
 				- pattern: `^0x[a-fA-F\d]{64}$`
 				- title: `keccak`
-				- type: `string`
 
 			- type: `array`
 
@@ -3660,9 +3659,9 @@ crit <code>FilterCriteria</code>
 			- type: `string`
 
 		- ToBlock: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
 
 		- Topics: 
 			- items: 
@@ -3678,6 +3677,7 @@ crit <code>FilterCriteria</code>
 
 
 	- type: object
+	- additionalProperties: `false`
 
 
 	```
@@ -3735,7 +3735,7 @@ crit <code>FilterCriteria</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -3750,10 +3750,25 @@ typesLog <code>[]*types.Log</code>
 	
 	- items: 
 
+			- additionalProperties: `false`
 			- properties: 
-				- address: 
+				- topics: 
+					- items: 
+						- description: `Hex representation of a Keccak 256 hash`
+						- pattern: `^0x[a-fA-F\d]{64}$`
+						- title: `keccak`
+						- type: `string`
+
+					- type: `array`
+
+				- blockHash: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
+					- type: `string`
+
+				- blockNumber: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
 					- type: `string`
 
 				- logIndex: 
@@ -3764,43 +3779,28 @@ typesLog <code>[]*types.Log</code>
 				- removed: 
 					- type: `boolean`
 
-				- topics: 
-					- items: 
-						- title: `keccak`
-						- type: `string`
-						- description: `Hex representation of a Keccak 256 hash`
-						- pattern: `^0x[a-fA-F\d]{64}$`
-
-					- type: `array`
+				- transactionHash: 
+					- type: `string`
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
 
 				- transactionIndex: 
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
 					- type: `string`
 
-				- blockHash: 
-					- title: `keccak`
-					- type: `string`
+				- address: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
-
-				- blockNumber: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
+					- title: `keccak`
 					- type: `string`
 
 				- data: 
-					- type: `string`
 					- pattern: `^0x([a-fA-F0-9]?)+$`
 					- title: `bytes`
-
-				- transactionHash: 
-					- pattern: `^0x[a-fA-F\d]{64}$`
-					- title: `keccak`
 					- type: `string`
 
 
 			- type: object
-			- additionalProperties: `false`
 
 
 	- type: array
@@ -3933,7 +3933,7 @@ func (api *PublicFilterAPI) GetLogs(ctx context.Context, crit FilterCriteria) ([
 GetProof returns the Merkle-proof for a given account and optionally some storage keys.
 
 
-__Params (3)__
+#### Params (3)
 
 Parameters must be given _by position_.  
 
@@ -3948,10 +3948,10 @@ address <code>common.Address</code>
 
 	``` Schema
 	
+	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 
 
 	```
@@ -4022,7 +4022,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -4036,17 +4036,27 @@ __Result__
 
 	``` Schema
 	
-	- additionalProperties: `false`
 	- properties: 
-		- balance: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
+		- accountProof: 
+			- type: `array`
+			- items: 
+				- type: `string`
 
-		- codeHash: 
-			- type: `string`
+
+		- address: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
+
+		- balance: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- codeHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
 
 		- nonce: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -4060,6 +4070,7 @@ __Result__
 
 		- storageProof: 
 			- items: 
+				- type: `object`
 				- additionalProperties: `false`
 				- properties: 
 					- key: 
@@ -4077,23 +4088,12 @@ __Result__
 						- type: `string`
 
 
-				- type: `object`
 
 			- type: `array`
-
-		- accountProof: 
-			- items: 
-				- type: `string`
-
-			- type: `array`
-
-		- address: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
 
 
 	- type: object
+	- additionalProperties: `false`
 
 
 	```
@@ -4231,7 +4231,7 @@ func (s *PublicBlockChainAPI) GetProof(ctx context.Context, address common.Addre
 GetRawTransactionByBlockHashAndIndex returns the bytes of the transaction for the given block hash and index.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -4280,10 +4280,10 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -4305,7 +4305,7 @@ index <code>hexutil.Uint</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -4381,7 +4381,7 @@ func (s *PublicTransactionPoolAPI) GetRawTransactionByBlockHashAndIndex(ctx cont
 GetRawTransactionByBlockNumberAndIndex returns the bytes of the transaction for the given block number and index.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -4396,21 +4396,21 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
+	- title: `blockNumberIdentifier`
 	- oneOf: 
 
+			- type: string
 			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
+
+
 			- type: string
-
-
 			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
-			- type: string
 
 
-	- title: `blockNumberIdentifier`
 
 
 	```
@@ -4483,7 +4483,7 @@ index <code>hexutil.Uint</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -4497,10 +4497,10 @@ __Result__
 
 	``` Schema
 	
+	- type: string
 	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 
 
 	```
@@ -4559,7 +4559,7 @@ func (s *PublicTransactionPoolAPI) GetRawTransactionByBlockNumberAndIndex(ctx co
 GetRawTransactionByHash returns the bytes of the transaction for the given hash.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -4599,7 +4599,7 @@ hash <code>common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -4683,7 +4683,7 @@ block number. The rpc.LatestBlockNumber and rpc.PendingBlockNumber meta block
 numbers are also allowed.
 
 
-__Params (3)__
+#### Params (3)
 
 Parameters must be given _by position_.  
 
@@ -4698,10 +4698,10 @@ address <code>common.Address</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -4741,7 +4741,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -4821,7 +4821,7 @@ func (s *PublicBlockChainAPI) GetStorageAt(ctx context.Context, address common.A
 GetTransactionByBlockHashAndIndex returns the transaction for the given block hash and index.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -4836,10 +4836,10 @@ blockHash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
-	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
+	- title: `keccak`
+	- description: `Hex representation of a Keccak 256 hash`
 
 
 	```
@@ -4870,10 +4870,10 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `uint`
 	- description: `Hex representation of a uint`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -4895,7 +4895,7 @@ index <code>hexutil.Uint</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -4913,41 +4913,11 @@ __Result__
 	- additionalProperties: `false`
 	- properties: 
 		- from: 
-			- title: `keccak`
 			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 
 		- gasPrice: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- r: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- transactionIndex: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- value: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- blockNumber: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- hash: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- s: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -4957,14 +4927,39 @@ __Result__
 			- title: `keccak`
 			- type: `string`
 
+		- transactionIndex: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- s: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- value: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- blockHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
+		- blockNumber: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- gas: 
+			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
+
+		- hash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
 		- input: 
@@ -4972,15 +4967,20 @@ __Result__
 			- title: `dataWord`
 			- type: `string`
 
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
 		- v: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- nonce: 
+		- r: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
 
 
 
@@ -5111,7 +5111,7 @@ func (s *PublicTransactionPoolAPI) GetTransactionByBlockHashAndIndex(ctx context
 GetTransactionByBlockNumberAndIndex returns the transaction for the given block number and index.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -5129,10 +5129,10 @@ blockNr <code>rpc.BlockNumber</code>
 	- title: `blockNumberIdentifier`
 	- oneOf: 
 
+			- type: string
 			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
-			- type: string
 
 
 			- title: `uint64`
@@ -5188,10 +5188,10 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
+	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
-	- title: `uint`
 
 
 	```
@@ -5213,7 +5213,7 @@ index <code>hexutil.Uint</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -5230,12 +5230,22 @@ __Result__
 	- type: object
 	- additionalProperties: `false`
 	- properties: 
-		- value: 
-			- type: `string`
+		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
 
-		- blockNumber: 
+		- input: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- r: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -5245,19 +5255,34 @@ __Result__
 			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 
+		- hash: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+
+		- blockHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- s: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
 		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
-		- gasPrice: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
+		- to: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
-		- r: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
+		- transactionIndex: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
 		- v: 
@@ -5265,39 +5290,14 @@ __Result__
 			- title: `integer`
 			- type: `string`
 
-		- blockHash: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
-		- input: 
-			- title: `dataWord`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- transactionIndex: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- hash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- nonce: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-
-		- s: 
+		- value: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
-		- to: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
+		- blockNumber: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 
@@ -5429,7 +5429,7 @@ func (s *PublicTransactionPoolAPI) GetTransactionByBlockNumberAndIndex(ctx conte
 GetTransactionByHash returns the transaction for the given hash
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -5444,10 +5444,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
-	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
+	- title: `keccak`
+	- description: `Hex representation of a Keccak 256 hash`
 
 
 	```
@@ -5469,7 +5469,7 @@ hash <code>common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -5485,20 +5485,40 @@ __Result__
 	
 	- additionalProperties: `false`
 	- properties: 
-		- hash: 
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
+
+		- hash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- to: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- blockHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
 
 		- transactionIndex: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
+		- v: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
-		- gas: 
-			- title: `uint64`
-			- type: `string`
+		- input: 
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
 
 		- nonce: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -5510,50 +5530,30 @@ __Result__
 			- title: `integer`
 			- type: `string`
 
-		- v: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- value: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- input: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- blockNumber: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- from: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
 		- s: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- blockHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
+		- value: 
 			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 
-		- to: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
+		- gas: 
+			- title: `uint64`
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
 
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- blockNumber: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
 
 
 	- type: object
@@ -5692,7 +5692,7 @@ func (s *PublicTransactionPoolAPI) GetTransactionByHash(ctx context.Context, has
 GetTransactionCount returns the number of transactions the given address has sent for the given block number
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -5741,7 +5741,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -5826,7 +5826,7 @@ func (s *PublicTransactionPoolAPI) GetTransactionCount(ctx context.Context, addr
 GetTransactionReceipt returns the transaction receipt for the given transaction hash.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -5866,7 +5866,7 @@ hash <code>common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -5972,7 +5972,7 @@ GetUncleByBlockHashAndIndex returns the uncle block for the given block hash and
 all transactions in the block are returned in full detail, otherwise only the transaction hash is returned.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -6046,7 +6046,7 @@ index <code>hexutil.Uint</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -6062,9 +6062,35 @@ __Result__
 	
 	- additionalProperties: `false`
 	- properties: 
-		- stateRoot: 
+		- transactionsRoot: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
+
+		- hash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- logsBloom: 
+			- maxItems: `256`
+			- minItems: `256`
+			- type: `array`
+			- items: 
+				- description: `Hex representation of the integer`
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
+
+
+		- number: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- timestamp: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
 		- totalDifficulty: 
@@ -6078,6 +6104,14 @@ __Result__
 
 			- type: `array`
 
+		- error: 
+			- type: `string`
+
+		- mixHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
 		- uncles: 
 			- items: 
 				- description: `Hex representation of a Keccak 256 hash`
@@ -6087,94 +6121,60 @@ __Result__
 
 			- type: `array`
 
-		- difficulty: 
+		- stateRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
 
 		- gasUsed: 
-			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
-
-		- parentHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- size: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-
-		- timestamp: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- gasLimit: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- hash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- sha3Uncles: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- transactionsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
 			- type: `string`
 
 		- miner: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
-			- type: `string`
 
 		- nonce: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- logsBloom: 
-			- items: 
-				- description: `Hex representation of the integer`
-				- pattern: `^0x[a-fA-F0-9]+$`
-				- title: `integer`
-				- type: `string`
+		- receiptsRoot: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 
-			- maxItems: `256`
-			- minItems: `256`
-			- type: `array`
-
-		- mixHash: 
+		- sha3Uncles: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
-		- number: 
+		- size: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- receiptsRoot: 
+		- extraData: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- gasLimit: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- parentHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
-
-		- error: 
-			- type: `string`
-
-		- extraData: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
 
 
 	- type: object
@@ -6359,7 +6359,7 @@ GetUncleByBlockNumberAndIndex returns the uncle block for the given block hash a
 all transactions in the block are returned in full detail, otherwise only the transaction hash is returned.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -6377,10 +6377,10 @@ blockNr <code>rpc.BlockNumber</code>
 	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
 			- type: string
+			- title: `blockNumberTag`
 
 
 			- title: `uint64`
@@ -6461,7 +6461,7 @@ index <code>hexutil.Uint</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -6482,62 +6482,15 @@ __Result__
 			- title: `keccak`
 			- type: `string`
 
-		- mixHash: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- transactionsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- difficulty: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- hash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- logsBloom: 
-			- minItems: `256`
-			- type: `array`
-			- items: 
-				- type: `string`
-				- description: `Hex representation of the integer`
-				- pattern: `^0x[a-fA-F0-9]+$`
-				- title: `integer`
-
-			- maxItems: `256`
-
-		- transactions: 
-			- items: 
-				- additionalProperties: `true`
-
-			- type: `array`
-
-		- nonce: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- sha3Uncles: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
+		- size: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
 		- totalDifficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- stateRoot: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
 
 		- uncles: 
 			- items: 
@@ -6548,17 +6501,9 @@ __Result__
 
 			- type: `array`
 
-		- error: 
-			- type: `string`
-
-		- receiptsRoot: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
-		- size: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
+		- difficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- number: 
@@ -6566,14 +6511,12 @@ __Result__
 			- title: `integer`
 			- type: `string`
 
-		- parentHash: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
 		- timestamp: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
+			- type: `string`
+
+		- error: 
 			- type: `string`
 
 		- extraData: 
@@ -6582,14 +6525,71 @@ __Result__
 			- type: `string`
 
 		- gasLimit: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
+
+		- logsBloom: 
+			- items: 
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
+				- description: `Hex representation of the integer`
+
+			- maxItems: `256`
+			- minItems: `256`
+			- type: `array`
+
+		- mixHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- stateRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- transactionsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
 
 		- gasUsed: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
+
+		- hash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- parentHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- receiptsRoot: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+
+		- sha3Uncles: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+
+		- transactions: 
+			- items: 
+				- additionalProperties: `true`
+
+			- type: `array`
 
 
 	- type: object
@@ -6773,7 +6773,7 @@ func (s *PublicBlockChainAPI) GetUncleByBlockNumberAndIndex(ctx context.Context,
 GetUncleCountByBlockHash returns number of uncles in the block for the given block hash
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -6813,7 +6813,7 @@ blockHash <code>common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -6890,7 +6890,7 @@ func (s *PublicBlockChainAPI) GetUncleCountByBlockHash(ctx context.Context, bloc
 GetUncleCountByBlockNumber returns number of uncles in the block for the given block number
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -6905,13 +6905,12 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- description: `The block height description`
 			- enum: earliest, latest, pending
 			- type: string
 			- title: `blockNumberTag`
+			- description: `The block height description`
 
 
 			- title: `uint64`
@@ -6920,6 +6919,7 @@ blockNr <code>rpc.BlockNumber</code>
 			- type: string
 
 
+	- title: `blockNumberIdentifier`
 
 
 	```
@@ -6958,7 +6958,7 @@ blockNr <code>rpc.BlockNumber</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -6972,10 +6972,10 @@ __Result__
 
 	``` Schema
 	
-	- description: `Hex representation of a uint`
-	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
 	- title: `uint`
+	- description: `Hex representation of a uint`
+	- pattern: `^0x([a-fA-F\d])+$`
 
 
 	```
@@ -7041,11 +7041,11 @@ The work package consists of 3 strings:
   result[3] - hex encoded block number
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -7150,11 +7150,11 @@ func (api *API) GetWork() ([4]string, error) {
 Hashrate returns the POW hashrate
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -7168,10 +7168,10 @@ __Result__
 
 	``` Schema
 	
+	- title: `uint64`
 	- description: `Hex representation of a uint64`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
-	- title: `uint64`
 
 
 	```
@@ -7227,11 +7227,11 @@ func (api *PublicEthereumAPI) Hashrate() hexutil.Uint64 {
 Mining returns an indication if this node is currently mining.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -7282,11 +7282,11 @@ It is part of the filter package since polling goes with eth_getFilterChanges.
 https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_newblockfilter
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -7373,7 +7373,7 @@ In case "fromBlock" > "toBlock" an error is returned.
 https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_newfilter
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -7388,27 +7388,14 @@ crit <code>FilterCriteria</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
-		- Topics: 
-			- items: 
-				- items: 
-					- title: `keccak`
-					- type: `string`
-					- description: `Hex representation of a Keccak 256 hash`
-					- pattern: `^0x[a-fA-F\d]{64}$`
-
-				- type: `array`
-
-			- type: `array`
-
 		- Addresses: 
 			- items: 
-				- description: `Hex representation of a Keccak 256 hash POINTER`
-				- pattern: `^0x[a-fA-F\d]{64}$`
 				- title: `keccak`
 				- type: `string`
+				- description: `Hex representation of a Keccak 256 hash POINTER`
+				- pattern: `^0x[a-fA-F\d]{64}$`
 
 			- type: `array`
 
@@ -7418,16 +7405,29 @@ crit <code>FilterCriteria</code>
 			- type: `string`
 
 		- FromBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- ToBlock: 
-			- title: `integer`
 			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+
+		- Topics: 
+			- items: 
+				- items: 
+					- description: `Hex representation of a Keccak 256 hash`
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- type: `array`
+
+			- type: `array`
 
 
+	- type: object
 
 
 	```
@@ -7485,7 +7485,7 @@ crit <code>FilterCriteria</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -7576,11 +7576,11 @@ It is part of the filter package because this filter can be used through the
 https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_newpendingtransactionfilter
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -7659,11 +7659,11 @@ NewSideBlockFilter creates a filter that fetches blocks that are imported into t
 It is part of the filter package since polling goes with eth_getFilterChanges.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -7737,11 +7737,11 @@ PendingTransactions returns the transactions that are in the transaction pool
 and have a from address that is one of the accounts this node manages.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -7754,29 +7754,23 @@ RPCTransaction <code>[]*RPCTransaction</code>
 
 	``` Schema
 	
-	- type: array
 	- items: 
 
 			- additionalProperties: `false`
 			- properties: 
-				- blockHash: 
-					- pattern: `^0x[a-fA-F\d]{64}$`
-					- title: `keccak`
+				- v: 
 					- type: `string`
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
 
 				- blockNumber: 
+					- type: `string`
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
-					- type: `string`
 
-				- nonce: 
-					- pattern: `^0x([a-fA-F\d])+$`
-					- title: `uint64`
-					- type: `string`
-
-				- r: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
+				- from: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
 					- type: `string`
 
 				- s: 
@@ -7784,24 +7778,24 @@ RPCTransaction <code>[]*RPCTransaction</code>
 					- title: `integer`
 					- type: `string`
 
-				- gasPrice: 
+				- value: 
+					- title: `integer`
 					- type: `string`
 					- pattern: `^0x[a-fA-F0-9]+$`
+
+				- blockHash: 
+					- title: `keccak`
+					- type: `string`
+					- pattern: `^0x[a-fA-F\d]{64}$`
+
+				- gasPrice: 
 					- title: `integer`
-
-				- hash: 
-					- pattern: `^0x[a-fA-F\d]{64}$`
-					- title: `keccak`
 					- type: `string`
+					- pattern: `^0x[a-fA-F0-9]+$`
 
-				- from: 
-					- pattern: `^0x[a-fA-F\d]{64}$`
-					- title: `keccak`
-					- type: `string`
-
-				- input: 
-					- pattern: `^0x([a-fA-F\d])+$`
-					- title: `dataWord`
+				- r: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
 					- type: `string`
 
 				- to: 
@@ -7810,29 +7804,35 @@ RPCTransaction <code>[]*RPCTransaction</code>
 					- pattern: `^0x[a-fA-F\d]{64}$`
 
 				- transactionIndex: 
+					- title: `uint64`
 					- type: `string`
 					- pattern: `^0x([a-fA-F\d])+$`
-					- title: `uint64`
-
-				- v: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-					- type: `string`
-
-				- value: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-					- type: `string`
 
 				- gas: 
 					- pattern: `^0x([a-fA-F\d])+$`
 					- title: `uint64`
 					- type: `string`
 
+				- hash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- nonce: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
+					- type: `string`
+
+				- input: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `dataWord`
+					- type: `string`
+
 
 			- type: object
 
 
+	- type: array
 
 
 	```
@@ -7987,11 +7987,11 @@ func (s *PublicTransactionPoolAPI) PendingTransactions() ([ // PendingTransactio
 ProtocolVersion returns the current Ethereum protocol version this node supports
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -8005,10 +8005,10 @@ __Result__
 
 	``` Schema
 	
+	- type: string
 	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 
 
 	```
@@ -8065,7 +8065,7 @@ Resend accepts an existing transaction and a new gas price and limit. It will re
 the given transaction from the pool and reinsert it with the new gas price and limit.
 
 
-__Params (3)__
+#### Params (3)
 
 Parameters must be given _by position_.  
 
@@ -8080,11 +8080,32 @@ sendArgs <code>SendTxArgs</code>
 
 	``` Schema
 	
+	- additionalProperties: `false`
 	- properties: 
-		- from: 
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- to: 
 			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+
+		- value: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
 
 		- gas: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -8097,33 +8118,12 @@ sendArgs <code>SendTxArgs</code>
 			- type: `string`
 
 		- input: 
+			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
-			- type: `string`
-
-		- nonce: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- to: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- value: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
 
 
 	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -8194,10 +8194,10 @@ gasPrice <code>*hexutil.Big</code>
 
 	``` Schema
 	
+	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
-	- title: `integer`
 
 
 	```
@@ -8228,10 +8228,10 @@ gasLimit <code>*hexutil.Uint64</code>
 
 	``` Schema
 	
-	- title: `uint64`
-	- description: `Hex representation of a uint64`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
+	- title: `uint64`
+	- description: `Hex representation of a uint64`
 
 
 	```
@@ -8253,7 +8253,7 @@ gasLimit <code>*hexutil.Uint64</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -8267,10 +8267,10 @@ __Result__
 
 	``` Schema
 	
+	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
-	- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 	```
@@ -8374,7 +8374,7 @@ SendRawTransaction will add the signed transaction to the transaction pool.
 The sender is responsible for signing the transaction and using the correct nonce.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -8389,10 +8389,10 @@ encodedTx <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `dataWord`
 	- description: `Hex representation of some bytes`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -8414,7 +8414,7 @@ encodedTx <code>hexutil.Bytes</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -8493,7 +8493,7 @@ SendTransaction creates a transaction for the given argument, sign it and submit
 transaction pool.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -8508,6 +8508,7 @@ args <code>SendTxArgs</code>
 
 	``` Schema
 	
+	- type: object
 	- additionalProperties: `false`
 	- properties: 
 		- from: 
@@ -8516,9 +8517,9 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- gas: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
 
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -8531,14 +8532,14 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- to: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
 
 		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -8546,12 +8547,11 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
 
 
-	- type: object
 
 
 	```
@@ -8613,7 +8613,7 @@ args <code>SendTxArgs</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -8712,7 +8712,7 @@ The account associated with addr must be unlocked.
 https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -8786,7 +8786,7 @@ data <code>hexutil.Bytes</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -8800,10 +8800,10 @@ __Result__
 
 	``` Schema
 	
+	- type: string
 	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 
 
 	```
@@ -8878,7 +8878,7 @@ The node needs to have the private key of the account corresponding with
 the given from address and it needs to be unlocked.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -8895,10 +8895,15 @@ args <code>SendTxArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
 		- gasPrice: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-			- type: `string`
 
 		- input: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -8911,9 +8916,9 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- to: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
 
 		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -8926,14 +8931,9 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- from: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
-
-		- gas: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
+			- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 	- type: object
@@ -8998,7 +8998,7 @@ args <code>SendTxArgs</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -9012,19 +9012,19 @@ __Result__
 
 	``` Schema
 	
+	- type: object
 	- additionalProperties: `false`
 	- properties: 
-		- tx: 
-			- additionalProperties: `false`
-			- type: `object`
-
 		- raw: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
 
+		- tx: 
+			- additionalProperties: `false`
+			- type: `object`
 
-	- type: object
+
 
 
 	```
@@ -9119,7 +9119,7 @@ It accepts the miner hash rate and an identifier which must be unique
 between nodes.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -9168,10 +9168,10 @@ id <code>common.Hash</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -9193,7 +9193,7 @@ id <code>common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -9258,7 +9258,7 @@ It returns an indication if the work was accepted.
 Note either an invalid solution, a stale work a non-existent work will return false.
 
 
-__Params (3)__
+#### Params (3)
 
 Parameters must be given _by position_.  
 
@@ -9273,10 +9273,10 @@ nonce <code>types.BlockNonce</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
+	- title: `integer`
 
 
 	```
@@ -9307,10 +9307,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
+	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
-	- title: `keccak`
 
 
 	```
@@ -9366,7 +9366,7 @@ digest <code>common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -9427,7 +9427,7 @@ Subscribe creates a subscription to an event channel.
 Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -9451,7 +9451,7 @@ subscriptionOptions <code>interface{}</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -9505,11 +9505,11 @@ yet received the latest block headers from its pears. In case it is synchronizin
 - knownStates:   number of known state entries that still need to be pulled
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -9568,7 +9568,7 @@ UninstallFilter removes the filter with the given filter id.
 https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_uninstallfilter
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -9583,7 +9583,7 @@ id <code>rpc.ID</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -9642,7 +9642,7 @@ func (api *PublicFilterAPI) UninstallFilter(id rpc.ID) bool {
 Unsubscribe terminates an existing subscription by ID.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -9657,7 +9657,7 @@ id <code>rpc.ID</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 

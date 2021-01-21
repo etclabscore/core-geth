@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T13:33:54-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -20,11 +20,11 @@
 Listening returns an indication if the node is listening for network connections.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -72,11 +72,11 @@ func (s *PublicNetAPI) Listening() bool {
 PeerCount returns the number of connected peers
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -149,11 +149,11 @@ func (s *PublicNetAPI) PeerCount() hexutil.Uint {
 Version returns the current ethereum protocol version.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 

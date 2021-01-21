@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T13:33:54-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -20,7 +20,7 @@
 AccountRange enumerates all accounts in the given block and start point in paging request
 
 
-__Params (6)__
+#### Params (6)
 
 Parameters must be given _by position_.  
 
@@ -44,10 +44,10 @@ start <code>[]byte</code>
 
 	``` Schema
 	
+	- title: `bytes`
 	- description: `Hex representation of a variable length byte array`
 	- pattern: `^0x([a-fA-F0-9]?)+$`
 	- type: string
-	- title: `bytes`
 
 
 	```
@@ -78,10 +78,10 @@ maxResults <code>int</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
+	- title: `integer`
 
 
 	```
@@ -130,7 +130,7 @@ incompletes <code>bool</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -149,33 +149,8 @@ __Result__
 		- accounts: 
 			- patternProperties: 
 				- .*: 
-					- type: `object`
 					- additionalProperties: `false`
 					- properties: 
-						- nonce: 
-							- pattern: `^0x[a-fA-F0-9]+$`
-							- title: `integer`
-							- type: `string`
-
-						- root: 
-							- type: `string`
-
-						- storage: 
-							- type: `object`
-							- patternProperties: 
-								- .*: 
-									- type: `string`
-
-
-
-						- address: 
-							- pattern: `^0x[a-fA-F\d]{64}$`
-							- title: `keccak`
-							- type: `string`
-
-						- balance: 
-							- type: `string`
-
 						- code: 
 							- type: `string`
 
@@ -187,7 +162,32 @@ __Result__
 							- title: `dataWord`
 							- type: `string`
 
+						- nonce: 
+							- pattern: `^0x[a-fA-F0-9]+$`
+							- title: `integer`
+							- type: `string`
 
+						- root: 
+							- type: `string`
+
+						- storage: 
+							- patternProperties: 
+								- .*: 
+									- type: `string`
+
+
+							- type: `object`
+
+						- address: 
+							- pattern: `^0x[a-fA-F\d]{64}$`
+							- title: `keccak`
+							- type: `string`
+
+						- balance: 
+							- type: `string`
+
+
+					- type: `object`
 
 
 			- type: `object`
@@ -347,7 +347,7 @@ BacktraceAt sets the log backtrace location. See package log for details on
 the pattern syntax.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -362,7 +362,7 @@ location <code>string</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -405,7 +405,7 @@ file. It uses a profile rate of 1 for most accurate information. If a different 
 desired, set the rate and write the profile manually.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -454,7 +454,7 @@ nsec <code>uint</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -500,11 +500,11 @@ ChaindbCompact flattens the entire key-value database into a single level,
 removing all unused slots and merging all keys.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 _None_
 
@@ -552,7 +552,7 @@ func (api *PrivateDebugAPI) ChaindbCompact() error {
 ChaindbProperty returns leveldb properties of the key-value database.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -567,7 +567,7 @@ property <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -621,7 +621,7 @@ CpuProfile turns on CPU profiling for nsec seconds and writes
 profile data to file.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -645,10 +645,10 @@ nsec <code>uint</code>
 
 	``` Schema
 	
-	- title: `integer`
-	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
+	- title: `integer`
+	- description: `Hex representation of the integer`
 
 
 	```
@@ -670,7 +670,7 @@ nsec <code>uint</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -716,7 +716,7 @@ func (h *HandlerT) CpuProfile(file string, nsec uint) error {
 DumpBlock retrieves the entire state of the database at a given block.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -740,10 +740,10 @@ blockNr <code>rpc.BlockNumber</code>
 			- type: string
 
 
+			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- type: string
-			- title: `uint64`
 
 
 
@@ -784,7 +784,7 @@ blockNr <code>rpc.BlockNumber</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -803,11 +803,17 @@ __Result__
 		- accounts: 
 			- patternProperties: 
 				- .*: 
+					- additionalProperties: `false`
 					- properties: 
-						- nonce: 
+						- key: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `dataWord`
 							- type: `string`
+
+						- nonce: 
 							- pattern: `^0x[a-fA-F0-9]+$`
 							- title: `integer`
+							- type: `string`
 
 						- root: 
 							- type: `string`
@@ -834,14 +840,8 @@ __Result__
 						- codeHash: 
 							- type: `string`
 
-						- key: 
-							- title: `dataWord`
-							- type: `string`
-							- pattern: `^0x([a-fA-F\d])+$`
-
 
 					- type: `object`
-					- additionalProperties: `false`
 
 
 			- type: `object`
@@ -972,11 +972,11 @@ func (api *PublicDebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error
 FreeOSMemory forces a garbage collection.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 _None_
 
@@ -1016,11 +1016,11 @@ func (*HandlerT) FreeOSMemory() {
 GcStats returns GC statistics.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -1036,29 +1036,6 @@ __Result__
 	
 	- additionalProperties: `false`
 	- properties: 
-		- PauseTotal: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- LastGC: 
-			- type: `string`
-			- format: `date-time`
-
-		- NumGC: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- Pause: 
-			- items: 
-				- type: `string`
-				- description: `Hex representation of the integer`
-				- pattern: `^0x[a-fA-F0-9]+$`
-				- title: `integer`
-
-			- type: `array`
-
 		- PauseEnd: 
 			- items: 
 				- format: `date-time`
@@ -1067,13 +1044,36 @@ __Result__
 			- type: `array`
 
 		- PauseQuantiles: 
-			- type: `array`
 			- items: 
-				- type: `string`
 				- description: `Hex representation of the integer`
 				- pattern: `^0x[a-fA-F0-9]+$`
 				- title: `integer`
+				- type: `string`
 
+			- type: `array`
+
+		- PauseTotal: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+
+		- LastGC: 
+			- format: `date-time`
+			- type: `string`
+
+		- NumGC: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- Pause: 
+			- items: 
+				- description: `Hex representation of the integer`
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
+
+			- type: `array`
 
 
 	- type: object
@@ -1174,11 +1174,11 @@ GetBadBlocks returns a list of the last 'bad blocks' that the client has seen on
 and returns them as a JSON list of block-hashes
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -1191,34 +1191,85 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 
 	``` Schema
 	
+	- type: array
 	- items: 
 
+			- type: object
 			- additionalProperties: `false`
 			- properties: 
 				- block: 
 					- additionalProperties: `false`
 					- properties: 
+						- mixHash: 
+							- title: `keccak`
+							- type: `string`
+							- pattern: `^0x[a-fA-F\d]{64}$`
+
+						- nonce: 
+							- pattern: `^0x[a-fA-F0-9]+$`
+							- title: `integer`
+							- type: `string`
+
+						- error: 
+							- type: `string`
+
+						- gasUsed: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `uint64`
+							- type: `string`
+
+						- size: 
+							- type: `string`
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `uint64`
+
+						- stateRoot: 
+							- pattern: `^0x[a-fA-F\d]{64}$`
+							- title: `keccak`
+							- type: `string`
+
 						- difficulty: 
 							- pattern: `^0x[a-fA-F0-9]+$`
 							- title: `integer`
 							- type: `string`
 
-						- gasLimit: 
-							- type: `string`
-							- pattern: `^0x([a-fA-F\d])+$`
-							- title: `uint64`
-
-						- extraData: 
-							- pattern: `^0x([a-fA-F\d])+$`
-							- title: `dataWord`
-							- type: `string`
-
-						- hash: 
+						- sha3Uncles: 
 							- pattern: `^0x[a-fA-F\d]{64}$`
 							- title: `keccak`
 							- type: `string`
 
 						- miner: 
+							- title: `keccak`
+							- type: `string`
+							- pattern: `^0x[a-fA-F\d]{64}$`
+
+						- parentHash: 
+							- pattern: `^0x[a-fA-F\d]{64}$`
+							- title: `keccak`
+							- type: `string`
+
+						- timestamp: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `uint64`
+							- type: `string`
+
+						- transactions: 
+							- items: 
+								- additionalProperties: `true`
+
+							- type: `array`
+
+						- transactionsRoot: 
+							- pattern: `^0x[a-fA-F\d]{64}$`
+							- title: `keccak`
+							- type: `string`
+
+						- gasLimit: 
+							- title: `uint64`
+							- type: `string`
+							- pattern: `^0x([a-fA-F\d])+$`
+
+						- hash: 
 							- pattern: `^0x[a-fA-F\d]{64}$`
 							- title: `keccak`
 							- type: `string`
@@ -1233,14 +1284,9 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 							- title: `keccak`
 							- type: `string`
 
-						- timestamp: 
-							- title: `uint64`
-							- type: `string`
-							- pattern: `^0x([a-fA-F\d])+$`
-
-						- transactionsRoot: 
-							- pattern: `^0x[a-fA-F\d]{64}$`
-							- title: `keccak`
+						- totalDifficulty: 
+							- pattern: `^0x[a-fA-F0-9]+$`
+							- title: `integer`
 							- type: `string`
 
 						- uncles: 
@@ -1252,82 +1298,36 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 
 							- type: `array`
 
-						- error: 
-							- type: `string`
-
-						- gasUsed: 
+						- extraData: 
 							- pattern: `^0x([a-fA-F\d])+$`
-							- title: `uint64`
+							- title: `dataWord`
 							- type: `string`
-
-						- mixHash: 
-							- pattern: `^0x[a-fA-F\d]{64}$`
-							- title: `keccak`
-							- type: `string`
-
-						- nonce: 
-							- pattern: `^0x[a-fA-F0-9]+$`
-							- title: `integer`
-							- type: `string`
-
-						- parentHash: 
-							- pattern: `^0x[a-fA-F\d]{64}$`
-							- title: `keccak`
-							- type: `string`
-
-						- size: 
-							- pattern: `^0x([a-fA-F\d])+$`
-							- title: `uint64`
-							- type: `string`
-
-						- stateRoot: 
-							- pattern: `^0x[a-fA-F\d]{64}$`
-							- title: `keccak`
-							- type: `string`
-
-						- totalDifficulty: 
-							- pattern: `^0x[a-fA-F0-9]+$`
-							- title: `integer`
-							- type: `string`
-
-						- transactions: 
-							- items: 
-								- additionalProperties: `true`
-
-							- type: `array`
 
 						- logsBloom: 
-							- maxItems: `256`
-							- minItems: `256`
-							- type: `array`
 							- items: 
-								- type: `string`
 								- description: `Hex representation of the integer`
 								- pattern: `^0x[a-fA-F0-9]+$`
 								- title: `integer`
+								- type: `string`
 
-
-						- sha3Uncles: 
-							- pattern: `^0x[a-fA-F\d]{64}$`
-							- title: `keccak`
-							- type: `string`
+							- maxItems: `256`
+							- minItems: `256`
+							- type: `array`
 
 
 					- type: `object`
 
 				- hash: 
-					- type: `string`
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
+					- type: `string`
 
 				- rlp: 
 					- type: `string`
 
 
-			- type: object
 
 
-	- type: array
 
 
 	```
@@ -1533,7 +1533,7 @@ func (api *PrivateDebugAPI) GetBadBlocks(ctx context.Context) ([ // GetBadBlocks
 GetBlockRlp retrieves the RLP encoded for of a single block.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -1548,10 +1548,10 @@ number <code>uint64</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- type: string
 
 
 	```
@@ -1573,7 +1573,7 @@ number <code>uint64</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1633,7 +1633,7 @@ code hash, or storage hash.
 With one parameter, returns the list of accounts modified in the specified block.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -1648,10 +1648,10 @@ startHash <code>common.Hash</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -1707,7 +1707,7 @@ endHash <code>*common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1722,10 +1722,10 @@ commonAddress <code>[]common.Address</code>
 	
 	- items: 
 
-			- title: `keccak`
 			- description: `Hex representation of a Keccak 256 hash POINTER`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- type: string
+			- title: `keccak`
 
 
 	- type: array
@@ -1816,7 +1816,7 @@ code hash, or storage hash.
 With one parameter, returns the list of accounts modified in the specified block.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -1831,10 +1831,10 @@ startNum <code>uint64</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
+	- title: `integer`
 
 
 	```
@@ -1890,7 +1890,7 @@ endNum <code>*uint64</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1996,7 +1996,7 @@ GoTrace turns on tracing for nsec seconds and writes
 trace data to file.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -2020,10 +2020,10 @@ nsec <code>uint</code>
 
 	``` Schema
 	
-	- title: `integer`
-	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
+	- title: `integer`
+	- description: `Hex representation of the integer`
 
 
 	```
@@ -2045,7 +2045,7 @@ nsec <code>uint</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -2091,11 +2091,11 @@ func (h *HandlerT) GoTrace(file string, nsec uint) error {
 MemStats returns detailed runtime memory statistics.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -2109,137 +2109,8 @@ __Result__
 
 	``` Schema
 	
-	- additionalProperties: `false`
 	- properties: 
-		- HeapInuse: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- MSpanInuse: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- NumForcedGC: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- PauseEnd: 
-			- items: 
-				- description: `Hex representation of the integer`
-				- pattern: `^0x[a-fA-F0-9]+$`
-				- title: `integer`
-				- type: `string`
-
-			- maxItems: `256`
-			- minItems: `256`
-			- type: `array`
-
-		- TotalAlloc: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- BuckHashSys: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- Lookups: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- OtherSys: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- Frees: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- HeapAlloc: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- LastGC: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- NextGC: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- PauseNs: 
-			- minItems: `256`
-			- type: `array`
-			- items: 
-				- description: `Hex representation of the integer`
-				- pattern: `^0x[a-fA-F0-9]+$`
-				- title: `integer`
-				- type: `string`
-
-			- maxItems: `256`
-
-		- StackInuse: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- BySize: 
-			- minItems: `61`
-			- type: `array`
-			- items: 
-				- additionalProperties: `false`
-				- properties: 
-					- Frees: 
-						- pattern: `^0x[a-fA-F0-9]+$`
-						- title: `integer`
-						- type: `string`
-
-					- Mallocs: 
-						- title: `integer`
-						- type: `string`
-						- pattern: `^0x[a-fA-F0-9]+$`
-
-					- Size: 
-						- pattern: `^0x[a-fA-F0-9]+$`
-						- title: `integer`
-						- type: `string`
-
-
-				- type: `object`
-
-			- maxItems: `61`
-
-		- Sys: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- StackSys: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- HeapIdle: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- HeapReleased: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- NumGC: 
+		- HeapObjects: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -2249,10 +2120,83 @@ __Result__
 			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 
-		- DebugGC: 
-			- type: `boolean`
+		- OtherSys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
 
-		- HeapSys: 
+		- StackInuse: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- BySize: 
+			- type: `array`
+			- items: 
+				- additionalProperties: `false`
+				- properties: 
+					- Mallocs: 
+						- pattern: `^0x[a-fA-F0-9]+$`
+						- title: `integer`
+						- type: `string`
+
+					- Size: 
+						- pattern: `^0x[a-fA-F0-9]+$`
+						- title: `integer`
+						- type: `string`
+
+					- Frees: 
+						- title: `integer`
+						- type: `string`
+						- pattern: `^0x[a-fA-F0-9]+$`
+
+
+				- type: `object`
+
+			- maxItems: `61`
+			- minItems: `61`
+
+		- GCSys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- LastGC: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- MSpanInuse: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- BuckHashSys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- HeapIdle: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- HeapReleased: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- NumForcedGC: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- StackSys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- TotalAlloc: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -2260,12 +2204,43 @@ __Result__
 		- EnableGC: 
 			- type: `boolean`
 
-		- GCSys: 
+		- GCCPUFraction: 
+			- type: `number`
+
+		- HeapInuse: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- HeapObjects: 
+		- NumGC: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- NextGC: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- DebugGC: 
+			- type: `boolean`
+
+		- HeapAlloc: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- HeapSys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- MCacheSys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Frees: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -2275,31 +2250,56 @@ __Result__
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 
-		- MSpanSys: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
+		- PauseEnd: 
+			- minItems: `256`
+			- type: `array`
+			- items: 
+				- description: `Hex representation of the integer`
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
 
-		- Mallocs: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
+			- maxItems: `256`
 
-		- GCCPUFraction: 
-			- type: `number`
+		- PauseNs: 
+			- type: `array`
+			- items: 
+				- description: `Hex representation of the integer`
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
 
-		- MCacheSys: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
+			- maxItems: `256`
+			- minItems: `256`
 
 		- Alloc: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
+		- MSpanSys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Mallocs: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Lookups: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Sys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 
 	- type: object
+	- additionalProperties: `false`
 
 
 	```
@@ -2546,7 +2546,7 @@ It uses a profile rate of 1 for most accurate information. If a different rate i
 desired, set the rate and write the profile manually.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -2595,7 +2595,7 @@ nsec <code>uint</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -2640,7 +2640,7 @@ func (*HandlerT) MutexProfile(file string, nsec uint) error {
 Preimage is a debug API function that returns the preimage for a sha3 hash, if known.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -2655,10 +2655,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
+	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
-	- title: `keccak`
 
 
 	```
@@ -2680,7 +2680,7 @@ hash <code>common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -2756,7 +2756,7 @@ func (api *PrivateDebugAPI) Preimage(ctx context.Context, hash common.Hash) (hex
 PrintBlock retrieves a block and returns its pretty printed form.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -2796,7 +2796,7 @@ number <code>uint64</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -2849,7 +2849,7 @@ RemovePendingTransaction removes a transaction from the txpool.
 It returns the transaction removed, if any.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -2889,7 +2889,7 @@ hash <code>common.Hash</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -2959,7 +2959,7 @@ func (api *PrivateDebugAPI) RemovePendingTransaction(hash common.Hash) (*types.T
 SeedHash retrieves the seed hash of a block.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -2974,10 +2974,10 @@ number <code>uint64</code>
 
 	``` Schema
 	
+	- type: string
 	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
 
 
 	```
@@ -2999,7 +2999,7 @@ number <code>uint64</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -3055,7 +3055,7 @@ SetBlockProfileRate sets the rate of goroutine block profile data collection.
 rate 0 disables block profiling.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -3070,10 +3070,10 @@ rate <code>int</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
+	- title: `integer`
 
 
 	```
@@ -3095,7 +3095,7 @@ rate <code>int</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -3137,7 +3137,7 @@ SetGCPercent sets the garbage collection target percentage. It returns the previ
 setting. A negative value disables GC.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -3152,10 +3152,10 @@ v <code>int</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
 	- title: `integer`
 	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
+	- type: string
 
 
 	```
@@ -3177,7 +3177,7 @@ v <code>int</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -3251,7 +3251,7 @@ func (*HandlerT) SetGCPercent(v int) int {
 SetHead rewinds the head of the blockchain to a previous block.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -3266,10 +3266,10 @@ number <code>hexutil.Uint64</code>
 
 	``` Schema
 	
-	- title: `uint64`
-	- description: `Hex representation of a uint64`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
+	- title: `uint64`
+	- description: `Hex representation of a uint64`
 
 
 	```
@@ -3291,7 +3291,7 @@ number <code>hexutil.Uint64</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -3331,7 +3331,7 @@ func (api *PrivateDebugAPI) SetHead(number hexutil.Uint64) {
 SetMutexProfileFraction sets the rate of mutex profiling.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -3371,7 +3371,7 @@ rate <code>int</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -3411,11 +3411,11 @@ func (*HandlerT) SetMutexProfileFraction(rate int) {
 Stacks returns a printed representation of the stacks of all goroutines.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -3467,7 +3467,7 @@ execution of EVM against a block pulled from the pool of bad ones to the
 local file system and returns a list of files to the caller.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -3482,10 +3482,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -3518,38 +3518,38 @@ config <code>*StdTraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- Debug: 
-			- type: `boolean`
-
 		- DisableMemory: 
 			- type: `boolean`
 
-		- DisableReturnData: 
-			- type: `boolean`
-
-		- DisableStorage: 
-			- type: `boolean`
-
 		- Limit: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-			- type: `string`
-
-		- Reexec: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
 
 		- TxHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
-		- overrides: 
-			- additionalProperties: `true`
+		- Debug: 
+			- type: `boolean`
+
+		- DisableReturnData: 
+			- type: `boolean`
 
 		- DisableStack: 
 			- type: `boolean`
+
+		- DisableStorage: 
+			- type: `boolean`
+
+		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
 
 
 	- type: object
@@ -3607,7 +3607,7 @@ config <code>*StdTraceConfig</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -3620,12 +3620,12 @@ string <code>[]string</code>
 
 	``` Schema
 	
-	- type: array
 	- items: 
 
 			- type: string
 
 
+	- type: array
 
 
 	```
@@ -3695,7 +3695,7 @@ execution of EVM to the local file system and returns a list of files
 to the caller.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -3744,43 +3744,43 @@ config <code>*StdTraceConfig</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
-		- Debug: 
-			- type: `boolean`
-
-		- DisableStorage: 
-			- type: `boolean`
-
 		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
 			- type: `boolean`
 
 		- DisableStack: 
 			- type: `boolean`
 
-		- Limit: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
+		- DisableStorage: 
+			- type: `boolean`
 
 		- Reexec: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-			- type: `string`
 
 		- TxHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
+		- Debug: 
+			- type: `boolean`
+
+		- DisableReturnData: 
+			- type: `boolean`
+
+		- Limit: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+
 		- overrides: 
 			- additionalProperties: `true`
 
 
+	- type: object
 
 
 	```
@@ -3835,7 +3835,7 @@ config <code>*StdTraceConfig</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -3919,7 +3919,7 @@ func (api *PrivateDebugAPI) StandardTraceBlockToFile(ctx context.Context, hash c
 StartCPUProfile turns on CPU profiling, writing to the given file.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -3934,7 +3934,7 @@ file <code>string</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -3990,7 +3990,7 @@ func (h *HandlerT) StartCPUProfile(file string) error {
 StartGoTrace turns on tracing, writing to the given file.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -4005,7 +4005,7 @@ file <code>string</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -4061,11 +4061,11 @@ func (h *HandlerT) StartGoTrace(file string) error {
 StopCPUProfile stops an ongoing CPU profile.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 _None_
 
@@ -4115,11 +4115,11 @@ func (h *HandlerT) StopCPUProfile() error {
 StopTrace stops an ongoing trace.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 _None_
 
@@ -4169,7 +4169,7 @@ func (h *HandlerT) StopGoTrace() error {
 StorageRangeAt returns the storage at the given block height and transaction index.
 
 
-__Params (5)__
+#### Params (5)
 
 Parameters must be given _by position_.  
 
@@ -4184,10 +4184,10 @@ blockHash <code>common.Hash</code>
 
 	``` Schema
 	
+	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 
 
 	```
@@ -4218,10 +4218,10 @@ txIndex <code>int</code>
 
 	``` Schema
 	
-	- title: `integer`
-	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
+	- title: `integer`
+	- description: `Hex representation of the integer`
 
 
 	```
@@ -4252,10 +4252,10 @@ contractAddress <code>common.Address</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
+	- title: `keccak`
 
 
 	```
@@ -4320,10 +4320,10 @@ maxResult <code>int</code>
 
 	``` Schema
 	
+	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
-	- title: `integer`
 
 
 	```
@@ -4345,7 +4345,7 @@ maxResult <code>int</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -4377,9 +4377,9 @@ __Result__
 							- type: `string`
 
 						- value: 
-							- pattern: `^0x[a-fA-F\d]{64}$`
 							- title: `keccak`
 							- type: `string`
+							- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 					- type: `object`
@@ -4486,7 +4486,7 @@ This is a temporary method to debug the externalsigner integration,
 TODO: Remove this method when the integration is mature
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -4501,10 +4501,10 @@ address <code>common.Address</code>
 
 	``` Schema
 	
+	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
-	- title: `keccak`
 
 
 	```
@@ -4535,10 +4535,10 @@ number <code>uint64</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- type: string
 
 
 	```
@@ -4560,7 +4560,7 @@ number <code>uint64</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -4574,10 +4574,10 @@ __Result__
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
+	- title: `keccak`
 
 
 	```
@@ -4663,7 +4663,7 @@ EVM against a block pulled from the pool of bad ones and returns them as a JSON
 object.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -4715,39 +4715,39 @@ config <code>*TraceConfig</code>
 	- type: object
 	- additionalProperties: `false`
 	- properties: 
+		- DisableMemory: 
+			- type: `boolean`
+
 		- DisableReturnData: 
+			- type: `boolean`
+
+		- Timeout: 
+			- type: `string`
+
+		- Tracer: 
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
+
+		- Debug: 
 			- type: `boolean`
 
 		- DisableStack: 
 			- type: `boolean`
 
-		- Limit: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- Tracer: 
-			- type: `string`
-
-		- Debug: 
-			- type: `boolean`
-
-		- DisableMemory: 
-			- type: `boolean`
-
 		- DisableStorage: 
 			- type: `boolean`
+
+		- Limit: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-
-		- Timeout: 
-			- type: `string`
-
-		- overrides: 
-			- additionalProperties: `true`
 
 
 
@@ -4805,7 +4805,7 @@ config <code>*TraceConfig</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -4822,11 +4822,11 @@ txTraceResult <code>[]*txTraceResult</code>
 
 			- additionalProperties: `false`
 			- properties: 
-				- result: 
-					- additionalProperties: `true`
-
 				- error: 
 					- type: `string`
+
+				- result: 
+					- additionalProperties: `true`
 
 
 			- type: object
@@ -4910,7 +4910,7 @@ TraceBlock returns the structured logs created during the execution of EVM
 and returns them as a JSON object.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -4959,22 +4959,17 @@ config <code>*TraceConfig</code>
 
 	``` Schema
 	
+	- type: object
+	- additionalProperties: `false`
 	- properties: 
-		- Limit: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- Reexec: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
 		- Timeout: 
 			- type: `string`
 
 		- Tracer: 
 			- type: `string`
+
+		- Debug: 
+			- type: `boolean`
 
 		- DisableMemory: 
 			- type: `boolean`
@@ -4982,21 +4977,26 @@ config <code>*TraceConfig</code>
 		- DisableReturnData: 
 			- type: `boolean`
 
+		- DisableStorage: 
+			- type: `boolean`
+
 		- DisableStack: 
 			- type: `boolean`
 
-		- DisableStorage: 
-			- type: `boolean`
+		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Reexec: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 
 		- overrides: 
 			- additionalProperties: `true`
 
-		- Debug: 
-			- type: `boolean`
 
-
-	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -5052,7 +5052,7 @@ config <code>*TraceConfig</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -5065,8 +5065,10 @@ txTraceResult <code>[]*txTraceResult</code>
 
 	``` Schema
 	
+	- type: array
 	- items: 
 
+			- additionalProperties: `false`
 			- properties: 
 				- error: 
 					- type: `string`
@@ -5076,10 +5078,8 @@ txTraceResult <code>[]*txTraceResult</code>
 
 
 			- type: object
-			- additionalProperties: `false`
 
 
-	- type: array
 
 
 	```
@@ -5150,7 +5150,7 @@ TraceBlockByHash returns the structured logs created during the execution of
 EVM and returns them as a JSON object.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -5165,10 +5165,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
+	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 
 
 	```
@@ -5204,16 +5204,13 @@ config <code>*TraceConfig</code>
 		- Debug: 
 			- type: `boolean`
 
-		- DisableReturnData: 
-			- type: `boolean`
-
-		- DisableStack: 
+		- DisableMemory: 
 			- type: `boolean`
 
 		- DisableStorage: 
 			- type: `boolean`
 
-		- Limit: 
+		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -5224,13 +5221,16 @@ config <code>*TraceConfig</code>
 		- overrides: 
 			- additionalProperties: `true`
 
-		- DisableMemory: 
+		- DisableReturnData: 
 			- type: `boolean`
 
-		- Reexec: 
-			- type: `string`
+		- DisableStack: 
+			- type: `boolean`
+
+		- Limit: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
 
 		- Timeout: 
 			- type: `string`
@@ -5292,7 +5292,7 @@ config <code>*TraceConfig</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -5307,6 +5307,8 @@ txTraceResult <code>[]*txTraceResult</code>
 	
 	- items: 
 
+			- type: object
+			- additionalProperties: `false`
 			- properties: 
 				- error: 
 					- type: `string`
@@ -5315,8 +5317,6 @@ txTraceResult <code>[]*txTraceResult</code>
 					- additionalProperties: `true`
 
 
-			- type: object
-			- additionalProperties: `false`
 
 
 	- type: array
@@ -5394,7 +5394,7 @@ TraceBlockByNumber returns the structured logs created during the execution of
 EVM and returns them as a JSON object.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -5409,21 +5409,21 @@ number <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
+	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- title: `blockNumberTag`
-			- description: `The block height description`
 			- enum: earliest, latest, pending
 			- type: string
+			- title: `blockNumberTag`
+			- description: `The block height description`
 
 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- type: string
 			- title: `uint64`
 			- description: `Hex representation of a uint64`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- type: string
 
 
-	- title: `blockNumberIdentifier`
 
 
 	```
@@ -5471,32 +5471,31 @@ config <code>*TraceConfig</code>
 
 	``` Schema
 	
-	- additionalProperties: `false`
 	- properties: 
+		- DisableReturnData: 
+			- type: `boolean`
+
+		- Tracer: 
+			- type: `string`
+
+		- Debug: 
+			- type: `boolean`
+
 		- DisableStack: 
 			- type: `boolean`
 
+		- DisableStorage: 
+			- type: `boolean`
+
 		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-
-		- Tracer: 
-			- type: `string`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableStorage: 
-			- type: `boolean`
 
 		- Timeout: 
 			- type: `string`
@@ -5504,11 +5503,12 @@ config <code>*TraceConfig</code>
 		- overrides: 
 			- additionalProperties: `true`
 
-		- Debug: 
+		- DisableMemory: 
 			- type: `boolean`
 
 
 	- type: object
+	- additionalProperties: `false`
 
 
 	```
@@ -5564,7 +5564,7 @@ config <code>*TraceConfig</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -5579,16 +5579,16 @@ txTraceResult <code>[]*txTraceResult</code>
 	
 	- items: 
 
+			- additionalProperties: `false`
 			- properties: 
-				- error: 
-					- type: `string`
-
 				- result: 
 					- additionalProperties: `true`
 
+				- error: 
+					- type: `string`
+
 
 			- type: object
-			- additionalProperties: `false`
 
 
 	- type: array
@@ -5662,7 +5662,7 @@ TraceBlockFromFile returns the structured logs created during the execution of
 EVM and returns them as a JSON object.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -5686,34 +5686,21 @@ config <code>*TraceConfig</code>
 
 	``` Schema
 	
+	- type: object
 	- additionalProperties: `false`
 	- properties: 
-		- Debug: 
-			- type: `boolean`
-
-		- DisableStorage: 
-			- type: `boolean`
-
-		- Reexec: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- Timeout: 
-			- type: `string`
-
 		- DisableMemory: 
 			- type: `boolean`
 
 		- DisableReturnData: 
 			- type: `boolean`
 
-		- DisableStack: 
-			- type: `boolean`
-
 		- Limit: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+
+		- Timeout: 
 			- type: `string`
 
 		- Tracer: 
@@ -5722,8 +5709,21 @@ config <code>*TraceConfig</code>
 		- overrides: 
 			- additionalProperties: `true`
 
+		- Debug: 
+			- type: `boolean`
 
-	- type: object
+		- DisableStack: 
+			- type: `boolean`
+
+		- DisableStorage: 
+			- type: `boolean`
+
+		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+
 
 
 	```
@@ -5779,7 +5779,7 @@ config <code>*TraceConfig</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -5792,9 +5792,9 @@ txTraceResult <code>[]*txTraceResult</code>
 
 	``` Schema
 	
-	- type: array
 	- items: 
 
+			- type: object
 			- additionalProperties: `false`
 			- properties: 
 				- error: 
@@ -5804,9 +5804,9 @@ txTraceResult <code>[]*txTraceResult</code>
 					- additionalProperties: `true`
 
 
-			- type: object
 
 
+	- type: array
 
 
 	```
@@ -5882,7 +5882,7 @@ if the given transaction was added on top of the provided block and returns them
 You can provide -2 as a block number to trace on top of the pending block.
 
 
-__Params (3)__
+#### Params (3)
 
 Parameters must be given _by position_.  
 
@@ -5899,25 +5899,10 @@ args <code>ethapi.CallArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- to: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- value: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- data: 
-			- title: `dataWord`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
 		- from: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
-			- type: `string`
 
 		- gas: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -5925,9 +5910,24 @@ args <code>ethapi.CallArgs</code>
 			- type: `string`
 
 		- gasPrice: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- to: 
+			- title: `keccak`
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+
+		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
 
 
 	- type: object
@@ -6000,15 +6000,10 @@ config <code>*TraceConfig</code>
 
 	``` Schema
 	
+	- type: object
 	- additionalProperties: `false`
 	- properties: 
-		- overrides: 
-			- additionalProperties: `true`
-
 		- Debug: 
-			- type: `boolean`
-
-		- DisableReturnData: 
 			- type: `boolean`
 
 		- DisableStorage: 
@@ -6019,10 +6014,13 @@ config <code>*TraceConfig</code>
 			- title: `integer`
 			- type: `string`
 
-		- Timeout: 
+		- Tracer: 
 			- type: `string`
 
 		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableReturnData: 
 			- type: `boolean`
 
 		- DisableStack: 
@@ -6033,11 +6031,13 @@ config <code>*TraceConfig</code>
 			- title: `integer`
 			- type: `string`
 
-		- Tracer: 
+		- Timeout: 
 			- type: `string`
 
+		- overrides: 
+			- additionalProperties: `true`
 
-	- type: object
+
 
 
 	```
@@ -6093,7 +6093,7 @@ config <code>*TraceConfig</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -6166,7 +6166,7 @@ TraceTransaction returns the structured logs created during the execution of EVM
 and returns them as a JSON object.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -6181,10 +6181,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
+	- title: `keccak`
 
 
 	```
@@ -6215,23 +6215,15 @@ config <code>*TraceConfig</code>
 
 	``` Schema
 	
+	- additionalProperties: `false`
 	- properties: 
-		- DisableStorage: 
-			- type: `boolean`
-
-		- Limit: 
+		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- Debug: 
-			- type: `boolean`
-
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableStack: 
-			- type: `boolean`
+		- Timeout: 
+			- type: `string`
 
 		- Tracer: 
 			- type: `string`
@@ -6242,17 +6234,25 @@ config <code>*TraceConfig</code>
 		- DisableReturnData: 
 			- type: `boolean`
 
-		- Reexec: 
+		- DisableStorage: 
+			- type: `boolean`
+
+		- Limit: 
 			- title: `integer`
 			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 
-		- Timeout: 
-			- type: `string`
+		- Debug: 
+			- type: `boolean`
+
+		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableStack: 
+			- type: `boolean`
 
 
 	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -6308,7 +6308,7 @@ config <code>*TraceConfig</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -6357,7 +6357,7 @@ Verbosity sets the log verbosity ceiling. The verbosity of individual packages
 and source files can be raised using Vmodule.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -6397,7 +6397,7 @@ level <code>int</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -6439,7 +6439,7 @@ Vmodule sets the log verbosity pattern. See package log for details on the
 pattern syntax.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -6454,7 +6454,7 @@ pattern <code>string</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -6495,7 +6495,7 @@ func (*HandlerT) Vmodule(pattern string) error {
 WriteBlockProfile writes a goroutine blocking profile to the given file.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -6510,7 +6510,7 @@ file <code>string</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -6552,7 +6552,7 @@ Note that the profiling rate cannot be set through the API,
 it must be set on the command line.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -6567,7 +6567,7 @@ file <code>string</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -6609,7 +6609,7 @@ func (*HandlerT) WriteMemProfile(file string) error {
 WriteMutexProfile writes a goroutine blocking profile to the given file.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -6624,7 +6624,7 @@ file <code>string</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 

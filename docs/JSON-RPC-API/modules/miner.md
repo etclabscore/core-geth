@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T13:33:54-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -20,11 +20,11 @@
 GetHashrate returns the current hashrate of the miner.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -97,7 +97,7 @@ func (api *PrivateMinerAPI) GetHashrate() uint64 {
 SetEtherbase sets the etherbase of the miner
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -137,7 +137,7 @@ etherbase <code>common.Address</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -186,7 +186,7 @@ func (api *PrivateMinerAPI) SetEtherbase(etherbase common.Address) bool {
 SetExtra sets the extra data string that is included when this miner mines a block.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -201,7 +201,7 @@ extra <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -252,7 +252,7 @@ func (api *PrivateMinerAPI) SetExtra(extra string) (bool, error) {
 SetGasPrice sets the minimum accepted gas price for the miner.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -292,7 +292,7 @@ gasPrice <code>hexutil.Big</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -344,7 +344,7 @@ func (api *PrivateMinerAPI) SetGasPrice(gasPrice hexutil.Big) bool {
 SetRecommitInterval updates the interval for miner sealing work recommitting.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -384,7 +384,7 @@ interval <code>int</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -428,7 +428,7 @@ number of threads allowed to use and updates the minimum price required by the
 transaction pool.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -468,7 +468,7 @@ threads <code>*int</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -516,11 +516,11 @@ Stop terminates the miner, both at the consensus engine level as well as at
 the block creation level.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 _None_
 

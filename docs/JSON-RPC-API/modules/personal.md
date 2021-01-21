@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T13:33:54-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -21,7 +21,7 @@ DeriveAccount requests a HD wallet to derive a new account, optionally pinning
 it for later reuse.
 
 
-__Params (3)__
+#### Params (3)
 
 Parameters must be given _by position_.  
 
@@ -54,7 +54,7 @@ pin <code>*bool</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -68,7 +68,6 @@ __Result__
 
 	``` Schema
 	
-	- additionalProperties: `false`
 	- properties: 
 		- address: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
@@ -76,7 +75,6 @@ __Result__
 			- type: `string`
 
 		- url: 
-			- type: `object`
 			- additionalProperties: `false`
 			- properties: 
 				- Path: 
@@ -86,9 +84,11 @@ __Result__
 					- type: `string`
 
 
+			- type: `object`
 
 
 	- type: object
+	- additionalProperties: `false`
 
 
 	```
@@ -182,7 +182,7 @@ the V value must be 27 or 28 for legacy reasons.
 https://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_ecRecover
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -231,10 +231,10 @@ sig <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
+	- title: `dataWord`
 
 
 	```
@@ -256,7 +256,7 @@ sig <code>hexutil.Bytes</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -270,10 +270,10 @@ __Result__
 
 	``` Schema
 	
+	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
-	- title: `keccak`
 
 
 	```
@@ -350,7 +350,7 @@ ImportRawKey stores the given hex encoded ECDSA key into the key directory,
 encrypting it with the passphrase.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -374,7 +374,7 @@ password <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -457,7 +457,7 @@ func (s *PrivateAccountAPI) ImportRawKey(privkey string, password string) (commo
 InitializeWallet initializes a new wallet at the provided URL, by generating and returning a new private key.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -472,7 +472,7 @@ url <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -538,11 +538,11 @@ func (s *PrivateAccountAPI) InitializeWallet(ctx context.Context, url string) (s
 listAccounts will return a list of addresses for accounts this node manages.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -626,11 +626,11 @@ func (s *PrivateAccountAPI) ListAccounts() [ // listAccounts will return a list 
 ListWallets will return a list of wallets this node manages.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -643,13 +643,13 @@ rawWallet <code>[]rawWallet</code>
 
 	``` Schema
 	
+	- type: array
 	- items: 
 
 			- additionalProperties: `false`
 			- properties: 
 				- accounts: 
 					- items: 
-						- type: `object`
 						- additionalProperties: `false`
 						- properties: 
 							- address: 
@@ -658,6 +658,7 @@ rawWallet <code>[]rawWallet</code>
 								- type: `string`
 
 							- url: 
+								- additionalProperties: `false`
 								- properties: 
 									- Path: 
 										- type: `string`
@@ -667,9 +668,9 @@ rawWallet <code>[]rawWallet</code>
 
 
 								- type: `object`
-								- additionalProperties: `false`
 
 
+						- type: `object`
 
 					- type: `array`
 
@@ -686,7 +687,6 @@ rawWallet <code>[]rawWallet</code>
 			- type: object
 
 
-	- type: array
 
 
 	```
@@ -793,7 +793,7 @@ func (s *PrivateAccountAPI) ListWallets() [ // ListWallets will return a list of
 LockAccount will lock the account associated with the given address when it's unlocked.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -833,7 +833,7 @@ addr <code>common.Address</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -884,7 +884,7 @@ func (s *PrivateAccountAPI) LockAccount(addr common.Address) bool {
 NewAccount will create a new account and returns the address for the new account.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -899,7 +899,7 @@ password <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -913,10 +913,10 @@ __Result__
 
 	``` Schema
 	
-	- title: `keccak`
-	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
+	- title: `keccak`
+	- description: `Hex representation of a Keccak 256 hash POINTER`
 
 
 	```
@@ -986,7 +986,7 @@ the method may return an extra challenge requiring a second open (e.g. the
 Trezor PIN matrix challenge).
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -1010,7 +1010,7 @@ passphrase <code>*string</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 
@@ -1063,7 +1063,7 @@ tries to sign it with the key associated with args.To. If the given passwd isn't
 able to decrypt the key it fails.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -1078,23 +1078,12 @@ args <code>SendTxArgs</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
-		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- from: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
 		- gas: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
 
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -1102,9 +1091,9 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- input: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- nonce: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -1121,7 +1110,18 @@ args <code>SendTxArgs</code>
 			- title: `integer`
 			- type: `string`
 
+		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
 
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+
+	- type: object
 
 
 	```
@@ -1192,7 +1192,7 @@ passwd <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1284,7 +1284,7 @@ The key used to calculate the signature is decrypted with the given password.
 https://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_sign
 
 
-__Params (3)__
+#### Params (3)
 
 Parameters must be given _by position_.  
 
@@ -1299,10 +1299,10 @@ data <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
+	- title: `dataWord`
 
 
 	```
@@ -1333,10 +1333,10 @@ addr <code>common.Address</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -1367,7 +1367,7 @@ passwd <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1460,7 +1460,7 @@ SignAndSendTransaction was renamed to SendTransaction. This method is deprecated
 and will be removed in the future. It primary goal is to give clients time to update.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -1498,14 +1498,14 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- to: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
 
 		- value: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
 
 		- data: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -1589,7 +1589,7 @@ passwd <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1603,10 +1603,10 @@ __Result__
 
 	``` Schema
 	
+	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 
 
 	```
@@ -1666,7 +1666,7 @@ able to decrypt the key it fails. The transaction is returned in RLP-form, not b
 to other nodes
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -1681,18 +1681,21 @@ args <code>SendTxArgs</code>
 
 	``` Schema
 	
-	- type: object
-	- additionalProperties: `false`
 	- properties: 
+		- gasPrice: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- input: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
 
 		- nonce: 
+			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
-			- type: `string`
 
 		- to: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
@@ -1710,21 +1713,18 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- from: 
+			- title: `keccak`
 			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
 
 		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- gasPrice: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
 
 
+	- type: object
+	- additionalProperties: `false`
 
 
 	```
@@ -1795,7 +1795,7 @@ passwd <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1812,13 +1812,13 @@ __Result__
 	- additionalProperties: `false`
 	- properties: 
 		- raw: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- tx: 
-			- additionalProperties: `false`
 			- type: `object`
+			- additionalProperties: `false`
 
 
 	- type: object
@@ -1912,7 +1912,7 @@ the given password for duration seconds. If duration is nil it will use a
 default of 300 seconds. It returns an indication if the account was unlocked.
 
 
-__Params (3)__
+#### Params (3)
 
 Parameters must be given _by position_.  
 
@@ -1927,10 +1927,10 @@ addr <code>common.Address</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
+	- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 	```
@@ -1995,7 +1995,7 @@ duration <code>*uint64</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -2065,7 +2065,7 @@ func (s *PrivateAccountAPI) UnlockAccount(ctx context.Context, addr common.Addre
 Unpair deletes a pairing between wallet and geth.
 
 
-__Params (2)__
+#### Params (2)
 
 Parameters must be given _by position_.  
 
@@ -2089,7 +2089,7 @@ pin <code>string</code>
 
 
 
-__Result__
+#### Result
 
 _None_
 

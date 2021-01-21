@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T13:33:54-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -21,7 +21,7 @@ AddPeer requests connecting to a remote node, and also maintaining the new
 connection at all times, even reconnecting if it is lost.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -36,7 +36,7 @@ url <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -94,7 +94,7 @@ func (api *privateAdminAPI) AddPeer(url string) (bool, error) {
 AddTrustedPeer allows a remote node to always connect, even if slots are full
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -109,7 +109,7 @@ url <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -166,11 +166,11 @@ func (api *privateAdminAPI) AddTrustedPeer(url string) (bool, error) {
 Datadir retrieves the current data directory the node is using.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -217,7 +217,7 @@ func (api *publicAdminAPI) Datadir() string {
 
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -241,10 +241,10 @@ blockNr <code>rpc.BlockNumber</code>
 			- type: string
 
 
-			- type: string
 			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- type: string
 
 
 
@@ -285,7 +285,7 @@ blockNr <code>rpc.BlockNumber</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -335,7 +335,7 @@ ExportChain exports the current blockchain into a local file,
 or a range of blocks if first and last are non-nil
 
 
-__Params (3)__
+#### Params (3)
 
 Parameters must be given _by position_.  
 
@@ -359,10 +359,10 @@ first <code>*uint64</code>
 
 	``` Schema
 	
-	- description: `Hex representation of the integer`
-	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
 	- title: `integer`
+	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
 
 
 	```
@@ -393,10 +393,10 @@ last <code>*uint64</code>
 
 	``` Schema
 	
+	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
-	- title: `integer`
 
 
 	```
@@ -418,7 +418,7 @@ last <code>*uint64</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -494,7 +494,7 @@ func (api *PrivateAdminAPI) ExportChain(file string, first *uint64, last *uint64
 ImportChain imports a blockchain from a local file.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -509,7 +509,7 @@ file <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -593,7 +593,7 @@ func (api *PrivateAdminAPI) ImportChain(file string) (bool, error) {
 MaxPeers sets the maximum peer limit for the protocol manager and the p2p server.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -608,10 +608,10 @@ n <code>int</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
 	- title: `integer`
 	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
+	- type: string
 
 
 	```
@@ -633,7 +633,7 @@ n <code>int</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -691,11 +691,11 @@ NodeInfo retrieves all the information we know about the host node at the
 protocol granularity.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -711,6 +711,28 @@ __Result__
 	
 	- additionalProperties: `false`
 	- properties: 
+		- listenAddr: 
+			- type: `string`
+
+		- name: 
+			- type: `string`
+
+		- ports: 
+			- additionalProperties: `false`
+			- properties: 
+				- discovery: 
+					- title: `integer`
+					- type: `string`
+					- pattern: `^0x[a-fA-F0-9]+$`
+
+				- listener: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+
+			- type: `object`
+
 		- protocols: 
 			- additionalProperties: `false`
 			- properties: 
@@ -720,9 +742,9 @@ __Result__
 					- type: `string`
 
 				- listener: 
-					- type: `string`
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
+					- type: `string`
 
 
 			- type: `object`
@@ -738,28 +760,6 @@ __Result__
 
 		- ip: 
 			- type: `string`
-
-		- listenAddr: 
-			- type: `string`
-
-		- name: 
-			- type: `string`
-
-		- ports: 
-			- additionalProperties: `false`
-			- properties: 
-				- discovery: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-					- type: `string`
-
-				- listener: 
-					- type: `string`
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-
-
-			- type: `object`
 
 
 	- type: object
@@ -874,11 +874,11 @@ Peers retrieves all the information we know about each individual peer at the
 protocol granularity.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -916,9 +916,6 @@ p2pPeerInfo <code>[]*p2p.PeerInfo</code>
 				- network: 
 					- additionalProperties: `false`
 					- properties: 
-						- static: 
-							- type: `boolean`
-
 						- trusted: 
 							- type: `boolean`
 
@@ -930,17 +927,16 @@ p2pPeerInfo <code>[]*p2p.PeerInfo</code>
 
 						- remoteAddress: 
 							- type: `string`
+
+						- static: 
+							- type: `boolean`
 
 
 					- type: `object`
 
 				- protocols: 
-					- type: `object`
 					- additionalProperties: `false`
 					- properties: 
-						- inbound: 
-							- type: `boolean`
-
 						- localAddress: 
 							- type: `string`
 
@@ -953,7 +949,11 @@ p2pPeerInfo <code>[]*p2p.PeerInfo</code>
 						- trusted: 
 							- type: `boolean`
 
+						- inbound: 
+							- type: `boolean`
 
+
+					- type: `object`
 
 
 			- type: object
@@ -1087,7 +1087,7 @@ func (api *publicAdminAPI) Peers() ([ // Peers retrieves all the information we 
 RemovePeer disconnects from a remote node if the connection exists
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -1102,7 +1102,7 @@ url <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1160,7 +1160,7 @@ RemoveTrustedPeer removes a remote node from the trusted peer set, but it
 does not disconnect it automatically.
 
 
-__Params (1)__
+#### Params (1)
 
 Parameters must be given _by position_.  
 
@@ -1175,7 +1175,7 @@ url <code>string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1233,7 +1233,7 @@ func (api *privateAdminAPI) RemoveTrustedPeer(url string) (bool, error) {
 StartRPC starts the HTTP RPC API server.
 
 
-__Params (5)__
+#### Params (5)
 
 Parameters must be given _by position_.  
 
@@ -1257,10 +1257,10 @@ port <code>*int</code>
 
 	``` Schema
 	
-	- title: `integer`
-	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
+	- title: `integer`
+	- description: `Hex representation of the integer`
 
 
 	```
@@ -1309,7 +1309,7 @@ vhosts <code>*string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1397,7 +1397,7 @@ func (api *privateAdminAPI) StartRPC(host *string, port *int, cors *string, apis
 StartWS starts the websocket RPC API server.
 
 
-__Params (4)__
+#### Params (4)
 
 Parameters must be given _by position_.  
 
@@ -1464,7 +1464,7 @@ apis <code>*string</code>
 
 
 
-__Result__
+#### Result
 
 
 
@@ -1548,11 +1548,11 @@ func (api *privateAdminAPI) StartWS(host *string, port *int, allowedOrigins *str
 StopRPC shuts down the HTTP server.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 
@@ -1601,11 +1601,11 @@ func (api *privateAdminAPI) StopRPC() (bool, error) {
 StopWS terminates all WebSocket servers.
 
 
-__Params (0)__
+#### Params (0)
 
 _None_
 
-__Result__
+#### Result
 
 
 

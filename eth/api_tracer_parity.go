@@ -25,9 +25,18 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/rpc"
 )
+
+// TraceFilterArgs represents the arguments for a call.
+type TraceFilterArgs struct {
+	FromBlock   hexutil.Uint64  `json:"fromBlock,omitempty"`   // Trace from this starting block
+	ToBlock     hexutil.Uint64  `json:"toBlock,omitempty"`     // Trace utill this end block
+	FromAddress *common.Address `json:"fromAddress,omitempty"` // Sent from these addresses
+	ToAddress   *common.Address `json:"toAddress,omitempty"`   // Sent to these addresses
+	After       uint64          `json:"after,omitempty"`       // The offset trace number
+	Count       uint64          `json:"count,omitempty"`       // Integer number of traces to display in a batch
+}
 
 // ParityTrace A trace in the desired format (Parity/OpenEtherum) See: https://Parity.github.io/wiki/JSONRPC-trace-module
 type ParityTrace struct {
@@ -171,7 +180,25 @@ func (api *PrivateTraceAPI) Transaction(ctx context.Context, hash common.Hash, c
 	return traceTransaction(ctx, api.eth, hash, config)
 }
 
-func (api *PrivateTraceAPI) Filter(ctx context.Context, args ethapi.CallArgs, config *TraceConfig) ([]*txTraceResult, error) {
-	// config = setConfigTracerToParity(config)
-	return nil, nil
+func (api *PrivateTraceAPI) Filter(ctx context.Context, args TraceFilterArgs, config *TraceConfig) (*rpc.Subscription, error) {
+	config = setConfigTracerToParity(config)
+
+	// Fetch the block interval that we want to trace
+	start := uint64(args.FromBlock)
+	end := uint64(args.ToBlock)
+
+	from := api.eth.blockchain.GetBlockByNumber(start)
+	to := api.eth.blockchain.GetBlockByNumber(end)
+
+	// Trace the chain if we've found all our blocks
+	if from == nil {
+		return nil, fmt.Errorf("starting block #%d not found", start)
+	}
+	if to == nil {
+		return nil, fmt.Errorf("end block #%d not found", end)
+	}
+	if from.Number().Cmp(to.Number()) >= 0 {
+		return nil, fmt.Errorf("end block (#%d) needs to come after start block (#%d)", end, start)
+	}
+	return traceChain(ctx, api.eth, from, to, config)
 }

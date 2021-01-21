@@ -25,6 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -201,4 +202,12 @@ func (api *PrivateTraceAPI) Filter(ctx context.Context, args TraceFilterArgs, co
 		return nil, fmt.Errorf("end block (#%d) needs to come after start block (#%d)", end, start)
 	}
 	return traceChain(ctx, api.eth, from, to, config)
+}
+
+// Call lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
+// if the given transaction was added on top of the provided block and returns them as a JSON object.
+// You can provide -2 as a block number to trace on top of the pending block.
+func (api *PrivateTraceAPI) Call(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+	config = setConfigTracerToParity(config)
+	return traceCall(ctx, api.eth, args, blockNrOrHash, config)
 }

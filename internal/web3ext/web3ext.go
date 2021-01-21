@@ -796,6 +796,12 @@ web3._extend({
 			params: 2,
 			inputFormatter: [null, null]
 		}),
+		new web3._extend.Method({
+			name: 'call',
+			call: 'trace_call',
+			params: 3,
+			inputFormatter: [web3._extend.formatters.inputCallFormatter, null, null]
+		}),
 	],
 	properties: []
 });

@@ -812,16 +812,16 @@ func (api *PrivateDebugAPI) TraceTransaction(ctx context.Context, hash common.Ha
 // TraceCall lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
-func (api *PrivateDebugAPI) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+func traceCall(ctx context.Context, eth *Ethereum, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
 	// First try to retrieve the state
-	statedb, header, err := api.eth.APIBackend.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
+	statedb, header, err := eth.APIBackend.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
 	if err != nil {
 		// Try to retrieve the specified block
 		var block *types.Block
 		if hash, ok := blockNrOrHash.Hash(); ok {
-			block = api.eth.blockchain.GetBlockByHash(hash)
+			block = eth.blockchain.GetBlockByHash(hash)
 		} else if number, ok := blockNrOrHash.Number(); ok {
-			block = api.eth.blockchain.GetBlockByNumber(uint64(number))
+			block = eth.blockchain.GetBlockByNumber(uint64(number))
 		}
 		if block == nil {
 			return nil, fmt.Errorf("block %v not found: %v", blockNrOrHash, err)
@@ -831,16 +831,32 @@ func (api *PrivateDebugAPI) TraceCall(ctx context.Context, args ethapi.CallArgs,
 		if config != nil && config.Reexec != nil {
 			reexec = *config.Reexec
 		}
-		_, _, statedb, err = api.computeTxEnv(block, 0, reexec)
+		_, _, statedb, err = computeTxEnv(eth, block, 0, reexec)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	// Execute the trace
-	msg := args.ToMessage(api.eth.APIBackend.RPCGasCap())
-	vmctx := core.NewEVMContext(msg, header, api.eth.blockchain, nil)
-	return api.traceTx(ctx, msg, vmctx, statedb, config)
+	msg := args.ToMessage(eth.APIBackend.RPCGasCap())
+	vmctx := core.NewEVMContext(msg, header, eth.blockchain, nil)
+
+	// taskExtraContext := map[string]interface{}{
+	// 	"blockNumber":         block.NumberU64(),
+	// 	"blockHash":           blockHash.Hex(),
+	// 	"transactionHash":     tx.Hash().Hex(),
+	// 	"transactionPosition": index,
+	// }
+
+	// return traceTx(ctx, api.eth, msg, vmctx, statedb, taskExtraContext, config)
+	return traceTx(ctx, eth, msg, vmctx, statedb, nil, config)
+}
+
+// TraceCall lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
+// if the given transaction was added on top of the provided block and returns them as a JSON object.
+// You can provide -2 as a block number to trace on top of the pending block.
+func (api *PrivateDebugAPI) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+	return traceCall(ctx, api.eth, args, blockNrOrHash, config)
 }
 
 // traceTx configures a new tracer according to the provided configuration, and

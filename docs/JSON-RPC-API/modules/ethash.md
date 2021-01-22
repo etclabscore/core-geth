@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -38,10 +38,10 @@ _None_
 
 	``` Schema
 	
-	- type: string
 	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- type: string
 
 
 	```
@@ -61,7 +61,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -153,7 +153,7 @@ num4string <code>[4]string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -303,7 +303,7 @@ id <code>common.Hash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -371,10 +371,10 @@ nonce <code>types.BlockNonce</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
+	- title: `integer`
 
 
 	```
@@ -476,7 +476,7 @@ digest <code>common.Hash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 

@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -40,10 +40,10 @@ number <code>rpc.BlockNumber</code>
 	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- enum: earliest, latest, pending
 			- type: string
 			- title: `blockNumberTag`
 			- description: `The block height description`
+			- enum: earliest, latest, pending
 
 
 			- title: `uint64`
@@ -99,44 +99,44 @@ config <code>*TraceConfig</code>
 
 	``` Schema
 	
+	- type: object
 	- additionalProperties: `false`
 	- properties: 
-		- Timeout: 
-			- type: `string`
-
-		- Tracer: 
-			- type: `string`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
-		- DisableStack: 
-			- type: `boolean`
-
-		- DisableStorage: 
-			- type: `boolean`
-
 		- Limit: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-			- type: `string`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- Debug: 
-			- type: `boolean`
-
-		- DisableMemory: 
-			- type: `boolean`
+		- Tracer: 
+			- type: `string`
 
 		- overrides: 
 			- additionalProperties: `true`
 
+		- DisableMemory: 
+			- type: `boolean`
 
-	- type: object
+		- DisableStorage: 
+			- type: `boolean`
+
+		- DisableStack: 
+			- type: `boolean`
+
+		- Timeout: 
+			- type: `string`
+
+		- Debug: 
+			- type: `boolean`
+
+		- DisableReturnData: 
+			- type: `boolean`
+
+
 
 
 	```
@@ -232,7 +232,7 @@ interface <code>[]interface{}</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -324,20 +324,10 @@ args <code>ethapi.CallArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- data: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-
-		- from: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
 		- gas: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
 
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -352,6 +342,16 @@ args <code>ethapi.CallArgs</code>
 		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
+
+		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
 
@@ -418,14 +418,6 @@ config <code>*TraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- DisableStorage: 
-			- type: `boolean`
-
-		- Limit: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
 		- Timeout: 
 			- type: `string`
 
@@ -435,13 +427,15 @@ config <code>*TraceConfig</code>
 		- Debug: 
 			- type: `boolean`
 
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
+		- Limit: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- DisableStack: 
+			- type: `boolean`
+
+		- DisableStorage: 
 			- type: `boolean`
 
 		- Reexec: 
@@ -451,6 +445,12 @@ config <code>*TraceConfig</code>
 
 		- overrides: 
 			- additionalProperties: `true`
+
+		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableReturnData: 
+			- type: `boolean`
 
 
 	- type: object
@@ -524,16 +524,16 @@ txTraceResult <code>[]*txTraceResult</code>
 	
 	- items: 
 
+			- additionalProperties: `false`
 			- properties: 
-				- result: 
-					- additionalProperties: `true`
-
 				- error: 
 					- type: `string`
 
+				- result: 
+					- additionalProperties: `true`
+
 
 			- type: object
-			- additionalProperties: `false`
 
 
 	- type: array
@@ -569,7 +569,7 @@ txTraceResult <code>[]*txTraceResult</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -620,10 +620,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
+	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 
 
 	```
@@ -656,31 +656,11 @@ config <code>*TraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- DisableReturnData: 
+		- DisableMemory: 
 			- type: `boolean`
 
 		- DisableStack: 
 			- type: `boolean`
-
-		- Reexec: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- Timeout: 
-			- type: `string`
-
-		- Debug: 
-			- type: `boolean`
-
-		- DisableMemory: 
-			- type: `boolean`
-
-		- Tracer: 
-			- type: `string`
-
-		- overrides: 
-			- additionalProperties: `true`
 
 		- DisableStorage: 
 			- type: `boolean`
@@ -689,6 +669,26 @@ config <code>*TraceConfig</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Debug: 
+			- type: `boolean`
+
+		- DisableReturnData: 
+			- type: `boolean`
+
+		- Timeout: 
+			- type: `string`
+
+		- Tracer: 
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
 
 
 	- type: object
@@ -758,7 +758,7 @@ interface <code>interface{}</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 

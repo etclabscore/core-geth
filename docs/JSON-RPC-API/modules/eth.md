@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -37,7 +37,6 @@ commonAddress <code>[]common.Address</code>
 
 	``` Schema
 	
-	- type: array
 	- items: 
 
 			- title: `keccak`
@@ -46,6 +45,7 @@ commonAddress <code>[]common.Address</code>
 			- type: string
 
 
+	- type: array
 
 
 	```
@@ -72,7 +72,7 @@ commonAddress <code>[]common.Address</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -149,7 +149,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -208,15 +208,10 @@ args <code>CallArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- value: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
 		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
 
 		- from: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
@@ -236,6 +231,11 @@ args <code>CallArgs</code>
 		- to: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
+
+		- value: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 
@@ -311,19 +311,15 @@ overrides <code>*map[common.Address]account</code>
 	
 	- patternProperties: 
 		- .*: 
+			- additionalProperties: `false`
 			- properties: 
-				- nonce: 
-					- pattern: `^0x([a-fA-F\d])+$`
-					- title: `uint64`
-					- type: `string`
-
 				- state: 
 					- patternProperties: 
 						- .*: 
-							- title: `keccak`
-							- type: `string`
 							- description: `Hex representation of a Keccak 256 hash`
 							- pattern: `^0x[a-fA-F\d]{64}$`
+							- title: `keccak`
+							- type: `string`
 
 
 					- type: `object`
@@ -331,10 +327,10 @@ overrides <code>*map[common.Address]account</code>
 				- stateDiff: 
 					- patternProperties: 
 						- .*: 
+							- description: `Hex representation of a Keccak 256 hash`
 							- pattern: `^0x[a-fA-F\d]{64}$`
 							- title: `keccak`
 							- type: `string`
-							- description: `Hex representation of a Keccak 256 hash`
 
 
 					- type: `object`
@@ -349,9 +345,13 @@ overrides <code>*map[common.Address]account</code>
 					- title: `dataWord`
 					- type: `string`
 
+				- nonce: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
+					- type: `string`
+
 
 			- type: `object`
-			- additionalProperties: `false`
 
 
 	- type: object
@@ -432,10 +432,10 @@ overrides <code>*map[common.Address]account</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
+	- title: `dataWord`
 
 
 	```
@@ -455,7 +455,7 @@ overrides <code>*map[common.Address]account</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -548,7 +548,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -629,7 +629,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -706,7 +706,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -760,6 +760,16 @@ args <code>CallArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- gas: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
@@ -776,19 +786,9 @@ args <code>CallArgs</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
-
-		- from: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
-		- gas: 
 			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
 
 
 	- type: object
@@ -866,10 +866,10 @@ blockNrOrHash <code>*rpc.BlockNumberOrHash</code>
 
 	``` Schema
 	
-	- title: `uint64`
-	- description: `Hex representation of a uint64`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
+	- title: `uint64`
+	- description: `Hex representation of a uint64`
 
 
 	```
@@ -889,7 +889,7 @@ blockNrOrHash <code>*rpc.BlockNumberOrHash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -948,10 +948,10 @@ _None_
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
+	- title: `keccak`
 
 
 	```
@@ -971,7 +971,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1023,9 +1023,23 @@ args <code>SendTxArgs</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
+		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- gasPrice: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- input: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
 		- nonce: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
@@ -1042,31 +1056,17 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- from: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
-
-		- gas: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
 			- type: `string`
 
-		- gasPrice: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
 
-		- input: 
-			- title: `dataWord`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-
+	- type: object
 
 
 	```
@@ -1144,14 +1144,14 @@ args <code>SendTxArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- tx: 
+			- additionalProperties: `false`
+			- type: `object`
+
 		- raw: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
-
-		- tx: 
-			- additionalProperties: `false`
-			- type: `object`
 
 
 	- type: object
@@ -1183,7 +1183,7 @@ args <code>SendTxArgs</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1246,10 +1246,10 @@ _None_
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
+	- title: `integer`
 
 
 	```
@@ -1269,7 +1269,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1323,10 +1323,10 @@ address <code>common.Address</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -1371,10 +1371,10 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
+	- title: `integer`
 
 
 	```
@@ -1394,7 +1394,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1452,10 +1452,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -1502,36 +1502,90 @@ fullTx <code>bool</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- gasLimit: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
+		- error: 
 			- type: `string`
 
-		- logsBloom: 
-			- items: 
-				- description: `Hex representation of the integer`
-				- pattern: `^0x[a-fA-F0-9]+$`
-				- title: `integer`
-				- type: `string`
+		- miner: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
 
-			- maxItems: `256`
-			- minItems: `256`
-			- type: `array`
+		- stateRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
 
-		- number: 
+		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- receiptsRoot: 
+		- mixHash: 
 			- title: `keccak`
 			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
+
+		- parentHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
 
 		- sha3Uncles: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
+
+		- size: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
+		- timestamp: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- totalDifficulty: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- transactionsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- gasLimit: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
+		- logsBloom: 
+			- items: 
+				- title: `integer`
+				- type: `string`
+				- description: `Hex representation of the integer`
+				- pattern: `^0x[a-fA-F0-9]+$`
+
+			- maxItems: `256`
+			- minItems: `256`
+			- type: `array`
+
+		- nonce: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- receiptsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- transactions: 
+			- items: 
+				- additionalProperties: `true`
+
+			- type: `array`
 
 		- uncles: 
 			- items: 
@@ -1542,7 +1596,9 @@ fullTx <code>bool</code>
 
 			- type: `array`
 
-		- error: 
+		- extraData: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
 			- type: `string`
 
 		- gasUsed: 
@@ -1550,70 +1606,14 @@ fullTx <code>bool</code>
 			- title: `uint64`
 			- type: `string`
 
-		- totalDifficulty: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- difficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- miner: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- mixHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- nonce: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- parentHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- stateRoot: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
-		- timestamp: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- transactions: 
-			- items: 
-				- additionalProperties: `true`
-
-			- type: `array`
-
-		- transactionsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- extraData: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
 		- hash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
-		- size: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
+		- number: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 
@@ -1751,7 +1751,7 @@ fullTx <code>bool</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1820,10 +1820,10 @@ number <code>rpc.BlockNumber</code>
 			- description: `The block height description`
 
 
+			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- type: string
-			- title: `uint64`
 
 
 
@@ -1889,79 +1889,10 @@ fullTx <code>bool</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- miner: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- parentHash: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
-		- timestamp: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-
-		- transactionsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- difficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- mixHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- nonce: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- uncles: 
-			- items: 
-				- title: `keccak`
-				- type: `string`
-				- description: `Hex representation of a Keccak 256 hash`
-				- pattern: `^0x[a-fA-F\d]{64}$`
-
-			- type: `array`
-
 		- error: 
 			- type: `string`
 
-		- hash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- receiptsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- size: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- stateRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
 		- gasLimit: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- gasUsed: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
@@ -1977,17 +1908,27 @@ fullTx <code>bool</code>
 			- minItems: `256`
 			- type: `array`
 
-		- number: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
+		- size: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
-		- sha3Uncles: 
+		- timestamp: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- miner: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
-		- totalDifficulty: 
+		- nonce: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- number: 
 			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
@@ -1998,9 +1939,68 @@ fullTx <code>bool</code>
 
 			- type: `array`
 
+		- sha3Uncles: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- totalDifficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- uncles: 
+			- type: `array`
+			- items: 
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+				- type: `string`
+				- description: `Hex representation of a Keccak 256 hash`
+
+
+		- difficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- extraData: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
+			- type: `string`
+
+		- gasUsed: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- mixHash: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+
+		- receiptsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- hash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- parentHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- stateRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- transactionsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
 
@@ -2138,7 +2138,7 @@ fullTx <code>bool</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -2263,7 +2263,7 @@ blockHash <code>common.Hash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -2385,10 +2385,10 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
+	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
-	- title: `uint`
 
 
 	```
@@ -2408,7 +2408,7 @@ blockNr <code>rpc.BlockNumber</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -2463,10 +2463,10 @@ address <code>common.Address</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -2511,10 +2511,10 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
+	- title: `dataWord`
 
 
 	```
@@ -2534,7 +2534,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -2607,7 +2607,7 @@ interface <code>interface{}</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -2703,11 +2703,21 @@ typesLog <code>[]*types.Log</code>
 			- additionalProperties: `false`
 			- properties: 
 				- data: 
+					- type: `string`
 					- pattern: `^0x([a-fA-F0-9]?)+$`
 					- title: `bytes`
+
+				- logIndex: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
 					- type: `string`
 
 				- transactionHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- address: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
 					- type: `string`
@@ -2717,34 +2727,24 @@ typesLog <code>[]*types.Log</code>
 					- title: `integer`
 					- type: `string`
 
-				- blockHash: 
-					- pattern: `^0x[a-fA-F\d]{64}$`
-					- title: `keccak`
-					- type: `string`
-
-				- logIndex: 
-					- title: `integer`
-					- type: `string`
-					- pattern: `^0x[a-fA-F0-9]+$`
-
 				- removed: 
 					- type: `boolean`
 
 				- topics: 
 					- items: 
-						- description: `Hex representation of a Keccak 256 hash`
 						- pattern: `^0x[a-fA-F\d]{64}$`
 						- title: `keccak`
 						- type: `string`
+						- description: `Hex representation of a Keccak 256 hash`
 
 					- type: `array`
 
 				- transactionIndex: 
+					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
 					- type: `string`
-					- pattern: `^0x[a-fA-F0-9]+$`
 
-				- address: 
+				- blockHash: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
 					- type: `string`
@@ -2827,7 +2827,7 @@ typesLog <code>[]*types.Log</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -2931,7 +2931,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -2982,10 +2982,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
+	- title: `keccak`
 
 
 	```
@@ -3023,23 +3023,8 @@ hash <code>common.Hash</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- hash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- mixHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
 		- extraData: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
-			- type: `string`
-
-		- gasLimit: 
-			- title: `uint64`
 			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 
@@ -3048,42 +3033,17 @@ hash <code>common.Hash</code>
 			- title: `uint64`
 			- type: `string`
 
-		- transactionsRoot: 
+		- hash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
-		- miner: 
-			- title: `keccak`
+		- mixHash: 
 			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
-
-		- number: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- timestamp: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-
-		- size: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- stateRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
-			- type: `string`
 
-		- totalDifficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- difficulty: 
+		- nonce: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -3093,13 +3053,42 @@ hash <code>common.Hash</code>
 			- title: `keccak`
 			- type: `string`
 
-		- receiptsRoot: 
+		- sha3Uncles: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- timestamp: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
+		- difficulty: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+
+		- gasLimit: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- miner: 
 			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 
+		- number: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- totalDifficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- logsBloom: 
-			- type: `array`
 			- items: 
 				- description: `Hex representation of the integer`
 				- pattern: `^0x[a-fA-F0-9]+$`
@@ -3108,16 +3097,27 @@ hash <code>common.Hash</code>
 
 			- maxItems: `256`
 			- minItems: `256`
+			- type: `array`
 
-		- nonce: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- sha3Uncles: 
+		- receiptsRoot: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
+
+		- size: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- stateRoot: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+
+		- transactionsRoot: 
+			- title: `keccak`
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 	- type: object
@@ -3236,7 +3236,7 @@ hash <code>common.Hash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -3293,13 +3293,12 @@ number <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- enum: earliest, latest, pending
-			- type: string
 			- title: `blockNumberTag`
 			- description: `The block height description`
+			- enum: earliest, latest, pending
+			- type: string
 
 
 			- title: `uint64`
@@ -3308,6 +3307,7 @@ number <code>rpc.BlockNumber</code>
 			- type: string
 
 
+	- title: `blockNumberIdentifier`
 
 
 	```
@@ -3360,48 +3360,30 @@ number <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
+	- type: object
+	- additionalProperties: `false`
 	- properties: 
-		- gasLimit: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
 		- miner: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
-			- type: `string`
-
-		- mixHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
 
 		- parentHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
-		- size: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
+		- difficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- extraData: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
-		- receiptsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- sha3Uncles: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- transactionsRoot: 
+		- hash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
@@ -3417,49 +3399,67 @@ number <code>rpc.BlockNumber</code>
 			- minItems: `256`
 			- type: `array`
 
+		- gasLimit: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
 		- nonce: 
-			- title: `integer`
 			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- stateRoot: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
+			- title: `integer`
 
 		- totalDifficulty: 
-			- title: `integer`
 			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- difficulty: 
 			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
-		- gasUsed: 
+		- transactionsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- receiptsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- size: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
 
-		- hash: 
+		- stateRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- timestamp: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- gasUsed: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
+		- mixHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
 		- number: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+
+		- sha3Uncles: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
-		- timestamp: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
-
-	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -3575,7 +3575,7 @@ number <code>rpc.BlockNumber</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -3638,31 +3638,8 @@ crit <code>FilterCriteria</code>
 
 	``` Schema
 	
+	- additionalProperties: `false`
 	- properties: 
-		- Addresses: 
-			- items: 
-				- type: `string`
-				- description: `Hex representation of a Keccak 256 hash POINTER`
-				- pattern: `^0x[a-fA-F\d]{64}$`
-				- title: `keccak`
-
-			- type: `array`
-
-		- BlockHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- FromBlock: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- ToBlock: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
 		- Topics: 
 			- items: 
 				- items: 
@@ -3675,9 +3652,32 @@ crit <code>FilterCriteria</code>
 
 			- type: `array`
 
+		- Addresses: 
+			- items: 
+				- description: `Hex representation of a Keccak 256 hash POINTER`
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+				- type: `string`
+
+			- type: `array`
+
+		- BlockHash: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+
+		- FromBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- ToBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 
 	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -3752,19 +3752,32 @@ typesLog <code>[]*types.Log</code>
 
 			- additionalProperties: `false`
 			- properties: 
+				- removed: 
+					- type: `boolean`
+
 				- topics: 
 					- items: 
+						- type: `string`
 						- description: `Hex representation of a Keccak 256 hash`
 						- pattern: `^0x[a-fA-F\d]{64}$`
 						- title: `keccak`
-						- type: `string`
 
 					- type: `array`
 
-				- blockHash: 
+				- transactionHash: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
 					- type: `string`
+
+				- data: 
+					- pattern: `^0x([a-fA-F0-9]?)+$`
+					- title: `bytes`
+					- type: `string`
+
+				- blockHash: 
+					- title: `keccak`
+					- type: `string`
+					- pattern: `^0x[a-fA-F\d]{64}$`
 
 				- blockNumber: 
 					- pattern: `^0x[a-fA-F0-9]+$`
@@ -3776,14 +3789,6 @@ typesLog <code>[]*types.Log</code>
 					- title: `integer`
 					- type: `string`
 
-				- removed: 
-					- type: `boolean`
-
-				- transactionHash: 
-					- type: `string`
-					- pattern: `^0x[a-fA-F\d]{64}$`
-					- title: `keccak`
-
 				- transactionIndex: 
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
@@ -3792,11 +3797,6 @@ typesLog <code>[]*types.Log</code>
 				- address: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
-					- type: `string`
-
-				- data: 
-					- pattern: `^0x([a-fA-F0-9]?)+$`
-					- title: `bytes`
 					- type: `string`
 
 
@@ -3877,7 +3877,7 @@ typesLog <code>[]*types.Log</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -3948,10 +3948,10 @@ address <code>common.Address</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -4036,12 +4036,13 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 	``` Schema
 	
+	- additionalProperties: `false`
 	- properties: 
 		- accountProof: 
-			- type: `array`
 			- items: 
 				- type: `string`
 
+			- type: `array`
 
 		- address: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
@@ -4049,9 +4050,9 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 			- type: `string`
 
 		- balance: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- codeHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
@@ -4070,7 +4071,6 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 		- storageProof: 
 			- items: 
-				- type: `object`
 				- additionalProperties: `false`
 				- properties: 
 					- key: 
@@ -4083,17 +4083,17 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 						- type: `array`
 
 					- value: 
+						- type: `string`
 						- pattern: `^0x[a-fA-F0-9]+$`
 						- title: `integer`
-						- type: `string`
 
 
+				- type: `object`
 
 			- type: `array`
 
 
 	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -4167,7 +4167,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -4280,10 +4280,10 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
+	- title: `uint`
 
 
 	```
@@ -4319,10 +4319,10 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
+	- type: string
 	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 
 
 	```
@@ -4342,7 +4342,7 @@ index <code>hexutil.Uint</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -4399,16 +4399,16 @@ blockNr <code>rpc.BlockNumber</code>
 	- title: `blockNumberIdentifier`
 	- oneOf: 
 
+			- enum: earliest, latest, pending
 			- type: string
 			- title: `blockNumberTag`
 			- description: `The block height description`
-			- enum: earliest, latest, pending
 
 
-			- type: string
 			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- type: string
 
 
 
@@ -4458,10 +4458,10 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
+	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
-	- title: `uint`
 
 
 	```
@@ -4497,10 +4497,10 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -4520,7 +4520,7 @@ index <code>hexutil.Uint</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -4636,7 +4636,7 @@ hash <code>common.Hash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -4778,7 +4778,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -4836,10 +4836,10 @@ blockHash <code>common.Hash</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -4909,17 +4909,55 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- type: object
-	- additionalProperties: `false`
 	- properties: 
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- r: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- blockNumber: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- from: 
 			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 
+		- s: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+
+		- gas: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
+
+		- hash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- input: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- blockHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
 		- to: 
@@ -4932,57 +4970,19 @@ index <code>hexutil.Uint</code>
 			- title: `uint64`
 			- type: `string`
 
-		- s: 
+		- v: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- blockHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
 
-		- blockNumber: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- gas: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-
-		- hash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- input: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- nonce: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- v: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- r: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-
+	- type: object
+	- additionalProperties: `false`
 
 
 	```
@@ -5072,7 +5072,7 @@ index <code>hexutil.Uint</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -5129,10 +5129,10 @@ blockNr <code>rpc.BlockNumber</code>
 	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- type: string
 			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
+			- type: string
 
 
 			- title: `uint64`
@@ -5227,22 +5227,16 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
-		- gasPrice: 
+		- blockHash: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+
+		- blockNumber: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-			- type: `string`
-
-		- input: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- nonce: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
 			- type: `string`
 
 		- r: 
@@ -5250,29 +5244,39 @@ index <code>hexutil.Uint</code>
 			- title: `integer`
 			- type: `string`
 
-		- from: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
-		- hash: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- blockHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- s: 
+		- v: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- gas: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
+			- type: `string`
+
+		- gasPrice: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- hash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- input: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- s: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
 		- to: 
@@ -5281,26 +5285,22 @@ index <code>hexutil.Uint</code>
 			- type: `string`
 
 		- transactionIndex: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
 
-		- v: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
+		- nonce: 
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 
 		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- blockNumber: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
 
-
+	- type: object
 
 
 	```
@@ -5390,7 +5390,7 @@ index <code>hexutil.Uint</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -5444,10 +5444,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -5485,19 +5485,34 @@ hash <code>common.Hash</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- from: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
+		- blockNumber: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- hash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+
+		- nonce: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
+		- r: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- to: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+
+		- v: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- blockHash: 
@@ -5505,29 +5520,19 @@ hash <code>common.Hash</code>
 			- title: `keccak`
 			- type: `string`
 
-		- transactionIndex: 
-			- title: `uint64`
-			- type: `string`
+		- gas: 
 			- pattern: `^0x([a-fA-F\d])+$`
-
-		- v: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
+			- title: `uint64`
 			- type: `string`
 
 		- input: 
+			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
-			- type: `string`
 
-		- nonce: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- r: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
 		- s: 
@@ -5535,25 +5540,20 @@ hash <code>common.Hash</code>
 			- title: `integer`
 			- type: `string`
 
-		- value: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- gas: 
+		- transactionIndex: 
 			- title: `uint64`
 			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
+
+		- value: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-
-		- blockNumber: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 
 	- type: object
@@ -5646,7 +5646,7 @@ hash <code>common.Hash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -5778,7 +5778,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -5906,7 +5906,7 @@ mapstringinterface <code>map[string]interface{}</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -6062,40 +6062,19 @@ index <code>hexutil.Uint</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- transactionsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- hash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- logsBloom: 
-			- maxItems: `256`
-			- minItems: `256`
-			- type: `array`
-			- items: 
-				- description: `Hex representation of the integer`
-				- pattern: `^0x[a-fA-F0-9]+$`
-				- title: `integer`
-				- type: `string`
-
-
-		- number: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- timestamp: 
+		- extraData: 
 			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
+			- title: `dataWord`
 			- type: `string`
 
-		- totalDifficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
+		- receiptsRoot: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+
+		- stateRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
 		- transactions: 
@@ -6104,12 +6083,88 @@ index <code>hexutil.Uint</code>
 
 			- type: `array`
 
+		- difficulty: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- hash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- logsBloom: 
+			- type: `array`
+			- items: 
+				- description: `Hex representation of the integer`
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
+
+			- maxItems: `256`
+			- minItems: `256`
+
+		- miner: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+
+		- parentHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- sha3Uncles: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- gasLimit: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
+		- gasUsed: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- number: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- timestamp: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
+		- totalDifficulty: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- transactionsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
 		- error: 
 			- type: `string`
 
 		- mixHash: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+
+		- nonce: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+
+		- size: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
 		- uncles: 
@@ -6120,61 +6175,6 @@ index <code>hexutil.Uint</code>
 				- type: `string`
 
 			- type: `array`
-
-		- stateRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- gasUsed: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- miner: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- nonce: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- receiptsRoot: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- sha3Uncles: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- size: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- difficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- extraData: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- gasLimit: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- parentHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
 
 
 	- type: object
@@ -6311,7 +6311,7 @@ index <code>hexutil.Uint</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -6377,10 +6377,10 @@ blockNr <code>rpc.BlockNumber</code>
 	- title: `blockNumberIdentifier`
 	- oneOf: 
 
+			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
 			- type: string
-			- title: `blockNumberTag`
 
 
 			- title: `uint64`
@@ -6436,10 +6436,10 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
+	- type: string
 	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 
 
 	```
@@ -6478,50 +6478,23 @@ index <code>hexutil.Uint</code>
 	- additionalProperties: `false`
 	- properties: 
 		- miner: 
+			- title: `keccak`
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+
+		- timestamp: 
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+
+		- transactionsRoot: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
-		- size: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- totalDifficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- uncles: 
-			- items: 
-				- type: `string`
-				- description: `Hex representation of a Keccak 256 hash`
-				- pattern: `^0x[a-fA-F\d]{64}$`
-				- title: `keccak`
-
-			- type: `array`
-
 		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-			- type: `string`
-
-		- number: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- timestamp: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- error: 
-			- type: `string`
-
-		- extraData: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
 			- type: `string`
 
 		- gasLimit: 
@@ -6529,7 +6502,32 @@ index <code>hexutil.Uint</code>
 			- title: `uint64`
 			- type: `string`
 
+		- mixHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- number: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+
+		- uncles: 
+			- items: 
+				- description: `Hex representation of a Keccak 256 hash`
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+				- type: `string`
+
+			- type: `array`
+
 		- logsBloom: 
+			- type: `array`
 			- items: 
 				- pattern: `^0x[a-fA-F0-9]+$`
 				- title: `integer`
@@ -6538,9 +6536,8 @@ index <code>hexutil.Uint</code>
 
 			- maxItems: `256`
 			- minItems: `256`
-			- type: `array`
 
-		- mixHash: 
+		- parentHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
@@ -6550,10 +6547,34 @@ index <code>hexutil.Uint</code>
 			- title: `keccak`
 			- type: `string`
 
-		- transactionsRoot: 
+		- totalDifficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- transactions: 
+			- items: 
+				- additionalProperties: `true`
+
+			- type: `array`
+
+		- sha3Uncles: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
+
+		- size: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- error: 
+			- type: `string`
+
+		- extraData: 
+			- title: `dataWord`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
 
 		- gasUsed: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -6565,31 +6586,10 @@ index <code>hexutil.Uint</code>
 			- title: `keccak`
 			- type: `string`
 
-		- nonce: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- parentHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
 		- receiptsRoot: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
-
-		- sha3Uncles: 
 			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- transactions: 
-			- items: 
-				- additionalProperties: `true`
-
-			- type: `array`
 
 
 	- type: object
@@ -6726,7 +6726,7 @@ index <code>hexutil.Uint</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -6827,10 +6827,10 @@ blockHash <code>common.Hash</code>
 
 	``` Schema
 	
+	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
 	- title: `uint`
-	- description: `Hex representation of a uint`
 
 
 	```
@@ -6850,7 +6850,7 @@ blockHash <code>common.Hash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -6905,12 +6905,13 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
+	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- enum: earliest, latest, pending
-			- type: string
 			- title: `blockNumberTag`
 			- description: `The block height description`
+			- enum: earliest, latest, pending
+			- type: string
 
 
 			- title: `uint64`
@@ -6919,7 +6920,6 @@ blockNr <code>rpc.BlockNumber</code>
 			- type: string
 
 
-	- title: `blockNumberIdentifier`
 
 
 	```
@@ -6972,10 +6972,10 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -6995,7 +6995,7 @@ blockNr <code>rpc.BlockNumber</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -7058,6 +7058,7 @@ num4string <code>[4]string</code>
 
 	``` Schema
 	
+	- type: array
 	- items: 
 
 			- type: string
@@ -7065,7 +7066,6 @@ num4string <code>[4]string</code>
 
 	- maxItems: `4`
 	- minItems: `4`
-	- type: array
 
 
 	```
@@ -7091,7 +7091,7 @@ num4string <code>[4]string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -7191,7 +7191,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -7243,7 +7243,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -7298,7 +7298,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -7390,30 +7390,6 @@ crit <code>FilterCriteria</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- Addresses: 
-			- items: 
-				- title: `keccak`
-				- type: `string`
-				- description: `Hex representation of a Keccak 256 hash POINTER`
-				- pattern: `^0x[a-fA-F\d]{64}$`
-
-			- type: `array`
-
-		- BlockHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- FromBlock: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- ToBlock: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
 		- Topics: 
 			- items: 
 				- items: 
@@ -7425,6 +7401,30 @@ crit <code>FilterCriteria</code>
 				- type: `array`
 
 			- type: `array`
+
+		- Addresses: 
+			- items: 
+				- type: `string`
+				- description: `Hex representation of a Keccak 256 hash POINTER`
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+
+			- type: `array`
+
+		- BlockHash: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+
+		- FromBlock: 
+			- title: `integer`
+			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- ToBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
 
 
 	- type: object
@@ -7497,7 +7497,7 @@ crit <code>FilterCriteria</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -7592,7 +7592,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -7675,7 +7675,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -7756,42 +7756,28 @@ RPCTransaction <code>[]*RPCTransaction</code>
 	
 	- items: 
 
+			- type: object
 			- additionalProperties: `false`
 			- properties: 
-				- v: 
-					- type: `string`
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-
-				- blockNumber: 
-					- type: `string`
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-
-				- from: 
+				- hash: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
 					- type: `string`
 
-				- s: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
+				- transactionIndex: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
 					- type: `string`
 
 				- value: 
+					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
 					- type: `string`
-					- pattern: `^0x[a-fA-F0-9]+$`
 
 				- blockHash: 
 					- title: `keccak`
 					- type: `string`
 					- pattern: `^0x[a-fA-F\d]{64}$`
-
-				- gasPrice: 
-					- title: `integer`
-					- type: `string`
-					- pattern: `^0x[a-fA-F0-9]+$`
 
 				- r: 
 					- pattern: `^0x[a-fA-F0-9]+$`
@@ -7799,28 +7785,28 @@ RPCTransaction <code>[]*RPCTransaction</code>
 					- type: `string`
 
 				- to: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
 					- type: `string`
-					- pattern: `^0x[a-fA-F\d]{64}$`
-
-				- transactionIndex: 
-					- title: `uint64`
-					- type: `string`
-					- pattern: `^0x([a-fA-F\d])+$`
 
 				- gas: 
 					- pattern: `^0x([a-fA-F\d])+$`
 					- title: `uint64`
 					- type: `string`
 
-				- hash: 
-					- pattern: `^0x[a-fA-F\d]{64}$`
-					- title: `keccak`
+				- gasPrice: 
+					- type: `string`
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+
+				- blockNumber: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
 					- type: `string`
 
-				- nonce: 
-					- pattern: `^0x([a-fA-F\d])+$`
-					- title: `uint64`
+				- from: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
 					- type: `string`
 
 				- input: 
@@ -7828,8 +7814,22 @@ RPCTransaction <code>[]*RPCTransaction</code>
 					- title: `dataWord`
 					- type: `string`
 
+				- nonce: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
+					- type: `string`
 
-			- type: object
+				- s: 
+					- type: `string`
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+
+				- v: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+
 
 
 	- type: array
@@ -7929,7 +7929,7 @@ RPCTransaction <code>[]*RPCTransaction</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -8005,10 +8005,10 @@ _None_
 
 	``` Schema
 	
-	- type: string
 	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -8028,7 +8028,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -8082,15 +8082,30 @@ sendArgs <code>SendTxArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- gas: 
+			- title: `uint64`
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+
+		- gasPrice: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- input: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
 		- nonce: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
 
 		- to: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
 
 		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -8103,24 +8118,9 @@ sendArgs <code>SendTxArgs</code>
 			- type: `string`
 
 		- from: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
-
-		- gas: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- gasPrice: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- input: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
+			- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 	- type: object
@@ -8228,10 +8228,10 @@ gasLimit <code>*hexutil.Uint64</code>
 
 	``` Schema
 	
-	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `uint64`
 	- description: `Hex representation of a uint64`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -8290,7 +8290,7 @@ gasLimit <code>*hexutil.Uint64</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -8451,7 +8451,7 @@ encodedTx <code>hexutil.Bytes</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -8508,28 +8508,22 @@ args <code>SendTxArgs</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
-		- from: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
 		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- gasPrice: 
-			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- input: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
 
 		- nonce: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -8547,11 +8541,17 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- data: 
-			- title: `dataWord`
 			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+
+		- from: 
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 
 
+	- type: object
 
 
 	```
@@ -8650,7 +8650,7 @@ args <code>SendTxArgs</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -8761,10 +8761,10 @@ data <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -8800,10 +8800,10 @@ data <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -8823,7 +8823,7 @@ data <code>hexutil.Bytes</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -8901,9 +8901,9 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- gasPrice: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
 
 		- input: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -9012,7 +9012,6 @@ args <code>SendTxArgs</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
 		- raw: 
@@ -9025,6 +9024,7 @@ args <code>SendTxArgs</code>
 			- type: `object`
 
 
+	- type: object
 
 
 	```
@@ -9053,7 +9053,7 @@ args <code>SendTxArgs</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -9134,10 +9134,10 @@ rate <code>hexutil.Uint64</code>
 
 	``` Schema
 	
-	- title: `uint64`
-	- description: `Hex representation of a uint64`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
+	- title: `uint64`
+	- description: `Hex representation of a uint64`
 
 
 	```
@@ -9168,10 +9168,10 @@ id <code>common.Hash</code>
 
 	``` Schema
 	
+	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 
 
 	```
@@ -9205,7 +9205,7 @@ id <code>common.Hash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -9273,10 +9273,10 @@ nonce <code>types.BlockNonce</code>
 
 	``` Schema
 	
+	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
 	- type: string
-	- title: `integer`
 
 
 	```
@@ -9378,7 +9378,7 @@ digest <code>common.Hash</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -9462,7 +9462,7 @@ subscriptionID <code>rpc.ID</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -9520,7 +9520,7 @@ interface <code>interface{}</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -9595,7 +9595,7 @@ id <code>rpc.ID</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -9661,7 +9661,7 @@ id <code>rpc.ID</code>
 
 _None_
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 

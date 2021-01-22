@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -68,14 +68,10 @@ pin <code>*bool</code>
 
 	``` Schema
 	
+	- type: object
+	- additionalProperties: `false`
 	- properties: 
-		- address: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
 		- url: 
-			- additionalProperties: `false`
 			- properties: 
 				- Path: 
 					- type: `string`
@@ -85,10 +81,14 @@ pin <code>*bool</code>
 
 
 			- type: `object`
+			- additionalProperties: `false`
+
+		- address: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
 
 
-	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -125,7 +125,7 @@ pin <code>*bool</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -231,10 +231,10 @@ sig <code>hexutil.Bytes</code>
 
 	``` Schema
 	
+	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
-	- title: `dataWord`
 
 
 	```
@@ -270,10 +270,10 @@ sig <code>hexutil.Bytes</code>
 
 	``` Schema
 	
+	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 
 
 	```
@@ -293,7 +293,7 @@ sig <code>hexutil.Bytes</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -411,7 +411,7 @@ password <code>string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -484,7 +484,7 @@ url <code>string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -557,10 +557,10 @@ commonAddress <code>[]common.Address</code>
 	
 	- items: 
 
+			- title: `keccak`
 			- description: `Hex representation of a Keccak 256 hash POINTER`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- type: string
-			- title: `keccak`
 
 
 	- type: array
@@ -590,7 +590,7 @@ commonAddress <code>[]common.Address</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -643,12 +643,16 @@ rawWallet <code>[]rawWallet</code>
 
 	``` Schema
 	
-	- type: array
 	- items: 
 
+			- type: object
 			- additionalProperties: `false`
 			- properties: 
+				- url: 
+					- type: `string`
+
 				- accounts: 
+					- type: `array`
 					- items: 
 						- additionalProperties: `false`
 						- properties: 
@@ -658,7 +662,6 @@ rawWallet <code>[]rawWallet</code>
 								- type: `string`
 
 							- url: 
-								- additionalProperties: `false`
 								- properties: 
 									- Path: 
 										- type: `string`
@@ -668,11 +671,11 @@ rawWallet <code>[]rawWallet</code>
 
 
 								- type: `object`
+								- additionalProperties: `false`
 
 
 						- type: `object`
 
-					- type: `array`
 
 				- failure: 
 					- type: `string`
@@ -680,13 +683,10 @@ rawWallet <code>[]rawWallet</code>
 				- status: 
 					- type: `string`
 
-				- url: 
-					- type: `string`
 
 
-			- type: object
 
-
+	- type: array
 
 
 	```
@@ -748,7 +748,7 @@ rawWallet <code>[]rawWallet</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -808,10 +808,10 @@ addr <code>common.Address</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
+	- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 	```
@@ -845,7 +845,7 @@ addr <code>common.Address</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -936,7 +936,7 @@ password <code>string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1014,7 +1014,7 @@ passphrase <code>*string</code>
 
 _None_
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1080,35 +1080,10 @@ args <code>SendTxArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- gas: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- gasPrice: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- input: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- nonce: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- to: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
 		- value: 
+			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-			- type: `string`
 
 		- data: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -1116,6 +1091,31 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- from: 
+			- title: `keccak`
+			- type: `string`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+
+		- gas: 
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+
+		- gasPrice: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- input: 
+			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- to: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
@@ -1206,10 +1206,10 @@ passwd <code>string</code>
 
 	``` Schema
 	
-	- title: `keccak`
-	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
+	- title: `keccak`
+	- description: `Hex representation of a Keccak 256 hash`
 
 
 	```
@@ -1229,7 +1229,7 @@ passwd <code>string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1381,10 +1381,10 @@ passwd <code>string</code>
 
 	``` Schema
 	
-	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `dataWord`
 	- description: `Hex representation of some bytes`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- type: string
 
 
 	```
@@ -1404,7 +1404,7 @@ passwd <code>string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1475,8 +1475,19 @@ args <code>SendTxArgs</code>
 
 	``` Schema
 	
+	- type: object
 	- additionalProperties: `false`
 	- properties: 
+		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
 		- gas: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
@@ -1488,14 +1499,14 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- input: 
+			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
-			- type: `string`
 
 		- nonce: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
 
 		- to: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
@@ -1507,18 +1518,7 @@ args <code>SendTxArgs</code>
 			- title: `integer`
 			- type: `string`
 
-		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
 
-		- from: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-
-	- type: object
 
 
 	```
@@ -1603,10 +1603,10 @@ passwd <code>string</code>
 
 	``` Schema
 	
-	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- type: string
 
 
 	```
@@ -1626,7 +1626,7 @@ passwd <code>string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1681,6 +1681,7 @@ args <code>SendTxArgs</code>
 
 	``` Schema
 	
+	- additionalProperties: `false`
 	- properties: 
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -1693,9 +1694,9 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- nonce: 
+			- title: `uint64`
 			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
 
 		- to: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
@@ -1713,18 +1714,17 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
 
 		- gas: 
-			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
+			- pattern: `^0x([a-fA-F\d])+$`
 
 
 	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -1850,7 +1850,7 @@ passwd <code>string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1927,10 +1927,10 @@ addr <code>common.Address</code>
 
 	``` Schema
 	
+	- pattern: `^0x[a-fA-F\d]{64}$`
 	- type: string
 	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
-	- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 	```
@@ -2007,7 +2007,7 @@ duration <code>*uint64</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -2093,7 +2093,7 @@ pin <code>string</code>
 
 _None_
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 

@@ -180,7 +180,7 @@ _None_
 {{- end }}
 {{- end }}
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 

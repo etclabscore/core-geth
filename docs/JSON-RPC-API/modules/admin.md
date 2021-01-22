@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -48,7 +48,7 @@ url <code>string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -121,7 +121,7 @@ url <code>string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -182,7 +182,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -235,10 +235,10 @@ blockNr <code>rpc.BlockNumber</code>
 	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
 			- type: string
+			- title: `blockNumberTag`
 
 
 			- title: `uint64`
@@ -297,7 +297,7 @@ blockNr <code>rpc.BlockNumber</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -430,7 +430,7 @@ last <code>*uint64</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -521,7 +521,7 @@ file <code>string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -645,7 +645,7 @@ n <code>int</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -709,8 +709,13 @@ _None_
 
 	``` Schema
 	
-	- additionalProperties: `false`
 	- properties: 
+		- id: 
+			- type: `string`
+
+		- ip: 
+			- type: `string`
+
 		- listenAddr: 
 			- type: `string`
 
@@ -721,20 +726,19 @@ _None_
 			- additionalProperties: `false`
 			- properties: 
 				- discovery: 
+					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
 					- type: `string`
-					- pattern: `^0x[a-fA-F0-9]+$`
 
 				- listener: 
+					- type: `string`
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
-					- type: `string`
 
 
 			- type: `object`
 
 		- protocols: 
-			- additionalProperties: `false`
 			- properties: 
 				- discovery: 
 					- pattern: `^0x[a-fA-F0-9]+$`
@@ -748,6 +752,7 @@ _None_
 
 
 			- type: `object`
+			- additionalProperties: `false`
 
 		- enode: 
 			- type: `string`
@@ -755,14 +760,9 @@ _None_
 		- enr: 
 			- type: `string`
 
-		- id: 
-			- type: `string`
-
-		- ip: 
-			- type: `string`
-
 
 	- type: object
+	- additionalProperties: `false`
 
 
 	```
@@ -832,7 +832,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -895,6 +895,51 @@ p2pPeerInfo <code>[]*p2p.PeerInfo</code>
 
 			- additionalProperties: `false`
 			- properties: 
+				- name: 
+					- type: `string`
+
+				- network: 
+					- additionalProperties: `false`
+					- properties: 
+						- static: 
+							- type: `boolean`
+
+						- trusted: 
+							- type: `boolean`
+
+						- inbound: 
+							- type: `boolean`
+
+						- localAddress: 
+							- type: `string`
+
+						- remoteAddress: 
+							- type: `string`
+
+
+					- type: `object`
+
+				- protocols: 
+					- additionalProperties: `false`
+					- properties: 
+						- trusted: 
+							- type: `boolean`
+
+						- inbound: 
+							- type: `boolean`
+
+						- localAddress: 
+							- type: `string`
+
+						- remoteAddress: 
+							- type: `string`
+
+						- static: 
+							- type: `boolean`
+
+
+					- type: `object`
+
 				- caps: 
 					- items: 
 						- type: `string`
@@ -909,51 +954,6 @@ p2pPeerInfo <code>[]*p2p.PeerInfo</code>
 
 				- id: 
 					- type: `string`
-
-				- name: 
-					- type: `string`
-
-				- network: 
-					- additionalProperties: `false`
-					- properties: 
-						- trusted: 
-							- type: `boolean`
-
-						- inbound: 
-							- type: `boolean`
-
-						- localAddress: 
-							- type: `string`
-
-						- remoteAddress: 
-							- type: `string`
-
-						- static: 
-							- type: `boolean`
-
-
-					- type: `object`
-
-				- protocols: 
-					- additionalProperties: `false`
-					- properties: 
-						- localAddress: 
-							- type: `string`
-
-						- remoteAddress: 
-							- type: `string`
-
-						- static: 
-							- type: `boolean`
-
-						- trusted: 
-							- type: `boolean`
-
-						- inbound: 
-							- type: `boolean`
-
-
-					- type: `object`
 
 
 			- type: object
@@ -1046,7 +1046,7 @@ p2pPeerInfo <code>[]*p2p.PeerInfo</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1114,7 +1114,7 @@ url <code>string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1187,7 +1187,7 @@ url <code>string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1257,10 +1257,10 @@ port <code>*int</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
 	- title: `integer`
 	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
+	- type: string
 
 
 	```
@@ -1321,7 +1321,7 @@ vhosts <code>*string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1476,7 +1476,7 @@ apis <code>*string</code>
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1564,7 +1564,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -1617,7 +1617,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 

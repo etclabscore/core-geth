@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-21T17:27:32-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -36,7 +36,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -90,10 +90,10 @@ _None_
 
 	``` Schema
 	
-	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
 	- type: string
+	- title: `uint`
 
 
 	```
@@ -113,7 +113,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 
@@ -165,7 +165,7 @@ _None_
 
 
 
-__Client Method Invocation Examples__
+#### Client Method Invocation Examples
 
 === "Shell"
 

@@ -72,3 +72,5 @@ markdown_extensions:
       social_url_shorthand: true
   - pymdownx.tasklist:
       custom_checkbox: true
+  - pymdownx.highlight:
+      linenums: true

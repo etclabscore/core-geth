@@ -1,3 +1,6 @@
 nav.md-nav.md-nav--secondary > ul ul {
   display: none;
 }
+nav.md-nav.md-nav--secondary > ul ul ul {
+  display: none;
+}

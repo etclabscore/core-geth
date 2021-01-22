@@ -8,7 +8,7 @@
 
 The `Makefile` at the root of the project includes many commands that can be useful for testing.
 
-!!! note "_make_ is not _required_"
+!!! note "`make` is not required"
     Please keep in mind that while you _can_ use `make` to run tests, you don't have to.
     You can also use plain old `go test` (and `go build`) as you would in any Go project.
 

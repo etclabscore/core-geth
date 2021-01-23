@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:50:40-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -154,7 +154,7 @@ etherbase <code>common.Address</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "miner_setEtherbase", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "miner_setEtherbase", "params": [<etherbase>]}'
 	```
 
 === "Javascript Console"
@@ -218,7 +218,7 @@ extra <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "miner_setExtra", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "miner_setExtra", "params": [<extra>]}'
 	```
 
 === "Javascript Console"
@@ -309,7 +309,7 @@ gasPrice <code>hexutil.Big</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "miner_setGasPrice", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "miner_setGasPrice", "params": [<gasPrice>]}'
 	```
 
 === "Javascript Console"
@@ -393,7 +393,7 @@ _None_
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "miner_setRecommitInterval", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "miner_setRecommitInterval", "params": [<interval>]}'
 	```
 
 === "Javascript Console"
@@ -477,7 +477,7 @@ _None_
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "miner_start", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "miner_start", "params": [<threads>]}'
 	```
 
 === "Javascript Console"

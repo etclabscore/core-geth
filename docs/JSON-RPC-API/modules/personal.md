@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:50:40-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -130,7 +130,7 @@ pin <code>*bool</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_deriveAccount", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_deriveAccount", "params": [<url>, <path>, <pin>]}'
 	```
 
 === "Javascript Console"
@@ -298,7 +298,7 @@ sig <code>hexutil.Bytes</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_ecRecover", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_ecRecover", "params": [<data>, <sig>]}'
 	```
 
 === "Javascript Console"
@@ -416,7 +416,7 @@ password <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_importRawKey", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_importRawKey", "params": [<privkey>, <password>]}'
 	```
 
 === "Javascript Console"
@@ -489,7 +489,7 @@ url <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_initializeWallet", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_initializeWallet", "params": [<url>]}'
 	```
 
 === "Javascript Console"
@@ -850,7 +850,7 @@ addr <code>common.Address</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_lockAccount", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_lockAccount", "params": [<addr>]}'
 	```
 
 === "Javascript Console"
@@ -941,7 +941,7 @@ password <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_newAccount", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_newAccount", "params": [<password>]}'
 	```
 
 === "Javascript Console"
@@ -1019,7 +1019,7 @@ _None_
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_openWallet", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_openWallet", "params": [<url>, <passphrase>]}'
 	```
 
 === "Javascript Console"
@@ -1234,7 +1234,7 @@ passwd <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_sendTransaction", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_sendTransaction", "params": [<args>, <passwd>]}'
 	```
 
 === "Javascript Console"
@@ -1409,7 +1409,7 @@ passwd <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_sign", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_sign", "params": [<data>, <addr>, <passwd>]}'
 	```
 
 === "Javascript Console"
@@ -1631,7 +1631,7 @@ passwd <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_signAndSendTransaction", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_signAndSendTransaction", "params": [<args>, <passwd>]}'
 	```
 
 === "Javascript Console"
@@ -1855,7 +1855,7 @@ passwd <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_signTransaction", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_signTransaction", "params": [<args>, <passwd>]}'
 	```
 
 === "Javascript Console"
@@ -2012,7 +2012,7 @@ duration <code>*uint64</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_unlockAccount", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_unlockAccount", "params": [<addr>, <password>, <duration>]}'
 	```
 
 === "Javascript Console"
@@ -2098,7 +2098,7 @@ _None_
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_unpair", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "personal_unpair", "params": [<url>, <pin>]}'
 	```
 
 === "Javascript Console"

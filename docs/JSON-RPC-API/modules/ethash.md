@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:50:40-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -308,7 +308,7 @@ id <code>common.Hash</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "ethash_submitHashRate", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "ethash_submitHashRate", "params": [<rate>, <id>]}'
 	```
 
 === "Javascript Console"
@@ -481,7 +481,7 @@ digest <code>common.Hash</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "ethash_submitWork", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "ethash_submitWork", "params": [<nonce>, <hash>, <digest>]}'
 	```
 
 === "Javascript Console"

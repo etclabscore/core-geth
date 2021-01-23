@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:50:40-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -237,7 +237,7 @@ interface <code>[]interface{}</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "trace_block", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "trace_block", "params": [<number>, <config>]}'
 	```
 
 === "Javascript Console"
@@ -574,7 +574,7 @@ txTraceResult <code>[]*txTraceResult</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "trace_filter", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "trace_filter", "params": [<args>, <config>]}'
 	```
 
 === "Javascript Console"
@@ -763,7 +763,7 @@ interface <code>interface{}</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "trace_transaction", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "trace_transaction", "params": [<hash>, <config>]}'
 	```
 
 === "Javascript Console"

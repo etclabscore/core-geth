@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:50:40-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -53,7 +53,7 @@ url <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_addPeer", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_addPeer", "params": [<url>]}'
 	```
 
 === "Javascript Console"
@@ -126,7 +126,7 @@ url <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_addTrustedPeer", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_addTrustedPeer", "params": [<url>]}'
 	```
 
 === "Javascript Console"
@@ -302,7 +302,7 @@ blockNr <code>rpc.BlockNumber</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_ecbp1100", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_ecbp1100", "params": [<blockNr>]}'
 	```
 
 === "Javascript Console"
@@ -435,7 +435,7 @@ last <code>*uint64</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_exportChain", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_exportChain", "params": [<file>, <first>, <last>]}'
 	```
 
 === "Javascript Console"
@@ -526,7 +526,7 @@ file <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_importChain", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_importChain", "params": [<file>]}'
 	```
 
 === "Javascript Console"
@@ -650,7 +650,7 @@ n <code>int</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_maxPeers", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_maxPeers", "params": [<n>]}'
 	```
 
 === "Javascript Console"
@@ -1119,7 +1119,7 @@ url <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_removePeer", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_removePeer", "params": [<url>]}'
 	```
 
 === "Javascript Console"
@@ -1192,7 +1192,7 @@ url <code>string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_removeTrustedPeer", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_removeTrustedPeer", "params": [<url>]}'
 	```
 
 === "Javascript Console"
@@ -1326,7 +1326,7 @@ vhosts <code>*string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_startRPC", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_startRPC", "params": [<host>, <port>, <cors>, <apis>, <vhosts>]}'
 	```
 
 === "Javascript Console"
@@ -1481,7 +1481,7 @@ apis <code>*string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_startWS", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "admin_startWS", "params": [<host>, <port>, <allowedOrigins>, <apis>]}'
 	```
 
 === "Javascript Console"

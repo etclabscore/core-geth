@@ -60,6 +60,31 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 
 	tpl := template.New("openrpc_doc")
 
+	trimNameSpecialChars := func(s string) string {
+		remove := []string{".", "*"}
+		for _, r := range remove {
+			s = strings.ReplaceAll(s, r, "")
+		}
+		return s
+	}
+
+	contentDescriptorGenericName := func(cd *meta_schema.ContentDescriptorObject) (name string) {
+		defer func() {
+			name = fmt.Sprintf("<%s>", name) // make it generic-looking
+		}()
+		if cd.Description == nil {
+			return string(*cd.Name)
+		}
+		if cd.Name == nil {
+			return string(*cd.Description)
+		}
+		tr := trimNameSpecialChars(string(*cd.Description))
+		if string(*cd.Name) == tr {
+			return string(*cd.Description)
+		}
+		return string(*cd.Name)
+	}
+
 	tpl.Funcs(template.FuncMap{
 		// tomap gives a plain map from a JSON representation of a given value.
 		// This is useful because the meta_schema data types, being generated, and conforming to a pretty
@@ -82,13 +107,9 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 		// method will also remove, eg '*hexutil.Uint64' -> 'hexutilUint64'.
 		// These "special" characters were removed because of concerns about by-name arguments
 		// and the use of titles for keys.
-		"trimNameSpecialChars": func(s string) string {
-			remove := []string{".", "*"}
-			for _, r := range remove {
-				s = strings.ReplaceAll(s, r, "")
-			}
-			return s
-		},
+		"trimNameSpecialChars": trimNameSpecialChars,
+		// contentDescriptorTitle returns the name or description, in that order.
+		"contentDescriptorGenericName": contentDescriptorGenericName,
 		// methodFormatJSConsole is a pretty-printer that returns the JS console use example for a method.
 		"methodFormatJSConsole": func(m *meta_schema.MethodObject) string {
 			name := string(*m.Name)
@@ -112,6 +133,19 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 				return
 			}()
 			return fmt.Sprintf("%s(%s);", formattedName, strings.Join(paramNames, ","))
+		},
+		// methodFormatCURL is a pretty printer that returns the 'curl' method invocation example string.
+		"methodFormatCURL": func(m *meta_schema.MethodObject) string {
+			paramNames := ""
+			if m.Params != nil {
+					out := []string{}
+					for _, p := range *m.Params {
+						out = append(out, contentDescriptorGenericName(p.ContentDescriptorObject))
+					}
+					paramNames = strings.Join(out, ", ")
+			}
+
+			return fmt.Sprintf(`curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)
 		},
 	})
 
@@ -186,7 +220,7 @@ _None_
 === "Shell"
 
 	` + "```" + ` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "{{ .Name }}", "params": []}'
+	{{ methodFormatCURL . }}
 	` + "```" + `
 
 === "Javascript Console"

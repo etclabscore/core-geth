@@ -138,11 +138,11 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 		"methodFormatCURL": func(m *meta_schema.MethodObject) string {
 			paramNames := ""
 			if m.Params != nil {
-					out := []string{}
-					for _, p := range *m.Params {
-						out = append(out, contentDescriptorGenericName(p.ContentDescriptorObject))
-					}
-					paramNames = strings.Join(out, ", ")
+				out := []string{}
+				for _, p := range *m.Params {
+					out = append(out, contentDescriptorGenericName(p.ContentDescriptorObject))
+				}
+				paramNames = strings.Join(out, ", ")
 			}
 
 			return fmt.Sprintf(`curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)

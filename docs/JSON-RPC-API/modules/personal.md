@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -68,10 +68,15 @@ pin <code>*bool</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
+		- address: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
 		- url: 
+			- additionalProperties: `false`
 			- properties: 
 				- Path: 
 					- type: `string`
@@ -81,14 +86,9 @@ pin <code>*bool</code>
 
 
 			- type: `object`
-			- additionalProperties: `false`
-
-		- address: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
 
 
+	- type: object
 
 
 	```
@@ -197,9 +197,9 @@ data <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -231,9 +231,9 @@ sig <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -270,10 +270,10 @@ sig <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
 
 
 	```
@@ -388,9 +388,9 @@ password <code>string</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -557,9 +557,9 @@ commonAddress <code>[]common.Address</code>
 	
 	- items: 
 
-			- title: `keccak`
 			- description: `Hex representation of a Keccak 256 hash POINTER`
 			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: string
 
 
@@ -645,14 +645,9 @@ rawWallet <code>[]rawWallet</code>
 	
 	- items: 
 
-			- type: object
 			- additionalProperties: `false`
 			- properties: 
-				- url: 
-					- type: `string`
-
 				- accounts: 
-					- type: `array`
 					- items: 
 						- additionalProperties: `false`
 						- properties: 
@@ -662,6 +657,7 @@ rawWallet <code>[]rawWallet</code>
 								- type: `string`
 
 							- url: 
+								- additionalProperties: `false`
 								- properties: 
 									- Path: 
 										- type: `string`
@@ -671,11 +667,11 @@ rawWallet <code>[]rawWallet</code>
 
 
 								- type: `object`
-								- additionalProperties: `false`
 
 
 						- type: `object`
 
+					- type: `array`
 
 				- failure: 
 					- type: `string`
@@ -683,7 +679,11 @@ rawWallet <code>[]rawWallet</code>
 				- status: 
 					- type: `string`
 
+				- url: 
+					- type: `string`
 
+
+			- type: object
 
 
 	- type: array
@@ -808,10 +808,10 @@ addr <code>common.Address</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
 
 
 	```
@@ -913,10 +913,10 @@ password <code>string</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
 
 
 	```
@@ -1080,25 +1080,20 @@ args <code>SendTxArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- value: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
 		- data: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
 
 		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
 
 		- gas: 
-			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
+			- type: `string`
 
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -1106,9 +1101,9 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- input: 
-			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
+			- type: `string`
 
 		- nonce: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -1118,6 +1113,11 @@ args <code>SendTxArgs</code>
 		- to: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
+
+		- value: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 
@@ -1206,10 +1206,10 @@ passwd <code>string</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
 
 
 	```
@@ -1301,8 +1301,8 @@ data <code>hexutil.Bytes</code>
 	
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `dataWord`
+	- type: string
 
 
 	```
@@ -1333,9 +1333,9 @@ addr <code>common.Address</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -1381,9 +1381,9 @@ passwd <code>string</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -1475,7 +1475,6 @@ args <code>SendTxArgs</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
 		- data: 
@@ -1499,14 +1498,14 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- input: 
-			- type: `string`
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
+			- type: `string`
 
 		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- to: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
@@ -1519,6 +1518,7 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 
+	- type: object
 
 
 	```
@@ -1603,9 +1603,9 @@ passwd <code>string</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -1683,31 +1683,6 @@ args <code>SendTxArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- gasPrice: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- input: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- nonce: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- to: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- value: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
 		- data: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
@@ -1719,9 +1694,34 @@ args <code>SendTxArgs</code>
 			- type: `string`
 
 		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
+
+		- gasPrice: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- input: 
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- to: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- value: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
 
 
 	- type: object
@@ -1817,8 +1817,8 @@ passwd <code>string</code>
 			- type: `string`
 
 		- tx: 
-			- type: `object`
 			- additionalProperties: `false`
+			- type: `object`
 
 
 	- type: object
@@ -1927,10 +1927,10 @@ addr <code>common.Address</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
 
 
 	```
@@ -1970,9 +1970,9 @@ duration <code>*uint64</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 

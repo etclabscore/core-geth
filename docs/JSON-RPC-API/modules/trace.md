@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -37,21 +37,21 @@ number <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- type: string
-			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
-
-
-			- title: `uint64`
-			- description: `Hex representation of a uint64`
-			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `blockNumberTag`
 			- type: string
 
 
+			- description: `Hex representation of a uint64`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: string
+
+
+	- title: `blockNumberIdentifier`
 
 
 	```
@@ -99,17 +99,34 @@ config <code>*TraceConfig</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
+		- Debug: 
+			- type: `boolean`
+
+		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableReturnData: 
+			- type: `boolean`
+
+		- DisableStack: 
+			- type: `boolean`
+
+		- DisableStorage: 
+			- type: `boolean`
+
 		- Limit: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
+
+		- Timeout: 
 			- type: `string`
 
 		- Tracer: 
@@ -118,25 +135,8 @@ config <code>*TraceConfig</code>
 		- overrides: 
 			- additionalProperties: `true`
 
-		- DisableMemory: 
-			- type: `boolean`
 
-		- DisableStorage: 
-			- type: `boolean`
-
-		- DisableStack: 
-			- type: `boolean`
-
-		- Timeout: 
-			- type: `string`
-
-		- Debug: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
-
+	- type: object
 
 
 	```
@@ -324,10 +324,20 @@ args <code>ethapi.CallArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
 		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -342,16 +352,6 @@ args <code>ethapi.CallArgs</code>
 		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-			- type: `string`
-
-		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- from: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
 			- type: `string`
 
 
@@ -418,19 +418,14 @@ config <code>*TraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- Timeout: 
-			- type: `string`
-
-		- Tracer: 
-			- type: `string`
-
 		- Debug: 
 			- type: `boolean`
 
-		- Limit: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
+		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableReturnData: 
+			- type: `boolean`
 
 		- DisableStack: 
 			- type: `boolean`
@@ -438,19 +433,24 @@ config <code>*TraceConfig</code>
 		- DisableStorage: 
 			- type: `boolean`
 
+		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
+		- Timeout: 
+			- type: `string`
+
+		- Tracer: 
+			- type: `string`
+
 		- overrides: 
 			- additionalProperties: `true`
-
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
 
 
 	- type: object
@@ -620,10 +620,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
 
 
 	```
@@ -656,7 +656,13 @@ config <code>*TraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- Debug: 
+			- type: `boolean`
+
 		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableReturnData: 
 			- type: `boolean`
 
 		- DisableStack: 
@@ -674,12 +680,6 @@ config <code>*TraceConfig</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-
-		- Debug: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
 
 		- Timeout: 
 			- type: `string`

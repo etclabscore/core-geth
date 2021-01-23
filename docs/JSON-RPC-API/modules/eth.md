@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -39,9 +39,9 @@ commonAddress <code>[]common.Address</code>
 	
 	- items: 
 
-			- title: `keccak`
 			- description: `Hex representation of a Keccak 256 hash POINTER`
 			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: string
 
 
@@ -126,9 +126,9 @@ _None_
 
 	``` Schema
 	
-	- title: `uint64`
 	- description: `Hex representation of a uint64`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint64`
 	- type: string
 
 
@@ -209,9 +209,9 @@ args <code>CallArgs</code>
 	- additionalProperties: `false`
 	- properties: 
 		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- from: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
@@ -313,6 +313,21 @@ overrides <code>*map[common.Address]account</code>
 		- .*: 
 			- additionalProperties: `false`
 			- properties: 
+				- balance: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- code: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `dataWord`
+					- type: `string`
+
+				- nonce: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
+					- type: `string`
+
 				- state: 
 					- patternProperties: 
 						- .*: 
@@ -334,21 +349,6 @@ overrides <code>*map[common.Address]account</code>
 
 
 					- type: `object`
-
-				- balance: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-					- type: `string`
-
-				- code: 
-					- pattern: `^0x([a-fA-F\d])+$`
-					- title: `dataWord`
-					- type: `string`
-
-				- nonce: 
-					- pattern: `^0x([a-fA-F\d])+$`
-					- title: `uint64`
-					- type: `string`
 
 
 			- type: `object`
@@ -434,8 +434,8 @@ overrides <code>*map[common.Address]account</code>
 	
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `dataWord`
+	- type: string
 
 
 	```
@@ -525,9 +525,9 @@ _None_
 
 	``` Schema
 	
-	- title: `uint64`
 	- description: `Hex representation of a uint64`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint64`
 	- type: string
 
 
@@ -606,9 +606,9 @@ _None_
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -683,9 +683,9 @@ _None_
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -760,15 +760,20 @@ args <code>CallArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
 		- from: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
 		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -781,14 +786,9 @@ args <code>CallArgs</code>
 			- type: `string`
 
 		- value: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- data: 
-			- title: `dataWord`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 
 	- type: object
@@ -866,10 +866,10 @@ blockNrOrHash <code>*rpc.BlockNumberOrHash</code>
 
 	``` Schema
 	
-	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
-	- title: `uint64`
 	- description: `Hex representation of a uint64`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint64`
+	- type: string
 
 
 	```
@@ -950,8 +950,8 @@ _None_
 	
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 	- title: `keccak`
+	- type: string
 
 
 	```
@@ -1025,6 +1025,16 @@ args <code>SendTxArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
 		- gas: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
@@ -1053,16 +1063,6 @@ args <code>SendTxArgs</code>
 		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-			- type: `string`
-
-		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- from: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
 			- type: `string`
 
 
@@ -1144,14 +1144,14 @@ args <code>SendTxArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- tx: 
-			- additionalProperties: `false`
-			- type: `object`
-
 		- raw: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
+
+		- tx: 
+			- additionalProperties: `false`
+			- type: `object`
 
 
 	- type: object
@@ -1248,8 +1248,8 @@ _None_
 	
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
 	- title: `integer`
+	- type: string
 
 
 	```
@@ -1323,9 +1323,9 @@ address <code>common.Address</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -1373,8 +1373,8 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 	
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
 	- title: `integer`
+	- type: string
 
 
 	```
@@ -1452,9 +1452,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -1502,103 +1502,22 @@ fullTx <code>bool</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- error: 
-			- type: `string`
-
-		- miner: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- stateRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
 		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- mixHash: 
-			- title: `keccak`
+		- error: 
 			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
-		- parentHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- sha3Uncles: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- size: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- timestamp: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- totalDifficulty: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- transactionsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- gasLimit: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- logsBloom: 
-			- items: 
-				- title: `integer`
-				- type: `string`
-				- description: `Hex representation of the integer`
-				- pattern: `^0x[a-fA-F0-9]+$`
-
-			- maxItems: `256`
-			- minItems: `256`
-			- type: `array`
-
-		- nonce: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- receiptsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- transactions: 
-			- items: 
-				- additionalProperties: `true`
-
-			- type: `array`
-
-		- uncles: 
-			- items: 
-				- description: `Hex representation of a Keccak 256 hash`
-				- pattern: `^0x[a-fA-F\d]{64}$`
-				- title: `keccak`
-				- type: `string`
-
-			- type: `array`
 
 		- extraData: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
+			- type: `string`
+
+		- gasLimit: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
 		- gasUsed: 
@@ -1611,10 +1530,91 @@ fullTx <code>bool</code>
 			- title: `keccak`
 			- type: `string`
 
+		- logsBloom: 
+			- items: 
+				- description: `Hex representation of the integer`
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
+
+			- maxItems: `256`
+			- minItems: `256`
+			- type: `array`
+
+		- miner: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- mixHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- number: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- parentHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- receiptsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- sha3Uncles: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- size: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- stateRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- timestamp: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- totalDifficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- transactions: 
+			- items: 
+				- additionalProperties: `true`
+
+			- type: `array`
+
+		- transactionsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- uncles: 
+			- items: 
+				- description: `Hex representation of a Keccak 256 hash`
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+				- type: `string`
+
+			- type: `array`
 
 
 	- type: object
@@ -1811,21 +1811,21 @@ number <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- enum: earliest, latest, pending
-			- type: string
-			- title: `blockNumberTag`
 			- description: `The block height description`
+			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
+			- type: string
 
 
-			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: string
 
 
+	- title: `blockNumberIdentifier`
 
 
 	```
@@ -1889,78 +1889,12 @@ fullTx <code>bool</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- error: 
-			- type: `string`
-
-		- gasLimit: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- logsBloom: 
-			- items: 
-				- pattern: `^0x[a-fA-F0-9]+$`
-				- title: `integer`
-				- type: `string`
-				- description: `Hex representation of the integer`
-
-			- maxItems: `256`
-			- minItems: `256`
-			- type: `array`
-
-		- size: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- timestamp: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- miner: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- nonce: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- number: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- transactions: 
-			- items: 
-				- additionalProperties: `true`
-
-			- type: `array`
-
-		- sha3Uncles: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- totalDifficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- uncles: 
-			- type: `array`
-			- items: 
-				- pattern: `^0x[a-fA-F\d]{64}$`
-				- title: `keccak`
-				- type: `string`
-				- description: `Hex representation of a Keccak 256 hash`
-
-
 		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
+
+		- error: 
 			- type: `string`
 
 		- extraData: 
@@ -1968,19 +1902,14 @@ fullTx <code>bool</code>
 			- title: `dataWord`
 			- type: `string`
 
-		- gasUsed: 
+		- gasLimit: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
 
-		- mixHash: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- receiptsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
+		- gasUsed: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
 		- hash: 
@@ -1988,9 +1917,55 @@ fullTx <code>bool</code>
 			- title: `keccak`
 			- type: `string`
 
+		- logsBloom: 
+			- items: 
+				- description: `Hex representation of the integer`
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
+
+			- maxItems: `256`
+			- minItems: `256`
+			- type: `array`
+
+		- miner: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- mixHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- number: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- parentHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
+
+		- receiptsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- sha3Uncles: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- size: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
 		- stateRoot: 
@@ -1998,10 +1973,35 @@ fullTx <code>bool</code>
 			- title: `keccak`
 			- type: `string`
 
+		- timestamp: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- totalDifficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- transactions: 
+			- items: 
+				- additionalProperties: `true`
+
+			- type: `array`
+
 		- transactionsRoot: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
+
+		- uncles: 
+			- items: 
+				- description: `Hex representation of a Keccak 256 hash`
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+				- type: `string`
+
+			- type: `array`
 
 
 	- type: object
@@ -2201,9 +2201,9 @@ blockHash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -2240,9 +2240,9 @@ blockHash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint`
 	- type: string
 
 
@@ -2318,21 +2318,21 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
 			- type: string
 
 
-			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: string
 
 
+	- title: `blockNumberIdentifier`
 
 
 	```
@@ -2385,9 +2385,9 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint`
 	- type: string
 
 
@@ -2463,9 +2463,9 @@ address <code>common.Address</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -2513,8 +2513,8 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 	
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `dataWord`
+	- type: string
 
 
 	```
@@ -2702,22 +2702,12 @@ typesLog <code>[]*types.Log</code>
 
 			- additionalProperties: `false`
 			- properties: 
-				- data: 
-					- type: `string`
-					- pattern: `^0x([a-fA-F0-9]?)+$`
-					- title: `bytes`
-
-				- logIndex: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-					- type: `string`
-
-				- transactionHash: 
+				- address: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
 					- type: `string`
 
-				- address: 
+				- blockHash: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
 					- type: `string`
@@ -2727,26 +2717,36 @@ typesLog <code>[]*types.Log</code>
 					- title: `integer`
 					- type: `string`
 
+				- data: 
+					- pattern: `^0x([a-fA-F0-9]?)+$`
+					- title: `bytes`
+					- type: `string`
+
+				- logIndex: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
 				- removed: 
 					- type: `boolean`
 
 				- topics: 
 					- items: 
+						- description: `Hex representation of a Keccak 256 hash`
 						- pattern: `^0x[a-fA-F\d]{64}$`
 						- title: `keccak`
 						- type: `string`
-						- description: `Hex representation of a Keccak 256 hash`
 
 					- type: `array`
+
+				- transactionHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
 
 				- transactionIndex: 
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
-					- type: `string`
-
-				- blockHash: 
-					- pattern: `^0x[a-fA-F\d]{64}$`
-					- title: `keccak`
 					- type: `string`
 
 
@@ -2908,9 +2908,9 @@ _None_
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -2984,8 +2984,8 @@ hash <code>common.Hash</code>
 	
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 	- title: `keccak`
+	- type: string
 
 
 	```
@@ -3023,10 +3023,20 @@ hash <code>common.Hash</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- difficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- extraData: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
+
+		- gasLimit: 
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
 
 		- gasUsed: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -3036,56 +3046,6 @@ hash <code>common.Hash</code>
 		- hash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
-			- type: `string`
-
-		- mixHash: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- nonce: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- parentHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- sha3Uncles: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- timestamp: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- difficulty: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- gasLimit: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- miner: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- number: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- totalDifficulty: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
 			- type: `string`
 
 		- logsBloom: 
@@ -3099,7 +3059,37 @@ hash <code>common.Hash</code>
 			- minItems: `256`
 			- type: `array`
 
+		- miner: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- mixHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- number: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- parentHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
 		- receiptsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- sha3Uncles: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
@@ -3110,14 +3100,24 @@ hash <code>common.Hash</code>
 			- type: `string`
 
 		- stateRoot: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
+
+		- timestamp: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- totalDifficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
 
 		- transactionsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 	- type: object
@@ -3295,15 +3295,15 @@ number <code>rpc.BlockNumber</code>
 	
 	- oneOf: 
 
-			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
 			- type: string
 
 
-			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: string
 
 
@@ -3360,19 +3360,8 @@ number <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
-		- miner: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- parentHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
 		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
@@ -3383,6 +3372,16 @@ number <code>rpc.BlockNumber</code>
 			- title: `dataWord`
 			- type: `string`
 
+		- gasLimit: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- gasUsed: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
 		- hash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
@@ -3390,36 +3389,46 @@ number <code>rpc.BlockNumber</code>
 
 		- logsBloom: 
 			- items: 
+				- description: `Hex representation of the integer`
 				- pattern: `^0x[a-fA-F0-9]+$`
 				- title: `integer`
 				- type: `string`
-				- description: `Hex representation of the integer`
 
 			- maxItems: `256`
 			- minItems: `256`
 			- type: `array`
 
-		- gasLimit: 
-			- title: `uint64`
+		- miner: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
+
+		- mixHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
 
 		- nonce: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-
-		- totalDifficulty: 
 			- type: `string`
+
+		- number: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
 
-		- transactionsRoot: 
+		- parentHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
 		- receiptsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- sha3Uncles: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
@@ -3439,27 +3448,18 @@ number <code>rpc.BlockNumber</code>
 			- title: `uint64`
 			- type: `string`
 
-		- gasUsed: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- mixHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- number: 
-			- type: `string`
+		- totalDifficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
 
-		- sha3Uncles: 
+		- transactionsRoot: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
 
+	- type: object
 
 
 	```
@@ -3640,6 +3640,30 @@ crit <code>FilterCriteria</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- Addresses: 
+			- items: 
+				- description: `Hex representation of a Keccak 256 hash POINTER`
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+				- type: `string`
+
+			- type: `array`
+
+		- BlockHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- FromBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- ToBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- Topics: 
 			- items: 
 				- items: 
@@ -3651,30 +3675,6 @@ crit <code>FilterCriteria</code>
 				- type: `array`
 
 			- type: `array`
-
-		- Addresses: 
-			- items: 
-				- description: `Hex representation of a Keccak 256 hash POINTER`
-				- pattern: `^0x[a-fA-F\d]{64}$`
-				- title: `keccak`
-				- type: `string`
-
-			- type: `array`
-
-		- BlockHash: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- FromBlock: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- ToBlock: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
 
 
 	- type: object
@@ -3752,15 +3752,40 @@ typesLog <code>[]*types.Log</code>
 
 			- additionalProperties: `false`
 			- properties: 
+				- address: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- blockHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- blockNumber: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- data: 
+					- pattern: `^0x([a-fA-F0-9]?)+$`
+					- title: `bytes`
+					- type: `string`
+
+				- logIndex: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
 				- removed: 
 					- type: `boolean`
 
 				- topics: 
 					- items: 
-						- type: `string`
 						- description: `Hex representation of a Keccak 256 hash`
 						- pattern: `^0x[a-fA-F\d]{64}$`
 						- title: `keccak`
+						- type: `string`
 
 					- type: `array`
 
@@ -3769,34 +3794,9 @@ typesLog <code>[]*types.Log</code>
 					- title: `keccak`
 					- type: `string`
 
-				- data: 
-					- pattern: `^0x([a-fA-F0-9]?)+$`
-					- title: `bytes`
-					- type: `string`
-
-				- blockHash: 
-					- title: `keccak`
-					- type: `string`
-					- pattern: `^0x[a-fA-F\d]{64}$`
-
-				- blockNumber: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-					- type: `string`
-
-				- logIndex: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-					- type: `string`
-
 				- transactionIndex: 
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
-					- type: `string`
-
-				- address: 
-					- pattern: `^0x[a-fA-F\d]{64}$`
-					- title: `keccak`
 					- type: `string`
 
 
@@ -3948,9 +3948,9 @@ address <code>common.Address</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -4083,9 +4083,9 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 						- type: `array`
 
 					- value: 
-						- type: `string`
 						- pattern: `^0x[a-fA-F0-9]+$`
 						- title: `integer`
+						- type: `string`
 
 
 				- type: `object`
@@ -4246,9 +4246,9 @@ blockHash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -4282,8 +4282,8 @@ index <code>hexutil.Uint</code>
 	
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `uint`
+	- type: string
 
 
 	```
@@ -4319,10 +4319,10 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
+	- type: string
 
 
 	```
@@ -4396,21 +4396,21 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- enum: earliest, latest, pending
-			- type: string
-			- title: `blockNumberTag`
 			- description: `The block height description`
+			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
+			- type: string
 
 
-			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: string
 
 
+	- title: `blockNumberIdentifier`
 
 
 	```
@@ -4458,9 +4458,9 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint`
 	- type: string
 
 
@@ -4497,9 +4497,9 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -4574,9 +4574,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -4613,9 +4613,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -4698,9 +4698,9 @@ address <code>common.Address</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -4755,9 +4755,9 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -4836,9 +4836,9 @@ blockHash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -4870,9 +4870,9 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint`
 	- type: string
 
 
@@ -4909,15 +4909,11 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
+	- additionalProperties: `false`
 	- properties: 
-		- nonce: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- r: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
+		- blockHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
 		- blockNumber: 
@@ -4926,19 +4922,14 @@ index <code>hexutil.Uint</code>
 			- type: `string`
 
 		- from: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
-
-		- s: 
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
 
 		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -4955,9 +4946,19 @@ index <code>hexutil.Uint</code>
 			- title: `dataWord`
 			- type: `string`
 
-		- blockHash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- r: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- s: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- to: 
@@ -4982,7 +4983,6 @@ index <code>hexutil.Uint</code>
 
 
 	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -5126,21 +5126,21 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
 			- type: string
 
 
-			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: string
 
 
+	- title: `blockNumberIdentifier`
 
 
 	```
@@ -5188,9 +5188,9 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint`
 	- type: string
 
 
@@ -5230,23 +5230,18 @@ index <code>hexutil.Uint</code>
 	- additionalProperties: `false`
 	- properties: 
 		- blockHash: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
 
 		- blockNumber: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- r: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- v: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
 		- gas: 
@@ -5269,14 +5264,19 @@ index <code>hexutil.Uint</code>
 			- title: `dataWord`
 			- type: `string`
 
-		- s: 
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- r: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- from: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
+		- s: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- to: 
@@ -5285,14 +5285,14 @@ index <code>hexutil.Uint</code>
 			- type: `string`
 
 		- transactionIndex: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
-		- nonce: 
+		- v: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
 
 		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -5444,9 +5444,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -5485,37 +5485,17 @@ hash <code>common.Hash</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- blockHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
 		- blockNumber: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
-		- hash: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
-		- nonce: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- r: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- to: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- v: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- blockHash: 
+		- from: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
@@ -5525,14 +5505,29 @@ hash <code>common.Hash</code>
 			- title: `uint64`
 			- type: `string`
 
-		- input: 
+		- gasPrice: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
 
-		- from: 
+		- hash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
+
+		- input: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- r: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- s: 
@@ -5540,17 +5535,22 @@ hash <code>common.Hash</code>
 			- title: `integer`
 			- type: `string`
 
+		- to: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
 		- transactionIndex: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
-		- value: 
+		- v: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
-		- gasPrice: 
+		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -5707,9 +5707,9 @@ address <code>common.Address</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -5755,9 +5755,9 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 	``` Schema
 	
-	- title: `uint64`
 	- description: `Hex representation of a uint64`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint64`
 	- type: string
 
 
@@ -5841,9 +5841,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -5987,9 +5987,9 @@ blockHash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -6021,9 +6021,9 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint`
 	- type: string
 
 
@@ -6062,31 +6062,28 @@ index <code>hexutil.Uint</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- difficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- error: 
+			- type: `string`
+
 		- extraData: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
 
-		- receiptsRoot: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- stateRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
+		- gasLimit: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
-		- transactions: 
-			- items: 
-				- additionalProperties: `true`
-
-			- type: `array`
-
-		- difficulty: 
-			- title: `integer`
+		- gasUsed: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- hash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
@@ -6094,7 +6091,6 @@ index <code>hexutil.Uint</code>
 			- type: `string`
 
 		- logsBloom: 
-			- type: `array`
 			- items: 
 				- description: `Hex representation of the integer`
 				- pattern: `^0x[a-fA-F0-9]+$`
@@ -6103,13 +6099,34 @@ index <code>hexutil.Uint</code>
 
 			- maxItems: `256`
 			- minItems: `256`
+			- type: `array`
 
 		- miner: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
+
+		- mixHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- number: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
 
 		- parentHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- receiptsRoot: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
@@ -6119,52 +6136,35 @@ index <code>hexutil.Uint</code>
 			- title: `keccak`
 			- type: `string`
 
-		- gasLimit: 
-			- title: `uint64`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- gasUsed: 
+		- size: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
 
-		- number: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
+		- stateRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
 		- timestamp: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- totalDifficulty: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
+
+		- transactions: 
+			- items: 
+				- additionalProperties: `true`
+
+			- type: `array`
 
 		- transactionsRoot: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
-			- type: `string`
-
-		- error: 
-			- type: `string`
-
-		- mixHash: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- nonce: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- size: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
 			- type: `string`
 
 		- uncles: 
@@ -6374,21 +6374,21 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
 			- type: string
 
 
-			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: string
 
 
+	- title: `blockNumberIdentifier`
 
 
 	```
@@ -6436,10 +6436,10 @@ index <code>hexutil.Uint</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint`
+	- type: string
 
 
 	```
@@ -6477,29 +6477,48 @@ index <code>hexutil.Uint</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- miner: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-
-		- timestamp: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-
-		- transactionsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
 		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
+		- error: 
+			- type: `string`
+
+		- extraData: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
 		- gasLimit: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
+			- type: `string`
+
+		- gasUsed: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- hash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- logsBloom: 
+			- items: 
+				- description: `Hex representation of the integer`
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
+
+			- maxItems: `256`
+			- minItems: `256`
+			- type: `array`
+
+		- miner: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: `string`
 
 		- mixHash: 
@@ -6513,38 +6532,38 @@ index <code>hexutil.Uint</code>
 			- type: `string`
 
 		- number: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-
-		- uncles: 
-			- items: 
-				- description: `Hex representation of a Keccak 256 hash`
-				- pattern: `^0x[a-fA-F\d]{64}$`
-				- title: `keccak`
-				- type: `string`
-
-			- type: `array`
-
-		- logsBloom: 
-			- type: `array`
-			- items: 
-				- pattern: `^0x[a-fA-F0-9]+$`
-				- title: `integer`
-				- type: `string`
-				- description: `Hex representation of the integer`
-
-			- maxItems: `256`
-			- minItems: `256`
+			- type: `string`
 
 		- parentHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
+		- receiptsRoot: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- sha3Uncles: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- size: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
 		- stateRoot: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
+			- type: `string`
+
+		- timestamp: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
 		- totalDifficulty: 
@@ -6558,38 +6577,19 @@ index <code>hexutil.Uint</code>
 
 			- type: `array`
 
-		- sha3Uncles: 
+		- transactionsRoot: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
 
-		- size: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
+		- uncles: 
+			- items: 
+				- description: `Hex representation of a Keccak 256 hash`
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+				- type: `string`
 
-		- error: 
-			- type: `string`
-
-		- extraData: 
-			- title: `dataWord`
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-
-		- gasUsed: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- hash: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- receiptsRoot: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
+			- type: `array`
 
 
 	- type: object
@@ -6788,9 +6788,9 @@ blockHash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -6829,8 +6829,8 @@ blockHash <code>common.Hash</code>
 	
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `uint`
+	- type: string
 
 
 	```
@@ -6905,21 +6905,21 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `blockNumberIdentifier`
 	- oneOf: 
 
-			- title: `blockNumberTag`
 			- description: `The block height description`
 			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
 			- type: string
 
 
-			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: string
 
 
+	- title: `blockNumberIdentifier`
 
 
 	```
@@ -6972,9 +6972,9 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint`
 	- type: string
 
 
@@ -7058,7 +7058,6 @@ num4string <code>[4]string</code>
 
 	``` Schema
 	
-	- type: array
 	- items: 
 
 			- type: string
@@ -7066,6 +7065,7 @@ num4string <code>[4]string</code>
 
 	- maxItems: `4`
 	- minItems: `4`
+	- type: array
 
 
 	```
@@ -7168,9 +7168,9 @@ _None_
 
 	``` Schema
 	
-	- title: `uint64`
 	- description: `Hex representation of a uint64`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint64`
 	- type: string
 
 
@@ -7390,6 +7390,30 @@ crit <code>FilterCriteria</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- Addresses: 
+			- items: 
+				- description: `Hex representation of a Keccak 256 hash POINTER`
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+				- type: `string`
+
+			- type: `array`
+
+		- BlockHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- FromBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- ToBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- Topics: 
 			- items: 
 				- items: 
@@ -7401,30 +7425,6 @@ crit <code>FilterCriteria</code>
 				- type: `array`
 
 			- type: `array`
-
-		- Addresses: 
-			- items: 
-				- type: `string`
-				- description: `Hex representation of a Keccak 256 hash POINTER`
-				- pattern: `^0x[a-fA-F\d]{64}$`
-				- title: `keccak`
-
-			- type: `array`
-
-		- BlockHash: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-
-		- FromBlock: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- ToBlock: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
 
 
 	- type: object
@@ -7756,35 +7756,19 @@ RPCTransaction <code>[]*RPCTransaction</code>
 	
 	- items: 
 
-			- type: object
 			- additionalProperties: `false`
 			- properties: 
-				- hash: 
-					- pattern: `^0x[a-fA-F\d]{64}$`
-					- title: `keccak`
-					- type: `string`
-
-				- transactionIndex: 
-					- pattern: `^0x([a-fA-F\d])+$`
-					- title: `uint64`
-					- type: `string`
-
-				- value: 
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-					- type: `string`
-
 				- blockHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
 					- type: `string`
-					- pattern: `^0x[a-fA-F\d]{64}$`
 
-				- r: 
+				- blockNumber: 
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
 					- type: `string`
 
-				- to: 
+				- from: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
 					- type: `string`
@@ -7795,16 +7779,11 @@ RPCTransaction <code>[]*RPCTransaction</code>
 					- type: `string`
 
 				- gasPrice: 
-					- type: `string`
-					- pattern: `^0x[a-fA-F0-9]+$`
-					- title: `integer`
-
-				- blockNumber: 
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
 					- type: `string`
 
-				- from: 
+				- hash: 
 					- pattern: `^0x[a-fA-F\d]{64}$`
 					- title: `keccak`
 					- type: `string`
@@ -7819,17 +7798,38 @@ RPCTransaction <code>[]*RPCTransaction</code>
 					- title: `uint64`
 					- type: `string`
 
-				- s: 
-					- type: `string`
+				- r: 
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
+					- type: `string`
+
+				- s: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- to: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- transactionIndex: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
+					- type: `string`
 
 				- v: 
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
 					- type: `string`
 
+				- value: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
 
+
+			- type: object
 
 
 	- type: array
@@ -8005,9 +8005,9 @@ _None_
 
 	``` Schema
 	
-	- title: `uint`
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint`
 	- type: string
 
 
@@ -8082,10 +8082,20 @@ sendArgs <code>SendTxArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
 		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -8111,16 +8121,6 @@ sendArgs <code>SendTxArgs</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-
-		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- from: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 	- type: object
@@ -8194,9 +8194,9 @@ gasPrice <code>*hexutil.Big</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -8228,9 +8228,9 @@ gasLimit <code>*hexutil.Uint64</code>
 
 	``` Schema
 	
-	- title: `uint64`
 	- description: `Hex representation of a uint64`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint64`
 	- type: string
 
 
@@ -8267,10 +8267,10 @@ gasLimit <code>*hexutil.Uint64</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
 
 
 	```
@@ -8389,9 +8389,9 @@ encodedTx <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -8428,9 +8428,9 @@ encodedTx <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -8510,20 +8510,30 @@ args <code>SendTxArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
 		- gas: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
 			- type: `string`
 
 		- gasPrice: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- input: 
+			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
 			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
 
 		- nonce: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -8539,16 +8549,6 @@ args <code>SendTxArgs</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-
-		- data: 
-			- type: `string`
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-
-		- from: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
 
 
 	- type: object
@@ -8627,9 +8627,9 @@ args <code>SendTxArgs</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -8727,9 +8727,9 @@ addr <code>common.Address</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -8761,9 +8761,9 @@ data <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -8800,9 +8800,9 @@ data <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -8895,6 +8895,16 @@ args <code>SendTxArgs</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
 		- gas: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
@@ -8924,16 +8934,6 @@ args <code>SendTxArgs</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-
-		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- from: 
-			- title: `keccak`
-			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
 
 
 	- type: object
@@ -9134,10 +9134,10 @@ rate <code>hexutil.Uint64</code>
 
 	``` Schema
 	
-	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
-	- title: `uint64`
 	- description: `Hex representation of a uint64`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint64`
+	- type: string
 
 
 	```
@@ -9168,10 +9168,10 @@ id <code>common.Hash</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
 
 
 	```
@@ -9273,9 +9273,9 @@ nonce <code>types.BlockNonce</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -9307,9 +9307,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -9341,9 +9341,9 @@ digest <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 

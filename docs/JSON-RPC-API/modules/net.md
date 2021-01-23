@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -92,8 +92,8 @@ _None_
 	
 	- description: `Hex representation of a uint`
 	- pattern: `^0x([a-fA-F\d])+$`
-	- type: string
 	- title: `uint`
+	- type: string
 
 
 	```

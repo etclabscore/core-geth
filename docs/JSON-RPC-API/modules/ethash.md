@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -38,9 +38,9 @@ _None_
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -120,7 +120,6 @@ num4string <code>[4]string</code>
 
 	``` Schema
 	
-	- type: array
 	- items: 
 
 			- type: string
@@ -128,6 +127,7 @@ num4string <code>[4]string</code>
 
 	- maxItems: `4`
 	- minItems: `4`
+	- type: array
 
 
 	```
@@ -232,9 +232,9 @@ rate <code>hexutil.Uint64</code>
 
 	``` Schema
 	
-	- title: `uint64`
 	- description: `Hex representation of a uint64`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint64`
 	- type: string
 
 
@@ -266,9 +266,9 @@ id <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -373,8 +373,8 @@ nonce <code>types.BlockNonce</code>
 	
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
 	- title: `integer`
+	- type: string
 
 
 	```
@@ -405,9 +405,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -441,8 +441,8 @@ digest <code>common.Hash</code>
 	
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 	- title: `keccak`
+	- type: string
 
 
 	```

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 	"strings"
 	"testing"
 	"text/template"
@@ -267,7 +268,15 @@ func printBullet(any interface{}, depth int) (out string) {
 	switch typ := any.(type) {
 	case map[string]interface{}:
 		out += "\n"
-		for k, v := range typ {
+		ordered := []string{}
+		for k := range typ {
+			ordered = append(ordered, k)
+		}
+		sort.Slice(ordered, func(i, j int) bool {
+			return ordered[i] < ordered[j]
+		})
+		for _, k := range ordered {
+			v := typ[k]
 			out += fmt.Sprintf("%s- %s: %s", strings.Repeat("\t", depth), k, printBullet(v, depth+1))
 		}
 	case []interface{}:

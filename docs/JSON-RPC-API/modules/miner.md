@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -38,9 +38,9 @@ _None_
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -112,9 +112,9 @@ etherbase <code>common.Address</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -267,10 +267,10 @@ gasPrice <code>hexutil.Big</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
+	- type: string
 
 
 	```
@@ -359,9 +359,9 @@ interval <code>int</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -445,8 +445,8 @@ threads <code>*int</code>
 	
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
 	- title: `integer`
+	- type: string
 
 
 	```

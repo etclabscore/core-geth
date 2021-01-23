@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -44,10 +44,10 @@ start <code>[]byte</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `bytes`
 	- description: `Hex representation of a variable length byte array`
 	- pattern: `^0x([a-fA-F0-9]?)+$`
+	- title: `bytes`
+	- type: string
 
 
 	```
@@ -78,9 +78,9 @@ maxResults <code>int</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -149,9 +149,16 @@ incompletes <code>bool</code>
 		- accounts: 
 			- patternProperties: 
 				- .*: 
-					- type: `object`
 					- additionalProperties: `false`
 					- properties: 
+						- address: 
+							- pattern: `^0x[a-fA-F\d]{64}$`
+							- title: `keccak`
+							- type: `string`
+
+						- balance: 
+							- type: `string`
+
 						- code: 
 							- type: `string`
 
@@ -179,23 +186,16 @@ incompletes <code>bool</code>
 
 							- type: `object`
 
-						- address: 
-							- title: `keccak`
-							- type: `string`
-							- pattern: `^0x[a-fA-F\d]{64}$`
 
-						- balance: 
-							- type: `string`
-
-
+					- type: `object`
 
 
 			- type: `object`
 
 		- next: 
-			- type: `string`
 			- pattern: `^0x([a-fA-F0-9]?)+$`
 			- title: `bytes`
+			- type: `string`
 
 		- root: 
 			- type: `string`
@@ -429,9 +429,9 @@ nsec <code>uint</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -645,9 +645,9 @@ nsec <code>uint</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -731,21 +731,21 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `blockNumberIdentifier`
 	- oneOf: 
 
 			- description: `The block height description`
 			- enum: earliest, latest, pending
-			- type: string
 			- title: `blockNumberTag`
+			- type: string
 
 
-			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: string
 
 
+	- title: `blockNumberIdentifier`
 
 
 	```
@@ -798,12 +798,21 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
+	- additionalProperties: `false`
 	- properties: 
 		- accounts: 
 			- patternProperties: 
 				- .*: 
 					- additionalProperties: `false`
 					- properties: 
+						- address: 
+							- pattern: `^0x[a-fA-F\d]{64}$`
+							- title: `keccak`
+							- type: `string`
+
+						- balance: 
+							- type: `string`
+
 						- code: 
 							- type: `string`
 
@@ -831,14 +840,6 @@ blockNr <code>rpc.BlockNumber</code>
 
 							- type: `object`
 
-						- address: 
-							- pattern: `^0x[a-fA-F\d]{64}$`
-							- title: `keccak`
-							- type: `string`
-
-						- balance: 
-							- type: `string`
-
 
 					- type: `object`
 
@@ -850,7 +851,6 @@ blockNr <code>rpc.BlockNumber</code>
 
 
 	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -1034,9 +1034,17 @@ _None_
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
+		- LastGC: 
+			- format: `date-time`
+			- type: `string`
+
+		- NumGC: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- Pause: 
 			- items: 
 				- description: `Hex representation of the integer`
@@ -1063,20 +1071,12 @@ _None_
 			- type: `array`
 
 		- PauseTotal: 
-			- type: `string`
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
-
-		- LastGC: 
-			- format: `date-time`
 			- type: `string`
 
-		- NumGC: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
 
-
+	- type: object
 
 
 	```
@@ -1198,8 +1198,44 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 				- block: 
 					- additionalProperties: `false`
 					- properties: 
+						- difficulty: 
+							- pattern: `^0x[a-fA-F0-9]+$`
+							- title: `integer`
+							- type: `string`
+
 						- error: 
 							- type: `string`
+
+						- extraData: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `dataWord`
+							- type: `string`
+
+						- gasLimit: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `uint64`
+							- type: `string`
+
+						- gasUsed: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `uint64`
+							- type: `string`
+
+						- hash: 
+							- pattern: `^0x[a-fA-F\d]{64}$`
+							- title: `keccak`
+							- type: `string`
+
+						- logsBloom: 
+							- items: 
+								- description: `Hex representation of the integer`
+								- pattern: `^0x[a-fA-F0-9]+$`
+								- title: `integer`
+								- type: `string`
+
+							- maxItems: `256`
+							- minItems: `256`
+							- type: `array`
 
 						- miner: 
 							- pattern: `^0x[a-fA-F\d]{64}$`
@@ -1211,59 +1247,20 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 							- title: `keccak`
 							- type: `string`
 
+						- nonce: 
+							- pattern: `^0x[a-fA-F0-9]+$`
+							- title: `integer`
+							- type: `string`
+
 						- number: 
 							- pattern: `^0x[a-fA-F0-9]+$`
 							- title: `integer`
 							- type: `string`
 
-						- size: 
-							- pattern: `^0x([a-fA-F\d])+$`
-							- title: `uint64`
-							- type: `string`
-
-						- transactionsRoot: 
+						- parentHash: 
 							- pattern: `^0x[a-fA-F\d]{64}$`
 							- title: `keccak`
 							- type: `string`
-
-						- difficulty: 
-							- pattern: `^0x[a-fA-F0-9]+$`
-							- title: `integer`
-							- type: `string`
-
-						- extraData: 
-							- pattern: `^0x([a-fA-F\d])+$`
-							- title: `dataWord`
-							- type: `string`
-
-						- gasLimit: 
-							- title: `uint64`
-							- type: `string`
-							- pattern: `^0x([a-fA-F\d])+$`
-
-						- uncles: 
-							- items: 
-								- title: `keccak`
-								- type: `string`
-								- description: `Hex representation of a Keccak 256 hash`
-								- pattern: `^0x[a-fA-F\d]{64}$`
-
-							- type: `array`
-
-						- stateRoot: 
-							- pattern: `^0x[a-fA-F\d]{64}$`
-							- title: `keccak`
-							- type: `string`
-
-						- timestamp: 
-							- title: `uint64`
-							- type: `string`
-							- pattern: `^0x([a-fA-F\d])+$`
-
-						- nonce: 
-							- type: `string`
-							- pattern: `^0x[a-fA-F0-9]+$`
-							- title: `integer`
 
 						- receiptsRoot: 
 							- pattern: `^0x[a-fA-F\d]{64}$`
@@ -1275,10 +1272,20 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 							- title: `keccak`
 							- type: `string`
 
-						- parentHash: 
+						- size: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `uint64`
+							- type: `string`
+
+						- stateRoot: 
+							- pattern: `^0x[a-fA-F\d]{64}$`
 							- title: `keccak`
 							- type: `string`
-							- pattern: `^0x[a-fA-F\d]{64}$`
+
+						- timestamp: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `uint64`
+							- type: `string`
 
 						- totalDifficulty: 
 							- pattern: `^0x[a-fA-F0-9]+$`
@@ -1291,25 +1298,18 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 
 							- type: `array`
 
-						- gasUsed: 
-							- title: `uint64`
-							- type: `string`
-							- pattern: `^0x([a-fA-F\d])+$`
-
-						- hash: 
+						- transactionsRoot: 
 							- pattern: `^0x[a-fA-F\d]{64}$`
 							- title: `keccak`
 							- type: `string`
 
-						- logsBloom: 
+						- uncles: 
 							- items: 
-								- title: `integer`
+								- description: `Hex representation of a Keccak 256 hash`
+								- pattern: `^0x[a-fA-F\d]{64}$`
+								- title: `keccak`
 								- type: `string`
-								- description: `Hex representation of the integer`
-								- pattern: `^0x[a-fA-F0-9]+$`
 
-							- maxItems: `256`
-							- minItems: `256`
 							- type: `array`
 
 
@@ -1548,9 +1548,9 @@ number <code>uint64</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -1648,10 +1648,10 @@ startHash <code>common.Hash</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
 
 
 	```
@@ -1682,9 +1682,9 @@ endHash <code>*common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -1722,9 +1722,9 @@ commonAddress <code>[]common.Address</code>
 	
 	- items: 
 
-			- title: `keccak`
 			- description: `Hex representation of a Keccak 256 hash POINTER`
 			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: string
 
 
@@ -1831,9 +1831,9 @@ startNum <code>uint64</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -1865,10 +1865,10 @@ endNum <code>*uint64</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
+	- type: string
 
 
 	```
@@ -1905,9 +1905,9 @@ commonAddress <code>[]common.Address</code>
 	
 	- items: 
 
-			- title: `keccak`
 			- description: `Hex representation of a Keccak 256 hash POINTER`
 			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
 			- type: string
 
 
@@ -2022,8 +2022,8 @@ nsec <code>uint</code>
 	
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
 	- title: `integer`
+	- type: string
 
 
 	```
@@ -2111,32 +2111,7 @@ _None_
 	
 	- additionalProperties: `false`
 	- properties: 
-		- HeapAlloc: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- HeapIdle: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- MCacheInuse: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- Sys: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- LastGC: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- StackSys: 
+		- Alloc: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -2146,110 +2121,9 @@ _None_
 			- title: `integer`
 			- type: `string`
 
-		- MCacheSys: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- MSpanInuse: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- PauseTotalNs: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- HeapReleased: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- HeapSys: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- Lookups: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- NextGC: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- OtherSys: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- StackInuse: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- Alloc: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- HeapInuse: 
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-
-		- Frees: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- MSpanSys: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- PauseEnd: 
-			- type: `array`
-			- items: 
-				- title: `integer`
-				- type: `string`
-				- description: `Hex representation of the integer`
-				- pattern: `^0x[a-fA-F0-9]+$`
-
-			- maxItems: `256`
-			- minItems: `256`
-
-		- HeapObjects: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- PauseNs: 
-			- items: 
-				- type: `string`
-				- description: `Hex representation of the integer`
-				- pattern: `^0x[a-fA-F0-9]+$`
-				- title: `integer`
-
-			- maxItems: `256`
-			- minItems: `256`
-			- type: `array`
-
-		- TotalAlloc: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- NumGC: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
 		- BySize: 
 			- items: 
+				- additionalProperties: `false`
 				- properties: 
 					- Frees: 
 						- pattern: `^0x[a-fA-F0-9]+$`
@@ -2262,13 +2136,12 @@ _None_
 						- type: `string`
 
 					- Size: 
+						- pattern: `^0x[a-fA-F0-9]+$`
 						- title: `integer`
 						- type: `string`
-						- pattern: `^0x[a-fA-F0-9]+$`
 
 
 				- type: `object`
-				- additionalProperties: `false`
 
 			- maxItems: `61`
 			- minItems: `61`
@@ -2280,10 +2153,75 @@ _None_
 		- EnableGC: 
 			- type: `boolean`
 
+		- Frees: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- GCCPUFraction: 
 			- type: `number`
 
 		- GCSys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- HeapAlloc: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- HeapIdle: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- HeapInuse: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- HeapObjects: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- HeapReleased: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- HeapSys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- LastGC: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Lookups: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- MCacheInuse: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- MCacheSys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- MSpanInuse: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- MSpanSys: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -2293,7 +2231,69 @@ _None_
 			- title: `integer`
 			- type: `string`
 
+		- NextGC: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- NumForcedGC: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- NumGC: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- OtherSys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- PauseEnd: 
+			- items: 
+				- description: `Hex representation of the integer`
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
+
+			- maxItems: `256`
+			- minItems: `256`
+			- type: `array`
+
+		- PauseNs: 
+			- items: 
+				- description: `Hex representation of the integer`
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
+
+			- maxItems: `256`
+			- minItems: `256`
+			- type: `array`
+
+		- PauseTotalNs: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- StackInuse: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- StackSys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Sys: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- TotalAlloc: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
@@ -2570,9 +2570,9 @@ nsec <code>uint</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -2655,9 +2655,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -2694,9 +2694,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -2771,10 +2771,10 @@ number <code>uint64</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
-	- title: `integer`
 	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
+	- type: string
 
 
 	```
@@ -2864,10 +2864,10 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
 
 
 	```
@@ -2974,9 +2974,9 @@ number <code>uint64</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -3070,9 +3070,9 @@ rate <code>int</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -3152,9 +3152,9 @@ v <code>int</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -3191,10 +3191,10 @@ v <code>int</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
-	- title: `integer`
 	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
+	- type: string
 
 
 	```
@@ -3266,9 +3266,9 @@ number <code>hexutil.Uint64</code>
 
 	``` Schema
 	
-	- title: `uint64`
 	- description: `Hex representation of a uint64`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint64`
 	- type: string
 
 
@@ -3346,9 +3346,9 @@ rate <code>int</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -3482,9 +3482,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -3518,6 +3518,9 @@ config <code>*StdTraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- Debug: 
+			- type: `boolean`
+
 		- DisableMemory: 
 			- type: `boolean`
 
@@ -3544,9 +3547,6 @@ config <code>*StdTraceConfig</code>
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
-
-		- Debug: 
-			- type: `boolean`
 
 		- overrides: 
 			- additionalProperties: `true`
@@ -3710,9 +3710,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -3746,14 +3746,6 @@ config <code>*StdTraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- Limit: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- overrides: 
-			- additionalProperties: `true`
-
 		- Debug: 
 			- type: `boolean`
 
@@ -3769,15 +3761,23 @@ config <code>*StdTraceConfig</code>
 		- DisableStorage: 
 			- type: `boolean`
 
-		- Reexec: 
+		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
 
 		- TxHash: 
 			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
 
 
 	- type: object
@@ -4184,10 +4184,10 @@ blockHash <code>common.Hash</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
 
 
 	```
@@ -4220,8 +4220,8 @@ txIndex <code>int</code>
 	
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
-	- type: string
 	- title: `integer`
+	- type: string
 
 
 	```
@@ -4252,9 +4252,9 @@ contractAddress <code>common.Address</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -4286,9 +4286,9 @@ keyStart <code>hexutil.Bytes</code>
 
 	``` Schema
 	
-	- title: `dataWord`
 	- description: `Hex representation of some bytes`
 	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -4320,9 +4320,9 @@ maxResult <code>int</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -4359,7 +4359,6 @@ maxResult <code>int</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
 		- nextKey: 
@@ -4389,6 +4388,7 @@ maxResult <code>int</code>
 			- type: `object`
 
 
+	- type: object
 
 
 	```
@@ -4501,10 +4501,10 @@ address <code>common.Address</code>
 
 	``` Schema
 	
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash POINTER`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
 
 
 	```
@@ -4535,9 +4535,9 @@ number <code>uint64</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -4576,8 +4576,8 @@ number <code>uint64</code>
 	
 	- description: `Hex representation of a Keccak 256 hash POINTER`
 	- pattern: `^0x[a-fA-F\d]{64}$`
-	- type: string
 	- title: `keccak`
+	- type: string
 
 
 	```
@@ -4678,9 +4678,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -4712,10 +4712,18 @@ config <code>*TraceConfig</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
+		- Debug: 
+			- type: `boolean`
+
+		- DisableMemory: 
+			- type: `boolean`
+
 		- DisableReturnData: 
+			- type: `boolean`
+
+		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
@@ -4726,30 +4734,22 @@ config <code>*TraceConfig</code>
 			- title: `integer`
 			- type: `string`
 
+		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- Timeout: 
 			- type: `string`
 
 		- Tracer: 
 			- type: `string`
 
-		- Debug: 
-			- type: `boolean`
-
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableStack: 
-			- type: `boolean`
-
-		- Reexec: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
 		- overrides: 
 			- additionalProperties: `true`
 
 
+	- type: object
 
 
 	```
@@ -4925,10 +4925,10 @@ blob <code>[]byte</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `bytes`
 	- description: `Hex representation of a variable length byte array`
 	- pattern: `^0x([a-fA-F0-9]?)+$`
+	- title: `bytes`
+	- type: string
 
 
 	```
@@ -4964,8 +4964,22 @@ config <code>*TraceConfig</code>
 		- Debug: 
 			- type: `boolean`
 
+		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableReturnData: 
+			- type: `boolean`
+
 		- DisableStack: 
 			- type: `boolean`
+
+		- DisableStorage: 
+			- type: `boolean`
+
+		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -4980,20 +4994,6 @@ config <code>*TraceConfig</code>
 
 		- overrides: 
 			- additionalProperties: `true`
-
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
-		- DisableStorage: 
-			- type: `boolean`
-
-		- Limit: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
 
 
 	- type: object
@@ -5165,9 +5165,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -5201,13 +5201,7 @@ config <code>*TraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- Tracer: 
-			- type: `string`
-
-		- overrides: 
-			- additionalProperties: `true`
-
-		- DisableStorage: 
+		- Debug: 
 			- type: `boolean`
 
 		- DisableMemory: 
@@ -5219,21 +5213,27 @@ config <code>*TraceConfig</code>
 		- DisableStack: 
 			- type: `boolean`
 
+		- DisableStorage: 
+			- type: `boolean`
+
 		- Limit: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
 
 		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- Timeout: 
 			- type: `string`
 
-		- Debug: 
-			- type: `boolean`
+		- Tracer: 
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
 
 
 	- type: object
@@ -5411,15 +5411,15 @@ number <code>rpc.BlockNumber</code>
 	
 	- oneOf: 
 
-			- enum: earliest, latest, pending
-			- type: string
-			- title: `blockNumberTag`
 			- description: `The block height description`
+			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
+			- type: string
 
 
-			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: string
 
 
@@ -5473,21 +5473,13 @@ config <code>*TraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- DisableReturnData: 
+		- Debug: 
 			- type: `boolean`
 
-		- Reexec: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- Tracer: 
-			- type: `string`
-
-		- overrides: 
-			- additionalProperties: `true`
-
 		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableReturnData: 
 			- type: `boolean`
 
 		- DisableStack: 
@@ -5501,11 +5493,19 @@ config <code>*TraceConfig</code>
 			- title: `integer`
 			- type: `string`
 
+		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- Timeout: 
 			- type: `string`
 
-		- Debug: 
-			- type: `boolean`
+		- Tracer: 
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
 
 
 	- type: object
@@ -5579,7 +5579,6 @@ txTraceResult <code>[]*txTraceResult</code>
 	
 	- items: 
 
-			- type: object
 			- additionalProperties: `false`
 			- properties: 
 				- error: 
@@ -5589,6 +5588,7 @@ txTraceResult <code>[]*txTraceResult</code>
 					- additionalProperties: `true`
 
 
+			- type: object
 
 
 	- type: array
@@ -5688,32 +5688,10 @@ config <code>*TraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
-		- Timeout: 
-			- type: `string`
+		- Debug: 
+			- type: `boolean`
 
 		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableStorage: 
-			- type: `boolean`
-
-		- Limit: 
-			- title: `integer`
-			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
-
-		- Reexec: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- Tracer: 
-			- type: `string`
-
-		- overrides: 
-			- additionalProperties: `true`
-
-		- Debug: 
 			- type: `boolean`
 
 		- DisableReturnData: 
@@ -5721,6 +5699,28 @@ config <code>*TraceConfig</code>
 
 		- DisableStack: 
 			- type: `boolean`
+
+		- DisableStorage: 
+			- type: `boolean`
+
+		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Timeout: 
+			- type: `string`
+
+		- Tracer: 
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
 
 
 	- type: object
@@ -5794,7 +5794,6 @@ txTraceResult <code>[]*txTraceResult</code>
 	
 	- items: 
 
-			- type: object
 			- additionalProperties: `false`
 			- properties: 
 				- error: 
@@ -5804,6 +5803,7 @@ txTraceResult <code>[]*txTraceResult</code>
 					- additionalProperties: `true`
 
 
+			- type: object
 
 
 	- type: array
@@ -5897,6 +5897,7 @@ args <code>ethapi.CallArgs</code>
 
 	``` Schema
 	
+	- additionalProperties: `false`
 	- properties: 
 		- data: 
 			- pattern: `^0x([a-fA-F\d])+$`
@@ -5914,14 +5915,14 @@ args <code>ethapi.CallArgs</code>
 			- type: `string`
 
 		- gasPrice: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- to: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
 			- title: `keccak`
 			- type: `string`
-			- pattern: `^0x[a-fA-F\d]{64}$`
 
 		- value: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -5930,7 +5931,6 @@ args <code>ethapi.CallArgs</code>
 
 
 	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -6000,11 +6000,15 @@ config <code>*TraceConfig</code>
 
 	``` Schema
 	
+	- additionalProperties: `false`
 	- properties: 
-		- Tracer: 
-			- type: `string`
+		- Debug: 
+			- type: `boolean`
 
 		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableReturnData: 
 			- type: `boolean`
 
 		- DisableStack: 
@@ -6023,13 +6027,10 @@ config <code>*TraceConfig</code>
 			- title: `integer`
 			- type: `string`
 
-		- Debug: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
 		- Timeout: 
+			- type: `string`
+
+		- Tracer: 
 			- type: `string`
 
 		- overrides: 
@@ -6037,7 +6038,6 @@ config <code>*TraceConfig</code>
 
 
 	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -6181,9 +6181,9 @@ hash <code>common.Hash</code>
 
 	``` Schema
 	
-	- title: `keccak`
 	- description: `Hex representation of a Keccak 256 hash`
 	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
 	- type: string
 
 
@@ -6215,30 +6215,32 @@ config <code>*TraceConfig</code>
 
 	``` Schema
 	
-	- type: object
 	- additionalProperties: `false`
 	- properties: 
+		- Debug: 
+			- type: `boolean`
+
+		- DisableMemory: 
+			- type: `boolean`
+
 		- DisableReturnData: 
+			- type: `boolean`
+
+		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
 			- type: `boolean`
 
 		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-			- pattern: `^0x[a-fA-F0-9]+$`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
-
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableStack: 
-			- type: `boolean`
 
 		- Timeout: 
 			- type: `string`
@@ -6249,10 +6251,8 @@ config <code>*TraceConfig</code>
 		- overrides: 
 			- additionalProperties: `true`
 
-		- Debug: 
-			- type: `boolean`
 
-
+	- type: object
 
 
 	```
@@ -6372,9 +6372,9 @@ level <code>int</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 

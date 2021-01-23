@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-22T08:53:19-06:00</code> |
+| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:35:53-06:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -232,21 +232,21 @@ blockNr <code>rpc.BlockNumber</code>
 
 	``` Schema
 	
-	- title: `blockNumberIdentifier`
 	- oneOf: 
 
 			- description: `The block height description`
 			- enum: earliest, latest, pending
-			- type: string
 			- title: `blockNumberTag`
+			- type: string
 
 
-			- title: `uint64`
 			- description: `Hex representation of a uint64`
 			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: string
 
 
+	- title: `blockNumberIdentifier`
 
 
 	```
@@ -359,10 +359,10 @@ first <code>*uint64</code>
 
 	``` Schema
 	
-	- type: string
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
+	- type: string
 
 
 	```
@@ -393,9 +393,9 @@ last <code>*uint64</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -608,9 +608,9 @@ n <code>int</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -709,7 +709,14 @@ _None_
 
 	``` Schema
 	
+	- additionalProperties: `false`
 	- properties: 
+		- enode: 
+			- type: `string`
+
+		- enr: 
+			- type: `string`
+
 		- id: 
 			- type: `string`
 
@@ -731,14 +738,15 @@ _None_
 					- type: `string`
 
 				- listener: 
-					- type: `string`
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
+					- type: `string`
 
 
 			- type: `object`
 
 		- protocols: 
+			- additionalProperties: `false`
 			- properties: 
 				- discovery: 
 					- pattern: `^0x[a-fA-F0-9]+$`
@@ -752,17 +760,9 @@ _None_
 
 
 			- type: `object`
-			- additionalProperties: `false`
-
-		- enode: 
-			- type: `string`
-
-		- enr: 
-			- type: `string`
 
 
 	- type: object
-	- additionalProperties: `false`
 
 
 	```
@@ -895,51 +895,6 @@ p2pPeerInfo <code>[]*p2p.PeerInfo</code>
 
 			- additionalProperties: `false`
 			- properties: 
-				- name: 
-					- type: `string`
-
-				- network: 
-					- additionalProperties: `false`
-					- properties: 
-						- static: 
-							- type: `boolean`
-
-						- trusted: 
-							- type: `boolean`
-
-						- inbound: 
-							- type: `boolean`
-
-						- localAddress: 
-							- type: `string`
-
-						- remoteAddress: 
-							- type: `string`
-
-
-					- type: `object`
-
-				- protocols: 
-					- additionalProperties: `false`
-					- properties: 
-						- trusted: 
-							- type: `boolean`
-
-						- inbound: 
-							- type: `boolean`
-
-						- localAddress: 
-							- type: `string`
-
-						- remoteAddress: 
-							- type: `string`
-
-						- static: 
-							- type: `boolean`
-
-
-					- type: `object`
-
 				- caps: 
 					- items: 
 						- type: `string`
@@ -954,6 +909,51 @@ p2pPeerInfo <code>[]*p2p.PeerInfo</code>
 
 				- id: 
 					- type: `string`
+
+				- name: 
+					- type: `string`
+
+				- network: 
+					- additionalProperties: `false`
+					- properties: 
+						- inbound: 
+							- type: `boolean`
+
+						- localAddress: 
+							- type: `string`
+
+						- remoteAddress: 
+							- type: `string`
+
+						- static: 
+							- type: `boolean`
+
+						- trusted: 
+							- type: `boolean`
+
+
+					- type: `object`
+
+				- protocols: 
+					- additionalProperties: `false`
+					- properties: 
+						- inbound: 
+							- type: `boolean`
+
+						- localAddress: 
+							- type: `string`
+
+						- remoteAddress: 
+							- type: `string`
+
+						- static: 
+							- type: `boolean`
+
+						- trusted: 
+							- type: `boolean`
+
+
+					- type: `object`
 
 
 			- type: object
@@ -1257,9 +1257,9 @@ port <code>*int</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 
@@ -1421,9 +1421,9 @@ port <code>*int</code>
 
 	``` Schema
 	
-	- title: `integer`
 	- description: `Hex representation of the integer`
 	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
 	- type: string
 
 

@@ -847,9 +847,15 @@ func traceCall(ctx context.Context, eth *Ethereum, args ethapi.CallArgs, blockNr
 	// 	"transactionHash":     tx.Hash().Hex(),
 	// 	"transactionPosition": index,
 	// }
+	taskExtraContext := map[string]interface{}{
+		"gasLimit": msg.Gas(),
+		"gasPrice": msg.GasPrice(),
+	}
+	if coinbase, err := eth.engine.Author(header); err == nil {
+		taskExtraContext["coinbase"] = coinbase
+	}
 
-	// return traceTx(ctx, api.eth, msg, vmctx, statedb, taskExtraContext, config)
-	return traceTx(ctx, eth, msg, vmctx, statedb, nil, config)
+	return traceTx(ctx, eth, msg, vmctx, statedb, taskExtraContext, config)
 }
 
 // TraceCall lets you trace a given eth_call. It collects the structured logs created during the execution of EVM

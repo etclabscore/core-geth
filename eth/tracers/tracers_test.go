@@ -473,3 +473,147 @@ func BenchmarkCallTracerParity(b *testing.B) {
 		})
 	}
 }
+
+type stateDiffAccount struct {
+	Balance interface{}                            `json:"balance"` // Can be either string "=" or mapping "*" => {"from": "hex", "to": "hex"}
+	Code    interface{}                            `json:"code"`
+	Nonce   interface{}                            `json:"nonce"`
+	Storage map[common.Hash]map[string]interface{} `json:"storage"`
+}
+
+type stateDiffBalance struct {
+	From *hexutil.Big `json:"from"`
+	To   *hexutil.Big `json:"to"`
+}
+
+type stateDiffCode struct {
+	From hexutil.Bytes `json:"from"`
+	To   hexutil.Bytes `json:"to"`
+}
+
+type stateDiffNonce struct {
+	From hexutil.Uint64 `json:"from"`
+	To   hexutil.Uint64 `json:"to"`
+}
+
+type stateDiffStorage struct {
+	From common.Hash `json:"from"`
+	To   common.Hash `json:"to"`
+}
+
+type stateDiffTest struct {
+	Genesis *genesisT.Genesis                    `json:"genesis"`
+	Context *callContext                         `json:"context"`
+	Input   string                               `json:"input"`
+	Result  map[common.Address]*stateDiffAccount `json:"result"`
+}
+
+func stateDiffTracerTestRunner(filename string) error {
+	// Call tracer test found, read if from disk
+	blob, err := ioutil.ReadFile(filepath.Join("testdata", filename))
+	if err != nil {
+		return fmt.Errorf("failed to read testcase: %v", err)
+	}
+	test := new(stateDiffTest)
+	if err := json.Unmarshal(blob, test); err != nil {
+		return fmt.Errorf("failed to parse testcase: %v", err)
+	}
+	// Configure a blockchain with the given prestate
+	tx := new(types.Transaction)
+	if err := rlp.DecodeBytes(common.FromHex(test.Input), tx); err != nil {
+		return fmt.Errorf("failed to parse testcase input: %v", err)
+	}
+	signer := types.MakeSigner(test.Genesis.Config, new(big.Int).SetUint64(uint64(test.Context.Number)))
+	origin, _ := signer.Sender(tx)
+
+	context := vm.Context{
+		CanTransfer: core.CanTransfer,
+		Transfer:    core.Transfer,
+		Origin:      origin,
+		Coinbase:    test.Context.Miner,
+		BlockNumber: new(big.Int).SetUint64(uint64(test.Context.Number)),
+		Time:        new(big.Int).SetUint64(uint64(test.Context.Time)),
+		Difficulty:  (*big.Int)(test.Context.Difficulty),
+		GasLimit:    uint64(test.Context.GasLimit),
+		GasPrice:    tx.GasPrice(),
+	}
+	_, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false)
+
+	// Create the tracer, the EVM environment and run it
+	tracer, err := New("stateDiffTracer")
+	if err != nil {
+		return fmt.Errorf("failed to create state diff tracer: %v", err)
+	}
+	evm := vm.NewEVM(context, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
+
+	msg, err := tx.AsMessage(signer)
+	if err != nil {
+		return fmt.Errorf("failed to prepare transaction for tracing: %v", err)
+	}
+	st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(tx.Gas()))
+
+	if _, err = st.TransitionDb(); err != nil {
+		return fmt.Errorf("failed to execute transaction: %v", err)
+	}
+
+	// Retrieve the trace result and compare against the etalon
+	res, err := tracer.GetResult()
+	if err != nil {
+		return fmt.Errorf("failed to retrieve trace result: %v", err)
+	}
+	ret := new(map[common.Address]*stateDiffAccount)
+	if err := json.Unmarshal(res, ret); err != nil {
+		return fmt.Errorf("failed to unmarshal trace result: %v", err)
+	}
+
+	if !jsonEqualStateDiff(ret, test.Result) {
+		// uncomment this for easier debugging
+		have, _ := json.MarshalIndent(ret, "", " ")
+		want, _ := json.MarshalIndent(test.Result, "", " ")
+		return fmt.Errorf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
+		return fmt.Errorf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
+	}
+	// return fmt.Errorf("fail")
+	return nil
+}
+
+// TestStateDiffTracer Iterates over all the input-output datasets in the state diff tracer test harness and
+// runs the JavaScript tracers against them.
+func TestStateDiffTracer(t *testing.T) {
+	files, err := ioutil.ReadDir("testdata")
+	if err != nil {
+		t.Fatalf("failed to retrieve tracer test suite: %v", err)
+	}
+	for _, file := range files {
+		if !strings.HasPrefix(file.Name(), "state_diff_tracer_") {
+			continue
+		}
+		file := file // capture range variable
+		t.Run(camel(strings.TrimSuffix(strings.TrimPrefix(file.Name(), "state_diff_tracer_"), ".json")), func(t *testing.T) {
+			t.Parallel()
+
+			err := stateDiffTracerTestRunner(file.Name())
+			if err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+// jsonEqual is similar to reflect.DeepEqual, but does a 'bounce' via json prior to
+// comparison
+func jsonEqualStateDiff(x, y interface{}) bool {
+	xTrace := new(map[common.Address]*stateDiffAccount)
+	yTrace := new(map[common.Address]*stateDiffAccount)
+	if xj, err := json.Marshal(x); err == nil {
+		json.Unmarshal(xj, xTrace)
+	} else {
+		return false
+	}
+	if yj, err := json.Marshal(y); err == nil {
+		json.Unmarshal(yj, yTrace)
+	} else {
+		return false
+	}
+	return reflect.DeepEqual(xTrace, yTrace)
+}

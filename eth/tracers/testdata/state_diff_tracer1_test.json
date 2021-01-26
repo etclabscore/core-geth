@@ -1,0 +1,88 @@
+{
+  "genesis": {
+    "number": "1555231",
+    "hash": "0x670dd43fe5752fa8ce78b6e58f4dc05620f56801936aa0861401637531bab285",
+    "nonce": "0x2e4975f17cb45fd9",
+    "mixHash": "0x531de29c7a09cd00ee5d5c278aae6aceac2e25975f193aad77b2b9898c2fb67e",
+    "stateRoot": "0x1e15b0bfa2e410b09fa8a922b374aabdbe075372b95090861b06f994cd99d852",
+    "miner": "0x877bd459c9b7d8576b44e59e09d076c25946f443",
+    "difficulty": "4660233",
+    "totalDifficulty": "2242394869995",
+    "extraData": "0xd683010b05846765746886676f312e3133856c696e7578",
+    "gasLimit": "9370970",
+    "timestamp": "1590794781",
+    "alloc": {
+      "0xe8e1752ae7b1a58f461e28db5ef2a761380772a2": {
+        "balance": "0x0",
+        "nonce": "0",
+        "code": "0x",
+        "storage": {}
+      },
+      "0x877bd459c9b7d8576b44e59e09d076c25946f443": {
+        "balance": "0x623c1d13bed5ca7fa074",
+        "nonce": "263129",
+        "code": "0x",
+        "storage": {}
+      }
+    },
+    "config": {
+      "networkId": 7,
+      "chainId": 63,
+      "eip2FBlock": 0,
+      "eip7FBlock": 0,
+      "eip150Block": 0,
+      "eip155Block": 0,
+      "eip160Block": 0,
+      "eip161FBlock": 0,
+      "eip170FBlock": 0,
+      "eip100FBlock": 0,
+      "eip140FBlock": 0,
+      "eip198FBlock": 0,
+      "eip211FBlock": 0,
+      "eip212FBlock": 0,
+      "eip213FBlock": 0,
+      "eip214FBlock": 0,
+      "eip658FBlock": 0,
+      "eip145FBlock": 301243,
+      "eip1014FBlock": 301243,
+      "eip1052FBlock": 301243,
+      "eip152FBlock": 999983,
+      "eip1108FBlock": 999983,
+      "eip1344FBlock": 999983,
+      "eip1884FBlock": 999983,
+      "eip2028FBlock": 999983,
+      "eip2200FBlock": 999983,
+      "ecip1017FBlock": 0,
+      "ecip1017EraRounds": 2000000,
+      "ecip1099FBlock": 2520000,
+      "ecbp1100FBlock": 2380000,
+      "disposalBlock": 0,
+      "ethash": {},
+      "requireBlockHashes": {
+          "840013": "0x2ceada2b191879b71a5bcf2241dd9bc50d6d953f1640e62f9c2cee941dc61c9d",
+          "840014": "0x8ec29dd692c8985b82410817bac232fc82805b746538d17bc924624fe74a0fcf"
+        }
+    }
+  },
+  "context": {
+    "number": "1555232",
+    "difficulty": "4660233",
+    "timestamp": "1590794792",
+    "gasLimit": "9380120",
+    "miner": "0x877bd459c9b7d8576b44e59e09d076c25946f443"
+  },
+  "input": "0xf867830403d9843b9aca0083019f1c8080935a600055602060006001f06001555a6064550081a2a060d93e5294d04c85bef3d6da1f1dc3070cdfb9ebc9496c6d1cfab2a1995ffad4a04111dd23edd4bd45085543561e496827cca846a690302e775780404743b310e6",
+  "result": {
+    "0x877bd459c9b7d8576b44e59e09d076c25946f443": {
+      "balance": "=",
+      "code": "=",
+      "nonce": {
+          "*": {
+              "from": "0x403d9",
+              "to": "0x403da"
+          }
+      },
+      "storage": {}
+    }
+  }
+}

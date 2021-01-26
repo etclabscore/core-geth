@@ -208,6 +208,9 @@ func (api *PrivateTraceAPI) Filter(ctx context.Context, args TraceFilterArgs, co
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
 func (api *PrivateTraceAPI) Call(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
-	config = setConfigTracerToParity(config)
+	// TODO: handle all 3 tracers
+	if config == nil {
+		config = setConfigTracerToParity(config)
+	}
 	return traceCall(ctx, api.eth, args, blockNrOrHash, config)
 }

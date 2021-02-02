@@ -170,6 +170,11 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 			cfg.Eth.ECBP1100 = new(big.Int).SetUint64(n)
 		}
 	}
+	if ctx.GlobalIsSet(utils.ECBP1100NoDisableFlag.Name) {
+		if enable := ctx.GlobalBool(utils.ECBP1100NoDisableFlag.Name); enable {
+			cfg.Eth.ECBP1100NoDisable = &enable
+		}
+	}
 
 	backend := utils.RegisterEthService(stack, &cfg.Eth)
 

@@ -292,6 +292,7 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 	}
 	if cs.pm.peers.Len() < minArtificialFinalityPeers {
 		if cs.pm.blockchain.IsArtificialFinalityEnabled() {
+			// If artificial finality state is forcefully set (overridden) this will just be a noop.
 			cs.pm.blockchain.EnableArtificialFinality(false, "reason", "low peers", "peers", cs.pm.peers.Len())
 		}
 	}

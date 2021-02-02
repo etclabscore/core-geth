@@ -52,6 +52,8 @@ const (
 	PendingTransactionsSubscription
 	// BlocksSubscription queries hashes for blocks that are imported
 	BlocksSubscription
+	// SideBlocksSubscription queries blocks that are imported non-canonically
+	SideBlocksSubscription
 	// LastSubscription keeps track of the last index
 	LastIndexSubscription
 )
@@ -93,6 +95,7 @@ type EventSystem struct {
 	rmLogsSub      event.Subscription // Subscription for removed log event
 	pendingLogsSub event.Subscription // Subscription for pending log event
 	chainSub       event.Subscription // Subscription for new chain event
+	chainSideSub   event.Subscription // Subscription for new side chain event
 
 	// Channels
 	install       chan *subscription         // install filter for event notification
@@ -102,6 +105,7 @@ type EventSystem struct {
 	pendingLogsCh chan []*types.Log          // Channel to receive new log event
 	rmLogsCh      chan core.RemovedLogsEvent // Channel to receive removed log event
 	chainCh       chan core.ChainEvent       // Channel to receive new chain event
+	chainSideCh   chan core.ChainSideEvent   // Channel to receive new side chain event
 }
 
 // NewEventSystem creates a new manager that listens for event on the given mux,
@@ -121,6 +125,7 @@ func NewEventSystem(backend Backend, lightMode bool) *EventSystem {
 		rmLogsCh:      make(chan core.RemovedLogsEvent, rmLogsChanSize),
 		pendingLogsCh: make(chan []*types.Log, logsChanSize),
 		chainCh:       make(chan core.ChainEvent, chainEvChanSize),
+		chainSideCh:   make(chan core.ChainSideEvent, chainEvChanSize),
 	}
 
 	// Subscribe events
@@ -128,10 +133,11 @@ func NewEventSystem(backend Backend, lightMode bool) *EventSystem {
 	m.logsSub = m.backend.SubscribeLogsEvent(m.logsCh)
 	m.rmLogsSub = m.backend.SubscribeRemovedLogsEvent(m.rmLogsCh)
 	m.chainSub = m.backend.SubscribeChainEvent(m.chainCh)
+	m.chainSideSub = m.backend.SubscribeChainSideEvent(m.chainSideCh)
 	m.pendingLogsSub = m.backend.SubscribePendingLogsEvent(m.pendingLogsCh)
 
 	// Make sure none of the subscriptions are empty
-	if m.txsSub == nil || m.logsSub == nil || m.rmLogsSub == nil || m.chainSub == nil || m.pendingLogsSub == nil {
+	if m.txsSub == nil || m.logsSub == nil || m.rmLogsSub == nil || m.chainSub == nil || m.chainSideSub == nil || m.pendingLogsSub == nil {
 		log.Crit("Subscribe for event system failed")
 	}
 
@@ -290,6 +296,22 @@ func (es *EventSystem) SubscribeNewHeads(headers chan *types.Header) *Subscripti
 	return es.subscribe(sub)
 }
 
+// SubscribeNewSideHeads creates a subscription that writes the header of a block that is
+// imported as a side chain.
+func (es *EventSystem) SubscribeNewSideHeads(headers chan *types.Header) *Subscription {
+	sub := &subscription{
+		id:        rpc.NewID(),
+		typ:       SideBlocksSubscription,
+		created:   time.Now(),
+		logs:      make(chan []*types.Log),
+		hashes:    make(chan []common.Hash),
+		headers:   headers,
+		installed: make(chan struct{}),
+		err:       make(chan error),
+	}
+	return es.subscribe(sub)
+}
+
 // SubscribePendingTxs creates a subscription that writes transaction hashes for
 // transactions that enter the transaction pool.
 func (es *EventSystem) SubscribePendingTxs(hashes chan []common.Hash) *Subscription {
@@ -366,6 +388,25 @@ func (es *EventSystem) handleChainEvent(filters filterIndex, ev core.ChainEvent)
 	}
 }
 
+func (es *EventSystem) handleChainSideEvent(filters filterIndex, ev core.ChainSideEvent) {
+	for _, f := range filters[SideBlocksSubscription] {
+		f.headers <- ev.Block.Header()
+	}
+	// Handle filtered log eventing similarly to the newHead event, except that 'remove' will always be set to true
+	// (indicating the logs come from a non-canonical block).
+	// When newHeads and newSideHeads are subscribed to at the same time, this can result in certain logs being broadcast
+	// repetitiously.
+	if es.lightMode && len(filters[LogsSubscription]) > 0 {
+		es.lightFilterNewSideHead(ev.Block.Header(), func(header *types.Header, remove bool) {
+			for _, f := range filters[LogsSubscription] {
+				if matchedLogs := es.lightFilterLogs(header, f.logsCrit.Addresses, f.logsCrit.Topics, remove); len(matchedLogs) > 0 {
+					f.logs <- matchedLogs
+				}
+			}
+		})
+	}
+}
+
 func (es *EventSystem) lightFilterNewHead(newHeader *types.Header, callBack func(*types.Header, bool)) {
 	oldh := es.lastHead
 	es.lastHead = newHeader
@@ -397,6 +438,10 @@ func (es *EventSystem) lightFilterNewHead(newHeader *types.Header, callBack func
 	for i := len(newHeaders) - 1; i >= 0; i-- {
 		callBack(newHeaders[i], false)
 	}
+}
+
+func (es *EventSystem) lightFilterNewSideHead(header *types.Header, callBack func(*types.Header, bool)) {
+	callBack(header, true)
 }
 
 // filter logs of a single header in light client mode
@@ -448,6 +493,7 @@ func (es *EventSystem) eventLoop() {
 		es.rmLogsSub.Unsubscribe()
 		es.pendingLogsSub.Unsubscribe()
 		es.chainSub.Unsubscribe()
+		es.chainSideSub.Unsubscribe()
 	}()
 
 	index := make(filterIndex)
@@ -467,6 +513,8 @@ func (es *EventSystem) eventLoop() {
 			es.handlePendingLogs(index, ev)
 		case ev := <-es.chainCh:
 			es.handleChainEvent(index, ev)
+		case ev := <-es.chainSideCh:
+			es.handleChainSideEvent(index, ev)
 
 		case f := <-es.install:
 			if f.typ == MinedAndPendingLogsSubscription {
@@ -496,6 +544,8 @@ func (es *EventSystem) eventLoop() {
 		case <-es.rmLogsSub.Err():
 			return
 		case <-es.chainSub.Err():
+			return
+		case <-es.chainSideSub.Err():
 			return
 		}
 	}

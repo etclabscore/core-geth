@@ -56,7 +56,12 @@ var sharedMetaRegisterer = &go_openrpc_reflect.MetaT{
 		return info
 	},
 	GetExternalDocsFn: func() (exdocs *meta_schema.ExternalDocumentationObject) {
-		return nil // FIXME
+		exdocs = &meta_schema.ExternalDocumentationObject{}
+		description := "ETC Labs Documentation"
+		exdocs.Description = (*meta_schema.ExternalDocumentationObjectDescription)(&description)
+		url := "https://etclabscore.github.io/core-geth/"
+		exdocs.Url = (*meta_schema.ExternalDocumentationObjectUrl)(&url)
+		return exdocs
 	},
 }
 
@@ -180,6 +185,21 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 
 		// Otherwise return the default.
 		return go_openrpc_reflect.EthereumReflector.GetContentDescriptorRequired(r, m, field)
+	}
+
+	appReflector.FnGetMethodExternalDocs = func(r reflect.Value, m reflect.Method, funcDecl *ast.FuncDecl) (*meta_schema.ExternalDocumentationObject, error) {
+		standard := go_openrpc_reflect.StandardReflector
+		got, err := standard.GetMethodExternalDocs(r, m, funcDecl)
+		if err != nil {
+			return nil, err
+		}
+		if got.Url == nil {
+			return got, nil
+		}
+		// Replace links to go-ethereum repo with current core-geth one
+		newLink := meta_schema.ExternalDocumentationObjectUrl(strings.Replace(string(*got.Url), "github.com/ethereum/go-ethereum", "github.com/etclabscore/core-geth", 1))
+		got.Url = &newLink
+		return got, nil
 	}
 
 	// Finally, register the configured reflector to the document.
@@ -312,6 +332,7 @@ var blockNumberOrHashD = fmt.Sprintf(`{
 var rpcSubscriptionParamsNameD = `{
 		"oneOf": [
 			{"type": "string", "enum": ["newHeads"], "description": "Fires a notification each time a new header is appended to the chain, including chain reorganizations."},
+			{"type": "string", "enum": ["newSideHeads"], "description": "Fires a notification each time a new header is appended to the non-canonical (side) chain, including chain reorganizations."},
 			{"type": "string", "enum": ["logs"], "description": "Returns logs that are included in new imported blocks and match the given filter criteria."},
 			{"type": "string", "enum": ["newPendingTransactions"], "description": "Returns the hash for all transactions that are added to the pending state and are signed with a key that is available in the node."},
 			{"type": "string", "enum": ["syncing"], "description": "Indicates when the node starts or stops synchronizing. The result can either be a boolean indicating that the synchronization has started (true), finished (false) or an object with various progress indicators."}

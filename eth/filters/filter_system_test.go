@@ -49,6 +49,7 @@ type testBackend struct {
 	rmLogsFeed      event.Feed
 	pendingLogsFeed event.Feed
 	chainFeed       event.Feed
+	chainSideFeed   event.Feed
 }
 
 func (b *testBackend) ChainDb() ethdb.Database {
@@ -121,6 +122,10 @@ func (b *testBackend) SubscribePendingLogsEvent(ch chan<- []*types.Log) event.Su
 
 func (b *testBackend) SubscribeChainEvent(ch chan<- core.ChainEvent) event.Subscription {
 	return b.chainFeed.Subscribe(ch)
+}
+
+func (b *testBackend) SubscribeChainSideEvent(ch chan<- core.ChainSideEvent) event.Subscription {
+	return b.chainSideFeed.Subscribe(ch)
 }
 
 func (b *testBackend) BloomStatus() (uint64, uint64) {
@@ -204,6 +209,62 @@ func TestBlockSubscription(t *testing.T) {
 	time.Sleep(1 * time.Second)
 	for _, e := range chainEvents {
 		backend.chainFeed.Send(e)
+	}
+
+	<-sub0.Err()
+	<-sub1.Err()
+}
+
+// TestSideBlockSubscription tests if a block subscription returns block hashes for posted chain events.
+// It creates multiple subscriptions:
+// - one at the start and should receive all posted chain events and a second (blockHashes)
+// - one that is created after a cutoff moment and uninstalled after a second cutoff moment (blockHashes[cutoff1:cutoff2])
+// - one that is created after the second cutoff moment (blockHashes[cutoff2:])
+func TestSideBlockSubscription(t *testing.T) {
+	t.Parallel()
+
+	var (
+		db              = rawdb.NewMemoryDatabase()
+		backend         = &testBackend{db: db}
+		api             = NewPublicFilterAPI(backend, false)
+		genesis         = core.MustCommitGenesis(db, new(genesisT.Genesis))
+		chain, _        = core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, 10, func(i int, gen *core.BlockGen) {})
+		chainSideEvents = []core.ChainSideEvent{}
+	)
+
+	for _, blk := range chain {
+		chainSideEvents = append(chainSideEvents, core.ChainSideEvent{Block: blk})
+	}
+
+	chan0 := make(chan *types.Header)
+	sub0 := api.events.SubscribeNewSideHeads(chan0)
+	chan1 := make(chan *types.Header)
+	sub1 := api.events.SubscribeNewSideHeads(chan1)
+
+	go func() { // simulate client
+		i1, i2 := 0, 0
+		for i1 != len(chainSideEvents) || i2 != len(chainSideEvents) {
+			select {
+			case header := <-chan0:
+				if chainSideEvents[i1].Block.Hash() != header.Hash() {
+					t.Errorf("sub0 received invalid hash on index %d, want %x, got %x", i1, chainSideEvents[i1].Block.Hash(), header.Hash())
+				}
+				i1++
+			case header := <-chan1:
+				if chainSideEvents[i2].Block.Hash() != header.Hash() {
+					t.Errorf("sub1 received invalid hash on index %d, want %x, got %x", i2, chainSideEvents[i2].Block.Hash(), header.Hash())
+				}
+				i2++
+			}
+		}
+
+		sub0.Unsubscribe()
+		sub1.Unsubscribe()
+	}()
+
+	time.Sleep(1 * time.Second)
+	for _, e := range chainSideEvents {
+		backend.chainSideFeed.Send(e)
 	}
 
 	<-sub0.Err()

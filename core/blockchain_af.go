@@ -16,6 +16,15 @@ import (
 // errReorgFinality represents an error caused by artificial finality mechanisms.
 var errReorgFinality = errors.New("finality-enforced invalid new chain")
 
+// ArtificialFinalityNoDisable overrides toggling of AF features, forcing it on.
+// n  = 1 : ON
+// n != 1 : OFF
+func (bc *BlockChain) ArtificialFinalityNoDisable(n int32) {
+	log.Warn("Deactivating ECBP1100 (MESS) disablers", "always on", true)
+	bc.artificialFinalityNoDisable = new(int32)
+	atomic.StoreInt32(bc.artificialFinalityNoDisable, n)
+}
+
 // EnableArtificialFinality enables and disable artificial finality features for the blockchain.
 // Currently toggled features include:
 // - ECBP1100-MESS: modified exponential subject scoring
@@ -25,14 +34,21 @@ var errReorgFinality = errors.New("finality-enforced invalid new chain")
 // then calling bc.EnableArtificialFinality(true) will be a noop.
 // The method is idempotent.
 func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interface{}) {
+	// Short circuit if AF state is enabled and nodisable=true.
+	if bc.artificialFinalityNoDisable != nil && atomic.LoadInt32(bc.artificialFinalityNoDisable) == 1 &&
+		bc.IsArtificialFinalityEnabled() && !enable {
+		log.Warn("Preventing disable artificial finality", "enabled", true, "nodisable", true)
+		return
+	}
+
 	// Store enable/disable value regardless of config activation.
 	var statusLog string
 	if enable {
 		statusLog = "Enabled"
-		atomic.StoreInt32(&bc.artificialFinalityEnabled, 1)
+		atomic.StoreInt32(&bc.artificialFinalityEnabledStatus, 1)
 	} else {
 		statusLog = "Disabled"
-		atomic.StoreInt32(&bc.artificialFinalityEnabled, 0)
+		atomic.StoreInt32(&bc.artificialFinalityEnabledStatus, 0)
 	}
 	if !bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, bc.CurrentHeader().Number) {
 		// Don't log anything if the config hasn't enabled it yet.
@@ -49,7 +65,7 @@ func (bc *BlockChain) EnableArtificialFinality(enable bool, logValues ...interfa
 // finality feature setting.
 // This status is agnostic of feature activation by chain configuration.
 func (bc *BlockChain) IsArtificialFinalityEnabled() bool {
-	return atomic.LoadInt32(&bc.artificialFinalityEnabled) == 1
+	return atomic.LoadInt32(&bc.artificialFinalityEnabledStatus) == 1
 }
 
 // getTDRatio is a helper function returning the total difficulty ratio of

@@ -1,6 +1,7 @@
 ---
 hide:
   - navigation # Hide navigation
+title: CoreGeth
 ---
 
 # CoreGeth: An Ethereum Protocol Provider

@@ -1,6 +1,7 @@
 ---
 hide:
   - toc        # Hide table of contents
+title: Included Tools
 ---
 
 ## Executables

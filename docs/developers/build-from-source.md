@@ -1,6 +1,10 @@
+---
+title: Build from Source
+---
+
 ## Dependencies
 
-- Make sure your system has __Go__ installed. Version 1.15+ is recommended. https://golang.org/doc/install
+- Make sure your system has __Go__ installed. Version __1.15.5+__ is recommended. https://golang.org/doc/install
 - Make sure your system has a C compiler installed. For example, with Linux Ubuntu:
 
 ```shell

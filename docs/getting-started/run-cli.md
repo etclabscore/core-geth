@@ -1,3 +1,7 @@
+---
+title: Command Line Interface (CLI)
+---
+
 ## Running `geth`
 
 !!! tip "Use for Ethereum mainnet"

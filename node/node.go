@@ -718,3 +718,10 @@ func GetAPIsByWhitelist(apis []rpc.API, modules []string, exposeAll bool) (regis
 	}
 	return registeredApis
 }
+
+// InprocDiscovery_DEVELOPMENTONLY is a development workaround method
+// only, and should not be considered a stable part of the public interface for this receiver.
+// Current workaround for https://github.com/open-rpc/meta-schema/issues/356.
+func (n *Node) InprocDiscovery_DEVELOPMENTONLY() *go_openrpc_reflect.Document {
+	return n.inprocOpenRPC
+}

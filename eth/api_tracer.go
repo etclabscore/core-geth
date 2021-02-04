@@ -841,13 +841,9 @@ func traceCall(ctx context.Context, eth *Ethereum, args ethapi.CallArgs, blockNr
 	msg := args.ToMessage(eth.APIBackend.RPCGasCap())
 	vmctx := core.NewEVMContext(msg, header, eth.blockchain, nil)
 
-	// taskExtraContext := map[string]interface{}{
-	// 	"blockNumber":         block.NumberU64(),
-	// 	"blockHash":           blockHash.Hex(),
-	// 	"transactionHash":     tx.Hash().Hex(),
-	// 	"transactionPosition": index,
-	// }
 	taskExtraContext := map[string]interface{}{
+		"blockNumber": header.Number.Uint64(),
+		"blockHash":   header.Hash().Hex(),
 		"gasLimit": msg.Gas(),
 		"gasPrice": msg.GasPrice(),
 	}

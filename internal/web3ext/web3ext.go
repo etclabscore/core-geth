@@ -802,6 +802,12 @@ web3._extend({
 			params: 3,
 			inputFormatter: [web3._extend.formatters.inputCallFormatter, null, null]
 		}),
+		new web3._extend.Method({
+			name: 'callMany',
+			call: 'trace_callMany',
+			params: 3,
+			inputFormatter: [null, null, null]
+		}),
 	],
 	properties: []
 });

@@ -809,7 +809,7 @@ func (api *PrivateDebugAPI) TraceTransaction(ctx context.Context, hash common.Ha
 	return traceTransaction(ctx, api.eth, hash, config)
 }
 
-// TraceCall lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
+// traceCall lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
 func traceCall(ctx context.Context, eth *Ethereum, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
@@ -863,6 +863,51 @@ func traceCall(ctx context.Context, eth *Ethereum, args ethapi.CallArgs, blockNr
 // You can provide -2 as a block number to trace on top of the pending block.
 func (api *PrivateDebugAPI) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
 	return traceCall(ctx, api.eth, args, blockNrOrHash, config)
+}
+
+// TraceCallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
+// if the given transaction was added on top of the provided block and returns them as a JSON object.
+// You can provide -2 as a block number to trace on top of the pending block.
+func traceCallMany(ctx context.Context, eth *Ethereum, txs []ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+	// First try to retrieve the state
+	statedb, header, err := eth.APIBackend.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
+	if err != nil {
+		// Try to retrieve the specified block
+		var block *types.Block
+		if hash, ok := blockNrOrHash.Hash(); ok {
+			block = eth.blockchain.GetBlockByHash(hash)
+		} else if number, ok := blockNrOrHash.Number(); ok {
+			block = eth.blockchain.GetBlockByNumber(uint64(number))
+		}
+		if block == nil {
+			return nil, fmt.Errorf("block %v not found: %v", blockNrOrHash, err)
+		}
+		// try to recompute the state
+		reexec := defaultTraceReexec
+		if config != nil && config.Reexec != nil {
+			reexec = *config.Reexec
+		}
+		_, _, statedb, err = computeTxEnv(eth, block, 0, reexec)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Execute the trace
+	var results = make([]interface{}, len(txs))
+	for idx, args := range txs {
+		msg := args.ToMessage(eth.APIBackend.RPCGasCap())
+		vmctx := core.NewEVMContext(msg, header, eth.blockchain, nil)
+
+		res, err := traceTx(ctx, eth, msg, vmctx, statedb, nil, config)
+		if err != nil {
+			results[idx] = &txTraceResult{Error: err.Error()}
+			continue
+		}
+		results[idx] = &txTraceResult{Result: res}
+	}
+
+	return results, nil
 }
 
 // traceTx configures a new tracer according to the provided configuration, and

@@ -214,3 +214,14 @@ func (api *PrivateTraceAPI) Call(ctx context.Context, args ethapi.CallArgs, bloc
 	}
 	return traceCall(ctx, api.eth, args, blockNrOrHash, config)
 }
+
+// CallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
+// if the given transaction was added on top of the provided block and returns them as a JSON object.
+// You can provide -2 as a block number to trace on top of the pending block.
+func (api *PrivateTraceAPI) CallMany(ctx context.Context, txs []ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+	// TODO: handle all 3 tracers
+	if config == nil {
+		config = setConfigTracerToParity(config)
+	}
+	return traceCallMany(ctx, api.eth, txs, blockNrOrHash, config)
+}

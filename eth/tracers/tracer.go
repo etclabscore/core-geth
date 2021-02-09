@@ -723,6 +723,9 @@ func (jst *Tracer) GetResult() (json.RawMessage, error) {
 		case string:
 			jst.vm.PushString(val)
 
+		case bool:
+			jst.vm.PushBoolean(val)
+
 		case []byte:
 			ptr := jst.vm.PushFixedBuffer(len(val))
 			copy(makeSlice(ptr, uint(len(val))), val)

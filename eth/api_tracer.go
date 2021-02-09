@@ -814,7 +814,9 @@ func (api *PrivateDebugAPI) TraceTransaction(ctx context.Context, hash common.Ha
 // You can provide -2 as a block number to trace on top of the pending block.
 func traceCall(ctx context.Context, eth *Ethereum, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
 	// First try to retrieve the state
+	blockNrOrHash.RequireCanonical = true
 	statedb, header, err := eth.APIBackend.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
+	// TODO: check logic on parent block
 	if err != nil {
 		// Try to retrieve the specified block
 		var block *types.Block
@@ -841,9 +843,41 @@ func traceCall(ctx context.Context, eth *Ethereum, args ethapi.CallArgs, blockNr
 	msg := args.ToMessage(eth.APIBackend.RPCGasCap())
 	vmctx := core.NewEVMContext(msg, header, eth.blockchain, nil)
 
+	originalCanTransfer := vmctx.CanTransfer
+	// Store the truth on wether from acount has enough balance for context usage
+	gasCost := new(big.Int).Mul(new(big.Int).SetUint64(msg.Gas()), msg.GasPrice())
+	totalCost := new(big.Int).Add(gasCost, msg.Value())
+	hasFromSufficientBalanceForValueAndGasCost := vmctx.CanTransfer(statedb, msg.From(), totalCost)
+	hasFromSufficientBalanceForGasCost := vmctx.CanTransfer(statedb, msg.From(), gasCost)
+
+	// This is needed for trace_call (debug mode),
+	// as the Transaction is being run on top of the block transactions,
+	// which might lead into ErrInsufficientFundsForTransfer error
+	vmctx.CanTransfer = func(db vm.StateDB, sender common.Address, amount *big.Int) bool {
+		if msg.From() == sender {
+			// fmt.Println("msg:", msg.From(), amount)
+			return true
+		}
+		res := originalCanTransfer(db, sender, amount)
+		// fmt.Println("originalCanTransfer:", res)
+		return res
+	}
+
+	// If the actual transaction would fail, then their is no reason to actually transfer any balance at all
+	vmctx.Transfer = func(db vm.StateDB, sender, recipient common.Address, amount *big.Int) {
+		senderBalance := db.GetBalance(sender)
+		if senderBalance.Cmp(amount) < 0 {
+			amount = big.NewInt(0)
+		}
+		db.SubBalance(sender, amount)
+		db.AddBalance(recipient, amount)
+	}
+
 	taskExtraContext := map[string]interface{}{
 		"blockNumber": header.Number.Uint64(),
 		"blockHash":   header.Hash().Hex(),
+		"hasFromSufficientBalanceForValueAndGasCost": hasFromSufficientBalanceForValueAndGasCost,
+		"hasFromSufficientBalanceForGasCost":         hasFromSufficientBalanceForGasCost,
 		"gasLimit": msg.Gas(),
 		"gasPrice": msg.GasPrice(),
 	}

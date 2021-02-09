@@ -238,6 +238,13 @@ func (dw *dbWrapper) pushObject(vm *duktape.Context) {
 		return 1
 	})
 	vm.PutPropString(obj, "exists")
+
+	// Push the wrapper for statedb.Empty
+	vm.PushGoFunction(func(ctx *duktape.Context) int {
+		ctx.PushBoolean(dw.db.Empty(common.BytesToAddress(popSlice(ctx))))
+		return 1
+	})
+	vm.PutPropString(obj, "isEmpty")
 }
 
 // contractWrapper provides a JavaScript wrapper around vm.Contract

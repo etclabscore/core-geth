@@ -82,7 +82,7 @@ func (l *JSONLogger) CaptureFault(env *EVM, pc uint64, op OpCode, gas, cost uint
 }
 
 // CaptureEnd is triggered at end of execution.
-func (l *JSONLogger) CaptureEnd(output []byte, gasUsed uint64, t time.Duration, err error) error {
+func (l *JSONLogger) CaptureEnd(env *EVM, output []byte, gasUsed uint64, t time.Duration, err error) error {
 	type endLog struct {
 		Output  string              `json:"output"`
 		GasUsed math.HexOrDecimal64 `json:"gasUsed"`

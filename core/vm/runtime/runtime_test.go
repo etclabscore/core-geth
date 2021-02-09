@@ -341,7 +341,7 @@ func (s *stepCounter) CaptureFault(env *vm.EVM, pc uint64, op vm.OpCode, gas, co
 	return nil
 }
 
-func (s *stepCounter) CaptureEnd(output []byte, gasUsed uint64, t time.Duration, err error) error {
+func (s *stepCounter) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, t time.Duration, err error) error {
 	return nil
 }
 

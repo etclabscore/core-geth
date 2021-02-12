@@ -113,10 +113,10 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 		vmenv   = NewEnv(cfg)
 		sender  = vm.AccountRef(cfg.Origin)
 	)
-	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.BlockNumber) {
+	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
 		cfg.State.AddAddressToAccessList(cfg.Origin)
 		cfg.State.AddAddressToAccessList(address)
-		for addr := range vm.PrecompiledContractsForConfig(cfg.ChainConfig, vmenv.BlockNumber) {
+		for addr := range vm.PrecompiledContractsForConfig(cfg.ChainConfig, vmenv.Context.BlockNumber) {
 			cfg.State.AddAddressToAccessList(addr)
 		}
 	}
@@ -150,9 +150,9 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 		vmenv  = NewEnv(cfg)
 		sender = vm.AccountRef(cfg.Origin)
 	)
-	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.BlockNumber) {
+	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
 		cfg.State.AddAddressToAccessList(cfg.Origin)
-		for addr := range vm.PrecompiledContractsForConfig(cfg.ChainConfig, vmenv.BlockNumber) {
+		for addr := range vm.PrecompiledContractsForConfig(cfg.ChainConfig, vmenv.Context.BlockNumber) {
 			cfg.State.AddAddressToAccessList(addr)
 		}
 	}
@@ -178,10 +178,10 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 	vmenv := NewEnv(cfg)
 
 	sender := cfg.State.GetOrNewStateObject(cfg.Origin)
-	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.BlockNumber) {
+	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
 		cfg.State.AddAddressToAccessList(cfg.Origin)
 		cfg.State.AddAddressToAccessList(address)
-		for addr := range vm.PrecompiledContractsForConfig(cfg.ChainConfig, vmenv.BlockNumber) {
+		for addr := range vm.PrecompiledContractsForConfig(cfg.ChainConfig, vmenv.Context.BlockNumber) {
 			cfg.State.AddAddressToAccessList(addr)
 		}
 	}

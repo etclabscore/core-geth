@@ -33,14 +33,16 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func TestSimulatedBackend(t *testing.T) {
 	var gasLimit uint64 = 8000029
 	key, _ := crypto.GenerateKey() // nolint: gosec
-	auth := bind.NewKeyedTransactor(key)
+	auth, _ := bind.NewKeyedTransactorWithChainID(key, big.NewInt(1337))
 	genAlloc := make(genesisT.GenesisAlloc)
 	genAlloc[auth.From] = genesisT.GenesisAccount{Balance: big.NewInt(9223372036854775807)}
 
@@ -122,12 +124,16 @@ func TestNewSimulatedBackend(t *testing.T) {
 	sim := simTestBackend(testAddr)
 	defer sim.Close()
 
-	if sim.config != params.AllEthashProtocolChanges {
-		t.Errorf("expected sim config to equal params.AllEthashProtocolChanges, got %v", sim.config)
+	wantConfig := &goethereum.ChainConfig{}
+	*wantConfig = *params.AllEthashProtocolChanges
+	wantConfig.SetChainID(big.NewInt(1337))
+
+	if err := confp.Equivalent(sim.config, wantConfig); err != nil {
+		t.Errorf("expected sim config to equal params.AllEthashProtocolChanges, got %v, err: %v", sim.config, err)
 	}
 
-	if sim.blockchain.Config() != params.AllEthashProtocolChanges {
-		t.Errorf("expected sim blockchain config to equal params.AllEthashProtocolChanges, got %v", sim.config)
+	if err := confp.Equivalent(sim.blockchain.Config(), wantConfig); err != nil {
+		t.Errorf("expected sim blockchain config to equal params.AllEthashProtocolChanges, got %v, err: %v", sim.config, err)
 	}
 
 	stateDB, _ := sim.blockchain.State()
@@ -412,7 +418,7 @@ func TestSimulatedBackend_EstimateGas(t *testing.T) {
 
 	key, _ := crypto.GenerateKey()
 	addr := crypto.PubkeyToAddress(key.PublicKey)
-	opts := bind.NewKeyedTransactor(key)
+	opts, _ := bind.NewKeyedTransactorWithChainID(key, big.NewInt(1337))
 
 	sim := NewSimulatedBackend(genesisT.GenesisAlloc{addr: {Balance: big.NewInt(vars.Ether)}}, 10000000)
 	defer sim.Close()
@@ -889,7 +895,7 @@ func TestSimulatedBackend_PendingCodeAt(t *testing.T) {
 	if err != nil {
 		t.Errorf("could not get code at test addr: %v", err)
 	}
-	auth := bind.NewKeyedTransactor(testKey)
+	auth, _ := bind.NewKeyedTransactorWithChainID(testKey, big.NewInt(1337))
 	contractAddr, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(abiBin), sim)
 	if err != nil {
 		t.Errorf("could not deploy contract: %v tx: %v contract: %v", err, tx, contract)
@@ -925,7 +931,7 @@ func TestSimulatedBackend_CodeAt(t *testing.T) {
 	if err != nil {
 		t.Errorf("could not get code at test addr: %v", err)
 	}
-	auth := bind.NewKeyedTransactor(testKey)
+	auth, _ := bind.NewKeyedTransactorWithChainID(testKey, big.NewInt(1337))
 	contractAddr, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(abiBin), sim)
 	if err != nil {
 		t.Errorf("could not deploy contract: %v tx: %v contract: %v", err, tx, contract)
@@ -957,7 +963,7 @@ func TestSimulatedBackend_PendingAndCallContract(t *testing.T) {
 	if err != nil {
 		t.Errorf("could not get code at test addr: %v", err)
 	}
-	contractAuth := bind.NewKeyedTransactor(testKey)
+	contractAuth, _ := bind.NewKeyedTransactorWithChainID(testKey, big.NewInt(1337))
 	addr, _, _, err := bind.DeployContract(contractAuth, parsed, common.FromHex(abiBin), sim)
 	if err != nil {
 		t.Errorf("could not deploy contract: %v", err)
@@ -1044,7 +1050,7 @@ func TestSimulatedBackend_CallContractRevert(t *testing.T) {
 	if err != nil {
 		t.Errorf("could not get code at test addr: %v", err)
 	}
-	contractAuth := bind.NewKeyedTransactor(testKey)
+	contractAuth, _ := bind.NewKeyedTransactorWithChainID(testKey, big.NewInt(1337))
 	addr, _, _, err := bind.DeployContract(contractAuth, parsed, common.FromHex(reverterBin), sim)
 	if err != nil {
 		t.Errorf("could not deploy contract: %v", err)

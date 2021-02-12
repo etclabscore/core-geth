@@ -335,6 +335,12 @@ func (ec *Client) SubscribeNewHead(ctx context.Context, ch chan<- *types.Header)
 	return ec.c.EthSubscribe(ctx, ch, "newHeads")
 }
 
+// SubscribeNewSideHead subscribes to notifications about the current blockchain head
+// on the given channel.
+func (ec *Client) SubscribeNewSideHead(ctx context.Context, ch chan<- *types.Header) (ethereum.Subscription, error) {
+	return ec.c.EthSubscribe(ctx, ch, "newSideHeads")
+}
+
 // State Access
 
 // NetworkID returns the network ID (also known as the chain ID) for this chain.
@@ -546,4 +552,13 @@ func toCallArg(msg ethereum.CallMsg) interface{} {
 		arg["gasPrice"] = (*hexutil.Big)(msg.GasPrice)
 	}
 	return arg
+}
+
+func (ec *Client) PeerCount(ctx context.Context) (uint64, error) {
+	var res hexutil.Uint64
+	err := ec.c.CallContext(ctx, &res, "net_peerCount")
+	if err != nil {
+		return 0, err
+	}
+	return uint64(res), nil
 }

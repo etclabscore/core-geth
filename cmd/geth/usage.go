@@ -25,7 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/internal/debug"
 	"github.com/ethereum/go-ethereum/internal/flags"
-	cli "gopkg.in/urfave/cli.v1"
+	"gopkg.in/urfave/cli.v1"
 )
 
 // AppHelpFlagGroups is the application flags, grouped by functionality.
@@ -61,6 +61,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.LightKDFFlag,
 			utils.WhitelistFlag,
 			utils.ECBP1100Flag,
+			utils.ECBP1100NoDisableFlag,
 		},
 	},
 	{
@@ -124,6 +125,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.CacheGCFlag,
 			utils.CacheSnapshotFlag,
 			utils.CacheNoPrefetchFlag,
+			utils.CachePreimagesFlag,
 		},
 	},
 	{

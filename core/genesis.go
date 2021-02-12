@@ -83,7 +83,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	// We have the genesis block in database(perhaps in ancient database)
 	// but the corresponding state is missing.
 	header := rawdb.ReadHeader(db, stored, 0)
-	if _, err := state.New(header.Root, state.NewDatabaseWithCache(db, 0, ""), nil); err != nil {
+	if _, err := state.New(header.Root, state.NewDatabaseWithConfig(db, nil), nil); err != nil {
 		if genesis == nil {
 			genesis = params.DefaultGenesisBlock()
 		}

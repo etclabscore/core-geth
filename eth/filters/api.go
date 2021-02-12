@@ -25,7 +25,7 @@ import (
 	"sync"
 	"time"
 
-	ethereum "github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -203,6 +203,39 @@ func (api *PublicFilterAPI) NewBlockFilter() rpc.ID {
 	return headerSub.ID
 }
 
+// NewSideBlockFilter creates a filter that fetches blocks that are imported into the chain with a non-canonical status.
+// It is part of the filter package since polling goes with eth_getFilterChanges.
+func (api *PublicFilterAPI) NewSideBlockFilter() rpc.ID {
+	var (
+		headers   = make(chan *types.Header)
+		headerSub = api.events.SubscribeNewSideHeads(headers)
+	)
+
+	api.filtersMu.Lock()
+	api.filters[headerSub.ID] = &filter{typ: SideBlocksSubscription, deadline: time.NewTimer(deadline), hashes: make([]common.Hash, 0), s: headerSub}
+	api.filtersMu.Unlock()
+
+	go func() {
+		for {
+			select {
+			case h := <-headers:
+				api.filtersMu.Lock()
+				if f, found := api.filters[headerSub.ID]; found {
+					f.hashes = append(f.hashes, h.Hash())
+				}
+				api.filtersMu.Unlock()
+			case <-headerSub.Err():
+				api.filtersMu.Lock()
+				delete(api.filters, headerSub.ID)
+				api.filtersMu.Unlock()
+				return
+			}
+		}
+	}()
+
+	return headerSub.ID
+}
+
 // NewHeads send a notification each time a new (header) block is appended to the chain.
 func (api *PublicFilterAPI) NewHeads(ctx context.Context) (*rpc.Subscription, error) {
 	notifier, supported := rpc.NotifierFromContext(ctx)
@@ -233,7 +266,37 @@ func (api *PublicFilterAPI) NewHeads(ctx context.Context) (*rpc.Subscription, er
 	return rpcSub, nil
 }
 
-// Logs creates a subscription that fires for all new log that match the given filter criteria.
+// NewSideHeads send a notification each time a new non-canonical (header) block is written to the database.
+func (api *PublicFilterAPI) NewSideHeads(ctx context.Context) (*rpc.Subscription, error) {
+	notifier, supported := rpc.NotifierFromContext(ctx)
+	if !supported {
+		return &rpc.Subscription{}, rpc.ErrNotificationsUnsupported
+	}
+
+	rpcSub := notifier.CreateSubscription()
+
+	go func() {
+		headers := make(chan *types.Header)
+		headersSub := api.events.SubscribeNewSideHeads(headers)
+
+		for {
+			select {
+			case h := <-headers:
+				notifier.Notify(rpcSub.ID, h)
+			case <-rpcSub.Err():
+				headersSub.Unsubscribe()
+				return
+			case <-notifier.Closed():
+				headersSub.Unsubscribe()
+				return
+			}
+		}
+	}()
+
+	return rpcSub, nil
+}
+
+// Logs creates a subscription that fires for all new logs that match the given filter criteria.
 func (api *PublicFilterAPI) Logs(ctx context.Context, crit FilterCriteria) (*rpc.Subscription, error) {
 	notifier, supported := rpc.NotifierFromContext(ctx)
 	if !supported {
@@ -292,7 +355,7 @@ func (api *PublicFilterAPI) NewFilter(crit FilterCriteria) (rpc.ID, error) {
 	logs := make(chan []*types.Log)
 	logsSub, err := api.events.SubscribeLogs(ethereum.FilterQuery(crit), logs)
 	if err != nil {
-		return rpc.ID(""), err
+		return "", err
 	}
 
 	api.filtersMu.Lock()
@@ -424,7 +487,7 @@ func (api *PublicFilterAPI) GetFilterChanges(id rpc.ID) (interface{}, error) {
 		f.deadline.Reset(deadline)
 
 		switch f.typ {
-		case PendingTransactionsSubscription, BlocksSubscription:
+		case PendingTransactionsSubscription, BlocksSubscription, SideBlocksSubscription:
 			hashes := f.hashes
 			f.hashes = nil
 			return returnHashes(hashes), nil

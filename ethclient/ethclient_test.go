@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -418,6 +419,149 @@ func TestRPCDiscover(t *testing.T) {
 	}
 }
 
+func subscriptionTestSetup(t *testing.T) (genesisBlock *genesisT.Genesis, backend *node.Node) {
+	// Generate test chain.
+	// Code largely taken from generateTestChain()
+	chainConfig := params.TestChainConfig
+	genesis := &genesisT.Genesis{
+		Config:    chainConfig,
+		Alloc:     genesisT.GenesisAlloc{testAddr: {Balance: testBalance}},
+		ExtraData: []byte("test genesis"),
+		Timestamp: 9000,
+	}
+
+	// Create node
+	// Code largely taken from newTestBackend(t)
+	backend, err := node.New(&node.Config{})
+	if err != nil {
+		t.Fatalf("can't create new node: %v", err)
+	}
+
+	// Create Ethereum Service
+	config := &eth.Config{Genesis: genesis}
+	config.Ethash.PowMode = ethash.ModeFake
+
+	return genesis, backend
+}
+
+func TestEthSubscribeNewSideHeads(t *testing.T) {
+
+	genesis, backend := subscriptionTestSetup(t)
+
+	db := rawdb.NewMemoryDatabase()
+	chainConfig := genesis.Config
+
+	gblock := core.GenesisToBlock(genesis, db)
+	engine := ethash.NewFaker()
+	originalBlocks, _ := core.GenerateChain(chainConfig, gblock, engine, db, 10, func(i int, gen *core.BlockGen) {
+		gen.OffsetTime(5)
+		gen.SetExtra([]byte("test"))
+	})
+	originalBlocks = append([]*types.Block{gblock}, originalBlocks...)
+
+	// Create Ethereum Service
+	config := &eth.Config{Genesis: genesis}
+	config.Ethash.PowMode = ethash.ModeFake
+	ethservice, err := eth.New(backend, config)
+	if err != nil {
+		t.Fatalf("can't create new ethereum service: %v", err)
+	}
+
+	// Import the test chain.
+	if err := backend.Start(); err != nil {
+		t.Fatalf("can't start test node: %v", err)
+	}
+	if _, err := ethservice.BlockChain().InsertChain(originalBlocks[1:]); err != nil {
+		t.Fatalf("can't import test blocks: %v", err)
+	}
+
+	// Create the client and newSideHeads subscription.
+	client, err := backend.Attach()
+	defer backend.Close()
+	defer client.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ec := NewClient(client)
+	defer ec.Close()
+
+	sideHeadCh := make(chan *types.Header)
+	sub, err := ec.SubscribeNewSideHead(context.Background(), sideHeadCh)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer sub.Unsubscribe()
+
+	// Create and import the second-seen chain.
+	replacementBlocks, _ := core.GenerateChain(chainConfig, originalBlocks[len(originalBlocks)-5], ethservice.Engine(), db, 5, func(i int, gen *core.BlockGen) {
+		gen.OffsetTime(-9) // difficulty++
+	})
+	if _, err := ethservice.BlockChain().InsertChain(replacementBlocks); err != nil {
+		t.Fatalf("can't import test blocks: %v", err)
+	}
+
+	headersOf := func(bs []*types.Block) (headers []*types.Header) {
+		for _, b := range bs {
+			headers = append(headers, b.Header())
+		}
+		return
+	}
+
+	expectations := []*types.Header{}
+
+	// Why do we expect the replacement (second-seen) blocks reported as side events?
+	// Because they'll be inserted in ascending order, and until their segment exceeds the total difficulty
+	// of the incumbent chain, they won't achieve canonical status, despite having greater difficulty per block
+	// (see the time offset in the block generator function above).
+	expectations = append(expectations, headersOf(replacementBlocks[:3])...)
+
+	// Once the replacement blocks exceed the total difficulty of the original chain, the
+	// blocks they replace will be reported as side chain events.
+	expectations = append(expectations, headersOf(originalBlocks[7:])...)
+
+	// This is illustrated in the logs called below.
+	for i, b := range originalBlocks {
+		t.Log("incumbent", i, b.NumberU64(), b.Hash().Hex()[:8])
+	}
+	for i, b := range replacementBlocks {
+		t.Log("replacement", i, b.NumberU64(), b.Hash().Hex()[:8])
+	}
+
+	const timeoutDura = 5 * time.Second
+	timeout := time.NewTimer(timeoutDura)
+
+	got := []*types.Header{}
+waiting:
+	for {
+		select {
+		case head := <-sideHeadCh:
+			t.Log("<-newSideHeads", head.Number.Uint64(), head.Hash().Hex()[:8])
+			got = append(got, head)
+			if len(got) == len(expectations) {
+				timeout.Stop()
+				break waiting
+			}
+			timeout.Reset(timeoutDura)
+		case err := <-sub.Err():
+			t.Fatal(err)
+		case <-timeout.C:
+			t.Fatal("timed out")
+		}
+	}
+	for i, b := range expectations {
+		if got[i] == nil {
+			t.Error("missing expected header (test will improvise a fake value)")
+			// Set a nonzero value so I don't have to refactor this...
+			got[i] = &types.Header{Number: big.NewInt(math.MaxInt64)}
+		}
+		if got[i].Number.Uint64() != b.Number.Uint64() {
+			t.Errorf("number: want: %d, got: %d", b.Number.Uint64(), got[i].Number.Uint64())
+		} else if got[i].Hash() != b.Hash() {
+			t.Errorf("hash: want: %s, got: %s", b.Hash().Hex()[:8], got[i].Hash().Hex()[:8])
+		}
+	}
+}
+
 // mustNewTestBackend is the same logic as newTestBackend(t *testing.T) but without the testing.T argument.
 // This function is used exclusively for the benchmarking tests, and will panic if it encounters an error.
 func mustNewTestBackend() (*node.Node, []*types.Block) {
@@ -581,6 +725,7 @@ var allRPCMethods = []string{
 	"eth_hashrate",
 	"eth_mining",
 	"eth_newBlockFilter",
+	"eth_newSideBlockFilter",
 	"eth_newFilter",
 	"eth_newPendingTransactionFilter",
 	"eth_pendingTransactions",

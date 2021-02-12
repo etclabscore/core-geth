@@ -125,6 +125,76 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 	}
 }
 
+// TestArtificialFinalityFeatureEnablingDisabling_NoDisable tests that when the nodisable override
+// is in place (see NOTE1 below), AF is not disabled at the min peer floor.
+func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
+	// Create a full protocol manager, check that fast sync gets disabled
+	a, _ := newTestProtocolManagerMust(t, downloader.FastSync, 1024, nil, nil)
+	if atomic.LoadUint32(&a.fastSync) == 1 {
+		t.Fatalf("fast sync not disabled on non-empty blockchain")
+	}
+
+	one := uint64(1)
+	a.blockchain.Config().SetECBP1100Transition(&one)
+
+	oMinAFPeers := minArtificialFinalityPeers
+	defer func() {
+		// Clean up after, resetting global default to original value.
+		minArtificialFinalityPeers = oMinAFPeers
+	}()
+	minArtificialFinalityPeers = 1
+
+	// Create a full protocol manager, check that fast sync gets disabled
+	b, _ := newTestProtocolManagerMust(t, downloader.FastSync, 0, nil, nil)
+	if atomic.LoadUint32(&b.fastSync) == 0 {
+		t.Fatalf("fast sync disabled on pristine blockchain")
+	}
+	b.blockchain.Config().SetECBP1100Transition(&one)
+
+	// NOTE1: Set the nodisable switch to the on position.
+	// This prevents the de-activation of AF features once they have been enabled.
+	// In geth code, this is set in the backend during blockchain construction.
+	b.blockchain.ArtificialFinalityNoDisable(1)
+
+	io1, io2 := p2p.MsgPipe()
+	go a.handle(a.newPeer(65, p2p.NewPeer(enode.ID{}, "peer-b", nil), io2, a.txpool.Get))
+	go b.handle(b.newPeer(65, p2p.NewPeer(enode.ID{}, "peer-a", nil), io1, b.txpool.Get))
+	time.Sleep(250 * time.Millisecond)
+
+	op := peerToSyncOp(downloader.FullSync, b.peers.BestPeer())
+	if err := b.doSync(op); err != nil {
+		t.Fatalf("sync failed: %v", err)
+	}
+
+	b.chainSync.forced = true
+	next := b.chainSync.nextSyncOp()
+	if next != nil {
+		t.Fatal("non-nil next sync op")
+	}
+	if !b.blockchain.Config().IsEnabled(b.blockchain.Config().GetECBP1100Transition, b.blockchain.CurrentBlock().Number()) {
+		t.Error("AF feature not configured")
+	}
+	if !b.blockchain.IsArtificialFinalityEnabled() {
+		t.Error("AF not enabled")
+	}
+
+	// Set the value back to default (more than 1).
+	minArtificialFinalityPeers = oMinAFPeers
+
+	// Next sync op will unset AF because manager only has 1 peer.
+	b.chainSync.forced = true
+	next = b.chainSync.nextSyncOp()
+	if next != nil {
+		t.Fatal("non-nil next sync op")
+	}
+	if !b.blockchain.IsArtificialFinalityEnabled() {
+		t.Error(`AF not enabled;
+The AF disable mechanism triggered by the minimum peers floor should have been short-circuited,
+preventing AF disablement on this sync op (with the minArtificialFinalityPeers value set to > 1 (defaultMinSyncPeers = 5)),
+and the number of peers 'a' is connected with being only 1.)`)
+	}
+}
+
 func TestArtificialFinalitySafetyLoopTimeComparison(t *testing.T) {
 	if !(time.Since(time.Unix(int64(params.DefaultMessNetGenesisBlock().Timestamp), 0)) > artificialFinalitySafetyInterval) {
 		t.Fatal("bad unit logic!")

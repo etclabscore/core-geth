@@ -111,7 +111,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigura
 		txIndex     = 0
 	)
 	gaspool.AddGas(pre.Env.GasLimit)
-	vmContext := vm.Context{
+	vmContext := vm.BlockContext{
 		CanTransfer: core.CanTransfer,
 		Transfer:    core.Transfer,
 		Coinbase:    pre.Env.Coinbase,
@@ -120,7 +120,6 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigura
 		Difficulty:  pre.Env.Difficulty,
 		GasLimit:    pre.Env.GasLimit,
 		GetHash:     getHash,
-		// GasPrice and Origin needs to be set per transaction
 	}
 	// If DAO is supported/enabled, we need to handle it here. In geth 'proper', it's
 	// done in StateProcessor.Process(block, ...), right before transactions are applied.
@@ -145,10 +144,9 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigura
 		vmConfig.Tracer = tracer
 		vmConfig.Debug = (tracer != nil)
 		statedb.Prepare(tx.Hash(), blockHash, txIndex)
-		vmContext.GasPrice = msg.GasPrice()
-		vmContext.Origin = msg.From()
+		txContext := core.NewEVMTxContext(msg)
 
-		evm := vm.NewEVM(vmContext, statedb, chainConfig, vmConfig)
+		evm := vm.NewEVM(vmContext, txContext, statedb, chainConfig, vmConfig)
 		if chainConfig.IsEnabled(chainConfig.GetEIP2929Transition, vmContext.BlockNumber) {
 			statedb.AddAddressToAccessList(msg.From())
 			if dst := msg.To(); dst != nil {
@@ -189,7 +187,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigura
 			receipt.GasUsed = msgResult.UsedGas
 			// if the transaction created a contract, store the creation address in the receipt.
 			if msg.To() == nil {
-				receipt.ContractAddress = crypto.CreateAddress(evm.Context.Origin, tx.Nonce())
+				receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce())
 			}
 			// Set the receipt logs and create a bloom for filtering
 			receipt.Logs = statedb.GetLogs(tx.Hash())

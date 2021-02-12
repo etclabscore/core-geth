@@ -97,7 +97,7 @@ func NewEVMInterpreter(evm *EVM, cfg Config) *EVMInterpreter {
 	// the jump table was initialised. If it was not
 	// we'll set the default jump table.
 	if cfg.JumpTable[STOP] == nil {
-		var jt = instructionSetForConfig(evm.chainConfig, evm.BlockNumber)
+		var jt = instructionSetForConfig(evm.chainConfig, evm.Context.BlockNumber)
 
 		for i, eip := range cfg.ExtraEips {
 			if err := EnableEIP(eip, &jt); err != nil {
@@ -217,7 +217,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 			return nil, &ErrStackOverflow{stackLen: sLen, limit: operation.maxStack}
 		}
 		// If the operation is valid, enforce and write restrictions
-		if in.readOnly && in.evm.ChainConfig().IsEnabled(in.evm.chainConfig.GetEIP214Transition, in.evm.BlockNumber) {
+		if in.readOnly && in.evm.ChainConfig().IsEnabled(in.evm.chainConfig.GetEIP214Transition, in.evm.Context.BlockNumber) {
 			// If the interpreter is operating in readonly mode, make sure no
 			// state-modifying operation is performed. The 3rd stack item
 			// for a call operation is the value. Transferring value from one

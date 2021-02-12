@@ -141,12 +141,6 @@ func remoteConsole(ctx *cli.Context) error {
 				path = filepath.Join(path, "classic")
 			} else if ctx.GlobalBool(utils.MordorFlag.Name) {
 				path = filepath.Join(path, "mordor")
-			} else if ctx.GlobalBool(utils.SocialFlag.Name) {
-				path = filepath.Join(path, "social")
-			} else if ctx.GlobalBool(utils.MixFlag.Name) {
-				path = filepath.Join(path, "mix")
-			} else if ctx.GlobalBool(utils.EthersocialFlag.Name) {
-				path = filepath.Join(path, "ethersocial")
 			} else if ctx.GlobalBool(utils.GoerliFlag.Name) {
 				path = filepath.Join(path, "goerli")
 			} else if ctx.GlobalBool(utils.YoloV2Flag.Name) {

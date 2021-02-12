@@ -66,16 +66,13 @@ import (
 )
 
 var (
-	foundationFlag  = flag.Bool("chain.foundation", false, "Configure genesis and bootnodes for foundation chain defaults")
-	classicFlag     = flag.Bool("chain.classic", false, "Configure genesis and bootnodes for classic chain defaults")
-	mordorFlag      = flag.Bool("chain.mordor", false, "Configure genesis and bootnodes for mordor chain defaults")
-	kottiFlag       = flag.Bool("chain.kotti", false, "Configure genesis and bootnodes for kotti chain defaults")
-	socialFlag      = flag.Bool("chain.social", false, "Configure genesis and bootnodes for social chain defaults")
-	ethersocialFlag = flag.Bool("chain.ethersocial", false, "Configure genesis and bootnodes for ethersocial chain defaults")
-	mixFlag         = flag.Bool("chain.mix", false, "Configure genesis and bootnodes for mix chain defaults")
-	testnetFlag     = flag.Bool("chain.testnet", false, "Configure genesis and bootnodes for testnet chain defaults")
-	rinkebyFlag     = flag.Bool("chain.rinkeby", false, "Configure genesis and bootnodes for rinkeby chain defaults")
-	goerliFlag      = flag.Bool("chain.goerli", false, "Configure genesis and bootnodes for goerli chain defaults")
+	foundationFlag = flag.Bool("chain.foundation", false, "Configure genesis and bootnodes for foundation chain defaults")
+	classicFlag    = flag.Bool("chain.classic", false, "Configure genesis and bootnodes for classic chain defaults")
+	mordorFlag     = flag.Bool("chain.mordor", false, "Configure genesis and bootnodes for mordor chain defaults")
+	kottiFlag      = flag.Bool("chain.kotti", false, "Configure genesis and bootnodes for kotti chain defaults")
+	testnetFlag    = flag.Bool("chain.testnet", false, "Configure genesis and bootnodes for testnet chain defaults")
+	rinkebyFlag    = flag.Bool("chain.rinkeby", false, "Configure genesis and bootnodes for rinkeby chain defaults")
+	goerliFlag     = flag.Bool("chain.goerli", false, "Configure genesis and bootnodes for goerli chain defaults")
 
 	attachFlag    = flag.String("attach", "", "Attach to an IPC or WS endpoint")
 	attachChainID = flag.Int64("attach.chainid", 0, "Configure fallback chain id value for use in attach mode (used if target does not have value available yet).")
@@ -111,9 +108,6 @@ var chainFlags = []*bool{
 	classicFlag,
 	mordorFlag,
 	kottiFlag,
-	socialFlag,
-	ethersocialFlag,
-	mixFlag,
 	testnetFlag,
 	rinkebyFlag,
 	goerliFlag,
@@ -139,12 +133,6 @@ func faucetDirFromChainIndicators(chainID uint64, genesisHash common.Hash) strin
 			return filepath.Join(datadir, "classic")
 		}
 		return filepath.Join(datadir, "")
-	case params.SocialGenesisHash:
-		return filepath.Join(datadir, "social")
-	case params.EthersocialGenesisHash:
-		return filepath.Join(datadir, "ethersocial")
-	case params.MixGenesisHash:
-		return filepath.Join(datadir, "mix")
 	case params.RopstenGenesisHash:
 		return filepath.Join(datadir, "ropsten")
 	case params.RinkebyGenesisHash:
@@ -168,9 +156,6 @@ func parseChainFlags() (gs *genesisT.Genesis, bs string, netid uint64) {
 		{*foundationFlag, params.DefaultGenesisBlock(), nil},
 		{*classicFlag, params.DefaultClassicGenesisBlock(), nil},
 		{*mordorFlag, params.DefaultMordorGenesisBlock(), nil},
-		{*socialFlag, params.DefaultSocialGenesisBlock(), params.SocialBootnodes},
-		{*ethersocialFlag, params.DefaultEthersocialGenesisBlock(), params.EthersocialBootnodes},
-		{*mixFlag, params.DefaultMixGenesisBlock(), params.MixBootnodes},
 		{*testnetFlag, params.DefaultRopstenGenesisBlock(), nil},
 		{*rinkebyFlag, params.DefaultRinkebyGenesisBlock(), nil},
 		{*kottiFlag, params.DefaultKottiGenesisBlock(), nil},

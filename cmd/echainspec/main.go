@@ -57,10 +57,6 @@ var defaultChainspecValues = map[string]ctypes.Configurator{
 	"rinkeby":    params.DefaultRinkebyGenesisBlock(),
 	"goerli":     params.DefaultGoerliGenesisBlock(),
 	"yolov2":     params.DefaultYoloV2GenesisBlock(),
-
-	"social":      params.DefaultSocialGenesisBlock(),
-	"ethersocial": params.DefaultEthersocialGenesisBlock(),
-	"mix":         params.DefaultMixGenesisBlock(),
 }
 
 var defaultChainspecNames = func() []string {

@@ -146,9 +146,6 @@ var (
 		utils.DeveloperPoWFlag,
 		utils.ClassicFlag,
 		utils.MordorFlag,
-		utils.SocialFlag,
-		utils.MixFlag,
-		utils.EthersocialFlag,
 		utils.LegacyTestnetFlag,
 		utils.RopstenFlag,
 		utils.RinkebyFlag,
@@ -324,15 +321,6 @@ func checkMainnet(ctx *cli.Context) bool {
 
 	case ctx.GlobalIsSet(utils.YoloV2Flag.Name):
 		log.Info("Starting Geth on YoloV2 testnet...")
-
-	case ctx.GlobalIsSet(utils.SocialFlag.Name):
-		log.Info("Starting Geth on Social network...")
-
-	case ctx.GlobalIsSet(utils.EthersocialFlag.Name):
-		log.Info("Starting Geth on EtherSocial network...")
-
-	case ctx.GlobalIsSet(utils.MixFlag.Name):
-		log.Info("Starting Geth on Mix network...")
 
 	case !ctx.GlobalIsSet(utils.NetworkIdFlag.Name):
 		log.Info("Starting Geth on Ethereum mainnet...")

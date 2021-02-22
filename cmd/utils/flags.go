@@ -1782,6 +1782,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 		SetDNSDiscoveryDefaults2(cfg, params.MordorDNSNetwork1)
 	default:
 		if cfg.NetworkId == 1 {
+			log.Warn("Not specifying a network flag is deprecated and will be removed in the future, please use --mainnet for Ethereum mainnet")
 			SetDNSDiscoveryDefaults(cfg, params.MainnetGenesisHash)
 		}
 	}

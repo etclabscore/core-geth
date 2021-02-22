@@ -309,8 +309,13 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 	op := peerToSyncOp(mode, peer)
 	if op.td.Cmp(ourTD) <= 0 {
 		// Enable artificial finality if parameters if should.
+		// - In full sync mode.
 		if op.mode == downloader.FullSync &&
+			// - Have enough peers.
 			cs.pm.peers.Len() >= minArtificialFinalityPeers &&
+			// - Head is not stale.
+			!(time.Since(time.Unix(int64(cs.pm.blockchain.CurrentHeader().Time), 0)) > artificialFinalitySafetyInterval) &&
+			// - AF is disabled (so we should reenable).
 			!cs.pm.blockchain.IsArtificialFinalityEnabled() {
 			cs.pm.blockchain.EnableArtificialFinality(true, "reason", "synced", "peers", cs.pm.peers.Len())
 		}

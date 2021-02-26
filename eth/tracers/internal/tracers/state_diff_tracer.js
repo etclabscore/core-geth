@@ -18,7 +18,7 @@
 // the transaction from a custom assembled genesisT block.
 {
 	// stateDiff is the genesisT that we're building.
-	stateDiff: null,
+	stateDiff: {},
 
 	debugState: {},
 
@@ -290,6 +290,24 @@
 		}
 	},
 
+	// init is invoked on the first call VM executes.
+	init: function(ctx, log, db) {
+		// Balances will potentially be wrong here, since they will include the value
+		// sent along with the message or the paid full gas cost. We fix that in "result()".
+
+		var toAccAddress = toAddress(ctx.to);
+
+		// Get actual "to" values for from, to, coinbase accounts
+		this.lookupAccount(toAddress(ctx.from), db);
+		this.lookupAccount(toAccAddress, db);
+		this.lookupAccount(toAddress(ctx.coinbase), db);
+
+		var contractAddress = log.contract.getAddress();
+		if (toHex(contractAddress) !== toHex(toAccAddress)) {
+			this.lookupAccount(contractAddress, db);
+		}
+	},
+
 	// step is invoked for every opcode that the VM executes.
 	step: function(log, db) {
 		// Capture any errors immediately
@@ -308,18 +326,6 @@
 		}
 
 		// Add the current account if we just started tracing
-		if (this.stateDiff === null){
-			this.stateDiff = {};
-
-			// var contractAddr = log.contract.getAddress();
-			// console.log('ex',db.exists(contractAddr));
-			// var type = db.exists(contractAddr) ? this.diffMarkers.Changed : this.diffMarkers.Born;
-			// Balance will potentially be wrong here, since this will include the value
-			// sent along with the message. We fix that in "result()".
-			this.lookupAccount(log.contract.getAddress(), db);
-			// console.log(log.contract.getAddress())
-			// this.lookupAccount(toAddress('0x893defcfe8dc3b7fe2b95c2ddd6415ac2f1eb582'), db);
-		}
 
 		// var refund = log.getRefund();
     // console.log('refund', refund)
@@ -430,16 +436,11 @@
 		var memoryMarker = this.diffMarkers.Memory;
 
 
-		var addValueToFromBalance = false;
 
 		// EIP161, when calling a non existing account, passing no value,
 		// then nothing happens and `CaptureState` (and  inline `step`) method are not being called,
 		// so no calculations or logic is being applied in the tracer.
 		// For this reason we initiate the state here.
-		if (this.stateDiff === null) {
-			this.stateDiff = {};
-			addValueToFromBalance = true;
-		}
 		if (this.lastGasIn === null) {
 			this.lastGasIn = ctx.gas;
 		}

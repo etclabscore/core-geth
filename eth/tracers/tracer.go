@@ -593,10 +593,13 @@ func (jst *Tracer) CaptureExtraContext(inputs map[string]interface{}) error {
 // CaptureState implements the Tracer interface to trace a single step of VM execution.
 func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, memory *vm.Memory, stack *vm.Stack, rStack *vm.ReturnStack, rdata []byte, contract *vm.Contract, depth int, err error) error {
 	if jst.err == nil {
+		initMarker := false
+
 		// Initialize the context if it wasn't done yet
 		if !jst.inited {
 			jst.ctx["block"] = env.BlockNumber.Uint64()
 			jst.inited = true
+			initMarker = true
 		}
 		// If tracing was interrupted, set the error and stop
 		if atomic.LoadUint32(&jst.interrupt) > 0 {
@@ -629,6 +632,15 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 		if err != nil {
 			jst.errorValue = new(string)
 			*jst.errorValue = err.Error()
+		}
+
+		if initMarker && jst.vm.GetPropString(jst.tracerObject, "init") {
+			jst.addCtxIntoState()
+			_, err := jst.call("init", "ctx", "log", "db")
+			if err != nil {
+				jst.err = wrapError("init", err)
+				return nil
+			}
 		}
 
 		// Checks wether tracer supports `getCallstackLength` method in order to achieve optimal performance for call_tracer*
@@ -710,8 +722,8 @@ func (jst *Tracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, t time
 	return nil
 }
 
-// GetResult calls the Javascript 'result' function and returns its value, or any accumulated error
-func (jst *Tracer) GetResult() (json.RawMessage, error) {
+// addCtxIntoState adds/updates the ctx vars in the duktape context
+func (jst *Tracer) addCtxIntoState() {
 	// Transform the context into a JavaScript object and inject into the state
 	obj := jst.vm.PushObject()
 
@@ -743,6 +755,11 @@ func (jst *Tracer) GetResult() (json.RawMessage, error) {
 		jst.vm.PutPropString(obj, key)
 	}
 	jst.vm.PutPropString(jst.stateObject, "ctx")
+}
+
+// GetResult calls the Javascript 'result' function and returns its value, or any accumulated error
+func (jst *Tracer) GetResult() (json.RawMessage, error) {
+	jst.addCtxIntoState()
 
 	// Finalize the trace and return the results
 	result, err := jst.call("result", "ctx", "db")

@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"math/big"
 	"os"
 	"reflect"
 	"runtime"
@@ -878,8 +879,8 @@ func traceCall(ctx context.Context, eth *Ethereum, args ethapi.CallArgs, blockNr
 		"blockHash":   header.Hash().Hex(),
 		"hasFromSufficientBalanceForValueAndGasCost": hasFromSufficientBalanceForValueAndGasCost,
 		"hasFromSufficientBalanceForGasCost":         hasFromSufficientBalanceForGasCost,
-		"gasLimit": msg.Gas(),
-		"gasPrice": msg.GasPrice(),
+		"gasLimit":                                   msg.Gas(),
+		"gasPrice":                                   msg.GasPrice(),
 	}
 	if coinbase, err := eth.engine.Author(header); err == nil {
 		taskExtraContext["coinbase"] = coinbase

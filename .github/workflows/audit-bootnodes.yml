@@ -1,0 +1,82 @@
+name: Audit Bootnodes
+
+on:
+
+  schedule:
+    - cron: '0 6 * * *'
+
+  pull_request:
+    branches:
+      - 'master'
+    paths:
+      - 'params/bootnode*'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    name: Audit Bootnodes
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.15
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+          git submodule update --init --recursive
+          go get golang.org/x/mobile/cmd/gomobile
+          gomobile init
+
+      - name: Build
+        run: |
+          make all
+
+      - name: Audit Bootnodes
+        shell: bash
+        run: |
+          healthcheck() {
+            enode_list="$(cat "$1" |grep -E 'enode://' | sed 's-"--g' | sed 's-\t--g'| sed 's/,.*//g')"
+            echo "$enode_list" | while read -r line; do
+              if 2>/dev/null ./build/bin/devp2p discv4 ping "${line}"; then
+                >&2 echo "PASS: ${line}"
+              else
+                echo "${line}"
+              fi
+            done
+          }
+          status=0
+          while read -r file; do
+            echo "Auditing ${file}"
+            healthcheck "${file}" | while read -r failed; do
+              echo "FAIL: ${fail}"
+              if [[ $GITHUB_EVENT_NAME != pull_request ]]; then
+                id="$(basename ${fail} | cut -d'@' -f1)"
+                sed -i '/'"${id}"'/d' "${file}"
+              else
+                status=1
+              fi
+            done
+          done < <(find ./params -type f -name '*bootnode*go')
+          exit $status
+
+      - name: Create Pull Request
+        if: github.event_name == 'schedule'
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: 'params: remove unresponsive bootnodes'
+          title: 'params: remove unresponsive bootnodes'
+          body: |
+            These bootnodes did not respond to `discv4 ping` requests.
+
+            For details: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID.
+          branch: remove-stale-bootnodes

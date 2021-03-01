@@ -73,5 +73,5 @@ jobs:
           body: |
             These bootnodes did not respond to `./build/bin/devp2p discv4 ping` requests.
 
-            For details: ${{github.github_server_url}}/${{github.github_repository}}/actions/runs/${{github.github_run_id}}.
+            For details: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}.
           branch: remove-stale-bootnodes

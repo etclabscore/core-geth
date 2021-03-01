@@ -93,6 +93,29 @@ func consoleCmdStdoutTest(flags []string, execCmd string, want interface{}) func
 	}
 }
 
+// TestGethFailureToLaunch tests that geth fail immediately when given invalid run parameters (ie CLI args).
+func TestGethFailureToLaunch(t *testing.T) {
+	cases := []struct {
+		flags            []string
+		expectErrorReStr string
+	}{
+		{
+			flags:            []string{"--badnet"},
+			expectErrorReStr: "(?ism)incorrect usage.*",
+		},
+	}
+	for _, c := range cases {
+		t.Run(fmt.Sprintf("TestIncorrectUsage: %v", c.flags), func(t *testing.T) {
+			geth := runGeth(t, c.flags...)
+			geth.ExpectRegexp(c.expectErrorReStr)
+			geth.ExpectExit()
+			if status := geth.ExitStatus(); status == 0 {
+				t.Errorf("expected exit status != 0, got: %d", status)
+			}
+		})
+	}
+}
+
 // Tests that a node embedded within a console can be started up properly and
 // then terminated by closing the input stream.
 func TestConsoleWelcome(t *testing.T) {

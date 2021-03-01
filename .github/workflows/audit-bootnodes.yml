@@ -29,10 +29,8 @@ jobs:
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
 
-      - name: Build devp2p
+      - name: Build bin/devp2p
         run: |
           mkdir -p build/bin
           go build -o build/bin/devp2p ./cmd/devp2p
@@ -43,7 +41,7 @@ jobs:
           healthcheck() {
             enode_list="$(cat "$1" |grep -E 'enode://' | sed 's-"--g' | sed 's-\t--g'| sed 's/,.*//g')"
             echo "$enode_list" | while read -r line; do
-              if 2>/dev/null ./build/bin/devp2p discv4 ping "${line}"; then
+              if >/dev/null 2>&1 ./build/bin/devp2p discv4 ping "${line}"; then
                 >&2 echo "PASS: ${line}"
               else
                 echo "${line}"

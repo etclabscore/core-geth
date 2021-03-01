@@ -61,7 +61,7 @@ jobs:
               fi
             done
           done < <(find ./params -type f -name '*bootnode*go')
-          test $status -eq 0 || git --no-pager diff
+          test "$GITHUB_EVENT_NAME" -ne "pull_request" && git --no-pager diff
           exit $status
 
       - name: Create Pull Request
@@ -71,7 +71,7 @@ jobs:
           commit-message: 'params: remove unresponsive bootnodes'
           title: 'params: remove unresponsive bootnodes'
           body: |
-            These bootnodes did not respond to `discv4 ping` requests.
+            These bootnodes did not respond to `./build/bin/devp2p discv4 ping` requests.
 
-            For details: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID.
+            For details: ${{GITHUB_SERVER_URL}}/${{GITHUB_REPOSITORY}}/actions/runs/${{GITHUB_RUN_ID}}.
           branch: remove-stale-bootnodes

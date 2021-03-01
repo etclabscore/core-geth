@@ -87,6 +87,9 @@ func consoleCmdStdoutTest(flags []string, execCmd string, want interface{}) func
 		geth.Expect(fmt.Sprintf(`%v
 `, want))
 		geth.ExpectExit()
+		if status := geth.ExitStatus(); status != 0 {
+			t.Errorf("expected exit status 0, got: %d", status)
+		}
 	}
 }
 

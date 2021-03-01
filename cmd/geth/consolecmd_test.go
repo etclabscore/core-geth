@@ -125,8 +125,15 @@ func TestGethStartupLogs(t *testing.T) {
 		expectStdErrRegexp string
 	}{
 		{
+			// --<chain> flag is NOT given. This is deprecated. User will be warned.
 			flags:              []string{},
-			expectStdErrRegexp: "(?ism).+WARN.+Not specifying a network flag is deprecated.*",
+			expectStdErrRegexp: "(?ism).+WARN.+Not specifying a chain flag is deprecated.*",
+		},
+		{
+			// Network flag is given.
+			// --<chain> flag is NOT given. This is deprecated. User will be warned.
+			flags:              []string{"--networkid=42"},
+			expectStdErrRegexp: "(?ism).+WARN.+Not specifying a chain flag is deprecated.*",
 		},
 	}
 	for _, c := range cases {

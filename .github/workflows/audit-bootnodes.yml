@@ -61,10 +61,11 @@ jobs:
               fi
             done
           done < <(find ./params -type f -name '*bootnode*go')
+          test $status -eq 0 || git --no-pager diff
           exit $status
 
       - name: Create Pull Request
-        if: github.event_name == 'schedule'
+        if: github.event_name != 'pull_request'
         uses: peter-evans/create-pull-request@v3
         with:
           commit-message: 'params: remove unresponsive bootnodes'

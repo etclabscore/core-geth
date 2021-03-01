@@ -22,6 +22,7 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -111,6 +112,33 @@ func TestGethFailureToLaunch(t *testing.T) {
 			geth.ExpectExit()
 			if status := geth.ExitStatus(); status == 0 {
 				t.Errorf("expected exit status != 0, got: %d", status)
+			}
+		})
+	}
+}
+
+// TestGethStartupLogs tests that geth logs certain things (given some set of flags).
+// In these cases, geth is run with a console command to print its name (and tests that it does).
+func TestGethStartupLogs(t *testing.T) {
+	cases := []struct {
+		flags              []string
+		expectStdErrRegexp string
+	}{
+		{
+			flags:              []string{},
+			expectStdErrRegexp: "(?ism).+WARN.+Not specifying a network flag is deprecated.*",
+		},
+	}
+	for _, c := range cases {
+		t.Run(fmt.Sprintf("TestGethStartupLogs: %v", c.flags), func(t *testing.T) {
+			geth := runGeth(t, append(c.flags, "--exec", "admin.nodeInfo.name", "console")...)
+			geth.ExpectRegexp("(?ism).*CoreGeth.*")
+			geth.ExpectExit()
+			if status := geth.ExitStatus(); status != 0 {
+				t.Errorf("expected exit status == 0, got: %d", status)
+			}
+			if !regexp.MustCompile(c.expectStdErrRegexp).MatchString(geth.StderrText()) {
+				t.Errorf("unmatched stderr output; want: %s, got: %s", c.expectStdErrRegexp, geth.StderrText())
 			}
 		})
 	}

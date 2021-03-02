@@ -8,7 +8,7 @@ jobs:
   - stage: lint
     os: linux
     dist: xenial
-    go: 1.15.x
+    go: 1.16.x
     env:
       - lint
     git:

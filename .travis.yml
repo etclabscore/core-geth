@@ -18,31 +18,19 @@ jobs:
 
   # Run core-geth -specific tests, proving regression-safety and config interoperability.
   - stage: build
-    name: "Go1.15.x: make test-coregeth"
+    name: "Go1.16.x: make test-coregeth"
     os: linux
     dist: xenial
-    go: 1.15.x
+    go: 1.16.x
     script:
     - make test-coregeth
 
   # Run build and tests against latest-1 Go version.
   - stage: build
-    name: "Go1.13.x: make test"
+    name: "Go1.15.x: make test"
     os: linux
     dist: xenial
-    go: 1.13.x
-    env:
-      - GO111MODULE=on
-    script:
-      - make all
-      - travis_wait 60 make test
-
-    # Run build and tests against latest-1 Go version.
-  - stage: build
-    name: "Go1.14.x: make test"
-    os: linux
-    dist: xenial
-    go: 1.14.x
+    go: 1.15.x
     env:
       - GO111MODULE=on
     script:
@@ -56,7 +44,7 @@ jobs:
     os: linux
     arch: arm64
     dist: xenial
-    go: 1.15.x
+    go: 1.16.x
     env:
       - GO111MODULE=on
     script:
@@ -66,10 +54,10 @@ jobs:
   # Run build and tests with environment-aware possible artifact deployment.
   - stage: build
     if: type = push
-    name: "Go1.15.x: make test && deploy"
+    name: "Go1.16.x: make test && deploy"
     os: linux
     dist: xenial
-    go: 1.15.x
+    go: 1.16.x
     script:
     - go run build/ci.go install -dlgo
     - travis_wait 60 make test
@@ -91,11 +79,11 @@ jobs:
   # Run build on ARM5 with environment-aware possible artifact deployment.
   - stage: build
     if: type = push
-    name: "ARM5/Go1.15.x: go run build/ci.go install && deploy"
+    name: "ARM5/Go1.16.x: go run build/ci.go install && deploy"
     os: linux
     dist: xenial
     sudo: required
-    go: 1.15.x
+    go: 1.16.x
     env:
       - ARMv5
     git:
@@ -127,9 +115,9 @@ jobs:
   #Run build on OSX with environment-aware possible artifact deployment.
   - stage: build
     if: type = push
-    name: "OSX/Go1.15.x: make all && deploy"
+    name: "OSX/Go1.16.x: make all && deploy"
     os: osx
-    go: 1.15.x
+    go: 1.16.x
     script:
     - echo "Increase the maximum number of open file descriptors on macOS"
     - NOFILE=20480

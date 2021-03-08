@@ -1,0 +1,157 @@
+language: go
+go_import_path: github.com/ethereum/go-ethereum
+sudo: false
+jobs:
+  include:
+
+  # Run linter check. Only test code linters on latest version of Go.
+  - stage: lint
+    os: linux
+    dist: xenial
+    go: 1.15.x
+    env:
+      - lint
+    git:
+      submodules: false
+    script:
+      - make lint
+
+  # Run core-geth -specific tests, proving regression-safety and config interoperability.
+  - stage: build
+    name: "Go1.15.x: make test-coregeth"
+    os: linux
+    dist: xenial
+    go: 1.15.x
+    script:
+    - make test-coregeth
+
+  # Run build and tests against latest-1 Go version.
+  - stage: build
+    name: "Go1.13.x: make test"
+    os: linux
+    dist: xenial
+    go: 1.13.x
+    env:
+      - GO111MODULE=on
+    script:
+      - make all
+      - travis_wait 60 make test
+
+    # Run build and tests against latest-1 Go version.
+  - stage: build
+    name: "Go1.14.x: make test"
+    os: linux
+    dist: xenial
+    go: 1.14.x
+    env:
+      - GO111MODULE=on
+    script:
+      - make all
+      - travis_wait 60 make test
+
+  # Run build and tests on ARM64 on Pull Requests.
+  - stage: build
+    name: "ARM64/Go1.15.x: make test"
+    if: type = pull_request
+    os: linux
+    arch: arm64
+    dist: xenial
+    go: 1.15.x
+    env:
+      - GO111MODULE=on
+    script:
+      - go run build/ci.go install -dlgo
+      - travis_wait 60 make test
+
+  # Run build and tests with environment-aware possible artifact deployment.
+  - stage: build
+    if: type = push
+    name: "Go1.15.x: make test && deploy"
+    os: linux
+    dist: xenial
+    go: 1.15.x
+    script:
+    - go run build/ci.go install -dlgo
+    - travis_wait 60 make test
+    before_deploy:
+    - sh build/deploy.sh
+    deploy:
+      provider: releases
+      api_key:
+        secure: f5ewX8iaY8E63wEGtLPZ8JF0/KUssJgAE+lqS7Nx5XxAM/GuE5X7mb9FmOiSzYyOexiftG8pwY0HVSXAaNk6HEl1GqlVsqMfuZgrVOAs8e0ltWgseI2T9qDp/oxxwWQ8cnPS3GrLwYUQTE+XfphL9aKkvt2RhoMmd1FPy6Dp0AYxzfLiZWCucBrR7HyHlIUjuM/DdN5U5te2loGhCyrDaKNeiIHQYp7h99cXFhKgC2N1mvXdIE7jxfiJGyEbmNksO0OY4RqBMNl7unOr8DvFf9dQBUc9cWfSRcAxt2DK4+zamX/0HJYfYRJR2Y2+z1oHrbJQnZm+9ZnOaXJt7bdWvON8jLJS+PLZT0kcSklSkKy3WEulijaGn1SIzEesadhnyHZxeDFgMnjVkSOCS0pDNtIv0SxfayqXvbYHzJhRDC4uVTRb+/PxMtZxIPCYBxLHJF6bkwmEWELl5I7UavN+jxuhkMDatqfN4V/j7JfqrLYFLHT9ByE5IBznizvJdxwXg8eo/RDJIJUwHjmKwsX9XBYmEX/UGe1O8ujJNTmg3acX9ECbwM2zgs1Br5WZtjRRDHT+YY6CbP2kPOCkpGqxwM0HPOJN/wALNVeeyCUAw3p/9mNbzJhqA8wCPmgnkzi+4m1HQoF3ADy15gUFEiq914o4dv2eQjUbgs0MaHskhEc=
+      file: core-geth*-$TRAVIS_OS_NAME*
+      file_glob: true
+      draft: true
+      on:
+        repo: etclabscore/core-geth
+        tags: true
+      skip_cleanup: true
+      tag_name: "$TRAVIS_TAG"
+
+  # Run build on ARM5 with environment-aware possible artifact deployment.
+  - stage: build
+    if: type = push
+    name: "ARM5/Go1.15.x: go run build/ci.go install && deploy"
+    os: linux
+    dist: xenial
+    sudo: required
+    go: 1.15.x
+    env:
+      - ARMv5
+    git:
+      submodules: false # avoid cloning ethereum/tests
+    addons:
+      apt:
+        packages:
+          - gcc-multilib
+    script:
+      # Switch over GCC to cross compilation (breaks 386, hence why do it here only)
+      - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-arm-linux-gnueabi libc6-dev-armel-cross gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+      - sudo ln -s /usr/include/asm-generic /usr/include/asm
+      - GOPATH=~/go_arm GOARM=5 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc
+    before_deploy:
+      - sh build/deploy_arm.sh
+    deploy:
+      provider: releases
+      api_key:
+        secure: f5ewX8iaY8E63wEGtLPZ8JF0/KUssJgAE+lqS7Nx5XxAM/GuE5X7mb9FmOiSzYyOexiftG8pwY0HVSXAaNk6HEl1GqlVsqMfuZgrVOAs8e0ltWgseI2T9qDp/oxxwWQ8cnPS3GrLwYUQTE+XfphL9aKkvt2RhoMmd1FPy6Dp0AYxzfLiZWCucBrR7HyHlIUjuM/DdN5U5te2loGhCyrDaKNeiIHQYp7h99cXFhKgC2N1mvXdIE7jxfiJGyEbmNksO0OY4RqBMNl7unOr8DvFf9dQBUc9cWfSRcAxt2DK4+zamX/0HJYfYRJR2Y2+z1oHrbJQnZm+9ZnOaXJt7bdWvON8jLJS+PLZT0kcSklSkKy3WEulijaGn1SIzEesadhnyHZxeDFgMnjVkSOCS0pDNtIv0SxfayqXvbYHzJhRDC4uVTRb+/PxMtZxIPCYBxLHJF6bkwmEWELl5I7UavN+jxuhkMDatqfN4V/j7JfqrLYFLHT9ByE5IBznizvJdxwXg8eo/RDJIJUwHjmKwsX9XBYmEX/UGe1O8ujJNTmg3acX9ECbwM2zgs1Br5WZtjRRDHT+YY6CbP2kPOCkpGqxwM0HPOJN/wALNVeeyCUAw3p/9mNbzJhqA8wCPmgnkzi+4m1HQoF3ADy15gUFEiq914o4dv2eQjUbgs0MaHskhEc=
+      file: core-geth*-arm*
+      file_glob: true
+      draft: true
+      on:
+        repo: etclabscore/core-geth
+        tags: true
+      skip_cleanup: true
+      tag_name: "$TRAVIS_TAG"
+
+  #Run build on OSX with environment-aware possible artifact deployment.
+  - stage: build
+    if: type = push
+    name: "OSX/Go1.15.x: make all && deploy"
+    os: osx
+    go: 1.15.x
+    script:
+    - echo "Increase the maximum number of open file descriptors on macOS"
+    - NOFILE=20480
+    - sudo sysctl -w kern.maxfiles=$NOFILE
+    - sudo sysctl -w kern.maxfilesperproc=$NOFILE
+    - sudo launchctl limit maxfiles $NOFILE $NOFILE
+    - sudo launchctl limit maxfiles
+    - ulimit -S -n $NOFILE
+    - ulimit -n
+    - unset -f cd
+    - go run build/ci.go install -dlgo
+    before_deploy:
+    - sh build/deploy.sh
+    deploy:
+      provider: releases
+      api_key:
+        secure: f5ewX8iaY8E63wEGtLPZ8JF0/KUssJgAE+lqS7Nx5XxAM/GuE5X7mb9FmOiSzYyOexiftG8pwY0HVSXAaNk6HEl1GqlVsqMfuZgrVOAs8e0ltWgseI2T9qDp/oxxwWQ8cnPS3GrLwYUQTE+XfphL9aKkvt2RhoMmd1FPy6Dp0AYxzfLiZWCucBrR7HyHlIUjuM/DdN5U5te2loGhCyrDaKNeiIHQYp7h99cXFhKgC2N1mvXdIE7jxfiJGyEbmNksO0OY4RqBMNl7unOr8DvFf9dQBUc9cWfSRcAxt2DK4+zamX/0HJYfYRJR2Y2+z1oHrbJQnZm+9ZnOaXJt7bdWvON8jLJS+PLZT0kcSklSkKy3WEulijaGn1SIzEesadhnyHZxeDFgMnjVkSOCS0pDNtIv0SxfayqXvbYHzJhRDC4uVTRb+/PxMtZxIPCYBxLHJF6bkwmEWELl5I7UavN+jxuhkMDatqfN4V/j7JfqrLYFLHT9ByE5IBznizvJdxwXg8eo/RDJIJUwHjmKwsX9XBYmEX/UGe1O8ujJNTmg3acX9ECbwM2zgs1Br5WZtjRRDHT+YY6CbP2kPOCkpGqxwM0HPOJN/wALNVeeyCUAw3p/9mNbzJhqA8wCPmgnkzi+4m1HQoF3ADy15gUFEiq914o4dv2eQjUbgs0MaHskhEc=
+      file: core-geth*-$TRAVIS_OS_NAME*
+      file_glob: true
+      draft: true
+      on:
+        repo: etclabscore/core-geth
+        tags: true
+      skip_cleanup: true
+      tag_name: "$TRAVIS_TAG"

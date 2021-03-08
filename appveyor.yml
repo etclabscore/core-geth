@@ -1,0 +1,63 @@
+os: Visual Studio 2015
+
+# Clone directly into GOPATH.
+clone_folder: C:\gopath\src\github.com\ethereum\go-ethereum
+clone_depth: 5
+version: "{branch}.{build}"
+environment:
+  global:
+    GO111MODULE: on
+    GOPATH: C:\gopath
+    CC: gcc.exe
+  matrix:
+    - GETH_ARCH: amd64
+      MSYS2_ARCH: x86_64
+      MSYS2_BITS: 64
+      MSYSTEM: MINGW64
+      PATH: C:\msys64\mingw64\bin\;C:\Program Files (x86)\NSIS\;%PATH%
+
+install:
+  - git submodule update --init
+  - rmdir C:\go /s /q
+  - appveyor DownloadFile https://dl.google.com/go/go1.15.5.windows-%GETH_ARCH%.zip
+  - 7z x go1.15.5.windows-%GETH_ARCH%.zip -y -oC:\ > NUL
+  - go version
+  - gcc --version
+
+build_script:
+  - ps: $env:VERSION = "$(git describe --always)"
+  - copy /Y evmc\include\evmc\evmc.h evmc\bindings\go\evmc\evmc.h
+  - copy /Y evmc\include\evmc\helpers.h evmc\bindings\go\evmc\helpers.h
+  - copy /Y evmc\include\evmc\loader.h evmc\bindings\go\evmc\loader.h
+  - copy /Y evmc\lib\loader\loader.c evmc\bindings\go\evmc\loader.c
+  - go run build\ci.go install -dlgo
+  - 7z a core-geth-win64-%VERSION%.zip .\build\bin\geth.exe
+  - ps: Get-FileHash core-geth-win64-$env:VERSION.zip -Algorithm SHA256
+  - ps: Get-FileHash core-geth-win64-$env:VERSION.zip -Algorithm SHA256 | Out-File core-geth-win64-$env:VERSION.zip.sha256
+  - 7z a core-geth-alltools-win64-%VERSION%.zip .\build\bin\*
+  - ps: Get-FileHash core-geth-alltools-win64-$env:VERSION.zip -Algorithm SHA256
+  - ps: Get-FileHash core-geth-alltools-win64-$env:VERSION.zip | Out-File core-geth-alltools-win64-$env:VERSION.zip.sha256
+
+for:
+  - branches:
+      only:
+        - /v\d*\.\d*\.\d*.*/
+    artifacts:
+      - path: '*core-geth-win64*.zip'
+        name: geth
+      - path: '*core-geth-win64*.zip.sha256'
+        name: geth-sha256
+      - path: '*core-geth-alltools*.zip'
+        name: alltools
+      - path: '*core-geth-alltools*.zip.sha256'
+        name: alltools-sha256
+
+deploy:
+  provider: GitHub
+  repository: etclabscore/core-geth
+  artifact: /core-geth.*-win64-.*\.zip.*/
+  auth_token:
+    secure: tLl/Lbjrer4HCRxAUD/KHocjIsyRWuR7QeK5OCMVTv5lCF2IUKCT6h51nNW4hjOZ
+  draft: true
+  on:
+    appveyor_repo_tag: true

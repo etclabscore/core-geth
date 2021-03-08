@@ -48,10 +48,6 @@ test-coregeth: \
  test-coregeth-consensus \
  test-coregeth-regression-condensed ## Runs all tests specific to core-geth.
 
-# Generate the necessary shared object for EVMC unit tests.
-evmc/bindings/go/evmc/example_vm.so:
-	./build/evmc-example_vm.so.sh
-
 # The following commands acquire external EWASM and EVM interpreter shared objects for
 # testing EVMC support.
 hera:
@@ -67,7 +63,7 @@ aleth-interpreter:
 	./build/aleth-interpreter.sh
 
 # Test EVMC support against various external interpreters.
-test-evmc: evmc/bindings/go/evmc/example_vm.so hera ssvm evmone aleth-interpreter
+test-evmc: hera ssvm evmone aleth-interpreter
 	go test -count 1 ./evmc/...
 	go test -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/hera/build/src/libhera.so
 	go test -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so
@@ -75,7 +71,7 @@ test-evmc: evmc/bindings/go/evmc/example_vm.so hera ssvm evmone aleth-interprete
 	go test -count 1 ./tests -run TestState -evmc.evm=$(ROOT_DIR)/build/_workspace/aleth/lib/libaleth-interpreter.so
 
 clean-evmc:
-	rm -rf evmc/bindings/go/evmc/example_vm.so ./build/_workspace/hera ./build/_workspace/SSVM ./build/_workspace/evmone ./build/_workspace/aleth
+	rm -rf ./build/_workspace/hera ./build/_workspace/SSVM ./build/_workspace/evmone ./build/_workspace/aleth
 
 test-coregeth-features: test-coregeth-features-parity test-coregeth-features-coregeth test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
 

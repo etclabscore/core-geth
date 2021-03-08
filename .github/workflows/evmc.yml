@@ -29,10 +29,6 @@ jobs:
           go get golang.org/x/mobile/cmd/gomobile
           gomobile init
 
-      - name: Build
-        run: |
-          make all
-
       - name: Test EVMC
         run: |
           make test-evmc

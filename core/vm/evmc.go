@@ -167,15 +167,13 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 		return evmc.StorageModified
 	}
 
-	/*
-		resetClearRefund := vars.NetSstoreResetClearRefund
-		cleanRefund := vars.NetSstoreResetRefund
+	resetClearRefund := vars.NetSstoreResetClearRefund
+	cleanRefund := vars.NetSstoreResetRefund
 
-		if hasEIP2200 {
-			resetClearRefund = vars.SstoreSetGasEIP2200 - vars.SloadGasEIP2200 // 19200
-			cleanRefund = vars.SstoreResetGasEIP2200 - vars.SloadGasEIP2200 // 4200
-		}
-	*/
+	if hasEIP2200 {
+		resetClearRefund = vars.SstoreSetGasEIP2200 - vars.SloadGasEIP2200 // 19200
+		cleanRefund = vars.SstoreResetGasEIP2200 - vars.SloadGasEIP2200    // 4200
+	}
 
 	if original == current {
 		if original.IsZero() { // create slot (2.1.1)
@@ -196,9 +194,9 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	}
 	if original.Eq(value) {
 		if original.IsZero() { // reset to original inexistent slot (2.2.2.1)
-			host.env.StateDB.AddRefund(vars.NetSstoreResetClearRefund)
+			host.env.StateDB.AddRefund(resetClearRefund)
 		} else { // reset to original existing slot (2.2.2.2)
-			host.env.StateDB.AddRefund(vars.NetSstoreResetRefund)
+			host.env.StateDB.AddRefund(cleanRefund)
 		}
 	}
 	return evmc.StorageModifiedAgain

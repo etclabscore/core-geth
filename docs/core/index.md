@@ -34,10 +34,6 @@ description of _all_ available methods, their parameters, and results.
 - Added `debug_removePendingTransaction` API method ([#203](https://github.com/etclabscore/core-geth/pull/203/files))
 - Comprehensive service discovery with OpenRPC through method `rpc.discover`.
 
-### Extended CLI
-
-- `--eth.protocols` configures `eth/x` protocol prioritization, eg. `65,64,63`.
-
 ### EVMCv7 Support
 
 - EVMCv7 support allows use with external EVMs (including EWASM).
@@ -47,6 +43,10 @@ description of _all_ available methods, their parameters, and results.
 
 - Remote freezer, store your `ancient` data on Amazon S3 or Storj.
     - _TODO_: Talk more about this, provide examples.
+
+### Extended CLI
+
+- `--eth.protocols` configures `eth/x` protocol prioritization, eg. `65,64,63`.
 
 ### Developer Features: Tools
 

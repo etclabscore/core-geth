@@ -52,7 +52,7 @@ func TestState(t *testing.T) {
 	}
 	if *testEVM != "" {
 		// These interpreters fail Constantinople (but pass ConstantinopleFix).
-		if strings.Contains(*testEVM, "aleth/") || strings.Contains(*testEVM, "evmone/") {
+		if strings.Contains(*testEVM, "aleth") || strings.Contains(*testEVM, "evmone") {
 			st.skipFork("^Constantinople$")
 		}
 

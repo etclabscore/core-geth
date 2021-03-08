@@ -38,9 +38,9 @@ description of _all_ available methods, their parameters, and results.
 
 - `--eth.protocols` configures `eth/x` protocol prioritization, eg. `65,64,63`.
 
-### EVMCv6 Support
+### EVMCv7 Support
 
-- EVMCv6 support allows use with external EVMs (including EWASM).
+- EVMCv7 support allows use with external EVMs (including EWASM).
 - See [Running Geth with an External VM](./core/evmc) for more information.
 
 ### Remote Store for Ancient Chaindata

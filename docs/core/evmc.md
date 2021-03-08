@@ -5,22 +5,29 @@ hide:
 
 # Running Geth with an External VM
 
-Geth supports the [EVMC](https://github.com/ethereum/evmc/) VM connector API version 6 as an experimental feature.
+Geth supports the __[EVMC](https://github.com/ethereum/evmc/) VM connector API Version 7__ as an experimental feature. This interface provides support for external EVM and EWASM interpreters.
 
-From [PR #57](https://github.com/etclabscore/core-geth/pull/57) geth enables an externally defined VM, either EVM or EWASM, via
+External interpreters can be configured on the command line via
 a `--vm.`-prefixed flag for normal instantiation, and `--evmc.` for testing.
 
-Options include EWASM and EVM shared object libraries, as follows:
+```
+  --vm.evm value                      External EVM configuration (default = built-in interpreter)
+  --vm.ewasm value                    External ewasm configuration (default = built-in interpreter)
+```
+
+Provided to these flags should be EWASM and EVM shared object libraries, as follows:
 
 - `--vm.ewasm=<path/to/interpreter.so`
 - `--vm.evm=<path/to/interpreter.so`
 
-Only EVMC __Version 6__ is supported, which is compatible with the versions of Hera EWASM <=v0.2.5 and SSVM EWASM >=0.5.0.
+## Testing EVMC Support
 
 This implementation may be tested by following the command defined in the Makefile as `evmc-test`, which
 tests the implementation against both of these mentioned EWASM libraries against the `/tests/` StateTest suite.
 
 These tests run exclusively via Github Actions, configured at `.github/workflows/evmc.yml`.
+
+## Discussion: Customizing EVMC Configuration
 
 While core-geth supports highly granular EIP/ECIP/xIP chain feature configuration (ie fork feature configs),
 EVMC does not. EVMC only supports the Fork configurations supported by ethereum/go-ethereum (eg. Byzantium, Constantinople, &c).

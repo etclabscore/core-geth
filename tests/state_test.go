@@ -53,8 +53,8 @@ func TestState(t *testing.T) {
 
 		// These fail because these forks were not supported at this version of the EVMOne .so.
 		// The EVMOne version (0.2.0) is the latest EVMC v6 compatible version.
-		st.skipFork("Constantinople") // Only support
-		st.skipFork("Istanbul")
+		// st.skipFork("Constantinople") // Only support
+		// st.skipFork("Istanbul")
 		st.skipFork("ETC_Phoenix")
 
 		// These tests are noted as SLOW above, and they fail against the EVMOne.so

@@ -21,43 +21,56 @@ package vm
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"math/big"
 	"strings"
+	"sync"
+
+	"github.com/ethereum/evmc/v7/bindings/go/evmc"
+	"github.com/ethereum/go-ethereum/params/vars"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/evmc/bindings/go/evmc"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/holiman/uint256"
 )
 
 // EVMC represents the reference to a common EVMC-based VM instance and
 // the current execution context as required by go-ethereum design.
 type EVMC struct {
-	instance *evmc.Instance  // The reference to the EVMC VM instance.
+	instance *evmc.VM        // The reference to the EVMC VM instance.
 	env      *EVM            // The execution context.
 	cap      evmc.Capability // The supported EVMC capability (EVM or Ewasm)
 	readOnly bool            // The readOnly flag (TODO: Try to get rid of it).
 }
 
 var (
-	evmModule       *evmc.Instance
-	ewasmModule     *evmc.Instance
-	evmcModuleError = errors.New("EVMC internal error")
+	evmModule   *evmc.VM
+	ewasmModule *evmc.VM
+	evmcMux     sync.Mutex
 )
 
 func InitEVMCEVM(config string) {
+	evmcMux.Lock()
+	defer evmcMux.Unlock()
+	if evmModule != nil {
+		return
+	}
+
 	evmModule = initEVMC(evmc.CapabilityEVM1, config)
+	log.Info("initialized EVMC interpreter", "path", config)
 }
 
 func InitEVMCEwasm(config string) {
+	evmcMux.Lock()
+	defer evmcMux.Unlock()
+	if ewasmModule != nil {
+		return
+	}
 	ewasmModule = initEVMC(evmc.CapabilityEWASM, config)
 }
 
-func initEVMC(cap evmc.Capability, config string) *evmc.Instance {
+func initEVMC(cap evmc.Capability, config string) *evmc.VM {
 	options := strings.Split(config, ",")
 	path := options[0]
 
@@ -86,7 +99,7 @@ func initEVMC(cap evmc.Capability, config string) *evmc.Instance {
 	}
 
 	if !instance.HasCapability(cap) {
-		panic(fmt.Errorf("The EVMC module %s does not have requested capability %d", path, cap))
+		panic(fmt.Errorf("the EVMC module %s does not have requested capability %d", path, cap))
 	}
 	return instance
 }
@@ -97,8 +110,8 @@ type hostContext struct {
 	contract *Contract // The reference to the current contract, needed by Call-like methods.
 }
 
-func (host *hostContext) AccountExists(addr common.Address) bool {
-	// if host.env.ChainConfig().IsEIP158(host.env.BlockNumber) {
+func (host *hostContext) AccountExists(evmcAddr evmc.Address) bool {
+	addr := common.Address(evmcAddr)
 	if host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP161dTransition, host.env.BlockNumber) {
 		if !host.env.StateDB.Empty(addr) {
 			return true
@@ -109,21 +122,29 @@ func (host *hostContext) AccountExists(addr common.Address) bool {
 	return false
 }
 
-func (host *hostContext) GetStorage(addr common.Address, key common.Hash) common.Hash {
-	return host.env.StateDB.GetState(addr, key)
+func (host *hostContext) GetStorage(addr evmc.Address, evmcKey evmc.Hash) evmc.Hash {
+	var value uint256.Int
+	key := common.Hash(evmcKey)
+	value.SetBytes(host.env.StateDB.GetState(common.Address(addr), key).Bytes())
+	return evmc.Hash(value.Bytes32())
 }
 
-func (host *hostContext) SetStorage(addr common.Address, key common.Hash, value common.Hash) (status evmc.StorageStatus) {
-	oldValue := host.env.StateDB.GetState(addr, key)
-	if oldValue == value {
+func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, evmcValue evmc.Hash) (status evmc.StorageStatus) {
+	addr := common.Address(evmcAddr)
+	key := common.Hash(evmcKey)
+	value := uint256.NewInt().SetBytes(evmcValue[:])
+	var oldValue uint256.Int
+	oldValue.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
+	if oldValue.Eq(value) {
 		return evmc.StorageUnchanged
 	}
 
-	current := host.env.StateDB.GetState(addr, key)
-	original := host.env.StateDB.GetCommittedState(addr, key)
+	var current, original uint256.Int
+	current.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
+	original.SetBytes(host.env.StateDB.GetCommittedState(addr, key).Bytes())
 
-	host.env.StateDB.SetState(addr, key, value)
-	
+	host.env.StateDB.SetState(addr, key, common.BytesToHash(value.Bytes()))
+
 	// Here's a great example of one of the limits of our (core-geth) current chainconfig interface model.
 	// Should we handle the logic here about historic-featuro logic (which really is nice, because when reading the strange-incantation implemations, it's nice to see why it is),
 	// or should we handle the question where we handle the rest of the questions like this, since this logic is
@@ -136,73 +157,76 @@ func (host *hostContext) SetStorage(addr common.Address, key common.Hash, value 
 	// when they don't specify each other in the spec.
 	hasNetStorageCostEIP := hasEIP2200 && hasEIP1884
 	if !hasNetStorageCostEIP {
-
-		zero := common.Hash{}
 		status = evmc.StorageModified
-		if oldValue == zero {
+		if oldValue.IsZero() {
 			return evmc.StorageAdded
-		} else if value == zero {
+		} else if value.IsZero() {
 			host.env.StateDB.AddRefund(vars.SstoreRefundGas)
 			return evmc.StorageDeleted
 		}
 		return evmc.StorageModified
 	}
 
-	resetClearRefund := vars.NetSstoreResetClearRefund
-	cleanRefund := vars.NetSstoreResetRefund
+	/*
+		resetClearRefund := vars.NetSstoreResetClearRefund
+		cleanRefund := vars.NetSstoreResetRefund
 
-	if hasEIP2200 {
-		resetClearRefund = vars.SstoreSetGasEIP2200 - vars.SloadGasEIP2200 // 19200
-		cleanRefund = vars.SstoreResetGasEIP2200 - vars.SloadGasEIP2200 // 4200
-	}
+		if hasEIP2200 {
+			resetClearRefund = vars.SstoreSetGasEIP2200 - vars.SloadGasEIP2200 // 19200
+			cleanRefund = vars.SstoreResetGasEIP2200 - vars.SloadGasEIP2200 // 4200
+		}
+	*/
 
 	if original == current {
-		if original == (common.Hash{}) { // create slot (2.1.1)
+		if original.IsZero() { // create slot (2.1.1)
 			return evmc.StorageAdded
 		}
-		if value == (common.Hash{}) { // delete slot (2.1.2b)
+		if value.IsZero() { // delete slot (2.1.2b)
 			host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
 			return evmc.StorageDeleted
 		}
 		return evmc.StorageModified
 	}
-	if original != (common.Hash{}) {
-		if current == (common.Hash{}) { // recreate slot (2.2.1.1)
+	if !original.IsZero() {
+		if current.IsZero() { // recreate slot (2.2.1.1)
 			host.env.StateDB.SubRefund(vars.NetSstoreClearRefund)
-		} else if value == (common.Hash{}) { // delete slot (2.2.1.2)
+		} else if value.IsZero() { // delete slot (2.2.1.2)
 			host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
 		}
 	}
-	if original == value {
-		if original == (common.Hash{}) { // reset to original inexistent slot (2.2.2.1)
-			host.env.StateDB.AddRefund(resetClearRefund)
+	if original.Eq(value) {
+		if original.IsZero() { // reset to original inexistent slot (2.2.2.1)
+			host.env.StateDB.AddRefund(vars.NetSstoreResetClearRefund)
 		} else { // reset to original existing slot (2.2.2.2)
-			host.env.StateDB.AddRefund(cleanRefund)
+			host.env.StateDB.AddRefund(vars.NetSstoreResetRefund)
 		}
 	}
 	return evmc.StorageModifiedAgain
 }
 
-func (host *hostContext) GetBalance(addr common.Address) common.Hash {
-	return common.BigToHash(host.env.StateDB.GetBalance(addr))
+func (host *hostContext) GetBalance(addr evmc.Address) evmc.Hash {
+	return evmc.Hash(common.BigToHash(host.env.StateDB.GetBalance(common.Address(addr))))
 }
 
-func (host *hostContext) GetCodeSize(addr common.Address) int {
-	return host.env.StateDB.GetCodeSize(addr)
+func (host *hostContext) GetCodeSize(addr evmc.Address) int {
+	return host.env.StateDB.GetCodeSize(common.Address(addr))
 }
 
-func (host *hostContext) GetCodeHash(addr common.Address) common.Hash {
+func (host *hostContext) GetCodeHash(evmcAddr evmc.Address) evmc.Hash {
+	addr := common.Address(evmcAddr)
 	if host.env.StateDB.Empty(addr) {
-		return common.Hash{}
+		return evmc.Hash{}
 	}
-	return host.env.StateDB.GetCodeHash(addr)
+	return evmc.Hash(host.env.StateDB.GetCodeHash(addr))
 }
 
-func (host *hostContext) GetCode(addr common.Address) []byte {
-	return host.env.StateDB.GetCode(addr)
+func (host *hostContext) GetCode(addr evmc.Address) []byte {
+	return host.env.StateDB.GetCode(common.Address(addr))
 }
 
-func (host *hostContext) Selfdestruct(addr common.Address, beneficiary common.Address) {
+func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evmc.Address) {
+	addr := common.Address(evmcAddr)
+	beneficiary := common.Address(evmcBeneficiary)
 	db := host.env.StateDB
 	if !db.HasSuicided(addr) {
 		db.AddRefund(vars.SelfdestructRefundGas)
@@ -213,28 +237,31 @@ func (host *hostContext) Selfdestruct(addr common.Address, beneficiary common.Ad
 
 func (host *hostContext) GetTxContext() evmc.TxContext {
 	return evmc.TxContext{
-		GasPrice:   common.BigToHash(host.env.GasPrice),
-		Origin:     host.env.Origin,
-		Coinbase:   host.env.Coinbase,
+		GasPrice:   evmc.Hash(common.BigToHash(host.env.GasPrice)),
+		Origin:     evmc.Address(host.env.Origin),
+		Coinbase:   evmc.Address(host.env.Coinbase),
 		Number:     host.env.BlockNumber.Int64(),
 		Timestamp:  host.env.Time.Int64(),
 		GasLimit:   int64(host.env.GasLimit),
-		Difficulty: common.BigToHash(host.env.Difficulty),
-		//ChainID:    common.BigToHash(host.env.chainConfig.GetChainID()),
+		Difficulty: evmc.Hash(common.BigToHash(host.env.Difficulty)),
 	}
 }
 
-func (host *hostContext) GetBlockHash(number int64) common.Hash {
+func (host *hostContext) GetBlockHash(number int64) evmc.Hash {
 	b := host.env.BlockNumber.Int64()
 	if number >= (b-256) && number < b {
-		return host.env.GetHash(uint64(number))
+		return evmc.Hash(host.env.GetHash(uint64(number)))
 	}
-	return common.Hash{}
+	return evmc.Hash{}
 }
 
-func (host *hostContext) EmitLog(addr common.Address, topics []common.Hash, data []byte) {
+func (host *hostContext) EmitLog(addr evmc.Address, evmcTopics []evmc.Hash, data []byte) {
+	topics := make([]common.Hash, len(evmcTopics))
+	for i, t := range evmcTopics {
+		topics[i] = common.Hash(t)
+	}
 	host.env.StateDB.AddLog(&types.Log{
-		Address:     addr,
+		Address:     common.Address(addr),
 		Topics:      topics,
 		Data:        data,
 		BlockNumber: host.env.BlockNumber.Uint64(),
@@ -242,26 +269,37 @@ func (host *hostContext) EmitLog(addr common.Address, topics []common.Hash, data
 }
 
 func (host *hostContext) Call(kind evmc.CallKind,
-	destination common.Address, sender common.Address, value *big.Int, input []byte, gas int64, depth int,
-	static bool, salt *big.Int) (output []byte, gasLeft int64, createAddr common.Address, err error) {
+	evmcDestination evmc.Address, evmcSender evmc.Address, valueBytes evmc.Hash, input []byte, gas int64, depth int,
+	static bool, saltBytes evmc.Hash) (output []byte, gasLeft int64, createAddrEvmc evmc.Address, err error) {
+
+	destination := common.Address(evmcDestination)
+
+	var createAddr common.Address
 
 	gasU := uint64(gas)
 	var gasLeftU uint64
+
+	value := uint256.NewInt()
+	value.SetBytes(valueBytes[:])
+
+	salt := big.NewInt(0)
+	salt.SetBytes(saltBytes[:])
 
 	switch kind {
 	case evmc.Call:
 		if static {
 			output, gasLeftU, err = host.env.StaticCall(host.contract, destination, input, gasU)
 		} else {
-			output, gasLeftU, err = host.env.Call(host.contract, destination, input, gasU, value)
+			output, gasLeftU, err = host.env.Call(host.contract, destination, input, gasU, value.ToBig())
 		}
 	case evmc.DelegateCall:
 		output, gasLeftU, err = host.env.DelegateCall(host.contract, destination, input, gasU)
 	case evmc.CallCode:
-		output, gasLeftU, err = host.env.CallCode(host.contract, destination, input, gasU, value)
+		output, gasLeftU, err = host.env.CallCode(host.contract, destination, input, gasU, value.ToBig())
 	case evmc.Create:
 		var createOutput []byte
-		createOutput, createAddr, gasLeftU, err = host.env.Create(host.contract, input, gasU, value)
+		createOutput, createAddr, gasLeftU, err = host.env.Create(host.contract, input, gasU, value.ToBig())
+		createAddrEvmc = evmc.Address(createAddr)
 		isHomestead := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP7Transition, host.env.BlockNumber)
 		if !isHomestead && err == ErrCodeStoreOutOfGas {
 			err = nil
@@ -274,9 +312,12 @@ func (host *hostContext) Call(kind evmc.CallKind,
 		}
 	case evmc.Create2:
 		var createOutput []byte
-		var saltUint256 = new(uint256.Int)
-		saltUint256.SetUint64(salt.Uint64())
-		createOutput, createAddr, gasLeftU, err = host.env.Create2(host.contract, input, gasU, value, saltUint256)
+
+		saltInt256 := new(uint256.Int)
+		saltInt256.SetBytes(salt.Bytes())
+
+		createOutput, createAddr, gasLeftU, err = host.env.Create2(host.contract, input, gasU, value.ToBig(), saltInt256)
+		createAddrEvmc = evmc.Address(createAddr)
 		if err == ErrExecutionReverted {
 			// Assign return buffer from REVERT.
 			// TODO: Bad API design: return data buffer and the code is returned in the same place. In worst case
@@ -295,7 +336,7 @@ func (host *hostContext) Call(kind evmc.CallKind,
 	}
 
 	gasLeft = int64(gasLeftU)
-	return output, gasLeft, createAddr, err
+	return output, gasLeft, createAddrEvmc, err
 }
 
 // getRevision translates ChainConfig's HF block information into EVMC revision.
@@ -356,21 +397,19 @@ func (evm *EVMC) Run(contract *Contract, input []byte, readOnly bool) (ret []byt
 		evm.readOnly,
 		evm.env.depth-1,
 		int64(contract.Gas),
-		contract.Address(),
-		contract.Caller(),
+		evmc.Address(contract.Address()),
+		evmc.Address(contract.Caller()),
 		input,
-		common.BigToHash(contract.Value()),
+		evmc.Hash(common.BigToHash(contract.value)),
 		contract.Code,
-		common.Hash{})
+		evmc.Hash{})
 
 	contract.Gas = uint64(gasLeft)
 
 	if err == evmc.Revert {
 		err = ErrExecutionReverted
 	} else if evmcError, ok := err.(evmc.Error); ok && evmcError.IsInternalError() {
-		//panic(fmt.Sprintf("EVMC VM internal error: %s", evmcError.Error()))
-		fmt.Println(fmt.Errorf("%s: %v (%v)", evmcModuleError, evmcError.Error(), err.Error()))
-		return nil, fmt.Errorf("%s: %v", evmcModuleError, evmcError.Error())
+		panic(fmt.Sprintf("EVMC VM internal error: %s", evmcError.Error()))
 	}
 
 	return output, err

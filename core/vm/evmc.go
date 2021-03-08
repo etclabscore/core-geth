@@ -242,6 +242,7 @@ func (host *hostContext) GetTxContext() evmc.TxContext {
 		Timestamp:  host.env.Time.Int64(),
 		GasLimit:   int64(host.env.GasLimit),
 		Difficulty: evmc.Hash(common.BigToHash(host.env.Difficulty)),
+		ChainID:    evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
 	}
 }
 

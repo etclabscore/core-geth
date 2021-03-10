@@ -8,8 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
-// FIXME: This is not yet correct.
-var ABCGenesisHash = common.HexToHash("0xa68ebde7932eccb177d38d55dcc6461a019dd795a681e59b5a3e4f3a7259a3f1")
+var ABCGenesisHash = common.HexToHash("0x5f32ce1ed875a04d74361164bcfcc24af721df8e616642486338300a691fe582")
 
 func DefaultABCGenesisBlock() *genesisT.Genesis {
 	return &genesisT.Genesis{

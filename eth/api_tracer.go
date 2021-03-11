@@ -834,7 +834,7 @@ func traceCall(ctx context.Context, eth *Ethereum, args ethapi.CallArgs, blockNr
 		if config != nil && config.Reexec != nil {
 			reexec = *config.Reexec
 		}
-		_, _, statedb, err = computeTxEnv(eth, block, 0, reexec)
+		_, _, statedb, err = computeTxEnv(eth, block, len(block.Transactions())-1, reexec)
 		if err != nil {
 			return nil, err
 		}

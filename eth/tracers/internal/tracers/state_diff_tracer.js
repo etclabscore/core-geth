@@ -17,12 +17,14 @@
 // stateDiffTracer outputs sufficient information to create a local execution of
 // the transaction from a custom assembled genesisT block.
 {
+	DEBUG: false,
+	COMPATIBILITY_TESTING: true,
+
 	// stateDiff is the genesisT that we're building.
 	stateDiff: {},
 
 	hasInitCalled: false,
-	lastAccessedAccount: null, // TODO: check as we might can remove it at the end
-	lastGasIn: null,	// TODO: this can be removed, keep it until we are sure
+	lastAccessedAccount: null,
 	lastRefund: 0,
 	hasError: false,
 
@@ -43,22 +45,29 @@
 		return typeof val !== "string" || val.indexOf("0x") !== 0 ? "0x" + val.toString(16) : val;
 	},
 
-	// lookupAccount injects the specified account into the stateDiff object.
+	// lookupAccount injects the specified account into the stateDiff object
 	lookupAccount: function(addr, db, type) {
-		var memoryMarker = this.diffMarkers.Memory;
-
 		var acc = toHex(addr);
+		this.lastAccessedAccount = acc;
+
+		// no need to fetch updates, as the account is marked as final
+		// which means that some manual calculations have been performed, usually in results()
+		// NOTE: it moved at the top of fuction in order we don't read from statedb when not needed
+		if (this.stateDiff[acc] !== undefined && this.stateDiff[acc]._final) {
+			return;
+		}
+
 		var balance = db.getBalance(addr);
 		var code = toHex(db.getCode(addr));
 		var nonce = db.getNonce(addr);
 
-		this.lastAccessedAccount = acc;
+		var memoryMarker = this.diffMarkers.Memory;
 
 		if (this.stateDiff[acc] === undefined) {
 			this.stateDiff[acc] = {
-				_type: type || this.diffMarkers.Changed,  // temp storage of account's initial type
+				_type: type || this.diffMarkers.Changed, // temp storage of account's initial type
 				_removed: false, // removed from state
-				_error: false, // evm returned an error
+				_error: false, // error returned by the VM
 				_final: false, // stop updating state if account's state marked as final
 				balance: {
 					[memoryMarker]: {
@@ -81,13 +90,6 @@
 
 		var accountData = this.stateDiff[acc];
 
-		if (accountData._final) {
-			return;
-		}
-
-		// console.log('nonce', type, acc, accountData.nonce, '=>',nonce)
-
-
 		// force type change
 		if (type !== undefined) {
 			// if an account has been Born within this run and also Died,
@@ -103,9 +105,6 @@
 			accountData.balance[memoryMarker].to = balance;
 		}
 
-		// var latestKnownNonce = accountData.nonce[memoryMarker].to || accountData.nonce[memoryMarker].from
-		// if (nonce && type === this.diffMarkers.Born) {
-		// 	accountData.nonce[memoryMarker].to = latestKnownNonce + 1;
 		// if state doesn't have the account, most probably because of EIP-161, then remove it
 		if (typeof nonce === "number" && nonce < accountData.nonce[memoryMarker].from) {
 			delete this.stateDiff[acc];
@@ -120,20 +119,18 @@
 	},
 
 	// lookupStorage injects the specified storage entry of the given account into
-	// the stateDiff object.
+	// the stateDiff object
 	lookupStorage: function(addr, key, val, db){
 		var acc = toHex(addr);
-		var idx = toHex(key);
-
 		this.lastAccessedAccount = acc;
-
-		var memoryMarker = this.diffMarkers.Memory;
 
 		if (this.stateDiff[acc] === undefined) {
 			return;
 		}
 
+		var memoryMarker = this.diffMarkers.Memory;
 		var accountData = this.stateDiff[acc];
+		var idx = toHex(key);
 
 		if (accountData.storage[idx] === undefined) {
 			var rval = toHex(db.getState(addr, key));
@@ -147,10 +144,10 @@
 		}
 
 		if (val) {
-			var tval = toHex(val);
-			accountData.storage[idx][memoryMarker].to = tval;
+			var sval = toHex(val);
+			accountData.storage[idx][memoryMarker].to = sval;
 
-			if (!accountData.storage[idx][memoryMarker]._changed && !(/^(0x)?0*$/.test(tval))) {
+			if (!accountData.storage[idx][memoryMarker]._changed && !(/^(0x)?0*$/.test(sval))) {
 				accountData.storage[idx][memoryMarker]._changed = true;
 			}
 		} else {
@@ -163,16 +160,21 @@
 		}
 	},
 
+	// formatSingle used to format output for Born and Died markers
 	formatSingle: function(data, type) {
 		type = type || this.diffMarkers.Changed;
 
 		var memoryMarker = this.diffMarkers.Memory;
 		var val = data[memoryMarker].to || data[memoryMarker].from;
 
+		// for Died markers, we want to output the "from" value
 		if (type === this.diffMarkers.Died) {
 			val = data[memoryMarker].from
 		}
 
+		// this is mostly for balances and nonces, where we can't have negative values
+		// it would have been considered in consensus rules, though for trace_call
+		// we break the logic on VM's CanTransfer & Transfer
 		if (bigInt.isInstance(val) && val.isNegative()) {
 			val = bigInt.zero;
 		}
@@ -182,16 +184,18 @@
 		}
 	},
 
+	// formatChanged used to format output for Changed marker,
+	// which handles the Same market internally
 	formatChanged: function(data, type) {
 		type = type || this.diffMarkers.Changed;
 
 		var memoryMarker = this.diffMarkers.Memory;
-		var changedMarker = this.diffMarkers.Changed;
-		var sameMarker = this.diffMarkers.Same;
-
 		var from = data[memoryMarker].from;
 		var to = data[memoryMarker].to;
 
+		// this is mostly for balances and nonces, where we can't have negative values
+		// it would have been considered in consensus rules, though for trace_call
+		// we break the logic on VM's CanTransfer & Transfer
 		if (bigInt.isInstance(from) && from.isNegative()) {
 			from = bigInt.zero;
 			data[memoryMarker].from = from; // used for checkIfSame
@@ -203,22 +207,22 @@
 		}
 
 		if (this.checkIfSame(data, type)) {
-			return sameMarker;
+			return this.diffMarkers.Same;
 		}
 
 		return {
-			[changedMarker]: {
+			[this.diffMarkers.Changed]: {
 				from: this.toHexJs(from),
 				to: this.toHexJs(to),
 			}
 		}
 	},
 
+	// checkIfSame check if both "from" and "to" have the same values
 	checkIfSame: function(data, type) {
 		type = type || this.diffMarkers.Changed;
 
 		var memoryMarker = this.diffMarkers.Memory;
-
 		var from = data[memoryMarker].from;
 		var to = data[memoryMarker].to;
 
@@ -227,52 +231,45 @@
 			from === to);
 	},
 
+	// hasAccountChanges checks if the account has any changes
+	// and has to be added to stateDiff's output
 	hasAccountChanges: function(data) {
 		var sameMarker = this.diffMarkers.Same;
-		// var bornMarker = this.diffMarkers.Born;
 
-		if (data.balance === sameMarker
+		return !(data.balance === sameMarker
 				&& data.nonce === sameMarker
 				&& data.code === sameMarker
-				&& this.isObjectEmpty(data.storage)
-		) {
-			return false;
-		// } else if (data.balance[bornMarker] === "0x0" &&
-		// 		data.nonce[bornMarker] === "0x0" &&
-		// 		data.code[bornMarker] === "0x" &&
-		// 		this.isObjectEmpty(data.storage)
-		// ) {
-		// 	return false;
-		}
-		return true;
+				&& this.isObjectEmpty(data.storage));
 	},
 
 	format: function(db) {
 		for (var acc in this.stateDiff) {
 			var accountAddress = toAddress(acc);
 			// fetch latest balance
-			// TODO: optimise
 			this.lookupAccount(accountAddress, db);
 
+			// FIXME: seems safe to remove as we remove deletion from within lookupAccount
 			// has been cleared in lookupAccount
-			if (this.stateDiff[acc] === undefined) {
-				continue;
-			}
+			// if (this.stateDiff[acc] === undefined) {
+			// 	continue;
+			// }
 
 			var memoryMarker = this.diffMarkers.Memory;
 			var changedMarker = this.diffMarkers.Changed;
 
 			var accountData = this.stateDiff[acc];
 
-			// remove accounts with errors. Do this check last (not in another method),
-			// otherwise account might be re-added if one of ctx.[from|to|coinbase] from within this.result()
+			// remove accounts with errors or marked for removal. Do this check last (not in another method),
+			// otherwise account might be re-added for ctx.[from|to|coinbase] from within this.result()
 			if (accountData._error || accountData._removed) {
 				delete this.stateDiff[acc];
 				continue;
 			}
 
 			// check if it is a new borned account
-			if (accountData.balance[memoryMarker].from == 0
+			// happens on mordor's tx: 0xc468750bd7d73f53ff3fdc74201245910d84d84bfc5c40d97e4c5a8928c92187
+			if (accountData._type === changedMarker
+					&& accountData.balance[memoryMarker].from == 0
 					&& accountData.code[memoryMarker].from === "0x"
 					&& accountData.nonce[memoryMarker].from == 0) {
 				accountData._type = this.diffMarkers.Born;
@@ -305,6 +302,7 @@
 				continue;
 			}
 
+			// handle storage entries
 			for (var idx in accountData.storage) {
 				// fetch latest value in storage
 				this.lookupStorage(accountAddress, toWord(idx), null, db);
@@ -314,9 +312,6 @@
 						|| sti[memoryMarker].to === undefined
 						|| !sti[memoryMarker]._changed) {
 					delete this.stateDiff[acc].storage[idx];
-				// } else if (accountData.storage[idx][type] === undefined ||
-				// 		/^(0x)?0*$/.test(accountData.storage[idx][type])) {
-				// 	delete this.stateDiff[acc].storage[idx];
 					continue;
 				}
 
@@ -346,41 +341,40 @@
 		}
 	},
 
+	// includeOpError checks for specific VM OP errors
 	includeOpError: function(err) {
 		return err
 			&& err.indexOf('contract address collision') > -1;
+			// && (err.indexOf('insufficient balance for transfer') > -1
+			// || err.indexOf('contract address collision') > -1);
 	},
 
 	// init is invoked on the first call VM executes.
 	// IMPORTANT: it is being called only on contract calls and not on transfers,
-	//            this is being handled in result()
+	//            this is being handled in this.result()
 	init: function(ctx, log, db) {
 		this.hasInitCalled = true;
 
-		// if (this.stateDiff === null) {
-		// 	this.stateDiff = {};
-		// }
-
+		// get actual "from" values for from|to|coinbase accounts.
 		// Balances will potentially be wrong here, since they will include the value
-		// sent along with the message or the paid full gas cost. We fix that in "result()".
+		// sent along with the message or the paid full gas cost. We fix that in this.result()
 
-		// Get actual "to" values for from, to, coinbase accounts
 		this.lookupAccount(ctx.from, db);
 		this.lookupAccount(ctx.coinbase, db);
 
-		// TODO: do we need to check for contractAddress? is ctx.to === contractAddress?
 		var toAccHex = toHex(ctx.to);
 		if(!/^(0x)?0*$/.test(toAccHex)) {
 			this.lookupAccount(ctx.to, db);
 		}
 
-		var contractAddress = log.contract.getAddress();
-		if (toHex(contractAddress) !== toAccHex) {
-			this.lookupAccount(contractAddress, db);
-		}
+		// TODO: do we need to check for contractAddress? is ctx.to === contractAddress?
+		// var contractAddress = log.contract.getAddress();
+		// if (toHex(contractAddress) !== toAccHex) {
+		// 	this.lookupAccount(contractAddress, db);
+		// }
 	},
 
-	// step is invoked for every opcode that the VM executes.
+	// step is invoked for every opcode that the VM executes
 	step: function(log, db) {
 		// Capture any errors immediately
 		var error = log.getError();
@@ -389,92 +383,43 @@
 			this.hasError = true;
 		}
 
-		// if (this.hasError) {
-		// 	console.log('ERROR', log.op.toString())
-		// }
+		// console.log('damn line 417 \t this.lastAccessedAccount',log.op.toString(), this.lastAccessedAccount,error)
 
 		if ((error !== undefined || this.includeOpError(opError))
 				&& this.lastAccessedAccount !== null
 				&& this.stateDiff[this.lastAccessedAccount] !== undefined) {
-        // console.log('damn line 318 \t this.lastAccessedAccount',log.op.toString(), this.lastAccessedAccount,error)
-
 			this.stateDiff[this.lastAccessedAccount]._error = true;  // mark account that had an error
 			this.lastAccessedAccount = null;
 			return;
 		}
 
-		// Add the current account if we just started tracing
-		// if (this.stateDiff === null){
-		// 	this.stateDiff = {};
-
-		// 	// var contractAddr = log.contract.getAddress();
-		// 	// console.log('ex',db.exists(contractAddr));
-		// 	// var type = db.exists(contractAddr) ? this.diffMarkers.Changed : this.diffMarkers.Born;
-		// 	// Balance will potentially be wrong here, since this will include the value
-		// 	// sent along with the message. We fix that in "result()".
-		// 	this.lookupAccount(log.contract.getAddress(), db);
-		// 	// console.log(log.contract.getAddress())
-		// 	// this.lookupAccount(toAddress('0x893defcfe8dc3b7fe2b95c2ddd6415ac2f1eb582'), db);
-		// }
-
-
-		this.lastGasIn = log.getGas();
 		this.lastRefund = log.getRefund();
-    // console.log('347 \t this.lastRefund', this.lastRefund)
-    // console.log('this.lastGasIn', 106376 - this.lastGasIn, 106376-log.getAvailableGas())
-		// var loga = {
-		// 	gasAvailableGas: log.getAvailableGas(),
-		// 	gasGas:   log.getGas(),
-		// 	gasCost: log.getCost(),
-		// 	getValue: log.contract.getValue(),
-		// }
-		// console.log('loga', loga)
 
-
-		// if (loga.gasAvailable > 0) {
-		// 	console.log('AMAZINIIG', loga)
-		// }
-		// this.logger.push(loga)
-		// console.log(log.op.toString(), log.stack.peek(0).toString(16), log.stack.peek(1).toString(16), log.stack.peek(2).toString(16), log.stack.peek(3).toString(16), log.stack.peek(4).toString(16));
-		// console.log(log.op.toString());
-
-		// Whenever new state is accessed, add it to the stateDiff
+		// whenever new state is accessed, add it to the stateDiff
 		switch (log.op.toString()) {
-			// case "ORIGIN": case "CALLER": case "ADDRESS":
-			// 	console.log(toHex(toAddress(log.stack.peek(0).toString(16))));
-			// 	break;
 			case "EXTCODECOPY": case "EXTCODESIZE": case "BALANCE":
 				this.lookupAccount(toAddress(log.stack.peek(0).toString(16)), db);
 				break;
 			case "CREATE":
-				var from = log.contract.getAddress();
-				this.lookupAccount(toContract(from, db.getNonce(from)), db, this.diffMarkers.Born);
+				var address = log.contract.getAddress();
+				this.lookupAccount(toContract(address, db.getNonce(address)), db, this.diffMarkers.Born);
 				break;
 			case "CREATE2":
-				var from = log.contract.getAddress();
 				// stack: salt, size, offset, endowment
 				var offset = log.stack.peek(1).valueOf()
 				var size = log.stack.peek(2).valueOf()
 				var end = offset + size
-				this.lookupAccount(toContract2(from, log.stack.peek(3).toString(16), log.memory.slice(offset, end)), db, this.diffMarkers.Born);
+				this.lookupAccount(toContract2(log.contract.getAddress(), log.stack.peek(3).toString(16), log.memory.slice(offset, end)), db, this.diffMarkers.Born);
 				break;
 			case "CALL": case "CALLCODE": case "DELEGATECALL": case "STATICCALL":
 				var address = toAddress(log.stack.peek(1).toString(16));
 
-				// No need to handle anything in pre-compiles
-				// While also helping, to maintain the lastAccessedAccount logic
+				// no need to handle anything in pre-compiles
+				// while also helping, to maintain the lastAccessedAccount logic
 				if (isPrecompiled(address)) {
 					break;
 				}
 
-				// if (log.op.toString() == "CALLCODE") {
-				// 	var value = log.stack.peek(2);
-        //   console.log('TCL: \t file: state_diff_tracer.js \t line 394 \t value', value)
-
-				// 	if (value > 0) {
-				// 		this.lastGasIn = bigInt(this.lastGasIn + 2300);
-				// 	}
-				// }
 				this.lookupAccount(address, db);
 				break;
 			case "SLOAD":
@@ -489,16 +434,10 @@
 		}
 	},
 
-	// fault is invoked when the actual execution of an opcode fails.
+	// fault is invoked when the actual execution of an opcode fails
 	fault: function(log, db) {
-		// this.lastGasIn = log.getGas();
-		// console.log('fault this.lastGasIn', 106376 - this.lastGasIn, 106376-log.getAvailableGas())
-		// console.log('fault', log.op.toString(), toHex(log.contract.getAddress()), log.stack.peek(0).toString(16), log.stack.peek(1).toString(16), log.stack.peek(2).toString(16), log.stack.peek(3).toString(16), log.stack.peek(4).toString(16));
-
 		var error = log.getError();
-    // console.log('TCL: \t file: state_diff_tracer.js \t line 325 \t error', error)
 		var opError = log.getCallError();
-		// console.log('TCL: \t file: state_diff_tracer.js \t line 327 \t opError', opError)
 		if (!this.hasError && (error !== undefined || opError !== undefined)) {
 			this.hasError = true;
 		}
@@ -508,7 +447,6 @@
 				&& this.stateDiff[this.lastAccessedAccount] !== undefined) {
 			this.stateDiff[this.lastAccessedAccount]._error = true;  // mark account that had an error
 			this.lastAccessedAccount = null;
-			return;
 		}
 	},
 
@@ -524,17 +462,9 @@
 		// 0xf18306dcc1badc05c32be8b91d31d6fcd1c8003e71c770fd69bbf77623cbbbdc // Died marker (remove)
 		// 0x00671034509a65920422f3f5060039183c9a04b3692c89c1bc7d92e27bd1fb83 // Slow TX (in general after this block)
 
-		// Reset lastAccessedAccount cleanup logic as it is being used only for `step` method
-		// NOTE: it's safe to be removed, as it's not being utilised from this point
-		// this.lastAccessedAccount = null;
-
 		var memoryMarker = this.diffMarkers.Memory;
 
-		if (this.lastGasIn === null) {
-			this.lastGasIn = ctx.gas;
-		}
-
-		// Get actual "to" values for from, to, coinbase accounts
+		// get actual "to" values for from|to|coinbase accounts
 		this.lookupAccount(ctx.from, db);
 		this.lookupAccount(ctx.to, db);
 		this.lookupAccount(ctx.coinbase, db);
@@ -542,6 +472,7 @@
 		var fromAccountHex = toHex(ctx.from);
 		var toAccountHex = toHex(ctx.to);
 		var coinbaseHex = toHex(ctx.coinbase);
+
 		var convertCtxKeysToBigInt = ['gasLimit', 'gas', 'gasPrice', 'gasUsed', 'value'];
 		for (var i in convertCtxKeysToBigInt) {
 			var key = convertCtxKeysToBigInt[i];
@@ -549,103 +480,218 @@
 		}
 
 		var refund = !this.hasError && this.lastRefund > 0 ? this.lastRefund : 0;
-		var gasUsed = ctx.gasLimit.subtract(ctx.gas).add(ctx.gasUsed).add(refund); // bigInt(this.lastGasIn) == ctx.gasLimit.subtract(ctx.gas).add(ctx.gasUsed);
 
-		// NOTE: both are equal for getting gasUsed
-		// 1. gasLimit - gas (=intrinsic gas) + gasUsed
-		// 2. gasLimit - this.lastGasIn
+		var gasUsed = ctx.gasLimit.subtract(ctx.gas).add(ctx.gasUsed).add(refund);
 		var gasLeft = ctx.gasLimit.subtract(gasUsed);
+
 		var refundValue = gasLeft.multiply(ctx.gasPrice);
 		var feesValue = gasUsed.multiply(ctx.gasPrice);
-
 		var fullGasCost = ctx.gasLimit.multiply(ctx.gasPrice);
 
-		var gasCost = ctx.gasLimit					// full gas for tx
-										.subtract(ctx.gas)	// gas given for this internal tx, calculates mostly the IntrinsicGas
-										.add(ctx.gasUsed)		// gas used for this internal tx
-										// .subtract(refund) 					// refund gas given
-										.multiply(ctx.gasPrice);
-
-		var coinbaseFees = ctx.gasLimit					// full gas for tx
-												.subtract(ctx.gas)	// gas given for this internal tx, calculates mostly the IntrinsicGas
-												.add(ctx.gasUsed)		// gas used for this internal tx
-												// .subtract(refund) 					// refund gas given
-												.multiply(ctx.gasPrice);
-
-
-		console.log('coinbaseFees\t', coinbaseFees)
-		console.log('fullGasCost\t', fullGasCost)
+		// In case from balance is negative because the tracer has disabled the CanTransfer check,
+		// and the Transfer happened before the CaptureStart and the interpreter execution
 		var hasFromSufficientBalanceForValueAndGasCost = ctx.hasFromSufficientBalanceForValueAndGasCost || false;
 		var hasFromSufficientBalanceForGasCost = ctx.hasFromSufficientBalanceForGasCost || false;
 
 		var isCreateType = ctx.type == "CREATE" || ctx.type == "CREATE2";
 		var isCallTypeWithZeroCodeForContract = !isCreateType && toHex(db.getCode(ctx.to)) == "0x"
-		var isCallTypeOnNonExistingAccount = ctx.type == "CALL" && ctx.value.isZero() && !db.exists(ctx.to)
-		// At this point, we need to deduct the "value" from the
-		// outer transaction, and move it back to the origin
-
-		// DEBUGGING GAS
-		console.log('\nCtx -----');
-		ctx.from = toHex(ctx.from);
-		ctx.to = toHex(ctx.to);
-		ctx.coinbase = toHex(ctx.coinbase);
-		ctx.parentBlockCoinbase = toHex(ctx.parentBlockCoinbase);
-		ctx.input = toHex(ctx.input).slice(0, 10) + '...<trimmed>';
-		ctx.output = toHex(ctx.output).slice(0, 10) + '...<trimmed>';
-		console.log(JSON.stringify(ctx, null, 2));
-
-		console.log('\nto exists\t\t', db.exists(ctx.to));
-		console.log('hasInitCalled\t\t', this.hasInitCalled);
-
-		console.log('hasError\t\t', this.hasError)
-
-		console.log('\nhasFromSufficientBalanceForValueAndGasCost\t', hasFromSufficientBalanceForValueAndGasCost)
-		console.log('hasFromSufficientBalanceForGasCost\t\t', hasFromSufficientBalanceForGasCost)
-
-		console.log('\nisCreateType\t\t\t\t', isCreateType)
-		console.log('isCallTypeWithZeroCodeForContract\t', isCallTypeWithZeroCodeForContract)
-		console.log('isCallTypeOnNonExistingAccount\t\t', isCallTypeOnNonExistingAccount)
+		var isCallTypeOnNonExistingAccount = ctx.type == "CALL" && ctx.value.isZero() && !db.exists(ctx.to) && !isPrecompiled(ctx.to)
 
 
-		console.log('\nCalcs ----');
-		console.log('\nvalue\t\t', ctx.value)
-		console.log('refund\t\t', refund)
+		// START DEBUGGING
+		var targetFrom = 0;
+		var targetCoinbase = 0;
 
-		console.log('\ngasUsed\t\t', gasUsed)
-		console.log('gasLeft\t\t', gasLeft)
-    console.log('refundValue\t', refundValue)
-    console.log('feesValue\t', feesValue)
-		console.log('fullGasCost\t\t', fullGasCost)
+		if (this.DEBUG) {
+			console.log()
 
-		console.log('gasCost\t\t', gasCost)
-		console.log('lastGasIn\t', this.lastGasIn, '\t\t-gasUsed\t', this.lastGasIn - ctx.gasUsed)
+			console.log('\nCtx -----');
+			ctx.from = toHex(ctx.from);
+			ctx.to = toHex(ctx.to);
+			ctx.coinbase = toHex(ctx.coinbase);
+			ctx.parentBlockCoinbase = toHex(ctx.parentBlockCoinbase);
+			ctx.input = toHex(ctx.input).slice(0, 10) + '...<trimmed>';
+			ctx.output = toHex(ctx.output).slice(0, 10) + '...<trimmed>';
+			console.log(JSON.stringify(ctx, null, 2));
 
-		console.log('\ngas\t\t', ctx.gas)
-		console.log('gasLimit\t', ctx.gasLimit, '\t-gasUsed\t', ctx.gasLimit - ctx.gasUsed)
-		console.log('gasLimit\t', ctx.gasLimit, '\t-gas\t\t', ctx.gasLimit - ctx.gas)
-		console.log('gasUsed\t\t', ctx.gasUsed)
-		console.log('gasPrice\t', ctx.gasPrice)
+			console.log('\nto exists\t\t', db.exists(ctx.to));
+			console.log('hasInitCalled\t\t', this.hasInitCalled);
 
-		if (this.stateDiff[fromAccountHex] !== undefined) {
-			console.log('\nbf.b fromA from\t\t', this.stateDiff[fromAccountHex].balance[memoryMarker].from)
-			console.log('bf.b fromA to\t\t', this.stateDiff[fromAccountHex].balance[memoryMarker].to)
+			console.log('hasError\t\t', this.hasError)
+
+			console.log('\nhasFromSufficientBalanceForValueAndGasCost\t', hasFromSufficientBalanceForValueAndGasCost)
+			console.log('hasFromSufficientBalanceForGasCost\t\t', hasFromSufficientBalanceForGasCost)
+
+			console.log('\nisCreateType\t\t\t\t', isCreateType)
+			console.log('isCallTypeWithZeroCodeForContract\t', isCallTypeWithZeroCodeForContract)
+			console.log('isCallTypeOnNonExistingAccount\t\t', isCallTypeOnNonExistingAccount)
+
+
+			console.log('\nCalcs ----');
+			console.log('\nvalue\t\t', ctx.value)
+			console.log('refund\t\t', refund)
+
+			console.log('\ngasUsed\t\t', gasUsed)
+			console.log('gasLeft\t\t', gasLeft)
+			console.log('refundValue\t', refundValue)
+			console.log('feesValue\t', feesValue)
+			console.log('fullGasCost\t', fullGasCost)
+
+			console.log('\ngas\t\t', ctx.gas)
+			console.log('gasLimit\t', ctx.gasLimit, '\t-gasUsed\t', ctx.gasLimit - ctx.gasUsed)
+			console.log('gasLimit\t', ctx.gasLimit, '\t-gas\t\t', ctx.gasLimit - ctx.gas)
+			console.log('ctx.gasUsed\t', ctx.gasUsed)
+			console.log('gasPrice\t', ctx.gasPrice)
+
+			if (this.stateDiff[fromAccountHex] !== undefined) {
+				console.log('\nbf.b fromA from\t\t', this.stateDiff[fromAccountHex].balance[memoryMarker].from)
+				console.log('bf.b fromA to\t\t', this.stateDiff[fromAccountHex].balance[memoryMarker].to)
+			}
+			if (this.stateDiff[toAccountHex] !== undefined) {
+				console.log('bf.b toA from\t\t', this.stateDiff[toAccountHex].balance[memoryMarker].from)
+				console.log('bf.b toA to\t\t', this.stateDiff[toAccountHex].balance[memoryMarker].to)
+			}
+			if (this.stateDiff[coinbaseHex] !== undefined) {
+				console.log('bf.b coinbase from\t', this.stateDiff[coinbaseHex].balance[memoryMarker].from)
+				console.log('bf.b coinbase to\t', this.stateDiff[coinbaseHex].balance[memoryMarker].to)
+			}
+
+			// -==============================-
+			// test_0xd729e9fc58bb481305edf2d4e4dfce202f197970ebcaa79ed776e1d84d7608ba.js
+			// from != coinbase
+
+			// targetFrom = bigInt('121518261918882341841225');
+			// targetCoinbase = bigInt('89536113793616000000000');
+
+			// 		"0x877bd459c9b7d8576b44e59e09d076c25946f443": {
+			//  -        "from": "0x19bb84a757e0e3ebe949"  121518261918882341841225 - 121518344860674341841225 = -82941792000000000
+			//  +        "from": "0x19bb85ce02ffb51da949"  121518344860674341841225
+			// 					"to": "0x19bb76c0072578c5a949"     121517260060674341841225
+
+			// 		"0x9f2659ffe7b3b467e46dcec3623392cf51635079": {
+			//  -        "from": "0x12f5c33038a1ba632000"  89536113793616000000000 - 89536030851824000000000 = 82941792000000000
+			//  +        "from": "0x12f5c2098d82e9316000"  89536030851824000000000
+			// 					"to": "0x12f5c336d2a97e256000"     89536115651824000000000
+
+
+			// -==============================-
+			// 0x0d39f0b8fd5e88fec9d7dc9af2b3be369a72b768bd85f19dfc504b6f6814ed1e
+			// from != coinbase
+
+			// targetFrom = bigInt('121470724535330341841146');
+
+			// 		"0x877bd459c9b7d8576b44e59e09d076c25946f443": {
+			//  -        "from": "0x19b8f0f0a166db76e8fa",  121470724535330341841146
+			//  +        "from": "0x19b8eff0dd169c24a8fa",
+			// 					"to": "0x19bba6a6cfa7375d28ef",
+			// -==============================-
+
+			// -==============================-
+			// 0xae3f7b74d841180b138083a9a4c8ce1ffea808ee15c6da3dd207e06b95d121cf
+			// from == coinbase
+
+			// targetFrom = bigInt('121514281962498341841230');
+			// targetCoinbase = targetFrom;
+
+			// 		"0x877bd459c9b7d8576b44e59e09d076c25946f443": "="
+			// -==============================-
+
+			// -==============================-
+			// 0x632778d9d6a3fb3394047d29353db05e0af4b8849de110959473a23a0b8326ad
+			// from == coinbase
+
+			// targetFrom = bigInt('121519205547922341840986');
+			// targetCoinbase = bigInt('89561811979280000000000');
+
+			// 		"0x877bd459c9b7d8576b44e59e09d076c25946f443": "="
+			// -==============================-
+
+			// -==============================-
+			// 0x6af0a5c3188ffacae4d340d4a17e14fdb5a54187683a80ef241bde248189882b
+			// from != coinbase
+
+			// targetFrom = bigInt('121467091227090341840990');
+			// targetCoinbase = targetFrom;
+
+			// 		"0x877bd459c9b7d8576b44e59e09d076c25946f443": "="
+			// -==============================-
+
+			// -==============================-
+			// 0xe571889a4cef4e430044f535b29af290a4749c2e731f41a8a19b754afc24dba6
+			// from != coinbase
+
+			// targetFrom = bigInt('121615567848266429681864');
+			// targetCoinbase = bigInt('89679040283856000000000');
+
+			// -==============================-
+
+			// -==============================-
+			// 0xbfca41d82781ba1888c10d96de84ff68799e328c658b34964d382eba019b3752
+			// from != coinbase
+
+			// targetFrom = bigInt('111958610750068889934909');
+			// targetCoinbase = bigInt('62899689512564658158728');
+
+			// -==============================-
+
+			// -==============================-
+			// 0xbcc77711a6c37a6ffb5b509d0bb02effcf6db5c6023caa822c5583665902cfa4
+			// from != coinbase
+
+			// targetFrom = bigInt('83564136527034046764942');
+			// targetCoinbase = bigInt('62899689512564658158728');
+
+			// -==============================-
+
+			// -==============================-
+			// 0x745dd02ca022ac47ad1d0799e171e2b43bbd5bfed96b12620e08ce9d0bf771a9
+			// from != coinbase
+
+			// 451749019456968055088506-451749019480768055088506=-23800000000000
+			// targetFrom = bigInt('451749019480768055088506');
+			// 89828976183021000000000-89828976159221000000000=23800000000000
+			// targetCoinbase = bigInt('89828976159221000000000');
+
+			// -==============================-
+
+			// -==============================-
+			// 0x0a4ca70dba769faf805cc4cabb0e2577231d2ecec32cefcc98b1d1220dd423b4
+			// from == coinbase
+
+			// targetFrom = bigInt('111960308816068889934909');
+			// targetCoinbase = targetFrom;
+
+			// -==============================-
+
+			// -==============================-
+			// 0xc548d23fda68492f2ca66409ba38e8d24d79337d6d9b93d25b3d9e3fc84714cb
+			// from == coinbase
+
+			// targetFrom = bigInt('121510984653642429681864');
+			// targetCoinbase = targetFrom;
+
+			// -==============================-
+
+			// -==============================-
+			// 0x0299a5f982ef3b30f2a8c6123b4bbdf7bc27b0bf98db0ca852d9c27fdfc4e84a
+			// from == coinbase
+
+			// targetFrom = bigInt('111521740132958889934882');
+			// targetCoinbase = targetFrom;
+
+			// -==============================-
 		}
-		if (this.stateDiff[toAccountHex] !== undefined) {
-			console.log('bf.b toA from\t\t', this.stateDiff[toAccountHex].balance[memoryMarker].from)
-			console.log('bf.b toA to\t\t', this.stateDiff[toAccountHex].balance[memoryMarker].to)
-		}
-		if (this.stateDiff[coinbaseHex] !== undefined) {
-			console.log('bf.b coinbase from\t', this.stateDiff[coinbaseHex].balance[memoryMarker].from)
-			console.log('bf.b coinbase to\t', this.stateDiff[coinbaseHex].balance[memoryMarker].to)
-		}
-		// END DEBUGGING GAS
+		// END DEBUGGING
 
 
-
-
-		// A transaction with value set, while from account has not enough balance to pay even for the gas cost,
-		// will not be run at all, though will not change the state
+		// a transaction with "value" set/positive,
+		// while "from" account has not enough balance to pay even for the gas cost,
+		// will not be run at all and will not change the state
 		if (!hasFromSufficientBalanceForGasCost && !hasFromSufficientBalanceForValueAndGasCost && ctx.value.isPositive()) {
+			// TODO: remove testing data
+			if (this.DEBUG || this.COMPATIBILITY_TESTING) {
+				return {'reason4': true};
+			}
 			return {};
 		}
 
@@ -653,7 +699,7 @@
 			var fromAcc = this.stateDiff[fromAccountHex];
 			var fromAccB = fromAcc.balance[memoryMarker];
 
-			// Add back call value, gasCost and refunds to the start balance,
+			// add back call value, gasCost and refunds to the start balance,
 			// as it has been transfered before the CaptureStart and the interpreter execution
 			var fromBal = fromAccB.from;
 			if (hasFromSufficientBalanceForGasCost) {
@@ -662,65 +708,52 @@
 						|| isCallTypeOnNonExistingAccount) {
 					fromBal = fromBal.add(feesValue);
 				} else {
-					console.log('from 2')
 					fromBal = fromBal.add(fullGasCost);
 				}
-				}
 			}
+
 			if (hasFromSufficientBalanceForValueAndGasCost && ctx.value.isPositive()) {
 				fromBal = fromBal.add(ctx.value);
 			}
-			fromAccB.from = fromBal;
-			var toBal = fromAccB.to;
 
-			// In case account doesn't have enough balance, the transfer won't happen,
+			fromAccB.from = fromBal;
+
+			// in case account doesn't have enough balance, the transfer won't happen,
 			// though the gasCost will still have to be paid
 			if (!hasFromSufficientBalanceForGasCost) {
-				// Remove gasCost paid for the transaction as it will happen after the interpreter execution
-				// var toBal = bigInt(fromAccB.to.slice(2), 16);
+				// remove gasCost paid for the transaction as it will happen after the interpreter execution
 				fromAccB.to = fromBal.subtract(feesValue);
 			}
 
-			// Decrement the caller's nonce,
+			// decrement the caller's nonce,
 			// as it has been increased before the CaptureStart and the interpreter execution
-			var fromNonce = fromAcc.nonce[memoryMarker].from;
-			fromAcc.nonce[memoryMarker].from = fromNonce - 1;
-
-			// var toNonce = fromAcc.nonce[memoryMarker].to;
-			// fromAcc.nonce[memoryMarker].to = "0x" + (toNonce + 1).toString(16);
+			fromAcc.nonce[memoryMarker].from -= 1;
 
 			// remove any errors marked on the from account, as it has to be included on output
 			// happens on mordor tx: 0x8f26c1acfce0178a2b037d85feeea99bb961bb46f541ad8c01c6668455952221
 			fromAcc._error = false;
 
+			// don't update from state anymore, as we applied our customs calcs
 			fromAcc._final = true;
 		}
 
 		if (this.stateDiff[toAccountHex] !== undefined) {
 			var toAcc = this.stateDiff[toAccountHex];
 
-			var fromBal = toAcc.balance[memoryMarker].from;
-
 			if (hasFromSufficientBalanceForValueAndGasCost) {
-				// Remove transferred value, as it has been transfered before the CaptureStart and the interpreter execution
-				toAcc.balance[memoryMarker].from = fromBal.subtract(ctx.value);
+				// remove transferred value, as it has been transfered before the CaptureStart and the interpreter execution
+				toAcc.balance[memoryMarker].from = toAcc.balance[memoryMarker].from.subtract(ctx.value);
 			} else {
-				// In case from account doesn't have enough balance, the transfer won't happen
+				// in case from account doesn't have enough balance, the transfer won't happen
 				toAcc.balance[memoryMarker].to = toAcc.balance[memoryMarker].from;
 			}
 
-			// var toBal = bigInt(toAcc.balance[memoryMarker].to.slice(2), 16);
-			// // Remove transferred value, as it has been transfered before the CaptureStart and the interpreter execution
-			// toAcc.balance[memoryMarker].to   = "0x" + toBal.subtract(ctx.value).toString(16);
-
-			toAcc._final = true;
-
-			// Mark new created contracts address
 			if (isCreateType) {
 				if (toAcc._type !== this.diffMarkers.Died) {
+					// mark new created contracts address
 					toAcc._type = this.diffMarkers.Born;
 				} else {
-					// if the new contract has not be persisted to state then remove it from state_diff output
+					// if the new contract has not be persisted to state then remove it from stateDiff output
 					toAcc._removed = true;
 				}
 			} else {
@@ -728,70 +761,60 @@
 				// happens on mordor tx: 0x89fd95d97374ccb9cdac249c74efdc57907c53beecb3e6ebce03b4ca31b0df2f
 				toAcc._error = false;
 			}
+
+			// don't update from state anymore, as we applied our customs calcs
+			toAcc._final = true;
 		}
 
 		if (this.stateDiff[coinbaseHex] !== undefined) {
 			var coinbaseAcc = this.stateDiff[coinbaseHex];
-			// var blockCoinbaseReward = ctx.blockCoinbaseReward ? bigInt(ctx.blockCoinbaseReward) : 0;
-
-			// FIXME: check if to or from is used
-			// var fromBal = coinbaseAcc.balance[memoryMarker].to;
-			var fromBal = coinbaseAcc.balance[memoryMarker].from;
 
 			// Remove gas cost as it will happen after the interpreter execution
 			if (hasFromSufficientBalanceForGasCost) {
 				// TODO: check for GetEIP161abcTransition too?
 				if (!this.hasInitCalled
 						|| isCallTypeOnNonExistingAccount) {
-					fromBal = fromBal.subtract(feesValue);
-				} else if (fromAccountHex === coinbaseHex) {
-          console.log('coinbase 2')
-					// fromBal = fromBal.add(refundValue);
-				}
+					coinbaseAcc.balance[memoryMarker].from = coinbaseAcc.balance[memoryMarker].from.subtract(feesValue);
 				}
 			}
 
-			coinbaseAcc.balance[memoryMarker].from = fromBal;
-
-			// Remove block reward, as state diff tracer applies to txs and not to blocks
-
-			// Add block reward from previous block
-			// var fromBal = bigInt(coinbaseAcc.balance[memoryMarker].from.slice(2), 16);
-			// coinbaseAcc.balance[memoryMarker].from = fromBal.add(blockCoinbaseReward);
-
-
-			// Remove block reward, as state diff tracer applies to txs and not to blocks
-
-			// Add block reward from previous block
-			// coinbaseToBal = coinbaseToBal.add(blockCoinbaseReward);
-
-			// // Add gas cost from current block as it will happen after the interpreter execution
-			// if (fromAccountHex !== coinbaseHex) {
-			// 	coinbaseToBal = coinbaseToBal.add(gasCost);
-			// }
 			// remove any errors marked on the coinbase account, as it has to be included on output
 			// happens on mordor tx: 0xbfca41d82781ba1888c10d96de84ff68799e328c658b34964d382eba019b3752
 			coinbaseAcc._error = false;
 
+			// don't update from state anymore, as we applied our customs calcs
 			coinbaseAcc._final = true;
 		}
 
-		if (this.stateDiff[fromAccountHex] !== undefined) {
-			console.log('\naf.b fromA from\t\t', this.stateDiff[fromAccountHex].balance[memoryMarker].from,
-				this.stateDiff[fromAccountHex].balance[memoryMarker].from.subtract(targetFrom))
-			console.log('af.b fromA to\t\t', this.stateDiff[fromAccountHex].balance[memoryMarker].to)
-		}
-		if (this.stateDiff[toAccountHex] !== undefined) {
-			console.log('af.b toA from\t\t', this.stateDiff[toAccountHex].balance[memoryMarker].from)
-			console.log('af.b toA to\t\t', this.stateDiff[toAccountHex].balance[memoryMarker].to)
-		}
-		if (this.stateDiff[coinbaseHex] !== undefined) {
-			console.log('af.b coinbase from\t', this.stateDiff[coinbaseHex].balance[memoryMarker].from, this.stateDiff
-				[coinbaseHex].balance[memoryMarker].from.subtract(targetCoinbase))
-			console.log('af.b coinbase to\t', this.stateDiff[coinbaseHex].balance[memoryMarker].to)
+		if (this.DEBUG) {
+			if (this.stateDiff[fromAccountHex] !== undefined) {
+				console.log('\naf.b fromA from\t\t', this.stateDiff[fromAccountHex].balance[memoryMarker].from,
+					this.stateDiff[fromAccountHex].balance[memoryMarker].from.subtract(targetFrom))
+				console.log('af.b fromA to\t\t', this.stateDiff[fromAccountHex].balance[memoryMarker].to)
+			}
+			if (this.stateDiff[toAccountHex] !== undefined) {
+				console.log('af.b toA from\t\t', this.stateDiff[toAccountHex].balance[memoryMarker].from)
+				console.log('af.b toA to\t\t', this.stateDiff[toAccountHex].balance[memoryMarker].to)
+			}
+			if (this.stateDiff[coinbaseHex] !== undefined) {
+				console.log('af.b coinbase from\t', this.stateDiff[coinbaseHex].balance[memoryMarker].from, this.stateDiff
+					[coinbaseHex].balance[memoryMarker].from.subtract(targetCoinbase))
+				console.log('af.b coinbase to\t', this.stateDiff[coinbaseHex].balance[memoryMarker].to)
+			}
 		}
 
 		this.format(db);
+
+		if (this.DEBUG || this.COMPATIBILITY_TESTING) {
+			if (hasFromSufficientBalanceForGasCost
+					&& !hasFromSufficientBalanceForValueAndGasCost
+					&& ctx.value.isPositive()
+					&& ctx.gasUsed.isZero()
+					&& gasUsed == '21000'
+					&& ctx.type === 'CALL') {
+				this.stateDiff['reason3'] = true;
+			}
+		}
 
 		// Return the assembled allocations (stateDiff)
 		return this.stateDiff;

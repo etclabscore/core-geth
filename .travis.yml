@@ -50,8 +50,10 @@ jobs:
       - travis_wait 60 make test
 
   # Run build and tests on ARM64 on Pull Requests.
+  # These tests are divided in half because their aggregate typical runtime
+  # exceeds Travis' time limit (~60m) and were consistently causing timeouts.
   - stage: build
-    name: "ARM64/Go1.15.x: make test"
+    name: "ARM64/Go1.15.x: make test [A-G]"
     if: type = pull_request
     os: linux
     arch: arm64
@@ -60,8 +62,18 @@ jobs:
     env:
       - GO111MODULE=on
     script:
-      - go run build/ci.go install -dlgo
-      - travis_wait 60 make test
+      - go run build/ci.go test -coverage $(printf './%s/... ' $(go list ./... | sed 's|github.com/ethereum/go-ethereum||g' | cut -d'/' -f2 | uniq | grep -E '^[a-g]'))
+  - stage: build
+    name: "ARM64/Go1.15.x: make test [H-Z]"
+    if: type = pull_request
+    os: linux
+    arch: arm64
+    dist: xenial
+    go: 1.15.x
+    env:
+      - GO111MODULE=on
+    script:
+      - go run build/ci.go test -coverage $(printf './%s/... ' $(go list ./... | sed 's|github.com/ethereum/go-ethereum||g' | cut -d'/' -f2 | uniq | grep -E '^[h-z]'))
 
   # Run build and tests with environment-aware possible artifact deployment.
   - stage: build

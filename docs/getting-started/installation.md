@@ -3,7 +3,7 @@ title: Installation
 ---
 
 !!! tip "Build from Source"
-    Instructions to build from source can be found [here](/developers/build-from-source/).
+    Instructions to build from source can be found [here](core-geth/developers/build-from-source/).
 
 ## Pre-built executable
 

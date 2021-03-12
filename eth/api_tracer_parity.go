@@ -23,7 +23,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -63,7 +63,7 @@ func setConfigTracerToParity(config *TraceConfig) *TraceConfig {
 
 func traceBlockReward(ctx context.Context, eth *Ethereum, block *types.Block, config *TraceConfig) (*ParityTrace, error) {
 	chainConfig := eth.blockchain.Config()
-	minerReward, _ := ethash.GetRewards(chainConfig, block.Header(), block.Uncles())
+	minerReward, _ := mutations.GetRewards(chainConfig, block.Header(), block.Uncles())
 
 	coinbase := block.Coinbase()
 
@@ -84,7 +84,7 @@ func traceBlockReward(ctx context.Context, eth *Ethereum, block *types.Block, co
 
 func traceBlockUncleRewards(ctx context.Context, eth *Ethereum, block *types.Block, config *TraceConfig) ([]*ParityTrace, error) {
 	chainConfig := eth.blockchain.Config()
-	_, uncleRewards := ethash.GetRewards(chainConfig, block.Header(), block.Uncles())
+	_, uncleRewards := mutations.GetRewards(chainConfig, block.Header(), block.Uncles())
 
 	results := make([]*ParityTrace, len(uncleRewards))
 	for i, uncle := range block.Uncles() {

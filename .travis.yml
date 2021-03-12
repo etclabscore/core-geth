@@ -50,6 +50,8 @@ jobs:
       - travis_wait 60 make test
 
   # Run build and tests on ARM64 on Pull Requests.
+  # These tests are divided in half because their aggregate typical runtime
+  # exceeds Travis' time limit (~60m) and were consistently causing timeouts.
   - stage: build
     name: "ARM64/Go1.15.x: make test [A-G]"
     if: type = pull_request

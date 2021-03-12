@@ -27,12 +27,12 @@ import (
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
@@ -923,7 +923,7 @@ func (w *worker) commitNewWork(interrupt *int32, noempty bool, timestamp int64) 
 	isDAOSupport := w.chainConfig.IsEnabled(w.chainConfig.GetEthashEIP779Transition, header.Number)
 	if isDAOSupport {
 		if daoNumber := w.chainConfig.GetEthashEIP779Transition(); daoNumber != nil && *daoNumber == header.Number.Uint64() {
-			misc.ApplyDAOHardFork(env.state)
+			mutations.ApplyDAOHardFork(env.state)
 		}
 	}
 	// Accumulate the uncles for the current block

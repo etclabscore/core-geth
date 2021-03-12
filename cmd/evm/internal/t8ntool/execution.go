@@ -23,7 +23,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
@@ -32,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -126,7 +126,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigura
 	isDAOSupport := chainConfig.IsEnabled(chainConfig.GetEthashEIP779Transition, new(big.Int).SetUint64(pre.Env.Number))
 	if isDAOSupport {
 		if daoNumber := chainConfig.GetEthashEIP779Transition(); daoNumber != nil && *daoNumber == pre.Env.Number {
-			misc.ApplyDAOHardFork(statedb)
+			mutations.ApplyDAOHardFork(statedb)
 		}
 	}
 

@@ -18,10 +18,10 @@ package mutations
 import (
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/core/state"
 )
 
 // Some weird constants to avoid constant memory allocs for them.

@@ -21,11 +21,11 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
@@ -67,7 +67,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 	isDAOSupport := p.config.IsEnabled(p.config.GetEthashEIP779Transition, block.Number())
 	if isDAOSupport {
 		if daoNumber := p.config.GetEthashEIP779Transition(); daoNumber != nil && *daoNumber == block.NumberU64() {
-			misc.ApplyDAOHardFork(statedb)
+			mutations.ApplyDAOHardFork(statedb)
 		}
 	}
 	blockContext := NewEVMBlockContext(header, p.bc, nil)

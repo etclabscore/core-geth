@@ -32,6 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -549,7 +550,7 @@ func (ethash *Ethash) Prepare(chain consensus.ChainHeaderReader, header *types.H
 // setting the final state on the header
 func (ethash *Ethash) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header) {
 	// Accumulate any block and uncle rewards and commit the final state root
-	accumulateRewards(chain.Config(), state, header, uncles)
+	mutations.AccumulateRewards(chain.Config(), state, header, uncles)
 	header.Root = state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, header.Number))
 }
 
@@ -585,6 +586,7 @@ func (ethash *Ethash) SealHash(header *types.Header) (hash common.Hash) {
 	hasher.Sum(hash[:0])
 	return hash
 }
+<<<<<<< HEAD
 
 // Some weird constants to avoid constant memory allocs for them.
 var (
@@ -690,3 +692,5 @@ func GetBlockWinnerRewardByEra(era *big.Int, blockReward *big.Int) *big.Int {
 
 	return r
 }
+=======
+>>>>>>> ethash: move rewards logic to params/mutations/rewards*

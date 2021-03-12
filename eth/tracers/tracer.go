@@ -568,6 +568,25 @@ func wrapError(context string, err error) error {
 	return fmt.Errorf("%v    in server-side tracer function '%v'", err, context)
 }
 
+func (jst *Tracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) error {
+	jst.dbWrapper.db = env.StateDB
+
+	for key, val := range inputs {
+		jst.ctx[key] = val
+	}
+
+	if jst.vm.GetPropString(jst.tracerObject, "init") {
+		jst.addCtxIntoState()
+		_, err := jst.call("init", "ctx", "db")
+		if err != nil {
+			jst.err = wrapError("init", err)
+			return nil
+		}
+	}
+
+	return nil
+}
+
 // CaptureStart implements the Tracer interface to initialize the tracing operation.
 func (jst *Tracer) CaptureStart(from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) error {
 	jst.ctx["type"] = "CALL"
@@ -583,23 +602,16 @@ func (jst *Tracer) CaptureStart(from common.Address, to common.Address, create b
 	return nil
 }
 
-func (jst *Tracer) CaptureExtraContext(inputs map[string]interface{}) error {
-	for key, val := range inputs {
-		jst.ctx[key] = val
-	}
-	return nil
-}
-
 // CaptureState implements the Tracer interface to trace a single step of VM execution.
 func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, memory *vm.Memory, stack *vm.Stack, rStack *vm.ReturnStack, rdata []byte, contract *vm.Contract, depth int, err error) error {
 	if jst.err == nil {
-		initMarker := false
+		// initMarker := false
 
 		// Initialize the context if it wasn't done yet
 		if !jst.inited {
 			jst.ctx["block"] = env.BlockNumber.Uint64()
 			jst.inited = true
-			initMarker = true
+			// initMarker = true
 		}
 		// If tracing was interrupted, set the error and stop
 		if atomic.LoadUint32(&jst.interrupt) > 0 {
@@ -634,14 +646,14 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 			*jst.errorValue = err.Error()
 		}
 
-		if initMarker && jst.vm.GetPropString(jst.tracerObject, "init") {
-			jst.addCtxIntoState()
-			_, err := jst.call("init", "ctx", "log", "db")
-			if err != nil {
-				jst.err = wrapError("init", err)
-				return nil
-			}
-		}
+		// if initMarker && jst.vm.GetPropString(jst.tracerObject, "init") {
+		// 	jst.addCtxIntoState()
+		// 	_, err := jst.call("init", "ctx", "log", "db")
+		// 	if err != nil {
+		// 		jst.err = wrapError("init", err)
+		// 		return nil
+		// 	}
+		// }
 
 		// Checks wether tracer supports `getCallstackLength` method in order to achieve optimal performance for call_tracer*
 		// in which case it checks if the call to `step` method has to be made, as the duktape prop call is an expensive operation

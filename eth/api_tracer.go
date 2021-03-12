@@ -866,26 +866,20 @@ func traceCall(ctx context.Context, eth *Ethereum, args ethapi.CallArgs, blockNr
 
 	// If the actual transaction would fail, then their is no reason to actually transfer any balance at all
 	vmctx.Transfer = func(db vm.StateDB, sender, recipient common.Address, amount *big.Int) {
-		var tamount big.Int
-		tamount.Set(amount)
+		toAmount := new(big.Int).Set(amount)
 
 		senderBalance := db.GetBalance(sender)
-		if senderBalance.Cmp(&tamount) < 0 {
-			tamount = *big.NewInt(0)
+		if senderBalance.Cmp(toAmount) < 0 {
+			toAmount.Set(big.NewInt(0))
 		}
 
-		originalTransfer(db, sender, recipient, &tamount)
+		originalTransfer(db, sender, recipient, toAmount)
 	}
 
 	// Add extra context needed for state_diff
 	taskExtraContext := map[string]interface{}{
 		"hasFromSufficientBalanceForValueAndGasCost": hasFromSufficientBalanceForValueAndGasCost,
 		"hasFromSufficientBalanceForGasCost":         hasFromSufficientBalanceForGasCost,
-		"gasLimit":                                   msg.Gas(),
-		"gasPrice":                                   msg.GasPrice(),
-	}
-	if coinbase, err := eth.engine.Author(header); err == nil {
-		taskExtraContext["coinbase"] = coinbase
 	}
 
 	return traceTx(ctx, eth, msg, vmctx, statedb, taskExtraContext, config)
@@ -973,10 +967,6 @@ func traceTx(ctx context.Context, eth *Ethereum, message core.Message, vmctx vm.
 		}()
 		defer cancel()
 
-		if extraContext != nil {
-			tracer.(*tracers.Tracer).CaptureExtraContext(extraContext)
-		}
-
 	case config == nil:
 		tracer = vm.NewStructLogger(nil)
 
@@ -985,6 +975,25 @@ func traceTx(ctx context.Context, eth *Ethereum, message core.Message, vmctx vm.
 	}
 	// Run the transaction with tracing enabled.
 	vmenv := vm.NewEVM(vmctx, statedb, eth.blockchain.Config(), vm.Config{Debug: true, Tracer: tracer})
+
+	switch tracer.(type) {
+	case *tracers.Tracer:
+		if extraContext == nil {
+			extraContext = map[string]interface{}{}
+		}
+
+		// Add useful context for all tracers
+		extraContext["from"] = message.From()
+		if message.To() != nil {
+			extraContext["msgTo"] = *message.To()
+		}
+		extraContext["coinbase"] = vmctx.Coinbase
+
+		extraContext["gasLimit"] = message.Gas()
+		extraContext["gasPrice"] = message.GasPrice()
+
+		tracer.(*tracers.Tracer).CapturePreEVM(vmenv, extraContext)
+	}
 
 	result, err := core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.Gas()))
 	if err != nil {

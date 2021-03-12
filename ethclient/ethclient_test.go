@@ -277,6 +277,43 @@ func TestHeader(t *testing.T) {
 	}
 }
 
+func TestHeader_TxesUnclesNotEmpty(t *testing.T) {
+	backend, _ := newTestBackend(t)
+	client, _ := backend.Attach()
+	defer backend.Close()
+	defer client.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
+	res := make(map[string]interface{})
+	err := client.CallContext(ctx, &res, "eth_getBlockByNumber", "latest", false)
+	if err == nil && res == nil {
+		err = ethereum.NotFound
+	}
+
+	// Sanity check response
+	if v, ok := res["number"]; !ok {
+		t.Fatal("missing 'number' field")
+	} else if n, err := hexutil.DecodeBig(v.(string)); err != nil || n == nil {
+		t.Fatal(err)
+	} else if n.Cmp(big.NewInt(1)) != 0 {
+		t.Fatalf("unexpected 'latest' block number: %v", n)
+	}
+	// 'transactions' key should exist as []
+	if v, ok := res["transactions"]; !ok {
+		t.Fatal("missing transactions field")
+	} else if len(v.([]interface{})) != 0 {
+		t.Fatal("'transactions' value not []")
+	}
+	// 'uncles' key should exist as []
+	if v, ok := res["uncles"]; !ok {
+		t.Fatal("missing uncles field")
+	} else if len(v.([]interface{})) != 0 {
+		t.Fatal("'uncles' value not []'")
+	}
+}
+
 func TestBalanceAt(t *testing.T) {
 	backend, _ := newTestBackend(t)
 	client, _ := backend.Attach()

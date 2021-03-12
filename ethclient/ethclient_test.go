@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"math/big"
 	"reflect"
 	"testing"
@@ -288,8 +289,8 @@ func TestHeader_TxesUnclesNotEmpty(t *testing.T) {
 
 	res := make(map[string]interface{})
 	err := client.CallContext(ctx, &res, "eth_getBlockByNumber", "latest", false)
-	if err == nil && res == nil {
-		err = ethereum.NotFound
+	if err != nil {
+		log.Fatalln(err)
 	}
 
 	// Sanity check response

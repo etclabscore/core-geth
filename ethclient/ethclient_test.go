@@ -321,8 +321,11 @@ func TestHeader_PendingNull(t *testing.T) {
 	defer backend.Close()
 	defer client.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 150*time.Millisecond)
 	defer cancel()
+
+	// Have to sleep a little to make sure miner has time to set pending.
+	time.Sleep(time.Millisecond * 50)
 
 	gotPending := make(map[string]interface{})
 	err := client.CallContext(ctx, &gotPending, "eth_getBlockByNumber", "pending", false)
@@ -330,9 +333,26 @@ func TestHeader_PendingNull(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// iterate expected non-null values, checking validity
+	// iterate expected values, checking validity
 	for k, v := range map[string]interface{}{
-		"number": "0x2",
+		// nulls
+		"nonce": nil,
+
+		// zero-values
+		"logsBloom":    "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+		"mixHash":      "0x0000000000000000000000000000000000000000000000000000000000000000",
+		"transactions": []interface{}{},
+		"uncles":       []interface{}{},
+
+		// filled
+		"number":           "0x2",
+		"parentHash":       "0x228d7580ae75567749daa5ed31ff1fcc09803ebe001b44f64b0f364c19bff4cb",
+		"receiptsRoot":     "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+		"sha3Uncles":       "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+		"size":             "0x21a",
+		"stateRoot":        "0x02189854bc38ea675df81794e54a2676230444d87adc7a51bbba0d4cc6519d43",
+		"transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+		// "timestamp":        "0x604f76f4", // incidentally nondeterministic
 	} {
 		gotVal, ok := gotPending[k]
 		if !ok {
@@ -340,17 +360,6 @@ func TestHeader_PendingNull(t *testing.T) {
 		}
 		if !reflect.DeepEqual(v, gotVal) {
 			t.Fatalf("%s: want: %v, got: %v", k, v, gotVal)
-		}
-	}
-
-	// iterate wanted null values, checking if they are present and set to 'null'
-	for _, key := range []string{"nonce"} {
-		val, ok := gotPending["nonce"]
-		if !ok {
-			t.Fatalf("%s: missing key", key)
-		}
-		if val != nil {
-			t.Fatalf("%s: non-nil value: %v", key, val)
 		}
 	}
 }

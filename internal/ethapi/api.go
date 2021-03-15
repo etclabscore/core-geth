@@ -1147,7 +1147,7 @@ func RPCMarshalHeader(head *types.Header) map[string]interface{} {
 // RPCMarshalHeaderT defines the RPC marshaling type for block headers.
 type RPCMarshalHeaderT struct {
 	Number           *hexutil.Big      `json:"number"`
-	Hash             *common.Hash      `json:"hash,omitempty"` // Pending will be nil
+	Hash             *common.Hash      `json:"hash"` // Pending will be nil
 	ParentHash       common.Hash       `json:"parentHash"`
 	Nonce            *types.BlockNonce `json:"nonce"` // Pending will be nil
 	MixHash          common.Hash       `json:"mixHash"`

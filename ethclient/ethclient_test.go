@@ -330,6 +330,19 @@ func TestHeader_PendingNull(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// iterate expected non-null values, checking validity
+	for k, v := range map[string]interface{}{
+		"number": "0x2",
+	} {
+		gotVal, ok := gotPending[k]
+		if !ok {
+			t.Fatalf("%s: missing key", k)
+		}
+		if !reflect.DeepEqual(v, gotVal) {
+			t.Fatalf("%s: want: %v, got: %v", k, v, gotVal)
+		}
+	}
+
 	// iterate wanted null values, checking if they are present and set to 'null'
 	for _, key := range []string{"nonce"} {
 		val, ok := gotPending["nonce"]

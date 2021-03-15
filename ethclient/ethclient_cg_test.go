@@ -4,55 +4,24 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
-	"math/big"
 	"regexp"
 	"testing"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
-func TestHeader_TxesUnclesNotEmptyLatest(t *testing.T) {
-	backend, _ := newTestBackend(t)
-	client, _ := backend.Attach()
-	defer backend.Close()
-	defer client.Close()
+/*
+The '_CanCompareGoEthereum' denotes tests that can be run against ethereum/go-ethereum.
+See .github/workflows/geth_1to1.yml for exemplary testing.
+*/
 
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-	defer cancel()
-
-	res := make(map[string]interface{})
-	err := client.CallContext(ctx, &res, "eth_getBlockByNumber", "latest", false)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	// Sanity check response
-	if v, ok := res["number"]; !ok {
-		t.Fatal("missing 'number' field")
-	} else if n, err := hexutil.DecodeBig(v.(string)); err != nil || n == nil {
-		t.Fatal(err)
-	} else if n.Cmp(big.NewInt(1)) != 0 {
-		t.Fatalf("unexpected 'latest' block number: %v", n)
-	}
-	// 'transactions' key should exist as []
-	if v, ok := res["transactions"]; !ok {
-		t.Fatal("missing transactions field")
-	} else if len(v.([]interface{})) != 0 {
-		t.Fatal("'transactions' value not []")
-	}
-	// 'uncles' key should exist as []
-	if v, ok := res["uncles"]; !ok {
-		t.Fatal("missing uncles field")
-	} else if len(v.([]interface{})) != 0 {
-		t.Fatal("'uncles' value not []'")
-	}
-}
-
-func TestEthGetBlock_ValidJSONResponse(t *testing.T) {
+// TestEthGetBlockByNumber_ValidJSONResponse_CanCompareGoEthereum tests that
+// JSON RPC API responses to eth_getBlockByNumber meet pattern-based expectations.
+// These validations include the null-ness of certain fields for the 'pending' block
+// as well existence of all expected keys and values.
+func TestEthGetBlockByNumber_ValidJSONResponse_CanCompareGoEthereum(t *testing.T) {
 	backend, _ := newTestBackend(t)
 	client, _ := backend.Attach()
 	defer backend.Close()

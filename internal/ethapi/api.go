@@ -1147,14 +1147,14 @@ func RPCMarshalHeader(head *types.Header) map[string]interface{} {
 // RPCMarshalHeaderT defines the RPC marshaling type for block headers.
 type RPCMarshalHeaderT struct {
 	Number           *hexutil.Big      `json:"number"`
-	Hash             *common.Hash      `json:"hash"` // Pending will be nil
+	Hash             *common.Hash      `json:"hash"` // -- Pending will be nil --
 	ParentHash       common.Hash       `json:"parentHash"`
-	Nonce            *types.BlockNonce `json:"nonce"` // Pending will be nil
+	Nonce            *types.BlockNonce `json:"nonce"` // -- Pending will be nil --
 	MixHash          common.Hash       `json:"mixHash"`
 	Sha3Uncles       common.Hash       `json:"sha3Uncles"`
 	LogsBloom        types.Bloom       `json:"logsBloom"`
 	StateRoot        common.Hash       `json:"stateRoot"`
-	Miner            *common.Address   `json:"miner"` // Pending will be nil
+	Miner            *common.Address   `json:"miner"` // -- Pending will be nil --
 	Difficulty       *hexutil.Big      `json:"difficulty"`
 	TotalDifficulty  *hexutil.Big      `json:"totalDifficulty"`
 	ExtraData        hexutil.Bytes     `json:"extraData"`
@@ -1198,18 +1198,19 @@ func NewRPCMarshalHeaderTFromHeader(header *types.Header) *RPCMarshalHeaderT {
 // rpcMarshalHeaderTSetTotalDifficulty sets the total difficulty field for RPC response headers.
 // If the hash is unavailable (ie in Pending state), the value will be 0.
 func (s *PublicBlockChainAPI) rpcMarshalHeaderTSetTotalDifficulty(ctx context.Context, header *RPCMarshalHeaderT) {
-	hash := header.Hash
-	if hash == nil {
-		c := common.Hash{}
-		hash = &c
-	}
-	header.TotalDifficulty = (*hexutil.Big)(s.b.GetTd(ctx, *hash))
-	if header.TotalDifficulty == nil || header.TotalDifficulty.ToInt().Cmp(common.Big0) == 0 {
-		if header.ParentHash != (common.Hash{}) && header.Difficulty != nil {
-			td := (*hexutil.Big)(s.b.GetTd(ctx, header.ParentHash))
-			header.TotalDifficulty = (*hexutil.Big)(td.ToInt().Add(td.ToInt(), header.Difficulty.ToInt()))
-		}
-	}
+	header.TotalDifficulty = (*hexutil.Big)(s.b.GetTd(ctx, *header.Hash))
+	// hash := header.Hash
+	// if hash == nil {
+	// 	c := common.Hash{}
+	// 	hash = &c
+	// }
+	// header.TotalDifficulty = (*hexutil.Big)(s.b.GetTd(ctx, *hash))
+	// if header.TotalDifficulty == nil || header.TotalDifficulty.ToInt().Cmp(common.Big0) == 0 {
+	// 	if header.ParentHash != (common.Hash{}) && header.Difficulty != nil {
+	// 		td := (*hexutil.Big)(s.b.GetTd(ctx, header.ParentHash))
+	// 		header.TotalDifficulty = (*hexutil.Big)(td.ToInt().Add(td.ToInt(), header.Difficulty.ToInt()))
+	// 	}
+	// }
 }
 
 // setAsPending sets fields that must be nil for pending headers and blocks.

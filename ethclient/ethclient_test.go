@@ -315,6 +315,33 @@ func TestHeader_TxesUnclesNotEmpty(t *testing.T) {
 	}
 }
 
+func TestHeader_PendingNull(t *testing.T) {
+	backend, _ := newTestBackend(t)
+	client, _ := backend.Attach()
+	defer backend.Close()
+	defer client.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
+	gotPending := make(map[string]interface{})
+	err := client.CallContext(ctx, &gotPending, "eth_getBlockByNumber", "pending", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// iterate wanted null values, checking if they are present and set to 'null'
+	for _, key := range []string{"nonce"} {
+		val, ok := gotPending["nonce"]
+		if !ok {
+			t.Fatalf("%s: missing key", key)
+		}
+		if val != nil {
+			t.Fatalf("%s: non-nil value: %v", key, val)
+		}
+	}
+}
+
 func TestBalanceAt(t *testing.T) {
 	backend, _ := newTestBackend(t)
 	client, _ := backend.Attach()

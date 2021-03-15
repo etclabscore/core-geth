@@ -52,7 +52,7 @@ func TestHeader_TxesUnclesNotEmptyLatest(t *testing.T) {
 	}
 }
 
-func TestHeader_PendingNull(t *testing.T) {
+func Test_EthGetBlockJSONResponse(t *testing.T) {
 	backend, _ := newTestBackend(t)
 	client, _ := backend.Attach()
 	defer backend.Close()
@@ -77,54 +77,110 @@ func TestHeader_PendingNull(t *testing.T) {
 	reHexAnyLen := regexp.MustCompile(`^"0x[a-zA-Z0-9]+"$`)
 	reHexHashLen := regexp.MustCompile(fmt.Sprintf(`^"0x[a-zA-Z0-9]{%d}"$`, common.HashLength*2))
 
-	cases := map[string]*regexp.Regexp{
-		"nonce": reNull,
-		"hash":  reNull,
-		"miner": reNull,
+	for blockHeight, cases := range map[string]map[string]*regexp.Regexp{
+		"earliest": {
+			"nonce": reHexAnyLen,
+			"hash":  reHexAnyLen,
+			"miner": regexp.MustCompile(fmt.Sprintf(`^"0x[a-zA-Z0-9]{%d}"$`, common.AddressLength*2)),
 
-		"totalDifficulty": reNull,
+			"totalDifficulty": reHexAnyLen,
 
-		"mixHash":   regexp.MustCompile(fmt.Sprintf(`^"0x[0]{%d}"$`, common.HashLength*2)),
-		"logsBloom": regexp.MustCompile(fmt.Sprintf(`^"0x[0]{%d}"$`, types.BloomByteLength*2)),
+			"mixHash":   regexp.MustCompile(fmt.Sprintf(`^"0x[0]{%d}"$`, common.HashLength*2)),
+			"logsBloom": regexp.MustCompile(fmt.Sprintf(`^"0x[0]{%d}"$`, types.BloomByteLength*2)),
 
-		"number":     reHexAnyLen,
-		"difficulty": reHexAnyLen,
-		"gasLimit":   reHexAnyLen,
-		"gasUsed":    reHexAnyLen,
-		"size":       reHexAnyLen,
-		"timestamp":  reHexAnyLen,
-		"extraData":  reHexAnyLen,
+			"number":     reHexAnyLen,
+			"difficulty": reHexAnyLen,
+			"gasLimit":   reHexAnyLen,
+			"gasUsed":    reHexAnyLen,
+			"size":       reHexAnyLen,
+			"timestamp":  reHexAnyLen,
+			"extraData":  reHexAnyLen,
 
-		"parentHash":       reHexHashLen,
-		"transactionsRoot": reHexHashLen,
-		"stateRoot":        reHexHashLen,
-		"receiptsRoot":     reHexHashLen,
-		"sha3Uncles":       reHexHashLen,
+			"parentHash":       reHexHashLen,
+			"transactionsRoot": reHexHashLen,
+			"stateRoot":        reHexHashLen,
+			"receiptsRoot":     reHexHashLen,
+			"sha3Uncles":       reHexHashLen,
 
-		"uncles":       regexp.MustCompile(`^\[\]$`),
-		"transactions": regexp.MustCompile(`^\[\]$`),
-	}
+			"uncles":       regexp.MustCompile(`^\[\]$`),
+			"transactions": regexp.MustCompile(`^\[\]$`),
+		},
+		"latest": {
+			"nonce": reHexAnyLen,
+			"hash":  reHexAnyLen,
+			"miner": regexp.MustCompile(fmt.Sprintf(`^"0x[a-zA-Z0-9]{%d}"$`, common.AddressLength*2)),
 
-	for _, fullTxes := range []bool{true, false} {
-		gotPending := make(map[string]json.RawMessage)
-		err := client.CallContext(ctx, &gotPending, "eth_getBlockByNumber", "pending", fullTxes)
-		if err != nil {
-			t.Fatal(err)
-		}
+			"totalDifficulty": reHexAnyLen,
 
-		for key, re := range cases {
-			gotVal, ok := gotPending[key]
-			if !ok {
-				t.Errorf("%s: missing key", key)
+			"mixHash":   regexp.MustCompile(fmt.Sprintf(`^"0x[0]{%d}"$`, common.HashLength*2)),
+			"logsBloom": regexp.MustCompile(fmt.Sprintf(`^"0x[0]{%d}"$`, types.BloomByteLength*2)),
+
+			"number":     reHexAnyLen,
+			"difficulty": reHexAnyLen,
+			"gasLimit":   reHexAnyLen,
+			"gasUsed":    reHexAnyLen,
+			"size":       reHexAnyLen,
+			"timestamp":  reHexAnyLen,
+			"extraData":  reHexAnyLen,
+
+			"parentHash":       reHexHashLen,
+			"transactionsRoot": reHexHashLen,
+			"stateRoot":        reHexHashLen,
+			"receiptsRoot":     reHexHashLen,
+			"sha3Uncles":       reHexHashLen,
+
+			"uncles":       regexp.MustCompile(`^\[\]$`),
+			"transactions": regexp.MustCompile(`^\[\]$`),
+		},
+		"pending": {
+			"nonce": reNull,
+			"hash":  reNull,
+			"miner": reNull,
+
+			"totalDifficulty": reNull,
+
+			"mixHash":   regexp.MustCompile(fmt.Sprintf(`^"0x[0]{%d}"$`, common.HashLength*2)),
+			"logsBloom": regexp.MustCompile(fmt.Sprintf(`^"0x[0]{%d}"$`, types.BloomByteLength*2)),
+
+			"number":     reHexAnyLen,
+			"difficulty": reHexAnyLen,
+			"gasLimit":   reHexAnyLen,
+			"gasUsed":    reHexAnyLen,
+			"size":       reHexAnyLen,
+			"timestamp":  reHexAnyLen,
+			"extraData":  reHexAnyLen,
+
+			"parentHash":       reHexHashLen,
+			"transactionsRoot": reHexHashLen,
+			"stateRoot":        reHexHashLen,
+			"receiptsRoot":     reHexHashLen,
+			"sha3Uncles":       reHexHashLen,
+
+			"uncles":       regexp.MustCompile(`^\[\]$`),
+			"transactions": regexp.MustCompile(`^\[\]$`),
+		},
+	} {
+		for _, fullTxes := range []bool{true, false} {
+			gotPending := make(map[string]json.RawMessage)
+			err := client.CallContext(ctx, &gotPending, "eth_getBlockByNumber", blockHeight, fullTxes)
+			if err != nil {
+				t.Fatal(err)
 			}
-			if !re.Match(gotVal) {
-				t.Errorf("%s want: %v, got: %v", key, re, string(gotVal))
-			}
-		}
 
-		for k, v := range gotPending {
-			if _, ok := cases[k]; !ok {
-				t.Errorf("%s: missing key (value: %v)", k, string(v))
+			for key, re := range cases {
+				gotVal, ok := gotPending[key]
+				if !ok {
+					t.Errorf("%s: missing key", key)
+				}
+				if !re.Match(gotVal) {
+					t.Errorf("%s want: %v, got: %v", key, re, string(gotVal))
+				}
+			}
+
+			for k, v := range gotPending {
+				if _, ok := cases[k]; !ok {
+					t.Errorf("%s: missing key (value: %v)", k, string(v))
+				}
 			}
 		}
 	}

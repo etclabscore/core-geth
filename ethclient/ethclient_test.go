@@ -41,6 +41,7 @@ import (
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/go-test/deep"
 	meta_schema "github.com/open-rpc/meta-schema"
 )
@@ -340,6 +341,7 @@ func TestHeader_PendingNull(t *testing.T) {
 	t.Logf("%s", string(b))
 
 	// iterate expected values, checking validity
+	wantBlockNumber := big.NewInt(2)
 	want := map[string]interface{}{
 		// nulls
 		"nonce": nil,
@@ -352,10 +354,11 @@ func TestHeader_PendingNull(t *testing.T) {
 		"uncles":       []interface{}{},
 
 		// filled
-		"number":           "0x2",
+		"number":           (*hexutil.Big)(wantBlockNumber).String(),
 		"gasLimit":         "0x47d5cc",
 		"gasUsed":          "0x0",
 		"difficulty":       "0x20000",
+		"totalDifficulty":  (*hexutil.Big)(new(big.Int).Mul(vars.MinimumDifficulty, wantBlockNumber)).String(),
 		"size":             "0x21a",
 		"parentHash":       "0x228d7580ae75567749daa5ed31ff1fcc09803ebe001b44f64b0f364c19bff4cb",
 		"extraData":        "0xda83010b1788436f72654765746886676f312e3135856c696e7578",

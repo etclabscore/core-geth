@@ -52,7 +52,7 @@ func TestHeader_TxesUnclesNotEmptyLatest(t *testing.T) {
 	}
 }
 
-func Test_EthGetBlockJSONResponse(t *testing.T) {
+func TestEthGetBlock_ValidJSONResponse(t *testing.T) {
 	backend, _ := newTestBackend(t)
 	client, _ := backend.Attach()
 	defer backend.Close()

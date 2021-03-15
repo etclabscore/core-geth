@@ -18,6 +18,7 @@ package ethclient
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -39,6 +40,7 @@ import (
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/go-test/deep"
 	meta_schema "github.com/open-rpc/meta-schema"
 )
 
@@ -333,8 +335,11 @@ func TestHeader_PendingNull(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	b, _ := json.MarshalIndent(gotPending, "", "    ")
+	t.Logf("%s", string(b))
+
 	// iterate expected values, checking validity
-	for k, v := range map[string]interface{}{
+	want := map[string]interface{}{
 		// nulls
 		"nonce": nil,
 
@@ -346,20 +351,35 @@ func TestHeader_PendingNull(t *testing.T) {
 
 		// filled
 		"number":           "0x2",
-		"parentHash":       "0x228d7580ae75567749daa5ed31ff1fcc09803ebe001b44f64b0f364c19bff4cb",
-		"receiptsRoot":     "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
-		"sha3Uncles":       "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+		"gasLimit":         "0x47d5cc",
+		"gasUsed":          "0x0",
+		"difficulty":       "0x20000",
 		"size":             "0x21a",
-		"stateRoot":        "0x02189854bc38ea675df81794e54a2676230444d87adc7a51bbba0d4cc6519d43",
+		"parentHash":       "0x228d7580ae75567749daa5ed31ff1fcc09803ebe001b44f64b0f364c19bff4cb",
+		"extraData":        "0xda83010b1788436f72654765746886676f312e3135856c696e7578",
 		"transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
-		// "timestamp":        "0x604f76f4", // incidentally nondeterministic
-	} {
+		"receiptsRoot":     "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+		"stateRoot":        "0x02189854bc38ea675df81794e54a2676230444d87adc7a51bbba0d4cc6519d43",
+		"sha3Uncles":       "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+		"timestamp":        "0x604f76f4", // incidentally nondeterministic; special case
+	}
+	for k, v := range want {
 		gotVal, ok := gotPending[k]
 		if !ok {
 			t.Fatalf("%s: missing key", k)
 		}
+		// special case (indeterminate time)
+		if k == "timestamp" {
+			gotVal = want["timestamp"]
+			gotPending["timestamp"] = gotVal
+		}
 		if !reflect.DeepEqual(v, gotVal) {
 			t.Fatalf("%s: want: %v, got: %v", k, v, gotVal)
+		}
+	}
+	if len(want) != len(gotPending) {
+		for _, diff := range deep.Equal(want, gotPending) {
+			t.Errorf("[want/got] +/-: %s", diff)
 		}
 	}
 }

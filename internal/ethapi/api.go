@@ -1154,7 +1154,7 @@ type RPCMarshalHeaderT struct {
 	Sha3Uncles       common.Hash       `json:"sha3Uncles"`
 	LogsBloom        types.Bloom       `json:"logsBloom"`
 	StateRoot        common.Hash       `json:"stateRoot"`
-	Miner            *common.Address   `json:"miner,omitempty"` // Pending will be nil
+	Miner            *common.Address   `json:"miner"` // Pending will be nil
 	Difficulty       *hexutil.Big      `json:"difficulty"`
 	TotalDifficulty  *hexutil.Big      `json:"totalDifficulty"`
 	ExtraData        hexutil.Bytes     `json:"extraData"`

@@ -2,16 +2,17 @@ package ethclient
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/big"
-	"reflect"
 	"regexp"
 	"testing"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/go-test/deep"
+	"github.com/ethereum/go-ethereum/core/types"
 )
 
 func TestHeader_TxesUnclesNotEmpty(t *testing.T) {
@@ -72,64 +73,59 @@ func TestHeader_PendingNull(t *testing.T) {
 		t.Fatal("bad test")
 	}
 
+	reNull := regexp.MustCompile(`^null$`)
+	reHexAnyLen := regexp.MustCompile(`^"0x[a-zA-Z0-9]+"$`)
+	reHexHashLen := regexp.MustCompile(fmt.Sprintf(`^"0x[a-zA-Z0-9]{%d}"$`, common.HashLength*2))
+
+	cases := map[string]*regexp.Regexp{
+		"nonce": reNull,
+		"hash":  reNull,
+		"miner": reNull,
+
+		"totalDifficulty": reNull,
+
+		"mixHash":   regexp.MustCompile(fmt.Sprintf(`^"0x[0]{%d}"$`, common.HashLength*2)),
+		"logsBloom": regexp.MustCompile(fmt.Sprintf(`^"0x[0]{%d}"$`, types.BloomByteLength*2)),
+
+		"number":     reHexAnyLen,
+		"difficulty": reHexAnyLen,
+		"gasLimit":   reHexAnyLen,
+		"gasUsed":    reHexAnyLen,
+		"size":       reHexAnyLen,
+		"timestamp":  reHexAnyLen,
+		"extraData":  reHexAnyLen,
+
+		"parentHash":       reHexHashLen,
+		"transactionsRoot": reHexHashLen,
+		"stateRoot":        reHexHashLen,
+		"receiptsRoot":     reHexHashLen,
+		"sha3Uncles":       reHexHashLen,
+
+		"uncles":       regexp.MustCompile(`^\[\]$`),
+		"transactions": regexp.MustCompile(`^\[\]$`),
+	}
+
 	for _, fullTxes := range []bool{true, false} {
-		gotPending := make(map[string]interface{})
+		gotPending := make(map[string]json.RawMessage)
 		err := client.CallContext(ctx, &gotPending, "eth_getBlockByNumber", "pending", fullTxes)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// Iterate expected values, checking validity.
-		wantBlockNumber := big.NewInt(2)
-		want := map[string]interface{}{
-			// Nulls.
-			"nonce": nil,
-			"hash":  nil,
-			"miner": nil,
-			// "totalDifficulty":  (*hexutil.Big)(new(big.Int).Mul(vars.MinimumDifficulty, wantBlockNumber)).String(),
-			"totalDifficulty": nil,
-
-			// Zero-values.
-			"logsBloom":    "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-			"mixHash":      "0x0000000000000000000000000000000000000000000000000000000000000000",
-			"transactions": []interface{}{},
-			"uncles":       []interface{}{},
-
-			// Filled.
-			"number":           (*hexutil.Big)(wantBlockNumber).String(),
-			"gasLimit":         "0x47d5cc",
-			"gasUsed":          hexutil.Uint64(0).String(),
-			"difficulty":       (*hexutil.Big)(parent.Difficulty).String(),
-			"size":             "0x21a",
-			"parentHash":       parent.Hash().Hex(),
-			"extraData":        "0xda83010b1788436f72654765746886676f312e3135856c696e7578",
-			"transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
-			"receiptsRoot":     "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
-			"stateRoot":        "0x02189854bc38ea675df81794e54a2676230444d87adc7a51bbba0d4cc6519d43",
-			"sha3Uncles":       "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
-			"timestamp":        "0x604f76f4", // Incidentally nondeterministic; special case.
-		}
-		for k, v := range want {
-			gotVal, ok := gotPending[k]
+		for key, re := range cases {
+			gotVal, ok := gotPending[key]
 			if !ok {
-				t.Errorf("%s: missing key", k)
+				t.Errorf("%s: missing key", key)
 			}
-			// Special case (indeterminate time).
-			if k == "timestamp" {
-				if !regexp.MustCompile(fmt.Sprintf(`^0x[a-zA-Z0-9]{%d}`, len("604f76f4"))).MatchString(gotVal.(string)) {
-					t.Errorf("%s: unexpected value: %v", k, gotVal)
-				}
-				gotVal = want["timestamp"]
-				gotPending["timestamp"] = gotVal
-			}
-			if !reflect.DeepEqual(v, gotVal) {
-				t.Errorf("%s: want: %v, got: %v", k, v, gotVal)
+			if !re.Match(gotVal) {
+				t.Errorf("%s want: %v, got: %v", key, re, string(gotVal))
 			}
 		}
 
-		// Slightly redundant, but additionally checks the occurrence of got -> want (supplementing want -> got).
-		for _, diff := range deep.Equal(want, gotPending) {
-			t.Errorf("[want/got] +/-: %s", diff)
+		for k, v := range gotPending {
+			if _, ok := cases[k]; !ok {
+				t.Errorf("%s: missing key (value: %v)", k, string(v))
+			}
 		}
 	}
 }

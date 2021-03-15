@@ -24,6 +24,7 @@ import (
 	"log"
 	"math/big"
 	"reflect"
+	"regexp"
 	"testing"
 	"time"
 
@@ -371,6 +372,9 @@ func TestHeader_PendingNull(t *testing.T) {
 		}
 		// special case (indeterminate time)
 		if k == "timestamp" {
+			if !regexp.MustCompile(fmt.Sprintf(`^0x[a-zA-Z0-9]{%d}`, len("604f76f4"))).MatchString(gotVal.(string)) {
+				t.Fatalf("%s: unexpected value: %v", k, gotVal)
+			}
 			gotVal = want["timestamp"]
 			gotPending["timestamp"] = gotVal
 		}

@@ -14,6 +14,7 @@ import (
 
 /*
 The '_CanCompareGoEthereum' denotes tests that can be run against ethereum/go-ethereum.
+These tests assume reliance on a shared Go code API (both at the private (test helpers) and public-methods levels).
 See .github/workflows/geth_1to1.yml for exemplary testing.
 */
 

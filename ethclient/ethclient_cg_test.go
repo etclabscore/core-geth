@@ -15,7 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
-func TestHeader_TxesUnclesNotEmpty(t *testing.T) {
+func TestHeader_TxesUnclesNotEmptyLatest(t *testing.T) {
 	backend, _ := newTestBackend(t)
 	client, _ := backend.Attach()
 	defer backend.Close()

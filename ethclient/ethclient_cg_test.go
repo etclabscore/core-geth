@@ -44,7 +44,7 @@ func TestEthGetBlockByNumber_ValidJSONResponse(t *testing.T) {
 	// completeBlockExpectations define expectations for 'earliest' and 'latest' blocks.
 	completeBlockExpectations := map[string]*regexp.Regexp{
 		"nonce": reHexAnyLen,
-		"hash":  reHexAnyLen,
+		"hash":  reHexHashLen,
 		"miner": regexp.MustCompile(fmt.Sprintf(`^"0x[a-zA-Z0-9]{%d}"$`, common.AddressLength*2)),
 
 		"totalDifficulty": reHexAnyLen,

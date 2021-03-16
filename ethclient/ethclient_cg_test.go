@@ -12,17 +12,11 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
-/*
-The '_CanCompareGoEthereum' denotes tests that can be run against ethereum/go-ethereum.
-These tests assume reliance on a shared Go code API (both at the private (test helpers) and public-methods levels).
-See .github/workflows/geth_1to1.yml for exemplary testing.
-*/
-
-// TestEthGetBlockByNumber_ValidJSONResponse_CanCompareGoEthereum tests that
+// TestEthGetBlockByNumber_ValidJSONResponse tests that
 // JSON RPC API responses to eth_getBlockByNumber meet pattern-based expectations.
 // These validations include the null-ness of certain fields for the 'pending' block
 // as well existence of all expected keys and values.
-func TestEthGetBlockByNumber_ValidJSONResponse_CanCompareGoEthereum(t *testing.T) {
+func TestEthGetBlockByNumber_ValidJSONResponse(t *testing.T) {
 	backend, _ := newTestBackend(t)
 	client, _ := backend.Attach()
 	defer backend.Close()

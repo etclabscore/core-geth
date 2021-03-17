@@ -439,15 +439,6 @@
 	// result is invoked when all the opcodes have been iterated over and returns
 	// the final result of the tracing
 	result: function(ctx, db) {
-
-		// KEEP for tests:
-		// 0x9965b02962ecd7aa6867fb8ea3357a9fd26f07f62c768ae4c9f902130babe97d
-		// 0x9d1a0f214ebc5d727fbc9c0dd299a2e76c8321fb5fc552fab87eb6028ab2239d?
-		// 0x870e57c81ae99c0bdc24351af834bfc571e9596c57202d55d77ff6a633854f5d
-		// 0x0c59ddf8ebbaa64140db6214bbad641fff6bb066847dbef3433d434bd1fb6270 // Died marker (keep)
-		// 0xf18306dcc1badc05c32be8b91d31d6fcd1c8003e71c770fd69bbf77623cbbbdc // Died marker (remove)
-		// 0x00671034509a65920422f3f5060039183c9a04b3692c89c1bc7d92e27bd1fb83 // Slow TX (in general after this block)
-
 		var memoryMarker = this.diffMarkers.Memory;
 
 		// get actual "to" values for from|to|coinbase accounts

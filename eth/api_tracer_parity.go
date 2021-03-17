@@ -181,6 +181,9 @@ func (api *PrivateTraceAPI) Transaction(ctx context.Context, hash common.Hash, c
 	return traceTransaction(ctx, api.eth, hash, config)
 }
 
+// Filter configures a new tracer according to the provided configuration, and
+// executes all the transactions contained within. The return value will be one item
+// per transaction, dependent on the requested tracer.
 func (api *PrivateTraceAPI) Filter(ctx context.Context, args TraceFilterArgs, config *TraceConfig) (*rpc.Subscription, error) {
 	config = setConfigTracerToParity(config)
 

@@ -809,6 +809,8 @@ var allRPCMethods = []string{
 	"personal_unlockAccount",
 	"personal_unpair",
 	"trace_block",
+	"trace_call",
+	"trace_callMany",
 	"trace_filter",
 	"trace_transaction",
 	"txpool_content",

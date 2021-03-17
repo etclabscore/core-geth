@@ -811,7 +811,6 @@ var allRPCMethods = []string{
 	"trace_block",
 	"trace_call",
 	"trace_callMany",
-	"trace_filter",
 	"trace_transaction",
 	"txpool_content",
 	"txpool_inspect",

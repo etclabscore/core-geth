@@ -17,9 +17,6 @@
 // stateDiffTracer outputs sufficient information to create a local execution of
 // the transaction from a custom assembled genesisT block.
 {
-	DEBUG: false,
-	COMPATIBILITY_TESTING: true,
-
 	// stateDiff is the genesisT that we're building.
 	stateDiff: {},
 
@@ -485,199 +482,10 @@
 		var isCreateType = ctx.type == "CREATE" || ctx.type == "CREATE2";
 		var isCallTypeOnNonExistingAccount = ctx.type == "CALL" && ctx.value.isZero() && !db.exists(ctx.to) && !isPrecompiled(ctx.to)
 
-
-		// START DEBUGGING
-		var targetFrom = 0;
-		var targetCoinbase = 0;
-
-		if (this.DEBUG) {
-			console.log()
-
-			console.log('\nCtx -----');
-			ctx.from = toHex(ctx.from);
-			ctx.to = toHex(ctx.to);
-			ctx.coinbase = toHex(ctx.coinbase);
-			ctx.parentBlockCoinbase = toHex(ctx.parentBlockCoinbase);
-			ctx.input = toHex(ctx.input).slice(0, 10) + '...<trimmed>';
-			ctx.output = toHex(ctx.output).slice(0, 10) + '...<trimmed>';
-			console.log(JSON.stringify(ctx, null, 2));
-
-			console.log('\nto exists\t\t', db.exists(ctx.to));
-			console.log('hasInitCalled\t\t', this.hasInitCalled);
-
-			console.log('hasError\t\t', this.hasError)
-
-			console.log('\nhasFromSufficientBalanceForValueAndGasCost\t', hasFromSufficientBalanceForValueAndGasCost)
-			console.log('hasFromSufficientBalanceForGasCost\t\t', hasFromSufficientBalanceForGasCost)
-
-			console.log('\nisCreateType\t\t\t\t', isCreateType)
-			console.log('isCallTypeOnNonExistingAccount\t\t', isCallTypeOnNonExistingAccount)
-
-			console.log('\nCalcs ----');
-			console.log('\nvalue\t\t', ctx.value)
-			console.log('refund\t\t', refund)
-
-			console.log('\ngasUsed\t\t', gasUsed)
-			console.log('gasLeft\t\t', gasLeft)
-			console.log('refundValue\t', refundValue)
-			console.log('feesValue\t', feesValue)
-			console.log('fullGasCost\t', fullGasCost)
-
-			console.log('\ngas\t\t', ctx.gas)
-			console.log('gasLimit\t', ctx.gasLimit, '\t-gasUsed\t', ctx.gasLimit - ctx.gasUsed)
-			console.log('gasLimit\t', ctx.gasLimit, '\t-gas\t\t', ctx.gasLimit - ctx.gas)
-			console.log('ctx.gasUsed\t', ctx.gasUsed)
-			console.log('gasPrice\t', ctx.gasPrice)
-
-			if (this.stateDiff[fromAccountHex] !== undefined) {
-				console.log('\nbf.b fromA from\t\t', this.stateDiff[fromAccountHex].balance[memoryMarker].from)
-				console.log('bf.b fromA to\t\t', this.stateDiff[fromAccountHex].balance[memoryMarker].to)
-			}
-			if (this.stateDiff[toAccountHex] !== undefined) {
-				console.log('bf.b toA from\t\t', this.stateDiff[toAccountHex].balance[memoryMarker].from)
-				console.log('bf.b toA to\t\t', this.stateDiff[toAccountHex].balance[memoryMarker].to)
-			}
-			if (this.stateDiff[coinbaseHex] !== undefined) {
-				console.log('bf.b coinbase from\t', this.stateDiff[coinbaseHex].balance[memoryMarker].from)
-				console.log('bf.b coinbase to\t', this.stateDiff[coinbaseHex].balance[memoryMarker].to)
-			}
-
-			// -==============================-
-			// test_0xd729e9fc58bb481305edf2d4e4dfce202f197970ebcaa79ed776e1d84d7608ba.js
-			// from != coinbase
-
-			// targetFrom = bigInt('121518261918882341841225');
-			// targetCoinbase = bigInt('89536113793616000000000');
-
-			// 		"0x877bd459c9b7d8576b44e59e09d076c25946f443": {
-			//  -        "from": "0x19bb84a757e0e3ebe949"  121518261918882341841225 - 121518344860674341841225 = -82941792000000000
-			//  +        "from": "0x19bb85ce02ffb51da949"  121518344860674341841225
-			// 					"to": "0x19bb76c0072578c5a949"     121517260060674341841225
-
-			// 		"0x9f2659ffe7b3b467e46dcec3623392cf51635079": {
-			//  -        "from": "0x12f5c33038a1ba632000"  89536113793616000000000 - 89536030851824000000000 = 82941792000000000
-			//  +        "from": "0x12f5c2098d82e9316000"  89536030851824000000000
-			// 					"to": "0x12f5c336d2a97e256000"     89536115651824000000000
-
-
-			// -==============================-
-			// 0x0d39f0b8fd5e88fec9d7dc9af2b3be369a72b768bd85f19dfc504b6f6814ed1e
-			// from != coinbase
-
-			// targetFrom = bigInt('121470724535330341841146');
-
-			// 		"0x877bd459c9b7d8576b44e59e09d076c25946f443": {
-			//  -        "from": "0x19b8f0f0a166db76e8fa",  121470724535330341841146
-			//  +        "from": "0x19b8eff0dd169c24a8fa",
-			// 					"to": "0x19bba6a6cfa7375d28ef",
-			// -==============================-
-
-			// -==============================-
-			// 0xae3f7b74d841180b138083a9a4c8ce1ffea808ee15c6da3dd207e06b95d121cf
-			// from == coinbase
-
-			// targetFrom = bigInt('121514281962498341841230');
-			// targetCoinbase = targetFrom;
-
-			// 		"0x877bd459c9b7d8576b44e59e09d076c25946f443": "="
-			// -==============================-
-
-			// -==============================-
-			// 0x632778d9d6a3fb3394047d29353db05e0af4b8849de110959473a23a0b8326ad
-			// from == coinbase
-
-			// targetFrom = bigInt('121519205547922341840986');
-			// targetCoinbase = bigInt('89561811979280000000000');
-
-			// 		"0x877bd459c9b7d8576b44e59e09d076c25946f443": "="
-			// -==============================-
-
-			// -==============================-
-			// 0x6af0a5c3188ffacae4d340d4a17e14fdb5a54187683a80ef241bde248189882b
-			// from != coinbase
-
-			// targetFrom = bigInt('121467091227090341840990');
-			// targetCoinbase = targetFrom;
-
-			// 		"0x877bd459c9b7d8576b44e59e09d076c25946f443": "="
-			// -==============================-
-
-			// -==============================-
-			// 0xe571889a4cef4e430044f535b29af290a4749c2e731f41a8a19b754afc24dba6
-			// from != coinbase
-
-			// targetFrom = bigInt('121615567848266429681864');
-			// targetCoinbase = bigInt('89679040283856000000000');
-
-			// -==============================-
-
-			// -==============================-
-			// 0xbfca41d82781ba1888c10d96de84ff68799e328c658b34964d382eba019b3752
-			// from != coinbase
-
-			// targetFrom = bigInt('111958610750068889934909');
-			// targetCoinbase = bigInt('62899689512564658158728');
-
-			// -==============================-
-
-			// -==============================-
-			// 0xbcc77711a6c37a6ffb5b509d0bb02effcf6db5c6023caa822c5583665902cfa4
-			// from != coinbase
-
-			// targetFrom = bigInt('83564136527034046764942');
-			// targetCoinbase = bigInt('62899689512564658158728');
-
-			// -==============================-
-
-			// -==============================-
-			// 0x745dd02ca022ac47ad1d0799e171e2b43bbd5bfed96b12620e08ce9d0bf771a9
-			// from != coinbase
-
-			// 451749019456968055088506-451749019480768055088506=-23800000000000
-			// targetFrom = bigInt('451749019480768055088506');
-			// 89828976183021000000000-89828976159221000000000=23800000000000
-			// targetCoinbase = bigInt('89828976159221000000000');
-
-			// -==============================-
-
-			// -==============================-
-			// 0x0a4ca70dba769faf805cc4cabb0e2577231d2ecec32cefcc98b1d1220dd423b4
-			// from == coinbase
-
-			// targetFrom = bigInt('111960308816068889934909');
-			// targetCoinbase = targetFrom;
-
-			// -==============================-
-
-			// -==============================-
-			// 0xc548d23fda68492f2ca66409ba38e8d24d79337d6d9b93d25b3d9e3fc84714cb
-			// from == coinbase
-
-			// targetFrom = bigInt('121510984653642429681864');
-			// targetCoinbase = targetFrom;
-
-			// -==============================-
-
-			// -==============================-
-			// 0x0299a5f982ef3b30f2a8c6123b4bbdf7bc27b0bf98db0ca852d9c27fdfc4e84a
-			// from == coinbase
-
-			// targetFrom = bigInt('111521740132958889934882');
-			// targetCoinbase = targetFrom;
-
-			// -==============================-
-		}
-		// END DEBUGGING
-
-
 		// a transaction with "value" set/positive,
 		// while "from" account has not enough balance to pay even for the gas cost,
 		// will not be run at all and will not change the state
 		if (!hasFromSufficientBalanceForGasCost && !hasFromSufficientBalanceForValueAndGasCost && ctx.value.isPositive()) {
-			// TODO: remove testing data
-			if (this.DEBUG || this.COMPATIBILITY_TESTING) {
-				return {'reason4': true};
-			}
 			return {};
 		}
 
@@ -730,35 +538,7 @@
 			coinbaseAcc._final = true;
 		}
 
-		if (this.DEBUG) {
-			if (this.stateDiff[fromAccountHex] !== undefined) {
-				console.log('\naf.b fromA from\t\t', this.stateDiff[fromAccountHex].balance[memoryMarker].from,
-					this.stateDiff[fromAccountHex].balance[memoryMarker].from.subtract(targetFrom))
-				console.log('af.b fromA to\t\t', this.stateDiff[fromAccountHex].balance[memoryMarker].to)
-			}
-			if (this.stateDiff[toAccountHex] !== undefined) {
-				console.log('af.b toA from\t\t', this.stateDiff[toAccountHex].balance[memoryMarker].from)
-				console.log('af.b toA to\t\t', this.stateDiff[toAccountHex].balance[memoryMarker].to)
-			}
-			if (this.stateDiff[coinbaseHex] !== undefined) {
-				console.log('af.b coinbase from\t', this.stateDiff[coinbaseHex].balance[memoryMarker].from, this.stateDiff
-					[coinbaseHex].balance[memoryMarker].from.subtract(targetCoinbase))
-				console.log('af.b coinbase to\t', this.stateDiff[coinbaseHex].balance[memoryMarker].to)
-			}
-		}
-
 		this.format(db);
-
-		if (this.DEBUG || this.COMPATIBILITY_TESTING) {
-			if (hasFromSufficientBalanceForGasCost
-					&& !hasFromSufficientBalanceForValueAndGasCost
-					&& ctx.value.isPositive()
-					&& ctx.gasUsed.isZero()
-					&& gasUsed == '21000'
-					&& ctx.type === 'CALL') {
-				this.stateDiff['reason3'] = true;
-			}
-		}
 
 		// Return the assembled allocations (stateDiff)
 		return this.stateDiff;

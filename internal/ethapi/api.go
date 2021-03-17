@@ -1222,11 +1222,23 @@ type RPCMarshalBlockT struct {
 
 // RPCMarshalBlockTIR is the intermediate representation of RPCMarshalBlockT.
 // This exists to avoid a circular reference when overriding the json marshaling interface.
-// RPCMarshalHeaderT is an embedded struct.
 type RPCMarshalBlockTIR struct {
 	*RPCMarshalHeaderT
 	Transactions []interface{} `json:"transactions"`
 	Uncles       []common.Hash `json:"uncles"`
+
+	Error string `json:"error,omitempty"`
+
+	inclTx bool
+	fullTx bool
+}
+
+// RPCMarshalUncleTIR is the intermediate representation of RPCMarshalBlockT which excludes the transactions field.
+// Transactions are excluded when the API returns block information for uncle blocks.
+// This exists to avoid a circular reference when overriding the json marshaling interface.
+type RPCMarshalUncleTIR struct {
+	*RPCMarshalHeaderT
+	Uncles []common.Hash `json:"uncles"`
 
 	Error string `json:"error,omitempty"`
 
@@ -1241,9 +1253,19 @@ func (b *RPCMarshalBlockT) MarshalJSON() ([]byte, error) {
 	if b.Error != "" {
 		return json.Marshal(map[string]interface{}{"error": b.Error})
 	}
-	ir := &RPCMarshalBlockTIR{
+	if b.inclTx {
+		ir := &RPCMarshalBlockTIR{
+			RPCMarshalHeaderT: b.RPCMarshalHeaderT,
+			Transactions:      b.Transactions,
+			Uncles:            b.Uncles,
+			Error:             "",
+			inclTx:            b.inclTx,
+			fullTx:            b.fullTx,
+		}
+		return json.Marshal(ir)
+	}
+	ir := &RPCMarshalUncleTIR{
 		RPCMarshalHeaderT: b.RPCMarshalHeaderT,
-		Transactions:      b.Transactions,
 		Uncles:            b.Uncles,
 		Error:             "",
 		inclTx:            b.inclTx,
@@ -1258,6 +1280,8 @@ func (b *RPCMarshalBlockT) MarshalJSON() ([]byte, error) {
 func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool) (*RPCMarshalBlockT, error) {
 	fields := &RPCMarshalBlockT{RPCMarshalHeaderT: NewRPCMarshalHeaderTFromHeader(block.Header())}
 	fields.Size = hexutil.Uint64(block.Size())
+	fields.inclTx = inclTx
+	fields.fullTx = fullTx
 
 	if inclTx {
 		formatTx := func(tx *types.Transaction) (interface{}, error) {

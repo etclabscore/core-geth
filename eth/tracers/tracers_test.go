@@ -523,9 +523,29 @@ func stateDiffTracerTestRunner(filename string) error {
 	// Configure a blockchain with the given prestate
 	msg := test.Input.ToMessage(uint64(test.Context.GasLimit))
 
+	// This is needed for trace_call (debug mode),
+	// as the Transaction is being run on top of the block transactions,
+	// which might lead into ErrInsufficientFundsForTransfer error
+	canTransfer := func(db vm.StateDB, sender common.Address, amount *big.Int) bool {
+		if msg.From() == sender {
+			return true
+		}
+		return core.CanTransfer(db, sender, amount)
+	}
+
+	// If the actual transaction would fail, then their is no reason to actually transfer any balance at all
+	transfer := func(db vm.StateDB, sender, recipient common.Address, amount *big.Int) {
+		toAmount := new(big.Int).Set(amount)
+		senderBalance := db.GetBalance(sender)
+		if senderBalance.Cmp(toAmount) < 0 {
+			toAmount.Set(big.NewInt(0))
+		}
+		core.Transfer(db, sender, recipient, toAmount)
+	}
+
 	context := vm.Context{
-		CanTransfer: core.CanTransfer,
-		Transfer:    core.Transfer,
+		CanTransfer: canTransfer,
+		Transfer:    transfer,
 		Origin:      msg.From(),
 		Coinbase:    test.Context.Miner,
 		BlockNumber: new(big.Int).SetUint64(uint64(test.Context.Number)),
@@ -536,37 +556,13 @@ func stateDiffTracerTestRunner(filename string) error {
 	}
 	_, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false)
 
-	// Mimic traceCall functionality
-	originalCanTransfer := context.CanTransfer
-	originalTransfer := context.Transfer
-
 	// Store the truth on wether from acount has enough balance for context usage
 	gasCost := new(big.Int).Mul(new(big.Int).SetUint64(msg.Gas()), msg.GasPrice())
 	totalCost := new(big.Int).Add(gasCost, msg.Value())
-	hasFromSufficientBalanceForValueAndGasCost := context.CanTransfer(statedb, msg.From(), totalCost)
-	hasFromSufficientBalanceForGasCost := context.CanTransfer(statedb, msg.From(), gasCost)
 
-	// This is needed for trace_call (debug mode),
-	// as the Transaction is being run on top of the block transactions,
-	// which might lead into ErrInsufficientFundsForTransfer error
-	context.CanTransfer = func(db vm.StateDB, sender common.Address, amount *big.Int) bool {
-		if msg.From() == sender {
-			return true
-		}
-		res := originalCanTransfer(db, sender, amount)
-		return res
-	}
-
-	// If the actual transaction would fail, then their is no reason to actually transfer any balance at all
-	context.Transfer = func(db vm.StateDB, sender, recipient common.Address, amount *big.Int) {
-		toAmount := new(big.Int).Set(amount)
-		senderBalance := db.GetBalance(sender)
-		if senderBalance.Cmp(toAmount) < 0 {
-			toAmount.Set(big.NewInt(0))
-		}
-
-		originalTransfer(db, sender, recipient, toAmount)
-	}
+	// It is important to use core.CanTransfer on the two following lines
+	hasFromSufficientBalanceForValueAndGasCost := core.CanTransfer(statedb, msg.From(), totalCost)
+	hasFromSufficientBalanceForGasCost := core.CanTransfer(statedb, msg.From(), gasCost)
 
 	// Add extra context needed for state_diff
 	taskExtraContext := map[string]interface{}{

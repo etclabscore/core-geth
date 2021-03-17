@@ -1216,8 +1216,8 @@ func (h *RPCMarshalHeaderT) setAsPending() {
 // RPCMarshalBlockT is a type handling RPC serialization for types.Block.
 type RPCMarshalBlockT struct {
 	*RPCMarshalHeaderT
-	Transactions []interface{} `json:"transactions,omitempty"`
-	Uncles       []common.Hash `json:"uncles,omitempty"`
+	Transactions []interface{} `json:"transactions"`
+	Uncles       []common.Hash `json:"uncles"`
 
 	Error string `json:"error,omitempty"`
 
@@ -1230,8 +1230,8 @@ type RPCMarshalBlockT struct {
 // RPCMarshalHeaderT is an embedded struct.
 type RPCMarshalBlockTIR struct {
 	*RPCMarshalHeaderT
-	Transactions []interface{} `json:"transactions,omitempty"`
-	Uncles       []common.Hash `json:"uncles,omitempty"`
+	Transactions []interface{} `json:"transactions"`
+	Uncles       []common.Hash `json:"uncles"`
 
 	Error string `json:"error,omitempty"`
 

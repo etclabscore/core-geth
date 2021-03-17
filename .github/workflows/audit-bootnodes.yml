@@ -56,12 +56,13 @@ jobs:
               if [[ $GITHUB_EVENT_NAME != pull_request ]]; then
                 id="$(basename ${failed} | cut -d'@' -f1)"
                 sed -i '/'"${id}"'/d' "${file}"
+                gofmt -w "${file}"
               else
                 status=1
               fi
             done
           done < <(find ./params -type f -name '*bootnode*go')
-          test "$GITHUB_EVENT_NAME" -ne "pull_request" && git --no-pager diff
+          if [[ $GITHUB_EVENT_NAME != pull_request ]]; then git --no-pager diff; fi
           exit $status
 
       - name: Create Pull Request

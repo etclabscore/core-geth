@@ -15,23 +15,28 @@ as the name of my new network.
 
 ### Define the configuration.
 
-Commit: `a901f84401`
+A branch [`docs/_tutorial-add-network`](https://github.com/etclabscore/core-geth/tree/docs/_tutorial-add-network) 
+is provided to illustrate the code necessary to define implement basic 
+core-geth support for a new network.
+
+A full diff comparing this branch against its base `v1.11.22` can
+be seen on the Github web UI [here](https://github.com/etclabscore/core-geth/compare/v1.11.22...docs/_tutorial-add-network?expand=1).
+
+Overall, the files touched include:
 
 ```
 > git --no-pager diff --name-only v1.11.22
-docs/developers/add-network.md
 params/bootnodes_abc.go
 params/config_abc.go
 params/config_abc_test.go
+params/example_abc_test.go
 params/genesis_abc.go
 ```
 
-Commit `2233ec80cb` writes an `Example`-style test showing and validating the
-JSON encoding of our new configuration.
-
 ---
 
-At this point the hard work is done.
+Once the skeleton provided by `docs/_tutorial-add-network` is done 
+it's time to put the configuration into action.
 
 We can now pursue two paths:
 

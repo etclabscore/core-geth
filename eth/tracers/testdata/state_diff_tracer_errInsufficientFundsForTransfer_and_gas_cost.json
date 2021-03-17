@@ -1,0 +1,89 @@
+{
+  "genesis": {
+    "number": "628841",
+    "hash": "0x3d4402247b84bf0713907efac8d7d3b66c10cd44c0c97caf95202decdcfe8106",
+    "nonce": "0x306a945b26719d04",
+    "mixHash": "0x6bd7bb8fdbc4de876d6acab4560f7c097e9ee95d7e97a7602e98aedaa394b9f1",
+    "stateRoot": "0x2e94d1afe7a7d9b78460c1b3647130b259224edb5947664958c44096c98a5357",
+    "miner": "0x774c398d763161f55b66a646f17edda4addad2ca",
+    "difficulty": "800761",
+    "totalDifficulty": "548028968779",
+    "extraData": "0xd983010907846765746888676f312e31332e358664617277696e",
+    "gasLimit": "8000000",
+    "timestamp": "1578460548",
+    "alloc": {
+      "0x655866a8b24f333e3a1d0a9a2e574289e245f808": {
+        "balance": "0x0",
+        "nonce": "1",
+        "code": "0x",
+        "storage": {}
+      },
+      "0x774c398d763161f55b66a646f17edda4addad2ca": {
+        "balance": "0x27162ced39a05220d688",
+        "nonce": "0",
+        "code": "0x",
+        "storage": {}
+      },
+      "0xf9a28de17edb352d6f82e9efb8fe6b050627c426": {
+        "balance": "0x371399697d84a6000",
+        "nonce": "0",
+        "code": "0x",
+        "storage": {}
+      }
+    },
+    "config": {
+      "networkId": 7,
+      "chainId": 63,
+      "eip2FBlock": 0,
+      "eip7FBlock": 0,
+      "eip150Block": 0,
+      "eip155Block": 0,
+      "eip160Block": 0,
+      "eip161FBlock": 0,
+      "eip170FBlock": 0,
+      "eip100FBlock": 0,
+      "eip140FBlock": 0,
+      "eip198FBlock": 0,
+      "eip211FBlock": 0,
+      "eip212FBlock": 0,
+      "eip213FBlock": 0,
+      "eip214FBlock": 0,
+      "eip658FBlock": 0,
+      "eip145FBlock": 301243,
+      "eip1014FBlock": 301243,
+      "eip1052FBlock": 301243,
+      "eip152FBlock": 999983,
+      "eip1108FBlock": 999983,
+      "eip1344FBlock": 999983,
+      "eip1884FBlock": 999983,
+      "eip2028FBlock": 999983,
+      "eip2200FBlock": 999983,
+      "ecip1017FBlock": 0,
+      "ecip1017EraRounds": 2000000,
+      "ecip1099FBlock": 2520000,
+      "ecbp1100FBlock": 2380000,
+      "disposalBlock": 0,
+      "ethash": {},
+      "requireBlockHashes": {
+          "840013": "0x2ceada2b191879b71a5bcf2241dd9bc50d6d953f1640e62f9c2cee941dc61c9d",
+          "840014": "0x8ec29dd692c8985b82410817bac232fc82805b746538d17bc924624fe74a0fcf"
+        }
+    }
+  },
+  "context": {
+    "number": "628841",
+    "difficulty": "800761",
+    "timestamp": "1578460548",
+    "gasLimit": "8000000",
+    "miner": "0x774c398d763161f55b66a646f17edda4addad2ca"
+  },
+  "input": {
+    "from": "0x655866a8b24f333e3a1d0a9a2e574289e245f808",
+    "to": "0xf9a28de17edb352d6f82e9efb8fe6b050627c426",
+    "gas": "0x5208",
+    "gasPrice": "0xba43b7400",
+    "value": "0xddcfbbb7a606000",
+    "data": "0x"
+  },
+  "result": {}
+}

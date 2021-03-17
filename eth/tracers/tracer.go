@@ -605,13 +605,10 @@ func (jst *Tracer) CaptureStart(from common.Address, to common.Address, create b
 // CaptureState implements the Tracer interface to trace a single step of VM execution.
 func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, memory *vm.Memory, stack *vm.Stack, rStack *vm.ReturnStack, rdata []byte, contract *vm.Contract, depth int, err error) error {
 	if jst.err == nil {
-		// initMarker := false
-
 		// Initialize the context if it wasn't done yet
 		if !jst.inited {
 			jst.ctx["block"] = env.BlockNumber.Uint64()
 			jst.inited = true
-			// initMarker = true
 		}
 		// If tracing was interrupted, set the error and stop
 		if atomic.LoadUint32(&jst.interrupt) > 0 {
@@ -645,15 +642,6 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 			jst.errorValue = new(string)
 			*jst.errorValue = err.Error()
 		}
-
-		// if initMarker && jst.vm.GetPropString(jst.tracerObject, "init") {
-		// 	jst.addCtxIntoState()
-		// 	_, err := jst.call("init", "ctx", "log", "db")
-		// 	if err != nil {
-		// 		jst.err = wrapError("init", err)
-		// 		return nil
-		// 	}
-		// }
 
 		// Checks wether tracer supports `getCallstackLength` method in order to achieve optimal performance for call_tracer*
 		// in which case it checks if the call to `step` method has to be made, as the duktape prop call is an expensive operation

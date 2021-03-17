@@ -817,7 +817,6 @@ func traceCall(ctx context.Context, eth *Ethereum, args ethapi.CallArgs, blockNr
 	// First try to retrieve the state
 	blockNrOrHash.RequireCanonical = true
 	statedb, header, err := eth.APIBackend.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
-	// TODO: check logic on parent block
 	if err != nil {
 		// Try to retrieve the specified block
 		var block *types.Block
@@ -1014,7 +1013,7 @@ func traceTx(ctx context.Context, eth *Ethereum, message core.Message, vmctx vm.
 	// Run the transaction with tracing enabled.
 	vmenv := vm.NewEVM(vmctx, statedb, eth.blockchain.Config(), vm.Config{Debug: true, Tracer: tracer})
 
-	switch tracer.(type) {
+	switch tracer := tracer.(type) {
 	case *tracers.Tracer:
 		if extraContext == nil {
 			extraContext = map[string]interface{}{}
@@ -1030,7 +1029,7 @@ func traceTx(ctx context.Context, eth *Ethereum, message core.Message, vmctx vm.
 		extraContext["gasLimit"] = message.Gas()
 		extraContext["gasPrice"] = message.GasPrice()
 
-		tracer.(*tracers.Tracer).CapturePreEVM(vmenv, extraContext)
+		tracer.CapturePreEVM(vmenv, extraContext)
 	}
 
 	result, err := core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.Gas()))

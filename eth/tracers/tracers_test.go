@@ -482,26 +482,6 @@ type stateDiffAccount struct {
 	Storage map[common.Hash]map[string]interface{} `json:"storage"`
 }
 
-type stateDiffBalance struct {
-	From *hexutil.Big `json:"from"`
-	To   *hexutil.Big `json:"to"`
-}
-
-type stateDiffCode struct {
-	From hexutil.Bytes `json:"from"`
-	To   hexutil.Bytes `json:"to"`
-}
-
-type stateDiffNonce struct {
-	From hexutil.Uint64 `json:"from"`
-	To   hexutil.Uint64 `json:"to"`
-}
-
-type stateDiffStorage struct {
-	From common.Hash `json:"from"`
-	To   common.Hash `json:"to"`
-}
-
 type stateDiffTest struct {
 	Genesis *genesisT.Genesis                    `json:"genesis"`
 	Context *callContext                         `json:"context"`

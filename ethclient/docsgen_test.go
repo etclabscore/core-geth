@@ -145,7 +145,7 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 				paramNames = strings.Join(out, ", ")
 			}
 
-			return fmt.Sprintf(`curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)
+			return fmt.Sprintf(`curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)
 		},
 	})
 

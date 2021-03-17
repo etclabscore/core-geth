@@ -9,7 +9,15 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/eth"
+	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 // TestEthGetBlockByNumber_ValidJSONResponse tests that
@@ -112,6 +120,99 @@ func TestEthGetBlockByNumber_ValidJSONResponse(t *testing.T) {
 					}
 				}
 			})
+		}
+	}
+}
+
+// newTestBackendWithUncles duplicates the logic of newTestBackend, except that it generates a backend
+// on top of a chain that has uncles.
+func newTestBackendWithUncles(t *testing.T) (*node.Node, []*types.Block) {
+	// Generate test chain.
+	genesis, blocks := generateTestChainWithUncles()
+	// Create node
+	n, err := node.New(&node.Config{})
+	if err != nil {
+		t.Fatalf("can't create new node: %v", err)
+	}
+	// Create Ethereum Service
+	config := &eth.Config{Genesis: genesis}
+	config.Ethash.PowMode = ethash.ModeFake
+	ethservice, err := eth.New(n, config)
+	if err != nil {
+		t.Fatalf("can't create new ethereum service: %v", err)
+	}
+	// Import the test chain.
+	if err := n.Start(); err != nil {
+		t.Fatalf("can't start test node: %v", err)
+	}
+	if _, err := ethservice.BlockChain().InsertChain(blocks[1:]); err != nil {
+		t.Fatalf("can't import test blocks: %v", err)
+	}
+	return n, blocks
+}
+
+// generateTestChainWithUncles is a test helper function that essentially duplicates generateTestChain,
+// except that the chain generated includes block with uncles.
+func generateTestChainWithUncles() (*genesisT.Genesis, []*types.Block) {
+	db := rawdb.NewMemoryDatabase()
+	config := params.AllEthashProtocolChanges
+	genesis := &genesisT.Genesis{
+		Config:    config,
+		Alloc:     genesisT.GenesisAlloc{testAddr: {Balance: testBalance}},
+		ExtraData: []byte("test genesis"),
+		Timestamp: 9000,
+	}
+	generate := func(i int, g *core.BlockGen) {
+		g.OffsetTime(5)
+		g.SetExtra([]byte("test"))
+		if i >= 6 {
+			b2 := g.PrevBlock(i - 3).Header()
+			b2.Extra = []byte("foo")
+			g.AddUncle(b2)
+		}
+	}
+	gblock := core.GenesisToBlock(genesis, db)
+	engine := ethash.NewFaker()
+	blocks, _ := core.GenerateChain(config, gblock, engine, db, 8, generate)
+	blocks = append([]*types.Block{gblock}, blocks...)
+
+	return genesis, blocks
+}
+
+// TestUncleResponseEncoding tests the correctness of the JSON encoding of uncle-type responses.
+// These, different from canonical or side blocks, should NOT include the transactions field.
+func TestUncleResponseEncoding(t *testing.T) {
+	backend, chain := newTestBackendWithUncles(t)
+	client, _ := backend.Attach()
+	defer backend.Close()
+	defer client.Close()
+
+	res := make(map[string]json.RawMessage)
+	err := client.Call(&res, "eth_getUncleByBlockNumberAndIndex", hexutil.EncodeUint64(uint64(len(chain)-1)), "0x0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(res) == 0 {
+		t.Fatal("empty response")
+	}
+
+	if v, ok := res["uncles"]; !ok {
+		t.Fatal("uncles: missing field")
+	} else if !regexp.MustCompile(`^\[\]$`).Match(v) {
+		t.Fatal("uncles: should be empty array")
+	}
+
+	if _, ok := res["transactions"]; ok {
+		t.Fatal("transactions: field not omitted")
+	}
+
+	// Sanity check a few other fields
+	reHexAnyLen := regexp.MustCompile(`^"0x[a-zA-Z0-9]+"$`)
+	for _, field := range []string{"number", "hash", "nonce", "parentHash", "transactionsRoot"} {
+		if v, ok := res[field]; !ok {
+			t.Fatalf("%s: missing field", field)
+		} else if !reHexAnyLen.Match(v) {
+			t.Fatalf("%s: unexpected value: %s", field, string(v))
 		}
 	}
 }

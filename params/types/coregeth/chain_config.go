@@ -184,9 +184,7 @@ type CoreGethChainConfig struct {
 	// https://eips.ethereum.org/EIPS/eip-2929
 	EIP2929FBlock *big.Int `json:"eip2929FBlock,omitempty"`
 
-	DisposalBlock    *big.Int `json:"disposalBlock,omitempty"`    // Bomb disposal HF block
-	SocialBlock      *big.Int `json:"socialBlock,omitempty"`      // Ethereum Social Reward block
-	EthersocialBlock *big.Int `json:"ethersocialBlock,omitempty"` // Ethersocial Reward block
+	DisposalBlock *big.Int `json:"disposalBlock,omitempty"` // Bomb disposal HF block
 
 	// Various consensus engines
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`

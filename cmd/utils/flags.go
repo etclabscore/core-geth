@@ -150,17 +150,9 @@ var (
 		Name:  "classic",
 		Usage: "Ethereum Classic network: pre-configured Ethereum Classic mainnet",
 	}
-	SocialFlag = cli.BoolFlag{
-		Name:  "social",
-		Usage: "Ethereum Social network: pre-configured Ethereum Social mainnet",
-	}
-	MixFlag = cli.BoolFlag{
-		Name:  "mix",
-		Usage: "MIX network: pre-configured MIX mainnet",
-	}
-	EthersocialFlag = cli.BoolFlag{
-		Name:  "ethersocial",
-		Usage: "Ethersocial network: pre-configured Ethersocial mainnet",
+	MainnetFlag = cli.BoolFlag{
+		Name:  "mainnet",
+		Usage: "Ethereum mainnet: pre-configured Ethereum mainnet",
 	}
 	YoloV2Flag = cli.BoolFlag{
 		Name:  "yolov2",
@@ -856,12 +848,6 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.ClassicBootnodes
 	case ctx.GlobalBool(MordorFlag.Name):
 		urls = params.MordorBootnodes
-	case ctx.GlobalBool(SocialFlag.Name):
-		urls = params.SocialBootnodes
-	case ctx.GlobalBool(MixFlag.Name):
-		urls = params.MixBootnodes
-	case ctx.GlobalBool(EthersocialFlag.Name):
-		urls = params.EthersocialBootnodes
 	case ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name):
 		urls = params.RopstenBootnodes
 	case ctx.GlobalBool(RinkebyFlag.Name):
@@ -1330,12 +1316,6 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "classic")
 	case ctx.GlobalBool(MordorFlag.Name):
 		return filepath.Join(baseDataDirPath, "mordor")
-	case ctx.GlobalBool(SocialFlag.Name):
-		return filepath.Join(baseDataDirPath, "social")
-	case ctx.GlobalBool(MixFlag.Name):
-		return filepath.Join(baseDataDirPath, "mix")
-	case ctx.GlobalBool(EthersocialFlag.Name):
-		return filepath.Join(baseDataDirPath, "ethersocial")
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		return filepath.Join(baseDataDirPath, "rinkeby")
 	case ctx.GlobalBool(KottiFlag.Name):
@@ -1621,7 +1601,7 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, LegacyTestnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV2Flag, ClassicFlag, KottiFlag, MordorFlag, EthersocialFlag, SocialFlag)
+	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, LegacyTestnetFlag, MainnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV2Flag, ClassicFlag, KottiFlag, MordorFlag)
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	CheckExclusive(ctx, GCModeFlag, "archive", TxLookupLimitFlag)
@@ -1783,8 +1763,12 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.
 	switch {
+	case ctx.GlobalBool(MainnetFlag.Name):
+		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
+			cfg.NetworkId = 1
+		}
+		SetDNSDiscoveryDefaults(cfg, params.MainnetGenesisHash)
 	case ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name):
-		cfg.Genesis = params.DefaultRopstenGenesisBlock()
 		SetDNSDiscoveryDefaults(cfg, params.RopstenGenesisHash)
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		SetDNSDiscoveryDefaults(cfg, params.RinkebyGenesisHash)
@@ -1797,9 +1781,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	case ctx.GlobalBool(MordorFlag.Name):
 		SetDNSDiscoveryDefaults2(cfg, params.MordorDNSNetwork1)
 	default:
-		if cfg.NetworkId == 1 {
-			SetDNSDiscoveryDefaults(cfg, params.MainnetGenesisHash)
-		}
+		// No --<chain> flag was given.
 	}
 
 	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) {
@@ -1994,16 +1976,12 @@ func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
 func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 	var genesis *genesisT.Genesis
 	switch {
+	case ctx.GlobalBool(MainnetFlag.Name):
+		genesis = params.DefaultGenesisBlock()
 	case ctx.GlobalBool(ClassicFlag.Name):
 		genesis = params.DefaultClassicGenesisBlock()
 	case ctx.GlobalBool(MordorFlag.Name):
 		genesis = params.DefaultMordorGenesisBlock()
-	case ctx.GlobalBool(SocialFlag.Name):
-		genesis = params.DefaultSocialGenesisBlock()
-	case ctx.GlobalBool(MixFlag.Name):
-		genesis = params.DefaultMixGenesisBlock()
-	case ctx.GlobalBool(EthersocialFlag.Name):
-		genesis = params.DefaultEthersocialGenesisBlock()
 	case ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name):
 		genesis = params.DefaultRopstenGenesisBlock()
 	case ctx.GlobalBool(RinkebyFlag.Name):

@@ -22,7 +22,6 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -36,6 +35,18 @@ const (
 	ipcAPIs  = "admin:1.0 debug:1.0 eth:1.0 ethash:1.0 miner:1.0 net:1.0 personal:1.0 rpc:1.0 trace:1.0 txpool:1.0 web3:1.0"
 	httpAPIs = "eth:1.0 net:1.0 rpc:1.0 web3:1.0"
 )
+
+// spawns geth with the given command line args, using a set of flags to minimise
+// memory and disk IO. If the args don't set --datadir, the
+// child g gets a temporary data directory.
+func runMinimalGeth(t *testing.T, args ...string) *testgeth {
+	// --ropsten to make the 'writing genesis to disk' faster (no accounts)
+	// --networkid=1337 to avoid cache bump
+	// --syncmode=full to avoid allocating fast sync bloom
+	allArgs := []string{"--ropsten", "--networkid", "1337", "--syncmode=full", "--port", "0",
+		"--nat", "none", "--nodiscover", "--maxpeers", "0", "--cache", "64"}
+	return runGeth(t, append(allArgs, args...)...)
+}
 
 // TestConsoleCmdNetworkIdentities tests network identity variables at runtime for a geth instance.
 // This provides a "production equivalent" integration test for consensus-relevant chain identity values which
@@ -94,127 +105,13 @@ func consoleCmdStdoutTest(flags []string, execCmd string, want interface{}) func
 	}
 }
 
-// TestGethFailureToLaunch tests that geth fail immediately when given invalid run parameters (ie CLI args).
-func TestGethFailureToLaunch(t *testing.T) {
-	cases := []struct {
-		flags            []string
-		expectErrorReStr string
-	}{
-		{
-			flags:            []string{"--badnet"},
-			expectErrorReStr: "(?ism)incorrect usage.*",
-		},
-	}
-	for _, c := range cases {
-		t.Run(fmt.Sprintf("TestIncorrectUsage: %v", c.flags), func(t *testing.T) {
-			geth := runGeth(t, c.flags...)
-			geth.ExpectRegexp(c.expectErrorReStr)
-			geth.ExpectExit()
-			if status := geth.ExitStatus(); status == 0 {
-				t.Errorf("expected exit status != 0, got: %d", status)
-			}
-		})
-	}
-}
-
-// TestGethStartupLogs tests that geth logs certain things (given some set of flags).
-// In these cases, geth is run with a console command to print its name (and tests that it does).
-func TestGethStartupLogs(t *testing.T) {
-	// semiPersistentDatadir is used to house an adhoc datadir for co-dependent geth test cases.
-	semiPersistentDatadir := filepath.Join(os.TempDir(), fmt.Sprintf("geth-startup-logs-test-%d", time.Now().Unix()))
-	defer os.RemoveAll(semiPersistentDatadir)
-
-	type matching struct {
-		pattern string // pattern is the pattern to match against geth's stderr log.
-		matches bool   // matches defines if the pattern should succeed or fail, ie. if the pattern should exist or should not exist.
-	}
-	cases := []struct {
-		flags    []string
-		matchers []matching
-
-		// callback is run after the geth run case completes.
-		// It can be used to reset any persistent state to provide a clean slate for the subsequent cases.
-		callback func() error
-	}{
-		{
-			// --<chain> flag is NOT given and datadir does not exist, representing a first tabula-rasa run.
-			// Use without a --<chain> flag is deprecated. User will be warned.
-			flags: []string{},
-			matchers: []matching{
-				{pattern: "(?ism).+WARN.+Not specifying a chain flag is deprecated.*", matches: true},
-			},
-		},
-		{
-			// Network flag is given.
-			// --<chain> flag is NOT given. This is deprecated. User will be warned.
-			// Same same but different as above.
-			flags: []string{"--networkid=42"},
-			matchers: []matching{
-				{pattern: "(?ism).+WARN.+Not specifying a chain flag is deprecated.*", matches: true},
-			},
-		},
-		// Little bit of a HACK.
-		// This is a co-dependent sequence of two test cases.
-		// First, startup a geth instance that will create a database, storing the genesis block.
-		// This is a basic use case and has no errors.
-		// The subsequent case then run geth re-using that datadir which has an existing chain database
-		// and contains a stored genesis block.
-		// Since the database contains a genesis block, the chain identity and config can (and will) be deduced from it;
-		// this causes no need for a --<chain> CLI flag to be passed again. The user will not be warned of a missing --<chain> flag.
-		{
-			// --<chain> flag is given. All is well. Database (storing genesis) is initialized.
-			flags: []string{"--datadir", semiPersistentDatadir, "--mainnet"},
-			matchers: []matching{
-				{pattern: "(?ism).*", matches: true},
-			},
-		},
-		{
-			// --<chain> flag is NOT given, BUT geth is being run on top of an existing
-			// datadir. Geth will use the existing (stored) genesis found in it.
-			// User should NOT be warned.
-			flags: []string{"--datadir", semiPersistentDatadir},
-			matchers: []matching{
-				{pattern: "(?ism).+WARN.+Not specifying a chain flag is deprecated.*", matches: false},
-				{pattern: "(?ism).+INFO.+Found stored genesis block.*", matches: true},
-			},
-			callback: func() error {
-				// Clean up this mini-suite.
-				return os.RemoveAll(semiPersistentDatadir)
-			},
-		},
-	}
-	for i, c := range cases {
-		t.Run(fmt.Sprintf("TestGethStartupLogs/%d: %v", i, c.flags), func(t *testing.T) {
-			geth := runGeth(t, append(c.flags, "--exec", "admin.nodeInfo.name", "console")...)
-			geth.ExpectRegexp("(?ism).*CoreGeth.*")
-			geth.ExpectExit()
-			if status := geth.ExitStatus(); status != 0 {
-				t.Errorf("expected exit status == 0, got: %d", status)
-			}
-			for _, match := range c.matchers {
-				if matched := regexp.MustCompile(match.pattern).MatchString(geth.StderrText()); matched != match.matches {
-					t.Errorf("unexpected stderr output; want: %s (matching?=%v) got: %s", match.pattern, match.matches, geth.StderrText())
-				}
-			}
-			if c.callback != nil {
-				if err := c.callback(); err != nil {
-					t.Fatal(err)
-				}
-			}
-		})
-	}
-}
-
 // Tests that a node embedded within a console can be started up properly and
 // then terminated by closing the input stream.
 func TestConsoleWelcome(t *testing.T) {
 	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
 
 	// Start a geth console, make sure it's cleaned up and terminate the console
-	geth := runGeth(t,
-		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase,
-		"console")
+	geth := runMinimalGeth(t, "--miner.etherbase", coinbase, "console")
 
 	// Gather all the infos the welcome message needs to contain
 	geth.SetTemplateFunc("clientname", func() string {
@@ -252,10 +149,13 @@ To exit, press ctrl-d
 }
 
 // Tests that a console can be attached to a running node via various means.
-func TestIPCAttachWelcome(t *testing.T) {
+func TestAttachWelcome(t *testing.T) {
+	var (
+		ipc      string
+		httpPort string
+		wsPort   string
+	)
 	// Configure the instance for IPC attachment
-	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
-	var ipc string
 	if runtime.GOOS == "windows" {
 		ipc = `\\.\pipe\geth` + strconv.Itoa(trulyRandInt(100000, 999999))
 	} else {
@@ -263,51 +163,28 @@ func TestIPCAttachWelcome(t *testing.T) {
 		defer os.RemoveAll(ws)
 		ipc = filepath.Join(ws, "geth.ipc")
 	}
-	geth := runGeth(t,
-		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--ipcpath", ipc)
-
-	defer func() {
-		geth.Interrupt()
-		geth.ExpectExit()
-	}()
-
-	waitForEndpoint(t, ipc, 3*time.Second)
-	testAttachWelcome(t, geth, "ipc:"+ipc, ipcAPIs)
-
-}
-
-func TestHTTPAttachWelcome(t *testing.T) {
-	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
-	port := strconv.Itoa(trulyRandInt(1024, 65536)) // Yeah, sometimes this will fail, sorry :P
-	geth := runGeth(t,
-		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--http", "--http.port", port)
-	defer func() {
-		geth.Interrupt()
-		geth.ExpectExit()
-	}()
-
-	endpoint := "http://127.0.0.1:" + port
-	waitForEndpoint(t, endpoint, 3*time.Second)
-	testAttachWelcome(t, geth, endpoint, httpAPIs)
-}
-
-func TestWSAttachWelcome(t *testing.T) {
-	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
-	port := strconv.Itoa(trulyRandInt(1024, 65536)) // Yeah, sometimes this will fail, sorry :P
-
-	geth := runGeth(t,
-		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--ws", "--ws.port", port)
-	defer func() {
-		geth.Interrupt()
-		geth.ExpectExit()
-	}()
-
-	endpoint := "ws://127.0.0.1:" + port
-	waitForEndpoint(t, endpoint, 3*time.Second)
-	testAttachWelcome(t, geth, endpoint, httpAPIs)
+	// And HTTP + WS attachment
+	p := trulyRandInt(1024, 65533) // Yeah, sometimes this will fail, sorry :P
+	httpPort = strconv.Itoa(p)
+	wsPort = strconv.Itoa(p + 1)
+	geth := runMinimalGeth(t, "--miner.etherbase", "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182",
+		"--ipcpath", ipc,
+		"--http", "--http.port", httpPort,
+		"--ws", "--ws.port", wsPort)
+	t.Run("ipc", func(t *testing.T) {
+		waitForEndpoint(t, ipc, 3*time.Second)
+		testAttachWelcome(t, geth, "ipc:"+ipc, ipcAPIs)
+	})
+	t.Run("http", func(t *testing.T) {
+		endpoint := "http://127.0.0.1:" + httpPort
+		waitForEndpoint(t, endpoint, 3*time.Second)
+		testAttachWelcome(t, geth, endpoint, httpAPIs)
+	})
+	t.Run("ws", func(t *testing.T) {
+		endpoint := "ws://127.0.0.1:" + wsPort
+		waitForEndpoint(t, endpoint, 3*time.Second)
+		testAttachWelcome(t, geth, endpoint, httpAPIs)
+	})
 }
 
 func testAttachWelcome(t *testing.T, geth *testgeth, endpoint, apis string) {

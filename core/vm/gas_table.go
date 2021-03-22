@@ -96,7 +96,7 @@ var (
 func gasSStore(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
 	var (
 		y, x    = stack.Back(1), stack.Back(0)
-		current = evm.StateDB.GetState(contract.Address(), common.Hash(x.Bytes32()))
+		current = evm.StateDB.GetState(contract.Address(), x.Bytes32())
 	)
 	// The legacy gas metering only takes into consideration the current state
 	neip1283t := !evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP1283Transition, evm.BlockNumber)
@@ -140,7 +140,7 @@ func gasSStore(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySi
 	if current == value { // noop (1)
 		return vars.NetSstoreNoopGas, nil
 	}
-	original := evm.StateDB.GetCommittedState(contract.Address(), common.Hash(x.Bytes32()))
+	original := evm.StateDB.GetCommittedState(contract.Address(), x.Bytes32())
 	if original == current {
 		if original == (common.Hash{}) { // create slot (2.1.1)
 			return vars.NetSstoreInitGas, nil
@@ -188,14 +188,14 @@ func gasSStoreEIP2200(evm *EVM, contract *Contract, stack *Stack, mem *Memory, m
 	// Gas sentry honoured, do the actual gas calculation based on the stored value
 	var (
 		y, x    = stack.Back(1), stack.Back(0)
-		current = evm.StateDB.GetState(contract.Address(), common.Hash(x.Bytes32()))
+		current = evm.StateDB.GetState(contract.Address(), x.Bytes32())
 	)
 	value := common.Hash(y.Bytes32())
 
 	if current == value { // noop (1)
 		return vars.SloadGasEIP2200, nil
 	}
-	original := evm.StateDB.GetCommittedState(contract.Address(), common.Hash(x.Bytes32()))
+	original := evm.StateDB.GetCommittedState(contract.Address(), x.Bytes32())
 	if original == current {
 		if original == (common.Hash{}) { // create slot (2.1.1)
 			return vars.SstoreSetGasEIP2200, nil

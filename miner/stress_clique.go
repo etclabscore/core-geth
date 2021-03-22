@@ -179,7 +179,6 @@ func makeSealer(genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, error) {
 			NoDiscovery: true,
 			MaxPeers:    25,
 		},
-		NoUSB: true,
 	}
 	// Start the node and configure a full Ethereum node on it
 	stack, err := node.New(config)
@@ -187,7 +186,7 @@ func makeSealer(genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, error) {
 		return nil, nil, err
 	}
 	// Create and register the backend
-	ethBackend, err := eth.New(stack, &eth.Config{
+	ethBackend, err := eth.New(stack, &ethconfig.Config{
 		Genesis:         genesis,
 		NetworkId:       genesis.Config.ChainID.Uint64(),
 		SyncMode:        downloader.FullSync,

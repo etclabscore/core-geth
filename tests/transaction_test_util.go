@@ -56,7 +56,7 @@ func (tt *TransactionTest) Run(config ctypes.ChainConfigurator) error {
 			return nil, nil, err
 		}
 		// Intrinsic gas
-		requiredGas, err := core.IntrinsicGas(tx.Data(), tx.To() == nil, isEIP2F, isEIP2028F)
+		requiredGas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil, isEIP2F, isEIP2028F)
 		if err != nil {
 			return nil, nil, err
 		}

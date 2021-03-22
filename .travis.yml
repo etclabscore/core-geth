@@ -56,8 +56,8 @@ jobs:
     if: type = pull_request
     os: linux
     arch: arm64
-    dist: xenial
-    go: 1.15.x
+      dist: xenial
+      go: 1.15.x
     env:
       - GO111MODULE=on
     script:

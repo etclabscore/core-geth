@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
-// faucet is a Ether faucet backed by a light client.
+// faucet is an Ether faucet backed by a light client.
 package main
 
 //go:generate go-bindata -nometadata -o website.go faucet.html
@@ -48,8 +48,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/downloader"
+	"github.com/ethereum/go-ethereum/eth/ethconfig"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/ethstats"
 	"github.com/ethereum/go-ethereum/les"
@@ -347,8 +347,9 @@ func main() {
 		log.Info("Using chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", fmt.Sprintf("%v", genesis.Config))
 
 		// Convert the bootnodes to internal enode representations
-		for _, boot := range utils.SplitAndTrim(*bootFlag) {
-			if url, err := discv5.ParseNode(boot); err == nil {
+		var enodes []*enode.Node
+		for _, boot := range strings.Split(*bootFlag, ",") {
+			if url, err := enode.Parse(enode.ValidSchemes, boot); err == nil {
 				enodes = append(enodes, url)
 			} else {
 				log.Error("Failed to parse bootnode URL", "url", boot, "err", err)
@@ -464,12 +465,19 @@ type faucet struct {
 	nonce    uint64             // Current pending nonce of the faucet
 	price    *big.Int           // Current gas price to issue funds with
 
-	conns    []*websocket.Conn    // Currently live websocket connections
+	conns    []*wsConn            // Currently live websocket connections
 	timeouts map[string]time.Time // History of users and their funding timeouts
 	reqs     []*request           // Currently pending funding requests
 	update   chan struct{}        // Channel to signal request updates
 
 	lock sync.RWMutex // Lock protecting the faucet's internals
+}
+
+// wsConn wraps a websocket connection with a write mutex as the underlying
+// websocket library does not synchronize access to the stream.
+type wsConn struct {
+	conn  *websocket.Conn
+	wlock sync.Mutex
 }
 
 const (
@@ -539,7 +547,7 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 	}
 
 	// Assemble the Ethereum light client protocol
-	cfg := eth.DefaultConfig
+	cfg := ethconfig.Defaults
 	cfg.NetworkId = network
 	cfg.Genesis = genesis
 
@@ -673,13 +681,14 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	f.lock.Lock()
-	f.conns = append(f.conns, conn)
+	wsconn := &wsConn{conn: conn}
+	f.conns = append(f.conns, wsconn)
 	f.lock.Unlock()
 
 	defer func() {
 		f.lock.Lock()
 		for i, c := range f.conns {
-			if c == conn {
+			if c.conn == conn {
 				f.conns = append(f.conns[:i], f.conns[i+1:]...)
 				break
 			}
@@ -707,7 +716,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 		if head == nil || balance == nil {
 			// Report the faucet offline until initial stats are ready
 			//lint:ignore ST1005 This error is to be displayed in the browser
-			if err = sendError(conn, errors.New("Faucet offline")); err != nil {
+			if err = sendError(wsconn, errors.New("Faucet offline")); err != nil {
 				log.Warn("Failed to send faucet error to client", "err", err)
 				return
 			}
@@ -723,7 +732,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 		log.Warn("Failed to get peer count", "error", err)
 		return
 	}
-	if err = send(conn, map[string]interface{}{
+	if err = send(wsconn, map[string]interface{}{
 		"funds":    new(big.Int).Div(balance, ether),
 		"funded":   nonce,
 		"peers":    peerCount,
@@ -732,7 +741,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 		log.Warn("Failed to send initial stats to client", "err", err)
 		return
 	}
-	if err = send(conn, head, 3*time.Second); err != nil {
+	if err = send(wsconn, head, 3*time.Second); err != nil {
 		log.Warn("Failed to send initial header to client", "err", err)
 		return
 	}
@@ -748,7 +757,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if !*noauthFlag && !strings.HasPrefix(msg.URL, "https://twitter.com/") && !strings.HasPrefix(msg.URL, "https://www.facebook.com/") {
-			if err = sendError(conn, errors.New("URL doesn't link to supported services")); err != nil {
+			if err = sendError(wsconn, errors.New("URL doesn't link to supported services")); err != nil {
 				log.Warn("Failed to send URL error to client", "err", err)
 				return
 			}
@@ -756,7 +765,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		if msg.Tier >= uint(*tiersFlag) {
 			//lint:ignore ST1005 This error is to be displayed in the browser
-			if err = sendError(conn, errors.New("Invalid funding tier requested")); err != nil {
+			if err = sendError(wsconn, errors.New("Invalid funding tier requested")); err != nil {
 				log.Warn("Failed to send tier error to client", "err", err)
 				return
 			}
@@ -772,7 +781,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 
 			res, err := http.PostForm("https://www.google.com/recaptcha/api/siteverify", form)
 			if err != nil {
-				if err = sendError(conn, err); err != nil {
+				if err = sendError(wsconn, err); err != nil {
 					log.Warn("Failed to send captcha post error to client", "err", err)
 					return
 				}
@@ -785,7 +794,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 			err = json.NewDecoder(res.Body).Decode(&result)
 			res.Body.Close()
 			if err != nil {
-				if err = sendError(conn, err); err != nil {
+				if err = sendError(wsconn, err); err != nil {
 					log.Warn("Failed to send captcha decode error to client", "err", err)
 					return
 				}
@@ -794,7 +803,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 			if !result.Success {
 				log.Warn("Captcha verification failed", "err", string(result.Errors))
 				//lint:ignore ST1005 it's funny and the robot won't mind
-				if err = sendError(conn, errors.New("Beep-bop, you're a robot!")); err != nil {
+				if err = sendError(wsconn, errors.New("Beep-bop, you're a robot!")); err != nil {
 					log.Warn("Failed to send captcha failure to client", "err", err)
 					return
 				}
@@ -822,7 +831,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 			err = errors.New("Something funky happened, please open an issue at https://github.com/ethereum/go-ethereum/issues")
 		}
 		if err != nil {
-			if err = sendError(conn, err); err != nil {
+			if err = sendError(wsconn, err); err != nil {
 				log.Warn("Failed to send prefix error to client", "err", err)
 				return
 			}
@@ -854,7 +863,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 			signed, err := f.keystore.SignTx(f.account, tx, chainId)
 			if err != nil {
 				f.lock.Unlock()
-				if err = sendError(conn, err); err != nil {
+				if err = sendError(wsconn, err); err != nil {
 					log.Warn("Failed to send transaction creation error to client", "err", err)
 					return
 				}
@@ -863,7 +872,7 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 			// Submit the transaction and mark as funded if successful
 			if err := f.client.SendTransaction(context.Background(), signed); err != nil {
 				f.lock.Unlock()
-				if err = sendError(conn, err); err != nil {
+				if err = sendError(wsconn, err); err != nil {
 					log.Warn("Failed to send transaction transmission error to client", "err", err)
 					return
 				}
@@ -885,13 +894,13 @@ func (f *faucet) apiHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Send an error if too frequent funding, othewise a success
 		if !fund {
-			if err = sendError(conn, fmt.Errorf("%s left until next allowance", common.PrettyDuration(time.Until(timeout)))); err != nil { // nolint: gosimple
+			if err = sendError(wsconn, fmt.Errorf("%s left until next allowance", common.PrettyDuration(time.Until(timeout)))); err != nil { // nolint: gosimple
 				log.Warn("Failed to send funding error to client", "err", err)
 				return
 			}
 			continue
 		}
-		if err = sendSuccess(conn, fmt.Sprintf("Funding request accepted for %s into %s", username, address.Hex())); err != nil {
+		if err = sendSuccess(wsconn, fmt.Sprintf("Funding request accepted for %s into %s", username, address.Hex())); err != nil {
 			log.Warn("Failed to send funding success to client", "err", err)
 			return
 		}
@@ -988,12 +997,12 @@ func (f *faucet) loop() {
 					"requests": f.reqs,
 				}, time.Second); err != nil {
 					log.Warn("Failed to send stats to client", "err", err)
-					conn.Close()
+					conn.conn.Close()
 					continue
 				}
 				if err := send(conn, head, time.Second); err != nil {
 					log.Warn("Failed to send header to client", "err", err)
-					conn.Close()
+					conn.conn.Close()
 				}
 			}
 			f.lock.RUnlock()
@@ -1015,7 +1024,7 @@ func (f *faucet) loop() {
 			for _, conn := range f.conns {
 				if err := send(conn, map[string]interface{}{"requests": f.reqs}, time.Second); err != nil {
 					log.Warn("Failed to send requests to client", "err", err)
-					conn.Close()
+					conn.conn.Close()
 				}
 			}
 			f.lock.RUnlock()
@@ -1029,23 +1038,25 @@ func (f *faucet) loop() {
 
 // sends transmits a data packet to the remote end of the websocket, but also
 // setting a write deadline to prevent waiting forever on the node.
-func send(conn *websocket.Conn, value interface{}, timeout time.Duration) error {
+func send(conn *wsConn, value interface{}, timeout time.Duration) error {
 	if timeout == 0 {
 		timeout = 60 * time.Second
 	}
-	conn.SetWriteDeadline(time.Now().Add(timeout))
-	return conn.WriteJSON(value)
+	conn.wlock.Lock()
+	defer conn.wlock.Unlock()
+	conn.conn.SetWriteDeadline(time.Now().Add(timeout))
+	return conn.conn.WriteJSON(value)
 }
 
 // sendError transmits an error to the remote end of the websocket, also setting
 // the write deadline to 1 second to prevent waiting forever.
-func sendError(conn *websocket.Conn, err error) error {
+func sendError(conn *wsConn, err error) error {
 	return send(conn, map[string]string{"error": err.Error()}, time.Second)
 }
 
 // sendSuccess transmits a success message to the remote end of the websocket, also
 // setting the write deadline to 1 second to prevent waiting forever.
-func sendSuccess(conn *websocket.Conn, msg string) error {
+func sendSuccess(conn *wsConn, msg string) error {
 	return send(conn, map[string]string{"success": msg}, time.Second)
 }
 
@@ -1209,7 +1220,13 @@ func authFacebook(url string) (string, string, common.Address, error) {
 	// Facebook's Graph API isn't really friendly with direct links. Still, we don't
 	// want to do ask read permissions from users, so just load the public posts and
 	// scrape it for the Ethereum address and profile URL.
-	res, err := http.Get(url)
+	//
+	// Facebook recently changed their desktop webpage to use AJAX for loading post
+	// content, so switch over to the mobile site for now. Will probably end up having
+	// to use the API eventually.
+	crawl := strings.Replace(url, "www.facebook.com", "m.facebook.com", 1)
+
+	res, err := http.Get(crawl)
 	if err != nil {
 		return "", "", common.Address{}, err
 	}

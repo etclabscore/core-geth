@@ -52,6 +52,19 @@ func setBig(i *big.Int, u *uint64) *big.Int {
 	return i
 }
 
+func bigNewU64Min(i, j *big.Int) *uint64 {
+	if i == nil {
+		return bigNewU64(j)
+	}
+	if j == nil {
+		return bigNewU64(i)
+	}
+	if j.Cmp(i) < 0 {
+		return bigNewU64(j)
+	}
+	return bigNewU64(i)
+}
+
 func (c *ChainConfig) GetAccountStartNonce() *uint64 {
 	return internal.GlobalConfigurator().GetAccountStartNonce()
 }
@@ -410,10 +423,29 @@ func (c *ChainConfig) SetEIP2315Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2929Transition() *uint64 {
-	return bigNewU64(c.YoloV3Block)
+	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2929Transition(n *uint64) error {
+	// yuck yuck yuck
+	if c.GetChainID().Cmp(common.Big1) == 0 {
+		c.BerlinBlock = setBig(c.BerlinBlock, n)
+		return nil
+	}
+	c.YoloV3Block = setBig(c.YoloV3Block, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEIP2930Transition() *uint64 {
+	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+}
+
+func (c *ChainConfig) SetEIP2930Transition(n *uint64) error {
+	// yuck
+	if c.GetChainID().Cmp(common.Big1) == 0 {
+		c.BerlinBlock = setBig(c.BerlinBlock, n)
+		return nil
+	}
 	c.YoloV3Block = setBig(c.YoloV3Block, n)
 	return nil
 }

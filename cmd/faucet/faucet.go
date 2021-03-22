@@ -48,6 +48,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/eth/ethconfig"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -56,7 +57,6 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/p2p/discv5"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/params"
@@ -293,7 +293,7 @@ func main() {
 
 	// Load and parse the genesis block requested by the user
 	var genesis *genesisT.Genesis
-	var enodes []*discv5.Node
+	var enodes []*enode.Node
 	var blob []byte
 
 	// client will be used if the faucet is attaching. If not it won't be touched.
@@ -516,7 +516,7 @@ func migrateFaucetDirectory(faucetDataDir string) error {
 }
 
 // startStack starts the node stack, ensures peering, and assigns the respective ethclient to the faucet.
-func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv5.Node, network uint64) error {
+func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*enode.Node, network uint64) error {
 
 	genesisHash := core.GenesisToBlock(genesis, nil).Hash()
 
@@ -556,10 +556,10 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 		cfg.SyncMode = downloader.LightSync
 	case "fast":
 		cfg.SyncMode = downloader.FastSync
-		cfg.ProtocolVersions = eth.DefaultProtocolVersions
+		cfg.ProtocolVersions = ethconfig.Defaults.ProtocolVersions
 	case "full":
 		cfg.SyncMode = downloader.FullSync
-		cfg.ProtocolVersions = eth.DefaultProtocolVersions
+		cfg.ProtocolVersions = ethconfig.Defaults.ProtocolVersions
 	default:
 		panic("impossible to reach, this should be handled in the auditFlagUse function")
 	}
@@ -580,7 +580,7 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*discv
 	default:
 		utils.SetDNSDiscoveryDefaults(&cfg, core.GenesisToBlock(genesis, nil).Hash())
 	}
-	log.Info("Config discovery", "urls", cfg.DiscoveryURLs)
+	log.Info("Config discovery", "urls", cfg.EthDiscoveryURLs)
 
 	// Establish the backend and enable stats reporting if configured to do so.
 	switch *syncmodeFlag {

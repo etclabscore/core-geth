@@ -61,7 +61,6 @@ const (
 
 // backend encompasses the bare-minimum functionality needed for ethstats reporting
 type backend interface {
-	ProtocolVersion() int
 	SubscribeChainHeadEvent(ch chan<- core.ChainHeadEvent) event.Subscription
 	SubscribeNewTxsEvent(ch chan<- core.NewTxsEvent) event.Subscription
 	CurrentHeader() *types.Header

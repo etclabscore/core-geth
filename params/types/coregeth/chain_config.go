@@ -180,6 +180,9 @@ type CoreGethChainConfig struct {
 	// https://eips.ethereum.org/EIPS/eip-2315
 	EIP2315FBlock *big.Int `json:"eip2315FBlock,omitempty"`
 
+	// TODO: Document me.
+	EIP2565FBlock *big.Int `json:"eip2565FBlock,omitempty"`
+
 	// EIP-2929: Gas cost increases for state access opcodes
 	// https://eips.ethereum.org/EIPS/eip-2929
 	EIP2929FBlock *big.Int `json:"eip2929FBlock,omitempty"`

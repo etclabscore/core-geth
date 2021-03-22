@@ -134,6 +134,8 @@ type ProtocolSpecifier interface {
 	SetECBP1100Transition(n *uint64) error
 	GetEIP2315Transition() *uint64
 	SetEIP2315Transition(n *uint64) error
+	GetEIP2565Transition() *uint64
+	SetEIP2565Transition(n *uint64) error
 	GetEIP2929Transition() *uint64
 	SetEIP2929Transition(n *uint64) error
 	GetEIP2930Transition() *uint64

@@ -1005,6 +1005,17 @@ func (spec *ParityChainSpec) SetEIP2929Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
+func (spec *ParityChainSpec) GetEIP2930Transition() *uint64 {
+	return nil
+}
+
+func (spec *ParityChainSpec) SetEIP2930Transition(n *uint64) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
 func (spec *ParityChainSpec) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil

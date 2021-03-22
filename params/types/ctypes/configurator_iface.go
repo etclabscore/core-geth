@@ -136,6 +136,8 @@ type ProtocolSpecifier interface {
 	SetEIP2315Transition(n *uint64) error
 	GetEIP2929Transition() *uint64
 	SetEIP2929Transition(n *uint64) error
+	GetEIP2930Transition() *uint64
+	SetEIP2930Transition(n *uint64) error
 }
 
 type Forker interface {

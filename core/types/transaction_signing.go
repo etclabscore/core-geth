@@ -24,7 +24,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
@@ -60,14 +59,13 @@ func MakeSigner(config ctypes.ChainConfigurator, blockNumber *big.Int) Signer {
 //
 // Use this in transaction-handling code where the current block number is unknown. If you
 // have the current block number available, use MakeSigner instead.
-// FIXME(ia)
-func LatestSigner(config *params.ChainConfig) Signer {
-	if config.ChainID != nil {
-		if config.BerlinBlock != nil || config.YoloV3Block != nil {
-			return NewEIP2930Signer(config.ChainID)
+func LatestSigner(config ctypes.ChainConfigurator) Signer {
+	if config.GetChainID() != nil {
+		if config.IsEnabled(config.GetEIP2930Transition, common.Big0) {
+			return NewEIP2930Signer(config.GetChainID())
 		}
-		if config.EIP155Block != nil {
-			return NewEIP155Signer(config.ChainID)
+		if config.IsEnabled(config.GetEIP155Transition, common.Big0) {
+			return NewEIP155Signer(config.GetChainID())
 		}
 	}
 	return HomesteadSigner{}

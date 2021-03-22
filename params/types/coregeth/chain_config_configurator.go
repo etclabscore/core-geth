@@ -408,6 +408,15 @@ func (c *CoreGethChainConfig) SetEIP2929Transition(n *uint64) error {
 	return nil
 }
 
+func (c *CoreGethChainConfig) GetEIP2930Transition() *uint64 {
+	return bigNewU64(c.EIP2930FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP2930Transition(n *uint64) error {
+	c.EIP2930FBlock = setBig(c.EIP2930FBlock, n)
+	return nil
+}
+
 func (c *CoreGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

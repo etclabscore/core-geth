@@ -184,6 +184,9 @@ type CoreGethChainConfig struct {
 	// https://eips.ethereum.org/EIPS/eip-2929
 	EIP2929FBlock *big.Int `json:"eip2929FBlock,omitempty"`
 
+	// TODO: Document me.
+	EIP2930FBlock *big.Int `json:"eip2930FBlock,omitempty"`
+
 	DisposalBlock *big.Int `json:"disposalBlock,omitempty"` // Bomb disposal HF block
 
 	// Various consensus engines

@@ -583,7 +583,7 @@ func opCreate(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([]
 	// homestead we must check for CodeStoreOutOfGasError (homestead only
 	// rule) and treat as an error, if the ruleset is frontier we must
 	// ignore this error and pretend the operation was successful.
-	if interpreter.evm.ChainConfig().IsEnabled(interpreter.evm.chainConfig.GetEIP2Transition, interpreter.evm.BlockNumber) && suberr == ErrCodeStoreOutOfGas {
+	if interpreter.evm.ChainConfig().IsEnabled(interpreter.evm.chainConfig.GetEIP2Transition, interpreter.evm.Context.BlockNumber) && suberr == ErrCodeStoreOutOfGas {
 		stackvalue.Clear()
 		interpreter.evm.CallErrorTemp = suberr // temp storage, for debug tracing
 	} else if suberr != nil && suberr != ErrCodeStoreOutOfGas {

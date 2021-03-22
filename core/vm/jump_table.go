@@ -179,10 +179,6 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 		enable2200(&instructionSet) // Net metered SSTORE - https://eips.ethereum.org/EIPS/eip-2200
 	}
 
-	if config.IsEnabled(config.GetEIP2315Transition, bn) {
-		enable2315(&instructionSet) // Subroutines - https://eips.ethereum.org/EIPS/eip-2315
-	}
-
 	if config.IsEnabled(config.GetEIP2929Transition, bn) {
 		enable2929(&instructionSet) // Access lists for trie accesses https://eips.ethereum.org/EIPS/eip-2929
 	}

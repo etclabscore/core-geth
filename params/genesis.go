@@ -77,9 +77,9 @@ func DefaultGoerliGenesisBlock() *genesisT.Genesis {
 	}
 }
 
-func DefaultYoloV2GenesisBlock() *genesisT.Genesis {
+func DefaultYoloV3GenesisBlock() *genesisT.Genesis {
 	return &genesisT.Genesis{
-		Config:     YoloV2ChainConfig,
+		Config:     YoloV3ChainConfig,
 		Timestamp:  0x5ed754f1,
 		ExtraData:  hexutil.MustDecode("0x00000000000000000000000000000000000000000000000000000000000000008a37866fd3627c9205a37c8685666f32ec07bb1b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
 		GasLimit:   0x47b760,

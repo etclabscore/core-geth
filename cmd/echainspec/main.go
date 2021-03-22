@@ -56,7 +56,7 @@ var defaultChainspecValues = map[string]ctypes.Configurator{
 	"ropsten":    params.DefaultRopstenGenesisBlock(),
 	"rinkeby":    params.DefaultRinkebyGenesisBlock(),
 	"goerli":     params.DefaultGoerliGenesisBlock(),
-	"yolov2":     params.DefaultYoloV2GenesisBlock(),
+	"yolov2":     params.DefaultYoloV3GenesisBlock(),
 }
 
 var defaultChainspecNames = func() []string {

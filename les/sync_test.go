@@ -259,7 +259,7 @@ func testSyncFromConfiguredCheckpoint(t *testing.T, protocol int) {
 
 	// Configure the local checkpoint(the first section)
 	head := server.handler.blockchain.GetHeaderByNumber(config.ChtSize - 1).Hash()
-	cp := &params.TrustedCheckpoint{
+	cp := &ctypes.TrustedCheckpoint{
 		SectionIndex: 0,
 		SectionHead:  head,
 		CHTRoot:      light.GetChtRoot(server.db, 0, head),

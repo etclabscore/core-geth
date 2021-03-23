@@ -26,7 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/light"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 var errInvalidCheckpoint = errors.New("invalid advertised checkpoint")
@@ -124,7 +124,7 @@ func (h *clientHandler) synchronise(peer *serverPeer) {
 	if h.backend.config.SyncFromCheckpoint {
 		local, checkpoint = true, h.backend.config.Checkpoint
 		if h.backend.config.Checkpoint == nil {
-			checkpoint = &params.TrustedCheckpoint{}
+			checkpoint = &ctypes.TrustedCheckpoint{}
 		}
 	}
 	// Determine whether we should run checkpoint syncing or normal light syncing.

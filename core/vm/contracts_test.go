@@ -79,8 +79,9 @@ var blake2FMalformedInputTests = []precompiledFailureTest{
 // So we override to ALL of the precompileds gathered, however hacky it may be.
 var allPrecompiles = func() map[common.Address]PrecompiledContract {
 	conf := params.AllEthashProtocolChanges
+	// TODO(ia): check this
 	zero := uint64(0)
-	err := conf.SetEIP2537Transition(&zero) // TODO(ia): check this
+	err := conf.SetEIP2537Transition(&zero)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -89,6 +90,9 @@ var allPrecompiles = func() map[common.Address]PrecompiledContract {
 
 func testPrecompiled(addr string, test precompiledTest, t *testing.T) {
 	p := allPrecompiles[common.HexToAddress(addr)]
+	if p == nil {
+		t.Fatalf("precompiled == nil, addr: %s", addr)
+	}
 	in := common.Hex2Bytes(test.Input)
 	gas := p.RequiredGas(in)
 	t.Run(fmt.Sprintf("%s-Gas=%d", test.Name, gas), func(t *testing.T) {

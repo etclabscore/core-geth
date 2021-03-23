@@ -563,15 +563,15 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/core"
 			"github.com/ethereum/go-ethereum/crypto"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		`
 			// Generate a new random account and a funded simulator
 			key, _ := crypto.GenerateKey()
 			auth, _ := bind.NewKeyedTransactorWithChainID(key, big.NewInt(1337))
 		
-			sim := backends.NewSimulatedBackend(core.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{auth.From: {Balance: big.NewInt(10000000000)}}, 10000000)
 			defer sim.Close()
 		
 			// Deploy a structs method invoker contract and execute its default method
@@ -653,7 +653,7 @@ var bindTests = []struct {
 		`
 			// Create a simulator and wrap a non-deployed contract
 
-			sim := backends.NewSimulatedBackend(core.GenesisAlloc{}, uint64(10000000000))
+			sim := backends.NewSimulatedBackend(genesisT.GenesisAlloc{}, uint64(10000000000))
 			defer sim.Close()
 
 			nonexistent, err := NewNonExistentStruct(common.Address{}, sim)

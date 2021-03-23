@@ -451,9 +451,9 @@ var (
 )
 
 // Exported for fuzzing
-var FrontierDifficultyCalulator = calcDifficultyFrontier
-var HomesteadDifficultyCalulator = calcDifficultyHomestead
-var DynamicDifficultyCalculator = makeDifficultyCalculator
+var FrontierDifficultyCalulator = CalcDifficultyFrontierU256
+var HomesteadDifficultyCalulator = CalcDifficultyHomesteadU256
+var DynamicDifficultyCalculator = MakeDifficultyCalculatorU256
 
 // verifySeal checks whether a block satisfies the PoW difficulty requirements,
 // either using the usual ethash cache for it, or alternatively using a full DAG

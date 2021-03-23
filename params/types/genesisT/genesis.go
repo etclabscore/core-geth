@@ -560,6 +560,22 @@ func (g *Genesis) SetEIP2929Transition(n *uint64) error {
 	return g.Config.SetEIP2929Transition(n)
 }
 
+func (g *Genesis) GetEIP2930Transition() *uint64 {
+	return g.Config.GetEIP2930Transition()
+}
+
+func (g *Genesis) SetEIP2930Transition(n *uint64) error {
+	return g.Config.SetEIP2930Transition(n)
+}
+
+func (g *Genesis) GetEIP2565Transition() *uint64 {
+	return g.Config.GetEIP2565Transition()
+}
+
+func (g *Genesis) SetEIP2565Transition(n *uint64) error {
+	return g.Config.SetEIP2565Transition(n)
+}
+
 func (g *Genesis) GetECBP1100Transition() *uint64 {
 	return g.Config.GetECBP1100Transition()
 }

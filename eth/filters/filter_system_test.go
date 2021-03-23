@@ -231,7 +231,7 @@ func TestSideBlockSubscription(t *testing.T) {
 	var (
 		db              = rawdb.NewMemoryDatabase()
 		backend         = &testBackend{db: db}
-		api             = NewPublicFilterAPI(backend, false)
+		api             = NewPublicFilterAPI(backend, false, deadline)
 		genesis         = core.MustCommitGenesis(db, new(genesisT.Genesis))
 		chain, _        = core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, 10, func(i int, gen *core.BlockGen) {})
 		chainSideEvents = []core.ChainSideEvent{}

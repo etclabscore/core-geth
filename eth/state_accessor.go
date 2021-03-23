@@ -92,7 +92,7 @@ func (eth *Ethereum) stateAtBlock(block *types.Block, reexec uint64) (statedb *s
 			return nil, nil, fmt.Errorf("processing block %d failed: %v", block.NumberU64(), err)
 		}
 		// Finalize the state so any modifications are written to the trie
-		root, err := statedb.Commit(eth.blockchain.Config().IsEIP158(block.Number()))
+		root, err := statedb.Commit(eth.blockchain.Config().IsEnabled(eth.blockchain.Config().GetEIP161dTransition, block.Number()))
 		if err != nil {
 			return nil, nil, err
 		}
@@ -156,7 +156,7 @@ func (eth *Ethereum) statesInRange(fromBlock, toBlock *types.Block, reexec uint6
 			return nil, nil, fmt.Errorf("processing block %d failed: %v", block.NumberU64(), err)
 		}
 		// Finalize the state so any modifications are written to the trie
-		root, err := statedb.Commit(eth.blockchain.Config().IsEIP158(block.Number()))
+		root, err := statedb.Commit(eth.blockchain.Config().IsEnabled(eth.blockchain.Config().GetEIP161dTransition, block.Number()))
 		if err != nil {
 			return nil, nil, err
 		}
@@ -223,7 +223,8 @@ func (eth *Ethereum) stateAtTransaction(block *types.Block, txIndex int, reexec 
 		}
 		// Ensure any modifications are committed to the state
 		// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-		statedb.Finalise(vmenv.ChainConfig().IsEIP158(block.Number()))
+		//
+		statedb.Finalise(vmenv.ChainConfig().IsEnabled(vmenv.ChainConfig().GetEIP161dTransition, block.Number()))
 	}
 	release()
 	return nil, vm.BlockContext{}, nil, nil, fmt.Errorf("transaction index %d out of range for block %#x", txIndex, block.Hash())

@@ -290,9 +290,9 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 		minPeers = cs.handler.maxPeers
 	}
 	if cs.handler.peers.len() < minArtificialFinalityPeers {
-		if cs.handler.blockchain.IsArtificialFinalityEnabled() {
+		if cs.handler.chain.IsArtificialFinalityEnabled() {
 			// If artificial finality state is forcefully set (overridden) this will just be a noop.
-			cs.handler.blockchain.EnableArtificialFinality(false, "reason", "low peers", "peers", cs.pm.peers.Len())
+			cs.handler.chain.EnableArtificialFinality(false, "reason", "low peers", "peers", cs.handler.peers.len())
 		}
 	}
 	if cs.handler.peers.len() < minPeers {
@@ -314,12 +314,12 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 		// - In full sync mode.
 		if op.mode == downloader.FullSync &&
 			// - Have enough peers.
-			cs.pm.peers.Len() >= minArtificialFinalityPeers &&
+			cs.handler.peers.len() >= minArtificialFinalityPeers &&
 			// - Head is not stale.
-			!(time.Since(time.Unix(int64(cs.pm.blockchain.CurrentHeader().Time), 0)) > artificialFinalitySafetyInterval) &&
+			!(time.Since(time.Unix(int64(cs.handler.chain.CurrentHeader().Time), 0)) > artificialFinalitySafetyInterval) &&
 			// - AF is disabled (so we should reenable).
-			!cs.pm.blockchain.IsArtificialFinalityEnabled() {
-			cs.pm.blockchain.EnableArtificialFinality(true, "reason", "synced", "peers", cs.pm.peers.Len())
+			!cs.handler.chain.IsArtificialFinalityEnabled() {
+			cs.handler.chain.EnableArtificialFinality(true, "reason", "synced", "peers", cs.handler.peers.len())
 		}
 		return nil // We're in sync.
 	}

@@ -17,7 +17,6 @@
 package core
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -1279,19 +1278,6 @@ func TestEIP155Transition(t *testing.T) {
 		genesis = MustCommitGenesis(db, gspec)
 	)
 
-	b, _ := json.MarshalIndent(gspec, "", "    ")
-	t.Logf("genesis: %v", string(b))
-
-	if gspec.GetChainID().Cmp(common.Big0) == 0 {
-		t.Fatalf("gspec.config.chaindID==0")
-	}
-	if !gspec.Config.IsEnabled(gspec.Config.GetEIP155Transition, big.NewInt(0)) {
-		t.Fatalf("not enabled")
-	}
-	if tr := *gspec.Config.GetEIP155Transition(); tr != 2 {
-		t.Fatalf("want: 2, got: %d", tr)
-	}
-
 	blockchain, _ := NewBlockChain(db, nil, gspec.Config, ethash.NewFaker(), vm.Config{}, nil, nil)
 	defer blockchain.Stop()
 
@@ -1331,15 +1317,7 @@ func TestEIP155Transition(t *testing.T) {
 			block.AddTx(tx)
 
 			// 1
-			if !gspec.Config.IsEnabled(gspec.Config.GetEIP155Transition, common.Big0) {
-				t.Fatalf("gspec.Config not enabled")
-			}
-			if !gspec.IsEnabled(gspec.GetEIP155Transition, common.Big0) {
-				t.Fatalf("gspec not enabled")
-			}
-			signer := types.LatestSigner(gspec.Config)
-			t.Logf("signer.type=%t", signer)
-			tx, err = basicTx(signer)
+			tx, err = basicTx(types.LatestSigner(gspec.Config))
 			if err != nil {
 				t.Fatal(err)
 			}

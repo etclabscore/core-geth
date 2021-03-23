@@ -228,9 +228,6 @@ type TxPool struct {
 	signer      types.Signer
 	mu          sync.RWMutex
 
-	istanbul bool // Fork indicator whether we are in the istanbul stage.
-	eip2718  bool // Fork indicator whether we are using EIP-2718 type transactions.
-
 	currentState  *state.StateDB // Current state in the blockchain head
 	pendingNonces *txNoncer      // Pending state tracking virtual nonces
 	currentMaxGas uint64         // Current gas limit for transaction caps
@@ -255,6 +252,7 @@ type TxPool struct {
 
 	eip2f    bool
 	eip2028f bool
+	eip2718  bool // Fork indicator whether we are using EIP-2718 type transactions.
 }
 
 type txpoolResetRequest struct {
@@ -1222,9 +1220,7 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 	// Update all fork indicator by next pending block number.
 	next := new(big.Int).Add(newHead.Number, big.NewInt(1))
 	pool.eip2028f = pool.chainconfig.IsEnabled(pool.chainconfig.GetEIP2028Transition, next)
-	// FIXME(ia)
-	pool.istanbul = pool.chainconfig.IsIstanbul(next)
-	pool.eip2718 = pool.chainconfig.IsBerlin(next)
+	pool.eip2718 = pool.chainconfig.IsEnabled(pool.chainconfig.GetEIP2718Transition, next)
 }
 
 // promoteExecutables moves transactions that have become processable from the

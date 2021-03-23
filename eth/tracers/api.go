@@ -170,6 +170,13 @@ type StdTraceConfig struct {
 	TxHash common.Hash
 }
 
+// txTraceContext is the contextual infos about a transaction before it gets run.
+type txTraceContext struct {
+	index int         // Index of the transaction within the block
+	hash  common.Hash // Hash of the transaction
+	block common.Hash // Hash of the block containing the transaction
+}
+
 // txTraceResult is the result of a single transaction trace.
 type txTraceResult struct {
 	Result interface{} `json:"result,omitempty"` // Trace results produced by the tracer
@@ -263,14 +270,17 @@ func (api *API) traceChain(ctx context.Context, start, end *types.Block, config 
 
 			// Fetch and execute the next block trace tasks
 			for task := range tasks {
-				signer := types.MakeSigner(api.eth.backend.ChainConfig(), task.block.Number())
+				signer := types.MakeSigner(api.backend.ChainConfig(), task.block.Number())
 				blockCtx := core.NewEVMBlockContext(task.block.Header(), api.chainContext(ctx), nil)
 				// Trace all the transactions contained within
 				for i, tx := range task.block.Transactions() {
 					msg, _ := tx.AsMessage(signer)
-					vmctx := core.NewEVMContext(msg, blockCtx, task.block.Header(), api.eth.blockchain, nil)
-
-					res, err := traceTx(ctx, api.eth, msg, vmctx, task.statedb, nil, config)
+					txctx := &txTraceContext{
+						index: i,
+						hash:  tx.Hash(),
+						block: task.block.Hash(),
+					}
+					res, err := traceTx(ctx, msg, txctx, blockCtx, task.statedb, nil, config)
 					if err != nil {
 						task.results[i] = &txTraceResult{Error: err.Error()}
 						log.Warn("Tracing failed", "hash", tx.Hash(), "block", task.block.NumberU64(), "err", err)
@@ -901,7 +911,7 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHa
 // traceTx configures a new tracer according to the provided configuration, and
 // executes the given message in the provided environment. The return value will
 // be tracer dependent.
-func traceTx(ctx context.Context, eth *Ethereum, message core.Message, vmctx vm.BlockContext, statedb *state.StateDB, extraContext map[string]interface{}, config *TraceConfig) (interface{}, error) {
+func traceTx(ctx context.Context, message core.Message, txctx *txTraceContext, vmctx vm.BlockContext, statedb *state.StateDB, extraContext map[string]interface{}, config *TraceConfig) (interface{}, error) {
 	// Assemble the structured logger or the JavaScript tracer
 	var (
 		tracer    vm.Tracer

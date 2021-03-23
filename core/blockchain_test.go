@@ -3096,7 +3096,7 @@ func TestEIP2718Transition(t *testing.T) {
 
 	// Import the canonical chain
 	diskdb := rawdb.NewMemoryDatabase()
-	genesis = MustCommitGenesis(diskdb, gspec)
+	MustCommitGenesis(diskdb, gspec)
 
 	chain, err := NewBlockChain(diskdb, nil, gspec.Config, engine, vm.Config{}, nil, nil)
 	if err != nil {

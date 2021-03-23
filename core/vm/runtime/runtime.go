@@ -114,7 +114,7 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 		vmenv   = NewEnv(cfg)
 		sender  = vm.AccountRef(cfg.Origin)
 	)
-	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.BlockNumber) {
+	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
 		cfg.State.PrepareAccessList(cfg.Origin, &address, vmenv.ActivePrecompiles(), nil)
 	}
 
@@ -147,7 +147,7 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 		vmenv  = NewEnv(cfg)
 		sender = vm.AccountRef(cfg.Origin)
 	)
-	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.BlockNumber) {
+	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
 		cfg.State.PrepareAccessList(cfg.Origin, nil, vmenv.ActivePrecompiles(), nil)
 	}
 
@@ -173,7 +173,7 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 
 	sender := cfg.State.GetOrNewStateObject(cfg.Origin)
 	statedb := cfg.State
-	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.BlockNumber) {
+	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
 		statedb.PrepareAccessList(cfg.Origin, &address, vmenv.ActivePrecompiles(), nil)
 	}
 

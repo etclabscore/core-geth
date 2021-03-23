@@ -995,47 +995,39 @@ func (spec *ParityChainSpec) SetEIP2315Transition(i *uint64) error {
 }
 
 func (spec *ParityChainSpec) GetEIP2929Transition() *uint64 {
-	return nil
+	return spec.Params.EIP2929Transition.Uint64P()
 }
 
 func (spec *ParityChainSpec) SetEIP2929Transition(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	return ctypes.ErrUnsupportedConfigFatal
+	spec.Params.EIP2929Transition = new(ParityU64).SetUint64(n)
+	return nil
 }
 
 func (spec *ParityChainSpec) GetEIP2930Transition() *uint64 {
-	return nil
+	return spec.Params.EIP2930Transition.Uint64P()
 }
 
 func (spec *ParityChainSpec) SetEIP2930Transition(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	return ctypes.ErrUnsupportedConfigFatal
+	spec.Params.EIP2930Transition = new(ParityU64).SetUint64(n)
+	return nil
 }
 
 func (spec *ParityChainSpec) GetEIP2565Transition() *uint64 {
-	return nil
+	return spec.Params.EIP2565Transition.Uint64P()
 }
 
 func (spec *ParityChainSpec) SetEIP2565Transition(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	return ctypes.ErrUnsupportedConfigFatal
-}
-
-func (spec *ParityChainSpec) GetEIP2718Transition() *uint64 {
+	spec.Params.EIP2565Transition = new(ParityU64).SetUint64(n)
 	return nil
 }
 
+func (spec *ParityChainSpec) GetEIP2718Transition() *uint64 {
+	return spec.Params.EIP2718Transition.Uint64P()
+}
+
 func (spec *ParityChainSpec) SetEIP2718Transition(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	return ctypes.ErrUnsupportedConfigFatal
+	spec.Params.EIP2718Transition = new(ParityU64).SetUint64(n)
+	return nil
 }
 
 func (spec *ParityChainSpec) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {

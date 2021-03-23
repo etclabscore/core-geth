@@ -120,6 +120,8 @@ func TestTxPool(t *testing.T) {
 				t.Errorf("relay.Send expected len = %d, got %d", exp, got)
 			}
 		}
+
+		// core-geth
 		if ii == len(gchain)/4 {
 			// Fuck up pool head
 			// This is an edge case that I'm not sure could really happen (hopefully not),
@@ -128,18 +130,23 @@ func TestTxPool(t *testing.T) {
 			pool.head = common.Hash{}
 		}
 
+		// core-geth
 		if ii == len(gchain)/2 {
 			// Attempt to insert a nil header into the headerchain
+			// NOTE(ia)
 			t.Log("Inserting nil header into header chain")
 			if _, err := lightchain.InsertHeaderChain([]*types.Header{nil}, 1); err == nil {
 				t.Fatal("insert nil header error should not be errorless")
 			}
 		}
+
+		// core-geth
 		if ii == len(gchain)/4*3 {
 			var h *types.Header
 			t.Log("Setting pool head to a nil header", h.Hash().Hex())
 			pool.setNewHead(h)
 		}
+
 		if _, err := lightchain.InsertHeaderChain([]*types.Header{block.Header()}, 1); err != nil {
 			t.Fatal(err)
 		}

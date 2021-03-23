@@ -298,11 +298,18 @@ func (hc *HeaderChain) writeHeaders(headers []*types.Header) (result *headerWrit
 
 func (hc *HeaderChain) ValidateHeaderChain(chain []*types.Header, checkFreq int) (int, error) {
 	// Do a sanity check that the provided chain is actually ordered and linked
+	if len(chain) == 0 {
+		return 0, nil
+	} else if len(chain) >= 1 {
+		if chain[0] == nil {
+			return 0, fmt.Errorf("header was nil")
+		}
+	}
 	for i := 1; i < len(chain); i++ {
+		if chain[i] == nil {
+			return 0, fmt.Errorf("header was nil")
+		}
 		if chain[i].Number.Uint64() != chain[i-1].Number.Uint64()+1 {
-			if chain[i] == nil {
-				return 0, fmt.Errorf("header was nil")
-			}
 			hash := chain[i].Hash()
 			parentHash := chain[i-1].Hash()
 			// Chain broke ancestry, log a message (programming error) and skip insertion

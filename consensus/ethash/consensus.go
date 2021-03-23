@@ -230,7 +230,7 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 	}
 	// Verify the header's timestamp
 	if !uncle {
-		if header.Time > uint64(unixNow+allowedFutureBlockTimeSeconds) {
+		if header.Time > uint64(unixNow+int64(allowedFutureBlockTime.Seconds())) {
 			return consensus.ErrFutureBlock
 		}
 	}

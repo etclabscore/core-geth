@@ -453,13 +453,9 @@ func (c *ChainConfig) GetEIP2929Transition() *uint64 {
 	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
 }
 
+// FIXME: Assigning BerlinBlock foregoes setting YoloV3.
 func (c *ChainConfig) SetEIP2929Transition(n *uint64) error {
-	// yuck yuck yuck
-	if c.GetChainID().Cmp(common.Big1) == 0 {
-		c.BerlinBlock = setBig(c.BerlinBlock, n)
-		return nil
-	}
-	c.YoloV3Block = setBig(c.YoloV3Block, n)
+	c.BerlinBlock = setBig(c.BerlinBlock, n)
 	return nil
 }
 
@@ -468,12 +464,7 @@ func (c *ChainConfig) GetEIP2930Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP2930Transition(n *uint64) error {
-	// yuck
-	if c.GetChainID().Cmp(common.Big1) == 0 {
-		c.BerlinBlock = setBig(c.BerlinBlock, n)
-		return nil
-	}
-	c.YoloV3Block = setBig(c.YoloV3Block, n)
+	c.BerlinBlock = setBig(c.BerlinBlock, n)
 	return nil
 }
 
@@ -482,12 +473,7 @@ func (c *ChainConfig) GetEIP2565Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP2565Transition(n *uint64) error {
-	// yuck
-	if c.GetChainID().Cmp(common.Big1) == 0 {
-		c.BerlinBlock = setBig(c.BerlinBlock, n)
-		return nil
-	}
-	c.YoloV3Block = setBig(c.YoloV3Block, n)
+	c.BerlinBlock = setBig(c.BerlinBlock, n)
 	return nil
 }
 
@@ -496,12 +482,7 @@ func (c *ChainConfig) GetEIP2718Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP2718Transition(n *uint64) error {
-	// yuck
-	if c.GetChainID().Cmp(common.Big1) == 0 {
-		c.BerlinBlock = setBig(c.BerlinBlock, n)
-		return nil
-	}
-	c.YoloV3Block = setBig(c.YoloV3Block, n)
+	c.BerlinBlock = setBig(c.BerlinBlock, n)
 	return nil
 }
 

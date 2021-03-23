@@ -206,11 +206,23 @@ func init() {
 		for k, v := range MapForkNameChainspecFileState {
 			config, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
 			if os.IsNotExist(err) {
-				wd, wde := os.Getwd()
-				if wde != nil {
-					panic(wde)
+				// wd, wde := os.Getwd()
+				// if wde != nil {
+				// 	panic(wde)
+				// }
+				config = Forks[k]
+				pspec := &parity.ParityChainSpec{}
+				if err := confp.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
+					panic(err)
 				}
-				panic(fmt.Sprintf("failed to find chainspec, wd: %s, config: %v/file: %v", wd, k, v))
+				b, _ := json.MarshalIndent(pspec, "", "    ")
+				writePath := paritySpecPath(v)
+				err := ioutil.WriteFile(writePath, b, os.ModePerm)
+				if err != nil {
+					panic(err)
+				}
+				//
+				// panic(fmt.Sprintf("failed to find chainspec, wd: %s, config: %v/file: %v", wd, k, v))
 			} else if err != nil {
 				panic(err)
 			}

@@ -61,10 +61,10 @@ func MakeSigner(config ctypes.ChainConfigurator, blockNumber *big.Int) Signer {
 // have the current block number available, use MakeSigner instead.
 func LatestSigner(config ctypes.ChainConfigurator) Signer {
 	if chainID := config.GetChainID(); chainID != nil {
-		if config.IsEnabled(config.GetEIP2930Transition, common.Big0) {
+		if config.GetEIP2930Transition() != nil {
 			return NewEIP2930Signer(chainID)
 		}
-		if config.IsEnabled(config.GetEIP155Transition, common.Big0) {
+		if config.GetEIP155Transition() != nil {
 			return NewEIP155Signer(chainID)
 		}
 	}

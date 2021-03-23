@@ -524,7 +524,7 @@ func (s *Ethereum) Engine() consensus.Engine          { return s.engine }
 func (s *Ethereum) ChainDb() ethdb.Database           { return s.chainDb }
 func (s *Ethereum) IsListening() bool                 { return true } // Always listening
 func (s *Ethereum) EthVersion() int {
-	return int(eth.MakeProtocols((*ethHandler)(s.handler), s.networkID, s.ethDialCandidates)[0])
+	return int(eth.MakeProtocols((*ethHandler)(s.handler), s.networkID, s.ethDialCandidates)[0].Version)
 }
 func (s *Ethereum) NetVersion() uint64                 { return s.networkID }
 func (s *Ethereum) Downloader() *downloader.Downloader { return s.handler.downloader }

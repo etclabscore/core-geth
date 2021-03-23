@@ -35,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 )
 
 // snapshotTestBasic wraps the common testing fields in the snapshot tests.
@@ -71,7 +72,7 @@ func (basic *snapshotTestBasic) prepare(t *testing.T) (*BlockChain, []*types.Blo
 	}
 	// Initialize a fresh chain
 	var (
-		genesis = new(Genesis).MustCommit(db)
+		genesis = MustCommitGenesis(db, new(genesisT.Genesis))
 		engine  = ethash.NewFullFaker()
 		gendb   = rawdb.NewMemoryDatabase()
 

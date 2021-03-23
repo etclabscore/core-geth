@@ -126,7 +126,7 @@ func newTester(t *testing.T, confOverride func(*ethconfig.Config)) *tester {
 	printer := new(bytes.Buffer)
 
 	console, err := New(Config{
-		DataDir:  stack.DataDir(),
+		DataDir:  stack.InstanceDir(),
 		DocRoot:  "testdata",
 		Client:   client,
 		Prompter: prompter,

@@ -69,7 +69,6 @@ type TxPool struct {
 
 	eip2f    bool
 	eip2028f bool
-	istanbul bool // Fork indicator whether we are in the istanbul stage.
 	eip2718  bool // Fork indicator whether we are in the eip2718 stage.
 }
 
@@ -335,8 +334,7 @@ func (pool *TxPool) setNewHead(head *types.Header) {
 	next := new(big.Int).Add(head.Number, big.NewInt(1))
 
 	pool.eip2028f = pool.config.IsEnabled(pool.config.GetEIP2028Transition, next)
-	pool.istanbul = pool.config.IsIstanbul(next)
-	pool.eip2718 = pool.config.IsBerlin(next)
+	pool.eip2718 = pool.config.IsEnabled(pool.config.GetEIP2718Transition, next)
 }
 
 // Stop stops the light transaction pool
@@ -404,7 +402,7 @@ func (pool *TxPool) validateTx(ctx context.Context, tx *types.Transaction) error
 	}
 
 	// Should supply enough intrinsic gas
-	gas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil, true, pool.eip2f, pool.eip2028f, pool.istanbul)
+	gas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil, pool.eip2f, pool.eip2028f)
 	if err != nil {
 		return err
 	}

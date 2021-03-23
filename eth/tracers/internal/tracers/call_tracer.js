@@ -20,6 +20,10 @@
 	// callstack is the current recursive call stack of the EVM execution.
 	callstack: [{}],
 
+	// getCallstackLength (optional) is used for optimisation reasons, checking from within go
+	// if the `step` method has to be called for a VM opcode.
+	getCallstackLength: function() {return this.callstack.length;},
+
 	// descended tracks whether we've just descended from an outer transaction into
 	// an inner call.
 	descended: false,
@@ -47,6 +51,7 @@
 				type:    op,
 				from:    toHex(log.contract.getAddress()),
 				input:   toHex(log.memory.slice(inOff, inEnd)),
+				gas:     log.getAvailableGas(),
 				gasIn:   log.getGas(),
 				gasCost: log.getCost(),
 				value:   '0x' + log.stack.peek(0).toString(16)
@@ -125,7 +130,7 @@
 
 			if (call.type == 'CREATE' || call.type == "CREATE2") {
 				// If the call was a CREATE, retrieve the contract address and output code
-				call.gasUsed = '0x' + bigInt(call.gasIn - call.gasCost - log.getGas()).toString(16);
+				call.gasUsed = '0x' + bigInt(call.gas - (log.getGas() - (call.gasIn - call.gasCost))).toString(16);
 				delete call.gasIn; delete call.gasCost;
 
 				var ret = log.stack.peek(0);

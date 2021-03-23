@@ -81,7 +81,6 @@ var (
 	errTimeout                 = errors.New("timeout")
 	errEmptyHeaderSet          = errors.New("empty header set by peer")
 	errPeersUnavailable        = errors.New("no peers available or all tried for download")
-	errNoAncestor              = errors.New("no common ancestor")
 	errInvalidAncestor         = errors.New("retrieved ancestor is invalid")
 	errInvalidChain            = errors.New("retrieved hash chain is invalid")
 	errInvalidBody             = errors.New("retrieved block body is invalid")

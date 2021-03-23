@@ -54,7 +54,6 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
-	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -301,46 +300,6 @@ func makeExtraData(extra []byte) []byte {
 		extra = nil
 	}
 	return extra
-}
-
-// CreateConsensusEngine creates the required type of consensus engine instance for an Ethereum service
-func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurator, config *ethash.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
-	// If proof-of-authority is requested, set it up
-	if chainConfig.GetConsensusEngineType().IsClique() {
-		return clique.New(&ctypes.CliqueConfig{
-			Period: chainConfig.GetCliquePeriod(),
-			Epoch:  chainConfig.GetCliqueEpoch(),
-		}, db)
-	}
-	// Otherwise assume proof-of-work
-	switch config.PowMode {
-	case ethash.ModeFake:
-		log.Warn("Ethash used in fake mode")
-		return ethash.NewFaker()
-	case ethash.ModePoissonFake:
-		log.Warn("Ethash used in fake Poisson mode")
-		return ethash.NewPoissonFaker()
-	case ethash.ModeTest:
-		log.Warn("Ethash used in test mode")
-		return ethash.NewTester(nil, noverify)
-	case ethash.ModeShared:
-		log.Warn("Ethash used in shared mode")
-		return ethash.NewShared()
-	default:
-		engine := ethash.New(ethash.Config{
-			CacheDir:         stack.ResolvePath(config.CacheDir),
-			CachesInMem:      config.CachesInMem,
-			CachesOnDisk:     config.CachesOnDisk,
-			CachesLockMmap:   config.CachesLockMmap,
-			DatasetDir:       config.DatasetDir,
-			DatasetsInMem:    config.DatasetsInMem,
-			DatasetsOnDisk:   config.DatasetsOnDisk,
-			DatasetsLockMmap: config.DatasetsLockMmap,
-			ECIP1099Block:    chainConfig.GetEthashECIP1099Transition(),
-		}, notify, noverify)
-		engine.SetThreads(-1) // Disable CPU mining
-		return engine
-	}
 }
 
 // APIs return the collection of RPC services the ethereum package offers.

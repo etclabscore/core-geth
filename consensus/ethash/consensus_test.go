@@ -29,6 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 type diffTest struct {
@@ -104,8 +105,8 @@ func TestDifficultyCalculators(t *testing.T) {
 		// 1 to 300 seconds diff
 		var timeDelta = uint64(1 + rand.Uint32()%3000)
 		diffBig := big.NewInt(0).SetBytes(randSlice(2, 10))
-		if diffBig.Cmp(params.MinimumDifficulty) < 0 {
-			diffBig.Set(params.MinimumDifficulty)
+		if diffBig.Cmp(vars.MinimumDifficulty) < 0 {
+			diffBig.Set(vars.MinimumDifficulty)
 		}
 		//rand.Read(difficulty)
 		header := &types.Header{
@@ -140,7 +141,7 @@ func TestDifficultyCalculators(t *testing.T) {
 }
 
 func BenchmarkDifficultyCalculator(b *testing.B) {
-	x1 := makeDifficultyCalculator(big.NewInt(1000000))
+	x1 := MakeDifficultyCalculatorU256(big.NewInt(1000000))
 	x2 := MakeDifficultyCalculatorU256(big.NewInt(1000000))
 	h := &types.Header{
 		ParentHash: common.Hash{},
@@ -152,7 +153,7 @@ func BenchmarkDifficultyCalculator(b *testing.B) {
 	b.Run("big-frontier", func(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
-			calcDifficultyFrontier(1000014, h)
+			CalcDifficultyFrontierU256(1000014, h)
 		}
 	})
 	b.Run("u256-frontier", func(b *testing.B) {
@@ -164,7 +165,7 @@ func BenchmarkDifficultyCalculator(b *testing.B) {
 	b.Run("big-homestead", func(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
-			calcDifficultyHomestead(1000014, h)
+			CalcDifficultyHomesteadU256(1000014, h)
 		}
 	})
 	b.Run("u256-homestead", func(b *testing.B) {

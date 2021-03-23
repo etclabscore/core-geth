@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"math/big"
 	"testing"
 	"time"
@@ -72,21 +71,29 @@ var blake2FMalformedInputTests = []precompiledFailureTest{
 	},
 }
 
-// allPrecompileds overrides the AllEthashProtocolChanges config.
-// YoloV2 includes EIP2537.
-// This config is Clique-based, for one.
-// For two, the chain feature isn't installed in all CliqueChainConfigs either.
-// So we override to ALL of the precompileds gathered, however hacky it may be.
-var allPrecompiles = func() map[common.Address]PrecompiledContract {
-	conf := params.AllEthashProtocolChanges
-	// TODO(ia): check this
-	zero := uint64(0)
-	err := conf.SetEIP2537Transition(&zero)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return PrecompiledContractsForConfig(conf, big.NewInt(0))
-}()
+// allPrecompiles does not map to the actual set of precompiles, as it also contains
+// repriced versions of precompiles at certain slots
+var allPrecompiles = map[common.Address]PrecompiledContract{
+	common.BytesToAddress([]byte{1}):    &ecrecover{},
+	common.BytesToAddress([]byte{2}):    &sha256hash{},
+	common.BytesToAddress([]byte{3}):    &ripemd160hash{},
+	common.BytesToAddress([]byte{4}):    &dataCopy{},
+	common.BytesToAddress([]byte{5}):    &bigModExp{eip2565: false}, // NOTE(ia): This isn't tested at 0x5 with 2565 repricing.
+	common.BytesToAddress([]byte{0xf5}): &bigModExp{eip2565: true},
+	common.BytesToAddress([]byte{6}):    &bn256AddIstanbul{},
+	common.BytesToAddress([]byte{7}):    &bn256ScalarMulIstanbul{},
+	common.BytesToAddress([]byte{8}):    &bn256PairingIstanbul{},
+	common.BytesToAddress([]byte{9}):    &blake2F{},
+	common.BytesToAddress([]byte{10}):   &bls12381G1Add{},
+	common.BytesToAddress([]byte{11}):   &bls12381G1Mul{},
+	common.BytesToAddress([]byte{12}):   &bls12381G1MultiExp{},
+	common.BytesToAddress([]byte{13}):   &bls12381G2Add{},
+	common.BytesToAddress([]byte{14}):   &bls12381G2Mul{},
+	common.BytesToAddress([]byte{15}):   &bls12381G2MultiExp{},
+	common.BytesToAddress([]byte{16}):   &bls12381Pairing{},
+	common.BytesToAddress([]byte{17}):   &bls12381MapG1{},
+	common.BytesToAddress([]byte{18}):   &bls12381MapG2{},
+}
 
 func testPrecompiled(addr string, test precompiledTest, t *testing.T) {
 	p := allPrecompiles[common.HexToAddress(addr)]

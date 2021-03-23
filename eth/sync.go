@@ -64,8 +64,8 @@ type txsync struct {
 // If it doesn't change, it means that we've stalled syncing for some reason,
 // and should disable the permapoint feature in case that's keeping
 // us on a dead chain.
-func (pm *ProtocolManager) artificialFinalitySafetyLoop() {
-	defer pm.wg.Done()
+func (h *handler) artificialFinalitySafetyLoop() {
+	defer h.wg.Done()
 
 	t := time.NewTicker(artificialFinalitySafetyInterval)
 	defer t.Stop()
@@ -73,15 +73,15 @@ func (pm *ProtocolManager) artificialFinalitySafetyLoop() {
 	for {
 		select {
 		case <-t.C:
-			if pm.blockchain.IsArtificialFinalityEnabled() {
+			if h.chain.IsArtificialFinalityEnabled() {
 				// Check if your chain has grown stale.
 				// If it has, disable artificial finality, we could be on an attacker's
 				// chain getting starved.
-				if time.Since(time.Unix(int64(pm.blockchain.CurrentHeader().Time), 0)) > artificialFinalitySafetyInterval {
-					pm.blockchain.EnableArtificialFinality(false, "reason", "stale safety interval", "interval", artificialFinalitySafetyInterval)
+				if time.Since(time.Unix(int64(h.chain.CurrentHeader().Time), 0)) > artificialFinalitySafetyInterval {
+					h.chain.EnableArtificialFinality(false, "reason", "stale safety interval", "interval", artificialFinalitySafetyInterval)
 				}
 			}
-		case <-pm.quitSync:
+		case <-h.quitSync:
 			return
 		}
 	}

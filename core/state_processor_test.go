@@ -28,6 +28,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
 	"golang.org/x/crypto/sha3"
 )
@@ -41,10 +43,10 @@ func TestStateProcessorErrors(t *testing.T) {
 		signer     = types.HomesteadSigner{}
 		testKey, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		db         = rawdb.NewMemoryDatabase()
-		gspec      = &Genesis{
+		gspec      = &genesisT.Genesis{
 			Config: params.TestChainConfig,
 		}
-		genesis       = gspec.MustCommit(db)
+		genesis       = MustCommitGenesis(db, gspec)
 		blockchain, _ = NewBlockChain(db, nil, gspec.Config, ethash.NewFaker(), vm.Config{}, nil, nil)
 	)
 	defer blockchain.Stop()

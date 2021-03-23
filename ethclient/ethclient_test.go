@@ -636,7 +636,7 @@ func TestRPCDiscover(t *testing.T) {
 		return false
 	}
 
-	methodNamesSlice := func() (names []string) {
+	responseMethods := func() (names []string) {
 		for _, m := range *res.Methods {
 			names = append(names, string(*m.Name))
 		}
@@ -645,13 +645,18 @@ func TestRPCDiscover(t *testing.T) {
 
 	over, under := []string{}, []string{}
 
-	for _, name := range methodNamesSlice {
+	// under: methods which exist in the response document,
+	// but are not contained in the canonical hardcoded list below
+	for _, name := range responseMethods {
 		if !sliceContains(allRPCMethods, name) {
 			under = append(under, name)
 		}
 	}
+
+	// over: methods which DO NOT exist in the response document,
+	// but ARE contained in the canonical hardcoded list below
 	for _, name := range allRPCMethods {
-		if !sliceContains(methodNamesSlice, name) {
+		if !sliceContains(responseMethods, name) {
 			over = append(over, name)
 		}
 	}

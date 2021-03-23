@@ -27,7 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/enr"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/trie"
 )
 
@@ -133,11 +133,11 @@ func MakeProtocols(backend Backend, network uint64, dnsdisc enode.Iterator) []p2
 // NodeInfo represents a short summary of the `eth` sub-protocol metadata
 // known about the host peer.
 type NodeInfo struct {
-	Network    uint64              `json:"network"`    // Ethereum network ID (1=Frontier, 2=Morden, Ropsten=3, Rinkeby=4)
-	Difficulty *big.Int            `json:"difficulty"` // Total difficulty of the host's blockchain
-	Genesis    common.Hash         `json:"genesis"`    // SHA3 hash of the host's genesis block
-	Config     *params.ChainConfig `json:"config"`     // Chain configuration for the fork rules
-	Head       common.Hash         `json:"head"`       // Hex hash of the host's best owned block
+	Network    uint64                   `json:"network"`    // Ethereum network ID (1=Frontier, 2=Morden, Ropsten=3, Rinkeby=4)
+	Difficulty *big.Int                 `json:"difficulty"` // Total difficulty of the host's blockchain
+	Genesis    common.Hash              `json:"genesis"`    // SHA3 hash of the host's genesis block
+	Config     ctypes.ChainConfigurator `json:"config"`     // Chain configuration for the fork rules
+	Head       common.Hash              `json:"head"`       // Hex hash of the host's best owned block
 }
 
 // nodeInfo retrieves some `eth` protocol metadata about the running host node.

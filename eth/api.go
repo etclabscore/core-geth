@@ -275,15 +275,15 @@ func (api *PrivateAdminAPI) Ecbp1100(blockNr rpc.BlockNumber) (bool, error) {
 
 // MaxPeers sets the maximum peer limit for the protocol manager and the p2p server.
 func (api *PrivateAdminAPI) MaxPeers(n int) (bool, error) {
-	api.eth.protocolManager.maxPeers = n
+	api.eth.handler.maxPeers = n
 	api.eth.p2pServer.MaxPeers = n
 
-	for i := api.eth.protocolManager.peers.Len(); i > n; i = api.eth.protocolManager.peers.Len() {
-		p := api.eth.protocolManager.peers.WorstPeer()
+	for i := api.eth.handler.peers.len(); i > n; i = api.eth.handler.peers.len() {
+		p := api.eth.handler.peers.WorstPeer()
 		if p == nil {
 			break
 		}
-		api.eth.protocolManager.removePeer(p.id)
+		api.eth.handler.removePeer(p.ID())
 	}
 	return true, nil
 }

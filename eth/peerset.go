@@ -257,3 +257,20 @@ func (ps *peerSet) close() {
 	}
 	ps.closed = true
 }
+
+// WorstPeer retrieves the known peer with the currently lowest total difficulty.
+func (ps *peerSet) WorstPeer() *ethPeer {
+	ps.lock.RLock()
+	defer ps.lock.RUnlock()
+
+	var (
+		worstPeer *ethPeer
+		worstTD   *big.Int
+	)
+	for _, p := range ps.peers {
+		if _, td := p.Head(); worstPeer == nil || td.Cmp(worstTD) < 0 {
+			worstPeer, worstTD = p, td
+		}
+	}
+	return worstPeer
+}

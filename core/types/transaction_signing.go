@@ -199,7 +199,7 @@ func (s eip2930Signer) Sender(tx *Transaction) (common.Address, error) {
 		return common.Address{}, ErrTxTypeNotSupported
 	}
 	if tx.ChainId().Cmp(s.chainId) != 0 {
-		return common.Address{}, ErrInvalidChainId
+		return common.Address{}, fmt.Errorf("%v: want: %d, got: %d", ErrInvalidChainId, s.chainId, tx.ChainId())
 	}
 	return recoverPlain(s.Hash(tx), R, S, V, true)
 }

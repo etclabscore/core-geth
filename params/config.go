@@ -248,7 +248,7 @@ var (
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
 	AllEthashProtocolChanges = &goethereum.ChainConfig{
-		ChainID:                 big.NewInt(1137),
+		ChainID:                 big.NewInt(1337),
 		HomesteadBlock:          big.NewInt(0),
 		DAOForkBlock:            nil,
 		DAOForkSupport:          false,

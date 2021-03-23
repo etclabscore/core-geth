@@ -40,7 +40,7 @@ type sigCache struct {
 func MakeSigner(config ctypes.ChainConfigurator, blockNumber *big.Int) Signer {
 	var signer Signer
 	switch {
-	case config.IsEnabled(config.GetEIP2930Transition, blockNumber): // FIXME(ia): implement EIP2930 iface method
+	case config.IsEnabled(config.GetEIP2930Transition, blockNumber):
 		signer = NewEIP2930Signer(config.GetChainID())
 	case config.IsEnabled(config.GetEIP155Transition, blockNumber):
 		signer = NewEIP155Signer(config.GetChainID())
@@ -60,12 +60,12 @@ func MakeSigner(config ctypes.ChainConfigurator, blockNumber *big.Int) Signer {
 // Use this in transaction-handling code where the current block number is unknown. If you
 // have the current block number available, use MakeSigner instead.
 func LatestSigner(config ctypes.ChainConfigurator) Signer {
-	if config.GetChainID() != nil {
+	if chainID := config.GetChainID(); chainID != nil {
 		if config.IsEnabled(config.GetEIP2930Transition, common.Big0) {
-			return NewEIP2930Signer(config.GetChainID())
+			return NewEIP2930Signer(chainID)
 		}
 		if config.IsEnabled(config.GetEIP155Transition, common.Big0) {
-			return NewEIP155Signer(config.GetChainID())
+			return NewEIP155Signer(chainID)
 		}
 	}
 	return HomesteadSigner{}

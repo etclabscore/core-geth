@@ -17,6 +17,7 @@
 package core
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -1268,19 +1269,33 @@ func TestEIP155Transition(t *testing.T) {
 		deleteAddr = common.Address{1}
 		gspec      = &genesisT.Genesis{
 			Config: &goethereum.ChainConfig{
-				ChainID:     big.NewInt(1),
-				EIP150Block: big.NewInt(0),
-				EIP155Block: big.NewInt(2), HomesteadBlock: new(big.Int),
+				ChainID:        big.NewInt(1),
+				HomesteadBlock: big.NewInt(0),
+				EIP150Block:    big.NewInt(0),
+				EIP155Block:    big.NewInt(2),
 			},
 			Alloc: genesisT.GenesisAlloc{address: {Balance: funds}, deleteAddr: {Balance: new(big.Int)}},
 		}
 		genesis = MustCommitGenesis(db, gspec)
 	)
 
+	b, _ := json.MarshalIndent(gspec, "", "    ")
+	t.Logf("genesis: %v", string(b))
+
+	if gspec.GetChainID().Cmp(common.Big0) == 0 {
+		t.Fatalf("gspec.config.chaindID==0")
+	}
+	if !gspec.Config.IsEnabled(gspec.Config.GetEIP155Transition, big.NewInt(0)) {
+		t.Fatalf("not enabled")
+	}
+	if tr := *gspec.Config.GetEIP155Transition(); tr != 2 {
+		t.Fatalf("want: 2, got: %d", tr)
+	}
+
 	blockchain, _ := NewBlockChain(db, nil, gspec.Config, ethash.NewFaker(), vm.Config{}, nil, nil)
 	defer blockchain.Stop()
 
-	blocks, _ := GenerateChain(gspec.Config, genesis, ethash.NewFaker(), db, 4, func(i int, block *BlockGen) {
+	blocks, _ := GenerateChain(gspec.Config, genesis, ethash.NewFaker(), db, 4, func(blockIndex int, block *BlockGen) {
 		var (
 			tx      *types.Transaction
 			err     error
@@ -1288,7 +1303,7 @@ func TestEIP155Transition(t *testing.T) {
 				return types.SignTx(types.NewTransaction(block.TxNonce(address), common.Address{}, new(big.Int), 21000, new(big.Int), nil), signer, key)
 			}
 		)
-		switch i {
+		switch blockIndex {
 		case 0:
 			tx, err = basicTx(types.HomesteadSigner{})
 			if err != nil {
@@ -1308,13 +1323,23 @@ func TestEIP155Transition(t *testing.T) {
 			}
 			block.AddTx(tx)
 		case 3:
+			// 0
 			tx, err = basicTx(types.HomesteadSigner{})
 			if err != nil {
 				t.Fatal(err)
 			}
 			block.AddTx(tx)
 
-			tx, err = basicTx(types.LatestSigner(gspec.Config))
+			// 1
+			if !gspec.Config.IsEnabled(gspec.Config.GetEIP155Transition, common.Big0) {
+				t.Fatalf("gspec.Config not enabled")
+			}
+			if !gspec.IsEnabled(gspec.GetEIP155Transition, common.Big0) {
+				t.Fatalf("gspec not enabled")
+			}
+			signer := types.LatestSigner(gspec.Config)
+			t.Logf("signer.type=%t", signer)
+			tx, err = basicTx(signer)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -1335,7 +1360,8 @@ func TestEIP155Transition(t *testing.T) {
 		t.Error("Expected block[3].txs[0] to not be replay protected")
 	}
 	if !block.Transactions()[1].Protected() {
-		t.Error("Expected block[3].txs[1] to be replay protected")
+		tx := block.Transactions()[1]
+		t.Errorf("Expected block[3].txs[1] to be replay protected; tx.chainid=%d", tx.ChainId())
 	}
 	if _, err := blockchain.InsertChain(blocks[4:]); err != nil {
 		t.Fatal(err)
@@ -1360,8 +1386,8 @@ func TestEIP155Transition(t *testing.T) {
 		}
 	})
 	_, err := blockchain.InsertChain(blocks)
-	if err != types.ErrInvalidChainId {
-		t.Error("expected error:", types.ErrInvalidChainId)
+	if !errors.Is(err, types.ErrInvalidChainId) {
+		t.Errorf("expected error: %q, got: %q", types.ErrInvalidChainId, err)
 	}
 }
 

@@ -123,6 +123,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		// reference tests themselves are passing.
 		forkPair, ok := writeStateTestsReferencePairs[subtest.Fork]
 		if !ok {
+			t.Logf("Skipping test (non-writing): %s", subtest.Fork)
 			continue
 		}
 

@@ -183,6 +183,9 @@ type CoreGethChainConfig struct {
 	// TODO: Document me.
 	EIP2565FBlock *big.Int `json:"eip2565FBlock,omitempty"`
 
+	// EIP2718FBlock is typed tx envelopes
+	EIP2718FBlock *big.Int `json:"eip2718FBlock,omitempty"`
+
 	// EIP-2929: Gas cost increases for state access opcodes
 	// https://eips.ethereum.org/EIPS/eip-2929
 	EIP2929FBlock *big.Int `json:"eip2929FBlock,omitempty"`

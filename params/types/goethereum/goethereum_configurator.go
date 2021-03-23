@@ -464,6 +464,20 @@ func (c *ChainConfig) SetEIP2565Transition(n *uint64) error {
 	return nil
 }
 
+func (c *ChainConfig) GetEIP2718Transition() *uint64 {
+	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+}
+
+func (c *ChainConfig) SetEIP2718Transition(n *uint64) error {
+	// yuck
+	if c.GetChainID().Cmp(common.Big1) == 0 {
+		c.BerlinBlock = setBig(c.BerlinBlock, n)
+		return nil
+	}
+	c.YoloV3Block = setBig(c.YoloV3Block, n)
+	return nil
+}
+
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

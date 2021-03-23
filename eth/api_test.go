@@ -264,7 +264,7 @@ func BenchmarkCopyConfiguratorInterface(b *testing.B) {
 func BenchmarkTestValueEquivalenceAlot(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		overrideEIP2929 := params.ClassicChainConfig.GetEIP2929Transition()
-		existingEIP2929 := params.YoloV2ChainConfig.GetEIP2929Transition()
+		existingEIP2929 := params.YoloV3ChainConfig.GetEIP2929Transition()
 		if (overrideEIP2929 == nil && existingEIP2929 != nil) ||
 			(overrideEIP2929 != nil && existingEIP2929 == nil) ||
 			(overrideEIP2929 != nil && existingEIP2929 != nil && *overrideEIP2929 != *existingEIP2929) {

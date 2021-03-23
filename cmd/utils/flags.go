@@ -1310,7 +1310,7 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "kotti")
 	case ctx.GlobalBool(GoerliFlag.Name):
 		return filepath.Join(baseDataDirPath, "goerli")
-	case ctx.GlobalBool(YoloV2Flag.Name):
+	case ctx.GlobalBool(YoloV3Flag.Name):
 		return filepath.Join(baseDataDirPath, "yolo-v2")
 	}
 	return baseDataDirPath
@@ -1411,7 +1411,7 @@ func setEthashDatasetDir(ctx *cli.Context, cfg *ethconfig.Config) {
 	case ctx.GlobalIsSet(EthashDatasetDirFlag.Name):
 		cfg.Ethash.DatasetDir = ctx.GlobalString(EthashDatasetDirFlag.Name)
 
-	case (ctx.GlobalBool(ClassicFlag.Name) || ctx.GlobalBool(MordorFlag.Name)) && cfg.Ethash.DatasetDir == eth.DefaultConfig.Ethash.DatasetDir:
+	case (ctx.GlobalBool(ClassicFlag.Name) || ctx.GlobalBool(MordorFlag.Name)) && cfg.Ethash.DatasetDir == ethconfig.Defaults.Ethash.DatasetDir:
 		// ECIP-1099 is set, use etchash dir for DAGs instead
 		home := HomeDir()
 		if runtime.GOOS == "darwin" {
@@ -1434,7 +1434,7 @@ func setEthashCacheDir(ctx *cli.Context, cfg *eth.Config) {
 	case ctx.GlobalIsSet(EthashCacheDirFlag.Name):
 		cfg.Ethash.CacheDir = ctx.GlobalString(EthashCacheDirFlag.Name)
 
-	case (ctx.GlobalBool(ClassicFlag.Name) || ctx.GlobalBool(MordorFlag.Name)) && cfg.Ethash.CacheDir == eth.DefaultConfig.Ethash.CacheDir:
+	case (ctx.GlobalBool(ClassicFlag.Name) || ctx.GlobalBool(MordorFlag.Name)) && cfg.Ethash.CacheDir == ethconfig.Defaults.Ethash.CacheDir:
 		// ECIP-1099 is set, use etchash dir for caches instead
 		cfg.Ethash.CacheDir = "etchash"
 	}
@@ -1703,7 +1703,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	if ctx.GlobalIsSet(EthProtocolsFlag.Name) {
 		protocolVersions := SplitAndTrim(ctx.GlobalString(EthProtocolsFlag.Name))
 		if len(protocolVersions) == 0 {
-			Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.DefaultProtocolVersions)), ","))
+			Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(ethconfig.Defaults.ProtocolVersions)), ","))
 		}
 
 		seenVersions := map[uint]interface{}{}
@@ -1718,7 +1718,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 			}
 
 			isValid := false
-			for _, proto := range eth.DefaultProtocolVersions {
+			for _, proto := range ethconfig.Defaults.ProtocolVersions {
 				if proto == uint(version) {
 					isValid = true
 					seenVersions[uint(version)] = nil
@@ -1727,7 +1727,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 			}
 
 			if !isValid {
-				Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.DefaultProtocolVersions)), ","))
+				Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(ethconfig.Defaults.ProtocolVersions)), ","))
 			}
 			cfg.ProtocolVersions = append(cfg.ProtocolVersions, uint(version))
 		}
@@ -1735,7 +1735,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 
 	// set default protocol versions
 	if len(cfg.ProtocolVersions) == 0 {
-		cfg.ProtocolVersions = eth.DefaultProtocolVersions
+		cfg.ProtocolVersions = ethconfig.Defaults.ProtocolVersions
 	}
 
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.
@@ -1745,7 +1745,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 			cfg.NetworkId = 1
 		}
 		SetDNSDiscoveryDefaults(cfg, params.MainnetGenesisHash)
-	case ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name):
+	case ctx.GlobalBool(RopstenFlag.Name):
 		SetDNSDiscoveryDefaults(cfg, params.RopstenGenesisHash)
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		SetDNSDiscoveryDefaults(cfg, params.RinkebyGenesisHash)
@@ -1814,14 +1814,14 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 }
 
 // SetDNSDiscoveryDefaults2 configures DNS discovery with the given URL if no URLs are set.
-func SetDNSDiscoveryDefaults2(cfg *eth.Config, url string) {
-	if cfg.DiscoveryURLs != nil {
+func SetDNSDiscoveryDefaults2(cfg *ethconfig.Config, url string) {
+	if cfg.EthDiscoveryURLs != nil {
 		return
 	}
 	if cfg.SyncMode == downloader.LightSync {
 		url = strings.Replace(url, "@all.", "@les.", 1)
 	}
-	cfg.DiscoveryURLs = []string{url}
+	cfg.EthDiscoveryURLs = []string{url}
 }
 
 // SetDNSDiscoveryDefaults configures DNS discovery with the given URL if
@@ -1966,7 +1966,7 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 		genesis = params.DefaultClassicGenesisBlock()
 	case ctx.GlobalBool(MordorFlag.Name):
 		genesis = params.DefaultMordorGenesisBlock()
-	case ctx.GlobalBool(LegacyTestnetFlag.Name) || ctx.GlobalBool(RopstenFlag.Name):
+	case ctx.GlobalBool(RopstenFlag.Name):
 		genesis = params.DefaultRopstenGenesisBlock()
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		genesis = params.DefaultRinkebyGenesisBlock()

@@ -41,6 +41,9 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -51,13 +54,13 @@ var (
 )
 
 type testBackend struct {
-	chainConfig *params.ChainConfig
+	chainConfig ctypes.ChainConfigurator
 	engine      consensus.Engine
 	chaindb     ethdb.Database
 	chain       *core.BlockChain
 }
 
-func newTestBackend(t *testing.T, n int, gspec *core.Genesis, generator func(i int, b *core.BlockGen)) *testBackend {
+func newTestBackend(t *testing.T, n int, gspec *genesisT.Genesis, generator func(i int, b *core.BlockGen)) *testBackend {
 	backend := &testBackend{
 		chainConfig: params.TestChainConfig,
 		engine:      ethash.NewFaker(),
@@ -67,12 +70,12 @@ func newTestBackend(t *testing.T, n int, gspec *core.Genesis, generator func(i i
 	gspec.Config = backend.chainConfig
 	var (
 		gendb   = rawdb.NewMemoryDatabase()
-		genesis = gspec.MustCommit(gendb)
+		genesis = core.MustCommitGenesis(gendb, gspec)
 	)
 	blocks, _ := core.GenerateChain(backend.chainConfig, genesis, backend.engine, gendb, n, generator)
 
 	// Import the canonical chain
-	gspec.MustCommit(backend.chaindb)
+	core.MustCommitGenesis(backend.chaindb, gspec)
 	cacheConfig := &core.CacheConfig{
 		TrieCleanLimit:    256,
 		TrieDirtyLimit:    256,
@@ -125,7 +128,7 @@ func (b *testBackend) RPCGasCap() uint64 {
 	return 25000000
 }
 
-func (b *testBackend) ChainConfig() *params.ChainConfig {
+func (b *testBackend) ChainConfig() ctypes.ChainConfigurator {
 	return b.chainConfig
 }
 
@@ -170,7 +173,7 @@ func (b *testBackend) StateAtTransaction(ctx context.Context, block *types.Block
 		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(tx.Gas())); err != nil {
 			return nil, vm.BlockContext{}, nil, nil, fmt.Errorf("transaction %#x failed: %v", tx.Hash(), err)
 		}
-		statedb.Finalise(vmenv.ChainConfig().IsEIP158(block.Number()))
+		statedb.Finalise(vmenv.ChainConfig().IsEnabled(vmenv.ChainConfig().GetEIP161dTransition, block.Number()))
 	}
 	return nil, vm.BlockContext{}, nil, nil, fmt.Errorf("transaction index %d out of range for block %#x", txIndex, block.Hash())
 }
@@ -196,10 +199,10 @@ func TestTraceCall(t *testing.T) {
 
 	// Initialize test accounts
 	accounts := newAccounts(3)
-	genesis := &core.Genesis{Alloc: core.GenesisAlloc{
-		accounts[0].addr: {Balance: big.NewInt(params.Ether)},
-		accounts[1].addr: {Balance: big.NewInt(params.Ether)},
-		accounts[2].addr: {Balance: big.NewInt(params.Ether)},
+	genesis := &genesisT.Genesis{Alloc: genesisT.GenesisAlloc{
+		accounts[0].addr: {Balance: big.NewInt(vars.Ether)},
+		accounts[1].addr: {Balance: big.NewInt(vars.Ether)},
+		accounts[2].addr: {Balance: big.NewInt(vars.Ether)},
 	}}
 	genBlocks := 10
 	signer := types.HomesteadSigner{}
@@ -326,9 +329,9 @@ func TestTraceTransaction(t *testing.T) {
 
 	// Initialize test accounts
 	accounts := newAccounts(2)
-	genesis := &core.Genesis{Alloc: core.GenesisAlloc{
-		accounts[0].addr: {Balance: big.NewInt(params.Ether)},
-		accounts[1].addr: {Balance: big.NewInt(params.Ether)},
+	genesis := &genesisT.Genesis{Alloc: genesisT.GenesisAlloc{
+		accounts[0].addr: {Balance: big.NewInt(vars.Ether)},
+		accounts[1].addr: {Balance: big.NewInt(vars.Ether)},
 	}}
 	target := common.Hash{}
 	signer := types.HomesteadSigner{}
@@ -359,10 +362,10 @@ func TestTraceBlock(t *testing.T) {
 
 	// Initialize test accounts
 	accounts := newAccounts(3)
-	genesis := &core.Genesis{Alloc: core.GenesisAlloc{
-		accounts[0].addr: {Balance: big.NewInt(params.Ether)},
-		accounts[1].addr: {Balance: big.NewInt(params.Ether)},
-		accounts[2].addr: {Balance: big.NewInt(params.Ether)},
+	genesis := &genesisT.Genesis{Alloc: genesisT.GenesisAlloc{
+		accounts[0].addr: {Balance: big.NewInt(vars.Ether)},
+		accounts[1].addr: {Balance: big.NewInt(vars.Ether)},
+		accounts[2].addr: {Balance: big.NewInt(vars.Ether)},
 	}}
 	genBlocks := 10
 	signer := types.HomesteadSigner{}

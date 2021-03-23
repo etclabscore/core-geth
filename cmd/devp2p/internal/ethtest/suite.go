@@ -126,7 +126,7 @@ func (s *Suite) TestMaliciousStatus(t *utesting.T) {
 	conn.handshake(t)
 	status := &Status{
 		ProtocolVersion: uint32(conn.ethProtocolVersion),
-		NetworkID:       s.chain.chainConfig.ChainID.Uint64(),
+		NetworkID:       s.chain.chainConfig.GetChainID().Uint64(),
 		TD:              largeNumber(2),
 		Head:            s.chain.blocks[s.chain.Len()-1].Hash(),
 		Genesis:         s.chain.blocks[0].Hash(),

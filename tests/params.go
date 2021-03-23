@@ -61,8 +61,11 @@ var MapForkNameChainspecFileState = map[string]string{
 	"ConstantinopleFix":    "constantinople_fix_test.json",
 	"EIP158ToByzantiumAt5": "eip158_to_byzantiumat5_test.json",
 	"Istanbul":             "istanbul_test.json",
+	"Berlin":               "berlin_test.json",
 	"ETC_Atlantis":         "classic_atlantis_test.json",
 	"ETC_Agharta":          "classic_agharta_test.json",
+	"ETC_Phoenix":          "classic_phoenix_test.json",
+	"ETC_Magneto":          "classic_magneto_test.json",
 }
 
 var mapForkNameChainspecFileDifficulty = map[string]string{

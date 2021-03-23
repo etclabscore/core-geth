@@ -50,15 +50,32 @@ var basePrecompiledContracts = map[common.Address]PrecompiledContract{
 	common.BytesToAddress([]byte{4}): &dataCopy{},
 }
 
+var PrecompiledContractsBLS = map[common.Address]PrecompiledContract{
+	common.BytesToAddress([]byte{10}): &bls12381G1Add{},
+	common.BytesToAddress([]byte{11}): &bls12381G1Mul{},
+	common.BytesToAddress([]byte{12}): &bls12381G1MultiExp{},
+	common.BytesToAddress([]byte{13}): &bls12381G2Add{},
+	common.BytesToAddress([]byte{14}): &bls12381G2Mul{},
+	common.BytesToAddress([]byte{15}): &bls12381G2MultiExp{},
+	common.BytesToAddress([]byte{16}): &bls12381Pairing{},
+	common.BytesToAddress([]byte{17}): &bls12381MapG1{},
+	common.BytesToAddress([]byte{18}): &bls12381MapG2{},
+}
+
+func mergeContracts(base, target map[common.Address]PrecompiledContract) {
+	for k, v := range target {
+		base[k] = v
+	}
+}
+
 // PrecompiledContractsForConfig returns a map containing valid precompiled contracts for a given point in a chain config.
 func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int) map[common.Address]PrecompiledContract {
 	// Copying to a new map is necessary because assigning to the original map
 	// creates a memory reference. Further, setting the vals to nil in case of nonconfiguration causes
 	// a panic during tests because they run asynchronously (also a valid reason for using an explicit copy).
 	precompileds := make(map[common.Address]PrecompiledContract)
-	for k, v := range basePrecompiledContracts {
-		precompileds[k] = v
-	}
+	mergeContracts(precompileds, basePrecompiledContracts)
+
 	if config.IsEnabled(config.GetEIP198Transition, bn) {
 		// TODO(ia): implement EIP2565 iface method
 		precompileds[common.BytesToAddress([]byte{5})] = &bigModExp{eip2565: config.IsEnabled(config.GetEIP2565Transition, bn)}
@@ -83,15 +100,7 @@ func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int)
 		precompileds[common.BytesToAddress([]byte{9})] = &blake2F{}
 	}
 	if config.IsEnabled(config.GetEIP2537Transition, bn) {
-		precompileds[common.BytesToAddress([]byte{10})] = &bls12381G1Add{}
-		precompileds[common.BytesToAddress([]byte{11})] = &bls12381G1Mul{}
-		precompileds[common.BytesToAddress([]byte{12})] = &bls12381G1MultiExp{}
-		precompileds[common.BytesToAddress([]byte{13})] = &bls12381G2Add{}
-		precompileds[common.BytesToAddress([]byte{14})] = &bls12381G2Mul{}
-		precompileds[common.BytesToAddress([]byte{15})] = &bls12381G2MultiExp{}
-		precompileds[common.BytesToAddress([]byte{16})] = &bls12381Pairing{}
-		precompileds[common.BytesToAddress([]byte{17})] = &bls12381MapG1{}
-		precompileds[common.BytesToAddress([]byte{18})] = &bls12381MapG2{}
+		mergeContracts(precompileds, PrecompiledContractsBLS)
 	}
 
 	return precompileds

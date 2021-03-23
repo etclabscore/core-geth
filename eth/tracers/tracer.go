@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params"
 	"gopkg.in/olebedev/go-duktape.v3"
 )
 
@@ -402,7 +403,7 @@ func New(code string, txCtx vm.TxContext) (*Tracer, error) {
 		return 1
 	})
 	tracer.vm.PushGlobalGoFunction("isPrecompiled", func(ctx *duktape.Context) int {
-		_, ok := vm.PrecompiledContractsIstanbul[common.BytesToAddress(popSlice(ctx))]
+		_, ok := vm.PrecompiledContractsForConfig(params.AllEthashProtocolChanges, big.NewInt(0))[common.BytesToAddress(popSlice(ctx))]
 		ctx.PushBoolean(ok)
 		return 1
 	})
@@ -550,8 +551,8 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 		if !jst.inited {
 			jst.ctx["block"] = env.Context.BlockNumber.Uint64()
 			// Compute intrinsic gas
-			isHomestead := env.ChainConfig().IsHomestead(env.Context.BlockNumber)
-			isIstanbul := env.ChainConfig().IsIstanbul(env.Context.BlockNumber)
+			isHomestead := env.ChainConfig().IsEnabled(env.ChainConfig().GetEIP2Transition, env.Context.BlockNumber)
+			isIstanbul := env.ChainConfig().IsEnabled(env.ChainConfig().GetEIP2028Transition, env.Context.BlockNumber)
 			var input []byte
 			if data, ok := jst.ctx["input"].([]byte); ok {
 				input = data

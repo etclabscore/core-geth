@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"reflect"
 	"runtime"
 	"sync"
 	"time"
@@ -39,7 +40,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 )
@@ -64,7 +65,7 @@ type Backend interface {
 	BlockByNumber(ctx context.Context, number rpc.BlockNumber) (*types.Block, error)
 	GetTransaction(ctx context.Context, txHash common.Hash) (*types.Transaction, common.Hash, uint64, uint64, error)
 	RPCGasCap() uint64
-	ChainConfig() *params.ChainConfig
+	ChainConfig() ctypes.ChainConfigurator
 	Engine() consensus.Engine
 	ChainDb() ethdb.Database
 	StateAtBlock(ctx context.Context, block *types.Block, reexec uint64) (*state.StateDB, func(), error)
@@ -273,7 +274,7 @@ func (api *API) traceChain(ctx context.Context, start, end *types.Block, config 
 						break
 					}
 					// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-					task.statedb.Finalise(api.backend.ChainConfig().IsEIP158(task.block.Number()))
+					task.statedb.Finalise(api.backend.ChainConfig().IsEnabled(api.backend.ChainConfig().GetEIP161dTransition, task.block.Number()))
 					task.results[i] = &txTraceResult{Result: res}
 				}
 				// Stream the result back to the user or abort on teardown
@@ -511,7 +512,7 @@ func (api *API) traceBlock(ctx context.Context, block *types.Block, config *Trac
 		}
 		// Finalize the state so any modifications are written to the trie
 		// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-		statedb.Finalise(vmenv.ChainConfig().IsEIP158(block.Number()))
+		statedb.Finalise(vmenv.ChainConfig().IsEnabled(api.backend.ChainConfig().GetEIP161dTransition, block.Number()))
 	}
 	close(jobs)
 	pend.Wait()
@@ -576,13 +577,25 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 	// Therefore, it's perfectly valid to specify `"futureForkBlock": 0`, to enable `futureFork`
 
 	if config != nil && config.Overrides != nil {
-		// Copy the config, to not screw up the main config
-		// Note: the Clique-part is _not_ deep copied
-		chainConfigCopy := new(params.ChainConfig)
-		*chainConfigCopy = *chainConfig
-		chainConfig = chainConfigCopy
-		if berlin := config.LogConfig.Overrides.BerlinBlock; berlin != nil {
-			chainConfig.BerlinBlock = berlin
+		overrideEIP2929 := config.Overrides.GetEIP2929Transition()
+		existingEIP2929 := chainConfig.GetEIP2929Transition()
+
+		// We only need to make a copy if this transition is actually going to be overridden.
+		// This very ugly logic assumes that testing value equivalence 4 times is cheaper than copying an arbitrary
+		// (and probably biggish) interface value unnecessarily.
+		if (overrideEIP2929 == nil && existingEIP2929 != nil) ||
+			(overrideEIP2929 != nil && existingEIP2929 == nil) ||
+			(overrideEIP2929 != nil && existingEIP2929 != nil && *overrideEIP2929 != *existingEIP2929) {
+
+			// Copy the config, to not screw up the main config
+			// Note: the Clique-part is _not_ deep copied
+
+			// We know that the underlying configurator value will always be a pointer.
+			chainConfig = reflect.New(reflect.ValueOf(chainConfig).Elem().Type()).Interface().(ctypes.ChainConfigurator)
+
+			if err := chainConfig.SetEIP2929Transition(overrideEIP2929); err != nil {
+				return nil, err
+			}
 			canon = false
 		}
 	}
@@ -632,7 +645,7 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 		}
 		// Finalize the state so any modifications are written to the trie
 		// Only delete empty objects if EIP158/161 (a.k.a Spurious Dragon) is in effect
-		statedb.Finalise(vmenv.ChainConfig().IsEIP158(block.Number()))
+		statedb.Finalise(vmenv.ChainConfig().IsEnabled(api.backend.ChainConfig().GetEIP161dTransition, block.Number()))
 
 		// If we've traced the transaction we were looking for, abort
 		if tx.Hash() == txHash {

@@ -3055,9 +3055,9 @@ func TestEIP2718Transition(t *testing.T) {
 		key, _  = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		address = crypto.PubkeyToAddress(key.PublicKey)
 		funds   = big.NewInt(1000000000)
-		gspec   = &Genesis{
+		gspec   = &genesisT.Genesis{
 			Config: params.YoloV3ChainConfig,
-			Alloc: GenesisAlloc{
+			Alloc: genesisT.GenesisAlloc{
 				address: {Balance: funds},
 				// The address 0xAAAA sloads 0x00 and 0x01
 				aa: {
@@ -3072,7 +3072,7 @@ func TestEIP2718Transition(t *testing.T) {
 				},
 			},
 		}
-		genesis = gspec.MustCommit(db)
+		genesis = MustCommitGenesis(db, gspec)
 	)
 
 	blocks, _ := GenerateChain(gspec.Config, genesis, engine, db, 1, func(i int, b *BlockGen) {
@@ -3081,7 +3081,7 @@ func TestEIP2718Transition(t *testing.T) {
 		// One transaction to 0xAAAA
 		signer := types.LatestSigner(gspec.Config)
 		tx, _ := types.SignNewTx(key, signer, &types.AccessListTx{
-			ChainID:  gspec.Config.ChainID,
+			ChainID:  gspec.Config.GetChainID(),
 			Nonce:    0,
 			To:       &aa,
 			Gas:      30000,
@@ -3096,7 +3096,7 @@ func TestEIP2718Transition(t *testing.T) {
 
 	// Import the canonical chain
 	diskdb := rawdb.NewMemoryDatabase()
-	gspec.MustCommit(diskdb)
+	genesis = MustCommitGenesis(diskdb, gspec)
 
 	chain, err := NewBlockChain(diskdb, nil, gspec.Config, engine, vm.Config{}, nil, nil)
 	if err != nil {
@@ -3109,7 +3109,7 @@ func TestEIP2718Transition(t *testing.T) {
 	block := chain.GetBlockByNumber(1)
 
 	// Expected gas is intrinsic + 2 * pc + hot load + cold load, since only one load is in the access list
-	expected := vars.TxGas + params.TxAccessListAddressGas + params.TxAccessListStorageKeyGas + vm.GasQuickStep*2 + vm.WarmStorageReadCostEIP2929 + vm.ColdSloadCostEIP2929
+	expected := vars.TxGas + vars.TxAccessListAddressGas + vars.TxAccessListStorageKeyGas + vm.GasQuickStep*2 + vm.WarmStorageReadCostEIP2929 + vm.ColdSloadCostEIP2929
 	if block.GasUsed() != expected {
 		t.Fatalf("incorrect amount of gas spent: expected %d, got %d", expected, block.GasUsed())
 

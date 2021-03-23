@@ -207,7 +207,7 @@ func TestTraceCall(t *testing.T) {
 		// Transfer from account[0] to account[1]
 		//    value: 1000 wei
 		//    fee:   0 wei
-		tx, _ := types.SignTx(types.NewTransaction(uint64(i), accounts[1].addr, big.NewInt(1000), params.TxGas, big.NewInt(0), nil), signer, accounts[0].key)
+		tx, _ := types.SignTx(types.NewTransaction(uint64(i), accounts[1].addr, big.NewInt(1000), vars.TxGas, big.NewInt(0), nil), signer, accounts[0].key)
 		b.AddTx(tx)
 	}))
 
@@ -229,7 +229,7 @@ func TestTraceCall(t *testing.T) {
 			config:    nil,
 			expectErr: nil,
 			expect: &ethapi.ExecutionResult{
-				Gas:         params.TxGas,
+				Gas:         vars.TxGas,
 				Failed:      false,
 				ReturnValue: "",
 				StructLogs:  []ethapi.StructLogRes{},
@@ -246,7 +246,7 @@ func TestTraceCall(t *testing.T) {
 			config:    nil,
 			expectErr: nil,
 			expect: &ethapi.ExecutionResult{
-				Gas:         params.TxGas,
+				Gas:         vars.TxGas,
 				Failed:      false,
 				ReturnValue: "",
 				StructLogs:  []ethapi.StructLogRes{},
@@ -275,7 +275,7 @@ func TestTraceCall(t *testing.T) {
 			config:    nil,
 			expectErr: nil,
 			expect: &ethapi.ExecutionResult{
-				Gas:         params.TxGas,
+				Gas:         vars.TxGas,
 				Failed:      false,
 				ReturnValue: "",
 				StructLogs:  []ethapi.StructLogRes{},
@@ -292,7 +292,7 @@ func TestTraceCall(t *testing.T) {
 			config:    nil,
 			expectErr: nil,
 			expect: &ethapi.ExecutionResult{
-				Gas:         params.TxGas,
+				Gas:         vars.TxGas,
 				Failed:      false,
 				ReturnValue: "",
 				StructLogs:  []ethapi.StructLogRes{},
@@ -336,7 +336,7 @@ func TestTraceTransaction(t *testing.T) {
 		// Transfer from account[0] to account[1]
 		//    value: 1000 wei
 		//    fee:   0 wei
-		tx, _ := types.SignTx(types.NewTransaction(uint64(i), accounts[1].addr, big.NewInt(1000), params.TxGas, big.NewInt(0), nil), signer, accounts[0].key)
+		tx, _ := types.SignTx(types.NewTransaction(uint64(i), accounts[1].addr, big.NewInt(1000), vars.TxGas, big.NewInt(0), nil), signer, accounts[0].key)
 		b.AddTx(tx)
 		target = tx.Hash()
 	}))
@@ -345,7 +345,7 @@ func TestTraceTransaction(t *testing.T) {
 		t.Errorf("Failed to trace transaction %v", err)
 	}
 	if !reflect.DeepEqual(result, &ethapi.ExecutionResult{
-		Gas:         params.TxGas,
+		Gas:         vars.TxGas,
 		Failed:      false,
 		ReturnValue: "",
 		StructLogs:  []ethapi.StructLogRes{},
@@ -370,7 +370,7 @@ func TestTraceBlock(t *testing.T) {
 		// Transfer from account[0] to account[1]
 		//    value: 1000 wei
 		//    fee:   0 wei
-		tx, _ := types.SignTx(types.NewTransaction(uint64(i), accounts[1].addr, big.NewInt(1000), params.TxGas, big.NewInt(0), nil), signer, accounts[0].key)
+		tx, _ := types.SignTx(types.NewTransaction(uint64(i), accounts[1].addr, big.NewInt(1000), vars.TxGas, big.NewInt(0), nil), signer, accounts[0].key)
 		b.AddTx(tx)
 	}))
 
@@ -395,7 +395,7 @@ func TestTraceBlock(t *testing.T) {
 			expect: []*txTraceResult{
 				{
 					Result: &ethapi.ExecutionResult{
-						Gas:         params.TxGas,
+						Gas:         vars.TxGas,
 						Failed:      false,
 						ReturnValue: "",
 						StructLogs:  []ethapi.StructLogRes{},
@@ -418,7 +418,7 @@ func TestTraceBlock(t *testing.T) {
 			expect: []*txTraceResult{
 				{
 					Result: &ethapi.ExecutionResult{
-						Gas:         params.TxGas,
+						Gas:         vars.TxGas,
 						Failed:      false,
 						ReturnValue: "",
 						StructLogs:  []ethapi.StructLogRes{},
@@ -434,7 +434,7 @@ func TestTraceBlock(t *testing.T) {
 			expect: []*txTraceResult{
 				{
 					Result: &ethapi.ExecutionResult{
-						Gas:         params.TxGas,
+						Gas:         vars.TxGas,
 						Failed:      false,
 						ReturnValue: "",
 						StructLogs:  []ethapi.StructLogRes{},

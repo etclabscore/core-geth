@@ -304,8 +304,8 @@ func checkMainnet(ctx *cli.Context) bool {
 	case ctx.GlobalIsSet(utils.KottiFlag.Name):
 		log.Info("Starting Geth on Kotti testnet...")
 
-	case ctx.GlobalIsSet(utils.YoloV2Flag.Name):
-		log.Info("Starting Geth on YoloV2 testnet...")
+	case ctx.GlobalIsSet(utils.YoloV3Flag.Name):
+		log.Info("Starting Geth on YoloV3 testnet...")
 
 	case !ctx.GlobalIsSet(utils.NetworkIdFlag.Name):
 		log.Info("Starting Geth on Ethereum mainnet...")

@@ -111,7 +111,7 @@ func SignNewTx(prv *ecdsa.PrivateKey, s Signer, txdata TxData) (*Transaction, er
 func MustSignNewTx(prv *ecdsa.PrivateKey, s Signer, txdata TxData) *Transaction {
 	tx, err := SignNewTx(prv, s, txdata)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("%w: signer=%T", err, s))
 	}
 	return tx
 }

@@ -36,7 +36,9 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
 )
 
@@ -89,8 +91,8 @@ func testForkIDSplit(t *testing.T, protocol uint) {
 	var (
 		engine = ethash.NewFaker()
 
-		configNoFork  = &params.ChainConfig{HomesteadBlock: big.NewInt(1)}
-		configProFork = &params.ChainConfig{
+		configNoFork  = &goethereum.ChainConfig{HomesteadBlock: big.NewInt(1)}
+		configProFork = &goethereum.ChainConfig{
 			HomesteadBlock: big.NewInt(1),
 			EIP150Block:    big.NewInt(2),
 			EIP155Block:    big.NewInt(2),
@@ -100,11 +102,11 @@ func testForkIDSplit(t *testing.T, protocol uint) {
 		dbNoFork  = rawdb.NewMemoryDatabase()
 		dbProFork = rawdb.NewMemoryDatabase()
 
-		gspecNoFork  = &core.Genesis{Config: configNoFork}
-		gspecProFork = &core.Genesis{Config: configProFork}
+		gspecNoFork  = &genesisT.Genesis{Config: configNoFork}
+		gspecProFork = &genesisT.Genesis{Config: configProFork}
 
-		genesisNoFork  = gspecNoFork.MustCommit(dbNoFork)
-		genesisProFork = gspecProFork.MustCommit(dbProFork)
+		genesisNoFork  = core.MustCommitGenesis(dbNoFork, gspecNoFork)
+		genesisProFork = core.MustCommitGenesis(dbProFork, gspecProFork)
 
 		chainNoFork, _  = core.NewBlockChain(dbNoFork, nil, configNoFork, engine, vm.Config{}, nil, nil)
 		chainProFork, _ = core.NewBlockChain(dbProFork, nil, configProFork, engine, vm.Config{}, nil, nil)
@@ -519,7 +521,7 @@ func testCheckpointChallenge(t *testing.T, syncmode downloader.SyncMode, checkpo
 	}
 	var response *types.Header
 	if checkpoint {
-		number := (uint64(rand.Intn(500))+1)*params.CHTFrequency - 1
+		number := (uint64(rand.Intn(500))+1)*vars.CHTFrequency - 1
 		response = &types.Header{Number: big.NewInt(int64(number)), Extra: []byte("valid")}
 
 		handler.handler.checkpointNumber = number

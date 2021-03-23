@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/ethconfig"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -193,7 +194,7 @@ func createNode(t *testing.T, gqlEnabled bool) *node.Node {
 func createGQLService(t *testing.T, stack *node.Node) {
 	// create backend
 	ethConf := &ethconfig.Config{
-		Genesis: &core.Genesis{
+		Genesis: &genesisT.Genesis{
 			Config:     params.AllEthashProtocolChanges,
 			GasLimit:   11500000,
 			Difficulty: big.NewInt(1048576),

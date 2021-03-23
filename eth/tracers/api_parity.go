@@ -73,8 +73,8 @@ func NewTraceAPI(debugAPI *API) *TraceAPI {
 	return &TraceAPI{debugAPI: debugAPI}
 }
 
-// TraceBlockReward retrieve the block reward for the coinbase address
-func (api *TraceAPI) TraceBlockReward(ctx context.Context, block *types.Block, config *TraceConfig) (*ParityTrace, error) {
+// traceBlockReward retrieve the block reward for the coinbase address
+func (api *TraceAPI) traceBlockReward(ctx context.Context, block *types.Block, config *TraceConfig) (*ParityTrace, error) {
 	chainConfig := api.debugAPI.backend.ChainConfig()
 	minerReward, _ := ethash.GetRewards(chainConfig, block.Header(), block.Uncles())
 
@@ -95,8 +95,8 @@ func (api *TraceAPI) TraceBlockReward(ctx context.Context, block *types.Block, c
 	return tr, nil
 }
 
-// TraceBlockUncleRewards retrieve the block rewards for uncle addresses
-func (api *TraceAPI) TraceBlockUncleRewards(ctx context.Context, block *types.Block, config *TraceConfig) ([]*ParityTrace, error) {
+// traceBlockUncleRewards retrieve the block rewards for uncle addresses
+func (api *TraceAPI) traceBlockUncleRewards(ctx context.Context, block *types.Block, config *TraceConfig) ([]*ParityTrace, error) {
 	chainConfig := api.debugAPI.backend.ChainConfig()
 	_, uncleRewards := ethash.GetRewards(chainConfig, block.Header(), block.Uncles())
 
@@ -138,12 +138,12 @@ func (api *TraceAPI) Block(ctx context.Context, number rpc.BlockNumber, config *
 		return nil, err
 	}
 
-	traceReward, err := api.TraceBlockReward(ctx, block, config)
+	traceReward, err := api.traceBlockReward(ctx, block, config)
 	if err != nil {
 		return nil, err
 	}
 
-	traceUncleRewards, err := api.TraceBlockUncleRewards(ctx, block, config)
+	traceUncleRewards, err := api.traceBlockUncleRewards(ctx, block, config)
 	if err != nil {
 		return nil, err
 	}

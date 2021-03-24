@@ -234,6 +234,9 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 	case ethash.ModeShared:
 		log.Warn("Ethash used in shared mode")
 		return ethash.NewShared()
+	case ethash.ModePoissonFake:
+		log.Warn("Ethash used in fake Poisson mode")
+		return ethash.NewPoissonFaker()
 	default:
 		engine := ethash.New(ethash.Config{
 			CacheDir:         stack.ResolvePath(config.CacheDir),

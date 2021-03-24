@@ -143,9 +143,12 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		t.Run(key, func(t *testing.T) {
 			withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
 				err := test.RunSetPost(subtest, vmconfig)
+				if err != nil {
+					t.Fatalf("Error encountered at RunSetPost: %v", err)
+				}
 
 				// Only write the test once, after all subtests have been written.
-				if err == nil && filledPostStates(test.json.Post[subtest.Fork]) {
+				if filledPostStates(test.json.Post[subtest.Fork]) {
 					b, err := json.MarshalIndent(test, "", "    ")
 					if err != nil {
 						return err
@@ -165,8 +168,6 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 						panic(err)
 					}
 					t.Logf("Wrote test file: %s\n", fpath)
-				} else {
-					t.Errorf("Error encountered at RunSetPost: %v", err)
 				}
 				return nil
 			})

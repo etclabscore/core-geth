@@ -2015,6 +2015,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 				DatasetsInMem:    ethconfig.Defaults.Ethash.DatasetsInMem,
 				DatasetsOnDisk:   ethconfig.Defaults.Ethash.DatasetsOnDisk,
 				DatasetsLockMmap: ethconfig.Defaults.Ethash.DatasetsLockMmap,
+				ECIP1099Block:    config.GetEthashECIP1099Transition(),
 			}, nil, false)
 		}
 	}

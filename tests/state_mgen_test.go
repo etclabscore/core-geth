@@ -114,8 +114,6 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		}
 	}
 
-	return
-
 	for _, subtest := range test.Subtests(nil) {
 		subtest := subtest
 

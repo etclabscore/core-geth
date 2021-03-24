@@ -141,36 +141,34 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
 
 		t.Run(key, func(t *testing.T) {
-			withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
-				err := test.RunSetPost(subtest, vmconfig)
+			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
+
+			err := test.RunSetPost(subtest, vmConfig)
+			if err != nil {
+				t.Fatalf("Error encountered at RunSetPost: %v", err)
+			}
+
+			// Only write the test once, after all subtests have been written.
+			if filledPostStates(test.json.Post[subtest.Fork]) {
+				b, err := json.MarshalIndent(test, "", "    ")
 				if err != nil {
-					t.Fatalf("Error encountered at RunSetPost: %v", err)
+					t.Fatalf("Error marshaling JSON: %v", err)
 				}
-
-				// Only write the test once, after all subtests have been written.
-				if filledPostStates(test.json.Post[subtest.Fork]) {
-					b, err := json.MarshalIndent(test, "", "    ")
-					if err != nil {
-						return err
-					}
-					fi, err := ioutil.ReadFile(fpath)
-					if err != nil {
-						t.Fatal("Error reading file, and will not write:", fpath, "test", string(b))
-						return nil
-					}
-					test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, head)
-					test.json.Info.Parent = submoduleParentRef
-					test.json.Info.ParentSha1Sum = fmt.Sprintf("%x", sha1.Sum(fi))
-					test.json.Info.Chainspecs = chainspecRefsState
-
-					err = ioutil.WriteFile(fpath, b, os.ModePerm)
-					if err != nil {
-						panic(err)
-					}
-					t.Logf("Wrote test file: %s\n", fpath)
+				fi, err := ioutil.ReadFile(fpath)
+				if err != nil {
+					t.Fatal("Error reading file, and will not write:", fpath, "test", string(b))
 				}
-				return nil
-			})
+				test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, head)
+				test.json.Info.Parent = submoduleParentRef
+				test.json.Info.ParentSha1Sum = fmt.Sprintf("%x", sha1.Sum(fi))
+				test.json.Info.Chainspecs = chainspecRefsState
+
+				err = ioutil.WriteFile(fpath, b, os.ModePerm)
+				if err != nil {
+					panic(err)
+				}
+				t.Logf("Wrote test file: %s\n", fpath)
+			}
 		})
 	}
 }

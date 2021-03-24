@@ -142,6 +142,7 @@
         "minGasLimit": "0x1388",
         "gasLimitBoundDivisor": "0x400",
         "networkID": "0x0",
+        "chainID": "0x0",
         "maxCodeSize": "0x6000",
         "eip140Transition": "0x0",
         "eip211Transition": "0x0",
@@ -179,6 +180,14 @@
                                 "word": 0
                             }
                         }
+                    },
+                    "0x0": {
+                        "price": {
+                            "linear": {
+                                "base": 3000,
+                                "word": 0
+                            }
+                        }
                     }
                 }
             }
@@ -188,6 +197,14 @@
             "builtin": {
                 "name": "sha256",
                 "pricing": {
+                    "0x0": {
+                        "price": {
+                            "linear": {
+                                "base": 60,
+                                "word": 2
+                            }
+                        }
+                    },
                     "0x0": {
                         "price": {
                             "linear": {
@@ -211,6 +228,14 @@
                                 "word": 1
                             }
                         }
+                    },
+                    "0x0": {
+                        "price": {
+                            "linear": {
+                                "base": 600,
+                                "word": 1
+                            }
+                        }
                     }
                 }
             }
@@ -220,6 +245,14 @@
             "builtin": {
                 "name": "identity",
                 "pricing": {
+                    "0x0": {
+                        "price": {
+                            "linear": {
+                                "base": 15,
+                                "word": 3
+                            }
+                        }
+                    },
                     "0x0": {
                         "price": {
                             "linear": {

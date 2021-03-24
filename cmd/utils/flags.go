@@ -1429,7 +1429,7 @@ func setEthashDatasetDir(ctx *cli.Context, cfg *ethconfig.Config) {
 	}
 }
 
-func setEthashCacheDir(ctx *cli.Context, cfg *ethconfig.Config) {
+func setEthashCacheDir(ctx *cli.Context, cfg *eth.Config) {
 	switch {
 	case ctx.GlobalIsSet(EthashCacheDirFlag.Name):
 		cfg.Ethash.CacheDir = ctx.GlobalString(EthashCacheDirFlag.Name)
@@ -1440,7 +1440,7 @@ func setEthashCacheDir(ctx *cli.Context, cfg *ethconfig.Config) {
 	}
 }
 
-func setEthash(ctx *cli.Context, cfg *ethconfig.Config) {
+func setEthash(ctx *cli.Context, cfg *eth.Config) {
 	// ECIP-1099
 	setEthashCacheDir(ctx, cfg)
 	setEthashDatasetDir(ctx, cfg)
@@ -1642,7 +1642,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		// If snap-sync is requested, this flag is also required
 		if cfg.SyncMode == downloader.SnapSync {
 			log.Info("Snap sync requested, enabling --snapshot")
-			// NOTE(ia): Does this actually enable --snapshot??
 		} else {
 			cfg.TrieCleanCache += cfg.SnapshotCache
 			cfg.SnapshotCache = 0 // Disabled
@@ -1676,7 +1675,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	if ctx.GlobalIsSet(RPCGlobalTxFeeCapFlag.Name) {
 		cfg.RPCTxFeeCap = ctx.GlobalFloat64(RPCGlobalTxFeeCapFlag.Name)
 	}
-	// NOTE(ia): Check this; DNSDiscovery, SnapDiscovery, default values, helper methods, etc.
 	if ctx.GlobalIsSet(NoDiscoverFlag.Name) {
 		cfg.EthDiscoveryURLs, cfg.SnapDiscoveryURLs = []string{}, []string{}
 	} else if ctx.GlobalIsSet(DNSDiscoveryFlag.Name) {
@@ -2008,7 +2006,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 		if ctx.GlobalBool(FakePoWPoissonFlag.Name) {
 			engine = ethash.NewPoissonFaker()
 		} else if !ctx.GlobalBool(FakePoWFlag.Name) {
-			c := ethash.Config{
+			engine = ethash.New(ethash.Config{
 				CacheDir:         stack.ResolvePath(ethconfig.Defaults.Ethash.CacheDir),
 				CachesInMem:      ethconfig.Defaults.Ethash.CachesInMem,
 				CachesOnDisk:     ethconfig.Defaults.Ethash.CachesOnDisk,
@@ -2018,9 +2016,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 				DatasetsOnDisk:   ethconfig.Defaults.Ethash.DatasetsOnDisk,
 				DatasetsLockMmap: ethconfig.Defaults.Ethash.DatasetsLockMmap,
 				ECIP1099Block:    config.GetEthashECIP1099Transition(),
-			}
-			engine = ethash.New(c, nil, false)
-			log.Info("Ethash configured", "config", c)
+			}, nil, false)
 		}
 	}
 	if gcmode := ctx.GlobalString(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {

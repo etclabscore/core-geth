@@ -114,8 +114,6 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		}
 	}
 
-	return
-
 	for _, subtest := range test.Subtests(nil) {
 		subtest := subtest
 
@@ -125,7 +123,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		// reference tests themselves are passing.
 		forkPair, ok := writeStateTestsReferencePairs[subtest.Fork]
 		if !ok {
-			// t.Logf("Skipping test (non-writing): %s", subtest.Fork)
+			t.Logf("Skipping test (non-writing): %s", subtest.Fork)
 			continue
 		}
 
@@ -154,7 +152,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 					}
 					fi, err := ioutil.ReadFile(fpath)
 					if err != nil {
-						t.Fatal("Error reading file, and will not write:", fpath, "test", string(b))
+						t.Fatal("Not writing file: ", fpath, "test", string(b))
 						return nil
 					}
 					test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, head)
@@ -166,9 +164,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 					if err != nil {
 						panic(err)
 					}
-					t.Logf("Wrote test file: %s\n", fpath)
-				} else {
-					t.Errorf("Error encountered at RunSetPost: %v", err)
+					t.Log("Wrote test file: ", fpath)
 				}
 				return nil
 			})

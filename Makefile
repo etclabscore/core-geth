@@ -113,13 +113,13 @@ tests-generate-state: ## Generate state tests.
 	@echo "Generating state tests."
 	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on \
 	env COREGETH_TESTS_GENERATE_STATE_TESTS=on \
-	go run build/ci.go test -v ./tests -run TestGenState
+	go run build/ci.go test -p 1 ./tests -run TestGenState
 
 tests-generate-difficulty: ## Generate difficulty tests.
 	@echo "Generating difficulty tests."
 	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on \
 	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
-	go run build/ci.go test -v ./tests -run TestDifficultyGen
+	go run build/ci.go test -p 1 ./tests -run TestDifficultyGen
 
 lint: ## Run linters.
 	$(GORUN) build/ci.go lint

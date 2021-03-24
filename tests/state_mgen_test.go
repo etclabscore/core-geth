@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -110,7 +111,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 			}
 			sum := sha1.Sum(b)
 			chainspecRefsState[subtest.Fork] = chainspecRef{filepath.Base(filename), sum[:]}
-			t.Logf("Created new fork chainspec file: %v", chainspecRefsState[subtest.Fork])
+			log.Printf("Created new fork chainspec file: %v", chainspecRefsState[subtest.Fork])
 		}
 	}
 
@@ -123,7 +124,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		// reference tests themselves are passing.
 		forkPair, ok := writeStateTestsReferencePairs[subtest.Fork]
 		if !ok {
-			// t.Logf("Skipping test (non-writing): %s", subtest.Fork)
+			// log.Printf("Skipping test (non-writing): %s", subtest.Fork)
 			continue
 		}
 
@@ -167,7 +168,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 				if err != nil {
 					panic(err)
 				}
-				t.Logf("Wrote test file: %s\n", fpath)
+				log.Printf("Wrote test file: %s\n", fpath)
 			}
 		})
 	}

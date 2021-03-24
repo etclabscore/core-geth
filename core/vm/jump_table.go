@@ -174,15 +174,12 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 	if config.IsEnabled(config.GetECIP1080Transition, bn) {
 		enableSelfBalance(&instructionSet)
 	}
-
 	if config.IsEnabled(config.GetEIP2200Transition, bn) && !config.IsEnabled(config.GetEIP2200DisableTransition, bn) {
 		enable2200(&instructionSet) // Net metered SSTORE - https://eips.ethereum.org/EIPS/eip-2200
 	}
-
 	if config.IsEnabled(config.GetEIP2929Transition, bn) {
 		enable2929(&instructionSet) // Access lists for trie accesses https://eips.ethereum.org/EIPS/eip-2929
 	}
-
 	return instructionSet
 }
 

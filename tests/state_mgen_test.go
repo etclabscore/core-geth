@@ -121,26 +121,24 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		// Note that using this function implies that you trust the test runner
 		// to give valid output, ie. only generate tests after you're sure the
 		// reference tests themselves are passing.
-		forkPair, ok := writeStateTestsReferencePairs[subtest.Fork]
+		targetFork, ok := writeStateTestsReferencePairs[subtest.Fork]
 		if !ok {
 			// t.Logf("Skipping test (non-writing): %s", subtest.Fork)
 			continue
 		}
 
-		if _, ok := test.json.Post[forkPair]; !ok {
-			test.json.Post[forkPair] = make([]stPostState, len(test.json.Post[subtest.Fork]))
+		if _, ok := test.json.Post[targetFork]; !ok {
+			test.json.Post[targetFork] = make([]stPostState, len(test.json.Post[subtest.Fork]))
 		}
 
 		// Initialize the subtest/index data by copy from reference.
-		reftestFork := subtest.Fork
-		test.json.Post[forkPair][subtest.Index] = test.json.Post[reftestFork][subtest.Index]
+		referenceFork := subtest.Fork
+		test.json.Post[targetFork][subtest.Index] = test.json.Post[referenceFork][subtest.Index]
 
 		// Set new fork name, so new test config will be used instead.
-		subtest.Fork = forkPair
+		subtest.Fork = targetFork
 
-		key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
-
-		t.Run(key, func(t *testing.T) {
+		t.Run(fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index), func(t *testing.T) {
 			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
 
 			err := test.RunSetPost(subtest, vmConfig)
@@ -149,7 +147,8 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 			}
 
 			// Only write the test once, after all subtests have been written.
-			if filledPostStates(test.json.Post[subtest.Fork]) {
+			writeFile := filledPostStates(test.json.Post[subtest.Fork])
+			if writeFile {
 				b, err := json.MarshalIndent(test, "", "    ")
 				if err != nil {
 					t.Fatalf("Error marshaling JSON: %v", err)
@@ -167,7 +166,6 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 				if err != nil {
 					panic(err)
 				}
-				// wrote file
 			}
 
 			_, _, err = test.Run(subtest, vmConfig, false)
@@ -179,8 +177,10 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 				t.Fatalf("FAIL snap=true %v", err)
 			}
 
-			t.Logf(`Wrote test file: %s
-%s -> %s`, fpath, reftestFork, subtest.Fork)
+			if writeFile {
+				t.Logf(`Wrote test file: %s
+%s -> %s`, fpath, referenceFork, subtest.Fork)
+			}
 		})
 	}
 }

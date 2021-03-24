@@ -138,7 +138,8 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		// Set new fork name, so new test config will be used instead.
 		subtest.Fork = targetFork
 
-		t.Run(fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index), func(t *testing.T) {
+		key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
+		t.Run(key, func(t *testing.T) {
 			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
 
 			err := test.RunSetPost(subtest, vmConfig)
@@ -149,18 +150,19 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 			// Only write the test once, after all subtests have been written.
 			writeFile := filledPostStates(test.json.Post[subtest.Fork])
 			if writeFile {
-				b, err := json.MarshalIndent(test, "", "    ")
-				if err != nil {
-					t.Fatalf("Error marshaling JSON: %v", err)
-				}
 				fi, err := ioutil.ReadFile(fpath)
 				if err != nil {
-					t.Fatal("Error reading file, and will not write:", fpath, "test", string(b))
+					t.Fatal("Error reading file, and will not write:", fpath, "test", key)
 				}
 				test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, head)
 				test.json.Info.Parent = submoduleParentRef
 				test.json.Info.ParentSha1Sum = fmt.Sprintf("%x", sha1.Sum(fi))
 				test.json.Info.Chainspecs = chainspecRefsState
+
+				b, err := json.MarshalIndent(test, "", "    ")
+				if err != nil {
+					t.Fatalf("Error marshaling JSON: %v", err)
+				}
 
 				err = ioutil.WriteFile(fpath, b, os.ModePerm)
 				if err != nil {

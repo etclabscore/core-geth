@@ -143,7 +143,7 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 
 func runTestGenerating(t *testing.T, tm *testMatcher, fpath string, test *StateTest, subtest StateSubtest, head string, subtests []StateSubtest) {
 
-	// originalJSON, _ := json.MarshalIndent(test, "", "    ")
+	originalJSON, _ := json.MarshalIndent(test, "", "    ")
 
 	// Only proceed with test forks which are destined for writing.
 	// Note that using this function implies that you trust the test runner
@@ -243,36 +243,34 @@ gend.root: %s
 
 		if writeFile {
 
-			// rf := func(t *testing.T, name string, test *StateTest) {
-			// 	ssubtests := test.Subtests(nil)
-			// 	for _, subtest := range ssubtests {
-			// 		subtest := subtest
-			// 		key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
-			// 		name := name + "/" + key
-			//
-			// 		t.Run(key+"/trie", func(t *testing.T) {
-			// 			withTraceFatal(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
-			// 				_, _, err := test.Run(subtest, vmconfig, false)
-			// 				checkedErr := tm.checkFailure(t, name+"/trie", err)
-			// 				if checkedErr != nil && *testEWASM != "" {
-			// 					checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
-			// 				}
-			// 				if checkedErr != nil {
-			// 					ioutil.WriteFile("original.json", originalJSON, os.ModePerm)
-			// 					ioutil.WriteFile("generated.json", generatedJSON, os.ModePerm)
-			// 					panic(checkedErr)
-			// 				}
-			// 				return checkedErr
-			// 			})
-			// 		})
-			// 	}
-			// }
-
 			t.Logf(`Wrote test file: %s
 %s -> %s`, fpath, referenceFork, targetFork)
 
 			// // Re-run the test we just wrote
-			// tm.runTestFile(t, fpath, fpath, rf)
+			tm.runTestFile(t, fpath, fpath, func(t *testing.T, name2 string, test2 *StateTest) {
+				ssubtests := test2.Subtests(nil)
+				for _, subtest2 := range ssubtests {
+					subtest2 := subtest2
+					key := fmt.Sprintf("%s/%d", subtest2.Fork, subtest2.Index)
+					name3 := name2 + "/" + key
+
+					t.Run(key+"/trie", func(t *testing.T) {
+						withTraceFatal(t, test2.gasLimit(subtest2), func(vmconfig vm.Config) error {
+							_, _, err := test2.Run(subtest2, vmconfig, false)
+							checkedErr := tm.checkFailure(t, name3+"/trie", err)
+							if checkedErr != nil && *testEWASM != "" {
+								checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
+							}
+							if checkedErr != nil {
+								ioutil.WriteFile("original.json", originalJSON, os.ModePerm)
+								ioutil.WriteFile("generated.json", generatedJSON, os.ModePerm)
+								panic(checkedErr)
+							}
+							return checkedErr
+						})
+					})
+				}
+			})
 
 		}
 	})

@@ -157,10 +157,11 @@ func runTestGenerating(t *testing.T, tm *testMatcher, fpath string, test *StateT
 
 	// if _, ok := test.json.Post[targetFork]; !ok {
 	test.json.Post[targetFork] = make([]stPostState, len(test.json.Post[referenceFork]))
+	copy(test.json.Post[targetFork], test.json.Post[referenceFork])
 	// }
 
 	// Initialize the subtest/index data by copy from reference.
-	test.json.Post[targetFork][subtest.Index] = test.json.Post[referenceFork][subtest.Index]
+	// test.json.Post[targetFork][subtest.Index] = test.json.Post[referenceFork][subtest.Index]
 
 	// Set new fork name, so new test config will be used instead.
 	subtest.Fork = targetFork

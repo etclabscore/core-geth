@@ -133,36 +133,41 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 		}
 	}
 
-	originalJSON, _ := json.MarshalIndent(test, "", "    ")
-
 	for _, subtest := range test.Subtests(nil) {
 		subtest := subtest
+		runTestGenerating(t, tm, fpath, test, subtest, head)
+	}
+}
 
-		// Only proceed with test forks which are destined for writing.
-		// Note that using this function implies that you trust the test runner
-		// to give valid output, ie. only generate tests after you're sure the
-		// reference tests themselves are passing.
-		// eg. Istanbul => ETC_Phoenix; Berlin => ETC_Magneto
-		referenceFork := subtest.Fork
-		targetFork, ok := writeStateTestsReferencePairs[referenceFork]
-		if !ok {
-			// t.Logf("Skipping test (non-writing): %s", subtest.Fork)
-			continue
-		}
+func runTestGenerating(t *testing.T, tm *testMatcher, fpath string, test *StateTest, subtest StateSubtest, head string) {
 
-		// if _, ok := test.json.Post[targetFork]; !ok {
-		test.json.Post[targetFork] = make([]stPostState, len(test.json.Post[referenceFork]))
-		// }
+	originalJSON, _ := json.MarshalIndent(test, "", "    ")
 
-		// Initialize the subtest/index data by copy from reference.
-		test.json.Post[targetFork][subtest.Index] = test.json.Post[referenceFork][subtest.Index]
+	// Only proceed with test forks which are destined for writing.
+	// Note that using this function implies that you trust the test runner
+	// to give valid output, ie. only generate tests after you're sure the
+	// reference tests themselves are passing.
+	// eg. Istanbul => ETC_Phoenix; Berlin => ETC_Magneto
+	referenceFork := subtest.Fork
+	targetFork, ok := writeStateTestsReferencePairs[referenceFork]
+	if !ok {
+		// t.Logf("Skipping test (non-writing): %s", subtest.Fork)
+		return
+	}
 
-		// Set new fork name, so new test config will be used instead.
-		subtest.Fork = targetFork
+	// if _, ok := test.json.Post[targetFork]; !ok {
+	test.json.Post[targetFork] = make([]stPostState, len(test.json.Post[referenceFork]))
+	// }
 
-		key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
+	// Initialize the subtest/index data by copy from reference.
+	test.json.Post[targetFork][subtest.Index] = test.json.Post[referenceFork][subtest.Index]
 
-		// t.Run(key, func(t *testing.T) {
+	// Set new fork name, so new test config will be used instead.
+	subtest.Fork = targetFork
+
+	key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
+
+	t.Run(key, func(t *testing.T) {
 		vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
 
 		// This is where the magic happens.
@@ -237,6 +242,5 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 			tm.runTestFile(t, fpath, fpath, rf)
 
 		}
-		// })
-	}
+	})
 }

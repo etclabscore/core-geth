@@ -218,11 +218,8 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 									checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
 								}
 								if checkedErr != nil {
-									t.Logf(`original:
-%s
----
-new:
-%s`, string(originalJSON), string(generatedJSON))
+									ioutil.WriteFile("original.json", originalJSON, os.ModePerm)
+									ioutil.WriteFile("generated.json", generatedJSON, os.ModePerm)
 									panic(checkedErr)
 								}
 								return checkedErr

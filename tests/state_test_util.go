@@ -99,6 +99,7 @@ type stPostState struct {
 		Gas   int `json:"gas"`
 		Value int `json:"value"`
 	} `json:"indexes"`
+	filled bool `json:"-"`
 }
 
 //go:generate gencodec -type stEnv -field-override stEnvMarshaling -out gen_stenv.go

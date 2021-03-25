@@ -110,7 +110,9 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 
 	// For tests using a config that does not have an associated chainspec file,
 	// then generate that file.
-	for _, subtest := range test.Subtests(nil) {
+	subtests := test.Subtests(nil)
+
+	for _, subtest := range subtests {
 		subtest := subtest
 		if _, ok := MapForkNameChainspecFileState[subtest.Fork]; !ok {
 			genesis := test.genesis(Forks[subtest.Fork])
@@ -133,13 +135,13 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 		}
 	}
 
-	for _, subtest := range test.Subtests(nil) {
+	for _, subtest := range subtests {
 		subtest := subtest
-		runTestGenerating(t, tm, fpath, test, subtest, head)
+		runTestGenerating(t, tm, fpath, test, subtest, head, subtests)
 	}
 }
 
-func runTestGenerating(t *testing.T, tm *testMatcher, fpath string, test *StateTest, subtest StateSubtest, head string) {
+func runTestGenerating(t *testing.T, tm *testMatcher, fpath string, test *StateTest, subtest StateSubtest, head string, subtests []StateSubtest) {
 
 	originalJSON, _ := json.MarshalIndent(test, "", "    ")
 
@@ -153,6 +155,16 @@ func runTestGenerating(t *testing.T, tm *testMatcher, fpath string, test *StateT
 	if !ok {
 		// t.Logf("Skipping test (non-writing): %s", subtest.Fork)
 		return
+	}
+
+	var crossReference stPostState
+
+	for _, s := range subtests {
+		if s.Fork == targetFork {
+			// This will/would regenerate an existing test subtest.
+			crossReference = test.json.Post[s.Fork][s.Index]
+			break
+		}
 	}
 
 	// if _, ok := test.json.Post[targetFork]; !ok {
@@ -175,6 +187,21 @@ func runTestGenerating(t *testing.T, tm *testMatcher, fpath string, test *StateT
 		err := test.RunSetPost(subtest, vmConfig)
 		if err != nil {
 			t.Fatalf("Error encountered at RunSetPost: %v", err)
+		}
+
+		// Check against cross reference, if any.
+		if crossReference != (stPostState{}) {
+			if crossReference.Root != test.json.Post[targetFork][subtest.Index].Root {
+				panic(fmt.Sprintf(`cross reference failed
+referenceFork: %s
+targetFork: %s
+cross.root: %s
+gend.root: %s
+`, referenceFork,
+					targetFork,
+					crossReference.Root,
+					test.json.Post[targetFork][subtest.Index].Root))
+			}
 		}
 
 		// Only write the test once, after all subtests have been written.
@@ -213,7 +240,8 @@ func runTestGenerating(t *testing.T, tm *testMatcher, fpath string, test *StateT
 		if writeFile {
 
 			rf := func(t *testing.T, name string, test *StateTest) {
-				for _, subtest := range test.Subtests(nil) {
+				ssubtests := test.Subtests(nil)
+				for _, subtest := range ssubtests {
 					subtest := subtest
 					key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
 					name := name + "/" + key

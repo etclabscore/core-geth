@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -133,6 +134,8 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 		}
 	}
 
+	originalJSON, _ := json.MarshalIndent(test, "", "    ")
+
 	for _, subtest := range test.Subtests(nil) {
 		subtest := subtest
 
@@ -169,6 +172,7 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 
 			// Only write the test once, after all subtests have been written.
 			writeFile := filledPostStates(test.json.Post[subtest.Fork])
+			generatedJSON := []byte{}
 			if writeFile {
 				fi, err := ioutil.ReadFile(fpath)
 				if err != nil {
@@ -179,12 +183,12 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 				test.json.Info.ParentSha1Sum = fmt.Sprintf("%x", sha1.Sum(fi))
 				test.json.Info.Chainspecs = chainspecRefsState
 
-				b, err := json.MarshalIndent(test, "", "    ")
+				generatedJSON, err = json.MarshalIndent(test, "", "    ")
 				if err != nil {
 					t.Fatalf("Error marshaling JSON: %v", err)
 				}
 
-				err = ioutil.WriteFile(fpath, b, os.ModePerm)
+				err = ioutil.WriteFile(fpath, generatedJSON, os.ModePerm)
 				if err != nil {
 					panic(err)
 				}
@@ -215,6 +219,11 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 									checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
 								}
 								if checkedErr != nil {
+									log.Printf(`original:
+%s
+---
+new:
+%s`, string(originalJSON), string(generatedJSON))
 									panic(checkedErr)
 								}
 								return checkedErr

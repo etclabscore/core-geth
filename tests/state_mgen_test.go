@@ -57,8 +57,8 @@ func TestGenState(t *testing.T) {
 	//st.slow(`^stTransactionTest/Opcodes_TransactionInit`)
 
 	// Very time consuming
-	st.skipLoad(`^stTimeConsuming/`)
-	st.whitelist("stZero")
+	// st.skipLoad(`^stTimeConsuming/`)
+	// st.whitelist("stZero")
 
 	// Broken tests:
 	// Expected failures:

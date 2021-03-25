@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -219,7 +218,7 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 									checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
 								}
 								if checkedErr != nil {
-									log.Printf(`original:
+									t.Logf(`original:
 %s
 ---
 new:

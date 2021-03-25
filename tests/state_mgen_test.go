@@ -239,36 +239,36 @@ gend.root: %s
 
 		if writeFile {
 
-			rf := func(t *testing.T, name string, test *StateTest) {
-				ssubtests := test.Subtests(nil)
-				for _, subtest := range ssubtests {
-					subtest := subtest
-					key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
-					name := name + "/" + key
-
-					t.Run(key+"/trie", func(t *testing.T) {
-						withTraceFatal(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
-							_, _, err := test.Run(subtest, vmconfig, false)
-							checkedErr := tm.checkFailure(t, name+"/trie", err)
-							if checkedErr != nil && *testEWASM != "" {
-								checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
-							}
-							if checkedErr != nil {
-								ioutil.WriteFile("original.json", originalJSON, os.ModePerm)
-								ioutil.WriteFile("generated.json", generatedJSON, os.ModePerm)
-								panic(checkedErr)
-							}
-							return checkedErr
-						})
-					})
-				}
-			}
+			// rf := func(t *testing.T, name string, test *StateTest) {
+			// 	ssubtests := test.Subtests(nil)
+			// 	for _, subtest := range ssubtests {
+			// 		subtest := subtest
+			// 		key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
+			// 		name := name + "/" + key
+			//
+			// 		t.Run(key+"/trie", func(t *testing.T) {
+			// 			withTraceFatal(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
+			// 				_, _, err := test.Run(subtest, vmconfig, false)
+			// 				checkedErr := tm.checkFailure(t, name+"/trie", err)
+			// 				if checkedErr != nil && *testEWASM != "" {
+			// 					checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
+			// 				}
+			// 				if checkedErr != nil {
+			// 					ioutil.WriteFile("original.json", originalJSON, os.ModePerm)
+			// 					ioutil.WriteFile("generated.json", generatedJSON, os.ModePerm)
+			// 					panic(checkedErr)
+			// 				}
+			// 				return checkedErr
+			// 			})
+			// 		})
+			// 	}
+			// }
 
 			t.Logf(`Wrote test file: %s
 %s -> %s`, fpath, referenceFork, targetFork)
 
-			// Re-run the test we just wrote
-			tm.runTestFile(t, fpath, fpath, rf)
+			// // Re-run the test we just wrote
+			// tm.runTestFile(t, fpath, fpath, rf)
 
 		}
 	})

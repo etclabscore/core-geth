@@ -143,3 +143,14 @@ func withTrace(t *testing.T, gasLimit uint64, test func(vm.Config) error) {
 	//t.Logf("EVM output: 0x%x", tracer.Output())
 	//t.Logf("EVM error: %v", tracer.Error())
 }
+
+func withTraceFatal(t *testing.T, gasLimit uint64, test func(vm.Config) error) {
+	// Use config from command line arguments.
+	config := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
+	err := test(config)
+	if err == nil {
+		return
+	}
+
+	t.Fatal(err)
+}

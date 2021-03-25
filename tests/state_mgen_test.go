@@ -68,10 +68,10 @@ func TestGenState(t *testing.T) {
 	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/0`, "bug in test")
 	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
 
-	st.walkFullName(t, stateTestDir, withWritingTests)
+	st.walkFullName(t, stateTestDir, st.withWritingTests)
 
 	// For Istanbul, older tests were moved into LegacyTests
-	st.walkFullName(t, legacyStateTestDir, withWritingTests)
+	// st.walkFullName(t, legacyStateTestDir, st.withWritingTests)
 }
 
 var (
@@ -92,7 +92,7 @@ func debug() {
 
 }
 
-func withWritingTests(t *testing.T, name string, test *StateTest) {
+func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTest) {
 
 	// Test output is written here.
 	//fpath := filepath.Join(currentTestDir, name)
@@ -199,8 +199,31 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 			}
 
 			if writeFile {
+
+				rf := func(t *testing.T, name string, test *StateTest) {
+					for _, subtest := range test.Subtests(nil) {
+						subtest := subtest
+						key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
+						name := name + "/" + key
+
+						t.Run(key+"/trie", func(t *testing.T) {
+							withTraceFatal(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
+								_, _, err := test.Run(subtest, vmconfig, false)
+								if err != nil && *testEWASM != "" {
+									err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
+								}
+								return tm.checkFailure(t, name+"/trie", err)
+							})
+						})
+					}
+				}
+
 				t.Logf(`Wrote test file: %s
 %s -> %s`, fpath, referenceFork, subtest.Fork)
+
+				// Re-run the test we just wrote
+				tm.runTestFile(t, fpath, fpath, rf)
+
 			}
 		})
 	}

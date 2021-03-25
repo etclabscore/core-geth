@@ -142,99 +142,101 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 		// Note that using this function implies that you trust the test runner
 		// to give valid output, ie. only generate tests after you're sure the
 		// reference tests themselves are passing.
-		targetFork, ok := writeStateTestsReferencePairs[subtest.Fork]
+		// eg. Istanbul => ETC_Phoenix; Berlin => ETC_Magneto
+		referenceFork := subtest.Fork
+		targetFork, ok := writeStateTestsReferencePairs[referenceFork]
 		if !ok {
 			// t.Logf("Skipping test (non-writing): %s", subtest.Fork)
 			continue
 		}
 
-		if _, ok := test.json.Post[targetFork]; !ok {
-			test.json.Post[targetFork] = make([]stPostState, len(test.json.Post[subtest.Fork]))
-		}
+		// if _, ok := test.json.Post[targetFork]; !ok {
+		test.json.Post[targetFork] = make([]stPostState, len(test.json.Post[referenceFork]))
+		// }
 
 		// Initialize the subtest/index data by copy from reference.
-		referenceFork := subtest.Fork
 		test.json.Post[targetFork][subtest.Index] = test.json.Post[referenceFork][subtest.Index]
 
 		// Set new fork name, so new test config will be used instead.
 		subtest.Fork = targetFork
 
 		key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
-		t.Run(key, func(t *testing.T) {
-			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
 
-			// This is where the magic happens.
-			err := test.RunSetPost(subtest, vmConfig)
+		// t.Run(key, func(t *testing.T) {
+		vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
+
+		// This is where the magic happens.
+		err := test.RunSetPost(subtest, vmConfig)
+		if err != nil {
+			t.Fatalf("Error encountered at RunSetPost: %v", err)
+		}
+
+		// Only write the test once, after all subtests have been written.
+		writeFile := filledPostStates(test.json.Post[targetFork])
+		generatedJSON := []byte{}
+		if writeFile {
+			fi, err := ioutil.ReadFile(fpath)
 			if err != nil {
-				t.Fatalf("Error encountered at RunSetPost: %v", err)
+				t.Fatal("Error reading file, and will not write:", fpath, "test", key)
 			}
+			test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, head)
+			test.json.Info.Parent = submoduleParentRef
+			test.json.Info.ParentSha1Sum = fmt.Sprintf("%x", sha1.Sum(fi))
+			test.json.Info.Chainspecs = chainspecRefsState
 
-			// Only write the test once, after all subtests have been written.
-			writeFile := filledPostStates(test.json.Post[subtest.Fork])
-			generatedJSON := []byte{}
-			if writeFile {
-				fi, err := ioutil.ReadFile(fpath)
-				if err != nil {
-					t.Fatal("Error reading file, and will not write:", fpath, "test", key)
-				}
-				test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, head)
-				test.json.Info.Parent = submoduleParentRef
-				test.json.Info.ParentSha1Sum = fmt.Sprintf("%x", sha1.Sum(fi))
-				test.json.Info.Chainspecs = chainspecRefsState
-
-				generatedJSON, err = json.MarshalIndent(test, "", "    ")
-				if err != nil {
-					t.Fatalf("Error marshaling JSON: %v", err)
-				}
-
-				err = ioutil.WriteFile(fpath, generatedJSON, os.ModePerm)
-				if err != nil {
-					panic(err)
-				}
-			}
-
-			_, _, err = test.Run(subtest, vmConfig, false)
+			generatedJSON, err = json.MarshalIndent(test, "", "    ")
 			if err != nil {
-				t.Fatalf("FAIL snap=false %v", err)
+				t.Fatalf("Error marshaling JSON: %v", err)
 			}
-			_, _, err = test.Run(subtest, vmConfig, true)
+
+			err = ioutil.WriteFile(fpath, generatedJSON, os.ModePerm)
 			if err != nil {
-				t.Fatalf("FAIL snap=true %v", err)
+				panic(err)
 			}
+		}
 
-			if writeFile {
+		_, _, err = test.Run(subtest, vmConfig, false)
+		if err != nil {
+			t.Fatalf("FAIL snap=false %v", err)
+		}
+		_, _, err = test.Run(subtest, vmConfig, true)
+		if err != nil {
+			t.Fatalf("FAIL snap=true %v", err)
+		}
 
-				rf := func(t *testing.T, name string, test *StateTest) {
-					for _, subtest := range test.Subtests(nil) {
-						subtest := subtest
-						key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
-						name := name + "/" + key
+		if writeFile {
 
-						t.Run(key+"/trie", func(t *testing.T) {
-							withTraceFatal(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
-								_, _, err := test.Run(subtest, vmconfig, false)
-								checkedErr := tm.checkFailure(t, name+"/trie", err)
-								if checkedErr != nil && *testEWASM != "" {
-									checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
-								}
-								if checkedErr != nil {
-									ioutil.WriteFile("original.json", originalJSON, os.ModePerm)
-									ioutil.WriteFile("generated.json", generatedJSON, os.ModePerm)
-									panic(checkedErr)
-								}
-								return checkedErr
-							})
+			rf := func(t *testing.T, name string, test *StateTest) {
+				for _, subtest := range test.Subtests(nil) {
+					subtest := subtest
+					key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
+					name := name + "/" + key
+
+					t.Run(key+"/trie", func(t *testing.T) {
+						withTraceFatal(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
+							_, _, err := test.Run(subtest, vmconfig, false)
+							checkedErr := tm.checkFailure(t, name+"/trie", err)
+							if checkedErr != nil && *testEWASM != "" {
+								checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
+							}
+							if checkedErr != nil {
+								ioutil.WriteFile("original.json", originalJSON, os.ModePerm)
+								ioutil.WriteFile("generated.json", generatedJSON, os.ModePerm)
+								panic(checkedErr)
+							}
+							return checkedErr
 						})
-					}
+					})
 				}
-
-				t.Logf(`Wrote test file: %s
-%s -> %s`, fpath, referenceFork, subtest.Fork)
-
-				// Re-run the test we just wrote
-				tm.runTestFile(t, fpath, fpath, rf)
-
 			}
-		})
+
+			t.Logf(`Wrote test file: %s
+%s -> %s`, fpath, referenceFork, targetFork)
+
+			// Re-run the test we just wrote
+			tm.runTestFile(t, fpath, fpath, rf)
+
+		}
+		// })
 	}
 }

@@ -46,6 +46,9 @@ func (t *StateTest) RunSetPost(subtest StateSubtest, vmconfig vm.Config) error {
 // filledPostStates returns true if all poststate elems are filled (non zero-valued)
 func filledPostStates(s []stPostState) bool {
 	for _, l := range s {
+		if l == (stPostState{}) {
+			return false
+		}
 		if common.Hash(l.Root) == (common.Hash{}) {
 			return false
 		}

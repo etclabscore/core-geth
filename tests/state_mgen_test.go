@@ -58,6 +58,7 @@ func TestGenState(t *testing.T) {
 
 	// Very time consuming
 	st.skipLoad(`^stTimeConsuming/`)
+	st.whitelist("stZero")
 
 	// Broken tests:
 	// Expected failures:
@@ -209,10 +210,14 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 						t.Run(key+"/trie", func(t *testing.T) {
 							withTraceFatal(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
 								_, _, err := test.Run(subtest, vmconfig, false)
-								if err != nil && *testEWASM != "" {
-									err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
+								checkedErr := tm.checkFailure(t, name+"/trie", err)
+								if checkedErr != nil && *testEWASM != "" {
+									checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
 								}
-								return tm.checkFailure(t, name+"/trie", err)
+								if checkedErr != nil {
+									panic(checkedErr)
+								}
+								return checkedErr
 							})
 						})
 					}

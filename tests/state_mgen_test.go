@@ -160,6 +160,7 @@ func withWritingTests(t *testing.T, name string, test *StateTest) {
 		t.Run(key, func(t *testing.T) {
 			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
 
+			// This is where the magic happens.
 			err := test.RunSetPost(subtest, vmConfig)
 			if err != nil {
 				t.Fatalf("Error encountered at RunSetPost: %v", err)

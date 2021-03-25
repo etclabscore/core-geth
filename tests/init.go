@@ -157,7 +157,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 	"ETC_Phoenix": &coregeth.CoreGethChainConfig{
 		NetworkID:       1,
 		Ethash:          new(ctypes.EthashConfig),
-		ChainID:         big.NewInt(61),
+		ChainID:         big.NewInt(1),
 		EIP2FBlock:      big.NewInt(0),
 		EIP7FBlock:      big.NewInt(0),
 		EIP150Block:     big.NewInt(0),
@@ -284,7 +284,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 	"ETC_Magneto": &coregeth.CoreGethChainConfig{
 		NetworkID:       1,
 		Ethash:          new(ctypes.EthashConfig),
-		ChainID:         big.NewInt(61),
+		ChainID:         big.NewInt(1),
 		EIP2FBlock:      big.NewInt(0),
 		EIP7FBlock:      big.NewInt(0),
 		EIP150Block:     big.NewInt(0),

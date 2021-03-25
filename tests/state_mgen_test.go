@@ -74,6 +74,24 @@ func TestGenState(t *testing.T) {
 	st.walkFullName(t, legacyStateTestDir, withWritingTests)
 }
 
+var (
+	// core-geth
+	baseDirCG            = filepath.Join(".", "testdata.core-geth")
+	blockTestDirCG       = filepath.Join(baseDir, "BlockchainTests")
+	stateTestDirCG       = filepath.Join(baseDir, "GeneralStateTests")
+	legacyStateTestDirCG = filepath.Join(baseDir, "LegacyTests", "Constantinople", "GeneralStateTests")
+
+	// foundation v1.10.1
+	baseDir101            = filepath.Join(".", "testdata.ethereum")
+	blockTestDir101       = filepath.Join(baseDir, "BlockchainTests")
+	stateTestDir101       = filepath.Join(baseDir, "GeneralStateTests")
+	legacyStateTestDir101 = filepath.Join(baseDir, "LegacyTests", "Constantinople", "GeneralStateTests")
+)
+
+func debug() {
+
+}
+
 func withWritingTests(t *testing.T, name string, test *StateTest) {
 
 	// Test output is written here.

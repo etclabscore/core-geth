@@ -25,10 +25,10 @@ import (
 // The reference (key) is used to define the environment and parameters, while the
 // output from these tests run against the <value> state is actually written.
 var writeStateTestsReferencePairs = map[string]string{
-	// "Byzantium":         "ETC_Atlantis",
-	// "ConstantinopleFix": "ETC_Agharta",
-	"Istanbul": "ETC_Phoenix",
-	// "Berlin":            "ETC_Magneto",
+	"Byzantium":         "ETC_Atlantis",
+	"ConstantinopleFix": "ETC_Agharta",
+	"Istanbul":          "ETC_Phoenix",
+	"Berlin":            "ETC_Magneto",
 }
 
 // RunSetPost runs the state subtest for a given config, and writes the resulting

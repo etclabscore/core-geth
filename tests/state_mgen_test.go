@@ -143,7 +143,7 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 
 func runTestGenerating(t *testing.T, tm *testMatcher, fpath string, test *StateTest, subtest StateSubtest, head string, subtests []StateSubtest) {
 
-	originalJSON, _ := json.MarshalIndent(test, "", "    ")
+	// originalJSON, _ := json.MarshalIndent(test, "", "    ")
 
 	// Only proceed with test forks which are destined for writing.
 	// Note that using this function implies that you trust the test runner

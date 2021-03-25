@@ -152,19 +152,23 @@ func runTestGenerating(t *testing.T, tm *testMatcher, fpath string, test *StateT
 	// eg. Istanbul => ETC_Phoenix; Berlin => ETC_Magneto
 	referenceFork := subtest.Fork
 	targetFork, ok := writeStateTestsReferencePairs[referenceFork]
-	if !ok {
-		// t.Logf("Skipping test (non-writing): %s", subtest.Fork)
-		return
-	}
+	// if !ok {
+	// 	// t.Logf("Skipping test (non-writing): %s", subtest.Fork)
+	// 	return
+	// }
 
 	var crossReference stPostState
 
-	for _, s := range subtests {
-		if s.Fork == targetFork {
-			// This will/would regenerate an existing test subtest.
-			crossReference = test.json.Post[s.Fork][s.Index]
-			break
+	if ok {
+		for _, s := range subtests {
+			if s.Fork == targetFork {
+				// This will/would regenerate an existing test subtest.
+				crossReference = test.json.Post[s.Fork][s.Index]
+				break
+			}
 		}
+	} else {
+		return
 	}
 
 	// if _, ok := test.json.Post[targetFork]; !ok {

@@ -72,7 +72,7 @@ func (tg *testMatcherGen) generateFromReference(ref, target string) {
 	tg.targets = append(tg.targets, target)
 }
 
-func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback func()) func(t *testing.T, name string, test *StateTest) {
+func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCallback func()) func(t *testing.T, name string, test *StateTest) {
 	return func(t *testing.T, name string, test *StateTest) {
 
 		subtests := test.Subtests(nil)
@@ -139,6 +139,7 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback func()) 
 
 		if len(targets) == 0 {
 			t.Skip()
+			skipCallback()
 			return
 		}
 
@@ -293,7 +294,10 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 
 	// tm.runTestFile(t, name, name, tm.stateTestRunner)
 	tm.runTestFile(t, name, name, tm.stateTestsGen(testOut, func() {
-		tm.runTestFile(t, targetName, targetName, tm.stateTestRunner)
+		tm.runTestFile(t, testOutFullName, testOutFullName, tm.stateTestRunner)
+		os.Rename(testOutFullName, name)
+	}, func() {
+		os.RemoveAll(testOutFullName)
 	}))
 }
 

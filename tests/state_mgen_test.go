@@ -79,29 +79,30 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback func()) 
 		targets := map[string][]stPostState{}
 
 		for _, s := range subtests {
-			var ref, target string
+			// Lookup the reference:target pairing, if any.
+			var referenceFork, targetFork string
 			for i, r := range tm.references {
 				if r.MatchString(s.Fork) {
-					ref = s.Fork
-					target = tm.targets[i]
+					referenceFork = s.Fork
+					targetFork = tm.targets[i]
 					break
 				}
 			}
-			if ref == "" {
+			if referenceFork == "" {
 				continue
 			}
 
-			if _, ok := targets[target]; !ok {
-				subtestsLen := len(test.json.Post[s.Fork])
-				targets[target] = make([]stPostState, subtestsLen)
+			if _, ok := targets[targetFork]; !ok {
+				subtestsLen := len(test.json.Post[referenceFork])
+				targets[targetFork] = make([]stPostState, subtestsLen)
 			}
 
 			targetSubtest := StateSubtest{
-				Fork:  target,
+				Fork:  targetFork,
 				Index: s.Index,
 			}
 
-			refPostState := test.json.Post[s.Fork]
+			refPostState := test.json.Post[referenceFork]
 
 			// Initialize the post state with reference indexes.
 			// These indexes (containing gas, value, and data) are used to construct the message (tx) run
@@ -129,7 +130,7 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback func()) 
 			stPost.Root = common.UnprefixedHash(root)
 			stPost.Logs = common.UnprefixedHash(rlpHash(statedb.Logs()))
 
-			targets[target][s.Index] = stPost
+			targets[targetFork][s.Index] = stPost
 		}
 
 		// Install the generated cases to the test.
@@ -137,6 +138,7 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback func()) 
 			test.json.Post[k] = v
 		}
 		if len(targets) == 0 {
+			t.Skip()
 			return
 		}
 

@@ -57,7 +57,8 @@ type testMatcherGen struct {
 	references []*regexp.Regexp
 	targets    []string
 
-	gitHead string
+	gitHead     string
+	errorPanics bool
 }
 
 func (tg *testMatcherGen) generateFromReference(ref, target string) {
@@ -174,14 +175,21 @@ func (tm *testMatcherGen) stateTestRunner(t *testing.T, name string, test *State
 		name := name + "/" + key
 
 		t.Run(key+"/trie", func(t *testing.T) {
-			wrapFatal(t, test.gasLimit(st), func(vmconfig vm.Config) error {
-				_, _, err := test.Run(st, vmconfig, false)
-				checkedErr := tm.checkFailure(t, name+"/trie", err)
-				if checkedErr != nil && *testEWASM != "" {
-					checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
+			// vmConfig is constructed using global variables for possible EVM and EWASM interpreters.
+			// These interpreters are configured with environment variables and are assigned in an init() function.
+			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
+			_, _, err := test.Run(st, vmConfig, false)
+			checkedErr := tm.checkFailure(t, name+"/trie", err)
+			if checkedErr != nil && *testEWASM != "" {
+				checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
+			}
+			if checkedErr != nil {
+				if tm.errorPanics {
+					panic(err)
+				} else {
+					t.Fatal(err)
 				}
-				return checkedErr
-			})
+			}
 		})
 	}
 }
@@ -203,6 +211,7 @@ func TestGenStateAll(t *testing.T) {
 	tm := new(testMatcherGen)
 	tm.testMatcher = new(testMatcher)
 	tm.noParallel = true
+	tm.errorPanics = true
 	tm.gitHead = head
 
 	tm.generateFromReference("Byzantium", "ETC_Atlantis")
@@ -230,6 +239,7 @@ func TestGenStateSingles(t *testing.T) {
 	tm := new(testMatcherGen)
 	tm.testMatcher = new(testMatcher)
 	tm.noParallel = true // disable parallelism
+	tm.errorPanics = true
 	tm.gitHead = head
 
 	tm.generateFromReference("Byzantium", "ETC_Atlantis")

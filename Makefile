@@ -113,7 +113,7 @@ tests-generate-state: ## Generate state tests.
 	@echo "Generating state tests."
 	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on \
 	env COREGETH_TESTS_GENERATE_STATE_TESTS=on \
-	go test -p 1 -v -timeout 60m ./tests -run TestGenState
+	go test -p 1 -v -timeout 60m ./tests -run TestGenState2
 	#go run build/ci.go test -v -timeout 60m ./tests -run TestGenState
 
 tests-generate-difficulty: ## Generate difficulty tests.

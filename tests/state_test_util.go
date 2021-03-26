@@ -88,7 +88,7 @@ type stInfo struct {
 	WrittenWith        string                 `json:"written-with"`
 	Parent             string                 `json:"parent"`
 	ParentSha1Sum      string                 `json:"parentSha1Sum"`
-	Chainspecs         chainspecRefsT         `json:"chainspecs"`
+	Chainspecs         chainspecRefsT         `json:"chainspecs,omitempty"`
 	Labels             map[string]interface{} `json:"labels,omitempty"`
 }
 

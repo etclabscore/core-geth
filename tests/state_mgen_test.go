@@ -232,7 +232,7 @@ func TestGenStateSingles(t *testing.T) {
 	head = strings.TrimSpace(head)
 
 	files := []string{
-		// "stStaticFlagEnabled/DelegatecallToPrecompileFromContractInitialization.json",
+		filepath.Join(stateTestDir, "stStaticFlagEnabled/DelegatecallToPrecompileFromContractInitialization.json"),
 		filepath.Join(stateTestDir, "stStaticCall/StaticcallToPrecompileFromCalledContract.json"),
 	}
 
@@ -253,15 +253,15 @@ func TestGenStateSingles(t *testing.T) {
 }
 
 func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {
-	testOutFullName, err := filepath.Abs(name)
-	if err != nil {
-		t.Fatal(err)
-	}
-	testOutFullName = filepath.Clean(testOutFullName)
-	testOut, err := os.OpenFile(testOutFullName, os.O_RDWR, os.ModePerm)
-	if err != nil {
-		t.Fatal(err)
-	}
+	// testOutFullName, err := filepath.Abs(name)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	// testOutFullName = filepath.Clean(testOutFullName)
+	// testOut, err := os.OpenFile(testOutFullName, os.O_RDWR, os.ModePerm)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
 
 	// Use a temporary file instead of overwriting the original.
 	// testOut, err := ioutil.TempFile(os.TempDir(), "test-generate-state-tests")
@@ -269,9 +269,31 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 	// 	t.Fatal(err)
 	// }
 
+	targetName := strings.Replace(name, "testdata", "testdata_gen", 1)
+	err := os.MkdirAll(filepath.Dir(targetName), os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+	testOutFullName, err := filepath.Abs(targetName)
+	if err != nil {
+		panic(err)
+	}
+	testOutFullName = filepath.Clean(testOutFullName)
+	if err := os.Truncate(testOutFullName, 0); os.IsNotExist(err) {
+		if _, err := os.Create(testOutFullName); err != nil {
+			panic(err)
+		}
+	} else if err != nil {
+		panic(err)
+	}
+	testOut, err := os.OpenFile(testOutFullName, os.O_RDWR, os.ModePerm)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// tm.runTestFile(t, name, name, tm.stateTestRunner)
 	tm.runTestFile(t, name, name, tm.stateTestsGen(testOut, func() {
-		tm.runTestFile(t, testOut.Name(), testOut.Name(), tm.stateTestRunner)
+		tm.runTestFile(t, targetName, targetName, tm.stateTestRunner)
 	}))
 }
 

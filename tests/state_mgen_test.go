@@ -240,12 +240,12 @@ func TestGenStateSingles(t *testing.T) {
 
 	files := []string{
 		// "stStaticFlagEnabled/DelegatecallToPrecompileFromContractInitialization.json",
-		"stStaticCall/StaticcallToPrecompileFromCalledContract.json",
+		filepath.Join(stateTestDir, "stStaticCall/StaticcallToPrecompileFromCalledContract.json"),
 	}
 
 	tm := new(testMatcherGen)
 	tm.testMatcher = new(testMatcher)
-	tm.noParallel = true
+	tm.noParallel = true // disable parallelism
 	tm.gitHead = head
 
 	tm.generateFromReference("Byzantium", "ETC_Atlantis")
@@ -256,7 +256,6 @@ func TestGenStateSingles(t *testing.T) {
 	for _, f := range files {
 		tm.runTestFile(t, f, f, tm.testWriteTest)
 	}
-
 }
 
 func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {

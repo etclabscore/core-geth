@@ -63,6 +63,8 @@ func TestState(t *testing.T) {
 		st.skipLoad(`^stStaticCall/static_Call50000`)
 	}
 
+	// st.whitelist("StaticcallToPrecompileFromCalledContract")
+
 	// Broken tests:
 	// Expected failures:
 	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/0`, "bug in test")

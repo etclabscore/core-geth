@@ -136,13 +136,14 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback func()) 
 			targets[targetFork][s.Index] = stPost
 		}
 
-		// Install the generated cases to the test.
-		for k, v := range targets {
-			test.json.Post[k] = v
-		}
 		if len(targets) == 0 {
 			t.Skip()
 			return
+		}
+
+		// Install the generated cases to the test.
+		for k, v := range targets {
+			test.json.Post[k] = v
 		}
 
 		// Assign provenance metadata to the test.
@@ -151,15 +152,14 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback func()) 
 		// Write the augmented test to the writer.
 		generatedJSON, err := json.MarshalIndent(test, "", "    ")
 		if err != nil {
-			t.Fatalf("Error marshaling JSON: %v", err)
+			panic(err)
 		}
-
 		_, err = w.Write(generatedJSON)
 		if err != nil {
-			t.Fatal(err)
+			panic(err)
 		}
 		if err := w.Close(); err != nil {
-			t.Fatal(err)
+			panic(err)
 		}
 		writeCallback()
 	}

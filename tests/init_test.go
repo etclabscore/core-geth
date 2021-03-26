@@ -266,7 +266,8 @@ func (tm *testMatcher) runTestFile(t *testing.T, path, name string, runTest inte
 	// Load the file as map[string]<testType>.
 	m := makeMapFromTestFunc(runTest)
 	if err := readJSONFile(path, m.Addr().Interface()); err != nil {
-		t.Fatal(err)
+		panic(err)
+		// t.Fatal(err)
 	}
 
 	// Run all tests from the map. Don't wrap in a subtest if there is only one test in the file.

@@ -89,7 +89,7 @@ type stInfo struct {
 	Parent             string                 `json:"parent"`
 	ParentSha1Sum      string                 `json:"parentSha1Sum"`
 	Chainspecs         chainspecRefsT         `json:"chainspecs"`
-	Labels             map[string]interface{} `json:"labels"`
+	Labels             map[string]interface{} `json:"labels,omitempty"`
 }
 
 type stPostState struct {

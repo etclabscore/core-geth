@@ -18,6 +18,7 @@ package tests
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -96,6 +97,14 @@ func readJSONFile(fn string, value interface{}) error {
 		return err
 	}
 	defer file.Close()
+
+	stat, err := file.Stat()
+	if err != nil {
+		return err
+	}
+	if stat.Size() == 0 {
+		return errors.New("empty")
+	}
 
 	err = readJSON(file, value)
 	if err != nil {
@@ -270,7 +279,12 @@ func (tm *testMatcher) runTestFile(t *testing.T, path, name string, runTest inte
 	// Load the file as map[string]<testType>.
 	m := makeMapFromTestFunc(runTest)
 	if err := readJSONFile(path, m.Addr().Interface()); err != nil {
-		panic(err)
+		if err.Error() != "empty" {
+			panic(err)
+		} else {
+			t.Skip("Empty")
+			return
+		}
 		// t.Fatal(err)
 	}
 

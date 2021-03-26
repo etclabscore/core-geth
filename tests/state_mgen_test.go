@@ -253,24 +253,8 @@ func TestGenStateSingles(t *testing.T) {
 	}
 }
 
-func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {
-	// testOutFullName, err := filepath.Abs(name)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-	// testOutFullName = filepath.Clean(testOutFullName)
-	// testOut, err := os.OpenFile(testOutFullName, os.O_RDWR, os.ModePerm)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-
-	// Use a temporary file instead of overwriting the original.
-	// testOut, err := ioutil.TempFile(os.TempDir(), "test-generate-state-tests")
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-
-	targetName := strings.Replace(name, "testdata", "testdata_gen", 1)
+func mustTemporaryGenerationPath(originalName string) (tempPath string) {
+	targetName := strings.Replace(originalName, "testdata", "testdata_gen", 1)
 	err := os.MkdirAll(filepath.Dir(targetName), os.ModePerm)
 	if err != nil {
 		panic(err)
@@ -287,6 +271,11 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 	} else if err != nil {
 		panic(err)
 	}
+	return testOutFullName
+}
+
+func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {
+	testOutFullName := mustTemporaryGenerationPath(name)
 	testOut, err := os.OpenFile(testOutFullName, os.O_RDWR, os.ModePerm)
 	if err != nil {
 		t.Fatal(err)

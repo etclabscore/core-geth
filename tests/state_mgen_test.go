@@ -243,16 +243,10 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 	if err != nil {
 		t.Fatal(err)
 	}
-	tm.runTestFile(t, name, name, func(t *testing.T, name string, test *StateTest) {
-		tm.stateTestRunner(t, name, test)
-		tm.runTestFile(t, name, name, tm.stateTestsGen(testOut, func() {
-			tm.runTestFile(t, testOut.Name(), testOut.Name(), tm.stateTestRunner)
-		}))
-	})
-	// tm.runTestFile(t, name, name, tm.stateTestRunner)
-	// tm.runTestFile(t, name, name, tm.stateTestsGen(testOut, func() {
-	// 	tm.runTestFile(t, testOut.Name(), testOut.Name(), tm.stateTestRunner)
-	// }))
+	tm.runTestFile(t, name, name, tm.stateTestRunner)
+	tm.runTestFile(t, name, name, tm.stateTestsGen(testOut, func() {
+		tm.runTestFile(t, testOut.Name(), testOut.Name(), tm.stateTestRunner)
+	}))
 }
 
 func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTest) {

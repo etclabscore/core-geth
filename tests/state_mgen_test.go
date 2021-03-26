@@ -71,7 +71,7 @@ func (tg *testMatcherGen) generateFromReference(ref, target string) {
 	tg.targets = append(tg.targets, target)
 }
 
-func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser) func(t *testing.T, name string, test *StateTest) {
+func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback func()) func(t *testing.T, name string, test *StateTest) {
 	return func(t *testing.T, name string, test *StateTest) {
 
 		subtests := test.Subtests(nil)
@@ -136,6 +136,9 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser) func(t *testing.T, nam
 		for k, v := range targets {
 			test.json.Post[k] = v
 		}
+		if len(targets) == 0 {
+			return
+		}
 
 		// Assign provenance metadata to the test.
 		test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, tm.gitHead)
@@ -153,6 +156,7 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser) func(t *testing.T, nam
 		if err := w.Close(); err != nil {
 			t.Fatal(err)
 		}
+		writeCallback()
 	}
 }
 
@@ -224,8 +228,9 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 		t.Fatal(err)
 	}
 	tm.runTestFile(t, name, name, tm.stateTestRunner)
-	tm.runTestFile(t, name, name, tm.stateTestsGen(testOut))
-	tm.runTestFile(t, testOut.Name(), testOut.Name(), tm.stateTestRunner)
+	tm.runTestFile(t, name, name, tm.stateTestsGen(testOut, func() {
+		tm.runTestFile(t, testOut.Name(), testOut.Name(), tm.stateTestRunner)
+	}))
 }
 
 func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTest) {

@@ -200,17 +200,6 @@ func TestGenStateAll(t *testing.T) {
 	head := build.RunGit("rev-parse", "HEAD")
 	head = strings.TrimSpace(head)
 
-	// files := []string{
-	// 	// "stStaticFlagEnabled/DelegatecallToPrecompileFromContractInitialization.json",
-	// 	"stStaticCall/StaticcallToPrecompileFromCalledContract.json",
-	// }
-	//
-	// testFile := filepath.Join(stateTestDir, files[0])
-	//
-	// if fi, err := os.Stat(testFile); err != nil || fi == nil {
-	// 	t.Fatal("DNE", err)
-	// }
-
 	tm := new(testMatcherGen)
 	tm.testMatcher = new(testMatcher)
 	tm.noParallel = true
@@ -220,11 +209,6 @@ func TestGenStateAll(t *testing.T) {
 	tm.generateFromReference("ConstantinopleFix", "ETC_Agharta")
 	tm.generateFromReference("Berlin", "ETC_Magneto")
 	tm.generateFromReference("Istanbul", "ETC_Phoenix")
-
-	// testOut, err := ioutil.TempFile(os.TempDir(), "test-generate-state-tests")
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
 
 	for _, dir := range []string{
 		stateTestDir,
@@ -268,7 +252,14 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 	if err != nil {
 		t.Fatal(err)
 	}
-	tm.runTestFile(t, name, name, tm.stateTestRunner)
+
+	// Use a temporary file instead of overwriting the original.
+	// testOut, err := ioutil.TempFile(os.TempDir(), "test-generate-state-tests")
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	// tm.runTestFile(t, name, name, tm.stateTestRunner)
 	tm.runTestFile(t, name, name, tm.stateTestsGen(testOut, func() {
 		tm.runTestFile(t, testOut.Name(), testOut.Name(), tm.stateTestRunner)
 	}))

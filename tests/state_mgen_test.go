@@ -20,17 +20,18 @@ import (
 	"crypto/sha1"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/internal/build"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/confp/tconvert"
-	"github.com/iancoleman/strcase"
 )
 
 func TestGenState(t *testing.T) {
@@ -45,51 +46,189 @@ func TestGenState(t *testing.T) {
 
 	// Generating tests should NOT skip slow or time consuming tests.
 
-	// Long tests:
-	//st.slow(`^stAttackTest/ContractCreationSpam`)
-	//st.slow(`^stBadOpcode/badOpcodes`)
-	//st.slow(`^stPreCompiledContracts/modexp`)
-	//st.slow(`^stQuadraticComplexityTest/`)
-	//st.slow(`^stStaticCall/static_Call50000`)
-	//st.slow(`^stStaticCall/static_Return50000`)
-	//st.slow(`^stStaticCall/static_Call1MB`)
-	//st.slow(`^stSystemOperationsTest/CallRecursiveBomb`)
-	//st.slow(`^stTransactionTest/Opcodes_TransactionInit`)
-
-	// Very time consuming
-	// st.skipLoad(`^stTimeConsuming/`)
-	// st.whitelist("stZero")
-
-	// Broken tests:
-	// Expected failures:
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/0`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/3`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/0`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/3`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/0`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
-
 	st.walkFullName(t, stateTestDir, st.withWritingTests)
 
 	// For Istanbul, older tests were moved into LegacyTests
 	// st.walkFullName(t, legacyStateTestDir, st.withWritingTests)
 }
 
-var (
-	// core-geth
-	baseDirCG            = filepath.Join(".", "testdata.core-geth")
-	blockTestDirCG       = filepath.Join(baseDir, "BlockchainTests")
-	stateTestDirCG       = filepath.Join(baseDir, "GeneralStateTests")
-	legacyStateTestDirCG = filepath.Join(baseDir, "LegacyTests", "Constantinople", "GeneralStateTests")
+type testMatcherGen struct {
+	*testMatcher
+	references []*regexp.Regexp
+	targets    []string
 
-	// foundation v1.10.1
-	baseDir101            = filepath.Join(".", "testdata.ethereum")
-	blockTestDir101       = filepath.Join(baseDir, "BlockchainTests")
-	stateTestDir101       = filepath.Join(baseDir, "GeneralStateTests")
-	legacyStateTestDir101 = filepath.Join(baseDir, "LegacyTests", "Constantinople", "GeneralStateTests")
-)
+	gitHead string
+}
 
-func debug() {
+func (tg *testMatcherGen) generateFromReference(ref, target string) {
+	if tg.references == nil {
+		tg.references = []*regexp.Regexp{}
+	}
+	tg.references = append(tg.references, regexp.MustCompile(ref))
+	if tg.targets == nil {
+		tg.targets = []string{}
+	}
+	tg.targets = append(tg.targets, target)
+}
+
+func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser) func(t *testing.T, name string, test *StateTest) {
+	return func(t *testing.T, name string, test *StateTest) {
+
+		subtests := test.Subtests(nil)
+
+		// We can use any fork to get the number of subtests that will be run for each fork
+		// since they must all be equivalent, and we assume that there must be at least one tested fork.
+		anyFork := subtests[0].Fork
+		subtestsLen := len(test.json.Post[anyFork])
+
+		targets := map[string][]stPostState{}
+
+		for _, s := range subtests {
+			var ref, target string
+			for i, r := range tm.references {
+				if r.MatchString(s.Fork) {
+					ref = s.Fork
+					target = tm.targets[i]
+					break
+				}
+			}
+			if ref == "" {
+				continue
+			}
+			if _, ok := targets[target]; !ok {
+				targets[target] = make([]stPostState, subtestsLen)
+			}
+
+			targetSubtest := StateSubtest{
+				Fork:  target,
+				Index: s.Index,
+			}
+
+			refPostState := test.json.Post[s.Fork]
+
+			// Initialize the post state with reference indexes.
+			// These indexes (containing gas, value, and data) are used to construct the message (tx) run
+			// by the test.
+			stPost := stPostState{
+				Indexes: stPostStateIndexes{
+					Data:  refPostState[s.Index].Indexes.Data,
+					Gas:   refPostState[s.Index].Indexes.Gas,
+					Value: refPostState[s.Index].Indexes.Value,
+				},
+			}
+
+			// vmConfig is constructed using global variables for possible EVM and EWASM interpreters.
+			// These interpreters are configured with environment variables and are assigned in an init() function.
+			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
+
+			// Since we know that tests run with and without the snapshotter features are equivalent, either boolean state
+			// is valid and 'false' is arbitrary.
+			_, statedb, root, err := test.RunNoVerifyWithPost(targetSubtest, vmConfig, false, stPost)
+			if err != nil {
+				t.Fatalf("Error encountered at RunSetPost: %v", err)
+			}
+
+			// Assign the generated testable values.
+			stPost.Root = common.UnprefixedHash(root)
+			stPost.Logs = common.UnprefixedHash(rlpHash(statedb.Logs()))
+
+			targets[target][s.Index] = stPost
+		}
+
+		// Install the generated cases to the test.
+		for k, v := range targets {
+			test.json.Post[k] = v
+		}
+
+		// Assign provenance metadata to the test.
+		test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, tm.gitHead)
+
+		// Write the augmented test to the writer.
+		generatedJSON, err := json.MarshalIndent(test, "", "    ")
+		if err != nil {
+			t.Fatalf("Error marshaling JSON: %v", err)
+		}
+
+		_, err = w.Write(generatedJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := w.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func (tm *testMatcherGen) stateTestRunner(t *testing.T, name string, test *StateTest) {
+	subtests := test.Subtests(nil)
+	for _, subtest := range subtests {
+		st := subtest
+
+		key := fmt.Sprintf("%s/%d", st.Fork, st.Index)
+		name := name + "/" + key
+
+		t.Run(key+"/trie", func(t *testing.T) {
+			wrapFatal(t, test.gasLimit(st), func(vmconfig vm.Config) error {
+				_, _, err := test.Run(st, vmconfig, false)
+				checkedErr := tm.checkFailure(t, name+"/trie", err)
+				if checkedErr != nil && *testEWASM != "" {
+					checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
+				}
+				return checkedErr
+			})
+		})
+	}
+}
+
+func TestGenState2(t *testing.T) {
+	// There is no need to run this git command for every test, but
+	// speed is not really a big deal here, and it's nice to keep as much logic out
+	// out the global scope as possible.
+	head := build.RunGit("rev-parse", "HEAD")
+	head = strings.TrimSpace(head)
+
+	// files := []string{
+	// 	// "stStaticFlagEnabled/DelegatecallToPrecompileFromContractInitialization.json",
+	// 	"stStaticCall/StaticcallToPrecompileFromCalledContract.json",
+	// }
+	//
+	// testFile := filepath.Join(stateTestDir, files[0])
+	//
+	// if fi, err := os.Stat(testFile); err != nil || fi == nil {
+	// 	t.Fatal("DNE", err)
+	// }
+
+	tm := new(testMatcherGen)
+	tm.testMatcher = new(testMatcher)
+	tm.gitHead = head
+
+	tm.generateFromReference("Byzantium", "ETC_Atlantis")
+	tm.generateFromReference("ConstantinopleFix", "ETC_Agharta")
+	tm.generateFromReference("Berlin", "ETC_Magneto")
+	tm.generateFromReference("Istanbul", "ETC_Phoenix")
+
+	// testOut, err := ioutil.TempFile(os.TempDir(), "test-generate-state-tests")
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	tm.walkFullName(t, legacyStateTestDir, tm.testWriteTest)
+	tm.walkFullName(t, stateTestDir, tm.testWriteTest)
+}
+
+func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {
+	testOutFullName, err := filepath.Abs(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testOutFullName = filepath.Clean(testOutFullName)
+	testOut, err := os.OpenFile(testOutFullName, os.O_RDWR, os.ModePerm)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tm.runTestFile(t, name, name, tm.stateTestRunner)
+	tm.runTestFile(t, name, name, tm.stateTestsGen(testOut))
+	tm.runTestFile(t, testOut.Name(), testOut.Name(), tm.stateTestRunner)
 
 }
 
@@ -112,28 +251,28 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 	// then generate that file.
 	subtests := test.Subtests(nil)
 
-	for _, subtest := range subtests {
-		subtest := subtest
-		if _, ok := MapForkNameChainspecFileState[subtest.Fork]; !ok {
-			genesis := test.genesis(Forks[subtest.Fork])
-			pspec, err := tconvert.NewParityChainSpec(subtest.Fork, genesis, []string{})
-			if err != nil {
-				t.Fatal(err)
-			}
-			b, err := json.MarshalIndent(pspec, "", "    ")
-			if err != nil {
-				t.Fatal(err)
-			}
-			filename := paritySpecPath(strcase.ToSnake(subtest.Fork) + ".json")
-			err = ioutil.WriteFile(filename, b, os.ModePerm)
-			if err != nil {
-				t.Fatal(err)
-			}
-			sum := sha1.Sum(b)
-			chainspecRefsState[subtest.Fork] = chainspecRef{filepath.Base(filename), sum[:]}
-			t.Logf("Created new fork chainspec file: %v", chainspecRefsState[subtest.Fork])
-		}
-	}
+	// for _, subtest := range subtests {
+	// 	subtest := subtest
+	// 	if _, ok := MapForkNameChainspecFileState[subtest.Fork]; !ok {
+	// 		genesis := test.genesis(Forks[subtest.Fork])
+	// 		pspec, err := tconvert.NewParityChainSpec(subtest.Fork, genesis, []string{})
+	// 		if err != nil {
+	// 			t.Fatal(err)
+	// 		}
+	// 		b, err := json.MarshalIndent(pspec, "", "    ")
+	// 		if err != nil {
+	// 			t.Fatal(err)
+	// 		}
+	// 		filename := paritySpecPath(strcase.ToSnake(subtest.Fork) + ".json")
+	// 		err = ioutil.WriteFile(filename, b, os.ModePerm)
+	// 		if err != nil {
+	// 			t.Fatal(err)
+	// 		}
+	// 		sum := sha1.Sum(b)
+	// 		chainspecRefsState[subtest.Fork] = chainspecRef{filepath.Base(filename), sum[:]}
+	// 		t.Logf("Created new fork chainspec file: %v", chainspecRefsState[subtest.Fork])
+	// 	}
+	// }
 
 	for _, subtest := range subtests {
 		subtest := subtest
@@ -255,7 +394,7 @@ gend.root: %s
 					name3 := name2 + "/" + key
 
 					t.Run(key+"/trie", func(t *testing.T) {
-						withTraceFatal(t, test2.gasLimit(subtest2), func(vmconfig vm.Config) error {
+						wrapFatal(t, test2.gasLimit(subtest2), func(vmconfig vm.Config) error {
 							_, _, err := test2.Run(subtest2, vmconfig, false)
 							checkedErr := tm.checkFailure(t, name3+"/trie", err)
 							if checkedErr != nil && *testEWASM != "" {

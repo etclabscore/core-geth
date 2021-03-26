@@ -111,16 +111,16 @@ tests-generate: tests-generate-state tests-generate-difficulty ## Generate all t
 
 tests-generate-state: ## Generate state tests.
 	@echo "Generating state tests."
-	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on \
 	env COREGETH_TESTS_GENERATE_STATE_TESTS=on \
-	go test -p 1 -v -timeout 60m ./tests -run TestGenState2
+	go test -p 1 -v -timeout 60m ./tests -run GenStateAll
+	#env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on \
 	#go run build/ci.go test -v -timeout 60m ./tests -run TestGenState
 
 tests-generate-difficulty: ## Generate difficulty tests.
 	@echo "Generating difficulty tests."
 	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on \
 	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
-	go run build/ci.go test -v -timeout 60m ./tests -run TestDifficultyGen
+	go run build/ci.go test -v -timeout 60m ./tests -run DifficultyGen
 
 lint: ## Run linters.
 	$(GORUN) build/ci.go lint

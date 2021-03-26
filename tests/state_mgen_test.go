@@ -225,8 +225,12 @@ func TestGenState2(t *testing.T) {
 	// 	t.Fatal(err)
 	// }
 
-	tm.walkFullName(t, legacyStateTestDir, tm.testWriteTest)
-	tm.walkFullName(t, stateTestDir, tm.testWriteTest)
+	for _, dir := range []string{
+		stateTestDir,
+		legacyStateTestDir,
+	} {
+		tm.walkFullName(t, dir, tm.testWriteTest)
+	}
 }
 
 func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {

@@ -91,6 +91,9 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback func()) 
 			if referenceFork == "" {
 				continue
 			}
+			if _, ok := Forks[targetFork]; !ok {
+				t.Fatalf("missing target fork config: %s, reference: %s", targetFork, referenceFork)
+			}
 
 			if _, ok := targets[targetFork]; !ok {
 				subtestsLen := len(test.json.Post[referenceFork])
@@ -184,6 +187,13 @@ func (tm *testMatcherGen) stateTestRunner(t *testing.T, name string, test *State
 }
 
 func TestGenState2(t *testing.T) {
+	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
+		t.Skip()
+	}
+	if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_OPENETHEREUM_KEY) == "" {
+		t.Fatal("Must use chainspec files for fork configurations.")
+	}
+
 	// There is no need to run this git command for every test, but
 	// speed is not really a big deal here, and it's nice to keep as much logic out
 	// out the global scope as possible.

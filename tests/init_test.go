@@ -122,6 +122,7 @@ type testMatcher struct {
 	slowpat      []*regexp.Regexp
 	skipforkpat  []*regexp.Regexp
 	whitelistpat *regexp.Regexp
+	noParallel   bool
 }
 
 type testConfig struct {
@@ -258,7 +259,9 @@ func (tm *testMatcher) runTestFile(t *testing.T, path, name string, runTest inte
 			t.Skip("Skipped by whitelist")
 		}
 	}
-	// t.Parallel()
+	if !tm.noParallel {
+		t.Parallel()
+	}
 
 	// Load the file as map[string]<testType>.
 	m := makeMapFromTestFunc(runTest)

@@ -213,6 +213,7 @@ func TestGenState2(t *testing.T) {
 
 	tm := new(testMatcherGen)
 	tm.testMatcher = new(testMatcher)
+	tm.noParallel = true
 	tm.gitHead = head
 
 	tm.generateFromReference("Byzantium", "ETC_Atlantis")

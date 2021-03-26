@@ -234,7 +234,28 @@ func TestGenStateAll(t *testing.T) {
 	}
 }
 
-func TestGenStateSingle(t *testing.T) {
+func TestGenStateSingles(t *testing.T) {
+	head := build.RunGit("rev-parse", "HEAD")
+	head = strings.TrimSpace(head)
+
+	files := []string{
+		// "stStaticFlagEnabled/DelegatecallToPrecompileFromContractInitialization.json",
+		"stStaticCall/StaticcallToPrecompileFromCalledContract.json",
+	}
+
+	tm := new(testMatcherGen)
+	tm.testMatcher = new(testMatcher)
+	tm.noParallel = true
+	tm.gitHead = head
+
+	tm.generateFromReference("Byzantium", "ETC_Atlantis")
+	tm.generateFromReference("ConstantinopleFix", "ETC_Agharta")
+	tm.generateFromReference("Berlin", "ETC_Magneto")
+	tm.generateFromReference("Istanbul", "ETC_Phoenix")
+
+	for _, f := range files {
+		tm.runTestFile(t, f, f, tm.testWriteTest)
+	}
 
 }
 

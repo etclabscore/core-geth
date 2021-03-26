@@ -78,17 +78,18 @@ type stJSON struct {
 }
 
 type stInfo struct {
-	Comment            string         `json:"comment"`
-	FillingRPCServer   string         `json:"filling-rpc-server"`
-	FillingToolVersion string         `json:"filling-tool-version"`
-	FilledWith         string         `json:"filledWith"`
-	LLLCVersion        string         `json:"lllcversion"`
-	Source             string         `json:"source"`
-	SourceHash         string         `json:"sourceHash"`
-	WrittenWith        string         `json:"written-with"`
-	Parent             string         `json:"parent"`
-	ParentSha1Sum      string         `json:"parentSha1Sum"`
-	Chainspecs         chainspecRefsT `json:"chainspecs"`
+	Comment            string                 `json:"comment"`
+	FillingRPCServer   string                 `json:"filling-rpc-server"`
+	FillingToolVersion string                 `json:"filling-tool-version"`
+	FilledWith         string                 `json:"filledWith"`
+	LLLCVersion        string                 `json:"lllcversion"`
+	Source             string                 `json:"source"`
+	SourceHash         string                 `json:"sourceHash"`
+	WrittenWith        string                 `json:"written-with"`
+	Parent             string                 `json:"parent"`
+	ParentSha1Sum      string                 `json:"parentSha1Sum"`
+	Chainspecs         chainspecRefsT         `json:"chainspecs"`
+	Labels             map[string]interface{} `json:"labels"`
 }
 
 type stPostState struct {

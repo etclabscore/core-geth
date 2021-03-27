@@ -32,6 +32,10 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/internal/build"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/confp"
+	"github.com/ethereum/go-ethereum/params/confp/tconvert"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
+	"github.com/iancoleman/strcase"
 )
 
 func TestGenState(t *testing.T) {
@@ -190,6 +194,76 @@ func (tm *testMatcherGen) stateTestRunner(t *testing.T, name string, test *State
 				} else {
 					t.Fatal(err)
 				}
+			}
+		})
+	}
+}
+
+func TestGenStateParityConfigs(t *testing.T) {
+	st := new(testMatcher)
+
+	// FYI: Possibly the slowest and stupidest way to write 14 files: read 42189 test to do it
+	// and write each file 1486 times.
+	for _, d := range []string{stateTestDir, legacyStateTestDir} {
+		st.walkFullName(t, d, func(t *testing.T, name string, test *StateTest) {
+
+			subtests := test.Subtests(nil)
+			for _, subtest := range subtests {
+				subtest := subtest
+
+				genesis := test.genesis(Forks[subtest.Fork])
+
+				// Write the genesis+config in the Parity config format.
+				pspec, err := tconvert.NewParityChainSpec(subtest.Fork, genesis, []string{})
+				if err != nil {
+					t.Fatal(err)
+				}
+				b, err := json.MarshalIndent(pspec, "", "    ")
+				if err != nil {
+					t.Fatal(err)
+				}
+				filename := filepath.Join(
+					"..",
+					"params",
+					"parity.json.d",
+					strcase.ToSnake(subtest.Fork)+".json",
+				)
+				err = ioutil.WriteFile(filename, b, os.ModePerm)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				// Also write it in coregeth format.
+				cgspec := &coregeth.CoreGethChainConfig{}
+				err = confp.Convert(Forks[subtest.Fork], cgspec)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				cgGenesis := test.genesis(cgspec)
+				b, err = json.MarshalIndent(cgGenesis, "", "    ")
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				filename = filepath.Join(
+					"..",
+					"params",
+					"coregeth.json.d",
+					strcase.ToSnake(subtest.Fork)+".json",
+				)
+				err = os.MkdirAll(filepath.Dir(filename), os.ModePerm)
+				if err != nil {
+					t.Fatal(err)
+				}
+				err = ioutil.WriteFile(filename, b, os.ModePerm)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				// We cannot write the config in any other formats because
+				// go-ethereum and multi-geth are unable to describe some of the
+				// features configured, eg. ECIPs and possibly others (eg. EIP2537).
 			}
 		})
 	}

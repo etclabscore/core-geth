@@ -42,6 +42,10 @@ func TestParityChainspec_CoreGeth(t *testing.T) {
 	ne = eip1108a != nil && eip1108b == nil
 	ne = ne || *eip1108a != *eip1108b
 	if ne {
-		t.Error("ne")
+		t.Fatal("ne")
 	}
+	if eip1108a == nil {
+		t.Fatal("nil")
+	}
+	t.Logf("%v %v", *eip1108a, *eip1108b)
 }

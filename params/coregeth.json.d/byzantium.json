@@ -1,0 +1,62 @@
+{
+    "config": {
+        "networkId": 1,
+        "chainId": 1,
+        "eip2FBlock": 0,
+        "eip7FBlock": 0,
+        "eip150Block": 0,
+        "eip155Block": 0,
+        "eip160Block": 0,
+        "eip161FBlock": 0,
+        "eip170FBlock": 0,
+        "eip100FBlock": 0,
+        "eip140FBlock": 0,
+        "eip198FBlock": 0,
+        "eip211FBlock": 0,
+        "eip212FBlock": 0,
+        "eip213FBlock": 0,
+        "eip214FBlock": 0,
+        "eip658FBlock": 0,
+        "ethash": {},
+        "difficultyBombDelays": {
+            "0x0": "0x2dc6c0"
+        },
+        "blockReward": {
+            "0x0": "0x29a2241af62c0000"
+        },
+        "requireBlockHashes": null
+    },
+    "nonce": "0x0",
+    "timestamp": "0x3e8",
+    "extraData": "0x",
+    "gasLimit": "0xf4240",
+    "difficulty": "0x20000",
+    "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "coinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+    "alloc": {
+        "a94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+            "balance": "0xde0b6b3a7640000"
+        },
+        "af3ecba2fe09a4f6c19f16a9d119e44e08c2da01": {
+            "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000000": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            },
+            "balance": "0x0"
+        },
+        "e2b35478fdd26477cc576dd906e6277761246a3c": {
+            "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000000": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            },
+            "balance": "0x0"
+        },
+        "ec2c6832d00680ece8ff9254f81fdab0a5a2ac50": {
+            "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000000": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            },
+            "balance": "0x0"
+        }
+    },
+    "number": "0x1",
+    "gasUsed": "0x0",
+    "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+}

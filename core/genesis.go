@@ -60,6 +60,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	if (stored == common.Hash{}) {
 		if genesis == nil {
 			log.Info("Writing default main-net genesis block")
+			log.Warn("Not specifying a chain flag is deprecated and will be removed in the future, please use --mainnet for Ethereum mainnet")
 			genesis = params.DefaultGenesisBlock()
 		} else {
 			log.Info("Writing custom genesis block")
@@ -159,12 +160,6 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 		return g.Config
 	case ghash == params.MainnetGenesisHash:
 		return params.MainnetChainConfig
-	case ghash == params.SocialGenesisHash:
-		return params.SocialChainConfig
-	case ghash == params.MixGenesisHash:
-		return params.MixChainConfig
-	case ghash == params.EthersocialGenesisHash:
-		return params.EthersocialChainConfig
 	case ghash == params.RinkebyGenesisHash:
 		return params.RinkebyChainConfig
 	case ghash == params.GoerliGenesisHash:

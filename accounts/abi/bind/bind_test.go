@@ -1746,11 +1746,20 @@ func TestGolangBindings(t *testing.T) {
 		t.Fatalf("failed to convert binding test to modules: %v\n%s", err, out)
 	}
 	pwd, _ := os.Getwd()
-	replacer := exec.Command(gocmd, "mod", "edit", "-replace", "github.com/ethereum/go-ethereum="+filepath.Join(pwd, "..", "..", "..")) // Repo root
+	repoRoot := filepath.Join(pwd, "..", "..", "..")
+
+	replacer := exec.Command(gocmd, "mod", "edit", "-replace", "github.com/ethereum/go-ethereum="+repoRoot) // Repo root
 	replacer.Dir = pkg
 	if out, err := replacer.CombinedOutput(); err != nil {
-		t.Fatalf("failed to replace binding test dependency to current source tree: %v\n%s", err, out)
+		t.Fatalf("failed to replace binding test 'replace' dependency to current source tree: %v\n%s", err, out)
 	}
+
+	tidyer := exec.Command(gocmd, "mod", "tidy")
+	tidyer.Dir = pkg
+	if out, err := tidyer.CombinedOutput(); err != nil {
+		t.Fatal(err, string(out))
+	}
+
 	// Test the entire package and report any failures
 	cmd := exec.Command(gocmd, "test", "-v", "-count", "1")
 	cmd.Dir = pkg

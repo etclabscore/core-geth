@@ -22,11 +22,6 @@ Networks supported by the respective go-ethereum packaged `geth` program.
 | ---    | ---               | ---                                   | ---                                                      | ---                  |
 | ETC    | :zap:             | Ethereum Classic                      | :heavy_check_mark:                                       |                      |
 | ETH    | :zap:             | Ethereum (Foundation)                 | :heavy_check_mark:                                       | :heavy_check_mark:   |
-| ETSC   | :zap:             | Ethereum Social                       | :heavy_check_mark:                                       |                      |
-| ESN    | :zap:             | EtherSocial                           | :heavy_check_mark:                                       |                      |
-| MIX    | :zap:             | Mix                                   | :heavy_check_mark:                                       |                      |
-| ELLA   | :zap:             | Ellaism                               | :no_entry_sign:<sup>[1](#ellaism-footnote)</sup>         |                      |
-| MUSIC  | :zap:             | Musicoin                              | :open_file_folder:<sup>[2](#configuration-capable)</sup> |                      |
 | -      | :zap: :handshake: | Private chains                        | :heavy_check_mark:                                       | :heavy_check_mark:   |
 |        | :zap:             | Mordor (Geth+Parity ETH PoW Testnet)  | :heavy_check_mark:                                       |                      |
 |        | :zap:             | Morden (Geth+Parity ETH PoW Testnet)  |                                                          |                      |

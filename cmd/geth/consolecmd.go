@@ -19,10 +19,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"strings"
-	"syscall"
 
 	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/console"
@@ -141,12 +139,6 @@ func remoteConsole(ctx *cli.Context) error {
 				path = filepath.Join(path, "classic")
 			} else if ctx.GlobalBool(utils.MordorFlag.Name) {
 				path = filepath.Join(path, "mordor")
-			} else if ctx.GlobalBool(utils.SocialFlag.Name) {
-				path = filepath.Join(path, "social")
-			} else if ctx.GlobalBool(utils.MixFlag.Name) {
-				path = filepath.Join(path, "mix")
-			} else if ctx.GlobalBool(utils.EthersocialFlag.Name) {
-				path = filepath.Join(path, "ethersocial")
 			} else if ctx.GlobalBool(utils.GoerliFlag.Name) {
 				path = filepath.Join(path, "goerli")
 			} else if ctx.GlobalBool(utils.YoloV2Flag.Name) {
@@ -231,13 +223,10 @@ func ephemeralConsole(ctx *cli.Context) error {
 			utils.Fatalf("Failed to execute %s: %v", file, err)
 		}
 	}
-	// Wait for pending callbacks, but stop for Ctrl-C.
-	abort := make(chan os.Signal, 1)
-	signal.Notify(abort, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		<-abort
-		os.Exit(0)
+		stack.Wait()
+		console.Stop(false)
 	}()
 	console.Stop(true)
 

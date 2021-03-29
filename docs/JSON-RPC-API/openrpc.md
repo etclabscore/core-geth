@@ -7,7 +7,7 @@ hide:
 # OpenRPC
 
 !!! tldr "TLDR"
-    The `rpc.discover` returns an API service description structured per the [OpenRPC specification](https://github.com/open-rpc/spec/blob/master/spec.md). 
+    The `rpc.discover` method returns an API service description structured per the [OpenRPC specification](https://github.com/open-rpc/spec/blob/master/spec.md). 
 
 ## Discovery
 

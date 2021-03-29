@@ -18,7 +18,6 @@ package main
 
 import (
 	"crypto/rand"
-	"fmt"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -36,59 +35,16 @@ const (
 	httpAPIs = "eth:1.0 net:1.0 rpc:1.0 web3:1.0"
 )
 
-// TestConsoleCmdNetworkIdentities tests network identity variables at runtime for a geth instance.
-// This provides a "production equivalent" integration test for consensus-relevant chain identity values which
-// cannot be adequately unit tested because of reliance on cli context variables.
-// These tests should cover expected default values and possible flag-interacting values, like --<chain> with --networkid=n.
-func TestConsoleCmdNetworkIdentities(t *testing.T) {
-	chainIdentityCases := []struct {
-		flags       []string
-		networkId   int
-		chainId     int
-		genesisHash string
-	}{
-		// Default chain value, without and with --networkid flag set.
-		{[]string{}, 1, 1, params.MainnetGenesisHash.Hex()},
-		{[]string{"--networkid", "42"}, 42, 1, params.MainnetGenesisHash.Hex()},
-
-		// Non-default chain value, without and with --networkid flag set.
-		{[]string{"--classic"}, 1, 61, params.MainnetGenesisHash.Hex()},
-		{[]string{"--classic", "--networkid", "42"}, 42, 61, params.MainnetGenesisHash.Hex()},
-
-		// All other possible --<chain> values.
-		{[]string{"--testnet"}, 3, 3, params.RopstenGenesisHash.Hex()},
-		{[]string{"--ropsten"}, 3, 3, params.RopstenGenesisHash.Hex()},
-		{[]string{"--rinkeby"}, 4, 4, params.RinkebyGenesisHash.Hex()},
-		{[]string{"--goerli"}, 5, 5, params.GoerliGenesisHash.Hex()},
-		{[]string{"--kotti"}, 6, 6, params.KottiGenesisHash.Hex()},
-		{[]string{"--mordor"}, 7, 63, params.MordorGenesisHash.Hex()},
-		{[]string{"--social"}, 28, 28, params.SocialGenesisHash.Hex()},
-		{[]string{"--ethersocial"}, 1, 31102, params.EthersocialGenesisHash.Hex()},
-		{[]string{"--yolov2"}, 133519467574834, 133519467574834, params.YoloV2GenesisHash.Hex()},
-	}
-	for i, p := range chainIdentityCases {
-
-		// Disable networking, preventing false-negatives if in an environment without networking service
-		// or collisions with an existing geth service.
-		p.flags = append(p.flags, "--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none")
-
-		t.Run(fmt.Sprintf("%d/%v/networkid", i, p.flags),
-			consoleCmdStdoutTest(p.flags, "admin.nodeInfo.protocols.eth.network", p.networkId))
-		t.Run(fmt.Sprintf("%d/%v/chainid", i, p.flags),
-			consoleCmdStdoutTest(p.flags, "admin.nodeInfo.protocols.eth.config.chainId", p.chainId))
-		t.Run(fmt.Sprintf("%d/%v/genesis_hash", i, p.flags),
-			consoleCmdStdoutTest(p.flags, "eth.getBlock(0, false).hash", strconv.Quote(p.genesisHash)))
-	}
-}
-
-func consoleCmdStdoutTest(flags []string, execCmd string, want interface{}) func(t *testing.T) {
-	return func(t *testing.T) {
-		flags = append(flags, "--exec", execCmd, "console")
-		geth := runGeth(t, flags...)
-		geth.Expect(fmt.Sprintf(`%v
-`, want))
-		geth.ExpectExit()
-	}
+// spawns geth with the given command line args, using a set of flags to minimise
+// memory and disk IO. If the args don't set --datadir, the
+// child g gets a temporary data directory.
+func runMinimalGeth(t *testing.T, args ...string) *testgeth {
+	// --ropsten to make the 'writing genesis to disk' faster (no accounts)
+	// --networkid=1337 to avoid cache bump
+	// --syncmode=full to avoid allocating fast sync bloom
+	allArgs := []string{"--ropsten", "--networkid", "1337", "--syncmode=full", "--port", "0",
+		"--nat", "none", "--nodiscover", "--maxpeers", "0", "--cache", "64"}
+	return runGeth(t, append(allArgs, args...)...)
 }
 
 // Tests that a node embedded within a console can be started up properly and
@@ -97,10 +53,7 @@ func TestConsoleWelcome(t *testing.T) {
 	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
 
 	// Start a geth console, make sure it's cleaned up and terminate the console
-	geth := runGeth(t,
-		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase,
-		"console")
+	geth := runMinimalGeth(t, "--etherbase", coinbase, "console")
 
 	// Gather all the infos the welcome message needs to contain
 	geth.SetTemplateFunc("clientname", func() string {
@@ -138,10 +91,13 @@ To exit, press ctrl-d
 }
 
 // Tests that a console can be attached to a running node via various means.
-func TestIPCAttachWelcome(t *testing.T) {
+func TestAttachWelcome(t *testing.T) {
+	var (
+		ipc      string
+		httpPort string
+		wsPort   string
+	)
 	// Configure the instance for IPC attachment
-	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
-	var ipc string
 	if runtime.GOOS == "windows" {
 		ipc = `\\.\pipe\geth` + strconv.Itoa(trulyRandInt(100000, 999999))
 	} else {
@@ -149,51 +105,28 @@ func TestIPCAttachWelcome(t *testing.T) {
 		defer os.RemoveAll(ws)
 		ipc = filepath.Join(ws, "geth.ipc")
 	}
-	geth := runGeth(t,
-		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--ipcpath", ipc)
-
-	defer func() {
-		geth.Interrupt()
-		geth.ExpectExit()
-	}()
-
-	waitForEndpoint(t, ipc, 3*time.Second)
-	testAttachWelcome(t, geth, "ipc:"+ipc, ipcAPIs)
-
-}
-
-func TestHTTPAttachWelcome(t *testing.T) {
-	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
-	port := strconv.Itoa(trulyRandInt(1024, 65536)) // Yeah, sometimes this will fail, sorry :P
-	geth := runGeth(t,
-		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--http", "--http.port", port)
-	defer func() {
-		geth.Interrupt()
-		geth.ExpectExit()
-	}()
-
-	endpoint := "http://127.0.0.1:" + port
-	waitForEndpoint(t, endpoint, 3*time.Second)
-	testAttachWelcome(t, geth, endpoint, httpAPIs)
-}
-
-func TestWSAttachWelcome(t *testing.T) {
-	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
-	port := strconv.Itoa(trulyRandInt(1024, 65536)) // Yeah, sometimes this will fail, sorry :P
-
-	geth := runGeth(t,
-		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--ws", "--ws.port", port)
-	defer func() {
-		geth.Interrupt()
-		geth.ExpectExit()
-	}()
-
-	endpoint := "ws://127.0.0.1:" + port
-	waitForEndpoint(t, endpoint, 3*time.Second)
-	testAttachWelcome(t, geth, endpoint, httpAPIs)
+	// And HTTP + WS attachment
+	p := trulyRandInt(1024, 65533) // Yeah, sometimes this will fail, sorry :P
+	httpPort = strconv.Itoa(p)
+	wsPort = strconv.Itoa(p + 1)
+	geth := runMinimalGeth(t, "--etherbase", "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182",
+		"--ipcpath", ipc,
+		"--http", "--http.port", httpPort,
+		"--ws", "--ws.port", wsPort)
+	t.Run("ipc", func(t *testing.T) {
+		waitForEndpoint(t, ipc, 3*time.Second)
+		testAttachWelcome(t, geth, "ipc:"+ipc, ipcAPIs)
+	})
+	t.Run("http", func(t *testing.T) {
+		endpoint := "http://127.0.0.1:" + httpPort
+		waitForEndpoint(t, endpoint, 3*time.Second)
+		testAttachWelcome(t, geth, endpoint, httpAPIs)
+	})
+	t.Run("ws", func(t *testing.T) {
+		endpoint := "ws://127.0.0.1:" + wsPort
+		waitForEndpoint(t, endpoint, 3*time.Second)
+		testAttachWelcome(t, geth, endpoint, httpAPIs)
+	})
 }
 
 func testAttachWelcome(t *testing.T, geth *testgeth, endpoint, apis string) {

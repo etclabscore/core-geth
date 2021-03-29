@@ -71,6 +71,21 @@ func setConfigTracerToParity(config *TraceConfig) *TraceConfig {
 	return config
 }
 
+func enchanceParityOutput(res interface{}, config *TraceConfig) interface{} {
+	if config.ParityCompatibleOutput {
+		out := map[string]interface{}{}
+
+		if *config.Tracer == "callTracerParity" {
+			out["trace"] = res
+		} else if *config.Tracer == "stateDiffTracer" {
+			out["stateDiff"] = res
+		}
+
+		res = out
+	}
+	return res
+}
+
 func traceBlockReward(ctx context.Context, eth *Ethereum, block *types.Block, config *TraceConfig) (*ParityTrace, error) {
 	chainConfig := eth.blockchain.Config()
 	minerReward, _ := ethash.GetRewards(chainConfig, block.Header(), block.Uncles())
@@ -215,7 +230,11 @@ func (api *PrivateTraceAPI) Call(ctx context.Context, args ethapi.CallArgs, bloc
 	if config == nil {
 		config = setConfigTracerToParity(config)
 	}
-	return traceCall(ctx, api.eth, args, blockNrOrHash, config)
+	res, err := traceCall(ctx, api.eth, args, blockNrOrHash, config)
+	if err != nil {
+		return nil, err
+	}
+	return enchanceParityOutput(res, config), nil
 }
 
 // CallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
@@ -226,5 +245,9 @@ func (api *PrivateTraceAPI) CallMany(ctx context.Context, txs []ethapi.CallArgs,
 	if config == nil {
 		config = setConfigTracerToParity(config)
 	}
-	return traceCallMany(ctx, api.eth, txs, blockNrOrHash, config)
+	res, err := traceCallMany(ctx, api.eth, txs, blockNrOrHash, config)
+	if err != nil {
+		return nil, err
+	}
+	return enchanceParityOutput(res, config), nil
 }

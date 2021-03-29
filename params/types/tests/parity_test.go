@@ -39,7 +39,7 @@ func TestParityChainspec_CoreGeth(t *testing.T) {
 	eip1108b := coregethB.GetEIP1108Transition()
 
 	ne := eip1108a == nil && eip1108b != nil
-	ne = eip1108a != nil && eip1108b == nil
+	ne = ne || eip1108a != nil && eip1108b == nil
 	ne = ne || *eip1108a != *eip1108b
 	if ne {
 		t.Fatal("ne")

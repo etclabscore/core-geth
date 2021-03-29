@@ -96,7 +96,7 @@ type stPostState struct {
 	Root    common.UnprefixedHash `json:"hash"`
 	Logs    common.UnprefixedHash `json:"logs"`
 	Indexes stPostStateIndexes    `json:"indexes"`
-	filled  bool                  `json:"-"`
+	filled  bool
 }
 
 type stPostStateIndexes struct {

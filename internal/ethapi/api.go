@@ -1145,14 +1145,14 @@ func RPCMarshalHeader(head *types.Header) map[string]interface{} {
 // RPCMarshalHeaderT defines the RPC marshaling type for block headers.
 type RPCMarshalHeaderT struct {
 	Number           *hexutil.Big      `json:"number"`
-	Hash             *common.Hash      `json:"hash,omitempty"` // Pending will be nil
+	Hash             *common.Hash      `json:"hash"` // -- Pending will be nil --
 	ParentHash       common.Hash       `json:"parentHash"`
-	Nonce            *types.BlockNonce `json:"nonce,omitempty"` // Pending will be nil
+	Nonce            *types.BlockNonce `json:"nonce"` // -- Pending will be nil --
 	MixHash          common.Hash       `json:"mixHash"`
 	Sha3Uncles       common.Hash       `json:"sha3Uncles"`
 	LogsBloom        types.Bloom       `json:"logsBloom"`
 	StateRoot        common.Hash       `json:"stateRoot"`
-	Miner            *common.Address   `json:"miner,omitempty"` // Pending will be nil
+	Miner            *common.Address   `json:"miner"` // -- Pending will be nil --
 	Difficulty       *hexutil.Big      `json:"difficulty"`
 	TotalDifficulty  *hexutil.Big      `json:"totalDifficulty"`
 	ExtraData        hexutil.Bytes     `json:"extraData"`
@@ -1196,12 +1196,7 @@ func NewRPCMarshalHeaderTFromHeader(header *types.Header) *RPCMarshalHeaderT {
 // rpcMarshalHeaderTSetTotalDifficulty sets the total difficulty field for RPC response headers.
 // If the hash is unavailable (ie in Pending state), the value will be 0.
 func (s *PublicBlockChainAPI) rpcMarshalHeaderTSetTotalDifficulty(ctx context.Context, header *RPCMarshalHeaderT) {
-	hash := header.Hash
-	if hash == nil {
-		c := common.Hash{}
-		hash = &c
-	}
-	header.TotalDifficulty = (*hexutil.Big)(s.b.GetTd(ctx, *hash))
+	header.TotalDifficulty = (*hexutil.Big)(s.b.GetTd(ctx, *header.Hash))
 }
 
 // setAsPending sets fields that must be nil for pending headers and blocks.
@@ -1225,11 +1220,23 @@ type RPCMarshalBlockT struct {
 
 // RPCMarshalBlockTIR is the intermediate representation of RPCMarshalBlockT.
 // This exists to avoid a circular reference when overriding the json marshaling interface.
-// RPCMarshalHeaderT is an embedded struct.
 type RPCMarshalBlockTIR struct {
 	*RPCMarshalHeaderT
 	Transactions []interface{} `json:"transactions"`
 	Uncles       []common.Hash `json:"uncles"`
+
+	Error string `json:"error,omitempty"`
+
+	inclTx bool
+	fullTx bool
+}
+
+// RPCMarshalUncleTIR is the intermediate representation of RPCMarshalBlockT which excludes the transactions field.
+// Transactions are excluded when the API returns block information for uncle blocks.
+// This exists to avoid a circular reference when overriding the json marshaling interface.
+type RPCMarshalUncleTIR struct {
+	*RPCMarshalHeaderT
+	Uncles []common.Hash `json:"uncles"`
 
 	Error string `json:"error,omitempty"`
 
@@ -1244,9 +1251,19 @@ func (b *RPCMarshalBlockT) MarshalJSON() ([]byte, error) {
 	if b.Error != "" {
 		return json.Marshal(map[string]interface{}{"error": b.Error})
 	}
-	ir := &RPCMarshalBlockTIR{
+	if b.inclTx {
+		ir := &RPCMarshalBlockTIR{
+			RPCMarshalHeaderT: b.RPCMarshalHeaderT,
+			Transactions:      b.Transactions,
+			Uncles:            b.Uncles,
+			Error:             "",
+			inclTx:            b.inclTx,
+			fullTx:            b.fullTx,
+		}
+		return json.Marshal(ir)
+	}
+	ir := &RPCMarshalUncleTIR{
 		RPCMarshalHeaderT: b.RPCMarshalHeaderT,
-		Transactions:      b.Transactions,
 		Uncles:            b.Uncles,
 		Error:             "",
 		inclTx:            b.inclTx,
@@ -1261,6 +1278,8 @@ func (b *RPCMarshalBlockT) MarshalJSON() ([]byte, error) {
 func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool) (*RPCMarshalBlockT, error) {
 	fields := &RPCMarshalBlockT{RPCMarshalHeaderT: NewRPCMarshalHeaderTFromHeader(block.Header())}
 	fields.Size = hexutil.Uint64(block.Size())
+	fields.inclTx = inclTx
+	fields.fullTx = fullTx
 
 	if inclTx {
 		formatTx := func(tx *types.Transaction) (interface{}, error) {

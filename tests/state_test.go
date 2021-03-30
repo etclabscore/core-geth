@@ -61,8 +61,12 @@ func TestState(t *testing.T) {
 		st.skipLoad(`^stQuadraticComplexityTest/`)
 		st.skipLoad(`^stStaticCall/static_Call50000`)
 	}
-
-	// st.whitelist("StaticcallToPrecompileFromCalledContract")
+	if *testEVM != "" || *testEWASM != "" {
+		// Berlin tests are not expected to pass for external EVMs, yet.
+		//
+		st.skipFork("^Berlin$")
+		st.skipFork("^Magneto$")
+	}
 
 	// Broken tests:
 	// Expected failures:

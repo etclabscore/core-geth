@@ -347,6 +347,8 @@ func getRevision(env *EVM) evmc.Revision {
 	// about chain config, where I'm choosing to prioritize "indicative" features
 	// as identifiers for Fork-Feature-Groups. Note that this is very different
 	// than using Feature-complete sets to assert "did Forkage."
+	case conf.IsEnabled(conf.GetEIP2565Transition, n):
+		panic("berlin is unsupported by EVMCv7")
 	case conf.IsEnabled(conf.GetEIP1884Transition, n):
 		return evmc.Istanbul
 	case conf.IsEnabled(conf.GetEIP1283DisableTransition, n):

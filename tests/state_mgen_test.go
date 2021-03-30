@@ -199,7 +199,11 @@ func (tm *testMatcherGen) stateTestRunner(t *testing.T, name string, test *State
 	}
 }
 
+// TestGenStateParityConfigs generates parity-style configurations.
+// This isn't a test. It generates configs.
+// Skip should be installed so this function will only be run by developers as needed.
 func TestGenStateParityConfigs(t *testing.T) {
+	t.Skip()
 	st := new(testMatcher)
 
 	// FYI: Possibly the slowest and stupidest way to write 14 files: read 42189 test to do it
@@ -303,6 +307,9 @@ func TestGenStateAll(t *testing.T) {
 }
 
 func TestGenStateSingles(t *testing.T) {
+	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
+		t.Skip()
+	}
 	head := build.RunGit("rev-parse", "HEAD")
 	head = strings.TrimSpace(head)
 

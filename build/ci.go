@@ -266,10 +266,10 @@ func doInstall(cmdline []string) {
 	gobuild.Args = append(gobuild.Args, buildFlags(env)...)
 
 	/*
-	TODO(meowsbits): The -trimpath flag is commented because it breaks openrpc discovery, for which
-	reflection/AST-parsing gets broken when paths are not full.
-	Is there a better solve for this? Can we just turn reflection off for the geth build?
-	 */
+		TODO(meowsbits): The -trimpath flag is commented because it breaks openrpc discovery, for which
+		reflection/AST-parsing gets broken when paths are not full.
+		Is there a better solve for this? Can we just turn reflection off for the geth build?
+	*/
 	// We use -trimpath to avoid leaking local paths into the built executables.
 	// gobuild.Args = append(gobuild.Args, "-trimpath")
 
@@ -359,6 +359,9 @@ func doTest(cmdline []string) {
 	// and some tests run into timeouts under load.
 	gotest := goTool("test", buildFlags(env)...)
 	gotest.Args = append(gotest.Args, "-p", "1")
+
+	// Despite package serialization, tests can still timeout on the CI.
+	gotest.Args = append(gotest.Args, "-timeout", "30m")
 	if *coverage {
 		gotest.Args = append(gotest.Args, "-covermode=atomic", "-cover")
 	}

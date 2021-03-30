@@ -65,7 +65,7 @@ func TestState(t *testing.T) {
 		// Berlin tests are not expected to pass for external EVMs, yet.
 		//
 		st.skipFork("^Berlin$")
-		st.skipFork("^Magneto$")
+		st.skipFork("Magneto")
 	}
 
 	// Broken tests:

@@ -44,7 +44,6 @@ sync-parity-chainspecs:
 
 test-coregeth: \
  test-coregeth-features \
- test-coregeth-chainspecs \
  test-coregeth-consensus \
  test-coregeth-regression-condensed ## Runs all tests specific to core-geth.
 
@@ -77,13 +76,9 @@ test-evmc: evmc/bindings/go/evmc/example_vm.so hera ssvm evmone aleth-interprete
 clean-evmc:
 	rm -rf evmc/bindings/go/evmc/example_vm.so ./build/_workspace/hera ./build/_workspace/SSVM ./build/_workspace/evmone ./build/_workspace/aleth
 
-test-coregeth-features: test-coregeth-features-parity test-coregeth-features-coregeth test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
+test-coregeth-features: test-coregeth-features-coregeth test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
 
 test-coregeth-consensus: test-coregeth-features-clique-consensus
-
-test-coregeth-features-parity:
-	@echo "Testing fork/feature/datatype implementation; equivalence - OPENETHEREUM."
-	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_OPENETHEREUM=on go test -count=1 ./tests
 
 test-coregeth-features-coregeth:
 	@echo "Testing fork/feature/datatype implementation; equivalence - COREGETH."

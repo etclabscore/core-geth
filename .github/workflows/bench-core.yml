@@ -1,0 +1,96 @@
+name: Benchmark Core
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  bench_core_geth:
+    name: Benchmark core-geth
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Set up Go 1.x
+        id: go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Benchmark etclabscore/core-geth
+        id: bench
+        run: |
+          go test -short ./core -count 1 -p 1 -timeout 60m -run NONE -bench=. -v |& tee core-geth.txt
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: core-geth
+          path: ./core-geth.txt
+
+  bench_go_ethereum:
+    name: Benchmark go-ethereum
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Set up Go 1.x
+        id: go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          repository: 'ethereum/go-ethereum'
+          ref: 'v1.9.25'
+
+      - name: Benchmark ethereum/go-ethereum
+        id: bench
+        run: |
+          go test -short ./core -count 1 -p 1 -timeout 60m -run NONE -bench=. -v |& tee go-ethereum.txt
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: go-ethereum
+          path: ./go-ethereum.txt
+
+  compare:
+    name: Compare
+    needs: [bench_core_geth, bench_go_ethereum]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Set up Go 1.x
+        id: go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Get dependencies
+        run: |
+          cd ..
+          go get golang.org/x/perf/cmd/...
+          cd -
+
+      - uses: actions/download-artifact@v2
+        name: Get go-ethereum artifact
+        with:
+          name: go-ethereum
+
+      - uses: actions/download-artifact@v2
+        name: Get core-geth artifact
+        with:
+          name: core-geth
+
+      - name: "Analyze Results [COMPRESSED]"
+        run: |
+          benchstat --geomean go-ethereum.txt core-geth.txt
+
+      - name: "Analyze Results [RAW DELTA]"
+        run: |
+          benchstat --geomean --delta-test=none go-ethereum.txt core-geth.txt

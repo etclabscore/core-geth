@@ -77,15 +77,15 @@ test-coregeth-consensus: test-coregeth-features-clique-consensus
 
 test-coregeth-features-coregeth:
 	@echo "Testing fork/feature/datatype implementation; equivalence - COREGETH."
-	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_COREGETH=on go test -count=1 ./tests
+	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_COREGETH=on go test -count=1 -timeout 60m ./tests
 
 test-coregeth-features-multigethv0:
 	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETHv0."
-	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETHV0=on go test -count=1 ./tests
+	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETHV0=on go test -count=1 -timeout 60m ./tests
 
 test-coregeth-features-clique-consensus:
 	@echo "Testing fork/feature/datatype implementation; equivalence - Clique consensus"
-	env COREGETH_TESTS_CHAINCONFIG_CONSENSUS_EQUIVALENCE_CLIQUE=on go test -count=1 -run TestState ./tests ## Only run state tests here, since Blockchain tests will care about rewards, etc.
+	env COREGETH_TESTS_CHAINCONFIG_CONSENSUS_EQUIVALENCE_CLIQUE=on go test -count=1 -timeout 60m -run TestState ./tests ## Only run state tests here, since Blockchain tests will care about rewards, etc.
 
 test-coregeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
 	@echo "Testing Parity JSON chainspec equivalence."

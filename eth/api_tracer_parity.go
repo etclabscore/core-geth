@@ -66,24 +66,28 @@ func setConfigTracerToParity(config *TraceConfig) *TraceConfig {
 		config = &TraceConfig{}
 	}
 
-	tracer := "callTracerParity"
-	config.Tracer = &tracer
+	if config.Tracer == nil {
+		tracer := "callTracerParity"
+		config.Tracer = &tracer
+	}
+
 	return config
 }
 
 func decorateParityOutput(res interface{}, config *TraceConfig) interface{} {
-	if config.ParityCompatibleOutput {
-		out := map[string]interface{}{}
-
-		if *config.Tracer == "callTracerParity" {
-			out["trace"] = res
-		} else if *config.Tracer == "stateDiffTracer" {
-			out["stateDiff"] = res
-		}
-
-		res = out
+	if config == nil || config.Tracer == nil || !config.ParityCompatibleOutput {
+		return res
 	}
-	return res
+
+	out := map[string]interface{}{}
+	if *config.Tracer == "callTracerParity" {
+		out["trace"] = res
+	} else if *config.Tracer == "stateDiffTracer" {
+		out["stateDiff"] = res
+	} else {
+		return res
+	}
+	return out
 }
 
 func traceBlockReward(ctx context.Context, eth *Ethereum, block *types.Block, config *TraceConfig) (*ParityTrace, error) {
@@ -226,10 +230,7 @@ func (api *PrivateTraceAPI) Filter(ctx context.Context, args TraceFilterArgs, co
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
 func (api *PrivateTraceAPI) Call(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
-	// TODO: handle all 3 tracers
-	if config == nil {
-		config = setConfigTracerToParity(config)
-	}
+	config = setConfigTracerToParity(config)
 	res, err := traceCall(ctx, api.eth, args, blockNrOrHash, config)
 	if err != nil {
 		return nil, err
@@ -241,10 +242,7 @@ func (api *PrivateTraceAPI) Call(ctx context.Context, args ethapi.CallArgs, bloc
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
 func (api *PrivateTraceAPI) CallMany(ctx context.Context, txs []ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
-	// TODO: handle all 3 tracers
-	if config == nil {
-		config = setConfigTracerToParity(config)
-	}
+	config = setConfigTracerToParity(config)
 	res, err := traceCallMany(ctx, api.eth, txs, blockNrOrHash, config)
 	if err != nil {
 		return nil, err

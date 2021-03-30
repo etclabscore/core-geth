@@ -75,10 +75,6 @@ func setConfigTracerToParity(config *TraceConfig) *TraceConfig {
 }
 
 func decorateParityOutput(res interface{}, config *TraceConfig) interface{} {
-	if config == nil || config.Tracer == nil || !config.ParityCompatibleOutput {
-		return res
-	}
-
 	out := map[string]interface{}{}
 	if *config.Tracer == "callTracerParity" {
 		out["trace"] = res
@@ -235,7 +231,10 @@ func (api *PrivateTraceAPI) Call(ctx context.Context, args ethapi.CallArgs, bloc
 	if err != nil {
 		return nil, err
 	}
-	return decorateParityOutput(res, config), nil
+	if config != nil && config.Tracer != nil && config.ParityCompatibleOutput {
+		res = decorateParityOutput(res, config)
+	}
+	return res, nil
 }
 
 // CallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
@@ -247,5 +246,8 @@ func (api *PrivateTraceAPI) CallMany(ctx context.Context, txs []ethapi.CallArgs,
 	if err != nil {
 		return nil, err
 	}
-	return decorateParityOutput(res, config), nil
+	if config != nil && config.Tracer != nil && config.ParityCompatibleOutput {
+		res = decorateParityOutput(res, config)
+	}
+	return res, nil
 }

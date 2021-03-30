@@ -346,6 +346,7 @@ func goToolSetEnv(cmd *exec.Cmd) {
 func doTest(cmdline []string) {
 	coverage := flag.Bool("coverage", false, "Whether to record code coverage")
 	verbose := flag.Bool("v", false, "Whether to log verbosely")
+	timeout := flag.String("timeout", "", "Timeout limit")
 	flag.CommandLine.Parse(cmdline)
 	env := build.Env()
 
@@ -359,14 +360,14 @@ func doTest(cmdline []string) {
 	// and some tests run into timeouts under load.
 	gotest := goTool("test", buildFlags(env)...)
 	gotest.Args = append(gotest.Args, "-p", "1")
-
-	// Despite package serialization, tests can still timeout on the CI.
-	gotest.Args = append(gotest.Args, "-timeout", "30m")
 	if *coverage {
 		gotest.Args = append(gotest.Args, "-covermode=atomic", "-cover")
 	}
 	if *verbose {
 		gotest.Args = append(gotest.Args, "-v")
+	}
+	if *timeout {
+		gotest.Args = append(gotest.Args, "-timeout", *timeout)
 	}
 
 	gotest.Args = append(gotest.Args, packages...)

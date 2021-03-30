@@ -23,7 +23,7 @@ jobs:
     dist: xenial
     go: 1.16.x
     script:
-    - make test-coregeth
+    - travis_wait 60 make test-coregeth
 
   # Run build and tests against latest-1 Go version.
   - stage: build

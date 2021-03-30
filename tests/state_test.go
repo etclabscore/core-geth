@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -50,12 +51,10 @@ func TestState(t *testing.T) {
 		st.skipLoad(`^stEWASM`)
 	}
 	if *testEVM != "" {
-
-		// These fail because these forks were not supported at this version of the EVMOne .so.
-		// The EVMOne version (0.2.0) is the latest EVMC v6 compatible version.
-		st.skipFork("Constantinople") // Only support
-		st.skipFork("Istanbul")
-		st.skipFork("ETC_Phoenix")
+		// These interpreters fail Constantinople (but pass ConstantinopleFix).
+		if strings.Contains(*testEVM, "aleth") || strings.Contains(*testEVM, "evmone") {
+			st.skipFork("^Constantinople$")
+		}
 
 		// These tests are noted as SLOW above, and they fail against the EVMOne.so
 		// So (get it?), skip 'em.

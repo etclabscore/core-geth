@@ -2,25 +2,11 @@
 
 set -e
 
-mkdir -p build/_workspace/SSVM/build/tools/ssvm-evmc/
-wget -O build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so https://github.com/second-state/SSVM/releases/download/0.5.0/libssvmEVMC-linux-x86_64.so
+if [[ "$OSTYPE" != "linux"* ]]; then
+    echo "This script is only currently configured to work on Linux. Please see \"https://github.com/second-state/ssvm-evmc#notice\" documentation for instructions to build in other environments."
+    exit 1
+fi
 
-# The follow are steps that might be used to build the SSVM SO from source.
-# This library is only used for testing.
-# Previous versions of this source worked by this pattern, but
-# fail for me with 0.5.0.
-# So I opted to use the above download pattern, which is simpler.
-#main() {
-#    mkdir -p build/_workspace
-#    [ ! -d build/_workspace/SSVM ] && git clone https://github.com/second-state/SSVM build/_workspace/SSVM || echo "SSVM exists."
-#    cd build/_workspace/SSVM
-#    git fetch --tags
-#    # git checkout 0.5.0
-#    git checkout 0.6.1
-#    mkdir -p build
-#    cd build
-#    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON ..
-#    make
-#    echo "Built library at: $(pwd)/tools/ssvm-evmc/libssvmEVMC.so"
-#}
-#main
+mkdir -p build/_workspace/SSVM/build/tools/ssvm-evmc/
+wget -O build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so \
+    https://github.com/second-state/ssvm-evmc/releases/download/evmc7-0.1.1/libssvm-evmc.so

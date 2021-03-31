@@ -13,8 +13,8 @@ It's good to mention that `trace_*` methods are nothing more than aliases to som
 
 The ad-hoc tracing API allows you to perform a number of different diagnostics on calls or transactions, either historical ones from the chain or hypothetical ones not yet mined.
 
-- [ ] trace_call *(alias to debug_traceCall)*
-- [ ] trace_callMany
+- [x] trace_call *(alias to debug_traceCall)*
+- [x] trace_callMany
 - [ ] trace_rawTransaction
 - [ ] trace_replayBlockTransactions
 - [ ] trace_replayTransaction
@@ -25,14 +25,14 @@ These APIs allow you to get a full externality trace on any transaction executed
 
 - [x] trace_block *(alias to debug_traceBlock)*
 - [x] trace_transaction *(alias to debug_traceTransaction)*
-- [ ] trace_filter (doesn't support address filtering yet)
+- [x] trace_filter (doesn't support address filtering yet)
 - [ ] trace_get
 
 ## Available tracers
 
 - `callTracerParity` Transaction trace returning a response equivalent to OpenEthereum's (aka Parity) response schema. For documentation on this response value see [here](#calltracerparity).
 - `vmTrace` Virtual Machine execution trace. Provides a full trace of the VM’s state throughout the execution of the transaction, including for any subcalls. *(Not implemented yet)*
-- `stateDiffTracer` State difference. Provides information detailing all altered portions of the Ethereum state made due to the execution of the transaction.
+- `stateDiffTracer` State difference. Provides information detailing all altered portions of the Ethereum state made due to the execution of the transaction. For documentation on this response value see [here](#statedifftracer).
 
 !!! Example "Example trace_* API method config (last method argument)"
 
@@ -97,6 +97,49 @@ Each object that represents an internal transaction consists of:
         "type": "call"
     }
 ]
+```
+
+#### stateDiffTracer
+
+Provides information detailing all **altered portions** of the Ethereum state made due to the execution of the transaction.
+
+Each address object provides the state differences for `balance`, `nonce`, `code` and `storage`.
+Actually, under the `storage` object, we can find the state differences for each contract's storage key.
+
+**Special symbols** explanation:
+
+* `+`, when we have a new entry in the state DB,
+* `-`, when we have a removal from the state DB,
+* `*`, when existing data have changed in the state DB, providing the `from` (old) and the `to` (new) values,
+* `=`, when the data remained the same.
+
+```js
+{
+    "0x877bd459c9b7d8576b44e59e09d076c25946f443": {
+        "balance": {
+            "*": {
+                "from": "0xd062abd70db4255a296",
+                "to": "0xd062ac59cb1bd516296"
+            }
+        },
+        "nonce": {
+            "*": {
+                "from": "0x1c7ff",
+                "to": "0x1c800"
+            }
+        },
+        "code": "=",
+        "storage": {
+            "0x0000000000000000000000000000000000000000000000000000000000000001": {
+                "*": {
+                    "from": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    "to": "0x0000000000000000000000000000000000000000000000000000000000000061"
+                }
+              },
+        }
+    },
+    ...
+}
 ```
 
 ## "stateDiff" tracer differences with OpenEthereum

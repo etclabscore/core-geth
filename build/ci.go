@@ -366,7 +366,7 @@ func doTest(cmdline []string) {
 	if *verbose {
 		gotest.Args = append(gotest.Args, "-v")
 	}
-	if *timeout {
+	if *timeout != "" {
 		gotest.Args = append(gotest.Args, "-timeout", *timeout)
 	}
 

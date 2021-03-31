@@ -334,40 +334,23 @@ func TestGenStateSingles(t *testing.T) {
 	}
 }
 
-func mustTemporaryGenerationPath(originalName string) (tempPath string) {
-	targetName := strings.Replace(originalName, "testdata", "testdata_gen", 1)
-	err := os.MkdirAll(filepath.Dir(targetName), os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-	testOutFullName, err := filepath.Abs(targetName)
-	if err != nil {
-		panic(err)
-	}
-	testOutFullName = filepath.Clean(testOutFullName)
-	if err := os.Truncate(testOutFullName, 0); os.IsNotExist(err) {
-		if _, err := os.Create(testOutFullName); err != nil {
-			panic(err)
-		}
-	} else if err != nil {
-		panic(err)
-	}
-	return testOutFullName
-}
-
 func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {
-	testOutFullName := mustTemporaryGenerationPath(name)
-	testOut, err := os.OpenFile(testOutFullName, os.O_RDWR, os.ModePerm)
+	tmpFile, err := ioutil.TempFile(os.TempDir(), "geth-state-test-generation")
 	if err != nil {
 		t.Fatal(err)
 	}
+	tmpFileName := tmpFile.Name()
 
 	// tm.runTestFile(t, name, name, tm.stateTestRunner)
-	tm.runTestFile(t, name, name, tm.stateTestsGen(testOut, func() {
-		tm.runTestFile(t, testOutFullName, testOutFullName, tm.stateTestRunner)
-		os.Rename(testOutFullName, name)
+	tm.runTestFile(t, name, name, tm.stateTestsGen(tmpFile, func() {
+		tm.runTestFile(t, tmpFileName, tmpFileName, tm.stateTestRunner)
+		if err := os.Rename(tmpFileName, name); err != nil {
+			t.Fatal(err)
+		}
 	}, func() {
-		os.RemoveAll(testOutFullName)
+		if err := os.RemoveAll(tmpFileName); err != nil {
+			t.Fatal(err)
+		}
 	}))
 }
 

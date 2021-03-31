@@ -35,7 +35,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
-	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/iancoleman/strcase"
 )
 
@@ -136,7 +135,7 @@ func TestGenStateSingles(t *testing.T) {
 	}
 
 	tm := new(testMatcherGen)
-	tm.allConfigs = make(map[string]*genesisT.Genesis)
+	tm.allConfigs = make(map[string]*coregeth.CoreGethChainConfig)
 	tm.testMatcher = new(testMatcher)
 	tm.noParallel = true // disable parallelism
 	tm.errorPanics = true

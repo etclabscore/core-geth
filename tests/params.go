@@ -296,11 +296,14 @@ func init() {
 					panic(wde)
 				}
 				config = Forks[k]
-				g := params.DefaultRopstenGenesisBlock()
-				g.Config = &coregeth.CoreGethChainConfig{}
-				if err := confp.Convert(config, g); ctypes.IsFatalUnsupportedErr(err) {
+				c := &coregeth.CoreGethChainConfig{}
+
+				if err := confp.Convert(config, c); ctypes.IsFatalUnsupportedErr(err) {
 					panic(err)
 				}
+
+				g := params.DefaultRopstenGenesisBlock()
+				g.Config = c
 
 				b, _ := json.MarshalIndent(g, "", "    ")
 				writePath := filepath.Join(coregethSpecsDir, v)

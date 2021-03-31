@@ -30,8 +30,10 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
+	"github.com/iancoleman/strcase"
 )
 
 var paritySpecsDir = filepath.Join("..", "params", "parity.json.d")
@@ -76,13 +78,13 @@ var MapForkNameChainspecFileState = map[string]string{
 	"Byzantium":            "byzantium_test.json",
 	"Constantinople":       "constantinople_test.json",
 	"ConstantinopleFix":    "constantinople_fix_test.json",
-	"EIP158ToByzantiumAt5": "eip158_to_byzantiumat5_test.json",
+	"EIP158ToByzantiumAt5": "eip_158_to_byzantium_at_5_test.json",
 	"Istanbul":             "istanbul_test.json",
 	"Berlin":               "berlin_test.json",
-	"ETC_Atlantis":         "classic_atlantis_test.json",
-	"ETC_Agharta":          "classic_agharta_test.json",
-	"ETC_Phoenix":          "classic_phoenix_test.json",
-	"ETC_Magneto":          "classic_magneto_test.json",
+	"ETC_Atlantis":         "etc_atlantis_test.json",
+	"ETC_Agharta":          "etc_agharta_test.json",
+	"ETC_Phoenix":          "etc_phoenix_test.json",
+	"ETC_Magneto":          "etc_magneto_test.json",
 }
 
 var mapForkNameChainspecFileDifficulty = map[string]string{
@@ -280,35 +282,52 @@ func init() {
 			}
 			difficultyChainConfigurations[k] = pspec
 		}
-		//
-		// } else if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_COREGETH_KEY) != "" {
-		// 	log.Println("Setting chain configurations from core-geth chainspecs")
-		//
-		// 	for k, v := range MapForkNameChainspecFileState {
-		// 		gen := &genesisT.Genesis{
-		// 			Config: &coregeth.CoreGethChainConfig{},
-		// 		}
-		// 		specPath := coregethSpecPath(v)
-		//
-		// 		config, sha1sum, err := readJSONFromFile()
-		// 		if err != nil {
-		// 			panic(err)
-		// 		}
-		// 		// chainspecRefsState[k] = chainspecRef{filepath.Base(v), sha1sum}
-		// 		Forks[k] = config
-		// 	}
-		//
-		// 	for k, v := range mapForkNameChainspecFileDifficulty {
-		// 		config, sha1sum, err := readConfigFromSpecFileParity(coregethSpecPath(v))
-		// 		if err != nil {
-		// 			panic(err)
-		// 		}
-		// 		if len(sha1sum) == 0 {
-		// 			panic("empty sha1 sum")
-		// 		}
-		// 		chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
-		// 		difficultyChainConfigurations[k] = config
-		// 	}
+
+	} else if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_COREGETH_KEY) != "" {
+		// This logic reads Forks (used by [General]StateTests) and Difficulty configurations
+		// from their respective coregeth.json.d/<file>.json files.
+		// This implementation differs from that of this scope's predecessor CG_CHAINCONFIG_CHAINSPECS_OPENETHEREUM_KEY
+		// because it only replaces Go values when it finds a corresponding configuration file
+		// (it does not demand to replace all available configurations).
+		// This avoids some unnecessary overhead for establishing configurations
+		// that aren't really relevant, like Morden testnets.
+		log.Println("Setting chain configurations from core-geth chainspecs")
+
+		// newForks avoid write+iterate on Forks map.
+		// All key:values in newForks will be written back to Forks.
+		newForks := map[string]ctypes.ChainConfigurator{}
+		for name := range Forks {
+			gen := &genesisT.Genesis{
+				Config: &coregeth.CoreGethChainConfig{},
+			}
+			specPath := filepath.Join(coregethSpecsDir, strcase.ToSnake(name)+"_test.json")
+
+			sha1sum, err := readJSONFromFile(specPath, gen)
+			if err != nil {
+				log.Printf("Failed to read core-geth state config file for %s: %s", name, specPath)
+				continue
+			}
+			chainspecRefsState[name] = chainspecRef{filepath.Base(specPath), sha1sum}
+			newForks[name] = gen.Config
+		}
+		for name, conf := range newForks {
+			Forks[name] = conf
+		}
+
+		for k, v := range mapForkNameChainspecFileDifficulty {
+			conf := &coregeth.CoreGethChainConfig{}
+			specPath := filepath.Join(coregethSpecsDir, v)
+			sha1sum, err := readJSONFromFile(specPath, conf)
+			if err != nil {
+				log.Printf("Failed to read core-geth difficulty file for %s: %s", k, specPath)
+				continue
+			}
+			if len(sha1sum) == 0 {
+				panic("empty sha1 sum")
+			}
+			chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
+			difficultyChainConfigurations[k] = conf
+		}
 
 		// DEPRECATED.
 		// Use CG_CHAINCONFIG_CHAINSPECS_COREGETH_KEY instead.

@@ -247,3 +247,31 @@ func TestUint64BigMapEncodesHex_SetValueTotalForHeight(t *testing.T) {
 	mgTestlike.SetValueTotalForHeight(&five, vars.EIP1234DifficultyBombDelay)
 	check(mgTestlike, mgTestlike.SumValues(&zero), vars.EIP649DifficultyBombDelay.Uint64())
 }
+
+func TestMapMeetsSpecification_1234(t *testing.T) {
+	data := `{
+		"difficultyBombDelays": {
+            "0x0": "0x4c4b40"
+        },
+        "blockReward": {
+            "0x0": "0x29a2241af62c0000"
+        }}`
+
+	im := struct {
+		DifficultyBombDelaySchedule Uint64BigMapEncodesHex `json:"difficultyBombDelays,omitempty"` // JSON tag matches Parity's
+		BlockRewardSchedule         Uint64BigMapEncodesHex `json:"blockReward,omitempty"`          // JSON tag matches Parity's
+	}{}
+	err := json.Unmarshal([]byte(data), &im)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	n := MapMeetsSpecification(
+		im.DifficultyBombDelaySchedule,
+		im.BlockRewardSchedule,
+		vars.EIP1234DifficultyBombDelay,
+		vars.EIP1234FBlockReward,
+	)
+
+	t.Logf("%v n=%v", im, n)
+}

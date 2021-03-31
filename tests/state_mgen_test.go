@@ -33,8 +33,8 @@ import (
 	"github.com/ethereum/go-ethereum/internal/build"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
-	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/iancoleman/strcase"
 )
 
@@ -161,8 +161,8 @@ func TestGenStateSingles(t *testing.T) {
 	}
 }
 
-// testWriteTest generates a file-based tests (writing a new file), and re-runs (testing) the generated test file.
 func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {
+	// testWriteTest generates a file-based tests (writing a new file), and re-runs (testing) the generated test file.
 
 	// Set up a temporary file to write the generated test(s) to.
 	// We have to use an actual file because the on-write callback re-runs the
@@ -337,10 +337,10 @@ func (tm *testMatcherGen) stateTestRunner(t *testing.T, name string, test *State
 	}
 }
 
-// TestGenStateParityConfigs generates parity-style configurations.
+// TestGenStateCoreGethConfigs generates core-geth-style configurations.
 // This isn't a test. It generates configs.
 // Skip should be installed so this function will only be run by developers as needed.
-func TestGenStateParityConfigs(t *testing.T) {
+func TestGenStateCoreGethConfigs(t *testing.T) {
 	t.Skip()
 	st := new(testMatcher)
 
@@ -355,57 +355,95 @@ func TestGenStateParityConfigs(t *testing.T) {
 
 				genesis := test.genesis(Forks[subtest.Fork])
 
-				// Write the genesis+config in the Parity config format.
-				pspec, err := tconvert.NewParityChainSpec(subtest.Fork, genesis, []string{})
+				cgConfig := &coregeth.CoreGethChainConfig{}
+				err := confp.Convert(genesis.Config, cgConfig)
 				if err != nil {
 					t.Fatal(err)
 				}
-				b, err := json.MarshalIndent(pspec, "", "    ")
+				genesis.Config = cgConfig
+
+				b, err := json.MarshalIndent(genesis, "", "    ")
 				if err != nil {
 					t.Fatal(err)
 				}
 				filename := filepath.Join(
-					"..",
-					"params",
-					"parity.json.d",
-					strcase.ToSnake(subtest.Fork)+".json",
+					coregethSpecsDir,
+					strcase.ToSnake(subtest.Fork)+"_test.json",
 				)
 				err = ioutil.WriteFile(filename, b, os.ModePerm)
 				if err != nil {
 					t.Fatal(err)
 				}
+			}
+		})
+	}
+}
 
-				// Also write it in coregeth format.
-				cgspec := &coregeth.CoreGethChainConfig{}
-				err = confp.Convert(Forks[subtest.Fork], cgspec)
-				if err != nil {
-					t.Fatal(err)
-				}
+func TestGeneratedConfigsEq(t *testing.T) {
+	specPath := filepath.Join(coregethSpecsDir, "berlin_test.json")
+	gen := &genesisT.Genesis{
+		Config: &coregeth.CoreGethChainConfig{},
+	}
+	_, err := readJSONFromFile(specPath, gen)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-				cgGenesis := test.genesis(cgspec)
-				b, err = json.MarshalIndent(cgGenesis, "", "    ")
-				if err != nil {
-					t.Fatal(err)
-				}
+	coded := Forks["Berlin"]
 
-				filename = filepath.Join(
-					"..",
-					"params",
-					"coregeth.json.d",
-					strcase.ToSnake(subtest.Fork)+".json",
-				)
-				err = os.MkdirAll(filepath.Dir(filename), os.ModePerm)
-				if err != nil {
-					t.Fatal(err)
-				}
-				err = ioutil.WriteFile(filename, b, os.ModePerm)
-				if err != nil {
-					t.Fatal(err)
-				}
+	err = confp.Equivalent(coded, gen.Config)
+	if err != nil {
+		t.Error(err)
+	}
+}
 
-				// We cannot write the config in any other formats because
-				// go-ethereum and multi-geth are unable to describe some of the
-				// features configured, eg. ECIPs and possibly others (eg. EIP2537).
+func TestConvertBerlin(t *testing.T) {
+	safePrint := func(n *uint64) string {
+		if n == nil {
+			return "nil"
+		}
+		return fmt.Sprintf("%d", *n)
+	}
+	for _, forkName := range []string{"Constantinople", "Istanbul", "Berlin"} {
+		t.Run(forkName, func(t *testing.T) {
+			berlin := Forks[forkName]
+			eip1234 := berlin.GetEthashEIP1234Transition()
+
+			cg := &coregeth.CoreGethChainConfig{}
+			err := confp.Convert(berlin, cg)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			cg1234 := cg.GetEthashEIP1234Transition()
+
+			t.Log(safePrint(eip1234), safePrint(cg1234))
+
+			err = confp.Equivalent(berlin, cg)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			b, _ := json.MarshalIndent(cg, "", "    ")
+			t.Log(string(b))
+
+			cg2 := &coregeth.CoreGethChainConfig{}
+			err = json.Unmarshal(b, cg2)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// zero := uint64(0)
+			// cg2.SetEthashEIP649Transition(&zero)
+			// cg2.SetEthashEIP1234Transition(&zero)
+
+			cg2_1234 := cg2.GetEthashEIP1234Transition()
+
+			t.Log(safePrint(eip1234), safePrint(cg1234), safePrint(cg2_1234))
+
+			err = confp.Equivalent(berlin, cg2)
+			if err != nil {
+				t.Fatal(err)
 			}
 		})
 	}

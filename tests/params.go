@@ -302,7 +302,6 @@ func init() {
 					panic(err)
 				}
 
-				g.Config = g
 				b, _ := json.MarshalIndent(g, "", "    ")
 				writePath := filepath.Join(coregethSpecsDir, v)
 				err := ioutil.WriteFile(writePath, b, os.ModePerm)

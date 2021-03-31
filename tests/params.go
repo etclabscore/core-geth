@@ -136,8 +136,9 @@ func readConfigFromSpecFileParity(name string) (spec ctypes.ChainConfigurator, s
 }
 
 func readConfigFromSpecFileCoreGeth(name string) (spec ctypes.ChainConfigurator, sha1sum []byte, err error) {
-	spec = &coregeth.CoreGethChainConfig{}
-	gen := &genesisT.Genesis{}
+	gen := &genesisT.Genesis{
+		Config: &coregeth.CoreGethChainConfig{},
+	}
 	if fi, err := os.Open(name); os.IsNotExist(err) {
 		return nil, nil, err
 	} else {
@@ -295,12 +296,13 @@ func init() {
 					panic(wde)
 				}
 				config = Forks[k]
-				cgspec := &coregeth.CoreGethChainConfig{}
-				if err := confp.Convert(config, cgspec); ctypes.IsFatalUnsupportedErr(err) {
+				g := params.DefaultRopstenGenesisBlock()
+				g.Config = &coregeth.CoreGethChainConfig{}
+				if err := confp.Convert(config, g); ctypes.IsFatalUnsupportedErr(err) {
 					panic(err)
 				}
-				g := params.DefaultRopstenGenesisBlock()
-				g.Config = cgspec
+
+				g.Config = g
 				b, _ := json.MarshalIndent(g, "", "    ")
 				writePath := filepath.Join(coregethSpecsDir, v)
 				err := ioutil.WriteFile(writePath, b, os.ModePerm)

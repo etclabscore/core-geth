@@ -1,0 +1,27 @@
+{
+    "networkId": 1,
+    "chainId": 1,
+    "eip2FBlock": 0,
+    "eip7FBlock": 0,
+    "eip150Block": 0,
+    "eip155Block": 0,
+    "eip160Block": 0,
+    "eip161FBlock": 0,
+    "eip170FBlock": 0,
+    "eip100FBlock": 5,
+    "eip140FBlock": 5,
+    "eip198FBlock": 5,
+    "eip211FBlock": 5,
+    "eip212FBlock": 5,
+    "eip213FBlock": 5,
+    "eip214FBlock": 5,
+    "eip658FBlock": 5,
+    "ethash": {},
+    "difficultyBombDelays": {
+        "0x5": "0x2dc6c0"
+    },
+    "blockReward": {
+        "0x5": "0x29a2241af62c0000"
+    },
+    "requireBlockHashes": null
+}

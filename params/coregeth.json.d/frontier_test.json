@@ -1,0 +1,6 @@
+{
+    "networkId": 1,
+    "chainId": 1,
+    "ethash": {},
+    "requireBlockHashes": null
+}

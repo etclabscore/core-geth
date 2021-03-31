@@ -49,11 +49,11 @@ type testMatcherGen struct {
 	gitHead     string
 	errorPanics bool
 
-	// allConfigs tracks each unique configuration (its genesis) used in a test-generating suite.
+	// allConfigs tracks each unique configuration used in a test-generating suite.
 	// This configuration map will be written to a file included with the tests as a reference
 	// so that cross-client tests can define what eg. "Berlin" means.
 	allConfigsMu sync.Mutex // safety first
-	allConfigs   map[string]*genesisT.Genesis
+	allConfigs   map[string]*coregeth.CoreGethChainConfig
 }
 
 // generateFromReference assigns reference:target pairs for test generation by fork name.
@@ -84,7 +84,7 @@ func TestGenStateAll(t *testing.T) {
 	head = strings.TrimSpace(head)
 
 	tm := new(testMatcherGen)
-	tm.allConfigs = make(map[string]*genesisT.Genesis)
+	tm.allConfigs = make(map[string]*coregeth.CoreGethChainConfig)
 	tm.testMatcher = new(testMatcher)
 	tm.noParallel = true
 	tm.errorPanics = true
@@ -100,6 +100,19 @@ func TestGenStateAll(t *testing.T) {
 		legacyStateTestDir,
 	} {
 		tm.walkFullName(t, dir, tm.testWriteTest)
+
+		// Write the chain config file.
+		// testdata/GeneralStateTests -> testdata/GeneralStateTests_configs.json
+		b, err := json.MarshalIndent(tm.allConfigs, "", "    ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = ioutil.WriteFile(fmt.Sprintf("%s_configs.json", dir), b, os.ModePerm)
+		if err != nil {
+			t.Fatal(err)
+		}
+		// Reset map as to only write config pertinent to forks in a tests directory.
+		tm.allConfigs = make(map[string]*coregeth.CoreGethChainConfig)
 	}
 }
 
@@ -188,23 +201,18 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 
 		for _, s := range subtests {
 
-			// vmConfig is constructed using global variables for possible EVM and EWASM interpreters.
-			// These interpreters are configured with environment variables and are assigned in an init() function.
-			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
-
 			// Prior to test-generation logic, record the genesis+chain config at the testmatcher level.
 			// This will allow us to generate a complete map of chain configurations for the test suite,
 			// whether the subtest's fork was used to generate any tests or not.
 			// Record the genesis+chain config at the testmatcher level.
-			config, eips, err := GetChainConfig(s.Fork)
+			config, _, err := GetChainConfig(s.Fork)
 			if err != nil {
 				t.Fatal(UnsupportedForkError{s.Fork})
 			}
-			vmConfig.ExtraEips = eips
-			genesis := test.genesis(config)
 
 			tm.allConfigsMu.Lock()
-			tm.allConfigs[s.Fork] = genesis
+			// This will panic if type isn't expected.
+			tm.allConfigs[s.Fork] = config.(*coregeth.CoreGethChainConfig)
 			tm.allConfigsMu.Unlock()
 
 			// Lookup the reference:target pairing, if any.
@@ -248,6 +256,10 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 					Value: refPostState[s.Index].Indexes.Value,
 				},
 			}
+
+			// vmConfig is constructed using global variables for possible EVM and EWASM interpreters.
+			// These interpreters are configured with environment variables and are assigned in an init() function.
+			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
 
 			// Since we know that tests run with and without the snapshotter features are equivalent, either boolean state
 			// is valid and 'false' is arbitrary.

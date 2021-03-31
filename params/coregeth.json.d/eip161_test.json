@@ -1,0 +1,13 @@
+{
+    "networkId": 1,
+    "chainId": 1,
+    "eip2FBlock": 0,
+    "eip7FBlock": 0,
+    "eip150Block": 0,
+    "eip155Block": 0,
+    "eip160Block": 0,
+    "eip161FBlock": 0,
+    "eip170FBlock": 0,
+    "ethash": {},
+    "requireBlockHashes": null
+}

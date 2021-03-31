@@ -585,6 +585,9 @@ func (c *CoreGethChainConfig) GetEthashEIP649Transition() *uint64 {
 		vars.EIP649DifficultyBombDelay,
 		vars.EIP649FBlockReward,
 	)
+	if diffN == nil {
+		diffN = c.GetEthashEIP1234Transition()
+	}
 	return diffN
 }
 
@@ -598,6 +601,12 @@ func (c *CoreGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
 
 	if n == nil {
 		return nil
+	}
+
+	if eip1234 := c.GetEthashEIP1234Transition(); eip1234 != nil {
+		if *eip1234 <= *n {
+			return nil
+		}
 	}
 
 	c.ensureExistingRewardSchedule()

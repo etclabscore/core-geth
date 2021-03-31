@@ -335,23 +335,38 @@ func TestGenStateSingles(t *testing.T) {
 }
 
 func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {
+
+	// Set up a temporary file to write the generated test(s) to.
+	// We have to use an actual file because the on-write callback re-runs the
+	// test using the newly-generated file to ensure consistency.
+	// If we didn't rerun the tests after writing, we could use a buffer as the WriteCloser.
+	// Note that parallelism can cause greasy bugs around file during read/write which is why
+	// we use a temporary file instead of immediately overwriting the canonical file in the first place;
+	// for example, I saw regular encoding errors without this pattern.
 	tmpFile, err := ioutil.TempFile(os.TempDir(), "geth-state-test-generation")
 	if err != nil {
 		t.Fatal(err)
 	}
 	tmpFileName := tmpFile.Name()
 
-	// tm.runTestFile(t, name, name, tm.stateTestRunner)
-	tm.runTestFile(t, name, name, tm.stateTestsGen(tmpFile, func() {
-		tm.runTestFile(t, tmpFileName, tmpFileName, tm.stateTestRunner)
-		if err := os.Rename(tmpFileName, name); err != nil {
-			t.Fatal(err)
-		}
-	}, func() {
-		if err := os.RemoveAll(tmpFileName); err != nil {
-			t.Fatal(err)
-		}
-	}))
+	tm.runTestFile(t, name, name, tm.stateTestsGen(tmpFile,
+		// On-Write:
+		// After generating the tests, rerun the test using the new test file, ensuring consistency.
+		// If the test passes (and it damn well should), then move the file to the canonical location.
+		func() {
+			tm.runTestFile(t, tmpFileName, tmpFileName, tm.stateTestRunner)
+			if err := os.Rename(tmpFileName, name); err != nil {
+				t.Fatal(err)
+			}
+		},
+		// On-Skip:
+		// This test is skipped by some condition in the test matcher, probably by skip-fork.
+		// In this case we just clean up the inoperative temp file.
+		func() {
+			if err := os.RemoveAll(tmpFileName); err != nil {
+				t.Fatal(err)
+			}
+		}))
 }
 
 func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTest) {

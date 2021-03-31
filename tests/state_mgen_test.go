@@ -25,6 +25,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -34,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/iancoleman/strcase"
 )
 
@@ -46,6 +48,12 @@ type testMatcherGen struct {
 
 	gitHead     string
 	errorPanics bool
+
+	// allConfigs tracks each unique configuration (its genesis) used in a test-generating suite.
+	// This configuration map will be written to a file included with the tests as a reference
+	// so that cross-client tests can define what eg. "Berlin" means.
+	allConfigsMu sync.Mutex // safety first
+	allConfigs   map[string]*genesisT.Genesis
 }
 
 // generateFromReference assigns reference:target pairs for test generation by fork name.
@@ -65,6 +73,9 @@ func TestGenStateAll(t *testing.T) {
 	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
 		t.Skip()
 	}
+	if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_COREGETH_KEY) == "" {
+		t.Fatal("Must use core-geth chain configs for test generation, converting if necessary.")
+	}
 
 	// There is no need to run this git command for every test, but
 	// speed is not really a big deal here, and it's nice to keep as much logic out
@@ -73,6 +84,7 @@ func TestGenStateAll(t *testing.T) {
 	head = strings.TrimSpace(head)
 
 	tm := new(testMatcherGen)
+	tm.allConfigs = make(map[string]*genesisT.Genesis)
 	tm.testMatcher = new(testMatcher)
 	tm.noParallel = true
 	tm.errorPanics = true
@@ -98,6 +110,9 @@ func TestGenStateSingles(t *testing.T) {
 	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
 		t.Skip()
 	}
+	if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_COREGETH_KEY) == "" {
+		t.Fatal("Must use core-geth chain configs for test generation, converting if necessary.")
+	}
 
 	head := build.RunGit("rev-parse", "HEAD")
 	head = strings.TrimSpace(head)
@@ -108,6 +123,7 @@ func TestGenStateSingles(t *testing.T) {
 	}
 
 	tm := new(testMatcherGen)
+	tm.allConfigs = make(map[string]*genesisT.Genesis)
 	tm.testMatcher = new(testMatcher)
 	tm.noParallel = true // disable parallelism
 	tm.errorPanics = true
@@ -171,6 +187,26 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 		targets := map[string][]stPostState{}
 
 		for _, s := range subtests {
+
+			// vmConfig is constructed using global variables for possible EVM and EWASM interpreters.
+			// These interpreters are configured with environment variables and are assigned in an init() function.
+			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
+
+			// Prior to test-generation logic, record the genesis+chain config at the testmatcher level.
+			// This will allow us to generate a complete map of chain configurations for the test suite,
+			// whether the subtest's fork was used to generate any tests or not.
+			// Record the genesis+chain config at the testmatcher level.
+			config, eips, err := GetChainConfig(s.Fork)
+			if err != nil {
+				t.Fatal(UnsupportedForkError{s.Fork})
+			}
+			vmConfig.ExtraEips = eips
+			genesis := test.genesis(config)
+
+			tm.allConfigsMu.Lock()
+			tm.allConfigs[s.Fork] = genesis
+			tm.allConfigsMu.Unlock()
+
 			// Lookup the reference:target pairing, if any.
 			var referenceFork, targetFork string
 			for i, r := range tm.references {
@@ -180,6 +216,9 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 					break
 				}
 			}
+
+			// If reference fork is empty we know that this subtest is not intended for as a reference
+			// for any target generated test.
 			if referenceFork == "" {
 				continue
 			}
@@ -209,10 +248,6 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 					Value: refPostState[s.Index].Indexes.Value,
 				},
 			}
-
-			// vmConfig is constructed using global variables for possible EVM and EWASM interpreters.
-			// These interpreters are configured with environment variables and are assigned in an init() function.
-			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
 
 			// Since we know that tests run with and without the snapshotter features are equivalent, either boolean state
 			// is valid and 'false' is arbitrary.

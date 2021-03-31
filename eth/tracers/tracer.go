@@ -244,7 +244,7 @@ func (dw *dbWrapper) pushObject(vm *duktape.Context) {
 		ctx.PushBoolean(dw.db.Empty(common.BytesToAddress(popSlice(ctx))))
 		return 1
 	})
-	vm.PutPropString(obj, "isEmpty")
+	vm.PutPropString(obj, "empty")
 }
 
 // contractWrapper provides a JavaScript wrapper around vm.Contract

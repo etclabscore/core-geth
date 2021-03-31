@@ -288,7 +288,7 @@
 				accountData.code = this.formatSingle(accountData.code, type);
 			}
 
-			if (db.isEmpty(toAddress(acc))) {
+			if (db.empty(toAddress(acc))) {
 				delete this.stateDiff[acc];
 				continue;
 			}

@@ -51,7 +51,7 @@ func paritySpecPath(name string) string {
 	return p
 }
 
-var coregethSpecsDir = filepath.Join("..", "params", "core-geth.json.d")
+var coregethSpecsDir = filepath.Join("..", "params", "coregeth.json.d")
 
 func coregethSpecPath(name string) string {
 	p := filepath.Join(coregethSpecsDir, name)
@@ -181,7 +181,7 @@ func writeDifficultyConfigFileCoreGeth(conf ctypes.ChainConfigurator, forkName s
 		return "", [20]byte{}, err
 	}
 
-	err = ioutil.WriteFile(filepath.Join("..", "params", "core-geth.json.d", specFilepath), b, os.ModePerm)
+	err = ioutil.WriteFile(filepath.Join("..", "params", "coregeth.json.d", specFilepath), b, os.ModePerm)
 	if err != nil {
 		return "", [20]byte{}, err
 	}

@@ -60,10 +60,10 @@ const (
 // TraceConfig holds extra parameters to trace functions.
 type TraceConfig struct {
 	*vm.LogConfig
-	Tracer                 *string
-	Timeout                *string
-	Reexec                 *uint64
-	ParityCompatibleOutput bool
+	Tracer            *string
+	Timeout           *string
+	Reexec            *uint64
+	NestedTraceOutput bool // Returns the trace output JSON nested under the trace name key. This allows full Parity compatibility to be achieved.
 }
 
 // StdTraceConfig holds extra parameters to standard-json trace functions.

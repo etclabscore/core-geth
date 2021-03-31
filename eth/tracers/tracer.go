@@ -568,6 +568,8 @@ func wrapError(context string, err error) error {
 	return fmt.Errorf("%v    in server-side tracer function '%v'", err, context)
 }
 
+// CapturePreEVM implements the Tracer interface to bootstrap the tracing context,
+// before EVM init. This is useful for reading initial balance, state, etc.
 func (jst *Tracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) error {
 	jst.dbWrapper.db = env.StateDB
 

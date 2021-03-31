@@ -326,6 +326,10 @@ type stepCounter struct {
 	steps int
 }
 
+func (s *stepCounter) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) error {
+	return nil
+}
+
 func (s *stepCounter) CaptureStart(from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) error {
 	return nil
 }

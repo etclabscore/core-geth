@@ -105,10 +105,12 @@ func (s *StructLog) ErrorString() string {
 
 // Tracer is used to collect execution traces from an EVM transaction
 // execution. CaptureState is called for each step of the VM with the
-// current VM state.
+// current VM state. CapturePreEVM is called before EVM init, is useful
+// for reading initial balance, state, etc.
 // Note that reference types are actual VM data structures; make copies
 // if you need to retain them beyond the current call.
 type Tracer interface {
+	CapturePreEVM(env *EVM, inputs map[string]interface{}) error
 	CaptureStart(from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) error
 	CaptureState(env *EVM, pc uint64, op OpCode, gas, cost uint64, memory *Memory, stack *Stack, rStack *ReturnStack, rData []byte, contract *Contract, depth int, err error) error
 	CaptureFault(env *EVM, pc uint64, op OpCode, gas, cost uint64, memory *Memory, stack *Stack, rStack *ReturnStack, contract *Contract, depth int, err error) error
@@ -138,6 +140,12 @@ func NewStructLogger(cfg *LogConfig) *StructLogger {
 		logger.cfg = *cfg
 	}
 	return logger
+}
+
+// CapturePreEVM implements the Tracer interface to bootstrap the tracing context,
+// before EVM init. This is useful for reading initial balance, state, etc.
+func (l *StructLogger) CapturePreEVM(env *EVM, inputs map[string]interface{}) error {
+	return nil
 }
 
 // CaptureStart implements the Tracer interface to initialize the tracing operation.
@@ -303,6 +311,10 @@ func NewMarkdownLogger(cfg *LogConfig, writer io.Writer) *mdLogger {
 		l.cfg = &LogConfig{}
 	}
 	return l
+}
+
+func (t *mdLogger) CapturePreEVM(env *EVM, inputs map[string]interface{}) error {
+	return nil
 }
 
 func (t *mdLogger) CaptureStart(from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) error {

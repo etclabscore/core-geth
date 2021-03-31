@@ -107,7 +107,7 @@ tests-generate-state: ## Generate state tests.
 
 tests-generate-difficulty: ## Generate difficulty tests.
 	@echo "Generating difficulty tests."
-	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_COREGETH=on \
+	env COREGETH_TESTS_CHAINCONFIG_COREGETH_SPECS=on \
 	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
 	go run build/ci.go test -v -timeout 60m ./tests -run TestDifficultyGen
 

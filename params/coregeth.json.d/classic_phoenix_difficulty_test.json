@@ -1,0 +1,20 @@
+{
+    "networkId": 0,
+    "chainId": null,
+    "eip100FBlock": 0,
+    "eip140FBlock": 0,
+    "eip198FBlock": 0,
+    "eip211FBlock": 0,
+    "eip212FBlock": 0,
+    "eip213FBlock": 0,
+    "eip214FBlock": 0,
+    "eip658FBlock": 0,
+    "eip145FBlock": 0,
+    "eip1014FBlock": 0,
+    "eip1052FBlock": 0,
+    "eip1283FBlock": 0,
+    "eip2200FBlock": 0,
+    "disposalBlock": 0,
+    "ethash": {},
+    "requireBlockHashes": null
+}

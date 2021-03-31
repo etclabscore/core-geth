@@ -67,6 +67,16 @@ func (tg *testMatcherGen) generateFromReference(ref, target string) {
 	tg.targets = append(tg.targets, target)
 }
 
+func (tg *testMatcherGen) getGenerationTarget(ref string) string {
+	// Lookup the reference:target pairing, if any.
+	for i, r := range tg.references {
+		if r.MatchString(ref) {
+			return tg.targets[i]
+		}
+	}
+	return ""
+}
+
 // TestGenStateAll generates tests for all State tests.
 func TestGenStateAll(t *testing.T) {
 	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
@@ -215,20 +225,15 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 			tm.allConfigsMu.Unlock()
 
 			// Lookup the reference:target pairing, if any.
-			var referenceFork, targetFork string
-			for i, r := range tm.references {
-				if r.MatchString(s.Fork) {
-					referenceFork = s.Fork
-					targetFork = tm.targets[i]
-					break
-				}
-			}
+			targetFork := tm.getGenerationTarget(s.Fork)
 
-			// If reference fork is empty we know that this subtest is not intended for as a reference
+			// If target fork is empty we know that this subtest is not intended for as a reference
 			// for any target generated test.
-			if referenceFork == "" {
+			if targetFork == "" {
 				continue
 			}
+			referenceFork := s.Fork
+
 			if _, ok := Forks[targetFork]; !ok {
 				t.Fatalf("missing target fork config: %s, reference: %s", targetFork, referenceFork)
 			}

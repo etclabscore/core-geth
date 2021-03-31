@@ -30,7 +30,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
@@ -135,12 +134,9 @@ func readConfigFromSpecFileParity(name string) (spec ctypes.ChainConfigurator, s
 	return spec, bb[:], nil
 }
 
-func readConfigFromSpecFileCoreGeth(name string) (spec ctypes.ChainConfigurator, sha1sum []byte, err error) {
-	gen := &genesisT.Genesis{
-		Config: &coregeth.CoreGethChainConfig{},
-	}
+func readJSONFromFile(name string, value interface{}) (sha1sum []byte, err error) {
 	if fi, err := os.Open(name); os.IsNotExist(err) {
-		return nil, nil, err
+		return nil, err
 	} else {
 		fi.Close()
 	}
@@ -148,7 +144,7 @@ func readConfigFromSpecFileCoreGeth(name string) (spec ctypes.ChainConfigurator,
 	if err != nil {
 		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
 	}
-	err = json.Unmarshal(b, gen)
+	err = json.Unmarshal(b, value)
 	if err != nil {
 		if jsonError, ok := err.(*json.SyntaxError); ok {
 			line, character, lcErr := lineAndCharacter(string(b), int(jsonError.Offset))
@@ -167,7 +163,7 @@ func readConfigFromSpecFileCoreGeth(name string) (spec ctypes.ChainConfigurator,
 		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
 	}
 	bb := sha1.Sum(b)
-	return gen, bb[:], nil
+	return bb[:], nil
 }
 
 func writeDifficultyConfigFileParity(conf ctypes.ChainConfigurator, forkName string) (string, [20]byte, error) {
@@ -284,64 +280,35 @@ func init() {
 			}
 			difficultyChainConfigurations[k] = pspec
 		}
-
-	} else if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_COREGETH_KEY) != "" {
-		log.Println("Setting chain configurations from core-geth chainspecs")
-
-		for k, v := range MapForkNameChainspecFileState {
-			config, sha1sum, err := readConfigFromSpecFileCoreGeth(coregethSpecPath(v))
-			if os.IsNotExist(err) {
-				wd, wde := os.Getwd()
-				if wde != nil {
-					panic(wde)
-				}
-				config = Forks[k]
-				c := &coregeth.CoreGethChainConfig{}
-
-				if err := confp.Convert(config, c); ctypes.IsFatalUnsupportedErr(err) {
-					panic(err)
-				}
-
-				g := params.DefaultRopstenGenesisBlock()
-				g.Config = c
-
-				b, _ := json.MarshalIndent(g, "", "    ")
-				writePath := filepath.Join(coregethSpecsDir, v)
-				err := ioutil.WriteFile(writePath, b, os.ModePerm)
-				if err != nil {
-					panic(fmt.Sprintf("failed to write chainspec; wd: %s, config: %v/file: %v", wd, k, writePath))
-				}
-				//
-				// panic(fmt.Sprintf("failed to find chainspec, wd: %s, config: %v/file: %v", wd, k, v))
-			} else if err != nil {
-				panic(err)
-			}
-			chainspecRefsState[k] = chainspecRef{filepath.Base(v), sha1sum}
-			Forks[k] = config
-		}
-
-		for k, v := range mapForkNameChainspecFileDifficulty {
-			config, sha1sum, err := readConfigFromSpecFileParity(coregethSpecPath(v))
-			if os.IsNotExist(err) && os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) != "" {
-				log.Println("Will generate chainspec file for", k, v)
-				conf := difficultyChainConfigurations[k]
-				_, sha, err := writeDifficultyConfigFileCoreGeth(conf, k)
-				if err != nil {
-					panic(fmt.Sprintf("error writing difficulty config file: %s: %s %v", k, v, err))
-				}
-				sha1sum := []byte{}
-				for _, v := range sha {
-					sha1sum = append(sha1sum, v)
-				}
-				chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
-				difficultyChainConfigurations[k] = conf
-			} else if len(sha1sum) == 0 {
-				panic("zero sum game")
-			} else {
-				chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
-				difficultyChainConfigurations[k] = config
-			}
-		}
+		//
+		// } else if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_COREGETH_KEY) != "" {
+		// 	log.Println("Setting chain configurations from core-geth chainspecs")
+		//
+		// 	for k, v := range MapForkNameChainspecFileState {
+		// 		gen := &genesisT.Genesis{
+		// 			Config: &coregeth.CoreGethChainConfig{},
+		// 		}
+		// 		specPath := coregethSpecPath(v)
+		//
+		// 		config, sha1sum, err := readJSONFromFile()
+		// 		if err != nil {
+		// 			panic(err)
+		// 		}
+		// 		// chainspecRefsState[k] = chainspecRef{filepath.Base(v), sha1sum}
+		// 		Forks[k] = config
+		// 	}
+		//
+		// 	for k, v := range mapForkNameChainspecFileDifficulty {
+		// 		config, sha1sum, err := readConfigFromSpecFileParity(coregethSpecPath(v))
+		// 		if err != nil {
+		// 			panic(err)
+		// 		}
+		// 		if len(sha1sum) == 0 {
+		// 			panic("empty sha1 sum")
+		// 		}
+		// 		chainspecRefsDifficulty[k] = chainspecRef{filepath.Base(v), sha1sum}
+		// 		difficultyChainConfigurations[k] = config
+		// 	}
 
 		// DEPRECATED.
 		// Use CG_CHAINCONFIG_CHAINSPECS_COREGETH_KEY instead.
@@ -349,17 +316,19 @@ func init() {
 		log.Println("Setting chain configurations from Parity chainspecs")
 
 		for k, v := range MapForkNameChainspecFileState {
-			config, sha1sum, err := readConfigFromSpecFileParity(paritySpecPath(v))
+			config := &parity.ParityChainSpec{}
+			sha1sum, err := readJSONFromFile(paritySpecPath(v), config)
 			if os.IsNotExist(err) {
 				wd, wde := os.Getwd()
 				if wde != nil {
 					panic(wde)
 				}
-				config = Forks[k]
+				fconfig := Forks[k]
 				pspec := &parity.ParityChainSpec{}
-				if err := confp.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
+				if err := confp.Convert(fconfig, pspec); ctypes.IsFatalUnsupportedErr(err) {
 					panic(err)
 				}
+				config = pspec
 				b, _ := json.MarshalIndent(pspec, "", "    ")
 				writePath := filepath.Join(paritySpecsDir, v)
 				err := ioutil.WriteFile(writePath, b, os.ModePerm)
@@ -376,7 +345,8 @@ func init() {
 		}
 
 		for k, v := range mapForkNameChainspecFileDifficulty {
-			config, sha1sum, err := readConfigFromSpecFileParity(paritySpecPath(v))
+			config := &parity.ParityChainSpec{}
+			sha1sum, err := readJSONFromFile(paritySpecPath(v), config)
 			if os.IsNotExist(err) && os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) != "" {
 				log.Println("Will generate chainspec file for", k, v)
 				conf := difficultyChainConfigurations[k]

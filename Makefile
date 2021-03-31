@@ -39,6 +39,9 @@ ios:
 test:
 	$(GORUN) build/ci.go test
 
+# DEPRECATED.
+# No attempt will be made after the Istanbul fork to maintain
+# Parity configuration support.
 sync-parity-chainspecs:
 	./params/parity.json.d/sync-parity-remote.sh
 
@@ -71,7 +74,9 @@ test-evmc: hera ssvm evmone aleth-interpreter
 clean-evmc:
 	rm -rf ./build/_workspace/hera ./build/_workspace/SSVM ./build/_workspace/evmone ./build/_workspace/aleth
 
-test-coregeth-features: test-coregeth-features-coregeth test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
+test-coregeth-features: \
+	test-coregeth-features-coregeth \
+	test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
 
 test-coregeth-consensus: test-coregeth-features-clique-consensus
 
@@ -87,6 +92,8 @@ test-coregeth-features-clique-consensus:
 	@echo "Testing fork/feature/datatype implementation; equivalence - Clique consensus"
 	env COREGETH_TESTS_CHAINCONFIG_CONSENSUS_EQUIVALENCE_CLIQUE=on go test -count=1 -timeout 60m -run TestState ./tests ## Only run state tests here, since Blockchain tests will care about rewards, etc.
 
+# DEPRECATED.
+# After Istanbul, don't trust Parity.
 test-coregeth-chainspecs-parity: ## Run tests specific to core-geth using parity chainspec file configs.
 	@echo "Testing Parity JSON chainspec equivalence."
 	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on go test -count=1 ./tests
@@ -110,10 +117,13 @@ tests-generate-state: ## Generate state tests.
 	go test -p 1 -v -timeout 60m ./tests -run TestGenStateAll
 
 tests-generate-difficulty: ## Generate difficulty tests.
+	@echo "Generating difficulty tests configs."
+	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS_CONFIGS=on \
+	go run build/ci.go test -v timeout 10m ./tests -run TestDifficultyTestConfigGen
+
 	@echo "Generating difficulty tests."
-	env COREGETH_TESTS_CHAINCONFIG_COREGETH_SPECS=on \
 	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
-	go run build/ci.go test -v -timeout 60m ./tests -run TestDifficultyGen
+	go run build/ci.go test -v -timeout 10m ./tests -run TestDifficultyGen
 
 lint: ## Run linters.
 	$(GORUN) build/ci.go lint

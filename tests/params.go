@@ -299,7 +299,9 @@ func init() {
 				if err := confp.Convert(config, cgspec); ctypes.IsFatalUnsupportedErr(err) {
 					panic(err)
 				}
-				b, _ := json.MarshalIndent(cgspec, "", "    ")
+				g := params.DefaultRopstenGenesisBlock()
+				g.Config = cgspec
+				b, _ := json.MarshalIndent(g, "", "    ")
 				writePath := filepath.Join(coregethSpecsDir, v)
 				err := ioutil.WriteFile(writePath, b, os.ModePerm)
 				if err != nil {

@@ -44,6 +44,11 @@ var (
 	// when applicable as equivalent config implementations for the default Go data type
 	// configs.
 	CG_CHAINCONFIG_CHAINSPECS_OPENETHEREUM_KEY = "COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS"
+
+	// CG_CHAINCONFIG_CHAINSPECS_COREGETH_KEY uses core-geth config data (in params/core-geth.json.d)
+	// when applicable as equivalent config implementations for the default Go data type
+	// configs.
+	CG_CHAINCONFIG_CHAINSPECS_COREGETH_KEY = "COREGETH_TESTS_CHAINCONFIG_COREGETH_SPECS"
 )
 
 type chainspecRefsT map[string]chainspecRef

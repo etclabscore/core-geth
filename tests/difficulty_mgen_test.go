@@ -132,7 +132,7 @@ func TestDifficultyGen(t *testing.T) {
 			specref, done := wroteNewChainConfigs[associateForkName]
 			if !done || specFile.Filename == "" {
 				t.Logf("Writing chain spec file: %s", forkName)
-				specFilepath, sum, err := writeDifficultyConfigFile(conf, associateForkName)
+				specFilepath, sum, err := writeDifficultyConfigFileParity(conf, associateForkName)
 				if err != nil {
 					t.Fatalf("could not write difficulty file, err=%v", err)
 				}

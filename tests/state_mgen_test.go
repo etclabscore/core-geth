@@ -17,7 +17,6 @@
 package tests
 
 import (
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -158,7 +157,7 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 		}
 
 		// Assign provenance metadata to the test.
-		test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, tm.gitHead)
+		test.json.Info.FilledWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, tm.gitHead)
 
 		// Write the augmented test to the writer.
 		generatedJSON, err := json.MarshalIndent(test, "", "    ")
@@ -282,9 +281,6 @@ func TestGenStateAll(t *testing.T) {
 	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
 		t.Skip()
 	}
-	// if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_OPENETHEREUM_KEY) == "" {
-	// 	t.Fatal("Must use chainspec files for fork configurations.")
-	// }
 
 	// There is no need to run this git command for every test, but
 	// speed is not really a big deal here, and it's nice to keep as much logic out
@@ -315,6 +311,7 @@ func TestGenStateSingles(t *testing.T) {
 	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
 		t.Skip()
 	}
+
 	head := build.RunGit("rev-parse", "HEAD")
 	head = strings.TrimSpace(head)
 
@@ -393,28 +390,8 @@ func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTe
 	// then generate that file.
 	subtests := test.Subtests(nil)
 
-	// for _, subtest := range subtests {
-	// 	subtest := subtest
-	// 	if _, ok := MapForkNameChainspecFileState[subtest.Fork]; !ok {
-	// 		genesis := test.genesis(Forks[subtest.Fork])
-	// 		pspec, err := tconvert.NewParityChainSpec(subtest.Fork, genesis, []string{})
-	// 		if err != nil {
-	// 			t.Fatal(err)
-	// 		}
-	// 		b, err := json.MarshalIndent(pspec, "", "    ")
-	// 		if err != nil {
-	// 			t.Fatal(err)
-	// 		}
-	// 		filename := paritySpecPath(strcase.ToSnake(subtest.Fork) + ".json")
-	// 		err = ioutil.WriteFile(filename, b, os.ModePerm)
-	// 		if err != nil {
-	// 			t.Fatal(err)
-	// 		}
-	// 		sum := sha1.Sum(b)
-	// 		chainspecRefsState[subtest.Fork] = chainspecRef{filepath.Base(filename), sum[:]}
-	// 		t.Logf("Created new fork chainspec file: %v", chainspecRefsState[subtest.Fork])
-	// 	}
-	// }
+	// TODO
+	// Write chain configs for subtests
 
 	for _, subtest := range subtests {
 		subtest := subtest
@@ -493,14 +470,14 @@ gend.root: %s
 		writeFile := filledPostStates(test.json.Post[targetFork])
 		generatedJSON := []byte{}
 		if writeFile {
-			fi, err := ioutil.ReadFile(fpath)
+			_, err := ioutil.ReadFile(fpath)
 			if err != nil {
 				t.Fatal("Error reading file, and will not write:", fpath, "test", key)
 			}
-			test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, head)
-			test.json.Info.Parent = submoduleParentRef
-			test.json.Info.ParentSha1Sum = fmt.Sprintf("%x", sha1.Sum(fi))
-			test.json.Info.Chainspecs = chainspecRefsState
+			// test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, head)
+			// test.json.Info.Parent = submoduleParentRef
+			// test.json.Info.ParentSha1Sum = fmt.Sprintf("%x", sha1.Sum(fi))
+			// test.json.Info.Chainspecs = chainspecRefsState
 
 			generatedJSON, err = json.MarshalIndent(test, "", "    ")
 			if err != nil {

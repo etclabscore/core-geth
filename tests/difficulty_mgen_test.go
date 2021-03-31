@@ -39,7 +39,7 @@ func TestDifficultyGen(t *testing.T) {
 	if !generateTests {
 		t.Skip()
 	}
-	if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_COREGETH_KEY) == "" {
+	if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_COREGETH_KEY) == "" {
 		t.Fatal("Must run test generation with JSON file chain configurations.")
 	}
 

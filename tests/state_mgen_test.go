@@ -37,24 +37,8 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
-func TestGenState(t *testing.T) {
-	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
-		t.Skip()
-	}
-	if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_OPENETHEREUM_KEY) == "" {
-		t.Fatal("Must use chainspec files for fork configurations.")
-	}
-
-	st := new(testMatcher)
-
-	// Generating tests should NOT skip slow or time consuming tests.
-
-	st.walkFullName(t, stateTestDir, st.withWritingTests)
-
-	// For Istanbul, older tests were moved into LegacyTests
-	// st.walkFullName(t, legacyStateTestDir, st.withWritingTests)
-}
-
+// testMatcherGen embeds the common testMatcher struct, extending it to include information
+// necessary for test generation.
 type testMatcherGen struct {
 	*testMatcher
 	references []*regexp.Regexp
@@ -74,6 +58,105 @@ func (tg *testMatcherGen) generateFromReference(ref, target string) {
 		tg.targets = []string{}
 	}
 	tg.targets = append(tg.targets, target)
+}
+
+// TestGenStateAll generates tests for all State tests.
+func TestGenStateAll(t *testing.T) {
+	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
+		t.Skip()
+	}
+
+	// There is no need to run this git command for every test, but
+	// speed is not really a big deal here, and it's nice to keep as much logic out
+	// out the global scope as possible.
+	head := build.RunGit("rev-parse", "HEAD")
+	head = strings.TrimSpace(head)
+
+	tm := new(testMatcherGen)
+	tm.testMatcher = new(testMatcher)
+	tm.noParallel = true
+	tm.errorPanics = true
+	tm.gitHead = head
+
+	tm.generateFromReference("Byzantium", "ETC_Atlantis")
+	tm.generateFromReference("ConstantinopleFix", "ETC_Agharta")
+	tm.generateFromReference("Berlin", "ETC_Magneto")
+	tm.generateFromReference("Istanbul", "ETC_Phoenix")
+
+	for _, dir := range []string{
+		stateTestDir,
+		legacyStateTestDir,
+	} {
+		tm.walkFullName(t, dir, tm.testWriteTest)
+	}
+}
+
+// TestGenStateSingles generates tests for a one or a few test files.
+// This should only be used as a debugging tool.
+// For production use, use TestGenStateAll.
+func TestGenStateSingles(t *testing.T) {
+	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
+		t.Skip()
+	}
+
+	head := build.RunGit("rev-parse", "HEAD")
+	head = strings.TrimSpace(head)
+
+	files := []string{
+		filepath.Join(stateTestDir, "stStaticFlagEnabled/DelegatecallToPrecompileFromContractInitialization.json"),
+		filepath.Join(stateTestDir, "stStaticCall/StaticcallToPrecompileFromCalledContract.json"),
+	}
+
+	tm := new(testMatcherGen)
+	tm.testMatcher = new(testMatcher)
+	tm.noParallel = true // disable parallelism
+	tm.errorPanics = true
+	tm.gitHead = head
+
+	tm.generateFromReference("Byzantium", "ETC_Atlantis")
+	tm.generateFromReference("ConstantinopleFix", "ETC_Agharta")
+	tm.generateFromReference("Berlin", "ETC_Magneto")
+	tm.generateFromReference("Istanbul", "ETC_Phoenix")
+
+	for _, f := range files {
+		tm.runTestFile(t, f, f, tm.testWriteTest)
+	}
+}
+
+// testWriteTest generates a file-based tests (writing a new file), and re-runs (testing) the generated test file.
+func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {
+
+	// Set up a temporary file to write the generated test(s) to.
+	// We have to use an actual file because the on-write callback re-runs the
+	// test using the newly-generated file to ensure consistency.
+	// If we didn't rerun the tests after writing, we could use a buffer as the WriteCloser.
+	// Note that parallelism can cause greasy bugs around file during read/write which is why
+	// we use a temporary file instead of immediately overwriting the canonical file in the first place;
+	// for example, I saw regular encoding errors without this pattern.
+	tmpFile, err := ioutil.TempFile(os.TempDir(), "geth-state-test-generation")
+	if err != nil {
+		t.Fatal(err)
+	}
+	tmpFileName := tmpFile.Name()
+
+	tm.runTestFile(t, name, name, tm.stateTestsGen(tmpFile,
+		// On-Write:
+		// After generating the tests, rerun the test using the new test file, ensuring consistency.
+		// If the test passes (and it damn well should), then move the file to the canonical location.
+		func() {
+			tm.runTestFile(t, tmpFileName, tmpFileName, tm.stateTestRunner)
+			if err := os.Rename(tmpFileName, name); err != nil {
+				t.Fatal(err)
+			}
+		},
+		// On-Skip:
+		// This test is skipped by some condition in the test matcher, probably by skip-fork.
+		// In this case we just clean up the inoperative temp file.
+		func() {
+			if err := os.RemoveAll(tmpFileName); err != nil {
+				t.Fatal(err)
+			}
+		}))
 }
 
 // stateTestsGen generates state tests using a reference fork and targeting a target fork.
@@ -275,261 +358,4 @@ func TestGenStateParityConfigs(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestGenStateAll(t *testing.T) {
-	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
-		t.Skip()
-	}
-
-	// There is no need to run this git command for every test, but
-	// speed is not really a big deal here, and it's nice to keep as much logic out
-	// out the global scope as possible.
-	head := build.RunGit("rev-parse", "HEAD")
-	head = strings.TrimSpace(head)
-
-	tm := new(testMatcherGen)
-	tm.testMatcher = new(testMatcher)
-	tm.noParallel = true
-	tm.errorPanics = true
-	tm.gitHead = head
-
-	tm.generateFromReference("Byzantium", "ETC_Atlantis")
-	tm.generateFromReference("ConstantinopleFix", "ETC_Agharta")
-	tm.generateFromReference("Berlin", "ETC_Magneto")
-	tm.generateFromReference("Istanbul", "ETC_Phoenix")
-
-	for _, dir := range []string{
-		stateTestDir,
-		legacyStateTestDir,
-	} {
-		tm.walkFullName(t, dir, tm.testWriteTest)
-	}
-}
-
-func TestGenStateSingles(t *testing.T) {
-	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
-		t.Skip()
-	}
-
-	head := build.RunGit("rev-parse", "HEAD")
-	head = strings.TrimSpace(head)
-
-	files := []string{
-		filepath.Join(stateTestDir, "stStaticFlagEnabled/DelegatecallToPrecompileFromContractInitialization.json"),
-		filepath.Join(stateTestDir, "stStaticCall/StaticcallToPrecompileFromCalledContract.json"),
-	}
-
-	tm := new(testMatcherGen)
-	tm.testMatcher = new(testMatcher)
-	tm.noParallel = true // disable parallelism
-	tm.errorPanics = true
-	tm.gitHead = head
-
-	tm.generateFromReference("Byzantium", "ETC_Atlantis")
-	tm.generateFromReference("ConstantinopleFix", "ETC_Agharta")
-	tm.generateFromReference("Berlin", "ETC_Magneto")
-	tm.generateFromReference("Istanbul", "ETC_Phoenix")
-
-	for _, f := range files {
-		tm.runTestFile(t, f, f, tm.testWriteTest)
-	}
-}
-
-func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {
-
-	// Set up a temporary file to write the generated test(s) to.
-	// We have to use an actual file because the on-write callback re-runs the
-	// test using the newly-generated file to ensure consistency.
-	// If we didn't rerun the tests after writing, we could use a buffer as the WriteCloser.
-	// Note that parallelism can cause greasy bugs around file during read/write which is why
-	// we use a temporary file instead of immediately overwriting the canonical file in the first place;
-	// for example, I saw regular encoding errors without this pattern.
-	tmpFile, err := ioutil.TempFile(os.TempDir(), "geth-state-test-generation")
-	if err != nil {
-		t.Fatal(err)
-	}
-	tmpFileName := tmpFile.Name()
-
-	tm.runTestFile(t, name, name, tm.stateTestsGen(tmpFile,
-		// On-Write:
-		// After generating the tests, rerun the test using the new test file, ensuring consistency.
-		// If the test passes (and it damn well should), then move the file to the canonical location.
-		func() {
-			tm.runTestFile(t, tmpFileName, tmpFileName, tm.stateTestRunner)
-			if err := os.Rename(tmpFileName, name); err != nil {
-				t.Fatal(err)
-			}
-		},
-		// On-Skip:
-		// This test is skipped by some condition in the test matcher, probably by skip-fork.
-		// In this case we just clean up the inoperative temp file.
-		func() {
-			if err := os.RemoveAll(tmpFileName); err != nil {
-				t.Fatal(err)
-			}
-		}))
-}
-
-func (tm *testMatcher) withWritingTests(t *testing.T, name string, test *StateTest) {
-
-	// Test output is written here.
-	//fpath := filepath.Join(currentTestDir, name)
-	//test.Name = strings.TrimSuffix(filepath.Base(fpath), ".json")
-
-	fpath := name
-	test.Name = strings.TrimSuffix(filepath.Base(name), ".json")
-
-	// There is no need to run this git command for every test, but
-	// speed is not really a big deal here, and it's nice to keep as much logic out
-	// out the global scope as possible.
-	head := build.RunGit("rev-parse", "HEAD")
-	head = strings.TrimSpace(head)
-
-	// For tests using a config that does not have an associated chainspec file,
-	// then generate that file.
-	subtests := test.Subtests(nil)
-
-	// TODO
-	// Write chain configs for subtests
-
-	for _, subtest := range subtests {
-		subtest := subtest
-		runTestGenerating(t, tm, fpath, test, subtest, head, subtests)
-	}
-}
-
-func runTestGenerating(t *testing.T, tm *testMatcher, fpath string, test *StateTest, subtest StateSubtest, head string, subtests []StateSubtest) {
-
-	originalJSON, _ := json.MarshalIndent(test, "", "    ")
-
-	// Only proceed with test forks which are destined for writing.
-	// Note that using this function implies that you trust the test runner
-	// to give valid output, ie. only generate tests after you're sure the
-	// reference tests themselves are passing.
-	// eg. Istanbul => ETC_Phoenix; Berlin => ETC_Magneto
-	referenceFork := subtest.Fork
-	targetFork, ok := writeStateTestsReferencePairs[referenceFork]
-	// if !ok {
-	// 	// t.Logf("Skipping test (non-writing): %s", subtest.Fork)
-	// 	return
-	// }
-
-	var crossReference stPostState
-
-	if ok {
-		for _, s := range subtests {
-			if s.Fork == targetFork {
-				// This will/would regenerate an existing test subtest.
-				crossReference = test.json.Post[s.Fork][s.Index]
-				break
-			}
-		}
-	} else {
-		return
-	}
-
-	// if _, ok := test.json.Post[targetFork]; !ok {
-	test.json.Post[targetFork] = make([]stPostState, len(test.json.Post[referenceFork]))
-	copy(test.json.Post[targetFork], test.json.Post[referenceFork])
-	// }
-
-	// Initialize the subtest/index data by copy from reference.
-	// test.json.Post[targetFork][subtest.Index] = test.json.Post[referenceFork][subtest.Index]
-
-	// Set new fork name, so new test config will be used instead.
-	subtest.Fork = targetFork
-
-	key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
-
-	t.Run(key, func(t *testing.T) {
-		vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
-
-		// This is where the magic happens.
-		err := test.RunSetPost(subtest, vmConfig)
-		if err != nil {
-			t.Fatalf("Error encountered at RunSetPost: %v", err)
-		}
-
-		// Check against cross reference, if any.
-		if crossReference != (stPostState{}) {
-			if crossReference.Root != test.json.Post[targetFork][subtest.Index].Root {
-				panic(fmt.Sprintf(`cross reference failed
-referenceFork: %s
-targetFork: %s
-cross.root: %s
-gend.root: %s
-`, referenceFork,
-					targetFork,
-					crossReference.Root,
-					test.json.Post[targetFork][subtest.Index].Root))
-			}
-		}
-
-		// Only write the test once, after all subtests have been written.
-		writeFile := filledPostStates(test.json.Post[targetFork])
-		generatedJSON := []byte{}
-		if writeFile {
-			_, err := ioutil.ReadFile(fpath)
-			if err != nil {
-				t.Fatal("Error reading file, and will not write:", fpath, "test", key)
-			}
-			// test.json.Info.WrittenWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, head)
-			// test.json.Info.Parent = submoduleParentRef
-			// test.json.Info.ParentSha1Sum = fmt.Sprintf("%x", sha1.Sum(fi))
-			// test.json.Info.Chainspecs = chainspecRefsState
-
-			generatedJSON, err = json.MarshalIndent(test, "", "    ")
-			if err != nil {
-				t.Fatalf("Error marshaling JSON: %v", err)
-			}
-
-			err = ioutil.WriteFile(fpath, generatedJSON, os.ModePerm)
-			if err != nil {
-				panic(err)
-			}
-		}
-
-		_, _, err = test.Run(subtest, vmConfig, false)
-		if err != nil {
-			t.Fatalf("FAIL snap=false %v", err)
-		}
-		_, _, err = test.Run(subtest, vmConfig, true)
-		if err != nil {
-			t.Fatalf("FAIL snap=true %v", err)
-		}
-
-		if writeFile {
-
-			t.Logf(`Wrote test file: %s
-%s -> %s`, fpath, referenceFork, targetFork)
-
-			// // Re-run the test we just wrote
-			tm.runTestFile(t, fpath, fpath, func(t *testing.T, name2 string, test2 *StateTest) {
-				ssubtests := test2.Subtests(nil)
-				for _, subtest2 := range ssubtests {
-					subtest2 := subtest2
-					key := fmt.Sprintf("%s/%d", subtest2.Fork, subtest2.Index)
-					name3 := name2 + "/" + key
-
-					t.Run(key+"/trie", func(t *testing.T) {
-						wrapFatal(t, test2.gasLimit(subtest2), func(vmconfig vm.Config) error {
-							_, _, err := test2.Run(subtest2, vmconfig, false)
-							checkedErr := tm.checkFailure(t, name3+"/trie", err)
-							if checkedErr != nil && *testEWASM != "" {
-								checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
-							}
-							if checkedErr != nil {
-								ioutil.WriteFile("original.json", originalJSON, os.ModePerm)
-								ioutil.WriteFile("generated.json", generatedJSON, os.ModePerm)
-								panic(checkedErr)
-							}
-							return checkedErr
-						})
-					})
-				}
-			})
-
-		}
-	})
 }

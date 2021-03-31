@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp/tconvert"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
@@ -101,7 +102,7 @@ var mapForkNameChainspecFileDifficulty = map[string]string{
 	"ETC_Phoenix":       "classic_phoenix_difficulty_test.json",
 }
 
-func readConfigFromSpecFile(name string) (spec ctypes.ChainConfigurator, sha1sum []byte, err error) {
+func readConfigFromSpecFileParity(name string) (spec ctypes.ChainConfigurator, sha1sum []byte, err error) {
 	spec = &parity.ParityChainSpec{}
 	if fi, err := os.Open(name); os.IsNotExist(err) {
 		return nil, nil, err
@@ -132,6 +133,40 @@ func readConfigFromSpecFile(name string) (spec ctypes.ChainConfigurator, sha1sum
 	}
 	bb := sha1.Sum(b)
 	return spec, bb[:], nil
+}
+
+func readConfigFromSpecFileCoreGeth(name string) (spec ctypes.ChainConfigurator, sha1sum []byte, err error) {
+	spec = &coregeth.CoreGethChainConfig{}
+	gen := &genesisT.Genesis{}
+	if fi, err := os.Open(name); os.IsNotExist(err) {
+		return nil, nil, err
+	} else {
+		fi.Close()
+	}
+	b, err := ioutil.ReadFile(name)
+	if err != nil {
+		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
+	}
+	err = json.Unmarshal(b, gen)
+	if err != nil {
+		if jsonError, ok := err.(*json.SyntaxError); ok {
+			line, character, lcErr := lineAndCharacter(string(b), int(jsonError.Offset))
+			fmt.Fprintf(os.Stderr, "test failed with error: Cannot parse JSON schema due to a syntax error at line %d, character %d: %v\n", line, character, jsonError.Error())
+			if lcErr != nil {
+				fmt.Fprintf(os.Stderr, "Couldn't find the line and character position of the error due to error %v\n", lcErr)
+			}
+		}
+		if jsonError, ok := err.(*json.UnmarshalTypeError); ok {
+			line, character, lcErr := lineAndCharacter(string(b), int(jsonError.Offset))
+			fmt.Fprintf(os.Stderr, "test failed with error: The JSON type '%v' cannot be converted into the Go '%v' type on struct '%s', field '%v'. See input file line %d, character %d\n", jsonError.Value, jsonError.Type.Name(), jsonError.Struct, jsonError.Field, line, character)
+			if lcErr != nil {
+				fmt.Fprintf(os.Stderr, "test failed with error: Couldn't find the line and character position of the error due to error %v\n", lcErr)
+			}
+		}
+		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
+	}
+	bb := sha1.Sum(b)
+	return gen, bb[:], nil
 }
 
 func writeDifficultyConfigFileParity(conf ctypes.ChainConfigurator, forkName string) (string, [20]byte, error) {
@@ -253,7 +288,7 @@ func init() {
 		log.Println("Setting chain configurations from core-geth chainspecs")
 
 		for k, v := range MapForkNameChainspecFileState {
-			config, sha1sum, err := readConfigFromSpecFile(coregethSpecPath(v))
+			config, sha1sum, err := readConfigFromSpecFileCoreGeth(coregethSpecPath(v))
 			if os.IsNotExist(err) {
 				wd, wde := os.Getwd()
 				if wde != nil {
@@ -280,7 +315,7 @@ func init() {
 		}
 
 		for k, v := range mapForkNameChainspecFileDifficulty {
-			config, sha1sum, err := readConfigFromSpecFile(coregethSpecPath(v))
+			config, sha1sum, err := readConfigFromSpecFileParity(coregethSpecPath(v))
 			if os.IsNotExist(err) && os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) != "" {
 				log.Println("Will generate chainspec file for", k, v)
 				conf := difficultyChainConfigurations[k]
@@ -308,7 +343,7 @@ func init() {
 		log.Println("Setting chain configurations from Parity chainspecs")
 
 		for k, v := range MapForkNameChainspecFileState {
-			config, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
+			config, sha1sum, err := readConfigFromSpecFileParity(paritySpecPath(v))
 			if os.IsNotExist(err) {
 				wd, wde := os.Getwd()
 				if wde != nil {
@@ -335,7 +370,7 @@ func init() {
 		}
 
 		for k, v := range mapForkNameChainspecFileDifficulty {
-			config, sha1sum, err := readConfigFromSpecFile(paritySpecPath(v))
+			config, sha1sum, err := readConfigFromSpecFileParity(paritySpecPath(v))
 			if os.IsNotExist(err) && os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) != "" {
 				log.Println("Will generate chainspec file for", k, v)
 				conf := difficultyChainConfigurations[k]

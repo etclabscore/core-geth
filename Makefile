@@ -91,7 +91,7 @@ test-coregeth-chainspecs-parity: ## Run tests specific to core-geth using parity
 	@echo "Testing Parity JSON chainspec equivalence."
 	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on go test -count=1 ./tests
 
-test-coregeth-chainspecs-coregeth: ## Run tests specific to core-geth using parity chainspec file configs.
+test-coregeth-chainspecs-coregeth: ## Run tests specific to core-geth using coregeth chainspec file configs.
 	@echo "Testing Parity JSON chainspec equivalence."
 	env COREGETH_TESTS_CHAINCONFIG_COREGETH_SPECS=on go test -count=1 ./tests
 

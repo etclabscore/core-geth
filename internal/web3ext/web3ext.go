@@ -782,7 +782,7 @@ web3._extend({
 			name: 'block',
 			call: 'trace_block',
 			params: 2,
-			inputFormatter: [null, null]
+			inputFormatter: [web3._extend.formatters.inputBlockNumberFormatter, null]
 		}),
 		new web3._extend.Method({
 			name: 'transaction',
@@ -800,13 +800,17 @@ web3._extend({
 			name: 'call',
 			call: 'trace_call',
 			params: 3,
-			inputFormatter: [web3._extend.formatters.inputCallFormatter, null, null]
+			inputFormatter: [web3._extend.formatters.inputCallFormatter, web3._extend.formatters.inputBlockNumberFormatter, null]
 		}),
 		new web3._extend.Method({
 			name: 'callMany',
 			call: 'trace_callMany',
 			params: 3,
-			inputFormatter: [null, null, null]
+			inputFormatter: [function(options) {
+				return options.map(function(opts) {
+					return web3._extend.formatters.inputCallFormatter(opts);
+				});
+			}, web3._extend.formatters.inputBlockNumberFormatter, null]
 		}),
 	],
 	properties: []

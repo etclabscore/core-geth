@@ -65,6 +65,7 @@ type testMatcherGen struct {
 	errorPanics bool
 }
 
+// generateFromReference assigns reference:target pairs for test generation by fork name.
 func (tg *testMatcherGen) generateFromReference(ref, target string) {
 	if tg.references == nil {
 		tg.references = []*regexp.Regexp{}
@@ -76,6 +77,10 @@ func (tg *testMatcherGen) generateFromReference(ref, target string) {
 	tg.targets = append(tg.targets, target)
 }
 
+// stateTestsGen generates state tests using a reference fork and targeting a target fork.
+// The reference fork is used to the pre-state and tested transaction(s) (which are schematized as indexes),
+// replacing the reference fork's chain config and genesis with that of the target fork.
+// The resulting post-state is assigned to the test's post.Root and post.Logs hashes.
 func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCallback func()) func(t *testing.T, name string, test *StateTest) {
 	return func(t *testing.T, name string, test *StateTest) {
 

@@ -113,7 +113,7 @@ tests-generate-state: ## Generate state tests.
 tests-generate-difficulty: ## Generate difficulty tests.
 	@echo "Generating difficulty tests configs."
 	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS_CONFIGS=on \
-	go run build/ci.go test -v timeout 10m ./tests -run TestDifficultyTestConfigGen
+	go run build/ci.go test -v -timeout 10m ./tests -run TestDifficultyTestConfigGen
 
 	@echo "Generating difficulty tests."
 	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \

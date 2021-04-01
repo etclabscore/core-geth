@@ -379,6 +379,12 @@ func TestGenStateCoreGethConfigs(t *testing.T) {
 	}
 }
 
+// TestGeneratedConfigsEq tests that the CoreGeth configuration described in
+// ../params/coregeth.json.d/berlin_test.json (a configuration which is relevant to
+// state tests) is equivalent to the configuration coded at Forks["Berlin"].
+// Note that when run with COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_COREGETH, for example,
+// the coded configuration will have been init'd with a CoreGeth-struct value (as opposed
+// to the default go-ethereum value).
 func TestGeneratedConfigsEq(t *testing.T) {
 	specPath := filepath.Join(coregethSpecsDir, "berlin_test.json")
 	gen := &genesisT.Genesis{
@@ -397,7 +403,11 @@ func TestGeneratedConfigsEq(t *testing.T) {
 	}
 }
 
-func TestConvertBerlin(t *testing.T) {
+// TestConvertDefaultsBounce tests that for a few default Forks configuration values (which are used in tests),
+// that the convert-marshal-unmarshal cycle (here, a "bounce") results in equivalent chain configurations.
+// EIP1234 is used as a canary test since I have seen that fail most lately, and it involved some complicated
+// encoding and interdependencies (is Ethash, rel EIP649, map encoding vs. inferrable boolean field).
+func TestConvertDefaultsBounce(t *testing.T) {
 	safePrint := func(n *uint64) string {
 		if n == nil {
 			return "nil"
@@ -432,10 +442,6 @@ func TestConvertBerlin(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-
-			// zero := uint64(0)
-			// cg2.SetEthashEIP649Transition(&zero)
-			// cg2.SetEthashEIP1234Transition(&zero)
 
 			cg2_1234 := cg2.GetEthashEIP1234Transition()
 

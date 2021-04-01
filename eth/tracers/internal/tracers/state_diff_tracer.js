@@ -493,12 +493,6 @@
 		if (this.stateDiff[toAccountHex] !== undefined) {
 			var toAcc = this.stateDiff[toAccountHex];
 
-			// TODO: check if it needs to be added back
-			// if (!hasFromSufficientBalanceForValueAndGasCost) {
-			// 	// in case from account doesn't have enough balance, the transfer won't happen
-			// 	toAcc.balance[memoryMarker].to = toAcc.balance[memoryMarker].from;
-			// }
-
 			if (isCreateType) {
 				if (toAcc._type !== this.diffMarkers.Died) {
 					// mark new created contracts address

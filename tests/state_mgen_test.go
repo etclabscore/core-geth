@@ -443,7 +443,7 @@ func TestConvertBerlin(t *testing.T) {
 
 			err = confp.Equivalent(berlin, cg2)
 			if err != nil {
-				t.Fatal(err)
+				t.Fatal(forkName, err)
 			}
 		})
 	}

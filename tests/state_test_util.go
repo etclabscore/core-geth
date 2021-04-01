@@ -92,7 +92,10 @@ type stPostState struct {
 	Root    common.UnprefixedHash `json:"hash"`
 	Logs    common.UnprefixedHash `json:"logs"`
 	Indexes stPostStateIndexes    `json:"indexes"`
-	filled  bool
+
+	// filled can be set to true when the subtest has been written,
+	// which can be helpful to distiguish unfilled tests from potentially filled zero-value tests.
+	filled bool
 }
 
 type stPostStateIndexes struct {

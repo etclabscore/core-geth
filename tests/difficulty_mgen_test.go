@@ -134,7 +134,7 @@ func TestDifficultyTestConfigGen(t *testing.T) {
 }
 
 // TestDifficultyGen generated line-delimited JSON tests using the existing default
-// difficutly tests suite as a base reference set.
+// difficulty tests suite as a base reference set.
 // Reference:Target pairs are defined with dt.generateFromReference.
 // The original test will be run and must pass in order for it to be copied to the
 // generated set and for it to be used as a reference, if applicable, for test generation.

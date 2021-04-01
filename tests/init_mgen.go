@@ -19,10 +19,8 @@ package tests
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/internal/build"
 )
 
 // This file holds variable and type relating specifically
@@ -92,11 +90,3 @@ func (c chainspecRef) MarshalJSON() ([]byte, error) {
 
 	return json.MarshalIndent(x, "", "    ")
 }
-
-// submoduleParentRef captures the current git status of the tests submodule.
-// This is used for reference when writing tests.
-var submoduleParentRef = func() string {
-	subModOut := build.RunGit("submodule", "status")
-	subModOut = strings.ReplaceAll(strings.TrimSpace(subModOut), " ", "_")
-	return subModOut
-}()

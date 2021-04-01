@@ -342,7 +342,6 @@
 	includeOpError: function(err) {
 		return err
 			&& err.indexOf('contract address collision') > -1;
-			// && (err.indexOf('insufficient balance for transfer') > -1
 	},
 
 	// init is invoked before any VM execution.

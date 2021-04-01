@@ -513,7 +513,7 @@ func stateDiffTracerTestRunner(filename string) error {
 		return core.CanTransfer(db, sender, amount)
 	}
 
-	// If the actual transaction would fail, then their is no reason to actually transfer any balance at all
+	// If the actual transaction would fail, then there is no reason to actually transfer any balance at all
 	transfer := func(db vm.StateDB, sender, recipient common.Address, amount *big.Int) {
 		toAmount := new(big.Int).Set(amount)
 		senderBalance := db.GetBalance(sender)
@@ -536,7 +536,7 @@ func stateDiffTracerTestRunner(filename string) error {
 	}
 	_, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false)
 
-	// Store the truth on wether from acount has enough balance for context usage
+	// Store the truth on whether from account has enough balance for context usage
 	gasCost := new(big.Int).Mul(new(big.Int).SetUint64(msg.Gas()), msg.GasPrice())
 	totalCost := new(big.Int).Add(gasCost, msg.Value())
 

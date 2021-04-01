@@ -92,12 +92,6 @@ test-coregeth-features-clique-consensus:
 	@echo "Testing fork/feature/datatype implementation; equivalence - Clique consensus"
 	env COREGETH_TESTS_CHAINCONFIG_CONSENSUS_EQUIVALENCE_CLIQUE=on go test -count=1 -timeout 60m -run TestState ./tests ## Only run state tests here, since Blockchain tests will care about rewards, etc.
 
-# DEPRECATED.
-# After Istanbul, don't trust Parity.
-test-coregeth-chainspecs-parity: ## Run tests specific to core-geth using parity chainspec file configs.
-	@echo "Testing Parity JSON chainspec equivalence."
-	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on go test -count=1 ./tests
-
 test-coregeth-chainspecs-coregeth: ## Run tests specific to core-geth using coregeth chainspec file configs.
 	@echo "Testing CoreGeth JSON chainspec equivalence."
 	env COREGETH_TESTS_CHAINCONFIG_COREGETH_SPECS=on go test -count=1 ./tests

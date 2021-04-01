@@ -18,7 +18,8 @@
 // the transaction from a custom assembled genesisT block.
 {
 	// prestate is the genesisT that we're building.
-	prestate: null,
+	prestate: {},
+	hasStepInited: false,
 
 	// lookupAccount injects the specified account into the prestate object.
 	lookupAccount: function(addr, db){
@@ -44,21 +45,24 @@
 		}
 	},
 
+	// init is invoked before any VM execution.
+	// ctx has to|msgTo|coinbase set and additional context based on each trace method.
+	init: function(ctx, db) {
+		// get actual "from" values for from|to|coinbase accounts.
+		this.lookupAccount(ctx.from, db);
+		this.lookupAccount(ctx.coinbase, db);
+
+		// msgTo is set for the init method and it is the actual "to" value of the Tx.
+		// ctx.to on the other hand is always set by the EVM and on type=CREATE
+		// it is the newly created contract address
+		if (ctx.msgTo !== undefined) {
+			this.lookupAccount(ctx.msgTo, db);
+		}
+	},
+
 	// result is invoked when all the opcodes have been iterated over and returns
 	// the final result of the tracing.
 	result: function(ctx, db) {
-		// At this point, we need to deduct the 'value' from the
-		// outer transaction, and move it back to the origin
-		this.lookupAccount(ctx.from, db);
-
-		var fromBal = bigInt(this.prestate[toHex(ctx.from)].balance.slice(2), 16);
-		var toBal   = bigInt(this.prestate[toHex(ctx.to)].balance.slice(2), 16);
-
-		this.prestate[toHex(ctx.to)].balance   = '0x'+toBal.subtract(ctx.value).toString(16);
-		this.prestate[toHex(ctx.from)].balance = '0x'+fromBal.add(ctx.value).toString(16);
-
-		// Decrement the caller's nonce, and remove empty create targets
-		this.prestate[toHex(ctx.from)].nonce--;
 		if (ctx.type == 'CREATE') {
 			// We can blibdly delete the contract prestate, as any existing state would
 			// have caused the transaction to be rejected as invalid in the first place.
@@ -70,13 +74,12 @@
 
 	// step is invoked for every opcode that the VM executes.
 	step: function(log, db) {
-		// Add the current account if we just started tracing
-		if (this.prestate === null){
-			this.prestate = {};
-			// Balance will potentially be wrong here, since this will include the value
-			// sent along with the message. We fix that in 'result()'.
+		if (!this.hasStepInited) {
+			this.hasStepInited = true;
+
 			this.lookupAccount(log.contract.getAddress(), db);
 		}
+
 		// Whenever new state is accessed, add it to the prestate
 		switch (log.op.toString()) {
 			case "EXTCODECOPY": case "EXTCODESIZE": case "BALANCE":

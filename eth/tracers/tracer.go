@@ -238,6 +238,13 @@ func (dw *dbWrapper) pushObject(vm *duktape.Context) {
 		return 1
 	})
 	vm.PutPropString(obj, "exists")
+
+	// Push the wrapper for statedb.Empty
+	vm.PushGoFunction(func(ctx *duktape.Context) int {
+		ctx.PushBoolean(dw.db.Empty(common.BytesToAddress(popSlice(ctx))))
+		return 1
+	})
+	vm.PutPropString(obj, "empty")
 }
 
 // contractWrapper provides a JavaScript wrapper around vm.Contract
@@ -561,6 +568,27 @@ func wrapError(context string, err error) error {
 	return fmt.Errorf("%v    in server-side tracer function '%v'", err, context)
 }
 
+// CapturePreEVM implements the Tracer interface to bootstrap the tracing context,
+// before EVM init. This is useful for reading initial balance, state, etc.
+func (jst *Tracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) error {
+	jst.dbWrapper.db = env.StateDB
+
+	for key, val := range inputs {
+		jst.ctx[key] = val
+	}
+
+	if jst.vm.GetPropString(jst.tracerObject, "init") {
+		jst.addCtxIntoState()
+		_, err := jst.call("init", "ctx", "db")
+		if err != nil {
+			jst.err = wrapError("init", err)
+			return nil
+		}
+	}
+
+	return nil
+}
+
 // CaptureStart implements the Tracer interface to initialize the tracing operation.
 func (jst *Tracer) CaptureStart(from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) error {
 	jst.ctx["type"] = "CALL"
@@ -573,13 +601,6 @@ func (jst *Tracer) CaptureStart(from common.Address, to common.Address, create b
 	jst.ctx["gas"] = gas
 	jst.ctx["value"] = value
 
-	return nil
-}
-
-func (jst *Tracer) CaptureExtraContext(inputs map[string]interface{}) error {
-	for key, val := range inputs {
-		jst.ctx[key] = val
-	}
 	return nil
 }
 
@@ -690,7 +711,9 @@ func (jst *Tracer) CaptureFault(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 }
 
 // CaptureEnd is called after the call finishes to finalize the tracing.
-func (jst *Tracer) CaptureEnd(output []byte, gasUsed uint64, t time.Duration, err error) error {
+func (jst *Tracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, t time.Duration, err error) error {
+	jst.dbWrapper.db = env.StateDB
+
 	jst.ctx["output"] = output
 	jst.ctx["gasUsed"] = gasUsed
 	jst.ctx["time"] = t.String()
@@ -701,8 +724,8 @@ func (jst *Tracer) CaptureEnd(output []byte, gasUsed uint64, t time.Duration, er
 	return nil
 }
 
-// GetResult calls the Javascript 'result' function and returns its value, or any accumulated error
-func (jst *Tracer) GetResult() (json.RawMessage, error) {
+// addCtxIntoState adds/updates the ctx vars in the duktape context
+func (jst *Tracer) addCtxIntoState() {
 	// Transform the context into a JavaScript object and inject into the state
 	obj := jst.vm.PushObject()
 
@@ -713,6 +736,9 @@ func (jst *Tracer) GetResult() (json.RawMessage, error) {
 
 		case string:
 			jst.vm.PushString(val)
+
+		case bool:
+			jst.vm.PushBoolean(val)
 
 		case []byte:
 			ptr := jst.vm.PushFixedBuffer(len(val))
@@ -731,6 +757,11 @@ func (jst *Tracer) GetResult() (json.RawMessage, error) {
 		jst.vm.PutPropString(obj, key)
 	}
 	jst.vm.PutPropString(jst.stateObject, "ctx")
+}
+
+// GetResult calls the Javascript 'result' function and returns its value, or any accumulated error
+func (jst *Tracer) GetResult() (json.RawMessage, error) {
+	jst.addCtxIntoState()
 
 	// Finalize the trace and return the results
 	result, err := jst.call("result", "ctx", "db")

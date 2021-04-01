@@ -1,0 +1,110 @@
+{
+  "genesis": {
+    "number": "555752",
+    "hash": "0x920d433e1132f0466baf1dcd1d7e8c6c685418d07dd422086ec0906046b97988",
+    "nonce": "0x36c27e7a6e4ddadd",
+    "mixHash": "0xca7f722bce4111585fe21ef720a68854f6205d1fb61147831a0ecf398006e4e8",
+    "stateRoot": "0xe3aad8de0c53a6d6ec6cf8bda8e428693f8126a62ab4b7eaf537e1f912f3d0fe",
+    "miner": "0x774c398d763161f55b66a646f17edda4addad2ca",
+    "difficulty": "1837798",
+    "totalDifficulty": "462753454418",
+    "extraData": "0xd983010907846765746888676f312e31332e358664617277696e",
+    "gasLimit": "4896338",
+    "timestamp": "1577426758",
+    "alloc": {
+      "0x877bd459c9b7d8576b44e59e09d076c25946f443": {
+        "balance": "0x11b2055ae5912cc8578e",
+        "nonce": "22002",
+        "code": "0x",
+        "storage": {}
+      },
+      "0x774c398d763161f55b66a646f17edda4addad2ca": {
+        "balance": "0xe03ea946e53124a4488",
+        "nonce": "0",
+        "code": "0x",
+        "storage": {}
+      }
+    },
+    "config": {
+      "networkId": 7,
+      "chainId": 63,
+      "eip2FBlock": 0,
+      "eip7FBlock": 0,
+      "eip150Block": 0,
+      "eip155Block": 0,
+      "eip160Block": 0,
+      "eip161FBlock": 0,
+      "eip170FBlock": 0,
+      "eip100FBlock": 0,
+      "eip140FBlock": 0,
+      "eip198FBlock": 0,
+      "eip211FBlock": 0,
+      "eip212FBlock": 0,
+      "eip213FBlock": 0,
+      "eip214FBlock": 0,
+      "eip658FBlock": 0,
+      "eip145FBlock": 301243,
+      "eip1014FBlock": 301243,
+      "eip1052FBlock": 301243,
+      "eip152FBlock": 999983,
+      "eip1108FBlock": 999983,
+      "eip1344FBlock": 999983,
+      "eip1884FBlock": 999983,
+      "eip2028FBlock": 999983,
+      "eip2200FBlock": 999983,
+      "ecip1017FBlock": 0,
+      "ecip1017EraRounds": 2000000,
+      "ecip1099FBlock": 2520000,
+      "ecbp1100FBlock": 2380000,
+      "disposalBlock": 0,
+      "ethash": {},
+      "requireBlockHashes": {
+          "840013": "0x2ceada2b191879b71a5bcf2241dd9bc50d6d953f1640e62f9c2cee941dc61c9d",
+          "840014": "0x8ec29dd692c8985b82410817bac232fc82805b746538d17bc924624fe74a0fcf"
+        }
+    }
+  },
+  "context": {
+    "number": "555752",
+    "difficulty": "1837798",
+    "timestamp": "1577426758",
+    "gasLimit": "4896338",
+    "miner": "0x774c398d763161f55b66a646f17edda4addad2ca"
+  },
+  "input": {
+    "from": "0x877bd459c9b7d8576b44e59e09d076c25946f443",
+    "gas": "0x15815",
+    "gasPrice": "0x746a528800",
+    "value": "0x0",
+    "data": "0x60606040527382effbaaaf28614e55b2ba440fb198e0e5789b0f600060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908302179055505b600060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16ff5b600a80608c6000396000f30060606040526008565b00"
+  },
+  "result": {
+    "0x877bd459c9b7d8576b44e59e09d076c25946f443": {
+      "balance": {
+        "*": {
+          "from": "0x11b2055ae5912cc8578e",
+          "to": "0x11b204e90f1546912f8e"
+        }
+      },
+      "nonce": {
+        "*": {
+          "from": "0x55f2",
+          "to": "0x55f3"
+        }
+      },
+      "code": "=",
+      "storage": {}
+    },
+    "0x774c398d763161f55b66a646f17edda4addad2ca": {
+      "balance": {
+        "*": {
+          "from": "0xe03ea946e53124a4488",
+          "to": "0xe03eb0644cef8816c88"
+        }
+      },
+      "nonce": "=",
+      "code": "=",
+      "storage": {}
+    }
+  }
+}

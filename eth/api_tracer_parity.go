@@ -266,5 +266,5 @@ func (api *PrivateTraceAPI) CallMany(ctx context.Context, txs []ethapi.CallArgs,
 	if err != nil {
 		return nil, err
 	}
-	return decorateResponse(res, config)
+	return res, nil
 }

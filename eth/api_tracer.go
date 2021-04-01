@@ -969,7 +969,12 @@ func traceCallMany(ctx context.Context, eth *Ethereum, txs []ethapi.CallArgs, bl
 			results[idx] = &txTraceResult{Error: err.Error()}
 			continue
 		}
-		results[idx] = &txTraceResult{Result: res}
+
+		res, err = decorateResponse(res, config)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decorate response for transaction at index %d with error %v", idx, err)
+		}
+		results[idx] = res
 	}
 
 	return results, nil

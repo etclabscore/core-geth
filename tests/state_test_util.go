@@ -58,22 +58,7 @@ type StateSubtest struct {
 }
 
 func (t *StateTest) UnmarshalJSON(in []byte) error {
-
-	ir := map[string]stJSON{}
-
-	err := json.Unmarshal(in, &ir)
-	if err != nil {
-		return err
-	}
-
-	for k := range ir {
-		t.Name = k
-		break
-	}
-
-	t.json = ir[t.Name]
-
-	return nil
+	return json.Unmarshal(in, &t.json)
 }
 
 func (t StateTest) MarshalJSON() ([]byte, error) {

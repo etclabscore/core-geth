@@ -60,6 +60,8 @@ var (
 		EIP145FBlock:  big.NewInt(9573000),
 		EIP1014FBlock: big.NewInt(9573000),
 		EIP1052FBlock: big.NewInt(9573000),
+		// EIP1283FBlock:   big.NewInt(9573000),
+		// PetersburgBlock: big.NewInt(9573000),
 
 		// Istanbul eq, aka Phoenix
 		// ECIP-1088

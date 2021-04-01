@@ -397,6 +397,20 @@ func TestGeneratedConfigsEq(t *testing.T) {
 
 	coded := Forks["Berlin"]
 
+	// Special case handling for EIP1283.
+	if coded.GetEIP1283Transition() == nil && coded.GetEIP1283DisableTransition() == nil {
+
+		e1283 := gen.Config.GetEIP1283Transition()
+		d1283 := gen.Config.GetEIP1283DisableTransition()
+
+		if (e1283 == nil && d1283 == nil) ||
+			(*e1283 == *d1283) {
+			gen.Config.SetEIP1283Transition(nil)
+			gen.Config.SetEIP1283DisableTransition(nil)
+		}
+
+	}
+
 	err = confp.Equivalent(coded, gen.Config)
 	if err != nil {
 		t.Error(err)

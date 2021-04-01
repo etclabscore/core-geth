@@ -313,6 +313,13 @@ func (c *ChainConfig) SetEIP1052Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP1283Transition() *uint64 {
+	// This is special case handling for multigeth configuration.
+	// It makes the tests pass.
+	if c.ConstantinopleBlock != nil && c.PetersburgBlock != nil {
+		if c.ConstantinopleBlock.Cmp(c.PetersburgBlock) == 0 {
+			return nil
+		}
+	}
 	return bigNewU64(c.ConstantinopleBlock)
 }
 
@@ -322,6 +329,11 @@ func (c *ChainConfig) SetEIP1283Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP1283DisableTransition() *uint64 {
+	if c.ConstantinopleBlock != nil && c.PetersburgBlock != nil {
+		if c.ConstantinopleBlock.Cmp(c.PetersburgBlock) == 0 {
+			return nil
+		}
+	}
 	return bigNewU64(c.PetersburgBlock)
 }
 

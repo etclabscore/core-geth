@@ -254,7 +254,7 @@ func TestMapMeetsSpecification_1234(t *testing.T) {
             "0x0": "0x4c4b40"
         },
         "blockReward": {
-            "0x0": "0x29a2241af62c0000"
+            "0x0": "0x1bc16d674ec80000"
         }}`
 
 	im := struct {
@@ -272,6 +272,9 @@ func TestMapMeetsSpecification_1234(t *testing.T) {
 		vars.EIP1234DifficultyBombDelay,
 		vars.EIP1234FBlockReward,
 	)
+	if n == nil || *n != 0 {
+		t.Fatal("n should be 0", n)
+	}
 
 	t.Logf("%v n=%v", im, n)
 }

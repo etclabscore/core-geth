@@ -36,8 +36,14 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
+// paritySpecsDir is where parity specs for testing are stored.
+// These are DEPRECATED.
+// Use core-geth configurations instead.
 var paritySpecsDir = filepath.Join("..", "params", "parity.json.d")
 
+// paritySpecPath is a test utility function to get the path
+// for a parity configuration file for testing.
+// DEPRECATED. Brittle. Confusing. Ugly. Sorry.
 func paritySpecPath(name string) string {
 	p := filepath.Join(paritySpecsDir, name)
 	if fi, err := os.Open(p); err == nil {
@@ -53,23 +59,13 @@ func paritySpecPath(name string) string {
 	return p
 }
 
+// coregethSpecsDir is where core-geth-style configuration files for testing are stored.
 var coregethSpecsDir = filepath.Join("..", "params", "coregeth.json.d")
 
-func coregethSpecPath(name string) string {
-	p := filepath.Join(coregethSpecsDir, name)
-	if fi, err := os.Open(p); err == nil {
-		fi.Close()
-		return p
-	} else if os.IsNotExist(err) {
-		// This is an ugly HACK because tests function are sometimes called from
-		// other packages that are nested more deeply, eg. eth/tracers.
-		// This is a workaround for that.
-		// And it sucks.
-		p = filepath.Join("..", coregethSpecsDir, name)
-	}
-	return p
-}
-
+// MapForkNameChainspecFileState is a dictionary pairing Fork names with respective
+// file base names.
+// These are used for StateTests, BlockchainTests, but not Difficulty tests.
+// These files are expected to be found in coregethSpecsDir.
 var MapForkNameChainspecFileState = map[string]string{
 	"Frontier":             "frontier_test.json",
 	"Homestead":            "homestead_test.json",
@@ -87,6 +83,10 @@ var MapForkNameChainspecFileState = map[string]string{
 	"ETC_Magneto":          "etc_magneto_test.json",
 }
 
+// mapForkNameChainspecFileDifficulty is a dictionary pairing fork names with respective
+// file base name.
+// These configurations are used exclusively for Difficulty tests.
+// These files are expected to be found in coregethSpecsDir.
 var mapForkNameChainspecFileDifficulty = map[string]string{
 	"Ropsten":           "ropsten_difficulty_test.json",
 	"Morden":            "morden_difficulty_test.json",
@@ -103,39 +103,10 @@ var mapForkNameChainspecFileDifficulty = map[string]string{
 	"ETC_Phoenix":       "classic_phoenix_difficulty_test.json",
 }
 
-func readConfigFromSpecFileParity(name string) (spec ctypes.ChainConfigurator, sha1sum []byte, err error) {
-	spec = &parity.ParityChainSpec{}
-	if fi, err := os.Open(name); os.IsNotExist(err) {
-		return nil, nil, err
-	} else {
-		fi.Close()
-	}
-	b, err := ioutil.ReadFile(name)
-	if err != nil {
-		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
-	}
-	err = json.Unmarshal(b, spec)
-	if err != nil {
-		if jsonError, ok := err.(*json.SyntaxError); ok {
-			line, character, lcErr := lineAndCharacter(string(b), int(jsonError.Offset))
-			fmt.Fprintf(os.Stderr, "test failed with error: Cannot parse JSON schema due to a syntax error at line %d, character %d: %v\n", line, character, jsonError.Error())
-			if lcErr != nil {
-				fmt.Fprintf(os.Stderr, "Couldn't find the line and character position of the error due to error %v\n", lcErr)
-			}
-		}
-		if jsonError, ok := err.(*json.UnmarshalTypeError); ok {
-			line, character, lcErr := lineAndCharacter(string(b), int(jsonError.Offset))
-			fmt.Fprintf(os.Stderr, "test failed with error: The JSON type '%v' cannot be converted into the Go '%v' type on struct '%s', field '%v'. See input file line %d, character %d\n", jsonError.Value, jsonError.Type.Name(), jsonError.Struct, jsonError.Field, line, character)
-			if lcErr != nil {
-				fmt.Fprintf(os.Stderr, "test failed with error: Couldn't find the line and character position of the error due to error %v\n", lcErr)
-			}
-		}
-		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
-	}
-	bb := sha1.Sum(b)
-	return spec, bb[:], nil
-}
-
+// readJSONFromFile is a utility function to read (unmarshaling) a value from a JSON file,
+// which tries to return helpful errors if it is unable to, which can be useful for debugging.
+// Additionally, it returns the SHA1 sum of the file if it does not error otherwise.
+// This is floozy logic, but I don't really care right now.
 func readJSONFromFile(name string, value interface{}) (sha1sum []byte, err error) {
 	if fi, err := os.Open(name); os.IsNotExist(err) {
 		return nil, err
@@ -168,6 +139,9 @@ func readJSONFromFile(name string, value interface{}) (sha1sum []byte, err error
 	return bb[:], nil
 }
 
+// writeDifficultyConfigFileParity writes a difficulty-test configuration file in the parity format.
+// This feature is DEPRECATED.
+// Write core-geth format configuration for testing instead.
 func writeDifficultyConfigFileParity(conf ctypes.ChainConfigurator, forkName string) (string, [20]byte, error) {
 	genesis := params.DefaultRopstenGenesisBlock()
 	genesis.Config = conf
@@ -187,35 +161,6 @@ func writeDifficultyConfigFileParity(conf ctypes.ChainConfigurator, forkName str
 	}
 
 	err = ioutil.WriteFile(filepath.Join("..", "params", "parity.json.d", specFilepath), b, os.ModePerm)
-	if err != nil {
-		return "", [20]byte{}, err
-	}
-
-	sum := sha1.Sum(b)
-	return specFilepath, sum, nil
-}
-
-func writeDifficultyConfigFileCoreGeth(conf ctypes.ChainConfigurator, forkName string) (string, [20]byte, error) {
-	genesis := params.DefaultRopstenGenesisBlock()
-
-	cg := &coregeth.CoreGethChainConfig{}
-	err := confp.Convert(conf, cg)
-	if err != nil {
-		return "", [20]byte{}, err
-	}
-	genesis.Config = cg
-
-	specFilepath, ok := mapForkNameChainspecFileDifficulty[forkName]
-	if !ok {
-		return "", [20]byte{}, fmt.Errorf("nonexisting chainspec JSON file path, ref/assoc config: %s", forkName)
-	}
-
-	b, err := json.MarshalIndent(genesis, "", "    ")
-	if err != nil {
-		return "", [20]byte{}, err
-	}
-
-	err = ioutil.WriteFile(filepath.Join("..", "params", "coregeth.json.d", specFilepath), b, os.ModePerm)
 	if err != nil {
 		return "", [20]byte{}, err
 	}
@@ -412,84 +357,6 @@ func init() {
 		}
 	}
 }
-
-//func convertMetaForkBlocksToFeatures(config *paramtypes.CoreGethChainConfig) {
-//	if config.HomesteadBlock != nil {
-//		config.EIP2FBlock = config.HomesteadBlock
-//		config.EIP7FBlock = config.HomesteadBlock
-//		config.HomesteadBlock = nil
-//	}
-//	if config.EIP158Block != nil {
-//		config.EIP160FBlock = config.EIP158Block
-//		config.EIP161FBlock = config.EIP158Block
-//		config.EIP170FBlock = config.EIP158Block
-//		config.EIP158Block = nil
-//	}
-//	if config.ByzantiumBlock != nil {
-//		// Difficulty adjustment to target mean block time including uncles
-//		// https://github.com/ethereum/EIPs/issues/100
-//		config.EIP100FBlock = config.ByzantiumBlock
-//		// Opcode REVERT
-//		// https://eips.ethereum.org/EIPS/eip-140
-//		config.EIP140FBlock = config.ByzantiumBlock
-//		// Precompiled contract for bigint_modexp
-//		// https://github.com/ethereum/EIPs/issues/198
-//		config.EIP198FBlock = config.ByzantiumBlock
-//		// Opcodes RETURNDATACOPY, RETURNDATASIZE
-//		// https://github.com/ethereum/EIPs/issues/211
-//		config.EIP211FBlock = config.ByzantiumBlock
-//		// Precompiled contract for pairing check
-//		// https://github.com/ethereum/EIPs/issues/212
-//		config.EIP212FBlock = config.ByzantiumBlock
-//		// Precompiled contracts for addition and scalar multiplication on the elliptic curve alt_bn128
-//		// https://github.com/ethereum/EIPs/issues/213
-//		config.EIP213FBlock = config.ByzantiumBlock
-//		// Opcode STATICCALL
-//		// https://github.com/ethereum/EIPs/issues/214
-//		config.EIP214FBlock = config.ByzantiumBlock
-//		// Metropolis diff bomb delay and reducing block reward
-//		// https://github.com/ethereum/EIPs/issues/649
-//		// note that this is closely related to EIP100.
-//		// In fact, EIP100 is bundled in
-//		config.EIP649FBlock = config.ByzantiumBlock
-//		// Transaction receipt status
-//		// https://github.com/ethereum/EIPs/issues/658
-//		config.EIP658FBlock = config.ByzantiumBlock
-//		// NOT CONFIGURABLE: prevent overwriting contracts
-//		// https://github.com/ethereum/EIPs/issues/684
-//		// EIP684FBlock *big.Int `json:"eip684BFlock,omitempty"`
-//
-//		config.ByzantiumBlock = nil
-//	}
-//	if config.ConstantinopleBlock != nil {
-//		// Opcodes SHR, SHL, SAR
-//		// https://eips.ethereum.org/EIPS/eip-145
-//		config.EIP145FBlock = config.ConstantinopleBlock
-//		// Opcode CREATE2
-//		// https://eips.ethereum.org/EIPS/eip-1014
-//		config.EIP1014FBlock = config.ConstantinopleBlock
-//		// Opcode EXTCODEHASH
-//		// https://eips.ethereum.org/EIPS/eip-1052
-//		config.EIP1052FBlock = config.ConstantinopleBlock
-//		// Constantinople difficulty bomb delay and block reward adjustment
-//		// https://eips.ethereum.org/EIPS/eip-1234
-//		config.EIP1234FBlock = config.ConstantinopleBlock
-//		// Net gas metering
-//		// https://eips.ethereum.org/EIPS/eip-1283
-//		config.EIP1283FBlock = config.ConstantinopleBlock
-//
-//		config.ConstantinopleBlock = nil
-//	}
-//	if config.IstanbulBlock != nil {
-//		config.EIP152FBlock = config.IstanbulBlock
-//		config.EIP1108FBlock = config.IstanbulBlock
-//		config.EIP1344FBlock = config.IstanbulBlock
-//		config.EIP1884FBlock = config.IstanbulBlock
-//		config.EIP2028FBlock = config.IstanbulBlock
-//		config.EIP2200FBlock = config.IstanbulBlock
-//		config.IstanbulBlock = nil
-//	}
-//}
 
 // https://adrianhesketh.com/2017/03/18/getting-line-and-character-positions-from-gos-json-unmarshal-errors/
 func lineAndCharacter(input string, offset int) (line int, character int, err error) {

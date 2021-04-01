@@ -35,8 +35,13 @@ import (
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
+// outNDJSONFile is the file where difficulty tests get written to.
+// The file is encoded as line-delimited JSON.
 var outNDJSONFile = filepath.Join(difficultyTestDir, "mgen_difficulty.ndjson")
 
+// TestDifficultyTestConfigGen generates the difficulty test configuration files
+// for all existing tests' configuration and the configuration for any to-be generated
+// test configurations (via dt.generateFromReference).
 func TestDifficultyTestConfigGen(t *testing.T) {
 	if os.Getenv(CG_GENERATE_DIFFICULTY_TEST_CONFIGS_KEY) == "" {
 		t.Skip()
@@ -128,6 +133,11 @@ func TestDifficultyTestConfigGen(t *testing.T) {
 	})
 }
 
+// TestDifficultyGen generated line-delimited JSON tests using the existing default
+// difficutly tests suite as a base reference set.
+// Reference:Target pairs are defined with dt.generateFromReference.
+// The original test will be run and must pass in order for it to be copied to the
+// generated set and for it to be used as a reference, if applicable, for test generation.
 func TestDifficultyGen(t *testing.T) {
 	if os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) == "" {
 		t.Skip()
@@ -176,6 +186,16 @@ func TestDifficultyGen(t *testing.T) {
 		dt.config(k, v)
 	}
 
+	mustSha1SumForFile := func(filePath string) []byte {
+		b, err := ioutil.ReadFile(filePath)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		s1s := sha1.Sum(b)
+		return s1s[:]
+	}
+
 	dt.walk(t, difficultyTestDir, func(t *testing.T, name string, test *DifficultyTest) {
 		cfg, key := dt.findConfig(name)
 
@@ -193,21 +213,11 @@ func TestDifficultyGen(t *testing.T) {
 			}
 			specPath := filepath.Join(coregethSpecsDir, fileBasename)
 
-			b, err := ioutil.ReadFile(specPath)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			s1s := sha1.Sum(b)
-			sha1sum := []byte{}
-			for _, v := range s1s {
-				sha1sum = append(sha1sum, v)
-			}
-
-			test.Chainspec = chainspecRef{Filename: fileBasename, Sha1Sum: sha1sum}
+			test.Chainspec = chainspecRef{Filename: fileBasename, Sha1Sum: mustSha1SumForFile(specPath)}
 			test.Name = strings.ReplaceAll(name, ".json", "")
 
-			mustAppendTestToFile(t, test, outNDJSONFile)
+			mustAppendTestToFileNDJSON(t, test, outNDJSONFile)
+			// -- This is as far as ALL tests go.
 
 			targetForkName := dt.getGenerationTarget(key)
 			if targetForkName == "" {
@@ -215,26 +225,34 @@ func TestDifficultyGen(t *testing.T) {
 				return
 			}
 
+			// Lookup Target configuration from canonical coded list, eg.
+			/*
+				"Ropsten":  params.RopstenChainConfig,
+				"Morden":   params.RopstenChainConfig,
+				"Frontier": &goethereum.ChainConfig{},
+			*/
 			targetConfiguration, ok := difficultyChainConfigurations[targetForkName]
 			if !ok {
 				t.Fatalf("config association failed; no existing Go chain config found: %s", targetForkName)
 			}
 
+			// Lookup respective Target configuration FILE name, eg.
+			/*
+				"Ropsten":           "ropsten_difficulty_test.json",
+				"Morden":            "morden_difficulty_test.json",
+				"Frontier":          "frontier_difficulty_test.json",
+			*/
 			targetConfigurationBasename := mapForkNameChainspecFileDifficulty[targetForkName]
 
-			targetSpecPath := filepath.Join(coregethSpecsDir, targetConfigurationBasename)
-			b, err = ioutil.ReadFile(targetSpecPath)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			s1s = sha1.Sum(b)
-			sha1sum = []byte{}
-			for _, v := range s1s {
-				sha1sum = append(sha1sum, v)
-			}
-
-			targetSpecRef := chainspecRef{Filename: targetConfigurationBasename, Sha1Sum: sha1sum}
+			// Establish the specification reference value.
+			// Note that this assumes that the files sourced here are indeed consistent with the
+			// the coded configurations (ie. that TestDifficultyTestConfigGen has already been
+			// run and has done its job properly).
+			// There is no coded relationship or test between the test file and the configuration
+			// actually used here.
+			targetSpecRef := chainspecRef{
+				Filename: targetConfigurationBasename,
+				Sha1Sum:  mustSha1SumForFile(filepath.Join(coregethSpecsDir, targetConfigurationBasename))}
 
 			newTest := &DifficultyTest{
 				ParentTimestamp:    test.ParentTimestamp,
@@ -256,14 +274,15 @@ func TestDifficultyGen(t *testing.T) {
 			if err := newTest.Run(targetConfiguration); err != nil {
 				t.Fatal(err)
 			}
-			mustAppendTestToFile(t, newTest, outNDJSONFile)
+			mustAppendTestToFileNDJSON(t, newTest, outNDJSONFile)
 			t.Logf("OK [generated] %v", newTest)
 
 		}
 	})
 }
 
-func mustAppendTestToFile(t *testing.T, test *DifficultyTest, filep string) {
+// mustAppendTestToFileNDJSON appends a difficulty test to a file as newline-delimited JSON.
+func mustAppendTestToFileNDJSON(t *testing.T, test *DifficultyTest, filep string) {
 	b, _ := json.Marshal(test)
 	out := []byte{}
 	buf := bytes.NewBuffer(out)

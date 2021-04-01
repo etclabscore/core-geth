@@ -291,6 +291,7 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 		}
 
 		// Assign provenance metadata to the test.
+		test.Name = strings.TrimSuffix(filepath.Base(name), filepath.Ext(name))
 		test.json.Info.FilledWith = fmt.Sprintf("%s-%s-%s", params.VersionName, params.VersionWithMeta, tm.gitHead)
 
 		// Write the augmented test to the writer.

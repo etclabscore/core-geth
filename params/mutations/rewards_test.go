@@ -1,17 +1,39 @@
 package mutations
 
 import (
+	"fmt"
 	"math/big"
 	"math/rand"
 	"testing"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 )
 
 var (
 	defaultEraLength   *big.Int = big.NewInt(5000000)
 	MaximumBlockReward          = big.NewInt(5e+18)
+	WinnerCoinbase              = common.HexToAddress("0000000000000000000000000000000000000001")
+	Uncle1Coinbase              = common.HexToAddress("0000000000000000000000000000000000000002")
+	Uncle2Coinbase              = common.HexToAddress("0000000000000000000000000000000000000003")
+
+	Era1WinnerReward      = big.NewInt(5e+18)
+	Era1WinnerUncleReward = big.NewInt(156250000000000000)
+	Era1UncleReward       = big.NewInt(4375000000000000000)
+
+	Era2WinnerReward      = big.NewInt(4e+18)
+	Era2WinnerUncleReward = new(big.Int).Div(big.NewInt(4e+18), big32)
+	Era2UncleReward       = new(big.Int).Div(big.NewInt(4e+18), big32)
+
+	Era3WinnerReward      = new(big.Int).Mul(new(big.Int).Div(Era2WinnerReward, big.NewInt(5)), big.NewInt(4))
+	Era3WinnerUncleReward = new(big.Int).Div(new(big.Int).Mul(new(big.Int).Div(Era2WinnerReward, big.NewInt(5)), big.NewInt(4)), big32)
+	Era3UncleReward       = new(big.Int).Div(new(big.Int).Mul(new(big.Int).Div(Era2WinnerReward, big.NewInt(5)), big.NewInt(4)), big32)
+
+	Era4WinnerReward      = new(big.Int).Mul(new(big.Int).Div(Era3WinnerReward, big.NewInt(5)), big.NewInt(4))
+	Era4WinnerUncleReward = new(big.Int).Div(new(big.Int).Mul(new(big.Int).Div(Era3WinnerReward, big.NewInt(5)), big.NewInt(4)), big32)
+	Era4UncleReward       = new(big.Int).Div(new(big.Int).Mul(new(big.Int).Div(Era3WinnerReward, big.NewInt(5)), big.NewInt(4)), big32)
 )
 
 func TestGetBlockEra1(t *testing.T) {
@@ -190,5 +212,337 @@ func TestGetBlockWinnerRewardForUnclesByEra(t *testing.T) {
 		if got.Cmp(dub.Mul(want, big.NewInt(2))) != 0 {
 			t.Errorf("@ %v: want: %v, got: %v", bn, want, got)
 		}
+	}
+}
+
+// Integration tests.
+//
+// There are two kinds of integration tests: accumulating and non-accumulation.
+// Accumulating tests check simulated accrual of a
+// winner and two uncle accounts over the winnings of many mined blocks.
+// If ecip1017 feature is not included in the hardcoded mainnet configuration, it will be temporarily
+// included and tested in this test.
+// This tests not only reward changes, but summations and state tallies over time.
+// Non-accumulating tests check the one-off reward structure at any point
+// over the specified era period.
+// Currently tested eras are 1, 2, 3, and the beginning of 4.
+// Both kinds of tests rely on manual calculations of 'want' account balance state,
+// and purposely avoid using existing calculation functions in state_processor.go.
+// Check points confirming calculations are at and around the 'boundaries' of forks and eras.
+//
+// Helpers.
+
+// expectedEraForTesting is a 1-indexed version of era number,
+// used exclusively for testing.
+type expectedEraForTesting int
+
+const (
+	era1 expectedEraForTesting = iota + 1
+	era2
+	era3
+	era4
+)
+
+type expectedRewards map[common.Address]*big.Int
+
+func calculateExpectedEraRewards(era expectedEraForTesting, numUncles int) expectedRewards {
+	wr := new(big.Int)
+	wur := new(big.Int)
+	ur := new(big.Int)
+	switch era {
+	case era1:
+		wr = Era1WinnerReward
+		wur = Era1WinnerUncleReward
+		ur = Era1UncleReward
+	case era2:
+		wr = Era2WinnerReward
+		wur = Era2WinnerUncleReward
+		ur = Era2UncleReward
+	case era3:
+		wr = Era3WinnerReward
+		wur = Era3WinnerUncleReward
+		ur = Era3UncleReward
+	case era4:
+		wr = Era4WinnerReward
+		wur = Era4WinnerUncleReward
+		ur = Era4UncleReward
+	}
+	return expectedRewards{
+		WinnerCoinbase: new(big.Int).Add(wr, new(big.Int).Mul(wur, big.NewInt(int64(numUncles)))),
+		Uncle1Coinbase: ur,
+		Uncle2Coinbase: ur,
+	}
+}
+
+// expectedEraFromBlockNumber is similar to GetBlockEra, but it
+// returns a 1-indexed version of the number of type expectedEraForTesting
+func expectedEraFromBlockNumber(i, eralen *big.Int, t *testing.T) expectedEraForTesting {
+	e := GetBlockEra(i, eralen)
+	ePlusOne := new(big.Int).Add(e, big.NewInt(1)) // since expectedEraForTesting is not 0-indexed; iota + 1
+	ei := ePlusOne.Int64()
+	expEra := int(ei)
+	if expEra > 4 || expEra < 1 {
+		t.Fatalf("Unexpected era value, want 1 < e < 5, got: %d", expEra)
+	}
+	return expectedEraForTesting(expEra)
+}
+
+type expectedRewardCase struct {
+	eraNum  expectedEraForTesting
+	block   *big.Int
+	rewards expectedRewards
+}
+
+// String implements stringer interface for expectedRewards
+// Useful for logging tests for visual confirmation.
+func (r expectedRewards) String() string {
+	return fmt.Sprintf("w: %d, u1: %d, u2: %d", r[WinnerCoinbase], r[Uncle1Coinbase], r[Uncle2Coinbase])
+}
+
+// String implements stringer interface for expectedRewardCase --
+// useful for double-checking test cases with t.Log
+// to visually ensure getting all desired test cases.
+func (c *expectedRewardCase) String() string {
+	return fmt.Sprintf("block=%d era=%d rewards=%s", c.block, c.eraNum, c.rewards)
+}
+
+// makeExpectedRewardCasesForConfig makes an array of expectedRewardCases.
+// It checks boundary cases for era length and fork numbers.
+//
+// An example of output:
+// ----
+//	{
+//		// mainnet
+//		{
+//			block:   big.NewInt(2),
+//			rewards: calculateExpectedEraRewards(era1, 1),
+//		},
+// ...
+//		{
+//			block:   big.NewInt(20000000),
+//			rewards: calculateExpectedEraRewards(era4, 1),
+//		},
+//	},
+func makeExpectedRewardCasesForConfig(c *coregeth.CoreGethChainConfig, numUncles int, t *testing.T) []expectedRewardCase {
+	erasToTest := []expectedEraForTesting{era1, era2, era3}
+	eraLen := new(big.Int)
+	ecip1017EraLen := c.ECIP1017EraRounds
+	if ecip1017EraLen == nil {
+		eraLen = defaultEraLength
+	} else {
+		eraLen = ecip1017EraLen
+	}
+
+	var cases []expectedRewardCase
+	var boundaryDiffs = []int64{-2, -1, 0, 1, 2}
+
+	// Include trivial initial early block values.
+	for _, i := range []*big.Int{big.NewInt(2), big.NewInt(13)} {
+		cases = append(cases, expectedRewardCase{
+			eraNum:  era1,
+			block:   i,
+			rewards: calculateExpectedEraRewards(era1, numUncles),
+		})
+	}
+
+	// Test boundaries of era.
+	for _, e := range erasToTest {
+		for _, d := range boundaryDiffs {
+			eb := big.NewInt(int64(e))
+			eraBoundary := new(big.Int).Mul(eb, eraLen)
+			bn := new(big.Int).Add(eraBoundary, big.NewInt(d))
+			if bn.Sign() < 1 {
+				t.Fatalf("unexpected 0 or neg block number: %d", bn)
+			}
+			era := expectedEraFromBlockNumber(bn, eraLen, t)
+			cases = append(cases, expectedRewardCase{
+				eraNum:  era,
+				block:   bn,
+				rewards: calculateExpectedEraRewards(era, numUncles),
+			})
+		}
+	}
+
+	return cases
+}
+
+/*
+// Accruing over block cases simulates miner account winning many times.
+// Uses maps of running sums for winner & 2 uncles to keep tally.
+func TestAccumulateRewards1(t *testing.T) {
+	configs := []*coregeth.CoreGethChainConfig{params.ClassicChainConfig, params.MordorChainConfig}
+	cases := [][]expectedRewardCase{}
+	for _, c := range configs {
+		cases = append(cases, makeExpectedRewardCasesForConfig(c, 2, t))
+	}
+
+	// t.Logf("Accruing balances over cases. 2 uncles. Configs mainnet=0, morden=1")
+	for i, config := range configs {
+		// Set up era len by chain configurations.
+		ecip1017ForkBlock := config.ECIP1017FBlock
+		if ecip1017ForkBlock == nil {
+			t.Fatal("ecip1017ForkBlock is not defined.")
+		}
+
+		eraLen := config.ECIP1017EraRounds
+		if eraLen == nil {
+			t.Error("No era length configured, is required.")
+		}
+
+		db := rawdb.NewMemoryDatabase()
+
+		stateDB, err := state.New(common.Hash{}, state.NewDatabase(db), nil)
+		if err != nil {
+			t.Fatalf("could not open statedb: %v", err)
+		}
+
+		var header *types.Header = &types.Header{}
+		var uncles []*types.Header = []*types.Header{{}, {}}
+
+		if i == 0 {
+			header.Coinbase = common.HexToAddress("000d836201318ec6899a67540690382780743280")
+			uncles[0].Coinbase = common.HexToAddress("001762430ea9c3a26e5749afdb70da5f78ddbb8c")
+			uncles[1].Coinbase = common.HexToAddress("001d14804b399c6ef80e64576f657660804fec0b")
+		} else {
+			header.Coinbase = common.HexToAddress("0000000000000000000000000000000000000001")
+			uncles[0].Coinbase = common.HexToAddress("0000000000000000000000000000000000000002")
+			uncles[1].Coinbase = common.HexToAddress("0000000000000000000000000000000000000003")
+		}
+
+		// Manual tallies for reward accumulation.
+		winnerB, totalB := new(big.Int), new(big.Int)
+		unclesB := []*big.Int{new(big.Int), new(big.Int)}
+
+		winnerB = stateDB.GetBalance(header.Coinbase)
+		unclesB[0] = stateDB.GetBalance(uncles[0].Coinbase)
+		unclesB[1] = stateDB.GetBalance(uncles[1].Coinbase)
+
+		totalB.Add(totalB, winnerB)
+		totalB.Add(totalB, unclesB[0])
+		totalB.Add(totalB, unclesB[1])
+
+		if totalB.Cmp(big.NewInt(0)) != 0 {
+			t.Errorf("unexpected: %v", totalB)
+		}
+
+		for _, c := range cases[i] {
+			bn := c.block
+			era := GetBlockEra(bn, eraLen)
+
+			header.Number = bn
+
+			for i, uncle := range uncles {
+
+				// Randomize uncle numbers with bound ( n-1 <= uncleNum <= n-7 ), where n is current head number
+				// See yellowpaper@11.1 for ommer validation reference. I expect n-7 is 6th-generation ommer.
+				// Note that ommer nth-generation impacts reward only for "Era 1".
+				rand.Seed(time.Now().UTC().UnixNano())
+
+				// 1 + [0..rand..7) == 1 + 0, 1 + 1, ... 1 + 6
+				un := new(big.Int).Add(big.NewInt(1), big.NewInt(int64(rand.Int31n(int32(7)))))
+				uncle.Number = new(big.Int).Sub(header.Number, un) // n - un
+
+				ur := GetBlockUncleRewardByEra(era, header, uncle, bn)
+				unclesB[i].Add(unclesB[i], ur)
+
+				totalB.Add(totalB, ur)
+			}
+
+			wr := GetBlockWinnerRewardByEra(era, bn)
+			wr.Add(wr, GetBlockWinnerRewardForUnclesByEra(era, uncles, bn))
+			winnerB.Add(winnerB, wr)
+
+			totalB.Add(totalB, winnerB)
+
+			AccumulateRewards(config, stateDB, header, uncles)
+
+			// Check balances.
+			//t.Logf("config=%d block=%d era=%d w:%d u1:%d u2:%d", i, bn, new(big.Int).Add(era, big.NewInt(1)), winnerB, unclesB[0], unclesB[1])
+			if wb := stateDB.GetBalance(header.Coinbase); wb.Cmp(winnerB) != 0 {
+				t.Errorf("winner balance @ %v, want: %v, got: %v (config: %v)", bn, winnerB, wb, i)
+			}
+			if uB0 := stateDB.GetBalance(uncles[0].Coinbase); unclesB[0].Cmp(uB0) != 0 {
+				t.Errorf("uncle1 balance @ %v, want: %v, got: %v (config: %v)", bn, unclesB[0], uB0, i)
+			}
+			if uB1 := stateDB.GetBalance(uncles[1].Coinbase); unclesB[1].Cmp(uB1) != 0 {
+				t.Errorf("uncle2 balance @ %v, want: %v, got: %v (config: %v)", bn, unclesB[1], uB1, i)
+			}
+		}
+		db.Close()
+	}
+}
+*/
+
+func TestGetBlockEra(t *testing.T) {
+	blockNum := big.NewInt(11700000)
+	eraLength := big.NewInt(5000000)
+	era := GetBlockEra(blockNum, eraLength)
+	if era.Cmp(big.NewInt(2)) != 0 {
+		t.Error("Should return Era 2", "era", era)
+	}
+	// handle negative blockNum
+	blockNum = big.NewInt(-50000)
+	era = GetBlockEra(blockNum, eraLength)
+	if era.Cmp(big.NewInt(0)) != 0 {
+		t.Error("Should return Era 0", "era", era)
+	}
+	// handle negative blockNum
+	blockNum = big.NewInt(5000001)
+	era = GetBlockEra(blockNum, eraLength)
+	if era.Cmp(big.NewInt(1)) != 0 {
+		t.Error("Should return Era 1", "era", era)
+	}
+}
+
+func TestGetBlockWinnerRewardByEra2(t *testing.T) {
+	baseReward := big.NewInt(5000000000000000000)
+	era := big.NewInt(0)
+	blockReward := GetBlockWinnerRewardByEra(era, baseReward)
+	if blockReward.Cmp(big.NewInt(5000000000000000000)) != 0 {
+		t.Error("Should return blockReward 5000000000000000000", "reward", blockReward)
+	}
+	era = big.NewInt(1)
+	blockReward = GetBlockWinnerRewardByEra(era, baseReward)
+	if blockReward.Cmp(big.NewInt(4000000000000000000)) != 0 {
+		t.Error("Should return blockReward 4000000000000000000", "reward", blockReward)
+	}
+	era = big.NewInt(2)
+	blockReward = GetBlockWinnerRewardByEra(era, baseReward)
+	if blockReward.Cmp(big.NewInt(3200000000000000000)) != 0 {
+		t.Error("Should return blockReward 3200000000000000000", "reward", blockReward)
+	}
+	era = big.NewInt(3)
+	blockReward = GetBlockWinnerRewardByEra(era, baseReward)
+	if blockReward.Cmp(big.NewInt(2560000000000000000)) != 0 {
+		t.Error("Should return blockReward 2560000000000000000", "reward", blockReward)
+	}
+	era = big.NewInt(4)
+	blockReward = GetBlockWinnerRewardByEra(era, baseReward)
+	if blockReward.Cmp(big.NewInt(2048000000000000000)) != 0 {
+		t.Error("Should return blockReward 2048000000000000000", "reward", blockReward)
+	}
+}
+
+func TestGetRewardForUncle(t *testing.T) {
+	baseReward := big.NewInt(4000000000000000000)
+	era := big.NewInt(0)
+	uncleReward := getEraUncleBlockReward(era, baseReward)
+	if uncleReward.Cmp(big.NewInt(125000000000000000)) != 0 {
+		t.Error("Should return uncleReward 125000000000000000", "reward", uncleReward)
+	}
+	baseReward = big.NewInt(3200000000000000000)
+	uncleReward = getEraUncleBlockReward(era, baseReward)
+	if uncleReward.Cmp(big.NewInt(100000000000000000)) != 0 {
+		t.Error("Should return uncleReward 100000000000000000", "reward", uncleReward)
+	}
+	baseReward = big.NewInt(2560000000000000000)
+	uncleReward = getEraUncleBlockReward(era, baseReward)
+	if uncleReward.Cmp(big.NewInt(80000000000000000)) != 0 {
+		t.Error("Should return uncleReward 80000000000000000", "reward", uncleReward)
+	}
+	baseReward = big.NewInt(2048000000000000000)
+	uncleReward = getEraUncleBlockReward(era, baseReward)
+	if uncleReward.Cmp(big.NewInt(64000000000000000)) != 0 {
+		t.Error("Should return uncleReward 64000000000000000", "reward", uncleReward)
 	}
 }

@@ -928,6 +928,7 @@ var allRPCMethods = []string{
 	"debug_traceBlockByNumber",
 	"debug_traceBlockFromFile",
 	"debug_traceCall",
+	"debug_traceCallMany",
 	"debug_traceTransaction",
 	"debug_verbosity",
 	"debug_vmodule",

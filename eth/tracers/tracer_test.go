@@ -69,7 +69,7 @@ func runTrace(tracer *Tracer, vmctx *vmContext) (json.RawMessage, error) {
 
 	tracer.CaptureStart(contract.Caller(), contract.Address(), false, []byte{}, startGas, value)
 	ret, err := env.Interpreter().Run(contract, []byte{}, false)
-	tracer.CaptureEnd(ret, startGas-contract.Gas, 1, err)
+	tracer.CaptureEnd(env, ret, startGas-contract.Gas, 1, err)
 	if err != nil {
 		return nil, err
 	}

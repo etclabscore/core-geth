@@ -17,6 +17,10 @@
 // noopTracer is just the barebone boilerplate code required from a JavaScript
 // object to be usable as a transaction tracer.
 {
+	// init is invoked before any VM execution.
+	// ctx has to|msgTo|coinbase set and additional context based on each trace method.
+	init: function(ctx, db) { },
+
 	// step is invoked for every opcode that the VM executes.
 	step: function(log, db) { },
 

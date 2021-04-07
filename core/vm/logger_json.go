@@ -41,6 +41,10 @@ func NewJSONLogger(cfg *LogConfig, writer io.Writer) *JSONLogger {
 	return l
 }
 
+func (l *JSONLogger) CapturePreEVM(env *EVM, inputs map[string]interface{}) error {
+	return nil
+}
+
 func (l *JSONLogger) CaptureStart(from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) error {
 	return nil
 }
@@ -81,7 +85,7 @@ func (l *JSONLogger) CaptureFault(env *EVM, pc uint64, op OpCode, gas, cost uint
 }
 
 // CaptureEnd is triggered at end of execution.
-func (l *JSONLogger) CaptureEnd(output []byte, gasUsed uint64, t time.Duration, err error) error {
+func (l *JSONLogger) CaptureEnd(env *EVM, output []byte, gasUsed uint64, t time.Duration, err error) error {
 	type endLog struct {
 		Output  string              `json:"output"`
 		GasUsed math.HexOrDecimal64 `json:"gasUsed"`

@@ -939,7 +939,6 @@ var allRPCMethods = []string{
 	"eth_blockNumber",
 	"eth_call",
 	"eth_chainId",
-	"eth_chainId",
 	"eth_coinbase",
 	"eth_estimateGas",
 	"eth_etherbase",

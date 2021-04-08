@@ -20,6 +20,7 @@ package utils
 import (
 	"crypto/ecdsa"
 	"fmt"
+	"github.com/ethereum/go-ethereum/consensus/lyra2"
 	"io"
 	"io/ioutil"
 	"math/big"
@@ -157,6 +158,10 @@ var (
 	YoloV2Flag = cli.BoolFlag{
 		Name:  "yolov2",
 		Usage: "YOLOv2 network: pre-configured proof-of-authority shortlived test network.",
+	}
+	MINTMEFlag = cli.BoolFlag{
+		Name:  "mintme",
+		Usage: "MintMe.com Coin mainnet: pre-configured MintMe.com Coin mainnet",
 	}
 	RinkebyFlag = cli.BoolFlag{
 		Name:  "rinkeby",
@@ -858,6 +863,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.GoerliBootnodes
 	case ctx.GlobalBool(YoloV2Flag.Name):
 		urls = params.YoloV2Bootnodes
+	case ctx.GlobalBool(MINTMEFlag.Name):
+		urls = params.MINTMEBootnodes
 	case cfg.BootstrapNodes != nil:
 		return // already set, don't apply defaults.
 	}
@@ -900,6 +907,8 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.GoerliBootnodes
 	case ctx.GlobalBool(YoloV2Flag.Name):
 		urls = params.YoloV2Bootnodes
+	case ctx.GlobalBool(MINTMEFlag.Name):
+		urls = params.MINTMEBootnodes
 	case cfg.BootstrapNodesV5 != nil:
 		return // already set, don't apply defaults.
 	}
@@ -1324,6 +1333,8 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "goerli")
 	case ctx.GlobalBool(YoloV2Flag.Name):
 		return filepath.Join(baseDataDirPath, "yolo-v2")
+	case ctx.GlobalBool(MINTMEFlag.Name):
+		return filepath.Join(baseDataDirPath, "mintme")
 	}
 	return baseDataDirPath
 }
@@ -1601,7 +1612,7 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, LegacyTestnetFlag, MainnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV2Flag, ClassicFlag, KottiFlag, MordorFlag)
+	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, LegacyTestnetFlag, MainnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV2Flag, ClassicFlag, KottiFlag, MordorFlag, MINTMEFlag)
 	CheckExclusive(ctx, LegacyLightServFlag, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	CheckExclusive(ctx, GCModeFlag, "archive", TxLookupLimitFlag)
@@ -1992,6 +2003,8 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 		genesis = params.DefaultGoerliGenesisBlock()
 	case ctx.GlobalBool(YoloV2Flag.Name):
 		genesis = params.DefaultYoloV2GenesisBlock()
+	case ctx.GlobalBool(MINTMEFlag.Name):
+		genesis = params.DefaultMINTMEGenesisBlock()
 	}
 	return genesis
 }
@@ -2017,6 +2030,18 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 			Period: config.GetCliquePeriod(),
 			Epoch:  config.GetCliqueEpoch(),
 		}, chainDb)
+	} else if config.GetConsensusEngineType().IsLyra2() {
+		engine = lyra2.New(ethash.Config{
+			CacheDir:         stack.ResolvePath(eth.DefaultConfig.Ethash.CacheDir),
+			CachesInMem:      eth.DefaultConfig.Ethash.CachesInMem,
+			CachesOnDisk:     eth.DefaultConfig.Ethash.CachesOnDisk,
+			CachesLockMmap:   eth.DefaultConfig.Ethash.CachesLockMmap,
+			DatasetDir:       stack.ResolvePath(eth.DefaultConfig.Ethash.DatasetDir),
+			DatasetsInMem:    eth.DefaultConfig.Ethash.DatasetsInMem,
+			DatasetsOnDisk:   eth.DefaultConfig.Ethash.DatasetsOnDisk,
+			DatasetsLockMmap: eth.DefaultConfig.Ethash.DatasetsLockMmap,
+			ECIP1099Block:    config.GetEthashECIP1099Transition(),
+		})
 	} else {
 		engine = ethash.NewFaker()
 		if ctx.GlobalBool(FakePoWPoissonFlag.Name) {

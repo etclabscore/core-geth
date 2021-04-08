@@ -29,7 +29,7 @@ var (
     MINTMEChainConfig = &coregeth.CoreGethChainConfig{
         NetworkID: 4269,
         ChainID:   big.NewInt(4269),
-        Ethash:    new(ctypes.EthashConfig),
+        Lyra2:    new(ctypes.Lyra2Config),
 
         EIP2FBlock: big.NewInt(0),
         EIP7FBlock: big.NewInt(0),

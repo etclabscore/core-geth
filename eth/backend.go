@@ -20,6 +20,7 @@ package eth
 import (
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/consensus/lyra2"
 	"math/big"
 	"runtime"
 	"sync"
@@ -270,6 +271,19 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 			Period: chainConfig.GetCliquePeriod(),
 			Epoch:  chainConfig.GetCliqueEpoch(),
 		}, db)
+	}
+	if chainConfig.GetConsensusEngineType().IsLyra2() {
+		return lyra2.New(ethash.Config{
+			CacheDir:         stack.ResolvePath(config.CacheDir),
+			CachesInMem:      config.CachesInMem,
+			CachesOnDisk:     config.CachesOnDisk,
+			CachesLockMmap:   config.CachesLockMmap,
+			DatasetDir:       config.DatasetDir,
+			DatasetsInMem:    config.DatasetsInMem,
+			DatasetsOnDisk:   config.DatasetsOnDisk,
+			DatasetsLockMmap: config.DatasetsLockMmap,
+			ECIP1099Block:    chainConfig.GetEthashECIP1099Transition(),
+		})
 	}
 	// Otherwise assume proof-of-work
 	switch config.PowMode {

@@ -481,6 +481,9 @@ func (c *ChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT {
 	if c.Clique != nil {
 		return ctypes.ConsensusEngineT_Clique
 	}
+	if c.Lyra2 != nil {
+		return ctypes.ConsensusEngineT_Lyra2
+	}
 	return ctypes.ConsensusEngineT_Ethash
 }
 

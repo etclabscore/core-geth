@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/Azure/azure-storage-blob-go v0.10.0
+	github.com/OneOfOne/xxhash v1.2.5 // indirect
 	github.com/VictoriaMetrics/fastcache v1.5.7
 	github.com/alecthomas/jsonschema v0.0.0-20200530073317-71f438968921
 	github.com/aristanetworks/goarista v0.0.0-20200812190859-4cb0e71f3c0e
@@ -40,7 +41,6 @@ require (
 	github.com/jackpal/go-nat-pmp v1.0.2
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/karalabe/usb v0.0.0-20191104083709-911d15fe12a9
-	github.com/ledgerwatch/turbo-geth v0.0.0-20210308133656-9d397082536c
 	github.com/mattn/go-colorable v0.1.7
 	github.com/mattn/go-isatty v0.0.12
 	github.com/mitchellh/go-homedir v1.1.0
@@ -54,6 +54,7 @@ require (
 	github.com/rs/cors v1.7.0
 	github.com/rs/xhandler v0.0.0-20170707052532-1eb70cf1520d // indirect
 	github.com/shirou/gopsutil v2.20.5+incompatible
+	github.com/spaolacci/murmur3 v1.0.1-0.20190317074736-539464a789e9 // indirect
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.0
 	github.com/status-im/keycard-go v0.0.0-20200402102358-957c09536969

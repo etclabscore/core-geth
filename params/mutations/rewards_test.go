@@ -8,8 +8,12 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 var (
@@ -19,9 +23,9 @@ var (
 	Uncle1Coinbase              = common.HexToAddress("0000000000000000000000000000000000000002")
 	Uncle2Coinbase              = common.HexToAddress("0000000000000000000000000000000000000003")
 
-	Era1WinnerReward      = big.NewInt(5e+18)
-	Era1WinnerUncleReward = big.NewInt(156250000000000000)
-	Era1UncleReward       = big.NewInt(4375000000000000000)
+	Era1WinnerReward      = big.NewInt(5e+18)               // base block reward
+	Era1WinnerUncleReward = big.NewInt(156250000000000000)  // uncle inclusion reward (base block reward / 32)
+	Era1UncleReward       = big.NewInt(4375000000000000000) // uncle reward (depth 1) (block reward * (7/8))
 
 	Era2WinnerReward      = big.NewInt(4e+18)
 	Era2WinnerUncleReward = new(big.Int).Div(big.NewInt(4e+18), big32)
@@ -237,19 +241,20 @@ func TestGetBlockWinnerRewardForUnclesByEra(t *testing.T) {
 type expectedEraForTesting int
 
 const (
-	era1 expectedEraForTesting = iota + 1
-	era2
-	era3
-	era4
+	era1 = 1
+	era2 = 2
+	era3 = 3
+	era4 = 4
 )
 
 type expectedRewards map[common.Address]*big.Int
 
-func calculateExpectedEraRewards(era expectedEraForTesting, numUncles int) expectedRewards {
+func calculateExpectedEraRewards(era *big.Int, numUncles int) expectedRewards {
 	wr := new(big.Int)
 	wur := new(big.Int)
 	ur := new(big.Int)
-	switch era {
+	uera := era.Int64()
+	switch uera {
 	case era1:
 		wr = Era1WinnerReward
 		wur = Era1WinnerUncleReward
@@ -276,19 +281,19 @@ func calculateExpectedEraRewards(era expectedEraForTesting, numUncles int) expec
 
 // expectedEraFromBlockNumber is similar to GetBlockEra, but it
 // returns a 1-indexed version of the number of type expectedEraForTesting
-func expectedEraFromBlockNumber(i, eralen *big.Int, t *testing.T) expectedEraForTesting {
+/*func expectedEraFromBlockNumber(i, eralen *big.Int, t *testing.T) int64 {
 	e := GetBlockEra(i, eralen)
-	ePlusOne := new(big.Int).Add(e, big.NewInt(1)) // since expectedEraForTesting is not 0-indexed; iota + 1
+	// ePlusOne := new(big.Int).Add(e, big.NewInt(1)) // since expectedEraForTesting is not 0-indexed; iota + 1
 	ei := ePlusOne.Int64()
 	expEra := int(ei)
 	if expEra > 4 || expEra < 1 {
 		t.Fatalf("Unexpected era value, want 1 < e < 5, got: %d", expEra)
 	}
-	return expectedEraForTesting(expEra)
-}
+	return int64(expEra)
+}*/
 
 type expectedRewardCase struct {
-	eraNum  expectedEraForTesting
+	eraNum  *big.Int
 	block   *big.Int
 	rewards expectedRewards
 }
@@ -324,7 +329,7 @@ func (c *expectedRewardCase) String() string {
 //		},
 //	},
 func makeExpectedRewardCasesForConfig(c *coregeth.CoreGethChainConfig, numUncles int, t *testing.T) []expectedRewardCase {
-	erasToTest := []expectedEraForTesting{era1, era2, era3}
+	erasToTest := []int64{era1, era2, era3}
 	eraLen := new(big.Int)
 	ecip1017EraLen := c.ECIP1017EraRounds
 	if ecip1017EraLen == nil {
@@ -338,10 +343,11 @@ func makeExpectedRewardCasesForConfig(c *coregeth.CoreGethChainConfig, numUncles
 
 	// Include trivial initial early block values.
 	for _, i := range []*big.Int{big.NewInt(2), big.NewInt(13)} {
+		era := GetBlockEra(i, eraLen)
 		cases = append(cases, expectedRewardCase{
-			eraNum:  era1,
+			eraNum:  era,
 			block:   i,
-			rewards: calculateExpectedEraRewards(era1, numUncles),
+			rewards: calculateExpectedEraRewards(era, numUncles),
 		})
 	}
 
@@ -354,7 +360,7 @@ func makeExpectedRewardCasesForConfig(c *coregeth.CoreGethChainConfig, numUncles
 			if bn.Sign() < 1 {
 				t.Fatalf("unexpected 0 or neg block number: %d", bn)
 			}
-			era := expectedEraFromBlockNumber(bn, eraLen, t)
+			era := GetBlockEra(bn, eraLen)
 			cases = append(cases, expectedRewardCase{
 				eraNum:  era,
 				block:   bn,
@@ -366,19 +372,12 @@ func makeExpectedRewardCasesForConfig(c *coregeth.CoreGethChainConfig, numUncles
 	return cases
 }
 
-/*
-// Accruing over block cases simulates miner account winning many times.
-// Uses maps of running sums for winner & 2 uncles to keep tally.
-func TestAccumulateRewards1(t *testing.T) {
-	configs := []*coregeth.CoreGethChainConfig{params.ClassicChainConfig, params.MordorChainConfig}
-	cases := [][]expectedRewardCase{}
-	for _, c := range configs {
-		cases = append(cases, makeExpectedRewardCasesForConfig(c, 2, t))
-	}
-
-	// t.Logf("Accruing balances over cases. 2 uncles. Configs mainnet=0, morden=1")
+func TestAccumulateRewards(t *testing.T) {
+	configs := []*coregeth.CoreGethChainConfig{params.ClassicChainConfig}
 	for i, config := range configs {
-		// Set up era len by chain configurations.
+		cases := [][]expectedRewardCase{}
+		cases = append(cases, makeExpectedRewardCasesForConfig(config, 2, t))
+
 		ecip1017ForkBlock := config.ECIP1017FBlock
 		if ecip1017ForkBlock == nil {
 			t.Fatal("ecip1017ForkBlock is not defined.")
@@ -410,27 +409,25 @@ func TestAccumulateRewards1(t *testing.T) {
 		}
 
 		// Manual tallies for reward accumulation.
-		winnerB, totalB := new(big.Int), new(big.Int)
-		unclesB := []*big.Int{new(big.Int), new(big.Int)}
+		totalB := new(big.Int)
 
-		winnerB = stateDB.GetBalance(header.Coinbase)
-		unclesB[0] = stateDB.GetBalance(uncles[0].Coinbase)
-		unclesB[1] = stateDB.GetBalance(uncles[1].Coinbase)
+		blockWinner := *stateDB.GetBalance(header.Coinbase) // start balance. 0
+		uncleMiner1 := *stateDB.GetBalance(uncles[0].Coinbase)
+		uncleMiner2 := *stateDB.GetBalance(uncles[1].Coinbase)
 
-		totalB.Add(totalB, winnerB)
-		totalB.Add(totalB, unclesB[0])
-		totalB.Add(totalB, unclesB[1])
+		totalB.Add(totalB, &blockWinner)
+		totalB.Add(totalB, &uncleMiner1)
+		totalB.Add(totalB, &uncleMiner2)
 
+		// make sure we are starting clean (everything is 0)
 		if totalB.Cmp(big.NewInt(0)) != 0 {
 			t.Errorf("unexpected: %v", totalB)
 		}
-
 		for _, c := range cases[i] {
 			bn := c.block
 			era := GetBlockEra(bn, eraLen)
-
 			header.Number = bn
-
+			blockReward := ctypes.EthashBlockReward(config, header.Number)
 			for i, uncle := range uncles {
 
 				// Randomize uncle numbers with bound ( n-1 <= uncleNum <= n-7 ), where n is current head number
@@ -442,36 +439,41 @@ func TestAccumulateRewards1(t *testing.T) {
 				un := new(big.Int).Add(big.NewInt(1), big.NewInt(int64(rand.Int31n(int32(7)))))
 				uncle.Number = new(big.Int).Sub(header.Number, un) // n - un
 
-				ur := GetBlockUncleRewardByEra(era, header, uncle, bn)
-				unclesB[i].Add(unclesB[i], ur)
+				ur := GetBlockUncleRewardByEra(era, header, uncle, blockReward)
+				if i == 0 {
+					uncleMiner1.Add(&uncleMiner1, ur)
+				}
+				if i == 1 {
+					uncleMiner2.Add(&uncleMiner2, ur)
+				}
 
 				totalB.Add(totalB, ur)
 			}
 
-			wr := GetBlockWinnerRewardByEra(era, bn)
-			wr.Add(wr, GetBlockWinnerRewardForUnclesByEra(era, uncles, bn))
-			winnerB.Add(winnerB, wr)
+			wr := GetBlockWinnerRewardByEra(era, blockReward)
+			wr.Add(wr, GetBlockWinnerRewardForUnclesByEra(era, uncles, blockReward))
+			blockWinner.Add(&blockWinner, wr)
 
-			totalB.Add(totalB, winnerB)
+			totalB.Add(totalB, &blockWinner)
 
 			AccumulateRewards(config, stateDB, header, uncles)
 
 			// Check balances.
-			//t.Logf("config=%d block=%d era=%d w:%d u1:%d u2:%d", i, bn, new(big.Int).Add(era, big.NewInt(1)), winnerB, unclesB[0], unclesB[1])
-			if wb := stateDB.GetBalance(header.Coinbase); wb.Cmp(winnerB) != 0 {
-				t.Errorf("winner balance @ %v, want: %v, got: %v (config: %v)", bn, winnerB, wb, i)
+			//t.Logf("config=%d block=%d era=%d w:%d u1:%d u2:%d", i, bn, new(big.Int).Add(era, big.NewInt(1)), blockWinner, uncleMiner1, uncleMiner2)
+			if wb := stateDB.GetBalance(header.Coinbase); wb.Cmp(&blockWinner) != 0 {
+				t.Errorf("winner balance @ %v, want: %v, got: %v (config: %v)", bn, blockWinner, wb, i)
 			}
-			if uB0 := stateDB.GetBalance(uncles[0].Coinbase); unclesB[0].Cmp(uB0) != 0 {
-				t.Errorf("uncle1 balance @ %v, want: %v, got: %v (config: %v)", bn, unclesB[0], uB0, i)
+			if uB0 := stateDB.GetBalance(uncles[0].Coinbase); uncleMiner1.Cmp(uB0) != 0 {
+				t.Errorf("uncle1 balance @ %v, want: %v, got: %v (config: %v)", bn, uncleMiner1, uB0, i)
 			}
-			if uB1 := stateDB.GetBalance(uncles[1].Coinbase); unclesB[1].Cmp(uB1) != 0 {
-				t.Errorf("uncle2 balance @ %v, want: %v, got: %v (config: %v)", bn, unclesB[1], uB1, i)
+			if uB1 := stateDB.GetBalance(uncles[1].Coinbase); uncleMiner2.Cmp(uB1) != 0 {
+				t.Errorf("uncle2 balance @ %v, want: %v, got: %v (config: %v)", bn, uncleMiner2, uB1, i)
 			}
 		}
+
 		db.Close()
 	}
 }
-*/
 
 func TestGetBlockEra(t *testing.T) {
 	blockNum := big.NewInt(11700000)
@@ -486,7 +488,6 @@ func TestGetBlockEra(t *testing.T) {
 	if era.Cmp(big.NewInt(0)) != 0 {
 		t.Error("Should return Era 0", "era", era)
 	}
-	// handle negative blockNum
 	blockNum = big.NewInt(5000001)
 	era = GetBlockEra(blockNum, eraLength)
 	if era.Cmp(big.NewInt(1)) != 0 {

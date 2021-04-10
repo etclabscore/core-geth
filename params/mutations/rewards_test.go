@@ -236,10 +236,6 @@ func TestGetBlockWinnerRewardForUnclesByEra(t *testing.T) {
 //
 // Helpers.
 
-// expectedEraForTesting is a 1-indexed version of era number,
-// used exclusively for testing.
-type expectedEraForTesting int
-
 const (
 	era1 = 1
 	era2 = 2
@@ -330,11 +326,9 @@ func (c *expectedRewardCase) String() string {
 //	},
 func makeExpectedRewardCasesForConfig(c *coregeth.CoreGethChainConfig, numUncles int, t *testing.T) []expectedRewardCase {
 	erasToTest := []int64{era1, era2, era3}
-	eraLen := new(big.Int)
+	eraLen := defaultEraLength
 	ecip1017EraLen := c.ECIP1017EraRounds
-	if ecip1017EraLen == nil {
-		eraLen = defaultEraLength
-	} else {
+	if ecip1017EraLen != nil {
 		eraLen = ecip1017EraLen
 	}
 
@@ -354,7 +348,7 @@ func makeExpectedRewardCasesForConfig(c *coregeth.CoreGethChainConfig, numUncles
 	// Test boundaries of era.
 	for _, e := range erasToTest {
 		for _, d := range boundaryDiffs {
-			eb := big.NewInt(int64(e))
+			eb := big.NewInt(e)
 			eraBoundary := new(big.Int).Mul(eb, eraLen)
 			bn := new(big.Int).Add(eraBoundary, big.NewInt(d))
 			if bn.Sign() < 1 {

@@ -21,6 +21,8 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/eth/filters"
+	"github.com/ethereum/go-ethereum/eth/tracers"
+	"github.com/ethereum/go-ethereum/internal/debug"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rpc"
 	meta_schema "github.com/open-rpc/meta-schema"
@@ -242,6 +244,10 @@ func registerOpenRPCAPIs(doc *go_openrpc_reflect.Document, apis []rpc.API) {
 		switch api.Service.(type) {
 		case *filters.PublicFilterAPI:
 			doc.RegisterReceiverName("eth", &RPCSubscription{})
+		case *debug.HandlerT:
+			doc.RegisterReceiverName("debug", &RPCSubscription{})
+		case *tracers.TraceAPI:
+			doc.RegisterReceiverName("trace", &RPCSubscription{})
 		}
 	}
 }

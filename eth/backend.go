@@ -273,17 +273,7 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 		}, db)
 	}
 	if chainConfig.GetConsensusEngineType().IsLyra2() {
-		return lyra2.New(ethash.Config{
-			CacheDir:         stack.ResolvePath(config.CacheDir),
-			CachesInMem:      config.CachesInMem,
-			CachesOnDisk:     config.CachesOnDisk,
-			CachesLockMmap:   config.CachesLockMmap,
-			DatasetDir:       config.DatasetDir,
-			DatasetsInMem:    config.DatasetsInMem,
-			DatasetsOnDisk:   config.DatasetsOnDisk,
-			DatasetsLockMmap: config.DatasetsLockMmap,
-			ECIP1099Block:    chainConfig.GetEthashECIP1099Transition(),
-		})
+		return lyra2.New(notify, noverify)
 	}
 	// Otherwise assume proof-of-work
 	switch config.PowMode {

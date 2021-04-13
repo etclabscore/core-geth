@@ -2031,17 +2031,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readOnly bool) (chain *core.B
 			Epoch:  config.GetCliqueEpoch(),
 		}, chainDb)
 	} else if config.GetConsensusEngineType().IsLyra2() {
-		engine = lyra2.New(ethash.Config{
-			CacheDir:         stack.ResolvePath(eth.DefaultConfig.Ethash.CacheDir),
-			CachesInMem:      eth.DefaultConfig.Ethash.CachesInMem,
-			CachesOnDisk:     eth.DefaultConfig.Ethash.CachesOnDisk,
-			CachesLockMmap:   eth.DefaultConfig.Ethash.CachesLockMmap,
-			DatasetDir:       stack.ResolvePath(eth.DefaultConfig.Ethash.DatasetDir),
-			DatasetsInMem:    eth.DefaultConfig.Ethash.DatasetsInMem,
-			DatasetsOnDisk:   eth.DefaultConfig.Ethash.DatasetsOnDisk,
-			DatasetsLockMmap: eth.DefaultConfig.Ethash.DatasetsLockMmap,
-			ECIP1099Block:    config.GetEthashECIP1099Transition(),
-		})
+		engine = lyra2.New(nil, false)
 	} else {
 		engine = ethash.NewFaker()
 		if ctx.GlobalBool(FakePoWPoissonFlag.Name) {

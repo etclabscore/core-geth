@@ -311,12 +311,12 @@ func NewLevelDBDatabase(file string, cache int, handles int, namespace string, r
 
 // NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a
 // freezer moving immutable chain segments into cold storage.
-func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, freezerURL string) (ethdb.Database, error) {
-	kvdb, err := leveldb.New(file, cache, handles, "eth/db/chaindata")
+func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, freezerURL string, readonly bool) (ethdb.Database, error) {
+	kvdb, err := leveldb.New(file, cache, handles, "eth/db/chaindata", readonly)
 	if err != nil {
 		return nil, err
 	}
-	frdb, err := NewDatabaseWithFreezerRemote(kvdb, freezerURL)
+	frdb, err := NewDatabaseWithFreezerRemote(kvdb, freezerURL, readonly)
 	if err != nil {
 		kvdb.Close()
 		return nil, err

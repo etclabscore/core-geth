@@ -137,10 +137,7 @@ func NewAccessListTracer(acl types.AccessList, from, to common.Address, precompi
 	}
 }
 
-// TODO(chris)
-func (a *AccessListTracer) CapturePreEVM(env *EVM, inputs map[string]interface{}) error {
-	panic("implement me")
-	return nil
+func (a *AccessListTracer) CapturePreEVM(env *EVM, inputs map[string]interface{}) {
 }
 
 func (a *AccessListTracer) CaptureStart(env *EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
@@ -170,7 +167,8 @@ func (a *AccessListTracer) CaptureState(env *EVM, pc uint64, op OpCode, gas, cos
 func (*AccessListTracer) CaptureFault(env *EVM, pc uint64, op OpCode, gas, cost uint64, scope *ScopeContext, depth int, err error) {
 }
 
-func (*AccessListTracer) CaptureEnd(output []byte, gasUsed uint64, t time.Duration, err error) {}
+func (*AccessListTracer) CaptureEnd(env *EVM, output []byte, gasUsed uint64, t time.Duration, err error) {
+}
 
 // AccessList returns the current accesslist maintained by the tracer.
 func (a *AccessListTracer) AccessList() types.AccessList {

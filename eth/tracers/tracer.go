@@ -571,7 +571,7 @@ func wrapError(context string, err error) error {
 
 // CapturePreEVM implements the Tracer interface to bootstrap the tracing context,
 // before EVM init. This is useful for reading initial balance, state, etc.
-func (jst *Tracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) error {
+func (jst *Tracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {
 	jst.dbWrapper.db = env.StateDB
 
 	for key, val := range inputs {
@@ -583,11 +583,9 @@ func (jst *Tracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) err
 		_, err := jst.call("init", "ctx", "db")
 		if err != nil {
 			jst.err = wrapError("init", err)
-			return nil
+			return
 		}
 	}
-
-	return nil
 }
 
 // CaptureStart implements the Tracer interface to initialize the tracing operation.
@@ -770,13 +768,9 @@ func (jst *Tracer) CaptureFault(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 }
 
 // CaptureEnd is called after the call finishes to finalize the tracing.
-<<<<<<< HEAD
-func (jst *Tracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, t time.Duration, err error) error {
+func (jst *Tracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, t time.Duration, err error) {
 	jst.dbWrapper.db = env.StateDB
 
-=======
-func (jst *Tracer) CaptureEnd(output []byte, gasUsed uint64, t time.Duration, err error) {
->>>>>>> foundation-1.10.2
 	jst.ctx["output"] = output
 	jst.ctx["time"] = t.String()
 	jst.ctx["gasUsed"] = gasUsed

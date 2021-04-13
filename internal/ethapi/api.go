@@ -1490,7 +1490,11 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 		input = *args.Data
 	}
 	// Retrieve the precompiles since they don't need to be added to the access list
-	precompiles := vm.ActivePrecompiles(b.ChainConfig().Rules(header.Number))
+	precompileMap := vm.PrecompiledContractsForConfig(b.ChainConfig(), header.Number)
+	precompiles := make([]common.Address, len(precompileMap))
+	for k := range precompileMap {
+		precompiles = append(precompiles, k)
+	}
 
 	// Create an initial tracer
 	prevTracer := vm.NewAccessListTracer(nil, args.From, to, precompiles)

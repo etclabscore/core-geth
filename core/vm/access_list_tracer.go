@@ -137,6 +137,12 @@ func NewAccessListTracer(acl types.AccessList, from, to common.Address, precompi
 	}
 }
 
+// TODO(chris)
+func (a *AccessListTracer) CapturePreEVM(env *EVM, inputs map[string]interface{}) error {
+	panic("implement me")
+	return nil
+}
+
 func (a *AccessListTracer) CaptureStart(env *EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
 }
 

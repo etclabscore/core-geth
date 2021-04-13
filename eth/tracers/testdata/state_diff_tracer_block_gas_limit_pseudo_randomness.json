@@ -1,0 +1,75 @@
+{
+  "genesis": {
+    "number": "553390",
+    "hash": "0xee4274416759e94311f8d592ed404c77bbda621bc23a16002efc30df8b85a7d0",
+    "nonce": "0x0d3ed91a5fa36d5b",
+    "mixHash": "0xec4a1cd2e35d7b753795571b995de3e0e9b7e2c107879faf8257b9e1a296acb0",
+    "stateRoot": "0xe842958789f840aa4604aa185530ae5257775d69e504d209d6c3c76b853921dd",
+    "miner": "0x877bd459c9b7d8576b44e59e09d076c25946f443",
+    "difficulty": "1904695",
+    "totalDifficulty": "458313574937",
+    "extraData": "0xd883010906846765746888676f312e31332e35856c696e7578",
+    "gasLimit": "7993447",
+    "timestamp": "1577395916",
+    "alloc": {
+      "0x877bd459c9b7d8576b44e59e09d076c25946f443": {
+        "balance": "0x193f8b4282f9e8b5c988",
+        "nonce": "2456",
+        "code": "0x",
+        "storage": {}
+      },
+      "0xf4f0bf65132bd199022296afae3a96ad6a2650c0": {
+        "balance": "0x0",
+        "nonce": "1",
+        "code": "0x60606040526000357c0100000000000000000000000000000000000000000000000000000000900480633ba150361461003957610037565b005b61004460045061005a565b6040518082815260200191505060405180910390f35b60006002600050544303600160005060003373ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020600050541080156100bc57506000600050543073ffffffffffffffffffffffffffffffffffffffff1631115b1561013a573373ffffffffffffffffffffffffffffffffffffffff166000600060005054604051809050600060405180830381858888f193505050505043600160005060003373ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020600050819055506001905061014456610143565b60009050610144565b5b9056",
+        "storage": {
+          "0x0000000000000000000000000000000000000000000000000000000000000002": "0x0000000000000000000000000000000000000000000000000000000000001680",
+          "0x537987af55f5bbbc71206512f559b0f986dc30762af44a0c73224d3085d0d19d": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x0000000000000000000000000000000000000000000000000000000000000000": "0x000000000000000000000000000000000000000000000000002386f26fc10000"
+        }
+      }
+    },
+    "config": {
+      "chainId": 63,
+      "daoForkSupport": true,
+      "eip150Block": 0,
+      "eip150Hash": "0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d",
+      "eip155Block": 0,
+      "eip158Block": 0,
+      "ethash": {},
+      "homesteadBlock": 0,
+      "byzantiumBlock": 0,
+      "constantinopleBlock": 301243,
+      "petersburgBlock": 999983,
+      "istanbulBlock": 999983
+    }
+  },
+  "context": {
+    "number": "553390",
+    "difficulty": "1904695",
+    "timestamp": "1577395916",
+    "gasLimit": "7993447",
+    "miner": "0x877bd459c9b7d8576b44e59e09d076c25946f443"
+  },
+  "input": {
+    "from": "0x877bd459c9b7d8576b44e59e09d076c25946f443",
+    "to": "0xf4f0bf65132bd199022296afae3a96ad6a2650c0",
+    "gas": "0x6ddd0",
+    "gasPrice": "0xe8d4a51000",
+    "value": "0x0",
+    "data": "0x3ba15036"
+  },
+  "result": {
+    "0x877bd459c9b7d8576b44e59e09d076c25946f443": {
+      "balance": "=",
+      "nonce": {
+        "*": {
+          "from": "0x998",
+          "to": "0x999"
+        }
+      },
+      "code": "=",
+      "storage": {}
+    }
+  }
+}

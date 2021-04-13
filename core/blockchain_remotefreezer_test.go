@@ -80,7 +80,7 @@ func testRPCRemoteFreezer(t *testing.T) (rpcFreezerEndpoint string, server *rpc.
 		t.Log("Using external freezer:", rpcFreezerEndpoint)
 	}
 
-	ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), rpcFreezerEndpoint)
+	ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), rpcFreezerEndpoint, false)
 	if err != nil {
 		t.Fatalf("failed to create temp freezer db: %v", err)
 	}
@@ -424,7 +424,7 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 	// Init block chain with external ancients, check all needed indices has been indexed.
 	limit := []uint64{0, 32, 64, 128}
 	for _, l := range limit {
-		ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), freezerRPCEndpoint)
+		ancientDb, err := rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), freezerRPCEndpoint, false)
 		if err != nil {
 			t.Fatalf("failed to create temp freezer db: %v", err)
 		}
@@ -444,7 +444,7 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 	}
 
 	// Reconstruct a block chain which only reserves HEAD-64 tx indices
-	ancientDb, err = rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), freezerRPCEndpoint)
+	ancientDb, err = rawdb.NewDatabaseWithFreezerRemote(rawdb.NewMemoryDatabase(), freezerRPCEndpoint, false)
 	if err != nil {
 		t.Fatalf("failed to create temp freezer db: %v", err)
 	}

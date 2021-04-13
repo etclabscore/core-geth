@@ -173,7 +173,7 @@ func TestNoStepExec(t *testing.T) {
 		startGas := uint64(10000)
 		contract := vm.NewContract(account{}, account{}, big.NewInt(0), startGas)
 		tracer.CaptureStart(env, contract.Caller(), contract.Address(), false, []byte{}, startGas, big.NewInt(0))
-		tracer.CaptureEnd(nil, startGas-contract.Gas, 1, nil)
+		tracer.CaptureEnd(env, nil, startGas-contract.Gas, 1, nil)
 		return tracer.GetResult()
 	}
 	execTracer := func(code string) []byte {

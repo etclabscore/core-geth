@@ -19,7 +19,6 @@ package tracers
 import (
 	"context"
 	"encoding/json"
-	"errors"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -28,6 +27,16 @@ import (
 	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/rpc"
 )
+
+// TraceFilterArgs represents the arguments for a call.
+type TraceFilterArgs struct {
+	FromBlock   hexutil.Uint64  `json:"fromBlock,omitempty"`   // Trace from this starting block
+	ToBlock     hexutil.Uint64  `json:"toBlock,omitempty"`     // Trace utill this end block
+	FromAddress *common.Address `json:"fromAddress,omitempty"` // Sent from these addresses
+	ToAddress   *common.Address `json:"toAddress,omitempty"`   // Sent to these addresses
+	After       uint64          `json:"after,omitempty"`       // The offset trace number
+	Count       uint64          `json:"count,omitempty"`       // Integer number of traces to display in a batch
+}
 
 // ParityTrace A trace in the desired format (Parity/OpenEtherum) See: https://Parity.github.io/wiki/JSONRPC-trace-module
 type ParityTrace struct {
@@ -50,14 +59,17 @@ type TraceRewardAction struct {
 	RewardType string          `json:"rewardType,omitempty"`
 }
 
-// setConfigTracerToParity forces the Tracer to the Parity one
-func setConfigTracerToParity(config *TraceConfig) *TraceConfig {
+// setTraceConfigDefaultTracer sets the default tracer to "callTracerParity" if none set
+func setTraceConfigDefaultTracer(config *TraceConfig) *TraceConfig {
 	if config == nil {
 		config = &TraceConfig{}
 	}
 
-	tracer := "callTracerParity"
-	config.Tracer = &tracer
+	if config.Tracer == nil {
+		tracer := "callTracerParity"
+		config.Tracer = &tracer
+	}
+
 	return config
 }
 
@@ -71,6 +83,41 @@ type TraceAPI struct {
 // private debug methods of the Ethereum service.
 func NewTraceAPI(debugAPI *API) *TraceAPI {
 	return &TraceAPI{debugAPI: debugAPI}
+}
+
+// decorateResponse applies formatting to trace results if needed.
+func decorateResponse(res interface{}, config *TraceConfig) (interface{}, error) {
+	if config != nil && config.NestedTraceOutput && config.Tracer != nil {
+		return decorateNestedTraceResponse(res, *config.Tracer), nil
+	}
+	return res, nil
+}
+
+// decorateNestedTraceResponse formats trace results the way Parity does.
+// Docs: https://openethereum.github.io/JSONRPC-trace-module
+// Example:
+/*
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "result": {
+    "output": "0x",
+    "stateDiff": { ... },
+    "trace": [ { ... }, ],
+    "vmTrace": { ... }
+  }
+}
+*/
+func decorateNestedTraceResponse(res interface{}, tracer string) interface{} {
+	out := map[string]interface{}{}
+	if tracer == "callTracerParity" {
+		out["trace"] = res
+	} else if tracer == "stateDiffTracer" {
+		out["stateDiff"] = res
+	} else {
+		return res
+	}
+	return out
 }
 
 // traceBlockReward retrieve the block reward for the coinbase address
@@ -126,7 +173,7 @@ func (api *TraceAPI) traceBlockUncleRewards(ctx context.Context, block *types.Bl
 // EVM and returns them as a JSON object.
 // The correct name will be TraceBlockByNumber, though we want to be compatible with Parity trace module.
 func (api *TraceAPI) Block(ctx context.Context, number rpc.BlockNumber, config *TraceConfig) ([]interface{}, error) {
-	config = setConfigTracerToParity(config)
+	config = setTraceConfigDefaultTracer(config)
 
 	block, err := api.debugAPI.blockByNumber(ctx, number)
 	if err != nil {
@@ -170,10 +217,39 @@ func (api *TraceAPI) Block(ctx context.Context, number rpc.BlockNumber, config *
 // Transaction returns the structured logs created during the execution of EVM
 // and returns them as a JSON object.
 func (api *TraceAPI) Transaction(ctx context.Context, hash common.Hash, config *TraceConfig) (interface{}, error) {
-	config = setConfigTracerToParity(config)
+	config = setTraceConfigDefaultTracer(config)
 	return api.debugAPI.TraceTransaction(ctx, hash, config)
 }
 
-func (api *TraceAPI) Filter(ctx context.Context, args ethapi.CallArgs, config *TraceConfig) ([]*txTraceResult, error) {
-	return nil, errors.New("not implemented")
+// Filter configures a new tracer according to the provided configuration, and
+// executes all the transactions contained within. The return value will be one item
+// per transaction, dependent on the requested tracer.
+func (api *TraceAPI) Filter(ctx context.Context, args TraceFilterArgs, config *TraceConfig) (*rpc.Subscription, error) {
+	config = setTraceConfigDefaultTracer(config)
+
+	// Fetch the block interval that we want to trace
+	start := rpc.BlockNumber(args.FromBlock)
+	end := rpc.BlockNumber(args.ToBlock)
+
+	return api.debugAPI.TraceChain(ctx, start, end, config)
+}
+
+// Call lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
+// if the given transaction was added on top of the provided block and returns them as a JSON object.
+// You can provide -2 as a block number to trace on top of the pending block.
+func (api *TraceAPI) Call(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+	config = setTraceConfigDefaultTracer(config)
+	res, err := api.debugAPI.TraceCall(ctx, args, blockNrOrHash, config)
+	if err != nil {
+		return nil, err
+	}
+	return decorateResponse(res, config)
+}
+
+// CallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
+// if the given transaction was added on top of the provided block and returns them as a JSON object.
+// You can provide -2 as a block number to trace on top of the pending block.
+func (api *TraceAPI) CallMany(ctx context.Context, txs []ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+	config = setTraceConfigDefaultTracer(config)
+	return api.debugAPI.TraceCallMany(ctx, txs, blockNrOrHash, config)
 }

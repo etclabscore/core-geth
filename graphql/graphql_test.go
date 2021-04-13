@@ -280,11 +280,11 @@ func createGQLServiceWithTransactions(t *testing.T, stack *node.Node) {
 	dad := common.HexToAddress("0x0000000000000000000000000000000000000dad")
 
 	ethConf := &ethconfig.Config{
-		Genesis: &core.Genesis{
+		Genesis: &genesisT.Genesis{
 			Config:     params.AllEthashProtocolChanges,
 			GasLimit:   11500000,
 			Difficulty: big.NewInt(1048576),
-			Alloc: core.GenesisAlloc{
+			Alloc: genesisT.GenesisAlloc{
 				address: {Balance: funds},
 				// The address 0xdad sloads 0x00 and 0x01
 				dad: {

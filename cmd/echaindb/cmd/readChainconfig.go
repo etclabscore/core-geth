@@ -47,7 +47,7 @@ Example:
 		}
 
 		log.Println("Opening database...")
-		db, err := rawdb.NewLevelDBDatabase(chainDBPath, 256, 16, "")
+		db, err := rawdb.NewLevelDBDatabase(chainDBPath, 256, 16, "", true)
 		if err != nil {
 			log.Fatal(err)
 		}

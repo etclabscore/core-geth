@@ -43,8 +43,8 @@ Example:
 
 	cat myconfig.json | echaindb --chaindb ./path/to/chaindata write-chainconfig 0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3
 
-	echaindb --chaindb ./path/to/chaindata write-chainconfig 0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3 < myconfig.json 
-	
+	echaindb --chaindb ./path/to/chaindata write-chainconfig 0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3 < myconfig.json
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
@@ -62,7 +62,7 @@ Example:
 		}
 
 		log.Println("Opening database...")
-		db, err := rawdb.NewLevelDBDatabase(chainDBPath, 256, 16, "")
+		db, err := rawdb.NewLevelDBDatabase(chainDBPath, 256, 16, "", false)
 		if err != nil {
 			log.Fatal(err)
 		}

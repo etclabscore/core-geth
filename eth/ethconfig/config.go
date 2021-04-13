@@ -227,8 +227,10 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 	switch config.PowMode {
 	case ethash.ModeFake:
 		log.Warn("Ethash used in fake mode")
+		return ethash.NewFaker()
 	case ethash.ModeTest:
 		log.Warn("Ethash used in test mode")
+		return ethash.NewTester(nil, noverify)
 	case ethash.ModeShared:
 		log.Warn("Ethash used in shared mode")
 		return ethash.NewShared()
@@ -250,5 +252,6 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 			ECIP1099Block:    chainConfig.GetEthashECIP1099Transition(),
 		}, notify, noverify)
 		engine.SetThreads(-1) // Disable CPU mining
-	return engine
+		return engine
+	}
 }

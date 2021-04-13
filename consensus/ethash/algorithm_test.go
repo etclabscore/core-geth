@@ -754,8 +754,12 @@ func TestConcurrentDiskCacheGeneration(t *testing.T) {
 		pend.Add(1)
 		go func(idx int) {
 			defer pend.Done()
-			// TODO(ia): Review me.
-			ethash := New(Config{cachedir, 0, 1, false, "", 0, 0, false, ModeNormal, nil, nil}, nil, false)
+
+			config := Config{
+				CacheDir:     cachedir,
+				CachesOnDisk: 1,
+			}
+			ethash := New(config, nil, false)
 			defer ethash.Close()
 			if err := ethash.verifySeal(nil, block.Header(), false); err != nil {
 				t.Errorf("proc %d: block verification failed: %v", idx, err)

@@ -1,16 +1,19 @@
 module github.com/ethereum/go-ethereum
 
-go 1.13
+go 1.15
 
 require (
 	github.com/Azure/azure-storage-blob-go v0.10.0
 	github.com/VictoriaMetrics/fastcache v1.5.7
 	github.com/alecthomas/jsonschema v0.0.0-20200530073317-71f438968921
-	github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6 // indirect
-	github.com/aws/aws-sdk-go v1.34.21
-	github.com/btcsuite/btcd v0.21.0-beta
-	github.com/cespare/cp v1.1.1
-	github.com/cloudflare/cloudflare-go v0.13.2
+    github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.2.0
+	github.com/aws/aws-sdk-go-v2/config v1.1.1
+	github.com/aws/aws-sdk-go-v2/credentials v1.1.1
+	github.com/aws/aws-sdk-go-v2/service/route53 v1.1.1
+	github.com/btcsuite/btcd v0.20.1-beta
+	github.com/cespare/cp v0.1.0
+	github.com/cloudflare/cloudflare-go v0.14.0
 	github.com/consensys/gurvy v0.3.8
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deckarep/golang-set v0.0.0-20180603214616-504e848d77ea
@@ -36,7 +39,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d
 	github.com/holiman/bloomfilter/v2 v2.0.3
 	github.com/holiman/uint256 v1.1.1
-	github.com/huin/goupnp v1.0.1-0.20200620063722-49508fba0031
+	github.com/huin/goupnp v1.0.1-0.20210310174557-0ca763054c88
 	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334
 	github.com/influxdata/influxdb v1.8.3
 	github.com/jackpal/go-nat-pmp v1.0.2
@@ -48,10 +51,10 @@ require (
 	github.com/mattn/go-isatty v0.0.12
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/naoina/toml v0.1.2-0.20170918210437-9fafd6967416
-	github.com/olekukonko/tablewriter v0.0.4
 	github.com/open-rpc/meta-schema v0.0.0-20201029221707-1b72ef2ea333
-	github.com/peterh/liner v1.2.0
-	github.com/prometheus/tsdb v0.10.0
+	github.com/olekukonko/tablewriter v0.0.5
+	github.com/peterh/liner v1.1.1-0.20190123174540-a2c9a5303de7
+	github.com/prometheus/tsdb v0.7.1
 	github.com/rjeczalik/notify v0.9.1
 	github.com/rs/cors v1.7.0
 	github.com/shirou/gopsutil v2.20.5+incompatible
@@ -59,18 +62,18 @@ require (
 	github.com/spf13/viper v1.7.0
 	github.com/status-im/keycard-go v0.0.0-20200402102358-957c09536969
 	github.com/stretchr/testify v1.7.0
-	github.com/syndtr/goleveldb v1.0.1-0.20200815110645-5c35d600f0ca
+	github.com/syndtr/goleveldb v1.0.1-0.20210305035536-64b5b1c73954
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.0
-	github.com/tyler-smith/go-bip39 v1.0.2
 	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
-	golang.org/x/exp v0.0.0-20200331195152-e8c3332aa8e5
+
+	github.com/tyler-smith/go-bip39 v1.0.1-0.20181017060643-dbb3b84ba2ef
+	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c
-	golang.org/x/text v0.3.3
-	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e
-	gonum.org/v1/gonum v0.8.1
-	gonum.org/v1/plot v0.8.0
+	golang.org/x/text v0.3.4
+	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324
+		gonum.org/v1/gonum v0.8.1
+    	gonum.org/v1/plot v0.8.0
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20200619000410-60c24ae608a6
 	gopkg.in/urfave/cli.v1 v1.20.0

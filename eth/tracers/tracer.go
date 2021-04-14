@@ -633,7 +633,7 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 	*jst.availableGasValue = uint(env.CallGasTemp)
 	*jst.costValue = uint(cost)
 	*jst.depthValue = uint(depth)
-	// *jst.returnData = rdata
+	*jst.returnData = rData
 	*jst.refundValue = uint(env.StateDB.GetRefund())
 
 	jst.opErrorValue = nil

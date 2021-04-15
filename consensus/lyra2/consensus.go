@@ -316,12 +316,12 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
         x.Set(bigMinus20)
     }
     // parent_diff + (parent_diff / 200 * max((2 if len(parent.uncles) else 1) - ((timestamp - parent.timestamp) // 9), -20))
-    y.Div(parent.Difficulty, DifficultyBoundDivisor) // TODO: lumat
+    y.Div(parent.Difficulty, DifficultyBoundDivisor)
     x.Mul(y, x)
     x.Add(parent.Difficulty, x)
 
     // minimum difficulty can ever be (before exponential factor)
-    if x.Cmp(MinimumDifficulty) < 0 { // TODO: lumat
+    if x.Cmp(MinimumDifficulty) < 0 {
         x.Set(MinimumDifficulty)
     }
     return x
@@ -333,9 +333,7 @@ func (lyra2 *Lyra2) VerifySeal(chain consensus.ChainHeaderReader, header *types.
     return lyra2.verifySeal(chain, header, false)
 }
 
-// verifySeal checks whether a block satisfies the PoW difficulty requirements,
-// either using the usual ethash cache for it, or alternatively using a full DAG
-// to make remote mining fast.
+// verifySeal checks whether a block satisfies the PoW difficulty requirements
 func (lyra2 *Lyra2) verifySeal(chain consensus.ChainHeaderReader, header *types.Header, fulldag bool) error {
     // If we're running a fake PoW, accept any seal as valid
     if lyra2.fakeMode {
@@ -354,17 +352,12 @@ func (lyra2 *Lyra2) verifySeal(chain consensus.ChainHeaderReader, header *types.
         return errInvalidDifficulty
     }
 
-    //result := hashimotoFull(dataset.dataset, lyra2.SealHash(header).Bytes(), header.Nonce.Uint64())
     headerBytes, err := lyra2.headerBytes(header)
     if err != nil {
         return err
     }
     result := lyra2.calcHash(headerBytes, header.Nonce.Uint64(), 1)
 
-    /*// Verify the calculated values against the ones provided in the header
-      if !bytes.Equal(header.MixDigest[:], digest) {
-          return errInvalidMixDigest
-      }*/
     target := new(big.Int).Div(two256, header.Difficulty)
     if result.Cmp(target) > 0 {
         return errInvalidPoW

@@ -9,9 +9,9 @@ import (
     "github.com/ethereum/go-ethereum/core/types"
 )
 
-var errEthashStopped = errors.New("ethash stopped")
+var errLyra2Stopped = errors.New("lyra2 stopped")
 
-// API exposes ethash related methods for the RPC interface.
+// API exposes lyra2 related methods for the RPC interface.
 type API struct {
     lyra2 *Lyra2
 }
@@ -35,7 +35,7 @@ func (api *API) GetWork() ([4]string, error) {
     select {
     case api.lyra2.remote.fetchWorkCh <- &sealWork{errc: errc, res: workCh}:
     case <-api.lyra2.remote.exitCh:
-        return [4]string{}, errEthashStopped
+        return [4]string{}, errLyra2Stopped
     }
     select {
     case work := <-workCh:

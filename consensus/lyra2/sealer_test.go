@@ -87,7 +87,7 @@ func TestStaleSubmission(t *testing.T) {
                 t.Errorf("case %d block parent hash mismatch, want %s, get %s", id+1, c.headers[c.submitIndex].ParentHash.Hex(), res.Header().ParentHash.Hex())
             }
         case <-time.NewTimer(time.Second).C:
-            t.Errorf("case %d fetch ethash result timeout", id+1)
+            t.Errorf("case %d fetch lyra2 result timeout", id+1)
         }
     }
 }

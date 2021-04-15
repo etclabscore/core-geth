@@ -22,7 +22,7 @@ import (
 )
 
 const (
-    // staleThreshold is the maximum depth of the acceptable stale but valid ethash solution.
+    // staleThreshold is the maximum depth of the acceptable stale but valid lyra2 solution.
     staleThreshold = 7
 )
 
@@ -180,13 +180,13 @@ func (lyra2 *Lyra2) mine(block *types.Block, id int, seed uint64, abort chan str
         nonce    = seed
     )
     logger := lyra2.log.New("miner", id)
-    logger.Trace("Started ethash search for new nonces", "seed", seed)
+    logger.Trace("Started lyra2 search for new nonces", "seed", seed)
 search:
     for {
         select {
         case <-abort:
             // Mining terminated, update stats and abort
-            logger.Trace("Ethash nonce search aborted", "attempts", nonce-seed)
+            logger.Trace("Lyra2 nonce search aborted", "attempts", nonce-seed)
             lyra2.hashrate.Mark(attempts)
             break search
 
@@ -203,8 +203,7 @@ search:
                 logger.Error("Cannot convert header to bytes")
                 break search
             }
-            result := lyra2.calcHash(headerBytes, header.Nonce.Uint64(), 1)
-            //digest, result := hashimotoFull(dataset.dataset, hash, nonce)
+            result := lyra2.calcHash(headerBytes, nonce, 1)
             if result.Cmp(target) <= 0 {
                 // Correct nonce found, create a new header with it
                 header = types.CopyHeader(header)
@@ -304,7 +303,7 @@ func startRemoteSealer(lyra2 *Lyra2, urls []string, noverify bool) *remoteSealer
 
 func (s *remoteSealer) loop() {
     defer func() {
-        s.lyra2.log.Trace("Ethash remote sealer is exiting")
+        s.lyra2.log.Trace("Lyra2 remote sealer is exiting")
         s.cancelNotify()
         s.reqWG.Wait()
         close(s.exitCh)
@@ -457,7 +456,7 @@ func (s *remoteSealer) submitWork(nonce types.BlockNonce, mixDigest common.Hash,
     }
     // Make sure the result channel is assigned.
     if s.results == nil {
-        s.lyra2.log.Warn("Ethash result channel is empty, submitted mining result is rejected")
+        s.lyra2.log.Warn("Lyra2 result channel is empty, submitted mining result is rejected")
         return false
     }
     s.lyra2.log.Trace("Verified correct proof-of-work", "sealhash", sealhash, "elapsed", common.PrettyDuration(time.Since(start)))

@@ -27,8 +27,8 @@ var (
     // MINTMEChainConfig is the chain parameters to run a node on the MINTME main network.
     // TODO: lumat
     MINTMEChainConfig = &coregeth.CoreGethChainConfig{
-        NetworkID: 4269,
-        ChainID:   big.NewInt(4269),
+        NetworkID: 37480,
+        ChainID:   big.NewInt(24734),
         Lyra2:    new(ctypes.Lyra2Config),
 
         EIP2FBlock: big.NewInt(0),

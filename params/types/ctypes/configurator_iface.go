@@ -205,6 +205,8 @@ type CliqueConfigurator interface {
 	SetCliquePeriod(n uint64) error
 	GetCliqueEpoch() uint64
 	SetCliqueEpoch(n uint64) error
+	GetCliqueEIP3436Transition() *uint64
+	SetCliqueEIP3436Transition(n *uint64) error
 }
 
 type BlockSealer interface {

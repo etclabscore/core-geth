@@ -312,7 +312,7 @@
 		};
 		var extraCtx = {
 			blockHash: ctx.blockHash,
-			blockNumber: ctx.blockNumber,
+			blockNumber: ctx.block,
 			transactionHash: ctx.transactionHash,
 			transactionPosition: ctx.transactionPosition,
 		};
@@ -368,7 +368,7 @@
 			subtraces: 0,
 			transactionPosition: extraCtx.transactionPosition,
 			transactionHash: extraCtx.transactionHash,
-			blockNumber: call.block || extraCtx.blockNumber,
+			blockNumber: extraCtx.blockNumber,
 			blockHash: extraCtx.blockHash,
 			time: call.time,
 		}

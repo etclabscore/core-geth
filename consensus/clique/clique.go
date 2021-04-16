@@ -695,7 +695,7 @@ func (c *Clique) APIs(chain consensus.ChainHeaderReader) []rpc.API {
 
 // IsReorg decides if a proposed block (header) should be preferred over the current header.
 // nb. blockPreserve is not used.
-func (c *Clique) IsReorg(chain consensus.ChainHeaderReader, currentTD, proposedTD *big.Int, current, proposed *types.Header, blockPreserve func(*types.Header) bool) (preferProposed bool, err error) {
+func (c *Clique) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, proposedTD *big.Int, current, proposed *types.Header, blockPreserve func(*types.Header) bool) (preferProposed bool, err error) {
 	// 1. Greater TD
 	if currentTD.Cmp(proposedTD) > 0 {
 		return false, nil

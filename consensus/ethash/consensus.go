@@ -579,7 +579,7 @@ func (ethash *Ethash) SealHash(header *types.Header) (hash common.Hash) {
 	return hash
 }
 
-func (ethash *Ethash) IsReorg(chain consensus.ChainHeaderReader, currentTD, proposedTD *big.Int, current, proposed *types.Header, blockPreserve func(*types.Header) bool) (bool, error) {
+func (ethash *Ethash) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, proposedTD *big.Int, current, proposed *types.Header, blockPreserve func(*types.Header) bool) (preferProposed bool, err error) {
 	// 1. Greater TD
 	// If the total difficulty is higher than our known, add it to the canonical chain
 	if currentTD.Cmp(proposedTD) > 0 {

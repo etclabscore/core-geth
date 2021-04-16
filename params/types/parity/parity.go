@@ -78,7 +78,7 @@ type ParityChainSpec struct {
 		} `json:"Clique,omitempty"`
 		Lyra2 struct {
 			Params struct {
-				MinimumDifficulty      *math.HexOrDecimal256         `json:"minimumDifficulty"`
+				MinimumDifficulty *math.HexOrDecimal256 `json:"minimumDifficulty"`
 			} `json:"params,omitempty"`
 		} `json:"Lyra2,omitempty"`
 	} `json:"engine"`

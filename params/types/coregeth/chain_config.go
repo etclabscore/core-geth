@@ -189,7 +189,7 @@ type CoreGethChainConfig struct {
 	// Various consensus engines
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
 	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
-	Lyra2 *ctypes.Lyra2Config `json:"lyra2,omitempty"`
+	Lyra2  *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
 
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint,omitempty"`
 	TrustedCheckpointOracle *ctypes.CheckpointOracleConfig `json:"trustedCheckpointOracle,omitempty"`

@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	mrand "math/rand"
 	"runtime"
 	"time"
 
@@ -576,6 +577,37 @@ func (ethash *Ethash) SealHash(header *types.Header) (hash common.Hash) {
 	})
 	hasher.Sum(hash[:0])
 	return hash
+}
+
+func (ethash *Ethash) IsReorg(chain consensus.ChainHeaderReader, currentTD, proposedTD *big.Int, current, proposed *types.Header, blockPreserve func(*types.Header) bool) (bool, error) {
+	// 1. Greater TD
+	// If the total difficulty is higher than our known, add it to the canonical chain
+	if currentTD.Cmp(proposedTD) > 0 {
+		return false, nil
+	}
+	// Proposed (external) total difficulty is equal to or equivalent local.
+	if proposedTD.Cmp(currentTD) > 0 {
+		return true, nil
+	}
+
+	// Blocks have same total difficulty.
+
+	// 2. Lesser block height
+	if current.Number.Cmp(proposed.Number) < 0 {
+		return false, nil
+	}
+	if proposed.Number.Cmp(current.Number) < 0 {
+		return true, nil
+	}
+
+	if blockPreserve != nil {
+		currentPreserve, proposedPreserve := blockPreserve(current), blockPreserve(proposed)
+
+		// Second clause in the condition reduces the vulnerability to selfish mining.
+		// Please refer to http://www.cs.cornell.edu/~ie53/publications/btcProcFC.pdf
+		return !currentPreserve && (proposedPreserve || mrand.Float64() < 0.5), nil
+	}
+	return false, nil
 }
 
 // Some weird constants to avoid constant memory allocs for them.

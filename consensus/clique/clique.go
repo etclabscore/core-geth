@@ -693,7 +693,37 @@ func (c *Clique) APIs(chain consensus.ChainHeaderReader) []rpc.API {
 	}}
 }
 
-// Eip3436Rule3rule4 implements Rule 3 and Rule 4 of EIP3436.
+// IsReorg decides if a proposed block (header) should be preferred over the current header.
+// nb. blockPreserve is not used.
+func (c *Clique) IsReorg(chain consensus.ChainHeaderReader, currentTD, proposedTD *big.Int, current, proposed *types.Header, blockPreserve func(*types.Header) bool) (preferProposed bool, err error) {
+	// 1. Greater TD
+	if currentTD.Cmp(proposedTD) > 0 {
+		return false, nil
+	}
+	// Proposed (external) total difficulty is equal to or equivalent local.
+	if proposedTD.Cmp(currentTD) > 0 {
+		return true, nil
+	}
+
+	// Blocks have same total difficulty.
+
+	// 2. Lesser block height
+	if current.Number.Cmp(proposed.Number) < 0 {
+		return false, nil
+	}
+	if proposed.Number.Cmp(current.Number) < 0 {
+		return true, nil
+	}
+
+	// Blocks have same number.
+
+	// 3. Signer index
+	// 4. Block hash uint256
+	return c.Eip3436Rule3rule4(chain, current, proposed)
+}
+
+// Eip3436Rule3rule4 implements Rule 3 and Rule 4 of EIP3436, which are the only MODIFIED (added) consensus rules the spec
+// defines (vs. pre-existing rules).
 /*
 When a Click validator is choosing between two different chain head blocks to build a nre proposed block they should chose the blocks from the following priority list.
 

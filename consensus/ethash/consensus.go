@@ -600,14 +600,22 @@ func (ethash *Ethash) ElectCanonical(chain consensus.ChainHeaderReader, currentT
 		return true, nil
 	}
 
+	// This clause reduces the vulnerability to selfish mining.
+	// Please refer to http://www.cs.cornell.edu/~ie53/publications/btcProcFC.pdf
+	tails := mrand.Float64() < 0.5
+
+	// The block preserve function allows preference to be yielded to miner interests;
+	// (by default) this means
+	// - blocks produced by the miner and
+	// - blocks with transactions which would be considered local by the miner.
 	if blockPreserve != nil {
 		currentPreserve, proposedPreserve := blockPreserve(current), blockPreserve(proposed)
-
-		// Second clause in the condition reduces the vulnerability to selfish mining.
-		// Please refer to http://www.cs.cornell.edu/~ie53/publications/btcProcFC.pdf
-		return !currentPreserve && (proposedPreserve || mrand.Float64() < 0.5), nil
+		return !currentPreserve && (proposedPreserve || tails), nil
 	}
-	return false, nil
+
+	// In the (rare, non-default) case that miner interest isn't established by
+	// a preserve function, we still need to return the coin toss.
+	return tails, nil
 }
 
 // Some weird constants to avoid constant memory allocs for them.

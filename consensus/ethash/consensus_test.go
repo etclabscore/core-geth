@@ -95,7 +95,8 @@ func TestEthash_ElectCanonical(t *testing.T) {
 		current, proposed     *types.Header
 		preserve              func(header *types.Header) bool
 
-		expect bool
+		expect     bool
+		stochastic bool // expect that we cannot expect with precision
 		// no error check (error will never be returned)
 	}{
 		// Total difficulty condition (prefer greater).
@@ -116,7 +117,8 @@ func TestEthash_ElectCanonical(t *testing.T) {
 			currentTD: 42, proposedTD: 42,
 		},
 		{
-			expect: false,
+			expect:     false,
+			stochastic: true,
 
 			current: &types.Header{Number: two}, proposed: &types.Header{Number: two},
 			currentTD: 42, proposedTD: 42,
@@ -130,8 +132,9 @@ func TestEthash_ElectCanonical(t *testing.T) {
 			t.Fatalf("case: %d, want: <nil>, got: %v", i, err)
 		}
 
-		if preferProposed != c.expect {
+		if !c.stochastic && preferProposed != c.expect {
 			t.Errorf("case: %d, want: %v, got: %v", i, c.expect, preferProposed)
 		}
+
 	}
 }

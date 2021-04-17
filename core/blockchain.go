@@ -1615,7 +1615,7 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 	// Check to see if the proposed block should take priority over the existing block head.
 	preferProposedCanonical, err := bc.Engine().ElectCanonical(bc, localTd, externTd, currentBlock.Header(), block.Header(), bc.shouldPreserve)
 	if err != nil {
-		log.Error("Error check reorg prioritization", "error", err)
+		log.Error("Failed to decide canonical prioritization", "error", err)
 		return NonStatTy, err
 	}
 

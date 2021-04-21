@@ -388,6 +388,7 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 		{rpc.BlockNumberOrHash{}, blockNumberOrHashD},
 		{rpc.Subscription{}, rpcSubscriptionIDD},
 		{RPCSubscriptionParamsName(""), rpcSubscriptionParamsNameD},
+		{rpc.ID(""), rpcSubscriptionIDD},
 	}
 
 	for _, d := range dict {

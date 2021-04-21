@@ -210,25 +210,59 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 }
 
 /*
-The following struct RPCSubscription and RPCSubscription.Unsubscribe method
+The following structs *RPCSubscription and *RPCSubscription.Unsubscribe method
 are documentation-only mocks to represent the otherwise invisible (un-reflected)
 method.
 It is appended to the OpenRPC document when the eth/api/filters.PublicFilterAPI receiver
-is registered.
+is registered, similar logic applies to other modules.
 */
-type RPCSubscription struct{}
+type RPCEthSubscription struct{}
 
 // Unsubscribe terminates an existing subscription by ID.
-func (sub *RPCSubscription) Unsubscribe(id rpc.ID) error {
+func (sub *RPCEthSubscription) Unsubscribe(id rpc.ID) error {
 	// This is a mock function, not the real one.
 	return nil
 }
 
-type RPCSubscriptionParamsName string
+type RPCEthSubscriptionParamsName string
 
 // Subscribe creates a subscription to an event channel.
 // Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
-func (sub *RPCSubscription) Subscribe(subscriptionName RPCSubscriptionParamsName, subscriptionOptions interface{}) (subscriptionID rpc.ID, err error) {
+func (sub *RPCEthSubscription) Subscribe(subscriptionName RPCEthSubscriptionParamsName, subscriptionOptions interface{}) (subscriptionID rpc.ID, err error) {
+	// This is a mock function, not the real one.
+	return
+}
+
+type RPCDebugSubscription struct{}
+
+// Unsubscribe terminates an existing subscription by ID.
+func (sub *RPCDebugSubscription) Unsubscribe(id rpc.ID) error {
+	// This is a mock function, not the real one.
+	return nil
+}
+
+type RPCDebugSubscriptionParamsName string
+
+// Subscribe creates a subscription to an event channel.
+// Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
+func (sub *RPCDebugSubscription) Subscribe(subscriptionName RPCDebugSubscriptionParamsName, subscriptionOptions interface{}) (subscriptionID rpc.ID, err error) {
+	// This is a mock function, not the real one.
+	return
+}
+
+type RPCTraceSubscription struct{}
+
+// Unsubscribe terminates an existing subscription by ID.
+func (sub *RPCTraceSubscription) Unsubscribe(id rpc.ID) error {
+	// This is a mock function, not the real one.
+	return nil
+}
+
+type RPCTraceSubscriptionParamsName string
+
+// Subscribe creates a subscription to an event channel.
+// Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
+func (sub *RPCTraceSubscription) Subscribe(subscriptionName RPCTraceSubscriptionParamsName, subscriptionOptions interface{}) (subscriptionID rpc.ID, err error) {
 	// This is a mock function, not the real one.
 	return
 }
@@ -243,11 +277,11 @@ func registerOpenRPCAPIs(doc *go_openrpc_reflect.Document, apis []rpc.API) {
 		// would otherwise not occur in the document.
 		switch api.Service.(type) {
 		case *filters.PublicFilterAPI:
-			doc.RegisterReceiverName("eth", &RPCSubscription{})
+			doc.RegisterReceiverName("eth", &RPCEthSubscription{})
 		case *debug.HandlerT:
-			doc.RegisterReceiverName("debug", &RPCSubscription{})
+			doc.RegisterReceiverName("debug", &RPCDebugSubscription{})
 		case *tracers.TraceAPI:
-			doc.RegisterReceiverName("trace", &RPCSubscription{})
+			doc.RegisterReceiverName("trace", &RPCTraceSubscription{})
 		}
 	}
 }
@@ -335,7 +369,7 @@ var blockNumberOrHashD = fmt.Sprintf(`{
           ]
         }`, blockNumberD, commonHashD, requireCanonicalD)
 
-var rpcSubscriptionParamsNameD = `{
+var rpcEthSubscriptionParamsNameD = `{
 		"title": "subscriptionName",
 		"oneOf": [
 			{"type": "string", "enum": ["newHeads"], "description": "Fires a notification each time a new header is appended to the chain, including chain reorganizations."},
@@ -343,6 +377,20 @@ var rpcSubscriptionParamsNameD = `{
 			{"type": "string", "enum": ["logs"], "description": "Returns logs that are included in new imported blocks and match the given filter criteria."},
 			{"type": "string", "enum": ["newPendingTransactions"], "description": "Returns the hash for all transactions that are added to the pending state and are signed with a key that is available in the node."},
 			{"type": "string", "enum": ["syncing"], "description": "Indicates when the node starts or stops synchronizing. The result can either be a boolean indicating that the synchronization has started (true), finished (false) or an object with various progress indicators."}
+		]
+	}`
+
+var rpcDebugSubscriptionParamsNameD = `{
+		"title": "subscriptionName",
+		"oneOf": [
+			{"type": "string", "enum": ["traceFilter"], "description": "Returns traces for the filtered transactions within a range of blocks."}
+		]
+	}`
+
+var rpcTraceSubscriptionParamsNameD = `{
+		"title": "subscriptionName",
+		"oneOf": [
+			{"type": "string", "enum": ["filter"], "description": "Returns traces for the filtered transactions within a range of blocks."}
 		]
 	}`
 
@@ -388,8 +436,10 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 		{rpc.BlockNumber(0), blockNumberD},
 		{rpc.BlockNumberOrHash{}, blockNumberOrHashD},
 		{rpc.Subscription{}, rpcSubscriptionIDD},
-		{RPCSubscriptionParamsName(""), rpcSubscriptionParamsNameD},
 		{rpc.ID(""), rpcSubscriptionIDD},
+		{RPCEthSubscriptionParamsName(""), rpcEthSubscriptionParamsNameD},
+		{RPCDebugSubscriptionParamsName(""), rpcDebugSubscriptionParamsNameD},
+		{RPCTraceSubscriptionParamsName(""), rpcTraceSubscriptionParamsNameD},
 	}
 
 	for _, d := range dict {

@@ -172,7 +172,7 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 
   + Required: {{ if .required }}✓ Yes{{ else }}No{{- end}}
 {{ if .deprecated }}  + Deprecated: :warning: Yes{{- end}}
-{{ if (or (gt (len .schema) 1) .schema.properties) }} 
+{{ if (or (gt (len .schema) 1) .schema.properties) }}
 === "Schema"
 
 	` + "```" + ` Schema
@@ -195,7 +195,7 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 
 #### Params ({{ .Params | len }})
 {{ if gt (.Params | len) 0 }}
-{{ if eq $methodmap.paramStructure "by-position" }}Parameters must be given _by position_.{{ else if eq $methodmap.paramStructure "by-name" }}Parameters must be given _by name_.{{ end }}  
+{{ if eq $methodmap.paramStructure "by-position" }}Parameters must be given _by position_.{{ else if eq $methodmap.paramStructure "by-name" }}Parameters must be given _by name_.{{ end }}
 {{ range $index, $param := .Params }}
 {{ $parammap := . | tomap }}
 __{{ sum $index 1 }}:__ {{ template "contentDescTpl" $parammap }}

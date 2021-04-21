@@ -383,14 +383,14 @@ var rpcEthSubscriptionParamsNameD = `{
 var rpcDebugSubscriptionParamsNameD = `{
 		"title": "subscriptionName",
 		"oneOf": [
-			{"type": "string", "enum": ["traceFilter"], "description": "Returns traces for the filtered transactions within a range of blocks."}
+			{"type": "string", "enum": ["traceChain"], "description": "Returns transaction traces within a range of blocks."}
 		]
 	}`
 
 var rpcTraceSubscriptionParamsNameD = `{
 		"title": "subscriptionName",
 		"oneOf": [
-			{"type": "string", "enum": ["filter"], "description": "Returns traces for the filtered transactions within a range of blocks."}
+			{"type": "string", "enum": ["filter"], "description": "Returns transaction traces for the filtered addresses within a range of blocks."}
 		]
 	}`
 

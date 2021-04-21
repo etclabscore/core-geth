@@ -336,6 +336,7 @@ var blockNumberOrHashD = fmt.Sprintf(`{
         }`, blockNumberD, commonHashD, requireCanonicalD)
 
 var rpcSubscriptionParamsNameD = `{
+		"title": "subscriptionName",
 		"oneOf": [
 			{"type": "string", "enum": ["newHeads"], "description": "Fires a notification each time a new header is appended to the chain, including chain reorganizations."},
 			{"type": "string", "enum": ["newSideHeads"], "description": "Fires a notification each time a new header is appended to the non-canonical (side) chain, including chain reorganizations."},

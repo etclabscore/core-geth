@@ -45,40 +45,7 @@ func (lyra2 *Lyra2) Seal(chain consensus.ChainHeaderReader, block *types.Block, 
 			lyra2.log.Warn("Sealing result is not read by miner", "mode", "fake", "sealhash", lyra2.SealHash(block.Header()))
 		}
 		return nil
-	} /*else if ethash.config.PowMode == ModePoissonFake {
-	    go func(header *types.Header) {
-	        // Assign random (but non-zero) values to header nonce and mix.
-	        header.Nonce = types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64)))
-	        b, _ := header.Nonce.MarshalText()
-	        header.MixDigest = common.BytesToHash(b)
-
-	        // Wait some amount of time.
-	        timeout := time.NewTimer(time.Duration(ethash.makePoissonFakeDelay()) * time.Second)
-	        defer timeout.Stop()
-
-	        select {
-	        case <-stop:
-	            return
-	        case <-ethash.update:
-	            timeout.Stop()
-	            if err := ethash.Seal(chain, block, results, stop); err != nil {
-	                ethash.config.Log.Error("Failed to restart sealing after update", "err", err)
-	            }
-	        case <-timeout.C:
-	            // Send the results when the timeout expires.
-	            select {
-	            case results <- block.WithSeal(header):
-	            default:
-	                ethash.config.Log.Warn("Sealing result is not read by miner", "mode", "fake", "sealhash", ethash.SealHash(block.Header()))
-	            }
-	        }
-	    }(block.Header())
-	    return nil
-	}*/
-	/*// If we're running a shared PoW, delegate sealing to it
-	  if ethash.shared != nil {
-	      return ethash.shared.Seal(chain, block, results, stop)
-	  }*/
+	}
 	// Create a runner and the multiple search threads it directs
 	abort := make(chan struct{})
 
@@ -383,11 +350,9 @@ func (s *remoteSealer) loop() {
 //   result[3], hex encoded block number
 func (s *remoteSealer) makeWork(block *types.Block) {
 	hash := s.lyra2.SealHash(block.Header())
-	//epochLength := calcEpochLength(block.NumberU64(), s.lyra2.config.ECIP1099Block)
-	//epoch := calcEpoch(block.NumberU64(), epochLength)
 	headerBytes, _ := s.lyra2.headerBytes(block.Header())
 	s.currentWork[0] = hash.Hex()
-	s.currentWork[1] = hex.EncodeToString(headerBytes) // TODO: nonce field?
+	s.currentWork[1] = hex.EncodeToString(headerBytes)
 	s.currentWork[2] = common.BytesToHash(new(big.Int).Div(two256, block.Difficulty()).Bytes()).Hex()
 	s.currentWork[3] = hexutil.EncodeBig(block.Number())
 

@@ -10,13 +10,13 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
-var MINTMEGenesisHash = common.HexToHash("0x5f32ce1ed875a04d74361164bcfcc24af721df8e616642486338300a691fe582") // TODO: lumat
+var MINTMEGenesisHash = common.HexToHash("0xdcdbbb7759b09ec5c5b3230a0412033793f2a5567cce7dff73bfa05a869ab114") // TODO: lumat
 
 func DecodeMintmeAlloc(data string) genesisT.GenesisAlloc {
-	var p []struct{
-		Addr *big.Int
+	var p []struct {
+		Addr    *big.Int
 		Balance *big.Int
-		Code []byte
+		Code    []byte
 		Storage []string
 		//Nonce uint64
 	}
@@ -32,7 +32,7 @@ func DecodeMintmeAlloc(data string) genesisT.GenesisAlloc {
 
 		ga[common.BigToAddress(account.Addr)] = genesisT.GenesisAccount{
 			Balance: account.Balance,
-			Code: account.Code,
+			Code:    account.Code,
 			Storage: storage,
 			//Nonce: account.Nonce,
 		}
@@ -49,6 +49,6 @@ func DefaultMINTMEGenesisBlock() *genesisT.Genesis {
 		GasLimit:   hexutil.MustDecodeUint64("0x2fefd8"),
 		Difficulty: hexutil.MustDecodeBig("0x20000"),
 		Timestamp:  1615385980,
-		Alloc: DecodeMintmeAlloc(allocMintme),
+		Alloc:      DecodeMintmeAlloc(allocMintme),
 	}
 }

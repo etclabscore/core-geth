@@ -17,6 +17,7 @@
 package clique
 
 import (
+	"bytes"
 	"math/big"
 	"testing"
 
@@ -27,6 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -111,5 +113,166 @@ func TestReimportMirroredState(t *testing.T) {
 	}
 	if head := chain.CurrentBlock().NumberU64(); head != 3 {
 		t.Fatalf("chain head mismatch: have %d, want %d", head, 3)
+	}
+}
+
+func TestClique_EIP3436_Scenario1(t *testing.T) {
+
+	scenarios := []struct {
+		signers      []string
+		commonBlocks []string
+		forks        [][]string
+	}{
+		{
+			// SCENARIO-1
+			// signers: A..H (8 count)
+			//
+			/*
+				Step 1
+				A fully in-order chain exists and validator 8 has just produced an in-turn block.
+
+				1A x
+				2B  x
+				3C   x
+				4D    x
+				5E     x
+				6F      x
+				7G       x
+				8H        x
+
+				Step 2
+				... and then validators 5, 7, and 8 go offline.
+
+				1A x
+				2B  x
+				3C   x
+				4D    x
+				5E     x   -
+				6F      x
+				7G       x -
+				8H        x-
+
+				Step 3
+				Two forks form, one with an in-order block from validator 1
+				and then an out of order block from validator 3.
+
+				The second fork forms from validators 2, 4, and 6 in order.
+				Both have a net total difficulty of 3 more than the common ancestor.
+
+				1A x        y
+				2B  x       z
+				3C   x       y
+				4D    x      z
+				5E     x   -
+				6F      x     z
+				7G       x -
+				8H        x-
+			*/
+			signers:      []string{"A", "B", "C", "D", "E", "F", "G", "H"},
+			commonBlocks: []string{"A", "B", "C", "D", "E", "F", "G", "H"},
+			forks: [][]string{
+				{"A", "C"},
+				{"B", "D", "F"},
+			},
+		},
+	}
+
+	for ii, tt := range scenarios {
+		// Create the account pool and generate the initial set of signerAddresses
+		accountsPool := newTesterAccountPool()
+
+		db := rawdb.NewMemoryDatabase()
+
+		// Assemble a chain of headers from the cast votes
+		config := *params.TestChainConfig
+		config.Clique = &ctypes.CliqueConfig{
+			Period: 1,
+			Epoch:  0,
+		}
+		engine := New(config.Clique, db)
+		engine.fakeDiff = false
+
+		signerAddresses := make([]common.Address, len(tt.signers))
+		for j, signer := range tt.signers {
+			signerAddresses[j] = accountsPool.address(signer)
+		}
+		for j := 0; j < len(signerAddresses); j++ {
+			for k := j + 1; k < len(signerAddresses); k++ {
+				if bytes.Compare(signerAddresses[j][:], signerAddresses[k][:]) > 0 {
+					signerAddresses[j], signerAddresses[k] = signerAddresses[k], signerAddresses[j]
+				}
+			}
+		}
+
+		// Create the genesis block with the initial set of signerAddresses
+		genesis := &genesisT.Genesis{
+			ExtraData: make([]byte, extraVanity+common.AddressLength*len(signerAddresses)+extraSeal),
+		}
+		for j, signer := range signerAddresses {
+			copy(genesis.ExtraData[extraVanity+j*common.AddressLength:], signer[:])
+		}
+		// Create a pristine blockchain with the genesis injected
+
+		/* genesisBlock := */
+		core.MustCommitGenesis(db, genesis)
+		genesisBlock := core.GenesisToBlock(genesis, db)
+
+		chain, err := core.NewBlockChain(db, nil, &config, engine, vm.Config{}, nil, nil)
+		if err != nil {
+			t.Errorf("test %d: failed to create test chain: %v", ii, err)
+			continue
+		}
+
+		// Build the common segment
+		commonSegmentBlocks := []*types.Block{genesisBlock}
+		for i := 0; i < len(tt.commonBlocks); i++ {
+
+			parentBlock := commonSegmentBlocks[len(commonSegmentBlocks)-1]
+
+			// engine.signer = accountsPool.address(tt.signers[i]) // accountsPool
+
+			generatedBlocks, _ := core.GenerateChain(&config, parentBlock, engine, db, 1, func(i int, gen *core.BlockGen) {
+				gen.SetCoinbase(common.Address{})
+			})
+			block := generatedBlocks[0]
+
+			// Get the header and prepare it for signing
+			header := block.Header()
+			header.ParentHash = parentBlock.Hash()
+
+			header.Time = parentBlock.Time() + 1
+			header.Difficulty = engine.CalcDifficulty(chain, 0, parentBlock.Header())
+
+			// Get the signer.
+			t.Logf("SIGNER (key): %v", tt.signers[i]) // eg. "A"
+
+			// Generate the signature, embed it into the header and the block.
+			//
+			header.Extra = make([]byte, extraVanity+extraSeal) // allocate byte slice
+
+			// Sign the header with the associated validator's key.
+			inTurnPoolSigner := tt.signers[i]
+			accountsPool.sign(header, inTurnPoolSigner)
+
+			// Double check to see what Clique thinks the signer of this block is.
+			author, err := engine.Author(header)
+			if err != nil {
+				t.Fatalf("author error: %v", err)
+			}
+			if wantSigner := accountsPool.address(inTurnPoolSigner); author != wantSigner {
+				t.Fatalf("header author != wanted signer: author: %s, signer: %s", author.Hex(), wantSigner.Hex())
+			}
+
+			generatedBlocks[0] = block.WithSeal(header)
+
+			commonSegmentBlocks = append(commonSegmentBlocks, generatedBlocks...) // == generatedBlocks[0]
+
+			if k, err := chain.InsertChain(generatedBlocks); err != nil {
+				t.Fatalf("case: %d, failed to import block %d, err: %v", ii, i, err)
+			} else if k != 1 {
+				t.Errorf("case: %d, failed to import block count: %d want: %d", ii, k, 1)
+			}
+		}
+
 	}
 }

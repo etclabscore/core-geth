@@ -120,9 +120,9 @@ func TestReimportMirroredState(t *testing.T) {
 func TestClique_EIP3436_Scenario1(t *testing.T) {
 
 	scenarios := []struct {
-		signers      []string
-		commonBlocks []string
-		forks        [][]string
+		lenSigners   int
+		commonBlocks []int
+		forks        [][]int
 	}{
 		{
 			// SCENARIO-1
@@ -169,11 +169,11 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 				7G       x -
 				8H        x-
 			*/
-			signers:      []string{"A", "B", "C", "D", "E", "F", "G", "H"},
-			commonBlocks: []string{"A", "B", "C", "D", "E", "F", "G", "H"},
-			forks: [][]string{
-				{"A", "C"},
-				{"B", "D", "F"},
+			lenSigners:   8,
+			commonBlocks: []int{0, 1, 2, 3, 4, 5, 6, 7},
+			forks: [][]int{
+				{0, 2},
+				{1, 3, 5},
 			},
 		},
 	}
@@ -197,9 +197,9 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 		engine := New(config.Clique, db)
 		engine.fakeDiff = false
 
-		signerAddressesSorted := make([]common.Address, len(tt.signers))
-		for j, signer := range tt.signers {
-			signerAddressesSorted[j] = accountsPool.address(signer)
+		signerAddressesSorted := make([]common.Address, tt.lenSigners)
+		for i := 0; i < tt.lenSigners; i++ {
+			signerAddressesSorted[i] = accountsPool.address(fmt.Sprintf("%s", []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"}[i]))
 		}
 		for j := 0; j < len(signerAddressesSorted); j++ {
 			for k := j + 1; k < len(signerAddressesSorted); k++ {
@@ -214,31 +214,6 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 			logSortedSigners += fmt.Sprintf("%d: (%s) %s\n", j, accountsPool.name(s), s.Hex())
 		}
 		t.Logf("SORTED SIGNERS:\n%s\n", logSortedSigners)
-
-		// Determine a sorted:test definition map.
-		// We need to know the index of A in the sorted list.
-		// We need this so we can create segment with properly ordered block signers.
-		//
-		// eg.
-		// D:1 (so "A" is actually "D" now)
-		// B:2
-		// A:3
-		// C:4
-		// E:5
-		// G:7
-		// F:8
-		// dictionaryOfSortedAddress := make(map[string]string, len(tt.signers))
-		// for _, x := range tt.signers {
-		// 	addr := accountsPool.address(x)
-		//
-		// 	// Get index of address in sorted list.
-		// 	for _, s := range signerAddressesSorted {
-		// 		if addr == s {
-		// 			dictionaryOfSortedAddress[x] =
-		// 		}
-		// 	}
-		// }
-		// func (signer[i] =>
 
 		// Create the genesis block with the initial set of signerAddressesSorted
 		genesis := &genesisT.Genesis{
@@ -263,16 +238,9 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 		commonSegmentBlocks := []*types.Block{genesisBlock}
 		for i := 0; i < len(tt.commonBlocks); i++ {
 
-			// signerIndex is the index of this signer in the defined signers list.
-			// signer order: a b c
-			// block order : a c b
-			var signerIndex int
-			for si, s := range tt.signers {
-				if s == tt.commonBlocks[i] {
-					signerIndex = si
-					break
-				}
-			}
+			signerIndex := tt.commonBlocks[i]
+			signerAddress := signerAddressesSorted[signerIndex]
+			signerName := accountsPool.name(signerAddress)
 
 			parentBlock := commonSegmentBlocks[len(commonSegmentBlocks)-1]
 
@@ -284,47 +252,34 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 			header.ParentHash = parentBlock.Hash()
 
 			header.Time = parentBlock.Time() + cliquePeriod
-			header.Difficulty = diffInTurn // engine.CalcDifficulty(chain, 0, parentBlock.Header())
-			// if header.Difficulty.Cmp(diffInTurn) != 0 {
-			// 	t.Logf("! unexpected difficulty: want: %v, got: %v\n", diffInTurn, header.Difficulty)
-			// }
-			if signerIndex != i {
-				header.Difficulty = diffNoTurn
-			}
 
-			// Generate the signature, embed it into the header and the block.
-			header.Extra = make([]byte, extraVanity+extraSeal) // allocate byte slice
+			// See if our required signer is in or out of turn and assign difficulty respectively.
+			difficulty := diffInTurn
 
-			// Get the ordered signer.
+			// If the snapshot reports this signer is out of turn, use out-of-turn difficulty.
 			snap, err := engine.snapshot(chain, parentBlock.NumberU64(), parentBlock.Hash(), nil)
 			if err != nil {
 				t.Fatalf("snap err: %v", err)
 			}
-			var wantInTurnSigner common.Address
-			for si, s := range signerAddressesSorted {
-				if snap.inturn(parentBlock.NumberU64()+1, s) {
-					t.Logf("inturn = %d (%s) %s", si, accountsPool.name(s), s.Hex())
-					wantInTurnSigner = s
-				}
+			if !snap.inturn(parentBlock.NumberU64()+1, signerAddress) {
+				difficulty = diffNoTurn
 			}
-			derivedInTurnSigner := signerAddressesSorted[int(parentBlock.NumberU64()+1)%len(tt.signers)]
-			if wantInTurnSigner != derivedInTurnSigner {
-				t.Fatalf("want: %s, got: %s", wantInTurnSigner, derivedInTurnSigner)
-			}
-			inTurnPoolSigner := derivedInTurnSigner
-			inTurnPoolSignerName := accountsPool.name(inTurnPoolSigner)
+			header.Difficulty = difficulty
 
-			t.Logf("SIGNING: %d (%s) %s\n", i+1, inTurnPoolSignerName, inTurnPoolSigner.Hex())
+			// Generate the signature, embed it into the header and the block.
+			header.Extra = make([]byte, extraVanity+extraSeal) // allocate byte slice
+
+			t.Logf("SIGNING: %d (%s) %s\n", i+1, signerName, signerAddress.Hex())
 
 			// Sign the header with the associated validator's key.
-			accountsPool.sign(header, inTurnPoolSignerName)
+			accountsPool.sign(header, signerName)
 
 			// Double check to see what Clique thinks the signer of this block is.
 			author, err := engine.Author(header)
 			if err != nil {
 				t.Fatalf("author error: %v", err)
 			}
-			if wantSigner := accountsPool.address(inTurnPoolSignerName); author != wantSigner {
+			if wantSigner := accountsPool.address(signerName); author != wantSigner {
 				t.Fatalf("header author != wanted signer: author: %s, signer: %s", author.Hex(), wantSigner.Hex())
 			}
 

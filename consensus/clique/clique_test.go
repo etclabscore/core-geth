@@ -18,6 +18,7 @@ package clique
 
 import (
 	"bytes"
+	"fmt"
 	"math/big"
 	"testing"
 
@@ -177,89 +178,153 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 		},
 	}
 
+	// validators: 8
+	//
+
 	for ii, tt := range scenarios {
-		// Create the account pool and generate the initial set of signerAddresses
+		// Create the account pool and generate the initial set of signerAddressesSorted
 		accountsPool := newTesterAccountPool()
 
 		db := rawdb.NewMemoryDatabase()
 
 		// Assemble a chain of headers from the cast votes
 		config := *params.TestChainConfig
+		cliquePeriod := uint64(1)
 		config.Clique = &ctypes.CliqueConfig{
-			Period: 1,
+			Period: cliquePeriod,
 			Epoch:  0,
 		}
 		engine := New(config.Clique, db)
 		engine.fakeDiff = false
 
-		signerAddresses := make([]common.Address, len(tt.signers))
+		signerAddressesSorted := make([]common.Address, len(tt.signers))
 		for j, signer := range tt.signers {
-			signerAddresses[j] = accountsPool.address(signer)
+			signerAddressesSorted[j] = accountsPool.address(signer)
 		}
-		for j := 0; j < len(signerAddresses); j++ {
-			for k := j + 1; k < len(signerAddresses); k++ {
-				if bytes.Compare(signerAddresses[j][:], signerAddresses[k][:]) > 0 {
-					signerAddresses[j], signerAddresses[k] = signerAddresses[k], signerAddresses[j]
+		for j := 0; j < len(signerAddressesSorted); j++ {
+			for k := j + 1; k < len(signerAddressesSorted); k++ {
+				if bytes.Compare(signerAddressesSorted[j][:], signerAddressesSorted[k][:]) > 0 {
+					signerAddressesSorted[j], signerAddressesSorted[k] = signerAddressesSorted[k], signerAddressesSorted[j]
 				}
 			}
 		}
 
-		// Create the genesis block with the initial set of signerAddresses
-		genesis := &genesisT.Genesis{
-			ExtraData: make([]byte, extraVanity+common.AddressLength*len(signerAddresses)+extraSeal),
+		logSortedSigners := ""
+		for j, s := range signerAddressesSorted {
+			logSortedSigners += fmt.Sprintf("%d: (%s) %s\n", j, accountsPool.name(s), s.Hex())
 		}
-		for j, signer := range signerAddresses {
+		t.Logf("SORTED SIGNERS:\n%s\n", logSortedSigners)
+
+		// Determine a sorted:test definition map.
+		// We need to know the index of A in the sorted list.
+		// We need this so we can create segment with properly ordered block signers.
+		//
+		// eg.
+		// D:1 (so "A" is actually "D" now)
+		// B:2
+		// A:3
+		// C:4
+		// E:5
+		// G:7
+		// F:8
+		// dictionaryOfSortedAddress := make(map[string]string, len(tt.signers))
+		// for _, x := range tt.signers {
+		// 	addr := accountsPool.address(x)
+		//
+		// 	// Get index of address in sorted list.
+		// 	for _, s := range signerAddressesSorted {
+		// 		if addr == s {
+		// 			dictionaryOfSortedAddress[x] =
+		// 		}
+		// 	}
+		// }
+		// func (signer[i] =>
+
+		// Create the genesis block with the initial set of signerAddressesSorted
+		genesis := &genesisT.Genesis{
+			ExtraData: make([]byte, extraVanity+common.AddressLength*len(signerAddressesSorted)+extraSeal),
+		}
+		for j, signer := range signerAddressesSorted {
 			copy(genesis.ExtraData[extraVanity+j*common.AddressLength:], signer[:])
 		}
+
+		genesisBlock := core.MustCommitGenesis(db, genesis)
+
 		// Create a pristine blockchain with the genesis injected
-
-		/* genesisBlock := */
-		core.MustCommitGenesis(db, genesis)
-		genesisBlock := core.GenesisToBlock(genesis, db)
-
 		chain, err := core.NewBlockChain(db, nil, &config, engine, vm.Config{}, nil, nil)
 		if err != nil {
 			t.Errorf("test %d: failed to create test chain: %v", ii, err)
 			continue
 		}
 
+		// mustMakeChain := func(parent *types.Block, blocksSigners []string)
+
 		// Build the common segment
 		commonSegmentBlocks := []*types.Block{genesisBlock}
 		for i := 0; i < len(tt.commonBlocks); i++ {
 
+			// signerIndex is the index of this signer in the defined signers list.
+			// signer order: a b c
+			// block order : a c b
+			var signerIndex int
+			for si, s := range tt.signers {
+				if s == tt.commonBlocks[i] {
+					signerIndex = si
+					break
+				}
+			}
+
 			parentBlock := commonSegmentBlocks[len(commonSegmentBlocks)-1]
 
-			// engine.signer = accountsPool.address(tt.signers[i]) // accountsPool
-
-			generatedBlocks, _ := core.GenerateChain(&config, parentBlock, engine, db, 1, func(i int, gen *core.BlockGen) {
-				gen.SetCoinbase(common.Address{})
-			})
+			generatedBlocks, _ := core.GenerateChain(&config, parentBlock, engine, db, 1, nil)
 			block := generatedBlocks[0]
 
 			// Get the header and prepare it for signing
 			header := block.Header()
 			header.ParentHash = parentBlock.Hash()
 
-			header.Time = parentBlock.Time() + 1
-			header.Difficulty = engine.CalcDifficulty(chain, 0, parentBlock.Header())
-
-			// Get the signer.
-			t.Logf("SIGNER (key): %v", tt.signers[i]) // eg. "A"
+			header.Time = parentBlock.Time() + cliquePeriod
+			header.Difficulty = diffInTurn // engine.CalcDifficulty(chain, 0, parentBlock.Header())
+			// if header.Difficulty.Cmp(diffInTurn) != 0 {
+			// 	t.Logf("! unexpected difficulty: want: %v, got: %v\n", diffInTurn, header.Difficulty)
+			// }
+			if signerIndex != i {
+				header.Difficulty = diffNoTurn
+			}
 
 			// Generate the signature, embed it into the header and the block.
-			//
 			header.Extra = make([]byte, extraVanity+extraSeal) // allocate byte slice
 
+			// Get the ordered signer.
+			snap, err := engine.snapshot(chain, parentBlock.NumberU64(), parentBlock.Hash(), nil)
+			if err != nil {
+				t.Fatalf("snap err: %v", err)
+			}
+			var wantInTurnSigner common.Address
+			for si, s := range signerAddressesSorted {
+				if snap.inturn(parentBlock.NumberU64()+1, s) {
+					t.Logf("inturn = %d (%s) %s", si, accountsPool.name(s), s.Hex())
+					wantInTurnSigner = s
+				}
+			}
+			derivedInTurnSigner := signerAddressesSorted[int(parentBlock.NumberU64()+1)%len(tt.signers)]
+			if wantInTurnSigner != derivedInTurnSigner {
+				t.Fatalf("want: %s, got: %s", wantInTurnSigner, derivedInTurnSigner)
+			}
+			inTurnPoolSigner := derivedInTurnSigner
+			inTurnPoolSignerName := accountsPool.name(inTurnPoolSigner)
+
+			t.Logf("SIGNING: %d (%s) %s\n", i+1, inTurnPoolSignerName, inTurnPoolSigner.Hex())
+
 			// Sign the header with the associated validator's key.
-			inTurnPoolSigner := tt.signers[i]
-			accountsPool.sign(header, inTurnPoolSigner)
+			accountsPool.sign(header, inTurnPoolSignerName)
 
 			// Double check to see what Clique thinks the signer of this block is.
 			author, err := engine.Author(header)
 			if err != nil {
 				t.Fatalf("author error: %v", err)
 			}
-			if wantSigner := accountsPool.address(inTurnPoolSigner); author != wantSigner {
+			if wantSigner := accountsPool.address(inTurnPoolSignerName); author != wantSigner {
 				t.Fatalf("header author != wanted signer: author: %s, signer: %s", author.Hex(), wantSigner.Hex())
 			}
 
@@ -267,12 +332,14 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 
 			commonSegmentBlocks = append(commonSegmentBlocks, generatedBlocks...) // == generatedBlocks[0]
 
-			if k, err := chain.InsertChain(generatedBlocks); err != nil {
-				t.Fatalf("case: %d, failed to import block %d, err: %v", ii, i, err)
-			} else if k != 1 {
-				t.Errorf("case: %d, failed to import block count: %d want: %d", ii, k, 1)
+			if k, err := chain.InsertChain(generatedBlocks); err != nil || k != 1 {
+				t.Fatalf("case: %d, failed to import block %d, count: %d, err: %v", ii, i, k, err)
 			}
 		}
+
+		// for scenarioForkIndex, forkBlockSigners := range tt.forks {
+		//
+		// }
 
 	}
 }

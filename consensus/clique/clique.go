@@ -20,9 +20,11 @@ package clique
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"math/big"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
@@ -470,7 +472,7 @@ func (c *Clique) verifySeal(chain consensus.ChainHeaderReader, header *types.Hea
 		if recent == signer {
 			// Signer is among recents, only fail if the current block doesn't shift it out
 			if limit := uint64(len(snap.Signers)/2 + 1); seen > number-limit {
-				return errRecentlySigned
+				return fmt.Errorf("%w: limit=%d seen=%d number=%d number-limit=%d", errRecentlySigned, limit, seen, number, number-limit)
 			}
 		}
 	}
@@ -478,10 +480,10 @@ func (c *Clique) verifySeal(chain consensus.ChainHeaderReader, header *types.Hea
 	if !c.fakeDiff {
 		inturn := snap.inturn(header.Number.Uint64(), signer)
 		if inturn && header.Difficulty.Cmp(diffInTurn) != 0 {
-			return errWrongDifficulty
+			return fmt.Errorf("%w: %s", errWrongDifficulty, "inturn")
 		}
 		if !inturn && header.Difficulty.Cmp(diffNoTurn) != 0 {
-			return errWrongDifficulty
+			return fmt.Errorf("%w: %s", errWrongDifficulty, "!inturn")
 		}
 	}
 	return nil
@@ -705,6 +707,8 @@ func (c *Clique) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, pr
 		return true, nil
 	}
 
+	fmt.Println("Clique.EC: difficulty ==")
+
 	// Blocks have same total difficulty.
 
 	// 2. Lesser block height
@@ -715,7 +719,19 @@ func (c *Clique) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, pr
 		return true, nil
 	}
 
+	fmt.Println("Clique.EC: number ==")
+
 	// Blocks have same number.
+
+	// EIP3436 says that the status quo preference algorithm is limited
+	// to greater net difficulty, but that isn't the case (at least in practice,
+	// withstanding whatever the EIP-255 initial Clique spec says).
+	// In practice, the status quo is/was that the shorter segment is
+	// preferred.
+	if c.config.EIP3436Transition == nil || c.config.EIP3436Transition.Cmp(current.Number) > 0 {
+		fmt.Println("Clique.EC: EIP3436 DISABLED")
+		return false, nil
+	}
 
 	// 3. Signer index
 	// 4. Block hash uint256
@@ -770,7 +786,7 @@ func (c *Clique) Eip3436Rule3rule4(chain consensus.ChainHeaderReader, current, p
 // Eip3436Rule3 selects the block (header) whose validator had the least recent in-turn block assignment.
 // If the compared signer addresses yield an equivalent value  this is considered non-definitive and
 // an empty value is returned.
-func (c *Clique) Eip3436Rule3(chain consensus.ChainHeaderReader, current, proposed *types.Header) (common.Address, error) {
+func (c *Clique) Eip3436Rule3(chain consensus.ChainHeaderReader, current, proposed *types.Header) (preferredAuthor common.Address, err error) {
 	snap, err := c.snapshot(chain, current.Number.Uint64()-1, current.ParentHash, nil)
 	if err != nil {
 		return common.Address{}, err
@@ -810,16 +826,32 @@ func (c *Clique) Eip3436Rule3(chain consensus.ChainHeaderReader, current, propos
 
 // Eip3436Rule4 selects the block (header) with the lowest hash when converted to an unsigned 256 bit integer.
 func (c *Clique) Eip3436Rule4(current, proposed *types.Header) (acceptProposed bool, err error) {
-	currentN, err := uint256.FromHex(current.Hash().Hex())
+	currentN, err := hashToUint256(current.Hash())
 	if err != nil {
 		return false, err
 	}
-	proposedN, err := uint256.FromHex(proposed.Hash().Hex())
+	proposedN, err := hashToUint256(proposed.Hash())
 	if err != nil {
 		return false, err
 	}
 	// Boolean should be defined truthy where proposed hash is less than current.
 	return proposedN.Lt(currentN), nil
+}
+
+// hashToUint256 converts a hash to a uint256 integer.
+func hashToUint256(h common.Hash) (*uint256.Int, error) {
+	hex := h.Hex()
+
+	// The library used will error if the hex value has any leading 0's,
+	// so those will be trimmed.
+	trimPre := ""
+	if strings.HasPrefix(hex, "0x") {
+		trimPre = strings.TrimPrefix(hex, "0x")
+	} else if strings.HasPrefix(hex, "0X") {
+		trimPre = strings.TrimPrefix(hex, "0X")
+	}
+	trimPre = strings.TrimLeft(trimPre, "0")
+	return uint256.FromHex("0x" + trimPre)
 }
 
 // SealHash returns the hash of a block prior to it being sealed.

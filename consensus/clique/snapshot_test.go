@@ -74,6 +74,15 @@ func (ap *testerAccountPool) address(account string) common.Address {
 	return crypto.PubkeyToAddress(ap.accounts[account].PublicKey)
 }
 
+func (ap *testerAccountPool) name(address common.Address) string {
+	for k, v := range ap.accounts {
+		if crypto.PubkeyToAddress(v.PublicKey) == address {
+			return k
+		}
+	}
+	return ""
+}
+
 // sign calculates a Clique digital signature for the given block and embeds it
 // back into the header.
 func (ap *testerAccountPool) sign(header *types.Header, signer string) {

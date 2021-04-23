@@ -707,10 +707,6 @@ func (c *Clique) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, pr
 		return true, nil
 	}
 
-	if c.config.EIP3436Transition == nil || c.config.EIP3436Transition.Cmp(current.Number) > 0 {
-		return false, nil
-	}
-
 	// Blocks have same total difficulty.
 
 	// 2. Lesser block height
@@ -722,6 +718,15 @@ func (c *Clique) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, pr
 	}
 
 	// Blocks have same number.
+
+	// EIP3436 says that the status quo preference algorithm is limited
+	// to greater net difficulty, but that isn't the case (at least in practice,
+	// withstanding whatever the EIP-255 initial Clique spec says).
+	// In practice, the status quo is/was that the shorter segment is
+	// preferred.
+	if c.config.EIP3436Transition == nil || c.config.EIP3436Transition.Cmp(current.Number) > 0 {
+		return false, nil
+	}
 
 	// 3. Signer index
 	// 4. Block hash uint256

@@ -314,16 +314,24 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 				// Assert that the net total difficulties of each fork are equal.
 				func(chain *core.BlockChain, forkHeads ...*types.Header) {
 					d := new(big.Int)
-					n := new(big.Int)
 					for i, head := range forkHeads {
 						td := chain.GetTd(head.Hash(), head.Number.Uint64())
 						if i == 0 {
-							n.Set(head.Number)
 							d.Set(td)
 							continue
 						}
 						if d.Cmp(td) != 0 {
 							t.Fatalf("want equal fork heads total difficulty")
+						}
+					}
+				},
+				// Assert that the block numbers of each fork head are equal.
+				func(chain *core.BlockChain, forkHeads ...*types.Header) {
+					n := new(big.Int)
+					for i, head := range forkHeads {
+						if i == 0 {
+							n.Set(head.Number)
+							continue
 						}
 						if n.Cmp(head.Number) != 0 {
 							t.Fatalf("want equal fork head numbers")

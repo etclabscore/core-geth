@@ -24,6 +24,7 @@ import (
 	"io"
 	"math/big"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
@@ -815,16 +816,32 @@ func (c *Clique) Eip3436Rule3(chain consensus.ChainHeaderReader, current, propos
 
 // Eip3436Rule4 selects the block (header) with the lowest hash when converted to an unsigned 256 bit integer.
 func (c *Clique) Eip3436Rule4(current, proposed *types.Header) (acceptProposed bool, err error) {
-	currentN, err := uint256.FromHex(current.Hash().Hex())
+	currentN, err := hashToUint256(current.Hash())
 	if err != nil {
 		return false, err
 	}
-	proposedN, err := uint256.FromHex(proposed.Hash().Hex())
+	proposedN, err := hashToUint256(proposed.Hash())
 	if err != nil {
 		return false, err
 	}
 	// Boolean should be defined truthy where proposed hash is less than current.
 	return proposedN.Lt(currentN), nil
+}
+
+// hashToUint256 converts a hash to a uint256 integer.
+func hashToUint256(h common.Hash) (*uint256.Int, error) {
+	hex := h.Hex()
+
+	// The library used will error if the hex value has any leading 0's,
+	// so those will be trimmed.
+	trimPre := ""
+	if strings.HasPrefix(hex, "0x") {
+		trimPre = strings.TrimPrefix(hex, "0x")
+	} else if strings.HasPrefix(hex, "0X") {
+		trimPre = strings.TrimPrefix(hex, "0X")
+	}
+	trimPre = strings.TrimLeft(trimPre, "0")
+	return uint256.FromHex("0x" + trimPre)
 }
 
 // SealHash returns the hash of a block prior to it being sealed.

@@ -518,3 +518,28 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 		}
 	}
 }
+
+func TestClique_Eip3436Rule4_hashToUint256(t *testing.T) {
+	// "0x0f73844a381e7a0e002f128376a848d5f1193d07dc0570f1531d1c95f9e95a93"
+	cases := []struct {
+		hash common.Hash
+		want *uint256.Int
+	}{
+		// This batch of cases is primarily concerned with checking
+		// that hashes containing leading 0's don't return errors
+		// (and that we're allowed to pass odd-length hex strings).
+		{common.HexToHash("0xff73844a381e7a0e002f128376a848d5f1193d07dc0570f1531d1c95f9e95a93"), nil},
+		{common.HexToHash("0x0f73844a381e7a0e002f128376a848d5f1193d07dc0570f1531d1c95f9e95a93"), nil},
+		{common.HexToHash("0xf73844a381e7a0e002f128376a848d5f1193d07dc0570f1531d1c95f9e95a93"), nil},
+	}
+	for i, c := range cases {
+		got, err := hashToUint256(c.hash)
+		if err != nil {
+			t.Errorf("case %d, error: %v (hash.hex=%s)", i, err, c.hash.Hex())
+		}
+		// Skip tests with want=nil
+		if c.want != nil && ((got == nil && c.want != nil) || (got.Cmp(c.want) != 0)) {
+			t.Errorf("case: %d, want: %v, got: %v", i, c.want, got)
+		}
+	}
+}

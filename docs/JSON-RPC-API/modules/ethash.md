@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:50:40-06:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-23T06:34:40-05:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -33,7 +33,7 @@ _None_
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -66,7 +66,7 @@ _None_
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "ethash_getHashrate", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_getHashrate", "params": []}'
 	```
 
 === "Javascript Console"
@@ -84,7 +84,7 @@ func (api *API) GetHashrate() uint64 {
 }// GetHashrate returns the current hashrate for local CPU miner and remote miner.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/consensus/ethash/api.go#L110" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/consensus/ethash/api.go#L110" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -115,7 +115,7 @@ num4string <code>[4]string</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -158,7 +158,7 @@ num4string <code>[4]string</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "ethash_getWork", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_getWork", "params": []}'
 	```
 
 === "Javascript Console"
@@ -199,7 +199,7 @@ func (api *API) GetWork() ([4]string, error) {
 //   result[3] - hex encoded block number
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/consensus/ethash/api.go#L41" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/consensus/ethash/api.go#L41" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -219,7 +219,7 @@ between nodes.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -227,7 +227,7 @@ rate <code>hexutil.Uint64</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -261,7 +261,7 @@ id <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -308,7 +308,7 @@ id <code>common.Hash</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "ethash_submitHashRate", "params": [<rate>, <id>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_submitHashRate", "params": [<rate>, <id>]}'
 	```
 
 === "Javascript Console"
@@ -341,7 +341,7 @@ func (api *API) SubmitHashRate(rate hexutil.Uint64, id common.Hash) bool {
 // between nodes.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/consensus/ethash/api.go#L92" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/consensus/ethash/api.go#L92" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -358,7 +358,7 @@ Note either an invalid solution, a stale work a non-existent work will return fa
 
 #### Params (3)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -366,7 +366,7 @@ nonce <code>types.BlockNonce</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -400,7 +400,7 @@ hash <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -434,7 +434,7 @@ digest <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -481,7 +481,7 @@ digest <code>common.Hash</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "ethash_submitWork", "params": [<nonce>, <hash>, <digest>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_submitWork", "params": [<nonce>, <hash>, <digest>]}'
 	```
 
 === "Javascript Console"
@@ -511,7 +511,7 @@ func (api *API) SubmitWork(nonce types.BlockNonce, hash, digest common.Hash) boo
 // Note either an invalid solution, a stale work a non-existent work will return false.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/consensus/ethash/api.go#L66" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/consensus/ethash/api.go#L66" target="_">View on GitHub →</a>
 </p>
 </details>
 

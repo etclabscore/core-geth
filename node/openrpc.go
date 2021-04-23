@@ -278,10 +278,6 @@ func registerOpenRPCAPIs(doc *go_openrpc_reflect.Document, apis []rpc.API) {
 		switch api.Service.(type) {
 		case *filters.PublicFilterAPI:
 			doc.RegisterReceiverName("eth", &RPCEthSubscription{})
-		case *debug.HandlerT:
-			doc.RegisterReceiverName("debug", &RPCDebugSubscription{})
-		case *tracers.TraceAPI:
-			doc.RegisterReceiverName("trace", &RPCTraceSubscription{})
 		}
 	}
 }

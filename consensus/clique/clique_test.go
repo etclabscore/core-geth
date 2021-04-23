@@ -120,6 +120,9 @@ func TestReimportMirroredState(t *testing.T) {
 }
 
 func TestClique_EIP3436_Scenario1(t *testing.T) {
+
+	cliquePeriod := uint64(1)
+
 	scenarios := []struct {
 		// The number of signers (aka validators).
 		// These addresses will be randomly generated on demand for each scenario
@@ -150,6 +153,8 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 		// canonicalForkIndex takes variadic fork heads and tells us which
 		// should get canonical preference (by index).
 		canonicalForkIndex func(forkHeads ...*types.Header) int
+
+		cliqueConfig *ctypes.CliqueConfig
 	}{
 		{
 			// SCENARIO-1
@@ -230,6 +235,53 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 					}
 				},
 			},
+			cliqueConfig: &ctypes.CliqueConfig{
+				Period:            cliquePeriod,
+				Epoch:             0,
+				EIP3436Transition: big.NewInt(0),
+			},
+		},
+		{
+			// SCENARIO-1 without EIP-3436 (negative test)
+			lenSigners:   8,
+			commonBlocks: []int{1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7},
+			forks: [][]int{
+				{1, 3, 5}, // 2, 4, 6
+				{0, 2},    // 1, 3
+			},
+			canonicalForkIndex: func(forkHeads ...*types.Header) int {
+				// Prefer the shorter fork.
+				minHeight := math.MaxBig63.Uint64()
+				n := -1
+				for i, head := range forkHeads {
+					if h := head.Number.Uint64(); h < minHeight {
+						n = i
+						minHeight = h
+					}
+				}
+				return n
+			},
+			assertions: []func(chain *core.BlockChain, forkHeads ...*types.Header){
+				// Assert that the net total difficulties of each fork are equal.
+				func(chain *core.BlockChain, forkHeads ...*types.Header) {
+					d := new(big.Int)
+					for i, head := range forkHeads {
+						td := chain.GetTd(head.Hash(), head.Number.Uint64())
+						if i == 0 {
+							d.Set(td)
+							continue
+						}
+						if d.Cmp(td) != 0 {
+							t.Fatalf("want equal fork heads total difficulty")
+						}
+					}
+				},
+			},
+			cliqueConfig: &ctypes.CliqueConfig{
+				Period:            cliquePeriod,
+				Epoch:             0,
+				EIP3436Transition: nil,
+			},
 		},
 		{
 			// SCENARIO-2
@@ -291,19 +343,30 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 
 				=> recently signed: limit=(8/2+1)=5 seen=13 number=17 number-limit=12
 
+				RESOLUTION (tentative): Use forks with length 2 instead of 3.
+
 			*/
 			lenSigners:   8,
 			commonBlocks: []int{1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6},
 			forks: [][]int{
-				{0, 2, 4}, // 1, 3, 5
-				{1, 3, 5}, //  2, 4, 6
+				// These expected values have been truncated to 2 block each instead
+				// of the EIP's described 3 blocks (per inline comments).
+				{0, 2}, // 1, 3, 5
+				{1, 3}, // 2, 4, 6
 			},
 			canonicalForkIndex: func(forkHeads ...*types.Header) int {
 				// Prefer the lowest hash.
-				minHashV, _ := uint256.FromBig(big.NewInt(0))
+				minHashV, overflow := uint256.FromBig(big.NewInt(0))
+				if overflow {
+					t.Fatalf("uint256 overflowed: 0")
+				}
 				n := -1
 				for i, head := range forkHeads {
-					if hv, _ := uint256.FromHex(head.Hash().Hex()); n == -1 || hv.Cmp(minHashV) < 0 {
+					hv, err := hashToUint256(head.Hash())
+					if err != nil {
+						t.Fatalf("uint256 err: %v, head.hex: %s", err, head.Hash().Hex())
+					}
+					if n == -1 || hv.Cmp(minHashV) < 0 {
 						minHashV.Set(hv)
 						n = i
 					}
@@ -339,6 +402,109 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 					}
 				},
 			},
+			cliqueConfig: &ctypes.CliqueConfig{
+				Period:            cliquePeriod,
+				Epoch:             0,
+				EIP3436Transition: big.NewInt(0),
+			},
+		},
+		{
+			// SCENARIO-2 without EIP-3436 (negative test)
+			lenSigners:   8,
+			commonBlocks: []int{1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6},
+			forks: [][]int{
+				// These expected values have been truncated to 2 block each instead
+				// of the EIP's described 3 blocks (per inline comments).
+				{0, 2}, // 1, 3, 5
+				{1, 3}, // 2, 4, 6
+			},
+			canonicalForkIndex: func(forkHeads ...*types.Header) int {
+				// Prefer the first-seen fork.
+				return 0
+			},
+			assertions: []func(chain *core.BlockChain, forkHeads ...*types.Header){
+				// Assert that the net total difficulties of each fork are equal.
+				func(chain *core.BlockChain, forkHeads ...*types.Header) {
+					d := new(big.Int)
+					for i, head := range forkHeads {
+						td := chain.GetTd(head.Hash(), head.Number.Uint64())
+						if i == 0 {
+							d.Set(td)
+							continue
+						}
+						if d.Cmp(td) != 0 {
+							t.Fatalf("want equal fork heads total difficulty")
+						}
+					}
+				},
+				// Assert that the block numbers of each fork head are equal.
+				func(chain *core.BlockChain, forkHeads ...*types.Header) {
+					n := new(big.Int)
+					for i, head := range forkHeads {
+						if i == 0 {
+							n.Set(head.Number)
+							continue
+						}
+						if n.Cmp(head.Number) != 0 {
+							t.Fatalf("want equal fork head numbers")
+						}
+					}
+				},
+			},
+			cliqueConfig: &ctypes.CliqueConfig{
+				Period:            cliquePeriod,
+				Epoch:             0,
+				EIP3436Transition: nil,
+			},
+		},
+		{
+			// SCENARIO-2 without EIP-3436 (negative test)
+			lenSigners:   8,
+			commonBlocks: []int{1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6},
+			forks: [][]int{
+				// These expected values have been truncated to 2 block each instead
+				// of the EIP's described 3 blocks (per inline comments).
+				{1, 3}, // 2, 4, 6
+				{0, 2}, // 1, 3, 5
+			},
+			canonicalForkIndex: func(forkHeads ...*types.Header) int {
+				// Prefer the OTHER first-seen fork.
+				return 0
+			},
+			assertions: []func(chain *core.BlockChain, forkHeads ...*types.Header){
+				// Assert that the net total difficulties of each fork are equal.
+				func(chain *core.BlockChain, forkHeads ...*types.Header) {
+					d := new(big.Int)
+					for i, head := range forkHeads {
+						td := chain.GetTd(head.Hash(), head.Number.Uint64())
+						if i == 0 {
+							d.Set(td)
+							continue
+						}
+						if d.Cmp(td) != 0 {
+							t.Fatalf("want equal fork heads total difficulty")
+						}
+					}
+				},
+				// Assert that the block numbers of each fork head are equal.
+				func(chain *core.BlockChain, forkHeads ...*types.Header) {
+					n := new(big.Int)
+					for i, head := range forkHeads {
+						if i == 0 {
+							n.Set(head.Number)
+							continue
+						}
+						if n.Cmp(head.Number) != 0 {
+							t.Fatalf("want equal fork head numbers")
+						}
+					}
+				},
+			},
+			cliqueConfig: &ctypes.CliqueConfig{
+				Period:            cliquePeriod,
+				Epoch:             0,
+				EIP3436Transition: nil,
+			},
 		},
 	}
 
@@ -351,13 +517,8 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 		// Assemble a chain of headers from the cast votes
 		config := *params.TestChainConfig
 
-		cliquePeriod := uint64(1)
 		config.Ethash = nil
-		config.Clique = &ctypes.CliqueConfig{
-			Period:            cliquePeriod,
-			Epoch:             0,
-			EIP3436Transition: big.NewInt(0), // TODO: pull this out at add negative test cases (showing that w/o EIP-3436 expectations fail).
-		}
+		config.Clique = tt.cliqueConfig
 		engine := New(config.Clique, db)
 		engine.fakeDiff = false
 

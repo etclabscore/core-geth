@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-23T06:34:40-05:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-23T07:40:55-05:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -4483,137 +4483,6 @@ func (api *PrivateDebugAPI) StorageRangeAt(blockHash common.Hash, txIndex int, c
 
 
 
-### debug_subscribe
-
-Subscribe creates a subscription to an event channel.
-Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
-
-
-#### Params (2)
-
-Parameters must be given _by position_.
-
-
-__1:__ 
-subscriptionName <code>RPCDebugSubscriptionParamsName</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- oneOf: 
-
-			- description: `Returns transaction traces within a range of blocks.`
-			- enum: traceChain
-			- type: string
-
-
-	- title: `subscriptionName`
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "oneOf": [
-            {
-                "description": "Returns transaction traces within a range of blocks.",
-                "enum": [
-                    "traceChain"
-                ],
-                "type": [
-                    "string"
-                ]
-            }
-        ],
-        "title": "subscriptionName"
-    }
-	```
-
-
-
-
-__2:__ 
-subscriptionOptions <code>interface{}</code> 
-
-  + Required: No
-
-
-
-
-
-
-#### Result
-
-
-
-subscriptionID <code>rpc.ID</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Subscription identifier`
-	- title: `subscriptionID`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Subscription identifier",
-        "title": "subscriptionID",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-#### Client Method Invocation Examples
-
-=== "Shell"
-
-	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_subscribe", "params": [<subscriptionName>, <subscriptionOptions>]}'
-	```
-
-=== "Javascript Console"
-
-	``` js
-	debug.subscribe(subscriptionName,subscriptionOptions);
-	```
-
-
-<details><summary>Source code</summary>
-<p>
-```go
-func (sub *RPCDebugSubscription) Subscribe(subscriptionName RPCDebugSubscriptionParamsName, subscriptionOptions interface{}) (subscriptionID rpc.ID, err error) {
-	return
-}// Subscribe creates a subscription to an event channel.
-// Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
-
-```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L250" target="_">View on GitHub →</a>
-</p>
-</details>
-
----
-
-
-
 ### debug_testSignCliqueBlock
 
 TestSignCliqueBlock fetches the given block number, and attempts to sign it as a clique header with the
@@ -6796,6 +6665,328 @@ func (api *API) TraceCallMany(ctx context.Context, txs [ // TraceCallMany lets y
 
 
 
+### debug_traceChain
+
+TraceChain returns the structured logs created during the execution of EVM
+between two blocks (excluding start) and returns them as a JSON object.
+
+
+#### Params (3)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+start <code>rpc.BlockNumber</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- oneOf: 
+
+			- description: `The block height description`
+			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
+			- type: string
+
+
+			- description: `Hex representation of a uint64`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: string
+
+
+	- title: `blockNumberIdentifier`
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "oneOf": [
+            {
+                "description": "The block height description",
+                "enum": [
+                    "earliest",
+                    "latest",
+                    "pending"
+                ],
+                "title": "blockNumberTag",
+                "type": [
+                    "string"
+                ]
+            },
+            {
+                "description": "Hex representation of a uint64",
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
+                "type": [
+                    "string"
+                ]
+            }
+        ],
+        "title": "blockNumberIdentifier"
+    }
+	```
+
+
+
+
+__2:__ 
+end <code>rpc.BlockNumber</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- oneOf: 
+
+			- description: `The block height description`
+			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
+			- type: string
+
+
+			- description: `Hex representation of a uint64`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: string
+
+
+	- title: `blockNumberIdentifier`
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "oneOf": [
+            {
+                "description": "The block height description",
+                "enum": [
+                    "earliest",
+                    "latest",
+                    "pending"
+                ],
+                "title": "blockNumberTag",
+                "type": [
+                    "string"
+                ]
+            },
+            {
+                "description": "Hex representation of a uint64",
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
+                "type": [
+                    "string"
+                ]
+            }
+        ],
+        "title": "blockNumberIdentifier"
+    }
+	```
+
+
+
+
+__3:__ 
+config <code>*TraceConfig</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- additionalProperties: `false`
+	- properties: 
+		- Debug: 
+			- type: `boolean`
+
+		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableReturnData: 
+			- type: `boolean`
+
+		- DisableStack: 
+			- type: `boolean`
+
+		- DisableStorage: 
+			- type: `boolean`
+
+		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- NestedTraceOutput: 
+			- type: `boolean`
+
+		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Timeout: 
+			- type: `string`
+
+		- Tracer: 
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
+
+
+	- type: object
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "additionalProperties": false,
+        "properties": {
+            "Debug": {
+                "type": "boolean"
+            },
+            "DisableMemory": {
+                "type": "boolean"
+            },
+            "DisableReturnData": {
+                "type": "boolean"
+            },
+            "DisableStack": {
+                "type": "boolean"
+            },
+            "DisableStorage": {
+                "type": "boolean"
+            },
+            "Limit": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "NestedTraceOutput": {
+                "type": "boolean"
+            },
+            "Reexec": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "Timeout": {
+                "type": "string"
+            },
+            "Tracer": {
+                "type": "string"
+            },
+            "overrides": {
+                "additionalProperties": true
+            }
+        },
+        "type": [
+            "object"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+
+<code>*rpc.Subscription</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+=== "Shell"
+
+	``` shell
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceChain", "params": [<start>, <end>, <config>]}'
+	```
+
+=== "Javascript Console"
+
+	``` js
+	debug.traceChain(start,end,config);
+	```
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *API) TraceChain(ctx context.Context, start, end rpc.BlockNumber, config *TraceConfig) (*rpc.Subscription, error) {
+	from, err := api.blockByNumber(ctx, start)
+	if err != nil {
+		return nil, err
+	}
+	to, err := api.blockByNumber(ctx, end)
+	if err != nil {
+		return nil, err
+	}
+	if from.Number().Cmp(to.Number()) >= 0 {
+		return nil, fmt.Errorf("end block (#%d) needs to come after start block (#%d)", end, start)
+	}
+	return api.traceChain(ctx, from, to, config)
+}// TraceChain returns the structured logs created during the execution of EVM
+// between two blocks (excluding start) and returns them as a JSON object.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L207" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
 ### debug_traceTransaction
 
 TraceTransaction returns the structured logs created during the execution of EVM
@@ -7007,84 +7198,6 @@ func (api *API) TraceTransaction(ctx context.Context, hash common.Hash, config *
 }
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L688" target="_">View on GitHub →</a>
-</p>
-</details>
-
----
-
-
-
-### debug_unsubscribe
-
-Unsubscribe terminates an existing subscription by ID.
-
-
-#### Params (1)
-
-Parameters must be given _by position_.
-
-
-__1:__ 
-id <code>rpc.ID</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Subscription identifier`
-	- title: `subscriptionID`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Subscription identifier",
-        "title": "subscriptionID",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-
-
-#### Result
-
-_None_
-
-#### Client Method Invocation Examples
-
-=== "Shell"
-
-	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_unsubscribe", "params": [<id>]}'
-	```
-
-=== "Javascript Console"
-
-	``` js
-	debug.unsubscribe(id);
-	```
-
-
-<details><summary>Source code</summary>
-<p>
-```go
-func (sub *RPCDebugSubscription) Unsubscribe(id rpc.ID) error {
-	return nil
-}// Unsubscribe terminates an existing subscription by ID.
-
-```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L241" target="_">View on GitHub →</a>
 </p>
 </details>
 

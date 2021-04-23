@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-23T06:34:40-05:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-23T07:40:55-05:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -861,6 +861,109 @@ func (api *publicAdminAPI) NodeInfo() (*p2p.NodeInfo, error) {
 
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L301" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### admin_peerEvents
+
+PeerEvents creates an RPC subscription which receives peer events from the
+node's p2p.Server
+
+
+#### Params (0)
+
+_None_
+
+#### Result
+
+
+
+
+<code>*rpc.Subscription</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+=== "Shell"
+
+	``` shell
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_peerEvents", "params": []}'
+	```
+
+=== "Javascript Console"
+
+	``` js
+	admin.peerEvents();
+	```
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *privateAdminAPI) PeerEvents(ctx context.Context) (*rpc.Subscription, error) {
+	server := api.node.Server()
+	if server == nil {
+		return nil, ErrNodeStopped
+	}
+	notifier, supported := rpc.NotifierFromContext(ctx)
+	if !supported {
+		return nil, rpc.ErrNotificationsUnsupported
+	}
+	rpcSub := notifier.CreateSubscription()
+	go func() {
+		events := make(chan *p2p.PeerEvent)
+		sub := server.SubscribeEvents(events)
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case event := <-events:
+				notifier.Notify(rpcSub.ID, event)
+			case <-sub.Err():
+				return
+			case <-rpcSub.Err():
+				return
+			case <-notifier.Closed():
+				return
+			}
+		}
+	}()
+	return rpcSub, nil
+}// PeerEvents creates an RPC subscription which receives peer events from the
+// node's p2p.Server
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L129" target="_">View on GitHub →</a>
 </p>
 </details>
 

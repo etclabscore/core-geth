@@ -21,8 +21,6 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/eth/filters"
-	"github.com/ethereum/go-ethereum/eth/tracers"
-	"github.com/ethereum/go-ethereum/internal/debug"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rpc"
 	meta_schema "github.com/open-rpc/meta-schema"
@@ -142,9 +140,15 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 		// the mock subscription receiver type RPCSubscription.
 		// This pattern matches all strings that start with Subscribe and are suffixed with a non-zero
 		// number of A-z characters.
-		if isPubSub(method.Type) && method.Type.In(0) == reflect.TypeOf(&eth.PublicEthereumAPI{}) {
-			return false
+		pkgStr := method.Type.In(0).String()
+		if (isPubSub(method.Type) && pkgStr == "*eth.PublicEthereumAPI") || pkgStr == "*filters.PublicFilterAPI" {
+			// The eth package and RPC module and its related filters package
+			// don't follow RPC code schema convention, so we need to skip them.
+			// Instead, we use the mocks derived from this file's RPCEthSubscription type instead.
+			// PubSub methods on these named receivers will be skipped.
+			return false // false means not eligible, true means eligible
 		}
+
 		// Reject all methods that use a channel in the their argument params.
 		// This causes SubscribeSyncStatus to be rejected.
 		for i := 0; i < method.Func.Type().NumIn(); i++ {

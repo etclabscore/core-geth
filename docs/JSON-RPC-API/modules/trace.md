@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-23T06:34:40-05:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-23T07:40:55-05:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -946,10 +946,11 @@ func (api *TraceAPI) CallMany(ctx context.Context, txs [ // CallMany lets you tr
 
 
 
-### trace_subscribe
+### trace_filter
 
-Subscribe creates a subscription to an event channel.
-Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
+Filter configures a new tracer according to the provided configuration, and
+executes all the transactions contained within. The return value will be one item
+per transaction, dependent on the requested tracer.
 
 
 #### Params (2)
@@ -958,7 +959,7 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-subscriptionName <code>RPCTraceSubscriptionParamsName</code> 
+args <code>TraceFilterArgs</code> 
 
   + Required: ✓ Yes
 
@@ -967,14 +968,40 @@ subscriptionName <code>RPCTraceSubscriptionParamsName</code>
 
 	``` Schema
 	
-	- oneOf: 
+	- additionalProperties: `false`
+	- properties: 
+		- after: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
 
-			- description: `Returns transaction traces for the filtered addresses within a range of blocks.`
-			- enum: filter
-			- type: string
+		- count: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- fromAddress: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- fromBlock: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- toAddress: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- toBlock: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
 
 
-	- title: `subscriptionName`
+	- type: object
 
 
 	```
@@ -983,18 +1010,42 @@ subscriptionName <code>RPCTraceSubscriptionParamsName</code>
 
 	``` Raw
 	{
-        "oneOf": [
-            {
-                "description": "Returns transaction traces for the filtered addresses within a range of blocks.",
-                "enum": [
-                    "filter"
-                ],
-                "type": [
-                    "string"
-                ]
+        "additionalProperties": false,
+        "properties": {
+            "after": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "count": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "fromAddress": {
+                "pattern": "^0x[a-fA-F\\d]{64}$",
+                "title": "keccak",
+                "type": "string"
+            },
+            "fromBlock": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
+                "type": "string"
+            },
+            "toAddress": {
+                "pattern": "^0x[a-fA-F\\d]{64}$",
+                "title": "keccak",
+                "type": "string"
+            },
+            "toBlock": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
+                "type": "string"
             }
-        ],
-        "title": "subscriptionName"
+        },
+        "type": [
+            "object"
+        ]
     }
 	```
 
@@ -1002,10 +1053,109 @@ subscriptionName <code>RPCTraceSubscriptionParamsName</code>
 
 
 __2:__ 
-subscriptionOptions <code>interface{}</code> 
+config <code>*TraceConfig</code> 
 
-  + Required: No
+  + Required: ✓ Yes
 
+
+=== "Schema"
+
+	``` Schema
+	
+	- additionalProperties: `false`
+	- properties: 
+		- Debug: 
+			- type: `boolean`
+
+		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableReturnData: 
+			- type: `boolean`
+
+		- DisableStack: 
+			- type: `boolean`
+
+		- DisableStorage: 
+			- type: `boolean`
+
+		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- NestedTraceOutput: 
+			- type: `boolean`
+
+		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Timeout: 
+			- type: `string`
+
+		- Tracer: 
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
+
+
+	- type: object
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "additionalProperties": false,
+        "properties": {
+            "Debug": {
+                "type": "boolean"
+            },
+            "DisableMemory": {
+                "type": "boolean"
+            },
+            "DisableReturnData": {
+                "type": "boolean"
+            },
+            "DisableStack": {
+                "type": "boolean"
+            },
+            "DisableStorage": {
+                "type": "boolean"
+            },
+            "Limit": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "NestedTraceOutput": {
+                "type": "boolean"
+            },
+            "Reexec": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "Timeout": {
+                "type": "string"
+            },
+            "Tracer": {
+                "type": "string"
+            },
+            "overrides": {
+                "additionalProperties": true
+            }
+        },
+        "type": [
+            "object"
+        ]
+    }
+	```
 
 
 
@@ -1015,7 +1165,8 @@ subscriptionOptions <code>interface{}</code>
 
 
 
-subscriptionID <code>rpc.ID</code> 
+
+<code>*rpc.Subscription</code> 
 
   + Required: ✓ Yes
 
@@ -1050,26 +1201,30 @@ subscriptionID <code>rpc.ID</code>
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_subscribe", "params": [<subscriptionName>, <subscriptionOptions>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_filter", "params": [<args>, <config>]}'
 	```
 
 === "Javascript Console"
 
 	``` js
-	trace.subscribe(subscriptionName,subscriptionOptions);
+	trace.filter(args,config);
 	```
 
 
 <details><summary>Source code</summary>
 <p>
 ```go
-func (sub *RPCTraceSubscription) Subscribe(subscriptionName RPCTraceSubscriptionParamsName, subscriptionOptions interface{}) (subscriptionID rpc.ID, err error) {
-	return
-}// Subscribe creates a subscription to an event channel.
-// Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
+func (api *TraceAPI) Filter(ctx context.Context, args TraceFilterArgs, config *TraceConfig) (*rpc.Subscription, error) {
+	config = setTraceConfigDefaultTracer(config)
+	start := rpc.BlockNumber(args.FromBlock)
+	end := rpc.BlockNumber(args.ToBlock)
+	return api.debugAPI.TraceChain(ctx, start, end, config)
+}// Filter configures a new tracer according to the provided configuration, and
+// executes all the transactions contained within. The return value will be one item
+// per transaction, dependent on the requested tracer.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L267" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api_parity.go#L227" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1268,84 +1423,6 @@ func (api *TraceAPI) Transaction(ctx context.Context, hash common.Hash, config *
 
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api_parity.go#L219" target="_">View on GitHub →</a>
-</p>
-</details>
-
----
-
-
-
-### trace_unsubscribe
-
-Unsubscribe terminates an existing subscription by ID.
-
-
-#### Params (1)
-
-Parameters must be given _by position_.
-
-
-__1:__ 
-id <code>rpc.ID</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Subscription identifier`
-	- title: `subscriptionID`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Subscription identifier",
-        "title": "subscriptionID",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-
-
-#### Result
-
-_None_
-
-#### Client Method Invocation Examples
-
-=== "Shell"
-
-	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_unsubscribe", "params": [<id>]}'
-	```
-
-=== "Javascript Console"
-
-	``` js
-	trace.unsubscribe(id);
-	```
-
-
-<details><summary>Source code</summary>
-<p>
-```go
-func (sub *RPCTraceSubscription) Unsubscribe(id rpc.ID) error {
-	return nil
-}// Unsubscribe terminates an existing subscription by ID.
-
-```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L258" target="_">View on GitHub →</a>
 </p>
 </details>
 

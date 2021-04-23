@@ -236,40 +236,6 @@ func (sub *RPCEthSubscription) Subscribe(subscriptionName RPCEthSubscriptionPara
 	return
 }
 
-type RPCDebugSubscription struct{}
-
-// Unsubscribe terminates an existing subscription by ID.
-func (sub *RPCDebugSubscription) Unsubscribe(id rpc.ID) error {
-	// This is a mock function, not the real one.
-	return nil
-}
-
-type RPCDebugSubscriptionParamsName string
-
-// Subscribe creates a subscription to an event channel.
-// Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
-func (sub *RPCDebugSubscription) Subscribe(subscriptionName RPCDebugSubscriptionParamsName, subscriptionOptions interface{}) (subscriptionID rpc.ID, err error) {
-	// This is a mock function, not the real one.
-	return
-}
-
-type RPCTraceSubscription struct{}
-
-// Unsubscribe terminates an existing subscription by ID.
-func (sub *RPCTraceSubscription) Unsubscribe(id rpc.ID) error {
-	// This is a mock function, not the real one.
-	return nil
-}
-
-type RPCTraceSubscriptionParamsName string
-
-// Subscribe creates a subscription to an event channel.
-// Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
-func (sub *RPCTraceSubscription) Subscribe(subscriptionName RPCTraceSubscriptionParamsName, subscriptionOptions interface{}) (subscriptionID rpc.ID, err error) {
-	// This is a mock function, not the real one.
-	return
-}
-
 // registerOpenRPCAPIs provides a convenience logic that is reused
 // congruent to the rpc package receiver registrations.
 func registerOpenRPCAPIs(doc *go_openrpc_reflect.Document, apis []rpc.API) {
@@ -379,20 +345,6 @@ var rpcEthSubscriptionParamsNameD = `{
 		]
 	}`
 
-var rpcDebugSubscriptionParamsNameD = `{
-		"title": "subscriptionName",
-		"oneOf": [
-			{"type": "string", "enum": ["traceChain"], "description": "Returns transaction traces within a range of blocks."}
-		]
-	}`
-
-var rpcTraceSubscriptionParamsNameD = `{
-		"title": "subscriptionName",
-		"oneOf": [
-			{"type": "string", "enum": ["filter"], "description": "Returns transaction traces for the filtered addresses within a range of blocks."}
-		]
-	}`
-
 // schemaDictEntry represents a type association passed to the jsonschema reflector.
 type schemaDictEntry struct {
 	example interface{}
@@ -437,8 +389,6 @@ func OpenRPCJSONSchemaTypeMapper(ty reflect.Type) *jsonschema.Type {
 		{rpc.Subscription{}, rpcSubscriptionIDD},
 		{rpc.ID(""), rpcSubscriptionIDD},
 		{RPCEthSubscriptionParamsName(""), rpcEthSubscriptionParamsNameD},
-		{RPCDebugSubscriptionParamsName(""), rpcDebugSubscriptionParamsNameD},
-		{RPCTraceSubscriptionParamsName(""), rpcTraceSubscriptionParamsNameD},
 	}
 
 	for _, d := range dict {

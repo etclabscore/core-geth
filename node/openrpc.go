@@ -142,8 +142,7 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 		// the mock subscription receiver type RPCSubscription.
 		// This pattern matches all strings that start with Subscribe and are suffixed with a non-zero
 		// number of A-z characters.
-		if isPubSub(method.Type) {
-			// This catches MOST of them (except SubscribeSyncStatus)
+		if isPubSub(method.Type) && method.Type.In(0) == reflect.TypeOf(&eth.PublicEthereumAPI{}) {
 			return false
 		}
 		// Reject all methods that use a channel in the their argument params.

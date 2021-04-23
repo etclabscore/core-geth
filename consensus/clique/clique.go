@@ -471,7 +471,7 @@ func (c *Clique) verifySeal(chain consensus.ChainHeaderReader, header *types.Hea
 		if recent == signer {
 			// Signer is among recents, only fail if the current block doesn't shift it out
 			if limit := uint64(len(snap.Signers)/2 + 1); seen > number-limit {
-				return errRecentlySigned
+				return fmt.Errorf("%w: limit=%d seen=%d number=%d number-limit=%d", errRecentlySigned, limit, seen, number, number-limit)
 			}
 		}
 	}
@@ -704,6 +704,10 @@ func (c *Clique) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, pr
 	// Proposed (external) total difficulty is equal to or equivalent local.
 	if proposedTD.Cmp(currentTD) > 0 {
 		return true, nil
+	}
+
+	if c.config.EIP3436Transition == nil || c.config.EIP3436Transition.Cmp(current.Number) > 0 {
+		return false, nil
 	}
 
 	// Blocks have same total difficulty.

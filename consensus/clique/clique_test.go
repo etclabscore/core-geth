@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -32,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/holiman/uint256"
 )
 
 // This test case is a repro of an annoying bug that took us forever to catch.
@@ -118,11 +120,36 @@ func TestReimportMirroredState(t *testing.T) {
 }
 
 func TestClique_EIP3436_Scenario1(t *testing.T) {
-
 	scenarios := []struct {
-		lenSigners   int
+		// The number of signers (aka validators).
+		// These addresses will be randomly generated on demand for each scenario
+		// and sorted per status quo Clique spec.
+		// They are referenced by their cardinality in this sorted list.
+		lenSigners int
+
+		// commonBlocks defines blocks by which validator should sign them.
+		// Validators are referenced by their index in the sorted signers list,
+		// which sorts by address.
 		commonBlocks []int
-		forks        [][]int
+
+		// forks defines blocks by which validator should sign them.
+		// These forks will be generated and attempted to be imported into
+		// the chain. We expect that import should always succeed for all blocks,
+		// with this test measuring only if the expected fork head actually gets
+		// canonical preference.
+		forks [][]int
+
+		// assertions are functions used to assert the expectations of
+		// fork heads in chain context against the specification's requirements, eg.
+		// make sure that the forks really do have equal total difficulty, or equal block numbers.
+		// This way we know that the deciding condition for achieving canonical status
+		// really is what we think it is (and not, eg. total difficulty).
+
+		assertions []func(chain *core.BlockChain, forkHeads ...*types.Header)
+
+		// canonicalForkIndex takes variadic fork heads and tells us which
+		// should get canonical preference (by index).
+		canonicalForkIndex func(forkHeads ...*types.Header) int
 	}{
 		{
 			// SCENARIO-1
@@ -170,16 +197,142 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 				8H        x-
 			*/
 			lenSigners:   8,
-			commonBlocks: []int{0, 1, 2, 3, 4, 5, 6, 7},
+			commonBlocks: []int{1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7},
 			forks: [][]int{
-				{0, 2},
-				{1, 3, 5},
+				{1, 3, 5}, // 2, 4, 6
+				{0, 2},    // 1, 3
+			},
+			canonicalForkIndex: func(forkHeads ...*types.Header) int {
+				// Prefer the shorter fork.
+				minHeight := math.MaxBig63.Uint64()
+				n := -1
+				for i, head := range forkHeads {
+					if h := head.Number.Uint64(); h < minHeight {
+						n = i
+						minHeight = h
+					}
+				}
+				return n
+			},
+			assertions: []func(chain *core.BlockChain, forkHeads ...*types.Header){
+				// Assert that the net total difficulties of each fork are equal.
+				func(chain *core.BlockChain, forkHeads ...*types.Header) {
+					d := new(big.Int)
+					for i, head := range forkHeads {
+						td := chain.GetTd(head.Hash(), head.Number.Uint64())
+						if i == 0 {
+							d.Set(td)
+							continue
+						}
+						if d.Cmp(td) != 0 {
+							t.Fatalf("want equal fork heads total difficulty")
+						}
+					}
+				},
+			},
+		},
+		{
+			// SCENARIO-2
+
+			/*
+					Step 1
+					For the second scenario with the same validator set and in-order chain with
+					validator 7 having just produced an in order block, then validators 7 and 8 go offline.
+
+					1A x
+					2B  x
+					3C   x
+					4D    x
+					5E     x
+					6F      x
+					7G       x
+					8H
+
+					1A x
+					2B  x
+					3C   x
+					4D    x
+					5E     x
+					6F      x
+					7G       x-
+					8H        -
+
+					Two forks form, 1,3,5 on one side and 2,4,6 on the other.
+					Both forks become aware of the other fork after producing their third block.
+					In this case both forks have equal total difficulty and equal length.
+
+					1A x       x
+					2B  x      y
+					3C   x      x
+					4D    x     y
+					5E     x     x
+					6F      x    y
+					7G       x-
+					8H        -
+
+				FIXME(meowsbits): This scenario yields a "recently signed" error
+				when attempting to import Signer 5 (really #6 b/c zero-indexing) into the
+				second fork.
+
+				On that fork, the sequence of signers is specified to be
+				... 7, 0, 1, 2, 3, 4, 5, 6, 1, 3, 5
+
+				(vs. the other fork)
+				... 7, 0, 1, 2, 3, 4, 5, 6, 0, 2, 4
+
+				The condition for "recently signed" is (from *Clique#verifySeal):
+
+				// Signer is among recents, only fail if the current block doesn't shift it out
+				if limit := uint64(len(snap.Signers)/2 + 1); seen > number-limit {
+					return errRecentlySigned
+				}
+
+				Evaluated, this yields
+
+				=> recently signed: limit=(8/2+1)=5 seen=13 number=17 number-limit=12
+
+			*/
+			lenSigners:   8,
+			commonBlocks: []int{1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6},
+			forks: [][]int{
+				{0, 2, 4}, // 1, 3, 5
+				{1, 3, 5}, //  2, 4, 6
+			},
+			canonicalForkIndex: func(forkHeads ...*types.Header) int {
+				// Prefer the lowest hash.
+				minHashV, _ := uint256.FromBig(big.NewInt(0))
+				n := -1
+				for i, head := range forkHeads {
+					if hv, _ := uint256.FromHex(head.Hash().Hex()); n == -1 || hv.Cmp(minHashV) < 0 {
+						minHashV.Set(hv)
+						n = i
+					}
+				}
+				return n
+			},
+			assertions: []func(chain *core.BlockChain, forkHeads ...*types.Header){
+				// Assert that the net total difficulties of each fork are equal.
+				func(chain *core.BlockChain, forkHeads ...*types.Header) {
+					d := new(big.Int)
+					n := new(big.Int)
+					for i, head := range forkHeads {
+						td := chain.GetTd(head.Hash(), head.Number.Uint64())
+						if i == 0 {
+							n.Set(head.Number)
+							d.Set(td)
+							continue
+						}
+						if d.Cmp(td) != 0 {
+							t.Fatalf("want equal fork heads total difficulty")
+						}
+						if n.Cmp(head.Number) != 0 {
+							t.Fatalf("want equal fork head numbers")
+						}
+					}
+				},
 			},
 		},
 	}
-
-	// validators: 8
-	//
 
 	for ii, tt := range scenarios {
 		// Create the account pool and generate the initial set of signerAddressesSorted
@@ -189,10 +342,13 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 
 		// Assemble a chain of headers from the cast votes
 		config := *params.TestChainConfig
+
 		cliquePeriod := uint64(1)
+		config.Ethash = nil
 		config.Clique = &ctypes.CliqueConfig{
-			Period: cliquePeriod,
-			Epoch:  0,
+			Period:            cliquePeriod,
+			Epoch:             0,
+			EIP3436Transition: big.NewInt(0), // TODO: pull this out at add negative test cases (showing that w/o EIP-3436 expectations fail).
 		}
 		engine := New(config.Clique, db)
 		engine.fakeDiff = false
@@ -209,6 +365,7 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 			}
 		}
 
+		// Pretty logging of the sorted signers list.
 		logSortedSigners := ""
 		for j, s := range signerAddressesSorted {
 			logSortedSigners += fmt.Sprintf("%d: (%s) %s\n", j, accountsPool.name(s), s.Hex())
@@ -232,17 +389,15 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 			continue
 		}
 
-		// mustMakeChain := func(parent *types.Block, blocksSigners []string)
-
-		// Build the common segment
-		commonSegmentBlocks := []*types.Block{genesisBlock}
-		for i := 0; i < len(tt.commonBlocks); i++ {
-
-			signerIndex := tt.commonBlocks[i]
+		// getNextBlockWithSigner generates a block given a parent block and the
+		// signer index of the validator that should sign it.
+		// It will use the Clique snapshot function to see if the signer is in turn or not,
+		// and will assign difficulty appropriately.
+		// After signing, it sanity-checks the Engine.Author method against the newly-signed
+		// block value to make sure that signing is done properly.
+		getNextBlockWithSigner := func(parentBlock *types.Block, signerIndex int) *types.Block {
 			signerAddress := signerAddressesSorted[signerIndex]
 			signerName := accountsPool.name(signerAddress)
-
-			parentBlock := commonSegmentBlocks[len(commonSegmentBlocks)-1]
 
 			generatedBlocks, _ := core.GenerateChain(&config, parentBlock, engine, db, 1, nil)
 			block := generatedBlocks[0]
@@ -261,7 +416,8 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 			if err != nil {
 				t.Fatalf("snap err: %v", err)
 			}
-			if !snap.inturn(parentBlock.NumberU64()+1, signerAddress) {
+			inturn := snap.inturn(parentBlock.NumberU64()+1, signerAddress)
+			if !inturn {
 				difficulty = diffNoTurn
 			}
 			header.Difficulty = difficulty
@@ -269,12 +425,13 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 			// Generate the signature, embed it into the header and the block.
 			header.Extra = make([]byte, extraVanity+extraSeal) // allocate byte slice
 
-			t.Logf("SIGNING: %d (%s) %s\n", i+1, signerName, signerAddress.Hex())
+			t.Logf("SIGNING: %d (%s) %v %s\n", signerIndex, signerName, inturn, signerAddress.Hex())
 
 			// Sign the header with the associated validator's key.
 			accountsPool.sign(header, signerName)
 
-			// Double check to see what Clique thinks the signer of this block is.
+			// Double check to see what the Clique Engine thinks the signer of this block is.
+			// It obviously should be the address we just used.
 			author, err := engine.Author(header)
 			if err != nil {
 				t.Fatalf("author error: %v", err)
@@ -283,18 +440,73 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 				t.Fatalf("header author != wanted signer: author: %s, signer: %s", author.Hex(), wantSigner.Hex())
 			}
 
-			generatedBlocks[0] = block.WithSeal(header)
-
-			commonSegmentBlocks = append(commonSegmentBlocks, generatedBlocks...) // == generatedBlocks[0]
-
-			if k, err := chain.InsertChain(generatedBlocks); err != nil || k != 1 {
-				t.Fatalf("case: %d, failed to import block %d, count: %d, err: %v", ii, i, k, err)
-			}
+			return block.WithSeal(header)
 		}
 
-		// for scenarioForkIndex, forkBlockSigners := range tt.forks {
-		//
-		// }
+		// Build the common segment
+		commonSegmentBlocks := []*types.Block{genesisBlock}
+		for i := 0; i < len(tt.commonBlocks); i++ {
 
+			signerIndex := tt.commonBlocks[i]
+			parentBlock := commonSegmentBlocks[len(commonSegmentBlocks)-1]
+
+			bl := getNextBlockWithSigner(parentBlock, signerIndex)
+
+			if k, err := chain.InsertChain([]*types.Block{bl}); err != nil || k != 1 {
+				t.Fatalf("case: %d, failed to import block %d, count: %d, err: %v", ii, i, k, err)
+			}
+
+			commonSegmentBlocks = append(commonSegmentBlocks, bl) // == generatedBlocks[0]
+		}
+
+		t.Logf("--- COMMON SEGMENT, td=%v", chain.GetTd(chain.CurrentHeader().Hash(), chain.CurrentHeader().Number.Uint64()))
+
+		forkHeads := make([]*types.Header, len(tt.forks))
+		forkTDs := make([]*big.Int, len(tt.forks))
+
+		// Create and import blocks for all the scenario's forks.
+		for scenarioForkIndex, forkBlockSigners := range tt.forks {
+
+			forkBlocks := make([]*types.Block, len(commonSegmentBlocks))
+			for i, b := range commonSegmentBlocks {
+				bcopy := &types.Block{}
+				*bcopy = *b
+				forkBlocks[i] = bcopy
+			}
+
+			for si, signerInt := range forkBlockSigners {
+
+				parent := forkBlocks[len(forkBlocks)-1]
+				bl := getNextBlockWithSigner(parent, signerInt)
+
+				if k, err := chain.InsertChain([]*types.Block{bl}); err != nil || k != 1 {
+					t.Fatalf("case: %d, failed to import block %d, count: %d, err: %v", ii, si, k, err)
+				} else {
+					t.Logf("INSERTED block.n=%d TD=%v", bl.NumberU64(), chain.GetTd(bl.Hash(), bl.NumberU64()))
+				}
+				forkBlocks = append(forkBlocks, bl)
+
+			} // End fork block imports.
+
+			forkHeads[scenarioForkIndex] = chain.CurrentHeader()
+			forkTDs[scenarioForkIndex] = chain.GetTd(chain.CurrentHeader().Hash(), chain.CurrentHeader().Number.Uint64())
+
+		} // End scenario fork imports.
+
+		// Run arbitrary assertion tests, ie. make sure that we've created forks that meet
+		// the expected scenario characteristics.
+		for _, f := range tt.assertions {
+			f(chain, forkHeads...)
+		}
+
+		// Finally, check that the current chain head matches the
+		// head of the wanted fork index.
+		if chain.CurrentHeader().Hash() != forkHeads[tt.canonicalForkIndex(forkHeads...)].Hash() {
+			forkHeadHashes := ""
+			for i, fh := range forkHeads {
+				forkHeadHashes += fmt.Sprintf("%d: %s td=%v\n", i, fh.Hash().Hex(), forkTDs[i])
+			}
+			t.Fatalf(`wrong fork index head: got: %s\nFork heads:\n%s`, chain.CurrentHeader().Hash().Hex(), forkHeadHashes)
+		}
 	}
 }

@@ -489,8 +489,6 @@ func testCliqueEIP3436(t *testing.T, testConfig cliqueEIP3436TestCase) {
 		// Generate the signature, embed it into the header and the block.
 		header.Extra = make([]byte, extraVanity+extraSeal) // allocate byte slice
 
-		t.Logf("SIGNING: %d (%s) %v %s\n", signerIndex, signerName, inturn, signerAddress.Hex())
-
 		// Sign the header with the associated validator's key.
 		accountsPool.sign(header, signerName)
 
@@ -505,7 +503,8 @@ func testCliqueEIP3436(t *testing.T, testConfig cliqueEIP3436TestCase) {
 		}
 
 		out := block.WithSeal(header)
-		t.Logf("BLOCK:   %x", out.Hash().Bytes()[:8])
+		t.Logf("BLOCK: num=%d hash=%x [signer.o=%d signer.name=%s signer.inturn=%v %x]\n", out.NumberU64(), out.Hash().Bytes()[:8],
+			signerIndex, signerName, inturn, signerAddress.Hex()[:8])
 		return out
 	}
 
@@ -548,11 +547,12 @@ func testCliqueEIP3436(t *testing.T, testConfig cliqueEIP3436TestCase) {
 			if k, err := chain.InsertChain([]*types.Block{bl}); err != nil || k != 1 {
 				t.Fatalf("failed to import block %d, count: %d, err: %v", si, k, err)
 			} else {
-				t.Logf("INSERTED block.n=%d TD=%v", bl.NumberU64(), chain.GetTd(bl.Hash(), bl.NumberU64()))
+				t.Logf("INSERTED TD=%v", chain.GetTd(bl.Hash(), bl.NumberU64()))
 			}
 			forkBlocks = append(forkBlocks, bl)
 
 		} // End fork block imports.
+		t.Logf("--- FORK: %d", scenarioForkIndex)
 
 		forkHeads[scenarioForkIndex] = forkBlocks[len(forkBlocks)-1].Header()
 		forkTDs[scenarioForkIndex] = chain.GetTd(chain.CurrentHeader().Hash(), chain.CurrentHeader().Number.Uint64())

@@ -575,7 +575,7 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 				t.Fatalf("case: %d, failed to import block %d, count: %d, err: %v", ii, i, k, err)
 			}
 
-			commonSegmentBlocks = append(commonSegmentBlocks, bl) // == generatedBlocks[0]
+			commonSegmentBlocks = append(commonSegmentBlocks, bl)
 		}
 
 		t.Logf("--- COMMON SEGMENT, td=%v", chain.GetTd(chain.CurrentHeader().Hash(), chain.CurrentHeader().Number.Uint64()))
@@ -607,8 +607,6 @@ func TestClique_EIP3436_Scenario1(t *testing.T) {
 
 			} // End fork block imports.
 
-			// head := &types.Header{}
-			// *head = *chain.CurrentHeader()
 			forkHeads[scenarioForkIndex] = forkBlocks[len(forkBlocks)-1].Header()
 			forkTDs[scenarioForkIndex] = chain.GetTd(chain.CurrentHeader().Hash(), chain.CurrentHeader().Number.Uint64())
 

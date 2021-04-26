@@ -707,6 +707,8 @@ func (c *Clique) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, pr
 		return true, nil
 	}
 
+	fmt.Println("Clique.EC: difficulty ==")
+
 	// Blocks have same total difficulty.
 
 	// 2. Lesser block height
@@ -717,6 +719,8 @@ func (c *Clique) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, pr
 		return true, nil
 	}
 
+	fmt.Println("Clique.EC: number ==")
+
 	// Blocks have same number.
 
 	// EIP3436 says that the status quo preference algorithm is limited
@@ -725,6 +729,7 @@ func (c *Clique) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, pr
 	// In practice, the status quo is/was that the shorter segment is
 	// preferred.
 	if c.config.EIP3436Transition == nil || c.config.EIP3436Transition.Cmp(current.Number) > 0 {
+		fmt.Println("Clique.EC: EIP3436 DISABLED")
 		return false, nil
 	}
 
@@ -758,13 +763,16 @@ Clients should choose the block with the largest value. Note that an in-turn blo
 When resolving rule 4 the hash should be converted into an unsigned 256 bit integer.
 */
 func (c *Clique) Eip3436Rule3rule4(chain consensus.ChainHeaderReader, current, proposed *types.Header) (acceptProposed bool, err error) {
+	fmt.Println("Clique.EC: Rule3")
 	want, err := c.Eip3436Rule3(chain, current, proposed)
 	if err != nil {
+		fmt.Println("Clique.EC: Rule3 err", err)
 		return false, err
 	}
 	if want == (common.Address{}) {
 		// Rule 3 was a tie.
 		// Use Rule 4.
+		fmt.Println("Clique.EC: Rule4")
 		return c.Eip3436Rule4(current, proposed)
 	}
 	// Rule 3 was decisive.
@@ -781,7 +789,10 @@ func (c *Clique) Eip3436Rule3rule4(chain consensus.ChainHeaderReader, current, p
 // Eip3436Rule3 selects the block (header) whose validator had the least recent in-turn block assignment.
 // If the compared signer addresses yield an equivalent value  this is considered non-definitive and
 // an empty value is returned.
-func (c *Clique) Eip3436Rule3(chain consensus.ChainHeaderReader, current, proposed *types.Header) (common.Address, error) {
+func (c *Clique) Eip3436Rule3(chain consensus.ChainHeaderReader, current, proposed *types.Header) (preferredAuthor common.Address, err error) {
+	defer func() {
+		fmt.Println("EIP3436 Rule3 prefer author", preferredAuthor.Hex()[:8])
+	}()
 	snap, err := c.snapshot(chain, current.Number.Uint64()-1, current.ParentHash, nil)
 	if err != nil {
 		return common.Address{}, err

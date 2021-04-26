@@ -20,10 +20,12 @@ import (
 	"bytes"
 	"fmt"
 	"math/big"
+	"sort"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -52,6 +54,14 @@ type cliqueEIP3436TestCase struct {
 	// with this test measuring only if the expected fork head actually gets
 	// canonical preference.
 	forks [][]int
+
+	// orderForkImport elects the order in which to import the generated forks.
+	// We need this because if we're testing for a random value like lowest hash (asserting
+	// that the chain with the head having the lowest hash prevails), then
+	// we need to make sure that that fork gets imported second so that we don't incidentally
+	// use arbitrary canonical-election preferences.
+	// If nil, the defined (coded) order will be used.
+	orderForkImport func(forks [][]*types.Block) [][]*types.Block
 
 	// assertions are functions used to assert the expectations of
 	// fork heads in chain context against the specification's requirements, eg.
@@ -152,7 +162,9 @@ func TestCliqueEIP3436_Scenario1_negative(t *testing.T) {
 	})
 }
 
+// FIXME
 func TestCliqueEIP3436_Scenario2_positive(t *testing.T) {
+	t.Skip("scenario invalid by design")
 	testCliqueEIP3436(t, cliqueEIP3436TestCase{
 		// SCENARIO-2
 
@@ -213,7 +225,7 @@ func TestCliqueEIP3436_Scenario2_positive(t *testing.T) {
 
 			=> recently signed: limit=(8/2+1)=5 seen=13 number=17 number-limit=12
 
-			RESOLUTION (tentative): Use forks with length 2 instead of 3.
+			RESOLUTION?(tentative): Use forks with length 2 instead of 3.
 
 		*/
 		lenSigners:   8,
@@ -256,6 +268,7 @@ func TestCliqueEIP3436_Scenario2_negative(t *testing.T) {
 	})
 }
 
+// FIXME
 func TestCliqueEIP3436_Scenario3_positive(t *testing.T) {
 	testCliqueEIP3436(t, cliqueEIP3436TestCase{
 		// SCENARIO-3
@@ -304,6 +317,16 @@ func TestCliqueEIP3436_Scenario3_positive(t *testing.T) {
 			{0, 3, 2},
 			{1, 7, 4},
 		},
+		orderForkImport: func(forks [][]*types.Block) [][]*types.Block {
+			sf := sortableForks_hashDescending(forks)
+			sort.Sort(sf)
+			headsOrdered := []string{}
+			for _, s := range sf {
+				headsOrdered = append(headsOrdered, s[len(s)-1].Hash().Hex()[:8])
+			}
+			t.Logf("SORTED DESC: %s", headsOrdered)
+			return sf
+		},
 		assertions: []func(t *testing.T, chain *core.BlockChain, forkHeads ...*types.Header){
 			assertEqualTotalDifficulties,
 			assertEqualNumbers,
@@ -311,6 +334,26 @@ func TestCliqueEIP3436_Scenario3_positive(t *testing.T) {
 		},
 		cliqueConfig: cliqueConfigEIP3436,
 	})
+}
+
+type sortableForks_hashDescending [][]*types.Block
+
+func (sf sortableForks_hashDescending) Len() int {
+	return len(sf)
+}
+
+func (sf sortableForks_hashDescending) Less(i, j int) bool {
+	heads := make([]*types.Header, sf.Len())
+	for i2, i3 := range sf {
+		if i2 == i || i2 == j {
+			heads[i2] = i3[len(i3)-1].Header()
+		}
+	}
+	return lowerHash(nil, heads...) == 0
+}
+
+func (sf sortableForks_hashDescending) Swap(i, j int) {
+	sf[i], sf[j] = sf[j], sf[i]
 }
 
 func testCliqueEIP3436(t *testing.T, testConfig cliqueEIP3436TestCase) {
@@ -369,7 +412,7 @@ func testCliqueEIP3436(t *testing.T, testConfig cliqueEIP3436TestCase) {
 	// and will assign difficulty appropriately.
 	// After signing, it sanity-checks the Engine.Author method against the newly-signed
 	// block value to make sure that signing is done properly.
-	getNextBlockWithSigner := func(parentBlock *types.Block, signerIndex int) *types.Block {
+	getNextBlockWithSigner := func(chr consensus.ChainHeaderReader, parentBlock *types.Block, signerIndex int) *types.Block {
 		signerAddress := signerAddressesSorted[signerIndex]
 		signerName := accountsPool.name(signerAddress)
 
@@ -386,7 +429,7 @@ func testCliqueEIP3436(t *testing.T, testConfig cliqueEIP3436TestCase) {
 		difficulty := diffInTurn
 
 		// If the snapshot reports this signer is out of turn, use out-of-turn difficulty.
-		snap, err := engine.snapshot(chain, parentBlock.NumberU64(), parentBlock.Hash(), nil)
+		snap, err := engine.snapshot(chr, parentBlock.NumberU64(), parentBlock.Hash(), nil)
 		if err != nil {
 			t.Fatalf("snap err: %v", err)
 		}
@@ -413,10 +456,12 @@ func testCliqueEIP3436(t *testing.T, testConfig cliqueEIP3436TestCase) {
 		}
 
 		out := block.WithSeal(header)
-		t.Logf("BLOCK: num=%d hash=%x signer[%d name=%s inturn=%v addr=%s]\n", out.NumberU64(), out.Hash().Bytes()[:4],
+		t.Logf("BLOCK: num=%d hash=%x d=%d signer[%d name=%s inturn=%v addr=%s]\n", out.NumberU64(), out.Hash().Bytes()[:4], out.Difficulty(),
 			signerIndex, signerName, inturn, signerAddress.Hex()[:8])
 		return out
 	}
+
+	mockHeaderReader := &mockChainHeaderReader{}
 
 	// Build the common segment
 	commonSegmentBlocks := []*types.Block{genesisBlock}
@@ -425,11 +470,12 @@ func testCliqueEIP3436(t *testing.T, testConfig cliqueEIP3436TestCase) {
 		signerIndex := testConfig.commonBlocks[i]
 		parentBlock := commonSegmentBlocks[len(commonSegmentBlocks)-1]
 
-		bl := getNextBlockWithSigner(parentBlock, signerIndex)
+		bl := getNextBlockWithSigner(chain, parentBlock, signerIndex)
 
 		if k, err := chain.InsertChain([]*types.Block{bl}); err != nil || k != 1 {
 			t.Fatalf("failed to import block %d, count: %d, err: %v", i, k, err)
 		}
+		mockHeaderReader.push(bl)
 
 		commonSegmentBlocks = append(commonSegmentBlocks, bl)
 	}
@@ -439,13 +485,18 @@ func testCliqueEIP3436(t *testing.T, testConfig cliqueEIP3436TestCase) {
 	// forkHeads holds the heads of each scenario's fork.
 	forkHeads := make([]*types.Header, len(testConfig.forks))
 
+	// forks will hold the blocks of each fork.
+	// It will be allowed to be mutated by a test configuration function
+	// to pass import order election responsibility to the test configuration.
+	forks := make([][]*types.Block, len(testConfig.forks))
+
 	// Create and import blocks for all the scenario's forks.
 	for scenarioForkIndex, forkBlockSigners := range testConfig.forks {
 
 		forkBlocks := []*types.Block{}
 
 		// Range over the blocks to be created for each fork, defined by the signer of that block.
-		for si, signerInt := range forkBlockSigners {
+		for _, signerInt := range forkBlockSigners {
 
 			var parent *types.Block
 			if len(forkBlocks) == 0 {
@@ -455,27 +506,89 @@ func testCliqueEIP3436(t *testing.T, testConfig cliqueEIP3436TestCase) {
 				parent = forkBlocks[len(forkBlocks)-1]
 			}
 
-			bl := getNextBlockWithSigner(parent, signerInt)
+			bl := getNextBlockWithSigner(mockHeaderReader, parent, signerInt)
 
-			if k, err := chain.InsertChain([]*types.Block{bl}); err != nil || k != 1 {
-				t.Fatalf("failed to import block %d, count: %d, err: %v", si, k, err)
-			} else {
-				t.Logf("INSERTED TD=%v", chain.GetTd(bl.Hash(), bl.NumberU64()))
-			}
+			mockHeaderReader.push(bl)
 			forkBlocks = append(forkBlocks, bl)
 
 		} // End fork block imports.
-		t.Logf("--- FORK: %d", scenarioForkIndex)
+
+		// Purge mock header reader blocks from the last fork, cleaning up for next.
+		mockHeaderReader.blocks = mockHeaderReader.blocks[:len(mockHeaderReader.blocks)-len(forkBlocks)]
+
+		forks[scenarioForkIndex] = forkBlocks
 
 		forkHeads[scenarioForkIndex] = forkBlocks[len(forkBlocks)-1].Header()
 
+		t.Logf("--- FORK: %d len=%d", scenarioForkIndex, len(forkBlocks))
+
 	} // End scenario fork imports.
+
+	// Order the forks if prescribed.
+	if testConfig.orderForkImport != nil {
+		forks = testConfig.orderForkImport(forks)
+	}
+
+	// Finally, import the forks' blocks in the fork order the config wants.
+	for fi, fork := range forks {
+		if k, err := chain.InsertChain(fork); err != nil {
+			t.Fatalf("failed to import block %d, count: %d, err: %v", fi, k, err)
+		} else {
+			bl := fork[len(fork)-1]
+			t.Logf("INSERTED TD=%v", chain.GetTd(bl.Hash(), bl.NumberU64()))
+		}
+	}
 
 	// Run arbitrary assertion tests, ie. make sure that we've created forks that meet
 	// the expected scenario characteristics.
 	for _, f := range testConfig.assertions {
 		f(t, chain, forkHeads...)
 	}
+}
+
+// mockChainHeaderReader implements ChainHeaderReader for testing.
+// We can't use the native Blockchain type because we want to postpone
+// the actual import of blocks, but we still want to be able to use the snapshot method
+// to check in/out-turn of signers.
+type mockChainHeaderReader struct {
+	blocks []*types.Block
+}
+
+func (m *mockChainHeaderReader) push(block *types.Block) {
+	if len(m.blocks) == 0 {
+		m.blocks = []*types.Block{}
+	}
+	m.blocks = append(m.blocks, block)
+}
+
+func (m *mockChainHeaderReader) Config() ctypes.ChainConfigurator {
+	panic("implement me") // disused
+}
+
+func (m *mockChainHeaderReader) CurrentHeader() *types.Header {
+	panic("implement me") // disused
+}
+
+func (m *mockChainHeaderReader) GetHeader(hash common.Hash, number uint64) *types.Header {
+	for _, block := range m.blocks {
+		if block.Hash() == hash && block.NumberU64() == number {
+			return block.Header()
+		}
+	}
+	return nil
+}
+
+func (m *mockChainHeaderReader) GetHeaderByNumber(number uint64) *types.Header {
+	for _, block := range m.blocks {
+		if block.NumberU64() == number {
+			return block.Header()
+		}
+	}
+	return nil
+}
+
+func (m *mockChainHeaderReader) GetHeaderByHash(hash common.Hash) *types.Header {
+	panic("implement me") // disused
 }
 
 // shorterFork defines logic returning the fork head the lower head number.

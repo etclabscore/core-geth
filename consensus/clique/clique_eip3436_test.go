@@ -380,7 +380,7 @@ func testCliqueEIP3436(t *testing.T, testConfig cliqueEIP3436TestCase) {
 
 	signerAddressesSorted := make([]common.Address, testConfig.lenSigners)
 	for i := 0; i < testConfig.lenSigners; i++ {
-		signerAddressesSorted[i] = accountsPool.address(fmt.Sprintf("%s", []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"}[i]))
+		signerAddressesSorted[i] = accountsPool.address([]string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"}[i])
 	}
 	for j := 0; j < len(signerAddressesSorted); j++ {
 		for k := j + 1; k < len(signerAddressesSorted); k++ {

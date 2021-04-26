@@ -239,7 +239,8 @@ func TestCliqueEIP3436_Scenario2_positive(t *testing.T) {
 		assertions: []func(t *testing.T, chain *core.BlockChain, forkHeads ...*types.Header){
 			assertEqualTotalDifficulties,
 			assertEqualNumbers,
-			assertCanonical(lowerHash),
+			// assertEIP3436Head_Rule3Rule4,
+			// assertCanonical(lowerHash),
 		},
 		cliqueConfig: cliqueConfigEIP3436,
 	})
@@ -321,7 +322,7 @@ func TestCliqueEIP3436_Scenario3_positive(t *testing.T) {
 		assertions: []func(t *testing.T, chain *core.BlockChain, forkHeads ...*types.Header){
 			assertEqualTotalDifficulties,
 			assertEqualNumbers,
-			assertCanonical(lowerHash),
+			assertEIP3436Head_Rule3Rule4,
 		},
 		cliqueConfig: cliqueConfigEIP3436,
 	})
@@ -657,6 +658,26 @@ func lowerHash(t *testing.T, forkHeads ...*types.Header) int {
 		}
 	}
 	return n
+}
+
+// assertEIP3436Head_Rule3Rule4 checks that the combined logic of EIP3436's rules 3 and 4
+// meet the outcome state of the got chain.
+func assertEIP3436Head_Rule3Rule4(t *testing.T, chain *core.BlockChain, forkHeads ...*types.Header) {
+	if len(forkHeads) != 2 {
+		t.Fatalf("test only supports 2 heads")
+	}
+	head := chain.CurrentHeader()
+	shouldSecond, err := chain.Engine().(*Clique).Eip3436Rule3rule4(chain, forkHeads[0], forkHeads[1])
+	if err != nil {
+		t.Fatalf("encountered error: %v", err)
+	}
+	want := forkHeads[0]
+	if shouldSecond {
+		want = forkHeads[1]
+	}
+	if head.Hash() != want.Hash() {
+		t.Errorf("want: %s, got: %s", want.Hash().Hex()[:8], head.Hash().Hex()[:8])
+	}
 }
 
 func assertCanonical(forkHeadChooser func(t *testing.T, forkHeads ...*types.Header) int) func(t *testing.T, chain *core.BlockChain, forkHeads ...*types.Header) {

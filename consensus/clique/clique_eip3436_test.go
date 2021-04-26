@@ -317,16 +317,7 @@ func TestCliqueEIP3436_Scenario3_positive(t *testing.T) {
 			{0, 3, 2},
 			{1, 7, 4},
 		},
-		orderForkImport: func(forks [][]*types.Block) [][]*types.Block {
-			sf := sortableForks_hashDescending(forks)
-			sort.Sort(sf)
-			headsOrdered := []string{}
-			for _, s := range sf {
-				headsOrdered = append(headsOrdered, s[len(s)-1].Hash().Hex()[:8])
-			}
-			t.Logf("SORTED DESC: %s", headsOrdered)
-			return sf
-		},
+		orderForkImport: getSortHashDescendingFn(t),
 		assertions: []func(t *testing.T, chain *core.BlockChain, forkHeads ...*types.Header){
 			assertEqualTotalDifficulties,
 			assertEqualNumbers,
@@ -334,6 +325,19 @@ func TestCliqueEIP3436_Scenario3_positive(t *testing.T) {
 		},
 		cliqueConfig: cliqueConfigEIP3436,
 	})
+}
+
+func getSortHashDescendingFn(t *testing.T) func(forks [][]*types.Block) [][]*types.Block {
+	return func(forks [][]*types.Block) [][]*types.Block {
+		sf := sortableForks_hashDescending(forks)
+		sort.Sort(sf)
+		headsOrdered := []string{}
+		for _, s := range sf {
+			headsOrdered = append(headsOrdered, s[len(s)-1].Hash().Hex()[:8])
+		}
+		t.Logf("SORTED DESC: %s", headsOrdered)
+		return sf
+	}
 }
 
 type sortableForks_hashDescending [][]*types.Block

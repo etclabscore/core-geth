@@ -763,16 +763,13 @@ Clients should choose the block with the largest value. Note that an in-turn blo
 When resolving rule 4 the hash should be converted into an unsigned 256 bit integer.
 */
 func (c *Clique) Eip3436Rule3rule4(chain consensus.ChainHeaderReader, current, proposed *types.Header) (acceptProposed bool, err error) {
-	fmt.Println("Clique.EC: Rule3")
 	want, err := c.Eip3436Rule3(chain, current, proposed)
 	if err != nil {
-		fmt.Println("Clique.EC: Rule3 err", err)
 		return false, err
 	}
 	if want == (common.Address{}) {
 		// Rule 3 was a tie.
 		// Use Rule 4.
-		fmt.Println("Clique.EC: Rule4")
 		return c.Eip3436Rule4(current, proposed)
 	}
 	// Rule 3 was decisive.
@@ -790,9 +787,6 @@ func (c *Clique) Eip3436Rule3rule4(chain consensus.ChainHeaderReader, current, p
 // If the compared signer addresses yield an equivalent value  this is considered non-definitive and
 // an empty value is returned.
 func (c *Clique) Eip3436Rule3(chain consensus.ChainHeaderReader, current, proposed *types.Header) (preferredAuthor common.Address, err error) {
-	defer func() {
-		fmt.Println("EIP3436 Rule3 prefer author", preferredAuthor.Hex()[:8])
-	}()
 	snap, err := c.snapshot(chain, current.Number.Uint64()-1, current.ParentHash, nil)
 	if err != nil {
 		return common.Address{}, err

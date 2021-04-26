@@ -19,6 +19,7 @@ package clique
 import (
 	"bytes"
 	"crypto/ecdsa"
+	"errors"
 	"sort"
 	"testing"
 
@@ -475,7 +476,7 @@ func TestClique(t *testing.T) {
 		if failed {
 			continue
 		}
-		if _, err = chain.InsertChain(batches[len(batches)-1]); err != tt.failure {
+		if _, err = chain.InsertChain(batches[len(batches)-1]); !errors.Is(err, tt.failure) {
 			t.Errorf("test %d: failure mismatch: have %v, want %v", i, err, tt.failure)
 		}
 		if tt.failure != nil {

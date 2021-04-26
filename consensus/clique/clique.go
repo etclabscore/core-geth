@@ -707,8 +707,6 @@ func (c *Clique) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, pr
 		return true, nil
 	}
 
-	fmt.Println("Clique.EC: difficulty ==")
-
 	// Blocks have same total difficulty.
 
 	// 2. Lesser block height
@@ -719,8 +717,6 @@ func (c *Clique) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, pr
 		return true, nil
 	}
 
-	fmt.Println("Clique.EC: number ==")
-
 	// Blocks have same number.
 
 	// EIP3436 says that the status quo preference algorithm is limited
@@ -729,7 +725,6 @@ func (c *Clique) ElectCanonical(chain consensus.ChainHeaderReader, currentTD, pr
 	// In practice, the status quo is/was that the shorter segment is
 	// preferred.
 	if c.config.EIP3436Transition == nil || c.config.EIP3436Transition.Cmp(current.Number) > 0 {
-		fmt.Println("Clique.EC: EIP3436 DISABLED")
 		return false, nil
 	}
 

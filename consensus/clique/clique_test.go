@@ -398,6 +398,7 @@ func TestCliqueEIP3436_Scenario3_positive(t *testing.T) {
 		assertions: []func(t *testing.T, chain *core.BlockChain, forkHeads ...*types.Header){
 			assertEqualTotalDifficulties,
 			assertEqualNumbers,
+			assertCanonical(lowerHash),
 		},
 		cliqueConfig: cliqueConfigEIP3436,
 	})
@@ -564,19 +565,6 @@ func testCliqueEIP3436(t *testing.T, testConfig cliqueEIP3436TestCase) {
 	for _, f := range testConfig.assertions {
 		f(t, chain, forkHeads...)
 	}
-
-	// Finally, check that the current chain head matches the
-	// head of the wanted fork index.
-	forkHeadHashes := ""
-	for i, fh := range forkHeads {
-		forkHeadHashes += fmt.Sprintf("%d: %s td=%v\n", i, fh.Hash().Hex(), forkTDs[i])
-	}
-	if chain.CurrentHeader().Hash() != forkHeads[testConfig.canonicalForkIndex(t, forkHeads...)].Hash() {
-		t.Errorf("wrong fork index head: got: %s\nFork heads:\n%s", chain.CurrentHeader().Hash().Hex(), forkHeadHashes)
-	} else {
-		t.Logf("CHAIN CURRENT HEAD: %x", chain.CurrentHeader().Hash().Bytes()[:8])
-		t.Logf("Heads: \n%s", forkHeadHashes)
-	}
 }
 
 // shorterFork defines logic returning the fork head the lower head number.
@@ -588,27 +576,6 @@ func shorterFork(t *testing.T, forkHeads ...*types.Header) int {
 		if h := head.Number.Uint64(); h < minHeight {
 			n = i
 			minHeight = h
-		}
-	}
-	return n
-}
-
-// lowerHash defines logic returning the fork head having the lesser block hash.
-func lowerHash(t *testing.T, forkHeads ...*types.Header) int {
-	// Prefer the lowest hash.
-	minHashV, overflow := uint256.FromBig(big.NewInt(0))
-	if overflow {
-		t.Fatalf("uint256 overflowed: 0")
-	}
-	n := -1
-	for i, head := range forkHeads {
-		hv, err := hashToUint256(head.Hash())
-		if err != nil {
-			t.Fatalf("uint256 err: %v, head.hex: %s", err, head.Hash().Hex())
-		}
-		if n == -1 || hv.Cmp(minHashV) < 0 {
-			minHashV.Set(hv)
-			n = i
 		}
 	}
 	return n
@@ -639,6 +606,44 @@ func assertEqualNumbers(t *testing.T, chain *core.BlockChain, forkHeads ...*type
 		}
 		if n.Cmp(head.Number) != 0 {
 			t.Fatalf("want equal fork head numbers")
+		}
+	}
+}
+
+// lowerHash defines logic returning the fork head having the lesser block hash.
+func lowerHash(t *testing.T, forkHeads ...*types.Header) int {
+	// Prefer the lowest hash.
+	minHashV, overflow := uint256.FromBig(big.NewInt(0))
+	if overflow {
+		t.Fatalf("uint256 overflowed: 0")
+	}
+	n := -1
+	for i, head := range forkHeads {
+		hv, err := hashToUint256(head.Hash())
+		if err != nil {
+			t.Fatalf("uint256 err: %v, head.hex: %s", err, head.Hash().Hex())
+		}
+		if n == -1 || hv.Cmp(minHashV) < 0 {
+			minHashV.Set(hv)
+			n = i
+		}
+	}
+	return n
+}
+
+func assertCanonical(forkHeadChooser func(t *testing.T, forkHeads ...*types.Header) int) func(t *testing.T, chain *core.BlockChain, forkHeads ...*types.Header) {
+	return func(t *testing.T, chain *core.BlockChain, forkHeads ...*types.Header) {
+
+		// Finally, check that the current chain head matches the
+		// head of the wanted fork index.
+		forkHeadHashes := make([]string, len(forkHeads))
+		for i := 0; i < len(forkHeads); i++ {
+			forkHeadHashes[i] = forkHeads[i].Hash().Hex()[:8]
+		}
+		if chain.CurrentHeader().Hash() != forkHeads[forkHeadChooser(t, forkHeads...)].Hash() {
+			t.Errorf("wrong fork index head: got: %s\nFork heads:\n%s", chain.CurrentHeader().Hash().Hex(), forkHeadHashes)
+		} else {
+			t.Logf("CHAIN CURRENT HEAD: %x", chain.CurrentHeader().Hash().Bytes()[:8])
 		}
 	}
 }

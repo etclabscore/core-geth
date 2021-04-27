@@ -110,6 +110,14 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 		"trimNameSpecialChars": trimNameSpecialChars,
 		// contentDescriptorTitle returns the name or description, in that order.
 		"contentDescriptorGenericName": contentDescriptorGenericName,
+		// isSubscribeMethod checks whether the method is a `*_subscribe` method
+		"isSubscribeMethod": func(m *meta_schema.MethodObject) bool {
+			return *m.Result.ContentDescriptorObject.Name == "subscriptionID"
+		},
+		// isSubscriptionableMethod checks whether the method returns a subscription
+		"isSubscriptionableMethod": func(m *meta_schema.MethodObject) bool {
+			return *m.Result.ContentDescriptorObject.Description == "*rpc.Subscription"
+		},
 		// methodFormatJSConsole is a pretty-printer that returns the JS console use example for a method.
 		"methodFormatJSConsole": func(m *meta_schema.MethodObject) string {
 			name := string(*m.Name)
@@ -146,6 +154,40 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 			}
 
 			return fmt.Sprintf(`curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)
+		},
+		// methodFormatCURLSubscription is a pretty printer that returns the websocket's method invocation example string.
+		"methodFormatCURLSubscription": func(m *meta_schema.MethodObject) string {
+			paramNames := ""
+			if m.Params != nil {
+				out := []string{}
+				for _, p := range *m.Params {
+					out = append(out, contentDescriptorGenericName(p.ContentDescriptorObject))
+				}
+				paramNames = strings.Join(out, ", ")
+			}
+
+			return fmt.Sprintf(`wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)
+		},
+		// methodFormatCURLSubscriptionable is a pretty printer that returns the websocket's method invocation example string using the package `*_subscribe` method.
+		"methodFormatCURLSubscriptionable": func(m *meta_schema.MethodObject) string {
+			methodName := string(*m.Name)
+			outParams := []string{}
+
+			methodParts := strings.Split(methodName, "_")
+			if len(methodParts) == 2 {
+				methodName = methodParts[0] + "_subscribe"
+				outParams = append(outParams, fmt.Sprintf("\"%s\"", methodParts[1]))
+			}
+
+			paramNames := ""
+			if m.Params != nil {
+				for _, p := range *m.Params {
+					outParams = append(outParams, contentDescriptorGenericName(p.ContentDescriptorObject))
+				}
+				paramNames = strings.Join(outParams, ", ")
+			}
+
+			return fmt.Sprintf(`wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "%s", "params": [%s]}'`, methodName, paramNames)
 		},
 	})
 
@@ -217,10 +259,17 @@ _None_
 
 #### Client Method Invocation Examples
 
+{{ $shellExample := methodFormatCURL . }}
+{{ if isSubscribeMethod . -}}
+{{ $shellExample = methodFormatCURLSubscription . }}
+{{ else if isSubscriptionableMethod . }}
+{{ $shellExample = methodFormatCURLSubscriptionable . }}
+{{ end }}
+
 === "Shell"
 
 	` + "```" + ` shell
-	{{ methodFormatCURL . }}
+	{{ $shellExample }}
 	` + "```" + `
 
 === "Javascript Console"

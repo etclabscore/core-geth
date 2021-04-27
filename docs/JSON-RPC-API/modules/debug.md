@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:50:40-06:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-27T19:06:39+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -22,7 +22,7 @@ AccountRange enumerates all accounts in the given block and start point in pagin
 
 #### Params (6)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -39,7 +39,7 @@ start <code>[]byte</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -73,7 +73,7 @@ maxResults <code>int</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -139,7 +139,7 @@ incompletes <code>bool</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -277,10 +277,13 @@ incompletes <code>bool</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_accountRange", "params": [<blockNrOrHash>, <start>, <maxResults>, <nocode>, <nostorage>, <incompletes>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_accountRange", "params": [<blockNrOrHash>, <start>, <maxResults>, <nocode>, <nostorage>, <incompletes>]}'
 	```
 
 === "Javascript Console"
@@ -333,7 +336,7 @@ func (api *PublicDebugAPI) AccountRange(blockNrOrHash rpc.BlockNumberOrHash, sta
 	return stateDb.IteratorDump(nocode, nostorage, incompletes, start, maxResults), nil
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L382" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L389" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -349,7 +352,7 @@ the pattern syntax.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -368,10 +371,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_backtraceAt", "params": [<location>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_backtraceAt", "params": [<location>]}'
 	```
 
 === "Javascript Console"
@@ -390,7 +396,7 @@ func (*HandlerT) BacktraceAt(location string) error {
 // the pattern syntax.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L68" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L68" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -407,7 +413,7 @@ desired, set the rate and write the profile manually.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -424,7 +430,7 @@ nsec <code>uint</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -460,10 +466,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_blockProfile", "params": [<file>, <nsec>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_blockProfile", "params": [<file>, <nsec>]}'
 	```
 
 === "Javascript Console"
@@ -486,7 +495,7 @@ func (*HandlerT) BlockProfile(file string, nsec uint) error {
 // desired, set the rate and write the profile manually.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L147" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L147" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -510,10 +519,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_chaindbCompact", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_chaindbCompact", "params": []}'
 	```
 
 === "Javascript Console"
@@ -539,7 +551,7 @@ func (api *PrivateDebugAPI) ChaindbCompact() error {
 	return nil
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L2004" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2069" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -554,7 +566,7 @@ ChaindbProperty returns leveldb properties of the key-value database.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -581,10 +593,13 @@ property <code>string</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_chaindbProperty", "params": [<property>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_chaindbProperty", "params": [<property>]}'
 	```
 
 === "Javascript Console"
@@ -607,7 +622,7 @@ func (api *PrivateDebugAPI) ChaindbProperty(property string) (string, error) {
 }// ChaindbProperty returns leveldb properties of the key-value database.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1993" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2058" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -623,7 +638,7 @@ profile data to file.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -640,7 +655,7 @@ nsec <code>uint</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -676,10 +691,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_cpuProfile", "params": [<file>, <nsec>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_cpuProfile", "params": [<file>, <nsec>]}'
 	```
 
 === "Javascript Console"
@@ -703,7 +721,7 @@ func (h *HandlerT) CpuProfile(file string, nsec uint) error {
 // profile data to file.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L88" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L88" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -718,7 +736,7 @@ DumpBlock retrieves the entire state of the database at a given block.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -726,7 +744,7 @@ blockNr <code>rpc.BlockNumber</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -793,7 +811,7 @@ blockNr <code>rpc.BlockNumber</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -921,10 +939,13 @@ blockNr <code>rpc.BlockNumber</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_dumpBlock", "params": [<blockNr>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_dumpBlock", "params": [<blockNr>]}'
 	```
 
 === "Javascript Console"
@@ -959,7 +980,7 @@ func (api *PublicDebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error
 }// DumpBlock retrieves the entire state of the database at a given block.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L304" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L304" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -982,10 +1003,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_freeOSMemory", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_freeOSMemory", "params": []}'
 	```
 
 === "Javascript Console"
@@ -1003,7 +1027,7 @@ func (*HandlerT) FreeOSMemory() {
 }// FreeOSMemory forces a garbage collection.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L200" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L200" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1029,7 +1053,7 @@ _None_
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -1137,10 +1161,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_gcStats", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_gcStats", "params": []}'
 	```
 
 === "Javascript Console"
@@ -1160,7 +1187,7 @@ func (*HandlerT) GcStats() *debug.GCStats {
 }// GcStats returns GC statistics.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L80" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L80" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1186,7 +1213,7 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -1484,10 +1511,13 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_getBadBlocks", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getBadBlocks", "params": []}'
 	```
 
 === "Javascript Console"
@@ -1503,24 +1533,30 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 func (api *PrivateDebugAPI) GetBadBlocks(ctx context.Context) ([ // GetBadBlocks returns a list of the last 'bad blocks' that the client has seen on the network
 // and returns them as a JSON list of block-hashes
 ]*BadBlockArgs, error) {
-	blocks := api.eth.BlockChain().BadBlocks()
-	results := make([]*BadBlockArgs, len(blocks))
-	var err error
-	for i, block := range blocks {
-		results[i] = &BadBlockArgs{Hash: block.Hash()}
+	var (
+		err	error
+		blocks	= rawdb.ReadAllBadBlocks(api.eth.chainDb)
+		results	= make([]*BadBlockArgs, 0, len(blocks))
+	)
+	for _, block := range blocks {
+		var (
+			blockRlp	string
+			blockJSON	*ethapi.RPCMarshalBlockT
+		)
 		if rlpBytes, err := rlp.EncodeToBytes(block); err != nil {
-			results[i].RLP = err.Error()
+			blockRlp = err.Error()
 		} else {
-			results[i].RLP = fmt.Sprintf("0x%x", rlpBytes)
+			blockRlp = fmt.Sprintf("0x%x", rlpBytes)
 		}
-		if results[i].Block, err = ethapi.RPCMarshalBlock(block, true, true); err != nil {
-			results[i].Block = &ethapi.RPCMarshalBlockT{Error: err.Error()}
+		if blockJSON, err = ethapi.RPCMarshalBlock(block, true, true); err != nil {
+			blockJSON = &ethapi.RPCMarshalBlockT{Error: err.Error()}
 		}
+		results = append(results, &BadBlockArgs{Hash: block.Hash(), RLP: blockRlp, Block: blockJSON})
 	}
 	return results, nil
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L357" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L357" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1535,7 +1571,7 @@ GetBlockRlp retrieves the RLP encoded for of a single block.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -1543,7 +1579,7 @@ number <code>uint64</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -1587,10 +1623,13 @@ number <code>uint64</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_getBlockRlp", "params": [<number>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getBlockRlp", "params": [<number>]}'
 	```
 
 === "Javascript Console"
@@ -1616,7 +1655,7 @@ func (api *PublicDebugAPI) GetBlockRlp(ctx context.Context, number uint64) (stri
 }// GetBlockRlp retrieves the RLP encoded for of a single block.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1908" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1973" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1635,7 +1674,7 @@ With one parameter, returns the list of accounts modified in the specified block
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -1643,7 +1682,7 @@ startHash <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -1677,7 +1716,7 @@ endHash <code>*common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -1715,7 +1754,7 @@ commonAddress <code>[]common.Address</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -1757,10 +1796,13 @@ commonAddress <code>[]common.Address</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_getModifiedAccountsByHash", "params": [<startHash>, <endHash>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getModifiedAccountsByHash", "params": [<startHash>, <endHash>]}'
 	```
 
 === "Javascript Console"
@@ -1799,7 +1841,7 @@ func (api *PrivateDebugAPI) GetModifiedAccountsByHash(startHash common.Hash, end
 	return api.getModifiedAccounts(startBlock, endBlock)
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L513" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L521" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1818,7 +1860,7 @@ With one parameter, returns the list of accounts modified in the specified block
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -1826,7 +1868,7 @@ startNum <code>uint64</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -1860,7 +1902,7 @@ endNum <code>*uint64</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -1898,7 +1940,7 @@ commonAddress <code>[]common.Address</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -1940,10 +1982,13 @@ commonAddress <code>[]common.Address</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_getModifiedAccountsByNumber", "params": [<startNum>, <endNum>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getModifiedAccountsByNumber", "params": [<startNum>, <endNum>]}'
 	```
 
 === "Javascript Console"
@@ -1982,7 +2027,7 @@ func (api *PrivateDebugAPI) GetModifiedAccountsByNumber(startNum uint64, endNum 
 	return api.getModifiedAccounts(startBlock, endBlock)
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L485" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L493" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1998,7 +2043,7 @@ trace data to file.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -2015,7 +2060,7 @@ nsec <code>uint</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -2051,10 +2096,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_goTrace", "params": [<file>, <nsec>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_goTrace", "params": [<file>, <nsec>]}'
 	```
 
 === "Javascript Console"
@@ -2078,7 +2126,7 @@ func (h *HandlerT) GoTrace(file string, nsec uint) error {
 // trace data to file.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L135" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L135" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2104,7 +2152,7 @@ _None_
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -2508,10 +2556,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_memStats", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_memStats", "params": []}'
 	```
 
 === "Javascript Console"
@@ -2531,7 +2582,7 @@ func (*HandlerT) MemStats() *runtime.MemStats {
 }// MemStats returns detailed runtime memory statistics.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L73" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L73" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2548,7 +2599,7 @@ desired, set the rate and write the profile manually.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -2565,7 +2616,7 @@ nsec <code>uint</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -2601,10 +2652,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_mutexProfile", "params": [<file>, <nsec>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_mutexProfile", "params": [<file>, <nsec>]}'
 	```
 
 === "Javascript Console"
@@ -2627,7 +2681,7 @@ func (*HandlerT) MutexProfile(file string, nsec uint) error {
 // desired, set the rate and write the profile manually.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L168" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L168" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2642,7 +2696,7 @@ Preimage is a debug API function that returns the preimage for a sha3 hash, if k
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -2650,7 +2704,7 @@ hash <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -2689,7 +2743,7 @@ hash <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -2719,10 +2773,13 @@ hash <code>common.Hash</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_preimage", "params": [<hash>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_preimage", "params": [<hash>]}'
 	```
 
 === "Javascript Console"
@@ -2743,7 +2800,7 @@ func (api *PrivateDebugAPI) Preimage(ctx context.Context, hash common.Hash) (hex
 }// Preimage is a debug API function that returns the preimage for a sha3 hash, if known.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L341" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L341" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2758,7 +2815,7 @@ PrintBlock retrieves a block and returns its pretty printed form.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -2766,7 +2823,7 @@ number <code>uint64</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -2810,10 +2867,13 @@ number <code>uint64</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_printBlock", "params": [<number>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_printBlock", "params": [<number>]}'
 	```
 
 === "Javascript Console"
@@ -2835,7 +2895,7 @@ func (api *PublicDebugAPI) PrintBlock(ctx context.Context, number uint64) (strin
 }// PrintBlock retrieves a block and returns its pretty printed form.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1960" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2025" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2851,7 +2911,7 @@ It returns the transaction removed, if any.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -2859,7 +2919,7 @@ hash <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -2898,7 +2958,7 @@ hash <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -2924,10 +2984,13 @@ hash <code>common.Hash</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_removePendingTransaction", "params": [<hash>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_removePendingTransaction", "params": [<hash>]}'
 	```
 
 === "Javascript Console"
@@ -2946,7 +3009,7 @@ func (api *PrivateDebugAPI) RemovePendingTransaction(hash common.Hash) (*types.T
 // It returns the transaction removed, if any.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L565" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L573" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2961,7 +3024,7 @@ SeedHash retrieves the seed hash of a block.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -2969,7 +3032,7 @@ number <code>uint64</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -3013,10 +3076,13 @@ number <code>uint64</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_seedHash", "params": [<number>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_seedHash", "params": [<number>]}'
 	```
 
 === "Javascript Console"
@@ -3041,7 +3107,7 @@ func (api *PublicDebugAPI) SeedHash(ctx context.Context, number uint64) (string,
 }// SeedHash retrieves the seed hash of a block.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1969" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2034" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3057,7 +3123,7 @@ rate 0 disables block profiling.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -3065,7 +3131,7 @@ rate <code>int</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -3101,10 +3167,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_setBlockProfileRate", "params": [<rate>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_setBlockProfileRate", "params": [<rate>]}'
 	```
 
 === "Javascript Console"
@@ -3123,7 +3192,7 @@ func (*HandlerT) SetBlockProfileRate(rate int) {
 // rate 0 disables block profiling.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L156" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L156" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3139,7 +3208,7 @@ setting. A negative value disables GC.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -3147,7 +3216,7 @@ v <code>int</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -3186,7 +3255,7 @@ v <code>int</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -3216,10 +3285,13 @@ v <code>int</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_setGCPercent", "params": [<v>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_setGCPercent", "params": [<v>]}'
 	```
 
 === "Javascript Console"
@@ -3238,7 +3310,7 @@ func (*HandlerT) SetGCPercent(v int) int {
 // setting. A negative value disables GC.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L206" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L206" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3253,7 +3325,7 @@ SetHead rewinds the head of the blockchain to a previous block.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -3261,7 +3333,7 @@ number <code>hexutil.Uint64</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -3297,10 +3369,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_setHead", "params": [<number>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_setHead", "params": [<number>]}'
 	```
 
 === "Javascript Console"
@@ -3318,7 +3393,7 @@ func (api *PrivateDebugAPI) SetHead(number hexutil.Uint64) {
 }// SetHead rewinds the head of the blockchain to a previous block.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L2016" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2081" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3333,7 +3408,7 @@ SetMutexProfileFraction sets the rate of mutex profiling.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -3341,7 +3416,7 @@ rate <code>int</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -3377,10 +3452,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_setMutexProfileFraction", "params": [<rate>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_setMutexProfileFraction", "params": [<rate>]}'
 	```
 
 === "Javascript Console"
@@ -3398,7 +3476,7 @@ func (*HandlerT) SetMutexProfileFraction(rate int) {
 }// SetMutexProfileFraction sets the rate of mutex profiling.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L177" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L177" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3429,10 +3507,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_stacks", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_stacks", "params": []}'
 	```
 
 === "Javascript Console"
@@ -3452,7 +3533,7 @@ func (*HandlerT) Stacks() string {
 }// Stacks returns a printed representation of the stacks of all goroutines.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L193" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L193" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3469,7 +3550,7 @@ local file system and returns a list of files to the caller.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -3477,7 +3558,7 @@ hash <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -3511,7 +3592,7 @@ config <code>*StdTraceConfig</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -3615,7 +3696,7 @@ string <code>[]string</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -3651,10 +3732,13 @@ string <code>[]string</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_standardTraceBadBlockToFile", "params": [<hash>, <config>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_standardTraceBadBlockToFile", "params": [<hash>, <config>]}'
 	```
 
 === "Javascript Console"
@@ -3667,12 +3751,11 @@ string <code>[]string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) StandardTraceBadBlockToFile(ctx context.Context, hash common.Hash, config *StdTraceConfig) ([ // StandardTraceBadBlockToFile dumps the structured logs created during the
+func (api *API) StandardTraceBadBlockToFile(ctx context.Context, hash common.Hash, config *StdTraceConfig) ([ // StandardTraceBadBlockToFile dumps the structured logs created during the
 // execution of EVM against a block pulled from the pool of bad ones to the
 // local file system and returns a list of files to the caller.
 ]string, error) {
-	blocks := api.eth.blockchain.BadBlocks()
-	for _, block := range blocks {
+	for _, block := range rawdb.ReadAllBadBlocks(api.backend.ChainDb()) {
 		if block.Hash() == hash {
 			return api.standardTraceBlockToFile(ctx, block, config)
 		}
@@ -3680,7 +3763,7 @@ func (api *PrivateDebugAPI) StandardTraceBadBlockToFile(ctx context.Context, has
 	return nil, fmt.Errorf("bad block %#x not found", hash)
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api_tracer.go#L446" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L448" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3697,7 +3780,7 @@ to the caller.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -3705,7 +3788,7 @@ hash <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -3739,7 +3822,7 @@ config <code>*StdTraceConfig</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -3843,7 +3926,7 @@ string <code>[]string</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -3879,10 +3962,13 @@ string <code>[]string</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_standardTraceBlockToFile", "params": [<hash>, <config>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_standardTraceBlockToFile", "params": [<hash>, <config>]}'
 	```
 
 === "Javascript Console"
@@ -3895,18 +3981,18 @@ string <code>[]string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) StandardTraceBlockToFile(ctx context.Context, hash common.Hash, config *StdTraceConfig) ([ // StandardTraceBlockToFile dumps the structured logs created during the
+func (api *API) StandardTraceBlockToFile(ctx context.Context, hash common.Hash, config *StdTraceConfig) ([ // StandardTraceBlockToFile dumps the structured logs created during the
 // execution of EVM to the local file system and returns a list of files
 // to the caller.
 ]string, error) {
-	block := api.eth.blockchain.GetBlockByHash(hash)
-	if block == nil {
-		return nil, fmt.Errorf("block %#x not found", hash)
+	block, err := api.blockByHash(ctx, hash)
+	if err != nil {
+		return nil, err
 	}
 	return api.standardTraceBlockToFile(ctx, block, config)
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api_tracer.go#L435" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L437" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3921,7 +4007,7 @@ StartCPUProfile turns on CPU profiling, writing to the given file.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -3940,10 +4026,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_startCPUProfile", "params": [<file>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_startCPUProfile", "params": [<file>]}'
 	```
 
 === "Javascript Console"
@@ -3977,7 +4066,7 @@ func (h *HandlerT) StartCPUProfile(file string) error {
 }// StartCPUProfile turns on CPU profiling, writing to the given file.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L98" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L98" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3992,7 +4081,7 @@ StartGoTrace turns on tracing, writing to the given file.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -4011,10 +4100,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_startGoTrace", "params": [<file>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_startGoTrace", "params": [<file>]}'
 	```
 
 === "Javascript Console"
@@ -4048,7 +4140,7 @@ func (h *HandlerT) StartGoTrace(file string) error {
 }// StartGoTrace turns on tracing, writing to the given file.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/trace.go#L30" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/trace.go#L30" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4071,10 +4163,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_stopCPUProfile", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_stopCPUProfile", "params": []}'
 	```
 
 === "Javascript Console"
@@ -4102,7 +4197,7 @@ func (h *HandlerT) StopCPUProfile() error {
 }// StopCPUProfile stops an ongoing CPU profile.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L119" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L119" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4125,10 +4220,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_stopGoTrace", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_stopGoTrace", "params": []}'
 	```
 
 === "Javascript Console"
@@ -4156,7 +4254,7 @@ func (h *HandlerT) StopGoTrace() error {
 }// StopTrace stops an ongoing trace.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/trace.go#L51" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/trace.go#L51" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4171,7 +4269,7 @@ StorageRangeAt returns the storage at the given block height and transaction ind
 
 #### Params (5)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -4179,7 +4277,7 @@ blockHash <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4213,7 +4311,7 @@ txIndex <code>int</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4247,7 +4345,7 @@ contractAddress <code>common.Address</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4281,7 +4379,7 @@ keyStart <code>hexutil.Bytes</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4315,7 +4413,7 @@ maxResult <code>int</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4354,7 +4452,7 @@ maxResult <code>int</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4436,10 +4534,13 @@ maxResult <code>int</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_storageRangeAt", "params": [<blockHash>, <txIndex>, <contractAddress>, <keyStart>, <maxResult>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_storageRangeAt", "params": [<blockHash>, <txIndex>, <contractAddress>, <keyStart>, <maxResult>]}'
 	```
 
 === "Javascript Console"
@@ -4457,10 +4558,11 @@ func (api *PrivateDebugAPI) StorageRangeAt(blockHash common.Hash, txIndex int, c
 	if block == nil {
 		return StorageRangeResult{}, fmt.Errorf("block %#x not found", blockHash)
 	}
-	_, _, statedb, err := api.computeTxEnv(block, txIndex, 0)
+	_, _, statedb, release, err := api.eth.stateAtTransaction(block, txIndex, 0)
 	if err != nil {
 		return StorageRangeResult{}, err
 	}
+	defer release()
 	st := statedb.StorageTrie(contractAddress)
 	if st == nil {
 		return StorageRangeResult{}, fmt.Errorf("account %x doesn't exist", contractAddress)
@@ -4469,7 +4571,142 @@ func (api *PrivateDebugAPI) StorageRangeAt(blockHash common.Hash, txIndex int, c
 }// StorageRangeAt returns the storage at the given block height and transaction index.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api.go#L440" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L447" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_subscribe
+
+Subscribe creates a subscription to an event channel.
+Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
+
+
+#### Params (2)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+subscriptionName <code>RPCDebugSubscriptionParamsName</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- oneOf: 
+
+			- description: `Returns transaction traces within a range of blocks.`
+			- enum: traceChain
+			- type: string
+
+
+	- title: `subscriptionName`
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "oneOf": [
+            {
+                "description": "Returns transaction traces within a range of blocks.",
+                "enum": [
+                    "traceChain"
+                ],
+                "type": [
+                    "string"
+                ]
+            }
+        ],
+        "title": "subscriptionName"
+    }
+	```
+
+
+
+
+__2:__ 
+subscriptionOptions <code>interface{}</code> 
+
+  + Required: No
+
+
+
+
+
+
+#### Result
+
+
+
+subscriptionID <code>rpc.ID</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+
+
+
+=== "Shell"
+
+	``` shell
+	wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_subscribe", "params": [<subscriptionName>, <subscriptionOptions>]}'
+	```
+
+=== "Javascript Console"
+
+	``` js
+	debug.subscribe(subscriptionName,subscriptionOptions);
+	```
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (sub *RPCDebugSubscription) Subscribe(subscriptionName RPCDebugSubscriptionParamsName, subscriptionOptions interface{}) (subscriptionID rpc.ID, err error) {
+	return
+}// Subscribe creates a subscription to an event channel.
+// Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L251" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4488,7 +4725,7 @@ TODO: Remove this method when the integration is mature
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -4496,7 +4733,7 @@ address <code>common.Address</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4530,7 +4767,7 @@ number <code>uint64</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4569,7 +4806,7 @@ number <code>uint64</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4599,10 +4836,13 @@ number <code>uint64</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_testSignCliqueBlock", "params": [<address>, <number>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_testSignCliqueBlock", "params": [<address>, <number>]}'
 	```
 
 === "Javascript Console"
@@ -4648,7 +4888,7 @@ func (api *PublicDebugAPI) TestSignCliqueBlock(ctx context.Context, address comm
 	return signer, nil
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L1925" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1990" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4665,7 +4905,7 @@ object.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -4673,7 +4913,7 @@ hash <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4707,7 +4947,7 @@ config <code>*TraceConfig</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4733,6 +4973,9 @@ config <code>*TraceConfig</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- NestedTraceOutput: 
+			- type: `boolean`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -4780,6 +5023,9 @@ config <code>*TraceConfig</code>
                 "title": "integer",
                 "type": "string"
             },
+            "NestedTraceOutput": {
+                "type": "boolean"
+            },
             "Reexec": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -4813,7 +5059,7 @@ txTraceResult <code>[]*txTraceResult</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4867,10 +5113,13 @@ txTraceResult <code>[]*txTraceResult</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_traceBadBlock", "params": [<hash>, <config>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceBadBlock", "params": [<hash>, <config>]}'
 	```
 
 === "Javascript Console"
@@ -4883,12 +5132,11 @@ txTraceResult <code>[]*txTraceResult</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) TraceBadBlock(ctx context.Context, hash common.Hash, config *TraceConfig) ([ // TraceBadBlock returns the structured logs created during the execution of
+func (api *API) TraceBadBlock(ctx context.Context, hash common.Hash, config *TraceConfig) ([ // TraceBadBlock returns the structured logs created during the execution of
 // EVM against a block pulled from the pool of bad ones and returns them as a JSON
 // object.
 ]*txTraceResult, error) {
-	blocks := api.eth.blockchain.BadBlocks()
-	for _, block := range blocks {
+	for _, block := range rawdb.ReadAllBadBlocks(api.backend.ChainDb()) {
 		if block.Hash() == hash {
 			return api.traceBlock(ctx, block, config)
 		}
@@ -4896,7 +5144,7 @@ func (api *PrivateDebugAPI) TraceBadBlock(ctx context.Context, hash common.Hash,
 	return nil, fmt.Errorf("bad block %#x not found", hash)
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api_tracer.go#L422" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L425" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4912,7 +5160,7 @@ and returns them as a JSON object.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -4920,7 +5168,7 @@ blob <code>[]byte</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4954,7 +5202,7 @@ config <code>*TraceConfig</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -4980,6 +5228,9 @@ config <code>*TraceConfig</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- NestedTraceOutput: 
+			- type: `boolean`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -5027,6 +5278,9 @@ config <code>*TraceConfig</code>
                 "title": "integer",
                 "type": "string"
             },
+            "NestedTraceOutput": {
+                "type": "boolean"
+            },
             "Reexec": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -5060,7 +5314,7 @@ txTraceResult <code>[]*txTraceResult</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -5114,10 +5368,13 @@ txTraceResult <code>[]*txTraceResult</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_traceBlock", "params": [<blob>, <config>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceBlock", "params": [<blob>, <config>]}'
 	```
 
 === "Javascript Console"
@@ -5130,13 +5387,17 @@ txTraceResult <code>[]*txTraceResult</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) TraceBlock(ctx context.Context, blob [ // TraceBlock returns the structured logs created during the execution of EVM
+func (api *API) TraceBlock(ctx context.Context, blob [ // TraceBlock returns the structured logs created during the execution of EVM
 // and returns them as a JSON object.
 ]byte, config *TraceConfig) ([]*txTraceResult, error) {
-	return traceBlockRLP(ctx, api.eth, blob, config)
+	block := new(types.Block)
+	if err := rlp.Decode(bytes.NewReader(blob), block); err != nil {
+		return nil, fmt.Errorf("could not decode block: %v", err)
+	}
+	return api.traceBlock(ctx, block, config)
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api_tracer.go#L405" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L404" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5152,7 +5413,7 @@ EVM and returns them as a JSON object.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -5160,7 +5421,7 @@ hash <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -5194,7 +5455,7 @@ config <code>*TraceConfig</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -5220,6 +5481,9 @@ config <code>*TraceConfig</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- NestedTraceOutput: 
+			- type: `boolean`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -5267,6 +5531,9 @@ config <code>*TraceConfig</code>
                 "title": "integer",
                 "type": "string"
             },
+            "NestedTraceOutput": {
+                "type": "boolean"
+            },
             "Reexec": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -5300,7 +5567,7 @@ txTraceResult <code>[]*txTraceResult</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -5354,10 +5621,13 @@ txTraceResult <code>[]*txTraceResult</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_traceBlockByHash", "params": [<hash>, <config>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceBlockByHash", "params": [<hash>, <config>]}'
 	```
 
 === "Javascript Console"
@@ -5370,17 +5640,17 @@ txTraceResult <code>[]*txTraceResult</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) TraceBlockByHash(ctx context.Context, hash common.Hash, config *TraceConfig) ([ // TraceBlockByHash returns the structured logs created during the execution of
+func (api *API) TraceBlockByHash(ctx context.Context, hash common.Hash, config *TraceConfig) ([ // TraceBlockByHash returns the structured logs created during the execution of
 // EVM and returns them as a JSON object.
 ]*txTraceResult, error) {
-	block := api.eth.blockchain.GetBlockByHash(hash)
-	if block == nil {
-		return nil, fmt.Errorf("block %#x not found", hash)
+	block, err := api.blockByHash(ctx, hash)
+	if err != nil {
+		return nil, err
 	}
 	return api.traceBlock(ctx, block, config)
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api_tracer.go#L385" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L394" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5396,7 +5666,7 @@ EVM and returns them as a JSON object.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -5404,7 +5674,7 @@ number <code>rpc.BlockNumber</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -5466,7 +5736,7 @@ config <code>*TraceConfig</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -5492,6 +5762,9 @@ config <code>*TraceConfig</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- NestedTraceOutput: 
+			- type: `boolean`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -5539,6 +5812,9 @@ config <code>*TraceConfig</code>
                 "title": "integer",
                 "type": "string"
             },
+            "NestedTraceOutput": {
+                "type": "boolean"
+            },
             "Reexec": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -5572,7 +5848,7 @@ txTraceResult <code>[]*txTraceResult</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -5626,10 +5902,13 @@ txTraceResult <code>[]*txTraceResult</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_traceBlockByNumber", "params": [<number>, <config>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceBlockByNumber", "params": [<number>, <config>]}'
 	```
 
 === "Javascript Console"
@@ -5642,13 +5921,17 @@ txTraceResult <code>[]*txTraceResult</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) TraceBlockByNumber(ctx context.Context, number rpc.BlockNumber, config *TraceConfig) ([ // TraceBlockByNumber returns the structured logs created during the execution of
+func (api *API) TraceBlockByNumber(ctx context.Context, number rpc.BlockNumber, config *TraceConfig) ([ // TraceBlockByNumber returns the structured logs created during the execution of
 // EVM and returns them as a JSON object.
 ]*txTraceResult, error) {
-	return traceBlockByNumber(ctx, api.eth, number, config)
+	block, err := api.blockByNumber(ctx, number)
+	if err != nil {
+		return nil, err
+	}
+	return api.traceBlock(ctx, block, config)
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api_tracer.go#L379" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L384" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5664,7 +5947,7 @@ EVM and returns them as a JSON object.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -5681,7 +5964,7 @@ config <code>*TraceConfig</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -5707,6 +5990,9 @@ config <code>*TraceConfig</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- NestedTraceOutput: 
+			- type: `boolean`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -5754,6 +6040,9 @@ config <code>*TraceConfig</code>
                 "title": "integer",
                 "type": "string"
             },
+            "NestedTraceOutput": {
+                "type": "boolean"
+            },
             "Reexec": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -5787,7 +6076,7 @@ txTraceResult <code>[]*txTraceResult</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -5841,10 +6130,13 @@ txTraceResult <code>[]*txTraceResult</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_traceBlockFromFile", "params": [<file>, <config>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceBlockFromFile", "params": [<file>, <config>]}'
 	```
 
 === "Javascript Console"
@@ -5857,7 +6149,7 @@ txTraceResult <code>[]*txTraceResult</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) TraceBlockFromFile(ctx context.Context, file string, config *TraceConfig) ([ // TraceBlockFromFile returns the structured logs created during the execution of
+func (api *API) TraceBlockFromFile(ctx context.Context, file string, config *TraceConfig) ([ // TraceBlockFromFile returns the structured logs created during the execution of
 // EVM and returns them as a JSON object.
 ]*txTraceResult, error) {
 	blob, err := ioutil.ReadFile(file)
@@ -5867,7 +6159,7 @@ func (api *PrivateDebugAPI) TraceBlockFromFile(ctx context.Context, file string,
 	return api.TraceBlock(ctx, blob, config)
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api_tracer.go#L411" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L414" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5877,14 +6169,15 @@ func (api *PrivateDebugAPI) TraceBlockFromFile(ctx context.Context, file string,
 
 ### debug_traceCall
 
-TraceCall lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
-if the given transaction was added on top of the provided block and returns them as a JSON object.
+TraceCall lets you trace a given eth_call. It collects the structured logs
+created during the execution of EVM if the given transaction was added on
+top of the provided block and returns them as a JSON object.
 You can provide -2 as a block number to trace on top of the pending block.
 
 
 #### Params (3)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -5892,13 +6185,36 @@ args <code>ethapi.CallArgs</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
 	
 	- additionalProperties: `false`
 	- properties: 
+		- accessList: 
+			- items: 
+				- additionalProperties: `false`
+				- properties: 
+					- address: 
+						- pattern: `^0x[a-fA-F\d]{64}$`
+						- title: `keccak`
+						- type: `string`
+
+					- storageKeys: 
+						- items: 
+							- description: `Hex representation of a Keccak 256 hash`
+							- pattern: `^0x[a-fA-F\d]{64}$`
+							- title: `keccak`
+							- type: `string`
+
+						- type: `array`
+
+
+				- type: `object`
+
+			- type: `array`
+
 		- data: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
@@ -5941,6 +6257,29 @@ args <code>ethapi.CallArgs</code>
 	{
         "additionalProperties": false,
         "properties": {
+            "accessList": {
+                "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "address": {
+                            "pattern": "^0x[a-fA-F\\d]{64}$",
+                            "title": "keccak",
+                            "type": "string"
+                        },
+                        "storageKeys": {
+                            "items": {
+                                "description": "Hex representation of a Keccak 256 hash",
+                                "pattern": "^0x[a-fA-F\\d]{64}$",
+                                "title": "keccak",
+                                "type": "string"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
+                },
+                "type": "array"
+            },
             "data": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "dataWord",
@@ -5995,7 +6334,7 @@ config <code>*TraceConfig</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -6021,6 +6360,9 @@ config <code>*TraceConfig</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- NestedTraceOutput: 
+			- type: `boolean`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -6068,6 +6410,9 @@ config <code>*TraceConfig</code>
                 "title": "integer",
                 "type": "string"
             },
+            "NestedTraceOutput": {
+                "type": "boolean"
+            },
             "Reexec": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -6106,10 +6451,13 @@ interface <code>interface{}</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_traceCall", "params": [<args>, <blockNrOrHash>, <config>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceCall", "params": [<args>, <blockNrOrHash>, <config>]}'
 	```
 
 === "Javascript Console"
@@ -6122,37 +6470,776 @@ interface <code>interface{}</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
-	statedb, header, err := api.eth.APIBackend.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
-	if err != nil {
-		var block *types.Block
-		if hash, ok := blockNrOrHash.Hash(); ok {
-			block = api.eth.blockchain.GetBlockByHash(hash)
-		} else if number, ok := blockNrOrHash.Number(); ok {
-			block = api.eth.blockchain.GetBlockByNumber(uint64(number))
-		}
-		if block == nil {
-			return nil, fmt.Errorf("block %v not found: %v", blockNrOrHash, err)
-		}
-		reexec := defaultTraceReexec
-		if config != nil && config.Reexec != nil {
-			reexec = *config.Reexec
-		}
-		_, _, statedb, err = api.computeTxEnv(block, 0, reexec)
-		if err != nil {
-			return nil, err
-		}
+func (api *API) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+	var (
+		err	error
+		block	*types.Block
+	)
+	if hash, ok := blockNrOrHash.Hash(); ok {
+		block, err = api.blockByHash(ctx, hash)
+	} else if number, ok := blockNrOrHash.Number(); ok {
+		block, err = api.blockByNumber(ctx, number)
 	}
-	msg := args.ToMessage(api.eth.APIBackend.RPCGasCap())
-	vmctx := core.NewEVMContext(msg, header, api.eth.blockchain, nil)
-	return api.traceTx(ctx, msg, vmctx, statedb, config)
-}// TraceCall lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
+	if err != nil {
+		return nil, err
+	}
+	reexec := defaultTraceReexec
+	if config != nil && config.Reexec != nil {
+		reexec = *config.Reexec
+	}
+	statedb, release, err := api.backend.StateAtBlock(ctx, block, reexec)
+	if err != nil {
+		return nil, err
+	}
+	defer release()
+	msg := args.ToMessage(api.backend.RPCGasCap())
+	vmctx := core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
+	originalCanTransfer := vmctx.CanTransfer
+	originalTransfer := vmctx.Transfer
+	gasCost := new(big.Int).Mul(new(big.Int).SetUint64(msg.Gas()), msg.GasPrice())
+	totalCost := new(big.Int).Add(gasCost, msg.Value())
+	hasFromSufficientBalanceForValueAndGasCost := vmctx.CanTransfer(statedb, msg.From(), totalCost)
+	hasFromSufficientBalanceForGasCost := vmctx.CanTransfer(statedb, msg.From(), gasCost)
+	vmctx.CanTransfer = func(db vm.StateDB, sender common.Address, amount *big.Int) bool {
+		if msg.From() == sender {
+			return true
+		}
+		res := originalCanTransfer(db, sender, amount)
+		return res
+	}
+	vmctx.Transfer = func(db vm.StateDB, sender, recipient common.Address, amount *big.Int) {
+		toAmount := new(big.Int).Set(amount)
+		senderBalance := db.GetBalance(sender)
+		if senderBalance.Cmp(toAmount) < 0 {
+			toAmount.Set(big.NewInt(0))
+		}
+		originalTransfer(db, sender, recipient, toAmount)
+	}
+	taskExtraContext := map // TraceCall lets you trace a given eth_call. It collects the structured logs
+	// created during the execution of EVM if the given transaction was added on
+	// top of the provided block and returns them as a JSON object.
+	// You can provide -2 as a block number to trace on top of the pending block.
+	// Try to retrieve the specified block
+	[string]interface{}{"hasFromSufficientBalanceForValueAndGasCost": hasFromSufficientBalanceForValueAndGasCost, "hasFromSufficientBalanceForGasCost": hasFromSufficientBalanceForGasCost}
+	return api.traceTx(ctx, msg, vmctx, statedb, taskExtraContext, config)
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L725" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_traceCallMany
+
+TraceCallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
+if the given transaction was added on top of the provided block and returns them as a JSON object.
+You can provide -2 as a block number to trace on top of the pending block.
+
+
+#### Params (3)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+txs <code>[]ethapi.CallArgs</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- items: 
+
+			- additionalProperties: `false`
+			- properties: 
+				- accessList: 
+					- items: 
+						- additionalProperties: `false`
+						- properties: 
+							- address: 
+								- pattern: `^0x[a-fA-F\d]{64}$`
+								- title: `keccak`
+								- type: `string`
+
+							- storageKeys: 
+								- items: 
+									- description: `Hex representation of a Keccak 256 hash`
+									- pattern: `^0x[a-fA-F\d]{64}$`
+									- title: `keccak`
+									- type: `string`
+
+								- type: `array`
+
+
+						- type: `object`
+
+					- type: `array`
+
+				- data: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `dataWord`
+					- type: `string`
+
+				- from: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- gas: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
+					- type: `string`
+
+				- gasPrice: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- to: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- value: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+
+			- type: object
+
+
+	- type: array
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "items": [
+            {
+                "additionalProperties": false,
+                "properties": {
+                    "accessList": {
+                        "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "address": {
+                                    "pattern": "^0x[a-fA-F\\d]{64}$",
+                                    "title": "keccak",
+                                    "type": "string"
+                                },
+                                "storageKeys": {
+                                    "items": {
+                                        "description": "Hex representation of a Keccak 256 hash",
+                                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                                        "title": "keccak",
+                                        "type": "string"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "type": "array"
+                    },
+                    "data": {
+                        "pattern": "^0x([a-fA-F\\d])+$",
+                        "title": "dataWord",
+                        "type": "string"
+                    },
+                    "from": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "gas": {
+                        "pattern": "^0x([a-fA-F\\d])+$",
+                        "title": "uint64",
+                        "type": "string"
+                    },
+                    "gasPrice": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "to": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "value": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    }
+                },
+                "type": [
+                    "object"
+                ]
+            }
+        ],
+        "type": [
+            "array"
+        ]
+    }
+	```
+
+
+
+
+__2:__ 
+blockNrOrHash <code>rpc.BlockNumberOrHash</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+
+__3:__ 
+config <code>*TraceConfig</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- additionalProperties: `false`
+	- properties: 
+		- Debug: 
+			- type: `boolean`
+
+		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableReturnData: 
+			- type: `boolean`
+
+		- DisableStack: 
+			- type: `boolean`
+
+		- DisableStorage: 
+			- type: `boolean`
+
+		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- NestedTraceOutput: 
+			- type: `boolean`
+
+		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Timeout: 
+			- type: `string`
+
+		- Tracer: 
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
+
+
+	- type: object
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "additionalProperties": false,
+        "properties": {
+            "Debug": {
+                "type": "boolean"
+            },
+            "DisableMemory": {
+                "type": "boolean"
+            },
+            "DisableReturnData": {
+                "type": "boolean"
+            },
+            "DisableStack": {
+                "type": "boolean"
+            },
+            "DisableStorage": {
+                "type": "boolean"
+            },
+            "Limit": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "NestedTraceOutput": {
+                "type": "boolean"
+            },
+            "Reexec": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "Timeout": {
+                "type": "string"
+            },
+            "Tracer": {
+                "type": "string"
+            },
+            "overrides": {
+                "additionalProperties": true
+            }
+        },
+        "type": [
+            "object"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+interface <code>interface{}</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+#### Client Method Invocation Examples
+
+
+
+
+=== "Shell"
+
+	``` shell
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceCallMany", "params": [<txs>, <blockNrOrHash>, <config>]}'
+	```
+
+=== "Javascript Console"
+
+	``` js
+	debug.traceCallMany(txs,blockNrOrHash,config);
+	```
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *API) TraceCallMany(ctx context.Context, txs [ // TraceCallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
-// Try to retrieve the specified block
+]ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+	var (
+		err	error
+		block	*types.Block
+	)
+	if hash, ok := blockNrOrHash.Hash(); ok {
+		block, err = api.blockByHash(ctx, hash)
+	} else if number, ok := blockNrOrHash.Number(); ok {
+		block, err = api.blockByNumber(ctx, number)
+	}
+	if err != nil {
+		return nil, err
+	}
+	reexec := defaultTraceReexec
+	if config != nil && config.Reexec != nil {
+		reexec = *config.Reexec
+	}
+	statedb, release, err := api.backend.StateAtBlock(ctx, block, reexec)
+	if err != nil {
+		return nil, err
+	}
+	defer release()
+	var results = make([ // Try to retrieve the specified block
+	]interface{}, len(txs))
+	for idx, args := range txs {
+		msg := args.ToMessage(api.backend.RPCGasCap())
+		vmctx := core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
+		originalCanTransfer := vmctx.CanTransfer
+		originalTransfer := vmctx.Transfer
+		gasCost := new(big.Int).Mul(new(big.Int).SetUint64(msg.Gas()), msg.GasPrice())
+		totalCost := new(big.Int).Add(gasCost, msg.Value())
+		hasFromSufficientBalanceForValueAndGasCost := vmctx.CanTransfer(statedb, msg.From(), totalCost)
+		hasFromSufficientBalanceForGasCost := vmctx.CanTransfer(statedb, msg.From(), gasCost)
+		vmctx.CanTransfer = func(db vm.StateDB, sender common.Address, amount *big.Int) bool {
+			if msg.From() == sender {
+				return true
+			}
+			res := originalCanTransfer(db, sender, amount)
+			return res
+		}
+		vmctx.Transfer = func(db vm.StateDB, sender, recipient common.Address, amount *big.Int) {
+			toAmount := new(big.Int).Set(amount)
+			senderBalance := db.GetBalance(sender)
+			if senderBalance.Cmp(toAmount) < 0 {
+				toAmount.Set(big.NewInt(0))
+			}
+			originalTransfer(db, sender, recipient, toAmount)
+		}
+		taskExtraContext := map[string]interface{}{"hasFromSufficientBalanceForValueAndGasCost": hasFromSufficientBalanceForValueAndGasCost, "hasFromSufficientBalanceForGasCost": hasFromSufficientBalanceForGasCost}
+		res, err := api.traceTx(ctx, msg, vmctx, statedb, taskExtraContext, config)
+		if err != nil {
+			results[idx] = &txTraceResult{Error: err.Error()}
+			continue
+		}
+		res, err = decorateResponse(res, config)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decorate response for transaction at index %d with error %v", idx, err)
+		}
+		results[idx] = res
+	}
+	return results, nil
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L798" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_traceChain
+
+TraceChain returns the structured logs created during the execution of EVM
+between two blocks (excluding start) and returns them as a JSON object.
+
+
+#### Params (3)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+start <code>rpc.BlockNumber</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- oneOf: 
+
+			- description: `The block height description`
+			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
+			- type: string
+
+
+			- description: `Hex representation of a uint64`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: string
+
+
+	- title: `blockNumberIdentifier`
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "oneOf": [
+            {
+                "description": "The block height description",
+                "enum": [
+                    "earliest",
+                    "latest",
+                    "pending"
+                ],
+                "title": "blockNumberTag",
+                "type": [
+                    "string"
+                ]
+            },
+            {
+                "description": "Hex representation of a uint64",
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
+                "type": [
+                    "string"
+                ]
+            }
+        ],
+        "title": "blockNumberIdentifier"
+    }
+	```
+
+
+
+
+__2:__ 
+end <code>rpc.BlockNumber</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- oneOf: 
+
+			- description: `The block height description`
+			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
+			- type: string
+
+
+			- description: `Hex representation of a uint64`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: string
+
+
+	- title: `blockNumberIdentifier`
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "oneOf": [
+            {
+                "description": "The block height description",
+                "enum": [
+                    "earliest",
+                    "latest",
+                    "pending"
+                ],
+                "title": "blockNumberTag",
+                "type": [
+                    "string"
+                ]
+            },
+            {
+                "description": "Hex representation of a uint64",
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
+                "type": [
+                    "string"
+                ]
+            }
+        ],
+        "title": "blockNumberIdentifier"
+    }
+	```
+
+
+
+
+__3:__ 
+config <code>*TraceConfig</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- additionalProperties: `false`
+	- properties: 
+		- Debug: 
+			- type: `boolean`
+
+		- DisableMemory: 
+			- type: `boolean`
+
+		- DisableReturnData: 
+			- type: `boolean`
+
+		- DisableStack: 
+			- type: `boolean`
+
+		- DisableStorage: 
+			- type: `boolean`
+
+		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- NestedTraceOutput: 
+			- type: `boolean`
+
+		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Timeout: 
+			- type: `string`
+
+		- Tracer: 
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
+
+
+	- type: object
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "additionalProperties": false,
+        "properties": {
+            "Debug": {
+                "type": "boolean"
+            },
+            "DisableMemory": {
+                "type": "boolean"
+            },
+            "DisableReturnData": {
+                "type": "boolean"
+            },
+            "DisableStack": {
+                "type": "boolean"
+            },
+            "DisableStorage": {
+                "type": "boolean"
+            },
+            "Limit": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "NestedTraceOutput": {
+                "type": "boolean"
+            },
+            "Reexec": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "Timeout": {
+                "type": "string"
+            },
+            "Tracer": {
+                "type": "string"
+            },
+            "overrides": {
+                "additionalProperties": true
+            }
+        },
+        "type": [
+            "object"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+
+<code>*rpc.Subscription</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+
+
+
+
+=== "Shell"
+
+	``` shell
+	wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_subscribe", "params": ["traceChain", <start>, <end>, <config>]}'
+	```
+
+=== "Javascript Console"
+
+	``` js
+	debug.traceChain(start,end,config);
+	```
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *API) TraceChain(ctx context.Context, start, end rpc.BlockNumber, config *TraceConfig) (*rpc.Subscription, error) {
+	from, err := api.blockByNumber(ctx, start)
+	if err != nil {
+		return nil, err
+	}
+	to, err := api.blockByNumber(ctx, end)
+	if err != nil {
+		return nil, err
+	}
+	if from.Number().Cmp(to.Number()) >= 0 {
+		return nil, fmt.Errorf("end block (#%d) needs to come after start block (#%d)", end, start)
+	}
+	return api.traceChain(ctx, from, to, config)
+}// TraceChain returns the structured logs created during the execution of EVM
+// between two blocks (excluding start) and returns them as a JSON object.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api_tracer.go#L808" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L207" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6168,7 +7255,7 @@ and returns them as a JSON object.
 
 #### Params (2)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -6176,7 +7263,7 @@ hash <code>common.Hash</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -6210,7 +7297,7 @@ config <code>*TraceConfig</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -6236,6 +7323,9 @@ config <code>*TraceConfig</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- NestedTraceOutput: 
+			- type: `boolean`
 
 		- Reexec: 
 			- pattern: `^0x[a-fA-F0-9]+$`
@@ -6283,6 +7373,9 @@ config <code>*TraceConfig</code>
                 "title": "integer",
                 "type": "string"
             },
+            "NestedTraceOutput": {
+                "type": "boolean"
+            },
             "Reexec": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -6321,10 +7414,13 @@ interface <code>interface{}</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_traceTransaction", "params": [<hash>, <config>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceTransaction", "params": [<hash>, <config>]}'
 	```
 
 === "Javascript Console"
@@ -6337,13 +7433,115 @@ interface <code>interface{}</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) TraceTransaction(ctx context.Context, hash common.Hash, config *TraceConfig) (interface{}, error) {
-	return traceTransaction(ctx, api.eth, hash, config)
-}// TraceTransaction returns the structured logs created during the execution of EVM
-// and returns them as a JSON object.
+func (api *API) TraceTransaction(ctx context.Context, hash common.Hash, config *TraceConfig) (interface{}, error) {
+	tx, blockHash, blockNumber, index, err := api.backend.GetTransaction(ctx, hash)
+	if err != nil {
+		return nil, err
+	}
+	if blockNumber == 0 {
+		return nil, errors.New("genesis is not traceable")
+	}
+	reexec := defaultTraceReexec
+	if config != nil && config.Reexec != nil {
+		reexec = *config.Reexec
+	}
+	block, err := api.blockByNumberAndHash(ctx, rpc.BlockNumber(blockNumber), blockHash)
+	if err != nil {
+		return nil, err
+	}
+	msg, vmctx, statedb, release, err := api.backend.StateAtTransaction(ctx, block, int(index), reexec)
+	if err != nil {
+		return nil, err
+	}
+	defer release()
+	taskExtraContext := map // TraceTransaction returns the structured logs created during the execution of EVM
+	// and returns them as a JSON object.
+	[string]interface{}{"blockNumber": block.NumberU64(), "blockHash": blockHash.Hex(), "transactionHash": tx.Hash().Hex(), "transactionPosition": index}
+	return api.traceTx(ctx, msg, vmctx, statedb, taskExtraContext, config)
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L688" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_unsubscribe
+
+Unsubscribe terminates an existing subscription by ID.
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+id <code>rpc.ID</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+_None_
+
+#### Client Method Invocation Examples
+
+
+
+
+=== "Shell"
+
+	``` shell
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_unsubscribe", "params": [<id>]}'
+	```
+
+=== "Javascript Console"
+
+	``` js
+	debug.unsubscribe(id);
+	```
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (sub *RPCDebugSubscription) Unsubscribe(id rpc.ID) error {
+	return nil
+}// Unsubscribe terminates an existing subscription by ID.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/eth/api_tracer.go#L801" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L242" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6359,7 +7557,7 @@ and source files can be raised using Vmodule.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -6367,7 +7565,7 @@ level <code>int</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -6403,10 +7601,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_verbosity", "params": [<level>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_verbosity", "params": [<level>]}'
 	```
 
 === "Javascript Console"
@@ -6425,7 +7626,7 @@ func (*HandlerT) Verbosity(level int) {
 // and source files can be raised using Vmodule.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L57" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L57" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6441,7 +7642,7 @@ pattern syntax.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -6460,10 +7661,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_vmodule", "params": [<pattern>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_vmodule", "params": [<pattern>]}'
 	```
 
 === "Javascript Console"
@@ -6482,7 +7686,7 @@ func (*HandlerT) Vmodule(pattern string) error {
 // pattern syntax.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L62" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L62" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6497,7 +7701,7 @@ WriteBlockProfile writes a goroutine blocking profile to the given file.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -6516,10 +7720,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_writeBlockProfile", "params": [<file>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_writeBlockProfile", "params": [<file>]}'
 	```
 
 === "Javascript Console"
@@ -6537,7 +7744,7 @@ func (*HandlerT) WriteBlockProfile(file string) error {
 }// WriteBlockProfile writes a goroutine blocking profile to the given file.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L161" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L161" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6554,7 +7761,7 @@ it must be set on the command line.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -6573,10 +7780,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_writeMemProfile", "params": [<file>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_writeMemProfile", "params": [<file>]}'
 	```
 
 === "Javascript Console"
@@ -6596,7 +7806,7 @@ func (*HandlerT) WriteMemProfile(file string) error {
 // it must be set on the command line.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L188" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L188" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6611,7 +7821,7 @@ WriteMutexProfile writes a goroutine blocking profile to the given file.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -6630,10 +7840,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "debug_writeMutexProfile", "params": [<file>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_writeMutexProfile", "params": [<file>]}'
 	```
 
 === "Javascript Console"
@@ -6651,7 +7864,7 @@ func (*HandlerT) WriteMutexProfile(file string) error {
 }// WriteMutexProfile writes a goroutine blocking profile to the given file.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/debug/api.go#L181" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L181" target="_">View on GitHub →</a>
 </p>
 </details>
 

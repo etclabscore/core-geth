@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:50:40-06:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-27T19:06:39+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -38,10 +38,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "web3_clientVersion", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "web3_clientVersion", "params": []}'
 	```
 
 === "Javascript Console"
@@ -59,7 +62,7 @@ func (s *publicWeb3API) ClientVersion() string {
 }// ClientVersion returns the node name
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/node/api.go#L320" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L320" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -75,7 +78,7 @@ It assumes the input is hex encoded.
 
 #### Params (1)
 
-Parameters must be given _by position_.  
+Parameters must be given _by position_.
 
 
 __1:__ 
@@ -83,7 +86,7 @@ input <code>hexutil.Bytes</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -122,7 +125,7 @@ input <code>hexutil.Bytes</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -152,10 +155,13 @@ input <code>hexutil.Bytes</code>
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "web3_sha3", "params": [<input>]}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "web3_sha3", "params": [<input>]}'
 	```
 
 === "Javascript Console"
@@ -174,7 +180,7 @@ func (s *publicWeb3API) Sha3(input hexutil.Bytes) hexutil.Bytes {
 // It assumes the input is hex encoded.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/node/api.go#L326" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L326" target="_">View on GitHub →</a>
 </p>
 </details>
 

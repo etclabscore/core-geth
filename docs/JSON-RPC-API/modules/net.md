@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:50:40-06:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-27T19:06:39+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -38,10 +38,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "net_listening", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "net_listening", "params": []}'
 	```
 
 === "Javascript Console"
@@ -59,7 +62,7 @@ func (s *PublicNetAPI) Listening() bool {
 }// Listening returns an indication if the node is listening for network connections.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L2033" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2098" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -85,7 +88,7 @@ _None_
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -115,10 +118,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "net_peerCount", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "net_peerCount", "params": []}'
 	```
 
 === "Javascript Console"
@@ -136,7 +142,7 @@ func (s *PublicNetAPI) PeerCount() hexutil.Uint {
 }// PeerCount returns the number of connected peers
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L2037" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2102" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -167,10 +173,13 @@ _None_
 
 #### Client Method Invocation Examples
 
+
+
+
 === "Shell"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "net_version", "params": []}'
+	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "net_version", "params": []}'
 	```
 
 === "Javascript Console"
@@ -188,7 +197,7 @@ func (s *PublicNetAPI) Version() string {
 }// Version returns the current ethereum protocol version.
 
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L2042" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2107" target="_">View on GitHub →</a>
 </p>
 </details>
 

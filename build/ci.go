@@ -75,7 +75,6 @@ var (
 		"COPYING",
 		executablePath("abigen"),
 		executablePath("bootnode"),
-		executablePath("echaindb"),
 		executablePath("echainspec"),
 		executablePath("evm"),
 		executablePath("geth"),
@@ -92,10 +91,6 @@ var (
 		{
 			BinaryName:  "bootnode",
 			Description: "Ethereum bootnode.",
-		},
-		{
-			BinaryName:  "echaindb",
-			Description: "Developer utility to inspect and manage the chain database",
 		},
 		{
 			BinaryName:  "echainspec",

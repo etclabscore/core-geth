@@ -66,6 +66,13 @@ var (
 		EIP2028FBlock: big.NewInt(999_983),
 		EIP2200FBlock: big.NewInt(999_983), // RePetersburg (== re-1283)
 
+		// Berlin eq, aka Magneto
+		EIP2315FBlock: big.NewInt(3_585_073),
+		EIP2565FBlock: big.NewInt(3_585_073),
+		EIP2718FBlock: big.NewInt(3_585_073),
+		EIP2929FBlock: big.NewInt(3_585_073),
+		EIP2930FBlock: big.NewInt(3_585_073),
+
 		ECIP1099FBlock: big.NewInt(2_520_000), // Etchash
 
 		DisposalBlock:      big.NewInt(0),

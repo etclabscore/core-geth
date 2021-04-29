@@ -78,6 +78,11 @@ type ParityChainSpec struct {
 				Epoch  *ParityU64 `json:"epoch,omitempty"`
 			} `json:"params,omitempty"`
 		} `json:"Clique,omitempty"`
+		Keccak struct {
+			Params struct {
+				BlockReward ctypes.Uint64BigValOrMapHex `json:"blockReward"`
+			} `json:"params"`
+		} `json:"Keccak256,omitempty"`
 	} `json:"engine"`
 
 	Params struct {

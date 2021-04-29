@@ -18,6 +18,7 @@
 package ethconfig
 
 import (
+	"github.com/ethereum/go-ethereum/consensus/keccak"
 	"math/big"
 	"os"
 	"os/user"
@@ -223,6 +224,27 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 			Period: chainConfig.GetCliquePeriod(),
 			Epoch:  chainConfig.GetCliqueEpoch(),
 		}, db)
+	}
+	if chainConfig.GetConsensusEngineType().IsKeccak() {
+		// Otherwise assume proof-of-work
+		switch config.PowMode {
+		case ethash.ModeFake:
+			log.Warn("Ethash used in fake mode")
+			return keccak.NewFaker()
+		case ethash.ModePoissonFake:
+			log.Warn("Ethash used in fake Poisson mode")
+			return keccak.NewPoissonFaker()
+		case ethash.ModeTest:
+			log.Warn("Ethash used in test mode")
+			return keccak.NewTester(nil, noverify)
+		case ethash.ModeShared:
+		default:
+			engine := keccak.New(keccak.Config{
+				ECIP1099Block: chainConfig.GetEthashECIP1099Transition(),
+			}, notify, noverify)
+			engine.SetThreads(-1) // Disable CPU mining
+			return engine
+		}
 	}
 	// Otherwise assume proof-of-work
 	switch config.PowMode {

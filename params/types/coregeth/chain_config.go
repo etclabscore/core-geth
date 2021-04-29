@@ -198,6 +198,7 @@ type CoreGethChainConfig struct {
 
 	// Various consensus engines
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
+	Keccak *ctypes.KeccakConfig `json:"keccak256,omitempty"`
 	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
 
 	Ethereum2CatalystFBlock *big.Int `json:"catalystBlock,omitempty"`
@@ -219,6 +220,8 @@ func (c *CoreGethChainConfig) String() string {
 		engine = c.Ethash
 	case c.Clique != nil:
 		engine = c.Clique
+	case c.Keccak != nil:
+		engine = c.Keccak
 	default:
 		engine = "unknown"
 	}

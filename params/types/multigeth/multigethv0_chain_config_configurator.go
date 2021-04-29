@@ -908,3 +908,14 @@ func (c *ChainConfig) SetCliqueEpoch(n uint64) error {
 	c.Clique.Epoch = n
 	return nil
 }
+
+func (c *ChainConfig) GetKeccakBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Keccak {
+		return nil
+	}
+	return nil
+}
+
+func (c *ChainConfig) SetKeccakBlockRewardSchedule(m ctypes.Uint64BigMapEncodesHex) error {
+	return ctypes.ErrUnsupportedConfigNoop
+}

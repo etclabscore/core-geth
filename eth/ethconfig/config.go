@@ -203,15 +203,12 @@ type Config struct {
 	// CheckpointOracle is the configuration for checkpoint oracle.
 	CheckpointOracle *ctypes.CheckpointOracleConfig `toml:",omitempty"`
 
-	// Manual configuration field for ECBP1100 activation number. Used for modifying genesis config via CLI flag.
-	ECBP1100 *big.Int
-
 	// ECBP1100NoDisable overrides
 	// When this value is *true, ECBP100 will not (ever) be disabled; when *false, it will never be enabled.
 	ECBP1100NoDisable *bool `toml:",omitempty"`
 
-	// Berlin block override (TODO: remove after the fork)
-	OverrideBerlin *big.Int `toml:",omitempty"`
+	// Magneto block override (TODO: remove after the fork)
+	OverrideMagneto *big.Int `toml:",omitempty"`
 }
 
 // CreateConsensusEngine creates a consensus engine for the given chain configuration.

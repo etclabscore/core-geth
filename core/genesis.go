@@ -51,7 +51,7 @@ func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.Cha
 // error is a *params.ConfigCompatError and the new, unwritten config is returned.
 //
 // The returned chain configuration is never nil.
-func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, ecbp1100 *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, overrideMagneto *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
@@ -66,9 +66,21 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			log.Info("Writing custom genesis block")
 		}
 
-		if ecbp1100 != nil {
-			n := ecbp1100.Uint64()
-			if err := genesis.SetECBP1100Transition(&n); err != nil {
+		if overrideMagneto != nil {
+			n := overrideMagneto.Uint64()
+			if err := genesis.SetEIP2565Transition(&n); err != nil {
+				return genesis, stored, err
+			}
+			if err := genesis.SetEIP2315Transition(&n); err != nil {
+				return genesis, stored, err
+			}
+			if err := genesis.SetEIP2929Transition(&n); err != nil {
+				return genesis, stored, err
+			}
+			if err := genesis.SetEIP2718Transition(&n); err != nil {
+				return genesis, stored, err
+			}
+			if err := genesis.SetEIP2930Transition(&n); err != nil {
 				return genesis, stored, err
 			}
 		}
@@ -108,11 +120,21 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	// Get the existing chain configuration.
 	newcfg := configOrDefault(genesis, stored)
 
-	// NOTE(ia): does not include overrideBerlin
-
-	if ecbp1100 != nil {
-		n := ecbp1100.Uint64()
-		if err := newcfg.SetECBP1100Transition(&n); err != nil {
+	if overrideMagneto != nil {
+		n := overrideMagneto.Uint64()
+		if err := newcfg.SetEIP2565Transition(&n); err != nil {
+			return newcfg, stored, err
+		}
+		if err := newcfg.SetEIP2315Transition(&n); err != nil {
+			return newcfg, stored, err
+		}
+		if err := newcfg.SetEIP2929Transition(&n); err != nil {
+			return newcfg, stored, err
+		}
+		if err := newcfg.SetEIP2718Transition(&n); err != nil {
+			return newcfg, stored, err
+		}
+		if err := newcfg.SetEIP2930Transition(&n); err != nil {
 			return newcfg, stored, err
 		}
 	}

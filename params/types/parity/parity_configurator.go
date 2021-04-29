@@ -1114,6 +1114,21 @@ func (spec *ParityChainSpec) SetCliqueEpoch(i uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetKeccakBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
+	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Keccak {
+		return nil
+	}
+	if reflect.DeepEqual(spec.Engine.Keccak, reflect.Zero(reflect.TypeOf(spec.Engine.Keccak)).Interface()) {
+		return nil
+	}
+	return ctypes.Uint64BigMapEncodesHex(spec.Engine.Keccak.Params.BlockReward)
+}
+
+func (spec *ParityChainSpec) SetKeccakBlockRewardSchedule(input ctypes.Uint64BigMapEncodesHex) error {
+	spec.Engine.Keccak.Params.BlockReward = ctypes.Uint64BigValOrMapHex(input)
+	return nil
+}
+
 func (spec *ParityChainSpec) GetSealingType() ctypes.BlockSealingT {
 	if !reflect.DeepEqual(spec.Genesis.Seal.Ethereum, reflect.Zero(reflect.TypeOf(spec.Genesis.Seal.Ethereum)).Interface()) {
 		return ctypes.BlockSealing_Ethereum

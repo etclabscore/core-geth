@@ -171,6 +171,7 @@ type ConsensusEnginator interface {
 	MustSetConsensusEngineType(t ConsensusEngineT) error
 	EthashConfigurator
 	CliqueConfigurator
+	KeccakConfigurator
 	Lyra2Configurator
 
 	// Catalyst: ETH -> ETH2 PoS transition helper
@@ -226,6 +227,11 @@ type CliqueConfigurator interface {
 	SetCliquePeriod(n uint64) error
 	GetCliqueEpoch() uint64
 	SetCliqueEpoch(n uint64) error
+}
+
+type KeccakConfigurator interface {
+	GetKeccakBlockRewardSchedule() Uint64BigMapEncodesHex
+	SetKeccakBlockRewardSchedule(m Uint64BigMapEncodesHex) error
 }
 
 type Lyra2Configurator interface {

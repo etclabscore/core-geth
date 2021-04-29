@@ -536,6 +536,9 @@ func (c *ChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT {
 	if c.Clique != nil {
 		return ctypes.ConsensusEngineT_Clique
 	}
+	if c.Keccak != nil {
+		return ctypes.ConsensusEngineT_Keccak
+	}
 	if c.Lyra2 != nil {
 		return ctypes.ConsensusEngineT_Lyra2
 	}
@@ -547,15 +550,26 @@ func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) erro
 	case ctypes.ConsensusEngineT_Ethash:
 		c.Ethash = new(ctypes.EthashConfig)
 		c.Clique = nil
+		c.Keccak = nil
+		c.Lyra2 = nil
 		return nil
 	case ctypes.ConsensusEngineT_Clique:
-		c.Clique = new(ctypes.CliqueConfig)
 		c.Ethash = nil
+		c.Clique = new(ctypes.CliqueConfig)
+		c.Keccak = nil
+		c.Lyra2 = nil
 		return nil
-	case ctypes.ConsensusEngineT_Lyra2:
-		c.Lyra2 = new(ctypes.Lyra2Config)
+	case ctypes.ConsensusEngineT_Keccak:
 		c.Ethash = nil
 		c.Clique = nil
+		c.Keccak = new(ctypes.KeccakConfig)
+		c.Lyra2 = nil
+		return nil
+	case ctypes.ConsensusEngineT_Lyra2:
+		c.Ethash = nil
+		c.Clique = nil
+		c.Keccak = nil
+		c.Lyra2 = new(ctypes.Lyra2Config)
 		return nil
 	default:
 		return ctypes.ErrUnsupportedConfigFatal
@@ -915,6 +929,17 @@ func (c *ChainConfig) SetCliqueEpoch(n uint64) error {
 	}
 	c.Clique.Epoch = n
 	return nil
+}
+
+func (c *ChainConfig) GetKeccakBlockRewardSchedule() ctypes.Uint64BigMapEncodesHex {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Keccak {
+		return nil
+	}
+	return nil
+}
+
+func (c *ChainConfig) SetKeccakBlockRewardSchedule(m ctypes.Uint64BigMapEncodesHex) error {
+	return ctypes.ErrUnsupportedConfigNoop
 }
 
 func (c *ChainConfig) GetLyra2NonceTransition() *uint64 {

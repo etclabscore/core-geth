@@ -63,6 +63,7 @@ type ChainConfig struct {
 	// Various consensus engines
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
 	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
+	Keccak *ctypes.KeccakConfig `json:"keccak256,omitempty"`
 	Lyra2  *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
 
 	Lyra2NonceTransitionBlock *big.Int `json:"lyra2NonceTransitionBlock,omitempty"`

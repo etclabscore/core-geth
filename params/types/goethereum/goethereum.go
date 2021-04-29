@@ -66,6 +66,7 @@ type ChainConfig struct {
 	// Various consensus engines
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
 	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
+	Keccak *ctypes.KeccakConfig `json:"keccak256,omitempty"`
 	Lyra2  *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
 
 	// NOTE: These are not included in this type upstream.
@@ -89,6 +90,10 @@ func (c *ChainConfig) String() string {
 		engine = c.Ethash
 	case c.Clique != nil:
 		engine = c.Clique
+	case c.Keccak != nil:
+		engine = c.Keccak
+	case c.Lyra2 != nil:
+		engine = c.Lyra2
 	default:
 		engine = "unknown"
 	}

@@ -272,11 +272,13 @@ _None_
 	{{ $shellExample }}
 	` + "```" + `
 
+{{ if not (isSubscriptionableMethod .) }}
 === "Javascript Console"
 
 	` + "```" + ` js
 	{{ methodFormatJSConsole . }}
 	` + "```" + `
+{{ end }}
 
 {{ $docs := .ExternalDocs | tomap }}
 <details><summary>Source code</summary>

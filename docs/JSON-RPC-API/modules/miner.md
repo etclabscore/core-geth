@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-27T19:06:39+03:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T01:11:45+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -72,11 +72,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_getHashrate", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	miner.getHashrate();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -163,11 +165,13 @@ etherbase <code>common.Address</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_setEtherbase", "params": [<etherbase>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	miner.setEtherbase(etherbase);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -230,11 +234,13 @@ extra <code>string</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_setExtra", "params": [<extra>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	miner.setExtra(extra);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -324,11 +330,13 @@ gasPrice <code>hexutil.Big</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_setGasPrice", "params": [<gasPrice>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	miner.setGasPrice(gasPrice);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -411,11 +419,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_setRecommitInterval", "params": [<interval>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	miner.setRecommitInterval(interval);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -498,11 +508,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_start", "params": [<threads>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	miner.start(threads);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -553,11 +565,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_stop", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	miner.stop();
 	```
+
 
 
 <details><summary>Source code</summary>

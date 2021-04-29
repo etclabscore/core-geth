@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-27T19:06:39+03:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T01:11:45+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -47,11 +47,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "web3_clientVersion", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	web3.clientVersion();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -164,11 +166,13 @@ input <code>hexutil.Bytes</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "web3_sha3", "params": [<input>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	web3.sha3(input);
 	```
+
 
 
 <details><summary>Source code</summary>

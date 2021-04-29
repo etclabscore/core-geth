@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-27T19:06:39+03:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T01:11:45+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -47,11 +47,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "net_listening", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	net.listening();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -127,11 +129,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "net_peerCount", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	net.peerCount();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -182,11 +186,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "net_version", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	net.version();
 	```
+
 
 
 <details><summary>Source code</summary>

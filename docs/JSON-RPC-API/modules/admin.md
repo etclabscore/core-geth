@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-27T19:06:39+03:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T01:11:45+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -59,11 +59,13 @@ url <code>string</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_addPeer", "params": [<url>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.addPeer(url);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -135,11 +137,13 @@ url <code>string</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_addTrustedPeer", "params": [<url>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.addTrustedPeer(url);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -199,11 +203,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_datadir", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.datadir();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -317,11 +323,13 @@ blockNr <code>rpc.BlockNumber</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_ecbp1100", "params": [<blockNr>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.ecbp1100(blockNr);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -453,11 +461,13 @@ last <code>*uint64</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_exportChain", "params": [<file>, <first>, <last>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.exportChain(file,first,last);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -547,11 +557,13 @@ file <code>string</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_importChain", "params": [<file>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.importChain(file);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -674,11 +686,13 @@ n <code>int</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_maxPeers", "params": [<n>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.maxPeers(n);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -864,11 +878,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_nodeInfo", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.nodeInfo();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -950,11 +966,7 @@ _None_
 	wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "admin_subscribe", "params": ["peerEvents"]}'
 	```
 
-=== "Javascript Console"
 
-	``` js
-	admin.peerEvents();
-	```
 
 
 <details><summary>Source code</summary>
@@ -1189,11 +1201,13 @@ p2pPeerInfo <code>[]*p2p.PeerInfo</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_peers", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.peers();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1260,11 +1274,13 @@ url <code>string</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_removePeer", "params": [<url>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.removePeer(url);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1336,11 +1352,13 @@ url <code>string</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_removeTrustedPeer", "params": [<url>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.removeTrustedPeer(url);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1473,11 +1491,13 @@ vhosts <code>*string</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_startRPC", "params": [<host>, <port>, <cors>, <apis>, <vhosts>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.startRPC(host,port,cors,apis,vhosts);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1631,11 +1651,13 @@ apis <code>*string</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_startWS", "params": [<host>, <port>, <allowedOrigins>, <apis>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.startWS(host,port,allowedOrigins,apis);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1722,11 +1744,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_stopRPC", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.stopRPC();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1778,11 +1802,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_stopWS", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	admin.stopWS();
 	```
+
 
 
 <details><summary>Source code</summary>

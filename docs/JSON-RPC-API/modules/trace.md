@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-27T19:06:39+03:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T01:11:45+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -249,11 +249,13 @@ interface <code>[]interface{}</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_block", "params": [<number>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	trace.block(number,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -595,11 +597,13 @@ interface <code>interface{}</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_call", "params": [<args>, <blockNrOrHash>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	trace.call(args,blockNrOrHash,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -929,11 +933,13 @@ interface <code>interface{}</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_callMany", "params": [<txs>, <blockNrOrHash>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	trace.callMany(txs,blockNrOrHash,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1218,11 +1224,7 @@ config <code>*TraceConfig</code>
 	wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "trace_subscribe", "params": ["filter", <args>, <config>]}'
 	```
 
-=== "Javascript Console"
 
-	``` js
-	trace.filter(args,config);
-	```
 
 
 <details><summary>Source code</summary>
@@ -1357,11 +1359,13 @@ subscriptionID <code>rpc.ID</code>
 	wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "trace_subscribe", "params": [<subscriptionName>, <subscriptionOptions>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	trace.subscribe(subscriptionName,subscriptionOptions);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1557,11 +1561,13 @@ interface <code>interface{}</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_transaction", "params": [<hash>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	trace.transaction(hash,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1640,11 +1646,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_unsubscribe", "params": [<id>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	trace.unsubscribe(id);
 	```
+
 
 
 <details><summary>Source code</summary>

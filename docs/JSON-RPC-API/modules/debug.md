@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-27T19:06:39+03:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T01:11:45+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -286,11 +286,13 @@ incompletes <code>bool</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_accountRange", "params": [<blockNrOrHash>, <start>, <maxResults>, <nocode>, <nostorage>, <incompletes>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.accountRange(blockNrOrHash,start,maxResults,nocode,nostorage,incompletes);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -380,11 +382,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_backtraceAt", "params": [<location>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.backtraceAt(location);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -475,11 +479,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_blockProfile", "params": [<file>, <nsec>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.blockProfile(file,nsec);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -528,11 +534,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_chaindbCompact", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.chaindbCompact();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -602,11 +610,13 @@ property <code>string</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_chaindbProperty", "params": [<property>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.chaindbProperty(property);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -700,11 +710,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_cpuProfile", "params": [<file>, <nsec>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.cpuProfile(file,nsec);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -948,11 +960,13 @@ blockNr <code>rpc.BlockNumber</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_dumpBlock", "params": [<blockNr>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.dumpBlock(blockNr);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1012,11 +1026,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_freeOSMemory", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.freeOSMemory();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1170,11 +1186,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_gcStats", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.gcStats();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1520,11 +1538,13 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getBadBlocks", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.getBadBlocks();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1632,11 +1652,13 @@ number <code>uint64</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getBlockRlp", "params": [<number>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.getBlockRlp(number);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1805,11 +1827,13 @@ commonAddress <code>[]common.Address</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getModifiedAccountsByHash", "params": [<startHash>, <endHash>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.getModifiedAccountsByHash(startHash,endHash);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -1991,11 +2015,13 @@ commonAddress <code>[]common.Address</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getModifiedAccountsByNumber", "params": [<startNum>, <endNum>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.getModifiedAccountsByNumber(startNum,endNum);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -2105,11 +2131,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_goTrace", "params": [<file>, <nsec>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.goTrace(file,nsec);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -2565,11 +2593,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_memStats", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.memStats();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -2661,11 +2691,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_mutexProfile", "params": [<file>, <nsec>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.mutexProfile(file,nsec);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -2782,11 +2814,13 @@ hash <code>common.Hash</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_preimage", "params": [<hash>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.preimage(hash);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -2876,11 +2910,13 @@ number <code>uint64</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_printBlock", "params": [<number>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.printBlock(number);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -2993,11 +3029,13 @@ hash <code>common.Hash</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_removePendingTransaction", "params": [<hash>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.removePendingTransaction(hash);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -3085,11 +3123,13 @@ number <code>uint64</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_seedHash", "params": [<number>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.seedHash(number);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -3176,11 +3216,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_setBlockProfileRate", "params": [<rate>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.setBlockProfileRate(rate);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -3294,11 +3336,13 @@ v <code>int</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_setGCPercent", "params": [<v>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.setGCPercent(v);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -3378,11 +3422,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_setHead", "params": [<number>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.setHead(number);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -3461,11 +3507,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_setMutexProfileFraction", "params": [<rate>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.setMutexProfileFraction(rate);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -3516,11 +3564,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_stacks", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.stacks();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -3741,11 +3791,13 @@ string <code>[]string</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_standardTraceBadBlockToFile", "params": [<hash>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.standardTraceBadBlockToFile(hash,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -3971,11 +4023,13 @@ string <code>[]string</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_standardTraceBlockToFile", "params": [<hash>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.standardTraceBlockToFile(hash,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -4035,11 +4089,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_startCPUProfile", "params": [<file>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.startCPUProfile(file);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -4109,11 +4165,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_startGoTrace", "params": [<file>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.startGoTrace(file);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -4172,11 +4230,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_stopCPUProfile", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.stopCPUProfile();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -4229,11 +4289,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_stopGoTrace", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.stopGoTrace();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -4543,11 +4605,13 @@ maxResult <code>int</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_storageRangeAt", "params": [<blockHash>, <txIndex>, <contractAddress>, <keyStart>, <maxResult>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.storageRangeAt(blockHash,txIndex,contractAddress,keyStart,maxResult);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -4690,11 +4754,13 @@ subscriptionID <code>rpc.ID</code>
 	wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_subscribe", "params": [<subscriptionName>, <subscriptionOptions>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.subscribe(subscriptionName,subscriptionOptions);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -4845,11 +4911,13 @@ number <code>uint64</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_testSignCliqueBlock", "params": [<address>, <number>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.testSignCliqueBlock(address,number);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -5122,11 +5190,13 @@ txTraceResult <code>[]*txTraceResult</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceBadBlock", "params": [<hash>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.traceBadBlock(hash,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -5377,11 +5447,13 @@ txTraceResult <code>[]*txTraceResult</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceBlock", "params": [<blob>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.traceBlock(blob,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -5630,11 +5702,13 @@ txTraceResult <code>[]*txTraceResult</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceBlockByHash", "params": [<hash>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.traceBlockByHash(hash,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -5911,11 +5985,13 @@ txTraceResult <code>[]*txTraceResult</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceBlockByNumber", "params": [<number>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.traceBlockByNumber(number,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -6139,11 +6215,13 @@ txTraceResult <code>[]*txTraceResult</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceBlockFromFile", "params": [<file>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.traceBlockFromFile(file,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -6460,11 +6538,13 @@ interface <code>interface{}</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceCall", "params": [<args>, <blockNrOrHash>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.traceCall(args,blockNrOrHash,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -6836,11 +6916,13 @@ interface <code>interface{}</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceCallMany", "params": [<txs>, <blockNrOrHash>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.traceCallMany(txs,blockNrOrHash,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -7212,11 +7294,7 @@ config <code>*TraceConfig</code>
 	wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_subscribe", "params": ["traceChain", <start>, <end>, <config>]}'
 	```
 
-=== "Javascript Console"
 
-	``` js
-	debug.traceChain(start,end,config);
-	```
 
 
 <details><summary>Source code</summary>
@@ -7423,11 +7501,13 @@ interface <code>interface{}</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_traceTransaction", "params": [<hash>, <config>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.traceTransaction(hash,config);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -7526,11 +7606,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_unsubscribe", "params": [<id>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.unsubscribe(id);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -7610,11 +7692,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_verbosity", "params": [<level>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.verbosity(level);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -7670,11 +7754,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_vmodule", "params": [<pattern>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.vmodule(pattern);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -7729,11 +7815,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_writeBlockProfile", "params": [<file>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.writeBlockProfile(file);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -7789,11 +7877,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_writeMemProfile", "params": [<file>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.writeMemProfile(file);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -7849,11 +7939,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_writeMutexProfile", "params": [<file>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	debug.writeMutexProfile(file);
 	```
+
 
 
 <details><summary>Source code</summary>

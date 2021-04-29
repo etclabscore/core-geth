@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-27T19:06:39+03:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T01:11:45+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -307,11 +307,13 @@ mapstringmapstringmapstringRPCTransaction <code>map[string]map[string]map[string
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "txpool_content", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	txpool.content();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -427,11 +429,13 @@ mapstringmapstringmapstringstring <code>map[string]map[string]map[string]string<
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "txpool_inspect", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	txpool.inspect();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -540,11 +544,13 @@ mapstringhexutilUint <code>map[string]hexutil.Uint</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "txpool_status", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	txpool.status();
 	```
+
 
 
 <details><summary>Source code</summary>

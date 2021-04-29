@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-27T19:06:39+03:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T01:11:45+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -72,11 +72,13 @@ _None_
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_getHashrate", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	ethash.getHashrate();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -167,11 +169,13 @@ num4string <code>[4]string</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_getWork", "params": []}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	ethash.getWork();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -320,11 +324,13 @@ id <code>common.Hash</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_submitHashRate", "params": [<rate>, <id>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	ethash.submitHashRate(rate,id);
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -496,11 +502,13 @@ digest <code>common.Hash</code>
 	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_submitWork", "params": [<nonce>, <hash>, <digest>]}'
 	```
 
+
 === "Javascript Console"
 
 	``` js
 	ethash.submitWork(nonce,hash,digest);
 	```
+
 
 
 <details><summary>Source code</summary>

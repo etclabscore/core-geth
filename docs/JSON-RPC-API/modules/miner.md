@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-30T01:11:45+03:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T19:24:24+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -64,12 +64,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_getHashrate", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_getHashrate", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "miner_getHashrate", "params": []}'
 	```
 
 
@@ -157,12 +165,20 @@ etherbase <code>common.Address</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_setEtherbase", "params": [<etherbase>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_setEtherbase", "params": [<etherbase>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "miner_setEtherbase", "params": [<etherbase>]}'
 	```
 
 
@@ -226,12 +242,20 @@ extra <code>string</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_setExtra", "params": [<extra>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_setExtra", "params": [<extra>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "miner_setExtra", "params": [<extra>]}'
 	```
 
 
@@ -322,12 +346,20 @@ gasPrice <code>hexutil.Big</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_setGasPrice", "params": [<gasPrice>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_setGasPrice", "params": [<gasPrice>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "miner_setGasPrice", "params": [<gasPrice>]}'
 	```
 
 
@@ -411,12 +443,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_setRecommitInterval", "params": [<interval>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_setRecommitInterval", "params": [<interval>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "miner_setRecommitInterval", "params": [<interval>]}'
 	```
 
 
@@ -500,12 +540,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_start", "params": [<threads>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_start", "params": [<threads>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "miner_start", "params": [<threads>]}'
 	```
 
 
@@ -557,12 +605,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_stop", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "miner_stop", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "miner_stop", "params": []}'
 	```
 
 

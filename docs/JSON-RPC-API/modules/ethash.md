@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-30T01:11:45+03:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T19:24:24+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -64,12 +64,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_getHashrate", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_getHashrate", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "ethash_getHashrate", "params": []}'
 	```
 
 
@@ -161,12 +169,20 @@ num4string <code>[4]string</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_getWork", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_getWork", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "ethash_getWork", "params": []}'
 	```
 
 
@@ -316,12 +332,20 @@ id <code>common.Hash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_submitHashRate", "params": [<rate>, <id>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_submitHashRate", "params": [<rate>, <id>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "ethash_submitHashRate", "params": [<rate>, <id>]}'
 	```
 
 
@@ -494,12 +518,20 @@ digest <code>common.Hash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_submitWork", "params": [<nonce>, <hash>, <digest>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_submitWork", "params": [<nonce>, <hash>, <digest>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "ethash_submitWork", "params": [<nonce>, <hash>, <digest>]}'
 	```
 
 

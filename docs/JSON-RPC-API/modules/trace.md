@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-30T01:11:45+03:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T19:24:24+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -241,12 +241,20 @@ interface <code>[]interface{}</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_block", "params": [<number>, <config>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_block", "params": [<number>, <config>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "trace_block", "params": [<number>, <config>]}'
 	```
 
 
@@ -589,12 +597,20 @@ interface <code>interface{}</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_call", "params": [<args>, <blockNrOrHash>, <config>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_call", "params": [<args>, <blockNrOrHash>, <config>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "trace_call", "params": [<args>, <blockNrOrHash>, <config>]}'
 	```
 
 
@@ -925,12 +941,20 @@ interface <code>interface{}</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_callMany", "params": [<txs>, <blockNrOrHash>, <config>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_callMany", "params": [<txs>, <blockNrOrHash>, <config>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "trace_callMany", "params": [<txs>, <blockNrOrHash>, <config>]}'
 	```
 
 
@@ -1218,10 +1242,12 @@ config <code>*TraceConfig</code>
 
 
 
-=== "Shell"
+
+
+=== "Shell WebSocket"
 
 	``` shell
-	wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "trace_subscribe", "params": ["filter", <args>, <config>]}'
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "trace_subscribe", "params": ["filter", <args>, <config>]}'
 	```
 
 
@@ -1353,18 +1379,13 @@ subscriptionID <code>rpc.ID</code>
 
 
 
-=== "Shell"
+
+=== "Shell WebSocket"
 
 	``` shell
-	wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "trace_subscribe", "params": [<subscriptionName>, <subscriptionOptions>]}'
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "trace_subscribe", "params": [<subscriptionName>, <subscriptionOptions>]}'
 	```
 
-
-=== "Javascript Console"
-
-	``` js
-	trace.subscribe(subscriptionName,subscriptionOptions);
-	```
 
 
 
@@ -1377,7 +1398,7 @@ func (sub *RPCTraceSubscription) Subscribe(subscriptionName RPCTraceSubscription
 // Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L268" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L269" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1553,12 +1574,20 @@ interface <code>interface{}</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_transaction", "params": [<hash>, <config>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_transaction", "params": [<hash>, <config>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "trace_transaction", "params": [<hash>, <config>]}'
 	```
 
 
@@ -1638,12 +1667,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_unsubscribe", "params": [<id>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "trace_unsubscribe", "params": [<id>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "trace_unsubscribe", "params": [<id>]}'
 	```
 
 
@@ -1663,7 +1700,7 @@ func (sub *RPCTraceSubscription) Unsubscribe(id rpc.ID) error {
 }// Unsubscribe terminates an existing subscription by ID.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L259" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L260" target="_">View on GitHub →</a>
 </p>
 </details>
 

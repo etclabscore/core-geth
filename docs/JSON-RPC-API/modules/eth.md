@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-30T01:11:45+03:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T19:24:24+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -75,12 +75,20 @@ commonAddress <code>[]common.Address</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_accounts", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_accounts", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_accounts", "params": []}'
 	```
 
 
@@ -157,12 +165,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_blockNumber", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_blockNumber", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_blockNumber", "params": []}'
 	```
 
 
@@ -514,12 +530,20 @@ overrides <code>*map[common.Address]account</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_call", "params": [<args>, <blockNrOrHash>, <overrides>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_call", "params": [<args>, <blockNrOrHash>, <overrides>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_call", "params": [<args>, <blockNrOrHash>, <overrides>]}'
 	```
 
 
@@ -556,91 +580,6 @@ func (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNrOr
 }
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L926" target="_">View on GitHub →</a>
-</p>
-</details>
-
----
-
-
-
-### eth_chainId
-
-ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.
-
-
-#### Params (0)
-
-_None_
-
-#### Result
-
-
-
-
-<code>hexutil.Uint64</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Hex representation of a uint64`
-	- pattern: `^0x([a-fA-F\d])+$`
-	- title: `uint64`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Hex representation of a uint64",
-        "pattern": "^0x([a-fA-F\\d])+$",
-        "title": "uint64",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-#### Client Method Invocation Examples
-
-
-
-
-=== "Shell"
-
-	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_chainId", "params": []}'
-	```
-
-
-=== "Javascript Console"
-
-	``` js
-	eth.chainId();
-	```
-
-
-
-<details><summary>Source code</summary>
-<p>
-```go
-func (api *PublicEthereumAPI) ChainId() (hexutil.Uint64, error) {
-	if config := api.e.blockchain.Config(); config.IsEnabled(config.GetEIP155Transition, api.e.blockchain.CurrentBlock().Number()) {
-		return (hexutil.Uint64)(api.e.blockchain.Config().GetChainID().Uint64()), nil
-	}
-	return hexutil.Uint64(0), fmt.Errorf("chain not synced beyond EIP-155 replay-protection fork block")
-}// ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.
-
-```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L70" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -697,12 +636,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_chainId", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_chainId", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_chainId", "params": []}'
 	```
 
 
@@ -723,6 +670,99 @@ func (s *PublicBlockChainAPI) ChainId() *hexutil.Big {
 
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L535" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_chainId
+
+ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.
+
+
+#### Params (0)
+
+_None_
+
+#### Result
+
+
+
+
+<code>hexutil.Uint64</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of a uint64`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `uint64`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of a uint64",
+        "pattern": "^0x([a-fA-F\\d])+$",
+        "title": "uint64",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_chainId", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_chainId", "params": []}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	eth.chainId();
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicEthereumAPI) ChainId() (hexutil.Uint64, error) {
+	if config := api.e.blockchain.Config(); config.IsEnabled(config.GetEIP155Transition, api.e.blockchain.CurrentBlock().Number()) {
+		return (hexutil.Uint64)(api.e.blockchain.Config().GetChainID().Uint64()), nil
+	}
+	return hexutil.Uint64(0), fmt.Errorf("chain not synced beyond EIP-155 replay-protection fork block")
+}// ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L70" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -779,12 +819,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_coinbase", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_coinbase", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_coinbase", "params": []}'
 	```
 
 
@@ -1013,12 +1061,20 @@ blockNrOrHash <code>*rpc.BlockNumberOrHash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_estimateGas", "params": [<args>, <blockNrOrHash>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_estimateGas", "params": [<args>, <blockNrOrHash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_estimateGas", "params": [<args>, <blockNrOrHash>]}'
 	```
 
 
@@ -1100,12 +1156,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_etherbase", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_etherbase", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_etherbase", "params": []}'
 	```
 
 
@@ -1373,12 +1437,20 @@ args <code>SendTxArgs</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_fillTransaction", "params": [<args>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_fillTransaction", "params": [<args>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_fillTransaction", "params": [<args>]}'
 	```
 
 
@@ -1464,12 +1536,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_gasPrice", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_gasPrice", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_gasPrice", "params": []}'
 	```
 
 
@@ -1594,12 +1674,20 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getBalance", "params": [<address>, <blockNrOrHash>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getBalance", "params": [<address>, <blockNrOrHash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getBalance", "params": [<address>, <blockNrOrHash>]}'
 	```
 
 
@@ -1956,12 +2044,20 @@ fullTx <code>bool</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getBlockByHash", "params": [<hash>, <fullTx>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getBlockByHash", "params": [<hash>, <fullTx>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getBlockByHash", "params": [<hash>, <fullTx>]}'
 	```
 
 
@@ -2348,12 +2444,20 @@ fullTx <code>bool</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getBlockByNumber", "params": [<number>, <fullTx>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getBlockByNumber", "params": [<number>, <fullTx>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getBlockByNumber", "params": [<number>, <fullTx>]}'
 	```
 
 
@@ -2478,12 +2582,20 @@ blockHash <code>common.Hash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getBlockTransactionCountByHash", "params": [<blockHash>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getBlockTransactionCountByHash", "params": [<blockHash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getBlockTransactionCountByHash", "params": [<blockHash>]}'
 	```
 
 
@@ -2628,12 +2740,20 @@ blockNr <code>rpc.BlockNumber</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getBlockTransactionCountByNumber", "params": [<blockNr>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getBlockTransactionCountByNumber", "params": [<blockNr>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getBlockTransactionCountByNumber", "params": [<blockNr>]}'
 	```
 
 
@@ -2759,12 +2879,20 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getCode", "params": [<address>, <blockNrOrHash>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getCode", "params": [<address>, <blockNrOrHash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getCode", "params": [<address>, <blockNrOrHash>]}'
 	```
 
 
@@ -2790,6 +2918,393 @@ func (s *PublicBlockChainAPI) GetCode(ctx context.Context, address common.Addres
 
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L726" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_getFilterChanges
+
+GetFilterChanges returns the logs for the filter with the given id since
+last time it was called. This can be used for polling.
+
+For pending transaction and block filters the result is []common.Hash.
+(pending)Log filters return []Log.
+
+https://eth.wiki/json-rpc/API#eth_getfilterchanges
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+id <code>rpc.ID</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+interface <code>interface{}</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getFilterChanges", "params": [<id>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getFilterChanges", "params": [<id>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	eth.getFilterChanges(id);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicFilterAPI) GetFilterChanges(id rpc.ID) (interface{}, error) {
+	api.filtersMu.Lock()
+	defer api.filtersMu.Unlock()
+	if f, found := api.filters[id]; found {
+		if !f.deadline.Stop() {
+			<-f.deadline.C
+		}
+		f.deadline.Reset(api.timeout)
+		switch f.typ {
+		case PendingTransactionsSubscription, BlocksSubscription, SideBlocksSubscription:
+			hashes := f.hashes
+			f.hashes = nil
+			return returnHashes(hashes), nil
+		case LogsSubscription, MinedAndPendingLogsSubscription:
+			logs := f.logs
+			f.logs = nil
+			return returnLogs(logs), nil
+		}
+	}
+	return [ // GetFilterChanges returns the logs for the filter with the given id since
+	// last time it was called. This can be used for polling.
+	//
+	// For pending transaction and block filters the result is []common.Hash.
+	// (pending)Log filters return []Log.
+	//
+	// https://eth.wiki/json-rpc/API#eth_getfilterchanges
+	]interface{}{}, fmt.Errorf("filter not found")
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L484" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_getFilterLogs
+
+GetFilterLogs returns the logs for the filter with the given id.
+If the filter could not be found an empty array of logs is returned.
+
+https://eth.wiki/json-rpc/API#eth_getfilterlogs
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+id <code>rpc.ID</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+typesLog <code>[]*types.Log</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- items: 
+
+			- additionalProperties: `false`
+			- properties: 
+				- address: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- blockHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- blockNumber: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- data: 
+					- pattern: `^0x([a-fA-F0-9]?)+$`
+					- title: `bytes`
+					- type: `string`
+
+				- logIndex: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- removed: 
+					- type: `boolean`
+
+				- topics: 
+					- items: 
+						- description: `Hex representation of a Keccak 256 hash`
+						- pattern: `^0x[a-fA-F\d]{64}$`
+						- title: `keccak`
+						- type: `string`
+
+					- type: `array`
+
+				- transactionHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- transactionIndex: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+
+			- type: object
+
+
+	- type: array
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "items": [
+            {
+                "additionalProperties": false,
+                "properties": {
+                    "address": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "blockHash": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "blockNumber": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "data": {
+                        "pattern": "^0x([a-fA-F0-9]?)+$",
+                        "title": "bytes",
+                        "type": "string"
+                    },
+                    "logIndex": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "removed": {
+                        "type": "boolean"
+                    },
+                    "topics": {
+                        "items": {
+                            "description": "Hex representation of a Keccak 256 hash",
+                            "pattern": "^0x[a-fA-F\\d]{64}$",
+                            "title": "keccak",
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "transactionHash": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "transactionIndex": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    }
+                },
+                "type": [
+                    "object"
+                ]
+            }
+        ],
+        "type": [
+            "array"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getFilterLogs", "params": [<id>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getFilterLogs", "params": [<id>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	eth.getFilterLogs(id);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicFilterAPI) GetFilterLogs(ctx context.Context, id rpc.ID) ([ // GetFilterLogs returns the logs for the filter with the given id.
+// If the filter could not be found an empty array of logs is returned.
+//
+// https://eth.wiki/json-rpc/API#eth_getfilterlogs
+]*types.Log, error) {
+	api.filtersMu.Lock()
+	f, found := api.filters[id]
+	api.filtersMu.Unlock()
+	if !found || f.typ != LogsSubscription {
+		return nil, fmt.Errorf("filter not found")
+	}
+	var filter *Filter
+	if f.crit.BlockHash != nil {
+		filter = NewBlockFilter(api.backend, *f.crit.BlockHash, f.crit.Addresses, f.crit.Topics)
+	} else {
+		begin := rpc.LatestBlockNumber.Int64()
+		if f.crit.FromBlock != nil {
+			begin = f.crit.FromBlock.Int64()
+		}
+		end := rpc.LatestBlockNumber.Int64()
+		if f.crit.ToBlock != nil {
+			end = f.crit.ToBlock.Int64()
+		}
+		filter = NewRangeFilter(api.backend, begin, end, f.crit.Addresses, f.crit.Topics)
+	}
+	logs, err := filter.Logs(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return returnLogs(logs), nil
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L443" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2846,12 +3361,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getHashrate", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getHashrate", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getHashrate", "params": []}'
 	```
 
 
@@ -3156,12 +3679,20 @@ hash <code>common.Hash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getHeaderByHash", "params": [<hash>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getHeaderByHash", "params": [<hash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getHeaderByHash", "params": [<hash>]}'
 	```
 
 
@@ -3500,12 +4031,20 @@ number <code>rpc.BlockNumber</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getHeaderByNumber", "params": [<number>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getHeaderByNumber", "params": [<number>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getHeaderByNumber", "params": [<number>]}'
 	```
 
 
@@ -3536,6 +4075,331 @@ func (s *PublicBlockChainAPI) GetHeaderByNumber(ctx context.Context, number rpc.
 
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L625" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_getLogs
+
+GetLogs returns logs matching the given argument that are stored within the state.
+
+https://eth.wiki/json-rpc/API#eth_getlogs
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+crit <code>FilterCriteria</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- additionalProperties: `false`
+	- properties: 
+		- Addresses: 
+			- items: 
+				- description: `Hex representation of a Keccak 256 hash POINTER`
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+				- type: `string`
+
+			- type: `array`
+
+		- BlockHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- FromBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- ToBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Topics: 
+			- items: 
+				- items: 
+					- description: `Hex representation of a Keccak 256 hash`
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- type: `array`
+
+			- type: `array`
+
+
+	- type: object
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "additionalProperties": false,
+        "properties": {
+            "Addresses": {
+                "items": {
+                    "description": "Hex representation of a Keccak 256 hash POINTER",
+                    "pattern": "^0x[a-fA-F\\d]{64}$",
+                    "title": "keccak",
+                    "type": "string"
+                },
+                "type": "array"
+            },
+            "BlockHash": {
+                "pattern": "^0x[a-fA-F\\d]{64}$",
+                "title": "keccak",
+                "type": "string"
+            },
+            "FromBlock": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "ToBlock": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "Topics": {
+                "items": {
+                    "items": {
+                        "description": "Hex representation of a Keccak 256 hash",
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "type": "array"
+            }
+        },
+        "type": [
+            "object"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+typesLog <code>[]*types.Log</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- items: 
+
+			- additionalProperties: `false`
+			- properties: 
+				- address: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- blockHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- blockNumber: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- data: 
+					- pattern: `^0x([a-fA-F0-9]?)+$`
+					- title: `bytes`
+					- type: `string`
+
+				- logIndex: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- removed: 
+					- type: `boolean`
+
+				- topics: 
+					- items: 
+						- description: `Hex representation of a Keccak 256 hash`
+						- pattern: `^0x[a-fA-F\d]{64}$`
+						- title: `keccak`
+						- type: `string`
+
+					- type: `array`
+
+				- transactionHash: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- transactionIndex: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+
+			- type: object
+
+
+	- type: array
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "items": [
+            {
+                "additionalProperties": false,
+                "properties": {
+                    "address": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "blockHash": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "blockNumber": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "data": {
+                        "pattern": "^0x([a-fA-F0-9]?)+$",
+                        "title": "bytes",
+                        "type": "string"
+                    },
+                    "logIndex": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "removed": {
+                        "type": "boolean"
+                    },
+                    "topics": {
+                        "items": {
+                            "description": "Hex representation of a Keccak 256 hash",
+                            "pattern": "^0x[a-fA-F\\d]{64}$",
+                            "title": "keccak",
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "transactionHash": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "transactionIndex": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    }
+                },
+                "type": [
+                    "object"
+                ]
+            }
+        ],
+        "type": [
+            "array"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getLogs", "params": [<crit>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getLogs", "params": [<crit>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	eth.getLogs(crit);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicFilterAPI) GetLogs(ctx context.Context, crit FilterCriteria) ([ // GetLogs returns logs matching the given argument that are stored within the state.
+//
+// https://eth.wiki/json-rpc/API#eth_getlogs
+]*types.Log, error) {
+	var filter *Filter
+	if crit.BlockHash != nil {
+		filter = NewBlockFilter(api.backend, *crit.BlockHash, crit.Addresses, crit.Topics)
+	} else {
+		begin := rpc.LatestBlockNumber.Int64()
+		if crit.FromBlock != nil {
+			begin = crit.FromBlock.Int64()
+		}
+		end := rpc.LatestBlockNumber.Int64()
+		if crit.ToBlock != nil {
+			end = crit.ToBlock.Int64()
+		}
+		filter = NewRangeFilter(api.backend, begin, end, crit.Addresses, crit.Topics)
+	}
+	logs, err := filter.Logs(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return returnLogs(logs), err
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L396" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3785,12 +4649,20 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getProof", "params": [<address>, <storageKeys>, <blockNrOrHash>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getProof", "params": [<address>, <storageKeys>, <blockNrOrHash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getProof", "params": [<address>, <storageKeys>, <blockNrOrHash>]}'
 	```
 
 
@@ -3965,12 +4837,20 @@ index <code>hexutil.Uint</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getRawTransactionByBlockHashAndIndex", "params": [<blockHash>, <index>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getRawTransactionByBlockHashAndIndex", "params": [<blockHash>, <index>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getRawTransactionByBlockHashAndIndex", "params": [<blockHash>, <index>]}'
 	```
 
 
@@ -4148,12 +5028,20 @@ index <code>hexutil.Uint</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getRawTransactionByBlockNumberAndIndex", "params": [<blockNr>, <index>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getRawTransactionByBlockNumberAndIndex", "params": [<blockNr>, <index>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getRawTransactionByBlockNumberAndIndex", "params": [<blockNr>, <index>]}'
 	```
 
 
@@ -4269,12 +5157,20 @@ hash <code>common.Hash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getRawTransactionByHash", "params": [<hash>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getRawTransactionByHash", "params": [<hash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getRawTransactionByHash", "params": [<hash>]}'
 	```
 
 
@@ -4416,12 +5312,20 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getStorageAt", "params": [<address>, <key>, <blockNrOrHash>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getStorageAt", "params": [<address>, <key>, <blockNrOrHash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getStorageAt", "params": [<address>, <key>, <blockNrOrHash>]}'
 	```
 
 
@@ -4781,12 +5685,20 @@ index <code>hexutil.Uint</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getTransactionByBlockHashAndIndex", "params": [<blockHash>, <index>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getTransactionByBlockHashAndIndex", "params": [<blockHash>, <index>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getTransactionByBlockHashAndIndex", "params": [<blockHash>, <index>]}'
 	```
 
 
@@ -5170,12 +6082,20 @@ index <code>hexutil.Uint</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getTransactionByBlockNumberAndIndex", "params": [<blockNr>, <index>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getTransactionByBlockNumberAndIndex", "params": [<blockNr>, <index>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getTransactionByBlockNumberAndIndex", "params": [<blockNr>, <index>]}'
 	```
 
 
@@ -5497,12 +6417,20 @@ hash <code>common.Hash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getTransactionByHash", "params": [<hash>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getTransactionByHash", "params": [<hash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getTransactionByHash", "params": [<hash>]}'
 	```
 
 
@@ -5634,12 +6562,20 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getTransactionCount", "params": [<address>, <blockNrOrHash>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getTransactionCount", "params": [<address>, <blockNrOrHash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getTransactionCount", "params": [<address>, <blockNrOrHash>]}'
 	```
 
 
@@ -5767,12 +6703,20 @@ mapstringinterface <code>map[string]interface{}</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getTransactionReceipt", "params": [<hash>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getTransactionReceipt", "params": [<hash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getTransactionReceipt", "params": [<hash>]}'
 	```
 
 
@@ -6175,12 +7119,20 @@ index <code>hexutil.Uint</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getUncleByBlockHashAndIndex", "params": [<blockHash>, <index>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getUncleByBlockHashAndIndex", "params": [<blockHash>, <index>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getUncleByBlockHashAndIndex", "params": [<blockHash>, <index>]}'
 	```
 
 
@@ -6595,12 +7547,20 @@ index <code>hexutil.Uint</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getUncleByBlockNumberAndIndex", "params": [<blockNr>, <index>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getUncleByBlockNumberAndIndex", "params": [<blockNr>, <index>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getUncleByBlockNumberAndIndex", "params": [<blockNr>, <index>]}'
 	```
 
 
@@ -6724,12 +7684,20 @@ blockHash <code>common.Hash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getUncleCountByBlockHash", "params": [<blockHash>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getUncleCountByBlockHash", "params": [<blockHash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getUncleCountByBlockHash", "params": [<blockHash>]}'
 	```
 
 
@@ -6874,12 +7842,20 @@ blockNr <code>rpc.BlockNumber</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getUncleCountByBlockNumber", "params": [<blockNr>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getUncleCountByBlockNumber", "params": [<blockNr>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getUncleCountByBlockNumber", "params": [<blockNr>]}'
 	```
 
 
@@ -6975,12 +7951,20 @@ num4string <code>[4]string</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getWork", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_getWork", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_getWork", "params": []}'
 	```
 
 
@@ -7080,12 +8064,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_hashrate", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_hashrate", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_hashrate", "params": []}'
 	```
 
 
@@ -7106,6 +8098,220 @@ func (api *PublicEthereumAPI) Hashrate() hexutil.Uint64 {
 
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L65" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_logs
+
+Logs creates a subscription that fires for all new logs that match the given filter criteria.
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+crit <code>FilterCriteria</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- additionalProperties: `false`
+	- properties: 
+		- Addresses: 
+			- items: 
+				- description: `Hex representation of a Keccak 256 hash POINTER`
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+				- type: `string`
+
+			- type: `array`
+
+		- BlockHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- FromBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- ToBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Topics: 
+			- items: 
+				- items: 
+					- description: `Hex representation of a Keccak 256 hash`
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- type: `array`
+
+			- type: `array`
+
+
+	- type: object
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "additionalProperties": false,
+        "properties": {
+            "Addresses": {
+                "items": {
+                    "description": "Hex representation of a Keccak 256 hash POINTER",
+                    "pattern": "^0x[a-fA-F\\d]{64}$",
+                    "title": "keccak",
+                    "type": "string"
+                },
+                "type": "array"
+            },
+            "BlockHash": {
+                "pattern": "^0x[a-fA-F\\d]{64}$",
+                "title": "keccak",
+                "type": "string"
+            },
+            "FromBlock": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "ToBlock": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "Topics": {
+                "items": {
+                    "items": {
+                        "description": "Hex representation of a Keccak 256 hash",
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "type": "array"
+            }
+        },
+        "type": [
+            "object"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+
+<code>*rpc.Subscription</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["logs", <crit>]}'
+	```
+
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicFilterAPI) Logs(ctx context.Context, crit FilterCriteria) (*rpc.Subscription, error) {
+	notifier, supported := rpc.NotifierFromContext(ctx)
+	if !supported {
+		return &rpc.Subscription{}, rpc.ErrNotificationsUnsupported
+	}
+	var (
+		rpcSub		= notifier.CreateSubscription()
+		matchedLogs	= make(chan [ // Logs creates a subscription that fires for all new logs that match the given filter criteria.
+		]*types.Log)
+	)
+	logsSub, err := api.events.SubscribeLogs(ethereum.FilterQuery(crit), matchedLogs)
+	if err != nil {
+		return nil, err
+	}
+	go func() {
+		for {
+			select {
+			case logs := <-matchedLogs:
+				for _, log := range logs {
+					notifier.Notify(rpcSub.ID, &log)
+				}
+			case <-rpcSub.Err():
+				logsSub.Unsubscribe()
+				return
+			case <-notifier.Closed():
+				logsSub.Unsubscribe()
+				return
+			}
+		}
+	}()
+	return rpcSub, nil
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L307" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -7137,12 +8343,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_mining", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_mining", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_mining", "params": []}'
 	```
 
 
@@ -7163,6 +8377,860 @@ func (api *PublicMinerAPI) Mining() bool {
 
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L91" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_newBlockFilter
+
+NewBlockFilter creates a filter that fetches blocks that are imported into the chain.
+It is part of the filter package since polling goes with eth_getFilterChanges.
+
+https://eth.wiki/json-rpc/API#eth_newblockfilter
+
+
+#### Params (0)
+
+_None_
+
+#### Result
+
+
+
+
+<code>rpc.ID</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_newBlockFilter", "params": []}'
+	```
+
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicFilterAPI) NewBlockFilter() rpc.ID {
+	var (
+		headers		= make(chan *types.Header)
+		headerSub	= api.events.SubscribeNewHeads(headers)
+	)
+	api.filtersMu.Lock()
+	api.filters[headerSub.ID] = &filter{typ: BlocksSubscription, deadline: time.NewTimer(api.timeout), hashes: make([ // NewBlockFilter creates a filter that fetches blocks that are imported into the chain.
+	// It is part of the filter package since polling goes with eth_getFilterChanges.
+	//
+	// https://eth.wiki/json-rpc/API#eth_newblockfilter
+	]common.Hash, 0), s: headerSub}
+	api.filtersMu.Unlock()
+	go func() {
+		for {
+			select {
+			case h := <-headers:
+				api.filtersMu.Lock()
+				if f, found := api.filters[headerSub.ID]; found {
+					f.hashes = append(f.hashes, h.Hash())
+				}
+				api.filtersMu.Unlock()
+			case <-headerSub.Err():
+				api.filtersMu.Lock()
+				delete(api.filters, headerSub.ID)
+				api.filtersMu.Unlock()
+				return
+			}
+		}
+	}()
+	return headerSub.ID
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L182" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_newFilter
+
+NewFilter creates a new filter and returns the filter id. It can be
+used to retrieve logs when the state changes. This method cannot be
+used to fetch logs that are already stored in the state.
+
+Default criteria for the from and to block are "latest".
+Using "latest" as block number will return logs for mined blocks.
+Using "pending" as block number returns logs for not yet mined (pending) blocks.
+In case logs are removed (chain reorg) previously returned logs are returned
+again but with the removed property set to true.
+
+In case "fromBlock" > "toBlock" an error is returned.
+
+https://eth.wiki/json-rpc/API#eth_newfilter
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+crit <code>FilterCriteria</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- additionalProperties: `false`
+	- properties: 
+		- Addresses: 
+			- items: 
+				- description: `Hex representation of a Keccak 256 hash POINTER`
+				- pattern: `^0x[a-fA-F\d]{64}$`
+				- title: `keccak`
+				- type: `string`
+
+			- type: `array`
+
+		- BlockHash: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- FromBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- ToBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Topics: 
+			- items: 
+				- items: 
+					- description: `Hex representation of a Keccak 256 hash`
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- type: `array`
+
+			- type: `array`
+
+
+	- type: object
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "additionalProperties": false,
+        "properties": {
+            "Addresses": {
+                "items": {
+                    "description": "Hex representation of a Keccak 256 hash POINTER",
+                    "pattern": "^0x[a-fA-F\\d]{64}$",
+                    "title": "keccak",
+                    "type": "string"
+                },
+                "type": "array"
+            },
+            "BlockHash": {
+                "pattern": "^0x[a-fA-F\\d]{64}$",
+                "title": "keccak",
+                "type": "string"
+            },
+            "FromBlock": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "ToBlock": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "Topics": {
+                "items": {
+                    "items": {
+                        "description": "Hex representation of a Keccak 256 hash",
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "type": "array"
+            }
+        },
+        "type": [
+            "object"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+
+<code>rpc.ID</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_newFilter", "params": [<crit>]}'
+	```
+
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicFilterAPI) NewFilter(crit FilterCriteria) (rpc.ID, error) {
+	logs := make(chan [ // NewFilter creates a new filter and returns the filter id. It can be
+	// used to retrieve logs when the state changes. This method cannot be
+	// used to fetch logs that are already stored in the state.
+	//
+	// Default criteria for the from and to block are "latest".
+	// Using "latest" as block number will return logs for mined blocks.
+	// Using "pending" as block number returns logs for not yet mined (pending) blocks.
+	// In case logs are removed (chain reorg) previously returned logs are returned
+	// again but with the removed property set to true.
+	//
+	// In case "fromBlock" > "toBlock" an error is returned.
+	//
+	// https://eth.wiki/json-rpc/API#eth_newfilter
+	]*types.Log)
+	logsSub, err := api.events.SubscribeLogs(ethereum.FilterQuery(crit), logs)
+	if err != nil {
+		return "", err
+	}
+	api.filtersMu.Lock()
+	api.filters[logsSub.ID] = &filter{typ: LogsSubscription, crit: crit, deadline: time.NewTimer(api.timeout), logs: make([]*types.Log, 0), s: logsSub}
+	api.filtersMu.Unlock()
+	go func() {
+		for {
+			select {
+			case l := <-logs:
+				api.filtersMu.Lock()
+				if f, found := api.filters[logsSub.ID]; found {
+					f.logs = append(f.logs, l...)
+				}
+				api.filtersMu.Unlock()
+			case <-logsSub.Err():
+				api.filtersMu.Lock()
+				delete(api.filters, logsSub.ID)
+				api.filtersMu.Unlock()
+				return
+			}
+		}
+	}()
+	return logsSub.ID, nil
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L361" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_newHeads
+
+NewHeads send a notification each time a new (header) block is appended to the chain.
+
+
+#### Params (0)
+
+_None_
+
+#### Result
+
+
+
+
+<code>*rpc.Subscription</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["newHeads"]}'
+	```
+
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicFilterAPI) NewHeads(ctx context.Context) (*rpc.Subscription, error) {
+	notifier, supported := rpc.NotifierFromContext(ctx)
+	if !supported {
+		return &rpc.Subscription{}, rpc.ErrNotificationsUnsupported
+	}
+	rpcSub := notifier.CreateSubscription()
+	go func() {
+		headers := make(chan *types.Header)
+		headersSub := api.events.SubscribeNewHeads(headers)
+		for {
+			select {
+			case h := <-headers:
+				notifier.Notify(rpcSub.ID, h)
+			case <-rpcSub.Err():
+				headersSub.Unsubscribe()
+				return
+			case <-notifier.Closed():
+				headersSub.Unsubscribe()
+				return
+			}
+		}
+	}()
+	return rpcSub, nil
+}// NewHeads send a notification each time a new (header) block is appended to the chain.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L247" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_newPendingTransactionFilter
+
+NewPendingTransactionFilter creates a filter that fetches pending transaction hashes
+as transactions enter the pending state.
+
+It is part of the filter package because this filter can be used through the
+`eth_getFilterChanges` polling method that is also used for log filters.
+
+https://eth.wiki/json-rpc/API#eth_newpendingtransactionfilter
+
+
+#### Params (0)
+
+_None_
+
+#### Result
+
+
+
+
+<code>rpc.ID</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_newPendingTransactionFilter", "params": []}'
+	```
+
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicFilterAPI) NewPendingTransactionFilter() rpc.ID {
+	var (
+		pendingTxs	= make(chan [ // NewPendingTransactionFilter creates a filter that fetches pending transaction hashes
+		// as transactions enter the pending state.
+		//
+		// It is part of the filter package because this filter can be used through the
+		// `eth_getFilterChanges` polling method that is also used for log filters.
+		//
+		// https://eth.wiki/json-rpc/API#eth_newpendingtransactionfilter
+		]common.Hash)
+		pendingTxSub	= api.events.SubscribePendingTxs(pendingTxs)
+	)
+	api.filtersMu.Lock()
+	api.filters[pendingTxSub.ID] = &filter{typ: PendingTransactionsSubscription, deadline: time.NewTimer(api.timeout), hashes: make([]common.Hash, 0), s: pendingTxSub}
+	api.filtersMu.Unlock()
+	go func() {
+		for {
+			select {
+			case ph := <-pendingTxs:
+				api.filtersMu.Lock()
+				if f, found := api.filters[pendingTxSub.ID]; found {
+					f.hashes = append(f.hashes, ph...)
+				}
+				api.filtersMu.Unlock()
+			case <-pendingTxSub.Err():
+				api.filtersMu.Lock()
+				delete(api.filters, pendingTxSub.ID)
+				api.filtersMu.Unlock()
+				return
+			}
+		}
+	}()
+	return pendingTxSub.ID
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L112" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_newPendingTransactions
+
+NewPendingTransactions creates a subscription that is triggered each time a transaction
+enters the transaction pool and was signed from one of the transactions this nodes manages.
+
+
+#### Params (0)
+
+_None_
+
+#### Result
+
+
+
+
+<code>*rpc.Subscription</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["newPendingTransactions"]}'
+	```
+
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicFilterAPI) NewPendingTransactions(ctx context.Context) (*rpc.Subscription, error) {
+	notifier, supported := rpc.NotifierFromContext(ctx)
+	if !supported {
+		return &rpc.Subscription{}, rpc.ErrNotificationsUnsupported
+	}
+	rpcSub := notifier.CreateSubscription()
+	go func() {
+		txHashes := make(chan [ // NewPendingTransactions creates a subscription that is triggered each time a transaction
+		// enters the transaction pool and was signed from one of the transactions this nodes manages.
+		]common.Hash, 128)
+		pendingTxSub := api.events.SubscribePendingTxs(txHashes)
+		for {
+			select {
+			case hashes := <-txHashes:
+				for _, h := range hashes {
+					notifier.Notify(rpcSub.ID, h)
+				}
+			case <-rpcSub.Err():
+				pendingTxSub.Unsubscribe()
+				return
+			case <-notifier.Closed():
+				pendingTxSub.Unsubscribe()
+				return
+			}
+		}
+	}()
+	return rpcSub, nil
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L145" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_newSideBlockFilter
+
+NewSideBlockFilter creates a filter that fetches blocks that are imported into the chain with a non-canonical status.
+It is part of the filter package since polling goes with eth_getFilterChanges.
+
+
+#### Params (0)
+
+_None_
+
+#### Result
+
+
+
+
+<code>rpc.ID</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_newSideBlockFilter", "params": []}'
+	```
+
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicFilterAPI) NewSideBlockFilter() rpc.ID {
+	var (
+		headers		= make(chan *types.Header)
+		headerSub	= api.events.SubscribeNewSideHeads(headers)
+	)
+	api.filtersMu.Lock()
+	api.filters[headerSub.ID] = &filter{typ: SideBlocksSubscription, deadline: time.NewTimer(api.timeout), hashes: make([ // NewSideBlockFilter creates a filter that fetches blocks that are imported into the chain with a non-canonical status.
+	// It is part of the filter package since polling goes with eth_getFilterChanges.
+	]common.Hash, 0), s: headerSub}
+	api.filtersMu.Unlock()
+	go func() {
+		for {
+			select {
+			case h := <-headers:
+				api.filtersMu.Lock()
+				if f, found := api.filters[headerSub.ID]; found {
+					f.hashes = append(f.hashes, h.Hash())
+				}
+				api.filtersMu.Unlock()
+			case <-headerSub.Err():
+				api.filtersMu.Lock()
+				delete(api.filters, headerSub.ID)
+				api.filtersMu.Unlock()
+				return
+			}
+		}
+	}()
+	return headerSub.ID
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L215" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_newSideHeads
+
+NewSideHeads send a notification each time a new non-canonical (header) block is written to the database.
+
+
+#### Params (0)
+
+_None_
+
+#### Result
+
+
+
+
+<code>*rpc.Subscription</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["newSideHeads"]}'
+	```
+
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicFilterAPI) NewSideHeads(ctx context.Context) (*rpc.Subscription, error) {
+	notifier, supported := rpc.NotifierFromContext(ctx)
+	if !supported {
+		return &rpc.Subscription{}, rpc.ErrNotificationsUnsupported
+	}
+	rpcSub := notifier.CreateSubscription()
+	go func() {
+		headers := make(chan *types.Header)
+		headersSub := api.events.SubscribeNewSideHeads(headers)
+		for {
+			select {
+			case h := <-headers:
+				notifier.Notify(rpcSub.ID, h)
+			case <-rpcSub.Err():
+				headersSub.Unsubscribe()
+				return
+			case <-notifier.Closed():
+				headersSub.Unsubscribe()
+				return
+			}
+		}
+	}()
+	return rpcSub, nil
+}// NewSideHeads send a notification each time a new non-canonical (header) block is written to the database.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L277" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -7437,12 +9505,20 @@ RPCTransaction <code>[]*RPCTransaction</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_pendingTransactions", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_pendingTransactions", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_pendingTransactions", "params": []}'
 	```
 
 
@@ -7778,12 +9854,20 @@ gasLimit <code>*hexutil.Uint64</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_resend", "params": [<sendArgs>, <gasPrice>, <gasLimit>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_resend", "params": [<sendArgs>, <gasPrice>, <gasLimit>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_resend", "params": [<sendArgs>, <gasPrice>, <gasLimit>]}'
 	```
 
 
@@ -7941,12 +10025,20 @@ input <code>hexutil.Bytes</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_sendRawTransaction", "params": [<input>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_sendRawTransaction", "params": [<input>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_sendRawTransaction", "params": [<input>]}'
 	```
 
 
@@ -8201,12 +10293,20 @@ args <code>SendTxArgs</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_sendTransaction", "params": [<args>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_sendTransaction", "params": [<args>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_sendTransaction", "params": [<args>]}'
 	```
 
 
@@ -8379,12 +10479,20 @@ data <code>hexutil.Bytes</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_sign", "params": [<addr>, <data>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_sign", "params": [<addr>, <data>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_sign", "params": [<addr>, <data>]}'
 	```
 
 
@@ -8670,12 +10778,20 @@ args <code>SendTxArgs</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_signTransaction", "params": [<args>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_signTransaction", "params": [<args>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_signTransaction", "params": [<args>]}'
 	```
 
 
@@ -8827,12 +10943,20 @@ id <code>common.Hash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_submitHashRate", "params": [<rate>, <id>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_submitHashRate", "params": [<rate>, <id>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_submitHashRate", "params": [<rate>, <id>]}'
 	```
 
 
@@ -9005,12 +11129,20 @@ digest <code>common.Hash</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_submitWork", "params": [<nonce>, <hash>, <digest>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_submitWork", "params": [<nonce>, <hash>, <digest>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_submitWork", "params": [<nonce>, <hash>, <digest>]}'
 	```
 
 
@@ -9211,18 +11343,13 @@ subscriptionID <code>rpc.ID</code>
 
 
 
-=== "Shell"
+
+=== "Shell WebSocket"
 
 	``` shell
-	wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": [<subscriptionName>, <subscriptionOptions>]}'
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": [<subscriptionName>, <subscriptionOptions>]}'
 	```
 
-
-=== "Javascript Console"
-
-	``` js
-	eth.subscribe(subscriptionName,subscriptionOptions);
-	```
 
 
 
@@ -9235,7 +11362,7 @@ func (sub *RPCEthSubscription) Subscribe(subscriptionName RPCEthSubscriptionPara
 // Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L234" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L235" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -9294,10 +11421,12 @@ _None_
 
 
 
-=== "Shell"
+
+
+=== "Shell WebSocket"
 
 	``` shell
-	wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["syncing"]}'
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["syncing"]}'
 	```
 
 
@@ -9369,12 +11498,20 @@ interface <code>interface{}</code>
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_syncing", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_syncing", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_syncing", "params": []}'
 	```
 
 
@@ -9405,6 +11542,118 @@ func (s *PublicEthereumAPI) Syncing() (interface{}, error) {
 }
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L75" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_uninstallFilter
+
+UninstallFilter removes the filter with the given filter id.
+
+https://eth.wiki/json-rpc/API#eth_uninstallfilter
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+id <code>rpc.ID</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Subscription identifier`
+	- title: `subscriptionID`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Subscription identifier",
+        "title": "subscriptionID",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+
+<code>bool</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_uninstallFilter", "params": [<id>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_uninstallFilter", "params": [<id>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	eth.uninstallFilter(id);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *PublicFilterAPI) UninstallFilter(id rpc.ID) bool {
+	api.filtersMu.Lock()
+	f, found := api.filters[id]
+	if found {
+		delete(api.filters, id)
+	}
+	api.filtersMu.Unlock()
+	if found {
+		f.s.Unsubscribe()
+	}
+	return found
+}// UninstallFilter removes the filter with the given filter id.
+//
+// https://eth.wiki/json-rpc/API#eth_uninstallfilter
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L425" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -9462,12 +11711,20 @@ _None_
 #### Client Method Invocation Examples
 
 
-
-
-=== "Shell"
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_unsubscribe", "params": [<id>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_unsubscribe", "params": [<id>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_unsubscribe", "params": [<id>]}'
 	```
 
 
@@ -9487,7 +11744,7 @@ func (sub *RPCEthSubscription) Unsubscribe(id rpc.ID) error {
 }// Unsubscribe terminates an existing subscription by ID.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L225" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L226" target="_">View on GitHub →</a>
 </p>
 </details>
 

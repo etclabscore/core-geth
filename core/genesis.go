@@ -71,9 +71,6 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			if err := genesis.SetEIP2565Transition(&n); err != nil {
 				return genesis, stored, err
 			}
-			if err := genesis.SetEIP2315Transition(&n); err != nil {
-				return genesis, stored, err
-			}
 			if err := genesis.SetEIP2929Transition(&n); err != nil {
 				return genesis, stored, err
 			}
@@ -123,9 +120,6 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	if overrideMagneto != nil {
 		n := overrideMagneto.Uint64()
 		if err := newcfg.SetEIP2565Transition(&n); err != nil {
-			return newcfg, stored, err
-		}
-		if err := newcfg.SetEIP2315Transition(&n); err != nil {
 			return newcfg, stored, err
 		}
 		if err := newcfg.SetEIP2929Transition(&n); err != nil {

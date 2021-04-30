@@ -118,6 +118,11 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 		"isSubscriptionableMethod": func(m *meta_schema.MethodObject) bool {
 			return *m.Result.ContentDescriptorObject.Description == "*rpc.Subscription"
 		},
+		// isFilterMethod checks whether the method is being used as a filter.
+		"isFilterMethod": func(m *meta_schema.MethodObject) bool {
+			// TODO: later, check for `*filters.PublicFilterAPI` only
+			return *m.Result.ContentDescriptorObject.Name == "rpcID"
+		},
 		// methodFormatJSConsole is a pretty-printer that returns the JS console use example for a method.
 		"methodFormatJSConsole": func(m *meta_schema.MethodObject) string {
 			name := string(*m.Name)
@@ -153,10 +158,10 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 				paramNames = strings.Join(out, ", ")
 			}
 
-			return fmt.Sprintf(`curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)
+			return fmt.Sprintf(`curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)
 		},
-		// methodFormatCURLSubscription is a pretty printer that returns the websocket's method invocation example string.
-		"methodFormatCURLSubscription": func(m *meta_schema.MethodObject) string {
+		// methodFormatWS is a pretty printer that returns the websocket's method invocation example string.
+		"methodFormatWS": func(m *meta_schema.MethodObject) string {
 			paramNames := ""
 			if m.Params != nil {
 				out := []string{}
@@ -166,10 +171,10 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 				paramNames = strings.Join(out, ", ")
 			}
 
-			return fmt.Sprintf(`wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)
+			return fmt.Sprintf(`wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)
 		},
-		// methodFormatCURLSubscriptionable is a pretty printer that returns the websocket's method invocation example string using the package `*_subscribe` method.
-		"methodFormatCURLSubscriptionable": func(m *meta_schema.MethodObject) string {
+		// methodFormatWSSubscribe is a pretty printer that returns the websocket's method invocation example string using the package `*_subscribe` method.
+		"methodFormatWSSubscribe": func(m *meta_schema.MethodObject) string {
 			methodName := string(*m.Name)
 			outParams := []string{}
 
@@ -187,7 +192,7 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 				paramNames = strings.Join(outParams, ", ")
 			}
 
-			return fmt.Sprintf(`wscat -c ws://localhost:8545 -x '{"jsonrpc": "2.0", "id": 1, "method": "%s", "params": [%s]}'`, methodName, paramNames)
+			return fmt.Sprintf(`wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "%s", "params": [%s]}'`, methodName, paramNames)
 		},
 	})
 
@@ -259,20 +264,26 @@ _None_
 
 #### Client Method Invocation Examples
 
-{{ $shellExample := methodFormatCURL . }}
-{{ if isSubscribeMethod . -}}
-{{ $shellExample = methodFormatCURLSubscription . }}
-{{ else if isSubscriptionableMethod . }}
-{{ $shellExample = methodFormatCURLSubscriptionable . }}
-{{ end }}
-
-=== "Shell"
+{{ if and (not (isSubscribeMethod .)) (and (not (isSubscriptionableMethod .)) (not (isFilterMethod .))) }}
+=== "Shell HTTP"
 
 	` + "```" + ` shell
-	{{ $shellExample }}
+	{{ methodFormatCURL . }}
+	` + "```" + `
+{{ end }}
+
+{{ $shellWSExample := methodFormatWS . }}
+{{ if isSubscriptionableMethod . }}
+{{ $shellWSExample = methodFormatWSSubscribe . }}
+{{ end }}
+
+=== "Shell WebSocket"
+
+	` + "```" + ` shell
+	{{ $shellWSExample }}
 	` + "```" + `
 
-{{ if not (isSubscriptionableMethod .) }}
+{{ if and (not (isSubscribeMethod .)) (and (not (isSubscriptionableMethod .)) (not (isFilterMethod .))) }}
 === "Javascript Console"
 
 	` + "```" + ` js

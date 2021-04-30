@@ -143,7 +143,7 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 		// This pattern matches all strings that start with Subscribe and are suffixed with a non-zero
 		// number of A-z characters.
 		pkgStr := method.Type.In(0).String()
-		if (isPubSub(method.Type) && pkgStr == "*eth.PublicEthereumAPI") || pkgStr == "*filters.PublicFilterAPI" {
+		if isPubSub(method.Type) && pkgStr == "*eth.PublicEthereumAPI" {
 			// This catches MOST of them (except SubscribeSyncStatus)
 			return false
 		}

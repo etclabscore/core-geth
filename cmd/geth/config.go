@@ -20,6 +20,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"math"
 	"math/big"
 	"os"
 	"reflect"
@@ -144,6 +145,11 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 	// Handle cross-chain configuration override cases.
 	if ctx.GlobalIsSet(utils.OverrideMagnetoFlag.Name) {
 		cfg.Eth.OverrideMagneto = new(big.Int).SetUint64(ctx.GlobalUint64(utils.OverrideMagnetoFlag.Name))
+	}
+	if ctx.GlobalIsSet(utils.ECBP1100Flag.Name) {
+		if n := ctx.GlobalUint64(utils.ECBP1100Flag.Name); n != math.MaxUint64 {
+			cfg.Eth.ECBP1100 = new(big.Int).SetUint64(n)
+		}
 	}
 	if ctx.GlobalIsSet(utils.ECBP1100NoDisableFlag.Name) {
 		if enable := ctx.GlobalBool(utils.ECBP1100NoDisableFlag.Name); enable {

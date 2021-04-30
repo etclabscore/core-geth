@@ -158,6 +158,7 @@ var (
 		utils.EWASMInterpreterFlag,
 		utils.EVMInterpreterFlag,
 		utils.MinerNotifyFullFlag,
+		utils.ECBP1100Flag,
 		utils.ECBP1100NoDisableFlag,
 		configFileFlag,
 	}

@@ -58,7 +58,10 @@ func (frdb *freezerdb) Close() error {
 // Freeze is a helper method used for external testing to trigger and block until
 // a freeze cycle completes, without having to sleep for a minute to trigger the
 // automatic background run.
-func (frdb *freezerdb) Freeze(threshold uint64) {
+func (frdb *freezerdb) Freeze(threshold uint64) error {
+	if frdb.AncientStore.(*freezer).readonly {
+		return errReadOnly
+	}
 	// Set the freezer threshold to a temporary value
 	defer func(old uint64) {
 		atomic.StoreUint64(&frdb.AncientStore.(*freezer).threshold, old)
@@ -69,6 +72,7 @@ func (frdb *freezerdb) Freeze(threshold uint64) {
 	trigger := make(chan struct{}, 1)
 	frdb.AncientStore.(*freezer).trigger <- trigger
 	<-trigger
+	return nil
 }
 
 // nofreezedb is a database wrapper that disables freezer data retrievals.
@@ -122,11 +126,11 @@ func NewDatabase(db ethdb.KeyValueStore) ethdb.Database {
 // NewDatabaseWithFreezerRemote creates a high level database on top of a given key-
 // value data store with a freezer moving immutable chain segments into cold
 // storage.
-func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerURL string) (ethdb.Database, error) {
+func NewDatabaseWithFreezerRemote(db ethdb.KeyValueStore, freezerURL string, readonly bool) (ethdb.Database, error) {
 	// Create the idle freezer instance
 	log.Info("New remote freezer", "freezer", freezerURL)
 
-	frdb, err := newFreezerRemoteClient(freezerURL)
+	frdb, err := newFreezerRemoteClient(freezerURL, readonly)
 	if err != nil {
 		log.Error("NewDatabaseWithFreezerRemote error", "error", err)
 		return nil, err
@@ -203,8 +207,9 @@ Please set --ancient.rpc to the correct path, and/or review the remote freezer's
 		}
 	}
 	// Freezer is consistent with the key-value database, permit combining the two
-	go freezeRemote(db, frdb, frdb.threshold, frdb.quit, frdb.trigger)
-
+	if !frdb.readonly {
+		go freezeRemote(db, frdb, frdb.threshold, frdb.quit, frdb.trigger)
+	}
 	return &freezerdb{
 		KeyValueStore: db,
 		AncientStore:  frdb,
@@ -214,9 +219,9 @@ Please set --ancient.rpc to the correct path, and/or review the remote freezer's
 // NewDatabaseWithFreezer creates a high level database on top of a given key-
 // value data store with a freezer moving immutable chain segments into cold
 // storage.
-func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace string) (ethdb.Database, error) {
+func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace string, readonly bool) (ethdb.Database, error) {
 	// Create the idle freezer instance
-	frdb, err := newFreezer(freezerStr, namespace)
+	frdb, err := newFreezer(freezerStr, namespace, readonly)
 	if err != nil {
 		return nil, err
 	}
@@ -272,8 +277,9 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 	}
 
 	// Freezer is consistent with the key-value database, permit combining the two
-	go frdb.freeze(db)
-
+	if !frdb.readonly {
+		go frdb.freeze(db)
+	}
 	return &freezerdb{
 		KeyValueStore: db,
 		AncientStore:  frdb,
@@ -295,8 +301,8 @@ func NewMemoryDatabaseWithCap(size int) ethdb.Database {
 
 // NewLevelDBDatabase creates a persistent key-value database without a freezer
 // moving immutable chain segments into cold storage.
-func NewLevelDBDatabase(file string, cache int, handles int, namespace string) (ethdb.Database, error) {
-	db, err := leveldb.New(file, cache, handles, namespace)
+func NewLevelDBDatabase(file string, cache int, handles int, namespace string, readonly bool) (ethdb.Database, error) {
+	db, err := leveldb.New(file, cache, handles, namespace, readonly)
 	if err != nil {
 		return nil, err
 	}
@@ -305,12 +311,12 @@ func NewLevelDBDatabase(file string, cache int, handles int, namespace string) (
 
 // NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a
 // freezer moving immutable chain segments into cold storage.
-func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, freezerURL string) (ethdb.Database, error) {
-	kvdb, err := leveldb.New(file, cache, handles, "eth/db/chaindata")
+func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, freezerURL string, readonly bool) (ethdb.Database, error) {
+	kvdb, err := leveldb.New(file, cache, handles, "eth/db/chaindata", readonly)
 	if err != nil {
 		return nil, err
 	}
-	frdb, err := NewDatabaseWithFreezerRemote(kvdb, freezerURL)
+	frdb, err := NewDatabaseWithFreezerRemote(kvdb, freezerURL, readonly)
 	if err != nil {
 		kvdb.Close()
 		return nil, err
@@ -320,12 +326,12 @@ func NewLevelDBDatabaseWithFreezerRemote(file string, cache int, handles int, fr
 
 // NewLevelDBDatabaseWithFreezer creates a persistent key-value database with a
 // freezer moving immutable chain segments into cold storage.
-func NewLevelDBDatabaseWithFreezer(file string, cache int, handles int, freezer string, namespace string) (ethdb.Database, error) {
-	kvdb, err := leveldb.New(file, cache, handles, namespace)
+func NewLevelDBDatabaseWithFreezer(file string, cache int, handles int, freezer string, namespace string, readonly bool) (ethdb.Database, error) {
+	kvdb, err := leveldb.New(file, cache, handles, namespace, readonly)
 	if err != nil {
 		return nil, err
 	}
-	frdb, err := NewDatabaseWithFreezer(kvdb, freezer, namespace)
+	frdb, err := NewDatabaseWithFreezer(kvdb, freezer, namespace, readonly)
 	if err != nil {
 		kvdb.Close()
 		return nil, err

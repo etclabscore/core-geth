@@ -298,12 +298,12 @@ func (hc *HeaderChain) writeHeaders(headers []*types.Header) (result *headerWrit
 
 func (hc *HeaderChain) ValidateHeaderChain(chain []*types.Header, checkFreq int) (int, error) {
 	// Do a sanity check that the provided chain is actually ordered and linked
+	// NOTE(meowsbits): These checks for nil heads are core-geth specific.
 	if len(chain) == 0 {
 		return 0, nil
-	} else if len(chain) >= 1 {
-		if chain[0] == nil {
-			return 0, fmt.Errorf("header was nil")
-		}
+	}
+	if chain[0] == nil {
+		return 0, fmt.Errorf("header was nil")
 	}
 	for i := 1; i < len(chain); i++ {
 		if chain[i] == nil {
@@ -333,7 +333,7 @@ func (hc *HeaderChain) ValidateHeaderChain(chain []*types.Header, checkFreq int)
 	seals := make([]bool, len(chain))
 	if checkFreq != 0 {
 		// In case of checkFreq == 0 all seals are left false.
-		for i := 0; i < len(seals)/checkFreq; i++ {
+		for i := 0; i <= len(seals)/checkFreq; i++ {
 			index := i*checkFreq + hc.rand.Intn(checkFreq)
 			if index >= len(seals) {
 				index = len(seals) - 1

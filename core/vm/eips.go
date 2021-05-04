@@ -80,9 +80,9 @@ func enable1884(jt *JumpTable) {
 	enableSelfBalance(jt)
 }
 
-func opSelfBalance(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([]byte, error) {
-	balance, _ := uint256.FromBig(interpreter.evm.StateDB.GetBalance(callContext.contract.Address()))
-	callContext.stack.push(balance)
+func opSelfBalance(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]byte, error) {
+	balance, _ := uint256.FromBig(interpreter.evm.StateDB.GetBalance(scope.Contract.Address()))
+	scope.Stack.push(balance)
 	return nil, nil
 }
 
@@ -99,9 +99,9 @@ func enable1344(jt *JumpTable) {
 }
 
 // opChainID implements CHAINID opcode
-func opChainID(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([]byte, error) {
+func opChainID(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]byte, error) {
 	chainId, _ := uint256.FromBig(interpreter.evm.chainConfig.GetChainID())
-	callContext.stack.push(chainId)
+	scope.Stack.push(chainId)
 	return nil, nil
 }
 

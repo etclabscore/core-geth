@@ -150,7 +150,6 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
 		cfg.State.PrepareAccessList(cfg.Origin, nil, vmenv.ActivePrecompiles(), nil)
 	}
-
 	// Call the code with the given configuration.
 	code, address, leftOverGas, err := vmenv.Create(
 		sender,
@@ -176,7 +175,6 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
 		statedb.PrepareAccessList(cfg.Origin, &address, vmenv.ActivePrecompiles(), nil)
 	}
-
 	// Call the code with the given configuration.
 	ret, leftOverGas, err := vmenv.Call(
 		sender,
@@ -185,6 +183,5 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 		cfg.GasLimit,
 		cfg.Value,
 	)
-
 	return ret, leftOverGas, err
 }

@@ -87,7 +87,7 @@ func TestStateProcessorErrors(t *testing.T) {
 			txs: []*types.Transaction{
 				makeTx(0, common.Address{}, big.NewInt(0), vars.TxGas, big.NewInt(0xffffff), nil),
 			},
-			want: "could not apply tx 0 [0xaa3f7d86802b1f364576d9071bf231e31d61b392d306831ac9cf706ff5371ce0]: insufficient funds for gas * price + value: address 0x71562b71999873DB5b286dF957af199Ec94617F7 have 0 want 352321515000",
+			want: "could not apply tx 0 [0xaa3f7d86802b1f364576d9071bf231e31d61b392d306831ac9cf706ff5371ce0]: insufficient funds for gas * price + value",
 		},
 		{
 			txs: []*types.Transaction{

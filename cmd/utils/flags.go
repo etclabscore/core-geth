@@ -264,9 +264,9 @@ var (
 		Usage: "Megabytes of memory allocated to bloom-filter for pruning",
 		Value: 2048,
 	}
-	OverrideBerlinFlag = cli.Uint64Flag{
-		Name:  "override.berlin",
-		Usage: "Manually specify Berlin fork-block, overriding the bundled setting",
+	OverrideMagnetoFlag = cli.Uint64Flag{
+		Name:  "override.magneto",
+		Usage: "Manually specify magneto fork-block, overriding the bundled setting",
 	}
 	// Light server and client settings
 	LightServeFlag = cli.IntFlag{

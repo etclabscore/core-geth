@@ -20,6 +20,7 @@ package eth
 import (
 	"errors"
 	"fmt"
+	"math"
 	"math/big"
 	"runtime"
 	"sync"
@@ -142,7 +143,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	if err != nil {
 		return nil, err
 	}
-	chainConfig, genesisHash, genesisErr := core.SetupGenesisBlockWithOverride(chainDb, config.Genesis, config.ECBP1100)
+	chainConfig, genesisHash, genesisErr := core.SetupGenesisBlockWithOverride(chainDb, config.Genesis, config.OverrideMagneto)
 	if _, ok := genesisErr.(*confp.ConfigCompatError); genesisErr != nil && !ok {
 		return nil, genesisErr
 	}
@@ -211,6 +212,13 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	}
 	eth.bloomIndexer.Start(eth.blockchain)
 	// Handle artificial finality config override cases.
+	if config.ECBP1100 != nil {
+		if n := config.ECBP1100.Uint64(); n != math.MaxUint64 {
+			if err := eth.blockchain.Config().SetECBP1100Transition(&n); err != nil {
+				return nil, err
+			}
+		}
+	}
 	if config.ECBP1100NoDisable != nil {
 		if *config.ECBP1100NoDisable {
 			eth.blockchain.ArtificialFinalityNoDisable(1)

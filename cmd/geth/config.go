@@ -20,12 +20,12 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"math"
 	"math/big"
 	"os"
 	"reflect"
 	"unicode"
 
-	"github.com/ethereum/go-ethereum/common/math"
 	"gopkg.in/urfave/cli.v1"
 
 	"github.com/ethereum/go-ethereum/cmd/utils"
@@ -142,11 +142,10 @@ func makeConfigNode(ctx *cli.Context) (*node.Node, gethConfig) {
 func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 	stack, cfg := makeConfigNode(ctx)
 
-	if ctx.GlobalIsSet(utils.OverrideBerlinFlag.Name) {
-		cfg.Eth.OverrideBerlin = new(big.Int).SetUint64(ctx.GlobalUint64(utils.OverrideBerlinFlag.Name))
-	}
-
 	// Handle cross-chain configuration override cases.
+	if ctx.GlobalIsSet(utils.OverrideMagnetoFlag.Name) {
+		cfg.Eth.OverrideMagneto = new(big.Int).SetUint64(ctx.GlobalUint64(utils.OverrideMagnetoFlag.Name))
+	}
 	if ctx.GlobalIsSet(utils.ECBP1100Flag.Name) {
 		if n := ctx.GlobalUint64(utils.ECBP1100Flag.Name); n != math.MaxUint64 {
 			cfg.Eth.ECBP1100 = new(big.Int).SetUint64(n)

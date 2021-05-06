@@ -73,6 +73,11 @@ func TestDifficultyTestConfigGen(t *testing.T) {
 	dt.generateFromReference("Byzantium", "ETC_Atlantis")
 	dt.generateFromReference("Constantinople", "ETC_Agharta")
 	dt.generateFromReference("EIP2384", "ETC_Phoenix")
+	/*
+		My rationale for not adding ETC_Magneto was that difficulty hasn't changed for the Foundation since EIP2384 Muir Glacier,
+		and the tests haven't changed in at least that long.
+		This leads to me to think that adding an ETC_Magneto case would only duplicate the set of ETC_Phoenix.
+	*/
 
 	for k, v := range difficultyChainConfigurations {
 		dt.config(k, v)
@@ -167,6 +172,11 @@ func TestDifficultyGen(t *testing.T) {
 	dt.generateFromReference("Byzantium", "ETC_Atlantis")
 	dt.generateFromReference("Constantinople", "ETC_Agharta")
 	dt.generateFromReference("EIP2384", "ETC_Phoenix")
+	/*
+		My rationale for not adding ETC_Magneto was that difficulty hasn't changed for the Foundation since EIP2384 Muir Glacier,
+		and the tests haven't changed in at least that long.
+		This leads to me to think that adding an ETC_Magneto case would only duplicate the set of ETC_Phoenix.
+	*/
 
 	// Not difficulty-tests
 	dt.skipLoad("hexencodetest.*")

@@ -94,11 +94,11 @@ func seedHash(epoch uint64, epochLength uint64) []byte {
 	return seed
 }
 
-// hashimoto aggregates data from the full dataset in order to produce our final
-// value for a particular header hash and nonce.
+// keccakHasher produces a hash from combining the hash of the block header contents
+// combined with a nonce.
 func keccakHasher(hash []byte, nonce uint64) ([]byte, []byte) {
 
-	// Combine header+nonce into a 64 byte seed
+	// Combine hash+nonce into a 64 byte seed
 	seed := make([]byte, 40)
 	copy(seed, hash)
 	binary.BigEndian.PutUint64(seed[32:], nonce)

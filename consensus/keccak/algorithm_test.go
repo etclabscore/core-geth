@@ -23,8 +23,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
-// Tests whether the hashimoto lookup works for both light as well as the full
-// datasets.
+// Unit test for keccakHasher function.
 func TestKeccakHasher(t *testing.T) {
 
 	// Create a block to verify

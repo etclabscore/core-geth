@@ -160,6 +160,7 @@ func TestGethStartupLogs(t *testing.T) {
 	for i, c := range cases {
 		t.Run(fmt.Sprintf("TestGethStartupLogs/%d: %v", i, c.flags), func(t *testing.T) {
 			geth := runGeth(t, append(c.flags, "--exec", "admin.nodeInfo.name", "console")...)
+			geth.KillTimeout = 10 * time.Second
 			geth.ExpectRegexp("(?ism).*CoreGeth.*")
 			geth.ExpectExit()
 			if status := geth.ExitStatus(); status != 0 {

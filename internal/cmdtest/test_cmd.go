@@ -37,16 +37,17 @@ import (
 )
 
 func NewTestCmd(t *testing.T, data interface{}) *TestCmd {
-	return &TestCmd{T: t, Data: data}
+	return &TestCmd{T: t, Data: data, KillTimeout: 5 * time.Second}
 }
 
 type TestCmd struct {
 	// For total convenience, all testing methods are available.
 	*testing.T
 
-	Func    template.FuncMap
-	Data    interface{}
-	Cleanup func()
+	Func        template.FuncMap
+	Data        interface{}
+	Cleanup     func()
+	KillTimeout time.Duration
 
 	cmd    *exec.Cmd
 	stdout *bufio.Reader
@@ -231,7 +232,7 @@ func (tt *TestCmd) Kill() {
 }
 
 func (tt *TestCmd) withKillTimeout(fn func()) {
-	timeout := time.AfterFunc(5*time.Second, func() {
+	timeout := time.AfterFunc(tt.KillTimeout, func() {
 		tt.Log("killing the child process (timeout)")
 		tt.Kill()
 	})

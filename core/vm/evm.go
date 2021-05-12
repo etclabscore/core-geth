@@ -463,7 +463,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 	ret, err := run(evm, contract, nil, false)
 
 	// Check whether the max code size has been exceeded, assign err if the case.
-	if err == nil && evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP170Transition, evm.Context.BlockNumber) && len(ret) > vars.MaxCodeSize {
+	if err == nil && evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP170Transition, evm.Context.BlockNumber) && uint64(len(ret)) > vars.MaxCodeSize {
 		err = ErrMaxCodeSizeExceeded
 	}
 

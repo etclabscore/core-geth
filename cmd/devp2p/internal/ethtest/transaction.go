@@ -25,7 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/internal/utesting"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 //var faucetAddr = common.HexToAddress("0x71562b71999873DB5b286dF957af199Ec94617F7")
@@ -224,7 +224,7 @@ func generateTxs(t *utesting.T, s *Suite, numTxs int) (map[common.Hash]common.Ha
 	return txHashMap, txs
 }
 
-func generateTx(t *utesting.T, chainConfig *params.ChainConfig, nonce uint64, gas uint64) *types.Transaction {
+func generateTx(t *utesting.T, chainConfig ctypes.ChainConfigurator, nonce uint64, gas uint64) *types.Transaction {
 	var to common.Address
 	tx := types.NewTransaction(nonce, to, big.NewInt(1), gas, big.NewInt(1), []byte{})
 	return signWithFaucet(t, chainConfig, tx)
@@ -287,7 +287,7 @@ func hugeData(t *utesting.T, s *Suite) *types.Transaction {
 	return signWithFaucet(t, s.chain.chainConfig, txNew)
 }
 
-func signWithFaucet(t *utesting.T, chainConfig *params.ChainConfig, tx *types.Transaction) *types.Transaction {
+func signWithFaucet(t *utesting.T, chainConfig ctypes.ChainConfigurator, tx *types.Transaction) *types.Transaction {
 	signer := types.LatestSigner(chainConfig)
 	signedTx, err := types.SignTx(tx, signer, faucetKey)
 	if err != nil {

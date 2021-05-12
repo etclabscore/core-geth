@@ -78,6 +78,8 @@ func (h *testEthHandler) Handle(peer *eth.Peer, packet eth.Packet) error {
 	default:
 		panic(fmt.Sprintf("unexpected eth packet type in tests: %T", packet))
 	}
+	// Unreachable: flow should never reach here.
+	return nil
 }
 
 // Tests that peers are correctly accepted (or rejected) based on the advertised

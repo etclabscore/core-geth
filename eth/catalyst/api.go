@@ -38,9 +38,9 @@ import (
 // Register adds catalyst APIs to the node.
 func Register(stack *node.Node, backend *eth.Ethereum) error {
 	chainconfig := backend.BlockChain().Config()
-	if chainconfig.CatalystBlock == nil {
+	if n := chainconfig.GetCatalystTransition(); n == nil {
 		return errors.New("catalystBlock is not set in genesis config")
-	} else if chainconfig.CatalystBlock.Sign() != 0 {
+	} else if *n != 0 {
 		return errors.New("catalystBlock of genesis config must be zero")
 	}
 

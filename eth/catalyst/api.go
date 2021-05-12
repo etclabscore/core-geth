@@ -30,7 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
-	chainParams "github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
 )
@@ -159,8 +159,8 @@ func (api *consensusAPI) AssembleBlock(params assembleBlockParams) (*executableD
 		transactions []*types.Transaction
 	)
 	for {
-		if env.gasPool.Gas() < chainParams.TxGas {
-			log.Trace("Not enough gas for further transactions", "have", env.gasPool, "want", chainParams.TxGas)
+		if env.gasPool.Gas() < vars.TxGas {
+			log.Trace("Not enough gas for further transactions", "have", env.gasPool, "want", vars.TxGas)
 			break
 		}
 		tx := txHeap.Peek()

@@ -711,15 +711,15 @@ func (spec *ParityChainSpec) MustSetConsensusEngineType(t ctypes.ConsensusEngine
 }
 
 func (spec *ParityChainSpec) GetCatalystTransition() *uint64 {
-	return spec.Engine.Ethash.Params.catalystBlock.Uint64P()
+	return spec.Engine.Ethash.Params.CatalystBlock.Uint64P()
 }
 
 func (spec *ParityChainSpec) SetCatalystTransition(n *uint64) error {
 	if n == nil {
-		spec.Engine.Ethash.Params.catalystBlock = nil
+		spec.Engine.Ethash.Params.CatalystBlock = nil
 		return nil
 	}
-	spec.Engine.Ethash.Params.catalystBlock = new(ParityU64).SetUint64(n)
+	spec.Engine.Ethash.Params.CatalystBlock = new(ParityU64).SetUint64(n)
 	return nil
 }
 

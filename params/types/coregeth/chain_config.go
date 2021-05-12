@@ -199,6 +199,8 @@ type CoreGethChainConfig struct {
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
 	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
 
+	Ethereum2CatalystFBlock *big.Int `json:"catalystBlock,omitempty"`
+
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint,omitempty"`
 	TrustedCheckpointOracle *ctypes.CheckpointOracleConfig `json:"trustedCheckpointOracle,omitempty"`
 

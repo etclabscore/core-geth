@@ -512,6 +512,15 @@ func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) erro
 	}
 }
 
+func (c *ChainConfig) GetCatalystTransition() *uint64 {
+	return bigNewU64(c.CatalystBlock)
+}
+
+func (c *ChainConfig) SetCatalystTransition(n *uint64) error {
+	c.CatalystBlock = setBig(c.CatalystBlock, n)
+	return nil
+}
+
 func (c *ChainConfig) GetEthashMinimumDifficulty() *big.Int {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil

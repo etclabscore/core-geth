@@ -169,6 +169,10 @@ type ConsensusEnginator interface {
 	MustSetConsensusEngineType(t ConsensusEngineT) error
 	EthashConfigurator
 	CliqueConfigurator
+
+	// Catalyst: ETH -> ETH2 PoS transition helper
+	GetCatalystTransition() *uint64
+	SetCatalystTransition(n *uint64) error
 }
 
 type EthashConfigurator interface {

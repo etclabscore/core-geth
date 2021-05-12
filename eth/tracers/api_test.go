@@ -314,10 +314,10 @@ func TestOverridenTraceCall(t *testing.T) {
 
 	// Initialize test accounts
 	accounts := newAccounts(3)
-	genesis := &core.Genesis{Alloc: core.GenesisAlloc{
-		accounts[0].addr: {Balance: big.NewInt(params.Ether)},
-		accounts[1].addr: {Balance: big.NewInt(params.Ether)},
-		accounts[2].addr: {Balance: big.NewInt(params.Ether)},
+	genesis := &genesisT.Genesis{Alloc: genesisT.GenesisAlloc{
+		accounts[0].addr: {Balance: big.NewInt(vars.Ether)},
+		accounts[1].addr: {Balance: big.NewInt(vars.Ether)},
+		accounts[2].addr: {Balance: big.NewInt(vars.Ether)},
 	}}
 	genBlocks := 10
 	signer := types.HomesteadSigner{}
@@ -325,7 +325,7 @@ func TestOverridenTraceCall(t *testing.T) {
 		// Transfer from account[0] to account[1]
 		//    value: 1000 wei
 		//    fee:   0 wei
-		tx, _ := types.SignTx(types.NewTransaction(uint64(i), accounts[1].addr, big.NewInt(1000), params.TxGas, big.NewInt(0), nil), signer, accounts[0].key)
+		tx, _ := types.SignTx(types.NewTransaction(uint64(i), accounts[1].addr, big.NewInt(1000), vars.TxGas, big.NewInt(0), nil), signer, accounts[0].key)
 		b.AddTx(tx)
 	}))
 	randomAccounts, tracer := newAccounts(3), "callTracer"
@@ -348,7 +348,7 @@ func TestOverridenTraceCall(t *testing.T) {
 			config: &TraceCallConfig{
 				Tracer: &tracer,
 				StateOverrides: &ethapi.StateOverride{
-					randomAccounts[0].addr: ethapi.OverrideAccount{Balance: newRPCBalance(new(big.Int).Mul(big.NewInt(1), big.NewInt(params.Ether)))},
+					randomAccounts[0].addr: ethapi.OverrideAccount{Balance: newRPCBalance(new(big.Int).Mul(big.NewInt(1), big.NewInt(vars.Ether)))},
 				},
 			},
 			expectErr: nil,

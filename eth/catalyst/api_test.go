@@ -29,6 +29,10 @@ import (
 	"github.com/ethereum/go-ethereum/eth/ethconfig"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var (
@@ -41,12 +45,12 @@ var (
 	testBalance = big.NewInt(2e10)
 )
 
-func generateTestChain() (*core.Genesis, []*types.Block) {
+func generateTestChain() (*genesisT.Genesis, []*types.Block) {
 	db := rawdb.NewMemoryDatabase()
 	config := params.AllEthashProtocolChanges
-	genesis := &core.Genesis{
+	genesis := &genesisT.Genesis{
 		Config:    config,
-		Alloc:     core.GenesisAlloc{testAddr: {Balance: testBalance}},
+		Alloc:     genesisT.GenesisAlloc{testAddr: {Balance: testBalance}},
 		ExtraData: []byte("test genesis"),
 		Timestamp: 9000,
 	}
@@ -54,19 +58,19 @@ func generateTestChain() (*core.Genesis, []*types.Block) {
 		g.OffsetTime(5)
 		g.SetExtra([]byte("test"))
 	}
-	gblock := genesis.ToBlock(db)
+	gblock := core.MustCommitGenesis(db, genesis)
 	engine := ethash.NewFaker()
 	blocks, _ := core.GenerateChain(config, gblock, engine, db, 10, generate)
 	blocks = append([]*types.Block{gblock}, blocks...)
 	return genesis, blocks
 }
 
-func generateTestChainWithFork(n int, fork int) (*core.Genesis, []*types.Block, []*types.Block) {
+func generateTestChainWithFork(n int, fork int) (*genesisT.Genesis, []*types.Block, []*types.Block) {
 	if fork >= n {
 		fork = n - 1
 	}
 	db := rawdb.NewMemoryDatabase()
-	config := &params.ChainConfig{
+	config := &goethereum.ChainConfig{
 		ChainID:             big.NewInt(1337),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),
@@ -79,11 +83,11 @@ func generateTestChainWithFork(n int, fork int) (*core.Genesis, []*types.Block, 
 		MuirGlacierBlock:    big.NewInt(0),
 		BerlinBlock:         big.NewInt(0),
 		CatalystBlock:       big.NewInt(0),
-		Ethash:              new(params.EthashConfig),
+		Ethash:              new(ctypes.EthashConfig),
 	}
-	genesis := &core.Genesis{
+	genesis := &genesisT.Genesis{
 		Config:    config,
-		Alloc:     core.GenesisAlloc{testAddr: {Balance: testBalance}},
+		Alloc:     genesisT.GenesisAlloc{testAddr: {Balance: testBalance}},
 		ExtraData: []byte("test genesis"),
 		Timestamp: 9000,
 	}
@@ -95,7 +99,7 @@ func generateTestChainWithFork(n int, fork int) (*core.Genesis, []*types.Block, 
 		g.OffsetTime(5)
 		g.SetExtra([]byte("testF"))
 	}
-	gblock := genesis.ToBlock(db)
+	gblock := core.MustCommitGenesis(db, genesis)
 	engine := ethash.NewFaker()
 	blocks, _ := core.GenerateChain(config, gblock, engine, db, n, generate)
 	blocks = append([]*types.Block{gblock}, blocks...)
@@ -109,8 +113,8 @@ func TestEth2AssembleBlock(t *testing.T) {
 	defer n.Close()
 
 	api := newConsensusAPI(ethservice)
-	signer := types.NewEIP155Signer(ethservice.BlockChain().Config().ChainID)
-	tx, err := types.SignTx(types.NewTransaction(0, blocks[8].Coinbase(), big.NewInt(1000), params.TxGas, nil, nil), signer, testKey)
+	signer := types.NewEIP155Signer(ethservice.BlockChain().Config().GetChainID())
+	tx, err := types.SignTx(types.NewTransaction(0, blocks[8].Coinbase(), big.NewInt(1000), vars.TxGas, nil, nil), signer, testKey)
 	if err != nil {
 		t.Fatalf("error signing transaction, err=%v", err)
 	}
@@ -215,7 +219,7 @@ func TestEth2NewBlock(t *testing.T) {
 }
 
 // startEthService creates a full node instance for testing.
-func startEthService(t *testing.T, genesis *core.Genesis, blocks []*types.Block) (*node.Node, *eth.Ethereum) {
+func startEthService(t *testing.T, genesis *genesisT.Genesis, blocks []*types.Block) (*node.Node, *eth.Ethereum) {
 	t.Helper()
 
 	n, err := node.New(&node.Config{})

@@ -316,7 +316,8 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	out := new(big.Int)
 
 	// TODO(ziogaschr): check this
-	if config.IsCatalyst(next) {
+	// NOTE(meowsbits): LGTM/https://github.com/ethereum/go-ethereum/blob/addd8824cf3ad6133c1b1bbc3387a621eafba6a3/consensus/ethash/consensus.go#L331
+	if config.IsEnabled(config.GetCatalystTransition, next) {
 		return big.NewInt(1)
 	}
 
@@ -599,7 +600,8 @@ var (
 func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*big.Int, []*big.Int) {
 	// Skip block reward in catalyst mode
 	// TODO(ziogaschr): check this
-	if config.IsCatalyst(header.Number) {
+	// NOTE(meowsbits): LGTM/https://github.com/ethereum/go-ethereum/blob/addd8824cf3ad6133c1b1bbc3387a621eafba6a3/consensus/ethash/consensus.go#L637
+	if config.IsEnabled(config.GetCatalystTransition, header.Number) {
 		return big.NewInt(0), []*big.Int{}
 	}
 

@@ -249,7 +249,6 @@ func (c *Conn) handshake(t *utesting.T) Message {
 		}
 		c.negotiateEthProtocol(msg.Caps)
 		if c.negotiatedProtoVersion == 0 {
-			// NOTE(meowsbits)
 			t.Fatalf("unexpected eth protocol version (msg.caps=%v our.caps=%v our.highest=%v)", msg.Caps, c.caps, c.ourHighestProtoVersion)
 		}
 		return msg

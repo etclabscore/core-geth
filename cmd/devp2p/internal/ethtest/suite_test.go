@@ -89,7 +89,7 @@ func setupGeth(stack *node.Node) error {
 
 	backend, err := eth.New(stack, &ethconfig.Config{
 		Genesis:                 &chain.genesis,
-		NetworkId:               chain.genesis.Config.ChainID.Uint64(), // 19763
+		NetworkId:               chain.genesis.Config.GetChainID().Uint64(), // 19763
 		DatabaseCache:           10,
 		TrieCleanCache:          10,
 		TrieCleanCacheJournal:   "",

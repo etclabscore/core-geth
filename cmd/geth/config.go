@@ -158,9 +158,7 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 		}
 	}
 
-	backend := utils.RegisterEthService(stack, &cfg.Eth)
-	// TODO(ziogaschr): check RegisterEthService signature
-	// backend, eth := utils.RegisterEthService(stack, &cfg.Eth)
+	backend, eth := utils.RegisterEthService(stack, &cfg.Eth)
 
 	// Configure catalyst.
 	if ctx.GlobalBool(utils.CatalystFlag.Name) {

@@ -315,8 +315,6 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	next := new(big.Int).Add(parent.Number, big1)
 	out := new(big.Int)
 
-	// TODO(ziogaschr): check this
-	// NOTE(meowsbits): LGTM/https://github.com/ethereum/go-ethereum/blob/addd8824cf3ad6133c1b1bbc3387a621eafba6a3/consensus/ethash/consensus.go#L331
 	if config.IsEnabled(config.GetCatalystTransition, next) {
 		return big.NewInt(1)
 	}
@@ -599,8 +597,6 @@ var (
 // included uncles. The coinbase of each uncle block is also calculated.
 func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*big.Int, []*big.Int) {
 	// Skip block reward in catalyst mode
-	// TODO(ziogaschr): check this
-	// NOTE(meowsbits): LGTM/https://github.com/ethereum/go-ethereum/blob/addd8824cf3ad6133c1b1bbc3387a621eafba6a3/consensus/ethash/consensus.go#L637
 	if config.IsEnabled(config.GetCatalystTransition, header.Number) {
 		return big.NewInt(0), []*big.Int{}
 	}

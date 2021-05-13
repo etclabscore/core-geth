@@ -53,7 +53,7 @@ var (
 
 // DefaultProtocolVersions are the supported versions of the `eth` protocol (first
 // is primary).
-var DefaultProtocolVersions = []uint{eth.ETH66, eth.ETH65, eth.ETH64}
+var DefaultProtocolVersions = []uint{eth.ETH66, eth.ETH65}
 
 // txPool defines the methods needed from a transaction pool implementation to
 // support all the operations needed by the Ethereum chain protocols.

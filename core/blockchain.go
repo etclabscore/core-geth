@@ -1218,8 +1218,6 @@ func (bc *BlockChain) InsertReceiptChain(blockChain types.Blocks, receiptChain [
 			if !bc.HasHeader(block.Hash(), block.NumberU64()) {
 				return i, fmt.Errorf("containing header #%d [%x..] unknown", block.Number(), block.Hash().Bytes()[:4])
 			}
-			// TODO(ziogaschr): check removal of https://github.com/etclabscore/core-geth/commit/f71d78cb26aad5bc7e4df76fadd082b69ca2de82
-			// with regards https://github.com/ethereum/go-ethereum/commit/83375b08731d95fdc91b6e1576db596c21384a3d
 			if block.NumberU64() == 1 {
 				// Make sure to write the genesis into the freezer
 				if frozen, _ := bc.db.Ancients(); frozen == 0 {

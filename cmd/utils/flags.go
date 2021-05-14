@@ -155,7 +155,7 @@ var (
 	}
 	EthProtocolsFlag = cli.StringFlag{
 		Name:  "eth.protocols",
-		Usage: "Sets the Ethereum Protocol versions (66|65|64) (default = 66,65,64 first is primary)",
+		Usage: "Sets the Ethereum Protocol versions (first is primary)",
 		Value: strings.Join(func() (strings []string) {
 			for _, s := range eth.DefaultProtocolVersions {
 				strings = append(strings, strconv.Itoa(int(s)))

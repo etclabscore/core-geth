@@ -362,19 +362,21 @@ func TestOverridenTraceCall(t *testing.T) {
 			},
 		},
 		// Invalid call without state overriding
-		{
-			blockNumber: rpc.PendingBlockNumber,
-			call: ethapi.CallArgs{
-				From:  &randomAccounts[0].addr,
-				To:    &randomAccounts[1].addr,
-				Value: (*hexutil.Big)(big.NewInt(1000)),
-			},
-			config: &TraceCallConfig{
-				Tracer: &tracer,
-			},
-			expectErr: core.ErrInsufficientFundsForTransfer,
-			expect:    nil,
-		},
+		// NOTE: this test has been disabled, as at core-geth we override
+		// vm.(Can)Transfer in order to have compatible tracers with OE
+		// {
+		// 	blockNumber: rpc.PendingBlockNumber,
+		// 	call: ethapi.CallArgs{
+		// 		From:  &randomAccounts[0].addr,
+		// 		To:    &randomAccounts[1].addr,
+		// 		Value: (*hexutil.Big)(big.NewInt(1000)),
+		// 	},
+		// 	config: &TraceCallConfig{
+		// 		Tracer: &tracer,
+		// 	},
+		// 	expectErr: core.ErrInsufficientFundsForTransfer,
+		// 	expect:    nil,
+		// },
 		// Successful simple contract call
 		//
 		// // SPDX-License-Identifier: GPL-3.0

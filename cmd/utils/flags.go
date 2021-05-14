@@ -1771,11 +1771,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		}
 	}
 
-	// set default protocol versions
-	if len(cfg.ProtocolVersions) == 0 {
-		cfg.ProtocolVersions = eth.DefaultProtocolVersions
-	}
-
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.
 	switch {
 	case ctx.GlobalBool(MainnetFlag.Name):

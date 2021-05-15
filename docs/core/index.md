@@ -25,7 +25,7 @@ CoreGeth features a synthetic build/+runtime service discovery API, allowing you
 description of _all_ available methods, their parameters, and results.
 
 !!! tip "RPC Service Documentation"
-    For complete documentation of the available JSON RPC APIs, please see the [JSON RPC API page](/JSON-RPC-API/).
+    For complete documentation of the available JSON RPC APIs, please see the [JSON RPC API page](/core-geth/JSON-RPC-API/modules/eth).
 
 #### Additional methods and options
 

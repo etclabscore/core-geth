@@ -836,14 +836,14 @@ func (c *ChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEthashEIP100BTransition() *uint64 {
-	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash && c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Keccak {
 		return nil
 	}
 	return bigNewU64(c.ByzantiumBlock)
 }
 
 func (c *ChainConfig) SetEthashEIP100BTransition(i *uint64) error {
-	if c.Ethash == nil {
+	if c.Ethash == nil && c.Keccak == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.ByzantiumBlock = setBig(c.ByzantiumBlock, i)

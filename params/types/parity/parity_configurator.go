@@ -979,7 +979,7 @@ func (spec *ParityChainSpec) SetEthashECIP1017EraRounds(n *uint64) error {
 }
 
 func (spec *ParityChainSpec) GetEthashEIP100BTransition() *uint64 {
-	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash && spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Keccak {
 		return nil
 	}
 	return spec.Engine.Ethash.Params.EIP100bTransition.Uint64P()

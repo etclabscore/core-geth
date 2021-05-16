@@ -191,6 +191,10 @@ var (
 		Name:  "mordor",
 		Usage: "Mordor network: Ethereum Classic's cross-client proof-of-work test network",
 	}
+	AstorFlag = cli.BoolFlag{
+		Name:  "astor",
+		Usage: "Astor network: Ethereum Classic's cross-client Keccak mining test network",
+	}
 	GoerliFlag = cli.BoolFlag{
 		Name:  "goerli",
 		Usage: "Görli network: pre-configured proof-of-authority test network",
@@ -871,6 +875,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.ClassicBootnodes
 	case ctx.GlobalBool(MordorFlag.Name):
 		urls = params.MordorBootnodes
+	case ctx.GlobalBool(AstorFlag.Name):
+		urls = params.AstorBootnodes
 	case ctx.GlobalBool(RopstenFlag.Name):
 		urls = params.RopstenBootnodes
 	case ctx.GlobalBool(RinkebyFlag.Name):
@@ -909,6 +915,8 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.ClassicBootnodes
 	case ctx.GlobalIsSet(MordorFlag.Name):
 		urls = params.MordorBootnodes
+	case ctx.GlobalIsSet(AstorFlag.Name):
+		urls = params.AstorBootnodes
 	case ctx.GlobalBool(RopstenFlag.Name):
 		urls = params.RopstenBootnodes
 	case ctx.GlobalBool(RinkebyFlag.Name):
@@ -1321,6 +1329,8 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "classic")
 	case ctx.GlobalBool(MordorFlag.Name):
 		return filepath.Join(baseDataDirPath, "mordor")
+	case ctx.GlobalBool(AstorFlag.Name):
+		return filepath.Join(baseDataDirPath, "astor")
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		return filepath.Join(baseDataDirPath, "rinkeby")
 	case ctx.GlobalBool(KottiFlag.Name):
@@ -1577,7 +1587,7 @@ func CheckExclusive(ctx *cli.Context, args ...interface{}) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, MainnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV3Flag, ClassicFlag, KottiFlag, MordorFlag)
+	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, MainnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV3Flag, ClassicFlag, KottiFlag, MordorFlag, AstorFlag)
 	CheckExclusive(ctx, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	CheckExclusive(ctx, GCModeFlag, "archive", TxLookupLimitFlag)
@@ -2009,6 +2019,8 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 		genesis = params.DefaultClassicGenesisBlock()
 	case ctx.GlobalBool(MordorFlag.Name):
 		genesis = params.DefaultMordorGenesisBlock()
+	case ctx.GlobalBool(AstorFlag.Name):
+		genesis = params.DefaultAstorGenesisBlock()
 	case ctx.GlobalBool(RopstenFlag.Name):
 		genesis = params.DefaultRopstenGenesisBlock()
 	case ctx.GlobalBool(RinkebyFlag.Name):

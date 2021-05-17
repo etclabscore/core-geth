@@ -155,8 +155,13 @@ var (
 	}
 	EthProtocolsFlag = cli.StringFlag{
 		Name:  "eth.protocols",
-		Usage: "Sets the Ethereum Protocol versions (66|65|64) (default = 66,65,64 first is primary)",
-		Value: "",
+		Usage: "Sets the Ethereum Protocol versions (first is primary)",
+		Value: strings.Join(func() (strings []string) {
+			for _, s := range eth.DefaultProtocolVersions {
+				strings = append(strings, strconv.Itoa(int(s)))
+			}
+			return
+		}(), ","),
 	}
 	ClassicFlag = cli.BoolFlag{
 		Name:  "classic",
@@ -1764,11 +1769,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 			}
 			cfg.ProtocolVersions = append(cfg.ProtocolVersions, uint(version))
 		}
-	}
-
-	// set default protocol versions
-	if len(cfg.ProtocolVersions) == 0 {
-		cfg.ProtocolVersions = eth.DefaultProtocolVersions
 	}
 
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.

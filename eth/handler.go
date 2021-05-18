@@ -51,9 +51,9 @@ var (
 	syncChallengeTimeout = 15 * time.Second // Time allowance for a node to reply to the sync progress challenge
 )
 
-// DefaultProtocolVersions are the supported versions of the `eth` protocol (first
+// SupportedProtocolVersions are the supported versions of the `eth` protocol (first
 // is primary).
-var DefaultProtocolVersions = []uint{eth.ETH66, eth.ETH65}
+var SupportedProtocolVersions = []uint{eth.ETH66, eth.ETH65}
 
 // txPool defines the methods needed from a transaction pool implementation to
 // support all the operations needed by the Ethereum chain protocols.

@@ -157,7 +157,7 @@ var (
 		Name:  "eth.protocols",
 		Usage: "Sets the Ethereum Protocol versions (first is primary)",
 		Value: strings.Join(func() (strings []string) {
-			for _, s := range eth.SupportedProtocolVersions {
+			for _, s := range ethconfig.Defaults.ProtocolVersions {
 				strings = append(strings, strconv.Itoa(int(s)))
 			}
 			return
@@ -1739,9 +1739,14 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	}
 
 	// Set the supported ETH Protocol Versions
+	supportedProtocolVersions := ethconfig.Defaults.ProtocolVersions
+	if cfg.Genesis != nil {
+		supportedProtocolVersions = cfg.Genesis.GetSupportedProtocolVersions()
+	}
+
 	protocolVersions := SplitAndTrim(ctx.GlobalString(EthProtocolsFlag.Name))
 	if len(protocolVersions) == 0 {
-		Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.SupportedProtocolVersions)), ","))
+		Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(supportedProtocolVersions)), ","))
 	}
 
 	seenVersions := map[uint]interface{}{}
@@ -1756,7 +1761,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		}
 
 		isValid := false
-		for _, proto := range eth.SupportedProtocolVersions {
+		for _, proto := range supportedProtocolVersions {
 			if proto == uint(version) {
 				isValid = true
 				seenVersions[uint(version)] = nil
@@ -1765,7 +1770,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		}
 
 		if !isValid {
-			Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.SupportedProtocolVersions)), ","))
+			Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(supportedProtocolVersions)), ","))
 		}
 		cfg.ProtocolVersions = append(cfg.ProtocolVersions, uint(version))
 	}

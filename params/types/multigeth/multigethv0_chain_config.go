@@ -13,8 +13,9 @@ import (
 // that any network, identified by its genesis block, can have its own
 // set of configuration options.
 type ChainConfig struct {
-	NetworkID uint64   `json:"-"`
-	ChainID   *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
+	NetworkID                 uint64   `json:"-"`
+	ChainID                   *big.Int `json:"chainId"`                   // chainId identifies the current chain and is used for replay protection
+	SupportedProtocolVersions []uint   `json:"supportedProtocolVersions"` // supportedProtocolVersions identifies the supported eth protocol versions for the current chain
 
 	HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)
 

@@ -21,6 +21,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var (
@@ -28,8 +29,9 @@ var (
 	KottiGenesisHash = common.HexToHash("0x14c2283285a88fe5fce9bf5c573ab03d6616695d717b12a127188bcacfc743c4")
 
 	KottiChainConfig = &coregeth.CoreGethChainConfig{
-		NetworkID: 6,
-		ChainID:   big.NewInt(6),
+		NetworkID:                 6,
+		ChainID:                   big.NewInt(6),
+		SupportedProtocolVersions: vars.SupportedProtocolVersions,
 		Clique: &ctypes.CliqueConfig{
 			Period: 15,
 			Epoch:  30000,

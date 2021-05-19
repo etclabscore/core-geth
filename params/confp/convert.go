@@ -124,7 +124,7 @@ func convert(k reflect.Type, source, target interface{}) error {
 		if !setResponse[0].IsNil() {
 			err := setResponse[0].Interface().(error)
 			v := response[0].Interface()
-			if !response[0].IsNil() {
+			if !response[0].IsNil() && response[0].Kind() == reflect.Ptr {
 				v = response[0].Elem().Interface()
 			}
 			e := ctypes.UnsupportedConfigError(err, strings.TrimPrefix(method.Name, "Get"), v)

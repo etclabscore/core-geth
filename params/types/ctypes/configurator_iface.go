@@ -62,6 +62,8 @@ type ProtocolSpecifier interface {
 	SetNetworkID(n *uint64) error
 	GetChainID() *big.Int
 	SetChainID(i *big.Int) error
+	GetSupportedProtocolVersions() []uint
+	SetSupportedProtocolVersions(p []uint) error
 	GetMaxCodeSize() *uint64
 	SetMaxCodeSize(n *uint64) error
 

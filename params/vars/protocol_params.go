@@ -32,6 +32,10 @@ var (
 	EIP2384DifficultyBombDelay = big.NewInt(9000000)
 )
 
+// SupportedProtocolVersions are the supported versions of the `eth` protocol (first
+// is primary).
+var SupportedProtocolVersions = []uint{66, 65}
+
 var (
 	GasLimitBoundDivisor uint64 = 1024    // The bound divisor of the gas limit, used in update calculations.
 	MinGasLimit          uint64 = 5000    // Minimum the gas limit may ever be.

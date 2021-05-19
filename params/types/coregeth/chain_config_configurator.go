@@ -113,6 +113,15 @@ func (c *CoreGethChainConfig) SetChainID(n *big.Int) error {
 	return nil
 }
 
+func (c *CoreGethChainConfig) GetSupportedProtocolVersions() []uint {
+	return c.SupportedProtocolVersions
+}
+
+func (c *CoreGethChainConfig) SetSupportedProtocolVersions(p []uint) error {
+	c.SupportedProtocolVersions = p
+	return nil
+}
+
 func (c *CoreGethChainConfig) GetMaxCodeSize() *uint64 {
 	return internal.GlobalConfigurator().GetMaxCodeSize()
 }

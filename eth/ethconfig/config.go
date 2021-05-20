@@ -68,7 +68,7 @@ var Defaults = Config{
 		DatasetsLockMmap: false,
 	},
 	NetworkId:               vars.DefaultNetworkID,
-	ProtocolVersions:        vars.SupportedProtocolVersions,
+	ProtocolVersions:        vars.DefaultProtocolVersions,
 	TxLookupLimit:           2350000,
 	LightPeers:              100,
 	UltraLightFraction:      75,

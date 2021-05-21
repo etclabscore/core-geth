@@ -34,19 +34,19 @@ description of _all_ available methods, their parameters, and results.
 - Added `debug_removePendingTransaction` API method ([#203](https://github.com/etclabscore/core-geth/pull/203/files))
 - Comprehensive service discovery with OpenRPC through method `rpc.discover`.
 
-### Extended CLI
+### EVMCv7 Support
 
-- `--eth.protocols` configures `eth/x` protocol prioritization, eg. `65,64,63`.
-
-### EVMCv6 Support
-
-- EVMCv6 support allows use with external EVMs (including EWASM).
+- EVMCv7 support allows use with external EVMs (including EWASM).
 - See [Running Geth with an External VM](./core/evmc) for more information.
 
 ### Remote Store for Ancient Chaindata
 
 - Remote freezer, store your `ancient` data on Amazon S3 or Storj.
     - _TODO_: Talk more about this, provide examples.
+
+### Extended CLI
+
+- `--eth.protocols` configures `eth/x` protocol prioritization, eg. `65,64,63`.
 
 ### Developer Features: Tools
 
@@ -69,7 +69,7 @@ description of _all_ available methods, their parameters, and results.
   + ECIP1099 (DAG growth limit)
   + ECIP1014 (defuse difficulty bomb), etc. :wink:
 
-- Out-of-the-box support for Ethereum Classic, EtherSocial, Social, and MIX networks.
+- Out-of-the-box support for Ethereum Classic.
   Chain configs are selected as `./build/bin/geth --<chain>`. For a list of supported networks and their CLI options, use `./build/bin/geth --help`.
 
 ## Divergent Design

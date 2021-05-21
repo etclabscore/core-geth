@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.22-unstable/generated-at:2021-01-23T04:50:40-06:00</code> |
+| Source | <code>1.11.23-unstable/generated-at:2021-04-30T19:24:24+03:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -32,7 +32,7 @@ mapstringmapstringmapstringRPCTransaction <code>map[string]map[string]map[string
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -45,12 +45,40 @@ mapstringmapstringmapstringRPCTransaction <code>map[string]map[string]map[string
 						- .*: 
 							- additionalProperties: `false`
 							- properties: 
+								- accessList: 
+									- items: 
+										- additionalProperties: `false`
+										- properties: 
+											- address: 
+												- pattern: `^0x[a-fA-F\d]{64}$`
+												- title: `keccak`
+												- type: `string`
+
+											- storageKeys: 
+												- items: 
+													- description: `Hex representation of a Keccak 256 hash`
+													- pattern: `^0x[a-fA-F\d]{64}$`
+													- title: `keccak`
+													- type: `string`
+
+												- type: `array`
+
+
+										- type: `object`
+
+									- type: `array`
+
 								- blockHash: 
 									- pattern: `^0x[a-fA-F\d]{64}$`
 									- title: `keccak`
 									- type: `string`
 
 								- blockNumber: 
+									- pattern: `^0x[a-fA-F0-9]+$`
+									- title: `integer`
+									- type: `string`
+
+								- chainId: 
 									- pattern: `^0x[a-fA-F0-9]+$`
 									- title: `integer`
 									- type: `string`
@@ -105,6 +133,11 @@ mapstringmapstringmapstringRPCTransaction <code>map[string]map[string]map[string
 									- title: `uint64`
 									- type: `string`
 
+								- type: 
+									- pattern: `^0x([a-fA-F\d])+$`
+									- title: `uint64`
+									- type: `string`
+
 								- v: 
 									- pattern: `^0x[a-fA-F0-9]+$`
 									- title: `integer`
@@ -142,12 +175,40 @@ mapstringmapstringmapstringRPCTransaction <code>map[string]map[string]map[string
                             ".*": {
                                 "additionalProperties": false,
                                 "properties": {
+                                    "accessList": {
+                                        "items": {
+                                            "additionalProperties": false,
+                                            "properties": {
+                                                "address": {
+                                                    "pattern": "^0x[a-fA-F\\d]{64}$",
+                                                    "title": "keccak",
+                                                    "type": "string"
+                                                },
+                                                "storageKeys": {
+                                                    "items": {
+                                                        "description": "Hex representation of a Keccak 256 hash",
+                                                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                                                        "title": "keccak",
+                                                        "type": "string"
+                                                    },
+                                                    "type": "array"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "type": "array"
+                                    },
                                     "blockHash": {
                                         "pattern": "^0x[a-fA-F\\d]{64}$",
                                         "title": "keccak",
                                         "type": "string"
                                     },
                                     "blockNumber": {
+                                        "pattern": "^0x[a-fA-F0-9]+$",
+                                        "title": "integer",
+                                        "type": "string"
+                                    },
+                                    "chainId": {
                                         "pattern": "^0x[a-fA-F0-9]+$",
                                         "title": "integer",
                                         "type": "string"
@@ -202,6 +263,11 @@ mapstringmapstringmapstringRPCTransaction <code>map[string]map[string]map[string
                                         "title": "uint64",
                                         "type": "string"
                                     },
+                                    "type": {
+                                        "pattern": "^0x([a-fA-F\\d])+$",
+                                        "title": "uint64",
+                                        "type": "string"
+                                    },
                                     "v": {
                                         "pattern": "^0x[a-fA-F0-9]+$",
                                         "title": "integer",
@@ -232,17 +298,30 @@ mapstringmapstringmapstringRPCTransaction <code>map[string]map[string]map[string
 
 #### Client Method Invocation Examples
 
-=== "Shell"
+
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "txpool_content", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "txpool_content", "params": []}'
 	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "txpool_content", "params": []}'
+	```
+
 
 === "Javascript Console"
 
 	``` js
 	txpool.content();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -269,7 +348,7 @@ func (s *PublicTxPoolAPI) Content() map // Content returns the transactions cont
 	return content
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L108" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L103" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -295,7 +374,7 @@ mapstringmapstringmapstringstring <code>map[string]map[string]map[string]string<
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -349,17 +428,30 @@ mapstringmapstringmapstringstring <code>map[string]map[string]map[string]string<
 
 #### Client Method Invocation Examples
 
-=== "Shell"
+
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "txpool_inspect", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "txpool_inspect", "params": []}'
 	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "txpool_inspect", "params": []}'
+	```
+
 
 === "Javascript Console"
 
 	``` js
 	txpool.inspect();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -394,7 +486,7 @@ func (s *PublicTxPoolAPI) Inspect() map // Inspect retrieves the content of the 
 	return content
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L145" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L140" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -419,7 +511,7 @@ mapstringhexutilUint <code>map[string]hexutil.Uint</code>
 
   + Required: ✓ Yes
 
- 
+
 === "Schema"
 
 	``` Schema
@@ -459,17 +551,30 @@ mapstringhexutilUint <code>map[string]hexutil.Uint</code>
 
 #### Client Method Invocation Examples
 
-=== "Shell"
+
+=== "Shell HTTP"
 
 	``` shell
-	curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", id": 42, "method": "txpool_status", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "txpool_status", "params": []}'
 	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "txpool_status", "params": []}'
+	```
+
 
 === "Javascript Console"
 
 	``` js
 	txpool.status();
 	```
+
 
 
 <details><summary>Source code</summary>
@@ -481,7 +586,7 @@ func (s *PublicTxPoolAPI) Status() map // Status returns the number of pending a
 	return map[string]hexutil.Uint{"pending": hexutil.Uint(pending), "queued": hexutil.Uint(queue)}
 }
 ```
-<a href="https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/api.go#L135" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L130" target="_">View on GitHub →</a>
 </p>
 </details>
 

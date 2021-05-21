@@ -180,13 +180,20 @@ type CoreGethChainConfig struct {
 	// https://eips.ethereum.org/EIPS/eip-2315
 	EIP2315FBlock *big.Int `json:"eip2315FBlock,omitempty"`
 
+	// TODO: Document me.
+	EIP2565FBlock *big.Int `json:"eip2565FBlock,omitempty"`
+
+	// EIP2718FBlock is typed tx envelopes
+	EIP2718FBlock *big.Int `json:"eip2718FBlock,omitempty"`
+
 	// EIP-2929: Gas cost increases for state access opcodes
 	// https://eips.ethereum.org/EIPS/eip-2929
 	EIP2929FBlock *big.Int `json:"eip2929FBlock,omitempty"`
 
-	DisposalBlock    *big.Int `json:"disposalBlock,omitempty"`    // Bomb disposal HF block
-	SocialBlock      *big.Int `json:"socialBlock,omitempty"`      // Ethereum Social Reward block
-	EthersocialBlock *big.Int `json:"ethersocialBlock,omitempty"` // Ethersocial Reward block
+	// TODO: Document me.
+	EIP2930FBlock *big.Int `json:"eip2930FBlock,omitempty"`
+
+	DisposalBlock *big.Int `json:"disposalBlock,omitempty"` // Bomb disposal HF block
 
 	// Various consensus engines
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`

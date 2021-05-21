@@ -114,6 +114,11 @@ func (b *BlockGen) AddTxWithChain(bc *BlockChain, tx *types.Transaction) {
 	b.receipts = append(b.receipts, receipt)
 }
 
+// GetBalance returns the balance of the given address at the generated block.
+func (b *BlockGen) GetBalance(addr common.Address) *big.Int {
+	return b.statedb.GetBalance(addr)
+}
+
 // AddUncheckedTx forcefully adds a transaction to the block without any
 // validation.
 //
@@ -286,8 +291,7 @@ func makeBlockChain(parent *types.Block, n int, engine consensus.Engine, db ethd
 }
 
 type fakeChainReader struct {
-	config  ctypes.ChainConfigurator
-	genesis *types.Block
+	config ctypes.ChainConfigurator
 }
 
 // Config returns the chain configuration.

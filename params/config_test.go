@@ -21,11 +21,18 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
+	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 func uint64P(n uint64) *uint64 {
@@ -342,6 +349,73 @@ func TestFoundationIsEIP779(t *testing.T) {
 		}
 		if *MainnetChainConfig.GetEthashEIP779Transition() != 1_920_000 {
 			t.Fatal("bad")
+		}
+	}
+}
+
+// genesisToBlock is a helper function duplicating the logic at core.MustCommitGenesis,
+// which cannot be imported into this package.
+func genesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
+	if db == nil {
+		db = rawdb.NewMemoryDatabase()
+	}
+	statedb, _ := state.New(common.Hash{}, state.NewDatabase(db), nil)
+	for addr, account := range g.Alloc {
+		statedb.AddBalance(addr, account.Balance)
+		statedb.SetCode(addr, account.Code)
+		statedb.SetNonce(addr, account.Nonce)
+		for key, value := range account.Storage {
+			statedb.SetState(addr, key, value)
+		}
+	}
+	root := statedb.IntermediateRoot(false)
+	head := &types.Header{
+		Number:     new(big.Int).SetUint64(g.Number),
+		Nonce:      types.EncodeNonce(g.Nonce),
+		Time:       g.Timestamp,
+		ParentHash: g.ParentHash,
+		Extra:      g.ExtraData,
+		GasLimit:   g.GasLimit,
+		GasUsed:    g.GasUsed,
+		Difficulty: g.Difficulty,
+		MixDigest:  g.Mixhash,
+		Coinbase:   g.Coinbase,
+		Root:       root,
+	}
+	if g.GasLimit == 0 {
+		head.GasLimit = vars.GenesisGasLimit
+	}
+	if g.Difficulty == nil {
+		head.Difficulty = vars.GenesisDifficulty
+	}
+	statedb.Commit(false)
+	statedb.Database().TrieDB().Commit(root, true, nil)
+
+	return types.NewBlock(head, nil, nil, nil, trie.NewStackTrie(nil))
+}
+
+func TestGenesisHashes(t *testing.T) {
+	cases := []struct {
+		genesis *genesisT.Genesis
+		hash    common.Hash
+	}{
+		{
+			genesis: DefaultClassicGenesisBlock(),
+			hash:    MainnetGenesisHash,
+		},
+		{
+			genesis: DefaultGoerliGenesisBlock(),
+			hash:    GoerliGenesisHash,
+		},
+		{
+			genesis: DefaultYoloV3GenesisBlock(),
+			hash:    YoloV3GenesisHash,
+		},
+	}
+	for i, c := range cases {
+		b := genesisToBlock(c.genesis, rawdb.NewMemoryDatabase())
+		if got := b.Hash(); got != c.hash {
+			t.Errorf("case: %d, want: %s, got: %s", i, c.hash.Hex(), got.Hex())
 		}
 	}
 }

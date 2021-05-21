@@ -50,17 +50,34 @@ var basePrecompiledContracts = map[common.Address]PrecompiledContract{
 	common.BytesToAddress([]byte{4}): &dataCopy{},
 }
 
+var PrecompiledContractsBLS = map[common.Address]PrecompiledContract{
+	common.BytesToAddress([]byte{10}): &bls12381G1Add{},
+	common.BytesToAddress([]byte{11}): &bls12381G1Mul{},
+	common.BytesToAddress([]byte{12}): &bls12381G1MultiExp{},
+	common.BytesToAddress([]byte{13}): &bls12381G2Add{},
+	common.BytesToAddress([]byte{14}): &bls12381G2Mul{},
+	common.BytesToAddress([]byte{15}): &bls12381G2MultiExp{},
+	common.BytesToAddress([]byte{16}): &bls12381Pairing{},
+	common.BytesToAddress([]byte{17}): &bls12381MapG1{},
+	common.BytesToAddress([]byte{18}): &bls12381MapG2{},
+}
+
+func mergeContracts(base, target map[common.Address]PrecompiledContract) {
+	for k, v := range target {
+		base[k] = v
+	}
+}
+
 // PrecompiledContractsForConfig returns a map containing valid precompiled contracts for a given point in a chain config.
 func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int) map[common.Address]PrecompiledContract {
 	// Copying to a new map is necessary because assigning to the original map
 	// creates a memory reference. Further, setting the vals to nil in case of nonconfiguration causes
 	// a panic during tests because they run asynchronously (also a valid reason for using an explicit copy).
 	precompileds := make(map[common.Address]PrecompiledContract)
-	for k, v := range basePrecompiledContracts {
-		precompileds[k] = v
-	}
+	mergeContracts(precompileds, basePrecompiledContracts)
+
 	if config.IsEnabled(config.GetEIP198Transition, bn) {
-		precompileds[common.BytesToAddress([]byte{5})] = &bigModExp{}
+		precompileds[common.BytesToAddress([]byte{5})] = &bigModExp{eip2565: config.IsEnabled(config.GetEIP2565Transition, bn)}
 	}
 	if config.IsEnabled(config.GetEIP213Transition, bn) {
 		if config.IsEnabled(config.GetEIP1108Transition, bn) {
@@ -82,15 +99,7 @@ func PrecompiledContractsForConfig(config ctypes.ChainConfigurator, bn *big.Int)
 		precompileds[common.BytesToAddress([]byte{9})] = &blake2F{}
 	}
 	if config.IsEnabled(config.GetEIP2537Transition, bn) {
-		precompileds[common.BytesToAddress([]byte{10})] = &bls12381G1Add{}
-		precompileds[common.BytesToAddress([]byte{11})] = &bls12381G1Mul{}
-		precompileds[common.BytesToAddress([]byte{12})] = &bls12381G1MultiExp{}
-		precompileds[common.BytesToAddress([]byte{13})] = &bls12381G2Add{}
-		precompileds[common.BytesToAddress([]byte{14})] = &bls12381G2Mul{}
-		precompileds[common.BytesToAddress([]byte{15})] = &bls12381G2MultiExp{}
-		precompileds[common.BytesToAddress([]byte{16})] = &bls12381Pairing{}
-		precompileds[common.BytesToAddress([]byte{17})] = &bls12381MapG1{}
-		precompileds[common.BytesToAddress([]byte{18})] = &bls12381MapG2{}
+		mergeContracts(precompileds, PrecompiledContractsBLS)
 	}
 
 	return precompileds
@@ -195,14 +204,19 @@ func (c *dataCopy) Run(in []byte) ([]byte, error) {
 }
 
 // bigModExp implements a native big integer exponential modular operation.
-type bigModExp struct{}
+type bigModExp struct {
+	eip2565 bool
+}
 
 var (
 	big0      = big.NewInt(0)
 	big1      = big.NewInt(1)
+	big3      = big.NewInt(3)
 	big4      = big.NewInt(4)
+	big7      = big.NewInt(7)
 	big8      = big.NewInt(8)
 	big16     = big.NewInt(16)
+	big20     = big.NewInt(20)
 	big32     = big.NewInt(32)
 	big64     = big.NewInt(64)
 	big96     = big.NewInt(96)
@@ -211,6 +225,34 @@ var (
 	big3072   = big.NewInt(3072)
 	big199680 = big.NewInt(199680)
 )
+
+// modexpMultComplexity implements bigModexp multComplexity formula, as defined in EIP-198
+//
+// def mult_complexity(x):
+//    if x <= 64: return x ** 2
+//    elif x <= 1024: return x ** 2 // 4 + 96 * x - 3072
+//    else: return x ** 2 // 16 + 480 * x - 199680
+//
+// where is x is max(length_of_MODULUS, length_of_BASE)
+func modexpMultComplexity(x *big.Int) *big.Int {
+	switch {
+	case x.Cmp(big64) <= 0:
+		x.Mul(x, x) // x ** 2
+	case x.Cmp(big1024) <= 0:
+		// (x ** 2 // 4 ) + ( 96 * x - 3072)
+		x = new(big.Int).Add(
+			new(big.Int).Div(new(big.Int).Mul(x, x), big4),
+			new(big.Int).Sub(new(big.Int).Mul(big96, x), big3072),
+		)
+	default:
+		// (x ** 2 // 16) + (480 * x - 199680)
+		x = new(big.Int).Add(
+			new(big.Int).Div(new(big.Int).Mul(x, x), big16),
+			new(big.Int).Sub(new(big.Int).Mul(big480, x), big199680),
+		)
+	}
+	return x
+}
 
 // RequiredGas returns the gas required to execute the pre-compiled contract.
 func (c *bigModExp) RequiredGas(input []byte) uint64 {
@@ -246,25 +288,36 @@ func (c *bigModExp) RequiredGas(input []byte) uint64 {
 		adjExpLen.Mul(big8, adjExpLen)
 	}
 	adjExpLen.Add(adjExpLen, big.NewInt(int64(msb)))
-
 	// Calculate the gas cost of the operation
 	gas := new(big.Int).Set(math.BigMax(modLen, baseLen))
-	switch {
-	case gas.Cmp(big64) <= 0:
+	if c.eip2565 {
+		// EIP-2565 has three changes
+		// 1. Different multComplexity (inlined here)
+		// in EIP-2565 (https://eips.ethereum.org/EIPS/eip-2565):
+		//
+		// def mult_complexity(x):
+		//    ceiling(x/8)^2
+		//
+		//where is x is max(length_of_MODULUS, length_of_BASE)
+		gas = gas.Add(gas, big7)
+		gas = gas.Div(gas, big8)
 		gas.Mul(gas, gas)
-	case gas.Cmp(big1024) <= 0:
-		gas = new(big.Int).Add(
-			new(big.Int).Div(new(big.Int).Mul(gas, gas), big4),
-			new(big.Int).Sub(new(big.Int).Mul(big96, gas), big3072),
-		)
-	default:
-		gas = new(big.Int).Add(
-			new(big.Int).Div(new(big.Int).Mul(gas, gas), big16),
-			new(big.Int).Sub(new(big.Int).Mul(big480, gas), big199680),
-		)
+
+		gas.Mul(gas, math.BigMax(adjExpLen, big1))
+		// 2. Different divisor (`GQUADDIVISOR`) (3)
+		gas.Div(gas, big3)
+		if gas.BitLen() > 64 {
+			return math.MaxUint64
+		}
+		// 3. Minimum price of 200 gas
+		if gas.Uint64() < 200 {
+			return 200
+		}
+		return gas.Uint64()
 	}
+	gas = modexpMultComplexity(gas)
 	gas.Mul(gas, math.BigMax(adjExpLen, big1))
-	gas.Div(gas, new(big.Int).SetUint64(vars.ModExpQuadCoeffDiv))
+	gas.Div(gas, big20)
 
 	if gas.BitLen() > 64 {
 		return math.MaxUint64

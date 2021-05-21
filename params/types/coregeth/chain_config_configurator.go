@@ -408,6 +408,33 @@ func (c *CoreGethChainConfig) SetEIP2929Transition(n *uint64) error {
 	return nil
 }
 
+func (c *CoreGethChainConfig) GetEIP2930Transition() *uint64 {
+	return bigNewU64(c.EIP2930FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP2930Transition(n *uint64) error {
+	c.EIP2930FBlock = setBig(c.EIP2930FBlock, n)
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetEIP2565Transition() *uint64 {
+	return bigNewU64(c.EIP2565FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP2565Transition(n *uint64) error {
+	c.EIP2565FBlock = setBig(c.EIP2565FBlock, n)
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetEIP2718Transition() *uint64 {
+	return bigNewU64(c.EIP2718FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP2718Transition(n *uint64) error {
+	c.EIP2718FBlock = setBig(c.EIP2718FBlock, n)
+	return nil
+}
+
 func (c *CoreGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {
@@ -558,6 +585,9 @@ func (c *CoreGethChainConfig) GetEthashEIP649Transition() *uint64 {
 		vars.EIP649DifficultyBombDelay,
 		vars.EIP649FBlockReward,
 	)
+	if diffN == nil {
+		diffN = c.GetEthashEIP1234Transition()
+	}
 	return diffN
 }
 
@@ -571,6 +601,12 @@ func (c *CoreGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
 
 	if n == nil {
 		return nil
+	}
+
+	if eip1234 := c.GetEthashEIP1234Transition(); eip1234 != nil {
+		if *eip1234 <= *n {
+			return nil
+		}
 	}
 
 	c.ensureExistingRewardSchedule()

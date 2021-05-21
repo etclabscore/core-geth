@@ -1776,7 +1776,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		}
 
 		if !isValid {
-			Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(supportedProtocolVersions)), ","))
+			Fatalf("--%s invalid version value: %d, must be one of %s", EthProtocolsFlag.Name, version, strings.Join(strings.Fields(fmt.Sprint(supportedProtocolVersions)), ","))
 		}
 		cfg.ProtocolVersions = append(cfg.ProtocolVersions, uint(version))
 	}

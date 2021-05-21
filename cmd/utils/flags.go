@@ -1744,13 +1744,19 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		supportedProtocolVersions = cfg.Genesis.GetSupportedProtocolVersions()
 	}
 
-	protocolVersions := SplitAndTrim(ctx.GlobalString(EthProtocolsFlag.Name))
-	if len(protocolVersions) == 0 {
+	configuredProtocolVersions := SplitAndTrim(ctx.GlobalString(EthProtocolsFlag.Name))
+	if len(configuredProtocolVersions) == 0 {
 		Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(supportedProtocolVersions)), ","))
 	}
 
+	// Since EthProtocolsFlag defines a default value that is the ethconfig.Defaults slice,
+	// we can always parse and act on this value whether or not the user sets the flag.
+	// Since our logic here will append to the parameterized 'cfg' value ProtocolVersions field,
+	// we need to make sure that that value starts empty.
+	cfg.ProtocolVersions = []uint{}
+
 	seenVersions := map[uint]interface{}{}
-	for _, versionString := range protocolVersions {
+	for _, versionString := range configuredProtocolVersions {
 		version, err := strconv.ParseUint(versionString, 10, 0)
 		if err != nil {
 			Fatalf("--%s has invalid value \"%v\" with error: %v", EthProtocolsFlag.Name, versionString, err)
@@ -1774,6 +1780,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		}
 		cfg.ProtocolVersions = append(cfg.ProtocolVersions, uint(version))
 	}
+	log.Info("Configured Ethereum protocol versions", "capabilities", cfg.ProtocolVersions)
 
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.
 	switch {

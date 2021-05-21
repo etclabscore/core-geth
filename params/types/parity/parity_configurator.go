@@ -107,7 +107,7 @@ func (spec *ParityChainSpec) SetChainID(i *big.Int) error {
 }
 
 func (spec *ParityChainSpec) GetSupportedProtocolVersions() []uint {
-	return nil
+	return vars.DefaultProtocolVersions
 }
 
 func (spec *ParityChainSpec) SetSupportedProtocolVersions(p []uint) error {

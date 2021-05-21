@@ -81,12 +81,22 @@ type ParityChainSpec struct {
 	} `json:"engine"`
 
 	Params struct {
-		AccountStartNonce         *ParityU64 `json:"accountStartNonce,omitempty"`
-		MaximumExtraDataSize      *ParityU64 `json:"maximumExtraDataSize,omitempty"`
-		MinGasLimit               *ParityU64 `json:"minGasLimit,omitempty"`
-		GasLimitBoundDivisor      *ParityU64 `json:"gasLimitBoundDivisor,omitempty"`
-		NetworkID                 *ParityU64 `json:"networkID,omitempty"`
-		ChainID                   *ParityU64 `json:"chainID,omitempty"`
+		AccountStartNonce    *ParityU64 `json:"accountStartNonce,omitempty"`
+		MaximumExtraDataSize *ParityU64 `json:"maximumExtraDataSize,omitempty"`
+		MinGasLimit          *ParityU64 `json:"minGasLimit,omitempty"`
+		GasLimitBoundDivisor *ParityU64 `json:"gasLimitBoundDivisor,omitempty"`
+		NetworkID            *ParityU64 `json:"networkID,omitempty"`
+		ChainID              *ParityU64 `json:"chainID,omitempty"`
+
+		// SupportedProtocolVersions is left here as a TODO.
+		// I don't think this field nor feature is supported by Parity, but
+		// this artifacts wants us to remember that its a thing which core-geth does support,
+		// and which Parity someday might support too.
+		// The Parity configurator in core-geth will always just return the core-geth app defaults, and Set calls
+		// will be a noop.
+		//
+		// SupportedProtocolVersions []*ParityU64 `json:"supported_protocol_versions,omitempty"`
+
 		MaxCodeSize               *ParityU64 `json:"maxCodeSize,omitempty"`
 		MaxCodeSizeTransition     *ParityU64 `json:"maxCodeSizeTransition,omitempty"`
 		EIP98Transition           *ParityU64 `json:"eip98Transition,omitempty"`

@@ -31,7 +31,7 @@ var (
 	KottiChainConfig = &coregeth.CoreGethChainConfig{
 		NetworkID:                 6,
 		ChainID:                   big.NewInt(6),
-		SupportedProtocolVersions: vars.SupportedProtocolVersions,
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 		Clique: &ctypes.CliqueConfig{
 			Period: 15,
 			Epoch:  30000,

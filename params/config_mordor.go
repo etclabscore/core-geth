@@ -29,7 +29,7 @@ var (
 	MordorChainConfig = &coregeth.CoreGethChainConfig{
 		NetworkID:                 7,
 		ChainID:                   big.NewInt(63),
-		SupportedProtocolVersions: vars.SupportedProtocolVersions,
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 		Ethash:                    new(ctypes.EthashConfig),
 
 		EIP2FBlock: big.NewInt(0),

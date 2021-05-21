@@ -56,7 +56,7 @@ var (
 	// MainnetChainConfig is the chain parameters to run a node on the main network.
 	MainnetChainConfig = &goethereum.ChainConfig{
 		ChainID:                   big.NewInt(1),
-		SupportedProtocolVersions: vars.SupportedProtocolVersions,
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 		HomesteadBlock:            big.NewInt(1_150_000),
 		DAOForkBlock:              big.NewInt(1_920_000),
 		DAOForkSupport:            true,
@@ -97,7 +97,7 @@ var (
 	// RopstenChainConfig contains the chain parameters to run a node on the Ropsten test network.
 	RopstenChainConfig = &goethereum.ChainConfig{
 		ChainID:                   big.NewInt(3),
-		SupportedProtocolVersions: vars.SupportedProtocolVersions,
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 		HomesteadBlock:            big.NewInt(0),
 		DAOForkBlock:              nil,
 		DAOForkSupport:            true,
@@ -138,7 +138,7 @@ var (
 	// RinkebyChainConfig contains the chain parameters to run a node on the Rinkeby test network.
 	RinkebyChainConfig = &goethereum.ChainConfig{
 		ChainID:                   big.NewInt(4),
-		SupportedProtocolVersions: vars.SupportedProtocolVersions,
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 		HomesteadBlock:            big.NewInt(1),
 		DAOForkBlock:              nil,
 		DAOForkSupport:            true,
@@ -183,7 +183,7 @@ var (
 	// GoerliChainConfig contains the chain parameters to run a node on the Görli test network.
 	GoerliChainConfig = &goethereum.ChainConfig{
 		ChainID:                   big.NewInt(5),
-		SupportedProtocolVersions: vars.SupportedProtocolVersions,
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 		HomesteadBlock:            big.NewInt(0),
 		DAOForkBlock:              nil,
 		DAOForkSupport:            true,
@@ -228,7 +228,7 @@ var (
 	// YoloV3ChainConfig contains the chain parameters to run a node on the YOLOv3 test network.
 	YoloV3ChainConfig = &goethereum.ChainConfig{
 		ChainID:                   new(big.Int).SetBytes([]byte("yolov3x")),
-		SupportedProtocolVersions: vars.SupportedProtocolVersions,
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 		HomesteadBlock:            big.NewInt(0),
 		DAOForkBlock:              nil,
 		DAOForkSupport:            true,

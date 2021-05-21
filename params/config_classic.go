@@ -32,7 +32,7 @@ var (
 		NetworkID:                 1,
 		Ethash:                    new(ctypes.EthashConfig),
 		ChainID:                   big.NewInt(61),
-		SupportedProtocolVersions: vars.SupportedProtocolVersions,
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 
 		EIP2FBlock: big.NewInt(1150000),
 		EIP7FBlock: big.NewInt(1150000),
@@ -96,7 +96,7 @@ var (
 		NetworkID:                 1,
 		Ethash:                    new(ctypes.EthashConfig),
 		ChainID:                   big.NewInt(6161),
-		SupportedProtocolVersions: vars.SupportedProtocolVersions,
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 
 		EIP2FBlock: big.NewInt(1),
 		EIP7FBlock: big.NewInt(1),

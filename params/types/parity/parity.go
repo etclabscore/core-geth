@@ -81,22 +81,12 @@ type ParityChainSpec struct {
 	} `json:"engine"`
 
 	Params struct {
-		AccountStartNonce    *ParityU64 `json:"accountStartNonce,omitempty"`
-		MaximumExtraDataSize *ParityU64 `json:"maximumExtraDataSize,omitempty"`
-		MinGasLimit          *ParityU64 `json:"minGasLimit,omitempty"`
-		GasLimitBoundDivisor *ParityU64 `json:"gasLimitBoundDivisor,omitempty"`
-		NetworkID            *ParityU64 `json:"networkID,omitempty"`
-		ChainID              *ParityU64 `json:"chainID,omitempty"`
-
-		// SupportedProtocolVersions is left here as a TODO.
-		// I don't think this field nor feature is supported by Parity, but
-		// this artifacts wants us to remember that its a thing which core-geth does support,
-		// and which Parity someday might support too.
-		// The Parity configurator in core-geth will always just return the core-geth app defaults, and Set calls
-		// will be a noop.
-		//
-		// SupportedProtocolVersions []*ParityU64 `json:"supported_protocol_versions,omitempty"`
-
+		AccountStartNonce         *ParityU64 `json:"accountStartNonce,omitempty"`
+		MaximumExtraDataSize      *ParityU64 `json:"maximumExtraDataSize,omitempty"`
+		MinGasLimit               *ParityU64 `json:"minGasLimit,omitempty"`
+		GasLimitBoundDivisor      *ParityU64 `json:"gasLimitBoundDivisor,omitempty"`
+		NetworkID                 *ParityU64 `json:"networkID,omitempty"`
+		ChainID                   *ParityU64 `json:"chainID,omitempty"`
 		MaxCodeSize               *ParityU64 `json:"maxCodeSize,omitempty"`
 		MaxCodeSizeTransition     *ParityU64 `json:"maxCodeSizeTransition,omitempty"`
 		EIP98Transition           *ParityU64 `json:"eip98Transition,omitempty"`
@@ -126,6 +116,12 @@ type ParityChainSpec struct {
 		EIP2565Transition         *ParityU64 `json:"eip2565Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
 		EIP2718Transition         *ParityU64 `json:"eip2718Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
 		ECIP1080Transition        *ParityU64 `json:"ecip1080Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+
+		// supportedProtocolVersions is left here as a caching field only.
+		// I don't think this feature is supported by Parity, but
+		// this value allows the configurator converter to gracefully handle test cases for Parity
+		// and for implementation design to be functional despite Parity not actually supporting the feature.
+		supportedProtocolVersions []uint
 
 		ForkBlock     *ParityU64   `json:"forkBlock,omitempty"`
 		ForkCanonHash *common.Hash `json:"forkCanonHash,omitempty"`

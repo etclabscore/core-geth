@@ -104,9 +104,9 @@ func (c *ChainConfig) SetChainID(n *big.Int) error {
 
 func (c *ChainConfig) GetSupportedProtocolVersions() []uint {
 	if len(c.SupportedProtocolVersions) == 0 {
-		return vars.DefaultProtocolVersions
+		c.SupportedProtocolVersions = vars.DefaultProtocolVersions
 	}
-	return vars.SupportedProtocolVersions
+	return c.SupportedProtocolVersions
 }
 
 func (c *ChainConfig) SetSupportedProtocolVersions(p []uint) error {

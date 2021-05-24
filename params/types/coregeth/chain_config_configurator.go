@@ -113,9 +113,14 @@ func (c *CoreGethChainConfig) SetChainID(n *big.Int) error {
 	return nil
 }
 
+// GetSupportedProtocolVersions returns the protocol versions supported by this configuration value.
+// When GetSupportedProtocolVersions is called, if the field containing the associated value (SupportedProtocolVersions)
+// is empty, this method will assign the app-default value to that field.
+// This establishes an in-data way of handling default behavior, and plays nicely with configurator equivalence
+// and conversion methods.
 func (c *CoreGethChainConfig) GetSupportedProtocolVersions() []uint {
 	if len(c.SupportedProtocolVersions) == 0 {
-		return vars.DefaultProtocolVersions
+		c.SupportedProtocolVersions = vars.DefaultProtocolVersions
 	}
 	return c.SupportedProtocolVersions
 }

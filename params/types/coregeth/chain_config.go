@@ -36,8 +36,9 @@ type CoreGethChainConfig struct {
 	// both for reference and edification.
 	// They show a difference between the upstream configuration data type (goethereum.ChainConfig) and this one.
 
-	NetworkID uint64   `json:"networkId"`
-	ChainID   *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
+	NetworkID                 uint64   `json:"networkId"`
+	ChainID                   *big.Int `json:"chainId"`                             // chainId identifies the current chain and is used for replay protection
+	SupportedProtocolVersions []uint   `json:"supportedProtocolVersions,omitempty"` // supportedProtocolVersions identifies the supported eth protocol versions for the current chain
 
 	// HF: Homestead
 	//HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)

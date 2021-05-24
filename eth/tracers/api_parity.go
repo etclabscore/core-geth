@@ -73,6 +73,20 @@ func setTraceConfigDefaultTracer(config *TraceConfig) *TraceConfig {
 	return config
 }
 
+// setTraceCallConfigDefaultTracer sets the default tracer to "callTracerParity" if none set
+func setTraceCallConfigDefaultTracer(config *TraceCallConfig) *TraceCallConfig {
+	if config == nil {
+		config = &TraceCallConfig{}
+	}
+
+	if config.Tracer == nil {
+		tracer := "callTracerParity"
+		config.Tracer = &tracer
+	}
+
+	return config
+}
+
 // TraceAPI is the collection of Ethereum full node APIs exposed over
 // the private debugging endpoint.
 type TraceAPI struct {
@@ -237,19 +251,20 @@ func (api *TraceAPI) Filter(ctx context.Context, args TraceFilterArgs, config *T
 // Call lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
-func (api *TraceAPI) Call(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
-	config = setTraceConfigDefaultTracer(config)
+func (api *TraceAPI) Call(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
+	config = setTraceCallConfigDefaultTracer(config)
 	res, err := api.debugAPI.TraceCall(ctx, args, blockNrOrHash, config)
 	if err != nil {
 		return nil, err
 	}
-	return decorateResponse(res, config)
+	traceConfig := getTraceConfigFromTraceCallConfig(config)
+	return decorateResponse(res, traceConfig)
 }
 
 // CallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
-func (api *TraceAPI) CallMany(ctx context.Context, txs []ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
-	config = setTraceConfigDefaultTracer(config)
+func (api *TraceAPI) CallMany(ctx context.Context, txs []ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
+	config = setTraceCallConfigDefaultTracer(config)
 	return api.debugAPI.TraceCallMany(ctx, txs, blockNrOrHash, config)
 }

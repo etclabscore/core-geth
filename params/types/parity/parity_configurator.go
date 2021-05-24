@@ -106,6 +106,18 @@ func (spec *ParityChainSpec) SetChainID(i *big.Int) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetSupportedProtocolVersions() []uint {
+	if len(spec.Params.supportedProtocolVersions) != 0 {
+		spec.Params.supportedProtocolVersions = vars.DefaultProtocolVersions
+	}
+	return spec.Params.supportedProtocolVersions
+}
+
+func (spec *ParityChainSpec) SetSupportedProtocolVersions(p []uint) error {
+	spec.Params.supportedProtocolVersions = p
+	return nil
+}
+
 func (spec *ParityChainSpec) GetEIP7Transition() *uint64 {
 	return spec.Engine.Ethash.Params.HomesteadTransition.Uint64P()
 }
@@ -708,6 +720,19 @@ func (spec *ParityChainSpec) MustSetConsensusEngineType(t ctypes.ConsensusEngine
 	default:
 		return ctypes.ErrUnsupportedConfigFatal
 	}
+}
+
+func (spec *ParityChainSpec) GetCatalystTransition() *uint64 {
+	return spec.Engine.Ethash.Params.CatalystBlock.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetCatalystTransition(n *uint64) error {
+	if n == nil {
+		spec.Engine.Ethash.Params.CatalystBlock = nil
+		return nil
+	}
+	spec.Engine.Ethash.Params.CatalystBlock = new(ParityU64).SetUint64(n)
+	return nil
 }
 
 func (spec *ParityChainSpec) GetEthashMinimumDifficulty() *big.Int {

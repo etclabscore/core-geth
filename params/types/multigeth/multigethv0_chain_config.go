@@ -13,8 +13,9 @@ import (
 // that any network, identified by its genesis block, can have its own
 // set of configuration options.
 type ChainConfig struct {
-	NetworkID uint64   `json:"-"`
-	ChainID   *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
+	NetworkID                 uint64   `json:"-"`
+	ChainID                   *big.Int `json:"chainId"`                             // chainId identifies the current chain and is used for replay protection
+	SupportedProtocolVersions []uint   `json:"supportedProtocolVersions,omitempty"` // supportedProtocolVersions identifies the supported eth protocol versions for the current chain
 
 	HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)
 
@@ -37,7 +38,8 @@ type ChainConfig struct {
 	BerlinBlock *big.Int `json:"berlinBlock,omitempty"` // Berlin switch block
 	YoloV3Block *big.Int `json:"yoloV3Block,omitempty"` // YOLO v3 (Ephemeral testnet)
 
-	EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
+	EWASMBlock    *big.Int `json:"ewasmBlock,omitempty"`    // EWASM switch block (nil = no fork, 0 = already activated)
+	CatalystBlock *big.Int `json:"catalystBlock,omitempty"` // Catalyst switch block (nil = no fork, 0 = already on catalyst)
 
 	//
 	// EXP cost increase

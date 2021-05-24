@@ -57,6 +57,8 @@ type ParityChainSpec struct {
 				HomesteadTransition *ParityU64 `json:"homesteadTransition"`
 				EIP100bTransition   *ParityU64 `json:"eip100bTransition"`
 
+				CatalystBlock *ParityU64 `json:"catalyst_block,omitempty"`
+
 				// Note: DAO fields will NOT be written to Parity configs from multi-geth.
 				// The chains with DAO settings are already canonical and have existing chainspecs.
 				// There is no need to replicate this information.
@@ -114,6 +116,12 @@ type ParityChainSpec struct {
 		EIP2565Transition         *ParityU64 `json:"eip2565Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
 		EIP2718Transition         *ParityU64 `json:"eip2718Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
 		ECIP1080Transition        *ParityU64 `json:"ecip1080Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+
+		// supportedProtocolVersions is left here as a caching field only.
+		// I don't think this feature is supported by Parity, but
+		// this value allows the configurator converter to gracefully handle test cases for Parity
+		// and for implementation design to be functional despite Parity not actually supporting the feature.
+		supportedProtocolVersions []uint
 
 		ForkBlock     *ParityU64   `json:"forkBlock,omitempty"`
 		ForkCanonHash *common.Hash `json:"forkCanonHash,omitempty"`

@@ -164,6 +164,17 @@ type TraceConfig struct {
 	NestedTraceOutput bool // Returns the trace output JSON nested under the trace name key. This allows full Parity compatibility to be achieved.
 }
 
+// TraceCallConfig is the config for traceCall API. It holds one more
+// field to override the state for tracing.
+type TraceCallConfig struct {
+	*vm.LogConfig
+	Tracer            *string
+	Timeout           *string
+	Reexec            *uint64
+	NestedTraceOutput bool // Returns the trace output JSON nested under the trace name key. This allows full Parity compatibility to be achieved.
+	StateOverrides    *ethapi.StateOverride
+}
+
 // StdTraceConfig holds extra parameters to standard-json trace functions.
 type StdTraceConfig struct {
 	vm.LogConfig
@@ -206,6 +217,20 @@ type blockTraceResult struct {
 type txTraceTask struct {
 	statedb *state.StateDB // Intermediate state prepped for tracing
 	index   int            // Transaction offset in the block
+}
+
+func getTraceConfigFromTraceCallConfig(config *TraceCallConfig) *TraceConfig {
+	var traceConfig *TraceConfig
+	if config != nil {
+		traceConfig = &TraceConfig{
+			LogConfig:         config.LogConfig,
+			Tracer:            config.Tracer,
+			Timeout:           config.Timeout,
+			Reexec:            config.Reexec,
+			NestedTraceOutput: config.NestedTraceOutput,
+		}
+	}
+	return traceConfig
 }
 
 // TraceChain returns the structured logs created during the execution of EVM
@@ -735,7 +760,7 @@ func (api *API) TraceTransaction(ctx context.Context, hash common.Hash, config *
 // created during the execution of EVM if the given transaction was added on
 // top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
-func (api *API) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+func (api *API) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
 	// Try to retrieve the specified block
 	var (
 		err   error
@@ -745,6 +770,8 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHa
 		block, err = api.blockByHash(ctx, hash)
 	} else if number, ok := blockNrOrHash.Number(); ok {
 		block, err = api.blockByNumber(ctx, number)
+	} else {
+		return nil, errors.New("invalid arguments; neither block nor hash specified")
 	}
 	if err != nil {
 		return nil, err
@@ -757,6 +784,12 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHa
 	statedb, err := api.backend.StateAtBlock(ctx, block, reexec, nil, true)
 	if err != nil {
 		return nil, err
+	}
+	// Apply the customized state rules if required.
+	if config != nil {
+		if err := config.StateOverrides.Apply(statedb); err != nil {
+			return nil, err
+		}
 	}
 	// Execute the trace
 	msg := args.ToMessage(api.backend.RPCGasCap())
@@ -800,13 +833,14 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHa
 		"hasFromSufficientBalanceForGasCost":         hasFromSufficientBalanceForGasCost,
 	}
 
-	return api.traceTx(ctx, msg, new(txTraceContext), vmctx, statedb, taskExtraContext, config)
+	traceConfig := getTraceConfigFromTraceCallConfig(config)
+	return api.traceTx(ctx, msg, new(txTraceContext), vmctx, statedb, taskExtraContext, traceConfig)
 }
 
 // TraceCallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
-func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
 	// Try to retrieve the specified block
 	var (
 		err   error
@@ -816,6 +850,8 @@ func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.CallArgs, blockN
 		block, err = api.blockByHash(ctx, hash)
 	} else if number, ok := blockNrOrHash.Number(); ok {
 		block, err = api.blockByNumber(ctx, number)
+	} else {
+		return nil, errors.New("invalid arguments; neither block nor hash specified")
 	}
 	if err != nil {
 		return nil, err
@@ -829,6 +865,14 @@ func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.CallArgs, blockN
 	if err != nil {
 		return nil, err
 	}
+	// Apply the customized state rules if required.
+	if config != nil {
+		if err := config.StateOverrides.Apply(statedb); err != nil {
+			return nil, err
+		}
+	}
+
+	traceConfig := getTraceConfigFromTraceCallConfig(config)
 
 	var results = make([]interface{}, len(txs))
 	for idx, args := range txs {
@@ -874,13 +918,13 @@ func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.CallArgs, blockN
 			"hasFromSufficientBalanceForGasCost":         hasFromSufficientBalanceForGasCost,
 		}
 
-		res, err := api.traceTx(ctx, msg, new(txTraceContext), vmctx, statedb, taskExtraContext, config)
+		res, err := api.traceTx(ctx, msg, new(txTraceContext), vmctx, statedb, taskExtraContext, traceConfig)
 		if err != nil {
 			results[idx] = &txTraceResult{Error: err.Error()}
 			continue
 		}
 
-		res, err = decorateResponse(res, config)
+		res, err = decorateResponse(res, traceConfig)
 		if err != nil {
 			return nil, fmt.Errorf("failed to decorate response for transaction at index %d with error %v", idx, err)
 		}
@@ -964,7 +1008,7 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *txTrac
 
 	result, err := core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.Gas()))
 	if err != nil {
-		return nil, fmt.Errorf("tracing failed: %v", err)
+		return nil, fmt.Errorf("tracing failed: %w", err)
 	}
 
 	// Depending on the tracer type, format and return the output.

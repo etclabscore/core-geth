@@ -113,6 +113,23 @@ func (c *CoreGethChainConfig) SetChainID(n *big.Int) error {
 	return nil
 }
 
+// GetSupportedProtocolVersions returns the protocol versions supported by this configuration value.
+// When GetSupportedProtocolVersions is called, if the field containing the associated value (SupportedProtocolVersions)
+// is empty, this method will assign the app-default value to that field.
+// This establishes an in-data way of handling default behavior, and plays nicely with configurator equivalence
+// and conversion methods.
+func (c *CoreGethChainConfig) GetSupportedProtocolVersions() []uint {
+	if len(c.SupportedProtocolVersions) == 0 {
+		c.SupportedProtocolVersions = vars.DefaultProtocolVersions
+	}
+	return c.SupportedProtocolVersions
+}
+
+func (c *CoreGethChainConfig) SetSupportedProtocolVersions(p []uint) error {
+	c.SupportedProtocolVersions = p
+	return nil
+}
+
 func (c *CoreGethChainConfig) GetMaxCodeSize() *uint64 {
 	return internal.GlobalConfigurator().GetMaxCodeSize()
 }
@@ -490,6 +507,15 @@ func (c *CoreGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngin
 	default:
 		return ctypes.ErrUnsupportedConfigFatal
 	}
+}
+
+func (c *CoreGethChainConfig) GetCatalystTransition() *uint64 {
+	return bigNewU64(c.Ethereum2CatalystFBlock)
+}
+
+func (c *CoreGethChainConfig) SetCatalystTransition(n *uint64) error {
+	c.Ethereum2CatalystFBlock = setBig(c.Ethereum2CatalystFBlock, n)
+	return nil
 }
 
 func (c *CoreGethChainConfig) GetEthashMinimumDifficulty() *big.Int {

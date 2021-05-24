@@ -35,6 +35,7 @@ import (
 )
 
 type Chain struct {
+	genesis     genesisT.Genesis
 	blocks      []*types.Block
 	chainConfig ctypes.ChainConfigurator
 }
@@ -125,16 +126,34 @@ func (c *Chain) GetHeaders(req GetBlockHeaders) (BlockHeaders, error) {
 // loadChain takes the given chain.rlp file, and decodes and returns
 // the blocks from the file.
 func loadChain(chainfile string, genesis string) (*Chain, error) {
-	chainConfig, err := ioutil.ReadFile(genesis)
+	gen, err := loadGenesis(genesis)
 	if err != nil {
-		return nil, err
-	}
-	var gen genesisT.Genesis
-	if err := json.Unmarshal(chainConfig, &gen); err != nil {
 		return nil, err
 	}
 	gblock := core.GenesisToBlock(&gen, nil)
 
+	blocks, err := blocksFromFile(chainfile, gblock)
+	if err != nil {
+		return nil, err
+	}
+
+	c := &Chain{genesis: gen, blocks: blocks, chainConfig: gen.Config}
+	return c, nil
+}
+
+func loadGenesis(genesisFile string) (genesisT.Genesis, error) {
+	chainConfig, err := ioutil.ReadFile(genesisFile)
+	if err != nil {
+		return genesisT.Genesis{}, err
+	}
+	var gen genesisT.Genesis
+	if err := json.Unmarshal(chainConfig, &gen); err != nil {
+		return genesisT.Genesis{}, err
+	}
+	return gen, nil
+}
+
+func blocksFromFile(chainfile string, gblock *types.Block) ([]*types.Block, error) {
 	// Load chain.rlp.
 	fh, err := os.Open(chainfile)
 	if err != nil {
@@ -162,7 +181,5 @@ func loadChain(chainfile string, genesis string) (*Chain, error) {
 		}
 		blocks = append(blocks, &b)
 	}
-
-	c := &Chain{blocks: blocks, chainConfig: gen.Config}
-	return c, nil
+	return blocks, nil
 }

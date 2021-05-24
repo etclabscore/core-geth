@@ -979,6 +979,7 @@ var allRPCMethods = []string{
 	"eth_getUncleCountByBlockHash",
 	"eth_getUncleCountByBlockNumber",
 	"eth_getWork",
+	"eth_hashrate",
 	"eth_logs",
 	"eth_mining",
 	"eth_newBlockFilter",

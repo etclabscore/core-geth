@@ -155,8 +155,13 @@ var (
 	}
 	EthProtocolsFlag = cli.StringFlag{
 		Name:  "eth.protocols",
-		Usage: "Sets the Ethereum Protocol versions (66|65|64) (default = 66,65,64 first is primary)",
-		Value: "",
+		Usage: "Sets the Ethereum Protocol versions (first is primary)",
+		Value: strings.Join(func() (strings []string) {
+			for _, s := range ethconfig.Defaults.ProtocolVersions {
+				strings = append(strings, strconv.Itoa(int(s)))
+			}
+			return
+		}(), ","),
 	}
 	ClassicFlag = cli.BoolFlag{
 		Name:  "classic",
@@ -804,6 +809,10 @@ var (
 		Name:  "ecbp1100.nodisable",
 		Usage: "Short-circuit ECBP-1100 (MESS) disable mechanisms; (yields a permanent-once-activated state, deactivating auto-shutoff mechanisms)",
 	}
+	CatalystFlag = cli.BoolFlag{
+		Name:  "catalyst",
+		Usage: "Catalyst mode (eth2 integration testing)",
+	}
 )
 
 // MakeDataDir retrieves the currently requested data directory, terminating
@@ -1242,10 +1251,11 @@ func SetP2PConfig(ctx *cli.Context, cfg *p2p.Config) {
 		cfg.NetRestrict = list
 	}
 
-	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) {
+	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) || ctx.GlobalBool(CatalystFlag.Name) {
 		// --dev mode can't use p2p networking.
 		cfg.MaxPeers = 0
-		cfg.ListenAddr = ":0"
+		cfg.ListenAddr = ""
+		cfg.NoDial = true
 		cfg.NoDiscovery = true
 		cfg.DiscoveryV5 = false
 	}
@@ -1728,43 +1738,49 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		cfg.NetworkId = *cfg.Genesis.GetNetworkID()
 	}
 
-	if ctx.GlobalIsSet(EthProtocolsFlag.Name) {
-		protocolVersions := SplitAndTrim(ctx.GlobalString(EthProtocolsFlag.Name))
-		if len(protocolVersions) == 0 {
-			Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.DefaultProtocolVersions)), ","))
-		}
-
-		seenVersions := map[uint]interface{}{}
-		for _, versionString := range protocolVersions {
-			version, err := strconv.ParseUint(versionString, 10, 0)
-			if err != nil {
-				Fatalf("--%s has invalid value \"%v\" with error: %v", EthProtocolsFlag.Name, versionString, err)
-			}
-
-			if _, duplicate := seenVersions[uint(version)]; duplicate {
-				Fatalf("--%s has duplicate version of %v", EthProtocolsFlag.Name, versionString)
-			}
-
-			isValid := false
-			for _, proto := range eth.DefaultProtocolVersions {
-				if proto == uint(version) {
-					isValid = true
-					seenVersions[uint(version)] = nil
-					break
-				}
-			}
-
-			if !isValid {
-				Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(eth.DefaultProtocolVersions)), ","))
-			}
-			cfg.ProtocolVersions = append(cfg.ProtocolVersions, uint(version))
-		}
+	// Set the supported ETH Protocol Versions
+	supportedProtocolVersions := ethconfig.Defaults.ProtocolVersions
+	if cfg.Genesis != nil {
+		supportedProtocolVersions = cfg.Genesis.GetSupportedProtocolVersions()
 	}
 
-	// set default protocol versions
-	if len(cfg.ProtocolVersions) == 0 {
-		cfg.ProtocolVersions = eth.DefaultProtocolVersions
+	configuredProtocolVersions := SplitAndTrim(ctx.GlobalString(EthProtocolsFlag.Name))
+	if len(configuredProtocolVersions) == 0 {
+		Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(supportedProtocolVersions)), ","))
 	}
+
+	// Since EthProtocolsFlag defines a default value that is the ethconfig.Defaults slice,
+	// we can always parse and act on this value whether or not the user sets the flag.
+	// Since our logic here will append to the parameterized 'cfg' value ProtocolVersions field,
+	// we need to make sure that that value starts empty.
+	cfg.ProtocolVersions = []uint{}
+
+	seenVersions := map[uint]interface{}{}
+	for _, versionString := range configuredProtocolVersions {
+		version, err := strconv.ParseUint(versionString, 10, 0)
+		if err != nil {
+			Fatalf("--%s has invalid value \"%v\" with error: %v", EthProtocolsFlag.Name, versionString, err)
+		}
+
+		if _, duplicate := seenVersions[uint(version)]; duplicate {
+			Fatalf("--%s has duplicate version of %v", EthProtocolsFlag.Name, versionString)
+		}
+
+		isValid := false
+		for _, proto := range supportedProtocolVersions {
+			if proto == uint(version) {
+				isValid = true
+				seenVersions[uint(version)] = nil
+				break
+			}
+		}
+
+		if !isValid {
+			Fatalf("--%s invalid version value: %d, must be one of %s", EthProtocolsFlag.Name, version, strings.Join(strings.Fields(fmt.Sprint(supportedProtocolVersions)), ","))
+		}
+		cfg.ProtocolVersions = append(cfg.ProtocolVersions, uint(version))
+	}
+	log.Info("Configured Ethereum protocol versions", "capabilities", cfg.ProtocolVersions)
 
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.
 	switch {
@@ -1829,7 +1845,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		if ctx.GlobalIsSet(DataDirFlag.Name) {
 			// Check if we have an already initialized chain and fall back to
 			// that if so. Otherwise we need to generate a new genesis spec.
-			chaindb := MakeChainDatabase(ctx, stack, true)
+			chaindb := MakeChainDatabase(ctx, stack, false) // TODO (MariusVanDerWijden) make this read only
 			if rawdb.ReadCanonicalHash(chaindb, 0) != (common.Hash{}) {
 				cfg.Genesis = nil // fallback to db content
 			}
@@ -1864,23 +1880,21 @@ func SetDNSDiscoveryDefaults(cfg *ethconfig.Config, genesis common.Hash) {
 	}
 	if url := params.KnownDNSNetwork(genesis, protocol); url != "" {
 		cfg.EthDiscoveryURLs = []string{url}
-	}
-	if cfg.SyncMode == downloader.SnapSync {
-		if url := params.KnownDNSNetwork(genesis, "snap"); url != "" {
-			cfg.SnapDiscoveryURLs = []string{url}
-		}
+		cfg.SnapDiscoveryURLs = cfg.EthDiscoveryURLs
 	}
 }
 
 // RegisterEthService adds an Ethereum client to the stack.
-func RegisterEthService(stack *node.Node, cfg *ethconfig.Config) ethapi.Backend {
+// The second return value is the full node instance, which may be nil if the
+// node is running as a light client.
+func RegisterEthService(stack *node.Node, cfg *ethconfig.Config) (ethapi.Backend, *eth.Ethereum) {
 	if cfg.SyncMode == downloader.LightSync {
 		backend, err := les.New(stack, cfg)
 		if err != nil {
 			Fatalf("Failed to register the Ethereum service: %v", err)
 		}
 		stack.RegisterAPIs(tracers.APIs(backend.ApiBackend))
-		return backend.ApiBackend
+		return backend.ApiBackend, nil
 	}
 	backend, err := eth.New(stack, cfg)
 	if err != nil {
@@ -1893,7 +1907,7 @@ func RegisterEthService(stack *node.Node, cfg *ethconfig.Config) ethapi.Backend 
 		}
 	}
 	stack.RegisterAPIs(tracers.APIs(backend.APIBackend))
-	return backend.APIBackend
+	return backend.APIBackend, backend
 }
 
 // RegisterEthStatsService configures the Ethereum Stats daemon and adds it to

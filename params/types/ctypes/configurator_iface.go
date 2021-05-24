@@ -62,6 +62,8 @@ type ProtocolSpecifier interface {
 	SetNetworkID(n *uint64) error
 	GetChainID() *big.Int
 	SetChainID(i *big.Int) error
+	GetSupportedProtocolVersions() []uint
+	SetSupportedProtocolVersions(p []uint) error
 	GetMaxCodeSize() *uint64
 	SetMaxCodeSize(n *uint64) error
 
@@ -169,6 +171,10 @@ type ConsensusEnginator interface {
 	MustSetConsensusEngineType(t ConsensusEngineT) error
 	EthashConfigurator
 	CliqueConfigurator
+
+	// Catalyst: ETH -> ETH2 PoS transition helper
+	GetCatalystTransition() *uint64
+	SetCatalystTransition(n *uint64) error
 }
 
 type EthashConfigurator interface {

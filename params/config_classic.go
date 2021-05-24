@@ -23,14 +23,16 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var (
 	// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
 	ClassicChainConfig = &coregeth.CoreGethChainConfig{
-		NetworkID: 1,
-		Ethash:    new(ctypes.EthashConfig),
-		ChainID:   big.NewInt(61),
+		NetworkID:                 1,
+		Ethash:                    new(ctypes.EthashConfig),
+		ChainID:                   big.NewInt(61),
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 
 		EIP2FBlock: big.NewInt(1150000),
 		EIP7FBlock: big.NewInt(1150000),
@@ -91,9 +93,10 @@ var (
 	ExpDiffPeriod            = big.NewInt(100000) // Exponential diff period for diff bomb & ECIP1010
 
 	MessNetConfig = &coregeth.CoreGethChainConfig{
-		NetworkID: 1,
-		Ethash:    new(ctypes.EthashConfig),
-		ChainID:   big.NewInt(6161),
+		NetworkID:                 1,
+		Ethash:                    new(ctypes.EthashConfig),
+		ChainID:                   big.NewInt(6161),
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 
 		EIP2FBlock: big.NewInt(1),
 		EIP7FBlock: big.NewInt(1),

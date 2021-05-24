@@ -304,6 +304,14 @@ func (g *Genesis) SetChainID(i *big.Int) error {
 	return g.Config.SetChainID(i)
 }
 
+func (g *Genesis) GetSupportedProtocolVersions() []uint {
+	return g.Config.GetSupportedProtocolVersions()
+}
+
+func (g *Genesis) SetSupportedProtocolVersions(p []uint) error {
+	return g.Config.SetSupportedProtocolVersions(p)
+}
+
 func (g *Genesis) GetMaxCodeSize() *uint64 {
 	return g.Config.GetMaxCodeSize()
 }
@@ -614,6 +622,14 @@ func (g *Genesis) GetConsensusEngineType() ctypes.ConsensusEngineT {
 
 func (g *Genesis) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
 	return g.Config.MustSetConsensusEngineType(t)
+}
+
+func (g *Genesis) GetCatalystTransition() *uint64 {
+	return g.Config.GetCatalystTransition()
+}
+
+func (g *Genesis) SetCatalystTransition(n *uint64) error {
+	return g.Config.SetCatalystTransition(n)
 }
 
 func (g *Genesis) GetEthashMinimumDifficulty() *big.Int {

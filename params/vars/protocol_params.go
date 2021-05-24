@@ -33,6 +33,15 @@ var (
 )
 
 var (
+	// SupportedProtocolVersions are the supported versions of the `eth` protocol (first
+	// is primary).
+	SupportedProtocolVersions = []uint{66, 65}
+
+	// DefaultProtocolVersions are the protocol version defaults.
+	DefaultProtocolVersions = SupportedProtocolVersions
+)
+
+var (
 	GasLimitBoundDivisor uint64 = 1024    // The bound divisor of the gas limit, used in update calculations.
 	MinGasLimit          uint64 = 5000    // Minimum the gas limit may ever be.
 	GenesisGasLimit      uint64 = 4712388 // Gas limit of the Genesis block.

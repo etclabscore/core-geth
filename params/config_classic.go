@@ -74,6 +74,12 @@ var (
 		EIP2028FBlock: big.NewInt(10_500_839),
 		EIP2200FBlock: big.NewInt(10_500_839), // RePetersburg (=~ re-1283)
 
+		// Berlin eq, aka Magneto
+		EIP2565FBlock: big.NewInt(13_189_133),
+		EIP2718FBlock: big.NewInt(13_189_133),
+		EIP2929FBlock: big.NewInt(13_189_133),
+		EIP2930FBlock: big.NewInt(13_189_133),
+
 		ECIP1099FBlock: big.NewInt(11_700_000), // Etchash (DAG size limit)
 
 		DisposalBlock:      big.NewInt(5900000),
@@ -135,6 +141,12 @@ var (
 		EIP1884FBlock: big.NewInt(10),
 		EIP2028FBlock: big.NewInt(10),
 		EIP2200FBlock: big.NewInt(10), // RePetersburg (=~ re-1283)
+
+		// Berlin eq, aka Magneto
+		EIP2565FBlock: big.NewInt(11),
+		EIP2718FBlock: big.NewInt(11),
+		EIP2929FBlock: big.NewInt(11),
+		EIP2930FBlock: big.NewInt(11),
 
 		DisposalBlock:      big.NewInt(5),
 		ECIP1017FBlock:     big.NewInt(5),

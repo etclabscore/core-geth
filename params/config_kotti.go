@@ -73,6 +73,12 @@ var (
 		EIP2028FBlock: big.NewInt(2_200_013),
 		EIP2200FBlock: big.NewInt(2_200_013), // RePetersburg (== re-1283)
 
+		// Berlin eq, aka Magneto
+		EIP2565FBlock: big.NewInt(4_368_634),
+		EIP2718FBlock: big.NewInt(4_368_634),
+		EIP2929FBlock: big.NewInt(4_368_634),
+		EIP2930FBlock: big.NewInt(4_368_634),
+
 		RequireBlockHashes: map[uint64]common.Hash{
 			0: KottiGenesisHash,
 			/*

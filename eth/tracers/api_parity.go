@@ -22,9 +22,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
+	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -137,7 +137,7 @@ func decorateNestedTraceResponse(res interface{}, tracer string) interface{} {
 // traceBlockReward retrieve the block reward for the coinbase address
 func (api *TraceAPI) traceBlockReward(ctx context.Context, block *types.Block, config *TraceConfig) (*ParityTrace, error) {
 	chainConfig := api.debugAPI.backend.ChainConfig()
-	minerReward, _ := ethash.GetRewards(chainConfig, block.Header(), block.Uncles())
+	minerReward, _ := mutations.GetRewards(chainConfig, block.Header(), block.Uncles())
 
 	coinbase := block.Coinbase()
 
@@ -159,7 +159,7 @@ func (api *TraceAPI) traceBlockReward(ctx context.Context, block *types.Block, c
 // traceBlockUncleRewards retrieve the block rewards for uncle addresses
 func (api *TraceAPI) traceBlockUncleRewards(ctx context.Context, block *types.Block, config *TraceConfig) ([]*ParityTrace, error) {
 	chainConfig := api.debugAPI.backend.ChainConfig()
-	_, uncleRewards := ethash.GetRewards(chainConfig, block.Header(), block.Uncles())
+	_, uncleRewards := mutations.GetRewards(chainConfig, block.Header(), block.Uncles())
 
 	results := make([]*ParityTrace, len(uncleRewards))
 	for i, uncle := range block.Uncles() {

@@ -24,7 +24,7 @@ import (
 )
 
 type (
-	executionFunc func(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([]byte, error)
+	executionFunc func(pc *uint64, interpreter *EVMInterpreter, callContext *ScopeContext) ([]byte, error)
 	gasFunc       func(*EVM, *Contract, *Stack, *Memory, uint64) (uint64, error) // last parameter is the requested memory size as a uint64
 	// memorySizeFunc returns the required size, and whether the operation overflowed a uint64
 	memorySizeFunc func(*Stack) (size uint64, overflow bool)
@@ -174,19 +174,12 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 	if config.IsEnabled(config.GetECIP1080Transition, bn) {
 		enableSelfBalance(&instructionSet)
 	}
-
 	if config.IsEnabled(config.GetEIP2200Transition, bn) && !config.IsEnabled(config.GetEIP2200DisableTransition, bn) {
 		enable2200(&instructionSet) // Net metered SSTORE - https://eips.ethereum.org/EIPS/eip-2200
 	}
-
-	if config.IsEnabled(config.GetEIP2315Transition, bn) {
-		enable2315(&instructionSet) // Subroutines - https://eips.ethereum.org/EIPS/eip-2315
-	}
-
 	if config.IsEnabled(config.GetEIP2929Transition, bn) {
 		enable2929(&instructionSet) // Access lists for trie accesses https://eips.ethereum.org/EIPS/eip-2929
 	}
-
 	return instructionSet
 }
 

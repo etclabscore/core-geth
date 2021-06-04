@@ -32,6 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -83,7 +84,7 @@ func (ethash *Ethash) VerifyHeader(chain consensus.ChainHeaderReader, header *ty
 		return consensus.ErrUnknownAncestor
 	}
 	// Sanity checks passed, do a proper verification
-	return ethash.verifyHeader(chain, header, parent, false, seal)
+	return ethash.verifyHeader(chain, header, parent, false, seal, time.Now().Unix())
 }
 
 // VerifyHeaders is similar to VerifyHeader, but verifies a batch of headers
@@ -107,15 +108,16 @@ func (ethash *Ethash) VerifyHeaders(chain consensus.ChainHeaderReader, headers [
 
 	// Create a task channel and spawn the verifiers
 	var (
-		inputs = make(chan int)
-		done   = make(chan int, workers)
-		errors = make([]error, len(headers))
-		abort  = make(chan struct{})
+		inputs  = make(chan int)
+		done    = make(chan int, workers)
+		errors  = make([]error, len(headers))
+		abort   = make(chan struct{})
+		unixNow = time.Now().Unix()
 	)
 	for i := 0; i < workers; i++ {
 		go func() {
 			for index := range inputs {
-				errors[index] = ethash.verifyHeaderWorker(chain, headers, seals, index)
+				errors[index] = ethash.verifyHeaderWorker(chain, headers, seals, index, unixNow)
 				done <- index
 			}
 		}()
@@ -151,7 +153,7 @@ func (ethash *Ethash) VerifyHeaders(chain consensus.ChainHeaderReader, headers [
 	return abort, errorsOut
 }
 
-func (ethash *Ethash) verifyHeaderWorker(chain consensus.ChainHeaderReader, headers []*types.Header, seals []bool, index int) error {
+func (ethash *Ethash) verifyHeaderWorker(chain consensus.ChainHeaderReader, headers []*types.Header, seals []bool, index int, unixNow int64) error {
 	var parent *types.Header
 	if index == 0 {
 		parent = chain.GetHeader(headers[0].ParentHash, headers[0].Number.Uint64()-1)
@@ -161,10 +163,7 @@ func (ethash *Ethash) verifyHeaderWorker(chain consensus.ChainHeaderReader, head
 	if parent == nil {
 		return consensus.ErrUnknownAncestor
 	}
-	if chain.GetHeader(headers[index].Hash(), headers[index].Number.Uint64()) != nil {
-		return nil // known block
-	}
-	return ethash.verifyHeader(chain, headers[index], parent, false, seals[index])
+	return ethash.verifyHeader(chain, headers[index], parent, false, seals[index], unixNow)
 }
 
 // VerifyUncles verifies that the given block's uncles conform to the consensus
@@ -186,15 +185,23 @@ func (ethash *Ethash) VerifyUncles(chain consensus.ChainReader, block *types.Blo
 
 	number, parent := block.NumberU64()-1, block.ParentHash()
 	for i := 0; i < 7; i++ {
-		ancestor := chain.GetBlock(parent, number)
-		if ancestor == nil {
+		ancestorHeader := chain.GetHeader(parent, number)
+		if ancestorHeader == nil {
 			break
 		}
-		ancestors[ancestor.Hash()] = ancestor.Header()
-		for _, uncle := range ancestor.Uncles() {
-			uncles.Add(uncle.Hash())
+		ancestors[parent] = ancestorHeader
+		// If the ancestor doesn't have any uncles, we don't have to iterate them
+		if ancestorHeader.UncleHash != types.EmptyUncleHash {
+			// Need to add those uncles to the blacklist too
+			ancestor := chain.GetBlock(parent, number)
+			if ancestor == nil {
+				break
+			}
+			for _, uncle := range ancestor.Uncles() {
+				uncles.Add(uncle.Hash())
+			}
 		}
-		parent, number = ancestor.ParentHash(), number-1
+		parent, number = ancestorHeader.ParentHash, number-1
 	}
 	ancestors[block.Hash()] = block.Header()
 	uncles.Add(block.Hash())
@@ -215,7 +222,7 @@ func (ethash *Ethash) VerifyUncles(chain consensus.ChainReader, block *types.Blo
 		if ancestors[uncle.ParentHash] == nil || uncle.ParentHash == block.ParentHash() {
 			return errDanglingUncle
 		}
-		if err := ethash.verifyHeader(chain, uncle, ancestors[uncle.ParentHash], true, true); err != nil {
+		if err := ethash.verifyHeader(chain, uncle, ancestors[uncle.ParentHash], true, true, time.Now().Unix()); err != nil {
 			return err
 		}
 	}
@@ -225,14 +232,14 @@ func (ethash *Ethash) VerifyUncles(chain consensus.ChainReader, block *types.Blo
 // verifyHeader checks whether a header conforms to the consensus rules of the
 // stock Ethereum ethash engine.
 // See YP section 4.3.4. "Block Header Validity"
-func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, parent *types.Header, uncle bool, seal bool) error {
+func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, parent *types.Header, uncle bool, seal bool, unixNow int64) error {
 	// Ensure that the header's extra-data section is of a reasonable size
 	if uint64(len(header.Extra)) > vars.MaximumExtraDataSize {
 		return fmt.Errorf("extra-data too long: %d > %d", len(header.Extra), vars.MaximumExtraDataSize)
 	}
 	// Verify the header's timestamp
 	if !uncle {
-		if header.Time > uint64(time.Now().Add(allowedFutureBlockTime).Unix()) {
+		if header.Time > uint64(unixNow+int64(allowedFutureBlockTime.Seconds())) {
 			return consensus.ErrFutureBlock
 		}
 	}
@@ -271,12 +278,12 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 	}
 	// Verify the engine specific seal securing the block
 	if seal {
-		if err := ethash.VerifySeal(chain, header); err != nil {
+		if err := ethash.verifySeal(chain, header, false); err != nil {
 			return err
 		}
 	}
 	// If all checks passed, validate any special fields for hard forks
-	if err := misc.VerifyDAOHeaderExtraData(chain.Config(), header); err != nil {
+	if err := mutations.VerifyDAOHeaderExtraData(chain.Config(), header); err != nil {
 		return err
 	}
 	if err := misc.VerifyForkHashes(chain.Config(), header, uncle); err != nil {
@@ -308,6 +315,10 @@ func parent_diff_over_dbd(p *types.Header) *big.Int {
 func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.Header) *big.Int {
 	next := new(big.Int).Add(parent.Number, big1)
 	out := new(big.Int)
+
+	if config.IsEnabled(config.GetCatalystTransition, next) {
+		return big.NewInt(1)
+	}
 
 	// ADJUSTMENT algorithms
 	if config.IsEnabled(config.GetEthashEIP100BTransition, next) {
@@ -452,11 +463,10 @@ var (
 	bigMinus99 = big.NewInt(-99)
 )
 
-// VerifySeal implements consensus.Engine, checking whether the given block satisfies
-// the PoW difficulty requirements.
-func (ethash *Ethash) VerifySeal(chain consensus.ChainHeaderReader, header *types.Header) error {
-	return ethash.verifySeal(chain, header, false)
-}
+// Exported for fuzzing
+var FrontierDifficultyCalulator = CalcDifficultyFrontierU256
+var HomesteadDifficultyCalulator = CalcDifficultyHomesteadU256
+var DynamicDifficultyCalculator = MakeDifficultyCalculatorU256
 
 // verifySeal checks whether a block satisfies the PoW difficulty requirements,
 // either using the usual ethash cache for it, or alternatively using a full DAG
@@ -540,19 +550,18 @@ func (ethash *Ethash) Prepare(chain consensus.ChainHeaderReader, header *types.H
 // setting the final state on the header
 func (ethash *Ethash) Finalize(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header) {
 	// Accumulate any block and uncle rewards and commit the final state root
-	accumulateRewards(chain.Config(), state, header, uncles)
+	mutations.AccumulateRewards(chain.Config(), state, header, uncles)
 	header.Root = state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, header.Number))
 }
 
 // FinalizeAndAssemble implements consensus.Engine, accumulating the block and
 // uncle rewards, setting the final state and assembling the block.
 func (ethash *Ethash) FinalizeAndAssemble(chain consensus.ChainHeaderReader, header *types.Header, state *state.StateDB, txs []*types.Transaction, uncles []*types.Header, receipts []*types.Receipt) (*types.Block, error) {
-	// Accumulate any block and uncle rewards and commit the final state root
-	accumulateRewards(chain.Config(), state, header, uncles)
-	header.Root = state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, header.Number))
+	// Finalize block
+	ethash.Finalize(chain, header, state, txs, uncles)
 
 	// Header seems complete, assemble into a block and return
-	return types.NewBlock(header, txs, uncles, receipts, new(trie.Trie)), nil
+	return types.NewBlock(header, txs, uncles, receipts, trie.NewStackTrie(nil)), nil
 }
 
 // SealHash returns the hash of a block prior to it being sealed.
@@ -576,104 +585,4 @@ func (ethash *Ethash) SealHash(header *types.Header) (hash common.Hash) {
 	})
 	hasher.Sum(hash[:0])
 	return hash
-}
-
-// Some weird constants to avoid constant memory allocs for them.
-var (
-	big8  = big.NewInt(8)
-	big32 = big.NewInt(32)
-)
-
-// GetRewards calculates the mining reward.
-// The total reward consists of the static block reward and rewards for
-// included uncles. The coinbase of each uncle block is also calculated.
-func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*big.Int, []*big.Int) {
-	if config.IsEnabled(config.GetEthashECIP1017Transition, header.Number) {
-		return ecip1017BlockReward(config, header, uncles)
-	}
-
-	blockReward := ctypes.EthashBlockReward(config, header.Number)
-
-	// Accumulate the rewards for the miner and any included uncles
-	uncleRewards := make([]*big.Int, len(uncles))
-	reward := new(big.Int).Set(blockReward)
-	r := new(big.Int)
-	for i, uncle := range uncles {
-		r.Add(uncle.Number, big8)
-		r.Sub(r, header.Number)
-		r.Mul(r, blockReward)
-		r.Div(r, big8)
-
-		ur := new(big.Int).Set(r)
-		uncleRewards[i] = ur
-
-		r.Div(blockReward, big32)
-		reward.Add(reward, r)
-	}
-
-	return reward, uncleRewards
-}
-
-// accumulateRewards credits the coinbase of the given block with the mining
-// reward. The coinbase of each uncle block is also rewarded.
-func accumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
-	minerReward, uncleRewards := GetRewards(config, header, uncles)
-	for i, uncle := range uncles {
-		state.AddBalance(uncle.Coinbase, uncleRewards[i])
-	}
-	state.AddBalance(header.Coinbase, minerReward)
-}
-
-// As of "Era 2" (zero-index era 1), uncle miners and winners are rewarded equally for each included block.
-// So they share this function.
-func getEraUncleBlockReward(era *big.Int, blockReward *big.Int) *big.Int {
-	return new(big.Int).Div(GetBlockWinnerRewardByEra(era, blockReward), big32)
-}
-
-// GetBlockUncleRewardByEra gets called _for each uncle miner_ associated with a winner block's uncles.
-func GetBlockUncleRewardByEra(era *big.Int, header, uncle *types.Header, blockReward *big.Int) *big.Int {
-	// Era 1 (index 0):
-	//   An extra reward to the winning miner for including uncles as part of the block, in the form of an extra 1/32 (0.15625ETC) per uncle included, up to a maximum of two (2) uncles.
-	if era.Cmp(big.NewInt(0)) == 0 {
-		r := new(big.Int)
-		r.Add(uncle.Number, big8) // 2,534,998 + 8              = 2,535,006
-		r.Sub(r, header.Number)   // 2,535,006 - 2,534,999        = 7
-		r.Mul(r, blockReward)     // 7 * 5e+18               = 35e+18
-		r.Div(r, big8)            // 35e+18 / 8                            = 7/8 * 5e+18
-
-		return r
-	}
-	return getEraUncleBlockReward(era, blockReward)
-}
-
-// GetBlockWinnerRewardForUnclesByEra gets called _per winner_, and accumulates rewards for each included uncle.
-// Assumes uncles have been validated and limited (@ func (v *BlockValidator) VerifyUncles).
-func GetBlockWinnerRewardForUnclesByEra(era *big.Int, uncles []*types.Header, blockReward *big.Int) *big.Int {
-	r := big.NewInt(0)
-
-	for range uncles {
-		r.Add(r, getEraUncleBlockReward(era, blockReward)) // can reuse this, since 1/32 for winner's uncles remain unchanged from "Era 1"
-	}
-	return r
-}
-
-// GetRewardByEra gets a block reward at disinflation rate.
-// Constants MaxBlockReward, DisinflationRateQuotient, and DisinflationRateDivisor assumed.
-func GetBlockWinnerRewardByEra(era *big.Int, blockReward *big.Int) *big.Int {
-	if era.Cmp(big.NewInt(0)) == 0 {
-		return new(big.Int).Set(blockReward)
-	}
-
-	// MaxBlockReward _r_ * (4/5)**era == MaxBlockReward * (4**era) / (5**era)
-	// since (q/d)**n == q**n / d**n
-	// qed
-	var q, d, r *big.Int = new(big.Int), new(big.Int), new(big.Int)
-
-	q.Exp(params.DisinflationRateQuotient, era, nil)
-	d.Exp(params.DisinflationRateDivisor, era, nil)
-
-	r.Mul(blockReward, q)
-	r.Div(r, d)
-
-	return r
 }

@@ -18,6 +18,7 @@ package tests
 
 import (
 	"bytes"
+	"crypto/sha1"
 	"encoding/json"
 	"io/ioutil"
 	"math/big"
@@ -28,20 +29,127 @@ import (
 
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/internal/build"
+	"github.com/ethereum/go-ethereum/params/confp"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
+// outNDJSONFile is the file where difficulty tests get written to.
+// The file is encoded as line-delimited JSON.
 var outNDJSONFile = filepath.Join(difficultyTestDir, "mgen_difficulty.ndjson")
 
-func TestDifficultyGen(t *testing.T) {
-	generateTests := os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) != ""
-
-	if !generateTests {
+// TestDifficultyTestConfigGen generates the difficulty test configuration files
+// for all existing tests' configuration and the configuration for any to-be generated
+// test configurations (via dt.generateFromReference).
+func TestDifficultyTestConfigGen(t *testing.T) {
+	if os.Getenv(CG_GENERATE_DIFFICULTY_TEST_CONFIGS_KEY) == "" {
 		t.Skip()
 	}
-	if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_OPENETHEREUM_KEY) == "" {
-		t.Fatal("Must run test generation with JSON file chain configurations.")
+
+	head := build.RunGit("rev-parse", "HEAD")
+	head = strings.TrimSpace(head)
+
+	dt := new(testMatcherGen)
+	dt.allConfigs = make(map[string]*coregeth.CoreGethChainConfig)
+	dt.testMatcher = new(testMatcher)
+	dt.noParallel = true // disable parallelism
+	dt.errorPanics = true
+	dt.gitHead = head
+
+	// Not difficulty-tests
+	dt.skipLoad("hexencodetest.*")
+	dt.skipLoad("crypto.*")
+	dt.skipLoad("blockgenesistest\\.json")
+	dt.skipLoad("genesishashestest\\.json")
+	dt.skipLoad("keyaddrtest\\.json")
+	dt.skipLoad("txtest\\.json")
+
+	// files are 2 years old, contains strange values
+	dt.skipLoad("difficultyCustomHomestead\\.json")
+	dt.skipLoad("difficultyMorden\\.json")
+	dt.skipLoad("difficultyOlimpic\\.json")
+
+	dt.generateFromReference("Byzantium", "ETC_Atlantis")
+	dt.generateFromReference("Constantinople", "ETC_Agharta")
+	dt.generateFromReference("EIP2384", "ETC_Phoenix")
+	/*
+		My rationale for not adding ETC_Magneto was that difficulty hasn't changed for the Foundation since EIP2384 Muir Glacier,
+		and the tests haven't changed in at least that long.
+		This leads to me to think that adding an ETC_Magneto case would only duplicate the set of ETC_Phoenix.
+	*/
+
+	for k, v := range difficultyChainConfigurations {
+		dt.config(k, v)
 	}
+
+	dt.walk(t, difficultyTestDir, func(t *testing.T, name string, test *DifficultyTest) {
+		config, matchedName := dt.findConfig(name)
+		// t.Logf("name: %s, matchedName: %s", name, matchedName)
+
+		fileBasename, ok := mapForkNameChainspecFileDifficulty[matchedName]
+		if !ok {
+			t.Fatalf("unmatched config name: %s", matchedName)
+		}
+		specPath := filepath.Join(coregethSpecsDir, fileBasename)
+
+		cgConfig := &coregeth.CoreGethChainConfig{}
+		err := confp.Convert(config, cgConfig)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		j, err := json.MarshalIndent(cgConfig, "", "    ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = ioutil.WriteFile(specPath, j, os.ModePerm)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		targetForkName := dt.getGenerationTarget(matchedName)
+		if targetForkName == "" {
+			return
+		}
+
+		targetConfiguration, ok := difficultyChainConfigurations[targetForkName]
+		if !ok {
+			t.Fatalf("config association failed; no existing Go chain config found: %s", targetForkName)
+		}
+
+		targetConfigurationBasename := mapForkNameChainspecFileDifficulty[targetForkName]
+		specPath = filepath.Join(coregethSpecsDir, targetConfigurationBasename)
+
+		cgConfig = &coregeth.CoreGethChainConfig{}
+		err = confp.Convert(targetConfiguration, cgConfig)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		j, err = json.MarshalIndent(cgConfig, "", "    ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = ioutil.WriteFile(specPath, j, os.ModePerm)
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+// TestDifficultyGen generated line-delimited JSON tests using the existing default
+// difficulty tests suite as a base reference set.
+// Reference:Target pairs are defined with dt.generateFromReference.
+// The original test will be run and must pass in order for it to be copied to the
+// generated set and for it to be used as a reference, if applicable, for test generation.
+func TestDifficultyGen(t *testing.T) {
+	if os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) == "" {
+		t.Skip()
+	}
+
+	head := build.RunGit("rev-parse", "HEAD")
+	head = strings.TrimSpace(head)
 
 	err := os.MkdirAll(filepath.Dir(outNDJSONFile), os.ModePerm)
 	if err != nil {
@@ -54,7 +162,21 @@ func TestDifficultyGen(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	dt := new(testMatcher)
+	dt := new(testMatcherGen)
+	dt.allConfigs = make(map[string]*coregeth.CoreGethChainConfig)
+	dt.testMatcher = new(testMatcher)
+	dt.noParallel = true // disable parallelism
+	dt.errorPanics = true
+	dt.gitHead = head
+
+	dt.generateFromReference("Byzantium", "ETC_Atlantis")
+	dt.generateFromReference("Constantinople", "ETC_Agharta")
+	dt.generateFromReference("EIP2384", "ETC_Phoenix")
+	/*
+		My rationale for not adding ETC_Magneto was that difficulty hasn't changed for the Foundation since EIP2384 Muir Glacier,
+		and the tests haven't changed in at least that long.
+		This leads to me to think that adding an ETC_Magneto case would only duplicate the set of ETC_Phoenix.
+	*/
 
 	// Not difficulty-tests
 	dt.skipLoad("hexencodetest.*")
@@ -74,10 +196,15 @@ func TestDifficultyGen(t *testing.T) {
 		dt.config(k, v)
 	}
 
-	// Map will hold pairs of newConfigName: chainSpecrefs.
-	// It will be used during writing of associated chainspec config files.
-	// See comment below.
-	wroteNewChainConfigs := make(map[string]chainspecRef)
+	mustSha1SumForFile := func(filePath string) []byte {
+		b, err := ioutil.ReadFile(filePath)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		s1s := sha1.Sum(b)
+		return s1s[:]
+	}
 
 	dt.walk(t, difficultyTestDir, func(t *testing.T, name string, test *DifficultyTest) {
 		cfg, key := dt.findConfig(name)
@@ -90,58 +217,52 @@ func TestDifficultyGen(t *testing.T) {
 			t.Fatalf("failed to run difficulty test, err=%v", err)
 		} else {
 
-			// Collect all paired tests and originals.
-			// The output file will yield ALL tests, not just newly-generated ones.
-			specFile, ok := chainspecRefsDifficulty[key]
+			fileBasename, ok := mapForkNameChainspecFileDifficulty[key]
 			if !ok {
-				t.Fatalf("missing spec ref; key=%s file=%s", key, specFile)
+				t.Fatalf("unmatched config name: %s", key)
 			}
-			test.Chainspec = specFile
+			specPath := filepath.Join(coregethSpecsDir, fileBasename)
+
+			test.Chainspec = chainspecRef{Filename: fileBasename, Sha1Sum: mustSha1SumForFile(specPath)}
 			test.Name = strings.ReplaceAll(name, ".json", "")
-			mustAppendTestToFile(t, test, outNDJSONFile)
 
-			// Kind of ugly reverse lookup from file -> fork name.
-			var forkName string
-			for k, v := range mapForkNameChainspecFileDifficulty {
-				if v == test.Chainspec.Filename {
-					forkName = k
-					break
-				}
-			}
-			if forkName == "" {
-				t.Fatal("missing fork/fileconf name", test, mapForkNameChainspecFileDifficulty)
-			}
+			mustAppendTestToFileNDJSON(t, test, outNDJSONFile)
+			// -- This is as far as ALL tests go.
 
-			// Is test(config) associated with a new test to be generated.
-			associateForkName, ok := writeDifficultyTestsReferencePairs[forkName]
-			if !ok {
-				t.Logf("OK [existing,nonref] %v", test)
+			targetForkName := dt.getGenerationTarget(key)
+			if targetForkName == "" {
+				// This configuration is not a reference for a generated target.
 				return
 			}
 
-			conf, ok := difficultyChainConfigurations[associateForkName]
+			// Lookup Target configuration from canonical coded list, eg.
+			/*
+				"Ropsten":  params.RopstenChainConfig,
+				"Morden":   params.RopstenChainConfig,
+				"Frontier": &goethereum.ChainConfig{},
+			*/
+			targetConfiguration, ok := difficultyChainConfigurations[targetForkName]
 			if !ok {
-				t.Fatalf("config association failed; no existing Go chain config found: %s", associateForkName)
+				t.Fatalf("config association failed; no existing Go chain config found: %s", targetForkName)
 			}
 
-			// If associated chainspec file has not been written at least once, write it.
-			// This ensures that for test generation, a chain spec file be written if it does not already exist.
-			// This is because it is more likely that we will want to write the chain spec in Go, then have the
-			// generator write the spec along with the tests to save the hurdle of manually building the chain spec
-			// file first as a dependency for test generation.
-			specref, done := wroteNewChainConfigs[associateForkName]
-			if !done || specFile.Filename == "" {
-				t.Logf("Writing chain spec file: %s", forkName)
-				specFilepath, sum, err := writeDifficultyConfigFile(conf, associateForkName)
-				if err != nil {
-					t.Fatalf("could not write difficulty file, err=%v", err)
-				}
-				specref = chainspecRef{
-					Filename: specFilepath,
-					Sha1Sum:  sum[:],
-				}
-				wroteNewChainConfigs[associateForkName] = specref
-			}
+			// Lookup respective Target configuration FILE name, eg.
+			/*
+				"Ropsten":           "ropsten_difficulty_test.json",
+				"Morden":            "morden_difficulty_test.json",
+				"Frontier":          "frontier_difficulty_test.json",
+			*/
+			targetConfigurationBasename := mapForkNameChainspecFileDifficulty[targetForkName]
+
+			// Establish the specification reference value.
+			// Note that this assumes that the files sourced here are indeed consistent with the
+			// the coded configurations (ie. that TestDifficultyTestConfigGen has already been
+			// run and has done its job properly).
+			// There is no coded relationship or test between the test file and the configuration
+			// actually used here.
+			targetSpecRef := chainspecRef{
+				Filename: targetConfigurationBasename,
+				Sha1Sum:  mustSha1SumForFile(filepath.Join(coregethSpecsDir, targetConfigurationBasename))}
 
 			newTest := &DifficultyTest{
 				ParentTimestamp:    test.ParentTimestamp,
@@ -149,28 +270,29 @@ func TestDifficultyGen(t *testing.T) {
 				UncleHash:          test.UncleHash,
 				CurrentTimestamp:   test.CurrentTimestamp,
 				CurrentBlockNumber: test.CurrentBlockNumber,
-				CurrentDifficulty: ethash.CalcDifficulty(conf, test.CurrentTimestamp, &types.Header{
+				CurrentDifficulty: ethash.CalcDifficulty(targetConfiguration, test.CurrentTimestamp, &types.Header{
 					Difficulty: test.ParentDifficulty,
 					Time:       test.ParentTimestamp,
 					Number:     big.NewInt(int64(test.CurrentBlockNumber - 1)),
 					UncleHash:  test.UncleHash,
 				}),
-				Chainspec: specref,
-				Name:      strings.ReplaceAll(test.Name, forkName, associateForkName),
+				Chainspec: targetSpecRef,
+				Name:      strings.ReplaceAll(test.Name, key, targetForkName),
 			}
 
 			// "Dogfood".
-			if err := newTest.Run(conf); err != nil {
+			if err := newTest.Run(targetConfiguration); err != nil {
 				t.Fatal(err)
 			}
-			mustAppendTestToFile(t, newTest, outNDJSONFile)
+			mustAppendTestToFileNDJSON(t, newTest, outNDJSONFile)
 			t.Logf("OK [generated] %v", newTest)
 
 		}
 	})
 }
 
-func mustAppendTestToFile(t *testing.T, test *DifficultyTest, filep string) {
+// mustAppendTestToFileNDJSON appends a difficulty test to a file as newline-delimited JSON.
+func mustAppendTestToFileNDJSON(t *testing.T, test *DifficultyTest, filep string) {
 	b, _ := json.Marshal(test)
 	out := []byte{}
 	buf := bytes.NewBuffer(out)

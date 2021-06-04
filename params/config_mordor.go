@@ -21,14 +21,16 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var (
 	// MordorChainConfig is the chain parameters to run a node on the Ethereum Classic Mordor test network (PoW).
 	MordorChainConfig = &coregeth.CoreGethChainConfig{
-		NetworkID: 7,
-		ChainID:   big.NewInt(63),
-		Ethash:    new(ctypes.EthashConfig),
+		NetworkID:                 7,
+		ChainID:                   big.NewInt(63),
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
+		Ethash:                    new(ctypes.EthashConfig),
 
 		EIP2FBlock: big.NewInt(0),
 		EIP7FBlock: big.NewInt(0),
@@ -65,6 +67,12 @@ var (
 		EIP1884FBlock: big.NewInt(999_983),
 		EIP2028FBlock: big.NewInt(999_983),
 		EIP2200FBlock: big.NewInt(999_983), // RePetersburg (== re-1283)
+
+		// Berlin eq, aka Magneto
+		EIP2565FBlock: big.NewInt(3_985_893),
+		EIP2718FBlock: big.NewInt(3_985_893),
+		EIP2929FBlock: big.NewInt(3_985_893),
+		EIP2930FBlock: big.NewInt(3_985_893),
 
 		ECIP1099FBlock: big.NewInt(2_520_000), // Etchash
 

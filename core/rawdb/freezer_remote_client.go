@@ -20,6 +20,7 @@ type FreezerRemoteClient struct {
 	threshold uint64             // Number of recent blocks not to freeze (params.FullImmutabilityThreshold apart from tests)
 	trigger   chan chan struct{} // Manual blocking freeze trigger, test determinism
 	closeOnce sync.Once
+	readonly  bool
 }
 
 const (
@@ -34,7 +35,7 @@ const (
 )
 
 // newFreezerRemoteClient constructs a rpc client to connect to a remote freezer
-func newFreezerRemoteClient(endpoint string) (*FreezerRemoteClient, error) {
+func newFreezerRemoteClient(endpoint string, readonly bool) (*FreezerRemoteClient, error) {
 	client, err := rpc.Dial(endpoint)
 	if err != nil {
 		return nil, err
@@ -44,6 +45,7 @@ func newFreezerRemoteClient(endpoint string) (*FreezerRemoteClient, error) {
 		threshold: vars.FullImmutabilityThreshold,
 		quit:      make(chan struct{}),
 		trigger:   make(chan chan struct{}),
+		readonly:  readonly,
 	}, nil
 }
 

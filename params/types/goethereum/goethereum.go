@@ -25,8 +25,9 @@ import (
 )
 
 type ChainConfig struct {
-	NetworkID uint64   `json:"-"`
-	ChainID   *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
+	NetworkID                 uint64   `json:"-"`
+	ChainID                   *big.Int `json:"chainId"`                             // chainId identifies the current chain and is used for replay protection
+	SupportedProtocolVersions []uint   `json:"supportedProtocolVersions,omitempty"` // supportedProtocolVersions identifies the supported eth protocol versions for the current chain
 
 	// HF: Homestead
 	HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)
@@ -56,9 +57,11 @@ type ChainConfig struct {
 	IstanbulBlock    *big.Int `json:"istanbulBlock,omitempty"`    // Istanbul switch block (nil = no fork, 0 = already on istanbul)
 	MuirGlacierBlock *big.Int `json:"muirGlacierBlock,omitempty"` // Eip-2384 (bomb delay) switch block (nil = no fork, 0 = already activated)
 
-	YoloV2Block *big.Int `json:"yoloV2Block,omitempty"` // YOLO v2 (Ephemeral testnet)
+	BerlinBlock *big.Int `json:"berlinBlock,omitempty"` // Berlin switch block
+	YoloV3Block *big.Int `json:"yoloV3Block,omitempty"` // YOLO v3 (Ephemeral testnet)
 
-	EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
+	EWASMBlock    *big.Int `json:"ewasmBlock,omitempty"`    // EWASM switch block (nil = no fork, 0 = already activated)
+	CatalystBlock *big.Int `json:"catalystBlock,omitempty"` // Catalyst switch block (nil = no fork, 0 = already on catalyst)
 
 	// Various consensus engines
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
@@ -86,7 +89,7 @@ func (c *ChainConfig) String() string {
 	default:
 		engine = "unknown"
 	}
-	return fmt.Sprintf("{ChainID: %v Homestead: %v DAO: %v DAOSupport: %v EIP150: %v EIP155: %v EIP158: %v Byzantium: %v Constantinople: %v ConstantinopleFix: %v Istanbul: %v MuirGlacier: %v Engine: %v}",
+	return fmt.Sprintf("{ChainID: %v Homestead: %v DAO: %v DAOSupport: %v EIP150: %v EIP155: %v EIP158: %v Byzantium: %v Constantinople: %v ConstantinopleFix: %v Istanbul: %v MuirGlacier: %v Berlin: %v Engine: %v}",
 		c.ChainID,
 		c.HomesteadBlock,
 		c.DAOForkBlock,
@@ -99,6 +102,7 @@ func (c *ChainConfig) String() string {
 		c.PetersburgBlock,
 		c.IstanbulBlock,
 		c.MuirGlacierBlock,
+		c.BerlinBlock,
 		engine,
 	)
 }

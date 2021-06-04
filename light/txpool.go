@@ -32,7 +32,6 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/rlp"
 )
 
 const (
@@ -70,6 +69,7 @@ type TxPool struct {
 
 	eip2f    bool
 	eip2028f bool
+	eip2718  bool // Fork indicator whether we are in the eip2718 stage.
 }
 
 // TxRelayBackend provides an interface to the mechanism that forwards transacions
@@ -91,7 +91,7 @@ type TxRelayBackend interface {
 func NewTxPool(config ctypes.ChainConfigurator, chain *LightChain, relay TxRelayBackend) *TxPool {
 	pool := &TxPool{
 		config:      config,
-		signer:      types.NewEIP155Signer(config.GetChainID()),
+		signer:      types.LatestSigner(config),
 		nonce:       make(map[common.Address]uint64),
 		pending:     make(map[common.Hash]*types.Transaction),
 		mined:       make(map[common.Hash][]*types.Transaction),
@@ -332,7 +332,9 @@ func (pool *TxPool) setNewHead(head *types.Header) {
 
 	// Update fork indicator by next pending block number
 	next := new(big.Int).Add(head.Number, big.NewInt(1))
+
 	pool.eip2028f = pool.config.IsEnabled(pool.config.GetEIP2028Transition, next)
+	pool.eip2718 = pool.config.IsEnabled(pool.config.GetEIP2718Transition, next)
 }
 
 // Stop stops the light transaction pool
@@ -400,7 +402,7 @@ func (pool *TxPool) validateTx(ctx context.Context, tx *types.Transaction) error
 	}
 
 	// Should supply enough intrinsic gas
-	gas, err := core.IntrinsicGas(tx.Data(), tx.To() == nil, pool.eip2f, pool.eip2028f)
+	gas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil, pool.eip2f, pool.eip2028f)
 	if err != nil {
 		return err
 	}
@@ -449,8 +451,7 @@ func (pool *TxPool) add(ctx context.Context, tx *types.Transaction) error {
 func (pool *TxPool) Add(ctx context.Context, tx *types.Transaction) error {
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
-
-	data, err := rlp.EncodeToBytes(tx)
+	data, err := tx.MarshalBinary()
 	if err != nil {
 		return err
 	}

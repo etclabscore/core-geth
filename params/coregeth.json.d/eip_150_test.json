@@ -1,0 +1,30 @@
+{
+    "config": {
+        "networkId": 1,
+        "chainId": 1,
+        "eip2FBlock": 0,
+        "eip7FBlock": 0,
+        "eip150Block": 0,
+        "ethash": {},
+        "requireBlockHashes": null
+    },
+    "nonce": "0x0",
+    "timestamp": "0x3e8",
+    "extraData": "0x",
+    "gasLimit": "0x10000804025c",
+    "difficulty": "0x20000",
+    "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "coinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+    "alloc": {
+        "0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6": {
+            "code": "0x63ffffffff6000f3",
+            "balance": "0xde0b6b3a7640000"
+        },
+        "a94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+            "balance": "0x186a0c3b1e19a180"
+        }
+    },
+    "number": "0x1",
+    "gasUsed": "0x0",
+    "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+}

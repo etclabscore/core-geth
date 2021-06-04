@@ -23,7 +23,7 @@ jobs:
     dist: xenial
     go: 1.16.x
     script:
-    - make test-coregeth
+    - travis_wait 60 make test-coregeth
 
   # Run build and tests against latest-1 Go version.
   - stage: build
@@ -50,7 +50,7 @@ jobs:
     env:
       - GO111MODULE=on
     script:
-      - go run build/ci.go test -coverage $(printf './%s/... ' $(go list ./... | sed 's|github.com/ethereum/go-ethereum||g' | cut -d'/' -f2 | uniq | grep -E '^[a-g]'))
+      - go run build/ci.go test -timeout 30m -coverage $(printf './%s/... ' $(go list ./... | sed 's|github.com/ethereum/go-ethereum||g' | cut -d'/' -f2 | uniq | grep -E '^[a-g]'))
   - stage: build
     name: "ARM64/Go1.16.x: make test [H-Z]"
     if: type = pull_request
@@ -61,7 +61,7 @@ jobs:
     env:
       - GO111MODULE=on
     script:
-      - go run build/ci.go test -coverage $(printf './%s/... ' $(go list ./... | sed 's|github.com/ethereum/go-ethereum||g' | cut -d'/' -f2 | uniq | grep -E '^[h-z]'))
+      - go run build/ci.go test -timeout 30m -coverage $(printf './%s/... ' $(go list ./... | sed 's|github.com/ethereum/go-ethereum||g' | cut -d'/' -f2 | uniq | grep -E '^[h-z]'))
 
   # Run build and tests with environment-aware possible artifact deployment.
   - stage: build

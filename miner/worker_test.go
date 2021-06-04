@@ -83,10 +83,25 @@ func init() {
 	cliqueChainConfig.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Clique)
 	cliqueChainConfig.SetCliquePeriod(10)
 	cliqueChainConfig.SetCliqueEpoch(30000)
-	tx1, _ := types.SignTx(types.NewTransaction(0, testUserAddress, big.NewInt(1000), vars.TxGas, nil, nil), types.HomesteadSigner{}, testBankKey)
+
+	signer := types.LatestSigner(params.TestChainConfig)
+	tx1 := types.MustSignNewTx(testBankKey, signer, &types.AccessListTx{
+		ChainID: params.TestChainConfig.ChainID,
+		Nonce:   0,
+		To:      &testUserAddress,
+		Value:   big.NewInt(1000),
+		Gas:     vars.TxGas,
+	})
 	pendingTxs = append(pendingTxs, tx1)
-	tx2, _ := types.SignTx(types.NewTransaction(1, testUserAddress, big.NewInt(1000), vars.TxGas, nil, nil), types.HomesteadSigner{}, testBankKey)
+
+	tx2 := types.MustSignNewTx(testBankKey, signer, &types.LegacyTx{
+		Nonce: 1,
+		To:    &testUserAddress,
+		Value: big.NewInt(1000),
+		Gas:   vars.TxGas,
+	})
 	newTxs = append(newTxs, tx2)
+
 	rand.Seed(time.Now().UnixNano())
 }
 

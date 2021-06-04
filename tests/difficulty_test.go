@@ -46,6 +46,7 @@ func TestDifficulty(t *testing.T) {
 
 	dt.walk(t, difficultyTestDir, func(t *testing.T, name string, test *DifficultyTest) {
 		cfg, _ := dt.findConfig(name)
+
 		if test.ParentDifficulty.Cmp(vars.MinimumDifficulty) < 0 {
 			t.Skip("difficulty below minimum")
 			return
@@ -56,7 +57,7 @@ func TestDifficulty(t *testing.T) {
 	})
 }
 
-func TestDifficulty2(t *testing.T) {
+func TestDifficultyNDJSON(t *testing.T) {
 	t.Parallel()
 
 	dt := new(testMatcher)

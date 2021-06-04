@@ -30,7 +30,7 @@ android:
 	@echo "Import \"$(GOBIN)/geth.aar\" to use the library."
 	@echo "Import \"$(GOBIN)/geth-sources.jar\" to add javadocs"
 	@echo "For more info see https://stackoverflow.com/questions/20994336/android-studio-how-to-attach-javadoc"
-	
+
 ios:
 	$(GORUN) build/ci.go xcode --local
 	@echo "Done building."
@@ -39,12 +39,14 @@ ios:
 test:
 	$(GORUN) build/ci.go test
 
+# DEPRECATED.
+# No attempt will be made after the Istanbul fork to maintain
+# Parity configuration support.
 sync-parity-chainspecs:
 	./params/parity.json.d/sync-parity-remote.sh
 
 test-coregeth: \
  test-coregeth-features \
- test-coregeth-chainspecs \
  test-coregeth-consensus \
  test-coregeth-regression-condensed ## Runs all tests specific to core-geth.
 
@@ -72,29 +74,27 @@ test-evmc: hera ssvm evmone aleth-interpreter
 clean-evmc:
 	rm -rf ./build/_workspace/hera ./build/_workspace/SSVM ./build/_workspace/evmone ./build/_workspace/aleth
 
-test-coregeth-features: test-coregeth-features-parity test-coregeth-features-coregeth test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
+test-coregeth-features: \
+	test-coregeth-features-coregeth \
+	test-coregeth-features-multigethv0 ## Runs tests specific to multi-geth using Fork/Feature configs.
 
 test-coregeth-consensus: test-coregeth-features-clique-consensus
 
-test-coregeth-features-parity:
-	@echo "Testing fork/feature/datatype implementation; equivalence - OPENETHEREUM."
-	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_OPENETHEREUM=on go test -count=1 ./tests
-
 test-coregeth-features-coregeth:
 	@echo "Testing fork/feature/datatype implementation; equivalence - COREGETH."
-	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_COREGETH=on go test -count=1 ./tests
+	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_COREGETH=on go test -count=1 -timeout 60m ./tests
 
 test-coregeth-features-multigethv0:
 	@echo "Testing fork/feature/datatype implementation; equivalence - MULTIGETHv0."
-	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETHV0=on go test -count=1 ./tests
+	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_MULTIGETHV0=on go test -count=1 -timeout 60m ./tests
 
 test-coregeth-features-clique-consensus:
 	@echo "Testing fork/feature/datatype implementation; equivalence - Clique consensus"
-	env COREGETH_TESTS_CHAINCONFIG_CONSENSUS_EQUIVALENCE_CLIQUE=on go test -count=1 -run TestState ./tests ## Only run state tests here, since Blockchain tests will care about rewards, etc.
+	env COREGETH_TESTS_CHAINCONFIG_CONSENSUS_EQUIVALENCE_CLIQUE=on go test -count=1 -timeout 60m -run TestState ./tests ## Only run state tests here, since Blockchain tests will care about rewards, etc.
 
-test-coregeth-chainspecs: ## Run tests specific to multi-geth using chainspec file configs.
-	@echo "Testing Parity JSON chainspec equivalence."
-	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on go test -count=1 ./tests
+test-coregeth-chainspecs-coregeth: ## Run tests specific to core-geth using coregeth chainspec file configs.
+	@echo "Testing CoreGeth JSON chainspec equivalence."
+	env COREGETH_TESTS_CHAINCONFIG_COREGETH_SPECS=on go test -count=1 ./tests
 
 test-coregeth-regression-condensed: geth
 	@echo "Running condensed regression tests (imports) against simulated canonical blockchains."
@@ -106,15 +106,18 @@ tests-generate: tests-generate-state tests-generate-difficulty ## Generate all t
 
 tests-generate-state: ## Generate state tests.
 	@echo "Generating state tests."
-	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on \
 	env COREGETH_TESTS_GENERATE_STATE_TESTS=on \
-	go run build/ci.go test -v ./tests -run TestGenState
+	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_COREGETH=on \
+	go test -p 1 -v -timeout 60m ./tests -run TestGenStateAll
 
 tests-generate-difficulty: ## Generate difficulty tests.
+	@echo "Generating difficulty tests configs."
+	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS_CONFIGS=on \
+	go run build/ci.go test -v -timeout 10m ./tests -run TestDifficultyTestConfigGen
+
 	@echo "Generating difficulty tests."
-	env COREGETH_TESTS_CHAINCONFIG_OPENETHEREUM_SPECS=on \
 	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
-	go run build/ci.go test -v ./tests -run TestDifficultyGen
+	go run build/ci.go test -v -timeout 10m ./tests -run TestDifficultyGen
 
 lint: ## Run linters.
 	$(GORUN) build/ci.go lint
@@ -133,12 +136,11 @@ docs-generate: ## Generate JSON RPC API documentation from the OpenRPC service d
 # You need to put $GOBIN (or $GOPATH/bin) in your PATH to use 'go generate'.
 
 devtools:
-	env GOBIN= go get -u golang.org/x/tools/cmd/stringer
-	env GOBIN= go get -u github.com/kevinburke/go-bindata/go-bindata
-	env GOBIN= go get -u github.com/fjl/gencodec
-	env GOBIN= go get -u github.com/golang/protobuf/protoc-gen-go
+	env GOBIN= go install golang.org/x/tools/cmd/stringer@latest
+	env GOBIN= go install github.com/kevinburke/go-bindata/go-bindata@latest
+	env GOBIN= go install github.com/fjl/gencodec@latest
+	env GOBIN= go install github.com/golang/protobuf/protoc-gen-go@latest
 	env GOBIN= go install ./cmd/abigen
-	@type "npm" 2> /dev/null || echo 'Please install node.js and npm'
 	@type "solc" 2> /dev/null || echo 'Please install solc'
 	@type "protoc" 2> /dev/null || echo 'Please install protoc'
 

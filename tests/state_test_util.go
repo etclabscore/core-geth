@@ -25,14 +25,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/core/state/snapshot"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/state/snapshot"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -79,27 +78,30 @@ type stJSON struct {
 }
 
 type stInfo struct {
-	Comment            string         `json:"comment"`
-	FillingRPCServer   string         `json:"filling-rpc-server"`
-	FillingToolVersion string         `json:"filling-tool-version"`
-	FilledWith         string         `json:"filledWith"`
-	LLLCVersion        string         `json:"lllcversion"`
-	Source             string         `json:"source"`
-	SourceHash         string         `json:"sourceHash"`
-	WrittenWith        string         `json:"written-with"`
-	Parent             string         `json:"parent"`
-	ParentSha1Sum      string         `json:"parentSha1Sum"`
-	Chainspecs         chainspecRefsT `json:"chainspecs"`
+	Comment            string                 `json:"comment"`
+	FillingRPCServer   string                 `json:"filling-rpc-server"`
+	FillingToolVersion string                 `json:"filling-tool-version"`
+	FilledWith         string                 `json:"filledWith"`
+	LLLCVersion        string                 `json:"lllcversion"`
+	Source             string                 `json:"source"`
+	SourceHash         string                 `json:"sourceHash"`
+	Labels             map[string]interface{} `json:"labels,omitempty"`
 }
 
 type stPostState struct {
 	Root    common.UnprefixedHash `json:"hash"`
 	Logs    common.UnprefixedHash `json:"logs"`
-	Indexes struct {
-		Data  int `json:"data"`
-		Gas   int `json:"gas"`
-		Value int `json:"value"`
-	}
+	Indexes stPostStateIndexes    `json:"indexes"`
+
+	// filled can be set to true when the subtest has been written,
+	// which can be helpful to distiguish unfilled tests from potentially filled zero-value tests.
+	filled bool
+}
+
+type stPostStateIndexes struct {
+	Data  int `json:"data"`
+	Gas   int `json:"gas"`
+	Value int `json:"value"`
 }
 
 //go:generate gencodec -type stEnv -field-override stEnvMarshaling -out gen_stenv.go
@@ -123,13 +125,14 @@ type stEnvMarshaling struct {
 //go:generate gencodec -type stTransaction -field-override stTransactionMarshaling -out gen_sttransaction.go
 
 type stTransaction struct {
-	GasPrice   *big.Int `json:"gasPrice"`
-	Nonce      uint64   `json:"nonce"`
-	To         string   `json:"to"`
-	Data       []string `json:"data"`
-	GasLimit   []uint64 `json:"gasLimit"`
-	Value      []string `json:"value"`
-	PrivateKey []byte   `json:"secretKey"`
+	GasPrice    *big.Int            `json:"gasPrice"`
+	Nonce       uint64              `json:"nonce"`
+	To          string              `json:"to"`
+	Data        []string            `json:"data"`
+	AccessLists []*types.AccessList `json:"accessLists,omitempty"`
+	GasLimit    []uint64            `json:"gasLimit"`
+	Value       []string            `json:"value"`
+	PrivateKey  []byte              `json:"secretKey"`
 }
 
 type stTransactionMarshaling struct {
@@ -201,6 +204,49 @@ func (t *StateTest) Run(subtest StateSubtest, vmconfig vm.Config, snapshotter bo
 }
 
 // RunNoVerify runs a specific subtest and returns the statedb and post-state root
+func (t *StateTest) RunNoVerifyWithPost(subtest StateSubtest, vmconfig vm.Config, snapshotter bool, post stPostState) (*snapshot.Tree, *state.StateDB, common.Hash, error) {
+	config, eips, err := GetChainConfig(subtest.Fork)
+	if err != nil {
+		return nil, nil, common.Hash{}, UnsupportedForkError{subtest.Fork}
+	}
+	vmconfig.ExtraEips = eips
+	block := core.GenesisToBlock(t.genesis(config), nil)
+	snaps, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre, snapshotter)
+
+	// post := t.json.Post[subtest.Fork][subtest.Index]
+	msg, err := t.json.Tx.toMessage(post)
+	if err != nil {
+		return nil, nil, common.Hash{}, err
+	}
+
+	// Prepare the EVM.
+	txContext := core.NewEVMTxContext(msg)
+	context := core.NewEVMBlockContext(block.Header(), nil, &t.json.Env.Coinbase)
+	context.GetHash = vmTestBlockHash
+	evm := vm.NewEVM(context, txContext, statedb, config, vmconfig)
+
+	// Execute the message.
+	snapshot := statedb.Snapshot()
+	gaspool := new(core.GasPool)
+	gaspool.AddGas(block.GasLimit())
+	if _, err := core.ApplyMessage(evm, msg, gaspool); err != nil {
+		statedb.RevertToSnapshot(snapshot)
+	}
+
+	// Commit block
+	statedb.Commit(config.IsEnabled(config.GetEIP161dTransition, block.Number()))
+	// Add 0-value mining reward. This only makes a difference in the cases
+	// where
+	// - the coinbase suicided, or
+	// - there are only 'bad' transactions, which aren't executed. In those cases,
+	//   the coinbase gets no txfee, so isn't created, and thus needs to be touched
+	statedb.AddBalance(block.Coinbase(), new(big.Int))
+	// And _now_ get the state root
+	root := statedb.IntermediateRoot(config.IsEnabled(config.GetEIP161dTransition, block.Number()))
+	return snaps, statedb, root, nil
+}
+
+// RunNoVerify runs a specific subtest and returns the statedb and post-state root
 func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapshotter bool) (*snapshot.Tree, *state.StateDB, common.Hash, error) {
 	config, eips, err := GetChainConfig(subtest.Fork)
 	if err != nil {
@@ -215,27 +261,21 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	if err != nil {
 		return nil, nil, common.Hash{}, err
 	}
-	context := core.NewEVMContext(msg, block.Header(), nil, &t.json.Env.Coinbase)
+
+	// Prepare the EVM.
+	txContext := core.NewEVMTxContext(msg)
+	context := core.NewEVMBlockContext(block.Header(), nil, &t.json.Env.Coinbase)
 	context.GetHash = vmTestBlockHash
+	evm := vm.NewEVM(context, txContext, statedb, config, vmconfig)
 
-	evm := vm.NewEVM(context, statedb, config, vmconfig)
-
-	if config.IsEnabled(config.GetEIP2929Transition, block.Number()) {
-		statedb.AddAddressToAccessList(msg.From())
-		if dst := msg.To(); dst != nil {
-			statedb.AddAddressToAccessList(*dst)
-			// If it's a create-tx, the destination will be added inside evm.create
-		}
-		for addr := range vm.PrecompiledContractsForConfig(config, block.Number()) {
-			statedb.AddAddressToAccessList(addr)
-		}
-	}
+	// Execute the message.
+	snapshot := statedb.Snapshot()
 	gaspool := new(core.GasPool)
 	gaspool.AddGas(block.GasLimit())
-	snapshot := statedb.Snapshot()
 	if _, err := core.ApplyMessage(evm, msg, gaspool); err != nil {
 		statedb.RevertToSnapshot(snapshot)
 	}
+
 	// Commit block
 	statedb.Commit(config.IsEnabled(config.GetEIP161dTransition, block.Number()))
 	// Add 0-value mining reward. This only makes a difference in the cases
@@ -269,7 +309,7 @@ func MakePreState(db ethdb.Database, accounts genesisT.GenesisAlloc, snapshotter
 
 	var snaps *snapshot.Tree
 	if snapshotter {
-		snaps = snapshot.New(db, sdb.TrieDB(), 1, root, false, false)
+		snaps, _ = snapshot.New(db, sdb.TrieDB(), 1, root, false, true, false)
 	}
 	statedb, _ = state.New(root, sdb, snaps)
 	return snaps, statedb
@@ -332,8 +372,11 @@ func (tx *stTransaction) toMessage(ps stPostState) (core.Message, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid tx data %q", dataHex)
 	}
-
-	msg := types.NewMessage(from, to, tx.Nonce, value, gasLimit, tx.GasPrice, data, true)
+	var accessList types.AccessList
+	if tx.AccessLists != nil && tx.AccessLists[ps.Indexes.Data] != nil {
+		accessList = *tx.AccessLists[ps.Indexes.Data]
+	}
+	msg := types.NewMessage(from, to, tx.Nonce, value, gasLimit, tx.GasPrice, data, accessList, true)
 	return msg, nil
 }
 

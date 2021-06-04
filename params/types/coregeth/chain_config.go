@@ -36,8 +36,9 @@ type CoreGethChainConfig struct {
 	// both for reference and edification.
 	// They show a difference between the upstream configuration data type (goethereum.ChainConfig) and this one.
 
-	NetworkID uint64   `json:"networkId"`
-	ChainID   *big.Int `json:"chainId"` // chainId identifies the current chain and is used for replay protection
+	NetworkID                 uint64   `json:"networkId"`
+	ChainID                   *big.Int `json:"chainId"`                             // chainId identifies the current chain and is used for replay protection
+	SupportedProtocolVersions []uint   `json:"supportedProtocolVersions,omitempty"` // supportedProtocolVersions identifies the supported eth protocol versions for the current chain
 
 	// HF: Homestead
 	//HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)
@@ -180,15 +181,26 @@ type CoreGethChainConfig struct {
 	// https://eips.ethereum.org/EIPS/eip-2315
 	EIP2315FBlock *big.Int `json:"eip2315FBlock,omitempty"`
 
+	// TODO: Document me.
+	EIP2565FBlock *big.Int `json:"eip2565FBlock,omitempty"`
+
+	// EIP2718FBlock is typed tx envelopes
+	EIP2718FBlock *big.Int `json:"eip2718FBlock,omitempty"`
+
 	// EIP-2929: Gas cost increases for state access opcodes
 	// https://eips.ethereum.org/EIPS/eip-2929
 	EIP2929FBlock *big.Int `json:"eip2929FBlock,omitempty"`
+
+	// TODO: Document me.
+	EIP2930FBlock *big.Int `json:"eip2930FBlock,omitempty"`
 
 	DisposalBlock *big.Int `json:"disposalBlock,omitempty"` // Bomb disposal HF block
 
 	// Various consensus engines
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
 	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
+
+	Ethereum2CatalystFBlock *big.Int `json:"catalystBlock,omitempty"`
 
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint,omitempty"`
 	TrustedCheckpointOracle *ctypes.CheckpointOracleConfig `json:"trustedCheckpointOracle,omitempty"`

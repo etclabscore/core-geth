@@ -113,6 +113,23 @@ func (c *CoreGethChainConfig) SetChainID(n *big.Int) error {
 	return nil
 }
 
+// GetSupportedProtocolVersions returns the protocol versions supported by this configuration value.
+// When GetSupportedProtocolVersions is called, if the field containing the associated value (SupportedProtocolVersions)
+// is empty, this method will assign the app-default value to that field.
+// This establishes an in-data way of handling default behavior, and plays nicely with configurator equivalence
+// and conversion methods.
+func (c *CoreGethChainConfig) GetSupportedProtocolVersions() []uint {
+	if len(c.SupportedProtocolVersions) == 0 {
+		c.SupportedProtocolVersions = vars.DefaultProtocolVersions
+	}
+	return c.SupportedProtocolVersions
+}
+
+func (c *CoreGethChainConfig) SetSupportedProtocolVersions(p []uint) error {
+	c.SupportedProtocolVersions = p
+	return nil
+}
+
 func (c *CoreGethChainConfig) GetMaxCodeSize() *uint64 {
 	return internal.GlobalConfigurator().GetMaxCodeSize()
 }
@@ -408,6 +425,33 @@ func (c *CoreGethChainConfig) SetEIP2929Transition(n *uint64) error {
 	return nil
 }
 
+func (c *CoreGethChainConfig) GetEIP2930Transition() *uint64 {
+	return bigNewU64(c.EIP2930FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP2930Transition(n *uint64) error {
+	c.EIP2930FBlock = setBig(c.EIP2930FBlock, n)
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetEIP2565Transition() *uint64 {
+	return bigNewU64(c.EIP2565FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP2565Transition(n *uint64) error {
+	c.EIP2565FBlock = setBig(c.EIP2565FBlock, n)
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetEIP2718Transition() *uint64 {
+	return bigNewU64(c.EIP2718FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP2718Transition(n *uint64) error {
+	c.EIP2718FBlock = setBig(c.EIP2718FBlock, n)
+	return nil
+}
+
 func (c *CoreGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {
@@ -463,6 +507,15 @@ func (c *CoreGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngin
 	default:
 		return ctypes.ErrUnsupportedConfigFatal
 	}
+}
+
+func (c *CoreGethChainConfig) GetCatalystTransition() *uint64 {
+	return bigNewU64(c.Ethereum2CatalystFBlock)
+}
+
+func (c *CoreGethChainConfig) SetCatalystTransition(n *uint64) error {
+	c.Ethereum2CatalystFBlock = setBig(c.Ethereum2CatalystFBlock, n)
+	return nil
 }
 
 func (c *CoreGethChainConfig) GetEthashMinimumDifficulty() *big.Int {
@@ -558,6 +611,9 @@ func (c *CoreGethChainConfig) GetEthashEIP649Transition() *uint64 {
 		vars.EIP649DifficultyBombDelay,
 		vars.EIP649FBlockReward,
 	)
+	if diffN == nil {
+		diffN = c.GetEthashEIP1234Transition()
+	}
 	return diffN
 }
 
@@ -571,6 +627,12 @@ func (c *CoreGethChainConfig) SetEthashEIP649Transition(n *uint64) error {
 
 	if n == nil {
 		return nil
+	}
+
+	if eip1234 := c.GetEthashEIP1234Transition(); eip1234 != nil {
+		if *eip1234 <= *n {
+			return nil
+		}
 	}
 
 	c.ensureExistingRewardSchedule()

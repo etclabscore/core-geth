@@ -112,7 +112,7 @@ type hostContext struct {
 
 func (host *hostContext) AccountExists(evmcAddr evmc.Address) bool {
 	addr := common.Address(evmcAddr)
-	if host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP161dTransition, host.env.BlockNumber) {
+	if host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP161dTransition, host.env.Context.BlockNumber) {
 		if !host.env.StateDB.Empty(addr) {
 			return true
 		}
@@ -150,8 +150,8 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	// or should we handle the question where we handle the rest of the questions like this, since this logic is
 	// REALLY logic that belongs to the abstract idea of a chainconfiguration (aka chainconfig), which makes sense
 	// but depends on ECIPs having steadier and more predictable logic.
-	hasEIP2200 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP2200Transition, host.env.BlockNumber)
-	hasEIP1884 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP1884Transition, host.env.BlockNumber)
+	hasEIP2200 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP2200Transition, host.env.Context.BlockNumber)
+	hasEIP1884 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP1884Transition, host.env.Context.BlockNumber)
 
 	// Here's an example where to me, it makes sense to use individual EIPs in the code...
 	// when they don't specify each other in the spec.
@@ -236,20 +236,20 @@ func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evm
 func (host *hostContext) GetTxContext() evmc.TxContext {
 	return evmc.TxContext{
 		GasPrice:   evmc.Hash(common.BigToHash(host.env.GasPrice)),
-		Origin:     evmc.Address(host.env.Origin),
-		Coinbase:   evmc.Address(host.env.Coinbase),
-		Number:     host.env.BlockNumber.Int64(),
-		Timestamp:  host.env.Time.Int64(),
-		GasLimit:   int64(host.env.GasLimit),
-		Difficulty: evmc.Hash(common.BigToHash(host.env.Difficulty)),
+		Origin:     evmc.Address(host.env.TxContext.Origin),
+		Coinbase:   evmc.Address(host.env.Context.Coinbase),
+		Number:     host.env.Context.BlockNumber.Int64(),
+		Timestamp:  host.env.Context.Time.Int64(),
+		GasLimit:   int64(host.env.Context.GasLimit),
+		Difficulty: evmc.Hash(common.BigToHash(host.env.Context.Difficulty)),
 		ChainID:    evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
 	}
 }
 
 func (host *hostContext) GetBlockHash(number int64) evmc.Hash {
-	b := host.env.BlockNumber.Int64()
+	b := host.env.Context.BlockNumber.Int64()
 	if number >= (b-256) && number < b {
-		return evmc.Hash(host.env.GetHash(uint64(number)))
+		return evmc.Hash(host.env.Context.GetHash(uint64(number)))
 	}
 	return evmc.Hash{}
 }
@@ -263,7 +263,7 @@ func (host *hostContext) EmitLog(addr evmc.Address, evmcTopics []evmc.Hash, data
 		Address:     common.Address(addr),
 		Topics:      topics,
 		Data:        data,
-		BlockNumber: host.env.BlockNumber.Uint64(),
+		BlockNumber: host.env.Context.BlockNumber.Uint64(),
 	})
 }
 
@@ -299,7 +299,7 @@ func (host *hostContext) Call(kind evmc.CallKind,
 		var createOutput []byte
 		createOutput, createAddr, gasLeftU, err = host.env.Create(host.contract, input, gasU, value.ToBig())
 		createAddrEvmc = evmc.Address(createAddr)
-		isHomestead := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP7Transition, host.env.BlockNumber)
+		isHomestead := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP7Transition, host.env.Context.BlockNumber)
 		if !isHomestead && err == ErrCodeStoreOutOfGas {
 			err = nil
 		}
@@ -340,13 +340,15 @@ func (host *hostContext) Call(kind evmc.CallKind,
 
 // getRevision translates ChainConfig's HF block information into EVMC revision.
 func getRevision(env *EVM) evmc.Revision {
-	n := env.BlockNumber
+	n := env.Context.BlockNumber
 	conf := env.ChainConfig()
 	switch {
 	// This is an example of choosing to use an "abstracted" idea
 	// about chain config, where I'm choosing to prioritize "indicative" features
 	// as identifiers for Fork-Feature-Groups. Note that this is very different
 	// than using Feature-complete sets to assert "did Forkage."
+	case conf.IsEnabled(conf.GetEIP2565Transition, n):
+		panic("berlin is unsupported by EVMCv7")
 	case conf.IsEnabled(conf.GetEIP1884Transition, n):
 		return evmc.Istanbul
 	case conf.IsEnabled(conf.GetEIP1283DisableTransition, n):

@@ -35,8 +35,8 @@ import (
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/downloader"
+	ethproto "github.com/ethereum/go-ethereum/eth/protocols/eth"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/les"
 	"github.com/ethereum/go-ethereum/log"
@@ -61,7 +61,6 @@ const (
 
 // backend encompasses the bare-minimum functionality needed for ethstats reporting
 type backend interface {
-	ProtocolVersion() int
 	SubscribeChainHeadEvent(ch chan<- core.ChainHeadEvent) event.Subscription
 	SubscribeNewTxsEvent(ch chan<- core.NewTxsEvent) event.Subscription
 	CurrentHeader() *types.Header
@@ -95,6 +94,8 @@ type Service struct {
 	pongCh chan struct{} // Pong notifications are fed into this channel
 	histCh chan []uint64 // History request block numbers are fed into this channel
 
+	headSub event.Subscription
+	txSub   event.Subscription
 }
 
 // connWrapper is a wrapper to prevent concurrent-write or concurrent-read on the
@@ -189,7 +190,12 @@ func New(node *node.Node, backend backend, engine consensus.Engine, url string) 
 
 // Start implements node.Lifecycle, starting up the monitoring and reporting daemon.
 func (s *Service) Start() error {
-	go s.loop()
+	// Subscribe to chain events to execute updates on
+	chainHeadCh := make(chan core.ChainHeadEvent, chainHeadChanSize)
+	s.headSub = s.backend.SubscribeChainHeadEvent(chainHeadCh)
+	txEventCh := make(chan core.NewTxsEvent, txChanSize)
+	s.txSub = s.backend.SubscribeNewTxsEvent(txEventCh)
+	go s.loop(chainHeadCh, txEventCh)
 
 	log.Info("Stats daemon started")
 	return nil
@@ -197,22 +203,15 @@ func (s *Service) Start() error {
 
 // Stop implements node.Lifecycle, terminating the monitoring and reporting daemon.
 func (s *Service) Stop() error {
+	s.headSub.Unsubscribe()
+	s.txSub.Unsubscribe()
 	log.Info("Stats daemon stopped")
 	return nil
 }
 
 // loop keeps trying to connect to the netstats server, reporting chain events
 // until termination.
-func (s *Service) loop() {
-	// Subscribe to chain events to execute updates on
-	chainHeadCh := make(chan core.ChainHeadEvent, chainHeadChanSize)
-	headSub := s.backend.SubscribeChainHeadEvent(chainHeadCh)
-	defer headSub.Unsubscribe()
-
-	txEventCh := make(chan core.NewTxsEvent, txChanSize)
-	txSub := s.backend.SubscribeNewTxsEvent(txEventCh)
-	defer txSub.Unsubscribe()
-
+func (s *Service) loop(chainHeadCh chan core.ChainHeadEvent, txEventCh chan core.NewTxsEvent) {
 	// Start a goroutine that exhausts the subscriptions to avoid events piling up
 	var (
 		quitCh = make(chan struct{})
@@ -245,9 +244,9 @@ func (s *Service) loop() {
 				}
 
 			// node stopped
-			case <-txSub.Err():
+			case <-s.txSub.Err():
 				break HandleLoop
-			case <-headSub.Err():
+			case <-s.headSub.Err():
 				break HandleLoop
 			}
 		}
@@ -466,13 +465,15 @@ func (s *Service) login(conn *connWrapper) error {
 	// Construct and send the login authentication
 	infos := s.server.NodeInfo()
 
-	var network, protocol string
+	var protocols []string
+	for _, proto := range s.server.Protocols {
+		protocols = append(protocols, fmt.Sprintf("%s/%d", proto.Name, proto.Version))
+	}
+	var network string
 	if info := infos.Protocols["eth"]; info != nil {
-		network = fmt.Sprintf("%d", info.(*eth.NodeInfo).Network)
-		protocol = fmt.Sprintf("eth/%d", s.backend.ProtocolVersion())
+		network = fmt.Sprintf("%d", info.(*ethproto.NodeInfo).Network)
 	} else {
 		network = fmt.Sprintf("%d", infos.Protocols["les"].(*les.NodeInfo).Network)
-		protocol = fmt.Sprintf("les/%d", les.ClientProtocolVersions[0])
 	}
 	auth := &authMsg{
 		ID: s.node,
@@ -481,7 +482,7 @@ func (s *Service) login(conn *connWrapper) error {
 			Node:     infos.Name,
 			Port:     infos.Ports.Listener,
 			Network:  network,
-			Protocol: protocol,
+			Protocol: strings.Join(protocols, ", "),
 			API:      "No",
 			Os:       runtime.GOOS,
 			OsVer:    runtime.GOARCH,
@@ -774,7 +775,7 @@ func (s *Service) reportStats(conn *connWrapper) error {
 	fullBackend, ok := s.backend.(fullNodeBackend)
 	if ok {
 		mining = fullBackend.Miner().Mining()
-		hashrate = int(fullBackend.Miner().HashRate())
+		hashrate = int(fullBackend.Miner().Hashrate())
 
 		sync := fullBackend.Downloader().Progress()
 		syncing = fullBackend.CurrentHeader().Number.Uint64() >= sync.HighestBlock

@@ -1866,6 +1866,7 @@ func SetDNSDiscoveryDefaults2(cfg *ethconfig.Config, url string) {
 		url = strings.Replace(url, "@all.", "@les.", 1)
 	}
 	cfg.EthDiscoveryURLs = []string{url}
+	cfg.SnapDiscoveryURLs = cfg.EthDiscoveryURLs
 }
 
 // SetDNSDiscoveryDefaults configures DNS discovery with the given URL if

@@ -1,0 +1,30 @@
+{
+    "networkId": 1,
+    "chainId": 1,
+    "eip2FBlock": 1150000,
+    "eip7FBlock": 1150000,
+    "daoForkBlock": 1920000,
+    "eip150Block": 2463000,
+    "eip155Block": 2675000,
+    "eip160Block": 2675000,
+    "eip161FBlock": 2675000,
+    "eip170FBlock": 2675000,
+    "eip100FBlock": 4370000,
+    "eip140FBlock": 4370000,
+    "eip198FBlock": 4370000,
+    "eip211FBlock": 4370000,
+    "eip212FBlock": 4370000,
+    "eip213FBlock": 4370000,
+    "eip214FBlock": 4370000,
+    "eip658FBlock": 4370000,
+    "ethash": {},
+    "difficultyBombDelays": {
+        "0x42ae50": "0x2dc6c0"
+    },
+    "blockReward": {
+        "0x42ae50": "0x29a2241af62c0000"
+    },
+    "requireBlockHashes": {
+        "2463000": "0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"
+    }
+}

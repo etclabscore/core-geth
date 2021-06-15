@@ -65,7 +65,8 @@ func setDefaults(cfg *Config) {
 			PetersburgBlock:     new(big.Int),
 			IstanbulBlock:       new(big.Int),
 			MuirGlacierBlock:    new(big.Int),
-			YoloV2Block:         nil,
+			BerlinBlock:         new(big.Int),
+			YoloV3Block:         nil,
 		}
 	}
 
@@ -113,12 +114,8 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 		vmenv   = NewEnv(cfg)
 		sender  = vm.AccountRef(cfg.Origin)
 	)
-	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.BlockNumber) {
-		cfg.State.AddAddressToAccessList(cfg.Origin)
-		cfg.State.AddAddressToAccessList(address)
-		for addr := range vm.PrecompiledContractsForConfig(cfg.ChainConfig, vmenv.BlockNumber) {
-			cfg.State.AddAddressToAccessList(addr)
-		}
+	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
+		cfg.State.PrepareAccessList(cfg.Origin, &address, vmenv.ActivePrecompiles(), nil)
 	}
 
 	cfg.State.CreateAccount(address)
@@ -150,13 +147,9 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 		vmenv  = NewEnv(cfg)
 		sender = vm.AccountRef(cfg.Origin)
 	)
-	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.BlockNumber) {
-		cfg.State.AddAddressToAccessList(cfg.Origin)
-		for addr := range vm.PrecompiledContractsForConfig(cfg.ChainConfig, vmenv.BlockNumber) {
-			cfg.State.AddAddressToAccessList(addr)
-		}
+	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
+		cfg.State.PrepareAccessList(cfg.Origin, nil, vmenv.ActivePrecompiles(), nil)
 	}
-
 	// Call the code with the given configuration.
 	code, address, leftOverGas, err := vmenv.Create(
 		sender,
@@ -178,14 +171,10 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 	vmenv := NewEnv(cfg)
 
 	sender := cfg.State.GetOrNewStateObject(cfg.Origin)
-	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.BlockNumber) {
-		cfg.State.AddAddressToAccessList(cfg.Origin)
-		cfg.State.AddAddressToAccessList(address)
-		for addr := range vm.PrecompiledContractsForConfig(cfg.ChainConfig, vmenv.BlockNumber) {
-			cfg.State.AddAddressToAccessList(addr)
-		}
+	statedb := cfg.State
+	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
+		statedb.PrepareAccessList(cfg.Origin, &address, vmenv.ActivePrecompiles(), nil)
 	}
-
 	// Call the code with the given configuration.
 	ret, leftOverGas, err := vmenv.Call(
 		sender,
@@ -194,6 +183,5 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 		cfg.GasLimit,
 		cfg.Value,
 	)
-
 	return ret, leftOverGas, err
 }

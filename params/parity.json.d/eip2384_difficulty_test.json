@@ -346,14 +346,6 @@
                     "0x0": {
                         "price": {
                             "alt_bn128_pairing": {
-                                "base": 100000,
-                                "pair": 80000
-                            }
-                        }
-                    },
-                    "0x0": {
-                        "price": {
-                            "alt_bn128_pairing": {
                                 "base": 45000,
                                 "pair": 34000
                             }
@@ -372,6 +364,14 @@
                             "alt_bn128_pairing": {
                                 "base": 45000,
                                 "pair": 34000
+                            }
+                        }
+                    },
+                    "0x0": {
+                        "price": {
+                            "alt_bn128_pairing": {
+                                "base": 100000,
+                                "pair": 80000
                             }
                         }
                     }

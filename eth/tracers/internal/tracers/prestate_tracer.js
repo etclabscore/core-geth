@@ -15,7 +15,7 @@
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 // prestateTracer outputs sufficient information to create a local execution of
-// the transaction from a custom assembled genesisT block.
+// the transaction from a custom assembled genesis block.
 {
 	// prestate is the genesisT that we're building.
 	prestate: {},

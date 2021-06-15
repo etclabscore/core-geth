@@ -23,14 +23,16 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var (
 	// ClassicChainConfig is the chain parameters to run a node on the Classic main network.
 	ClassicChainConfig = &coregeth.CoreGethChainConfig{
-		NetworkID: 1,
-		Ethash:    new(ctypes.EthashConfig),
-		ChainID:   big.NewInt(61),
+		NetworkID:                 1,
+		Ethash:                    new(ctypes.EthashConfig),
+		ChainID:                   big.NewInt(61),
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 
 		EIP2FBlock: big.NewInt(1150000),
 		EIP7FBlock: big.NewInt(1150000),
@@ -60,6 +62,8 @@ var (
 		EIP145FBlock:  big.NewInt(9573000),
 		EIP1014FBlock: big.NewInt(9573000),
 		EIP1052FBlock: big.NewInt(9573000),
+		// EIP1283FBlock:   big.NewInt(9573000),
+		// PetersburgBlock: big.NewInt(9573000),
 
 		// Istanbul eq, aka Phoenix
 		// ECIP-1088
@@ -69,6 +73,12 @@ var (
 		EIP1884FBlock: big.NewInt(10_500_839),
 		EIP2028FBlock: big.NewInt(10_500_839),
 		EIP2200FBlock: big.NewInt(10_500_839), // RePetersburg (=~ re-1283)
+
+		// Berlin eq, aka Magneto
+		EIP2565FBlock: big.NewInt(13_189_133),
+		EIP2718FBlock: big.NewInt(13_189_133),
+		EIP2929FBlock: big.NewInt(13_189_133),
+		EIP2930FBlock: big.NewInt(13_189_133),
 
 		ECIP1099FBlock: big.NewInt(11_700_000), // Etchash (DAG size limit)
 
@@ -89,9 +99,10 @@ var (
 	ExpDiffPeriod            = big.NewInt(100000) // Exponential diff period for diff bomb & ECIP1010
 
 	MessNetConfig = &coregeth.CoreGethChainConfig{
-		NetworkID: 1,
-		Ethash:    new(ctypes.EthashConfig),
-		ChainID:   big.NewInt(6161),
+		NetworkID:                 1,
+		Ethash:                    new(ctypes.EthashConfig),
+		ChainID:                   big.NewInt(6161),
+		SupportedProtocolVersions: vars.DefaultProtocolVersions,
 
 		EIP2FBlock: big.NewInt(1),
 		EIP7FBlock: big.NewInt(1),
@@ -130,6 +141,12 @@ var (
 		EIP1884FBlock: big.NewInt(10),
 		EIP2028FBlock: big.NewInt(10),
 		EIP2200FBlock: big.NewInt(10), // RePetersburg (=~ re-1283)
+
+		// Berlin eq, aka Magneto
+		EIP2565FBlock: big.NewInt(11),
+		EIP2718FBlock: big.NewInt(11),
+		EIP2929FBlock: big.NewInt(11),
+		EIP2930FBlock: big.NewInt(11),
 
 		DisposalBlock:      big.NewInt(5),
 		ECIP1017FBlock:     big.NewInt(5),

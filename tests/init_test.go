@@ -122,6 +122,7 @@ type testMatcher struct {
 	slowpat      []*regexp.Regexp
 	skipforkpat  []*regexp.Regexp
 	whitelistpat *regexp.Regexp
+	noParallel   bool
 }
 
 type testConfig struct {
@@ -188,7 +189,7 @@ func (tm *testMatcher) findSkip(name string) (reason string, skipload bool) {
 }
 
 // findConfig returns the chain config matching defined patterns.
-func (tm *testMatcher) findConfig(name string) (ctypes.ChainConfigurator, string) {
+func (tm *testMatcher) findConfig(name string) (config ctypes.ChainConfigurator, configRegexKey string) {
 	// TODO(fjl): name can be derived from testing.T when min Go version is 1.8
 	for _, m := range tm.configpat {
 		if m.p.MatchString(name) {
@@ -258,12 +259,15 @@ func (tm *testMatcher) runTestFile(t *testing.T, path, name string, runTest inte
 			t.Skip("Skipped by whitelist")
 		}
 	}
-	t.Parallel()
+	if !tm.noParallel {
+		t.Parallel()
+	}
 
 	// Load the file as map[string]<testType>.
 	m := makeMapFromTestFunc(runTest)
 	if err := readJSONFile(path, m.Addr().Interface()); err != nil {
-		t.Fatal(err)
+		panic(err)
+		// t.Fatal(err)
 	}
 
 	// Run all tests from the map. Don't wrap in a subtest if there is only one test in the file.

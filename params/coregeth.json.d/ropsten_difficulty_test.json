@@ -1,0 +1,48 @@
+{
+    "networkId": 3,
+    "chainId": 3,
+    "eip2FBlock": 0,
+    "eip7FBlock": 0,
+    "eip150Block": 0,
+    "eip155Block": 10,
+    "eip160Block": 10,
+    "eip161FBlock": 10,
+    "eip170FBlock": 10,
+    "eip100FBlock": 1700000,
+    "eip140FBlock": 1700000,
+    "eip198FBlock": 1700000,
+    "eip211FBlock": 1700000,
+    "eip212FBlock": 1700000,
+    "eip213FBlock": 1700000,
+    "eip214FBlock": 1700000,
+    "eip658FBlock": 1700000,
+    "eip145FBlock": 4230000,
+    "eip1014FBlock": 4230000,
+    "eip1052FBlock": 4230000,
+    "eip1283FBlock": 4230000,
+    "petersburgBlock": 4939394,
+    "eip152FBlock": 6485846,
+    "eip1108FBlock": 6485846,
+    "eip1344FBlock": 6485846,
+    "eip1884FBlock": 6485846,
+    "eip2028FBlock": 6485846,
+    "eip2200FBlock": 6485846,
+    "eip2384FBlock": 7117117,
+    "eip2565FBlock": 9812189,
+    "eip2718FBlock": 9812189,
+    "eip2929FBlock": 9812189,
+    "eip2930FBlock": 9812189,
+    "ethash": {},
+    "difficultyBombDelays": {
+        "0x19f0a0": "0x2dc6c0",
+        "0x408b70": "0x1e8480",
+        "0x6c993d": "0x3d0900"
+    },
+    "blockReward": {
+        "0x19f0a0": "0x29a2241af62c0000",
+        "0x408b70": "0x1bc16d674ec80000"
+    },
+    "requireBlockHashes": {
+        "0": "0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d"
+    }
+}

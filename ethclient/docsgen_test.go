@@ -110,6 +110,19 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 		"trimNameSpecialChars": trimNameSpecialChars,
 		// contentDescriptorTitle returns the name or description, in that order.
 		"contentDescriptorGenericName": contentDescriptorGenericName,
+		// isSubscribeMethod checks whether the method is a `*_subscribe` method
+		"isSubscribeMethod": func(m *meta_schema.MethodObject) bool {
+			return *m.Result.ContentDescriptorObject.Name == "subscriptionID"
+		},
+		// isSubscriptionableMethod checks whether the method returns a subscription
+		"isSubscriptionableMethod": func(m *meta_schema.MethodObject) bool {
+			return *m.Result.ContentDescriptorObject.Description == "*rpc.Subscription"
+		},
+		// isFilterMethod checks whether the method is being used as a filter.
+		"isFilterMethod": func(m *meta_schema.MethodObject) bool {
+			// TODO: later, check for `*filters.PublicFilterAPI` only
+			return *m.Result.ContentDescriptorObject.Name == "rpcID"
+		},
 		// methodFormatJSConsole is a pretty-printer that returns the JS console use example for a method.
 		"methodFormatJSConsole": func(m *meta_schema.MethodObject) string {
 			name := string(*m.Name)
@@ -145,7 +158,41 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 				paramNames = strings.Join(out, ", ")
 			}
 
-			return fmt.Sprintf(`curl -X POST http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)
+			return fmt.Sprintf(`curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)
+		},
+		// methodFormatWS is a pretty printer that returns the websocket's method invocation example string.
+		"methodFormatWS": func(m *meta_schema.MethodObject) string {
+			paramNames := ""
+			if m.Params != nil {
+				out := []string{}
+				for _, p := range *m.Params {
+					out = append(out, contentDescriptorGenericName(p.ContentDescriptorObject))
+				}
+				paramNames = strings.Join(out, ", ")
+			}
+
+			return fmt.Sprintf(`wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "%s", "params": [%s]}'`, *m.Name, paramNames)
+		},
+		// methodFormatWSSubscribe is a pretty printer that returns the websocket's method invocation example string using the package `*_subscribe` method.
+		"methodFormatWSSubscribe": func(m *meta_schema.MethodObject) string {
+			methodName := string(*m.Name)
+			outParams := []string{}
+
+			methodParts := strings.Split(methodName, "_")
+			if len(methodParts) == 2 {
+				methodName = methodParts[0] + "_subscribe"
+				outParams = append(outParams, fmt.Sprintf("\"%s\"", methodParts[1]))
+			}
+
+			paramNames := ""
+			if m.Params != nil {
+				for _, p := range *m.Params {
+					outParams = append(outParams, contentDescriptorGenericName(p.ContentDescriptorObject))
+				}
+				paramNames = strings.Join(outParams, ", ")
+			}
+
+			return fmt.Sprintf(`wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "%s", "params": [%s]}'`, methodName, paramNames)
 		},
 	})
 
@@ -172,7 +219,7 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 
   + Required: {{ if .required }}✓ Yes{{ else }}No{{- end}}
 {{ if .deprecated }}  + Deprecated: :warning: Yes{{- end}}
-{{ if (or (gt (len .schema) 1) .schema.properties) }} 
+{{ if (or (gt (len .schema) 1) .schema.properties) }}
 === "Schema"
 
 	` + "```" + ` Schema
@@ -195,7 +242,7 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 
 #### Params ({{ .Params | len }})
 {{ if gt (.Params | len) 0 }}
-{{ if eq $methodmap.paramStructure "by-position" }}Parameters must be given _by position_.{{ else if eq $methodmap.paramStructure "by-name" }}Parameters must be given _by name_.{{ end }}  
+{{ if eq $methodmap.paramStructure "by-position" }}Parameters must be given _by position_.{{ else if eq $methodmap.paramStructure "by-name" }}Parameters must be given _by name_.{{ end }}
 {{ range $index, $param := .Params }}
 {{ $parammap := . | tomap }}
 __{{ sum $index 1 }}:__ {{ template "contentDescTpl" $parammap }}
@@ -217,17 +264,32 @@ _None_
 
 #### Client Method Invocation Examples
 
-=== "Shell"
+{{ if and (not (isSubscribeMethod .)) (and (not (isSubscriptionableMethod .)) (not (isFilterMethod .))) }}
+=== "Shell HTTP"
 
 	` + "```" + ` shell
 	{{ methodFormatCURL . }}
 	` + "```" + `
+{{ end }}
 
+{{ $shellWSExample := methodFormatWS . }}
+{{ if isSubscriptionableMethod . }}
+{{ $shellWSExample = methodFormatWSSubscribe . }}
+{{ end }}
+
+=== "Shell WebSocket"
+
+	` + "```" + ` shell
+	{{ $shellWSExample }}
+	` + "```" + `
+
+{{ if and (not (isSubscribeMethod .)) (and (not (isSubscriptionableMethod .)) (not (isFilterMethod .))) }}
 === "Javascript Console"
 
 	` + "```" + ` js
 	{{ methodFormatJSConsole . }}
 	` + "```" + `
+{{ end }}
 
 {{ $docs := .ExternalDocs | tomap }}
 <details><summary>Source code</summary>

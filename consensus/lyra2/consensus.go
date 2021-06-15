@@ -475,7 +475,7 @@ func getEraUncleBlockReward(minerReward *big.Int) *big.Int {
 func accumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
 	eraLen := big.NewInt(100000)
 	era := GetBlockEra(header.Number, eraLen)
-	era = era.Add(era, big.NewInt(68)) // TODO: lumat
+	era = era.Add(era, big.NewInt(72))
 
 	minerReward := GetBlockWinnerRewardByEra(era)
 	uncleReward := getEraUncleBlockReward(minerReward)

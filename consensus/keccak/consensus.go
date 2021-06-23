@@ -34,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -278,7 +279,7 @@ func (keccak *Keccak) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 		}
 	}
 	// If all checks passed, validate any special fields for hard forks
-	if err := misc.VerifyDAOHeaderExtraData(chain.Config(), header); err != nil {
+	if err := mutations.VerifyDAOHeaderExtraData(chain.Config(), header); err != nil {
 		return err
 	}
 	if err := misc.VerifyForkHashes(chain.Config(), header, uncle); err != nil {

@@ -522,6 +522,11 @@ func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) erro
 		c.Clique = new(ctypes.CliqueConfig)
 		c.Ethash = nil
 		return nil
+	case ctypes.ConsensusEngineT_Lyra2:
+		c.Lyra2 = new(ctypes.Lyra2Config)
+		c.Ethash = nil
+		c.Clique = nil
+		return nil
 	default:
 		return ctypes.ErrUnsupportedConfigFatal
 	}

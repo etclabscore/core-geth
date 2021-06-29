@@ -95,17 +95,9 @@ func (lyra2 *Lyra2) Close() error {
 
 // APIs implements consensus.Engine, returning the user facing RPC APIs.
 func (lyra2 *Lyra2) APIs(chain consensus.ChainHeaderReader) []rpc.API {
-    // In order to ensure backward compatibility, we exposes lyra2 RPC APIs
-    // to both eth and lyra2 namespaces.
     return []rpc.API{
         {
             Namespace: "eth",
-            Version:   "1.0",
-            Service:   &API{lyra2},
-            Public:    true,
-        },
-        {
-            Namespace: "lyra2",
             Version:   "1.0",
             Service:   &API{lyra2},
             Public:    true,

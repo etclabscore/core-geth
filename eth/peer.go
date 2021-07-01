@@ -17,6 +17,7 @@
 package eth
 
 import (
+	"fmt"
 	"math/big"
 	"sync"
 	"time"
@@ -28,9 +29,15 @@ import (
 // ethPeerInfo represents a short summary of the `eth` sub-protocol metadata known
 // about a connected peer.
 type ethPeerInfo struct {
-	Version    uint     `json:"version"`    // Ethereum protocol version negotiated
-	Difficulty *big.Int `json:"difficulty"` // Total difficulty of the peer's blockchain
-	Head       string   `json:"head"`       // Hex hash of the peer's best owned block
+	Version    uint              `json:"version"`          // Ethereum protocol version negotiated
+	Difficulty *big.Int          `json:"difficulty"`       // Total difficulty of the peer's blockchain
+	Head       string            `json:"head"`             // Hex hash of the peer's best owned block
+	ForkID     ethPeerInfoForkID `json:"forkId,omitempty"` // ForkID from handshake. The JSON tag casing follows the pattern established by chainId elsewhere in APIs.
+}
+
+type ethPeerInfoForkID struct {
+	Next uint64 `json:"next"`
+	Hash string `json:"hash"`
 }
 
 // ethPeer is a wrapper around eth.Peer to maintain a few extra metadata.
@@ -47,11 +54,19 @@ type ethPeer struct {
 func (p *ethPeer) info() *ethPeerInfo {
 	hash, td := p.Head()
 
-	return &ethPeerInfo{
+	info := &ethPeerInfo{
 		Version:    p.Version(),
 		Difficulty: td,
 		Head:       hash.Hex(),
 	}
+	// ForkID was introduced with eth/64
+	if p.Version() >= 64 {
+		info.ForkID = ethPeerInfoForkID{
+			Next: p.ForkID().Next,
+			Hash: fmt.Sprintf("%x", p.ForkID().Hash),
+		}
+	}
+	return info
 }
 
 // snapPeerInfo represents a short summary of the `snap` sub-protocol metadata known

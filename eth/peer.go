@@ -63,7 +63,7 @@ func (p *ethPeer) info() *ethPeerInfo {
 	if p.Version() >= 64 {
 		info.ForkID = ethPeerInfoForkID{
 			Next: p.ForkID().Next,
-			Hash: fmt.Sprintf("%x", p.ForkID().Hash),
+			Hash: fmt.Sprintf("0x%x", p.ForkID().Hash),
 		}
 	}
 	return info

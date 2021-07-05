@@ -223,7 +223,7 @@ func TestCreation(t *testing.T) {
 				{3_985_894, ID{Hash: checksumToBytes(0x92b323e0), Next: 0}},
 			},
 		},
-		// MintME test cases
+		// MintMe test cases
 		{
 			"mintme",
 			params.MintMeChainConfig,

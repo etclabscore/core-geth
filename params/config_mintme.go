@@ -24,8 +24,8 @@ import (
 )
 
 var (
-	// MINTMEChainConfig is the chain parameters to run a node on the MINTME main network.
-	MINTMEChainConfig = &coregeth.CoreGethChainConfig{
+	// MintMeChainConfig is the chain parameters to run a node on the MINTME main network.
+	MintMeChainConfig = &coregeth.CoreGethChainConfig{
 		NetworkID: 37480,
 		ChainID:   big.NewInt(24734),
 		Lyra2:     new(ctypes.Lyra2Config),

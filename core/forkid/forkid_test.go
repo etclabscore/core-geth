@@ -223,11 +223,11 @@ func TestCreation(t *testing.T) {
 				{3_985_894, ID{Hash: checksumToBytes(0x92b323e0), Next: 0}},
 			},
 		},
-		// MINTME test cases
+		// MintME test cases
 		{
 			"mintme",
-			params.MINTMEChainConfig,
-			params.MINTMEGenesisHash,
+			params.MintMeChainConfig,
+			params.MintMeGenesisHash,
 			[]testcase{
 				{0, ID{Hash: checksumToBytes(0x02bf4180), Next: 0}},
 			},
@@ -371,7 +371,7 @@ func TestGatherForks(t *testing.T) {
 		},
 		{
 			"mintme",
-			params.MINTMEChainConfig,
+			params.MintMeChainConfig,
 			[]uint64{},
 		},
 	}
@@ -452,9 +452,9 @@ func TestGenerateSpecificationCases(t *testing.T) {
 			common.HexToHash("0cd786a2425d16f152c658316c423e6ce1181e15c3295826d7c9904cba9ce303"),
 		},
 		{
-			"MINTME",
-			params.MINTMEChainConfig,
-			params.MINTMEGenesisHash,
+			"MintMe",
+			params.MintMeChainConfig,
+			params.MintMeGenesisHash,
 		},
 	}
 	for _, tt := range tests {

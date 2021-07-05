@@ -187,8 +187,8 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 		return params.RopstenChainConfig
 	case ghash == params.YoloV3GenesisHash:
 		return params.YoloV3ChainConfig
-	case ghash == params.MINTMEGenesisHash:
-		return params.MINTMEChainConfig
+	case ghash == params.MintMeGenesisHash:
+		return params.MintMeChainConfig
 	default:
 		return params.AllEthashProtocolChanges
 	}

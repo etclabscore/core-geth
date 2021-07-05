@@ -242,7 +242,7 @@ func ethFilter(args []string) (nodeFilter, error) {
 	case "mordor":
 		filter = forkid.NewStaticFilter(params.MordorChainConfig, params.MordorGenesisHash)
 	case "mintme":
-		filter = forkid.NewStaticFilter(params.MINTMEChainConfig, params.MINTMEGenesisHash)
+		filter = forkid.NewStaticFilter(params.MintMeChainConfig, params.MintMeGenesisHash)
 	default:
 		return nil, fmt.Errorf("unknown network %q", args[0])
 	}

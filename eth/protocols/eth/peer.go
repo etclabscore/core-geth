@@ -23,6 +23,7 @@ import (
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/forkid"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -72,8 +73,9 @@ type Peer struct {
 	rw        p2p.MsgReadWriter // Input/output streams for snap
 	version   uint              // Protocol version negotiated
 
-	head common.Hash // Latest advertised head block hash
-	td   *big.Int    // Latest advertised head block total difficulty
+	head   common.Hash // Latest advertised head block hash
+	td     *big.Int    // Latest advertised head block total difficulty
+	forkid forkid.ID   // Advertised forkid at time of handshake
 
 	knownBlocks     mapset.Set             // Set of block hashes known to be known by this peer
 	queuedBlocks    chan *blockPropagation // Queue of blocks to broadcast to the peer
@@ -147,6 +149,11 @@ func (p *Peer) SetHead(hash common.Hash, td *big.Int) {
 
 	copy(p.head[:], hash[:])
 	p.td.Set(td)
+}
+
+// ForkID retrieves the reported forkid at the time of handshake.
+func (p *Peer) ForkID() forkid.ID {
+	return p.forkid
 }
 
 // KnownBlock returns whether peer is known to already have a block.

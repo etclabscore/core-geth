@@ -42,6 +42,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/clique"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/consensus/lyra2"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -174,6 +175,10 @@ var (
 	YoloV3Flag = cli.BoolFlag{
 		Name:  "yolov3",
 		Usage: "YOLOv3 network: pre-configured proof-of-authority shortlived test network.",
+	}
+	MintMeFlag = cli.BoolFlag{
+		Name:  "mintme",
+		Usage: "MintMe.com Coin mainnet: pre-configured MintMe.com Coin mainnet",
 	}
 	RinkebyFlag = cli.BoolFlag{
 		Name:  "rinkeby",
@@ -881,6 +886,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.GoerliBootnodes
 	case ctx.GlobalBool(YoloV3Flag.Name):
 		urls = params.YoloV3Bootnodes
+	case ctx.GlobalBool(MintMeFlag.Name):
+		urls = params.MintMeBootnodes
 	case cfg.BootstrapNodes != nil:
 		return // already set, don't apply defaults.
 	}
@@ -919,6 +926,8 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.GoerliBootnodes
 	case ctx.GlobalBool(YoloV3Flag.Name):
 		urls = params.YoloV3Bootnodes
+	case ctx.GlobalBool(MintMeFlag.Name):
+		urls = params.MintMeBootnodes
 	case cfg.BootstrapNodesV5 != nil:
 		return // already set, don't apply defaults.
 	}
@@ -1329,6 +1338,8 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "goerli")
 	case ctx.GlobalBool(YoloV3Flag.Name):
 		return filepath.Join(baseDataDirPath, "yolo-v2")
+	case ctx.GlobalBool(MintMeFlag.Name):
+		return filepath.Join(baseDataDirPath, "mintme")
 	}
 	return baseDataDirPath
 }
@@ -1577,7 +1588,7 @@ func CheckExclusive(ctx *cli.Context, args ...interface{}) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, MainnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV3Flag, ClassicFlag, KottiFlag, MordorFlag)
+	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, MainnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV3Flag, ClassicFlag, KottiFlag, MordorFlag, MintMeFlag)
 	CheckExclusive(ctx, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	CheckExclusive(ctx, GCModeFlag, "archive", TxLookupLimitFlag)
@@ -2019,6 +2030,8 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 		genesis = params.DefaultGoerliGenesisBlock()
 	case ctx.GlobalBool(YoloV3Flag.Name):
 		genesis = params.DefaultYoloV3GenesisBlock()
+	case ctx.GlobalBool(MintMeFlag.Name):
+		genesis = params.DefaultMintMeGenesisBlock()
 	}
 	return genesis
 }
@@ -2044,6 +2057,8 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 			Period: config.GetCliquePeriod(),
 			Epoch:  config.GetCliqueEpoch(),
 		}, chainDb)
+	} else if config.GetConsensusEngineType().IsLyra2() {
+		engine = lyra2.New(nil, false)
 	} else {
 		engine = ethash.NewFaker()
 		if ctx.GlobalBool(FakePoWPoissonFlag.Name) {

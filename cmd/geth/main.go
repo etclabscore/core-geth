@@ -143,6 +143,7 @@ var (
 		utils.RinkebyFlag,
 		utils.GoerliFlag,
 		utils.YoloV3Flag,
+		utils.MintMeFlag,
 		utils.ClassicFlag,
 		utils.MordorFlag,
 		utils.KottiFlag,
@@ -304,6 +305,9 @@ func checkMainnet(ctx *cli.Context) bool {
 
 	case ctx.GlobalIsSet(utils.YoloV3Flag.Name):
 		log.Info("Starting Geth on YoloV3 testnet...")
+
+	case ctx.GlobalIsSet(utils.MintMeFlag.Name):
+		log.Info("Starting Geth on MintMe.com Coin mainnet...")
 
 	case !ctx.GlobalIsSet(utils.NetworkIdFlag.Name):
 		log.Info("Starting Geth on Ethereum mainnet...")

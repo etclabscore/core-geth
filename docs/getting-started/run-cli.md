@@ -141,6 +141,7 @@ ETHEREUM OPTIONS:
   --goerli                            Görli network: pre-configured proof-of-authority test network
   --rinkeby                           Rinkeby network: pre-configured proof-of-authority test network
   --yolov2                            YOLOv2 network: pre-configured proof-of-authority shortlived test network.
+  --mintme                            MintMe.com Coin mainnet: pre-configured MintMe.com Coin mainnet
   --ropsten                           Ropsten network: pre-configured proof-of-work test network
   --syncmode value                    Blockchain sync mode ("fast", "full", or "light") (default: fast)
   --exitwhensynced                    Exits after block synchronisation completes

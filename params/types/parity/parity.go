@@ -78,6 +78,11 @@ type ParityChainSpec struct {
 				Epoch  *ParityU64 `json:"epoch,omitempty"`
 			} `json:"params,omitempty"`
 		} `json:"Clique,omitempty"`
+		Lyra2 struct {
+			Params struct {
+				MinimumDifficulty *math.HexOrDecimal256 `json:"minimumDifficulty"`
+			} `json:"params,omitempty"`
+		} `json:"Lyra2,omitempty"`
 	} `json:"engine"`
 
 	Params struct {

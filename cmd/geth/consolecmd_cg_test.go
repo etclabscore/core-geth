@@ -39,6 +39,7 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 		{[]string{"--kotti"}, 6, 6, params.KottiGenesisHash.Hex()},
 		{[]string{"--mordor"}, 7, 63, params.MordorGenesisHash.Hex()},
 		{[]string{"--yolov3"}, int(params.YoloV3ChainConfig.ChainID.Uint64()), int(params.YoloV3ChainConfig.ChainID.Uint64()), params.YoloV3GenesisHash.Hex()},
+		{[]string{"--mintme"}, 37480, 24734, params.MintMeGenesisHash.Hex()},
 	}
 	for i, p := range chainIdentityCases {
 

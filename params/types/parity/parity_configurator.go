@@ -686,6 +686,9 @@ func (spec *ParityChainSpec) GetConsensusEngineType() ctypes.ConsensusEngineT {
 	if spec.Engine.Clique.Params.Period != nil && spec.Engine.Clique.Params.Epoch != nil {
 		return ctypes.ConsensusEngineT_Clique
 	}
+	if spec.Engine.Lyra2.Params.MinimumDifficulty != nil {
+		return ctypes.ConsensusEngineT_Lyra2
+	}
 	if spec.Engine.Ethash.Params.MinimumDifficulty != nil {
 		return ctypes.ConsensusEngineT_Ethash
 	}

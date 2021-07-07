@@ -223,6 +223,15 @@ func TestCreation(t *testing.T) {
 				{3_985_894, ID{Hash: checksumToBytes(0x92b323e0), Next: 0}},
 			},
 		},
+		// MintMe test cases
+		{
+			"mintme",
+			params.MintMeChainConfig,
+			params.MintMeGenesisHash,
+			[]testcase{
+				{0, ID{Hash: checksumToBytes(0x02bf4180), Next: 0}},
+			},
+		},
 	}
 	for i, tt := range tests {
 		for j, ttt := range tt.cases {
@@ -360,6 +369,11 @@ func TestGatherForks(t *testing.T) {
 			params.KottiChainConfig,
 			[]uint64{716_617, 1_705_549, 2_200_013, 4_368_634},
 		},
+		{
+			"mintme",
+			params.MintMeChainConfig,
+			[]uint64{},
+		},
 	}
 	sliceContains := func(sl []uint64, u uint64) bool {
 		for _, s := range sl {
@@ -436,6 +450,11 @@ func TestGenerateSpecificationCases(t *testing.T) {
 				EIP1052FBlock:     big.NewInt(5000381), // Agharta
 			},
 			common.HexToHash("0cd786a2425d16f152c658316c423e6ce1181e15c3295826d7c9904cba9ce303"),
+		},
+		{
+			"MintMe",
+			params.MintMeChainConfig,
+			params.MintMeGenesisHash,
 		},
 	}
 	for _, tt := range tests {

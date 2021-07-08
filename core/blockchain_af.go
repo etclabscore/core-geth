@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 )
@@ -91,6 +92,14 @@ func (bc *BlockChain) getTDRatio(commonAncestor, current, proposed *types.Header
 // over later-to-come counterparts, especially proposed segments stretching far into the past.
 func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) error {
 
+	// Short-circuit to no-op in case proposed segment has greater premier-canonical TD than current.
+	currentPremierAggregateDifficulty := bc.getTdPremierCanonical(commonAncestor, current)
+	proposedPremierAggregateDifficulty := bc.getTdPremierCanonical(commonAncestor, proposed)
+	if proposedPremierAggregateDifficulty.Cmp(currentPremierAggregateDifficulty) > 0 {
+		// Short circuit, returning no error and allowing the reorg to proceed without intervention.
+		return nil
+	}
+
 	// Get the total difficulties of the proposed chain segment and the existing one.
 	commonAncestorTD := bc.GetTd(commonAncestor.Hash(), commonAncestor.Number.Uint64())
 	proposedParentTD := bc.GetTd(proposed.ParentHash, proposed.Number.Uint64()-1)
@@ -124,6 +133,28 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 		)
 	}
 	return nil
+}
+
+// getTdPremierCanonical gets the sum of difficulties for all blocks in a segment which are marked
+// as "premier-canonical," that is, as being the first-seen for a given block number.
+// We assume that all headers between common ancestor (inclusive) and the head (non inclusive, since we have the header value already)
+// will exist in DB, and thus have an available TD measurement.
+func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header) (td *big.Int) {
+
+	td = big.NewInt(0)
+	focus := head
+
+	// Rewind the whole segment, starting at the top, and going through the common ancestor.
+	for focus.ParentHash != commonAncestor.ParentHash {
+		// If the header is marked as premier-canonical, its difficulty value is included in the sum.
+		if rawdb.ReadPremierCanonicalHash(bc.db, focus.Number.Uint64()) == focus.Hash() {
+			td.Add(td, focus.Difficulty)
+		}
+
+		// Step back by one.
+		focus = bc.GetHeaderByHash(focus.ParentHash)
+	}
+	return td
 }
 
 /*

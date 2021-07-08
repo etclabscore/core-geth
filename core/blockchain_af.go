@@ -147,7 +147,7 @@ func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header) 
 	// Rewind the whole segment, starting at the top, and going through the common ancestor.
 	for focus.ParentHash != commonAncestor.ParentHash {
 		// If the header is marked as premier-canonical, its difficulty value is included in the sum.
-		if rawdb.ReadPremierCanonicalHash(bc.db, focus.Number.Uint64()) == focus.Hash() {
+		if rawdb.ReadPremierCanonicalHash(bc.db, premiereCanonicalNumber(focus)) == focus.Hash() {
 			td.Add(td, focus.Difficulty)
 		}
 
@@ -155,6 +155,11 @@ func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header) 
 		focus = bc.GetHeaderByHash(focus.ParentHash)
 	}
 	return td
+}
+
+func premiereCanonicalNumber(header *types.Header) uint64 {
+	t := header.Time
+	return t - (t % 60)
 }
 
 /*

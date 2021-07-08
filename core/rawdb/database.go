@@ -622,7 +622,7 @@ func truncateKVtoFreezer(freezerdb *freezer, db ethdb.KeyValueStore) {
 			}
 			DeleteBlock(db, hash, n)
 			DeleteCanonicalHash(db, n)
-			DeletePremierCanonicalHash(db, n)
+			DeletePremierCanonicalHash(db, n) // FIXME
 		}
 	}
 	log.Warn("Finished KV truncation")

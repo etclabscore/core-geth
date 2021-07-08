@@ -1095,3 +1095,19 @@ got.tdr=%v got.pen=%v`,
 	}
 
 }
+
+func TestAMESSTimeScheme(t *testing.T) {
+	for _, ti := range []struct {
+		name string
+		at   time.Time
+	}{
+		{"now  ", time.Now()},
+		{"t-1s ", time.Now().Add(-1 * time.Second)},
+		{"t-30s", time.Now().Add(-30 * time.Second)},
+		{"t-50s", time.Now().Add(-55 * time.Second)},
+		{"t-70s", time.Now().Add(-70 * time.Second)},
+	} {
+		i := uint64(ti.at.Unix())
+		t.Log(ti.name, i-(i%60))
+	}
+}

@@ -239,7 +239,7 @@ func freezeRemote(db ethdb.KeyValueStore, f ethdb.AncientStore, threshold uint64
 			if first+uint64(i) != 0 {
 				DeleteBlockWithoutNumber(batch, ancients[i], first+uint64(i))
 				DeleteCanonicalHash(batch, first+uint64(i))
-				DeletePremierCanonicalHash(batch, first+uint64(i))
+				DeletePremierCanonicalHash(batch, first+uint64(i)) // FIXME
 			}
 		}
 		if err := batch.Write(); err != nil {

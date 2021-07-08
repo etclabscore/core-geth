@@ -76,10 +76,11 @@ var (
 	uncleanShutdownKey = []byte("unclean-shutdown") // config prefix for the db
 
 	// Data item prefixes (use single byte to avoid mixing data types, avoid `i`, used for indexes).
-	headerPrefix       = []byte("h") // headerPrefix + num (uint64 big endian) + hash -> header
-	headerTDSuffix     = []byte("t") // headerPrefix + num (uint64 big endian) + hash + headerTDSuffix -> td
-	headerHashSuffix   = []byte("n") // headerPrefix + num (uint64 big endian) + headerHashSuffix -> hash
-	headerNumberPrefix = []byte("H") // headerNumberPrefix + hash -> num (uint64 big endian)
+	headerPrefix                     = []byte("h") // headerPrefix + num (uint64 big endian) + hash -> header
+	headerTDSuffix                   = []byte("t") // headerPrefix + num (uint64 big endian) + hash + headerTDSuffix -> td
+	headerHashSuffix                 = []byte("n") // headerPrefix + num (uint64 big endian) + headerHashSuffix -> hash
+	headerPremierCanonicalHashSuffix = []byte("p") // headerPrefix + num (uint64 big endian) + headerPremierCanonicalHashSuffix -> hash
+	headerNumberPrefix               = []byte("H") // headerNumberPrefix + hash -> num (uint64 big endian)
 
 	blockBodyPrefix     = []byte("b") // blockBodyPrefix + num (uint64 big endian) + hash -> block body
 	blockReceiptsPrefix = []byte("r") // blockReceiptsPrefix + num (uint64 big endian) + hash -> block receipts
@@ -191,6 +192,11 @@ func headerTDKey(number uint64, hash common.Hash) []byte {
 // headerHashKey = headerPrefix + num (uint64 big endian) + headerHashSuffix
 func headerHashKey(number uint64) []byte {
 	return append(append(headerPrefix, encodeBlockNumber(number)...), headerHashSuffix...)
+}
+
+// headerPremierCanonicalHashKey = headerPrefix + num (uint64 big endian) + headerPremierCanonicalHashKey
+func headerPremierCanonicalHashKey(number uint64) []byte {
+	return append(append(headerPrefix, encodeBlockNumber(number)...), headerPremierCanonicalHashSuffix...)
 }
 
 // headerNumberKey = headerNumberPrefix + hash

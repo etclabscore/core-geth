@@ -64,6 +64,38 @@ func DeleteCanonicalHash(db ethdb.KeyValueWriter, number uint64) {
 	}
 }
 
+func ReadPremierCanonicalHash(db ethdb.Reader, number uint64) common.Hash {
+	data, _ := db.Ancient(freezerHashTable, number)
+	if len(data) == 0 {
+		data, _ = db.Get(headerPremierCanonicalHashKey(number))
+		// In the background freezer is moving data from leveldb to flatten files.
+		// So during the first check for ancient db, the data is not yet in there,
+		// but when we reach into leveldb, the data was already moved. That would
+		// result in a not found error.
+		if len(data) == 0 {
+			data, _ = db.Ancient(freezerHashTable, number)
+		}
+	}
+	if len(data) == 0 {
+		return common.Hash{}
+	}
+	return common.BytesToHash(data)
+}
+
+// WritePremierCanonicalHash stores the hash assigned to a premier canonical block number.
+func WritePremierCanonicalHash(db ethdb.KeyValueWriter, hash common.Hash, number uint64) {
+	if err := db.Put(headerPremierCanonicalHashKey(number), hash.Bytes()); err != nil {
+		log.Crit("Failed to store number to premier-canonical hash mapping", "err", err)
+	}
+}
+
+// DeletePremierCanonicalHash removes the number to hash canonical mapping.
+func DeletePremierCanonicalHash(db ethdb.KeyValueWriter, number uint64) {
+	if err := db.Delete(headerPremierCanonicalHashKey(number)); err != nil {
+		log.Crit("Failed to delete number to premier-canonical hash mapping", "err", err)
+	}
+}
+
 // ReadAllHashes retrieves all the hashes assigned to blocks at a certain heights,
 // both canonical and reorged forks included.
 func ReadAllHashes(db ethdb.Iteratee, number uint64) []common.Hash {

@@ -783,11 +783,19 @@ func (bc *BlockChain) writeHeadBlock(block *types.Block) {
 	// If the block is on a side chain or an unknown one, force other heads onto it too
 	updateHeads := rawdb.ReadCanonicalHash(bc.db, block.NumberU64()) != block.Hash()
 
+	// If a premier-canonial entry does not yet exist for this block number,
+	// then we'll add one.
+	updatePremierCanonical := rawdb.ReadPremierCanonicalHash(bc.db, block.NumberU64()) == (common.Hash{})
+
 	// Add the block to the canonical chain number scheme and mark as the head
 	batch := bc.db.NewBatch()
 	rawdb.WriteCanonicalHash(batch, block.Hash(), block.NumberU64())
 	rawdb.WriteTxLookupEntriesByBlock(batch, block)
 	rawdb.WriteHeadBlockHash(batch, block.Hash())
+
+	if updatePremierCanonical {
+		rawdb.WritePremierCanonicalHash(bc.db, block.Hash(), block.NumberU64())
+	}
 
 	// If the block is better than our head or is on a different chain, force update heads
 	if updateHeads {

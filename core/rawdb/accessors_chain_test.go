@@ -304,6 +304,29 @@ func TestCanonicalMappingStorage(t *testing.T) {
 	}
 }
 
+// Tests that canonical numbers can be mapped to hashes and retrieved.
+func TestPremierCanonicalMappingStorage(t *testing.T) {
+	db := NewMemoryDatabase()
+
+	// Create a test canonical number and assinged hash to move around
+	hash, number := common.Hash{0: 0xff}, uint64(314)
+	if entry := ReadPremierCanonicalHash(db, number); entry != (common.Hash{}) {
+		t.Fatalf("Non existent premier-canonical mapping returned: %v", entry)
+	}
+	// Write and verify the TD in the database
+	WritePremierCanonicalHash(db, hash, number)
+	if entry := ReadPremierCanonicalHash(db, number); entry == (common.Hash{}) {
+		t.Fatalf("Stored premier-canonical mapping not found")
+	} else if entry != hash {
+		t.Fatalf("Retrieved premier-canonical mapping mismatch: have %v, want %v", entry, hash)
+	}
+	// Delete the TD and verify the execution
+	DeletePremierCanonicalHash(db, number)
+	if entry := ReadPremierCanonicalHash(db, number); entry != (common.Hash{}) {
+		t.Fatalf("Deleted premier-canonical mapping returned: %v", entry)
+	}
+}
+
 // Tests that head headers and head blocks can be assigned, individually.
 func TestHeadStorage(t *testing.T) {
 	db := NewMemoryDatabase()

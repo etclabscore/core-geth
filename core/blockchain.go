@@ -1274,6 +1274,7 @@ func (bc *BlockChain) InsertReceiptChain(blockChain types.Blocks, receiptChain [
 			if block.NumberU64() != 0 {
 				rawdb.DeleteBlockWithoutNumber(batch, block.Hash(), block.NumberU64())
 				rawdb.DeleteCanonicalHash(batch, block.NumberU64())
+				// TODO: rawdb.DeletePremierCanonicalHash(batch, block.NumberU64())
 			}
 		}
 		if err := batch.Write(); err != nil {

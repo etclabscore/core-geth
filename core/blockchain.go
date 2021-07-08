@@ -783,9 +783,11 @@ func (bc *BlockChain) writeHeadBlock(block *types.Block) {
 	// If the block is on a side chain or an unknown one, force other heads onto it too
 	updateHeads := rawdb.ReadCanonicalHash(bc.db, block.NumberU64()) != block.Hash()
 
-	// If a premier-canonial entry does not yet exist for this block number,
-	// then we'll add one.
-	updatePremierCanonical := rawdb.ReadPremierCanonicalHash(bc.db, block.NumberU64()) == (common.Hash{})
+	// If a premier-canonical entry does not yet exist for this block number,
+	// then we set it.
+	// Premier-canonical entries should only be added for the first-seen blocks for any given number.
+	// Blocks which are established as canonical heads through the reorg process are not considered premier-canonical.
+	setPremierCanonical := rawdb.ReadPremierCanonicalHash(bc.db, block.NumberU64()) == (common.Hash{})
 
 	// Add the block to the canonical chain number scheme and mark as the head
 	batch := bc.db.NewBatch()
@@ -793,7 +795,7 @@ func (bc *BlockChain) writeHeadBlock(block *types.Block) {
 	rawdb.WriteTxLookupEntriesByBlock(batch, block)
 	rawdb.WriteHeadBlockHash(batch, block.Hash())
 
-	if updatePremierCanonical {
+	if setPremierCanonical {
 		rawdb.WritePremierCanonicalHash(bc.db, block.Hash(), block.NumberU64())
 	}
 

@@ -93,8 +93,8 @@ func (bc *BlockChain) getTDRatio(commonAncestor, current, proposed *types.Header
 func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) error {
 
 	// Short-circuit to no-op in case proposed segment has greater premier-canonical TD than current.
-	currentPremierAggregateDifficulty := bc.getTdPremierCanonical(commonAncestor, current)
-	proposedPremierAggregateDifficulty := bc.getTdPremierCanonical(commonAncestor, proposed)
+	currentPremierAggregateDifficulty := bc.getTdPremierCanonical(commonAncestor, current, current.Time)
+	proposedPremierAggregateDifficulty := bc.getTdPremierCanonical(commonAncestor, proposed, current.Time)
 	if proposedPremierAggregateDifficulty.Cmp(currentPremierAggregateDifficulty) > 0 {
 		// Short circuit, returning no error and allowing the reorg to proceed without intervention.
 		return nil
@@ -139,7 +139,7 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 // as "premier-canonical," that is, as being the first-seen for a given block number.
 // We assume that all headers between common ancestor (inclusive) and the head (non inclusive, since we have the header value already)
 // will exist in DB, and thus have an available TD measurement.
-func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header) (td *big.Int) {
+func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, maxTimeLim uint64) (td *big.Int) {
 
 	td = big.NewInt(0)
 	focus := head
@@ -147,7 +147,7 @@ func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header) 
 	// Rewind the whole segment, starting at the top, and going through the common ancestor.
 	for focus.ParentHash != commonAncestor.ParentHash {
 		// If the header is marked as premier-canonical, its difficulty value is included in the sum.
-		if rawdb.ReadPremierCanonicalHash(bc.db, premiereCanonicalNumber(focus)) == focus.Hash() {
+		if focus.Time <= maxTimeLim && rawdb.ReadPremierCanonicalHash(bc.db, premiereCanonicalNumber(focus)) == focus.Hash() {
 			td.Add(td, focus.Difficulty)
 		}
 
@@ -157,6 +157,10 @@ func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header) 
 	return td
 }
 
+// premiereCanonicalNumber gets the value (number) on which premier-canonical entries in the database
+// are keyed.
+// The value returned represents the floored minute of their header's timestamp.
+// 99%+ of blocks are timestamped within 60 seconds of their parent.
 func premiereCanonicalNumber(header *types.Header) uint64 {
 	t := header.Time
 	return t - (t % 60)

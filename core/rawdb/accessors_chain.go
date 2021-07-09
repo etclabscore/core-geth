@@ -64,18 +64,21 @@ func DeleteCanonicalHash(db ethdb.KeyValueWriter, number uint64) {
 	}
 }
 
+// TODO
+// Deleting premier-canonical data is difficult if its keyed on timestamp (instead of block number),
+// since it requires access to (probably all) the header fields, rather than just number/hash.
+//
+// This could be addressed with another indexed 'table' in the db that would provide
+// lookup information for hash/num:unixTime so that the hash/num could return the key for the premier-canonical
+// data.
+// Or, the accessors could implement an iterator system which would curse (as in cursor-over) the
+// entries and find matching entries and remove them given some range definition.
+//
+// Neither seems awesome.
+
+// ReadPremierCanonicalHash reads the premier-canonical hash from the database.
 func ReadPremierCanonicalHash(db ethdb.Reader, number uint64) common.Hash {
-	data, _ := db.Ancient(freezerHashTable, number)
-	if len(data) == 0 {
-		data, _ = db.Get(headerPremierCanonicalHashKey(number))
-		// In the background freezer is moving data from leveldb to flatten files.
-		// So during the first check for ancient db, the data is not yet in there,
-		// but when we reach into leveldb, the data was already moved. That would
-		// result in a not found error.
-		if len(data) == 0 {
-			data, _ = db.Ancient(freezerHashTable, number)
-		}
-	}
+	data, _ := db.Get(headerPremierCanonicalHashKey(number))
 	if len(data) == 0 {
 		return common.Hash{}
 	}
@@ -90,6 +93,8 @@ func WritePremierCanonicalHash(db ethdb.KeyValueWriter, hash common.Hash, number
 }
 
 // DeletePremierCanonicalHash removes the number to hash canonical mapping.
+// FIXME: This is not actually used anywhere, and once written the data will never change (even under
+// drastic commands like SetHead).
 func DeletePremierCanonicalHash(db ethdb.KeyValueWriter, number uint64) {
 	if err := db.Delete(headerPremierCanonicalHashKey(number)); err != nil {
 		log.Crit("Failed to delete number to premier-canonical hash mapping", "err", err)

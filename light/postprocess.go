@@ -281,7 +281,6 @@ func (c *ChtIndexerBackend) Prune(threshold uint64) error {
 			// In order to totally get rid of this index, we need an additional
 			// flag to specify how many historical data light client can serve.
 			rawdb.DeleteCanonicalHash(batch, numbers[i])
-			rawdb.DeletePremierCanonicalHash(batch, numbers[i]) // FIXME
 			rawdb.DeleteBlockWithoutNumber(batch, hashes[i], numbers[i])
 		}
 		if batch.ValueSize() > ethdb.IdealBatchSize {

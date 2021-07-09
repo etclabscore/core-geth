@@ -633,9 +633,9 @@ func (hc *HeaderChain) SetHead(head uint64, updateFn UpdateHeadBlocksCallback, d
 				rawdb.DeleteTd(batch, hash, num)
 			}
 			rawdb.DeleteCanonicalHash(batch, num)
-			rawdb.DeletePremierCanonicalHash(batch, num) // FIXME
 		}
 	}
+
 	// Flush all accumulated deletions.
 	if err := batch.Write(); err != nil {
 		log.Crit("Failed to rewind block", "error", err)

@@ -139,22 +139,28 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 // as "premier-canonical," that is, as being the first-seen for a given block number.
 // We assume that all headers between common ancestor (inclusive) and the head (non inclusive, since we have the header value already)
 // will exist in DB, and thus have an available TD measurement.
-func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, maxTimeLim uint64) (td *big.Int) {
+func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, segmentLatestTime uint64) (weightedNetDifficulty *big.Int) {
 
-	td = big.NewInt(0)
+	weightedNetDifficulty = big.NewInt(0)
+	latestTime := new(big.Int).SetUint64(segmentLatestTime)
 	focus := head
 
 	// Rewind the whole segment, starting at the top, and going through the common ancestor.
 	for focus.ParentHash != commonAncestor.ParentHash {
 		// If the header is marked as premier-canonical, its difficulty value is included in the sum.
-		if focus.Time <= maxTimeLim && rawdb.ReadPremierCanonicalHash(bc.db, premiereCanonicalNumber(focus)) == focus.Hash() {
-			td.Add(td, focus.Difficulty)
+		if focus.Time <= segmentLatestTime && rawdb.ReadPremierCanonicalHash(bc.db, premiereCanonicalNumber(focus)) == focus.Hash() {
+			// Emphasize the priority associated with the leading (oldest) sections versus the later section
+			// of the segment.
+			weightedDifficulty := new(big.Int).Set(focus.Difficulty)
+			ageMultiplier := new(big.Int).Sub(latestTime, new(big.Int).SetUint64(focus.Time))
+			weightedDifficulty.Mul(weightedDifficulty, ageMultiplier)
+			weightedNetDifficulty.Add(weightedNetDifficulty, weightedDifficulty)
 		}
 
 		// Step back by one.
 		focus = bc.GetHeaderByHash(focus.ParentHash)
 	}
-	return td
+	return weightedNetDifficulty
 }
 
 // premiereCanonicalNumber gets the value (number) on which premier-canonical entries in the database

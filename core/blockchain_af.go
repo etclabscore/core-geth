@@ -95,9 +95,13 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 	// Short-circuit to no-op in case proposed segment has greater premier-canonical TD than current.
 	currentPremierAggregateDifficulty := bc.getTdPremierCanonical(commonAncestor, current, current.Time)
 	proposedPremierAggregateDifficulty := bc.getTdPremierCanonical(commonAncestor, proposed, current.Time)
+
+	// PROPOSED Weighted Net Difficulty > CURRENT Weighted Net Difficulty ?
 	if proposedPremierAggregateDifficulty.Cmp(currentPremierAggregateDifficulty) > 0 {
+		// Yes: PROPOSED is greater than CURRENT, MESS is not applied (and reorg continues normally).
+		//
 		// Short circuit, returning no error and allowing the reorg to proceed without intervention.
-		return nil
+		return nil // MESS is not applied.
 	}
 
 	// Get the total difficulties of the proposed chain segment and the existing one.
@@ -139,28 +143,51 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 // as "premier-canonical," that is, as being the first-seen for a given block number.
 // We assume that all headers between common ancestor (inclusive) and the head (non inclusive, since we have the header value already)
 // will exist in DB, and thus have an available TD measurement.
-func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, segmentLatestTime uint64) (weightedNetDifficulty *big.Int) {
+func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, segmentLatestTime uint64) (ageWeightedNetDifficulty *big.Int) {
 
-	weightedNetDifficulty = big.NewInt(0)
+	ageWeightedNetDifficulty = big.NewInt(0)
 	latestTime := new(big.Int).SetUint64(segmentLatestTime)
 	focus := head
 
 	// Rewind the whole segment, starting at the top, and going through the common ancestor.
 	for focus.ParentHash != commonAncestor.ParentHash {
+
 		// If the header is marked as premier-canonical, its difficulty value is included in the sum.
-		if focus.Time <= segmentLatestTime && rawdb.ReadPremierCanonicalHash(bc.db, premiereCanonicalNumber(focus)) == focus.Hash() {
+		headerIsFirstSeen := rawdb.ReadPremierCanonicalHash(bc.db, premiereCanonicalNumber(focus)) == focus.Hash()
+		if focus.Time <= segmentLatestTime && headerIsFirstSeen {
+
 			// Emphasize the priority associated with the leading (oldest) sections versus the later section
 			// of the segment.
-			weightedDifficulty := new(big.Int).Set(focus.Difficulty)
+
+			// eg. 45789246846
+			weightedDifficulty := new(big.Int).Set(focus.Difficulty) // Difficulty of the first-seen block.
+
+			// Older blocks get higher difficulty compensation.
+			// current.Time - block.Time
+			// Old blocks get bigger numbers, eg. 1 hour = 3600
+			// Young blocks get small numbers, eg. 2 minutes = 120
 			ageMultiplier := new(big.Int).Sub(latestTime, new(big.Int).SetUint64(focus.Time))
+
+			// old:    		 3600 * 45789246846
+			// medium: 		 1000 * 45789246846
+			// medium-young: 500  * 45789246846
+			// young:        120  * 45789246846
+			// v. young:     3    * 45789246846
 			weightedDifficulty.Mul(weightedDifficulty, ageMultiplier)
-			weightedNetDifficulty.Add(weightedNetDifficulty, weightedDifficulty)
+
+			// +
+			ageWeightedNetDifficulty.Add(ageWeightedNetDifficulty, weightedDifficulty)
+
+		} else {
+			// Conditions not met; nothing happens. Continue rewind.
 		}
 
 		// Step back by one.
 		focus = bc.GetHeaderByHash(focus.ParentHash)
 	}
-	return weightedNetDifficulty
+
+	// Net weighted difficulty for a chain segment.
+	return ageWeightedNetDifficulty
 }
 
 // premiereCanonicalNumber gets the value (number) on which premier-canonical entries in the database

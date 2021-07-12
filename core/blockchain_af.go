@@ -192,11 +192,8 @@ func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, 
 
 // premiereCanonicalNumber gets the value (number) on which premier-canonical entries in the database
 // are keyed.
-// The value returned represents the floored minute of their header's timestamp.
-// 99%+ of blocks are timestamped within 60 seconds of their parent.
 func premiereCanonicalNumber(header *types.Header) uint64 {
-	t := header.Time
-	return t - (t % 60)
+	return header.Number.Uint64()
 }
 
 /*

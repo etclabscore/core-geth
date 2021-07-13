@@ -146,7 +146,6 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, segmentLatestTime uint64) (ageWeightedNetDifficulty *big.Int) {
 
 	ageWeightedNetDifficulty = big.NewInt(0)
-	latestTime := new(big.Int).SetUint64(segmentLatestTime)
 	focus := head
 
 	// Rewind the whole segment, starting at the top, and going through the common ancestor.
@@ -159,24 +158,19 @@ func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, 
 			// Emphasize the priority associated with the leading (oldest) sections versus the later section
 			// of the segment.
 
-			// eg. 45789246846
-			weightedDifficulty := new(big.Int).Set(focus.Difficulty) // Difficulty of the first-seen block.
-
 			// Older blocks get higher difficulty compensation.
 			// current.Time - block.Time
 			// Old blocks get bigger numbers, eg. 1 hour = 3600
 			// Young blocks get small numbers, eg. 2 minutes = 120
-			ageMultiplier := new(big.Int).Sub(latestTime, new(big.Int).SetUint64(focus.Time))
 
-			// old:    		 3600 * 45789246846
-			// medium: 		 1000 * 45789246846
-			// medium-young: 500  * 45789246846
-			// young:        120  * 45789246846
-			// v. young:     3    * 45789246846
-			weightedDifficulty.Mul(weightedDifficulty, ageMultiplier)
+			// old:    		 3600
+			// medium: 		 1000
+			// medium-young: 500
+			// young:        120
+			// v. young:     3
 
 			// +
-			ageWeightedNetDifficulty.Add(ageWeightedNetDifficulty, weightedDifficulty)
+			ageWeightedNetDifficulty.Add(ageWeightedNetDifficulty, new(big.Int).SetUint64(segmentLatestTime-focus.Time))
 
 		} else {
 			// Conditions not met; nothing happens. Continue rewind.
@@ -239,7 +233,7 @@ func ecbp1100PolynomialV(x *big.Int) *big.Int {
 	xA.Exp(xA, big2, nil)
 	xA.Mul(xA, big3)
 
-	// 3 * x**2 // xcap
+	// 2 * x**3 // xcap
 	xB.Exp(xB, big3, nil)
 	xB.Mul(xB, big2)
 	xB.Div(xB, ecbp1100PolynomialVXCap)

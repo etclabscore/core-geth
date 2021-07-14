@@ -200,6 +200,7 @@ type CoreGethChainConfig struct {
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
 	Keccak *ctypes.KeccakConfig `json:"keccak256,omitempty"`
 	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
+	Lyra2  *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
 
 	Ethereum2CatalystFBlock *big.Int `json:"catalystBlock,omitempty"`
 
@@ -222,6 +223,8 @@ func (c *CoreGethChainConfig) String() string {
 		engine = c.Clique
 	case c.Keccak != nil:
 		engine = c.Keccak
+	case c.Lyra2 != nil:
+		engine = c.Lyra2
 	default:
 		engine = "unknown"
 	}

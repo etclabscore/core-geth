@@ -83,6 +83,11 @@ type ParityChainSpec struct {
 				BlockReward ctypes.Uint64BigValOrMapHex `json:"blockReward"`
 			} `json:"params"`
 		} `json:"Keccak256,omitempty"`
+		Lyra2 struct {
+			Params struct {
+				MinimumDifficulty *math.HexOrDecimal256 `json:"minimumDifficulty"`
+			} `json:"params,omitempty"`
+		} `json:"Lyra2,omitempty"`
 	} `json:"engine"`
 
 	Params struct {

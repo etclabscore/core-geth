@@ -233,6 +233,9 @@ type CliqueConfigurator interface {
 	SetCliqueEpoch(n uint64) error
 }
 
+type Lyra2Configurator interface {
+}
+
 type BlockSealer interface {
 	GetSealingType() BlockSealingT
 	SetSealingType(t BlockSealingT) error

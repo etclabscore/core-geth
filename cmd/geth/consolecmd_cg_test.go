@@ -40,7 +40,8 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 		{[]string{"--mordor"}, 7, 63, params.MordorGenesisHash.Hex()},
 		{[]string{"--yolov3"}, int(params.YoloV3ChainConfig.ChainID.Uint64()), int(params.YoloV3ChainConfig.ChainID.Uint64()), params.YoloV3GenesisHash.Hex()},
 		{[]string{"--astor"}, 212, 212, params.AstorGenesisHash.Hex()},
-	}
+		{[]string{"--mintme"}, 37480, 24734, params.MintMeGenesisHash.Hex()},
+ 	}
 	for i, p := range chainIdentityCases {
 
 		// Disable networking, preventing false-negatives if in an environment without networking service

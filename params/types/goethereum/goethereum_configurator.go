@@ -509,6 +509,9 @@ func (c *ChainConfig) GetConsensusEngineType() ctypes.ConsensusEngineT {
 	if c.Keccak != nil {
 		return ctypes.ConsensusEngineT_Keccak
 	}
+	if c.Lyra2 != nil {
+		return ctypes.ConsensusEngineT_Lyra2
+	}
 	return ctypes.ConsensusEngineT_Ethash
 }
 
@@ -528,6 +531,11 @@ func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) erro
 		c.Ethash = nil
 		c.Clique = nil
 		c.Keccak = new(ctypes.KeccakConfig)
+		return nil
+	case ctypes.ConsensusEngineT_Lyra2:
+		c.Lyra2 = new(ctypes.Lyra2Config)
+		c.Ethash = nil
+		c.Clique = nil
 		return nil
 	default:
 		return ctypes.ErrUnsupportedConfigFatal

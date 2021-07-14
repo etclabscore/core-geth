@@ -273,6 +273,7 @@ const (
 	ConsensusEngineT_Ethash
 	ConsensusEngineT_Clique
 	ConsensusEngineT_Keccak
+	ConsensusEngineT_Lyra2
 )
 
 func (c ConsensusEngineT) String() string {
@@ -283,6 +284,8 @@ func (c ConsensusEngineT) String() string {
 		return "clique"
 	case ConsensusEngineT_Keccak:
 		return "keccak"
+	case ConsensusEngineT_Lyra2:
+		return "lyra2"
 	default:
 		return "unknown"
 	}
@@ -298,6 +301,10 @@ func (c ConsensusEngineT) IsClique() bool {
 
 func (c ConsensusEngineT) IsKeccak() bool {
 	return c == ConsensusEngineT_Keccak
+}
+
+func (c ConsensusEngineT) IsLyra2() bool {
+	return c == ConsensusEngineT_Lyra2
 }
 
 func (c ConsensusEngineT) IsUnknown() bool {
@@ -387,4 +394,12 @@ type CliqueConfig struct {
 // String implements the stringer interface, returning the consensus engine details.
 func (c *CliqueConfig) String() string {
 	return "clique"
+}
+
+// Lyra2Config is the consensus engine configs for MINTME network.
+type Lyra2Config struct{}
+
+// String implements the stringer interface, returning the consensus engine details.
+func (c *Lyra2Config) String() string {
+	return "lyra2"
 }

@@ -67,6 +67,7 @@ type ChainConfig struct {
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
 	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
 	Keccak *ctypes.KeccakConfig `json:"keccak256,omitempty"`
+	Lyra2  *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
 
 	// NOTE: These are not included in this type upstream.
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint"`

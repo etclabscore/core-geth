@@ -93,15 +93,26 @@ func (bc *BlockChain) getTDRatio(commonAncestor, current, proposed *types.Header
 func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) error {
 
 	// Short-circuit to no-op in case proposed segment has greater premier-canonical TD than current.
-	currentPremierAggregateDifficulty := bc.getTdPremierCanonical(commonAncestor, current, current.Time)
-	proposedPremierAggregateDifficulty := bc.getTdPremierCanonical(commonAncestor, proposed, current.Time)
+	//
+	// Intention: We want to exempt proposed segments which have greater saturation of first-to-canonical blocks
+	// than the incumbent segment, but keep MESS activated when this is not the case.
+	//
+	// The logic behind this is that malicious/suspicious segments will exhibit characteristically lower
+	// first-to-canonical saturation because of their necessary initial isolation (secrecy).
+	// This logic provides a way to identify segments having greater or lesser "competitive publicity" rate (which is argued to
+	// be relatively indicative of "honesty").
+	// Relatively competitively-public (identified as "honest") segments are not subject to the MESS acceptance algorithm.
+	//
+	// PCS: Premier Canonical Score
+	currentPCS := bc.getTdPremierCanonical(commonAncestor, current, current.Time)
+	proposedPCS := bc.getTdPremierCanonical(commonAncestor, proposed, current.Time)
 
-	// PROPOSED Weighted Net Difficulty > CURRENT Weighted Net Difficulty ?
-	if proposedPremierAggregateDifficulty.Cmp(currentPremierAggregateDifficulty) > 0 {
-		// Yes: PROPOSED is greater than CURRENT, MESS is not applied (and reorg continues normally).
+	if proposedPCS.Cmp(currentPCS) > 0 {
+		// MESS is not applied (and reorg continues normally), since the proposed chain is more saturated with
+		// first-to-canonical blocks.
 		//
-		// Short circuit, returning no error and allowing the reorg to proceed without intervention.
-		return nil // MESS is not applied.
+		// Short circuit, returning no error and allowing the reorg to proceed without MESS intervention.
+		return nil
 	}
 
 	// Get the total difficulties of the proposed chain segment and the existing one.
@@ -143,9 +154,9 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 // as "premier-canonical," that is, as being the first-seen for a given block number.
 // We assume that all headers between common ancestor (inclusive) and the head (non inclusive, since we have the header value already)
 // will exist in DB, and thus have an available TD measurement.
-func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, segmentLatestTime uint64) (ageWeightedNetDifficulty *big.Int) {
+func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, segmentLatestTime uint64) (score *big.Int) {
 
-	ageWeightedNetDifficulty = big.NewInt(0)
+	score = big.NewInt(0)
 	focus := head
 
 	// Rewind the whole segment, starting at the top, and going through the common ancestor.
@@ -169,11 +180,9 @@ func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, 
 			// young:        120
 			// v. young:     3
 
-			// +
-			ageWeightedNetDifficulty.Add(ageWeightedNetDifficulty, new(big.Int).SetUint64(segmentLatestTime-focus.Time))
-
+			score.Add(score, new(big.Int).SetUint64(segmentLatestTime-focus.Time))
 		} else {
-			// Conditions not met; nothing happens. Continue rewind.
+			// Conditions not met; nothing happens. Continue iteration.
 		}
 
 		// Step back by one.
@@ -181,7 +190,7 @@ func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, 
 	}
 
 	// Net weighted difficulty for a chain segment.
-	return ageWeightedNetDifficulty
+	return score
 }
 
 // premiereCanonicalNumber gets the value (number) on which premier-canonical entries in the database

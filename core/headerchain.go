@@ -240,6 +240,7 @@ func (hc *HeaderChain) writeHeaders(headers []*types.Header) (result *headerWrit
 					break
 				}
 				rawdb.DeleteCanonicalHash(markerBatch, i)
+				// DO NOT delete PremierCanonical values on reorg.
 			}
 			// Overwrite any stale canonical number assignments, going
 			// backwards from the first header in this import
@@ -633,6 +634,7 @@ func (hc *HeaderChain) SetHead(head uint64, updateFn UpdateHeadBlocksCallback, d
 				rawdb.DeleteTd(batch, hash, num)
 			}
 			rawdb.DeleteCanonicalHash(batch, num)
+			rawdb.DeletePremierCanonicalHash(batch, num)
 		}
 	}
 

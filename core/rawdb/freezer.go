@@ -393,6 +393,7 @@ func (f *freezer) freeze(db ethdb.KeyValueStore) {
 			if first+uint64(i) != 0 {
 				DeleteBlockWithoutNumber(batch, ancients[i], first+uint64(i))
 				DeleteCanonicalHash(batch, first+uint64(i))
+				DeletePremierCanonicalHash(batch, first+uint64(i))
 			}
 		}
 		if err := batch.Write(); err != nil {

@@ -93,8 +93,6 @@ func WritePremierCanonicalHash(db ethdb.KeyValueWriter, hash common.Hash, number
 }
 
 // DeletePremierCanonicalHash removes the number to hash canonical mapping.
-// FIXME: This is not actually used anywhere, and once written the data will never change (even under
-// drastic commands like SetHead).
 func DeletePremierCanonicalHash(db ethdb.KeyValueWriter, number uint64) {
 	if err := db.Delete(headerPremierCanonicalHashKey(number)); err != nil {
 		log.Crit("Failed to delete number to premier-canonical hash mapping", "err", err)

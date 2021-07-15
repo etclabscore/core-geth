@@ -1278,13 +1278,14 @@ func (bc *BlockChain) InsertReceiptChain(blockChain types.Blocks, receiptChain [
 		for _, nh := range deleted {
 			rawdb.DeleteBlockWithoutNumber(batch, nh.hash, nh.number)
 			rawdb.DeleteCanonicalHash(batch, nh.number)
+			rawdb.DeletePremierCanonicalHash(batch, nh.number)
 		}
 		for _, block := range blockChain {
 			// Always keep genesis block in active database.
 			if block.NumberU64() != 0 {
 				rawdb.DeleteBlockWithoutNumber(batch, block.Hash(), block.NumberU64())
 				rawdb.DeleteCanonicalHash(batch, block.NumberU64())
-				// TODO: rawdb.DeletePremierCanonicalHash(batch, block.NumberU64())
+				rawdb.DeletePremierCanonicalHash(batch, block.NumberU64())
 			}
 		}
 		if err := batch.Write(); err != nil {
@@ -2429,6 +2430,7 @@ func (bc *BlockChain) reorg(data *reorgData) error {
 			break
 		}
 		rawdb.DeleteCanonicalHash(indexesBatch, i)
+		// DO NOT delete PremierCanonical values on reorg.
 	}
 	if err := indexesBatch.Write(); err != nil {
 		log.Crit("Failed to delete useless indexes", "err", err)

@@ -157,10 +157,9 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, segmentLatestTime uint64) (score *big.Int) {
 
 	score = big.NewInt(0)
-	focus := head
 
 	// Rewind the whole segment, starting at the top, and going through the common ancestor.
-	for focus.ParentHash != commonAncestor.ParentHash {
+	for focus := head; focus.Hash() != commonAncestor.Hash(); focus = bc.GetHeaderByHash(focus.ParentHash) {
 
 		// If the header is marked as premier-canonical, its difficulty value is included in the sum.
 		headerIsFirstSeen := rawdb.ReadPremierCanonicalHash(bc.db, premiereCanonicalNumber(focus)) == focus.Hash()
@@ -186,7 +185,7 @@ func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, 
 		}
 
 		// Step back by one.
-		focus = bc.GetHeaderByHash(focus.ParentHash)
+
 	}
 
 	// Net weighted difficulty for a chain segment.

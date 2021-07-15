@@ -111,7 +111,7 @@ func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) 
 		// MESS is not applied (and reorg continues normally), since the proposed chain is more saturated with
 		// first-to-canonical blocks.
 		//
-		// Short circuit, returning no error and allowing the reorg to proceed without MESS intervention.
+		// Code: Short circuit, returning no error and allowing the reorg to proceed without MESS intervention.
 		return nil
 	}
 
@@ -158,12 +158,18 @@ func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, 
 
 	score = big.NewInt(0)
 
-	// Rewind the whole segment, starting at the top, and going through the common ancestor.
-	for focus := head; focus.Hash() != commonAncestor.Hash(); focus = bc.GetHeaderByHash(focus.ParentHash) {
+	// Iterate backwards through the whole segment, starting at the top, and going until the common ancestor.
+	for focus := head; focus != nil /* safety, should never happen */ && focus.Hash() != commonAncestor.Hash(); focus = bc.GetHeaderByHash(focus.ParentHash) {
 
-		// If the header is marked as premier-canonical, its difficulty value is included in the sum.
-		headerIsFirstSeen := rawdb.ReadPremierCanonicalHash(bc.db, premiereCanonicalNumber(focus)) == focus.Hash()
-		if focus.Time <= segmentLatestTime && headerIsFirstSeen {
+		// There are two conditions for the addition of the block's value to the score:
+
+		// 1. If the block's timestamp lies within the respective span of the current segment.
+		if focus.Time > segmentLatestTime {
+			continue
+		}
+
+		// 2. If the header is marked as premier-canonical, its unit score is included in the sum.
+		if rawdb.ReadPremierCanonicalHash(bc.db, premiereCanonicalNumber(focus)) == focus.Hash() {
 
 			// Emphasize the priority associated with the leading (oldest) sections versus the later section
 			// of the segment.
@@ -180,12 +186,7 @@ func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, 
 			// v. young:     3
 
 			score.Add(score, new(big.Int).SetUint64(segmentLatestTime-focus.Time))
-		} else {
-			// Conditions not met; nothing happens. Continue iteration.
 		}
-
-		// Step back by one.
-
 	}
 
 	// Net weighted difficulty for a chain segment.

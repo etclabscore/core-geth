@@ -64,19 +64,19 @@ func DeleteCanonicalHash(db ethdb.KeyValueWriter, number uint64) {
 	}
 }
 
-// TODO
-// Deleting premier-canonical data is difficult if its keyed on timestamp (instead of block number),
-// since it requires access to (probably all) the header fields, rather than just number/hash.
-//
-// This could be addressed with another indexed 'table' in the db that would provide
-// lookup information for hash/num:unixTime so that the hash/num could return the key for the premier-canonical
-// data.
-// Or, the accessors could implement an iterator system which would curse (as in cursor-over) the
-// entries and find matching entries and remove them given some range definition.
-//
-// Neither seems awesome.
+// PremierCanonicalHash are very similar to CanonicalHash accessors.
+// Both, obviously, describe something about the canonical state.
+// While CanonicalHash(s) describe the CURRENT state of the canonical identity,
+// PremierCanonicalHash(s) describe the INITIAL state of the canonical identity at some key (as implemented: for some number).
+// Once the PremierCanonicalHash identity is defined for some key, it may not be deleted or
+// edited unless under the processes of
+// - manual user override (eg SetHead)
+// - rollback caused by data corruption (eg SetHead or Truncate)
+// - archive of KV block data to the Freezer, which represents the limit of reorganization depth (for this program).
 
 // ReadPremierCanonicalHash reads the premier-canonical hash from the database.
+// Note that the Ancient database is not queried in case the KV lookup fails;
+// it is expected that PremierCanonical data is not available for blocks which have been migrated to the freezer store.
 func ReadPremierCanonicalHash(db ethdb.Reader, number uint64) common.Hash {
 	data, _ := db.Get(headerPremierCanonicalHashKey(number))
 	if len(data) == 0 {

@@ -195,6 +195,17 @@ func (bc *BlockChain) getTdPremierCanonical(commonAncestor, head *types.Header, 
 
 // premiereCanonicalNumber gets the value (number) on which premier-canonical entries in the database
 // are keyed.
+// FIXME: (Sort of, FIXME... more like WIP).
+// This function wraps a header value and returns a number.
+// It's essentially used to define the key (a number) under which the premier-canonical entry is
+// stored in the database.
+// For the time being, this is the HEADER NUMBER.
+// However, we have also experimented with using HEADER TIMESTAMP and DIFFICULTY.
+// HEADER NUMBER is the simplest to reason about and easiest to implement, so, pending any discoveries
+// w/r/t the algorithm in theory, we'll probably stick with this.
+//
+// When this decision is finalized, the function can be removed,
+// and callers of rawdb.[Get|Write|Delete]PremierCanonicalHash can just use the proper header value directly.
 func premiereCanonicalNumber(header *types.Header) uint64 {
 	return header.Number.Uint64()
 }

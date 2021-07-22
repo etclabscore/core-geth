@@ -376,7 +376,11 @@ func (r Receipts) DeriveFields(config ctypes.ChainConfigurator, hash common.Hash
 		if txs[i].To() == nil {
 			// Deriving the signer is expensive, only do if it's actually needed
 			from, _ := Sender(signer, txs[i])
-			r[i].ContractAddress = crypto.CreateAddress(from, txs[i].Nonce())
+			if config.IsEnabled(config.GetLyra2NonceTransition, r[i].BlockNumber) {
+				r[i].ContractAddress = crypto.CreateAddress(from, txs[i].Nonce()+0x00ffffff)
+			} else {
+				r[i].ContractAddress = crypto.CreateAddress(from, txs[i].Nonce())
+			}
 		}
 		// The used gas can be calculated based on previous r
 		if i == 0 {

@@ -187,7 +187,11 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigura
 
 			// If the transaction created a contract, store the creation address in the receipt.
 			if msg.To() == nil {
-				receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce())
+				if chainConfig.IsEnabled(chainConfig.GetLyra2NonceTransition, vmContext.BlockNumber) {
+					receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce()+0x00ffffff)
+				} else {
+					receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce())
+				}
 			}
 
 			// Set the receipt logs and create the bloom filter.

@@ -21,6 +21,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/consensus/lyra2"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -127,7 +128,7 @@ func applyTransaction(msg types.Message, config ctypes.ChainConfigurator, bc Cha
 	// If the transaction created a contract, store the creation address in the receipt.
 	if msg.To() == nil {
 		if config.IsEnabled(config.GetLyra2NonceTransition, header.Number) {
-			receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce()+0x00ffffff)
+			receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce() + lyra2.ContractNonceOffset)
 		} else {
 			receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce())
 		}

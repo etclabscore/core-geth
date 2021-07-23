@@ -23,6 +23,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/consensus/lyra2"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
@@ -188,7 +189,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigura
 			// If the transaction created a contract, store the creation address in the receipt.
 			if msg.To() == nil {
 				if chainConfig.IsEnabled(chainConfig.GetLyra2NonceTransition, vmContext.BlockNumber) {
-					receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce()+0x00ffffff)
+					receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce() + lyra2.ContractNonceOffset)
 				} else {
 					receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce())
 				}

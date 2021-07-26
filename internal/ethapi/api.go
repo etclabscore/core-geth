@@ -36,7 +36,6 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/consensus/clique"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/consensus/lyra2"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -1493,7 +1492,7 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 		to = *args.To
 	} else {
 		if b.ChainConfig().IsEnabled(b.ChainConfig().GetLyra2NonceTransition, header.Number) {
-			to = crypto.CreateAddress(args.From, uint64(*args.Nonce) + lyra2.ContractNonceOffset)
+			to = crypto.CreateAddress(args.From, uint64(*args.Nonce)+vars.Lyra2ContractNonceOffset)
 		} else {
 			to = crypto.CreateAddress(args.From, uint64(*args.Nonce))
 		}
@@ -1877,7 +1876,7 @@ func SubmitTransaction(ctx context.Context, b Backend, tx *types.Transaction) (c
 	if tx.To() == nil {
 		addr := crypto.CreateAddress(from, tx.Nonce())
 		if b.ChainConfig().IsEnabled(b.ChainConfig().GetLyra2NonceTransition, b.CurrentBlock().Number()) {
-			addr = crypto.CreateAddress(from, tx.Nonce() + lyra2.ContractNonceOffset)
+			addr = crypto.CreateAddress(from, tx.Nonce()+vars.Lyra2ContractNonceOffset)
 		}
 		log.Info("Submitted contract creation", "hash", tx.Hash().Hex(), "from", from, "nonce", tx.Nonce(), "contract", addr.Hex(), "value", tx.Value())
 	} else {

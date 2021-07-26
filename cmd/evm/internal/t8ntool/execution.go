@@ -23,7 +23,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/consensus/lyra2"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
@@ -35,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
 	"golang.org/x/crypto/sha3"
@@ -189,7 +189,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig ctypes.ChainConfigura
 			// If the transaction created a contract, store the creation address in the receipt.
 			if msg.To() == nil {
 				if chainConfig.IsEnabled(chainConfig.GetLyra2NonceTransition, vmContext.BlockNumber) {
-					receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce() + lyra2.ContractNonceOffset)
+					receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce()+vars.Lyra2ContractNonceOffset)
 				} else {
 					receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce())
 				}

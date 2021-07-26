@@ -26,9 +26,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/consensus/lyra2"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
@@ -378,7 +378,7 @@ func (r Receipts) DeriveFields(config ctypes.ChainConfigurator, hash common.Hash
 			// Deriving the signer is expensive, only do if it's actually needed
 			from, _ := Sender(signer, txs[i])
 			if config.IsEnabled(config.GetLyra2NonceTransition, r[i].BlockNumber) {
-				r[i].ContractAddress = crypto.CreateAddress(from, txs[i].Nonce() + lyra2.ContractNonceOffset)
+				r[i].ContractAddress = crypto.CreateAddress(from, txs[i].Nonce()+vars.Lyra2ContractNonceOffset)
 			} else {
 				r[i].ContractAddress = crypto.CreateAddress(from, txs[i].Nonce())
 			}

@@ -29,8 +29,6 @@ var (
 	big32                    = big.NewInt(32)
 	DisinflationRateQuotient = big.NewInt(249)
 	DisinflationRateDivisor  = big.NewInt(250)
-
-	ContractNonceOffset uint64 = 0x00ffffff
 )
 
 // Various error messages to mark blocks invalid. These should be private to

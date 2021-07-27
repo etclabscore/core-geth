@@ -65,5 +65,5 @@ type ChainConfig struct {
 	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
 	Lyra2  *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
 
-	Lyra2NonceTransitionBlock *big.Int `json:"-"`
+	Lyra2NonceTransitionBlock *big.Int `json:"lyra2NonceTransitionBlock,omitempty"`
 }

@@ -1013,6 +1013,17 @@ func (spec *ParityChainSpec) SetEthashECIP1099Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
+func (spec *ParityChainSpec) GetEthashConfig() *ctypes.EthashConfig {
+	return nil
+}
+
+func (spec *ParityChainSpec) SetEthashConfig(n *ctypes.EthashConfig) error {
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
 func (spec *ParityChainSpec) GetEIP2315Transition() *uint64 {
 	return spec.Params.EIP2315Transition.Uint64P()
 }

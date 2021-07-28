@@ -63,11 +63,16 @@ func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []
 // AccumulateRewards credits the coinbase of the given block with the mining
 // reward. The coinbase of each uncle block is also rewarded.
 func AccumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
-	minerReward, uncleRewards := GetRewards(config, header, uncles)
-	for i, uncle := range uncles {
-		state.AddBalance(uncle.Coinbase, uncleRewards[i])
+	ethashConfig := config.GetEthashConfig()
+	if header.Number.Cmp(ethashConfig.UIP0FBlock) >= 0 {
+		accumulateUbiqRewards(config, state, header, uncles)
+	} else {
+		minerReward, uncleRewards := GetRewards(config, header, uncles)
+		for i, uncle := range uncles {
+			state.AddBalance(uncle.Coinbase, uncleRewards[i])
+		}
+		state.AddBalance(header.Coinbase, minerReward)
 	}
-	state.AddBalance(header.Coinbase, minerReward)
 }
 
 // As of "Era 2" (zero-index era 1), uncle miners and winners are rewarded equally for each included block.

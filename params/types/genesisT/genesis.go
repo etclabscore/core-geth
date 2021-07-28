@@ -760,6 +760,14 @@ func (g *Genesis) SetEthashECIP1099Transition(n *uint64) error {
 	return g.Config.SetEthashECIP1099Transition(n)
 }
 
+func (g *Genesis) GetEthashConfig() *ctypes.EthashConfig {
+	return g.Config.GetEthashConfig()
+}
+
+func (g *Genesis) SetEthashConfig(n *ctypes.EthashConfig) error {
+	return g.Config.SetEthashConfig(n)
+}
+
 func (g *Genesis) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	return g.Config.GetEthashDifficultyBombDelaySchedule()
 }

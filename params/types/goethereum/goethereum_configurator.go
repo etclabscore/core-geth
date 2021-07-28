@@ -772,6 +772,20 @@ func (c *ChainConfig) SetEthashECIP1099Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
+func (c *ChainConfig) GetEthashConfig() *ctypes.EthashConfig {
+	return nil
+}
+
+func (c *ChainConfig) SetEthashConfig(n *ctypes.EthashConfig) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	if n == nil {
+		return nil
+	}
+	return ctypes.ErrUnsupportedConfigFatal
+}
+
 func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil

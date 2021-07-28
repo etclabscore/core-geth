@@ -44,6 +44,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.NetworkIdFlag,
 			utils.MainnetFlag,
 			utils.ClassicFlag,
+			utils.UbiqFlag,
 			utils.MordorFlag,
 			utils.KottiFlag,
 			utils.GoerliFlag,

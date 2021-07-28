@@ -2700,3 +2700,11 @@ func (bc *BlockChain) SubscribeLogsEvent(ch chan<- []*types.Log) event.Subscript
 func (bc *BlockChain) SubscribeBlockProcessingEvent(ch chan<- bool) event.Subscription {
 	return bc.scope.Track(bc.blockProcFeed.Subscribe(ch))
 }
+
+// calcPastMedianTime calculates the median time of the previous few blocks
+// prior to, and including, the passed block node.
+//
+// Modified from btcsuite
+func (bc *BlockChain) CalcPastMedianTime(number uint64, parent *types.Header) *big.Int {
+	return bc.hc.CalcPastMedianTime(number, parent)
+}

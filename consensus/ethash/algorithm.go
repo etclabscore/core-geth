@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/bitutil"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
+	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -137,6 +138,18 @@ func makeHasher(h hash.Hash) hasher {
 	}
 }
 
+// blakeHasher creates a repetitive hasher, allowing the same hash data structures
+// to be reused between hash runs instead of requiring new ones to be created.
+// The returned function is not thread safe!
+// based on previous Sum based makeHasher as blake2b lacks a Read function - iquidus
+func blakeHasher(h hash.Hash) hasher {
+	return func(dest []byte, data []byte) {
+		h.Write(data)
+		h.Sum(dest[:0])
+		h.Reset()
+	}
+}
+
 // seedHash is the seed to use for generating a verification cache and the mining
 // dataset. The block number passed should be pre-rounded to an epoch boundary + 1
 // e.g: seedHash(calcEpochBlock(epoch, epochLength))
@@ -161,7 +174,7 @@ func seedHash(epoch uint64, epochLength uint64) []byte {
 // algorithm from Strict Memory Hard Hashing Functions (2014). The output is a
 // set of 524288 64-byte values.
 // This method places the result into dest in machine byte order.
-func generateCache(dest []uint32, epoch uint64, epochLength uint64, seed []byte) {
+func generateCache(dest []uint32, epoch uint64, epochLength uint64, uip1Epoch uint64, seed []byte) {
 	// Print some debug logs to allow analysis on low end devices
 	logger := log.New("epoch", epoch)
 
@@ -205,6 +218,10 @@ func generateCache(dest []uint32, epoch uint64, epochLength uint64, seed []byte)
 	}()
 	// Create a hasher to reuse between invocations
 	keccak512 := makeHasher(sha3.NewLegacyKeccak512())
+	if epoch >= uip1Epoch { // UIP1
+		h, _ := blake2b.New512(nil)
+		keccak512 = blakeHasher(h) // use blakeHasher instead of makeHasher here.
+	}
 
 	// Sequentially produce the initial dataset
 	keccak512(cache, seed)

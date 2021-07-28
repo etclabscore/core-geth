@@ -363,7 +363,13 @@ type CheckpointOracleConfig struct {
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.
-type EthashConfig struct{}
+type EthashConfig struct {
+	DigishieldV3FBlock    *big.Int `json:"digishieldV3FBlock,omitempty"`    // Block to activate DigiShield V3 diff algo (UIP-0)
+	DigishieldV3ModFBlock *big.Int `json:"digishieldV3ModFBlock,omitempty"` // Block to activate the DigiShield V3 modded diff algo (UIP-0)
+	FluxFBlock            *big.Int `json:"fluxFBlock,omitempty"`            // Block to activate the Flux diff algo (UIP-0)
+	UIP0FBlock            *big.Int `json:"uip0FBlock,omitempty"`            // Ubiq monetary policy and diff algosS (UIP-0)
+	UIP1FEpoch            *big.Int `json:"uip1FEpoch,omitempty"`            // Ubqhash (UIP-1)
+}
 
 // String implements the stringer interface, returning the consensus engine details.
 func (c *EthashConfig) String() string {

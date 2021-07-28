@@ -172,6 +172,10 @@ var (
 		Name:  "mainnet",
 		Usage: "Ethereum mainnet: pre-configured Ethereum mainnet",
 	}
+	UbiqFlag = cli.BoolFlag{
+		Name:  "ubiq",
+		Usage: "Ubiq network: pre-configured Ubiq mainnet",
+	}
 	YoloV3Flag = cli.BoolFlag{
 		Name:  "yolov3",
 		Usage: "YOLOv3 network: pre-configured proof-of-authority shortlived test network.",
@@ -888,6 +892,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.YoloV3Bootnodes
 	case ctx.GlobalBool(MintMeFlag.Name):
 		urls = params.MintMeBootnodes
+	case ctx.GlobalBool(UbiqFlag.Name):
+		urls = params.UbiqBootnodes
 	case cfg.BootstrapNodes != nil:
 		return // already set, don't apply defaults.
 	}
@@ -928,6 +934,8 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.YoloV3Bootnodes
 	case ctx.GlobalBool(MintMeFlag.Name):
 		urls = params.MintMeBootnodes
+	case ctx.GlobalIsSet(UbiqFlag.Name):
+		urls = params.UbiqBootnodes
 	case cfg.BootstrapNodesV5 != nil:
 		return // already set, don't apply defaults.
 	}
@@ -1340,6 +1348,8 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "yolo-v2")
 	case ctx.GlobalBool(MintMeFlag.Name):
 		return filepath.Join(baseDataDirPath, "mintme")
+	case ctx.GlobalBool(UbiqFlag.Name):
+		return filepath.Join(baseDataDirPath, "ubiq")
 	}
 	return baseDataDirPath
 }
@@ -1454,6 +1464,22 @@ func setEthashDatasetDir(ctx *cli.Context, cfg *ethconfig.Config) {
 		} else {
 			cfg.Ethash.DatasetDir = filepath.Join(home, ".etchash")
 		}
+
+	case (ctx.GlobalBool(UbiqFlag.Name)) && cfg.Ethash.DatasetDir == ethconfig.Defaults.Ethash.DatasetDir:
+		// UIP1 is set, use ubqhash dir for DAGs instead
+		home := HomeDir()
+		if runtime.GOOS == "darwin" {
+			cfg.Ethash.DatasetDir = filepath.Join(home, "Library", "Ubqhash")
+		} else if runtime.GOOS == "windows" {
+			localappdata := os.Getenv("LOCALAPPDATA")
+			if localappdata != "" {
+				cfg.Ethash.DatasetDir = filepath.Join(localappdata, "Ubqhash")
+			} else {
+				cfg.Ethash.DatasetDir = filepath.Join(home, "AppData", "Local", "Ubqhash")
+			}
+		} else {
+			cfg.Ethash.DatasetDir = filepath.Join(home, ".ubqhash")
+		}
 	}
 }
 
@@ -1465,11 +1491,15 @@ func setEthashCacheDir(ctx *cli.Context, cfg *eth.Config) {
 	case (ctx.GlobalBool(ClassicFlag.Name) || ctx.GlobalBool(MordorFlag.Name)) && cfg.Ethash.CacheDir == ethconfig.Defaults.Ethash.CacheDir:
 		// ECIP-1099 is set, use etchash dir for caches instead
 		cfg.Ethash.CacheDir = "etchash"
+
+	case (ctx.GlobalBool(UbiqFlag.Name)) && cfg.Ethash.CacheDir == ethconfig.Defaults.Ethash.CacheDir:
+		// UIP1 is set, use ubqhash dir for caches instead
+		cfg.Ethash.CacheDir = "ubqhash"
 	}
 }
 
 func setEthash(ctx *cli.Context, cfg *eth.Config) {
-	// ECIP-1099
+	// ECIP-1099 & UIP1
 	setEthashCacheDir(ctx, cfg)
 	setEthashDatasetDir(ctx, cfg)
 
@@ -1588,7 +1618,7 @@ func CheckExclusive(ctx *cli.Context, args ...interface{}) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, MainnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV3Flag, ClassicFlag, KottiFlag, MordorFlag, MintMeFlag)
+	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, MainnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, YoloV3Flag, ClassicFlag, KottiFlag, MordorFlag, MintMeFlag, UbiqFlag)
 	CheckExclusive(ctx, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	CheckExclusive(ctx, GCModeFlag, "archive", TxLookupLimitFlag)
@@ -1814,6 +1844,8 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		SetDNSDiscoveryDefaults2(cfg, params.MordorDNSNetwork1)
 	case ctx.GlobalBool(YoloV3Flag.Name):
 		SetDNSDiscoveryDefaults(cfg, params.YoloV3GenesisHash)
+	case ctx.GlobalBool(UbiqFlag.Name):
+		SetDNSDiscoveryDefaults(cfg, params.UbiqGenesisHash)
 	default:
 		// No --<chain> flag was given.
 	}
@@ -2032,6 +2064,8 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 		genesis = params.DefaultYoloV3GenesisBlock()
 	case ctx.GlobalBool(MintMeFlag.Name):
 		genesis = params.DefaultMintMeGenesisBlock()
+	case ctx.GlobalBool(UbiqFlag.Name):
+		genesis = params.DefaultUbiqGenesisBlock()
 	}
 	return genesis
 }

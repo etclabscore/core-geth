@@ -33,7 +33,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/mutations"
-	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
@@ -296,7 +295,7 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 // the difficulty that a new block should have when created at time
 // given the parent block's time and difficulty.
 func (ethash *Ethash) CalcDifficulty(chain consensus.ChainHeaderReader, time uint64, parent *types.Header) *big.Int {
-	return CalcDifficulty(chain.Config(), time, parent)
+	return CalcDifficulty(chain, time, parent)
 }
 
 // parent_time_delta is a convenience fn for CalcDifficulty
@@ -312,9 +311,15 @@ func parent_diff_over_dbd(p *types.Header) *big.Int {
 // CalcDifficulty is the difficulty adjustment algorithm. It returns
 // the difficulty that a new block should have when created at time
 // given the parent block's time and difficulty.
-func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.Header) *big.Int {
+func CalcDifficulty(chain consensus.ChainHeaderReader, time uint64, parent *types.Header) *big.Int {
 	next := new(big.Int).Add(parent.Number, big1)
 	out := new(big.Int)
+	config := chain.Config()
+	ethashConfig := config.GetEthashConfig()
+
+	if ethashConfig.FluxFBlock != nil {
+		return calcDifficultyUbiq(chain, time, parent)
+	}
 
 	if config.IsEnabled(config.GetCatalystTransition, next) {
 		return big.NewInt(1)

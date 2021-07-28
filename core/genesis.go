@@ -189,6 +189,8 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 		return params.YoloV3ChainConfig
 	case ghash == params.MintMeGenesisHash:
 		return params.MintMeChainConfig
+	case ghash == params.UbiqGenesisHash:
+		return params.UbiqChainConfig
 	default:
 		return params.AllEthashProtocolChanges
 	}

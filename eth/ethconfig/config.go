@@ -18,6 +18,7 @@
 package ethconfig
 
 import (
+	"math"
 	"math/big"
 	"os"
 	"os/user"
@@ -243,6 +244,14 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 		log.Warn("Ethash used in fake Poisson mode")
 		return ethash.NewPoissonFaker()
 	default:
+		ethashConfig := chainConfig.GetEthashConfig()
+		var uip1Epoch uint64 = math.MaxUint64
+		if ethashConfig.UIP1FEpoch != nil {
+			uip1Epoch = ethashConfig.UIP1FEpoch.Uint64()
+		}
+
+		log.Warn("uip1:", "Epoch", uip1Epoch)
+
 		engine := ethash.New(ethash.Config{
 			PowMode:          config.PowMode,
 			CacheDir:         stack.ResolvePath(config.CacheDir),
@@ -255,6 +264,7 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 			DatasetsLockMmap: config.DatasetsLockMmap,
 			NotifyFull:       config.NotifyFull,
 			ECIP1099Block:    chainConfig.GetEthashECIP1099Transition(),
+			UIP1Epoch:        &uip1Epoch,
 		}, notify, noverify)
 		engine.SetThreads(-1) // Disable CPU mining
 		return engine

@@ -582,3 +582,11 @@ func (lc *LightChain) DisableCheckFreq() {
 func (lc *LightChain) EnableCheckFreq() {
 	atomic.StoreInt32(&lc.disableCheckFreq, 0)
 }
+
+// calcPastMedianTime calculates the median time of the previous few blocks
+// prior to, and including, the passed block node.
+//
+// Modified from btcsuite
+func (lc *LightChain) CalcPastMedianTime(number uint64, parent *types.Header) *big.Int {
+	return lc.hc.CalcPastMedianTime(number, parent)
+}

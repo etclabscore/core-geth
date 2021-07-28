@@ -232,6 +232,20 @@ func TestCreation(t *testing.T) {
 				{0, ID{Hash: checksumToBytes(0x02bf4180), Next: 0}},
 			},
 		},
+		// Ubiq test cases
+		{
+			"ubiq",
+			params.UbiqChainConfig,
+			params.UbiqGenesisHash,
+			[]testcase{
+				{0, ID{Hash: checksumToBytes(0xf3073ee8), Next: 10}},            // Unsynced, last Frontier, Homestead,
+				{10, ID{Hash: checksumToBytes(0x3f0fcc99), Next: 1075090}},      // First Spurious block
+				{1075089, ID{Hash: checksumToBytes(0x3f0fcc99), Next: 1075090}}, // Last Spurious block
+				{1075090, ID{Hash: checksumToBytes(0xa4ecb4b6), Next: 1500000}}, // First Byzantium, Constantinople, Petersbug, (andromeda)
+				{1499999, ID{Hash: checksumToBytes(0xa4ecb4b6), Next: 1500000}}, // Last Byzantium, Constantinople, Petersbug, (andromeda)
+				{1500000, ID{Hash: checksumToBytes(0x65ea97e0), Next: 0}},       // First Istanbul (taurus)
+			},
+		},
 	}
 	for i, tt := range tests {
 		for j, ttt := range tt.cases {

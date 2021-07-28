@@ -58,6 +58,7 @@ var defaultChainspecValues = map[string]ctypes.Configurator{
 	"goerli":     params.DefaultGoerliGenesisBlock(),
 	"yolov3":     params.DefaultYoloV3GenesisBlock(),
 	"mintme":     params.DefaultMintMeGenesisBlock(),
+	"ubiq":       params.DefaultUbiqGenesisBlock(),
 }
 
 var defaultChainspecNames = func() []string {

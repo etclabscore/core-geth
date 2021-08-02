@@ -74,7 +74,7 @@ func newClientHandler(ulcServers []string, ulcFraction int, checkpoint *ctypes.T
 		height = (checkpoint.SectionIndex+1)*vars.CHTFrequency - 1
 	}
 	handler.fetcher = newLightFetcher(backend.blockchain, backend.engine, backend.peers, handler.ulc, backend.chainDb, backend.reqDist, handler.synchronise)
-	handler.downloader = downloader.New(height, backend.chainDb, nil, backend.eventMux, nil, backend.blockchain, handler.removePeer)
+	handler.downloader = downloader.New(height, backend.chainDb, nil, backend.eventMux, nil, backend.blockchain, handler.removePeer, &backend.config.NetworkId)
 	handler.backend.peers.subscribe((*downloaderPeerNotify)(handler))
 	return handler
 }

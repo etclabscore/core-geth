@@ -58,9 +58,9 @@ var (
 	qosTuningImpact  = 0.25 // Impact that a new tuning target has on the previous value
 
 	maxQueuedHeaders = 32 * 1024 // [eth/62] Maximum number of headers to queue for import (DOS protection)
-	// TODO(iquidus): these should only be changed if uip0 is enabled.
-	maxHeadersProcess           = 1                               //2048                            // Number of header download results to import at once into the chain
-	maxResultsProcess           = 1                               //2048                            // Number of content download results to import at once into the chain
+
+	maxHeadersProcess           = 2048                            // Number of header download results to import at once into the chain
+	maxResultsProcess           = 2048                            // Number of content download results to import at once into the chain
 	fullMaxForkAncestry  uint64 = vars.FullImmutabilityThreshold  // Maximum chain reorganisation (locally redeclared so tests can reduce it)
 	lightMaxForkAncestry uint64 = vars.LightImmutabilityThreshold // Maximum chain reorganisation (locally redeclared so tests can reduce it)
 
@@ -166,6 +166,8 @@ type Downloader struct {
 	bodyFetchHook    func([]*types.Header) // Method to call upon starting a block body fetch
 	receiptFetchHook func([]*types.Header) // Method to call upon starting a receipt fetch
 	chainInsertHook  func([]*fetchResult)  // Method to call upon inserting a chain of blocks (possibly in multiple invocations)
+
+	networkId *uint64 // networkId
 }
 
 // LightChain encapsulates functions required to synchronise a light chain.
@@ -222,7 +224,7 @@ type BlockChain interface {
 }
 
 // New creates a new downloader to fetch hashes and blocks from remote peers.
-func New(checkpoint uint64, stateDb ethdb.Database, stateBloom *trie.SyncBloom, mux *event.TypeMux, chain BlockChain, lightchain LightChain, dropPeer peerDropFn) *Downloader {
+func New(checkpoint uint64, stateDb ethdb.Database, stateBloom *trie.SyncBloom, mux *event.TypeMux, chain BlockChain, lightchain LightChain, dropPeer peerDropFn, networkId *uint64) *Downloader {
 	if lightchain == nil {
 		lightchain = chain
 	}
@@ -252,6 +254,7 @@ func New(checkpoint uint64, stateDb ethdb.Database, stateBloom *trie.SyncBloom, 
 			processed: rawdb.ReadFastTrieProgress(stateDb),
 		},
 		trackStateReq: make(chan *stateReq),
+		networkId:     networkId,
 	}
 	go dl.qosTuner()
 	go dl.stateFetcher()
@@ -445,6 +448,16 @@ func (d *Downloader) synchronise(id string, hash common.Hash, td *big.Int, mode 
 
 	// Atomically set the requested sync mode
 	atomic.StoreUint32(&d.mode, uint32(mode))
+
+	// Ubiq mainnet downloader fix.
+	if *d.networkId == 8 {
+		if mode == FullSync {
+			maxResultsProcess = 1
+			maxHeadersProcess = 1
+		} else {
+			maxHeadersProcess = 1
+		}
+	}
 
 	// Retrieve the origin peer and initiate the downloading process
 	p := d.peers.Peer(id)

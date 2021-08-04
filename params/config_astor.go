@@ -65,13 +65,13 @@ var (
 		EIP2028FBlock: big.NewInt(0),
 		EIP2200FBlock: big.NewInt(0), // RePetersburg (== re-1283)
 
-		ECIP1099FBlock: big.NewInt(0), // Etchash
+		ECIP1099FBlock: nil, // Etchash
 
-		DisposalBlock:      big.NewInt(0),
-		ECIP1017FBlock:     big.NewInt(0),
-		ECIP1017EraRounds:  big.NewInt(0),
+		DisposalBlock:      big.NewInt(0), // aka ECIP-1041
+		ECIP1017FBlock:     nil,
+		ECIP1017EraRounds:  nil,
 		ECIP1010PauseBlock: nil,
 		ECIP1010Length:     nil,
-		ECBP1100FBlock:     big.NewInt(0), // ETA 29 Sept 2020, ~1500 UTC
+		ECBP1100FBlock:     nil,
 	}
 )

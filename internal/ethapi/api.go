@@ -1491,7 +1491,11 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 	if args.To != nil {
 		to = *args.To
 	} else {
-		to = crypto.CreateAddress(args.From, uint64(*args.Nonce))
+		if b.ChainConfig().IsEnabled(b.ChainConfig().GetLyra2NonceTransition, header.Number) {
+			to = crypto.CreateAddress(args.From, uint64(*args.Nonce)+vars.Lyra2ContractNonceOffset)
+		} else {
+			to = crypto.CreateAddress(args.From, uint64(*args.Nonce))
+		}
 	}
 	var input []byte
 	if args.Input != nil {
@@ -1871,6 +1875,9 @@ func SubmitTransaction(ctx context.Context, b Backend, tx *types.Transaction) (c
 
 	if tx.To() == nil {
 		addr := crypto.CreateAddress(from, tx.Nonce())
+		if b.ChainConfig().IsEnabled(b.ChainConfig().GetLyra2NonceTransition, b.CurrentBlock().Number()) {
+			addr = crypto.CreateAddress(from, tx.Nonce()+vars.Lyra2ContractNonceOffset)
+		}
 		log.Info("Submitted contract creation", "hash", tx.Hash().Hex(), "from", from, "nonce", tx.Nonce(), "contract", addr.Hex(), "value", tx.Value())
 	} else {
 		log.Info("Submitted transaction", "hash", tx.Hash().Hex(), "from", from, "nonce", tx.Nonce(), "recipient", tx.To(), "value", tx.Value())

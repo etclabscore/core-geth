@@ -171,6 +171,7 @@ type ConsensusEnginator interface {
 	MustSetConsensusEngineType(t ConsensusEngineT) error
 	EthashConfigurator
 	CliqueConfigurator
+	Lyra2Configurator
 
 	// Catalyst: ETH -> ETH2 PoS transition helper
 	GetCatalystTransition() *uint64
@@ -228,6 +229,8 @@ type CliqueConfigurator interface {
 }
 
 type Lyra2Configurator interface {
+	GetLyra2NonceTransition() *uint64
+	SetLyra2NonceTransition(n *uint64) error
 }
 
 type BlockSealer interface {

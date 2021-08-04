@@ -43,17 +43,6 @@ func ecip1017BlockReward(config ctypes.ChainConfigurator, header *types.Header, 
 	return wr, uncleRewards
 }
 
-func ecip1010Explosion(config ctypes.ChainConfigurator, next *big.Int, exPeriodRef *big.Int) {
-	// https://github.com/ethereumproject/ECIPs/blob/master/ECIPs/ECIP-1010.md
-
-	if next.Uint64() < *config.GetEthashECIP1010ContinueTransition() {
-		exPeriodRef.SetUint64(*config.GetEthashECIP1010PauseTransition())
-	} else {
-		length := new(big.Int).SetUint64(*config.GetEthashECIP1010ContinueTransition() - *config.GetEthashECIP1010PauseTransition())
-		exPeriodRef.Sub(exPeriodRef, length)
-	}
-}
-
 // GetBlockEra gets which "Era" a given block is within, given an era length (ecip-1017 has era=5,000,000 blocks)
 // Returns a zero-index era number, so "Era 1": 0, "Era 2": 1, "Era 3": 2 ...
 func GetBlockEra(blockNum, eraLength *big.Int) *big.Int {

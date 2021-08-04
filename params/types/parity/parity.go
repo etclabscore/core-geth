@@ -80,7 +80,9 @@ type ParityChainSpec struct {
 		} `json:"Clique,omitempty"`
 		Keccak struct {
 			Params struct {
-				BlockReward ctypes.Uint64BigValOrMapHex `json:"blockReward"`
+				BlockReward          ctypes.Uint64BigValOrMapHex `json:"blockReward"`
+				EIP100bTransition    *ParityU64                  `json:"eip100bTransition"`
+				BombDefuseTransition *ParityU64                  `json:"bombDefuseTransition"`
 			} `json:"params"`
 		} `json:"Keccak256,omitempty"`
 		Lyra2 struct {

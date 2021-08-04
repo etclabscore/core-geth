@@ -752,6 +752,22 @@ func (g *Genesis) SetEthashECIP1041Transition(n *uint64) error {
 	return g.Config.SetEthashECIP1041Transition(n)
 }
 
+func (g *Genesis) GetKeccakEIP100BTransition() *uint64 {
+	return g.Config.GetKeccakEIP100BTransition()
+}
+
+func (g *Genesis) SetKeccakEIP100BTransition(n *uint64) error {
+	return g.Config.SetKeccakEIP100BTransition(n)
+}
+
+func (g *Genesis) GetKeccakECIP1041Transition() *uint64 {
+	return g.Config.GetKeccakECIP1041Transition()
+}
+
+func (g *Genesis) SetKeccakECIP1041Transition(n *uint64) error {
+	return g.Config.SetKeccakECIP1041Transition(n)
+}
+
 func (g *Genesis) GetEthashECIP1099Transition() *uint64 {
 	return g.Config.GetEthashECIP1099Transition()
 }

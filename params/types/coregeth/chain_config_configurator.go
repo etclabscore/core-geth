@@ -830,7 +830,7 @@ func (c *CoreGethChainConfig) SetEthashECIP1017EraRounds(n *uint64) error {
 }
 
 func (c *CoreGethChainConfig) GetEthashEIP100BTransition() *uint64 {
-	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash && c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Keccak {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
 	}
 	return bigNewU64(c.EIP100FBlock)
@@ -853,6 +853,36 @@ func (c *CoreGethChainConfig) GetEthashECIP1041Transition() *uint64 {
 
 func (c *CoreGethChainConfig) SetEthashECIP1041Transition(n *uint64) error {
 	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	c.DisposalBlock = setBig(c.DisposalBlock, n)
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetKeccakEIP100BTransition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Keccak {
+		return nil
+	}
+	return bigNewU64(c.EIP100FBlock)
+}
+
+func (c *CoreGethChainConfig) SetKeccakEIP100BTransition(n *uint64) error {
+	if c.Keccak == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	c.EIP100FBlock = setBig(c.EIP100FBlock, n)
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetKeccakECIP1041Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Keccak {
+		return nil
+	}
+	return bigNewU64(c.DisposalBlock)
+}
+
+func (c *CoreGethChainConfig) SetKeccakECIP1041Transition(n *uint64) error {
+	if c.Keccak == nil {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.DisposalBlock = setBig(c.DisposalBlock, n)

@@ -232,6 +232,11 @@ type CliqueConfigurator interface {
 type KeccakConfigurator interface {
 	GetKeccakBlockRewardSchedule() Uint64BigMapEncodesHex
 	SetKeccakBlockRewardSchedule(m Uint64BigMapEncodesHex) error
+
+	GetKeccakEIP100BTransition() *uint64
+	SetKeccakEIP100BTransition(n *uint64) error
+	GetKeccakECIP1041Transition() *uint64
+	SetKeccakECIP1041Transition(n *uint64) error
 }
 
 type Lyra2Configurator interface {

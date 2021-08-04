@@ -1002,6 +1002,30 @@ func (spec *ParityChainSpec) SetEthashECIP1041Transition(n *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetKeccakEIP100BTransition() *uint64 {
+	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Keccak {
+		return nil
+	}
+	return spec.Engine.Keccak.Params.EIP100bTransition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetKeccakEIP100BTransition(n *uint64) error {
+	spec.Engine.Keccak.Params.EIP100bTransition = new(ParityU64).SetUint64(n)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetKeccakECIP1041Transition() *uint64 {
+	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Keccak {
+		return nil
+	}
+	return spec.Engine.Keccak.Params.BombDefuseTransition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetKeccakECIP1041Transition(n *uint64) error {
+	spec.Engine.Keccak.Params.BombDefuseTransition = new(ParityU64).SetUint64(n)
+	return nil
+}
+
 func (spec *ParityChainSpec) GetEthashECIP1099Transition() *uint64 {
 	return nil
 }

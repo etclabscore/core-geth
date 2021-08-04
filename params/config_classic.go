@@ -44,7 +44,7 @@ var (
 		EIP155Block:  big.NewInt(3000000),
 		EIP160FBlock: big.NewInt(3000000),
 
-		// EIP158~
+		// EIP158
 		EIP161FBlock: big.NewInt(8772000),
 		EIP170FBlock: big.NewInt(8772000),
 

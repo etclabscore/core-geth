@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -37,11 +36,9 @@ var (
 
 // Config are the configuration parameters of the Keccak.
 type Config struct {
-	PowMode ethash.Mode
+	PowMode Mode
 
 	Log log.Logger `toml:"-"`
-	// ECIP-1099
-	ECIP1099Block *uint64 `toml:"-"`
 }
 
 // Keccak is a consensus engine based on proof-of-work implementing the Keccak hashing algorithm.
@@ -83,7 +80,7 @@ func New(config Config, notify []string, noverify bool) *Keccak {
 // purposes.
 func NewTester(notify []string, noverify bool) *Keccak {
 	Keccak := &Keccak{
-		config:   Config{PowMode: ethash.ModeTest, Log: log.Root()},
+		config:   Config{PowMode: ModeTest, Log: log.Root()},
 		update:   make(chan struct{}),
 		hashrate: metrics.NewMeterForced(),
 	}
@@ -97,45 +94,7 @@ func NewTester(notify []string, noverify bool) *Keccak {
 func NewFaker() *Keccak {
 	return &Keccak{
 		config: Config{
-			PowMode: ethash.ModeFake,
-			Log:     log.Root(),
-		},
-	}
-}
-
-// NewFakeFailer creates a keccak consensus engine with a fake PoW scheme that
-// accepts all blocks as valid apart from the single one specified, though they
-// still have to conform to the Ethereum consensus rules.
-func NewFakeFailer(fail uint64) *Keccak {
-	return &Keccak{
-		config: Config{
-			PowMode: ethash.ModeFake,
-			Log:     log.Root(),
-		},
-		fakeFail: fail,
-	}
-}
-
-// NewFakeDelayer creates a keccak consensus engine with a fake PoW scheme that
-// accepts all blocks as valid, but delays verifications by some time, though
-// they still have to conform to the Ethereum consensus rules.
-func NewFakeDelayer(delay time.Duration) *Keccak {
-	return &Keccak{
-		config: Config{
-			PowMode: ethash.ModeFake,
-			Log:     log.Root(),
-		},
-		fakeDelay: delay,
-	}
-}
-
-// NewPoissonFaker creates a Keccak consensus engine with a fake PoW scheme that
-// accepts all blocks as valid, but delays mining by some time based on miner.threads, though
-// they still have to conform to the Ethereum consensus rules.
-func NewPoissonFaker() *Keccak {
-	return &Keccak{
-		config: Config{
-			PowMode: ethash.ModePoissonFake,
+			PowMode: ModeFake,
 			Log:     log.Root(),
 		},
 	}
@@ -146,7 +105,19 @@ func NewPoissonFaker() *Keccak {
 func NewFullFaker() *Keccak {
 	return &Keccak{
 		config: Config{
-			PowMode: ethash.ModeFullFake,
+			PowMode: ModeFullFake,
+			Log:     log.Root(),
+		},
+	}
+}
+
+// NewPoissonFaker creates a keccak consensus engine with a fake PoW scheme that
+// accepts all blocks as valid, but delays mining by some time based on miner.threads, though
+// they still have to conform to the Ethereum consensus rules.
+func NewPoissonFaker() *Keccak {
+	return &Keccak{
+		config: Config{
+			PowMode: ModePoissonFake,
 			Log:     log.Root(),
 		},
 	}
@@ -198,7 +169,7 @@ func (Keccak *Keccak) SetThreads(threads int) {
 // hashrate of all remote miner.
 func (Keccak *Keccak) Hashrate() float64 {
 	// Short circuit if we are run the Keccak in normal/test mode.
-	if Keccak.config.PowMode != ethash.ModeNormal && Keccak.config.PowMode != ethash.ModeTest {
+	if Keccak.config.PowMode != ModeNormal && Keccak.config.PowMode != ModeTest {
 		return Keccak.hashrate.Rate1()
 	}
 	var res = make(chan uint64, 1)
@@ -230,4 +201,31 @@ func (Keccak *Keccak) APIs(chain consensus.ChainHeaderReader) []rpc.API {
 // dataset.
 func SeedHash(epoch uint64, epochLength uint64) []byte {
 	return seedHash(epoch, epochLength)
+}
+
+// Mode defines the type and amount of PoW verification an ethash engine makes.
+type Mode uint
+
+const (
+	ModeNormal Mode = iota
+	ModeTest
+	ModeFake
+	ModeFullFake
+	ModePoissonFake
+)
+
+func (m Mode) String() string {
+	switch m {
+	case ModeNormal:
+		return "Normal"
+	case ModeTest:
+		return "Test"
+	case ModeFake:
+		return "Fake"
+	case ModeFullFake:
+		return "FullFake"
+	case ModePoissonFake:
+		return "ModePoissonFake"
+	}
+	return "unknown"
 }

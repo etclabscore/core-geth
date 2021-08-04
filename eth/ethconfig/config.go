@@ -240,9 +240,7 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 			return keccak.NewTester(nil, noverify)
 		case ethash.ModeShared:
 		default:
-			engine := keccak.New(keccak.Config{
-				ECIP1099Block: chainConfig.GetEthashECIP1099Transition(),
-			}, notify, noverify)
+			engine := keccak.New(keccak.Config{}, notify, noverify)
 			engine.SetThreads(-1) // Disable CPU mining
 			return engine
 		}

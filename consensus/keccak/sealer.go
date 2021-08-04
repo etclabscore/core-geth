@@ -30,8 +30,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/consensus"
@@ -69,7 +67,7 @@ func (keccak *Keccak) makePoissonFakeDelay() float64 {
 // the block's difficulty requirements.
 func (keccak *Keccak) Seal(chain consensus.ChainHeaderReader, block *types.Block, results chan<- *types.Block, stop <-chan struct{}) error {
 	// If we're running a fake PoW, simply return a 0 nonce immediately
-	if keccak.config.PowMode == ethash.ModeFake || keccak.config.PowMode == ethash.ModeFullFake {
+	if keccak.config.PowMode == ModeFake || keccak.config.PowMode == ModeFullFake {
 		header := block.Header()
 		header.Nonce, header.MixDigest = types.BlockNonce{}, common.Hash{}
 		select {
@@ -78,7 +76,7 @@ func (keccak *Keccak) Seal(chain consensus.ChainHeaderReader, block *types.Block
 			keccak.config.Log.Warn("Sealing result is not read by miner", "mode", "fake", "sealhash", keccak.SealHash(block.Header()))
 		}
 		return nil
-	} else if keccak.config.PowMode == ethash.ModePoissonFake {
+	} else if keccak.config.PowMode == ModePoissonFake {
 		go func(header *types.Header) {
 			// Assign random (but non-zero) values to header nonce and mix.
 			header.Nonce = types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64)))
@@ -383,7 +381,7 @@ func (s *remoteSealer) loop() {
 //   result[3], hex encoded block number
 func (s *remoteSealer) makeWork(block *types.Block) {
 	hash := s.keccak.SealHash(block.Header())
-	epochLength := calcEpochLength(block.NumberU64(), s.keccak.config.ECIP1099Block)
+	epochLength := calcEpochLength(block.NumberU64(), nil)
 	epoch := calcEpoch(block.NumberU64(), epochLength)
 	s.currentWork[0] = hash.Hex()
 	s.currentWork[1] = common.BytesToHash(SeedHash(epoch, epochLength)).Hex()

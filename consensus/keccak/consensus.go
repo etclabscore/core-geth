@@ -24,8 +24,6 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-
 	mapset "github.com/deckarep/golang-set"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -73,7 +71,7 @@ func (keccak *Keccak) Author(header *types.Header) (common.Address, error) {
 // stock Ethereum keccak engine.
 func (keccak *Keccak) VerifyHeader(chain consensus.ChainHeaderReader, header *types.Header, seal bool) error {
 	// If we're running a full engine faking, accept any input as valid
-	if keccak.config.PowMode == ethash.ModeFullFake {
+	if keccak.config.PowMode == ModeFullFake {
 		return nil
 	}
 	// Short circuit if the header is known, or its parent not
@@ -94,7 +92,7 @@ func (keccak *Keccak) VerifyHeader(chain consensus.ChainHeaderReader, header *ty
 // a results channel to retrieve the async verifications.
 func (keccak *Keccak) VerifyHeaders(chain consensus.ChainHeaderReader, headers []*types.Header, seals []bool) (chan<- struct{}, <-chan error) {
 	// If we're running a full engine faking, accept any input as valid
-	if keccak.config.PowMode == ethash.ModeFullFake || len(headers) == 0 {
+	if keccak.config.PowMode == ModeFullFake || len(headers) == 0 {
 		abort, results := make(chan struct{}), make(chan error, len(headers))
 		for i := 0; i < len(headers); i++ {
 			results <- nil
@@ -174,7 +172,7 @@ func (keccak *Keccak) verifyHeaderWorker(chain consensus.ChainHeaderReader, head
 // rules of the stock Ethereum keccak engine.
 func (keccak *Keccak) VerifyUncles(chain consensus.ChainReader, block *types.Block) error {
 	// If we're running a full engine faking, accept any input as valid
-	if keccak.config.PowMode == ethash.ModeFullFake {
+	if keccak.config.PowMode == ModeFullFake {
 		return nil
 	}
 	// Verify that there are at most 2 uncles included in this block
@@ -390,7 +388,7 @@ func (keccak *Keccak) VerifySeal(chain consensus.ChainHeaderReader, header *type
 // to make remote mining fast.
 func (keccak *Keccak) verifySeal(chain consensus.ChainHeaderReader, header *types.Header) error {
 	// If we're running a fake PoW, accept any seal as valid
-	if keccak.config.PowMode == ethash.ModeFake || keccak.config.PowMode == ethash.ModePoissonFake || keccak.config.PowMode == ethash.ModeFullFake {
+	if keccak.config.PowMode == ModeFake {
 		time.Sleep(keccak.fakeDelay)
 		if keccak.fakeFail == header.Number.Uint64() {
 			return errInvalidPoW
@@ -478,10 +476,6 @@ var (
 // The total reward consists of the static block reward and rewards for
 // included uncles. The coinbase of each uncle block is also calculated.
 func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []*types.Header) (*big.Int, []*big.Int) {
-	if config.IsEnabled(config.GetEthashECIP1017Transition, header.Number) {
-		return ecip1017BlockReward(config, header, uncles)
-	}
-
 	blockReward := ctypes.KeccakBlockReward(config, header.Number)
 
 	// Accumulate the rewards for the miner and any included uncles

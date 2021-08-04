@@ -313,7 +313,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	out := new(big.Int)
 
 	// ADJUSTMENT algorithms
-	if config.IsEnabled(config.GetEthashEIP100BTransition, next) {
+	if config.IsEnabled(config.GetKeccakEIP100BTransition, next) {
 		// https://github.com/ethereum/EIPs/issues/100
 		// algorithm:
 		// diff = (parent_diff +
@@ -361,7 +361,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	// after adjustment and before bomb
 	out.Set(math.BigMax(out, vars.MinimumDifficulty))
 
-	if config.IsEnabled(config.GetEthashECIP1041Transition, next) {
+	if config.IsEnabled(config.GetKeccakECIP1041Transition, next) {
 		return out
 	}
 

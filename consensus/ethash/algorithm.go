@@ -174,7 +174,7 @@ func seedHash(epoch uint64, epochLength uint64) []byte {
 // algorithm from Strict Memory Hard Hashing Functions (2014). The output is a
 // set of 524288 64-byte values.
 // This method places the result into dest in machine byte order.
-func generateCache(dest []uint32, epoch uint64, epochLength uint64, uip1Epoch uint64, seed []byte) {
+func generateCache(dest []uint32, epoch uint64, epochLength uint64, uip1Epoch *uint64, seed []byte) {
 	// Print some debug logs to allow analysis on low end devices
 	logger := log.New("epoch", epoch)
 
@@ -218,7 +218,7 @@ func generateCache(dest []uint32, epoch uint64, epochLength uint64, uip1Epoch ui
 	}()
 	// Create a hasher to reuse between invocations
 	keccak512 := makeHasher(sha3.NewLegacyKeccak512())
-	if epoch >= uip1Epoch { // UIP1
+	if uip1Epoch != nil && epoch >= *uip1Epoch { // UIP1
 		h, _ := blake2b.New512(nil)
 		keccak512 = blakeHasher(h) // use blakeHasher instead of makeHasher here.
 	}

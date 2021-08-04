@@ -64,7 +64,7 @@ func GetRewards(config ctypes.ChainConfigurator, header *types.Header, uncles []
 // reward. The coinbase of each uncle block is also rewarded.
 func AccumulateRewards(config ctypes.ChainConfigurator, state *state.StateDB, header *types.Header, uncles []*types.Header) {
 	ethashConfig := config.GetEthashConfig()
-	if ethashConfig.UIP0FBlock != nil && header.Number.Cmp(ethashConfig.UIP0FBlock) >= 0 {
+	if ethashConfig != nil && ethashConfig.UIP0FBlock != nil && header.Number.Cmp(ethashConfig.UIP0FBlock) >= 0 {
 		accumulateUbiqRewards(config, state, header, uncles)
 	} else {
 		minerReward, uncleRewards := GetRewards(config, header, uncles)

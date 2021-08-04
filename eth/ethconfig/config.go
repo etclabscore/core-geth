@@ -246,11 +246,9 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 	default:
 		ethashConfig := chainConfig.GetEthashConfig()
 		var uip1Epoch uint64 = math.MaxUint64
-		if ethashConfig.UIP1FEpoch != nil {
+		if ethashConfig != nil && ethashConfig.UIP1FEpoch != nil {
 			uip1Epoch = ethashConfig.UIP1FEpoch.Uint64()
 		}
-
-		log.Warn("uip1:", "Epoch", uip1Epoch)
 
 		engine := ethash.New(ethash.Config{
 			PowMode:          config.PowMode,

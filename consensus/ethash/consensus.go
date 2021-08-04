@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/mutations"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
@@ -246,7 +247,7 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 		return errOlderBlockTime
 	}
 	// Verify the block's difficulty based on its timestamp and parent's difficulty
-	expected := ethash.CalcDifficulty(chain, header.Time, parent)
+	expected := ethash.CalcDifficultyCHR(chain, header.Time, parent)
 
 	if expected.Cmp(header.Difficulty) != 0 {
 		return fmt.Errorf("invalid difficulty: have %v, want %v", header.Difficulty, expected)
@@ -291,11 +292,18 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 	return nil
 }
 
+// CalcDifficultyCHR is the difficulty adjustment algorithm. It returns
+// the difficulty that a new block should have when created at time
+// given the parent block's time and difficulty.
+func (ethash *Ethash) CalcDifficultyCHR(chain consensus.ChainHeaderReader, time uint64, parent *types.Header) *big.Int {
+	return CalcDifficultyCHR(chain, time, parent)
+}
+
 // CalcDifficulty is the difficulty adjustment algorithm. It returns
 // the difficulty that a new block should have when created at time
 // given the parent block's time and difficulty.
 func (ethash *Ethash) CalcDifficulty(chain consensus.ChainHeaderReader, time uint64, parent *types.Header) *big.Int {
-	return CalcDifficulty(chain, time, parent)
+	return CalcDifficultyCHR(chain, time, parent)
 }
 
 // parent_time_delta is a convenience fn for CalcDifficulty
@@ -308,18 +316,24 @@ func parent_diff_over_dbd(p *types.Header) *big.Int {
 	return new(big.Int).Div(p.Difficulty, vars.DifficultyBoundDivisor)
 }
 
-// CalcDifficulty is the difficulty adjustment algorithm. It returns
-// the difficulty that a new block should have when created at time
-// given the parent block's time and difficulty.
-func CalcDifficulty(chain consensus.ChainHeaderReader, time uint64, parent *types.Header) *big.Int {
-	next := new(big.Int).Add(parent.Number, big1)
-	out := new(big.Int)
+// CalcDifficultyCHR is a wrapper function for CalcDifficulty
+func CalcDifficultyCHR(chain consensus.ChainHeaderReader, time uint64, parent *types.Header) *big.Int {
 	config := chain.Config()
 	ethashConfig := config.GetEthashConfig()
 
-	if ethashConfig.FluxFBlock != nil {
+	if ethashConfig != nil && ethashConfig.FluxFBlock != nil {
 		return calcDifficultyUbiq(chain, time, parent)
 	}
+
+	return CalcDifficulty(config, time, parent)
+}
+
+// CalcDifficulty is the difficulty adjustment algorithm. It returns
+// the difficulty that a new block should have when created at time
+// given the parent block's time and difficulty.
+func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.Header) *big.Int {
+	next := new(big.Int).Add(parent.Number, big1)
+	out := new(big.Int)
 
 	if config.IsEnabled(config.GetCatalystTransition, next) {
 		return big.NewInt(1)
@@ -547,7 +561,7 @@ func (ethash *Ethash) Prepare(chain consensus.ChainHeaderReader, header *types.H
 	if parent == nil {
 		return consensus.ErrUnknownAncestor
 	}
-	header.Difficulty = ethash.CalcDifficulty(chain, header.Time, parent)
+	header.Difficulty = ethash.CalcDifficultyCHR(chain, header.Time, parent)
 	return nil
 }
 

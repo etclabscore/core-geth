@@ -50,7 +50,7 @@ func TestCachesGet(t *testing.T) {
 		maxUint64         uint64 = math.MaxUint64
 	)
 	// test without ecip-1099 enabled
-	currentIA, futureIA := ethashA.caches.get(epoch, epochLengthDefault, &maxUint64)
+	currentIA, futureIA := ethashA.caches.get(epoch, epochLengthDefault, &maxUint64, &maxUint64)
 	currentA := currentIA.(*cache)
 	if currentA.epoch != epoch {
 		t.Errorf("cache: current epoch mismatch: have %d, want %d", currentA.epoch, epoch)
@@ -60,7 +60,7 @@ func TestCachesGet(t *testing.T) {
 		t.Errorf("cache: future epoch mismatch: have %d, want %d", futureA.epoch, nextEpochDefault)
 	}
 	// test activation boundary of ecip-1099
-	currentIB, futureIB := ethashB.caches.get(epoch, epochLengthDefault, &ecip1099Block)
+	currentIB, futureIB := ethashB.caches.get(epoch, epochLengthDefault, &ecip1099Block, &maxUint64)
 	currentB := currentIB.(*cache)
 	if currentB.epoch != epoch {
 		t.Errorf("cache: current epoch mismatch: have %d, want %d", currentB.epoch, epoch)
@@ -70,7 +70,7 @@ func TestCachesGet(t *testing.T) {
 		t.Errorf("cache: future epoch mismatch: have %d, want %d", futureB.epoch, nextEpochECIP1099)
 	}
 	// test post ecip-1099 activation
-	currentIC, futureIC := ethashC.caches.get(nextEpochECIP1099, epochLengthECIP1099, &ecip1099Block)
+	currentIC, futureIC := ethashC.caches.get(nextEpochECIP1099, epochLengthECIP1099, &ecip1099Block, &maxUint64)
 	currentC := currentIC.(*cache)
 	if currentC.epoch != nextEpochECIP1099 {
 		t.Errorf("cache: current epoch mismatch: have %d, want %d", currentC.epoch, nextEpochECIP1099)

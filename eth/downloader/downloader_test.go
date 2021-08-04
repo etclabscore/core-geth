@@ -65,7 +65,8 @@ type downloadTester struct {
 	ancientReceipts map[common.Hash]types.Receipts // Ancient receipts belonging to the tester
 	ancientChainTd  map[common.Hash]*big.Int       // Ancient total difficulties of the blocks in the local chain
 
-	lock sync.RWMutex
+	lock      sync.RWMutex
+	networkId uint64
 }
 
 // newTester creates a new downloader test mocker.
@@ -85,11 +86,12 @@ func newTester() *downloadTester {
 		ancientBlocks:   map[common.Hash]*types.Block{testGenesis.Hash(): testGenesis},
 		ancientReceipts: map[common.Hash]types.Receipts{testGenesis.Hash(): nil},
 		ancientChainTd:  map[common.Hash]*big.Int{testGenesis.Hash(): testGenesis.Difficulty()},
+		networkId:       1,
 	}
 	tester.stateDb = rawdb.NewMemoryDatabase()
 	tester.stateDb.Put(testGenesis.Root().Bytes(), []byte{0x00})
 
-	tester.downloader = New(0, tester.stateDb, trie.NewSyncBloom(1, tester.stateDb), new(event.TypeMux), tester, nil, tester.dropPeer)
+	tester.downloader = New(0, tester.stateDb, trie.NewSyncBloom(1, tester.stateDb), new(event.TypeMux), tester, nil, tester.dropPeer, &tester.networkId)
 	return tester
 }
 

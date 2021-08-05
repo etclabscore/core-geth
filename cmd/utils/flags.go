@@ -2073,7 +2073,12 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 	} else if config.GetConsensusEngineType().IsLyra2() {
 		engine = lyra2.New(nil, false)
 	} else if config.GetConsensusEngineType().IsKeccak() {
-		engine = keccak.New(keccak.Config{ /* TODO */ }, nil, false)
+		engine = keccak.NewFaker()
+		if ctx.GlobalBool(FakePoWPoissonFlag.Name) {
+			engine = keccak.NewPoissonFaker()
+		} else if !ctx.GlobalBool(FakePoWFlag.Name) {
+			engine = keccak.New(keccak.Config{}, nil, false)
+		}
 	} else {
 		engine = ethash.NewFaker()
 		if ctx.GlobalBool(FakePoWPoissonFlag.Name) {

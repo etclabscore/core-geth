@@ -26,7 +26,7 @@ import (
 
 var errKeccakStopped = errors.New("keccak stopped")
 
-// API exposes ethash related methods for the RPC interface.
+// API exposes keccak related methods for the RPC interface.
 type API struct {
 	keccak *Keccak
 }

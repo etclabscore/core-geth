@@ -48,18 +48,18 @@ func TestRemoteNotify(t *testing.T) {
 	}))
 	defer server.Close()
 
-	// Create the custom ethash engine.
-	ethash := NewTester([]string{server.URL}, false)
-	defer ethash.Close()
+	// Create the custom keccak engine.
+	keccak := NewTester([]string{server.URL}, false)
+	defer keccak.Close()
 
 	// Stream a work task and ensure the notification bubbles out.
 	header := &types.Header{Number: big.NewInt(1), Difficulty: big.NewInt(100)}
 	block := types.NewBlockWithHeader(header)
 
-	ethash.Seal(nil, block, nil, nil)
+	keccak.Seal(nil, block, nil, nil)
 	select {
 	case work := <-sink:
-		if want := ethash.SealHash(header).Hex(); work[0] != want {
+		if want := keccak.SealHash(header).Hex(); work[0] != want {
 			t.Errorf("work packet hash mismatch: have %s, want %s", work[0], want)
 		}
 		epoch := calcEpoch(header.Number.Uint64(), epochLengthDefault)
@@ -93,10 +93,10 @@ func TestRemoteMultiNotify(t *testing.T) {
 	}))
 	defer server.Close()
 
-	// Create the custom ethash engine.
-	ethash := NewTester([]string{server.URL}, false)
-	ethash.config.Log = testlog.Logger(t, log.LvlWarn)
-	defer ethash.Close()
+	// Create the custom keccak engine.
+	keccak := NewTester([]string{server.URL}, false)
+	keccak.config.Log = testlog.Logger(t, log.LvlWarn)
+	defer keccak.Close()
 
 	// Provide a results reader.
 	// Otherwise the unread results will be logged asynchronously
@@ -107,7 +107,7 @@ func TestRemoteMultiNotify(t *testing.T) {
 	for i := 0; i < cap(sink); i++ {
 		header := &types.Header{Number: big.NewInt(int64(i)), Difficulty: big.NewInt(100)}
 		block := types.NewBlockWithHeader(header)
-		ethash.Seal(nil, block, results, nil)
+		keccak.Seal(nil, block, results, nil)
 	}
 
 	for i := 0; i < cap(sink); i++ {
@@ -122,9 +122,9 @@ func TestRemoteMultiNotify(t *testing.T) {
 
 // Tests whether stale solutions are correctly processed.
 func TestStaleSubmission(t *testing.T) {
-	ethash := NewTester(nil, true)
-	defer ethash.Close()
-	api := &API{ethash}
+	keccak := NewTester(nil, true)
+	defer keccak.Close()
+	api := &API{keccak}
 
 	fakeNonce, fakeDigest := types.BlockNonce{0x01, 0x02, 0x03}, common.HexToHash("deadbeef")
 
@@ -173,9 +173,9 @@ func TestStaleSubmission(t *testing.T) {
 
 	for id, c := range testcases {
 		for _, h := range c.headers {
-			ethash.Seal(nil, types.NewBlockWithHeader(h), results, nil)
+			keccak.Seal(nil, types.NewBlockWithHeader(h), results, nil)
 		}
-		if res := api.SubmitWork(fakeNonce, ethash.SealHash(c.headers[c.submitIndex]), fakeDigest); res != c.submitRes {
+		if res := api.SubmitWork(fakeNonce, keccak.SealHash(c.headers[c.submitIndex]), fakeDigest); res != c.submitRes {
 			t.Errorf("case %d submit result mismatch, want %t, get %t", id+1, c.submitRes, res)
 		}
 		if !c.submitRes {
@@ -199,7 +199,7 @@ func TestStaleSubmission(t *testing.T) {
 				t.Errorf("case %d block parent hash mismatch, want %s, get %s", id+1, c.headers[c.submitIndex].ParentHash.Hex(), res.Header().ParentHash.Hex())
 			}
 		case <-time.NewTimer(time.Second).C:
-			t.Errorf("case %d fetch ethash result timeout", id+1)
+			t.Errorf("case %d fetch keccak result timeout", id+1)
 		}
 	}
 }

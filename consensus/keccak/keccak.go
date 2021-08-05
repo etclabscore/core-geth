@@ -203,7 +203,7 @@ func SeedHash(epoch uint64, epochLength uint64) []byte {
 	return seedHash(epoch, epochLength)
 }
 
-// Mode defines the type and amount of PoW verification an ethash engine makes.
+// Mode defines the type and amount of PoW verification a keccak engine makes.
 type Mode uint
 
 const (

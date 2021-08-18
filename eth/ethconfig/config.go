@@ -235,9 +235,6 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 		case ethash.ModePoissonFake:
 			log.Warn("Ethash used in fake Poisson mode")
 			return keccak.NewPoissonFaker()
-		case ethash.ModeTest:
-			log.Warn("Ethash used in test mode")
-			return keccak.NewTester(nil, noverify)
 		case ethash.ModeShared:
 		default:
 			engine := keccak.New(keccak.Config{}, notify, noverify)

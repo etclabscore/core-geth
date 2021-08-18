@@ -80,7 +80,7 @@ func New(config Config, notify []string, noverify bool) *Keccak {
 // purposes.
 func NewTester(notify []string, noverify bool) *Keccak {
 	Keccak := &Keccak{
-		config:   Config{PowMode: ModeTest, Log: log.Root()},
+		config:   Config{PowMode: ModeNormal, Log: log.Root()},
 		update:   make(chan struct{}),
 		hashrate: metrics.NewMeterForced(),
 	}
@@ -168,8 +168,8 @@ func (Keccak *Keccak) SetThreads(threads int) {
 // Note the returned hashrate includes local hashrate, but also includes the total
 // hashrate of all remote miner.
 func (Keccak *Keccak) Hashrate() float64 {
-	// Short circuit if we are run the Keccak in normal/test mode.
-	if Keccak.config.PowMode != ModeNormal && Keccak.config.PowMode != ModeTest {
+	// Short circuit if we are run the Keccak in normal mode.
+	if Keccak.config.PowMode != ModeNormal {
 		return Keccak.hashrate.Rate1()
 	}
 	var res = make(chan uint64, 1)
@@ -208,7 +208,6 @@ type Mode uint
 
 const (
 	ModeNormal Mode = iota
-	ModeTest
 	ModeFake
 	ModeFullFake
 	ModePoissonFake
@@ -218,8 +217,6 @@ func (m Mode) String() string {
 	switch m {
 	case ModeNormal:
 		return "Normal"
-	case ModeTest:
-		return "Test"
 	case ModeFake:
 		return "Fake"
 	case ModeFullFake:

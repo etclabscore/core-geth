@@ -62,14 +62,6 @@ func TestRemoteNotify(t *testing.T) {
 		if want := keccak.SealHash(header).Hex(); work[0] != want {
 			t.Errorf("work packet hash mismatch: have %s, want %s", work[0], want)
 		}
-		epoch := calcEpoch(header.Number.Uint64(), epochLengthDefault)
-		if want := common.BytesToHash(SeedHash(epoch, epochLengthDefault)).Hex(); work[1] != want {
-			t.Errorf("work packet seed mismatch: have %s, want %s", work[1], want)
-		}
-		target := new(big.Int).Div(new(big.Int).Lsh(big.NewInt(1), 256), header.Difficulty)
-		if want := common.BytesToHash(target.Bytes()).Hex(); work[2] != want {
-			t.Errorf("work packet target mismatch: have %s, want %s", work[2], want)
-		}
 	case <-time.After(3 * time.Second):
 		t.Fatalf("notification timed out")
 	}

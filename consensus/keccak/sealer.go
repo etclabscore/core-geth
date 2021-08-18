@@ -376,15 +376,15 @@ func (s *remoteSealer) loop() {
 //
 // The work package consists of 3 strings:
 //   result[0], 32 bytes hex encoded current block header pow-hash
-//   result[1], 32 bytes hex encoded seed hash used for DAG
+//   result[1], 32 bytes hex encoded seed hash used for DAG on ethash
 //   result[2], 32 bytes hex encoded boundary condition ("target"), 2^256/difficulty
 //   result[3], hex encoded block number
+//
+// TODO: examine if removal of result[1] is much work (if any) for external miner software or if a spec for it
 func (s *remoteSealer) makeWork(block *types.Block) {
 	hash := s.keccak.SealHash(block.Header())
-	epochLength := calcEpochLength(block.NumberU64(), nil)
-	epoch := calcEpoch(block.NumberU64(), epochLength)
 	s.currentWork[0] = hash.Hex()
-	s.currentWork[1] = common.BytesToHash(SeedHash(epoch, epochLength)).Hex()
+	s.currentWork[1] = common.Hash{}.Hex()
 	s.currentWork[2] = common.BytesToHash(new(big.Int).Div(two256, block.Difficulty()).Bytes()).Hex()
 	s.currentWork[3] = hexutil.EncodeBig(block.Number())
 

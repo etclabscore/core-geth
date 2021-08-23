@@ -93,8 +93,8 @@ var (
 	minutesFlag = flag.Int("faucet.minutes", 1440, "Number of minutes to wait between funding rounds")
 	tiersFlag   = flag.Int("faucet.tiers", 3, "Number of funding tiers to enable (x3 time, x2.5 funds)")
 
-	accJSONFlag = flag.String("account.json", "", "Key json file to fund user requests with")
-	accPassFlag = flag.String("account.pass", "", "Decryption password to access faucet funds")
+	accJSONFlag = flag.String("account.json", "", "[Required] Path to key json file to fund user requests with")
+	accPassFlag = flag.String("account.pass", "", "[Required] Path to plaintext file containing decryption password to access faucet funds")
 
 	captchaToken  = flag.String("captcha.token", "", "Recaptcha site key to authenticate client side")
 	captchaSecret = flag.String("captcha.secret", "", "Recaptcha secret key to authenticate server side")
@@ -281,6 +281,13 @@ func auditFlagUse() {
 		if !ok {
 			log.Crit("invalid value for -syncmode", "value", *syncmodeFlag, "allowed", allowedModes)
 		}
+	}
+
+	if *accJSONFlag == "" {
+		log.Crit("missing required flag for path to account JSON file: --account.json")
+	}
+	if *accPassFlag == "" {
+		log.Crit("missing required flag for path to plaintext file containing account password: --account.pass")
 	}
 }
 

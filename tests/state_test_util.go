@@ -93,11 +93,17 @@ type stPostState struct {
 	Logs            common.UnprefixedHash `json:"logs"`
 	TxBytes         hexutil.Bytes         `json:"txbytes"`
 	ExpectException string                `json:"expectException"`
-	Indexes         struct {
-		Data  int `json:"data"`
-		Gas   int `json:"gas"`
-		Value int `json:"value"`
-	}
+	Indexes         stPostStateIndexes    `json:"indexes"`
+
+	// filled can be set to true when the subtest has been written,
+	// which can be helpful to distiguish unfilled tests from potentially filled zero-value tests.
+	filled bool
+}
+
+type stPostStateIndexes struct {
+	Data  int `json:"data"`
+	Gas   int `json:"gas"`
+	Value int `json:"value"`
 }
 
 //go:generate gencodec -type stEnv -field-override stEnvMarshaling -out gen_stenv.go

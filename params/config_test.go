@@ -407,10 +407,6 @@ func TestGenesisHashes(t *testing.T) {
 			genesis: DefaultGoerliGenesisBlock(),
 			hash:    GoerliGenesisHash,
 		},
-		{
-			genesis: DefaultYoloV3GenesisBlock(),
-			hash:    YoloV3GenesisHash,
-		},
 	}
 	for i, c := range cases {
 		b := genesisToBlock(c.genesis, rawdb.NewMemoryDatabase())

@@ -196,6 +196,7 @@ type CoreGethChainConfig struct {
 
 	EIP1559FBlock *big.Int `json:"eip1559FBlock,omitempty"`
 	EIP3541FBlock *big.Int `json:"eip3541FBlock,omitempty"`
+	EIP3529FBlock *big.Int `json:"eip3529FBlock,omitempty"`
 
 	DisposalBlock *big.Int `json:"disposalBlock,omitempty"` // Bomb disposal HF block
 

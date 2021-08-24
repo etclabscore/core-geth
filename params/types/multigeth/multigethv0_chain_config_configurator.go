@@ -504,6 +504,15 @@ func (c *ChainConfig) SetEIP3541Transition(n *uint64) error {
 	return nil
 }
 
+func (c *ChainConfig) GetEIP3529Transition() *uint64 {
+	return bigNewU64Min(c.LondonBlock, c.LondonBlock)
+}
+
+func (c *ChainConfig) SetEIP3529Transition(n *uint64) error {
+	c.LondonBlock = setBig(c.LondonBlock, n)
+	return nil
+}
+
 func (c *ChainConfig) GetEIP2565Transition() *uint64 {
 	return bigNewU64(c.BerlinBlock)
 }

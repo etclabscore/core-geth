@@ -1058,6 +1058,15 @@ func (spec *ParityChainSpec) SetEIP3541Transition(n *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetEIP3529Transition() *uint64 {
+	return spec.Params.EIP3529Transition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP3529Transition(n *uint64) error {
+	spec.Params.EIP3529Transition = new(ParityU64).SetUint64(n)
+	return nil
+}
+
 func (spec *ParityChainSpec) GetEIP2565Transition() *uint64 {
 	return spec.Params.EIP2565Transition.Uint64P()
 }

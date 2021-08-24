@@ -85,7 +85,7 @@ func TestTxPool(t *testing.T) {
 	var (
 		sdb     = rawdb.NewMemoryDatabase()
 		ldb     = rawdb.NewMemoryDatabase()
-		gspec   = genesisT.Genesis{Alloc: genesisT.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}, BaseFee: big.NewInt(params.InitialBaseFee)}
+		gspec   = genesisT.Genesis{Alloc: genesisT.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}, BaseFee: big.NewInt(vars.InitialBaseFee)}
 		genesis = core.MustCommitGenesis(sdb, &gspec)
 	)
 	core.MustCommitGenesis(ldb, &gspec)

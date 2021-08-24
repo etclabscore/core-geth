@@ -830,13 +830,13 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, bloc
 	}
 
 	traceConfig := getTraceConfigFromTraceCallConfig(config)
-	return api.traceTx(ctx, msg, new(txTraceContext), vmctx, statedb, taskExtraContext, traceConfig)
+	return api.traceTx(ctx, msg, new(Context), vmctx, statedb, taskExtraContext, traceConfig)
 }
 
 // TraceCallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
-func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
+func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
 	// Try to retrieve the specified block
 	var (
 		err   error
@@ -873,7 +873,7 @@ func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.CallArgs, blockN
 	var results = make([]interface{}, len(txs))
 	for idx, args := range txs {
 		// Execute the trace
-		msg := args.ToMessage(api.backend.RPCGasCap())
+		msg, err := args.ToMessage(api.backend.RPCGasCap(), block.BaseFee())
 		vmctx := core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
 
 		originalCanTransfer := vmctx.CanTransfer
@@ -981,13 +981,13 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 			extraContext = map[string]interface{}{}
 		}
 
-		if txctx.hash != (common.Hash{}) {
-			extraContext["transactionHash"] = txctx.hash.Hex()
+		if txctx.TxHash != (common.Hash{}) {
+			extraContext["transactionHash"] = txctx.TxHash.Hex()
 		}
-		if txctx.block != (common.Hash{}) {
-			extraContext["blockHash"] = txctx.block.Hex()
+		if txctx.BlockHash != (common.Hash{}) {
+			extraContext["blockHash"] = txctx.BlockHash.Hex()
 		}
-		extraContext["transactionPosition"] = uint64(txctx.index)
+		extraContext["transactionPosition"] = uint64(txctx.TxIndex)
 
 		// Add useful context for all tracers
 		extraContext["from"] = message.From()

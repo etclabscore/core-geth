@@ -324,7 +324,7 @@ type Tracer struct {
 	activePrecompiles []common.Address // Updated on CaptureStart based on given rules
 
 	supportsStepPerfOptimisations bool  // Checks wether tracer supports `getCallstackLength` method in order to achieve optimal performance for call_tracer*
-	andleNextOpCode               bool  // Flag for step prechecker, instructing that next VM opcode has to be proccessed in `step` method
+	handleNextOpCode              bool  // Flag for step prechecker, instructing that next VM opcode has to be proccessed in `step` method
 	callTracerCallstackLength     *uint // Holds the current callstack length for call tracers, which can be compared with VM depth
 }
 
@@ -615,7 +615,7 @@ func (jst *Tracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {
 
 	if jst.vm.GetPropString(jst.tracerObject, "init") {
 		jst.addCtxIntoState()
-		_, err := jst.call("init", "ctx", "db")
+		_, err := jst.call(true, "init", "ctx", "db")
 		if err != nil {
 			jst.err = wrapError("init", err)
 			return
@@ -639,9 +639,15 @@ func (jst *Tracer) CaptureStart(env *vm.EVM, from common.Address, to common.Addr
 	// Initialize the context
 	jst.ctx["block"] = env.Context.BlockNumber.Uint64()
 	jst.dbWrapper.db = env.StateDB
+
 	// Update list of precompiles based on current block
-	rules := env.ChainConfig().Rules(env.Context.BlockNumber)
-	jst.activePrecompiles = vm.ActivePrecompiles(rules)
+	// Retrieve the precompiles since they don't need to be added to the access list
+	precompileMap := vm.PrecompiledContractsForConfig(env.ChainConfig(), env.Context.BlockNumber)
+	precompiles := make([]common.Address, len(precompileMap))
+	for k := range precompileMap {
+		precompiles = append(precompiles, k)
+	}
+	jst.activePrecompiles = precompiles
 
 	// Compute intrinsic gas
 	hasEIP2 := env.ChainConfig().IsEnabled(env.ChainConfig().GetEIP2Transition, env.Context.BlockNumber)

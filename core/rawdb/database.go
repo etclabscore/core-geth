@@ -208,7 +208,11 @@ Please set --ancient.rpc to the correct path, and/or review the remote freezer's
 	}
 	// Freezer is consistent with the key-value database, permit combining the two
 	if !frdb.readonly {
-		go freezeRemote(db, frdb, frdb.threshold, frdb.quit, frdb.trigger)
+		frdb.wg.Add(1)
+		go func() {
+			freezeRemote(db, frdb, frdb.threshold, frdb.quit, frdb.trigger)
+			frdb.wg.Done()
+		}()
 	}
 	return &freezerdb{
 		KeyValueStore: db,
@@ -280,7 +284,7 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 	if !frdb.readonly {
 		frdb.wg.Add(1)
 		go func() {
-			go frdb.freeze(db)
+			frdb.freeze(db)
 			frdb.wg.Done()
 		}()
 	}

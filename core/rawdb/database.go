@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"sync/atomic"
 	"time"
 
@@ -279,7 +280,7 @@ func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace
 	if !frdb.readonly {
 		frdb.wg.Add(1)
 		go func() {
-			go freezeRemote(db, frdb, frdb.threshold, frdb.quit, frdb.trigger)
+			go frdb.freeze(db)
 			frdb.wg.Done()
 		}()
 	}

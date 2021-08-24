@@ -454,17 +454,21 @@ func (c *ChainConfig) SetECBP1100Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
+// GetEIP2315Transition implements EIP2537.
+// This logic is written but not configured for any Ethereum-supported networks, yet.
 func (c *ChainConfig) GetEIP2315Transition() *uint64 {
-	return bigNewU64(c.YoloV3Block)
+	return nil
 }
 
 func (c *ChainConfig) SetEIP2315Transition(n *uint64) error {
-	c.YoloV3Block = setBig(c.YoloV3Block, n)
+	if n != nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
 	return nil
 }
 
 func (c *ChainConfig) GetEIP2929Transition() *uint64 {
-	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+	return bigNewU64(c.BerlinBlock)
 }
 
 // FIXME: Assigning BerlinBlock foregoes setting YoloV3.
@@ -474,7 +478,7 @@ func (c *ChainConfig) SetEIP2929Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2930Transition() *uint64 {
-	return bigNewU64Min(c.BerlinBlock, c.BerlinBlock)
+	return bigNewU64(c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2930Transition(n *uint64) error {
@@ -483,7 +487,7 @@ func (c *ChainConfig) SetEIP2930Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP1559Transition() *uint64 {
-	return bigNewU64Min(c.LondonBlock, c.LondonBlock)
+	return bigNewU64(c.LondonBlock)
 }
 
 func (c *ChainConfig) SetEIP1559Transition(n *uint64) error {
@@ -492,7 +496,7 @@ func (c *ChainConfig) SetEIP1559Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2565Transition() *uint64 {
-	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+	return bigNewU64(c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2565Transition(n *uint64) error {
@@ -501,7 +505,7 @@ func (c *ChainConfig) SetEIP2565Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2718Transition() *uint64 {
-	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+	return bigNewU64(c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2718Transition(n *uint64) error {

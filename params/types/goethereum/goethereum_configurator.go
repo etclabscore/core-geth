@@ -443,7 +443,7 @@ func (c *ChainConfig) SetEIP2315Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2929Transition() *uint64 {
-	return bigNewU64Min(c.BerlinBlock, c.BerlinBlock)
+	return bigNewU64(c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2929Transition(n *uint64) error {

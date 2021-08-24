@@ -91,7 +91,7 @@ var (
 	CodePrefix            = []byte("c") // CodePrefix + code hash -> account code
 
 	preimagePrefix = []byte("secure-key-")      // preimagePrefix + hash -> preimage
-	ConfigPrefix   = []byte("ethereum-config-") // config prefix for the db
+	configPrefix   = []byte("ethereum-config-") // config prefix for the db
 
 	// Chain index prefixes (use `i` + single byte to avoid mixing data types).
 	BloomBitsIndexPrefix = []byte("iB") // BloomBitsIndexPrefix is the data table of a chain indexer to track its progress
@@ -257,7 +257,7 @@ func IsCodeKey(key []byte) (bool, []byte) {
 	return false, nil
 }
 
-// ConfigKey = ConfigPrefix + hash
+// ConfigKey = configPrefix + hash
 func ConfigKey(hash common.Hash) []byte {
-	return append(ConfigPrefix, hash.Bytes()...)
+	return append(configPrefix, hash.Bytes()...)
 }

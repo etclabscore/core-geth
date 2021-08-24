@@ -22,6 +22,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/ethereum/evmc/v7/bindings/go/evmc"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -149,33 +150,27 @@ type EVM struct {
 // only ever be used *once*.
 func NewEVM(blockCtx BlockContext, txCtx TxContext, statedb StateDB, chainConfig ctypes.ChainConfigurator, config Config) *EVM {
 	evm := &EVM{
-		Context:      blockCtx,
-		TxContext:    txCtx,
-		StateDB:      statedb,
-		Config:       config,
-		chainConfig:  chainConfig,
-		interpreters: make([]Interpreter, 0, 1),
+		Context:     blockCtx,
+		TxContext:   txCtx,
+		StateDB:     statedb,
+		Config:      config,
+		chainConfig: chainConfig,
+		// The list of interpreters, space reserved for both EVM and EWASM ones.
+		interpreters: make([]Interpreter, 0, 2),
 	}
 
-	if chainConfig.IsEWASM(blockCtx.BlockNumber) {
-		// to be implemented by EVM-C and Wagon PRs.
-		// if vmConfig.EWASMInterpreter != "" {
-		//  extIntOpts := strings.Split(vmConfig.EWASMInterpreter, ":")
-		//  path := extIntOpts[0]
-		//  options := []string{}
-		//  if len(extIntOpts) > 1 {
-		//    options = extIntOpts[1..]
-		//  }
-		//  evm.interpreters = append(evm.interpreters, NewEVMVCInterpreter(evm, vmConfig, options))
-		// } else {
-		// 	evm.interpreters = append(evm.interpreters, NewEWASMInterpreter(evm, vmConfig))
-		// }
-		panic("No supported ewasm interpreter yet.")
+	// In some implementations, EWASM may be configured with a block number.
+	// In this implementation, the interpreter is configured globally instead.
+	if config.EWASMInterpreter != "" {
+		evm.interpreters = append(evm.interpreters, &EVMC{ewasmModule, evm, evmc.CapabilityEWASM, false})
 	}
 
-	// vmConfig.EVMInterpreter will be used by EVM-C, it won't be checked here
-	// as we always want to have the built-in EVM as the failover option.
-	evm.interpreters = append(evm.interpreters, NewEVMInterpreter(evm, config))
+	if config.EVMInterpreter != "" {
+		evm.interpreters = append(evm.interpreters, &EVMC{evmModule, evm, evmc.CapabilityEVM1, false})
+	} else {
+		evm.interpreters = append(evm.interpreters, NewEVMInterpreter(evm, config))
+	}
+
 	evm.interpreter = evm.interpreters[0]
 
 	return evm

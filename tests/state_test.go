@@ -102,7 +102,7 @@ func TestState(t *testing.T) {
 							// Ignore expected errors (TODO MariusVanDerWijden check error string)
 							return nil
 						}
-						return st.checkFailure(t, name+"/trie", err)
+						return st.checkFailure(t, err)
 					})
 				})
 				t.Run(key+"/snap", func(t *testing.T) {
@@ -120,7 +120,7 @@ func TestState(t *testing.T) {
 						if err != nil && *testEWASM != "" {
 							err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
 						}
-						return st.checkFailure(t, name+"/snap", err)
+						return st.checkFailure(t, err)
 					})
 				})
 			}

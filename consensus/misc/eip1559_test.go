@@ -46,6 +46,7 @@ func copyConfig(original *goethereum.ChainConfig) *goethereum.ChainConfig {
 		MuirGlacierBlock:    original.MuirGlacierBlock,
 		BerlinBlock:         original.BerlinBlock,
 		LondonBlock:         original.LondonBlock,
+		EWASMBlock:          original.EWASMBlock,
 		CatalystBlock:       original.CatalystBlock,
 		Ethash:              original.Ethash,
 		Clique:              original.Clique,

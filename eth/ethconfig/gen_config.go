@@ -100,6 +100,8 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.GPO = c.GPO
 	enc.EnablePreimageRecording = c.EnablePreimageRecording
 	enc.DocRoot = c.DocRoot
+	enc.EWASMInterpreter = c.EWASMInterpreter
+	enc.EVMInterpreter = c.EVMInterpreter
 	enc.RPCGasCap = c.RPCGasCap
 	enc.RPCTxFeeCap = c.RPCTxFeeCap
 	enc.Checkpoint = c.Checkpoint
@@ -266,6 +268,12 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	}
 	if dec.DocRoot != nil {
 		c.DocRoot = *dec.DocRoot
+	}
+	if dec.EWASMInterpreter != nil {
+		c.EWASMInterpreter = *dec.EWASMInterpreter
+	}
+	if dec.EVMInterpreter != nil {
+		c.EVMInterpreter = *dec.EVMInterpreter
 	}
 	if dec.RPCGasCap != nil {
 		c.RPCGasCap = *dec.RPCGasCap

@@ -805,6 +805,16 @@ var (
 		Usage: "Comma-separated InfluxDB tags (key/values) attached to all measurements",
 		Value: metrics.DefaultConfig.InfluxDBTags,
 	}
+	EWASMInterpreterFlag = cli.StringFlag{
+		Name:  "vm.ewasm",
+		Usage: "External ewasm configuration (default = built-in interpreter)",
+		Value: "",
+	}
+	EVMInterpreterFlag = cli.StringFlag{
+		Name:  "vm.evm",
+		Usage: "External EVM configuration (default = built-in interpreter)",
+		Value: "",
+	}
 	ECBP1100Flag = cli.Uint64Flag{
 		Name:  "ecbp1100",
 		Usage: "Configure ECBP-1100 (MESS) block activation number",
@@ -814,6 +824,7 @@ var (
 		Name:  "ecbp1100.nodisable",
 		Usage: "Short-circuit ECBP-1100 (MESS) disable mechanisms; (yields a permanent-once-activated state, deactivating auto-shutoff mechanisms)",
 	}
+
 	CatalystFlag = cli.BoolFlag{
 		Name:  "catalyst",
 		Usage: "Catalyst mode (eth2 integration testing)",
@@ -1705,6 +1716,13 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		cfg.EnablePreimageRecording = ctx.GlobalBool(VMEnableDebugFlag.Name)
 	}
 
+	if ctx.GlobalIsSet(EWASMInterpreterFlag.Name) {
+		cfg.EWASMInterpreter = ctx.GlobalString(EWASMInterpreterFlag.Name)
+	}
+
+	if ctx.GlobalIsSet(EVMInterpreterFlag.Name) {
+		cfg.EVMInterpreter = ctx.GlobalString(EVMInterpreterFlag.Name)
+	}
 	if ctx.GlobalIsSet(RPCGlobalGasCapFlag.Name) {
 		cfg.RPCGasCap = ctx.GlobalUint64(RPCGlobalGasCapFlag.Name)
 	}

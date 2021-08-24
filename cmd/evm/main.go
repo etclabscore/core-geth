@@ -129,6 +129,11 @@ var (
 		Name:  "noreturndata",
 		Usage: "disable return data output",
 	}
+	EVMInterpreterFlag = cli.StringFlag{
+		Name:  "vm.evm",
+		Usage: "External EVM configuration (default = built-in interpreter)",
+		Value: "",
+	}
 )
 
 var stateTransitionCommand = cli.Command{
@@ -180,6 +185,7 @@ func init() {
 		DisableStackFlag,
 		DisableStorageFlag,
 		DisableReturnDataFlag,
+		EVMInterpreterFlag,
 	}
 	app.Commands = []cli.Command{
 		compileCommand,

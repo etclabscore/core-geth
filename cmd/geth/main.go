@@ -157,6 +157,8 @@ var (
 		utils.GpoPercentileFlag,
 		utils.GpoMaxGasPriceFlag,
 		utils.GpoIgnoreGasPriceFlag,
+		utils.EWASMInterpreterFlag,
+		utils.EVMInterpreterFlag,
 		utils.MinerNotifyFullFlag,
 		utils.ECBP1100Flag,
 		utils.ECBP1100NoDisableFlag,

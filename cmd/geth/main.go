@@ -302,9 +302,6 @@ func checkMainnet(ctx *cli.Context) bool {
 	case ctx.GlobalIsSet(utils.KottiFlag.Name):
 		log.Info("Starting Geth on Kotti testnet...")
 
-	case ctx.GlobalIsSet(utils.YoloV3Flag.Name):
-		log.Info("Starting Geth on YoloV3 testnet...")
-
 	case ctx.GlobalIsSet(utils.MintMeFlag.Name):
 		log.Info("Starting Geth on MintMe.com Coin mainnet...")
 

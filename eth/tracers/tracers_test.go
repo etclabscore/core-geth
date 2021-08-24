@@ -379,7 +379,7 @@ func BenchmarkTransactionTrace(b *testing.B) {
 		Difficulty:  big.NewInt(0xffffffff),
 		GasLimit:    gas,
 	}
-	alloc := core.GenesisAlloc{}
+	alloc := genesisT.GenesisAlloc{}
 	// The code pushes 'deadbeef' into memory, then the other params, and calls CREATE2, then returns
 	// the address
 	loop := []byte{
@@ -387,12 +387,12 @@ func BenchmarkTransactionTrace(b *testing.B) {
 		byte(vm.PUSH1), 0, // jumpdestination
 		byte(vm.JUMP),
 	}
-	alloc[common.HexToAddress("0x00000000000000000000000000000000deadbeef")] = core.GenesisAccount{
+	alloc[common.HexToAddress("0x00000000000000000000000000000000deadbeef")] = genesisT.GenesisAccount{
 		Nonce:   1,
 		Code:    loop,
 		Balance: big.NewInt(1),
 	}
-	alloc[from] = core.GenesisAccount{
+	alloc[from] = genesisT.GenesisAccount{
 		Nonce:   1,
 		Code:    []byte{},
 		Balance: big.NewInt(500000000000000),
@@ -567,7 +567,7 @@ type stateDiffAccount struct {
 type stateDiffTest struct {
 	Genesis *genesisT.Genesis                    `json:"genesis"`
 	Context *callContext                         `json:"context"`
-	Input   ethapi.CallArgs                      `json:"input"`
+	Input   *ethapi.TransactionArgs              `json:"input"`
 	Result  map[common.Address]*stateDiffAccount `json:"result"`
 }
 
@@ -583,7 +583,10 @@ func stateDiffTracerTestRunner(filename string) error {
 	}
 
 	// Configure a blockchain with the given prestate
-	msg := test.Input.ToMessage(uint64(test.Context.GasLimit))
+	msg, err := test.Input.ToMessage(uint64(test.Context.GasLimit), nil)
+	if err != nil {
+		return fmt.Errorf("failed to create transaction: %v", err)
+	}
 
 	// This is needed for trace_call (debug mode),
 	// as the Transaction is being run on top of the block transactions,

@@ -229,7 +229,7 @@ var (
 		Threshold: 2,
 	}
 
-	CalaverasChainConfig = &ChainConfig{
+	CalaverasChainConfig = &goethereum.ChainConfig{
 		ChainID:             big.NewInt(123),
 		HomesteadBlock:      big.NewInt(0),
 		DAOForkBlock:        nil,
@@ -244,7 +244,7 @@ var (
 		MuirGlacierBlock:    nil,
 		BerlinBlock:         big.NewInt(0),
 		LondonBlock:         big.NewInt(500),
-		Clique: &CliqueConfig{
+		Clique: &ctypes.CliqueConfig{
 			Period: 30,
 			Epoch:  30000,
 		},

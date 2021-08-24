@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"sync/atomic"
 	"time"
 
@@ -210,7 +209,7 @@ Please set --ancient.rpc to the correct path, and/or review the remote freezer's
 	if !frdb.readonly {
 		frdb.wg.Add(1)
 		go func() {
-			frdb.freeze(db)
+			go freezeRemote(db, frdb, frdb.threshold, frdb.quit, frdb.trigger)
 			frdb.wg.Done()
 		}()
 	}

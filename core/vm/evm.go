@@ -134,7 +134,6 @@ func NewEVM(blockCtx BlockContext, txCtx TxContext, statedb StateDB, chainConfig
 		StateDB:     statedb,
 		Config:      config,
 		chainConfig: chainConfig,
-		chainRules:  chainConfig.Rules(blockCtx.BlockNumber),
 	}
 	evm.interpreter = NewEVMInterpreter(evm, config)
 	return evm
@@ -433,7 +432,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 	}
 
 	// Reject code starting with 0xEF if EIP-3541 is enabled.
-	if err == nil && len(ret) >= 1 && ret[0] == 0xEF && evm.chainRules.IsLondon {
+	if err == nil && len(ret) >= 1 && ret[0] == 0xEF && evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP3541Transition, evm.Context.BlockNumber) {
 		err = ErrInvalidCode
 	}
 

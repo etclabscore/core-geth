@@ -271,7 +271,9 @@ func BenchmarkCopyConfiguratorInterface(b *testing.B) {
 	}
 }
 
+// TODO(iquidus): this test needs an existingEIP2929 replacement yolov3 has been removed.
 // BenchmarkTestValueEquivalenceAlot gets about 1.5 ns/op on my machine.
+/*
 func BenchmarkTestValueEquivalenceAlot(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		overrideEIP2929 := params.ClassicChainConfig.GetEIP2929Transition()
@@ -283,3 +285,4 @@ func BenchmarkTestValueEquivalenceAlot(b *testing.B) {
 		}
 	}
 }
+*/

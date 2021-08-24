@@ -23,12 +23,14 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // copyConfig does a _shallow_ copy of a given config. Safe to set new values, but
 // do not use e.g. SetInt() on the numbers. For testing only
-func copyConfig(original *params.ChainConfig) *params.ChainConfig {
-	return &params.ChainConfig{
+func copyConfig(original *goethereum.ChainConfig) *goethereum.ChainConfig {
+	return &goethereum.ChainConfig{
 		ChainID:             original.ChainID,
 		HomesteadBlock:      original.HomesteadBlock,
 		DAOForkBlock:        original.DAOForkBlock,
@@ -50,7 +52,7 @@ func copyConfig(original *params.ChainConfig) *params.ChainConfig {
 	}
 }
 
-func config() *params.ChainConfig {
+func config() *goethereum.ChainConfig {
 	config := copyConfig(params.TestChainConfig)
 	config.LondonBlock = big.NewInt(5)
 	return config
@@ -59,7 +61,7 @@ func config() *params.ChainConfig {
 // TestBlockGasLimits tests the gasLimit checks for blocks both across
 // the EIP-1559 boundary and post-1559 blocks
 func TestBlockGasLimits(t *testing.T) {
-	initial := new(big.Int).SetUint64(params.InitialBaseFee)
+	initial := new(big.Int).SetUint64(vars.InitialBaseFee)
 
 	for i, tc := range []struct {
 		pGasLimit uint64
@@ -114,9 +116,9 @@ func TestCalcBaseFee(t *testing.T) {
 		parentGasUsed   uint64
 		expectedBaseFee int64
 	}{
-		{params.InitialBaseFee, 20000000, 10000000, params.InitialBaseFee}, // usage == target
-		{params.InitialBaseFee, 20000000, 9000000, 987500000},              // usage below target
-		{params.InitialBaseFee, 20000000, 11000000, 1012500000},            // usage above target
+		{vars.InitialBaseFee, 20000000, 10000000, vars.InitialBaseFee}, // usage == target
+		{vars.InitialBaseFee, 20000000, 9000000, 987500000},            // usage below target
+		{vars.InitialBaseFee, 20000000, 11000000, 1012500000},          // usage above target
 	}
 	for i, test := range tests {
 		parent := &types.Header{

@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -298,7 +299,7 @@ func createGQLServiceWithTransactions(t *testing.T, stack *node.Node) {
 					Balance: big.NewInt(0),
 				},
 			},
-			BaseFee: big.NewInt(params.InitialBaseFee),
+			BaseFee: big.NewInt(vars.InitialBaseFee),
 		},
 		Ethash: ethash.Config{
 			PowMode: ethash.ModeFake,
@@ -323,14 +324,14 @@ func createGQLServiceWithTransactions(t *testing.T, stack *node.Node) {
 		To:       &dad,
 		Value:    big.NewInt(100),
 		Gas:      50000,
-		GasPrice: big.NewInt(params.InitialBaseFee),
+		GasPrice: big.NewInt(vars.InitialBaseFee),
 	})
 	envelopTx, _ := types.SignNewTx(key, signer, &types.AccessListTx{
 		ChainID:  ethConf.Genesis.Config.GetChainID(),
 		Nonce:    uint64(1),
 		To:       &dad,
 		Gas:      30000,
-		GasPrice: big.NewInt(params.InitialBaseFee),
+		GasPrice: big.NewInt(vars.InitialBaseFee),
 		Value:    big.NewInt(50),
 		AccessList: types.AccessList{{
 			Address:     dad,

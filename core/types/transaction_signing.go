@@ -170,18 +170,18 @@ type Signer interface {
 	Equal(Signer) bool
 }
 
-type londonSigner struct{ eip2930Signer }
+type eip1559Signer struct{ eip2930Signer }
 
-// NewLondonSigner returns a signer that accepts
+// NewEIP1559Signer returns a signer that accepts
 // - EIP-1559 dynamic fee transactions
 // - EIP-2930 access list transactions,
 // - EIP-155 replay protected transactions, and
 // - legacy Homestead transactions.
-func NewLondonSigner(chainId *big.Int) Signer {
-	return londonSigner{eip2930Signer{NewEIP155Signer(chainId)}}
+func NewEIP1559Signer(chainId *big.Int) Signer {
+	return eip1559Signer{eip2930Signer{NewEIP155Signer(chainId)}}
 }
 
-func (s londonSigner) Sender(tx *Transaction) (common.Address, error) {
+func (s eip1559Signer) Sender(tx *Transaction) (common.Address, error) {
 	if tx.Type() != DynamicFeeTxType {
 		return s.eip2930Signer.Sender(tx)
 	}
@@ -195,12 +195,12 @@ func (s londonSigner) Sender(tx *Transaction) (common.Address, error) {
 	return recoverPlain(s.Hash(tx), R, S, V, true)
 }
 
-func (s londonSigner) Equal(s2 Signer) bool {
-	x, ok := s2.(londonSigner)
+func (s eip1559Signer) Equal(s2 Signer) bool {
+	x, ok := s2.(eip1559Signer)
 	return ok && x.chainId.Cmp(s.chainId) == 0
 }
 
-func (s londonSigner) SignatureValues(tx *Transaction, sig []byte) (R, S, V *big.Int, err error) {
+func (s eip1559Signer) SignatureValues(tx *Transaction, sig []byte) (R, S, V *big.Int, err error) {
 	txdata, ok := tx.inner.(*DynamicFeeTx)
 	if !ok {
 		return s.eip2930Signer.SignatureValues(tx, sig)
@@ -217,7 +217,7 @@ func (s londonSigner) SignatureValues(tx *Transaction, sig []byte) (R, S, V *big
 
 // Hash returns the hash to be signed by the sender.
 // It does not uniquely identify the transaction.
-func (s londonSigner) Hash(tx *Transaction) common.Hash {
+func (s eip1559Signer) Hash(tx *Transaction) common.Hash {
 	if tx.Type() != DynamicFeeTxType {
 		return s.eip2930Signer.Hash(tx)
 	}

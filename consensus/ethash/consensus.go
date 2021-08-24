@@ -262,6 +262,7 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 		return fmt.Errorf("invalid gasUsed: have %d, gasLimit %d", header.GasUsed, header.GasLimit)
 	}
 	// Verify the block's gas usage and (if applicable) verify the base fee.
+	// TODO(ziogaschr): use config.IsEnabled
 	if !chain.Config().IsMystique(header.Number) {
 		// Verify BaseFee not present before EIP-1559 fork.
 		if header.BaseFee != nil {
@@ -321,6 +322,8 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	if config.IsEnabled(config.GetCatalystTransition, next) {
 		return big.NewInt(1)
 	}
+
+	// TODO(ziogaschr): check for calcDifficultyEip3554
 
 	// ADJUSTMENT algorithms
 	if config.IsEnabled(config.GetEthashEIP100BTransition, next) {

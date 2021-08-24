@@ -166,7 +166,7 @@ func TestNewAdjustTimeFail(t *testing.T) {
 	head, _ := sim.HeaderByNumber(context.Background(), nil) // Should be child's, good enough
 	gasPrice := new(big.Int).Add(head.BaseFee, big.NewInt(1))
 
-	tx := types.NewTransaction(0, testAddr, big.NewInt(1000), params.TxGas, gasPrice, nil)
+	tx := types.NewTransaction(0, testAddr, big.NewInt(1000), vars.TxGas, gasPrice, nil)
 	signedTx, err := types.SignTx(tx, types.HomesteadSigner{}, testKey)
 	if err != nil {
 		t.Errorf("could not sign tx: %v", err)
@@ -187,7 +187,7 @@ func TestNewAdjustTimeFail(t *testing.T) {
 		t.Errorf("adjusted time not equal to a minute. prev: %v, new: %v", prevTime, newTime)
 	}
 	// Put a transaction after adjusting time
-	tx2 := types.NewTransaction(1, testAddr, big.NewInt(1000), params.TxGas, gasPrice, nil)
+	tx2 := types.NewTransaction(1, testAddr, big.NewInt(1000), vars.TxGas, gasPrice, nil)
 	signedTx2, err := types.SignTx(tx2, types.HomesteadSigner{}, testKey)
 	if err != nil {
 		t.Errorf("could not sign tx: %v", err)
@@ -293,7 +293,7 @@ func TestNonceAt(t *testing.T) {
 	head, _ := sim.HeaderByNumber(context.Background(), nil) // Should be child's, good enough
 	gasPrice := new(big.Int).Add(head.BaseFee, big.NewInt(1))
 
-	tx := types.NewTransaction(nonce, testAddr, big.NewInt(1000), params.TxGas, gasPrice, nil)
+	tx := types.NewTransaction(nonce, testAddr, big.NewInt(1000), vars.TxGas, gasPrice, nil)
 	signedTx, err := types.SignTx(tx, types.HomesteadSigner{}, testKey)
 	if err != nil {
 		t.Errorf("could not sign tx: %v", err)
@@ -337,7 +337,7 @@ func TestSendTransaction(t *testing.T) {
 	head, _ := sim.HeaderByNumber(context.Background(), nil) // Should be child's, good enough
 	gasPrice := new(big.Int).Add(head.BaseFee, big.NewInt(1))
 
-	tx := types.NewTransaction(uint64(0), testAddr, big.NewInt(1000), params.TxGas, gasPrice, nil)
+	tx := types.NewTransaction(uint64(0), testAddr, big.NewInt(1000), vars.TxGas, gasPrice, nil)
 	signedTx, err := types.SignTx(tx, types.HomesteadSigner{}, testKey)
 	if err != nil {
 		t.Errorf("could not sign tx: %v", err)
@@ -375,7 +375,7 @@ func TestTransactionByHash(t *testing.T) {
 	head, _ := sim.HeaderByNumber(context.Background(), nil) // Should be child's, good enough
 	gasPrice := new(big.Int).Add(head.BaseFee, big.NewInt(1))
 
-	tx := types.NewTransaction(uint64(0), testAddr, big.NewInt(1000), params.TxGas, gasPrice, nil)
+	tx := types.NewTransaction(uint64(0), testAddr, big.NewInt(1000), vars.TxGas, gasPrice, nil)
 	signedTx, err := types.SignTx(tx, types.HomesteadSigner{}, testKey)
 	if err != nil {
 		t.Errorf("could not sign tx: %v", err)
@@ -590,7 +590,7 @@ func TestEstimateGasWithPrice(t *testing.T) {
 			GasTipCap: big.NewInt(1),
 			Value:     big.NewInt(1e17), // the remaining balance for fee is 2.1ether
 			Data:      nil,
-		}, params.TxGas, nil},
+		}, vars.TxGas, nil},
 
 		{"EstimateEIP1559WithSuperHighFees", ethereum.CallMsg{
 			From:      addr,
@@ -600,7 +600,7 @@ func TestEstimateGasWithPrice(t *testing.T) {
 			GasTipCap: big.NewInt(1),
 			Value:     big.NewInt(1e17 + 1), // the remaining balance for fee is 2.1ether
 			Data:      nil,
-		}, params.TxGas, errors.New("gas required exceeds allowance (20999)")}, // 20999=(2.2ether-0.1ether-1wei)/(1e14)
+		}, vars.TxGas, errors.New("gas required exceeds allowance (20999)")}, // 20999=(2.2ether-0.1ether-1wei)/(1e14)
 	}
 	for i, c := range cases {
 		got, err := sim.EstimateGas(context.Background(), c.message)
@@ -713,7 +713,7 @@ func TestTransactionCount(t *testing.T) {
 	head, _ := sim.HeaderByNumber(context.Background(), nil) // Should be child's, good enough
 	gasPrice := new(big.Int).Add(head.BaseFee, big.NewInt(1))
 
-	tx := types.NewTransaction(uint64(0), testAddr, big.NewInt(1000), params.TxGas, gasPrice, nil)
+	tx := types.NewTransaction(uint64(0), testAddr, big.NewInt(1000), vars.TxGas, gasPrice, nil)
 	signedTx, err := types.SignTx(tx, types.HomesteadSigner{}, testKey)
 	if err != nil {
 		t.Errorf("could not sign tx: %v", err)
@@ -770,7 +770,7 @@ func TestTransactionInBlock(t *testing.T) {
 	head, _ := sim.HeaderByNumber(context.Background(), nil) // Should be child's, good enough
 	gasPrice := new(big.Int).Add(head.BaseFee, big.NewInt(1))
 
-	tx := types.NewTransaction(uint64(0), testAddr, big.NewInt(1000), params.TxGas, gasPrice, nil)
+	tx := types.NewTransaction(uint64(0), testAddr, big.NewInt(1000), vars.TxGas, gasPrice, nil)
 	signedTx, err := types.SignTx(tx, types.HomesteadSigner{}, testKey)
 	if err != nil {
 		t.Errorf("could not sign tx: %v", err)
@@ -828,7 +828,7 @@ func TestPendingNonceAt(t *testing.T) {
 	head, _ := sim.HeaderByNumber(context.Background(), nil) // Should be child's, good enough
 	gasPrice := new(big.Int).Add(head.BaseFee, big.NewInt(1))
 
-	tx := types.NewTransaction(uint64(0), testAddr, big.NewInt(1000), params.TxGas, gasPrice, nil)
+	tx := types.NewTransaction(uint64(0), testAddr, big.NewInt(1000), vars.TxGas, gasPrice, nil)
 	signedTx, err := types.SignTx(tx, types.HomesteadSigner{}, testKey)
 	if err != nil {
 		t.Errorf("could not sign tx: %v", err)
@@ -851,7 +851,7 @@ func TestPendingNonceAt(t *testing.T) {
 	}
 
 	// make a new transaction with a nonce of 1
-	tx = types.NewTransaction(uint64(1), testAddr, big.NewInt(1000), params.TxGas, gasPrice, nil)
+	tx = types.NewTransaction(uint64(1), testAddr, big.NewInt(1000), vars.TxGas, gasPrice, nil)
 	signedTx, err = types.SignTx(tx, types.HomesteadSigner{}, testKey)
 	if err != nil {
 		t.Errorf("could not sign tx: %v", err)
@@ -883,7 +883,7 @@ func TestTransactionReceipt(t *testing.T) {
 	head, _ := sim.HeaderByNumber(context.Background(), nil) // Should be child's, good enough
 	gasPrice := new(big.Int).Add(head.BaseFee, big.NewInt(1))
 
-	tx := types.NewTransaction(uint64(0), testAddr, big.NewInt(1000), params.TxGas, gasPrice, nil)
+	tx := types.NewTransaction(uint64(0), testAddr, big.NewInt(1000), vars.TxGas, gasPrice, nil)
 	signedTx, err := types.SignTx(tx, types.HomesteadSigner{}, testKey)
 	if err != nil {
 		t.Errorf("could not sign tx: %v", err)
@@ -1312,7 +1312,7 @@ func TestForkResendTx(t *testing.T) {
 	head, _ := sim.HeaderByNumber(context.Background(), nil) // Should be child's, good enough
 	gasPrice := new(big.Int).Add(head.BaseFee, big.NewInt(1))
 
-	_tx := types.NewTransaction(0, testAddr, big.NewInt(1000), params.TxGas, gasPrice, nil)
+	_tx := types.NewTransaction(0, testAddr, big.NewInt(1000), vars.TxGas, gasPrice, nil)
 	tx, _ := types.SignTx(_tx, types.HomesteadSigner{}, testKey)
 	sim.SendTransaction(context.Background(), tx)
 	sim.Commit()

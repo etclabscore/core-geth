@@ -286,7 +286,7 @@ var (
 	}
 	OverrideMystiqueFlag = cli.Uint64Flag{
 		Name:  "override.mystique",
-		Usage: "Manually specify mystique fork-block, overriding the bundled setting",
+		Usage: "Manually specify Mystique fork-block, overriding the bundled setting",
 	}
 	// Light server and client settings
 	LightServeFlag = cli.IntFlag{
@@ -804,16 +804,6 @@ var (
 		Name:  "metrics.influxdb.tags",
 		Usage: "Comma-separated InfluxDB tags (key/values) attached to all measurements",
 		Value: metrics.DefaultConfig.InfluxDBTags,
-	}
-	EWASMInterpreterFlag = cli.StringFlag{
-		Name:  "vm.ewasm",
-		Usage: "External ewasm configuration (default = built-in interpreter)",
-		Value: "",
-	}
-	EVMInterpreterFlag = cli.StringFlag{
-		Name:  "vm.evm",
-		Usage: "External EVM configuration (default = built-in interpreter)",
-		Value: "",
 	}
 	ECBP1100Flag = cli.Uint64Flag{
 		Name:  "ecbp1100",
@@ -1719,15 +1709,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		cfg.EnablePreimageRecording = ctx.GlobalBool(VMEnableDebugFlag.Name)
 	}
 
-	if ctx.GlobalIsSet(EWASMInterpreterFlag.Name) {
-		cfg.EWASMInterpreter = ctx.GlobalString(EWASMInterpreterFlag.Name)
-		vm.InitEVMCEwasm(cfg.EWASMInterpreter)
-	}
-
-	if ctx.GlobalIsSet(EVMInterpreterFlag.Name) {
-		cfg.EVMInterpreter = ctx.GlobalString(EVMInterpreterFlag.Name)
-		vm.InitEVMCEVM(cfg.EVMInterpreter)
-	}
 	if ctx.GlobalIsSet(RPCGlobalGasCapFlag.Name) {
 		cfg.RPCGasCap = ctx.GlobalUint64(RPCGlobalGasCapFlag.Name)
 	}
@@ -2047,7 +2028,7 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 	case ctx.GlobalBool(GoerliFlag.Name):
 		genesis = params.DefaultGoerliGenesisBlock()
 	case ctx.GlobalBool(CalaverasFlag.Name):
-		genesis = core.DefaultCalaverasGenesisBlock()
+		genesis = params.DefaultCalaverasGenesisBlock()
 	case ctx.GlobalBool(MintMeFlag.Name):
 		genesis = params.DefaultMintMeGenesisBlock()
 	case ctx.GlobalBool(DeveloperFlag.Name):

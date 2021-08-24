@@ -34,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // Tests a recovery for a short canonical chain where a recent block was already
@@ -1771,7 +1772,8 @@ func testRepair(t *testing.T, tt *rewindTest, snapshots bool) {
 
 	// Initialize a fresh chain
 	var (
-		genesis = (&Genesis{BaseFee: big.NewInt(params.InitialBaseFee)}).MustCommit(db) // TODO(iquidus): check this. previously: MustCommitGenesis(db, new(genesisT.Genesis))
+		gspec   = &genesisT.Genesis{BaseFee: big.NewInt(vars.InitialBaseFee)}
+		genesis = MustCommitGenesis(db, gspec)
 		engine  = ethash.NewFullFaker()
 		config  = &CacheConfig{
 			TrieCleanLimit: 256,

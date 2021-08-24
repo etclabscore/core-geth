@@ -339,7 +339,7 @@ func generateTxs(s *Suite, numTxs int) (map[common.Hash]common.Hash, []*types.Tr
 	return txHashMap, txs, nil
 }
 
-func generateTx(chainConfig *params.ChainConfig, nonce uint64, gas uint64) *types.Transaction {
+func generateTx(chainConfig ctypes.ChainConfigurator, nonce uint64, gas uint64) *types.Transaction {
 	var to common.Address
 	tx := types.NewTransaction(nonce, to, big.NewInt(1), gas, big.NewInt(1), []byte{})
 	return signWithFaucet(chainConfig, tx)
@@ -409,7 +409,7 @@ func hugeData(s *Suite) *types.Transaction {
 	return signWithFaucet(s.chain.chainConfig, txNew)
 }
 
-func signWithFaucet(chainConfig *params.ChainConfig, tx *types.Transaction) *types.Transaction {
+func signWithFaucet(chainConfig ctypes.ChainConfigurator, tx *types.Transaction) *types.Transaction {
 	signer := types.LatestSigner(chainConfig)
 	signedTx, err := types.SignTx(tx, signer, faucetKey)
 	if err != nil {

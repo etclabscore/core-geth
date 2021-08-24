@@ -21,7 +21,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ethereum/evmc/v7/bindings/go/evmc"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -130,27 +129,13 @@ type EVM struct {
 // only ever be used *once*.
 func NewEVM(blockCtx BlockContext, txCtx TxContext, statedb StateDB, chainConfig ctypes.ChainConfigurator, config Config) *EVM {
 	evm := &EVM{
-		Context:      blockCtx,
-		TxContext:    txCtx,
-		StateDB:      statedb,
-		Config:       config,
-		chainConfig:  chainConfig,
-		chainRules:   chainConfig.Rules(blockCtx.BlockNumber),
-		interpreters: make([]Interpreter, 0, 2),
+		Context:     blockCtx,
+		TxContext:   txCtx,
+		StateDB:     statedb,
+		Config:      config,
+		chainConfig: chainConfig,
+		chainRules:  chainConfig.Rules(blockCtx.BlockNumber),
 	}
-
-	// In some implementations, EWASM may be configured with a block number.
-	// In this implementation, the interpreter is configured globally instead.
-	if config.EWASMInterpreter != "" {
-		evm.interpreters = append(evm.interpreters, &EVMC{ewasmModule, evm, evmc.CapabilityEWASM, false})
-	}
-
-	if config.EVMInterpreter != "" {
-		evm.interpreters = append(evm.interpreters, &EVMC{evmModule, evm, evmc.CapabilityEVM1, false})
-	} else {
-		evm.interpreters = append(evm.interpreters, NewEVMInterpreter(evm, config))
-	}
-
 	evm.interpreter = NewEVMInterpreter(evm, config)
 	return evm
 }

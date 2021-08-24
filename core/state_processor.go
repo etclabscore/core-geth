@@ -109,8 +109,8 @@ func applyTransaction(msg types.Message, config ctypes.ChainConfigurator, bc Cha
 
 	// Update the state with pending changes.
 	var root []byte
-	eip161d := config.IsEnabled(config.GetEIP161dTransition, header.Number)
-	if config.IsEnabled(config.GetEIP658Transition, header.Number) {
+	eip161d := config.IsEnabled(config.GetEIP161dTransition, blockNumber)
+	if config.IsEnabled(config.GetEIP658Transition, blockNumber) {
 		statedb.Finalise(eip161d)
 	} else {
 		root = statedb.IntermediateRoot(eip161d).Bytes()
@@ -130,7 +130,7 @@ func applyTransaction(msg types.Message, config ctypes.ChainConfigurator, bc Cha
 
 	// If the transaction created a contract, store the creation address in the receipt.
 	if msg.To() == nil {
-		if config.IsEnabled(config.GetLyra2NonceTransition, header.Number) {
+		if config.IsEnabled(config.GetLyra2NonceTransition, blockNumber) {
 			receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce()+vars.Lyra2ContractNonceOffset)
 		} else {
 			receipt.ContractAddress = crypto.CreateAddress(evm.TxContext.Origin, tx.Nonce())

@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func verifyUnbrokenCanonchain(hc *HeaderChain) error {
@@ -72,7 +73,8 @@ func testInsert(t *testing.T, hc *HeaderChain, chain []*types.Header, wantStatus
 func TestHeaderInsertion(t *testing.T) {
 	var (
 		db      = rawdb.NewMemoryDatabase()
-		genesis = MustCommitGenesis(db, &genesisT.Genesis{BaseFee: big.NewInt(params.InitialBaseFee)})
+		gspec   = &genesisT.Genesis{BaseFee: big.NewInt(vars.InitialBaseFee)}
+		genesis = MustCommitGenesis(db, gspec)
 	)
 
 	hc, err := NewHeaderChain(db, params.AllEthashProtocolChanges, ethash.NewFaker(), func() bool { return false })

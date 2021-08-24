@@ -40,8 +40,8 @@ func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.Cha
 }
 
 func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, overrideMystique *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
-	if genesis != nil && genesis.Config == nil {
-		return params.AllEthashProtocolChanges, common.Hash{}, errGenesisNoConfig
+	if genesis != nil && confp.IsEmpty(genesis.Config) {
+		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
 	// Just commit the new block if there is no stored genesis block.
 	stored := rawdb.ReadCanonicalHash(db, 0)
@@ -105,6 +105,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	// Get the existing chain configuration.
 	newcfg := configOrDefault(genesis, stored)
 
+	// TODO(ziogaschr): overrideMystique
 	if overrideMagneto != nil {
 		n := overrideMagneto.Uint64()
 		if err := newcfg.SetEIP2565Transition(&n); err != nil {
@@ -120,6 +121,11 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			return newcfg, stored, err
 		}
 	}
+
+	// TODO(ziogaschr): do we need this?
+	// if err := newcfg.CheckConfigForkOrder(); err != nil {
+	// 	return newcfg, common.Hash{}, err
+	// }
 
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {
@@ -268,8 +274,8 @@ func MustCommitGenesis(db ethdb.Database, g *genesisT.Genesis) *types.Block {
 // GenesisBlockForTesting creates and writes a block in which addr has the given wei balance.
 func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big.Int) *types.Block {
 	g := genesisT.Genesis{
-		Alloc: genesisT.GenesisAlloc{addr: {Balance: balance}}
-		BaseFee: big.NewInt(params.InitialBaseFee),
+		Alloc:   genesisT.GenesisAlloc{addr: {Balance: balance}},
+		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
 	return MustCommitGenesis(db, &g)
 }

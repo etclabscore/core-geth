@@ -22,6 +22,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -260,6 +261,7 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 	} else {
 		time = parent.Time() + 10 // block time is fixed at 10 seconds
 	}
+	// TODO(ziogaschr): IsEIP158?
 	header := &types.Header{
 		Root:       state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, parent.Number())),
 		ParentHash: parent.Hash(),
@@ -274,10 +276,11 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 		Number:   new(big.Int).Add(parent.Number(), common.Big1),
 		Time:     time,
 	}
+	// TODO(ziogaschr): Use IsEnabled...
 	if chain.Config().IsLondon(header.Number) {
 		header.BaseFee = misc.CalcBaseFee(chain.Config(), parent.Header())
 		if !chain.Config().IsLondon(parent.Number()) {
-			parentGasLimit := parent.GasLimit() * params.ElasticityMultiplier
+			parentGasLimit := parent.GasLimit() * vars.ElasticityMultiplier
 			header.GasLimit = CalcGasLimit(parentGasLimit, parentGasLimit)
 		}
 	}

@@ -29,7 +29,6 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/holiman/uint256"
 )
 
@@ -140,7 +139,7 @@ func NewStructLogger(cfg *LogConfig) *StructLogger {
 
 // CapturePreEVM implements the Tracer interface to bootstrap the tracing context,
 // before EVM init. This is useful for reading initial balance, state, etc.
-func (l *StructLogger) CapturePreEVM(env *EVM, inputs map[string]interface{}) {
+func (l *StructLogger) CapturePreEVM(env *EVM, inputs map[string]interface{}) {}
 
 // Reset clears the data held by the logger.
 func (l *StructLogger) Reset() {

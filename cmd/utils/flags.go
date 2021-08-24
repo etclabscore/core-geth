@@ -924,8 +924,6 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.KottiBootnodes
 	case ctx.GlobalBool(GoerliFlag.Name):
 		urls = params.GoerliBootnodes
-	case ctx.GlobalBool(YoloV3Flag.Name):
-		urls = params.YoloV3Bootnodes
 	case ctx.GlobalBool(MintMeFlag.Name):
 		urls = params.MintMeBootnodes
 	case cfg.BootstrapNodesV5 != nil:
@@ -1339,8 +1337,6 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "kotti")
 	case ctx.GlobalBool(GoerliFlag.Name):
 		return filepath.Join(baseDataDirPath, "goerli")
-	case ctx.GlobalBool(YoloV3Flag.Name):
-		return filepath.Join(baseDataDirPath, "yolo-v2")
 	case ctx.GlobalBool(MintMeFlag.Name):
 		return filepath.Join(baseDataDirPath, "mintme")
 	}

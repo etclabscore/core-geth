@@ -316,14 +316,13 @@ func (tm *testMatcherGen) stateTestRunner(t *testing.T, name string, test *State
 		st := subtest
 
 		key := fmt.Sprintf("%s/%d", st.Fork, st.Index)
-		name := name + "/" + key
 
 		t.Run(key+"/trie", func(t *testing.T) {
 			// vmConfig is constructed using global variables for possible EVM and EWASM interpreters.
 			// These interpreters are configured with environment variables and are assigned in an init() function.
 			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
 			_, _, err := test.Run(st, vmConfig, false)
-			checkedErr := tm.checkFailure(t, name+"/trie", err)
+			checkedErr := tm.checkFailure(t, err)
 			if checkedErr != nil && *testEWASM != "" {
 				checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
 			}

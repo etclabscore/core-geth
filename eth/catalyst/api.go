@@ -273,7 +273,7 @@ func insertBlockParamsToBlock(config ctypes.ChainConfigurator, parent *types.Hea
 		GasUsed:     params.GasUsed,
 		Time:        params.Timestamp,
 	}
-	if config.IsLondon(number) {
+	if config.IsEnabled(config.GetEIP1559Transition, number) {
 		header.BaseFee = misc.CalcBaseFee(config, parent)
 	}
 	block := types.NewBlockWithHeader(header).WithBody(txs, nil /* uncles */)

@@ -152,6 +152,9 @@ type ProtocolSpecifier interface {
 	// Typed transaction envelope
 	GetEIP2718Transition() *uint64
 	SetEIP2718Transition(n *uint64) error
+
+	GetEIP1559Transition() *uint64
+	SetEIP1559Transition(n *uint64) error
 }
 
 type Forker interface {

@@ -36,6 +36,7 @@ type ChainConfig struct {
 	MuirGlacierBlock    *big.Int `json:"muirGlacierBlock,omitempty"`    // Eip-2384 (bomb delay) switch block (nil = no fork, 0 = already activated)
 
 	BerlinBlock *big.Int `json:"berlinBlock,omitempty"` // Berlin switch block
+	LondonBlock *big.Int `json:"londonBlock,omitempty"` // YOLO v3 (Ephemeral testnet)
 	YoloV3Block *big.Int `json:"yoloV3Block,omitempty"` // YOLO v3 (Ephemeral testnet)
 
 	EWASMBlock    *big.Int `json:"ewasmBlock,omitempty"`    // EWASM switch block (nil = no fork, 0 = already activated)

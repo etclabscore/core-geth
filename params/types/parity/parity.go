@@ -120,6 +120,7 @@ type ParityChainSpec struct {
 		EIP2930Transition         *ParityU64 `json:"eip2930Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
 		EIP2565Transition         *ParityU64 `json:"eip2565Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
 		EIP2718Transition         *ParityU64 `json:"eip2718Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
+		EIP1559Transition         *ParityU64 `json:"eip1559Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
 		ECIP1080Transition        *ParityU64 `json:"ecip1080Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
 		Lyra2NonceTransition      *ParityU64 `json:"lyra2NonceTransition,omitempty"`
 

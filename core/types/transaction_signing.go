@@ -41,7 +41,7 @@ func MakeSigner(config ctypes.ChainConfigurator, blockNumber *big.Int) Signer {
 	var signer Signer
 	switch {
 	case config.IsEnabled(config.GetEIP1559Transition, blockNumber):
-		signer = NewEIP1559Signer(config.ChainID)
+		signer = NewEIP1559Signer(config.GetChainID())
 	case config.IsEnabled(config.GetEIP2930Transition, blockNumber):
 		signer = NewEIP2930Signer(config.GetChainID())
 	case config.IsEnabled(config.GetEIP155Transition, blockNumber):

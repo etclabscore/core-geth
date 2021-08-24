@@ -474,11 +474,20 @@ func (c *ChainConfig) SetEIP2929Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2930Transition() *uint64 {
-	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+	return bigNewU64Min(c.BerlinBlock, c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2930Transition(n *uint64) error {
 	c.BerlinBlock = setBig(c.BerlinBlock, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEIP1559Transition() *uint64 {
+	return bigNewU64Min(c.LondonBlock, c.LondonBlock)
+}
+
+func (c *ChainConfig) SetEIP1559Transition(n *uint64) error {
+	c.LondonBlock = setBig(c.LondonBlock, n)
 	return nil
 }
 

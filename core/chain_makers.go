@@ -261,7 +261,6 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 	} else {
 		time = parent.Time() + 10 // block time is fixed at 10 seconds
 	}
-	// TODO(ziogaschr): IsEIP158?
 	header := &types.Header{
 		Root:       state.IntermediateRoot(chain.Config().IsEnabled(chain.Config().GetEIP161dTransition, parent.Number())),
 		ParentHash: parent.Hash(),
@@ -276,10 +275,9 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 		Number:   new(big.Int).Add(parent.Number(), common.Big1),
 		Time:     time,
 	}
-	// TODO(ziogaschr): Use IsEnabled...
-	if chain.Config().IsLondon(header.Number) {
+	if chain.Config().IsEnabled(chain.Config().GetEIP1559Transition, header.Number) {
 		header.BaseFee = misc.CalcBaseFee(chain.Config(), parent.Header())
-		if !chain.Config().IsLondon(parent.Number()) {
+		if !chain.Config().IsEnabled(chain.Config().GetEIP1559Transition, parent.Number()) {
 			parentGasLimit := parent.GasLimit() * vars.ElasticityMultiplier
 			header.GasLimit = CalcGasLimit(parentGasLimit, parentGasLimit)
 		}

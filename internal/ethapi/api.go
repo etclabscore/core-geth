@@ -1562,12 +1562,6 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 			to = crypto.CreateAddress(args.from(), uint64(*args.Nonce))
 		}
 	}
-	var input []byte
-	if args.Input != nil {
-		input = *args.Input
-	} else if args.Data != nil {
-		input = *args.Data
-	}
 	// Retrieve the precompiles since they don't need to be added to the access list
 	precompileMap := vm.PrecompiledContractsForConfig(b.ChainConfig(), header.Number)
 	precompiles := make([]common.Address, len(precompileMap))

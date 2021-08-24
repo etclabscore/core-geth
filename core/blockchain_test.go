@@ -78,7 +78,7 @@ func newCanonical(engine consensus.Engine, n int, full bool) (ethdb.Database, *B
 }
 
 func newGwei(n int64) *big.Int {
-	return new(big.Int).Mul(big.NewInt(n), big.NewInt(params.GWei))
+	return new(big.Int).Mul(big.NewInt(n), big.NewInt(vars.GWei))
 }
 
 // Test fork of length N starting from block i

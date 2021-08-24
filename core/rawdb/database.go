@@ -208,77 +208,11 @@ Please set --ancient.rpc to the correct path, and/or review the remote freezer's
 	}
 	// Freezer is consistent with the key-value database, permit combining the two
 	if !frdb.readonly {
-		go freezeRemote(db, frdb, frdb.threshold, frdb.quit, frdb.trigger)
-	}
-	return &freezerdb{
-		KeyValueStore: db,
-		AncientStore:  frdb,
-	}, nil
-}
-
-// NewDatabaseWithFreezer creates a high level database on top of a given key-
-// value data store with a freezer moving immutable chain segments into cold
-// storage.
-func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace string, readonly bool) (ethdb.Database, error) {
-	// Create the idle freezer instance
-	frdb, err := newFreezer(freezerStr, namespace, readonly)
-	if err != nil {
-		return nil, err
-	}
-	// Since the freezer can be stored separately from the user's key-value database,
-	// there's a fairly high probability that the user requests invalid combinations
-	// of the freezer and database. Ensure that we don't shoot ourselves in the foot
-	// by serving up conflicting data, leading to both datastores getting corrupted.
-	//
-	//   - If both the freezer and key-value store is empty (no genesis), we just
-	//     initialized a new empty freezer, so everything's fine.
-	//   - If the key-value store is empty, but the freezer is not, we need to make
-	//     sure the user's genesis matches the freezer. That will be checked in the
-	//     blockchain, since we don't have the genesis block here (nor should we at
-	//     this point care, the key-value/freezer combo is valid).
-	//   - If neither the key-value store nor the freezer is empty, cross validate
-	//     the genesis hashes to make sure they are compatible. If they are, also
-	//     ensure that there's no gap between the freezer and sunsequently leveldb.
-	//   - If the key-value store is not empty, but the freezer is we might just be
-	//     upgrading to the freezer release, or we might have had a small chain and
-	//     not frozen anything yet. Ensure that no blocks are missing yet from the
-	//     key-value store, since that would mean we already had an old freezer.
-	validateErr := validateFreezerVsKV(frdb, db)
-	if validateErr != nil {
-
-		log.Warn("Freezer/KV validation error, attempting freezer repair", "error", validateErr)
-		if reperr := frdb.repair(); reperr != nil {
-			log.Warn("Freezer repair errored", "error", reperr)
-
-			// Repair did error, AND the validation errored, so return both together because that's double bad.
-			return nil, fmt.Errorf("freezer/kv error=%v freezer repair error=%v", validateErr, reperr)
-		}
-
-		log.Warn("Freezer repair OK")
-
-		truncateKVtoFreezer(frdb, db)
-
-		// Re-validate the ancient/kv dbs.
-		// If still a gap, try removing the kv data back to the ancient level.
-		validateErr = validateFreezerVsKV(frdb, db)
-	}
-
-	if validateErr != nil && strings.Contains(validateErr.Error(), "gap") {
-		// Re-validate again.
-		validateErr = validateFreezerVsKV(frdb, db)
-	} else if validateErr != nil {
-		return nil, validateErr
-	}
-
-	if validateErr != nil {
-		// If this fails, there's nothing left for us to do.
-		log.Warn("KV truncation failed to resuscitate Freezer/KV db gap.")
-		return nil, validateErr
-	}
-
-	// Freezer is consistent with the key-value database, permit combining the two
-	if !frdb.readonly {
-		go frdb.freeze(db)
+		frdb.wg.Add(1)
+		go func() {
+			frdb.freeze(db)
+			frdb.wg.Done()
+		}()
 	}
 	return &freezerdb{
 		KeyValueStore: db,
@@ -408,9 +342,8 @@ func InspectDatabase(db ethdb.Database, keyPrefix, keyStart []byte) error {
 		bloomTrieNodes stat
 
 		// Meta- and unaccounted data
-		metadata     stat
-		unaccounted  stat
-		shutdownInfo stat
+		metadata    stat
+		unaccounted stat
 
 		// Totals
 		total common.StorageSize
@@ -447,6 +380,8 @@ func InspectDatabase(db ethdb.Database, keyPrefix, keyStart []byte) error {
 			storageSnaps.Add(size)
 		case bytes.HasPrefix(key, preimagePrefix) && len(key) == (len(preimagePrefix)+common.HashLength):
 			preimages.Add(size)
+		case bytes.HasPrefix(key, configPrefix) && len(key) == (len(configPrefix)+common.HashLength):
+			metadata.Add(size)
 		case bytes.HasPrefix(key, bloomBitsPrefix) && len(key) == (len(bloomBitsPrefix)+10+common.HashLength):
 			bloomBits.Add(size)
 		case bytes.HasPrefix(key, BloomBitsIndexPrefix):
@@ -461,8 +396,6 @@ func InspectDatabase(db ethdb.Database, keyPrefix, keyStart []byte) error {
 			bytes.HasPrefix(key, []byte("bltIndex-")) ||
 			bytes.HasPrefix(key, []byte("bltRoot-")): // Bloomtrie sub
 			bloomTrieNodes.Add(size)
-		case bytes.Equal(key, uncleanShutdownKey):
-			shutdownInfo.Add(size)
 		default:
 			var accounted bool
 			for _, meta := range [][]byte{
@@ -517,7 +450,6 @@ func InspectDatabase(db ethdb.Database, keyPrefix, keyStart []byte) error {
 		{"Key-Value store", "Storage snapshot", storageSnaps.Size(), storageSnaps.Count()},
 		{"Key-Value store", "Clique snapshots", cliqueSnaps.Size(), cliqueSnaps.Count()},
 		{"Key-Value store", "Singleton metadata", metadata.Size(), metadata.Count()},
-		{"Key-Value store", "Shutdown metadata", shutdownInfo.Size(), shutdownInfo.Count()},
 		{"Ancient store", "Headers", ancientHeadersSize.String(), ancients.String()},
 		{"Ancient store", "Bodies", ancientBodiesSize.String(), ancients.String()},
 		{"Ancient store", "Receipt lists", ancientReceiptsSize.String(), ancients.String()},

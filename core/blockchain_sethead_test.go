@@ -1970,7 +1970,7 @@ func testSetHead(t *testing.T, tt *rewindTest, snapshots bool) {
 
 	// Initialize a fresh chain
 	var (
-		genesis = MustCommitGenesis(db, new(genesisT.Genesis))
+		genesis = (&Genesis{BaseFee: big.NewInt(params.InitialBaseFee)}).MustCommit(db) // TODO(iquidus): check this. previously: MustCommitGenesis(db, new(genesisT.Genesis))
 		engine  = ethash.NewFullFaker()
 		config  = &CacheConfig{
 			TrieCleanLimit: 256,

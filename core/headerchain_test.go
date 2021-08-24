@@ -19,6 +19,7 @@ package core
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"testing"
 	"time"
 
@@ -71,7 +72,7 @@ func testInsert(t *testing.T, hc *HeaderChain, chain []*types.Header, wantStatus
 func TestHeaderInsertion(t *testing.T) {
 	var (
 		db      = rawdb.NewMemoryDatabase()
-		genesis = MustCommitGenesis(db, new(genesisT.Genesis))
+		genesis = MustCommitGenesis(db, &genesisT.Genesis{BaseFee: big.NewInt(params.InitialBaseFee)})
 	)
 
 	hc, err := NewHeaderChain(db, params.AllEthashProtocolChanges, ethash.NewFaker(), func() bool { return false })

@@ -26,7 +26,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -324,10 +323,10 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 
 	if !eip3529f {
 		// Before EIP-3529: refunds were capped to gasUsed / 2
-		st.refundGas(params.RefundQuotient)
+		st.refundGas(vars.RefundQuotient)
 	} else {
 		// After EIP-3529: refunds are capped to gasUsed / 5
-		st.refundGas(params.RefundQuotientEIP3529)
+		st.refundGas(vars.RefundQuotientEIP3529)
 	}
 	effectiveTip := st.gasPrice
 	if london { // TODO(iquidus): which eip is this?

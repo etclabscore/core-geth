@@ -132,10 +132,13 @@ type ProtocolSpecifier interface {
 	SetEIP1706Transition(n *uint64) error
 	GetEIP2537Transition() *uint64
 	SetEIP2537Transition(n *uint64) error
+
 	GetECBP1100Transition() *uint64
 	SetECBP1100Transition(n *uint64) error
 	GetEIP2315Transition() *uint64
 	SetEIP2315Transition(n *uint64) error
+	GetEIP1559Transition() *uint64
+	SetEIP1559Transition(n *uint64) error
 
 	// ModExp gas cost
 	GetEIP2565Transition() *uint64

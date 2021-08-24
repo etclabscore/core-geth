@@ -23,17 +23,18 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // VerifyEip1559Header verifies some header attributes which were changed in EIP-1559,
 // - gas limit check
 // - basefee check
-func VerifyEip1559Header(config *params.ChainConfig, parent, header *types.Header) error {
+func VerifyEip1559Header(config ctypes.ChainConfigurator, parent, header *types.Header) error {
 	// Verify that the gas limit remains within allowed bounds
 	parentGasLimit := parent.GasLimit
-	if !config.IsLondon(parent.Number) {
-		parentGasLimit = parent.GasLimit * params.ElasticityMultiplier
+	if !config.IsEnabled(config.GetEIP1559Transition, parent.Number) {
+		parentGasLimit = parent.GasLimit * vars.ElasticityMultiplier
 	}
 	if err := VerifyGaslimit(parentGasLimit, header.GasLimit); err != nil {
 		return err
@@ -52,16 +53,16 @@ func VerifyEip1559Header(config *params.ChainConfig, parent, header *types.Heade
 }
 
 // CalcBaseFee calculates the basefee of the header.
-func CalcBaseFee(config *params.ChainConfig, parent *types.Header) *big.Int {
+func CalcBaseFee(config ctypes.ChainConfigurator, parent *types.Header) *big.Int {
 	// If the current block is the first EIP-1559 block, return the InitialBaseFee.
-	if !config.IsLondon(parent.Number) {
-		return new(big.Int).SetUint64(params.InitialBaseFee)
+	if !config.IsEnabled(config.GetEIP1559Transition, parent.Number) {
+		return new(big.Int).SetUint64(vars.InitialBaseFee)
 	}
 
 	var (
-		parentGasTarget          = parent.GasLimit / params.ElasticityMultiplier
+		parentGasTarget          = parent.GasLimit / vars.ElasticityMultiplier
 		parentGasTargetBig       = new(big.Int).SetUint64(parentGasTarget)
-		baseFeeChangeDenominator = new(big.Int).SetUint64(params.BaseFeeChangeDenominator)
+		baseFeeChangeDenominator = new(big.Int).SetUint64(vars.BaseFeeChangeDenominator)
 	)
 	// If the parent gasUsed is the same as the target, the baseFee remains unchanged.
 	if parent.GasUsed == parentGasTarget {

@@ -288,6 +288,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	eip2f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2Transition, st.evm.Context.BlockNumber)
 	eip2028f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2028Transition, st.evm.Context.BlockNumber)
 	eip3529f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3529Transition, st.evm.Context.BlockNumber)
+	eip1559f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP1559Transition, st.evm.Context.BlockNumber)
 	contractCreation := msg.To() == nil
 
 	// Pay intrinsic gas
@@ -329,7 +330,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		st.refundGas(vars.RefundQuotientEIP3529)
 	}
 	effectiveTip := st.gasPrice
-	if london { // TODO(iquidus): which eip is this?
+	if eip1559f { // TODO(iquidus): which eip is this?
 		effectiveTip = cmath.BigMin(st.gasTipCap, new(big.Int).Sub(st.gasFeeCap, st.evm.Context.BaseFee))
 	}
 	st.state.AddBalance(st.evm.Context.Coinbase, new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), effectiveTip))

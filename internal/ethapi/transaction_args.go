@@ -84,7 +84,7 @@ func (args *TransactionArgs) setDefaults(ctx context.Context, b Backend) error {
 	// need to consult the chain for defaults. It's definitely a London tx.
 	if args.MaxPriorityFeePerGas == nil || args.MaxFeePerGas == nil {
 		// In this clause, user left some fields unspecified.
-		if b.ChainConfig().IsLondon(head.Number) && args.GasPrice == nil {
+		if b.ChainConfig().IsEnabled(b.ChainConfig().GetEIP1559Transition, head.Number) && args.GasPrice == nil {
 			if args.MaxPriorityFeePerGas == nil {
 				tip, err := b.SuggestGasTipCap(ctx)
 				if err != nil {
@@ -111,7 +111,7 @@ func (args *TransactionArgs) setDefaults(ctx context.Context, b Backend) error {
 				if err != nil {
 					return err
 				}
-				if b.ChainConfig().IsLondon(head.Number) {
+				if b.ChainConfig().IsEnabled(b.ChainConfig().GetEIP1559Transition, head.Number) {
 					// The legacy tx gas price suggestion should not add 2x base fee
 					// because all fees are consumed, so it would result in a spiral
 					// upwards.
@@ -165,7 +165,7 @@ func (args *TransactionArgs) setDefaults(ctx context.Context, b Backend) error {
 		log.Trace("Estimate gas usage automatically", "gas", args.Gas)
 	}
 	if args.ChainID == nil {
-		id := (*hexutil.Big)(b.ChainConfig().ChainID)
+		id := (*hexutil.Big)(b.ChainConfig().GetChainID())
 		args.ChainID = id
 	}
 	return nil

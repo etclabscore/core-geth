@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
@@ -146,7 +147,7 @@ func (api *consensusAPI) AssembleBlock(params assembleBlockParams) (*executableD
 		Extra:      []byte{},
 		Time:       params.Timestamp,
 	}
-	if config := api.eth.BlockChain().Config(); config.IsLondon(header.Number) {
+	if config := api.eth.BlockChain().Config(); config.IsEnabled(config.GetEIP1559Transition, header.Number) {
 		header.BaseFee = misc.CalcBaseFee(config, parent.Header())
 	}
 	err = api.eth.Engine().Prepare(bc, header)
@@ -250,7 +251,7 @@ func decodeTransactions(enc [][]byte) ([]*types.Transaction, error) {
 	return txs, nil
 }
 
-func insertBlockParamsToBlock(config *chainParams.ChainConfig, parent *types.Header, params executableData) (*types.Block, error) {
+func insertBlockParamsToBlock(config ctypes.ChainConfigurator, parent *types.Header, params executableData) (*types.Block, error) {
 	txs, err := decodeTransactions(params.Transactions)
 	if err != nil {
 		return nil, err
@@ -272,7 +273,7 @@ func insertBlockParamsToBlock(config *chainParams.ChainConfig, parent *types.Hea
 		GasUsed:     params.GasUsed,
 		Time:        params.Timestamp,
 	}
-	if config.IsLondon(number) {
+	if config.IsEnabled(config.GetEIP1559Transition, number) {
 		header.BaseFee = misc.CalcBaseFee(config, parent)
 	}
 	block := types.NewBlockWithHeader(header).WithBody(txs, nil /* uncles */)

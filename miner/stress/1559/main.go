@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/fdlimit"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
@@ -42,6 +41,8 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 var (
@@ -58,7 +59,7 @@ func main() {
 		faucets[i], _ = crypto.GenerateKey()
 	}
 	// Pre-generate the ethash mining DAG so we don't race
-	ethash.MakeDataset(1, filepath.Join(os.Getenv("HOME"), ".ethash"))
+	ethash.MakeDataset(1, ethash.CalcEpochLength(0, nil), filepath.Join(os.Getenv("HOME"), ".ethash"))
 
 	// Create an Ethash network based off of the Ropsten config
 	genesis := makeGenesis(faucets)
@@ -108,7 +109,7 @@ func main() {
 
 		// The signer activates the 1559 features even before the fork,
 		// so the new 1559 txs can be created with this signer.
-		signer = types.LatestSignerForChainID(genesis.Config.ChainID)
+		signer = types.LatestSignerForChainID(genesis.GetChainID())
 	)
 	for {
 		// Pick a random mining node
@@ -133,7 +134,7 @@ func main() {
 		}
 
 		// Wait if the basefee is raised too fast
-		if baseFee != nil && baseFee.Cmp(new(big.Int).Mul(big.NewInt(100), big.NewInt(params.GWei))) > 0 {
+		if baseFee != nil && baseFee.Cmp(new(big.Int).Mul(big.NewInt(100), big.NewInt(vars.GWei))) > 0 {
 			time.Sleep(500 * time.Millisecond)
 		}
 	}
@@ -185,22 +186,28 @@ func makeTransaction(nonce uint64, privKey *ecdsa.PrivateKey, signer types.Signe
 
 // makeGenesis creates a custom Ethash genesis block based on some pre-defined
 // faucet accounts.
-func makeGenesis(faucets []*ecdsa.PrivateKey) *core.Genesis {
-	genesis := core.DefaultRopstenGenesisBlock()
+func makeGenesis(faucets []*ecdsa.PrivateKey) *genesisT.Genesis {
+	genesis := params.DefaultRopstenGenesisBlock()
 
 	genesis.Config = params.AllEthashProtocolChanges
-	genesis.Config.LondonBlock = londonBlock
-	genesis.Difficulty = params.MinimumDifficulty
+	var londonBlockUint64 *uint64
+	if londonBlock != nil {
+		l := londonBlock.Uint64()
+		londonBlockUint64 = &l
+	}
+	genesis.SetEIP1559Transition(londonBlockUint64)
+	genesis.Difficulty = vars.MinimumDifficulty
 
 	// Small gaslimit for easier basefee moving testing.
 	genesis.GasLimit = 8_000_000
 
-	genesis.Config.ChainID = big.NewInt(18)
-	genesis.Config.EIP150Hash = common.Hash{}
+	genesis.SetChainID(big.NewInt(18))
+	// TODO(meowsbits): review me
+	// genesis.Config.EIP150Hash = common.Hash{}
 
-	genesis.Alloc = core.GenesisAlloc{}
+	genesis.Alloc = genesisT.GenesisAlloc{}
 	for _, faucet := range faucets {
-		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = core.GenesisAccount{
+		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = genesisT.GenesisAccount{
 			Balance: new(big.Int).Exp(big.NewInt(2), big.NewInt(128), nil),
 		}
 	}
@@ -212,7 +219,7 @@ func makeGenesis(faucets []*ecdsa.PrivateKey) *core.Genesis {
 	return genesis
 }
 
-func makeMiner(genesis *core.Genesis) (*node.Node, *eth.Ethereum, error) {
+func makeMiner(genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, error) {
 	// Define the basic configurations for the Ethereum node
 	datadir, _ := ioutil.TempDir("", "")
 
@@ -234,7 +241,7 @@ func makeMiner(genesis *core.Genesis) (*node.Node, *eth.Ethereum, error) {
 	}
 	ethBackend, err := eth.New(stack, &ethconfig.Config{
 		Genesis:         genesis,
-		NetworkId:       genesis.Config.ChainID.Uint64(),
+		NetworkId:       genesis.GetChainID().Uint64(),
 		SyncMode:        downloader.FullSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,

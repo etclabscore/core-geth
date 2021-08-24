@@ -132,7 +132,7 @@ func (host *hostContext) GetStorage(addr evmc.Address, evmcKey evmc.Hash) evmc.H
 func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, evmcValue evmc.Hash) (status evmc.StorageStatus) {
 	addr := common.Address(evmcAddr)
 	key := common.Hash(evmcKey)
-	value := uint256.NewInt().SetBytes(evmcValue[:])
+	value := new(uint256.Int).SetBytes(evmcValue[:])
 	var oldValue uint256.Int
 	oldValue.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
 	if oldValue.Eq(value) {
@@ -278,7 +278,7 @@ func (host *hostContext) Call(kind evmc.CallKind,
 	gasU := uint64(gas)
 	var gasLeftU uint64
 
-	value := uint256.NewInt()
+	value := new(uint256.Int)
 	value.SetBytes(valueBytes[:])
 
 	salt := big.NewInt(0)

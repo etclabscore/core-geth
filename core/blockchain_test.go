@@ -2428,12 +2428,12 @@ func TestSideImportPrunedBlocks(t *testing.T) {
 	engine := ethash.NewFaker()
 	db := rawdb.NewMemoryDatabase()
 	gspec := &genesisT.Genesis{BaseFee: big.NewInt(vars.InitialBaseFee)}
-	genesis := MustCommitGenesis(db, gpsec)
+	genesis := MustCommitGenesis(db, gspec)
 
 	// Generate and import the canonical chain
 	blocks, _ := GenerateChain(params.TestChainConfig, genesis, engine, db, 2*TriesInMemory, nil)
 	diskdb := rawdb.NewMemoryDatabase()
-	MustCommitGenesis(diskdb, gpsec)
+	MustCommitGenesis(diskdb, gspec)
 	chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("failed to create tester chain: %v", err)

@@ -3157,10 +3157,10 @@ func TestEIP1559Transition(t *testing.T) {
 		key2, _ = crypto.HexToECDSA("8a1f9a8f95be41cd7ccb6168179afb4504aefe388d1e14474d32c45c72ce7b7a")
 		addr1   = crypto.PubkeyToAddress(key1.PublicKey)
 		addr2   = crypto.PubkeyToAddress(key2.PublicKey)
-		funds   = new(big.Int).Mul(common.Big1, big.NewInt(params.Ether))
-		gspec   = &Genesis{
+		funds   = new(big.Int).Mul(common.Big1, big.NewInt(vars.Ether))
+		gspec   = &genesisT.Genesis{
 			Config: params.AllEthashProtocolChanges,
-			Alloc: GenesisAlloc{
+			Alloc: genesisT.GenesisAlloc{
 				addr1: {Balance: funds},
 				addr2: {Balance: funds},
 				// The address 0xAAAA sloads 0x00 and 0x01
@@ -3180,7 +3180,7 @@ func TestEIP1559Transition(t *testing.T) {
 
 	gspec.Config.BerlinBlock = common.Big0
 	gspec.Config.LondonBlock = common.Big0
-	genesis := gspec.MustCommit(db)
+	genesis := MustCommitGenesis(db, gspec)
 	signer := types.LatestSigner(gspec.Config)
 
 	blocks, _ := GenerateChain(gspec.Config, genesis, engine, db, 1, func(i int, b *BlockGen) {
@@ -3193,7 +3193,7 @@ func TestEIP1559Transition(t *testing.T) {
 		}}
 
 		txdata := &types.DynamicFeeTx{
-			ChainID:    gspec.Config.ChainID,
+			ChainID:    gspec.Config.GetChainID(),
 			Nonce:      0,
 			To:         &aa,
 			Gas:        30000,
@@ -3209,7 +3209,7 @@ func TestEIP1559Transition(t *testing.T) {
 	})
 
 	diskdb := rawdb.NewMemoryDatabase()
-	gspec.MustCommit(diskdb)
+	MustCommitGenesis(diskdb, gspec)
 
 	chain, err := NewBlockChain(diskdb, nil, gspec.Config, engine, vm.Config{}, nil, nil)
 	if err != nil {
@@ -3222,8 +3222,8 @@ func TestEIP1559Transition(t *testing.T) {
 	block := chain.GetBlockByNumber(1)
 
 	// 1+2: Ensure EIP-1559 access lists are accounted for via gas usage.
-	expectedGas := params.TxGas + params.TxAccessListAddressGas + params.TxAccessListStorageKeyGas +
-		vm.GasQuickStep*2 + params.WarmStorageReadCostEIP2929 + params.ColdSloadCostEIP2929
+	expectedGas := vars.TxGas + vars.TxAccessListAddressGas + vars.TxAccessListStorageKeyGas +
+		vm.GasQuickStep*2 + vars.WarmStorageReadCostEIP2929 + vars.ColdSloadCostEIP2929
 	if block.GasUsed() != expectedGas {
 		t.Fatalf("incorrect amount of gas spent: expected %d, got %d", expectedGas, block.GasUsed())
 	}
@@ -3234,7 +3234,7 @@ func TestEIP1559Transition(t *testing.T) {
 	actual := state.GetBalance(block.Coinbase())
 	expected := new(big.Int).Add(
 		new(big.Int).SetUint64(block.GasUsed()*block.Transactions()[0].GasTipCap().Uint64()),
-		ethash.ConstantinopleBlockReward,
+		ethtest.ConstantinopleBlockReward,
 	)
 	if actual.Cmp(expected) != 0 {
 		t.Fatalf("miner balance incorrect: expected %d, got %d", expected, actual)

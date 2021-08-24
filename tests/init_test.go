@@ -18,6 +18,7 @@ package tests
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -59,9 +60,9 @@ func TestMain(m *testing.M) {
 }
 
 var (
-	baseDir            = filepath.Join(".", "testdata")
-	blockTestDir       = filepath.Join(baseDir, "BlockchainTests")
-	stateTestDir       = filepath.Join(baseDir, "GeneralStateTests")
+	baseDir      = filepath.Join(".", "testdata")
+	blockTestDir = filepath.Join(baseDir, "BlockchainTests")
+	stateTestDir = filepath.Join(baseDir, "GeneralStateTests")
 	//legacyStateTestDir = filepath.Join(baseDir, "LegacyTests", "Constantinople", "GeneralStateTests")
 	transactionTestDir = filepath.Join(baseDir, "TransactionTests")
 	vmTestDir          = filepath.Join(baseDir, "VMTests")
@@ -118,7 +119,9 @@ type testMatcher struct {
 	failpat        []testFailure
 	skiploadpat    []*regexp.Regexp
 	slowpat        []*regexp.Regexp
+	skipforkpat    []*regexp.Regexp
 	runonlylistpat *regexp.Regexp
+	noParallel     bool
 }
 
 type testConfig struct {
@@ -185,10 +188,11 @@ func (tm *testMatcher) findSkip(name string) (reason string, skipload bool) {
 }
 
 // findConfig returns the chain config matching defined patterns.
-func (tm *testMatcher) findConfig(t *testing.T) config ctypes.ChainConfigurator {
+func (tm *testMatcher) findConfig(name string) (config ctypes.ChainConfigurator, configRegexKey string) {
+	// TODO(fjl): name can be derived from testing.T when min Go version is 1.8
 	for _, m := range tm.configpat {
-		if m.p.MatchString(t.Name()) {
-			return &m.config
+		if m.p.MatchString(name) {
+			return m.config, m.p.String()
 		}
 	}
 	log.Println("using empty config", name)

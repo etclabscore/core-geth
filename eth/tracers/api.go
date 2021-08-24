@@ -914,7 +914,7 @@ func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.CallArgs, blockN
 			"hasFromSufficientBalanceForGasCost":         hasFromSufficientBalanceForGasCost,
 		}
 
-		res, err := api.traceTx(ctx, msg, new(txTraceContext), vmctx, statedb, taskExtraContext, traceConfig)
+		res, err := api.traceTx(ctx, msg, new(Context), vmctx, statedb, taskExtraContext, traceConfig)
 		if err != nil {
 			results[idx] = &txTraceResult{Error: err.Error()}
 			continue
@@ -928,7 +928,6 @@ func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.CallArgs, blockN
 	}
 
 	return results, nil
-	// TODO(iquidus): return api.traceTx(ctx, msg, new(Context), vmctx, statedb, traceConfig) ??
 }
 
 // traceTx configures a new tracer according to the provided configuration, and

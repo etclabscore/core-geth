@@ -31,7 +31,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
 	"gopkg.in/olebedev/go-duktape.v3"
 )
 
@@ -322,10 +321,11 @@ type Tracer struct {
 	interrupt uint32 // Atomic flag to signal execution interruption
 	reason    error  // Textual reason for the interruption
 
-	supportsStepPerfOptimisations bool             // Checks wether tracer supports `getCallstackLength` method in order to achieve optimal performance for call_tracer*
-	andleNextOpCode               bool             // Flag for step prechecker, instructing that next VM opcode has to be proccessed in `step` method
-	callTracerCallstackLength     *uint            // Holds the current callstack length for call tracers, which can be compared with VM depth
-	activePrecompiles             []common.Address // Updated on CaptureStart based on given rules
+	activePrecompiles []common.Address // Updated on CaptureStart based on given rules
+
+	supportsStepPerfOptimisations bool  // Checks wether tracer supports `getCallstackLength` method in order to achieve optimal performance for call_tracer*
+	andleNextOpCode               bool  // Flag for step prechecker, instructing that next VM opcode has to be proccessed in `step` method
+	callTracerCallstackLength     *uint // Holds the current callstack length for call tracers, which can be compared with VM depth
 }
 
 // Context contains some contextual infos for a transaction execution that is not
@@ -433,8 +433,14 @@ func New(code string, ctx *Context) (*Tracer, error) {
 		return 1
 	})
 	tracer.vm.PushGlobalGoFunction("isPrecompiled", func(ctx *duktape.Context) int {
-		_, ok := vm.PrecompiledContractsForConfig(params.AllEthashProtocolChanges, big.NewInt(0))[common.BytesToAddress(popSlice(ctx))]
-		ctx.PushBoolean(ok)
+		addr := common.BytesToAddress(popSlice(ctx))
+		for _, p := range tracer.activePrecompiles {
+			if p == addr {
+				ctx.PushBoolean(true)
+				return 1
+			}
+		}
+		ctx.PushBoolean(false)
 		return 1
 	})
 	tracer.vm.PushGlobalGoFunction("slice", func(ctx *duktape.Context) int {
@@ -720,7 +726,7 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 		}
 	}
 
-	if _, err := jst.call("step", "log", "db"); err != nil {
+	if _, err := jst.call(true, "step", "log", "db"); err != nil {
 		jst.err = wrapError("step", err)
 	}
 }

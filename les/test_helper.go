@@ -145,12 +145,12 @@ func prepare(n int, backend *backends.SimulatedBackend) {
 			backend.SendTransaction(ctx, tx2)
 
 			// user1 deploys a test contract
-			tx3, _ := types.SignTx(types.NewContractCreation(userNonce1+1, big.NewInt(0), 200000, big.NewInt(params.InitialBaseFee), testContractCode), signer, userKey1)
+			tx3, _ := types.SignTx(types.NewContractCreation(userNonce1+1, big.NewInt(0), 200000, big.NewInt(vars.InitialBaseFee), testContractCode), signer, userKey1)
 			backend.SendTransaction(ctx, tx3)
 			testContractAddr = crypto.CreateAddress(userAddr1, userNonce1+1)
 
 			// user1 deploys a event contract
-			tx4, _ := types.SignTx(types.NewContractCreation(userNonce1+2, big.NewInt(0), 200000, big.NewInt(params.InitialBaseFee), testEventEmitterCode), signer, userKey1)
+			tx4, _ := types.SignTx(types.NewContractCreation(userNonce1+2, big.NewInt(0), 200000, big.NewInt(vars.InitialBaseFee), testEventEmitterCode), signer, userKey1)
 			backend.SendTransaction(ctx, tx4)
 		case 2:
 			// Builtin-block
@@ -164,7 +164,7 @@ func prepare(n int, backend *backends.SimulatedBackend) {
 
 			// invoke test contract
 			data := common.Hex2Bytes("C16431B900000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001")
-			tx2, _ := types.SignTx(types.NewTransaction(bankNonce+1, testContractAddr, big.NewInt(0), 100000, big.NewInt(params.InitialBaseFee), data), signer, bankKey)
+			tx2, _ := types.SignTx(types.NewTransaction(bankNonce+1, testContractAddr, big.NewInt(0), 100000, big.NewInt(vars.InitialBaseFee), data), signer, bankKey)
 			backend.SendTransaction(ctx, tx2)
 		case 3:
 			// Builtin-block
@@ -174,7 +174,7 @@ func prepare(n int, backend *backends.SimulatedBackend) {
 			// invoke test contract
 			bankNonce, _ := backend.PendingNonceAt(ctx, bankAddr)
 			data := common.Hex2Bytes("C16431B900000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002")
-			tx, _ := types.SignTx(types.NewTransaction(bankNonce, testContractAddr, big.NewInt(0), 100000, big.NewInt(params.InitialBaseFee), data), signer, bankKey)
+			tx, _ := types.SignTx(types.NewTransaction(bankNonce, testContractAddr, big.NewInt(0), 100000, big.NewInt(vars.InitialBaseFee), data), signer, bankKey)
 			backend.SendTransaction(ctx, tx)
 		}
 		backend.Commit()
@@ -200,7 +200,7 @@ func newTestClientHandler(backend *backends.SimulatedBackend, odr *LesOdr, index
 			Config:   params.AllEthashProtocolChanges,
 			Alloc:    genesisT.GenesisAlloc{bankAddr: {Balance: bankFunds}},
 			GasLimit: 100000000,
-			BaseFee:  big.NewInt(params.InitialBaseFee),
+			BaseFee:  big.NewInt(vars.InitialBaseFee),
 		}
 		oracle *checkpointoracle.CheckpointOracle
 	)
@@ -260,7 +260,7 @@ func newTestServerHandler(blocks int, indexers []*core.ChainIndexer, db ethdb.Da
 			Config:   params.AllEthashProtocolChanges,
 			Alloc:    genesisT.GenesisAlloc{bankAddr: {Balance: bankFunds}},
 			GasLimit: 100000000,
-			BaseFee:  big.NewInt(params.InitialBaseFee),
+			BaseFee:  big.NewInt(vars.InitialBaseFee),
 		}
 		oracle *checkpointoracle.CheckpointOracle
 	)

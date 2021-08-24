@@ -77,6 +77,18 @@ func DefaultGoerliGenesisBlock() *genesisT.Genesis {
 	}
 }
 
+func DefaultCalaverasGenesisBlock() *genesisT.Genesis {
+	// Full genesis: https://gist.github.com/holiman/c6ed9269dce28304ad176314caa75e97
+	return &genesisT.Genesis{
+		Config:     CalaverasChainConfig,
+		Timestamp:  1622378367,
+		ExtraData:  hexutil.MustDecode("0x00000000000000000000000000000000000000000000000000000000000000005211cea3870c7ba7c6c44b185e62eecdb864cd8c560228ce57d31efbf64c200b2c200aacec78cf17a7148e784fe95a7a750335f8b9572ee28d72e7650000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+		GasLimit:   4700000,
+		Difficulty: big.NewInt(1),
+		Alloc:      genesisT.DecodePreAlloc(CalaverasAllocData),
+	}
+}
+
 // DeveloperGenesisBlock returns the 'geth --dev' genesis block. Note, this must
 // be seeded with the
 func DeveloperGenesisBlock(period uint64, faucet common.Address, useEthash bool) *genesisT.Genesis {

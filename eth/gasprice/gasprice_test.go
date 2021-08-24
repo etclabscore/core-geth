@@ -124,8 +124,8 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 				Nonce:     b.TxNonce(addr),
 				To:        &common.Address{},
 				Gas:       30000,
-				GasFeeCap: big.NewInt(100 * params.GWei),
-				GasTipCap: big.NewInt(int64(i+1) * params.GWei),
+				GasFeeCap: big.NewInt(100 * vars.GWei),
+				GasTipCap: big.NewInt(int64(i+1) * vars.GWei),
 				Data:      []byte{},
 			}
 			tx = types.NewTx(txdata)
@@ -134,7 +134,7 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 				Nonce:    b.TxNonce(addr),
 				To:       &common.Address{},
 				Gas:      21000,
-				GasPrice: big.NewInt(int64(i+1) * params.GWei),
+				GasPrice: big.NewInt(int64(i+1) * vars.GWei),
 				Value:    big.NewInt(100),
 				Data:     []byte{},
 			}
@@ -148,7 +148,7 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 	})
 	// Construct testing chain
 	diskdb := rawdb.NewMemoryDatabase()
-	gspec.Commit(diskdb)
+	core.MustCommitGenesis(diskdb, gspec)
 	chain, err := core.NewBlockChain(diskdb, nil, gspec.Config, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to create local chain, %v", err)
@@ -175,11 +175,11 @@ func TestSuggestTipCap(t *testing.T) {
 		fork   *big.Int // London fork number
 		expect *big.Int // Expected gasprice suggestion
 	}{
-		{nil, big.NewInt(params.GWei * int64(30))},
-		{big.NewInt(0), big.NewInt(params.GWei * int64(30))},  // Fork point in genesis
-		{big.NewInt(1), big.NewInt(params.GWei * int64(30))},  // Fork point in first block
-		{big.NewInt(32), big.NewInt(params.GWei * int64(30))}, // Fork point in last block
-		{big.NewInt(33), big.NewInt(params.GWei * int64(30))}, // Fork point in the future
+		{nil, big.NewInt(vars.GWei * int64(30))},
+		{big.NewInt(0), big.NewInt(vars.GWei * int64(30))},  // Fork point in genesis
+		{big.NewInt(1), big.NewInt(vars.GWei * int64(30))},  // Fork point in first block
+		{big.NewInt(32), big.NewInt(vars.GWei * int64(30))}, // Fork point in last block
+		{big.NewInt(33), big.NewInt(vars.GWei * int64(30))}, // Fork point in the future
 	}
 	for _, c := range cases {
 		backend := newTestBackend(t, c.fork, false)

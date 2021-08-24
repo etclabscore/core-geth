@@ -116,8 +116,8 @@ func TestEth2AssembleBlock(t *testing.T) {
 	defer n.Close()
 
 	api := newConsensusAPI(ethservice)
-	signer := types.NewEIP155Signer(ethservice.BlockChain().Config().ChainID)
-	tx, err := types.SignTx(types.NewTransaction(0, blocks[8].Coinbase(), big.NewInt(1000), params.TxGas, big.NewInt(params.InitialBaseFee), nil), signer, testKey)
+	signer := types.NewEIP155Signer(ethservice.BlockChain().Config().GetChainID())
+	tx, err := types.SignTx(types.NewTransaction(0, blocks[8].Coinbase(), big.NewInt(1000), vars.TxGas, big.NewInt(vars.InitialBaseFee), nil), signer, testKey)
 	if err != nil {
 		t.Fatalf("error signing transaction, err=%v", err)
 	}

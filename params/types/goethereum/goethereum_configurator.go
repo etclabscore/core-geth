@@ -407,12 +407,16 @@ func (c *ChainConfig) SetEIP1706Transition(n *uint64) error {
 	return nil
 }
 
+// GetEIP2537Transition implements EIP2537.
+// This logic is written but not configured for any Ethereum-supported networks, yet.
 func (c *ChainConfig) GetEIP2537Transition() *uint64 {
-	return bigNewU64(c.YoloV3Block)
+	return nil
 }
 
 func (c *ChainConfig) SetEIP2537Transition(n *uint64) error {
-	c.YoloV3Block = setBig(c.YoloV3Block, n)
+	if n != nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
 	return nil
 }
 
@@ -425,17 +429,21 @@ func (c *ChainConfig) SetECBP1100Transition(n *uint64) error {
 	return nil
 }
 
+// GetEIP2315Transition implements EIP2537.
+// This logic is written but not configured for any Ethereum-supported networks, yet.
 func (c *ChainConfig) GetEIP2315Transition() *uint64 {
-	return bigNewU64(c.YoloV3Block)
+	return nil
 }
 
 func (c *ChainConfig) SetEIP2315Transition(n *uint64) error {
-	c.YoloV3Block = setBig(c.YoloV3Block, n)
+	if n != nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
 	return nil
 }
 
 func (c *ChainConfig) GetEIP2929Transition() *uint64 {
-	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+	return bigNewU64Min(c.BerlinBlock, c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2929Transition(n *uint64) error {
@@ -444,7 +452,7 @@ func (c *ChainConfig) SetEIP2929Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2930Transition() *uint64 {
-	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+	return bigNewU64Min(c.BerlinBlock, c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2930Transition(n *uint64) error {
@@ -453,7 +461,7 @@ func (c *ChainConfig) SetEIP2930Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2565Transition() *uint64 {
-	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+	return bigNewU64Min(c.BerlinBlock, c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2565Transition(n *uint64) error {
@@ -462,7 +470,7 @@ func (c *ChainConfig) SetEIP2565Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2718Transition() *uint64 {
-	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+	return bigNewU64Min(c.BerlinBlock, c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2718Transition(n *uint64) error {

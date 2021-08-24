@@ -51,7 +51,7 @@ func TestDifficulty(t *testing.T) {
 			t.Skip("difficulty below minimum")
 			return
 		}
-		if err := dt.checkFailure(t, name, test.Run(cfg)); err != nil {
+		if err := dt.checkFailure(t, test.Run(cfg)); err != nil {
 			t.Error(err)
 		}
 	})
@@ -60,9 +60,11 @@ func TestDifficulty(t *testing.T) {
 func TestDifficultyNDJSON(t *testing.T) {
 	t.Parallel()
 
+	dt := new(testMatcher)
+
 	dt.walk(t, difficultyTestDir, func(t *testing.T, name string, test *DifficultyTest) {
-		cfg := dt.findConfig(t)
-		if test.ParentDifficulty.Cmp(params.MinimumDifficulty) < 0 {
+		cfg, _ := dt.findConfig(t.Name())
+		if test.ParentDifficulty.Cmp(vars.MinimumDifficulty) < 0 {
 			t.Skip("difficulty below minimum")
 			return
 		}

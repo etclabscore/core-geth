@@ -452,7 +452,7 @@ func (c *ChainConfig) SetEIP2929Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2930Transition() *uint64 {
-	return bigNewU64Min(c.BerlinBlock, c.BerlinBlock)
+	return bigNewU64(c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2930Transition(n *uint64) error {
@@ -470,7 +470,7 @@ func (c *ChainConfig) SetEIP1559Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2565Transition() *uint64 {
-	return bigNewU64Min(c.BerlinBlock, c.BerlinBlock)
+	return bigNewU64(c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2565Transition(n *uint64) error {
@@ -479,7 +479,7 @@ func (c *ChainConfig) SetEIP2565Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2718Transition() *uint64 {
-	return bigNewU64Min(c.BerlinBlock, c.BerlinBlock)
+	return bigNewU64(c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2718Transition(n *uint64) error {

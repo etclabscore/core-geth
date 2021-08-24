@@ -216,7 +216,16 @@ func (t *StateTest) RunNoVerifyWithPost(subtest StateSubtest, vmconfig vm.Config
 	snaps, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre, snapshotter)
 
 	// post := t.json.Post[subtest.Fork][subtest.Index]
-	msg, err := t.json.Tx.toMessage(post)
+	var baseFee *big.Int
+	if config.IsEnabled(config.GetEIP1559Transition, new(big.Int)) {
+		baseFee = t.json.Env.BaseFee
+		if baseFee == nil {
+			// Retesteth uses `0x10` for genesis baseFee. Therefore, it defaults to
+			// parent - 2 : 0xa as the basefee for 'this' context.
+			baseFee = big.NewInt(0x0a)
+		}
+	}
+	msg, err := t.json.Tx.toMessage(post, baseFee)
 	if err != nil {
 		return nil, nil, common.Hash{}, err
 	}
@@ -259,7 +268,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	snaps, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre, snapshotter)
 
 	var baseFee *big.Int
-	if config.IsLondon(new(big.Int)) {
+	if config.IsEnabled(config.GetEIP1559Transition, new(big.Int)) {
 		baseFee = t.json.Env.BaseFee
 		if baseFee == nil {
 			// Retesteth uses `0x10` for genesis baseFee. Therefore, it defaults to

@@ -54,18 +54,21 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			log.Info("Writing custom genesis block")
 		}
 
-		if overrideMagneto != nil {
-			n := overrideMagneto.Uint64()
-			if err := genesis.SetEIP2565Transition(&n); err != nil {
+		if overrideMystique != nil {
+			n := overrideMystique.Uint64()
+			if err := genesis.SetEIP1559Transition(&n); err != nil {
 				return genesis, stored, err
 			}
-			if err := genesis.SetEIP2929Transition(&n); err != nil {
+			if err := genesis.SetEIP3198Transition(&n); err != nil {
 				return genesis, stored, err
 			}
-			if err := genesis.SetEIP2718Transition(&n); err != nil {
+			if err := genesis.SetEIP3529Transition(&n); err != nil {
 				return genesis, stored, err
 			}
-			if err := genesis.SetEIP2930Transition(&n); err != nil {
+			if err := genesis.SetEIP3541Transition(&n); err != nil {
+				return genesis, stored, err
+			}
+			if err := genesis.SetEIP3554Transition(&n); err != nil {
 				return genesis, stored, err
 			}
 		}
@@ -106,18 +109,21 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	newcfg := configOrDefault(genesis, stored)
 
 	// TODO(ziogaschr): overrideMystique
-	if overrideMagneto != nil {
-		n := overrideMagneto.Uint64()
-		if err := newcfg.SetEIP2565Transition(&n); err != nil {
+	if overrideMystique != nil {
+		n := overrideMystique.Uint64()
+		if err := newcfg.SetEIP1559Transition(&n); err != nil {
 			return newcfg, stored, err
 		}
-		if err := newcfg.SetEIP2929Transition(&n); err != nil {
+		if err := newcfg.SetEIP3198Transition(&n); err != nil {
 			return newcfg, stored, err
 		}
-		if err := newcfg.SetEIP2718Transition(&n); err != nil {
+		if err := newcfg.SetEIP3529Transition(&n); err != nil {
 			return newcfg, stored, err
 		}
-		if err := newcfg.SetEIP2930Transition(&n); err != nil {
+		if err := newcfg.SetEIP3541Transition(&n); err != nil {
+			return newcfg, stored, err
+		}
+		if err := newcfg.SetEIP3554Transition(&n); err != nil {
 			return newcfg, stored, err
 		}
 	}
@@ -226,11 +232,11 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	if g.Difficulty == nil {
 		head.Difficulty = vars.GenesisDifficulty
 	}
-	if g.Config != nil && g.Config.IsLondon(common.Big0) {
+	if g.Config != nil && g.Config.IsEnabled(g.Config.GetEIP1559Transition, common.Big0) {
 		if g.BaseFee != nil {
 			head.BaseFee = g.BaseFee
 		} else {
-			head.BaseFee = new(big.Int).SetUint64(params.InitialBaseFee)
+			head.BaseFee = new(big.Int).SetUint64(vars.InitialBaseFee)
 		}
 	}
 	statedb.Commit(false)

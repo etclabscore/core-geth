@@ -191,6 +191,14 @@ type CoreGethChainConfig struct {
 	// https://eips.ethereum.org/EIPS/eip-2929
 	EIP2929FBlock *big.Int `json:"eip2929FBlock,omitempty"`
 
+	// EIP-3198: BASEFEE opcode
+	// https://eips.ethereum.org/EIPS/eip-3198
+	EIP3198FBlock *big.Int `json:"eip3198FBlock,omitempty"`
+
+	// EIP-3554: Difficulty Bomb Delay to December 2021
+	// https://eips.ethereum.org/EIPS/eip-3554
+	EIP3554FBlock *big.Int `json:"eip3554FBlock,omitempty"`
+
 	// TODO: Document me.
 	EIP2930FBlock *big.Int `json:"eip2930FBlock,omitempty"`
 

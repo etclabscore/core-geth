@@ -359,6 +359,7 @@ var (
 		ConstantinopleBlock:       big.NewInt(0),
 		PetersburgBlock:           big.NewInt(0),
 		IstanbulBlock:             big.NewInt(0),
+		LondonBlock:               big.NewInt(0),
 		EWASMBlock:                nil,
 		CatalystBlock:             nil,
 		Ethash:                    nil,

@@ -229,7 +229,13 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 		engine = ethash.NewFaker()
 	}
 
-	chainConfig.LondonBlock = big.NewInt(0)
+	// Turn on London hard fork config.
+	zero := uint64(0)
+	chainConfig.SetEIP1559Transition(&zero)
+	chainConfig.SetEIP3198Transition(&zero)
+	chainConfig.SetEIP3529Transition(&zero)
+	chainConfig.SetEIP3541Transition(&zero)
+	chainConfig.SetEIP3554Transition(&zero)
 	w, b := newTestWorker(t, chainConfig, engine, db, 0)
 	defer w.close()
 

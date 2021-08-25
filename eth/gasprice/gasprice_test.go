@@ -104,10 +104,11 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 		signer = types.LatestSigner(gspec.Config)
 	)
 	if londonBlock != nil {
-		gspec.Config.LondonBlock = londonBlock
+		lb := londonBlock.Uint64()
+		gspec.SetEIP1559Transition(&lb)
 		signer = types.LatestSigner(gspec.Config)
 	} else {
-		gspec.Config.LondonBlock = nil
+		gspec.Config.SetEIP1559Transition(nil)
 	}
 	engine := ethash.NewFaker()
 	db := rawdb.NewMemoryDatabase()
@@ -120,7 +121,7 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 		var tx *types.Transaction
 		if londonBlock != nil && b.Number().Cmp(londonBlock) >= 0 { // TODO(iquidus): 1559?
 			txdata := &types.DynamicFeeTx{
-				ChainID:   gspec.Config.ChainID,
+				ChainID:   gspec.Config.GetChainID(),
 				Nonce:     b.TxNonce(addr),
 				To:        &common.Address{},
 				Gas:       30000,

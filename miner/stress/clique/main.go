@@ -135,13 +135,13 @@ func makeGenesis(faucets []*ecdsa.PrivateKey, sealers []*ecdsa.PrivateKey) *gene
 	genesis := params.DefaultRinkebyGenesisBlock()
 	genesis.GasLimit = 25000000
 
-	genesis.Config.ChainID = big.NewInt(18)
-	genesis.Config.Clique.Period = 1
-	genesis.Config.EIP150Hash = common.Hash{}
+	genesis.SetChainID(big.NewInt(18))
+	genesis.SetCliquePeriod(1)
+	// genesis.Config.EIP150Hash = common.Hash{}
 
-	genesis.Alloc = genesis.GenesisAlloc{}
+	genesis.Alloc = genesisT.GenesisAlloc{}
 	for _, faucet := range faucets {
-		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = genesis.GenesisAccount{
+		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = genesisT.GenesisAccount{
 			Balance: new(big.Int).Exp(big.NewInt(2), big.NewInt(128), nil),
 		}
 	}
@@ -187,7 +187,7 @@ func makeSealer(genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, error) {
 	// Create and register the backend
 	ethBackend, err := eth.New(stack, &ethconfig.Config{
 		Genesis:         genesis,
-		NetworkId:       genesis.Config.ChainID.Uint64(),
+		NetworkId:       genesis.Config.GetChainID().Uint64(),
 		SyncMode:        downloader.FullSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,

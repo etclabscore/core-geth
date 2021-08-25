@@ -37,17 +37,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
-// Command line flags to configure the interpreters.
-var (
-	testEVM   = flag.String("vm.evm", "", "EVM configuration")
-	testEWASM = flag.String("vm.ewasm", "", "EWASM configuration")
-)
-
-func TestMain(m *testing.M) {
-	flag.Parse()
-	os.Exit(m.Run())
-}
-
 var (
 	// The API of this value => filepath<str/ing>,capabilities<k=v>,...
 	testEVM   = flag.String("evmc.evm", "", "EVMC EVM1 configuration")

@@ -322,8 +322,6 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		return big.NewInt(1)
 	}
 
-	// TODO(ziogaschr): check for calcDifficultyEip3554
-
 	// ADJUSTMENT algorithms
 	if config.IsEnabled(config.GetEthashEIP100BTransition, next) {
 		// https://github.com/ethereum/EIPs/issues/100
@@ -396,6 +394,16 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 				continue
 			}
 			fakeBlockNumber.Sub(fakeBlockNumber, dur)
+		}
+		exPeriodRef.Set(fakeBlockNumber)
+
+	} else if config.IsEnabled(config.GetEthashEIP3554Transition, next) {
+		// calcDifficultyEIP3554 is the difficulty adjustment algorithm for London (December 2021).
+		// The calculation uses the Byzantium rules, but with bomb offset 9.7M.
+		fakeBlockNumber := new(big.Int)
+		delayWithOffset := new(big.Int).Sub(vars.EIP3554DifficultyBombDelay, common.Big1)
+		if parent.Number.Cmp(delayWithOffset) >= 0 {
+			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 

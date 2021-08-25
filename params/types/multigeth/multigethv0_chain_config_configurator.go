@@ -522,15 +522,6 @@ func (c *ChainConfig) SetEIP3198Transition(n *uint64) error {
 	return nil
 }
 
-func (c *ChainConfig) GetEIP3554Transition() *uint64 {
-	return bigNewU64(c.LondonBlock)
-}
-
-func (c *ChainConfig) SetEIP3554Transition(n *uint64) error {
-	c.LondonBlock = setBig(c.LondonBlock, n)
-	return nil
-}
-
 func (c *ChainConfig) GetEIP2565Transition() *uint64 {
 	return bigNewU64(c.BerlinBlock)
 }
@@ -760,6 +751,19 @@ func (c *ChainConfig) GetEthashEIP2384Transition() *uint64 {
 
 func (c *ChainConfig) SetEthashEIP2384Transition(n *uint64) error {
 	c.MuirGlacierBlock = setBig(c.MuirGlacierBlock, n)
+	return nil
+}
+
+// London (December 2021) difficulty bomb delay
+func (c *ChainConfig) GetEthashEIP3554Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+		return nil
+	}
+	return bigNewU64(c.LondonBlock)
+}
+
+func (c *ChainConfig) SetEthashEIP3554Transition(n *uint64) error {
+	c.LondonBlock = setBig(c.LondonBlock, n)
 	return nil
 }
 

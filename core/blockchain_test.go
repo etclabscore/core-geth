@@ -3189,7 +3189,7 @@ func TestEIP1559Transition(t *testing.T) {
 	gspec.SetEIP3198Transition(&zero)
 	gspec.SetEIP3529Transition(&zero)
 	gspec.SetEIP3541Transition(&zero)
-	gspec.SetEIP3554Transition(&zero)
+	gspec.SetEthashEIP3554Transition(&zero)
 
 	genesis := MustCommitGenesis(db, gspec)
 	signer := types.LatestSigner(gspec.Config)

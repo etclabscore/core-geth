@@ -159,6 +159,11 @@ type CoreGethChainConfig struct {
 	eip2384Inferred bool
 	EIP2384FBlock   *big.Int `json:"eip2384FBlock,omitempty"`
 
+	// EIP-3554: Difficulty Bomb Delay to December 2021
+	// https://eips.ethereum.org/EIPS/eip-3554
+	eip3554Inferred bool
+	EIP3554FBlock   *big.Int `json:"eip3554FBlock,omitempty"`
+
 	// EIP-1706: Resolves reentrancy attack vector enabled with EIP1283.
 	// https://eips.ethereum.org/EIPS/eip-1706
 	EIP1706FBlock *big.Int `json:"eip1706FBlock,omitempty"`
@@ -194,10 +199,6 @@ type CoreGethChainConfig struct {
 	// EIP-3198: BASEFEE opcode
 	// https://eips.ethereum.org/EIPS/eip-3198
 	EIP3198FBlock *big.Int `json:"eip3198FBlock,omitempty"`
-
-	// EIP-3554: Difficulty Bomb Delay to December 2021
-	// https://eips.ethereum.org/EIPS/eip-3554
-	EIP3554FBlock *big.Int `json:"eip3554FBlock,omitempty"`
 
 	// TODO: Document me.
 	EIP2930FBlock *big.Int `json:"eip2930FBlock,omitempty"`

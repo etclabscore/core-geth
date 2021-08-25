@@ -235,7 +235,7 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 	chainConfig.SetEIP3198Transition(&zero)
 	chainConfig.SetEIP3529Transition(&zero)
 	chainConfig.SetEIP3541Transition(&zero)
-	chainConfig.SetEIP3554Transition(&zero)
+	chainConfig.SetEthashEIP3554Transition(&zero)
 	w, b := newTestWorker(t, chainConfig, engine, db, 0)
 	defer w.close()
 

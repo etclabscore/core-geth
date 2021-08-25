@@ -68,7 +68,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			if err := genesis.SetEIP3541Transition(&n); err != nil {
 				return genesis, stored, err
 			}
-			if err := genesis.SetEIP3554Transition(&n); err != nil {
+			if err := genesis.SetEthashEIP3554Transition(&n); err != nil {
 				return genesis, stored, err
 			}
 		}
@@ -123,7 +123,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 		if err := newcfg.SetEIP3541Transition(&n); err != nil {
 			return newcfg, stored, err
 		}
-		if err := newcfg.SetEIP3554Transition(&n); err != nil {
+		if err := newcfg.SetEthashEIP3554Transition(&n); err != nil {
 			return newcfg, stored, err
 		}
 	}

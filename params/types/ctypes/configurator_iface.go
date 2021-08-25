@@ -165,9 +165,6 @@ type ProtocolSpecifier interface {
 
 	GetEIP3198Transition() *uint64
 	SetEIP3198Transition(n *uint64) error
-
-	GetEIP3554Transition() *uint64
-	SetEIP3554Transition(n *uint64) error
 }
 
 type Forker interface {
@@ -216,6 +213,8 @@ type EthashConfigurator interface {
 	SetEthashEIP1234Transition(n *uint64) error
 	GetEthashEIP2384Transition() *uint64
 	SetEthashEIP2384Transition(n *uint64) error
+	GetEthashEIP3554Transition() *uint64
+	SetEthashEIP3554Transition(n *uint64) error
 	GetEthashECIP1010PauseTransition() *uint64
 	SetEthashECIP1010PauseTransition(n *uint64) error
 	GetEthashECIP1010ContinueTransition() *uint64

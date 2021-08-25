@@ -107,8 +107,8 @@ func (tm *testMatcher) runTestFileB(b *testing.B, path, name string, runTest int
 	if r, _ := tm.findSkip(name); r != "" {
 		b.Skip(r)
 	}
-	if tm.whitelistpat != nil {
-		if !tm.whitelistpat.MatchString(name) {
+	if tm.runonlylistpat != nil {
+		if !tm.runonlylistpat.MatchString(name) {
 			b.Skip("Skipped by whitelist")
 		}
 	}

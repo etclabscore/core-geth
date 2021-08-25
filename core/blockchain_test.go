@@ -3178,8 +3178,9 @@ func TestEIP1559Transition(t *testing.T) {
 		}
 	)
 
-	gspec.Config.BerlinBlock = common.Big0
-	gspec.Config.LondonBlock = common.Big0
+	zero := uint64(0)
+	gspec.SetEIP2718Transition(&zero)
+	gspec.SetEIP1559Transition(&zero)
 	genesis := MustCommitGenesis(db, gspec)
 	signer := types.LatestSigner(gspec.Config)
 
@@ -3234,7 +3235,7 @@ func TestEIP1559Transition(t *testing.T) {
 	actual := state.GetBalance(block.Coinbase())
 	expected := new(big.Int).Add(
 		new(big.Int).SetUint64(block.GasUsed()*block.Transactions()[0].GasTipCap().Uint64()),
-		ethtest.ConstantinopleBlockReward,
+		vars.EIP649FBlockReward,
 	)
 	if actual.Cmp(expected) != 0 {
 		t.Fatalf("miner balance incorrect: expected %d, got %d", expected, actual)
@@ -3274,7 +3275,7 @@ func TestEIP1559Transition(t *testing.T) {
 	actual = state.GetBalance(block.Coinbase())
 	expected = new(big.Int).Add(
 		new(big.Int).SetUint64(block.GasUsed()*effectiveTip),
-		ethash.ConstantinopleBlockReward,
+		vars.EIP649FBlockReward,
 	)
 	if actual.Cmp(expected) != 0 {
 		t.Fatalf("miner balance incorrect: expected %d, got %d", expected, actual)

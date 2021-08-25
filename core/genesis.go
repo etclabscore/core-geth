@@ -108,7 +108,6 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	// Get the existing chain configuration.
 	newcfg := configOrDefault(genesis, stored)
 
-	// TODO(ziogaschr): overrideMystique
 	if overrideMystique != nil {
 		n := overrideMystique.Uint64()
 		if err := newcfg.SetEIP1559Transition(&n); err != nil {
@@ -127,11 +126,6 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			return newcfg, stored, err
 		}
 	}
-
-	// TODO(ziogaschr): do we need this?
-	// if err := newcfg.CheckConfigForkOrder(); err != nil {
-	// 	return newcfg, common.Hash{}, err
-	// }
 
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {

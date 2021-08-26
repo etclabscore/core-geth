@@ -104,6 +104,7 @@ func DeveloperGenesisBlock(period uint64, faucet common.Address, useEthash bool)
 			Config:     config,
 			ExtraData:  append(append(make([]byte, 32), faucet[:]...), make([]byte, crypto.SignatureLength)...),
 			GasLimit:   6283185,
+			BaseFee:    big.NewInt(vars.InitialBaseFee),
 			Difficulty: big.NewInt(1),
 			Alloc: map[common.Address]genesisT.GenesisAccount{
 				common.BytesToAddress([]byte{1}): {Balance: big.NewInt(1)}, // ECRecover

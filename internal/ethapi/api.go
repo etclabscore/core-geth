@@ -1222,6 +1222,7 @@ type RPCMarshalHeaderT struct {
 	Timestamp        hexutil.Uint64    `json:"timestamp"`
 	TransactionsRoot common.Hash       `json:"transactionsRoot"`
 	ReceiptsRoot     common.Hash       `json:"receiptsRoot"`
+	BaseFee          *hexutil.Big      `json:"baseFeePerGas,omitempty"`
 }
 
 // NewRPCMarshalHeaderTFromHeader constructs a new RPCMarshalHeaderT struct from a given header.
@@ -1231,7 +1232,7 @@ func NewRPCMarshalHeaderTFromHeader(header *types.Header) *RPCMarshalHeaderT {
 	nonce := header.Nonce
 	miner := header.Coinbase
 
-	return &RPCMarshalHeaderT{
+	head := &RPCMarshalHeaderT{
 		Number:           (*hexutil.Big)(header.Number),
 		Hash:             &hash,
 		ParentHash:       header.ParentHash,
@@ -1251,6 +1252,12 @@ func NewRPCMarshalHeaderTFromHeader(header *types.Header) *RPCMarshalHeaderT {
 		TransactionsRoot: header.TxHash,
 		ReceiptsRoot:     header.ReceiptHash,
 	}
+
+	if header.BaseFee != nil {
+		head.BaseFee = (*hexutil.Big)(header.BaseFee)
+	}
+
+	return head
 }
 
 // rpcMarshalHeaderTSetTotalDifficulty sets the total difficulty field for RPC response headers.

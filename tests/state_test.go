@@ -83,6 +83,7 @@ func TestState(t *testing.T) {
 	// For Istanbul, older tests were moved into LegacyTests
 	for _, dir := range []string{
 		stateTestDir,
+		stateTestDirCG,
 		// legacy state tests are disabled, due to them not being
 		// regenerated for the no-sender-eoa change.
 		//legacyStateTestDir,

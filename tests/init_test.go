@@ -63,11 +63,12 @@ var (
 	baseDir            = filepath.Join(".", "testdata")
 	blockTestDir       = filepath.Join(baseDir, "BlockchainTests")
 	stateTestDir       = filepath.Join(baseDir, "GeneralStateTests")
+	stateTestDirCG     = filepath.Join(baseDir, "GeneralStateTests.core-geth")
 	legacyStateTestDir = filepath.Join(baseDir, "LegacyTests", "Constantinople", "GeneralStateTests")
 	transactionTestDir = filepath.Join(baseDir, "TransactionTests")
 	vmTestDir          = filepath.Join(baseDir, "VMTests")
 	rlpTestDir         = filepath.Join(baseDir, "RLPTests")
-	difficultyTestDir  = filepath.Join(baseDir, "BasicTests")
+	difficultyTestDir  = filepath.Join(baseDir, "BasicTests.core-geth")
 )
 
 func readJSON(reader io.Reader, value interface{}) error {

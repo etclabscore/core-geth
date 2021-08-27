@@ -62,8 +62,27 @@ func TestDifficultyNDJSON(t *testing.T) {
 
 	dt := new(testMatcher)
 
-	dt.walk(t, difficultyTestDir, func(t *testing.T, name string, test *DifficultyTest) {
-		cfg, _ := dt.findConfig(t.Name())
+	// Not NDJSON
+	dt.skipLoad(`\\.json$`)
+
+	for k, v := range difficultyChainConfigurations {
+		dt.config(k, v)
+	}
+
+	dt.walkScanNDJSON(t, difficultyTestDir, func(t *testing.T, name string, test *DifficultyTest) {
+		// Kind of ugly reverse lookup from file -> fork name.
+		var forkName string
+		for k, v := range mapForkNameChainspecFileDifficulty {
+			if v == test.Chainspec.Filename {
+				forkName = k
+				break
+			}
+		}
+		if forkName == "" {
+			t.Fatal("missing fork/fileconf name", test, mapForkNameChainspecFileDifficulty)
+		}
+
+		cfg, _ := dt.findConfig(forkName)
 		if test.ParentDifficulty.Cmp(vars.MinimumDifficulty) < 0 {
 			t.Skip("difficulty below minimum")
 			return

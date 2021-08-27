@@ -81,7 +81,7 @@ type AncientReader interface {
 	//  - at most 'count' items,
 	//  - at least 1 item (even if exceeding the maxBytes), but will otherwise
 	//   return as many items as fit into maxBytes.
-	ReadAncients(kind string, start, count, maxBytes uint64) ([][]byte, error)
+	// ReadAncients(kind string, start, count, maxBytes uint64) ([][]byte, error)
 
 	// Ancients returns the ancient item numbers in the ancient store.
 	Ancients() (uint64, error)

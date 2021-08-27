@@ -66,7 +66,6 @@ var (
 	stateTestDirCG     = filepath.Join(baseDir, "GeneralStateTests.core-geth")
 	legacyStateTestDir = filepath.Join(baseDir, "LegacyTests", "Constantinople", "GeneralStateTests")
 	transactionTestDir = filepath.Join(baseDir, "TransactionTests")
-	vmTestDir          = filepath.Join(baseDir, "VMTests")
 	rlpTestDir         = filepath.Join(baseDir, "RLPTests")
 	difficultyTestDir  = filepath.Join(baseDir, "BasicTests.core-geth")
 )

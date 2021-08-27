@@ -178,8 +178,6 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 		return params.MordorChainConfig
 	case ghash == params.RopstenGenesisHash:
 		return params.RopstenChainConfig
-	case ghash == params.CalaverasGenesisHash:
-		return params.CalaverasChainConfig
 	case ghash == params.MintMeGenesisHash:
 		return params.MintMeChainConfig
 	default:

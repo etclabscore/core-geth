@@ -84,9 +84,7 @@ func TestState(t *testing.T) {
 	for _, dir := range []string{
 		stateTestDir,
 		stateTestDirCG,
-		// legacy state tests are disabled, due to them not being
-		// regenerated for the no-sender-eoa change.
-		//legacyStateTestDir,
+		legacyStateTestDir,
 	} {
 		st.walk(t, dir, func(t *testing.T, name string, test *StateTest) {
 			for _, subtest := range test.Subtests(st.skipforkpat) {

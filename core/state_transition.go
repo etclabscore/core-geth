@@ -198,8 +198,11 @@ func (st *StateTransition) buyGas() error {
 		balanceCheck = balanceCheck.Mul(balanceCheck, st.gasFeeCap)
 		balanceCheck.Add(balanceCheck, st.value)
 	}
-	if !st.evm.Context.CanTransfer(st.state, st.msg.From(), balanceCheck) {
-		have, want := st.state.GetBalance(st.msg.From()), balanceCheck
+	// if !st.evm.Context.CanTransfer(st.state, st.msg.From(), balanceCheck) {
+	// 	have, want := st.state.GetBalance(st.msg.From()), balanceCheck
+	// 	return fmt.Errorf("%w: address %v have %v want %v", ErrInsufficientFunds, st.msg.From().Hex(), have, want)
+	// }
+	if have, want := st.state.GetBalance(st.msg.From()), balanceCheck; have.Cmp(want) < 0 {
 		return fmt.Errorf("%w: address %v have %v want %v", ErrInsufficientFunds, st.msg.From().Hex(), have, want)
 	}
 	if err := st.gp.SubGas(st.msg.Gas()); err != nil {

@@ -254,6 +254,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		IstanbulBlock:       big.NewInt(5),
 	},
 	"Berlin": &goethereum.ChainConfig{
+		Ethash:              new(ctypes.EthashConfig),
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),
@@ -266,6 +267,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		BerlinBlock:         big.NewInt(0),
 	},
 	"BerlinToLondonAt5": &goethereum.ChainConfig{
+		Ethash:              new(ctypes.EthashConfig),
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),
@@ -279,6 +281,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		LondonBlock:         big.NewInt(5),
 	},
 	"London": &goethereum.ChainConfig{
+		Ethash:              new(ctypes.EthashConfig),
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),

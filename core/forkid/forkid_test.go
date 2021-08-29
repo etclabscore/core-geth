@@ -229,7 +229,8 @@ func TestCreation(t *testing.T) {
 			params.MintMeChainConfig,
 			params.MintMeGenesisHash,
 			[]testcase{
-				{0, ID{Hash: checksumToBytes(0x02bf4180), Next: 0}},
+				{0, ID{Hash: checksumToBytes(0x02bf4180), Next: 252500}},
+				{252500, ID{Hash: checksumToBytes(0x50aed09f), Next: 0}},
 			},
 		},
 	}
@@ -372,7 +373,7 @@ func TestGatherForks(t *testing.T) {
 		{
 			"mintme",
 			params.MintMeChainConfig,
-			[]uint64{},
+			[]uint64{252_500},
 		},
 	}
 	sliceContains := func(sl []uint64, u uint64) bool {

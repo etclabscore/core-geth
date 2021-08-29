@@ -1263,3 +1263,15 @@ func (spec *ParityChainSpec) UpdateAccount(address common.Address, bal *big.Int,
 	}
 	return nil
 }
+
+func (spec *ParityChainSpec) GetLyra2NonceTransition() *uint64 {
+	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Lyra2 {
+		return nil
+	}
+	return spec.Params.Lyra2NonceTransition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetLyra2NonceTransition(n *uint64) error {
+	spec.Params.Lyra2NonceTransition = new(ParityU64).SetUint64(n)
+	return nil
+}

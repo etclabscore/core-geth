@@ -919,3 +919,20 @@ func (c *CoreGethChainConfig) SetCliqueEpoch(n uint64) error {
 	c.Clique.Epoch = n
 	return nil
 }
+
+func (c *CoreGethChainConfig) GetLyra2NonceTransition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Lyra2 {
+		return nil
+	}
+	return bigNewU64(c.Lyra2NonceTransitionBlock)
+}
+
+func (c *CoreGethChainConfig) SetLyra2NonceTransition(n *uint64) error {
+	if c.Lyra2 == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+
+	c.Lyra2NonceTransitionBlock = setBig(c.Lyra2NonceTransitionBlock, n)
+
+	return nil
+}

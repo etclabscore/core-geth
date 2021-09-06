@@ -62,7 +62,7 @@ func makeGasSStoreFunc(clearingRefund uint64) gasFunc {
 				return cost + vars.SstoreSetGasEIP2200, nil
 			}
 			if value == (common.Hash{}) { // delete slot (2.1.2b)
-				evm.StateDB.AddRefund(vars.SstoreClearsScheduleRefundEIP2200)
+				evm.StateDB.AddRefund(clearingRefund)
 			}
 			// EIP-2200 original clause:
 			//		return vars.SstoreResetGasEIP2200, nil // write existing slot (2.1.2)
@@ -70,9 +70,9 @@ func makeGasSStoreFunc(clearingRefund uint64) gasFunc {
 		}
 		if original != (common.Hash{}) {
 			if current == (common.Hash{}) { // recreate slot (2.2.1.1)
-				evm.StateDB.SubRefund(vars.SstoreClearsScheduleRefundEIP2200)
+				evm.StateDB.SubRefund(clearingRefund)
 			} else if value == (common.Hash{}) { // delete slot (2.2.1.2)
-				evm.StateDB.AddRefund(vars.SstoreClearsScheduleRefundEIP2200)
+				evm.StateDB.AddRefund(clearingRefund)
 			}
 		}
 		if original == value {

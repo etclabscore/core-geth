@@ -52,18 +52,21 @@ func setBig(i *big.Int, u *uint64) *big.Int {
 	return i
 }
 
-func bigNewU64Min(i, j *big.Int) *uint64 {
-	if i == nil {
-		return bigNewU64(j)
-	}
-	if j == nil {
-		return bigNewU64(i)
-	}
-	if j.Cmp(i) < 0 {
-		return bigNewU64(j)
-	}
-	return bigNewU64(i)
-}
+// bigNewU64Min is disused, but nice-to-have logic in case useful.
+// It chooses the first existing (non-nil) minimum big.Int value.
+// This has been useful for testnet configurations in particular.
+// func bigNewU64Min(i, j *big.Int) *uint64 {
+// 	if i == nil {
+// 		return bigNewU64(j)
+// 	}
+// 	if j == nil {
+// 		return bigNewU64(i)
+// 	}
+// 	if j.Cmp(i) < 0 {
+// 		return bigNewU64(j)
+// 	}
+// 	return bigNewU64(i)
+// }
 
 func (c *ChainConfig) GetAccountStartNonce() *uint64 {
 	return internal.GlobalConfigurator().GetAccountStartNonce()

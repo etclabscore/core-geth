@@ -874,6 +874,10 @@ func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.TransactionArgs,
 	for idx, args := range txs {
 		// Execute the trace
 		msg, err := args.ToMessage(api.backend.RPCGasCap(), block.BaseFee())
+		if err != nil {
+			results[idx] = &txTraceResult{Error: err.Error()}
+			continue
+		}
 		vmctx := core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
 
 		originalCanTransfer := vmctx.CanTransfer

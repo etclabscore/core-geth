@@ -1,6 +1,10 @@
 {
     "networkId": 1,
     "chainId": null,
+    "supportedProtocolVersions": [
+        66,
+        65
+    ],
     "ethash": {},
     "requireBlockHashes": null
 }

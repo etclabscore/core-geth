@@ -1,6 +1,10 @@
 {
     "networkId": 3,
     "chainId": 3,
+    "supportedProtocolVersions": [
+        66,
+        65
+    ],
     "eip2FBlock": 0,
     "eip7FBlock": 0,
     "eip150Block": 0,
@@ -28,15 +32,21 @@
     "eip2028FBlock": 6485846,
     "eip2200FBlock": 6485846,
     "eip2384FBlock": 7117117,
+    "eip3554FBlock": 10499401,
     "eip2565FBlock": 9812189,
     "eip2718FBlock": 9812189,
     "eip2929FBlock": 9812189,
+    "eip3198FBlock": 10499401,
     "eip2930FBlock": 9812189,
+    "eip1559FBlock": 10499401,
+    "eip3541FBlock": 10499401,
+    "eip3529FBlock": 10499401,
     "ethash": {},
     "difficultyBombDelays": {
         "0x19f0a0": "0x2dc6c0",
         "0x408b70": "0x1e8480",
-        "0x6c993d": "0x3d0900"
+        "0x6c993d": "0x3d0900",
+        "0xa03549": "0xaae60"
     },
     "blockReward": {
         "0x19f0a0": "0x29a2241af62c0000",

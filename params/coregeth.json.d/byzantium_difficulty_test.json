@@ -1,6 +1,10 @@
 {
     "networkId": 1,
     "chainId": null,
+    "supportedProtocolVersions": [
+        66,
+        65
+    ],
     "eip100FBlock": 0,
     "eip140FBlock": 0,
     "eip198FBlock": 0,

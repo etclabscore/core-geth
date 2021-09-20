@@ -208,12 +208,6 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 
 		targets := map[string][]stPostState{}
 
-		// Make a copy of the pre state
-		preState := genesisT.GenesisAlloc{}
-		for k, v := range test.json.Pre {
-			preState[k] = v
-		}
-
 		for _, s := range subtests {
 
 			// Prior to test-generation logic, record the genesis+chain config at the testmatcher level.
@@ -283,11 +277,6 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 			stPost.Logs = common.UnprefixedHash(rlpHash(statedb.Logs()))
 
 			targets[targetFork][s.Index] = stPost
-
-			// Copy the original pre-state back to the test pre
-			for k := range test.json.Pre {
-				test.json.Pre[k] = preState[k]
-			}
 		}
 
 		if len(targets) == 0 {

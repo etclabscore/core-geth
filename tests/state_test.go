@@ -66,6 +66,7 @@ func TestState(t *testing.T) {
 		//
 		st.skipFork("^Berlin$")
 		st.skipFork("Magneto")
+		st.skipFork("London")
 	}
 
 	// Un-skip this when https://github.com/ethereum/tests/issues/908 is closed

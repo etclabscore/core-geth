@@ -8,5 +8,5 @@ if [[ "$OSTYPE" != "linux"* ]]; then
 fi
 
 mkdir -p build/_workspace/SSVM/build/tools/ssvm-evmc/
-wget -O build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so \
+[[ -f build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so ]] || wget -O build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so \
     https://github.com/second-state/ssvm-evmc/releases/download/evmc7-0.1.1/libssvm-evmc.so

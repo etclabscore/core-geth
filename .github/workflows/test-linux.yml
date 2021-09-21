@@ -56,4 +56,6 @@ jobs:
         with:
           submodules: recursive
 
-      - run: make test
+      - run: |
+          make all
+          make test

@@ -1,4 +1,7 @@
 name: Lint and Tests
+env:
+  # Set to empty.
+  ANDROID_HOME:
 
 # Controls when the action will run.
 on:

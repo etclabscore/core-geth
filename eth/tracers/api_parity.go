@@ -212,11 +212,15 @@ func (api *TraceAPI) Block(ctx context.Context, number rpc.BlockNumber, config *
 	results := []interface{}{}
 
 	for _, result := range traceResults {
-		var tmp []interface{}
+		var tmp interface{}
 		if err := json.Unmarshal(result.Result.(json.RawMessage), &tmp); err != nil {
 			return nil, err
 		}
-		results = append(results, tmp...)
+		if *config.Tracer == "stateDiffTracer" {
+			results = append(results, tmp)
+		} else {
+			results = append(results, tmp.([]interface{})...)
+		}
 	}
 
 	results = append(results, traceReward)

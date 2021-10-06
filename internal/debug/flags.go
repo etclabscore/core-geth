@@ -111,7 +111,6 @@ var Flags = []cli.Flag{
 var glogger *log.GlogHandler
 
 func init() {
-	Flags = append(Flags, DeprecatedFlags...)
 	glogger = log.NewGlogHandler(log.StreamHandler(os.Stderr, log.TerminalFormat(false)))
 	glogger.Verbosity(log.LvlInfo)
 	log.Root().SetHandler(glogger)
@@ -169,27 +168,12 @@ func Setup(ctx *cli.Context) error {
 		if err := Handler.StartCPUProfile(cpuFile); err != nil {
 			return err
 		}
-	} else if legacyCPUFile := ctx.GlobalString(legacyCpuprofileFlag.Name); legacyCPUFile != "" {
-		log.Warn("The flag --cpuprofile is deprecated and will be removed in the future, please use --pprof.cpuprofile")
-		if err := Handler.StartCPUProfile(legacyCPUFile); err != nil {
-			return err
-		}
 	}
 
 	// pprof server
 	if ctx.GlobalBool(pprofFlag.Name) {
 		listenHost := ctx.GlobalString(pprofAddrFlag.Name)
-		if ctx.GlobalIsSet(legacyPprofAddrFlag.Name) {
-			listenHost = ctx.GlobalString(legacyPprofAddrFlag.Name)
-			log.Warn("The flag --pprofaddr is deprecated and will be removed in the future, please use --pprof.addr")
-		}
-
 		port := ctx.GlobalInt(pprofPortFlag.Name)
-		if ctx.GlobalIsSet(legacyPprofPortFlag.Name) {
-			port = ctx.GlobalInt(legacyPprofPortFlag.Name)
-			log.Warn("The flag --pprofport is deprecated and will be removed in the future, please use --pprof.port")
-		}
-
 		address := fmt.Sprintf("%s:%d", listenHost, port)
 		// This context value ("metrics.addr") represents the utils.MetricsHTTPFlag.Name.
 		// It cannot be imported because it will cause a cyclical dependency.

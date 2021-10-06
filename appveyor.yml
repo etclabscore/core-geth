@@ -1,11 +1,12 @@
-os: Visual Studio 2019
 clone_depth: 5
 version: "{branch}.{build}"
+
+image:
+  - Ubuntu
+  - Visual Studio 2019
+
 environment:
   matrix:
-    # We use gcc from MSYS2 because it is the most recent compiler version available on
-    # AppVeyor. Note: gcc.exe only works properly if the corresponding bin/ directory is
-    # contained in PATH.
     - GETH_ARCH: amd64
       GETH_CC: C:\msys64\mingw64\bin\gcc.exe
       PATH: C:\msys64\mingw64\bin;C:\Program Files (x86)\NSIS\;%PATH%
@@ -13,7 +14,6 @@ environment:
 install:
   - git submodule update --init --depth 1
   - go version
-  - "%GETH_CC% --version"
 
 build_script:
   - ps: $env:VERSION = "$(git describe --always)"

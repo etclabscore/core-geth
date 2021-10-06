@@ -291,6 +291,85 @@ func (cw *contractWrapper) pushObject(vm *duktape.Context) {
 	vm.PutPropString(obj, "getInput")
 }
 
+type frame struct {
+	typ   *string
+	from  *common.Address
+	to    *common.Address
+	input []byte
+	gas   *uint
+	value *big.Int
+}
+
+func newFrame() *frame {
+	return &frame{
+		typ:  new(string),
+		from: new(common.Address),
+		to:   new(common.Address),
+		gas:  new(uint),
+	}
+}
+
+func (f *frame) pushObject(vm *duktape.Context) {
+	obj := vm.PushObject()
+
+	vm.PushGoFunction(func(ctx *duktape.Context) int { pushValue(ctx, *f.typ); return 1 })
+	vm.PutPropString(obj, "getType")
+
+	vm.PushGoFunction(func(ctx *duktape.Context) int { pushValue(ctx, *f.from); return 1 })
+	vm.PutPropString(obj, "getFrom")
+
+	vm.PushGoFunction(func(ctx *duktape.Context) int { pushValue(ctx, *f.to); return 1 })
+	vm.PutPropString(obj, "getTo")
+
+	vm.PushGoFunction(func(ctx *duktape.Context) int { pushValue(ctx, f.input); return 1 })
+	vm.PutPropString(obj, "getInput")
+
+	vm.PushGoFunction(func(ctx *duktape.Context) int { pushValue(ctx, *f.gas); return 1 })
+	vm.PutPropString(obj, "getGas")
+
+	vm.PushGoFunction(func(ctx *duktape.Context) int {
+		if f.value != nil {
+			pushValue(ctx, f.value)
+		} else {
+			ctx.PushUndefined()
+		}
+		return 1
+	})
+	vm.PutPropString(obj, "getValue")
+}
+
+type frameResult struct {
+	gasUsed    *uint
+	output     []byte
+	errorValue *string
+}
+
+func newFrameResult() *frameResult {
+	return &frameResult{
+		gasUsed: new(uint),
+	}
+}
+
+func (r *frameResult) pushObject(vm *duktape.Context) {
+	obj := vm.PushObject()
+
+	vm.PushGoFunction(func(ctx *duktape.Context) int { pushValue(ctx, *r.gasUsed); return 1 })
+	vm.PutPropString(obj, "getGasUsed")
+
+	vm.PushGoFunction(func(ctx *duktape.Context) int { pushValue(ctx, r.output); return 1 })
+	vm.PutPropString(obj, "getOutput")
+
+	vm.PushGoFunction(func(ctx *duktape.Context) int {
+		if r.errorValue != nil {
+			pushValue(ctx, *r.errorValue)
+		} else {
+			ctx.PushUndefined()
+		}
+		return 1
+	})
+	vm.PutPropString(obj, "getError")
+}
+
 // Tracer provides an implementation of Tracer that evaluates a Javascript
 // function for each VM execution step.
 type Tracer struct {
@@ -315,6 +394,9 @@ type Tracer struct {
 	opErrorValue      *string // Swappable error value for this specific call wrapped by a log accessor. NOTE: the error is for the previous call trace
 	refundValue       *uint   // Swappable refund value wrapped by a log accessor
 
+	frame       *frame       // Represents entry into call frame. Fields are swappable
+	frameResult *frameResult // Represents exit from a call frame. Fields are swappable
+
 	ctx map[string]interface{} // Transaction context gathered throughout execution
 	err error                  // Error, if one has occurred
 
@@ -322,6 +404,9 @@ type Tracer struct {
 	reason    error  // Textual reason for the interruption
 
 	activePrecompiles []common.Address // Updated on CaptureStart based on given rules
+
+	traceSteps      bool // When true, will invoke step() on each opcode
+	traceCallFrames bool // When true, will invoke enter() and exit() js funcs
 
 	supportsStepPerfOptimisations bool  // Checks wether tracer supports `getCallstackLength` method in order to achieve optimal performance for call_tracer*
 	handleNextOpCode              bool  // Flag for step prechecker, instructing that next VM opcode has to be proccessed in `step` method
@@ -360,6 +445,8 @@ func New(code string, ctx *Context) (*Tracer, error) {
 		returnData:                new([]byte),
 		refundValue:               new(uint),
 		callTracerCallstackLength: new(uint),
+		frame:                     newFrame(),
+		frameResult:               newFrameResult(),
 	}
 	if ctx.BlockHash != (common.Hash{}) {
 		tracer.ctx["blockHash"] = ctx.BlockHash
@@ -472,9 +559,7 @@ func New(code string, ctx *Context) (*Tracer, error) {
 	}
 	tracer.vm.Pop()
 
-	if !tracer.vm.GetPropString(tracer.tracerObject, "step") {
-		return nil, fmt.Errorf("trace object must expose a function step()")
-	}
+	hasStep := tracer.vm.GetPropString(tracer.tracerObject, "step")
 	tracer.vm.Pop()
 
 	if !tracer.vm.GetPropString(tracer.tracerObject, "fault") {
@@ -486,6 +571,23 @@ func New(code string, ctx *Context) (*Tracer, error) {
 		return nil, fmt.Errorf("trace object must expose a function result()")
 	}
 	tracer.vm.Pop()
+
+	hasEnter := tracer.vm.GetPropString(tracer.tracerObject, "enter")
+	tracer.vm.Pop()
+	hasExit := tracer.vm.GetPropString(tracer.tracerObject, "exit")
+	tracer.vm.Pop()
+
+	if hasEnter != hasExit {
+		return nil, fmt.Errorf("trace object must expose either both or none of enter() and exit()")
+	}
+	if !hasStep {
+		// If there's no step function, the enter and exit must be present
+		if !hasEnter {
+			return nil, fmt.Errorf("trace object must expose either step() or both enter() and exit()")
+		}
+	}
+	tracer.traceCallFrames = hasEnter
+	tracer.traceSteps = hasStep
 
 	// Tracer is valid, inject the big int library to access large numbers
 	tracer.vm.EvalString(bigIntegerJS)
@@ -554,6 +656,12 @@ func New(code string, ctx *Context) (*Tracer, error) {
 	tracer.vm.PutPropString(logObject, "getError")
 
 	tracer.vm.PutPropString(tracer.stateObject, "log")
+
+	tracer.frame.pushObject(tracer.vm)
+	tracer.vm.PutPropString(tracer.stateObject, "frame")
+
+	tracer.frameResult.pushObject(tracer.vm)
+	tracer.vm.PutPropString(tracer.stateObject, "frameResult")
 
 	tracer.dbWrapper.pushObject(tracer.vm)
 	tracer.vm.PutPropString(tracer.stateObject, "db")
@@ -661,12 +769,16 @@ func (jst *Tracer) CaptureStart(env *vm.EVM, from common.Address, to common.Addr
 
 // CaptureState implements the Tracer interface to trace a single step of VM execution.
 func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, rData []byte, depth int, err error) {
+	if !jst.traceSteps {
+		return
+	}
 	if jst.err != nil {
 		return
 	}
 	// If tracing was interrupted, set the error and stop
 	if atomic.LoadUint32(&jst.interrupt) > 0 {
 		jst.err = jst.reason
+		env.Cancel()
 		return
 	}
 	jst.opWrapper.op = op
@@ -768,6 +880,63 @@ func (jst *Tracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, t time
 	}
 }
 
+// CaptureEnter is called when EVM enters a new scope (via call, create or selfdestruct).
+func (jst *Tracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
+	if !jst.traceCallFrames {
+		return
+	}
+	if jst.err != nil {
+		return
+	}
+	// If tracing was interrupted, set the error and stop
+	if atomic.LoadUint32(&jst.interrupt) > 0 {
+		jst.err = jst.reason
+		return
+	}
+
+	*jst.frame.typ = typ.String()
+	*jst.frame.from = from
+	*jst.frame.to = to
+	jst.frame.input = common.CopyBytes(input)
+	*jst.frame.gas = uint(gas)
+	jst.frame.value = nil
+	if value != nil {
+		jst.frame.value = new(big.Int).SetBytes(value.Bytes())
+	}
+
+	if _, err := jst.call(true, "enter", "frame"); err != nil {
+		jst.err = wrapError("enter", err)
+	}
+}
+
+// CaptureExit is called when EVM exits a scope, even if the scope didn't
+// execute any code.
+func (jst *Tracer) CaptureExit(output []byte, gasUsed uint64, err error) {
+	if !jst.traceCallFrames {
+		return
+	}
+	if jst.err != nil {
+		return
+	}
+	// If tracing was interrupted, set the error and stop
+	if atomic.LoadUint32(&jst.interrupt) > 0 {
+		jst.err = jst.reason
+		return
+	}
+
+	jst.frameResult.output = common.CopyBytes(output)
+	*jst.frameResult.gasUsed = uint(gasUsed)
+	jst.frameResult.errorValue = nil
+	if err != nil {
+		jst.frameResult.errorValue = new(string)
+		*jst.frameResult.errorValue = err.Error()
+	}
+
+	if _, err := jst.call(true, "exit", "frameResult"); err != nil {
+		jst.err = wrapError("exit", err)
+	}
+}
+
 // addCtxIntoState adds/updates the ctx vars in the duktape context
 func (jst *Tracer) addCtxIntoState() {
 	// Transform the context into a JavaScript object and inject into the state
@@ -795,17 +964,21 @@ func (jst *Tracer) addCtxIntoState() {
 		case *big.Int:
 			pushBigInt(val, jst.vm)
 
-		case int:
-			jst.vm.PushInt(val)
-
-		case common.Hash:
-			ptr := jst.vm.PushFixedBuffer(32)
-			copy(makeSlice(ptr, 32), val[:])
-
 		default:
 			panic(fmt.Sprintf("unsupported type: %T", val))
 		}
 		jst.vm.PutPropString(obj, key)
+	}
+	jst.vm.PutPropString(jst.stateObject, "ctx")
+}
+
+// GetResult calls the Javascript 'result' function and returns its value, or any accumulated error
+func (jst *Tracer) GetResult() (json.RawMessage, error) {
+	// Transform the context into a JavaScript object and inject into the state
+	obj := jst.vm.PushObject()
+
+	for key, val := range jst.ctx {
+		jst.addToObj(obj, key, val)
 	}
 	jst.vm.PutPropString(jst.stateObject, "ctx")
 }
@@ -824,4 +997,36 @@ func (jst *Tracer) GetResult() (json.RawMessage, error) {
 	jst.vm.Destroy()
 
 	return result, jst.err
+}
+
+// addToObj pushes a field to a JS object.
+func (jst *Tracer) addToObj(obj int, key string, val interface{}) {
+	pushValue(jst.vm, val)
+	jst.vm.PutPropString(obj, key)
+}
+
+func pushValue(ctx *duktape.Context, val interface{}) {
+	switch val := val.(type) {
+	case uint64:
+		ctx.PushUint(uint(val))
+	case string:
+		ctx.PushString(val)
+	case []byte:
+		ptr := ctx.PushFixedBuffer(len(val))
+		copy(makeSlice(ptr, uint(len(val))), val)
+	case common.Address:
+		ptr := ctx.PushFixedBuffer(20)
+		copy(makeSlice(ptr, 20), val[:])
+	case *big.Int:
+		pushBigInt(val, ctx)
+	case int:
+		ctx.PushInt(val)
+	case uint:
+		ctx.PushUint(val)
+	case common.Hash:
+		ptr := ctx.PushFixedBuffer(32)
+		copy(makeSlice(ptr, 32), val[:])
+	default:
+		panic(fmt.Sprintf("unsupported type: %T", val))
+	}
 }

@@ -242,11 +242,14 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 func CommitGenesis(g *genesisT.Genesis, db ethdb.Database) (*types.Block, error) {
 	block := GenesisToBlock(g, db)
 	if block.Number().Sign() != 0 {
-		return nil, fmt.Errorf("can't commit genesis block with number > 0")
+		return nil, errors.New("can't commit genesis block with number > 0")
 	}
 	config := g.Config
 	if config == nil {
 		config = params.AllEthashProtocolChanges
+	}
+	if config.Clique != nil && len(block.Extra()) == 0 {
+		return nil, errors.New("can't start clique chain without signers")
 	}
 	rawdb.WriteTd(db, block.Hash(), block.NumberU64(), g.Difficulty)
 	rawdb.WriteBlock(db, block)

@@ -33,7 +33,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/clique"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/consensus/misc"
@@ -125,7 +124,7 @@ func (s *PublicEthereumAPI) FeeHistory(ctx context.Context, blockCount rpc.Decim
 // - pulledStates:  number of state entries processed until now
 // - knownStates:   number of known state entries that still need to be pulled
 func (s *PublicEthereumAPI) Syncing() (interface{}, error) {
-	progress := s.b.Downloader().Progress()
+	progress := s.b.SyncProgress()
 
 	// Return not syncing if the synchronisation already completed
 	if progress.CurrentBlock >= progress.HighestBlock {
@@ -1175,8 +1174,7 @@ func FormatLogs(logs []vm.StructLog) []StructLogRes {
 }
 
 // RPCMarshalHeader converts the given header to the RPC output .
-func RPCMarshalHeader(head *types.Header, engine consensus.Engine) map[string]interface{} {
-	miner, _ := engine.Author(head)
+func RPCMarshalHeader(head *types.Header) map[string]interface{} {
 	result := map[string]interface{}{
 		"number":           (*hexutil.Big)(head.Number),
 		"hash":             head.Hash(),
@@ -1186,7 +1184,7 @@ func RPCMarshalHeader(head *types.Header, engine consensus.Engine) map[string]in
 		"sha3Uncles":       head.UncleHash,
 		"logsBloom":        head.Bloom,
 		"stateRoot":        head.Root,
-		"miner":            miner,
+		"miner":            head.Coinbase,
 		"difficulty":       (*hexutil.Big)(head.Difficulty),
 		"extraData":        hexutil.Bytes(head.Extra),
 		"size":             hexutil.Uint64(head.Size()),
@@ -1344,7 +1342,7 @@ func (b *RPCMarshalBlockT) MarshalJSON() ([]byte, error) {
 // RPCMarshalBlock converts the given block to the RPC output which depends on fullTx. If inclTx is true transactions are
 // returned. When fullTx is true the returned block contains full transaction details, otherwise it will only contain
 // transaction hashes.
-func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool, engine consensus.Engine) (*RPCMarshalBlockT, error) {
+func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool) (*RPCMarshalBlockT, error) {
 	fields := &RPCMarshalBlockT{RPCMarshalHeaderT: NewRPCMarshalHeaderTFromHeader(block.Header())}
 	fields.Size = hexutil.Uint64(block.Size())
 	fields.inclTx = inclTx
@@ -1390,7 +1388,7 @@ func (s *PublicBlockChainAPI) rpcMarshalHeader(ctx context.Context, header *type
 // rpcMarshalBlock uses the generalized output filler, then adds the total difficulty field, which requires
 // a `PublicBlockchainAPI`.
 func (s *PublicBlockChainAPI) rpcMarshalBlock(ctx context.Context, b *types.Block, inclTx bool, fullTx bool) (*RPCMarshalBlockT, error) {
-	fields, err := RPCMarshalBlock(b, inclTx, fullTx, s.b.Engine())
+	fields, err := RPCMarshalBlock(b, inclTx, fullTx)
 	if err != nil {
 		return nil, err
 	}

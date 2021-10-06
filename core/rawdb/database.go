@@ -105,9 +105,9 @@ func (db *nofreezedb) AncientSize(kind string) (uint64, error) {
 	return 0, errNotSupported
 }
 
-// AppendAncient returns an error as we don't have a backing chain freezer.
-func (db *nofreezedb) AppendAncient(number uint64, hash, header, body, receipts, td []byte) error {
-	return errNotSupported
+// ModifyAncients is not supported.
+func (db *nofreezedb) ModifyAncients(func(ethdb.AncientWriteOp) error) (int64, error) {
+	return 0, errNotSupported
 }
 
 // TruncateAncients returns an error as we don't have a backing chain freezer.
@@ -123,9 +123,7 @@ func (db *nofreezedb) Sync() error {
 // NewDatabase creates a high level database on top of a given key-value data
 // store without a freezer moving immutable chain segments into cold storage.
 func NewDatabase(db ethdb.KeyValueStore) ethdb.Database {
-	return &nofreezedb{
-		KeyValueStore: db,
-	}
+	return &nofreezedb{KeyValueStore: db}
 }
 
 // NewDatabaseWithFreezerRemote creates a high level database on top of a given key-

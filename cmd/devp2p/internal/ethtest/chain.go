@@ -40,16 +40,6 @@ type Chain struct {
 	chainConfig ctypes.ChainConfigurator
 }
 
-func (c *Chain) WriteTo(writer io.Writer) error {
-	for _, block := range c.blocks {
-		if err := rlp.Encode(writer, block); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 // Len returns the length of the chain.
 func (c *Chain) Len() int {
 	return len(c.blocks)

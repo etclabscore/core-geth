@@ -66,6 +66,14 @@ func TestSetupGenesisBlock(t *testing.T) {
 	}
 }
 
+func TestInvalidCliqueConfig(t *testing.T) {
+	block := GenesisToBlock(params.DefaultGoerliGenesisBlock(), nil)
+	block.ExtraData = []byte{}
+	if _, err := block.Commit(nil); err == nil {
+		t.Fatal("Expected error on invalid clique config")
+	}
+}
+
 func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 	db := rawdb.NewMemoryDatabase()
 

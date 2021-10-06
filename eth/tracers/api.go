@@ -523,7 +523,7 @@ func (api *API) IntermediateRoots(ctx context.Context, hash common.Hash, config 
 		signer             = types.MakeSigner(api.backend.ChainConfig(), block.Number())
 		chainConfig        = api.backend.ChainConfig()
 		vmctx              = core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
-		deleteEmptyObjects = chainConfig.IsEIP158(block.Number())
+		deleteEmptyObjects = api.backend.ChainConfig().IsEnabled(api.backend.ChainConfig().GetEIP161dTransition, block.Number())
 	)
 	for i, tx := range block.Transactions() {
 		var (

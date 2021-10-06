@@ -941,42 +941,6 @@ func (jst *Tracer) CaptureExit(output []byte, gasUsed uint64, err error) {
 func (jst *Tracer) addCtxIntoState() {
 	// Transform the context into a JavaScript object and inject into the state
 	obj := jst.vm.PushObject()
-
-	for key, val := range jst.ctx {
-		switch val := val.(type) {
-		case uint64:
-			jst.vm.PushUint(uint(val))
-
-		case string:
-			jst.vm.PushString(val)
-
-		case bool:
-			jst.vm.PushBoolean(val)
-
-		case []byte:
-			ptr := jst.vm.PushFixedBuffer(len(val))
-			copy(makeSlice(ptr, uint(len(val))), val)
-
-		case common.Address:
-			ptr := jst.vm.PushFixedBuffer(20)
-			copy(makeSlice(ptr, 20), val[:])
-
-		case *big.Int:
-			pushBigInt(val, jst.vm)
-
-		default:
-			panic(fmt.Sprintf("unsupported type: %T", val))
-		}
-		jst.vm.PutPropString(obj, key)
-	}
-	jst.vm.PutPropString(jst.stateObject, "ctx")
-}
-
-// GetResult calls the Javascript 'result' function and returns its value, or any accumulated error
-func (jst *Tracer) GetResult() (json.RawMessage, error) {
-	// Transform the context into a JavaScript object and inject into the state
-	obj := jst.vm.PushObject()
-
 	for key, val := range jst.ctx {
 		jst.addToObj(obj, key, val)
 	}
@@ -985,6 +949,7 @@ func (jst *Tracer) GetResult() (json.RawMessage, error) {
 
 // GetResult calls the Javascript 'result' function and returns its value, or any accumulated error
 func (jst *Tracer) GetResult() (json.RawMessage, error) {
+	// Transform the context into a JavaScript object and inject into the state
 	jst.addCtxIntoState()
 
 	// Finalize the trace and return the results
@@ -1011,6 +976,8 @@ func pushValue(ctx *duktape.Context, val interface{}) {
 		ctx.PushUint(uint(val))
 	case string:
 		ctx.PushString(val)
+	case bool:
+		ctx.PushBoolean(val)
 	case []byte:
 		ptr := ctx.PushFixedBuffer(len(val))
 		copy(makeSlice(ptr, uint(len(val))), val)

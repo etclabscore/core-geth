@@ -32,7 +32,6 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
@@ -298,7 +297,7 @@ func rlpHash(x interface{}) (h common.Hash) {
 // the caller does not provide an explicit difficulty, but instead provides only
 // parent timestamp + difficulty.
 // Note: this method only works for ethash engine.
-func calcDifficulty(config *params.ChainConfig, number, currentTime, parentTime uint64,
+func calcDifficulty(config ctypes.ChainConfigurator, number, currentTime, parentTime uint64,
 	parentDifficulty *big.Int, parentUncleHash common.Hash) *big.Int {
 	uncleHash := parentUncleHash
 	if uncleHash == (common.Hash{}) {

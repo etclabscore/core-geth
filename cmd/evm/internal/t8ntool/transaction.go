@@ -28,7 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/tests"
 	"gopkg.in/urfave/cli.v1"
@@ -74,7 +74,7 @@ func Transaction(ctx *cli.Context) error {
 	var (
 		txStr       = ctx.String(InputTxsFlag.Name)
 		inputData   = &input{}
-		chainConfig *params.ChainConfig
+		chainConfig ctypes.ChainConfigurator
 	)
 	// Construct the chainconfig
 	if cConf, _, err := tests.GetChainConfig(ctx.String(ForknameFlag.Name)); err != nil {
@@ -83,7 +83,9 @@ func Transaction(ctx *cli.Context) error {
 		chainConfig = cConf
 	}
 	// Set the chain id
-	chainConfig.ChainID = big.NewInt(ctx.Int64(ChainIDFlag.Name))
+	if err := chainConfig.SetChainID(big.NewInt(ctx.Int64(ChainIDFlag.Name))); err != nil {
+		return err
+	}
 	var body hexutil.Bytes
 	if txStr == stdinSelector {
 		decoder := json.NewDecoder(os.Stdin)

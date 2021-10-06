@@ -233,7 +233,7 @@ func TestStateChangeDuringTransactionPoolReset(t *testing.T) {
 	)
 
 	// setup pool with 2 transaction in it
-	statedb.SetBalance(address, new(big.Int).SetUint64(params.Ether))
+	statedb.SetBalance(address, new(big.Int).SetUint64(vars.Ether))
 	blockchain := &testChain{&testBlockChain{1000000000, statedb, new(event.Feed)}, address, &trigger}
 
 	tx0 := transaction(0, 100000, key)

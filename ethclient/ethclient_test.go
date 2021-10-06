@@ -916,6 +916,7 @@ var allRPCMethods = []string{
 	"debug_getModifiedAccountsByHash",
 	"debug_getModifiedAccountsByNumber",
 	"debug_goTrace",
+	"debug_intermediateRoots",
 	"debug_memStats",
 	"debug_mutexProfile",
 	"debug_preimage",

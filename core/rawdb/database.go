@@ -228,7 +228,7 @@ Please set --ancient.rpc to the correct path, and/or review the remote freezer's
 // storage.
 func NewDatabaseWithFreezer(db ethdb.KeyValueStore, freezerStr string, namespace string, readonly bool) (ethdb.Database, error) {
 	// Create the idle freezer instance
-	frdb, err := newFreezer(freezerStr, namespace, readonly)
+	frdb, err := newFreezer(freezerStr, namespace, readonly, freezerTableSize, FreezerNoSnappy)
 	if err != nil {
 		return nil, err
 	}

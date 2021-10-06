@@ -31,6 +31,7 @@ const (
 	FreezerMethodAncients         = "freezer_ancients"
 	FreezerMethodAncientSize      = "freezer_ancientSize"
 	FreezerMethodAppendAncient    = "freezer_appendAncient"
+	FreezerMethodModifyAncients   = "freezer_modifyAncients"
 	FreezerMethodTruncateAncients = "freezer_truncateAncients"
 	FreezerMethodSync             = "freezer_sync"
 )
@@ -96,6 +97,12 @@ func (api *FreezerRemoteClient) AncientSize(kind string) (uint64, error) {
 // Note that the frozen marker is updated outside of the service calls.
 func (api *FreezerRemoteClient) AppendAncient(number uint64, hash, header, body, receipts, td []byte) (err error) {
 	return api.client.Call(nil, FreezerMethodAppendAncient, number, hash, header, body, receipts, td)
+}
+
+// ModifyAncients runs the given write operation.
+func (api *FreezerRemoteClient) ModifyAncients(func(ethdb.AncientWriteOp) error) (int64, error) {
+	// TODO (meowbits | ziogaschr): do we support write operations?
+	return 0, errNotSupported
 }
 
 // TruncateAncients discards any recent data above the provided threshold number.
@@ -224,7 +231,7 @@ func freezeRemote(db ethdb.KeyValueStore, f ethdb.AncientStore, threshold uint64
 			}
 			log.Trace("Deep froze ancient block", "number", numFrozen, "hash", hash)
 			// Inject all the components into the relevant data tables
-			if err := f.AppendAncient(numFrozen, hash[:], header, body, receipts, td); err != nil {
+			if err := f.(*FreezerRemoteClient).AppendAncient(numFrozen, hash[:], header, body, receipts, td); err != nil {
 				break
 			}
 			ancients = append(ancients, hash)

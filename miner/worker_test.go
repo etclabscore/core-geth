@@ -77,8 +77,10 @@ var (
 func init() {
 	testTxPoolConfig = core.DefaultTxPoolConfig
 	testTxPoolConfig.Journal = ""
-	ethashChainConfig = params.TestChainConfig
-	cliqueChainConfig = params.TestChainConfig
+	ethashTestChainConfig := *params.TestChainConfig
+	ethashChainConfig = &ethashTestChainConfig
+	cliqueTestChainConfig := *params.TestChainConfig
+	cliqueChainConfig = &cliqueTestChainConfig
 	cliqueChainConfig.MustSetConsensusEngineType(ctypes.ConsensusEngineT_Clique)
 	cliqueChainConfig.SetCliquePeriod(10)
 	cliqueChainConfig.SetCliqueEpoch(30000)

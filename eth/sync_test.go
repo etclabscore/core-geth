@@ -173,8 +173,8 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 	defer emptyPipe.Close()
 	defer fullPipe.Close()
 
-	fullPeer := eth.NewPeer(65, p2p.NewPeer(enode.ID{2}, "", nil), fullPipe, a.txpool)
-	emptyPeer := eth.NewPeer(65, p2p.NewPeer(enode.ID{1}, "", nil), emptyPipe, b.txpool)
+	fullPeer := eth.NewPeer(66, p2p.NewPeer(enode.ID{2}, "", nil), fullPipe, a.txpool)
+	emptyPeer := eth.NewPeer(66, p2p.NewPeer(enode.ID{1}, "", nil), emptyPipe, b.txpool)
 	defer emptyPeer.Close()
 	defer fullPeer.Close()
 
@@ -253,8 +253,8 @@ func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
 	defer emptyPipe.Close()
 	defer fullPipe.Close()
 
-	fullPeer := eth.NewPeer(65, p2p.NewPeer(enode.ID{2}, "", nil), fullPipe, a.txpool)
-	emptyPeer := eth.NewPeer(65, p2p.NewPeer(enode.ID{1}, "", nil), emptyPipe, b.txpool)
+	fullPeer := eth.NewPeer(66, p2p.NewPeer(enode.ID{2}, "", nil), fullPipe, a.txpool)
+	emptyPeer := eth.NewPeer(66, p2p.NewPeer(enode.ID{1}, "", nil), emptyPipe, b.txpool)
 	defer emptyPeer.Close()
 	defer fullPeer.Close()
 
@@ -333,8 +333,8 @@ func TestArtificialFinalityFeatureEnablingDisabling_StaleHead(t *testing.T) {
 	defer emptyPipe.Close()
 	defer fullPipe.Close()
 
-	fullPeer := eth.NewPeer(65, p2p.NewPeer(enode.ID{2}, "", nil), fullPipe, a.txpool)
-	emptyPeer := eth.NewPeer(65, p2p.NewPeer(enode.ID{1}, "", nil), emptyPipe, b.txpool)
+	fullPeer := eth.NewPeer(66, p2p.NewPeer(enode.ID{2}, "", nil), fullPipe, a.txpool)
+	emptyPeer := eth.NewPeer(66, p2p.NewPeer(enode.ID{1}, "", nil), emptyPipe, b.txpool)
 	defer emptyPeer.Close()
 	defer fullPeer.Close()
 

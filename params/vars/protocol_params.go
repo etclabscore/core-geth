@@ -37,7 +37,7 @@ var (
 var (
 	// SupportedProtocolVersions are the supported versions of the `eth` protocol (first
 	// is primary).
-	SupportedProtocolVersions = []uint{66, 65}
+	SupportedProtocolVersions = []uint{66}
 
 	// DefaultProtocolVersions are the protocol version defaults.
 	DefaultProtocolVersions = SupportedProtocolVersions

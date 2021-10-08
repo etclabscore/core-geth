@@ -796,8 +796,6 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 
 	jst.opErrorValue = nil
 	if env.CallErrorTemp != nil {
-		jst.opErrorValue = new(string)
-		*jst.opErrorValue = env.CallErrorTemp.Error()
 
 		env.CallErrorTemp = nil // clean temp error storage, for debug tracing
 	}
@@ -809,40 +807,6 @@ func (jst *Tracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost 
 
 	// Checks wether tracer supports `getCallstackLength` method in order to achieve optimal performance for call_tracer*
 	// in which case it checks if the call to `step` method has to be made, as the duktape prop call is an expensive operation
-	if jst.supportsStepPerfOptimisations {
-		run := false
-
-		if jst.callTracerCallstackLength == nil {
-			jst.vm.PushString("getCallstackLength")
-			code := jst.vm.PcallProp(jst.tracerObject, 0)
-			if code != 0 {
-				jst.vm.Pop()
-				err := jst.vm.SafeToString(-1)
-				jst.err = wrapError("step", errors.New(err))
-				return
-			}
-
-			jst.callTracerCallstackLength = new(uint)
-			*jst.callTracerCallstackLength = jst.vm.GetUint(-1)
-			jst.vm.Pop()
-		}
-
-		if *jst.callTracerCallstackLength-1 == uint(depth) {
-			run = true
-		} else if jst.handleNextOpCode {
-			jst.handleNextOpCode = false
-			run = true
-		} else if op&0xf0 == 0xf0 {
-			jst.handleNextOpCode = true
-			run = true
-		}
-
-		if !run {
-			return
-		} else {
-			jst.callTracerCallstackLength = nil
-		}
-	}
 
 	if _, err := jst.call(true, "step", "log", "db"); err != nil {
 		jst.err = wrapError("step", err)

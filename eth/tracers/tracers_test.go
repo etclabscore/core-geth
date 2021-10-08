@@ -437,7 +437,8 @@ func BenchmarkTransactionTrace(b *testing.B) {
 }
 
 func BenchmarkTracers(b *testing.B) {
-	files, err := ioutil.ReadDir(filepath.Join("testdata", "call_tracer"))
+	folderName := "call_tracer"
+	files, err := ioutil.ReadDir(filepath.Join("testdata", folderName))
 	if err != nil {
 		b.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}
@@ -447,7 +448,7 @@ func BenchmarkTracers(b *testing.B) {
 		}
 		file := file // capture range variable
 		b.Run(camel(strings.TrimSuffix(file.Name(), ".json")), func(b *testing.B) {
-			blob, err := ioutil.ReadFile(filepath.Join("testdata", "call_tracer", file.Name()))
+			blob, err := ioutil.ReadFile(filepath.Join("testdata", folderName, file.Name()))
 			if err != nil {
 				b.Fatalf("failed to read testcase: %v", err)
 			}
@@ -506,9 +507,9 @@ func benchTracer(tracerName string, test *callTracerTest, b *testing.B) {
 	}
 }
 
-func callTracerParityTestRunner(filename string) error {
+func callTracerParityTestRunner(filename string, dirPath string) error {
 	// Call tracer test found, read if from disk
-	blob, err := ioutil.ReadFile(filepath.Join("testdata", filename))
+	blob, err := ioutil.ReadFile(filepath.Join("testdata", dirPath, filename))
 	if err != nil {
 		return fmt.Errorf("failed to read testcase: %v", err)
 	}
@@ -578,19 +579,20 @@ func callTracerParityTestRunner(filename string) error {
 // Iterates over all the input-output datasets in the tracer parity test harness and
 // runs the JavaScript tracers against them.
 func TestCallTracerParity(t *testing.T) {
-	files, err := ioutil.ReadDir("testdata")
+	folderName := "call_tracer_parity"
+	files, err := ioutil.ReadDir(filepath.Join("testdata", folderName))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}
 	for _, file := range files {
-		if !strings.HasPrefix(file.Name(), "parity_call_tracer_") {
+		if !strings.HasSuffix(file.Name(), ".json") {
 			continue
 		}
 		file := file // capture range variable
-		t.Run(camel(strings.TrimSuffix(strings.TrimPrefix(file.Name(), "parity_call_tracer_"), ".json")), func(t *testing.T) {
+		t.Run(camel(strings.TrimSuffix(file.Name(), ".json")), func(t *testing.T) {
 			t.Parallel()
 
-			err := callTracerParityTestRunner(file.Name())
+			err := callTracerParityTestRunner(file.Name(), folderName)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -617,16 +619,16 @@ func jsonEqualParity(x, y interface{}) bool {
 }
 
 func BenchmarkCallTracerParity(b *testing.B) {
-	files, err := filepath.Glob("testdata/parity_call_tracer_*.json")
+	files, err := filepath.Glob("testdata/call_tracer_parity/*.json")
 	if err != nil {
 		b.Fatalf("failed to read testdata: %v", err)
 	}
 
 	for _, file := range files {
-		filename := strings.TrimPrefix(file, "testdata/")
-		b.Run(camel(strings.TrimSuffix(strings.TrimPrefix(filename, "parity_call_tracer_"), ".json")), func(b *testing.B) {
+		filename := strings.TrimPrefix(file, "testdata/call_tracer_parity/")
+		b.Run(camel(strings.TrimSuffix(filename, ".json")), func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				err := callTracerParityTestRunner(filename)
+				err := callTracerParityTestRunner(filename, "call_tracer_parity")
 				if err != nil {
 					b.Fatal(err)
 				}
@@ -649,9 +651,9 @@ type stateDiffTest struct {
 	Result  map[common.Address]*stateDiffAccount `json:"result"`
 }
 
-func stateDiffTracerTestRunner(filename string) error {
+func stateDiffTracerTestRunner(filename string, dirPath string) error {
 	// Call tracer test found, read if from disk
-	blob, err := ioutil.ReadFile(filepath.Join("testdata", filename))
+	blob, err := ioutil.ReadFile(filepath.Join("testdata", dirPath, filename))
 	if err != nil {
 		return fmt.Errorf("failed to read testcase: %v", err)
 	}
@@ -760,19 +762,20 @@ func stateDiffTracerTestRunner(filename string) error {
 // TestStateDiffTracer Iterates over all the input-output datasets in the state diff tracer test harness and
 // runs the JavaScript tracers against them.
 func TestStateDiffTracer(t *testing.T) {
-	files, err := ioutil.ReadDir("testdata")
+	folderName := "state_diff_tracer"
+	files, err := ioutil.ReadDir(filepath.Join("testdata", folderName))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}
 	for _, file := range files {
-		if !strings.HasPrefix(file.Name(), "state_diff_tracer_") {
+		if !strings.HasSuffix(file.Name(), ".json") {
 			continue
 		}
 		file := file // capture range variable
-		t.Run(camel(strings.TrimSuffix(strings.TrimPrefix(file.Name(), "state_diff_tracer_"), ".json")), func(t *testing.T) {
+		t.Run(camel(strings.TrimSuffix(file.Name(), ".json")), func(t *testing.T) {
 			t.Parallel()
 
-			err := stateDiffTracerTestRunner(file.Name())
+			err := stateDiffTracerTestRunner(file.Name(), folderName)
 			if err != nil {
 				t.Fatal(err)
 			}

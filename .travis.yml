@@ -4,39 +4,6 @@ sudo: false
 jobs:
 include:
 
-  # Run linter check. Only test code linters on latest version of Go.
-  - stage: lint
-    os: linux
-    dist: xenial
-    go: 1.16.x
-    env:
-      - lint
-    git:
-      submodules: false
-    script:
-      - make lint
-
-  # Run core-geth -specific tests, proving regression-safety and config interoperability.
-  - stage: build
-    name: "Go1.16.x: make test-coregeth"
-    os: linux
-    dist: xenial
-    go: 1.16.x
-    script:
-    - travis_wait 60 make test-coregeth
-
-  # Run build and tests against latest-1 Go version.
-  - stage: build
-    name: "Go1.15.x: make test"
-    os: linux
-    dist: xenial
-    go: 1.15.x
-    env:
-      - GO111MODULE=on
-    script:
-      - make all
-      - travis_wait 60 make test
-
   # Run build and tests on ARM64 on Pull Requests.
   # These tests are divided in half because their aggregate typical runtime
   # exceeds Travis' time limit (~60m) and were consistently causing timeouts.

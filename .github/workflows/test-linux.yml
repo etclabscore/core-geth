@@ -1,0 +1,66 @@
+name: Lint and Tests
+env:
+  # Set to empty.
+  ANDROID_HOME:
+
+# Controls when the action will run.
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # Run linter check. Only test code linters on latest version of Go.
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.17
+        id: go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.17
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: false
+
+      - run: make lint
+
+  # Run core-geth -specific tests, proving regression-safety and config interoperability.
+  test-cg:
+    name: Tests-CoreGeth
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.17
+        id: go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.17
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - run: make test-coregeth
+
+  # Run build and tests against latest-1 Go version.
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.16
+        id: go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - run: |
+          make all
+          make test

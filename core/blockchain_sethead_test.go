@@ -35,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // rewindTest is a test case for chain rollback upon user request.
@@ -1970,7 +1971,8 @@ func testSetHead(t *testing.T, tt *rewindTest, snapshots bool) {
 
 	// Initialize a fresh chain
 	var (
-		genesis = MustCommitGenesis(db, new(genesisT.Genesis))
+		gspec   = &genesisT.Genesis{BaseFee: big.NewInt(vars.InitialBaseFee)}
+		genesis = MustCommitGenesis(db, gspec)
 		engine  = ethash.NewFullFaker()
 		config  = &CacheConfig{
 			TrieCleanLimit: 256,

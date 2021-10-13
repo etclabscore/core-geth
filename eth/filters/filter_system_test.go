@@ -176,7 +176,8 @@ func TestBlockSubscription(t *testing.T) {
 		db          = rawdb.NewMemoryDatabase()
 		backend     = &testBackend{db: db}
 		api         = NewPublicFilterAPI(backend, false, deadline)
-		genesis     = core.MustCommitGenesis(db, new(genesisT.Genesis))
+		gspec       = &genesisT.Genesis{BaseFee: big.NewInt(vars.InitialBaseFee)}
+		genesis     = core.MustCommitGenesis(db, gspec)
 		chain, _    = core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, 10, func(i int, gen *core.BlockGen) {})
 		chainEvents = []core.ChainEvent{}
 	)
@@ -232,7 +233,8 @@ func TestSideBlockSubscription(t *testing.T) {
 		db              = rawdb.NewMemoryDatabase()
 		backend         = &testBackend{db: db}
 		api             = NewPublicFilterAPI(backend, false, deadline)
-		genesis         = core.MustCommitGenesis(db, new(genesisT.Genesis))
+		gspec           = &genesisT.Genesis{BaseFee: big.NewInt(vars.InitialBaseFee)}
+		genesis         = core.MustCommitGenesis(db, gspec)
 		chain, _        = core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, 10, func(i int, gen *core.BlockGen) {})
 		chainSideEvents = []core.ChainSideEvent{}
 	)

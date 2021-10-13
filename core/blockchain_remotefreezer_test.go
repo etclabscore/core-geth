@@ -99,10 +99,11 @@ func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 		gendb   = rawdb.NewMemoryDatabase()
 		key, _  = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		address = crypto.PubkeyToAddress(key.PublicKey)
-		funds   = big.NewInt(1000000000)
+		funds   = big.NewInt(1000000000000000)
 		gspec   = &genesisT.Genesis{
-			Config: params.TestChainConfig,
-			Alloc:  genesisT.GenesisAlloc{address: {Balance: funds}},
+			Config:  params.TestChainConfig,
+			Alloc:   genesisT.GenesisAlloc{address: {Balance: funds}},
+			BaseFee: big.NewInt(vars.InitialBaseFee),
 		}
 		genesis = MustCommitGenesis(gendb, gspec)
 		signer  = types.NewEIP155Signer(gspec.Config.GetChainID())
@@ -113,7 +114,7 @@ func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 		// If the block number is multiple of 3, send a few bonus transactions to the miner
 		if i%3 == 2 {
 			for j := 0; j < i%4+1; j++ {
-				tx, err := types.SignTx(types.NewTransaction(block.TxNonce(address), common.Address{0x00}, big.NewInt(1000), vars.TxGas, nil, nil), signer, key)
+				tx, err := types.SignTx(types.NewTransaction(block.TxNonce(address), common.Address{0x00}, big.NewInt(1000), vars.TxGas, block.header.BaseFee, nil), signer, key)
 				if err != nil {
 					panic(err)
 				}
@@ -257,8 +258,12 @@ func TestIncompleteAncientReceiptChainInsertion_RemoteFreezer(t *testing.T) {
 		gendb   = rawdb.NewMemoryDatabase()
 		key, _  = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		address = crypto.PubkeyToAddress(key.PublicKey)
-		funds   = big.NewInt(1000000000)
-		gspec   = &genesisT.Genesis{Config: params.TestChainConfig, Alloc: genesisT.GenesisAlloc{address: {Balance: funds}}}
+		funds   = big.NewInt(1000000000000000)
+		gspec   = &genesisT.Genesis{
+			Config:  params.TestChainConfig,
+			Alloc:   genesisT.GenesisAlloc{address: {Balance: funds}},
+			BaseFee: big.NewInt(vars.InitialBaseFee),
+		}
 		genesis = MustCommitGenesis(gendb, gspec)
 	)
 	height := uint64(1024)
@@ -327,14 +332,18 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 		gendb   = rawdb.NewMemoryDatabase()
 		key, _  = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		address = crypto.PubkeyToAddress(key.PublicKey)
-		funds   = big.NewInt(1000000000)
-		gspec   = &genesisT.Genesis{Config: params.TestChainConfig, Alloc: genesisT.GenesisAlloc{address: {Balance: funds}}}
+		funds   = big.NewInt(1000000000000000)
+		gspec   = &genesisT.Genesis{
+			Config:  params.TestChainConfig,
+			Alloc:   genesisT.GenesisAlloc{address: {Balance: funds}},
+			BaseFee: big.NewInt(vars.InitialBaseFee),
+		}
 		genesis = MustCommitGenesis(gendb, gspec)
 		signer  = types.NewEIP155Signer(gspec.Config.GetChainID())
 	)
 	height := uint64(128)
 	blocks, receipts := GenerateChain(gspec.Config, genesis, ethash.NewFaker(), gendb, int(height), func(i int, block *BlockGen) {
-		tx, err := types.SignTx(types.NewTransaction(block.TxNonce(address), common.Address{0x00}, big.NewInt(1000), vars.TxGas, nil, nil), signer, key)
+		tx, err := types.SignTx(types.NewTransaction(block.TxNonce(address), common.Address{0x00}, big.NewInt(1000), vars.TxGas, block.header.BaseFee, nil), signer, key)
 		if err != nil {
 			panic(err)
 		}
@@ -470,14 +479,18 @@ func TestSkipStaleTxIndicesInFastSync_RemoteFreezer(t *testing.T) {
 		gendb   = rawdb.NewMemoryDatabase()
 		key, _  = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		address = crypto.PubkeyToAddress(key.PublicKey)
-		funds   = big.NewInt(1000000000)
-		gspec   = &genesisT.Genesis{Config: params.TestChainConfig, Alloc: genesisT.GenesisAlloc{address: {Balance: funds}}}
+		funds   = big.NewInt(1000000000000000)
+		gspec   = &genesisT.Genesis{
+			Config:  params.TestChainConfig,
+			Alloc:   genesisT.GenesisAlloc{address: {Balance: funds}},
+			BaseFee: big.NewInt(vars.InitialBaseFee),
+		}
 		genesis = MustCommitGenesis(gendb, gspec)
 		signer  = types.NewEIP155Signer(gspec.Config.GetChainID())
 	)
 	height := uint64(128)
 	blocks, receipts := GenerateChain(gspec.Config, genesis, ethash.NewFaker(), gendb, int(height), func(i int, block *BlockGen) {
-		tx, err := types.SignTx(types.NewTransaction(block.TxNonce(address), common.Address{0x00}, big.NewInt(1000), vars.TxGas, nil, nil), signer, key)
+		tx, err := types.SignTx(types.NewTransaction(block.TxNonce(address), common.Address{0x00}, big.NewInt(1000), vars.TxGas, block.header.BaseFee, nil), signer, key)
 		if err != nil {
 			panic(err)
 		}

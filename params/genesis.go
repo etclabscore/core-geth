@@ -77,17 +77,6 @@ func DefaultGoerliGenesisBlock() *genesisT.Genesis {
 	}
 }
 
-func DefaultYoloV3GenesisBlock() *genesisT.Genesis {
-	return &genesisT.Genesis{
-		Config:     YoloV3ChainConfig,
-		Timestamp:  0x6027dd2e,
-		ExtraData:  hexutil.MustDecode("0x00000000000000000000000000000000000000000000000000000000000000008a37866fd3627c9205a37c8685666f32ec07bb1b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-		GasLimit:   0x47b760,
-		Difficulty: big.NewInt(1),
-		Alloc:      genesisT.DecodePreAlloc(YoloV3AllocData),
-	}
-}
-
 // DeveloperGenesisBlock returns the 'geth --dev' genesis block. Note, this must
 // be seeded with the
 func DeveloperGenesisBlock(period uint64, faucet common.Address, useEthash bool) *genesisT.Genesis {
@@ -103,6 +92,7 @@ func DeveloperGenesisBlock(period uint64, faucet common.Address, useEthash bool)
 			Config:     config,
 			ExtraData:  append(append(make([]byte, 32), faucet[:]...), make([]byte, crypto.SignatureLength)...),
 			GasLimit:   6283185,
+			BaseFee:    big.NewInt(vars.InitialBaseFee),
 			Difficulty: big.NewInt(1),
 			Alloc: map[common.Address]genesisT.GenesisAccount{
 				common.BytesToAddress([]byte{1}): {Balance: big.NewInt(1)}, // ECRecover

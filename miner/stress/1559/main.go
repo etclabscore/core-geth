@@ -1,4 +1,4 @@
-// Copyright 2018 The go-ethereum Authors
+// Copyright 2021 The go-ethereum Authors
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -14,9 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-// +build none
-
-// This file contains a miner stress test based on the Ethash consensus engine.
+// This file contains a miner stress test for eip 1559.
 package main
 
 import (
@@ -29,7 +27,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/fdlimit"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
@@ -37,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/downloader"
+	"github.com/ethereum/go-ethereum/eth/ethconfig"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/node"
@@ -45,6 +43,10 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
+)
+
+var (
+	londonBlock = big.NewInt(30) // Predefined london fork block for activating eip 1559.
 )
 
 func main() {
@@ -57,7 +59,7 @@ func main() {
 		faucets[i], _ = crypto.GenerateKey()
 	}
 	// Pre-generate the ethash mining DAG so we don't race
-	ethash.MakeDataset(1, filepath.Join(os.Getenv("HOME"), ".ethash"))
+	ethash.MakeDataset(1, ethash.CalcEpochLength(0, nil), filepath.Join(os.Getenv("HOME"), ".ethash"))
 
 	// Create an Ethash network based off of the Ropsten config
 	genesis := makeGenesis(faucets)
@@ -102,44 +104,117 @@ func main() {
 	time.Sleep(3 * time.Second)
 
 	// Start injecting transactions from the faucets like crazy
-	nonces := make([]uint64, len(faucets))
+	var (
+		nonces = make([]uint64, len(faucets))
+
+		// The signer activates the 1559 features even before the fork,
+		// so the new 1559 txs can be created with this signer.
+		signer = types.LatestSignerForChainID(genesis.GetChainID())
+	)
 	for {
 		// Pick a random mining node
 		index := rand.Intn(len(faucets))
 		backend := nodes[index%len(nodes)]
 
-		// Create a self transaction and inject into the pool
-		tx, err := types.SignTx(types.NewTransaction(nonces[index], crypto.PubkeyToAddress(faucets[index].PublicKey), new(big.Int), 21000, big.NewInt(100000000000+rand.Int63n(65536)), nil), types.HomesteadSigner{}, faucets[index])
-		if err != nil {
-			panic(err)
-		}
+		headHeader := backend.BlockChain().CurrentHeader()
+		baseFee := headHeader.BaseFee
+
+		// Create a self transaction and inject into the pool. The legacy
+		// and 1559 transactions can all be created by random even if the
+		// fork is not happened.
+		tx := makeTransaction(nonces[index], faucets[index], signer, baseFee)
 		if err := backend.TxPool().AddLocal(tx); err != nil {
-			panic(err)
+			continue
 		}
 		nonces[index]++
 
 		// Wait if we're too saturated
-		if pend, _ := backend.TxPool().Stats(); pend > 2048 {
+		if pend, _ := backend.TxPool().Stats(); pend > 4192 {
 			time.Sleep(100 * time.Millisecond)
 		}
+
+		// Wait if the basefee is raised too fast
+		if baseFee != nil && baseFee.Cmp(new(big.Int).Mul(big.NewInt(100), big.NewInt(vars.GWei))) > 0 {
+			time.Sleep(500 * time.Millisecond)
+		}
 	}
+}
+
+func makeTransaction(nonce uint64, privKey *ecdsa.PrivateKey, signer types.Signer, baseFee *big.Int) *types.Transaction {
+	// Generate legacy transaction
+	if rand.Intn(2) == 0 {
+		tx, err := types.SignTx(types.NewTransaction(nonce, crypto.PubkeyToAddress(privKey.PublicKey), new(big.Int), 21000, big.NewInt(100000000000+rand.Int63n(65536)), nil), signer, privKey)
+		if err != nil {
+			panic(err)
+		}
+		return tx
+	}
+	// Generate eip 1559 transaction
+	recipient := crypto.PubkeyToAddress(privKey.PublicKey)
+
+	// Feecap and feetip are limited to 32 bytes. Offer a sightly
+	// larger buffer for creating both valid and invalid transactions.
+	var buf = make([]byte, 32+5)
+	rand.Read(buf)
+	gasTipCap := new(big.Int).SetBytes(buf)
+
+	// If the given base fee is nil(the 1559 is still not available),
+	// generate a fake base fee in order to create 1559 tx forcibly.
+	if baseFee == nil {
+		baseFee = new(big.Int).SetInt64(int64(rand.Int31()))
+	}
+	// Generate the feecap, 75% valid feecap and 25% unguaranted.
+	var gasFeeCap *big.Int
+	if rand.Intn(4) == 0 {
+		rand.Read(buf)
+		gasFeeCap = new(big.Int).SetBytes(buf)
+	} else {
+		gasFeeCap = new(big.Int).Add(baseFee, gasTipCap)
+	}
+	return types.MustSignNewTx(privKey, signer, &types.DynamicFeeTx{
+		ChainID:    signer.ChainID(),
+		Nonce:      nonce,
+		GasTipCap:  gasTipCap,
+		GasFeeCap:  gasFeeCap,
+		Gas:        21000,
+		To:         &recipient,
+		Value:      big.NewInt(100),
+		Data:       nil,
+		AccessList: nil,
+	})
 }
 
 // makeGenesis creates a custom Ethash genesis block based on some pre-defined
 // faucet accounts.
 func makeGenesis(faucets []*ecdsa.PrivateKey) *genesisT.Genesis {
 	genesis := params.DefaultRopstenGenesisBlock()
+
+	genesis.Config = params.AllEthashProtocolChanges
+	var londonBlockUint64 *uint64
+	if londonBlock != nil {
+		l := londonBlock.Uint64()
+		londonBlockUint64 = &l
+	}
+	genesis.SetEIP1559Transition(londonBlockUint64)
 	genesis.Difficulty = vars.MinimumDifficulty
-	genesis.GasLimit = 25000000
 
-	genesis.Config.ChainID = big.NewInt(18)
-	genesis.Config.EIP150Hash = common.Hash{}
+	// Small gaslimit for easier basefee moving testing.
+	genesis.GasLimit = 8_000_000
 
-	genesis.Alloc = genesis.GenesisAlloc{}
+	genesis.SetChainID(big.NewInt(18))
+	// TODO(meowsbits): review me
+	// genesis.Config.EIP150Hash = common.Hash{}
+
+	genesis.Alloc = genesisT.GenesisAlloc{}
 	for _, faucet := range faucets {
-		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = genesis.GenesisAccount{
+		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = genesisT.GenesisAccount{
 			Balance: new(big.Int).Exp(big.NewInt(2), big.NewInt(128), nil),
 		}
+	}
+	if londonBlock.Sign() == 0 {
+		log.Info("Enabled the eip 1559 by default")
+	} else {
+		log.Info("Registered the london fork", "number", londonBlock)
 	}
 	return genesis
 }
@@ -166,15 +241,14 @@ func makeMiner(genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, error) {
 	}
 	ethBackend, err := eth.New(stack, &ethconfig.Config{
 		Genesis:         genesis,
-		NetworkId:       genesis.Config.ChainID.Uint64(),
+		NetworkId:       genesis.GetChainID().Uint64(),
 		SyncMode:        downloader.FullSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,
 		TxPool:          core.DefaultTxPoolConfig,
-		GPO:             eth.DefaultConfig.GPO,
-		Ethash:          eth.DefaultConfig.Ethash,
+		GPO:             ethconfig.Defaults.GPO,
+		Ethash:          ethconfig.Defaults.Ethash,
 		Miner: miner.Config{
-			GasFloor: genesis.GasLimit * 9 / 10,
 			GasCeil:  genesis.GasLimit * 11 / 10,
 			GasPrice: big.NewInt(1),
 			Recommit: time.Second,
@@ -183,7 +257,6 @@ func makeMiner(genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-
 	err = stack.Start()
 	return stack, ethBackend, err
 }

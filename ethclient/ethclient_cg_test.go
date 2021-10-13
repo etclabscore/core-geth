@@ -74,6 +74,8 @@ func TestEthGetBlockByNumber_ValidJSONResponse(t *testing.T) {
 		"receiptsRoot":     reHexHashLen,
 		"sha3Uncles":       reHexHashLen,
 
+		"baseFeePerGas": reHexAnyLen,
+
 		"uncles":       regexp.MustCompile(`^\[\]$`),
 		"transactions": regexp.MustCompile(`^\[\]$`),
 	}

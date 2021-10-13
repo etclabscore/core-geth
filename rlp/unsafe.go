@@ -1,4 +1,4 @@
-// Copyright 2014 The go-ethereum Authors
+// Copyright 2021 The go-ethereum Authors
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -14,26 +14,22 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package tests
+// +build !nacl,!js,cgo
+
+package rlp
 
 import (
-	"testing"
-
-	"github.com/ethereum/go-ethereum/core/vm"
+	"reflect"
+	"unsafe"
 )
 
-func TestVM(t *testing.T) {
-	t.Parallel()
-	vmt := new(testMatcher)
-	vmt.slow("^vmPerformance")
-	vmt.fails("^vmSystemOperationsTest.json/createNameRegistrator$", "fails without parallel execution")
-
-	vmt.walk(t, vmTestDir, func(t *testing.T, name string, test *VMTest) {
-		withTrace(t, test.json.Exec.GasLimit, func(vmconfig vm.Config) error {
-			return vmt.checkFailure(t, name+"/trie", test.Run(vmconfig, false))
-		})
-		withTrace(t, test.json.Exec.GasLimit, func(vmconfig vm.Config) error {
-			return vmt.checkFailure(t, name+"/snap", test.Run(vmconfig, true))
-		})
-	})
+// byteArrayBytes returns a slice of the byte array v.
+func byteArrayBytes(v reflect.Value) []byte {
+	len := v.Len()
+	var s []byte
+	hdr := (*reflect.SliceHeader)(unsafe.Pointer(&s))
+	hdr.Data = v.UnsafeAddr()
+	hdr.Cap = len
+	hdr.Len = len
+	return s
 }

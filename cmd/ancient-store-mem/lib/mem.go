@@ -22,6 +22,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/ethereum/go-ethereum/common"
 )
 
 const (
@@ -45,7 +47,9 @@ type MemFreezerRemoteServerAPI struct {
 }
 
 func NewMemFreezerRemoteServerAPI() *MemFreezerRemoteServerAPI {
-	return &MemFreezerRemoteServerAPI{store: make(map[string][]byte)}
+	return &MemFreezerRemoteServerAPI{
+		store: make(map[string][]byte),
+	}
 }
 
 func (r *MemFreezerRemoteServerAPI) storeKey(kind string, number uint64) string {
@@ -75,6 +79,7 @@ func (f *MemFreezerRemoteServerAPI) Ancient(kind string, number uint64) ([]byte,
 	if !ok {
 		return nil, errOutOfBounds
 	}
+
 	return v, nil
 }
 
@@ -94,15 +99,16 @@ func (f *MemFreezerRemoteServerAPI) AncientSize(kind string) (uint64, error) {
 	return sum, nil
 }
 
+var fieldNames = []string{
+	freezerRemoteHashTable,
+	freezerRemoteHeaderTable,
+	freezerRemoteBodiesTable,
+	freezerRemoteReceiptTable,
+	freezerRemoteDifficultyTable,
+}
+
 func (f *MemFreezerRemoteServerAPI) AppendAncient(number uint64, hash, header, body, receipt, td []byte) error {
 	// fmt.Println("mock server called", "method=AppendAncient", "number=", number, "header", fmt.Sprintf("%x", header))
-	fieldNames := []string{
-		freezerRemoteHashTable,
-		freezerRemoteHeaderTable,
-		freezerRemoteBodiesTable,
-		freezerRemoteReceiptTable,
-		freezerRemoteDifficultyTable,
-	}
 	fields := [][]byte{hash, header, body, receipt, td}
 	if number != f.count {
 		return errOutOfOrder
@@ -117,8 +123,50 @@ func (f *MemFreezerRemoteServerAPI) AppendAncient(number uint64, hash, header, b
 	return nil
 }
 
+func (f *MemFreezerRemoteServerAPI) Append(kind string, num uint64, item interface{}) error {
+	if f.count != num {
+		return fmt.Errorf("%w: num=%d, count=%d", errOutOfOrder, num, f.count)
+	}
+
+	// This is a really crufty thing.
+	// We need to increment the freezer counter when all of a block's data have been written.
+	// This is harder to do than AppendAncient because we're only handling one field at a time.
+	// So we look at the ModifyAncients method and use the implementation for the
+	// current AncientWriteOperator closure. In accessors_chain.go, this
+	// writes one block at time (via independent fields), and the last independent
+	// field called is 'diffs'. (See methods: WriteAncientBlocks and writeAncientBlock).
+	// As long as we assume that 'diffs' are the last-called field when writing
+	// a block, we can use it as the trigger for the count incrementing.
+	if kind == freezerRemoteDifficultyTable {
+		f.count = num + 1
+	}
+
+	str := item.(string)
+
+	f.mu.Lock()
+	f.store[f.storeKey(kind, num)] = common.Hex2Bytes(str)
+	f.mu.Unlock()
+
+	return nil
+}
+
+func (f *MemFreezerRemoteServerAPI) AppendRaw(kind string, num uint64, item []byte) error {
+	if f.count != num {
+		return fmt.Errorf("%w: num=%d, count=%d", errOutOfOrder, num, f.count)
+	}
+
+	f.mu.Lock()
+	f.store[f.storeKey(kind, num)] = item
+	f.mu.Unlock()
+
+	return nil
+}
+
 func (f *MemFreezerRemoteServerAPI) TruncateAncients(n uint64) error {
 	// fmt.Println("mock server called", "method=TruncateAncients")
+	if f.count <= n {
+		return nil
+	}
 	f.count = n
 	f.mu.Lock()
 	defer f.mu.Unlock()

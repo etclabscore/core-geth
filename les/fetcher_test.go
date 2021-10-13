@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // verifyImportEvent verifies that one single event arrive on an import channel.
@@ -243,11 +244,10 @@ func testInvalidAnnounces(t *testing.T, protocol int) {
 	}
 	done := make(chan *types.Header, 1)
 	c.handler.fetcher.newHeadHook = func(header *types.Header) { done <- header }
-
 	// Prepare announcement by latest header.
 	headerOne := s.backend.Blockchain().GetHeaderByNumber(1)
 	hash, number := headerOne.Hash(), headerOne.Number.Uint64()
-	td := big.NewInt(200) // bad td
+	td := big.NewInt(vars.GenesisDifficulty.Int64() + 200) // bad td
 
 	// Sign the announcement if necessary.
 	announce := announceData{hash, number, td, 0, nil}
@@ -257,7 +257,7 @@ func testInvalidAnnounces(t *testing.T, protocol int) {
 	peer.cpeer.sendAnnounce(announce)
 	<-done // Wait syncing
 
-	// Ensure the bad peer is evicited
+	// Ensure the bad peer is evicted
 	if c.handler.backend.peers.len() != 0 {
 		t.Fatalf("Failed to evict invalid peer")
 	}

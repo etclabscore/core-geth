@@ -232,7 +232,7 @@ func (f *freezer) AncientSize(kind string) (uint64, error) {
 }
 
 // ModifyAncients runs the given write operation.
-func (f *freezer) ModifyAncients(fn func(ethdb.AncientWriteOp) error) (writeSize int64, err error) {
+func (f *freezer) ModifyAncients(fn func(ethdb.AncientWriteOperator) error) (writeSize int64, err error) {
 	if f.readonly {
 		return 0, errReadOnly
 	}
@@ -490,7 +490,7 @@ func (f *freezer) freeze(db ethdb.KeyValueStore) {
 func (f *freezer) freezeRange(nfdb *nofreezedb, number, limit uint64) (hashes []common.Hash, err error) {
 	hashes = make([]common.Hash, 0, limit-number)
 
-	_, err = f.ModifyAncients(func(op ethdb.AncientWriteOp) error {
+	_, err = f.ModifyAncients(func(op ethdb.AncientWriteOperator) error {
 		for ; number <= limit; number++ {
 			// Retrieve all the components of the canonical block.
 			hash := ReadCanonicalHash(nfdb, number)

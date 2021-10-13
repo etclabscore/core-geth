@@ -54,7 +54,7 @@ func TestFreezerModify(t *testing.T) {
 	defer f.Close()
 
 	// Commit test data.
-	_, err := f.ModifyAncients(func(op ethdb.AncientWriteOp) error {
+	_, err := f.ModifyAncients(func(op ethdb.AncientWriteOperator) error {
 		for i := range valuesRaw {
 			if err := op.AppendRaw("raw", uint64(i), valuesRaw[i]); err != nil {
 				return err
@@ -99,7 +99,7 @@ func TestFreezerModifyRollback(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	theError := errors.New("oops")
-	_, err := f.ModifyAncients(func(op ethdb.AncientWriteOp) error {
+	_, err := f.ModifyAncients(func(op ethdb.AncientWriteOperator) error {
 		// Append three items. This creates two files immediately,
 		// because the table size limit of the test freezer is 2048.
 		require.NoError(t, op.AppendRaw("test", 0, make([]byte, 2048)))
@@ -144,7 +144,7 @@ func TestFreezerConcurrentModifyRetrieve(t *testing.T) {
 		defer wg.Done()
 		defer close(written)
 		for item := uint64(0); item < 10000; item += writeBatchSize {
-			_, err := f.ModifyAncients(func(op ethdb.AncientWriteOp) error {
+			_, err := f.ModifyAncients(func(op ethdb.AncientWriteOperator) error {
 				for i := uint64(0); i < writeBatchSize; i++ {
 					item := item + i
 					value := getChunk(32, int(item))
@@ -199,7 +199,7 @@ func TestFreezerConcurrentModifyTruncate(t *testing.T) {
 		if err := f.TruncateAncients(0); err != nil {
 			t.Fatal("truncate failed:", err)
 		}
-		_, err := f.ModifyAncients(func(op ethdb.AncientWriteOp) error {
+		_, err := f.ModifyAncients(func(op ethdb.AncientWriteOperator) error {
 			for i := uint64(0); i < 100; i++ {
 				if err := op.AppendRaw("test", i, item); err != nil {
 					return err
@@ -220,7 +220,7 @@ func TestFreezerConcurrentModifyTruncate(t *testing.T) {
 		)
 		wg.Add(3)
 		go func() {
-			_, modifyErr = f.ModifyAncients(func(op ethdb.AncientWriteOp) error {
+			_, modifyErr = f.ModifyAncients(func(op ethdb.AncientWriteOperator) error {
 				for i := uint64(100); i < 200; i++ {
 					if err := op.AppendRaw("test", i, item); err != nil {
 						return err

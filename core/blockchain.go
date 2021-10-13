@@ -207,8 +207,7 @@ type BlockChain struct {
 	processor  Processor // Block transaction processor interface
 	vmConfig   vm.Config
 
-	shouldPreserve  func(*types.Block) bool        // Function used to determine whether should preserve the given block.
-	terminateInsert func(common.Hash, uint64) bool // Testing hook used to terminate ancient receipt chain insertion.
+	shouldPreserve func(*types.Block) bool // Function used to determine whether should preserve the given block.
 
 	artificialFinalityNoDisable     *int32 // manual override prevents disabling artificial finality feature activation
 	artificialFinalityEnabledStatus int32  // toggles artificial finality features; will be always 1 if artificialFinalityForce=1

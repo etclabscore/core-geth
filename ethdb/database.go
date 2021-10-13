@@ -95,7 +95,7 @@ type AncientWriter interface {
 	// ModifyAncients runs a write operation on the ancient store.
 	// If the function returns an error, any changes to the underlying store are reverted.
 	// The integer return value is the total size of the written data.
-	ModifyAncients(func(AncientWriteOp) error) (int64, error)
+	ModifyAncients(func(AncientWriteOperator) error) (int64, error)
 
 	// TruncateAncients discards all but the first n ancient data from the ancient store.
 	TruncateAncients(n uint64) error
@@ -104,8 +104,8 @@ type AncientWriter interface {
 	Sync() error
 }
 
-// AncientWriteOp is given to the function argument of ModifyAncients.
-type AncientWriteOp interface {
+// AncientWriteOperator is given to the function argument of ModifyAncients.
+type AncientWriteOperator interface {
 	// Append adds an RLP-encoded item.
 	Append(kind string, number uint64, item interface{}) error
 

@@ -8,6 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/vars"
+	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -15,13 +16,14 @@ import (
 // The struct's methods delegate the business logic to an external server
 // that is responsible for managing an actual ancient store.
 type FreezerRemoteClient struct {
-	client    *rpc.Client
-	quit      chan struct{}
-	threshold uint64             // Number of recent blocks not to freeze (params.FullImmutabilityThreshold apart from tests)
-	trigger   chan chan struct{} // Manual blocking freeze trigger, test determinism
-	closeOnce sync.Once
-	readonly  bool
-	wg        sync.WaitGroup
+	client     *rpc.Client
+	quit       chan struct{}
+	threshold  uint64             // Number of recent blocks not to freeze (params.FullImmutabilityThreshold apart from tests)
+	trigger    chan chan struct{} // Manual blocking freeze trigger, test determinism
+	closeOnce  sync.Once
+	readonly   bool
+	wg         sync.WaitGroup
+	writeBatch *freezerBatchRemote
 }
 
 const (
@@ -34,6 +36,11 @@ const (
 	FreezerMethodModifyAncients   = "freezer_modifyAncients"
 	FreezerMethodTruncateAncients = "freezer_truncateAncients"
 	FreezerMethodSync             = "freezer_sync"
+
+	// FreezerMethodWriteAppend and FreezerMethodWriteAppendRaw are
+	// methods for re-written (get it?) freezer design with write batching.
+	FreezerMethodWriteAppend    = "freezer_append"
+	FreezerMethodWriteAppendRaw = "freezer_appendRaw"
 )
 
 // newFreezerRemoteClient constructs a rpc client to connect to a remote freezer
@@ -43,11 +50,12 @@ func newFreezerRemoteClient(endpoint string, readonly bool) (*FreezerRemoteClien
 		return nil, err
 	}
 	return &FreezerRemoteClient{
-		client:    client,
-		threshold: vars.FullImmutabilityThreshold,
-		quit:      make(chan struct{}),
-		trigger:   make(chan chan struct{}),
-		readonly:  readonly,
+		client:     client,
+		threshold:  vars.FullImmutabilityThreshold,
+		quit:       make(chan struct{}),
+		trigger:    make(chan chan struct{}),
+		readonly:   readonly,
+		writeBatch: &freezerBatchRemote{client: client},
 	}, nil
 }
 
@@ -68,6 +76,7 @@ func (api *FreezerRemoteClient) HasAncient(kind string, number uint64) (bool, er
 func (api *FreezerRemoteClient) Ancient(kind string, number uint64) ([]byte, error) {
 	res := []byte{}
 	if err := api.client.Call(&res, FreezerMethodAncient, kind, number); err != nil {
+		// llog.Println("frc.Ancient", kind, number, string(res))
 		return nil, err
 	}
 	return res, nil
@@ -99,10 +108,68 @@ func (api *FreezerRemoteClient) AppendAncient(number uint64, hash, header, body,
 	return api.client.Call(nil, FreezerMethodAppendAncient, number, hash, header, body, receipts, td)
 }
 
+type freezerBatchRemote struct {
+	client *rpc.Client
+
+	// writeSize is managed here (at the client, rather than the server)
+	// because the write-operations are granular (per header, receipt, hash, etcetera), and the size written value
+	// is an aggregate at the ModifyAncients-level.
+	writeSize int64
+}
+
+func (b *freezerBatchRemote) Append(kind string, num uint64, item interface{}) error {
+	var res int64
+	bs, err := rlp.EncodeToBytes(item)
+	if err != nil {
+		return err
+	}
+
+	err = b.client.Call(&res, FreezerMethodWriteAppend, kind, num, common.Bytes2Hex(bs))
+	if err != nil {
+		b.writeSize += int64(len(bs))
+	}
+	return err
+}
+
+func (b *freezerBatchRemote) AppendRaw(kind string, num uint64, item []byte) error {
+	err := b.client.Call(nil, FreezerMethodWriteAppendRaw, kind, num, item)
+	if err != nil {
+		b.writeSize += int64(len(item))
+	}
+	return err
+}
+
+func (b *freezerBatchRemote) reset() {
+	b.writeSize = 0
+}
+
 // ModifyAncients runs the given write operation.
-func (api *FreezerRemoteClient) ModifyAncients(func(ethdb.AncientWriteOp) error) (int64, error) {
-	// TODO (meowbits | ziogaschr): do we support write operations?
-	return 0, errNotSupported
+func (api *FreezerRemoteClient) ModifyAncients(fn func(ethdb.AncientWriteOperator) error) (writeSize int64, err error) {
+	if api.readonly {
+		return 0, errReadOnly
+	}
+	prev, err := api.Ancients()
+	if err != nil {
+		return 0, err
+	}
+
+	// Roll back all tables to the starting position in case of error.
+	defer func() {
+		if err != nil {
+			log.Warn("Rolling back ancients", "target(previous)", prev)
+			if err := api.TruncateAncients(prev); err != nil {
+				log.Error("Freezer table roll-back failed", "index", prev, "err", err)
+			}
+		}
+	}()
+
+	// Do the writing.
+	api.writeBatch.reset()
+	if err := fn(api.writeBatch); err != nil {
+		return 0, err
+	}
+
+	return api.writeBatch.writeSize, nil
 }
 
 // TruncateAncients discards any recent data above the provided threshold number.

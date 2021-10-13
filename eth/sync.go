@@ -47,11 +47,6 @@ var (
 	artificialFinalitySafetyInterval = time.Second * time.Duration(30*vars.DurationLimit.Uint64())
 )
 
-type txsync struct {
-	p   *eth.Peer
-	txs []*types.Transaction
-}
-
 // artificialFinalitySafetyLoop compares our local head across timer intervals.
 // If it changes, assuming the interval is sufficiently long,
 // it means we're syncing ok: there has been a steady flow of blocks.

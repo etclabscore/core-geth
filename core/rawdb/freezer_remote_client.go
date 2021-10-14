@@ -21,6 +21,7 @@ type FreezerRemoteClient struct {
 	trigger   chan chan struct{} // Manual blocking freeze trigger, test determinism
 	closeOnce sync.Once
 	readonly  bool
+	wg        sync.WaitGroup
 }
 
 const (

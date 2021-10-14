@@ -213,14 +213,18 @@ func (api *TraceAPI) Block(ctx context.Context, number rpc.BlockNumber, config *
 	results := []interface{}{}
 
 	for _, result := range traceResults {
-		var tmp []interface{}
 		if result.Error != "" {
 			return nil, errors.New(result.Error)
 		}
+		var tmp interface{}
 		if err := json.Unmarshal(result.Result.(json.RawMessage), &tmp); err != nil {
 			return nil, err
 		}
-		results = append(results, tmp...)
+		if *config.Tracer == "stateDiffTracer" {
+			results = append(results, tmp)
+		} else {
+			results = append(results, tmp.([]interface{})...)
+		}
 	}
 
 	results = append(results, traceReward)
@@ -255,7 +259,7 @@ func (api *TraceAPI) Filter(ctx context.Context, args TraceFilterArgs, config *T
 // Call lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
-func (api *TraceAPI) Call(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
+func (api *TraceAPI) Call(ctx context.Context, args ethapi.TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
 	config = setTraceCallConfigDefaultTracer(config)
 	res, err := api.debugAPI.TraceCall(ctx, args, blockNrOrHash, config)
 	if err != nil {
@@ -268,7 +272,7 @@ func (api *TraceAPI) Call(ctx context.Context, args ethapi.CallArgs, blockNrOrHa
 // CallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
-func (api *TraceAPI) CallMany(ctx context.Context, txs []ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
+func (api *TraceAPI) CallMany(ctx context.Context, txs []ethapi.TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
 	config = setTraceCallConfigDefaultTracer(config)
 	return api.debugAPI.TraceCallMany(ctx, txs, blockNrOrHash, config)
 }

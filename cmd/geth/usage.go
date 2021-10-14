@@ -48,7 +48,6 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.KottiFlag,
 			utils.GoerliFlag,
 			utils.RinkebyFlag,
-			utils.YoloV3Flag,
 			utils.RopstenFlag,
 			utils.MintMeFlag,
 			utils.SyncModeFlag,
@@ -191,7 +190,6 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.MinerNotifyFlag,
 			utils.MinerNotifyFullFlag,
 			utils.MinerGasPriceFlag,
-			utils.MinerGasTargetFlag,
 			utils.MinerGasLimitFlag,
 			utils.MinerEtherbaseFlag,
 			utils.MinerExtraDataFlag,
@@ -205,6 +203,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.GpoBlocksFlag,
 			utils.GpoPercentileFlag,
 			utils.GpoMaxGasPriceFlag,
+			utils.GpoIgnoreGasPriceFlag,
 		},
 	},
 	{
@@ -237,6 +236,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.LegacyRPCCORSDomainFlag,
 			utils.LegacyRPCVirtualHostsFlag,
 			utils.LegacyRPCApiFlag,
+			utils.LegacyMinerGasTargetFlag,
 		},
 	},
 	{

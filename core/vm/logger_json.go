@@ -60,23 +60,17 @@ func (l *JSONLogger) CaptureState(env *EVM, pc uint64, op OpCode, gas, cost uint
 		Gas:           gas,
 		GasCost:       cost,
 		MemorySize:    memory.Len(),
-		Storage:       nil,
 		Depth:         depth,
 		RefundCounter: env.StateDB.GetRefund(),
 		Err:           err,
 	}
-	if !l.cfg.DisableMemory {
+	if !l.cfg.EnableMemory {
 		log.Memory = memory.Data()
 	}
 	if !l.cfg.DisableStack {
-		//TODO(@holiman) improve this
-		logstack := make([]*big.Int, len(stack.Data()))
-		for i, item := range stack.Data() {
-			logstack[i] = item.ToBig()
-		}
-		log.Stack = logstack
+		log.Stack = stack.data
 	}
-	if !l.cfg.DisableReturnData {
+	if !l.cfg.EnableReturnData {
 		log.ReturnData = rData
 	}
 	l.encoder.Encode(log)
@@ -90,8 +84,9 @@ func (l *JSONLogger) CaptureEnd(env *EVM, output []byte, gasUsed uint64, t time.
 		Time    time.Duration       `json:"time"`
 		Err     string              `json:"error,omitempty"`
 	}
+	var errMsg string
 	if err != nil {
-		l.encoder.Encode(endLog{common.Bytes2Hex(output), math.HexOrDecimal64(gasUsed), t, err.Error()})
+		errMsg = err.Error()
 	}
-	l.encoder.Encode(endLog{common.Bytes2Hex(output), math.HexOrDecimal64(gasUsed), t, ""})
+	l.encoder.Encode(endLog{common.Bytes2Hex(output), math.HexOrDecimal64(gasUsed), t, errMsg})
 }

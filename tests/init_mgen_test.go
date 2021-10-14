@@ -91,8 +91,8 @@ func (tm *testMatcher) runTestFileNDJSON(t *testing.T, path, name string, runTes
 	if r, _ := tm.findSkip(name); r != "" {
 		t.Skip(r)
 	}
-	if tm.whitelistpat != nil {
-		if !tm.whitelistpat.MatchString(name) {
+	if tm.runonlylistpat != nil {
+		if !tm.runonlylistpat.MatchString(name) {
 			t.Skip("Skipped by whitelist")
 		}
 	}

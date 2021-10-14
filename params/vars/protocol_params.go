@@ -30,6 +30,8 @@ var (
 	EIP1234DifficultyBombDelay = big.NewInt(5000000)
 
 	EIP2384DifficultyBombDelay = big.NewInt(9000000)
+	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3554.md
+	EIP3554DifficultyBombDelay = big.NewInt(9700000)
 )
 
 var (
@@ -42,11 +44,15 @@ var (
 )
 
 var (
-	GasLimitBoundDivisor uint64 = 1024    // The bound divisor of the gas limit, used in update calculations.
-	MinGasLimit          uint64 = 5000    // Minimum the gas limit may ever be.
-	GenesisGasLimit      uint64 = 4712388 // Gas limit of the Genesis block.
+	GasLimitBoundDivisor uint64 = 1024  // The bound divisor of the gas limit, used in update calculations.
+	MinGasLimit          uint64 = 5000  // Minimum the gas limit may ever be.
+	MaximumExtraDataSize uint64 = 32    // Maximum size extra data may be after Genesis.
+	MaxCodeSize          uint64 = 24576 // Maximum bytecode to permit for a contract
+)
 
-	MaximumExtraDataSize  uint64 = 32    // Maximum size extra data may be after Genesis.
+var (
+	GenesisGasLimit uint64 = 4712388 // Gas limit of the Genesis block.
+
 	ExpByteGas            uint64 = 10    // Times ceil(log256(exponent)) for the EXP instruction.
 	SloadGas              uint64 = 50    // Multiplied by the number of 32-byte words that are copied (round up) for any *COPY operation and added.
 	CallValueTransferGas  uint64 = 9000  // Paid for CALL when the value transfer is non-zero.
@@ -61,7 +67,7 @@ var (
 	Sha3Gas     uint64 = 30 // Once per SHA3 operation.
 	Sha3WordGas uint64 = 6  // Once per word of the SHA3 operation's data.
 
-	SstoreSetGas    uint64 = 20000 // Once per SLOAD operation.
+	SstoreSetGas    uint64 = 20000 // Once per SSTORE operation.
 	SstoreResetGas  uint64 = 5000  // Once per SSTORE operation if the zeroness changes from zero.
 	SstoreClearGas  uint64 = 5000  // Once per SSTORE operation if the zeroness doesn't change.
 	SstoreRefundGas uint64 = 15000 // Once per SSTORE operation if the zeroness changes to zero.
@@ -79,6 +85,16 @@ var (
 	SstoreSetGasEIP2200               uint64 = 20000 // Once per SSTORE operation from clean zero to non-zero
 	SstoreResetGasEIP2200             uint64 = 5000  // Once per SSTORE operation from clean non-zero to something else
 	SstoreClearsScheduleRefundEIP2200 uint64 = 15000 // Once per SSTORE operation for clearing an originally existing storage slot
+
+	ColdAccountAccessCostEIP2929 = uint64(2600) // COLD_ACCOUNT_ACCESS_COST
+	ColdSloadCostEIP2929         = uint64(2100) // COLD_SLOAD_COST
+	WarmStorageReadCostEIP2929   = uint64(100)  // WARM_STORAGE_READ_COST
+
+	// In EIP-2200: SstoreResetGas was 5000.
+	// In EIP-2929: SstoreResetGas was changed to '5000 - COLD_SLOAD_COST'.
+	// In EIP-3529: SSTORE_CLEARS_SCHEDULE is defined as SSTORE_RESET_GAS + ACCESS_LIST_STORAGE_KEY_COST
+	// Which becomes: 5000 - 2100 + 1900 = 4800
+	SstoreClearsScheduleRefundEIP3529 uint64 = SstoreResetGasEIP2200 - ColdSloadCostEIP2929 + TxAccessListStorageKeyGas
 
 	JumpdestGas   uint64 = 1     // Once per JUMPDEST operation.
 	EpochDuration uint64 = 30000 // Duration between proof-of-work epochs.
@@ -131,7 +147,8 @@ var (
 	// Introduced in Tangerine Whistle (Eip 150)
 	CreateBySelfdestructGas uint64 = 25000
 
-	MaxCodeSize uint64 = 24576 // Maximum bytecode to permit for a contract
+	BaseFeeChangeDenominator uint64 = 8 // Bounds the amount the base fee can change between blocks.
+	ElasticityMultiplier     uint64 = 2 // Bounds the maximum gas limit an EIP-1559 block may have.
 
 	// Precompiled contract gas prices
 
@@ -160,6 +177,15 @@ var (
 	Bls12381PairingPerPairGas uint64 = 23000  // Per-point pair gas price for BLS12-381 elliptic curve pairing check
 	Bls12381MapG1Gas          uint64 = 5500   // Gas price for BLS12-381 mapping field element to G1 operation
 	Bls12381MapG2Gas          uint64 = 110000 // Gas price for BLS12-381 mapping field element to G2 operation
+
+	// The Refund Quotient is the cap on how much of the used gas can be refunded. Before EIP-3529,
+	// up to half the consumed gas could be refunded. Redefined as 1/5th in EIP-3529
+	RefundQuotient        uint64 = 2
+	RefundQuotientEIP3529 uint64 = 5
+)
+
+const (
+	InitialBaseFee = 1000000000 // Initial base fee for EIP-1559 blocks.
 )
 
 // Gas discount table for BLS12-381 G1 and G2 multi exponentiation operations

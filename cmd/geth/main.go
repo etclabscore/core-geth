@@ -68,7 +68,7 @@ var (
 		utils.NoUSBFlag,
 		utils.USBFlag,
 		utils.SmartCardDaemonPathFlag,
-		utils.OverrideMagnetoFlag,
+		utils.OverrideMystiqueFlag,
 		utils.EthashCacheDirFlag,
 		utils.EthashCachesInMemoryFlag,
 		utils.EthashCachesOnDiskFlag,
@@ -120,7 +120,7 @@ var (
 		utils.MiningEnabledFlag,
 		utils.MinerThreadsFlag,
 		utils.MinerNotifyFlag,
-		utils.MinerGasTargetFlag,
+		utils.LegacyMinerGasTargetFlag,
 		utils.MinerGasLimitFlag,
 		utils.MinerGasPriceFlag,
 		utils.MinerEtherbaseFlag,
@@ -142,7 +142,6 @@ var (
 		utils.RopstenFlag,
 		utils.RinkebyFlag,
 		utils.GoerliFlag,
-		utils.YoloV3Flag,
 		utils.MintMeFlag,
 		utils.ClassicFlag,
 		utils.MordorFlag,
@@ -156,6 +155,7 @@ var (
 		utils.GpoBlocksFlag,
 		utils.GpoPercentileFlag,
 		utils.GpoMaxGasPriceFlag,
+		utils.GpoIgnoreGasPriceFlag,
 		utils.EWASMInterpreterFlag,
 		utils.EVMInterpreterFlag,
 		utils.MinerNotifyFullFlag,
@@ -207,6 +207,10 @@ var (
 		utils.MetricsInfluxDBUsernameFlag,
 		utils.MetricsInfluxDBPasswordFlag,
 		utils.MetricsInfluxDBTagsFlag,
+		utils.MetricsEnableInfluxDBV2Flag,
+		utils.MetricsInfluxDBTokenFlag,
+		utils.MetricsInfluxDBBucketFlag,
+		utils.MetricsInfluxDBOrganizationFlag,
 	}
 )
 
@@ -285,9 +289,6 @@ func checkMainnet(ctx *cli.Context) bool {
 	case ctx.GlobalIsSet(utils.GoerliFlag.Name):
 		log.Info("Starting Geth on Görli testnet...")
 
-	case ctx.GlobalIsSet(utils.YoloV3Flag.Name):
-		log.Info("Starting Geth on YOLOv3 testnet...")
-
 	case ctx.GlobalIsSet(utils.DeveloperFlag.Name):
 		log.Info("Starting Geth in ephemeral proof-of-authority network dev mode...")
 
@@ -302,9 +303,6 @@ func checkMainnet(ctx *cli.Context) bool {
 
 	case ctx.GlobalIsSet(utils.KottiFlag.Name):
 		log.Info("Starting Geth on Kotti testnet...")
-
-	case ctx.GlobalIsSet(utils.YoloV3Flag.Name):
-		log.Info("Starting Geth on YoloV3 testnet...")
 
 	case ctx.GlobalIsSet(utils.MintMeFlag.Name):
 		log.Info("Starting Geth on MintMe.com Coin mainnet...")

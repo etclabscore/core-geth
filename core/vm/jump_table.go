@@ -180,6 +180,12 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 	if config.IsEnabled(config.GetEIP2929Transition, bn) {
 		enable2929(&instructionSet) // Access lists for trie accesses https://eips.ethereum.org/EIPS/eip-2929
 	}
+	if config.IsEnabled(config.GetEIP3529Transition, bn) {
+		enable3529(&instructionSet) // Reduction in refunds
+	}
+	if config.IsEnabled(config.GetEIP3198Transition, bn) {
+		enable3198(&instructionSet) // BASEFEE opcode
+	}
 	return instructionSet
 }
 

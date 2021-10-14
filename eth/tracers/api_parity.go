@@ -19,6 +19,7 @@ package tracers
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -212,6 +213,9 @@ func (api *TraceAPI) Block(ctx context.Context, number rpc.BlockNumber, config *
 	results := []interface{}{}
 
 	for _, result := range traceResults {
+		if result.Error != "" {
+			return nil, errors.New(result.Error)
+		}
 		var tmp interface{}
 		if err := json.Unmarshal(result.Result.(json.RawMessage), &tmp); err != nil {
 			return nil, err

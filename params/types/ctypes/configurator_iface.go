@@ -132,6 +132,7 @@ type ProtocolSpecifier interface {
 	SetEIP1706Transition(n *uint64) error
 	GetEIP2537Transition() *uint64
 	SetEIP2537Transition(n *uint64) error
+
 	GetECBP1100Transition() *uint64
 	SetECBP1100Transition(n *uint64) error
 	GetEIP2315Transition() *uint64
@@ -152,6 +153,18 @@ type ProtocolSpecifier interface {
 	// Typed transaction envelope
 	GetEIP2718Transition() *uint64
 	SetEIP2718Transition(n *uint64) error
+
+	GetEIP1559Transition() *uint64
+	SetEIP1559Transition(n *uint64) error
+
+	GetEIP3541Transition() *uint64
+	SetEIP3541Transition(n *uint64) error
+
+	GetEIP3529Transition() *uint64
+	SetEIP3529Transition(n *uint64) error
+
+	GetEIP3198Transition() *uint64
+	SetEIP3198Transition(n *uint64) error
 }
 
 type Forker interface {
@@ -200,6 +213,8 @@ type EthashConfigurator interface {
 	SetEthashEIP1234Transition(n *uint64) error
 	GetEthashEIP2384Transition() *uint64
 	SetEthashEIP2384Transition(n *uint64) error
+	GetEthashEIP3554Transition() *uint64
+	SetEthashEIP3554Transition(n *uint64) error
 	GetEthashECIP1010PauseTransition() *uint64
 	SetEthashECIP1010PauseTransition(n *uint64) error
 	GetEthashECIP1010ContinueTransition() *uint64

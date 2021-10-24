@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-// +build none
-
 // This file contains a miner stress test based on the Clique consensus engine.
 package main
 
@@ -36,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/downloader"
+	"github.com/ethereum/go-ethereum/eth/ethconfig"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/node"
@@ -136,13 +135,13 @@ func makeGenesis(faucets []*ecdsa.PrivateKey, sealers []*ecdsa.PrivateKey) *gene
 	genesis := params.DefaultRinkebyGenesisBlock()
 	genesis.GasLimit = 25000000
 
-	genesis.Config.ChainID = big.NewInt(18)
-	genesis.Config.Clique.Period = 1
-	genesis.Config.EIP150Hash = common.Hash{}
+	genesis.SetChainID(big.NewInt(18))
+	genesis.SetCliquePeriod(1)
+	// genesis.Config.EIP150Hash = common.Hash{}
 
-	genesis.Alloc = genesis.GenesisAlloc{}
+	genesis.Alloc = genesisT.GenesisAlloc{}
 	for _, faucet := range faucets {
-		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = genesis.GenesisAccount{
+		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = genesisT.GenesisAccount{
 			Balance: new(big.Int).Exp(big.NewInt(2), big.NewInt(128), nil),
 		}
 	}
@@ -188,14 +187,13 @@ func makeSealer(genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, error) {
 	// Create and register the backend
 	ethBackend, err := eth.New(stack, &ethconfig.Config{
 		Genesis:         genesis,
-		NetworkId:       genesis.Config.ChainID.Uint64(),
+		NetworkId:       genesis.Config.GetChainID().Uint64(),
 		SyncMode:        downloader.FullSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,
 		TxPool:          core.DefaultTxPoolConfig,
-		GPO:             eth.DefaultConfig.GPO,
+		GPO:             ethconfig.Defaults.GPO,
 		Miner: miner.Config{
-			GasFloor: genesis.GasLimit * 9 / 10,
 			GasCeil:  genesis.GasLimit * 11 / 10,
 			GasPrice: big.NewInt(1),
 			Recommit: time.Second,

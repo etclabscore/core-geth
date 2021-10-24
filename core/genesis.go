@@ -39,20 +39,7 @@ func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.Cha
 	return SetupGenesisBlockWithOverride(db, genesis, nil)
 }
 
-// SetupGenesisBlockWithOverride writes or updates the genesis block in db.
-// The block that will be used is:
-//
-//                          genesis == nil       genesis != nil
-//                       +------------------------------------------
-//     db has no genesis |  main-net default  |  genesis
-//     db has genesis    |  from DB           |  genesis (if compatible)
-//
-// The stored chain configuration will be updated if it is compatible (i.e. does not
-// specify a fork block below the local head block). In case of a conflict, the
-// error is a *params.ConfigCompatError and the new, unwritten config is returned.
-//
-// The returned chain configuration is never nil.
-func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, overrideMagneto *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, overrideMystique *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
@@ -67,18 +54,21 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			log.Info("Writing custom genesis block")
 		}
 
-		if overrideMagneto != nil {
-			n := overrideMagneto.Uint64()
-			if err := genesis.SetEIP2565Transition(&n); err != nil {
+		if overrideMystique != nil {
+			n := overrideMystique.Uint64()
+			if err := genesis.SetEIP1559Transition(&n); err != nil {
 				return genesis, stored, err
 			}
-			if err := genesis.SetEIP2929Transition(&n); err != nil {
+			if err := genesis.SetEIP3198Transition(&n); err != nil {
 				return genesis, stored, err
 			}
-			if err := genesis.SetEIP2718Transition(&n); err != nil {
+			if err := genesis.SetEIP3529Transition(&n); err != nil {
 				return genesis, stored, err
 			}
-			if err := genesis.SetEIP2930Transition(&n); err != nil {
+			if err := genesis.SetEIP3541Transition(&n); err != nil {
+				return genesis, stored, err
+			}
+			if err := genesis.SetEthashEIP3554Transition(&n); err != nil {
 				return genesis, stored, err
 			}
 		}
@@ -118,18 +108,21 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	// Get the existing chain configuration.
 	newcfg := configOrDefault(genesis, stored)
 
-	if overrideMagneto != nil {
-		n := overrideMagneto.Uint64()
-		if err := newcfg.SetEIP2565Transition(&n); err != nil {
+	if overrideMystique != nil {
+		n := overrideMystique.Uint64()
+		if err := newcfg.SetEIP1559Transition(&n); err != nil {
 			return newcfg, stored, err
 		}
-		if err := newcfg.SetEIP2929Transition(&n); err != nil {
+		if err := newcfg.SetEIP3198Transition(&n); err != nil {
 			return newcfg, stored, err
 		}
-		if err := newcfg.SetEIP2718Transition(&n); err != nil {
+		if err := newcfg.SetEIP3529Transition(&n); err != nil {
 			return newcfg, stored, err
 		}
-		if err := newcfg.SetEIP2930Transition(&n); err != nil {
+		if err := newcfg.SetEIP3541Transition(&n); err != nil {
+			return newcfg, stored, err
+		}
+		if err := newcfg.SetEthashEIP3554Transition(&n); err != nil {
 			return newcfg, stored, err
 		}
 	}
@@ -185,8 +178,6 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 		return params.MordorChainConfig
 	case ghash == params.RopstenGenesisHash:
 		return params.RopstenChainConfig
-	case ghash == params.YoloV3GenesisHash:
-		return params.YoloV3ChainConfig
 	case ghash == params.MintMeGenesisHash:
 		return params.MintMeChainConfig
 	default:
@@ -200,7 +191,10 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	if db == nil {
 		db = rawdb.NewMemoryDatabase()
 	}
-	statedb, _ := state.New(common.Hash{}, state.NewDatabase(db), nil)
+	statedb, err := state.New(common.Hash{}, state.NewDatabase(db), nil)
+	if err != nil {
+		panic(err)
+	}
 	for addr, account := range g.Alloc {
 		statedb.AddBalance(addr, account.Balance)
 		statedb.SetCode(addr, account.Code)
@@ -218,6 +212,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 		Extra:      g.ExtraData,
 		GasLimit:   g.GasLimit,
 		GasUsed:    g.GasUsed,
+		BaseFee:    g.BaseFee,
 		Difficulty: g.Difficulty,
 		MixDigest:  g.Mixhash,
 		Coinbase:   g.Coinbase,
@@ -228,6 +223,13 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	}
 	if g.Difficulty == nil {
 		head.Difficulty = vars.GenesisDifficulty
+	}
+	if g.Config != nil && g.Config.IsEnabled(g.Config.GetEIP1559Transition, common.Big0) {
+		if g.BaseFee != nil {
+			head.BaseFee = g.BaseFee
+		} else {
+			head.BaseFee = new(big.Int).SetUint64(vars.InitialBaseFee)
+		}
 	}
 	statedb.Commit(false)
 	statedb.Database().TrieDB().Commit(root, true, nil)
@@ -269,6 +271,9 @@ func MustCommitGenesis(db ethdb.Database, g *genesisT.Genesis) *types.Block {
 
 // GenesisBlockForTesting creates and writes a block in which addr has the given wei balance.
 func GenesisBlockForTesting(db ethdb.Database, addr common.Address, balance *big.Int) *types.Block {
-	g := genesisT.Genesis{Alloc: genesisT.GenesisAlloc{addr: {Balance: balance}}}
+	g := genesisT.Genesis{
+		Alloc:   genesisT.GenesisAlloc{addr: {Balance: balance}},
+		BaseFee: big.NewInt(vars.InitialBaseFee),
+	}
 	return MustCommitGenesis(db, &g)
 }

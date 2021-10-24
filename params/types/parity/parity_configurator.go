@@ -925,6 +925,39 @@ func (spec *ParityChainSpec) SetEthashEIP2384Transition(n *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetEthashEIP3554Transition() *uint64 {
+	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+		return nil
+	}
+	if spec.Engine.Ethash.Params.eip3554Inferred {
+		return spec.Engine.Ethash.Params.eip3554Transition.Uint64P()
+	}
+
+	var diffN *uint64
+	defer func() {
+		spec.Engine.Ethash.Params.eip3554Transition = new(ParityU64).SetUint64(diffN)
+		spec.Engine.Ethash.Params.eip3554Inferred = true
+	}()
+
+	// Get block number (key) from map where EIP3554 criteria is met.
+	diffN = ctypes.MapMeetsSpecification(spec.Engine.Ethash.Params.DifficultyBombDelays, nil, vars.EIP3554DifficultyBombDelay, nil)
+	return diffN
+}
+
+func (spec *ParityChainSpec) SetEthashEIP3554Transition(n *uint64) error {
+	spec.Engine.Ethash.Params.eip3554Transition = new(ParityU64).SetUint64(n)
+	spec.Engine.Ethash.Params.eip3554Inferred = true
+
+	if n == nil {
+		return nil
+	}
+
+	spec.ensureExistingDifficultyDelaySchedule()
+	spec.Engine.Ethash.Params.DifficultyBombDelays.SetValueTotalForHeight(n, vars.EIP3554DifficultyBombDelay)
+
+	return nil
+}
+
 func (spec *ParityChainSpec) GetEthashECIP1010PauseTransition() *uint64 {
 	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
@@ -1037,6 +1070,42 @@ func (spec *ParityChainSpec) GetEIP2930Transition() *uint64 {
 
 func (spec *ParityChainSpec) SetEIP2930Transition(n *uint64) error {
 	spec.Params.EIP2930Transition = new(ParityU64).SetUint64(n)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP1559Transition() *uint64 {
+	return spec.Params.EIP1559Transition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP1559Transition(n *uint64) error {
+	spec.Params.EIP1559Transition = new(ParityU64).SetUint64(n)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP3541Transition() *uint64 {
+	return spec.Params.EIP3541Transition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP3541Transition(n *uint64) error {
+	spec.Params.EIP3541Transition = new(ParityU64).SetUint64(n)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP3529Transition() *uint64 {
+	return spec.Params.EIP3529Transition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP3529Transition(n *uint64) error {
+	spec.Params.EIP3529Transition = new(ParityU64).SetUint64(n)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP3198Transition() *uint64 {
+	return spec.Params.EIP3198Transition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP3198Transition(n *uint64) error {
+	spec.Params.EIP3198Transition = new(ParityU64).SetUint64(n)
 	return nil
 }
 

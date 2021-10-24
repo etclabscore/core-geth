@@ -20,18 +20,21 @@ func bigNewU64(i *big.Int) *uint64 {
 	return newU64(i.Uint64())
 }
 
-func bigNewU64Min(i, j *big.Int) *uint64 {
-	if i == nil {
-		return bigNewU64(j)
-	}
-	if j == nil {
-		return bigNewU64(i)
-	}
-	if j.Cmp(i) < 0 {
-		return bigNewU64(j)
-	}
-	return bigNewU64(i)
-}
+// bigNewU64Min is disused, but nice-to-have logic in case useful.
+// It chooses the first existing (non-nil) minimum big.Int value.
+// This has been useful for testnet configurations in particular.
+// func bigNewU64Min(i, j *big.Int) *uint64 {
+// 	if i == nil {
+// 		return bigNewU64(j)
+// 	}
+// 	if j == nil {
+// 		return bigNewU64(i)
+// 	}
+// 	if j.Cmp(i) < 0 {
+// 		return bigNewU64(j)
+// 	}
+// 	return bigNewU64(i)
+// }
 
 func setBig(i *big.Int, u *uint64) *big.Int {
 	if u == nil {
@@ -454,17 +457,21 @@ func (c *ChainConfig) SetECBP1100Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
+// GetEIP2315Transition implements EIP2537.
+// This logic is written but not configured for any Ethereum-supported networks, yet.
 func (c *ChainConfig) GetEIP2315Transition() *uint64 {
-	return bigNewU64(c.YoloV3Block)
+	return nil
 }
 
 func (c *ChainConfig) SetEIP2315Transition(n *uint64) error {
-	c.YoloV3Block = setBig(c.YoloV3Block, n)
+	if n != nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
 	return nil
 }
 
 func (c *ChainConfig) GetEIP2929Transition() *uint64 {
-	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+	return bigNewU64(c.BerlinBlock)
 }
 
 // FIXME: Assigning BerlinBlock foregoes setting YoloV3.
@@ -474,7 +481,7 @@ func (c *ChainConfig) SetEIP2929Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2930Transition() *uint64 {
-	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+	return bigNewU64(c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2930Transition(n *uint64) error {
@@ -482,8 +489,44 @@ func (c *ChainConfig) SetEIP2930Transition(n *uint64) error {
 	return nil
 }
 
+func (c *ChainConfig) GetEIP1559Transition() *uint64 {
+	return bigNewU64(c.LondonBlock)
+}
+
+func (c *ChainConfig) SetEIP1559Transition(n *uint64) error {
+	c.LondonBlock = setBig(c.LondonBlock, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEIP3541Transition() *uint64 {
+	return bigNewU64(c.LondonBlock)
+}
+
+func (c *ChainConfig) SetEIP3541Transition(n *uint64) error {
+	c.LondonBlock = setBig(c.LondonBlock, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEIP3529Transition() *uint64 {
+	return bigNewU64(c.LondonBlock)
+}
+
+func (c *ChainConfig) SetEIP3529Transition(n *uint64) error {
+	c.LondonBlock = setBig(c.LondonBlock, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEIP3198Transition() *uint64 {
+	return bigNewU64(c.LondonBlock)
+}
+
+func (c *ChainConfig) SetEIP3198Transition(n *uint64) error {
+	c.LondonBlock = setBig(c.LondonBlock, n)
+	return nil
+}
+
 func (c *ChainConfig) GetEIP2565Transition() *uint64 {
-	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+	return bigNewU64(c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2565Transition(n *uint64) error {
@@ -492,7 +535,7 @@ func (c *ChainConfig) SetEIP2565Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP2718Transition() *uint64 {
-	return bigNewU64Min(c.YoloV3Block, c.BerlinBlock)
+	return bigNewU64(c.BerlinBlock)
 }
 
 func (c *ChainConfig) SetEIP2718Transition(n *uint64) error {
@@ -711,6 +754,19 @@ func (c *ChainConfig) GetEthashEIP2384Transition() *uint64 {
 
 func (c *ChainConfig) SetEthashEIP2384Transition(n *uint64) error {
 	c.MuirGlacierBlock = setBig(c.MuirGlacierBlock, n)
+	return nil
+}
+
+// London (December 2021) difficulty bomb delay
+func (c *ChainConfig) GetEthashEIP3554Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+		return nil
+	}
+	return bigNewU64(c.LondonBlock)
+}
+
+func (c *ChainConfig) SetEthashEIP3554Transition(n *uint64) error {
+	c.LondonBlock = setBig(c.LondonBlock, n)
 	return nil
 }
 

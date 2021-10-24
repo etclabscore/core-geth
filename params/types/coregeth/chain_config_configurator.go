@@ -452,6 +452,42 @@ func (c *CoreGethChainConfig) SetEIP2718Transition(n *uint64) error {
 	return nil
 }
 
+func (c *CoreGethChainConfig) GetEIP1559Transition() *uint64 {
+	return bigNewU64(c.EIP1559FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP1559Transition(n *uint64) error {
+	c.EIP1559FBlock = setBig(c.EIP1559FBlock, n)
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetEIP3541Transition() *uint64 {
+	return bigNewU64(c.EIP3541FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP3541Transition(n *uint64) error {
+	c.EIP3541FBlock = setBig(c.EIP3541FBlock, n)
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetEIP3529Transition() *uint64 {
+	return bigNewU64(c.EIP3529FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP3529Transition(n *uint64) error {
+	c.EIP3529FBlock = setBig(c.EIP3529FBlock, n)
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetEIP3198Transition() *uint64 {
+	return bigNewU64(c.EIP3198FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEIP3198Transition(n *uint64) error {
+	c.EIP3198FBlock = setBig(c.EIP3198FBlock, n)
+	return nil
+}
+
 func (c *CoreGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {
@@ -731,6 +767,43 @@ func (c *CoreGethChainConfig) SetEthashEIP2384Transition(n *uint64) error {
 
 	c.ensureExistingDifficultySchedule()
 	c.DifficultyBombDelaySchedule.SetValueTotalForHeight(n, vars.EIP2384DifficultyBombDelay)
+
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetEthashEIP3554Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+		return nil
+	}
+	if c.eip3554Inferred {
+		return bigNewU64(c.EIP3554FBlock)
+	}
+
+	var diffN *uint64
+	defer func() {
+		c.EIP3554FBlock = setBig(c.EIP3554FBlock, diffN)
+		c.eip3554Inferred = true
+	}()
+
+	// Get block number (key) from map where EIP3554 criteria is met.
+	diffN = ctypes.MapMeetsSpecification(c.DifficultyBombDelaySchedule, nil, vars.EIP3554DifficultyBombDelay, nil)
+	return diffN
+}
+
+func (c *CoreGethChainConfig) SetEthashEIP3554Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+
+	c.EIP3554FBlock = setBig(c.EIP3554FBlock, n)
+	c.eip3554Inferred = true
+
+	if n == nil {
+		return nil
+	}
+
+	c.ensureExistingDifficultySchedule()
+	c.DifficultyBombDelaySchedule.SetValueTotalForHeight(n, vars.EIP3554DifficultyBombDelay)
 
 	return nil
 }

@@ -159,6 +159,11 @@ type CoreGethChainConfig struct {
 	eip2384Inferred bool
 	EIP2384FBlock   *big.Int `json:"eip2384FBlock,omitempty"`
 
+	// EIP-3554: Difficulty Bomb Delay to December 2021
+	// https://eips.ethereum.org/EIPS/eip-3554
+	eip3554Inferred bool
+	EIP3554FBlock   *big.Int `json:"eip3554FBlock,omitempty"`
+
 	// EIP-1706: Resolves reentrancy attack vector enabled with EIP1283.
 	// https://eips.ethereum.org/EIPS/eip-1706
 	EIP1706FBlock *big.Int `json:"eip1706FBlock,omitempty"`
@@ -191,8 +196,16 @@ type CoreGethChainConfig struct {
 	// https://eips.ethereum.org/EIPS/eip-2929
 	EIP2929FBlock *big.Int `json:"eip2929FBlock,omitempty"`
 
+	// EIP-3198: BASEFEE opcode
+	// https://eips.ethereum.org/EIPS/eip-3198
+	EIP3198FBlock *big.Int `json:"eip3198FBlock,omitempty"`
+
 	// TODO: Document me.
 	EIP2930FBlock *big.Int `json:"eip2930FBlock,omitempty"`
+
+	EIP1559FBlock *big.Int `json:"eip1559FBlock,omitempty"`
+	EIP3541FBlock *big.Int `json:"eip3541FBlock,omitempty"`
+	EIP3529FBlock *big.Int `json:"eip3529FBlock,omitempty"`
 
 	DisposalBlock *big.Int `json:"disposalBlock,omitempty"` // Bomb disposal HF block
 

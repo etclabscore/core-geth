@@ -52,6 +52,7 @@ type Genesis struct {
 	Number     uint64      `json:"number"`
 	GasUsed    uint64      `json:"gasUsed"`
 	ParentHash common.Hash `json:"parentHash"`
+	BaseFee    *big.Int    `json:"baseFeePerGas"`
 }
 
 func (g *Genesis) ForEachAccount(fn func(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error) error {
@@ -115,6 +116,7 @@ type genesisSpecMarshaling struct {
 	GasUsed    math.HexOrDecimal64
 	Number     math.HexOrDecimal64
 	Difficulty *math.HexOrDecimal256
+	BaseFee    *math.HexOrDecimal256
 	Alloc      map[common.UnprefixedAddress]GenesisAccount
 }
 
@@ -576,6 +578,38 @@ func (g *Genesis) SetEIP2930Transition(n *uint64) error {
 	return g.Config.SetEIP2930Transition(n)
 }
 
+func (g *Genesis) GetEIP1559Transition() *uint64 {
+	return g.Config.GetEIP1559Transition()
+}
+
+func (g *Genesis) SetEIP1559Transition(n *uint64) error {
+	return g.Config.SetEIP1559Transition(n)
+}
+
+func (g *Genesis) GetEIP3541Transition() *uint64 {
+	return g.Config.GetEIP3541Transition()
+}
+
+func (g *Genesis) SetEIP3541Transition(n *uint64) error {
+	return g.Config.SetEIP3541Transition(n)
+}
+
+func (g *Genesis) GetEIP3529Transition() *uint64 {
+	return g.Config.GetEIP3529Transition()
+}
+
+func (g *Genesis) SetEIP3529Transition(n *uint64) error {
+	return g.Config.SetEIP3529Transition(n)
+}
+
+func (g *Genesis) GetEIP3198Transition() *uint64 {
+	return g.Config.GetEIP3198Transition()
+}
+
+func (g *Genesis) SetEIP3198Transition(n *uint64) error {
+	return g.Config.SetEIP3198Transition(n)
+}
+
 func (g *Genesis) GetEIP2565Transition() *uint64 {
 	return g.Config.GetEIP2565Transition()
 }
@@ -702,6 +736,14 @@ func (g *Genesis) GetEthashEIP2384Transition() *uint64 {
 
 func (g *Genesis) SetEthashEIP2384Transition(n *uint64) error {
 	return g.Config.SetEthashEIP2384Transition(n)
+}
+
+func (g *Genesis) GetEthashEIP3554Transition() *uint64 {
+	return g.Config.GetEthashEIP3554Transition()
+}
+
+func (g *Genesis) SetEthashEIP3554Transition(n *uint64) error {
+	return g.Config.SetEthashEIP3554Transition(n)
 }
 
 func (g *Genesis) GetEthashECIP1010PauseTransition() *uint64 {

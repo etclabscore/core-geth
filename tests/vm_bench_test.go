@@ -8,47 +8,48 @@ import (
 	"regexp"
 	"strings"
 	"testing"
-	"time"
-
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/vm"
 )
 
-// BenchmarkVM runs benchmarks against the JSON VM test suite cases.
-// If the go test -short flag is passed, only the FIRST file in each subdirectory
-// (which describes related groups of tests) will be run.
-func BenchmarkVM(b *testing.B) {
-	vmt := new(testMatcher)
-	vmt.skipLoad("^vmSystemOperationsTest.json")
-	vmt.walkB(b, vmTestDir, func(b *testing.B, name string, test *VMTest) {
-		b.ReportAllocs()
-		vmconfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
-		var statedb = &state.StateDB{}
-		_, sdb := MakePreState(rawdb.NewMemoryDatabase(), test.json.Pre, false)
-		*statedb = *sdb
-		start := time.Now()
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			test.exec(statedb, vmconfig)
-			b.StopTimer()
-			*statedb = *sdb
-			b.StartTimer()
-		}
-		b.StopTimer()
-		gasRemaining := uint64(0)
-		if test.json.GasRemaining != nil {
-			gasRemaining = uint64(*test.json.GasRemaining)
-		}
-		gasUsed := test.json.Exec.GasLimit - gasRemaining
-		elapsed := uint64(time.Since(start))
-		if elapsed < 1 {
-			elapsed = 1
-		}
-		mgasps := (100 * 1000 * gasUsed * uint64(b.N)) / elapsed
-		b.ReportMetric(float64(mgasps)/100, "mgas/s")
-	})
-}
+// meowsbits:
+//
+// The VMTests were removed entirely by
+// - https://github.com/ethereum/go-ethereum/commit/fb4007bb2208a5b76f76287c03001ef906261691#diff-59830ebc3a4184110566bf1a290d08473dfdcbd492ce498b14cd1a5e2fa2e441
+// - https://github.com/ethereum/go-ethereum/pull/23350
+//
+// // BenchmarkVM runs benchmarks against the JSON VM test suite cases.
+// // If the go test -short flag is passed, only the FIRST file in each subdirectory
+// // (which describes related groups of tests) will be run.
+// func BenchmarkVM(b *testing.B) {
+// 	vmt := new(testMatcher)
+// 	vmt.skipLoad("^vmSystemOperationsTest.json")
+// 	vmt.walkB(b, vmTestDir, func(b *testing.B, name string, test *VMTest) {
+// 		b.ReportAllocs()
+// 		vmconfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
+// 		var statedb = &state.StateDB{}
+// 		_, sdb := MakePreState(rawdb.NewMemoryDatabase(), test.json.Pre, false)
+// 		*statedb = *sdb
+// 		start := time.Now()
+// 		b.ResetTimer()
+// 		for i := 0; i < b.N; i++ {
+// 			test.exec(statedb, vmconfig)
+// 			b.StopTimer()
+// 			*statedb = *sdb
+// 			b.StartTimer()
+// 		}
+// 		b.StopTimer()
+// 		gasRemaining := uint64(0)
+// 		if test.json.GasRemaining != nil {
+// 			gasRemaining = uint64(*test.json.GasRemaining)
+// 		}
+// 		gasUsed := test.json.Exec.GasLimit - gasRemaining
+// 		elapsed := uint64(time.Since(start))
+// 		if elapsed < 1 {
+// 			elapsed = 1
+// 		}
+// 		mgasps := (100 * 1000 * gasUsed * uint64(b.N)) / elapsed
+// 		b.ReportMetric(float64(mgasps)/100, "mgas/s")
+// 	})
+// }
 
 // walkB invokes its runTest argument for all subtests in the given directory.
 //
@@ -107,8 +108,8 @@ func (tm *testMatcher) runTestFileB(b *testing.B, path, name string, runTest int
 	if r, _ := tm.findSkip(name); r != "" {
 		b.Skip(r)
 	}
-	if tm.whitelistpat != nil {
-		if !tm.whitelistpat.MatchString(name) {
+	if tm.runonlylistpat != nil {
+		if !tm.runonlylistpat.MatchString(name) {
 			b.Skip("Skipped by whitelist")
 		}
 	}

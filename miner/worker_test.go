@@ -70,7 +70,6 @@ var (
 
 	testConfig = &Config{
 		Recommit: time.Second,
-		GasFloor: vars.GenesisGasLimit,
 		GasCeil:  vars.GenesisGasLimit,
 	}
 )
@@ -86,19 +85,21 @@ func init() {
 
 	signer := types.LatestSigner(params.TestChainConfig)
 	tx1 := types.MustSignNewTx(testBankKey, signer, &types.AccessListTx{
-		ChainID: params.TestChainConfig.ChainID,
-		Nonce:   0,
-		To:      &testUserAddress,
-		Value:   big.NewInt(1000),
-		Gas:     vars.TxGas,
+		ChainID:  params.TestChainConfig.ChainID,
+		Nonce:    0,
+		To:       &testUserAddress,
+		Value:    big.NewInt(1000),
+		Gas:      vars.TxGas,
+		GasPrice: big.NewInt(vars.InitialBaseFee),
 	})
 	pendingTxs = append(pendingTxs, tx1)
 
 	tx2 := types.MustSignNewTx(testBankKey, signer, &types.LegacyTx{
-		Nonce: 1,
-		To:    &testUserAddress,
-		Value: big.NewInt(1000),
-		Gas:   vars.TxGas,
+		Nonce:    1,
+		To:       &testUserAddress,
+		Value:    big.NewInt(1000),
+		Gas:      vars.TxGas,
+		GasPrice: big.NewInt(vars.InitialBaseFee),
 	})
 	newTxs = append(newTxs, tx2)
 
@@ -184,10 +185,11 @@ func (b *testWorkerBackend) newRandomUncle() *types.Block {
 
 func (b *testWorkerBackend) newRandomTx(creation bool) *types.Transaction {
 	var tx *types.Transaction
+	gasPrice := big.NewInt(10 * vars.InitialBaseFee)
 	if creation {
-		tx, _ = types.SignTx(types.NewContractCreation(b.txPool.Nonce(testBankAddress), big.NewInt(0), testGas, nil, common.FromHex(testCode)), types.HomesteadSigner{}, testBankKey)
+		tx, _ = types.SignTx(types.NewContractCreation(b.txPool.Nonce(testBankAddress), big.NewInt(0), testGas, gasPrice, common.FromHex(testCode)), types.HomesteadSigner{}, testBankKey)
 	} else {
-		tx, _ = types.SignTx(types.NewTransaction(b.txPool.Nonce(testBankAddress), testUserAddress, big.NewInt(1000), vars.TxGas, nil, nil), types.HomesteadSigner{}, testBankKey)
+		tx, _ = types.SignTx(types.NewTransaction(b.txPool.Nonce(testBankAddress), testUserAddress, big.NewInt(1000), vars.TxGas, gasPrice, nil), types.HomesteadSigner{}, testBankKey)
 	}
 	return tx
 }
@@ -227,6 +229,13 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 		engine = ethash.NewFaker()
 	}
 
+	// Turn on London hard fork config.
+	zero := uint64(0)
+	chainConfig.SetEIP1559Transition(&zero)
+	chainConfig.SetEIP3198Transition(&zero)
+	chainConfig.SetEIP3529Transition(&zero)
+	chainConfig.SetEIP3541Transition(&zero)
+	chainConfig.SetEthashEIP3554Transition(&zero)
 	w, b := newTestWorker(t, chainConfig, engine, db, 0)
 	defer w.close()
 

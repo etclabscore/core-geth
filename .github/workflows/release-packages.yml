@@ -18,7 +18,7 @@ jobs:
       matrix:
         include:
         - os: macos-latest
-          BUILD_OS_NAME: macos
+          BUILD_OS_NAME: osx
 
         - os: ubuntu-latest
           BUILD_OS_NAME: linux

@@ -60,7 +60,7 @@ jobs:
 
               GOARM=5 go run build/ci.go install -dlgo -arch arm
 
-      - name: Prepare archive's for release
+      - name: Prepare archives for release
         run: ./build/deploy.sh
         env:
           BUILD_OS_NAME: ${{ matrix.BUILD_OS_NAME }}

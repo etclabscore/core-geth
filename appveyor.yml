@@ -2,7 +2,6 @@ clone_depth: 5
 version: "{branch}.{build}"
 
 image:
-  - Ubuntu
   - Visual Studio 2019
 
 environment:

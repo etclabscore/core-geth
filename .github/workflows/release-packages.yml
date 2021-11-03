@@ -1,0 +1,71 @@
+name: Build packages for a release
+
+on:
+  push:
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-linux:
+    name: Build artifacts
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - os: macos-latest
+          BUILD_OS_NAME: osx
+
+        - os: ubuntu-latest
+          BUILD_OS_NAME: linux
+
+        - os: ubuntu-latest
+          BUILD_OS_NAME: arm
+
+        - os: windows-latest
+          BUILD_OS_NAME: win64
+
+    steps:
+      - name: Checkout etclabscore/core-geth
+        uses: actions/checkout@v2
+
+      - name: Set up Go 1.16
+        if: ${{ matrix.BUILD_OS_NAME != 'arm' }}
+        id: go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+
+      - name: Build all packages (non ARM)
+        if: ${{ matrix.BUILD_OS_NAME != 'arm' }}
+        run: make all
+
+      - name: Build all packages (ARM)
+        uses: pguyot/arm-runner-action@v1
+        id: build_image
+        if: ${{ matrix.BUILD_OS_NAME == 'arm' }}
+        with:
+          image_additional_mb: 2000
+          copy_artifact_path: ./build/bin/
+          copy_artifact_dest: ./build/bin/
+          commands: |
+              wget https://golang.org/dl/go1.16.9.linux-armv6l.tar.gz
+              sudo tar -C /usr/local -xzf go1.16.9.linux-armv6l.tar.gz
+              rm go1.16.9.linux-armv6l.tar.gz
+              export PATH=$PATH:/usr/local/go/bin
+
+              GOARM=5 go run build/ci.go install -dlgo -arch arm
+
+      - name: Prepare archives for release
+        run: ./build/deploy.sh
+        env:
+          BUILD_OS_NAME: ${{ matrix.BUILD_OS_NAME }}
+
+      - name: Upload release sssets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: core-geth*.zip*

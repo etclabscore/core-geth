@@ -130,11 +130,11 @@ func (c *cloudflareClient) uploadRecords(name string, records map[string]string)
 		old, exists := existing[path]
 		if !exists {
 			// Entry is unknown, push a new one to Cloudflare.
-			log.Info(fmt.Sprintf("Creating %s = %q", path, val))
 			ttl := rootTTL
 			if path != name {
 				ttl = treeNodeTTL // Max TTL permitted by Cloudflare
 			}
+			log.Info(fmt.Sprintf("Creating %s = %q", path, val), "ttl", ttl)
 			record := cloudflare.DNSRecord{Type: "TXT", Name: path, Content: val, TTL: ttl}
 			_, err = c.CreateDNSRecord(context.Background(), c.zoneID, record)
 		} else if old.Content != val {

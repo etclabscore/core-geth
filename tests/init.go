@@ -264,6 +264,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ConstantinopleBlock: big.NewInt(0),
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(0),
+		MuirGlacierBlock:    big.NewInt(0),
 		BerlinBlock:         big.NewInt(0),
 	},
 	"BerlinToLondonAt5": &goethereum.ChainConfig{
@@ -277,6 +278,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ConstantinopleBlock: big.NewInt(0),
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(0),
+		MuirGlacierBlock:    big.NewInt(0),
 		BerlinBlock:         big.NewInt(0),
 		LondonBlock:         big.NewInt(5),
 	},
@@ -291,10 +293,11 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ConstantinopleBlock: big.NewInt(0),
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(0),
+		MuirGlacierBlock:    big.NewInt(0),
 		BerlinBlock:         big.NewInt(0),
 		LondonBlock:         big.NewInt(0),
 	},
-	"Aleut": &goethereum.ChainConfig{
+	"ArrowGlacier": &goethereum.ChainConfig{
 		ChainID:             big.NewInt(1),
 		HomesteadBlock:      big.NewInt(0),
 		EIP150Block:         big.NewInt(0),
@@ -304,8 +307,10 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ConstantinopleBlock: big.NewInt(0),
 		PetersburgBlock:     big.NewInt(0),
 		IstanbulBlock:       big.NewInt(0),
+		MuirGlacierBlock:    big.NewInt(0),
 		BerlinBlock:         big.NewInt(0),
 		LondonBlock:         big.NewInt(0),
+		ArrowGlacierBlock:   big.NewInt(0),
 	},
 	"ETC_Magneto": &coregeth.CoreGethChainConfig{
 		NetworkID:       1,

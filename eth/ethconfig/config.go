@@ -91,10 +91,11 @@ var Defaults = Config{
 		GasPrice: big.NewInt(vars.GWei),
 		Recommit: 3 * time.Second,
 	},
-	TxPool:      core.DefaultTxPoolConfig,
-	RPCGasCap:   50000000,
-	GPO:         FullNodeGPO,
-	RPCTxFeeCap: 1, // 1 ether
+	TxPool:        core.DefaultTxPoolConfig,
+	RPCGasCap:     50000000,
+	RPCEVMTimeout: 5 * time.Second,
+	GPO:           FullNodeGPO,
+	RPCTxFeeCap:   1, // 1 ether
 }
 
 func init() {
@@ -200,6 +201,9 @@ type Config struct {
 	// RPCGasCap is the global gas cap for eth-call variants.
 	RPCGasCap uint64
 
+	// RPCEVMTimeout is the global timeout for eth-call.
+	RPCEVMTimeout time.Duration
+
 	// RPCTxFeeCap is the global transaction fee(price * gaslimit) cap for
 	// send-transction variants. The unit is ether.
 	RPCTxFeeCap float64
@@ -219,6 +223,9 @@ type Config struct {
 
 	// Mystique block override (TODO: remove after the fork)
 	OverrideMystique *big.Int `toml:",omitempty"`
+
+	// Arrow Glacier block override (TODO: remove after the fork)
+	OverrideArrowGlacier *big.Int `toml:",omitempty"`
 }
 
 // CreateConsensusEngine creates a consensus engine for the given chain configuration.

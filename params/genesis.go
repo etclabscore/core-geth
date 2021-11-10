@@ -53,6 +53,19 @@ func DefaultRopstenGenesisBlock() *genesisT.Genesis {
 	}
 }
 
+// DefaultSepoliaGenesisBlock returns the Sepolia network genesis block.
+func DefaultSepoliaGenesisBlock() *genesisT.Genesis {
+	return &genesisT.Genesis{
+		Config:     SepoliaChainConfig,
+		Nonce:      0,
+		ExtraData:  []byte("Sepolia, Athens, Attica, Greece!"),
+		GasLimit:   30000000,
+		Difficulty: big.NewInt(131072),
+		Timestamp:  1633267481,
+		Alloc:      genesisT.DecodePreAlloc(SepoliaAllocData),
+	}
+}
+
 // DefaultRinkebyGenesisBlock returns the Rinkeby network genesis block.
 func DefaultRinkebyGenesisBlock() *genesisT.Genesis {
 	return &genesisT.Genesis{

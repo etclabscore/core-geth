@@ -127,6 +127,10 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			return newcfg, stored, err
 		}
 	}
+	if overrideArrowGlacier != nil {
+		// TODO (ziogaschr): ADD EIPs
+		newcfg.ArrowGlacierBlock = overrideArrowGlacier
+	}
 
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {
@@ -179,6 +183,8 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 		return params.MordorChainConfig
 	case ghash == params.RopstenGenesisHash:
 		return params.RopstenChainConfig
+	case ghash == params.SepoliaGenesisHash:
+		return params.SepoliaChainConfig
 	case ghash == params.MintMeGenesisHash:
 		return params.MintMeChainConfig
 	default:

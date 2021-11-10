@@ -92,7 +92,7 @@ func (p *testTxPool) AddRemotes(txs []*types.Transaction) []error {
 }
 
 // Pending returns all the transactions known to the pool
-func (p *testTxPool) Pending(enforceTips bool) (map[common.Address]types.Transactions, error) {
+func (p *testTxPool) Pending(enforceTips bool) map[common.Address]types.Transactions {
 	p.lock.RLock()
 	defer p.lock.RUnlock()
 
@@ -104,7 +104,7 @@ func (p *testTxPool) Pending(enforceTips bool) (map[common.Address]types.Transac
 	for _, batch := range batches {
 		sort.Sort(types.TxByNonce(batch))
 	}
-	return batches, nil
+	return batches
 }
 
 // SubscribeNewTxsEvent should return an event subscription of NewTxsEvent and

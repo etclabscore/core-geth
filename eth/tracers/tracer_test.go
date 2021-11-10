@@ -60,7 +60,7 @@ func testCtx() *vmContext {
 	return &vmContext{blockCtx: vm.BlockContext{BlockNumber: big.NewInt(1)}, txCtx: vm.TxContext{GasPrice: big.NewInt(100000)}}
 }
 
-func runTrace(tracer *Tracer, vmctx *vmContext, chaincfg ctypes.ChainConfigurator) (json.RawMessage, error) {
+func runTrace(tracer Tracer, vmctx *vmContext, chaincfg ctypes.ChainConfigurator) (json.RawMessage, error) {
 	env := vm.NewEVM(vmctx.blockCtx, vmctx.txCtx, &dummyStatedb{}, chaincfg, vm.Config{Debug: true, Tracer: tracer})
 	var (
 		startGas uint64 = 10000
@@ -170,7 +170,7 @@ func TestHaltBetweenSteps(t *testing.T) {
 // TestNoStepExec tests a regular value transfer (no exec), and accessing the statedb
 // in 'result'
 func TestNoStepExec(t *testing.T) {
-	runEmptyTrace := func(tracer *Tracer, vmctx *vmContext) (json.RawMessage, error) {
+	runEmptyTrace := func(tracer Tracer, vmctx *vmContext) (json.RawMessage, error) {
 		env := vm.NewEVM(vmctx.blockCtx, vmctx.txCtx, &dummyStatedb{}, params.TestChainConfig, vm.Config{Debug: true, Tracer: tracer})
 		startGas := uint64(10000)
 		contract := vm.NewContract(account{}, account{}, big.NewInt(0), startGas)
@@ -209,7 +209,7 @@ func TestNoStepExec(t *testing.T) {
 }
 
 func TestIsPrecompile(t *testing.T) {
-	chaincfg := &goethereum.ChainConfig{ChainID: big.NewInt(1), HomesteadBlock: big.NewInt(0), DAOForkBlock: nil, DAOForkSupport: false, EIP150Block: big.NewInt(0), EIP150Hash: common.Hash{}, EIP155Block: big.NewInt(0), EIP158Block: big.NewInt(0), ByzantiumBlock: big.NewInt(100), ConstantinopleBlock: big.NewInt(0), PetersburgBlock: big.NewInt(0), IstanbulBlock: big.NewInt(200), MuirGlacierBlock: big.NewInt(0), BerlinBlock: big.NewInt(300), LondonBlock: big.NewInt(0), EWASMBlock: nil, CatalystBlock: nil, Ethash: new(ctypes.EthashConfig), Clique: nil}
+	chaincfg := &goethereum.ChainConfig{ChainID: big.NewInt(1), HomesteadBlock: big.NewInt(0), DAOForkBlock: nil, DAOForkSupport: false, EIP150Block: big.NewInt(0), EIP150Hash: common.Hash{}, EIP155Block: big.NewInt(0), EIP158Block: big.NewInt(0), ByzantiumBlock: big.NewInt(100), ConstantinopleBlock: big.NewInt(0), PetersburgBlock: big.NewInt(0), IstanbulBlock: big.NewInt(200), MuirGlacierBlock: big.NewInt(0), BerlinBlock: big.NewInt(300), LondonBlock: big.NewInt(0), EWASMBlock: nil, TerminalTotalDifficulty: nil, Ethash: new(ctypes.EthashConfig), Clique: nil}
 	chaincfg.ByzantiumBlock = big.NewInt(100)
 	chaincfg.IstanbulBlock = big.NewInt(200)
 	chaincfg.BerlinBlock = big.NewInt(300)

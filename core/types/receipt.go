@@ -428,7 +428,7 @@ func (rs Receipts) DeriveFields(config ctypes.ChainConfigurator, hash common.Has
 		if txs[i].To() == nil {
 			// Deriving the signer is expensive, only do if it's actually needed
 			from, _ := Sender(signer, txs[i])
-			if config.IsEnabled(config.GetLyra2NonceTransition, r[i].BlockNumber) {
+			if config.IsEnabled(config.GetLyra2NonceTransition, rs[i].BlockNumber) {
 				rs[i].ContractAddress = crypto.CreateAddress(from, txs[i].Nonce()+vars.Lyra2ContractNonceOffset)
 			} else {
 				rs[i].ContractAddress = crypto.CreateAddress(from, txs[i].Nonce())

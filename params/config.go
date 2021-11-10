@@ -140,7 +140,7 @@ var (
 	}
 
 	// SepoliaChainConfig contains the chain parameters to run a node on the Sepolia test network.
-	SepoliaChainConfig = &ChainConfig{
+	SepoliaChainConfig = &goethereum.ChainConfig{
 		ChainID:             big.NewInt(11155111),
 		HomesteadBlock:      big.NewInt(0),
 		DAOForkBlock:        nil,
@@ -155,11 +155,11 @@ var (
 		MuirGlacierBlock:    big.NewInt(0),
 		BerlinBlock:         big.NewInt(0),
 		LondonBlock:         big.NewInt(0),
-		Ethash:              new(EthashConfig),
+		Ethash:              new(ctypes.EthashConfig),
 	}
 
 	// SepoliaTrustedCheckpoint contains the light client trusted checkpoint for the Sepolia test network.
-	SepoliaTrustedCheckpoint = &TrustedCheckpoint{
+	SepoliaTrustedCheckpoint = &ctypes.TrustedCheckpoint{
 		SectionIndex: 1,
 		SectionHead:  common.HexToHash("0x5dde65e28745b10ff9e9b86499c3a3edc03587b27a06564a4342baf3a37de869"),
 		CHTRoot:      common.HexToHash("0x042a0d914f7baa4f28f14d12291e5f346e88c5b9d95127bf5422a8afeacd27e8"),

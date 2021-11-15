@@ -42,7 +42,7 @@ func RopstenGenesis() string {
 
 // SepoliaGenesis returns the JSON spec to use for the Sepolia test network.
 func SepoliaGenesis() string {
-	enc, err := json.Marshal(core.DefaultSepoliaGenesisBlock())
+	enc, err := json.Marshal(params.DefaultSepoliaGenesisBlock())
 	if err != nil {
 		panic(err)
 	}

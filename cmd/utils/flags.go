@@ -1825,7 +1825,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 11155111
 		}
-		cfg.Genesis = core.DefaultSepoliaGenesisBlock()
+		cfg.Genesis = params.DefaultSepoliaGenesisBlock()
 		SetDNSDiscoveryDefaults(cfg, params.SepoliaGenesisHash)
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		SetDNSDiscoveryDefaults(cfg, params.RinkebyGenesisHash)

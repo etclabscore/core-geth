@@ -127,10 +127,11 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			return newcfg, stored, err
 		}
 	}
-	if overrideArrowGlacier != nil {
-		// TODO (ziogaschr): ADD EIPs
-		newcfg.ArrowGlacierBlock = overrideArrowGlacier
-	}
+
+	// TODO (ziogaschr): Add EIPs, after Mystique activations
+	// if overrideArrowGlacier != nil {
+	// 	newcfg.ArrowGlacierBlock = overrideArrowGlacier
+	// }
 
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {

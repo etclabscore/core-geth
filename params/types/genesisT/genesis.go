@@ -658,12 +658,12 @@ func (g *Genesis) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
 	return g.Config.MustSetConsensusEngineType(t)
 }
 
-func (g *Genesis) GetEthashTerminalTotalDifficultyTransition() *big.Int {
-	return g.Config.GetEthashTerminalTotalDifficultyTransition()
+func (g *Genesis) GetEthashTerminalTotalDifficulty() *big.Int {
+	return g.Config.GetEthashTerminalTotalDifficulty()
 }
 
-func (g *Genesis) SetEthashTerminalTotalDifficultyTransition(n *big.Int) error {
-	return g.Config.SetEthashTerminalTotalDifficultyTransition(n)
+func (g *Genesis) SetEthashTerminalTotalDifficulty(n *big.Int) error {
+	return g.Config.SetEthashTerminalTotalDifficulty(n)
 }
 
 func (g *Genesis) GetEthashMinimumDifficulty() *big.Int {

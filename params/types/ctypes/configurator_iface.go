@@ -228,8 +228,8 @@ type EthashConfigurator interface {
 	GetEthashECIP1099Transition() *uint64
 	SetEthashECIP1099Transition(n *uint64) error
 
-	GetEthashTerminalTotalDifficultyTransition() *big.Int
-	SetEthashTerminalTotalDifficultyTransition(n *big.Int) error
+	GetEthashTerminalTotalDifficulty() *big.Int
+	SetEthashTerminalTotalDifficulty(n *big.Int) error
 
 	GetEthashDifficultyBombDelaySchedule() Uint64BigMapEncodesHex
 	SetEthashDifficultyBombDelaySchedule(m Uint64BigMapEncodesHex) error

@@ -319,7 +319,7 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	out := new(big.Int)
 
 	// TODO (meowbits): do we need this?
-	// if config.IsEnabled(config.GetEthashTerminalTotalDifficultyTransition, next) {
+	// if config.IsEnabled(config.GetEthashTerminalTotalDifficulty, next) {
 	// 	return big.NewInt(1)
 	// }
 

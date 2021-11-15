@@ -725,11 +725,11 @@ func (spec *ParityChainSpec) MustSetConsensusEngineType(t ctypes.ConsensusEngine
 	}
 }
 
-func (spec *ParityChainSpec) GetEthashTerminalTotalDifficultyTransition() *big.Int {
+func (spec *ParityChainSpec) GetEthashTerminalTotalDifficulty() *big.Int {
 	return spec.Engine.Ethash.Params.TerminalTotalDifficulty.ToInt()
 }
 
-func (spec *ParityChainSpec) SetEthashTerminalTotalDifficultyTransition(n *big.Int) error {
+func (spec *ParityChainSpec) SetEthashTerminalTotalDifficulty(n *big.Int) error {
 	if n == nil {
 		spec.Engine.Ethash.Params.TerminalTotalDifficulty = nil
 		return nil

@@ -553,11 +553,11 @@ func (c *CoreGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngin
 	}
 }
 
-func (c *CoreGethChainConfig) GetEthashTerminalTotalDifficultyTransition() *big.Int {
+func (c *CoreGethChainConfig) GetEthashTerminalTotalDifficulty() *big.Int {
 	return c.TerminalTotalDifficulty
 }
 
-func (c *CoreGethChainConfig) SetEthashTerminalTotalDifficultyTransition(n *big.Int) error {
+func (c *CoreGethChainConfig) SetEthashTerminalTotalDifficulty(n *big.Int) error {
 	c.TerminalTotalDifficulty = n
 	return nil
 }

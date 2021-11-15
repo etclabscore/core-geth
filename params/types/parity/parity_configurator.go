@@ -958,6 +958,39 @@ func (spec *ParityChainSpec) SetEthashEIP3554Transition(n *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetEthashEIP4345Transition() *uint64 {
+	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+		return nil
+	}
+	if spec.Engine.Ethash.Params.eip4345Inferred {
+		return spec.Engine.Ethash.Params.eip4345Transition.Uint64P()
+	}
+
+	var diffN *uint64
+	defer func() {
+		spec.Engine.Ethash.Params.eip4345Transition = new(ParityU64).SetUint64(diffN)
+		spec.Engine.Ethash.Params.eip4345Inferred = true
+	}()
+
+	// Get block number (key) from map where EIP4345 criteria is met.
+	diffN = ctypes.MapMeetsSpecification(spec.Engine.Ethash.Params.DifficultyBombDelays, nil, vars.EIP4345DifficultyBombDelay, nil)
+	return diffN
+}
+
+func (spec *ParityChainSpec) SetEthashEIP4345Transition(n *uint64) error {
+	spec.Engine.Ethash.Params.eip4345Transition = new(ParityU64).SetUint64(n)
+	spec.Engine.Ethash.Params.eip4345Inferred = true
+
+	if n == nil {
+		return nil
+	}
+
+	spec.ensureExistingDifficultyDelaySchedule()
+	spec.Engine.Ethash.Params.DifficultyBombDelays.SetValueTotalForHeight(n, vars.EIP4345DifficultyBombDelay)
+
+	return nil
+}
+
 func (spec *ParityChainSpec) GetEthashECIP1010PauseTransition() *uint64 {
 	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil

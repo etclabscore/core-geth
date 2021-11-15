@@ -770,6 +770,19 @@ func (c *ChainConfig) SetEthashEIP3554Transition(n *uint64) error {
 	return nil
 }
 
+// ArrowGlacier (June 2022) difficulty bomb delay
+func (c *ChainConfig) GetEthashEIP4345Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+		return nil
+	}
+	return bigNewU64(c.ArrowGlacierBlock)
+}
+
+func (c *ChainConfig) SetEthashEIP4345Transition(n *uint64) error {
+	c.ArrowGlacierBlock = setBig(c.ArrowGlacierBlock, n)
+	return nil
+}
+
 func (c *ChainConfig) GetEthashECIP1010PauseTransition() *uint64 {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil

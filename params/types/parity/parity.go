@@ -55,6 +55,8 @@ type ParityChainSpec struct {
 				eip2384Transition *ParityU64
 				eip3554Inferred   bool
 				eip3554Transition *ParityU64
+				eip4345Inferred   bool
+				eip4345Transition *ParityU64
 
 				HomesteadTransition *ParityU64 `json:"homesteadTransition"`
 				EIP100bTransition   *ParityU64 `json:"eip100bTransition"`

@@ -219,7 +219,7 @@ type CoreGethChainConfig struct {
 	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
 	Lyra2  *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
 
-	Ethereum2CatalystFBlock *big.Int `json:"catalystBlock,omitempty"`
+	TerminalTotalDifficulty *big.Int `json:"terminalTotalDifficulty,omitempty"`
 
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint,omitempty"`
 	TrustedCheckpointOracle *ctypes.CheckpointOracleConfig `json:"trustedCheckpointOracle,omitempty"`

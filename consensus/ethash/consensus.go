@@ -318,9 +318,10 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	next := new(big.Int).Add(parent.Number, big1)
 	out := new(big.Int)
 
-	if config.IsEnabled(config.GetCatalystTransition, next) {
-		return big.NewInt(1)
-	}
+	// TODO (meowbits): do we need this?
+	// if config.IsEnabled(config.GetEthashTerminalTotalDifficultyTransition, next) {
+	// 	return big.NewInt(1)
+	// }
 
 	// ADJUSTMENT algorithms
 	if config.IsEnabled(config.GetEthashEIP100BTransition, next) {

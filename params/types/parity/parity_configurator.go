@@ -725,16 +725,16 @@ func (spec *ParityChainSpec) MustSetConsensusEngineType(t ctypes.ConsensusEngine
 	}
 }
 
-func (spec *ParityChainSpec) GetCatalystTransition() *uint64 {
-	return spec.Engine.Ethash.Params.CatalystBlock.Uint64P()
+func (spec *ParityChainSpec) GetEthashTerminalTotalDifficultyTransition() *big.Int {
+	return spec.Engine.Ethash.Params.TerminalTotalDifficulty.ToInt()
 }
 
-func (spec *ParityChainSpec) SetCatalystTransition(n *uint64) error {
+func (spec *ParityChainSpec) SetEthashTerminalTotalDifficultyTransition(n *big.Int) error {
 	if n == nil {
-		spec.Engine.Ethash.Params.CatalystBlock = nil
+		spec.Engine.Ethash.Params.TerminalTotalDifficulty = nil
 		return nil
 	}
-	spec.Engine.Ethash.Params.CatalystBlock = new(ParityU64).SetUint64(n)
+	spec.Engine.Ethash.Params.TerminalTotalDifficulty = math.NewHexOrDecimal256(n.Int64())
 	return nil
 }
 

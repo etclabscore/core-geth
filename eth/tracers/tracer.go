@@ -703,7 +703,7 @@ func wrapError(context string, err error) error {
 
 // CapturePreEVM implements the Tracer interface to bootstrap the tracing context,
 // before EVM init. This is useful for reading initial balance, state, etc.
-func (jst *Tracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {
+func (jst *jsTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {
 	jst.dbWrapper.db = env.StateDB
 
 	for key, val := range inputs {
@@ -857,7 +857,7 @@ func (jst *jsTracer) CaptureFault(env *vm.EVM, pc uint64, op vm.OpCode, gas, cos
 }
 
 // CaptureEnd is called after the call finishes to finalize the tracing.
-func (jst *Tracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, t time.Duration, err error) {
+func (jst *jsTracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, t time.Duration, err error) {
 	jst.dbWrapper.db = env.StateDB
 
 	jst.ctx["output"] = output

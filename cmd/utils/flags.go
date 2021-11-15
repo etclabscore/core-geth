@@ -191,6 +191,7 @@ var (
 	GoerliFlag = cli.BoolFlag{
 		Name:  "goerli",
 		Usage: "Görli network: pre-configured proof-of-authority test network",
+	}
 	SepoliaFlag = cli.BoolFlag{
 		Name:  "sepolia",
 		Usage: "Sepolia network: pre-configured proof-of-work test network",

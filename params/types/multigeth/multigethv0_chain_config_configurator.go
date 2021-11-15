@@ -605,12 +605,12 @@ func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) erro
 	}
 }
 
-func (c *ChainConfig) GetCatalystTransition() *uint64 {
-	return bigNewU64(c.CatalystBlock)
+func (c *ChainConfig) GetEthashTerminalTotalDifficultyTransition() *big.Int {
+	return c.TerminalTotalDifficulty
 }
 
-func (c *ChainConfig) SetCatalystTransition(n *uint64) error {
-	c.CatalystBlock = setBig(c.CatalystBlock, n)
+func (c *ChainConfig) SetEthashTerminalTotalDifficultyTransition(n *big.Int) error {
+	c.TerminalTotalDifficulty = n
 	return nil
 }
 

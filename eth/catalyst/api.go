@@ -40,7 +40,7 @@ import (
 // Register adds catalyst APIs to the node.
 func Register(stack *node.Node, backend *eth.Ethereum) error {
 	chainconfig := backend.BlockChain().Config()
-	if chainconfig.TerminalTotalDifficulty == nil {
+	if n := chainconfig.GetEthashTerminalTotalDifficultyTransition(); n == nil {
 		return errors.New("catalyst started without valid total difficulty")
 	}
 

@@ -84,7 +84,7 @@ func generateTestChainWithFork(n int, fork int) (*genesisT.Genesis, []*types.Blo
 		MuirGlacierBlock:    big.NewInt(0),
 		BerlinBlock:         big.NewInt(0),
 		LondonBlock:         big.NewInt(0),
-		CatalystBlock:       big.NewInt(0),
+		TerminalTotalDifficulty:       big.NewInt(0),
 		Ethash:              new(ctypes.EthashConfig),
 	}
 	genesis := &genesisT.Genesis{

@@ -62,6 +62,8 @@ func NewCallTracer() tracers.Tracer {
 	return t
 }
 
+func (l *callTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {}
+
 func (t *callTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
 	t.callstack[0] = callFrame{
 		Type:  "CALL",
@@ -76,7 +78,7 @@ func (t *callTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Ad
 	}
 }
 
-func (t *callTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {
+func (t *callTracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, _ time.Duration, err error) {
 	t.callstack[0].GasUsed = uintToHex(gasUsed)
 	if err != nil {
 		t.callstack[0].Error = err.Error()

@@ -940,7 +940,7 @@ func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.TransactionArgs,
 	if config != nil && config.Reexec != nil {
 		reexec = *config.Reexec
 	}
-	statedb, err := api.backend.StateAtBlock(ctx, block, reexec, nil, true)
+	statedb, err := api.backend.StateAtBlock(ctx, block, reexec, nil, true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -1061,7 +1061,7 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 	statedb.Prepare(txctx.TxHash, txctx.TxIndex)
 
 	switch tracer := tracer.(type) {
-	case *Tracer:
+	case *jsTracer:
 		if extraContext == nil {
 			extraContext = map[string]interface{}{}
 		}

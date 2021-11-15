@@ -61,7 +61,9 @@ type ParityChainSpec struct {
 				HomesteadTransition *ParityU64 `json:"homesteadTransition"`
 				EIP100bTransition   *ParityU64 `json:"eip100bTransition"`
 
-				CatalystBlock *ParityU64 `json:"catalyst_block,omitempty"`
+				// TerminalTotalDifficulty is the amount of total difficulty reached by
+				// the network that triggers the consensus upgrade.
+				TerminalTotalDifficulty *math.HexOrDecimal256 `json:"terminalTotalDifficulty,omitempty"`
 
 				// Note: DAO fields will NOT be written to Parity configs from multi-geth.
 				// The chains with DAO settings are already canonical and have existing chainspecs.

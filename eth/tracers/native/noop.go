@@ -20,10 +20,12 @@ func NewNoopTracer() tracers.Tracer {
 	return &noopTracer{}
 }
 
+func (l *noopTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {}
+
 func (t *noopTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
 }
 
-func (t *noopTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {
+func (t *noopTracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, _ time.Duration, err error) {
 }
 
 func (t *noopTracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, rData []byte, depth int, err error) {

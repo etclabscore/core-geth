@@ -140,9 +140,13 @@ func Transaction(ctx *cli.Context) error {
 		} else {
 			r.Address = sender
 		}
+
+		eip2f := chainConfig.IsEnabled(chainConfig.GetEIP2Transition, new(big.Int))
+		eip2028f := chainConfig.IsEnabled(chainConfig.GetEIP2028Transition, new(big.Int))
+
 		// Check intrinsic gas
 		if gas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil,
-			chainConfig.IsHomestead(new(big.Int)), chainConfig.IsIstanbul(new(big.Int))); err != nil {
+			eip2f, eip2028f); err != nil {
 			r.Error = err
 			results = append(results, r)
 			continue

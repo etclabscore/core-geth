@@ -23,13 +23,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ebakus/go-ebakus/core"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
@@ -319,17 +319,14 @@ func TestSetupGenesisBlock2(t *testing.T) {
 }
 
 func TestGenesis_Commit(t *testing.T) {
-	genesis := &core.Genesis{
+	genesis := &genesisT.Genesis{
 		BaseFee: big.NewInt(vars.InitialBaseFee),
 		Config:  params.TestChainConfig,
 		// difficulty is nil
 	}
 
 	db := rawdb.NewMemoryDatabase()
-	genesisBlock, err := genesis.Commit(db)
-	if err != nil {
-		t.Fatal(err)
-	}
+	genesisBlock := MustCommitGenesis(db, genesis)
 
 	if genesis.Difficulty != nil {
 		t.Fatalf("assumption wrong")

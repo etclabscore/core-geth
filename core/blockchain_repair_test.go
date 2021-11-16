@@ -27,7 +27,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ebakus/go-ebakus/core"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -1901,7 +1900,7 @@ func TestIssue23496(t *testing.T) {
 
 	// Initialize a fresh chain
 	var (
-		genesis = (&core.Genesis{BaseFee: big.NewInt(vars.InitialBaseFee)}).MustCommit(db)
+		genesis = MustCommitGenesis(db, (&genesisT.Genesis{BaseFee: big.NewInt(vars.InitialBaseFee)}))
 		engine  = ethash.NewFullFaker()
 		config  = &CacheConfig{
 			TrieCleanLimit: 256,

@@ -23,6 +23,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/ebakus/go-ebakus/core"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/params"
@@ -30,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func TestSetupGenesisBlock(t *testing.T) {
@@ -317,8 +319,8 @@ func TestSetupGenesisBlock2(t *testing.T) {
 }
 
 func TestGenesis_Commit(t *testing.T) {
-	genesis := &Genesis{
-		BaseFee: big.NewInt(params.InitialBaseFee),
+	genesis := &core.Genesis{
+		BaseFee: big.NewInt(vars.InitialBaseFee),
 		Config:  params.TestChainConfig,
 		// difficulty is nil
 	}
@@ -334,8 +336,8 @@ func TestGenesis_Commit(t *testing.T) {
 	}
 
 	// This value should have been set as default in the ToBlock method.
-	if genesisBlock.Difficulty().Cmp(params.GenesisDifficulty) != 0 {
-		t.Errorf("assumption wrong: want: %d, got: %v", params.GenesisDifficulty, genesisBlock.Difficulty())
+	if genesisBlock.Difficulty().Cmp(vars.GenesisDifficulty) != 0 {
+		t.Errorf("assumption wrong: want: %d, got: %v", vars.GenesisDifficulty, genesisBlock.Difficulty())
 	}
 
 	// Expect the stored total difficulty to be the difficulty of the genesis block.

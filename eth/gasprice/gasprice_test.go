@@ -103,28 +103,24 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 		key, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		addr   = crypto.PubkeyToAddress(key.PublicKey)
 		config = *params.TestChainConfig // needs copy because it is modified below
-		gspec  = &core.Genesis{
+		gspec  = &genesisT.Genesis{
 			Config: &config,
-			Alloc:  core.GenesisAlloc{addr: {Balance: big.NewInt(math.MaxInt64)}},
+			Alloc:  genesisT.GenesisAlloc{addr: {Balance: big.NewInt(math.MaxInt64)}},
 		}
 		signer = types.LatestSigner(gspec.Config)
 	)
-	// TODO (ziogaschr): check below lines (commented out is ours)
-	config.LondonBlock = londonBlock
-	config.ArrowGlacierBlock = londonBlock
-	// if londonBlock != nil {
-	// 	lb := londonBlock.Uint64()
-	// 	gspec.SetEIP1559Transition(&lb)
-	// 	signer = types.LatestSigner(gspec.Config)
-	// } else {
-	// 	gspec.Config.SetEIP1559Transition(nil)
-	// }
+
+	if londonBlock != nil {
+		lb := londonBlock.Uint64()
+		gspec.SetEIP1559Transition(&lb)
+		signer = types.LatestSigner(gspec.Config)
+	} else {
+		gspec.Config.SetEIP1559Transition(nil)
+	}
+
 	engine := ethash.NewFaker()
 	db := rawdb.NewMemoryDatabase()
-	genesis, err := gspec.Commit(db)
-	if err != nil {
-		t.Fatal(err)
-	}
+	genesis := core.MustCommitGenesis(db, gspec)
 	// Generate testing blocks
 	blocks, _ := core.GenerateChain(gspec.Config, genesis, engine, db, testHead+1, func(i int, b *core.BlockGen) {
 		b.SetCoinbase(common.Address{1})
@@ -154,7 +150,7 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 	})
 	// Construct testing chain
 	diskdb := rawdb.NewMemoryDatabase()
-	gspec.Commit(diskdb)
+	core.MustCommitGenesis(diskdb, gspec)
 	chain, err := core.NewBlockChain(diskdb, &core.CacheConfig{TrieCleanNoPrefetch: true}, &config, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to create local chain, %v", err)

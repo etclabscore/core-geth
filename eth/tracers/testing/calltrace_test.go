@@ -18,6 +18,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/eth/tracers"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/tests"
 
@@ -49,10 +50,10 @@ type callTrace struct {
 
 // callTracerTest defines a single test to check the call tracer against.
 type callTracerTest struct {
-	Genesis *core.Genesis `json:"genesis"`
-	Context *callContext  `json:"context"`
-	Input   string        `json:"input"`
-	Result  *callTrace    `json:"result"`
+	Genesis *genesisT.Genesis `json:"genesis"`
+	Context *callContext      `json:"context"`
+	Input   string            `json:"input"`
+	Result  *callTrace        `json:"result"`
 }
 
 // Iterates over all the input-output datasets in the tracer test harness and

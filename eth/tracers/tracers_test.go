@@ -23,11 +23,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/big"
+	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -203,12 +206,12 @@ func TestZeroValueToNotExitCall(t *testing.T) {
 		byte(vm.DUP1), byte(vm.PUSH1), 0xff, byte(vm.GAS), // value=0,address=0xff, gas=GAS
 		byte(vm.CALL),
 	}
-	var alloc = core.GenesisAlloc{
-		to: core.GenesisAccount{
+	var alloc = genesisT.GenesisAlloc{
+		to: genesisT.GenesisAccount{
 			Nonce: 1,
 			Code:  code,
 		},
-		origin: core.GenesisAccount{
+		origin: genesisT.GenesisAccount{
 			Nonce:   0,
 			Balance: big.NewInt(500000000000000),
 		},

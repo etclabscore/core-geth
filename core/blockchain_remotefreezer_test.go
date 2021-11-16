@@ -394,10 +394,10 @@ func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 	for i := 0; i < len(blocks); i++ {
 		num, hash := blocks[i].NumberU64(), blocks[i].Hash()
 
-		if ftd, atd := fast.GetTdByHash(hash), archive.GetTdByHash(hash); ftd.Cmp(atd) != 0 {
+		if ftd, atd := fast.GetTd(hash, num), archive.GetTd(hash, num); ftd.Cmp(atd) != 0 {
 			t.Errorf("block #%d [%x]: td mismatch: fastdb %v, archivedb %v", num, hash, ftd, atd)
 		}
-		if antd, artd := ancient.GetTdByHash(hash), archive.GetTdByHash(hash); antd == nil || artd == nil || antd.Cmp(artd) != 0 {
+		if antd, artd := ancient.GetTd(hash, num), archive.GetTd(hash, num); antd == nil || artd == nil || antd.Cmp(artd) != 0 {
 			t.Errorf("block #%d [%x]: td.byhash mismatch: ancientdb %v, archivedb %v", num, hash, antd, artd)
 			t.Logf("debug, block.difficulty: %v", blocks[i].Difficulty())
 		}

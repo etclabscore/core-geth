@@ -240,7 +240,7 @@ func MapMeetsSpecification(difficulties Uint64BigMapEncodesHex, rewards Uint64Bi
 			panic(fmt.Sprintf("dnil difficulties: %v, sl: %v", difficulties, sl))
 		}
 		total.Add(total, d)
-		if total.Cmp(difficultySum) == 0 {
+		if total.Cmp(difficultySum) >= 0 {
 			diffN = &s
 			break
 		}

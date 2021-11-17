@@ -429,7 +429,7 @@ func TestConvertDefaultsBounce(t *testing.T) {
 		}
 		return fmt.Sprintf("%d", *n)
 	}
-	for _, forkName := range []string{"Constantinople", "Istanbul", "Berlin"} {
+	for _, forkName := range []string{"Constantinople", "Istanbul", "Berlin", "London", "ArrowGlacier"} {
 		t.Run(forkName, func(t *testing.T) {
 			forkConfig := Forks[forkName]
 			eip1234 := forkConfig.GetEthashEIP1234Transition()

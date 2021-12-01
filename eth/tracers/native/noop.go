@@ -34,10 +34,10 @@ func (t *noopTracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cos
 func (t *noopTracer) CaptureFault(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, _ *vm.ScopeContext, depth int, err error) {
 }
 
-func (t *noopTracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
+func (t *noopTracer) CaptureEnter(env *vm.EVM, typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
 }
 
-func (t *noopTracer) CaptureExit(output []byte, gasUsed uint64, err error) {
+func (t *noopTracer) CaptureExit(env *vm.EVM, output []byte, gasUsed uint64, err error) {
 }
 
 func (t *noopTracer) GetResult() (json.RawMessage, error) {

@@ -397,6 +397,11 @@ func (op OpCode) String() string {
 	return str
 }
 
+// // MarshalJSON implements the json.Marshaller interface.
+// func (op OpCode) MarshalJSON() ([]byte, error) {
+// 	return json.Marshal(op.String())
+// }
+
 var stringToOp = map[string]OpCode{
 	"STOP":           STOP,
 	"ADD":            ADD,

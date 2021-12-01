@@ -55,7 +55,7 @@ func (evm *EVM) ActivePrecompiles() []common.Address {
 	return addresses
 }
 
-func (evm *EVM) precompile(addr common.Address) (PrecompiledContract, bool) {
+func (evm *EVM) Precompile(addr common.Address) (PrecompiledContract, bool) {
 	var precompiles = PrecompiledContractsForConfig(evm.ChainConfig(), evm.Context.BlockNumber)
 	p, ok := precompiles[addr]
 	return p, ok
@@ -216,7 +216,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		return nil, gas, ErrInsufficientBalance
 	}
 	snapshot := evm.StateDB.Snapshot()
-	p, isPrecompile := evm.precompile(addr)
+	p, isPrecompile := evm.Precompile(addr)
 
 	if !evm.StateDB.Exist(addr) {
 		if !isPrecompile && evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP161abcTransition, evm.Context.BlockNumber) && value.Sign() == 0 {
@@ -226,8 +226,8 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 					evm.Config.Tracer.CaptureStart(evm, caller.Address(), addr, false, input, gas, value)
 					evm.Config.Tracer.CaptureEnd(evm, ret, 0, 0, nil)
 				} else {
-					evm.Config.Tracer.CaptureEnter(CALL, caller.Address(), addr, input, gas, value)
-					evm.Config.Tracer.CaptureExit(ret, 0, nil)
+					evm.Config.Tracer.CaptureEnter(evm, CALL, caller.Address(), addr, input, gas, value)
+					evm.Config.Tracer.CaptureExit(evm, ret, 0, nil)
 				}
 			}
 			return nil, gas, nil
@@ -245,9 +245,9 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			}(gas, time.Now())
 		} else {
 			// Handle tracer events for entering and exiting a call frame
-			evm.Config.Tracer.CaptureEnter(CALL, caller.Address(), addr, input, gas, value)
+			evm.Config.Tracer.CaptureEnter(evm, CALL, caller.Address(), addr, input, gas, value)
 			defer func(startGas uint64) {
-				evm.Config.Tracer.CaptureExit(ret, startGas-gas, err)
+				evm.Config.Tracer.CaptureExit(evm, ret, startGas-gas, err)
 			}(gas)
 		}
 	}
@@ -311,14 +311,14 @@ func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, 
 
 	// Invoke tracer hooks that signal entering/exiting a call frame
 	if evm.Config.Debug {
-		evm.Config.Tracer.CaptureEnter(CALLCODE, caller.Address(), addr, input, gas, value)
+		evm.Config.Tracer.CaptureEnter(evm, CALLCODE, caller.Address(), addr, input, gas, value)
 		defer func(startGas uint64) {
-			evm.Config.Tracer.CaptureExit(ret, startGas-gas, err)
+			evm.Config.Tracer.CaptureExit(evm, ret, startGas-gas, err)
 		}(gas)
 	}
 
 	// It is allowed to call precompiles, even via delegatecall
-	if p, isPrecompile := evm.precompile(addr); isPrecompile {
+	if p, isPrecompile := evm.Precompile(addr); isPrecompile {
 		ret, gas, err = RunPrecompiledContract(p, input, gas)
 	} else {
 		addrCopy := addr
@@ -355,14 +355,14 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 
 	// Invoke tracer hooks that signal entering/exiting a call frame
 	if evm.Config.Debug {
-		evm.Config.Tracer.CaptureEnter(DELEGATECALL, caller.Address(), addr, input, gas, nil)
+		evm.Config.Tracer.CaptureEnter(evm, DELEGATECALL, caller.Address(), addr, input, gas, nil)
 		defer func(startGas uint64) {
-			evm.Config.Tracer.CaptureExit(ret, startGas-gas, err)
+			evm.Config.Tracer.CaptureExit(evm, ret, startGas-gas, err)
 		}(gas)
 	}
 
 	// It is allowed to call precompiles, even via delegatecall
-	if p, isPrecompile := evm.precompile(addr); isPrecompile {
+	if p, isPrecompile := evm.Precompile(addr); isPrecompile {
 		ret, gas, err = RunPrecompiledContract(p, input, gas)
 	} else {
 		addrCopy := addr
@@ -408,13 +408,13 @@ func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte
 
 	// Invoke tracer hooks that signal entering/exiting a call frame
 	if evm.Config.Debug {
-		evm.Config.Tracer.CaptureEnter(STATICCALL, caller.Address(), addr, input, gas, nil)
+		evm.Config.Tracer.CaptureEnter(evm, STATICCALL, caller.Address(), addr, input, gas, nil)
 		defer func(startGas uint64) {
-			evm.Config.Tracer.CaptureExit(ret, startGas-gas, err)
+			evm.Config.Tracer.CaptureExit(evm, ret, startGas-gas, err)
 		}(gas)
 	}
 
-	if p, isPrecompile := evm.precompile(addr); isPrecompile {
+	if p, isPrecompile := evm.Precompile(addr); isPrecompile {
 		ret, gas, err = RunPrecompiledContract(p, input, gas)
 	} else {
 		// At this point, we use a copy of address. If we don't, the go compiler will
@@ -497,7 +497,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 		if evm.depth == 0 {
 			evm.Config.Tracer.CaptureStart(evm, caller.Address(), address, true, codeAndHash.code, gas, value)
 		} else {
-			evm.Config.Tracer.CaptureEnter(typ, caller.Address(), address, codeAndHash.code, gas, value)
+			evm.Config.Tracer.CaptureEnter(evm, typ, caller.Address(), address, codeAndHash.code, gas, value)
 		}
 	}
 
@@ -542,7 +542,7 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 		if evm.depth == 0 {
 			evm.Config.Tracer.CaptureEnd(evm, ret, gas-contract.Gas, time.Since(start), err)
 		} else {
-			evm.Config.Tracer.CaptureExit(ret, gas-contract.Gas, err)
+			evm.Config.Tracer.CaptureExit(evm, ret, gas-contract.Gas, err)
 		}
 	}
 	return ret, address, contract.Gas, err

@@ -834,7 +834,7 @@ func (jst *jsTracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, t ti
 }
 
 // CaptureEnter is called when EVM enters a new scope (via call, create or selfdestruct).
-func (jst *jsTracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
+func (jst *jsTracer) CaptureEnter(env *vm.EVM, typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
 	if !jst.traceCallFrames {
 		return
 	}
@@ -864,7 +864,7 @@ func (jst *jsTracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.
 
 // CaptureExit is called when EVM exits a scope, even if the scope didn't
 // execute any code.
-func (jst *jsTracer) CaptureExit(output []byte, gasUsed uint64, err error) {
+func (jst *jsTracer) CaptureExit(env *vm.EVM, output []byte, gasUsed uint64, err error) {
 	if !jst.traceCallFrames {
 		return
 	}

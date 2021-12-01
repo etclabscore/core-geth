@@ -258,8 +258,10 @@ func TestEnterExit(t *testing.T) {
 		Contract: vm.NewContract(&account{}, &account{}, big.NewInt(0), 0),
 	}
 
-	tracer.CaptureEnter(vm.CALL, scope.Contract.Caller(), scope.Contract.Address(), []byte{}, 1000, new(big.Int))
-	tracer.CaptureExit([]byte{}, 400, nil)
+	env := &vm.EVM{}
+
+	tracer.CaptureEnter(env, vm.CALL, scope.Contract.Caller(), scope.Contract.Address(), []byte{}, 1000, new(big.Int))
+	tracer.CaptureExit(env, []byte{}, 400, nil)
 
 	have, err := tracer.GetResult()
 	if err != nil {

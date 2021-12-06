@@ -38,6 +38,15 @@ var RopstenBootnodes = []string{
 	"enode://865a63255b3bb68023b6bffd5095118fcc13e79dcf014fe4e47e065c350c7cc72af2e53eff895f11ba1bbb6a2b33271c1116ee870f266618eadfc2e78aa7349c@52.176.100.77:30303", // US-Azure parity
 }
 
+// SepoliaBootnodes are the enode URLs of the P2P bootstrap nodes running on the
+// Sepolia test network.
+var SepoliaBootnodes = []string{
+	// geth
+	"enode://9246d00bc8fd1742e5ad2428b80fc4dc45d786283e05ef6edbd9002cbc335d40998444732fbe921cb88e1d2c73d1b1de53bae6a2237996e9bfe14f871baf7066@18.168.182.86:30303",
+	// besu
+	"enode://ec66ddcf1a974950bd4c782789a7e04f8aa7110a72569b6e65fcd51e937e74eed303b1ea734e4d19cfaec9fbff9b6ee65bf31dcb50ba79acce9dd63a6aca61c7@52.14.151.177:30303",
+}
+
 // RinkebyBootnodes are the enode URLs of the P2P bootstrap nodes running on the
 // Rinkeby test network.
 var RinkebyBootnodes = []string{

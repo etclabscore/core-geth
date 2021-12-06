@@ -18,7 +18,7 @@ require (
 	github.com/deckarep/golang-set v0.0.0-20180603214616-504e848d77ea
 	github.com/deepmap/oapi-codegen v1.8.2 // indirect
 	github.com/docker/docker v1.4.2-0.20180625184442-8e610b2b55bf
-	github.com/dop251/goja v0.0.0-20200721192441-a695b0cdd498
+	github.com/dop251/goja v0.0.0-20211011172007-d99e4b8cbf48
 	github.com/edsrzf/mmap-go v1.0.0
 	github.com/etclabscore/go-openrpc-reflect v0.0.35
 	github.com/ethereum/evmc/v7 v7.5.0
@@ -45,7 +45,7 @@ require (
 	github.com/jackpal/go-nat-pmp v1.0.2-0.20160603034137-1fa385a6f458
 	github.com/jedisct1/go-minisign v0.0.0-20190909160543-45766022959e
 	github.com/julienschmidt/httprouter v1.2.0
-	github.com/karalabe/usb v0.0.0-20190919080040-51dc0efba356
+	github.com/karalabe/usb v0.0.0-20211005121534-4c5740d64559
 	github.com/mattn/go-colorable v0.1.8
 	github.com/mattn/go-isatty v0.0.12
 	github.com/naoina/toml v0.1.2-0.20170918210437-9fafd6967416
@@ -76,5 +76,4 @@ require (
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20200619000410-60c24ae608a6
 	gopkg.in/urfave/cli.v1 v1.20.0
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

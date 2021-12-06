@@ -34,7 +34,7 @@
         "eip2930FBlock": 0,
         "ethash": {},
         "difficultyBombDelays": {
-            "0x0": "0x4c4b40"
+            "0x0": "0x895440"
         },
         "blockReward": {
             "0x0": "0x1bc16d674ec80000"

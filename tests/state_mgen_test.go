@@ -35,6 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/go-test/deep"
 	"github.com/iancoleman/strcase"
 )
 
@@ -411,7 +412,7 @@ func TestGeneratedConfigsEq(t *testing.T) {
 
 	}
 
-	err = confp.Equivalent(coded, gen.Config)
+	err = confp.Equivalent(gen.Config, coded)
 	if err != nil {
 		t.Error(err)
 	}
@@ -428,41 +429,55 @@ func TestConvertDefaultsBounce(t *testing.T) {
 		}
 		return fmt.Sprintf("%d", *n)
 	}
-	for _, forkName := range []string{"Constantinople", "Istanbul", "Berlin"} {
+	for _, forkName := range []string{"Constantinople", "Istanbul", "Berlin", "London", "ArrowGlacier"} {
 		t.Run(forkName, func(t *testing.T) {
-			berlin := Forks[forkName]
-			eip1234 := berlin.GetEthashEIP1234Transition()
+			forkConfig := Forks[forkName]
+			eip1234 := forkConfig.GetEthashEIP1234Transition()
 
-			cg := &coregeth.CoreGethChainConfig{}
-			err := confp.Convert(berlin, cg)
+			// Convert the original config (type) into the CoreGeth chain config data type.
+			coreGethConfig := &coregeth.CoreGethChainConfig{}
+			err := confp.Convert(forkConfig, coreGethConfig)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			cg1234 := cg.GetEthashEIP1234Transition()
+			// Read the EIP1234 value from the converted version.
+			cg1234 := coreGethConfig.GetEthashEIP1234Transition()
 
-			t.Log(safePrint(eip1234), safePrint(cg1234))
+			t.Logf("DEBUG1/%s eip=%s cg=%s", forkName, safePrint(eip1234), safePrint(cg1234))
 
-			err = confp.Equivalent(berlin, cg)
+			// Assert that the converted chain configuration data type is equivalent to the original.
+			err = confp.Equivalent(forkConfig, coreGethConfig)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			b, _ := json.MarshalIndent(cg, "", "    ")
+			b, _ := json.MarshalIndent(coreGethConfig, "", "    ")
 			t.Log(string(b))
 
-			cg2 := &coregeth.CoreGethChainConfig{}
-			err = json.Unmarshal(b, cg2)
+			coreGethConfig2 := &coregeth.CoreGethChainConfig{}
+			err = json.Unmarshal(b, coreGethConfig2)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			cg2_1234 := cg2.GetEthashEIP1234Transition()
+			cg2_1234 := coreGethConfig2.GetEthashEIP1234Transition()
 
-			t.Log(safePrint(eip1234), safePrint(cg1234), safePrint(cg2_1234))
+			t.Logf("DEBUG2/%s eip=%s cg=%s cg2=%s", forkName, safePrint(eip1234), safePrint(cg1234), safePrint(cg2_1234))
 
-			err = confp.Equivalent(berlin, cg2)
+			err = confp.Equivalent(forkConfig, coreGethConfig2)
 			if err != nil {
+
+				jb, err := json.MarshalIndent(coreGethConfig2, "", "    ")
+				if err != nil {
+					t.Fatal(err)
+				}
+				t.Logf("%s", string(jb))
+
+				for _, d := range deep.Equal(coreGethConfig, coreGethConfig2) {
+					t.Logf("diff: %s", d)
+				}
+
 				t.Fatal(forkName, err)
 			}
 		})

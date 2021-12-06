@@ -162,6 +162,9 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 	if ctx.GlobalIsSet(utils.OverrideMystiqueFlag.Name) {
 		cfg.Eth.OverrideMystique = new(big.Int).SetUint64(ctx.GlobalUint64(utils.OverrideMystiqueFlag.Name))
 	}
+	if ctx.GlobalIsSet(utils.OverrideArrowGlacierFlag.Name) {
+		cfg.Eth.OverrideArrowGlacier = new(big.Int).SetUint64(ctx.GlobalUint64(utils.OverrideArrowGlacierFlag.Name))
+	}
 	if ctx.GlobalIsSet(utils.ECBP1100Flag.Name) {
 		if n := ctx.GlobalUint64(utils.ECBP1100Flag.Name); n != math.MaxUint64 {
 			cfg.Eth.ECBP1100 = new(big.Int).SetUint64(n)

@@ -553,12 +553,12 @@ func (c *CoreGethChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngin
 	}
 }
 
-func (c *CoreGethChainConfig) GetCatalystTransition() *uint64 {
-	return bigNewU64(c.Ethereum2CatalystFBlock)
+func (c *CoreGethChainConfig) GetEthashTerminalTotalDifficulty() *big.Int {
+	return c.TerminalTotalDifficulty
 }
 
-func (c *CoreGethChainConfig) SetCatalystTransition(n *uint64) error {
-	c.Ethereum2CatalystFBlock = setBig(c.Ethereum2CatalystFBlock, n)
+func (c *CoreGethChainConfig) SetEthashTerminalTotalDifficulty(n *big.Int) error {
+	c.TerminalTotalDifficulty = n
 	return nil
 }
 
@@ -804,6 +804,43 @@ func (c *CoreGethChainConfig) SetEthashEIP3554Transition(n *uint64) error {
 
 	c.ensureExistingDifficultySchedule()
 	c.DifficultyBombDelaySchedule.SetValueTotalForHeight(n, vars.EIP3554DifficultyBombDelay)
+
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetEthashEIP4345Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+		return nil
+	}
+	if c.eip4345Inferred {
+		return bigNewU64(c.EIP4345FBlock)
+	}
+
+	var diffN *uint64
+	defer func() {
+		c.EIP4345FBlock = setBig(c.EIP4345FBlock, diffN)
+		c.eip4345Inferred = true
+	}()
+
+	// Get block number (key) from map where EIP4345 criteria is met.
+	diffN = ctypes.MapMeetsSpecification(c.DifficultyBombDelaySchedule, nil, vars.EIP4345DifficultyBombDelay, nil)
+	return diffN
+}
+
+func (c *CoreGethChainConfig) SetEthashEIP4345Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+
+	c.EIP4345FBlock = setBig(c.EIP4345FBlock, n)
+	c.eip4345Inferred = true
+
+	if n == nil {
+		return nil
+	}
+
+	c.ensureExistingDifficultySchedule()
+	c.DifficultyBombDelaySchedule.SetValueTotalForHeight(n, vars.EIP4345DifficultyBombDelay)
 
 	return nil
 }

@@ -102,12 +102,14 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 	var (
 		key, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 		addr   = crypto.PubkeyToAddress(key.PublicKey)
+		config = *params.TestChainConfig // needs copy because it is modified below
 		gspec  = &genesisT.Genesis{
-			Config: params.TestChainConfig,
+			Config: &config,
 			Alloc:  genesisT.GenesisAlloc{addr: {Balance: big.NewInt(math.MaxInt64)}},
 		}
 		signer = types.LatestSigner(gspec.Config)
 	)
+
 	if londonBlock != nil {
 		lb := londonBlock.Uint64()
 		gspec.SetEIP1559Transition(&lb)
@@ -115,17 +117,17 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 	} else {
 		gspec.Config.SetEIP1559Transition(nil)
 	}
+
 	engine := ethash.NewFaker()
 	db := rawdb.NewMemoryDatabase()
 	genesis := core.MustCommitGenesis(db, gspec)
-
 	// Generate testing blocks
 	blocks, _ := core.GenerateChain(gspec.Config, genesis, engine, db, testHead+1, func(i int, b *core.BlockGen) {
 		b.SetCoinbase(common.Address{1})
 
-		var tx *types.Transaction
-		if londonBlock != nil && b.Number().Cmp(londonBlock) >= 0 { // TODO(iquidus): 1559?
-			txdata := &types.DynamicFeeTx{
+		var txdata types.TxData
+		if londonBlock != nil && b.Number().Cmp(londonBlock) >= 0 {
+			txdata = &types.DynamicFeeTx{
 				ChainID:   gspec.Config.GetChainID(),
 				Nonce:     b.TxNonce(addr),
 				To:        &common.Address{},
@@ -134,9 +136,8 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 				GasTipCap: big.NewInt(int64(i+1) * vars.GWei),
 				Data:      []byte{},
 			}
-			tx = types.NewTx(txdata)
 		} else {
-			txdata := &types.LegacyTx{
+			txdata = &types.LegacyTx{
 				Nonce:    b.TxNonce(addr),
 				To:       &common.Address{},
 				Gas:      21000,
@@ -144,18 +145,13 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 				Value:    big.NewInt(100),
 				Data:     []byte{},
 			}
-			tx = types.NewTx(txdata)
 		}
-		tx, err := types.SignTx(tx, signer, key)
-		if err != nil {
-			t.Fatalf("failed to create tx: %v", err)
-		}
-		b.AddTx(tx)
+		b.AddTx(types.MustSignNewTx(key, signer, txdata))
 	})
 	// Construct testing chain
 	diskdb := rawdb.NewMemoryDatabase()
 	core.MustCommitGenesis(diskdb, gspec)
-	chain, err := core.NewBlockChain(diskdb, nil, gspec.Config, engine, vm.Config{}, nil, nil)
+	chain, err := core.NewBlockChain(diskdb, &core.CacheConfig{TrieCleanNoPrefetch: true}, &config, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		t.Fatalf("Failed to create local chain, %v", err)
 	}

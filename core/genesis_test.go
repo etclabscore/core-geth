@@ -29,7 +29,9 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func TestSetupGenesisBlock(t *testing.T) {
@@ -313,5 +315,32 @@ func TestSetupGenesisBlock2(t *testing.T) {
 
 	if !bytes.Equal(bCompactB, bCompactA) {
 		t.Fatal("different config")
+	}
+}
+
+func TestGenesis_Commit(t *testing.T) {
+	genesis := &genesisT.Genesis{
+		BaseFee: big.NewInt(vars.InitialBaseFee),
+		Config:  params.TestChainConfig,
+		// difficulty is nil
+	}
+
+	db := rawdb.NewMemoryDatabase()
+	genesisBlock := MustCommitGenesis(db, genesis)
+
+	if genesis.Difficulty != nil {
+		t.Fatalf("assumption wrong")
+	}
+
+	// This value should have been set as default in the ToBlock method.
+	if genesisBlock.Difficulty().Cmp(vars.GenesisDifficulty) != 0 {
+		t.Errorf("assumption wrong: want: %d, got: %v", vars.GenesisDifficulty, genesisBlock.Difficulty())
+	}
+
+	// Expect the stored total difficulty to be the difficulty of the genesis block.
+	stored := rawdb.ReadTd(db, genesisBlock.Hash(), genesisBlock.NumberU64())
+
+	if stored.Cmp(genesisBlock.Difficulty()) != 0 {
+		t.Errorf("inequal difficulty; stored: %v, genesisBlock: %v", stored, genesisBlock.Difficulty())
 	}
 }

@@ -192,6 +192,10 @@ var (
 		Name:  "goerli",
 		Usage: "Görli network: pre-configured proof-of-authority test network",
 	}
+	SepoliaFlag = cli.BoolFlag{
+		Name:  "sepolia",
+		Usage: "Sepolia network: pre-configured proof-of-work test network",
+	}
 	DeveloperFlag = cli.BoolFlag{
 		Name:  "dev",
 		Usage: "Ephemeral proof-of-authority network with a pre-funded developer account, mining enabled",
@@ -279,6 +283,10 @@ var (
 	OverrideMystiqueFlag = cli.Uint64Flag{
 		Name:  "override.mystique",
 		Usage: "Manually specify Mystique fork-block, overriding the bundled setting",
+	}
+	OverrideArrowGlacierFlag = cli.Uint64Flag{
+		Name:  "override.arrowglacier",
+		Usage: "Manually specify Arrow Glacier fork-block, overriding the bundled setting",
 	}
 	// Light server and client settings
 	LightServeFlag = cli.IntFlag{
@@ -539,6 +547,11 @@ var (
 		Usage: "Sets a cap on gas that can be used in eth_call/estimateGas (0=infinite)",
 		Value: ethconfig.Defaults.RPCGasCap,
 	}
+	RPCGlobalEVMTimeoutFlag = cli.DurationFlag{
+		Name:  "rpc.evmtimeout",
+		Usage: "Sets a timeout used for eth_call (0=infinite)",
+		Value: ethconfig.Defaults.RPCEVMTimeout,
+	}
 	RPCGlobalTxFeeCapFlag = cli.Float64Flag{
 		Name:  "rpc.txfeecap",
 		Usage: "Sets a cap on transaction fee (in ether) that can be sent via the RPC APIs (0 = no cap)",
@@ -731,7 +744,7 @@ var (
 	}
 	GpoMaxGasPriceFlag = cli.Int64Flag{
 		Name:  "gpo.maxprice",
-		Usage: "Maximum gas price will be recommended by gpo",
+		Usage: "Maximum transaction priority fee (or gasprice before London fork) to be recommended by gpo",
 		Value: ethconfig.Defaults.GPO.MaxPrice.Int64(),
 	}
 	GpoIgnoreGasPriceFlag = cli.Int64Flag{
@@ -904,6 +917,8 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.MordorBootnodes
 	case ctx.GlobalBool(RopstenFlag.Name):
 		urls = params.RopstenBootnodes
+	case ctx.GlobalBool(SepoliaFlag.Name):
+		urls = params.SepoliaBootnodes
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		urls = params.RinkebyBootnodes
 	case ctx.GlobalBool(KottiFlag.Name):
@@ -1337,6 +1352,8 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 		return filepath.Join(baseDataDirPath, "kotti")
 	case ctx.GlobalBool(GoerliFlag.Name):
 		return filepath.Join(baseDataDirPath, "goerli")
+	case ctx.GlobalBool(SepoliaFlag.Name):
+		return filepath.Join(baseDataDirPath, "sepolia")
 	case ctx.GlobalBool(MintMeFlag.Name):
 		return filepath.Join(baseDataDirPath, "mintme")
 	}
@@ -1589,7 +1606,7 @@ func CheckExclusive(ctx *cli.Context, args ...interface{}) {
 // SetEthConfig applies eth-related command line flags to the config.
 func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// Avoid conflicting network flags
-	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, MainnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, ClassicFlag, KottiFlag, MordorFlag, MintMeFlag)
+	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, MainnetFlag, RopstenFlag, RinkebyFlag, GoerliFlag, SepoliaFlag, ClassicFlag, KottiFlag, MordorFlag, MintMeFlag)
 	CheckExclusive(ctx, LightServeFlag, SyncModeFlag, "light")
 	CheckExclusive(ctx, DeveloperFlag, DeveloperPoWFlag, ExternalSignerFlag) // Can't use both ephemeral unlocked and external signer
 	if ctx.GlobalString(GCModeFlag.Name) == "archive" && ctx.GlobalUint64(TxLookupLimitFlag.Name) != 0 {
@@ -1720,6 +1737,9 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	} else {
 		log.Info("Global gas cap disabled")
 	}
+	if ctx.GlobalIsSet(RPCGlobalEVMTimeoutFlag.Name) {
+		cfg.RPCEVMTimeout = ctx.GlobalDuration(RPCGlobalEVMTimeoutFlag.Name)
+	}
 	if ctx.GlobalIsSet(RPCGlobalTxFeeCapFlag.Name) {
 		cfg.RPCTxFeeCap = ctx.GlobalFloat64(RPCGlobalTxFeeCapFlag.Name)
 	}
@@ -1801,6 +1821,12 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		SetDNSDiscoveryDefaults(cfg, params.MainnetGenesisHash)
 	case ctx.GlobalBool(RopstenFlag.Name):
 		SetDNSDiscoveryDefaults(cfg, params.RopstenGenesisHash)
+	case ctx.GlobalBool(SepoliaFlag.Name):
+		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
+			cfg.NetworkId = 11155111
+		}
+		cfg.Genesis = params.DefaultSepoliaGenesisBlock()
+		SetDNSDiscoveryDefaults(cfg, params.SepoliaGenesisHash)
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		SetDNSDiscoveryDefaults(cfg, params.RinkebyGenesisHash)
 	case ctx.GlobalBool(GoerliFlag.Name):
@@ -2050,6 +2076,8 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 		genesis = params.DefaultMordorGenesisBlock()
 	case ctx.GlobalBool(RopstenFlag.Name):
 		genesis = params.DefaultRopstenGenesisBlock()
+	case ctx.GlobalBool(SepoliaFlag.Name):
+		genesis = params.DefaultSepoliaGenesisBlock()
 	case ctx.GlobalBool(RinkebyFlag.Name):
 		genesis = params.DefaultRinkebyGenesisBlock()
 	case ctx.GlobalBool(KottiFlag.Name):

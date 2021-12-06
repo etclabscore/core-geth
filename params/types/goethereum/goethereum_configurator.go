@@ -579,12 +579,12 @@ func (c *ChainConfig) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) erro
 	}
 }
 
-func (c *ChainConfig) GetCatalystTransition() *uint64 {
-	return bigNewU64(c.CatalystBlock)
+func (c *ChainConfig) GetEthashTerminalTotalDifficulty() *big.Int {
+	return c.TerminalTotalDifficulty
 }
 
-func (c *ChainConfig) SetCatalystTransition(n *uint64) error {
-	c.CatalystBlock = setBig(c.CatalystBlock, n)
+func (c *ChainConfig) SetEthashTerminalTotalDifficulty(n *big.Int) error {
+	c.TerminalTotalDifficulty = n
 	return nil
 }
 
@@ -732,6 +732,21 @@ func (c *ChainConfig) SetEthashEIP3554Transition(n *uint64) error {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.LondonBlock = setBig(c.LondonBlock, n)
+	return nil
+}
+
+func (c *ChainConfig) GetEthashEIP4345Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+		return nil
+	}
+	return bigNewU64(c.ArrowGlacierBlock)
+}
+
+func (c *ChainConfig) SetEthashEIP4345Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	c.ArrowGlacierBlock = setBig(c.ArrowGlacierBlock, n)
 	return nil
 }
 

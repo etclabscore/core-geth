@@ -24,6 +24,7 @@ type FreezerRemoteClient struct {
 	readonly   bool
 	wg         sync.WaitGroup
 	writeBatch *freezerBatchRemote
+	writeMu    sync.Mutex
 }
 
 const (
@@ -89,6 +90,14 @@ func (api *FreezerRemoteClient) Ancients() (uint64, error) {
 	return res, err
 }
 
+// 	// ReadAncients runs the given read operation while ensuring that no writes take place
+//	// on the underlying freezer.
+func (api *FreezerRemoteClient) ReadAncients(fn func(ethdb.AncientReader) error) (err error) {
+	api.writeMu.Lock()
+	defer api.writeMu.Unlock()
+	return fn(api)
+}
+
 // AncientSize returns the ancient size of the specified category.
 func (api *FreezerRemoteClient) AncientSize(kind string) (uint64, error) {
 	var res uint64
@@ -105,6 +114,8 @@ func (api *FreezerRemoteClient) AncientSize(kind string) (uint64, error) {
 //
 // Note that the frozen marker is updated outside of the service calls.
 func (api *FreezerRemoteClient) AppendAncient(number uint64, hash, header, body, receipts, td []byte) (err error) {
+	api.writeMu.Lock()
+	defer api.writeMu.Unlock()
 	return api.client.Call(nil, FreezerMethodAppendAncient, number, hash, header, body, receipts, td)
 }
 
@@ -152,6 +163,8 @@ func (api *FreezerRemoteClient) ModifyAncients(fn func(ethdb.AncientWriteOperato
 	if err != nil {
 		return 0, err
 	}
+	api.writeMu.Lock()
+	defer api.writeMu.Unlock()
 
 	// Roll back all tables to the starting position in case of error.
 	defer func() {
@@ -174,11 +187,15 @@ func (api *FreezerRemoteClient) ModifyAncients(fn func(ethdb.AncientWriteOperato
 
 // TruncateAncients discards any recent data above the provided threshold number.
 func (api *FreezerRemoteClient) TruncateAncients(items uint64) error {
+	api.writeMu.Lock()
+	defer api.writeMu.Unlock()
 	return api.client.Call(nil, FreezerMethodTruncateAncients, items)
 }
 
 // Sync flushes all data tables to disk.
 func (api *FreezerRemoteClient) Sync() error {
+	api.writeMu.Lock()
+	defer api.writeMu.Unlock()
 	return api.client.Call(nil, FreezerMethodSync)
 }
 

@@ -35,11 +35,15 @@ type ChainConfig struct {
 	IstanbulBlock       *big.Int `json:"istanbulBlock,omitempty"`       // Istanbul switch block (nil = no fork, 0 = already on istanbul)
 	MuirGlacierBlock    *big.Int `json:"muirGlacierBlock,omitempty"`    // Eip-2384 (bomb delay) switch block (nil = no fork, 0 = already activated)
 
-	BerlinBlock *big.Int `json:"berlinBlock,omitempty"` // Berlin switch block
-	LondonBlock *big.Int `json:"londonBlock,omitempty"` // London switch block
+	BerlinBlock       *big.Int `json:"berlinBlock,omitempty"`       // Berlin switch block
+	LondonBlock       *big.Int `json:"londonBlock,omitempty"`       // London switch block
+	ArrowGlacierBlock *big.Int `json:"arrowGlacierBlock,omitempty"` // ArrowGlacier switch block
 
-	EWASMBlock    *big.Int `json:"ewasmBlock,omitempty"`    // EWASM switch block (nil = no fork, 0 = already activated)
-	CatalystBlock *big.Int `json:"catalystBlock,omitempty"` // Catalyst switch block (nil = no fork, 0 = already on catalyst)
+	EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
+
+	// TerminalTotalDifficulty is the amount of total difficulty reached by
+	// the network that triggers the consensus upgrade.
+	TerminalTotalDifficulty *big.Int `json:"terminalTotalDifficulty,omitempty"`
 
 	//
 	// EXP cost increase

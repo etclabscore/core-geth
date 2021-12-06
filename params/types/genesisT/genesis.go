@@ -658,12 +658,12 @@ func (g *Genesis) MustSetConsensusEngineType(t ctypes.ConsensusEngineT) error {
 	return g.Config.MustSetConsensusEngineType(t)
 }
 
-func (g *Genesis) GetCatalystTransition() *uint64 {
-	return g.Config.GetCatalystTransition()
+func (g *Genesis) GetEthashTerminalTotalDifficulty() *big.Int {
+	return g.Config.GetEthashTerminalTotalDifficulty()
 }
 
-func (g *Genesis) SetCatalystTransition(n *uint64) error {
-	return g.Config.SetCatalystTransition(n)
+func (g *Genesis) SetEthashTerminalTotalDifficulty(n *big.Int) error {
+	return g.Config.SetEthashTerminalTotalDifficulty(n)
 }
 
 func (g *Genesis) GetEthashMinimumDifficulty() *big.Int {
@@ -744,6 +744,14 @@ func (g *Genesis) GetEthashEIP3554Transition() *uint64 {
 
 func (g *Genesis) SetEthashEIP3554Transition(n *uint64) error {
 	return g.Config.SetEthashEIP3554Transition(n)
+}
+
+func (g *Genesis) GetEthashEIP4345Transition() *uint64 {
+	return g.Config.GetEthashEIP4345Transition()
+}
+
+func (g *Genesis) SetEthashEIP4345Transition(n *uint64) error {
+	return g.Config.SetEthashEIP4345Transition(n)
 }
 
 func (g *Genesis) GetEthashECIP1010PauseTransition() *uint64 {

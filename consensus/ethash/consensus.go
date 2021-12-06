@@ -318,9 +318,10 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	next := new(big.Int).Add(parent.Number, big1)
 	out := new(big.Int)
 
-	if config.IsEnabled(config.GetCatalystTransition, next) {
-		return big.NewInt(1)
-	}
+	// TODO (meowbits): do we need this?
+	// if config.IsEnabled(config.GetEthashTerminalTotalDifficulty, next) {
+	// 	return big.NewInt(1)
+	// }
 
 	// ADJUSTMENT algorithms
 	if config.IsEnabled(config.GetEthashEIP100BTransition, next) {
@@ -394,6 +395,16 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 				continue
 			}
 			fakeBlockNumber.Sub(fakeBlockNumber, dur)
+		}
+		exPeriodRef.Set(fakeBlockNumber)
+
+	} else if config.IsEnabled(config.GetEthashEIP4345Transition, next) {
+		// calcDifficultyEip4345 is the difficulty adjustment algorithm as specified by EIP 4345.
+		// It offsets the bomb a total of 10.7M blocks.
+		fakeBlockNumber := new(big.Int)
+		delayWithOffset := new(big.Int).Sub(vars.EIP4345DifficultyBombDelay, common.Big1)
+		if parent.Number.Cmp(delayWithOffset) >= 0 {
+			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 

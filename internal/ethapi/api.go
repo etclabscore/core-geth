@@ -971,7 +971,7 @@ func (e *revertError) ErrorData() interface{} {
 // Note, this function doesn't make and changes in the state/blockchain and is
 // useful to execute and retrieve values.
 func (s *PublicBlockChainAPI) Call(ctx context.Context, args TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, overrides *StateOverride) (hexutil.Bytes, error) {
-	result, err := DoCall(ctx, s.b, args, blockNrOrHash, overrides, 5*time.Second, s.b.RPCGasCap())
+	result, err := DoCall(ctx, s.b, args, blockNrOrHash, overrides, s.b.RPCEVMTimeout(), s.b.RPCGasCap())
 	if err != nil {
 		return nil, err
 	}
@@ -1342,7 +1342,7 @@ func (b *RPCMarshalBlockT) MarshalJSON() ([]byte, error) {
 // RPCMarshalBlock converts the given block to the RPC output which depends on fullTx. If inclTx is true transactions are
 // returned. When fullTx is true the returned block contains full transaction details, otherwise it will only contain
 // transaction hashes.
-func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool) (*RPCMarshalBlockT, error) {
+func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool, config ctypes.ChainConfigurator) (*RPCMarshalBlockT, error) {
 	fields := &RPCMarshalBlockT{RPCMarshalHeaderT: NewRPCMarshalHeaderTFromHeader(block.Header())}
 	fields.Size = hexutil.Uint64(block.Size())
 	fields.inclTx = inclTx
@@ -1354,7 +1354,7 @@ func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool) (*RPCMarshalB
 		}
 		if fullTx {
 			formatTx = func(tx *types.Transaction) (interface{}, error) {
-				return newRPCTransactionFromBlockHash(block, tx.Hash()), nil
+				return newRPCTransactionFromBlockHash(block, tx.Hash(), config), nil
 			}
 		}
 		txs := block.Transactions()
@@ -1388,7 +1388,7 @@ func (s *PublicBlockChainAPI) rpcMarshalHeader(ctx context.Context, header *type
 // rpcMarshalBlock uses the generalized output filler, then adds the total difficulty field, which requires
 // a `PublicBlockchainAPI`.
 func (s *PublicBlockChainAPI) rpcMarshalBlock(ctx context.Context, b *types.Block, inclTx bool, fullTx bool) (*RPCMarshalBlockT, error) {
-	fields, err := RPCMarshalBlock(b, inclTx, fullTx)
+	fields, err := RPCMarshalBlock(b, inclTx, fullTx, s.b.ChainConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -1423,17 +1423,8 @@ type RPCTransaction struct {
 
 // newRPCTransaction returns a transaction that will serialize to the RPC
 // representation, with the given location metadata set (if available).
-func newRPCTransaction(tx *types.Transaction, blockHash common.Hash, blockNumber uint64, index uint64, baseFee *big.Int) *RPCTransaction {
-	// Determine the signer. For replay-protected transactions, use the most permissive
-	// signer, because we assume that signers are backwards-compatible with old
-	// transactions. For non-protected transactions, the homestead signer signer is used
-	// because the return value of ChainId is zero for those transactions.
-	var signer types.Signer
-	if tx.Protected() {
-		signer = types.LatestSignerForChainID(tx.ChainId())
-	} else {
-		signer = types.HomesteadSigner{}
-	}
+func newRPCTransaction(tx *types.Transaction, blockHash common.Hash, blockNumber uint64, index uint64, baseFee *big.Int, config ctypes.ChainConfigurator) *RPCTransaction {
+	signer := types.MakeSigner(config, big.NewInt(0).SetUint64(blockNumber))
 	from, _ := types.Sender(signer, tx)
 	v, r, s := tx.RawSignatureValues()
 	result := &RPCTransaction{
@@ -1481,19 +1472,21 @@ func newRPCTransaction(tx *types.Transaction, blockHash common.Hash, blockNumber
 // newRPCPendingTransaction returns a pending transaction that will serialize to the RPC representation
 func newRPCPendingTransaction(tx *types.Transaction, current *types.Header, config ctypes.ChainConfigurator) *RPCTransaction {
 	var baseFee *big.Int
+	blockNumber := uint64(0)
 	if current != nil {
 		baseFee = misc.CalcBaseFee(config, current)
+		blockNumber = current.Number.Uint64()
 	}
-	return newRPCTransaction(tx, common.Hash{}, 0, 0, baseFee)
+	return newRPCTransaction(tx, common.Hash{}, blockNumber, 0, baseFee, config)
 }
 
 // newRPCTransactionFromBlockIndex returns a transaction that will serialize to the RPC representation.
-func newRPCTransactionFromBlockIndex(b *types.Block, index uint64) *RPCTransaction {
+func newRPCTransactionFromBlockIndex(b *types.Block, index uint64, config ctypes.ChainConfigurator) *RPCTransaction {
 	txs := b.Transactions()
 	if index >= uint64(len(txs)) {
 		return nil
 	}
-	return newRPCTransaction(txs[index], b.Hash(), b.NumberU64(), index, b.BaseFee())
+	return newRPCTransaction(txs[index], b.Hash(), b.NumberU64(), index, b.BaseFee(), config)
 }
 
 // newRPCRawTransactionFromBlockIndex returns the bytes of a transaction given a block and a transaction index.
@@ -1507,10 +1500,10 @@ func newRPCRawTransactionFromBlockIndex(b *types.Block, index uint64) hexutil.By
 }
 
 // newRPCTransactionFromBlockHash returns a transaction that will serialize to the RPC representation.
-func newRPCTransactionFromBlockHash(b *types.Block, hash common.Hash) *RPCTransaction {
+func newRPCTransactionFromBlockHash(b *types.Block, hash common.Hash, config ctypes.ChainConfigurator) *RPCTransaction {
 	for idx, tx := range b.Transactions() {
 		if tx.Hash() == hash {
-			return newRPCTransactionFromBlockIndex(b, uint64(idx))
+			return newRPCTransactionFromBlockIndex(b, uint64(idx), config)
 		}
 	}
 	return nil
@@ -1659,7 +1652,7 @@ func (s *PublicTransactionPoolAPI) GetBlockTransactionCountByHash(ctx context.Co
 // GetTransactionByBlockNumberAndIndex returns the transaction for the given block number and index.
 func (s *PublicTransactionPoolAPI) GetTransactionByBlockNumberAndIndex(ctx context.Context, blockNr rpc.BlockNumber, index hexutil.Uint) *RPCTransaction {
 	if block, _ := s.b.BlockByNumber(ctx, blockNr); block != nil {
-		return newRPCTransactionFromBlockIndex(block, uint64(index))
+		return newRPCTransactionFromBlockIndex(block, uint64(index), s.b.ChainConfig())
 	}
 	return nil
 }
@@ -1667,7 +1660,7 @@ func (s *PublicTransactionPoolAPI) GetTransactionByBlockNumberAndIndex(ctx conte
 // GetTransactionByBlockHashAndIndex returns the transaction for the given block hash and index.
 func (s *PublicTransactionPoolAPI) GetTransactionByBlockHashAndIndex(ctx context.Context, blockHash common.Hash, index hexutil.Uint) *RPCTransaction {
 	if block, _ := s.b.BlockByHash(ctx, blockHash); block != nil {
-		return newRPCTransactionFromBlockIndex(block, uint64(index))
+		return newRPCTransactionFromBlockIndex(block, uint64(index), s.b.ChainConfig())
 	}
 	return nil
 }
@@ -1719,7 +1712,7 @@ func (s *PublicTransactionPoolAPI) GetTransactionByHash(ctx context.Context, has
 		if err != nil {
 			return nil, err
 		}
-		return newRPCTransaction(tx, blockHash, blockNumber, index, header.BaseFee), nil
+		return newRPCTransaction(tx, blockHash, blockNumber, index, header.BaseFee, s.b.ChainConfig()), nil
 	}
 	// No finalized transaction, try to retrieve it from the pool
 	if tx := s.b.GetPoolTransaction(hash); tx != nil {
@@ -2064,17 +2057,22 @@ func NewPublicDebugAPI(b Backend) *PublicDebugAPI {
 	return &PublicDebugAPI{b: b}
 }
 
+// GetHeaderRlp retrieves the RLP encoded for of a single header.
+func (api *PublicDebugAPI) GetHeaderRlp(ctx context.Context, number uint64) (hexutil.Bytes, error) {
+	header, _ := api.b.HeaderByNumber(ctx, rpc.BlockNumber(number))
+	if header == nil {
+		return nil, fmt.Errorf("header #%d not found", number)
+	}
+	return rlp.EncodeToBytes(header)
+}
+
 // GetBlockRlp retrieves the RLP encoded for of a single block.
-func (api *PublicDebugAPI) GetBlockRlp(ctx context.Context, number uint64) (string, error) {
+func (api *PublicDebugAPI) GetBlockRlp(ctx context.Context, number uint64) (hexutil.Bytes, error) {
 	block, _ := api.b.BlockByNumber(ctx, rpc.BlockNumber(number))
 	if block == nil {
-		return "", fmt.Errorf("block #%d not found", number)
+		return nil, fmt.Errorf("block #%d not found", number)
 	}
-	encoded, err := rlp.EncodeToBytes(block)
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%x", encoded), nil
+	return rlp.EncodeToBytes(block)
 }
 
 // TestSignCliqueBlock fetches the given block number, and attempts to sign it as a clique header with the

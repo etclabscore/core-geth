@@ -128,6 +128,11 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 		}
 	}
 
+	// TODO (ziogaschr): Add EIPs, after Mystique activations
+	// if overrideArrowGlacier != nil {
+	// 	newcfg.ArrowGlacierBlock = overrideArrowGlacier
+	// }
+
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {
 		log.Warn("Found genesis block without chain config")
@@ -179,6 +184,8 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 		return params.MordorChainConfig
 	case ghash == params.RopstenGenesisHash:
 		return params.RopstenChainConfig
+	case ghash == params.SepoliaGenesisHash:
+		return params.SepoliaChainConfig
 	case ghash == params.MintMeGenesisHash:
 		return params.MintMeChainConfig
 	default:

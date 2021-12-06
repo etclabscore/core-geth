@@ -26,6 +26,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -35,17 +36,19 @@ import (
 )
 
 type result struct {
-	Error   error
-	Address common.Address
-	Hash    common.Hash
+	Error        error
+	Address      common.Address
+	Hash         common.Hash
+	IntrinsicGas uint64
 }
 
 // MarshalJSON marshals as JSON with a hash.
 func (r *result) MarshalJSON() ([]byte, error) {
 	type xx struct {
-		Error   string          `json:"error,omitempty"`
-		Address *common.Address `json:"address,omitempty"`
-		Hash    *common.Hash    `json:"hash,omitempty"`
+		Error        string          `json:"error,omitempty"`
+		Address      *common.Address `json:"address,omitempty"`
+		Hash         *common.Hash    `json:"hash,omitempty"`
+		IntrinsicGas uint64          `json:"intrinsicGas,omitempty"`
 	}
 	var out xx
 	if r.Error != nil {
@@ -57,6 +60,7 @@ func (r *result) MarshalJSON() ([]byte, error) {
 	if r.Hash != (common.Hash{}) {
 		out.Hash = &r.Hash
 	}
+	out.IntrinsicGas = r.IntrinsicGas
 	return json.Marshal(out)
 }
 
@@ -119,18 +123,59 @@ func Transaction(ctx *cli.Context) error {
 	}
 	var results []result
 	for it.Next() {
+		if err := it.Err(); err != nil {
+			return NewError(ErrorIO, err)
+		}
 		var tx types.Transaction
 		err := rlp.DecodeBytes(it.Value(), &tx)
 		if err != nil {
 			results = append(results, result{Error: err})
 			continue
 		}
-		sender, err := types.Sender(signer, &tx)
-		if err != nil {
-			results = append(results, result{Error: err})
+		r := result{Hash: tx.Hash()}
+		if sender, err := types.Sender(signer, &tx); err != nil {
+			r.Error = err
+			results = append(results, r)
 			continue
+		} else {
+			r.Address = sender
 		}
-		results = append(results, result{Address: sender, Hash: tx.Hash()})
+
+		eip2f := chainConfig.IsEnabled(chainConfig.GetEIP2Transition, new(big.Int))
+		eip2028f := chainConfig.IsEnabled(chainConfig.GetEIP2028Transition, new(big.Int))
+
+		// Check intrinsic gas
+		if gas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil,
+			eip2f, eip2028f); err != nil {
+			r.Error = err
+			results = append(results, r)
+			continue
+		} else {
+			r.IntrinsicGas = gas
+			if tx.Gas() < gas {
+				r.Error = fmt.Errorf("%w: have %d, want %d", core.ErrIntrinsicGas, tx.Gas(), gas)
+				results = append(results, r)
+				continue
+			}
+		}
+		// Validate <256bit fields
+		switch {
+		case tx.Value().BitLen() > 256:
+			r.Error = errors.New("value exceeds 256 bits")
+		case tx.GasPrice().BitLen() > 256:
+			r.Error = errors.New("gasPrice exceeds 256 bits")
+		case tx.GasTipCap().BitLen() > 256:
+			r.Error = errors.New("maxPriorityFeePerGas exceeds 256 bits")
+		case tx.GasFeeCap().BitLen() > 256:
+			r.Error = errors.New("maxFeePerGas exceeds 256 bits")
+		case tx.GasFeeCap().Cmp(tx.GasTipCap()) < 0:
+			r.Error = errors.New("maxFeePerGas < maxPriorityFeePerGas")
+		case new(big.Int).Mul(tx.GasPrice(), new(big.Int).SetUint64(tx.Gas())).BitLen() > 256:
+			r.Error = errors.New("gas * gasPrice exceeds 256 bits")
+		case new(big.Int).Mul(tx.GasFeeCap(), new(big.Int).SetUint64(tx.Gas())).BitLen() > 256:
+			r.Error = errors.New("gas * maxFeePerGas exceeds 256 bits")
+		}
+		results = append(results, r)
 	}
 	out, err := json.MarshalIndent(results, "", "  ")
 	fmt.Println(string(out))

@@ -185,10 +185,6 @@ type ConsensusEnginator interface {
 	EthashConfigurator
 	CliqueConfigurator
 	Lyra2Configurator
-
-	// Catalyst: ETH -> ETH2 PoS transition helper
-	GetCatalystTransition() *uint64
-	SetCatalystTransition(n *uint64) error
 }
 
 type EthashConfigurator interface {
@@ -215,6 +211,8 @@ type EthashConfigurator interface {
 	SetEthashEIP2384Transition(n *uint64) error
 	GetEthashEIP3554Transition() *uint64
 	SetEthashEIP3554Transition(n *uint64) error
+	GetEthashEIP4345Transition() *uint64
+	SetEthashEIP4345Transition(n *uint64) error
 	GetEthashECIP1010PauseTransition() *uint64
 	SetEthashECIP1010PauseTransition(n *uint64) error
 	GetEthashECIP1010ContinueTransition() *uint64
@@ -229,6 +227,9 @@ type EthashConfigurator interface {
 	SetEthashECIP1041Transition(n *uint64) error
 	GetEthashECIP1099Transition() *uint64
 	SetEthashECIP1099Transition(n *uint64) error
+
+	GetEthashTerminalTotalDifficulty() *big.Int
+	SetEthashTerminalTotalDifficulty(n *big.Int) error
 
 	GetEthashDifficultyBombDelaySchedule() Uint64BigMapEncodesHex
 	SetEthashDifficultyBombDelaySchedule(m Uint64BigMapEncodesHex) error

@@ -57,11 +57,15 @@ type ChainConfig struct {
 	IstanbulBlock    *big.Int `json:"istanbulBlock,omitempty"`    // Istanbul switch block (nil = no fork, 0 = already on istanbul)
 	MuirGlacierBlock *big.Int `json:"muirGlacierBlock,omitempty"` // Eip-2384 (bomb delay) switch block (nil = no fork, 0 = already activated)
 
-	BerlinBlock *big.Int `json:"berlinBlock,omitempty"` // Berlin switch block
-	LondonBlock *big.Int `json:"londonBlock,omitempty"` // London switch block
+	BerlinBlock       *big.Int `json:"berlinBlock,omitempty"`       // Berlin switch block
+	LondonBlock       *big.Int `json:"londonBlock,omitempty"`       // London switch block
+	ArrowGlacierBlock *big.Int `json:"arrowGlacierBlock,omitempty"` // ArrowGlacier switch block
 
-	EWASMBlock    *big.Int `json:"ewasmBlock,omitempty"`    // EWASM switch block (nil = no fork, 0 = already activated)
-	CatalystBlock *big.Int `json:"catalystBlock,omitempty"` // Catalyst switch block (nil = no fork, 0 = already on catalyst)
+	EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
+
+	// TerminalTotalDifficulty is the amount of total difficulty reached by
+	// the network that triggers the consensus upgrade.
+	TerminalTotalDifficulty *big.Int `json:"terminalTotalDifficulty,omitempty"`
 
 	// Various consensus engines
 	Ethash *ctypes.EthashConfig `json:"ethash,omitempty"`
@@ -92,7 +96,7 @@ func (c *ChainConfig) String() string {
 	default:
 		engine = "unknown"
 	}
-	return fmt.Sprintf("{ChainID: %v Homestead: %v DAO: %v DAOSupport: %v EIP150: %v EIP155: %v EIP158: %v Byzantium: %v Constantinople: %v ConstantinopleFix: %v Istanbul: %v MuirGlacier: %v Berlin: %v Engine: %v}",
+	return fmt.Sprintf("{ChainID: %v Homestead: %v DAO: %v DAOSupport: %v EIP150: %v EIP155: %v EIP158: %v Byzantium: %v Constantinople: %v ConstantinopleFix: %v Istanbul: %v MuirGlacier: %v Berlin: %v London: %v ArrowGlacier: %v Engine: %v}",
 		c.ChainID,
 		c.HomesteadBlock,
 		c.DAOForkBlock,
@@ -106,6 +110,8 @@ func (c *ChainConfig) String() string {
 		c.IstanbulBlock,
 		c.MuirGlacierBlock,
 		c.BerlinBlock,
+		c.LondonBlock,
+		c.ArrowGlacierBlock,
 		engine,
 	)
 }

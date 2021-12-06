@@ -725,16 +725,16 @@ func (spec *ParityChainSpec) MustSetConsensusEngineType(t ctypes.ConsensusEngine
 	}
 }
 
-func (spec *ParityChainSpec) GetCatalystTransition() *uint64 {
-	return spec.Engine.Ethash.Params.CatalystBlock.Uint64P()
+func (spec *ParityChainSpec) GetEthashTerminalTotalDifficulty() *big.Int {
+	return spec.Engine.Ethash.Params.TerminalTotalDifficulty.ToInt()
 }
 
-func (spec *ParityChainSpec) SetCatalystTransition(n *uint64) error {
+func (spec *ParityChainSpec) SetEthashTerminalTotalDifficulty(n *big.Int) error {
 	if n == nil {
-		spec.Engine.Ethash.Params.CatalystBlock = nil
+		spec.Engine.Ethash.Params.TerminalTotalDifficulty = nil
 		return nil
 	}
-	spec.Engine.Ethash.Params.CatalystBlock = new(ParityU64).SetUint64(n)
+	spec.Engine.Ethash.Params.TerminalTotalDifficulty = math.NewHexOrDecimal256(n.Int64())
 	return nil
 }
 
@@ -954,6 +954,39 @@ func (spec *ParityChainSpec) SetEthashEIP3554Transition(n *uint64) error {
 
 	spec.ensureExistingDifficultyDelaySchedule()
 	spec.Engine.Ethash.Params.DifficultyBombDelays.SetValueTotalForHeight(n, vars.EIP3554DifficultyBombDelay)
+
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEthashEIP4345Transition() *uint64 {
+	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+		return nil
+	}
+	if spec.Engine.Ethash.Params.eip4345Inferred {
+		return spec.Engine.Ethash.Params.eip4345Transition.Uint64P()
+	}
+
+	var diffN *uint64
+	defer func() {
+		spec.Engine.Ethash.Params.eip4345Transition = new(ParityU64).SetUint64(diffN)
+		spec.Engine.Ethash.Params.eip4345Inferred = true
+	}()
+
+	// Get block number (key) from map where EIP4345 criteria is met.
+	diffN = ctypes.MapMeetsSpecification(spec.Engine.Ethash.Params.DifficultyBombDelays, nil, vars.EIP4345DifficultyBombDelay, nil)
+	return diffN
+}
+
+func (spec *ParityChainSpec) SetEthashEIP4345Transition(n *uint64) error {
+	spec.Engine.Ethash.Params.eip4345Transition = new(ParityU64).SetUint64(n)
+	spec.Engine.Ethash.Params.eip4345Inferred = true
+
+	if n == nil {
+		return nil
+	}
+
+	spec.ensureExistingDifficultyDelaySchedule()
+	spec.Engine.Ethash.Params.DifficultyBombDelays.SetValueTotalForHeight(n, vars.EIP4345DifficultyBombDelay)
 
 	return nil
 }

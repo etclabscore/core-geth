@@ -32,7 +32,7 @@ import (
 )
 
 func TestState(t *testing.T) {
-	//t.Parallel()
+	// t.Parallel()
 
 	st := new(testMatcher)
 	// Long tests:
@@ -94,7 +94,7 @@ func TestState(t *testing.T) {
 	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
 
 	heads := make(chan *types.Header)
-	//var sub ethereum.Subscription
+	// var sub ethereum.Subscription
 	var err error
 	quit := make(chan bool)
 	if os.Getenv("AM") != "" {
@@ -105,19 +105,19 @@ func TestState(t *testing.T) {
 		}
 		fmt.Println("Transmitter OKGO")
 		t.Log("log: Transmitter OKGO")
-		//defer sub.Unsubscribe()
+		// defer sub.Unsubscribe()
 	}
 
 	// For Istanbul, older tests were moved into LegacyTests
 	for _, dir := range []string{
 		stateTestDir,
-		//legacyStateTestDir,
+		// legacyStateTestDir,
 	} {
 		if os.Getenv("AM") != "" {
 			go func() {
 				for {
 					select {
-					//case err := <-sub.Err():
+					// case err := <-sub.Err():
 					//	if err != nil {
 					//		t.Fatal("subscription error", err)
 					//	}
@@ -148,7 +148,7 @@ func TestState(t *testing.T) {
 							if gas >= lim {
 								gas = lim - 1
 							}
-							next := types.NewMessage(MyTransmitter.sender, &receipt.ContractAddress, 0, v.Value(), gas, v.GasPrice(), v.Data(), false)
+							next := types.NewMessage(MyTransmitter.sender, &receipt.ContractAddress, 0, v.Value(), gas, v.GasPrice(), nil, nil, v.Data(), nil, false)
 
 							sentTxHash, err := MyTransmitter.SendMessage(next)
 							if err != nil {
@@ -172,41 +172,29 @@ func TestState(t *testing.T) {
 			for _, subtest := range test.Subtests(st.skipforkpat) {
 				subtest := subtest
 				key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
+				name := name + "/" + key
 
 				fmt.Println("running test", name)
 				t.Run(key+"/trie", func(t *testing.T) {
 					withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
 						_, _, err := test.Run(subtest, vmconfig, false)
-						if err != nil && *testEWASM != "" {
-							err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
-						}
-						if err != nil && len(test.json.Post[subtest.Fork][subtest.Index].ExpectException) > 0 {
-							// Ignore expected errors (TODO MariusVanDerWijden check error string)
-							return nil
-						}
 						return st.checkFailure(t, err)
 					})
 				})
+				// time.Sleep(time.Second)
 				// t.Run(key+"/snap", func(t *testing.T) {
 				// 	withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
 				// 		snaps, statedb, err := test.Run(subtest, vmconfig, true)
-				// 		if snaps != nil && statedb != nil {
 				// 			if _, err := snaps.Journal(statedb.IntermediateRoot(false)); err != nil {
 				// 				return err
 				// 			}
-				// 		}
-				// 		if err != nil && len(test.json.Post[subtest.Fork][subtest.Index].ExpectException) > 0 {
-				// 			// Ignore expected errors (TODO MariusVanDerWijden check error string)
-				// 			return nil
-				// 		}
-				// 		if err != nil && *testEWASM != "" {
-				// 			err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
-				// 		}
-				// 		return st.checkFailure(t, err)
+				//		return st.checkFailure(t, name+"/snap", err)
 				// 	})
+				// })
+			}
 		})
 		MyTransmitter.wg.Wait()
-		//t.Run("wait for pending txs", func(t *testing.T) {
+		// t.Run("wait for pending txs", func(t *testing.T) {
 		//	time.Sleep(5*time.Second)
 		//	for len(MyTransmitter.txPendingContracts) > 0 {
 		//		fmt.Println("Sleeping")
@@ -221,7 +209,7 @@ func TestState(t *testing.T) {
 		//	}
 		//	quit <- true
 		//	close(quit)
-		//})
+		// })
 	}
 }
 

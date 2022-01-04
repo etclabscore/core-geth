@@ -17,14 +17,22 @@
 package tests
 
 import (
+	"context"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"math/big"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
+	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -35,9 +43,11 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
 )
@@ -193,6 +203,147 @@ outer:
 	return sub
 }
 
+type Transmitter struct {
+	ctx                context.Context
+	client             *ethclient.Client
+	sender             common.Address
+	nonce              uint64
+	chainId            *big.Int
+	ks                 *keystore.KeyStore
+	txPendingContracts map[common.Hash]core.Message
+	mu                 sync.Mutex
+	wg                 sync.WaitGroup
+	count              int
+}
+
+var MyTransmitter *Transmitter
+
+func setupClient(ctx context.Context) (*ethclient.Client, *big.Int) {
+	endpoint := os.Getenv("AM_CLIENT")
+	if endpoint == "" {
+		fmt.Println("NO ENDPOINT")
+		os.Exit(1)
+	}
+	cl, err := ethclient.Dial(endpoint)
+	if err != nil {
+		panic(err)
+	}
+	cid, err := cl.ChainID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return cl, cid
+}
+
+func setupKeystore() *keystore.KeyStore {
+	keydir := os.Getenv("AM_KEYSTORE")
+	if keydir == "" {
+		panic("NO KEYSTORE")
+	}
+	ks := keystore.NewKeyStore(keydir, keystore.StandardScryptN, keystore.StandardScryptP)
+
+	acc := os.Getenv("AM_ADDRESS")
+	if acc == "" {
+		panic("NO SENDING ADDRESS")
+	}
+	passFile := os.Getenv("AM_PASSWORDFILE")
+	if passFile == "" {
+		panic("NO PASSFILE")
+	}
+	password, err := ioutil.ReadFile(passFile)
+	if err != nil {
+		panic(err)
+	}
+	sender := common.HexToAddress(acc)
+	err = ks.Unlock(accounts.Account{Address: sender}, strings.TrimSuffix(string(password), "\n"))
+	if err != nil {
+		panic(err)
+	}
+	return ks
+}
+func NewTransmitter() *Transmitter {
+	ctx := context.Background()
+	cl, cid := setupClient(ctx)
+	ks := setupKeystore()
+	sender := ks.Accounts()[0]
+
+	t := &Transmitter{
+		ctx:                ctx,
+		client:             cl,
+		chainId:            cid,
+		ks:                 ks,
+		sender:             sender.Address,
+		txPendingContracts: make(map[common.Hash]core.Message),
+	}
+	t.setNonce()
+	return t
+}
+
+func (t *Transmitter) setNonce() {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	nonce, err := t.client.NonceAt(t.ctx, t.sender, nil)
+	if err != nil {
+		log.Fatal("pending nonce", err)
+	}
+	t.nonce = uint64(nonce)
+	fmt.Println("set transmitter nonce", nonce)
+}
+
+var maxValue = big.NewInt(vars.GWei) // As much as is willing to go into value in transaction.
+func (t *Transmitter) SendMessage(msg core.Message) (common.Hash, error) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	defer t.wg.Done()
+
+	txhash := common.Hash{}
+	var tx *types.Transaction
+
+	gas := msg.Gas()
+	igas, err := core.IntrinsicGas(msg.Data(), msg.To() == nil, true, true)
+	if err != nil {
+		panic(fmt.Sprintf("instrinsict gas calc err=%v", err))
+	}
+	gas += igas
+	if gas > 8000000 {
+		gas = 8000000
+	}
+
+	val := msg.Value()
+	if val.Cmp(maxValue) > 0 {
+		val.Set(maxValue)
+	}
+
+	if msg.To() == nil {
+		tx = types.NewContractCreation(t.nonce, val, gas, msg.GasPrice(), msg.Data())
+	} else {
+		to := *msg.To()
+		tx = types.NewTransaction(t.nonce, to, val, gas, msg.GasPrice(), msg.Data())
+		if strings.Contains(to.Hex(), "000000000000000000000000000000000") {
+			b, _ := json.MarshalIndent(tx, "", "    ")
+			panic(fmt.Sprintf("empty To address=%v", string(b)))
+		}
+	}
+
+	signed, err := t.ks.SignTx(accounts.Account{Address: t.sender}, tx, t.chainId)
+	if err != nil {
+		return txhash, fmt.Errorf("sign tx: %v", err)
+	}
+	err = t.client.SendTransaction(t.ctx, signed)
+
+	//if t.count > 15 {
+	//	time.Sleep(15 * time.Second)
+	//	t.count = 0
+	//}
+	//t.count++
+	//
+	if err != nil {
+		return txhash, fmt.Errorf("send tx: %v nonce=%d gas=%d", err, t.nonce, msg.Gas())
+	}
+	t.nonce++
+	return signed.Hash(), nil
+}
+
 // Run executes a specific subtest and verifies the post-state and logs
 func (t *StateTest) Run(subtest StateSubtest, vmconfig vm.Config, snapshotter bool) (*snapshot.Tree, *state.StateDB, error) {
 	snaps, statedb, root, err := t.RunNoVerify(subtest, vmconfig, snapshotter)
@@ -314,6 +465,103 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	gaspool.AddGas(block.GasLimit())
 	if _, err := core.ApplyMessage(evm, msg, gaspool); err != nil {
 		statedb.RevertToSnapshot(snapshot)
+	}
+
+	n, err := MyTransmitter.client.TxpoolPending(MyTransmitter.ctx)
+
+	//n, err := MyTransmitter.client.PendingTransactionCount(MyTransmitter.ctx)
+	for ; err == nil && n > 1000; n, err = MyTransmitter.client.TxpoolPending(MyTransmitter.ctx) {
+		fmt.Println("Txpool pending len=", n, "(sleeping)")
+		time.Sleep(time.Second)
+	}
+	for ; err == nil && n > 1000; n, err = MyTransmitter.client.TxpoolQueued(MyTransmitter.ctx) {
+		fmt.Println("Txpool queued len=", n, "(sleeping)")
+		time.Sleep(time.Second)
+	}
+
+	//toHex := ""
+	//if msg.To() != nil {
+	//	toHex = msg.To().Hex()
+	//}
+	//fmt.Println("apply message", "msg", "from", msg.From().Hex(), "to", toHex, "data", common.Bytes2Hex(msg.Data()))
+
+	if msg.From() == (common.Address{}) {
+		panic("empty sender") // I don't think this will ever happen for the >=Istanbul test set.
+	}
+
+	// We need to deploy the target contract,
+	// wait for it to be included in a block so we can get the transaction receipt (this is the 'pre' state),
+	// then send the test transaction to the transactionReceipt.contractAddress.
+
+	for preAccount, st := range t.json.Pre {
+		// This is the constant sender address;
+		/*
+			> geth --keystore ./ks account import 0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8
+			> geth --keystore ./ks account list
+			INFO [05-29|11:53:58.909] Maximum peer count                       ETH=50 LES=0 total=50
+			INFO [05-29|11:53:58.909] Smartcard socket not found, disabling    err="stat /run/pcscd/pcscd.comm: no such file or directory"
+			Account #0: {a94f5374fce5edbc8e2a8697c15331677e6ebf0b} keystore:///home/ia/go/src/github.com/ethereum/go-ethereum/ks/UTC--2020-05-29T15-59-34.926438299Z--a94f5374fce5edbc8e2a8697c15331677e6ebf0b
+
+		*/
+		if preAccount == common.HexToAddress("0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b") {
+			continue
+		}
+		if msg.To() == nil {
+			continue
+		}
+		if *msg.To() != preAccount {
+			continue
+		}
+		if len(st.Code) == 0 {
+			continue
+		}
+
+		gas := uint64(0)
+		igas, err := core.IntrinsicGas(msg.Data(), true, true, true)
+		if err != nil {
+			panic(fmt.Sprintf("instrinsict gas calc err=%v", err))
+		}
+		gas += igas
+		if gas > 8000000 {
+			gas = 8000000
+		}
+
+		tx := types.NewMessage(MyTransmitter.sender, nil, 0, new(big.Int), gas, big.NewInt(vars.GWei), st.Code, false)
+
+		fmt.Println("PRE", t.Name, subtest.Fork, subtest.Index, preAccount.Hex(), common.Bytes2Hex(tx.Data()))
+		MyTransmitter.wg.Add(1)
+		txHash, err := MyTransmitter.SendMessage(tx)
+		if err != nil {
+			log.Fatal("send prestate message ", err)
+		}
+
+		// regsiter this sent transaction hash to the transaction that we should send when the one we just sent completes.
+		MyTransmitter.mu.Lock()
+		MyTransmitter.wg.Add(1)
+		MyTransmitter.txPendingContracts[txHash] = msg
+		MyTransmitter.mu.Unlock()
+
+	}
+
+	if msg.To() == nil {
+		gas := uint64(0)
+		igas, err := core.IntrinsicGas(msg.Data(), true, true, true)
+		if err != nil {
+			panic(fmt.Sprintf("instrinsict gas calc err=%v", err))
+		}
+		gas += igas
+		if gas > 8000000 {
+			gas = 8000000
+		}
+
+		fmt.Println("TX", t.Name, subtest.Fork, subtest.Index, common.Bytes2Hex(msg.Data()))
+		tx := types.NewMessage(MyTransmitter.sender, nil, 0, new(big.Int), gas, big.NewInt(vars.GWei), msg.Data(), false)
+		MyTransmitter.wg.Add(1)
+		txHash, err := MyTransmitter.SendMessage(tx)
+		if err != nil {
+			log.Fatal("send contract create ", err)
+		}
+		fmt.Println("sent contract creation", txHash.Hex())
 	}
 
 	// Commit block

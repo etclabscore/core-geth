@@ -19,35 +19,38 @@ package tests
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"fmt"
 	"os"
 	"reflect"
 	"strings"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func TestState(t *testing.T) {
-	t.Parallel()
+	//t.Parallel()
 
 	st := new(testMatcher)
 	// Long tests:
-	st.slow(`^stAttackTest/ContractCreationSpam`)
-	st.slow(`^stBadOpcode/badOpcodes`)
-	st.slow(`^stPreCompiledContracts/modexp`)
-	st.slow(`^stQuadraticComplexityTest/`)
-	st.slow(`^stStaticCall/static_Call50000`)
-	st.slow(`^stStaticCall/static_Return50000`)
-	st.slow(`^stSystemOperationsTest/CallRecursiveBomb`)
-	st.slow(`^stTransactionTest/Opcodes_TransactionInit`)
+	// st.whitelist(`^stAttackTest/ContractCreationSpam`)
+	// st.whitelist(`^stBadOpcode/badOpcodes`)
+	// st.whitelist(`^stPreCompiledContracts/modexp`)
+	// st.whitelist(`^stQuadraticComplexityTest/`)
+	// st.whitelist(`^stStaticCall/static_Call50000`)
+	// st.whitelist(`^stStaticCall/static_Return50000`)
+	// st.whitelist(`^stSystemOperationsTest/CallRecursiveBomb`)
+	// st.whitelist(`^stTransactionTest/Opcodes_TransactionInit`)
 
 	// Very time consuming
-	st.skipLoad(`^stTimeConsuming/`)
-	st.skipLoad(`.*vmPerformance/loop.*`)
+	// st.skipLoad(`^stTimeConsuming/`)
+	// st.skipLoad(`.*vmPerformance/loop.*`)
 
 	// Uses 1GB RAM per tested fork
-	st.skipLoad(`^stStaticCall/static_Call1MB`)
+	// st.whitelist(`^stStaticCall/static_Call1MB`)
 
 	if *testEWASM == "" {
 		st.skipLoad(`^stEWASM`)
@@ -90,16 +93,87 @@ func TestState(t *testing.T) {
 	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/0`, "bug in test")
 	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
 
+	heads := make(chan *types.Header)
+	//var sub ethereum.Subscription
+	var err error
+	quit := make(chan bool)
+	if os.Getenv("AM") != "" {
+		MyTransmitter = NewTransmitter()
+		_, err = MyTransmitter.client.SubscribeNewHead(context.Background(), heads)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fmt.Println("Transmitter OKGO")
+		t.Log("log: Transmitter OKGO")
+		//defer sub.Unsubscribe()
+	}
+
 	// For Istanbul, older tests were moved into LegacyTests
 	for _, dir := range []string{
 		stateTestDir,
-		legacyStateTestDir,
+		//legacyStateTestDir,
 	} {
+		if os.Getenv("AM") != "" {
+			go func() {
+				for {
+					select {
+					//case err := <-sub.Err():
+					//	if err != nil {
+					//		t.Fatal("subscription error", err)
+					//	}
+					case head := <-heads:
+						bl, err := MyTransmitter.client.BlockByHash(MyTransmitter.ctx, head.Hash())
+						if err != nil {
+							t.Fatal(err)
+						}
+						fmt.Println("New block head", "num", bl.NumberU64(), "txlen", bl.Transactions().Len(), "hash", bl.Hash().Hex())
+						for _, tr := range bl.Transactions() {
+
+							MyTransmitter.mu.Lock()
+							v, ok := MyTransmitter.txPendingContracts[tr.Hash()]
+							MyTransmitter.mu.Unlock()
+							if !ok {
+								continue
+							}
+
+							fmt.Println("Matched pending transaction", tr.Hash().Hex())
+
+							receipt, err := MyTransmitter.client.TransactionReceipt(MyTransmitter.ctx, tr.Hash())
+							if err != nil {
+								panic(fmt.Sprintf("receipt err=%v tx=%x", err, tr.Hash()))
+							}
+
+							gas := v.Gas()
+							lim := bl.GasLimit() - (bl.GasLimit() / vars.GasLimitBoundDivisor)
+							if gas >= lim {
+								gas = lim - 1
+							}
+							next := types.NewMessage(MyTransmitter.sender, &receipt.ContractAddress, 0, v.Value(), gas, v.GasPrice(), v.Data(), false)
+
+							sentTxHash, err := MyTransmitter.SendMessage(next)
+							if err != nil {
+								panic(fmt.Sprintf("send pend err=%v tx=%v", err, next))
+							}
+
+							MyTransmitter.mu.Lock()
+							delete(MyTransmitter.txPendingContracts, tr.Hash())
+							MyTransmitter.mu.Unlock()
+
+							fmt.Println("Sent was-pending tx", "hash", sentTxHash.Hex())
+						}
+					case <-quit:
+						return
+
+					}
+				}
+			}()
+		}
 		st.walk(t, dir, func(t *testing.T, name string, test *StateTest) {
 			for _, subtest := range test.Subtests(st.skipforkpat) {
 				subtest := subtest
 				key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
 
+				fmt.Println("running test", name)
 				t.Run(key+"/trie", func(t *testing.T) {
 					withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
 						_, _, err := test.Run(subtest, vmconfig, false)
@@ -113,26 +187,41 @@ func TestState(t *testing.T) {
 						return st.checkFailure(t, err)
 					})
 				})
-				t.Run(key+"/snap", func(t *testing.T) {
-					withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
-						snaps, statedb, err := test.Run(subtest, vmconfig, true)
-						if snaps != nil && statedb != nil {
-							if _, err := snaps.Journal(statedb.IntermediateRoot(false)); err != nil {
-								return err
-							}
-						}
-						if err != nil && len(test.json.Post[subtest.Fork][subtest.Index].ExpectException) > 0 {
-							// Ignore expected errors (TODO MariusVanDerWijden check error string)
-							return nil
-						}
-						if err != nil && *testEWASM != "" {
-							err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
-						}
-						return st.checkFailure(t, err)
-					})
-				})
-			}
+				// t.Run(key+"/snap", func(t *testing.T) {
+				// 	withTrace(t, test.gasLimit(subtest), func(vmconfig vm.Config) error {
+				// 		snaps, statedb, err := test.Run(subtest, vmconfig, true)
+				// 		if snaps != nil && statedb != nil {
+				// 			if _, err := snaps.Journal(statedb.IntermediateRoot(false)); err != nil {
+				// 				return err
+				// 			}
+				// 		}
+				// 		if err != nil && len(test.json.Post[subtest.Fork][subtest.Index].ExpectException) > 0 {
+				// 			// Ignore expected errors (TODO MariusVanDerWijden check error string)
+				// 			return nil
+				// 		}
+				// 		if err != nil && *testEWASM != "" {
+				// 			err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
+				// 		}
+				// 		return st.checkFailure(t, err)
+				// 	})
 		})
+		MyTransmitter.wg.Wait()
+		//t.Run("wait for pending txs", func(t *testing.T) {
+		//	time.Sleep(5*time.Second)
+		//	for len(MyTransmitter.txPendingContracts) > 0 {
+		//		fmt.Println("Sleeping")
+		//		time.Sleep(time.Minute)
+		//		//MyTransmitter.mu.Lock()
+		//		//for k, v := range MyTransmitter.txPendingContracts {
+		//		//
+		//		//}
+		//		//
+		//		//MyTransmitter.mu.Unlock()
+		//		//
+		//	}
+		//	quit <- true
+		//	close(quit)
+		//})
 	}
 }
 

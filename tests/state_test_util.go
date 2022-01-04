@@ -300,7 +300,7 @@ func (t *Transmitter) SendMessage(msg core.Message) (common.Hash, error) {
 	var tx *types.Transaction
 
 	gas := msg.Gas()
-	igas, err := core.IntrinsicGas(msg.Data(), msg.To() == nil, true, true)
+	igas, err := core.IntrinsicGas(msg.Data(), nil, msg.To() == nil, true, true)
 	if err != nil {
 		panic(fmt.Sprintf("instrinsict gas calc err=%v", err))
 	}
@@ -331,11 +331,11 @@ func (t *Transmitter) SendMessage(msg core.Message) (common.Hash, error) {
 	}
 	err = t.client.SendTransaction(t.ctx, signed)
 
-	//if t.count > 15 {
+	// if t.count > 15 {
 	//	time.Sleep(15 * time.Second)
 	//	t.count = 0
-	//}
-	//t.count++
+	// }
+	// t.count++
 	//
 	if err != nil {
 		return txhash, fmt.Errorf("send tx: %v nonce=%d gas=%d", err, t.nonce, msg.Gas())
@@ -469,7 +469,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 
 	n, err := MyTransmitter.client.TxpoolPending(MyTransmitter.ctx)
 
-	//n, err := MyTransmitter.client.PendingTransactionCount(MyTransmitter.ctx)
+	// n, err := MyTransmitter.client.PendingTransactionCount(MyTransmitter.ctx)
 	for ; err == nil && n > 1000; n, err = MyTransmitter.client.TxpoolPending(MyTransmitter.ctx) {
 		fmt.Println("Txpool pending len=", n, "(sleeping)")
 		time.Sleep(time.Second)
@@ -479,11 +479,11 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 		time.Sleep(time.Second)
 	}
 
-	//toHex := ""
-	//if msg.To() != nil {
+	// toHex := ""
+	// if msg.To() != nil {
 	//	toHex = msg.To().Hex()
-	//}
-	//fmt.Println("apply message", "msg", "from", msg.From().Hex(), "to", toHex, "data", common.Bytes2Hex(msg.Data()))
+	// }
+	// fmt.Println("apply message", "msg", "from", msg.From().Hex(), "to", toHex, "data", common.Bytes2Hex(msg.Data()))
 
 	if msg.From() == (common.Address{}) {
 		panic("empty sender") // I don't think this will ever happen for the >=Istanbul test set.
@@ -517,7 +517,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 		}
 
 		gas := uint64(0)
-		igas, err := core.IntrinsicGas(msg.Data(), true, true, true)
+		igas, err := core.IntrinsicGas(msg.Data(), nil, true, true, true)
 		if err != nil {
 			panic(fmt.Sprintf("instrinsict gas calc err=%v", err))
 		}
@@ -526,7 +526,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 			gas = 8000000
 		}
 
-		tx := types.NewMessage(MyTransmitter.sender, nil, 0, new(big.Int), gas, big.NewInt(vars.GWei), st.Code, false)
+		tx := types.NewMessage(MyTransmitter.sender, nil, 0, new(big.Int), gas, big.NewInt(vars.GWei), nil, nil, st.Code, nil, false)
 
 		fmt.Println("PRE", t.Name, subtest.Fork, subtest.Index, preAccount.Hex(), common.Bytes2Hex(tx.Data()))
 		MyTransmitter.wg.Add(1)
@@ -545,7 +545,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 
 	if msg.To() == nil {
 		gas := uint64(0)
-		igas, err := core.IntrinsicGas(msg.Data(), true, true, true)
+		igas, err := core.IntrinsicGas(msg.Data(), nil, true, true, true)
 		if err != nil {
 			panic(fmt.Sprintf("instrinsict gas calc err=%v", err))
 		}
@@ -555,7 +555,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 		}
 
 		fmt.Println("TX", t.Name, subtest.Fork, subtest.Index, common.Bytes2Hex(msg.Data()))
-		tx := types.NewMessage(MyTransmitter.sender, nil, 0, new(big.Int), gas, big.NewInt(vars.GWei), msg.Data(), false)
+		tx := types.NewMessage(MyTransmitter.sender, nil, 0, new(big.Int), gas, big.NewInt(vars.GWei), nil, nil, msg.Data(), nil, false)
 		MyTransmitter.wg.Add(1)
 		txHash, err := MyTransmitter.SendMessage(tx)
 		if err != nil {

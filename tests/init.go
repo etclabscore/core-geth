@@ -411,6 +411,8 @@ var Forks = map[string]ctypes.ChainConfigurator{
 
 		// London
 		/*
+			https://github.com/ethereumclassic/ECIPs/blob/master/_specs/ecip-1104.md
+
 			3529 (Alternative refund reduction) 	#22733 	Include
 			3541 (Reject new contracts starting with the 0xEF byte) 	#22809 	Include
 			1559 (Fee market change) 	#22837 #22896 	Omit

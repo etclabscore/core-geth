@@ -494,28 +494,6 @@ func (c *ChainConfig) GetEIP1559Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP1559Transition(n *uint64) error {
-	if n == nil && c.LondonBlock != nil {
-		// Once set, the London feature batch cannot be unset.
-		// This is annoying, but necessary.
-		// The core-geth configuration interface pattern
-		// allows only SOME features from the London fork to be
-		// activated.
-		// In programmatically converting between the two
-		// interface types (core-geth vs. go-ethereum|multi-geth),
-		// configurations are unilaterally specific;
-		// all configurations available with the go-ethereum config
-		// can be represented in the core-geth config;
-		// BUT not all configurations possible with the core-geth
-		// config are possible with the go-ethereum config.
-		//
-		// So we hack it.
-		// We know the conventional use case for this problem;
-		// translating configuration types for tests, usually
-		// where the configs are defaults.
-		// We know that Ethereum Classic implements partial sets
-		// of fork-feature sets on Ethereum Foundation.
-		return ctypes.ErrUnsupportedConfigNoop
-	}
 	c.LondonBlock = setBig(c.LondonBlock, n)
 	return nil
 }
@@ -525,9 +503,6 @@ func (c *ChainConfig) GetEIP3541Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP3541Transition(n *uint64) error {
-	if n == nil && c.LondonBlock != nil {
-		return ctypes.ErrUnsupportedConfigNoop
-	}
 	c.LondonBlock = setBig(c.LondonBlock, n)
 	return nil
 }
@@ -537,9 +512,6 @@ func (c *ChainConfig) GetEIP3529Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP3529Transition(n *uint64) error {
-	if n == nil && c.LondonBlock != nil {
-		return ctypes.ErrUnsupportedConfigNoop
-	}
 	c.LondonBlock = setBig(c.LondonBlock, n)
 	return nil
 }

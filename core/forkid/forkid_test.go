@@ -75,7 +75,7 @@ func TestCreation(t *testing.T) {
 				{12964999, ID{Hash: checksumToBytes(0x0eb440f6), Next: 12965000}}, // Last Berlin block
 				{12965000, ID{Hash: checksumToBytes(0xb715077d), Next: 13773000}}, // First London block
 				{13772999, ID{Hash: checksumToBytes(0xb715077d), Next: 13773000}}, // Last London block
-				{13773000, ID{Hash: checksumToBytes(0x20c327fc), Next: 0}},        /// First Arrow Glacier block
+				{13773000, ID{Hash: checksumToBytes(0x20c327fc), Next: 0}},        // / First Arrow Glacier block
 				{20000000, ID{Hash: checksumToBytes(0x20c327fc), Next: 0}},        // Future Arrow Glacier block
 			},
 		},
@@ -229,8 +229,11 @@ func TestCreation(t *testing.T) {
 				{2_519_999, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
 				{2_520_000, ID{Hash: checksumToBytes(0x66b5c286), Next: 3_985_893}},
 				{3_985_892, ID{Hash: checksumToBytes(0x66b5c286), Next: 3_985_893}},
-				{3_985_893, ID{Hash: checksumToBytes(0x92b323e0), Next: 0}},
-				{3_985_894, ID{Hash: checksumToBytes(0x92b323e0), Next: 0}},
+				{3_985_893, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_406_050}},
+				{3_985_894, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_406_050}},
+				{5_406_049, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_406_050}},
+				{5_406_050, ID{Hash: checksumToBytes(0x792a31b3), Next: 0}},
+				{5_406_051, ID{Hash: checksumToBytes(0x792a31b3), Next: 0}},
 			},
 		},
 		// MintMe test cases
@@ -377,7 +380,7 @@ func TestGatherForks(t *testing.T) {
 		{
 			"mordor",
 			params.MordorChainConfig,
-			[]uint64{301_243, 999_983, 2_520_000, 3_985_893},
+			[]uint64{301_243, 999_983, 2_520_000, 3_985_893, 5_406_050},
 		},
 		{
 			"kotti",

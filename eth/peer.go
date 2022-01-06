@@ -19,8 +19,6 @@ package eth
 import (
 	"fmt"
 	"math/big"
-	"sync"
-	"time"
 
 	"github.com/ethereum/go-ethereum/eth/protocols/eth"
 	"github.com/ethereum/go-ethereum/eth/protocols/snap"
@@ -43,11 +41,8 @@ type ethPeerInfoForkID struct {
 // ethPeer is a wrapper around eth.Peer to maintain a few extra metadata.
 type ethPeer struct {
 	*eth.Peer
-	snapExt *snapPeer // Satellite `snap` connection
-
-	syncDrop *time.Timer   // Connection dropper if `eth` sync progress isn't validated in time
+	snapExt  *snapPeer     // Satellite `snap` connection
 	snapWait chan struct{} // Notification channel for snap connections
-	lock     sync.RWMutex  // Mutex protecting the internal fields
 }
 
 // info gathers and returns some `eth` protocol metadata known about a peer.

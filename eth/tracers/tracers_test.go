@@ -17,6 +17,7 @@
 package tracers
 
 import (
+<<<<<<< HEAD
 	"crypto/ecdsa"
 	"crypto/rand"
 	"encoding/json"
@@ -25,6 +26,9 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+=======
+	"math/big"
+>>>>>>> v1.10.15
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -35,12 +39,14 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/eth/tracers/logger"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/tests"
 )
 
+<<<<<<< HEAD
 // To generate a new callTracer test, copy paste the makeTest method below into
 // a Geth console and call it with a transaction hash you which to export.
 
@@ -91,6 +97,8 @@ var makeTest = function(tx, reexec) {
 }
 */
 
+=======
+>>>>>>> v1.10.15
 // callTrace is the result of a callTracer run.
 type callTrace struct {
 	Type    string          `json:"type"`
@@ -105,6 +113,7 @@ type callTrace struct {
 	Calls   []callTrace     `json:"calls,omitempty"`
 }
 
+<<<<<<< HEAD
 type callContext struct {
 	Number     math.HexOrDecimal64   `json:"number"`
 	Difficulty *math.HexOrDecimal256 `json:"difficulty"`
@@ -299,6 +308,8 @@ func jsonEqual(x, y interface{}) bool {
 	return reflect.DeepEqual(xTrace, yTrace)
 }
 
+=======
+>>>>>>> v1.10.15
 func BenchmarkTransactionTrace(b *testing.B) {
 	key, _ := crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291")
 	from := crypto.PubkeyToAddress(key.PublicKey)
@@ -349,7 +360,7 @@ func BenchmarkTransactionTrace(b *testing.B) {
 	}
 	_, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), alloc, false)
 	// Create the tracer, the EVM environment and run it
-	tracer := vm.NewStructLogger(&vm.LogConfig{
+	tracer := logger.NewStructLogger(&logger.Config{
 		Debug: false,
 		//DisableStorage: true,
 		//EnableMemory: false,

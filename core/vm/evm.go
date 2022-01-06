@@ -204,9 +204,6 @@ func (evm *EVM) Interpreter() Interpreter {
 // the necessary steps to create accounts and reverses the state in case of an
 // execution error or failed value transfer.
 func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas uint64, value *big.Int) (ret []byte, leftOverGas uint64, err error) {
-	if evm.Config.NoRecursion && evm.depth > 0 {
-		return nil, gas, nil
-	}
 	// Fail if we're trying to execute above the call depth limit
 	if evm.depth > int(vars.CallCreateDepth) {
 		return nil, gas, ErrDepth
@@ -293,9 +290,6 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 // CallCode differs from Call in the sense that it executes the given address'
 // code with the caller as context.
 func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, gas uint64, value *big.Int) (ret []byte, leftOverGas uint64, err error) {
-	if evm.Config.NoRecursion && evm.depth > 0 {
-		return nil, gas, nil
-	}
 	// Fail if we're trying to execute above the call depth limit
 	if evm.depth > int(vars.CallCreateDepth) {
 		return nil, gas, ErrDepth
@@ -344,9 +338,6 @@ func (evm *EVM) CallCode(caller ContractRef, addr common.Address, input []byte, 
 // DelegateCall differs from CallCode in the sense that it executes the given address'
 // code with the caller as context and the caller is set to the caller of the caller.
 func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []byte, gas uint64) (ret []byte, leftOverGas uint64, err error) {
-	if evm.Config.NoRecursion && evm.depth > 0 {
-		return nil, gas, nil
-	}
 	// Fail if we're trying to execute above the call depth limit
 	if evm.depth > int(vars.CallCreateDepth) {
 		return nil, gas, ErrDepth
@@ -386,9 +377,6 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr common.Address, input []by
 // Opcodes that attempt to perform such modifications will result in exceptions
 // instead of performing the modifications.
 func (evm *EVM) StaticCall(caller ContractRef, addr common.Address, input []byte, gas uint64) (ret []byte, leftOverGas uint64, err error) {
-	if evm.Config.NoRecursion && evm.depth > 0 {
-		return nil, gas, nil
-	}
 	// Fail if we're trying to execute above the call depth limit
 	if evm.depth > int(vars.CallCreateDepth) {
 		return nil, gas, ErrDepth
@@ -463,6 +451,9 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 		return nil, common.Address{}, gas, ErrInsufficientBalance
 	}
 	nonce := evm.StateDB.GetNonce(caller.Address())
+	if nonce+1 < nonce {
+		return nil, common.Address{}, gas, ErrNonceUintOverflow
+	}
 	evm.StateDB.SetNonce(caller.Address(), nonce+1)
 
 	// We add this to the access list _before_ taking a snapshot. Even if the creation fails,
@@ -488,10 +479,6 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
 	// The contract is a scoped environment for this execution context only.
 	contract := NewContract(caller, AccountRef(address), value, gas)
 	contract.SetCodeOptionalHash(&address, codeAndHash)
-
-	if evm.Config.NoRecursion && evm.depth > 0 {
-		return nil, address, gas, nil
-	}
 
 	if evm.Config.Debug {
 		if evm.depth == 0 {
@@ -560,7 +547,7 @@ func (evm *EVM) Create(caller ContractRef, code []byte, gas uint64, value *big.I
 
 // Create2 creates a new contract using code as deployment code.
 //
-// The different between Create2 with Create is Create2 uses sha3(0xff ++ msg.sender ++ salt ++ sha3(init_code))[12:]
+// The different between Create2 with Create is Create2 uses keccak256(0xff ++ msg.sender ++ salt ++ keccak256(init_code))[12:]
 // instead of the usual sender-and-nonce-hash as the address where the contract is initialized at.
 func (evm *EVM) Create2(caller ContractRef, code []byte, gas uint64, endowment *big.Int, salt *uint256.Int) (ret []byte, contractAddr common.Address, leftOverGas uint64, err error) {
 	codeAndHash := &codeAndHash{code: code}

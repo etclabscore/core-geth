@@ -40,7 +40,8 @@ import (
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/node"
 
-	// Force-load the native, to trigger registration
+	// Force-load the tracer engines to trigger registration
+	_ "github.com/ethereum/go-ethereum/eth/tracers/js"
 	_ "github.com/ethereum/go-ethereum/eth/tracers/native"
 
 	"gopkg.in/urfave/cli.v1"
@@ -74,6 +75,7 @@ var (
 		utils.SmartCardDaemonPathFlag,
 		utils.OverrideMystiqueFlag,
 		utils.OverrideArrowGlacierFlag,
+		utils.OverrideTerminalTotalDifficulty,
 		utils.EthashCacheDirFlag,
 		utils.EthashCachesInMemoryFlag,
 		utils.EthashCachesOnDiskFlag,
@@ -143,7 +145,11 @@ var (
 		utils.MainnetFlag,
 		utils.DeveloperFlag,
 		utils.DeveloperPeriodFlag,
+<<<<<<< HEAD
 		utils.DeveloperPoWFlag,
+=======
+		utils.DeveloperGasLimitFlag,
+>>>>>>> v1.10.15
 		utils.RopstenFlag,
 		utils.SepoliaFlag,
 		utils.RinkebyFlag,
@@ -284,6 +290,9 @@ func checkMainnet(ctx *cli.Context) bool {
 	case ctx.GlobalIsSet(utils.RopstenFlag.Name):
 		log.Info("Starting Geth on Ropsten testnet...")
 
+	case ctx.GlobalIsSet(utils.SepoliaFlag.Name):
+		log.Info("Starting Geth on Sepolia testnet...")
+
 	case ctx.GlobalIsSet(utils.RinkebyFlag.Name):
 		log.Info("Starting Geth on Rinkeby testnet...")
 
@@ -326,7 +335,15 @@ func prepare(ctx *cli.Context) {
 	// If we're a full node on mainnet without --cache specified, bump default cache allowance
 	if ctx.GlobalString(utils.SyncModeFlag.Name) != "light" && !ctx.GlobalIsSet(utils.CacheFlag.Name) && !ctx.GlobalIsSet(utils.NetworkIdFlag.Name) {
 		// Make sure we're not on any supported preconfigured testnet either
+<<<<<<< HEAD
 		if isMainnet {
+=======
+		if !ctx.GlobalIsSet(utils.RopstenFlag.Name) &&
+			!ctx.GlobalIsSet(utils.SepoliaFlag.Name) &&
+			!ctx.GlobalIsSet(utils.RinkebyFlag.Name) &&
+			!ctx.GlobalIsSet(utils.GoerliFlag.Name) &&
+			!ctx.GlobalIsSet(utils.DeveloperFlag.Name) {
+>>>>>>> v1.10.15
 			// Nope, we're really on mainnet. Bump that cache up!
 			log.Info("Bumping default cache on mainnet", "provided", ctx.GlobalInt(utils.CacheFlag.Name), "updated", 4096)
 			ctx.GlobalSet(utils.CacheFlag.Name, strconv.Itoa(4096))
@@ -357,7 +374,7 @@ func geth(ctx *cli.Context) error {
 	stack, backend := makeFullNode(ctx)
 	defer stack.Close()
 
-	startNode(ctx, stack, backend)
+	startNode(ctx, stack, backend, false)
 	stack.Wait()
 	return nil
 }
@@ -365,11 +382,11 @@ func geth(ctx *cli.Context) error {
 // startNode boots up the system node and all registered protocols, after which
 // it unlocks any requested accounts, and starts the RPC/IPC interfaces and the
 // miner.
-func startNode(ctx *cli.Context, stack *node.Node, backend ethapi.Backend) {
+func startNode(ctx *cli.Context, stack *node.Node, backend ethapi.Backend, isConsole bool) {
 	debug.Memsize.Add("node", stack)
 
 	// Start up the node itself
-	utils.StartNode(ctx, stack)
+	utils.StartNode(ctx, stack, isConsole)
 
 	// Unlock any account specifically requested
 	unlockAccounts(ctx, stack)

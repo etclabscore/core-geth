@@ -18,7 +18,6 @@ package vm
 
 import (
 	"hash"
-	"sync/atomic"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -29,11 +28,10 @@ import (
 type Config struct {
 	Debug                   bool      // Enables debugging
 	Tracer                  EVMLogger // Opcode logger
-	NoRecursion             bool      // Disables call, callcode, delegate call and create
 	NoBaseFee               bool      // Forces the EIP-1559 baseFee to 0 (needed for 0 price calls)
 	EnablePreimageRecording bool      // Enables recording of SHA3/keccak preimages
 
-	JumpTable [256]*operation // EVM instruction table, automatically populated if unset
+	JumpTable *JumpTable // EVM instruction table, automatically populated if unset
 
 	EWASMInterpreter string // External EWASM interpreter options
 	EVMInterpreter   string // External EVM interpreter options
@@ -93,20 +91,46 @@ type EVMInterpreter struct {
 
 // NewEVMInterpreter returns a new instance of the Interpreter.
 func NewEVMInterpreter(evm *EVM, cfg Config) *EVMInterpreter {
+<<<<<<< HEAD
 	// We use the STOP instruction to see whether
 	// the jump table was initialised. If it was not
 	// we'll set the default jump table.
 	if cfg.JumpTable[STOP] == nil {
 		var jt = instructionSetForConfig(evm.chainConfig, evm.Context.BlockNumber)
 
+=======
+	// If jump table was not initialised we set the default one.
+	if cfg.JumpTable == nil {
+		switch {
+		case evm.chainRules.IsLondon:
+			cfg.JumpTable = &londonInstructionSet
+		case evm.chainRules.IsBerlin:
+			cfg.JumpTable = &berlinInstructionSet
+		case evm.chainRules.IsIstanbul:
+			cfg.JumpTable = &istanbulInstructionSet
+		case evm.chainRules.IsConstantinople:
+			cfg.JumpTable = &constantinopleInstructionSet
+		case evm.chainRules.IsByzantium:
+			cfg.JumpTable = &byzantiumInstructionSet
+		case evm.chainRules.IsEIP158:
+			cfg.JumpTable = &spuriousDragonInstructionSet
+		case evm.chainRules.IsEIP150:
+			cfg.JumpTable = &tangerineWhistleInstructionSet
+		case evm.chainRules.IsHomestead:
+			cfg.JumpTable = &homesteadInstructionSet
+		default:
+			cfg.JumpTable = &frontierInstructionSet
+		}
+>>>>>>> v1.10.15
 		for i, eip := range cfg.ExtraEips {
-			if err := EnableEIP(eip, &jt); err != nil {
+			copy := *cfg.JumpTable
+			if err := EnableEIP(eip, &copy); err != nil {
 				// Disable it, so caller can check if it's activated or not
 				cfg.ExtraEips = append(cfg.ExtraEips[:i], cfg.ExtraEips[i+1:]...)
 				log.Error("EIP activation failed", "eip", eip, "error", err)
 			}
+			cfg.JumpTable = &copy
 		}
-		cfg.JumpTable = jt
 	}
 
 	return &EVMInterpreter{
@@ -175,9 +199,9 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		defer func() {
 			if err != nil {
 				if !logged {
-					in.cfg.Tracer.CaptureState(in.evm, pcCopy, op, gasCopy, cost, callContext, in.returnData, in.evm.depth, err)
+					in.cfg.Tracer.CaptureState(pcCopy, op, gasCopy, cost, callContext, in.returnData, in.evm.depth, err)
 				} else {
-					in.cfg.Tracer.CaptureFault(in.evm, pcCopy, op, gasCopy, cost, callContext, in.evm.depth, err)
+					in.cfg.Tracer.CaptureFault(pcCopy, op, gasCopy, cost, callContext, in.evm.depth, err)
 				}
 			}
 		}()
@@ -186,33 +210,30 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 	// explicit STOP, RETURN or SELFDESTRUCT is executed, an error occurred during
 	// the execution of one of the operations or until the done flag is set by the
 	// parent context.
-	steps := 0
 	for {
-		steps++
-		if steps%1000 == 0 && atomic.LoadInt32(&in.evm.abort) != 0 {
-			break
-		}
 		if in.cfg.Debug {
 			// Capture pre-execution values for tracing.
 			logged, pcCopy, gasCopy = false, pc, contract.Gas
 		}
+<<<<<<< HEAD
 
 		// Clean up the CallGasTemp on every iteration, as you never know how it might be used in the future, causing false positives
 		in.evm.CallGasTemp = 0
 
+=======
+>>>>>>> v1.10.15
 		// Get the operation from the jump table and validate the stack to ensure there are
 		// enough stack items available to perform the operation.
 		op = contract.GetOp(pc)
 		operation := in.cfg.JumpTable[op]
-		if operation == nil {
-			return nil, &ErrInvalidOpCode{opcode: op}
-		}
+		cost = operation.constantGas // For tracing
 		// Validate stack
 		if sLen := stack.len(); sLen < operation.minStack {
 			return nil, &ErrStackUnderflow{stackLen: sLen, required: operation.minStack}
 		} else if sLen > operation.maxStack {
 			return nil, &ErrStackOverflow{stackLen: sLen, limit: operation.maxStack}
 		}
+<<<<<<< HEAD
 		// If the operation is valid, enforce write restrictions
 		if in.readOnly && in.evm.ChainConfig().IsEnabled(in.evm.chainConfig.GetEIP214Transition, in.evm.Context.BlockNumber) {
 			// If the interpreter is operating in readonly mode, make sure no
@@ -250,43 +271,58 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		// Dynamic portion of gas
 		// consume the gas and return an error if not enough gas is available.
 		// cost is explicitly set so that the capture state defer method can get the proper cost
+=======
+		if !contract.UseGas(cost) {
+			return nil, ErrOutOfGas
+		}
+>>>>>>> v1.10.15
 		if operation.dynamicGas != nil {
+			// All ops with a dynamic memory usage also has a dynamic gas cost.
+			var memorySize uint64
+			// calculate the new memory size and expand the memory to fit
+			// the operation
+			// Memory check needs to be done prior to evaluating the dynamic gas portion,
+			// to detect calculation overflows
+			if operation.memorySize != nil {
+				memSize, overflow := operation.memorySize(stack)
+				if overflow {
+					return nil, ErrGasUintOverflow
+				}
+				// memory is expanded in words of 32 bytes. Gas
+				// is also calculated in words.
+				if memorySize, overflow = math.SafeMul(toWordSize(memSize), 32); overflow {
+					return nil, ErrGasUintOverflow
+				}
+			}
+			// Consume the gas and return an error if not enough gas is available.
+			// cost is explicitly set so that the capture state defer method can get the proper cost
 			var dynamicCost uint64
 			dynamicCost, err = operation.dynamicGas(in.evm, contract, stack, mem, memorySize)
-			cost += dynamicCost // total cost, for debug tracing
+			cost += dynamicCost // for tracing
 			if err != nil || !contract.UseGas(dynamicCost) {
 				return nil, ErrOutOfGas
 			}
+			if memorySize > 0 {
+				mem.Resize(memorySize)
+			}
 		}
-		if memorySize > 0 {
-			mem.Resize(memorySize)
-		}
-
 		if in.cfg.Debug {
-			in.cfg.Tracer.CaptureState(in.evm, pc, op, gasCopy, cost, callContext, in.returnData, in.evm.depth, err)
+			in.cfg.Tracer.CaptureState(pc, op, gasCopy, cost, callContext, in.returnData, in.evm.depth, err)
 			logged = true
 		}
-
 		// execute the operation
 		res, err = operation.execute(&pc, in, callContext)
-		// if the operation clears the return data (e.g. it has returning data)
-		// set the last return to the result of the operation.
-		if operation.returns {
-			in.returnData = res
+		if err != nil {
+			break
 		}
-
-		switch {
-		case err != nil:
-			return nil, err
-		case operation.reverts:
-			return res, ErrExecutionReverted
-		case operation.halts:
-			return res, nil
-		case !operation.jumps:
-			pc++
-		}
+		pc++
 	}
-	return nil, nil
+
+	if err == errStopToken {
+		err = nil // clear stop token error
+	}
+
+	return res, err
 }
 
 // CanRun tells if the contract, passed as an argument, can be

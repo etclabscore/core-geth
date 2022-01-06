@@ -115,8 +115,14 @@ var (
 )
 
 const (
+<<<<<<< HEAD
 	rootTTL     = 30 * 60      // 30 min
 	treeNodeTTL = 24 * 60 * 60 // 1 day
+=======
+	rootTTL               = 30 * 60              // 30 min
+	treeNodeTTL           = 4 * 7 * 24 * 60 * 60 // 4 weeks
+	treeNodeTTLCloudflare = 24 * 60 * 60         // 1 day
+>>>>>>> v1.10.15
 )
 
 // dnsSync performs dnsSyncCommand.

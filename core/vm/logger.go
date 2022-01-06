@@ -1,4 +1,4 @@
-// Copyright 2015 The go-ethereum Authors
+// Copyright 2021 The go-ethereum Authors
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -17,14 +17,11 @@
 package vm
 
 import (
-	"encoding/hex"
-	"fmt"
-	"io"
 	"math/big"
-	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+<<<<<<< HEAD
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -98,6 +95,10 @@ func (s *StructLog) ErrorString() string {
 	return ""
 }
 
+=======
+)
+
+>>>>>>> v1.10.15
 // EVMLogger is used to collect execution traces from an EVM transaction
 // execution. CaptureState is called for each step of the VM with the
 // current VM state. CapturePreEVM is called before EVM init, is useful
@@ -107,9 +108,10 @@ func (s *StructLog) ErrorString() string {
 type EVMLogger interface {
 	CapturePreEVM(env *EVM, inputs map[string]interface{})
 	CaptureStart(env *EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int)
-	CaptureState(env *EVM, pc uint64, op OpCode, gas, cost uint64, scope *ScopeContext, rData []byte, depth int, err error)
+	CaptureState(pc uint64, op OpCode, gas, cost uint64, scope *ScopeContext, rData []byte, depth int, err error)
 	CaptureEnter(typ OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int)
 	CaptureExit(output []byte, gasUsed uint64, err error)
+<<<<<<< HEAD
 	CaptureFault(env *EVM, pc uint64, op OpCode, gas, cost uint64, scope *ScopeContext, depth int, err error)
 	CaptureEnd(env *EVM, output []byte, gasUsed uint64, t time.Duration, err error)
 }
@@ -363,3 +365,8 @@ func (t *mdLogger) CaptureEnter(typ OpCode, from common.Address, to common.Addre
 }
 
 func (t *mdLogger) CaptureExit(output []byte, gasUsed uint64, err error) {}
+=======
+	CaptureFault(pc uint64, op OpCode, gas, cost uint64, scope *ScopeContext, depth int, err error)
+	CaptureEnd(output []byte, gasUsed uint64, t time.Duration, err error)
+}
+>>>>>>> v1.10.15

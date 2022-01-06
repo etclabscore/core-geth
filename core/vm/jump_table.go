@@ -17,10 +17,16 @@
 package vm
 
 import (
+<<<<<<< HEAD
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
+=======
+	"fmt"
+
+	"github.com/ethereum/go-ethereum/params"
+>>>>>>> v1.10.15
 )
 
 type (
@@ -43,17 +49,12 @@ type operation struct {
 
 	// memorySize returns the memory size required for the operation
 	memorySize memorySizeFunc
-
-	halts   bool // indicates whether the operation should halt further execution
-	jumps   bool // indicates whether the program counter should not increment
-	writes  bool // determines whether this a state modifying operation
-	reverts bool // determines whether the operation reverts state (implicitly halts)
-	returns bool // determines whether the operations sets the return data content
 }
 
 // JumpTable contains the EVM opcodes supported at a given fork.
 type JumpTable [256]*operation
 
+<<<<<<< HEAD
 // instructionSetForConfig determines an instruction set for the vm using
 // the chain config params and a current block number
 func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpTable {
@@ -70,6 +71,64 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 			memorySize:  memoryDelegateCall,
 			returns:     true,
 		}
+=======
+func validate(jt JumpTable) JumpTable {
+	for i, op := range jt {
+		if op == nil {
+			panic(fmt.Sprintf("op 0x%x is not set", i))
+		}
+		// The interpreter has an assumption that if the memorySize function is
+		// set, then the dynamicGas function is also set. This is a somewhat
+		// arbitrary assumption, and can be removed if we need to -- but it
+		// allows us to avoid a condition check. As long as we have that assumption
+		// in there, this little sanity check prevents us from merging in a
+		// change which violates it.
+		if op.memorySize != nil && op.dynamicGas == nil {
+			panic(fmt.Sprintf("op %v has dynamic memory but not dynamic gas", OpCode(i).String()))
+		}
+	}
+	return jt
+}
+
+// newLondonInstructionSet returns the frontier, homestead, byzantium,
+// contantinople, istanbul, petersburg, berlin and london instructions.
+func newLondonInstructionSet() JumpTable {
+	instructionSet := newBerlinInstructionSet()
+	enable3529(&instructionSet) // EIP-3529: Reduction in refunds https://eips.ethereum.org/EIPS/eip-3529
+	enable3198(&instructionSet) // Base fee opcode https://eips.ethereum.org/EIPS/eip-3198
+	return validate(instructionSet)
+}
+
+// newBerlinInstructionSet returns the frontier, homestead, byzantium,
+// contantinople, istanbul, petersburg and berlin instructions.
+func newBerlinInstructionSet() JumpTable {
+	instructionSet := newIstanbulInstructionSet()
+	enable2929(&instructionSet) // Access lists for trie accesses https://eips.ethereum.org/EIPS/eip-2929
+	return validate(instructionSet)
+}
+
+// newIstanbulInstructionSet returns the frontier, homestead, byzantium,
+// contantinople, istanbul and petersburg instructions.
+func newIstanbulInstructionSet() JumpTable {
+	instructionSet := newConstantinopleInstructionSet()
+
+	enable1344(&instructionSet) // ChainID opcode - https://eips.ethereum.org/EIPS/eip-1344
+	enable1884(&instructionSet) // Reprice reader opcodes - https://eips.ethereum.org/EIPS/eip-1884
+	enable2200(&instructionSet) // Net metered SSTORE - https://eips.ethereum.org/EIPS/eip-2200
+
+	return validate(instructionSet)
+}
+
+// newConstantinopleInstructionSet returns the frontier, homestead,
+// byzantium and contantinople instructions.
+func newConstantinopleInstructionSet() JumpTable {
+	instructionSet := newByzantiumInstructionSet()
+	instructionSet[SHL] = &operation{
+		execute:     opSHL,
+		constantGas: GasFastestStep,
+		minStack:    minStack(2, 1),
+		maxStack:    maxStack(2, 1),
+>>>>>>> v1.10.15
 	}
 	// Tangerine Whistle
 	if config.IsEnabled(config.GetEIP150Transition, bn) {
@@ -97,6 +156,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 			returns:    true,
 		}
 	}
+<<<<<<< HEAD
 	if config.IsEnabled(config.GetEIP214Transition, bn) {
 		instructionSet[STATICCALL] = &operation{
 			execute:     opStaticCall,
@@ -123,6 +183,30 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 			maxStack:    maxStack(3, 0),
 			memorySize:  memoryReturnDataCopy,
 		}
+=======
+	instructionSet[CREATE2] = &operation{
+		execute:     opCreate2,
+		constantGas: params.Create2Gas,
+		dynamicGas:  gasCreate2,
+		minStack:    minStack(4, 1),
+		maxStack:    maxStack(4, 1),
+		memorySize:  memoryCreate2,
+	}
+	return validate(instructionSet)
+}
+
+// newByzantiumInstructionSet returns the frontier, homestead and
+// byzantium instructions.
+func newByzantiumInstructionSet() JumpTable {
+	instructionSet := newSpuriousDragonInstructionSet()
+	instructionSet[STATICCALL] = &operation{
+		execute:     opStaticCall,
+		constantGas: params.CallGasEIP150,
+		dynamicGas:  gasStaticCall,
+		minStack:    minStack(6, 1),
+		maxStack:    maxStack(6, 1),
+		memorySize:  memoryStaticCall,
+>>>>>>> v1.10.15
 	}
 	// Constantinople
 	if config.IsEnabled(config.GetEIP145Transition, bn) {
@@ -157,6 +241,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 			returns:     true,
 		}
 	}
+<<<<<<< HEAD
 	if config.IsEnabled(config.GetEIP1052Transition, bn) {
 		instructionSet[EXTCODEHASH] = &operation{
 			execute:     opExtCodeHash,
@@ -185,19 +270,69 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 	}
 	if config.IsEnabled(config.GetEIP3198Transition, bn) {
 		enable3198(&instructionSet) // BASEFEE opcode
+=======
+	instructionSet[REVERT] = &operation{
+		execute:    opRevert,
+		dynamicGas: gasRevert,
+		minStack:   minStack(2, 0),
+		maxStack:   maxStack(2, 0),
+		memorySize: memoryRevert,
 	}
-	return instructionSet
+	return validate(instructionSet)
 }
 
+// EIP 158 a.k.a Spurious Dragon
+func newSpuriousDragonInstructionSet() JumpTable {
+	instructionSet := newTangerineWhistleInstructionSet()
+	instructionSet[EXP].dynamicGas = gasExpEIP158
+	return validate(instructionSet)
+
+}
+
+// EIP 150 a.k.a Tangerine Whistle
+func newTangerineWhistleInstructionSet() JumpTable {
+	instructionSet := newHomesteadInstructionSet()
+	instructionSet[BALANCE].constantGas = params.BalanceGasEIP150
+	instructionSet[EXTCODESIZE].constantGas = params.ExtcodeSizeGasEIP150
+	instructionSet[SLOAD].constantGas = params.SloadGasEIP150
+	instructionSet[EXTCODECOPY].constantGas = params.ExtcodeCopyBaseEIP150
+	instructionSet[CALL].constantGas = params.CallGasEIP150
+	instructionSet[CALLCODE].constantGas = params.CallGasEIP150
+	instructionSet[DELEGATECALL].constantGas = params.CallGasEIP150
+	return validate(instructionSet)
+}
+
+// newHomesteadInstructionSet returns the frontier and homestead
+// instructions that can be executed during the homestead phase.
+func newHomesteadInstructionSet() JumpTable {
+	instructionSet := newFrontierInstructionSet()
+	instructionSet[DELEGATECALL] = &operation{
+		execute:     opDelegateCall,
+		dynamicGas:  gasDelegateCall,
+		constantGas: params.CallGasFrontier,
+		minStack:    minStack(6, 1),
+		maxStack:    maxStack(6, 1),
+		memorySize:  memoryDelegateCall,
+>>>>>>> v1.10.15
+	}
+	return validate(instructionSet)
+}
+
+<<<<<<< HEAD
 // newBaseInstructionSet returns Frontier instructions
 func newBaseInstructionSet() JumpTable {
 	return JumpTable{
+=======
+// newFrontierInstructionSet returns the frontier instructions
+// that can be executed during the frontier phase.
+func newFrontierInstructionSet() JumpTable {
+	tbl := JumpTable{
+>>>>>>> v1.10.15
 		STOP: {
 			execute:     opStop,
 			constantGas: 0,
 			minStack:    minStack(0, 0),
 			maxStack:    maxStack(0, 0),
-			halts:       true,
 		},
 		ADD: {
 			execute:     opAdd,
@@ -331,13 +466,20 @@ func newBaseInstructionSet() JumpTable {
 			minStack:    minStack(2, 1),
 			maxStack:    maxStack(2, 1),
 		},
+<<<<<<< HEAD
 		SHA3: {
 			execute:     opSha3,
 			constantGas: vars.Sha3Gas,
 			dynamicGas:  gasSha3,
+=======
+		KECCAK256: {
+			execute:     opKeccak256,
+			constantGas: params.Keccak256Gas,
+			dynamicGas:  gasKeccak256,
+>>>>>>> v1.10.15
 			minStack:    minStack(2, 1),
 			maxStack:    maxStack(2, 1),
-			memorySize:  memorySha3,
+			memorySize:  memoryKeccak256,
 		},
 		ADDRESS: {
 			execute:     opAddress,
@@ -500,21 +642,18 @@ func newBaseInstructionSet() JumpTable {
 			dynamicGas: gasSStore,
 			minStack:   minStack(2, 0),
 			maxStack:   maxStack(2, 0),
-			writes:     true,
 		},
 		JUMP: {
 			execute:     opJump,
 			constantGas: GasMidStep,
 			minStack:    minStack(1, 0),
 			maxStack:    maxStack(1, 0),
-			jumps:       true,
 		},
 		JUMPI: {
 			execute:     opJumpi,
 			constantGas: GasSlowStep,
 			minStack:    minStack(2, 0),
 			maxStack:    maxStack(2, 0),
-			jumps:       true,
 		},
 		PC: {
 			execute:     opPc,
@@ -930,7 +1069,6 @@ func newBaseInstructionSet() JumpTable {
 			minStack:   minStack(2, 0),
 			maxStack:   maxStack(2, 0),
 			memorySize: memoryLog,
-			writes:     true,
 		},
 		LOG1: {
 			execute:    makeLog(1),
@@ -938,7 +1076,6 @@ func newBaseInstructionSet() JumpTable {
 			minStack:   minStack(3, 0),
 			maxStack:   maxStack(3, 0),
 			memorySize: memoryLog,
-			writes:     true,
 		},
 		LOG2: {
 			execute:    makeLog(2),
@@ -946,7 +1083,6 @@ func newBaseInstructionSet() JumpTable {
 			minStack:   minStack(4, 0),
 			maxStack:   maxStack(4, 0),
 			memorySize: memoryLog,
-			writes:     true,
 		},
 		LOG3: {
 			execute:    makeLog(3),
@@ -954,7 +1090,6 @@ func newBaseInstructionSet() JumpTable {
 			minStack:   minStack(5, 0),
 			maxStack:   maxStack(5, 0),
 			memorySize: memoryLog,
-			writes:     true,
 		},
 		LOG4: {
 			execute:    makeLog(4),
@@ -962,7 +1097,6 @@ func newBaseInstructionSet() JumpTable {
 			minStack:   minStack(6, 0),
 			maxStack:   maxStack(6, 0),
 			memorySize: memoryLog,
-			writes:     true,
 		},
 		CREATE: {
 			execute:     opCreate,
@@ -971,8 +1105,6 @@ func newBaseInstructionSet() JumpTable {
 			minStack:    minStack(3, 1),
 			maxStack:    maxStack(3, 1),
 			memorySize:  memoryCreate,
-			writes:      true,
-			returns:     true,
 		},
 		CALL: {
 			execute:     opCall,
@@ -981,7 +1113,6 @@ func newBaseInstructionSet() JumpTable {
 			minStack:    minStack(7, 1),
 			maxStack:    maxStack(7, 1),
 			memorySize:  memoryCall,
-			returns:     true,
 		},
 		CALLCODE: {
 			execute:     opCallCode,
@@ -990,7 +1121,6 @@ func newBaseInstructionSet() JumpTable {
 			minStack:    minStack(7, 1),
 			maxStack:    maxStack(7, 1),
 			memorySize:  memoryCall,
-			returns:     true,
 		},
 		RETURN: {
 			execute:    opReturn,
@@ -998,15 +1128,21 @@ func newBaseInstructionSet() JumpTable {
 			minStack:   minStack(2, 0),
 			maxStack:   maxStack(2, 0),
 			memorySize: memoryReturn,
-			halts:      true,
 		},
 		SELFDESTRUCT: {
-			execute:    opSuicide,
+			execute:    opSelfdestruct,
 			dynamicGas: gasSelfdestruct,
 			minStack:   minStack(1, 0),
 			maxStack:   maxStack(1, 0),
-			halts:      true,
-			writes:     true,
 		},
 	}
+
+	// Fill all unassigned slots with opUndefined.
+	for i, entry := range tbl {
+		if entry == nil {
+			tbl[i] = &operation{execute: opUndefined, maxStack: maxStack(0, 0)}
+		}
+	}
+
+	return validate(tbl)
 }

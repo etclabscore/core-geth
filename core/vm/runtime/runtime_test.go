@@ -34,7 +34,15 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/eth/tracers"
+<<<<<<< HEAD
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
+=======
+	"github.com/ethereum/go-ethereum/eth/tracers/logger"
+	"github.com/ethereum/go-ethereum/params"
+
+	// force-load js tracers to trigger registration
+	_ "github.com/ethereum/go-ethereum/eth/tracers/js"
+>>>>>>> v1.10.15
 )
 
 func TestDefaults(t *testing.T) {
@@ -322,18 +330,27 @@ func TestBlockhash(t *testing.T) {
 }
 
 type stepCounter struct {
-	inner *vm.JSONLogger
+	inner *logger.JSONLogger
 	steps int
 }
 
 func (s *stepCounter) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {
 }
 
+<<<<<<< HEAD
 func (s *stepCounter) CaptureStart(from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) error {
 	return nil
 }
 
 func (s *stepCounter) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, memory *vm.Memory, stack *vm.Stack, rData []byte, contract *vm.Contract, depth int, err error) error {
+=======
+func (s *stepCounter) CaptureFault(pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, depth int, err error) {
+}
+
+func (s *stepCounter) CaptureEnd(output []byte, gasUsed uint64, t time.Duration, err error) {}
+
+func (s *stepCounter) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, rData []byte, depth int, err error) {
+>>>>>>> v1.10.15
 	s.steps++
 	// Enable this for more output
 	//s.inner.CaptureState(env, pc, op, gas, cost, memory, stack, rStack, contract, depth, err)
@@ -496,7 +513,7 @@ func BenchmarkSimpleLoop(b *testing.B) {
 		byte(vm.JUMP),
 	}
 
-	//tracer := vm.NewJSONLogger(nil, os.Stdout)
+	//tracer := logger.NewJSONLogger(nil, os.Stdout)
 	//Execute(loopingCode, nil, &Config{
 	//	EVMConfig: vm.Config{
 	//		Debug:  true,
@@ -517,7 +534,7 @@ func BenchmarkSimpleLoop(b *testing.B) {
 // TestEip2929Cases contains various testcases that are used for
 // EIP-2929 about gas repricings
 func TestEip2929Cases(t *testing.T) {
-
+	t.Skip("Test only useful for generating documentation")
 	id := 1
 	prettyPrint := func(comment string, code []byte) {
 
@@ -539,7 +556,7 @@ func TestEip2929Cases(t *testing.T) {
 		Execute(code, nil, &Config{
 			EVMConfig: vm.Config{
 				Debug:     true,
-				Tracer:    vm.NewMarkdownLogger(nil, os.Stdout),
+				Tracer:    logger.NewMarkdownLogger(nil, os.Stdout),
 				ExtraEips: []int{2929},
 			},
 		})
@@ -689,7 +706,7 @@ func TestColdAccountAccessCost(t *testing.T) {
 			want: 7600,
 		},
 	} {
-		tracer := vm.NewStructLogger(nil)
+		tracer := logger.NewStructLogger(nil)
 		Execute(tc.code, nil, &Config{
 			EVMConfig: vm.Config{
 				Debug:  true,

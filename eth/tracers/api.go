@@ -38,6 +38,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/eth/tracers/logger"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/log"
@@ -167,27 +168,42 @@ func (api *API) blockByNumberAndHash(ctx context.Context, number rpc.BlockNumber
 
 // TraceConfig holds extra parameters to trace functions.
 type TraceConfig struct {
+<<<<<<< HEAD
 	*vm.LogConfig
 	Tracer            *string
 	Timeout           *string
 	Reexec            *uint64
 	NestedTraceOutput bool // Returns the trace output JSON nested under the trace name key. This allows full Parity compatibility to be achieved.
+=======
+	*logger.Config
+	Tracer  *string
+	Timeout *string
+	Reexec  *uint64
+>>>>>>> v1.10.15
 }
 
 // TraceCallConfig is the config for traceCall API. It holds one more
 // field to override the state for tracing.
 type TraceCallConfig struct {
+<<<<<<< HEAD
 	*vm.LogConfig
 	Tracer            *string
 	Timeout           *string
 	Reexec            *uint64
 	NestedTraceOutput bool // Returns the trace output JSON nested under the trace name key. This allows full Parity compatibility to be achieved.
 	StateOverrides    *ethapi.StateOverride
+=======
+	*logger.Config
+	Tracer         *string
+	Timeout        *string
+	Reexec         *uint64
+	StateOverrides *ethapi.StateOverride
+>>>>>>> v1.10.15
 }
 
 // StdTraceConfig holds extra parameters to standard-json trace functions.
 type StdTraceConfig struct {
-	vm.LogConfig
+	logger.Config
 	Reexec *uint64
 	TxHash common.Hash
 }
@@ -687,11 +703,11 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 	}
 	// Retrieve the tracing configurations, or use default values
 	var (
-		logConfig vm.LogConfig
+		logConfig logger.Config
 		txHash    common.Hash
 	)
 	if config != nil {
-		logConfig = config.LogConfig
+		logConfig = config.Config
 		txHash = config.TxHash
 	}
 	logConfig.Debug = true
@@ -711,6 +727,7 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 	// Therefore, it's perfectly valid to specify `"futureForkBlock": 0`, to enable `futureFork`
 
 	if config != nil && config.Overrides != nil {
+<<<<<<< HEAD
 		overrideEIP2929 := config.Overrides.GetEIP2929Transition()
 		existingEIP2929 := chainConfig.GetEIP2929Transition()
 
@@ -730,6 +747,15 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 			if err := chainConfig.SetEIP2929Transition(overrideEIP2929); err != nil {
 				return nil, err
 			}
+=======
+		// Copy the config, to not screw up the main config
+		// Note: the Clique-part is _not_ deep copied
+		chainConfigCopy := new(params.ChainConfig)
+		*chainConfigCopy = *chainConfig
+		chainConfig = chainConfigCopy
+		if berlin := config.Config.Overrides.BerlinBlock; berlin != nil {
+			chainConfig.BerlinBlock = berlin
+>>>>>>> v1.10.15
 			canon = false
 		}
 	}
@@ -760,7 +786,7 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 			writer = bufio.NewWriter(dump)
 			vmConf = vm.Config{
 				Debug:                   true,
-				Tracer:                  vm.NewJSONLogger(&logConfig, writer),
+				Tracer:                  logger.NewJSONLogger(&logConfig, writer),
 				EnablePreimageRecording: true,
 			}
 		}
@@ -946,8 +972,16 @@ func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.TransactionArgs,
 	}
 	// Apply the customized state rules if required.
 	if config != nil {
+<<<<<<< HEAD
 		if err := config.StateOverrides.Apply(statedb); err != nil {
 			return nil, err
+=======
+		traceConfig = &TraceConfig{
+			Config:  config.Config,
+			Tracer:  config.Tracer,
+			Timeout: config.Timeout,
+			Reexec:  config.Reexec,
+>>>>>>> v1.10.15
 		}
 	}
 
@@ -1029,7 +1063,7 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 	)
 	switch {
 	case config == nil:
-		tracer = vm.NewStructLogger(nil)
+		tracer = logger.NewStructLogger(nil)
 	case config.Tracer != nil:
 		// Define a meaningful timeout of a single transaction trace
 		timeout := defaultTraceTimeout
@@ -1052,7 +1086,7 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 			tracer = t
 		}
 	default:
-		tracer = vm.NewStructLogger(config.LogConfig)
+		tracer = logger.NewStructLogger(config.Config)
 	}
 	// Run the transaction with tracing enabled.
 	vmenv := vm.NewEVM(vmctx, txContext, statedb, api.backend.ChainConfig(), vm.Config{Debug: true, Tracer: tracer, NoBaseFee: true})
@@ -1094,7 +1128,7 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 
 	// Depending on the tracer type, format and return the output.
 	switch tracer := tracer.(type) {
-	case *vm.StructLogger:
+	case *logger.StructLogger:
 		// If the result contains a revert reason, return it.
 		returnVal := fmt.Sprintf("%x", result.Return())
 		if len(result.Revert()) > 0 {

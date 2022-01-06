@@ -92,7 +92,7 @@ func DefaultGoerliGenesisBlock() *genesisT.Genesis {
 
 // DeveloperGenesisBlock returns the 'geth --dev' genesis block. Note, this must
 // be seeded with the
-func DeveloperGenesisBlock(period uint64, faucet common.Address, useEthash bool) *genesisT.Genesis {
+func DeveloperGenesisBlock(period uint64, gasLimit uint64, faucet common.Address, useEthash bool) *genesisT.Genesis {
 	if !useEthash {
 		// Make a copy to avoid unpredicted contamination.
 		config := &goethereum.ChainConfig{}
@@ -104,7 +104,7 @@ func DeveloperGenesisBlock(period uint64, faucet common.Address, useEthash bool)
 		return &genesisT.Genesis{
 			Config:     config,
 			ExtraData:  append(append(make([]byte, 32), faucet[:]...), make([]byte, crypto.SignatureLength)...),
-			GasLimit:   6283185,
+			GasLimit:   gasLimit,
 			BaseFee:    big.NewInt(vars.InitialBaseFee),
 			Difficulty: big.NewInt(1),
 			Alloc: map[common.Address]genesisT.GenesisAccount{

@@ -83,6 +83,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.DeveloperFlag,
 			utils.DeveloperPeriodFlag,
 			utils.DeveloperPoWFlag,
+			utils.DeveloperGasLimitFlag,
 		},
 	},
 	{

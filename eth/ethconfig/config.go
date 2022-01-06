@@ -27,6 +27,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/consensus/beacon"
 	"github.com/ethereum/go-ethereum/consensus/clique"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/consensus/lyra2"
@@ -226,49 +227,54 @@ type Config struct {
 
 	// Arrow Glacier block override (TODO: remove after the fork)
 	OverrideArrowGlacier *big.Int `toml:",omitempty"`
+
+	// OverrideTerminalTotalDifficulty (TODO: remove after the fork)
+	OverrideTerminalTotalDifficulty *big.Int `toml:",omitempty"`
 }
 
 // CreateConsensusEngine creates a consensus engine for the given chain configuration.
 func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurator, config *ethash.Config, notify []string, noverify bool, db ethdb.Database) consensus.Engine {
 	// If proof-of-authority is requested, set it up
+	var engine consensus.Engine
 	if chainConfig.GetConsensusEngineType().IsClique() {
-		return clique.New(&ctypes.CliqueConfig{
+		engine = clique.New(&ctypes.CliqueConfig{
 			Period: chainConfig.GetCliquePeriod(),
 			Epoch:  chainConfig.GetCliqueEpoch(),
 		}, db)
+	} else if chainConfig.GetConsensusEngineType().IsLyra2() {
+		engine = lyra2.New(notify, noverify)
+	} else {
+		// Otherwise assume proof-of-work
+		switch config.PowMode {
+		case ethash.ModeFake:
+			log.Warn("Ethash used in fake mode")
+			return ethash.NewFaker()
+		case ethash.ModeTest:
+			log.Warn("Ethash used in test mode")
+			return ethash.NewTester(nil, noverify)
+		case ethash.ModeShared:
+			log.Warn("Ethash used in shared mode")
+			return ethash.NewShared()
+		case ethash.ModePoissonFake:
+			log.Warn("Ethash used in fake Poisson mode")
+			return ethash.NewPoissonFaker()
+		default:
+			engine = ethash.New(ethash.Config{
+				PowMode:          config.PowMode,
+				CacheDir:         stack.ResolvePath(config.CacheDir),
+				CachesInMem:      config.CachesInMem,
+				CachesOnDisk:     config.CachesOnDisk,
+				CachesLockMmap:   config.CachesLockMmap,
+				DatasetDir:       config.DatasetDir,
+				DatasetsInMem:    config.DatasetsInMem,
+				DatasetsOnDisk:   config.DatasetsOnDisk,
+				DatasetsLockMmap: config.DatasetsLockMmap,
+				NotifyFull:       config.NotifyFull,
+				ECIP1099Block:    chainConfig.GetEthashECIP1099Transition(),
+			}, notify, noverify)
+			engine.(*ethash.Ethash).SetThreads(-1) // Disable CPU mining
+		}
 	}
-	if chainConfig.GetConsensusEngineType().IsLyra2() {
-		return lyra2.New(notify, noverify)
-	}
-	// Otherwise assume proof-of-work
-	switch config.PowMode {
-	case ethash.ModeFake:
-		log.Warn("Ethash used in fake mode")
-		return ethash.NewFaker()
-	case ethash.ModeTest:
-		log.Warn("Ethash used in test mode")
-		return ethash.NewTester(nil, noverify)
-	case ethash.ModeShared:
-		log.Warn("Ethash used in shared mode")
-		return ethash.NewShared()
-	case ethash.ModePoissonFake:
-		log.Warn("Ethash used in fake Poisson mode")
-		return ethash.NewPoissonFaker()
-	default:
-		engine := ethash.New(ethash.Config{
-			PowMode:          config.PowMode,
-			CacheDir:         stack.ResolvePath(config.CacheDir),
-			CachesInMem:      config.CachesInMem,
-			CachesOnDisk:     config.CachesOnDisk,
-			CachesLockMmap:   config.CachesLockMmap,
-			DatasetDir:       config.DatasetDir,
-			DatasetsInMem:    config.DatasetsInMem,
-			DatasetsOnDisk:   config.DatasetsOnDisk,
-			DatasetsLockMmap: config.DatasetsLockMmap,
-			NotifyFull:       config.NotifyFull,
-			ECIP1099Block:    chainConfig.GetEthashECIP1099Transition(),
-		}, notify, noverify)
-		engine.SetThreads(-1) // Disable CPU mining
-		return engine
-	}
+
+	return beacon.New(engine)
 }

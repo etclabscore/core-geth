@@ -37,6 +37,8 @@ import (
 // TestCreation tests that different genesis and fork rule combinations result in
 // the correct fork ID.
 func TestCreation(t *testing.T) {
+	mergeConfig := *params.MainnetChainConfig
+	mergeConfig.MergeForkBlock = big.NewInt(15000000)
 	type testcase struct {
 		head uint64
 		want ID
@@ -75,7 +77,7 @@ func TestCreation(t *testing.T) {
 				{12964999, ID{Hash: checksumToBytes(0x0eb440f6), Next: 12965000}}, // Last Berlin block
 				{12965000, ID{Hash: checksumToBytes(0xb715077d), Next: 13773000}}, // First London block
 				{13772999, ID{Hash: checksumToBytes(0xb715077d), Next: 13773000}}, // Last London block
-				{13773000, ID{Hash: checksumToBytes(0x20c327fc), Next: 0}},        /// First Arrow Glacier block
+				{13773000, ID{Hash: checksumToBytes(0x20c327fc), Next: 0}},        // First Arrow Glacier block
 				{20000000, ID{Hash: checksumToBytes(0x20c327fc), Next: 0}},        // Future Arrow Glacier block
 			},
 		},

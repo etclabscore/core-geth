@@ -45,6 +45,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 type nodetype int
@@ -76,7 +77,7 @@ func (typ nodetype) String() string {
 
 var (
 	// transitionDifficulty is the target total difficulty for transition
-	transitionDifficulty = new(big.Int).Mul(big.NewInt(20), params.MinimumDifficulty)
+	transitionDifficulty = new(big.Int).Mul(big.NewInt(20), vars.MinimumDifficulty)
 
 	// blockInterval is the time interval for creating a new eth2 block
 	blockInterval    = time.Second * 3
@@ -407,12 +408,12 @@ func main() {
 // faucet accounts.
 func makeGenesis(faucets []*ecdsa.PrivateKey) *core.Genesis {
 	genesis := core.DefaultRopstenGenesisBlock()
-	genesis.Difficulty = params.MinimumDifficulty
+	genesis.Difficulty = vars.MinimumDifficulty
 	genesis.GasLimit = 25000000
 
 	genesis.Config.ChainID = big.NewInt(18)
 	genesis.Config.EIP150Hash = common.Hash{}
-	genesis.BaseFee = big.NewInt(params.InitialBaseFee)
+	genesis.BaseFee = big.NewInt(vars.InitialBaseFee)
 	genesis.Config.TerminalTotalDifficulty = transitionDifficulty
 
 	genesis.Alloc = core.GenesisAlloc{}

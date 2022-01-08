@@ -199,13 +199,13 @@ var genesis = &core.Genesis{
 	Alloc:     core.GenesisAlloc{testAddr: {Balance: testBalance}},
 	ExtraData: []byte("test genesis"),
 	Timestamp: 9000,
-	BaseFee:   big.NewInt(params.InitialBaseFee),
+	BaseFee:   big.NewInt(vars.InitialBaseFee),
 }
 
 var testTx1 = types.MustSignNewTx(testKey, types.LatestSigner(genesis.Config), &types.LegacyTx{
 	Nonce:    0,
 	Value:    big.NewInt(12),
-	GasPrice: big.NewInt(params.InitialBaseFee),
+	GasPrice: big.NewInt(vars.InitialBaseFee),
 	Gas:      params.TxGas,
 	To:       &common.Address{2},
 })
@@ -213,7 +213,7 @@ var testTx1 = types.MustSignNewTx(testKey, types.LatestSigner(genesis.Config), &
 var testTx2 = types.MustSignNewTx(testKey, types.LatestSigner(genesis.Config), &types.LegacyTx{
 	Nonce:    1,
 	Value:    big.NewInt(8),
-	GasPrice: big.NewInt(params.InitialBaseFee),
+	GasPrice: big.NewInt(vars.InitialBaseFee),
 	Gas:      params.TxGas,
 	To:       &common.Address{2},
 })

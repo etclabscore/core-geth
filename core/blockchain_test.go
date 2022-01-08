@@ -2236,7 +2236,7 @@ func testInsertKnownChainDataWithMerging(t *testing.T, typ string, mergeHeight i
 	chainConfig := *params.TestChainConfig
 	var (
 		db        = rawdb.NewMemoryDatabase()
-		genesis   = (&Genesis{BaseFee: big.NewInt(params.InitialBaseFee), Config: &chainConfig}).MustCommit(db)
+		genesis   = (&Genesis{BaseFee: big.NewInt(vars.InitialBaseFee), Config: &chainConfig}).MustCommit(db)
 		runMerger = consensus.NewMerger(db)
 		runEngine = beacon.New(ethash.NewFaker())
 		genEngine = beacon.New(ethash.NewFaker())
@@ -2276,7 +2276,7 @@ func testInsertKnownChainDataWithMerging(t *testing.T, typ string, mergeHeight i
 	if err != nil {
 		t.Fatalf("failed to create temp freezer db: %v", err)
 	}
-	(&Genesis{BaseFee: big.NewInt(params.InitialBaseFee)}).MustCommit(chaindb)
+	(&Genesis{BaseFee: big.NewInt(vars.InitialBaseFee)}).MustCommit(chaindb)
 	defer os.RemoveAll(dir)
 
 	chain, err := NewBlockChain(chaindb, nil, &chainConfig, runEngine, vm.Config{}, nil, nil)

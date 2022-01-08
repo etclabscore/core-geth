@@ -32,6 +32,7 @@ const (
 	FreezerMethodHasAncient       = "freezer_hasAncient"
 	FreezerMethodAncient          = "freezer_ancient"
 	FreezerMethodAncients         = "freezer_ancients"
+	FreezerMethodAncientRange     = "freezer_ancientRange"
 	FreezerMethodAncientSize      = "freezer_ancientSize"
 	FreezerMethodAppendAncient    = "freezer_appendAncient"
 	FreezerMethodModifyAncients   = "freezer_modifyAncients"
@@ -87,6 +88,12 @@ func (api *FreezerRemoteClient) Ancient(kind string, number uint64) ([]byte, err
 func (api *FreezerRemoteClient) Ancients() (uint64, error) {
 	var res uint64
 	err := api.client.Call(&res, FreezerMethodAncients)
+	return res, err
+}
+
+func (api *FreezerRemoteClient) AncientRange(kind string, start, count, maxBytes uint64) ([][]byte, error) {
+	var res [][]byte
+	err := api.client.Call(&res, FreezerMethodAncientRange)
 	return res, err
 }
 

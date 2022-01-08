@@ -32,6 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
 	fuzz "github.com/google/gofuzz"
 )
@@ -62,11 +63,11 @@ func getChain() *core.BlockChain {
 		}
 		ga[common.BytesToAddress(a)] = acc
 	}
-	gspec := core.Genesis{
+	gspec := genesisT.Genesis{
 		Config: params.TestChainConfig,
 		Alloc:  ga,
 	}
-	genesis := gspec.MustCommit(db)
+	genesis := core.MustCommitGenesis(rawdb.NewMemoryDatabase(), &gspec)
 	blocks, _ := core.GenerateChain(gspec.Config, genesis, ethash.NewFaker(), db, 2,
 		func(i int, gen *core.BlockGen) {})
 	cacheConf := &core.CacheConfig{

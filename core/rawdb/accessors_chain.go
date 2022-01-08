@@ -704,7 +704,7 @@ func deriveLogFields(receipts []*receiptLogs, hash common.Hash, number uint64, t
 // ReadLogs retrieves the logs for all transactions in a block. The log fields
 // are populated with metadata. In case the receipts or the block body
 // are not found, a nil is returned.
-func ReadLogs(db ethdb.Reader, hash common.Hash, number uint64, config *params.ChainConfig) [][]*types.Log {
+func ReadLogs(db ethdb.Reader, hash common.Hash, number uint64, config ctypes.ChainConfigurator) [][]*types.Log {
 	// Retrieve the flattened receipt slice
 	data := ReadReceiptsRLP(db, hash, number)
 	if len(data) == 0 {
@@ -740,7 +740,7 @@ func ReadLogs(db ethdb.Reader, hash common.Hash, number uint64, config *params.C
 // readLegacyLogs is a temporary workaround for when trying to read logs
 // from a block which has its receipt stored in the legacy format. It'll
 // be removed after users have migrated their freezer databases.
-func readLegacyLogs(db ethdb.Reader, hash common.Hash, number uint64, config *params.ChainConfig) [][]*types.Log {
+func readLegacyLogs(db ethdb.Reader, hash common.Hash, number uint64, config ctypes.ChainConfigurator) [][]*types.Log {
 	receipts := ReadReceipts(db, hash, number, config)
 	if receipts == nil {
 		return nil

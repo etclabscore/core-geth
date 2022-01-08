@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/fdlimit"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/eth"
@@ -204,7 +205,7 @@ func newNodeManager(genesis *genesisT.Genesis) *nodeManager {
 	return &nodeManager{
 		close:        make(chan struct{}),
 		genesis:      genesis,
-		genesisBlock: genesis.ToBlock(nil),
+		genesisBlock: core.MustCommitGenesis(rawdb.NewMemoryDatabase(), genesis),
 	}
 }
 
@@ -357,6 +358,7 @@ func main() {
 		faucets[i], _ = crypto.GenerateKey()
 	}
 	// Pre-generate the ethash mining DAG so we don't race
+	// 30000 is the default Ethash epoch length. 60000 is the ETChash epoch length after ECIP1099.
 	ethash.MakeDataset(1, ethash.CalcEpochLength(0, nil), ethconfig.Defaults.Ethash.DatasetDir)
 
 	// Create an Ethash network based off of the Ropsten config
@@ -411,11 +413,9 @@ func makeGenesis(faucets []*ecdsa.PrivateKey) *genesisT.Genesis {
 	genesis.Difficulty = vars.MinimumDifficulty
 	genesis.GasLimit = 25000000
 
-	genesis.SetChainID(big.NewInt(18))
-	// genesis.Config.EIP150Hash = common.Hash{}
-
+	genesis.Config.SetChainID(big.NewInt(18))
 	genesis.BaseFee = big.NewInt(vars.InitialBaseFee)
-	genesis.SetEthashTerminalTotalDifficulty(transitionDifficulty)
+	genesis.Config.SetEthashTerminalTotalDifficulty(transitionDifficulty)
 
 	genesis.Alloc = genesisT.GenesisAlloc{}
 	for _, faucet := range faucets {
@@ -448,7 +448,7 @@ func makeFullNode(genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, *cataly
 	}
 	econfig := &ethconfig.Config{
 		Genesis:         genesis,
-		NetworkId:       genesis.Config.ChainID.Uint64(),
+		NetworkId:       genesis.Config.GetChainID().Uint64(),
 		SyncMode:        downloader.FullSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,
@@ -499,7 +499,7 @@ func makeLightNode(genesis *genesisT.Genesis) (*node.Node, *les.LightEthereum, *
 	}
 	lesBackend, err := les.New(stack, &ethconfig.Config{
 		Genesis:         genesis,
-		NetworkId:       genesis.Config.ChainID.Uint64(),
+		NetworkId:       genesis.Config.GetChainID().Uint64(),
 		SyncMode:        downloader.LightSync,
 		DatabaseCache:   256,
 		DatabaseHandles: 256,

@@ -174,10 +174,10 @@ func (b *BlockGen) AddUncle(h *types.Header) {
 
 	// The gas limit and price should be derived from the parent
 	h.GasLimit = parent.GasLimit
-	if b.config.IsLondon(h.Number) {
+	if b.config.IsEnabled(b.config.GetEIP1559Transition, h.Number) {
 		h.BaseFee = misc.CalcBaseFee(b.config, parent)
-		if !b.config.IsLondon(parent.Number) {
-			parentGasLimit := parent.GasLimit * params.ElasticityMultiplier
+		if !b.config.IsEnabled(b.config.GetEIP1559Transition, parent.Number) {
+			parentGasLimit := parent.GasLimit * vars.ElasticityMultiplier
 			h.GasLimit = CalcGasLimit(parentGasLimit, parentGasLimit)
 		}
 	}
@@ -235,7 +235,7 @@ func GenerateChain(config ctypes.ChainConfigurator, parent *types.Block, engine 
 		// to a chain, so the difficulty will be left unset (nil). Set it here to the
 		// correct value.
 		if b.header.Difficulty == nil {
-			if config.TerminalTotalDifficulty == nil {
+			if config.GetEthashTerminalTotalDifficulty() == nil {
 				// Clique chain
 				b.header.Difficulty = big.NewInt(2)
 			} else {

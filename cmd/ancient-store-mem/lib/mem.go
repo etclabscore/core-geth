@@ -88,6 +88,15 @@ func (f *MemFreezerRemoteServerAPI) Ancients() (uint64, error) {
 	return f.count, nil
 }
 
+func (f *MemFreezerRemoteServerAPI) AncientRange(kind string, start, count, maxBytes uint64) ([][]byte, error) {
+	res := make([][]byte, 0)
+	// fmt.Println("mock server called", "method=Ancients")
+	for i := uint64(0); i < count; i++ {
+		res = append(res, f.store[f.storeKey(kind, start+i)][:maxBytes])
+	}
+	return res, nil
+}
+
 func (f *MemFreezerRemoteServerAPI) AncientSize(kind string) (uint64, error) {
 	// fmt.Println("mock server called", "method=AncientSize")
 	sum := uint64(0)

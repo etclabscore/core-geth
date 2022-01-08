@@ -74,6 +74,12 @@ func (t *table) Ancients() (uint64, error) {
 	return t.db.Ancients()
 }
 
+// AncientRange is a noop passthrough that just forwards the request to the underlying
+// database.
+func (t *table) AncientRange(kind string, start, count, maxBytes uint64) ([][]byte, error) {
+	return t.db.AncientRange(kind, start, count, maxBytes)
+}
+
 // AncientSize is a noop passthrough that just forwards the request to the underlying
 // database.
 func (t *table) AncientSize(kind string) (uint64, error) {

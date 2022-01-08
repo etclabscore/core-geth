@@ -365,12 +365,12 @@ func (beacon *Beacon) SetThreads(threads int) {
 // It depends on the parentHash already being stored in the database.
 // If the parentHash is not stored in the database a UnknownAncestor error is returned.
 func IsTTDReached(chain consensus.ChainHeaderReader, parentHash common.Hash, number uint64) (bool, error) {
-	if chain.Config().TerminalTotalDifficulty == nil {
+	if chain.Config().GetEthashTerminalTotalDifficulty() == nil {
 		return false, nil
 	}
 	td := chain.GetTd(parentHash, number)
 	if td == nil {
 		return false, consensus.ErrUnknownAncestor
 	}
-	return td.Cmp(chain.Config().TerminalTotalDifficulty) >= 0, nil
+	return td.Cmp(chain.Config().GetEthashTerminalTotalDifficulty()) >= 0, nil
 }

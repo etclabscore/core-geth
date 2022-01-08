@@ -2272,7 +2272,11 @@ func (bc *BlockChain) SetChainHead(newBlock *types.Block) error {
 
 	// Run the reorg if necessary and set the given block as new head.
 	if newBlock.ParentHash() != bc.CurrentBlock().Hash() {
-		if err := bc.reorg(bc.CurrentBlock(), newBlock); err != nil {
+		d := bc.getReorgData(bc.CurrentBlock(), newBlock)
+		if d.err != nil {
+			return d.err
+		}
+		if err := bc.reorg(d); err != nil {
 			return err
 		}
 	}

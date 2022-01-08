@@ -587,7 +587,7 @@ func TestTracingWithOverrides(t *testing.T) {
 	t.Parallel()
 	// Initialize test accounts
 	accounts := newAccounts(3)
-	genesis := &core.Genesis{Alloc: core.GenesisAlloc{
+	genesis := &core.Genesis{Alloc: genesisT.GenesisAlloc{
 		accounts[0].addr: {Balance: big.NewInt(params.Ether)},
 		accounts[1].addr: {Balance: big.NewInt(params.Ether)},
 		accounts[2].addr: {Balance: big.NewInt(params.Ether)},

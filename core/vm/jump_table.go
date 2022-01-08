@@ -17,13 +17,11 @@
 package vm
 
 import (
+	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
-	"fmt"
-
-	"github.com/ethereum/go-ethereum/params"
 )
 
 type (
@@ -83,7 +81,6 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 			minStack:    minStack(6, 1),
 			maxStack:    maxStack(6, 1),
 			memorySize:  memoryDelegateCall,
-			returns:     true,
 		}
 	}
 	// Tangerine Whistle
@@ -108,8 +105,6 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 			minStack:   minStack(2, 0),
 			maxStack:   maxStack(2, 0),
 			memorySize: memoryRevert,
-			reverts:    true,
-			returns:    true,
 		}
 	}
 	if config.IsEnabled(config.GetEIP214Transition, bn) {
@@ -120,7 +115,6 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 			minStack:    minStack(6, 1),
 			maxStack:    maxStack(6, 1),
 			memorySize:  memoryStaticCall,
-			returns:     true,
 		}
 	}
 	if config.IsEnabled(config.GetEIP211Transition, bn) {
@@ -176,6 +170,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 			constantGas: vars.ExtcodeHashGasConstantinople,
 			minStack:    minStack(1, 1),
 			maxStack:    maxStack(1, 1),
+		}
 	}
 	if config.IsEnabled(config.GetEIP1344Transition, bn) {
 		enable1344(&instructionSet) // ChainID opcode - https://eips.ethereum.org/EIPS/eip-1344
@@ -203,7 +198,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 
 // newBaseInstructionSet returns Frontier instructions
 func newBaseInstructionSet() JumpTable {
-	return JumpTable{
+	tbl := JumpTable{
 		STOP: {
 			execute:     opStop,
 			constantGas: 0,
@@ -344,7 +339,7 @@ func newBaseInstructionSet() JumpTable {
 		},
 		KECCAK256: {
 			execute:     opKeccak256,
-			constantGas: params.Keccak256Gas,
+			constantGas: vars.Keccak256Gas,
 			dynamicGas:  gasKeccak256,
 			minStack:    minStack(2, 1),
 			maxStack:    maxStack(2, 1),

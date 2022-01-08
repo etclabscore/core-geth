@@ -26,7 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 // ChainReader defines a small collection of methods needed to access the local
@@ -34,7 +34,7 @@ import (
 // and lightchain.
 type ChainReader interface {
 	// Config retrieves the header chain's chain configuration.
-	Config() *params.ChainConfig
+	Config() ctypes.ChainConfigurator
 
 	// GetTd returns the total difficulty of a local block.
 	GetTd(common.Hash, uint64) *big.Int
@@ -85,7 +85,7 @@ func (f *ForkChoice) ReorgNeeded(current *types.Header, header *types.Header) (b
 	// Accept the new header as the chain head if the transition
 	// is already triggered. We assume all the headers after the
 	// transition come from the trusted consensus layer.
-	if ttd := f.chain.Config().TerminalTotalDifficulty; ttd != nil && ttd.Cmp(externTd) <= 0 {
+	if ttd := f.chain.Config().GetEthashTerminalTotalDifficulty(); ttd != nil && ttd.Cmp(externTd) <= 0 {
 		return true, nil
 	}
 	// If the total difficulty is higher than our known, add it to the canonical chain

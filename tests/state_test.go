@@ -20,6 +20,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -65,9 +66,16 @@ func TestState(t *testing.T) {
 	if *testEVM != "" || *testEWASM != "" {
 		// Berlin tests are not expected to pass for external EVMs, yet.
 		//
-		st.skipFork("^Berlin$")
-		st.skipFork("Magneto")
-		st.skipFork("London")
+		st.skipFork("^Berlin$") // ETH
+		st.skipFork("Magneto")  // ETC
+		st.skipFork("London")   // ETH
+		st.skipFork("Mystique") // ETC
+	}
+	// The multigeth data type (like the Ethereum Foundation data type) doesn't support
+	// the ETC_Mystique fork/feature configuration, which omits EIP1559 and the associated BASEFEE
+	// opcode stuff. This configuration cannot be represented in their struct.
+	if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_MULTIGETHV0_KEY) != "" {
+		st.skipFork("ETC_Mystique")
 	}
 
 	// Un-skip this when https://github.com/ethereum/tests/issues/908 is closed
@@ -75,12 +83,12 @@ func TestState(t *testing.T) {
 
 	// Broken tests:
 	// Expected failures:
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/0`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/3`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/0`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/3`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/0`, "bug in test")
-	//st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
+	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/0`, "bug in test")
+	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/3`, "bug in test")
+	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/0`, "bug in test")
+	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/3`, "bug in test")
+	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/0`, "bug in test")
+	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
 
 	// For Istanbul, older tests were moved into LegacyTests
 	for _, dir := range []string{

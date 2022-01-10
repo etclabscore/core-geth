@@ -370,6 +370,67 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ECIP1010PauseBlock: nil,
 		ECIP1010Length:     nil,
 	},
+	"ETC_Mystique": &coregeth.CoreGethChainConfig{
+		NetworkID:       1,
+		Ethash:          new(ctypes.EthashConfig),
+		ChainID:         big.NewInt(61),
+		EIP2FBlock:      big.NewInt(0),
+		EIP7FBlock:      big.NewInt(0),
+		EIP150Block:     big.NewInt(0),
+		EIP155Block:     big.NewInt(0),
+		EIP160FBlock:    big.NewInt(0),
+		EIP161FBlock:    big.NewInt(0),
+		EIP170FBlock:    big.NewInt(0),
+		EIP100FBlock:    big.NewInt(0),
+		EIP140FBlock:    big.NewInt(0),
+		EIP198FBlock:    big.NewInt(0),
+		EIP211FBlock:    big.NewInt(0),
+		EIP212FBlock:    big.NewInt(0),
+		EIP213FBlock:    big.NewInt(0),
+		EIP214FBlock:    big.NewInt(0),
+		EIP658FBlock:    big.NewInt(0),
+		EIP145FBlock:    big.NewInt(0),
+		EIP1014FBlock:   big.NewInt(0),
+		EIP1052FBlock:   big.NewInt(0),
+		EIP1283FBlock:   big.NewInt(0),
+		PetersburgBlock: big.NewInt(0),
+		// Istanbul eq, aka Phoenix
+		// ECIP-1088
+		EIP152FBlock:  big.NewInt(0),
+		EIP1108FBlock: big.NewInt(0),
+		EIP1344FBlock: big.NewInt(0),
+		EIP1884FBlock: big.NewInt(0),
+		EIP2028FBlock: big.NewInt(0),
+		EIP2200FBlock: big.NewInt(0), // RePetersburg (=~ re-1283)
+
+		// Berlin
+		EIP2565FBlock: big.NewInt(0),
+		EIP2929FBlock: big.NewInt(0),
+		EIP2718FBlock: big.NewInt(0),
+		EIP2930FBlock: big.NewInt(0),
+
+		// London
+		/*
+			https://github.com/ethereumclassic/ECIPs/blob/master/_specs/ecip-1104.md
+
+			3529 (Alternative refund reduction) 	#22733 	Include
+			3541 (Reject new contracts starting with the 0xEF byte) 	#22809 	Include
+			1559 (Fee market change) 	#22837 #22896 	Omit
+			3198 (BASEFEE opcode) 	#22837 	Omit
+			3228 (bomb delay) 	#22840 and #22870 	Omit
+		*/
+		EIP3529FBlock: big.NewInt(0),
+		EIP3541FBlock: big.NewInt(0),
+		EIP1559FBlock: nil,
+		EIP3198FBlock: nil,
+		EIP3554FBlock: nil,
+
+		DisposalBlock:      big.NewInt(0),
+		ECIP1017FBlock:     big.NewInt(5000000), // FIXME(meows) maybe
+		ECIP1017EraRounds:  big.NewInt(5000000),
+		ECIP1010PauseBlock: nil,
+		ECIP1010Length:     nil,
+	},
 }
 
 // Returns the set of defined fork names

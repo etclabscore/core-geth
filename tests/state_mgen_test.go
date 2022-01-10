@@ -104,6 +104,7 @@ func TestGenStateAll(t *testing.T) {
 	tm.generateFromReference("ConstantinopleFix", "ETC_Agharta")
 	tm.generateFromReference("Berlin", "ETC_Magneto")
 	tm.generateFromReference("Istanbul", "ETC_Phoenix")
+	tm.generateFromReference("London", "ETC_Mystique")
 
 	for _, dir := range []string{
 		stateTestDir,

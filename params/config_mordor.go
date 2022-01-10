@@ -76,6 +76,10 @@ var (
 
 		ECIP1099FBlock: big.NewInt(2_520_000), // Etchash
 
+		// London (partially), aka Mystique
+		EIP3529FBlock: big.NewInt(5_520_000),
+		EIP3541FBlock: big.NewInt(5_520_000),
+
 		DisposalBlock:      big.NewInt(0),
 		ECIP1017FBlock:     big.NewInt(0),
 		ECIP1017EraRounds:  big.NewInt(2000000),

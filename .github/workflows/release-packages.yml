@@ -24,7 +24,7 @@ jobs:
           BUILD_OS_NAME: linux
 
         - os: ubuntu-18.04
-            BUILD_OS_NAME: linux_bionic
+          BUILD_OS_NAME: linux_bionic
 
         - os: ubuntu-latest
           BUILD_OS_NAME: arm

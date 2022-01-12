@@ -103,7 +103,7 @@ func (t *callTracer) CaptureFault(pc uint64, op vm.OpCode, gas, cost uint64, _ *
 }
 
 // CaptureEnter is called when EVM enters a new scope (via call, create or selfdestruct).
-func (t *callTracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
+func (t *callTracer) CaptureEnter(env *vm.EVM, typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
 	// Skip if tracing was interrupted
 	if atomic.LoadUint32(&t.interrupt) > 0 {
 		t.env.Cancel()
@@ -123,7 +123,7 @@ func (t *callTracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.
 
 // CaptureExit is called when EVM exits a scope, even if the scope didn't
 // execute any code.
-func (t *callTracer) CaptureExit(output []byte, gasUsed uint64, err error) {
+func (t *callTracer) CaptureExit(env *vm.EVM, output []byte, gasUsed uint64, err error) {
 	size := len(t.callstack)
 	if size <= 1 {
 		return

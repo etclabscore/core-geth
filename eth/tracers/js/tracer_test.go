@@ -61,9 +61,10 @@ func testCtx() *vmContext {
 	return &vmContext{blockCtx: vm.BlockContext{BlockNumber: big.NewInt(1)}, txCtx: vm.TxContext{GasPrice: big.NewInt(100000)}}
 }
 
-func runTrace(tracer Tracer, vmctx *vmContext, chaincfg ctypes.ChainConfigurator) (json.RawMessage, error) {
-	env := vm.NewEVM(vmctx.blockCtx, vmctx.txCtx, &dummyStatedb{}, chaincfg, vm.Config{Debug: true, Tracer: tracer})
+func runTrace(tracer tracers.Tracer, vmctx *vmContext, chaincfg *ctypes.ChainConfigurator) (json.RawMessage, error) {
+
 	var (
+		env             = vm.NewEVM(vmctx.blockCtx, vmctx.txCtx, &dummyStatedb{}, *chaincfg, vm.Config{Debug: true, Tracer: tracer})
 		startGas uint64 = 10000
 		value           = big.NewInt(0)
 		contract        = vm.NewContract(account{}, account{}, value, startGas)
@@ -86,7 +87,7 @@ func TestTracer(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		ret, err := runTrace(tracer, testCtx(), params.TestChainConfig)
+		ret, err := runTrace(tracer, testCtx(), vars.TestChainConfig)
 		if err != nil {
 			return nil, err.Error() // Stringify to allow comparison without nil checks
 		}
@@ -168,14 +169,6 @@ func TestHaltBetweenSteps(t *testing.T) {
 // TestNoStepExec tests a regular value transfer (no exec), and accessing the statedb
 // in 'result'
 func TestNoStepExec(t *testing.T) {
-	runEmptyTrace := func(tracer Tracer, vmctx *vmContext) (json.RawMessage, error) {
-		env := vm.NewEVM(vmctx.blockCtx, vmctx.txCtx, &dummyStatedb{}, params.TestChainConfig, vm.Config{Debug: true, Tracer: tracer})
-		startGas := uint64(10000)
-		contract := vm.NewContract(account{}, account{}, big.NewInt(0), startGas)
-		tracer.CaptureStart(env, contract.Caller(), contract.Address(), false, []byte{}, startGas, big.NewInt(0))
-		tracer.CaptureEnd(env, nil, startGas-contract.Gas, 1, nil)
-		return tracer.GetResult()
-	}
 	execTracer := func(code string) []byte {
 		t.Helper()
 		tracer, err := newJsTracer(code, nil)
@@ -253,8 +246,10 @@ func TestEnterExit(t *testing.T) {
 	scope := &vm.ScopeContext{
 		Contract: vm.NewContract(&account{}, &account{}, big.NewInt(0), 0),
 	}
-	tracer.CaptureEnter(vm.CALL, scope.Contract.Caller(), scope.Contract.Address(), []byte{}, 1000, new(big.Int))
-	tracer.CaptureExit([]byte{}, 400, nil)
+
+	env := &vm.EVM{}
+	tracer.CaptureEnter(env, vm.CALL, scope.Contract.Caller(), scope.Contract.Address(), []byte{}, 1000, new(big.Int))
+	tracer.CaptureExit(env, []byte{}, 400, nil)
 
 	have, err := tracer.GetResult()
 	if err != nil {

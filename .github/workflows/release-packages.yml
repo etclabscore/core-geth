@@ -72,4 +72,5 @@ jobs:
       - name: Upload release sssets
         uses: softprops/action-gh-release@v1
         with:
+          draft: true
           files: core-geth*.zip*

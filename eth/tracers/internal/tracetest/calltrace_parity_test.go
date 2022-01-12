@@ -72,7 +72,7 @@ type callTracerParityTest struct {
 	Result  *[]callTraceParity `json:"result"`
 }
 
-func callTracerParityTestRunner(filename string, dirPath string) error {
+func callTracerParityTestRunner(tracerName string, filename string, dirPath string) error {
 	// Call tracer test found, read if from disk
 	blob, err := ioutil.ReadFile(filepath.Join("..", "testdata", dirPath, filename))
 	if err != nil {
@@ -105,7 +105,7 @@ func callTracerParityTestRunner(filename string, dirPath string) error {
 	_, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false)
 
 	// Create the tracer, the EVM environment and run it
-	tracer, err := tracers.New("callTracerParity", new(tracers.Context))
+	tracer, err := tracers.New(tracerName, new(tracers.Context))
 	if err != nil {
 		return fmt.Errorf("failed to create call tracer: %v", err)
 	}
@@ -150,6 +150,7 @@ func TestCallTracerParity(t *testing.T) {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}
 	for _, file := range files {
+		// if file.Name() != "big_slow.json" {
 		if !strings.HasSuffix(file.Name(), ".json") {
 			continue
 		}
@@ -157,7 +158,7 @@ func TestCallTracerParity(t *testing.T) {
 		t.Run(camel(strings.TrimSuffix(file.Name(), ".json")), func(t *testing.T) {
 			t.Parallel()
 
-			err := callTracerParityTestRunner(file.Name(), folderName)
+			err := callTracerParityTestRunner("callParityTracer", file.Name(), folderName)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -193,7 +194,7 @@ func BenchmarkCallTracerParity(b *testing.B) {
 		filename := strings.TrimPrefix(file, "testdata/call_tracer_parity/")
 		b.Run(camel(strings.TrimSuffix(filename, ".json")), func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				err := callTracerParityTestRunner(filename, "call_tracer_parity")
+				err := callTracerParityTestRunner("callParityTracer", filename, "call_tracer_parity")
 				if err != nil {
 					b.Fatal(err)
 				}

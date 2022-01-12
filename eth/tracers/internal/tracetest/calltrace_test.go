@@ -35,11 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/eth/tracers"
-<<<<<<< HEAD:eth/tracers/testing/calltrace_test.go
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
-=======
-	"github.com/ethereum/go-ethereum/params"
->>>>>>> v1.10.15:eth/tracers/internal/tracetest/calltrace_test.go
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/tests"
 

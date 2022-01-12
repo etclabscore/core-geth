@@ -168,37 +168,22 @@ func (api *API) blockByNumberAndHash(ctx context.Context, number rpc.BlockNumber
 
 // TraceConfig holds extra parameters to trace functions.
 type TraceConfig struct {
-<<<<<<< HEAD
-	*vm.LogConfig
+	*logger.Config
 	Tracer            *string
 	Timeout           *string
 	Reexec            *uint64
 	NestedTraceOutput bool // Returns the trace output JSON nested under the trace name key. This allows full Parity compatibility to be achieved.
-=======
-	*logger.Config
-	Tracer  *string
-	Timeout *string
-	Reexec  *uint64
->>>>>>> v1.10.15
 }
 
 // TraceCallConfig is the config for traceCall API. It holds one more
 // field to override the state for tracing.
 type TraceCallConfig struct {
-<<<<<<< HEAD
-	*vm.LogConfig
+	*logger.Config
 	Tracer            *string
 	Timeout           *string
 	Reexec            *uint64
-	NestedTraceOutput bool // Returns the trace output JSON nested under the trace name key. This allows full Parity compatibility to be achieved.
 	StateOverrides    *ethapi.StateOverride
-=======
-	*logger.Config
-	Tracer         *string
-	Timeout        *string
-	Reexec         *uint64
-	StateOverrides *ethapi.StateOverride
->>>>>>> v1.10.15
+	NestedTraceOutput bool // Returns the trace output JSON nested under the trace name key. This allows full Parity compatibility to be achieved.
 }
 
 // StdTraceConfig holds extra parameters to standard-json trace functions.
@@ -727,7 +712,6 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 	// Therefore, it's perfectly valid to specify `"futureForkBlock": 0`, to enable `futureFork`
 
 	if config != nil && config.Overrides != nil {
-<<<<<<< HEAD
 		overrideEIP2929 := config.Overrides.GetEIP2929Transition()
 		existingEIP2929 := chainConfig.GetEIP2929Transition()
 
@@ -747,15 +731,6 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 			if err := chainConfig.SetEIP2929Transition(overrideEIP2929); err != nil {
 				return nil, err
 			}
-=======
-		// Copy the config, to not screw up the main config
-		// Note: the Clique-part is _not_ deep copied
-		chainConfigCopy := new(params.ChainConfig)
-		*chainConfigCopy = *chainConfig
-		chainConfig = chainConfigCopy
-		if berlin := config.Config.Overrides.BerlinBlock; berlin != nil {
-			chainConfig.BerlinBlock = berlin
->>>>>>> v1.10.15
 			canon = false
 		}
 	}
@@ -972,16 +947,8 @@ func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.TransactionArgs,
 	}
 	// Apply the customized state rules if required.
 	if config != nil {
-<<<<<<< HEAD
 		if err := config.StateOverrides.Apply(statedb); err != nil {
 			return nil, err
-=======
-		traceConfig = &TraceConfig{
-			Config:  config.Config,
-			Tracer:  config.Tracer,
-			Timeout: config.Timeout,
-			Reexec:  config.Reexec,
->>>>>>> v1.10.15
 		}
 	}
 

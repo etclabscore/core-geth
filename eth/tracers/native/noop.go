@@ -39,21 +39,14 @@ func newNoopTracer() tracers.Tracer {
 	return &noopTracer{}
 }
 
-<<<<<<< HEAD
 func (l *noopTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {}
 
-func (t *noopTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
-}
-
-func (t *noopTracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, _ time.Duration, err error) {
-=======
 // CaptureStart implements the EVMLogger interface to initialize the tracing operation.
 func (t *noopTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
 }
 
-// CaptureEnd is called after the call finishes to finalize the tracing.
-func (t *noopTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {
->>>>>>> v1.10.15
+// CaptureEnd is called after the call finishes to finalize the tracing
+func (t *noopTracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, _ time.Duration, err error) {
 }
 
 // CaptureState implements the EVMLogger interface to trace a single step of VM execution.
@@ -64,13 +57,10 @@ func (t *noopTracer) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64, sco
 func (t *noopTracer) CaptureFault(pc uint64, op vm.OpCode, gas, cost uint64, _ *vm.ScopeContext, depth int, err error) {
 }
 
-// CaptureEnter is called when EVM enters a new scope (via call, create or selfdestruct).
-func (t *noopTracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
+func (t *noopTracer) CaptureEnter(env *vm.EVM, typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
 }
 
-// CaptureExit is called when EVM exits a scope, even if the scope didn't
-// execute any code.
-func (t *noopTracer) CaptureExit(output []byte, gasUsed uint64, err error) {
+func (t *noopTracer) CaptureExit(env *vm.EVM, output []byte, gasUsed uint64, err error) {
 }
 
 // GetResult returns an empty json object.

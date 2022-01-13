@@ -58,7 +58,14 @@ jobs:
 
           sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-arm-linux-gnueabi libc6-dev-armel-cross gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross
           sudo ln -s /usr/include/asm-generic /usr/include/asm
-
+          
+          echo "arm: This archive filepath is deprecated."
+          echo "     It will be removed, and will cease to be present"
+          echo "     as of the etclabscore/core-geth@v1.12.6 release."
+          echo "     The \*-arm5\* build should be used instead."
+          GOARM=5 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc
+          env BUILD_OS_NAME=arm ./build/archive-signing.sh
+          
           GOARM=5 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc
           env BUILD_OS_NAME=arm5 ./build/archive-signing.sh
           GOARM=6 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc

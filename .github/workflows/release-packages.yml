@@ -60,17 +60,17 @@ jobs:
           sudo ln -s /usr/include/asm-generic /usr/include/asm
 
           GOARM=5 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc
-          env BUILD_OS_NAME=arm5 ./build/deploy.sh
+          env BUILD_OS_NAME=arm5 ./build/archive-signing.sh
           GOARM=6 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc
-          env BUILD_OS_NAME=arm6 ./build/deploy.sh
+          env BUILD_OS_NAME=arm6 ./build/archive-signing.sh
           GOARM=7 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabihf-gcc
-          env BUILD_OS_NAME=arm7 ./build/deploy.sh
+          env BUILD_OS_NAME=arm7 ./build/archive-signing.sh
           go run build/ci.go install -dlgo -arch arm64 -cc aarch64-linux-gnu-gcc
-          env BUILD_OS_NAME=arm64 ./build/deploy.sh
+          env BUILD_OS_NAME=arm64 ./build/archive-signing.sh
 
       - name: Prepare archives for release
         if: ${{ matrix.BUILD_OS_NAME != 'arm' }}
-        run: ./build/deploy.sh
+        run: ./build/archive-signing.sh
         env:
           BUILD_OS_NAME: ${{ matrix.BUILD_OS_NAME }}
 

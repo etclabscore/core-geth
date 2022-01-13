@@ -46,10 +46,11 @@ jobs:
 
       - name: Build all packages (non ARM)
         if: ${{ matrix.BUILD_OS_NAME != 'arm' }}
+        id: build-non-arm-images
         run: make all
 
       - name: Build all packages (ARM)
-        id: build_image-arm
+        id: build-arm-images
         if: ${{ matrix.BUILD_OS_NAME == 'arm' }}
         run: |
           sudo apt-get update

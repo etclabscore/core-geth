@@ -38,13 +38,8 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p"
-<<<<<<< HEAD
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
-	"github.com/ethereum/go-ethereum/trie"
-=======
-	"github.com/ethereum/go-ethereum/params"
->>>>>>> v1.10.15
 )
 
 const (

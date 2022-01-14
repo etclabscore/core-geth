@@ -32,12 +32,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
-<<<<<<< HEAD
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-=======
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
->>>>>>> v1.10.15
 	lru "github.com/hashicorp/golang-lru"
 )
 
@@ -61,12 +57,8 @@ const (
 // It is not thread safe either, the encapsulating chain structures should do
 // the necessary mutex locking/unlocking.
 type HeaderChain struct {
-<<<<<<< HEAD
 	config ctypes.ChainConfigurator
 
-=======
-	config        *params.ChainConfig
->>>>>>> v1.10.15
 	chainDb       ethdb.Database
 	genesisHeader *types.Header
 

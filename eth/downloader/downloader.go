@@ -35,13 +35,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
-<<<<<<< HEAD
-	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/params/vars"
-	"github.com/ethereum/go-ethereum/trie"
-=======
-	"github.com/ethereum/go-ethereum/params"
->>>>>>> v1.10.15
 )
 
 var (
@@ -792,78 +786,6 @@ func (d *Downloader) findAncestor(p *peerConnection, remoteHeader *types.Header)
 func (d *Downloader) findAncestorSpanSearch(p *peerConnection, mode SyncMode, remoteHeight, localHeight uint64, floor int64) (uint64, error) {
 	from, count, skip, max := calculateRequestSpan(remoteHeight, localHeight)
 
-<<<<<<< HEAD
-	p.log.Debug("Span searching for common ancestor", "count", count, "from", from, "skip", skip)
-
-	go p.peer.RequestHeadersByNumber(uint64(from), count, skip, false)
-
-	// Wait for the remote response to the head fetch
-	number, hash := uint64(0), common.Hash{}
-
-	ttl := d.peers.rates.TargetTimeout()
-	timeout := time.After(ttl)
-
-	for finished := false; !finished; {
-		select {
-		case <-d.cancelCh:
-			return 0, errCanceled
-
-		case packet := <-d.headerCh:
-			// Discard anything not from the origin peer
-			if packet.PeerId() != p.id {
-				log.Debug("Received headers from incorrect peer", "peer", packet.PeerId())
-				break
-			}
-			// Make sure the peer actually gave something valid
-			headers := packet.(*headerPack).headers
-			if len(headers) == 0 {
-				p.log.Warn("Empty head header set")
-				return 0, errEmptyHeaderSet
-			}
-			// Make sure the peer's reply conforms to the request
-			for i, header := range headers {
-				expectNumber := from + int64(i)*int64(skip+1)
-				if number := header.Number.Int64(); number != expectNumber {
-					p.log.Warn("Head headers broke chain ordering", "index", i, "requested", expectNumber, "received", number)
-					return 0, fmt.Errorf("%w: %v", errInvalidChain, errors.New("head headers broke chain ordering"))
-				}
-			}
-			// Check if a common ancestor was found
-			finished = true
-			for i := len(headers) - 1; i >= 0; i-- {
-				// Skip any headers that underflow/overflow our requested set
-				if headers[i].Number.Int64() < from || headers[i].Number.Uint64() > max {
-					continue
-				}
-				// Otherwise check if we already know the header or not
-				h := headers[i].Hash()
-				n := headers[i].Number.Uint64()
-
-				var known bool
-				switch SyncMode(d.mode) {
-				case FullSync:
-					known = d.blockchain.HasBlock(h, n)
-				case FastSync:
-					known = d.blockchain.HasFastBlock(h, n)
-				case LightSync:
-					known = d.lightchain.HasHeader(h, n)
-				default:
-					log.Crit("unknown sync mode", "mode", d.mode)
-				}
-				if known {
-					number, hash = n, h
-					break
-				}
-			}
-
-		case <-timeout:
-			p.log.Debug("Waiting for head header timed out", "elapsed", ttl)
-			return 0, errTimeout
-
-		case <-d.bodyCh:
-		case <-d.receiptCh:
-			// Out of bounds delivery, ignore
-=======
 	p.log.Trace("Span searching for common ancestor", "count", count, "from", from, "skip", skip)
 	headers, hashes, err := d.fetchHeadersByNumber(p, uint64(from), count, skip, false)
 	if err != nil {
@@ -907,7 +829,6 @@ func (d *Downloader) findAncestorSpanSearch(p *peerConnection, mode SyncMode, re
 		if known {
 			number, hash = n, h
 			break
->>>>>>> v1.10.15
 		}
 	}
 	// If the head fetch already found an ancestor, return
@@ -937,67 +858,6 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, mode SyncMode, 
 		// Split our chain interval in two, and request the hash to cross check
 		check := (start + end) / 2
 
-<<<<<<< HEAD
-		ttl := d.peers.rates.TargetTimeout()
-		timeout := time.After(ttl)
-
-		go p.peer.RequestHeadersByNumber(check, 1, 0, false)
-
-		// Wait until a reply arrives to this request
-		for arrived := false; !arrived; {
-			select {
-			case <-d.cancelCh:
-				return 0, errCanceled
-
-			case packet := <-d.headerCh:
-				// Discard anything not from the origin peer
-				if packet.PeerId() != p.id {
-					log.Debug("Received headers from incorrect peer", "peer", packet.PeerId())
-					break
-				}
-				// Make sure the peer actually gave something valid
-				headers := packet.(*headerPack).headers
-				if len(headers) != 1 {
-					p.log.Warn("Multiple headers for single request", "headers", len(headers))
-					return 0, fmt.Errorf("%w: multiple headers (%d) for single request", errBadPeer, len(headers))
-				}
-				arrived = true
-
-				// Modify the search interval based on the response
-				hash = headers[0].Hash()
-				n := headers[0].Number.Uint64()
-
-				var known bool
-				switch SyncMode(d.mode) {
-				case FullSync:
-					known = d.blockchain.HasBlock(hash, n)
-				case FastSync:
-					known = d.blockchain.HasFastBlock(hash, n)
-				case LightSync:
-					known = d.lightchain.HasHeader(hash, n)
-				default:
-					log.Crit("unknown sync mode", "mode", d.mode)
-				}
-				if !known {
-					end = check
-					break
-				}
-				header := d.lightchain.GetHeaderByHash(hash) // Independent of sync mode, header surely exists
-				if header.Number.Uint64() != check {
-					p.log.Warn("Received non requested header", "number", header.Number, "hash", header.Hash(), "request", check)
-					return 0, fmt.Errorf("%w: non-requested header (%d)", errBadPeer, header.Number)
-				}
-				start = check
-
-			case <-timeout:
-				p.log.Debug("Waiting for search header timed out", "elapsed", ttl)
-				return 0, errTimeout
-
-			case <-d.bodyCh:
-			case <-d.receiptCh:
-				// Out of bounds delivery, ignore
-			}
-=======
 		headers, hashes, err := d.fetchHeadersByNumber(p, check, 1, 0, false)
 		if err != nil {
 			return 0, err
@@ -1017,8 +877,10 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, mode SyncMode, 
 			known = d.blockchain.HasBlock(h, n)
 		case SnapSync:
 			known = d.blockchain.HasFastBlock(h, n)
+		case LightSync:
+			known = d.lightchain.HasHeader(hash, n)
 		default:
-			known = d.lightchain.HasHeader(h, n)
+			log.Crit("unknown sync mode", "mode", d.mode)
 		}
 		if !known {
 			end = check
@@ -1028,7 +890,6 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, mode SyncMode, 
 		if header.Number.Uint64() != check {
 			p.log.Warn("Received non requested header", "number", header.Number, "hash", header.Hash(), "request", check)
 			return 0, fmt.Errorf("%w: non-requested header (%d)", errBadPeer, header.Number)
->>>>>>> v1.10.15
 		}
 		start = check
 		hash = h

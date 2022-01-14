@@ -31,11 +31,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
-<<<<<<< HEAD
 	"github.com/ethereum/go-ethereum/params/vars"
-=======
 	"github.com/ethereum/go-ethereum/trie"
->>>>>>> v1.10.15
 )
 
 var (

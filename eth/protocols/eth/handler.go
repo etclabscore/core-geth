@@ -28,12 +28,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/enr"
-<<<<<<< HEAD
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/trie"
-=======
-	"github.com/ethereum/go-ethereum/params"
->>>>>>> v1.10.15
 )
 
 const (

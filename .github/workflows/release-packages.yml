@@ -23,7 +23,7 @@ jobs:
         # Build on 18.04 (Bionic) because the OS GLIBC is bumped above 2.26 in later versions (eg. 20.04).
         # This GLIBC version included and used by default in at least Amazon Linux 2 and Ubuntu Bionic.
         # The C compiler used by default in the 18.04 runner produces an executable which is runnable
-        # on Ubuntu Disco and Focal (tested by meowsbits); it is forward compatible.  
+        # on Ubuntu Disco and Focal (tested by meowsbits); it is forward compatible.
         - os: ubuntu-18.04
           BUILD_OS_NAME: linux
 
@@ -46,26 +46,39 @@ jobs:
 
       - name: Build all packages (non ARM)
         if: ${{ matrix.BUILD_OS_NAME != 'arm' }}
+        id: build-non-arm-images
         run: make all
 
       - name: Build all packages (ARM)
-        uses: pguyot/arm-runner-action@v1
-        id: build_image
+        id: build-arm-images
         if: ${{ matrix.BUILD_OS_NAME == 'arm' }}
-        with:
-          image_additional_mb: 2000
-          copy_artifact_path: ./build/bin/
-          copy_artifact_dest: ./build/bin/
-          commands: |
-              wget https://golang.org/dl/go1.16.9.linux-armv6l.tar.gz
-              sudo tar -C /usr/local -xzf go1.16.9.linux-armv6l.tar.gz
-              rm go1.16.9.linux-armv6l.tar.gz
-              export PATH=$PATH:/usr/local/go/bin
+        run: |
+          sudo apt-get update
 
-              GOARM=5 go run build/ci.go install -dlgo -arch arm
+          sudo apt install gcc-multilib
+
+          sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install gcc-arm-linux-gnueabi libc6-dev-armel-cross gcc-arm-linux-gnueabihf libc6-dev-armhf-cross gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+          sudo ln -s /usr/include/asm-generic /usr/include/asm
+          
+          echo "arm: This archive filepath is deprecated."
+          echo "     It will be removed, and will cease to be present"
+          echo "     as of the etclabscore/core-geth@v1.12.7 release."
+          echo "     The \*-arm5\* build should be used instead."
+          GOARM=5 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc
+          env BUILD_OS_NAME=arm ./build/archive-signing.sh
+          
+          GOARM=5 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc
+          env BUILD_OS_NAME=arm5 ./build/archive-signing.sh
+          GOARM=6 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabi-gcc
+          env BUILD_OS_NAME=arm6 ./build/archive-signing.sh
+          GOARM=7 go run build/ci.go install -dlgo -arch arm -cc arm-linux-gnueabihf-gcc
+          env BUILD_OS_NAME=arm7 ./build/archive-signing.sh
+          go run build/ci.go install -dlgo -arch arm64 -cc aarch64-linux-gnu-gcc
+          env BUILD_OS_NAME=arm64 ./build/archive-signing.sh
 
       - name: Prepare archives for release
-        run: ./build/deploy.sh
+        if: ${{ matrix.BUILD_OS_NAME != 'arm' }}
+        run: ./build/archive-signing.sh
         env:
           BUILD_OS_NAME: ${{ matrix.BUILD_OS_NAME }}
 

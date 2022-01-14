@@ -17,13 +17,11 @@
 package vm
 
 import (
+	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
-	"fmt"
-
-	"github.com/ethereum/go-ethereum/params"
 )
 
 type (
@@ -193,10 +191,10 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 		enable2929(&instructionSet) // Access lists for trie accesses https://eips.ethereum.org/EIPS/eip-2929
 	}
 	if config.IsEnabled(config.GetEIP3529Transition, bn) {
-		enable3529(&instructionSet) // Reduction in refunds
+		enable3529(&instructionSet) // Reduction in refunds https://eips.ethereum.org/EIPS/eip-3529
 	}
 	if config.IsEnabled(config.GetEIP3198Transition, bn) {
-		enable3198(&instructionSet) // BASEFEE opcode
+		enable3198(&instructionSet) // BASEFEE opcode https://eips.ethereum.org/EIPS/eip-3198
 	}
 	return validate(instructionSet)
 }
@@ -344,7 +342,7 @@ func newBaseInstructionSet() JumpTable {
 		},
 		KECCAK256: {
 			execute:     opKeccak256,
-			constantGas: params.Keccak256Gas,
+			constantGas: vars.Keccak256Gas,
 			dynamicGas:  gasKeccak256,
 			minStack:    minStack(2, 1),
 			maxStack:    maxStack(2, 1),

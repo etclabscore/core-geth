@@ -879,6 +879,8 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, mode SyncMode, 
 			known = d.blockchain.HasBlock(h, n)
 		case SnapSync:
 			known = d.blockchain.HasFastBlock(h, n)
+		case LightSync:
+			known = d.lightchain.HasHeader(hash, n)
 		default:
 			log.Crit("unknown sync mode", "mode", d.mode)
 		}

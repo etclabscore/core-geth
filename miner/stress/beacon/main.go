@@ -357,7 +357,7 @@ func main() {
 		faucets[i], _ = crypto.GenerateKey()
 	}
 	// Pre-generate the ethash mining DAG so we don't race
-	ethash.MakeDataset(1, filepath.Join(os.Getenv("HOME"), ".ethash"))
+	ethash.MakeDataset(1, ethash.CalcEpochLength(0, nil), ethconfig.Defaults.Ethash.DatasetDir)
 
 	// Create an Ethash network based off of the Ropsten config
 	genesis := makeGenesis(faucets)

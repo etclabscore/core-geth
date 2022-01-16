@@ -227,7 +227,7 @@ func getTraceConfigFromTraceCallConfig(config *TraceCallConfig) *TraceConfig {
 	var traceConfig *TraceConfig
 	if config != nil {
 		traceConfig = &TraceConfig{
-			LogConfig:         config.LogConfig,
+			Config:            config.Config,
 			Tracer:            config.Tracer,
 			Timeout:           config.Timeout,
 			Reexec:            config.Reexec,

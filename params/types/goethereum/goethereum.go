@@ -61,6 +61,8 @@ type ChainConfig struct {
 	LondonBlock       *big.Int `json:"londonBlock,omitempty"`       // London switch block
 	ArrowGlacierBlock *big.Int `json:"arrowGlacierBlock,omitempty"` // ArrowGlacier switch block
 
+	MergeForkBlock *big.Int `json:"mergeForkBlock,omitempty"` // EIP-3675 (TheMerge) switch block (nil = no fork, 0 = already in merge proceedings)
+
 	EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
 	// TerminalTotalDifficulty is the amount of total difficulty reached by

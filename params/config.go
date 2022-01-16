@@ -283,7 +283,7 @@ var (
 		BerlinBlock:               big.NewInt(0),
 		LondonBlock:               big.NewInt(0),
 		ArrowGlacierBlock:         big.NewInt(0),
-		MergeForkBlock:            nil, // NOTE(meowsbits)
+		MergeForkBlock:            nil,
 		EWASMBlock:                nil,
 		TerminalTotalDifficulty:   nil,
 		Ethash:                    new(ctypes.EthashConfig),

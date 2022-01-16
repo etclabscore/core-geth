@@ -24,7 +24,6 @@ import (
 	"math/big"
 	"math/rand"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
@@ -45,6 +44,8 @@ import (
 	"github.com/ethereum/go-ethereum/p2p"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 type nodetype int
@@ -76,7 +77,7 @@ func (typ nodetype) String() string {
 
 var (
 	// transitionDifficulty is the target total difficulty for transition
-	transitionDifficulty = new(big.Int).Mul(big.NewInt(20), params.MinimumDifficulty)
+	transitionDifficulty = new(big.Int).Mul(big.NewInt(20), vars.MinimumDifficulty)
 
 	// blockInterval is the time interval for creating a new eth2 block
 	blockInterval    = time.Second * 3
@@ -95,7 +96,7 @@ type ethNode struct {
 	enode      *enode.Node
 }
 
-func newNode(typ nodetype, genesis *core.Genesis, enodes []*enode.Node) *ethNode {
+func newNode(typ nodetype, genesis *genesisT.Genesis, enodes []*enode.Node) *ethNode {
 	var (
 		err        error
 		api        *catalyst.ConsensusAPI
@@ -192,14 +193,14 @@ func (n *ethNode) insertBlockAndSetHead(parent *types.Header, ed catalyst.Execut
 }
 
 type nodeManager struct {
-	genesis      *core.Genesis
+	genesis      *genesisT.Genesis
 	genesisBlock *types.Block
 	nodes        []*ethNode
 	enodes       []*enode.Node
 	close        chan struct{}
 }
 
-func newNodeManager(genesis *core.Genesis) *nodeManager {
+func newNodeManager(genesis *genesisT.Genesis) *nodeManager {
 	return &nodeManager{
 		close:        make(chan struct{}),
 		genesis:      genesis,
@@ -405,26 +406,27 @@ func main() {
 
 // makeGenesis creates a custom Ethash genesis block based on some pre-defined
 // faucet accounts.
-func makeGenesis(faucets []*ecdsa.PrivateKey) *core.Genesis {
-	genesis := core.DefaultRopstenGenesisBlock()
-	genesis.Difficulty = params.MinimumDifficulty
+func makeGenesis(faucets []*ecdsa.PrivateKey) *genesisT.Genesis {
+	genesis := params.DefaultRopstenGenesisBlock()
+	genesis.Difficulty = vars.MinimumDifficulty
 	genesis.GasLimit = 25000000
 
-	genesis.Config.ChainID = big.NewInt(18)
-	genesis.Config.EIP150Hash = common.Hash{}
-	genesis.BaseFee = big.NewInt(params.InitialBaseFee)
-	genesis.Config.TerminalTotalDifficulty = transitionDifficulty
+	genesis.SetChainID(big.NewInt(18))
+	// genesis.Config.EIP150Hash = common.Hash{}
 
-	genesis.Alloc = core.GenesisAlloc{}
+	genesis.BaseFee = big.NewInt(vars.InitialBaseFee)
+	genesis.SetEthashTerminalTotalDifficulty(transitionDifficulty)
+
+	genesis.Alloc = genesisT.GenesisAlloc{}
 	for _, faucet := range faucets {
-		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = core.GenesisAccount{
+		genesis.Alloc[crypto.PubkeyToAddress(faucet.PublicKey)] = genesisT.GenesisAccount{
 			Balance: new(big.Int).Exp(big.NewInt(2), big.NewInt(128), nil),
 		}
 	}
 	return genesis
 }
 
-func makeFullNode(genesis *core.Genesis) (*node.Node, *eth.Ethereum, *catalyst.ConsensusAPI, error) {
+func makeFullNode(genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, *catalyst.ConsensusAPI, error) {
 	// Define the basic configurations for the Ethereum node
 	datadir, _ := ioutil.TempDir("", "")
 
@@ -475,7 +477,7 @@ func makeFullNode(genesis *core.Genesis) (*node.Node, *eth.Ethereum, *catalyst.C
 	return stack, ethBackend, catalyst.NewConsensusAPI(ethBackend, nil), err
 }
 
-func makeLightNode(genesis *core.Genesis) (*node.Node, *les.LightEthereum, *catalyst.ConsensusAPI, error) {
+func makeLightNode(genesis *genesisT.Genesis) (*node.Node, *les.LightEthereum, *catalyst.ConsensusAPI, error) {
 	// Define the basic configurations for the Ethereum node
 	datadir, _ := ioutil.TempDir("", "")
 

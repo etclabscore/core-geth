@@ -176,13 +176,13 @@ func (a *AccessListTracer) CaptureState(pc uint64, op vm.OpCode, gas, cost uint6
 func (*AccessListTracer) CaptureFault(pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, depth int, err error) {
 }
 
-func (*AccessListTracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, t time.Duration, err error) {
+func (*AccessListTracer) CaptureEnd(output []byte, gasUsed uint64, t time.Duration, err error) {
 }
 
-func (*AccessListTracer) CaptureEnter(env *vm.EVM, typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
+func (*AccessListTracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
 }
 
-func (*AccessListTracer) CaptureExit(env *vm.EVM, output []byte, gasUsed uint64, err error) {}
+func (*AccessListTracer) CaptureExit(output []byte, gasUsed uint64, err error) {}
 
 // AccessList returns the current accesslist maintained by the tracer.
 func (a *AccessListTracer) AccessList() types.AccessList {

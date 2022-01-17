@@ -72,7 +72,7 @@ func runTrace(tracer Tracer, vmctx *vmContext, chaincfg ctypes.ChainConfigurator
 
 	tracer.CaptureStart(env, contract.Caller(), contract.Address(), false, []byte{}, startGas, value)
 	ret, err := env.Interpreter().Run(contract, []byte{}, false)
-	tracer.CaptureEnd(env, ret, startGas-contract.Gas, 1, err)
+	tracer.CaptureEnd(ret, startGas-contract.Gas, 1, err)
 	if err != nil {
 		return nil, err
 	}
@@ -246,9 +246,8 @@ func TestEnterExit(t *testing.T) {
 		Contract: vm.NewContract(&account{}, &account{}, big.NewInt(0), 0),
 	}
 
-	env := &vm.EVM{}
-	tracer.CaptureEnter(env, vm.CALL, scope.Contract.Caller(), scope.Contract.Address(), []byte{}, 1000, new(big.Int))
-	tracer.CaptureExit(env, []byte{}, 400, nil)
+	tracer.CaptureEnter(vm.CALL, scope.Contract.Caller(), scope.Contract.Address(), []byte{}, 1000, new(big.Int))
+	tracer.CaptureExit([]byte{}, 400, nil)
 
 	have, err := tracer.GetResult()
 	if err != nil {

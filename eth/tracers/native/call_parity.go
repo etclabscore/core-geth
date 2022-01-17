@@ -175,7 +175,7 @@ func (t *callParityTracer) CaptureStart(env *vm.EVM, from common.Address, to com
 	}
 }
 
-func (t *callParityTracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, _ time.Duration, err error) {
+func (t *callParityTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {
 	if err != nil {
 		t.callstack[0].Error = err.Error()
 		if err.Error() == "execution reverted" && len(output) > 0 {
@@ -189,13 +189,13 @@ func (t *callParityTracer) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64
 	}
 }
 
-func (t *callParityTracer) CaptureState(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, rData []byte, depth int, err error) {
+func (t *callParityTracer) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, rData []byte, depth int, err error) {
 }
 
-func (t *callParityTracer) CaptureFault(env *vm.EVM, pc uint64, op vm.OpCode, gas, cost uint64, _ *vm.ScopeContext, depth int, err error) {
+func (t *callParityTracer) CaptureFault(pc uint64, op vm.OpCode, gas, cost uint64, _ *vm.ScopeContext, depth int, err error) {
 }
 
-func (t *callParityTracer) CaptureEnter(env *vm.EVM, typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
+func (t *callParityTracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
 	// Skip if tracing was interrupted
 	if atomic.LoadUint32(&t.interrupt) > 0 {
 		// TODO: env.Cancel()
@@ -226,7 +226,7 @@ func (t *callParityTracer) CaptureEnter(env *vm.EVM, typ vm.OpCode, from common.
 	t.callstack = append(t.callstack, call)
 }
 
-func (t *callParityTracer) CaptureExit(env *vm.EVM, output []byte, gasUsed uint64, err error) {
+func (t *callParityTracer) CaptureExit(output []byte, gasUsed uint64, err error) {
 	size := len(t.callstack)
 	if size <= 1 {
 		return
@@ -281,7 +281,6 @@ func (t *callParityTracer) Finalize(call callParityFrame, traceAddress []int) ([
 		var childTraceAddress []int
 		childTraceAddress = append(childTraceAddress, traceAddress...)
 		childTraceAddress = append(childTraceAddress, i)
-
 
 		// Delegatecall uses the value from parent
 		if (childCall.Type == "DELEGATECALL" || childCall.Type == "STATICCALL") && childCall.Action.Value.ToInt().Cmp(common.Big0) == 0 {

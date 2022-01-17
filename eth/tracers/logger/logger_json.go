@@ -83,7 +83,7 @@ func (l *JSONLogger) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64, sco
 }
 
 // CaptureEnd is triggered at end of execution.
-func (l *JSONLogger) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, t time.Duration, err error) {
+func (l *JSONLogger) CaptureEnd(output []byte, gasUsed uint64, t time.Duration, err error) {
 	type endLog struct {
 		Output  string              `json:"output"`
 		GasUsed math.HexOrDecimal64 `json:"gasUsed"`
@@ -97,7 +97,7 @@ func (l *JSONLogger) CaptureEnd(env *vm.EVM, output []byte, gasUsed uint64, t ti
 	l.encoder.Encode(endLog{common.Bytes2Hex(output), math.HexOrDecimal64(gasUsed), t, errMsg})
 }
 
-func (l *JSONLogger) CaptureEnter(env *vm.EVM, typ vm.OpCode, from, to common.Address, input []byte, gas uint64, value *big.Int) {
+func (l *JSONLogger) CaptureEnter(typ vm.OpCode, from, to common.Address, input []byte, gas uint64, value *big.Int) {
 }
 
-func (l *JSONLogger) CaptureExit(env *vm.EVM, output []byte, gasUsed uint64, err error) {}
+func (l *JSONLogger) CaptureExit(output []byte, gasUsed uint64, err error) {}

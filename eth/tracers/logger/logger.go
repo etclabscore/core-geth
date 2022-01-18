@@ -133,6 +133,8 @@ func (l *StructLogger) Reset() {
 	l.err = nil
 }
 
+func (l *StructLogger) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {}
+
 // CaptureStart implements the EVMLogger interface to initialize the tracing operation.
 func (l *StructLogger) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
 	l.env = env

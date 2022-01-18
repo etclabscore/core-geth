@@ -562,6 +562,15 @@ func (c *CoreGethChainConfig) SetEthashTerminalTotalDifficulty(n *big.Int) error
 	return nil
 }
 
+// IsTerminalPoWBlock returns whether the given block is the last block of PoW stage.
+func (c *CoreGethChainConfig) IsTerminalPoWBlock(parentTotalDiff *big.Int, totalDiff *big.Int) bool {
+	terminalTotalDifficulty := c.GetEthashTerminalTotalDifficulty()
+	if terminalTotalDifficulty == nil {
+		return false
+	}
+	return parentTotalDiff.Cmp(terminalTotalDifficulty) < 0 && totalDiff.Cmp(terminalTotalDifficulty) >= 0
+}
+
 func (c *CoreGethChainConfig) GetEthashMinimumDifficulty() *big.Int {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil

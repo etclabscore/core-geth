@@ -666,6 +666,15 @@ func (g *Genesis) SetEthashTerminalTotalDifficulty(n *big.Int) error {
 	return g.Config.SetEthashTerminalTotalDifficulty(n)
 }
 
+// IsTerminalPoWBlock returns whether the given block is the last block of PoW stage.
+func (g *Genesis) IsTerminalPoWBlock(parentTotalDiff *big.Int, totalDiff *big.Int) bool {
+	terminalTotalDifficulty := g.Config.GetEthashTerminalTotalDifficulty()
+	if terminalTotalDifficulty == nil {
+		return false
+	}
+	return parentTotalDiff.Cmp(terminalTotalDifficulty) < 0 && totalDiff.Cmp(terminalTotalDifficulty) >= 0
+}
+
 func (g *Genesis) GetEthashMinimumDifficulty() *big.Int {
 	return g.Config.GetEthashMinimumDifficulty()
 }

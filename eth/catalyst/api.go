@@ -92,7 +92,7 @@ type ConsensusAPI struct {
 func NewConsensusAPI(eth *eth.Ethereum, les *les.LightEthereum) *ConsensusAPI {
 	var engine consensus.Engine
 	if eth == nil {
-		if les.BlockChain().Config().TerminalTotalDifficulty == nil {
+		if les.BlockChain().Config().GetEthashTerminalTotalDifficulty() == nil {
 			panic("Catalyst started without valid total difficulty")
 		}
 		if b, ok := les.Engine().(*beacon.Beacon); ok {
@@ -101,7 +101,7 @@ func NewConsensusAPI(eth *eth.Ethereum, les *les.LightEthereum) *ConsensusAPI {
 			engine = beacon.New(les.Engine())
 		}
 	} else {
-		if eth.BlockChain().Config().TerminalTotalDifficulty == nil {
+		if eth.BlockChain().Config().GetEthashTerminalTotalDifficulty() == nil {
 			panic("Catalyst started without valid total difficulty")
 		}
 		if b, ok := eth.Engine().(*beacon.Beacon); ok {
@@ -272,7 +272,7 @@ func (api *ConsensusAPI) ExecutePayloadV1(params ExecutableDataV1) (ExecutePaylo
 	}
 	parent := api.eth.BlockChain().GetBlockByHash(params.ParentHash)
 	td := api.eth.BlockChain().GetTd(parent.Hash(), block.NumberU64()-1)
-	ttd := api.eth.BlockChain().Config().TerminalTotalDifficulty
+	ttd := api.eth.BlockChain().Config().GetEthashTerminalTotalDifficulty()
 	if td.Cmp(ttd) < 0 {
 		return api.invalid(), fmt.Errorf("can not execute payload on top of block with low td got: %v threshold %v", td, ttd)
 	}
@@ -479,7 +479,7 @@ func (api *ConsensusAPI) checkTerminalTotalDifficulty(head common.Hash) error {
 		return &GenericServerError
 	}
 	td := api.eth.BlockChain().GetTd(newHeadBlock.Hash(), newHeadBlock.NumberU64())
-	if td != nil && td.Cmp(api.eth.BlockChain().Config().TerminalTotalDifficulty) < 0 {
+	if td != nil && td.Cmp(api.eth.BlockChain().Config().GetEthashTerminalTotalDifficulty()) < 0 {
 		return &InvalidTB
 	}
 	return nil

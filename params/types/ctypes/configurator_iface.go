@@ -231,6 +231,8 @@ type EthashConfigurator interface {
 	GetEthashTerminalTotalDifficulty() *big.Int
 	SetEthashTerminalTotalDifficulty(n *big.Int) error
 
+	IsTerminalPoWBlock(parentTotalDiff *big.Int, totalDiff *big.Int) bool
+
 	GetEthashDifficultyBombDelaySchedule() Uint64BigMapEncodesHex
 	SetEthashDifficultyBombDelaySchedule(m Uint64BigMapEncodesHex) error
 	GetEthashBlockRewardSchedule() Uint64BigMapEncodesHex

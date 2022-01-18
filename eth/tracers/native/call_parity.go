@@ -53,7 +53,7 @@ var paritySkipTracesForErrors = []string{
 }
 
 func init() {
-	tracers.RegisterNativeTracer("callParityTracer", NewCallParityTracer)
+	register("callParityTracer", NewCallParityTracer)
 }
 
 // callParityFrame is the result of a callParityTracerParity run.

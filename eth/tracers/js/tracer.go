@@ -679,6 +679,8 @@ func wrapError(context string, err error) error {
 	return fmt.Errorf("%v    in server-side tracer function '%v'", err, context)
 }
 
+func (jst *jsTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {}
+
 // CaptureStart implements the Tracer interface to initialize the tracing operation.
 func (jst *jsTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
 	jst.env = env
@@ -697,13 +699,12 @@ func (jst *jsTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Ad
 	jst.ctx["block"] = env.Context.BlockNumber.Uint64()
 	jst.dbWrapper.db = env.StateDB
 	// Update list of precompiles based on current block
-	rules := env.ChainConfig().Rules(env.Context.BlockNumber)
-	jst.activePrecompiles = vm.ActivePrecompiles(rules)
+	jst.activePrecompiles = env.ActivePrecompiles()
 
 	// Compute intrinsic gas
-	isHomestead := env.ChainConfig().IsHomestead(env.Context.BlockNumber)
-	isIstanbul := env.ChainConfig().IsIstanbul(env.Context.BlockNumber)
-	intrinsicGas, err := core.IntrinsicGas(input, nil, jst.ctx["type"] == "CREATE", isHomestead, isIstanbul)
+	hasEIP2 := env.ChainConfig().IsEnabled(env.ChainConfig().GetEIP2Transition, env.Context.BlockNumber)
+	hasEIP2028 := env.ChainConfig().IsEnabled(env.ChainConfig().GetEIP2028Transition, env.Context.BlockNumber)
+	intrinsicGas, err := core.IntrinsicGas(input, nil, jst.ctx["type"] == "CREATE", hasEIP2, hasEIP2028)
 	if err != nil {
 		return
 	}

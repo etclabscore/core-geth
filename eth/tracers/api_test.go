@@ -422,10 +422,10 @@ func TestTracingWithOverrides(t *testing.T) {
 	t.Parallel()
 	// Initialize test accounts
 	accounts := newAccounts(3)
-	genesis := &core.Genesis{Alloc: core.GenesisAlloc{
-		accounts[0].addr: {Balance: big.NewInt(params.Ether)},
-		accounts[1].addr: {Balance: big.NewInt(params.Ether)},
-		accounts[2].addr: {Balance: big.NewInt(params.Ether)},
+	genesis := &genesisT.Genesis{Alloc: genesisT.GenesisAlloc{
+		accounts[0].addr: {Balance: big.NewInt(vars.Ether)},
+		accounts[1].addr: {Balance: big.NewInt(vars.Ether)},
+		accounts[2].addr: {Balance: big.NewInt(vars.Ether)},
 	}}
 	genBlocks := 10
 	signer := types.HomesteadSigner{}
@@ -433,7 +433,7 @@ func TestTracingWithOverrides(t *testing.T) {
 		// Transfer from account[0] to account[1]
 		//    value: 1000 wei
 		//    fee:   0 wei
-		tx, _ := types.SignTx(types.NewTransaction(uint64(i), accounts[1].addr, big.NewInt(1000), params.TxGas, b.BaseFee(), nil), signer, accounts[0].key)
+		tx, _ := types.SignTx(types.NewTransaction(uint64(i), accounts[1].addr, big.NewInt(1000), vars.TxGas, b.BaseFee(), nil), signer, accounts[0].key)
 		b.AddTx(tx)
 	}))
 	randomAccounts := newAccounts(3)
@@ -451,11 +451,11 @@ func TestTracingWithOverrides(t *testing.T) {
 	}{
 		// Call which can only succeed if state is state overridden
 		{
-			Result: &ethapi.ExecutionResult{
-				Gas:         vars.TxGas,
-				Failed:      false,
-				ReturnValue: "",
-				StructLogs:  []ethapi.StructLogRes{},
+			blockNumber: rpc.PendingBlockNumber,
+			call: ethapi.TransactionArgs{
+				From:  &randomAccounts[0].addr,
+				To:    &randomAccounts[1].addr,
+				Value: (*hexutil.Big)(big.NewInt(1000)),
 			},
 			config: &TraceCallConfig{
 				StateOverrides: &ethapi.StateOverride{

@@ -227,7 +227,7 @@ func getTraceConfigFromTraceCallConfig(config *TraceCallConfig) *TraceConfig {
 	var traceConfig *TraceConfig
 	if config != nil {
 		traceConfig = &TraceConfig{
-			LogConfig:         config.LogConfig,
+			Config:            config.Config,
 			Tracer:            config.Tracer,
 			Timeout:           config.Timeout,
 			Reexec:            config.Reexec,
@@ -1024,9 +1024,10 @@ func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.TransactionArgs,
 func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Context, vmctx vm.BlockContext, statedb *state.StateDB, extraContext map[string]interface{}, config *TraceConfig) (interface{}, error) {
 	// Assemble the structured logger or the JavaScript tracer
 	var (
-		tracer    vm.EVMLogger
-		err       error
-		txContext = core.NewEVMTxContext(message)
+		tracer     vm.EVMLogger
+		err        error
+		isJsTracer = false
+		txContext  = core.NewEVMTxContext(message)
 	)
 	switch {
 	case config == nil:
@@ -1051,6 +1052,7 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 			}()
 			defer cancel()
 			tracer = t
+			isJsTracer = true
 		}
 	default:
 		tracer = logger.NewStructLogger(config.Config)
@@ -1061,8 +1063,7 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 	// Call Prepare to clear out the statedb access list
 	statedb.Prepare(txctx.TxHash, txctx.TxIndex)
 
-	switch tracer := tracer.(type) {
-	case *jsTracer:
+	if isJsTracer {
 		if extraContext == nil {
 			extraContext = map[string]interface{}{}
 		}

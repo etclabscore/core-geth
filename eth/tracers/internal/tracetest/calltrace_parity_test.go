@@ -1,4 +1,4 @@
-package testing
+package tracetest
 
 import (
 	"encoding/json"

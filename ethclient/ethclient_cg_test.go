@@ -77,7 +77,7 @@ func TestEthGetBlockByNumber_ValidJSONResponse(t *testing.T) {
 		"baseFeePerGas": reHexAnyLen,
 
 		"uncles":       regexp.MustCompile(`^\[\]$`),
-		"transactions": regexp.MustCompile(`^\[\]$`),
+		"transactions": regexp.MustCompile(`^\[.*\]$`),
 	}
 
 	// Construct the 'pending' block expectations as a copy of the concrete block

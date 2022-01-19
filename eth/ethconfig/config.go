@@ -248,16 +248,16 @@ func CreateConsensusEngine(stack *node.Node, chainConfig ctypes.ChainConfigurato
 		switch config.PowMode {
 		case ethash.ModeFake:
 			log.Warn("Ethash used in fake mode")
-			return ethash.NewFaker()
+			engine = ethash.NewFaker()
 		case ethash.ModeTest:
 			log.Warn("Ethash used in test mode")
-			return ethash.NewTester(nil, noverify)
+			engine = ethash.NewTester(nil, noverify)
 		case ethash.ModeShared:
 			log.Warn("Ethash used in shared mode")
-			return ethash.NewShared()
+			engine = ethash.NewShared()
 		case ethash.ModePoissonFake:
 			log.Warn("Ethash used in fake Poisson mode")
-			return ethash.NewPoissonFaker()
+			engine = ethash.NewPoissonFaker()
 		default:
 			engine = ethash.New(ethash.Config{
 				PowMode:          config.PowMode,

@@ -22,6 +22,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -72,6 +73,7 @@ func newTestHandlerWithBlocksWithOpts(blocks int, mode downloader.SyncMode, gen 
 
 	handler, _ := newHandler(&handlerConfig{
 		Database:   db,
+		Merger:     consensus.NewMerger(db),
 		Chain:      chain,
 		TxPool:     txpool,
 		Network:    1,

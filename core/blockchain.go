@@ -2104,6 +2104,8 @@ func (bc *BlockChain) getReorgData(oldBlock, newBlock *types.Block) *reorgData {
 		// Remove an old block as well as stash away a new block
 		oldChain = append(oldChain, oldBlock)
 		deletedTxs = append(deletedTxs, oldBlock.Transactions()...)
+
+		// Collect deleted logs for notification
 		logs := bc.collectLogs(oldBlock.Hash(), true)
 		if len(logs) > 0 {
 			deletedLogs = append(deletedLogs, logs)
@@ -2155,20 +2157,6 @@ func (bc *BlockChain) reorg(data *reorgData) error {
 	}
 	var (
 		addedTxs types.Transactions
-		// mergeLogs returns a merged log slice with specified sort order.
-		mergeLogs = func(logs [][]*types.Log, reverse bool) []*types.Log {
-			var ret []*types.Log
-			if reverse {
-				for i := len(logs) - 1; i >= 0; i-- {
-					ret = append(ret, logs[i]...)
-				}
-			} else {
-				for i := 0; i < len(logs); i++ {
-					ret = append(ret, logs[i]...)
-				}
-			}
-			return ret
-		}
 	)
 
 	// Ensure the user sees large reorgs
@@ -2235,7 +2223,7 @@ func (bc *BlockChain) reorg(data *reorgData) error {
 		bc.rmLogsFeed.Send(RemovedLogsEvent{mergeLogs(data.deletedLogs, true)})
 	}
 	if len(data.rebirthLogs) > 0 {
-		bc.logsFeed.Send(mergeLogs(data.rebirthLogs, false))
+		bc.logsFeed.Send(mergeLogs(rebirthLogs, false))
 	}
 	if len(data.oldChain) > 0 {
 		for i := len(data.oldChain) - 1; i >= 0; i-- {

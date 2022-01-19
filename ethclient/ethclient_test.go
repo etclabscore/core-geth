@@ -245,6 +245,7 @@ func newTestBackend(t *testing.T) (*node.Node, []*types.Block) {
 	return n, blocks
 }
 
+// generateTestChain generates 2 blocks. The first block contains 2 transactions.
 func generateTestChain() []*types.Block {
 	db := rawdb.NewMemoryDatabase()
 	config := params.AllEthashProtocolChanges
@@ -402,7 +403,7 @@ func testBalanceAt(t *testing.T, client *rpc.Client) {
 }
 
 func TestHeader_TxesUnclesNotEmpty(t *testing.T) {
-	backend, _ := newTestBackend(t)
+	backend, blocks := newTestBackend(t)
 	client, _ := backend.Attach()
 	defer backend.Close()
 	defer client.Close()
@@ -417,18 +418,19 @@ func TestHeader_TxesUnclesNotEmpty(t *testing.T) {
 	}
 
 	// Sanity check response
+	wantBlocksN := blocks[len(blocks)-1].Number()
 	if v, ok := res["number"]; !ok {
 		t.Fatal("missing 'number' field")
 	} else if n, err := hexutil.DecodeBig(v.(string)); err != nil || n == nil {
 		t.Fatal(err)
-	} else if n.Cmp(big.NewInt(1)) != 0 {
-		t.Fatalf("unexpected 'latest' block number: %v", n)
+	} else if n.Cmp(wantBlocksN) != 0 {
+		t.Fatalf("unexpected 'latest' block number: %v, want: %d", n, wantBlocksN)
 	}
 	// 'transactions' key should exist as []
 	if v, ok := res["transactions"]; !ok {
 		t.Fatal("missing transactions field")
-	} else if len(v.([]interface{})) != 0 {
-		t.Fatal("'transactions' value not []")
+	} else if len(v.([]interface{})) != 2 {
+		t.Fatalf("'transactions' value not [], got: %v", len(v.([]interface{})))
 	}
 	// 'uncles' key should exist as []
 	if v, ok := res["uncles"]; !ok {

@@ -48,10 +48,6 @@ var parityErrorMappingStartingWith = map[string]string{
 	"stack underflow": "Stack underflow",
 }
 
-var paritySkipTracesForErrors = []string{
-	"insufficient balance for transfer",
-}
-
 func init() {
 	register("callParityTracer", NewCallParityTracer)
 }

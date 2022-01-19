@@ -41,7 +41,7 @@ var trieRoot common.Hash
 
 func getChain() *core.BlockChain {
 	db := rawdb.NewMemoryDatabase()
-	ga := make(core.GenesisAlloc, 1000)
+	ga := make(genesisT.GenesisAlloc, 1000)
 	var a = make([]byte, 20)
 	var mkStorage = func(k, v int) (common.Hash, common.Hash) {
 		var kB = make([]byte, 32)
@@ -57,7 +57,7 @@ func getChain() *core.BlockChain {
 	}
 	for i := 0; i < 1000; i++ {
 		binary.LittleEndian.PutUint64(a, uint64(i+0xff))
-		acc := core.GenesisAccount{Balance: big.NewInt(int64(i))}
+		acc := genesisT.GenesisAccount{Balance: big.NewInt(int64(i))}
 		if i%2 == 1 {
 			acc.Storage = storage
 		}

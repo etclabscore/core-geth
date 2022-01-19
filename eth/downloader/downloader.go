@@ -873,7 +873,7 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, mode SyncMode, 
 		case SnapSync:
 			known = d.blockchain.HasFastBlock(h, n)
 		case LightSync:
-			known = d.lightchain.HasHeader(hash, n)
+			known = d.lightchain.HasHeader(h, n)
 		default:
 			log.Crit("unknown sync mode", "mode", d.mode)
 		}
@@ -881,7 +881,7 @@ func (d *Downloader) findAncestorBinarySearch(p *peerConnection, mode SyncMode, 
 			end = check
 			continue
 		}
-		header := d.lightchain.GetHeaderByHash(hash) // Independent of sync mode, header surely exists
+		header := d.lightchain.GetHeaderByHash(h) // Independent of sync mode, header surely exists
 		if header.Number.Uint64() != check {
 			p.log.Warn("Received non requested header", "number", header.Number, "hash", header.Hash(), "request", check)
 			return 0, fmt.Errorf("%w: non-requested header (%d)", errBadPeer, header.Number)

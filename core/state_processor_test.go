@@ -88,7 +88,7 @@ func TestStateProcessorErrors(t *testing.T) {
 						Balance: big.NewInt(1000000000000000000), // 1 ether
 						Nonce:   0,
 					},
-					common.HexToAddress("0xfd0810DD14796680f72adf1a371963d0745BCc64"): GenesisAccount{
+					common.HexToAddress("0xfd0810DD14796680f72adf1a371963d0745BCc64"): genesisT.GenesisAccount{
 						Balance: big.NewInt(1000000000000000000), // 1 ether
 						Nonce:   math.MaxUint64,
 					},

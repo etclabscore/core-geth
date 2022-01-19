@@ -71,7 +71,7 @@ func generatePreMergeChain(n int) (*genesisT.Genesis, []*types.Block) {
 	for _, b := range blocks {
 		totalDifficulty.Add(totalDifficulty, b.Difficulty())
 	}
-	config.TerminalTotalDifficulty = totalDifficulty
+	config.SetEthashTerminalTotalDifficulty(totalDifficulty)
 	return genesis, blocks
 }
 

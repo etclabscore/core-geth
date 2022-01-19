@@ -133,7 +133,7 @@ func testHeaderVerificationForMerging(t *testing.T, isClique bool) {
 			td += int(block.Difficulty().Uint64())
 		}
 		config := *params.AllCliqueProtocolChanges
-		config.TerminalTotalDifficulty = big.NewInt(int64(td))
+		config.SetEthashTerminalTotalDifficulty(big.NewInt(int64(td)))
 		postBlocks, _ = GenerateChain(&config, preBlocks[len(preBlocks)-1], genEngine, testdb, 8, nil)
 		chainConfig = &config
 		runEngine = beacon.New(engine)
@@ -149,7 +149,7 @@ func testHeaderVerificationForMerging(t *testing.T, isClique bool) {
 			td += int(block.Difficulty().Uint64())
 		}
 		config := *params.TestChainConfig
-		config.TerminalTotalDifficulty = big.NewInt(int64(td))
+		config.SetEthashTerminalTotalDifficulty(big.NewInt(int64(td)))
 		postBlocks, _ = GenerateChain(params.TestChainConfig, preBlocks[len(preBlocks)-1], genEngine, testdb, 8, nil)
 
 		chainConfig = &config

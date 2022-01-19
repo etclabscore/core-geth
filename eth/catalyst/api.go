@@ -256,7 +256,7 @@ func (api *ConsensusAPI) ExecutePayloadV1(params ExecutableDataV1) (ExecutePaylo
 			return api.invalid(), fmt.Errorf("could not find parent %x", params.ParentHash)
 		}
 		if err = api.les.BlockChain().InsertHeader(block.Header()); err != nil {
-			return api.invalid(), err
+			return api.invalid(), fmt.Errorf("%w [les]", err)
 		}
 		return ExecutePayloadResponse{Status: VALID.Status, LatestValidHash: block.Hash()}, nil
 	}
@@ -277,7 +277,7 @@ func (api *ConsensusAPI) ExecutePayloadV1(params ExecutableDataV1) (ExecutePaylo
 		return api.invalid(), fmt.Errorf("can not execute payload on top of block with low td got: %v threshold %v", td, ttd)
 	}
 	if err := api.eth.BlockChain().InsertBlockWithoutSetHead(block); err != nil {
-		return api.invalid(), err
+		return api.invalid(), fmt.Errorf("%w [eth]", err)
 	}
 
 	if merger := api.merger(); !merger.TDDReached() {
@@ -325,6 +325,9 @@ func (api *ConsensusAPI) assembleBlock(parentHash common.Hash, params *PayloadAt
 	if err := api.engine.Prepare(bc, header); err != nil {
 		return nil, err
 	}
+	// if header.Difficulty.Cmp(common.Big0) == 0 {
+	// 	return nil, fmt.Errorf("zero difficulty, engine=%v", reflect.TypeOf(api.engine))
+	// }
 	env, err := api.makeEnv(parent, header)
 	if err != nil {
 		return nil, err

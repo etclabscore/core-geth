@@ -2245,7 +2245,7 @@ func testInsertKnownChainDataWithMerging(t *testing.T, typ string, mergeHeight i
 		if engine != nil {
 			runMerger.FinalizePoS()
 			// Set the terminal total difficulty in the config
-			chainConfig.TerminalTotalDifficulty = big.NewInt(int64(height))
+			chainConfig.SetEthashTerminalTotalDifficulty(big.NewInt(int64(height)))
 		}
 	}
 

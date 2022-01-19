@@ -584,6 +584,10 @@ func (c *ChainConfig) GetEthashTerminalTotalDifficulty() *big.Int {
 }
 
 func (c *ChainConfig) SetEthashTerminalTotalDifficulty(n *big.Int) error {
+	if n == nil {
+		c.TerminalTotalDifficulty = nil
+		return nil
+	}
 	c.TerminalTotalDifficulty = new(big.Int).Set(n)
 	return nil
 }

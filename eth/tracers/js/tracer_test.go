@@ -61,7 +61,7 @@ func testCtx() *vmContext {
 	return &vmContext{blockCtx: vm.BlockContext{BlockNumber: big.NewInt(1)}, txCtx: vm.TxContext{GasPrice: big.NewInt(100000)}}
 }
 
-func runTrace(tracer Tracer, vmctx *vmContext, chaincfg ctypes.ChainConfigurator) (json.RawMessage, error) {
+func runTrace(tracer tracers.Tracer, vmctx *vmContext, chaincfg ctypes.ChainConfigurator) (json.RawMessage, error) {
 	env := vm.NewEVM(vmctx.blockCtx, vmctx.txCtx, &dummyStatedb{}, chaincfg, vm.Config{Debug: true, Tracer: tracer})
 	var (
 		startGas uint64 = 10000

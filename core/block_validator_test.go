@@ -33,7 +33,9 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 // Tests that simple header verification works, for both good and bad blocks.
@@ -94,7 +96,7 @@ func testHeaderVerificationForMerging(t *testing.T, isClique bool) {
 		preBlocks   []*types.Block
 		postBlocks  []*types.Block
 		runEngine   consensus.Engine
-		chainConfig *params.ChainConfig
+		chainConfig ctypes.ChainConfigurator
 		merger      = consensus.NewMerger(rawdb.NewMemoryDatabase())
 	)
 	if isClique {
@@ -103,15 +105,15 @@ func testHeaderVerificationForMerging(t *testing.T, isClique bool) {
 			addr   = crypto.PubkeyToAddress(key.PublicKey)
 			engine = clique.New(params.AllCliqueProtocolChanges.Clique, testdb)
 		)
-		genspec := &Genesis{
+		genspec := &genesisT.Genesis{
 			ExtraData: make([]byte, 32+common.AddressLength+crypto.SignatureLength),
-			Alloc: map[common.Address]GenesisAccount{
+			Alloc: map[common.Address]genesisT.GenesisAccount{
 				addr: {Balance: big.NewInt(1)},
 			},
-			BaseFee: big.NewInt(params.InitialBaseFee),
+			BaseFee: big.NewInt(vars.InitialBaseFee),
 		}
 		copy(genspec.ExtraData[32:], addr[:])
-		genesis := genspec.MustCommit(testdb)
+		genesis := MustCommitGenesis(testdb, genspec)
 
 		genEngine := beacon.New(engine)
 		preBlocks, _ = GenerateChain(params.AllCliqueProtocolChanges, genesis, genEngine, testdb, 8, nil)
@@ -136,8 +138,8 @@ func testHeaderVerificationForMerging(t *testing.T, isClique bool) {
 		chainConfig = &config
 		runEngine = beacon.New(engine)
 	} else {
-		gspec := &Genesis{Config: params.TestChainConfig}
-		genesis := gspec.MustCommit(testdb)
+		gspec := &genesisT.Genesis{Config: params.TestChainConfig}
+		genesis := MustCommitGenesis(testdb, gspec)
 		genEngine := beacon.New(ethash.NewFaker())
 
 		preBlocks, _ = GenerateChain(params.TestChainConfig, genesis, genEngine, testdb, 8, nil)

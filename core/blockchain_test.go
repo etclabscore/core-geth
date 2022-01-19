@@ -2276,7 +2276,7 @@ func testInsertKnownChainDataWithMerging(t *testing.T, typ string, mergeHeight i
 	if err != nil {
 		t.Fatalf("failed to create temp freezer db: %v", err)
 	}
-	MustCommitGenesis(chaindb, (&genesisT.Genesis{BaseFee: big.NewInt(params.InitialBaseFee)}))
+	MustCommitGenesis(chaindb, (&genesisT.Genesis{BaseFee: big.NewInt(vars.InitialBaseFee)}))
 	defer os.RemoveAll(dir)
 
 	chain, err := NewBlockChain(chaindb, nil, &chainConfig, runEngine, vm.Config{}, nil, nil)

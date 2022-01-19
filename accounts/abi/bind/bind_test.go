@@ -1931,15 +1931,15 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/core"
 			"github.com/ethereum/go-ethereum/crypto"
 			"github.com/ethereum/go-ethereum/eth/ethconfig"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		tester: `
 			var (
 				key, _  = crypto.GenerateKey()
 				user, _ = bind.NewKeyedTransactorWithChainID(key, big.NewInt(1337))
-				sim     = backends.NewSimulatedBackend(core.GenesisAlloc{user.From: {Balance: big.NewInt(1000000000000000000)}}, ethconfig.Defaults.Miner.GasCeil)
+				sim     = backends.NewSimulatedBackend(genesisT.GenesisAlloc{user.From: {Balance: big.NewInt(1000000000000000000)}}, ethconfig.Defaults.Miner.GasCeil)
 			)
 			defer sim.Close()
 
@@ -1970,7 +1970,7 @@ func TestGolangBindings(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temporary workspace: %v", err)
 	}
-	//defer os.RemoveAll(ws)
+	// defer os.RemoveAll(ws)
 
 	pkg := filepath.Join(ws, "bindtest")
 	if err = os.MkdirAll(pkg, 0700); err != nil {

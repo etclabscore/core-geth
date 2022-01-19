@@ -161,8 +161,8 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 
 	// Create a full protocol manager, check that fast sync gets disabled
 	a := newTestHandlerWithBlocksWithOpts(1024, downloader.FullSync, genFunc)
-	if atomic.LoadUint32(&a.handler.fastSync) == 1 {
-		t.Fatalf("fast sync not disabled on non-empty blockchain")
+	if atomic.LoadUint32(&a.handler.snapSync) == 1 {
+		t.Fatalf("snap sync not disabled on non-empty blockchain")
 	}
 	defer a.close()
 
@@ -178,8 +178,8 @@ func TestArtificialFinalityFeatureEnablingDisabling(t *testing.T) {
 
 	// Create a full protocol manager, check that fast sync gets disabled
 	b := newTestHandlerWithBlocksWithOpts(0, downloader.FullSync, genFunc)
-	if atomic.LoadUint32(&b.handler.fastSync) == 1 {
-		t.Fatalf("fast sync not disabled on non-empty blockchain")
+	if atomic.LoadUint32(&b.handler.snapSync) == 1 {
+		t.Fatalf("snap sync not disabled on non-empty blockchain")
 	}
 	defer b.close()
 	b.chain.Config().SetECBP1100Transition(&one)

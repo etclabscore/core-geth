@@ -1473,68 +1473,59 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 		//      from the canonical chain, which has not been verified.
 		// Skip all known blocks that are behind us.
 		var (
-			reorg   bool
-			current = bc.CurrentBlock()
+			reorg    bool
+			current  = bc.CurrentBlock()
+			localTd  = bc.GetTd(current.Hash(), current.NumberU64())
+			externTd = bc.GetTd(block.ParentHash(), block.NumberU64()-1) // The first block can't be nil
 		)
 		for block != nil && bc.skipBlock(err, it) {
-			// NOTE(meowsbits): ECBP1100 and Artificial Finality conditions need to be re-included.
-			// We also need to make sure that the getReorgData method is OK.
-			//
-			// Here's the original core-geth code from this scope:
-			/*
-						// TODO (meowbits): have a look
+			// TODO (meowbits): have a look
 
-				// canonicalDisallowed is set to true if the total difficulty is greater than
-				// our local head, but the segment fails to meet the criteria required by any artificial finality features,
-				// namely that it requires a reorg (parent != current) and does not meet an inflated difficulty ratio.
-				canonicalDisallowed := false
+			// canonicalDisallowed is set to true if the total difficulty is greater than
+			// our local head, but the segment fails to meet the criteria required by any artificial finality features,
+			// namely that it requires a reorg (parent != current) and does not meet an inflated difficulty ratio.
+			canonicalDisallowed := false
 
-				externTd = new(big.Int).Add(externTd, block.Difficulty())
-				if localTd.Cmp(externTd) < 0 {
-					// Have found a known block with GREATER THAN local total difficulty.
-					// Do not ignore this block, and as such, do not continue inserter iteration.
+			externTd = new(big.Int).Add(externTd, block.Difficulty())
+			if localTd.Cmp(externTd) < 0 {
+				// Have found a known block with GREATER THAN local total difficulty.
+				// Do not ignore this block, and as such, do not continue inserter iteration.
 
-					// Check if known block write will cause a reorg.
-					if block.ParentHash() != current.Hash() {
-						reorgData := bc.getReorgData(current, block)
-						if reorgData.err == nil {
-							// If the reorgData is NOT nil, we know that the writeKnownBlockAsHead -> reorg
-							// logic will return the error.
-							// We let that part of the flow handle that error.
-							// We're only concerned with the non-error case, where the reorg
-							// will be permitted.
+				// Check if known block write will cause a reorg.
+				if block.ParentHash() != current.Hash() {
+					reorgData := bc.getReorgData(current, block)
+					if reorgData.err == nil {
+						// If the reorgData is NOT nil, we know that the writeKnownBlockAsHead -> reorg
+						// logic will return the error.
+						// We let that part of the flow handle that error.
+						// We're only concerned with the non-error case, where the reorg
+						// will be permitted.
 
-							// It will. That means we are on a different chain currently.
-							// Check if artificial finality forbids the reorganization,
-							// effectively overriding the simple (original) TD comparison check.
+						// It will. That means we are on a different chain currently.
+						// Check if artificial finality forbids the reorganization,
+						// effectively overriding the simple (original) TD comparison check.
 
-							if bc.IsArtificialFinalityEnabled() &&
-								bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, current.Number()) {
+						if bc.IsArtificialFinalityEnabled() &&
+							bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, current.Number()) {
 
-								if err := bc.ecbp1100(reorgData.commonBlock.Header(), current.Header(), block.Header()); err != nil {
+							if err := bc.ecbp1100(reorgData.commonBlock.Header(), current.Header(), block.Header()); err != nil {
 
-									canonicalDisallowed = true
-									log.Trace("Reorg disallowed", "error", err)
+								canonicalDisallowed = true
+								log.Trace("Reorg disallowed", "error", err)
 
-								}
 							}
 						}
 					}
-					if !canonicalDisallowed {
-						break
-					}
-					// canonicalDisallowed == true
-					// Total difficulty was greater, but that condition has been overridden by the artificial
-					// finality check. Continue like nothing happened.
 				}
+			}
 
-				// Local vs. External total difficulty was less than or equal.
-				// This block is deep in our chain and is not a head contender.
-			*/
+			// Local vs. External total difficulty was less than or equal.
+			// This block is deep in our chain and is not a head contender.
 			reorg, err = bc.forker.ReorgNeeded(current.Header(), block.Header())
 			if err != nil {
 				return it.index, err
 			}
+			reorg = reorg && !canonicalDisallowed
 			if reorg {
 				// Switch to import mode if the forker says the reorg is necessary
 				// and also the block is not on the canonical chain.

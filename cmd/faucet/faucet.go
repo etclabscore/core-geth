@@ -270,7 +270,7 @@ func auditFlagUse() {
 	}
 
 	if *syncmodeFlag != "" {
-		allowedModes := []string{"light", "fast", "full"}
+		allowedModes := []string{"light", "snap", "full"}
 		var ok bool
 		for _, mode := range allowedModes {
 			if mode == *syncmodeFlag {
@@ -561,8 +561,8 @@ func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*enode
 	switch *syncmodeFlag {
 	case "light":
 		cfg.SyncMode = downloader.LightSync
-	case "fast":
-		cfg.SyncMode = downloader.FastSync
+	case "snap":
+		cfg.SyncMode = downloader.SnapSync
 		cfg.ProtocolVersions = ethconfig.Defaults.ProtocolVersions
 	case "full":
 		cfg.SyncMode = downloader.FullSync

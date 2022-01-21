@@ -74,7 +74,7 @@ type callTracerParityTest struct {
 
 func callTracerParityTestRunner(tracerName string, filename string, dirPath string) error {
 	// Call tracer test found, read if from disk
-	blob, err := ioutil.ReadFile(filepath.Join("..", "testdata", dirPath, filename))
+	blob, err := ioutil.ReadFile(filepath.Join("testdata", dirPath, filename))
 	if err != nil {
 		return fmt.Errorf("failed to read testcase: %v", err)
 	}
@@ -145,7 +145,7 @@ func callTracerParityTestRunner(tracerName string, filename string, dirPath stri
 // runs the JavaScript tracers against them.
 func TestCallTracerParity(t *testing.T) {
 	folderName := "call_tracer_parity"
-	files, err := ioutil.ReadDir(filepath.Join("..", "testdata", folderName))
+	files, err := ioutil.ReadDir(filepath.Join("testdata", folderName))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}
@@ -219,7 +219,7 @@ type stateDiffTest struct {
 
 func stateDiffTracerTestRunner(filename string, dirPath string) error {
 	// Call tracer test found, read if from disk
-	blob, err := ioutil.ReadFile(filepath.Join("..", "testdata", dirPath, filename))
+	blob, err := ioutil.ReadFile(filepath.Join("testdata", dirPath, filename))
 	if err != nil {
 		return fmt.Errorf("failed to read testcase: %v", err)
 	}
@@ -329,7 +329,7 @@ func stateDiffTracerTestRunner(filename string, dirPath string) error {
 // runs the JavaScript tracers against them.
 func TestStateDiffTracer(t *testing.T) {
 	folderName := "state_diff"
-	files, err := ioutil.ReadDir(filepath.Join("..", "testdata", folderName))
+	files, err := ioutil.ReadDir(filepath.Join("testdata", folderName))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}

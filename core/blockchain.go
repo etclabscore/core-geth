@@ -279,10 +279,6 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, chainConfig ctyp
 		if frozen > 0 {
 			txIndexBlock = frozen
 		}
-		// loadLastState and other steps below assume that CurrentBlock is not nil.
-		if bc.CurrentBlock() == nil {
-			bc.writeHeadBlock(bc.genesisBlock)
-		}
 	}
 	if err := bc.loadLastState(); err != nil {
 		return nil, err
@@ -423,7 +419,7 @@ func (bc *BlockChain) empty() bool {
 		rawdb.ReadHeadBlockHash(bc.db),
 		rawdb.ReadHeadHeaderHash(bc.db),
 		rawdb.ReadHeadFastBlockHash(bc.db)} {
-		if hash != (common.Hash{}) && hash != genesis {
+		if hash != genesis {
 			return false
 		}
 	}
@@ -564,7 +560,7 @@ func (bc *BlockChain) setHeadBeyondRoot(head uint64, root common.Hash, repair bo
 			// Degrade the chain markers if they are explicitly reverted.
 			// In theory we should update all in-memory markers in the
 			// last step, however the direction of SetHead is from high
-			// to low, so it's safe the update in-memory markers directly.
+			// to low, so it's safe to update in-memory markers directly.
 			bc.currentBlock.Store(newHeadBlock)
 			headBlockGauge.Update(int64(newHeadBlock.NumberU64()))
 		}
@@ -989,25 +985,25 @@ func (bc *BlockChain) InsertReceiptChain(blockChain types.Blocks, receiptChain [
 		// range. In this case, all tx indices of newly imported blocks should be
 		// generated.
 		var batch = bc.db.NewBatch()
-		for _, block := range blockChain {
+		for i, block := range blockChain {
 			if bc.txLookupLimit == 0 || ancientLimit <= bc.txLookupLimit || block.NumberU64() >= ancientLimit-bc.txLookupLimit {
 				rawdb.WriteTxLookupEntriesByBlock(batch, block)
 			} else if rawdb.ReadTxIndexTail(bc.db) != nil {
 				rawdb.WriteTxLookupEntriesByBlock(batch, block)
 			}
 			stats.processed++
-		}
 
-		// Flush all tx-lookup index data.
-		size += int64(batch.ValueSize())
-		if err := batch.Write(); err != nil {
-			// The tx index data could not be written.
-			// Roll back the ancient store update.
-			fastBlock := bc.CurrentFastBlock().NumberU64()
-			if err := bc.db.TruncateAncients(fastBlock + 1); err != nil {
-				log.Error("Can't truncate ancient store after failed insert", "err", err)
+			if batch.ValueSize() > ethdb.IdealBatchSize || i == len(blockChain)-1 {
+				size += int64(batch.ValueSize())
+				if err = batch.Write(); err != nil {
+					fastBlock := bc.CurrentFastBlock().NumberU64()
+					if err := bc.db.TruncateAncients(fastBlock + 1); err != nil {
+						log.Error("Can't truncate ancient store after failed insert", "err", err)
+					}
+					return 0, err
+				}
+				batch.Reset()
 			}
-			return 0, err
 		}
 
 		// Sync the ancient store explicitly to ensure all data has been flushed to disk.
@@ -1479,60 +1475,59 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 			externTd = bc.GetTd(block.ParentHash(), block.NumberU64()-1) // The first block can't be nil
 		)
 		for block != nil && bc.skipBlock(err, it) {
-			// TODO (meowbits): have a look
-
-			// canonicalDisallowed is set to true if the total difficulty is greater than
-			// our local head, but the segment fails to meet the criteria required by any artificial finality features,
-			// namely that it requires a reorg (parent != current) and does not meet an inflated difficulty ratio.
-			canonicalDisallowed := false
-
-			externTd = new(big.Int).Add(externTd, block.Difficulty())
-			if localTd.Cmp(externTd) < 0 {
-				// Have found a known block with GREATER THAN local total difficulty.
-				// Do not ignore this block, and as such, do not continue inserter iteration.
-
-				// Check if known block write will cause a reorg.
-				if block.ParentHash() != current.Hash() {
-					reorgData := bc.getReorgData(current, block)
-					if reorgData.err == nil {
-						// If the reorgData is NOT nil, we know that the writeKnownBlockAsHead -> reorg
-						// logic will return the error.
-						// We let that part of the flow handle that error.
-						// We're only concerned with the non-error case, where the reorg
-						// will be permitted.
-
-						// It will. That means we are on a different chain currently.
-						// Check if artificial finality forbids the reorganization,
-						// effectively overriding the simple (original) TD comparison check.
-
-						if bc.IsArtificialFinalityEnabled() &&
-							bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, current.Number()) {
-
-							if err := bc.ecbp1100(reorgData.commonBlock.Header(), current.Header(), block.Header()); err != nil {
-
-								canonicalDisallowed = true
-								log.Trace("Reorg disallowed", "error", err)
-
-							}
-						}
-					}
-				}
-			}
-
 			// Local vs. External total difficulty was less than or equal.
 			// This block is deep in our chain and is not a head contender.
 			reorg, err = bc.forker.ReorgNeeded(current.Header(), block.Header())
 			if err != nil {
 				return it.index, err
 			}
-			reorg = reorg && !canonicalDisallowed
 			if reorg {
+				// TODO (meowbits): have a look
+
+				// canonicalDisallowed is set to true if the total difficulty is greater than
+				// our local head, but the segment fails to meet the criteria required by any artificial finality features,
+				// namely that it requires a reorg (parent != current) and does not meet an inflated difficulty ratio.
+				canonicalDisallowed := false
+
+				externTd = new(big.Int).Add(externTd, block.Difficulty())
+				if localTd.Cmp(externTd) < 0 {
+					// Have found a known block with GREATER THAN local total difficulty.
+					// Do not ignore this block, and as such, do not continue inserter iteration.
+
+					// Check if known block write will cause a reorg.
+					if block.ParentHash() != current.Hash() {
+						reorgData := bc.getReorgData(current, block)
+						if reorgData.err == nil {
+							// If the reorgData is NOT nil, we know that the writeKnownBlockAsHead -> reorg
+							// logic will return the error.
+							// We let that part of the flow handle that error.
+							// We're only concerned with the non-error case, where the reorg
+							// will be permitted.
+
+							// It will. That means we are on a different chain currently.
+							// Check if artificial finality forbids the reorganization,
+							// effectively overriding the simple (original) TD comparison check.
+
+							if bc.IsArtificialFinalityEnabled() &&
+								bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, current.Number()) {
+
+								if err := bc.ecbp1100(reorgData.commonBlock.Header(), current.Header(), block.Header()); err != nil {
+
+									canonicalDisallowed = true
+									log.Trace("Reorg disallowed", "error", err)
+
+								}
+							}
+						}
+					}
+				}
+
 				// Switch to import mode if the forker says the reorg is necessary
 				// and also the block is not on the canonical chain.
 				// In eth2 the forker always returns true for reorg decision (blindly trusting
 				// the external consensus engine), but in order to prevent the unnecessary
 				// reorgs when importing known blocks, the special case is handled here.
-				if block.NumberU64() > current.NumberU64() || bc.GetCanonicalHash(block.NumberU64()) != block.Hash() {
+				if !canonicalDisallowed && block.NumberU64() > current.NumberU64() || bc.GetCanonicalHash(block.NumberU64()) != block.Hash() {
 					break
 				}
 			}
@@ -2142,7 +2137,8 @@ func (bc *BlockChain) reorg(data *reorgData) error {
 
 	if data.err != nil {
 		if data.err == errReorgImpossible {
-			log.Error("Impossible reorg, please file an issue", "oldnum", data.oldBlock.Number(), "oldhash", data.oldBlock.Hash(), "newnum", data.newBlock.Number(), "newhash", data.newBlock.Hash())
+			// log.Error("Impossible reorg, please file an issue", "oldnum", data.oldBlock.Number(), "oldhash", data.oldBlock.Hash(), "newnum", data.newBlock.Number(), "newhash", data.newBlock.Hash())
+			log.Error("impossible reorg, please file an issue")
 		}
 		return data.err
 	}

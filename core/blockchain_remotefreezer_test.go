@@ -433,7 +433,6 @@ func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 }
 
 func TestTransactionIndices_RemoteFreezer(t *testing.T) {
-	t.Skip("DEBUG-DEVELOPMENT")
 	// Configure and generate a sample block chain
 	var (
 		gendb   = rawdb.NewMemoryDatabase()

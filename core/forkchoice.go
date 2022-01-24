@@ -19,26 +19,17 @@ package core
 import (
 	crand "crypto/rand"
 	"errors"
+	"fmt"
 	"math/big"
 	mrand "math/rand"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
-
-// ChainReader defines a small collection of methods needed to access the local
-// blockchain during header verification. It's implemented by both blockchain
-// and lightchain.
-type ChainReader interface {
-	// Config retrieves the header chain's chain configuration.
-	Config() ctypes.ChainConfigurator
-
-	// GetTd returns the total difficulty of a local block.
-	GetTd(common.Hash, uint64) *big.Int
-}
 
 // ForkChoice is the fork chooser based on the highest total difficulty of the
 // chain(the fork choice used in the eth1) and the external fork choice (the fork
@@ -46,7 +37,7 @@ type ChainReader interface {
 // offering fork choice during the eth1/2 merge phase, but also keep the compatibility
 // for all other proof-of-work networks.
 type ForkChoice struct {
-	chain ChainReader
+	chain consensus.ChainHeaderReader
 	rand  *mrand.Rand
 
 	// preserve is a helper function used in td fork choice.
@@ -56,7 +47,7 @@ type ForkChoice struct {
 	preserve func(header *types.Header) bool
 }
 
-func NewForkChoice(chainReader ChainReader, preserve func(header *types.Header) bool) *ForkChoice {
+func NewForkChoice(chainReader consensus.ChainHeaderReader, preserve func(header *types.Header) bool) *ForkChoice {
 	// Seed a fast but crypto originating random generator
 	seed, err := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
 	if err != nil {

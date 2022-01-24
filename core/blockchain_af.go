@@ -89,13 +89,13 @@ func (bc *BlockChain) getTDRatio(commonAncestor, current, proposed *types.Header
 // ecbp1100 implements the "MESS" artificial finality mechanism
 // "Modified Exponential Subjective Scoring" used to prefer known chain segments
 // over later-to-come counterparts, especially proposed segments stretching far into the past.
-func (bc *BlockChain) ecbp1100(commonAncestor, current, proposed *types.Header) error {
+func ecbp1100(commonAncestor, current, proposed *types.Header, getTDFunc func(common.Hash, uint64) *big.Int) error {
 
 	// Get the total difficulties of the proposed chain segment and the existing one.
-	commonAncestorTD := bc.GetTd(commonAncestor.Hash(), commonAncestor.Number.Uint64())
-	proposedParentTD := bc.GetTd(proposed.ParentHash, proposed.Number.Uint64()-1)
+	commonAncestorTD := getTDFunc(commonAncestor.Hash(), commonAncestor.Number.Uint64())
+	proposedParentTD := getTDFunc(proposed.ParentHash, proposed.Number.Uint64()-1)
 	proposedTD := new(big.Int).Add(proposed.Difficulty, proposedParentTD)
-	localTD := bc.GetTd(current.Hash(), current.Number.Uint64())
+	localTD := getTDFunc(current.Hash(), current.Number.Uint64())
 
 	// if proposed_subchain_td * CURVE_FUNCTION_DENOMINATOR < get_curve_function_numerator(proposed.Time - commonAncestor.Time) * local_subchain_td.
 	proposedSubchainTD := new(big.Int).Sub(proposedTD, commonAncestorTD)

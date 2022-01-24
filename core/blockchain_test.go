@@ -2046,6 +2046,52 @@ func testSideImport(t *testing.T, numCanonBlocksInSidechain, blocksBetweenCommon
 	}
 }
 
+func TestForkChoice_CommonAncestor(t *testing.T) {
+	engine := ethash.NewFaker()
+
+	db := rawdb.NewMemoryDatabase()
+	genesis := params.DefaultMessNetGenesisBlock()
+	genesisB := MustCommitGenesis(db, genesis)
+
+	chain, err := NewBlockChain(db, nil, genesis.Config, engine, vm.Config{}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer chain.Stop()
+
+	blocksA, _ := GenerateChain(genesis.Config, genesisB, engine, db, 10, func(i int, b *BlockGen) {
+		b.SetNonce(types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64))))
+		b.OffsetTime(0)
+	})
+	_, err = chain.InsertChain(blocksA)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if chain.CurrentBlock().NumberU64() != 10 {
+		t.Fatal("insanity")
+	}
+
+	// Define a common ancestor.
+	commonAncestor := blocksA[6]
+
+	// Build B segment from the common ancestor.
+	blocksB, _ := GenerateChain(genesis.Config, commonAncestor, engine, db, 4, func(i int, b *BlockGen) {
+		b.SetNonce(types.EncodeNonce(uint64(rand.Int63n(math.MaxInt64))))
+		b.OffsetTime(0)
+	})
+	// Insert it. The forker must have access to working chain reader methods (ie. GetHeader).
+	chain.InsertChain(blocksB[:3])
+
+	ancestor, err := chain.forker.CommonAncestor(blocksA[len(blocksA)-1].Header(), blocksB[len(blocksB)-1].Header())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if n := ancestor.Number.Uint64(); n != commonAncestor.NumberU64() {
+		t.Fatalf("got: %d, want: %d", n, commonAncestor.NumberU64())
+	}
+}
+
 // Tests that importing a sidechain (S), where
 // - S is sidechain, containing blocks [Sn...Sm]
 // - C is canon chain, containing blocks [G..Cn..Cm]

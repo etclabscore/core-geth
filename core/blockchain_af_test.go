@@ -51,6 +51,9 @@ func runMESSTest2(t *testing.T, enableMess bool, easyL, hardL, caN int, easyT, h
 		t.Fatal(err)
 	}
 	_, err = chain.InsertChain(hard)
+	if err != nil {
+		t.Logf("insert hard chain error = %v", err)
+	}
 	hardHead = chain.CurrentBlock().Hash() == hard[len(hard)-1].Hash()
 	return
 }

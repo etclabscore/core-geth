@@ -60,6 +60,42 @@ func NewForkChoice(chainReader consensus.ChainHeaderReader, preserve func(header
 	}
 }
 
+func (f *ForkChoice) CommonAncestor(current *types.Header, header *types.Header) (*types.Header, error) {
+
+	oldH, newH := types.CopyHeader(current), types.CopyHeader(header)
+	var commonAncestor *types.Header
+
+	// Reduce the longer chain to the same number as the shorter one.
+	if oldH.Number.Uint64() > newH.Number.Uint64() {
+		for ; oldH != nil && oldH.Number.Uint64() != newH.Number.Uint64(); oldH = f.chain.GetHeader(oldH.ParentHash, oldH.Number.Uint64()-1) {
+			// noop (txes and logs aggregation not handled here)
+		}
+	} else {
+		for ; newH != nil && newH.Number.Uint64() != oldH.Number.Uint64(); newH = f.chain.GetHeader(newH.ParentHash, newH.Number.Uint64()-1) {
+			// noop
+		}
+	}
+
+	// Both sides of the reorg are at the same number, reduce both until the
+	// common ancestor is found.
+	for {
+		if oldH.Hash() == newH.Hash() {
+			commonAncestor = oldH
+			break
+		}
+		oldH = f.chain.GetHeader(oldH.ParentHash, oldH.Number.Uint64()-1)
+		if oldH == nil {
+			return nil, fmt.Errorf("invalid oldH chain")
+		}
+
+		newH = f.chain.GetHeader(newH.ParentHash, newH.Number.Uint64()-1)
+		if newH == nil {
+			return nil, fmt.Errorf("invalid newH chain")
+		}
+	}
+	return commonAncestor, nil
+}
+
 // ReorgNeeded returns whether the reorg should be applied
 // based on the given external header and local canonical chain.
 // In the td mode, the new head is chosen if the corresponding
@@ -95,5 +131,47 @@ func (f *ForkChoice) ReorgNeeded(current *types.Header, header *types.Header) (b
 			reorg = !currentPreserve && (externPreserve || f.rand.Float64() < 0.5)
 		}
 	}
+
+	// If reorg is not needed (false), then we can just return.
+	// The following logic adds a condition only in the case where a reorg would
+	// otherwise be indicated.
+	if !reorg {
+		return reorg, nil
+	}
+
+	if bc, ok := f.chain.(*BlockChain); ok {
+		// Short circuit if not configured for Artificial Finality.
+		if !bc.IsArtificialFinalityEnabled() {
+			return reorg, nil
+		}
+	}
+	if !f.chain.Config().IsEnabled(f.chain.Config().GetECBP1100Transition, current.Number) {
+		return reorg, nil
+	}
+
+	commonHeader, err := f.CommonAncestor(current, header)
+	if err != nil {
+		return reorg, err
+	}
+
+	if err := ecbp1100(commonHeader, current, header, f.chain.GetTd); err != nil {
+
+		reorg = false
+		log.Warn("Reorg disallowed", "error", err)
+
+	} else if current.Number.Uint64()-commonHeader.Number.Uint64() > 2 {
+
+		// Reorg is allowed, only log the MESS line if old chain is longer than normal.
+		log.Info("ECBP1100-MESS 🔓",
+			"status", "accepted",
+			"age", common.PrettyAge(time.Unix(int64(commonHeader.Time), 0)),
+			"current.span", common.PrettyDuration(time.Duration(current.Time-commonHeader.Time)*time.Second),
+			"proposed.span", common.PrettyDuration(time.Duration(header.Time-commonHeader.Time)*time.Second),
+			"common.bno", commonHeader.Number.Uint64(), "common.hash", commonHeader.Hash(),
+			"current.bno", current.Number.Uint64(), "current.hash", current.Hash(),
+			"proposed.bno", header.Number.Uint64(), "proposed.hash", header.Hash(),
+		)
+	}
+
 	return reorg, nil
 }

@@ -93,7 +93,7 @@ func (api *FreezerRemoteClient) Ancients() (uint64, error) {
 
 func (api *FreezerRemoteClient) AncientRange(kind string, start, count, maxBytes uint64) ([][]byte, error) {
 	var res [][]byte
-	err := api.client.Call(&res, FreezerMethodAncientRange)
+	err := api.client.Call(&res, FreezerMethodAncientRange, kind, start, count, maxBytes)
 	return res, err
 }
 

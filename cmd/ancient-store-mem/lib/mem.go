@@ -92,7 +92,10 @@ func (f *MemFreezerRemoteServerAPI) AncientRange(kind string, start, count, maxB
 	res := make([][]byte, 0)
 	// fmt.Println("mock server called", "method=Ancients")
 	for i := uint64(0); i < count; i++ {
-		res = append(res, f.store[f.storeKey(kind, start+i)][:maxBytes])
+		// FIXME: This should truncate (sort of) the bytes to the maxBytes value.
+		// See freezer_table.go#RetrieveItems and friends.
+		item := f.store[f.storeKey(kind, start+i)]
+		res = append(res, item)
 	}
 	return res, nil
 }

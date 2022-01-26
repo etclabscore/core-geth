@@ -1,0 +1,307 @@
+2022/01/25 16:46:46 FROM 0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B
+2022/01/25 16:46:46 FROM 0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B
+2022/01/25 16:46:46 FROM 0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B
+2022/01/25 16:46:46 FROM 0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B
+2022/01/25 16:46:46 FROM 0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B
+2022/01/25 16:46:46 FROM 0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B
+[
+  {
+    "name": "emptyWithStorage",
+    "pass": true,
+    "fork": "EIP150",
+    "state": {
+      "root": "4fbb1e5d5dab6d79241ba3b49d3b5bd35248c3de9d9d2cb5fab55efb79ea20b6",
+      "accounts": {
+        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+          "balance": "210000",
+          "nonce": 0,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x9d860e7bb7e6b09b87ab7406933ef2980c19d7d0192d8939cf6dc6908a03305f"
+        },
+        "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "999999790000",
+          "nonce": 1,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x03601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616b"
+        },
+        "0xb94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "0",
+          "nonce": 0,
+          "root": "0x1880789997b7ad9f7dbe3eaa5a6341554c53df4f094f0b23574de72be7099e05",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "storage": {
+            "0x0000000000000000000000000000000000000000000000000000000000000000": "bc36789e7a1e281436464229828f817d6612f7b477d66591ff96a9e064bcc98a"
+          },
+          "key": "0xd0c30dcd188e2cdd56c50b2044d150873010914736f94d07d26ff74c7f0cf89b"
+        }
+      }
+    }
+  },
+  {
+    "name": "emptyWithStorage",
+    "pass": true,
+    "fork": "Berlin",
+    "state": {
+      "root": "85a4c3494572ab82aa1c15a6caa3712b3cfcb571b076ea47ee1283d9bfdf8440",
+      "accounts": {
+        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+          "balance": "210000",
+          "nonce": 0,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x9d860e7bb7e6b09b87ab7406933ef2980c19d7d0192d8939cf6dc6908a03305f"
+        },
+        "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "999999790000",
+          "nonce": 1,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x03601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616b"
+        }
+      }
+    }
+  },
+  {
+    "name": "emptyWithStorage",
+    "pass": true,
+    "fork": "ETC_Magneto",
+    "state": {
+      "root": "85a4c3494572ab82aa1c15a6caa3712b3cfcb571b076ea47ee1283d9bfdf8440",
+      "accounts": {
+        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+          "balance": "210000",
+          "nonce": 0,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x9d860e7bb7e6b09b87ab7406933ef2980c19d7d0192d8939cf6dc6908a03305f"
+        },
+        "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "999999790000",
+          "nonce": 1,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x03601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616b"
+        }
+      }
+    }
+  },
+  {
+    "name": "emptyWithStorage",
+    "pass": true,
+    "fork": "ETC_Phoenix",
+    "state": {
+      "root": "85a4c3494572ab82aa1c15a6caa3712b3cfcb571b076ea47ee1283d9bfdf8440",
+      "accounts": {
+        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+          "balance": "210000",
+          "nonce": 0,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x9d860e7bb7e6b09b87ab7406933ef2980c19d7d0192d8939cf6dc6908a03305f"
+        },
+        "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "999999790000",
+          "nonce": 1,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x03601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616b"
+        }
+      }
+    }
+  },
+  {
+    "name": "emptyWithStorage",
+    "pass": true,
+    "fork": "Istanbul",
+    "state": {
+      "root": "85a4c3494572ab82aa1c15a6caa3712b3cfcb571b076ea47ee1283d9bfdf8440",
+      "accounts": {
+        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+          "balance": "210000",
+          "nonce": 0,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x9d860e7bb7e6b09b87ab7406933ef2980c19d7d0192d8939cf6dc6908a03305f"
+        },
+        "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "999999790000",
+          "nonce": 1,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x03601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616b"
+        }
+      }
+    }
+  },
+  {
+    "name": "emptyWithStorage",
+    "pass": true,
+    "fork": "London",
+    "state": {
+      "root": "53994d198e224bd748327064161148d88bc7c3a252062197363bda2408864225",
+      "accounts": {
+        "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "999999790000",
+          "nonce": 1,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x03601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616b"
+        }
+      }
+    }
+  }
+]
+2022/01/25 16:46:46 FROM 0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B
+2022/01/25 16:46:46 FROM 0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B
+2022/01/25 16:46:46 FROM 0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B
+2022/01/25 16:46:46 FROM 0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B
+2022/01/25 16:46:46 FROM 0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B
+2022/01/25 16:46:46 FROM 0xa94f5374Fce5edBC8E2a8697C15331677e6EbF0B
+[
+  {
+    "name": "emptyWithoutStorage",
+    "pass": true,
+    "fork": "Istanbul",
+    "state": {
+      "root": "85a4c3494572ab82aa1c15a6caa3712b3cfcb571b076ea47ee1283d9bfdf8440",
+      "accounts": {
+        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+          "balance": "210000",
+          "nonce": 0,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x9d860e7bb7e6b09b87ab7406933ef2980c19d7d0192d8939cf6dc6908a03305f"
+        },
+        "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "999999790000",
+          "nonce": 1,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x03601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616b"
+        }
+      }
+    }
+  },
+  {
+    "name": "emptyWithoutStorage",
+    "pass": true,
+    "fork": "London",
+    "state": {
+      "root": "53994d198e224bd748327064161148d88bc7c3a252062197363bda2408864225",
+      "accounts": {
+        "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "999999790000",
+          "nonce": 1,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x03601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616b"
+        }
+      }
+    }
+  },
+  {
+    "name": "emptyWithoutStorage",
+    "pass": true,
+    "fork": "EIP150",
+    "state": {
+      "root": "898f33844769547844e1efc91b2367643708a5e1dc53be125ba65d34ce0c2fb7",
+      "accounts": {
+        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+          "balance": "210000",
+          "nonce": 0,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x9d860e7bb7e6b09b87ab7406933ef2980c19d7d0192d8939cf6dc6908a03305f"
+        },
+        "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "999999790000",
+          "nonce": 1,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x03601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616b"
+        },
+        "0xb94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "0",
+          "nonce": 0,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0xd0c30dcd188e2cdd56c50b2044d150873010914736f94d07d26ff74c7f0cf89b"
+        }
+      }
+    }
+  },
+  {
+    "name": "emptyWithoutStorage",
+    "pass": true,
+    "fork": "Berlin",
+    "state": {
+      "root": "85a4c3494572ab82aa1c15a6caa3712b3cfcb571b076ea47ee1283d9bfdf8440",
+      "accounts": {
+        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+          "balance": "210000",
+          "nonce": 0,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x9d860e7bb7e6b09b87ab7406933ef2980c19d7d0192d8939cf6dc6908a03305f"
+        },
+        "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "999999790000",
+          "nonce": 1,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x03601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616b"
+        }
+      }
+    }
+  },
+  {
+    "name": "emptyWithoutStorage",
+    "pass": true,
+    "fork": "ETC_Magneto",
+    "state": {
+      "root": "85a4c3494572ab82aa1c15a6caa3712b3cfcb571b076ea47ee1283d9bfdf8440",
+      "accounts": {
+        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+          "balance": "210000",
+          "nonce": 0,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x9d860e7bb7e6b09b87ab7406933ef2980c19d7d0192d8939cf6dc6908a03305f"
+        },
+        "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "999999790000",
+          "nonce": 1,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x03601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616b"
+        }
+      }
+    }
+  },
+  {
+    "name": "emptyWithoutStorage",
+    "pass": true,
+    "fork": "ETC_Phoenix",
+    "state": {
+      "root": "85a4c3494572ab82aa1c15a6caa3712b3cfcb571b076ea47ee1283d9bfdf8440",
+      "accounts": {
+        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+          "balance": "210000",
+          "nonce": 0,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x9d860e7bb7e6b09b87ab7406933ef2980c19d7d0192d8939cf6dc6908a03305f"
+        },
+        "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b": {
+          "balance": "999999790000",
+          "nonce": 1,
+          "root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "key": "0x03601462093b5945d1676df093446790fd31b20e7b12a2e8e5e09d068109616b"
+        }
+      }
+    }
+  }
+]

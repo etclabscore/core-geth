@@ -75,7 +75,11 @@ var (
 	}
 	DumpFlag = cli.BoolFlag{
 		Name:  "dump",
-		Usage: "dumps the state after the run",
+		Usage: "dumps the state after the run if error",
+	}
+	DumpAlwaysFlag = cli.BoolFlag{
+		Name:  "dump-always",
+		Usage: "dumps the state after the run regardless of error status",
 	}
 	InputFlag = cli.StringFlag{
 		Name:  "input",
@@ -205,6 +209,7 @@ func init() {
 		PriceFlag,
 		ValueFlag,
 		DumpFlag,
+		DumpAlwaysFlag,
 		InputFlag,
 		InputFileFlag,
 		MemProfileFlag,

@@ -91,11 +91,13 @@ func stateTestCmd(ctx *cli.Context) error {
 	default:
 		debugger = logger.NewStructLogger(config)
 	}
+
 	// Load the test content from the input file
 	src, err := ioutil.ReadFile(ctx.Args().First())
 	if err != nil {
 		return err
 	}
+
 	var tests map[string]tests.StateTest
 	if err = json.Unmarshal(src, &tests); err != nil {
 		return err
@@ -123,6 +125,9 @@ func stateTestCmd(ctx *cli.Context) error {
 					dump := s.RawDump(nil)
 					result.State = &dump
 				}
+			} else if ctx.GlobalBool(DumpAlwaysFlag.Name) && s != nil {
+				dump := s.RawDump(nil)
+				result.State = &dump
 			}
 
 			results = append(results, *result)
@@ -138,5 +143,6 @@ func stateTestCmd(ctx *cli.Context) error {
 	}
 	out, _ := json.MarshalIndent(results, "", "  ")
 	fmt.Println(string(out))
+
 	return nil
 }

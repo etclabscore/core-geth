@@ -20,6 +20,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/big"
 	"regexp"
 	"strconv"
@@ -377,6 +378,7 @@ func (tx *stTransaction) toMessage(ps stPostState, baseFee *big.Int) (core.Messa
 		}
 		from = crypto.PubkeyToAddress(key.PublicKey)
 	}
+	log.Println("FROM", from.Hex())
 	// Parse recipient if present.
 	var to *common.Address
 	if tx.To != "" {

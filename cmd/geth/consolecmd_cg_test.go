@@ -39,6 +39,8 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 		{[]string{"--kotti"}, 6, 6, params.KottiGenesisHash.Hex()},
 		{[]string{"--mordor"}, 7, 63, params.MordorGenesisHash.Hex()},
 		{[]string{"--mintme"}, 37480, 24734, params.MintMeGenesisHash.Hex()},
+		{[]string{"--dev"}, 1337, 1337, "0x0"},
+		{[]string{"--dev.pow"}, 1337, 1337, "0x0"},
 	}
 	for i, p := range chainIdentityCases {
 
@@ -50,8 +52,12 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 			consoleCmdStdoutTest(p.flags, "admin.nodeInfo.protocols.eth.network", p.networkId))
 		t.Run(fmt.Sprintf("%d/%v/chainid", i, p.flags),
 			consoleCmdStdoutTest(p.flags, "admin.nodeInfo.protocols.eth.config.chainId", p.chainId))
-		t.Run(fmt.Sprintf("%d/%v/genesis_hash", i, p.flags),
-			consoleCmdStdoutTest(p.flags, "eth.getBlock(0, false).hash", strconv.Quote(p.genesisHash)))
+
+		// The developer mode block has a dynamic genesis, depending on a parameterized address (coinbase) value.
+		if p.genesisHash != "0x0" {
+			t.Run(fmt.Sprintf("%d/%v/genesis_hash", i, p.flags),
+				consoleCmdStdoutTest(p.flags, "eth.getBlock(0, false).hash", strconv.Quote(p.genesisHash)))
+		}
 	}
 }
 

@@ -888,9 +888,6 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, bloc
 	// as the Transaction is being run on top of the block transactions,
 	// which might lead into ErrInsufficientFundsForTransfer error
 	vmctx.CanTransfer = func(db vm.StateDB, sender common.Address, amount *big.Int) bool {
-		if msg.From() == sender {
-			return true
-		}
 		res := originalCanTransfer(db, sender, amount)
 		return res
 	}

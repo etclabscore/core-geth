@@ -335,7 +335,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		st.refundGas(vars.RefundQuotientEIP3529)
 	}
 	effectiveTip := st.gasPrice
-	if eip1559f { // TODO(iquidus): which eip is this?
+	if eip1559f {
 		effectiveTip = cmath.BigMin(st.gasTipCap, new(big.Int).Sub(st.gasFeeCap, st.evm.Context.BaseFee))
 	}
 	st.state.AddBalance(st.evm.Context.Coinbase, new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), effectiveTip))

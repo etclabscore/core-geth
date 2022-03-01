@@ -39,6 +39,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/tests"
+	"github.com/go-test/deep"
 
 	// Force-load native and js pacakges, to trigger registration
 	_ "github.com/ethereum/go-ethereum/eth/tracers/js"
@@ -188,6 +189,7 @@ func testCallTracer(tracerName string, dirPath string, t *testing.T) {
 			if err != nil {
 				t.Fatalf("failed to create call tracer: %v", err)
 			}
+			t.Logf("Call tracer type: %v", reflect.TypeOf(tracer))
 			evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
 			msg, err := tx.AsMessage(signer, nil)
 			if err != nil {
@@ -208,10 +210,19 @@ func testCallTracer(tracerName string, dirPath string, t *testing.T) {
 			}
 
 			if !jsonEqual(ret, test.Result) {
-				// uncomment this for easier debugging
-				//have, _ := json.MarshalIndent(ret, "", " ")
-				//want, _ := json.MarshalIndent(test.Result, "", " ")
-				//t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
+				t.Logf("tracer name: %s", tracerName)
+
+				// uncomment this for easier debugging <3 ziogaschr
+				have, _ := json.MarshalIndent(ret, "", " ")
+				want, _ := json.MarshalIndent(test.Result, "", " ")
+				t.Logf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
+
+				// uncomment this for harder debugging <3 meowsbits
+				lines := deep.Equal(ret, test.Result)
+				for _, l := range lines {
+					t.Logf("%s", l)
+				}
+
 				t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
 			}
 		})

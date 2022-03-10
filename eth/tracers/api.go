@@ -875,8 +875,8 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, bloc
 	}
 	vmctx := core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
 
-	originalCanTransfer := vmctx.CanTransfer
-	originalTransfer := vmctx.Transfer
+	// originalCanTransfer := vmctx.CanTransfer
+	// originalTransfer := vmctx.Transfer
 
 	// Store the truth on wether from acount has enough balance for context usage
 	gasCost := new(big.Int).Mul(new(big.Int).SetUint64(msg.Gas()), msg.GasPrice())
@@ -884,25 +884,29 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, bloc
 	hasFromSufficientBalanceForValueAndGasCost := vmctx.CanTransfer(statedb, msg.From(), totalCost)
 	hasFromSufficientBalanceForGasCost := vmctx.CanTransfer(statedb, msg.From(), gasCost)
 
-	// This is needed for trace_call (debug mode),
-	// as the Transaction is being run on top of the block transactions,
-	// which might lead into ErrInsufficientFundsForTransfer error
-	vmctx.CanTransfer = func(db vm.StateDB, sender common.Address, amount *big.Int) bool {
-		res := originalCanTransfer(db, sender, amount)
-		return res
-	}
+	// // This is needed for trace_call (debug mode),
+	// // as the Transaction is being run on top of the block transactions,
+	// // which might lead into ErrInsufficientFundsForTransfer error
+	// vmctx.CanTransfer = func(db vm.StateDB, sender common.Address, amount *big.Int) bool {
+	// 	if msg.From() == sender {
+	// 		return true
+	// 	}
 
-	// If the actual transaction would fail, then their is no reason to actually transfer any balance at all
-	vmctx.Transfer = func(db vm.StateDB, sender, recipient common.Address, amount *big.Int) {
-		toAmount := new(big.Int).Set(amount)
+	// 	res := originalCanTransfer(db, sender, amount)
+	// 	return res
+	// }
 
-		senderBalance := db.GetBalance(sender)
-		if senderBalance.Cmp(toAmount) < 0 {
-			toAmount.Set(big.NewInt(0))
-		}
+	// // If the actual transaction would fail, then their is no reason to actually transfer any balance at all
+	// vmctx.Transfer = func(db vm.StateDB, sender, recipient common.Address, amount *big.Int) {
+	// 	toAmount := new(big.Int).Set(amount)
 
-		originalTransfer(db, sender, recipient, toAmount)
-	}
+	// 	senderBalance := db.GetBalance(sender)
+	// 	if senderBalance.Cmp(toAmount) < 0 {
+	// 		toAmount.Set(big.NewInt(0))
+	// 	}
+
+	// 	originalTransfer(db, sender, recipient, toAmount)
+	// }
 
 	// Add extra context needed for state_diff
 	taskExtraContext := map[string]interface{}{

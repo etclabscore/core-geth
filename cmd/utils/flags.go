@@ -1766,8 +1766,10 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// Override any default configs for hard coded networks.
 
 	// Override genesis configuration if a --<chain> flag.
-	if gen := genesisForCtxChainConfig(ctx); gen != nil {
-		cfg.Genesis = gen
+	if !ctx.GlobalBool(DeveloperFlag.Name) && !ctx.GlobalBool(DeveloperPoWFlag.Name) {
+		if gen := genesisForCtxChainConfig(ctx); gen != nil {
+			cfg.Genesis = gen
+		}
 	}
 
 	// Establish NetworkID.

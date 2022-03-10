@@ -82,6 +82,10 @@ var (
 
 		ECIP1099FBlock: big.NewInt(11_700_000), // Etchash (DAG size limit)
 
+		// London (partially), aka Mystique
+		EIP3529FBlock: big.NewInt(14_525_000),
+		EIP3541FBlock: big.NewInt(14_525_000),
+
 		DisposalBlock:      big.NewInt(5900000),
 		ECIP1017FBlock:     big.NewInt(5000000),
 		ECIP1017EraRounds:  big.NewInt(5000000),

@@ -187,8 +187,11 @@ func TestCreation(t *testing.T) {
 				{11_700_000, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 13_189_133}},
 				{11_700_001, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 13_189_133}},
 				{13_189_132, ID{Hash: checksumToBytes(0xdb63a1ca), Next: 13_189_133}},
-				{13_189_133, ID{Hash: checksumToBytes(0x0f6bf187), Next: 0}},
-				{13_189_134, ID{Hash: checksumToBytes(0x0f6bf187), Next: 0}},
+				{13_189_133, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
+				{13_189_134, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
+				{14_524_999, ID{Hash: checksumToBytes(0x0f6bf187), Next: 14_525_000}},
+				{14_525_000, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 0}},
+				{14_525_001, ID{Hash: checksumToBytes(0x7fd1bb25), Next: 0}},
 			},
 		},
 		{
@@ -207,8 +210,11 @@ func TestCreation(t *testing.T) {
 				{2200013, ID{Hash: checksumToBytes(0x6f402821), Next: 4_368_634}},
 				{2200014, ID{Hash: checksumToBytes(0x6f402821), Next: 4_368_634}},
 				{4_368_633, ID{Hash: checksumToBytes(0x6f402821), Next: 4_368_634}},
-				{4_368_634, ID{Hash: checksumToBytes(0xf03e54e7), Next: 0}},
-				{4_368_635, ID{Hash: checksumToBytes(0xf03e54e7), Next: 0}},
+				{4_368_634, ID{Hash: checksumToBytes(0xf03e54e7), Next: 5_578_000}},
+				{4_368_635, ID{Hash: checksumToBytes(0xf03e54e7), Next: 5_578_000}},
+				{5_577_999, ID{Hash: checksumToBytes(0xf03e54e7), Next: 5_578_000}},
+				{5_578_000, ID{Hash: checksumToBytes(0xc5459816), Next: 0}},
+				{5_578_001, ID{Hash: checksumToBytes(0xc5459816), Next: 0}},
 			},
 		},
 		{
@@ -231,8 +237,11 @@ func TestCreation(t *testing.T) {
 				{2_519_999, ID{Hash: checksumToBytes(0xf42f5539), Next: 2_520_000}},
 				{2_520_000, ID{Hash: checksumToBytes(0x66b5c286), Next: 3_985_893}},
 				{3_985_892, ID{Hash: checksumToBytes(0x66b5c286), Next: 3_985_893}},
-				{3_985_893, ID{Hash: checksumToBytes(0x92b323e0), Next: 0}},
-				{3_985_894, ID{Hash: checksumToBytes(0x92b323e0), Next: 0}},
+				{3_985_893, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
+				{3_985_894, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
+				{5_519_999, ID{Hash: checksumToBytes(0x92b323e0), Next: 5_520_000}},
+				{5_520_000, ID{Hash: checksumToBytes(0x8c9b1797), Next: 0}},
+				{5_520_001, ID{Hash: checksumToBytes(0x8c9b1797), Next: 0}},
 			},
 		},
 		// MintMe test cases
@@ -369,7 +378,7 @@ func TestGatherForks(t *testing.T) {
 		{
 			"classic",
 			params.ClassicChainConfig,
-			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000, 10500839, 11_700_000, 13_189_133},
+			[]uint64{1150000, 2500000, 3000000, 5000000, 5900000, 8772000, 9573000, 10500839, 11_700_000, 13_189_133, 14_525_000},
 		},
 		{
 			"mainnet",
@@ -379,12 +388,12 @@ func TestGatherForks(t *testing.T) {
 		{
 			"mordor",
 			params.MordorChainConfig,
-			[]uint64{301_243, 999_983, 2_520_000, 3_985_893},
+			[]uint64{301_243, 999_983, 2_520_000, 3_985_893, 5_520_000},
 		},
 		{
 			"kotti",
 			params.KottiChainConfig,
-			[]uint64{716_617, 1_705_549, 2_200_013, 4_368_634},
+			[]uint64{716_617, 1_705_549, 2_200_013, 4_368_634, 5_578_000},
 		},
 		{
 			"mintme",

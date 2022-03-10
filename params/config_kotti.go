@@ -79,6 +79,10 @@ var (
 		EIP2929FBlock: big.NewInt(4_368_634),
 		EIP2930FBlock: big.NewInt(4_368_634),
 
+		// London (partially), aka Mystique
+		EIP3529FBlock: big.NewInt(5_578_000),
+		EIP3541FBlock: big.NewInt(5_578_000),
+
 		RequireBlockHashes: map[uint64]common.Hash{
 			0: KottiGenesisHash,
 			/*

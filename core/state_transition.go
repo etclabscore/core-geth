@@ -312,6 +312,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	}
 
 	// Set up the initial access list.
+	// meowsbits/202203 go-ethereum has: if rules := st.evm.ChainConfig().Rules(st.evm.Context.BlockNumber, st.evm.Context.Random != nil); rules.IsBerlin {
 	if st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2929Transition, st.evm.Context.BlockNumber) {
 		st.state.PrepareAccessList(msg.From(), msg.To(), st.evm.ActivePrecompiles(), msg.AccessList())
 	}

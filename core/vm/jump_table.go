@@ -193,6 +193,15 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 	if config.IsEnabled(config.GetEIP3198Transition, bn) {
 		enable3198(&instructionSet) // BASEFEE opcode https://eips.ethereum.org/EIPS/eip-3198
 	}
+	// meowsbits/202203 TODO: RANDOM opcode for theMerge
+	if true {
+		instructionSet[RANDOM] = &operation{
+			execute:     opRandom,
+			constantGas: GasQuickStep,
+			minStack:    minStack(0, 1),
+			maxStack:    maxStack(0, 1),
+		}
+	}
 	return validate(instructionSet)
 }
 

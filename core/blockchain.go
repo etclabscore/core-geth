@@ -1010,7 +1010,6 @@ func (bc *BlockChain) InsertReceiptChain(blockChain types.Blocks, receiptChain [
 		if err := bc.db.Sync(); err != nil {
 			return 0, err
 		}
-
 		// Update the current fast block because all block data is now present in DB.
 		previousFastBlock := bc.CurrentFastBlock().NumberU64()
 		if !updateHead(blockChain[len(blockChain)-1]) {

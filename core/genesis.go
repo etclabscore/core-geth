@@ -233,6 +233,8 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	if g.GasLimit == 0 {
 		head.GasLimit = vars.GenesisGasLimit
 	}
+	// -- meowsbits/202203 go-ethereum has: if g.Difficulty == nil && g.Mixhash == (common.Hash{}) {
+	// They also assign the Difficulty field directly.
 	if g.Difficulty == nil {
 		head.Difficulty = new(big.Int)
 		head.Difficulty.Set(vars.GenesisDifficulty)

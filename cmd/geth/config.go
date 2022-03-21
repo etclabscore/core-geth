@@ -177,7 +177,7 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 			cfg.Eth.ECBP1100NoDisable = &enable
 		}
 	}
-	backend, _ := utils.RegisterEthService(stack, &cfg.Eth, ctx.GlobalBool(utils.CatalystFlag.Name))
+	backend, _ := utils.RegisterEthService(stack, &cfg.Eth)
 
 	// Configure GraphQL if requested
 	if ctx.GlobalIsSet(utils.GraphQLEnabledFlag.Name) {

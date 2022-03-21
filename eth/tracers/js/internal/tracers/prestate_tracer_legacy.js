@@ -63,6 +63,25 @@
 	// result is invoked when all the opcodes have been iterated over and returns
 	// the final result of the tracing.
 	result: function(ctx, db) {
+		if (this.prestate === null) {
+			this.prestate = {};
+			// If tx is transfer-only, the recipient account
+			// hasn't been populated.
+			this.lookupAccount(ctx.to, db);
+		}
+
+		// At this point, we need to deduct the 'value' from the
+		// outer transaction, and move it back to the origin
+		this.lookupAccount(ctx.from, db);
+
+		var fromBal = bigInt(this.prestate[toHex(ctx.from)].balance.slice(2), 16);
+		var toBal   = bigInt(this.prestate[toHex(ctx.to)].balance.slice(2), 16);
+
+		this.prestate[toHex(ctx.to)].balance   = '0x'+toBal.subtract(ctx.value).toString(16);
+		this.prestate[toHex(ctx.from)].balance = '0x'+fromBal.add(ctx.value).add((ctx.gasUsed + ctx.intrinsicGas) * ctx.gasPrice).toString(16);
+
+		// Decrement the caller's nonce, and remove empty create targets
+		this.prestate[toHex(ctx.from)].nonce--;
 		if (ctx.type == 'CREATE') {
 			// We can blibdly delete the contract prestate, as any existing state would
 			// have caused the transaction to be rejected as invalid in the first place.
@@ -82,7 +101,7 @@
 
 		// Whenever new state is accessed, add it to the prestate
 		switch (log.op.toString()) {
-			case "EXTCODECOPY": case "EXTCODESIZE": case "BALANCE":
+			case "EXTCODECOPY": case "EXTCODESIZE": case "EXTCODEHASH": case "BALANCE":
 				this.lookupAccount(toAddress(log.stack.peek(0).toString(16)), db);
 				break;
 			case "CREATE":

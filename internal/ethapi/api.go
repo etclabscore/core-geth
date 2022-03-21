@@ -289,7 +289,7 @@ func NewPrivateAccountAPI(b Backend, nonceLock *AddrLocker) *PrivateAccountAPI {
 	}
 }
 
-// listAccounts will return a list of addresses for accounts this node manages.
+// ListAccounts will return a list of addresses for accounts this node manages.
 func (s *PrivateAccountAPI) ListAccounts() []common.Address {
 	return s.am.Accounts()
 }
@@ -1574,6 +1574,7 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 			to = crypto.CreateAddress(args.from(), uint64(*args.Nonce))
 		}
 	}
+
 	// Retrieve the precompiles since they don't need to be added to the access list
 	precompileMap := vm.PrecompiledContractsForConfig(b.ChainConfig(), header.Number)
 	precompiles := make([]common.Address, len(precompileMap))
@@ -1803,7 +1804,7 @@ func (s *PublicTransactionPoolAPI) GetTransactionReceipt(ctx context.Context, ha
 		fields["status"] = hexutil.Uint(receipt.Status)
 	}
 	if receipt.Logs == nil {
-		fields["logs"] = [][]*types.Log{}
+		fields["logs"] = []*types.Log{}
 	}
 	// If the ContractAddress is 20 0x0 bytes, assume it is not a contract creation
 	if receipt.ContractAddress != (common.Address{}) {

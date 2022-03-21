@@ -57,6 +57,10 @@ func newPrestateTracer() tracers.Tracer {
 	return &prestateTracer{prestate: prestate{}}
 }
 
+func (t *prestateTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {
+	// TODO implement me? meowsbits/202203
+}
+
 // CaptureStart implements the EVMLogger interface to initialize the tracing operation.
 func (t *prestateTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
 	t.env = env
@@ -64,9 +68,9 @@ func (t *prestateTracer) CaptureStart(env *vm.EVM, from common.Address, to commo
 	t.to = to
 
 	// Compute intrinsic gas
-	isHomestead := env.ChainConfig().IsHomestead(env.Context.BlockNumber)
-	isIstanbul := env.ChainConfig().IsIstanbul(env.Context.BlockNumber)
-	intrinsicGas, err := core.IntrinsicGas(input, nil, create, isHomestead, isIstanbul)
+	eip2f := env.ChainConfig().IsEnabled(env.ChainConfig().GetEIP2Transition, new(big.Int))
+	eip2028f := env.ChainConfig().IsEnabled(env.ChainConfig().GetEIP2028Transition, new(big.Int))
+	intrinsicGas, err := core.IntrinsicGas(input, nil, create, eip2f, eip2028f)
 	if err != nil {
 		return
 	}

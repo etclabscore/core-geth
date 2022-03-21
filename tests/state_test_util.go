@@ -362,7 +362,7 @@ func MakePreState(db ethdb.Database, accounts genesisT.GenesisAlloc, snapshotter
 }
 
 func (t *StateTest) genesis(config ctypes.ChainConfigurator) *genesisT.Genesis {
-	return &genesisT.Genesis{
+	genesis := &genesisT.Genesis{
 		Config:     config,
 		Coinbase:   t.json.Env.Coinbase,
 		Difficulty: t.json.Env.Difficulty,

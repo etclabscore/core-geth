@@ -674,7 +674,11 @@ func TestRandom(t *testing.T) {
 			pc             = uint64(0)
 			evmInterpreter = env.interpreter
 		)
-		opRandom(&pc, evmInterpreter, &ScopeContext{nil, stack, nil})
+		assertEVMInterpreter, ok := evmInterpreter.(*EVMInterpreter)
+		if !ok {
+			t.Fatal("must use *EVMInterpreter interpreter for this test")
+		}
+		opRandom(&pc, assertEVMInterpreter, &ScopeContext{nil, stack, nil})
 		if len(stack.data) != 1 {
 			t.Errorf("Expected one item on stack after %v, got %d: ", tt.name, len(stack.data))
 		}

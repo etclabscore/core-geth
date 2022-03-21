@@ -254,8 +254,9 @@ func Transition(ctx *cli.Context) error {
 			return NewError(ErrorConfig, errors.New("EIP-1559 config but missing 'currentBaseFee' in env section"))
 		}
 	}
-	// Sanity check, to not `panic` in state_transition
-	if prestate.Env.Random != nil && !chainConfig.IsLondon(big.NewInt(int64(prestate.Env.Number))) {
+	// Here, EIP3529 is used to represent IsLondon fork logic.
+	if prestate.Env.Random != nil && !chainConfig.IsEnabled(chainConfig.GetEIP3529Transition, big.NewInt(int64(prestate.Env.Number))) {
+		// Sanity check, to not `panic` in state_transition
 		return NewError(ErrorConfig, errors.New("can only apply RANDOM on top of London chainrules"))
 	}
 	if env := prestate.Env; env.Difficulty == nil {

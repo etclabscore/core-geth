@@ -1279,7 +1279,7 @@ func SetP2PConfig(ctx *cli.Context, cfg *p2p.Config) {
 		cfg.NetRestrict = list
 	}
 
-	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) || ctx.GlobalBool(CatalystFlag.Name) {
+	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) {
 		// --dev mode can't use p2p networking.
 		cfg.MaxPeers = 0
 		cfg.ListenAddr = ""
@@ -1943,7 +1943,7 @@ func RegisterEthService(stack *node.Node, cfg *ethconfig.Config) (ethapi.Backend
 			Fatalf("Failed to register the Ethereum service: %v", err)
 		}
 		stack.RegisterAPIs(tracers.APIs(backend.ApiBackend))
-		if backend.BlockChain().Config().TerminalTotalDifficulty != nil {
+		if backend.BlockChain().Config().GetEthashTerminalTotalDifficulty() != nil {
 			if err := lescatalyst.Register(stack, backend); err != nil {
 				Fatalf("Failed to register the catalyst service: %v", err)
 			}
@@ -1960,7 +1960,7 @@ func RegisterEthService(stack *node.Node, cfg *ethconfig.Config) (ethapi.Backend
 			Fatalf("Failed to create the LES server: %v", err)
 		}
 	}
-	if backend.BlockChain().Config().TerminalTotalDifficulty != nil {
+	if backend.BlockChain().Config().GetEthashTerminalTotalDifficulty() != nil {
 		if err := ethcatalyst.Register(stack, backend); err != nil {
 			Fatalf("Failed to register the catalyst service: %v", err)
 		}

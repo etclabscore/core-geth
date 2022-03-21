@@ -217,7 +217,7 @@ func runBenchmarkFile(b *testing.B, path string) {
 }
 
 func runBenchmark(b *testing.B, t *StateTest) {
-	for _, subtest := range t.Subtests() {
+	for _, subtest := range t.Subtests(nil) {
 		subtest := subtest
 		key := fmt.Sprintf("%s/%d", subtest.Fork, subtest.Index)
 
@@ -230,11 +230,11 @@ func runBenchmark(b *testing.B, t *StateTest) {
 				return
 			}
 			vmconfig.ExtraEips = eips
-			block := t.genesis(config).ToBlock(nil)
+			block := core.GenesisToBlock(t.genesis(config), nil)
 			_, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre, false)
 
 			var baseFee *big.Int
-			if config.IsLondon(new(big.Int)) {
+			if config.IsEnabled(config.GetEIP3529Transition, new(big.Int)) {
 				baseFee = t.json.Env.BaseFee
 				if baseFee == nil {
 					// Retesteth uses `0x10` for genesis baseFee. Therefore, it defaults to

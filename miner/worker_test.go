@@ -40,6 +40,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
 
@@ -553,17 +554,19 @@ func TestGetSealingWorkEthash(t *testing.T) {
 }
 
 func TestGetSealingWorkClique(t *testing.T) {
-	testGetSealingWork(t, cliqueChainConfig, clique.New(cliqueChainConfig.Clique, rawdb.NewMemoryDatabase()), false)
+	testGetSealingWork(t, cliqueChainConfig, clique.New(&ctypes.CliqueConfig{
+		Period: cliqueChainConfig.GetCliquePeriod(),
+		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
+	}, rawdb.NewMemoryDatabase()), false)
 }
 
 func TestGetSealingWorkPostMerge(t *testing.T) {
-	local := new(params.ChainConfig)
-	*local = *ethashChainConfig
-	local.TerminalTotalDifficulty = big.NewInt(0)
+	local := new(goethereum.ChainConfig)
+	local.SetEthashTerminalTotalDifficulty(big.NewInt(0))
 	testGetSealingWork(t, local, ethash.NewFaker(), true)
 }
 
-func testGetSealingWork(t *testing.T, chainConfig *params.ChainConfig, engine consensus.Engine, postMerge bool) {
+func testGetSealingWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engine consensus.Engine, postMerge bool) {
 	defer engine.Close()
 
 	w, b := newTestWorker(t, chainConfig, engine, rawdb.NewMemoryDatabase(), 0)

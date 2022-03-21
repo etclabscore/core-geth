@@ -41,7 +41,7 @@ type CoreGethChainConfig struct {
 	SupportedProtocolVersions []uint   `json:"supportedProtocolVersions,omitempty"` // supportedProtocolVersions identifies the supported eth protocol versions for the current chain
 
 	// HF: Homestead
-	//HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)
+	// HomesteadBlock *big.Int `json:"homesteadBlock,omitempty"` // Homestead switch block (nil = no fork, 0 = already homestead)
 	// "Homestead Hard-fork Changes"
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.md
 	EIP2FBlock *big.Int `json:"eip2FBlock,omitempty"`
@@ -52,16 +52,16 @@ type CoreGethChainConfig struct {
 
 	// HF: DAO
 	DAOForkBlock *big.Int `json:"daoForkBlock,omitempty"` // TheDAO hard-fork switch block (nil = no fork)
-	//DAOForkSupport bool     `json:"daoForkSupport,omitempty"` // Whether the nodes supports or opposes the DAO hard-fork
+	// DAOForkSupport bool     `json:"daoForkSupport,omitempty"` // Whether the nodes supports or opposes the DAO hard-fork
 
 	// HF: Tangerine Whistle
 	// EIP150 implements the Gas price changes (https://github.com/ethereum/EIPs/issues/150)
 	EIP150Block *big.Int `json:"eip150Block,omitempty"` // EIP150 HF block (nil = no fork)
-	//EIP150Hash  common.Hash `json:"eip150Hash,omitempty"`  // EIP150 HF hash (needed for header only clients as only gas pricing changed)
+	// EIP150Hash  common.Hash `json:"eip150Hash,omitempty"`  // EIP150 HF hash (needed for header only clients as only gas pricing changed)
 
 	// HF: Spurious Dragon
 	EIP155Block *big.Int `json:"eip155Block,omitempty"` // EIP155 HF block
-	//EIP158Block *big.Int `json:"eip158Block,omitempty"` // EIP158 HF block, includes implementations of 158/161, 160, and 170
+	// EIP158Block *big.Int `json:"eip158Block,omitempty"` // EIP158 HF block, includes implementations of 158/161, 160, and 170
 	//
 	// EXP cost increase
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-160.md
@@ -78,7 +78,7 @@ type CoreGethChainConfig struct {
 	EIP170FBlock *big.Int `json:"eip170FBlock,omitempty"`
 
 	// HF: Byzantium
-	//ByzantiumBlock *big.Int `json:"byzantiumBlock,omitempty"` // Byzantium switch block (nil = no fork, 0 = already on byzantium)
+	// ByzantiumBlock *big.Int `json:"byzantiumBlock,omitempty"` // Byzantium switch block (nil = no fork, 0 = already on byzantium)
 
 	// Difficulty adjustment to target mean block time including uncles
 	// https://github.com/ethereum/EIPs/issues/100
@@ -115,7 +115,7 @@ type CoreGethChainConfig struct {
 	// EIP684FBlock *big.Int `json:"eip684BFlock,omitempty"`
 
 	// HF: Constantinople
-	//ConstantinopleBlock *big.Int `json:"constantinopleBlock,omitempty"` // Constantinople switch block (nil = no fork, 0 = already activated)
+	// ConstantinopleBlock *big.Int `json:"constantinopleBlock,omitempty"` // Constantinople switch block (nil = no fork, 0 = already activated)
 	//
 	// Opcodes SHR, SHL, SAR
 	// https://eips.ethereum.org/EIPS/eip-145
@@ -137,7 +137,7 @@ type CoreGethChainConfig struct {
 	PetersburgBlock *big.Int `json:"petersburgBlock,omitempty"` // Petersburg switch block (nil = same as Constantinople)
 
 	// HF: Istanbul
-	//IstanbulBlock *big.Int `json:"istanbulBlock,omitempty"` // Istanbul switch block (nil = no fork, 0 = already on istanbul)
+	// IstanbulBlock *big.Int `json:"istanbulBlock,omitempty"` // Istanbul switch block (nil = no fork, 0 = already on istanbul)
 	//
 	// EIP-152: Add Blake2 compression function F precompile
 	EIP152FBlock *big.Int `json:"eip152FBlock,omitempty"`
@@ -176,7 +176,7 @@ type CoreGethChainConfig struct {
 	// https://github.com/ethereum/EIPs/pull/2537: BLS12-381 curve operations
 	EIP2537FBlock *big.Int `json:"eip2537FBlock,omitempty"`
 
-	//EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
+	// EWASMBlock *big.Int `json:"ewasmBlock,omitempty"` // EWASM switch block (nil = no fork, 0 = already activated)
 
 	ECIP1010PauseBlock *big.Int `json:"ecip1010PauseBlock,omitempty"` // ECIP1010 pause HF block
 	ECIP1010Length     *big.Int `json:"ecip1010Length,omitempty"`     // ECIP1010 length
@@ -204,6 +204,9 @@ type CoreGethChainConfig struct {
 	// EIP-3198: BASEFEE opcode
 	// https://eips.ethereum.org/EIPS/eip-3198
 	EIP3198FBlock *big.Int `json:"eip3198FBlock,omitempty"`
+
+	// EIP-4399: RANDOM opcode (supplanting DIFFICULTY)
+	EIP4399FBlock *big.Int `json:"eip4399FBlock,omitempty"`
 
 	// TODO: Document me.
 	EIP2930FBlock *big.Int `json:"eip2930FBlock,omitempty"`

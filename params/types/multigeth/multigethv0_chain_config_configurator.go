@@ -543,6 +543,15 @@ func (c *ChainConfig) SetEIP2718Transition(n *uint64) error {
 	return nil
 }
 
+func (c *ChainConfig) GetEIP4399Transition() *uint64 {
+	return bigNewU64(c.MergeForkBlock)
+}
+
+func (c *ChainConfig) SetEIP4399Transition(n *uint64) error {
+	c.MergeForkBlock = setBig(c.MergeForkBlock, n)
+	return nil
+}
+
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

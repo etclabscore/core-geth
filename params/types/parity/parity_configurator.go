@@ -1169,6 +1169,15 @@ func (spec *ParityChainSpec) SetEIP2718Transition(n *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetEIP4399Transition() *uint64 {
+	return spec.Params.EIP4399Transition.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP4399Transition(n *uint64) error {
+	spec.Params.EIP4399Transition = new(ParityU64).SetUint64(n)
+	return nil
+}
+
 func (spec *ParityChainSpec) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	if spec.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil

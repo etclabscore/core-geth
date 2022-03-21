@@ -17,6 +17,7 @@
 package miner
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"math/big"
@@ -33,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
@@ -1019,6 +1021,20 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 		log.Error("Failed to prepare header for sealing", "err", err)
 		return nil, err
 	}
+	// If we are care about TheDAO hard-fork check whether to override the extra-data or not
+	if daoBlockUint64 := w.chainConfig.GetEthashEIP779Transition(); daoBlockUint64 != nil {
+		daoBlock := new(big.Int).SetUint64(*daoBlockUint64)
+		// Check whether the block is among the fork extra-override range
+		limit := new(big.Int).Add(daoBlock, vars.DAOForkExtraRange)
+		if header.Number.Cmp(daoBlock) >= 0 && header.Number.Cmp(limit) < 0 {
+			// Depending whether we support or oppose the fork, override differently
+			if w.chainConfig.GetEthashEIP779Transition() != nil {
+				header.Extra = common.CopyBytes(vars.DAOForkBlockExtra)
+			} else if bytes.Equal(header.Extra, vars.DAOForkBlockExtra) {
+				header.Extra = []byte{} // If miner opposes, don't let it use the reserved extra-data
+			}
+		}
+	}
 	// Could potentially happen if starting to mine in an odd state.
 	// Note genParams.coinbase can be different with header.Coinbase
 	// since clique algorithm can modify the coinbase field in header.
@@ -1026,6 +1042,13 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 	if err != nil {
 		log.Error("Failed to create sealing context", "err", err)
 		return nil, err
+	}
+	// Mutate the block and state according to any hard-fork specs
+	isDAOSupport := w.chainConfig.IsEnabled(w.chainConfig.GetEthashEIP779Transition, header.Number)
+	if isDAOSupport {
+		if daoNumber := w.chainConfig.GetEthashEIP779Transition(); daoNumber != nil && *daoNumber == header.Number.Uint64() {
+			mutations.ApplyDAOHardFork(env.state)
+		}
 	}
 	// Accumulate the uncles for the sealing work only if it's allowed.
 	if !genParams.noUncle {

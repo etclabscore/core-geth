@@ -27,6 +27,31 @@ type FreezerRemoteClient struct {
 	writeMu    sync.Mutex
 }
 
+func (api *FreezerRemoteClient) Tail() (uint64, error) {
+	var res uint64
+	err := api.client.Call(&res, FreezerMethodTail)
+	return res, err
+}
+
+func (api *FreezerRemoteClient) TruncateHead(n uint64) error {
+	api.writeMu.Lock()
+	defer api.writeMu.Unlock()
+	return api.client.Call(nil, FreezerMethodTruncateHead, n)
+}
+
+func (api *FreezerRemoteClient) TruncateTail(n uint64) error {
+	api.writeMu.Lock()
+	defer api.writeMu.Unlock()
+	return api.client.Call(nil, FreezerMethodTruncateTail, n)
+}
+
+func (api *FreezerRemoteClient) MigrateTable(s string, f func([]byte) ([]byte, error)) error {
+	api.writeMu.Lock()
+	defer api.writeMu.Unlock()
+	// TODO/meowsbits/20220405: implement me
+	return nil
+}
+
 const (
 	FreezerMethodClose            = "freezer_close"
 	FreezerMethodHasAncient       = "freezer_hasAncient"
@@ -43,6 +68,12 @@ const (
 	// methods for re-written (get it?) freezer design with write batching.
 	FreezerMethodWriteAppend    = "freezer_append"
 	FreezerMethodWriteAppendRaw = "freezer_appendRaw"
+
+	// FreezerMethodTail and the following are methods are introduced from v1.10.17
+	FreezerMethodTail         = "freezer_tail"
+	FreezerMethodTruncateHead = "freezer_truncateHead"
+	FreezerMethodTruncateTail = "freezer_truncateTail"
+	FreezerMethodMigrateTable = "freezer_migrateTable"
 )
 
 // newFreezerRemoteClient constructs a rpc client to connect to a remote freezer

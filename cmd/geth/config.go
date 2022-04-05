@@ -110,7 +110,7 @@ func loadConfig(file string, cfg *gethConfig) error {
 
 func defaultNodeConfig() node.Config {
 	cfg := node.DefaultConfig
-	cfg.Name = databaseIdentifier // TODO/meowsbits: double check
+	cfg.Name = databaseIdentifier
 	cfg.Version = params.VersionWithCommit(gitCommit, gitDate)
 	cfg.HTTPModules = append(cfg.HTTPModules, "eth")
 	cfg.WSModules = append(cfg.WSModules, "eth")

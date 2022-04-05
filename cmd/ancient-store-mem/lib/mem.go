@@ -175,7 +175,29 @@ func (f *MemFreezerRemoteServerAPI) AppendRaw(kind string, num uint64, item []by
 	return nil
 }
 
-func (f *MemFreezerRemoteServerAPI) TruncateAncients(n uint64) error {
+func (f *MemFreezerRemoteServerAPI) TruncateTail(n uint64) error {
+	// fmt.Println("mock server called", "method=TruncateAncients")
+	if f.count <= n {
+		return nil
+	}
+	f.count = n
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	for k := range f.store {
+		spl := strings.Split(k, "-")
+		num, err := strconv.ParseUint(spl[1], 10, 64)
+		if err != nil {
+			return err
+		}
+		if num >= n {
+			delete(f.store, k)
+		}
+	}
+	return nil
+}
+
+// TODO/meowsbits/20220405: fixme (copypasta from TruncateTail, which was exactly Truncate before
+func (f *MemFreezerRemoteServerAPI) TruncateHead(n uint64) error {
 	// fmt.Println("mock server called", "method=TruncateAncients")
 	if f.count <= n {
 		return nil

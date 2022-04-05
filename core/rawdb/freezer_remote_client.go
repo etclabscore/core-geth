@@ -53,16 +53,15 @@ func (api *FreezerRemoteClient) MigrateTable(s string, f func([]byte) ([]byte, e
 }
 
 const (
-	FreezerMethodClose            = "freezer_close"
-	FreezerMethodHasAncient       = "freezer_hasAncient"
-	FreezerMethodAncient          = "freezer_ancient"
-	FreezerMethodAncients         = "freezer_ancients"
-	FreezerMethodAncientRange     = "freezer_ancientRange"
-	FreezerMethodAncientSize      = "freezer_ancientSize"
-	FreezerMethodAppendAncient    = "freezer_appendAncient"
-	FreezerMethodModifyAncients   = "freezer_modifyAncients"
-	FreezerMethodTruncateAncients = "freezer_truncateAncients"
-	FreezerMethodSync             = "freezer_sync"
+	FreezerMethodClose          = "freezer_close"
+	FreezerMethodHasAncient     = "freezer_hasAncient"
+	FreezerMethodAncient        = "freezer_ancient"
+	FreezerMethodAncients       = "freezer_ancients"
+	FreezerMethodAncientRange   = "freezer_ancientRange"
+	FreezerMethodAncientSize    = "freezer_ancientSize"
+	FreezerMethodAppendAncient  = "freezer_appendAncient"
+	FreezerMethodModifyAncients = "freezer_modifyAncients"
+	FreezerMethodSync           = "freezer_sync"
 
 	// FreezerMethodWriteAppend and FreezerMethodWriteAppendRaw are
 	// methods for re-written (get it?) freezer design with write batching.
@@ -208,7 +207,7 @@ func (api *FreezerRemoteClient) ModifyAncients(fn func(ethdb.AncientWriteOperato
 	defer func() {
 		if err != nil {
 			log.Warn("Rolling back ancients", "target(previous)", prev)
-			if err := api.TruncateAncients(prev); err != nil {
+			if err := api.TruncateTail(prev); err != nil {
 				log.Error("Freezer table roll-back failed", "index", prev, "err", err)
 			}
 		}
@@ -221,13 +220,6 @@ func (api *FreezerRemoteClient) ModifyAncients(fn func(ethdb.AncientWriteOperato
 	}
 
 	return api.writeBatch.writeSize, nil
-}
-
-// TruncateAncients discards any recent data above the provided threshold number.
-func (api *FreezerRemoteClient) TruncateAncients(items uint64) error {
-	api.writeMu.Lock()
-	defer api.writeMu.Unlock()
-	return api.client.Call(nil, FreezerMethodTruncateAncients, items)
 }
 
 // Sync flushes all data tables to disk.

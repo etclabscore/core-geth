@@ -67,10 +67,12 @@ type Node struct {
 
 	databases map[*closeTrackingDB]struct{} // All open databases
 
-	inprocOpenRPC *go_openrpc_reflect.Document
-	ipcOpenRPC    *go_openrpc_reflect.Document
-	httpOpenRPC   *go_openrpc_reflect.Document
-	wsOpenRPC     *go_openrpc_reflect.Document
+	inprocOpenRPC   *go_openrpc_reflect.Document
+	ipcOpenRPC      *go_openrpc_reflect.Document
+	httpOpenRPC     *go_openrpc_reflect.Document
+	httpAuthOpenRPC *go_openrpc_reflect.Document
+	wsOpenRPC       *go_openrpc_reflect.Document
+	wsAuthOpenRPC   *go_openrpc_reflect.Document
 }
 
 const (
@@ -383,13 +385,36 @@ func (n *Node) setupOpenRPC() error {
 		}
 		n.httpOpenRPC.WithMeta(metaRegistererForURL("http://"))
 	}
-	wsServer := n.wsServerForPort(n.config.WSPort)
+	if n.httpAuth.rpcAllowed() {
+		n.httpOpenRPC = newOpenRPCDocument()
+		h := n.httpAuth.httpHandler.Load().(*rpcHandler)
+		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.HTTPModules, false)
+		registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
+		n.httpOpenRPC.RegisterListener(n.httpAuth.listener)
+		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpOpenRPC}); err != nil {
+			return err
+		}
+		n.httpOpenRPC.WithMeta(metaRegistererForURL("http://"))
+	}
+	wsServer := n.wsServerForPort(n.config.WSPort, false)
 	if wsServer.wsAllowed() {
 		n.wsOpenRPC = newOpenRPCDocument()
 		h := wsServer.wsHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.WSModules, false)
 		registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
 		n.wsOpenRPC.RegisterListener(wsServer.listener)
+		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsOpenRPC}); err != nil {
+			return err
+		}
+		n.wsOpenRPC.WithMeta(metaRegistererForURL("ws://"))
+	}
+	wsAuthServer := n.wsServerForPort(n.config.WSPort, true)
+	if wsAuthServer.wsAllowed() {
+		n.wsOpenRPC = newOpenRPCDocument()
+		h := wsAuthServer.wsHandler.Load().(*rpcHandler)
+		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.WSModules, false)
+		registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
+		n.wsOpenRPC.RegisterListener(wsAuthServer.listener)
 		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsOpenRPC}); err != nil {
 			return err
 		}

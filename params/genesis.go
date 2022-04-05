@@ -17,7 +17,9 @@
 package params
 
 import (
+	"encoding/json"
 	"math/big"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -88,6 +90,15 @@ func DefaultGoerliGenesisBlock() *genesisT.Genesis {
 		Difficulty: big.NewInt(1),
 		Alloc:      genesisT.DecodePreAlloc(GoerliAllocData),
 	}
+}
+
+func DefaultKilnGenesisBlock() *genesisT.Genesis {
+	g := new(genesisT.Genesis)
+	reader := strings.NewReader(KilnAllocData)
+	if err := json.NewDecoder(reader).Decode(g); err != nil {
+		panic(err)
+	}
+	return g
 }
 
 // DeveloperGenesisBlock returns the 'geth --dev' genesis block. Note, this must

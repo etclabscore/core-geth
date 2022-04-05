@@ -28,6 +28,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 )
@@ -95,6 +98,43 @@ func (ga *GenesisAlloc) UnmarshalJSON(data []byte) error {
 	for addr, a := range m {
 		(*ga)[common.Address(addr)] = a
 	}
+	return nil
+}
+
+// Flush adds allocated genesis accounts into a fresh new statedb and
+// commit the state changes into the given database handler.
+func (ga *GenesisAlloc) Flush(db ethdb.Database) (common.Hash, error) {
+	statedb, err := state.New(common.Hash{}, state.NewDatabase(db), nil)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	for addr, account := range *ga {
+		statedb.AddBalance(addr, account.Balance)
+		statedb.SetCode(addr, account.Code)
+		statedb.SetNonce(addr, account.Nonce)
+		for key, value := range account.Storage {
+			statedb.SetState(addr, key, value)
+		}
+	}
+	root, err := statedb.Commit(false)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	err = statedb.Database().TrieDB().Commit(root, true, nil)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	return root, nil
+}
+
+// Write writes the json marshaled genesis state into database
+// with the given block hash as the unique identifier.
+func (ga *GenesisAlloc) Write(db ethdb.KeyValueWriter, hash common.Hash) error {
+	blob, err := json.Marshal(ga)
+	if err != nil {
+		return err
+	}
+	rawdb.WriteGenesisState(db, hash, blob)
 	return nil
 }
 

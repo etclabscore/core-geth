@@ -51,16 +51,16 @@ func (b *Long) UnmarshalGraphQL(input interface{}) error {
 	switch input := input.(type) {
 	case string:
 		// uncomment to support hex values
-		//if strings.HasPrefix(input, "0x") {
+		// if strings.HasPrefix(input, "0x") {
 		//	// apply leniency and support hex representations of longs.
 		//	value, err := hexutil.DecodeUint64(input)
 		//	*b = Long(value)
 		//	return err
-		//} else {
+		// } else {
 		value, err := strconv.ParseInt(input, 10, 64)
 		*b = Long(value)
 		return err
-		//}
+		// }
 	case int32:
 		*b = Long(input)
 	case int64:
@@ -643,7 +643,7 @@ func (b *Block) NextBaseFeePerGas(ctx context.Context) (*hexutil.Big, error) {
 	chaincfg := b.backend.ChainConfig()
 	if header.BaseFee == nil {
 		// Make sure next block doesn't enable EIP-1559
-		if !chaincfg.IsLondon(new(big.Int).Add(header.Number, common.Big1)) {
+		if !chaincfg.IsEnabled(chaincfg.GetEIP1559Transition, new(big.Int).Add(header.Number, common.Big1)) {
 			return nil, nil
 		}
 	}

@@ -76,7 +76,7 @@ func TestClient1(t *testing.T) {
 		}
 		if i > 42 && i%42 == 0 {
 			*head -= 15
-			err := frClient.TruncateAncients(*head)
+			err := frClient.TruncateTail(*head)
 			if err != nil {
 				t.Fatalf("truncate: %v", err)
 			}

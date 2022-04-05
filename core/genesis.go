@@ -17,6 +17,7 @@
 package core
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -217,6 +218,43 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 	}
 }
 
+// Flush adds allocated genesis accounts into a fresh new statedb and
+// commit the state changes into the given database handler.
+func gaFlush(ga *genesisT.GenesisAlloc, db ethdb.Database) (common.Hash, error) {
+	statedb, err := state.New(common.Hash{}, state.NewDatabase(db), nil)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	for addr, account := range *ga {
+		statedb.AddBalance(addr, account.Balance)
+		statedb.SetCode(addr, account.Code)
+		statedb.SetNonce(addr, account.Nonce)
+		for key, value := range account.Storage {
+			statedb.SetState(addr, key, value)
+		}
+	}
+	root, err := statedb.Commit(false)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	err = statedb.Database().TrieDB().Commit(root, true, nil)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	return root, nil
+}
+
+// Write writes the json marshaled genesis state into database
+// with the given block hash as the unique identifier.
+func gaWrite(ga *genesisT.GenesisAlloc, db ethdb.KeyValueWriter, hash common.Hash) error {
+	blob, err := json.Marshal(ga)
+	if err != nil {
+		return err
+	}
+	rawdb.WriteGenesisState(db, hash, blob)
+	return nil
+}
+
 // CommitGenesisState loads the stored genesis state with the given block
 // hash and commits them into the given database handler.
 func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
@@ -258,7 +296,7 @@ func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 			return errors.New("not found")
 		}
 	}
-	_, err := alloc.Flush(db)
+	_, err := gaFlush(&alloc, db)
 	return err
 }
 
@@ -268,7 +306,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	if db == nil {
 		db = rawdb.NewMemoryDatabase()
 	}
-	root, err := g.Alloc.Flush(db)
+	root, err := gaFlush(&g.Alloc, db)
 	if err != nil {
 		panic(err)
 	}
@@ -319,7 +357,7 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database) (*types.Block, error)
 	if config.GetConsensusEngineType().IsClique() && len(block.Extra()) == 0 {
 		return nil, errors.New("can't start clique chain without signers")
 	}
-	if err := g.Alloc.Write(db, block.Hash()); err != nil {
+	if err := gaWrite(&g.Alloc, db, block.Hash()); err != nil {
 		return nil, err
 	}
 	rawdb.WriteTd(db, block.Hash(), block.NumberU64(), block.Difficulty())

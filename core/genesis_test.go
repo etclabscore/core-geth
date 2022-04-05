@@ -354,7 +354,7 @@ func TestReadWriteGenesisAlloc(t *testing.T) {
 		}
 		hash = common.HexToHash("0xdeadbeef")
 	)
-	alloc.Write(db, hash)
+	gaWrite(alloc, db, hash)
 
 	var reload genesisT.GenesisAlloc
 	err := reload.UnmarshalJSON(rawdb.ReadGenesisState(db, hash))

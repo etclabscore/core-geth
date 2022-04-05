@@ -2,6 +2,22 @@
 title: Build from Source
 ---
 
+## Hardware Requirements
+
+Minimum:
+
+* CPU with 2+ cores
+* 4GB RAM
+* 500GB free storage space to sync the Mainnet
+* 8 MBit/sec download Internet service
+
+Recommended:
+
+* Fast CPU with 4+ cores
+* 16GB+ RAM
+* High Performance SSD with at least 500GB free space
+* 25+ MBit/sec download Internet service
+
 ## Dependencies
 
 - Make sure your system has __Go__ installed. Version __1.15.5+__ is recommended. https://golang.org/doc/install

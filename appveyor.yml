@@ -11,7 +11,7 @@ environment:
       PATH: C:\msys64\mingw64\bin;C:\Program Files (x86)\NSIS\;%PATH%
 
 install:
-  - git submodule update --init --depth 1
+  - git submodule update --init --depth 1 --recursive
   - go version
 
 build_script:

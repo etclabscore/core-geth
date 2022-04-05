@@ -125,7 +125,7 @@ func (api *ConsensusAPI) ForkchoiceUpdatedV1(update beacon.ForkchoiceStateV1, pa
 		var (
 			td  = api.eth.BlockChain().GetTd(update.HeadBlockHash, block.NumberU64())
 			ptd = api.eth.BlockChain().GetTd(block.ParentHash(), block.NumberU64()-1)
-			ttd = api.eth.BlockChain().Config().TerminalTotalDifficulty
+			ttd = api.eth.BlockChain().Config().GetEthashTerminalTotalDifficulty()
 		)
 		if td == nil || (block.NumberU64() > 0 && ptd == nil) {
 			log.Error("TDs unavailable for TTD check", "number", block.NumberU64(), "hash", update.HeadBlockHash, "td", td, "parent", block.ParentHash(), "ptd", ptd)
@@ -214,7 +214,7 @@ func (api *ConsensusAPI) ExchangeTransitionConfigurationV1(config beacon.Transit
 	if config.TerminalTotalDifficulty == nil {
 		return nil, errors.New("invalid terminal total difficulty")
 	}
-	ttd := api.eth.BlockChain().Config().TerminalTotalDifficulty
+	ttd := api.eth.BlockChain().Config().GetEthashTerminalTotalDifficulty()
 	if ttd.Cmp(config.TerminalTotalDifficulty.ToInt()) != 0 {
 		log.Warn("Invalid TTD configured", "geth", ttd, "beacon", config.TerminalTotalDifficulty)
 		return nil, fmt.Errorf("invalid ttd: execution %v consensus %v", ttd, config.TerminalTotalDifficulty)

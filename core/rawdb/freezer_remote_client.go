@@ -207,7 +207,7 @@ func (api *FreezerRemoteClient) ModifyAncients(fn func(ethdb.AncientWriteOperato
 	defer func() {
 		if err != nil {
 			log.Warn("Rolling back ancients", "target(previous)", prev)
-			if err := api.TruncateTail(prev); err != nil {
+			if err := api.TruncateHead(prev); err != nil {
 				log.Error("Freezer table roll-back failed", "index", prev, "err", err)
 			}
 		}

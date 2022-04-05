@@ -209,7 +209,7 @@ func TestFreezerRemote_Short(t *testing.T) {
 		t.Fatalf("ancients: %v", err)
 	} else if n != 0 {
 		t.Logf("truncating pre-existing ancients from: %d (truncating to 0)", n)
-		err = ancientDb.TruncateTail(0)
+		err = ancientDb.TruncateHead(0)
 		if err != nil {
 			t.Fatalf("truncate ancients: %v", err)
 		}
@@ -222,7 +222,7 @@ func TestFreezerRemote_Short(t *testing.T) {
 	defer func() {
 		// A deferred truncation to 0 will allow a single freezer instance to
 		// handle multiple tests in serial.
-		if err := ancientDb.TruncateTail(0); err != nil {
+		if err := ancientDb.TruncateHead(0); err != nil {
 			t.Fatalf("deferred truncate ancients error: %v", err)
 		}
 	}()
@@ -326,7 +326,7 @@ func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 		t.Fatalf("ancients: %v", err)
 	} else if n != 0 {
 		t.Logf("truncating pre-existing ancients from: %d (truncating to 0)", n)
-		err = ancientDb.TruncateTail(0)
+		err = ancientDb.TruncateHead(0)
 		if err != nil {
 			t.Fatalf("truncate ancients: %v", err)
 		}
@@ -339,7 +339,7 @@ func TestFastVsFullChains_RemoteFreezer(t *testing.T) {
 	defer func() {
 		// A deferred truncation to 0 will allow a single freezer instance to
 		// handle multiple tests in serial.
-		if err := ancientDb.TruncateTail(0); err != nil {
+		if err := ancientDb.TruncateHead(0); err != nil {
 			t.Fatalf("deferred truncate ancients error: %v", err)
 		}
 	}()
@@ -498,7 +498,7 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 		t.Fatalf("ancients: %v", err)
 	} else if n != 0 {
 		t.Logf("truncating pre-existing ancients from: %d (truncating to 0)", n)
-		err = ancientDb.TruncateTail(0)
+		err = ancientDb.TruncateHead(0)
 		if err != nil {
 			t.Fatalf("truncate ancients: %v", err)
 		}
@@ -511,7 +511,7 @@ func TestTransactionIndices_RemoteFreezer(t *testing.T) {
 	defer func() {
 		// A deferred truncation to 0 will allow a single freezer instance to
 		// handle multiple tests in serial.
-		if err := ancientDb.TruncateTail(0); err != nil {
+		if err := ancientDb.TruncateHead(0); err != nil {
 			t.Fatalf("deferred truncate ancients error: %v", err)
 		}
 	}()
@@ -642,7 +642,7 @@ func TestSkipStaleTxIndicesInFastSync_RemoteFreezer(t *testing.T) {
 		t.Fatalf("ancients: %v", err)
 	} else if n != 0 {
 		t.Logf("truncating pre-existing ancients from: %d (truncating to 0)", n)
-		err = ancientDb.TruncateTail(0)
+		err = ancientDb.TruncateHead(0)
 		if err != nil {
 			t.Fatalf("truncate ancients: %v", err)
 		}
@@ -655,7 +655,7 @@ func TestSkipStaleTxIndicesInFastSync_RemoteFreezer(t *testing.T) {
 	defer func() {
 		// A deferred truncation to 0 will allow a single freezer instance to
 		// handle multiple tests in serial.
-		if err := ancientDb.TruncateTail(0); err != nil {
+		if err := ancientDb.TruncateHead(0); err != nil {
 			t.Fatalf("deferred truncate ancients error: %v", err)
 		}
 	}()

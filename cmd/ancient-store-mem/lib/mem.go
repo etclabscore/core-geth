@@ -189,14 +189,13 @@ func (f *MemFreezerRemoteServerAPI) TruncateTail(n uint64) error {
 		if err != nil {
 			return err
 		}
-		if num >= n {
+		if num <= n {
 			delete(f.store, k)
 		}
 	}
 	return nil
 }
 
-// TODO/meowsbits/20220405: fixme (copypasta from TruncateTail, which was exactly Truncate before
 func (f *MemFreezerRemoteServerAPI) TruncateHead(n uint64) error {
 	// fmt.Println("mock server called", "method=TruncateAncients")
 	if f.count <= n {

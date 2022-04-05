@@ -113,14 +113,14 @@ func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 
 	// Capture and debug-log the marshaled stored config.
 	b, _ := json.MarshalIndent(config, "", "    ")
-	//t.Log(string(b))
+	// t.Log(string(b))
 
 	// Read the stored config manually.
 	stored := rawdb.ReadCanonicalHash(db, 0)
 	storedConfig := rawdb.ReadChainConfig(db, stored)
 
 	b2, _ := json.MarshalIndent(storedConfig, "", "    ")
-	//t.Log(string(b2))
+	// t.Log(string(b2))
 
 	if !bytes.Equal(b, b2) {
 		t.Fatal("different chain config read vs. wrote")
@@ -348,15 +348,15 @@ func TestGenesis_Commit(t *testing.T) {
 func TestReadWriteGenesisAlloc(t *testing.T) {
 	var (
 		db    = rawdb.NewMemoryDatabase()
-		alloc = &GenesisAlloc{
+		alloc = &genesisT.GenesisAlloc{
 			{1}: {Balance: big.NewInt(1), Storage: map[common.Hash]common.Hash{{1}: {1}}},
 			{2}: {Balance: big.NewInt(2), Storage: map[common.Hash]common.Hash{{2}: {2}}},
 		}
 		hash = common.HexToHash("0xdeadbeef")
 	)
-	alloc.write(db, hash)
+	alloc.Write(db, hash)
 
-	var reload GenesisAlloc
+	var reload genesisT.GenesisAlloc
 	err := reload.UnmarshalJSON(rawdb.ReadGenesisState(db, hash))
 	if err != nil {
 		t.Fatalf("Failed to load genesis state %v", err)

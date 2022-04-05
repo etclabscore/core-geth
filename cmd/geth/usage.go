@@ -59,10 +59,9 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.EthStatsURLFlag,
 			utils.IdentityFlag,
 			utils.LightKDFFlag,
-			utils.WhitelistFlag,
 			utils.ECBP1100Flag,
 			utils.ECBP1100NoDisableFlag,
-			utils.EthPeerRequiredBlocksFlag,
+			utils.EthPeerRequiredBlocksFlag, // was WhitelistFlag before 1.10.17
 		},
 	},
 	{

@@ -222,8 +222,8 @@ func TestInvalidPayloadTimestamp(t *testing.T) {
 
 		// TODO (MariusVanDerWijden) following tests are currently broken,
 		// fixed in upcoming merge-kiln-v2 pr
-		//{parent.Time() + 1, false},
-		//{uint64(time.Now().Unix()) + uint64(time.Minute), false},
+		// {parent.Time() + 1, false},
+		// {uint64(time.Now().Unix()) + uint64(time.Minute), false},
 	}
 
 	for i, test := range tests {
@@ -499,7 +499,7 @@ func TestExchangeTransitionConfig(t *testing.T) {
 	}
 	// invalid terminal block hash
 	config = beacon.TransitionConfigurationV1{
-		TerminalTotalDifficulty: (*hexutil.Big)(genesis.Config.TerminalTotalDifficulty),
+		TerminalTotalDifficulty: (*hexutil.Big)(genesis.Config.GetEthashTerminalTotalDifficulty()),
 		TerminalBlockHash:       common.Hash{1},
 		TerminalBlockNumber:     0,
 	}
@@ -508,7 +508,7 @@ func TestExchangeTransitionConfig(t *testing.T) {
 	}
 	// valid config
 	config = beacon.TransitionConfigurationV1{
-		TerminalTotalDifficulty: (*hexutil.Big)(genesis.Config.TerminalTotalDifficulty),
+		TerminalTotalDifficulty: (*hexutil.Big)(genesis.Config.GetEthashTerminalTotalDifficulty()),
 		TerminalBlockHash:       common.Hash{},
 		TerminalBlockNumber:     0,
 	}
@@ -517,7 +517,7 @@ func TestExchangeTransitionConfig(t *testing.T) {
 	}
 	// valid config
 	config = beacon.TransitionConfigurationV1{
-		TerminalTotalDifficulty: (*hexutil.Big)(genesis.Config.TerminalTotalDifficulty),
+		TerminalTotalDifficulty: (*hexutil.Big)(genesis.Config.GetEthashTerminalTotalDifficulty()),
 		TerminalBlockHash:       preMergeBlocks[5].Hash(),
 		TerminalBlockNumber:     6,
 	}

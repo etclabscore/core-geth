@@ -55,11 +55,9 @@ func BenchmarkInsertChain_valueTx_100kB_diskdb(b *testing.B) {
 	benchInsertChain(b, true, genValueTx(100*1024))
 }
 func BenchmarkInsertChain_uncles_memdb(b *testing.B) {
-	b.Skip("pending upstream resolution of https://github.com/ethereum/go-ethereum/issues/24654")
 	benchInsertChain(b, false, genUncles)
 }
 func BenchmarkInsertChain_uncles_diskdb(b *testing.B) {
-	b.Skip("pending upstream resolution of https://github.com/ethereum/go-ethereum/issues/24654")
 	benchInsertChain(b, true, genUncles)
 }
 func BenchmarkInsertChain_ring200_memdb(b *testing.B) {
@@ -166,7 +164,7 @@ func genTxRing(naccounts int) func(int, *BlockGen) {
 
 // genUncles generates blocks with two uncle headers.
 func genUncles(i int, gen *BlockGen) {
-	if i >= 6 {
+	if i >= 7 {
 		b2 := gen.PrevBlock(i - 6).Header()
 		b2.Extra = []byte("foo")
 		gen.AddUncle(b2)

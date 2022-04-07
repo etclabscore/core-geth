@@ -73,9 +73,7 @@ jobs:
 
       - name: Get dependencies
         run: |
-          cd ..
-          go get golang.org/x/perf/cmd/...
-          cd -
+          go install golang.org/x/perf/cmd/benchstat@latest
 
       - uses: actions/download-artifact@v2
         name: Get go-ethereum artifact

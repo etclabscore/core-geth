@@ -56,7 +56,7 @@ func init() {
 type callParityFrame struct {
 	Action              callTraceParityAction `json:"action"`
 	BlockHash           *common.Hash          `json:"-"`
-	BlockNumber         uint64                `json:"-"`
+	BlockNumber         uint64                `json:"blockNumber"`
 	Error               string                `json:"error,omitempty"`
 	Result              callTraceParityResult `json:"result"`
 	Subtraces           int                   `json:"subtraces"`
@@ -162,6 +162,7 @@ func (t *callParityTracer) CaptureStart(env *vm.EVM, from common.Address, to com
 			Gas:   hexutil.Uint64(gas),
 		},
 		Result: callTraceParityResult{},
+		BlockNumber: env.Context.BlockNumber.Uint64(),
 	}
 	if value != nil {
 		t.callstack[0].Action.Value = hexutil.Big(*value)
@@ -215,6 +216,7 @@ func (t *callParityTracer) CaptureEnter(typ vm.OpCode, from common.Address, to c
 			// Value: hexutil.Big(*value),
 		},
 		Result: callTraceParityResult{},
+		BlockNumber: t.callstack[0].BlockNumber,
 	}
 	if value != nil {
 		call.Action.Value = hexutil.Big(*value)

@@ -1587,7 +1587,7 @@ func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.
 				if bc.IsArtificialFinalityEnabled() &&
 					bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, currentBlock.Number()) {
 
-					if err := bc.ecbp1100(d.commonBlock.Header(), currentBlock.Header(), block.Header()); err != nil {
+					if err := bc.adess(d.commonBlock.Header(), currentBlock.Header(), block.Header()); err != nil {
 
 						canonicalDisallowed = true
 						log.Warn("Reorg disallowed", "error", err)
@@ -1806,7 +1806,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals bool) (int, er
 						if bc.IsArtificialFinalityEnabled() &&
 							bc.chainConfig.IsEnabled(bc.chainConfig.GetECBP1100Transition, current.Number()) {
 
-							if err := bc.ecbp1100(reorgData.commonBlock.Header(), current.Header(), block.Header()); err != nil {
+							if err := bc.adess(reorgData.commonBlock.Header(), current.Header(), block.Header()); err != nil {
 
 								canonicalDisallowed = true
 								log.Trace("Reorg disallowed", "error", err)

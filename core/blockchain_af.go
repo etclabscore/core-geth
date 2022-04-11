@@ -87,6 +87,82 @@ func (bc *BlockChain) getTDRatio(commonAncestor, current, proposed *types.Header
 	return tdRatio
 }
 
+// adessAlpha is the number of blocks which MUST NOT BE FIRST SEEN in order for the penalty logic (ADESS) to apply.
+// > The Penalty is assigned to a chain if
+// > there are no first seen blocks in the interval [ν + 1, α] blocks after the fork block
+var adessAlpha = 4
+
+// adessTau is the number of blocks _more_ that the Attacker chain must have in order to become canonical.
+var adessTau = 4
+
+// adessEpsilon is the per-block penalty: 1 / (1 + epsilon)
+var adessEpsilon = 0.001   // this is unused in code, only for concept
+var adessEpsilonQuo = 1000 // translation of concept to code
+var adessEpsilonDen = 1001
+
+// adess implements the proposal documented in 'A Proof-of-Work Protocol to Deter Double-Spend Attacks'
+// The function returns 'nil' (no error) if the proposed reorganization is allowed,
+// otherwise it returns an error contextualizing the insufficiency of the proposed segment.
+// Variables (parameters) for this logic are defined immediately above.
+func (bc *BlockChain) adess(commonAncestor, current, proposed *types.Header) error {
+	// alpha:
+
+	// FIRST, we must guarantee there exist >= α blocks in the proposed chain
+	// if NOT, the condition is unsatisfied, and we return early, doing nothing (noop).
+	alphaHeight := commonAncestor.Number.Uint64() + uint64(adessAlpha)
+	if proposed.Number.Uint64() < alphaHeight {
+		return nil
+	}
+
+	// do a noop short-circuit if there is a first-seen block in the first [ν + 1, α] blocks after the fork block
+	// Because of the way this function is written, we have to iterate backwards through the whole proposed
+	// segment. We'll skip all headers which are above the range relevant to the alpha value.
+	for h := proposed; h != nil && h.Hash() != commonAncestor.Hash(); h = bc.GetHeaderByHash(h.ParentHash) {
+		if h.Number.Uint64() > alphaHeight {
+			// This header is above the alpha range.
+			continue
+		}
+		// We're in the alpha range.
+		// If the block WAS first seen, we'll return. NO FIRST SEEN BLOCKS are allowed within this range.
+		if rawdb.ReadPremierCanonicalHash(bc.db, premiereCanonicalNumber(h)) == h.Hash() {
+			// This block WAS first seen.
+			// The ADESS penalty assignment condition is NOT satisfied.
+			return nil
+		}
+	}
+
+	// tau:
+
+	proposedHeightMinWithTau := current.Number.Uint64() + uint64(adessTau)
+
+	if proposed.Number.Uint64() < proposedHeightMinWithTau {
+		// The proposed segment does NOT have Tau more blocks than the incumbent.
+		return fmt.Errorf("proposed segment is insufficiently long (via ADESS Tau condition)")
+	}
+
+	// epsilon:
+
+	// Get the total difficulties of the proposed chain segment and the existing one.
+	commonAncestorTD := bc.GetTd(commonAncestor.Hash(), commonAncestor.Number.Uint64())
+	proposedParentTD := bc.GetTd(proposed.ParentHash, proposed.Number.Uint64()-1)
+	proposedTD := new(big.Int).Add(proposed.Difficulty, proposedParentTD)
+	localTD := bc.GetTd(current.Hash(), current.Number.Uint64())
+
+	proposedSubchainTD := new(big.Int).Sub(proposedTD, commonAncestorTD)
+	localSubchainTD := new(big.Int).Sub(localTD, commonAncestorTD)
+
+	// Written as: Give a "bonus" to the incumbent segment rather than a rational-number discount to the proposed segment.
+	// This helps us avoid doing division, and we get to use only integers.
+	eProposedSubchainTD := new(big.Int).Mul(proposedSubchainTD, big.NewInt(int64(adessEpsilonQuo))) // eg. * 1000
+	eLocalSubchainTD := new(big.Int).Mul(localSubchainTD, big.NewInt(int64(adessEpsilonDen)))       // eg. * 1001
+
+	if eProposedSubchainTD.Cmp(eLocalSubchainTD) < 0 {
+		return fmt.Errorf("proposed segment is insufficiently difficult (via ADESS epsilon difficulty penalty)")
+	}
+
+	return nil
+}
+
 // ecbp1100 implements the "MESS" artificial finality mechanism
 // "Modified Exponential Subjective Scoring" used to prefer known chain segments
 // over later-to-come counterparts, especially proposed segments stretching far into the past.

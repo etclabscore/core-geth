@@ -51,11 +51,6 @@
 		var type = frame.getType()
 		var to = frame.getTo()
 
-		// Skip any pre-compile invocations, those are just fancy opcodes
-		if (isPrecompiled(to) && (type == "CALL" || type == "STATICCALL")) {
-			return;
-		}
-
 		var call = {
 			type: type,
 			from: toHex(frame.getFrom()),
@@ -73,6 +68,14 @@
 		var len = this.callstack.length
 		if (len > 1) {
 			var call = this.callstack.pop()
+
+			// Skip any pre-compile invocations, those are just fancy opcodes
+			// NOTE: let them captured on `enter` method so as we handle internal txs state correctly
+			//			 and drop them here, as pop() has removed them from the stack
+			if (isPrecompiled(call.to) && (call.type == "CALL" || call.type == "STATICCALL")) {
+				return;
+			}
+
 			call.gasUsed = '0x' + bigInt(frameResult.getGasUsed()).toString('16')
 			var error = frameResult.getError()
 			if (error === undefined) {

@@ -128,7 +128,7 @@ type callParityTracer struct {
 
 // NewCallParityTracer returns a native go tracer which tracks
 // call frames of a tx, and implements vm.EVMLogger.
-func NewCallParityTracer() tracers.Tracer {
+func NewCallParityTracer(ctx *tracers.Context) tracers.Tracer {
 	// First callParityframe contains tx context info
 	// and is populated on start and end.
 	t := &callParityTracer{callstack: make([]callParityFrame, 1)}

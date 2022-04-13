@@ -226,7 +226,7 @@
 							call.error = opError;
 						}
 					} else {
-						// NOTE(ziogachr): we should reach this else anymore
+						// NOTE(ziogachr): we shouldn't reach this else anymore
 						call.error = "internal failure"; // TODO(karalabe): surface these faults somehow
 					}
 				}

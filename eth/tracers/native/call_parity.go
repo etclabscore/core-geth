@@ -54,11 +54,11 @@ func init() {
 
 // callParityFrame is the result of a callParityTracerParity run.
 type callParityFrame struct {
-	Action              callTraceParityAction  `json:"action"`
+	Action              CallTraceParityAction  `json:"action"`
 	BlockHash           *common.Hash           `json:"blockHash"`
 	BlockNumber         uint64                 `json:"blockNumber"`
 	Error               string                 `json:"error,omitempty"`
-	Result              *callTraceParityResult `json:"result,omitempty"`
+	Result              *CallTraceParityResult `json:"result,omitempty"`
 	Subtraces           int                    `json:"subtraces"`
 	TraceAddress        []int                  `json:"traceAddress"`
 	TransactionHash     *common.Hash           `json:"transactionHash"`
@@ -67,23 +67,7 @@ type callParityFrame struct {
 	Calls               []callParityFrame      `json:"-"`
 }
 
-// type callTraceParityAction struct {
-// 	Author         string `json:"author,omitempty"`
-// 	RewardType     string `json:"rewardType,omitempty"`
-// 	SelfDestructed string `json:"address,omitempty"`
-// 	Balance        string `json:"balance,omitempty"`
-// 	CallType       string `json:"callType,omitempty"`
-// 	CreationMethod string `json:"creationMethod,omitempty"`
-// 	From           string `json:"from,omitempty"`
-// 	Gas            string `json:"gas,omitempty"`
-// 	Init           string `json:"init,omitempty"`
-// 	Input          string `json:"input,omitempty"`
-// 	RefundAddress  string `json:"refundAddress,omitempty"`
-// 	To             string `json:"to,omitempty"`
-// 	Value          string `json:"value,omitempty"`
-// }
-
-type callTraceParityAction struct {
+type CallTraceParityAction struct {
 	Author         *common.Address `json:"author,omitempty"`
 	RewardType     *string         `json:"rewardType,omitempty"`
 	SelfDestructed *common.Address `json:"address,omitempty"`
@@ -91,34 +75,20 @@ type callTraceParityAction struct {
 	CallType       string          `json:"callType,omitempty"`
 	CreationMethod string          `json:"creationMethod,omitempty"`
 	From           *common.Address `json:"from,omitempty"`
-	Gas            hexutil.Uint64  `json:"gas,omitempty"`
+	Gas            *hexutil.Uint64 `json:"gas,omitempty"`
 	Init           *hexutil.Bytes  `json:"init,omitempty"`
 	Input          *hexutil.Bytes  `json:"input,omitempty"`
 	RefundAddress  *common.Address `json:"refundAddress,omitempty"`
 	To             *common.Address `json:"to,omitempty"`
-	Value          hexutil.Big     `json:"value,omitempty"`
+	Value          *hexutil.Big    `json:"value,omitempty"`
 }
 
-type callTraceParityResult struct {
+type CallTraceParityResult struct {
 	Address *common.Address `json:"address,omitempty"`
 	Code    *hexutil.Bytes  `json:"code,omitempty"`
-	GasUsed hexutil.Uint64  `json:"gasUsed,omitempty"`
-	Output  hexutil.Bytes   `json:"output,omitempty"`
+	GasUsed *hexutil.Uint64 `json:"gasUsed,omitempty"`
+	Output  *hexutil.Bytes  `json:"output,omitempty"`
 }
-
-// type callParityFrame struct {
-// 	Type    string            `json:"type"`
-// 	From    string            `json:"from"`
-// 	To      string            `json:"to,omitempty"`
-// 	Value   string            `json:"value,omitempty"`
-// 	Gas     string            `json:"gas"`
-// 	GasUsed string            `json:"gasUsed"`
-// 	Input   string            `json:"input"`
-// 	Output  string            `json:"output,omitempty"`
-// 	Error   string            `json:"error,omitempty"`
-// 	Calls   []callParityFrame `json:"calls,omitempty"`
-// }
-
 type callParityTracer struct {
 	env               *vm.EVM
 	ctx               *tracers.Context // Holds tracer context data
@@ -227,14 +197,14 @@ func (t *callParityTracer) CaptureEnter(typ vm.OpCode, from common.Address, to c
 
 	call := callParityFrame{
 		Type: strings.ToLower(typ.String()),
-		Action: callTraceParityAction{
+		Action: CallTraceParityAction{
 			From:  &from,
 			To:    &to,
 			Input: &inputHex,
 			Gas:   hexutil.Uint64(gas),
 			// Value: hexutil.Big(*value),
 		},
-		Result:      &callTraceParityResult{},
+		Result:      &CallTraceParityResult{},
 		BlockNumber: t.callstack[0].BlockNumber,
 	}
 	if value != nil {

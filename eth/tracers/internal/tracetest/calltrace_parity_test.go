@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -24,45 +23,22 @@ import (
 
 	// Force-load the native, to trigger registration
 	"github.com/ethereum/go-ethereum/eth/tracers"
-	_ "github.com/ethereum/go-ethereum/eth/tracers/native"
+	"github.com/ethereum/go-ethereum/eth/tracers/native"
 )
 
 // callTraceParity is the result of a callTracerParity run.
 type callTraceParity struct {
-	Action              callTraceParityAction `json:"action"`
-	BlockHash           *common.Hash          `json:"-"`
-	BlockNumber         uint64                `json:"-"`
-	Error               string                `json:"error,omitempty"`
-	Result              callTraceParityResult `json:"result"`
-	Subtraces           int                   `json:"subtraces"`
-	TraceAddress        []int                 `json:"traceAddress"`
-	TransactionHash     *common.Hash          `json:"-"`
-	TransactionPosition *uint64               `json:"-"`
-	Type                string                `json:"type"`
-	Time                string                `json:"-"`
-}
-
-type callTraceParityAction struct {
-	Author         *common.Address `json:"author,omitempty"`
-	RewardType     *string         `json:"rewardType,omitempty"`
-	SelfDestructed *common.Address `json:"address,omitempty"`
-	Balance        *hexutil.Big    `json:"balance,omitempty"`
-	CallType       string          `json:"callType,omitempty"`
-	CreationMethod string          `json:"creationMethod,omitempty"`
-	From           common.Address  `json:"from,omitempty"`
-	Gas            hexutil.Uint64  `json:"gas,omitempty"`
-	Init           *hexutil.Bytes  `json:"init,omitempty"`
-	Input          *hexutil.Bytes  `json:"input,omitempty"`
-	RefundAddress  *common.Address `json:"refundAddress,omitempty"`
-	To             common.Address  `json:"to,omitempty"`
-	Value          hexutil.Big     `json:"value,omitempty"`
-}
-
-type callTraceParityResult struct {
-	Address *common.Address `json:"address,omitempty"`
-	Code    *hexutil.Bytes  `json:"code,omitempty"`
-	GasUsed hexutil.Uint64  `json:"gasUsed,omitempty"`
-	Output  hexutil.Bytes   `json:"output,omitempty"`
+	Action              native.CallTraceParityAction  `json:"action"`
+	BlockHash           *common.Hash                  `json:"-"`
+	BlockNumber         uint64                        `json:"-"`
+	Error               string                        `json:"error,omitempty"`
+	Result              *native.CallTraceParityResult `json:"result,omitempty"`
+	Subtraces           int                           `json:"subtraces"`
+	TraceAddress        []int                         `json:"traceAddress"`
+	TransactionHash     *common.Hash                  `json:"-"`
+	TransactionPosition *uint64                       `json:"-"`
+	Type                string                        `json:"type"`
+	Time                string                        `json:"-"`
 }
 
 // callTracerParityTest defines a single test to check the call tracer against.

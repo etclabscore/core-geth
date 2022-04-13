@@ -54,17 +54,17 @@ func init() {
 
 // callParityFrame is the result of a callParityTracerParity run.
 type callParityFrame struct {
-	Action              callTraceParityAction `json:"action"`
-	BlockHash           *common.Hash          `json:"-"`
-	BlockNumber         uint64                `json:"blockNumber"`
-	Error               string                `json:"error,omitempty"`
-	Result              callTraceParityResult `json:"result"`
-	Subtraces           int                   `json:"subtraces"`
-	TraceAddress        []int                 `json:"traceAddress"`
-	TransactionHash     *common.Hash          `json:"-"`
-	TransactionPosition *uint64               `json:"-"`
-	Type                string                `json:"type"`
-	Calls               []callParityFrame     `json:"-"`
+	Action              callTraceParityAction  `json:"action"`
+	BlockHash           *common.Hash           `json:"blockHash"`
+	BlockNumber         uint64                 `json:"blockNumber"`
+	Error               string                 `json:"error,omitempty"`
+	Result              *callTraceParityResult `json:"result,omitempty"`
+	Subtraces           int                    `json:"subtraces"`
+	TraceAddress        []int                  `json:"traceAddress"`
+	TransactionHash     *common.Hash           `json:"transactionHash"`
+	TransactionPosition *uint64                `json:"transactionPosition"`
+	Type                string                 `json:"type"`
+	Calls               []callParityFrame      `json:"-"`
 }
 
 // type callTraceParityAction struct {
@@ -120,6 +120,8 @@ type callTraceParityResult struct {
 // }
 
 type callParityTracer struct {
+	env               *vm.EVM
+	ctx               *tracers.Context // Holds tracer context data
 	callstack         []callParityFrame
 	interrupt         uint32           // Atomic flag to signal execution interruption
 	reason            error            // Textual reason for the interruption
@@ -131,7 +133,7 @@ type callParityTracer struct {
 func NewCallParityTracer(ctx *tracers.Context) tracers.Tracer {
 	// First callParityframe contains tx context info
 	// and is populated on start and end.
-	t := &callParityTracer{callstack: make([]callParityFrame, 1)}
+	t := &callParityTracer{callstack: make([]callParityFrame, 1), ctx: ctx}
 	return t
 }
 
@@ -145,9 +147,24 @@ func (t *callParityTracer) isPrecompiled(addr common.Address) bool {
 	return false
 }
 
+func (t *callParityTracer) fillCtxInformation(callFrame *callParityFrame) {
+	if t.ctx != nil {
+		if t.ctx.BlockHash != (common.Hash{}) {
+			callFrame.BlockHash = &t.ctx.BlockHash
+		}
+		if t.ctx.TxHash != (common.Hash{}) {
+			callFrame.TransactionHash = &t.ctx.TxHash
+		}
+		transactionPosition := uint64(t.ctx.TxIndex)
+		callFrame.TransactionPosition = &transactionPosition
+	}
+}
+
 func (l *callParityTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {}
 
 func (t *callParityTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
+	t.env = env
+
 	// Skip any pre-compile invocations, those are just fancy opcodes
 	t.activePrecompiles = env.ActivePrecompiles()
 
@@ -161,7 +178,7 @@ func (t *callParityTracer) CaptureStart(env *vm.EVM, from common.Address, to com
 			Input: &inputHex,
 			Gas:   hexutil.Uint64(gas),
 		},
-		Result: callTraceParityResult{},
+		Result:      &callTraceParityResult{},
 		BlockNumber: env.Context.BlockNumber.Uint64(),
 	}
 	if value != nil {
@@ -170,6 +187,8 @@ func (t *callParityTracer) CaptureStart(env *vm.EVM, from common.Address, to com
 	if create {
 		t.callstack[0].Type = strings.ToLower(vm.CREATE.String())
 	}
+
+	t.fillCtxInformation(&t.callstack[0])
 }
 
 func (t *callParityTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {
@@ -195,7 +214,7 @@ func (t *callParityTracer) CaptureFault(pc uint64, op vm.OpCode, gas, cost uint6
 func (t *callParityTracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
 	// Skip if tracing was interrupted
 	if atomic.LoadUint32(&t.interrupt) > 0 {
-		// TODO: env.Cancel()
+		t.env.Cancel()
 		return
 	}
 
@@ -215,12 +234,14 @@ func (t *callParityTracer) CaptureEnter(typ vm.OpCode, from common.Address, to c
 			Gas:   hexutil.Uint64(gas),
 			// Value: hexutil.Big(*value),
 		},
-		Result: callTraceParityResult{},
+		Result:      &callTraceParityResult{},
 		BlockNumber: t.callstack[0].BlockNumber,
 	}
 	if value != nil {
 		call.Action.Value = hexutil.Big(*value)
 	}
+	t.fillCtxInformation(&call)
+
 	t.callstack = append(t.callstack, call)
 }
 
@@ -361,7 +382,7 @@ func (t *callParityTracer) formatSuicideResult(call *callParityFrame) {
 
 	call.Action.Input = nil
 
-	call.Result = callTraceParityResult{}
+	call.Result = nil
 }
 
 func (t *callParityTracer) convertErrorToParity(call *callParityFrame) {
@@ -371,12 +392,12 @@ func (t *callParityTracer) convertErrorToParity(call *callParityFrame) {
 
 	if parityError, ok := parityErrorMapping[call.Error]; ok {
 		call.Error = parityError
-		call.Result = callTraceParityResult{}
+		call.Result = nil
 	} else {
 		for gethError, parityError := range parityErrorMappingStartingWith {
 			if strings.HasPrefix(call.Error, gethError) {
 				call.Error = parityError
-				call.Result = callTraceParityResult{}
+				call.Result = nil
 			}
 		}
 	}

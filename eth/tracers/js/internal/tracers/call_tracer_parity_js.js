@@ -66,32 +66,33 @@
 
 	exit: function(frameResult) {
 		var len = this.callstack.length
-		if (len > 1) {
-			var call = this.callstack.pop()
-
-			// Skip any pre-compile invocations, those are just fancy opcodes
-			// NOTE: let them captured on `enter` method so as we handle internal txs state correctly
-			//			 and drop them here, as pop() has removed them from the stack
-			if (isPrecompiled(call.to) && (call.type == "CALL" || call.type == "STATICCALL")) {
-				return;
-			}
-
-			call.gasUsed = '0x' + bigInt(frameResult.getGasUsed()).toString('16')
-			var error = frameResult.getError()
-			if (error === undefined) {
-				call.output = toHex(frameResult.getOutput())
-			} else {
-				call.error = error
-				if (call.type === 'CREATE' || call.type === 'CREATE2') {
-					delete call.to
-				}
-			}
-			len -= 1
-			if (this.callstack[len-1].calls === undefined) {
-				this.callstack[len-1].calls = []
-			}
-			this.callstack[len-1].calls.push(call)
+		if (len <= 1) {
+			return
 		}
+		var call = this.callstack.pop()
+
+		// Skip any pre-compile invocations, those are just fancy opcodes
+		// NOTE: let them captured on `enter` method so as we handle internal txs state correctly
+		//			 and drop them here, as pop() has removed them from the stack
+		if (isPrecompiled(toAddress(call.to)) && (call.type == "CALL" || call.type == "STATICCALL")) {
+			return;
+		}
+
+		call.gasUsed = '0x' + bigInt(frameResult.getGasUsed()).toString('16')
+		var error = frameResult.getError()
+		if (error === undefined) {
+			call.output = toHex(frameResult.getOutput())
+		} else {
+			call.error = error
+			if (call.type === 'CREATE' || call.type === 'CREATE2') {
+				delete call.to
+			}
+		}
+		len -= 1
+		if (this.callstack[len-1].calls === undefined) {
+			this.callstack[len-1].calls = []
+		}
+		this.callstack[len-1].calls.push(call)
 	},
 
 	// fault is invoked when the actual execution of an opcode fails.

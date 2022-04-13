@@ -139,20 +139,22 @@ func (t *callParityTracer) CaptureStart(env *vm.EVM, from common.Address, to com
 	t.activePrecompiles = env.ActivePrecompiles()
 
 	inputHex := hexutil.Bytes(common.CopyBytes(input))
+	gasHex := hexutil.Uint64(gas)
 
 	t.callstack[0] = callParityFrame{
 		Type: strings.ToLower(vm.CALL.String()),
-		Action: callTraceParityAction{
+		Action: CallTraceParityAction{
 			From:  &from,
 			To:    &to,
 			Input: &inputHex,
-			Gas:   hexutil.Uint64(gas),
+			Gas:   &gasHex,
 		},
-		Result:      &callTraceParityResult{},
+		Result:      &CallTraceParityResult{},
 		BlockNumber: env.Context.BlockNumber.Uint64(),
 	}
 	if value != nil {
-		t.callstack[0].Action.Value = hexutil.Big(*value)
+		valueHex := hexutil.Big(*value)
+		t.callstack[0].Action.Value = &valueHex
 	}
 	if create {
 		t.callstack[0].Type = strings.ToLower(vm.CREATE.String())
@@ -165,13 +167,16 @@ func (t *callParityTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Dura
 	if err != nil {
 		t.callstack[0].Error = err.Error()
 		if err.Error() == "execution reverted" && len(output) > 0 {
-			t.callstack[0].Result.Output = hexutil.Bytes(common.CopyBytes(output))
+			outputHex := hexutil.Bytes(common.CopyBytes(output))
+			t.callstack[0].Result.Output = &outputHex
 		}
 	} else {
 		// TODO (ziogaschr): move back outside of if, makes sense to have it always. Is addition, no API breaks
-		t.callstack[0].Result.GasUsed = hexutil.Uint64(gasUsed)
+		gasUsedHex := hexutil.Uint64(gasUsed)
+		t.callstack[0].Result.GasUsed = &gasUsedHex
 
-		t.callstack[0].Result.Output = hexutil.Bytes(common.CopyBytes(output))
+		outputHex := hexutil.Bytes(common.CopyBytes(output))
+		t.callstack[0].Result.Output = &outputHex
 	}
 }
 
@@ -194,6 +199,7 @@ func (t *callParityTracer) CaptureEnter(typ vm.OpCode, from common.Address, to c
 	}
 
 	inputHex := hexutil.Bytes(common.CopyBytes(input))
+	gasHex := hexutil.Uint64(gas)
 
 	call := callParityFrame{
 		Type: strings.ToLower(typ.String()),
@@ -201,15 +207,17 @@ func (t *callParityTracer) CaptureEnter(typ vm.OpCode, from common.Address, to c
 			From:  &from,
 			To:    &to,
 			Input: &inputHex,
-			Gas:   hexutil.Uint64(gas),
-			// Value: hexutil.Big(*value),
+			Gas:   &gasHex,
 		},
 		Result:      &CallTraceParityResult{},
 		BlockNumber: t.callstack[0].BlockNumber,
 	}
+	valueHex := hexutil.Big{}
 	if value != nil {
-		call.Action.Value = hexutil.Big(*value)
+		valueHex = hexutil.Big(*value)
 	}
+	call.Action.Value = &valueHex
+
 	t.fillCtxInformation(&call)
 
 	t.callstack = append(t.callstack, call)
@@ -225,9 +233,11 @@ func (t *callParityTracer) CaptureExit(output []byte, gasUsed uint64, err error)
 	t.callstack = t.callstack[:size-1]
 	size -= 1
 
-	call.Result.GasUsed = hexutil.Uint64(gasUsed)
+	gasUsedHex := hexutil.Uint64(gasUsed)
+	call.Result.GasUsed = &gasUsedHex
 	if err == nil {
-		call.Result.Output = hexutil.Bytes(common.CopyBytes(output))
+		outputHex := hexutil.Bytes(common.CopyBytes(output))
+		call.Result.Output = &outputHex
 	} else {
 		call.Error = err.Error()
 		typ := vm.StringToOp(strings.ToUpper(call.Type))
@@ -285,7 +295,6 @@ func (t *callParityTracer) Finalize(call callParityFrame, traceAddress []int) ([
 
 		results = append(results, child...)
 	}
-	// fmt.Println("results:", results)
 
 	return results, nil
 }
@@ -319,14 +328,15 @@ func (t *callParityTracer) formatCreateResult(call *callParityFrame) {
 
 	input := call.Action.Input
 	call.Action.Init = input
-	call.Action.Input = nil
 
 	to := call.Action.To
 	call.Result.Address = to
-	call.Action.To = nil
 
-	output := call.Result.Output
-	call.Result.Code = &output
+	call.Result.Code = call.Result.Output
+
+	call.Action.To = nil
+	call.Action.Input = nil
+
 	call.Result.Output = nil
 }
 
@@ -346,13 +356,19 @@ func (t *callParityTracer) formatSuicideResult(call *callParityFrame) {
 
 	addrFrom := call.Action.From
 	call.Action.SelfDestructed = addrFrom
-	call.Action.From = nil
+
+	balanceHex := *call.Action.Value
+	call.Action.Balance = &balanceHex
+
+	call.Action.Value = nil
 
 	addrTo := call.Action.To
 	call.Action.RefundAddress = addrTo
-	call.Action.Balance = &call.Action.Value
 
+	call.Action.From = nil
+	call.Action.To = nil
 	call.Action.Input = nil
+	call.Action.Gas = nil
 
 	call.Result = nil
 }

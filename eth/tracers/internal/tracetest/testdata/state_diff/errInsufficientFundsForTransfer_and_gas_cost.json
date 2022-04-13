@@ -61,5 +61,10 @@
     "value": "0xddcfbbb7a606000",
     "data": "0x"
   },
+  "stateOverrides": {
+    "0x655866a8b24F333e3A1D0a9A2E574289E245f808": {
+      "balance": "0xde0b6b3a7640000"
+    }
+  },
   "result": {}
 }

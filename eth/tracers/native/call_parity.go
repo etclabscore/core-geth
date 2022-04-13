@@ -49,7 +49,7 @@ var parityErrorMappingStartingWith = map[string]string{
 }
 
 func init() {
-	register("callParityTracer", NewCallParityTracer)
+	register("callTracerParity", NewCallParityTracer)
 }
 
 // callParityFrame is the result of a callParityTracerParity run.

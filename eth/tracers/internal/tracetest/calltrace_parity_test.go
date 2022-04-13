@@ -20,6 +20,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/tests"
+	"github.com/go-test/deep"
 
 	// Force-load the native, to trigger registration
 	"github.com/ethereum/go-ethereum/eth/tracers"
@@ -72,7 +73,7 @@ type callTracerParityTest struct {
 	Result  *[]callTraceParity `json:"result"`
 }
 
-func callTracerParityTestRunner(tracerName string, filename string, dirPath string) error {
+func callTracerParityTestRunner(tracerName string, filename string, dirPath string, t testing.TB) error {
 	// Call tracer test found, read if from disk
 	blob, err := ioutil.ReadFile(filepath.Join("testdata", dirPath, filename))
 	if err != nil {
@@ -132,25 +133,48 @@ func callTracerParityTestRunner(tracerName string, filename string, dirPath stri
 	}
 
 	if !jsonEqualParity(ret, test.Result) {
+		t.Logf("tracer name: %s", tracerName)
+
 		// uncomment this for easier debugging
 		// have, _ := json.MarshalIndent(ret, "", " ")
 		// want, _ := json.MarshalIndent(test.Result, "", " ")
-		// return fmt.Errorf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
-		return fmt.Errorf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
+		// t.Logf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
+
+		// uncomment this for harder debugging <3 meowsbits
+		lines := deep.Equal(ret, test.Result)
+		for _, l := range lines {
+			t.Logf("%s", l)
+		}
+
+		t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
 	}
 	return nil
 }
 
 // Iterates over all the input-output datasets in the tracer parity test harness and
-// runs the JavaScript tracers against them.
-func TestCallTracerParity(t *testing.T) {
-	folderName := "call_tracer_parity"
-	files, err := ioutil.ReadDir(filepath.Join("testdata", folderName))
+// runs the JavaScript legacy tracer against them.
+func TestCallTracerParityLegacy(t *testing.T) {
+	testCallTracerParity("callTracerParityLegacy", "call_tracer_parity", t)
+}
+
+// Iterates over all the input-output datasets in the tracer parity test harness and
+// runs the JavaScript tracer against them.
+func TestCallTracerParityJs(t *testing.T) {
+	testCallTracerParity("callTracerParityJs", "call_tracer_parity", t)
+}
+
+// Iterates over all the input-output datasets in the tracer parity test harness and
+// runs the Native tracer against them.
+func TestCallTracerParityNative(t *testing.T) {
+	testCallTracerParity("callTracerParity", "call_tracer_parity", t)
+}
+
+func testCallTracerParity(tracerName string, dirPath string, t *testing.T) {
+	files, err := ioutil.ReadDir(filepath.Join("testdata", dirPath))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}
 	for _, file := range files {
-		// if file.Name() != "big_slow.json" {
 		if !strings.HasSuffix(file.Name(), ".json") {
 			continue
 		}
@@ -158,7 +182,7 @@ func TestCallTracerParity(t *testing.T) {
 		t.Run(camel(strings.TrimSuffix(file.Name(), ".json")), func(t *testing.T) {
 			t.Parallel()
 
-			err := callTracerParityTestRunner("callParityTracer", file.Name(), folderName)
+			err := callTracerParityTestRunner(tracerName, file.Name(), dirPath, t)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -194,7 +218,7 @@ func BenchmarkCallTracerParity(b *testing.B) {
 		filename := strings.TrimPrefix(file, "testdata/call_tracer_parity/")
 		b.Run(camel(strings.TrimSuffix(filename, ".json")), func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				err := callTracerParityTestRunner("callParityTracer", filename, "call_tracer_parity")
+				err := callTracerParityTestRunner("callTracerParity", filename, "call_tracer_parity", b)
 				if err != nil {
 					b.Fatal(err)
 				}
@@ -319,7 +343,13 @@ func stateDiffTracerTestRunner(filename string, dirPath string) error {
 		// uncomment this for easier debugging
 		// have, _ := json.MarshalIndent(ret, "", " ")
 		// want, _ := json.MarshalIndent(test.Result, "", " ")
-		// return fmt.Errorf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
+		// fmt.Printf("trace mismatch: \nhave %+v\nwant %+v\n", string(have), string(want))
+
+		// uncomment this for harder debugging <3 meowsbits
+		lines := deep.Equal(ret, test.Result)
+		for _, l := range lines {
+			fmt.Printf("%s\n", l)
+		}
 		return fmt.Errorf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
 	}
 	return nil

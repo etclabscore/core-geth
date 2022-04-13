@@ -301,8 +301,10 @@ func (t *callParityTracer) Finalize(call callParityFrame, traceAddress []int) ([
 		childTraceAddress = append(childTraceAddress, traceAddress...)
 		childTraceAddress = append(childTraceAddress, i)
 
-		// Delegatecall uses the value from parent
-		if (childCall.Type == "DELEGATECALL" || childCall.Type == "STATICCALL") && childCall.Action.Value.ToInt().Cmp(common.Big0) == 0 {
+		// (Delegate|Static)call uses the value from parent, if zero
+		childCallType := vm.StringToOp(strings.ToUpper(childCall.Type))
+		if (childCallType == vm.DELEGATECALL || childCallType == vm.STATICCALL) &&
+			(childCall.Action.Value == nil || childCall.Action.Value.ToInt().Cmp(big.NewInt(0)) == 0) {
 			childCall.Action.Value = call.Action.Value
 		}
 

@@ -28,17 +28,17 @@ import (
 
 // callTraceParity is the result of a callTracerParity run.
 type callTraceParity struct {
-	Action              native.CallTraceParityAction  `json:"action"`
-	BlockHash           *common.Hash                  `json:"-"`
-	BlockNumber         uint64                        `json:"-"`
-	Error               string                        `json:"error,omitempty"`
-	Result              *native.CallTraceParityResult `json:"result,omitempty"`
-	Subtraces           int                           `json:"subtraces"`
-	TraceAddress        []int                         `json:"traceAddress"`
-	TransactionHash     *common.Hash                  `json:"-"`
-	TransactionPosition *uint64                       `json:"-"`
-	Type                string                        `json:"type"`
-	Time                string                        `json:"-"`
+	Action              native.CallTraceParityAction `json:"action"`
+	BlockHash           *common.Hash                 `json:"-"`
+	BlockNumber         uint64                       `json:"-"`
+	Error               string                       `json:"error,omitempty"`
+	Result              native.CallTraceParityResult `json:"result,omitempty"`
+	Subtraces           int                          `json:"subtraces"`
+	TraceAddress        []int                        `json:"traceAddress"`
+	TransactionHash     *common.Hash                 `json:"-"`
+	TransactionPosition *uint64                      `json:"-"`
+	Type                string                       `json:"type"`
+	Time                string                       `json:"-"`
 }
 
 // callTracerParityTest defines a single test to check the call tracer against.

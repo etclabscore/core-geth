@@ -325,7 +325,6 @@ func (t *callParityTracer) Stop(err error) {
 }
 
 func (t *callParityTracer) formatCreateResult(call *callParityFrame) {
-	call.Action.CreationMethod = call.Type
 	call.Type = strings.ToLower(vm.CREATE.String())
 
 	input := call.Action.Input

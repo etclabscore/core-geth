@@ -428,7 +428,6 @@
 				value:          call.value,               // Value
 				gas:            call.gas,                 // Gas
 				init:           call.input,               // Initialization code
-				creationMethod: call.type.toLowerCase(),  // Create Type
 			},
 			result: {
 				gasUsed:  call.gasUsed,  // Gas used

@@ -103,8 +103,7 @@ type callParityTracer struct {
 func NewCallParityTracer(ctx *tracers.Context) tracers.Tracer {
 	// First callParityframe contains tx context info
 	// and is populated on start and end.
-	t := &callParityTracer{callstack: make([]callParityFrame, 1), ctx: ctx}
-	return t
+	return &callParityTracer{callstack: make([]callParityFrame, 1), ctx: ctx}
 }
 
 // isPrecompiled returns whether the addr is a precompile. Logic borrowed from newJsTracer in eth/tracers/js/tracer.go

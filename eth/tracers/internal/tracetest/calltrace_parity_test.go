@@ -281,7 +281,7 @@ func stateDiffTracerTestRunner(filename string, dirPath string) error {
 	}
 
 	// Create the tracer, the EVM environment and run it
-	tracer, err := tracers.New("stateDiffTracerLegacy", new(tracers.Context))
+	tracer, err := tracers.New("stateDiffTracer", new(tracers.Context))
 	if err != nil {
 		return fmt.Errorf("failed to create state diff tracer: %v", err)
 	}

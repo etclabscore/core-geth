@@ -134,12 +134,6 @@ func TestCallTracerParityLegacy(t *testing.T) {
 }
 
 // Iterates over all the input-output datasets in the tracer parity test harness and
-// runs the JavaScript tracer against them.
-func TestCallTracerParityJs(t *testing.T) {
-	testCallTracerParity("callTracerParityJs", "call_tracer_parity", t)
-}
-
-// Iterates over all the input-output datasets in the tracer parity test harness and
 // runs the Native tracer against them.
 func TestCallTracerParityNative(t *testing.T) {
 	testCallTracerParity("callTracerParity", "call_tracer_parity", t)

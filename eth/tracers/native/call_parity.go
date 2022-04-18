@@ -198,11 +198,6 @@ func (t *callParityTracer) CaptureEnter(typ vm.OpCode, from common.Address, to c
 		return
 	}
 
-	// Skip any pre-compile invocations, those are just fancy opcodes
-	if t.isPrecompiled(to) && (typ == vm.CALL || typ == vm.STATICCALL) {
-		return
-	}
-
 	inputHex := hexutil.Bytes(common.CopyBytes(input))
 
 	call := callParityFrame{
@@ -231,6 +226,14 @@ func (t *callParityTracer) CaptureExit(output []byte, gasUsed uint64, err error)
 	call := t.callstack[size-1]
 	t.callstack = t.callstack[:size-1]
 	size -= 1
+
+	// Skip any pre-compile invocations, those are just fancy opcodes
+	// NOTE: let them captured on `CaptureEnter` method so as we handle internal txs state correctly
+	//			 and drop them here, as it has been removed from the callstack
+	typ := vm.StringToOp(strings.ToUpper(call.Type))
+	if t.isPrecompiled(*call.Action.To) && (typ == vm.CALL || typ == vm.STATICCALL) {
+		return
+	}
 
 	call.Result.GasUsed = hexutil.Uint64(gasUsed)
 	if err == nil {

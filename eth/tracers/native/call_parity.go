@@ -49,41 +49,25 @@ var parityErrorMappingStartingWith = map[string]string{
 }
 
 func init() {
-	register("callParityTracer", NewCallParityTracer)
+	register("callTracerParity", NewCallParityTracer)
 }
 
 // callParityFrame is the result of a callParityTracerParity run.
 type callParityFrame struct {
-	Action              callTraceParityAction `json:"action"`
-	BlockHash           *common.Hash          `json:"-"`
-	BlockNumber         uint64                `json:"-"`
-	Error               string                `json:"error,omitempty"`
-	Result              callTraceParityResult `json:"result"`
-	Subtraces           int                   `json:"subtraces"`
-	TraceAddress        []int                 `json:"traceAddress"`
-	TransactionHash     *common.Hash          `json:"-"`
-	TransactionPosition *uint64               `json:"-"`
-	Type                string                `json:"type"`
-	Calls               []callParityFrame     `json:"-"`
+	Action              CallTraceParityAction  `json:"action"`
+	BlockHash           *common.Hash           `json:"blockHash"`
+	BlockNumber         uint64                 `json:"blockNumber"`
+	Error               string                 `json:"error,omitempty"`
+	Result              *CallTraceParityResult `json:"result,omitempty"`
+	Subtraces           int                    `json:"subtraces"`
+	TraceAddress        []int                  `json:"traceAddress"`
+	TransactionHash     *common.Hash           `json:"transactionHash"`
+	TransactionPosition *uint64                `json:"transactionPosition"`
+	Type                string                 `json:"type"`
+	Calls               []callParityFrame      `json:"-"`
 }
 
-// type callTraceParityAction struct {
-// 	Author         string `json:"author,omitempty"`
-// 	RewardType     string `json:"rewardType,omitempty"`
-// 	SelfDestructed string `json:"address,omitempty"`
-// 	Balance        string `json:"balance,omitempty"`
-// 	CallType       string `json:"callType,omitempty"`
-// 	CreationMethod string `json:"creationMethod,omitempty"`
-// 	From           string `json:"from,omitempty"`
-// 	Gas            string `json:"gas,omitempty"`
-// 	Init           string `json:"init,omitempty"`
-// 	Input          string `json:"input,omitempty"`
-// 	RefundAddress  string `json:"refundAddress,omitempty"`
-// 	To             string `json:"to,omitempty"`
-// 	Value          string `json:"value,omitempty"`
-// }
-
-type callTraceParityAction struct {
+type CallTraceParityAction struct {
 	Author         *common.Address `json:"author,omitempty"`
 	RewardType     *string         `json:"rewardType,omitempty"`
 	SelfDestructed *common.Address `json:"address,omitempty"`
@@ -91,35 +75,23 @@ type callTraceParityAction struct {
 	CallType       string          `json:"callType,omitempty"`
 	CreationMethod string          `json:"creationMethod,omitempty"`
 	From           *common.Address `json:"from,omitempty"`
-	Gas            hexutil.Uint64  `json:"gas,omitempty"`
+	Gas            *hexutil.Uint64 `json:"gas,omitempty"`
 	Init           *hexutil.Bytes  `json:"init,omitempty"`
 	Input          *hexutil.Bytes  `json:"input,omitempty"`
 	RefundAddress  *common.Address `json:"refundAddress,omitempty"`
 	To             *common.Address `json:"to,omitempty"`
-	Value          hexutil.Big     `json:"value,omitempty"`
+	Value          *hexutil.Big    `json:"value,omitempty"`
 }
 
-type callTraceParityResult struct {
+type CallTraceParityResult struct {
 	Address *common.Address `json:"address,omitempty"`
 	Code    *hexutil.Bytes  `json:"code,omitempty"`
-	GasUsed hexutil.Uint64  `json:"gasUsed,omitempty"`
-	Output  hexutil.Bytes   `json:"output,omitempty"`
+	GasUsed *hexutil.Uint64 `json:"gasUsed,omitempty"`
+	Output  *hexutil.Bytes  `json:"output,omitempty"`
 }
-
-// type callParityFrame struct {
-// 	Type    string            `json:"type"`
-// 	From    string            `json:"from"`
-// 	To      string            `json:"to,omitempty"`
-// 	Value   string            `json:"value,omitempty"`
-// 	Gas     string            `json:"gas"`
-// 	GasUsed string            `json:"gasUsed"`
-// 	Input   string            `json:"input"`
-// 	Output  string            `json:"output,omitempty"`
-// 	Error   string            `json:"error,omitempty"`
-// 	Calls   []callParityFrame `json:"calls,omitempty"`
-// }
-
 type callParityTracer struct {
+	env               *vm.EVM
+	ctx               *tracers.Context // Holds tracer context data
 	callstack         []callParityFrame
 	interrupt         uint32           // Atomic flag to signal execution interruption
 	reason            error            // Textual reason for the interruption
@@ -128,11 +100,10 @@ type callParityTracer struct {
 
 // NewCallParityTracer returns a native go tracer which tracks
 // call frames of a tx, and implements vm.EVMLogger.
-func NewCallParityTracer() tracers.Tracer {
+func NewCallParityTracer(ctx *tracers.Context) tracers.Tracer {
 	// First callParityframe contains tx context info
 	// and is populated on start and end.
-	t := &callParityTracer{callstack: make([]callParityFrame, 1)}
-	return t
+	return &callParityTracer{callstack: make([]callParityFrame, 1), ctx: ctx}
 }
 
 // isPrecompiled returns whether the addr is a precompile. Logic borrowed from newJsTracer in eth/tracers/js/tracer.go
@@ -145,43 +116,66 @@ func (t *callParityTracer) isPrecompiled(addr common.Address) bool {
 	return false
 }
 
+func (t *callParityTracer) fillCallFrameFromContext(callFrame *callParityFrame) {
+	if t.ctx != nil {
+		if t.ctx.BlockHash != (common.Hash{}) {
+			callFrame.BlockHash = &t.ctx.BlockHash
+		}
+		if t.ctx.TxHash != (common.Hash{}) {
+			callFrame.TransactionHash = &t.ctx.TxHash
+		}
+		transactionPosition := uint64(t.ctx.TxIndex)
+		callFrame.TransactionPosition = &transactionPosition
+	}
+}
+
 func (l *callParityTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {}
 
 func (t *callParityTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
+	t.env = env
+
 	// Skip any pre-compile invocations, those are just fancy opcodes
 	t.activePrecompiles = env.ActivePrecompiles()
 
 	inputHex := hexutil.Bytes(common.CopyBytes(input))
+	gasHex := hexutil.Uint64(gas)
 
 	t.callstack[0] = callParityFrame{
 		Type: strings.ToLower(vm.CALL.String()),
-		Action: callTraceParityAction{
+		Action: CallTraceParityAction{
 			From:  &from,
 			To:    &to,
 			Input: &inputHex,
-			Gas:   hexutil.Uint64(gas),
+			Gas:   &gasHex,
 		},
-		Result: callTraceParityResult{},
+		Result:      &CallTraceParityResult{},
+		BlockNumber: env.Context.BlockNumber.Uint64(),
 	}
 	if value != nil {
-		t.callstack[0].Action.Value = hexutil.Big(*value)
+		valueHex := hexutil.Big(*value)
+		t.callstack[0].Action.Value = &valueHex
 	}
 	if create {
 		t.callstack[0].Type = strings.ToLower(vm.CREATE.String())
 	}
+
+	t.fillCallFrameFromContext(&t.callstack[0])
 }
 
 func (t *callParityTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {
 	if err != nil {
 		t.callstack[0].Error = err.Error()
 		if err.Error() == "execution reverted" && len(output) > 0 {
-			t.callstack[0].Result.Output = hexutil.Bytes(common.CopyBytes(output))
+			outputHex := hexutil.Bytes(common.CopyBytes(output))
+			t.callstack[0].Result.Output = &outputHex
 		}
 	} else {
 		// TODO (ziogaschr): move back outside of if, makes sense to have it always. Is addition, no API breaks
-		t.callstack[0].Result.GasUsed = hexutil.Uint64(gasUsed)
+		gasUsedHex := hexutil.Uint64(gasUsed)
+		t.callstack[0].Result.GasUsed = &gasUsedHex
 
-		t.callstack[0].Result.Output = hexutil.Bytes(common.CopyBytes(output))
+		outputHex := hexutil.Bytes(common.CopyBytes(output))
+		t.callstack[0].Result.Output = &outputHex
 	}
 }
 
@@ -194,31 +188,32 @@ func (t *callParityTracer) CaptureFault(pc uint64, op vm.OpCode, gas, cost uint6
 func (t *callParityTracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.Address, input []byte, gas uint64, value *big.Int) {
 	// Skip if tracing was interrupted
 	if atomic.LoadUint32(&t.interrupt) > 0 {
-		// TODO: env.Cancel()
-		return
-	}
-
-	// Skip any pre-compile invocations, those are just fancy opcodes
-	if t.isPrecompiled(to) && (typ == vm.CALL || typ == vm.STATICCALL) {
+		t.env.Cancel()
 		return
 	}
 
 	inputHex := hexutil.Bytes(common.CopyBytes(input))
+	gasHex := hexutil.Uint64(gas)
 
 	call := callParityFrame{
 		Type: strings.ToLower(typ.String()),
-		Action: callTraceParityAction{
+		Action: CallTraceParityAction{
 			From:  &from,
 			To:    &to,
 			Input: &inputHex,
-			Gas:   hexutil.Uint64(gas),
-			// Value: hexutil.Big(*value),
+			Gas:   &gasHex,
 		},
-		Result: callTraceParityResult{},
+		Result:      &CallTraceParityResult{},
+		BlockNumber: t.callstack[0].BlockNumber,
 	}
+	valueHex := hexutil.Big{}
 	if value != nil {
-		call.Action.Value = hexutil.Big(*value)
+		valueHex = hexutil.Big(*value)
 	}
+	call.Action.Value = &valueHex
+
+	t.fillCallFrameFromContext(&call)
+
 	t.callstack = append(t.callstack, call)
 }
 
@@ -232,9 +227,19 @@ func (t *callParityTracer) CaptureExit(output []byte, gasUsed uint64, err error)
 	t.callstack = t.callstack[:size-1]
 	size -= 1
 
-	call.Result.GasUsed = hexutil.Uint64(gasUsed)
+	// Skip any pre-compile invocations, those are just fancy opcodes
+	// NOTE: let them captured on `CaptureEnter` method so as we handle internal txs state correctly
+	//			 and drop them here, as it has been removed from the callstack
+	typ := vm.StringToOp(strings.ToUpper(call.Type))
+	if t.isPrecompiled(*call.Action.To) && (typ == vm.CALL || typ == vm.STATICCALL) {
+		return
+	}
+
+	gasUsedHex := hexutil.Uint64(gasUsed)
+	call.Result.GasUsed = &gasUsedHex
 	if err == nil {
-		call.Result.Output = hexutil.Bytes(common.CopyBytes(output))
+		outputHex := hexutil.Bytes(common.CopyBytes(output))
+		call.Result.Output = &outputHex
 	} else {
 		call.Error = err.Error()
 		typ := vm.StringToOp(strings.ToUpper(call.Type))
@@ -278,8 +283,10 @@ func (t *callParityTracer) Finalize(call callParityFrame, traceAddress []int) ([
 		childTraceAddress = append(childTraceAddress, traceAddress...)
 		childTraceAddress = append(childTraceAddress, i)
 
-		// Delegatecall uses the value from parent
-		if (childCall.Type == "DELEGATECALL" || childCall.Type == "STATICCALL") && childCall.Action.Value.ToInt().Cmp(common.Big0) == 0 {
+		// Delegatecall uses the value from parent, if zero
+		childCallType := vm.StringToOp(strings.ToUpper(childCall.Type))
+		if (childCallType == vm.DELEGATECALL) &&
+			(childCall.Action.Value == nil || childCall.Action.Value.ToInt().Cmp(big.NewInt(0)) == 0) {
 			childCall.Action.Value = call.Action.Value
 		}
 
@@ -290,7 +297,6 @@ func (t *callParityTracer) Finalize(call callParityFrame, traceAddress []int) ([
 
 		results = append(results, child...)
 	}
-	// fmt.Println("results:", results)
 
 	return results, nil
 }
@@ -319,19 +325,19 @@ func (t *callParityTracer) Stop(err error) {
 }
 
 func (t *callParityTracer) formatCreateResult(call *callParityFrame) {
-	call.Action.CreationMethod = call.Type
 	call.Type = strings.ToLower(vm.CREATE.String())
 
 	input := call.Action.Input
 	call.Action.Init = input
-	call.Action.Input = nil
 
 	to := call.Action.To
 	call.Result.Address = to
-	call.Action.To = nil
 
-	output := call.Result.Output
-	call.Result.Code = &output
+	call.Result.Code = call.Result.Output
+
+	call.Action.To = nil
+	call.Action.Input = nil
+
 	call.Result.Output = nil
 }
 
@@ -351,15 +357,21 @@ func (t *callParityTracer) formatSuicideResult(call *callParityFrame) {
 
 	addrFrom := call.Action.From
 	call.Action.SelfDestructed = addrFrom
-	call.Action.From = nil
+
+	balanceHex := *call.Action.Value
+	call.Action.Balance = &balanceHex
+
+	call.Action.Value = nil
 
 	addrTo := call.Action.To
 	call.Action.RefundAddress = addrTo
-	call.Action.Balance = &call.Action.Value
 
+	call.Action.From = nil
+	call.Action.To = nil
 	call.Action.Input = nil
+	call.Action.Gas = nil
 
-	call.Result = callTraceParityResult{}
+	call.Result = nil
 }
 
 func (t *callParityTracer) convertErrorToParity(call *callParityFrame) {
@@ -369,12 +381,12 @@ func (t *callParityTracer) convertErrorToParity(call *callParityFrame) {
 
 	if parityError, ok := parityErrorMapping[call.Error]; ok {
 		call.Error = parityError
-		call.Result = callTraceParityResult{}
+		call.Result = nil
 	} else {
 		for gethError, parityError := range parityErrorMappingStartingWith {
 			if strings.HasPrefix(call.Error, gethError) {
 				call.Error = parityError
-				call.Result = callTraceParityResult{}
+				call.Result = nil
 			}
 		}
 	}

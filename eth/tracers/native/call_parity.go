@@ -116,7 +116,7 @@ func (t *callParityTracer) isPrecompiled(addr common.Address) bool {
 	return false
 }
 
-func (t *callParityTracer) fillCtxInformation(callFrame *callParityFrame) {
+func (t *callParityTracer) fillCallFrameFromContext(callFrame *callParityFrame) {
 	if t.ctx != nil {
 		if t.ctx.BlockHash != (common.Hash{}) {
 			callFrame.BlockHash = &t.ctx.BlockHash
@@ -159,7 +159,7 @@ func (t *callParityTracer) CaptureStart(env *vm.EVM, from common.Address, to com
 		t.callstack[0].Type = strings.ToLower(vm.CREATE.String())
 	}
 
-	t.fillCtxInformation(&t.callstack[0])
+	t.fillCallFrameFromContext(&t.callstack[0])
 }
 
 func (t *callParityTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {
@@ -212,7 +212,7 @@ func (t *callParityTracer) CaptureEnter(typ vm.OpCode, from common.Address, to c
 	}
 	call.Action.Value = &valueHex
 
-	t.fillCtxInformation(&call)
+	t.fillCallFrameFromContext(&call)
 
 	t.callstack = append(t.callstack, call)
 }

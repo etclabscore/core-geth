@@ -1036,6 +1036,10 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 		extraContext["gasPrice"] = message.GasPrice()
 
 		tracer.CapturePreEVM(vmenv, extraContext)
+
+		if traceStateCapturer, ok := tracer.(vm.EVMLogger_StateCapturer); ok {
+			traceStateCapturer.CapturePreEVM2(vmenv, extraContext)
+		}
 	}
 
 	result, err := core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.Gas()))

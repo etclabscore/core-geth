@@ -281,7 +281,9 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 	}
 	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
 
-	tracer.CapturePreEVM(evm, taskExtraContext)
+	if traceStateCapturer, ok := tracer.(vm.EVMLogger_StateCapturer); ok {
+		traceStateCapturer.CapturePreEVM2(evm, taskExtraContext)
+	}
 
 	st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(msg.Gas()))
 	if _, err = st.TransitionDb(); err != nil {

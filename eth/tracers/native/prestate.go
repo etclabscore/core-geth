@@ -67,6 +67,8 @@ func (t *prestateTracer) CaptureStart(env *vm.EVM, from common.Address, to commo
 	t.create = create
 	t.to = to
 
+	t.lookupAccount(t.env.Context.Coinbase)
+
 	// Compute intrinsic gas
 	eip2f := env.ChainConfig().IsEnabled(env.ChainConfig().GetEIP2Transition, new(big.Int))
 	eip2028f := env.ChainConfig().IsEnabled(env.ChainConfig().GetEIP2028Transition, new(big.Int))

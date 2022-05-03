@@ -19,7 +19,6 @@ package native
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"math/big"
 	"sync/atomic"
 	"time"
@@ -48,6 +47,7 @@ const (
 type stateDiff = map[common.Address]*stateDiffAccount
 type stateDiffAccount struct {
 	marker  *stateDiffMarker                                `json:"-"`
+	err     error                                           `json:"-"`
 	Balance interface{}                                     `json:"balance"`
 	Nonce   interface{}                                     `json:"nonce"`
 	Code    interface{}                                     `json:"code"`
@@ -70,26 +70,29 @@ type StateDiffNonce struct {
 }
 
 type StateDiffStorage struct {
-	From common.Hash `json:"from"`
-	To   common.Hash `json:"to"`
+	changed bool        `json:"-"`
+	From    common.Hash `json:"from"`
+	To      common.Hash `json:"to"`
 }
 
 type stateDiffTracer struct {
-	env              *vm.EVM
-	ctx              *tracers.Context // Holds tracer context data
-	stateDiff        stateDiff
-	initialState     *state.StateDB
-	create           bool
-	to               common.Address
-	accountsToRemove []common.Address
-	interrupt        uint32 // Atomic flag to signal execution interruption
-	reason           error  // Textual reason for the interruption
+	env                *vm.EVM
+	ctx                *tracers.Context // Holds tracer context data
+	stateDiff          stateDiff
+	initialState       *state.StateDB
+	create             bool
+	to                 common.Address
+	accountsToRemove   []common.Address
+	changedStorageKeys map[common.Address]map[common.Hash]bool
+	interrupt          uint32 // Atomic flag to signal execution interruption
+	reason             error  // Textual reason for the interruption
 }
 
 func newStateDiffTracer(ctx *tracers.Context) tracers.Tracer {
 	// First callframe contains tx context info
 	// and is populated on start and end.
-	return &stateDiffTracer{stateDiff: stateDiff{}, ctx: ctx}
+	return &stateDiffTracer{stateDiff: stateDiff{}, ctx: ctx,
+		changedStorageKeys: make(map[common.Address]map[common.Hash]bool)}
 }
 
 func (t *stateDiffTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {
@@ -117,26 +120,37 @@ func (t *stateDiffTracer) CaptureStart(env *vm.EVM, from common.Address, to comm
 }
 
 // CaptureEnd is called after the call finishes to finalize the tracing.
-func (t *stateDiffTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {
-	// if t.create {
-	// 	// Exclude created contract.
-	// 	delete(t.stateDiff, t.to)
-	// }
-}
+func (t *stateDiffTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {}
 
 // CaptureState implements the EVMLogger interface to trace a single step of VM execution.
 func (t *stateDiffTracer) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, rData []byte, depth int, err error) {
-	if err != nil {
-		t.accountsToRemove = append(t.accountsToRemove, scope.Contract.Address())
-	}
-
 	stack := scope.Stack
 	stackData := stack.Data()
 	stackLen := len(stackData)
 	switch {
 	case stackLen >= 1 && (op == vm.SLOAD || op == vm.SSTORE):
+		addr := scope.Contract.Address()
 		slot := common.Hash(stackData[stackLen-1].Bytes32())
-		t.initStorageKey(scope.Contract.Address(), slot)
+		t.initStorageKey(addr, slot)
+
+		// check if storage set/changed at least once
+		if op == vm.SSTORE {
+			if _, ok := t.changedStorageKeys[addr]; !ok {
+				t.changedStorageKeys[addr] = make(map[common.Hash]bool)
+			}
+
+			isValueChanged, found := t.changedStorageKeys[addr][slot]
+			if !found {
+				t.changedStorageKeys[addr][slot] = false
+			}
+
+			if !isValueChanged {
+				val := common.Hash(stackData[stackLen-2].Bytes32())
+				if val != (common.Hash{}) {
+					t.changedStorageKeys[addr][slot] = true
+				}
+			}
+		}
 	case stackLen >= 1 && (op == vm.EXTCODECOPY || op == vm.EXTCODEHASH || op == vm.EXTCODESIZE || op == vm.BALANCE):
 		addr := common.Address(stackData[stackLen-1].Bytes20())
 		t.initAccount(addr, nil)
@@ -163,6 +177,13 @@ func (t *stateDiffTracer) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64
 		// on SELFDESTRUCT mark the contract address as died
 		marker := markerDied
 		t.initAccount(scope.Contract.Address(), &marker)
+	}
+
+	// log any account errors, in order we decide removal of accounts later
+	if err != nil {
+		if account, ok := t.stateDiff[scope.Contract.Address()]; ok {
+			account.err = err
+		}
 	}
 }
 
@@ -191,11 +212,7 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 			continue
 		}
 
-		// fmt.Println("initialState:", t.initialState)
-		// fmt.Println("StateDB:", t.env.StateDB)
-		initialExist := t.initialState.Exist(addr)
-		exist := t.env.StateDB.Exist(addr)
-
+		// read any special predefined marker set
 		var marker stateDiffMarker
 		if accountDiff.marker != nil {
 			marker = *accountDiff.marker
@@ -210,23 +227,47 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 			continue
 		}
 
+		// remove accounts with errors, except "out of gas"
+		// though, when "out of gas", happens on new account creation, then we remove it as well
+		if accountDiff.err != nil &&
+			(accountDiff.err.Error() != "out of gas" || marker == markerBorn) {
+			t.accountsToRemove = append(t.accountsToRemove, addr)
+			continue
+		}
+
+		initialExist := t.initialState.Exist(addr)
+		exist := t.env.StateDB.Exist(addr)
+
 		// handle storage keys
 		var storageKeysToRemove []common.Hash
 
 		// fill storage
 		for key := range accountDiff.Storage {
+			hasChanged := false
+			if changedKeys, ok := t.changedStorageKeys[addr]; ok {
+				if changed, ok := changedKeys[key]; ok && changed {
+					hasChanged = true
+				}
+			}
+
 			fromStorage := t.initialState.GetState(addr, key)
 			toStorage := t.env.StateDB.GetState(addr, key)
 
-			// mark unchanged storage items for deletion
-			if toStorage == (common.Hash{}) || fromStorage == toStorage {
-				storageKeysToRemove = append(storageKeysToRemove, key)
-			} else if initialExist && exist {
+			if initialExist && exist {
+				// mark unchanged storage items for deletion
+				if fromStorage == toStorage || (fromStorage == (common.Hash{}) && toStorage == (common.Hash{})) {
+					storageKeysToRemove = append(storageKeysToRemove, key)
+				} else {
 					accountDiff.Storage[key][markerChanged] = &StateDiffStorage{
 						From: fromStorage,
 						To:   toStorage,
+					}
 				}
 			} else if !initialExist && exist {
+				if !hasChanged {
+					storageKeysToRemove = append(storageKeysToRemove, key)
+					continue
+				}
 				accountDiff.Storage[key][markerBorn] = toStorage
 			} else if initialExist && !exist {
 				accountDiff.Storage[key][markerDied] = fromStorage
@@ -240,7 +281,8 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 
 		allEqual := len(accountDiff.Storage) == 0
 
-		if !initialExist && exist {
+		// account creation
+		if !initialExist && exist && !hasDied {
 			accountDiff.Nonce = map[stateDiffMarker]hexutil.Uint64{
 				markerBorn: hexutil.Uint64(t.env.StateDB.GetNonce(addr)),
 			}
@@ -250,9 +292,18 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 			accountDiff.Code = map[stateDiffMarker]hexutil.Bytes{
 				markerBorn: t.env.StateDB.GetCode(addr),
 			}
+
 			// account has been removed
 		} else if initialExist && !exist || hasDied {
 			fromNonce := t.initialState.GetNonce(addr)
+
+			// if state doesn't have the account, most probably because of EIP-161, then remove it
+			// TODO: add better reason about this. OE does it this way
+			if fromNonce == 0 {
+				t.accountsToRemove = append(t.accountsToRemove, addr)
+				continue
+			}
+
 			accountDiff.Nonce = map[stateDiffMarker]hexutil.Uint64{
 				markerDied: hexutil.Uint64(fromNonce),
 			}
@@ -262,6 +313,8 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 			accountDiff.Code = map[stateDiffMarker]hexutil.Bytes{
 				markerDied: t.initialState.GetCode(addr),
 			}
+
+			// account changed
 		} else if initialExist && exist {
 			fromNonce := t.initialState.GetNonce(addr)
 			toNonce := t.env.StateDB.GetNonce(addr)
@@ -334,8 +387,8 @@ func (t *stateDiffTracer) initAccount(address common.Address, marker *stateDiffM
 			Storage: make(map[common.Hash]map[stateDiffMarker]interface{}),
 		}
 	} else {
+		// update the marker if account already inited
 		if marker != nil && *marker != "" {
-			fmt.Println("acc address:", address, marker)
 			t.stateDiff[address].marker = marker
 		}
 	}

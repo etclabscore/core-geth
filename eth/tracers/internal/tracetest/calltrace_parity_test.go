@@ -252,28 +252,6 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 		return fmt.Errorf("failed to apply test stateOverrides: %v", err)
 	}
 
-	// Store the truth on whether from account has enough balance for context usage
-	gasCost := new(big.Int).Mul(new(big.Int).SetUint64(msg.Gas()), msg.GasPrice())
-	totalCost := new(big.Int).Add(gasCost, msg.Value())
-
-	// It is important to use core.CanTransfer on the two following lines
-	hasFromSufficientBalanceForValueAndGasCost := core.CanTransfer(statedb, msg.From(), totalCost)
-	hasFromSufficientBalanceForGasCost := core.CanTransfer(statedb, msg.From(), gasCost)
-
-	// Add extra context needed for state_diff
-	taskExtraContext := map[string]interface{}{
-		"hasFromSufficientBalanceForValueAndGasCost": hasFromSufficientBalanceForValueAndGasCost,
-		"hasFromSufficientBalanceForGasCost":         hasFromSufficientBalanceForGasCost,
-		"from":                                       msg.From(),
-		"coinbase":                                   context.Coinbase,
-		"gasLimit":                                   msg.Gas(),
-		"gasPrice":                                   msg.GasPrice(),
-	}
-
-	if msg.To() != nil {
-		taskExtraContext["msgTo"] = *msg.To()
-	}
-
 	// Create the tracer, the EVM environment and run it
 	tracer, err := tracers.New(tracerName, new(tracers.Context))
 	if err != nil {
@@ -282,7 +260,7 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
 
 	if traceStateCapturer, ok := tracer.(vm.EVMLogger_StateCapturer); ok {
-		traceStateCapturer.CapturePreEVM2(evm, taskExtraContext)
+		traceStateCapturer.CapturePreEVM(evm)
 	}
 
 	st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(msg.Gas()))
@@ -317,12 +295,6 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 		t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
 	}
 	return nil
-}
-
-// Iterates over all the input-output datasets in the tracer test harness and
-// runs the JavaScript legacy tracer against them.
-func TestStateDiffTracerLegacy(t *testing.T) {
-	testStateDiffTracer("stateDiffTracerLegacy", "state_diff", t)
 }
 
 // Iterates over all the input-output datasets in the tracer test harness and

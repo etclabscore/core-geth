@@ -94,11 +94,7 @@ func newStateDiffTracer(ctx *tracers.Context) tracers.Tracer {
 	return &stateDiffTracer{stateDiff: stateDiff{}, ctx: ctx,
 		changedStorageKeys: make(map[common.Address]map[common.Hash]bool)}
 }
-
-func (t *stateDiffTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {
-}
-
-func (t *stateDiffTracer) CapturePreEVM2(env *vm.EVM, inputs map[string]interface{}) {
+func (t *stateDiffTracer) CapturePreEVM(env *vm.EVM) {
 	t.env = env
 	if t.initialState == nil {
 		t.initialState = t.env.StateDB.(*state.StateDB).Copy()

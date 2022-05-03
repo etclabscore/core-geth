@@ -62,8 +62,6 @@ func newCallTracer(ctx *tracers.Context) tracers.Tracer {
 	return &callTracer{callstack: make([]callFrame, 1)}
 }
 
-func (l *callTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {}
-
 // CaptureStart implements the EVMLogger interface to initialize the tracing operation.
 func (t *callTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
 	t.env = env

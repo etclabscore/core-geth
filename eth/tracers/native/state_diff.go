@@ -39,10 +39,10 @@ func init() {
 type stateDiffMarker string
 
 const (
-	stateDiffMarkerBorn    stateDiffMarker = "+"
-	stateDiffMarkerDied                    = "-"
-	stateDiffMarkerChanged                 = "*"
-	stateDiffMarkerSame                    = "="
+	markerBorn    stateDiffMarker = "+"
+	markerDied    stateDiffMarker = "-"
+	markerChanged stateDiffMarker = "*"
+	markerSame    stateDiffMarker = "="
 )
 
 type stateDiff = map[common.Address]*stateDiffAccount
@@ -109,7 +109,7 @@ func (t *stateDiffTracer) CaptureStart(env *vm.EVM, from common.Address, to comm
 
 	var marker stateDiffMarker
 	if create {
-		marker = stateDiffMarkerBorn
+		marker = markerBorn
 	}
 
 	t.initAccount(from, nil)
@@ -146,19 +146,22 @@ func (t *stateDiffTracer) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64
 	case op == vm.CREATE:
 		addr := scope.Contract.Address()
 		nonce := t.env.StateDB.GetNonce(addr)
-		t.initAccount(crypto.CreateAddress(addr, nonce), nil)
+		marker := markerBorn
+		t.initAccount(crypto.CreateAddress(addr, nonce), &marker)
 	case stackLen >= 4 && op == vm.CREATE2:
 		offset := stackData[stackLen-2]
 		size := stackData[stackLen-3]
 		init := scope.Memory.GetCopy(int64(offset.Uint64()), int64(size.Uint64()))
 		inithash := crypto.Keccak256(init)
 		salt := stackData[stackLen-4]
-		t.initAccount(crypto.CreateAddress2(scope.Contract.Address(), salt.Bytes32(), inithash), nil)
+		marker := markerBorn
+		t.initAccount(crypto.CreateAddress2(scope.Contract.Address(), salt.Bytes32(), inithash), &marker)
 	case stackLen >= 1 && op == vm.SELFDESTRUCT:
 		addr := common.Address(stackData[stackLen-1].Bytes20())
 		t.initAccount(addr, nil)
-		var marker stateDiffMarker
-		marker = stateDiffMarkerDied
+
+		// on SELFDESTRUCT mark the contract address as died
+		marker := markerDied
 		t.initAccount(scope.Contract.Address(), &marker)
 	}
 }
@@ -198,7 +201,11 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 			marker = *accountDiff.marker
 		}
 
-		if t.create && addr == t.to && marker == stateDiffMarkerDied {
+		hasDied := marker == markerDied
+
+		// if an account has been Born within this run and also Died,
+		// this means it will never be persisted to the state
+		if t.create && addr == t.to && hasDied {
 			t.accountsToRemove = append(t.accountsToRemove, addr)
 			continue
 		}
@@ -215,14 +222,14 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 			if toStorage == (common.Hash{}) || fromStorage == toStorage {
 				storageKeysToRemove = append(storageKeysToRemove, key)
 			} else if initialExist && exist {
-				accountDiff.Storage[key][stateDiffMarkerChanged] = &StateDiffStorage{
-					From: fromStorage,
-					To:   toStorage,
+					accountDiff.Storage[key][markerChanged] = &StateDiffStorage{
+						From: fromStorage,
+						To:   toStorage,
 				}
 			} else if !initialExist && exist {
-				accountDiff.Storage[key][stateDiffMarkerBorn] = toStorage
+				accountDiff.Storage[key][markerBorn] = toStorage
 			} else if initialExist && !exist {
-				accountDiff.Storage[key][stateDiffMarkerDied] = fromStorage
+				accountDiff.Storage[key][markerDied] = fromStorage
 			}
 		}
 
@@ -235,58 +242,60 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 
 		if !initialExist && exist {
 			accountDiff.Nonce = map[stateDiffMarker]hexutil.Uint64{
-				stateDiffMarkerBorn: hexutil.Uint64(t.env.StateDB.GetNonce(addr)),
+				markerBorn: hexutil.Uint64(t.env.StateDB.GetNonce(addr)),
 			}
 			accountDiff.Balance = map[stateDiffMarker]*hexutil.Big{
-				stateDiffMarkerBorn: (*hexutil.Big)(t.env.StateDB.GetBalance(addr)),
+				markerBorn: (*hexutil.Big)(t.env.StateDB.GetBalance(addr)),
 			}
 			accountDiff.Code = map[stateDiffMarker]hexutil.Bytes{
-				stateDiffMarkerBorn: t.env.StateDB.GetCode(addr),
+				markerBorn: t.env.StateDB.GetCode(addr),
 			}
-		} else if initialExist && !exist || marker == stateDiffMarkerDied {
+			// account has been removed
+		} else if initialExist && !exist || hasDied {
+			fromNonce := t.initialState.GetNonce(addr)
 			accountDiff.Nonce = map[stateDiffMarker]hexutil.Uint64{
-				stateDiffMarkerDied: hexutil.Uint64(t.initialState.GetNonce(addr)),
+				markerDied: hexutil.Uint64(fromNonce),
 			}
 			accountDiff.Balance = map[stateDiffMarker]*hexutil.Big{
-				stateDiffMarkerDied: (*hexutil.Big)(t.initialState.GetBalance(addr)),
+				markerDied: (*hexutil.Big)(t.initialState.GetBalance(addr)),
 			}
 			accountDiff.Code = map[stateDiffMarker]hexutil.Bytes{
-				stateDiffMarkerDied: t.initialState.GetCode(addr),
+				markerDied: t.initialState.GetCode(addr),
 			}
 		} else if initialExist && exist {
 			fromNonce := t.initialState.GetNonce(addr)
 			toNonce := t.env.StateDB.GetNonce(addr)
 			if fromNonce == toNonce {
-				accountDiff.Nonce = stateDiffMarkerSame
+				accountDiff.Nonce = markerSame
 			} else {
-				m := make(map[stateDiffMarker]*StateDiffNonce)
-				m[stateDiffMarkerChanged] = &StateDiffNonce{
+				diff := make(map[stateDiffMarker]*StateDiffNonce)
+				diff[markerChanged] = &StateDiffNonce{
 					From: hexutil.Uint64(fromNonce),
 					To:   hexutil.Uint64(toNonce),
 				}
-				accountDiff.Nonce = m
+				accountDiff.Nonce = diff
 				allEqual = false
 			}
 
 			fromBalance := t.initialState.GetBalance(addr)
 			toBalance := t.env.StateDB.GetBalance(addr)
 			if fromBalance.Cmp(toBalance) == 0 {
-				accountDiff.Balance = stateDiffMarkerSame
+				accountDiff.Balance = markerSame
 			} else {
-				m := make(map[stateDiffMarker]*StateDiffBalance)
-				m[stateDiffMarkerChanged] = &StateDiffBalance{From: (*hexutil.Big)(fromBalance), To: (*hexutil.Big)(toBalance)}
-				accountDiff.Balance = m
+				diff := make(map[stateDiffMarker]*StateDiffBalance)
+				diff[markerChanged] = &StateDiffBalance{From: (*hexutil.Big)(fromBalance), To: (*hexutil.Big)(toBalance)}
+				accountDiff.Balance = diff
 				allEqual = false
 			}
 
 			fromCode := t.initialState.GetCode(addr)
 			toCode := t.env.StateDB.GetCode(addr)
 			if bytes.Equal(fromCode, toCode) {
-				accountDiff.Code = stateDiffMarkerSame
+				accountDiff.Code = markerSame
 			} else {
-				m := make(map[stateDiffMarker]*StateDiffCode)
-				m[stateDiffMarkerChanged] = &StateDiffCode{From: fromCode, To: toCode}
-				accountDiff.Code = m
+				diff := make(map[stateDiffMarker]*StateDiffCode)
+				diff[markerChanged] = &StateDiffCode{From: fromCode, To: toCode}
+				accountDiff.Code = diff
 				allEqual = false
 			}
 

@@ -23,5 +23,5 @@ package vm
 // See api_parity.go.
 type EVMLogger_StateCapturer interface {
 	EVMLogger
-	CapturePreEVM2(env *EVM, inputs map[string]interface{})
+	CapturePreEVM(env *EVM)
 }

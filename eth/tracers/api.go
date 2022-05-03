@@ -985,6 +985,8 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 	// Call Prepare to clear out the statedb access list
 	statedb.Prepare(txctx.TxHash, txctx.TxIndex)
 
+	if traceStateCapturer, ok := tracer.(vm.EVMLogger_StateCapturer); ok {
+		traceStateCapturer.CapturePreEVM(vmenv)
 	}
 
 	result, err := core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.Gas()))

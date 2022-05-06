@@ -234,6 +234,13 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 		initialExist := t.initialState.Exist(addr)
 		exist := t.env.StateDB.Exist(addr)
 
+		// if initialState doesn't have the account (new account creation),
+		// and hasDied, then account will be removed from state
+		if !initialExist && hasDied {
+			t.accountsToRemove = append(t.accountsToRemove, addr)
+			continue
+		}
+
 		// handle storage keys
 		var storageKeysToRemove []common.Hash
 

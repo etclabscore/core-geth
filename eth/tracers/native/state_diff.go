@@ -172,6 +172,11 @@ func (t *stateDiffTracer) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64
 
 		// on SELFDESTRUCT mark the contract address as died
 		marker := markerDied
+
+		// account won't be SELFDESTRUCTed if out of gas happens on same instruction
+		if err != nil && err.Error() == "out of gas" {
+			marker = ""
+		}
 		t.initAccount(scope.Contract.Address(), &marker)
 	}
 
@@ -299,14 +304,6 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 			// account has been removed
 		} else if initialExist && !exist || hasDied {
 			fromNonce := t.initialState.GetNonce(addr)
-
-			// if state doesn't have the account, most probably because of EIP-161, then remove it
-			// TODO: add better reason about this. OE does it this way
-			if fromNonce == 0 {
-				t.accountsToRemove = append(t.accountsToRemove, addr)
-				continue
-			}
-
 			accountDiff.Nonce = map[stateDiffMarker]hexutil.Uint64{
 				markerDied: hexutil.Uint64(fromNonce),
 			}

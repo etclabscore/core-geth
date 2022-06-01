@@ -47,7 +47,8 @@
     "difficulty": "1958508",
     "timestamp": "1577545029",
     "gasLimit": "15085328",
-    "miner": "0x877bd459c9b7d8576b44e59e09d076c25946f443"
+    "miner": "0x877bd459c9b7d8576b44e59e09d076c25946f443",
+    "transactionHash": "0x0c59ddf8ebbaa64140db6214bbad641fff6bb066847dbef3433d434bd1fb6270"
   },
   "input": {
     "from": "0x877bd459c9b7d8576b44e59e09d076c25946f443",

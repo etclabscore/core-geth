@@ -129,8 +129,6 @@ func (t *callParityTracer) fillCallFrameFromContext(callFrame *callParityFrame) 
 	}
 }
 
-func (l *callParityTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {}
-
 func (t *callParityTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
 	t.env = env
 

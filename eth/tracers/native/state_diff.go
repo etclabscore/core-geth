@@ -25,6 +25,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/eth/tracers"
@@ -34,31 +35,23 @@ func init() {
 	register("stateDiffTracer", newStateDiffTracer)
 }
 
+type stateDiffMarker string
+
 const (
-	// diffMarkerMemory= "_"	// temp state used while running the tracer, will never be returned to the user
-	diffMarkerBorn    = "+"
-	diffMarkerDied    = "-"
-	diffMarkerChanged = "*"
-	diffMarkerSame    = "="
+	markerBorn    stateDiffMarker = "+"
+	markerDied    stateDiffMarker = "-"
+	markerChanged stateDiffMarker = "*"
+	markerSame    stateDiffMarker = "="
 )
 
 type stateDiff = map[common.Address]*stateDiffAccount
 type stateDiffAccount struct {
-	empty  bool               `json:"-"`
-	exists StateDiffExistance `json:"-"`
-	// Balance string                      `json:"balance"`
-	// Nonce   uint64                      `json:"nonce"`
-	// Code    string                      `json:"code"`
-	// Storage map[common.Hash]common.Hash `json:"storage"`
-	Balance interface{}                            `json:"balance"` // Can be either string "=" or mapping "*" => {"from": "hex", "to": "hex"}
-	Nonce   interface{}                            `json:"nonce"`
-	Code    interface{}                            `json:"code"`
-	Storage map[common.Hash]map[string]interface{} `json:"storage"`
-}
-
-type StateDiffExistance struct {
-	From bool
-	To   bool
+	marker  *stateDiffMarker                                `json:"-"`
+	err     error                                           `json:"-"`
+	Balance interface{}                                     `json:"balance"`
+	Nonce   interface{}                                     `json:"nonce"`
+	Code    interface{}                                     `json:"code"`
+	Storage map[common.Hash]map[stateDiffMarker]interface{} `json:"storage"`
 }
 
 type StateDiffBalance struct {
@@ -77,92 +70,53 @@ type StateDiffNonce struct {
 }
 
 type StateDiffStorage struct {
-	From common.Hash `json:"from"`
-	To   common.Hash `json:"to"`
+	changed bool        `json:"-"`
+	From    common.Hash `json:"from"`
+	To      common.Hash `json:"to"`
 }
 
 type stateDiffTracer struct {
-	env          *vm.EVM
-	ctx          *tracers.Context // Holds tracer context data
-	stateDiff    stateDiff
-	initialState *int
-	create       bool
-	to           common.Address
-	interrupt    uint32 // Atomic flag to signal execution interruption
-	reason       error  // Textual reason for the interruption
+	env                *vm.EVM
+	ctx                *tracers.Context // Holds tracer context data
+	stateDiff          stateDiff
+	initialState       *state.StateDB
+	create             bool
+	to                 common.Address
+	accountsToRemove   []common.Address
+	changedStorageKeys map[common.Address]map[common.Hash]bool
+	interrupt          uint32 // Atomic flag to signal execution interruption
+	reason             error  // Textual reason for the interruption
 }
 
 func newStateDiffTracer(ctx *tracers.Context) tracers.Tracer {
 	// First callframe contains tx context info
 	// and is populated on start and end.
-	return &stateDiffTracer{stateDiff: stateDiff{}, ctx: ctx}
+	return &stateDiffTracer{stateDiff: stateDiff{}, ctx: ctx,
+		changedStorageKeys: make(map[common.Address]map[common.Hash]bool)}
 }
-
-func (t *stateDiffTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {
-}
-
-func (t *stateDiffTracer) CapturePreEVM2(env *vm.EVM, inputs map[string]interface{}) {
+func (t *stateDiffTracer) CapturePreEVM(env *vm.EVM) {
 	t.env = env
 	if t.initialState == nil {
-		snapshot := t.env.StateDB.Snapshot()
-		t.initialState = &snapshot
+		t.initialState = t.env.StateDB.(*state.StateDB).Copy()
 	}
 }
 
 // CaptureStart implements the EVMLogger interface to initialize the tracing operation.
 func (t *stateDiffTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
-	// t.env = env
+	t.create = create
+	t.to = to
 
-	// if t.initialState == nil {
-	// 	snapshot := t.env.StateDB.Snapshot()
-	// 	t.initialState = &snapshot
-	// }
+	var marker stateDiffMarker
+	if create {
+		marker = markerBorn
+	}
 
-	// t.create = create
-	// t.to = to
-
-	// Compute intrinsic gas
-	// eip2f := env.ChainConfig().IsEnabled(env.ChainConfig().GetEIP2Transition, new(big.Int))
-	// eip2028f := env.ChainConfig().IsEnabled(env.ChainConfig().GetEIP2028Transition, new(big.Int))
-	// intrinsicGas, err := core.IntrinsicGas(input, nil, create, eip2f, eip2028f)
-	// if err != nil {
-	// 	return
-	// }
-
-	t.prepareAccount(from)
-	t.prepareAccount(to)
-
-	// t.lookupAccount(from)
-	// t.lookupAccount(to)
-
-	// The recipient balance includes the value transferred.
-	// toBal := hexutil.MustDecodeBig(t.stateDiff[to].Balance)
-	// toBal = new(big.Int).Sub(toBal, value)
-	// t.stateDiff[to].Balance = hexutil.EncodeBig(toBal)
-
-	// // The sender balance is after reducing: value, gasLimit, intrinsicGas.
-	// // We need to re-add them to get the pre-tx balance.
-	// fromBal := hexutil.MustDecodeBig(t.stateDiff[from].Balance)
-	// gasPrice := env.TxContext.GasPrice
-	// consumedGas := new(big.Int).Mul(
-	// 	gasPrice,
-	// 	new(big.Int).Add(
-	// 		new(big.Int).SetUint64(intrinsicGas),
-	// 		new(big.Int).SetUint64(gas),
-	// 	),
-	// )
-	// fromBal.Add(fromBal, new(big.Int).Add(value, consumedGas))
-	// t.stateDiff[from].Balance = hexutil.EncodeBig(fromBal)
-	// t.stateDiff[from].Nonce--
+	t.initAccount(from, nil)
+	t.initAccount(to, &marker)
 }
 
 // CaptureEnd is called after the call finishes to finalize the tracing.
-func (t *stateDiffTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {
-	// if t.create {
-	// 	// Exclude created contract.
-	// 	delete(t.stateDiff, t.to)
-	// }
-}
+func (t *stateDiffTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {}
 
 // CaptureState implements the EVMLogger interface to trace a single step of VM execution.
 func (t *stateDiffTracer) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, rData []byte, depth int, err error) {
@@ -171,29 +125,66 @@ func (t *stateDiffTracer) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64
 	stackLen := len(stackData)
 	switch {
 	case stackLen >= 1 && (op == vm.SLOAD || op == vm.SSTORE):
+		addr := scope.Contract.Address()
 		slot := common.Hash(stackData[stackLen-1].Bytes32())
-		t.lookupStorage(scope.Contract.Address(), slot)
-	case stackLen >= 1 && (op == vm.EXTCODECOPY || op == vm.EXTCODEHASH || op == vm.EXTCODESIZE || op == vm.BALANCE || op == vm.SELFDESTRUCT):
+		t.initStorageKey(addr, slot)
+
+		// check if storage set/changed at least once
+		if op == vm.SSTORE {
+			if _, ok := t.changedStorageKeys[addr]; !ok {
+				t.changedStorageKeys[addr] = make(map[common.Hash]bool)
+			}
+
+			isValueChanged, found := t.changedStorageKeys[addr][slot]
+			if !found {
+				t.changedStorageKeys[addr][slot] = false
+			}
+
+			if !isValueChanged {
+				val := common.Hash(stackData[stackLen-2].Bytes32())
+				if val != (common.Hash{}) {
+					t.changedStorageKeys[addr][slot] = true
+				}
+			}
+		}
+	case stackLen >= 1 && (op == vm.EXTCODECOPY || op == vm.EXTCODEHASH || op == vm.EXTCODESIZE || op == vm.BALANCE):
 		addr := common.Address(stackData[stackLen-1].Bytes20())
-		// t.lookupAccount(addr)
-		t.prepareAccount(addr)
+		t.initAccount(addr, nil)
 	case stackLen >= 5 && (op == vm.DELEGATECALL || op == vm.CALL || op == vm.STATICCALL || op == vm.CALLCODE):
 		addr := common.Address(stackData[stackLen-2].Bytes20())
-		// t.lookupAccount(addr)
-		t.prepareAccount(addr)
+		t.initAccount(addr, nil)
 	case op == vm.CREATE:
 		addr := scope.Contract.Address()
 		nonce := t.env.StateDB.GetNonce(addr)
-		// t.lookupAccount(crypto.CreateAddress(addr, nonce))
-		t.prepareAccount(crypto.CreateAddress(addr, nonce))
+		marker := markerBorn
+		t.initAccount(crypto.CreateAddress(addr, nonce), &marker)
 	case stackLen >= 4 && op == vm.CREATE2:
 		offset := stackData[stackLen-2]
 		size := stackData[stackLen-3]
 		init := scope.Memory.GetCopy(int64(offset.Uint64()), int64(size.Uint64()))
 		inithash := crypto.Keccak256(init)
 		salt := stackData[stackLen-4]
-		// t.lookupAccount(crypto.CreateAddress2(scope.Contract.Address(), salt.Bytes32(), inithash))
-		t.prepareAccount(crypto.CreateAddress2(scope.Contract.Address(), salt.Bytes32(), inithash))
+		marker := markerBorn
+		t.initAccount(crypto.CreateAddress2(scope.Contract.Address(), salt.Bytes32(), inithash), &marker)
+	case stackLen >= 1 && op == vm.SELFDESTRUCT:
+		addr := common.Address(stackData[stackLen-1].Bytes20())
+		t.initAccount(addr, nil)
+
+		// on SELFDESTRUCT mark the contract address as died
+		marker := markerDied
+
+		// account won't be SELFDESTRUCTed if out of gas happens on same instruction
+		if err != nil && err.Error() == "out of gas" {
+			marker = ""
+		}
+		t.initAccount(scope.Contract.Address(), &marker)
+	}
+
+	// log any account errors, in order we decide removal of accounts later
+	if err != nil {
+		if account, ok := t.stateDiff[scope.Contract.Address()]; ok {
+			account.err = err
+		}
 	}
 }
 
@@ -213,186 +204,165 @@ func (t *stateDiffTracer) CaptureExit(output []byte, gasUsed uint64, err error) 
 // GetResult returns the json-encoded nested list of call traces, and any
 // error arising from the encoding or forceful termination (via `Stop`).
 func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
-	// TODO: consider releasing snapshot
-	// t.env.StateDB.DiscardSnapshot(t.initialState)
-	var accountsToRemove []common.Address
+	t.initAccount(t.env.Context.Coinbase, nil)
 
-	t.prepareAccount(t.env.Context.Coinbase)
-
-	// read from latest state
 	for addr, accountDiff := range t.stateDiff {
-		accountDiff.empty = t.env.StateDB.Empty(addr)
-		if accountDiff.empty {
-			accountsToRemove = append(accountsToRemove, addr)
+		// remove empty accounts
+		if t.env.StateDB.Empty(addr) {
+			t.accountsToRemove = append(t.accountsToRemove, addr)
 			continue
 		}
 
-		accountDiff.exists = StateDiffExistance{
-			To: t.env.StateDB.Exist(addr),
+		// read any special predefined marker set
+		var marker stateDiffMarker
+		if accountDiff.marker != nil {
+			marker = *accountDiff.marker
 		}
 
-		accountDiff.Nonce = StateDiffNonce{
-			To: (hexutil.Uint64)(t.env.StateDB.GetNonce(addr)),
-		}
+		hasDied := marker == markerDied
 
-		accountDiff.Balance = StateDiffBalance{
-			To: (*hexutil.Big)(t.env.StateDB.GetBalance(addr)),
-		}
-
-		accountDiff.Code = StateDiffCode{
-			To: t.env.StateDB.GetCode(addr),
-		}
-
-		for key := range accountDiff.Storage {
-			accountDiff.Storage[key]["*"] = StateDiffStorage{
-				To: t.env.StateDB.GetState(addr, key),
-			}
-		}
-	}
-
-	// read from initial state
-	t.env.StateDB.RevertToSnapshot(*t.initialState)
-	for addr, accountDiff := range t.stateDiff {
-		accountDiff.exists.From = t.env.StateDB.Exist(addr)
-
-		if nonce, ok := accountDiff.Nonce.(StateDiffNonce); ok {
-			nonce.From = (hexutil.Uint64)(t.env.StateDB.GetNonce(addr))
-			accountDiff.Nonce = nonce
-		}
-
-		if bal, ok := accountDiff.Balance.(StateDiffBalance); ok {
-			bal.From = (*hexutil.Big)(t.env.StateDB.GetBalance(addr))
-			accountDiff.Balance = bal
-		}
-
-		if code, ok := accountDiff.Code.(StateDiffCode); ok {
-			code.From = t.env.StateDB.GetCode(addr)
-			accountDiff.Code = code
-		}
-
-		for key := range accountDiff.Storage {
-			if storage, ok := accountDiff.Storage[key]["*"].(StateDiffStorage); ok {
-				storage.From = t.env.StateDB.GetState(addr, key)
-				accountDiff.Storage[key]["*"] = storage
-			}
-		}
-	}
-
-	// compare states
-	// TODO: merge loop with the above one
-	for addr, accountDiff := range t.stateDiff {
-		// TODO: rename to isEmpty
-		if accountDiff.empty {
+		// if an account has been Born within this run and also Died,
+		// this means it will never be persisted to the state
+		if t.create && addr == t.to && hasDied {
+			t.accountsToRemove = append(t.accountsToRemove, addr)
 			continue
 		}
 
-		// delete empty or unchanged storage items
-		for key, accountStorage := range accountDiff.Storage {
-			storage := accountStorage["*"].(StateDiffStorage)
-			if storage.To == (common.Hash{}) || storage.From == storage.To {
-				delete(accountDiff.Storage, key)
+		// remove accounts with errors, except "out of gas"
+		// though, when "out of gas", happens on new account creation, then we remove it as well
+		if accountDiff.err != nil &&
+			(accountDiff.err.Error() != "out of gas" || marker == markerBorn) {
+			t.accountsToRemove = append(t.accountsToRemove, addr)
+			continue
+		}
+
+		initialExist := t.initialState.Exist(addr)
+		exist := t.env.StateDB.Exist(addr)
+
+		// if initialState doesn't have the account (new account creation),
+		// and hasDied, then account will be removed from state
+		if !initialExist && hasDied {
+			t.accountsToRemove = append(t.accountsToRemove, addr)
+			continue
+		}
+
+		// handle storage keys
+		var storageKeysToRemove []common.Hash
+
+		// fill storage
+		for key := range accountDiff.Storage {
+			hasChanged := false
+			if changedKeys, ok := t.changedStorageKeys[addr]; ok {
+				if changed, ok := changedKeys[key]; ok && changed {
+					hasChanged = true
+				}
+			}
+
+			fromStorage := t.initialState.GetState(addr, key)
+			toStorage := t.env.StateDB.GetState(addr, key)
+
+			if initialExist && exist {
+				// mark unchanged storage items for deletion
+				if fromStorage == toStorage || (fromStorage == (common.Hash{}) && toStorage == (common.Hash{})) {
+					storageKeysToRemove = append(storageKeysToRemove, key)
+				} else {
+					accountDiff.Storage[key][markerChanged] = &StateDiffStorage{
+						From: fromStorage,
+						To:   toStorage,
+					}
+				}
+			} else if !initialExist && exist {
+				if !hasChanged {
+					storageKeysToRemove = append(storageKeysToRemove, key)
+					continue
+				}
+				accountDiff.Storage[key][markerBorn] = toStorage
+			} else if initialExist && !exist {
+				accountDiff.Storage[key][markerDied] = fromStorage
 			}
 		}
 
-		// account removed
-		if accountDiff.exists.From && !accountDiff.exists.To {
-			{
-				m := make(map[string]hexutil.Uint64)
-				if nonce, ok := accountDiff.Nonce.(StateDiffNonce); ok {
-					m["-"] = nonce.From
-					accountDiff.Nonce = m
-				}
+		// remove marked storage keys
+		for _, key := range storageKeysToRemove {
+			delete(accountDiff.Storage, key)
+		}
+
+		allEqual := len(accountDiff.Storage) == 0
+
+		// account creation
+		if !initialExist && exist && !hasDied {
+			accountDiff.Nonce = map[stateDiffMarker]hexutil.Uint64{
+				markerBorn: hexutil.Uint64(t.env.StateDB.GetNonce(addr)),
 			}
-			{
-				m := make(map[string]*hexutil.Big)
-				if bal, ok := accountDiff.Balance.(StateDiffBalance); ok {
-					m["-"] = bal.From
-					accountDiff.Balance = m
-				}
+			accountDiff.Balance = map[stateDiffMarker]*hexutil.Big{
+				markerBorn: (*hexutil.Big)(t.env.StateDB.GetBalance(addr)),
 			}
-			{
-				m := make(map[string]hexutil.Bytes)
-				if code, ok := accountDiff.Code.(StateDiffCode); ok {
-					m["-"] = code.From
-					accountDiff.Code = m
-				}
+			accountDiff.Code = map[stateDiffMarker]hexutil.Bytes{
+				markerBorn: t.env.StateDB.GetCode(addr),
 			}
 
-			// new account added
-		} else if !accountDiff.exists.From && accountDiff.exists.To {
-			{
-				m := make(map[string]hexutil.Uint64)
-				if nonce, ok := accountDiff.Nonce.(StateDiffNonce); ok {
-					m["+"] = nonce.To
-					accountDiff.Nonce = m
-				}
+			// account has been removed
+		} else if initialExist && !exist || hasDied {
+			fromNonce := t.initialState.GetNonce(addr)
+			accountDiff.Nonce = map[stateDiffMarker]hexutil.Uint64{
+				markerDied: hexutil.Uint64(fromNonce),
 			}
-			{
-				m := make(map[string]*hexutil.Big)
-				if bal, ok := accountDiff.Balance.(StateDiffBalance); ok {
-					m["+"] = bal.To
-					accountDiff.Balance = m
-				}
+			accountDiff.Balance = map[stateDiffMarker]*hexutil.Big{
+				markerDied: (*hexutil.Big)(t.initialState.GetBalance(addr)),
 			}
-			{
-				m := make(map[string]hexutil.Bytes)
-				if code, ok := accountDiff.Code.(StateDiffCode); ok {
-					m["+"] = code.To
-					accountDiff.Code = m
-				}
-			}
-
-			for _, accountStorage := range accountDiff.Storage {
-				storage := accountStorage["*"].(StateDiffStorage)
-				delete(accountStorage, "*")
-				accountStorage["+"] = &storage.To
+			accountDiff.Code = map[stateDiffMarker]hexutil.Bytes{
+				markerDied: t.initialState.GetCode(addr),
 			}
 
 			// account changed
-		} else if accountDiff.exists.From && accountDiff.exists.To {
-			allEqual := len(accountDiff.Storage) == 0
+		} else if initialExist && exist {
+			fromNonce := t.initialState.GetNonce(addr)
+			toNonce := t.env.StateDB.GetNonce(addr)
+			if fromNonce == toNonce {
+				accountDiff.Nonce = markerSame
+			} else {
+				diff := make(map[stateDiffMarker]*StateDiffNonce)
+				diff[markerChanged] = &StateDiffNonce{
+					From: hexutil.Uint64(fromNonce),
+					To:   hexutil.Uint64(toNonce),
+				}
+				accountDiff.Nonce = diff
+				allEqual = false
+			}
 
-			if nonce, ok := accountDiff.Nonce.(StateDiffNonce); ok {
-				if nonce.From == nonce.To {
-					accountDiff.Nonce = "="
-				} else {
-					m := make(map[string]StateDiffNonce)
-					m["*"] = nonce
-					accountDiff.Nonce = m
-					allEqual = false
-				}
+			fromBalance := t.initialState.GetBalance(addr)
+			toBalance := t.env.StateDB.GetBalance(addr)
+			if fromBalance.Cmp(toBalance) == 0 {
+				accountDiff.Balance = markerSame
+			} else {
+				diff := make(map[stateDiffMarker]*StateDiffBalance)
+				diff[markerChanged] = &StateDiffBalance{From: (*hexutil.Big)(fromBalance), To: (*hexutil.Big)(toBalance)}
+				accountDiff.Balance = diff
+				allEqual = false
 			}
-			if bal, ok := accountDiff.Balance.(StateDiffBalance); ok {
-				if bal.To.ToInt().Cmp(bal.From.ToInt()) == 0 {
-					accountDiff.Balance = "="
-				} else {
-					m := make(map[string]StateDiffBalance)
-					m["*"] = bal
-					accountDiff.Balance = m
-					allEqual = false
-				}
-			}
-			if code, ok := accountDiff.Code.(StateDiffCode); ok {
-				if bytes.Equal(code.From, code.To) {
-					accountDiff.Code = "="
-				} else {
-					m := make(map[string]StateDiffCode)
-					m["*"] = code
-					accountDiff.Code = m
-					allEqual = false
-				}
+
+			fromCode := t.initialState.GetCode(addr)
+			toCode := t.env.StateDB.GetCode(addr)
+			if bytes.Equal(fromCode, toCode) {
+				accountDiff.Code = markerSame
+			} else {
+				diff := make(map[stateDiffMarker]*StateDiffCode)
+				diff[markerChanged] = &StateDiffCode{From: fromCode, To: toCode}
+				accountDiff.Code = diff
+				allEqual = false
 			}
 
 			if allEqual {
-				accountsToRemove = append(accountsToRemove, addr)
+				t.accountsToRemove = append(t.accountsToRemove, addr)
 			}
+
 		} else {
-			accountsToRemove = append(accountsToRemove, addr)
+			t.accountsToRemove = append(t.accountsToRemove, addr)
 		}
 	}
 
 	// remove marked accounts
-	for _, addr := range accountsToRemove {
+	for _, addr := range t.accountsToRemove {
 		delete(t.stateDiff, addr)
 	}
 
@@ -409,48 +379,24 @@ func (t *stateDiffTracer) Stop(err error) {
 	atomic.StoreUint32(&t.interrupt, 1)
 }
 
-// func (t *stateDiffTracer) WriteAccountStorage(address common.Address, incarnation uint64, key *common.Hash, original, value *uint256.Int) error {
-// 	if *original == *value {
-// 		return nil
-// 	}
-// 	accountDiff := sd.sdMap[address]
-// 	if accountDiff == nil {
-// 		accountDiff = &StateDiffAccount{Storage: make(map[common.Hash]map[string]interface{})}
-// 		sd.sdMap[address] = accountDiff
-// 	}
-// 	m := make(map[string]interface{})
-// 	m["*"] = &StateDiffStorage{From: common.BytesToHash(original.Bytes()), To: common.BytesToHash(value.Bytes())}
-// 	accountDiff.Storage[*key] = m
-// 	return nil
-// }
-
-func (t *stateDiffTracer) prepareAccount(address common.Address) error {
+// initAccount stores the account address, in order we fetch the data in GetResult
+func (t *stateDiffTracer) initAccount(address common.Address, marker *stateDiffMarker) error {
 	if _, ok := t.stateDiff[address]; !ok {
-		t.stateDiff[address] = &stateDiffAccount{Storage: make(map[common.Hash]map[string]interface{})}
+		t.stateDiff[address] = &stateDiffAccount{
+			marker:  marker,
+			Storage: make(map[common.Hash]map[stateDiffMarker]interface{}),
+		}
+	} else {
+		// update the marker if account already inited
+		if marker != nil && *marker != "" {
+			t.stateDiff[address].marker = marker
+		}
 	}
 	return nil
 }
 
-// lookupAccount fetches details of an account and adds it to the stateDiff
-// if it doesn't exist there.
-func (t *stateDiffTracer) lookupAccount(addr common.Address) {
-	if _, ok := t.stateDiff[addr]; ok {
-		return
-	}
-	t.stateDiff[addr] = &stateDiffAccount{
-		Balance: bigToHex(t.env.StateDB.GetBalance(addr)),
-		Nonce:   t.env.StateDB.GetNonce(addr),
-		Code:    bytesToHex(t.env.StateDB.GetCode(addr)),
-		Storage: make(map[common.Hash]map[string]interface{}),
-	}
-}
-
-// lookupStorage fetches the requested storage slot and adds
-// it to the stateDiff of the given contract. It assumes `lookupAccount`
+// initStorageKey stores the storage key in the account, in order we fetch the data in GetResult. It assumes `lookupAccount`
 // has been performed on the contract before.
-func (t *stateDiffTracer) lookupStorage(addr common.Address, key common.Hash) {
-	// if _, ok := t.stateDiff[addr].Storage[key]; ok {
-	// 	return
-	// }
-	t.stateDiff[addr].Storage[key] = make(map[string]interface{})
+func (t *stateDiffTracer) initStorageKey(addr common.Address, key common.Hash) {
+	t.stateDiff[addr].Storage[key] = make(map[stateDiffMarker]interface{})
 }

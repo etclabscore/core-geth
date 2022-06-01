@@ -61,5 +61,49 @@
     "value": "0xddcfbbb7a606000",
     "data": "0x"
   },
-  "result": {}
+  "stateOverrides": {
+    "0x655866a8b24F333e3A1D0a9A2E574289E245f808": {
+      "balance": "0xde0b6b3a7640000"
+    }
+  },
+  "result": {
+    "0x655866a8b24f333e3a1d0a9a2e574289e245f808": {
+      "balance": {
+        "*": {
+          "from": "0xde0b6b3a7640000",
+          "to": "0x0"
+        }
+      },
+      "code": "=",
+      "nonce": {
+        "*": {
+          "from": "0x1",
+          "to": "0x2"
+        }
+      },
+      "storage": {}
+    },
+    "0x774c398d763161f55b66a646f17edda4addad2ca": {
+      "balance": {
+        "*": {
+          "from": "0x27162ced39a05220d688",
+          "to": "0x27162cf0f4987f247688"
+        }
+      },
+      "code": "=",
+      "nonce": "=",
+      "storage": {}
+    },
+    "0xf9a28de17edb352d6f82e9efb8fe6b050627c426": {
+      "balance": {
+        "*": {
+          "from": "0x371399697d84a6000",
+          "to": "0x37f16925352aac000"
+        }
+      },
+      "code": "=",
+      "nonce": "=",
+      "storage": {}
+    }
+  }
 }

@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -20,48 +19,26 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/tests"
+	"github.com/go-test/deep"
 
 	// Force-load the native, to trigger registration
 	"github.com/ethereum/go-ethereum/eth/tracers"
-	_ "github.com/ethereum/go-ethereum/eth/tracers/native"
+	"github.com/ethereum/go-ethereum/eth/tracers/native"
 )
 
 // callTraceParity is the result of a callTracerParity run.
 type callTraceParity struct {
-	Action              callTraceParityAction `json:"action"`
-	BlockHash           *common.Hash          `json:"-"`
-	BlockNumber         uint64                `json:"-"`
-	Error               string                `json:"error,omitempty"`
-	Result              callTraceParityResult `json:"result"`
-	Subtraces           int                   `json:"subtraces"`
-	TraceAddress        []int                 `json:"traceAddress"`
-	TransactionHash     *common.Hash          `json:"-"`
-	TransactionPosition *uint64               `json:"-"`
-	Type                string                `json:"type"`
-	Time                string                `json:"-"`
-}
-
-type callTraceParityAction struct {
-	Author         *common.Address `json:"author,omitempty"`
-	RewardType     *string         `json:"rewardType,omitempty"`
-	SelfDestructed *common.Address `json:"address,omitempty"`
-	Balance        *hexutil.Big    `json:"balance,omitempty"`
-	CallType       string          `json:"callType,omitempty"`
-	CreationMethod string          `json:"creationMethod,omitempty"`
-	From           common.Address  `json:"from,omitempty"`
-	Gas            hexutil.Uint64  `json:"gas,omitempty"`
-	Init           *hexutil.Bytes  `json:"init,omitempty"`
-	Input          *hexutil.Bytes  `json:"input,omitempty"`
-	RefundAddress  *common.Address `json:"refundAddress,omitempty"`
-	To             common.Address  `json:"to,omitempty"`
-	Value          hexutil.Big     `json:"value,omitempty"`
-}
-
-type callTraceParityResult struct {
-	Address *common.Address `json:"address,omitempty"`
-	Code    *hexutil.Bytes  `json:"code,omitempty"`
-	GasUsed hexutil.Uint64  `json:"gasUsed,omitempty"`
-	Output  hexutil.Bytes   `json:"output,omitempty"`
+	Action              native.CallTraceParityAction `json:"action"`
+	BlockHash           *common.Hash                 `json:"-"`
+	BlockNumber         uint64                       `json:"-"`
+	Error               string                       `json:"error,omitempty"`
+	Result              native.CallTraceParityResult `json:"result,omitempty"`
+	Subtraces           int                          `json:"subtraces"`
+	TraceAddress        []int                        `json:"traceAddress"`
+	TransactionHash     *common.Hash                 `json:"-"`
+	TransactionPosition *uint64                      `json:"-"`
+	Type                string                       `json:"type"`
+	Time                string                       `json:"-"`
 }
 
 // callTracerParityTest defines a single test to check the call tracer against.
@@ -72,7 +49,7 @@ type callTracerParityTest struct {
 	Result  *[]callTraceParity `json:"result"`
 }
 
-func callTracerParityTestRunner(tracerName string, filename string, dirPath string) error {
+func callTracerParityTestRunner(tracerName string, filename string, dirPath string, t testing.TB) error {
 	// Call tracer test found, read if from disk
 	blob, err := ioutil.ReadFile(filepath.Join("testdata", dirPath, filename))
 	if err != nil {
@@ -132,25 +109,42 @@ func callTracerParityTestRunner(tracerName string, filename string, dirPath stri
 	}
 
 	if !jsonEqualParity(ret, test.Result) {
+		t.Logf("tracer name: %s", tracerName)
+
 		// uncomment this for easier debugging
 		// have, _ := json.MarshalIndent(ret, "", " ")
 		// want, _ := json.MarshalIndent(test.Result, "", " ")
-		// return fmt.Errorf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
-		return fmt.Errorf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
+		// t.Logf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
+
+		// uncomment this for harder debugging <3 meowsbits
+		lines := deep.Equal(ret, test.Result)
+		for _, l := range lines {
+			t.Logf("%s", l)
+		}
+
+		t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
 	}
 	return nil
 }
 
 // Iterates over all the input-output datasets in the tracer parity test harness and
-// runs the JavaScript tracers against them.
-func TestCallTracerParity(t *testing.T) {
-	folderName := "call_tracer_parity"
-	files, err := ioutil.ReadDir(filepath.Join("testdata", folderName))
+// runs the JavaScript legacy tracer against them.
+func TestCallTracerParityLegacy(t *testing.T) {
+	testCallTracerParity("callTracerParityLegacy", "call_tracer_parity", t)
+}
+
+// Iterates over all the input-output datasets in the tracer parity test harness and
+// runs the Native tracer against them.
+func TestCallTracerParityNative(t *testing.T) {
+	testCallTracerParity("callTracerParity", "call_tracer_parity", t)
+}
+
+func testCallTracerParity(tracerName string, dirPath string, t *testing.T) {
+	files, err := ioutil.ReadDir(filepath.Join("testdata", dirPath))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}
 	for _, file := range files {
-		// if file.Name() != "big_slow.json" {
 		if !strings.HasSuffix(file.Name(), ".json") {
 			continue
 		}
@@ -158,7 +152,7 @@ func TestCallTracerParity(t *testing.T) {
 		t.Run(camel(strings.TrimSuffix(file.Name(), ".json")), func(t *testing.T) {
 			t.Parallel()
 
-			err := callTracerParityTestRunner("callParityTracer", file.Name(), folderName)
+			err := callTracerParityTestRunner(tracerName, file.Name(), dirPath, t)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -194,7 +188,7 @@ func BenchmarkCallTracerParity(b *testing.B) {
 		filename := strings.TrimPrefix(file, "testdata/call_tracer_parity/")
 		b.Run(camel(strings.TrimSuffix(filename, ".json")), func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				err := callTracerParityTestRunner("callParityTracer", filename, "call_tracer_parity")
+				err := callTracerParityTestRunner("callTracerParity", filename, "call_tracer_parity", b)
 				if err != nil {
 					b.Fatal(err)
 				}
@@ -211,13 +205,14 @@ type stateDiffAccount struct {
 }
 
 type stateDiffTest struct {
-	Genesis *genesisT.Genesis                    `json:"genesis"`
-	Context *callContext                         `json:"context"`
-	Input   *ethapi.TransactionArgs              `json:"input"`
-	Result  map[common.Address]*stateDiffAccount `json:"result"`
+	Genesis        *genesisT.Genesis       `json:"genesis"`
+	Context        *callContext            `json:"context"`
+	Input          *ethapi.TransactionArgs `json:"input"`
+	StateOverrides *ethapi.StateOverride
+	Result         *map[common.Address]*stateDiffAccount `json:"result"`
 }
 
-func stateDiffTracerTestRunner(filename string, dirPath string) error {
+func stateDiffTracerTestRunner(tracerName string, filename string, dirPath string, t testing.TB) error {
 	// Call tracer test found, read if from disk
 	blob, err := ioutil.ReadFile(filepath.Join("testdata", dirPath, filename))
 	if err != nil {
@@ -237,30 +232,14 @@ func stateDiffTracerTestRunner(filename string, dirPath string) error {
 	// This is needed for trace_call (debug mode),
 	// as the Transaction is being run on top of the block transactions,
 	// which might lead into ErrInsufficientFundsForTransfer error
-	canTransfer := func(db vm.StateDB, sender common.Address, amount *big.Int) bool {
-		if msg.From() == sender {
-			return true
-		}
-		return core.CanTransfer(db, sender, amount)
-	}
-
-	// If the actual transaction would fail, then there is no reason to actually transfer any balance at all
-	transfer := func(db vm.StateDB, sender, recipient common.Address, amount *big.Int) {
-		toAmount := new(big.Int).Set(amount)
-		senderBalance := db.GetBalance(sender)
-		if senderBalance.Cmp(toAmount) < 0 {
-			toAmount.Set(big.NewInt(0))
-		}
-		core.Transfer(db, sender, recipient, toAmount)
-	}
 
 	txContext := vm.TxContext{
 		Origin:   msg.From(),
 		GasPrice: msg.GasPrice(),
 	}
 	context := vm.BlockContext{
-		CanTransfer: canTransfer,
-		Transfer:    transfer,
+		CanTransfer: core.CanTransfer,
+		Transfer:    core.Transfer,
 		Coinbase:    test.Context.Miner,
 		BlockNumber: new(big.Int).SetUint64(uint64(test.Context.Number)),
 		Time:        new(big.Int).SetUint64(uint64(test.Context.Time)),
@@ -268,6 +247,10 @@ func stateDiffTracerTestRunner(filename string, dirPath string) error {
 		GasLimit:    uint64(test.Context.GasLimit),
 	}
 	_, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false)
+
+	if err := test.StateOverrides.Apply(statedb); err != nil {
+		return fmt.Errorf("failed to apply test stateOverrides: %v", err)
+	}
 
 	// Store the truth on whether from account has enough balance for context usage
 	gasCost := new(big.Int).Mul(new(big.Int).SetUint64(msg.Gas()), msg.GasPrice())
@@ -292,13 +275,15 @@ func stateDiffTracerTestRunner(filename string, dirPath string) error {
 	}
 
 	// Create the tracer, the EVM environment and run it
-	tracer, err := tracers.New("stateDiffTracer", new(tracers.Context))
+	tracer, err := tracers.New(tracerName, new(tracers.Context))
 	if err != nil {
 		return fmt.Errorf("failed to create state diff tracer: %v", err)
 	}
 	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
 
-	tracer.CapturePreEVM(evm, taskExtraContext)
+	if traceStateCapturer, ok := tracer.(vm.EVMLogger_StateCapturer); ok {
+		traceStateCapturer.CapturePreEVM2(evm, taskExtraContext)
+	}
 
 	st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(msg.Gas()))
 	if _, err = st.TransitionDb(); err != nil {
@@ -316,24 +301,45 @@ func stateDiffTracerTestRunner(filename string, dirPath string) error {
 	}
 
 	if !jsonEqualStateDiff(ret, test.Result) {
+		t.Logf("tracer name: %s", tracerName)
+
 		// uncomment this for easier debugging
-		// have, _ := json.MarshalIndent(ret, "", " ")
-		// want, _ := json.MarshalIndent(test.Result, "", " ")
-		// return fmt.Errorf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
-		return fmt.Errorf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
+		have, _ := json.MarshalIndent(ret, "", " ")
+		want, _ := json.MarshalIndent(test.Result, "", " ")
+		t.Logf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
+
+		// uncomment this for harder debugging <3 meowsbits
+		lines := deep.Equal(ret, test.Result)
+		for _, l := range lines {
+			t.Logf("%s", l)
+		}
+
+		t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
 	}
 	return nil
 }
 
+// Iterates over all the input-output datasets in the tracer test harness and
+// runs the JavaScript legacy tracer against them.
+func TestStateDiffTracerLegacy(t *testing.T) {
+	testStateDiffTracer("stateDiffTracerLegacy", "state_diff", t)
+}
+
+// Iterates over all the input-output datasets in the tracer test harness and
+// runs the Native tracer against them.
+func TestStateDiffTracerNative(t *testing.T) {
+	testStateDiffTracer("stateDiffTracer", "state_diff", t)
+}
+
 // TestStateDiffTracer Iterates over all the input-output datasets in the state diff tracer test harness and
 // runs the JavaScript tracers against them.
-func TestStateDiffTracer(t *testing.T) {
-	folderName := "state_diff"
-	files, err := ioutil.ReadDir(filepath.Join("testdata", folderName))
+func testStateDiffTracer(tracerName string, dirPath string, t *testing.T) {
+	files, err := ioutil.ReadDir(filepath.Join("testdata", dirPath))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}
 	for _, file := range files {
+		// if !strings.HasSuffix(file.Name(), "errInsufficientFundsForTransfer_and_gas_cost.json") {
 		if !strings.HasSuffix(file.Name(), ".json") {
 			continue
 		}
@@ -341,7 +347,7 @@ func TestStateDiffTracer(t *testing.T) {
 		t.Run(camel(strings.TrimSuffix(file.Name(), ".json")), func(t *testing.T) {
 			t.Parallel()
 
-			err := stateDiffTracerTestRunner(file.Name(), folderName)
+			err := stateDiffTracerTestRunner(tracerName, file.Name(), dirPath, t)
 			if err != nil {
 				t.Fatal(err)
 			}

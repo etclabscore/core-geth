@@ -120,7 +120,8 @@
       },
       "blockNumber": 25001,
       "result": {
-        "gasUsed": "0x12bb3"
+        "gasUsed": "0x12bb3",
+        "output": "0x"
       },
       "subtraces": 2,
       "traceAddress": [],
@@ -155,7 +156,8 @@
       },
       "blockNumber": 0,
       "result": {
-        "gasUsed": "0xedb7"
+        "gasUsed": "0xedb7",
+        "output": "0x"
       },
       "subtraces": 4,
       "traceAddress": [1],
@@ -262,7 +264,8 @@
       },
       "blockNumber": 0,
       "result": {
-        "gasUsed": "0xc51c"
+        "gasUsed": "0xc51c",
+        "output": "0x"
       },
       "subtraces": 12,
       "traceAddress": [1, 3],
@@ -315,7 +318,8 @@
       },
       "blockNumber": 0,
       "result": {
-        "gasUsed": "0x5374"
+        "gasUsed": "0x5374",
+        "output": "0x"
       },
       "subtraces": 6,
       "traceAddress": [1, 3, 2],
@@ -476,7 +480,8 @@
       },
       "blockNumber": 0,
       "result": {
-        "gasUsed": "0x12fa"
+        "gasUsed": "0x12fa",
+        "output": "0x"
       },
       "subtraces": 1,
       "traceAddress": [1, 3, 5],
@@ -601,7 +606,8 @@
       },
       "blockNumber": 0,
       "result": {
-        "gasUsed": "0xebb"
+        "gasUsed": "0xebb",
+        "output": "0x"
       },
       "subtraces": 1,
       "traceAddress": [1, 3, 11],

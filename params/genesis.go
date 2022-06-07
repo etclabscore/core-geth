@@ -183,6 +183,7 @@ func DeveloperGenesisBlock(period uint64, gasLimit uint64, faucet common.Address
 		ExtraData:  append(append(make([]byte, 32), faucet[:]...), make([]byte, crypto.SignatureLength)...),
 		GasLimit:   6283185,
 		Difficulty: vars.MinimumDifficulty,
+		BaseFee:    big.NewInt(vars.InitialBaseFee),
 		Alloc: map[common.Address]genesisT.GenesisAccount{
 			common.BytesToAddress([]byte{1}): {Balance: big.NewInt(1)}, // ECRecover
 			common.BytesToAddress([]byte{2}): {Balance: big.NewInt(1)}, // SHA256

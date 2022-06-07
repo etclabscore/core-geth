@@ -43,9 +43,6 @@ func NewJSONLogger(cfg *Config, writer io.Writer) *JSONLogger {
 	return l
 }
 
-func (l *JSONLogger) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {
-}
-
 func (l *JSONLogger) CaptureStart(env *vm.EVM, from, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
 	l.env = env
 }

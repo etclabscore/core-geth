@@ -634,6 +634,13 @@ func newJsTracer(code string, ctx *tracers2.Context) (tracers2.Tracer, error) {
 	tracer.vm.PushGoFunction(func(ctx *duktape.Context) int { ctx.PushUint(*tracer.depthValue); return 1 })
 	tracer.vm.PutPropString(logObject, "getDepth")
 
+	tracer.vm.PushGoFunction(func(ctx *duktape.Context) int {
+		ptr := ctx.PushFixedBuffer(len(*tracer.returnData))
+		copy(makeSlice(ptr, uint(len(*tracer.returnData))), *tracer.returnData)
+		return 1
+	})
+	tracer.vm.PutPropString(logObject, "getReturnData")
+
 	tracer.vm.PushGoFunction(func(ctx *duktape.Context) int { ctx.PushUint(*tracer.refundValue); return 1 })
 	tracer.vm.PutPropString(logObject, "getRefund")
 
@@ -712,25 +719,6 @@ func (jst *jsTracer) call(noret bool, method string, args ...string) (json.RawMe
 
 func wrapError(context string, err error) error {
 	return fmt.Errorf("%v    in server-side tracer function '%v'", err, context)
-}
-
-// CapturePreEVM implements the Tracer interface to bootstrap the tracing context,
-// before EVM init. This is useful for reading initial balance, state, etc.
-func (jst *jsTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {
-	jst.dbWrapper.db = env.StateDB
-
-	for key, val := range inputs {
-		jst.ctx[key] = val
-	}
-
-	if jst.vm.GetPropString(jst.tracerObject, "init") {
-		jst.addCtxIntoState()
-		_, err := jst.call(true, "init", "ctx", "db")
-		if err != nil {
-			jst.err = wrapError("init", err)
-			return
-		}
-	}
 }
 
 // CaptureStart implements the Tracer interface to initialize the tracing operation.

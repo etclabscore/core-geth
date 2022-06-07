@@ -51,14 +51,10 @@ type prestateTracer struct {
 	reason    error  // Textual reason for the interruption
 }
 
-func newPrestateTracer() tracers.Tracer {
+func newPrestateTracer(ctx *tracers.Context) tracers.Tracer {
 	// First callframe contains tx context info
 	// and is populated on start and end.
 	return &prestateTracer{prestate: prestate{}}
-}
-
-func (t *prestateTracer) CapturePreEVM(env *vm.EVM, inputs map[string]interface{}) {
-	// TODO implement me? meowsbits/202203
 }
 
 // CaptureStart implements the EVMLogger interface to initialize the tracing operation.
@@ -66,6 +62,8 @@ func (t *prestateTracer) CaptureStart(env *vm.EVM, from common.Address, to commo
 	t.env = env
 	t.create = create
 	t.to = to
+
+	t.lookupAccount(t.env.Context.Coinbase)
 
 	// Compute intrinsic gas
 	eip2f := env.ChainConfig().IsEnabled(env.ChainConfig().GetEIP2Transition, new(big.Int))

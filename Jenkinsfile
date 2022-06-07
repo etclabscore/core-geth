@@ -23,8 +23,9 @@ pipeline {
                     agent { label "aws-slave-m5-xlarge" }
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo rm -rf /usr/bin/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo cp /usr/local/go/bin/* /usr/bin/"
+                        sh "sudo rm -rf /usr/bin/go && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
+                        sh "sudo cp /usr/local/go/bin/go /usr/bin/go"
+                        sh "sudo cp /usr/local/go/bin/gofmt /usr/bin/gofmt"
                         sh "go version"
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-kotti"
@@ -41,8 +42,9 @@ pipeline {
                     agent { label "aws-slave-m5-xlarge" }
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo rm -rf /usr/bin/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo cp /usr/local/go/bin/* /usr/bin/"
+                        sh "sudo rm -rf /usr/bin/go && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
+                        sh "sudo cp /usr/local/go/bin/go /usr/bin/go"
+                        sh "sudo cp /usr/local/go/bin/gofmt /usr/bin/gofmt"
                         sh "go version"
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-mordor"
@@ -60,8 +62,9 @@ pipeline {
                     agent { label "aws-slave-m5-xlarge" }
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo rm -rf /usr/bin/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo cp /usr/local/go/bin/* /usr/bin/"
+                        sh "sudo rm -rf /usr/bin/go && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
+                        sh "sudo cp /usr/local/go/bin/go /usr/bin/go"
+                        sh "sudo cp /usr/local/go/bin/gofmt /usr/bin/gofmt"
                         sh "go version"
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-goerli"

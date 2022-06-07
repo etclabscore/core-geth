@@ -24,7 +24,7 @@ pipeline {
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
                         sh "sudo rm -rf /usr/bin/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo mv /usr/local/go/bin/* /usr/bin/"
+                        sh "sudo cp /usr/local/go/bin/* /usr/bin/"
                         sh "go version"
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-kotti"
@@ -42,7 +42,7 @@ pipeline {
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
                         sh "sudo rm -rf /usr/bin/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo mv /usr/local/go/bin/* /usr/bin/"
+                        sh "sudo cp /usr/local/go/bin/* /usr/bin/"
                         sh "go version"
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-mordor"
@@ -61,7 +61,7 @@ pipeline {
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
                         sh "sudo rm -rf /usr/bin/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo mv /usr/local/go/bin/* /usr/bin/"
+                        sh "sudo cp /usr/local/go/bin/* /usr/bin/"
                         sh "go version"
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-goerli"

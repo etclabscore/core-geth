@@ -23,7 +23,7 @@ pipeline {
                     agent { label "aws-slave-m5-xlarge" }
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
+                        sh "sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
                         sh "export PATH=$PATH:/usr/local/go/bin"
                         sh "go version"
                         sh "make geth && ./build/bin/geth version"
@@ -41,7 +41,7 @@ pipeline {
                     agent { label "aws-slave-m5-xlarge" }
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
+                        sh "sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
                         sh "export PATH=$PATH:/usr/local/go/bin"
                         sh "go version"
                         sh "make geth && ./build/bin/geth version"
@@ -60,7 +60,7 @@ pipeline {
                     agent { label "aws-slave-m5-xlarge" }
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
+                        sh "sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
                         sh "export PATH=$PATH:/usr/local/go/bin"
                         sh "go version"
                         sh "make geth && ./build/bin/geth version"

@@ -24,7 +24,6 @@ pipeline {
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
                         sh "sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo rm $(which go)"
                         sh "export PATH=$PATH:/usr/local/go/bin"
                         sh "go version"
                         sh "make geth && ./build/bin/geth version"
@@ -43,7 +42,6 @@ pipeline {
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
                         sh "sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo rm $(which go)"
                         sh "export PATH=$PATH:/usr/local/go/bin"
                         sh "go version"
                         sh "make geth && ./build/bin/geth version"
@@ -63,7 +61,6 @@ pipeline {
                     steps {
                         sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
                         sh "sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
-                        sh "sudo rm $(which go)"
                         sh "export PATH=$PATH:/usr/local/go/bin"
                         sh "go version"
                         sh "make geth && ./build/bin/geth version"

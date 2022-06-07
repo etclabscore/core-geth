@@ -45,21 +45,6 @@
 		}
 	},
 
-	// init is invoked before any VM execution.
-	// ctx has to|msgTo|coinbase set and additional context based on each trace method.
-	init: function(ctx, db) {
-		// get actual "from" values for from|to|coinbase accounts.
-		this.lookupAccount(ctx.from, db);
-		this.lookupAccount(ctx.coinbase, db);
-
-		// msgTo is set for the init method and it is the actual "to" value of the Tx.
-		// ctx.to on the other hand is always set by the EVM and on type=CREATE
-		// it is the newly created contract address
-		if (ctx.msgTo !== undefined) {
-			this.lookupAccount(ctx.msgTo, db);
-		}
-	},
-
 	// result is invoked when all the opcodes have been iterated over and returns
 	// the final result of the tracing.
 	result: function(ctx, db) {

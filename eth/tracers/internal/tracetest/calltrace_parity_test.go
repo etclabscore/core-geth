@@ -212,7 +212,7 @@ type stateDiffTest struct {
 	Result         *map[common.Address]*stateDiffAccount `json:"result"`
 }
 
-func stateDiffTracerTestRunner(filename string, dirPath string) error {
+func stateDiffTracerTestRunner(tracerName string, filename string, dirPath string, t testing.TB) error {
 	// Call tracer test found, read if from disk
 	blob, err := ioutil.ReadFile(filepath.Join("testdata", dirPath, filename))
 	if err != nil {
@@ -252,36 +252,16 @@ func stateDiffTracerTestRunner(filename string, dirPath string) error {
 		return fmt.Errorf("failed to apply test stateOverrides: %v", err)
 	}
 
-	// Store the truth on whether from account has enough balance for context usage
-	gasCost := new(big.Int).Mul(new(big.Int).SetUint64(msg.Gas()), msg.GasPrice())
-	totalCost := new(big.Int).Add(gasCost, msg.Value())
-
-	// It is important to use core.CanTransfer on the two following lines
-	hasFromSufficientBalanceForValueAndGasCost := core.CanTransfer(statedb, msg.From(), totalCost)
-	hasFromSufficientBalanceForGasCost := core.CanTransfer(statedb, msg.From(), gasCost)
-
-	// Add extra context needed for state_diff
-	taskExtraContext := map[string]interface{}{
-		"hasFromSufficientBalanceForValueAndGasCost": hasFromSufficientBalanceForValueAndGasCost,
-		"hasFromSufficientBalanceForGasCost":         hasFromSufficientBalanceForGasCost,
-		"from":                                       msg.From(),
-		"coinbase":                                   context.Coinbase,
-		"gasLimit":                                   msg.Gas(),
-		"gasPrice":                                   msg.GasPrice(),
-	}
-
-	if msg.To() != nil {
-		taskExtraContext["msgTo"] = *msg.To()
-	}
-
 	// Create the tracer, the EVM environment and run it
-	tracer, err := tracers.New("stateDiffTracer", new(tracers.Context))
+	tracer, err := tracers.New(tracerName, new(tracers.Context))
 	if err != nil {
 		return fmt.Errorf("failed to create state diff tracer: %v", err)
 	}
 	evm := vm.NewEVM(context, txContext, statedb, test.Genesis.Config, vm.Config{Debug: true, Tracer: tracer})
 
-	tracer.CapturePreEVM(evm, taskExtraContext)
+	if traceStateCapturer, ok := tracer.(vm.EVMLogger_StateCapturer); ok {
+		traceStateCapturer.CapturePreEVM(evm)
+	}
 
 	st := core.NewStateTransition(evm, msg, new(core.GasPool).AddGas(msg.Gas()))
 	if _, err = st.TransitionDb(); err != nil {
@@ -299,30 +279,39 @@ func stateDiffTracerTestRunner(filename string, dirPath string) error {
 	}
 
 	if !jsonEqualStateDiff(ret, test.Result) {
+		t.Logf("tracer name: %s", tracerName)
+
 		// uncomment this for easier debugging
-		// have, _ := json.MarshalIndent(ret, "", " ")
-		// want, _ := json.MarshalIndent(test.Result, "", " ")
-		// fmt.Printf("trace mismatch: \nhave %+v\nwant %+v\n", string(have), string(want))
+		have, _ := json.MarshalIndent(ret, "", " ")
+		want, _ := json.MarshalIndent(test.Result, "", " ")
+		t.Logf("trace mismatch: \nhave %+v\nwant %+v", string(have), string(want))
 
 		// uncomment this for harder debugging <3 meowsbits
 		lines := deep.Equal(ret, test.Result)
 		for _, l := range lines {
-			fmt.Printf("%s\n", l)
+			t.Logf("%s", l)
 		}
-		return fmt.Errorf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
+
+		t.Fatalf("trace mismatch: \nhave %+v\nwant %+v", ret, test.Result)
 	}
 	return nil
 }
 
+// Iterates over all the input-output datasets in the tracer test harness and
+// runs the Native tracer against them.
+func TestStateDiffTracerNative(t *testing.T) {
+	testStateDiffTracer("stateDiffTracer", "state_diff", t)
+}
+
 // TestStateDiffTracer Iterates over all the input-output datasets in the state diff tracer test harness and
 // runs the JavaScript tracers against them.
-func TestStateDiffTracer(t *testing.T) {
-	folderName := "state_diff"
-	files, err := ioutil.ReadDir(filepath.Join("testdata", folderName))
+func testStateDiffTracer(tracerName string, dirPath string, t *testing.T) {
+	files, err := ioutil.ReadDir(filepath.Join("testdata", dirPath))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}
 	for _, file := range files {
+		// if !strings.HasSuffix(file.Name(), "errInsufficientFundsForTransfer_and_gas_cost.json") {
 		if !strings.HasSuffix(file.Name(), ".json") {
 			continue
 		}
@@ -330,7 +319,7 @@ func TestStateDiffTracer(t *testing.T) {
 		t.Run(camel(strings.TrimSuffix(file.Name(), ".json")), func(t *testing.T) {
 			t.Parallel()
 
-			err := stateDiffTracerTestRunner(file.Name(), folderName)
+			err := stateDiffTracerTestRunner(tracerName, file.Name(), dirPath, t)
 			if err != nil {
 				t.Fatal(err)
 			}

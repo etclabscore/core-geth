@@ -1,4 +1,4 @@
-// Copyright 2017 The go-ethereum Authors
+// Copyright 2021 The go-ethereum Authors
 // This file is part of the go-ethereum library.
 //
 // The go-ethereum library is free software: you can redistribute it and/or modify
@@ -14,16 +14,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-// noopTracer is just the barebone boilerplate code required from a JavaScript
-// object to be usable as a transaction tracer.
-{
-	// step is invoked for every opcode that the VM executes.
-	step: function(log, db) { },
+package vm
 
-	// fault is invoked when the actual execution of an opcode fails.
-	fault: function(log, db) { },
-
-	// result is invoked when all the opcodes have been iterated over and returns
-	// the final result of the tracing.
-	result: function(ctx, db) { return {}; }
+// EVMLogger_StateCapturer extends the EVMLogger interface,
+// but adding support for a native state-diff tracer.
+// *stateDiffTracer implements this interface, and really likes
+// being able to manage state (of state/) directly.
+// See api_parity.go.
+type EVMLogger_StateCapturer interface {
+	EVMLogger
+	CapturePreEVM(env *EVM)
 }

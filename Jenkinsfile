@@ -22,6 +22,11 @@ pipeline {
                 stage('Kotti') {
                     agent { label "aws-slave-m5-xlarge" }
                     steps {
+                        sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
+                        sh "sudo rm -rf /usr/bin/go && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
+                        sh "sudo cp /usr/local/go/bin/go /usr/bin/go"
+                        sh "sudo cp /usr/local/go/bin/gofmt /usr/bin/gofmt"
+                        sh "go version"
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-kotti"
                         sh "shasum -a 256 -c ./tests/regression/shasums/kotti.0-2544960.rlp.gz.sha256"
@@ -36,6 +41,11 @@ pipeline {
                 stage('Mordor') {
                     agent { label "aws-slave-m5-xlarge" }
                     steps {
+                        sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
+                        sh "sudo rm -rf /usr/bin/go && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
+                        sh "sudo cp /usr/local/go/bin/go /usr/bin/go"
+                        sh "sudo cp /usr/local/go/bin/gofmt /usr/bin/gofmt"
+                        sh "go version"
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-mordor"
                         sh "shasum -a 256 -c ./tests/regression/shasums/mordor.0-1686858.rlp.gz.sha256"
@@ -51,6 +61,11 @@ pipeline {
                 stage('Goerli') {
                     agent { label "aws-slave-m5-xlarge" }
                     steps {
+                        sh "curl -L -O https://go.dev/dl/go1.18.3.linux-amd64.tar.gz"
+                        sh "sudo rm -rf /usr/bin/go && sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz"
+                        sh "sudo cp /usr/local/go/bin/go /usr/bin/go"
+                        sh "sudo cp /usr/local/go/bin/gofmt /usr/bin/gofmt"
+                        sh "go version"
                         sh "make geth && ./build/bin/geth version"
                         sh "rm -rf ${GETH_DATADIR}-goerli"
                         sh "shasum -a 256 -c ./tests/regression/shasums/goerli.0-2000000.rlp.gz.sha256"

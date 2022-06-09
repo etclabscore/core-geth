@@ -906,10 +906,13 @@ var (
 		GoerliFlag,
 		SepoliaFlag,
 		KilnFlag,
+		MordorFlag,
+		KottiFlag,
 	}
 	// NetworkFlags is the flag group of all built-in supported networks.
 	NetworkFlags = append([]cli.Flag{
 		MainnetFlag,
+		ClassicFlag,
 	}, TestnetFlags...)
 
 	// DatabasePathFlags is the flag group of all database path flags.

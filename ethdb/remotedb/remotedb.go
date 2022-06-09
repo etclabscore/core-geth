@@ -97,7 +97,7 @@ func (db *Database) Delete(key []byte) error {
 	panic("not supported")
 }
 
-func (db *Database) ModifyAncients(f func(ethdb.AncientWriteOp) error) (int64, error) {
+func (db *Database) ModifyAncients(f func(operator ethdb.AncientWriteOperator) error) (int64, error) {
 	panic("not supported")
 }
 

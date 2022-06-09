@@ -30,7 +30,6 @@ require (
 	github.com/go-stack/stack v1.8.0
 	github.com/go-test/deep v1.0.8
 	github.com/golang-jwt/jwt/v4 v4.3.0
-	github.com/golang/protobuf v1.5.0
 	github.com/golang/snappy v0.0.4
 	github.com/google/gofuzz v1.1.1-0.20200604201612-c04b05f3adfa
 	github.com/google/uuid v1.2.0
@@ -75,6 +74,7 @@ require (
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
 	golang.org/x/tools v0.1.8-0.20211029000441-d6a9af8af023
 	gonum.org/v1/gonum v0.6.0
+	google.golang.org/protobuf v1.28.0
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 	gopkg.in/urfave/cli.v1 v1.20.0
 )

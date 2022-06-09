@@ -30,12 +30,14 @@ import (
 //go:generate go run github.com/fjl/gencodec -type DifficultyTest -field-override difficultyTestMarshaling -out gen_difficultytest.go
 
 type DifficultyTest struct {
-	ParentTimestamp    uint64      `json:"parentTimestamp"`
-	ParentDifficulty   *big.Int    `json:"parentDifficulty"`
-	UncleHash          common.Hash `json:"parentUncles"`
-	CurrentTimestamp   uint64      `json:"currentTimestamp"`
-	CurrentBlockNumber uint64      `json:"currentBlockNumber"`
-	CurrentDifficulty  *big.Int    `json:"currentDifficulty"`
+	ParentTimestamp    uint64       `json:"parentTimestamp"`
+	ParentDifficulty   *big.Int     `json:"parentDifficulty"`
+	UncleHash          common.Hash  `json:"parentUncles"`
+	CurrentTimestamp   uint64       `json:"currentTimestamp"`
+	CurrentBlockNumber uint64       `json:"currentBlockNumber"`
+	CurrentDifficulty  *big.Int     `json:"currentDifficulty"`
+	Chainspec          chainspecRef `json:"chainspec"`
+	Name               string       `json:"name"`
 }
 
 type difficultyTestMarshaling struct {
@@ -45,6 +47,8 @@ type difficultyTestMarshaling struct {
 	CurrentDifficulty  *math.HexOrDecimal256
 	UncleHash          common.Hash
 	CurrentBlockNumber math.HexOrDecimal64
+	Chainspec          chainspecRef `json:"chainspec"`
+	Name               string
 }
 
 func (test *DifficultyTest) Run(config ctypes.ChainConfigurator) error {

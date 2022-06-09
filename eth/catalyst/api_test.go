@@ -557,7 +557,7 @@ func TestNewPayloadOnInvalidChain(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		statedb, _ := ethservice.BlockChain().StateAt(parent.Root())
 		nonce := statedb.GetNonce(testAddr)
-		tx, _ := types.SignTx(types.NewContractCreation(nonce, new(big.Int), 1000000, big.NewInt(2*params.InitialBaseFee), logCode), types.LatestSigner(ethservice.BlockChain().Config()), testKey)
+		tx, _ := types.SignTx(types.NewContractCreation(nonce, new(big.Int), 1000000, big.NewInt(2*vars.InitialBaseFee), logCode), types.LatestSigner(ethservice.BlockChain().Config()), testKey)
 		ethservice.TxPool().AddLocal(tx)
 
 		params := beacon.PayloadAttributesV1{
@@ -756,12 +756,12 @@ func TestTrickRemoteBlockCache(t *testing.T) {
 
 	var invalidChain []*beacon.ExecutableDataV1
 	// create a valid payload (P1)
-	//payload1 := getNewPayload(t, apiA, commonAncestor)
-	//invalidChain = append(invalidChain, payload1)
+	// payload1 := getNewPayload(t, apiA, commonAncestor)
+	// invalidChain = append(invalidChain, payload1)
 
 	// create an invalid payload2 (P2)
 	payload2 := getNewPayload(t, apiA, commonAncestor)
-	//payload2.ParentHash = payload1.BlockHash
+	// payload2.ParentHash = payload1.BlockHash
 	payload2.GasUsed += 1
 	payload2 = setBlockhash(payload2)
 	invalidChain = append(invalidChain, payload2)

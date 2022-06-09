@@ -486,8 +486,8 @@ var (
 )
 
 // Exported for fuzzing
-var FrontierDifficultyCalulator = CalcDifficultyFrontierU256
-var HomesteadDifficultyCalulator = CalcDifficultyHomesteadU256
+var FrontierDifficultyCalculator = CalcDifficultyFrontierU256
+var HomesteadDifficultyCalculator = CalcDifficultyHomesteadU256
 var DynamicDifficultyCalculator = MakeDifficultyCalculatorU256
 
 // verifySeal checks whether a block satisfies the PoW difficulty requirements,

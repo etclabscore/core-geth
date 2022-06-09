@@ -778,19 +778,6 @@ func (n *Node) OpenDatabase(name string, cache, handles int, namespace string, r
 	return db, err
 }
 
-// OpenDatabaseWithFreezerRemote opens an existing database with the given name (or
-// creates one if no previous can be found) from within the node's data directory,
-// also attaching a chain freezer to it that moves ancient chain data from the
-// database to immutable append-only files. If the node is an ephemeral one, a
-// memory database is returned.
-func (n *Node) OpenDatabaseWithFreezerRemote(name string, cache, handles int, freezerURL string, readonly bool) (ethdb.Database, error) {
-	if n.config.DataDir == "" {
-		return rawdb.NewMemoryDatabase(), nil
-	}
-	root := n.config.ResolvePath(name)
-	return rawdb.NewLevelDBDatabaseWithFreezerRemote(root, cache, handles, freezerURL, readonly)
-}
-
 // OpenDatabaseWithFreezer opens an existing database with the given name (or
 // creates one if no previous can be found) from within the node's data directory,
 // also attaching a chain freezer to it that moves ancient chain data from the

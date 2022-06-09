@@ -24,7 +24,10 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 //go:generate go run github.com/fjl/gencodec -type DifficultyTest -field-override difficultyTestMarshaling -out gen_difficultytest.go
@@ -70,4 +73,96 @@ func (test *DifficultyTest) Run(config ctypes.ChainConfigurator) error {
 	}
 	return nil
 
+}
+
+var (
+	mainnetChainConfig = &goethereum.ChainConfig{
+		Ethash:         new(ctypes.EthashConfig),
+		ChainID:        big.NewInt(1),
+		HomesteadBlock: big.NewInt(1150000),
+		DAOForkBlock:   big.NewInt(1920000),
+		DAOForkSupport: true,
+		EIP150Block:    big.NewInt(2463000),
+		EIP150Hash:     common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
+		EIP155Block:    big.NewInt(2675000),
+		EIP158Block:    big.NewInt(2675000),
+		ByzantiumBlock: big.NewInt(4370000),
+	}
+)
+
+var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
+	"Ropsten":  params.RopstenChainConfig,
+	"Morden":   params.RopstenChainConfig,
+	"Frontier": &goethereum.ChainConfig{},
+	"Homestead": &goethereum.ChainConfig{
+		Ethash:         new(ctypes.EthashConfig),
+		HomesteadBlock: big.NewInt(0),
+	},
+	"Byzantium": &goethereum.ChainConfig{
+		Ethash:         new(ctypes.EthashConfig),
+		ByzantiumBlock: big.NewInt(0),
+	},
+	"MainNetwork":       mainnetChainConfig,
+	"CustomMainNetwork": mainnetChainConfig,
+	"Constantinople": &goethereum.ChainConfig{
+		Ethash:              new(ctypes.EthashConfig),
+		HomesteadBlock:      big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+	},
+	"difficulty.json": mainnetChainConfig,
+	"ETC_Atlantis": &coregeth.CoreGethChainConfig{
+		Ethash:        new(ctypes.EthashConfig),
+		EIP100FBlock:  big.NewInt(0),
+		EIP140FBlock:  big.NewInt(0),
+		EIP198FBlock:  big.NewInt(0),
+		EIP211FBlock:  big.NewInt(0),
+		EIP212FBlock:  big.NewInt(0),
+		EIP213FBlock:  big.NewInt(0),
+		EIP214FBlock:  big.NewInt(0),
+		EIP658FBlock:  big.NewInt(0),
+		DisposalBlock: big.NewInt(0),
+	},
+	"ETC_Agharta": &coregeth.CoreGethChainConfig{
+		Ethash:        new(ctypes.EthashConfig),
+		EIP100FBlock:  big.NewInt(0),
+		EIP140FBlock:  big.NewInt(0),
+		EIP198FBlock:  big.NewInt(0),
+		EIP211FBlock:  big.NewInt(0),
+		EIP212FBlock:  big.NewInt(0),
+		EIP213FBlock:  big.NewInt(0),
+		EIP214FBlock:  big.NewInt(0),
+		EIP658FBlock:  big.NewInt(0),
+		EIP145FBlock:  big.NewInt(0),
+		EIP1014FBlock: big.NewInt(0),
+		EIP1052FBlock: big.NewInt(0),
+		EIP1283FBlock: big.NewInt(0),
+		EIP2200FBlock: big.NewInt(0), // Petersburg
+		DisposalBlock: big.NewInt(0),
+	},
+	"EIP2384": &goethereum.ChainConfig{
+		Ethash:              new(ctypes.EthashConfig),
+		HomesteadBlock:      big.NewInt(0),
+		ByzantiumBlock:      big.NewInt(0),
+		ConstantinopleBlock: big.NewInt(0),
+		IstanbulBlock:       big.NewInt(0),
+		MuirGlacierBlock:    big.NewInt(0),
+	},
+	"ETC_Phoenix": &coregeth.CoreGethChainConfig{
+		Ethash:        new(ctypes.EthashConfig),
+		EIP100FBlock:  big.NewInt(0),
+		EIP140FBlock:  big.NewInt(0),
+		EIP198FBlock:  big.NewInt(0),
+		EIP211FBlock:  big.NewInt(0),
+		EIP212FBlock:  big.NewInt(0),
+		EIP213FBlock:  big.NewInt(0),
+		EIP214FBlock:  big.NewInt(0),
+		EIP658FBlock:  big.NewInt(0),
+		EIP145FBlock:  big.NewInt(0),
+		EIP1014FBlock: big.NewInt(0),
+		EIP1052FBlock: big.NewInt(0),
+		EIP1283FBlock: big.NewInt(0),
+		EIP2200FBlock: big.NewInt(0), // Petersburg
+		DisposalBlock: big.NewInt(0),
+	},
 }

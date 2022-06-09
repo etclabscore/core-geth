@@ -35,6 +35,7 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 		{[]string{"--mainnet"}, 1, 1, params.MainnetGenesisHash.Hex()},
 		{[]string{"--ropsten"}, 3, 3, params.RopstenGenesisHash.Hex()},
 		{[]string{"--rinkeby"}, 4, 4, params.RinkebyGenesisHash.Hex()},
+		{[]string{"--sepolia"}, 11155111, 11155111, params.SepoliaGenesisHash.Hex()},
 		{[]string{"--goerli"}, 5, 5, params.GoerliGenesisHash.Hex()},
 		{[]string{"--kotti"}, 6, 6, params.KottiGenesisHash.Hex()},
 		{[]string{"--mordor"}, 7, 63, params.MordorGenesisHash.Hex()},

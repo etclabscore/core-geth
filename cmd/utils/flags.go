@@ -183,10 +183,6 @@ var (
 		Name:  "rinkeby",
 		Usage: "Rinkeby network: pre-configured proof-of-authority test network",
 	}
-	GoerliFlag = cli.BoolFlag{
-		Name:  "goerli",
-		Usage: "Görli network: pre-configured proof-of-authority test network",
-	}
 	KottiFlag = cli.BoolFlag{
 		Name:  "kotti",
 		Usage: "Kotti network: cross-client proof-of-authority test network",

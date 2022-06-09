@@ -17,8 +17,6 @@
 package main
 
 import (
-	"io/ioutil"
-	"math/big"
 	"os"
 	"path/filepath"
 	"testing"

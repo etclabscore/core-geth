@@ -983,13 +983,13 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 	statedb.Prepare(txctx.TxHash, txctx.TxIndex)
 
 	/*
-	TODO(meowsbits)/PTAL(ziogaschr)
+		TODO(meowsbits)/PTAL(ziogaschr)
 
-		if traceStateCapturer, ok := tracer.(vm.EVMLogger_StateCapturer); ok {
-			traceStateCapturer.CapturePreEVM(vmenv)
-		}
+			if traceStateCapturer, ok := tracer.(vm.EVMLogger_StateCapturer); ok {
+				traceStateCapturer.CapturePreEVM(vmenv)
+			}
 
-	^ This was the original. I believe the CapturePreEVM has been moved to state_transition.go.
+		^ This was the original. I believe the CapturePreEVM has been moved to state_transition.go.
 	*/
 	if _, err = core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.Gas())); err != nil {
 		return nil, fmt.Errorf("tracing failed: %w", err)

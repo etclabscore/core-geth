@@ -148,7 +148,7 @@ func TestSetHeadBeforeTotalDifficulty(t *testing.T) {
 func TestEth2PrepareAndGetPayload(t *testing.T) {
 	genesis, blocks := generatePreMergeChain(10)
 	// We need to properly set the terminal total difficulty
-		genesis.Config.SetEthashTerminalTotalDifficulty(new(big.Int).Sub(genesis.Config.GetEthashTerminalTotalDifficulty(), blocks[9].Difficulty()))
+	genesis.Config.SetEthashTerminalTotalDifficulty(new(big.Int).Sub(genesis.Config.GetEthashTerminalTotalDifficulty(), blocks[9].Difficulty()))
 	n, ethservice := startEthService(t, genesis, blocks[:9])
 	defer n.Close()
 

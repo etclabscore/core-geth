@@ -17,7 +17,6 @@
 package ethash
 
 import (
-	"io/ioutil"
 	"math"
 	"math/big"
 	"math/rand"

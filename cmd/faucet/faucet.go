@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"math"
 	"math/big"
 	"net/http"

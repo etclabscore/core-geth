@@ -111,10 +111,6 @@ type Ethereum struct {
 // initialisation of the common Ethereum object)
 func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	// Ensure configuration values are compatible and sane
-	var (
-		chainDb ethdb.Database
-		err     error
-	)
 	if config.SyncMode == downloader.LightSync {
 		return nil, errors.New("can't run eth.Ethereum in light sync mode, use les.LightEthereum")
 	}
@@ -141,11 +137,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	ethashConfig.NotifyFull = config.Miner.NotifyFull
 
 	// Assemble the Ethereum object
-	if config.DatabaseFreezerRemote != "" {
-		chainDb, err = stack.OpenDatabaseWithFreezerRemote("chaindata", config.DatabaseCache, config.DatabaseHandles, config.DatabaseFreezerRemote, false)
-	} else {
-		chainDb, err = stack.OpenDatabaseWithFreezer("chaindata", config.DatabaseCache, config.DatabaseHandles, config.DatabaseFreezer, "eth/db/chaindata/", false)
-	}
+	chainDb, err := stack.OpenDatabaseWithFreezer("chaindata", config.DatabaseCache, config.DatabaseHandles, config.DatabaseFreezer, "eth/db/chaindata/", false)
 	if err != nil {
 		return nil, err
 	}

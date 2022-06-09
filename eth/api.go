@@ -309,6 +309,8 @@ func (api *PublicDebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error
 	var block *types.Block
 	if blockNr == rpc.LatestBlockNumber {
 		block = api.eth.blockchain.CurrentBlock()
+	} else if blockNr == rpc.FinalizedBlockNumber {
+		block = api.eth.blockchain.CurrentFinalizedBlock()
 	} else {
 		block = api.eth.blockchain.GetBlockByNumber(uint64(blockNr))
 	}
@@ -397,6 +399,8 @@ func (api *PublicDebugAPI) AccountRange(blockNrOrHash rpc.BlockNumberOrHash, sta
 			var block *types.Block
 			if number == rpc.LatestBlockNumber {
 				block = api.eth.blockchain.CurrentBlock()
+			} else if number == rpc.FinalizedBlockNumber {
+				block = api.eth.blockchain.CurrentFinalizedBlock()
 			} else {
 				block = api.eth.blockchain.GetBlockByNumber(uint64(number))
 			}

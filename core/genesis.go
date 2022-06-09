@@ -36,6 +36,12 @@ import (
 	"github.com/ethereum/go-ethereum/trie"
 )
 
+
+//go:generate go run github.com/fjl/gencodec -type Genesis -field-override genesisSpecMarshaling -out gen_genesis.go
+//go:generate go run github.com/fjl/gencodec -type GenesisAccount -field-override genesisAccountMarshaling -out gen_genesis_account.go
+
+var errGenesisNoConfig = errors.New("genesis has no chain configuration")
+
 // SetupGenesisBlock wraps SetupGenesisBlockWithOverride, always using a nil value for the override.
 func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
 	return SetupGenesisBlockWithOverride(db, genesis, nil, nil)
@@ -353,6 +359,9 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database) (*types.Block, error)
 	config := g.Config
 	if config == nil {
 		config = params.AllEthashProtocolChanges
+	}
+	if err := config.CheckConfigForkOrder(); err != nil {
+		return nil, err
 	}
 	if config.GetConsensusEngineType().IsClique() && len(block.Extra()) == 0 {
 		return nil, errors.New("can't start clique chain without signers")

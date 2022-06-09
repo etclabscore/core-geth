@@ -63,7 +63,6 @@ func testCtx() *vmContext {
 }
 
 func runTrace(tracer tracers.Tracer, vmctx *vmContext, chaincfg ctypes.ChainConfigurator) (json.RawMessage, error) {
-	env := vm.NewEVM(vmctx.blockCtx, vmctx.txCtx, &dummyStatedb{}, chaincfg, vm.Config{Debug: true, Tracer: tracer})
 	var (
 		env             = vm.NewEVM(vmctx.blockCtx, vmctx.txCtx, &dummyStatedb{}, chaincfg, vm.Config{Debug: true, Tracer: tracer})
 		gasLimit uint64 = 31000

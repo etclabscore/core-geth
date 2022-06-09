@@ -913,6 +913,7 @@ var (
 	NetworkFlags = append([]cli.Flag{
 		MainnetFlag,
 		ClassicFlag,
+		MintMeFlag,
 	}, TestnetFlags...)
 
 	// DatabasePathFlags is the flag group of all database path flags.

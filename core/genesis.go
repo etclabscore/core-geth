@@ -359,9 +359,11 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database) (*types.Block, error)
 	if config == nil {
 		config = params.AllEthashProtocolChanges
 	}
-	if err := config.CheckConfigForkOrder(); err != nil {
-		return nil, err
-	}
+
+	// Upstream omission:
+	// ethereum/go-ethereum does: config.CheckConfigForkOrder()
+	// core-geth does not.
+
 	if config.GetConsensusEngineType().IsClique() && len(block.Extra()) == 0 {
 		return nil, errors.New("can't start clique chain without signers")
 	}

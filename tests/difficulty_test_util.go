@@ -24,7 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
 //go:generate go run github.com/fjl/gencodec -type DifficultyTest -field-override difficultyTestMarshaling -out gen_difficultytest.go
@@ -47,7 +47,7 @@ type difficultyTestMarshaling struct {
 	CurrentBlockNumber math.HexOrDecimal64
 }
 
-func (test *DifficultyTest) Run(config *params.ChainConfig) error {
+func (test *DifficultyTest) Run(config ctypes.ChainConfigurator) error {
 	parentNumber := big.NewInt(int64(test.CurrentBlockNumber - 1))
 	parent := &types.Header{
 		Difficulty: test.ParentDifficulty,

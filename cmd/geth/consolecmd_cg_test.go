@@ -64,7 +64,7 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 
 func consoleCmdStdoutTest(flags []string, execCmd string, want interface{}) func(t *testing.T) {
 	return func(t *testing.T) {
-		flags = append(flags, "--exec", execCmd, "console")
+		flags = append(flags, "--ipcpath", filepath.Join(os.TempDir(), "geth.ipc"), "--exec", execCmd, "console")
 		geth := runGeth(t, flags...)
 		geth.Expect(fmt.Sprintf(`%v
 `, want))

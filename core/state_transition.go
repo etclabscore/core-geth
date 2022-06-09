@@ -297,30 +297,30 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	}
 
 	var (
-		msg = st.msg
-		sender = vm.AccountRef(msg.From())
+		msg              = st.msg
+		sender           = vm.AccountRef(msg.From())
 		contractCreation = msg.To() == nil
 
 		// EIP-2: Homestead
-		eip2f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2Transition, st.evm.Context.BlockNumber)
+		eip2f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2Transition, st.evm.Context.BlockNumber)
 
 		// Istanbul
 		// https://eips.ethereum.org/EIPS/eip-1679
 		// EIP-2028: Calldata gas cost reduction
-		eip2028f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2028Transition, st.evm.Context.BlockNumber)
+		eip2028f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2028Transition, st.evm.Context.BlockNumber)
 
 		// Berlin
 		// https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/berlin.md
 		// EIP-2930: Optional access lists
-		eip2930f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2930Transition, st.evm.Context.BlockNumber)
+		eip2930f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2930Transition, st.evm.Context.BlockNumber)
 
 		// London
 		// https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/london.md
 		// EIP-1559: Fee market change: burn fee and tips
-		eip1559f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP1559Transition, st.evm.Context.BlockNumber)
+		eip1559f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP1559Transition, st.evm.Context.BlockNumber)
 
 		// EIP-3529: Reduction in refunds
-		eip3529f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3529Transition, st.evm.Context.BlockNumber)
+		eip3529f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3529Transition, st.evm.Context.BlockNumber)
 	)
 
 	// Check clauses 4-5, subtract intrinsic gas if everything is correct

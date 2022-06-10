@@ -88,17 +88,9 @@ type stateDiffTracer struct {
 	reason             error  // Textual reason for the interruption
 }
 
-func (t *stateDiffTracer) CaptureTxStart(gasLimit uint64) {
-	// TODO implement me
-	// PTAL(@ziogaschr)
-	// panic("implement me")
-}
+func (t *stateDiffTracer) CaptureTxStart(gasLimit uint64) {}
 
-func (t *stateDiffTracer) CaptureTxEnd(restGas uint64) {
-	// TODO implement me
-	// PTAL(@ziogaschr)
-	// panic("implement me")
-}
+func (t *stateDiffTracer) CaptureTxEnd(restGas uint64) {}
 
 func newStateDiffTracer(ctx *tracers.Context) tracers.Tracer {
 	// First callframe contains tx context info

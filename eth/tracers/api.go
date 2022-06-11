@@ -982,15 +982,10 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 	// Call Prepare to clear out the statedb access list
 	statedb.Prepare(txctx.TxHash, txctx.TxIndex)
 
-	/*
-		TODO(meowsbits)/PTAL(ziogaschr)
-
-			if traceStateCapturer, ok := tracer.(vm.EVMLogger_StateCapturer); ok {
-				traceStateCapturer.CapturePreEVM(vmenv)
-			}
-
-		^ This was the original. I believe the CapturePreEVM has been moved to state_transition.go.
-	*/
+	// CaptrurePreEVM is being used from state_diff tracer to read balance/nonce/code of accounts before TX execution
+	if traceStateCapturer, ok := tracer.(vm.EVMLogger_StateCapturer); ok {
+		traceStateCapturer.CapturePreEVM(vmenv)
+	}
 	if _, err = core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.Gas())); err != nil {
 		return nil, fmt.Errorf("tracing failed: %w", err)
 	}

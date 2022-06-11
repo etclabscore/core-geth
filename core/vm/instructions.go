@@ -585,10 +585,15 @@ func opCreate(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]b
 		value        = scope.Stack.pop()
 		offset, size = scope.Stack.pop(), scope.Stack.pop()
 		input        = scope.Memory.GetCopy(int64(offset.Uint64()), int64(size.Uint64()))
-		gas          = interpreter.evm.CallGasTemp
+		gas          = scope.Contract.Gas
 	)
+	if interpreter.evm.ChainConfig().IsEnabled(interpreter.evm.chainConfig.GetEIP150Transition, interpreter.evm.Context.BlockNumber) {
+		gas -= gas / 64
+	}
 	// reuse size int for stackvalue
 	stackvalue := size
+
+	scope.Contract.UseGas(gas)
 
 	//TODO: use uint256.Int instead of converting with toBig()
 	var bigVal = big0
@@ -630,9 +635,12 @@ func opCreate2(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]
 		offset, size = scope.Stack.pop(), scope.Stack.pop()
 		salt         = scope.Stack.pop()
 		input        = scope.Memory.GetCopy(int64(offset.Uint64()), int64(size.Uint64()))
-		gas          = interpreter.evm.CallGasTemp
+		gas          = scope.Contract.Gas
 	)
 
+	// Apply EIP150
+	gas -= gas / 64
+	scope.Contract.UseGas(gas)
 	// reuse size int for stackvalue
 	stackvalue := size
 	//TODO: use uint256.Int instead of converting with toBig()

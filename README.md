@@ -50,7 +50,7 @@ Ellaism users are asked to switch to
 
 - CoreGeth documentation is available [here](https://etclabscore.github.io/core-geth).
   + Getting Started [Installation](https://etclabscore.github.io/core-geth/getting-started/installation) and [CLI](https://etclabscore.github.io/core-geth/getting-started/run-cli)
-  + [JSONRPC API](https://etclabscore.github.io/core-geth/apis/jsonrpc-apis)
+  + [JSONRPC API](https://etclabscore.github.io/core-geth/JSON-RPC-API)
   + [Developers](https://etclabscore.github.io/core-geth/developers/build-from-source)
   + [Tutorials](https://etclabscore.github.io/core-geth/tutorials/private-network)
 - Further [ethereum/go-ethereum](https://github.com/ethereum/go-ethereum) documentation about can be found [here](https://geth.ethereum.org/docs/).

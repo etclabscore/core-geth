@@ -1978,15 +1978,15 @@ var bindTests = []struct {
 
 			"github.com/ethereum/go-ethereum/accounts/abi/bind"
 			"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
-			"github.com/ethereum/go-ethereum/core"
 			"github.com/ethereum/go-ethereum/crypto"
 			"github.com/ethereum/go-ethereum/eth/ethconfig"
+			"github.com/ethereum/go-ethereum/params/types/genesisT"
 		`,
 		tester: `
 			var (
 				key, _  = crypto.GenerateKey()
 				user, _ = bind.NewKeyedTransactorWithChainID(key, big.NewInt(1337))
-				sim     = backends.NewSimulatedBackend(core.GenesisAlloc{user.From: {Balance: big.NewInt(1000000000000000000)}}, ethconfig.Defaults.Miner.GasCeil)
+				sim     = backends.NewSimulatedBackend(genesisT.GenesisAlloc{user.From: {Balance: big.NewInt(1000000000000000000)}}, ethconfig.Defaults.Miner.GasCeil)
 			)
 			defer sim.Close()
 
@@ -2072,7 +2072,35 @@ func TestGolangBindings(t *testing.T) {
 	tidyer := exec.Command(gocmd, "mod", "tidy")
 	tidyer.Dir = pkg
 	if out, err := tidyer.CombinedOutput(); err != nil {
-		t.Fatal(err, string(out))
+		t.Log("WARN: go mod tidy errored", err, string(out))
+		// The use of flag -compat=1.17 solves test error as follows:
+		/*
+				...
+				       bindtest imports
+				                github.com/ethereum/go-ethereum/core/types tested by
+				                github.com/ethereum/go-ethereum/core/types.test imports
+				                github.com/ethereum/go-ethereum/core/rawdb imports
+				                github.com/prometheus/tsdb/fileutil tested by
+				                github.com/prometheus/tsdb/fileutil.test imports
+				                github.com/prometheus/tsdb/testutil imports
+				                github.com/go-kit/kit/log imports
+				                github.com/go-logfmt/logfmt loaded from github.com/go-logfmt/logfmt@v0.3.0,
+				                but go 1.16 would select v0.4.0
+				...
+
+			        To upgrade to the versions selected by go 1.16:
+			                go mod tidy -go=1.16 && go mod tidy -go=1.17
+			        If reproducibility with go 1.16 is not needed:
+			                go mod tidy -compat=1.17
+			        For other options, see:
+			                https://golang.org/doc/modules/pruning
+
+		*/
+		tidyer = exec.Command(gocmd, "mod", "tidy", "-compat=1.17")
+		tidyer.Dir = pkg
+		if out, err := tidyer.CombinedOutput(); err != nil {
+			t.Fatal(err, string(out))
+		}
 	}
 
 	// Test the entire package and report any failures

@@ -293,9 +293,8 @@ func (api *ConsensusAPI) NewPayloadV1(params beacon.ExecutableDataV1) (beacon.Pa
 	// triggering too early
 	var (
 		ptd  = api.eth.BlockChain().GetTd(parent.Hash(), parent.NumberU64())
-		ttd = api.eth.BlockChain().Config().GetEthashTerminalTotalDifficulty()
+		ttd  = api.eth.BlockChain().Config().GetEthashTerminalTotalDifficulty()
 		gptd = api.eth.BlockChain().GetTd(parent.ParentHash(), parent.NumberU64()-1)
-
 	)
 	if ptd.Cmp(ttd) < 0 {
 		log.Warn("Ignoring pre-merge payload", "number", params.Number, "hash", params.BlockHash, "td", ptd, "ttd", ttd)

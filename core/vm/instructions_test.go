@@ -240,7 +240,7 @@ func TestWriteExpectedValues(t *testing.T) {
 			env         = NewEVM(BlockContext{}, TxContext{}, nil, params.TestChainConfig, Config{})
 			stack       = newstack()
 			pc          = uint64(0)
-		interpreter = env.interpreter.(*EVMInterpreter)
+			interpreter = env.interpreter.(*EVMInterpreter)
 		)
 		result := make([]TwoOperandTestcase, len(args))
 		for i, param := range args {

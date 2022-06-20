@@ -122,10 +122,10 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 	*/
 	// vs:
 	/*
-	config.LondonBlock = londonBlock
-	config.ArrowGlacierBlock = londonBlock
-	config.GrayGlacierBlock = londonBlock
-	 */
+		config.LondonBlock = londonBlock
+		config.ArrowGlacierBlock = londonBlock
+		config.GrayGlacierBlock = londonBlock
+	*/
 
 	engine := ethash.NewFaker()
 	db := rawdb.NewMemoryDatabase()

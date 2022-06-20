@@ -119,7 +119,6 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 		newcfg.SetEthashTerminalTotalDifficulty(overrideTerminalTotalDifficulty)
 	}
 
-
 	// TODO (ziogaschr): Add EIPs, after Mystique activations
 	// if overrideArrowGlacier != nil {
 	// 	newcfg.ArrowGlacierBlock = overrideArrowGlacier
@@ -145,20 +144,20 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	if genesis == nil && !confp.Identical(storedcfg, newcfg, []string{"NetworkID", "ChainID"}) {
 		// TODO/meowsbits/20220405: ethereum code for this scope follows:
 		/*
-			// Special case: if a private network is being used (no genesis and also no
-			// mainnet hash in the database), we must not apply the `configOrDefault`
-			// chain config as that would be AllProtocolChanges (applying any new fork
-			// on top of an existing private network genesis block). In that case, only
-			// apply the overrides.
+				// Special case: if a private network is being used (no genesis and also no
+				// mainnet hash in the database), we must not apply the `configOrDefault`
+				// chain config as that would be AllProtocolChanges (applying any new fork
+				// on top of an existing private network genesis block). In that case, only
+				// apply the overrides.
 
-			if ... :
-			newcfg = storedcfg
-		if overrideGrayGlacier != nil {
-			newcfg.GrayGlacierBlock = overrideGrayGlacier
-			}
-			if overrideTerminalTotalDifficulty != nil {
-				newcfg.TerminalTotalDifficulty = overrideTerminalTotalDifficulty
-			}
+				if ... :
+				newcfg = storedcfg
+			if overrideGrayGlacier != nil {
+				newcfg.GrayGlacierBlock = overrideGrayGlacier
+				}
+				if overrideTerminalTotalDifficulty != nil {
+					newcfg.TerminalTotalDifficulty = overrideTerminalTotalDifficulty
+				}
 		*/
 		// ... and this is ours:
 		log.Info("Found non-defaulty stored config, using it.")

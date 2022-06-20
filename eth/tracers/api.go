@@ -181,7 +181,7 @@ type TraceCallConfig struct {
 	Timeout           *string
 	Reexec            *uint64
 	StateOverrides    *ethapi.StateOverride
-	BlockOverrides *ethapi.BlockOverrides
+	BlockOverrides    *ethapi.BlockOverrides
 	NestedTraceOutput bool // Returns the trace output JSON nested under the trace name key. This allows full Parity compatibility to be achieved.
 }
 

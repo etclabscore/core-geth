@@ -59,25 +59,6 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			log.Info("Writing custom genesis block")
 		}
 
-		if overrideMystique != nil {
-			n := overrideMystique.Uint64()
-			if err := genesis.SetEIP1559Transition(&n); err != nil {
-				return genesis, stored, err
-			}
-			if err := genesis.SetEIP3198Transition(&n); err != nil {
-				return genesis, stored, err
-			}
-			if err := genesis.SetEIP3529Transition(&n); err != nil {
-				return genesis, stored, err
-			}
-			if err := genesis.SetEIP3541Transition(&n); err != nil {
-				return genesis, stored, err
-			}
-			if err := genesis.SetEthashEIP3554Transition(&n); err != nil {
-				return genesis, stored, err
-			}
-		}
-
 		block, err := CommitGenesis(genesis, db)
 		if err != nil {
 			return genesis.Config, common.Hash{}, err
@@ -113,16 +94,12 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	// Get the existing chain configuration.
 	newcfg := configOrDefault(genesis, stored)
 	if overrideGrayGlacier != nil {
-		newcfg.GrayGlacierBlock = overrideGrayGlacier
+		n := overrideGrayGlacier.Uint64()
+		newcfg.SetEthashEIP5133Transition(&n)
 	}
 	if overrideTerminalTotalDifficulty != nil {
 		newcfg.SetEthashTerminalTotalDifficulty(overrideTerminalTotalDifficulty)
 	}
-
-	// TODO (ziogaschr): Add EIPs, after Mystique activations
-	// if overrideArrowGlacier != nil {
-	// 	newcfg.ArrowGlacierBlock = overrideArrowGlacier
-	// }
 
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {

@@ -988,6 +988,21 @@ func (c *CoreGethChainConfig) SetEthashECIP1099Transition(n *uint64) error {
 	return nil
 }
 
+func (c *CoreGethChainConfig) GetEthashEIP5133Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+		return nil
+	}
+	return bigNewU64(c.EIP5133FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEthashEIP5133Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	c.EIP5133FBlock = setBig(c.EIP5133FBlock, n)
+	return nil
+}
+
 func (c *CoreGethChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil

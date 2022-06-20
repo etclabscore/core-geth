@@ -870,6 +870,18 @@ func (c *ChainConfig) SetEthashECIP1099Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
+func (c *ChainConfig) GetEthashEIP5133Transition() *uint64 {
+	return bigNewU64(c.GrayGlacierBlock)
+}
+
+func (c *ChainConfig) SetEthashEIP5133Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	c.GrayGlacierBlock = setBig(c.GrayGlacierBlock, n)
+	return nil
+}
+
 func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil

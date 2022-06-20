@@ -535,5 +535,6 @@ func TestGenerateSpecificationCases(t *testing.T) {
 		}
 		fmt.Println()
 		fmt.Println()
+		t.Log("generated cases", generatedCases)
 	}
 }

@@ -227,8 +227,8 @@ type Config struct {
 	// Mystique block override (TODO: remove after the fork)
 	OverrideMystique *big.Int `toml:",omitempty"`
 
-	// Arrow Glacier block override (TODO: remove after the fork)
-	OverrideArrowGlacier *big.Int `toml:",omitempty"`
+	// Gray Glacier block override (TODO: remove after the fork)
+	OverrideGrayGlacier *big.Int `toml:",omitempty"`
 
 	// OverrideTerminalTotalDifficulty (TODO: remove after the fork)
 	OverrideTerminalTotalDifficulty *big.Int `toml:",omitempty"`

@@ -92,6 +92,7 @@ func newTestHandlerWithBlocksWithOpts(blocks int, mode downloader.SyncMode, gen 
 
 // Tests that snap sync is disabled after a successful sync cycle.
 func TestSnapSyncDisabling66(t *testing.T) { testSnapSyncDisabling(t, eth.ETH66, snap.SNAP1) }
+func TestSnapSyncDisabling67(t *testing.T) { testSnapSyncDisabling(t, eth.ETH67, snap.SNAP1) }
 
 // Tests that snap sync gets disabled as soon as a real block is successfully
 // imported into the blockchain.

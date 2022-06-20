@@ -44,7 +44,7 @@ func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.Cha
 	return SetupGenesisBlockWithOverride(db, genesis, nil, nil)
 }
 
-func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, overrideMystique, overrideTerminalTotalDifficulty *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, overrideGrayGlacier, overrideTerminalTotalDifficulty *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
@@ -112,29 +112,13 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	}
 	// Get the existing chain configuration.
 	newcfg := configOrDefault(genesis, stored)
-
+	if overrideGrayGlacier != nil {
+		newcfg.GrayGlacierBlock = overrideGrayGlacier
+	}
 	if overrideTerminalTotalDifficulty != nil {
 		newcfg.SetEthashTerminalTotalDifficulty(overrideTerminalTotalDifficulty)
 	}
 
-	if overrideMystique != nil {
-		n := overrideMystique.Uint64()
-		if err := newcfg.SetEIP1559Transition(&n); err != nil {
-			return newcfg, stored, err
-		}
-		if err := newcfg.SetEIP3198Transition(&n); err != nil {
-			return newcfg, stored, err
-		}
-		if err := newcfg.SetEIP3529Transition(&n); err != nil {
-			return newcfg, stored, err
-		}
-		if err := newcfg.SetEIP3541Transition(&n); err != nil {
-			return newcfg, stored, err
-		}
-		if err := newcfg.SetEthashEIP3554Transition(&n); err != nil {
-			return newcfg, stored, err
-		}
-	}
 
 	// TODO (ziogaschr): Add EIPs, after Mystique activations
 	// if overrideArrowGlacier != nil {
@@ -169,8 +153,8 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 
 			if ... :
 			newcfg = storedcfg
-			if overrideArrowGlacier != nil {
-				newcfg.ArrowGlacierBlock = overrideArrowGlacier
+		if overrideGrayGlacier != nil {
+			newcfg.GrayGlacierBlock = overrideGrayGlacier
 			}
 			if overrideTerminalTotalDifficulty != nil {
 				newcfg.TerminalTotalDifficulty = overrideTerminalTotalDifficulty

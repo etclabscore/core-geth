@@ -173,7 +173,7 @@ var (
 	}
 	RopstenFlag = cli.BoolFlag{
 		Name:  "ropsten",
-		Usage: "Ropsten network: pre-configured proof-of-work test network",
+		Usage: "Ropsten network: pre-configured proof-of-stake test network",
 	}
 	MintMeFlag = cli.BoolFlag{
 		Name:  "mintme",
@@ -296,13 +296,9 @@ var (
 		Usage: "Megabytes of memory allocated to bloom-filter for pruning",
 		Value: 2048,
 	}
-	OverrideMystiqueFlag = cli.Uint64Flag{
-		Name:  "override.mystique",
-		Usage: "Manually specify Mystique fork-block, overriding the bundled setting",
-	}
-	OverrideArrowGlacierFlag = cli.Uint64Flag{
-		Name:  "override.arrowglacier",
-		Usage: "Manually specify Arrow Glacier fork-block, overriding the bundled setting",
+	OverrideGrayGlacierFlag = cli.Uint64Flag{
+		Name:  "override.grayglacier",
+		Usage: "Manually specify Gray Glacier fork-block, overriding the bundled setting",
 	}
 	OverrideTerminalTotalDifficulty = BigFlag{
 		Name:  "override.terminaltotaldifficulty",
@@ -617,6 +613,10 @@ var (
 	NoCompactionFlag = cli.BoolFlag{
 		Name:  "nocompaction",
 		Usage: "Disables db compaction after import",
+	}
+	IgnoreLegacyReceiptsFlag = cli.BoolFlag{
+		Name:  "ignore-legacy-receipts",
+		Usage: "Geth will start up even if there are legacy receipts in freezer",
 	}
 	// RPC settings
 	IPCDisabledFlag = cli.BoolFlag{

@@ -110,13 +110,22 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 		signer = types.LatestSigner(gspec.Config)
 	)
 
-	if londonBlock != nil {
-		lb := londonBlock.Uint64()
-		gspec.SetEIP1559Transition(&lb)
-		signer = types.LatestSigner(gspec.Config)
-	} else {
-		gspec.Config.SetEIP1559Transition(nil)
-	}
+	// TODO-meowsbits:
+	/*
+		if londonBlock != nil {
+			lb := londonBlock.Uint64()
+			gspec.SetEIP1559Transition(&lb)
+			signer = types.LatestSigner(gspec.Config)
+		} else {
+			gspec.Config.SetEIP1559Transition(nil)
+		}
+	*/
+	// vs:
+	/*
+	config.LondonBlock = londonBlock
+	config.ArrowGlacierBlock = londonBlock
+	config.GrayGlacierBlock = londonBlock
+	 */
 
 	engine := ethash.NewFaker()
 	db := rawdb.NewMemoryDatabase()

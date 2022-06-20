@@ -59,11 +59,10 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		EVMInterpreter                  string
 		RPCGasCap                       uint64 `toml:",omitempty"`
 		RPCEVMTimeout                   time.Duration
-		RPCTxFeeCap                     float64                        `toml:",omitempty"`
+		RPCTxFeeCap                     float64
 		Checkpoint                      *ctypes.TrustedCheckpoint      `toml:",omitempty"`
 		CheckpointOracle                *ctypes.CheckpointOracleConfig `toml:",omitempty"`
-		OverrideMystique                *big.Int                       `toml:",omitempty"`
-		OverrideArrowGlacier            *big.Int                       `toml:",omitempty"`
+		OverrideGrayGlacier             *big.Int                       `toml:",omitempty"`
 		OverrideTerminalTotalDifficulty *big.Int                       `toml:",omitempty"`
 	}
 	var enc Config
@@ -110,8 +109,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.RPCTxFeeCap = c.RPCTxFeeCap
 	enc.Checkpoint = c.Checkpoint
 	enc.CheckpointOracle = c.CheckpointOracle
-	enc.OverrideMystique = c.OverrideMystique
-	enc.OverrideArrowGlacier = c.OverrideArrowGlacier
+	enc.OverrideGrayGlacier = c.OverrideGrayGlacier
 	enc.OverrideTerminalTotalDifficulty = c.OverrideTerminalTotalDifficulty
 	return &enc, nil
 }
@@ -159,11 +157,10 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		EVMInterpreter                  *string
 		RPCGasCap                       *uint64 `toml:",omitempty"`
 		RPCEVMTimeout                   *time.Duration
-		RPCTxFeeCap                     *float64                       `toml:",omitempty"`
+		RPCTxFeeCap                     *float64
 		Checkpoint                      *ctypes.TrustedCheckpoint      `toml:",omitempty"`
 		CheckpointOracle                *ctypes.CheckpointOracleConfig `toml:",omitempty"`
-		OverrideMystique                *big.Int                       `toml:",omitempty"`
-		OverrideArrowGlacier            *big.Int                       `toml:",omitempty"`
+		OverrideGrayGlacier             *big.Int                       `toml:",omitempty"`
 		OverrideTerminalTotalDifficulty *big.Int                       `toml:",omitempty"`
 	}
 	var dec Config
@@ -299,11 +296,8 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	if dec.CheckpointOracle != nil {
 		c.CheckpointOracle = dec.CheckpointOracle
 	}
-	if dec.OverrideMystique != nil {
-		c.OverrideMystique = dec.OverrideMystique
-	}
-	if dec.OverrideArrowGlacier != nil {
-		c.OverrideArrowGlacier = dec.OverrideArrowGlacier
+	if dec.OverrideGrayGlacier != nil {
+		c.OverrideGrayGlacier = dec.OverrideGrayGlacier
 	}
 	if dec.OverrideTerminalTotalDifficulty != nil {
 		c.OverrideTerminalTotalDifficulty = dec.OverrideTerminalTotalDifficulty

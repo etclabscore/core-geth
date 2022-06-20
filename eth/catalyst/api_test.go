@@ -816,10 +816,10 @@ func TestInvalidBloom(t *testing.T) {
 
 func TestNewPayloadOnInvalidTerminalBlock(t *testing.T) {
 	genesis, preMergeBlocks := generatePreMergeChain(100)
-	fmt.Println(genesis.Config.TerminalTotalDifficulty)
-	genesis.Config.TerminalTotalDifficulty = preMergeBlocks[0].Difficulty() //.Sub(genesis.Config.TerminalTotalDifficulty, preMergeBlocks[len(preMergeBlocks)-1].Difficulty())
+	fmt.Println(genesis.Config.GetEthashTerminalTotalDifficulty())
+	genesis.Config.SetEthashTerminalTotalDifficulty(preMergeBlocks[0].Difficulty()) // .Sub(genesis.Config.TerminalTotalDifficulty, preMergeBlocks[len(preMergeBlocks)-1].Difficulty())
 
-	fmt.Println(genesis.Config.TerminalTotalDifficulty)
+	fmt.Println(genesis.Config.GetEthashTerminalTotalDifficulty())
 	n, ethservice := startEthService(t, genesis, preMergeBlocks)
 	defer n.Close()
 

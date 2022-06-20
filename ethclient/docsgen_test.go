@@ -346,7 +346,7 @@ _None_
 
 		nDoc := &meta_schema.OpenrpcDocument{}
 		*nDoc = *res
-		nDoc.Methods = (*meta_schema.Methods)(&group)
+		nDoc.Methods = (*meta_schema.Methods)(&group) //nolint:gosec
 		err = tpl.Execute(fi, nDoc)
 		if err != nil {
 			t.Fatal(err)

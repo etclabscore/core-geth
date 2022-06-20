@@ -380,24 +380,6 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 	// exPeriodRef the explosion clause's reference point
 	exPeriodRef := new(big.Int).Add(parent.Number, big1)
 
-	// TODO(meowsbits): Introduce EIP5133, et al.
-	/*
-		// calcDifficultyEip5133 is the difficulty adjustment algorithm as specified by EIP 5133.
-		// It offsets the bomb a total of 11.4M blocks.
-		// Specification EIP-5133: https://eips.ethereum.org/EIPS/eip-5133
-		calcDifficultyEip5133 = makeDifficultyCalculator(big.NewInt(11_400_000))
-
-		// calcDifficultyEip4345 is the difficulty adjustment algorithm as specified by EIP 4345.
-		// It offsets the bomb a total of 10.7M blocks.
-		// Specification EIP-4345: https://eips.ethereum.org/EIPS/eip-4345
-		calcDifficultyEip4345 = makeDifficultyCalculator(big.NewInt(10_700_000))
-
-		// calcDifficultyEip3554 is the difficulty adjustment algorithm as specified by EIP 3554.
-		// It offsets the bomb a total of 9.7M blocks.
-		// Specification EIP-3554: https://eips.ethereum.org/EIPS/eip-3554
-		calcDifficultyEip3554 = makeDifficultyCalculator(big.NewInt(9700000))
-
-	*/
 	if config.IsEnabled(config.GetEthashECIP1010PauseTransition, next) {
 		ecip1010Explosion(config, next, exPeriodRef)
 

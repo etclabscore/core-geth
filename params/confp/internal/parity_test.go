@@ -38,7 +38,7 @@ func TestBlockConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 	parityHomestead := paritySpec.Engine.Ethash.Params.HomesteadTransition
-	if parityHomestead != nil && *parityHomestead >= 0 {
+	if parityHomestead != nil && *parityHomestead >= 0 { // nolint:staticcheck
 		t.Errorf("nonnil parity homestead")
 	}
 }

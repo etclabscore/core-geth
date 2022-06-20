@@ -25,7 +25,6 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -877,5 +876,6 @@ func (g *Genesis) SetLyra2NonceTransition(n *uint64) error {
 }
 
 func (g *Genesis) String() string {
-	return spew.Sdump(g)
+	j, _ := json.MarshalIndent(g, "", "    ")
+	return "Genesis: " + string(j)
 }

@@ -235,6 +235,7 @@ ecbp1100AGExpB is an exponential function with x as a base (and rationalized exp
 OPTION 2: Slightly slower takeoff, steeper eventual ascent
 g(x)=x^(x*0.00002)
 */
+//nolint:deadcode
 func ecbp1100AGExpB(x float64) (antiGravity float64) {
 	return math.Pow(x, x*0.00002)
 }

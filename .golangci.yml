@@ -71,6 +71,10 @@ issues:
       text: 'G505: Blocklisted import crypto/sha1: weak cryptographic primitive'
     - path: tests/params.go
       text: 'G401: Use of weak cryptographic primitive'
+    - path: tests/difficulty_mgen_test.go
+      text: 'G505: Blocklisted import crypto/sha1: weak cryptographic primitive'
+    - path: tests/difficulty_mgen_test.go
+      text: 'G401: Use of weak cryptographic primitive'
   exclude:
     - 'SA1019: event.TypeMux is deprecated: use Feed'
     - 'SA1019: strings.Title is deprecated'

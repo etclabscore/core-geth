@@ -226,7 +226,7 @@ func Equivalent(a, b ctypes.ChainConfigurator) error {
 		return false
 	}
 	for _, h := range testForks {
-		if err := Compatible(&h, a, b); err != nil {
+		if err := Compatible(&h, a, b); err != nil { // nolint:gosec
 			if !essentiallyEquivalent(err.StoredConfig, err.NewConfig) {
 				return err
 			}

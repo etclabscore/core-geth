@@ -387,15 +387,15 @@ func (n *Node) setupOpenRPC() error {
 		n.httpOpenRPC.WithMeta(metaRegistererForURL("http://"))
 	}
 	if n.httpAuth.rpcAllowed() {
-		n.httpOpenRPC = newOpenRPCDocument()
+		n.httpAuthOpenRPC = newOpenRPCDocument()
 		h := n.httpAuth.httpHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.HTTPModules, false)
 		registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
-		n.httpOpenRPC.RegisterListener(n.httpAuth.listener)
-		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpOpenRPC}); err != nil {
+		n.httpAuthOpenRPC.RegisterListener(n.httpAuth.listener)
+		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpAuthOpenRPC}); err != nil {
 			return err
 		}
-		n.httpOpenRPC.WithMeta(metaRegistererForURL("http://"))
+		n.httpAuthOpenRPC.WithMeta(metaRegistererForURL("http://"))
 	}
 	wsServer := n.wsServerForPort(n.config.WSPort, false)
 	if wsServer.wsAllowed() {
@@ -411,15 +411,15 @@ func (n *Node) setupOpenRPC() error {
 	}
 	wsAuthServer := n.wsServerForPort(n.config.WSPort, true)
 	if wsAuthServer.wsAllowed() {
-		n.wsOpenRPC = newOpenRPCDocument()
+		n.wsAuthOpenRPC = newOpenRPCDocument()
 		h := wsAuthServer.wsHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.WSModules, false)
 		registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
-		n.wsOpenRPC.RegisterListener(wsAuthServer.listener)
-		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsOpenRPC}); err != nil {
+		n.wsAuthOpenRPC.RegisterListener(wsAuthServer.listener)
+		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsAuthOpenRPC}); err != nil {
 			return err
 		}
-		n.wsOpenRPC.WithMeta(metaRegistererForURL("ws://"))
+		n.wsAuthOpenRPC.WithMeta(metaRegistererForURL("ws://"))
 	}
 	return nil
 }

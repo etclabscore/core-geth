@@ -518,12 +518,11 @@ func (c *ChainConfig) SetEIP2718Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP4399Transition() *uint64 {
-	return bigNewU64(c.MergeForkBlock)
+	return nil // API removed 1.10.19
 }
 
 func (c *ChainConfig) SetEIP4399Transition(n *uint64) error {
-	c.MergeForkBlock = setBig(c.MergeForkBlock, n)
-	return nil
+	return ctypes.ErrUnsupportedConfigFatal
 }
 
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {

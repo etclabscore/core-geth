@@ -79,9 +79,8 @@ func TestCreation(t *testing.T) {
 				{13772999, ID{Hash: checksumToBytes(0xb715077d), Next: 13773000}}, // Last London block
 				{13773000, ID{Hash: checksumToBytes(0x20c327fc), Next: 15050000}}, // First Arrow Glacier block
 				{15049999, ID{Hash: checksumToBytes(0x20c327fc), Next: 15050000}}, // Last Arrow Glacier block
-				{15050000, ID{Hash: checksumToBytes(0xf0afd0e3), Next: 18000000}}, // First Gray Glacier block
-				{18000000, ID{Hash: checksumToBytes(0x4fb8a872), Next: 0}},        // First Merge Start block
-				{20000000, ID{Hash: checksumToBytes(0x4fb8a872), Next: 0}},        // Future Merge Start block
+				{15050000, ID{Hash: checksumToBytes(0xf0afd0e3), Next: 0}},        // First Gray Glacier block
+				{20000000, ID{Hash: checksumToBytes(0xf0afd0e3), Next: 0}},        // Future Gray Glacier block
 			},
 		},
 		// Ropsten test cases

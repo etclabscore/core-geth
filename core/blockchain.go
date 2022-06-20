@@ -1967,6 +1967,7 @@ func mergeLogs(logs [][]*types.Log, reverse bool) []*types.Log {
 	return ret
 }
 
+// nolint:unused
 func (bc *BlockChain) commonAncestor(a *types.Header, b *types.Header) (*types.Header, error) {
 	var commonH *types.Header
 	for {

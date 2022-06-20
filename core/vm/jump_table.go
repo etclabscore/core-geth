@@ -69,7 +69,7 @@ func validate(jt JumpTable) JumpTable {
 
 // instructionSetForConfig determines an instruction set for the vm using
 // the chain config params and a current block number
-func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpTable {
+func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, bn *big.Int) JumpTable {
 	instructionSet := newBaseInstructionSet()
 
 	// Homestead
@@ -193,8 +193,7 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, bn *big.Int) JumpT
 	if config.IsEnabled(config.GetEIP3198Transition, bn) {
 		enable3198(&instructionSet) // BASEFEE opcode https://eips.ethereum.org/EIPS/eip-3198
 	}
-	// meowsbits/202203 TODO: RANDOM opcode for theMerge
-	if config.IsEnabled(config.GetEIP4399Transition, bn) {
+	if isPostMerge {
 		instructionSet[RANDOM] = &operation{
 			execute:     opRandom,
 			constantGas: GasQuickStep,

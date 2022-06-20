@@ -95,7 +95,7 @@ func NewEVMInterpreter(evm *EVM, cfg Config) *EVMInterpreter {
 	// the jump table was initialised. If it was not
 	// we'll set the default jump table.
 	if cfg.JumpTable == nil || cfg.JumpTable[STOP] == nil {
-		var jt = instructionSetForConfig(evm.chainConfig, evm.Context.BlockNumber)
+		var jt = instructionSetForConfig(evm.chainConfig, evm.Context.Random != nil, evm.Context.BlockNumber)
 		cfg.JumpTable = &jt
 
 		for i, eip := range cfg.ExtraEips {

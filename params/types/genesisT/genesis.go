@@ -25,6 +25,7 @@ import (
 	"math/big"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -873,4 +874,8 @@ func (g *Genesis) GetLyra2NonceTransition() *uint64 {
 
 func (g *Genesis) SetLyra2NonceTransition(n *uint64) error {
 	return g.Config.SetLyra2NonceTransition(n)
+}
+
+func (g *Genesis) String() string {
+	return spew.Sdump(g)
 }

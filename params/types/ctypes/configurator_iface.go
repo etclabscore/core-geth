@@ -42,6 +42,8 @@ type Configurator interface {
 }
 
 type ChainConfigurator interface {
+	String() string
+
 	ProtocolSpecifier
 	Forker
 	ConsensusEnginator // Consensus Engine

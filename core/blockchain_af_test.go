@@ -878,7 +878,7 @@ func TestBlockChain_AF_Difficulty_Develop(t *testing.T) {
 			10, 3,
 			true, true,
 		},
-		//5
+		// 5
 		{
 			1000, 100, 900,
 			10, 3,
@@ -917,6 +917,7 @@ func TestBlockChain_AF_Difficulty_Develop(t *testing.T) {
 	// 	}
 	// }
 
+	// nolint:unused
 	type ratioComparison struct {
 		tdRatio float64
 		penalty float64

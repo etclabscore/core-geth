@@ -390,7 +390,7 @@ func (n *Node) setupOpenRPC() error {
 		n.httpAuthOpenRPC = newOpenRPCDocument()
 		h := n.httpAuth.httpHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.HTTPModules, false)
-		registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
+		registerOpenRPCAPIs(n.httpAuthOpenRPC, registeredAPIs)
 		n.httpAuthOpenRPC.RegisterListener(n.httpAuth.listener)
 		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpAuthOpenRPC}); err != nil {
 			return err
@@ -414,7 +414,7 @@ func (n *Node) setupOpenRPC() error {
 		n.wsAuthOpenRPC = newOpenRPCDocument()
 		h := wsAuthServer.wsHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.WSModules, false)
-		registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
+		registerOpenRPCAPIs(n.wsAuthOpenRPC, registeredAPIs)
 		n.wsAuthOpenRPC.RegisterListener(wsAuthServer.listener)
 		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsAuthOpenRPC}); err != nil {
 			return err

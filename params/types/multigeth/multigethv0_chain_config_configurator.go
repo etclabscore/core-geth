@@ -37,6 +37,7 @@ func bigNewU64(i *big.Int) *uint64 {
 // 	return bigNewU64(i)
 // }
 
+// nolint: staticcheck
 func setBig(i *big.Int, u *uint64) *big.Int {
 	if u == nil {
 		return nil

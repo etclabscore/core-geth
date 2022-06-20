@@ -536,6 +536,9 @@ func (h *handler) Start(maxPeers int) {
 	// start sync handlers
 	h.wg.Add(1)
 	go h.chainSync.loop()
+
+	h.wg.Add(1)
+	go h.artificialFinalitySafetyLoop()
 }
 
 func (h *handler) Stop() {

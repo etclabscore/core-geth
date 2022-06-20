@@ -3872,12 +3872,12 @@ func TestCanonicalHashMarker(t *testing.T) {
 	for _, c := range cases {
 		var (
 			db    = rawdb.NewMemoryDatabase()
-			gspec = &Genesis{
+			gspec = &genesisT.Genesis{
 				Config:  params.TestChainConfig,
-				Alloc:   GenesisAlloc{},
-				BaseFee: big.NewInt(params.InitialBaseFee),
+				Alloc:   genesisT.GenesisAlloc{},
+				BaseFee: big.NewInt(vars.InitialBaseFee),
 			}
-			genesis = gspec.MustCommit(db)
+			genesis = MustCommitGenesis(db, gspec)
 			engine  = ethash.NewFaker()
 		)
 		forkA, _ := GenerateChain(params.TestChainConfig, genesis, engine, db, c.forkA, func(i int, gen *BlockGen) {})
@@ -3885,7 +3885,7 @@ func TestCanonicalHashMarker(t *testing.T) {
 
 		// Initialize test chain
 		diskdb := rawdb.NewMemoryDatabase()
-		gspec.MustCommit(diskdb)
+		MustCommitGenesis(diskdb, gspec)
 		chain, err := NewBlockChain(diskdb, nil, params.TestChainConfig, engine, vm.Config{}, nil, nil)
 		if err != nil {
 			t.Fatalf("failed to create tester chain: %v", err)

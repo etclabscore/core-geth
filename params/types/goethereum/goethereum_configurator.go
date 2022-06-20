@@ -523,7 +523,7 @@ func (c *ChainConfig) GetEIP4399Transition() *uint64 {
 }
 
 func (c *ChainConfig) SetEIP4399Transition(n *uint64) error {
-	return ctypes.ErrUnsupportedConfigFatal
+	return ctypes.ErrUnsupportedConfigNoop
 }
 
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {

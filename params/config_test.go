@@ -46,14 +46,18 @@ func TestCheckCompatible(t *testing.T) {
 		wantErr     *confp.ConfigCompatError
 	}
 	tests := []test{
+		// 0
 		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 0, wantErr: nil},
+		// 1
 		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 100, wantErr: nil},
+		// 2
 		{
 			stored:  &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), EIP150Block: big.NewInt(10)},
 			new:     &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), EIP150Block: big.NewInt(20)},
 			head:    9,
 			wantErr: nil,
 		},
+		// 3
 		{
 			stored: AllEthashProtocolChanges,
 			new:    &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: nil},
@@ -65,6 +69,7 @@ func TestCheckCompatible(t *testing.T) {
 				RewindTo:     0,
 			},
 		},
+		// 4
 		{
 			stored: AllEthashProtocolChanges,
 			new:    &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: big.NewInt(1)},
@@ -76,6 +81,7 @@ func TestCheckCompatible(t *testing.T) {
 				RewindTo:     0,
 			},
 		},
+		// 5
 		{
 			stored: &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: big.NewInt(30), EIP150Block: big.NewInt(10)},
 			new:    &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: big.NewInt(25), EIP150Block: big.NewInt(20)},
@@ -87,6 +93,7 @@ func TestCheckCompatible(t *testing.T) {
 				RewindTo:     9,
 			},
 		},
+		// 6
 		{
 			stored: &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
 			new:    &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
@@ -98,23 +105,28 @@ func TestCheckCompatible(t *testing.T) {
 				RewindTo:     23,
 			},
 		},
+		// 7
 		{
 			stored:  &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), ByzantiumBlock: big.NewInt(30)},
 			new:     &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP211FBlock: big.NewInt(26)},
 			head:    25,
 			wantErr: nil,
 		},
+		// 8
 		{
 			stored:  &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), ByzantiumBlock: big.NewInt(30)},
 			new:     &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
 			head:    25,
 			wantErr: nil,
 		},
+		// 9
 		{
 			stored: MainnetChainConfig,
 			new: func() ctypes.ChainConfigurator {
 				c := &goethereum.ChainConfig{}
-				confp.Convert(MainnetChainConfig, c)
+				if err := confp.Convert(MainnetChainConfig, c); err != nil {
+					panic(err)
+				}
 				c.SetEthashEIP779Transition(uint64P(1900000))
 				return c
 			}(),
@@ -188,7 +200,7 @@ func TestCheckCompatible(t *testing.T) {
 				c.SetEIP152Transition(nil)
 				c.SetEIP1108Transition(nil)
 				c.SetEIP1344Transition(nil)
-				//c.SetEIP1884Transition(nil)
+				// c.SetEIP1884Transition(nil)
 				c.SetEIP2028Transition(nil)
 				c.SetEIP2200Transition(nil)
 				return c
@@ -205,7 +217,7 @@ func TestCheckCompatible(t *testing.T) {
 				c.SetEIP152Transition(nil)
 				c.SetEIP1108Transition(nil)
 				c.SetEIP1344Transition(nil)
-				//c.SetEIP1884Transition(nil)
+				// c.SetEIP1884Transition(nil)
 				c.SetEIP2028Transition(nil)
 				c.SetEIP2200Transition(nil)
 				return c
@@ -242,8 +254,8 @@ func TestCheckCompatible(t *testing.T) {
 					ConstantinopleBlock: big.NewInt(9573000),
 					PetersburgBlock:     big.NewInt(9573000),
 					// As if client hasn't upgraded config to latest fork.
-					//IstanbulBlock:       big.NewInt(10500839),
-					//EIP1884DisableFBlock:big.NewInt(10500839),
+					// IstanbulBlock:       big.NewInt(10500839),
+					// EIP1884DisableFBlock:big.NewInt(10500839),
 					ECIP1017EraBlock:   big.NewInt(5000000),
 					EIP160Block:        big.NewInt(3000000),
 					ECIP1010PauseBlock: big.NewInt(3000000),
@@ -311,13 +323,13 @@ func TestCheckCompatible(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for i, test := range tests {
 		err := confp.Compatible(&test.head, test.stored, test.new)
 		if (err == nil && test.wantErr != nil) || (err != nil && test.wantErr == nil) {
-			t.Errorf("nil/nonnil, error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", test.stored, test.new, test.head, err, test.wantErr)
+			t.Errorf("[case %d] nil/nonnil, error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", i, test.stored, test.new, test.head, err, test.wantErr)
 		} else if err != nil && (err.RewindTo != test.wantErr.RewindTo) {
-			//if !reflect.DeepEqual(err, test.wantErr) {
-			t.Errorf("error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", test.stored, test.new, test.head, err, test.wantErr)
+			// if !reflect.DeepEqual(err, test.wantErr) {
+			t.Errorf("[case %d] error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", i, test.stored, test.new, test.head, err, test.wantErr)
 		}
 	}
 }

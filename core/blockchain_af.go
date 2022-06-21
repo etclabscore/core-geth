@@ -91,8 +91,8 @@ func (bc *BlockChain) getTDRatio(commonAncestor, current, proposed *types.Header
 // The grace period spans from the fork block on.
 var adessOmega uint64 = 4
 
-// adessEpsilon is the per-block penalty: 1 / (1 + epsilon)
-var adessEpsilonQuo = big.NewInt(1000) // ie. 1 / 1000
+// adessEpsilonDiv is the per-block penalty: 1 / (1 + epsilon)
+var adessEpsilonDiv uint64 = 10 // ie. 1 / 1000
 
 // adessPenaltyAssignment implements the logic to decide whether or not the proposed chain segment
 // should be assigned a penalty/handicap on their consensus score (total difficulty) value.
@@ -136,19 +136,6 @@ func (bc *BlockChain) adessCountPremierCanonical(head, common *types.Header) (to
 	return
 }
 
-// adessPenaltyProposed returns the discount (expressed in Total Difficulty) that will be
-// applied to the proposed chain if and when the penalty is assigned.
-func (bc *BlockChain) adessPenaltyProposed(commonAncestor, current, proposed *types.Header) *big.Int {
-	// Traverse the proposed segment backwards and sum up the total discount.
-	totalDiscount := new(big.Int)
-	for h := proposed; h != nil && h.Hash() != commonAncestor.Hash(); h = bc.GetHeaderByHash(h.ParentHash) {
-		blockTD := bc.GetTd(h.Hash(), h.Number.Uint64())
-		blockDiscount := new(big.Int).Div(blockTD, adessEpsilonQuo)
-		totalDiscount.Add(totalDiscount, blockDiscount)
-	}
-	return totalDiscount
-}
-
 // adess implements the proposal documented in 'A Proof-of-Work Protocol to Deter Double-Spend Attacks'
 // The function returns 'nil' (no error) if the proposed reorganization is allowed,
 // otherwise it returns an error contextualizing the insufficiency of the proposed segment.
@@ -161,28 +148,16 @@ func (bc *BlockChain) adess(commonAncestor, current, proposed *types.Header) err
 		return nil
 	}
 
-	// Get the total difficulties of the proposed chain segment and the existing one.
+	// FIXME: Rational numbers and rounding.
+	commonN := commonAncestor.Number.Uint64()
+	currentSegmentLength := current.Number.Uint64() - commonN
+	proposedSegmentLength := proposed.Number.Uint64() - commonN
 
-	// Operational boilerplate:
-	commonAncestorTD := bc.GetTd(commonAncestor.Hash(), commonAncestor.Number.Uint64())
-	proposedParentTD := bc.GetTd(proposed.ParentHash, proposed.Number.Uint64()-1)
-	proposedTD := new(big.Int).Add(proposed.Difficulty, proposedParentTD)
-	localTD := bc.GetTd(current.Hash(), current.Number.Uint64())
+	wantLength := currentSegmentLength + (currentSegmentLength / adessEpsilonDiv)
 
-	// Local and proposed segment TDs (post fork block):
-	proposedSubchainTD := new(big.Int).Sub(proposedTD, commonAncestorTD)
-	localSubchainTD := new(big.Int).Sub(localTD, commonAncestorTD)
-
-	// proposedPenalty is the raw penalty value derived from the proposed segment.
-	// This value will be deducted from the proposed segment's TD.
-	proposedPenalty := bc.adessPenaltyProposed(commonAncestor, current, proposed)
-
-	// Deduct the penalty directly from the proposed segment's TD value.
-	proposedSubchainTD.Sub(proposedSubchainTD, proposedPenalty)
-
-	// If the local score is greater than the handicapped proposed score,
-	// return an error indicating that ADESS wants to reject the proposed segment.
-	if localSubchainTD.Cmp(proposedSubchainTD) > 0 {
+	// Return error if the proposed segment has a shorter than demanded
+	// segment length.
+	if proposedSegmentLength < wantLength {
 		return fmt.Errorf(`ADESS rejects proposed segment`)
 	}
 

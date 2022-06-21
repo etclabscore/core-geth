@@ -1,9 +1,9 @@
 package multigeth
 
 import (
+	"encoding/json"
 	"math/big"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/internal"
@@ -1036,5 +1036,6 @@ func (c *ChainConfig) SetLyra2NonceTransition(n *uint64) error {
 }
 
 func (c *ChainConfig) String() string {
-	return spew.Sdump(c)
+	j, _ := json.MarshalIndent(c, "", "    ")
+	return "Multigeth Config: " + string(j)
 }

@@ -70,9 +70,8 @@ type StateDiffNonce struct {
 }
 
 type StateDiffStorage struct {
-	changed bool        `json:"-"`
-	From    common.Hash `json:"from"`
-	To      common.Hash `json:"to"`
+	From common.Hash `json:"from"`
+	To   common.Hash `json:"to"`
 }
 
 type stateDiffTracer struct {
@@ -87,6 +86,10 @@ type stateDiffTracer struct {
 	interrupt          uint32 // Atomic flag to signal execution interruption
 	reason             error  // Textual reason for the interruption
 }
+
+func (t *stateDiffTracer) CaptureTxStart(gasLimit uint64) {}
+
+func (t *stateDiffTracer) CaptureTxEnd(restGas uint64) {}
 
 func newStateDiffTracer(ctx *tracers.Context) tracers.Tracer {
 	// First callframe contains tx context info

@@ -36,12 +36,15 @@ import (
 	"github.com/ethereum/go-ethereum/trie"
 )
 
+//go:generate go run github.com/fjl/gencodec -type Genesis -field-override genesisSpecMarshaling -out gen_genesis.go
+//go:generate go run github.com/fjl/gencodec -type GenesisAccount -field-override genesisAccountMarshaling -out gen_genesis_account.go
+
 // SetupGenesisBlock wraps SetupGenesisBlockWithOverride, always using a nil value for the override.
 func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
 	return SetupGenesisBlockWithOverride(db, genesis, nil, nil)
 }
 
-func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, overrideMystique, overrideTerminalTotalDifficulty *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, overrideGrayGlacier, overrideTerminalTotalDifficulty *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
@@ -54,25 +57,6 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			genesis = params.DefaultGenesisBlock()
 		} else {
 			log.Info("Writing custom genesis block")
-		}
-
-		if overrideMystique != nil {
-			n := overrideMystique.Uint64()
-			if err := genesis.SetEIP1559Transition(&n); err != nil {
-				return genesis, stored, err
-			}
-			if err := genesis.SetEIP3198Transition(&n); err != nil {
-				return genesis, stored, err
-			}
-			if err := genesis.SetEIP3529Transition(&n); err != nil {
-				return genesis, stored, err
-			}
-			if err := genesis.SetEIP3541Transition(&n); err != nil {
-				return genesis, stored, err
-			}
-			if err := genesis.SetEthashEIP3554Transition(&n); err != nil {
-				return genesis, stored, err
-			}
 		}
 
 		block, err := CommitGenesis(genesis, db)
@@ -109,34 +93,13 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	}
 	// Get the existing chain configuration.
 	newcfg := configOrDefault(genesis, stored)
-
+	if overrideGrayGlacier != nil {
+		n := overrideGrayGlacier.Uint64()
+		newcfg.SetEthashEIP5133Transition(&n)
+	}
 	if overrideTerminalTotalDifficulty != nil {
 		newcfg.SetEthashTerminalTotalDifficulty(overrideTerminalTotalDifficulty)
 	}
-
-	if overrideMystique != nil {
-		n := overrideMystique.Uint64()
-		if err := newcfg.SetEIP1559Transition(&n); err != nil {
-			return newcfg, stored, err
-		}
-		if err := newcfg.SetEIP3198Transition(&n); err != nil {
-			return newcfg, stored, err
-		}
-		if err := newcfg.SetEIP3529Transition(&n); err != nil {
-			return newcfg, stored, err
-		}
-		if err := newcfg.SetEIP3541Transition(&n); err != nil {
-			return newcfg, stored, err
-		}
-		if err := newcfg.SetEthashEIP3554Transition(&n); err != nil {
-			return newcfg, stored, err
-		}
-	}
-
-	// TODO (ziogaschr): Add EIPs, after Mystique activations
-	// if overrideArrowGlacier != nil {
-	// 	newcfg.ArrowGlacierBlock = overrideArrowGlacier
-	// }
 
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {
@@ -158,20 +121,20 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	if genesis == nil && !confp.Identical(storedcfg, newcfg, []string{"NetworkID", "ChainID"}) {
 		// TODO/meowsbits/20220405: ethereum code for this scope follows:
 		/*
-			// Special case: if a private network is being used (no genesis and also no
-			// mainnet hash in the database), we must not apply the `configOrDefault`
-			// chain config as that would be AllProtocolChanges (applying any new fork
-			// on top of an existing private network genesis block). In that case, only
-			// apply the overrides.
+				// Special case: if a private network is being used (no genesis and also no
+				// mainnet hash in the database), we must not apply the `configOrDefault`
+				// chain config as that would be AllProtocolChanges (applying any new fork
+				// on top of an existing private network genesis block). In that case, only
+				// apply the overrides.
 
-			if ... :
-			newcfg = storedcfg
-			if overrideArrowGlacier != nil {
-				newcfg.ArrowGlacierBlock = overrideArrowGlacier
-			}
-			if overrideTerminalTotalDifficulty != nil {
-				newcfg.TerminalTotalDifficulty = overrideTerminalTotalDifficulty
-			}
+				if ... :
+				newcfg = storedcfg
+			if overrideGrayGlacier != nil {
+				newcfg.GrayGlacierBlock = overrideGrayGlacier
+				}
+				if overrideTerminalTotalDifficulty != nil {
+					newcfg.TerminalTotalDifficulty = overrideTerminalTotalDifficulty
+				}
 		*/
 		// ... and this is ours:
 		log.Info("Found non-defaulty stored config, using it.")
@@ -354,6 +317,11 @@ func CommitGenesis(g *genesisT.Genesis, db ethdb.Database) (*types.Block, error)
 	if config == nil {
 		config = params.AllEthashProtocolChanges
 	}
+
+	// Upstream omission:
+	// ethereum/go-ethereum does: config.CheckConfigForkOrder()
+	// core-geth does not.
+
 	if config.GetConsensusEngineType().IsClique() && len(block.Extra()) == 0 {
 		return nil, errors.New("can't start clique chain without signers")
 	}

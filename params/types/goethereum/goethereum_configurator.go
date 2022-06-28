@@ -44,6 +44,7 @@ func bigNewU64(i *big.Int) *uint64 {
 	return newU64(i.Uint64())
 }
 
+// nolint: staticcheck
 func setBig(i *big.Int, u *uint64) *big.Int {
 	if u == nil {
 		return nil
@@ -518,12 +519,11 @@ func (c *ChainConfig) SetEIP2718Transition(n *uint64) error {
 }
 
 func (c *ChainConfig) GetEIP4399Transition() *uint64 {
-	return bigNewU64(c.MergeForkBlock)
+	return nil // API removed 1.10.19
 }
 
 func (c *ChainConfig) SetEIP4399Transition(n *uint64) error {
-	c.MergeForkBlock = setBig(c.MergeForkBlock, n)
-	return nil
+	return ctypes.ErrUnsupportedConfigNoop
 }
 
 func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
@@ -869,6 +869,18 @@ func (c *ChainConfig) SetEthashECIP1099Transition(n *uint64) error {
 		return nil
 	}
 	return ctypes.ErrUnsupportedConfigFatal
+}
+
+func (c *ChainConfig) GetEthashEIP5133Transition() *uint64 {
+	return bigNewU64(c.GrayGlacierBlock)
+}
+
+func (c *ChainConfig) SetEthashEIP5133Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	c.GrayGlacierBlock = setBig(c.GrayGlacierBlock, n)
+	return nil
 }
 
 func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {

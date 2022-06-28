@@ -111,11 +111,20 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 	)
 
 	if londonBlock != nil {
-		lb := londonBlock.Uint64()
-		gspec.SetEIP1559Transition(&lb)
-		signer = types.LatestSigner(gspec.Config)
+		londonN := londonBlock.Uint64()
+		config.SetEIP1559Transition(&londonN)
+		config.SetEIP3541Transition(&londonN)
+		config.SetEIP3529Transition(&londonN)
+		config.SetEIP3198Transition(&londonN)
+		config.SetEthashEIP4345Transition(&londonN) // ArrowGlacier
+		config.SetEthashEIP5133Transition(&londonN) // GrayGlacier
 	} else {
-		gspec.Config.SetEIP1559Transition(nil)
+		config.SetEIP1559Transition(nil)
+		config.SetEIP3541Transition(nil)
+		config.SetEIP3529Transition(nil)
+		config.SetEIP3198Transition(nil)
+		config.SetEthashEIP4345Transition(nil) // ArrowGlacier
+		config.SetEthashEIP5133Transition(nil) // GrayGlacier
 	}
 
 	engine := ethash.NewFaker()

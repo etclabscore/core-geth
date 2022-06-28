@@ -151,6 +151,7 @@ func (s *RPCService) Modules() map[string]string {
 	return modules
 }
 
+// nolint:unused
 func (s *RPCService) methods() map[string][]string {
 	s.server.services.mu.Lock()
 	defer s.server.services.mu.Unlock()

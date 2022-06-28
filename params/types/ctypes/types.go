@@ -241,7 +241,7 @@ func MapMeetsSpecification(difficulties Uint64BigMapEncodesHex, rewards Uint64Bi
 		}
 		total.Add(total, d)
 		if total.Cmp(difficultySum) >= 0 {
-			diffN = &s
+			diffN = &s //nolint:gosec,exportloopref
 			break
 		}
 	}

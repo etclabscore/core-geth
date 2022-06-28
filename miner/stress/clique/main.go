@@ -20,7 +20,6 @@ package main
 import (
 	"bytes"
 	"crypto/ecdsa"
-	"io/ioutil"
 	"math/big"
 	"math/rand"
 	"os"
@@ -184,7 +183,7 @@ func makeGenesis(faucets []*ecdsa.PrivateKey, sealers []*ecdsa.PrivateKey) *gene
 
 func makeSealer(genesis *genesisT.Genesis) (*node.Node, *eth.Ethereum, error) {
 	// Define the basic configurations for the Ethereum node
-	datadir, _ := ioutil.TempDir("", "")
+	datadir, _ := os.MkdirTemp("", "")
 
 	config := &node.Config{
 		Name:    "geth",

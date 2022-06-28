@@ -116,7 +116,6 @@ type testWorkerBackend struct {
 	db         ethdb.Database
 	txPool     *core.TxPool
 	chain      *core.BlockChain
-	testTxFeed event.Feed
 	genesis    *genesisT.Genesis
 	uncleBlock *types.Block
 }
@@ -662,7 +661,9 @@ func testGetSealingWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engi
 
 	// This API should work even when the automatic sealing is not enabled
 	for _, c := range cases {
-		block, err := w.getSealingBlock(c.parent, timestamp, c.coinbase, c.random)
+		resChan, errChan, _ := w.getSealingBlock(c.parent, timestamp, c.coinbase, c.random, false)
+		block := <-resChan
+		err := <-errChan
 		if c.expectErr {
 			if err == nil {
 				t.Error("Expect error but get nil")
@@ -678,7 +679,9 @@ func testGetSealingWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engi
 	// This API should work even when the automatic sealing is enabled
 	w.start()
 	for _, c := range cases {
-		block, err := w.getSealingBlock(c.parent, timestamp, c.coinbase, c.random)
+		resChan, errChan, _ := w.getSealingBlock(c.parent, timestamp, c.coinbase, c.random, false)
+		block := <-resChan
+		err := <-errChan
 		if c.expectErr {
 			if err == nil {
 				t.Error("Expect error but get nil")

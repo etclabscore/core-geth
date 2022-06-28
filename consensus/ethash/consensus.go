@@ -397,6 +397,16 @@ func CalcDifficulty(config ctypes.ChainConfigurator, time uint64, parent *types.
 		}
 		exPeriodRef.Set(fakeBlockNumber)
 
+	} else if config.IsEnabled(config.GetEthashEIP5133Transition, next) {
+		// calcDifficultyEip4345 is the difficulty adjustment algorithm as specified by EIP 4345.
+		// It offsets the bomb a total of 10.7M blocks.
+		fakeBlockNumber := new(big.Int)
+		delayWithOffset := new(big.Int).Sub(vars.EIP5133DifficultyBombDelay, common.Big1)
+		if parent.Number.Cmp(delayWithOffset) >= 0 {
+			fakeBlockNumber = fakeBlockNumber.Sub(parent.Number, delayWithOffset)
+		}
+		exPeriodRef.Set(fakeBlockNumber)
+
 	} else if config.IsEnabled(config.GetEthashEIP4345Transition, next) {
 		// calcDifficultyEip4345 is the difficulty adjustment algorithm as specified by EIP 4345.
 		// It offsets the bomb a total of 10.7M blocks.
@@ -486,8 +496,8 @@ var (
 )
 
 // Exported for fuzzing
-var FrontierDifficultyCalulator = CalcDifficultyFrontierU256
-var HomesteadDifficultyCalulator = CalcDifficultyHomesteadU256
+var FrontierDifficultyCalculator = CalcDifficultyFrontierU256
+var HomesteadDifficultyCalculator = CalcDifficultyHomesteadU256
 var DynamicDifficultyCalculator = MakeDifficultyCalculatorU256
 
 // verifySeal checks whether a block satisfies the PoW difficulty requirements,

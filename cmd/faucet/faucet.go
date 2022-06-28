@@ -17,17 +17,16 @@
 // faucet is an Ether faucet backed by a light client.
 package main
 
-//go:generate go-bindata -nometadata -o website.go faucet.html
-//go:generate gofmt -w -s website.go
-
 import (
 	"bytes"
 	"context"
+	_ "embed"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"math"
 	"math/big"
@@ -60,7 +59,6 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/nat"
 	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/gorilla/websocket"
 )
@@ -124,6 +122,9 @@ var (
 	gitCommit = "" // Git SHA1 commit hash of the release (set via linker flags)
 	gitDate   = "" // Git commit date YYYYMMDD of the release (set via linker flags)
 )
+
+//go:embed faucet.html
+var websiteTmpl string
 
 func faucetDirFromChainIndicators(chainID uint64, genesisHash common.Hash) string {
 	datadir := filepath.Join(os.Getenv("HOME"), ".faucet")
@@ -333,13 +334,8 @@ func main() {
 			periods[i] = strings.TrimSuffix(periods[i], "s")
 		}
 	}
-	// Load up and render the faucet website
-	tmpl, err := Asset("faucet.html")
-	if err != nil {
-		log.Crit("Failed to load the faucet template", "err", err)
-	}
 	website := new(bytes.Buffer)
-	err = template.Must(template.New("").Parse(string(tmpl))).Execute(website, map[string]interface{}{
+	err := template.Must(template.New("").Parse(websiteTmpl)).Execute(website, map[string]interface{}{
 		"Network":   *netnameFlag,
 		"Amounts":   amounts,
 		"Periods":   periods,
@@ -354,7 +350,6 @@ func main() {
 		log.Info("Using chain/net config", "network id", *netFlag, "bootnodes", *bootFlag, "chain config", fmt.Sprintf("%v", genesis.Config))
 
 		// Convert the bootnodes to internal enode representations
-		var enodes []*enode.Node
 		for _, boot := range strings.Split(*bootFlag, ",") {
 			if url, err := enode.Parse(enode.ValidSchemes, boot); err == nil {
 				enodes = append(enodes, url)
@@ -371,7 +366,7 @@ func main() {
 	}
 
 	// Load up the account key and decrypt its password
-	if blob, err = ioutil.ReadFile(*accPassFlag); err != nil {
+	if blob, err = os.ReadFile(*accPassFlag); err != nil {
 		log.Crit("Failed to read account password contents", "file", *accPassFlag, "err", err)
 	}
 	pass := strings.TrimSuffix(string(blob), "\n")
@@ -460,10 +455,9 @@ type request struct {
 
 // faucet represents a crypto faucet backed by an Ethereum light client.
 type faucet struct {
-	config ctypes.ChainConfigurator // Chain configurations for signing
-	stack  *node.Node               // Ethereum protocol stack
-	client *ethclient.Client        // Client connection to the Ethereum chain
-	index  []byte                   // Index page to serve up on the web
+	stack  *node.Node        // Ethereum protocol stack
+	client *ethclient.Client // Client connection to the Ethereum chain
+	index  []byte            // Index page to serve up on the web
 
 	keystore *keystore.KeyStore // Keystore containing the single signer
 	account  accounts.Account   // Account funding user faucet requests
@@ -1113,7 +1107,7 @@ func authTwitter(url string, tokenV1, tokenV2 string) (string, string, string, c
 	}
 	username := parts[len(parts)-3]
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return "", "", "", common.Address{}, err
 	}
@@ -1239,7 +1233,7 @@ func authFacebook(url string) (string, string, common.Address, error) {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return "", "", common.Address{}, err
 	}

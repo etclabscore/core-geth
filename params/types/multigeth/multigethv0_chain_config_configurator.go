@@ -1,6 +1,7 @@
 package multigeth
 
 import (
+	"encoding/json"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -36,6 +37,7 @@ func bigNewU64(i *big.Int) *uint64 {
 // 	return bigNewU64(i)
 // }
 
+// nolint: staticcheck
 func setBig(i *big.Int, u *uint64) *big.Int {
 	if u == nil {
 		return nil
@@ -952,6 +954,18 @@ func (c *ChainConfig) SetEthashECIP1099Transition(n *uint64) error {
 	return ctypes.ErrUnsupportedConfigFatal
 }
 
+func (c *ChainConfig) GetEthashEIP5133Transition() *uint64 {
+	return bigNewU64(c.GrayGlacierBlock)
+}
+
+func (c *ChainConfig) SetEthashEIP5133Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	c.GrayGlacierBlock = setBig(c.GrayGlacierBlock, n)
+	return nil
+}
+
 func (c *ChainConfig) GetEthashDifficultyBombDelaySchedule() ctypes.Uint64BigMapEncodesHex {
 	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
 		return nil
@@ -1019,4 +1033,9 @@ func (c *ChainConfig) SetLyra2NonceTransition(n *uint64) error {
 	c.Lyra2NonceTransitionBlock = setBig(c.Lyra2NonceTransitionBlock, n)
 
 	return nil
+}
+
+func (c *ChainConfig) String() string {
+	j, _ := json.MarshalIndent(c, "", "    ")
+	return "Multigeth Config: " + string(j)
 }

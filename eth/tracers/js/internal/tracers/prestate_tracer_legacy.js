@@ -18,8 +18,7 @@
 // the transaction from a custom assembled genesis block.
 {
 	// prestate is the genesisT that we're building.
-	prestate: {},
-	hasStepInited: false,
+	prestate: null,
 
 	// lookupAccount injects the specified account into the prestate object.
 	lookupAccount: function(addr, db){
@@ -78,12 +77,13 @@
 
 	// step is invoked for every opcode that the VM executes.
 	step: function(log, db) {
-		if (!this.hasStepInited) {
-			this.hasStepInited = true;
-
+		// Add the current account if we just started tracing
+		if (this.prestate === null){
+			this.prestate = {};
+			// Balance will potentially be wrong here, since this will include the value
+			// sent along with the message. We fix that in 'result()'.
 			this.lookupAccount(log.contract.getAddress(), db);
 		}
-
 		// Whenever new state is accessed, add it to the prestate
 		switch (log.op.toString()) {
 			case "EXTCODECOPY": case "EXTCODESIZE": case "EXTCODEHASH": case "BALANCE":

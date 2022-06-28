@@ -70,6 +70,7 @@ func (bc *BlockChain) IsArtificialFinalityEnabled() bool {
 
 // getTDRatio is a helper function returning the total difficulty ratio of
 // proposed over current chain segments.
+// nolint:unused
 func (bc *BlockChain) getTDRatio(commonAncestor, current, proposed *types.Header) float64 {
 	// Get the total difficulty ratio of the proposed chain segment over the existing one.
 	commonAncestorTD := bc.GetTd(commonAncestor.Hash(), commonAncestor.Number.Uint64())
@@ -235,6 +236,7 @@ ecbp1100AGExpB is an exponential function with x as a base (and rationalized exp
 OPTION 2: Slightly slower takeoff, steeper eventual ascent
 g(x)=x^(x*0.00002)
 */
+//nolint:deadcode,unused
 func ecbp1100AGExpB(x float64) (antiGravity float64) {
 	return math.Pow(x, x*0.00002)
 }
@@ -251,6 +253,7 @@ This was (one of?) Vitalik's "original" specs:
 OPTION 1 (Original ESS)
 f(x)=1.0001^(x)
 */
+//nolint:unused
 func ecbp1100AGExpA(x float64) (antiGravity float64) {
 	return math.Pow(1.0001, x)
 }

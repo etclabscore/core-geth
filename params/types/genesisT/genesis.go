@@ -771,6 +771,14 @@ func (g *Genesis) SetEthashEIP4345Transition(n *uint64) error {
 	return g.Config.SetEthashEIP4345Transition(n)
 }
 
+func (g *Genesis) GetEthashEIP5133Transition() *uint64 {
+	return g.Config.GetEthashEIP5133Transition()
+}
+
+func (g *Genesis) SetEthashEIP5133Transition(n *uint64) error {
+	return g.Config.SetEthashEIP5133Transition(n)
+}
+
 func (g *Genesis) GetEthashECIP1010PauseTransition() *uint64 {
 	return g.Config.GetEthashECIP1010PauseTransition()
 }
@@ -865,4 +873,9 @@ func (g *Genesis) GetLyra2NonceTransition() *uint64 {
 
 func (g *Genesis) SetLyra2NonceTransition(n *uint64) error {
 	return g.Config.SetLyra2NonceTransition(n)
+}
+
+func (g *Genesis) String() string {
+	j, _ := json.MarshalIndent(g, "", "    ")
+	return "Genesis: " + string(j)
 }

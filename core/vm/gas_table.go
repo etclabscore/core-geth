@@ -283,27 +283,8 @@ var (
 	gasMLoad   = pureMemoryGascost
 	gasMStore8 = pureMemoryGascost
 	gasMStore  = pureMemoryGascost
+	gasCreate  = pureMemoryGascost
 )
-
-func gasCreate(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
-	var overflow bool
-	gas, err := memoryGasCost(mem, memorySize)
-	if err != nil {
-		return 0, err
-	}
-	remainingGasTemp, overflow := math.SafeSub(contract.Gas, gas)
-	if overflow {
-		return 0, ErrGasUintOverflow
-	}
-	evm.CallGasTemp, err = createGasEip150(evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP150Transition, evm.Context.BlockNumber), remainingGasTemp)
-	if err != nil {
-		return 0, err
-	}
-	if gas, overflow = math.SafeAdd(gas, evm.CallGasTemp); overflow {
-		return 0, ErrGasUintOverflow
-	}
-	return gas, nil
-}
 
 func gasCreate2(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
 	gas, err := memoryGasCost(mem, memorySize)
@@ -318,17 +299,6 @@ func gasCreate2(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memoryS
 		return 0, ErrGasUintOverflow
 	}
 	if gas, overflow = math.SafeAdd(gas, wordGas); overflow {
-		return 0, ErrGasUintOverflow
-	}
-	remainingGasTemp, overflow := math.SafeSub(contract.Gas, gas)
-	if overflow {
-		return 0, ErrGasUintOverflow
-	}
-	evm.CallGasTemp, err = createGasEip150(evm.ChainConfig().IsEnabled(evm.chainConfig.GetEIP150Transition, evm.Context.BlockNumber), remainingGasTemp)
-	if err != nil {
-		return 0, err
-	}
-	if gas, overflow = math.SafeAdd(gas, evm.CallGasTemp); overflow {
 		return 0, ErrGasUintOverflow
 	}
 	return gas, nil

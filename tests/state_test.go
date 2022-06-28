@@ -212,6 +212,7 @@ func runBenchmarkFile(b *testing.B, path string) {
 		return
 	}
 	for _, t := range m {
+		t := t
 		runBenchmark(b, &t)
 	}
 }

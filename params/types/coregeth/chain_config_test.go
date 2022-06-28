@@ -8,13 +8,14 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
+// nolint:unused
 var testConfig = &CoreGethChainConfig{
 	NetworkID:  1,
 	Ethash:     new(ctypes.EthashConfig),
 	ChainID:    big.NewInt(61),
 	EIP2FBlock: big.NewInt(1150000),
 	EIP7FBlock: big.NewInt(1150000),
-	//DAOForkBlock:        big.NewInt(1920000),
+	// DAOForkBlock:        big.NewInt(1920000),
 	EIP150Block:        big.NewInt(2500000),
 	EIP155Block:        big.NewInt(3000000),
 	EIP160FBlock:       big.NewInt(3000000),

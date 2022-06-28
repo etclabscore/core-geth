@@ -104,7 +104,7 @@ func TestDifficultyCalculators(t *testing.T) {
 	for i := 0; i < 5000; i++ {
 		// 1 to 300 seconds diff
 		var timeDelta = uint64(1 + rand.Uint32()%3000)
-		diffBig := big.NewInt(0).SetBytes(randSlice(2, 10))
+		diffBig := new(big.Int).SetBytes(randSlice(2, 10))
 		if diffBig.Cmp(vars.MinimumDifficulty) < 0 {
 			diffBig.Set(vars.MinimumDifficulty)
 		}
@@ -122,8 +122,8 @@ func TestDifficultyCalculators(t *testing.T) {
 			bigFn  func(time uint64, parent *types.Header) *big.Int
 			u256Fn func(time uint64, parent *types.Header) *big.Int
 		}{
-			{FrontierDifficultyCalulator, CalcDifficultyFrontierU256},
-			{HomesteadDifficultyCalulator, CalcDifficultyHomesteadU256},
+			{FrontierDifficultyCalculator, CalcDifficultyFrontierU256},
+			{HomesteadDifficultyCalculator, CalcDifficultyHomesteadU256},
 			{DynamicDifficultyCalculator(bombDelay), MakeDifficultyCalculatorU256(bombDelay)},
 		} {
 			time := header.Time + timeDelta

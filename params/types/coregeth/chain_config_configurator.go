@@ -47,6 +47,7 @@ func bigNewU64(i *big.Int) *uint64 {
 	return newU64(i.Uint64())
 }
 
+// nolint: staticcheck
 func setBig(i *big.Int, u *uint64) *big.Int {
 	if u == nil {
 		return nil
@@ -985,6 +986,21 @@ func (c *CoreGethChainConfig) SetEthashECIP1099Transition(n *uint64) error {
 		return ctypes.ErrUnsupportedConfigFatal
 	}
 	c.ECIP1099FBlock = setBig(c.ECIP1099FBlock, n)
+	return nil
+}
+
+func (c *CoreGethChainConfig) GetEthashEIP5133Transition() *uint64 {
+	if c.GetConsensusEngineType() != ctypes.ConsensusEngineT_Ethash {
+		return nil
+	}
+	return bigNewU64(c.EIP5133FBlock)
+}
+
+func (c *CoreGethChainConfig) SetEthashEIP5133Transition(n *uint64) error {
+	if c.Ethash == nil {
+		return ctypes.ErrUnsupportedConfigFatal
+	}
+	c.EIP5133FBlock = setBig(c.EIP5133FBlock, n)
 	return nil
 }
 

@@ -18,8 +18,8 @@ package tracetest
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"math/big"
+	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -137,7 +137,7 @@ func TestCallTracerNative(t *testing.T) {
 }
 
 func testCallTracer(tracerName string, dirPath string, t *testing.T) {
-	files, err := ioutil.ReadDir(filepath.Join("testdata", dirPath))
+	files, err := os.ReadDir(filepath.Join("testdata", dirPath))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}
@@ -154,7 +154,7 @@ func testCallTracer(tracerName string, dirPath string, t *testing.T) {
 				tx   = new(types.Transaction)
 			)
 			// Call tracer test found, read if from disk
-			if blob, err := ioutil.ReadFile(filepath.Join("testdata", dirPath, file.Name())); err != nil {
+			if blob, err := os.ReadFile(filepath.Join("testdata", dirPath, file.Name())); err != nil {
 				t.Fatalf("failed to read testcase: %v", err)
 			} else if err := json.Unmarshal(blob, test); err != nil {
 				t.Fatalf("failed to parse testcase: %v", err)
@@ -252,7 +252,7 @@ func camel(str string) string {
 	return strings.Join(pieces, "")
 }
 func BenchmarkTracers(b *testing.B) {
-	files, err := ioutil.ReadDir(filepath.Join("testdata", "call_tracer"))
+	files, err := os.ReadDir(filepath.Join("testdata", "call_tracer"))
 	if err != nil {
 		b.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}
@@ -262,7 +262,7 @@ func BenchmarkTracers(b *testing.B) {
 		}
 		file := file // capture range variable
 		b.Run(camel(strings.TrimSuffix(file.Name(), ".json")), func(b *testing.B) {
-			blob, err := ioutil.ReadFile(filepath.Join("testdata", "call_tracer", file.Name()))
+			blob, err := os.ReadFile(filepath.Join("testdata", "call_tracer", file.Name()))
 			if err != nil {
 				b.Fatalf("failed to read testcase: %v", err)
 			}
@@ -270,7 +270,7 @@ func BenchmarkTracers(b *testing.B) {
 			if err := json.Unmarshal(blob, test); err != nil {
 				b.Fatalf("failed to parse testcase: %v", err)
 			}
-			benchTracer("callTracerNative", test, b)
+			benchTracer("callTracer", test, b)
 		})
 	}
 }

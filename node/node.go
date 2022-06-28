@@ -20,6 +20,7 @@ import (
 	crand "crypto/rand"
 	"errors"
 	"fmt"
+	"hash/crc32"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -386,15 +387,15 @@ func (n *Node) setupOpenRPC() error {
 		n.httpOpenRPC.WithMeta(metaRegistererForURL("http://"))
 	}
 	if n.httpAuth.rpcAllowed() {
-		n.httpOpenRPC = newOpenRPCDocument()
+		n.httpAuthOpenRPC = newOpenRPCDocument()
 		h := n.httpAuth.httpHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.HTTPModules, false)
-		registerOpenRPCAPIs(n.httpOpenRPC, registeredAPIs)
-		n.httpOpenRPC.RegisterListener(n.httpAuth.listener)
-		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpOpenRPC}); err != nil {
+		registerOpenRPCAPIs(n.httpAuthOpenRPC, registeredAPIs)
+		n.httpAuthOpenRPC.RegisterListener(n.httpAuth.listener)
+		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.httpAuthOpenRPC}); err != nil {
 			return err
 		}
-		n.httpOpenRPC.WithMeta(metaRegistererForURL("http://"))
+		n.httpAuthOpenRPC.WithMeta(metaRegistererForURL("http://"))
 	}
 	wsServer := n.wsServerForPort(n.config.WSPort, false)
 	if wsServer.wsAllowed() {
@@ -410,15 +411,15 @@ func (n *Node) setupOpenRPC() error {
 	}
 	wsAuthServer := n.wsServerForPort(n.config.WSPort, true)
 	if wsAuthServer.wsAllowed() {
-		n.wsOpenRPC = newOpenRPCDocument()
+		n.wsAuthOpenRPC = newOpenRPCDocument()
 		h := wsAuthServer.wsHandler.Load().(*rpcHandler)
 		registeredAPIs := GetAPIsByWhitelist(n.rpcAPIs, n.config.WSModules, false)
-		registerOpenRPCAPIs(n.wsOpenRPC, registeredAPIs)
-		n.wsOpenRPC.RegisterListener(wsAuthServer.listener)
-		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsOpenRPC}); err != nil {
+		registerOpenRPCAPIs(n.wsAuthOpenRPC, registeredAPIs)
+		n.wsAuthOpenRPC.RegisterListener(wsAuthServer.listener)
+		if err := h.server.RegisterName("rpc", &RPCDiscoveryService{d: n.wsAuthOpenRPC}); err != nil {
 			return err
 		}
-		n.wsOpenRPC.WithMeta(metaRegistererForURL("ws://"))
+		n.wsAuthOpenRPC.WithMeta(metaRegistererForURL("ws://"))
 	}
 	return nil
 }
@@ -433,10 +434,10 @@ func (n *Node) obtainJWTSecret(cliParam string) ([]byte, error) {
 		fileName = n.ResolvePath(datadirJWTKey)
 	}
 	// try reading from file
-	log.Debug("Reading JWT secret", "path", fileName)
 	if data, err := os.ReadFile(fileName); err == nil {
 		jwtSecret := common.FromHex(strings.TrimSpace(string(data)))
 		if len(jwtSecret) == 32 {
+			log.Info("Loaded JWT secret file", "path", fileName, "crc32", fmt.Sprintf("%#x", crc32.ChecksumIEEE(jwtSecret)))
 			return jwtSecret, nil
 		}
 		log.Error("Invalid JWT secret", "path", fileName, "length", len(jwtSecret))
@@ -776,19 +777,6 @@ func (n *Node) OpenDatabase(name string, cache, handles int, namespace string, r
 		db = n.wrapDatabase(db)
 	}
 	return db, err
-}
-
-// OpenDatabaseWithFreezerRemote opens an existing database with the given name (or
-// creates one if no previous can be found) from within the node's data directory,
-// also attaching a chain freezer to it that moves ancient chain data from the
-// database to immutable append-only files. If the node is an ephemeral one, a
-// memory database is returned.
-func (n *Node) OpenDatabaseWithFreezerRemote(name string, cache, handles int, freezerURL string, readonly bool) (ethdb.Database, error) {
-	if n.config.DataDir == "" {
-		return rawdb.NewMemoryDatabase(), nil
-	}
-	root := n.config.ResolvePath(name)
-	return rawdb.NewLevelDBDatabaseWithFreezerRemote(root, cache, handles, freezerURL, readonly)
 }
 
 // OpenDatabaseWithFreezer opens an existing database with the given name (or

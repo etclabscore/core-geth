@@ -288,15 +288,42 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	if err := st.preCheck(); err != nil {
 		return nil, err
 	}
-	msg := st.msg
-	sender := vm.AccountRef(msg.From())
-	eip2f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2Transition, st.evm.Context.BlockNumber)
-	eip2028f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2028Transition, st.evm.Context.BlockNumber)
-	eip3529f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3529Transition, st.evm.Context.BlockNumber)
-	eip1559f := st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP1559Transition, st.evm.Context.BlockNumber)
-	contractCreation := msg.To() == nil
 
-	// Pay intrinsic gas
+	if st.evm.Config.Debug {
+		st.evm.Config.Tracer.CaptureTxStart(st.initialGas)
+		defer func() {
+			st.evm.Config.Tracer.CaptureTxEnd(st.gas)
+		}()
+	}
+
+	var (
+		msg              = st.msg
+		sender           = vm.AccountRef(msg.From())
+		contractCreation = msg.To() == nil
+
+		// EIP-2: Homestead
+		eip2f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2Transition, st.evm.Context.BlockNumber)
+
+		// Istanbul
+		// https://eips.ethereum.org/EIPS/eip-1679
+		// EIP-2028: Calldata gas cost reduction
+		eip2028f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2028Transition, st.evm.Context.BlockNumber)
+
+		// Berlin
+		// https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/berlin.md
+		// EIP-2930: Optional access lists
+		eip2930f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2930Transition, st.evm.Context.BlockNumber)
+
+		// London
+		// https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/london.md
+		// EIP-1559: Fee market change: burn fee and tips
+		eip1559f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP1559Transition, st.evm.Context.BlockNumber)
+
+		// EIP-3529: Reduction in refunds
+		eip3529f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3529Transition, st.evm.Context.BlockNumber)
+	)
+
+	// Check clauses 4-5, subtract intrinsic gas if everything is correct
 	gas, err := IntrinsicGas(st.data, st.msg.AccessList(), contractCreation, eip2f, eip2028f)
 	if err != nil {
 		return nil, err
@@ -312,8 +339,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	}
 
 	// Set up the initial access list.
-	// meowsbits/202203 go-ethereum has: if rules := st.evm.ChainConfig().Rules(st.evm.Context.BlockNumber, st.evm.Context.Random != nil); rules.IsBerlin {
-	if st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP2929Transition, st.evm.Context.BlockNumber) {
+	if eip2930f {
 		st.state.PrepareAccessList(msg.From(), msg.To(), st.evm.ActivePrecompiles(), msg.AccessList())
 	}
 	var (

@@ -478,7 +478,7 @@ func opDifficulty(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) 
 }
 
 func opRandom(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]byte, error) {
-	v := new(uint256.Int).SetBytes((interpreter.evm.Context.Random.Bytes()))
+	v := new(uint256.Int).SetBytes(interpreter.evm.Context.Random.Bytes())
 	scope.Stack.push(v)
 	return nil, nil
 }
@@ -585,12 +585,17 @@ func opCreate(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]b
 		value        = scope.Stack.pop()
 		offset, size = scope.Stack.pop(), scope.Stack.pop()
 		input        = scope.Memory.GetCopy(int64(offset.Uint64()), int64(size.Uint64()))
-		gas          = interpreter.evm.CallGasTemp
+		gas          = scope.Contract.Gas
 	)
+	if interpreter.evm.ChainConfig().IsEnabled(interpreter.evm.chainConfig.GetEIP150Transition, interpreter.evm.Context.BlockNumber) {
+		gas -= gas / 64
+	}
 	// reuse size int for stackvalue
 	stackvalue := size
 
-	//TODO: use uint256.Int instead of converting with toBig()
+	scope.Contract.UseGas(gas)
+
+	// TODO: use uint256.Int instead of converting with toBig()
 	var bigVal = big0
 	if !value.IsZero() {
 		bigVal = value.ToBig()
@@ -630,12 +635,17 @@ func opCreate2(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]
 		offset, size = scope.Stack.pop(), scope.Stack.pop()
 		salt         = scope.Stack.pop()
 		input        = scope.Memory.GetCopy(int64(offset.Uint64()), int64(size.Uint64()))
-		gas          = interpreter.evm.CallGasTemp
+		gas          = scope.Contract.Gas
 	)
 
+	// Apply EIP150
+	if interpreter.evm.ChainConfig().IsEnabled(interpreter.evm.chainConfig.GetEIP150Transition, interpreter.evm.Context.BlockNumber) {
+		gas -= gas / 64
+	}
+	scope.Contract.UseGas(gas)
 	// reuse size int for stackvalue
 	stackvalue := size
-	//TODO: use uint256.Int instead of converting with toBig()
+	// TODO: use uint256.Int instead of converting with toBig()
 	bigEndowment := big0
 	if !endowment.IsZero() {
 		bigEndowment = endowment.ToBig()
@@ -676,7 +686,7 @@ func opCall(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]byt
 		return nil, ErrWriteProtection
 	}
 	var bigVal = big0
-	//TODO: use uint256.Int instead of converting with toBig()
+	// TODO: use uint256.Int instead of converting with toBig()
 	// By using big0 here, we save an alloc for the most common case (non-ether-transferring contract calls),
 	// but it would make more sense to extend the usage of uint256.Int
 	if !value.IsZero() {
@@ -715,7 +725,7 @@ func opCallCode(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([
 	// Get arguments from the memory.
 	args := scope.Memory.GetPtr(int64(inOffset.Uint64()), int64(inSize.Uint64()))
 
-	//TODO: use uint256.Int instead of converting with toBig()
+	// TODO: use uint256.Int instead of converting with toBig()
 	var bigVal = big0
 	if !value.IsZero() {
 		gas += vars.CallStipend

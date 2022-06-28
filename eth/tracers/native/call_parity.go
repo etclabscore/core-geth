@@ -98,6 +98,10 @@ type callParityTracer struct {
 	activePrecompiles []common.Address // Updated on CaptureStart based on given rules
 }
 
+func (t *callParityTracer) CaptureTxStart(gasLimit uint64) {}
+
+func (t *callParityTracer) CaptureTxEnd(restGas uint64) {}
+
 // NewCallParityTracer returns a native go tracer which tracks
 // call frames of a tx, and implements vm.EVMLogger.
 func NewCallParityTracer(ctx *tracers.Context) tracers.Tracer {

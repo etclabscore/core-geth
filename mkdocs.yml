@@ -37,6 +37,8 @@ theme:
     - navigation.expand
     - navigation.sections
     # - navigation.instant
+    - navigation.tracking
+    - navigation.top
 
 extra_css:
   - assets/css/extra.css

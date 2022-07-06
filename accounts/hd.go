@@ -26,7 +26,7 @@ import (
 )
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-var BIP0044CoinType = BIP0044CoinTypeEther
+var BIP0044CoinType = BIP0044CoinTypeEtherClassic
 var BIP0044CoinTypeTestnet uint32 = 0x1
 var BIP0044CoinTypeEther uint32 = 0x3c
 var BIP0044CoinTypeEtherClassic uint32 = 0x3d

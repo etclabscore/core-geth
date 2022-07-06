@@ -26,33 +26,42 @@ import (
 )
 
 // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-var BIP0044CoinType = BIP0044CoinTypeEtherClassic
-var BIP0044CoinTypeTestnet uint32 = 0x1
-var BIP0044CoinTypeEther uint32 = 0x3c
-var BIP0044CoinTypeEtherClassic uint32 = 0x3d
+const BIP0044CoinTypeTestnet uint32 = 0x1
+const BIP0044CoinTypeEther uint32 = 0x3c
+const BIP0044CoinTypeEtherClassic uint32 = 0x3d
 
-func mustStr(i uint32) string {
-	return fmt.Sprintf("%d", i)
-}
-
-func mustHex(i uint32) string {
-	return fmt.Sprintf("0x%x", i)
-}
+// BIP0044CoinType is the global default value for the chain configured hardware derivation path.
+// Its value is set by an init() function and can be modified, along with its dependent global variables
+// to change the default coin type by using the function SetCoinTypeConfiguration.
+var BIP0044CoinType uint32
 
 // DefaultRootDerivationPath is the root path to which custom derivation endpoints
 // are appended. As such, the first account will be at m/44'/61'/0'/0, the second
 // at m/44'/61'/0'/1, etc.
-var DefaultRootDerivationPath = DerivationPath{0x80000000 + 44, 0x80000000 + BIP0044CoinType, 0x80000000 + 0, 0}
+var DefaultRootDerivationPath DerivationPath
 
 // DefaultBaseDerivationPath is the base path from which custom derivation endpoints
 // are incremented. As such, the first account will be at m/44'/61'/0'/0/0, the second
 // at m/44'/61'/0'/0/1, etc.
-var DefaultBaseDerivationPath = DerivationPath{0x80000000 + 44, 0x80000000 + BIP0044CoinType, 0x80000000 + 0, 0, 0}
+var DefaultBaseDerivationPath DerivationPath
 
 // LegacyLedgerBaseDerivationPath is the legacy base path from which custom derivation
 // endpoints are incremented. As such, the first account will be at m/44'/61'/0'/0, the
 // second at m/44'/61'/0'/1, etc.
-var LegacyLedgerBaseDerivationPath = DerivationPath{0x80000000 + 44, 0x80000000 + BIP0044CoinType, 0x80000000 + 0, 0}
+var LegacyLedgerBaseDerivationPath DerivationPath
+
+// SetCoinTypeConfiguration sets the global coin type configuration to the given value.
+func SetCoinTypeConfiguration(coinType uint32) {
+	BIP0044CoinType = coinType
+	DefaultRootDerivationPath = DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0}
+	DefaultBaseDerivationPath = DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0, 0}
+	LegacyLedgerBaseDerivationPath = DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0}
+}
+
+// init configures the global coin type and root derivation path for Ethereum mainnet.
+func init() {
+	SetCoinTypeConfiguration(BIP0044CoinTypeEther)
+}
 
 // DerivationPath represents the computer friendly version of a hierarchical
 // deterministic wallet account derivation path.

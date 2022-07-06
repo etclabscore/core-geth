@@ -25,57 +25,103 @@ import (
 // Tests that HD derivation paths can be correctly parsed into our internal binary
 // representation.
 func TestHDPathParsing(t *testing.T) {
-	tests := []struct {
-		input  string
-		output DerivationPath
-	}{
-		// Plain absolute derivation paths
-		{"m/44'/61'/0'/0", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0}},
-		{"m/44'/61'/0'/128", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 128}},
-		{"m/44'/61'/0'/0'", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0x80000000 + 0}},
-		{"m/44'/61'/0'/128'", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0x80000000 + 128}},
-		{"m/2147483692/2147483709/2147483648/0", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0}},
-		{"m/2147483692/2147483709/2147483648/2147483648", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0x80000000 + 0}},
+	t.Run("testParseDerivationPath_Default", testHDPathParsing(BIP0044CoinType))
+	t.Run("testParseDerivationPath_Ether", testHDPathParsing(BIP0044CoinTypeEther))
+	t.Run("testParseDerivationPath_EtherClassic", testHDPathParsing(BIP0044CoinTypeEtherClassic))
+	t.Run("testParseDerivationPath_Testnet", testHDPathParsing(BIP0044CoinTypeTestnet))
+}
 
-		// Plain relative derivation paths
-		{"0", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0, 0}},
-		{"128", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0, 128}},
-		{"0'", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0, 0x80000000 + 0}},
-		{"128'", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0, 0x80000000 + 128}},
-		{"2147483648", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0, 0x80000000 + 0}},
+func testHDPathParsing(coinType uint32) func(t *testing.T) {
+	return func(t *testing.T) {
 
-		// Hexadecimal absolute derivation paths
-		{"m/0x2C'/0x3d'/0x00'/0x00", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0}},
-		{"m/0x2C'/0x3d'/0x00'/0x80", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 128}},
-		{"m/0x2C'/0x3d'/0x00'/0x00'", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0x80000000 + 0}},
-		{"m/0x2C'/0x3d'/0x00'/0x80'", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0x80000000 + 128}},
-		{"m/0x8000002C/0x8000003d/0x80000000/0x00", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0}},
-		{"m/0x8000002C/0x8000003d/0x80000000/0x80000000", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0x80000000 + 0}},
+		// Set the coin type to the one we're testing.
+		// This assigns the default derivations and iterator to the coin type.
+		SetCoinTypeConfiguration(coinType)
 
-		// Hexadecimal relative derivation paths
-		{"0x00", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0, 0}},
-		{"0x80", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0, 128}},
-		{"0x00'", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0, 0x80000000 + 0}},
-		{"0x80'", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0, 0x80000000 + 128}},
-		{"0x80000000", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0, 0x80000000 + 0}},
+		tests := []struct {
+			input  string
+			output DerivationPath
+		}{
+			// Plain absolute derivation paths
+			{"m/44'/" + mustStr(coinType) + "'/0'/0", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0}},
+			{"m/44'/" + mustStr(coinType) + "'/0'/128", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 128}},
+			{"m/44'/" + mustStr(coinType) + "'/0'/0'", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0x80000000 + 0}},
+			{"m/44'/" + mustStr(coinType) + "'/0'/128'", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0x80000000 + 128}},
+			{"m/2147483692/" + mustStr(0x80000000+coinType) + "/2147483648/0", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0}},
+			{"m/2147483692/" + mustStr(0x80000000+coinType) + "/2147483648/2147483648", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0x80000000 + 0}},
 
-		// Weird inputs just to ensure they work
-		{"	m  /   44			'\n/\n   61	\n\n\t'   /\n0 ' /\t\t	0", DerivationPath{0x80000000 + 44, 0x80000000 + 61, 0x80000000 + 0, 0}},
+			// Plain relative derivation paths
+			{"0", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0, 0}},
+			{"128", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0, 128}},
+			{"0'", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0, 0x80000000 + 0}},
+			{"128'", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0, 0x80000000 + 128}},
+			{"2147483648", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0, 0x80000000 + 0}},
 
-		// Invalid derivation paths
-		{"", nil},              // Empty relative derivation path
-		{"m", nil},             // Empty absolute derivation path
-		{"m/", nil},            // Missing last derivation component
-		{"/44'/61'/0'/0", nil}, // Absolute path without m prefix, might be user error
-		{"m/2147483648'", nil}, // Overflows 32 bit integer
-		{"m/-1'", nil},         // Cannot contain negative number
-	}
-	for i, tt := range tests {
-		if path, err := ParseDerivationPath(tt.input); !reflect.DeepEqual(path, tt.output) {
-			t.Errorf("test %d: parse mismatch: have %v (%v), want %v", i, path, err, tt.output)
-		} else if path == nil && err == nil {
-			t.Errorf("test %d: nil path and error: %v", i, err)
+			// Hexadecimal absolute derivation paths
+			{"m/0x2C'/" + mustHex(coinType) + "'/0x00'/0x00", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0}},
+			{"m/0x2C'/" + mustHex(coinType) + "'/0x00'/0x80", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 128}},
+			{"m/0x2C'/" + mustHex(coinType) + "'/0x00'/0x00'", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0x80000000 + 0}},
+			{"m/0x2C'/" + mustHex(coinType) + "'/0x00'/0x80'", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0x80000000 + 128}},
+			{"m/0x8000002C/" + mustHex(0x80000000+coinType) + "/0x80000000/0x00", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0}},
+			{"m/0x8000002C/" + mustHex(0x80000000+coinType) + "/0x80000000/0x80000000", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0x80000000 + 0}},
+
+			// Hexadecimal relative derivation paths
+			{"0x00", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0, 0}},
+			{"0x80", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0, 128}},
+			{"0x00'", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0, 0x80000000 + 0}},
+			{"0x80'", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0, 0x80000000 + 128}},
+			{"0x80000000", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0, 0x80000000 + 0}},
+
+			// Weird inputs just to ensure they work
+			{"	m  /   44			'\n/\n   " + mustStr(coinType) + "	\n\n\t'   /\n0 ' /\t\t	0", DerivationPath{0x80000000 + 44, 0x80000000 + coinType, 0x80000000 + 0, 0}},
+
+			// Invalid derivation paths
+			{"", nil},   // Empty relative derivation path
+			{"m", nil},  // Empty absolute derivation path
+			{"m/", nil}, // Missing last derivation component
+			{"/44'/" + mustStr(coinType) + "'/0'/0", nil}, // Absolute path without m prefix, might be user error
+			{"m/2147483648'", nil},                        // Overflows 32 bit integer
+			{"m/-1'", nil},                                // Cannot contain negative number
 		}
+		for i, tt := range tests {
+			if path, err := ParseDerivationPath(tt.input); !reflect.DeepEqual(path, tt.output) {
+				t.Errorf("test %d: parse mismatch: have %v (%v), want %v", i, path, err, tt.output)
+			} else if path == nil && err == nil {
+				t.Errorf("test %d: nil path and error: %v", i, err)
+			}
+		}
+	}
+}
+
+func testHdPathIteration(coinType uint32) func(t *testing.T) {
+	return func(t *testing.T) {
+		SetCoinTypeConfiguration(coinType)
+		testDerive(t, DefaultIterator(DefaultBaseDerivationPath),
+			[]string{
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/0'/0/0", "m/44'/" + mustStr(BIP0044CoinType) + "'/0'/0/1",
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/0'/0/2", "m/44'/" + mustStr(BIP0044CoinType) + "'/0'/0/3",
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/0'/0/4", "m/44'/" + mustStr(BIP0044CoinType) + "'/0'/0/5",
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/0'/0/6", "m/44'/" + mustStr(BIP0044CoinType) + "'/0'/0/7",
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/0'/0/8", "m/44'/" + mustStr(BIP0044CoinType) + "'/0'/0/9",
+			})
+
+		testDerive(t, DefaultIterator(LegacyLedgerBaseDerivationPath),
+			[]string{
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/0'/0", "m/44'/" + mustStr(BIP0044CoinType) + "'/0'/1",
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/0'/2", "m/44'/" + mustStr(BIP0044CoinType) + "'/0'/3",
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/0'/4", "m/44'/" + mustStr(BIP0044CoinType) + "'/0'/5",
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/0'/6", "m/44'/" + mustStr(BIP0044CoinType) + "'/0'/7",
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/0'/8", "m/44'/" + mustStr(BIP0044CoinType) + "'/0'/9",
+			})
+
+		testDerive(t, LedgerLiveIterator(DefaultBaseDerivationPath),
+			[]string{
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/0'/0/0", "m/44'/" + mustStr(BIP0044CoinType) + "'/1'/0/0",
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/2'/0/0", "m/44'/" + mustStr(BIP0044CoinType) + "'/3'/0/0",
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/4'/0/0", "m/44'/" + mustStr(BIP0044CoinType) + "'/5'/0/0",
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/6'/0/0", "m/44'/" + mustStr(BIP0044CoinType) + "'/7'/0/0",
+				"m/44'/" + mustStr(BIP0044CoinType) + "'/8'/0/0", "m/44'/" + mustStr(BIP0044CoinType) + "'/9'/0/0",
+			})
 	}
 }
 
@@ -89,30 +135,16 @@ func testDerive(t *testing.T, next func() DerivationPath, expected []string) {
 }
 
 func TestHdPathIteration(t *testing.T) {
-	testDerive(t, DefaultIterator(DefaultBaseDerivationPath),
-		[]string{
-			"m/44'/61'/0'/0/0", "m/44'/61'/0'/0/1",
-			"m/44'/61'/0'/0/2", "m/44'/61'/0'/0/3",
-			"m/44'/61'/0'/0/4", "m/44'/61'/0'/0/5",
-			"m/44'/61'/0'/0/6", "m/44'/61'/0'/0/7",
-			"m/44'/61'/0'/0/8", "m/44'/61'/0'/0/9",
-		})
+	t.Run("TestHdPathIteration_Default", testHdPathIteration(BIP0044CoinType))
+	t.Run("TestHdPathIteration_Ether", testHdPathIteration(BIP0044CoinTypeEther))
+	t.Run("TestHdPathIteration_EtherClassic", testHdPathIteration(BIP0044CoinTypeEtherClassic))
+	t.Run("TestHdPathIteration_Testnet", testHdPathIteration(BIP0044CoinTypeTestnet))
+}
 
-	testDerive(t, DefaultIterator(LegacyLedgerBaseDerivationPath),
-		[]string{
-			"m/44'/61'/0'/0", "m/44'/61'/0'/1",
-			"m/44'/61'/0'/2", "m/44'/61'/0'/3",
-			"m/44'/61'/0'/4", "m/44'/61'/0'/5",
-			"m/44'/61'/0'/6", "m/44'/61'/0'/7",
-			"m/44'/61'/0'/8", "m/44'/61'/0'/9",
-		})
+func mustStr(i uint32) string {
+	return fmt.Sprintf("%d", i)
+}
 
-	testDerive(t, LedgerLiveIterator(DefaultBaseDerivationPath),
-		[]string{
-			"m/44'/61'/0'/0/0", "m/44'/61'/1'/0/0",
-			"m/44'/61'/2'/0/0", "m/44'/61'/3'/0/0",
-			"m/44'/61'/4'/0/0", "m/44'/61'/5'/0/0",
-			"m/44'/61'/6'/0/0", "m/44'/61'/7'/0/0",
-			"m/44'/61'/8'/0/0", "m/44'/61'/9'/0/0",
-		})
+func mustHex(i uint32) string {
+	return fmt.Sprintf("0x%x", i)
 }

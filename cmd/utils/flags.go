@@ -1417,6 +1417,24 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	}
 	if ctx.GlobalIsSet(USBFlag.Name) {
 		cfg.USB = ctx.GlobalBool(USBFlag.Name)
+
+		// Set default derivation path to a testnet value if we're configuring for a testnet.
+		for _, f := range TestnetFlags {
+			if ctx.GlobalIsSet(f.GetName()) && ctx.GlobalBool(f.GetName()) {
+				log.Info("Using testnet HD derivation path", "basepath", accounts.DefaultBaseDerivationPath)
+				accounts.SetCoinTypeConfiguration(accounts.BIP0044CoinTypeTestnet)
+				break
+			}
+		}
+
+		// Configure the HD derivation path for Ethereum Classic (ETC) if
+		// the client is configuring for ETC.
+		// This will not conflict with the testnet configuration handling above
+		// because we trust that the network configuration flags are checked to
+		// be exclusive.
+		if ctx.GlobalIsSet(ClassicFlag.Name) && ctx.GlobalBool(ClassicFlag.Name) {
+			accounts.SetCoinTypeConfiguration(accounts.BIP0044CoinTypeEtherClassic)
+		}
 	}
 	if ctx.GlobalIsSet(InsecureUnlockAllowedFlag.Name) {
 		cfg.InsecureUnlockAllowed = ctx.GlobalBool(InsecureUnlockAllowedFlag.Name)

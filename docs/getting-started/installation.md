@@ -28,7 +28,7 @@ $ docker run -d \
     -p 8545:8545 \
     etclabscore/core-geth \
     --classic \
-    --rpc --rpcport 8545
+    --http --http.port 8545
 ```
 
 This will start `geth` in fast-sync mode with a DB memory allowance of 1GB just as the

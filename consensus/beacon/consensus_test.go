@@ -8,22 +8,23 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 )
 
 type mockChain struct {
-	config *params.ChainConfig
+	config ctypes.ChainConfigurator
 	tds    map[uint64]*big.Int
 }
 
 func newMockChain() *mockChain {
 	return &mockChain{
-		config: new(params.ChainConfig),
+		config: new(goethereum.ChainConfig),
 		tds:    make(map[uint64]*big.Int),
 	}
 }
 
-func (m *mockChain) Config() *params.ChainConfig {
+func (m *mockChain) Config() ctypes.ChainConfigurator {
 	return m.config
 }
 
@@ -48,7 +49,7 @@ func (m *mockChain) GetTd(hash common.Hash, number uint64) *big.Int {
 func TestVerifyTerminalBlock(t *testing.T) {
 	chain := newMockChain()
 	chain.tds[0] = big.NewInt(10)
-	chain.config.TerminalTotalDifficulty = big.NewInt(50)
+	chain.config.SetEthashTerminalTotalDifficulty(big.NewInt(50))
 
 	tests := []struct {
 		preHeaders []*types.Header
@@ -125,7 +126,7 @@ func TestVerifyTerminalBlock(t *testing.T) {
 
 	for i, test := range tests {
 		fmt.Printf("Test: %v\n", i)
-		chain.config.TerminalTotalDifficulty = test.ttd
+		chain.config.SetEthashTerminalTotalDifficulty(test.ttd)
 		index, err := verifyTerminalPoWBlock(chain, test.preHeaders)
 		if err != test.err {
 			t.Fatalf("Invalid error encountered, expected %v got %v", test.err, err)

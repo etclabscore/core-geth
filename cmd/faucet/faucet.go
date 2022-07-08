@@ -71,7 +71,7 @@ var (
 	testnetFlag    = flag.Bool("chain.testnet", false, "Configure genesis and bootnodes for testnet chain defaults")
 	rinkebyFlag    = flag.Bool("chain.rinkeby", false, "Configure genesis and bootnodes for rinkeby chain defaults")
 	goerliFlag     = flag.Bool("chain.goerli", false, "Configure genesis and bootnodes for goerli chain defaults")
-	sepoliaFlag    = flag.Bool("chain.sepolia", false, "Initializes the faucet with Sepolia network config")
+	sepoliaFlag    = flag.Bool("chain.sepolia", false, "Configure genesis and bootnodes for sepolia chain defaults")
 
 	attachFlag    = flag.String("attach", "", "Attach to an IPC or WS endpoint")
 	attachChainID = flag.Int64("attach.chainid", 0, "Configure fallback chain id value for use in attach mode (used if target does not have value available yet).")
@@ -113,6 +113,7 @@ var chainFlags = []*bool{
 	testnetFlag,
 	rinkebyFlag,
 	goerliFlag,
+	sepoliaFlag,
 }
 
 var (
@@ -148,6 +149,8 @@ func faucetDirFromChainIndicators(chainID uint64, genesisHash common.Hash) strin
 		return filepath.Join(datadir, "kotti")
 	case params.MordorGenesisHash:
 		return filepath.Join(datadir, "mordor")
+	case params.SepoliaGenesisHash:
+		return filepath.Join(datadir, "sepolia")
 	}
 	return datadir
 }
@@ -165,6 +168,7 @@ func parseChainFlags() (gs *genesisT.Genesis, bs string, netid uint64) {
 		{*rinkebyFlag, params.DefaultRinkebyGenesisBlock(), nil},
 		{*kottiFlag, params.DefaultKottiGenesisBlock(), nil},
 		{*goerliFlag, params.DefaultGoerliGenesisBlock(), nil},
+		{*sepoliaFlag, params.DefaultSepoliaGenesisBlock(), nil},
 	}
 
 	var bss []string

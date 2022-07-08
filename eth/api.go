@@ -611,7 +611,7 @@ func (api *DebugAPI) GetAccessibleState(from, to rpc.BlockNumber) (uint64, error
 
 // RemovePendingTransaction removes a transaction from the txpool.
 // It returns the transaction removed, if any.
-func (api *PrivateDebugAPI) RemovePendingTransaction(hash common.Hash) (*types.Transaction, error) {
+func (api *DebugAPI) RemovePendingTransaction(hash common.Hash) (*types.Transaction, error) {
 	return api.eth.txPool.RemoveTx(hash), nil
 }
 

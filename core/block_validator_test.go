@@ -110,7 +110,8 @@ func testHeaderVerificationForMerging(t *testing.T, isClique bool) {
 			Alloc: map[common.Address]genesisT.GenesisAccount{
 				addr: {Balance: big.NewInt(1)},
 			},
-			BaseFee: big.NewInt(vars.InitialBaseFee),
+			BaseFee:    big.NewInt(vars.InitialBaseFee),
+			Difficulty: new(big.Int),
 		}
 		copy(genspec.ExtraData[32:], addr[:])
 		genesis := MustCommitGenesis(testdb, genspec)

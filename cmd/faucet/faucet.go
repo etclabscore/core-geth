@@ -71,6 +71,7 @@ var (
 	testnetFlag    = flag.Bool("chain.testnet", false, "Configure genesis and bootnodes for testnet chain defaults")
 	rinkebyFlag    = flag.Bool("chain.rinkeby", false, "Configure genesis and bootnodes for rinkeby chain defaults")
 	goerliFlag     = flag.Bool("chain.goerli", false, "Configure genesis and bootnodes for goerli chain defaults")
+	sepoliaFlag    = flag.Bool("chain.sepolia", false, "Initializes the faucet with Sepolia network config")
 
 	attachFlag    = flag.String("attach", "", "Attach to an IPC or WS endpoint")
 	attachChainID = flag.Int64("attach.chainid", 0, "Configure fallback chain id value for use in attach mode (used if target does not have value available yet).")
@@ -1240,7 +1241,7 @@ func authFacebook(url string) (string, string, common.Address, error) {
 	address := common.HexToAddress(string(regexp.MustCompile("0x[0-9a-fA-F]{40}").Find(body)))
 	if address == (common.Address{}) {
 		//lint:ignore ST1005 This error is to be displayed in the browser
-		return "", "", common.Address{}, errors.New("No Ethereum address found to fund")
+		return "", "", common.Address{}, errors.New("No Ethereum address found to fund. Please check the post URL and verify that it can be viewed publicly.")
 	}
 	var avatar string
 	if parts = regexp.MustCompile(`src="([^"]+fbcdn\.net[^"]+)"`).FindStringSubmatch(string(body)); len(parts) == 2 {

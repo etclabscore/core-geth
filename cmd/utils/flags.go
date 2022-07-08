@@ -2029,7 +2029,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// Establish NetworkID.
 	// If dev-mode is used, then NetworkID will be overridden.
 	if ctx.IsSet(NetworkIdFlag.Name) {
-		cfg.NetworkId = ctx.GlobalUint64(NetworkIdFlag.Name)
+		cfg.NetworkId = ctx.Uint64(NetworkIdFlag.Name)
 	} else if cfg.Genesis != nil {
 		cfg.NetworkId = *cfg.Genesis.GetNetworkID()
 	}

@@ -1743,7 +1743,7 @@ func setEthash(ctx *cli.Context, cfg *eth.Config) {
 	setEthashCacheDir(ctx, cfg)
 	setEthashDatasetDir(ctx, cfg)
 
-	if ctx.GlobalBool(FakePoWPoissonFlag.Name) {
+	if ctx.Bool(FakePoWPoissonFlag.Name) {
 		cfg.Ethash.PowMode = ethash.ModePoissonFake
 	}
 	if ctx.IsSet(EthashCachesInMemoryFlag.Name) {
@@ -2020,7 +2020,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// Override any default configs for hard coded networks.
 
 	// Override genesis configuration if a --<chain> flag.
-	if !ctx.GlobalBool(DeveloperFlag.Name) && !ctx.GlobalBool(DeveloperPoWFlag.Name) {
+	if !ctx.Bool(DeveloperFlag.Name) && !ctx.Bool(DeveloperPoWFlag.Name) {
 		if gen := genesisForCtxChainConfig(ctx); gen != nil {
 			cfg.Genesis = gen
 		}
@@ -2125,7 +2125,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		// No --<chain> flag was given.
 	}
 
-	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) {
+	if ctx.Bool(DeveloperFlag.Name) || ctx.Bool(DeveloperPoWFlag.Name) {
 		if !ctx.GlobalIsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 1337
 		}
@@ -2394,7 +2394,7 @@ func genesisForCtxChainConfig(ctx *cli.Context) *genesisT.Genesis {
 }
 
 func MakeGenesis(ctx *cli.Context) *genesisT.Genesis {
-	if ctx.GlobalBool(DeveloperFlag.Name) || ctx.GlobalBool(DeveloperPoWFlag.Name) {
+	if ctx.Bool(DeveloperFlag.Name) || ctx.Bool(DeveloperPoWFlag.Name) {
 		Fatalf("Developer chains are ephemeral")
 	}
 	return genesisForCtxChainConfig(ctx)
@@ -2413,7 +2413,7 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 	ethashConf := ethconfig.Defaults.Ethash
 	if ctx.Bool(FakePoWFlag.Name) {
 		ethashConf.PowMode = ethash.ModeFake
-	} else if ctx.GlobalBool(FakePoWPoissonFlag.Name) {
+	} else if ctx.Bool(FakePoWPoissonFlag.Name) {
 		ethashConf.PowMode = ethash.ModePoissonFake
 	}
 	engine = ethconfig.CreateConsensusEngine(stack, config, &ethashConf, nil, false, chainDb)

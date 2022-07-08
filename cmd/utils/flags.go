@@ -1127,7 +1127,7 @@ func setBootstrapNodes(ctx *cli.Context, cfg *p2p.Config) {
 	urls := params.MainnetBootnodes
 	switch {
 	case ctx.IsSet(BootnodesFlag.Name):
-		urls = SplitAndTrim(ctx.GlobalString(BootnodesFlag.Name))
+		urls = SplitAndTrim(ctx.String(BootnodesFlag.Name))
 	case ctx.Bool(ClassicFlag.Name):
 		urls = params.ClassicBootnodes
 	case ctx.Bool(MordorFlag.Name):
@@ -1172,7 +1172,7 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 	urls := params.V5Bootnodes
 	switch {
 	case ctx.IsSet(BootnodesFlag.Name):
-		urls = SplitAndTrim(ctx.GlobalString(BootnodesFlag.Name))
+		urls = SplitAndTrim(ctx.String(BootnodesFlag.Name))
 	case ctx.IsSet(ClassicFlag.Name):
 		urls = params.ClassicBootnodes
 	case ctx.IsSet(MordorFlag.Name):
@@ -1617,7 +1617,7 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 func setDataDir(ctx *cli.Context, cfg *node.Config) {
 	switch {
 	case ctx.IsSet(DataDirFlag.Name):
-		cfg.DataDir = ctx.GlobalString(DataDirFlag.Name)
+		cfg.DataDir = ctx.String(DataDirFlag.Name)
 
 	case ctx.Bool(DeveloperFlag.Name) || ctx.Bool(DeveloperPoWFlag.Name):
 		cfg.DataDir = "" // unless explicitly requested, use memory databases
@@ -2040,7 +2040,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		supportedProtocolVersions = cfg.Genesis.GetSupportedProtocolVersions()
 	}
 
-	configuredProtocolVersions := SplitAndTrim(ctx.GlobalString(EthProtocolsFlag.Name))
+	configuredProtocolVersions := SplitAndTrim(ctx.String(EthProtocolsFlag.Name))
 	if len(configuredProtocolVersions) == 0 {
 		Fatalf("--%s must be comma separated list of %s", EthProtocolsFlag.Name, strings.Join(strings.Fields(fmt.Sprint(supportedProtocolVersions)), ","))
 	}

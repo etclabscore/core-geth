@@ -159,7 +159,7 @@ var (
 		BerlinBlock:             big.NewInt(0),
 		LondonBlock:             big.NewInt(0),
 		TerminalTotalDifficulty: big.NewInt(17_000_000_000_000_000),
-		Ethash:              new(ctypes.EthashConfig),
+		Ethash:                  new(ctypes.EthashConfig),
 	}
 
 	// SepoliaTrustedCheckpoint contains the light client trusted checkpoint for the Sepolia test network.

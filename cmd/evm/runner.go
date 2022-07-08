@@ -57,7 +57,7 @@ var runCommand = &cli.Command{
 // the initialized Genesis structure
 func readGenesis(genesisPath string) *genesisT.Genesis {
 	// Make sure we have a valid genesis JSON
-	//genesisPath := ctx.Args().First()
+	// genesisPath := ctx.Args().First()
 	if len(genesisPath) == 0 {
 		utils.Fatalf("Must supply path to genesis JSON file")
 	}
@@ -167,7 +167,7 @@ func runCmd(ctx *cli.Context) error {
 			var err error
 			// If - is specified, it means that code comes from stdin
 			if codeFileFlag == "-" {
-				//Try reading from stdin
+				// Try reading from stdin
 				if hexcode, err = io.ReadAll(os.Stdin); err != nil {
 					fmt.Printf("Could not load code from stdin: %v\n", err)
 					os.Exit(1)
@@ -217,7 +217,7 @@ func runCmd(ctx *cli.Context) error {
 		EVMConfig: vm.Config{
 			Tracer:         tracer,
 			Debug:          ctx.Bool(DebugFlag.Name) || ctx.Bool(MachineFlag.Name),
-			EVMInterpreter: ctx.GlobalString(EVMInterpreterFlag.Name),
+			EVMInterpreter: ctx.String(EVMInterpreterFlag.Name),
 		},
 	}
 

@@ -180,13 +180,13 @@ func verifyTerminalPoWBlock(chain consensus.ChainHeaderReader, preHeaders []*typ
 	}
 	// Check that all blocks before the last one are below the TTD
 	for i, head := range preHeaders {
-		if td.Cmp(chain.Config().TerminalTotalDifficulty) >= 0 {
+		if td.Cmp(chain.Config().GetEthashTerminalTotalDifficulty()) >= 0 {
 			return i, consensus.ErrInvalidTerminalBlock
 		}
 		td.Add(td, head.Difficulty)
 	}
 	// Check that the last block is the terminal block
-	if td.Cmp(chain.Config().TerminalTotalDifficulty) < 0 {
+	if td.Cmp((chain.Config().GetEthashTerminalTotalDifficulty())) < 0 {
 		return len(preHeaders) - 1, consensus.ErrInvalidTerminalBlock
 	}
 	return 0, nil

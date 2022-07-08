@@ -1614,7 +1614,7 @@ func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) stri
 	return baseDataDirPath
 }
 
-func setDataDir(ctx *cli.Context, cfg *node.Config) {
+func SetDataDir(ctx *cli.Context, cfg *node.Config) {
 	switch {
 	case ctx.IsSet(DataDirFlag.Name):
 		cfg.DataDir = ctx.String(DataDirFlag.Name)

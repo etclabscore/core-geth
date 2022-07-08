@@ -164,13 +164,13 @@ func makeFullNode(ctx *cli.Context) (*node.Node, ethapi.Backend) {
 	if ctx.IsSet(utils.OverrideTerminalTotalDifficulty.Name) {
 		cfg.Eth.OverrideTerminalTotalDifficulty = flags.GlobalBig(ctx, utils.OverrideTerminalTotalDifficulty.Name)
 	}
-	if ctx.GlobalIsSet(utils.ECBP1100Flag.Name) {
-		if n := ctx.GlobalUint64(utils.ECBP1100Flag.Name); n != math.MaxUint64 {
+	if ctx.IsSet(utils.ECBP1100Flag.Name) {
+		if n := ctx.Uint64(utils.ECBP1100Flag.Name); n != math.MaxUint64 {
 			cfg.Eth.ECBP1100 = new(big.Int).SetUint64(n)
 		}
 	}
-	if ctx.GlobalIsSet(utils.ECBP1100NoDisableFlag.Name) {
-		if enable := ctx.GlobalBool(utils.ECBP1100NoDisableFlag.Name); enable {
+	if ctx.IsSet(utils.ECBP1100NoDisableFlag.Name) {
+		if enable := ctx.Bool(utils.ECBP1100NoDisableFlag.Name); enable {
 			cfg.Eth.ECBP1100NoDisable = &enable
 		}
 	}

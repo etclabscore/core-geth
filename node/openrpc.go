@@ -277,7 +277,7 @@ func registerOpenRPCAPIs(doc *go_openrpc_reflect.Document, apis []rpc.API) {
 		// Append a mock interface for the eth_unsubscribe method, which
 		// would otherwise not occur in the document.
 		switch api.Service.(type) {
-		case *filters.PublicFilterAPI:
+		case *filters.FilterAPI:
 			doc.RegisterReceiverName("eth", &RPCEthSubscription{})
 		case *debug.HandlerT:
 			doc.RegisterReceiverName("debug", &RPCDebugSubscription{})

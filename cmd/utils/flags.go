@@ -1891,7 +1891,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	// since light client relies on the server for transaction status query.
 	CheckExclusive(ctx, LightServeFlag, TxLookupLimitFlag)
 
-	CheckExclusive(ctx, AncientFlag, AncientRPCFlag)
 	CheckExclusive(ctx, DeveloperPoWFlag, DeveloperPeriodFlag, FakePoWFlag)
 	CheckExclusive(ctx, FakePoWFlag, FakePoWPoissonFlag)
 

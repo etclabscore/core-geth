@@ -25,6 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/eth/tracers/logger"
+	"github.com/ethereum/go-ethereum/internal/flags"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/tests"
 
@@ -37,11 +38,13 @@ var stateTestCommand = &cli.Command{
 	Usage:     "executes the given state tests",
 	ArgsUsage: "<file>",
 	Flags:     []cli.Flag{stateTestEVMCEWASMFlag},
+	Category:  flags.DevCategory,
 }
 
-var stateTestEVMCEWASMFlag = cli.StringFlag{
-	Name:  "evmc.ewasm",
-	Usage: "EVMC EWASM configuration",
+var stateTestEVMCEWASMFlag = &cli.StringFlag{
+	Name:     "evmc.ewasm",
+	Usage:    "EVMC EWASM configuration",
+	Category: flags.DevCategory,
 }
 
 // StatetestResult contains the execution status after running a state test, any

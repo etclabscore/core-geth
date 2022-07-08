@@ -1928,9 +1928,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	if ctx.IsSet(AncientFlag.Name) {
 		cfg.DatabaseFreezer = ctx.String(AncientFlag.Name)
 	}
-	if ctx.IsSet(AncientRPCFlag.Name) {
-		cfg.DatabaseFreezerRemote = ctx.String(AncientRPCFlag.Name)
-	}
 
 	if gcmode := ctx.String(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {
 		Fatalf("--%s must be either 'full' or 'archive'", GCModeFlag.Name)

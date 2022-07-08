@@ -1209,7 +1209,6 @@ var allRPCMethods = []string{
 	"personal_openWallet",
 	"personal_sendTransaction",
 	"personal_sign",
-	"personal_signAndSendTransaction",
 	"personal_signTransaction",
 	"personal_unlockAccount",
 	"personal_unpair",

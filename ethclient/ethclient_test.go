@@ -795,7 +795,22 @@ func TestRPCDiscover(t *testing.T) {
 	}
 
 	if len(over) > 0 || len(under) > 0 {
-		t.Fatalf("over: %v, under: %v", over, under)
+		printList := func(list []string) string {
+			if len(list) == 0 {
+				return "∅" // empty set
+			}
+			var str string
+			for _, s := range list {
+				str += "-" + s + "\n"
+			}
+			return str
+		}
+		t.Fatalf(`OVER (methods which do not appear in the current API, but exist in the hardcoded response document):): 
+%v
+
+UNDER (methods which appear in the current API, but do not appear in the hardcoded response document):): 
+%v
+`, printList(over), printList(under))
 	}
 }
 
@@ -1002,6 +1017,36 @@ func BenchmarkRPC_BlockNumber(b *testing.B) {
 		}
 	}
 }
+
+/*
+--- FAIL: TestRPCDiscover (0.39s)
+    ethclient_test.go:798: over: [
+personal_signAndSendTransaction
+trace_block
+trace_call
+trace_callMany
+trace_filter
+trace_subscribe
+trace_transaction
+trace_unsubscribe
+],
+
+under: [
+trace_intermediateRoots
+trace_standardTraceBadBlockToFile
+trace_standardTraceBlockToFile
+trace_traceBadBlock
+trace_traceBlock
+trace_traceBlockByHash
+trace_traceBlockByNumber
+trace_traceBlockFromFile
+trace_traceCall
+trace_traceCallMany
+trace_traceChain
+trace_traceTransaction
+]
+
+*/
 
 // allRPCMethods lists all methods exposed over JSONRPC.
 var allRPCMethods = []string{

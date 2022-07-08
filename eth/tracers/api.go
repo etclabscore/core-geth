@@ -1011,12 +1011,11 @@ func APIs(backend Backend) []rpc.API {
 			Namespace: "debug",
 			Version:   "1.0",
 			Service:   debugAPI,
-			Public:    false, // TODO(meowsbits): verify public: false. ethereum/go-ethereum use `debug` namespace ONLY, and Public field is unset (bool=false by default?)
 		},
 		{
 			Namespace: "trace",
 			Version:   "1.0",
-			Service:   NewAPI(backend),
+			Service:   NewTraceAPI(debugAPI),
 		},
 	}
 }

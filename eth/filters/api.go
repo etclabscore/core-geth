@@ -202,7 +202,7 @@ func (api *FilterAPI) NewBlockFilter() rpc.ID {
 
 // NewSideBlockFilter creates a filter that fetches blocks that are imported into the chain with a non-canonical status.
 // It is part of the filter package since polling goes with eth_getFilterChanges.
-func (api *PublicFilterAPI) NewSideBlockFilter() rpc.ID {
+func (api *FilterAPI) NewSideBlockFilter() rpc.ID {
 	var (
 		headers   = make(chan *types.Header)
 		headerSub = api.events.SubscribeNewSideHeads(headers)

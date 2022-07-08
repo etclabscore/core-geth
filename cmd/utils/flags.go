@@ -23,6 +23,7 @@ import (
 	"math"
 	"math/big"
 	"os"
+	"os/user"
 	"path/filepath"
 	"runtime"
 	godebug "runtime/debug"
@@ -1704,6 +1705,16 @@ func setTxPool(ctx *cli.Context, cfg *core.TxPoolConfig) {
 	}
 }
 
+func homeDir() string {
+	if home := os.Getenv("HOME"); home != "" {
+		return home
+	}
+	if usr, err := user.Current(); err == nil {
+		return usr.HomeDir
+	}
+	return ""
+}
+
 func setEthashDatasetDir(ctx *cli.Context, cfg *ethconfig.Config) {
 	switch {
 	case ctx.IsSet(EthashDatasetDirFlag.Name):
@@ -1711,7 +1722,8 @@ func setEthashDatasetDir(ctx *cli.Context, cfg *ethconfig.Config) {
 
 	case (ctx.Bool(ClassicFlag.Name) || ctx.Bool(MordorFlag.Name)) && cfg.Ethash.DatasetDir == ethconfig.Defaults.Ethash.DatasetDir:
 		// ECIP-1099 is set, use etchash dir for DAGs instead
-		home := HomeDir()
+		home := homeDir()
+
 		if runtime.GOOS == "darwin" {
 			cfg.Ethash.DatasetDir = filepath.Join(home, "Library", "Etchash")
 		} else if runtime.GOOS == "windows" {

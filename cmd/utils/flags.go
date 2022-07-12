@@ -2085,20 +2085,16 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	log.Info("Configured Ethereum protocol versions", "capabilities", cfg.ProtocolVersions)
 
 	// Set DNS discovery defaults for hard coded networks with DNS defaults.
-	// TODO/meowsbits/20220405: review this re: kiln, sepolia
+	// core-geth: NetworkID is configured several stanzas above, based on the returned genesis GetNetworkID() value.
+	// GetNetworkID is a configurator method which will either return a custom json:- field NetworkID if set for
+	// the config, or it'll return the ChainID if the NetworkID is not explicitly set.
+	// This behavior matches practical expectations for how network id and chain id are normally defined.
 	switch {
 	case ctx.Bool(MainnetFlag.Name):
-		if !ctx.IsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = 1
-		}
 		SetDNSDiscoveryDefaults(cfg, params.MainnetGenesisHash)
 	case ctx.Bool(RopstenFlag.Name):
-		// TODO(meowsbits): verify that networkid=3 gets set
 		SetDNSDiscoveryDefaults(cfg, params.RopstenGenesisHash)
 	case ctx.Bool(SepoliaFlag.Name):
-		if !ctx.IsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = 11155111
-		}
 		cfg.Genesis = params.DefaultSepoliaGenesisBlock()
 		SetDNSDiscoveryDefaults(cfg, params.SepoliaGenesisHash)
 	case ctx.Bool(RinkebyFlag.Name):
@@ -2122,9 +2118,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	case ctx.Bool(MordorFlag.Name):
 		SetDNSDiscoveryDefaults2(cfg, params.MordorDNSNetwork1)
 	case ctx.Bool(KilnFlag.Name):
-		if !ctx.IsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = 1337802
-		}
 		cfg.Genesis = params.DefaultKilnGenesisBlock()
 		SetDNSDiscoveryDefaults(cfg, params.KilnGenesisHash)
 	default:
@@ -2132,6 +2125,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	}
 
 	if ctx.Bool(DeveloperFlag.Name) || ctx.Bool(DeveloperPoWFlag.Name) {
+		// Dev-mode overrides NetworkID, as promised.
 		if !ctx.IsSet(NetworkIdFlag.Name) {
 			cfg.NetworkId = 1337
 		}

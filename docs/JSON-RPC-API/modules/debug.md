@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-30T19:24:24+03:00</code> |
+| Source | <code>1.12.9-unstable/generated-at:2022-07-13T09:50:34-07:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -35,7 +35,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 __2:__ 
-start <code>[]byte</code> 
+start <code>hexutil.Bytes</code> 
 
   + Required: ✓ Yes
 
@@ -44,9 +44,9 @@ start <code>[]byte</code>
 
 	``` Schema
 	
-	- description: `Hex representation of a variable length byte array`
-	- pattern: `^0x([a-fA-F0-9]?)+$`
-	- title: `bytes`
+	- description: `Hex representation of some bytes`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -56,9 +56,9 @@ start <code>[]byte</code>
 
 	``` Raw
 	{
-        "description": "Hex representation of a variable length byte array",
-        "pattern": "^0x([a-fA-F0-9]?)+$",
-        "title": "bytes",
+        "description": "Hex representation of some bytes",
+        "pattern": "^0x([a-fA-F\\d])+$",
+        "title": "dataWord",
         "type": [
             "string"
         ]
@@ -160,9 +160,13 @@ incompletes <code>bool</code>
 							- type: `string`
 
 						- code: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `dataWord`
 							- type: `string`
 
 						- codeHash: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `dataWord`
 							- type: `string`
 
 						- key: 
@@ -176,6 +180,8 @@ incompletes <code>bool</code>
 							- type: `string`
 
 						- root: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `dataWord`
 							- type: `string`
 
 						- storage: 
@@ -226,9 +232,13 @@ incompletes <code>bool</code>
                                 "type": "string"
                             },
                             "code": {
+                                "pattern": "^0x([a-fA-F\\d])+$",
+                                "title": "dataWord",
                                 "type": "string"
                             },
                             "codeHash": {
+                                "pattern": "^0x([a-fA-F\\d])+$",
+                                "title": "dataWord",
                                 "type": "string"
                             },
                             "key": {
@@ -242,6 +252,8 @@ incompletes <code>bool</code>
                                 "type": "string"
                             },
                             "root": {
+                                "pattern": "^0x([a-fA-F\\d])+$",
+                                "title": "dataWord",
                                 "type": "string"
                             },
                             "storage": {
@@ -306,8 +318,7 @@ incompletes <code>bool</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicDebugAPI) AccountRange(blockNrOrHash rpc.BlockNumberOrHash, start [ // AccountRange enumerates all accounts in the given block and start point in paging request
-]byte, maxResults int, nocode, nostorage, incompletes bool) (state.IteratorDump, error) {
+func (api *DebugAPI) AccountRange(blockNrOrHash rpc.BlockNumberOrHash, start hexutil.Bytes, maxResults int, nocode, nostorage, incompletes bool) (state.IteratorDump, error) {
 	var stateDb *state.StateDB
 	var err error
 	if number, ok := blockNrOrHash.Number(); ok {
@@ -317,6 +328,8 @@ func (api *PublicDebugAPI) AccountRange(blockNrOrHash rpc.BlockNumberOrHash, sta
 			var block *types.Block
 			if number == rpc.LatestBlockNumber {
 				block = api.eth.blockchain.CurrentBlock()
+			} else if number == rpc.FinalizedBlockNumber {
+				block = api.eth.blockchain.CurrentFinalizedBlock()
 			} else {
 				block = api.eth.blockchain.GetBlockByNumber(uint64(number))
 			}
@@ -340,13 +353,15 @@ func (api *PublicDebugAPI) AccountRange(blockNrOrHash rpc.BlockNumberOrHash, sta
 	} else {
 		return state.IteratorDump{}, errors.New("either block number or block hash must be specified")
 	}
+	opts := &state.DumpConfig{SkipCode: nocode, SkipStorage: nostorage, OnlyWithAddresses: !incompletes, Start: start, Max: uint64(maxResults)}
 	if maxResults > AccountRangeMaxResults || maxResults <= 0 {
-		maxResults = AccountRangeMaxResults
+		opts.Max = AccountRangeMaxResults
 	}
-	return stateDb.IteratorDump(nocode, nostorage, incompletes, start, maxResults), nil
-}
+	return stateDb.IteratorDump(opts), nil
+}// AccountRange enumerates all accounts in the given block and start point in paging request
+
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L389" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L361" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -416,7 +431,7 @@ func (*HandlerT) BacktraceAt(location string) error {
 // the pattern syntax.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L68" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L70" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -525,7 +540,7 @@ func (*HandlerT) BlockProfile(file string, nsec uint) error {
 // desired, set the rate and write the profile manually.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L147" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L149" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -578,7 +593,7 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) ChaindbCompact() error {
+func (api *DebugAPI) ChaindbCompact() error {
 	for b := byte(0); b < 255; b++ {
 		log.Info("Compacting chain database", "range", fmt.Sprintf("0x%0.2X-0x%0.2X", b, b+1))
 		if err := api.b.ChainDb().Compact([ // ChaindbCompact flattens the entire key-value database into a single level,
@@ -591,7 +606,7 @@ func (api *PrivateDebugAPI) ChaindbCompact() error {
 	return nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2069" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2122" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -662,7 +677,7 @@ property <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) ChaindbProperty(property string) (string, error) {
+func (api *DebugAPI) ChaindbProperty(property string) (string, error) {
 	if property == "" {
 		property = "leveldb.stats"
 	} else if !strings.HasPrefix(property, "leveldb.") {
@@ -672,7 +687,7 @@ func (api *PrivateDebugAPI) ChaindbProperty(property string) (string, error) {
 }// ChaindbProperty returns leveldb properties of the key-value database.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2058" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2111" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -781,7 +796,341 @@ func (h *HandlerT) CpuProfile(file string, nsec uint) error {
 // profile data to file.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L88" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L90" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_dbAncient
+
+DbAncient retrieves an ancient binary blob from the append-only immutable files.
+It is a mapping to the `AncientReaderOp.Ancient` method
+
+
+#### Params (2)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+kind <code>string</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+
+__2:__ 
+number <code>uint64</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of the integer",
+        "pattern": "^0x[a-fA-F0-9]+$",
+        "title": "integer",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+
+<code>hexutil.Bytes</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of some bytes`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of some bytes",
+        "pattern": "^0x([a-fA-F\\d])+$",
+        "title": "dataWord",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_dbAncient", "params": [<kind>, <number>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_dbAncient", "params": [<kind>, <number>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	debug.dbAncient(kind,number);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *DebugAPI) DbAncient(kind string, number uint64) (hexutil.Bytes, error) {
+	return api.b.ChainDb().Ancient(kind, number)
+}// DbAncient retrieves an ancient binary blob from the append-only immutable files.
+// It is a mapping to the `AncientReaderOp.Ancient` method
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/dbapi.go#L35" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_dbAncients
+
+DbAncients returns the ancient item numbers in the ancient store.
+It is a mapping to the `AncientReaderOp.Ancients` method
+
+
+#### Params (0)
+
+_None_
+
+#### Result
+
+
+
+
+<code>uint64</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of the integer",
+        "pattern": "^0x[a-fA-F0-9]+$",
+        "title": "integer",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_dbAncients", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_dbAncients", "params": []}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	debug.dbAncients();
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *DebugAPI) DbAncients() (uint64, error) {
+	return api.b.ChainDb().Ancients()
+}// DbAncients returns the ancient item numbers in the ancient store.
+// It is a mapping to the `AncientReaderOp.Ancients` method
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/dbapi.go#L41" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_dbGet
+
+DbGet returns the raw value of a key stored in the database.
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+key <code>string</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+
+
+#### Result
+
+
+
+
+<code>hexutil.Bytes</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of some bytes`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of some bytes",
+        "pattern": "^0x([a-fA-F\\d])+$",
+        "title": "dataWord",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_dbGet", "params": [<key>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_dbGet", "params": [<key>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	debug.dbGet(key);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *DebugAPI) DbGet(key string) (hexutil.Bytes, error) {
+	blob, err := common.ParseHexOrString(key)
+	if err != nil {
+		return nil, err
+	}
+	return api.b.ChainDb().Get(blob)
+}// DbGet returns the raw value of a key stored in the database.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/dbapi.go#L25" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -892,9 +1241,13 @@ blockNr <code>rpc.BlockNumber</code>
 							- type: `string`
 
 						- code: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `dataWord`
 							- type: `string`
 
 						- codeHash: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `dataWord`
 							- type: `string`
 
 						- key: 
@@ -908,6 +1261,8 @@ blockNr <code>rpc.BlockNumber</code>
 							- type: `string`
 
 						- root: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `dataWord`
 							- type: `string`
 
 						- storage: 
@@ -953,9 +1308,13 @@ blockNr <code>rpc.BlockNumber</code>
                                 "type": "string"
                             },
                             "code": {
+                                "pattern": "^0x([a-fA-F\\d])+$",
+                                "title": "dataWord",
                                 "type": "string"
                             },
                             "codeHash": {
+                                "pattern": "^0x([a-fA-F\\d])+$",
+                                "title": "dataWord",
                                 "type": "string"
                             },
                             "key": {
@@ -969,6 +1328,8 @@ blockNr <code>rpc.BlockNumber</code>
                                 "type": "string"
                             },
                             "root": {
+                                "pattern": "^0x([a-fA-F\\d])+$",
+                                "title": "dataWord",
                                 "type": "string"
                             },
                             "storage": {
@@ -1028,14 +1389,17 @@ blockNr <code>rpc.BlockNumber</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicDebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error) {
+func (api *DebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error) {
+	opts := &state.DumpConfig{OnlyWithAddresses: true, Max: AccountRangeMaxResults}
 	if blockNr == rpc.PendingBlockNumber {
 		_, stateDb := api.eth.miner.Pending()
-		return stateDb.RawDump(false, false, true), nil
+		return stateDb.RawDump(opts), nil
 	}
 	var block *types.Block
 	if blockNr == rpc.LatestBlockNumber {
 		block = api.eth.blockchain.CurrentBlock()
+	} else if blockNr == rpc.FinalizedBlockNumber {
+		block = api.eth.blockchain.CurrentFinalizedBlock()
 	} else {
 		block = api.eth.blockchain.GetBlockByNumber(uint64(blockNr))
 	}
@@ -1046,11 +1410,11 @@ func (api *PublicDebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error
 	if err != nil {
 		return state.Dump{}, err
 	}
-	return stateDb.RawDump(false, false, true), nil
+	return stateDb.RawDump(opts), nil
 }// DumpBlock retrieves the entire state of the database at a given block.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L304" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L282" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1107,7 +1471,7 @@ func (*HandlerT) FreeOSMemory() {
 }// FreeOSMemory forces a garbage collection.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L200" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L236" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1277,7 +1641,282 @@ func (*HandlerT) GcStats() *debug.GCStats {
 }// GcStats returns GC statistics.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L80" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L82" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_getAccessibleState
+
+GetAccessibleState returns the first number where the node has accessible
+state on disk. Note this being the post-state of that block and the pre-state
+of the next block.
+The (from, to) parameters are the sequence of blocks to search, which can go
+either forwards or backwards
+
+
+#### Params (2)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+from <code>rpc.BlockNumber</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- oneOf: 
+
+			- description: `The block height description`
+			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
+			- type: string
+
+
+			- description: `Hex representation of a uint64`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: string
+
+
+	- title: `blockNumberIdentifier`
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "oneOf": [
+            {
+                "description": "The block height description",
+                "enum": [
+                    "earliest",
+                    "latest",
+                    "pending"
+                ],
+                "title": "blockNumberTag",
+                "type": [
+                    "string"
+                ]
+            },
+            {
+                "description": "Hex representation of a uint64",
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
+                "type": [
+                    "string"
+                ]
+            }
+        ],
+        "title": "blockNumberIdentifier"
+    }
+	```
+
+
+
+
+__2:__ 
+to <code>rpc.BlockNumber</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- oneOf: 
+
+			- description: `The block height description`
+			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
+			- type: string
+
+
+			- description: `Hex representation of a uint64`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: string
+
+
+	- title: `blockNumberIdentifier`
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "oneOf": [
+            {
+                "description": "The block height description",
+                "enum": [
+                    "earliest",
+                    "latest",
+                    "pending"
+                ],
+                "title": "blockNumberTag",
+                "type": [
+                    "string"
+                ]
+            },
+            {
+                "description": "Hex representation of a uint64",
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
+                "type": [
+                    "string"
+                ]
+            }
+        ],
+        "title": "blockNumberIdentifier"
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+
+<code>uint64</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of the integer",
+        "pattern": "^0x[a-fA-F0-9]+$",
+        "title": "integer",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getAccessibleState", "params": [<from>, <to>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_getAccessibleState", "params": [<from>, <to>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	debug.getAccessibleState(from,to);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *DebugAPI) GetAccessibleState(from, to rpc.BlockNumber) (uint64, error) {
+	db := api.eth.ChainDb()
+	var pivot uint64
+	if p := rawdb.ReadLastPivotNumber(db); p != nil {
+		pivot = *p
+		log.Info("Found fast-sync pivot marker", "number", pivot)
+	}
+	var resolveNum = func(num rpc.BlockNumber) (uint64, error) {
+		if num.Int64() < 0 {
+			block := api.eth.blockchain.CurrentBlock()
+			if block == nil {
+				return 0, fmt.Errorf("current block missing")
+			}
+			return block.NumberU64(), nil
+		}
+		return uint64(num.Int64()), nil
+	}
+	var (
+		start	uint64
+		end	uint64
+		delta	= int64(1)
+		lastLog	time.Time
+		err	error
+	)
+	if start, err = resolveNum(from); err != nil {
+		return 0, err
+	}
+	if end, err = resolveNum(to); err != nil {
+		return 0, err
+	}
+	if start == end {
+		return 0, fmt.Errorf("from and to needs to be different")
+	}
+	if start > end {
+		delta = -1
+	}
+	for i := int64(start); i != int64(end); i += delta {
+		if time.Since(lastLog) > 8*time.Second {
+			log.Info("Finding roots", "from", start, "to", end, "at", i)
+			lastLog = time.Now()
+		}
+		if i < int64(pivot) {
+			continue
+		}
+		h := api.eth.BlockChain().GetHeaderByNumber(uint64(i))
+		if h == nil {
+			return 0, fmt.Errorf("missing header %d", i)
+		}
+		if ok, _ := api.eth.ChainDb().Has(h.Root[ // GetAccessibleState returns the first number where the node has accessible
+		// state on disk. Note this being the post-state of that block and the pre-state
+		// of the next block.
+		// The (from, to) parameters are the sequence of blocks to search, which can go
+		// either forwards or backwards
+		:]); ok {
+			return uint64(i), nil
+		}
+	}
+	return 0, fmt.Errorf("No state found")
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L556" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1288,7 +1927,7 @@ func (*HandlerT) GcStats() *debug.GCStats {
 ### debug_getBadBlocks
 
 GetBadBlocks returns a list of the last 'bad blocks' that the client has seen on the network
-and returns them as a JSON list of block-hashes
+and returns them as a JSON list of block hashes.
 
 
 #### Params (0)
@@ -1315,6 +1954,11 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 				- block: 
 					- additionalProperties: `false`
 					- properties: 
+						- baseFeePerGas: 
+							- pattern: `^0x[a-fA-F0-9]+$`
+							- title: `integer`
+							- type: `string`
+
 						- difficulty: 
 							- pattern: `^0x[a-fA-F0-9]+$`
 							- title: `integer`
@@ -1460,6 +2104,11 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
                     "block": {
                         "additionalProperties": false,
                         "properties": {
+                            "baseFeePerGas": {
+                                "pattern": "^0x[a-fA-F0-9]+$",
+                                "title": "integer",
+                                "type": "string"
+                            },
                             "difficulty": {
                                 "pattern": "^0x[a-fA-F0-9]+$",
                                 "title": "integer",
@@ -1630,8 +2279,8 @@ BadBlockArgs <code>[]*BadBlockArgs</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) GetBadBlocks(ctx context.Context) ([ // GetBadBlocks returns a list of the last 'bad blocks' that the client has seen on the network
-// and returns them as a JSON list of block-hashes
+func (api *DebugAPI) GetBadBlocks(ctx context.Context) ([ // GetBadBlocks returns a list of the last 'bad blocks' that the client has seen on the network
+// and returns them as a JSON list of block hashes.
 ]*BadBlockArgs, error) {
 	var (
 		err	error
@@ -1648,7 +2297,7 @@ func (api *PrivateDebugAPI) GetBadBlocks(ctx context.Context) ([ // GetBadBlocks
 		} else {
 			blockRlp = fmt.Sprintf("0x%x", rlpBytes)
 		}
-		if blockJSON, err = ethapi.RPCMarshalBlock(block, true, true); err != nil {
+		if blockJSON, err = ethapi.RPCMarshalBlock(block, true, true, api.eth.APIBackend.ChainConfig()); err != nil {
 			blockJSON = &ethapi.RPCMarshalBlockT{Error: err.Error()}
 		}
 		results = append(results, &BadBlockArgs{Hash: block.Hash(), RLP: blockRlp, Block: blockJSON})
@@ -1656,7 +2305,7 @@ func (api *PrivateDebugAPI) GetBadBlocks(ctx context.Context) ([ // GetBadBlocks
 	return results, nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L357" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L329" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1714,10 +2363,35 @@ number <code>uint64</code>
 
 
 
-<code>string</code> 
+<code>hexutil.Bytes</code> 
 
   + Required: ✓ Yes
 
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of some bytes`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of some bytes",
+        "pattern": "^0x([a-fA-F\\d])+$",
+        "title": "dataWord",
+        "type": [
+            "string"
+        ]
+    }
+	```
 
 
 
@@ -1752,20 +2426,146 @@ number <code>uint64</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicDebugAPI) GetBlockRlp(ctx context.Context, number uint64) (string, error) {
+func (api *DebugAPI) GetBlockRlp(ctx context.Context, number uint64) (hexutil.Bytes, error) {
 	block, _ := api.b.BlockByNumber(ctx, rpc.BlockNumber(number))
 	if block == nil {
-		return "", fmt.Errorf("block #%d not found", number)
+		return nil, fmt.Errorf("block #%d not found", number)
 	}
-	encoded, err := rlp.EncodeToBytes(block)
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%x", encoded), nil
+	return rlp.EncodeToBytes(block)
 }// GetBlockRlp retrieves the RLP encoded for of a single block.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1973" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2054" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_getHeaderRlp
+
+GetHeaderRlp retrieves the RLP encoded for of a single header.
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+number <code>uint64</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of the integer",
+        "pattern": "^0x[a-fA-F0-9]+$",
+        "title": "integer",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+
+<code>hexutil.Bytes</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of some bytes`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of some bytes",
+        "pattern": "^0x([a-fA-F\\d])+$",
+        "title": "dataWord",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getHeaderRlp", "params": [<number>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_getHeaderRlp", "params": [<number>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	debug.getHeaderRlp(number);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *DebugAPI) GetHeaderRlp(ctx context.Context, number uint64) (hexutil.Bytes, error) {
+	header, _ := api.b.HeaderByNumber(ctx, rpc.BlockNumber(number))
+	if header == nil {
+		return nil, fmt.Errorf("header #%d not found", number)
+	}
+	return rlp.EncodeToBytes(header)
+}// GetHeaderRlp retrieves the RLP encoded for of a single header.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2045" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1935,7 +2735,7 @@ commonAddress <code>[]common.Address</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) GetModifiedAccountsByHash(startHash common.Hash, endHash *common.Hash) ([ // GetModifiedAccountsByHash returns all accounts that have changed between the
+func (api *DebugAPI) GetModifiedAccountsByHash(startHash common.Hash, endHash *common.Hash) ([ // GetModifiedAccountsByHash returns all accounts that have changed between the
 // two blocks specified. A change is defined as a difference in nonce, balance,
 // code hash, or storage hash.
 //
@@ -1961,7 +2761,7 @@ func (api *PrivateDebugAPI) GetModifiedAccountsByHash(startHash common.Hash, end
 	return api.getModifiedAccounts(startBlock, endBlock)
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L521" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L501" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2131,7 +2931,7 @@ commonAddress <code>[]common.Address</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) GetModifiedAccountsByNumber(startNum uint64, endNum *uint64) ([ // GetModifiedAccountsByNumber returns all accounts that have changed between the
+func (api *DebugAPI) GetModifiedAccountsByNumber(startNum uint64, endNum *uint64) ([ // GetModifiedAccountsByNumber returns all accounts that have changed between the
 // two blocks specified. A change is defined as a difference in nonce, balance,
 // code hash, or storage hash.
 //
@@ -2157,7 +2957,141 @@ func (api *PrivateDebugAPI) GetModifiedAccountsByNumber(startNum uint64, endNum 
 	return api.getModifiedAccounts(startBlock, endBlock)
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L493" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L473" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_getRawReceipts
+
+GetRawReceipts retrieves the binary-encoded raw receipts of a single block.
+
+
+#### Params (1)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+blockNrOrHash <code>rpc.BlockNumberOrHash</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+
+
+#### Result
+
+
+
+hexutilBytes <code>[]hexutil.Bytes</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- items: 
+
+			- description: `Hex representation of some bytes`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: string
+
+
+	- type: array
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "items": [
+            {
+                "description": "Hex representation of some bytes",
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "dataWord",
+                "type": [
+                    "string"
+                ]
+            }
+        ],
+        "type": [
+            "array"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_getRawReceipts", "params": [<blockNrOrHash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_getRawReceipts", "params": [<blockNrOrHash>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	debug.getRawReceipts(blockNrOrHash);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *DebugAPI) GetRawReceipts(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash) ([ // GetRawReceipts retrieves the binary-encoded raw receipts of a single block.
+]hexutil.Bytes, error) {
+	var hash common.Hash
+	if h, ok := blockNrOrHash.Hash(); ok {
+		hash = h
+	} else {
+		block, err := api.b.BlockByNumberOrHash(ctx, blockNrOrHash)
+		if err != nil {
+			return nil, err
+		}
+		hash = block.Hash()
+	}
+	receipts, err := api.b.GetReceipts(ctx, hash)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]hexutil.Bytes, len(receipts))
+	for i, receipt := range receipts {
+		b, err := receipt.MarshalBinary()
+		if err != nil {
+			return nil, err
+		}
+		result[i] = b
+	}
+	return result, nil
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2063" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2266,7 +3200,296 @@ func (h *HandlerT) GoTrace(file string, nsec uint) error {
 // trace data to file.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L135" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L137" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### debug_intermediateRoots
+
+IntermediateRoots executes a block (bad- or canon- or side-), and returns a list
+of intermediate roots: the stateroot after each transaction.
+
+
+#### Params (2)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+hash <code>common.Hash</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of a Keccak 256 hash`
+	- pattern: `^0x[a-fA-F\d]{64}$`
+	- title: `keccak`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of a Keccak 256 hash",
+        "pattern": "^0x[a-fA-F\\d]{64}$",
+        "title": "keccak",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+
+__2:__ 
+config <code>*TraceConfig</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- additionalProperties: `false`
+	- properties: 
+		- Debug: 
+			- type: `boolean`
+
+		- DisableStack: 
+			- type: `boolean`
+
+		- DisableStorage: 
+			- type: `boolean`
+
+		- EnableMemory: 
+			- type: `boolean`
+
+		- EnableReturnData: 
+			- type: `boolean`
+
+		- Limit: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- NestedTraceOutput: 
+			- type: `boolean`
+
+		- Reexec: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- Timeout: 
+			- type: `string`
+
+		- Tracer: 
+			- type: `string`
+
+		- overrides: 
+			- additionalProperties: `true`
+
+
+	- type: object
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "additionalProperties": false,
+        "properties": {
+            "Debug": {
+                "type": "boolean"
+            },
+            "DisableStack": {
+                "type": "boolean"
+            },
+            "DisableStorage": {
+                "type": "boolean"
+            },
+            "EnableMemory": {
+                "type": "boolean"
+            },
+            "EnableReturnData": {
+                "type": "boolean"
+            },
+            "Limit": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "NestedTraceOutput": {
+                "type": "boolean"
+            },
+            "Reexec": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "Timeout": {
+                "type": "string"
+            },
+            "Tracer": {
+                "type": "string"
+            },
+            "overrides": {
+                "additionalProperties": true
+            }
+        },
+        "type": [
+            "object"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+commonHash <code>[]common.Hash</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- items: 
+
+			- description: `Hex representation of a Keccak 256 hash`
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: string
+
+
+	- type: array
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "items": [
+            {
+                "description": "Hex representation of a Keccak 256 hash",
+                "pattern": "^0x[a-fA-F\\d]{64}$",
+                "title": "keccak",
+                "type": [
+                    "string"
+                ]
+            }
+        ],
+        "type": [
+            "array"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_intermediateRoots", "params": [<hash>, <config>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_intermediateRoots", "params": [<hash>, <config>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	debug.intermediateRoots(hash,config);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *API) IntermediateRoots(ctx context.Context, hash common.Hash, config *TraceConfig) ([ // IntermediateRoots executes a block (bad- or canon- or side-), and returns a list
+// of intermediate roots: the stateroot after each transaction.
+]common.Hash, error) {
+	block, _ := api.blockByHash(ctx, hash)
+	if block == nil {
+		block = rawdb.ReadBadBlock(api.backend.ChainDb(), hash)
+	}
+	if block == nil {
+		return nil, fmt.Errorf("block %#x not found", hash)
+	}
+	if block.NumberU64() == 0 {
+		return nil, errors.New("genesis is not traceable")
+	}
+	parent, err := api.blockByNumberAndHash(ctx, rpc.BlockNumber(block.NumberU64()-1), block.ParentHash())
+	if err != nil {
+		return nil, err
+	}
+	reexec := defaultTraceReexec
+	if config != nil && config.Reexec != nil {
+		reexec = *config.Reexec
+	}
+	statedb, err := api.backend.StateAtBlock(ctx, parent, reexec, nil, true, false)
+	if err != nil {
+		return nil, err
+	}
+	var (
+		roots			[]common.Hash
+		signer			= types.MakeSigner(api.backend.ChainConfig(), block.Number())
+		chainConfig		= api.backend.ChainConfig()
+		vmctx			= core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
+		deleteEmptyObjects	= api.backend.ChainConfig().IsEnabled(api.backend.ChainConfig().GetEIP161dTransition, block.Number())
+	)
+	for i, tx := range block.Transactions() {
+		var (
+			msg, _		= tx.AsMessage(signer, block.BaseFee())
+			txContext	= core.NewEVMTxContext(msg)
+			vmenv		= vm.NewEVM(vmctx, txContext, statedb, chainConfig, vm.Config{})
+		)
+		statedb.Prepare(tx.Hash(), i)
+		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.Gas())); err != nil {
+			log.Warn("Tracing intermediate roots did not complete", "txindex", i, "txhash", tx.Hash(), "err", err)
+			return roots, nil
+		}
+		roots = append(roots, statedb.IntermediateRoot(deleteEmptyObjects))
+	}
+	return roots, nil
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L514" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2732,7 +3955,7 @@ func (*HandlerT) MemStats() *runtime.MemStats {
 }// MemStats returns detailed runtime memory statistics.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L73" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L75" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2841,7 +4064,7 @@ func (*HandlerT) MutexProfile(file string, nsec uint) error {
 // desired, set the rate and write the profile manually.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L168" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L170" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2962,7 +4185,7 @@ hash <code>common.Hash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) Preimage(ctx context.Context, hash common.Hash) (hexutil.Bytes, error) {
+func (api *DebugAPI) Preimage(ctx context.Context, hash common.Hash) (hexutil.Bytes, error) {
 	if preimage := rawdb.ReadPreimage(api.eth.ChainDb(), hash); preimage != nil {
 		return preimage, nil
 	}
@@ -2970,7 +4193,7 @@ func (api *PrivateDebugAPI) Preimage(ctx context.Context, hash common.Hash) (hex
 }// Preimage is a debug API function that returns the preimage for a sha3 hash, if known.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L341" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L313" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3066,7 +4289,7 @@ number <code>uint64</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicDebugAPI) PrintBlock(ctx context.Context, number uint64) (string, error) {
+func (api *DebugAPI) PrintBlock(ctx context.Context, number uint64) (string, error) {
 	block, _ := api.b.BlockByNumber(ctx, rpc.BlockNumber(number))
 	if block == nil {
 		return "", fmt.Errorf("block #%d not found", number)
@@ -3075,7 +4298,7 @@ func (api *PublicDebugAPI) PrintBlock(ctx context.Context, number uint64) (strin
 }// PrintBlock retrieves a block and returns its pretty printed form.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2025" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2090" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3193,13 +4416,13 @@ hash <code>common.Hash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) RemovePendingTransaction(hash common.Hash) (*types.Transaction, error) {
+func (api *DebugAPI) RemovePendingTransaction(hash common.Hash) (*types.Transaction, error) {
 	return api.eth.txPool.RemoveTx(hash), nil
 }// RemovePendingTransaction removes a transaction from the txpool.
 // It returns the transaction removed, if any.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L573" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L614" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3295,7 +4518,7 @@ number <code>uint64</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicDebugAPI) SeedHash(ctx context.Context, number uint64) (string, error) {
+func (api *DebugAPI) SeedHash(ctx context.Context, number uint64) (string, error) {
 	block, _ := api.b.BlockByNumber(ctx, rpc.BlockNumber(number))
 	if block == nil {
 		return "", fmt.Errorf("block #%d not found", number)
@@ -3307,7 +4530,7 @@ func (api *PublicDebugAPI) SeedHash(ctx context.Context, number uint64) (string,
 }// SeedHash retrieves the seed hash of a block.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2034" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2099" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3402,7 +4625,7 @@ func (*HandlerT) SetBlockProfileRate(rate int) {
 // rate 0 disables block profiling.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L156" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L158" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3530,7 +4753,7 @@ func (*HandlerT) SetGCPercent(v int) int {
 // setting. A negative value disables GC.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L206" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L242" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3618,12 +4841,12 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) SetHead(number hexutil.Uint64) {
+func (api *DebugAPI) SetHead(number hexutil.Uint64) {
 	api.b.SetHead(uint64(number))
 }// SetHead rewinds the head of the blockchain to a previous block.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2081" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L2134" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3716,7 +4939,7 @@ func (*HandlerT) SetMutexProfileFraction(rate int) {
 }// SetMutexProfileFraction sets the rate of mutex profiling.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L177" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L179" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3726,12 +4949,25 @@ func (*HandlerT) SetMutexProfileFraction(rate int) {
 
 ### debug_stacks
 
-Stacks returns a printed representation of the stacks of all goroutines.
+Stacks returns a printed representation of the stacks of all goroutines. It
+also permits the following optional filters to be used:
+  - filter: boolean expression of packages to filter for
 
 
-#### Params (0)
+#### Params (1)
 
-_None_
+Parameters must be given _by position_.
+
+
+__1:__ 
+filter <code>*string</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+
 
 #### Result
 
@@ -3751,7 +4987,7 @@ _None_
 === "Shell HTTP"
 
 	``` shell
-	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_stacks", "params": []}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_stacks", "params": [<filter>]}'
 	```
 
 
@@ -3761,14 +4997,14 @@ _None_
 === "Shell WebSocket"
 
 	``` shell
-	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_stacks", "params": []}'
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_stacks", "params": [<filter>]}'
 	```
 
 
 === "Javascript Console"
 
 	``` js
-	debug.stacks();
+	debug.stacks(filter);
 	```
 
 
@@ -3776,14 +5012,37 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (*HandlerT) Stacks() string {
+func (*HandlerT) Stacks(filter *string) string {
 	buf := new(bytes.Buffer)
 	pprof.Lookup("goroutine").WriteTo(buf, 2)
+	if filter != nil && len(*filter) > 0 {
+		expanded := *filter
+		expanded = regexp.MustCompile(`[:/\.A-Za-z0-9_-]+`).ReplaceAllString(expanded, "`$0` in Value")
+		expanded = regexp.MustCompile("!(`[:/\\.A-Za-z0-9_-]+`)").ReplaceAllString(expanded, "$1 not")
+		expanded = strings.ReplaceAll(expanded, "||", "or")
+		expanded = strings.ReplaceAll(expanded, "&&", "and")
+		log.Info("Expanded filter expression", "filter", *filter, "expanded", expanded)
+		expr, err := bexpr.CreateEvaluator(expanded)
+		if err != nil {
+			log.Error("Failed to parse filter expression", "expanded", expanded, "err", err)
+			return ""
+		}
+		dump := buf.String()
+		buf.Reset()
+		for _, trace := // Stacks returns a printed representation of the stacks of all goroutines. It
+		// also permits the following optional filters to be used:
+		//   - filter: boolean expression of packages to filter for
+		range strings.Split(dump, "\n\n") {
+			if ok, _ := expr.Evaluate(map[string]string{"Value": trace}); ok {
+				buf.WriteString(trace)
+				buf.WriteString("\n\n")
+			}
+		}
+	}
 	return buf.String()
-}// Stacks returns a printed representation of the stacks of all goroutines.
-
+}
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L193" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L197" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3852,16 +5111,16 @@ config <code>*StdTraceConfig</code>
 		- Debug: 
 			- type: `boolean`
 
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
 		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
+			- type: `boolean`
+
+		- EnableMemory: 
+			- type: `boolean`
+
+		- EnableReturnData: 
 			- type: `boolean`
 
 		- Limit: 
@@ -3897,16 +5156,16 @@ config <code>*StdTraceConfig</code>
             "Debug": {
                 "type": "boolean"
             },
-            "DisableMemory": {
-                "type": "boolean"
-            },
-            "DisableReturnData": {
-                "type": "boolean"
-            },
             "DisableStack": {
                 "type": "boolean"
             },
             "DisableStorage": {
+                "type": "boolean"
+            },
+            "EnableMemory": {
+                "type": "boolean"
+            },
+            "EnableReturnData": {
                 "type": "boolean"
             },
             "Limit": {
@@ -4015,15 +5274,14 @@ func (api *API) StandardTraceBadBlockToFile(ctx context.Context, hash common.Has
 // execution of EVM against a block pulled from the pool of bad ones to the
 // local file system and returns a list of files to the caller.
 ]string, error) {
-	for _, block := range rawdb.ReadAllBadBlocks(api.backend.ChainDb()) {
-		if block.Hash() == hash {
-			return api.standardTraceBlockToFile(ctx, block, config)
-		}
+	block := rawdb.ReadBadBlock(api.backend.ChainDb(), hash)
+	if block == nil {
+		return nil, fmt.Errorf("bad block %#x not found", hash)
 	}
-	return nil, fmt.Errorf("bad block %#x not found", hash)
+	return api.standardTraceBlockToFile(ctx, block, config)
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L448" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L572" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4092,16 +5350,16 @@ config <code>*StdTraceConfig</code>
 		- Debug: 
 			- type: `boolean`
 
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
 		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
+			- type: `boolean`
+
+		- EnableMemory: 
+			- type: `boolean`
+
+		- EnableReturnData: 
 			- type: `boolean`
 
 		- Limit: 
@@ -4137,16 +5395,16 @@ config <code>*StdTraceConfig</code>
             "Debug": {
                 "type": "boolean"
             },
-            "DisableMemory": {
-                "type": "boolean"
-            },
-            "DisableReturnData": {
-                "type": "boolean"
-            },
             "DisableStack": {
                 "type": "boolean"
             },
             "DisableStorage": {
+                "type": "boolean"
+            },
+            "EnableMemory": {
+                "type": "boolean"
+            },
+            "EnableReturnData": {
                 "type": "boolean"
             },
             "Limit": {
@@ -4262,7 +5520,7 @@ func (api *API) StandardTraceBlockToFile(ctx context.Context, hash common.Hash, 
 	return api.standardTraceBlockToFile(ctx, block, config)
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L437" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L504" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4346,7 +5604,7 @@ func (h *HandlerT) StartCPUProfile(file string) error {
 }// StartCPUProfile turns on CPU profiling, writing to the given file.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L98" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L100" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4430,7 +5688,7 @@ func (h *HandlerT) StartGoTrace(file string) error {
 }// StartGoTrace turns on tracing, writing to the given file.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/trace.go#L30" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/trace.go#L31" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4497,7 +5755,7 @@ func (h *HandlerT) StopCPUProfile() error {
 }// StopCPUProfile stops an ongoing CPU profile.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L119" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L121" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4564,7 +5822,7 @@ func (h *HandlerT) StopGoTrace() error {
 }// StopTrace stops an ongoing trace.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/trace.go#L51" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/trace.go#L52" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4873,16 +6131,15 @@ maxResult <code>int</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateDebugAPI) StorageRangeAt(blockHash common.Hash, txIndex int, contractAddress common.Address, keyStart hexutil.Bytes, maxResult int) (StorageRangeResult, error) {
+func (api *DebugAPI) StorageRangeAt(blockHash common.Hash, txIndex int, contractAddress common.Address, keyStart hexutil.Bytes, maxResult int) (StorageRangeResult, error) {
 	block := api.eth.blockchain.GetBlockByHash(blockHash)
 	if block == nil {
 		return StorageRangeResult{}, fmt.Errorf("block %#x not found", blockHash)
 	}
-	_, _, statedb, release, err := api.eth.stateAtTransaction(block, txIndex, 0)
+	_, _, statedb, err := api.eth.stateAtTransaction(block, txIndex, 0)
 	if err != nil {
 		return StorageRangeResult{}, err
 	}
-	defer release()
 	st := statedb.StorageTrie(contractAddress)
 	if st == nil {
 		return StorageRangeResult{}, fmt.Errorf("account %x doesn't exist", contractAddress)
@@ -4891,7 +6148,7 @@ func (api *PrivateDebugAPI) StorageRangeAt(blockHash common.Hash, txIndex int, c
 }// StorageRangeAt returns the storage at the given block height and transaction index.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L447" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L428" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5023,199 +6280,7 @@ func (sub *RPCDebugSubscription) Subscribe(subscriptionName RPCDebugSubscription
 // Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L252" target="_">View on GitHub →</a>
-</p>
-</details>
-
----
-
-
-
-### debug_testSignCliqueBlock
-
-TestSignCliqueBlock fetches the given block number, and attempts to sign it as a clique header with the
-given address, returning the address of the recovered signature
-
-This is a temporary method to debug the externalsigner integration,
-TODO: Remove this method when the integration is mature
-
-
-#### Params (2)
-
-Parameters must be given _by position_.
-
-
-__1:__ 
-address <code>common.Address</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Hex representation of a Keccak 256 hash POINTER`
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- title: `keccak`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Hex representation of a Keccak 256 hash POINTER",
-        "pattern": "^0x[a-fA-F\\d]{64}$",
-        "title": "keccak",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-
-__2:__ 
-number <code>uint64</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Hex representation of the integer`
-	- pattern: `^0x[a-fA-F0-9]+$`
-	- title: `integer`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Hex representation of the integer",
-        "pattern": "^0x[a-fA-F0-9]+$",
-        "title": "integer",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-
-
-#### Result
-
-
-
-
-<code>common.Address</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Hex representation of a Keccak 256 hash POINTER`
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- title: `keccak`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Hex representation of a Keccak 256 hash POINTER",
-        "pattern": "^0x[a-fA-F\\d]{64}$",
-        "title": "keccak",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-#### Client Method Invocation Examples
-
-
-=== "Shell HTTP"
-
-	``` shell
-	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "debug_testSignCliqueBlock", "params": [<address>, <number>]}'
-	```
-
-
-
-
-
-=== "Shell WebSocket"
-
-	``` shell
-	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "debug_testSignCliqueBlock", "params": [<address>, <number>]}'
-	```
-
-
-=== "Javascript Console"
-
-	``` js
-	debug.testSignCliqueBlock(address,number);
-	```
-
-
-
-<details><summary>Source code</summary>
-<p>
-```go
-func (api *PublicDebugAPI) TestSignCliqueBlock(ctx context.Context, address common.Address, number uint64) (common.Address, error) {
-	block, _ := api.b.BlockByNumber(ctx, rpc.BlockNumber(number))
-	if block == nil {
-		return common.Address{}, fmt.Errorf("block #%d not found", number)
-	}
-	header := block.Header()
-	header.Extra = make([ // TestSignCliqueBlock fetches the given block number, and attempts to sign it as a clique header with the
-	// given address, returning the address of the recovered signature
-	//
-	// This is a temporary method to debug the externalsigner integration,
-	// TODO: Remove this method when the integration is mature
-	]byte, 32+65)
-	encoded := clique.CliqueRLP(header)
-	account := accounts.Account{Address: address}
-	wallet, err := api.b.AccountManager().Find(account)
-	if err != nil {
-		return common.Address{}, err
-	}
-	signature, err := wallet.SignData(account, accounts.MimetypeClique, encoded)
-	if err != nil {
-		return common.Address{}, err
-	}
-	sealHash := clique.SealHash(header).Bytes()
-	log.Info("test signing of clique block", "Sealhash", fmt.Sprintf("%x", sealHash), "signature", fmt.Sprintf("%x", signature))
-	pubkey, err := crypto.Ecrecover(sealHash, signature)
-	if err != nil {
-		return common.Address{}, err
-	}
-	var signer common.Address
-	copy(signer[:], crypto.Keccak256(pubkey[1:])[12:])
-	return signer, nil
-}
-```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1990" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L251" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5284,16 +6349,16 @@ config <code>*TraceConfig</code>
 		- Debug: 
 			- type: `boolean`
 
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
 		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
+			- type: `boolean`
+
+		- EnableMemory: 
+			- type: `boolean`
+
+		- EnableReturnData: 
 			- type: `boolean`
 
 		- Limit: 
@@ -5333,16 +6398,16 @@ config <code>*TraceConfig</code>
             "Debug": {
                 "type": "boolean"
             },
-            "DisableMemory": {
-                "type": "boolean"
-            },
-            "DisableReturnData": {
-                "type": "boolean"
-            },
             "DisableStack": {
                 "type": "boolean"
             },
             "DisableStorage": {
+                "type": "boolean"
+            },
+            "EnableMemory": {
+                "type": "boolean"
+            },
+            "EnableReturnData": {
                 "type": "boolean"
             },
             "Limit": {
@@ -5473,15 +6538,14 @@ func (api *API) TraceBadBlock(ctx context.Context, hash common.Hash, config *Tra
 // EVM against a block pulled from the pool of bad ones and returns them as a JSON
 // object.
 ]*txTraceResult, error) {
-	for _, block := range rawdb.ReadAllBadBlocks(api.backend.ChainDb()) {
-		if block.Hash() == hash {
-			return api.traceBlock(ctx, block, config)
-		}
+	block := rawdb.ReadBadBlock(api.backend.ChainDb(), hash)
+	if block == nil {
+		return nil, fmt.Errorf("bad block %#x not found", hash)
 	}
-	return nil, fmt.Errorf("bad block %#x not found", hash)
+	return api.traceBlock(ctx, block, config)
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L425" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L493" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5501,7 +6565,7 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-blob <code>[]byte</code> 
+blob <code>hexutil.Bytes</code> 
 
   + Required: ✓ Yes
 
@@ -5510,9 +6574,9 @@ blob <code>[]byte</code>
 
 	``` Schema
 	
-	- description: `Hex representation of a variable length byte array`
-	- pattern: `^0x([a-fA-F0-9]?)+$`
-	- title: `bytes`
+	- description: `Hex representation of some bytes`
+	- pattern: `^0x([a-fA-F\d])+$`
+	- title: `dataWord`
 	- type: string
 
 
@@ -5522,9 +6586,9 @@ blob <code>[]byte</code>
 
 	``` Raw
 	{
-        "description": "Hex representation of a variable length byte array",
-        "pattern": "^0x([a-fA-F0-9]?)+$",
-        "title": "bytes",
+        "description": "Hex representation of some bytes",
+        "pattern": "^0x([a-fA-F\\d])+$",
+        "title": "dataWord",
         "type": [
             "string"
         ]
@@ -5549,16 +6613,16 @@ config <code>*TraceConfig</code>
 		- Debug: 
 			- type: `boolean`
 
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
 		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
+			- type: `boolean`
+
+		- EnableMemory: 
+			- type: `boolean`
+
+		- EnableReturnData: 
 			- type: `boolean`
 
 		- Limit: 
@@ -5598,16 +6662,16 @@ config <code>*TraceConfig</code>
             "Debug": {
                 "type": "boolean"
             },
-            "DisableMemory": {
-                "type": "boolean"
-            },
-            "DisableReturnData": {
-                "type": "boolean"
-            },
             "DisableStack": {
                 "type": "boolean"
             },
             "DisableStorage": {
+                "type": "boolean"
+            },
+            "EnableMemory": {
+                "type": "boolean"
+            },
+            "EnableReturnData": {
                 "type": "boolean"
             },
             "Limit": {
@@ -5734,9 +6798,9 @@ txTraceResult <code>[]*txTraceResult</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *API) TraceBlock(ctx context.Context, blob [ // TraceBlock returns the structured logs created during the execution of EVM
+func (api *API) TraceBlock(ctx context.Context, blob hexutil.Bytes, config *TraceConfig) ([ // TraceBlock returns the structured logs created during the execution of EVM
 // and returns them as a JSON object.
-]byte, config *TraceConfig) ([]*txTraceResult, error) {
+]*txTraceResult, error) {
 	block := new(types.Block)
 	if err := rlp.Decode(bytes.NewReader(blob), block); err != nil {
 		return nil, fmt.Errorf("could not decode block: %v", err)
@@ -5744,7 +6808,7 @@ func (api *API) TraceBlock(ctx context.Context, blob [ // TraceBlock returns the
 	return api.traceBlock(ctx, block, config)
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L404" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L472" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5812,16 +6876,16 @@ config <code>*TraceConfig</code>
 		- Debug: 
 			- type: `boolean`
 
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
 		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
+			- type: `boolean`
+
+		- EnableMemory: 
+			- type: `boolean`
+
+		- EnableReturnData: 
 			- type: `boolean`
 
 		- Limit: 
@@ -5861,16 +6925,16 @@ config <code>*TraceConfig</code>
             "Debug": {
                 "type": "boolean"
             },
-            "DisableMemory": {
-                "type": "boolean"
-            },
-            "DisableReturnData": {
-                "type": "boolean"
-            },
             "DisableStack": {
                 "type": "boolean"
             },
             "DisableStorage": {
+                "type": "boolean"
+            },
+            "EnableMemory": {
+                "type": "boolean"
+            },
+            "EnableReturnData": {
                 "type": "boolean"
             },
             "Limit": {
@@ -6007,7 +7071,7 @@ func (api *API) TraceBlockByHash(ctx context.Context, hash common.Hash, config *
 	return api.traceBlock(ctx, block, config)
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L394" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L462" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6103,16 +7167,16 @@ config <code>*TraceConfig</code>
 		- Debug: 
 			- type: `boolean`
 
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
 		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
+			- type: `boolean`
+
+		- EnableMemory: 
+			- type: `boolean`
+
+		- EnableReturnData: 
 			- type: `boolean`
 
 		- Limit: 
@@ -6152,16 +7216,16 @@ config <code>*TraceConfig</code>
             "Debug": {
                 "type": "boolean"
             },
-            "DisableMemory": {
-                "type": "boolean"
-            },
-            "DisableReturnData": {
-                "type": "boolean"
-            },
             "DisableStack": {
                 "type": "boolean"
             },
             "DisableStorage": {
+                "type": "boolean"
+            },
+            "EnableMemory": {
+                "type": "boolean"
+            },
+            "EnableReturnData": {
                 "type": "boolean"
             },
             "Limit": {
@@ -6298,7 +7362,7 @@ func (api *API) TraceBlockByNumber(ctx context.Context, number rpc.BlockNumber, 
 	return api.traceBlock(ctx, block, config)
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L384" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L452" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6341,16 +7405,16 @@ config <code>*TraceConfig</code>
 		- Debug: 
 			- type: `boolean`
 
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
 		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
+			- type: `boolean`
+
+		- EnableMemory: 
+			- type: `boolean`
+
+		- EnableReturnData: 
 			- type: `boolean`
 
 		- Limit: 
@@ -6390,16 +7454,16 @@ config <code>*TraceConfig</code>
             "Debug": {
                 "type": "boolean"
             },
-            "DisableMemory": {
-                "type": "boolean"
-            },
-            "DisableReturnData": {
-                "type": "boolean"
-            },
             "DisableStack": {
                 "type": "boolean"
             },
             "DisableStorage": {
+                "type": "boolean"
+            },
+            "EnableMemory": {
+                "type": "boolean"
+            },
+            "EnableReturnData": {
                 "type": "boolean"
             },
             "Limit": {
@@ -6529,14 +7593,14 @@ txTraceResult <code>[]*txTraceResult</code>
 func (api *API) TraceBlockFromFile(ctx context.Context, file string, config *TraceConfig) ([ // TraceBlockFromFile returns the structured logs created during the execution of
 // EVM and returns them as a JSON object.
 ]*txTraceResult, error) {
-	blob, err := ioutil.ReadFile(file)
+	blob, err := os.ReadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("could not read file: %v", err)
 	}
 	return api.TraceBlock(ctx, blob, config)
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L414" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L482" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6549,7 +7613,6 @@ func (api *API) TraceBlockFromFile(ctx context.Context, file string, config *Tra
 TraceCall lets you trace a given eth_call. It collects the structured logs
 created during the execution of EVM if the given transaction was added on
 top of the provided block and returns them as a JSON object.
-You can provide -2 as a block number to trace on top of the pending block.
 
 
 #### Params (3)
@@ -6558,7 +7621,7 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-args <code>ethapi.CallArgs</code> 
+args <code>ethapi.TransactionArgs</code> 
 
   + Required: ✓ Yes
 
@@ -6592,6 +7655,11 @@ args <code>ethapi.CallArgs</code>
 
 			- type: `array`
 
+		- chainId: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- data: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
@@ -6610,6 +7678,26 @@ args <code>ethapi.CallArgs</code>
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
+
+		- input: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
 		- to: 
@@ -6657,6 +7745,11 @@ args <code>ethapi.CallArgs</code>
                 },
                 "type": "array"
             },
+            "chainId": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
             "data": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "dataWord",
@@ -6675,6 +7768,26 @@ args <code>ethapi.CallArgs</code>
             "gasPrice": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
+                "type": "string"
+            },
+            "input": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "dataWord",
+                "type": "string"
+            },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "nonce": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
                 "type": "string"
             },
             "to": {
@@ -6707,7 +7820,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 __3:__ 
-config <code>*TraceConfig</code> 
+config <code>*TraceCallConfig</code> 
 
   + Required: ✓ Yes
 
@@ -6718,19 +7831,55 @@ config <code>*TraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- BlockOverrides: 
+			- additionalProperties: `false`
+			- properties: 
+				- Coinbase: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- Difficulty: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- GasLimit: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
+					- type: `string`
+
+				- Number: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- Random: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- Time: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+
+			- type: `object`
+
 		- Debug: 
-			- type: `boolean`
-
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
 			- type: `boolean`
 
 		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
+			- type: `boolean`
+
+		- EnableMemory: 
+			- type: `boolean`
+
+		- EnableReturnData: 
 			- type: `boolean`
 
 		- Limit: 
@@ -6745,6 +7894,54 @@ config <code>*TraceConfig</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- StateOverrides: 
+			- patternProperties: 
+				- .*: 
+					- additionalProperties: `false`
+					- properties: 
+						- balance: 
+							- pattern: `^0x[a-fA-F0-9]+$`
+							- title: `integer`
+							- type: `string`
+
+						- code: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `dataWord`
+							- type: `string`
+
+						- nonce: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `uint64`
+							- type: `string`
+
+						- state: 
+							- patternProperties: 
+								- .*: 
+									- description: `Hex representation of a Keccak 256 hash`
+									- pattern: `^0x[a-fA-F\d]{64}$`
+									- title: `keccak`
+									- type: `string`
+
+
+							- type: `object`
+
+						- stateDiff: 
+							- patternProperties: 
+								- .*: 
+									- description: `Hex representation of a Keccak 256 hash`
+									- pattern: `^0x[a-fA-F\d]{64}$`
+									- title: `keccak`
+									- type: `string`
+
+
+							- type: `object`
+
+
+					- type: `object`
+
+
+			- type: `object`
 
 		- Timeout: 
 			- type: `string`
@@ -6767,19 +7964,55 @@ config <code>*TraceConfig</code>
 	{
         "additionalProperties": false,
         "properties": {
+            "BlockOverrides": {
+                "additionalProperties": false,
+                "properties": {
+                    "Coinbase": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "Difficulty": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "GasLimit": {
+                        "pattern": "^0x([a-fA-F\\d])+$",
+                        "title": "uint64",
+                        "type": "string"
+                    },
+                    "Number": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "Random": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "Time": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "Debug": {
-                "type": "boolean"
-            },
-            "DisableMemory": {
-                "type": "boolean"
-            },
-            "DisableReturnData": {
                 "type": "boolean"
             },
             "DisableStack": {
                 "type": "boolean"
             },
             "DisableStorage": {
+                "type": "boolean"
+            },
+            "EnableMemory": {
+                "type": "boolean"
+            },
+            "EnableReturnData": {
                 "type": "boolean"
             },
             "Limit": {
@@ -6794,6 +8027,54 @@ config <code>*TraceConfig</code>
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
                 "type": "string"
+            },
+            "StateOverrides": {
+                "patternProperties": {
+                    ".*": {
+                        "additionalProperties": false,
+                        "properties": {
+                            "balance": {
+                                "pattern": "^0x[a-fA-F0-9]+$",
+                                "title": "integer",
+                                "type": "string"
+                            },
+                            "code": {
+                                "pattern": "^0x([a-fA-F\\d])+$",
+                                "title": "dataWord",
+                                "type": "string"
+                            },
+                            "nonce": {
+                                "pattern": "^0x([a-fA-F\\d])+$",
+                                "title": "uint64",
+                                "type": "string"
+                            },
+                            "state": {
+                                "patternProperties": {
+                                    ".*": {
+                                        "description": "Hex representation of a Keccak 256 hash",
+                                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                                        "title": "keccak",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "stateDiff": {
+                                "patternProperties": {
+                                    ".*": {
+                                        "description": "Hex representation of a Keccak 256 hash",
+                                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                                        "title": "keccak",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
             },
             "Timeout": {
                 "type": "string"
@@ -6857,7 +8138,7 @@ interface <code>interface{}</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *API) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
 	var (
 		err	error
 		block	*types.Block
@@ -6865,7 +8146,12 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHa
 	if hash, ok := blockNrOrHash.Hash(); ok {
 		block, err = api.blockByHash(ctx, hash)
 	} else if number, ok := blockNrOrHash.Number(); ok {
+		if number == rpc.PendingBlockNumber {
+			return nil, errors.New("tracing on top of pending is not supported")
+		}
 		block, err = api.blockByNumber(ctx, number)
+	} else {
+		return nil, errors.New("invalid arguments; neither block nor hash specified")
 	}
 	if err != nil {
 		return nil, err
@@ -6874,44 +8160,30 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.CallArgs, blockNrOrHa
 	if config != nil && config.Reexec != nil {
 		reexec = *config.Reexec
 	}
-	statedb, release, err := api.backend.StateAtBlock(ctx, block, reexec)
+	statedb, err := api.backend.StateAtBlock(ctx, block, reexec, nil, true, false)
 	if err != nil {
 		return nil, err
 	}
-	defer release()
-	msg := args.ToMessage(api.backend.RPCGasCap())
 	vmctx := core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
-	originalCanTransfer := vmctx.CanTransfer
-	originalTransfer := vmctx.Transfer
-	gasCost := new(big.Int).Mul(new(big.Int).SetUint64(msg.Gas()), msg.GasPrice())
-	totalCost := new(big.Int).Add(gasCost, msg.Value())
-	hasFromSufficientBalanceForValueAndGasCost := vmctx.CanTransfer(statedb, msg.From(), totalCost)
-	hasFromSufficientBalanceForGasCost := vmctx.CanTransfer(statedb, msg.From(), gasCost)
-	vmctx.CanTransfer = func(db vm.StateDB, sender common.Address, amount *big.Int) bool {
-		if msg.From() == sender {
-			return true
+	if config != nil {
+		if err := config.StateOverrides.Apply(statedb); err != nil {
+			return nil, err
 		}
-		res := originalCanTransfer(db, sender, amount)
-		return res
+		config.BlockOverrides.Apply(&vmctx)
 	}
-	vmctx.Transfer = func(db vm.StateDB, sender, recipient common.Address, amount *big.Int) {
-		toAmount := new(big.Int).Set(amount)
-		senderBalance := db.GetBalance(sender)
-		if senderBalance.Cmp(toAmount) < 0 {
-			toAmount.Set(big.NewInt(0))
-		}
-		originalTransfer(db, sender, recipient, toAmount)
+	msg, err := args.ToMessage(api.backend.RPCGasCap(), block.BaseFee())
+	if err != nil {
+		return nil, err
 	}
-	taskExtraContext := map // TraceCall lets you trace a given eth_call. It collects the structured logs
-	// created during the execution of EVM if the given transaction was added on
-	// top of the provided block and returns them as a JSON object.
-	// You can provide -2 as a block number to trace on top of the pending block.
-	// Try to retrieve the specified block
-	[string]interface{}{"hasFromSufficientBalanceForValueAndGasCost": hasFromSufficientBalanceForValueAndGasCost, "hasFromSufficientBalanceForGasCost": hasFromSufficientBalanceForGasCost}
-	return api.traceTx(ctx, msg, vmctx, statedb, taskExtraContext, config)
-}
+	traceConfig := getTraceConfigFromTraceCallConfig(config)
+	return api.traceTx(ctx, msg, new(Context), vmctx, statedb, traceConfig)
+}// TraceCall lets you trace a given eth_call. It collects the structured logs
+// created during the execution of EVM if the given transaction was added on
+// top of the provided block and returns them as a JSON object.
+// Try to retrieve the specified block
+
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L725" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L839" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6932,7 +8204,7 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-txs <code>[]ethapi.CallArgs</code> 
+txs <code>[]ethapi.TransactionArgs</code> 
 
   + Required: ✓ Yes
 
@@ -6968,6 +8240,11 @@ txs <code>[]ethapi.CallArgs</code>
 
 					- type: `array`
 
+				- chainId: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
 				- data: 
 					- pattern: `^0x([a-fA-F\d])+$`
 					- title: `dataWord`
@@ -6986,6 +8263,26 @@ txs <code>[]ethapi.CallArgs</code>
 				- gasPrice: 
 					- pattern: `^0x[a-fA-F0-9]+$`
 					- title: `integer`
+					- type: `string`
+
+				- input: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `dataWord`
+					- type: `string`
+
+				- maxFeePerGas: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- maxPriorityFeePerGas: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- nonce: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
 					- type: `string`
 
 				- to: 
@@ -7038,6 +8335,11 @@ txs <code>[]ethapi.CallArgs</code>
                         },
                         "type": "array"
                     },
+                    "chainId": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
                     "data": {
                         "pattern": "^0x([a-fA-F\\d])+$",
                         "title": "dataWord",
@@ -7056,6 +8358,26 @@ txs <code>[]ethapi.CallArgs</code>
                     "gasPrice": {
                         "pattern": "^0x[a-fA-F0-9]+$",
                         "title": "integer",
+                        "type": "string"
+                    },
+                    "input": {
+                        "pattern": "^0x([a-fA-F\\d])+$",
+                        "title": "dataWord",
+                        "type": "string"
+                    },
+                    "maxFeePerGas": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "maxPriorityFeePerGas": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "nonce": {
+                        "pattern": "^0x([a-fA-F\\d])+$",
+                        "title": "uint64",
                         "type": "string"
                     },
                     "to": {
@@ -7093,7 +8415,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 __3:__ 
-config <code>*TraceConfig</code> 
+config <code>*TraceCallConfig</code> 
 
   + Required: ✓ Yes
 
@@ -7104,19 +8426,55 @@ config <code>*TraceConfig</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- BlockOverrides: 
+			- additionalProperties: `false`
+			- properties: 
+				- Coinbase: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- Difficulty: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- GasLimit: 
+					- pattern: `^0x([a-fA-F\d])+$`
+					- title: `uint64`
+					- type: `string`
+
+				- Number: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- Random: 
+					- pattern: `^0x[a-fA-F\d]{64}$`
+					- title: `keccak`
+					- type: `string`
+
+				- Time: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+
+			- type: `object`
+
 		- Debug: 
-			- type: `boolean`
-
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
 			- type: `boolean`
 
 		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
+			- type: `boolean`
+
+		- EnableMemory: 
+			- type: `boolean`
+
+		- EnableReturnData: 
 			- type: `boolean`
 
 		- Limit: 
@@ -7131,6 +8489,54 @@ config <code>*TraceConfig</code>
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
 			- type: `string`
+
+		- StateOverrides: 
+			- patternProperties: 
+				- .*: 
+					- additionalProperties: `false`
+					- properties: 
+						- balance: 
+							- pattern: `^0x[a-fA-F0-9]+$`
+							- title: `integer`
+							- type: `string`
+
+						- code: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `dataWord`
+							- type: `string`
+
+						- nonce: 
+							- pattern: `^0x([a-fA-F\d])+$`
+							- title: `uint64`
+							- type: `string`
+
+						- state: 
+							- patternProperties: 
+								- .*: 
+									- description: `Hex representation of a Keccak 256 hash`
+									- pattern: `^0x[a-fA-F\d]{64}$`
+									- title: `keccak`
+									- type: `string`
+
+
+							- type: `object`
+
+						- stateDiff: 
+							- patternProperties: 
+								- .*: 
+									- description: `Hex representation of a Keccak 256 hash`
+									- pattern: `^0x[a-fA-F\d]{64}$`
+									- title: `keccak`
+									- type: `string`
+
+
+							- type: `object`
+
+
+					- type: `object`
+
+
+			- type: `object`
 
 		- Timeout: 
 			- type: `string`
@@ -7153,19 +8559,55 @@ config <code>*TraceConfig</code>
 	{
         "additionalProperties": false,
         "properties": {
+            "BlockOverrides": {
+                "additionalProperties": false,
+                "properties": {
+                    "Coinbase": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "Difficulty": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "GasLimit": {
+                        "pattern": "^0x([a-fA-F\\d])+$",
+                        "title": "uint64",
+                        "type": "string"
+                    },
+                    "Number": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "Random": {
+                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                        "title": "keccak",
+                        "type": "string"
+                    },
+                    "Time": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "Debug": {
-                "type": "boolean"
-            },
-            "DisableMemory": {
-                "type": "boolean"
-            },
-            "DisableReturnData": {
                 "type": "boolean"
             },
             "DisableStack": {
                 "type": "boolean"
             },
             "DisableStorage": {
+                "type": "boolean"
+            },
+            "EnableMemory": {
+                "type": "boolean"
+            },
+            "EnableReturnData": {
                 "type": "boolean"
             },
             "Limit": {
@@ -7180,6 +8622,54 @@ config <code>*TraceConfig</code>
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
                 "type": "string"
+            },
+            "StateOverrides": {
+                "patternProperties": {
+                    ".*": {
+                        "additionalProperties": false,
+                        "properties": {
+                            "balance": {
+                                "pattern": "^0x[a-fA-F0-9]+$",
+                                "title": "integer",
+                                "type": "string"
+                            },
+                            "code": {
+                                "pattern": "^0x([a-fA-F\\d])+$",
+                                "title": "dataWord",
+                                "type": "string"
+                            },
+                            "nonce": {
+                                "pattern": "^0x([a-fA-F\\d])+$",
+                                "title": "uint64",
+                                "type": "string"
+                            },
+                            "state": {
+                                "patternProperties": {
+                                    ".*": {
+                                        "description": "Hex representation of a Keccak 256 hash",
+                                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                                        "title": "keccak",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "stateDiff": {
+                                "patternProperties": {
+                                    ".*": {
+                                        "description": "Hex representation of a Keccak 256 hash",
+                                        "pattern": "^0x[a-fA-F\\d]{64}$",
+                                        "title": "keccak",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
             },
             "Timeout": {
                 "type": "string"
@@ -7246,7 +8736,7 @@ interface <code>interface{}</code>
 func (api *API) TraceCallMany(ctx context.Context, txs [ // TraceCallMany lets you trace a given eth_call. It collects the structured logs created during the execution of EVM
 // if the given transaction was added on top of the provided block and returns them as a JSON object.
 // You can provide -2 as a block number to trace on top of the pending block.
-]ethapi.CallArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (interface{}, error) {
+]ethapi.TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, config *TraceCallConfig) (interface{}, error) {
 	var (
 		err	error
 		block	*types.Block
@@ -7255,6 +8745,8 @@ func (api *API) TraceCallMany(ctx context.Context, txs [ // TraceCallMany lets y
 		block, err = api.blockByHash(ctx, hash)
 	} else if number, ok := blockNrOrHash.Number(); ok {
 		block, err = api.blockByNumber(ctx, number)
+	} else {
+		return nil, errors.New("invalid arguments; neither block nor hash specified")
 	}
 	if err != nil {
 		return nil, err
@@ -7263,44 +8755,31 @@ func (api *API) TraceCallMany(ctx context.Context, txs [ // TraceCallMany lets y
 	if config != nil && config.Reexec != nil {
 		reexec = *config.Reexec
 	}
-	statedb, release, err := api.backend.StateAtBlock(ctx, block, reexec)
+	statedb, err := api.backend.StateAtBlock(ctx, block, reexec, nil, true, false)
 	if err != nil {
 		return nil, err
 	}
-	defer release()
+	if config != nil {
+		if err := config.StateOverrides.Apply(statedb); err != nil {
+			return nil, err
+		}
+	}
+	traceConfig := getTraceConfigFromTraceCallConfig(config)
 	var results = make([ // Try to retrieve the specified block
 	]interface{}, len(txs))
 	for idx, args := range txs {
-		msg := args.ToMessage(api.backend.RPCGasCap())
-		vmctx := core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
-		originalCanTransfer := vmctx.CanTransfer
-		originalTransfer := vmctx.Transfer
-		gasCost := new(big.Int).Mul(new(big.Int).SetUint64(msg.Gas()), msg.GasPrice())
-		totalCost := new(big.Int).Add(gasCost, msg.Value())
-		hasFromSufficientBalanceForValueAndGasCost := vmctx.CanTransfer(statedb, msg.From(), totalCost)
-		hasFromSufficientBalanceForGasCost := vmctx.CanTransfer(statedb, msg.From(), gasCost)
-		vmctx.CanTransfer = func(db vm.StateDB, sender common.Address, amount *big.Int) bool {
-			if msg.From() == sender {
-				return true
-			}
-			res := originalCanTransfer(db, sender, amount)
-			return res
-		}
-		vmctx.Transfer = func(db vm.StateDB, sender, recipient common.Address, amount *big.Int) {
-			toAmount := new(big.Int).Set(amount)
-			senderBalance := db.GetBalance(sender)
-			if senderBalance.Cmp(toAmount) < 0 {
-				toAmount.Set(big.NewInt(0))
-			}
-			originalTransfer(db, sender, recipient, toAmount)
-		}
-		taskExtraContext := map[string]interface{}{"hasFromSufficientBalanceForValueAndGasCost": hasFromSufficientBalanceForValueAndGasCost, "hasFromSufficientBalanceForGasCost": hasFromSufficientBalanceForGasCost}
-		res, err := api.traceTx(ctx, msg, vmctx, statedb, taskExtraContext, config)
+		msg, err := args.ToMessage(api.backend.RPCGasCap(), block.BaseFee())
 		if err != nil {
 			results[idx] = &txTraceResult{Error: err.Error()}
 			continue
 		}
-		res, err = decorateResponse(res, config)
+		vmctx := core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
+		res, err := api.traceTx(ctx, msg, new(Context), vmctx, statedb, traceConfig)
+		if err != nil {
+			results[idx] = &txTraceResult{Error: err.Error()}
+			continue
+		}
+		res, err = decorateResponse(res, traceConfig)
 		if err != nil {
 			return nil, fmt.Errorf("failed to decorate response for transaction at index %d with error %v", idx, err)
 		}
@@ -7309,7 +8788,7 @@ func (api *API) TraceCallMany(ctx context.Context, txs [ // TraceCallMany lets y
 	return results, nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L798" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L893" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -7467,16 +8946,16 @@ config <code>*TraceConfig</code>
 		- Debug: 
 			- type: `boolean`
 
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
 		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
+			- type: `boolean`
+
+		- EnableMemory: 
+			- type: `boolean`
+
+		- EnableReturnData: 
 			- type: `boolean`
 
 		- Limit: 
@@ -7516,16 +8995,16 @@ config <code>*TraceConfig</code>
             "Debug": {
                 "type": "boolean"
             },
-            "DisableMemory": {
-                "type": "boolean"
-            },
-            "DisableReturnData": {
-                "type": "boolean"
-            },
             "DisableStack": {
                 "type": "boolean"
             },
             "DisableStorage": {
+                "type": "boolean"
+            },
+            "EnableMemory": {
+                "type": "boolean"
+            },
+            "EnableReturnData": {
                 "type": "boolean"
             },
             "Limit": {
@@ -7634,7 +9113,7 @@ func (api *API) TraceChain(ctx context.Context, start, end rpc.BlockNumber, conf
 // between two blocks (excluding start) and returns them as a JSON object.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L207" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L241" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -7702,16 +9181,16 @@ config <code>*TraceConfig</code>
 		- Debug: 
 			- type: `boolean`
 
-		- DisableMemory: 
-			- type: `boolean`
-
-		- DisableReturnData: 
-			- type: `boolean`
-
 		- DisableStack: 
 			- type: `boolean`
 
 		- DisableStorage: 
+			- type: `boolean`
+
+		- EnableMemory: 
+			- type: `boolean`
+
+		- EnableReturnData: 
 			- type: `boolean`
 
 		- Limit: 
@@ -7751,16 +9230,16 @@ config <code>*TraceConfig</code>
             "Debug": {
                 "type": "boolean"
             },
-            "DisableMemory": {
-                "type": "boolean"
-            },
-            "DisableReturnData": {
-                "type": "boolean"
-            },
             "DisableStack": {
                 "type": "boolean"
             },
             "DisableStorage": {
+                "type": "boolean"
+            },
+            "EnableMemory": {
+                "type": "boolean"
+            },
+            "EnableReturnData": {
                 "type": "boolean"
             },
             "Limit": {
@@ -7839,7 +9318,7 @@ interface <code>interface{}</code>
 <p>
 ```go
 func (api *API) TraceTransaction(ctx context.Context, hash common.Hash, config *TraceConfig) (interface{}, error) {
-	tx, blockHash, blockNumber, index, err := api.backend.GetTransaction(ctx, hash)
+	_, blockHash, blockNumber, index, err := api.backend.GetTransaction(ctx, hash)
 	if err != nil {
 		return nil, err
 	}
@@ -7854,18 +9333,17 @@ func (api *API) TraceTransaction(ctx context.Context, hash common.Hash, config *
 	if err != nil {
 		return nil, err
 	}
-	msg, vmctx, statedb, release, err := api.backend.StateAtTransaction(ctx, block, int(index), reexec)
+	msg, vmctx, statedb, err := api.backend.StateAtTransaction(ctx, block, int(index), reexec)
 	if err != nil {
 		return nil, err
 	}
-	defer release()
-	taskExtraContext := map // TraceTransaction returns the structured logs created during the execution of EVM
-	// and returns them as a JSON object.
-	[string]interface{}{"blockNumber": block.NumberU64(), "blockHash": blockHash.Hex(), "transactionHash": tx.Hash().Hex(), "transactionPosition": index}
-	return api.traceTx(ctx, msg, vmctx, statedb, taskExtraContext, config)
-}
+	txctx := &Context{BlockHash: blockHash, TxIndex: int(index), TxHash: hash}
+	return api.traceTx(ctx, msg, txctx, vmctx, statedb, config)
+}// TraceTransaction returns the structured logs created during the execution of EVM
+// and returns them as a JSON object.
+
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L688" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/tracers/api.go#L807" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -7956,7 +9434,7 @@ func (sub *RPCDebugSubscription) Unsubscribe(id rpc.ID) error {
 }// Unsubscribe terminates an existing subscription by ID.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L243" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L242" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8051,7 +9529,7 @@ func (*HandlerT) Verbosity(level int) {
 // and source files can be raised using Vmodule.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L57" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L59" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8121,7 +9599,7 @@ func (*HandlerT) Vmodule(pattern string) error {
 // pattern syntax.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L62" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L64" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8189,7 +9667,7 @@ func (*HandlerT) WriteBlockProfile(file string) error {
 }// WriteBlockProfile writes a goroutine blocking profile to the given file.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L161" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L163" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8261,7 +9739,7 @@ func (*HandlerT) WriteMemProfile(file string) error {
 // it must be set on the command line.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L188" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L190" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8329,7 +9807,7 @@ func (*HandlerT) WriteMutexProfile(file string) error {
 }// WriteMutexProfile writes a goroutine blocking profile to the given file.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L181" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/debug/api.go#L183" target="_">View on GitHub →</a>
 </p>
 </details>
 

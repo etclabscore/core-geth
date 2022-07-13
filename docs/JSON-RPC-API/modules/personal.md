@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-30T19:24:24+03:00</code> |
+| Source | <code>1.12.9-unstable/generated-at:2022-07-13T09:50:34-07:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -156,7 +156,7 @@ pin <code>*bool</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) DeriveAccount(url string, path string, pin *bool) (accounts.Account, error) {
+func (s *PersonalAccountAPI) DeriveAccount(url string, path string, pin *bool) (accounts.Account, error) {
 	wallet, err := s.am.Wallet(url)
 	if err != nil {
 		return accounts.Account{}, err
@@ -173,7 +173,7 @@ func (s *PrivateAccountAPI) DeriveAccount(url string, path string, pin *bool) (a
 // it for later reuse.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L258" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L341" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -337,7 +337,7 @@ sig <code>hexutil.Bytes</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) EcRecover(ctx context.Context, data, sig hexutil.Bytes) (common.Address, error) {
+func (s *PersonalAccountAPI) EcRecover(ctx context.Context, data, sig hexutil.Bytes) (common.Address, error) {
 	if len(sig) != crypto.SignatureLength {
 		return common.Address{}, fmt.Errorf("signature must be %d bytes long", crypto.SignatureLength)
 	}
@@ -362,7 +362,7 @@ func (s *PrivateAccountAPI) EcRecover(ctx context.Context, data, sig hexutil.Byt
 // https://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_ecRecover
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L459" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L546" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -468,7 +468,7 @@ password <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) ImportRawKey(privkey string, password string) (common.Address, error) {
+func (s *PersonalAccountAPI) ImportRawKey(privkey string, password string) (common.Address, error) {
 	key, err := crypto.HexToECDSA(privkey)
 	if err != nil {
 		return common.Address{}, err
@@ -483,7 +483,7 @@ func (s *PrivateAccountAPI) ImportRawKey(privkey string, password string) (commo
 // encrypting it with the passphrase.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L299" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L382" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -554,7 +554,7 @@ url <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) InitializeWallet(ctx context.Context, url string) (string, error) {
+func (s *PersonalAccountAPI) InitializeWallet(ctx context.Context, url string) (string, error) {
 	wallet, err := s.am.Wallet(url)
 	if err != nil {
 		return "", err
@@ -577,7 +577,7 @@ func (s *PrivateAccountAPI) InitializeWallet(ctx context.Context, url string) (s
 	}
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L482" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L563" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -587,7 +587,7 @@ func (s *PrivateAccountAPI) InitializeWallet(ctx context.Context, url string) (s
 
 ### personal_listAccounts
 
-listAccounts will return a list of addresses for accounts this node manages.
+ListAccounts will return a list of addresses for accounts this node manages.
 
 
 #### Params (0)
@@ -673,12 +673,12 @@ commonAddress <code>[]common.Address</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) ListAccounts() [ // listAccounts will return a list of addresses for accounts this node manages.
+func (s *PersonalAccountAPI) ListAccounts() [ // ListAccounts will return a list of addresses for accounts this node manages.
 ]common.Address {
 	return s.am.Accounts()
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L208" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L291" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -844,7 +844,7 @@ rawWallet <code>[]rawWallet</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) ListWallets() [ // ListWallets will return a list of wallets this node manages.
+func (s *PersonalAccountAPI) ListWallets() [ // ListWallets will return a list of wallets this node manages.
 ]rawWallet {
 	wallets := make([]rawWallet, 0)
 	for _, wallet := range s.am.Wallets() {
@@ -858,7 +858,7 @@ func (s *PrivateAccountAPI) ListWallets() [ // ListWallets will return a list of
 	return wallets
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L222" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L305" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -954,7 +954,7 @@ addr <code>common.Address</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) LockAccount(addr common.Address) bool {
+func (s *PersonalAccountAPI) LockAccount(addr common.Address) bool {
 	if ks, err := fetchKeystore(s.am); err == nil {
 		return ks.Lock(addr) == nil
 	}
@@ -962,7 +962,7 @@ func (s *PrivateAccountAPI) LockAccount(addr common.Address) bool {
 }// LockAccount will lock the account associated with the given address when it's unlocked.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L344" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L427" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1058,7 +1058,7 @@ password <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) NewAccount(password string) (common.Address, error) {
+func (s *PersonalAccountAPI) NewAccount(password string) (common.Address, error) {
 	ks, err := fetchKeystore(s.am)
 	if err != nil {
 		return common.Address{}, err
@@ -1074,7 +1074,7 @@ func (s *PrivateAccountAPI) NewAccount(password string) (common.Address, error) 
 }// NewAccount will create a new account and returns the address for the new account.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L274" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L357" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1149,7 +1149,7 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) OpenWallet(url string, passphrase *string) error {
+func (s *PersonalAccountAPI) OpenWallet(url string, passphrase *string) error {
 	wallet, err := s.am.Wallet(url)
 	if err != nil {
 		return err
@@ -1165,7 +1165,7 @@ func (s *PrivateAccountAPI) OpenWallet(url string, passphrase *string) error {
 // Trezor PIN matrix challenge).
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L244" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L327" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1176,8 +1176,8 @@ func (s *PrivateAccountAPI) OpenWallet(url string, passphrase *string) error {
 ### personal_sendTransaction
 
 SendTransaction will create a transaction from the given arguments and
-tries to sign it with the key associated with args.From. If the given passwd isn't
-able to decrypt the key it fails.
+tries to sign it with the key associated with args.From. If the given
+passwd isn't able to decrypt the key it fails.
 
 
 #### Params (2)
@@ -1186,7 +1186,7 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-args <code>SendTxArgs</code> 
+args <code>TransactionArgs</code> 
 
   + Required: ✓ Yes
 
@@ -1248,6 +1248,16 @@ args <code>SendTxArgs</code>
 		- input: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
+			- type: `string`
+
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- nonce: 
@@ -1328,6 +1338,16 @@ args <code>SendTxArgs</code>
             "input": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "dataWord",
+                "type": "string"
+            },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
                 "type": "string"
             },
             "nonce": {
@@ -1433,23 +1453,23 @@ passwd <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) SendTransaction(ctx context.Context, args SendTxArgs, passwd string) (common.Hash, error) {
+func (s *PersonalAccountAPI) SendTransaction(ctx context.Context, args TransactionArgs, passwd string) (common.Hash, error) {
 	if args.Nonce == nil {
-		s.nonceLock.LockAddr(args.From)
-		defer s.nonceLock.UnlockAddr(args.From)
+		s.nonceLock.LockAddr(args.from())
+		defer s.nonceLock.UnlockAddr(args.from())
 	}
 	signed, err := s.signTransaction(ctx, &args, passwd)
 	if err != nil {
-		log.Warn("Failed transaction send attempt", "from", args.From, "to", args.To, "value", args.Value.ToInt(), "err", err)
+		log.Warn("Failed transaction send attempt", "from", args.from(), "to", args.To, "value", args.Value.ToInt(), "err", err)
 		return common.Hash{}, err
 	}
 	return SubmitTransaction(ctx, s.b, signed)
 }// SendTransaction will create a transaction from the given arguments and
-// tries to sign it with the key associated with args.From. If the given passwd isn't
-// able to decrypt the key it fails.
+// tries to sign it with the key associated with args.From. If the given
+// passwd isn't able to decrypt the key it fails.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L374" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L457" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1460,7 +1480,7 @@ func (s *PrivateAccountAPI) SendTransaction(ctx context.Context, args SendTxArgs
 ### personal_sign
 
 Sign calculates an Ethereum ECDSA signature for:
-keccack256("\x19Ethereum Signed Message:\n" + len(message) + message))
+keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))
 
 Note, the produced signature conforms to the secp256k1 curve R, S and V values,
 where the V value will be 27 or 28 for legacy reasons.
@@ -1621,7 +1641,7 @@ passwd <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) Sign(ctx context.Context, data hexutil.Bytes, addr common.Address, passwd string) (hexutil.Bytes, error) {
+func (s *PersonalAccountAPI) Sign(ctx context.Context, data hexutil.Bytes, addr common.Address, passwd string) (hexutil.Bytes, error) {
 	account := accounts.Account{Address: addr}
 	wallet, err := s.b.AccountManager().Find(account)
 	if err != nil {
@@ -1635,7 +1655,7 @@ func (s *PrivateAccountAPI) Sign(ctx context.Context, data hexutil.Bytes, addr c
 	signature[crypto.RecoveryIDOffset] += 27
 	return signature, nil
 }// Sign calculates an Ethereum ECDSA signature for:
-// keccack256("\x19Ethereum Signed Message:\n" + len(message) + message))
+// keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))
 //
 // Note, the produced signature conforms to the secp256k1 curve R, S and V values,
 // where the V value will be 27 or 28 for legacy reasons.
@@ -1645,280 +1665,7 @@ func (s *PrivateAccountAPI) Sign(ctx context.Context, data hexutil.Bytes, addr c
 // https://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_sign
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L431" target="_">View on GitHub →</a>
-</p>
-</details>
-
----
-
-
-
-### personal_signAndSendTransaction
-
-SignAndSendTransaction was renamed to SendTransaction. This method is deprecated
-and will be removed in the future. It primary goal is to give clients time to update.
-
-
-#### Params (2)
-
-Parameters must be given _by position_.
-
-
-__1:__ 
-args <code>SendTxArgs</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- additionalProperties: `false`
-	- properties: 
-		- accessList: 
-			- items: 
-				- additionalProperties: `false`
-				- properties: 
-					- address: 
-						- pattern: `^0x[a-fA-F\d]{64}$`
-						- title: `keccak`
-						- type: `string`
-
-					- storageKeys: 
-						- items: 
-							- description: `Hex representation of a Keccak 256 hash`
-							- pattern: `^0x[a-fA-F\d]{64}$`
-							- title: `keccak`
-							- type: `string`
-
-						- type: `array`
-
-
-				- type: `object`
-
-			- type: `array`
-
-		- chainId: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- data: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- from: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- gas: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- gasPrice: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-		- input: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `dataWord`
-			- type: `string`
-
-		- nonce: 
-			- pattern: `^0x([a-fA-F\d])+$`
-			- title: `uint64`
-			- type: `string`
-
-		- to: 
-			- pattern: `^0x[a-fA-F\d]{64}$`
-			- title: `keccak`
-			- type: `string`
-
-		- value: 
-			- pattern: `^0x[a-fA-F0-9]+$`
-			- title: `integer`
-			- type: `string`
-
-
-	- type: object
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "additionalProperties": false,
-        "properties": {
-            "accessList": {
-                "items": {
-                    "additionalProperties": false,
-                    "properties": {
-                        "address": {
-                            "pattern": "^0x[a-fA-F\\d]{64}$",
-                            "title": "keccak",
-                            "type": "string"
-                        },
-                        "storageKeys": {
-                            "items": {
-                                "description": "Hex representation of a Keccak 256 hash",
-                                "pattern": "^0x[a-fA-F\\d]{64}$",
-                                "title": "keccak",
-                                "type": "string"
-                            },
-                            "type": "array"
-                        }
-                    },
-                    "type": "object"
-                },
-                "type": "array"
-            },
-            "chainId": {
-                "pattern": "^0x[a-fA-F0-9]+$",
-                "title": "integer",
-                "type": "string"
-            },
-            "data": {
-                "pattern": "^0x([a-fA-F\\d])+$",
-                "title": "dataWord",
-                "type": "string"
-            },
-            "from": {
-                "pattern": "^0x[a-fA-F\\d]{64}$",
-                "title": "keccak",
-                "type": "string"
-            },
-            "gas": {
-                "pattern": "^0x([a-fA-F\\d])+$",
-                "title": "uint64",
-                "type": "string"
-            },
-            "gasPrice": {
-                "pattern": "^0x[a-fA-F0-9]+$",
-                "title": "integer",
-                "type": "string"
-            },
-            "input": {
-                "pattern": "^0x([a-fA-F\\d])+$",
-                "title": "dataWord",
-                "type": "string"
-            },
-            "nonce": {
-                "pattern": "^0x([a-fA-F\\d])+$",
-                "title": "uint64",
-                "type": "string"
-            },
-            "to": {
-                "pattern": "^0x[a-fA-F\\d]{64}$",
-                "title": "keccak",
-                "type": "string"
-            },
-            "value": {
-                "pattern": "^0x[a-fA-F0-9]+$",
-                "title": "integer",
-                "type": "string"
-            }
-        },
-        "type": [
-            "object"
-        ]
-    }
-	```
-
-
-
-
-__2:__ 
-passwd <code>string</code> 
-
-  + Required: ✓ Yes
-
-
-
-
-
-
-#### Result
-
-
-
-
-<code>common.Hash</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Hex representation of a Keccak 256 hash`
-	- pattern: `^0x[a-fA-F\d]{64}$`
-	- title: `keccak`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Hex representation of a Keccak 256 hash",
-        "pattern": "^0x[a-fA-F\\d]{64}$",
-        "title": "keccak",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-#### Client Method Invocation Examples
-
-
-=== "Shell HTTP"
-
-	``` shell
-	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "personal_signAndSendTransaction", "params": [<args>, <passwd>]}'
-	```
-
-
-
-
-
-=== "Shell WebSocket"
-
-	``` shell
-	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "personal_signAndSendTransaction", "params": [<args>, <passwd>]}'
-	```
-
-
-=== "Javascript Console"
-
-	``` js
-	personal.signAndSendTransaction(args,passwd);
-	```
-
-
-
-<details><summary>Source code</summary>
-<p>
-```go
-func (s *PrivateAccountAPI) SignAndSendTransaction(ctx context.Context, args SendTxArgs, passwd string) (common.Hash, error) {
-	return s.SendTransaction(ctx, args, passwd)
-}// SignAndSendTransaction was renamed to SendTransaction. This method is deprecated
-// and will be removed in the future. It primary goal is to give clients time to update.
-
-```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L477" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L518" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1940,7 +1687,7 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-args <code>SendTxArgs</code> 
+args <code>TransactionArgs</code> 
 
   + Required: ✓ Yes
 
@@ -2002,6 +1749,16 @@ args <code>SendTxArgs</code>
 		- input: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
+			- type: `string`
+
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- nonce: 
@@ -2082,6 +1839,16 @@ args <code>SendTxArgs</code>
             "input": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "dataWord",
+                "type": "string"
+            },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
                 "type": "string"
             },
             "nonce": {
@@ -2205,22 +1972,26 @@ passwd <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) SignTransaction(ctx context.Context, args SendTxArgs, passwd string) (*SignTransactionResult, error) {
+func (s *PersonalAccountAPI) SignTransaction(ctx context.Context, args TransactionArgs, passwd string) (*SignTransactionResult, error) {
+	if args.From == nil {
+		return nil, fmt.Errorf("sender not specified")
+	}
 	if args.Gas == nil {
 		return nil, fmt.Errorf("gas not specified")
 	}
-	if args.GasPrice == nil {
-		return nil, fmt.Errorf("gasPrice not specified")
+	if args.GasPrice == nil && (args.MaxFeePerGas == nil || args.MaxPriorityFeePerGas == nil) {
+		return nil, fmt.Errorf("missing gasPrice or maxFeePerGas/maxPriorityFeePerGas")
 	}
 	if args.Nonce == nil {
 		return nil, fmt.Errorf("nonce not specified")
 	}
-	if err := checkTxFee(args.GasPrice.ToInt(), uint64(*args.Gas), s.b.RPCTxFeeCap()); err != nil {
+	tx := args.toTransaction()
+	if err := checkTxFee(tx.GasPrice(), tx.Gas(), s.b.RPCTxFeeCap()); err != nil {
 		return nil, err
 	}
 	signed, err := s.signTransaction(ctx, &args, passwd)
 	if err != nil {
-		log.Warn("Failed transaction sign attempt", "from", args.From, "to", args.To, "value", args.Value.ToInt(), "err", err)
+		log.Warn("Failed transaction sign attempt", "from", args.from(), "to", args.To, "value", args.Value.ToInt(), "err", err)
 		return nil, err
 	}
 	data, err := signed.MarshalBinary()
@@ -2234,7 +2005,7 @@ func (s *PrivateAccountAPI) SignTransaction(ctx context.Context, args SendTxArgs
 // to other nodes
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L393" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L476" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2375,7 +2146,7 @@ duration <code>*uint64</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) UnlockAccount(ctx context.Context, addr common.Address, password string, duration *uint64) (bool, error) {
+func (s *PersonalAccountAPI) UnlockAccount(ctx context.Context, addr common.Address, password string, duration *uint64) (bool, error) {
 	if s.b.ExtRPCEnabled() && !s.b.AccountManager().Config().InsecureUnlockAllowed {
 		return false, errors.New("account unlock with HTTP access is forbidden")
 	}
@@ -2402,7 +2173,7 @@ func (s *PrivateAccountAPI) UnlockAccount(ctx context.Context, addr common.Addre
 // default of 300 seconds. It returns an indication if the account was unlocked.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L315" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L398" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2474,7 +2245,7 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PrivateAccountAPI) Unpair(ctx context.Context, url string, pin string) error {
+func (s *PersonalAccountAPI) Unpair(ctx context.Context, url string, pin string) error {
 	wallet, err := s.am.Wallet(url)
 	if err != nil {
 		return err
@@ -2488,7 +2259,7 @@ func (s *PrivateAccountAPI) Unpair(ctx context.Context, url string, pin string) 
 	}
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L509" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L590" target="_">View on GitHub →</a>
 </p>
 </details>
 

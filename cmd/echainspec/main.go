@@ -56,7 +56,10 @@ var defaultChainspecValues = map[string]ctypes.Configurator{
 	"ropsten":    params.DefaultRopstenGenesisBlock(),
 	"rinkeby":    params.DefaultRinkebyGenesisBlock(),
 	"goerli":     params.DefaultGoerliGenesisBlock(),
-	"mintme":     params.DefaultMintMeGenesisBlock(),
+	"sepolia":    params.DefaultSepoliaGenesisBlock(),
+	"kiln":       params.DefaultKilnGenesisBlock(),
+
+	"mintme": params.DefaultMintMeGenesisBlock(),
 }
 
 var defaultChainspecNames = func() []string {
@@ -155,7 +158,7 @@ func convertf(ctx *cli.Context) error {
 func init() {
 	app.Name = "echainspec"
 	app.Usage = "A chain specification and configuration tool for EVM clients"
-	//app.Description = "A chain specification and configuration tool for EVM clients"
+	// app.Description = "A chain specification and configuration tool for EVM clients"
 	app.Version = params.VersionWithCommit(gitCommit, gitDate)
 	cli.AppHelpTemplate = `{{.Name}} {{if .Flags}}[global options] {{end}}command{{if .Flags}} [command options]{{end}} [arguments...]
 

@@ -37,6 +37,7 @@ var AppHelpFlagGroups = []flags.FlagGroup{
 			utils.MinFreeDiskSpaceFlag,
 			utils.KeyStoreDirFlag,
 			utils.USBFlag,
+			utils.USBPathIDFlag,
 			utils.SmartCardDaemonPathFlag,
 			utils.NetworkIdFlag,
 			utils.SyncModeFlag,

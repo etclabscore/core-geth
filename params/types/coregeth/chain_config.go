@@ -217,6 +217,8 @@ type CoreGethChainConfig struct {
 
 	EIP5133FBlock *big.Int `json:"eip5133FBloc,omitempty"`
 
+	MergeNetsplitVBlock *big.Int `json:"mergeNetsplitVBlock,omitempty"` // Virtual fork after The Merge to use as a network splitter
+
 	DisposalBlock *big.Int `json:"disposalBlock,omitempty"` // Bomb disposal HF block
 
 	// Various consensus engines

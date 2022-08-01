@@ -172,6 +172,10 @@ type ProtocolSpecifier interface {
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4399.md
 	GetEIP4399Transition() *uint64
 	SetEIP4399Transition(n *uint64) error
+
+	// GetMergeVirtualTransition is a Virtual fork after The Merge to use as a network splitter
+	GetMergeVirtualTransition() *uint64
+	SetMergeVirtualTransition(n *uint64) error
 }
 
 type Forker interface {

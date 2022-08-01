@@ -61,7 +61,6 @@ func NewForkChoice(chainReader consensus.ChainHeaderReader, preserve func(header
 }
 
 func (f *ForkChoice) CommonAncestor(current *types.Header, header *types.Header) (*types.Header, error) {
-
 	oldH, newH := types.CopyHeader(current), types.CopyHeader(header)
 	var commonAncestor *types.Header
 
@@ -155,12 +154,9 @@ func (f *ForkChoice) ReorgNeeded(current *types.Header, header *types.Header) (b
 	}
 
 	if err := ecbp1100(commonHeader, current, header, f.chain.GetTd); err != nil {
-
 		reorg = false
 		log.Warn("Reorg disallowed", "error", err)
-
 	} else if current.Number.Uint64()-commonHeader.Number.Uint64() > 2 {
-
 		// Reorg is allowed, only log the MESS line if old chain is longer than normal.
 		log.Info("ECBP1100-MESS 🔓",
 			"status", "accepted",

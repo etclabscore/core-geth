@@ -354,7 +354,6 @@ func (n *Node) closeDataDir() {
 }
 
 func (n *Node) setupOpenRPC() error {
-
 	// In-proc RPC is always available. It's created and assigned in the Node.New construction.
 	n.inprocOpenRPC = newOpenRPCDocument()
 	registerOpenRPCAPIs(n.inprocOpenRPC, n.rpcAPIs)

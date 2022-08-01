@@ -170,7 +170,6 @@ func writeDifficultyConfigFileParity(conf ctypes.ChainConfigurator, forkName str
 }
 
 func init() {
-
 	if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_COREGETH_KEY) != "" {
 		log.Println("converting to CoreGeth Chain Config data type.")
 
@@ -189,7 +188,6 @@ func init() {
 			}
 			difficultyChainConfigurations[k] = mgc
 		}
-
 	} else if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_MULTIGETHV0_KEY) != "" {
 		log.Println("converting to MultiGethV0 data type.")
 
@@ -208,7 +206,6 @@ func init() {
 			}
 			difficultyChainConfigurations[k] = pspec
 		}
-
 	} else if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_OPENETHEREUM_KEY) != "" {
 		log.Println("converting to Parity data type.")
 
@@ -227,7 +224,6 @@ func init() {
 			}
 			difficultyChainConfigurations[k] = pspec
 		}
-
 	} else if os.Getenv(CG_CHAINCONFIG_CHAINSPECS_COREGETH_KEY) != "" {
 		// This logic reads Forks (used by [General]StateTests) and Difficulty configurations
 		// from their respective coregeth.json.d/<file>.json files.

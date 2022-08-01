@@ -525,7 +525,6 @@ func TestGenerateSpecificationCases(t *testing.T) {
 			r, _ := rlp.EncodeToBytes(id)
 			if isCanonical {
 				fmt.Printf("| __head=%d__ | FORK_HASH=%x | FORK_NEXT=%d | %x |\n", c, id.Hash, id.Next, r)
-
 			} else {
 				fmt.Printf("| head=%d | FORK_HASH=%x | FORK_NEXT=%d | %x |\n", c, id.Hash, id.Next, r)
 			}

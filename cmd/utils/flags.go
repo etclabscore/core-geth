@@ -1623,9 +1623,7 @@ func SetDataDir(ctx *cli.Context, cfg *node.Config) {
 			log.Warn("Using the deprecated `testnet` datadir. Future versions will store the Ropsten chain in `ropsten`.")
 			cfg.DataDir = legacyPath
 		} else {
-
 			cfg.DataDir = filepath.Join(vars.DefaultDataDir(), "ropsten")
-
 		}
 
 	case cfg.DataDir == vars.DefaultDataDir():

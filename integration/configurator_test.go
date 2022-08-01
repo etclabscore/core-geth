@@ -53,7 +53,6 @@ func TestConstantinopleEquivalence(t *testing.T) {
 }
 
 func TestEquivalent_Features(t *testing.T) {
-
 	mustValidate := func(c ctypes.ChainConfigurator) {
 		zero, max := uint64(0), uint64(math.MaxUint64)
 		for _, head := range []*uint64{
@@ -96,7 +95,6 @@ func TestEquivalent_Features(t *testing.T) {
 			return *n
 		}
 		debuglog := func(a, b ctypes.ChainConfigurator) {
-
 			// Debugging log lines.
 			t.Log("o", oconf.GetConsensusEngineType())
 			t.Log("m", mg.GetConsensusEngineType())

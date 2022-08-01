@@ -130,7 +130,6 @@ func newOpenRPCDocument() *go_openrpc_reflect.Document {
 	}
 
 	appReflector.FnIsMethodEligible = func(method reflect.Method) bool {
-
 		// Method must be exported.
 		if method.PkgPath != "" {
 			return false

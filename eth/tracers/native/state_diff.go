@@ -358,7 +358,6 @@ func (t *stateDiffTracer) GetResult() (json.RawMessage, error) {
 			if allEqual {
 				t.accountsToRemove = append(t.accountsToRemove, addr)
 			}
-
 		} else {
 			t.accountsToRemove = append(t.accountsToRemove, addr)
 		}

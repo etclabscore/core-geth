@@ -721,7 +721,6 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 		if (overrideEIP2929 == nil && existingEIP2929 != nil) ||
 			(overrideEIP2929 != nil && existingEIP2929 == nil) ||
 			(overrideEIP2929 != nil && existingEIP2929 != nil && *overrideEIP2929 != *existingEIP2929) {
-
 			// Copy the config, to not screw up the main config
 			// Note: the Clique-part is _not_ deep copied
 

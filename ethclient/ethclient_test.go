@@ -840,7 +840,6 @@ func subscriptionTestSetup(t *testing.T) (genesisBlock *genesisT.Genesis, backen
 }
 
 func TestEthSubscribeNewSideHeads(t *testing.T) {
-
 	genesis, backend := subscriptionTestSetup(t)
 
 	db := rawdb.NewMemoryDatabase()

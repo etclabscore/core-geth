@@ -91,7 +91,6 @@ func (bc *BlockChain) getTDRatio(commonAncestor, current, proposed *types.Header
 // "Modified Exponential Subjective Scoring" used to prefer known chain segments
 // over later-to-come counterparts, especially proposed segments stretching far into the past.
 func ecbp1100(commonAncestor, current, proposed *types.Header, getTDFunc func(common.Hash, uint64) *big.Int) error {
-
 	// Get the total difficulties of the proposed chain segment and the existing one.
 	commonAncestorTD := getTDFunc(commonAncestor.Hash(), commonAncestor.Number.Uint64())
 	proposedParentTD := getTDFunc(proposed.ParentHash, proposed.Number.Uint64()-1)
@@ -149,7 +148,6 @@ The if tdRatio < antiGravity check would then be
 if proposed_subchain_td * CURVE_FUNCTION_DENOMINATOR < get_curve_function_numerator(current.Time - commonAncestor.Time) * local_subchain_td.
 */
 func ecbp1100PolynomialV(x *big.Int) *big.Int {
-
 	// Make a copy; do not mutate argument value.
 
 	// if x > xcap:

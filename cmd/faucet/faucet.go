@@ -506,7 +506,6 @@ func migrateFaucetDirectory(faucetDataDir string) error {
 		return nil
 	}
 	if err == nil && d.IsDir() {
-
 		// Path exists and is a directory.
 		log.Warn("Found existing 'MultiFaucet' directory, migrating", "old", oldFaucetNodePath, "new", targetFaucetNodePath)
 		if err := os.Rename(oldFaucetNodePath, targetFaucetNodePath); err != nil {
@@ -523,7 +522,6 @@ func migrateFaucetDirectory(faucetDataDir string) error {
 
 // startStack starts the node stack, ensures peering, and assigns the respective ethclient to the faucet.
 func (f *faucet) startStack(genesis *genesisT.Genesis, port int, enodes []*enode.Node, network uint64) error {
-
 	genesisHash := core.GenesisToBlock(genesis, nil).Hash()
 
 	faucetDataDir := faucetDirFromChainIndicators(genesis.Config.GetChainID().Uint64(), genesisHash)

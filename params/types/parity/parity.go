@@ -297,7 +297,6 @@ type ParityChainSpecPricingPrice struct {
 }
 
 func (p *ParityChainSpecPricingMaybe) UnmarshalJSON(input []byte) error {
-
 	// If old schema structure with "pricing" field
 	pricing := ParityChainSpecPricing{}
 	err := json.Unmarshal(input, &pricing)

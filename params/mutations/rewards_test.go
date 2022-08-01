@@ -122,7 +122,6 @@ func TestGetBlockWinnerRewardByEra(t *testing.T) {
 			t.Errorf("@ %v, got: %v, want %v", bn, gotReward, expectedReward)
 		}
 	}
-
 }
 
 func TestGetBlockUncleRewardByEra(t *testing.T) {
@@ -453,7 +452,7 @@ func TestAccumulateRewards(t *testing.T) {
 			AccumulateRewards(config, stateDB, header, uncles)
 
 			// Check balances.
-			//t.Logf("config=%d block=%d era=%d w:%d u1:%d u2:%d", i, bn, new(big.Int).Add(era, big.NewInt(1)), blockWinner, uncleMiner1, uncleMiner2)
+			// t.Logf("config=%d block=%d era=%d w:%d u1:%d u2:%d", i, bn, new(big.Int).Add(era, big.NewInt(1)), blockWinner, uncleMiner1, uncleMiner2)
 			if wb := stateDB.GetBalance(header.Coinbase); wb.Cmp(&blockWinner) != 0 {
 				t.Errorf("winner balance @ %v, want: %v, got: %v (config: %v)", bn, blockWinner, wb, i)
 			}

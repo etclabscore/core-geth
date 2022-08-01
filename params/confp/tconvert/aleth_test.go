@@ -30,7 +30,6 @@ import (
 // FIXME(meowsbits): Requires implementing ChainConfigurator interface for Aleth data type.
 // Tests the go-ethereum to Aleth chainspec conversion for the Stureby testnet.
 func TestAlethSturebyConverter(t *testing.T) {
-
 	// Read GETH genesis type.
 	blob, err := ioutil.ReadFile(filepath.Join("..", "testdata", "stureby_geth.json"))
 	if err != nil {
@@ -72,7 +71,7 @@ func TestAlethSturebyConverter(t *testing.T) {
 		t.Log()
 
 		t.Log("__ConvertedTo spec (Aleth):")
-		//t.Log(spew.Sprint(convertedSpec))
+		// t.Log(spew.Sprint(convertedSpec))
 		bm, _ := json.MarshalIndent(convertedSpec, "", "    ")
 		t.Log(string(bm))
 	}

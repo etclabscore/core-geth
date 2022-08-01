@@ -107,5 +107,4 @@ func (spec *AlethGenesisSpec) SetAccount(address common.Address, account genesis
 	}
 	a.Balance = (*math.HexOrDecimal256)(account.Balance)
 	a.Nonce = account.Nonce
-
 }

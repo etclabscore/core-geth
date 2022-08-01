@@ -115,7 +115,6 @@ func IsEmpty(anything interface{}) bool {
 }
 
 func IsValid(conf ctypes.ChainConfigurator, head *uint64) *ConfigValidError {
-
 	// head-agnostic logic
 	if conf.GetNetworkID() == nil {
 		return NewValidErr("NetworkID cannot be nil", "!=nil", conf.GetNetworkID())

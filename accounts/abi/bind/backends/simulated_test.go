@@ -1353,7 +1353,7 @@ func TestCommitReturnValue(t *testing.T) {
 	// Create a block in the original chain (containing a transaction to force different block hashes)
 	head, _ := sim.HeaderByNumber(context.Background(), nil) // Should be child's, good enough
 	gasPrice := new(big.Int).Add(head.BaseFee, big.NewInt(1))
-	_tx := types.NewTransaction(0, testAddr, big.NewInt(1000), params.TxGas, gasPrice, nil)
+	_tx := types.NewTransaction(0, testAddr, big.NewInt(1000), vars.TxGas, gasPrice, nil)
 	tx, _ := types.SignTx(_tx, types.HomesteadSigner{}, testKey)
 	sim.SendTransaction(context.Background(), tx)
 	h2 := sim.Commit()

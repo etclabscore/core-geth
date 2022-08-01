@@ -1009,12 +1009,10 @@ func APIs(backend Backend) []rpc.API {
 	return []rpc.API{
 		{
 			Namespace: "debug",
-			Version:   "1.0",
 			Service:   debugAPI,
 		},
 		{
 			Namespace: "trace",
-			Version:   "1.0",
 			Service:   NewTraceAPI(debugAPI),
 		},
 	}

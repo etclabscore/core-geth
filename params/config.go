@@ -159,6 +159,7 @@ var (
 		BerlinBlock:             big.NewInt(0),
 		LondonBlock:             big.NewInt(0),
 		TerminalTotalDifficulty: big.NewInt(17_000_000_000_000_000),
+		MergeNetsplitBlock:      big.NewInt(1735371),
 		Ethash:                  new(ctypes.EthashConfig),
 	}
 
@@ -219,22 +220,23 @@ var (
 
 	// GoerliChainConfig contains the chain parameters to run a node on the Görli test network.
 	GoerliChainConfig = &goethereum.ChainConfig{
-		ChainID:                   big.NewInt(5),
+		ChainID:                 big.NewInt(5),
 		SupportedProtocolVersions: vars.DefaultProtocolVersions,
-		HomesteadBlock:            big.NewInt(0),
-		DAOForkBlock:              nil,
-		DAOForkSupport:            true,
-		EIP150Block:               big.NewInt(0),
-		EIP155Block:               big.NewInt(0),
-		EIP158Block:               big.NewInt(0),
-		ByzantiumBlock:            big.NewInt(0),
-		ConstantinopleBlock:       big.NewInt(0),
-		PetersburgBlock:           big.NewInt(0),
-		IstanbulBlock:             big.NewInt(1_561_651),
-		MuirGlacierBlock:          nil,
-		BerlinBlock:               big.NewInt(4_460_644),
-		LondonBlock:               big.NewInt(5_062_605),
-		ArrowGlacierBlock:         nil,
+		HomesteadBlock:          big.NewInt(0),
+		DAOForkBlock:            nil,
+		DAOForkSupport:          true,
+		EIP150Block:             big.NewInt(0),
+		EIP155Block:             big.NewInt(0),
+		EIP158Block:             big.NewInt(0),
+		ByzantiumBlock:          big.NewInt(0),
+		ConstantinopleBlock:     big.NewInt(0),
+		PetersburgBlock:         big.NewInt(0),
+		IstanbulBlock:           big.NewInt(1_561_651),
+		MuirGlacierBlock:        nil,
+		BerlinBlock:             big.NewInt(4_460_644),
+		LondonBlock:             big.NewInt(5_062_605),
+		ArrowGlacierBlock:       nil,
+		TerminalTotalDifficulty: big.NewInt(10_790_000),
 		TrustedCheckpoint:         GoerliTrustedCheckpoint,
 		TrustedCheckpointOracle:   GoerliCheckpointOracle,
 		Clique: &ctypes.CliqueConfig{
@@ -288,9 +290,12 @@ var (
 		LondonBlock:               big.NewInt(0),
 		ArrowGlacierBlock:         big.NewInt(0),
 		GrayGlacierBlock:          big.NewInt(0),
-		EWASMBlock:                nil,
+		MergeNetsplitBlock: nil,
+		ShanghaiBlock: nil,
+		CancunBlock: nil,
 		TerminalTotalDifficulty:   nil,
 		Ethash:                    new(ctypes.EthashConfig),
+		EWASMBlock:                nil,
 		Clique:                    nil,
 		TrustedCheckpoint:         nil,
 		TrustedCheckpointOracle:   nil,
@@ -350,6 +355,8 @@ var (
 			ArrowGlacierBlock   *big.Int `json:"arrowGlacierBlock,omitempty"`   // Eip-4345 (bomb delay) switch block (nil = no fork, 0 = already activated)
 			GrayGlacierBlock    *big.Int `json:"grayGlacierBlock,omitempty"`    // Eip-5133 (bomb delay) switch block (nil = no fork, 0 = already activated)
 			MergeNetsplitBlock  *big.Int `json:"mergeNetsplitBlock,omitempty"`  // Virtual fork after The Merge to use as a network splitter
+	ShanghaiBlock       *big.Int `json:"shanghaiBlock,omitempty"`       // Shanghai switch block (nil = no fork, 0 = already on shanghai)
+	CancunBlock         *big.Int `json:"cancunBlock,omitempty"`         // Cancun switch block (nil = no fork, 0 = already on cancun)
 
 			// TerminalTotalDifficulty is the amount of total difficulty reached by
 			// the network that triggers the consensus upgrade.

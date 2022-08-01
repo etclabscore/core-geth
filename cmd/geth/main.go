@@ -59,7 +59,7 @@ var (
 	// The app that holds all commands and flags.
 	app = flags.NewApp(gitCommit, gitDate, "the ETC Core Go-Ethereum command line interface")
 	// flags that configure the node
-	nodeFlags = utils.GroupFlags([]cli.Flag{
+	nodeFlags = flags.Merge([]cli.Flag{
 		utils.IdentityFlag,
 		utils.UnlockedAccountFlag,
 		utils.PasswordFileFlag,
@@ -251,7 +251,7 @@ func init() {
 	}
 	sort.Sort(cli.CommandsByName(app.Commands))
 
-	app.Flags = utils.GroupFlags(
+	app.Flags = flags.Merge(
 		nodeFlags,
 		rpcFlags,
 		consoleFlags,

@@ -190,7 +190,6 @@ func TestStartStopMiner(t *testing.T) {
 	waitForMiningState(t, miner, true)
 	miner.Stop()
 	waitForMiningState(t, miner, false)
-
 }
 
 func TestCloseMiner(t *testing.T) {

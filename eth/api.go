@@ -296,6 +296,8 @@ func (api *DebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error) {
 		block = api.eth.blockchain.CurrentBlock()
 	} else if blockNr == rpc.FinalizedBlockNumber {
 		block = api.eth.blockchain.CurrentFinalizedBlock()
+	} else if blockNr == rpc.SafeBlockNumber {
+		block = api.eth.blockchain.CurrentSafeBlock()
 	} else {
 		block = api.eth.blockchain.GetBlockByNumber(uint64(blockNr))
 	}
@@ -340,7 +342,7 @@ func (api *DebugAPI) GetBadBlocks(ctx context.Context) ([]*BadBlockArgs, error) 
 		if rlpBytes, err := rlp.EncodeToBytes(block); err != nil {
 			blockRlp = err.Error() // Hacky, but hey, it works
 		} else {
-			blockRlp = fmt.Sprintf("0x%x", rlpBytes)
+			blockRlp = fmt.Sprintf("%#x", rlpBytes)
 		}
 		if blockJSON, err = ethapi.RPCMarshalBlock(block, true, true, api.eth.APIBackend.ChainConfig()); err != nil {
 			blockJSON = &ethapi.RPCMarshalBlockT{Error: err.Error()}
@@ -374,6 +376,8 @@ func (api *DebugAPI) AccountRange(blockNrOrHash rpc.BlockNumberOrHash, start hex
 				block = api.eth.blockchain.CurrentBlock()
 			} else if number == rpc.FinalizedBlockNumber {
 				block = api.eth.blockchain.CurrentFinalizedBlock()
+			} else if number == rpc.SafeBlockNumber {
+				block = api.eth.blockchain.CurrentSafeBlock()
 			} else {
 				block = api.eth.blockchain.GetBlockByNumber(uint64(number))
 			}
@@ -606,7 +610,7 @@ func (api *DebugAPI) GetAccessibleState(from, to rpc.BlockNumber) (uint64, error
 			return uint64(i), nil
 		}
 	}
-	return 0, fmt.Errorf("No state found")
+	return 0, fmt.Errorf("no state found")
 }
 
 // RemovePendingTransaction removes a transaction from the txpool.

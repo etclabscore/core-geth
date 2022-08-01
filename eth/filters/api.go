@@ -311,7 +311,6 @@ func (api *FilterAPI) Logs(ctx context.Context, crit FilterCriteria) (*rpc.Subsc
 	}
 
 	go func() {
-
 		for {
 			select {
 			case logs := <-matchedLogs:

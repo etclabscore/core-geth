@@ -114,6 +114,10 @@ var (
 		Usage:    "Enable monitoring and management of USB hardware wallets",
 		Category: flags.AccountCategory,
 	}
+	USBPathIDFlag = &cli.Uint64Flag{
+		Name:  "usb.pathid",
+		Usage: "Specify USB path ID per SLIP-0044 (1=all testnets, 60=ETH mainnet, 61=ETC mainnet)",
+	}
 	SmartCardDaemonPathFlag = &cli.StringFlag{
 		Name:     "pcscdpath",
 		Usage:    "Path to the smartcard daemon (pcscd) socket file",
@@ -1558,6 +1562,42 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	}
 	if ctx.IsSet(USBFlag.Name) {
 		cfg.USB = ctx.Bool(USBFlag.Name)
+
+		// We handle configuration of HD paths only if --usb is set to a truthy value.
+		if cfg.USB {
+
+			// Flag --usb.pathid allows configuration for arbitrary SLIP-0044 values.
+			if ctx.IsSet(USBPathIDFlag.Name) {
+				pathID := ctx.Uint64(USBPathIDFlag.Name)
+				if pathID > math.MaxUint32 {
+					Fatalf("Invalid USB path ID (exceeds uint32): %d", pathID)
+				}
+				accounts.SetCoinTypeConfiguration(uint32(pathID))
+				log.Info("Using custom HD derivation path", "pathid", uint32(pathID), "basepath", accounts.DefaultBaseDerivationPath)
+
+			} else {
+				// Set default hd path based on --chain configuration flags, if any.
+
+				// Set default derivation path to a testnet value if we're configuring for a testnet.
+				for _, f := range TestnetFlags {
+					if ctx.IsSet(f.GetName()) && ctx.Bool(f.GetName()) {
+						accounts.SetCoinTypeConfiguration(accounts.BIP0044CoinTypeTestnet)
+						log.Info("Using testnet HD derivation path", "basepath", accounts.DefaultBaseDerivationPath)
+						break
+					}
+				}
+
+				// Configure the HD derivation path for Ethereum Classic (ETC) if
+				// the client is configuring for ETC.
+				// This will not conflict with the testnet configuration handling above
+				// because we trust that the network configuration flags are checked to
+				// be exclusive.
+				if ctx.IsSet(ClassicFlag.Name) && ctx.Bool(ClassicFlag.Name) {
+					accounts.SetCoinTypeConfiguration(accounts.BIP0044CoinTypeEtherClassic)
+					log.Info("Using Ethereum Classic (ETC) HD derivation path", "basepath", accounts.DefaultBaseDerivationPath)
+				}
+			}
+		}
 	}
 	if ctx.IsSet(InsecureUnlockAllowedFlag.Name) {
 		cfg.InsecureUnlockAllowed = ctx.Bool(InsecureUnlockAllowedFlag.Name)

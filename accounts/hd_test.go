@@ -25,6 +25,7 @@ import (
 // Tests that HD derivation paths can be correctly parsed into our internal binary
 // representation.
 func TestHDPathParsing(t *testing.T) {
+	SetCoinTypeConfiguration(BIP0044CoinTypeEther)
 	tests := []struct {
 		input  string
 		output DerivationPath

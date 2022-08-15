@@ -1565,7 +1565,6 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 
 		// We handle configuration of HD paths only if --usb is set to a truthy value.
 		if cfg.USB {
-
 			// Flag --usb.pathid allows configuration for arbitrary SLIP-0044 values.
 			if ctx.IsSet(USBPathIDFlag.Name) {
 				pathID := ctx.Uint64(USBPathIDFlag.Name)
@@ -1574,13 +1573,12 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 				}
 				accounts.SetCoinTypeConfiguration(uint32(pathID))
 				log.Info("Using custom HD derivation path", "pathid", uint32(pathID), "basepath", accounts.DefaultBaseDerivationPath)
-
 			} else {
 				// Set default hd path based on --chain configuration flags, if any.
-
 				// Set default derivation path to a testnet value if we're configuring for a testnet.
 				for _, f := range TestnetFlags {
-					if ctx.IsSet(f.GetName()) && ctx.Bool(f.GetName()) {
+					name := f.Names()[0] // This won't overflow because the flags always have a Name, because they are defined as --name.
+					if ctx.IsSet(name) && ctx.Bool(name) {
 						accounts.SetCoinTypeConfiguration(accounts.BIP0044CoinTypeTestnet)
 						log.Info("Using testnet HD derivation path", "basepath", accounts.DefaultBaseDerivationPath)
 						break

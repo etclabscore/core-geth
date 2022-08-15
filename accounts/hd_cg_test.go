@@ -33,7 +33,6 @@ func TestHDPathParsing_CG(t *testing.T) {
 
 func testHDPathParsing(coinType uint32) func(t *testing.T) {
 	return func(t *testing.T) {
-
 		// Set the coin type to the one we're testing.
 		// This assigns the default derivations and iterator to the coin type.
 		SetCoinTypeConfiguration(coinType)

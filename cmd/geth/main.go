@@ -70,6 +70,7 @@ var (
 		utils.ExternalSignerFlag,
 		utils.NoUSBFlag,
 		utils.USBFlag,
+		utils.USBPathIDFlag,
 		utils.SmartCardDaemonPathFlag,
 		utils.OverrideGrayGlacierFlag,
 		utils.OverrideTerminalTotalDifficulty,

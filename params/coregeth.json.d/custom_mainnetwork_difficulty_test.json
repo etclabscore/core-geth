@@ -1,6 +1,9 @@
 {
     "networkId": 1,
     "chainId": 1,
+    "supportedProtocolVersions": [
+        66
+    ],
     "eip2FBlock": 1150000,
     "eip7FBlock": 1150000,
     "daoForkBlock": 1920000,

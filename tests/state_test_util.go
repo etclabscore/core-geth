@@ -235,15 +235,34 @@ func (t *StateTest) RunNoVerifyWithPost(subtest StateSubtest, vmconfig vm.Config
 	}
 	msg, err := t.json.Tx.toMessage(post, baseFee)
 	if err != nil {
-		return nil, nil, common.Hash{}, err
+		return nil, nil, common.Hash{}, fmt.Errorf("%w: toMessage: %v", err, t.json.Tx)
+	}
+
+	// Try to recover tx with current signer
+	if len(post.TxBytes) != 0 {
+		var ttx types.Transaction
+		err := ttx.UnmarshalBinary(post.TxBytes)
+		if err != nil {
+			return nil, nil, common.Hash{}, err
+		}
+
+		if _, err := types.Sender(types.LatestSigner(config), &ttx); err != nil {
+			return nil, nil, common.Hash{}, err
+		}
 	}
 
 	// Prepare the EVM.
 	txContext := core.NewEVMTxContext(msg)
 	context := core.NewEVMBlockContext(block.Header(), nil, &t.json.Env.Coinbase)
 	context.GetHash = vmTestBlockHash
+	context.BaseFee = baseFee
+	context.Random = nil
+	if config.IsEnabled(config.GetEIP1559Transition, new(big.Int)) && t.json.Env.Random != nil {
+		rnd := common.BigToHash(t.json.Env.Random)
+		context.Random = &rnd
+		context.Difficulty = big.NewInt(0)
+	}
 	evm := vm.NewEVM(context, txContext, statedb, config, vmconfig)
-
 	// Execute the message.
 	snapshot := statedb.Snapshot()
 	gaspool := new(core.GasPool)

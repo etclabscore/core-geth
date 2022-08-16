@@ -2,8 +2,7 @@
     "networkId": 3,
     "chainId": 3,
     "supportedProtocolVersions": [
-        66,
-        65
+        66
     ],
     "eip2FBlock": 0,
     "eip7FBlock": 0,
@@ -42,6 +41,7 @@
     "eip3541FBlock": 10499401,
     "eip3529FBlock": 10499401,
     "ethash": {},
+    "terminalTotalDifficulty": 50000000000000000,
     "difficultyBombDelays": {
         "0x19f0a0": "0x2dc6c0",
         "0x408b70": "0x1e8480",

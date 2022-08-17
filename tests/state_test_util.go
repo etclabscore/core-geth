@@ -215,73 +215,12 @@ func (t *StateTest) Run(subtest StateSubtest, vmconfig vm.Config, snapshotter bo
 
 // RunNoVerify runs a specific subtest and returns the statedb and post-state root
 func (t *StateTest) RunNoVerifyWithPost(subtest StateSubtest, vmconfig vm.Config, snapshotter bool, post stPostState) (*snapshot.Tree, *state.StateDB, common.Hash, error) {
-	config, eips, err := GetChainConfig(subtest.Fork)
-	if err != nil {
-		return nil, nil, common.Hash{}, UnsupportedForkError{subtest.Fork}
-	}
-	vmconfig.ExtraEips = eips
-	block := core.GenesisToBlock(t.genesis(config), nil)
-	snaps, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre, snapshotter)
-
-	// post := t.json.Post[subtest.Fork][subtest.Index]
-	var baseFee *big.Int
-	if config.IsEnabled(config.GetEIP1559Transition, new(big.Int)) {
-		baseFee = t.json.Env.BaseFee
-		if baseFee == nil {
-			// Retesteth uses `0x10` for genesis baseFee. Therefore, it defaults to
-			// parent - 2 : 0xa as the basefee for 'this' context.
-			baseFee = big.NewInt(0x0a)
-		}
-	}
-	msg, err := t.json.Tx.toMessage(post, baseFee)
-	if err != nil {
-		return nil, nil, common.Hash{}, fmt.Errorf("%w: toMessage: %v", err, t.json.Tx)
-	}
-
-	// Try to recover tx with current signer
-	if len(post.TxBytes) != 0 {
-		var ttx types.Transaction
-		err := ttx.UnmarshalBinary(post.TxBytes)
-		if err != nil {
-			return nil, nil, common.Hash{}, err
-		}
-
-		if _, err := types.Sender(types.LatestSigner(config), &ttx); err != nil {
-			return nil, nil, common.Hash{}, err
-		}
-	}
-
-	// Prepare the EVM.
-	txContext := core.NewEVMTxContext(msg)
-	context := core.NewEVMBlockContext(block.Header(), nil, &t.json.Env.Coinbase)
-	context.GetHash = vmTestBlockHash
-	context.BaseFee = baseFee
-	context.Random = nil
-	if config.IsEnabled(config.GetEIP1559Transition, new(big.Int)) && t.json.Env.Random != nil {
-		rnd := common.BigToHash(t.json.Env.Random)
-		context.Random = &rnd
-		context.Difficulty = big.NewInt(0)
-	}
-	evm := vm.NewEVM(context, txContext, statedb, config, vmconfig)
-	// Execute the message.
-	snapshot := statedb.Snapshot()
-	gaspool := new(core.GasPool)
-	gaspool.AddGas(block.GasLimit())
-	if _, err := core.ApplyMessage(evm, msg, gaspool); err != nil {
-		statedb.RevertToSnapshot(snapshot)
-	}
-
-	// Commit block
-	statedb.Commit(config.IsEnabled(config.GetEIP161dTransition, block.Number()))
-	// Add 0-value mining reward. This only makes a difference in the cases
-	// where
-	// - the coinbase suicided, or
-	// - there are only 'bad' transactions, which aren't executed. In those cases,
-	//   the coinbase gets no txfee, so isn't created, and thus needs to be touched
-	statedb.AddBalance(block.Coinbase(), new(big.Int))
-	// And _now_ get the state root
-	root := statedb.IntermediateRoot(config.IsEnabled(config.GetEIP161dTransition, block.Number()))
-	return snaps, statedb, root, nil
+	stPostCp := t.json.Post[subtest.Fork][subtest.Index]
+	defer func() {
+		t.json.Post[subtest.Fork][subtest.Index] = stPostCp
+	}()
+	t.json.Post[subtest.Fork][subtest.Index] = post
+	return t.RunNoVerify(subtest, vmconfig, snapshotter)
 }
 
 // RunNoVerify runs a specific subtest and returns the statedb and post-state root

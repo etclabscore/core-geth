@@ -1,11 +1,13 @@
 package main
 
 import (
+	"crypto/sha1"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -165,7 +167,10 @@ func TestGethStartupLogs(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		t.Run(fmt.Sprintf("TestGethStartupLogs/%d: %v", i, c.flags), func(t *testing.T) {
+		// fix for darwin, where long test names fail with "The ipc endpoint is longer than %d characters."
+		hashedFlags := fmt.Sprintf("%x", sha1.Sum([]byte(strings.Join(c.flags, " "))))
+
+		t.Run(fmt.Sprintf("%d:%v", i, hashedFlags[:8]), func(t *testing.T) {
 			geth := runGeth(t, append(c.flags, "--exec", "admin.nodeInfo.name", "console")...)
 			geth.KillTimeout = 10 * time.Second
 			geth.ExpectRegexp("(?ism).*CoreGeth.*")

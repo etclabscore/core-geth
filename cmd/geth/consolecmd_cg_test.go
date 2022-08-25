@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -168,7 +168,7 @@ func TestGethStartupLogs(t *testing.T) {
 	}
 	for i, c := range cases {
 		// fix for darwin, where long test names fail with "The ipc endpoint is longer than %d characters."
-		hashedFlags := fmt.Sprintf("%x", sha1.Sum([]byte(strings.Join(c.flags, " "))))
+		hashedFlags := fmt.Sprintf("%x", sha256.Sum256([]byte(strings.Join(c.flags, " "))))
 
 		t.Run(fmt.Sprintf("%d:%v", i, hashedFlags[:8]), func(t *testing.T) {
 			geth := runGeth(t, append(c.flags, "--exec", "admin.nodeInfo.name", "console")...)

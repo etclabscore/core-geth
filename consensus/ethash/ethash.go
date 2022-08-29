@@ -376,17 +376,17 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 			path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
 			os.Remove(path)
 
-			// Speculative, aggressive deletes
+			// // Speculative, aggressive deletes
+			// //
+			// if ep > 2 {
+			// 	seed = seedHash(uint64(ep*2), epochLengthDefault)
+			// 	path = filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
+			// 	os.Remove(path)
 			//
-			if ep > 2 {
-				seed = seedHash(uint64(ep*2), epochLengthDefault)
-				path = filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
-				os.Remove(path)
-
-				seed = seedHash(uint64(ep*2)-1, epochLengthDefault)
-				path = filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
-				os.Remove(path)
-			}
+			// 	seed = seedHash(uint64(ep*2)-1, epochLengthDefault)
+			// 	path = filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
+			// 	os.Remove(path)
+			// }
 		}
 	})
 }

@@ -375,14 +375,20 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 			generateCache(c.cache, c.epoch, c.epochLength, seed)
 		}
 		// Iterate over all previous instances and delete old ones
-		for ep := int(c.epoch) - limit; ep >= 0; ep-- {
-			seed := seedHash(uint64(ep), c.epochLength)
+		rmCacheFile := func(epoch, epochLength uint64) {
+			seed := seedHash(epoch, c.epochLength)
 			path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s*", algorithmRevision, seed[:8], endian))
 			files, _ := filepath.Glob(path)
 			for _, file := range files {
 				logger.Warn("Removing cache file", "rm.epoch", ep, "rm.length", c.epochLength, "file", file)
 				os.Remove(file)
 			}
+		}
+		for ep := int(c.epoch) - limit; ep >= 0; ep-- {
+			// Remove more files than we need to for the sake of
+			// making sure that we remove old cache files from pre-ECIP1099 eras if needed.
+			rmCacheFile(uint64(ep), c.epochLength)
+			rmCacheFile(uint64(ep*2), c.epochLength/2)
 		}
 	})
 }

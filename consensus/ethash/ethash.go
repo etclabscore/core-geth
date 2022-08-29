@@ -257,7 +257,7 @@ func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (i
 
 	// Update the 'future item' if epoch is larger than previously seen.
 	if (epoch < maxEpoch-1 && lru.future < nextEpoch) || didECIP1099Upgrade {
-		log.Trace("Requiring new future ethash "+lru.what, "epoch", nextEpoch)
+		log.Trace("Requiring new future ethash "+lru.what, "epoch", nextEpoch, "nextEpochLength", nextEpochLength)
 		future = lru.new(nextEpoch, nextEpochLength)
 		lru.future = nextEpoch
 		lru.futureItem = future
@@ -380,7 +380,7 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 			path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s*", algorithmRevision, seed[:8], endian))
 			files, _ := filepath.Glob(path)
 			for _, file := range files {
-				logger.Warn("Removing cache file", "rm.epoch", ep, "file", file)
+				logger.Warn("Removing cache file", "rm.epoch", ep, "rm.length", c.epochLength, "file", file)
 				os.Remove(file)
 			}
 		}
@@ -484,7 +484,7 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 			path := filepath.Join(dir, fmt.Sprintf("full-R%d-%x%s*", algorithmRevision, seed[:8], endian))
 			files, _ := filepath.Glob(path)
 			for _, file := range files {
-				logger.Warn("Removing dataset file", "rm.epoch", ep, "file", file)
+				logger.Warn("Removing dataset file", "rm.epoch", ep, "rm.length", d.epochLength, "file", file)
 				os.Remove(file)
 			}
 		}

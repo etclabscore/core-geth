@@ -326,6 +326,7 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		if test {
 			size = 1024
 		}
+		log.Debug("ethash.cache", "method", "generate", "size", size, "seed", fmt.Sprintf("%x", seed), "dir", dir)
 		// If we don't store anything on disk, generate and return.
 		if dir == "" {
 			c.cache = make([]uint32, size/4)
@@ -338,7 +339,7 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 			endian = ".be"
 		}
 		path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
-		logger := log.New("epoch", c.epoch)
+		logger := log.New("epoch", c.epoch, "epoch.length", c.epochLength)
 
 		// We're about to mmap the file, ensure that the mapping is cleaned up when the
 		// cache becomes unused.
@@ -370,8 +371,12 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		// Iterate over all previous instances and delete old ones
 		for ep := int(c.epoch) - limit; ep >= 0; ep-- {
 			seed := seedHash(uint64(ep), c.epochLength)
-			path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
-			os.Remove(path)
+			path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s*", algorithmRevision, seed[:8], endian))
+			files, _ := filepath.Glob(path)
+			for _, file := range files {
+				logger.Warn("Removing cache file", "rm.epoch", ep, "file", file)
+				os.Remove(file)
+			}
 		}
 	})
 }
@@ -414,6 +419,8 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 			csize = 1024
 			dsize = 32 * 1024
 		}
+		log.Debug("ethash.dataset", "method", "generate", "csize", csize, "dsize", dsize, "seed", fmt.Sprintf("%x", seed), "dir", dir)
+
 		// If we don't store anything on disk, generate and return
 		if dir == "" {
 			cache := make([]uint32, csize/4)
@@ -430,7 +437,7 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 			endian = ".be"
 		}
 		path := filepath.Join(dir, fmt.Sprintf("full-R%d-%x%s", algorithmRevision, seed[:8], endian))
-		logger := log.New("epoch", d.epoch)
+		logger := log.New("epoch", d.epoch, "epoch.length", d.epochLength)
 
 		// We're about to mmap the file, ensure that the mapping is cleaned up when the
 		// cache becomes unused.
@@ -468,8 +475,12 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		// Iterate over all previous instances and delete old ones
 		for ep := int(d.epoch) - limit; ep >= 0; ep-- {
 			seed := seedHash(uint64(ep), d.epochLength)
-			path := filepath.Join(dir, fmt.Sprintf("full-R%d-%x%s", algorithmRevision, seed[:8], endian))
-			os.Remove(path)
+			path := filepath.Join(dir, fmt.Sprintf("full-R%d-%x%s*", algorithmRevision, seed[:8], endian))
+			files, _ := filepath.Glob(path)
+			for _, file := range files {
+				logger.Warn("Removing dataset file", "rm.epoch", ep, "file", file)
+				os.Remove(file)
+			}
 		}
 	})
 }

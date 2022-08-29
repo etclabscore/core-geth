@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math/big"
 	"runtime"
+	"strings"
 	"time"
 
 	mapset "github.com/deckarep/golang-set"
@@ -517,39 +518,61 @@ func (ethash *Ethash) verifySeal(chain consensus.ChainHeaderReader, header *type
 		digest []byte
 		result []byte
 	)
+
+	errorContext := map[string]interface{}{}
+
 	// If fast-but-heavy PoW verification was requested, use an ethash dataset
 	if fulldag {
-		dataset := ethash.dataset(number, true)
-		if dataset.generated() {
-			digest, result = hashimotoFull(dataset.dataset, ethash.SealHash(header).Bytes(), header.Nonce.Uint64())
+		myDataset := ethash.dataset(number, true)
+
+		errorContext["dataset.generated"] = myDataset.generated()
+
+		if myDataset.generated() {
+			errorContext["dataset.epoch"] = myDataset.epoch
+			errorContext["dataset.epochLength"] = myDataset.epochLength
+
+			digest, result = hashimotoFull(myDataset.dataset, ethash.SealHash(header).Bytes(), header.Nonce.Uint64())
 
 			// Datasets are unmapped in a finalizer. Ensure that the dataset stays alive
 			// until after the call to hashimotoFull so it's not unmapped while being used.
-			runtime.KeepAlive(dataset)
+			runtime.KeepAlive(myDataset)
 		} else {
 			// Dataset not yet generated, don't hang, use a cache instead
 			fulldag = false
 		}
 	}
+	var size uint64
 	// If slow-but-light PoW verification was requested (or DAG not yet ready), use an ethash cache
 	if !fulldag {
-		cache := ethash.cache(number)
-		epochLength := calcEpochLength(number, ethash.config.ECIP1099Block)
-		epoch := calcEpoch(number, epochLength)
-		size := datasetSize(epoch)
+		myCache := ethash.cache(number)
+
+		// epochLength := calcEpochLength(number, ethash.config.ECIP1099Block)
+		// epoch := calcEpoch(number, epochLength)
+
+		errorContext["cache.epoch"] = myCache.epoch
+		errorContext["cache.epochLength"] = myCache.epochLength
+
+		size = datasetSize(myCache.epoch)
 		if ethash.config.PowMode == ModeTest {
 			size = 32 * 1024
 		}
-		digest, result = hashimotoLight(size, cache.cache, ethash.SealHash(header).Bytes(), header.Nonce.Uint64())
+		errorContext["cache.size"] = size
+		digest, result = hashimotoLight(size, myCache.cache, ethash.SealHash(header).Bytes(), header.Nonce.Uint64())
 
 		// Caches are unmapped in a finalizer. Ensure that the cache stays alive
 		// until after the call to hashimotoLight so it's not unmapped while being used.
-		runtime.KeepAlive(cache)
+		runtime.KeepAlive(myCache)
 	}
+
 	// Verify the calculated values against the ones provided in the header
 	if !bytes.Equal(header.MixDigest[:], digest) {
-		return errInvalidMixDigest
+		errContextStrs := []string{}
+		for k, v := range errorContext {
+			errContextStrs = append(errContextStrs, fmt.Sprintf("%s=%v", k, v))
+		}
+		return fmt.Errorf("%w [%s]", errInvalidMixDigest, strings.Join(errContextStrs, " "))
 	}
+
 	target := new(big.Int).Div(two256, header.Difficulty)
 	if new(big.Int).SetBytes(result).Cmp(target) > 0 {
 		return errInvalidPoW

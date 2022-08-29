@@ -543,14 +543,20 @@ func (ethash *Ethash) verifySeal(chain consensus.ChainHeaderReader, header *type
 	}
 	var size uint64
 	// If slow-but-light PoW verification was requested (or DAG not yet ready), use an ethash cache
+
 	if !fulldag {
 		myCache := ethash.cache(number)
 
-		// epochLength := calcEpochLength(number, ethash.config.ECIP1099Block)
-		// epoch := calcEpoch(number, epochLength)
+		calcedEpochLength := calcEpochLength(number, ethash.config.ECIP1099Block)
+		calcedEpoch := calcEpoch(number, calcedEpochLength)
+
+		errorContext["calcEpoch"] = calcedEpoch
+		errorContext["calcEpochLength"] = calcedEpochLength
+		errorContext["calcSeedHash"] = fmt.Sprintf("%x", seedHash(calcedEpoch, calcedEpochLength)[:8])
 
 		errorContext["cache.epoch"] = myCache.epoch
 		errorContext["cache.epochLength"] = myCache.epochLength
+		errorContext["cache.seedHash"] = fmt.Sprintf("%x", seedHash(myCache.epoch, myCache.epochLength)[:8])
 
 		size = datasetSize(myCache.epoch)
 		if ethash.config.PowMode == ModeTest {

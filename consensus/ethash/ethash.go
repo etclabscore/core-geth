@@ -226,31 +226,37 @@ func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (i
 	lru.mu.Lock()
 	defer lru.mu.Unlock()
 
+	cacheKey := fmt.Sprintf("%d-%d", epoch, epochLength)
+
 	// Get or create the item for the requested epoch.
-	item, ok := lru.cache.Get(epoch)
+	item, ok := lru.cache.Get(cacheKey)
 	if !ok {
 		if lru.future > 0 && lru.future == epoch {
 			item = lru.futureItem
 		} else {
-			log.Trace("Requiring new ethash "+lru.what, "epoch", epoch)
+			log.Trace("Requiring new ethash "+lru.what, "epoch", epoch, "epochLength", epochLength)
 			item = lru.new(epoch, epochLength)
 		}
-		lru.cache.Add(epoch, item)
+		lru.cache.Add(cacheKey, item)
 	}
 
 	// Ensure pre-generation handles ecip-1099 changeover correctly
 	var nextEpoch = epoch + 1
 	var nextEpochLength = epochLength
+	var didECIP1099Upgrade bool
+
 	if ecip1099FBlock != nil {
 		nextEpochBlock := nextEpoch * epochLength
-		if nextEpochBlock == *ecip1099FBlock && epochLength == epochLengthDefault {
+		if nextEpochBlock >= *ecip1099FBlock && epochLength == epochLengthDefault {
 			nextEpoch = nextEpoch / 2
 			nextEpochLength = epochLengthECIP1099
+			log.Warn("Next epoch is the dawn of Etchash", "nextEpochBlock", nextEpochBlock, "nextEpoch", nextEpoch, "nextEpochLength", nextEpochLength)
+			didECIP1099Upgrade = true
 		}
 	}
 
 	// Update the 'future item' if epoch is larger than previously seen.
-	if epoch < maxEpoch-1 && lru.future < nextEpoch {
+	if (epoch < maxEpoch-1 && lru.future < nextEpoch) || didECIP1099Upgrade {
 		log.Trace("Requiring new future ethash "+lru.what, "epoch", nextEpoch)
 		future = lru.new(nextEpoch, nextEpochLength)
 		lru.future = nextEpoch

@@ -30,6 +30,32 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
+func TestSeedHashForEpochs(t *testing.T) {
+	// tr := params.MordorChainConfig.GetEthashECIP1099Transition()
+
+	blockNumber := uint64(4_980_000 + 1)
+
+	ep := calcEpoch(blockNumber, epochLengthECIP1099)
+	seed1099 := seedHash(ep, epochLengthECIP1099)
+
+	ep2 := calcEpoch(blockNumber, epochLengthDefault)
+	seedDefault := seedHash(ep2, epochLengthDefault)
+
+	t.Logf("%x / %x", seed1099[:8], seedDefault[:8])
+	// => ethash_test.go:44: 3aa8f28cac16bdd8 / 3aa8f28cac16bdd8
+
+	/*
+		Cache paths use the seed hash for filepath id.
+		If these are not cleaned up properly,
+		the cache will HIT an existing (not rm'd) cache file that should not exist.
+		('endian' here is only a usually-empty string that depends on
+			> isLittleEndian returns whether the local system is running in little or big endian byte order.
+		)
+
+		path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s*", algorithmRevision, seed[:8], endian))
+	*/
+}
+
 // Tests caches get sets correct future
 func TestCachesGet(t *testing.T) {
 	ethashA := NewTester(nil, false)

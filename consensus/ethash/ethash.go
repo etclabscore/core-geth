@@ -342,7 +342,7 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		if !isLittleEndian() {
 			endian = ".be"
 		}
-		path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
+		path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x-%d%s", algorithmRevision, seed[:8], c.epochLength, endian))
 		logger := log.New("epoch", c.epoch)
 
 		// We're about to mmap the file, ensure that the mapping is cleaned up when the
@@ -376,7 +376,7 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		for ep := int(c.epoch) - limit; ep >= 0; ep-- {
 			// Stateful deletes
 			seed := seedHash(uint64(ep), c.epochLength)
-			path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
+			path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x-%d%s", algorithmRevision, seed[:8], c.epochLength, endian))
 			os.Remove(path)
 
 			// // Speculative, aggressive deletes
@@ -729,6 +729,8 @@ func (ethash *Ethash) cache(block uint64) *cache {
 	current := currentI.(*cache)
 
 	// Wait for generation finish.
+	// The 'generate' method will either fetch the cache from a memory mapped file,
+	// of, if that doesn't exist, it will generate one and write it to a file.
 	current.generate(ethash.config.CacheDir, ethash.config.CachesOnDisk, ethash.config.CachesLockMmap, ethash.config.PowMode == ModeTest)
 
 	// If we need a new future cache, now's a good time to regenerate it.

@@ -392,9 +392,8 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 					} else {
 						logger.Warn("Deleted legacy ethash cache file", "path", file)
 					}
-				} else {
-					// Else the file is unrecognized (unknown name format), leave it alone.
 				}
+				// Else the file is unrecognized (unknown name format), leave it alone.
 				continue
 			}
 			if e <= c.epoch-uint64(limit) || e > c.epoch+1 {

@@ -226,8 +226,9 @@ func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (i
 	lru.mu.Lock()
 	defer lru.mu.Unlock()
 
+	cacheKey := fmt.Sprintf("%d-%d", epoch, epochLength)
 	// Get or create the item for the requested epoch.
-	item, ok := lru.cache.Get(epoch)
+	item, ok := lru.cache.Get(cacheKey)
 	if !ok {
 		if lru.future > 0 && lru.future == epoch {
 			item = lru.futureItem
@@ -235,7 +236,7 @@ func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (i
 			log.Trace("Requiring new ethash "+lru.what, "epoch", epoch)
 			item = lru.new(epoch, epochLength)
 		}
-		lru.cache.Add(epoch, item)
+		lru.cache.Add(cacheKey, item)
 	}
 
 	// Ensure pre-generation handles ecip-1099 changeover correctly

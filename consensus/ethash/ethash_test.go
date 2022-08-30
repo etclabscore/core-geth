@@ -73,7 +73,6 @@ func TestEthashCaches(t *testing.T) {
 	trialMax := ecip1099Block * uint64(testIterationMultiple) * 2
 	latestIteratedEpoch := uint64(math.MaxInt64)
 	for n := uint64(0); n < trialMax; n += epochLengthDefault / 300 {
-
 		// Calculate the epoch number independently to use for logging and debugging.
 		epochLength := epochLengthDefault
 		if n >= ecip1099Block {

@@ -244,7 +244,7 @@ func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (i
 	var nextEpochLength = epochLength
 	if ecip1099FBlock != nil {
 		nextEpochBlock := nextEpoch * epochLength
-		if nextEpochBlock == *ecip1099FBlock && epochLength == epochLengthDefault {
+		if nextEpochBlock >= *ecip1099FBlock && epochLength == epochLengthDefault {
 			nextEpoch = nextEpoch / 2
 			nextEpochLength = epochLengthECIP1099
 		}

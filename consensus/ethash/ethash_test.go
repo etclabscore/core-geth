@@ -64,12 +64,15 @@ func TestEthashCaches(t *testing.T) {
 	stop := ecip1099Block * uint64(multiple) * 2
 	for n := uint64(0); n < stop; n += 100 {
 		if n%10_000 == 0 {
-			t.Logf("Block number: %d/%d (%0.1f%%) 1099=%d", n, stop, float64(n)/float64(stop)*100, ecip1099Block)
+			t.Logf("@1099 %d/%d (%0.1f%%) @range %d/%d (%0.1f%%)",
+				n, stop, float64(n)/float64(ecip1099Block)*100,
+				n, stop, float64(n)/float64(stop)*100,
+			)
 		}
 		c := e.cache(n)
 		c.finalizer()
 		if n >= ecip1099Block && c.epochLength != epochLengthECIP1099 {
-			t.Fatalf("Unexpected epoch length")
+			t.Fatalf("Unexpected epoch length: %d", c.epochLength)
 		}
 	}
 }

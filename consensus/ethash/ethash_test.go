@@ -21,6 +21,7 @@ import (
 	"math/big"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -28,7 +29,97 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/log"
 )
+
+func verboseLogging() {
+	glogger := log.NewGlogHandler(log.StreamHandler(os.Stdout, log.TerminalFormat(false)))
+	glogger.Verbosity(log.Lvl(99))
+	log.Root().SetHandler(glogger)
+}
+
+func TestEthashCaches(t *testing.T) {
+	verboseLogging()
+
+	// Make a copy of the default config.
+	conf := Config{
+		CacheDir:         filepath.Join(os.TempDir(), "ethash-cache-test-cachedir"),
+		CachesInMem:      2,
+		CachesOnDisk:     3,
+		CachesLockMmap:   false,
+		DatasetsInMem:    1,
+		DatasetsOnDisk:   2,
+		DatasetsLockMmap: false,
+		DatasetDir:       filepath.Join(os.TempDir(), "ethash-cache-test-datadir"),
+		PowMode:          ModeNormal,
+	}
+
+	// Clean up ahead of ourselves.
+	os.RemoveAll(conf.CacheDir)
+	os.RemoveAll(conf.DatasetDir)
+
+	// And after ourselves.
+	defer os.RemoveAll(conf.CacheDir)
+	defer os.RemoveAll(conf.DatasetDir)
+
+	// Use some "big" arbitrary multiple to make sure that simulate real life adequately.
+	testIterationMultiple := 6
+	ecip1099Block := uint64(epochLengthDefault * conf.CachesInMem * testIterationMultiple)
+	conf.ECIP1099Block = &ecip1099Block
+
+	// Construct our Ethash
+	e := New(conf, nil, false)
+
+	trialMax := ecip1099Block * uint64(testIterationMultiple) * 2
+	latestIteratedEpoch := uint64(math.MaxInt64)
+	for n := uint64(0); n < trialMax; n += epochLengthDefault / 300 {
+
+		// Calculate the epoch number independently to use for logging and debugging.
+		epochLength := epochLengthDefault
+		if n >= ecip1099Block {
+			epochLength = epochLengthECIP1099
+		}
+		ep := calcEpoch(n, uint64(epochLength))
+		epl := calcEpochLength(n, conf.ECIP1099Block)
+
+		if ep != latestIteratedEpoch {
+			t.Logf("block=%d epoch=%d epoch.len=%d ECIP1099=/%d (%0.1f%%) RANGE=/%d (%0.1f%%)",
+				n,
+				ep, epl,
+				ecip1099Block, float64(n)/float64(ecip1099Block)*100,
+				trialMax, float64(n)/float64(trialMax)*100,
+			)
+			latestIteratedEpoch = ep
+		}
+
+		// This is the tested function.
+		c := e.cache(n)
+		c.finalizer()
+
+		// Do we get the right epoch length?
+		if n >= ecip1099Block && c.epochLength != epochLengthECIP1099 {
+			// Give the future epoch routine a chance to finish.
+			time.Sleep(1 * time.Second)
+
+			// current status
+			t.Logf("block=%d epoch=%d epoch.len=%d ECIP1099=/%d (%0.1f%%) RANGE=/%d (%0.1f%%)",
+				n,
+				ep, epl,
+				ecip1099Block, float64(n)/float64(ecip1099Block)*100,
+				trialMax, float64(n)/float64(trialMax)*100,
+			)
+
+			// ls -l /tmp/ethash-cache-test-cachedir
+			entries, _ := os.ReadDir(conf.CacheDir)
+			t.Log("cachedir", conf.CacheDir)
+			for _, entry := range entries {
+				t.Logf(`  - %s\n`, entry.Name())
+			}
+
+			t.Fatalf("Unexpected epoch length: %d", c.epochLength)
+		}
+	}
+}
 
 // Tests caches get sets correct future
 func TestCachesGet(t *testing.T) {

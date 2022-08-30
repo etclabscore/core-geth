@@ -21,6 +21,7 @@ import (
 	"math/big"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -29,6 +30,49 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 )
+
+func TestEthashCaches(t *testing.T) {
+
+	// Make a copy of the default config.
+	conf := Config{
+		CacheDir:         filepath.Join(os.TempDir(), "ethash-cache-test-cachedir"),
+		CachesInMem:      2,
+		CachesOnDisk:     3,
+		CachesLockMmap:   false,
+		DatasetsInMem:    1,
+		DatasetsOnDisk:   2,
+		DatasetsLockMmap: false,
+		DatasetDir:       filepath.Join(os.TempDir(), "ethash-cache-test-datadir"),
+		PowMode:          ModeNormal,
+	}
+
+	// Clean up ahead of ourselves.
+	os.RemoveAll(conf.CacheDir)
+	os.RemoveAll(conf.DatasetDir)
+
+	// And after ourselves.
+	defer os.RemoveAll(conf.CacheDir)
+	defer os.RemoveAll(conf.DatasetDir)
+
+	// Use some "big" arbitrary multiple to make sure that simulate real life adequately.
+	multiple := 6
+	ecip1099Block := uint64(epochLengthDefault * conf.CachesInMem * multiple)
+	conf.ECIP1099Block = &ecip1099Block
+
+	e := New(conf, nil, false)
+
+	stop := ecip1099Block * uint64(multiple) * 2
+	for n := uint64(0); n < stop; n += 100 {
+		if n%10_000 == 0 {
+			t.Logf("Block number: %d/%d (%0.1f%%) 1099=%d", n, stop, float64(n)/float64(stop)*100, ecip1099Block)
+		}
+		c := e.cache(n)
+		c.finalizer()
+		if n >= ecip1099Block && c.epochLength != epochLengthECIP1099 {
+			t.Fatalf("Unexpected epoch length")
+		}
+	}
+}
 
 // Tests caches get sets correct future
 func TestCachesGet(t *testing.T) {

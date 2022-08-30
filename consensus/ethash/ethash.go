@@ -241,18 +241,18 @@ func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (i
 	// Ensure pre-generation handles ecip-1099 changeover correctly
 	var nextEpoch = epoch + 1
 	var nextEpochLength = epochLength
-	var didECIP1099Upgrade bool
+	// var didECIP1099Upgrade bool
 	if ecip1099FBlock != nil {
 		nextEpochBlock := nextEpoch * epochLength
 		if nextEpochBlock >= *ecip1099FBlock && epochLength == epochLengthDefault {
 			nextEpoch = nextEpoch / 2
 			nextEpochLength = epochLengthECIP1099
-			didECIP1099Upgrade = true
+			// didECIP1099Upgrade = true
 		}
 	}
 
 	// Update the 'future item' if epoch is larger than previously seen.
-	if (epoch < maxEpoch-1 && lru.future < nextEpoch) || didECIP1099Upgrade {
+	if (epoch < maxEpoch-1 && lru.future < nextEpoch) || /*didECIP1099Upgrade*/ false {
 		log.Trace("Requiring new future ethash "+lru.what, "epoch", nextEpoch)
 		future = lru.new(nextEpoch, nextEpochLength)
 		lru.future = nextEpoch
@@ -274,7 +274,10 @@ type cache struct {
 // newCache creates a new ethash verification cache and returns it as a plain Go
 // interface to be usable in an LRU cache.
 func newCache(epoch uint64, epochLength uint64) interface{} {
-	return &cache{epoch: epoch, epochLength: epochLength}
+	return &cache{
+		epoch:       epoch,
+		epochLength: epochLength,
+	}
 }
 
 // isBadCache checks a given caches/datsets keccak256 hash against bad caches (ecip-1099)

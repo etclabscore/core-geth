@@ -340,8 +340,13 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		if !isLittleEndian() {
 			endian = ".be"
 		}
-		path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
-		logger := log.New("epoch", c.epoch)
+		// The file path naming scheme was changed to include epoch values in the filename,
+		// which enables a filepath glob with scan to identify out-of-bounds caches and remove them.
+		// The legacy path declaration is provided below as a comment for reference.
+		//
+		// path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))                 // LEGACY
+		path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%d-%x%s", algorithmRevision, c.epoch, seed[:8], endian)) // CURRENT
+		logger := log.New("epoch", c.epoch, "epochLength", c.epochLength)
 
 		// We're about to mmap the file, ensure that the mapping is cleaned up when the
 		// cache becomes unused.
@@ -370,11 +375,35 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 			c.cache = make([]uint32, size/4)
 			generateCache(c.cache, c.epoch, c.epochLength, seed)
 		}
-		// Iterate over all previous instances and delete old ones
-		for ep := int(c.epoch) - limit; ep >= 0; ep-- {
-			seed := seedHash(uint64(ep), c.epochLength)
-			path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
-			os.Remove(path)
+
+		// Iterate over all cache file instances, deleting any out of bounds (where epoch is below lower limit, or above upper limit).
+		matches, _ := filepath.Glob(filepath.Join(dir, fmt.Sprintf("cache-R%d*", algorithmRevision)))
+		for _, file := range matches {
+			var ar int   // algorithm revision
+			var e uint64 // epoch
+			var s string // seed
+			if _, err := fmt.Sscanf(filepath.Base(file), "cache-R%d-%d-%s"+endian, &ar, &e, &s); err != nil {
+				// There is an unrecognized file in this directory.
+				// See if the name matches the expected pattern of the legacy naming scheme.
+				if _, err := fmt.Sscanf(filepath.Base(file), "cache-R%d-%s"+endian, &ar, &s); err == nil {
+					// This file matches the previous generation naming pattern (sans epoch).
+					if err := os.Remove(file); err != nil {
+						logger.Error("Failed to remove legacy ethash cache file", "file", file, "err", err)
+					} else {
+						logger.Warn("Deleted legacy ethash cache file", "path", file)
+					}
+				} else {
+					// Else the file is unrecognized (unknown name format), leave it alone.
+				}
+				continue
+			}
+			if e <= c.epoch-uint64(limit) || e > c.epoch+1 {
+				if err := os.Remove(file); err == nil {
+					logger.Debug("Deleted ethash cache file", "target.epoch", e, "file", file)
+				} else {
+					logger.Error("Failed to delete ethash cache file", "target.epoch", e, "file", file, "err", err)
+				}
+			}
 		}
 	})
 }

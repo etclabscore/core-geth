@@ -372,9 +372,9 @@ func TestReadWriteGenesisAlloc(t *testing.T) {
 			{1}: {Balance: big.NewInt(1), Storage: map[common.Hash]common.Hash{{1}: {1}}},
 			{2}: {Balance: big.NewInt(2), Storage: map[common.Hash]common.Hash{{2}: {2}}},
 		}
-		hash, _ = alloc.DeriveHash()
+		hash, _ = gaDeriveHash(alloc)
 	)
-	alloc.Flush(db)
+	gaFlush(alloc, db)
 
 	var reload genesisT.GenesisAlloc
 	err := reload.UnmarshalJSON(rawdb.ReadGenesisStateSpec(db, hash))

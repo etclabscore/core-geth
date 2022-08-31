@@ -223,7 +223,7 @@ func gaWrite(ga *genesisT.GenesisAlloc, db ethdb.KeyValueWriter, hash common.Has
 	if err != nil {
 		return err
 	}
-	rawdb.WriteGenesisState(db, hash, blob)
+	rawdb.WriteGenesisStateSpec(db, hash, blob)
 	return nil
 }
 
@@ -231,7 +231,7 @@ func gaWrite(ga *genesisT.GenesisAlloc, db ethdb.KeyValueWriter, hash common.Has
 // hash and commits them into the given database handler.
 func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 	var alloc genesisT.GenesisAlloc
-	blob := rawdb.ReadGenesisState(db, hash)
+	blob := rawdb.ReadGenesisStateSpec(db, hash)
 	if len(blob) != 0 {
 		if err := alloc.UnmarshalJSON(blob); err != nil {
 			return err

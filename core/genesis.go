@@ -44,7 +44,7 @@ func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.Cha
 	return SetupGenesisBlockWithOverride(db, genesis, nil, nil)
 }
 
-func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, overrideGrayGlacier, overrideTerminalTotalDifficulty *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, overrideTerminalTotalDifficulty *big.Int, overrideTerminalTotalDifficultyPassed *bool) (ctypes.ChainConfigurator, common.Hash, error) {
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
@@ -52,11 +52,10 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	applyOverrides := func(config ctypes.ChainConfigurator) {
 		if config != nil {
 			if overrideTerminalTotalDifficulty != nil {
-				config.SetEthashTerminalTotalDifficulty(overrideTerminalTotalDifficulty)
+				config.TerminalTotalDifficulty = overrideTerminalTotalDifficulty
 			}
-			if overrideGrayGlacier != nil {
-				gg := overrideGrayGlacier.Uint64()
-				config.SetEthashEIP5133Transition(&gg)
+			if overrideTerminalTotalDifficultyPassed != nil {
+				config.TerminalTotalDifficultyPassed = *overrideTerminalTotalDifficultyPassed
 			}
 		}
 	}

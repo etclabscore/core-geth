@@ -33,6 +33,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/ethconfig"
+	"github.com/ethereum/go-ethereum/eth/filters"
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
@@ -52,7 +53,7 @@ func TestBuildSchema(t *testing.T) {
 	}
 	defer stack.Close()
 	// Make sure the schema can be parsed and matched up to the object model.
-	if err := newHandler(stack, nil, []string{}, []string{}); err != nil {
+	if err := newHandler(stack, nil, nil, []string{}, []string{}); err != nil {
 		t.Errorf("Could not construct GraphQL handler: %v", err)
 	}
 }
@@ -265,7 +266,8 @@ func createGQLService(t *testing.T, stack *node.Node) {
 		t.Fatalf("could not create import blocks: %v", err)
 	}
 	// create gql service
-	err = New(stack, ethBackend.APIBackend, []string{}, []string{})
+	filterSystem := filters.NewFilterSystem(ethBackend.APIBackend, filters.Config{})
+	err = New(stack, ethBackend.APIBackend, filterSystem, []string{}, []string{})
 	if err != nil {
 		t.Fatalf("could not create graphql service: %v", err)
 	}
@@ -350,7 +352,8 @@ func createGQLServiceWithTransactions(t *testing.T, stack *node.Node) {
 		t.Fatalf("could not create import blocks: %v", err)
 	}
 	// create gql service
-	err = New(stack, ethBackend.APIBackend, []string{}, []string{})
+	filterSystem := filters.NewFilterSystem(ethBackend.APIBackend, filters.Config{})
+	err = New(stack, ethBackend.APIBackend, filterSystem, []string{}, []string{})
 	if err != nil {
 		t.Fatalf("could not create graphql service: %v", err)
 	}

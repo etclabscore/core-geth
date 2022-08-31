@@ -318,6 +318,30 @@ func TestSetupGenesisBlock2(t *testing.T) {
 	}
 }
 
+// TestGenesisHashes checks the congruity of default genesis data to
+// corresponding hardcoded genesis hash values.
+func TestGenesisHashes(t *testing.T) {
+	for i, c := range []struct {
+		genesis *Genesis
+		want    common.Hash
+	}{
+		{DefaultGenesisBlock(), params.MainnetGenesisHash},
+		{DefaultGoerliGenesisBlock(), params.GoerliGenesisHash},
+		{DefaultRopstenGenesisBlock(), params.RopstenGenesisHash},
+		{DefaultRinkebyGenesisBlock(), params.RinkebyGenesisHash},
+		{DefaultSepoliaGenesisBlock(), params.SepoliaGenesisHash},
+	} {
+		// Test via MustCommit
+		if have := c.genesis.MustCommit(rawdb.NewMemoryDatabase()).Hash(); have != c.want {
+			t.Errorf("case: %d a), want: %s, got: %s", i, c.want.Hex(), have.Hex())
+		}
+		// Test via ToBlock
+		if have := c.genesis.ToBlock().Hash(); have != c.want {
+			t.Errorf("case: %d a), want: %s, got: %s", i, c.want.Hex(), have.Hex())
+		}
+	}
+}
+
 func TestGenesis_Commit(t *testing.T) {
 	genesis := &genesisT.Genesis{
 		BaseFee: big.NewInt(vars.InitialBaseFee),
@@ -352,9 +376,10 @@ func TestReadWriteGenesisAlloc(t *testing.T) {
 			{1}: {Balance: big.NewInt(1), Storage: map[common.Hash]common.Hash{{1}: {1}}},
 			{2}: {Balance: big.NewInt(2), Storage: map[common.Hash]common.Hash{{2}: {2}}},
 		}
-		hash = common.HexToHash("0xdeadbeef")
+		hash, _ = alloc.deriveHash()
 	)
 	gaWrite(alloc, db, hash)
+	alloc.flush(db)
 
 	var reload genesisT.GenesisAlloc
 	err := reload.UnmarshalJSON(rawdb.ReadGenesisState(db, hash))

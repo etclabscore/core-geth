@@ -571,7 +571,7 @@ func (api *ConsensusAPI) heartbeat() {
 		time.Sleep(5 * time.Second)
 
 		// If the network is not yet merged/merging, don't bother scaring the user
-		ttd := api.eth.BlockChain().Config().TerminalTotalDifficulty
+		ttd := api.eth.BlockChain().Config().GetEthashTerminalTotalDifficulty()
 		if ttd == nil {
 			continue
 		}
@@ -589,7 +589,7 @@ func (api *ConsensusAPI) heartbeat() {
 
 		// If there have been no updates for the past while, warn the user
 		// that the beacon client is probably offline
-		if api.eth.BlockChain().Config().TerminalTotalDifficultyPassed || api.eth.Merger().TDDReached() {
+		if api.eth.BlockChain().Config().GetEthashTerminalTotalDifficultyPassed() || api.eth.Merger().TDDReached() {
 			if time.Since(lastForkchoiceUpdate) > beaconUpdateConsensusTimeout && time.Since(lastNewPayloadUpdate) > beaconUpdateConsensusTimeout {
 				if time.Since(lastTransitionUpdate) > beaconUpdateExchangeTimeout {
 					if time.Since(offlineLogged) > beaconUpdateWarnFrequency {

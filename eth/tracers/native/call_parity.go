@@ -49,6 +49,7 @@ var parityErrorMappingStartingWith = map[string]string{
 }
 
 func init() {
+	// type ctorFn = func(*tracers.Context, json.RawMessage) (tracers.Tracer, error)
 	register("callTracerParity", NewCallParityTracer)
 }
 
@@ -104,10 +105,10 @@ func (t *callParityTracer) CaptureTxEnd(restGas uint64) {}
 
 // NewCallParityTracer returns a native go tracer which tracks
 // call frames of a tx, and implements vm.EVMLogger.
-func NewCallParityTracer(ctx *tracers.Context) tracers.Tracer {
+func NewCallParityTracer(ctx *tracers.Context, j json.RawMessage) (tracers.Tracer, error) {
 	// First callParityframe contains tx context info
 	// and is populated on start and end.
-	return &callParityTracer{callstack: make([]callParityFrame, 1), ctx: ctx}
+	return &callParityTracer{callstack: make([]callParityFrame, 1), ctx: ctx}, nil
 }
 
 // isPrecompiled returns whether the addr is a precompile. Logic borrowed from newJsTracer in eth/tracers/js/tracer.go

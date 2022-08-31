@@ -91,11 +91,11 @@ func (t *stateDiffTracer) CaptureTxStart(gasLimit uint64) {}
 
 func (t *stateDiffTracer) CaptureTxEnd(restGas uint64) {}
 
-func newStateDiffTracer(ctx *tracers.Context) tracers.Tracer {
+func newStateDiffTracer(ctx *tracers.Context, j json.RawMessage) (tracers.Tracer, error) {
 	// First callframe contains tx context info
 	// and is populated on start and end.
 	return &stateDiffTracer{stateDiff: stateDiff{}, ctx: ctx,
-		changedStorageKeys: make(map[common.Address]map[common.Hash]bool)}
+		changedStorageKeys: make(map[common.Address]map[common.Hash]bool)}, nil
 }
 func (t *stateDiffTracer) CapturePreEVM(env *vm.EVM) {
 	t.env = env

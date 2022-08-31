@@ -36,7 +36,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -209,11 +210,11 @@ func TestSetFeeDefaults(t *testing.T) {
 
 type backendMock struct {
 	current *types.Header
-	config  *params.ChainConfig
+	config  ctypes.ChainConfigurator
 }
 
 func newBackendMock() *backendMock {
-	config := &params.ChainConfig{
+	config := &goethereum.ChainConfig{
 		ChainID:             big.NewInt(42),
 		HomesteadBlock:      big.NewInt(0),
 		DAOForkBlock:        nil,
@@ -253,8 +254,8 @@ func (b *backendMock) deactivateLondon() {
 func (b *backendMock) SuggestGasTipCap(ctx context.Context) (*big.Int, error) {
 	return big.NewInt(42), nil
 }
-func (b *backendMock) CurrentHeader() *types.Header     { return b.current }
-func (b *backendMock) ChainConfig() *params.ChainConfig { return b.config }
+func (b *backendMock) CurrentHeader() *types.Header          { return b.current }
+func (b *backendMock) ChainConfig() ctypes.ChainConfigurator { return b.config }
 
 // Other methods needed to implement Backend interface.
 func (b *backendMock) SyncProgress() ethereum.SyncProgress { return ethereum.SyncProgress{} }

@@ -39,6 +39,8 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
 )
@@ -68,11 +70,11 @@ func newTesterWithNotification(t *testing.T, success func()) *downloadTester {
 	t.Cleanup(func() {
 		db.Close()
 	})
-	gspec := core.Genesis{
-		Alloc:   core.GenesisAlloc{testAddress: {Balance: big.NewInt(1000000000000000)}},
-		BaseFee: big.NewInt(params.InitialBaseFee),
+	gspec := &genesisT.Genesis{
+		Alloc:   genesisT.GenesisAlloc{testAddress: {Balance: big.NewInt(1000000000000000)}},
+		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
-	gspec.MustCommit(db)
+	core.MustCommitGenesis(db, gspec)
 
 	chain, err := core.NewBlockChain(db, nil, params.TestChainConfig, ethash.NewFaker(), vm.Config{}, nil, nil)
 	if err != nil {
@@ -1452,7 +1454,7 @@ func TestBeaconSync66Full(t *testing.T) { testBeaconSync(t, eth.ETH66, FullSync)
 func TestBeaconSync66Snap(t *testing.T) { testBeaconSync(t, eth.ETH66, SnapSync) }
 
 func testBeaconSync(t *testing.T, protocol uint, mode SyncMode) {
-	//log.Root().SetHandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	// log.Root().SetHandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 
 	var cases = []struct {
 		name  string // The name of testing scenario

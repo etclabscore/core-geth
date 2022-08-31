@@ -634,6 +634,15 @@ func (c *ChainConfig) SetEthashTerminalTotalDifficulty(n *big.Int) error {
 	return nil
 }
 
+func (c *ChainConfig) GetEthashTerminalTotalDifficultyPassed() bool {
+	return c.TerminalTotalDifficultyPassed
+}
+
+func (c *ChainConfig) SetEthashTerminalTotalDifficultyPassed(t bool) error {
+	c.TerminalTotalDifficultyPassed = t
+	return nil
+}
+
 // IsTerminalPoWBlock returns whether the given block is the last block of PoW stage.
 func (c *ChainConfig) IsTerminalPoWBlock(parentTotalDiff *big.Int, totalDiff *big.Int) bool {
 	terminalTotalDifficulty := c.GetEthashTerminalTotalDifficulty()

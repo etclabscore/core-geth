@@ -52,10 +52,10 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	applyOverrides := func(config ctypes.ChainConfigurator) {
 		if config != nil {
 			if overrideTerminalTotalDifficulty != nil {
-				config.TerminalTotalDifficulty = overrideTerminalTotalDifficulty
+				config.SetEthashTerminalTotalDifficulty(overrideTerminalTotalDifficulty)
 			}
 			if overrideTerminalTotalDifficultyPassed != nil {
-				config.TerminalTotalDifficultyPassed = *overrideTerminalTotalDifficultyPassed
+				config.SetEthashTerminalTotalDifficultyPassed(*overrideTerminalTotalDifficultyPassed)
 			}
 		}
 	}

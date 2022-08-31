@@ -28,6 +28,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func makeReceipt(addr common.Address) *types.Receipt {
@@ -51,15 +53,15 @@ func BenchmarkFilters(b *testing.B) {
 		addr3   = common.BytesToAddress([]byte("ethereum"))
 		addr4   = common.BytesToAddress([]byte("random addresses please"))
 
-		gspec = core.Genesis{
-			Alloc:   core.GenesisAlloc{addr1: {Balance: big.NewInt(1000000)}},
-			BaseFee: big.NewInt(params.InitialBaseFee),
+		gspec = &genesisT.Genesis{
+			Alloc:   genesisT.GenesisAlloc{addr1: {Balance: big.NewInt(1000000)}},
+			BaseFee: big.NewInt(vars.InitialBaseFee),
 		}
-		genesis = gspec.ToBlock()
+		genesis = core.GenesisToBlock(gspec, nil)
 	)
 	defer db.Close()
 
-	gspec.MustCommit(db)
+	core.MustCommitGenesis(db, gspec)
 
 	chain, receipts := core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, 100010, func(i int, gen *core.BlockGen) {
 		switch i {
@@ -113,15 +115,15 @@ func TestFilters(t *testing.T) {
 		hash3 = common.BytesToHash([]byte("topic3"))
 		hash4 = common.BytesToHash([]byte("topic4"))
 
-		gspec = core.Genesis{
-			Alloc:   core.GenesisAlloc{addr: {Balance: big.NewInt(1000000)}},
-			BaseFee: big.NewInt(params.InitialBaseFee),
+		gspec = &genesisT.Genesis{
+			Alloc:   genesisT.GenesisAlloc{addr: {Balance: big.NewInt(1000000)}},
+			BaseFee: big.NewInt(vars.InitialBaseFee),
 		}
-		genesis = gspec.ToBlock()
+		genesis = core.GenesisToBlock(gspec, nil)
 	)
 	defer db.Close()
 
-	gspec.MustCommit(db)
+	core.MustCommitGenesis(db, gspec)
 
 	chain, receipts := core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), db, 1000, func(i int, gen *core.BlockGen) {
 		switch i {

@@ -253,7 +253,7 @@ func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (i
 	// Update the 'future item' if epoch is larger than previously seen.
 	// Last conditional clause ('lru.future > nextEpoch') handles the ECIP1099 case where
 	// the next epoch is expected to be LESSER THAN that of the previous state's future epoch number.
-	if epoch < maxEpoch-1 && (lru.future < nextEpoch || lru.future > nextEpoch) {
+	if epoch < maxEpoch-1 && lru.future != nextEpoch {
 		log.Trace("Requiring new future ethash "+lru.what, "epoch", nextEpoch)
 		future = lru.new(nextEpoch, nextEpochLength)
 		lru.future = nextEpoch

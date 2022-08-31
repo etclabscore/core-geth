@@ -93,7 +93,6 @@ func TestEthashCaches(t *testing.T) {
 
 		// This is the tested function.
 		c := e.cache(n)
-		c.finalizer()
 
 		// Do we get the right epoch length?
 		if n >= ecip1099Block && c.epochLength != epochLengthECIP1099 {

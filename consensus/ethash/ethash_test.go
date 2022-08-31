@@ -38,6 +38,54 @@ func verboseLogging() {
 	log.Root().SetHandler(glogger)
 }
 
+func TestEthashECIP1099UniqueSeedHashes(t *testing.T) {
+	// Use some "big" arbitrary multiple to make sure that simulate real life adequately.
+	testIterationMultiple := 6
+	ecip1099Block := uint64(epochLengthDefault * 3 * testIterationMultiple)
+
+	// Define a table to hold our seed hashes.
+	// We'll reference these to see if there are any dupes.
+	type seedHashT struct {
+		epoch       uint64
+		epochLength uint64
+	}
+	seedHashes := make(map[string]seedHashT)
+
+	trialMax := ecip1099Block * uint64(testIterationMultiple) * 42
+	latestIteratedEpoch := uint64(math.MaxInt64)
+	for n := uint64(0); n < trialMax; n += epochLengthDefault / 2 {
+		// Calculate the epoch number independently to use for logging and debugging.
+		epochLength := epochLengthDefault
+		if n >= ecip1099Block {
+			epochLength = epochLengthECIP1099
+		}
+		ep := calcEpoch(n, uint64(epochLength))
+		epl := calcEpochLength(n, &ecip1099Block)
+
+		if ep != latestIteratedEpoch {
+			latestIteratedEpoch = ep
+
+			seed := seedHash(ep, epl)
+			seedHex := hexutil.Encode(seed[:])[2:]
+			if v, ok := seedHashes[seedHex]; ok {
+				t.Logf("block=%d epoch=%d epoch.len=%d ECIP1099=/%d (%0.1f%%) RANGE=/%d (%0.1f%%)",
+					n,
+					ep, epl,
+					ecip1099Block, float64(n)/float64(ecip1099Block)*100,
+					trialMax, float64(n)/float64(trialMax)*100,
+				)
+				t.Errorf("duplicate seed hash: %s a.epoch=%d a.epochLength=%d b.epoch=%d b.epochLength=%d",
+					seedHex, v.epoch, v.epochLength, ep, epl)
+			} else {
+				seedHashes[seedHex] = seedHashT{
+					epoch:       ep,
+					epochLength: epl,
+				}
+			}
+		}
+	}
+}
+
 func TestEthashCaches(t *testing.T) {
 	verboseLogging()
 

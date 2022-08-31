@@ -17,6 +17,7 @@
 package ethash
 
 import (
+	"fmt"
 	"math"
 	"math/big"
 	"math/rand"
@@ -174,6 +175,82 @@ func TestEthashCaches(t *testing.T) {
 			}
 			t.Fatalf("Too many cache files: %d", len(entries))
 		}
+	}
+}
+
+func TestEthashCacheFileEviction(t *testing.T) {
+	verboseLogging()
+
+	// Make a copy of the default config.
+	conf := Config{
+		CacheDir:         filepath.Join(os.TempDir(), "ethash-cache-test-cachedir"),
+		CachesInMem:      2,
+		CachesOnDisk:     3,
+		CachesLockMmap:   false,
+		DatasetsInMem:    1,
+		DatasetsOnDisk:   2,
+		DatasetsLockMmap: false,
+		DatasetDir:       filepath.Join(os.TempDir(), "ethash-cache-test-datadir"),
+		PowMode:          ModeNormal,
+	}
+
+	// Clean up ahead of ourselves.
+	os.RemoveAll(conf.CacheDir)
+	os.RemoveAll(conf.DatasetDir)
+
+	// And after ourselves.
+	defer os.RemoveAll(conf.CacheDir)
+	defer os.RemoveAll(conf.DatasetDir)
+
+	// Use some "big" arbitrary multiple to make sure that simulate real life adequately.
+	testIterationMultiple := 6
+	ecip1099Block := uint64(epochLengthDefault * conf.CachesInMem * testIterationMultiple)
+	conf.ECIP1099Block = &ecip1099Block
+
+	// Construct our Ethash
+	e := New(conf, nil, false)
+
+	bn := uint64(12_345_678)
+
+	el := calcEpochLength(bn, conf.ECIP1099Block)
+	ep := calcEpoch(bn, el)
+	seed := seedHash(ep, el)
+
+	os.MkdirAll(conf.CacheDir, 0700)
+
+	// Create a legacy cache file.
+	// This should get removed.
+	legacyCacheFileBasePath := fmt.Sprintf("cache-R%d-%x", algorithmRevision, seed[:8])
+	legacyCacheFilePath := filepath.Join(conf.CacheDir, legacyCacheFileBasePath)
+	if err := os.WriteFile(legacyCacheFilePath, []byte{}, 0644); err != nil {
+		t.Fatal(err)
+	}
+	// Create an unknown file in the cache dir.
+	// This should not get removed.
+	unknownCacheFilePath := filepath.Join(conf.CacheDir, "unexpected-file")
+	if err := os.WriteFile(unknownCacheFilePath, []byte{}, 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// Print entries before ethash.cache method called.
+	entries, _ := os.ReadDir(conf.CacheDir)
+	for _, entry := range entries {
+		t.Logf(`  - %s`, entry.Name())
+	}
+
+	// Call the cache method, which will clean up the cache dir after generating the cache.
+	e.cache(bn)
+
+	entries, _ = os.ReadDir(conf.CacheDir)
+	for _, entry := range entries {
+		t.Logf(`  - %s`, entry.Name())
+	}
+
+	if _, err := os.Stat(legacyCacheFilePath); !os.IsNotExist(err) {
+		t.Fatalf("legacy cache file %s not removed", legacyCacheFilePath)
+	}
+	if _, err := os.Stat(unknownCacheFilePath); err != nil {
+		t.Fatalf("unknown cache file %s removed", unknownCacheFilePath)
 	}
 }
 

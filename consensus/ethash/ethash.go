@@ -244,7 +244,10 @@ func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (i
 	var nextEpochLength = epochLength
 	if ecip1099FBlock != nil {
 		nextEpochBlock := nextEpoch * epochLength
-		if nextEpochBlock >= *ecip1099FBlock && epochLength == epochLengthDefault {
+		// Note that == demands that the ECIP1099 activation block is situated
+		// at the beginning of an epoch.
+		// https://github.com/ethereumclassic/ECIPs/blob/master/_specs/ecip-1099.md#implementation
+		if nextEpochBlock == *ecip1099FBlock && epochLength == epochLengthDefault {
 			nextEpoch = nextEpoch / 2
 			nextEpochLength = epochLengthECIP1099
 		}

@@ -742,7 +742,7 @@ func (spec *ParityChainSpec) GetEthashTerminalTotalDifficultyPassed() bool {
 	return spec.Engine.Ethash.Params.TerminalTotalDifficultyPassed
 }
 
-func (spec *ParityChainSpec) SetEthashTerminalTotalDifficulty(t bool) error {
+func (spec *ParityChainSpec) SetEthashTerminalTotalDifficultyPassed(t bool) error {
 	spec.Engine.Ethash.Params.TerminalTotalDifficultyPassed = t
 	return nil
 }

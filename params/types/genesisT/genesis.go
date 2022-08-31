@@ -28,12 +28,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/trie"
 )
 
 var ErrGenesisNoConfig = errors.New("genesis has no chain configuration")
@@ -99,59 +95,6 @@ func (ga *GenesisAlloc) UnmarshalJSON(data []byte) error {
 	for addr, a := range m {
 		(*ga)[common.Address(addr)] = a
 	}
-	return nil
-}
-
-// DeriveHash computes the state root according to the genesis specification.
-func (ga *GenesisAlloc) DeriveHash() (common.Hash, error) {
-	// Create an ephemeral in-memory database for computing hash,
-	// all the derived states will be discarded to not pollute disk.
-	db := state.NewDatabase(rawdb.NewMemoryDatabase())
-	statedb, err := state.New(common.Hash{}, db, nil)
-	if err != nil {
-		return common.Hash{}, err
-	}
-	for addr, account := range *ga {
-		statedb.AddBalance(addr, account.Balance)
-		statedb.SetCode(addr, account.Code)
-		statedb.SetNonce(addr, account.Nonce)
-		for key, value := range account.Storage {
-			statedb.SetState(addr, key, value)
-		}
-	}
-	return statedb.Commit(false)
-}
-
-// Flush is very similar with deriveHash, but the main difference is
-// all the generated states will be persisted into the given database.
-// Also, the genesis state specification will be flushed as well.
-func (ga *GenesisAlloc) Flush(db ethdb.Database) error {
-	statedb, err := state.New(common.Hash{}, state.NewDatabaseWithConfig(db, &trie.Config{Preimages: true}), nil)
-	if err != nil {
-		return err
-	}
-	for addr, account := range *ga {
-		statedb.AddBalance(addr, account.Balance)
-		statedb.SetCode(addr, account.Code)
-		statedb.SetNonce(addr, account.Nonce)
-		for key, value := range account.Storage {
-			statedb.SetState(addr, key, value)
-		}
-	}
-	root, err := statedb.Commit(false)
-	if err != nil {
-		return err
-	}
-	err = statedb.Database().TrieDB().Commit(root, true, nil)
-	if err != nil {
-		return err
-	}
-	// Marshal the genesis state specification and persist.
-	blob, err := json.Marshal(ga)
-	if err != nil {
-		return err
-	}
-	rawdb.WriteGenesisStateSpec(db, root, blob)
 	return nil
 }
 

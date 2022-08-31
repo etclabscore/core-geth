@@ -215,6 +215,10 @@ func IsCodeKey(key []byte) (bool, []byte) {
 	return false, nil
 }
 
+func ConfigKey(hash common.Hash) []byte {
+	return configKey(hash)
+}
+
 // configKey = configPrefix + hash
 func configKey(hash common.Hash) []byte {
 	return append(configPrefix, hash.Bytes()...)

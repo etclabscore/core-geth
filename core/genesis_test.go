@@ -322,21 +322,17 @@ func TestSetupGenesisBlock2(t *testing.T) {
 // corresponding hardcoded genesis hash values.
 func TestGenesisHashes(t *testing.T) {
 	for i, c := range []struct {
-		genesis *Genesis
+		genesis *genesisT.Genesis
 		want    common.Hash
 	}{
-		{DefaultGenesisBlock(), params.MainnetGenesisHash},
-		{DefaultGoerliGenesisBlock(), params.GoerliGenesisHash},
-		{DefaultRopstenGenesisBlock(), params.RopstenGenesisHash},
-		{DefaultRinkebyGenesisBlock(), params.RinkebyGenesisHash},
-		{DefaultSepoliaGenesisBlock(), params.SepoliaGenesisHash},
+		{params.DefaultGenesisBlock(), params.MainnetGenesisHash},
+		{params.DefaultGoerliGenesisBlock(), params.GoerliGenesisHash},
+		{params.DefaultRopstenGenesisBlock(), params.RopstenGenesisHash},
+		{params.DefaultRinkebyGenesisBlock(), params.RinkebyGenesisHash},
+		{params.DefaultSepoliaGenesisBlock(), params.SepoliaGenesisHash},
 	} {
 		// Test via MustCommit
-		if have := c.genesis.MustCommit(rawdb.NewMemoryDatabase()).Hash(); have != c.want {
-			t.Errorf("case: %d a), want: %s, got: %s", i, c.want.Hex(), have.Hex())
-		}
-		// Test via ToBlock
-		if have := c.genesis.ToBlock().Hash(); have != c.want {
+		if have := MustCommitGenesis(rawdb.NewMemoryDatabase(), c.genesis).Hash(); have != c.want {
 			t.Errorf("case: %d a), want: %s, got: %s", i, c.want.Hex(), have.Hex())
 		}
 	}
@@ -376,13 +372,12 @@ func TestReadWriteGenesisAlloc(t *testing.T) {
 			{1}: {Balance: big.NewInt(1), Storage: map[common.Hash]common.Hash{{1}: {1}}},
 			{2}: {Balance: big.NewInt(2), Storage: map[common.Hash]common.Hash{{2}: {2}}},
 		}
-		hash, _ = alloc.deriveHash()
+		hash, _ = alloc.DeriveHash()
 	)
-	gaWrite(alloc, db, hash)
-	alloc.flush(db)
+	alloc.Flush(db)
 
 	var reload genesisT.GenesisAlloc
-	err := reload.UnmarshalJSON(rawdb.ReadGenesisState(db, hash))
+	err := reload.UnmarshalJSON(rawdb.ReadGenesisStateSpec(db, hash))
 	if err != nil {
 		t.Fatalf("Failed to load genesis state %v", err)
 	}

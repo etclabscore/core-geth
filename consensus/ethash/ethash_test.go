@@ -143,7 +143,7 @@ func TestEthashCaches(t *testing.T) {
 		c := e.cache(n)
 
 		// Do we get the right epoch length?
-		if n >= ecip1099Block && c.epochLength != epochLengthECIP1099 {
+		if c.epochLength != epl {
 			// Give the future epoch routine a chance to finish.
 			time.Sleep(1 * time.Second)
 
@@ -163,6 +163,16 @@ func TestEthashCaches(t *testing.T) {
 			}
 
 			t.Fatalf("Unexpected epoch length: %d", c.epochLength)
+		}
+
+		entries, _ := os.ReadDir(conf.CacheDir)
+		// We add +1 to CachesOnDisk because the future epoch cache is also created and can still
+		// be in-progress generating as a goroutine.
+		if len(entries) > conf.CachesOnDisk+1 {
+			for _, entry := range entries {
+				t.Logf(`  - %s`, entry.Name())
+			}
+			t.Fatalf("Too many cache files: %d", len(entries))
 		}
 	}
 }

@@ -46,7 +46,7 @@ var (
 		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
 	genesis      = core.MustCommitGenesis(testdb, gspec)
-	unknownBlock = types.NewBlock(&types.Header{GasLimit: vars.GenesisGasLimit, BaseFee: big.NewInt(params.InitialBaseFee)}, nil, nil, nil, trie.NewStackTrie(nil))
+	unknownBlock = types.NewBlock(&types.Header{GasLimit: vars.GenesisGasLimit, BaseFee: big.NewInt(vars.InitialBaseFee)}, nil, nil, nil, trie.NewStackTrie(nil))
 )
 
 // makeChain creates a chain of n blocks starting at and including parent.

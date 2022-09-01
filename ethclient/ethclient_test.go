@@ -779,7 +779,67 @@ func sendTransaction(ec *Client) error {
 	return ec.SendTransaction(context.Background(), tx)
 }
 
+func sliceContains(sl []string, str string) bool {
+	for _, s := range sl {
+		if str == s {
+			return true
+		}
+	}
+	return false
+}
+
 func TestRPCDiscover(t *testing.T) {
+	check := func(r meta_schema.OpenrpcDocument) {
+		responseMethods := func() (names []string) {
+			for _, m := range *r.Methods {
+				names = append(names, string(*m.Name))
+			}
+			return
+		}()
+
+		over, under := []string{}, []string{}
+
+		// under: methods which exist in the response document,
+		// but are not contained in the canonical hardcoded list below
+		for _, name := range responseMethods {
+			if !sliceContains(allRPCMethods, name) {
+				under = append(under, name)
+			}
+		}
+
+		// over: methods which DO NOT exist in the response document,
+		// but ARE contained in the canonical hardcoded list below
+		for _, name := range allRPCMethods {
+			if !sliceContains(responseMethods, name) {
+				over = append(over, name)
+			}
+		}
+
+		if len(over) > 0 || len(under) > 0 {
+			printList := func(list []string) string {
+				if len(list) == 0 {
+					return "∅" // empty set
+				}
+				var str string
+				for _, s := range list {
+					str += "-" + s + "\n"
+				}
+				return str
+			}
+
+			responseDocument, _ := json.MarshalIndent(r, "", "    ")
+			t.Logf(`Response Document:
+
+%s`, string(responseDocument))
+			t.Fatalf(`OVER (methods which do not appear in the current API, but exist in the hardcoded response document):): 
+%v
+
+UNDER (methods which appear in the current API, but do not appear in the hardcoded response document):): 
+%v
+`, printList(over), printList(under))
+		}
+	}
+
 	backend, _ := newTestBackend(t)
 	client, _ := backend.Attach()
 	defer backend.Close()
@@ -791,63 +851,7 @@ func TestRPCDiscover(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	sliceContains := func(sl []string, str string) bool {
-		for _, s := range sl {
-			if str == s {
-				return true
-			}
-		}
-		return false
-	}
-
-	responseMethods := func() (names []string) {
-		for _, m := range *res.Methods {
-			names = append(names, string(*m.Name))
-		}
-		return
-	}()
-
-	over, under := []string{}, []string{}
-
-	// under: methods which exist in the response document,
-	// but are not contained in the canonical hardcoded list below
-	for _, name := range responseMethods {
-		if !sliceContains(allRPCMethods, name) {
-			under = append(under, name)
-		}
-	}
-
-	// over: methods which DO NOT exist in the response document,
-	// but ARE contained in the canonical hardcoded list below
-	for _, name := range allRPCMethods {
-		if !sliceContains(responseMethods, name) {
-			over = append(over, name)
-		}
-	}
-
-	if len(over) > 0 || len(under) > 0 {
-		printList := func(list []string) string {
-			if len(list) == 0 {
-				return "∅" // empty set
-			}
-			var str string
-			for _, s := range list {
-				str += "-" + s + "\n"
-			}
-			return str
-		}
-
-		responseDocument, _ := json.MarshalIndent(res, "", "    ")
-		t.Logf(`Response Document:
-
-%s`, string(responseDocument))
-		t.Fatalf(`OVER (methods which do not appear in the current API, but exist in the hardcoded response document):): 
-%v
-
-UNDER (methods which appear in the current API, but do not appear in the hardcoded response document):): 
-%v
-`, printList(over), printList(under))
-	}
+	check(res)
 }
 
 func subscriptionTestSetup(t *testing.T) (genesisBlock *genesisT.Genesis, backend *node.Node) {

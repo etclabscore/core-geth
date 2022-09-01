@@ -901,6 +901,12 @@ func TestEthSubscribeNewSideHeads(t *testing.T) {
 		t.Fatalf("can't create new ethereum service: %v", err)
 	}
 
+	filterSystem := filters.NewFilterSystem(ethservice.APIBackend, filters.Config{})
+	backend.RegisterAPIs([]rpc.API{{
+		Namespace: "eth",
+		Service:   filters.NewFilterAPI(filterSystem, false),
+	}})
+
 	// Import the test chain.
 	if err := backend.Start(); err != nil {
 		t.Fatalf("can't start test node: %v", err)
@@ -912,6 +918,7 @@ func TestEthSubscribeNewSideHeads(t *testing.T) {
 	// Create the client and newSideHeads subscription.
 	client, err := backend.Attach()
 	defer backend.Close()
+
 	defer client.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -922,9 +929,18 @@ func TestEthSubscribeNewSideHeads(t *testing.T) {
 	sideHeadCh := make(chan *types.Header)
 	sub, err := ec.SubscribeNewSideHead(context.Background(), sideHeadCh)
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
+	} else {
+		defer sub.Unsubscribe()
 	}
-	defer sub.Unsubscribe()
+
+	headCh := make(chan *types.Header)
+	sub2, err2 := ec.SubscribeNewHead(context.Background(), headCh)
+	if err2 != nil {
+		t.Error(err2)
+	} else {
+		defer sub2.Unsubscribe()
+	}
 
 	// Create and import the second-seen chain.
 	replacementBlocks, _ := core.GenerateChain(chainConfig, originalBlocks[len(originalBlocks)-5], ethservice.Engine(), db, 5, func(i int, gen *core.BlockGen) {
@@ -993,6 +1009,11 @@ waiting:
 		} else if got[i].Hash() != b.Hash() {
 			t.Errorf("hash: want: %s, got: %s", b.Hash().Hex()[:8], got[i].Hash().Hex()[:8])
 		}
+	}
+
+	if t.Failed() {
+		unAuthed, authed := backend.GetAPIs()
+		t.Logf("backend APIS: unAuthed=%v authed=%v", unAuthed, authed)
 	}
 }
 

@@ -241,6 +241,11 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 			// parent - 2 : 0xa as the basefee for 'this' context.
 			baseFee = big.NewInt(0x0a)
 		}
+	} else {
+		// Configure a default zero-value gasPrice in case it is not set.
+		if t.json.Tx.GasPrice == nil {
+			t.json.Tx.GasPrice = new(big.Int)
+		}
 	}
 	post := t.json.Post[subtest.Fork][subtest.Index]
 	msg, err := t.json.Tx.toMessage(post, baseFee)

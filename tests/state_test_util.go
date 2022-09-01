@@ -244,7 +244,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	} else {
 		// Configure a default zero-value gasPrice in case it is not set.
 		if t.json.Tx.GasPrice == nil {
-			t.json.Tx.GasPrice = new(big.Int)
+			t.json.Tx.GasPrice = big.NewInt(0)
 		}
 	}
 	post := t.json.Post[subtest.Fork][subtest.Index]

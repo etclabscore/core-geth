@@ -18,6 +18,7 @@ package tests
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -29,6 +30,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/internal/build"
 	"github.com/ethereum/go-ethereum/params"
@@ -285,6 +287,9 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 				if refPostState[s.Index].ExpectException == "" {
 					// TODO: Turn this error into the kind of error constants that upstream uses, eg. TR_TypeNotSupported.
 					stPost.ExpectException = err.Error()
+					if errors.Is(err, types.ErrTxTypeNotSupported) {
+						stPost.ExpectException = "TR_TypeNotSupported"
+					}
 				}
 
 				// Either way, we maintain the incumbent post state values,

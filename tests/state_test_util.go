@@ -92,7 +92,7 @@ type stPostState struct {
 	Root            common.UnprefixedHash `json:"hash"`
 	Logs            common.UnprefixedHash `json:"logs"`
 	TxBytes         hexutil.Bytes         `json:"txbytes"`
-	ExpectException string                `json:"expectException"`
+	ExpectException string                `json:"expectException,omitempty"`
 	Indexes         stPostStateIndexes    `json:"indexes"`
 
 	// filled can be set to true when the subtest has been written,

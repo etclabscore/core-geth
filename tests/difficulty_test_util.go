@@ -39,8 +39,8 @@ type DifficultyTest struct {
 	CurrentTimestamp   uint64       `json:"currentTimestamp"`
 	CurrentBlockNumber uint64       `json:"currentBlockNumber"`
 	CurrentDifficulty  *big.Int     `json:"currentDifficulty"`
-	Chainspec          chainspecRef `json:"chainspec"`
-	Name               string       `json:"name"`
+	Chainspec          chainspecRef `json:"chainspec,omitempty"` // CG-only
+	Name               string       `json:"name,omitempty"`      // CG-only
 }
 
 type difficultyTestMarshaling struct {

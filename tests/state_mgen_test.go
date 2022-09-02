@@ -167,6 +167,8 @@ func TestGenStateSingles(t *testing.T) {
 	}
 }
 
+var generatedBasedir = filepath.Join(".", "testdata_generated")
+
 func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {
 	// testWriteTest generates a file-based tests (writing a new file), and re-runs (testing) the generated test file.
 
@@ -189,7 +191,19 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 		// If the test passes (and it damn well should), then move the file to the canonical location.
 		func() {
 			tm.runTestFile(t, tmpFileName, tmpFileName, tm.stateTestRunner)
-			if err := os.Rename(tmpFileName, name); err != nil {
+
+			rel, err := filepath.Rel(baseDir, name)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			targetPath := filepath.Join(generatedBasedir, rel)
+
+			if err := os.MkdirAll(filepath.Dir(targetPath), os.ModePerm); err != nil {
+				t.Fatal(err)
+			}
+
+			if err := os.Rename(tmpFileName, targetPath); err != nil {
 				t.Fatal(err)
 			}
 		},
@@ -211,6 +225,7 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 	return func(t *testing.T, name string, test *StateTest) {
 		subtests := test.Subtests(nil)
 
+		// targets are the subtests that will be generated
 		targets := map[string][]stPostState{}
 
 		for _, s := range subtests {
@@ -319,6 +334,7 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 		}
 
 		// Install the generated cases to the test.
+		test.json.Post = make(map[string][]stPostState) // Reset the post state. We'll only add the generated post states.
 		for k, v := range targets {
 			test.json.Post[k] = v
 		}

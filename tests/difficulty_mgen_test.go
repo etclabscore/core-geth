@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"math/big"
 	"os"
@@ -34,10 +35,6 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/vars"
 )
-
-// outNDJSONFile is the file where difficulty tests get written to.
-// The file is encoded as line-delimited JSON.
-var outNDJSONFile = filepath.Join(difficultyTestDir, "mgen_difficulty.ndjson")
 
 // TestDifficultyTestConfigGen generates the difficulty test configuration files
 // for all existing tests' configuration and the configuration for any to-be generated
@@ -151,17 +148,6 @@ func TestDifficultyGen(t *testing.T) {
 	head := build.RunGit("rev-parse", "HEAD")
 	head = strings.TrimSpace(head)
 
-	err := os.MkdirAll(filepath.Dir(outNDJSONFile), os.ModePerm)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Truncate/touch output file.
-	err = ioutil.WriteFile(outNDJSONFile, []byte{}, os.ModePerm)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	dt := new(testMatcherGen)
 	dt.allConfigs = make(map[string]*coregeth.CoreGethChainConfig)
 	dt.testMatcher = new(testMatcher)
@@ -206,8 +192,73 @@ func TestDifficultyGen(t *testing.T) {
 		return s1s[:]
 	}
 
+	// ORIGINAL
+	// testdata/BasicTests/difficultyFrontier.json#test1,test2,test3,...
+
+	// OUTPUT
+	// testdata_generated/BasicTests/difficultyFrontier.json#test1,test2,test3,...
+	// testdata_generated/BasicTests/difficultyFrontier.ndjson
+
+	rel, err := filepath.Rel(baseDir, difficultyTestDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	targetDir := filepath.Join(generatedBasedir, rel)
+	if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
+		t.Fatal(err)
+	}
+
+	// outNDJSONFile is the file where difficulty tests get written to.
+	// The file is encoded as line-delimited JSON.
+	var outNDJSONFile = filepath.Join(difficultyTestDir, "mgen_difficulty.ndjson")
+
+	if err := os.MkdirAll(filepath.Dir(outNDJSONFile), os.ModePerm); err != nil {
+		t.Fatal(err)
+	}
+
+	// Truncate/touch output file.
+	err = ioutil.WriteFile(outNDJSONFile, []byte{}, os.ModePerm)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	mustReadTestFileJSON := func(filePath string) map[string]DifficultyTest {
+		b, err := ioutil.ReadFile(filePath)
+		if err != nil {
+			t.Log(err)
+			return map[string]DifficultyTest{}
+		}
+		var tests map[string]DifficultyTest
+		if err := json.Unmarshal(b, &tests); err != nil {
+			t.Log(err)
+			return map[string]DifficultyTest{}
+		}
+		return tests
+	}
+	mustWriteTestFileJSON := func(filePath string, tests map[string]DifficultyTest) {
+		b, err := json.MarshalIndent(tests, "", "    ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = ioutil.WriteFile(filePath, b, os.ModePerm)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
 	dt.walk(t, difficultyTestDir, func(t *testing.T, name string, test *DifficultyTest) {
 		cfg, key := dt.findConfig(name)
+
+		// // difficulty_mgen_test.go:212: name: difficulty.json/ExpDiffAtBlock200000Decrease, key: difficulty.json
+		// // difficulty_mgen_test.go:254: name: difficultyCustomMainNetwork.json/DifficultyTest1, test.name= key: MainNetwork
+		// t.Logf("name: %s, test.name=%s key: %s", name, test.Name, key)
+		// panic("here")
+
+		spl := strings.Split(name, string(filepath.Separator))
+		testCaseName := spl[len(spl)-1] // eg ExpDiffAtBlock200000Decrease
+		// filename := spl[0]          // eg difficultyCustomMainNetwork.json
+		filename := fmt.Sprintf("difficulty%s.json", key) // eg difficultyMainNetwork.json
+		targetFilePath := filepath.Join(targetDir, filename)
 
 		if test.ParentDifficulty.Cmp(vars.MinimumDifficulty) < 0 {
 			t.Skip("difficulty below minimum")
@@ -225,7 +276,7 @@ func TestDifficultyGen(t *testing.T) {
 			test.Chainspec = chainspecRef{Filename: fileBasename, Sha1Sum: mustSha1SumForFile(specPath)}
 			test.Name = strings.ReplaceAll(name, ".json", "")
 
-			mustAppendTestToFileNDJSON(t, test, outNDJSONFile)
+			// mustAppendTestToFileNDJSON(t, test, outNDJSONFile)
 			// -- This is as far as ALL tests go.
 
 			targetForkName := dt.getGenerationTarget(key)
@@ -283,7 +334,12 @@ func TestDifficultyGen(t *testing.T) {
 			if err := newTest.Run(targetConfiguration); err != nil {
 				t.Fatal(err)
 			}
-			mustAppendTestToFileNDJSON(t, newTest, outNDJSONFile)
+
+			m := mustReadTestFileJSON(targetFilePath)
+			m[testCaseName] = *newTest
+			mustWriteTestFileJSON(targetFilePath, m)
+
+			// mustAppendTestToFileNDJSON(t, newTest, outNDJSONFile)
 			t.Logf("OK [generated] %v", newTest)
 		}
 	})

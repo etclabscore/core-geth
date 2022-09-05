@@ -226,8 +226,9 @@ func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (i
 	lru.mu.Lock()
 	defer lru.mu.Unlock()
 
+	cacheKey := fmt.Sprintf("%d-%d", epoch, epochLength)
 	// Get or create the item for the requested epoch.
-	item, ok := lru.cache.Get(epoch)
+	item, ok := lru.cache.Get(cacheKey)
 	if !ok {
 		if lru.future > 0 && lru.future == epoch {
 			item = lru.futureItem
@@ -235,7 +236,7 @@ func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (i
 			log.Trace("Requiring new ethash "+lru.what, "epoch", epoch)
 			item = lru.new(epoch, epochLength)
 		}
-		lru.cache.Add(epoch, item)
+		lru.cache.Add(cacheKey, item)
 	}
 
 	// Ensure pre-generation handles ecip-1099 changeover correctly
@@ -243,6 +244,9 @@ func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (i
 	var nextEpochLength = epochLength
 	if ecip1099FBlock != nil {
 		nextEpochBlock := nextEpoch * epochLength
+		// Note that == demands that the ECIP1099 activation block is situated
+		// at the beginning of an epoch.
+		// https://github.com/ethereumclassic/ECIPs/blob/master/_specs/ecip-1099.md#implementation
 		if nextEpochBlock == *ecip1099FBlock && epochLength == epochLengthDefault {
 			nextEpoch = nextEpoch / 2
 			nextEpochLength = epochLengthECIP1099
@@ -250,7 +254,9 @@ func (lru *lru) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64) (i
 	}
 
 	// Update the 'future item' if epoch is larger than previously seen.
-	if epoch < maxEpoch-1 && lru.future < nextEpoch {
+	// Last conditional clause ('lru.future > nextEpoch') handles the ECIP1099 case where
+	// the next epoch is expected to be LESSER THAN that of the previous state's future epoch number.
+	if epoch < maxEpoch-1 && lru.future != nextEpoch {
 		log.Trace("Requiring new future ethash "+lru.what, "epoch", nextEpoch)
 		future = lru.new(nextEpoch, nextEpochLength)
 		lru.future = nextEpoch
@@ -337,8 +343,13 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		if !isLittleEndian() {
 			endian = ".be"
 		}
-		path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
-		logger := log.New("epoch", c.epoch)
+		// The file path naming scheme was changed to include epoch values in the filename,
+		// which enables a filepath glob with scan to identify out-of-bounds caches and remove them.
+		// The legacy path declaration is provided below as a comment for reference.
+		//
+		// path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))                 // LEGACY
+		path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%d-%x%s", algorithmRevision, c.epoch, seed[:8], endian)) // CURRENT
+		logger := log.New("epoch", c.epoch, "epochLength", c.epochLength)
 
 		// We're about to mmap the file, ensure that the mapping is cleaned up when the
 		// cache becomes unused.
@@ -367,11 +378,34 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 			c.cache = make([]uint32, size/4)
 			generateCache(c.cache, c.epoch, c.epochLength, seed)
 		}
-		// Iterate over all previous instances and delete old ones
-		for ep := int(c.epoch) - limit; ep >= 0; ep-- {
-			seed := seedHash(uint64(ep), c.epochLength)
-			path := filepath.Join(dir, fmt.Sprintf("cache-R%d-%x%s", algorithmRevision, seed[:8], endian))
-			os.Remove(path)
+
+		// Iterate over all cache file instances, deleting any out of bounds (where epoch is below lower limit, or above upper limit).
+		matches, _ := filepath.Glob(filepath.Join(dir, fmt.Sprintf("cache-R%d*", algorithmRevision)))
+		for _, file := range matches {
+			var ar int   // algorithm revision
+			var e uint64 // epoch
+			var s string // seed
+			if _, err := fmt.Sscanf(filepath.Base(file), "cache-R%d-%d-%s"+endian, &ar, &e, &s); err != nil {
+				// There is an unrecognized file in this directory.
+				// See if the name matches the expected pattern of the legacy naming scheme.
+				if _, err := fmt.Sscanf(filepath.Base(file), "cache-R%d-%s"+endian, &ar, &s); err == nil {
+					// This file matches the previous generation naming pattern (sans epoch).
+					if err := os.Remove(file); err != nil {
+						logger.Error("Failed to remove legacy ethash cache file", "file", file, "err", err)
+					} else {
+						logger.Warn("Deleted legacy ethash cache file", "path", file)
+					}
+				}
+				// Else the file is unrecognized (unknown name format), leave it alone.
+				continue
+			}
+			if e <= c.epoch-uint64(limit) || e > c.epoch+1 {
+				if err := os.Remove(file); err == nil {
+					logger.Debug("Deleted ethash cache file", "target.epoch", e, "file", file)
+				} else {
+					logger.Error("Failed to delete ethash cache file", "target.epoch", e, "file", file, "err", err)
+				}
+			}
 		}
 	})
 }
@@ -429,7 +463,7 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		if !isLittleEndian() {
 			endian = ".be"
 		}
-		path := filepath.Join(dir, fmt.Sprintf("full-R%d-%x%s", algorithmRevision, seed[:8], endian))
+		path := filepath.Join(dir, fmt.Sprintf("full-R%d-%d-%x%s", algorithmRevision, d.epoch, seed[:8], endian))
 		logger := log.New("epoch", d.epoch)
 
 		// We're about to mmap the file, ensure that the mapping is cleaned up when the
@@ -465,11 +499,34 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 			d.dataset = make([]uint32, dsize/4)
 			generateDataset(d.dataset, d.epoch, d.epochLength, cache)
 		}
-		// Iterate over all previous instances and delete old ones
-		for ep := int(d.epoch) - limit; ep >= 0; ep-- {
-			seed := seedHash(uint64(ep), d.epochLength)
-			path := filepath.Join(dir, fmt.Sprintf("full-R%d-%x%s", algorithmRevision, seed[:8], endian))
-			os.Remove(path)
+
+		// Iterate over all full file instances, deleting any out of bounds (where epoch is below lower limit, or above upper limit).
+		matches, _ := filepath.Glob(filepath.Join(dir, fmt.Sprintf("full-R%d*", algorithmRevision)))
+		for _, file := range matches {
+			var ar int   // algorithm revision
+			var e uint64 // epoch
+			var s string // seed
+			if _, err := fmt.Sscanf(filepath.Base(file), "full-R%d-%d-%s"+endian, &ar, &e, &s); err != nil {
+				// There is an unrecognized file in this directory.
+				// See if the name matches the expected pattern of the legacy naming scheme.
+				if _, err := fmt.Sscanf(filepath.Base(file), "full-R%d-%s"+endian, &ar, &s); err == nil {
+					// This file matches the previous generation naming pattern (sans epoch).
+					if err := os.Remove(file); err != nil {
+						logger.Error("Failed to remove legacy ethash full file", "file", file, "err", err)
+					} else {
+						logger.Warn("Deleted legacy ethash full file", "path", file)
+					}
+				}
+				// Else the file is unrecognized (unknown name format), leave it alone.
+				continue
+			}
+			if e <= d.epoch-uint64(limit) || e > d.epoch+1 {
+				if err := os.Remove(file); err == nil {
+					logger.Debug("Deleted ethash full file", "target.epoch", e, "file", file)
+				} else {
+					logger.Error("Failed to delete ethash full file", "target.epoch", e, "file", file, "err", err)
+				}
+			}
 		}
 	})
 }

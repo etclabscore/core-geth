@@ -72,7 +72,6 @@ func (test *DifficultyTest) Run(config ctypes.ChainConfigurator) error {
 			test.CurrentTimestamp, test.CurrentBlockNumber, actual, exp)
 	}
 	return nil
-
 }
 
 var (

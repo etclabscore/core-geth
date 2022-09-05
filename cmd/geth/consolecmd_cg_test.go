@@ -45,7 +45,6 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 		{[]string{"--dev.pow"}, 1337, 1337, "0x0"},
 	}
 	for i, p := range chainIdentityCases {
-
 		// Disable networking, preventing false-negatives if in an environment without networking service
 		// or collisions with an existing geth service.
 		p.flags = append(p.flags, "--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none")

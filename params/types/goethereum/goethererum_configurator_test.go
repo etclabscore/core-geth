@@ -14,5 +14,4 @@ func TestChainConfig_converting(t *testing.T) {
 	if _, ok := reflect.TypeOf(fromChainer).Elem().FieldByName("Converting"); ok {
 		reflect.ValueOf(fromChainer).Elem().Field(0).SetBool(true)
 	}
-
 }

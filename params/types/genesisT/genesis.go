@@ -634,6 +634,14 @@ func (g *Genesis) SetEIP4399Transition(n *uint64) error {
 	return g.Config.SetEIP4399Transition(n)
 }
 
+func (g *Genesis) GetMergeVirtualTransition() *uint64 {
+	return g.Config.GetMergeVirtualTransition()
+}
+
+func (g *Genesis) SetMergeVirtualTransition(n *uint64) error {
+	return g.Config.SetMergeVirtualTransition(n)
+}
+
 func (g *Genesis) GetECBP1100Transition() *uint64 {
 	return g.Config.GetECBP1100Transition()
 }

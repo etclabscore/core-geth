@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-30T19:24:24+03:00</code> |
+| Source | <code>1.12.9-unstable/generated-at:2022-07-13T09:50:34-07:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -79,7 +79,7 @@ url <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *privateAdminAPI) AddPeer(url string) (bool, error) {
+func (api *adminAPI) AddPeer(url string) (bool, error) {
 	server := api.node.Server()
 	if server == nil {
 		return false, ErrNodeStopped
@@ -94,7 +94,7 @@ func (api *privateAdminAPI) AddPeer(url string) (bool, error) {
 // connection at all times, even reconnecting if it is lost.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L65" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L60" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -165,7 +165,7 @@ url <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *privateAdminAPI) AddTrustedPeer(url string) (bool, error) {
+func (api *adminAPI) AddTrustedPeer(url string) (bool, error) {
 	server := api.node.Server()
 	if server == nil {
 		return false, ErrNodeStopped
@@ -179,7 +179,7 @@ func (api *privateAdminAPI) AddTrustedPeer(url string) (bool, error) {
 }// AddTrustedPeer allows a remote node to always connect, even if slots are full
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L97" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L92" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -239,12 +239,12 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *publicAdminAPI) Datadir() string {
+func (api *adminAPI) Datadir() string {
 	return api.node.DataDir()
 }// Datadir retrieves the current data directory the node is using.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L311" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L315" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -367,13 +367,13 @@ blockNr <code>rpc.BlockNumber</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateAdminAPI) Ecbp1100(blockNr rpc.BlockNumber) (bool, error) {
+func (api *AdminAPI) Ecbp1100(blockNr rpc.BlockNumber) (bool, error) {
 	i := uint64(blockNr.Int64())
 	err := api.eth.blockchain.Config().SetECBP1100Transition(&i)
 	return api.eth.blockchain.IsArtificialFinalityEnabled() && api.eth.blockchain.Config().IsEnabled(api.eth.blockchain.Config().GetECBP1100Transition, api.eth.blockchain.CurrentBlock().Number()), err
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L267" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L246" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -384,7 +384,7 @@ func (api *PrivateAdminAPI) Ecbp1100(blockNr rpc.BlockNumber) (bool, error) {
 ### admin_exportChain
 
 ExportChain exports the current blockchain into a local file,
-or a range of blocks if first and last are non-nil
+or a range of blocks if first and last are non-nil.
 
 
 #### Params (3)
@@ -513,7 +513,7 @@ last <code>*uint64</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateAdminAPI) ExportChain(file string, first *uint64, last *uint64) (bool, error) {
+func (api *AdminAPI) ExportChain(file string, first *uint64, last *uint64) (bool, error) {
 	if first == nil && last != nil {
 		return false, errors.New("last cannot be specified without first")
 	}
@@ -543,10 +543,10 @@ func (api *PrivateAdminAPI) ExportChain(file string, first *uint64, last *uint64
 	}
 	return true, nil
 }// ExportChain exports the current blockchain into a local file,
-// or a range of blocks if first and last are non-nil
+// or a range of blocks if first and last are non-nil.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L171" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L150" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -617,7 +617,7 @@ file <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateAdminAPI) ImportChain(file string) (bool, error) {
+func (api *AdminAPI) ImportChain(file string) (bool, error) {
 	in, err := os.Open(file)
 	if err != nil {
 		return false, err
@@ -658,7 +658,7 @@ func (api *PrivateAdminAPI) ImportChain(file string) (bool, error) {
 	return true, nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L219" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L198" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -754,7 +754,7 @@ n <code>int</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PrivateAdminAPI) MaxPeers(n int) (bool, error) {
+func (api *AdminAPI) MaxPeers(n int) (bool, error) {
 	api.eth.handler.maxPeers = n
 	api.eth.p2pServer.MaxPeers = n
 	for i := api.eth.handler.peers.len(); i > n; i = api.eth.handler.peers.len() {
@@ -768,7 +768,7 @@ func (api *PrivateAdminAPI) MaxPeers(n int) (bool, error) {
 }// MaxPeers sets the maximum peer limit for the protocol manager and the p2p server.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L277" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L256" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -954,7 +954,7 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *publicAdminAPI) NodeInfo() (*p2p.NodeInfo, error) {
+func (api *adminAPI) NodeInfo() (*p2p.NodeInfo, error) {
 	server := api.node.Server()
 	if server == nil {
 		return nil, ErrNodeStopped
@@ -964,7 +964,7 @@ func (api *publicAdminAPI) NodeInfo() (*p2p.NodeInfo, error) {
 // protocol granularity.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L301" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L305" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1038,7 +1038,7 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *privateAdminAPI) PeerEvents(ctx context.Context) (*rpc.Subscription, error) {
+func (api *adminAPI) PeerEvents(ctx context.Context) (*rpc.Subscription, error) {
 	server := api.node.Server()
 	if server == nil {
 		return nil, ErrNodeStopped
@@ -1070,7 +1070,7 @@ func (api *privateAdminAPI) PeerEvents(ctx context.Context) (*rpc.Subscription, 
 // node's p2p.Server
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L129" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L124" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1287,7 +1287,7 @@ p2pPeerInfo <code>[]*p2p.PeerInfo</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *publicAdminAPI) Peers() ([ // Peers retrieves all the information we know about each individual peer at the
+func (api *adminAPI) Peers() ([ // Peers retrieves all the information we know about each individual peer at the
 // protocol granularity.
 ]*p2p.PeerInfo, error) {
 	server := api.node.Server()
@@ -1297,7 +1297,7 @@ func (api *publicAdminAPI) Peers() ([ // Peers retrieves all the information we 
 	return server.PeersInfo(), nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L291" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L295" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1368,7 +1368,7 @@ url <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *privateAdminAPI) RemovePeer(url string) (bool, error) {
+func (api *adminAPI) RemovePeer(url string) (bool, error) {
 	server := api.node.Server()
 	if server == nil {
 		return false, ErrNodeStopped
@@ -1382,7 +1382,7 @@ func (api *privateAdminAPI) RemovePeer(url string) (bool, error) {
 }// RemovePeer disconnects from a remote node if the connection exists
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L81" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L76" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1454,7 +1454,7 @@ url <code>string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *privateAdminAPI) RemoveTrustedPeer(url string) (bool, error) {
+func (api *adminAPI) RemoveTrustedPeer(url string) (bool, error) {
 	server := api.node.Server()
 	if server == nil {
 		return false, ErrNodeStopped
@@ -1469,7 +1469,184 @@ func (api *privateAdminAPI) RemoveTrustedPeer(url string) (bool, error) {
 // does not disconnect it automatically.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L113" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L108" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### admin_startHTTP
+
+StartHTTP starts the HTTP RPC API server.
+
+
+#### Params (5)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+host <code>*string</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+
+__2:__ 
+port <code>*int</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of the integer",
+        "pattern": "^0x[a-fA-F0-9]+$",
+        "title": "integer",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+
+__3:__ 
+cors <code>*string</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+
+__4:__ 
+apis <code>*string</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+
+__5:__ 
+vhosts <code>*string</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+
+
+#### Result
+
+
+
+
+<code>bool</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_startHTTP", "params": [<host>, <port>, <cors>, <apis>, <vhosts>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "admin_startHTTP", "params": [<host>, <port>, <cors>, <apis>, <vhosts>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	admin.startHTTP(host,port,cors,apis,vhosts);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *adminAPI) StartHTTP(host *string, port *int, cors *string, apis *string, vhosts *string) (bool, error) {
+	api.node.lock.Lock()
+	defer api.node.lock.Unlock()
+	if host == nil {
+		h := DefaultHTTPHost
+		if api.node.config.HTTPHost != "" {
+			h = api.node.config.HTTPHost
+		}
+		host = &h
+	}
+	if port == nil {
+		port = &api.node.config.HTTPPort
+	}
+	config := httpConfig{CorsAllowedOrigins: api.node.config.HTTPCors, Vhosts: api.node.config.HTTPVirtualHosts, Modules: api.node.config.HTTPModules}
+	if cors != nil {
+		config.CorsAllowedOrigins = nil
+		for _, origin := // StartHTTP starts the HTTP RPC API server.
+		range strings.Split(*cors, ",") {
+			config.CorsAllowedOrigins = append(config.CorsAllowedOrigins, strings.TrimSpace(origin))
+		}
+	}
+	if vhosts != nil {
+		config.Vhosts = nil
+		for _, vhost := range strings.Split(*host, ",") {
+			config.Vhosts = append(config.Vhosts, strings.TrimSpace(vhost))
+		}
+	}
+	if apis != nil {
+		config.Modules = nil
+		for _, m := range strings.Split(*apis, ",") {
+			config.Modules = append(config.Modules, strings.TrimSpace(m))
+		}
+	}
+	if err := api.node.http.setListenAddr(*host, *port); err != nil {
+		return false, err
+	}
+	if err := api.node.http.enableRPC(api.node.rpcAPIs, config); err != nil {
+		return false, err
+	}
+	if err := api.node.http.start(); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L161" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1480,6 +1657,7 @@ func (api *privateAdminAPI) RemoveTrustedPeer(url string) (bool, error) {
 ### admin_startRPC
 
 StartRPC starts the HTTP RPC API server.
+Deprecated: use StartHTTP instead.
 
 
 #### Params (5)
@@ -1601,52 +1779,14 @@ vhosts <code>*string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *privateAdminAPI) StartRPC(host *string, port *int, cors *string, apis *string, vhosts *string) (bool, error) {
-	api.node.lock.Lock()
-	defer api.node.lock.Unlock()
-	if host == nil {
-		h := DefaultHTTPHost
-		if api.node.config.HTTPHost != "" {
-			h = api.node.config.HTTPHost
-		}
-		host = &h
-	}
-	if port == nil {
-		port = &api.node.config.HTTPPort
-	}
-	config := httpConfig{CorsAllowedOrigins: api.node.config.HTTPCors, Vhosts: api.node.config.HTTPVirtualHosts, Modules: api.node.config.HTTPModules}
-	if cors != nil {
-		config.CorsAllowedOrigins = nil
-		for _, origin := // StartRPC starts the HTTP RPC API server.
-		range strings.Split(*cors, ",") {
-			config.CorsAllowedOrigins = append(config.CorsAllowedOrigins, strings.TrimSpace(origin))
-		}
-	}
-	if vhosts != nil {
-		config.Vhosts = nil
-		for _, vhost := range strings.Split(*host, ",") {
-			config.Vhosts = append(config.Vhosts, strings.TrimSpace(vhost))
-		}
-	}
-	if apis != nil {
-		config.Modules = nil
-		for _, m := range strings.Split(*apis, ",") {
-			config.Modules = append(config.Modules, strings.TrimSpace(m))
-		}
-	}
-	if err := api.node.http.setListenAddr(*host, *port); err != nil {
-		return false, err
-	}
-	if err := api.node.http.enableRPC(api.node.rpcAPIs, config); err != nil {
-		return false, err
-	}
-	if err := api.node.http.start(); err != nil {
-		return false, err
-	}
-	return true, nil
-}
+func (api *adminAPI) StartRPC(host *string, port *int, cors *string, apis *string, vhosts *string) (bool, error) {
+	log.Warn("Deprecation warning", "method", "admin.StartRPC", "use-instead", "admin.StartHTTP")
+	return api.StartHTTP(host, port, cors, apis, vhosts)
+}// StartRPC starts the HTTP RPC API server.
+// Deprecated: use StartHTTP instead.
+
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L166" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L216" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1769,7 +1909,7 @@ apis <code>*string</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *privateAdminAPI) StartWS(host *string, port *int, allowedOrigins *string, apis *string) (bool, error) {
+func (api *adminAPI) StartWS(host *string, port *int, allowedOrigins *string, apis *string) (bool, error) {
 	api.node.lock.Lock()
 	defer api.node.lock.Unlock()
 	if host == nil {
@@ -1796,11 +1936,12 @@ func (api *privateAdminAPI) StartWS(host *string, port *int, allowedOrigins *str
 			config.Origins = append(config.Origins, strings.TrimSpace(origin))
 		}
 	}
-	server := api.node.wsServerForPort(*port)
+	server := api.node.wsServerForPort(*port, false)
 	if err := server.setListenAddr(*host, *port); err != nil {
 		return false, err
 	}
-	if err := server.enableWS(api.node.rpcAPIs, config); err != nil {
+	openApis, _ := api.node.GetAPIs()
+	if err := server.enableWS(openApis, config); err != nil {
 		return false, err
 	}
 	if err := server.start(); err != nil {
@@ -1810,7 +1951,73 @@ func (api *privateAdminAPI) StartWS(host *string, port *int, allowedOrigins *str
 	return true, nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L226" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L235" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### admin_stopHTTP
+
+StopHTTP shuts down the HTTP server.
+
+
+#### Params (0)
+
+_None_
+
+#### Result
+
+
+
+
+<code>bool</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "admin_stopHTTP", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "admin_stopHTTP", "params": []}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	admin.stopHTTP();
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (api *adminAPI) StopHTTP() (bool, error) {
+	api.node.http.stop()
+	return true, nil
+}// StopHTTP shuts down the HTTP server.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L222" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1821,6 +2028,7 @@ func (api *privateAdminAPI) StartWS(host *string, port *int, allowedOrigins *str
 ### admin_stopRPC
 
 StopRPC shuts down the HTTP server.
+Deprecated: use StopHTTP instead.
 
 
 #### Params (0)
@@ -1870,13 +2078,14 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *privateAdminAPI) StopRPC() (bool, error) {
-	api.node.http.stop()
-	return true, nil
+func (api *adminAPI) StopRPC() (bool, error) {
+	log.Warn("Deprecation warning", "method", "admin.StopRPC", "use-instead", "admin.StopHTTP")
+	return api.StopHTTP()
 }// StopRPC shuts down the HTTP server.
+// Deprecated: use StopHTTP instead.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L220" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L229" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1936,14 +2145,14 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *privateAdminAPI) StopWS() (bool, error) {
+func (api *adminAPI) StopWS() (bool, error) {
 	api.node.http.stopWS()
 	api.node.ws.stop()
 	return true, nil
 }// StopWS terminates all WebSocket servers.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L277" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L287" target="_">View on GitHub →</a>
 </p>
 </details>
 

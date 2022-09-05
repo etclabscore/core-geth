@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-30T19:24:24+03:00</code> |
+| Source | <code>1.12.9-unstable/generated-at:2022-07-13T09:50:34-07:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -17,7 +17,7 @@
 
 ### eth_accounts
 
-Accounts returns the collection of accounts this node manages
+Accounts returns the collection of accounts this node manages.
 
 
 #### Params (0)
@@ -103,12 +103,12 @@ commonAddress <code>[]common.Address</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicAccountAPI) Accounts() [ // Accounts returns the collection of accounts this node manages
+func (s *EthereumAccountAPI) Accounts() [ // Accounts returns the collection of accounts this node manages.
 ]common.Address {
 	return s.am.Accounts()
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L185" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L268" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -193,13 +193,13 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) BlockNumber() hexutil.Uint64 {
+func (s *BlockChainAPI) BlockNumber() hexutil.Uint64 {
 	header, _ := s.b.HeaderByNumber(context.Background(), rpc.LatestBlockNumber)
 	return hexutil.Uint64(header.Number.Uint64())
 }// BlockNumber returns the block number of the chain head.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L540" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L625" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -223,7 +223,7 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-args <code>CallArgs</code> 
+args <code>TransactionArgs</code> 
 
   + Required: ✓ Yes
 
@@ -257,6 +257,11 @@ args <code>CallArgs</code>
 
 			- type: `array`
 
+		- chainId: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- data: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
@@ -275,6 +280,26 @@ args <code>CallArgs</code>
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
+
+		- input: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
 		- to: 
@@ -322,6 +347,11 @@ args <code>CallArgs</code>
                 },
                 "type": "array"
             },
+            "chainId": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
             "data": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "dataWord",
@@ -340,6 +370,26 @@ args <code>CallArgs</code>
             "gasPrice": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
+                "type": "string"
+            },
+            "input": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "dataWord",
+                "type": "string"
+            },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "nonce": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
                 "type": "string"
             },
             "to": {
@@ -372,7 +422,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 
 
 __3:__ 
-overrides <code>*map[common.Address]account</code> 
+overrides <code>*StateOverride</code> 
 
   + Required: ✓ Yes
 
@@ -558,18 +608,8 @@ overrides <code>*map[common.Address]account</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNrOrHash rpc.BlockNumberOrHash, overrides *map // Call executes the given transaction on the state for the given block number.
-//
-// Additionally, the caller can specify a batch of contract for fields overriding.
-//
-// Note, this function doesn't make and changes in the state/blockchain and is
-// useful to execute and retrieve values.
-[common.Address]account) (hexutil.Bytes, error) {
-	var accounts map[common.Address]account
-	if overrides != nil {
-		accounts = *overrides
-	}
-	result, err := DoCall(ctx, s.b, args, blockNrOrHash, accounts, vm.Config{}, 5*time.Second, s.b.RPCGasCap())
+func (s *BlockChainAPI) Call(ctx context.Context, args TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, overrides *StateOverride) (hexutil.Bytes, error) {
+	result, err := DoCall(ctx, s.b, args, blockNrOrHash, overrides, s.b.RPCEVMTimeout(), s.b.RPCGasCap())
 	if err != nil {
 		return nil, err
 	}
@@ -577,9 +617,15 @@ func (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNrOr
 		return nil, newRevertError(result)
 	}
 	return result.Return(), result.Err
-}
+}// Call executes the given transaction on the state for the given block number.
+//
+// Additionally, the caller can specify a batch of contract for fields overriding.
+//
+// Note, this function doesn't make and changes in the state/blockchain and is
+// useful to execute and retrieve values.
+
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L926" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1011" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -589,7 +635,12 @@ func (s *PublicBlockChainAPI) Call(ctx context.Context, args CallArgs, blockNrOr
 
 ### eth_chainId
 
-ChainId returns the chainID value for transaction replay protection.
+ChainId is the EIP-155 replay-protection chain id for the current Ethereum chain config.
+
+Note, this method does not conform to EIP-695 because the configured chain ID is always
+returned, regardless of the current head block. We used to return an error when the chain
+wasn't synced up to a block where EIP-155 is enabled, but this behavior caused issues
+in CL clients.
 
 
 #### Params (0)
@@ -664,105 +715,17 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) ChainId() *hexutil.Big {
-	return (*hexutil.Big)(s.b.ChainConfig().GetChainID())
-}// ChainId returns the chainID value for transaction replay protection.
+func (api *BlockChainAPI) ChainId() *hexutil.Big {
+	return (*hexutil.Big)(api.b.ChainConfig().GetChainID())
+}// ChainId is the EIP-155 replay-protection chain id for the current Ethereum chain config.
+//
+// Note, this method does not conform to EIP-695 because the configured chain ID is always
+// returned, regardless of the current head block. We used to return an error when the chain
+// wasn't synced up to a block where EIP-155 is enabled, but this behavior caused issues
+// in CL clients.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L535" target="_">View on GitHub →</a>
-</p>
-</details>
-
----
-
-
-
-### eth_chainId
-
-ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.
-
-
-#### Params (0)
-
-_None_
-
-#### Result
-
-
-
-
-<code>hexutil.Uint64</code> 
-
-  + Required: ✓ Yes
-
-
-=== "Schema"
-
-	``` Schema
-	
-	- description: `Hex representation of a uint64`
-	- pattern: `^0x([a-fA-F\d])+$`
-	- title: `uint64`
-	- type: string
-
-
-	```
-
-=== "Raw"
-
-	``` Raw
-	{
-        "description": "Hex representation of a uint64",
-        "pattern": "^0x([a-fA-F\\d])+$",
-        "title": "uint64",
-        "type": [
-            "string"
-        ]
-    }
-	```
-
-
-
-#### Client Method Invocation Examples
-
-
-=== "Shell HTTP"
-
-	``` shell
-	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_chainId", "params": []}'
-	```
-
-
-
-
-
-=== "Shell WebSocket"
-
-	``` shell
-	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_chainId", "params": []}'
-	```
-
-
-=== "Javascript Console"
-
-	``` js
-	eth.chainId();
-	```
-
-
-
-<details><summary>Source code</summary>
-<p>
-```go
-func (api *PublicEthereumAPI) ChainId() (hexutil.Uint64, error) {
-	if config := api.e.blockchain.Config(); config.IsEnabled(config.GetEIP155Transition, api.e.blockchain.CurrentBlock().Number()) {
-		return (hexutil.Uint64)(api.e.blockchain.Config().GetChainID().Uint64()), nil
-	}
-	return hexutil.Uint64(0), fmt.Errorf("chain not synced beyond EIP-155 replay-protection fork block")
-}// ChainId is the EIP-155 replay-protection chain id for the current ethereum chain config.
-
-```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L70" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L620" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -772,7 +735,7 @@ func (api *PublicEthereumAPI) ChainId() (hexutil.Uint64, error) {
 
 ### eth_coinbase
 
-Coinbase is the address that mining rewards will be send to (alias for Etherbase)
+Coinbase is the address that mining rewards will be send to (alias for Etherbase).
 
 
 #### Params (0)
@@ -847,9 +810,9 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicEthereumAPI) Coinbase() (common.Address, error) {
+func (api *EthereumAPI) Coinbase() (common.Address, error) {
 	return api.Etherbase()
-}// Coinbase is the address that mining rewards will be send to (alias for Etherbase)
+}// Coinbase is the address that mining rewards will be send to (alias for Etherbase).
 
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L60" target="_">View on GitHub →</a>
@@ -860,10 +823,10 @@ func (api *PublicEthereumAPI) Coinbase() (common.Address, error) {
 
 
 
-### eth_estimateGas
+### eth_createAccessList
 
-EstimateGas returns an estimate of the amount of gas needed to execute the
-given transaction against the current pending block.
+CreateAccessList creates a EIP-2930 type AccessList for the given transaction.
+Reexec and BlockNrOrHash can be specified to create the accessList on top of a certain state.
 
 
 #### Params (2)
@@ -872,7 +835,7 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-args <code>CallArgs</code> 
+args <code>TransactionArgs</code> 
 
   + Required: ✓ Yes
 
@@ -906,6 +869,11 @@ args <code>CallArgs</code>
 
 			- type: `array`
 
+		- chainId: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- data: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
@@ -924,6 +892,26 @@ args <code>CallArgs</code>
 		- gasPrice: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
+			- type: `string`
+
+		- input: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
 			- type: `string`
 
 		- to: 
@@ -971,6 +959,11 @@ args <code>CallArgs</code>
                 },
                 "type": "array"
             },
+            "chainId": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
             "data": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "dataWord",
@@ -989,6 +982,393 @@ args <code>CallArgs</code>
             "gasPrice": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
+                "type": "string"
+            },
+            "input": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "dataWord",
+                "type": "string"
+            },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "nonce": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
+                "type": "string"
+            },
+            "to": {
+                "pattern": "^0x[a-fA-F\\d]{64}$",
+                "title": "keccak",
+                "type": "string"
+            },
+            "value": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            }
+        },
+        "type": [
+            "object"
+        ]
+    }
+	```
+
+
+
+
+__2:__ 
+blockNrOrHash <code>*rpc.BlockNumberOrHash</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+
+
+#### Result
+
+
+
+
+<code>*accessListResult</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- additionalProperties: `false`
+	- properties: 
+		- accessList: 
+			- items: 
+				- additionalProperties: `false`
+				- properties: 
+					- address: 
+						- pattern: `^0x[a-fA-F\d]{64}$`
+						- title: `keccak`
+						- type: `string`
+
+					- storageKeys: 
+						- items: 
+							- description: `Hex representation of a Keccak 256 hash`
+							- pattern: `^0x[a-fA-F\d]{64}$`
+							- title: `keccak`
+							- type: `string`
+
+						- type: `array`
+
+
+				- type: `object`
+
+			- type: `array`
+
+		- error: 
+			- type: `string`
+
+		- gasUsed: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+
+	- type: object
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "additionalProperties": false,
+        "properties": {
+            "accessList": {
+                "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "address": {
+                            "pattern": "^0x[a-fA-F\\d]{64}$",
+                            "title": "keccak",
+                            "type": "string"
+                        },
+                        "storageKeys": {
+                            "items": {
+                                "description": "Hex representation of a Keccak 256 hash",
+                                "pattern": "^0x[a-fA-F\\d]{64}$",
+                                "title": "keccak",
+                                "type": "string"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
+                },
+                "type": "array"
+            },
+            "error": {
+                "type": "string"
+            },
+            "gasUsed": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
+                "type": "string"
+            }
+        },
+        "type": [
+            "object"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_createAccessList", "params": [<args>, <blockNrOrHash>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_createAccessList", "params": [<args>, <blockNrOrHash>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	eth.createAccessList(args,blockNrOrHash);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (s *BlockChainAPI) CreateAccessList(ctx context.Context, args TransactionArgs, blockNrOrHash *rpc.BlockNumberOrHash) (*accessListResult, error) {
+	bNrOrHash := rpc.BlockNumberOrHashWithNumber(rpc.PendingBlockNumber)
+	if blockNrOrHash != nil {
+		bNrOrHash = *blockNrOrHash
+	}
+	acl, gasUsed, vmerr, err := AccessList(ctx, s.b, bNrOrHash, args)
+	if err != nil {
+		return nil, err
+	}
+	result := &accessListResult{Accesslist: &acl, GasUsed: hexutil.Uint64(gasUsed)}
+	if vmerr != nil {
+		result.Error = vmerr.Error()
+	}
+	return result, nil
+}// CreateAccessList creates a EIP-2930 type AccessList for the given transaction.
+// Reexec and BlockNrOrHash can be specified to create the accessList on top of a certain state.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1505" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_estimateGas
+
+EstimateGas returns an estimate of the amount of gas needed to execute the
+given transaction against the current pending block.
+
+
+#### Params (2)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+args <code>TransactionArgs</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- additionalProperties: `false`
+	- properties: 
+		- accessList: 
+			- items: 
+				- additionalProperties: `false`
+				- properties: 
+					- address: 
+						- pattern: `^0x[a-fA-F\d]{64}$`
+						- title: `keccak`
+						- type: `string`
+
+					- storageKeys: 
+						- items: 
+							- description: `Hex representation of a Keccak 256 hash`
+							- pattern: `^0x[a-fA-F\d]{64}$`
+							- title: `keccak`
+							- type: `string`
+
+						- type: `array`
+
+
+				- type: `object`
+
+			- type: `array`
+
+		- chainId: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- data: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- from: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- gas: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- gasPrice: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- input: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `dataWord`
+			- type: `string`
+
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- nonce: 
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: `string`
+
+		- to: 
+			- pattern: `^0x[a-fA-F\d]{64}$`
+			- title: `keccak`
+			- type: `string`
+
+		- value: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+
+	- type: object
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "additionalProperties": false,
+        "properties": {
+            "accessList": {
+                "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "address": {
+                            "pattern": "^0x[a-fA-F\\d]{64}$",
+                            "title": "keccak",
+                            "type": "string"
+                        },
+                        "storageKeys": {
+                            "items": {
+                                "description": "Hex representation of a Keccak 256 hash",
+                                "pattern": "^0x[a-fA-F\\d]{64}$",
+                                "title": "keccak",
+                                "type": "string"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
+                },
+                "type": "array"
+            },
+            "chainId": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "data": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "dataWord",
+                "type": "string"
+            },
+            "from": {
+                "pattern": "^0x[a-fA-F\\d]{64}$",
+                "title": "keccak",
+                "type": "string"
+            },
+            "gas": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
+                "type": "string"
+            },
+            "gasPrice": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "input": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "dataWord",
+                "type": "string"
+            },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "nonce": {
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
                 "type": "string"
             },
             "to": {
@@ -1089,7 +1469,7 @@ blockNrOrHash <code>*rpc.BlockNumberOrHash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) EstimateGas(ctx context.Context, args CallArgs, blockNrOrHash *rpc.BlockNumberOrHash) (hexutil.Uint64, error) {
+func (s *BlockChainAPI) EstimateGas(ctx context.Context, args TransactionArgs, blockNrOrHash *rpc.BlockNumberOrHash) (hexutil.Uint64, error) {
 	bNrOrHash := rpc.BlockNumberOrHashWithNumber(rpc.PendingBlockNumber)
 	if blockNrOrHash != nil {
 		bNrOrHash = *blockNrOrHash
@@ -1099,7 +1479,7 @@ func (s *PublicBlockChainAPI) EstimateGas(ctx context.Context, args CallArgs, bl
 // given transaction against the current pending block.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1053" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1145" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1109,7 +1489,7 @@ func (s *PublicBlockChainAPI) EstimateGas(ctx context.Context, args CallArgs, bl
 
 ### eth_etherbase
 
-Etherbase is the address that mining rewards will be send to
+Etherbase is the address that mining rewards will be send to.
 
 
 #### Params (0)
@@ -1184,9 +1564,9 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicEthereumAPI) Etherbase() (common.Address, error) {
+func (api *EthereumAPI) Etherbase() (common.Address, error) {
 	return api.e.Etherbase()
-}// Etherbase is the address that mining rewards will be send to
+}// Etherbase is the address that mining rewards will be send to.
 
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L55" target="_">View on GitHub →</a>
@@ -1197,10 +1577,321 @@ func (api *PublicEthereumAPI) Etherbase() (common.Address, error) {
 
 
 
+### eth_feeHistory
+
+
+
+#### Params (3)
+
+Parameters must be given _by position_.
+
+
+__1:__ 
+blockCount <code>rpc.DecimalOrHex</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of the integer",
+        "pattern": "^0x[a-fA-F0-9]+$",
+        "title": "integer",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+
+__2:__ 
+lastBlock <code>rpc.BlockNumber</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- oneOf: 
+
+			- description: `The block height description`
+			- enum: earliest, latest, pending
+			- title: `blockNumberTag`
+			- type: string
+
+
+			- description: `Hex representation of a uint64`
+			- pattern: `^0x([a-fA-F\d])+$`
+			- title: `uint64`
+			- type: string
+
+
+	- title: `blockNumberIdentifier`
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "oneOf": [
+            {
+                "description": "The block height description",
+                "enum": [
+                    "earliest",
+                    "latest",
+                    "pending"
+                ],
+                "title": "blockNumberTag",
+                "type": [
+                    "string"
+                ]
+            },
+            {
+                "description": "Hex representation of a uint64",
+                "pattern": "^0x([a-fA-F\\d])+$",
+                "title": "uint64",
+                "type": [
+                    "string"
+                ]
+            }
+        ],
+        "title": "blockNumberIdentifier"
+    }
+	```
+
+
+
+
+__3:__ 
+rewardPercentiles <code>[]float64</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- items: 
+
+			- type: number
+
+
+	- type: array
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "items": [
+            {
+                "type": [
+                    "number"
+                ]
+            }
+        ],
+        "type": [
+            "array"
+        ]
+    }
+	```
+
+
+
+
+
+#### Result
+
+
+
+
+<code>*feeHistoryResult</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- additionalProperties: `false`
+	- properties: 
+		- baseFeePerGas: 
+			- items: 
+				- description: `Hex representation of the integer`
+				- pattern: `^0x[a-fA-F0-9]+$`
+				- title: `integer`
+				- type: `string`
+
+			- type: `array`
+
+		- gasUsedRatio: 
+			- items: 
+				- type: `number`
+
+			- type: `array`
+
+		- oldestBlock: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- reward: 
+			- items: 
+				- items: 
+					- description: `Hex representation of the integer`
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- type: `array`
+
+			- type: `array`
+
+
+	- type: object
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "additionalProperties": false,
+        "properties": {
+            "baseFeePerGas": {
+                "items": {
+                    "description": "Hex representation of the integer",
+                    "pattern": "^0x[a-fA-F0-9]+$",
+                    "title": "integer",
+                    "type": "string"
+                },
+                "type": "array"
+            },
+            "gasUsedRatio": {
+                "items": {
+                    "type": "number"
+                },
+                "type": "array"
+            },
+            "oldestBlock": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "reward": {
+                "items": {
+                    "items": {
+                        "description": "Hex representation of the integer",
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "type": "array"
+            }
+        },
+        "type": [
+            "object"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_feeHistory", "params": [<blockCount>, <lastBlock>, <rewardPercentiles>]}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_feeHistory", "params": [<blockCount>, <lastBlock>, <rewardPercentiles>]}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	eth.feeHistory(blockCount,lastBlock,rewardPercentiles);
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (s *EthereumAPI) FeeHistory(ctx context.Context, blockCount rpc.DecimalOrHex, lastBlock rpc.BlockNumber, rewardPercentiles []float64) (*feeHistoryResult, error) {
+	oldest, reward, baseFee, gasUsed, err := s.b.FeeHistory(ctx, int(blockCount), lastBlock, rewardPercentiles)
+	if err != nil {
+		return nil, err
+	}
+	results := &feeHistoryResult{OldestBlock: (*hexutil.Big)(oldest), GasUsedRatio: gasUsed}
+	if reward != nil {
+		results.Reward = make([][]*hexutil.Big, len(reward))
+		for i, w := range reward {
+			results.Reward[i] = make([]*hexutil.Big, len(w))
+			for j, v := range w {
+				results.Reward[i][j] = (*hexutil.Big)(v)
+			}
+		}
+	}
+	if baseFee != nil {
+		results.BaseFee = make([]*hexutil.Big, len(baseFee))
+		for i, v := range baseFee {
+			results.BaseFee[i] = (*hexutil.Big)(v)
+		}
+	}
+	return results, nil
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L91" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
 ### eth_fillTransaction
 
-FillTransaction fills the defaults (nonce, gas, gasPrice) on a given unsigned transaction,
-and returns it to the caller for further processing (signing + broadcast)
+FillTransaction fills the defaults (nonce, gas, gasPrice or 1559 fields)
+on a given unsigned transaction, and returns it to the caller for further
+processing (signing + broadcast).
 
 
 #### Params (1)
@@ -1209,7 +1900,7 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-args <code>SendTxArgs</code> 
+args <code>TransactionArgs</code> 
 
   + Required: ✓ Yes
 
@@ -1271,6 +1962,16 @@ args <code>SendTxArgs</code>
 		- input: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
+			- type: `string`
+
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- nonce: 
@@ -1351,6 +2052,16 @@ args <code>SendTxArgs</code>
             "input": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "dataWord",
+                "type": "string"
+            },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
                 "type": "string"
             },
             "nonce": {
@@ -1465,7 +2176,7 @@ args <code>SendTxArgs</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) FillTransaction(ctx context.Context, args SendTxArgs) (*SignTransactionResult, error) {
+func (s *TransactionAPI) FillTransaction(ctx context.Context, args TransactionArgs) (*SignTransactionResult, error) {
 	if err := args.setDefaults(ctx, s.b); err != nil {
 		return nil, err
 	}
@@ -1475,11 +2186,12 @@ func (s *PublicTransactionPoolAPI) FillTransaction(ctx context.Context, args Sen
 		return nil, err
 	}
 	return &SignTransactionResult{data, tx}, nil
-}// FillTransaction fills the defaults (nonce, gas, gasPrice) on a given unsigned transaction,
-// and returns it to the caller for further processing (signing + broadcast)
+}// FillTransaction fills the defaults (nonce, gas, gasPrice or 1559 fields)
+// on a given unsigned transaction, and returns it to the caller for further
+// processing (signing + broadcast).
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1799" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1870" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1489,7 +2201,7 @@ func (s *PublicTransactionPoolAPI) FillTransaction(ctx context.Context, args Sen
 
 ### eth_gasPrice
 
-GasPrice returns a suggestion for a gas price.
+GasPrice returns a suggestion for a gas price for legacy transactions.
 
 
 #### Params (0)
@@ -1564,13 +2276,19 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicEthereumAPI) GasPrice(ctx context.Context) (*hexutil.Big, error) {
-	price, err := s.b.SuggestPrice(ctx)
-	return (*hexutil.Big)(price), err
-}// GasPrice returns a suggestion for a gas price.
+func (s *EthereumAPI) GasPrice(ctx context.Context) (*hexutil.Big, error) {
+	tipcap, err := s.b.SuggestGasTipCap(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if head := s.b.CurrentHeader(); head.BaseFee != nil {
+		tipcap.Add(tipcap, head.BaseFee)
+	}
+	return (*hexutil.Big)(tipcap), err
+}// GasPrice returns a suggestion for a gas price for legacy transactions.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L63" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L64" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1702,7 +2420,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) GetBalance(ctx context.Context, address common.Address, blockNrOrHash rpc.BlockNumberOrHash) (*hexutil.Big, error) {
+func (s *BlockChainAPI) GetBalance(ctx context.Context, address common.Address, blockNrOrHash rpc.BlockNumberOrHash) (*hexutil.Big, error) {
 	state, _, err := s.b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
 	if state == nil || err != nil {
 		return nil, err
@@ -1713,7 +2431,7 @@ func (s *PublicBlockChainAPI) GetBalance(ctx context.Context, address common.Add
 // block numbers are also allowed.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L548" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L633" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -1792,6 +2510,11 @@ fullTx <code>bool</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- baseFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
@@ -1918,6 +2641,11 @@ fullTx <code>bool</code>
 	{
         "additionalProperties": false,
         "properties": {
+            "baseFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
             "difficulty": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -2072,7 +2800,7 @@ fullTx <code>bool</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) GetBlockByHash(ctx context.Context, hash common.Hash, fullTx bool) (*RPCMarshalBlockT, error) {
+func (s *BlockChainAPI) GetBlockByHash(ctx context.Context, hash common.Hash, fullTx bool) (*RPCMarshalBlockT, error) {
 	block, err := s.b.BlockByHash(ctx, hash)
 	if block != nil {
 		return s.rpcMarshalBlock(ctx, block, true, fullTx)
@@ -2082,7 +2810,7 @@ func (s *PublicBlockChainAPI) GetBlockByHash(ctx context.Context, hash common.Ha
 // detail, otherwise only the transaction hash is returned.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L667" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L753" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2192,6 +2920,11 @@ fullTx <code>bool</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- baseFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
@@ -2318,6 +3051,11 @@ fullTx <code>bool</code>
 	{
         "additionalProperties": false,
         "properties": {
+            "baseFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
             "difficulty": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -2472,7 +3210,7 @@ fullTx <code>bool</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) GetBlockByNumber(ctx context.Context, number rpc.BlockNumber, fullTx bool) (*RPCMarshalBlockT, error) {
+func (s *BlockChainAPI) GetBlockByNumber(ctx context.Context, number rpc.BlockNumber, fullTx bool) (*RPCMarshalBlockT, error) {
 	block, err := s.b.BlockByNumber(ctx, number)
 	if block != nil && err == nil {
 		response, err := s.rpcMarshalBlock(ctx, block, true, fullTx)
@@ -2489,7 +3227,7 @@ func (s *PublicBlockChainAPI) GetBlockByNumber(ctx context.Context, number rpc.B
 //   only the transaction hash is returned.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L652" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L738" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2610,7 +3348,7 @@ blockHash <code>common.Hash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) GetBlockTransactionCountByHash(ctx context.Context, blockHash common.Hash) *hexutil.Uint {
+func (s *TransactionAPI) GetBlockTransactionCountByHash(ctx context.Context, blockHash common.Hash) *hexutil.Uint {
 	if block, _ := s.b.BlockByHash(ctx, blockHash); block != nil {
 		n := hexutil.Uint(len(block.Transactions()))
 		return &n
@@ -2619,7 +3357,7 @@ func (s *PublicTransactionPoolAPI) GetBlockTransactionCountByHash(ctx context.Co
 }// GetBlockTransactionCountByHash returns the number of transactions in the block with the given hash.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1457" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1627" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2768,7 +3506,7 @@ blockNr <code>rpc.BlockNumber</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) GetBlockTransactionCountByNumber(ctx context.Context, blockNr rpc.BlockNumber) *hexutil.Uint {
+func (s *TransactionAPI) GetBlockTransactionCountByNumber(ctx context.Context, blockNr rpc.BlockNumber) *hexutil.Uint {
 	if block, _ := s.b.BlockByNumber(ctx, blockNr); block != nil {
 		n := hexutil.Uint(len(block.Transactions()))
 		return &n
@@ -2777,7 +3515,7 @@ func (s *PublicTransactionPoolAPI) GetBlockTransactionCountByNumber(ctx context.
 }// GetBlockTransactionCountByNumber returns the number of transactions in the block with the given block number.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1448" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1618" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2907,7 +3645,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) GetCode(ctx context.Context, address common.Address, blockNrOrHash rpc.BlockNumberOrHash) (hexutil.Bytes, error) {
+func (s *BlockChainAPI) GetCode(ctx context.Context, address common.Address, blockNrOrHash rpc.BlockNumberOrHash) (hexutil.Bytes, error) {
 	state, _, err := s.b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
 	if state == nil || err != nil {
 		return nil, err
@@ -2917,7 +3655,7 @@ func (s *PublicBlockChainAPI) GetCode(ctx context.Context, address common.Addres
 }// GetCode returns the code stored at the given address in the state for the given block number.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L726" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L812" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -2932,8 +3670,6 @@ last time it was called. This can be used for polling.
 
 For pending transaction and block filters the result is []common.Hash.
 (pending)Log filters return []Log.
-
-https://eth.wiki/json-rpc/API#eth_getfilterchanges
 
 
 #### Params (1)
@@ -3016,7 +3752,7 @@ interface <code>interface{}</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicFilterAPI) GetFilterChanges(id rpc.ID) (interface{}, error) {
+func (api *FilterAPI) GetFilterChanges(id rpc.ID) (interface{}, error) {
 	api.filtersMu.Lock()
 	defer api.filtersMu.Unlock()
 	if f, found := api.filters[id]; found {
@@ -3040,12 +3776,10 @@ func (api *PublicFilterAPI) GetFilterChanges(id rpc.ID) (interface{}, error) {
 	//
 	// For pending transaction and block filters the result is []common.Hash.
 	// (pending)Log filters return []Log.
-	//
-	// https://eth.wiki/json-rpc/API#eth_getfilterchanges
 	]interface{}{}, fmt.Errorf("filter not found")
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L484" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L465" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3057,8 +3791,6 @@ func (api *PublicFilterAPI) GetFilterChanges(id rpc.ID) (interface{}, error) {
 
 GetFilterLogs returns the logs for the filter with the given id.
 If the filter could not be found an empty array of logs is returned.
-
-https://eth.wiki/json-rpc/API#eth_getfilterlogs
 
 
 #### Params (1)
@@ -3272,10 +4004,8 @@ typesLog <code>[]*types.Log</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicFilterAPI) GetFilterLogs(ctx context.Context, id rpc.ID) ([ // GetFilterLogs returns the logs for the filter with the given id.
+func (api *FilterAPI) GetFilterLogs(ctx context.Context, id rpc.ID) ([ // GetFilterLogs returns the logs for the filter with the given id.
 // If the filter could not be found an empty array of logs is returned.
-//
-// https://eth.wiki/json-rpc/API#eth_getfilterlogs
 ]*types.Log, error) {
 	api.filtersMu.Lock()
 	f, found := api.filters[id]
@@ -3304,7 +4034,7 @@ func (api *PublicFilterAPI) GetFilterLogs(ctx context.Context, id rpc.ID) ([ // 
 	return returnLogs(logs), nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L443" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L426" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3463,6 +4193,11 @@ hash <code>common.Hash</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- baseFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
@@ -3571,6 +4306,11 @@ hash <code>common.Hash</code>
 	{
         "additionalProperties": false,
         "properties": {
+            "baseFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
             "difficulty": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -3707,7 +4447,7 @@ hash <code>common.Hash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) GetHeaderByHash(ctx context.Context, hash common.Hash) *RPCMarshalHeaderT {
+func (s *BlockChainAPI) GetHeaderByHash(ctx context.Context, hash common.Hash) *RPCMarshalHeaderT {
 	header, _ := s.b.HeaderByHash(ctx, hash)
 	if header != nil {
 		return s.rpcMarshalHeader(ctx, header)
@@ -3716,7 +4456,7 @@ func (s *PublicBlockChainAPI) GetHeaderByHash(ctx context.Context, hash common.H
 }// GetHeaderByHash returns the requested header by hash.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L639" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L725" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -3815,6 +4555,11 @@ number <code>rpc.BlockNumber</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- baseFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
@@ -3923,6 +4668,11 @@ number <code>rpc.BlockNumber</code>
 	{
         "additionalProperties": false,
         "properties": {
+            "baseFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
             "difficulty": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -4059,7 +4809,7 @@ number <code>rpc.BlockNumber</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) GetHeaderByNumber(ctx context.Context, number rpc.BlockNumber) (*RPCMarshalHeaderT, error) {
+func (s *BlockChainAPI) GetHeaderByNumber(ctx context.Context, number rpc.BlockNumber) (*RPCMarshalHeaderT, error) {
 	header, err := s.b.HeaderByNumber(ctx, number)
 	if header != nil && err == nil {
 		response := s.rpcMarshalHeader(ctx, header)
@@ -4074,7 +4824,7 @@ func (s *PublicBlockChainAPI) GetHeaderByNumber(ctx context.Context, number rpc.
 // * When blockNr is -2 the pending chain head is returned.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L625" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L711" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4085,8 +4835,6 @@ func (s *PublicBlockChainAPI) GetHeaderByNumber(ctx context.Context, number rpc.
 ### eth_getLogs
 
 GetLogs returns logs matching the given argument that are stored within the state.
-
-https://eth.wiki/json-rpc/API#eth_getlogs
 
 
 #### Params (1)
@@ -4374,9 +5122,7 @@ typesLog <code>[]*types.Log</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicFilterAPI) GetLogs(ctx context.Context, crit FilterCriteria) ([ // GetLogs returns logs matching the given argument that are stored within the state.
-//
-// https://eth.wiki/json-rpc/API#eth_getlogs
+func (api *FilterAPI) GetLogs(ctx context.Context, crit FilterCriteria) ([ // GetLogs returns logs matching the given argument that are stored within the state.
 ]*types.Log, error) {
 	var filter *Filter
 	if crit.BlockHash != nil {
@@ -4399,7 +5145,7 @@ func (api *PublicFilterAPI) GetLogs(ctx context.Context, crit FilterCriteria) ([
 	return returnLogs(logs), err
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L396" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L383" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4677,7 +5423,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) GetProof(ctx context.Context, address common.Address, storageKeys [ // GetProof returns the Merkle-proof for a given account and optionally some storage keys.
+func (s *BlockChainAPI) GetProof(ctx context.Context, address common.Address, storageKeys [ // GetProof returns the Merkle-proof for a given account and optionally some storage keys.
 ]string, blockNrOrHash rpc.BlockNumberOrHash) (*AccountResult, error) {
 	state, _, err := s.b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
 	if state == nil || err != nil {
@@ -4710,7 +5456,7 @@ func (s *PublicBlockChainAPI) GetProof(ctx context.Context, address common.Addre
 	return &AccountResult{Address: address, AccountProof: toHexSlice(accountProof), Balance: (*hexutil.Big)(state.GetBalance(address)), CodeHash: codeHash, Nonce: hexutil.Uint64(state.GetNonce(address)), StorageHash: storageHash, StorageProof: storageProof}, state.Error()
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L573" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L659" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -4865,7 +5611,7 @@ index <code>hexutil.Uint</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) GetRawTransactionByBlockHashAndIndex(ctx context.Context, blockHash common.Hash, index hexutil.Uint) hexutil.Bytes {
+func (s *TransactionAPI) GetRawTransactionByBlockHashAndIndex(ctx context.Context, blockHash common.Hash, index hexutil.Uint) hexutil.Bytes {
 	if block, _ := s.b.BlockByHash(ctx, blockHash); block != nil {
 		return newRPCRawTransactionFromBlockIndex(block, uint64(index))
 	}
@@ -4873,7 +5619,7 @@ func (s *PublicTransactionPoolAPI) GetRawTransactionByBlockHashAndIndex(ctx cont
 }// GetRawTransactionByBlockHashAndIndex returns the bytes of the transaction for the given block hash and index.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1490" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1660" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5056,7 +5802,7 @@ index <code>hexutil.Uint</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) GetRawTransactionByBlockNumberAndIndex(ctx context.Context, blockNr rpc.BlockNumber, index hexutil.Uint) hexutil.Bytes {
+func (s *TransactionAPI) GetRawTransactionByBlockNumberAndIndex(ctx context.Context, blockNr rpc.BlockNumber, index hexutil.Uint) hexutil.Bytes {
 	if block, _ := s.b.BlockByNumber(ctx, blockNr); block != nil {
 		return newRPCRawTransactionFromBlockIndex(block, uint64(index))
 	}
@@ -5064,7 +5810,7 @@ func (s *PublicTransactionPoolAPI) GetRawTransactionByBlockNumberAndIndex(ctx co
 }// GetRawTransactionByBlockNumberAndIndex returns the bytes of the transaction for the given block number and index.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1482" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1652" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5185,7 +5931,7 @@ hash <code>common.Hash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) GetRawTransactionByHash(ctx context.Context, hash common.Hash) (hexutil.Bytes, error) {
+func (s *TransactionAPI) GetRawTransactionByHash(ctx context.Context, hash common.Hash) (hexutil.Bytes, error) {
 	tx, _, _, _, err := s.b.GetTransaction(ctx, hash)
 	if err != nil {
 		return nil, err
@@ -5199,7 +5945,7 @@ func (s *PublicTransactionPoolAPI) GetRawTransactionByHash(ctx context.Context, 
 }// GetRawTransactionByHash returns the bytes of the transaction for the given hash.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1536" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1710" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5340,7 +6086,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) GetStorageAt(ctx context.Context, address common.Address, key string, blockNrOrHash rpc.BlockNumberOrHash) (hexutil.Bytes, error) {
+func (s *BlockChainAPI) GetStorageAt(ctx context.Context, address common.Address, key string, blockNrOrHash rpc.BlockNumberOrHash) (hexutil.Bytes, error) {
 	state, _, err := s.b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
 	if state == nil || err != nil {
 		return nil, err
@@ -5352,7 +6098,7 @@ func (s *PublicBlockChainAPI) GetStorageAt(ctx context.Context, address common.A
 	:], state.Error()
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L738" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L824" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5518,6 +6264,16 @@ index <code>hexutil.Uint</code>
 			- title: `dataWord`
 			- type: `string`
 
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- nonce: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
@@ -5633,6 +6389,16 @@ index <code>hexutil.Uint</code>
                 "title": "dataWord",
                 "type": "string"
             },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
             "nonce": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "uint64",
@@ -5713,15 +6479,15 @@ index <code>hexutil.Uint</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) GetTransactionByBlockHashAndIndex(ctx context.Context, blockHash common.Hash, index hexutil.Uint) *RPCTransaction {
+func (s *TransactionAPI) GetTransactionByBlockHashAndIndex(ctx context.Context, blockHash common.Hash, index hexutil.Uint) *RPCTransaction {
 	if block, _ := s.b.BlockByHash(ctx, blockHash); block != nil {
-		return newRPCTransactionFromBlockIndex(block, uint64(index))
+		return newRPCTransactionFromBlockIndex(block, uint64(index), s.b.ChainConfig())
 	}
 	return nil
 }// GetTransactionByBlockHashAndIndex returns the transaction for the given block hash and index.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1474" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1644" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -5915,6 +6681,16 @@ index <code>hexutil.Uint</code>
 			- title: `dataWord`
 			- type: `string`
 
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- nonce: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
@@ -6030,6 +6806,16 @@ index <code>hexutil.Uint</code>
                 "title": "dataWord",
                 "type": "string"
             },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
             "nonce": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "uint64",
@@ -6110,15 +6896,15 @@ index <code>hexutil.Uint</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) GetTransactionByBlockNumberAndIndex(ctx context.Context, blockNr rpc.BlockNumber, index hexutil.Uint) *RPCTransaction {
+func (s *TransactionAPI) GetTransactionByBlockNumberAndIndex(ctx context.Context, blockNr rpc.BlockNumber, index hexutil.Uint) *RPCTransaction {
 	if block, _ := s.b.BlockByNumber(ctx, blockNr); block != nil {
-		return newRPCTransactionFromBlockIndex(block, uint64(index))
+		return newRPCTransactionFromBlockIndex(block, uint64(index), s.b.ChainConfig())
 	}
 	return nil
 }// GetTransactionByBlockNumberAndIndex returns the transaction for the given block number and index.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1466" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1636" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6250,6 +7036,16 @@ hash <code>common.Hash</code>
 			- title: `dataWord`
 			- type: `string`
 
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- nonce: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `uint64`
@@ -6365,6 +7161,16 @@ hash <code>common.Hash</code>
                 "title": "dataWord",
                 "type": "string"
             },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
             "nonce": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "uint64",
@@ -6445,22 +7251,26 @@ hash <code>common.Hash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) GetTransactionByHash(ctx context.Context, hash common.Hash) (*RPCTransaction, error) {
+func (s *TransactionAPI) GetTransactionByHash(ctx context.Context, hash common.Hash) (*RPCTransaction, error) {
 	tx, blockHash, blockNumber, index, err := s.b.GetTransaction(ctx, hash)
 	if err != nil {
 		return nil, err
 	}
 	if tx != nil {
-		return newRPCTransaction(tx, blockHash, blockNumber, index), nil
+		header, err := s.b.HeaderByHash(ctx, blockHash)
+		if err != nil {
+			return nil, err
+		}
+		return newRPCTransaction(tx, blockHash, blockNumber, index, header.BaseFee, s.b.ChainConfig()), nil
 	}
 	if tx := s.b.GetPoolTransaction(hash); tx != nil {
-		return newRPCPendingTransaction(tx), nil
+		return newRPCPendingTransaction(tx, s.b.CurrentHeader(), s.b.ChainConfig()), nil
 	}
 	return nil, nil
 }// GetTransactionByHash returns the transaction for the given hash
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1517" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1687" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6590,7 +7400,7 @@ blockNrOrHash <code>rpc.BlockNumberOrHash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) GetTransactionCount(ctx context.Context, address common.Address, blockNrOrHash rpc.BlockNumberOrHash) (*hexutil.Uint64, error) {
+func (s *TransactionAPI) GetTransactionCount(ctx context.Context, address common.Address, blockNrOrHash rpc.BlockNumberOrHash) (*hexutil.Uint64, error) {
 	if blockNr, ok := blockNrOrHash.Number(); ok && blockNr == rpc.PendingBlockNumber {
 		nonce, err := s.b.GetPoolNonce(ctx, address)
 		if err != nil {
@@ -6607,7 +7417,7 @@ func (s *PublicTransactionPoolAPI) GetTransactionCount(ctx context.Context, addr
 }// GetTransactionCount returns the number of transactions the given address has sent for the given block number
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1498" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1668" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6731,7 +7541,7 @@ mapstringinterface <code>map[string]interface{}</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) GetTransactionReceipt(ctx context.Context, hash common.Hash) (map // GetTransactionReceipt returns the transaction receipt for the given transaction hash.
+func (s *TransactionAPI) GetTransactionReceipt(ctx context.Context, hash common.Hash) (map // GetTransactionReceipt returns the transaction receipt for the given transaction hash.
 [string]interface{}, error) {
 	tx, blockHash, blockNumber, index, err := s.b.GetTransaction(ctx, hash)
 	if err != nil {
@@ -6749,13 +7559,23 @@ func (s *PublicTransactionPoolAPI) GetTransactionReceipt(ctx context.Context, ha
 	signer := types.MakeSigner(s.b.ChainConfig(), bigblock)
 	from, _ := types.Sender(signer, tx)
 	fields := map[string]interface{}{"blockHash": blockHash, "blockNumber": hexutil.Uint64(blockNumber), "transactionHash": hash, "transactionIndex": hexutil.Uint64(index), "from": from, "to": tx.To(), "gasUsed": hexutil.Uint64(receipt.GasUsed), "cumulativeGasUsed": hexutil.Uint64(receipt.CumulativeGasUsed), "contractAddress": nil, "logs": receipt.Logs, "logsBloom": receipt.Bloom, "type": hexutil.Uint(tx.Type())}
+	if !s.b.ChainConfig().IsEnabled(s.b.ChainConfig().GetEIP1559Transition, bigblock) {
+		fields["effectiveGasPrice"] = hexutil.Uint64(tx.GasPrice().Uint64())
+	} else {
+		header, err := s.b.HeaderByHash(ctx, blockHash)
+		if err != nil {
+			return nil, err
+		}
+		gasPrice := new(big.Int).Add(header.BaseFee, tx.EffectiveGasTipValue(header.BaseFee))
+		fields["effectiveGasPrice"] = hexutil.Uint64(gasPrice.Uint64())
+	}
 	if len(receipt.PostState) > 0 {
 		fields["root"] = hexutil.Bytes(receipt.PostState)
 	} else {
 		fields["status"] = hexutil.Uint(receipt.Status)
 	}
 	if receipt.Logs == nil {
-		fields["logs"] = [][]*types.Log{}
+		fields["logs"] = []*types.Log{}
 	}
 	if receipt.ContractAddress != (common.Address{}) {
 		fields["contractAddress"] = receipt.ContractAddress
@@ -6763,7 +7583,7 @@ func (s *PublicTransactionPoolAPI) GetTransactionReceipt(ctx context.Context, ha
 	return fields, nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1553" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1727" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -6867,6 +7687,11 @@ index <code>hexutil.Uint</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- baseFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
@@ -6993,6 +7818,11 @@ index <code>hexutil.Uint</code>
 	{
         "additionalProperties": false,
         "properties": {
+            "baseFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
             "difficulty": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -7147,7 +7977,7 @@ index <code>hexutil.Uint</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) GetUncleByBlockHashAndIndex(ctx context.Context, blockHash common.Hash, index hexutil.Uint) (*RPCMarshalBlockT, error) {
+func (s *BlockChainAPI) GetUncleByBlockHashAndIndex(ctx context.Context, blockHash common.Hash, index hexutil.Uint) (*RPCMarshalBlockT, error) {
 	block, err := s.b.BlockByHash(ctx, blockHash)
 	if block != nil {
 		uncles := block.Uncles()
@@ -7163,7 +7993,7 @@ func (s *PublicBlockChainAPI) GetUncleByBlockHashAndIndex(ctx context.Context, b
 // all transactions in the block are returned in full detail, otherwise only the transaction hash is returned.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L693" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L779" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -7295,6 +8125,11 @@ index <code>hexutil.Uint</code>
 	
 	- additionalProperties: `false`
 	- properties: 
+		- baseFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
 		- difficulty: 
 			- pattern: `^0x[a-fA-F0-9]+$`
 			- title: `integer`
@@ -7421,6 +8256,11 @@ index <code>hexutil.Uint</code>
 	{
         "additionalProperties": false,
         "properties": {
+            "baseFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
             "difficulty": {
                 "pattern": "^0x[a-fA-F0-9]+$",
                 "title": "integer",
@@ -7575,7 +8415,7 @@ index <code>hexutil.Uint</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) GetUncleByBlockNumberAndIndex(ctx context.Context, blockNr rpc.BlockNumber, index hexutil.Uint) (*RPCMarshalBlockT, error) {
+func (s *BlockChainAPI) GetUncleByBlockNumberAndIndex(ctx context.Context, blockNr rpc.BlockNumber, index hexutil.Uint) (*RPCMarshalBlockT, error) {
 	block, err := s.b.BlockByNumber(ctx, blockNr)
 	if block != nil {
 		uncles := block.Uncles()
@@ -7591,7 +8431,7 @@ func (s *PublicBlockChainAPI) GetUncleByBlockNumberAndIndex(ctx context.Context,
 // all transactions in the block are returned in full detail, otherwise only the transaction hash is returned.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L677" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L763" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -7712,7 +8552,7 @@ blockHash <code>common.Hash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) GetUncleCountByBlockHash(ctx context.Context, blockHash common.Hash) *hexutil.Uint {
+func (s *BlockChainAPI) GetUncleCountByBlockHash(ctx context.Context, blockHash common.Hash) *hexutil.Uint {
 	if block, _ := s.b.BlockByHash(ctx, blockHash); block != nil {
 		n := hexutil.Uint(len(block.Uncles()))
 		return &n
@@ -7721,7 +8561,7 @@ func (s *PublicBlockChainAPI) GetUncleCountByBlockHash(ctx context.Context, bloc
 }// GetUncleCountByBlockHash returns number of uncles in the block for the given block hash
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L717" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L803" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -7870,7 +8710,7 @@ blockNr <code>rpc.BlockNumber</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicBlockChainAPI) GetUncleCountByBlockNumber(ctx context.Context, blockNr rpc.BlockNumber) *hexutil.Uint {
+func (s *BlockChainAPI) GetUncleCountByBlockNumber(ctx context.Context, blockNr rpc.BlockNumber) *hexutil.Uint {
 	if block, _ := s.b.BlockByNumber(ctx, blockNr); block != nil {
 		n := hexutil.Uint(len(block.Uncles()))
 		return &n
@@ -7879,7 +8719,7 @@ func (s *PublicBlockChainAPI) GetUncleCountByBlockNumber(ctx context.Context, bl
 }// GetUncleCountByBlockNumber returns number of uncles in the block for the given block number
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L708" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L794" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8017,7 +8857,7 @@ func (api *API) GetWork() ([4]string, error) {
 
 ### eth_hashrate
 
-Hashrate returns the POW hashrate
+Hashrate returns the POW hashrate.
 
 
 #### Params (0)
@@ -8092,9 +8932,9 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicEthereumAPI) Hashrate() hexutil.Uint64 {
-	return hexutil.Uint64(api.e.Miner().HashRate())
-}// Hashrate returns the POW hashrate
+func (api *EthereumAPI) Hashrate() hexutil.Uint64 {
+	return hexutil.Uint64(api.e.Miner().Hashrate())
+}// Hashrate returns the POW hashrate.
 
 ```
 <a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L65" target="_">View on GitHub →</a>
@@ -8107,7 +8947,7 @@ func (api *PublicEthereumAPI) Hashrate() hexutil.Uint64 {
 
 ### eth_logs
 
-Logs creates a subscription that fires for all new logs that match the given filter criteria.
+Logs creates a subscription that fires for all new log that match the given filter criteria.
 
 
 #### Params (1)
@@ -8278,14 +9118,14 @@ crit <code>FilterCriteria</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicFilterAPI) Logs(ctx context.Context, crit FilterCriteria) (*rpc.Subscription, error) {
+func (api *FilterAPI) Logs(ctx context.Context, crit FilterCriteria) (*rpc.Subscription, error) {
 	notifier, supported := rpc.NotifierFromContext(ctx)
 	if !supported {
 		return &rpc.Subscription{}, rpc.ErrNotificationsUnsupported
 	}
 	var (
 		rpcSub		= notifier.CreateSubscription()
-		matchedLogs	= make(chan [ // Logs creates a subscription that fires for all new logs that match the given filter criteria.
+		matchedLogs	= make(chan [ // Logs creates a subscription that fires for all new log that match the given filter criteria.
 		]*types.Log)
 	)
 	logsSub, err := api.events.SubscribeLogs(ethereum.FilterQuery(crit), matchedLogs)
@@ -8297,6 +9137,7 @@ func (api *PublicFilterAPI) Logs(ctx context.Context, crit FilterCriteria) (*rpc
 			select {
 			case logs := <-matchedLogs:
 				for _, log := range logs {
+					log := log
 					notifier.Notify(rpcSub.ID, &log)
 				}
 			case <-rpcSub.Err():
@@ -8311,7 +9152,101 @@ func (api *PublicFilterAPI) Logs(ctx context.Context, crit FilterCriteria) (*rpc
 	return rpcSub, nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L307" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L297" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_maxPriorityFeePerGas
+
+MaxPriorityFeePerGas returns a suggestion for a gas tip cap for dynamic fee transactions.
+
+
+#### Params (0)
+
+_None_
+
+#### Result
+
+
+
+
+<code>*hexutil.Big</code> 
+
+  + Required: ✓ Yes
+
+
+=== "Schema"
+
+	``` Schema
+	
+	- description: `Hex representation of the integer`
+	- pattern: `^0x[a-fA-F0-9]+$`
+	- title: `integer`
+	- type: string
+
+
+	```
+
+=== "Raw"
+
+	``` Raw
+	{
+        "description": "Hex representation of the integer",
+        "pattern": "^0x[a-fA-F0-9]+$",
+        "title": "integer",
+        "type": [
+            "string"
+        ]
+    }
+	```
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_maxPriorityFeePerGas", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_maxPriorityFeePerGas", "params": []}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	eth.maxPriorityFeePerGas();
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (s *EthereumAPI) MaxPriorityFeePerGas(ctx context.Context) (*hexutil.Big, error) {
+	tipcap, err := s.b.SuggestGasTipCap(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return (*hexutil.Big)(tipcap), err
+}// MaxPriorityFeePerGas returns a suggestion for a gas tip cap for dynamic fee transactions.
+
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L76" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8371,12 +9306,12 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicMinerAPI) Mining() bool {
+func (api *EthereumAPI) Mining() bool {
 	return api.e.IsMining()
 }// Mining returns an indication if this node is currently mining.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L91" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/api.go#L71" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8388,8 +9323,6 @@ func (api *PublicMinerAPI) Mining() bool {
 
 NewBlockFilter creates a filter that fetches blocks that are imported into the chain.
 It is part of the filter package since polling goes with eth_getFilterChanges.
-
-https://eth.wiki/json-rpc/API#eth_newblockfilter
 
 
 #### Params (0)
@@ -8450,7 +9383,7 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicFilterAPI) NewBlockFilter() rpc.ID {
+func (api *FilterAPI) NewBlockFilter() rpc.ID {
 	var (
 		headers		= make(chan *types.Header)
 		headerSub	= api.events.SubscribeNewHeads(headers)
@@ -8458,8 +9391,6 @@ func (api *PublicFilterAPI) NewBlockFilter() rpc.ID {
 	api.filtersMu.Lock()
 	api.filters[headerSub.ID] = &filter{typ: BlocksSubscription, deadline: time.NewTimer(api.timeout), hashes: make([ // NewBlockFilter creates a filter that fetches blocks that are imported into the chain.
 	// It is part of the filter package since polling goes with eth_getFilterChanges.
-	//
-	// https://eth.wiki/json-rpc/API#eth_newblockfilter
 	]common.Hash, 0), s: headerSub}
 	api.filtersMu.Unlock()
 	go func() {
@@ -8482,7 +9413,7 @@ func (api *PublicFilterAPI) NewBlockFilter() rpc.ID {
 	return headerSub.ID
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L182" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L172" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8503,8 +9434,6 @@ In case logs are removed (chain reorg) previously returned logs are returned
 again but with the removed property set to true.
 
 In case "fromBlock" > "toBlock" an error is returned.
-
-https://eth.wiki/json-rpc/API#eth_newfilter
 
 
 #### Params (1)
@@ -8673,7 +9602,7 @@ crit <code>FilterCriteria</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicFilterAPI) NewFilter(crit FilterCriteria) (rpc.ID, error) {
+func (api *FilterAPI) NewFilter(crit FilterCriteria) (rpc.ID, error) {
 	logs := make(chan [ // NewFilter creates a new filter and returns the filter id. It can be
 	// used to retrieve logs when the state changes. This method cannot be
 	// used to fetch logs that are already stored in the state.
@@ -8685,8 +9614,6 @@ func (api *PublicFilterAPI) NewFilter(crit FilterCriteria) (rpc.ID, error) {
 	// again but with the removed property set to true.
 	//
 	// In case "fromBlock" > "toBlock" an error is returned.
-	//
-	// https://eth.wiki/json-rpc/API#eth_newfilter
 	]*types.Log)
 	logsSub, err := api.events.SubscribeLogs(ethereum.FilterQuery(crit), logs)
 	if err != nil {
@@ -8715,7 +9642,7 @@ func (api *PublicFilterAPI) NewFilter(crit FilterCriteria) (rpc.ID, error) {
 	return logsSub.ID, nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L361" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L350" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8788,7 +9715,7 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicFilterAPI) NewHeads(ctx context.Context) (*rpc.Subscription, error) {
+func (api *FilterAPI) NewHeads(ctx context.Context) (*rpc.Subscription, error) {
 	notifier, supported := rpc.NotifierFromContext(ctx)
 	if !supported {
 		return &rpc.Subscription{}, rpc.ErrNotificationsUnsupported
@@ -8814,7 +9741,7 @@ func (api *PublicFilterAPI) NewHeads(ctx context.Context) (*rpc.Subscription, er
 }// NewHeads send a notification each time a new (header) block is appended to the chain.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L247" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L237" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -8829,8 +9756,6 @@ as transactions enter the pending state.
 
 It is part of the filter package because this filter can be used through the
 `eth_getFilterChanges` polling method that is also used for log filters.
-
-https://eth.wiki/json-rpc/API#eth_newpendingtransactionfilter
 
 
 #### Params (0)
@@ -8891,15 +9816,13 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicFilterAPI) NewPendingTransactionFilter() rpc.ID {
+func (api *FilterAPI) NewPendingTransactionFilter() rpc.ID {
 	var (
 		pendingTxs	= make(chan [ // NewPendingTransactionFilter creates a filter that fetches pending transaction hashes
 		// as transactions enter the pending state.
 		//
 		// It is part of the filter package because this filter can be used through the
 		// `eth_getFilterChanges` polling method that is also used for log filters.
-		//
-		// https://eth.wiki/json-rpc/API#eth_newpendingtransactionfilter
 		]common.Hash)
 		pendingTxSub	= api.events.SubscribePendingTxs(pendingTxs)
 	)
@@ -8926,7 +9849,7 @@ func (api *PublicFilterAPI) NewPendingTransactionFilter() rpc.ID {
 	return pendingTxSub.ID
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L112" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L104" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -9000,7 +9923,7 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicFilterAPI) NewPendingTransactions(ctx context.Context) (*rpc.Subscription, error) {
+func (api *FilterAPI) NewPendingTransactions(ctx context.Context) (*rpc.Subscription, error) {
 	notifier, supported := rpc.NotifierFromContext(ctx)
 	if !supported {
 		return &rpc.Subscription{}, rpc.ErrNotificationsUnsupported
@@ -9029,7 +9952,7 @@ func (api *PublicFilterAPI) NewPendingTransactions(ctx context.Context) (*rpc.Su
 	return rpcSub, nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L145" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L137" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -9101,7 +10024,7 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicFilterAPI) NewSideBlockFilter() rpc.ID {
+func (api *FilterAPI) NewSideBlockFilter() rpc.ID {
 	var (
 		headers		= make(chan *types.Header)
 		headerSub	= api.events.SubscribeNewSideHeads(headers)
@@ -9131,7 +10054,7 @@ func (api *PublicFilterAPI) NewSideBlockFilter() rpc.ID {
 	return headerSub.ID
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L215" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L205" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -9204,7 +10127,7 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicFilterAPI) NewSideHeads(ctx context.Context) (*rpc.Subscription, error) {
+func (api *FilterAPI) NewSideHeads(ctx context.Context) (*rpc.Subscription, error) {
 	notifier, supported := rpc.NotifierFromContext(ctx)
 	if !supported {
 		return &rpc.Subscription{}, rpc.ErrNotificationsUnsupported
@@ -9230,7 +10153,7 @@ func (api *PublicFilterAPI) NewSideHeads(ctx context.Context) (*rpc.Subscription
 }// NewSideHeads send a notification each time a new non-canonical (header) block is written to the database.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L277" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L267" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -9326,6 +10249,16 @@ RPCTransaction <code>[]*RPCTransaction</code>
 				- input: 
 					- pattern: `^0x([a-fA-F\d])+$`
 					- title: `dataWord`
+					- type: `string`
+
+				- maxFeePerGas: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
+					- type: `string`
+
+				- maxPriorityFeePerGas: 
+					- pattern: `^0x[a-fA-F0-9]+$`
+					- title: `integer`
 					- type: `string`
 
 				- nonce: 
@@ -9448,6 +10381,16 @@ RPCTransaction <code>[]*RPCTransaction</code>
                         "title": "dataWord",
                         "type": "string"
                     },
+                    "maxFeePerGas": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
+                    "maxPriorityFeePerGas": {
+                        "pattern": "^0x[a-fA-F0-9]+$",
+                        "title": "integer",
+                        "type": "string"
+                    },
                     "nonce": {
                         "pattern": "^0x([a-fA-F\\d])+$",
                         "title": "uint64",
@@ -9533,7 +10476,7 @@ RPCTransaction <code>[]*RPCTransaction</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) PendingTransactions() ([ // PendingTransactions returns the transactions that are in the transaction pool
+func (s *TransactionAPI) PendingTransactions() ([ // PendingTransactions returns the transactions that are in the transaction pool
 // and have a from address that is one of the accounts this node manages.
 ]*RPCTransaction, error) {
 	pending, err := s.b.GetPoolTransactions()
@@ -9546,17 +10489,18 @@ func (s *PublicTransactionPoolAPI) PendingTransactions() ([ // PendingTransactio
 			accounts[account.Address] = struct{}{}
 		}
 	}
+	curHeader := s.b.CurrentHeader()
 	transactions := make([]*RPCTransaction, 0, len(pending))
 	for _, tx := range pending {
 		from, _ := types.Sender(s.signer, tx)
 		if _, exists := accounts[from]; exists {
-			transactions = append(transactions, newRPCPendingTransaction(tx))
+			transactions = append(transactions, newRPCPendingTransaction(tx, curHeader, s.b.ChainConfig()))
 		}
 	}
 	return transactions, nil
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1887" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1959" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -9576,7 +10520,7 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-sendArgs <code>SendTxArgs</code> 
+sendArgs <code>TransactionArgs</code> 
 
   + Required: ✓ Yes
 
@@ -9638,6 +10582,16 @@ sendArgs <code>SendTxArgs</code>
 		- input: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
+			- type: `string`
+
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- nonce: 
@@ -9718,6 +10672,16 @@ sendArgs <code>SendTxArgs</code>
             "input": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "dataWord",
+                "type": "string"
+            },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
                 "type": "string"
             },
             "nonce": {
@@ -9882,7 +10846,7 @@ gasLimit <code>*hexutil.Uint64</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) Resend(ctx context.Context, sendArgs SendTxArgs, gasPrice *hexutil.Big, gasLimit *hexutil.Uint64) (common.Hash, error) {
+func (s *TransactionAPI) Resend(ctx context.Context, sendArgs TransactionArgs, gasPrice *hexutil.Big, gasLimit *hexutil.Uint64) (common.Hash, error) {
 	if sendArgs.Nonce == nil {
 		return common.Hash{}, fmt.Errorf("missing transaction nonce in transaction spec")
 	}
@@ -9911,14 +10875,14 @@ func (s *PublicTransactionPoolAPI) Resend(ctx context.Context, sendArgs SendTxAr
 	range pending {
 		wantSigHash := s.signer.Hash(matchTx)
 		pFrom, err := types.Sender(s.signer, p)
-		if err == nil && pFrom == sendArgs.From && s.signer.Hash(p) == wantSigHash {
+		if err == nil && pFrom == sendArgs.from() && s.signer.Hash(p) == wantSigHash {
 			if gasPrice != nil && (*big.Int)(gasPrice).Sign() != 0 {
 				sendArgs.GasPrice = gasPrice
 			}
 			if gasLimit != nil && *gasLimit != 0 {
 				sendArgs.Gas = gasLimit
 			}
-			signedTx, err := s.sign(sendArgs.From, sendArgs.toTransaction())
+			signedTx, err := s.sign(sendArgs.from(), sendArgs.toTransaction())
 			if err != nil {
 				return common.Hash{}, err
 			}
@@ -9931,7 +10895,7 @@ func (s *PublicTransactionPoolAPI) Resend(ctx context.Context, sendArgs SendTxAr
 	return common.Hash{}, fmt.Errorf("transaction %#x not found", matchTx.Hash())
 }
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1910" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1983" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -10053,7 +11017,7 @@ input <code>hexutil.Bytes</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, input hexutil.Bytes) (common.Hash, error) {
+func (s *TransactionAPI) SendRawTransaction(ctx context.Context, input hexutil.Bytes) (common.Hash, error) {
 	tx := new(types.Transaction)
 	if err := tx.UnmarshalBinary(input); err != nil {
 		return common.Hash{}, err
@@ -10063,7 +11027,7 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, input
 // The sender is responsible for signing the transaction and using the correct nonce.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1815" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1886" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -10083,7 +11047,7 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-args <code>SendTxArgs</code> 
+args <code>TransactionArgs</code> 
 
   + Required: ✓ Yes
 
@@ -10145,6 +11109,16 @@ args <code>SendTxArgs</code>
 		- input: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
+			- type: `string`
+
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- nonce: 
@@ -10225,6 +11199,16 @@ args <code>SendTxArgs</code>
             "input": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "dataWord",
+                "type": "string"
+            },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
                 "type": "string"
             },
             "nonce": {
@@ -10321,15 +11305,15 @@ args <code>SendTxArgs</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) SendTransaction(ctx context.Context, args SendTxArgs) (common.Hash, error) {
-	account := accounts.Account{Address: args.From}
+func (s *TransactionAPI) SendTransaction(ctx context.Context, args TransactionArgs) (common.Hash, error) {
+	account := accounts.Account{Address: args.from()}
 	wallet, err := s.b.AccountManager().Find(account)
 	if err != nil {
 		return common.Hash{}, err
 	}
 	if args.Nonce == nil {
-		s.nonceLock.LockAddr(args.From)
-		defer s.nonceLock.UnlockAddr(args.From)
+		s.nonceLock.LockAddr(args.from())
+		defer s.nonceLock.UnlockAddr(args.from())
 	}
 	if err := args.setDefaults(ctx, s.b); err != nil {
 		return common.Hash{}, err
@@ -10344,7 +11328,7 @@ func (s *PublicTransactionPoolAPI) SendTransaction(ctx context.Context, args Sen
 // transaction pool.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1767" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1837" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -10355,7 +11339,7 @@ func (s *PublicTransactionPoolAPI) SendTransaction(ctx context.Context, args Sen
 ### eth_sign
 
 Sign calculates an ECDSA signature for:
-keccack256("\x19Ethereum Signed Message:\n" + len(message) + message).
+keccak256("\x19Ethereum Signed Message:\n" + len(message) + message).
 
 Note, the produced signature conforms to the secp256k1 curve R, S and V values,
 where the V value will be 27 or 28 for legacy reasons.
@@ -10507,7 +11491,7 @@ data <code>hexutil.Bytes</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) Sign(addr common.Address, data hexutil.Bytes) (hexutil.Bytes, error) {
+func (s *TransactionAPI) Sign(addr common.Address, data hexutil.Bytes) (hexutil.Bytes, error) {
 	account := accounts.Account{Address: addr}
 	wallet, err := s.b.AccountManager().Find(account)
 	if err != nil {
@@ -10519,7 +11503,7 @@ func (s *PublicTransactionPoolAPI) Sign(addr common.Address, data hexutil.Bytes)
 	}
 	return signature, err
 }// Sign calculates an ECDSA signature for:
-// keccack256("\x19Ethereum Signed Message:\n" + len(message) + message).
+// keccak256("\x19Ethereum Signed Message:\n" + len(message) + message).
 //
 // Note, the produced signature conforms to the secp256k1 curve R, S and V values,
 // where the V value will be 27 or 28 for legacy reasons.
@@ -10529,7 +11513,7 @@ func (s *PublicTransactionPoolAPI) Sign(addr common.Address, data hexutil.Bytes)
 // https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1832" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1903" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -10550,7 +11534,7 @@ Parameters must be given _by position_.
 
 
 __1:__ 
-args <code>SendTxArgs</code> 
+args <code>TransactionArgs</code> 
 
   + Required: ✓ Yes
 
@@ -10612,6 +11596,16 @@ args <code>SendTxArgs</code>
 		- input: 
 			- pattern: `^0x([a-fA-F\d])+$`
 			- title: `dataWord`
+			- type: `string`
+
+		- maxFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
+			- type: `string`
+
+		- maxPriorityFeePerGas: 
+			- pattern: `^0x[a-fA-F0-9]+$`
+			- title: `integer`
 			- type: `string`
 
 		- nonce: 
@@ -10692,6 +11686,16 @@ args <code>SendTxArgs</code>
             "input": {
                 "pattern": "^0x([a-fA-F\\d])+$",
                 "title": "dataWord",
+                "type": "string"
+            },
+            "maxFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
+                "type": "string"
+            },
+            "maxPriorityFeePerGas": {
+                "pattern": "^0x[a-fA-F0-9]+$",
+                "title": "integer",
                 "type": "string"
             },
             "nonce": {
@@ -10806,12 +11810,12 @@ args <code>SendTxArgs</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *PublicTransactionPoolAPI) SignTransaction(ctx context.Context, args SendTxArgs) (*SignTransactionResult, error) {
+func (s *TransactionAPI) SignTransaction(ctx context.Context, args TransactionArgs) (*SignTransactionResult, error) {
 	if args.Gas == nil {
 		return nil, fmt.Errorf("gas not specified")
 	}
-	if args.GasPrice == nil {
-		return nil, fmt.Errorf("gasPrice not specified")
+	if args.GasPrice == nil && (args.MaxPriorityFeePerGas == nil || args.MaxFeePerGas == nil) {
+		return nil, fmt.Errorf("missing gasPrice or maxFeePerGas/maxPriorityFeePerGas")
 	}
 	if args.Nonce == nil {
 		return nil, fmt.Errorf("nonce not specified")
@@ -10819,24 +11823,25 @@ func (s *PublicTransactionPoolAPI) SignTransaction(ctx context.Context, args Sen
 	if err := args.setDefaults(ctx, s.b); err != nil {
 		return nil, err
 	}
-	if err := checkTxFee(args.GasPrice.ToInt(), uint64(*args.Gas), s.b.RPCTxFeeCap()); err != nil {
+	tx := args.toTransaction()
+	if err := checkTxFee(tx.GasPrice(), tx.Gas(), s.b.RPCTxFeeCap()); err != nil {
 		return nil, err
 	}
-	tx, err := s.sign(args.From, args.toTransaction())
+	signed, err := s.sign(args.from(), tx)
 	if err != nil {
 		return nil, err
 	}
-	data, err := tx.MarshalBinary()
+	data, err := signed.MarshalBinary()
 	if err != nil {
 		return nil, err
 	}
-	return &SignTransactionResult{data, tx}, nil
+	return &SignTransactionResult{data, signed}, nil
 }// SignTransaction will sign the given transaction with the from account.
 // The node needs to have the private key of the account corresponding with
 // the given from address and it needs to be unlocked.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1857" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L1928" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -10844,7 +11849,7 @@ func (s *PublicTransactionPoolAPI) SignTransaction(ctx context.Context, args Sen
 
 
 
-### eth_submitHashRate
+### eth_submitHashrate
 
 SubmitHashrate can be used for remote miners to submit their hash rate.
 This enables the node to report the combined hash rate of all miners
@@ -10946,7 +11951,7 @@ id <code>common.Hash</code>
 === "Shell HTTP"
 
 	``` shell
-	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_submitHashRate", "params": [<rate>, <id>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_submitHashrate", "params": [<rate>, <id>]}'
 	```
 
 
@@ -10956,14 +11961,14 @@ id <code>common.Hash</code>
 === "Shell WebSocket"
 
 	``` shell
-	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_submitHashRate", "params": [<rate>, <id>]}'
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_submitHashrate", "params": [<rate>, <id>]}'
 	```
 
 
 === "Javascript Console"
 
 	``` js
-	eth.submitHashRate(rate,id);
+	eth.submitHashrate(rate,id);
 	```
 
 
@@ -10971,7 +11976,7 @@ id <code>common.Hash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *API) SubmitHashRate(rate hexutil.Uint64, id common.Hash) bool {
+func (api *API) SubmitHashrate(rate hexutil.Uint64, id common.Hash) bool {
 	if api.ethash.remote == nil {
 		return false
 	}
@@ -11362,7 +12367,87 @@ func (sub *RPCEthSubscription) Subscribe(subscriptionName RPCEthSubscriptionPara
 // Subscriptions are not available over HTTP; they are only available over WS, IPC, and Process connections.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L235" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L234" target="_">View on GitHub →</a>
+</p>
+</details>
+
+---
+
+
+
+### eth_syncing
+
+Syncing returns false in case the node is currently not syncing with the network. It can be up to date or has not
+yet received the latest block headers from its pears. In case it is synchronizing:
+- startingBlock: block number this node started to synchronise from
+- currentBlock:  block number this node is currently importing
+- highestBlock:  block number of the highest block header this node has received from peers
+- pulledStates:  number of state entries processed until now
+- knownStates:   number of known state entries that still need to be pulled
+
+
+#### Params (0)
+
+_None_
+
+#### Result
+
+
+
+interface <code>interface{}</code> 
+
+  + Required: ✓ Yes
+
+
+
+
+#### Client Method Invocation Examples
+
+
+=== "Shell HTTP"
+
+	``` shell
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_syncing", "params": []}'
+	```
+
+
+
+
+
+=== "Shell WebSocket"
+
+	``` shell
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_syncing", "params": []}'
+	```
+
+
+=== "Javascript Console"
+
+	``` js
+	eth.syncing();
+	```
+
+
+
+<details><summary>Source code</summary>
+<p>
+```go
+func (s *EthereumAPI) Syncing() (interface{}, error) {
+	progress := s.b.SyncProgress()
+	if progress.CurrentBlock >= progress.HighestBlock {
+		return false, nil
+	}
+	return map // Syncing returns false in case the node is currently not syncing with the network. It can be up to date or has not
+	// yet received the latest block headers from its pears. In case it is synchronizing:
+	// - startingBlock: block number this node started to synchronise from
+	// - currentBlock:  block number this node is currently importing
+	// - highestBlock:  block number of the highest block header this node has received from peers
+	// - pulledStates:  number of state entries processed until now
+	// - knownStates:   number of known state entries that still need to be pulled
+	[string]interface{}{"startingBlock": hexutil.Uint64(progress.StartingBlock), "currentBlock": hexutil.Uint64(progress.CurrentBlock), "highestBlock": hexutil.Uint64(progress.HighestBlock), "syncedAccounts": hexutil.Uint64(progress.SyncedAccounts), "syncedAccountBytes": hexutil.Uint64(progress.SyncedAccountBytes), "syncedBytecodes": hexutil.Uint64(progress.SyncedBytecodes), "syncedBytecodeBytes": hexutil.Uint64(progress.SyncedBytecodeBytes), "syncedStorage": hexutil.Uint64(progress.SyncedStorage), "syncedStorageBytes": hexutil.Uint64(progress.SyncedStorageBytes), "healedTrienodes": hexutil.Uint64(progress.HealedTrienodes), "healedTrienodeBytes": hexutil.Uint64(progress.HealedTrienodeBytes), "healedBytecodes": hexutil.Uint64(progress.HealedBytecodes), "healedBytecodeBytes": hexutil.Uint64(progress.HealedBytecodeBytes), "healingTrienodes": hexutil.Uint64(progress.HealingTrienodes), "healingBytecode": hexutil.Uint64(progress.HealingBytecode)}, nil
+}
+```
+<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L125" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -11435,7 +12520,7 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicDownloaderAPI) Syncing(ctx context.Context) (*rpc.Subscription, error) {
+func (api *DownloaderAPI) Syncing(ctx context.Context) (*rpc.Subscription, error) {
 	notifier, supported := rpc.NotifierFromContext(ctx)
 	if !supported {
 		return &rpc.Subscription{}, rpc.ErrNotificationsUnsupported
@@ -11469,91 +12554,9 @@ func (api *PublicDownloaderAPI) Syncing(ctx context.Context) (*rpc.Subscription,
 
 
 
-### eth_syncing
-
-Syncing returns false in case the node is currently not syncing with the network. It can be up to date or has not
-yet received the latest block headers from its pears. In case it is synchronizing:
-- startingBlock: block number this node started to synchronise from
-- currentBlock:  block number this node is currently importing
-- highestBlock:  block number of the highest block header this node has received from peers
-- pulledStates:  number of state entries processed until now
-- knownStates:   number of known state entries that still need to be pulled
-
-
-#### Params (0)
-
-_None_
-
-#### Result
-
-
-
-interface <code>interface{}</code> 
-
-  + Required: ✓ Yes
-
-
-
-
-#### Client Method Invocation Examples
-
-
-=== "Shell HTTP"
-
-	``` shell
-	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "eth_syncing", "params": []}'
-	```
-
-
-
-
-
-=== "Shell WebSocket"
-
-	``` shell
-	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "eth_syncing", "params": []}'
-	```
-
-
-=== "Javascript Console"
-
-	``` js
-	eth.syncing();
-	```
-
-
-
-<details><summary>Source code</summary>
-<p>
-```go
-func (s *PublicEthereumAPI) Syncing() (interface{}, error) {
-	progress := s.b.Downloader().Progress()
-	if progress.CurrentBlock >= progress.HighestBlock {
-		return false, nil
-	}
-	return map // Syncing returns false in case the node is currently not syncing with the network. It can be up to date or has not
-	// yet received the latest block headers from its pears. In case it is synchronizing:
-	// - startingBlock: block number this node started to synchronise from
-	// - currentBlock:  block number this node is currently importing
-	// - highestBlock:  block number of the highest block header this node has received from peers
-	// - pulledStates:  number of state entries processed until now
-	// - knownStates:   number of known state entries that still need to be pulled
-	[string]interface{}{"startingBlock": hexutil.Uint64(progress.StartingBlock), "currentBlock": hexutil.Uint64(progress.CurrentBlock), "highestBlock": hexutil.Uint64(progress.HighestBlock), "pulledStates": hexutil.Uint64(progress.PulledStates), "knownStates": hexutil.Uint64(progress.KnownStates)}, nil
-}
-```
-<a href="https://github.com/etclabscore/core-geth/blob/master/internal/ethapi/api.go#L75" target="_">View on GitHub →</a>
-</p>
-</details>
-
----
-
-
-
 ### eth_uninstallFilter
 
 UninstallFilter removes the filter with the given filter id.
-
-https://eth.wiki/json-rpc/API#eth_uninstallfilter
 
 
 #### Params (1)
@@ -11637,7 +12640,7 @@ id <code>rpc.ID</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *PublicFilterAPI) UninstallFilter(id rpc.ID) bool {
+func (api *FilterAPI) UninstallFilter(id rpc.ID) bool {
 	api.filtersMu.Lock()
 	f, found := api.filters[id]
 	if found {
@@ -11649,11 +12652,9 @@ func (api *PublicFilterAPI) UninstallFilter(id rpc.ID) bool {
 	}
 	return found
 }// UninstallFilter removes the filter with the given filter id.
-//
-// https://eth.wiki/json-rpc/API#eth_uninstallfilter
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L425" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/eth/filters/api.go#L410" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -11744,7 +12745,7 @@ func (sub *RPCEthSubscription) Unsubscribe(id rpc.ID) error {
 }// Unsubscribe terminates an existing subscription by ID.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L226" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/openrpc.go#L225" target="_">View on GitHub →</a>
 </p>
 </details>
 

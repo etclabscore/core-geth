@@ -205,13 +205,11 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 // The resulting post-state is assigned to the test's post.Root and post.Logs hashes.
 func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCallback func()) func(t *testing.T, name string, test *StateTest) {
 	return func(t *testing.T, name string, test *StateTest) {
-
 		subtests := test.Subtests(nil)
 
 		targets := map[string][]stPostState{}
 
 		for _, s := range subtests {
-
 			// Prior to test-generation logic, record the genesis+chain config at the testmatcher level.
 			// This will allow us to generate a complete map of chain configurations for the test suite,
 			// whether the subtest's fork was used to generate any tests or not.
@@ -350,7 +348,6 @@ func TestGenStateCoreGethConfigs(t *testing.T) {
 	// and write each file 1486 times.
 	for _, d := range []string{stateTestDir, legacyStateTestDir} {
 		st.walkFullName(t, d, func(t *testing.T, name string, test *StateTest) {
-
 			subtests := test.Subtests(nil)
 			for _, subtest := range subtests {
 				subtest := subtest
@@ -401,7 +398,6 @@ func TestGeneratedConfigsEq(t *testing.T) {
 
 	// Special case handling for EIP1283.
 	if coded.GetEIP1283Transition() == nil && coded.GetEIP1283DisableTransition() == nil {
-
 		e1283 := gen.Config.GetEIP1283Transition()
 		d1283 := gen.Config.GetEIP1283DisableTransition()
 
@@ -410,7 +406,6 @@ func TestGeneratedConfigsEq(t *testing.T) {
 			gen.Config.SetEIP1283Transition(nil)
 			gen.Config.SetEIP1283DisableTransition(nil)
 		}
-
 	}
 
 	err = confp.Equivalent(gen.Config, coded)
@@ -468,7 +463,6 @@ func TestConvertDefaultsBounce(t *testing.T) {
 
 			err = confp.Equivalent(forkConfig, coreGethConfig2)
 			if err != nil {
-
 				jb, err := json.MarshalIndent(coreGethConfig2, "", "    ")
 				if err != nil {
 					t.Fatal(err)

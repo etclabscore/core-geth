@@ -35,6 +35,6 @@ func VerifyForkHashes(config ctypes.ChainConfigurator, header *types.Header, unc
 	if wantHash := config.GetForkCanonHash(header.Number.Uint64()); wantHash == (common.Hash{}) || wantHash == header.Hash() {
 		return nil
 	} else {
-		return fmt.Errorf("verify canonical block hash failed, block number %d: have 0x%x, want 0x%x", header.Number.Uint64(), header.Hash(), wantHash)
+		return fmt.Errorf("verify canonical block hash failed, block number %d: have %#x, want %#x", header.Number.Uint64(), header.Hash(), wantHash)
 	}
 }

@@ -216,7 +216,6 @@ func TestDifficultyGen(t *testing.T) {
 		if err := dt.checkFailure(t, test.Run(cfg)); err != nil {
 			t.Fatalf("failed to run difficulty test, err=%v", err)
 		} else {
-
 			fileBasename, ok := mapForkNameChainspecFileDifficulty[key]
 			if !ok {
 				t.Fatalf("unmatched config name: %s", key)
@@ -286,7 +285,6 @@ func TestDifficultyGen(t *testing.T) {
 			}
 			mustAppendTestToFileNDJSON(t, newTest, outNDJSONFile)
 			t.Logf("OK [generated] %v", newTest)
-
 		}
 	})
 }

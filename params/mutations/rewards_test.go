@@ -95,7 +95,6 @@ func TestGetBlockEra2(t *testing.T) {
 }
 
 func TestGetBlockWinnerRewardByEra(t *testing.T) {
-
 	cases := map[*big.Int]*big.Int{
 		big.NewInt(0):        MaximumBlockReward,
 		big.NewInt(1):        MaximumBlockReward,
@@ -122,11 +121,9 @@ func TestGetBlockWinnerRewardByEra(t *testing.T) {
 			t.Errorf("@ %v, got: %v, want %v", bn, gotReward, expectedReward)
 		}
 	}
-
 }
 
 func TestGetBlockUncleRewardByEra(t *testing.T) {
-
 	var we1, we2, we3, we4 *big.Int = new(big.Int), new(big.Int), new(big.Int), new(big.Int)
 
 	// manually divide maxblockreward/32 to compare to got
@@ -149,7 +146,6 @@ func TestGetBlockUncleRewardByEra(t *testing.T) {
 	}
 
 	for bn, want := range cases {
-
 		era := GetBlockEra(bn, defaultEraLength)
 
 		var header, uncle *types.Header = &types.Header{}, &types.Header{}
@@ -179,7 +175,6 @@ func TestGetBlockUncleRewardByEra(t *testing.T) {
 }
 
 func TestGetBlockWinnerRewardForUnclesByEra(t *testing.T) {
-
 	// "want era 1", "want era 2", ...
 	var we1, we2, we3, we4 *big.Int = new(big.Int), new(big.Int), new(big.Int), new(big.Int)
 	we1.Div(MaximumBlockReward, big.NewInt(32))
@@ -423,7 +418,6 @@ func TestAccumulateRewards(t *testing.T) {
 			header.Number = bn
 			blockReward := ctypes.EthashBlockReward(config, header.Number)
 			for i, uncle := range uncles {
-
 				// Randomize uncle numbers with bound ( n-1 <= uncleNum <= n-7 ), where n is current head number
 				// See yellowpaper@11.1 for ommer validation reference. I expect n-7 is 6th-generation ommer.
 				// Note that ommer nth-generation impacts reward only for "Era 1".
@@ -453,7 +447,7 @@ func TestAccumulateRewards(t *testing.T) {
 			AccumulateRewards(config, stateDB, header, uncles)
 
 			// Check balances.
-			//t.Logf("config=%d block=%d era=%d w:%d u1:%d u2:%d", i, bn, new(big.Int).Add(era, big.NewInt(1)), blockWinner, uncleMiner1, uncleMiner2)
+			// t.Logf("config=%d block=%d era=%d w:%d u1:%d u2:%d", i, bn, new(big.Int).Add(era, big.NewInt(1)), blockWinner, uncleMiner1, uncleMiner2)
 			if wb := stateDB.GetBalance(header.Coinbase); wb.Cmp(&blockWinner) != 0 {
 				t.Errorf("winner balance @ %v, want: %v, got: %v (config: %v)", bn, blockWinner, wb, i)
 			}

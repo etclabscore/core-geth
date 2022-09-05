@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-30T19:24:24+03:00</code> |
+| Source | <code>1.12.9-unstable/generated-at:2022-07-13T09:50:34-07:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -233,7 +233,7 @@ func (api *API) GetWork() ([4]string, error) {
 
 
 
-### ethash_submitHashRate
+### ethash_submitHashrate
 
 SubmitHashrate can be used for remote miners to submit their hash rate.
 This enables the node to report the combined hash rate of all miners
@@ -335,7 +335,7 @@ id <code>common.Hash</code>
 === "Shell HTTP"
 
 	``` shell
-	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_submitHashRate", "params": [<rate>, <id>]}'
+	curl -X POST -H "Content-Type: application/json" http://localhost:8545 --data '{"jsonrpc": "2.0", "id": 42, "method": "ethash_submitHashrate", "params": [<rate>, <id>]}'
 	```
 
 
@@ -345,14 +345,14 @@ id <code>common.Hash</code>
 === "Shell WebSocket"
 
 	``` shell
-	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "ethash_submitHashRate", "params": [<rate>, <id>]}'
+	wscat -c ws://localhost:8546 -x '{"jsonrpc": "2.0", "id": 1, "method": "ethash_submitHashrate", "params": [<rate>, <id>]}'
 	```
 
 
 === "Javascript Console"
 
 	``` js
-	ethash.submitHashRate(rate,id);
+	ethash.submitHashrate(rate,id);
 	```
 
 
@@ -360,7 +360,7 @@ id <code>common.Hash</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (api *API) SubmitHashRate(rate hexutil.Uint64, id common.Hash) bool {
+func (api *API) SubmitHashrate(rate hexutil.Uint64, id common.Hash) bool {
 	if api.ethash.remote == nil {
 		return false
 	}

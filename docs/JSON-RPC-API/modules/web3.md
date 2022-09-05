@@ -7,7 +7,7 @@
 
 | Entity | Version |
 | --- | --- |
-| Source | <code>1.11.23-unstable/generated-at:2021-04-30T19:24:24+03:00</code> |
+| Source | <code>1.12.9-unstable/generated-at:2022-07-13T09:50:34-07:00</code> |
 | OpenRPC | <code>1.2.6</code> |
 
 ---
@@ -67,12 +67,12 @@ _None_
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *publicWeb3API) ClientVersion() string {
+func (s *web3API) ClientVersion() string {
 	return s.stack.Server().Name
 }// ClientVersion returns the node name
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L320" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L324" target="_">View on GitHub →</a>
 </p>
 </details>
 
@@ -194,13 +194,13 @@ input <code>hexutil.Bytes</code>
 <details><summary>Source code</summary>
 <p>
 ```go
-func (s *publicWeb3API) Sha3(input hexutil.Bytes) hexutil.Bytes {
+func (s *web3API) Sha3(input hexutil.Bytes) hexutil.Bytes {
 	return crypto.Keccak256(input)
 }// Sha3 applies the ethereum sha3 implementation on the input.
 // It assumes the input is hex encoded.
 
 ```
-<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L326" target="_">View on GitHub →</a>
+<a href="https://github.com/etclabscore/core-geth/blob/master/node/api.go#L330" target="_">View on GitHub →</a>
 </p>
 </details>
 

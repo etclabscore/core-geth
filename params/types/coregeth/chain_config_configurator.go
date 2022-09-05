@@ -498,6 +498,15 @@ func (c *CoreGethChainConfig) SetEIP4399Transition(n *uint64) error {
 	return nil
 }
 
+func (c *CoreGethChainConfig) GetMergeVirtualTransition() *uint64 {
+	return bigNewU64(c.MergeNetsplitVBlock)
+}
+
+func (c *CoreGethChainConfig) SetMergeVirtualTransition(n *uint64) error {
+	c.MergeNetsplitVBlock = setBig(c.MergeNetsplitVBlock, n)
+	return nil
+}
+
 func (c *CoreGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	f := fn()
 	if f == nil || n == nil {

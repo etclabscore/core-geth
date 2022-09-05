@@ -925,7 +925,6 @@ func TestBlockChain_AF_Difficulty_Develop(t *testing.T) {
 	gotRatioComparisons := []ratioComparison{}
 
 	for i, c := range cases {
-
 		if err := chain.Reset(); err != nil {
 			t.Fatal(err)
 		}
@@ -967,7 +966,6 @@ func TestBlockChain_AF_Difficulty_Develop(t *testing.T) {
 		// td ratios
 		// for j := 0; j < c.hardLen; j++ {
 		for j := 0; j < n; j++ {
-
 			td := chain.GetTd(hard[j].Hash(), hard[j].NumberU64())
 			if td != nil {
 				point := plotter.XY{X: float64(hard[j].NumberU64()), Y: float64(td.Uint64())}
@@ -1097,5 +1095,4 @@ got.tdr=%v got.pen=%v`,
 				c.accepted, c.hardGetsHead, hardHead, err, compared.tdRatio, compared.penalty)
 		}
 	}
-
 }

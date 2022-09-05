@@ -48,6 +48,19 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
+
+	applyOverrides := func(config ctypes.ChainConfigurator) {
+		if config != nil {
+			if overrideTerminalTotalDifficulty != nil {
+				config.SetEthashTerminalTotalDifficulty(overrideTerminalTotalDifficulty)
+			}
+			if overrideGrayGlacier != nil {
+				gg := overrideGrayGlacier.Uint64()
+				config.SetEthashEIP5133Transition(&gg)
+			}
+		}
+	}
+
 	// Just commit the new block if there is no stored genesis block.
 	stored := rawdb.ReadCanonicalHash(db, 0)
 	if (stored == common.Hash{}) {
@@ -63,6 +76,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 		if err != nil {
 			return genesis.Config, common.Hash{}, err
 		}
+		applyOverrides(genesis.Config)
 		log.Info("Wrote custom genesis block OK", "config", genesis.Config)
 		return genesis.Config, block.Hash(), nil
 	}
@@ -82,6 +96,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 		if err != nil {
 			return genesis.Config, hash, err
 		}
+		applyOverrides(genesis.Config)
 		return genesis.Config, block.Hash(), nil
 	}
 	// Check whether the genesis block is already written.
@@ -93,14 +108,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 	}
 	// Get the existing chain configuration.
 	newcfg := configOrDefault(genesis, stored)
-	if overrideGrayGlacier != nil {
-		n := overrideGrayGlacier.Uint64()
-		newcfg.SetEthashEIP5133Transition(&n)
-	}
-	if overrideTerminalTotalDifficulty != nil {
-		newcfg.SetEthashTerminalTotalDifficulty(overrideTerminalTotalDifficulty)
-	}
-
+	applyOverrides(newcfg)
 	storedcfg := rawdb.ReadChainConfig(db, stored)
 	if storedcfg == nil {
 		log.Warn("Found genesis block without chain config")
@@ -138,6 +146,8 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 		*/
 		// ... and this is ours:
 		log.Info("Found non-defaulty stored config, using it.")
+		newcfg = storedcfg
+		applyOverrides(newcfg)
 		return storedcfg, stored, nil
 	}
 	// Check config compatibility and write the config. Compatibility errors

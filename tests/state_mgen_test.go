@@ -132,7 +132,7 @@ func TestGenStateAll(t *testing.T) {
 // For production use, use TestGenStateAll.
 func TestGenStateSingles(t *testing.T) {
 	if os.Getenv(CG_GENERATE_STATE_TESTS_KEY) == "" {
-		t.Skip()
+		t.Skip("Use CG_GENERATE_STATE_TESTS=1 to generate state tests.")
 	}
 	if os.Getenv(CG_CHAINCONFIG_FEATURE_EQ_COREGETH_KEY) == "" {
 		t.Fatal("Must use core-geth chain configs for test generation, converting if necessary.")
@@ -141,9 +141,10 @@ func TestGenStateSingles(t *testing.T) {
 	head := build.RunGit("rev-parse", "HEAD")
 	head = strings.TrimSpace(head)
 
-	files := []string{
-		filepath.Join(stateTestDir, "stStaticFlagEnabled/DelegatecallToPrecompileFromContractInitialization.json"),
-		filepath.Join(stateTestDir, "stStaticCall/StaticcallToPrecompileFromCalledContract.json"),
+	filesEnv := os.Getenv("TEST_FILES")
+	files := []string{}
+	for _, f := range strings.Split(filesEnv, ",") {
+		files = append(files, filepath.Join(stateTestDir, f))
 	}
 
 	tm := new(testMatcherGen)
@@ -157,6 +158,7 @@ func TestGenStateSingles(t *testing.T) {
 	tm.generateFromReference("ConstantinopleFix", "ETC_Agharta")
 	tm.generateFromReference("Berlin", "ETC_Magneto")
 	tm.generateFromReference("Istanbul", "ETC_Phoenix")
+	tm.generateFromReference("London", "ETC_Mystique")
 
 	for _, f := range files {
 		tm.runTestFile(t, f, f, tm.testWriteTest)
@@ -243,11 +245,6 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 				targets[targetFork] = make([]stPostState, subtestsLen)
 			}
 
-			targetSubtest := StateSubtest{
-				Fork:  targetFork,
-				Index: s.Index,
-			}
-
 			refPostState := test.json.Post[referenceFork]
 
 			// Initialize the post state with reference indexes.
@@ -259,28 +256,59 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 					Gas:   refPostState[s.Index].Indexes.Gas,
 					Value: refPostState[s.Index].Indexes.Value,
 				},
+				TxBytes:         refPostState[s.Index].TxBytes,
+				ExpectException: refPostState[s.Index].ExpectException,
+				// Root: <This is set pending the results of the Run under the target subtests.>
+				// Logs: <This is set pending the results of the Run under the target subtests.>
 			}
 
 			// vmConfig is constructed using global variables for possible EVM and EWASM interpreters.
 			// These interpreters are configured with environment variables and are assigned in an init() function.
 			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
 
-			// Since we know that tests run with and without the snapshotter features are equivalent, either boolean state
-			// is valid and 'false' is arbitrary.
-			_, statedb, root, err := test.RunNoVerifyWithPost(targetSubtest, vmConfig, false, stPost)
-			if err != nil {
-				t.Fatalf("Error encountered at RunSetPost: %v", err)
+			targetSubtest := StateSubtest{
+				Fork:  targetFork,
+				Index: s.Index,
 			}
 
-			// Assign the generated testable values.
-			stPost.Root = common.UnprefixedHash(root)
-			stPost.Logs = common.UnprefixedHash(rlpHash(statedb.Logs()))
+			_, statedb, root, err := test.RunNoVerifyWithPost(targetSubtest, vmConfig, false, stPost)
+			if err != nil {
+				// Our runner has returned an error.
+				// This can either be an intentional error (testing for the error), or an "unexpected" error,
+				// which, since we're transposing tests, could still be a desirable error.
+				// For example, London adopts EIP1559, while its counterpart, Mystique, does not.
+				// In this case, the London test might return no error, while Mystique would return an error
+				// (eg "unsupported transaction type").
+
+				// An error was returned, but none defined for this test.
+				// We write the error to the generated test.
+				if refPostState[s.Index].ExpectException == "" {
+					// TODO: Turn this error into the kind of error constants that upstream uses, eg. TR_TypeNotSupported.
+					stPost.ExpectException = err.Error()
+				}
+
+				// Either way, we maintain the incumbent post state values,
+				// although we do not expect our runner to return these for us.
+				stPost.Root = refPostState[s.Index].Root
+				stPost.Logs = refPostState[s.Index].Logs
+			}
+
+			if err == nil {
+				if refPostState[s.Index].ExpectException != "" {
+					// An error was expected, but none returned.
+					// We overwrite the expected error to a zero value, because it didn't fail under our target configuration.
+					stPost.ExpectException = ""
+				}
+				// If no error was returned, we can safely expect the root and statedb value to exist for us.
+				stPost.Root = common.UnprefixedHash(root)
+				stPost.Logs = common.UnprefixedHash(rlpHash(statedb.Logs()))
+			}
 
 			targets[targetFork][s.Index] = stPost
 		}
 
 		if len(targets) == 0 {
-			t.Skip()
+			t.Skip("No targets found for this test")
 			skipCallback()
 			return
 		}
@@ -322,13 +350,17 @@ func (tm *testMatcherGen) stateTestRunner(t *testing.T, name string, test *State
 			// These interpreters are configured with environment variables and are assigned in an init() function.
 			vmConfig := vm.Config{EVMInterpreter: *testEVM, EWASMInterpreter: *testEWASM}
 			_, _, err := test.Run(st, vmConfig, false)
+			if err != nil && len(test.json.Post[st.Fork][st.Index].ExpectException) > 0 {
+				// Ignore expected errors (TODO MariusVanDerWijden check error string)
+				return
+			}
 			checkedErr := tm.checkFailure(t, err)
 			if checkedErr != nil && *testEWASM != "" {
 				checkedErr = fmt.Errorf("%w ewasm=%s", checkedErr, *testEWASM)
 			}
 			if checkedErr != nil {
 				if tm.errorPanics {
-					panic(err)
+					panic(checkedErr)
 				} else {
 					t.Fatal(err)
 				}
@@ -346,7 +378,10 @@ func TestGenStateCoreGethConfigs(t *testing.T) {
 
 	// FYI: Possibly the slowest and stupidest way to write 14 files: read 42189 test to do it
 	// and write each file 1486 times.
-	for _, d := range []string{stateTestDir, legacyStateTestDir} {
+	for _, d := range []string{
+		stateTestDir,
+		legacyStateTestDir,
+	} {
 		st.walkFullName(t, d, func(t *testing.T, name string, test *StateTest) {
 			subtests := test.Subtests(nil)
 			for _, subtest := range subtests {

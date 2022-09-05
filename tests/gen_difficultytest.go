@@ -37,8 +37,8 @@ func (d DifficultyTest) MarshalJSON() ([]byte, error) {
 		CurrentTimestamp   math.HexOrDecimal64   `json:"currentTimestamp"`
 		CurrentBlockNumber math.HexOrDecimal64   `json:"currentBlockNumber"`
 		CurrentDifficulty  *math.HexOrDecimal256 `json:"currentDifficulty"`
-		Chainspec          chainspecRef          `json:"chainspec"`
-		Name               string                `json:"name"`
+		// Chainspec          chainspecRef          `json:"chainspec,omitempty"`
+		// Name               string                `json:"name,omitempty"`
 	}
 	var enc DifficultyTest
 	enc.ParentTimestamp = math.HexOrDecimal64(d.ParentTimestamp)
@@ -47,8 +47,8 @@ func (d DifficultyTest) MarshalJSON() ([]byte, error) {
 	enc.CurrentTimestamp = math.HexOrDecimal64(d.CurrentTimestamp)
 	enc.CurrentBlockNumber = math.HexOrDecimal64(d.CurrentBlockNumber)
 	enc.CurrentDifficulty = (*math.HexOrDecimal256)(d.CurrentDifficulty)
-	enc.Chainspec = d.Chainspec
-	enc.Name = d.Name
+	// enc.Chainspec = d.Chainspec
+	// enc.Name = d.Name
 	return json.Marshal(&enc)
 }
 
@@ -61,8 +61,8 @@ func (d *DifficultyTest) UnmarshalJSON(input []byte) error {
 		CurrentTimestamp   *math.HexOrDecimal64  `json:"currentTimestamp"`
 		CurrentBlockNumber *math.HexOrDecimal64  `json:"currentBlockNumber"`
 		CurrentDifficulty  *math.HexOrDecimal256 `json:"currentDifficulty"`
-		Chainspec          *chainspecRef         `json:"chainspec"`
-		Name               *string               `json:"name"`
+		// Chainspec          *chainspecRef         `json:"chainspec,omitempty"`
+		// Name               *string               `json:"name,omitempty"`
 	}
 	var dec DifficultyTest
 	if err := json.Unmarshal(input, &dec); err != nil {
@@ -86,11 +86,11 @@ func (d *DifficultyTest) UnmarshalJSON(input []byte) error {
 	if dec.CurrentDifficulty != nil {
 		d.CurrentDifficulty = (*big.Int)(dec.CurrentDifficulty)
 	}
-	if dec.Chainspec != nil {
-		d.Chainspec = *dec.Chainspec
-	}
-	if dec.Name != nil {
-		d.Name = *dec.Name
-	}
+	// if dec.Chainspec != nil {
+	// 	d.Chainspec = *dec.Chainspec
+	// }
+	// if dec.Name != nil {
+	// 	d.Name = *dec.Name
+	// }
 	return nil
 }

@@ -113,13 +113,6 @@ func TestState(t *testing.T) {
 						if err != nil && *testEWASM != "" {
 							err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
 						}
-						if err != nil && len(test.json.Post[subtest.Fork][subtest.Index].ExpectException) > 0 {
-							// Ignore expected errors (TODO MariusVanDerWijden check error string)
-							return nil
-						}
-						if err == nil && len(test.json.Post[subtest.Fork][subtest.Index].ExpectException) > 0 {
-							return fmt.Errorf("expected exception %q", test.json.Post[subtest.Fork][subtest.Index].ExpectException)
-						}
 						return st.checkFailure(t, err)
 					})
 				})
@@ -130,10 +123,6 @@ func TestState(t *testing.T) {
 							if _, err := snaps.Journal(statedb.IntermediateRoot(false)); err != nil {
 								return err
 							}
-						}
-						if err != nil && len(test.json.Post[subtest.Fork][subtest.Index].ExpectException) > 0 {
-							// Ignore expected errors (TODO MariusVanDerWijden check error string)
-							return nil
 						}
 						if err != nil && *testEWASM != "" {
 							err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)

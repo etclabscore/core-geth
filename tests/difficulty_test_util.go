@@ -33,14 +33,12 @@ import (
 //go:generate go run github.com/fjl/gencodec -type DifficultyTest -field-override difficultyTestMarshaling -out gen_difficultytest.go
 
 type DifficultyTest struct {
-	ParentTimestamp    uint64       `json:"parentTimestamp"`
-	ParentDifficulty   *big.Int     `json:"parentDifficulty"`
-	UncleHash          common.Hash  `json:"parentUncles"`
-	CurrentTimestamp   uint64       `json:"currentTimestamp"`
-	CurrentBlockNumber uint64       `json:"currentBlockNumber"`
-	CurrentDifficulty  *big.Int     `json:"currentDifficulty"`
-	Chainspec          chainspecRef `json:"chainspec,omitempty"` // CG-only
-	Name               string       `json:"name,omitempty"`      // CG-only
+	ParentTimestamp    uint64      `json:"parentTimestamp"`
+	ParentDifficulty   *big.Int    `json:"parentDifficulty"`
+	UncleHash          common.Hash `json:"parentUncles"`
+	CurrentTimestamp   uint64      `json:"currentTimestamp"`
+	CurrentBlockNumber uint64      `json:"currentBlockNumber"`
+	CurrentDifficulty  *big.Int    `json:"currentDifficulty"`
 }
 
 type difficultyTestMarshaling struct {
@@ -50,8 +48,6 @@ type difficultyTestMarshaling struct {
 	CurrentDifficulty  *math.HexOrDecimal256
 	UncleHash          common.Hash
 	CurrentBlockNumber math.HexOrDecimal64
-	Chainspec          chainspecRef `json:"chainspec"`
-	Name               string
 }
 
 func (test *DifficultyTest) Run(config ctypes.ChainConfigurator) error {
@@ -111,33 +107,126 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 	},
 	"difficulty.json": mainnetChainConfig,
 	"ETC_Atlantis": &coregeth.CoreGethChainConfig{
-		Ethash:        new(ctypes.EthashConfig),
-		EIP100FBlock:  big.NewInt(0),
-		EIP140FBlock:  big.NewInt(0),
-		EIP198FBlock:  big.NewInt(0),
-		EIP211FBlock:  big.NewInt(0),
-		EIP212FBlock:  big.NewInt(0),
-		EIP213FBlock:  big.NewInt(0),
-		EIP214FBlock:  big.NewInt(0),
-		EIP658FBlock:  big.NewInt(0),
-		DisposalBlock: big.NewInt(0),
+		Ethash:     new(ctypes.EthashConfig),
+		NetworkID:  1,
+		ChainID:    big.NewInt(1),
+		EIP2FBlock: big.NewInt(0),
+		EIP7FBlock: big.NewInt(0),
+
+		EIP150Block: big.NewInt(0),
+
+		EIP155Block:  big.NewInt(0),
+		EIP160FBlock: big.NewInt(0),
+
+		// EIP158~
+		EIP161FBlock: big.NewInt(0),
+		EIP170FBlock: big.NewInt(0),
+
+		// Byzantium eq
+		EIP100FBlock: big.NewInt(0),
+		EIP140FBlock: big.NewInt(0),
+		EIP198FBlock: big.NewInt(0),
+		EIP211FBlock: big.NewInt(0),
+		EIP212FBlock: big.NewInt(0),
+		EIP213FBlock: big.NewInt(0),
+		EIP214FBlock: big.NewInt(0),
+		EIP658FBlock: big.NewInt(0),
+
+		// // Constantinople eq, aka Agharta
+		// EIP145FBlock:  big.NewInt(0),
+		// EIP1014FBlock: big.NewInt(0),
+		// EIP1052FBlock: big.NewInt(0),
+		// // EIP1283FBlock:   big.NewInt(0),
+		// // PetersburgBlock: big.NewInt(0),
+		//
+		// // Istanbul eq, aka Phoenix
+		// // ECIP-1088
+		// EIP152FBlock:  big.NewInt(0),
+		// EIP1108FBlock: big.NewInt(0),
+		// EIP1344FBlock: big.NewInt(0),
+		// EIP1884FBlock: big.NewInt(0),
+		// EIP2028FBlock: big.NewInt(0),
+		// EIP2200FBlock: big.NewInt(0), // RePetersburg (=~ re-1283)
+		//
+		// // Berlin eq, aka Magneto
+		// EIP2565FBlock: big.NewInt(0),
+		// EIP2718FBlock: big.NewInt(0),
+		// EIP2929FBlock: big.NewInt(0),
+		// EIP2930FBlock: big.NewInt(0),
+		//
+		// ECIP1099FBlock: big.NewInt(0), // Etchash (DAG size limit)
+		//
+		// // London (partially), aka Mystique
+		// EIP3529FBlock: big.NewInt(0),
+		// EIP3541FBlock: big.NewInt(0),
+
+		DisposalBlock:      big.NewInt(0),
+		ECIP1017FBlock:     big.NewInt(0),
+		ECIP1017EraRounds:  big.NewInt(0),
+		ECIP1010PauseBlock: big.NewInt(0),
+		ECIP1010Length:     big.NewInt(0),
+		ECBP1100FBlock:     big.NewInt(0), // ETA 09 Oct 2020
 	},
 	"ETC_Agharta": &coregeth.CoreGethChainConfig{
-		Ethash:        new(ctypes.EthashConfig),
-		EIP100FBlock:  big.NewInt(0),
-		EIP140FBlock:  big.NewInt(0),
-		EIP198FBlock:  big.NewInt(0),
-		EIP211FBlock:  big.NewInt(0),
-		EIP212FBlock:  big.NewInt(0),
-		EIP213FBlock:  big.NewInt(0),
-		EIP214FBlock:  big.NewInt(0),
-		EIP658FBlock:  big.NewInt(0),
+		Ethash:     new(ctypes.EthashConfig),
+		NetworkID:  1,
+		ChainID:    big.NewInt(1),
+		EIP2FBlock: big.NewInt(0),
+		EIP7FBlock: big.NewInt(0),
+
+		EIP150Block: big.NewInt(0),
+
+		EIP155Block:  big.NewInt(0),
+		EIP160FBlock: big.NewInt(0),
+
+		// EIP158~
+		EIP161FBlock: big.NewInt(0),
+		EIP170FBlock: big.NewInt(0),
+
+		// Byzantium eq
+		EIP100FBlock: big.NewInt(0),
+		EIP140FBlock: big.NewInt(0),
+		EIP198FBlock: big.NewInt(0),
+		EIP211FBlock: big.NewInt(0),
+		EIP212FBlock: big.NewInt(0),
+		EIP213FBlock: big.NewInt(0),
+		EIP214FBlock: big.NewInt(0),
+		EIP658FBlock: big.NewInt(0),
+
+		// Constantinople eq, aka Agharta
 		EIP145FBlock:  big.NewInt(0),
 		EIP1014FBlock: big.NewInt(0),
 		EIP1052FBlock: big.NewInt(0),
-		EIP1283FBlock: big.NewInt(0),
-		EIP2200FBlock: big.NewInt(0), // Petersburg
-		DisposalBlock: big.NewInt(0),
+		// EIP1283FBlock:   big.NewInt(0),
+		// PetersburgBlock: big.NewInt(0),
+
+		// // Istanbul eq, aka Phoenix
+		// // ECIP-1088
+		// EIP152FBlock:  big.NewInt(0),
+		// EIP1108FBlock: big.NewInt(0),
+		// EIP1344FBlock: big.NewInt(0),
+		// EIP1884FBlock: big.NewInt(0),
+		// EIP2028FBlock: big.NewInt(0),
+		// EIP2200FBlock: big.NewInt(0), // RePetersburg (=~ re-1283)
+		//
+		// // Berlin eq, aka Magneto
+		// EIP2565FBlock: big.NewInt(0),
+		// EIP2718FBlock: big.NewInt(0),
+		// EIP2929FBlock: big.NewInt(0),
+		// EIP2930FBlock: big.NewInt(0),
+		//
+		// ECIP1099FBlock: big.NewInt(0), // Etchash (DAG size limit)
+		//
+		// // London (partially), aka Mystique
+		// EIP3529FBlock: big.NewInt(0),
+		// EIP3541FBlock: big.NewInt(0),
+
+		DisposalBlock:      big.NewInt(0),
+		ECIP1017FBlock:     big.NewInt(0),
+		ECIP1017EraRounds:  big.NewInt(0),
+		ECIP1010PauseBlock: big.NewInt(0),
+		ECIP1010Length:     big.NewInt(0),
+		ECBP1100FBlock:     big.NewInt(0), // ETA 09 Oct 2020
 	},
 	"EIP2384": &goethereum.ChainConfig{
 		Ethash:              new(ctypes.EthashConfig),
@@ -148,20 +237,186 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 		MuirGlacierBlock:    big.NewInt(0),
 	},
 	"ETC_Phoenix": &coregeth.CoreGethChainConfig{
-		Ethash:        new(ctypes.EthashConfig),
-		EIP100FBlock:  big.NewInt(0),
-		EIP140FBlock:  big.NewInt(0),
-		EIP198FBlock:  big.NewInt(0),
-		EIP211FBlock:  big.NewInt(0),
-		EIP212FBlock:  big.NewInt(0),
-		EIP213FBlock:  big.NewInt(0),
-		EIP214FBlock:  big.NewInt(0),
-		EIP658FBlock:  big.NewInt(0),
+		Ethash:     new(ctypes.EthashConfig),
+		NetworkID:  1,
+		ChainID:    big.NewInt(1),
+		EIP2FBlock: big.NewInt(0),
+		EIP7FBlock: big.NewInt(0),
+
+		EIP150Block: big.NewInt(0),
+
+		EIP155Block:  big.NewInt(0),
+		EIP160FBlock: big.NewInt(0),
+
+		// EIP158~
+		EIP161FBlock: big.NewInt(0),
+		EIP170FBlock: big.NewInt(0),
+
+		// Byzantium eq
+		EIP100FBlock: big.NewInt(0),
+		EIP140FBlock: big.NewInt(0),
+		EIP198FBlock: big.NewInt(0),
+		EIP211FBlock: big.NewInt(0),
+		EIP212FBlock: big.NewInt(0),
+		EIP213FBlock: big.NewInt(0),
+		EIP214FBlock: big.NewInt(0),
+		EIP658FBlock: big.NewInt(0),
+
+		// Constantinople eq, aka Agharta
 		EIP145FBlock:  big.NewInt(0),
 		EIP1014FBlock: big.NewInt(0),
 		EIP1052FBlock: big.NewInt(0),
-		EIP1283FBlock: big.NewInt(0),
-		EIP2200FBlock: big.NewInt(0), // Petersburg
-		DisposalBlock: big.NewInt(0),
+		// EIP1283FBlock:   big.NewInt(0),
+		// PetersburgBlock: big.NewInt(0),
+
+		// Istanbul eq, aka Phoenix
+		// ECIP-1088
+		EIP152FBlock:  big.NewInt(0),
+		EIP1108FBlock: big.NewInt(0),
+		EIP1344FBlock: big.NewInt(0),
+		EIP1884FBlock: big.NewInt(0),
+		EIP2028FBlock: big.NewInt(0),
+		EIP2200FBlock: big.NewInt(0), // RePetersburg (=~ re-1283)
+
+		// // Berlin eq, aka Magneto
+		// EIP2565FBlock: big.NewInt(0),
+		// EIP2718FBlock: big.NewInt(0),
+		// EIP2929FBlock: big.NewInt(0),
+		// EIP2930FBlock: big.NewInt(0),
+		//
+		// ECIP1099FBlock: big.NewInt(0), // Etchash (DAG size limit)
+		//
+		// // London (partially), aka Mystique
+		// EIP3529FBlock: big.NewInt(0),
+		// EIP3541FBlock: big.NewInt(0),
+
+		DisposalBlock:      big.NewInt(0),
+		ECIP1017FBlock:     big.NewInt(0),
+		ECIP1017EraRounds:  big.NewInt(0),
+		ECIP1010PauseBlock: big.NewInt(0),
+		ECIP1010Length:     big.NewInt(0),
+		ECBP1100FBlock:     big.NewInt(0), // ETA 09 Oct 2020
+	},
+	"ETC_Magneto": &coregeth.CoreGethChainConfig{
+		Ethash:     new(ctypes.EthashConfig),
+		NetworkID:  1,
+		ChainID:    big.NewInt(1),
+		EIP2FBlock: big.NewInt(0),
+		EIP7FBlock: big.NewInt(0),
+
+		EIP150Block: big.NewInt(0),
+
+		EIP155Block:  big.NewInt(0),
+		EIP160FBlock: big.NewInt(0),
+
+		// EIP158~
+		EIP161FBlock: big.NewInt(0),
+		EIP170FBlock: big.NewInt(0),
+
+		// Byzantium eq
+		EIP100FBlock: big.NewInt(0),
+		EIP140FBlock: big.NewInt(0),
+		EIP198FBlock: big.NewInt(0),
+		EIP211FBlock: big.NewInt(0),
+		EIP212FBlock: big.NewInt(0),
+		EIP213FBlock: big.NewInt(0),
+		EIP214FBlock: big.NewInt(0),
+		EIP658FBlock: big.NewInt(0),
+
+		// Constantinople eq, aka Agharta
+		EIP145FBlock:  big.NewInt(0),
+		EIP1014FBlock: big.NewInt(0),
+		EIP1052FBlock: big.NewInt(0),
+		// EIP1283FBlock:   big.NewInt(0),
+		// PetersburgBlock: big.NewInt(0),
+
+		// Istanbul eq, aka Phoenix
+		// ECIP-1088
+		EIP152FBlock:  big.NewInt(0),
+		EIP1108FBlock: big.NewInt(0),
+		EIP1344FBlock: big.NewInt(0),
+		EIP1884FBlock: big.NewInt(0),
+		EIP2028FBlock: big.NewInt(0),
+		EIP2200FBlock: big.NewInt(0), // RePetersburg (=~ re-1283)
+
+		// Berlin eq, aka Magneto
+		EIP2565FBlock: big.NewInt(0),
+		EIP2718FBlock: big.NewInt(0),
+		EIP2929FBlock: big.NewInt(0),
+		EIP2930FBlock: big.NewInt(0),
+
+		// ECIP1099FBlock: big.NewInt(0), // Etchash (DAG size limit)
+		//
+		// // London (partially), aka Mystique
+		// EIP3529FBlock: big.NewInt(0),
+		// EIP3541FBlock: big.NewInt(0),
+
+		DisposalBlock:      big.NewInt(0),
+		ECIP1017FBlock:     big.NewInt(0),
+		ECIP1017EraRounds:  big.NewInt(0),
+		ECIP1010PauseBlock: big.NewInt(0),
+		ECIP1010Length:     big.NewInt(0),
+		ECBP1100FBlock:     big.NewInt(0), // ETA 09 Oct 2020
+	},
+	"ETC_Mystique": &coregeth.CoreGethChainConfig{
+		Ethash:     new(ctypes.EthashConfig),
+		NetworkID:  1,
+		ChainID:    big.NewInt(1),
+		EIP2FBlock: big.NewInt(0),
+		EIP7FBlock: big.NewInt(0),
+
+		EIP150Block: big.NewInt(0),
+
+		EIP155Block:  big.NewInt(0),
+		EIP160FBlock: big.NewInt(0),
+
+		// EIP158~
+		EIP161FBlock: big.NewInt(0),
+		EIP170FBlock: big.NewInt(0),
+
+		// Byzantium eq
+		EIP100FBlock: big.NewInt(0),
+		EIP140FBlock: big.NewInt(0),
+		EIP198FBlock: big.NewInt(0),
+		EIP211FBlock: big.NewInt(0),
+		EIP212FBlock: big.NewInt(0),
+		EIP213FBlock: big.NewInt(0),
+		EIP214FBlock: big.NewInt(0),
+		EIP658FBlock: big.NewInt(0),
+
+		// Constantinople eq, aka Agharta
+		EIP145FBlock:  big.NewInt(0),
+		EIP1014FBlock: big.NewInt(0),
+		EIP1052FBlock: big.NewInt(0),
+		// EIP1283FBlock:   big.NewInt(0),
+		// PetersburgBlock: big.NewInt(0),
+
+		// Istanbul eq, aka Phoenix
+		// ECIP-1088
+		EIP152FBlock:  big.NewInt(0),
+		EIP1108FBlock: big.NewInt(0),
+		EIP1344FBlock: big.NewInt(0),
+		EIP1884FBlock: big.NewInt(0),
+		EIP2028FBlock: big.NewInt(0),
+		EIP2200FBlock: big.NewInt(0), // RePetersburg (=~ re-1283)
+
+		// Berlin eq, aka Magneto
+		EIP2565FBlock: big.NewInt(0),
+		EIP2718FBlock: big.NewInt(0),
+		EIP2929FBlock: big.NewInt(0),
+		EIP2930FBlock: big.NewInt(0),
+
+		ECIP1099FBlock: big.NewInt(0), // Etchash (DAG size limit)
+
+		// London (partially), aka Mystique
+		EIP3529FBlock: big.NewInt(0),
+		EIP3541FBlock: big.NewInt(0),
+
+		DisposalBlock:      big.NewInt(0),
+		ECIP1017FBlock:     big.NewInt(0),
+		ECIP1017EraRounds:  big.NewInt(0),
+		ECIP1010PauseBlock: big.NewInt(0),
+		ECIP1010Length:     big.NewInt(0),
+		ECBP1100FBlock:     big.NewInt(0), // ETA 09 Oct 2020
 	},
 }

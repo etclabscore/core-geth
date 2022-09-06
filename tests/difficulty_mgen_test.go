@@ -144,17 +144,55 @@ func TestDifficultyGen(t *testing.T) {
 		t.Skip()
 	}
 
+	configs := map[string]ctypes.ChainConfigurator{
+		"ETC_Atlantis": difficultyChainConfigurations["ETC_Atlantis"],
+		"ETC_Agharta":  difficultyChainConfigurations["ETC_Agharta"],
+		"ETC_Phoenix":  difficultyChainConfigurations["ETC_Phoenix"],
+		"ETC_Magneto":  difficultyChainConfigurations["ETC_Magneto"],
+		"ETC_Mystique": difficultyChainConfigurations["ETC_Mystique"],
+	}
+
 	targetDir := filepath.Join(generatedBasedir, "BasicTests")
 	if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
 		t.Fatal(err)
 	}
 
-	configs := map[string]ctypes.ChainConfigurator{
-		"ETC_Atlantis": difficultyChainConfigurations["ETC_Atlantis"],
-		"ETC_Agharta":  difficultyChainConfigurations["ETC_Agharta"],
-		"ETC_Phoenix":  difficultyChainConfigurations["ETC_Phoenix"],
+	// Write all the configs we'll use to JSON files for reference and provenance.
+	if err := os.MkdirAll(filepath.Join(targetDir, "configs"), os.ModePerm); err != nil {
+		t.Fatal(err)
+	}
+	for configName, config := range configs {
+		cgConfig := &coregeth.CoreGethChainConfig{}
+		err := confp.Convert(config, cgConfig)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		j, err := json.MarshalIndent(cgConfig, "", "    ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = ioutil.WriteFile(filepath.Join(targetDir, "configs", configName+".json"), j, os.ModePerm)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
+	// Establish test matrix values.
+	//
+	// Multiples of 8 offset by 1, maxing out at 121.
+	timestampOffsets := func() []uint64 {
+		var r []uint64
+		for i := 1; i <= 121; i += 8 {
+			r = append(r, uint64(i))
+		}
+		return r
+	}()
+
+	// Establish a constant value for simulating a block referencing any uncles.
+	// The headers passed to this method do not need to be valid.
+	// It is important, however, that the value is consistent to avoid noisy differences between generations.
+	uncleTrueHash := types.CalcUncleHash([]*types.Header{{Number: big.NewInt(1)}})
 	parentDifficulty := new(big.Int).Mul(vars.MinimumDifficulty, big.NewInt(10))
 
 	for name, config := range configs {
@@ -162,18 +200,11 @@ func TestDifficultyGen(t *testing.T) {
 		targetFilePath := filepath.Join(targetDir, targetFileBaseName)
 		os.Truncate(targetFilePath, 0)
 		for _, blockNumber := range []uint64{0, 1, 10_000_000} {
-			for _, timestampOffset := range []uint64{1, 9, 18, 27, 36, 45, 54, 63, 71, 80, 89, 98} {
+			for _, timestampOffset := range timestampOffsets {
 				for _, uncle := range []bool{false, true} {
 					uncleHash := types.CalcUncleHash(nil)
 					if uncle {
-						// The headers passed to this method do not need to be valid.
-						// It is important, however, that the value is consistent,
-						// to avoid noisy meaningless differences between generations.
-						uncleHash = types.CalcUncleHash([]*types.Header{
-							{
-								Number: big.NewInt(1),
-							},
-						})
+						uncleHash = uncleTrueHash
 					}
 
 					// Establish test parameters.
@@ -182,7 +213,7 @@ func TestDifficultyGen(t *testing.T) {
 						ParentDifficulty:   parentDifficulty,
 						UncleHash:          uncleHash,
 						CurrentBlockNumber: blockNumber,
-						// CurrentTimestamp:   This gets filled later.
+						// CurrentTimestamp:  This gets filled later.
 						// CurrentDifficulty: This gets filled later.
 					}
 

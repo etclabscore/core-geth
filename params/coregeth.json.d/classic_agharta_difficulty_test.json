@@ -1,10 +1,17 @@
 {
-    "networkId": 0,
-    "chainId": null,
+    "networkId": 1,
+    "chainId": 1,
     "supportedProtocolVersions": [
-        66,
-        65
+        67,
+        66
     ],
+    "eip2FBlock": 0,
+    "eip7FBlock": 0,
+    "eip150Block": 0,
+    "eip155Block": 0,
+    "eip160Block": 0,
+    "eip161FBlock": 0,
+    "eip170FBlock": 0,
     "eip100FBlock": 0,
     "eip140FBlock": 0,
     "eip198FBlock": 0,
@@ -16,8 +23,11 @@
     "eip145FBlock": 0,
     "eip1014FBlock": 0,
     "eip1052FBlock": 0,
-    "eip1283FBlock": 0,
-    "eip2200FBlock": 0,
+    "ecip1010PauseBlock": 0,
+    "ecip1010Length": 0,
+    "ecip1017FBlock": 0,
+    "ecip1017EraRounds": 0,
+    "ecbp1100FBlock": 0,
     "disposalBlock": 0,
     "ethash": {},
     "requireBlockHashes": null

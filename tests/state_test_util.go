@@ -73,7 +73,7 @@ type stJSON struct {
 	Env  stEnv                    `json:"env"`
 	Pre  genesisT.GenesisAlloc    `json:"pre"`
 	Tx   stTransaction            `json:"transaction"`
-	Out  hexutil.Bytes            `json:"out"`
+	Out  hexutil.Bytes            `json:"out,omitempty"`
 	Post map[string][]stPostState `json:"post"`
 }
 
@@ -116,6 +116,7 @@ type stEnv struct {
 	Number     uint64         `json:"currentNumber"     gencodec:"required"`
 	Timestamp  uint64         `json:"currentTimestamp"  gencodec:"required"`
 	BaseFee    *big.Int       `json:"currentBaseFee,omitempty"    gencodec:"optional"`
+	Previous   common.Hash    `json:"previousHash,omitempty"      gencodec:"optional"` // Previous is an unused field, but it exists in the tests.
 }
 
 type stEnvMarshaling struct {
@@ -126,6 +127,7 @@ type stEnvMarshaling struct {
 	Number     math.HexOrDecimal64
 	Timestamp  math.HexOrDecimal64
 	BaseFee    *math.HexOrDecimal256
+	Previous   common.Hash // unused
 }
 
 //go:generate go run github.com/fjl/gencodec -type stTransaction -field-override stTransactionMarshaling -out gen_sttransaction.go
@@ -141,6 +143,7 @@ type stTransaction struct {
 	GasLimit             []uint64            `json:"gasLimit"`
 	Value                []string            `json:"value"`
 	PrivateKey           []byte              `json:"secretKey"`
+	Sender               common.Address      `json:"sender,omitempty"`
 }
 
 type stTransactionMarshaling struct {

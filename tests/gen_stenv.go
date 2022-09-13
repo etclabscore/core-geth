@@ -16,16 +16,16 @@ var _ = (*stEnvMarshaling)(nil)
 // MarshalJSON marshals as JSON.
 func (s stEnv) MarshalJSON() ([]byte, error) {
 	type stEnv struct {
-		Coinbase   common.UnprefixedAddress `json:"currentCoinbase"   gencodec:"required"`
-		Difficulty *math.HexOrDecimal256    `json:"currentDifficulty" gencodec:"optional"`
-		Random     *math.HexOrDecimal256    `json:"currentRandom"     gencodec:"optional"`
-		GasLimit   math.HexOrDecimal64      `json:"currentGasLimit"   gencodec:"required"`
-		Number     math.HexOrDecimal64      `json:"currentNumber"     gencodec:"required"`
-		Timestamp  math.HexOrDecimal64      `json:"currentTimestamp"  gencodec:"required"`
-		BaseFee    *math.HexOrDecimal256    `json:"currentBaseFee"    gencodec:"optional"`
+		Coinbase   common.Address        `json:"currentCoinbase"   gencodec:"required"`
+		Difficulty *math.HexOrDecimal256 `json:"currentDifficulty" gencodec:"optional"`
+		Random     *math.HexOrDecimal256 `json:"currentRandom,omitempty"     gencodec:"optional"`
+		GasLimit   math.HexOrDecimal64   `json:"currentGasLimit"   gencodec:"required"`
+		Number     math.HexOrDecimal64   `json:"currentNumber"     gencodec:"required"`
+		Timestamp  math.HexOrDecimal64   `json:"currentTimestamp"  gencodec:"required"`
+		BaseFee    *math.HexOrDecimal256 `json:"currentBaseFee,omitempty"    gencodec:"optional"`
 	}
 	var enc stEnv
-	enc.Coinbase = common.UnprefixedAddress(s.Coinbase)
+	enc.Coinbase = s.Coinbase
 	enc.Difficulty = (*math.HexOrDecimal256)(s.Difficulty)
 	enc.Random = (*math.HexOrDecimal256)(s.Random)
 	enc.GasLimit = math.HexOrDecimal64(s.GasLimit)
@@ -38,13 +38,13 @@ func (s stEnv) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON unmarshals from JSON.
 func (s *stEnv) UnmarshalJSON(input []byte) error {
 	type stEnv struct {
-		Coinbase   *common.UnprefixedAddress `json:"currentCoinbase"   gencodec:"required"`
-		Difficulty *math.HexOrDecimal256     `json:"currentDifficulty" gencodec:"optional"`
-		Random     *math.HexOrDecimal256     `json:"currentRandom"     gencodec:"optional"`
-		GasLimit   *math.HexOrDecimal64      `json:"currentGasLimit"   gencodec:"required"`
-		Number     *math.HexOrDecimal64      `json:"currentNumber"     gencodec:"required"`
-		Timestamp  *math.HexOrDecimal64      `json:"currentTimestamp"  gencodec:"required"`
-		BaseFee    *math.HexOrDecimal256     `json:"currentBaseFee"    gencodec:"optional"`
+		Coinbase   *common.Address       `json:"currentCoinbase"   gencodec:"required"`
+		Difficulty *math.HexOrDecimal256 `json:"currentDifficulty" gencodec:"optional"`
+		Random     *math.HexOrDecimal256 `json:"currentRandom,omitempty"     gencodec:"optional"`
+		GasLimit   *math.HexOrDecimal64  `json:"currentGasLimit"   gencodec:"required"`
+		Number     *math.HexOrDecimal64  `json:"currentNumber"     gencodec:"required"`
+		Timestamp  *math.HexOrDecimal64  `json:"currentTimestamp"  gencodec:"required"`
+		BaseFee    *math.HexOrDecimal256 `json:"currentBaseFee,omitempty"    gencodec:"optional"`
 	}
 	var dec stEnv
 	if err := json.Unmarshal(input, &dec); err != nil {
@@ -53,7 +53,7 @@ func (s *stEnv) UnmarshalJSON(input []byte) error {
 	if dec.Coinbase == nil {
 		return errors.New("missing required field 'currentCoinbase' for stEnv")
 	}
-	s.Coinbase = common.Address(*dec.Coinbase)
+	s.Coinbase = *dec.Coinbase
 	if dec.Difficulty != nil {
 		s.Difficulty = (*big.Int)(dec.Difficulty)
 	}

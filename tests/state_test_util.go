@@ -111,15 +111,15 @@ type stPostStateIndexes struct {
 type stEnv struct {
 	Coinbase   common.Address `json:"currentCoinbase"   gencodec:"required"`
 	Difficulty *big.Int       `json:"currentDifficulty" gencodec:"optional"`
-	Random     *big.Int       `json:"currentRandom"     gencodec:"optional"`
+	Random     *big.Int       `json:"currentRandom,omitempty"     gencodec:"optional"`
 	GasLimit   uint64         `json:"currentGasLimit"   gencodec:"required"`
 	Number     uint64         `json:"currentNumber"     gencodec:"required"`
 	Timestamp  uint64         `json:"currentTimestamp"  gencodec:"required"`
-	BaseFee    *big.Int       `json:"currentBaseFee"    gencodec:"optional"`
+	BaseFee    *big.Int       `json:"currentBaseFee,omitempty"    gencodec:"optional"`
 }
 
 type stEnvMarshaling struct {
-	Coinbase   common.UnprefixedAddress
+	Coinbase   common.Address
 	Difficulty *math.HexOrDecimal256
 	Random     *math.HexOrDecimal256
 	GasLimit   math.HexOrDecimal64

@@ -212,8 +212,10 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 				}
 				b, _ := json.MarshalIndent(conf, "", "    ")
 				configPathTarget := filepath.Join(targetDirCommon, fmt.Sprintf("%s_config.json", target)) // e.g. "testdata_generated/GeneralStateTests/ETC_Atlantis_config.json"
-				if err := ioutil.WriteFile(configPathTarget, b, os.ModePerm); err != nil {
-					t.Fatal(err)
+				if _, statErr := os.Stat(configPathTarget); os.IsNotExist(statErr) {
+					if err := ioutil.WriteFile(configPathTarget, b, os.ModePerm); err != nil {
+						t.Fatal(err)
+					}
 				}
 			}
 		},

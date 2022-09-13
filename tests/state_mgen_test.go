@@ -113,19 +113,6 @@ func TestGenStateAll(t *testing.T) {
 		legacyStateTestDir,
 	} {
 		tm.walkFullName(t, dir, tm.testWriteTest)
-
-		// Write the chain config file.
-		// testdata/GeneralStateTests -> testdata/GeneralStateTests_configs.json
-		b, err := json.MarshalIndent(tm.allConfigs, "", "    ")
-		if err != nil {
-			t.Fatal(err)
-		}
-		err = ioutil.WriteFile(fmt.Sprintf("%s_configs.json", dir), b, os.ModePerm)
-		if err != nil {
-			t.Fatal(err)
-		}
-		// Reset map as to only write config pertinent to forks in a tests directory.
-		tm.allConfigs = make(map[string]*coregeth.CoreGethChainConfig)
 	}
 }
 
@@ -205,6 +192,22 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 
 			if err := os.Rename(tmpFileName, targetPath); err != nil {
 				t.Fatal(err)
+			}
+
+			// Write all relevant configs.
+			// FIXME This is obviously super redundant, but hey.
+			sts := test.Subtests(nil)
+			for _, s := range sts {
+				target := tm.getGenerationTarget(s.Fork)
+				if target == "" {
+					continue
+				}
+				conf, _, err := GetChainConfig(target)
+				if err != nil {
+					t.Fatal(err)
+				}
+				b, _ := json.MarshalIndent(conf, "", "    ")
+				ioutil.WriteFile(filepath.Join(generatedBasedir, fmt.Sprintf("%s_config.json", target)), b, os.ModePerm)
 			}
 		},
 		// On-Skip:

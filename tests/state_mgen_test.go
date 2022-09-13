@@ -195,7 +195,11 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 			}
 
 			// Write all relevant configs.
-			// FIXME This is obviously super redundant, but hey.
+
+			relSpl := strings.Split(rel, string(filepath.Separator))
+			targetDirCommon := filepath.Join(generatedBasedir, relSpl[0]) // e.g. "testdata_generated/GeneralStateTests"
+
+			// FIXME This is obviously super redundant.
 			sts := test.Subtests(nil)
 			for _, s := range sts {
 				target := tm.getGenerationTarget(s.Fork)
@@ -207,7 +211,10 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 					t.Fatal(err)
 				}
 				b, _ := json.MarshalIndent(conf, "", "    ")
-				ioutil.WriteFile(filepath.Join(generatedBasedir, fmt.Sprintf("%s_config.json", target)), b, os.ModePerm)
+				configPathTarget := filepath.Join(targetDirCommon, fmt.Sprintf("%s_config.json", target)) // e.g. "testdata_generated/GeneralStateTests/ETC_Atlantis_config.json"
+				if err := ioutil.WriteFile(configPathTarget, b, os.ModePerm); err != nil {
+					t.Fatal(err)
+				}
 			}
 		},
 		// On-Skip:

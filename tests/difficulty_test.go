@@ -27,13 +27,16 @@ func TestDifficulty(t *testing.T) {
 
 	dt := new(testMatcher)
 
-	// Not difficulty-tests
+	// Not difficulty tests
 	dt.skipLoad("hexencodetest.*")
 	dt.skipLoad("crypto.*")
 	dt.skipLoad("blockgenesistest\\.json")
 	dt.skipLoad("genesishashestest\\.json")
 	dt.skipLoad("keyaddrtest\\.json")
 	dt.skipLoad("txtest\\.json")
+
+	// Not difficulty tests: configs
+	dt.skipLoad(".*config.*")
 
 	// files are 2 years old, contains strange values
 	dt.skipLoad("difficultyCustomHomestead\\.json")
@@ -44,17 +47,22 @@ func TestDifficulty(t *testing.T) {
 		dt.config(k, v)
 	}
 
-	dt.walk(t, difficultyTestDir, func(t *testing.T, name string, test *DifficultyTest) {
-		cfg, _ := dt.findConfig(name)
+	for _, dir := range []string{
+		difficultyTestDir,
+		difficultyTestDirETC,
+	} {
+		dt.walk(t, dir, func(t *testing.T, name string, test *DifficultyTest) {
+			cfg, _ := dt.findConfig(name)
 
-		if test.ParentDifficulty.Cmp(vars.MinimumDifficulty) < 0 {
-			t.Skip("difficulty below minimum")
-			return
-		}
-		if err := dt.checkFailure(t, test.Run(cfg)); err != nil {
-			t.Error(err)
-		}
-	})
+			if test.ParentDifficulty.Cmp(vars.MinimumDifficulty) < 0 {
+				t.Skip("difficulty below minimum")
+				return
+			}
+			if err := dt.checkFailure(t, test.Run(cfg)); err != nil {
+				t.Error(err)
+			}
+		})
+	}
 }
 
 // func TestDifficultyNDJSON(t *testing.T) {

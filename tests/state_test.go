@@ -52,6 +52,9 @@ func TestState(t *testing.T) {
 	st.skipLoad(`^stTimeConsuming/`)
 	st.skipLoad(`.*vmPerformance/loop.*`)
 
+	// Not state tests: configs
+	st.skipLoad(".*config.*")
+
 	// Uses 1GB RAM per tested fork
 	st.skipLoad(`^stStaticCall/static_Call1MB`)
 
@@ -101,6 +104,9 @@ func TestState(t *testing.T) {
 		stateTestDir,
 		legacyStateTestDir,
 		benchmarksDir,
+
+		stateTestDirETC,
+		legacyTestDirETC,
 	} {
 		st.walk(t, dir, func(t *testing.T, name string, test *StateTest) {
 			for _, subtest := range test.Subtests(st.skipforkpat) {

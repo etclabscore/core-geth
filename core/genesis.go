@@ -72,11 +72,11 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			log.Info("Writing custom genesis block")
 		}
 
+		applyOverrides(genesis.Config)
 		block, err := CommitGenesis(genesis, db)
 		if err != nil {
 			return genesis.Config, common.Hash{}, err
 		}
-		applyOverrides(genesis.Config)
 		log.Info("Wrote custom genesis block OK", "config", genesis.Config)
 		return genesis.Config, block.Hash(), nil
 	}

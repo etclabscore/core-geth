@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/big"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -211,7 +212,8 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 					t.Fatal(err)
 				}
 				b, _ := json.MarshalIndent(conf, "", "    ")
-				configPathTarget := filepath.Join(targetDirCommon, fmt.Sprintf("%s_config.json", target)) // e.g. "testdata_generated/GeneralStateTests/ETC_Atlantis_config.json"
+				configPathTarget := filepath.Join(targetDirCommon, "configs", fmt.Sprintf("%s_config.json", target)) // e.g. "testdata_generated/GeneralStateTests/ETC_Atlantis_config.json"
+				os.MkdirAll(filepath.Dir(configPathTarget), os.ModePerm)
 				if _, statErr := os.Stat(configPathTarget); os.IsNotExist(statErr) {
 					if err := ioutil.WriteFile(configPathTarget, b, os.ModePerm); err != nil {
 						t.Fatal(err)
@@ -343,6 +345,20 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 			t.Skip("No targets found for this test")
 			skipCallback()
 			return
+		}
+
+		eip1559ExistsAnySubtest := false
+		for _, s := range subtests {
+			config, _, err := GetChainConfig(s.Fork)
+			if err != nil {
+				t.Fatal(UnsupportedForkError{s.Fork})
+			}
+			if config.IsEnabled(config.GetEIP1559Transition, big.NewInt(int64(test.json.Env.Number))) {
+				eip1559ExistsAnySubtest = true
+			}
+		}
+		if !eip1559ExistsAnySubtest {
+			test.json.Env.BaseFee = nil
 		}
 
 		// Install the generated cases to the test.

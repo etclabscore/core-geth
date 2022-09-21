@@ -242,6 +242,10 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 		// targets are the subtests that will be generated
 		targets := map[string][]stPostState{}
 
+		// eip1559ExistsAnySubtest will be used to omit `currentBaseFee` field
+		// from the test env if EIP1559 not present in any of the subtest configs.
+		eip1559ExistsAnySubtest := false
+
 		for _, s := range subtests {
 			// Prior to test-generation logic, record the genesis+chain config at the testmatcher level.
 			// This will allow us to generate a complete map of chain configurations for the test suite,
@@ -269,6 +273,15 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 
 			if _, ok := Forks[targetFork]; !ok {
 				t.Fatalf("missing target fork config: %s, reference: %s", targetFork, referenceFork)
+			}
+
+			// Check to see if EIP1559 is enabled in the target subtest config.
+			tconfig, _, err := GetChainConfig(targetFork)
+			if err != nil {
+				t.Fatal(UnsupportedForkError{s.Fork})
+			}
+			if config.IsEnabled(tconfig.GetEIP1559Transition, big.NewInt(int64(test.json.Env.Number))) {
+				eip1559ExistsAnySubtest = true
 			}
 
 			if _, ok := targets[targetFork]; !ok {
@@ -347,16 +360,6 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 			return
 		}
 
-		eip1559ExistsAnySubtest := false
-		for _, s := range subtests {
-			config, _, err := GetChainConfig(s.Fork)
-			if err != nil {
-				t.Fatal(UnsupportedForkError{s.Fork})
-			}
-			if config.IsEnabled(config.GetEIP1559Transition, big.NewInt(int64(test.json.Env.Number))) {
-				eip1559ExistsAnySubtest = true
-			}
-		}
 		if !eip1559ExistsAnySubtest {
 			test.json.Env.BaseFee = nil
 		}

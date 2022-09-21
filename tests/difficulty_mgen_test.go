@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/internal/build"
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -133,6 +134,117 @@ func TestDifficultyTestConfigGen(t *testing.T) {
 			t.Fatal(err)
 		}
 	})
+}
+
+// TestDifficultyGen2 generates JSON tests from scratch.
+// The test case matrix can be deduced from the for-loop iterations.
+// The cases are written to files PER CHAIN CONFIG, following the upstream convention,
+// eg. tests/testdata_generated/BasicTests/difficultyETC_Agharta.json
+func TestDifficultyGen2(t *testing.T) {
+	if os.Getenv(CG_GENERATE_DIFFICULTY_TESTS_KEY) == "" {
+		t.Skip()
+	}
+
+	configs := map[string]ctypes.ChainConfigurator{
+		"ETC": params.ClassicChainConfig,
+	}
+
+	targetDir := filepath.Join(generatedBasedir, "DifficultyTests", "dfETC")
+	if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
+		t.Fatal(err)
+	}
+
+	// Establish test matrix values.
+	//
+	// Multiples of 8 offset by 1, maxing out at 121.
+	timestampOffsets := func() []uint64 {
+		var r []uint64
+		for i := 1; i <= 121; i += 8 {
+			r = append(r, uint64(i))
+		}
+		return r
+	}()
+
+	// Establish a constant value for simulating a block referencing any uncles.
+	// The headers passed to this method do not need to be valid.
+	// It is important, however, that the value is consistent to avoid noisy differences between generations.
+	uncleTrueHash := types.CalcUncleHash([]*types.Header{{Number: big.NewInt(1)}})
+	parentDifficulty := new(big.Int).Mul(vars.MinimumDifficulty, big.NewInt(100))
+
+	filledTests := map[string]*DifficultyTest{}
+	for configName, config := range configs {
+		testsName := fmt.Sprintf("difficulty%s", configName)
+		targetFileBaseName := fmt.Sprintf("difficulty%s.json", configName)
+		targetFilePath := filepath.Join(targetDir, targetFileBaseName)
+		os.Truncate(targetFilePath, 0)
+		forks := confp.Forks(config)
+		writeForks := []uint64{}
+		for _, f := range forks {
+			writeForks = append(writeForks, f)
+			if f >= 1 {
+				writeForks = append(writeForks, f-1)
+			}
+			writeForks = append(writeForks, f+1)
+		}
+		for _, blockNumber := range writeForks {
+			for _, timestampOffset := range timestampOffsets {
+				for _, uncle := range []bool{false, true} {
+					uncleHash := types.EmptyUncleHash
+					if uncle {
+						uncleHash = uncleTrueHash
+					}
+
+					// Establish test parameters.
+					newTest := &DifficultyTest{
+						ParentTimestamp:    blockNumber*13 + 13,
+						ParentDifficulty:   parentDifficulty,
+						UncleHash:          uncleHash,
+						CurrentBlockNumber: blockNumber,
+						// CurrentTimestamp:  This gets filled later.
+						// CurrentDifficulty: This gets filled later.
+					}
+
+					newTest.CurrentTimestamp = newTest.ParentTimestamp + timestampOffset
+
+					// Fill the expected difficulty from the test params we've just established.
+					newTest.CurrentDifficulty = ethash.CalcDifficulty(config, newTest.CurrentTimestamp, &types.Header{
+						Difficulty: newTest.ParentDifficulty,
+						Time:       newTest.ParentTimestamp,
+						Number:     big.NewInt(int64(newTest.CurrentBlockNumber - 1)),
+						UncleHash:  newTest.UncleHash,
+					})
+
+					filledTests[fmt.Sprintf("difficulty_n%d_t%d_u%t", blockNumber, timestampOffset, uncle)] = newTest
+
+					mustWriteTestFileJSON2(t, targetFilePath, filledTests, testsName, configName)
+				}
+			}
+		}
+	}
+}
+
+func mustWriteTestFileJSON2(tt *testing.T, filePath string, tests map[string]*DifficultyTest, testName string, configName string) {
+	enc := make(map[string]json.RawMessage)
+	for k, v := range tests {
+		b, err := json.MarshalIndent(v, "", "    ")
+		if err != nil {
+			tt.Fatal(err)
+		}
+		enc[k] = b
+	}
+	enc2 := map[string]interface{}{
+		testName: map[string]interface{}{
+			configName: enc,
+		},
+	}
+	b, err := json.MarshalIndent(enc2, "", "    ")
+	if err != nil {
+		tt.Fatal(err)
+	}
+	err = ioutil.WriteFile(filePath, b, os.ModePerm)
+	if err != nil {
+		tt.Fatal(err)
+	}
 }
 
 // TestDifficultyGen generates JSON tests from scratch.

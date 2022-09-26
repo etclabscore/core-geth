@@ -17,9 +17,9 @@
 package tests
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
-
-	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 func TestDifficulty(t *testing.T) {
@@ -27,39 +27,39 @@ func TestDifficulty(t *testing.T) {
 
 	dt := new(testMatcher)
 
-	// Not difficulty tests
-	dt.skipLoad("hexencodetest.*")
-	dt.skipLoad("crypto.*")
-	dt.skipLoad("blockgenesistest\\.json")
-	dt.skipLoad("genesishashestest\\.json")
-	dt.skipLoad("keyaddrtest\\.json")
-	dt.skipLoad("txtest\\.json")
-
-	// Not difficulty tests: configs
-	dt.skipLoad(".*config.*")
-
-	// files are 2 years old, contains strange values
-	dt.skipLoad("difficultyCustomHomestead\\.json")
-	dt.skipLoad("difficultyMorden\\.json")
-	dt.skipLoad("difficultyOlimpic\\.json")
-
 	for k, v := range difficultyChainConfigurations {
 		dt.config(k, v)
 	}
 
 	for _, dir := range []string{
 		difficultyTestDir,
-		difficultyTestDirETC,
+		// difficultyTestDirETC,
 	} {
-		dt.walk(t, dir, func(t *testing.T, name string, test *DifficultyTest) {
-			cfg, _ := dt.findConfig(name)
+		dt.walk(t, dir, func(t *testing.T, name string, superTest map[string]json.RawMessage) {
+			for fork, rawTests := range superTest {
+				if fork == "_info" {
+					continue
+				}
+				var tests map[string]DifficultyTest
+				if err := json.Unmarshal(rawTests, &tests); err != nil {
+					t.Error(err)
+					continue
+				}
 
-			if test.ParentDifficulty.Cmp(vars.MinimumDifficulty) < 0 {
-				t.Skip("difficulty below minimum")
-				return
-			}
-			if err := dt.checkFailure(t, test.Run(cfg)); err != nil {
-				t.Error(err)
+				cfg, ok := Forks[fork]
+				if !ok {
+					t.Error(UnsupportedForkError{fork})
+					continue
+				}
+
+				for subname, subtest := range tests {
+					key := fmt.Sprintf("%s/%s", fork, subname)
+					t.Run(key, func(t *testing.T) {
+						if err := dt.checkFailure(t, subtest.Run(cfg)); err != nil {
+							t.Error(err)
+						}
+					})
+				}
 			}
 		})
 	}

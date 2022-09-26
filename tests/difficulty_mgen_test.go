@@ -27,6 +27,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/internal/build"
@@ -165,10 +166,6 @@ func TestDifficultyGen2(t *testing.T) {
 		return r
 	}()
 
-	// Establish a constant value for simulating a block referencing any uncles.
-	// The headers passed to this method do not need to be valid.
-	// It is important, however, that the value is consistent to avoid noisy differences between generations.
-	uncleTrueHash := types.CalcUncleHash([]*types.Header{{Number: big.NewInt(1)}})
 	parentDifficulty := new(big.Int).Mul(vars.MinimumDifficulty, big.NewInt(100))
 
 	filledTests := map[string]*DifficultyTest{}
@@ -189,16 +186,20 @@ func TestDifficultyGen2(t *testing.T) {
 		for _, blockNumber := range writeForks {
 			for _, timestampOffset := range timestampOffsets {
 				for _, uncle := range []bool{false, true} {
+					uncleCount := 0
+					if uncle {
+						uncleCount = 1
+					}
 					uncleHash := types.EmptyUncleHash
 					if uncle {
-						uncleHash = uncleTrueHash
+						uncleHash = types.CalcUncleHash([]*types.Header{{Number: common.Big1}})
 					}
 
 					// Establish test parameters.
 					newTest := &DifficultyTest{
 						ParentTimestamp:    blockNumber*13 + 13,
 						ParentDifficulty:   parentDifficulty,
-						UncleHash:          uncleHash,
+						ParentUncles:       uint64(uncleCount),
 						CurrentBlockNumber: blockNumber,
 						// CurrentTimestamp:  This gets filled later.
 						// CurrentDifficulty: This gets filled later.
@@ -211,7 +212,7 @@ func TestDifficultyGen2(t *testing.T) {
 						Difficulty: newTest.ParentDifficulty,
 						Time:       newTest.ParentTimestamp,
 						Number:     big.NewInt(int64(newTest.CurrentBlockNumber - 1)),
-						UncleHash:  newTest.UncleHash,
+						UncleHash:  uncleHash,
 					})
 
 					filledTests[fmt.Sprintf("difficulty_n%d_t%d_u%t", blockNumber, timestampOffset, uncle)] = newTest
@@ -301,10 +302,6 @@ func TestDifficultyGen(t *testing.T) {
 		return r
 	}()
 
-	// Establish a constant value for simulating a block referencing any uncles.
-	// The headers passed to this method do not need to be valid.
-	// It is important, however, that the value is consistent to avoid noisy differences between generations.
-	uncleTrueHash := types.CalcUncleHash([]*types.Header{{Number: big.NewInt(1)}})
 	parentDifficulty := new(big.Int).Mul(vars.MinimumDifficulty, big.NewInt(10))
 
 	for name, config := range configs {
@@ -314,16 +311,19 @@ func TestDifficultyGen(t *testing.T) {
 		for _, blockNumber := range []uint64{0, 1, 10_000_000} {
 			for _, timestampOffset := range timestampOffsets {
 				for _, uncle := range []bool{false, true} {
-					uncleHash := types.CalcUncleHash(nil)
+					uncleCount := 0
 					if uncle {
-						uncleHash = uncleTrueHash
+						uncleCount = 1
 					}
-
+					uncleHash := types.EmptyUncleHash
+					if uncle {
+						uncleHash = types.CalcUncleHash([]*types.Header{{Number: common.Big1}})
+					}
 					// Establish test parameters.
 					newTest := &DifficultyTest{
 						ParentTimestamp:    blockNumber*13 + 13,
 						ParentDifficulty:   parentDifficulty,
-						UncleHash:          uncleHash,
+						ParentUncles:       uint64(uncleCount),
 						CurrentBlockNumber: blockNumber,
 						// CurrentTimestamp:  This gets filled later.
 						// CurrentDifficulty: This gets filled later.
@@ -336,7 +336,7 @@ func TestDifficultyGen(t *testing.T) {
 						Difficulty: newTest.ParentDifficulty,
 						Time:       newTest.ParentTimestamp,
 						Number:     big.NewInt(int64(newTest.CurrentBlockNumber - 1)),
-						UncleHash:  newTest.UncleHash,
+						UncleHash:  uncleHash,
 					})
 
 					m := mustReadTestFileJSON(t, targetFilePath)

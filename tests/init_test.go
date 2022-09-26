@@ -65,13 +65,13 @@ var (
 	legacyStateTestDir = filepath.Join(baseDir, "LegacyTests", "Constantinople", "GeneralStateTests")
 	transactionTestDir = filepath.Join(baseDir, "TransactionTests")
 	rlpTestDir         = filepath.Join(baseDir, "RLPTests")
-	difficultyTestDir  = filepath.Join(baseDir, "BasicTests")
+	difficultyTestDir  = filepath.Join(baseDir, "DifficultyTests")
 	benchmarksDir      = filepath.Join(".", "evm-benchmarks", "benchmarks")
 
 	baseDirETC           = filepath.Join(".", "testdata-etc")
 	stateTestDirETC      = filepath.Join(baseDirETC, "GeneralStateTests")
 	legacyTestDirETC     = filepath.Join(baseDirETC, "LegacyTests", "Constantinople", "GeneralStateTests")
-	difficultyTestDirETC = filepath.Join(baseDirETC, "BasicTests")
+	difficultyTestDirETC = filepath.Join(baseDirETC, "DifficultyTests")
 )
 
 func readJSON(reader io.Reader, value interface{}) error {

@@ -81,10 +81,10 @@ type stInfo struct {
 	Comment            string                 `json:"comment"`
 	FillingRPCServer   string                 `json:"filling-rpc-server"`
 	FillingToolVersion string                 `json:"filling-tool-version"`
-	FilledWith         string                 `json:"filledWith"`
-	LLLCVersion        string                 `json:"lllcversion"`
-	Source             string                 `json:"source"`
-	SourceHash         string                 `json:"sourceHash"`
+	FilledWith         string                 `json:"filledWith,omitempty"`
+	LLLCVersion        string                 `json:"lllcversion,omitempty"`
+	Source             string                 `json:"source,omitempty"`
+	SourceHash         string                 `json:"sourceHash,omitempty"`
 	Labels             map[string]interface{} `json:"labels,omitempty"`
 }
 

@@ -67,6 +67,7 @@ func TestDifficultyGen2(t *testing.T) {
 	}()
 
 	parentDifficulty := new(big.Int).Mul(vars.MinimumDifficulty, big.NewInt(100))
+	blockTimeDefault := uint64(13)
 
 	filledTests := map[string]DifficultyTest{}
 	for configName, config := range configs {
@@ -74,8 +75,8 @@ func TestDifficultyGen2(t *testing.T) {
 		targetFileBaseName := fmt.Sprintf("difficulty%s.json", configName)
 		targetFilePath := filepath.Join(targetDir, targetFileBaseName)
 		os.Truncate(targetFilePath, 0)
-		writeForks := heightsForTesting(config)
-		for _, blockNumber := range writeForks {
+		heights := heightsForTesting(config)
+		for _, blockNumber := range heights {
 			for _, timestampOffset := range timestampOffsets {
 				for _, uncle := range []bool{false, true} {
 					uncleCount := 0
@@ -87,7 +88,7 @@ func TestDifficultyGen2(t *testing.T) {
 
 					// Establish test parameters.
 					newTest := DifficultyTest{
-						ParentTimestamp:    blockNumber*13 + 13,
+						ParentTimestamp:    blockNumber*blockTimeDefault + blockTimeDefault,
 						ParentDifficulty:   parentDifficulty,
 						ParentUncles:       uint64(uncleCount),
 						CurrentBlockNumber: blockNumber,
@@ -121,7 +122,7 @@ func heightsForTesting(config ctypes.ChainConfigurator) []uint64 {
 	forks := confp.Forks(config)
 	copy(blockHeights, forks)
 	for _, forkBlock := range forks {
-		if forkBlock >= 1 {
+		if forkBlock > 0 {
 			blockHeights = append(blockHeights, forkBlock-1)
 		}
 		blockHeights = append(blockHeights, forkBlock+1)

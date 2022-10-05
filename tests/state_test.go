@@ -102,11 +102,11 @@ func TestState(t *testing.T) {
 	// For Istanbul, older tests were moved into LegacyTests
 	for _, dir := range []string{
 		stateTestDir,
-		legacyStateTestDir,
+		// legacyStateTestDir,
 		benchmarksDir,
 
 		stateTestDirETC,
-		legacyTestDirETC,
+		// legacyTestDirETC,
 	} {
 		st.walk(t, dir, func(t *testing.T, name string, test *StateTest) {
 			for _, subtest := range test.Subtests(st.skipforkpat) {
@@ -230,7 +230,7 @@ func runBenchmark(b *testing.B, t *StateTest) {
 			}
 			vmconfig.ExtraEips = eips
 			block := core.GenesisToBlock(t.genesis(config), nil)
-			_, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre, false)
+			_, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre.toGenesisAlloc(), false)
 
 			var baseFee *big.Int
 			if config.IsEnabled(config.GetEIP3529Transition, new(big.Int)) {

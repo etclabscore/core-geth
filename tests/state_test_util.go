@@ -71,7 +71,7 @@ func (t StateTest) MarshalJSON() ([]byte, error) {
 type stJSON struct {
 	Info stInfo                   `json:"_info"`
 	Env  stEnv                    `json:"env"`
-	Pre  genesisT.GenesisAlloc    `json:"pre"`
+	Pre  stPre                    `json:"pre"`
 	Tx   stTransaction            `json:"transaction"`
 	Out  hexutil.Bytes            `json:"out,omitempty"`
 	Post map[string][]stPostState `json:"post"`
@@ -273,7 +273,7 @@ func (t *StateTest) RunNoVerify(subtest StateSubtest, vmconfig vm.Config, snapsh
 	}
 	vmconfig.ExtraEips = eips
 	block := core.GenesisToBlock(t.genesis(config), nil)
-	snaps, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre, snapshotter)
+	snaps, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre.toGenesisAlloc(), snapshotter)
 
 	var baseFee *big.Int
 	if config.IsEnabled(config.GetEIP1559Transition, new(big.Int)) {
@@ -375,7 +375,7 @@ func (t *StateTest) genesis(config ctypes.ChainConfigurator) *genesisT.Genesis {
 		GasLimit:   t.json.Env.GasLimit,
 		Number:     t.json.Env.Number,
 		Timestamp:  t.json.Env.Timestamp,
-		Alloc:      t.json.Pre,
+		Alloc:      t.json.Pre.toGenesisAlloc(),
 	}
 	if t.json.Env.Random != nil {
 		// Post-Merge

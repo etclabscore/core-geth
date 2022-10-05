@@ -32,8 +32,8 @@ func TestDifficulty(t *testing.T) {
 	}
 
 	for _, dir := range []string{
-		difficultyTestDir,
-		// difficultyTestDirETC,
+		// difficultyTestDir,
+		difficultyTestDirETC,
 	} {
 		dt.walk(t, dir, func(t *testing.T, name string, superTest map[string]json.RawMessage) {
 			for fork, rawTests := range superTest {

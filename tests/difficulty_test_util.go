@@ -46,15 +46,17 @@ type difficultyTestMarshaling struct {
 	ParentDifficulty   *math.HexOrDecimal256
 	CurrentTimestamp   math.HexOrDecimal64
 	CurrentDifficulty  *math.HexOrDecimal256
-	UncleHash          math.HexOrDecimal64
+	ParentUncles       math.HexOrDecimal64
 	CurrentBlockNumber math.HexOrDecimal64
 }
+
+var uncleHashNonEmpty = types.CalcUncleHash([]*types.Header{{Number: common.Big1}})
 
 func (test *DifficultyTest) Run(config ctypes.ChainConfigurator) error {
 	parentNumber := big.NewInt(int64(test.CurrentBlockNumber - 1))
 	uncleHash := types.EmptyUncleHash
 	if test.ParentUncles != 0 {
-		uncleHash = types.CalcUncleHash([]*types.Header{{Number: common.Big1}})
+		uncleHash = uncleHashNonEmpty
 	}
 	parent := &types.Header{
 		Difficulty: test.ParentDifficulty,

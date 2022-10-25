@@ -63,7 +63,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 	"ETC_Atlantis": &coregeth.CoreGethChainConfig{
 		NetworkID:          1,
 		Ethash:             new(ctypes.EthashConfig),
-		ChainID:            big.NewInt(1),
+		ChainID:            big.NewInt(61),
 		EIP2FBlock:         big.NewInt(0),
 		EIP7FBlock:         big.NewInt(0),
 		EIP150Block:        big.NewInt(0),
@@ -115,7 +115,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 	"ETC_Agharta": &coregeth.CoreGethChainConfig{
 		NetworkID:          1,
 		Ethash:             new(ctypes.EthashConfig),
-		ChainID:            big.NewInt(1),
+		ChainID:            big.NewInt(61),
 		EIP2FBlock:         big.NewInt(0),
 		EIP7FBlock:         big.NewInt(0),
 		EIP150Block:        big.NewInt(0),
@@ -157,7 +157,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 	"ETC_Phoenix": &coregeth.CoreGethChainConfig{
 		NetworkID:       1,
 		Ethash:          new(ctypes.EthashConfig),
-		ChainID:         big.NewInt(1),
+		ChainID:         big.NewInt(61),
 		EIP2FBlock:      big.NewInt(0),
 		EIP7FBlock:      big.NewInt(0),
 		EIP150Block:     big.NewInt(0),
@@ -361,7 +361,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 	"ETC_Magneto": &coregeth.CoreGethChainConfig{
 		NetworkID:       1,
 		Ethash:          new(ctypes.EthashConfig),
-		ChainID:         big.NewInt(1),
+		ChainID:         big.NewInt(61),
 		EIP2FBlock:      big.NewInt(0),
 		EIP7FBlock:      big.NewInt(0),
 		EIP150Block:     big.NewInt(0),
@@ -406,7 +406,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 	"ETC_Mystique": &coregeth.CoreGethChainConfig{
 		NetworkID:       1,
 		Ethash:          new(ctypes.EthashConfig),
-		ChainID:         big.NewInt(1),
+		ChainID:         big.NewInt(61),
 		EIP2FBlock:      big.NewInt(0),
 		EIP7FBlock:      big.NewInt(0),
 		EIP150Block:     big.NewInt(0),

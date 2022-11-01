@@ -18,6 +18,7 @@ package core
 
 import (
 	"runtime"
+	"sync"
 
 	"github.com/ethereum/go-ethereum/core/types"
 )
@@ -42,6 +43,7 @@ type txSenderCacherRequest struct {
 type txSenderCacher struct {
 	threads int
 	tasks   chan *txSenderCacherRequest
+	mu      sync.Mutex
 }
 
 // newTxSenderCacher creates a new transaction sender background cacher and starts
@@ -62,7 +64,9 @@ func newTxSenderCacher(threads int) *txSenderCacher {
 func (cacher *txSenderCacher) cache() {
 	for task := range cacher.tasks {
 		for i := 0; i < len(task.txs); i += task.inc {
+			cacher.mu.Lock()
 			types.Sender(task.signer, task.txs[i])
+			cacher.mu.Unlock()
 		}
 	}
 }

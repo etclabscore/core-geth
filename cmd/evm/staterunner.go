@@ -114,6 +114,10 @@ func stateTestCmd(ctx *cli.Context) error {
 		EVMInterpreter:   ctx.String(utils.EVMInterpreterFlag.Name),
 	}
 
+	if cfg.EVMInterpreter != "" {
+		vm.InitEVMCEVM(cfg.EVMInterpreter)
+	}
+
 	results := make([]StatetestResult, 0, len(tests))
 	for key, test := range tests {
 		for _, st := range test.Subtests(nil) {

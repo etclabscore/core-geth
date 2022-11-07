@@ -183,6 +183,11 @@ func Transition(ctx *cli.Context) error {
 		Debug:          (tracer != nil),
 		EVMInterpreter: ctx.String(utils.EVMInterpreterFlag.Name),
 	}
+
+	if vmConfig.EVMInterpreter != "" {
+		vm.InitEVMCEVM(vmConfig.EVMInterpreter)
+	}
+
 	// Construct the chainconfig
 	var chainConfig ctypes.ChainConfigurator
 	if cConf, extraEips, err := tests.GetChainConfig(ctx.String(ForknameFlag.Name)); err != nil {

@@ -20,7 +20,7 @@ require (
 	github.com/dop251/goja v0.0.0-20220405120441-9037c2b61cbf
 	github.com/edsrzf/mmap-go v1.0.0
 	github.com/etclabscore/go-openrpc-reflect v0.0.37
-	github.com/ethereum/evmc/v7 v7.5.0
+	github.com/ethereum/evmc/v10 v10.0.0
 	github.com/fatih/color v1.7.0
 	github.com/fjl/gencodec v0.0.0-20220412091415-8bb9e558978c
 	github.com/fjl/memsize v0.0.0-20190710130421-bcb5799ab5e5

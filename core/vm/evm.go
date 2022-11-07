@@ -22,7 +22,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ethereum/evmc/v7/bindings/go/evmc"
+	"github.com/ethereum/evmc/v10/bindings/go/evmc"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
@@ -277,7 +277,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			gas = 0
 		}
 		// TODO: consider clearing up unused snapshots:
-		//} else {
+		// } else {
 		//	evm.StateDB.DiscardSnapshot(snapshot)
 	}
 	return ret, gas, err

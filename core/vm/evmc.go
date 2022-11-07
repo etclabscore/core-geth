@@ -26,7 +26,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ethereum/evmc/v7/bindings/go/evmc"
+	"github.com/ethereum/evmc/v10/bindings/go/evmc"
 	"github.com/ethereum/go-ethereum/params/vars"
 
 	"github.com/ethereum/go-ethereum/common"

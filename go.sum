@@ -135,8 +135,8 @@ github.com/etclabscore/go-jsonschema-walk v0.0.6 h1:DrNzoKWKd8f8XB5nFGBY00IcjakR
 github.com/etclabscore/go-jsonschema-walk v0.0.6/go.mod h1:VdfDY72AFAiUhy0ZXEaWSpveGjMT5JcDIm903NGqFwQ=
 github.com/etclabscore/go-openrpc-reflect v0.0.37 h1:IH0e7JqIvR9OhbbFWi/BHIkXrqbR3Zyia3RJ733eT6c=
 github.com/etclabscore/go-openrpc-reflect v0.0.37/go.mod h1:0404Ky3igAasAOpyj1eESjstTyneBAIk5PgJFbK4s5E=
-github.com/ethereum/evmc/v7 v7.5.0 h1:vwKcs1DINXqvaymranmlpO64fysJJkirCCJ+kkaPaCs=
-github.com/ethereum/evmc/v7 v7.5.0/go.mod h1:q2Q0rCSUlIkngd+mZwfCzEUbvB0IIopH1+7hcs9QuDg=
+github.com/ethereum/evmc/v10 v10.0.0 h1:zuhGmMJIf4hXWph8NPzt5Wlu3Ujsf84KYFordc6mTTk=
+github.com/ethereum/evmc/v10 v10.0.0/go.mod h1:A5SnakP7hgfMwjG0cNgpR3st5hQJzXDz2++bvOQqt5c=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fjl/gencodec v0.0.0-20220412091415-8bb9e558978c h1:CndMRAH4JIwxbW8KYq6Q+cGWcGHz0FjGR3QqcInWcW0=

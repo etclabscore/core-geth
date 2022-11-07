@@ -244,7 +244,7 @@ func (host *hostContext) GetCode(addr evmc.Address) []byte {
 	return host.env.StateDB.GetCode(common.Address(addr))
 }
 
-func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evmc.Address) {
+func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evmc.Address) bool {
 	addr := common.Address(evmcAddr)
 	beneficiary := common.Address(evmcBeneficiary)
 	db := host.env.StateDB
@@ -252,7 +252,7 @@ func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evm
 		db.AddRefund(vars.SelfdestructRefundGas)
 	}
 	db.AddBalance(beneficiary, db.GetBalance(addr))
-	db.Suicide(addr)
+	return db.Suicide(addr)
 }
 
 func (host *hostContext) GetTxContext() evmc.TxContext {

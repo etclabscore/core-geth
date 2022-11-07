@@ -2021,10 +2021,12 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 
 	if ctx.IsSet(EWASMInterpreterFlag.Name) {
 		cfg.EWASMInterpreter = ctx.String(EWASMInterpreterFlag.Name)
+		vm.InitEVMCEwasm(cfg.EWASMInterpreter)
 	}
 
 	if ctx.IsSet(EVMInterpreterFlag.Name) {
 		cfg.EVMInterpreter = ctx.String(EVMInterpreterFlag.Name)
+		vm.InitEVMCEVM(cfg.EVMInterpreter)
 	}
 	if ctx.IsSet(RPCGlobalGasCapFlag.Name) {
 		cfg.RPCGasCap = ctx.Uint64(RPCGlobalGasCapFlag.Name)

@@ -288,9 +288,14 @@ func (host *hostContext) EmitLog(addr evmc.Address, evmcTopics []evmc.Hash, data
 	})
 }
 
+// Call
+// need the method:
+//   Call(kind CallKind, recipient Address, sender Address, value Hash, input []byte, gas int64, depth int, static bool, salt Hash, codeAddress Address) (output []byte, gasLeft int64, gasRefund int64, createAddr Address, err error)
+// have the method:
+//   Call(kind evmc.CallKind, evmcDestination evmc.Address, evmcSender evmc.Address, valueBytes evmc.Hash, input []byte, gas int64, depth int, static bool, saltBytes evmc.Hash) (output []byte, gasLeft int64, createAddrEvmc evmc.Address, err error)
 func (host *hostContext) Call(kind evmc.CallKind,
 	evmcDestination evmc.Address, evmcSender evmc.Address, valueBytes evmc.Hash, input []byte, gas int64, depth int,
-	static bool, saltBytes evmc.Hash) (output []byte, gasLeft int64, createAddrEvmc evmc.Address, err error) {
+	static bool, saltBytes evmc.Hash) (output []byte, gasLeft int64, gasRefund int64, createAddrEvmc evmc.Address, err error) {
 
 	destination := common.Address(evmcDestination)
 
@@ -356,7 +361,8 @@ func (host *hostContext) Call(kind evmc.CallKind,
 	}
 
 	gasLeft = int64(gasLeftU)
-	return output, gasLeft, createAddrEvmc, err
+	gasRefund = int64(host.env.StateDB.GetRefund())
+	return output, gasLeft, gasRefund, createAddrEvmc, err
 }
 
 // getRevision translates ChainConfig's HF block information into EVMC revision.

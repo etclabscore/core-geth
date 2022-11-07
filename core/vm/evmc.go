@@ -367,7 +367,7 @@ func getRevision(env *EVM) evmc.Revision {
 	// This is an example of choosing to use an "abstracted" idea
 	// about chain config, where I'm choosing to prioritize "indicative" features
 	// as identifiers for Fork-Feature-Groups. Note that this is very different
-	// than using Feature-complete sets to assert "did Forkage."
+	// from using Feature-complete sets to assert "did Forkage."
 	case conf.IsEnabled(conf.GetEIP2565Transition, n):
 		return evmc.Berlin
 	case conf.IsEnabled(conf.GetEIP1884Transition, n):

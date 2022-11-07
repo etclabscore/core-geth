@@ -257,14 +257,13 @@ func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evm
 
 func (host *hostContext) GetTxContext() evmc.TxContext {
 	return evmc.TxContext{
-		GasPrice:   evmc.Hash(common.BigToHash(host.env.GasPrice)),
-		Origin:     evmc.Address(host.env.TxContext.Origin),
-		Coinbase:   evmc.Address(host.env.Context.Coinbase),
-		Number:     host.env.Context.BlockNumber.Int64(),
-		Timestamp:  host.env.Context.Time.Int64(),
-		GasLimit:   int64(host.env.Context.GasLimit),
-		Difficulty: evmc.Hash(common.BigToHash(host.env.Context.Difficulty)),
-		ChainID:    evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
+		GasPrice:  evmc.Hash(common.BigToHash(host.env.GasPrice)),
+		Origin:    evmc.Address(host.env.TxContext.Origin),
+		Coinbase:  evmc.Address(host.env.Context.Coinbase),
+		Number:    host.env.Context.BlockNumber.Int64(),
+		Timestamp: host.env.Context.Time.Int64(),
+		GasLimit:  int64(host.env.Context.GasLimit),
+		ChainID:   evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
 	}
 }
 

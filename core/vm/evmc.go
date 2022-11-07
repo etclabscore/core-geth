@@ -295,9 +295,10 @@ func (host *hostContext) EmitLog(addr evmc.Address, evmcTopics []evmc.Hash, data
 //   Call(kind evmc.CallKind, evmcDestination evmc.Address, evmcSender evmc.Address, valueBytes evmc.Hash, input []byte, gas int64, depth int, static bool, saltBytes evmc.Hash) (output []byte, gasLeft int64, createAddrEvmc evmc.Address, err error)
 func (host *hostContext) Call(kind evmc.CallKind,
 	evmcDestination evmc.Address, evmcSender evmc.Address, valueBytes evmc.Hash, input []byte, gas int64, depth int,
-	static bool, saltBytes evmc.Hash) (output []byte, gasLeft int64, gasRefund int64, createAddrEvmc evmc.Address, err error) {
+	static bool, saltBytes evmc.Hash, evmcCodeAddress evmc.Address) (output []byte, gasLeft int64, gasRefund int64, createAddrEvmc evmc.Address, err error) {
 
 	destination := common.Address(evmcDestination)
+	codeTarget := common.Address(evmcCodeAddress)
 
 	var createAddr common.Address
 
@@ -318,9 +319,9 @@ func (host *hostContext) Call(kind evmc.CallKind,
 			output, gasLeftU, err = host.env.Call(host.contract, destination, input, gasU, value.ToBig())
 		}
 	case evmc.DelegateCall:
-		output, gasLeftU, err = host.env.DelegateCall(host.contract, destination, input, gasU)
+		output, gasLeftU, err = host.env.DelegateCall(host.contract, codeTarget, input, gasU)
 	case evmc.CallCode:
-		output, gasLeftU, err = host.env.CallCode(host.contract, destination, input, gasU, value.ToBig())
+		output, gasLeftU, err = host.env.CallCode(host.contract, codeTarget, input, gasU, value.ToBig())
 	case evmc.Create:
 		var createOutput []byte
 		createOutput, createAddr, gasLeftU, err = host.env.Create(host.contract, input, gasU, value.ToBig())

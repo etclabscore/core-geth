@@ -374,6 +374,8 @@ func getRevision(env *EVM) evmc.Revision {
 	// about chain config, where I'm choosing to prioritize "indicative" features
 	// as identifiers for Fork-Feature-Groups. Note that this is very different
 	// from using Feature-complete sets to assert "did Forkage."
+	case conf.IsEnabled(conf.GetEIP1559Transition, n):
+		return evmc.London
 	case conf.IsEnabled(conf.GetEIP2565Transition, n):
 		return evmc.Berlin
 	case conf.IsEnabled(conf.GetEIP1884Transition, n):
@@ -430,7 +432,7 @@ func (evm *EVMC) Run(contract *Contract, input []byte, readOnly bool) (ret []byt
 		input,
 		evmc.Hash(common.BigToHash(contract.value)),
 		contract.Code,
-		evmc.Hash{})
+	)
 
 	contract.Gas = uint64(gasLeft)
 

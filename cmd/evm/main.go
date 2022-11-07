@@ -23,6 +23,7 @@ import (
 	"os"
 
 	"github.com/ethereum/go-ethereum/cmd/evm/internal/t8ntool"
+	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/internal/flags"
 	"github.com/urfave/cli/v2"
 )
@@ -132,11 +133,6 @@ var (
 		Value: true,
 		Usage: "enable return data output",
 	}
-	EVMInterpreterFlag = &cli.StringFlag{
-		Name:  "vm.evm",
-		Usage: "External EVM configuration (default = built-in interpreter)",
-		Value: "",
-	}
 )
 
 var stateTransitionCommand = &cli.Command{
@@ -162,6 +158,7 @@ var stateTransitionCommand = &cli.Command{
 		t8ntool.ChainIDFlag,
 		t8ntool.RewardFlag,
 		t8ntool.VerbosityFlag,
+		utils.EVMInterpreterFlag,
 	},
 }
 
@@ -222,7 +219,7 @@ func init() {
 		DisableStackFlag,
 		DisableStorageFlag,
 		DisableReturnDataFlag,
-		EVMInterpreterFlag,
+		utils.EVMInterpreterFlag,
 	}
 	app.Commands = []*cli.Command{
 		compileCommand,

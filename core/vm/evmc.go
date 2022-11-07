@@ -110,6 +110,28 @@ type hostContext struct {
 	contract *Contract // The reference to the current contract, needed by Call-like methods.
 }
 
+func (host *hostContext) AccessAccount(addr evmc.Address) evmc.AccessStatus {
+	if !host.env.chainConfig.IsEnabled(host.env.chainConfig.GetEIP2929Transition, host.env.Context.BlockNumber) {
+		return evmc.ColdAccess
+	}
+
+	if host.env.StateDB.AddressInAccessList(common.Address(addr)) {
+		return evmc.WarmAccess
+	}
+	return evmc.ColdAccess
+}
+
+func (host *hostContext) AccessStorage(addr evmc.Address, key evmc.Hash) evmc.AccessStatus {
+	if !host.env.chainConfig.IsEnabled(host.env.chainConfig.GetEIP2929Transition, host.env.Context.BlockNumber) {
+		return evmc.ColdAccess
+	}
+	
+	if addrOK, slotOK := host.env.StateDB.SlotInAccessList(common.Address(addr), common.Hash(key)); addrOK && slotOK {
+		return evmc.WarmAccess
+	}
+	return evmc.ColdAccess
+}
+
 func (host *hostContext) AccountExists(evmcAddr evmc.Address) bool {
 	addr := common.Address(evmcAddr)
 	if host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP161dTransition, host.env.Context.BlockNumber) {

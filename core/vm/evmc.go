@@ -125,7 +125,7 @@ func (host *hostContext) AccessStorage(addr evmc.Address, key evmc.Hash) evmc.Ac
 	if !host.env.chainConfig.IsEnabled(host.env.chainConfig.GetEIP2929Transition, host.env.Context.BlockNumber) {
 		return evmc.ColdAccess
 	}
-	
+
 	if addrOK, slotOK := host.env.StateDB.SlotInAccessList(common.Address(addr), common.Hash(key)); addrOK && slotOK {
 		return evmc.WarmAccess
 	}
@@ -158,7 +158,7 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	var oldValue uint256.Int
 	oldValue.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
 	if oldValue.Eq(value) {
-		return evmc.StorageUnchanged
+		return evmc.StorageAssigned
 	}
 
 	var current, original uint256.Int
@@ -169,7 +169,7 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 
 	// Here's a great example of one of the limits of our (core-geth) current chainconfig interface model.
 	// Should we handle the logic here about historic-featuro logic (which really is nice, because when reading the strange-incantation implemations, it's nice to see why it is),
-	// or should we handle the question where we handle the rest of the questions like this, since this logic is
+	// or should we handle the question of where we handle the rest of the questions like this, since this logic is
 	// REALLY logic that belongs to the abstract idea of a chainconfiguration (aka chainconfig), which makes sense
 	// but depends on ECIPs having steadier and more predictable logic.
 	hasEIP2200 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP2200Transition, host.env.Context.BlockNumber)
@@ -221,7 +221,7 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 			host.env.StateDB.AddRefund(cleanRefund)
 		}
 	}
-	return evmc.StorageModifiedAgain
+	return evmc.StorageAssigned
 }
 
 func (host *hostContext) GetBalance(addr evmc.Address) evmc.Hash {

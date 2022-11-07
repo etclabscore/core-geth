@@ -48,9 +48,6 @@ test-coregeth: \
 hera:
 	./build/hera.sh
 
-ssvm:
-	./build/ssvm.sh
-
 evmone:
 	./build/evmone.sh
 
@@ -58,9 +55,8 @@ aleth-interpreter:
 	./build/aleth-interpreter.sh
 
 # Test EVMC support against various external interpreters.
-test-evmc: hera ssvm evmone aleth-interpreter
+test-evmc: hera evmone aleth-interpreter
 	go test -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/hera/build/src/libhera.so
-	go test -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so
 	go test -count 1 ./tests -run TestState -evmc.evm=$(ROOT_DIR)/build/_workspace/evmone/lib/libevmone.so
 	go test -count 1 ./tests -run TestState -evmc.evm=$(ROOT_DIR)/build/_workspace/aleth/lib/libaleth-interpreter.so
 

@@ -287,11 +287,8 @@ func (host *hostContext) EmitLog(addr evmc.Address, evmcTopics []evmc.Hash, data
 	})
 }
 
-// Call
-// need the method:
-//   Call(kind CallKind, recipient Address, sender Address, value Hash, input []byte, gas int64, depth int, static bool, salt Hash, codeAddress Address) (output []byte, gasLeft int64, gasRefund int64, createAddr Address, err error)
-// have the method:
-//   Call(kind evmc.CallKind, evmcDestination evmc.Address, evmcSender evmc.Address, valueBytes evmc.Hash, input []byte, gas int64, depth int, static bool, saltBytes evmc.Hash) (output []byte, gasLeft int64, createAddrEvmc evmc.Address, err error)
+// Call executes a message call transaction.
+// - evmcCodeAddress: https://github.com/ethereum/evmc/commit/8314761222c837d41f573b0af1152ce1c9895a32#diff-4c54ef259154e3cd3bd18b1963e027655525f909a887700cc2d1386e075c3628R155
 func (host *hostContext) Call(kind evmc.CallKind,
 	evmcDestination evmc.Address, evmcSender evmc.Address, valueBytes evmc.Hash, input []byte, gas int64, depth int,
 	static bool, saltBytes evmc.Hash, evmcCodeAddress evmc.Address) (output []byte, gasLeft int64, gasRefund int64, createAddrEvmc evmc.Address, err error) {

@@ -375,7 +375,7 @@ func getRevision(env *EVM) evmc.Revision {
 		return evmc.London
 	case conf.IsEnabled(conf.GetEIP2565Transition, n):
 		return evmc.Berlin
-	case conf.IsEnabled(conf.GetEIP1884Transition, n) && conf.IsEnabled(conf.GetEIP2200Transition, n):
+	case conf.IsEnabled(conf.GetEIP1884Transition, n):
 		return evmc.Istanbul
 	case conf.IsEnabled(conf.GetEIP1283DisableTransition, n):
 		return evmc.Petersburg

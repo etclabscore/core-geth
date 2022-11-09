@@ -111,7 +111,7 @@ type hostContext struct {
 }
 
 func (host *hostContext) AccessAccount(addr evmc.Address) evmc.AccessStatus {
-	if !host.env.chainConfig.IsEnabled(host.env.chainConfig.GetEIP2929Transition, host.env.Context.BlockNumber) {
+	if getRevision(host.env) < evmc.Berlin /* EIP-2929 */ {
 		return evmc.ColdAccess
 	}
 
@@ -122,7 +122,7 @@ func (host *hostContext) AccessAccount(addr evmc.Address) evmc.AccessStatus {
 }
 
 func (host *hostContext) AccessStorage(addr evmc.Address, key evmc.Hash) evmc.AccessStatus {
-	if !host.env.chainConfig.IsEnabled(host.env.chainConfig.GetEIP2929Transition, host.env.Context.BlockNumber) {
+	if getRevision(host.env) < evmc.Berlin /* EIP-2929 */ {
 		return evmc.ColdAccess
 	}
 
@@ -134,7 +134,7 @@ func (host *hostContext) AccessStorage(addr evmc.Address, key evmc.Hash) evmc.Ac
 
 func (host *hostContext) AccountExists(evmcAddr evmc.Address) bool {
 	addr := common.Address(evmcAddr)
-	if host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP161dTransition, host.env.Context.BlockNumber) {
+	if getRevision(host.env) >= evmc.SpuriousDragon /* EIP-161 */ {
 		if !host.env.StateDB.Empty(addr) {
 			return true
 		}
@@ -172,13 +172,12 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	// or should we handle the question of where we handle the rest of the questions like this, since this logic is
 	// REALLY logic that belongs to the abstract idea of a chainconfiguration (aka chainconfig), which makes sense
 	// but depends on ECIPs having steadier and more predictable logic.
-	hasEIP2200 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP2200Transition, host.env.Context.BlockNumber)
-	hasEIP1884 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP1884Transition, host.env.Context.BlockNumber)
 
-	// Here's an example where to me, it makes sense to use individual EIPs in the code...
-	// when they don't specify each other in the spec.
-	hasNetStorageCostEIP := hasEIP2200 && hasEIP1884
-	if !hasNetStorageCostEIP {
+	// isIstanbul was originally defined as two conditions: EIP1884, EIP2200;
+	// but now the code expects any configuration to always apply (or have applied) them together at (as) the Istanbul fork.
+	isIstanbul := getRevision(host.env) >= evmc.Istanbul
+
+	if !isIstanbul {
 		status = evmc.StorageModified
 		if oldValue.IsZero() {
 			return evmc.StorageAdded
@@ -192,7 +191,7 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	resetClearRefund := vars.NetSstoreResetClearRefund
 	cleanRefund := vars.NetSstoreResetRefund
 
-	if hasEIP2200 {
+	if isIstanbul {
 		resetClearRefund = vars.SstoreSetGasEIP2200 - vars.SloadGasEIP2200 // 19200
 		cleanRefund = vars.SstoreResetGasEIP2200 - vars.SloadGasEIP2200    // 4200
 	}
@@ -326,7 +325,7 @@ func (host *hostContext) Call(kind evmc.CallKind,
 		var createOutput []byte
 		createOutput, createAddr, gasLeftU, err = host.env.Create(host.contract, input, gasU, value.ToBig())
 		createAddrEvmc = evmc.Address(createAddr)
-		isHomestead := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP7Transition, host.env.Context.BlockNumber)
+		isHomestead := getRevision(host.env) >= evmc.Homestead
 		if !isHomestead && err == ErrCodeStoreOutOfGas {
 			err = nil
 		}
@@ -379,7 +378,7 @@ func getRevision(env *EVM) evmc.Revision {
 		return evmc.London
 	case conf.IsEnabled(conf.GetEIP2565Transition, n):
 		return evmc.Berlin
-	case conf.IsEnabled(conf.GetEIP1884Transition, n):
+	case conf.IsEnabled(conf.GetEIP1884Transition, n) && conf.IsEnabled(conf.GetEIP2200Transition, n):
 		return evmc.Istanbul
 	case conf.IsEnabled(conf.GetEIP1283DisableTransition, n):
 		return evmc.Petersburg

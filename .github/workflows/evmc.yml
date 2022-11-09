@@ -8,8 +8,8 @@ on:
 
 jobs:
 
-  build-ewasm:
-    name: EWASM State Tests
+  build-evmc:
+    name: EVMC/EVM+EWASM State Tests
     runs-on: ubuntu-latest
     steps:
 

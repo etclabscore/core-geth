@@ -255,7 +255,7 @@ func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evm
 }
 
 func (host *hostContext) GetTxContext() evmc.TxContext {
-	return evmc.TxContext{
+	txCtx := evmc.TxContext{
 		GasPrice:  evmc.Hash(common.BigToHash(host.env.GasPrice)),
 		Origin:    evmc.Address(host.env.TxContext.Origin),
 		Coinbase:  evmc.Address(host.env.Context.Coinbase),
@@ -264,6 +264,13 @@ func (host *hostContext) GetTxContext() evmc.TxContext {
 		GasLimit:  int64(host.env.Context.GasLimit),
 		ChainID:   evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
 	}
+	if getRevision(host.env) >= evmc.London {
+		txCtx.BaseFee = evmc.Hash(common.BigToHash(host.env.Context.BaseFee))
+		if host.env.Context.Random != nil {
+			txCtx.PrevRandao = evmc.Hash(*host.env.Context.Random)
+		}
+	}
+	return txCtx
 }
 
 func (host *hostContext) GetBlockHash(number int64) evmc.Hash {

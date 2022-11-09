@@ -365,7 +365,10 @@ func (host *hostContext) Call(kind evmc.CallKind,
 	}
 
 	gasLeft = int64(gasLeftU)
-	gasRefund = int64(host.env.StateDB.GetRefund())
+	gasRefund = gasLeft
+	if getRevision(host.env) >= evmc.London {
+		gasRefund = int64(host.env.StateDB.GetRefund())
+	}
 	return output, gasLeft, gasRefund, createAddrEvmc, err
 }
 

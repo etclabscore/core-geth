@@ -26,7 +26,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ethereum/evmc/v7/bindings/go/evmc"
+	"github.com/ethereum/evmc/v10/bindings/go/evmc"
 	"github.com/ethereum/go-ethereum/params/vars"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -110,9 +110,31 @@ type hostContext struct {
 	contract *Contract // The reference to the current contract, needed by Call-like methods.
 }
 
+func (host *hostContext) AccessAccount(addr evmc.Address) evmc.AccessStatus {
+	if getRevision(host.env) < evmc.Berlin /* EIP-2929 */ {
+		return evmc.ColdAccess
+	}
+
+	if host.env.StateDB.AddressInAccessList(common.Address(addr)) {
+		return evmc.WarmAccess
+	}
+	return evmc.ColdAccess
+}
+
+func (host *hostContext) AccessStorage(addr evmc.Address, key evmc.Hash) evmc.AccessStatus {
+	if getRevision(host.env) < evmc.Berlin /* EIP-2929 */ {
+		return evmc.ColdAccess
+	}
+
+	if addrOK, slotOK := host.env.StateDB.SlotInAccessList(common.Address(addr), common.Hash(key)); addrOK && slotOK {
+		return evmc.WarmAccess
+	}
+	return evmc.ColdAccess
+}
+
 func (host *hostContext) AccountExists(evmcAddr evmc.Address) bool {
 	addr := common.Address(evmcAddr)
-	if host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP161dTransition, host.env.Context.BlockNumber) {
+	if getRevision(host.env) >= evmc.SpuriousDragon /* EIP-161 */ {
 		if !host.env.StateDB.Empty(addr) {
 			return true
 		}
@@ -136,7 +158,7 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	var oldValue uint256.Int
 	oldValue.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
 	if oldValue.Eq(value) {
-		return evmc.StorageUnchanged
+		return evmc.StorageAssigned
 	}
 
 	var current, original uint256.Int
@@ -147,16 +169,15 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 
 	// Here's a great example of one of the limits of our (core-geth) current chainconfig interface model.
 	// Should we handle the logic here about historic-featuro logic (which really is nice, because when reading the strange-incantation implemations, it's nice to see why it is),
-	// or should we handle the question where we handle the rest of the questions like this, since this logic is
+	// or should we handle the question of where we handle the rest of the questions like this, since this logic is
 	// REALLY logic that belongs to the abstract idea of a chainconfiguration (aka chainconfig), which makes sense
 	// but depends on ECIPs having steadier and more predictable logic.
-	hasEIP2200 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP2200Transition, host.env.Context.BlockNumber)
-	hasEIP1884 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP1884Transition, host.env.Context.BlockNumber)
 
-	// Here's an example where to me, it makes sense to use individual EIPs in the code...
-	// when they don't specify each other in the spec.
-	hasNetStorageCostEIP := hasEIP2200 && hasEIP1884
-	if !hasNetStorageCostEIP {
+	// isIstanbul was originally defined as two conditions: EIP1884, EIP2200;
+	// but now the code expects any configuration to always apply (or have applied) them together at (as) the Istanbul fork.
+	isIstanbul := getRevision(host.env) >= evmc.Istanbul
+
+	if !isIstanbul {
 		status = evmc.StorageModified
 		if oldValue.IsZero() {
 			return evmc.StorageAdded
@@ -170,7 +191,7 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	resetClearRefund := vars.NetSstoreResetClearRefund
 	cleanRefund := vars.NetSstoreResetRefund
 
-	if hasEIP2200 {
+	if isIstanbul {
 		resetClearRefund = vars.SstoreSetGasEIP2200 - vars.SloadGasEIP2200 // 19200
 		cleanRefund = vars.SstoreResetGasEIP2200 - vars.SloadGasEIP2200    // 4200
 	}
@@ -199,7 +220,7 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 			host.env.StateDB.AddRefund(cleanRefund)
 		}
 	}
-	return evmc.StorageModifiedAgain
+	return evmc.StorageAssigned
 }
 
 func (host *hostContext) GetBalance(addr evmc.Address) evmc.Hash {
@@ -222,7 +243,7 @@ func (host *hostContext) GetCode(addr evmc.Address) []byte {
 	return host.env.StateDB.GetCode(common.Address(addr))
 }
 
-func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evmc.Address) {
+func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evmc.Address) bool {
 	addr := common.Address(evmcAddr)
 	beneficiary := common.Address(evmcBeneficiary)
 	db := host.env.StateDB
@@ -230,20 +251,26 @@ func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evm
 		db.AddRefund(vars.SelfdestructRefundGas)
 	}
 	db.AddBalance(beneficiary, db.GetBalance(addr))
-	db.Suicide(addr)
+	return db.Suicide(addr)
 }
 
 func (host *hostContext) GetTxContext() evmc.TxContext {
-	return evmc.TxContext{
-		GasPrice:   evmc.Hash(common.BigToHash(host.env.GasPrice)),
-		Origin:     evmc.Address(host.env.TxContext.Origin),
-		Coinbase:   evmc.Address(host.env.Context.Coinbase),
-		Number:     host.env.Context.BlockNumber.Int64(),
-		Timestamp:  host.env.Context.Time.Int64(),
-		GasLimit:   int64(host.env.Context.GasLimit),
-		Difficulty: evmc.Hash(common.BigToHash(host.env.Context.Difficulty)),
-		ChainID:    evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
+	txCtx := evmc.TxContext{
+		GasPrice:  evmc.Hash(common.BigToHash(host.env.GasPrice)),
+		Origin:    evmc.Address(host.env.TxContext.Origin),
+		Coinbase:  evmc.Address(host.env.Context.Coinbase),
+		Number:    host.env.Context.BlockNumber.Int64(),
+		Timestamp: host.env.Context.Time.Int64(),
+		GasLimit:  int64(host.env.Context.GasLimit),
+		ChainID:   evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
 	}
+	if getRevision(host.env) >= evmc.London {
+		txCtx.BaseFee = evmc.Hash(common.BigToHash(host.env.Context.BaseFee))
+		if host.env.Context.Random != nil {
+			txCtx.PrevRandao = evmc.Hash(*host.env.Context.Random)
+		}
+	}
+	return txCtx
 }
 
 func (host *hostContext) GetBlockHash(number int64) evmc.Hash {
@@ -267,11 +294,14 @@ func (host *hostContext) EmitLog(addr evmc.Address, evmcTopics []evmc.Hash, data
 	})
 }
 
+// Call executes a message call transaction.
+// - evmcCodeAddress: https://github.com/ethereum/evmc/commit/8314761222c837d41f573b0af1152ce1c9895a32#diff-4c54ef259154e3cd3bd18b1963e027655525f909a887700cc2d1386e075c3628R155
 func (host *hostContext) Call(kind evmc.CallKind,
 	evmcDestination evmc.Address, evmcSender evmc.Address, valueBytes evmc.Hash, input []byte, gas int64, depth int,
-	static bool, saltBytes evmc.Hash) (output []byte, gasLeft int64, createAddrEvmc evmc.Address, err error) {
+	static bool, saltBytes evmc.Hash, evmcCodeAddress evmc.Address) (output []byte, gasLeft int64, gasRefund int64, createAddrEvmc evmc.Address, err error) {
 
 	destination := common.Address(evmcDestination)
+	codeTarget := common.Address(evmcCodeAddress)
 
 	var createAddr common.Address
 
@@ -292,14 +322,14 @@ func (host *hostContext) Call(kind evmc.CallKind,
 			output, gasLeftU, err = host.env.Call(host.contract, destination, input, gasU, value.ToBig())
 		}
 	case evmc.DelegateCall:
-		output, gasLeftU, err = host.env.DelegateCall(host.contract, destination, input, gasU)
+		output, gasLeftU, err = host.env.DelegateCall(host.contract, codeTarget, input, gasU)
 	case evmc.CallCode:
-		output, gasLeftU, err = host.env.CallCode(host.contract, destination, input, gasU, value.ToBig())
+		output, gasLeftU, err = host.env.CallCode(host.contract, codeTarget, input, gasU, value.ToBig())
 	case evmc.Create:
 		var createOutput []byte
 		createOutput, createAddr, gasLeftU, err = host.env.Create(host.contract, input, gasU, value.ToBig())
 		createAddrEvmc = evmc.Address(createAddr)
-		isHomestead := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP7Transition, host.env.Context.BlockNumber)
+		isHomestead := getRevision(host.env) >= evmc.Homestead
 		if !isHomestead && err == ErrCodeStoreOutOfGas {
 			err = nil
 		}
@@ -335,7 +365,11 @@ func (host *hostContext) Call(kind evmc.CallKind,
 	}
 
 	gasLeft = int64(gasLeftU)
-	return output, gasLeft, createAddrEvmc, err
+	gasRefund = gasLeft
+	if getRevision(host.env) >= evmc.London {
+		gasRefund = int64(host.env.StateDB.GetRefund())
+	}
+	return output, gasLeft, gasRefund, createAddrEvmc, err
 }
 
 // getRevision translates ChainConfig's HF block information into EVMC revision.
@@ -346,9 +380,11 @@ func getRevision(env *EVM) evmc.Revision {
 	// This is an example of choosing to use an "abstracted" idea
 	// about chain config, where I'm choosing to prioritize "indicative" features
 	// as identifiers for Fork-Feature-Groups. Note that this is very different
-	// than using Feature-complete sets to assert "did Forkage."
+	// from using Feature-complete sets to assert "did Forkage."
+	case conf.IsEnabled(conf.GetEIP1559Transition, n):
+		return evmc.London
 	case conf.IsEnabled(conf.GetEIP2565Transition, n):
-		panic("berlin is unsupported by EVMCv7")
+		return evmc.Berlin
 	case conf.IsEnabled(conf.GetEIP1884Transition, n):
 		return evmc.Istanbul
 	case conf.IsEnabled(conf.GetEIP1283DisableTransition, n):
@@ -403,7 +439,7 @@ func (evm *EVMC) Run(contract *Contract, input []byte, readOnly bool) (ret []byt
 		input,
 		evmc.Hash(common.BigToHash(contract.value)),
 		contract.Code,
-		evmc.Hash{})
+	)
 
 	contract.Gas = uint64(gasLeft)
 

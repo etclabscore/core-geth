@@ -134,14 +134,10 @@ func (host *hostContext) AccessStorage(addr evmc.Address, key evmc.Hash) evmc.Ac
 
 func (host *hostContext) AccountExists(evmcAddr evmc.Address) bool {
 	addr := common.Address(evmcAddr)
-	if getRevision(host.env) >= evmc.SpuriousDragon /* EIP-161 */ {
-		if !host.env.StateDB.Empty(addr) {
-			return true
-		}
-	} else if host.env.StateDB.Exist(addr) {
-		return true
+	if host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP161dTransition, host.env.Context.BlockNumber) /* EIP-161 */ {
+		return !host.env.StateDB.Empty(addr)
 	}
-	return false
+	return host.env.StateDB.Exist(addr)
 }
 
 func (host *hostContext) GetStorage(addr evmc.Address, evmcKey evmc.Hash) evmc.Hash {
@@ -151,22 +147,7 @@ func (host *hostContext) GetStorage(addr evmc.Address, evmcKey evmc.Hash) evmc.H
 	return evmc.Hash(value.Bytes32())
 }
 
-func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, evmcValue evmc.Hash) (status evmc.StorageStatus) {
-	addr := common.Address(evmcAddr)
-	key := common.Hash(evmcKey)
-	value := new(uint256.Int).SetBytes(evmcValue[:])
-	var oldValue uint256.Int
-	oldValue.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
-	if oldValue.Eq(value) {
-		return evmc.StorageAssigned
-	}
-
-	var current, original uint256.Int
-	current.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
-	original.SetBytes(host.env.StateDB.GetCommittedState(addr, key).Bytes())
-
-	host.env.StateDB.SetState(addr, key, common.BytesToHash(value.Bytes()))
-
+func (host *hostContext) storageStatus(original, current, value *uint256.Int) (status evmc.StorageStatus) {
 	// /**
 	//  * The effect of an attempt to modify a contract storage item.
 	//  *
@@ -300,14 +281,141 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 			status = evmc.StorageModifiedRestored
 		}
 	}
+	return status
+}
 
-	revision := getRevision(host.env)
+func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, evmcValue evmc.Hash) (status evmc.StorageStatus) {
+	addr := common.Address(evmcAddr)
+	key := common.Hash(evmcKey)
+	value := new(uint256.Int).SetBytes(evmcValue[:])
 
-	if revision >= evmc.Istanbul /* EIP-1884, EIP-2200 */ {
+	var current, original = new(uint256.Int), new(uint256.Int)
+	current.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
+	original.SetBytes(host.env.StateDB.GetCommittedState(addr, key).Bytes())
+
+	host.env.StateDB.SetState(addr, key, common.BytesToHash(value.Bytes()))
+
+	// defer func() {
+	status = host.storageStatus(original, current, value)
+	// }()
+
+	if getRevision(host.env) == evmc.Constantinople /* EIP-1283 */ {
 		if current.Eq(value) {
-			return
+			return evmc.StorageAssigned
 		}
+
+		// (X -> X) -> Y
+		if original.Eq(current) {
+			// 0 -> 0 -> Y
+			if original.IsZero() {
+				return evmc.StorageAdded
+			}
+			// X -> X -> 0
+			if value.IsZero() {
+				host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
+				return evmc.StorageDeleted
+			}
+			return evmc.StorageModified
+		}
+		if !original.IsZero() {
+			// X -> 0 -> Z
+			if current.IsZero() {
+				host.env.StateDB.SubRefund(vars.NetSstoreClearRefund)
+				// X -> 0 -> 0
+			} else if value.IsZero() {
+				host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
+			}
+		}
+		if original.Eq(value) {
+			if original.IsZero() {
+				host.env.StateDB.AddRefund(vars.NetSstoreResetClearRefund)
+			} else {
+				host.env.StateDB.AddRefund(vars.NetSstoreResetRefund)
+			}
+		}
+		return evmc.StorageAssigned
+	}
+
+	if getRevision(host.env) < evmc.Istanbul {
+		if current.Eq(value) {
+			return evmc.StorageAssigned
+		}
+
+		if current.IsZero() && !value.IsZero() {
+			return evmc.StorageAdded
+		}
+		if !current.IsZero() && value.IsZero() {
+			host.env.StateDB.AddRefund(vars.SstoreRefundGas)
+			return evmc.StorageDeleted
+		}
+		return evmc.StorageAssigned
+
+	} else /* Istanbul: EIP-2200 */ {
+
+		/*
+				Replace SSTORE opcode gas cost calculation (including refunds) with the following logic:
+
+				    If gasleft is less than or equal to gas stipend, fail the current call frame with ‘out of gas’ exception.
+
+				    If current value equals new value (this is a no-op), SLOAD_GAS is deducted.
+
+				    If current value does not equal new value
+				        If original value equals current value (this storage slot has not been changed by the current execution context)
+				            If original value is 0, SSTORE_SET_GAS is deducted.
+				            Otherwise, SSTORE_RESET_GAS gas is deducted. If new value is 0, add SSTORE_CLEARS_SCHEDULE gas to refund counter.
+				        If original value does not equal current value (this storage slot is dirty), SLOAD_GAS gas is deducted. Apply both of the following clauses.
+				            If original value is not 0
+				                If current value is 0 (also means that new value is not 0), remove SSTORE_CLEARS_SCHEDULE gas from refund counter.
+				                If new value is 0 (also means that current value is not 0), add SSTORE_CLEARS_SCHEDULE gas to refund counter.
+				            If original value equals new value (this storage slot is reset)
+				                If original value is 0, add SSTORE_SET_GAS - SLOAD_GAS to refund counter.
+				                Otherwise, add SSTORE_RESET_GAS - SLOAD_GAS gas to refund counter.
+
+				---
+
+					If gasleft is less than or equal to gas stipend, fail the current call frame with ‘out of gas’ exception.
+						:: NO IMPLEMENTATION
+
+					If current value equals new value (this is a no-op), SLOAD_GAS is deducted.
+						:: SHORT-CIRCUIT near top of function
+
+					If current value does not equal new value
+
+						If original value equals current value (this storage slot has not been changed by the current execution context)
+
+
+							If original value is 0, SSTORE_SET_GAS is deducted.
+			                :: 0 -> 0 -> Z: evmc.StorageAdded
+
+							Otherwise, SSTORE_RESET_GAS gas is deducted.
+							:: X -> X -> Z: evmc.StorageModified
+
+							If new value is 0, add SSTORE_CLEARS_SCHEDULE gas to refund counter.
+							:: X -> X -> 0: evmc.StorageDeleted
+
+						If original value does not equal current value (this storage slot is dirty), SLOAD_GAS gas is deducted.
+						Apply both of the following clauses.
+
+							If original value is not 0
+								If current value is 0 (also means that new value is not 0), remove SSTORE_CLEARS_SCHEDULE gas from refund counter.
+								:: X -> 0 -> X: evmc.StorageAddedDeleted
+
+								If new value is 0 (also means that current value is not 0), add SSTORE_CLEARS_SCHEDULE gas to refund counter.
+								:: X -> Z -> 0: evmc.StorageDeleted
+
+							If original value equals new value (this storage slot is reset)
+								If original value is 0, add SSTORE_SET_GAS - SLOAD_GAS to refund counter.
+								Otherwise, add SSTORE_RESET_GAS - SLOAD_GAS gas to refund counter.
+		*/
+
+		if current.Eq(value) {
+			return evmc.StorageAssigned
+		}
+
 		if original == current {
+			if original.IsZero() {
+				return
+			}
 			if value.IsZero() {
 				host.env.StateDB.AddRefund(vars.SstoreClearsScheduleRefundEIP2200)
 			}
@@ -327,73 +435,9 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 				host.env.StateDB.AddRefund(vars.SstoreResetGasEIP2200 - vars.SloadGasEIP2200)
 			}
 		}
-		return
-
-	} else if revision == evmc.Constantinople {
-		if current.Eq(value) {
-			return
-		}
-
-		if original == current {
-			if original.IsZero() {
-				return
-			}
-			if value.IsZero() {
-				host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
-			}
-			return
-		}
-		if !original.IsZero() {
-			if current.IsZero() {
-				host.env.StateDB.SubRefund(vars.NetSstoreClearRefund)
-			} else if value.IsZero() {
-				host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
-			}
-		}
-		if original.Eq(value) {
-			if original.IsZero() {
-				host.env.StateDB.AddRefund(vars.NetSstoreResetClearRefund)
-			} else {
-				host.env.StateDB.AddRefund(vars.NetSstoreResetRefund)
-			}
-		}
-		return
 	}
 
-	// else (default, homestead on)
-	if !current.IsZero() && value.IsZero() {
-		host.env.StateDB.AddRefund(vars.SstoreRefundGas)
-	}
-
-	return status
-
-	// if original == current {
-	// 	// 0 -> 0 -> Z
-	// 	if original.IsZero() { // create slot (2.1.1)
-	// 		return evmc.StorageAdded
-	// 	}
-	//
-	// 	if value.IsZero() { // delete slot (2.1.2b)
-	// 		host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
-	// 		return evmc.StorageDeleted
-	// 	}
-	// 	return evmc.StorageModified
-	// }
-	//
-	// if !original.IsZero() {
-	// 	if current.IsZero() { // recreate slot (2.2.1.1)
-	// 		host.env.StateDB.SubRefund(vars.NetSstoreClearRefund)
-	// 	} else if value.IsZero() { // delete slot (2.2.1.2)
-	// 		host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
-	// 	}
-	// }
-	// if original.Eq(value) {
-	// 	if original.IsZero() { // reset to original inexistent slot (2.2.2.1)
-	// 		host.env.StateDB.AddRefund(vars.NetSstoreResetClearRefund)
-	// 	} else { // reset to original existing slot (2.2.2.2)
-	// 		host.env.StateDB.AddRefund(vars.NetSstoreResetRefund)
-	// 	}
-	// }
+	return
 }
 
 func (host *hostContext) GetBalance(addr evmc.Address) evmc.Hash {

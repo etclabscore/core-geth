@@ -18,7 +18,7 @@ package tconvert
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -31,7 +31,7 @@ import (
 // Tests the go-ethereum to Aleth chainspec conversion for the Stureby testnet.
 func TestAlethSturebyConverter(t *testing.T) {
 	// Read GETH genesis type.
-	blob, err := ioutil.ReadFile(filepath.Join("..", "testdata", "stureby_geth.json"))
+	blob, err := os.ReadFile(filepath.Join("..", "testdata", "stureby_geth.json"))
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}
@@ -47,7 +47,7 @@ func TestAlethSturebyConverter(t *testing.T) {
 	}
 
 	// Read the aleth JSON spec.
-	expBlob, err := ioutil.ReadFile(filepath.Join("..", "testdata", "stureby_aleth.json"))
+	expBlob, err := os.ReadFile(filepath.Join("..", "testdata", "stureby_aleth.json"))
 	if err != nil {
 		t.Fatalf("could not read file: %v", err)
 	}

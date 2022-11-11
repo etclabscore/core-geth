@@ -2,8 +2,8 @@ package generic
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"math/big"
+	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -39,7 +39,7 @@ func TestUnmarshalChainConfigurator(t *testing.T) {
 	}
 
 	for i, c := range cases {
-		b, err := ioutil.ReadFile(c.file)
+		b, err := os.ReadFile(c.file)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -250,19 +250,19 @@ func TestUnmarshalChainConfigurator2(t *testing.T) {
 			wantType: reflect.TypeOf(&coregeth.CoreGethChainConfig{}),
 		},
 		// FIXME
-		//{
+		// {
 		//	versionid: "latest",
 		//	raw: func() string {
 		//		b, _ := json.MarshalIndent(params.ClassicChainConfig, "", "    ")
 		//		return string(b)
 		//	}(),
 		//	wantType: reflect.TypeOf(&multigeth.CoreGethChainConfig{}),
-		//},
+		// },
 	}
 
 	head := uint64(10_000_000)
 
-	//outer:
+	// outer:
 	for i := 0; i < len(cases); i++ {
 		for j := 0; j < len(cases); j++ {
 			if j >= i {

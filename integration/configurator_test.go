@@ -18,8 +18,8 @@ package integration
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -176,7 +176,7 @@ func TestEquivalent_ReadParity(t *testing.T) {
 		a := tests.Forks[k]
 
 		b := &parity.ParityChainSpec{}
-		bs, err := ioutil.ReadFile(filepath.Join(parityP, v))
+		bs, err := os.ReadFile(filepath.Join(parityP, v))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -225,7 +225,7 @@ func TestParityGeneses(t *testing.T) {
 	for _, tt := range testes {
 		p := filepath.Join("..", "params", "parity.json.d", tt.filename)
 		pspec := &parity.ParityChainSpec{}
-		b, err := ioutil.ReadFile(p)
+		b, err := os.ReadFile(p)
 		if err != nil {
 			t.Fatal(err)
 		}

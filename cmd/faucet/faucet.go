@@ -27,7 +27,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"math"
 	"math/big"
 	"net/http"
@@ -184,7 +183,7 @@ func parseChainFlags() (gs *genesisT.Genesis, bs string, netid uint64) {
 
 	// allow overrides
 	if *genesisFlag != "" {
-		blob, err := ioutil.ReadFile(*genesisFlag)
+		blob, err := os.ReadFile(*genesisFlag)
 		if err != nil {
 			log.Crit("Failed to read genesis block contents", "genesis", *genesisFlag, "err", err)
 		}
@@ -414,7 +413,7 @@ func main() {
 
 	keystorePath := filepath.Join(faucetDirFromChainIndicators(chainID, genesisHash), "keys")
 	ks := keystore.NewKeyStore(keystorePath, keystore.StandardScryptN, keystore.StandardScryptP)
-	if blob, err = ioutil.ReadFile(*accJSONFlag); err != nil {
+	if blob, err = os.ReadFile(*accJSONFlag); err != nil {
 		log.Crit("Failed to read account key contents", "file", *accJSONFlag, "err", err)
 	}
 	acc, err := ks.Import(blob, pass, pass)

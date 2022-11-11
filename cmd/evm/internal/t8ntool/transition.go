@@ -179,13 +179,18 @@ func Transition(ctx *cli.Context) error {
 	prestate.Env = *inputData.Env
 
 	vmConfig := vm.Config{
-		Tracer:         tracer,
-		Debug:          (tracer != nil),
-		EVMInterpreter: ctx.String(utils.EVMInterpreterFlag.Name),
+		Tracer:           tracer,
+		Debug:            (tracer != nil),
+		EVMInterpreter:   ctx.String(utils.EVMInterpreterFlag.Name),
+		EWASMInterpreter: ctx.String(utils.EWASMInterpreterFlag.Name),
 	}
 
 	if vmConfig.EVMInterpreter != "" {
 		vm.InitEVMCEVM(vmConfig.EVMInterpreter)
+	}
+
+	if vmConfig.EWASMInterpreter != "" {
+		vm.InitEVMCEwasm(vmConfig.EWASMInterpreter)
 	}
 
 	// Construct the chainconfig

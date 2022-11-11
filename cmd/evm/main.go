@@ -159,6 +159,7 @@ var stateTransitionCommand = &cli.Command{
 		t8ntool.RewardFlag,
 		t8ntool.VerbosityFlag,
 		utils.EVMInterpreterFlag,
+		utils.EWASMInterpreterFlag,
 	},
 }
 

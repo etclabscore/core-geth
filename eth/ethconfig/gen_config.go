@@ -21,6 +21,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	type Config struct {
 		Genesis                               *genesisT.Genesis `toml:",omitempty"`
 		NetworkId                             uint64
+		ProtocolVersions                      []uint
 		SyncMode                              downloader.SyncMode
 		EthDiscoveryURLs                      []string
 		SnapDiscoveryURLs                     []string
@@ -42,6 +43,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		DatabaseHandles                       int                    `toml:"-"`
 		DatabaseCache                         int
 		DatabaseFreezer                       string
+		DatabaseFreezerRemote                 string
 		TrieCleanCache                        int
 		TrieCleanCacheJournal                 string        `toml:",omitempty"`
 		TrieCleanCacheRejournal               time.Duration `toml:",omitempty"`
@@ -58,17 +60,21 @@ func (c Config) MarshalTOML() (interface{}, error) {
 		DocRoot                               string `toml:"-"`
 		EWASMInterpreter                      string
 		EVMInterpreter                        string
-		RPCGasCap                             uint64 `toml:",omitempty"`
+		RPCGasCap                             uint64
 		RPCEVMTimeout                         time.Duration
 		RPCTxFeeCap                           float64
 		Checkpoint                            *ctypes.TrustedCheckpoint      `toml:",omitempty"`
 		CheckpointOracle                      *ctypes.CheckpointOracleConfig `toml:",omitempty"`
-		OverrideTerminalTotalDifficulty       *big.Int                       `toml:",omitempty"`
-		OverrideTerminalTotalDifficultyPassed *bool                          `toml:",omitempty"`
+		ECBP1100                              *big.Int
+		ECBP1100NoDisable                     *bool    `toml:",omitempty"`
+		OverrideMystique                      *big.Int `toml:",omitempty"`
+		OverrideTerminalTotalDifficulty       *big.Int `toml:",omitempty"`
+		OverrideTerminalTotalDifficultyPassed *bool    `toml:",omitempty"`
 	}
 	var enc Config
 	enc.Genesis = c.Genesis
 	enc.NetworkId = c.NetworkId
+	enc.ProtocolVersions = c.ProtocolVersions
 	enc.SyncMode = c.SyncMode
 	enc.EthDiscoveryURLs = c.EthDiscoveryURLs
 	enc.SnapDiscoveryURLs = c.SnapDiscoveryURLs
@@ -90,6 +96,7 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.DatabaseHandles = c.DatabaseHandles
 	enc.DatabaseCache = c.DatabaseCache
 	enc.DatabaseFreezer = c.DatabaseFreezer
+	enc.DatabaseFreezerRemote = c.DatabaseFreezerRemote
 	enc.TrieCleanCache = c.TrieCleanCache
 	enc.TrieCleanCacheJournal = c.TrieCleanCacheJournal
 	enc.TrieCleanCacheRejournal = c.TrieCleanCacheRejournal
@@ -111,6 +118,9 @@ func (c Config) MarshalTOML() (interface{}, error) {
 	enc.RPCTxFeeCap = c.RPCTxFeeCap
 	enc.Checkpoint = c.Checkpoint
 	enc.CheckpointOracle = c.CheckpointOracle
+	enc.ECBP1100 = c.ECBP1100
+	enc.ECBP1100NoDisable = c.ECBP1100NoDisable
+	enc.OverrideMystique = c.OverrideMystique
 	enc.OverrideTerminalTotalDifficulty = c.OverrideTerminalTotalDifficulty
 	enc.OverrideTerminalTotalDifficultyPassed = c.OverrideTerminalTotalDifficultyPassed
 	return &enc, nil
@@ -121,6 +131,7 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	type Config struct {
 		Genesis                               *genesisT.Genesis `toml:",omitempty"`
 		NetworkId                             *uint64
+		ProtocolVersions                      []uint
 		SyncMode                              *downloader.SyncMode
 		EthDiscoveryURLs                      []string
 		SnapDiscoveryURLs                     []string
@@ -142,6 +153,7 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		DatabaseHandles                       *int                   `toml:"-"`
 		DatabaseCache                         *int
 		DatabaseFreezer                       *string
+		DatabaseFreezerRemote                 *string
 		TrieCleanCache                        *int
 		TrieCleanCacheJournal                 *string        `toml:",omitempty"`
 		TrieCleanCacheRejournal               *time.Duration `toml:",omitempty"`
@@ -158,13 +170,16 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 		DocRoot                               *string `toml:"-"`
 		EWASMInterpreter                      *string
 		EVMInterpreter                        *string
-		RPCGasCap                             *uint64 `toml:",omitempty"`
+		RPCGasCap                             *uint64
 		RPCEVMTimeout                         *time.Duration
 		RPCTxFeeCap                           *float64
 		Checkpoint                            *ctypes.TrustedCheckpoint      `toml:",omitempty"`
 		CheckpointOracle                      *ctypes.CheckpointOracleConfig `toml:",omitempty"`
-		OverrideTerminalTotalDifficulty       *big.Int                       `toml:",omitempty"`
-		OverrideTerminalTotalDifficultyPassed *bool                          `toml:",omitempty"`
+		ECBP1100                              *big.Int
+		ECBP1100NoDisable                     *bool    `toml:",omitempty"`
+		OverrideMystique                      *big.Int `toml:",omitempty"`
+		OverrideTerminalTotalDifficulty       *big.Int `toml:",omitempty"`
+		OverrideTerminalTotalDifficultyPassed *bool    `toml:",omitempty"`
 	}
 	var dec Config
 	if err := unmarshal(&dec); err != nil {
@@ -175,6 +190,9 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	}
 	if dec.NetworkId != nil {
 		c.NetworkId = *dec.NetworkId
+	}
+	if dec.ProtocolVersions != nil {
+		c.ProtocolVersions = dec.ProtocolVersions
 	}
 	if dec.SyncMode != nil {
 		c.SyncMode = *dec.SyncMode
@@ -239,6 +257,9 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	if dec.DatabaseFreezer != nil {
 		c.DatabaseFreezer = *dec.DatabaseFreezer
 	}
+	if dec.DatabaseFreezerRemote != nil {
+		c.DatabaseFreezerRemote = *dec.DatabaseFreezerRemote
+	}
 	if dec.TrieCleanCache != nil {
 		c.TrieCleanCache = *dec.TrieCleanCache
 	}
@@ -301,6 +322,15 @@ func (c *Config) UnmarshalTOML(unmarshal func(interface{}) error) error {
 	}
 	if dec.CheckpointOracle != nil {
 		c.CheckpointOracle = dec.CheckpointOracle
+	}
+	if dec.ECBP1100 != nil {
+		c.ECBP1100 = dec.ECBP1100
+	}
+	if dec.ECBP1100NoDisable != nil {
+		c.ECBP1100NoDisable = dec.ECBP1100NoDisable
+	}
+	if dec.OverrideMystique != nil {
+		c.OverrideMystique = dec.OverrideMystique
 	}
 	if dec.OverrideTerminalTotalDifficulty != nil {
 		c.OverrideTerminalTotalDifficulty = dec.OverrideTerminalTotalDifficulty

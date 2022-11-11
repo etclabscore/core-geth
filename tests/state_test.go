@@ -75,10 +75,10 @@ func TestState(t *testing.T) {
 	if *testEVM != "" || *testEWASM != "" {
 		// Berlin tests are not expected to pass for external EVMs, yet.
 		//
-		st.skipFork("^Berlin$") // ETH
-		st.skipFork("Magneto")  // ETC
-		st.skipFork("London")   // ETH
-		st.skipFork("Mystique") // ETC
+		// st.skipFork("Berlin")   // ETH
+		// st.skipFork("Magneto") // ETC
+		// st.skipFork("London")   // ETH
+		// st.skipFork("Mystique") // ETC
 	}
 	// The multigeth data type (like the Ethereum Foundation data type) doesn't support
 	// the ETC_Mystique fork/feature configuration, which omits EIP1559 and the associated BASEFEE

@@ -188,39 +188,194 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 		return evmc.StorageModified
 	}
 
-	resetClearRefund := vars.NetSstoreResetClearRefund
-	cleanRefund := vars.NetSstoreResetRefund
+	// /**
+	//  * The effect of an attempt to modify a contract storage item.
+	//  *
+	//  * See @ref storagestatus for additional information about design of this enum
+	//  * and analysis of the specification.
+	//  *
+	//  * For the purpose of explaining the meaning of each element, the following
+	//  * notation is used:
+	//  * - 0 is zero value,
+	//  * - X != 0 (X is any value other than 0),
+	//  * - Y != 0, Y != X,  (Y is any value other than X and 0),
+	//  * - Z != 0, Z != X, Z != X (Z is any value other than Y and X and 0),
+	//  * - the "o -> c -> v" triple describes the change status in the context of:
+	//  *   - o: original value (cold value before a transaction started),
+	//  *   - c: current storage value,
+	//  *   - v: new storage value to be set.
+	//  *
+	//  * The order of elements follows EIPs introducing net storage gas costs:
+	//  * - EIP-2200: https://eips.ethereum.org/EIPS/eip-2200,
+	//  * - EIP-1283: https://eips.ethereum.org/EIPS/eip-1283.
+	//  */
+	// enum evmc_storage_status
+	// {
+	// 	/**
+	// 	 * The new/same value is assigned to the storage item without affecting the cost structure.
+	// 	 *
+	// 	 * The storage value item is either:
+	// 	 * - left unchanged (c == v) or
+	// 	 * - the dirty value (o != c) is modified again (c != v).
+	// 	 * This is the group of cases related to minimal gas cost of only accessing warm storage.
+	// 	 * 0|X   -> 0 -> 0 (current value unchanged)
+	// 	 * 0|X|Y -> Y -> Y (current value unchanged)
+	// 	 * 0|X   -> Y -> Z (modified previously added/modified value)
+	// 	 *
+	// 	 * This is "catch all remaining" status. I.e. if all other statuses are correctly matched
+	// 	 * this status should be assigned to all remaining cases.
+	// 	 */
+	// 	EVMC_STORAGE_ASSIGNED = 0,
+	status = evmc.StorageAssigned
+	//
+	// 	/**
+	// 	 * A new storage item is added by changing
+	// 	 * the current clean zero to a nonzero value.
+	// 	 * 0 -> 0 -> Z
+	// 	 */
+	// 		EVMC_STORAGE_ADDED = 1,
+	//
+	if original.IsZero() && current.IsZero() && !value.IsZero() {
+		status = evmc.StorageAdded
+	}
+	// /**
+	//  * A storage item is deleted by changing
+	//  * the current clean nonzero to the zero value.
+	//  * X -> X -> 0
+	//  */
+	// 	EVMC_STORAGE_DELETED = 2,
+	//
+	if !original.IsZero() && !current.IsZero() && value.IsZero() {
+		status = evmc.StorageDeleted
+	}
+	// /**
+	//  * A storage item is modified by changing
+	//  * the current clean nonzero to other nonzero value.
+	//  * X -> X -> Z
+	//  */
+	// 	EVMC_STORAGE_MODIFIED = 3,
+	//
+	if !original.IsZero() && !current.IsZero() && !value.IsZero() {
+		if original == current {
+			status = evmc.StorageModified
+		}
+	}
+	// /**
+	//  * A storage item is added by changing
+	//  * the current dirty zero to a nonzero value other than the original value.
+	//  * X -> 0 -> Z
+	//  */
+	// 	EVMC_STORAGE_DELETED_ADDED = 4,
+	//
+	if !original.IsZero() && current.IsZero() && !value.IsZero() {
+		if !original.Eq(value) {
+			status = evmc.StorageDeletedAdded
+		}
+	}
+	// /**
+	//  * A storage item is deleted by changing
+	//  * the current dirty nonzero to the zero value and the original value is not zero.
+	//  * X -> Y -> 0
+	//  */
+	// 	EVMC_STORAGE_MODIFIED_DELETED = 5,
+	//
+	if !original.IsZero() && !current.IsZero() && value.IsZero() {
+		if original != current {
+			status = evmc.StorageModifiedDeleted
+		}
+	}
+	// /**
+	//  * A storage item is added by changing
+	//  * the current dirty zero to the original value.
+	//  * X -> 0 -> X
+	//  */
+	// 	EVMC_STORAGE_DELETED_RESTORED = 6,
+	//
+	if !original.IsZero() && current.IsZero() && !value.IsZero() {
+		if original.Eq(value) {
+			status = evmc.StorageDeletedRestored
+		}
+	}
+	// /**
+	//  * A storage item is deleted by changing
+	//  * the current dirty nonzero to the original zero value.
+	//  * 0 -> Y -> 0
+	//  */
+	// 	EVMC_STORAGE_ADDED_DELETED = 7,
+	//
+	if original.IsZero() && !current.IsZero() && value.IsZero() {
+		status = evmc.StorageAddedDeleted
+	}
+	// /**
+	//  * A storage item is modified by changing
+	//  * the current dirty nonzero to the original nonzero value other than the current value.
+	//  * X -> Y -> X
+	//  */
+	// 	EVMC_STORAGE_MODIFIED_RESTORED = 8
+	// };
+	//
+	if !original.IsZero() && !current.IsZero() && !value.IsZero() {
+		if original != current && original.Eq(value) {
+			status = evmc.StorageModifiedRestored
+		}
+	}
 
-	if isIstanbul {
-		resetClearRefund = vars.SstoreSetGasEIP2200 - vars.SloadGasEIP2200 // 19200
-		cleanRefund = vars.SstoreResetGasEIP2200 - vars.SloadGasEIP2200    // 4200
+	// if original == current {
+	// 	// 0 -> 0 -> Z
+	// 	if original.IsZero() { // create slot (2.1.1)
+	// 		return evmc.StorageAdded
+	// 	}
+	//
+	// 	if value.IsZero() { // delete slot (2.1.2b)
+	// 		host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
+	// 		return evmc.StorageDeleted
+	// 	}
+	// 	return evmc.StorageModified
+	// }
+	//
+	// if !original.IsZero() {
+	// 	if current.IsZero() { // recreate slot (2.2.1.1)
+	// 		host.env.StateDB.SubRefund(vars.NetSstoreClearRefund)
+	// 	} else if value.IsZero() { // delete slot (2.2.1.2)
+	// 		host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
+	// 	}
+	// }
+	// if original.Eq(value) {
+	// 	if original.IsZero() { // reset to original inexistent slot (2.2.2.1)
+	// 		host.env.StateDB.AddRefund(vars.NetSstoreResetClearRefund)
+	// 	} else { // reset to original existing slot (2.2.2.2)
+	// 		host.env.StateDB.AddRefund(vars.NetSstoreResetRefund)
+	// 	}
+	// }
+
+	if current.Eq(value) {
+		return
 	}
 
 	if original == current {
-		if original.IsZero() { // create slot (2.1.1)
-			return evmc.StorageAdded
+		if original.IsZero() {
+			return
 		}
-		if value.IsZero() { // delete slot (2.1.2b)
+		if value.IsZero() {
 			host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
-			return evmc.StorageDeleted
 		}
-		return evmc.StorageModified
+		return
 	}
 	if !original.IsZero() {
-		if current.IsZero() { // recreate slot (2.2.1.1)
+		if current.IsZero() {
 			host.env.StateDB.SubRefund(vars.NetSstoreClearRefund)
-		} else if value.IsZero() { // delete slot (2.2.1.2)
+		} else if value.IsZero() {
 			host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
 		}
 	}
 	if original.Eq(value) {
-		if original.IsZero() { // reset to original inexistent slot (2.2.2.1)
-			host.env.StateDB.AddRefund(resetClearRefund)
-		} else { // reset to original existing slot (2.2.2.2)
-			host.env.StateDB.AddRefund(cleanRefund)
+		if original.IsZero() {
+			host.env.StateDB.AddRefund(vars.NetSstoreResetClearRefund)
+		} else {
+			host.env.StateDB.AddRefund(vars.NetSstoreResetRefund)
 		}
 	}
-	return evmc.StorageAssigned
+	return status
 }
 
 func (host *hostContext) GetBalance(addr evmc.Address) evmc.Hash {

@@ -167,27 +167,6 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 
 	host.env.StateDB.SetState(addr, key, common.BytesToHash(value.Bytes()))
 
-	// Here's a great example of one of the limits of our (core-geth) current chainconfig interface model.
-	// Should we handle the logic here about historic-featuro logic (which really is nice, because when reading the strange-incantation implemations, it's nice to see why it is),
-	// or should we handle the question of where we handle the rest of the questions like this, since this logic is
-	// REALLY logic that belongs to the abstract idea of a chainconfiguration (aka chainconfig), which makes sense
-	// but depends on ECIPs having steadier and more predictable logic.
-
-	// isIstanbul was originally defined as two conditions: EIP1884, EIP2200;
-	// but now the code expects any configuration to always apply (or have applied) them together at (as) the Istanbul fork.
-	isIstanbul := getRevision(host.env) >= evmc.Istanbul
-
-	if !isIstanbul {
-		status = evmc.StorageModified
-		if oldValue.IsZero() {
-			return evmc.StorageAdded
-		} else if value.IsZero() {
-			host.env.StateDB.AddRefund(vars.SstoreRefundGas)
-			return evmc.StorageDeleted
-		}
-		return evmc.StorageModified
-	}
-
 	// /**
 	//  * The effect of an attempt to modify a contract storage item.
 	//  *
@@ -246,7 +225,9 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	// 	EVMC_STORAGE_DELETED = 2,
 	//
 	if !original.IsZero() && !current.IsZero() && value.IsZero() {
-		status = evmc.StorageDeleted
+		if original == current {
+			status = evmc.StorageDeleted
+		}
 	}
 	// /**
 	//  * A storage item is modified by changing
@@ -320,6 +301,72 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 		}
 	}
 
+	revision := getRevision(host.env)
+
+	if revision >= evmc.Istanbul /* EIP-1884, EIP-2200 */ {
+		if current.Eq(value) {
+			return
+		}
+		if original == current {
+			if value.IsZero() {
+				host.env.StateDB.AddRefund(vars.SstoreClearsScheduleRefundEIP2200)
+			}
+			return
+		}
+		if !original.IsZero() {
+			if current.IsZero() {
+				host.env.StateDB.SubRefund(vars.SstoreClearsScheduleRefundEIP2200)
+			} else if value.IsZero() {
+				host.env.StateDB.AddRefund(vars.SstoreClearsScheduleRefundEIP2200)
+			}
+		}
+		if original.Eq(value) {
+			if original.IsZero() {
+				host.env.StateDB.AddRefund(vars.SstoreSetGasEIP2200 - vars.SloadGasEIP2200)
+			} else {
+				host.env.StateDB.AddRefund(vars.SstoreResetGasEIP2200 - vars.SloadGasEIP2200)
+			}
+		}
+		return
+
+	} else if revision == evmc.Constantinople {
+		if current.Eq(value) {
+			return
+		}
+
+		if original == current {
+			if original.IsZero() {
+				return
+			}
+			if value.IsZero() {
+				host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
+			}
+			return
+		}
+		if !original.IsZero() {
+			if current.IsZero() {
+				host.env.StateDB.SubRefund(vars.NetSstoreClearRefund)
+			} else if value.IsZero() {
+				host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
+			}
+		}
+		if original.Eq(value) {
+			if original.IsZero() {
+				host.env.StateDB.AddRefund(vars.NetSstoreResetClearRefund)
+			} else {
+				host.env.StateDB.AddRefund(vars.NetSstoreResetRefund)
+			}
+		}
+		return
+	}
+
+	// else (default, homestead on)
+	if !current.IsZero() && value.IsZero() {
+		host.env.StateDB.AddRefund(vars.SstoreRefundGas)
+	}
+
+	return status
+
 	// if original == current {
 	// 	// 0 -> 0 -> Z
 	// 	if original.IsZero() { // create slot (2.1.1)
@@ -347,35 +394,6 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	// 		host.env.StateDB.AddRefund(vars.NetSstoreResetRefund)
 	// 	}
 	// }
-
-	if current.Eq(value) {
-		return
-	}
-
-	if original == current {
-		if original.IsZero() {
-			return
-		}
-		if value.IsZero() {
-			host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
-		}
-		return
-	}
-	if !original.IsZero() {
-		if current.IsZero() {
-			host.env.StateDB.SubRefund(vars.NetSstoreClearRefund)
-		} else if value.IsZero() {
-			host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
-		}
-	}
-	if original.Eq(value) {
-		if original.IsZero() {
-			host.env.StateDB.AddRefund(vars.NetSstoreResetClearRefund)
-		} else {
-			host.env.StateDB.AddRefund(vars.NetSstoreResetRefund)
-		}
-	}
-	return status
 }
 
 func (host *hostContext) GetBalance(addr evmc.Address) evmc.Hash {
@@ -540,7 +558,7 @@ func getRevision(env *EVM) evmc.Revision {
 		return evmc.London
 	case conf.IsEnabled(conf.GetEIP2565Transition, n):
 		return evmc.Berlin
-	case conf.IsEnabled(conf.GetEIP1884Transition, n):
+	case conf.IsEnabled(conf.GetEIP2200Transition, n):
 		return evmc.Istanbul
 	case conf.IsEnabled(conf.GetEIP1283DisableTransition, n):
 		return evmc.Petersburg

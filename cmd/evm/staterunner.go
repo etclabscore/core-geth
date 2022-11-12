@@ -38,17 +38,8 @@ var stateTestCommand = &cli.Command{
 	Name:      "statetest",
 	Usage:     "executes the given state tests",
 	ArgsUsage: "<file>",
-	Flags: []cli.Flag{
-		stateTestEVMCEWASMFlag,
-		utils.EVMInterpreterFlag,
-	},
-	Category: flags.DevCategory,
-}
-
-var stateTestEVMCEWASMFlag = &cli.StringFlag{
-	Name:     "evmc.ewasm",
-	Usage:    "EVMC EWASM configuration",
-	Category: flags.DevCategory,
+	Flags:     []cli.Flag{},
+	Category:  flags.DevCategory,
 }
 
 // StatetestResult contains the execution status after running a state test, any
@@ -69,11 +60,6 @@ func stateTestCmd(ctx *cli.Context) error {
 	glogger := log.NewGlogHandler(log.StreamHandler(os.Stderr, log.TerminalFormat(false)))
 	glogger.Verbosity(log.Lvl(ctx.Int(VerbosityFlag.Name)))
 	log.Root().SetHandler(glogger)
-
-	if s := ctx.String(stateTestEVMCEWASMFlag.Name); s != "" {
-		log.Info("Running tests with %s=%s", "evmc.ewasm", s)
-		vm.InitEVMCEwasm(s)
-	}
 
 	// Configure the EVM logger
 	config := &logger.Config{
@@ -110,12 +96,15 @@ func stateTestCmd(ctx *cli.Context) error {
 	cfg := vm.Config{
 		Tracer:           tracer,
 		Debug:            ctx.Bool(DebugFlag.Name) || ctx.Bool(MachineFlag.Name),
-		EWASMInterpreter: ctx.String(stateTestEVMCEWASMFlag.Name),
 		EVMInterpreter:   ctx.String(utils.EVMInterpreterFlag.Name),
+		EWASMInterpreter: ctx.String(utils.EWASMInterpreterFlag.Name),
 	}
 
 	if cfg.EVMInterpreter != "" {
 		vm.InitEVMCEVM(cfg.EVMInterpreter)
+	}
+	if cfg.EWASMInterpreter != "" {
+		vm.InitEVMCEwasm(cfg.EWASMInterpreter)
 	}
 
 	results := make([]StatetestResult, 0, len(tests))

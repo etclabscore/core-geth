@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/core/state"
@@ -38,8 +39,16 @@ var stateTestCommand = &cli.Command{
 	Name:      "statetest",
 	Usage:     "executes the given state tests",
 	ArgsUsage: "<file>",
-	Flags:     []cli.Flag{},
-	Category:  flags.DevCategory,
+	Flags: []cli.Flag{
+		forkFlag,
+	},
+	Category: flags.DevCategory,
+}
+
+var forkFlag = &cli.StringFlag{
+	Name:  "forks",
+	Usage: "Run only these forks, comma separated",
+	Value: "",
 }
 
 // StatetestResult contains the execution status after running a state test, any
@@ -110,6 +119,18 @@ func stateTestCmd(ctx *cli.Context) error {
 	results := make([]StatetestResult, 0, len(tests))
 	for key, test := range tests {
 		for _, st := range test.Subtests(nil) {
+			if len(ctx.String(forkFlag.Name)) > 0 {
+				forkMatched := false
+				for _, fork := range strings.Split(ctx.String(forkFlag.Name), ",") {
+					if strings.Contains(fork, st.Fork) {
+						forkMatched = true
+						break
+					}
+				}
+				if !forkMatched {
+					continue
+				}
+			}
 			// Run the test and aggregate the result
 			result := &StatetestResult{Name: key, Fork: st.Fork, Pass: true}
 			_, s, err := test.Run(st, cfg, false)
@@ -120,10 +141,10 @@ func stateTestCmd(ctx *cli.Context) error {
 			if err != nil {
 				// Test failed, mark as so and dump any state to aid debugging
 				result.Pass, result.Error = false, err.Error()
-				if ctx.Bool(DumpFlag.Name) && s != nil {
-					dump := s.RawDump(nil)
-					result.State = &dump
-				}
+			}
+			if ctx.Bool(DumpFlag.Name) && s != nil {
+				dump := s.RawDump(nil)
+				result.State = &dump
 			}
 
 			results = append(results, *result)

@@ -319,6 +319,12 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	key := common.Hash(evmcKey)
 	value := new(uint256.Int).SetBytes(evmcValue[:])
 
+	// var oldValue uint256.Int
+	// oldValue.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
+	// if oldValue.Eq(value) {
+	// 	return evmc.StorageAssigned
+	// }
+
 	var current, original = new(uint256.Int), new(uint256.Int)
 	current.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
 	original.SetBytes(host.env.StateDB.GetCommittedState(addr, key).Bytes())

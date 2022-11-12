@@ -49,6 +49,7 @@ require (
 	github.com/mattn/go-colorable v0.1.8
 	github.com/mattn/go-isatty v0.0.12
 	github.com/naoina/toml v0.1.2-0.20170918210437-9fafd6967416
+	github.com/nsf/jsondiff v0.0.0-20210926074059-1e845ec5d249
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/open-rpc/meta-schema v0.0.0-20201029221707-1b72ef2ea333
 	github.com/peterh/liner v1.1.1-0.20190123174540-a2c9a5303de7

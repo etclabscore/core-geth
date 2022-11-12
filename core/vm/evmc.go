@@ -369,13 +369,15 @@ func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evm
 
 func (host *hostContext) GetTxContext() evmc.TxContext {
 	txCtx := evmc.TxContext{
-		GasPrice:  evmc.Hash(common.BigToHash(host.env.GasPrice)),
-		Origin:    evmc.Address(host.env.TxContext.Origin),
-		Coinbase:  evmc.Address(host.env.Context.Coinbase),
-		Number:    host.env.Context.BlockNumber.Int64(),
-		Timestamp: host.env.Context.Time.Int64(),
-		GasLimit:  int64(host.env.Context.GasLimit),
-		ChainID:   evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
+		GasPrice:   evmc.Hash(common.BigToHash(host.env.GasPrice)),
+		Origin:     evmc.Address(host.env.TxContext.Origin),
+		Coinbase:   evmc.Address(host.env.Context.Coinbase),
+		Number:     host.env.Context.BlockNumber.Int64(),
+		Timestamp:  host.env.Context.Time.Int64(),
+		GasLimit:   int64(host.env.Context.GasLimit),
+		ChainID:    evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
+		BaseFee:    evmc.Hash{},
+		PrevRandao: evmc.Hash{},
 	}
 	conf := host.env.ChainConfig()
 	if conf.IsEnabled(conf.GetEIP1559Transition, host.env.Context.BlockNumber) {
@@ -540,26 +542,6 @@ func (evm *EVMC) Run(contract *Contract, input []byte, readOnly bool) (ret []byt
 		defer func() { evm.readOnly = false }()
 	}
 
-	// output, gasLeft, err := evm.instance.Execute(
-	// 	&hostContext{evm.env, contract},
-	// 	getRevision(evm.env),
-	// 	kind,
-	// 	evm.readOnly,
-	// 	evm.env.depth-1,
-	// 	int64(contract.Gas),
-	// 	evmc.Address(contract.Address()),
-	// 	evmc.Address(contract.Caller()),
-	// 	input,
-	// 	evmc.Hash(common.BigToHash(contract.value)),
-	// 	contract.Code,
-	// )
-
-	/*
-		func (vm *VM) Execute(
-		ctx HostContext, rev Revision, kind CallKind, static bool, depth int, gas int64,
-		recipient Address, sender Address, input []byte, value Hash, code []byte)
-		(output []byte, gasLeft int64, err error)
-	*/
 	output, gasLeft, err := evm.instance.Execute(
 		&hostContext{evm.env, contract},
 		getRevision(evm.env),
@@ -567,11 +549,11 @@ func (evm *EVMC) Run(contract *Contract, input []byte, readOnly bool) (ret []byt
 		evm.readOnly,
 		evm.env.depth-1,
 		int64(contract.Gas),
-		evmc.Address(contract.Address()), // recipient
-		evmc.Address(contract.Caller()),  // sender
+		evmc.Address(contract.Address()),
+		evmc.Address(contract.Caller()),
 		input,
 		evmc.Hash(common.BigToHash(contract.value)),
-		contract.Code, // code
+		contract.Code,
 	)
 
 	contract.Gas = uint64(gasLeft)

@@ -12,7 +12,6 @@ import (
 	"github.com/ethereum/go-ethereum/eth/tracers/logger"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/tests"
-	"github.com/go-test/deep"
 	"github.com/nsf/jsondiff"
 )
 
@@ -27,22 +26,50 @@ type testResult struct {
 	dumpJSON []byte
 }
 
+var (
+	// Configure the tested external EVMs
+	soEVMOne = evmcVM{
+		evmc.CapabilityEVM1,
+		"../build/_workspace/evmone/lib/libevmone.so",
+	}
+	soHera = evmcVM{
+		evmc.CapabilityEWASM,
+		"../build/_workspace/hera/build/src/libhera.so",
+	}
+)
+
+var (
+	// Define fork(s) to run
+	forks = []string{"Istanbul"}
+)
+
 func TestHeraVEVMOne(t *testing.T) {
 
 	// Configure the go-ethereum logger
-	glogger := log.NewGlogHandler(log.StreamHandler(os.Stderr, log.TerminalFormat(false)))
-	glogger.Verbosity(log.Lvl(log.LvlDebug))
-	log.Root().SetHandler(glogger)
+	verbose := false
+	if verbose {
+		glogger := log.NewGlogHandler(log.StreamHandler(os.Stderr, log.TerminalFormat(false)))
+		glogger.Verbosity(log.Lvl(log.LvlDebug))
+		log.Root().SetHandler(glogger)
+	}
 
 	// Define the test path(s)
-	myTestFile := "../tests/testdata/GeneralStateTests/VMTests/vmArithmeticTest/add.json"
-	// myTestFile := "../tests/testdata/GeneralStateTests/stRandom/randomStatetest153.json"
+	// myTestFiles :=
+	myTestFiles := []string{
+		// "../tests/testdata/GeneralStateTests/VMTests/vmArithmeticTest/add.json",
+		"../tests/testdata/GeneralStateTests/stRandom/randomStatetest153.json",
+		// "../tests/testdata/GeneralStateTests/stBadOpcode/operationDiffGas.json",
+		// "../tests/testdata/GeneralStateTests/stCallCodes/callcallcallcode_001_SuicideMiddle.json",
+	}
 
-	// Define fork(s) to run
-	forks := []string{"Istanbul"}
+	for _, myTestFile := range myTestFiles {
+		runEVMCStateTestFile(t, []evmcVM{soEVMOne, soHera}, myTestFile)
+	}
+}
 
+func runEVMCStateTestFile(t *testing.T, myEVMs []evmcVM, testFile string) {
 	// Load the test content from the input file
-	src, err := os.ReadFile(myTestFile)
+	src, err := os.ReadFile(testFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,20 +78,12 @@ func TestHeraVEVMOne(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Configure the tested external EVMs
-	soEVMOne := evmcVM{
-		evmc.CapabilityEVM1,
-		"../build/_workspace/evmone/lib/libevmone.so",
-	}
-	soHera := evmcVM{
-		evmc.CapabilityEWASM,
-		"../build/_workspace/hera/build/src/libhera.so",
-	}
-
 	// Run the tests
+	t.Log("====== Running tests from", testFile)
 	for _, mytest := range mytests {
-		evmoneResults := runTest(t, soEVMOne, mytest, forks)
-		heraResults := runTest(t, soHera, mytest, forks)
+
+		evmoneResults := runEVMCStateTest(t, soEVMOne, mytest, forks)
+		heraResults := runEVMCStateTest(t, soHera, mytest, forks)
 
 		// Compare output
 		for i, evmoneResult := range evmoneResults {
@@ -81,22 +100,18 @@ func TestHeraVEVMOne(t *testing.T) {
 				t.Errorf("Hera error: %v", heraResult.err)
 			}
 
-			if didErr {
-				lines := deep.Equal(evmoneResult.dump, heraResult.dump)
-				for _, line := range lines {
-					t.Errorf("EVMOne/Hera diff: %v", line)
-				}
+			opts := jsondiff.DefaultConsoleOptions()
+			diff, diffStr := jsondiff.Compare(heraResult.dumpJSON, evmoneResult.dumpJSON, &opts)
 
-				opts := jsondiff.DefaultConsoleOptions()
-				diff, diffStr := jsondiff.Compare(evmoneResult.dumpJSON, heraResult.dumpJSON, &opts)
+			if didErr || diff != jsondiff.FullMatch {
+				t.Log("JSON diff:", diff)
 				t.Log(diffStr)
-				t.Log(diff)
 			}
 		}
 	}
 }
 
-func runTest(t *testing.T, myvm evmcVM, test tests.StateTest, forks []string) []testResult {
+func runEVMCStateTest(t *testing.T, myvm evmcVM, test tests.StateTest, forks []string) []testResult {
 	loggerConfig := &logger.Config{
 		EnableMemory:     false,
 		DisableStack:     false,

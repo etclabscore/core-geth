@@ -119,6 +119,7 @@ func (host *hostContext) AccessAccount(addr evmc.Address) evmc.AccessStatus {
 	if host.env.StateDB.AddressInAccessList(common.Address(addr)) {
 		return evmc.WarmAccess
 	}
+	host.env.StateDB.AddAddressToAccessList(common.Address(addr))
 	return evmc.ColdAccess
 }
 
@@ -131,6 +132,7 @@ func (host *hostContext) AccessStorage(addr evmc.Address, key evmc.Hash) evmc.Ac
 	if addrOK, slotOK := host.env.StateDB.SlotInAccessList(common.Address(addr), common.Hash(key)); addrOK && slotOK {
 		return evmc.WarmAccess
 	}
+	host.env.StateDB.AddSlotToAccessList(common.Address(addr), common.Hash(key))
 	return evmc.ColdAccess
 }
 
@@ -318,12 +320,6 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	addr := common.Address(evmcAddr)
 	key := common.Hash(evmcKey)
 	value := new(uint256.Int).SetBytes(evmcValue[:])
-
-	var oldValue uint256.Int
-	oldValue.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
-	if oldValue.Eq(value) {
-		return evmc.StorageAssigned
-	}
 
 	var current, original = new(uint256.Int), new(uint256.Int)
 	current.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())

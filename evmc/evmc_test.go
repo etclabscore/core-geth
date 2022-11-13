@@ -1,6 +1,8 @@
 package evmc
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"os"
 	"strings"
@@ -21,9 +23,11 @@ type evmcVM struct {
 }
 
 type testResult struct {
-	err      error
-	dump     state.Dump
-	dumpJSON []byte
+	fork        string
+	err         error
+	dump        state.Dump
+	dumpJSON    []byte
+	debugOutput []byte
 }
 
 var (
@@ -57,9 +61,14 @@ func TestHeraVEVMOne(t *testing.T) {
 	// myTestFiles :=
 	myTestFiles := []string{
 		// "../tests/testdata/GeneralStateTests/VMTests/vmArithmeticTest/add.json",
+		// "../tests/testdata/LegacyTests/Constantinople/GeneralStateTests/VMTests/vmArithmeticTest/add.json",
+
 		"../tests/testdata/GeneralStateTests/stRandom/randomStatetest153.json",
+		// "../tests/testdata/LegacyTests/Constantinople/GeneralStateTests/stRandom/randomStatetest153.json",
 		// "../tests/testdata/GeneralStateTests/stBadOpcode/operationDiffGas.json",
 		// "../tests/testdata/GeneralStateTests/stCallCodes/callcallcallcode_001_SuicideMiddle.json",
+		// "../tests/testdata/GeneralStateTests/stBadOpcode/opcEADiffPlaces.json",
+		// "../tests/testdata/GeneralStateTests/stZeroKnowledge2/ecadd_0-0_0-0_25000_128.json",
 	}
 
 	for _, myTestFile := range myTestFiles {
@@ -104,8 +113,15 @@ func runEVMCStateTestFile(t *testing.T, myEVMs []evmcVM, testFile string) {
 			diff, diffStr := jsondiff.Compare(heraResult.dumpJSON, evmoneResult.dumpJSON, &opts)
 
 			if didErr || diff != jsondiff.FullMatch {
+				t.Log("====== Test failed, fork:", evmoneResult.fork)
 				t.Log("JSON diff:", diff)
 				t.Log(diffStr)
+				t.Log("EVMOne debug output:")
+				t.Log(string(evmoneResult.debugOutput))
+				t.Log("Hera debug output:")
+				t.Log(string(heraResult.debugOutput))
+			} else {
+				t.Log("====== Test passed, fork:", evmoneResult.fork)
 			}
 		}
 	}
@@ -113,34 +129,19 @@ func runEVMCStateTestFile(t *testing.T, myEVMs []evmcVM, testFile string) {
 
 func runEVMCStateTest(t *testing.T, myvm evmcVM, test tests.StateTest, forks []string) []testResult {
 	loggerConfig := &logger.Config{
-		EnableMemory:     false,
+		EnableMemory:     true,
 		DisableStack:     false,
 		DisableStorage:   false,
 		EnableReturnData: true,
 	}
 	var (
 		tracer   vm.EVMLogger
-		debugger *logger.StructLogger
+		debugger *logger.JSONLogger
 	)
-	debugger = logger.NewStructLogger(loggerConfig)
-	tracer = debugger
-
-	// Iterate over all the tests, run them and aggregate the results
-	cfg := vm.Config{
-		Tracer: tracer,
-		Debug:  true,
-	}
-	if myvm.cap == evmc.CapabilityEVM1 {
-		cfg.EVMInterpreter = myvm.path
-		vm.InitEVMCEVM(cfg.EVMInterpreter)
-	} else if myvm.cap == evmc.CapabilityEWASM {
-		cfg.EWASMInterpreter = myvm.path
-		vm.InitEVMCEwasm(cfg.EWASMInterpreter)
-	}
 
 	results := []testResult{}
 	for _, st := range test.Subtests(nil) {
-		res := testResult{}
+		res := testResult{fork: st.Fork}
 		if len(forks) > 0 {
 			forkMatched := false
 			for _, fork := range forks {
@@ -154,8 +155,34 @@ func runEVMCStateTest(t *testing.T, myvm evmcVM, test tests.StateTest, forks []s
 			}
 		}
 
+		buf := new(bytes.Buffer)
+		w := bufio.NewWriter(buf)
+		debugger = logger.NewJSONLogger(loggerConfig, w)
+		tracer = debugger
+
+		// Iterate over all the tests, run them and aggregate the results
+		cfg := vm.Config{
+			Tracer: tracer,
+			Debug:  true,
+		}
+
+		if myvm.cap == evmc.CapabilityEVM1 {
+			cfg.EVMInterpreter = myvm.path
+			vm.InitEVMCEVM(cfg.EVMInterpreter)
+		} else if myvm.cap == evmc.CapabilityEWASM {
+			cfg.EWASMInterpreter = myvm.path
+			vm.InitEVMCEwasm(cfg.EWASMInterpreter)
+		}
+
 		_, s, err := test.Run(st, cfg, false)
 		res.err = err
+
+		w.Flush()
+
+		if err != nil {
+			res.debugOutput = buf.Bytes()
+		}
+
 		// if err != nil {
 		// 	// Test failed, mark as so and dump any state to aid debugging
 		// 	// result.Pass, result.Error = false, err.Error()
@@ -164,6 +191,7 @@ func runEVMCStateTest(t *testing.T, myvm evmcVM, test tests.StateTest, forks []s
 			res.dump = s.RawDump(nil)
 			res.dumpJSON, _ = json.MarshalIndent(res.dump, "", "  ")
 		}
+
 		results = append(results, res)
 	}
 	return results

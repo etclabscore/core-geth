@@ -154,7 +154,6 @@ func (host *hostContext) setStorageLegacy(original, current, value *uint256.Int)
 		return evmc.StorageAssigned
 	}
 
-	status = evmc.StorageModified
 	if current.IsZero() {
 		return evmc.StorageAdded
 	} else if value.IsZero() {
@@ -205,8 +204,8 @@ func (host *hostContext) setStorageEIP1283(original, current, value *uint256.Int
 }
 
 func (host *hostContext) setStorageEIP2200(original, current, value *uint256.Int) (status evmc.StorageStatus) {
-
-	// 2. "If current value equals new value (this is a no-op)"
+	//
+	// // 2. "If current value equals new value (this is a no-op)"
 	if current.Eq(value) {
 		return evmc.StorageAssigned
 	}
@@ -284,6 +283,7 @@ func (host *hostContext) setStorageEIP2200(original, current, value *uint256.Int
 		if original.IsZero() {
 
 			// "add SSTORE_SET_GAS - SLOAD_GAS to refund counter"
+			// 20000 - 800
 			host.env.StateDB.AddRefund(vars.SstoreSetGasEIP2200 - vars.SloadGasEIP2200)
 			triggeredClauses |= restoredBySet
 		} else
@@ -319,11 +319,11 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	key := common.Hash(evmcKey)
 	value := new(uint256.Int).SetBytes(evmcValue[:])
 
-	// var oldValue uint256.Int
-	// oldValue.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
-	// if oldValue.Eq(value) {
-	// 	return evmc.StorageAssigned
-	// }
+	var oldValue uint256.Int
+	oldValue.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
+	if oldValue.Eq(value) {
+		return evmc.StorageAssigned
+	}
 
 	var current, original = new(uint256.Int), new(uint256.Int)
 	current.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
@@ -422,7 +422,7 @@ func (host *hostContext) Call(kind evmc.CallKind,
 	evmcRecipient evmc.Address, evmcSender evmc.Address, valueBytes evmc.Hash, input []byte, gas int64, depth int,
 	static bool, saltBytes evmc.Hash, evmcCodeAddress evmc.Address) (output []byte, gasLeft int64, gasRefund int64, createAddrEvmc evmc.Address, err error) {
 
-	destination := common.Address(evmcRecipient)
+	recipient := common.Address(evmcRecipient)
 	codeAddress := common.Address(evmcCodeAddress)
 
 	var createAddr common.Address
@@ -439,9 +439,9 @@ func (host *hostContext) Call(kind evmc.CallKind,
 	switch kind {
 	case evmc.Call:
 		if static {
-			output, gasLeftU, err = host.env.StaticCall(host.contract, destination, input, gasU)
+			output, gasLeftU, err = host.env.StaticCall(host.contract, recipient, input, gasU)
 		} else {
-			output, gasLeftU, err = host.env.Call(host.contract, destination, input, gasU, value.ToBig())
+			output, gasLeftU, err = host.env.Call(host.contract, recipient, input, gasU, value.ToBig())
 		}
 	case evmc.DelegateCall:
 		output, gasLeftU, err = host.env.DelegateCall(host.contract, codeAddress, input, gasU)
@@ -490,6 +490,7 @@ func (host *hostContext) Call(kind evmc.CallKind,
 
 	gasLeft = int64(gasLeftU)
 	gasRefund = int64(host.env.StateDB.GetRefund())
+
 	return output, gasLeft, gasRefund, createAddrEvmc, err
 }
 

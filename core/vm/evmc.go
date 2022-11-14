@@ -151,21 +151,32 @@ func (host *hostContext) GetStorage(addr evmc.Address, evmcKey evmc.Hash) evmc.H
 	return evmc.Hash(value.Bytes32())
 }
 
+// setStorageLegacy implements the legacy (pre-EIP-1283 and pre-EIP-2200) storage setting.
+// See core/vm/gas_table.go#gasSStore for reference.
 func (host *hostContext) setStorageLegacy(original, current, value *uint256.Int) (status evmc.StorageStatus) {
-	if current.Eq(value) {
-		return evmc.StorageAssigned
-	}
-
-	if current.IsZero() {
+	// This checks for 3 scenario's and calculates gas accordingly:
+	//
+	// 1. From a zero-value address to a non-zero value         (NEW VALUE)
+	// 2. From a non-zero value address to a zero-value address (DELETE)
+	// 3. From a non-zero to a non-zero
+	switch {
+	case current.IsZero() && !value.IsZero():
 		return evmc.StorageAdded
-	} else if value.IsZero() {
+	case !current.IsZero() && value.IsZero():
 		host.env.StateDB.AddRefund(vars.SstoreRefundGas)
 		return evmc.StorageDeleted
+	default: // non 0 => non 0 (or 0 => 0)
+		return evmc.StorageAssigned
 	}
-	return evmc.StorageAssigned
 }
 
 func (host *hostContext) setStorageEIP1283(original, current, value *uint256.Int) (status evmc.StorageStatus) {
+
+	// conf := host.env.ChainConfig()
+	// if host.contract.Gas <= vars.CallStipend && conf.IsEnabled(conf.GetEIP1706Transition, host.env.Context.BlockNumber) {
+	// 	return evmc.StorageAssigned
+	// }
+
 	if current.Eq(value) {
 		return evmc.StorageAssigned
 	}
@@ -206,6 +217,12 @@ func (host *hostContext) setStorageEIP1283(original, current, value *uint256.Int
 }
 
 func (host *hostContext) setStorageEIP2200(original, current, value *uint256.Int) (status evmc.StorageStatus) {
+	// Clause 1 is irrelevant:
+	// 1. "If gasleft is less than or equal to gas stipend,
+	//    fail the current call frame with ‘out of gas’ exception"
+	// if host.contract.Gas <= vars.SstoreSentryGasEIP2200 {
+	// 	return evmc.StorageAssigned
+	// }
 	//
 	// // 2. "If current value equals new value (this is a no-op)"
 	if current.Eq(value) {
@@ -325,17 +342,24 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 	current.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
 	original.SetBytes(host.env.StateDB.GetCommittedState(addr, key).Bytes())
 
-	host.env.StateDB.SetState(addr, key, common.BytesToHash(value.Bytes()))
+	host.env.StateDB.SetState(addr, key, value.Bytes32())
 
 	conf := host.env.ChainConfig()
+
 	if conf.IsEnabled(conf.GetEIP2200Transition, host.env.Context.BlockNumber) {
-		return host.setStorageEIP2200(original, current, value)
+		// >= Istanbul
+		status = host.setStorageEIP2200(original, current, value)
 	} else if conf.IsEnabled(conf.GetEIP1283Transition, host.env.Context.BlockNumber) &&
 		!conf.IsEnabled(conf.GetEIP1283DisableTransition, host.env.Context.BlockNumber) {
-		return host.setStorageEIP1283(original, current, value)
+		// == Constantinople
+		status = host.setStorageEIP1283(original, current, value)
 	} else {
-		return host.setStorageLegacy(original, current, value)
+		// == Legacy (< Istanbul && !Constantinople)
+		fmt.Println("calling legacy sstore")
+		status = host.setStorageLegacy(original, current, value)
 	}
+
+	return status
 }
 
 func (host *hostContext) GetBalance(addr evmc.Address) evmc.Hash {
@@ -426,11 +450,8 @@ func (host *hostContext) Call(kind evmc.CallKind,
 	gasU := uint64(gas)
 	var gasLeftU uint64
 
-	value := new(uint256.Int)
-	value.SetBytes(valueBytes[:])
-
-	salt := big.NewInt(0)
-	salt.SetBytes(saltBytes[:])
+	value := new(uint256.Int).SetBytes(valueBytes[:])
+	salt := big.NewInt(0).SetBytes(saltBytes[:])
 
 	switch kind {
 	case evmc.Call:

@@ -19,6 +19,10 @@ download()
 
 unpack()
 {
+    rm -rf build/_workspace/evmone/bin
+    rm -rf build/_workspace/evmone/include
+    rm -rf build/_workspace/evmone/lib
+
     tar xzvf build/_workspace/evmone/evmone-${TARGET_VERSION}-linux-x86_64.tar.gz -C build/_workspace/evmone/
 }
 

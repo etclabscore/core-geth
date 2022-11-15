@@ -7,6 +7,8 @@ set -e
 # wget -P build/_workspace/hera/ https://github.com/ewasm/hera/releases/download/v0.3.2/hera-0.3.2-linux-x86_64.tar.gz
 # tar -C build/_workspace/hera/0.3.2 -xzf build/_workspace/hera/hera-0.3.2-linux-x86_64.tar.gz
 
+TARGET_VERSION=0.6.0
+
 EXTENSION="so"
 
 _OSTYPE=${OSTYPE}
@@ -23,7 +25,7 @@ main() {
     mkdir -p build/_workspace
     [ ! -d build/_workspace/hera ] && git clone https://github.com/ewasm/hera build/_workspace/hera || echo "Hera exists."
     cd build/_workspace/hera
-    git checkout v0.6.0
+    git checkout v${TARGET_VERSION}
     git submodule update --init
     mkdir -p build
     cd build

@@ -7,12 +7,16 @@ set -e
 # wget -P build/_workspace/hera/ https://github.com/ewasm/hera/releases/download/v0.3.2/hera-0.3.2-linux-x86_64.tar.gz
 # tar -C build/_workspace/hera/0.3.2 -xzf build/_workspace/hera/hera-0.3.2-linux-x86_64.tar.gz
 
+EXTENSION="so"
+
 _OSTYPE=${OSTYPE}
 if [[ ${_OSTYPE} == "linux"* ]]; then
     _OSTYPE="linux"
+    EXTENSION="so"
 fi
 if [[ ${_OSTYPE} == "darwin"* ]]; then
     _OSTYPE="darwin"
+    EXTENSION="dylib"
 fi
 
 main() {
@@ -25,6 +29,6 @@ main() {
     cd build
     cmake -DBUILD_SHARED_LIBS=ON ..
     cmake --build .
-    echo "Built library at: $(pwd)/src/libhera.so"
+    echo "Built library at: $(pwd)/src/libhera.${EXTENSION}"
 }
 main

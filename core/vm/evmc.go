@@ -355,7 +355,6 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 		status = host.setStorageEIP1283(original, current, value)
 	} else {
 		// == Legacy (< Istanbul && !Constantinople)
-		fmt.Println("calling legacy sstore")
 		status = host.setStorageLegacy(original, current, value)
 	}
 

@@ -394,14 +394,17 @@ func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evm
 
 func (host *hostContext) GetTxContext() evmc.TxContext {
 	txCtx := evmc.TxContext{
-		GasPrice:   evmc.Hash(common.BigToHash(host.env.GasPrice)),
-		Origin:     evmc.Address(host.env.TxContext.Origin),
-		Coinbase:   evmc.Address(host.env.Context.Coinbase),
-		Number:     host.env.Context.BlockNumber.Int64(),
-		Timestamp:  host.env.Context.Time.Int64(),
-		GasLimit:   int64(host.env.Context.GasLimit),
-		ChainID:    evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
-		BaseFee:    evmc.Hash{},
+		GasPrice:  evmc.Hash(common.BigToHash(host.env.GasPrice)),
+		Origin:    evmc.Address(host.env.TxContext.Origin),
+		Coinbase:  evmc.Address(host.env.Context.Coinbase),
+		Number:    host.env.Context.BlockNumber.Int64(),
+		Timestamp: host.env.Context.Time.Int64(),
+		GasLimit:  int64(host.env.Context.GasLimit),
+		ChainID:   evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
+		BaseFee:   evmc.Hash{},
+
+		// PrevRandao is, with EIP-1559, replacing the Difficulty field.
+		// It is repurposed to represent the random value.
 		PrevRandao: evmc.Hash(common.BigToHash(host.env.Context.Difficulty)),
 	}
 	conf := host.env.ChainConfig()

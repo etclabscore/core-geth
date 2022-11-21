@@ -233,7 +233,7 @@ func (host *hostContext) setStorageEIP2200(original, current, value *uint256.Int
 	//
 	// 3.1. "If original value equals current value
 	//      (this storage slot has not been changed by the current execution context)"
-	if original == current {
+	if original.Eq(current) {
 
 		// 3.1.1 "If original value is 0"
 		if original.IsZero() {

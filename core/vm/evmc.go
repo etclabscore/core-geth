@@ -402,7 +402,7 @@ func (host *hostContext) GetTxContext() evmc.TxContext {
 		GasLimit:   int64(host.env.Context.GasLimit),
 		ChainID:    evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
 		BaseFee:    evmc.Hash{},
-		PrevRandao: evmc.Hash{},
+		PrevRandao: evmc.Hash(common.BigToHash(host.env.Context.Difficulty)),
 	}
 	conf := host.env.ChainConfig()
 	if conf.IsEnabled(conf.GetEIP1559Transition, host.env.Context.BlockNumber) {

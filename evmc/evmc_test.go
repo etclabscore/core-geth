@@ -42,7 +42,7 @@ var (
 	// Configure the tested external EVMs
 	soEVMOne = evmcVM{
 		cap:       evmc.CapabilityEVM1,
-		path:      "../build/_workspace/evmone/lib/libevmone.so",
+		path:      "../build/_workspace/evmone/lib/libevmone.so,trace=on",
 		evmLogger: &logger.JSONLogger{},
 	}
 	soHera = evmcVM{

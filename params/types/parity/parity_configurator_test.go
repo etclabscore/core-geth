@@ -18,7 +18,7 @@ package parity
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common/math"
@@ -62,7 +62,7 @@ func TestParityChainSpec_GetSetUint64(t *testing.T) {
 
 func TestParityChainSpec_GetEIP2537(t *testing.T) {
 	specFile := "../../parity.json.d/foundation.json"
-	b, err := ioutil.ReadFile(specFile)
+	b, err := os.ReadFile(specFile)
 	if err != nil {
 		t.Fatalf("read file: %v", err)
 	}

@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"runtime"
 	"strconv"
@@ -179,7 +178,7 @@ func initGenesis(ctx *cli.Context) error {
 	}
 
 	genesis := new(genesisT.Genesis)
-	bs, err := ioutil.ReadFile(genesisPath)
+	bs, err := os.ReadFile(genesisPath)
 	if err != nil {
 		utils.Fatalf("Failed to read genesis file: %v", err)
 	}

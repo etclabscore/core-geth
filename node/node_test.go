@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -328,7 +327,7 @@ func TestOpenRPCMetaSchemaSpecLatest(t *testing.T) {
 	}
 
 	localJSONFilePath := "./testdata/open-rpc-meta-schema-1.14.0.json"
-	localJSONFile, err := ioutil.ReadFile(localJSONFilePath)
+	localJSONFile, err := os.ReadFile(localJSONFilePath)
 	if err != nil {
 		t.Fatalf("failed to load local spec JSON file: %v", err)
 	}

@@ -167,7 +167,7 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 	// Note that parallelism can cause greasy bugs around file during read/write which is why
 	// we use a temporary file instead of immediately overwriting the canonical file in the first place;
 	// for example, I saw regular encoding errors without this pattern.
-	tmpFile, err := ioutil.TempFile(os.TempDir(), "geth-state-test-generation")
+	tmpFile, err := os.CreateTemp(os.TempDir(), "geth-state-test-generation")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -456,7 +456,7 @@ func TestGenStateCoreGethConfigs(t *testing.T) {
 					coregethSpecsDir,
 					strcase.ToSnake(subtest.Fork)+"_test.json",
 				)
-				err = ioutil.WriteFile(filename, b, os.ModePerm)
+				err = os.WriteFile(filename, b, os.ModePerm)
 				if err != nil {
 					t.Fatal(err)
 				}

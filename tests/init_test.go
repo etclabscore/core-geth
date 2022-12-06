@@ -65,12 +65,12 @@ var (
 	legacyStateTestDir = filepath.Join(baseDir, "LegacyTests", "Constantinople", "GeneralStateTests")
 	transactionTestDir = filepath.Join(baseDir, "TransactionTests")
 	rlpTestDir         = filepath.Join(baseDir, "RLPTests")
-	difficultyTestDir  = filepath.Join(baseDir, "DifficultyTests")
-	benchmarksDir      = filepath.Join(".", "evm-benchmarks", "benchmarks")
+	// difficultyTestDir  = filepath.Join(baseDir, "DifficultyTests")
+	benchmarksDir = filepath.Join(".", "evm-benchmarks", "benchmarks")
 
-	baseDirETC           = filepath.Join(".", "testdata-etc")
-	stateTestDirETC      = filepath.Join(baseDirETC, "GeneralStateTests")
-	legacyTestDirETC     = filepath.Join(baseDirETC, "LegacyTests", "Constantinople", "GeneralStateTests")
+	baseDirETC      = filepath.Join(".", "testdata-etc")
+	stateTestDirETC = filepath.Join(baseDirETC, "GeneralStateTests")
+	// legacyTestDirETC     = filepath.Join(baseDirETC, "LegacyTests", "Constantinople", "GeneralStateTests")
 	difficultyTestDirETC = filepath.Join(baseDirETC, "DifficultyTests")
 )
 

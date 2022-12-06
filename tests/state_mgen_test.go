@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -215,7 +214,7 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 				configPathTarget := filepath.Join(targetDirCommon, "configs", fmt.Sprintf("%s_config.json", target)) // e.g. "testdata_generated/GeneralStateTests/ETC_Atlantis_config.json"
 				os.MkdirAll(filepath.Dir(configPathTarget), os.ModePerm)
 				if _, statErr := os.Stat(configPathTarget); os.IsNotExist(statErr) {
-					if err := ioutil.WriteFile(configPathTarget, b, os.ModePerm); err != nil {
+					if err := os.WriteFile(configPathTarget, b, os.ModePerm); err != nil {
 						t.Fatal(err)
 					}
 				}

@@ -19,7 +19,6 @@ package tests
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math/big"
 	"math/rand"
 	"os"
@@ -183,7 +182,7 @@ func writeDifficultyTestFileJSON(t *testing.T, filePath string, tests map[string
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ioutil.WriteFile(filePath, b, os.ModePerm)
+	err = os.WriteFile(filePath, b, os.ModePerm)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -8,4 +8,4 @@
 	shallow = true
 [submodule "tests-etc"]
 	path = tests/testdata-etc
-	url = https://github.com/etclabscore/tests-etc
+	url = https://github.com/etclabscore/tests

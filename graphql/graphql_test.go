@@ -39,6 +39,7 @@ import (
 	"github.com/ethereum/go-ethereum/node"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -192,7 +193,7 @@ func TestGraphQLBlockSerializationEIP2718(t *testing.T) {
 				Balance: big.NewInt(0),
 			},
 		},
-		BaseFee: big.NewInt(params.InitialBaseFee),
+		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
 	signer := types.LatestSigner(genesis.Config)
 	newGQLService(t, stack, genesis, 1, func(i int, gen *core.BlockGen) {
@@ -202,15 +203,15 @@ func TestGraphQLBlockSerializationEIP2718(t *testing.T) {
 			To:       &dad,
 			Value:    big.NewInt(100),
 			Gas:      50000,
-			GasPrice: big.NewInt(params.InitialBaseFee),
+			GasPrice: big.NewInt(vars.InitialBaseFee),
 		})
 		gen.AddTx(tx)
 		tx, _ = types.SignNewTx(key, signer, &types.AccessListTx{
-			ChainID:  genesis.Config.ChainID,
+			ChainID:  genesis.Config.GetChainID(),
 			Nonce:    uint64(1),
 			To:       &dad,
 			Gas:      30000,
-			GasPrice: big.NewInt(params.InitialBaseFee),
+			GasPrice: big.NewInt(vars.InitialBaseFee),
 			Value:    big.NewInt(50),
 			AccessList: types.AccessList{{
 				Address:     dad,
@@ -279,7 +280,7 @@ func TestGraphQLTransactionLogs(t *testing.T) {
 			GasLimit:   11500000,
 			Difficulty: big.NewInt(1048576),
 			Alloc: genesisT.GenesisAlloc{
-				addr: {Balance: big.NewInt(params.Ether)},
+				addr: {Balance: big.NewInt(vars.Ether)},
 				dad: {
 					// LOG0(0, 0), LOG0(0, 0), RETURN(0, 0)
 					Code:    common.Hex2Bytes("60006000a060006000a060006000f3"),
@@ -294,11 +295,11 @@ func TestGraphQLTransactionLogs(t *testing.T) {
 	defer stack.Close()
 
 	handler := newGQLService(t, stack, genesis, 1, func(i int, gen *core.BlockGen) {
-		tx, _ := types.SignNewTx(key, signer, &types.LegacyTx{To: &dad, Gas: 100000, GasPrice: big.NewInt(params.InitialBaseFee)})
+		tx, _ := types.SignNewTx(key, signer, &types.LegacyTx{To: &dad, Gas: 100000, GasPrice: big.NewInt(vars.InitialBaseFee)})
 		gen.AddTx(tx)
-		tx, _ = types.SignNewTx(key, signer, &types.LegacyTx{To: &dad, Nonce: 1, Gas: 100000, GasPrice: big.NewInt(params.InitialBaseFee)})
+		tx, _ = types.SignNewTx(key, signer, &types.LegacyTx{To: &dad, Nonce: 1, Gas: 100000, GasPrice: big.NewInt(vars.InitialBaseFee)})
 		gen.AddTx(tx)
-		tx, _ = types.SignNewTx(key, signer, &types.LegacyTx{To: &dad, Nonce: 2, Gas: 100000, GasPrice: big.NewInt(params.InitialBaseFee)})
+		tx, _ = types.SignNewTx(key, signer, &types.LegacyTx{To: &dad, Nonce: 2, Gas: 100000, GasPrice: big.NewInt(vars.InitialBaseFee)})
 		gen.AddTx(tx)
 	})
 	// start node

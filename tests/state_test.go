@@ -58,6 +58,8 @@ func TestState(t *testing.T) {
 	// Uses 1GB RAM per tested fork
 	st.skipLoad(`^stStaticCall/static_Call1MB`)
 
+	st.skipLoad(`.*EOF1.*`)
+
 	if *testEWASM == "" {
 		st.skipLoad(`^stEWASM`)
 	}

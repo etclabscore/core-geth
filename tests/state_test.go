@@ -108,7 +108,7 @@ func TestState(t *testing.T) {
 		benchmarksDir,
 
 		stateTestDirETC,
-		// legacyTestDirETC,
+		legacyTestDirETC,
 	} {
 		st.walk(t, dir, func(t *testing.T, name string, test *StateTest) {
 			for _, subtest := range test.Subtests(st.skipforkpat) {

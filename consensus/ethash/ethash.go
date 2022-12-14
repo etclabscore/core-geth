@@ -463,7 +463,7 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		if !isLittleEndian() {
 			endian = ".be"
 		}
-		path := filepath.Join(dir, fmt.Sprintf("full-R%d-%x%s", algorithmRevision, seed[:8], endian))
+		path := filepath.Join(dir, fmt.Sprintf("full-R%d-%d-%x%s", algorithmRevision, d.epoch, seed[:8], endian))
 		logger := log.New("epoch", d.epoch)
 
 		// We're about to mmap the file, ensure that the mapping is cleaned up when the
@@ -499,11 +499,34 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 			d.dataset = make([]uint32, dsize/4)
 			generateDataset(d.dataset, d.epoch, d.epochLength, cache)
 		}
-		// Iterate over all previous instances and delete old ones
-		for ep := int(d.epoch) - limit; ep >= 0; ep-- {
-			seed := seedHash(uint64(ep), d.epochLength)
-			path := filepath.Join(dir, fmt.Sprintf("full-R%d-%x%s", algorithmRevision, seed[:8], endian))
-			os.Remove(path)
+
+		// Iterate over all full file instances, deleting any out of bounds (where epoch is below lower limit, or above upper limit).
+		matches, _ := filepath.Glob(filepath.Join(dir, fmt.Sprintf("full-R%d*", algorithmRevision)))
+		for _, file := range matches {
+			var ar int   // algorithm revision
+			var e uint64 // epoch
+			var s string // seed
+			if _, err := fmt.Sscanf(filepath.Base(file), "full-R%d-%d-%s"+endian, &ar, &e, &s); err != nil {
+				// There is an unrecognized file in this directory.
+				// See if the name matches the expected pattern of the legacy naming scheme.
+				if _, err := fmt.Sscanf(filepath.Base(file), "full-R%d-%s"+endian, &ar, &s); err == nil {
+					// This file matches the previous generation naming pattern (sans epoch).
+					if err := os.Remove(file); err != nil {
+						logger.Error("Failed to remove legacy ethash full file", "file", file, "err", err)
+					} else {
+						logger.Warn("Deleted legacy ethash full file", "path", file)
+					}
+				}
+				// Else the file is unrecognized (unknown name format), leave it alone.
+				continue
+			}
+			if e <= d.epoch-uint64(limit) || e > d.epoch+1 {
+				if err := os.Remove(file); err == nil {
+					logger.Debug("Deleted ethash full file", "target.epoch", e, "file", file)
+				} else {
+					logger.Error("Failed to delete ethash full file", "target.epoch", e, "file", file, "err", err)
+				}
+			}
 		}
 	})
 }

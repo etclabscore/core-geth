@@ -37,12 +37,19 @@ var (
 		EIP2FBlock: big.NewInt(1150000),
 		EIP7FBlock: big.NewInt(1150000),
 
-		//DAOForkBlock:        big.NewInt(1920000),
+		// DAOForkBlock:        big.NewInt(1920000),
 
 		EIP150Block: big.NewInt(2500000),
 
-		EIP155Block:  big.NewInt(3000000),
-		EIP160FBlock: big.NewInt(3000000),
+		EIP155Block:        big.NewInt(3000000),
+		EIP160FBlock:       big.NewInt(3000000),
+		ECIP1010PauseBlock: big.NewInt(3000000),
+		ECIP1010Length:     big.NewInt(2000000),
+
+		ECIP1017FBlock:    big.NewInt(5000000),
+		ECIP1017EraRounds: big.NewInt(5000000),
+
+		DisposalBlock: big.NewInt(5900000),
 
 		// EIP158~
 		EIP161FBlock: big.NewInt(8772000),
@@ -74,24 +81,19 @@ var (
 		EIP2028FBlock: big.NewInt(10_500_839),
 		EIP2200FBlock: big.NewInt(10_500_839), // RePetersburg (=~ re-1283)
 
+		ECBP1100FBlock: big.NewInt(11_380_000), // ETA 09 Oct 2020
+		ECIP1099FBlock: big.NewInt(11_700_000), // Etchash (DAG size limit)
+
 		// Berlin eq, aka Magneto
 		EIP2565FBlock: big.NewInt(13_189_133),
 		EIP2718FBlock: big.NewInt(13_189_133),
 		EIP2929FBlock: big.NewInt(13_189_133),
 		EIP2930FBlock: big.NewInt(13_189_133),
 
-		ECIP1099FBlock: big.NewInt(11_700_000), // Etchash (DAG size limit)
-
 		// London (partially), aka Mystique
 		EIP3529FBlock: big.NewInt(14_525_000),
 		EIP3541FBlock: big.NewInt(14_525_000),
 
-		DisposalBlock:      big.NewInt(5900000),
-		ECIP1017FBlock:     big.NewInt(5000000),
-		ECIP1017EraRounds:  big.NewInt(5000000),
-		ECIP1010PauseBlock: big.NewInt(3000000),
-		ECIP1010Length:     big.NewInt(2000000),
-		ECBP1100FBlock:     big.NewInt(11_380_000), // ETA 09 Oct 2020
 		RequireBlockHashes: map[uint64]common.Hash{
 			1920000: common.HexToHash("0x94365e3a8c0b35089c1d1195081fe7489b528a84b22199c916180db8b28ade7f"),
 			2500000: common.HexToHash("0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a"),

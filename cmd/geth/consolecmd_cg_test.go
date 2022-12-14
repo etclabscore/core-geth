@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -48,14 +49,14 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 		// or collisions with an existing geth service.
 		p.flags = append(p.flags, "--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none")
 
-		t.Run(fmt.Sprintf("%d/%v/networkid", i, p.flags),
+		t.Run(fmt.Sprintf("%d/networkid", i),
 			consoleCmdStdoutTest(p.flags, "admin.nodeInfo.protocols.eth.network", p.networkId))
-		t.Run(fmt.Sprintf("%d/%v/chainid", i, p.flags),
+		t.Run(fmt.Sprintf("%d/chainid", i),
 			consoleCmdStdoutTest(p.flags, "admin.nodeInfo.protocols.eth.config.chainId", p.chainId))
 
 		// The developer mode block has a dynamic genesis, depending on a parameterized address (coinbase) value.
 		if p.genesisHash != "0x0" {
-			t.Run(fmt.Sprintf("%d/%v/genesis_hash", i, p.flags),
+			t.Run(fmt.Sprintf("%d/genesis_hash", i),
 				consoleCmdStdoutTest(p.flags, "eth.getBlock(0, false).hash", strconv.Quote(p.genesisHash)))
 		}
 	}
@@ -64,7 +65,9 @@ func TestConsoleCmdNetworkIdentities(t *testing.T) {
 func consoleCmdStdoutTest(flags []string, execCmd string, want interface{}) func(t *testing.T) {
 	return func(t *testing.T) {
 		flags = append(flags, "--ipcpath", filepath.Join(os.TempDir(), "geth.ipc"), "--exec", execCmd, "console")
+		t.Log("flags:", flags)
 		geth := runGeth(t, flags...)
+		geth.KillTimeout = 20 * time.Second
 		geth.Expect(fmt.Sprintf(`%v
 `, want))
 		geth.ExpectExit()
@@ -85,8 +88,9 @@ func TestGethFailureToLaunch(t *testing.T) {
 			expectErrorReStr: "(?ism)incorrect usage.*",
 		},
 	}
-	for _, c := range cases {
-		t.Run(fmt.Sprintf("TestIncorrectUsage: %v", c.flags), func(t *testing.T) {
+	for i, c := range cases {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Log("flags:", c.flags)
 			geth := runGeth(t, c.flags...)
 			geth.ExpectRegexp(c.expectErrorReStr)
 			geth.ExpectExit()
@@ -97,11 +101,23 @@ func TestGethFailureToLaunch(t *testing.T) {
 	}
 }
 
+// randomStr is used in naming the geth tests' temporary datadir.
+func randomStr(n int) string {
+	letterBytes := "abcdefghijklmnopqrstuvwxyz"
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Int63()%int64(len(letterBytes))]
+	}
+	return string(b)
+}
+
 // TestGethStartupLogs tests that geth logs certain things (given some set of flags).
 // In these cases, geth is run with a console command to print its name (and tests that it does).
 func TestGethStartupLogs(t *testing.T) {
 	// semiPersistentDatadir is used to house an adhoc datadir for co-dependent geth test cases.
-	semiPersistentDatadir := filepath.Join(os.TempDir(), fmt.Sprintf("geth-startup-logs-test-%d", time.Now().Unix()))
+	// WATCHOUT: For Unix-based operating systems, you're going to have problems if the IPC endpoint is
+	// longer than ___ characters.
+	semiPersistentDatadir := filepath.Join(os.TempDir(), fmt.Sprintf("geth-test-%x", randomStr(4)))
 	defer os.RemoveAll(semiPersistentDatadir)
 
 	type matching struct {
@@ -164,8 +180,10 @@ func TestGethStartupLogs(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		t.Run(fmt.Sprintf("TestGethStartupLogs/%d: %v", i, c.flags), func(t *testing.T) {
-			geth := runGeth(t, append(c.flags, "--ipcpath", filepath.Join(os.TempDir(), "geth.ipc"), "--exec", "admin.nodeInfo.name", "console")...)
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			caseFlags := append(c.flags, "--exec", "admin.nodeInfo.name", "console")
+			t.Log("flags:", caseFlags)
+			geth := runGeth(t, caseFlags...)
 			geth.KillTimeout = 10 * time.Second
 			geth.ExpectRegexp("(?ism).*CoreGeth.*")
 			geth.ExpectExit()

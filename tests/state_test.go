@@ -52,8 +52,13 @@ func TestState(t *testing.T) {
 	st.skipLoad(`^stTimeConsuming/`)
 	st.skipLoad(`.*vmPerformance/loop.*`)
 
+	// Not state tests: configs
+	st.skipLoad(".*config.*")
+
 	// Uses 1GB RAM per tested fork
 	st.skipLoad(`^stStaticCall/static_Call1MB`)
+
+	st.skipLoad(`.*EOF1.*`)
 
 	if *testEWASM == "" {
 		st.skipLoad(`^stEWASM`)
@@ -72,7 +77,7 @@ func TestState(t *testing.T) {
 	if *testEVM != "" || *testEWASM != "" {
 		// Berlin tests are not expected to pass for external EVMs, yet.
 		//
-		st.skipFork("^Berlin$") // ETH
+		st.skipFork("Berlin")   // ETH
 		st.skipFork("Magneto")  // ETC
 		st.skipFork("London")   // ETH
 		st.skipFork("Mystique") // ETC
@@ -101,6 +106,9 @@ func TestState(t *testing.T) {
 		stateTestDir,
 		legacyStateTestDir,
 		benchmarksDir,
+
+		stateTestDirETC,
+		legacyTestDirETC,
 	} {
 		st.walk(t, dir, func(t *testing.T, name string, test *StateTest) {
 			for _, subtest := range test.Subtests(st.skipforkpat) {
@@ -113,10 +121,6 @@ func TestState(t *testing.T) {
 						if err != nil && *testEWASM != "" {
 							err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
 						}
-						if err != nil && len(test.json.Post[subtest.Fork][subtest.Index].ExpectException) > 0 {
-							// Ignore expected errors (TODO MariusVanDerWijden check error string)
-							return nil
-						}
 						return st.checkFailure(t, err)
 					})
 				})
@@ -127,10 +131,6 @@ func TestState(t *testing.T) {
 							if _, err := snaps.Journal(statedb.IntermediateRoot(false)); err != nil {
 								return err
 							}
-						}
-						if err != nil && len(test.json.Post[subtest.Fork][subtest.Index].ExpectException) > 0 {
-							// Ignore expected errors (TODO MariusVanDerWijden check error string)
-							return nil
 						}
 						if err != nil && *testEWASM != "" {
 							err = fmt.Errorf("%v ewasm=%s", err, *testEWASM)
@@ -232,7 +232,7 @@ func runBenchmark(b *testing.B, t *StateTest) {
 			}
 			vmconfig.ExtraEips = eips
 			block := core.GenesisToBlock(t.genesis(config), nil)
-			_, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre, false)
+			_, statedb := MakePreState(rawdb.NewMemoryDatabase(), t.json.Pre.toGenesisAlloc(), false)
 
 			var baseFee *big.Int
 			if config.IsEnabled(config.GetEIP3529Transition, new(big.Int)) {

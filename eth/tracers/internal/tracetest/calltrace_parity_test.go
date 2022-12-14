@@ -3,8 +3,8 @@ package tracetest
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math/big"
+	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -51,7 +51,7 @@ type callTracerParityTest struct {
 
 func callTracerParityTestRunner(tracerName string, filename string, dirPath string, t testing.TB) error {
 	// Call tracer test found, read if from disk
-	blob, err := ioutil.ReadFile(filepath.Join("testdata", dirPath, filename))
+	blob, err := os.ReadFile(filepath.Join("testdata", dirPath, filename))
 	if err != nil {
 		return fmt.Errorf("failed to read testcase: %v", err)
 	}
@@ -134,7 +134,7 @@ func TestCallTracerParityNative(t *testing.T) {
 }
 
 func testCallTracerParity(tracerName string, dirPath string, t *testing.T) {
-	files, err := ioutil.ReadDir(filepath.Join("testdata", dirPath))
+	files, err := os.ReadDir(filepath.Join("testdata", dirPath))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}
@@ -208,7 +208,7 @@ type stateDiffTest struct {
 
 func stateDiffTracerTestRunner(tracerName string, filename string, dirPath string, t testing.TB) error {
 	// Call tracer test found, read if from disk
-	blob, err := ioutil.ReadFile(filepath.Join("testdata", dirPath, filename))
+	blob, err := os.ReadFile(filepath.Join("testdata", dirPath, filename))
 	if err != nil {
 		return fmt.Errorf("failed to read testcase: %v", err)
 	}
@@ -300,7 +300,7 @@ func TestStateDiffTracerNative(t *testing.T) {
 // TestStateDiffTracer Iterates over all the input-output datasets in the state diff tracer test harness and
 // runs the JavaScript tracers against them.
 func testStateDiffTracer(tracerName string, dirPath string, t *testing.T) {
-	files, err := ioutil.ReadDir(filepath.Join("testdata", dirPath))
+	files, err := os.ReadDir(filepath.Join("testdata", dirPath))
 	if err != nil {
 		t.Fatalf("failed to retrieve tracer test suite: %v", err)
 	}

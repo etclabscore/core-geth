@@ -26,6 +26,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/state"
@@ -178,9 +179,20 @@ func Transition(ctx *cli.Context) error {
 	prestate.Env = *inputData.Env
 
 	vmConfig := vm.Config{
-		Tracer: tracer,
-		Debug:  (tracer != nil),
+		Tracer:           tracer,
+		Debug:            (tracer != nil),
+		EVMInterpreter:   ctx.String(utils.EVMInterpreterFlag.Name),
+		EWASMInterpreter: ctx.String(utils.EWASMInterpreterFlag.Name),
 	}
+
+	if vmConfig.EVMInterpreter != "" {
+		vm.InitEVMCEVM(vmConfig.EVMInterpreter)
+	}
+
+	if vmConfig.EWASMInterpreter != "" {
+		vm.InitEVMCEwasm(vmConfig.EWASMInterpreter)
+	}
+
 	// Construct the chainconfig
 	var chainConfig ctypes.ChainConfigurator
 	if cConf, extraEips, err := tests.GetChainConfig(ctx.String(ForknameFlag.Name)); err != nil {

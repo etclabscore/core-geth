@@ -2,6 +2,7 @@
     "networkId": 1,
     "chainId": 1,
     "supportedProtocolVersions": [
+        67,
         66
     ],
     "eip2FBlock": 1150000,

@@ -217,7 +217,7 @@ func runCmd(ctx *cli.Context) error {
 		EVMConfig: vm.Config{
 			Tracer:         tracer,
 			Debug:          ctx.Bool(DebugFlag.Name) || ctx.Bool(MachineFlag.Name),
-			EVMInterpreter: ctx.String(EVMInterpreterFlag.Name),
+			EVMInterpreter: ctx.String(utils.EVMInterpreterFlag.Name),
 		},
 	}
 

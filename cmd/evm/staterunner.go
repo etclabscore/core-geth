@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/eth/tracers/logger"
@@ -37,13 +38,23 @@ var stateTestCommand = &cli.Command{
 	Name:      "statetest",
 	Usage:     "executes the given state tests",
 	ArgsUsage: "<file>",
-	Flags:     []cli.Flag{stateTestEVMCEWASMFlag},
-	Category:  flags.DevCategory,
+	Flags: []cli.Flag{
+		stateTestForkFlag,
+		stateTestEVMCEWASMFlag,
+		utils.EVMInterpreterFlag,
+	},
+	Category: flags.DevCategory,
 }
 
 var stateTestEVMCEWASMFlag = &cli.StringFlag{
 	Name:     "evmc.ewasm",
 	Usage:    "EVMC EWASM configuration",
+	Category: flags.DevCategory,
+}
+
+var stateTestForkFlag = &cli.StringFlag{
+	Name:     "fork",
+	Usage:    "Fork to use for the test",
 	Category: flags.DevCategory,
 }
 
@@ -107,10 +118,22 @@ func stateTestCmd(ctx *cli.Context) error {
 		Tracer:           tracer,
 		Debug:            ctx.Bool(DebugFlag.Name) || ctx.Bool(MachineFlag.Name),
 		EWASMInterpreter: ctx.String(stateTestEVMCEWASMFlag.Name),
+		EVMInterpreter:   ctx.String(utils.EVMInterpreterFlag.Name),
 	}
+
+	if cfg.EVMInterpreter != "" {
+		vm.InitEVMCEVM(cfg.EVMInterpreter)
+	}
+	if cfg.EWASMInterpreter != "" {
+		vm.InitEVMCEwasm(cfg.EWASMInterpreter)
+	}
+
 	results := make([]StatetestResult, 0, len(tests))
 	for key, test := range tests {
 		for _, st := range test.Subtests(nil) {
+			if ctx.String(stateTestForkFlag.Name) != "" && ctx.String(stateTestForkFlag.Name) != st.Fork {
+				continue
+			}
 			// Run the test and aggregate the result
 			result := &StatetestResult{Name: key, Fork: st.Fork, Pass: true}
 			_, s, err := test.Run(st, cfg, false)

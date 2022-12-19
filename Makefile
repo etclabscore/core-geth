@@ -30,7 +30,7 @@ ios:
 	@echo "Import \"$(GOBIN)/Geth.framework\" to use the library."
 
 test:
-	$(GORUN) build/ci.go test
+	$(GORUN) build/ci.go test -timeout 20m
 
 # DEPRECATED.
 # No attempt will be made after the Istanbul fork to maintain

@@ -215,7 +215,8 @@ type CoreGethChainConfig struct {
 	EIP3541FBlock *big.Int `json:"eip3541FBlock,omitempty"`
 	EIP3529FBlock *big.Int `json:"eip3529FBlock,omitempty"`
 
-	EIP5133FBlock *big.Int `json:"eip5133FBloc,omitempty"`
+	EIP5133FBlock   *big.Int `json:"eip5133FBlock,omitempty"`
+	eip5133Inferred bool
 
 	MergeNetsplitVBlock *big.Int `json:"mergeNetsplitVBlock,omitempty"` // Virtual fork after The Merge to use as a network splitter
 

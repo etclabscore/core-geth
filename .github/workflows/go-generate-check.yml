@@ -13,8 +13,6 @@ jobs:
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
       - name: Run go:generate
         id: go-generate
         run: go generate ./...

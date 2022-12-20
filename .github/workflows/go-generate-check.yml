@@ -1,0 +1,26 @@
+name: Developer helper
+on: pull_request
+jobs:
+  go-generate-check:
+    name: Check if "go generate" has been run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.x
+        id: go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Run go:generate
+        id: go-generate
+        run: go generate ./...
+      - name: Check for modified files
+        id: git-check
+        run:
+          if ! git diff-index --quiet HEAD --; then
+            core.setFailed('Please run `go generate ./...` to update codebase')
+          fi

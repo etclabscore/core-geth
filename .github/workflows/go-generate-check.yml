@@ -23,7 +23,6 @@ jobs:
           SOLC_BIN=solc-linux-amd64-v0.6.12+commit.27d51765
           curl -OL https://binaries.soliditylang.org/linux-amd64/$SOLC_BIN
           sudo mv $SOLC_BIN /usr/local/bin/solc
-          rm $SOLC_BIN
 
       - name: Install devtools
         id: install-devtools

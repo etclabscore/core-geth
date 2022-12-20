@@ -18,7 +18,7 @@ jobs:
         run: |
           sudo add-apt-repository ppa:ethereum/ethereum
           sudo apt-get update
-          sudo apt-get install solc
+          sudo apt-get install solc=0.6.12
           sudo apt-get install -y protobuf-compiler
       - name: Install devtools
         id: install-devtools

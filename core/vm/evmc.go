@@ -295,9 +295,7 @@ func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, ev
 
 	host.env.StateDB.SetState(addr, key, common.BytesToHash(value.Bytes()))
 
-	// defer func() {
 	status = host.storageStatus(original, current, value)
-	// }()
 
 	if getRevision(host.env) == evmc.Constantinople /* EIP-1283 */ {
 		if current.Eq(value) {

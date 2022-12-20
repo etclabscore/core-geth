@@ -18,8 +18,13 @@ jobs:
         run: |
           sudo add-apt-repository ppa:ethereum/ethereum
           sudo apt-get update
-          sudo apt-get install solc=0.6.12
           sudo apt-get install -y protobuf-compiler
+
+          SOLC_BIN=solc-linux-amd64-v0.6.12+commit.27d51765
+          curl -OL https://binaries.soliditylang.org/linux-amd64/$SOLC_BIN
+          sudo mv $SOLC_BIN /usr/local/bin/solc
+          rm $SOLC_BIN
+
       - name: Install devtools
         id: install-devtools
         run: make devtools

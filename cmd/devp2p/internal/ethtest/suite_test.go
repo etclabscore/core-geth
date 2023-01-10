@@ -48,6 +48,7 @@ func TestEthSuite(t *testing.T) {
 	}
 	for _, test := range suite.EthTests() {
 		t.Run(test.Name, func(t *testing.T) {
+			time.Sleep(time.Second)
 			result := utesting.RunTAP([]utesting.Test{{Name: test.Name, Fn: test.Fn}}, os.Stdout)
 			if result[0].Failed {
 				t.Fatal()
@@ -69,6 +70,7 @@ func TestSnapSuite(t *testing.T) {
 	}
 	for _, test := range suite.SnapTests() {
 		t.Run(test.Name, func(t *testing.T) {
+			time.Sleep(time.Second)
 			result := utesting.RunTAP([]utesting.Test{{Name: test.Name, Fn: test.Fn}}, os.Stdout)
 			if result[0].Failed {
 				t.Fatal()
@@ -100,6 +102,7 @@ func runGeth() (*node.Node, error) {
 		stack.Close()
 		return nil, err
 	}
+
 	return stack, nil
 }
 

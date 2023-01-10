@@ -36,7 +36,7 @@ var (
 )
 
 func TestEthSuite(t *testing.T) {
-	geth, err := runGeth()
+	geth, err := runGeth(t)
 	if err != nil {
 		t.Fatalf("could not run geth: %v", err)
 	}
@@ -58,7 +58,7 @@ func TestEthSuite(t *testing.T) {
 }
 
 func TestSnapSuite(t *testing.T) {
-	geth, err := runGeth()
+	geth, err := runGeth(t)
 	if err != nil {
 		t.Fatalf("could not run geth: %v", err)
 	}
@@ -80,7 +80,8 @@ func TestSnapSuite(t *testing.T) {
 }
 
 // runGeth creates and starts a geth node
-func runGeth() (*node.Node, error) {
+func runGeth(t *testing.T) (*node.Node, error) {
+	t.Helper()
 	stack, err := node.New(&node.Config{
 		P2P: p2p.Config{
 			ListenAddr:  "127.0.0.1:0",

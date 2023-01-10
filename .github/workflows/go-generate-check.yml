@@ -30,6 +30,9 @@ jobs:
       - name: Run go:generate
         id: go-generate
         run: go generate ./...
+      - name: Skip whitelisted generated go files
+        id: skip-files
+        run: git checkout params/types/genesisT/gen_genesis.go
       - name: Check for modified files
         id: git-check
         run:

@@ -10,7 +10,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ^1.16
-
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
       - name: Install deps
@@ -40,7 +39,12 @@ jobs:
         id: git-check
         run: |
           if ! git diff-index --quiet HEAD --; then
+            echo "changes_exist=true" >> $GITHUB_ENV
             git status
-
-            core.setFailed('Please run \"go generate ./...\" to update codebase')
           fi
+      - name: Fail if modified files exist
+        if: env.changes_exist == 'true'
+        uses: actions/github-script@v3
+        with:
+          script: |
+              core.setFailed("Please run 'go generate ./...' to update codebase")

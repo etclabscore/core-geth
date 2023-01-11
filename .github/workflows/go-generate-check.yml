@@ -1,5 +1,17 @@
 name: Developer helper
 on: pull_request
+env:
+  # GENERATE_EXCEPTIONS are exceptions made to the 'go generate' command.
+  # These patterns are matched (negatively) against 'go list' output.
+  #
+  # - trezor: Ignore generating trezor package based on this comment:
+  #   https://github.com/ethereum/go-ethereum/blob/master/accounts/usbwallet/trezor/trezor.go#L21-L43
+  GENERATE_EXCEPTIONS: ("trezor")
+  # GENERATE_IGNORES are applied after the 'go generate' command.
+  # These files will be reverted after 'go generate' to their original ref version.
+  #
+  # - gen_genesis.go: file which has custom modifications for unmarshaling the various genesis formats
+  GENERATE_IGNORES: ("params/types/genesisT/gen_genesis.go")
 jobs:
   go-generate-check:
     name: Check if "go generate" has been run
@@ -27,14 +39,16 @@ jobs:
       - name: Run go:generate
         id: go-generate
         run: |
-          # ignore generating trezor package based on this comment:
-          # https://github.com/ethereum/go-ethereum/blob/master/accounts/usbwallet/trezor/trezor.go#L21-L43
-          go generate `go list ./... | grep -v trezor`
+          list="$(go list ./...)"
+          for pattern in "${env.GENERATE_EXCEPTIONS[@]}"; do
+            list="$(grep -v "$pattern" <<< "$list")"
+          done
+          go generate "$list"
       - name: Skip whitelisted generated go files
         id: skip-files
         run: |
-          # ignore `gen_genesis.go` file which has custom modifications for unmarshaling the various genesis formats
-          git checkout params/types/genesisT/gen_genesis.go
+          git checkout -- "${env.GENERATE_IGNORES[*]}"
+
       - name: Check for modified files
         id: git-check
         run: |
@@ -42,6 +56,7 @@ jobs:
             echo "changes_exist=true" >> $GITHUB_ENV
             git status
           fi
+
       - name: Fail if modified files exist
         if: env.changes_exist == 'true'
         uses: actions/github-script@v3

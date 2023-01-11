@@ -15,7 +15,7 @@ jobs:
       - name: Install deps
         id: install-deps
         run: |
-          SOLC_BIN=solc-linux-amd64-v0.6.12+commit.27d51765
+          SOLC_BIN=solc-linux-amd64-v0.6.0+commit.26b70077
           curl -OL https://binaries.soliditylang.org/linux-amd64/$SOLC_BIN
           sudo mv $SOLC_BIN /usr/bin/solc
           sudo chmod +x /usr/bin/solc

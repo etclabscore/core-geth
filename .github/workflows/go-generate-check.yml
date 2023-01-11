@@ -16,26 +16,31 @@ jobs:
       - name: Install deps
         id: install-deps
         run: |
-          sudo add-apt-repository ppa:ethereum/ethereum
-          sudo apt-get update
-          sudo apt-get install -y protobuf-compiler
-
           SOLC_BIN=solc-linux-amd64-v0.6.12+commit.27d51765
           curl -OL https://binaries.soliditylang.org/linux-amd64/$SOLC_BIN
-          sudo mv $SOLC_BIN /usr/local/bin/solc
+          sudo mv $SOLC_BIN /usr/bin/solc
+          sudo chmod +x /usr/bin/solc
 
+        shell: bash
       - name: Install devtools
         id: install-devtools
         run: make devtools
       - name: Run go:generate
         id: go-generate
-        run: go generate ./...
+        run: |
+          # ignore generating trezor package based on this comment:
+          # https://github.com/ethereum/go-ethereum/blob/master/accounts/usbwallet/trezor/trezor.go#L21-L43
+          go generate `go list ./... | grep -v trezor`
       - name: Skip whitelisted generated go files
         id: skip-files
-        run: git checkout params/types/genesisT/gen_genesis.go
+        run: |
+          # ignore `gen_genesis.go` file which has custom modifications for unmarshaling the various genesis formats
+          git checkout params/types/genesisT/gen_genesis.go
       - name: Check for modified files
         id: git-check
-        run:
+        run: |
           if ! git diff-index --quiet HEAD --; then
-            core.setFailed('Please run `go generate ./...` to update codebase')
+            git status
+
+            core.setFailed('Please run \"go generate ./...\" to update codebase')
           fi

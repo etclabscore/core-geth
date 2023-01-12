@@ -6,12 +6,14 @@ env:
   #
   # - trezor: Ignore generating trezor package based on this comment:
   #   https://github.com/ethereum/go-ethereum/blob/master/accounts/usbwallet/trezor/trezor.go#L21-L43
-  GENERATE_EXCEPTIONS: ("trezor")
+  GENERATE_EXCEPTIONS: |
+    trezor
   # GENERATE_IGNORES are applied after the 'go generate' command.
   # These files will be reverted after 'go generate' to their original ref version.
   #
   # - gen_genesis.go: file which has custom modifications for unmarshaling the various genesis formats
-  GENERATE_IGNORES: ("params/types/genesisT/gen_genesis.go")
+  GENERATE_IGNORES: |
+    params/types/genesisT/gen_genesis.go
 jobs:
   go-generate-check:
     name: Check if "go generate" has been run
@@ -40,26 +42,20 @@ jobs:
         id: go-generate
         run: |
           list="$(go list ./...)"
-          for pattern in "${env.GENERATE_EXCEPTIONS[@]}"; do
+          for pattern in ${GENERATE_EXCEPTIONS[@]}; do
             list="$(grep -v "$pattern" <<< "$list")"
           done
           go generate "$list"
       - name: Skip whitelisted generated go files
         id: skip-files
         run: |
-          git checkout -- "${env.GENERATE_IGNORES[*]}"
+          git checkout -- ${GENERATE_IGNORES[@]}
 
       - name: Check for modified files
         id: git-check
         run: |
           if ! git diff-index --quiet HEAD --; then
-            echo "changes_exist=true" >> $GITHUB_ENV
+            echo "🔴 ERROR: There are modified files after running 'go generate'"
             git status
+            exit 1
           fi
-
-      - name: Fail if modified files exist
-        if: env.changes_exist == 'true'
-        uses: actions/github-script@v3
-        with:
-          script: |
-              core.setFailed("Please run 'go generate ./...' to update codebase")

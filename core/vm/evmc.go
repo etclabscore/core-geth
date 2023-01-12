@@ -26,7 +26,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ethereum/evmc/v10/bindings/go/evmc"
+	"github.com/ethereum/evmc/v7/bindings/go/evmc"
 	"github.com/ethereum/go-ethereum/params/vars"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -110,34 +110,16 @@ type hostContext struct {
 	contract *Contract // The reference to the current contract, needed by Call-like methods.
 }
 
-func (host *hostContext) AccessAccount(addr evmc.Address) evmc.AccessStatus {
-	if getRevision(host.env) < evmc.Berlin /* EIP-2929 */ {
-		return evmc.ColdAccess
-	}
-
-	if host.env.StateDB.AddressInAccessList(common.Address(addr)) {
-		return evmc.WarmAccess
-	}
-	return evmc.ColdAccess
-}
-
-func (host *hostContext) AccessStorage(addr evmc.Address, key evmc.Hash) evmc.AccessStatus {
-	if getRevision(host.env) < evmc.Berlin /* EIP-2929 */ {
-		return evmc.ColdAccess
-	}
-
-	if addrOK, slotOK := host.env.StateDB.SlotInAccessList(common.Address(addr), common.Hash(key)); addrOK && slotOK {
-		return evmc.WarmAccess
-	}
-	return evmc.ColdAccess
-}
-
 func (host *hostContext) AccountExists(evmcAddr evmc.Address) bool {
 	addr := common.Address(evmcAddr)
-	if host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP161dTransition, host.env.Context.BlockNumber) /* EIP-161 */ {
-		return !host.env.StateDB.Empty(addr)
+	if host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP161dTransition, host.env.Context.BlockNumber) {
+		if !host.env.StateDB.Empty(addr) {
+			return true
+		}
+	} else if host.env.StateDB.Exist(addr) {
+		return true
 	}
-	return host.env.StateDB.Exist(addr)
+	return false
 }
 
 func (host *hostContext) GetStorage(addr evmc.Address, evmcKey evmc.Hash) evmc.Hash {
@@ -147,295 +129,77 @@ func (host *hostContext) GetStorage(addr evmc.Address, evmcKey evmc.Hash) evmc.H
 	return evmc.Hash(value.Bytes32())
 }
 
-func (host *hostContext) storageStatus(original, current, value *uint256.Int) (status evmc.StorageStatus) {
-	// /**
-	//  * The effect of an attempt to modify a contract storage item.
-	//  *
-	//  * See @ref storagestatus for additional information about design of this enum
-	//  * and analysis of the specification.
-	//  *
-	//  * For the purpose of explaining the meaning of each element, the following
-	//  * notation is used:
-	//  * - 0 is zero value,
-	//  * - X != 0 (X is any value other than 0),
-	//  * - Y != 0, Y != X,  (Y is any value other than X and 0),
-	//  * - Z != 0, Z != X, Z != X (Z is any value other than Y and X and 0),
-	//  * - the "o -> c -> v" triple describes the change status in the context of:
-	//  *   - o: original value (cold value before a transaction started),
-	//  *   - c: current storage value,
-	//  *   - v: new storage value to be set.
-	//  *
-	//  * The order of elements follows EIPs introducing net storage gas costs:
-	//  * - EIP-2200: https://eips.ethereum.org/EIPS/eip-2200,
-	//  * - EIP-1283: https://eips.ethereum.org/EIPS/eip-1283.
-	//  */
-	// enum evmc_storage_status
-	// {
-	// 	/**
-	// 	 * The new/same value is assigned to the storage item without affecting the cost structure.
-	// 	 *
-	// 	 * The storage value item is either:
-	// 	 * - left unchanged (c == v) or
-	// 	 * - the dirty value (o != c) is modified again (c != v).
-	// 	 * This is the group of cases related to minimal gas cost of only accessing warm storage.
-	// 	 * 0|X   -> 0 -> 0 (current value unchanged)
-	// 	 * 0|X|Y -> Y -> Y (current value unchanged)
-	// 	 * 0|X   -> Y -> Z (modified previously added/modified value)
-	// 	 *
-	// 	 * This is "catch all remaining" status. I.e. if all other statuses are correctly matched
-	// 	 * this status should be assigned to all remaining cases.
-	// 	 */
-	// 	EVMC_STORAGE_ASSIGNED = 0,
-	status = evmc.StorageAssigned
-	//
-	// 	/**
-	// 	 * A new storage item is added by changing
-	// 	 * the current clean zero to a nonzero value.
-	// 	 * 0 -> 0 -> Z
-	// 	 */
-	// 		EVMC_STORAGE_ADDED = 1,
-	//
-	if original.IsZero() && current.IsZero() && !value.IsZero() {
-		status = evmc.StorageAdded
-	}
-	// /**
-	//  * A storage item is deleted by changing
-	//  * the current clean nonzero to the zero value.
-	//  * X -> X -> 0
-	//  */
-	// 	EVMC_STORAGE_DELETED = 2,
-	//
-	if !original.IsZero() && !current.IsZero() && value.IsZero() {
-		if original == current {
-			status = evmc.StorageDeleted
-		}
-	}
-	// /**
-	//  * A storage item is modified by changing
-	//  * the current clean nonzero to other nonzero value.
-	//  * X -> X -> Z
-	//  */
-	// 	EVMC_STORAGE_MODIFIED = 3,
-	//
-	if !original.IsZero() && !current.IsZero() && !value.IsZero() {
-		if original == current {
-			status = evmc.StorageModified
-		}
-	}
-	// /**
-	//  * A storage item is added by changing
-	//  * the current dirty zero to a nonzero value other than the original value.
-	//  * X -> 0 -> Z
-	//  */
-	// 	EVMC_STORAGE_DELETED_ADDED = 4,
-	//
-	if !original.IsZero() && current.IsZero() && !value.IsZero() {
-		if !original.Eq(value) {
-			status = evmc.StorageDeletedAdded
-		}
-	}
-	// /**
-	//  * A storage item is deleted by changing
-	//  * the current dirty nonzero to the zero value and the original value is not zero.
-	//  * X -> Y -> 0
-	//  */
-	// 	EVMC_STORAGE_MODIFIED_DELETED = 5,
-	//
-	if !original.IsZero() && !current.IsZero() && value.IsZero() {
-		if original != current {
-			status = evmc.StorageModifiedDeleted
-		}
-	}
-	// /**
-	//  * A storage item is added by changing
-	//  * the current dirty zero to the original value.
-	//  * X -> 0 -> X
-	//  */
-	// 	EVMC_STORAGE_DELETED_RESTORED = 6,
-	//
-	if !original.IsZero() && current.IsZero() && !value.IsZero() {
-		if original.Eq(value) {
-			status = evmc.StorageDeletedRestored
-		}
-	}
-	// /**
-	//  * A storage item is deleted by changing
-	//  * the current dirty nonzero to the original zero value.
-	//  * 0 -> Y -> 0
-	//  */
-	// 	EVMC_STORAGE_ADDED_DELETED = 7,
-	//
-	if original.IsZero() && !current.IsZero() && value.IsZero() {
-		status = evmc.StorageAddedDeleted
-	}
-	// /**
-	//  * A storage item is modified by changing
-	//  * the current dirty nonzero to the original nonzero value other than the current value.
-	//  * X -> Y -> X
-	//  */
-	// 	EVMC_STORAGE_MODIFIED_RESTORED = 8
-	// };
-	//
-	if !original.IsZero() && !current.IsZero() && !value.IsZero() {
-		if original != current && original.Eq(value) {
-			status = evmc.StorageModifiedRestored
-		}
-	}
-	return status
-}
-
 func (host *hostContext) SetStorage(evmcAddr evmc.Address, evmcKey evmc.Hash, evmcValue evmc.Hash) (status evmc.StorageStatus) {
 	addr := common.Address(evmcAddr)
 	key := common.Hash(evmcKey)
 	value := new(uint256.Int).SetBytes(evmcValue[:])
+	var oldValue uint256.Int
+	oldValue.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
+	if oldValue.Eq(value) {
+		return evmc.StorageUnchanged
+	}
 
-	var current, original = new(uint256.Int), new(uint256.Int)
+	var current, original uint256.Int
 	current.SetBytes(host.env.StateDB.GetState(addr, key).Bytes())
 	original.SetBytes(host.env.StateDB.GetCommittedState(addr, key).Bytes())
 
 	host.env.StateDB.SetState(addr, key, common.BytesToHash(value.Bytes()))
 
-	status = host.storageStatus(original, current, value)
+	// Here's a great example of one of the limits of our (core-geth) current chainconfig interface model.
+	// Should we handle the logic here about historic-featuro logic (which really is nice, because when reading the strange-incantation implemations, it's nice to see why it is),
+	// or should we handle the question where we handle the rest of the questions like this, since this logic is
+	// REALLY logic that belongs to the abstract idea of a chainconfiguration (aka chainconfig), which makes sense
+	// but depends on ECIPs having steadier and more predictable logic.
+	hasEIP2200 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP2200Transition, host.env.Context.BlockNumber)
+	hasEIP1884 := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP1884Transition, host.env.Context.BlockNumber)
 
-	if getRevision(host.env) == evmc.Constantinople /* EIP-1283 */ {
-		if current.Eq(value) {
-			return evmc.StorageAssigned
-		}
-
-		// (X -> X) -> Y
-		if original.Eq(current) {
-			// 0 -> 0 -> Y
-			if original.IsZero() {
-				return evmc.StorageAdded
-			}
-			// X -> X -> 0
-			if value.IsZero() {
-				host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
-				return evmc.StorageDeleted
-			}
-			return evmc.StorageModified
-		}
-		if !original.IsZero() {
-			// X -> 0 -> Z
-			if current.IsZero() {
-				host.env.StateDB.SubRefund(vars.NetSstoreClearRefund)
-				// X -> 0 -> 0
-			} else if value.IsZero() {
-				host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
-			}
-		}
-		if original.Eq(value) {
-			if original.IsZero() {
-				host.env.StateDB.AddRefund(vars.NetSstoreResetClearRefund)
-			} else {
-				host.env.StateDB.AddRefund(vars.NetSstoreResetRefund)
-			}
-		}
-		return evmc.StorageAssigned
-	}
-
-	if getRevision(host.env) < evmc.Istanbul {
-		if current.Eq(value) {
-			return evmc.StorageAssigned
-		}
-
-		if current.IsZero() && !value.IsZero() {
+	// Here's an example where to me, it makes sense to use individual EIPs in the code...
+	// when they don't specify each other in the spec.
+	hasNetStorageCostEIP := hasEIP2200 && hasEIP1884
+	if !hasNetStorageCostEIP {
+		status = evmc.StorageModified
+		if oldValue.IsZero() {
 			return evmc.StorageAdded
-		}
-		if !current.IsZero() && value.IsZero() {
+		} else if value.IsZero() {
 			host.env.StateDB.AddRefund(vars.SstoreRefundGas)
 			return evmc.StorageDeleted
 		}
-		return evmc.StorageAssigned
-
-	} else /* Istanbul: EIP-2200 */ {
-
-		/*
-				Replace SSTORE opcode gas cost calculation (including refunds) with the following logic:
-
-				    If gasleft is less than or equal to gas stipend, fail the current call frame with ‘out of gas’ exception.
-
-				    If current value equals new value (this is a no-op), SLOAD_GAS is deducted.
-
-				    If current value does not equal new value
-				        If original value equals current value (this storage slot has not been changed by the current execution context)
-				            If original value is 0, SSTORE_SET_GAS is deducted.
-				            Otherwise, SSTORE_RESET_GAS gas is deducted. If new value is 0, add SSTORE_CLEARS_SCHEDULE gas to refund counter.
-				        If original value does not equal current value (this storage slot is dirty), SLOAD_GAS gas is deducted. Apply both of the following clauses.
-				            If original value is not 0
-				                If current value is 0 (also means that new value is not 0), remove SSTORE_CLEARS_SCHEDULE gas from refund counter.
-				                If new value is 0 (also means that current value is not 0), add SSTORE_CLEARS_SCHEDULE gas to refund counter.
-				            If original value equals new value (this storage slot is reset)
-				                If original value is 0, add SSTORE_SET_GAS - SLOAD_GAS to refund counter.
-				                Otherwise, add SSTORE_RESET_GAS - SLOAD_GAS gas to refund counter.
-
-				---
-
-					If gasleft is less than or equal to gas stipend, fail the current call frame with ‘out of gas’ exception.
-						:: NO IMPLEMENTATION
-
-					If current value equals new value (this is a no-op), SLOAD_GAS is deducted.
-						:: SHORT-CIRCUIT near top of function
-
-					If current value does not equal new value
-
-						If original value equals current value (this storage slot has not been changed by the current execution context)
-
-
-							If original value is 0, SSTORE_SET_GAS is deducted.
-			                :: 0 -> 0 -> Z: evmc.StorageAdded
-
-							Otherwise, SSTORE_RESET_GAS gas is deducted.
-							:: X -> X -> Z: evmc.StorageModified
-
-							If new value is 0, add SSTORE_CLEARS_SCHEDULE gas to refund counter.
-							:: X -> X -> 0: evmc.StorageDeleted
-
-						If original value does not equal current value (this storage slot is dirty), SLOAD_GAS gas is deducted.
-						Apply both of the following clauses.
-
-							If original value is not 0
-								If current value is 0 (also means that new value is not 0), remove SSTORE_CLEARS_SCHEDULE gas from refund counter.
-								:: X -> 0 -> X: evmc.StorageAddedDeleted
-
-								If new value is 0 (also means that current value is not 0), add SSTORE_CLEARS_SCHEDULE gas to refund counter.
-								:: X -> Z -> 0: evmc.StorageDeleted
-
-							If original value equals new value (this storage slot is reset)
-								If original value is 0, add SSTORE_SET_GAS - SLOAD_GAS to refund counter.
-								Otherwise, add SSTORE_RESET_GAS - SLOAD_GAS gas to refund counter.
-		*/
-
-		if current.Eq(value) {
-			return evmc.StorageAssigned
-		}
-
-		if original == current {
-			if original.IsZero() {
-				return
-			}
-			if value.IsZero() {
-				host.env.StateDB.AddRefund(vars.SstoreClearsScheduleRefundEIP2200)
-			}
-			return
-		}
-		if !original.IsZero() {
-			if current.IsZero() {
-				host.env.StateDB.SubRefund(vars.SstoreClearsScheduleRefundEIP2200)
-			} else if value.IsZero() {
-				host.env.StateDB.AddRefund(vars.SstoreClearsScheduleRefundEIP2200)
-			}
-		}
-		if original.Eq(value) {
-			if original.IsZero() {
-				host.env.StateDB.AddRefund(vars.SstoreSetGasEIP2200 - vars.SloadGasEIP2200)
-			} else {
-				host.env.StateDB.AddRefund(vars.SstoreResetGasEIP2200 - vars.SloadGasEIP2200)
-			}
-		}
+		return evmc.StorageModified
 	}
 
-	return
+	resetClearRefund := vars.NetSstoreResetClearRefund
+	cleanRefund := vars.NetSstoreResetRefund
+
+	if hasEIP2200 {
+		resetClearRefund = vars.SstoreSetGasEIP2200 - vars.SloadGasEIP2200 // 19200
+		cleanRefund = vars.SstoreResetGasEIP2200 - vars.SloadGasEIP2200    // 4200
+	}
+
+	if original == current {
+		if original.IsZero() { // create slot (2.1.1)
+			return evmc.StorageAdded
+		}
+		if value.IsZero() { // delete slot (2.1.2b)
+			host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
+			return evmc.StorageDeleted
+		}
+		return evmc.StorageModified
+	}
+	if !original.IsZero() {
+		if current.IsZero() { // recreate slot (2.2.1.1)
+			host.env.StateDB.SubRefund(vars.NetSstoreClearRefund)
+		} else if value.IsZero() { // delete slot (2.2.1.2)
+			host.env.StateDB.AddRefund(vars.NetSstoreClearRefund)
+		}
+	}
+	if original.Eq(value) {
+		if original.IsZero() { // reset to original inexistent slot (2.2.2.1)
+			host.env.StateDB.AddRefund(resetClearRefund)
+		} else { // reset to original existing slot (2.2.2.2)
+			host.env.StateDB.AddRefund(cleanRefund)
+		}
+	}
+	return evmc.StorageModifiedAgain
 }
 
 func (host *hostContext) GetBalance(addr evmc.Address) evmc.Hash {
@@ -458,7 +222,7 @@ func (host *hostContext) GetCode(addr evmc.Address) []byte {
 	return host.env.StateDB.GetCode(common.Address(addr))
 }
 
-func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evmc.Address) bool {
+func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evmc.Address) {
 	addr := common.Address(evmcAddr)
 	beneficiary := common.Address(evmcBeneficiary)
 	db := host.env.StateDB
@@ -466,26 +230,20 @@ func (host *hostContext) Selfdestruct(evmcAddr evmc.Address, evmcBeneficiary evm
 		db.AddRefund(vars.SelfdestructRefundGas)
 	}
 	db.AddBalance(beneficiary, db.GetBalance(addr))
-	return db.Suicide(addr)
+	db.Suicide(addr)
 }
 
 func (host *hostContext) GetTxContext() evmc.TxContext {
-	txCtx := evmc.TxContext{
-		GasPrice:  evmc.Hash(common.BigToHash(host.env.GasPrice)),
-		Origin:    evmc.Address(host.env.TxContext.Origin),
-		Coinbase:  evmc.Address(host.env.Context.Coinbase),
-		Number:    host.env.Context.BlockNumber.Int64(),
-		Timestamp: host.env.Context.Time.Int64(),
-		GasLimit:  int64(host.env.Context.GasLimit),
-		ChainID:   evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
+	return evmc.TxContext{
+		GasPrice:   evmc.Hash(common.BigToHash(host.env.GasPrice)),
+		Origin:     evmc.Address(host.env.TxContext.Origin),
+		Coinbase:   evmc.Address(host.env.Context.Coinbase),
+		Number:     host.env.Context.BlockNumber.Int64(),
+		Timestamp:  host.env.Context.Time.Int64(),
+		GasLimit:   int64(host.env.Context.GasLimit),
+		Difficulty: evmc.Hash(common.BigToHash(host.env.Context.Difficulty)),
+		ChainID:    evmc.Hash(common.BigToHash(host.env.chainConfig.GetChainID())),
 	}
-	if getRevision(host.env) >= evmc.London {
-		txCtx.BaseFee = evmc.Hash(common.BigToHash(host.env.Context.BaseFee))
-		if host.env.Context.Random != nil {
-			txCtx.PrevRandao = evmc.Hash(*host.env.Context.Random)
-		}
-	}
-	return txCtx
 }
 
 func (host *hostContext) GetBlockHash(number int64) evmc.Hash {
@@ -509,14 +267,11 @@ func (host *hostContext) EmitLog(addr evmc.Address, evmcTopics []evmc.Hash, data
 	})
 }
 
-// Call executes a message call transaction.
-// - evmcCodeAddress: https://github.com/ethereum/evmc/commit/8314761222c837d41f573b0af1152ce1c9895a32#diff-4c54ef259154e3cd3bd18b1963e027655525f909a887700cc2d1386e075c3628R155
 func (host *hostContext) Call(kind evmc.CallKind,
 	evmcDestination evmc.Address, evmcSender evmc.Address, valueBytes evmc.Hash, input []byte, gas int64, depth int,
-	static bool, saltBytes evmc.Hash, evmcCodeAddress evmc.Address) (output []byte, gasLeft int64, gasRefund int64, createAddrEvmc evmc.Address, err error) {
+	static bool, saltBytes evmc.Hash) (output []byte, gasLeft int64, createAddrEvmc evmc.Address, err error) {
 
 	destination := common.Address(evmcDestination)
-	codeTarget := common.Address(evmcCodeAddress)
 
 	var createAddr common.Address
 
@@ -537,14 +292,14 @@ func (host *hostContext) Call(kind evmc.CallKind,
 			output, gasLeftU, err = host.env.Call(host.contract, destination, input, gasU, value.ToBig())
 		}
 	case evmc.DelegateCall:
-		output, gasLeftU, err = host.env.DelegateCall(host.contract, codeTarget, input, gasU)
+		output, gasLeftU, err = host.env.DelegateCall(host.contract, destination, input, gasU)
 	case evmc.CallCode:
-		output, gasLeftU, err = host.env.CallCode(host.contract, codeTarget, input, gasU, value.ToBig())
+		output, gasLeftU, err = host.env.CallCode(host.contract, destination, input, gasU, value.ToBig())
 	case evmc.Create:
 		var createOutput []byte
 		createOutput, createAddr, gasLeftU, err = host.env.Create(host.contract, input, gasU, value.ToBig())
 		createAddrEvmc = evmc.Address(createAddr)
-		isHomestead := getRevision(host.env) >= evmc.Homestead
+		isHomestead := host.env.ChainConfig().IsEnabled(host.env.ChainConfig().GetEIP7Transition, host.env.Context.BlockNumber)
 		if !isHomestead && err == ErrCodeStoreOutOfGas {
 			err = nil
 		}
@@ -580,11 +335,7 @@ func (host *hostContext) Call(kind evmc.CallKind,
 	}
 
 	gasLeft = int64(gasLeftU)
-	gasRefund = gasLeft
-	if getRevision(host.env) >= evmc.London {
-		gasRefund = int64(host.env.StateDB.GetRefund())
-	}
-	return output, gasLeft, gasRefund, createAddrEvmc, err
+	return output, gasLeft, createAddrEvmc, err
 }
 
 // getRevision translates ChainConfig's HF block information into EVMC revision.
@@ -595,12 +346,10 @@ func getRevision(env *EVM) evmc.Revision {
 	// This is an example of choosing to use an "abstracted" idea
 	// about chain config, where I'm choosing to prioritize "indicative" features
 	// as identifiers for Fork-Feature-Groups. Note that this is very different
-	// from using Feature-complete sets to assert "did Forkage."
-	case conf.IsEnabled(conf.GetEIP1559Transition, n):
-		return evmc.London
+	// than using Feature-complete sets to assert "did Forkage."
 	case conf.IsEnabled(conf.GetEIP2565Transition, n):
-		return evmc.Berlin
-	case conf.IsEnabled(conf.GetEIP2200Transition, n):
+		panic("berlin is unsupported by EVMCv7")
+	case conf.IsEnabled(conf.GetEIP1884Transition, n):
 		return evmc.Istanbul
 	case conf.IsEnabled(conf.GetEIP1283DisableTransition, n):
 		return evmc.Petersburg
@@ -654,7 +403,7 @@ func (evm *EVMC) Run(contract *Contract, input []byte, readOnly bool) (ret []byt
 		input,
 		evmc.Hash(common.BigToHash(contract.value)),
 		contract.Code,
-	)
+		evmc.Hash{})
 
 	contract.Gas = uint64(gasLeft)
 

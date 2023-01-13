@@ -8,12 +8,6 @@ env:
   #   https://github.com/ethereum/go-ethereum/blob/master/accounts/usbwallet/trezor/trezor.go#L21-L43
   GENERATE_EXCEPTIONS: |
     trezor
-  # GENERATE_IGNORES are applied after the 'go generate' command.
-  # These files will be reverted after 'go generate' to their original ref version.
-  #
-  # - gen_genesis.go: file which has custom modifications for unmarshaling the various genesis formats
-  GENERATE_IGNORES: |
-    params/types/genesisT/gen_genesis.go
 jobs:
   go-generate-check:
     name: Check if "go generate" has been run
@@ -25,7 +19,9 @@ jobs:
         with:
           go-version: ^1.16
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Install deps
         id: install-deps
         run: |
@@ -46,10 +42,20 @@ jobs:
             list="$(grep -v "$pattern" <<< "$list")"
           done
           go generate "$list"
-      - name: Skip whitelisted generated go files
-        id: skip-files
+      - name: Revert custom generated files modifications before comparing them
+        id: revert-custom-generated-modifications
         run: |
-          git checkout -- ${GENERATE_IGNORES[@]}
+          # NOTE to developers checking what triggered this alert.
+          # This script is meant to alert you if some files have to be regenerated using `go generate`.
+          # If this happens, you have to run `go generate ./...` and then check the below commits that are being reverted and reapply them, after considering if they are needed.
+
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+          # Intentionally revert this commit which has a custom modification to the genesis unmarshaling,
+          # with regards reading different genesis formats origniating from different clients
+          # This way, this script can alert us on any code changes that have to be applied on if file gets changed.
+          git revert --no-edit 4b2cf83737ffe7c46c334a11414d151de049e0b3
 
       - name: Check for modified files
         id: git-check

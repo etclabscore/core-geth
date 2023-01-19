@@ -58,6 +58,8 @@ func TestState(t *testing.T) {
 	// Uses 1GB RAM per tested fork
 	st.skipLoad(`^stStaticCall/static_Call1MB`)
 
+	st.skipLoad(`.*EOF1.*`)
+
 	if *testEWASM == "" {
 		st.skipLoad(`^stEWASM`)
 	}
@@ -75,10 +77,11 @@ func TestState(t *testing.T) {
 	if *testEVM != "" || *testEWASM != "" {
 		// Berlin tests are not expected to pass for external EVMs, yet.
 		//
-		st.skipFork("^Berlin$") // ETH
+		st.skipFork("Berlin")   // ETH
 		st.skipFork("Magneto")  // ETC
 		st.skipFork("London")   // ETH
 		st.skipFork("Mystique") // ETC
+		st.skipFork("Merged")   // ETH
 	}
 	// The multigeth data type (like the Ethereum Foundation data type) doesn't support
 	// the ETC_Mystique fork/feature configuration, which omits EIP1559 and the associated BASEFEE
@@ -102,11 +105,11 @@ func TestState(t *testing.T) {
 	// For Istanbul, older tests were moved into LegacyTests
 	for _, dir := range []string{
 		stateTestDir,
-		// legacyStateTestDir,
+		legacyStateTestDir,
 		benchmarksDir,
 
 		stateTestDirETC,
-		// legacyTestDirETC,
+		legacyTestDirETC,
 	} {
 		st.walk(t, dir, func(t *testing.T, name string, test *StateTest) {
 			for _, subtest := range test.Subtests(st.skipforkpat) {

@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -167,7 +166,7 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 	// Note that parallelism can cause greasy bugs around file during read/write which is why
 	// we use a temporary file instead of immediately overwriting the canonical file in the first place;
 	// for example, I saw regular encoding errors without this pattern.
-	tmpFile, err := ioutil.TempFile(os.TempDir(), "geth-state-test-generation")
+	tmpFile, err := os.CreateTemp(os.TempDir(), "geth-state-test-generation")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -215,7 +214,7 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 				configPathTarget := filepath.Join(targetDirCommon, "configs", fmt.Sprintf("%s_config.json", target)) // e.g. "testdata_generated/GeneralStateTests/ETC_Atlantis_config.json"
 				os.MkdirAll(filepath.Dir(configPathTarget), os.ModePerm)
 				if _, statErr := os.Stat(configPathTarget); os.IsNotExist(statErr) {
-					if err := ioutil.WriteFile(configPathTarget, b, os.ModePerm); err != nil {
+					if err := os.WriteFile(configPathTarget, b, os.ModePerm); err != nil {
 						t.Fatal(err)
 					}
 				}
@@ -456,7 +455,7 @@ func TestGenStateCoreGethConfigs(t *testing.T) {
 					coregethSpecsDir,
 					strcase.ToSnake(subtest.Fork)+"_test.json",
 				)
-				err = ioutil.WriteFile(filename, b, os.ModePerm)
+				err = os.WriteFile(filename, b, os.ModePerm)
 				if err != nil {
 					t.Fatal(err)
 				}

@@ -19,8 +19,8 @@ package convert_test
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math/big"
+	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -36,7 +36,7 @@ import (
 )
 
 func mustOpenF(t *testing.T, fabbrev string, into interface{}) {
-	b, err := ioutil.ReadFile(filepath.Join("..", "testdata", fmt.Sprintf("stureby_%s.json", fabbrev)))
+	b, err := os.ReadFile(filepath.Join("..", "testdata", fmt.Sprintf("stureby_%s.json", fabbrev)))
 	if err != nil {
 		t.Fatal(err)
 	}

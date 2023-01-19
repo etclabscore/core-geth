@@ -664,6 +664,7 @@ func (s *StateDB) Copy() *StateDB {
 		// and in the Finalise-method, there is a case where an object is in the journal but not
 		// in the stateObjects: OOG after touch on ripeMD prior to Byzantium. Thus, we need to check for
 		// nil
+		// meowsbits-ripemd
 		if object, exist := s.stateObjects[addr]; exist {
 			// Even though the original object is dirty, we are not copying the journal,
 			// so we need to make sure that anyside effect the journal would have caused
@@ -785,6 +786,7 @@ func (s *StateDB) Finalise(deleteEmptyObjects bool) {
 			// it will persist in the journal even though the journal is reverted. In this special circumstance,
 			// it may exist in `s.journal.dirties` but not in `s.stateObjects`.
 			// Thus, we can safely ignore it here
+			// meowsbits-ripemd
 			continue
 		}
 		if obj.suicided || (deleteEmptyObjects && obj.empty()) {

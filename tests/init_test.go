@@ -32,7 +32,6 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 )
 
@@ -190,18 +189,6 @@ func (tm *testMatcher) findSkip(name string) (reason string, skipload bool) {
 		}
 	}
 	return "", false
-}
-
-// findConfig returns the chain config matching defined patterns.
-func (tm *testMatcher) findConfig(name string) (config ctypes.ChainConfigurator, configRegexKey string) {
-	// TODO(fjl): name can be derived from testing.T when min Go version is 1.8
-	for _, m := range tm.configpat {
-		if m.p.MatchString(name) {
-			return m.config, m.p.String()
-		}
-	}
-	log.Println("using empty config", name)
-	return new(coregeth.CoreGethChainConfig), ""
 }
 
 // checkFailure checks whether a failure is expected.

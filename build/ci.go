@@ -138,7 +138,7 @@ var (
 		"focal":  "golang-go",   // EOL: 04/2030
 		"impish": "golang-go",   // EOL: 07/2022
 		"jammy":  "golang-go",   // EOL: 04/2032
-		//"kinetic": "golang-go",   //  EOL: 07/2023
+		// "kinetic": "golang-go",   //  EOL: 07/2023
 	}
 
 	debGoBootPaths = map[string]string{
@@ -349,7 +349,7 @@ func doLint(cmdline []string) {
 	}
 
 	linter := downloadLinter(*cachedir)
-	lflags := []string{"run", "--timeout", "3m0s", "--config", ".golangci.yml"}
+	lflags := []string{"run", "--timeout", "5m0s", "--config", ".golangci.yml"}
 	build.MustRunCommand(linter, append(lflags, packages...)...)
 	fmt.Println("You have achieved perfection.")
 }

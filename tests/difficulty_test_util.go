@@ -103,6 +103,10 @@ var difficultyChainConfigurations = map[string]ctypes.ChainConfigurator{
 		Ethash:         new(ctypes.EthashConfig),
 		ByzantiumBlock: big.NewInt(0),
 	},
+	"GrayGlacier": &goethereum.ChainConfig{
+		Ethash:           new(ctypes.EthashConfig),
+		GrayGlacierBlock: big.NewInt(0),
+	},
 	"MainNetwork":       mainnetChainConfig,
 	"CustomMainNetwork": mainnetChainConfig,
 	"Constantinople": &goethereum.ChainConfig{

@@ -1,0 +1,67 @@
+name: Developer helper
+on: pull_request
+env:
+  # GENERATE_EXCEPTIONS are exceptions made to the 'go generate' command.
+  # These patterns are matched (negatively) against 'go list' output.
+  #
+  # - trezor: Ignore generating trezor package based on this comment:
+  #   https://github.com/ethereum/go-ethereum/blob/master/accounts/usbwallet/trezor/trezor.go#L21-L43
+  GENERATE_EXCEPTIONS: |
+    trezor
+jobs:
+  go-generate-check:
+    name: Check if "go generate" has been run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.x
+        id: go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install deps
+        id: install-deps
+        run: |
+          SOLC_BIN=solc-linux-amd64-v0.6.0+commit.26b70077
+          curl -OL https://binaries.soliditylang.org/linux-amd64/$SOLC_BIN
+          sudo mv $SOLC_BIN /usr/bin/solc
+          sudo chmod +x /usr/bin/solc
+
+        shell: bash
+      - name: Install devtools
+        id: install-devtools
+        run: make devtools
+      - name: Run go:generate
+        id: go-generate
+        run: |
+          list="$(go list ./...)"
+          for pattern in ${GENERATE_EXCEPTIONS[@]}; do
+            list="$(grep -v "$pattern" <<< "$list")"
+          done
+          go generate "$list"
+      - name: Revert custom generated files modifications before comparing them
+        id: revert-custom-generated-modifications
+        run: |
+          # NOTE to developers checking what triggered this alert.
+          # This script is meant to alert you if some files have to be regenerated using `go generate`.
+          # If this happens, you have to run `go generate ./...` and then check the below commits that are being reverted and reapply them, after considering if they are needed.
+
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+          # Intentionally revert this commit which has a custom modification to the genesis unmarshaling,
+          # with regards reading different genesis formats origniating from different clients
+          # This way, this script can alert us on any code changes that have to be applied on if file gets changed.
+          git revert --no-edit 4b2cf83737ffe7c46c334a11414d151de049e0b3
+
+      - name: Check for modified files
+        id: git-check
+        run: |
+          if ! git diff-index --quiet HEAD --; then
+            echo "🔴 ERROR: There are modified files after running 'go generate'"
+            git status
+            exit 1
+          fi

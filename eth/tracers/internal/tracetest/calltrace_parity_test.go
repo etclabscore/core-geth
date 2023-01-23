@@ -82,7 +82,7 @@ func callTracerParityTestRunner(tracerName string, filename string, dirPath stri
 	_, statedb := tests.MakePreState(rawdb.NewMemoryDatabase(), test.Genesis.Alloc, false)
 
 	// Create the tracer, the EVM environment and run it
-	tracer, err := tracers.New(tracerName, new(tracers.Context))
+	tracer, err := tracers.New(tracerName, new(tracers.Context), nil)
 	if err != nil {
 		return fmt.Errorf("failed to create call tracer: %v", err)
 	}
@@ -247,7 +247,7 @@ func stateDiffTracerTestRunner(tracerName string, filename string, dirPath strin
 	}
 
 	// Create the tracer, the EVM environment and run it
-	tracer, err := tracers.New(tracerName, new(tracers.Context))
+	tracer, err := tracers.New(tracerName, new(tracers.Context), nil)
 	if err != nil {
 		return fmt.Errorf("failed to create state diff tracer: %v", err)
 	}

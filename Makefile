@@ -30,7 +30,7 @@ ios:
 	@echo "Import \"$(GOBIN)/Geth.framework\" to use the library."
 
 test:
-	$(GORUN) build/ci.go test
+	$(GORUN) build/ci.go test -timeout 20m
 
 # DEPRECATED.
 # No attempt will be made after the Istanbul fork to maintain
@@ -48,24 +48,16 @@ test-coregeth: \
 hera:
 	./build/hera.sh
 
-ssvm:
-	./build/ssvm.sh
-
 evmone:
 	./build/evmone.sh
 
-aleth-interpreter:
-	./build/aleth-interpreter.sh
-
 # Test EVMC support against various external interpreters.
-test-evmc: hera ssvm evmone aleth-interpreter
+test-evmc: hera evmone
 	go test -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/hera/build/src/libhera.so
-	go test -count 1 ./tests -run TestState -evmc.ewasm=$(ROOT_DIR)/build/_workspace/SSVM/build/tools/ssvm-evmc/libssvmEVMC.so
 	go test -count 1 ./tests -run TestState -evmc.evm=$(ROOT_DIR)/build/_workspace/evmone/lib/libevmone.so
-	go test -count 1 ./tests -run TestState -evmc.evm=$(ROOT_DIR)/build/_workspace/aleth/lib/libaleth-interpreter.so
 
 clean-evmc:
-	rm -rf ./build/_workspace/hera ./build/_workspace/SSVM ./build/_workspace/evmone ./build/_workspace/aleth
+	rm -rf ./build/_workspace/hera ./build/_workspace/evmone
 
 test-coregeth-features: \
 	test-coregeth-features-coregeth \
@@ -102,15 +94,19 @@ tests-generate-state: ## Generate state tests.
 	env COREGETH_TESTS_GENERATE_STATE_TESTS=on \
 	env COREGETH_TESTS_CHAINCONFIG_FEATURE_EQUIVALENCE_COREGETH=on \
 	go test -p 1 -v -timeout 60m ./tests -run TestGenStateAll
+	rm -rf ./tests/testdata-etc/GeneralStateTests
+	mv ./tests/testdata_generated/GeneralStateTests ./tests/testdata-etc/GeneralStateTests
+	rm -rf ./tests/testdata-etc/LegacyTests
+	mv ./tests/testdata_generated/LegacyTests ./tests/testdata-etc/LegacyTests
+	rm -rf ./tests/testdata_generated
 
 tests-generate-difficulty: ## Generate difficulty tests.
-	@echo "Generating difficulty tests configs."
-	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS_CONFIGS=on \
-	go run build/ci.go test -v -timeout 10m ./tests -run TestDifficultyTestConfigGen
-
 	@echo "Generating difficulty tests."
 	env COREGETH_TESTS_GENERATE_DIFFICULTY_TESTS=on \
 	go run build/ci.go test -v -timeout 10m ./tests -run TestDifficultyGen
+	rm -rf ./tests/testdata-etc/DifficultyTests
+	mv ./tests/testdata_generated/DifficultyTests ./tests/testdata-etc/DifficultyTests
+	rm -rf ./tests/testdata_generated
 
 lint: ## Run linters.
 	$(GORUN) build/ci.go lint

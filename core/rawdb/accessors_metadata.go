@@ -56,7 +56,7 @@ func WriteDatabaseVersion(db ethdb.KeyValueWriter, version uint64) {
 
 // ReadChainConfig retrieves the consensus settings based on the given genesis hash.
 func ReadChainConfig(db ethdb.KeyValueReader, hash common.Hash) ctypes.ChainConfigurator {
-	data, _ := db.Get(ConfigKey(hash))
+	data, _ := db.Get(configKey(hash))
 	if len(data) == 0 {
 		return nil
 	}
@@ -77,20 +77,21 @@ func WriteChainConfig(db ethdb.KeyValueWriter, hash common.Hash, cfg ctypes.Chai
 	if err != nil {
 		log.Crit("Failed to JSON encode chain config", "err", err)
 	}
-	if err := db.Put(ConfigKey(hash), data); err != nil {
+	if err := db.Put(configKey(hash), data); err != nil {
 		log.Crit("Failed to store chain config", "err", err)
 	}
 }
 
-// ReadGenesisState retrieves the genesis state based on the given genesis hash.
-func ReadGenesisState(db ethdb.KeyValueReader, hash common.Hash) []byte {
-	data, _ := db.Get(genesisKey(hash))
+// ReadGenesisStateSpec retrieves the genesis state specification based on the
+// given genesis hash.
+func ReadGenesisStateSpec(db ethdb.KeyValueReader, hash common.Hash) []byte {
+	data, _ := db.Get(genesisStateSpecKey(hash))
 	return data
 }
 
-// WriteGenesisState writes the genesis state into the disk.
-func WriteGenesisState(db ethdb.KeyValueWriter, hash common.Hash, data []byte) {
-	if err := db.Put(genesisKey(hash), data); err != nil {
+// WriteGenesisStateSpec writes the genesis state specification into the disk.
+func WriteGenesisStateSpec(db ethdb.KeyValueWriter, hash common.Hash, data []byte) {
+	if err := db.Put(genesisStateSpecKey(hash), data); err != nil {
 		log.Crit("Failed to store genesis state", "err", err)
 	}
 }

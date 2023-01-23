@@ -32,6 +32,9 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
+//go:generate go run github.com/fjl/gencodec -type Genesis -field-override genesisSpecMarshaling -out gen_genesis.go
+//go:generate go run github.com/fjl/gencodec -type GenesisAccount -field-override genesisAccountMarshaling -out gen_genesis_account.go
+
 var ErrGenesisNoConfig = errors.New("genesis has no chain configuration")
 
 // Genesis specifies the header fields, state of a genesis block. It also defines hard
@@ -680,6 +683,14 @@ func (g *Genesis) GetEthashTerminalTotalDifficulty() *big.Int {
 
 func (g *Genesis) SetEthashTerminalTotalDifficulty(n *big.Int) error {
 	return g.Config.SetEthashTerminalTotalDifficulty(n)
+}
+
+func (g *Genesis) GetEthashTerminalTotalDifficultyPassed() bool {
+	return g.Config.GetEthashTerminalTotalDifficultyPassed()
+}
+
+func (g *Genesis) SetEthashTerminalTotalDifficultyPassed(t bool) error {
+	return g.Config.SetEthashTerminalTotalDifficultyPassed(t)
 }
 
 // IsTerminalPoWBlock returns whether the given block is the last block of PoW stage.

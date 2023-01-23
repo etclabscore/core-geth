@@ -67,6 +67,7 @@ func consoleCmdStdoutTest(flags []string, execCmd string, want interface{}) func
 		flags = append(flags, "--ipcpath", filepath.Join(os.TempDir(), "geth.ipc"), "--exec", execCmd, "console")
 		t.Log("flags:", flags)
 		geth := runGeth(t, flags...)
+		geth.KillTimeout = 20 * time.Second
 		geth.Expect(fmt.Sprintf(`%v
 `, want))
 		geth.ExpectExit()

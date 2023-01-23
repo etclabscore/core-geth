@@ -21,10 +21,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	gomath "math"
 	"math/big"
 	"math/rand"
 	"sort"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -78,6 +80,29 @@ const (
 	// and waste round trip times. If it's too high, we're capping responses and
 	// waste bandwidth.
 	maxTrieRequestCount = maxRequestSize / 512
+
+	// trienodeHealRateMeasurementImpact is the impact a single measurement has on
+	// the local node's trienode processing capacity. A value closer to 0 reacts
+	// slower to sudden changes, but it is also more stable against temporary hiccups.
+	trienodeHealRateMeasurementImpact = 0.005
+
+	// minTrienodeHealThrottle is the minimum divisor for throttling trie node
+	// heal requests to avoid overloading the local node and exessively expanding
+	// the state trie bedth wise.
+	minTrienodeHealThrottle = 1
+
+	// maxTrienodeHealThrottle is the maximum divisor for throttling trie node
+	// heal requests to avoid overloading the local node and exessively expanding
+	// the state trie bedth wise.
+	maxTrienodeHealThrottle = maxTrieRequestCount
+
+	// trienodeHealThrottleIncrease is the multiplier for the throttle when the
+	// rate of arriving data is higher than the rate of processing it.
+	trienodeHealThrottleIncrease = 1.33
+
+	// trienodeHealThrottleDecrease is the divisor for the throttle when the
+	// rate of arriving data is lower than the rate of processing it.
+	trienodeHealThrottleDecrease = 1.25
 )
 
 var (
@@ -365,7 +390,7 @@ type SyncPeer interface {
 	RequestAccountRange(id uint64, root, origin, limit common.Hash, bytes uint64) error
 
 	// RequestStorageRanges fetches a batch of storage slots belonging to one or
-	// more accounts. If slots from only one accout is requested, an origin marker
+	// more accounts. If slots from only one account is requested, an origin marker
 	// may also be used to retrieve from there.
 	RequestStorageRanges(id uint64, root common.Hash, accounts []common.Hash, origin, limit []byte, bytes uint64) error
 
@@ -373,7 +398,7 @@ type SyncPeer interface {
 	RequestByteCodes(id uint64, hashes []common.Hash, bytes uint64) error
 
 	// RequestTrieNodes fetches a batch of account or storage trie nodes rooted in
-	// a specificstate trie.
+	// a specific state trie.
 	RequestTrieNodes(id uint64, root common.Hash, paths []TrieNodePathSet, bytes uint64) error
 
 	// Log retrieves the peer's own contextual logger.
@@ -431,6 +456,11 @@ type Syncer struct {
 	trienodeHealReqs map[uint64]*trienodeHealRequest // Trie node requests currently running
 	bytecodeHealReqs map[uint64]*bytecodeHealRequest // Bytecode requests currently running
 
+	trienodeHealRate      float64   // Average heal rate for processing trie node data
+	trienodeHealPend      uint64    // Number of trie nodes currently pending for processing
+	trienodeHealThrottle  float64   // Divisor for throttling the amount of trienode heal data requested
+	trienodeHealThrottled time.Time // Timestamp the last time the throttle was updated
+
 	trienodeHealSynced uint64             // Number of state trie nodes downloaded
 	trienodeHealBytes  common.StorageSize // Number of state trie bytes persisted to disk
 	trienodeHealDups   uint64             // Number of state trie nodes already processed
@@ -476,9 +506,10 @@ func NewSyncer(db ethdb.KeyValueStore) *Syncer {
 		trienodeHealIdlers: make(map[string]struct{}),
 		bytecodeHealIdlers: make(map[string]struct{}),
 
-		trienodeHealReqs: make(map[uint64]*trienodeHealRequest),
-		bytecodeHealReqs: make(map[uint64]*bytecodeHealRequest),
-		stateWriter:      db.NewBatch(),
+		trienodeHealReqs:     make(map[uint64]*trienodeHealRequest),
+		bytecodeHealReqs:     make(map[uint64]*bytecodeHealRequest),
+		trienodeHealThrottle: maxTrienodeHealThrottle, // Tune downward instead of insta-filling with junk
+		stateWriter:          db.NewBatch(),
 
 		extProgress: new(SyncProgress),
 	}
@@ -1183,10 +1214,10 @@ func (s *Syncer) assignStorageTasks(success chan *storageResponse, fail chan *st
 		}
 		if subtask == nil {
 			// No large contract required retrieval, but small ones available
-			for acccount, root := range task.stateTasks {
-				delete(task.stateTasks, acccount)
+			for account, root := range task.stateTasks {
+				delete(task.stateTasks, account)
 
-				accounts = append(accounts, acccount)
+				accounts = append(accounts, account)
 				roots = append(roots, root)
 
 				if len(accounts) >= storageSets {
@@ -1320,6 +1351,10 @@ func (s *Syncer) assignTrienodeHealTasks(success chan *trienodeHealResponse, fai
 		// Generate the network query and send it to the peer
 		if cap > maxTrieRequestCount {
 			cap = maxTrieRequestCount
+		}
+		cap = int(float64(cap) / s.trienodeHealThrottle)
+		if cap <= 0 {
+			cap = 1
 		}
 		var (
 			hashes   = make([]common.Hash, 0, cap)
@@ -1486,7 +1521,7 @@ func (s *Syncer) assignBytecodeHealTasks(success chan *bytecodeHealResponse, fai
 	}
 }
 
-// revertRequests locates all the currently pending reuqests from a particular
+// revertRequests locates all the currently pending requests from a particular
 // peer and reverts them, rescheduling for others to fulfill.
 func (s *Syncer) revertRequests(peer string) {
 	// Gather the requests first, revertals need the lock too
@@ -1575,7 +1610,7 @@ func (s *Syncer) revertAccountRequest(req *accountRequest) {
 	s.lock.Unlock()
 
 	// If there's a timeout timer still running, abort it and mark the account
-	// task as not-pending, ready for resheduling
+	// task as not-pending, ready for rescheduling
 	req.timeout.Stop()
 	if req.task.req == req {
 		req.task.req = nil
@@ -1616,7 +1651,7 @@ func (s *Syncer) revertBytecodeRequest(req *bytecodeRequest) {
 	s.lock.Unlock()
 
 	// If there's a timeout timer still running, abort it and mark the code
-	// retrievals as not-pending, ready for resheduling
+	// retrievals as not-pending, ready for rescheduling
 	req.timeout.Stop()
 	for _, hash := range req.hashes {
 		req.task.codeTasks[hash] = struct{}{}
@@ -1657,7 +1692,7 @@ func (s *Syncer) revertStorageRequest(req *storageRequest) {
 	s.lock.Unlock()
 
 	// If there's a timeout timer still running, abort it and mark the storage
-	// task as not-pending, ready for resheduling
+	// task as not-pending, ready for rescheduling
 	req.timeout.Stop()
 	if req.subTask != nil {
 		req.subTask.req = nil
@@ -1743,7 +1778,7 @@ func (s *Syncer) revertBytecodeHealRequest(req *bytecodeHealRequest) {
 	s.lock.Unlock()
 
 	// If there's a timeout timer still running, abort it and mark the code
-	// retrievals as not-pending, ready for resheduling
+	// retrievals as not-pending, ready for rescheduling
 	req.timeout.Stop()
 	for _, hash := range req.hashes {
 		req.task.codeTasks[hash] = struct{}{}
@@ -2035,7 +2070,7 @@ func (s *Syncer) processStorageResponse(res *storageResponse) {
 			}
 			tr.Commit()
 		}
-		// Persist the received storage segements. These flat state maybe
+		// Persist the received storage segments. These flat state maybe
 		// outdated during the sync, but it can be fixed later during the
 		// snapshot generation.
 		for j := 0; j < len(res.hashes[i]); j++ {
@@ -2090,6 +2125,10 @@ func (s *Syncer) processStorageResponse(res *storageResponse) {
 // processTrienodeHealResponse integrates an already validated trienode response
 // into the healer tasks.
 func (s *Syncer) processTrienodeHealResponse(res *trienodeHealResponse) {
+	var (
+		start = time.Now()
+		fills int
+	)
 	for i, hash := range res.hashes {
 		node := res.nodes[i]
 
@@ -2098,6 +2137,8 @@ func (s *Syncer) processTrienodeHealResponse(res *trienodeHealResponse) {
 			res.task.trieTasks[res.paths[i]] = res.hashes[i]
 			continue
 		}
+		fills++
+
 		// Push the trie node into the state syncer
 		s.trienodeHealSynced++
 		s.trienodeHealBytes += common.StorageSize(len(node))
@@ -2121,6 +2162,50 @@ func (s *Syncer) processTrienodeHealResponse(res *trienodeHealResponse) {
 		log.Crit("Failed to persist healing data", "err", err)
 	}
 	log.Debug("Persisted set of healing data", "type", "trienodes", "bytes", common.StorageSize(batch.ValueSize()))
+
+	// Calculate the processing rate of one filled trie node
+	rate := float64(fills) / (float64(time.Since(start)) / float64(time.Second))
+
+	// Update the currently measured trienode queueing and processing throughput.
+	//
+	// The processing rate needs to be updated uniformly independent if we've
+	// processed 1x100 trie nodes or 100x1 to keep the rate consistent even in
+	// the face of varying network packets. As such, we cannot just measure the
+	// time it took to process N trie nodes and update once, we need one update
+	// per trie node.
+	//
+	// Naively, that would be:
+	//
+	//   for i:=0; i<fills; i++ {
+	//     healRate = (1-measurementImpact)*oldRate + measurementImpact*newRate
+	//   }
+	//
+	// Essentially, a recursive expansion of HR = (1-MI)*HR + MI*NR.
+	//
+	// We can expand that formula for the Nth item as:
+	//   HR(N) = (1-MI)^N*OR + (1-MI)^(N-1)*MI*NR + (1-MI)^(N-2)*MI*NR + ... + (1-MI)^0*MI*NR
+	//
+	// The above is a geometric sequence that can be summed to:
+	//   HR(N) = (1-MI)^N*(OR-NR) + NR
+	s.trienodeHealRate = gomath.Pow(1-trienodeHealRateMeasurementImpact, float64(fills))*(s.trienodeHealRate-rate) + rate
+
+	pending := atomic.LoadUint64(&s.trienodeHealPend)
+	if time.Since(s.trienodeHealThrottled) > time.Second {
+		// Periodically adjust the trie node throttler
+		if float64(pending) > 2*s.trienodeHealRate {
+			s.trienodeHealThrottle *= trienodeHealThrottleIncrease
+		} else {
+			s.trienodeHealThrottle /= trienodeHealThrottleDecrease
+		}
+		if s.trienodeHealThrottle > maxTrienodeHealThrottle {
+			s.trienodeHealThrottle = maxTrienodeHealThrottle
+		} else if s.trienodeHealThrottle < minTrienodeHealThrottle {
+			s.trienodeHealThrottle = minTrienodeHealThrottle
+		}
+		s.trienodeHealThrottled = time.Now()
+
+		log.Debug("Updated trie node heal throttler", "rate", s.trienodeHealRate, "pending", pending, "throttle", s.trienodeHealThrottle)
+	}
 }
 
 // processBytecodeHealResponse integrates an already validated bytecode response
@@ -2170,7 +2255,7 @@ func (s *Syncer) forwardAccountTask(task *accountTask) {
 	}
 	task.res = nil
 
-	// Persist the received account segements. These flat state maybe
+	// Persist the received account segments. These flat state maybe
 	// outdated during the sync, but it can be fixed later during the
 	// snapshot generation.
 	oldAccountBytes := s.accountBytes
@@ -2248,14 +2333,18 @@ func (s *Syncer) OnAccounts(peer SyncPeer, id uint64, hashes []common.Hash, acco
 	// Whether or not the response is valid, we can mark the peer as idle and
 	// notify the scheduler to assign a new task. If the response is invalid,
 	// we'll drop the peer in a bit.
+	defer func() {
+		s.lock.Lock()
+		defer s.lock.Unlock()
+		if _, ok := s.peers[peer.ID()]; ok {
+			s.accountIdlers[peer.ID()] = struct{}{}
+		}
+		select {
+		case s.update <- struct{}{}:
+		default:
+		}
+	}()
 	s.lock.Lock()
-	if _, ok := s.peers[peer.ID()]; ok {
-		s.accountIdlers[peer.ID()] = struct{}{}
-	}
-	select {
-	case s.update <- struct{}{}:
-	default:
-	}
 	// Ensure the response is for a valid request
 	req, ok := s.accountReqs[id]
 	if !ok {
@@ -2360,14 +2449,18 @@ func (s *Syncer) onByteCodes(peer SyncPeer, id uint64, bytecodes [][]byte) error
 	// Whether or not the response is valid, we can mark the peer as idle and
 	// notify the scheduler to assign a new task. If the response is invalid,
 	// we'll drop the peer in a bit.
+	defer func() {
+		s.lock.Lock()
+		defer s.lock.Unlock()
+		if _, ok := s.peers[peer.ID()]; ok {
+			s.bytecodeIdlers[peer.ID()] = struct{}{}
+		}
+		select {
+		case s.update <- struct{}{}:
+		default:
+		}
+	}()
 	s.lock.Lock()
-	if _, ok := s.peers[peer.ID()]; ok {
-		s.bytecodeIdlers[peer.ID()] = struct{}{}
-	}
-	select {
-	case s.update <- struct{}{}:
-	default:
-	}
 	// Ensure the response is for a valid request
 	req, ok := s.bytecodeReqs[id]
 	if !ok {
@@ -2469,14 +2562,18 @@ func (s *Syncer) OnStorage(peer SyncPeer, id uint64, hashes [][]common.Hash, slo
 	// Whether or not the response is valid, we can mark the peer as idle and
 	// notify the scheduler to assign a new task. If the response is invalid,
 	// we'll drop the peer in a bit.
+	defer func() {
+		s.lock.Lock()
+		defer s.lock.Unlock()
+		if _, ok := s.peers[peer.ID()]; ok {
+			s.storageIdlers[peer.ID()] = struct{}{}
+		}
+		select {
+		case s.update <- struct{}{}:
+		default:
+		}
+	}()
 	s.lock.Lock()
-	if _, ok := s.peers[peer.ID()]; ok {
-		s.storageIdlers[peer.ID()] = struct{}{}
-	}
-	select {
-	case s.update <- struct{}{}:
-	default:
-	}
 	// Ensure the response is for a valid request
 	req, ok := s.storageReqs[id]
 	if !ok {
@@ -2596,14 +2693,18 @@ func (s *Syncer) OnTrieNodes(peer SyncPeer, id uint64, trienodes [][]byte) error
 	// Whether or not the response is valid, we can mark the peer as idle and
 	// notify the scheduler to assign a new task. If the response is invalid,
 	// we'll drop the peer in a bit.
+	defer func() {
+		s.lock.Lock()
+		defer s.lock.Unlock()
+		if _, ok := s.peers[peer.ID()]; ok {
+			s.trienodeHealIdlers[peer.ID()] = struct{}{}
+		}
+		select {
+		case s.update <- struct{}{}:
+		default:
+		}
+	}()
 	s.lock.Lock()
-	if _, ok := s.peers[peer.ID()]; ok {
-		s.trienodeHealIdlers[peer.ID()] = struct{}{}
-	}
-	select {
-	case s.update <- struct{}{}:
-	default:
-	}
 	// Ensure the response is for a valid request
 	req, ok := s.trienodeHealReqs[id]
 	if !ok {
@@ -2639,10 +2740,12 @@ func (s *Syncer) OnTrieNodes(peer SyncPeer, id uint64, trienodes [][]byte) error
 
 	// Cross reference the requested trienodes with the response to find gaps
 	// that the serving node is missing
-	hasher := sha3.NewLegacyKeccak256().(crypto.KeccakState)
-	hash := make([]byte, 32)
-
-	nodes := make([][]byte, len(req.hashes))
+	var (
+		hasher = sha3.NewLegacyKeccak256().(crypto.KeccakState)
+		hash   = make([]byte, 32)
+		nodes  = make([][]byte, len(req.hashes))
+		fills  uint64
+	)
 	for i, j := 0, 0; i < len(trienodes); i++ {
 		// Find the next hash that we've been served, leaving misses with nils
 		hasher.Reset()
@@ -2654,16 +2757,22 @@ func (s *Syncer) OnTrieNodes(peer SyncPeer, id uint64, trienodes [][]byte) error
 		}
 		if j < len(req.hashes) {
 			nodes[j] = trienodes[i]
+			fills++
 			j++
 			continue
 		}
 		// We've either ran out of hashes, or got unrequested data
 		logger.Warn("Unexpected healing trienodes", "count", len(trienodes)-i)
+
 		// Signal this request as failed, and ready for rescheduling
 		s.scheduleRevertTrienodeHealRequest(req)
 		return errors.New("unexpected healing trienode")
 	}
 	// Response validated, send it to the scheduler for filling
+	atomic.AddUint64(&s.trienodeHealPend, fills)
+	defer func() {
+		atomic.AddUint64(&s.trienodeHealPend, ^(fills - 1))
+	}()
 	response := &trienodeHealResponse{
 		paths:  req.paths,
 		task:   req.task,
@@ -2691,14 +2800,18 @@ func (s *Syncer) onHealByteCodes(peer SyncPeer, id uint64, bytecodes [][]byte) e
 	// Whether or not the response is valid, we can mark the peer as idle and
 	// notify the scheduler to assign a new task. If the response is invalid,
 	// we'll drop the peer in a bit.
+	defer func() {
+		s.lock.Lock()
+		defer s.lock.Unlock()
+		if _, ok := s.peers[peer.ID()]; ok {
+			s.bytecodeHealIdlers[peer.ID()] = struct{}{}
+		}
+		select {
+		case s.update <- struct{}{}:
+		default:
+		}
+	}()
 	s.lock.Lock()
-	if _, ok := s.peers[peer.ID()]; ok {
-		s.bytecodeHealIdlers[peer.ID()] = struct{}{}
-	}
-	select {
-	case s.update <- struct{}{}:
-	default:
-	}
 	// Ensure the response is for a valid request
 	req, ok := s.bytecodeHealReqs[id]
 	if !ok {
@@ -2773,7 +2886,7 @@ func (s *Syncer) onHealByteCodes(peer SyncPeer, id uint64, bytecodes [][]byte) e
 }
 
 // onHealState is a callback method to invoke when a flat state(account
-// or storage slot) is downloded during the healing stage. The flat states
+// or storage slot) is downloaded during the healing stage. The flat states
 // can be persisted blindly and can be fixed later in the generation stage.
 // Note it's not concurrent safe, please handle the concurrent issue outside.
 func (s *Syncer) onHealState(paths [][]byte, value []byte) error {

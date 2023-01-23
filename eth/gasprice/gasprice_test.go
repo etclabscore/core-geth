@@ -48,6 +48,15 @@ func (b *testBackend) HeaderByNumber(ctx context.Context, number rpc.BlockNumber
 	if number > testHead {
 		return nil, nil
 	}
+	if number == rpc.EarliestBlockNumber {
+		number = 0
+	}
+	if number == rpc.FinalizedBlockNumber {
+		return b.chain.CurrentFinalizedBlock().Header(), nil
+	}
+	if number == rpc.SafeBlockNumber {
+		return b.chain.CurrentSafeBlock().Header(), nil
+	}
 	if number == rpc.LatestBlockNumber {
 		number = testHead
 	}
@@ -64,6 +73,15 @@ func (b *testBackend) HeaderByNumber(ctx context.Context, number rpc.BlockNumber
 func (b *testBackend) BlockByNumber(ctx context.Context, number rpc.BlockNumber) (*types.Block, error) {
 	if number > testHead {
 		return nil, nil
+	}
+	if number == rpc.EarliestBlockNumber {
+		number = 0
+	}
+	if number == rpc.FinalizedBlockNumber {
+		return b.chain.CurrentFinalizedBlock(), nil
+	}
+	if number == rpc.SafeBlockNumber {
+		return b.chain.CurrentSafeBlock(), nil
 	}
 	if number == rpc.LatestBlockNumber {
 		number = testHead
@@ -118,6 +136,7 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 		config.SetEIP3198Transition(&londonN)
 		config.SetEthashEIP4345Transition(&londonN) // ArrowGlacier
 		config.SetEthashEIP5133Transition(&londonN) // GrayGlacier
+		config.SetEthashTerminalTotalDifficulty(big.NewInt(0))
 	} else {
 		config.SetEIP1559Transition(nil)
 		config.SetEIP3541Transition(nil)
@@ -165,6 +184,8 @@ func newTestBackend(t *testing.T, londonBlock *big.Int, pending bool) *testBacke
 		t.Fatalf("Failed to create local chain, %v", err)
 	}
 	chain.InsertChain(blocks)
+	chain.SetFinalized(chain.GetBlockByNumber(25))
+	chain.SetSafe(chain.GetBlockByNumber(25))
 	return &testBackend{chain: chain, pending: pending}
 }
 

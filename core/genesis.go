@@ -36,15 +36,12 @@ import (
 	"github.com/ethereum/go-ethereum/trie"
 )
 
-//go:generate go run github.com/fjl/gencodec -type Genesis -field-override genesisSpecMarshaling -out gen_genesis.go
-//go:generate go run github.com/fjl/gencodec -type GenesisAccount -field-override genesisAccountMarshaling -out gen_genesis_account.go
-
 // SetupGenesisBlock wraps SetupGenesisBlockWithOverride, always using a nil value for the override.
 func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
 	return SetupGenesisBlockWithOverride(db, genesis, nil, nil)
 }
 
-func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, overrideGrayGlacier, overrideTerminalTotalDifficulty *big.Int) (ctypes.ChainConfigurator, common.Hash, error) {
+func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis, overrideTerminalTotalDifficulty *big.Int, overrideTerminalTotalDifficultyPassed *bool) (ctypes.ChainConfigurator, common.Hash, error) {
 	if genesis != nil && confp.IsEmpty(genesis.Config) {
 		return params.AllEthashProtocolChanges, common.Hash{}, genesisT.ErrGenesisNoConfig
 	}
@@ -54,9 +51,8 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, genesis *genesisT.Genesis,
 			if overrideTerminalTotalDifficulty != nil {
 				config.SetEthashTerminalTotalDifficulty(overrideTerminalTotalDifficulty)
 			}
-			if overrideGrayGlacier != nil {
-				gg := overrideGrayGlacier.Uint64()
-				config.SetEthashEIP5133Transition(&gg)
+			if overrideTerminalTotalDifficultyPassed != nil {
+				config.SetEthashTerminalTotalDifficultyPassed(*overrideTerminalTotalDifficultyPassed)
 			}
 		}
 	}
@@ -193,10 +189,10 @@ func configOrDefault(g *genesisT.Genesis, ghash common.Hash) ctypes.ChainConfigu
 
 // Flush adds allocated genesis accounts into a fresh new statedb and
 // commit the state changes into the given database handler.
-func gaFlush(ga *genesisT.GenesisAlloc, db ethdb.Database) (common.Hash, error) {
-	statedb, err := state.New(common.Hash{}, state.NewDatabase(db), nil)
+func gaFlush(ga *genesisT.GenesisAlloc, db ethdb.Database) error {
+	statedb, err := state.New(common.Hash{}, state.NewDatabaseWithConfig(db, &trie.Config{Preimages: true}), nil)
 	if err != nil {
-		return common.Hash{}, err
+		return err
 	}
 	for addr, account := range *ga {
 		statedb.AddBalance(addr, account.Balance)
@@ -208,13 +204,39 @@ func gaFlush(ga *genesisT.GenesisAlloc, db ethdb.Database) (common.Hash, error) 
 	}
 	root, err := statedb.Commit(false)
 	if err != nil {
-		return common.Hash{}, err
+		return err
 	}
 	err = statedb.Database().TrieDB().Commit(root, true, nil)
 	if err != nil {
+		return err
+	}
+	// Marshal the genesis state specification and persist.
+	blob, err := json.Marshal(ga)
+	if err != nil {
+		return err
+	}
+	rawdb.WriteGenesisStateSpec(db, root, blob)
+	return nil
+}
+
+// gaDeriveHash computes the state root according to the genesis specification.
+func gaDeriveHash(ga *genesisT.GenesisAlloc) (common.Hash, error) {
+	// Create an ephemeral in-memory database for computing hash,
+	// all the derived states will be discarded to not pollute disk.
+	db := state.NewDatabase(rawdb.NewMemoryDatabase())
+	statedb, err := state.New(common.Hash{}, db, nil)
+	if err != nil {
 		return common.Hash{}, err
 	}
-	return root, nil
+	for addr, account := range *ga {
+		statedb.AddBalance(addr, account.Balance)
+		statedb.SetCode(addr, account.Code)
+		statedb.SetNonce(addr, account.Nonce)
+		for key, value := range account.Storage {
+			statedb.SetState(addr, key, value)
+		}
+	}
+	return statedb.Commit(false)
 }
 
 // Write writes the json marshaled genesis state into database
@@ -224,7 +246,7 @@ func gaWrite(ga *genesisT.GenesisAlloc, db ethdb.KeyValueWriter, hash common.Has
 	if err != nil {
 		return err
 	}
-	rawdb.WriteGenesisState(db, hash, blob)
+	rawdb.WriteGenesisStateSpec(db, hash, blob)
 	return nil
 }
 
@@ -232,7 +254,7 @@ func gaWrite(ga *genesisT.GenesisAlloc, db ethdb.KeyValueWriter, hash common.Has
 // hash and commits them into the given database handler.
 func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 	var alloc genesisT.GenesisAlloc
-	blob := rawdb.ReadGenesisState(db, hash)
+	blob := rawdb.ReadGenesisStateSpec(db, hash)
 	if len(blob) != 0 {
 		if err := alloc.UnmarshalJSON(blob); err != nil {
 			return err
@@ -269,7 +291,7 @@ func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 			return errors.New("not found")
 		}
 	}
-	_, err := gaFlush(&alloc, db)
+	err := gaFlush(&alloc, db)
 	return err
 }
 
@@ -279,7 +301,11 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 	if db == nil {
 		db = rawdb.NewMemoryDatabase()
 	}
-	root, err := gaFlush(&g.Alloc, db)
+	root, err := gaDeriveHash(&g.Alloc)
+	if err != nil {
+		panic(err)
+	}
+	err = gaFlush(&g.Alloc, db)
 	if err != nil {
 		panic(err)
 	}

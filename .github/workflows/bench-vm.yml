@@ -52,7 +52,7 @@ jobs:
         run: |
           git remote add foundation https://github.com/ethereum/go-ethereum.git
           git fetch foundation
-          git checkout v1.9.25
+          git checkout v1.10.26
           # git submodule update
           git checkout $GITHUB_SHA -- tests/vm_bench_test.go
           go test -short ./tests -count 1 -p 1 -timeout 60m -run NONE -bench=VM -v |& tee go-ethereum.txt
@@ -102,4 +102,4 @@ jobs:
 
       - name: "Analyze Results [RAW DELTA]"
         run: |
-          benchstat --delta-test=none go-ethereum.txt core-geth.txt
+          benchstat go-ethereum.txt core-geth.txt

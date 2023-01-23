@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 
@@ -15,9 +15,9 @@ import (
 
 func readInputData(ctx *cli.Context) ([]byte, error) {
 	if !ctx.GlobalIsSet(fileInFlag.Name) {
-		return ioutil.ReadAll(os.Stdin)
+		return io.ReadAll(os.Stdin)
 	}
-	return ioutil.ReadFile(ctx.GlobalString(fileInFlag.Name))
+	return os.ReadFile(ctx.GlobalString(fileInFlag.Name))
 }
 
 func unmarshalChainSpec(format string, data []byte) (conf ctypes.Configurator, err error) {

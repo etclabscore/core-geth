@@ -3,7 +3,6 @@ package ethclient
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"sort"
 	"strings"
@@ -49,7 +48,7 @@ func TestRPCDiscover_BuildStatic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = ioutil.WriteFile("../build/static/openrpc.json", data, os.ModePerm)
+	err = os.WriteFile("../build/static/openrpc.json", data, os.ModePerm)
 	if err != nil {
 		t.Fatal(err)
 	}

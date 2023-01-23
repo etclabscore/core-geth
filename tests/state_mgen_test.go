@@ -18,9 +18,10 @@ package tests
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"math/big"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -29,6 +30,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/internal/build"
 	"github.com/ethereum/go-ethereum/params"
@@ -111,19 +113,6 @@ func TestGenStateAll(t *testing.T) {
 		legacyStateTestDir,
 	} {
 		tm.walkFullName(t, dir, tm.testWriteTest)
-
-		// Write the chain config file.
-		// testdata/GeneralStateTests -> testdata/GeneralStateTests_configs.json
-		b, err := json.MarshalIndent(tm.allConfigs, "", "    ")
-		if err != nil {
-			t.Fatal(err)
-		}
-		err = ioutil.WriteFile(fmt.Sprintf("%s_configs.json", dir), b, os.ModePerm)
-		if err != nil {
-			t.Fatal(err)
-		}
-		// Reset map as to only write config pertinent to forks in a tests directory.
-		tm.allConfigs = make(map[string]*coregeth.CoreGethChainConfig)
 	}
 }
 
@@ -165,6 +154,8 @@ func TestGenStateSingles(t *testing.T) {
 	}
 }
 
+var generatedBasedir = filepath.Join(".", "testdata_generated")
+
 func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTest) {
 	// testWriteTest generates a file-based tests (writing a new file), and re-runs (testing) the generated test file.
 
@@ -175,7 +166,7 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 	// Note that parallelism can cause greasy bugs around file during read/write which is why
 	// we use a temporary file instead of immediately overwriting the canonical file in the first place;
 	// for example, I saw regular encoding errors without this pattern.
-	tmpFile, err := ioutil.TempFile(os.TempDir(), "geth-state-test-generation")
+	tmpFile, err := os.CreateTemp(os.TempDir(), "geth-state-test-generation")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -187,8 +178,46 @@ func (tm *testMatcherGen) testWriteTest(t *testing.T, name string, test *StateTe
 		// If the test passes (and it damn well should), then move the file to the canonical location.
 		func() {
 			tm.runTestFile(t, tmpFileName, tmpFileName, tm.stateTestRunner)
-			if err := os.Rename(tmpFileName, name); err != nil {
+
+			rel, err := filepath.Rel(baseDir, name)
+			if err != nil {
 				t.Fatal(err)
+			}
+
+			targetPath := filepath.Join(generatedBasedir, rel)
+
+			if err := os.MkdirAll(filepath.Dir(targetPath), os.ModePerm); err != nil {
+				t.Fatal(err)
+			}
+
+			if err := os.Rename(tmpFileName, targetPath); err != nil {
+				t.Fatal(err)
+			}
+
+			// Write all relevant configs.
+
+			relSpl := strings.Split(rel, string(filepath.Separator))
+			targetDirCommon := filepath.Join(generatedBasedir, relSpl[0]) // e.g. "testdata_generated/GeneralStateTests"
+
+			// FIXME This is obviously super redundant.
+			sts := test.Subtests(nil)
+			for _, s := range sts {
+				target := tm.getGenerationTarget(s.Fork)
+				if target == "" {
+					continue
+				}
+				conf, _, err := GetChainConfig(target)
+				if err != nil {
+					t.Fatal(err)
+				}
+				b, _ := json.MarshalIndent(conf, "", "    ")
+				configPathTarget := filepath.Join(targetDirCommon, "configs", fmt.Sprintf("%s_config.json", target)) // e.g. "testdata_generated/GeneralStateTests/ETC_Atlantis_config.json"
+				os.MkdirAll(filepath.Dir(configPathTarget), os.ModePerm)
+				if _, statErr := os.Stat(configPathTarget); os.IsNotExist(statErr) {
+					if err := os.WriteFile(configPathTarget, b, os.ModePerm); err != nil {
+						t.Fatal(err)
+					}
+				}
 			}
 		},
 		// On-Skip:
@@ -209,7 +238,12 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 	return func(t *testing.T, name string, test *StateTest) {
 		subtests := test.Subtests(nil)
 
+		// targets are the subtests that will be generated
 		targets := map[string][]stPostState{}
+
+		// eip1559ExistsAnySubtest will be used to omit `currentBaseFee` field
+		// from the test env if EIP1559 not present in any of the subtest configs.
+		eip1559ExistsAnySubtest := false
 
 		for _, s := range subtests {
 			// Prior to test-generation logic, record the genesis+chain config at the testmatcher level.
@@ -238,6 +272,15 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 
 			if _, ok := Forks[targetFork]; !ok {
 				t.Fatalf("missing target fork config: %s, reference: %s", targetFork, referenceFork)
+			}
+
+			// Check to see if EIP1559 is enabled in the target subtest config.
+			tconfig, _, err := GetChainConfig(targetFork)
+			if err != nil {
+				t.Fatal(UnsupportedForkError{s.Fork})
+			}
+			if config.IsEnabled(tconfig.GetEIP1559Transition, big.NewInt(int64(test.json.Env.Number))) {
+				eip1559ExistsAnySubtest = true
 			}
 
 			if _, ok := targets[targetFork]; !ok {
@@ -285,6 +328,9 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 				if refPostState[s.Index].ExpectException == "" {
 					// TODO: Turn this error into the kind of error constants that upstream uses, eg. TR_TypeNotSupported.
 					stPost.ExpectException = err.Error()
+					if errors.Is(err, types.ErrTxTypeNotSupported) {
+						stPost.ExpectException = "TR_TypeNotSupported"
+					}
 				}
 
 				// Either way, we maintain the incumbent post state values,
@@ -313,7 +359,12 @@ func (tm *testMatcherGen) stateTestsGen(w io.WriteCloser, writeCallback, skipCal
 			return
 		}
 
+		if !eip1559ExistsAnySubtest {
+			test.json.Env.BaseFee = nil
+		}
+
 		// Install the generated cases to the test.
+		test.json.Post = make(map[string][]stPostState) // Reset the post state. We'll only add the generated post states.
 		for k, v := range targets {
 			test.json.Post[k] = v
 		}
@@ -404,7 +455,7 @@ func TestGenStateCoreGethConfigs(t *testing.T) {
 					coregethSpecsDir,
 					strcase.ToSnake(subtest.Fork)+"_test.json",
 				)
-				err = ioutil.WriteFile(filename, b, os.ModePerm)
+				err = os.WriteFile(filename, b, os.ModePerm)
 				if err != nil {
 					t.Fatal(err)
 				}

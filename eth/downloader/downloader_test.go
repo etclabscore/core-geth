@@ -39,6 +39,8 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
 )
@@ -68,7 +70,11 @@ func newTesterWithNotification(t *testing.T, success func()) *downloadTester {
 	t.Cleanup(func() {
 		db.Close()
 	})
-	core.GenesisBlockForTesting(db, testAddress, big.NewInt(1000000000000000))
+	gspec := &genesisT.Genesis{
+		Alloc:   genesisT.GenesisAlloc{testAddress: {Balance: big.NewInt(1000000000000000)}},
+		BaseFee: big.NewInt(vars.InitialBaseFee),
+	}
+	core.MustCommitGenesis(db, gspec)
 
 	chain, err := core.NewBlockChain(db, nil, params.TestChainConfig, ethash.NewFaker(), vm.Config{}, nil, nil)
 	if err != nil {
@@ -356,7 +362,7 @@ func (dlp *downloadTesterPeer) RequestAccountRange(id uint64, root, origin, limi
 }
 
 // RequestStorageRanges fetches a batch of storage slots belonging to one or
-// more accounts. If slots from only one accout is requested, an origin marker
+// more accounts. If slots from only one account is requested, an origin marker
 // may also be used to retrieve from there.
 func (dlp *downloadTesterPeer) RequestStorageRanges(id uint64, root common.Hash, accounts []common.Hash, origin, limit []byte, bytes uint64) error {
 	// Create the request and service it
@@ -395,7 +401,7 @@ func (dlp *downloadTesterPeer) RequestByteCodes(id uint64, hashes []common.Hash,
 }
 
 // RequestTrieNodes fetches a batch of account or storage trie nodes rooted in
-// a specificstate trie.
+// a specific state trie.
 func (dlp *downloadTesterPeer) RequestTrieNodes(id uint64, root common.Hash, paths []snap.TrieNodePathSet, bytes uint64) error {
 	req := &snap.GetTrieNodesPacket{
 		ID:    id,
@@ -567,8 +573,8 @@ func testForkedSync(t *testing.T, protocol uint, mode SyncMode) {
 	assertOwnChain(t, tester, len(chainB.blocks))
 }
 
-// Tests that synchronising against a much shorter but much heavyer fork works
-// corrently and is not dropped.
+// Tests that synchronising against a much shorter but much heavier fork works
+// currently and is not dropped.
 func TestHeavyForkedSync66Full(t *testing.T)  { testHeavyForkedSync(t, eth.ETH66, FullSync) }
 func TestHeavyForkedSync66Snap(t *testing.T)  { testHeavyForkedSync(t, eth.ETH66, SnapSync) }
 func TestHeavyForkedSync66Light(t *testing.T) { testHeavyForkedSync(t, eth.ETH66, LightSync) }
@@ -1448,7 +1454,7 @@ func TestBeaconSync66Full(t *testing.T) { testBeaconSync(t, eth.ETH66, FullSync)
 func TestBeaconSync66Snap(t *testing.T) { testBeaconSync(t, eth.ETH66, SnapSync) }
 
 func testBeaconSync(t *testing.T, protocol uint, mode SyncMode) {
-	//log.Root().SetHandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
+	// log.Root().SetHandler(log.LvlFilterHandler(log.LvlInfo, log.StreamHandler(os.Stderr, log.TerminalFormat(true))))
 
 	var cases = []struct {
 		name  string // The name of testing scenario

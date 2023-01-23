@@ -20,7 +20,6 @@ import (
 	"crypto/sha1"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -113,7 +112,7 @@ func readJSONFromFile(name string, value interface{}) (sha1sum []byte, err error
 	} else {
 		fi.Close()
 	}
-	b, err := ioutil.ReadFile(name)
+	b, err := os.ReadFile(name)
 	if err != nil {
 		panic(fmt.Sprintf("%s err: %s\n%s", name, err, b))
 	}
@@ -160,7 +159,7 @@ func writeDifficultyConfigFileParity(conf ctypes.ChainConfigurator, forkName str
 		return "", [20]byte{}, err
 	}
 
-	err = ioutil.WriteFile(filepath.Join("..", "params", "parity.json.d", specFilepath), b, os.ModePerm)
+	err = os.WriteFile(filepath.Join("..", "params", "parity.json.d", specFilepath), b, os.ModePerm)
 	if err != nil {
 		return "", [20]byte{}, err
 	}
@@ -291,7 +290,7 @@ func init() {
 				config = pspec
 				b, _ := json.MarshalIndent(pspec, "", "    ")
 				writePath := filepath.Join(paritySpecsDir, v)
-				err := ioutil.WriteFile(writePath, b, os.ModePerm)
+				err := os.WriteFile(writePath, b, os.ModePerm)
 				if err != nil {
 					panic(fmt.Sprintf("failed to write chainspec; wd: %s, config: %v/file: %v", wd, k, writePath))
 				}

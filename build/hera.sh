@@ -16,7 +16,7 @@ main() {
     mkdir -p build/_workspace
     [ ! -d build/_workspace/hera ] && git clone https://github.com/ewasm/hera build/_workspace/hera || echo "Hera exists."
     cd build/_workspace/hera
-    git checkout v0.6.0
+    git checkout v0.3.2
     git submodule update --init
     mkdir -p build
     cd build

@@ -18,7 +18,6 @@ package parity
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -98,7 +97,7 @@ func TestParityChainSpec_UnmarshalJSON(t *testing.T) {
 			return nil
 		}
 		t.Run(info.Name(), func(t *testing.T) {
-			b, err := ioutil.ReadFile(path)
+			b, err := os.ReadFile(path)
 			if err != nil {
 				t.Fatal(err)
 			}

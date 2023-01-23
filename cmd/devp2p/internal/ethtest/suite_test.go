@@ -36,7 +36,7 @@ var (
 )
 
 func TestEthSuite(t *testing.T) {
-	geth, err := runGeth()
+	geth, err := runGeth(t)
 	if err != nil {
 		t.Fatalf("could not run geth: %v", err)
 	}
@@ -46,8 +46,9 @@ func TestEthSuite(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not create new test suite: %v", err)
 	}
-	for _, test := range suite.Eth66Tests() {
+	for _, test := range suite.EthTests() {
 		t.Run(test.Name, func(t *testing.T) {
+			time.Sleep(time.Second)
 			result := utesting.RunTAP([]utesting.Test{{Name: test.Name, Fn: test.Fn}}, os.Stdout)
 			if result[0].Failed {
 				t.Fatal()
@@ -57,7 +58,7 @@ func TestEthSuite(t *testing.T) {
 }
 
 func TestSnapSuite(t *testing.T) {
-	geth, err := runGeth()
+	geth, err := runGeth(t)
 	if err != nil {
 		t.Fatalf("could not run geth: %v", err)
 	}
@@ -69,6 +70,7 @@ func TestSnapSuite(t *testing.T) {
 	}
 	for _, test := range suite.SnapTests() {
 		t.Run(test.Name, func(t *testing.T) {
+			time.Sleep(time.Second)
 			result := utesting.RunTAP([]utesting.Test{{Name: test.Name, Fn: test.Fn}}, os.Stdout)
 			if result[0].Failed {
 				t.Fatal()
@@ -78,7 +80,8 @@ func TestSnapSuite(t *testing.T) {
 }
 
 // runGeth creates and starts a geth node
-func runGeth() (*node.Node, error) {
+func runGeth(t *testing.T) (*node.Node, error) {
+	t.Helper()
 	stack, err := node.New(&node.Config{
 		P2P: p2p.Config{
 			ListenAddr:  "127.0.0.1:0",
@@ -100,6 +103,7 @@ func runGeth() (*node.Node, error) {
 		stack.Close()
 		return nil, err
 	}
+
 	return stack, nil
 }
 

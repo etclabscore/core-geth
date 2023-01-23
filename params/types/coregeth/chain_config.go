@@ -215,7 +215,8 @@ type CoreGethChainConfig struct {
 	EIP3541FBlock *big.Int `json:"eip3541FBlock,omitempty"`
 	EIP3529FBlock *big.Int `json:"eip3529FBlock,omitempty"`
 
-	EIP5133FBlock *big.Int `json:"eip5133FBloc,omitempty"`
+	EIP5133FBlock   *big.Int `json:"eip5133FBlock,omitempty"`
+	eip5133Inferred bool
 
 	MergeNetsplitVBlock *big.Int `json:"mergeNetsplitVBlock,omitempty"` // Virtual fork after The Merge to use as a network splitter
 
@@ -226,7 +227,14 @@ type CoreGethChainConfig struct {
 	Clique *ctypes.CliqueConfig `json:"clique,omitempty"`
 	Lyra2  *ctypes.Lyra2Config  `json:"lyra2,omitempty"`
 
+	// TerminalTotalDifficulty is the amount of total difficulty reached by
+	// the network that triggers the consensus upgrade.
 	TerminalTotalDifficulty *big.Int `json:"terminalTotalDifficulty,omitempty"`
+
+	// TerminalTotalDifficultyPassed is a flag specifying that the network already
+	// passed the terminal total difficulty. Its purpose is to disable legacy sync
+	// even without having seen the TTD locally (safer long term).
+	TerminalTotalDifficultyPassed bool `json:"terminalTotalDifficultyPassed,omitempty"`
 
 	TrustedCheckpoint       *ctypes.TrustedCheckpoint      `json:"trustedCheckpoint,omitempty"`
 	TrustedCheckpointOracle *ctypes.CheckpointOracleConfig `json:"trustedCheckpointOracle,omitempty"`

@@ -738,6 +738,15 @@ func (spec *ParityChainSpec) SetEthashTerminalTotalDifficulty(n *big.Int) error 
 	return nil
 }
 
+func (spec *ParityChainSpec) GetEthashTerminalTotalDifficultyPassed() bool {
+	return spec.Engine.Ethash.Params.TerminalTotalDifficultyPassed
+}
+
+func (spec *ParityChainSpec) SetEthashTerminalTotalDifficultyPassed(t bool) error {
+	spec.Engine.Ethash.Params.TerminalTotalDifficultyPassed = t
+	return nil
+}
+
 // IsTerminalPoWBlock returns whether the given block is the last block of PoW stage.
 func (spec *ParityChainSpec) IsTerminalPoWBlock(parentTotalDiff *big.Int, totalDiff *big.Int) bool {
 	terminalTotalDifficulty := spec.GetEthashTerminalTotalDifficulty()

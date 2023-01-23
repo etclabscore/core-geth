@@ -68,6 +68,11 @@ type ParityChainSpec struct {
 				// the network that triggers the consensus upgrade.
 				TerminalTotalDifficulty *math.HexOrDecimal256 `json:"terminalTotalDifficulty,omitempty"`
 
+				// TerminalTotalDifficultyPassed is a flag specifying that the network already
+				// passed the terminal total difficulty. Its purpose is to disable legacy sync
+				// even without having seen the TTD locally (safer long term).
+				TerminalTotalDifficultyPassed bool `json:"terminalTotalDifficultyPassed,omitempty"`
+
 				// Note: DAO fields will NOT be written to Parity configs from multi-geth.
 				// The chains with DAO settings are already canonical and have existing chainspecs.
 				// There is no need to replicate this information.

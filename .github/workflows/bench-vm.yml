@@ -102,4 +102,4 @@ jobs:
 
       - name: "Analyze Results [RAW DELTA]"
         run: |
-          benchstat --delta-test=none go-ethereum.txt core-geth.txt
+          benchstat go-ethereum.txt core-geth.txt

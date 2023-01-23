@@ -98,8 +98,8 @@ jobs:
 
       - name: "Analyze Results [COMPRESSED]"
         run: |
-          benchstat --geomean go-ethereum_compress.txt core-geth_compress.txt
+          benchstat go-ethereum_compress.txt core-geth_compress.txt
 
       - name: "Analyze Results [RAW DELTA]"
         run: |
-          benchstat --geomean --delta-test=none go-ethereum.txt core-geth.txt
+          benchstat --delta-test=none go-ethereum.txt core-geth.txt

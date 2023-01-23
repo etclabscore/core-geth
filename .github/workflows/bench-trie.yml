@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'ethereum/go-ethereum'
-          ref: 'v1.9.25'
+          ref: 'v1.10.26'
 
       - name: Benchmark ethereum/go-ethereum
         id: bench

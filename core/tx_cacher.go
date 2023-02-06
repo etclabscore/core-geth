@@ -60,16 +60,9 @@ func newTxSenderCacher(threads int) *txSenderCacher {
 // cache is an infinite loop, caching transaction senders from various forms of
 // data structures.
 func (cacher *txSenderCacher) cache() {
-	for {
-		select {
-		case task := <-cacher.tasks:
-			for i := 0; i < len(task.txs); i += task.inc {
-				types.Sender(task.signer, task.txs[i])
-			}
-		default:
-			if cacher.tasks == nil {
-				return
-			}
+	for task := range cacher.tasks {
+		for i := 0; i < len(task.txs); i += task.inc {
+			types.Sender(task.signer, task.txs[i])
 		}
 	}
 }

@@ -40,7 +40,15 @@ var (
 	// minArtificialFinalityPeers defines the minimum number of peers our node must be connected
 	// to in order to enable artificial finality features.
 	// A minimum number of peer connections mitigates the risk of lower-powered eclipse attacks.
-	minArtificialFinalityPeers = defaultMinSyncPeers
+	// We wrap this up in a uint32 and access it with atomic because
+	// the way the TestArtificialFinalityFeatureEnablingDisabling_* tests are cause
+	// a race condition; the tests want to assert variable operations under different conditions
+	// for this value, so they change it. And because they change it while they have handler instances
+	// running concurrently, the results are racey.
+	// So, tl;dr: use uint32 because atomic likes that and because the tests need it.
+	// Otherwise, the value should never change during the geth program, so the production race
+	// condition is expected to not exist (or be impracticable).
+	minArtificialFinalityPeers = uint32(defaultMinSyncPeers)
 
 	// artificialFinalitySafetyInterval defines the interval at which the local head is checked for staleness.
 	// If the head is found to be stale across this interval, artificial finality features are disabled.
@@ -215,7 +223,7 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 	} else if minPeers > cs.handler.maxPeers {
 		minPeers = cs.handler.maxPeers
 	}
-	if cs.handler.peers.len() < minArtificialFinalityPeers {
+	if cs.handler.peers.len() < int(atomic.LoadUint32(&minArtificialFinalityPeers)) {
 		if cs.handler.chain.IsArtificialFinalityEnabled() {
 			// If artificial finality state is forcefully set (overridden) this will just be a noop.
 			cs.handler.chain.EnableArtificialFinality(false, "reason", "low peers", "peers", cs.handler.peers.len())
@@ -245,7 +253,7 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 		// - In full sync mode.
 		if op.mode == downloader.FullSync &&
 			// - Have enough peers.
-			cs.handler.peers.len() >= minArtificialFinalityPeers &&
+			cs.handler.peers.len() >= int(atomic.LoadUint32(&minArtificialFinalityPeers)) &&
 			// - Head is not stale.
 			!(time.Since(time.Unix(int64(cs.handler.chain.CurrentHeader().Time), 0)) > artificialFinalitySafetyInterval) &&
 			// - AF is disabled (so we should reenable).

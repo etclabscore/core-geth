@@ -166,12 +166,12 @@ func TestArtificialFinalityFeatureEnablingDisabling_AbleDisable(t *testing.T) {
 	// Its important to do this before starting the syncer because
 	// of a potential data race with the minArtificialFinalityPeers value.
 	// This value does not (should not) change during geth runtime.
-	oMinAFPeers := minArtificialFinalityPeers
+	oMinAFPeers := atomic.LoadUint32(&minArtificialFinalityPeers)
 	defer func() {
 		// Clean up after, resetting global default to original value.
-		minArtificialFinalityPeers = oMinAFPeers
+		atomic.StoreUint32(&minArtificialFinalityPeers, oMinAFPeers)
 	}()
-	minArtificialFinalityPeers = 1
+	atomic.StoreUint32(&minArtificialFinalityPeers, 1)
 
 	maxBlocksCreated := 1024
 	genFunc := blockGenContemporaryTime(int64(maxBlocksCreated))
@@ -233,7 +233,7 @@ func TestArtificialFinalityFeatureEnablingDisabling_AbleDisable(t *testing.T) {
 	}
 
 	// Set the value back to default (more than 1).
-	minArtificialFinalityPeers = oMinAFPeers
+	atomic.StoreUint32(&minArtificialFinalityPeers, oMinAFPeers)
 
 	// Next sync op will unset AF because manager only has 1 peer.
 	atomic.StoreUint32(&b.handler.chainSync.forced, 1)
@@ -256,12 +256,12 @@ func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
 	// Its important to do this before starting the syncer because
 	// of a potential data race with the minArtificialFinalityPeers value.
 	// This value does not (should not) change during geth runtime.
-	oMinAFPeers := minArtificialFinalityPeers
+	oMinAFPeers := atomic.LoadUint32(&minArtificialFinalityPeers)
 	defer func() {
 		// Clean up after, resetting global default to original value.
-		minArtificialFinalityPeers = oMinAFPeers
+		atomic.StoreUint32(&minArtificialFinalityPeers, oMinAFPeers)
 	}()
-	minArtificialFinalityPeers = 1
+	atomic.StoreUint32(&minArtificialFinalityPeers, 1)
 
 	maxBlocksCreated := 1024
 	genFunc := blockGenContemporaryTime(int64(maxBlocksCreated))
@@ -312,7 +312,7 @@ func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
 
 	// Revert safety condition overrides to default values.
 	// Set the value back to default (more than 1).
-	minArtificialFinalityPeers = oMinAFPeers
+	atomic.StoreUint32(&minArtificialFinalityPeers, oMinAFPeers)
 
 	if next != nil {
 		t.Fatal("non-nil next sync op")
@@ -350,12 +350,12 @@ func TestArtificialFinalityFeatureEnablingDisabling_StaleHead(t *testing.T) {
 	// Its important to do this before starting the syncer because
 	// of a potential data race with the minArtificialFinalityPeers value.
 	// This value does not (should not) change during geth runtime.
-	oMinAFPeers := minArtificialFinalityPeers
+	oMinAFPeers := atomic.LoadUint32(&minArtificialFinalityPeers)
 	defer func() {
 		// Clean up after, resetting global default to original value.
-		minArtificialFinalityPeers = oMinAFPeers
+		atomic.StoreUint32(&minArtificialFinalityPeers, oMinAFPeers)
 	}()
-	minArtificialFinalityPeers = 1
+	atomic.StoreUint32(&minArtificialFinalityPeers, 1)
 
 	maxBlocksCreated := 1024
 
@@ -399,7 +399,7 @@ func TestArtificialFinalityFeatureEnablingDisabling_StaleHead(t *testing.T) {
 
 	// Revert safety condition overrides to default values.
 	// Set the value back to default (more than 1).
-	minArtificialFinalityPeers = oMinAFPeers
+	atomic.StoreUint32(&minArtificialFinalityPeers, oMinAFPeers)
 
 	if next != nil {
 		t.Fatal("non-nil next sync op")

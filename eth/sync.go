@@ -107,7 +107,7 @@ func (h *handler) syncTransactions(p *eth.Peer) {
 type chainSyncer struct {
 	handler     *handler
 	force       *time.Timer
-	forced      bool // true when force timer fired
+	forced      uint32 // true when force timer fired
 	warned      time.Time
 	peerEventCh chan struct{}
 	doneCh      chan error // non-nil when sync is running
@@ -166,7 +166,7 @@ func (cs *chainSyncer) loop() {
 		case err := <-cs.doneCh:
 			cs.doneCh = nil
 			cs.force.Reset(forceSyncCycle)
-			cs.forced = false
+			atomic.StoreUint32(&cs.forced, 0)
 
 			// If we've reached the merge transition but no beacon client is available, or
 			// it has not yet switched us over, keep warning the user that their infra is
@@ -176,7 +176,7 @@ func (cs *chainSyncer) loop() {
 				cs.warned = time.Now()
 			}
 		case <-cs.force.C:
-			cs.forced = true
+			atomic.StoreUint32(&cs.forced, 1)
 
 		case <-cs.handler.quitSync:
 			// Disable all insertion on the blockchain. This needs to happen before
@@ -210,7 +210,7 @@ func (cs *chainSyncer) nextSyncOp() *chainSyncOp {
 	}
 	// Ensure we're at minimum peer count.
 	minPeers := defaultMinSyncPeers
-	if cs.forced {
+	if atomic.LoadUint32(&cs.forced) == 1 {
 		minPeers = 1
 	} else if minPeers > cs.handler.maxPeers {
 		minPeers = cs.handler.maxPeers

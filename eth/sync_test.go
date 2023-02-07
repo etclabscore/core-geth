@@ -219,7 +219,8 @@ func TestArtificialFinalityFeatureEnablingDisabling_AbleDisable(t *testing.T) {
 		t.Fatalf("sync failed: %v", err)
 	}
 
-	b.handler.chainSync.forced = true
+	atomic.StoreUint32(&b.handler.chainSync.forced, 1)
+
 	next := b.handler.chainSync.nextSyncOp()
 	if next != nil {
 		t.Fatal("non-nil next sync op")
@@ -235,7 +236,7 @@ func TestArtificialFinalityFeatureEnablingDisabling_AbleDisable(t *testing.T) {
 	minArtificialFinalityPeers = oMinAFPeers
 
 	// Next sync op will unset AF because manager only has 1 peer.
-	b.handler.chainSync.forced = true
+	atomic.StoreUint32(&b.handler.chainSync.forced, 1)
 	next = b.handler.chainSync.nextSyncOp()
 	if next != nil {
 		t.Fatal("non-nil next sync op")
@@ -306,7 +307,7 @@ func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
 		t.Fatalf("sync failed: %v", err)
 	}
 
-	b.handler.chainSync.forced = true
+	atomic.StoreUint32(&b.handler.chainSync.forced, 1)
 	next := b.handler.chainSync.nextSyncOp()
 
 	// Revert safety condition overrides to default values.
@@ -324,7 +325,7 @@ func TestArtificialFinalityFeatureEnablingDisabling_NoDisable(t *testing.T) {
 	}
 
 	// Next sync op will unset AF because manager only has 1 peer.
-	b.handler.chainSync.forced = true
+	atomic.StoreUint32(&b.handler.chainSync.forced, 1)
 	next = b.handler.chainSync.nextSyncOp()
 	if next != nil {
 		t.Fatal("non-nil next sync op")
@@ -393,7 +394,7 @@ func TestArtificialFinalityFeatureEnablingDisabling_StaleHead(t *testing.T) {
 		t.Fatalf("sync failed: %v", err)
 	}
 
-	b.handler.chainSync.forced = true
+	atomic.StoreUint32(&b.handler.chainSync.forced, 1)
 	next := b.handler.chainSync.nextSyncOp()
 
 	// Revert safety condition overrides to default values.

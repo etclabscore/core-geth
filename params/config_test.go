@@ -33,6 +33,9 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/multigeth"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
+	"time"
+
+	"github.com/ethereum/go-ethereum/common/math"
 )
 
 func uint64P(n uint64) *uint64 {
@@ -42,62 +45,60 @@ func uint64P(n uint64) *uint64 {
 func TestCheckCompatible(t *testing.T) {
 	type test struct {
 		stored, new ctypes.ChainConfigurator
-		head        uint64
+		headBlock        uint64
+		headTimestamp uint64
 		wantErr     *confp.ConfigCompatError
 	}
 	tests := []test{
-		// 0
-		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 0, wantErr: nil},
-		// 1
-		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 100, wantErr: nil},
-		// 2
+		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, headBlock: 0, headTimestamp: 0, wantErr: nil},
+		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, headBlock: 0, headTimestamp: uint64(time.Now().Unix()), wantErr: nil},
+		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, headBlock: 100, wantErr: nil},
 		{
 			stored:  &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), EIP150Block: big.NewInt(10)},
 			new:     &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), EIP150Block: big.NewInt(20)},
-			head:    9,
-			wantErr: nil,
+			headBlock:    9,
+			wantErr:   nil,
 		},
-		// 3
 		{
-			stored: AllEthashProtocolChanges,
+			stored:    AllEthashProtocolChanges,
 			new:    &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: nil},
-			head:   3,
+			headBlock:   3,
 			wantErr: &confp.ConfigCompatError{
-				What:         "Homestead fork block",
-				StoredConfig: uint64P(0),
-				NewConfig:    nil,
-				RewindTo:     0,
+				What:          "Homestead fork block",
+				StoredBlock:   big.NewInt(0),
+				NewBlock:      nil,
+				RewindToBlock: 0,
 			},
 		},
 		// 4
 		{
-			stored: AllEthashProtocolChanges,
+			stored:    AllEthashProtocolChanges,
 			new:    &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: big.NewInt(1)},
-			head:   3,
+			headBlock:   3,
 			wantErr: &confp.ConfigCompatError{
-				What:         "Homestead fork block",
-				StoredConfig: uint64P(0),
-				NewConfig:    uint64P(1),
-				RewindTo:     0,
+				What:          "Homestead fork block",
+				StoredBlock:   big.NewInt(0),
+				NewBlock:      big.NewInt(1),
+				RewindToBlock: 0,
 			},
 		},
 		// 5
 		{
 			stored: &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: big.NewInt(30), EIP150Block: big.NewInt(10)},
 			new:    &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), HomesteadBlock: big.NewInt(25), EIP150Block: big.NewInt(20)},
-			head:   25,
+			headBlock:   25,
 			wantErr: &confp.ConfigCompatError{
-				What:         "EIP150 fork block",
-				StoredConfig: uint64P(10),
-				NewConfig:    uint64P(20),
-				RewindTo:     9,
+				What:          "EIP150 fork block",
+				StoredBlock:   big.NewInt(10),
+				NewBlock:      big.NewInt(20),
+				RewindToBlock: 9,
 			},
 		},
 		// 6
 		{
 			stored: &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP100FBlock: big.NewInt(30), EIP649FBlock: big.NewInt(30)},
 			new:    &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP100FBlock: big.NewInt(24), EIP649FBlock: big.NewInt(24)},
-			head:   25,
+			headBlock:   25,
 			wantErr: &confp.ConfigCompatError{
 				What:         "EIP100F fork block",
 				StoredConfig: uint64P(30),
@@ -109,14 +110,14 @@ func TestCheckCompatible(t *testing.T) {
 		{
 			stored:  &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), ByzantiumBlock: big.NewInt(30)},
 			new:     &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP211FBlock: big.NewInt(26)},
-			head:    25,
+			headBlock:    25,
 			wantErr: nil,
 		},
 		// 8
 		{
 			stored:  &goethereum.ChainConfig{Ethash: new(ctypes.EthashConfig), ByzantiumBlock: big.NewInt(30)},
 			new:     &coregeth.CoreGethChainConfig{Ethash: new(ctypes.EthashConfig), EIP100FBlock: big.NewInt(26), EIP649FBlock: big.NewInt(26)},
-			head:    25,
+			headBlock:    25,
 			wantErr: nil,
 		},
 		// 9
@@ -130,7 +131,7 @@ func TestCheckCompatible(t *testing.T) {
 				c.SetEthashEIP779Transition(uint64P(1900000))
 				return c
 			}(),
-			head: MainnetChainConfig.DAOForkBlock.Uint64(),
+			headBlock: MainnetChainConfig.DAOForkBlock.Uint64(),
 			wantErr: &confp.ConfigCompatError{
 				What:         "DAO fork support flag",
 				StoredConfig: uint64P(MainnetChainConfig.DAOForkBlock.Uint64()),
@@ -146,7 +147,7 @@ func TestCheckCompatible(t *testing.T) {
 				c.SetEthashEIP779Transition(nil)
 				return c
 			}(),
-			head: MainnetChainConfig.DAOForkBlock.Uint64(),
+			headBlock: MainnetChainConfig.DAOForkBlock.Uint64(),
 			wantErr: &confp.ConfigCompatError{
 				What:         "DAO fork support flag",
 				StoredConfig: uint64P(MainnetChainConfig.DAOForkBlock.Uint64()),
@@ -162,7 +163,7 @@ func TestCheckCompatible(t *testing.T) {
 				c.SetChainID(new(big.Int).Sub(MainnetChainConfig.EIP155Block, common.Big1))
 				return c
 			}(),
-			head: MainnetChainConfig.EIP158Block.Uint64(),
+			headBlock: MainnetChainConfig.EIP158Block.Uint64(),
 			wantErr: &confp.ConfigCompatError{
 				What:         "EIP155 chain ID",
 				StoredConfig: uint64P(MainnetChainConfig.EIP155Block.Uint64()),
@@ -186,7 +187,7 @@ func TestCheckCompatible(t *testing.T) {
 				}
 				return c
 			}(),
-			head:    5,
+			headBlock:    5,
 			wantErr: nil,
 		},
 		{
@@ -206,7 +207,7 @@ func TestCheckCompatible(t *testing.T) {
 				return c
 			}(),
 			new:     ClassicChainConfig,
-			head:    9550000,
+			headBlock:    9550000,
 			wantErr: nil,
 		},
 		{
@@ -223,7 +224,7 @@ func TestCheckCompatible(t *testing.T) {
 				return c
 			}(),
 			new:     ClassicChainConfig,
-			head:    9550000,
+			headBlock:    9550000,
 			wantErr: nil,
 		},
 		{
@@ -265,8 +266,8 @@ func TestCheckCompatible(t *testing.T) {
 				return c
 			}(),
 			new:     ClassicChainConfig,
-			head:    9700000,
-			wantErr: nil,
+			headBlock:    9700000,
+			wantErr:   nil,
 		},
 		{
 			stored: func() ctypes.ChainConfigurator {
@@ -294,7 +295,7 @@ func TestCheckCompatible(t *testing.T) {
 				return c
 			}(),
 			new:     ClassicChainConfig,
-			head:    9700000,
+			headBlock:    9700000,
 			wantErr: nil,
 		},
 		// https://github.com/ethereum/go-ethereum/pull/21473
@@ -307,15 +308,15 @@ func TestCheckCompatible(t *testing.T) {
 		// {
 		// 	stored:  &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30)},
 		// 	new:     &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30), PetersburgBlock: big.NewInt(30)},
-		// 	head:    40,
+		// 	headBlock:    40,
 		// 	wantErr: nil,
 		// },
 		{
 			stored: &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30)},
 			new:    &goethereum.ChainConfig{ConstantinopleBlock: big.NewInt(30), PetersburgBlock: big.NewInt(31)},
-			head:   40,
+			headBlock:   40,
 			wantErr: &confp.ConfigCompatError{
-				What:         "Petersburg fork block",
+				What:          "Petersburg fork block",
 				StoredConfig: nil,
 				NewConfig:    uint64P(big.NewInt(31).Uint64()),
 				RewindTo:     30,
@@ -324,12 +325,12 @@ func TestCheckCompatible(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		err := confp.Compatible(&test.head, test.stored, test.new)
+		err := confp.Compatible(&test.headBlock, test.stored, test.new)
 		if (err == nil && test.wantErr != nil) || (err != nil && test.wantErr == nil) {
-			t.Errorf("[case %d] nil/nonnil, error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", i, test.stored, test.new, test.head, err, test.wantErr)
+			t.Errorf("[case %d] nil/nonnil, error mismatch:\nstored: %v\nnew: %v\nheadBlock: %v\nerr: %v\nwant: %v", i, test.stored, test.new, test.headBlock, err, test.wantErr)
 		} else if err != nil && (err.RewindTo != test.wantErr.RewindTo) {
 			// if !reflect.DeepEqual(err, test.wantErr) {
-			t.Errorf("[case %d] error mismatch:\nstored: %v\nnew: %v\nhead: %v\nerr: %v\nwant: %v", i, test.stored, test.new, test.head, err, test.wantErr)
+			t.Errorf("[case %d] error mismatch:\nstored: %v\nnew: %v\nheadBlock: %v\nerr: %v\nwant: %v", i, test.stored, test.new, test.headBlock, err, test.wantErr)
 		}
 	}
 }
@@ -424,6 +425,23 @@ func TestGenesisHashes(t *testing.T) {
 		b := genesisToBlock(c.genesis, rawdb.NewMemoryDatabase())
 		if got := b.Hash(); got != c.hash {
 			t.Errorf("case: %d, want: %s, got: %s", i, c.hash.Hex(), got.Hex())
-		}
+	}
+}
+
+func TestConfigRules(t *testing.T) {
+	c := &ChainConfig{
+		ShanghaiTime: newUint64(500),
+	}
+	var stamp uint64
+	if r := c.Rules(big.NewInt(0), true, stamp); r.IsShanghai {
+		t.Errorf("expected %v to not be shanghai", stamp)
+	}
+	stamp = 500
+	if r := c.Rules(big.NewInt(0), true, stamp); !r.IsShanghai {
+		t.Errorf("expected %v to be shanghai", stamp)
+	}
+	stamp = math.MaxInt64
+	if r := c.Rules(big.NewInt(0), true, stamp); !r.IsShanghai {
+		t.Errorf("expected %v to be shanghai", stamp)
 	}
 }

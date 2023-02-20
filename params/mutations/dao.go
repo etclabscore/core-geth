@@ -41,10 +41,11 @@ var (
 // ensure it conforms to DAO hard-fork rules.
 //
 // DAO hard-fork extension to the header validity:
-//   a) if the node is no-fork, do not accept blocks in the [fork, fork+10) range
-//      with the fork specific extra-data set
-//   b) if the node is pro-fork, require blocks in the specific range to have the
-//      unique extra-data set.
+//
+//   - if the node is no-fork, do not accept blocks in the [fork, fork+10) range
+//     with the fork specific extra-data set.
+//   - if the node is pro-fork, require blocks in the specific range to have the
+//     unique extra-data set.
 func VerifyDAOHeaderExtraData(config ctypes.ChainConfigurator, header *types.Header) error {
 	// If the config wants the DAO fork, it should validate the extra data.
 	// Otherwise, like any other block or any other config, it should not care.

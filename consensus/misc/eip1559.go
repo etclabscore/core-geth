@@ -34,7 +34,7 @@ func VerifyEip1559Header(config ctypes.ChainConfigurator, parent, header *types.
 	// Verify that the gas limit remains within allowed bounds
 	parentGasLimit := parent.GasLimit
 	if !config.IsEnabled(config.GetEIP1559Transition, parent.Number) {
-		parentGasLimit = parent.GasLimit * vars.ElasticityMultiplier
+		parentGasLimit = parent.GasLimit * vars.ElasticityMultiplier()
 	}
 	if err := VerifyGaslimit(parentGasLimit, header.GasLimit); err != nil {
 		return err
@@ -59,7 +59,7 @@ func CalcBaseFee(config ctypes.ChainConfigurator, parent *types.Header) *big.Int
 		return new(big.Int).SetUint64(vars.InitialBaseFee)
 	}
 
-	parentGasTarget := parent.GasLimit / vars.ElasticityMultiplier
+	parentGasTarget := parent.GasLimit / vars.ElasticityMultiplier()
 	// If the parent gasUsed is the same as the target, the baseFee remains unchanged.
 	if parent.GasUsed == parentGasTarget {
 		return new(big.Int).Set(parent.BaseFee)
@@ -76,7 +76,7 @@ func CalcBaseFee(config ctypes.ChainConfigurator, parent *types.Header) *big.Int
 		num.SetUint64(parent.GasUsed - parentGasTarget)
 		num.Mul(num, parent.BaseFee)
 		num.Div(num, denom.SetUint64(parentGasTarget))
-		num.Div(num, denom.SetUint64(vars.BaseFeeChangeDenominator))
+		num.Div(num, denom.SetUint64(vars.BaseFeeChangeDenominator()))
 		baseFeeDelta := math.BigMax(num, common.Big1)
 
 		return num.Add(parent.BaseFee, baseFeeDelta)
@@ -86,7 +86,7 @@ func CalcBaseFee(config ctypes.ChainConfigurator, parent *types.Header) *big.Int
 		num.SetUint64(parentGasTarget - parent.GasUsed)
 		num.Mul(num, parent.BaseFee)
 		num.Div(num, denom.SetUint64(parentGasTarget))
-		num.Div(num, denom.SetUint64(vars.BaseFeeChangeDenominator))
+		num.Div(num, denom.SetUint64(vars.BaseFeeChangeDenominator()))
 		baseFee := num.Sub(parent.BaseFee, num)
 
 		return math.BigMax(baseFee, common.Big0)

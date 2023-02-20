@@ -26,6 +26,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -94,13 +95,11 @@ func TestState(t *testing.T) {
 	st.skipLoad(`^stQuadraticComplexityTest/QuadraticComplexitySolidity_CallDataCopy`)
 
 	// Broken tests:
+	//
+	// The stEOF tests are generated with EOF as part of Shanghai, which
+	// is erroneous. Therefore, these tests are skipped.
+	st.skipLoad(`^EIPTests/stEOF/`)
 	// Expected failures:
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/0`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Byzantium/3`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/0`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/Constantinople/3`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/0`, "bug in test")
-	// st.fails(`^stRevertTest/RevertPrecompiledTouch(_storage)?\.json/ConstantinopleFix/3`, "bug in test")
 
 	// For Istanbul, older tests were moved into LegacyTests
 	for _, dir := range []string{
@@ -277,17 +276,38 @@ func runBenchmark(b *testing.B, t *StateTest) {
 			sender := vm.NewContract(vm.AccountRef(msg.From()), vm.AccountRef(msg.From()),
 				nil, 0)
 
+			var (
+				gasUsed uint64
+				elapsed uint64
+				refund  uint64
+			)
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
-				// Execute the message.
 				snapshot := statedb.Snapshot()
-				_, _, err = evm.Call(sender, *msg.To(), msg.Data(), msg.Gas(), msg.Value())
+				statedb.Prepare(rules, msg.From(), context.Coinbase, msg.To(), vm.ActivePrecompiles(rules), msg.AccessList())
+				b.StartTimer()
+				start := time.Now()
+
+				// Execute the message.
+				_, leftOverGas, err := evm.Call(sender, *msg.To(), msg.Data(), msg.Gas(), msg.Value())
 				if err != nil {
 					b.Error(err)
 					return
 				}
+
+				b.StopTimer()
+				elapsed += uint64(time.Since(start))
+				refund += statedb.GetRefund()
+				gasUsed += msg.Gas() - leftOverGas
+
 				statedb.RevertToSnapshot(snapshot)
 			}
+			if elapsed < 1 {
+				elapsed = 1
+			}
+			// Keep it as uint64, multiply 100 to get two digit float later
+			mgasps := (100 * 1000 * (gasUsed - refund)) / elapsed
+			b.ReportMetric(float64(mgasps)/100, "mgas/s")
 		})
 	}
 }

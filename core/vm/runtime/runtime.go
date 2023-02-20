@@ -19,7 +19,6 @@ package runtime
 import (
 	"math"
 	"math/big"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -39,7 +38,7 @@ type Config struct {
 	Origin      common.Address
 	Coinbase    common.Address
 	BlockNumber *big.Int
-	Time        *big.Int
+	Time        uint64
 	GasLimit    uint64
 	GasPrice    *big.Int
 	Value       *big.Int
@@ -74,9 +73,6 @@ func setDefaults(cfg *Config) {
 
 	if cfg.Difficulty == nil {
 		cfg.Difficulty = new(big.Int)
-	}
-	if cfg.Time == nil {
-		cfg.Time = big.NewInt(time.Now().Unix())
 	}
 	if cfg.GasLimit == 0 {
 		cfg.GasLimit = math.MaxUint64
@@ -119,10 +115,10 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 		vmenv   = NewEnv(cfg)
 		sender  = vm.AccountRef(cfg.Origin)
 	)
-	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
-		cfg.State.PrepareAccessList(cfg.Origin, &address, vmenv.ActivePrecompiles(), nil)
-	}
-
+	// Execute the preparatory steps for state transition which includes:
+	// - prepare accessList(post-berlin)
+	// - reset transient storage(eip 1153)
+	cfg.State.Prepare(rules, cfg.Origin, cfg.Coinbase, &address, vmenv.ActivePrecompiles(), nil)
 	cfg.State.CreateAccount(address)
 	// set the receiver's (the executing contract) code for execution.
 	cfg.State.SetCode(address, code)
@@ -134,7 +130,6 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 		cfg.GasLimit,
 		cfg.Value,
 	)
-
 	return ret, cfg.State, err
 }
 
@@ -151,10 +146,12 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 	var (
 		vmenv  = NewEnv(cfg)
 		sender = vm.AccountRef(cfg.Origin)
+		rules  = cfg.ChainConfig.Rules(vmenv.Context.BlockNumber, vmenv.Context.Random != nil, vmenv.Context.Time)
 	)
-	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
-		cfg.State.PrepareAccessList(cfg.Origin, nil, vmenv.ActivePrecompiles(), nil)
-	}
+	// Execute the preparatory steps for state transition which includes:
+	// - prepare accessList(post-berlin)
+	// - reset transient storage(eip 1153)
+	cfg.State.Prepare(rules, cfg.Origin, cfg.Coinbase, nil, vmenv.ActivePrecompiles(), nil)
 	// Call the code with the given configuration.
 	code, address, leftOverGas, err := vmenv.Create(
 		sender,
@@ -173,13 +170,17 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, error) {
 	setDefaults(cfg)
 
-	vmenv := NewEnv(cfg)
+	var (
+		vmenv   = NewEnv(cfg)
+		sender  = cfg.State.GetOrNewStateObject(cfg.Origin)
+		statedb = cfg.State
+		rules   = cfg.ChainConfig.Rules(vmenv.Context.BlockNumber, vmenv.Context.Random != nil, vmenv.Context.Time)
+	)
+	// Execute the preparatory steps for state transition which includes:
+	// - prepare accessList(post-berlin)
+	// - reset transient storage(eip 1153)
+	statedb.Prepare(rules, cfg.Origin, cfg.Coinbase, &address, vmenv.ActivePrecompiles(), nil)
 
-	sender := cfg.State.GetOrNewStateObject(cfg.Origin)
-	statedb := cfg.State
-	if cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2929Transition, vmenv.Context.BlockNumber) {
-		statedb.PrepareAccessList(cfg.Origin, &address, vmenv.ActivePrecompiles(), nil)
-	}
 	// Call the code with the given configuration.
 	ret, leftOverGas, err := vmenv.Call(
 		sender,

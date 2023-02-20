@@ -32,6 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -55,7 +56,7 @@ const (
 
 var (
 	// Test chain configurations
-	testTxPoolConfig  core.TxPoolConfig
+	testTxPoolConfig  txpool.Config
 	ethashChainConfig ctypes.ChainConfigurator
 	cliqueChainConfig ctypes.ChainConfigurator
 
@@ -78,7 +79,7 @@ var (
 )
 
 func init() {
-	testTxPoolConfig = core.DefaultTxPoolConfig
+	testTxPoolConfig = txpool.DefaultConfig
 	testTxPoolConfig.Journal = ""
 	ethashTestChainConfig := *params.TestChainConfig
 	ethashChainConfig = &ethashTestChainConfig
@@ -114,18 +115,17 @@ func init() {
 // testWorkerBackend implements worker.Backend interfaces and wraps all information needed during the testing.
 type testWorkerBackend struct {
 	db         ethdb.Database
-	txPool     *core.TxPool
+	txPool     *txpool.TxPool
 	chain      *core.BlockChain
 	genesis    *genesisT.Genesis
 	uncleBlock *types.Block
 }
 
 func newTestWorkerBackend(t *testing.T, chainConfig ctypes.ChainConfigurator, engine consensus.Engine, db ethdb.Database, n int) *testWorkerBackend {
-	var gspec = genesisT.Genesis{
+	var gspec = &core.Genesis{
 		Config: chainConfig,
 		Alloc:  genesisT.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
 	}
-
 	switch e := engine.(type) {
 	case *clique.Clique:
 		gspec.ExtraData = make([]byte, 32+common.AddressLength+crypto.SignatureLength)
@@ -137,39 +137,43 @@ func newTestWorkerBackend(t *testing.T, chainConfig ctypes.ChainConfigurator, en
 	default:
 		t.Fatalf("unexpected consensus engine type: %T", engine)
 	}
-	genesis := core.MustCommitGenesis(db, &gspec)
-
-	chain, _ := core.NewBlockChain(db, &core.CacheConfig{TrieDirtyDisabled: true}, gspec.Config, engine, vm.Config{}, nil, nil)
-	txpool := core.NewTxPool(testTxPoolConfig, chainConfig, chain)
+	chain, err := core.NewBlockChain(db, &core.CacheConfig{TrieDirtyDisabled: true}, gspec, nil, engine, vm.Config{}, nil, nil)
+	if err != nil {
+		t.Fatalf("core.NewBlockChain failed: %v", err)
+	}
+	txpool := txpool.NewTxPool(testTxPoolConfig, chainConfig, chain)
 
 	// Generate a small n-block chain and an uncle block for it
+	var uncle *types.Block
 	if n > 0 {
-		blocks, _ := core.GenerateChain(chainConfig, genesis, engine, db, n, func(i int, gen *core.BlockGen) {
+		genDb, blocks, _ := core.GenerateChainWithGenesis(gspec, engine, n, func(i int, gen *core.BlockGen) {
 			gen.SetCoinbase(testBankAddress)
 		})
 		if _, err := chain.InsertChain(blocks); err != nil {
 			t.Fatalf("failed to insert origin chain: %v", err)
 		}
+		parent := chain.GetBlockByHash(chain.CurrentBlock().ParentHash())
+		blocks, _ = core.GenerateChain(chainConfig, parent, engine, genDb, 1, func(i int, gen *core.BlockGen) {
+			gen.SetCoinbase(testUserAddress)
+		})
+		uncle = blocks[0]
+	} else {
+		_, blocks, _ := core.GenerateChainWithGenesis(gspec, engine, 1, func(i int, gen *core.BlockGen) {
+			gen.SetCoinbase(testUserAddress)
+		})
+		uncle = blocks[0]
 	}
-	parent := genesis
-	if n > 0 {
-		parent = chain.GetBlockByHash(chain.CurrentBlock().ParentHash())
-	}
-	blocks, _ := core.GenerateChain(chainConfig, parent, engine, db, 1, func(i int, gen *core.BlockGen) {
-		gen.SetCoinbase(testUserAddress)
-	})
-
 	return &testWorkerBackend{
 		db:         db,
 		chain:      chain,
 		txPool:     txpool,
-		genesis:    &gspec,
-		uncleBlock: blocks[0],
+		genesis:    gspec,
+		uncleBlock: uncle,
 	}
 }
 
 func (b *testWorkerBackend) BlockChain() *core.BlockChain { return b.chain }
-func (b *testWorkerBackend) TxPool() *core.TxPool         { return b.txPool }
+func (b *testWorkerBackend) TxPool() *txpool.TxPool       { return b.txPool }
 func (b *testWorkerBackend) StateAtBlock(block *types.Block, reexec uint64, base *state.StateDB, checkLive bool, preferDisk bool) (statedb *state.StateDB, err error) {
 	return nil, errors.New("not supported")
 }
@@ -226,7 +230,7 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 	if isClique {
 		chainConfig = params.AllCliqueProtocolChanges
 		chainConfig.SetCliquePeriod(1)
-		chainConfig.SetCliqueEpoch(30000)
+		chainConfig.SetCliqueEpoch(30000) // PTAL-meowsbits Is this problematically writing to the pointer value?
 		engine = clique.New(&ctypes.CliqueConfig{
 			Period: chainConfig.GetCliquePeriod(),
 			Epoch:  chainConfig.GetCliqueEpoch(),
@@ -235,21 +239,11 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 		chainConfig = params.AllEthashProtocolChanges
 		engine = ethash.NewFaker()
 	}
-
-	// Turn on London hard fork config.
-	zero := uint64(0)
-	chainConfig.SetEIP1559Transition(&zero)
-	chainConfig.SetEIP3198Transition(&zero)
-	chainConfig.SetEIP3529Transition(&zero)
-	chainConfig.SetEIP3541Transition(&zero)
-	chainConfig.SetEthashEIP3554Transition(&zero)
 	w, b := newTestWorker(t, chainConfig, engine, db, 0)
 	defer w.close()
 
 	// This test chain imports the mined blocks.
-	db2 := rawdb.NewMemoryDatabase()
-	core.MustCommitGenesis(db2, b.genesis)
-	chain, _ := core.NewBlockChain(db2, nil, b.chain.Config(), engine, vm.Config{}, nil, nil)
+	chain, _ := core.NewBlockChain(rawdb.NewMemoryDatabase(), nil, b.genesis, nil, engine, vm.Config{}, nil, nil)
 	defer chain.Stop()
 
 	// Ignore empty commit here for less noise.
@@ -344,7 +338,7 @@ func TestStreamUncleBlock(t *testing.T) {
 	w, b := newTestWorker(t, ethashChainConfig, ethash, rawdb.NewMemoryDatabase(), 1)
 	defer w.close()
 
-	var taskCh = make(chan struct{})
+	var taskCh = make(chan struct{}, 3)
 
 	taskIndex := 0
 	w.newTaskHook = func(task *task) {
@@ -549,23 +543,24 @@ func testAdjustInterval(t *testing.T, chainConfig ctypes.ChainConfigurator, engi
 }
 
 func TestGetSealingWorkEthash(t *testing.T) {
-	testGetSealingWork(t, ethashChainConfig, ethash.NewFaker(), false)
+	testGetSealingWork(t, ethashChainConfig, ethash.NewFaker())
 }
 
 func TestGetSealingWorkClique(t *testing.T) {
 	testGetSealingWork(t, cliqueChainConfig, clique.New(&ctypes.CliqueConfig{
 		Period: cliqueChainConfig.GetCliquePeriod(),
 		Epoch:  cliqueChainConfig.GetCliqueEpoch(),
-	}, rawdb.NewMemoryDatabase()), false)
+	}, rawdb.NewMemoryDatabase()))
 }
 
 func TestGetSealingWorkPostMerge(t *testing.T) {
 	local := new(goethereum.ChainConfig)
-	local.SetEthashTerminalTotalDifficulty(big.NewInt(0))
-	testGetSealingWork(t, local, ethash.NewFaker(), true)
+	*local = *ethashChainConfig // FIXME-meowsbits Copy value, respecting types.
+	local.TerminalTotalDifficulty = big.NewInt(0)
+	testGetSealingWork(t, local, ethash.NewFaker())
 }
 
-func testGetSealingWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engine consensus.Engine, postMerge bool) {
+func testGetSealingWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engine consensus.Engine) {
 	defer engine.Close()
 
 	w, b := newTestWorker(t, chainConfig, engine, rawdb.NewMemoryDatabase(), 0)
@@ -592,7 +587,7 @@ func testGetSealingWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engi
 		}
 		_, isClique := engine.(*clique.Clique)
 		if !isClique {
-			if len(block.Extra()) != 0 {
+			if len(block.Extra()) != 2 {
 				t.Error("Unexpected extra field")
 			}
 			if block.Coinbase() != coinbase {
@@ -661,9 +656,7 @@ func testGetSealingWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engi
 
 	// This API should work even when the automatic sealing is not enabled
 	for _, c := range cases {
-		resChan, errChan, _ := w.getSealingBlock(c.parent, timestamp, c.coinbase, c.random, false)
-		block := <-resChan
-		err := <-errChan
+		block, _, err := w.getSealingBlock(c.parent, timestamp, c.coinbase, c.random, nil, false)
 		if c.expectErr {
 			if err == nil {
 				t.Error("Expect error but get nil")
@@ -679,9 +672,7 @@ func testGetSealingWork(t *testing.T, chainConfig ctypes.ChainConfigurator, engi
 	// This API should work even when the automatic sealing is enabled
 	w.start()
 	for _, c := range cases {
-		resChan, errChan, _ := w.getSealingBlock(c.parent, timestamp, c.coinbase, c.random, false)
-		block := <-resChan
-		err := <-errChan
+		block, _, err := w.getSealingBlock(c.parent, timestamp, c.coinbase, c.random, nil, false)
 		if c.expectErr {
 			if err == nil {
 				t.Error("Expect error but get nil")

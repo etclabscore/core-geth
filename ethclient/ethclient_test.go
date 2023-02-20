@@ -255,15 +255,6 @@ func newTestBackend(t *testing.T) (*node.Node, []*types.Block) {
 
 // generateTestChain generates 2 blocks. The first block contains 2 transactions.
 func generateTestChain() []*types.Block {
-	db := rawdb.NewMemoryDatabase()
-	config := params.AllEthashProtocolChanges
-	genesis := &genesisT.Genesis{
-		Config:    config,
-		Alloc:     genesisT.GenesisAlloc{testAddr: {Balance: testBalance}},
-		ExtraData: []byte("test genesis"),
-		Timestamp: 9000,
-		BaseFee:   big.NewInt(vars.InitialBaseFee),
-	}
 	generate := func(i int, g *core.BlockGen) {
 		g.OffsetTime(5)
 		g.SetExtra([]byte("test"))
@@ -273,11 +264,9 @@ func generateTestChain() []*types.Block {
 			g.AddTx(testTx2)
 		}
 	}
-	gblock := core.GenesisToBlock(genesis, db)
-	engine := ethash.NewFaker()
-	blocks, _ := core.GenerateChain(genesis.Config, gblock, engine, db, 2, generate)
-	blocks = append([]*types.Block{gblock}, blocks...)
-	return blocks
+	_, blocks, _ := core.GenerateChainWithGenesis(genesis, ethash.NewFaker(), 2, generate)
+	genesisBlock := core.MustCommitGenesis(rawdb.NewMemoryDatabase(), genesis)
+	return append([]*types.Block{genesisBlock}, blocks...)
 }
 
 func TestEthClient(t *testing.T) {
@@ -460,7 +449,7 @@ func testTransactionInBlockInterrupted(t *testing.T, client *rpc.Client) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// Test tx in block interupted.
+	// Test tx in block interrupted.
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	tx, err := ec.TransactionInBlock(ctx, block.Hash(), 0)

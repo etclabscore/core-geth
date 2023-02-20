@@ -71,12 +71,11 @@ func newTesterWithNotification(t *testing.T, success func()) *downloadTester {
 		db.Close()
 	})
 	gspec := &genesisT.Genesis{
+		Config:  params.TestChainConfig,
 		Alloc:   genesisT.GenesisAlloc{testAddress: {Balance: big.NewInt(1000000000000000)}},
 		BaseFee: big.NewInt(vars.InitialBaseFee),
 	}
-	core.MustCommitGenesis(db, gspec)
-
-	chain, err := core.NewBlockChain(db, nil, params.TestChainConfig, ethash.NewFaker(), vm.Config{}, nil, nil)
+	chain, err := core.NewBlockChain(db, nil, gspec, nil, ethash.NewFaker(), vm.Config{}, nil, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -276,8 +275,9 @@ func (dlp *downloadTesterPeer) RequestBodies(hashes []common.Hash, sink chan *et
 		rlp.DecodeBytes(blob, bodies[i])
 	}
 	var (
-		txsHashes   = make([]common.Hash, len(bodies))
-		uncleHashes = make([]common.Hash, len(bodies))
+		txsHashes        = make([]common.Hash, len(bodies))
+		uncleHashes      = make([]common.Hash, len(bodies))
+		withdrawalHashes = make([]common.Hash, len(bodies))
 	)
 	hasher := trie.NewStackTrie(nil)
 	for i, body := range bodies {
@@ -290,7 +290,7 @@ func (dlp *downloadTesterPeer) RequestBodies(hashes []common.Hash, sink chan *et
 	res := &eth.Response{
 		Req:  req,
 		Res:  (*eth.BlockBodiesPacket)(&bodies),
-		Meta: [][]common.Hash{txsHashes, uncleHashes},
+		Meta: [][]common.Hash{txsHashes, uncleHashes, withdrawalHashes},
 		Time: 1,
 		Done: make(chan error, 1), // Ignore the returned status
 	}

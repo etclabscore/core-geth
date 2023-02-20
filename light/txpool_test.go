@@ -38,19 +38,19 @@ type testTxRelay struct {
 	send, discard, mined chan int
 }
 
-func (self *testTxRelay) Send(txs types.Transactions) {
-	self.send <- len(txs)
+func (r *testTxRelay) Send(txs types.Transactions) {
+	r.send <- len(txs)
 }
 
-func (self *testTxRelay) NewHead(head common.Hash, mined []common.Hash, rollback []common.Hash) {
+func (r *testTxRelay) NewHead(head common.Hash, mined []common.Hash, rollback []common.Hash) {
 	m := len(mined)
 	if m != 0 {
-		self.mined <- m
+		r.mined <- m
 	}
 }
 
-func (self *testTxRelay) Discard(hashes []common.Hash) {
-	self.discard <- len(hashes)
+func (r *testTxRelay) Discard(hashes []common.Hash) {
+	r.discard <- len(hashes)
 }
 
 const poolTestTxsN = 1000
@@ -85,18 +85,21 @@ func TestTxPool(t *testing.T) {
 	var (
 		sdb     = rawdb.NewMemoryDatabase()
 		ldb     = rawdb.NewMemoryDatabase()
-		gspec   = genesisT.Genesis{Alloc: genesisT.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}, BaseFee: big.NewInt(vars.InitialBaseFee)}
-		genesis = core.MustCommitGenesis(sdb, &gspec)
+		gspec = &genesisT.Genesis{
+			Config:  params.TestChainConfig,
+			Alloc:   genesisT.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
+			BaseFee: big.NewInt(vars.InitialBaseFee),
+		}
 	)
-	core.MustCommitGenesis(ldb, &gspec)
 	// Assemble the test environment
-	blockchain, _ := core.NewBlockChain(sdb, nil, params.TestChainConfig, ethash.NewFullFaker(), vm.Config{}, nil, nil)
-	gchain, _ := core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), sdb, poolTestBlocksN, txPoolTestChainGen)
+	blockchain, _ := core.NewBlockChain(sdb, nil, gspec, nil, ethash.NewFullFaker(), vm.Config{}, nil, nil)
+	_, gchain, _ := core.GenerateChainWithGenesis(gspec, ethash.NewFaker(), poolTestBlocks, txPoolTestChainGen)
 	if _, err := blockchain.InsertChain(gchain); err != nil {
 		panic(err)
 	}
 
-	odr := &testOdr{sdb: sdb, ldb: ldb, indexerConfig: TestClientIndexerConfig}
+	core.MustCommitGenesis(ldb, gspec)
+	odr := &testOdr{sdb: sdb, ldb: ldb, serverState: blockchain.StateCache(), indexerConfig: TestClientIndexerConfig}
 	relay := &testTxRelay{
 		send:    make(chan int, 1),
 		discard: make(chan int, 1),

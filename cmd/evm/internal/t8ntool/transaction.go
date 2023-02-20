@@ -146,7 +146,7 @@ func Transaction(ctx *cli.Context) error {
 
 		// Check intrinsic gas
 		if gas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil,
-			eip2f, eip2028f); err != nil {
+			eip2f, eip2028f, eipXXXXf); err != nil {
 			r.Error = err
 			results = append(results, r)
 			continue
@@ -176,6 +176,10 @@ func Transaction(ctx *cli.Context) error {
 			r.Error = errors.New("gas * gasPrice exceeds 256 bits")
 		case new(big.Int).Mul(tx.GasFeeCap(), new(big.Int).SetUint64(tx.Gas())).BitLen() > 256:
 			r.Error = errors.New("gas * maxFeePerGas exceeds 256 bits")
+		}
+		// Check whether the init code size has been exceeded.
+		if chainConfig.IsShanghai(0) && tx.To() == nil && len(tx.Data()) > params.MaxInitCodeSize {
+			r.Error = errors.New("max initcode size exceeded")
 		}
 		results = append(results, r)
 	}

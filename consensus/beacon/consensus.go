@@ -354,7 +354,7 @@ func (beacon *Beacon) FinalizeAndAssemble(chain consensus.ChainHeaderReader, hea
 	if !beacon.IsPoSHeader(header) {
 		return beacon.ethone.FinalizeAndAssemble(chain, header, state, txs, uncles, receipts, nil)
 	}
-	shanghai := chain.Config().IsShanghai(header.Time)
+	shanghai := chain.Config().IsEnabledByTime(chain.Config().GetEIP4895TransitionTime, &header.Time)
 	if shanghai {
 		// All blocks after Shanghai must include a withdrawals root.
 		if withdrawals == nil {
@@ -445,7 +445,7 @@ func IsTTDReached(chain consensus.ChainHeaderReader, parentHash common.Hash, par
 	if chain.Config().GetEthashTerminalTotalDifficulty() == nil {
 		return false, nil
 	}
-	td := chain.GetTd(parentHash, number)
+	td := chain.GetTd(parentHash, parentNumber)
 	if td == nil {
 		return false, consensus.ErrUnknownAncestor
 	}

@@ -255,7 +255,8 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *genesis
 	}
 	log.Info("")
 	log.Info(strings.Repeat("-", 153))
-	for _, line := range strings.Split(chainConfig.Description(), "\n") {
+	// TODO meowsbits implement prettier Strings (aka 'Description()') for chain configurator implementations.
+	for _, line := range strings.Split(chainConfig.String(), "\n") {
 		log.Info(line)
 	}
 	log.Info(strings.Repeat("-", 153))

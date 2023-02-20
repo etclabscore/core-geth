@@ -182,14 +182,14 @@ func enable3198(jt *JumpTable) {
 func enable1153(jt *JumpTable) {
 	jt[TLOAD] = &operation{
 		execute:     opTload,
-		constantGas: params.WarmStorageReadCostEIP2929,
+		constantGas: vars.WarmStorageReadCostEIP2929,
 		minStack:    minStack(1, 1),
 		maxStack:    maxStack(1, 1),
 	}
 
 	jt[TSTORE] = &operation{
 		execute:     opTstore,
-		constantGas: params.WarmStorageReadCostEIP2929,
+		constantGas: vars.WarmStorageReadCostEIP2929,
 		minStack:    minStack(2, 0),
 		maxStack:    maxStack(2, 0),
 	}

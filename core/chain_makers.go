@@ -340,13 +340,13 @@ func GenerateChain(config ctypes.ChainConfigurator, parent *types.Block, engine 
 // GenerateChainWithGenesis is a wrapper of GenerateChain which will initialize
 // genesis block to database first according to the provided genesis specification
 // then generate chain on top.
-func GenerateChainWithGenesis(genesis *Genesis, engine consensus.Engine, n int, gen func(int, *BlockGen)) (ethdb.Database, []*types.Block, []types.Receipts) {
+func GenerateChainWithGenesis(genesis *genesisT.Genesis, engine consensus.Engine, n int, gen func(int, *BlockGen)) (ethdb.Database, []*types.Block, []types.Receipts) {
 	db := rawdb.NewMemoryDatabase()
-	_, err := genesis.Commit(db, trie.NewDatabase(db))
+	genesisBlock, err := CommitGenesis(genesis, db, trie.NewDatabase(db))
 	if err != nil {
 		panic(err)
 	}
-	blocks, receipts := GenerateChain(genesis.Config, genesis.ToBlock(), engine, db, n, gen)
+	blocks, receipts := GenerateChain(genesis.Config, genesisBlock, engine, db, n, gen)
 	return db, blocks, receipts
 }
 

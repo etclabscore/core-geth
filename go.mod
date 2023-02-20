@@ -16,6 +16,7 @@ require (
 	github.com/cockroachdb/pebble v0.0.0-20230209160836-829675f94811
 	github.com/consensys/gnark-crypto v0.9.1-0.20230105202408-1a7a29904a7c
 	github.com/davecgh/go-spew v1.1.1
+	github.com/deckarep/golang-set v1.8.0
 	github.com/deckarep/golang-set/v2 v2.1.0
 	github.com/docker/docker v1.6.2
 	github.com/dop251/goja v0.0.0-20230122112309-96b1610dd4f7
@@ -58,15 +59,15 @@ require (
 	github.com/prometheus/tsdb v0.7.1
 	github.com/rs/cors v1.7.0
 	github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible
+	github.com/spf13/cobra v1.5.0
 	github.com/status-im/keycard-go v0.2.0
 	github.com/stretchr/testify v1.8.0
-	github.com/spf13/cobra v0.0.3
-	github.com/status-im/keycard-go v0.0.0-20190316090335-8537d3370df4
-	github.com/stretchr/testify v1.7.2
 	github.com/supranational/blst v0.3.8-0.20220526154634-513d2456b344
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
+	github.com/tidwall/gjson v1.6.0
 	github.com/tyler-smith/go-bip39 v1.1.0
 	github.com/urfave/cli/v2 v2.17.2-0.20221006022127-8f469abc00aa
+	github.com/xeipuuv/gojsonschema v1.2.0
 	golang.org/x/crypto v0.1.0
 	golang.org/x/exp v0.0.0-20230206171751-46f607a40771
 	golang.org/x/sync v0.1.0
@@ -74,18 +75,6 @@ require (
 	golang.org/x/text v0.7.0
 	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af
 	golang.org/x/tools v0.2.0
-	github.com/tidwall/gjson v1.6.0
-	github.com/tyler-smith/go-bip39 v1.0.1-0.20181017060643-dbb3b84ba2ef
-	github.com/urfave/cli/v2 v2.10.2
-	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
-	golang.org/x/exp v0.0.0-20220426173459-3bcf042a4bf5
-	golang.org/x/mobile v0.0.0-20190719004257-d2bd2a29d028
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a
-	golang.org/x/text v0.3.7
-	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
-	golang.org/x/tools v0.1.8-0.20211029000441-d6a9af8af023
 	gonum.org/v1/gonum v0.6.0
 	gonum.org/v1/plot v0.0.0-20190515093506-e2840ee46a6b
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
@@ -96,7 +85,6 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.21.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v0.8.3 // indirect
 	github.com/DataDog/zstd v1.5.2 // indirect
-	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
@@ -117,13 +105,10 @@ require (
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
 	github.com/deepmap/oapi-codegen v1.8.2 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
-	github.com/deepmap/oapi-codegen v1.6.0 // indirect
-	github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 // indirect
 	github.com/etclabscore/go-jsonschema-walk v0.0.6 // indirect
 	github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90 // indirect
 	github.com/garslo/gogen v0.0.0-20170306192744-1d203ffc1f61 // indirect
 	github.com/getsentry/sentry-go v0.18.0 // indirect
-	github.com/go-ole/go-ole v1.2.1 // indirect
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.4 // indirect
@@ -135,13 +120,13 @@ require (
 	github.com/iancoleman/orderedmap v0.1.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/influxdata/line-protocol v0.0.0-20210311194329-9aa0e372d097 // indirect
+	github.com/josharian/intern v1.0.0 // indirect
+	github.com/jung-kurt/gofpdf v1.0.3-0.20190309125859-24315acbbda5 // indirect
 	github.com/klauspost/compress v1.15.15 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/josharian/intern v1.0.0 // indirect
-	github.com/jung-kurt/gofpdf v1.0.3-0.20190309125859-24315acbbda5 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
-	github.com/mailru/easyjson v0.7.6 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
@@ -157,7 +142,7 @@ require (
 	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/spf13/pflag v1.0.3 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tidwall/match v1.0.1 // indirect
 	github.com/tidwall/pretty v1.0.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
@@ -166,8 +151,6 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b // indirect
-	golang.org/x/mod v0.6.0-dev.0.20211013180041-c96bc1413d57 // indirect
-	golang.org/x/net v0.0.0-20220607020251-c690dde0001d // indirect
 	golang.org/x/mod v0.6.0 // indirect
 	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220517211312-f3a8303e98df // indirect

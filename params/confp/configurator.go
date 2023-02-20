@@ -185,7 +185,7 @@ func Equivalent(a, b ctypes.ChainConfigurator) error {
 	// Check forks sameness.
 	fa, fb := BlockForks(a), BlockForks(b)
 	if len(fa) != len(fb) {
-		return fmt.Errorf("different fork count: %d / %d (%v / %v)", len(fa), len(fb), fa, fb)
+		return fmt.Errorf("different block-fork count: %d / %d (%v / %v)", len(fa), len(fb), fa, fb)
 	}
 	for i := range fa {
 		if fa[i] != fb[i] {
@@ -195,7 +195,23 @@ func Equivalent(a, b ctypes.ChainConfigurator) error {
 			if fb[i] == math.MaxUint64 {
 				return fmt.Errorf("fb bigmax: %d", fb[i])
 			}
-			return fmt.Errorf("fork index %d not same: %d / %d", i, fa[i], fb[i])
+			return fmt.Errorf("block-fork index %d not same: %d / %d", i, fa[i], fb[i])
+		}
+	}
+
+	fa, fb = TimeForks(a), TimeForks(b)
+	if len(fa) != len(fb) {
+		return fmt.Errorf("different time-fork count: %d / %d (%v / %v)", len(fa), len(fb), fa, fb)
+	}
+	for i := range fa {
+		if fa[i] != fb[i] {
+			if fa[i] == math.MaxUint64 {
+				return fmt.Errorf("fa bigmax: %d", fa[i])
+			}
+			if fb[i] == math.MaxUint64 {
+				return fmt.Errorf("fb bigmax: %d", fb[i])
+			}
+			return fmt.Errorf("time-fork index %d not same: %d / %d", i, fa[i], fb[i])
 		}
 	}
 

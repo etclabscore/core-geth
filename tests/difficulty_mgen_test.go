@@ -126,7 +126,9 @@ func TestDifficultyGen2(t *testing.T) {
 func difficultyTestCaseHeights(config ctypes.ChainConfigurator) []uint64 {
 	blockHeights := []uint64{}
 
-	// Add the fork blocks.
+	// Add the block-fork blocks.
+	// We do not handle time-forks, since it is assumed that under time-based chain configuration contexts,
+	// difficulty will be inoperative or otherwise disused.
 	forks := confp.BlockForks(config)
 	copy(blockHeights, forks)
 	for _, forkBlock := range forks {

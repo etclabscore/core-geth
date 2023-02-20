@@ -49,7 +49,7 @@ type operation struct {
 // JumpTable contains the EVM opcodes supported at a given fork.
 type JumpTable [256]*operation
 
-func validate(jt JumpTable) JumpTable {
+func validate(jt *JumpTable) *JumpTable {
 	for i, op := range jt {
 		if op == nil {
 			panic(fmt.Sprintf("op %#x is not set", i))
@@ -69,7 +69,7 @@ func validate(jt JumpTable) JumpTable {
 
 // instructionSetForConfig determines an instruction set for the vm using
 // the chain config params and a current block number
-func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, bn *big.Int) JumpTable {
+func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, bn *big.Int) *JumpTable {
 	instructionSet := newBaseInstructionSet()
 
 	// Homestead
@@ -173,25 +173,25 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 		}
 	}
 	if config.IsEnabled(config.GetEIP1344Transition, bn) {
-		enable1344(&instructionSet) // ChainID opcode - https://eips.ethereum.org/EIPS/eip-1344
+		enable1344(instructionSet) // ChainID opcode - https://eips.ethereum.org/EIPS/eip-1344
 	}
 	if config.IsEnabled(config.GetEIP1884Transition, bn) {
-		enable1884(&instructionSet) // Reprice reader opcodes - https://eips.ethereum.org/EIPS/eip-1884
+		enable1884(instructionSet) // Reprice reader opcodes - https://eips.ethereum.org/EIPS/eip-1884
 	}
 	if config.IsEnabled(config.GetECIP1080Transition, bn) {
-		enableSelfBalance(&instructionSet)
+		enableSelfBalance(instructionSet)
 	}
 	if config.IsEnabled(config.GetEIP2200Transition, bn) && !config.IsEnabled(config.GetEIP2200DisableTransition, bn) {
-		enable2200(&instructionSet) // Net metered SSTORE - https://eips.ethereum.org/EIPS/eip-2200
+		enable2200(instructionSet) // Net metered SSTORE - https://eips.ethereum.org/EIPS/eip-2200
 	}
 	if config.IsEnabled(config.GetEIP2929Transition, bn) {
-		enable2929(&instructionSet) // Access lists for trie accesses https://eips.ethereum.org/EIPS/eip-2929
+		enable2929(instructionSet) // Access lists for trie accesses https://eips.ethereum.org/EIPS/eip-2929
 	}
 	if config.IsEnabled(config.GetEIP3529Transition, bn) {
-		enable3529(&instructionSet) // Reduction in refunds https://eips.ethereum.org/EIPS/eip-3529
+		enable3529(instructionSet) // Reduction in refunds https://eips.ethereum.org/EIPS/eip-3529
 	}
 	if config.IsEnabled(config.GetEIP3198Transition, bn) {
-		enable3198(&instructionSet) // BASEFEE opcode https://eips.ethereum.org/EIPS/eip-3198
+		enable3198(instructionSet) // BASEFEE opcode https://eips.ethereum.org/EIPS/eip-3198
 	}
 	if isPostMerge {
 		instructionSet[RANDOM] = &operation{
@@ -203,17 +203,17 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 	}
 	// TODO-meowsbits Implement me.
 	if config.IsEnabled(config.GetEIP3855Transition, bn) {
-		enable3855(&instructionSet) // PUSH0 instruction
+		enable3855(instructionSet) // PUSH0 instruction
 	}
 	if config.IsEnabled(config.GetEIP3860Transition, bn) {
-		enable3860(&instructionSet) // Limit and meter initcode
+		enable3860(instructionSet) // Limit and meter initcode
 	}
 	return validate(instructionSet)
 }
 
 // newBaseInstructionSet returns Frontier instructions
-func newBaseInstructionSet() JumpTable {
-	tbl := JumpTable{
+func newBaseInstructionSet() *JumpTable {
+	tbl := &JumpTable{
 		STOP: {
 			execute:     opStop,
 			constantGas: 0,

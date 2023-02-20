@@ -112,7 +112,7 @@ func errOut(n int, err error) chan error {
 // Note, this function will not verify the header validity but just split them.
 func (beacon *Beacon) splitHeaders(chain consensus.ChainHeaderReader, headers []*types.Header) ([]*types.Header, []*types.Header, error) {
 	// TTD is not defined yet, all headers should be in legacy format.
-	ttd := chain.Config().TerminalTotalDifficulty
+	ttd := chain.Config().GetEthashTerminalTotalDifficulty()
 	if ttd == nil {
 		return headers, nil, nil
 	}

@@ -308,9 +308,9 @@ func TestValidation(t *testing.T) {
 		id     ID
 		err    error
 	}{
-		//------------------
+		// ------------------
 		// Block based tests
-		//------------------
+		// ------------------
 
 		// Local is mainnet Gray Glacier, remote announces the same. No future fork is announced.
 		{params.MainnetChainConfig, 15050000, 0, ID{Hash: checksumToBytes(0xf0afd0e3), Next: 0}, nil},
@@ -382,9 +382,9 @@ func TestValidation(t *testing.T) {
 		// TODO(karalabe): This testcase will fail once mainnet gets timestamped forks, make legacy chain config
 		{params.MainnetChainConfig, 7279999, 0, ID{Hash: checksumToBytes(0xa00bc324), Next: 7279999}, ErrLocalIncompatibleOrStale},
 
-		//------------------------------------
+		// ------------------------------------
 		// Block to timestamp transition tests
-		//------------------------------------
+		// ------------------------------------
 
 		// Local is mainnet currently in Gray Glacier only (so it's aware of Shanghai), remote announces
 		// also Gray Glacier, but it's not yet aware of Shanghai (e.g. non updated node before the fork).
@@ -442,9 +442,9 @@ func TestValidation(t *testing.T) {
 		// fork) at block 7279999, before Shanghai. Local is incompatible.
 		{&timestampedConfig, 19999999, 1667999999, ID{Hash: checksumToBytes(0xf0afd0e3), Next: 1667999999}, ErrLocalIncompatibleOrStale},
 
-		//----------------------
+		// ----------------------
 		// Timestamp based tests
-		//----------------------
+		// ----------------------
 
 		// Local is mainnet Shanghai, remote announces the same. No future fork is announced.
 		{&timestampedConfig, 20000000, 1668000000, ID{Hash: checksumToBytes(0x71147644), Next: 0}, nil},
@@ -458,21 +458,21 @@ func TestValidation(t *testing.T) {
 		// In this case we don't know if Cancun passed yet or not.
 		//
 		// TODO(karalabe): Enable this when Cancun is specced
-		//{&timestampedConfig, 20000000, 1668000000, ID{Hash: checksumToBytes(0x71147644), Next: 0}, nil},
+		// {&timestampedConfig, 20000000, 1668000000, ID{Hash: checksumToBytes(0x71147644), Next: 0}, nil},
 
 		// Local is mainnet currently in Shanghai only (so it's aware of Cancun), remote announces
 		// also Shanghai, and it's also aware of Cancun (e.g. updated node before the fork). We
 		// don't know if Cancun passed yet (will pass) or not.
 		//
 		// TODO(karalabe): Enable this when Cancun is specced and update next timestamp
-		//{&timestampedConfig, 20000000, 1668000000, ID{Hash: checksumToBytes(0x71147644), Next: 1678000000}, nil},
+		// {&timestampedConfig, 20000000, 1668000000, ID{Hash: checksumToBytes(0x71147644), Next: 1678000000}, nil},
 
 		// Local is mainnet currently in Shanghai only (so it's aware of Cancun), remote announces
 		// also Shanghai, and it's also aware of some random fork (e.g. misconfigured Cancun). As
 		// neither forks passed at neither nodes, they may mismatch, but we still connect for now.
 		//
 		// TODO(karalabe): Enable this when Cancun is specced
-		//{&timestampedConfig, 20000000, 1668000000, ID{Hash: checksumToBytes(0x71147644), Next: math.MaxUint64}, nil},
+		// {&timestampedConfig, 20000000, 1668000000, ID{Hash: checksumToBytes(0x71147644), Next: math.MaxUint64}, nil},
 
 		// Local is mainnet exactly on Cancun, remote announces Shanghai + knowledge about Cancun. Remote
 		// is simply out of sync, accept.
@@ -483,30 +483,30 @@ func TestValidation(t *testing.T) {
 		// Local is mainnet Cancun, remote announces Shanghai + knowledge about Cancun. Remote
 		// is simply out of sync, accept.
 		// TODO(karalabe): Enable this when Cancun is specced, update local head and time, next timestamp
-		//{&timestampedConfig, 21123456, 1678123456, ID{Hash: checksumToBytes(0x71147644), Next: 1678000000}, nil},
+		// {&timestampedConfig, 21123456, 1678123456, ID{Hash: checksumToBytes(0x71147644), Next: 1678000000}, nil},
 
 		// Local is mainnet Prague, remote announces Shanghai + knowledge about Cancun. Remote
 		// is definitely out of sync. It may or may not need the Prague update, we don't know yet.
 		//
 		// TODO(karalabe): Enable this when Cancun **and** Prague is specced, update all the numbers
-		//{&timestampedConfig, 0, 0, ID{Hash: checksumToBytes(0x3edd5b10), Next: 4370000}, nil},
+		// {&timestampedConfig, 0, 0, ID{Hash: checksumToBytes(0x3edd5b10), Next: 4370000}, nil},
 
 		// Local is mainnet Shanghai, remote announces Cancun. Local is out of sync, accept.
 		//
 		// TODO(karalabe): Enable this when Cancun is specced, update remote checksum
-		//{&timestampedConfig, 21000000, 1678000000, ID{Hash: checksumToBytes(0x00000000), Next: 0}, nil},
+		// {&timestampedConfig, 21000000, 1678000000, ID{Hash: checksumToBytes(0x00000000), Next: 0}, nil},
 
 		// Local is mainnet Shanghai, remote announces Cancun, but is not aware of Prague. Local
 		// out of sync. Local also knows about a future fork, but that is uncertain yet.
 		//
 		// TODO(karalabe): Enable this when Cancun **and** Prague is specced, update remote checksum
-		//{&timestampedConfig, 21000000, 1678000000, ID{Hash: checksumToBytes(0x00000000), Next: 0}, nil},
+		// {&timestampedConfig, 21000000, 1678000000, ID{Hash: checksumToBytes(0x00000000), Next: 0}, nil},
 
 		// Local is mainnet Cancun. remote announces Shanghai but is not aware of further forks.
 		// Remote needs software update.
 		//
 		// TODO(karalabe): Enable this when Cancun is specced, update local head and time
-		//{&timestampedConfig, 21000000, 1678000000, ID{Hash: checksumToBytes(0x71147644), Next: 0}, ErrRemoteStale},
+		// {&timestampedConfig, 21000000, 1678000000, ID{Hash: checksumToBytes(0x71147644), Next: 0}, ErrRemoteStale},
 
 		// Local is mainnet Shanghai, and isn't aware of more forks. Remote announces Shanghai +
 		// 0xffffffff. Local needs software update, reject.
@@ -516,7 +516,7 @@ func TestValidation(t *testing.T) {
 		// 0xffffffff. Local needs software update, reject.
 		//
 		// TODO(karalabe): Enable this when Cancun is specced, update remote checksum
-		//{&timestampedConfig, 20000000, 1668000000, ID{Hash: checksumToBytes(checksumUpdate(0x00000000, math.MaxUint64)), Next: 0}, ErrLocalIncompatibleOrStale},
+		// {&timestampedConfig, 20000000, 1668000000, ID{Hash: checksumToBytes(checksumUpdate(0x00000000, math.MaxUint64)), Next: 0}, ErrLocalIncompatibleOrStale},
 
 		// Local is mainnet Shanghai, remote is random Shanghai.
 		{&timestampedConfig, 20000000, 1668000000, ID{Hash: checksumToBytes(0x12345678), Next: 0}, ErrLocalIncompatibleOrStale},
@@ -531,7 +531,7 @@ func TestValidation(t *testing.T) {
 		// fork) at timestamp 1668000000, before Cancun. Local is incompatible.
 		//
 		// TODO(karalabe): Enable this when Cancun is specced
-		//{params.MainnetChainConfig, 20999999, 1677999999, ID{Hash: checksumToBytes(0x71147644), Next: 1678000000}, ErrLocalIncompatibleOrStale},
+		// {params.MainnetChainConfig, 20999999, 1677999999, ID{Hash: checksumToBytes(0x71147644), Next: 1678000000}, ErrLocalIncompatibleOrStale},
 	}
 	for i, tt := range tests {
 		filter := newFilter(tt.config, params.MainnetGenesisHash, func() (uint64, uint64) { return tt.head, tt.time })
@@ -691,7 +691,7 @@ func TestGenerateSpecificationCases(t *testing.T) {
 		for _, fi := range forks {
 			forksS = append(forksS, strconv.Itoa(int(fi)))
 		}
-		fmt.Printf("- Forks: `%s`\n", strings.Join(forksS, "`,`"))
+		fmt.Printf("- BlockForks: `%s`\n", strings.Join(forksS, "`,`"))
 		fmt.Println()
 		fmt.Println("| Head Block Number | `FORK_HASH` | `FORK_NEXT` | RLP Encoded (Hex) |")
 		fmt.Println("| --- | --- | --- | --- |")

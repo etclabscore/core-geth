@@ -183,7 +183,7 @@ func Equivalent(a, b ctypes.ChainConfigurator) error {
 	}
 
 	// Check forks sameness.
-	fa, fb := Forks(a), Forks(b)
+	fa, fb := BlockForks(a), BlockForks(b)
 	if len(fa) != len(fb) {
 		return fmt.Errorf("different fork count: %d / %d (%v / %v)", len(fa), len(fb), fa, fb)
 	}
@@ -270,13 +270,55 @@ func Transitions(conf ctypes.ChainConfigurator) (fns []func() *uint64, names []s
 	return fns, names
 }
 
-// Forks returns non-nil, non <maxUin64>, unique sorted forks for a ChainConfigurator.
-func Forks(conf ctypes.ChainConfigurator) []uint64 {
+// BlockForks returns non-nil, non <maxUin64>, unique sorted forks defined by block number for a ChainConfigurator.
+func BlockForks(conf ctypes.ChainConfigurator) []uint64 {
 	var forks []uint64
 	var forksM = make(map[uint64]struct{}) // Will key for uniqueness as fork numbers are appended to slice.
 
 	transitions, names := Transitions(conf)
 	for i, tr := range transitions {
+		if match, _ := regexp.MatchString(`Time`, names[i]); match {
+			// Skip time-based transition names, assuming these are not block-based hardforks.
+			continue
+		}
+		// Skip cross-compatible namespaced transition names, assuming
+		// these will not be enforced as hardforks.
+		if nameSignalsCompatibility(names[i]) {
+			continue
+		}
+		// Extract the fork rule block number and aggregate it
+		response := tr()
+		if response == nil ||
+			*response == math.MaxUint64 ||
+			*response == 0x7fffffffffffff ||
+			*response == 0x7FFFFFFFFFFFFFFF {
+			continue
+		}
+
+		// Only append unique fork numbers, excluding 0 (genesis config is not considered a fork)
+		if _, ok := forksM[*response]; !ok && *response != 0 {
+			forks = append(forks, *response)
+			forksM[*response] = struct{}{}
+		}
+	}
+	sort.Slice(forks, func(i, j int) bool {
+		return forks[i] < forks[j]
+	})
+
+	return forks
+}
+
+// TimeForks returns non-nil, non <maxUin64>, unique sorted forks defined by block time for a ChainConfigurator.
+func TimeForks(conf ctypes.ChainConfigurator) []uint64 {
+	var forks []uint64
+	var forksM = make(map[uint64]struct{}) // Will key for uniqueness as fork numbers are appended to slice.
+
+	transitions, names := Transitions(conf)
+	for i, tr := range transitions {
+		if match, _ := regexp.MatchString(`Time`, names[i]); !match {
+			// Skip non-time-based transition names, assuming these are not time-based hardforks.
+			continue
+		}
 		// Skip cross-compatible namespaced transition names, assuming
 		// these will not be enforced as hardforks.
 		if nameSignalsCompatibility(names[i]) {

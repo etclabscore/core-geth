@@ -127,7 +127,7 @@ func difficultyTestCaseHeights(config ctypes.ChainConfigurator) []uint64 {
 	blockHeights := []uint64{}
 
 	// Add the fork blocks.
-	forks := confp.Forks(config)
+	forks := confp.BlockForks(config)
 	copy(blockHeights, forks)
 	for _, forkBlock := range forks {
 		if forkBlock > 0 {

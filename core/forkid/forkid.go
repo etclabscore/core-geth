@@ -236,6 +236,6 @@ func checksumToBytes(hash uint32) [4]byte {
 }
 
 // gatherForks gathers all the known forks and creates a sorted list out of them.
-func gatherForks(config ctypes.ChainConfigurator) []uint64 {
-	return confp.Forks(config)
+func gatherForks(config ctypes.ChainConfigurator) ([]uint64, []uint64) {
+	return confp.BlockForks(config), confp.TimeForks(config)
 }

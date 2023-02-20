@@ -109,6 +109,14 @@ func (c *ChainConfig) SetElasticityMultiplier(n *uint64) error {
 	return internal.GlobalConfigurator().SetElasticityMultiplier(n)
 }
 
+func (c *ChainConfig) GetBaseFeeChangeDenominator() uint64 {
+	return internal.GlobalConfigurator().GetBaseFeeChangeDenominator()
+}
+
+func (c *ChainConfig) SetBaseFeeChangeDenominator(n *uint64) error {
+	return internal.GlobalConfigurator().SetBaseFeeChangeDenominator(n)
+}
+
 // GetNetworkID and the following Set/Getters for ChainID too
 // are... opinionated... because of where and how currently the NetworkID
 // value is designed.

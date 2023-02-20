@@ -146,6 +146,14 @@ func (c *CoreGethChainConfig) SetElasticityMultiplier(n *uint64) error {
 	return internal.GlobalConfigurator().SetElasticityMultiplier(n)
 }
 
+func (c *CoreGethChainConfig) GetBaseFeeChangeDenominator() uint64 {
+	return internal.GlobalConfigurator().GetBaseFeeChangeDenominator()
+}
+
+func (c *CoreGethChainConfig) SetBaseFeeChangeDenominator(n *uint64) error {
+	return internal.GlobalConfigurator().SetBaseFeeChangeDenominator(n)
+}
+
 func (c *CoreGethChainConfig) GetEIP7Transition() *uint64 {
 	return bigNewU64(c.EIP7FBlock)
 }

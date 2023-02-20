@@ -71,6 +71,8 @@ type ProtocolSpecifier interface {
 
 	GetElasticityMultiplier() uint64
 	SetElasticityMultiplier(n *uint64) error
+	GetBaseFeeChangeDenominator() uint64
+	SetBaseFeeChangeDenominator(n *uint64) error
 
 	// Be careful with EIP2.
 	// It is a messy EIP, specifying diverse changes, like difficulty, intrinsic gas costs for contract creation,

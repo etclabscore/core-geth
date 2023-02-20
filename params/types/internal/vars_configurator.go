@@ -78,10 +78,16 @@ func (_ GlobalVarsConfigurator) GetElasticityMultiplier() uint64 {
 }
 
 func (_ GlobalVarsConfigurator) SetElasticityMultiplier(n *uint64) error {
-	if n == nil {
-		return nil
-	}
-	// vars.DefaultElasticityMultiplier = int(*n) // Its a const. Setter is noop.
+	// Noop.
+	return nil
+}
+
+func (_ GlobalVarsConfigurator) GetBaseFeeChangeDenominator() uint64 {
+	return vars.DefaultBaseFeeChangeDenominator
+}
+
+func (_ GlobalVarsConfigurator) SetBaseFeeChangeDenominator(n *uint64) error {
+	// Noop.
 	return nil
 }
 

@@ -76,7 +76,7 @@ func CalcBaseFee(config ctypes.ChainConfigurator, parent *types.Header) *big.Int
 		num.SetUint64(parent.GasUsed - parentGasTarget)
 		num.Mul(num, parent.BaseFee)
 		num.Div(num, denom.SetUint64(parentGasTarget))
-		num.Div(num, denom.SetUint64(vars.BaseFeeChangeDenominator()))
+		num.Div(num, denom.SetUint64(config.GetBaseFeeChangeDenominator()))
 		baseFeeDelta := math.BigMax(num, common.Big1)
 
 		return num.Add(parent.BaseFee, baseFeeDelta)
@@ -86,7 +86,7 @@ func CalcBaseFee(config ctypes.ChainConfigurator, parent *types.Header) *big.Int
 		num.SetUint64(parentGasTarget - parent.GasUsed)
 		num.Mul(num, parent.BaseFee)
 		num.Div(num, denom.SetUint64(parentGasTarget))
-		num.Div(num, denom.SetUint64(vars.BaseFeeChangeDenominator()))
+		num.Div(num, denom.SetUint64(config.GetBaseFeeChangeDenominator()))
 		baseFee := num.Sub(parent.BaseFee, num)
 
 		return math.BigMax(baseFee, common.Big0)

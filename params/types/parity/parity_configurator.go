@@ -89,6 +89,15 @@ func (spec *ParityChainSpec) SetElasticityMultiplier(i *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetBaseFeeChangeDenominator() uint64 {
+	return vars.DefaultBaseFeeChangeDenominator
+}
+
+func (spec *ParityChainSpec) SetBaseFeeChangeDenominator(i *uint64) error {
+	// Noop.
+	return nil
+}
+
 func (spec *ParityChainSpec) GetNetworkID() *uint64 {
 	return spec.Params.NetworkID.Uint64P()
 }

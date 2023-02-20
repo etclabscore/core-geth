@@ -637,6 +637,14 @@ func (c *ChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	return big.NewInt(int64(*f)).Cmp(n) <= 0
 }
 
+func (c *ChainConfig) IsEnabledByTime(fn func() *uint64, n *uint64) bool {
+	f := fn()
+	if f == nil || n == nil {
+		return false
+	}
+	return *f <= *n
+}
+
 func (c *ChainConfig) GetForkCanonHash(n uint64) common.Hash {
 	if c.EIP150Block != nil && c.EIP150Block.Uint64() == n {
 		return c.EIP150Hash

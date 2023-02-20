@@ -581,6 +581,14 @@ func (c *CoreGethChainConfig) IsEnabled(fn func() *uint64, n *big.Int) bool {
 	return big.NewInt(int64(*f)).Cmp(n) <= 0
 }
 
+func (c *CoreGethChainConfig) IsEnabledByTime(fn func() *uint64, n *uint64) bool {
+	f := fn()
+	if f == nil || n == nil {
+		return false
+	}
+	return *f <= *n
+}
+
 func (c *CoreGethChainConfig) GetForkCanonHash(n uint64) common.Hash {
 	if c.RequireBlockHashes == nil {
 		return common.Hash{}

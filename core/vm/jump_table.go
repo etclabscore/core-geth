@@ -69,7 +69,7 @@ func validate(jt *JumpTable) *JumpTable {
 
 // instructionSetForConfig determines an instruction set for the vm using
 // the chain config params and a current block number
-func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, bn *big.Int) *JumpTable {
+func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, bn *big.Int, bt *uint64) *JumpTable {
 	instructionSet := newBaseInstructionSet()
 
 	// Homestead
@@ -202,10 +202,10 @@ func instructionSetForConfig(config ctypes.ChainConfigurator, isPostMerge bool, 
 		}
 	}
 	// TODO-meowsbits Implement me.
-	if config.IsEnabled(config.GetEIP3855Transition, bn) {
+	if config.IsEnabledByTime(config.GetEIP3855TransitionTime, bt) {
 		enable3855(instructionSet) // PUSH0 instruction
 	}
-	if config.IsEnabled(config.GetEIP3860Transition, bn) {
+	if config.IsEnabledByTime(config.GetEIP3860TransitionTime, bt) {
 		enable3860(instructionSet) // Limit and meter initcode
 	}
 	return validate(instructionSet)

@@ -80,7 +80,7 @@ type EVMInterpreter struct {
 func NewEVMInterpreter(evm *EVM) *EVMInterpreter {
 	// If jump table was not initialised we set the default one.
 	var table *JumpTable
-	table = instructionSetForConfig(evm.chainConfig, evm.Context.Random != nil, evm.Context.BlockNumber)
+	table = instructionSetForConfig(evm.chainConfig, evm.Context.Random != nil, evm.Context.BlockNumber, &evm.Context.Time)
 	var extraEips []int
 	if len(evm.Config.ExtraEips) > 0 {
 		// Deep-copy jumptable to prevent modification of opcodes in other tables

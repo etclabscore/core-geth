@@ -343,10 +343,10 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		eip3529f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3529Transition, st.evm.Context.BlockNumber)
 
 		// EIP-3860: Limit and meter initcode
-		eip3860f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3860Transition, st.evm.Context.BlockNumber)
+		eip3860f = st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP3860TransitionTime, &st.evm.Context.Time)
 
 		// EIP-3651: Warm coinbase
-		eip3651f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3651Transition, st.evm.Context.BlockNumber)
+		eip3651f = st.evm.ChainConfig().IsEnabledByTime(st.evm.ChainConfig().GetEIP3651TransitionTime, &st.evm.Context.Time)
 	)
 
 	// Check clauses 4-5, subtract intrinsic gas if everything is correct

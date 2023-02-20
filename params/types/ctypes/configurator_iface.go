@@ -205,6 +205,7 @@ type Forker interface {
 	// IsEnabled tells if interface has met or exceeded a fork block number.
 	// eg. IsEnabled(c.GetEIP1108Transition, big.NewInt(42)))
 	IsEnabled(fn func() *uint64, n *big.Int) bool
+	IsEnabledByTime(fn func() *uint64, n *uint64) bool
 
 	// ForkCanonHash yields arbitrary number/hash pairs.
 	// This is an abstraction derived from the original EIP150 implementation.

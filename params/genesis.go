@@ -43,18 +43,6 @@ func DefaultGenesisBlock() *genesisT.Genesis {
 	}
 }
 
-// DefaultRopstenGenesisBlock returns the Ropsten network genesis block.
-func DefaultRopstenGenesisBlock() *genesisT.Genesis {
-	return &genesisT.Genesis{
-		Config:     RopstenChainConfig,
-		Nonce:      66,
-		ExtraData:  hexutil.MustDecode("0x3535353535353535353535353535353535353535353535353535353535353535"),
-		GasLimit:   16777216,
-		Difficulty: big.NewInt(1048576),
-		Alloc:      genesisT.DecodePreAlloc(TestnetAllocData),
-	}
-}
-
 // DefaultSepoliaGenesisBlock returns the Sepolia network genesis block.
 func DefaultSepoliaGenesisBlock() *genesisT.Genesis {
 	return &genesisT.Genesis{

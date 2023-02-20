@@ -31,7 +31,6 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
 )
@@ -1101,8 +1100,8 @@ func (s *StateDB) Commit(deleteEmptyObjects bool) (common.Hash, error) {
 // - Reset access list (Berlin)
 // - Add coinbase to access list (EIP-3651)
 // - Reset transient storage (EIP-1153)
-func (s *StateDB) Prepare(rules params.Rules, sender, coinbase common.Address, dst *common.Address, precompiles []common.Address, list types.AccessList) {
-	if rules.IsBerlin {
+func (s *StateDB) Prepare(eip2930 bool, eip3651 bool, sender, coinbase common.Address, dst *common.Address, precompiles []common.Address, list types.AccessList) {
+	if eip2930 { // TODO meowsbits Implement Rules as a generic ChainConfigurator function.
 		// Clear out any leftover from previous executions
 		al := newAccessList()
 		s.accessList = al
@@ -1121,7 +1120,7 @@ func (s *StateDB) Prepare(rules params.Rules, sender, coinbase common.Address, d
 				al.AddSlot(el.Address, key)
 			}
 		}
-		if rules.IsShanghai { // EIP-3651: warm coinbase
+		if eip3651 { // EIP-3651: warm coinbase
 			al.AddAddress(coinbase)
 		}
 	}

@@ -342,8 +342,11 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		// EIP-3529: Reduction in refunds
 		eip3529f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3529Transition, st.evm.Context.BlockNumber)
 
-		// EIP-3529: Reduction in refunds
+		// EIP-3860: Limit and meter initcode
 		eip3860f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3860Transition, st.evm.Context.BlockNumber)
+
+		// EIP-3651: Warm coinbase
+		eip3651f = st.evm.ChainConfig().IsEnabled(st.evm.ChainConfig().GetEIP3651Transition, st.evm.Context.BlockNumber)
 	)
 
 	// Check clauses 4-5, subtract intrinsic gas if everything is correct
@@ -374,7 +377,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	// - prepare accessList(post-berlin)
 	// - reset transient storage(eip 1153)
 	// FIXME-meowsbits Rules. Its not a thing in core-geth.
-	st.state.Prepare(rules, msg.From(), st.evm.Context.Coinbase, msg.To(), st.evm.ActivePrecompiles(), msg.AccessList())
+	st.state.Prepare(eip2930f, eip3651f, msg.From(), st.evm.Context.Coinbase, msg.To(), st.evm.ActivePrecompiles(), msg.AccessList())
 
 	var (
 		ret   []byte

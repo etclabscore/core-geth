@@ -429,7 +429,7 @@ func TestGenesisHashes(t *testing.T) {
 }
 
 func TestConfigRules(t *testing.T) {
-	c := &ChainConfig{
+	c := &goethereum.ChainConfig{
 		ShanghaiTime: newUint64(500),
 	}
 	var stamp uint64

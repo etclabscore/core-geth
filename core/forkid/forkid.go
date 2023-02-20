@@ -22,10 +22,6 @@ import (
 	"errors"
 	"hash/crc32"
 	"math"
-	"math/big"
-	"reflect"
-	"sort"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"

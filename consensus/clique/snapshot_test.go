@@ -406,9 +406,9 @@ func (tt *cliqueTest) run(t *testing.T) {
 		}
 	}
 	// Create the genesis block with the initial set of signers
-		genesis := &genesisT.Genesis{
+	genesis := &genesisT.Genesis{
 		ExtraData: make([]byte, extraVanity+common.AddressLength*len(signers)+extraSeal),
-			BaseFee:   big.NewInt(vars.InitialBaseFee),
+		BaseFee:   big.NewInt(vars.InitialBaseFee),
 	}
 	for j, signer := range signers {
 		copy(genesis.ExtraData[extraVanity+j*common.AddressLength:], signer[:])
@@ -416,7 +416,7 @@ func (tt *cliqueTest) run(t *testing.T) {
 
 	// Assemble a chain of headers from the cast votes
 	config := *params.TestChainConfig
-		config.Clique = &ctypes.CliqueConfig{
+	config.Clique = &ctypes.CliqueConfig{
 		Period: 1,
 		Epoch:  tt.epoch,
 	}

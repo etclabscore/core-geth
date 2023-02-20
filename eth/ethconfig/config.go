@@ -18,6 +18,7 @@
 package ethconfig
 
 import (
+	"math/big"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -30,7 +31,6 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/clique"
 	"github.com/ethereum/go-ethereum/consensus/ethash"
 	"github.com/ethereum/go-ethereum/consensus/lyra2"
-	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/eth/downloader"
 	"github.com/ethereum/go-ethereum/eth/gasprice"
@@ -38,6 +38,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -252,17 +253,17 @@ func CreateConsensusEngine(stack *node.Node, ethashConfig *ethash.Config, clique
 			engine = ethash.NewPoissonFaker()
 		default:
 			engine = ethash.New(ethash.Config{
-			PowMode:          ethashConfig.PowMode,
-			CacheDir:         stack.ResolvePath(ethashConfig.CacheDir),
-			CachesInMem:      ethashConfig.CachesInMem,
-			CachesOnDisk:     ethashConfig.CachesOnDisk,
-			CachesLockMmap:   ethashConfig.CachesLockMmap,
-			DatasetDir:       ethashConfig.DatasetDir,
-			DatasetsInMem:    ethashConfig.DatasetsInMem,
-			DatasetsOnDisk:   ethashConfig.DatasetsOnDisk,
-			DatasetsLockMmap: ethashConfig.DatasetsLockMmap,
-			NotifyFull:       ethashConfig.NotifyFull,
-			ECIP1099Block:    ethashConfig.ECIP1099Block,
+				PowMode:          ethashConfig.PowMode,
+				CacheDir:         stack.ResolvePath(ethashConfig.CacheDir),
+				CachesInMem:      ethashConfig.CachesInMem,
+				CachesOnDisk:     ethashConfig.CachesOnDisk,
+				CachesLockMmap:   ethashConfig.CachesLockMmap,
+				DatasetDir:       ethashConfig.DatasetDir,
+				DatasetsInMem:    ethashConfig.DatasetsInMem,
+				DatasetsOnDisk:   ethashConfig.DatasetsOnDisk,
+				DatasetsLockMmap: ethashConfig.DatasetsLockMmap,
+				NotifyFull:       ethashConfig.NotifyFull,
+				ECIP1099Block:    ethashConfig.ECIP1099Block,
 			}, notify, noverify)
 			engine.(*ethash.Ethash).SetThreads(-1) // Disable CPU mining
 		}

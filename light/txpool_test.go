@@ -83,8 +83,8 @@ func TestTxPool(t *testing.T) {
 	}
 
 	var (
-		sdb     = rawdb.NewMemoryDatabase()
-		ldb     = rawdb.NewMemoryDatabase()
+		sdb   = rawdb.NewMemoryDatabase()
+		ldb   = rawdb.NewMemoryDatabase()
 		gspec = &genesisT.Genesis{
 			Config:  params.TestChainConfig,
 			Alloc:   genesisT.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},

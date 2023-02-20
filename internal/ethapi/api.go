@@ -19,6 +19,7 @@ package ethapi
 import (
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -1242,7 +1243,7 @@ type RPCMarshalHeaderT struct {
 	TransactionsRoot common.Hash       `json:"transactionsRoot"`
 	ReceiptsRoot     common.Hash       `json:"receiptsRoot"`
 	BaseFee          *hexutil.Big      `json:"baseFeePerGas,omitempty"`
-	Withdrawals interface{} `json:"withdrawals,omitempty"` // FIXME-meowsbits
+	Withdrawals      interface{}       `json:"withdrawals,omitempty"` // FIXME-meowsbits
 }
 
 // NewRPCMarshalHeaderTFromHeader constructs a new RPCMarshalHeaderT struct from a given header.

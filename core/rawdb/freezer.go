@@ -231,7 +231,7 @@ func (f *Freezer) ReadAncients(fn func(ethdb.AncientReaderOp) error) (err error)
 }
 
 // ModifyAncients runs the given write operation.
-func (f *Freezer) ModifyAncients(fn func(operator ethdb.AncientWriteOperator) error) (writeSize int64, err error) {
+func (f *Freezer) ModifyAncients(fn func(operator ethdb.AncientWriteOp) error) (writeSize int64, err error) {
 	if f.readonly {
 		return 0, errReadOnly
 	}

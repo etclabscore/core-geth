@@ -119,7 +119,7 @@ func (db *nofreezedb) AncientSize(kind string) (uint64, error) {
 }
 
 // ModifyAncients is not supported.
-func (db *nofreezedb) ModifyAncients(func(ethdb.AncientWriteOperator) error) (int64, error) {
+func (db *nofreezedb) ModifyAncients(func(ethdb.AncientWriteOp) error) (int64, error) {
 	return 0, errNotSupported
 }
 

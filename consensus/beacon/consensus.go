@@ -262,7 +262,7 @@ func (beacon *Beacon) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 		return err
 	}
 	// Verify existence / non-existence of withdrawalsHash.
-	shanghai := chain.Config().IsShanghai(header.Time)
+	shanghai := chain.Config().IsEnabledByTime(chain.Config().GetEIP4895TransitionTime, &header.Time)
 	if shanghai && header.WithdrawalsHash == nil {
 		return fmt.Errorf("missing withdrawalsHash")
 	}

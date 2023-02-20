@@ -2454,7 +2454,7 @@ func (bc *BlockChain) reportBlock(block *types.Block, receipts types.Receipts, e
 
 // summarizeBadBlock returns a string summarizing the bad block and other
 // relevant information.
-func summarizeBadBlock(block *types.Block, receipts []*types.Receipt, config *params.ChainConfig, err error) string {
+func summarizeBadBlock(block *types.Block, receipts []*types.Receipt, config ctypes.ChainConfigurator, err error) string {
 	var receiptString string
 	for i, receipt := range receipts {
 		receiptString += fmt.Sprintf("\n  %d: cumulative: %v gas: %v contract: %v status: %v tx: %v logs: %v bloom: %x state: %x",

@@ -369,7 +369,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	// However, this was not enforced in the incumbent core-geth version. It may be a red herring.
 	//
 	// Check whether the init code size has been exceeded.
-	if eip3860f && contractCreation && len(st.data) > vars.MaxInitCodeSize {
+	if eip3860f && contractCreation && uint64(len(st.data)) > vars.MaxInitCodeSize {
 		return nil, fmt.Errorf("%w: code size %v limit %v", ErrMaxInitCodeSizeExceeded, len(st.data), vars.MaxInitCodeSize)
 	}
 

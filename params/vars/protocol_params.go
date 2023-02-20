@@ -51,7 +51,9 @@ var (
 	GasLimitBoundDivisor uint64 = 1024 // The bound divisor of the gas limit, used in update calculations.
 	MinGasLimit          uint64 = 5000 // Minimum the gas limit may ever be.
 
-	MaximumExtraDataSize uint64 = 32    // Maximum size extra data may be after Genesis.
+	MaximumExtraDataSize uint64 = 32              // Maximum size extra data may be after Genesis.
+	MaxCodeSize          uint64 = 24576           // Maximum bytecode to permit for a contract
+	MaxInitCodeSize             = 2 * MaxCodeSize // Maximum initcode to permit in a creation transaction and create instructions
 )
 
 const (
@@ -156,9 +158,6 @@ const (
 	DefaultBaseFeeChangeDenominator = 8          // Bounds the amount the base fee can change between blocks.
 	DefaultElasticityMultiplier     = 2          // Bounds the maximum gas limit an EIP-1559 block may have.
 	InitialBaseFee                  = 1000000000 // Initial base fee for EIP-1559 blocks.
-
-	MaxCodeSize     = 24576           // Maximum bytecode to permit for a contract
-	MaxInitCodeSize = 2 * MaxCodeSize // Maximum initcode to permit in a creation transaction and create instructions
 
 	// Precompiled contract gas prices
 

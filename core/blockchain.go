@@ -46,6 +46,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -249,7 +250,7 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *genesis
 	// to database if the genesis block is not present yet, or load the
 	// stored one from database.
 	chainConfig, genesisHash, genesisErr := SetupGenesisBlockWithOverride(db, triedb, genesis, overrides)
-	if _, ok := genesisErr.(*params.ConfigCompatError); genesisErr != nil && !ok {
+	if _, ok := genesisErr.(*confp.ConfigCompatError); genesisErr != nil && !ok {
 		return nil, genesisErr
 	}
 	log.Info("")

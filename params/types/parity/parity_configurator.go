@@ -1238,6 +1238,51 @@ func (spec *ParityChainSpec) SetEIP4399Transition(n *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetEIP3651TransitionTime() *uint64 {
+	return spec.Params.EIP3651TransitionTime.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP3651TransitionTime(n *uint64) error {
+	spec.Params.EIP3651TransitionTime = new(ParityU64).SetUint64(n)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP3855TransitionTime() *uint64 {
+	return spec.Params.EIP3855TransitionTime.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP3855TransitionTime(n *uint64) error {
+	spec.Params.EIP3855TransitionTime = new(ParityU64).SetUint64(n)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP3860TransitionTime() *uint64 {
+	return spec.Params.EIP3860TransitionTime.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP3860TransitionTime(n *uint64) error {
+	spec.Params.EIP3860TransitionTime = new(ParityU64).SetUint64(n)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP4895TransitionTime() *uint64 {
+	return spec.Params.EIP4895TransitionTime.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP4895TransitionTime(n *uint64) error {
+	spec.Params.EIP4895TransitionTime = new(ParityU64).SetUint64(n)
+	return nil
+}
+
+func (spec *ParityChainSpec) GetEIP6049TransitionTime() *uint64 {
+	return spec.Params.EIP6049TransitionTime.Uint64P()
+}
+
+func (spec *ParityChainSpec) SetEIP6049TransitionTime(n *uint64) error {
+	spec.Params.EIP6049TransitionTime = new(ParityU64).SetUint64(n)
+	return nil
+}
+
 func (spec *ParityChainSpec) GetMergeVirtualTransition() *uint64 {
 	return spec.Params.TheMerge.Uint64P()
 }

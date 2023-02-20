@@ -208,7 +208,7 @@ type CoreGethChainConfig struct {
 	// EIP-4399: RANDOM opcode (supplanting DIFFICULTY)
 	EIP4399FBlock *big.Int `json:"eip4399FBlock,omitempty"`
 
-	// TODO: Document me.
+	// EIP-2930: Access lists.
 	EIP2930FBlock *big.Int `json:"eip2930FBlock,omitempty"`
 
 	EIP1559FBlock *big.Int `json:"eip1559FBlock,omitempty"`
@@ -217,6 +217,13 @@ type CoreGethChainConfig struct {
 
 	EIP5133FBlock   *big.Int `json:"eip5133FBlock,omitempty"`
 	eip5133Inferred bool
+
+	// Shanghai
+	EIP3651FTime *uint64 `json:"eip3651FTime,omitempty"` // EIP-3651: Warm COINBASE
+	EIP3855FTime *uint64 `json:"eip3855FTime,omitempty"` // EIP-3855: PUSH0 instruction
+	EIP3860FTime *uint64 `json:"eip3860FTime,omitempty"` // EIP-3860: Limit and meter initcode
+	EIP4895FTime *uint64 `json:"eip4895FTime,omitempty"` // EIP-4895: Beacon chain push withdrawals as operations
+	EIP6049FTime *uint64 `json:"eip6049FTime,omitempty"` // EIP-6049: Deprecate SELFDESTRUCT. Note: EIP-6049 does not change the behavior of SELFDESTRUCT in and of itself, but formally announces client developers' intention of changing it in future upgrades. It is recommended that software which exposes the SELFDESTRUCT opcode to users warn them about an upcoming change in semantics.
 
 	MergeNetsplitVBlock *big.Int `json:"mergeNetsplitVBlock,omitempty"` // Virtual fork after The Merge to use as a network splitter
 

@@ -570,6 +570,56 @@ func (c *ChainConfig) SetEIP4399Transition(n *uint64) error {
 	return nil
 }
 
+// EIP3651: Warm COINBASE
+func (c *ChainConfig) GetEIP3651TransitionTime() *uint64 {
+	return c.ShanghaiTime
+}
+
+func (c *ChainConfig) SetEIP3651TransitionTime(n *uint64) error {
+	c.ShanghaiTime = n
+	return nil
+}
+
+// GetEIP3855TransitionTime EIP3855: PUSH0 instruction
+func (c *ChainConfig) GetEIP3855TransitionTime() *uint64 {
+	return c.ShanghaiTime
+}
+
+func (c *ChainConfig) SetEIP3855TransitionTime(n *uint64) error {
+	c.ShanghaiTime = n
+	return nil
+}
+
+// GetEIP3860TransitionTime EIP3860: Limit and meter initcode
+func (c *ChainConfig) GetEIP3860TransitionTime() *uint64 {
+	return c.ShanghaiTime
+}
+
+func (c *ChainConfig) SetEIP3860TransitionTime(n *uint64) error {
+	c.ShanghaiTime = n
+	return nil
+}
+
+// GetEIP4895TransitionTime EIP4895: Beacon chain push withdrawals as operations
+func (c *ChainConfig) GetEIP4895TransitionTime() *uint64 {
+	return c.ShanghaiTime
+}
+
+func (c *ChainConfig) SetEIP4895TransitionTime(n *uint64) error {
+	c.ShanghaiTime = n
+	return nil
+}
+
+// GetEIP6049TransitionTime EIP6049: Deprecate SELFDESTRUCT
+func (c *ChainConfig) GetEIP6049TransitionTime() *uint64 {
+	return c.ShanghaiTime
+}
+
+func (c *ChainConfig) SetEIP6049TransitionTime(n *uint64) error {
+	c.ShanghaiTime = n
+	return nil
+}
+
 func (c *ChainConfig) GetMergeVirtualTransition() *uint64 {
 	return bigNewU64(c.MergeNetsplitBlock)
 }

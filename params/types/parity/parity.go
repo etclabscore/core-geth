@@ -129,19 +129,27 @@ type ParityChainSpec struct {
 		EIP2028Transition         *ParityU64 `json:"eip2028Transition,omitempty"`
 		EIP2315Transition         *ParityU64 `json:"eip2315Transition,omitempty"`
 		EIP2537Transition         *ParityU64 `json:"eip2537Transition,omitempty"`
-		EIP1706Transition         *ParityU64 `json:"eip1706Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
-		EIP2929Transition         *ParityU64 `json:"eip2929Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
-		EIP2930Transition         *ParityU64 `json:"eip2930Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
-		EIP2565Transition         *ParityU64 `json:"eip2565Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
-		EIP2718Transition         *ParityU64 `json:"eip2718Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
-		EIP1559Transition         *ParityU64 `json:"eip1559Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
-		EIP3198Transition         *ParityU64 `json:"eip3198Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
-		EIP3541Transition         *ParityU64 `json:"eip3541Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
-		EIP3529Transition         *ParityU64 `json:"eip3529Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
-		EIP4399Transition         *ParityU64 `json:"eip4399Transition,omitempty"`  // FIXME, when and if i'm implemented in Parity
-		TheMerge                  *ParityU64 `json:"theMergeTransition,omitempty"` // FIXME, when and if i'm implemented in Parity
-		ECIP1080Transition        *ParityU64 `json:"ecip1080Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
-		Lyra2NonceTransition      *ParityU64 `json:"lyra2NonceTransition,omitempty"`
+		EIP1706Transition         *ParityU64 `json:"eip1706Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP2929Transition         *ParityU64 `json:"eip2929Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP2930Transition         *ParityU64 `json:"eip2930Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP2565Transition         *ParityU64 `json:"eip2565Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP2718Transition         *ParityU64 `json:"eip2718Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP1559Transition         *ParityU64 `json:"eip1559Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP3198Transition         *ParityU64 `json:"eip3198Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP3541Transition         *ParityU64 `json:"eip3541Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP3529Transition         *ParityU64 `json:"eip3529Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP4399Transition         *ParityU64 `json:"eip4399Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+
+		// Shanghai
+		EIP3651TransitionTime *ParityU64 `json:"eip3651TransitionTime,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP3855TransitionTime *ParityU64 `json:"eip3855TransitionTime,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP3860TransitionTime *ParityU64 `json:"eip3860TransitionTime,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP4895TransitionTime *ParityU64 `json:"eip4895TransitionTime,omitempty"` // FIXME, when and if i'm implemented in Parity
+		EIP6049TransitionTime *ParityU64 `json:"eip6049TransitionTime,omitempty"` // FIXME, when and if i'm implemented in Parity
+
+		TheMerge             *ParityU64 `json:"theMergeTransition,omitempty"` // FIXME, when and if i'm implemented in Parity
+		ECIP1080Transition   *ParityU64 `json:"ecip1080Transition,omitempty"` // FIXME, when and if i'm implemented in Parity
+		Lyra2NonceTransition *ParityU64 `json:"lyra2NonceTransition,omitempty"`
 
 		// supportedProtocolVersions is left here as a caching field only.
 		// I don't think this feature is supported by Parity, but

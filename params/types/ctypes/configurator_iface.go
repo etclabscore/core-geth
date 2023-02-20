@@ -178,6 +178,24 @@ type ProtocolSpecifier interface {
 	GetEIP4399Transition() *uint64
 	SetEIP4399Transition(n *uint64) error
 
+	// Shanghai:
+	//
+	// EIP3651: Warm COINBASE
+	GetEIP3651TransitionTime() *uint64
+	SetEIP3651TransitionTime(n *uint64) error
+	// EIP3855: PUSH0 instruction
+	GetEIP3855TransitionTime() *uint64
+	SetEIP3855TransitionTime(n *uint64) error
+	// EIP3860: Limit and meter initcode
+	GetEIP3860TransitionTime() *uint64
+	SetEIP3860TransitionTime(n *uint64) error
+	// EIP4895: Beacon chain push withdrawals as operations
+	GetEIP4895TransitionTime() *uint64
+	SetEIP4895TransitionTime(n *uint64) error
+	// EIP6049: Deprecate SELFDESTRUCT
+	GetEIP6049TransitionTime() *uint64
+	SetEIP6049TransitionTime(n *uint64) error
+
 	// GetMergeVirtualTransition is a Virtual fork after The Merge to use as a network splitter
 	GetMergeVirtualTransition() *uint64
 	SetMergeVirtualTransition(n *uint64) error

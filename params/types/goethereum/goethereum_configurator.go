@@ -101,6 +101,14 @@ func (c *ChainConfig) SetGasLimitBoundDivisor(n *uint64) error {
 	return internal.GlobalConfigurator().SetGasLimitBoundDivisor(n)
 }
 
+func (c *ChainConfig) GetElasticityMultiplier() uint64 {
+	return internal.GlobalConfigurator().GetElasticityMultiplier()
+}
+
+func (c *ChainConfig) SetElasticityMultiplier(n *uint64) error {
+	return internal.GlobalConfigurator().SetElasticityMultiplier(n)
+}
+
 // GetNetworkID and the following Set/Getters for ChainID too
 // are... opinionated... because of where and how currently the NetworkID
 // value is designed.

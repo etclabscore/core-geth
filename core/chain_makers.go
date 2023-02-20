@@ -32,6 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/confp/generic"
 	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/trie"
 )
@@ -203,7 +204,7 @@ func (b *BlockGen) AddUncle(h *types.Header) {
 	if b.config.IsEnabled(b.config.GetEIP1559Transition, h.Number) {
 		h.BaseFee = misc.CalcBaseFee(b.config, parent)
 		if !b.config.IsEnabled(b.config.GetEIP1559Transition, parent.Number) {
-			parentGasLimit := parent.GasLimit * b.config.ElasticityMultiplier()
+			parentGasLimit := parent.GasLimit * b.config.GetElasticityMultiplier()
 			h.GasLimit = CalcGasLimit(parentGasLimit, parentGasLimit)
 		}
 	}
@@ -373,7 +374,7 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 	if chain.Config().IsEnabled(chain.Config().GetEIP1559Transition, header.Number) {
 		header.BaseFee = misc.CalcBaseFee(chain.Config(), parent.Header())
 		if !chain.Config().IsEnabled(chain.Config().GetEIP1559Transition, parent.Number()) {
-			parentGasLimit := parent.GasLimit() * chain.Config().ElasticityMultiplier()
+			parentGasLimit := parent.GasLimit() * chain.Config().GetElasticityMultiplier()
 			header.GasLimit = CalcGasLimit(parentGasLimit, parentGasLimit)
 		}
 	}
@@ -381,7 +382,7 @@ func makeHeader(chain consensus.ChainReader, parent *types.Block, state *state.S
 }
 
 // makeHeaderChain creates a deterministic chain of headers rooted at parent.
-func makeHeaderChain(chainConfig *params.ChainConfig, parent *types.Header, n int, engine consensus.Engine, db ethdb.Database, seed int) []*types.Header {
+func makeHeaderChain(chainConfig ctypes.ChainConfigurator, parent *types.Header, n int, engine consensus.Engine, db ethdb.Database, seed int) []*types.Header {
 	blocks := makeBlockChain(chainConfig, types.NewBlockWithHeader(parent), n, engine, db, seed)
 	headers := make([]*types.Header, len(blocks))
 	for i, block := range blocks {
@@ -391,7 +392,7 @@ func makeHeaderChain(chainConfig *params.ChainConfig, parent *types.Header, n in
 }
 
 // makeHeaderChainWithGenesis creates a deterministic chain of headers from genesis.
-func makeHeaderChainWithGenesis(genesis *Genesis, n int, engine consensus.Engine, seed int) (ethdb.Database, []*types.Header) {
+func makeHeaderChainWithGenesis(genesis *genesisT.Genesis, n int, engine consensus.Engine, seed int) (ethdb.Database, []*types.Header) {
 	db, blocks := makeBlockChainWithGenesis(genesis, n, engine, seed)
 	headers := make([]*types.Header, len(blocks))
 	for i, block := range blocks {
@@ -401,7 +402,7 @@ func makeHeaderChainWithGenesis(genesis *Genesis, n int, engine consensus.Engine
 }
 
 // makeBlockChain creates a deterministic chain of blocks rooted at parent.
-func makeBlockChain(chainConfig *params.ChainConfig, parent *types.Block, n int, engine consensus.Engine, db ethdb.Database, seed int) []*types.Block {
+func makeBlockChain(chainConfig ctypes.ChainConfigurator, parent *types.Block, n int, engine consensus.Engine, db ethdb.Database, seed int) []*types.Block {
 	blocks, _ := GenerateChain(chainConfig, parent, engine, db, n, func(i int, b *BlockGen) {
 		b.SetCoinbase(common.Address{0: byte(seed), 19: byte(i)})
 	})
@@ -409,7 +410,7 @@ func makeBlockChain(chainConfig *params.ChainConfig, parent *types.Block, n int,
 }
 
 // makeBlockChain creates a deterministic chain of blocks from genesis
-func makeBlockChainWithGenesis(genesis *Genesis, n int, engine consensus.Engine, seed int) (ethdb.Database, []*types.Block) {
+func makeBlockChainWithGenesis(genesis *genesisT.Genesis, n int, engine consensus.Engine, seed int) (ethdb.Database, []*types.Block) {
 	db, blocks, _ := GenerateChainWithGenesis(genesis, engine, n, func(i int, b *BlockGen) {
 		b.SetCoinbase(common.Address{0: byte(seed), 19: byte(i)})
 	})

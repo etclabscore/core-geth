@@ -1025,7 +1025,7 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 	if w.chainConfig.IsEnabled(w.chainConfig.GetEIP1559Transition, header.Number) {
 		header.BaseFee = misc.CalcBaseFee(w.chainConfig, parent.Header())
 		if !w.chainConfig.IsEnabled(w.chainConfig.GetEIP1559Transition, parent.Number()) {
-			parentGasLimit := parent.GasLimit() * w.chainConfig.ElasticityMultiplier()
+			parentGasLimit := parent.GasLimit() * w.chainConfig.GetElasticityMultiplier()
 			header.GasLimit = core.CalcGasLimit(parentGasLimit, w.config.GasCeil)
 		}
 	}

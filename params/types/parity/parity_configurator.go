@@ -80,6 +80,15 @@ func (spec *ParityChainSpec) SetGasLimitBoundDivisor(i *uint64) error {
 	return nil
 }
 
+func (spec *ParityChainSpec) GetElasticityMultiplier() uint64 {
+	return vars.DefaultElasticityMultiplier
+}
+
+func (spec *ParityChainSpec) SetElasticityMultiplier(i *uint64) error {
+	// Noop.
+	return nil
+}
+
 func (spec *ParityChainSpec) GetNetworkID() *uint64 {
 	return spec.Params.NetworkID.Uint64P()
 }

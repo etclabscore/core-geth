@@ -138,6 +138,14 @@ func (c *CoreGethChainConfig) SetMaxCodeSize(n *uint64) error {
 	return internal.GlobalConfigurator().SetMaxCodeSize(n)
 }
 
+func (c *CoreGethChainConfig) GetElasticityMultiplier() uint64 {
+	return internal.GlobalConfigurator().GetElasticityMultiplier()
+}
+
+func (c *CoreGethChainConfig) SetElasticityMultiplier(n *uint64) error {
+	return internal.GlobalConfigurator().SetElasticityMultiplier(n)
+}
+
 func (c *CoreGethChainConfig) GetEIP7Transition() *uint64 {
 	return bigNewU64(c.EIP7FBlock)
 }

@@ -69,6 +69,9 @@ type ProtocolSpecifier interface {
 	GetMaxCodeSize() *uint64
 	SetMaxCodeSize(n *uint64) error
 
+	GetElasticityMultiplier() uint64
+	SetElasticityMultiplier(n *uint64) error
+
 	// Be careful with EIP2.
 	// It is a messy EIP, specifying diverse changes, like difficulty, intrinsic gas costs for contract creation,
 	// txpool management, and contract OoG handling.

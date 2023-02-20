@@ -34,7 +34,7 @@ func VerifyEip1559Header(config ctypes.ChainConfigurator, parent, header *types.
 	// Verify that the gas limit remains within allowed bounds
 	parentGasLimit := parent.GasLimit
 	if !config.IsEnabled(config.GetEIP1559Transition, parent.Number) {
-		parentGasLimit = parent.GasLimit * vars.ElasticityMultiplier()
+		parentGasLimit = parent.GasLimit * config.GetElasticityMultiplier()
 	}
 	if err := VerifyGaslimit(parentGasLimit, header.GasLimit); err != nil {
 		return err
@@ -59,7 +59,7 @@ func CalcBaseFee(config ctypes.ChainConfigurator, parent *types.Header) *big.Int
 		return new(big.Int).SetUint64(vars.InitialBaseFee)
 	}
 
-	parentGasTarget := parent.GasLimit / vars.ElasticityMultiplier()
+	parentGasTarget := parent.GasLimit / config.GetElasticityMultiplier()
 	// If the parent gasUsed is the same as the target, the baseFee remains unchanged.
 	if parent.GasUsed == parentGasTarget {
 		return new(big.Int).Set(parent.BaseFee)

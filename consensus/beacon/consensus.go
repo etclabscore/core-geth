@@ -26,7 +26,6 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
@@ -339,7 +338,7 @@ func (beacon *Beacon) Finalize(chain consensus.ChainHeaderReader, header *types.
 	for _, w := range withdrawals {
 		// Convert amount from gwei to wei.
 		amount := new(big.Int).SetUint64(w.Amount)
-		amount = amount.Mul(amount, big.NewInt(params.GWei))
+		amount = amount.Mul(amount, big.NewInt(vars.GWei))
 		state.AddBalance(w.Address, amount)
 	}
 	// The block reward is no longer handled here. It's done by the

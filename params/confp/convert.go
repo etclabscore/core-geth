@@ -43,11 +43,12 @@ func CloneChainConfigurator(from ctypes.ChainConfigurator) (ctypes.ChainConfigur
 	return to, nil
 }
 
-// Automagically translate between [Must|]Setters and Getters.
-func Crush(to, from interface{}) error {
+// Crush passes the Getter values from source to the Setters in dest,
+// doing so for all interface types that together compose the relevant Configurator interface.
+func Crush(dest, source interface{}) error {
 	// Interfaces must be either ChainConfigurator or GenesisBlocker.
 	for i, v := range []interface{}{
-		from, to,
+		source, dest,
 	} {
 		_, genesiser := v.(ctypes.GenesisBlocker)
 		_, chainconfer := v.(ctypes.ChainConfigurator)
@@ -59,8 +60,8 @@ func Crush(to, from interface{}) error {
 	// Order may matter; configuration parameters may be interdependent across data structures, eg EIP1283 and Genesis builtins.
 	// Try to order translation sensibly
 
-	fromGener, fromGenerOk := from.(ctypes.GenesisBlocker)
-	toGener, toGenerOk := to.(ctypes.GenesisBlocker)
+	fromGener, fromGenerOk := source.(ctypes.GenesisBlocker)
+	toGener, toGenerOk := dest.(ctypes.GenesisBlocker)
 
 	// Set Genesis.
 	if fromGenerOk && toGenerOk {
@@ -81,8 +82,8 @@ func Crush(to, from interface{}) error {
 		}
 	}
 
-	fromChainer, fromChainerOk := from.(ctypes.ChainConfigurator)
-	toChainer, toChainerOk := to.(ctypes.ChainConfigurator)
+	fromChainer, fromChainerOk := source.(ctypes.ChainConfigurator)
+	toChainer, toChainerOk := dest.(ctypes.ChainConfigurator)
 
 	if !fromChainerOk || !toChainerOk {
 		return nil

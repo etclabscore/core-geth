@@ -1230,7 +1230,7 @@ func (w *worker) commit(env *environment, interval func(), update bool, start ti
 				w.unconfirmed.Shift(block.NumberU64() - 1)
 
 				fees := totalFees(block, env.receipts)
-				feesInEther := new(big.Float).Quo(new(big.Float).SetInt(fees), big.NewFloat(params.Ether))
+				feesInEther := new(big.Float).Quo(new(big.Float).SetInt(fees), big.NewFloat(vars.Ether))
 				log.Info("Commit new sealing work", "number", block.Number(), "sealhash", w.engine.SealHash(block.Header()),
 					"uncles", len(env.uncles), "txs", env.tcount,
 					"gas", block.GasUsed(), "fees", feesInEther,

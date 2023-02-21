@@ -199,7 +199,7 @@ func (api *ConsensusAPI) ExchangeTransitionConfigurationV1(config engine.Transit
 		return nil, errors.New("invalid terminal total difficulty")
 	}
 
-	ttd := api.les.BlockChain().Config().TerminalTotalDifficulty
+	ttd := api.les.BlockChain().Config().GetEthashTerminalTotalDifficulty()
 	if ttd == nil || ttd.Cmp(config.TerminalTotalDifficulty.ToInt()) != 0 {
 		log.Warn("Invalid TTD configured", "geth", ttd, "beacon", config.TerminalTotalDifficulty)
 		return nil, fmt.Errorf("invalid ttd: execution %v consensus %v", ttd, config.TerminalTotalDifficulty)

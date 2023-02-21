@@ -69,7 +69,7 @@ func Crush(dest, source interface{}, crushZeroValues bool) error {
 		switch et {
 		case ctypes.BlockSealing_Ethereum:
 			k := reflect.TypeOf((*ctypes.GenesisBlocker)(nil)).Elem()
-			if err := crush(k, fromGener, toGener); err != nil {
+			if err := crush(k, fromGener, toGener, crushZeroValues); err != nil {
 				return err
 			}
 		default:
@@ -91,7 +91,7 @@ func Crush(dest, source interface{}, crushZeroValues bool) error {
 
 	// Set general chain parameters.
 	k := reflect.TypeOf((*ctypes.ProtocolSpecifier)(nil)).Elem()
-	if err := crush(k, fromChainer, toChainer); err != nil {
+	if err := crush(k, fromChainer, toChainer, crushZeroValues); err != nil {
 		return err
 	}
 
@@ -110,17 +110,17 @@ func Crush(dest, source interface{}, crushZeroValues bool) error {
 	switch engineType {
 	case ctypes.ConsensusEngineT_Ethash:
 		k := reflect.TypeOf((*ctypes.EthashConfigurator)(nil)).Elem()
-		if err := crush(k, fromChainer, toChainer); err != nil {
+		if err := crush(k, fromChainer, toChainer, crushZeroValues); err != nil {
 			return err
 		}
 	case ctypes.ConsensusEngineT_Clique:
 		k := reflect.TypeOf((*ctypes.CliqueConfigurator)(nil)).Elem()
-		if err := crush(k, fromChainer, toChainer); err != nil {
+		if err := crush(k, fromChainer, toChainer, crushZeroValues); err != nil {
 			return err
 		}
 	case ctypes.ConsensusEngineT_Lyra2:
 		k := reflect.TypeOf((*ctypes.Lyra2Configurator)(nil)).Elem()
-		if err := crush(k, fromChainer, toChainer); err != nil {
+		if err := crush(k, fromChainer, toChainer, crushZeroValues); err != nil {
 			return err
 		}
 	default:
@@ -130,7 +130,8 @@ func Crush(dest, source interface{}, crushZeroValues bool) error {
 	return nil
 }
 
-func crush(k reflect.Type, source, target interface{}) error {
+func crush(k reflect.Type, source, target interface{}, crushZeroValues bool) error {
+methodsLoop:
 	for i := 0; i < k.NumMethod(); i++ {
 		method := k.Method(i)
 
@@ -142,8 +143,25 @@ func crush(k reflect.Type, source, target interface{}) error {
 			continue
 		}
 
+		// Call the getter on the source and capture the response.
 		callGetIn := []reflect.Value{}
 		response := reflect.ValueOf(source).MethodByName(method.Name).Call(callGetIn)
+
+		// If we're not crushing zero values and the response is a zero value, skip it.
+		if !crushZeroValues {
+			allNil := true
+			for _, r := range response {
+				if !r.IsNil() {
+					allNil = false
+					break
+				}
+			}
+			if allNil {
+				continue methodsLoop
+			}
+		}
+
+		// Pass the result from the source getter to the setter on the destination.
 		setResponse := reflect.ValueOf(target).MethodByName(setterName).Call(response)
 
 		if !setResponse[0].IsNil() {

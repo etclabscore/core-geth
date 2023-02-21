@@ -416,7 +416,7 @@ func (es *EventSystem) SubscribeNewSideHeads(headers chan *types.Header) *Subscr
 		typ:       SideBlocksSubscription,
 		created:   time.Now(),
 		logs:      make(chan []*types.Log),
-		hashes:    make(chan []common.Hash),
+		txs:       make(chan []*types.Transaction),
 		headers:   headers,
 		installed: make(chan struct{}),
 		err:       make(chan error),

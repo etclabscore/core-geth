@@ -174,7 +174,7 @@ func init() {
 
 		for i, config := range Forks {
 			mgc := &coregeth.CoreGethChainConfig{}
-			if err := confp.Convert(config, mgc); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Convert(mgc, config); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			Forks[i] = mgc
@@ -182,7 +182,7 @@ func init() {
 
 		for k, v := range difficultyChainConfigurations {
 			mgc := &coregeth.CoreGethChainConfig{}
-			if err := confp.Convert(v, mgc); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Convert(mgc, v); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = mgc
@@ -192,7 +192,7 @@ func init() {
 
 		for i, config := range Forks {
 			pspec := &multigeth.ChainConfig{}
-			if err := confp.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Convert(pspec, config); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			Forks[i] = pspec
@@ -200,7 +200,7 @@ func init() {
 
 		for k, v := range difficultyChainConfigurations {
 			pspec := &multigeth.ChainConfig{}
-			if err := confp.Convert(v, pspec); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Convert(pspec, v); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = pspec
@@ -210,7 +210,7 @@ func init() {
 
 		for i, config := range Forks {
 			pspec := &parity.ParityChainSpec{}
-			if err := confp.Convert(config, pspec); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Convert(pspec, config); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			Forks[i] = pspec
@@ -218,7 +218,7 @@ func init() {
 
 		for k, v := range difficultyChainConfigurations {
 			pspec := &parity.ParityChainSpec{}
-			if err := confp.Convert(v, pspec); ctypes.IsFatalUnsupportedErr(err) {
+			if err := confp.Convert(pspec, v); ctypes.IsFatalUnsupportedErr(err) {
 				panic(err)
 			}
 			difficultyChainConfigurations[k] = pspec
@@ -284,7 +284,7 @@ func init() {
 				}
 				fconfig := Forks[k]
 				pspec := &parity.ParityChainSpec{}
-				if err := confp.Convert(fconfig, pspec); ctypes.IsFatalUnsupportedErr(err) {
+				if err := confp.Convert(pspec, fconfig); ctypes.IsFatalUnsupportedErr(err) {
 					panic(err)
 				}
 				config = pspec

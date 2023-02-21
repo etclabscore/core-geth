@@ -41,7 +41,7 @@ import (
 func TestConstantinopleEquivalence(t *testing.T) {
 	conf := tests.Forks["Constantinople"]
 	pspec := &parity.ParityChainSpec{}
-	err := confp.Convert(conf, pspec)
+	err := confp.Convert(pspec, conf)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +77,7 @@ func TestEquivalent_Features(t *testing.T) {
 		// Integration tests: conversion
 
 		mg := &coregeth.CoreGethChainConfig{}
-		err := confp.Convert(oconf, mg)
+		err := confp.Convert(mg, oconf)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -145,7 +145,7 @@ func TestEquivalent_Features(t *testing.T) {
 		}
 
 		pc := &parity.ParityChainSpec{}
-		err = confp.Convert(oconf, pc)
+		err = confp.Convert(pc, oconf)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -236,7 +236,7 @@ func TestParityGeneses(t *testing.T) {
 		genc := &genesisT.Genesis{
 			Config: &coregeth.CoreGethChainConfig{},
 		}
-		err = confp.Convert(pspec, genc)
+		err = confp.Convert(genc, pspec)
 		if err != nil {
 			t.Fatal(err)
 		}

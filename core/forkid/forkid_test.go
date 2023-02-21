@@ -711,7 +711,7 @@ func TestGenerateSpecificationCases(t *testing.T) {
 			}
 
 			gethConfig := &coregeth.CoreGethChainConfig{}
-			err := confp.Convert(tt.config, gethConfig)
+			err := confp.Convert(gethConfig, tt.config)
 			if err != nil {
 				t.Fatal(err)
 			}

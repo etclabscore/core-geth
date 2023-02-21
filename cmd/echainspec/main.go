@@ -143,7 +143,7 @@ func convertf(ctx *cli.Context) error {
 	} else if !ok {
 		return errInvalidOutputFlag
 	}
-	err := confp.Convert(globalChainspecValue, c)
+	err := confp.Convert(c, globalChainspecValue)
 	if err != nil {
 		return err
 	}

@@ -441,7 +441,7 @@ func TestGenStateCoreGethConfigs(t *testing.T) {
 				genesis := test.genesis(Forks[subtest.Fork])
 
 				cgConfig := &coregeth.CoreGethChainConfig{}
-				err := confp.Convert(genesis.Config, cgConfig)
+				err := confp.Convert(cgConfig, genesis.Config)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -518,7 +518,7 @@ func TestConvertDefaultsBounce(t *testing.T) {
 
 			// Convert the original config (type) into the CoreGeth chain config data type.
 			coreGethConfig := &coregeth.CoreGethChainConfig{}
-			err := confp.Convert(forkConfig, coreGethConfig)
+			err := confp.Convert(coreGethConfig, forkConfig)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -33,10 +33,10 @@ func NewParityChainSpec(network string, genesis *genesisT.Genesis, bootnodes []s
 		Nodes:   bootnodes,
 		Datadir: strings.ToLower(network),
 	}
-	if err := confp.Convert(genesis, spec); err != nil {
+	if err := confp.Convert(spec, genesis); err != nil {
 		return nil, err
 	}
-	if err := confp.Convert(genesis.Config, spec); err != nil {
+	if err := confp.Convert(spec, genesis.Config); err != nil {
 		return nil, err
 	}
 	return spec, nil
@@ -49,10 +49,10 @@ func ParityConfigToCoreGethGenesis(c *parity.ParityChainSpec) (*genesisT.Genesis
 		Config: &coregeth.CoreGethChainConfig{},
 	}
 
-	if err := confp.Convert(c, mg); err != nil {
+	if err := confp.Convert(mg, c); err != nil {
 		return nil, err
 	}
-	if err := confp.Convert(c, mg.Config); err != nil {
+	if err := confp.Convert(mg.Config, c); err != nil {
 		return nil, err
 	}
 	return mg, nil

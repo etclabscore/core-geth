@@ -125,7 +125,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: MainnetChainConfig,
 			new: func() ctypes.ChainConfigurator {
 				c := &goethereum.ChainConfig{}
-				if err := confp.Convert(MainnetChainConfig, c); err != nil {
+				if err := confp.Convert(c, MainnetChainConfig); err != nil {
 					panic(err)
 				}
 				c.SetEthashEIP779Transition(uint64P(1900000))
@@ -143,7 +143,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: MainnetChainConfig,
 			new: func() ctypes.ChainConfigurator {
 				c := &goethereum.ChainConfig{}
-				confp.Convert(MainnetChainConfig, c)
+				confp.Convert(c, MainnetChainConfig)
 				c.SetEthashEIP779Transition(nil)
 				return c
 			}(),
@@ -231,7 +231,7 @@ func TestCheckCompatible(t *testing.T) {
 			stored: MainnetChainConfig,
 			new: func() ctypes.ChainConfigurator {
 				c := &coregeth.CoreGethChainConfig{}
-				err := confp.Convert(MainnetChainConfig, c)
+				err := confp.Convert(c, MainnetChainConfig)
 				if err != nil {
 					panic(err)
 				}

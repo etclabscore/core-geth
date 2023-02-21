@@ -36,7 +36,7 @@ func CloneChainConfigurator(from ctypes.ChainConfigurator) (ctypes.ChainConfigur
 	to = reflect.New(reflect.ValueOf(from).Elem().Type()).Interface().(ctypes.ChainConfigurator)
 
 	// To complete the clone, we convert the original into the zero-value copy.
-	if err := Convert(from, to); err != nil {
+	if err := Convert(to, from); err != nil {
 		return nil, err
 	}
 
@@ -44,7 +44,7 @@ func CloneChainConfigurator(from ctypes.ChainConfigurator) (ctypes.ChainConfigur
 }
 
 // Automagically translate between [Must|]Setters and Getters.
-func Convert(from, to interface{}) error {
+func Convert(to, from interface{}) error {
 	// Interfaces must be either ChainConfigurator or GenesisBlocker.
 	for i, v := range []interface{}{
 		from, to,

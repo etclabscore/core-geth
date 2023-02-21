@@ -105,7 +105,7 @@ func (c *ChainConfig) GetElasticityMultiplier() uint64 {
 	return internal.GlobalConfigurator().GetElasticityMultiplier()
 }
 
-func (c *ChainConfig) SetElasticityMultiplier(n *uint64) error {
+func (c *ChainConfig) SetElasticityMultiplier(n uint64) error {
 	return internal.GlobalConfigurator().SetElasticityMultiplier(n)
 }
 
@@ -113,7 +113,7 @@ func (c *ChainConfig) GetBaseFeeChangeDenominator() uint64 {
 	return internal.GlobalConfigurator().GetBaseFeeChangeDenominator()
 }
 
-func (c *ChainConfig) SetBaseFeeChangeDenominator(n *uint64) error {
+func (c *ChainConfig) SetBaseFeeChangeDenominator(n uint64) error {
 	return internal.GlobalConfigurator().SetBaseFeeChangeDenominator(n)
 }
 

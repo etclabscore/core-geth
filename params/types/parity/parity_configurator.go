@@ -84,7 +84,7 @@ func (spec *ParityChainSpec) GetElasticityMultiplier() uint64 {
 	return vars.DefaultElasticityMultiplier
 }
 
-func (spec *ParityChainSpec) SetElasticityMultiplier(i *uint64) error {
+func (spec *ParityChainSpec) SetElasticityMultiplier(n uint64) error {
 	// Noop.
 	return nil
 }
@@ -93,7 +93,7 @@ func (spec *ParityChainSpec) GetBaseFeeChangeDenominator() uint64 {
 	return vars.DefaultBaseFeeChangeDenominator
 }
 
-func (spec *ParityChainSpec) SetBaseFeeChangeDenominator(i *uint64) error {
+func (spec *ParityChainSpec) SetBaseFeeChangeDenominator(n uint64) error {
 	// Noop.
 	return nil
 }

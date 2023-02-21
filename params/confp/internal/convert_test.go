@@ -26,8 +26,6 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/params/confp"
-	"github.com/ethereum/go-ethereum/params/confp/tconvert"
-	"github.com/ethereum/go-ethereum/params/types/aleth"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
@@ -35,8 +33,8 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
-func mustOpenF(t *testing.T, fabbrev string, into interface{}) {
-	b, err := os.ReadFile(filepath.Join("..", "testdata", fmt.Sprintf("stureby_%s.json", fabbrev)))
+func mustReadTestdataTo(t *testing.T, fabbrev string, into interface{}) {
+	b, err := os.ReadFile(filepath.Join("..", "testdata", fmt.Sprintf("%s_foundation.json", fabbrev)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -48,34 +46,36 @@ func mustOpenF(t *testing.T, fabbrev string, into interface{}) {
 
 func Test_UnmarshalJSON(t *testing.T) {
 	for _, f := range []string{
-		"geth", "parity", "aleth",
+		"geth", "coregeth",
 	} {
 		switch f {
 		case "geth":
 			c := &genesisT.Genesis{}
-			mustOpenF(t, f, c)
-			if *c.Config.GetNetworkID() != 314158 {
-				t.Errorf("networkid")
+			mustReadTestdataTo(t, f, c)
+			if c.Config.GetChainID().Cmp(big.NewInt(1)) != 0 {
+				t.Errorf("go-ethereum: wrong chainid")
 			}
-		case "parity":
-			p := &parity.ParityChainSpec{}
-			mustOpenF(t, f, p)
-			_, err := tconvert.ParityConfigToCoreGethGenesis(p)
-			if err != nil {
-				t.Error(err)
+			if _, ok := c.Config.(*goethereum.ChainConfig); !ok {
+				t.Errorf("go-ethereum: wrong type")
 			}
-		case "aleth":
-			a := &aleth.AlethGenesisSpec{}
-			mustOpenF(t, f, a)
+		case "coregeth":
+			c := &genesisT.Genesis{}
+			mustReadTestdataTo(t, f, c)
+			if c.Config.GetChainID().Cmp(big.NewInt(1)) != 0 {
+				t.Errorf("core-geth: wrong chainid")
+			}
+			if _, ok := c.Config.(*coregeth.CoreGethChainConfig); !ok {
+				t.Errorf("core-geth: wrong type")
+			}
 		}
 	}
 }
 
 func TestConvert(t *testing.T) {
-	spec := parity.ParityChainSpec{}
-	mustOpenF(t, "parity", &spec)
+	spec := goethereum.ChainConfig{}
+	mustReadTestdataTo(t, "geth", &spec)
 
-	spec2 := parity.ParityChainSpec{}
+	spec2 := goethereum.ChainConfig{}
 	err := confp.Convert(&spec, &spec2)
 	if err != nil {
 		t.Error(err)

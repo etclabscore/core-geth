@@ -70,9 +70,9 @@ type ProtocolSpecifier interface {
 	SetMaxCodeSize(n *uint64) error
 
 	GetElasticityMultiplier() uint64
-	SetElasticityMultiplier(n *uint64) error
+	SetElasticityMultiplier(n uint64) error
 	GetBaseFeeChangeDenominator() uint64
-	SetBaseFeeChangeDenominator(n *uint64) error
+	SetBaseFeeChangeDenominator(n uint64) error
 
 	// Be careful with EIP2.
 	// It is a messy EIP, specifying diverse changes, like difficulty, intrinsic gas costs for contract creation,

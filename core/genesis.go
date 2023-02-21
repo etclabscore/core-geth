@@ -37,6 +37,8 @@ import (
 	"github.com/ethereum/go-ethereum/trie"
 )
 
+var errGenesisNoConfig = errors.New("genesis has no chain configuration")
+
 // ChainOverrides contains the changes to chain config.
 type ChainOverrides struct {
 	OverrideShanghai *uint64
@@ -160,7 +162,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 	if head == nil {
 		return newcfg, stored, fmt.Errorf("missing head header")
 	}
-	compatErr := confp.Compatible(head.Number, head.Time, storedcfg, newcfg)
+	compatErr := confp.Compatible(head.Number, &head.Time, storedcfg, newcfg)
 	if compatErr != nil && ((head.Number.Uint64() != 0 && compatErr.RewindToBlock != 0) || (head.Time != 0 && compatErr.RewindToTime != 0)) {
 		return newcfg, stored, compatErr
 	}
@@ -175,7 +177,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 // is already present in database, otherwise, return the config in the
 // provided genesis specification. Note the returned clique config can
 // be nil if we are not in the clique network.
-func LoadCliqueConfig(db ethdb.Database, genesis *Genesis) (*params.CliqueConfig, error) {
+func LoadCliqueConfig(db ethdb.Database, genesis *genesisT.Genesis) (*ctypes.CliqueConfig, error) {
 	// Load the stored chain config from the database. It can be nil
 	// in case the database is empty. Notably, we only care about the
 	// chain config corresponds to the canonical chain.
@@ -183,7 +185,10 @@ func LoadCliqueConfig(db ethdb.Database, genesis *Genesis) (*params.CliqueConfig
 	if stored != (common.Hash{}) {
 		storedcfg := rawdb.ReadChainConfig(db, stored)
 		if storedcfg != nil {
-			return storedcfg.Clique, nil
+			return &ctypes.CliqueConfig{
+				Period: storedcfg.GetCliquePeriod(),
+				Epoch:  storedcfg.GetCliqueEpoch(),
+			}, nil
 		}
 	}
 	// Load the clique config from the provided genesis specification.
@@ -196,10 +201,14 @@ func LoadCliqueConfig(db ethdb.Database, genesis *Genesis) (*params.CliqueConfig
 		// config is missing(initialize the empty leveldb with an
 		// external ancient chain segment), ensure the provided genesis
 		// is matched.
-		if stored != (common.Hash{}) && genesis.ToBlock().Hash() != stored {
-			return nil, &GenesisMismatchError{stored, genesis.ToBlock().Hash()}
+		genesisBlock := MustCommitGenesis(rawdb.NewMemoryDatabase(), genesis)
+		if stored != (common.Hash{}) && genesisBlock.Hash() != stored {
+			return nil, &genesisT.GenesisMismatchError{stored, genesisBlock.Hash()}
 		}
-		return genesis.Config.Clique, nil
+		return &ctypes.CliqueConfig{
+			Period: genesis.Config.GetCliquePeriod(),
+			Epoch:  genesis.Config.GetCliqueEpoch(),
+		}, nil
 	}
 	// There is no stored chain config and no new config provided,
 	// In this case the default chain config(mainnet) will be used,
@@ -249,10 +258,14 @@ func gaFlush(ga *genesisT.GenesisAlloc, db ethdb.Database) error {
 	if err != nil {
 		return err
 	}
-	err = statedb.Database().TrieDB().Commit(root, true, nil)
-	if err != nil {
-		return err
+	// Commit newly generated states into disk if it's not empty.
+	if root != types.EmptyRootHash {
+		err = statedb.Database().TrieDB().Commit(root, true)
+		if err != nil {
+			return err
+		}
 	}
+
 	// Marshal the genesis state specification and persist.
 	blob, err := json.Marshal(ga)
 	if err != nil {
@@ -313,8 +326,6 @@ func CommitGenesisState(db ethdb.Database, hash common.Hash) error {
 		case params.MainnetGenesisHash:
 			genesis = params.DefaultGenesisBlock()
 			// TODO/meowsbits/20220405: make sure we don't need Classic in here
-		case params.RopstenGenesisHash:
-			genesis = params.DefaultRopstenGenesisBlock()
 		case params.RinkebyGenesisHash:
 			genesis = params.DefaultRinkebyGenesisBlock()
 		case params.GoerliGenesisHash:
@@ -383,7 +394,7 @@ func GenesisToBlock(g *genesisT.Genesis, db ethdb.Database) *types.Block {
 		}
 	}
 	var withdrawals []*types.Withdrawal
-	if g.Config != nil && g.Config.IsShanghai(g.Timestamp) {
+	if g.Config != nil && g.Config.IsEnabledByTime(g.Config.GetEIP4895TransitionTime, &g.Timestamp) {
 		head.WithdrawalsHash = &types.EmptyRootHash
 		withdrawals = make([]*types.Withdrawal, 0)
 	}

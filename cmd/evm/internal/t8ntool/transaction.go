@@ -30,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/tests"
 	"github.com/urfave/cli/v2"
@@ -180,7 +181,8 @@ func Transaction(ctx *cli.Context) error {
 			r.Error = errors.New("gas * maxFeePerGas exceeds 256 bits")
 		}
 		// Check whether the init code size has been exceeded.
-		if chainConfig.IsShanghai(0) && tx.To() == nil && len(tx.Data()) > params.MaxInitCodeSize {
+		// EIP-3860: Limit and meter initcode
+		if chainConfig.IsEnabledByTime(chainConfig.GetEIP3860TransitionTime, &zero) && tx.To() == nil && uint64(len(tx.Data())) > vars.MaxInitCodeSize {
 			r.Error = errors.New("max initcode size exceeded")
 		}
 		results = append(results, r)

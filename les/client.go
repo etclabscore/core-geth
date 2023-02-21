@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/mclock"
 	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/consensus/lyra2"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/bloombits"
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -47,6 +48,7 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enr"
 	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/coregeth"
+	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/goethereum"
 	"github.com/ethereum/go-ethereum/params/vars"
 	"github.com/ethereum/go-ethereum/rlp"
@@ -112,6 +114,17 @@ func New(stack *node.Node, config *ethconfig.Config) (*LightEthereum, error) {
 	log.Info(strings.Repeat("-", 153))
 	log.Info("")
 
+	var cliqueConfig *ctypes.CliqueConfig
+	var lyra2Config *lyra2.Config
+	if chainConfig.GetConsensusEngineType() == ctypes.ConsensusEngineT_Clique {
+		cliqueConfig = &ctypes.CliqueConfig{
+			Period: chainConfig.GetCliquePeriod(),
+			Epoch:  chainConfig.GetCliqueEpoch(),
+		}
+	} else if chainConfig.GetConsensusEngineType() == ctypes.ConsensusEngineT_Lyra2 {
+		lyra2Config = &lyra2.Config{}
+	}
+
 	peers := newServerPeerSet()
 	merger := consensus.NewMerger(chainDb)
 	leth := &LightEthereum{
@@ -129,7 +142,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*LightEthereum, error) {
 		reqDist:         newRequestDistributor(peers, &mclock.System{}),
 		accountManager:  stack.AccountManager(),
 		merger:          merger,
-		engine:          ethconfig.CreateConsensusEngine(stack, &config.Ethash, chainConfig.Clique, nil, nil, false, chainDb),
+		engine:          ethconfig.CreateConsensusEngine(stack, &config.Ethash, cliqueConfig, lyra2Config, nil, false, chainDb),
 		bloomRequests:   make(chan chan *bloombits.Retrieval),
 		bloomIndexer:    core.NewBloomIndexer(chainDb, vars.BloomBitsBlocksClient, vars.HelperTrieConfirmations),
 		p2pServer:       stack.Server(),

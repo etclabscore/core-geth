@@ -36,7 +36,7 @@ type Lyra2 struct {
 	remote   *remoteSealer
 }
 
-type Lyra2Config struct {
+type Config struct {
 	FakeMode  bool
 	FakeFail  uint64
 	FakeDelay time.Duration
@@ -45,9 +45,9 @@ type Lyra2Config struct {
 	Rand *rand.Rand
 }
 
-func New(config *Lyra2Config, notify []string, noverify bool) *Lyra2 {
+func New(config *Config, notify []string, noverify bool) *Lyra2 {
 	if config == nil {
-		config = &Lyra2Config{}
+		config = &Config{}
 	}
 	lyra2 := &Lyra2{
 		fakeMode:  config.FakeMode,

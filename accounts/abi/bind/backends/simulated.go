@@ -955,7 +955,7 @@ func (fb *filterBackend) ServiceFilter(ctx context.Context, ms *bloombits.Matche
 	panic("not supported")
 }
 
-func (fb *filterBackend) ChainConfig() *params.ChainConfig {
+func (fb *filterBackend) ChainConfig() ctypes.ChainConfigurator {
 	panic("not supported")
 }
 

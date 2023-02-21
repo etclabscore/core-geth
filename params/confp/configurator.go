@@ -186,14 +186,22 @@ func IsValid(conf ctypes.ChainConfigurator, head *uint64) *ConfigValidError {
 func Compatible(headBlock *big.Int, headTime *uint64, a, b ctypes.ChainConfigurator) *ConfigCompatError {
 	// Iterate checkCompatible to find the lowest conflict.
 	var lastErr *ConfigCompatError
+
 	for {
 		err := compatible(headBlock, headTime, a, b)
-		if err == nil || (lastErr != nil && err.RewindToBlock == lastErr.RewindToBlock) {
+		if err == nil || (lastErr != nil && err.RewindToBlock == lastErr.RewindToBlock && err.RewindToTime == lastErr.RewindToTime) {
 			break
 		}
 		lastErr = err
-		headBlock = new(big.Int).SetUint64(lastErr.RewindToBlock)
+
+		if err.RewindToTime > 0 {
+			headTime = new(uint64)
+			*headTime = err.RewindToTime
+		} else {
+			headBlock = new(big.Int).SetUint64(err.RewindToBlock)
+		}
 	}
+
 	return lastErr
 }
 
@@ -232,7 +240,6 @@ func compatible(headBlock *big.Int, headTime *uint64, a, b ctypes.ChainConfigura
 				return newBlockCompatError("mismatching chain ids after EIP155 transition", tai, tbi)
 			}
 		}
-		return nil
 	}
 
 	// Handle forks by time.

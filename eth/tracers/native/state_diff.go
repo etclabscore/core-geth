@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"math/big"
 	"sync/atomic"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -119,7 +118,7 @@ func (t *stateDiffTracer) CaptureStart(env *vm.EVM, from common.Address, to comm
 }
 
 // CaptureEnd is called after the call finishes to finalize the tracing.
-func (t *stateDiffTracer) CaptureEnd(output []byte, gasUsed uint64, _ time.Duration, err error) {}
+func (t *stateDiffTracer) CaptureEnd(output []byte, gasUsed uint64, err error) {}
 
 // CaptureState implements the EVMLogger interface to trace a single step of VM execution.
 func (t *stateDiffTracer) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, rData []byte, depth int, err error) {

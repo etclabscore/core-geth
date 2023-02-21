@@ -1498,7 +1498,7 @@ func newRPCTransaction(tx *types.Transaction, blockHash common.Hash, blockNumber
 }
 
 // NewRPCPendingTransaction returns a pending transaction that will serialize to the RPC representation
-func newRPCPendingTransaction(tx *types.Transaction, current *types.Header, config ctypes.ChainConfigurator) *RPCTransaction {
+func NewRPCPendingTransaction(tx *types.Transaction, current *types.Header, config ctypes.ChainConfigurator) *RPCTransaction {
 	var baseFee *big.Int
 	blockNumber := uint64(0)
 	if current != nil {

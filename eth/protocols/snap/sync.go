@@ -2228,50 +2228,6 @@ func (s *Syncer) commitHealer(force bool) {
 		log.Crit("Failed to persist healing data", "err", err)
 	}
 	log.Debug("Persisted set of healing data", "type", "trienodes", "bytes", common.StorageSize(batch.ValueSize()))
-
-	// Calculate the processing rate of one filled trie node
-	rate := float64(fills) / (float64(time.Since(start)) / float64(time.Second))
-
-	// Update the currently measured trienode queueing and processing throughput.
-	//
-	// The processing rate needs to be updated uniformly independent if we've
-	// processed 1x100 trie nodes or 100x1 to keep the rate consistent even in
-	// the face of varying network packets. As such, we cannot just measure the
-	// time it took to process N trie nodes and update once, we need one update
-	// per trie node.
-	//
-	// Naively, that would be:
-	//
-	//   for i:=0; i<fills; i++ {
-	//     healRate = (1-measurementImpact)*oldRate + measurementImpact*newRate
-	//   }
-	//
-	// Essentially, a recursive expansion of HR = (1-MI)*HR + MI*NR.
-	//
-	// We can expand that formula for the Nth item as:
-	//   HR(N) = (1-MI)^N*OR + (1-MI)^(N-1)*MI*NR + (1-MI)^(N-2)*MI*NR + ... + (1-MI)^0*MI*NR
-	//
-	// The above is a geometric sequence that can be summed to:
-	//   HR(N) = (1-MI)^N*(OR-NR) + NR
-	s.trienodeHealRate = gomath.Pow(1-trienodeHealRateMeasurementImpact, float64(fills))*(s.trienodeHealRate-rate) + rate
-
-	pending := atomic.LoadUint64(&s.trienodeHealPend)
-	if time.Since(s.trienodeHealThrottled) > time.Second {
-		// Periodically adjust the trie node throttler
-		if float64(pending) > 2*s.trienodeHealRate {
-			s.trienodeHealThrottle *= trienodeHealThrottleIncrease
-		} else {
-			s.trienodeHealThrottle /= trienodeHealThrottleDecrease
-		}
-		if s.trienodeHealThrottle > maxTrienodeHealThrottle {
-			s.trienodeHealThrottle = maxTrienodeHealThrottle
-		} else if s.trienodeHealThrottle < minTrienodeHealThrottle {
-			s.trienodeHealThrottle = minTrienodeHealThrottle
-		}
-		s.trienodeHealThrottled = time.Now()
-
-		log.Debug("Updated trie node heal throttler", "rate", s.trienodeHealRate, "pending", pending, "throttle", s.trienodeHealThrottle)
-	}
 }
 
 // processBytecodeHealResponse integrates an already validated bytecode response

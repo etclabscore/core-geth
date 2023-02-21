@@ -108,7 +108,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*LightEthereum, error) {
 	}
 	log.Info("")
 	log.Info(strings.Repeat("-", 153))
-	for _, line := range strings.Split(chainConfig.Description(), "\n") {
+	for _, line := range strings.Split(chainConfig.String(), "\n") {
 		log.Info(line)
 	}
 	log.Info(strings.Repeat("-", 153))

@@ -111,7 +111,8 @@ func (t *BlockTest) Run(snapshotter bool) error {
 
 	// import pre accounts & construct test genesis block & state root
 	db := rawdb.NewMemoryDatabase()
-	gblock, err := core.CommitGenesis(t.genesis(config), db, trie.NewDatabase(db)) // FIXME-meowsbits Another arg? Trie?
+	genesis := t.genesis(config)
+	gblock, err := core.CommitGenesis(genesis, db, trie.NewDatabase(db)) // FIXME-meowsbits Another arg? Trie?
 	if err != nil {
 		return err
 	}
@@ -135,7 +136,7 @@ func (t *BlockTest) Run(snapshotter bool) error {
 		cache.SnapshotLimit = 1
 		cache.SnapshotWait = true
 	}
-	chain, err := core.NewBlockChain(db, cache, gspec, nil, engine, vm.Config{}, nil, nil)
+	chain, err := core.NewBlockChain(db, cache, genesis, nil, engine, vm.Config{}, nil, nil)
 	if err != nil {
 		return err
 	}

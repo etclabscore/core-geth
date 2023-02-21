@@ -979,10 +979,12 @@ func (api *API) TraceCallMany(ctx context.Context, txs []ethapi.TransactionArgs,
 	if config != nil && config.Reexec != nil {
 		reexec = *config.Reexec
 	}
-	statedb, err := api.backend.StateAtBlock(ctx, block, reexec, nil, true, false)
+	statedb, release, err := api.backend.StateAtBlock(ctx, block, reexec, nil, true, false)
 	if err != nil {
 		return nil, err
 	}
+	defer release()
+
 	// Apply the customized state rules if required.
 	if config != nil {
 		if err := config.StateOverrides.Apply(statedb); err != nil {

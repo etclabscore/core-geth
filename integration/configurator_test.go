@@ -214,10 +214,6 @@ func TestParityGeneses(t *testing.T) {
 			params.DefaultMordorGenesisBlock(),
 		},
 		{
-			"ropsten.json",
-			params.DefaultRopstenGenesisBlock(),
-		},
-		{
 			"kotti.json",
 			params.DefaultKottiGenesisBlock(),
 		},

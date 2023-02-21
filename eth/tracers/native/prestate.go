@@ -35,7 +35,7 @@ func init() {
 	tracers.DefaultDirectory.Register("prestateTracer", newPrestateTracer, false)
 }
 
-type state = map[common.Address]*account
+type addressState = map[common.Address]*account
 
 type account struct {
 	Balance *big.Int                    `json:"balance,omitempty"`
@@ -56,8 +56,8 @@ type accountMarshaling struct {
 type prestateTracer struct {
 	noopTracer
 	env       *vm.EVM
-	pre       state
-	post      state
+	pre       addressState
+	post      addressState
 	create    bool
 	to        common.Address
 	gasLimit  uint64 // Amount of gas bought for the whole tx
@@ -80,8 +80,8 @@ func newPrestateTracer(ctx *tracers.Context, cfg json.RawMessage) (tracers.Trace
 		}
 	}
 	return &prestateTracer{
-		pre:     state{},
-		post:    state{},
+		pre:     addressState{},
+		post:    addressState{},
 		config:  config,
 		created: make(map[common.Address]bool),
 		deleted: make(map[common.Address]bool),
@@ -241,8 +241,8 @@ func (t *prestateTracer) GetResult() (json.RawMessage, error) {
 	var err error
 	if t.config.DiffMode {
 		res, err = json.Marshal(struct {
-			Post state `json:"post"`
-			Pre  state `json:"pre"`
+			Post addressState `json:"post"`
+			Pre  addressState `json:"pre"`
 		}{t.post, t.pre})
 	} else {
 		res, err = json.Marshal(t.pre)

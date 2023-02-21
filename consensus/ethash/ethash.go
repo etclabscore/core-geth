@@ -330,13 +330,7 @@ func (c *cache) generate(dir string, limit int, lock bool, test bool) {
 		c.dump, c.mmap, c.cache, err = memoryMap(path, lock)
 		if err == nil {
 			logger.Debug("Loaded old ethash cache from disk")
-			isBad, hash := isBadCache(c.epoch, c.epochLength, c.cache)
-			if isBad {
-				// cache is bad. Set err, then continue as if cache could not be read from disk.
-				err = fmt.Errorf("Cache with hash %s has been flagged as bad", hash)
-			} else {
-				return
-			}
+			return
 		}
 		logger.Debug("Failed to load old ethash cache", "err", err)
 
@@ -445,16 +439,7 @@ func (d *dataset) generate(dir string, limit int, lock bool, test bool) {
 		d.dump, d.mmap, d.dataset, err = memoryMap(path, lock)
 		if err == nil {
 			logger.Debug("Loaded old ethash dataset from disk", "path", path)
-			isBad, hash := isBadCache(d.epoch, d.epochLength, d.dataset)
-			if isBad {
-				// dataset is bad. Continue as if cache could not be read from disk.
-				err = fmt.Errorf("Dataset with hash %s has been flagged as bad", hash)
-				// regenerating DAG is a intensive process, we should let the user know
-				// why it's happening.
-				logger.Error("Bad DAG on disk", "path", path, "hash", hash)
-			} else {
-				return
-			}
+			return
 		}
 		logger.Debug("Failed to load old ethash dataset", "err", err)
 

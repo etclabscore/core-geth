@@ -114,11 +114,20 @@ func Execute(code, input []byte, cfg *Config) ([]byte, *state.StateDB, error) {
 		address = common.BytesToAddress([]byte("contract"))
 		vmenv   = NewEnv(cfg)
 		sender  = vm.AccountRef(cfg.Origin)
+
+		// Berlin
+		// https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/berlin.md
+		// EIP-2930: Optional access lists
+		eip2930f = cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2930Transition, vmenv.Context.BlockNumber)
+
+		// Shanghai
+		// EIP-3651: Warm coinbase
+		eip3651f = cfg.ChainConfig.IsEnabledByTime(cfg.ChainConfig.GetEIP3651TransitionTime, &vmenv.Context.Time)
 	)
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)
 	// - reset transient storage(eip 1153)
-	cfg.State.Prepare(rules, cfg.Origin, cfg.Coinbase, &address, vmenv.ActivePrecompiles(), nil)
+	cfg.State.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, &address, vmenv.ActivePrecompiles(), nil)
 	cfg.State.CreateAccount(address)
 	// set the receiver's (the executing contract) code for execution.
 	cfg.State.SetCode(address, code)
@@ -146,12 +155,20 @@ func Create(input []byte, cfg *Config) ([]byte, common.Address, uint64, error) {
 	var (
 		vmenv  = NewEnv(cfg)
 		sender = vm.AccountRef(cfg.Origin)
-		rules  = cfg.ChainConfig.Rules(vmenv.Context.BlockNumber, vmenv.Context.Random != nil, vmenv.Context.Time)
+
+		// Berlin
+		// https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/berlin.md
+		// EIP-2930: Optional access lists
+		eip2930f = cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2930Transition, vmenv.Context.BlockNumber)
+
+		// Shanghai
+		// EIP-3651: Warm coinbase
+		eip3651f = cfg.ChainConfig.IsEnabledByTime(cfg.ChainConfig.GetEIP3651TransitionTime, &vmenv.Context.Time)
 	)
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)
 	// - reset transient storage(eip 1153)
-	cfg.State.Prepare(rules, cfg.Origin, cfg.Coinbase, nil, vmenv.ActivePrecompiles(), nil)
+	cfg.State.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, nil, vmenv.ActivePrecompiles(), nil)
 	// Call the code with the given configuration.
 	code, address, leftOverGas, err := vmenv.Create(
 		sender,
@@ -174,12 +191,19 @@ func Call(address common.Address, input []byte, cfg *Config) ([]byte, uint64, er
 		vmenv   = NewEnv(cfg)
 		sender  = cfg.State.GetOrNewStateObject(cfg.Origin)
 		statedb = cfg.State
-		rules   = cfg.ChainConfig.Rules(vmenv.Context.BlockNumber, vmenv.Context.Random != nil, vmenv.Context.Time)
+		// Berlin
+		// https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/berlin.md
+		// EIP-2930: Optional access lists
+		eip2930f = cfg.ChainConfig.IsEnabled(cfg.ChainConfig.GetEIP2930Transition, vmenv.Context.BlockNumber)
+
+		// Shanghai
+		// EIP-3651: Warm coinbase
+		eip3651f = cfg.ChainConfig.IsEnabledByTime(cfg.ChainConfig.GetEIP3651TransitionTime, &vmenv.Context.Time)
 	)
 	// Execute the preparatory steps for state transition which includes:
 	// - prepare accessList(post-berlin)
 	// - reset transient storage(eip 1153)
-	statedb.Prepare(rules, cfg.Origin, cfg.Coinbase, &address, vmenv.ActivePrecompiles(), nil)
+	statedb.Prepare(eip2930f, eip3651f, cfg.Origin, cfg.Coinbase, &address, vmenv.ActivePrecompiles(), nil)
 
 	// Call the code with the given configuration.
 	ret, leftOverGas, err := vmenv.Call(

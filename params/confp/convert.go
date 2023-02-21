@@ -21,33 +21,21 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
-	"github.com/ethereum/go-ethereum/params/types/goethereum"
-	"github.com/ethereum/go-ethereum/params/types/multigeth"
-	"github.com/ethereum/go-ethereum/params/types/parity"
 )
 
 // CloneChainConfigurator creates a copy of the given ChainConfigurator.
-// Note that this does not support the GenesisBlocker interface;
-// this function won't (currently) be used in that context, and its extra overhead that we don't need (yet).
-func CloneChainConfigurator(from interface{}) (interface{}, error) {
+func CloneChainConfigurator(from ctypes.ChainConfigurator) (ctypes.ChainConfigurator, error) {
 	// Use a hardcoded switch on known types implementing the ChainConfigurator interface.
 	// Reflection would be more elegant, but it's not worth the conceptual overhead.
-	var to interface{}
-	switch from.(type) {
-	case *goethereum.ChainConfig:
-		to = new(goethereum.ChainConfig)
-	case *coregeth.CoreGethChainConfig:
-		to = new(coregeth.CoreGethChainConfig)
-	case *multigeth.ChainConfig:
-		to = new(multigeth.ChainConfig)
-	case *parity.ParityChainSpec:
-		to = new(parity.ParityChainSpec)
-	default:
-		return nil, fmt.Errorf("cannot clone unknown type %T", from)
-	}
+	var to ctypes.ChainConfigurator
 
+	// Note that reflect.New will create a new value which is initialized to its zero value
+	// (so it will not be a copy of the original).
+	// https://stackoverflow.com/a/37851764
+	to = reflect.New(reflect.ValueOf(from).Elem().Type()).Interface().(ctypes.ChainConfigurator)
+
+	// To complete the clone, we convert the original into the zero-value copy.
 	if err := Convert(from, to); err != nil {
 		return nil, err
 	}

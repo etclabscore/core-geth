@@ -75,7 +75,7 @@ func Test_UnmarshalJSON(t *testing.T) {
 func testConvert(t *testing.T, aType string, a, b ctypes.ChainConfigurator) {
 	ag, bg := &genesisT.Genesis{Config: a}, &genesisT.Genesis{Config: b}
 	mustReadTestdataTo(t, aType, ag)
-	err := confp.Convert(bg, ag)
+	err := confp.Crush(bg, ag)
 	if err != nil {
 		t.Fatal(err)
 	}

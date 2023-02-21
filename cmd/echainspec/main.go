@@ -143,7 +143,7 @@ func convertf(ctx *cli.Context) error {
 	} else if !ok {
 		return errInvalidOutputFlag
 	}
-	err := confp.Convert(c, globalChainspecValue)
+	err := confp.Crush(c, globalChainspecValue)
 	if err != nil {
 		return err
 	}
@@ -194,11 +194,11 @@ USAGE:
 
 EXAMPLES:
 
-	Convert an external chain configuration between client formats (from STDIN)
+	Crush an external chain configuration between client formats (from STDIN)
 .
 		> cat my-parity-spec.json | {{.Name}} --inputf parity --outputf [geth|coregeth]
 
-	Convert an external chain configuration between client formats (from file).
+	Crush an external chain configuration between client formats (from file).
 
 		> {{.Name}} --inputf parity --file my-parity-spec.json --outputf [geth|coregeth]
 

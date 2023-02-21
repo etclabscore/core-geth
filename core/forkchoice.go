@@ -153,12 +153,12 @@ func (f *ForkChoice) ReorgNeeded(current *types.Header, extern *types.Header) (b
 		return reorg, nil
 	}
 
-	commonHeader, err := f.CommonAncestor(current, header)
+	commonHeader, err := f.CommonAncestor(current, extern)
 	if err != nil {
 		return reorg, err
 	}
 
-	if err := ecbp1100(commonHeader, current, header, f.chain.GetTd); err != nil {
+	if err := ecbp1100(commonHeader, current, extern, f.chain.GetTd); err != nil {
 		reorg = false
 		log.Warn("Reorg disallowed", "error", err)
 	} else if current.Number.Uint64()-commonHeader.Number.Uint64() > 2 {
@@ -167,10 +167,10 @@ func (f *ForkChoice) ReorgNeeded(current *types.Header, extern *types.Header) (b
 			"status", "accepted",
 			"age", common.PrettyAge(time.Unix(int64(commonHeader.Time), 0)),
 			"current.span", common.PrettyDuration(time.Duration(current.Time-commonHeader.Time)*time.Second),
-			"proposed.span", common.PrettyDuration(time.Duration(header.Time-commonHeader.Time)*time.Second),
+			"proposed.span", common.PrettyDuration(time.Duration(extern.Time-commonHeader.Time)*time.Second),
 			"common.bno", commonHeader.Number.Uint64(), "common.hash", commonHeader.Hash(),
 			"current.bno", current.Number.Uint64(), "current.hash", current.Hash(),
-			"proposed.bno", header.Number.Uint64(), "proposed.hash", header.Hash(),
+			"proposed.bno", extern.Number.Uint64(), "proposed.hash", extern.Hash(),
 		)
 	}
 

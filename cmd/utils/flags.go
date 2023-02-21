@@ -2531,9 +2531,9 @@ func MakeChain(ctx *cli.Context, stack *node.Node, readonly bool) (*core.BlockCh
 	}
 	ethashConfig := ethconfig.Defaults.Ethash
 	if ctx.Bool(FakePoWFlag.Name) {
-		ethashConf.PowMode = ethash.ModeFake
+		ethashConfig.PowMode = ethash.ModeFake
 	} else if ctx.Bool(FakePoWPoissonFlag.Name) {
-		ethashConf.PowMode = ethash.ModePoissonFake
+		ethashConfig.PowMode = ethash.ModePoissonFake
 	}
 	engine := ethconfig.CreateConsensusEngine(stack, &ethashConfig, cliqueConfig, nil, false, chainDb)
 	if gcmode := ctx.String(GCModeFlag.Name); gcmode != "full" && gcmode != "archive" {

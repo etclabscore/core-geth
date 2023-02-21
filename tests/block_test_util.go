@@ -40,6 +40,7 @@ import (
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/types/genesisT"
 	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 // A BlockTest checks handling of entire blocks.
@@ -110,7 +111,7 @@ func (t *BlockTest) Run(snapshotter bool) error {
 
 	// import pre accounts & construct test genesis block & state root
 	db := rawdb.NewMemoryDatabase()
-	gblock, err := core.CommitGenesis(t.genesis(config), db) // FIXME-meowsbits Another arg? Trie?
+	gblock, err := core.CommitGenesis(t.genesis(config), db, trie.NewDatabase(db)) // FIXME-meowsbits Another arg? Trie?
 	if err != nil {
 		return err
 	}

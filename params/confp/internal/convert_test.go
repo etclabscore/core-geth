@@ -17,6 +17,7 @@
 package convert_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"math/big"
@@ -164,4 +165,68 @@ func TestCompatible(t *testing.T) {
 		t.Log(names[i], fn())
 	}
 	t.Log(fns)
+}
+
+func isJSONEqual(a, b interface{}) bool {
+	aa, err := json.Marshal(a)
+	if err != nil {
+		return false
+	}
+	bb, err := json.Marshal(b)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(aa, bb)
+}
+
+func TestCloneChainConfigurator(t *testing.T) {
+	for _, f := range []string{
+		"geth", "coregeth",
+	} {
+		switch f {
+		case "geth":
+			c := &genesisT.Genesis{}
+			mustReadTestdataTo(t, f, c)
+			if c.Config.GetChainID().Cmp(big.NewInt(1)) != 0 {
+				t.Errorf("go-ethereum: wrong chainid")
+			}
+			if _, ok := c.Config.(*goethereum.ChainConfig); !ok {
+				t.Errorf("go-ethereum: wrong type")
+			}
+			cloned, err := confp.CloneChainConfigurator(c.Config)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if diffs := confp.Equal(reflect.TypeOf((*ctypes.ChainConfigurator)(nil)), c.Config, cloned); len(diffs) != 0 {
+				for _, diff := range diffs {
+					t.Error("not equal", diff.Field, diff.A, diff.B)
+				}
+			}
+			if !isJSONEqual(c.Config, cloned) {
+				t.Error("not json equal")
+			}
+
+		case "coregeth":
+			c := &genesisT.Genesis{}
+			mustReadTestdataTo(t, f, c)
+			if c.Config.GetChainID().Cmp(big.NewInt(1)) != 0 {
+				t.Errorf("core-geth: wrong chainid")
+			}
+			if _, ok := c.Config.(*coregeth.CoreGethChainConfig); !ok {
+				t.Errorf("core-geth: wrong type")
+			}
+			cloned, err := confp.CloneChainConfigurator(c.Config)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if diffs := confp.Equal(reflect.TypeOf((*ctypes.ChainConfigurator)(nil)), c.Config, cloned); len(diffs) != 0 {
+				for _, diff := range diffs {
+					t.Error("not equal", diff.Field, diff.A, diff.B)
+				}
+			}
+			if !isJSONEqual(c.Config, cloned) {
+				t.Error("not json equal")
+			}
+		}
+	}
 }

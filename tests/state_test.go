@@ -280,11 +280,20 @@ func runBenchmark(b *testing.B, t *StateTest) {
 				gasUsed uint64
 				elapsed uint64
 				refund  uint64
+
+				// Berlin
+				// https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/berlin.md
+				// EIP-2930: Optional access lists
+				eip2930f = config.IsEnabled(config.GetEIP2930Transition, evm.Context.BlockNumber)
+
+				// Shanghai
+				// EIP-3651: Warm coinbase
+				eip3651f = config.IsEnabledByTime(config.GetEIP3651TransitionTime, &evm.Context.Time)
 			)
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
 				snapshot := statedb.Snapshot()
-				statedb.Prepare(rules, msg.From(), context.Coinbase, msg.To(), vm.ActivePrecompiles(rules), msg.AccessList())
+				statedb.Prepare(eip2930f, eip3651f, msg.From(), context.Coinbase, msg.To(), evm.ActivePrecompiles(), msg.AccessList())
 				b.StartTimer()
 				start := time.Now()
 

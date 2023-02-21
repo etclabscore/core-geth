@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"reflect"
 	"runtime"
 	"sync"
 	"time"
@@ -40,7 +41,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params/confp"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -1093,44 +1094,13 @@ func APIs(backend Backend) []rpc.API {
 // overrideConfig returns a copy of original with forks enabled by override enabled,
 // along with a boolean that indicates whether the copy is canonical (equivalent to the original).
 // Note: the Clique-part is _not_ deep copied
-func overrideConfig(original *params.ChainConfig, override *params.ChainConfig) (*params.ChainConfig, bool) {
-	copy := new(params.ChainConfig)
-	*copy = *original
-	canon := true
-
-	// Apply forks (after Berlin) to the copy.
-	if block := override.BerlinBlock; block != nil {
-		copy.BerlinBlock = block
-		canon = false
+func overrideConfig(original ctypes.ChainConfigurator, override ctypes.ChainConfigurator) (ctypes.ChainConfigurator, bool) {
+	cpy, err := confp.CloneChainConfigurator(original)
+	if err != nil {
+		panic(err)
 	}
-	if block := override.LondonBlock; block != nil {
-		copy.LondonBlock = block
-		canon = false
+	if err := confp.Crush(cpy, override, false); err != nil {
+		panic(err)
 	}
-	if block := override.ArrowGlacierBlock; block != nil {
-		copy.ArrowGlacierBlock = block
-		canon = false
-	}
-	if block := override.GrayGlacierBlock; block != nil {
-		copy.GrayGlacierBlock = block
-		canon = false
-	}
-	if block := override.MergeNetsplitBlock; block != nil {
-		copy.MergeNetsplitBlock = block
-		canon = false
-	}
-	if timestamp := override.ShanghaiTime; timestamp != nil {
-		copy.ShanghaiTime = timestamp
-		canon = false
-	}
-	if timestamp := override.CancunTime; timestamp != nil {
-		copy.CancunTime = timestamp
-		canon = false
-	}
-	if timestamp := override.PragueTime; timestamp != nil {
-		copy.PragueTime = timestamp
-		canon = false
-	}
-
-	return copy, canon
+	return cpy, len(confp.Equal(reflect.TypeOf((*ctypes.ChainConfigurator)(nil)), original, cpy)) == 0
 }

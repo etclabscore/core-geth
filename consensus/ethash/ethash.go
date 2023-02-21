@@ -237,7 +237,10 @@ func (lru *lru[T]) get(epoch uint64, epochLength uint64, ecip1099FBlock *uint64)
 	lru.mu.Lock()
 	defer lru.mu.Unlock()
 
-	cacheKey := fmt.Sprintf("%d-%d", epoch, epochLength)
+	// Use the sum of epoch and epochLength as the cache key.
+	// This is not perfectly safe, but it's good enough (at least for the first 30000 epochs, or the first 427 years).
+	cacheKey := epochLength + epoch
+
 	// Get or create the item for the requested epoch.
 	item, ok := lru.cache.Get(cacheKey)
 	if !ok {

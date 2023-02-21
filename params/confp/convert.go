@@ -21,8 +21,39 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/params/types/coregeth"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/types/goethereum"
+	"github.com/ethereum/go-ethereum/params/types/multigeth"
+	"github.com/ethereum/go-ethereum/params/types/parity"
 )
+
+// CloneChainConfigurator creates a copy of the given ChainConfigurator.
+// Note that this does not support the GenesisBlocker interface;
+// this function won't (currently) be used in that context, and its extra overhead that we don't need (yet).
+func CloneChainConfigurator(from interface{}) (interface{}, error) {
+	// Use a hardcoded switch on known types implementing the ChainConfigurator interface.
+	// Reflection would be more elegant, but it's not worth the conceptual overhead.
+	var to interface{}
+	switch from.(type) {
+	case *goethereum.ChainConfig:
+		to = new(goethereum.ChainConfig)
+	case *coregeth.CoreGethChainConfig:
+		to = new(coregeth.CoreGethChainConfig)
+	case *multigeth.ChainConfig:
+		to = new(multigeth.ChainConfig)
+	case *parity.ParityChainSpec:
+		to = new(parity.ParityChainSpec)
+	default:
+		return nil, fmt.Errorf("cannot clone unknown type %T", from)
+	}
+
+	if err := Convert(from, to); err != nil {
+		return nil, err
+	}
+
+	return to, nil
+}
 
 // Automagically translate between [Must|]Setters and Getters.
 func Convert(from, to interface{}) error {
@@ -136,7 +167,7 @@ func convert(k reflect.Type, source, target interface{}) error {
 			if ctypes.IsFatalUnsupportedErr(err) {
 				return e
 			}
-			//log.Println(e) // FIXME?
+			// log.Println(e) // FIXME?
 		}
 	}
 	return nil

@@ -485,7 +485,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		ECIP1010PauseBlock: nil,
 		ECIP1010Length:     nil,
 	},
-	"Shanghai": {
+	"Shanghai": &goethereum.ChainConfig{
 		ChainID:                 big.NewInt(1),
 		HomesteadBlock:          big.NewInt(0),
 		EIP150Block:             big.NewInt(0),
@@ -503,7 +503,7 @@ var Forks = map[string]ctypes.ChainConfigurator{
 		TerminalTotalDifficulty: big.NewInt(0),
 		ShanghaiTime:            u64(0),
 	},
-	"MergeToShanghaiAtTime15k": {
+	"MergeToShanghaiAtTime15k": &goethereum.ChainConfig{
 		ChainID:                 big.NewInt(1),
 		HomesteadBlock:          big.NewInt(0),
 		EIP150Block:             big.NewInt(0),

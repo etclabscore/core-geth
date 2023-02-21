@@ -277,7 +277,7 @@ func (ethash *Ethash) verifyHeader(chain consensus.ChainHeaderReader, header, pa
 	if diff := new(big.Int).Sub(header.Number, parent.Number); diff.Cmp(big.NewInt(1)) != 0 {
 		return consensus.ErrInvalidNumber
 	}
-	if chain.Config().IsShanghai(header.Time) {
+	if chain.Config().IsEnabledByTime(chain.Config().GetEIP3860TransitionTime, &header.Time) {
 		return fmt.Errorf("ethash does not support shanghai fork")
 	}
 	// Verify the engine specific seal securing the block

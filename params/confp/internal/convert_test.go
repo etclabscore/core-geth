@@ -72,7 +72,7 @@ func Test_UnmarshalJSON(t *testing.T) {
 	}
 }
 
-func testConvert(t *testing.T, aType string, a, b ctypes.ChainConfigurator) {
+func testCrush(t *testing.T, aType string, a, b ctypes.ChainConfigurator) {
 	ag, bg := &genesisT.Genesis{Config: a}, &genesisT.Genesis{Config: b}
 	mustReadTestdataTo(t, aType, ag)
 	err := confp.Crush(bg, ag, true)
@@ -97,11 +97,11 @@ func testConvert(t *testing.T, aType string, a, b ctypes.ChainConfigurator) {
 	}
 }
 
-func TestConvert(t *testing.T) {
-	testConvert(t, "geth", &goethereum.ChainConfig{}, &goethereum.ChainConfig{})
-	testConvert(t, "coregeth", &coregeth.CoreGethChainConfig{}, &coregeth.CoreGethChainConfig{})
-	testConvert(t, "geth", &goethereum.ChainConfig{}, &coregeth.CoreGethChainConfig{})
-	testConvert(t, "coregeth", &coregeth.CoreGethChainConfig{}, &goethereum.ChainConfig{})
+func TestCrush(t *testing.T) {
+	testCrush(t, "geth", &goethereum.ChainConfig{}, &goethereum.ChainConfig{})
+	testCrush(t, "coregeth", &coregeth.CoreGethChainConfig{}, &coregeth.CoreGethChainConfig{})
+	testCrush(t, "geth", &goethereum.ChainConfig{}, &coregeth.CoreGethChainConfig{})
+	testCrush(t, "coregeth", &coregeth.CoreGethChainConfig{}, &goethereum.ChainConfig{})
 }
 
 func TestIdentical(t *testing.T) {

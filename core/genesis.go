@@ -43,8 +43,8 @@ type ChainOverrides struct {
 }
 
 // SetupGenesisBlock wraps SetupGenesisBlockWithOverride, always using a nil value for the override.
-func SetupGenesisBlock(db ethdb.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
-	return SetupGenesisBlockWithOverride(db, genesis, nil, nil)
+func SetupGenesisBlock(db ethdb.Database, triedb *trie.Database, genesis *genesisT.Genesis) (ctypes.ChainConfigurator, common.Hash, error) {
+	return SetupGenesisBlockWithOverride(db, triedb, genesis, nil)
 }
 
 func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, genesis *genesisT.Genesis, overrides *ChainOverrides) (ctypes.ChainConfigurator, common.Hash, error) {
@@ -55,7 +55,11 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 	applyOverrides := func(config ctypes.ChainConfigurator) {
 		if config != nil {
 			if overrides != nil && overrides.OverrideShanghai != nil {
-				config.ShanghaiTime = overrides.OverrideShanghai
+				config.SetEIP3651TransitionTime(overrides.OverrideShanghai)
+				config.SetEIP3855TransitionTime(overrides.OverrideShanghai)
+				config.SetEIP3860TransitionTime(overrides.OverrideShanghai)
+				config.SetEIP4895TransitionTime(overrides.OverrideShanghai)
+				config.SetEIP6049TransitionTime(overrides.OverrideShanghai)
 			}
 		}
 	}

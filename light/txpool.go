@@ -71,7 +71,7 @@ type TxPool struct {
 	eip2f    bool
 	eip2028f bool
 	eip2718  bool // Fork indicator whether we are in the eip2718 stage.
-	shanghai bool // Fork indicator whether we are in the shanghai stage.
+	eip3860  bool // Fork indicator whether we are in the shanghai stage.
 }
 
 // TxRelayBackend provides an interface to the mechanism that forwards transactions to the
@@ -338,7 +338,8 @@ func (pool *TxPool) setNewHead(head *types.Header) {
 
 	pool.eip2028f = pool.config.IsEnabled(pool.config.GetEIP2028Transition, next)
 	pool.eip2718 = pool.config.IsEnabled(pool.config.GetEIP2718Transition, next)
-	pool.shanghai = pool.config.IsShanghai(uint64(time.Now().Unix())) // FIXME-meowsbits
+	now := uint64(time.Now().Unix())
+	pool.eip3860 = pool.config.IsEnabledByTime(pool.config.GetEIP3860TransitionTime, &now)
 }
 
 // Stop stops the light transaction pool
@@ -406,7 +407,7 @@ func (pool *TxPool) validateTx(ctx context.Context, tx *types.Transaction) error
 	}
 
 	// Should supply enough intrinsic gas
-	gas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil, pool.eip2f, pool.eip2028f, pool.shanghai)
+	gas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil, pool.eip2f, pool.eip2028f, pool.eip3860)
 	if err != nil {
 		return err
 	}
@@ -463,7 +464,7 @@ func (pool *TxPool) Add(ctx context.Context, tx *types.Transaction) error {
 	if err := pool.add(ctx, tx); err != nil {
 		return err
 	}
-	//fmt.Println("Send", tx.Hash())
+	// fmt.Println("Send", tx.Hash())
 	pool.relay.Send(types.Transactions{tx})
 
 	pool.chainDb.Put(tx.Hash().Bytes(), data)

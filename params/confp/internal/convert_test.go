@@ -71,21 +71,36 @@ func Test_UnmarshalJSON(t *testing.T) {
 	}
 }
 
-func TestConvert(t *testing.T) {
-	spec := goethereum.ChainConfig{}
-	mustReadTestdataTo(t, "geth", &spec)
-
-	spec2 := goethereum.ChainConfig{}
-	err := confp.Convert(&spec, &spec2)
+func testConvert(t *testing.T, aType string, a, b ctypes.ChainConfigurator) {
+	ag, bg := &genesisT.Genesis{Config: a}, &genesisT.Genesis{Config: b}
+	mustReadTestdataTo(t, aType, ag)
+	err := confp.Convert(ag, bg)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
-
-	if diffs := confp.Equal(reflect.TypeOf((*ctypes.Configurator)(nil)), &spec, &spec2); len(diffs) != 0 {
+	didError := false
+	if diffs := confp.Equal(reflect.TypeOf((*ctypes.Configurator)(nil)), ag, bg); len(diffs) != 0 {
+		didError = true
 		for _, diff := range diffs {
 			t.Error("not equal", diff.Field, diff.A, diff.B)
 		}
 	}
+	if didError {
+		// Log the json encoding of the b struct for debugging.
+		bb, err := json.MarshalIndent(bg, "", "  ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log(string(bb))
+		t.Fatal("not equal")
+	}
+}
+
+func TestConvert(t *testing.T) {
+	testConvert(t, "geth", &goethereum.ChainConfig{}, &goethereum.ChainConfig{})
+	testConvert(t, "coregeth", &coregeth.CoreGethChainConfig{}, &coregeth.CoreGethChainConfig{})
+	testConvert(t, "geth", &goethereum.ChainConfig{}, &coregeth.CoreGethChainConfig{})
+	testConvert(t, "coregeth", &coregeth.CoreGethChainConfig{}, &goethereum.ChainConfig{})
 }
 
 func TestIdentical(t *testing.T) {

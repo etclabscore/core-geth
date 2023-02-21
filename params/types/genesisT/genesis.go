@@ -58,6 +58,66 @@ type Genesis struct {
 	BaseFee    *big.Int    `json:"baseFeePerGas"`
 }
 
+func (g *Genesis) GetElasticityMultiplier() uint64 {
+	return g.Config.GetElasticityMultiplier()
+}
+
+func (g *Genesis) SetElasticityMultiplier(n uint64) error {
+	return g.Config.SetElasticityMultiplier(n)
+}
+
+func (g *Genesis) GetBaseFeeChangeDenominator() uint64 {
+	return g.Config.GetBaseFeeChangeDenominator()
+}
+
+func (g *Genesis) SetBaseFeeChangeDenominator(n uint64) error {
+	return g.Config.SetBaseFeeChangeDenominator(n)
+}
+
+func (g *Genesis) GetEIP3651TransitionTime() *uint64 {
+	return g.Config.GetEIP3651TransitionTime()
+}
+
+func (g *Genesis) SetEIP3651TransitionTime(n *uint64) error {
+	return g.Config.SetEIP3651TransitionTime(n)
+}
+
+func (g *Genesis) GetEIP3855TransitionTime() *uint64 {
+	return g.Config.GetEIP3855TransitionTime()
+}
+
+func (g *Genesis) SetEIP3855TransitionTime(n *uint64) error {
+	return g.Config.SetEIP3855TransitionTime(n)
+}
+
+func (g *Genesis) GetEIP3860TransitionTime() *uint64 {
+	return g.Config.GetEIP3860TransitionTime()
+}
+
+func (g *Genesis) SetEIP3860TransitionTime(n *uint64) error {
+	return g.Config.SetEIP3860TransitionTime(n)
+}
+
+func (g *Genesis) GetEIP4895TransitionTime() *uint64 {
+	return g.Config.GetEIP4895TransitionTime()
+}
+
+func (g *Genesis) SetEIP4895TransitionTime(n *uint64) error {
+	return g.Config.SetEIP4895TransitionTime(n)
+}
+
+func (g *Genesis) GetEIP6049TransitionTime() *uint64 {
+	return g.Config.GetEIP6049TransitionTime()
+}
+
+func (g *Genesis) SetEIP6049TransitionTime(n *uint64) error {
+	return g.Config.SetEIP6049TransitionTime(n)
+}
+
+func (g *Genesis) IsEnabledByTime(fn func() *uint64, n *uint64) bool {
+	return g.Config.IsEnabledByTime(fn, n)
+}
+
 func (g *Genesis) ForEachAccount(fn func(address common.Address, bal *big.Int, nonce uint64, code []byte, storage map[common.Hash]common.Hash) error) error {
 	for k, v := range g.Alloc {
 		if err := fn(k, v.Balance, v.Nonce, v.Code, v.Storage); err != nil {

@@ -14,7 +14,7 @@ func TestParityChainspec_CoreGeth(t *testing.T) {
 	coregethA := tests.Forks["ETC_Magneto"]
 
 	pspec := &parity.ParityChainSpec{}
-	err := confp.Crush(pspec, coregethA)
+	err := confp.Crush(pspec, coregethA, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,7 +25,7 @@ func TestParityChainspec_CoreGeth(t *testing.T) {
 	}
 
 	coregethB := &coregeth.CoreGethChainConfig{}
-	err = confp.Crush(coregethB, pspec)
+	err = confp.Crush(coregethB, pspec, true)
 	if err != nil {
 		t.Fatal(err)
 	}

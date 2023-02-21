@@ -36,7 +36,7 @@ func CloneChainConfigurator(from ctypes.ChainConfigurator) (ctypes.ChainConfigur
 	to = reflect.New(reflect.ValueOf(from).Elem().Type()).Interface().(ctypes.ChainConfigurator)
 
 	// To complete the clone, we crush the original into the zero-value copy.
-	if err := Crush(to, from); err != nil {
+	if err := Crush(to, from, true); err != nil {
 		return nil, err
 	}
 
@@ -46,7 +46,7 @@ func CloneChainConfigurator(from ctypes.ChainConfigurator) (ctypes.ChainConfigur
 // Crush passes the Getter values from source to the Setters in dest,
 // doing so for all interface types that together compose the relevant Configurator interface.
 // Interfaces must be either ChainConfigurator or GenesisBlocker.
-func Crush(dest, source interface{}) error {
+func Crush(dest, source interface{}, crushZeroValues bool) error {
 	for i, v := range []interface{}{
 		source, dest,
 	} {

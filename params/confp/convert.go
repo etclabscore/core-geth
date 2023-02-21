@@ -60,11 +60,12 @@ func Crush(dest, source interface{}, crushZeroValues bool) error {
 	// Order may matter; configuration parameters may be interdependent across data structures, eg EIP1283 and Genesis builtins.
 	// Try to order translation sensibly
 
+	// Are both interfaces GenesisBlockers?
 	fromGener, fromGenerOk := source.(ctypes.GenesisBlocker)
 	toGener, toGenerOk := dest.(ctypes.GenesisBlocker)
 
-	// Set Genesis.
 	if fromGenerOk && toGenerOk {
+		// Set Genesis.
 		et := fromGener.GetSealingType()
 		switch et {
 		case ctypes.BlockSealing_Ethereum:
@@ -82,51 +83,70 @@ func Crush(dest, source interface{}, crushZeroValues bool) error {
 		}
 	}
 
-	fromChainer, fromChainerOk := source.(ctypes.ChainConfigurator)
-	toChainer, toChainerOk := dest.(ctypes.ChainConfigurator)
-
-	if !fromChainerOk || !toChainerOk {
-		return nil
-	}
-
-	// Set general chain parameters.
-	k := reflect.TypeOf((*ctypes.ProtocolSpecifier)(nil)).Elem()
-	if err := crush(k, fromChainer, toChainer, crushZeroValues); err != nil {
-		return err
-	}
-
-	// Set hardcoded fork hash(es)
-	for f, h := range fromChainer.GetForkCanonHashes() {
-		if err := toChainer.SetForkCanonHash(f, h); ctypes.IsFatalUnsupportedErr(err) {
+	// Are both interfaces ChainConfigurators?
+	fromProtocolSpecifier, fromPSOK := source.(ctypes.ProtocolSpecifier)
+	toProtocolSpecifier, toPSOK := dest.(ctypes.ProtocolSpecifier)
+	if fromPSOK || toPSOK {
+		// Set general chain parameters.
+		k := reflect.TypeOf((*ctypes.ProtocolSpecifier)(nil)).Elem()
+		if err := crush(k, fromProtocolSpecifier, toProtocolSpecifier, crushZeroValues); err != nil {
 			return err
 		}
 	}
 
-	// Set consensus engine params.
-	engineType := fromChainer.GetConsensusEngineType()
-	if err := toChainer.MustSetConsensusEngineType(engineType); err != nil {
-		return ctypes.UnsupportedConfigError(err, "consensus engine", engineType)
-	}
-	switch engineType {
-	case ctypes.ConsensusEngineT_Ethash:
-		k := reflect.TypeOf((*ctypes.EthashConfigurator)(nil)).Elem()
-		if err := crush(k, fromChainer, toChainer, crushZeroValues); err != nil {
-			return err
+	// Are both interfaces Forkers?
+	fromForker, fromForkerOK := source.(ctypes.Forker)
+	toForker, toForkerOK := dest.(ctypes.Forker)
+	if fromForkerOK && toForkerOK {
+		// Set hardcoded fork hash(es)
+		for f, h := range fromForker.GetForkCanonHashes() {
+			if err := toForker.SetForkCanonHash(f, h); ctypes.IsFatalUnsupportedErr(err) {
+				return err
+			}
 		}
-	case ctypes.ConsensusEngineT_Clique:
-		k := reflect.TypeOf((*ctypes.CliqueConfigurator)(nil)).Elem()
-		if err := crush(k, fromChainer, toChainer, crushZeroValues); err != nil {
-			return err
-		}
-	case ctypes.ConsensusEngineT_Lyra2:
-		k := reflect.TypeOf((*ctypes.Lyra2Configurator)(nil)).Elem()
-		if err := crush(k, fromChainer, toChainer, crushZeroValues); err != nil {
-			return err
-		}
-	default:
-		return ctypes.UnsupportedConfigError(ctypes.ErrUnsupportedConfigFatal, "consensus engine", ctypes.ConsensusEngineT_Unknown)
 	}
 
+	// Are both interfaces ConsensusEnginators?
+	fromConsensusEnginator, fromCEOK := source.(ctypes.ConsensusEnginator)
+	toConsensusEnginator, toCEOK := dest.(ctypes.ConsensusEnginator)
+	if fromCEOK && toCEOK {
+		// Set consensus engine params.
+		engineType := fromConsensusEnginator.GetConsensusEngineType()
+
+		// If the source engine type is empty (rather: unknown),
+		// this would normally be a problem;
+		// but if we're not crushing zero-values then we can ignore it and return early.
+		if engineType == ctypes.ConsensusEngineT_Unknown && !crushZeroValues {
+			// noop
+			// Use goto instead of return because I want to make it clear that we're not returning early, per se,
+			// but skipping the following logic chunk in this case.
+			goto next
+		}
+		if err := toConsensusEnginator.MustSetConsensusEngineType(engineType); err != nil {
+			return ctypes.UnsupportedConfigError(err, "consensus engine setter", engineType)
+		}
+		switch engineType {
+		case ctypes.ConsensusEngineT_Ethash:
+			k := reflect.TypeOf((*ctypes.EthashConfigurator)(nil)).Elem()
+			if err := crush(k, fromProtocolSpecifier, toProtocolSpecifier, crushZeroValues); err != nil {
+				return err
+			}
+		case ctypes.ConsensusEngineT_Clique:
+			k := reflect.TypeOf((*ctypes.CliqueConfigurator)(nil)).Elem()
+			if err := crush(k, fromProtocolSpecifier, toProtocolSpecifier, crushZeroValues); err != nil {
+				return err
+			}
+		case ctypes.ConsensusEngineT_Lyra2:
+			k := reflect.TypeOf((*ctypes.Lyra2Configurator)(nil)).Elem()
+			if err := crush(k, fromProtocolSpecifier, toProtocolSpecifier, crushZeroValues); err != nil {
+				return err
+			}
+		default:
+			return ctypes.UnsupportedConfigError(ctypes.ErrUnsupportedConfigFatal, "consensus engine", ctypes.ConsensusEngineT_Unknown)
+		}
+
+	}
+next:
 	return nil
 }
 
@@ -151,7 +171,7 @@ methodsLoop:
 		if !crushZeroValues {
 			allNil := true
 			for _, r := range response {
-				if !r.IsNil() {
+				if r.Kind() == reflect.Ptr && !r.IsNil() {
 					allNil = false
 					break
 				}

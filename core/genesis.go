@@ -156,7 +156,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 	if head == nil {
 		return newcfg, stored, fmt.Errorf("missing head header")
 	}
-	compatErr := confp.Compatible(height, head.Time, storedcfg, newcfg)
+	compatErr := confp.Compatible(head.Number, head.Time, storedcfg, newcfg)
 	if compatErr != nil && ((head.Number.Uint64() != 0 && compatErr.RewindToBlock != 0) || (head.Time != 0 && compatErr.RewindToTime != 0)) {
 		return newcfg, stored, compatErr
 	}

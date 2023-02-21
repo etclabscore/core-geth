@@ -255,10 +255,11 @@ func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 		t.Fatal("different chain config read vs. wrote")
 	}
 
-	headHeight := uint64(9700559)
+	headHeight := big.NewInt(9700559)
+	headTime := 9700559
 	headHash := common.HexToHash("0xe618c1b2d738dfa09052e199e5870274f09eb83c684a8a2c194b82dedc00a977")
 	rawdb.WriteHeadHeaderHash(db, headHash)
-	rawdb.WriteHeaderNumber(db, headHash, headHeight)
+	rawdb.WriteHeaderNumber(db, headHash, headHeight.Uint64())
 
 	genB := params.DefaultClassicGenesisBlock()
 
@@ -276,10 +277,10 @@ func TestSetupGenesisBlockOldVsNewMultigeth(t *testing.T) {
 
 	// These should be redundant to the SetupGenesisBlock method, but this is
 	// for double double double extra sureness.
-	if compatErr := confp.Compatible(&headHeight, genA, genB); compatErr != nil {
+	if compatErr := confp.Compatible(headHeight, headTime, genA, genB); compatErr != nil {
 		t.Fatal(err)
 	}
-	if compatErr := confp.Compatible(&headHeight, config, newConfig); compatErr != nil {
+	if compatErr := confp.Compatible(headHeight, headTime, config, newConfig); compatErr != nil {
 		t.Fatal(err)
 	}
 }

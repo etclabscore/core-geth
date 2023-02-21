@@ -35,7 +35,7 @@ func CloneChainConfigurator(from ctypes.ChainConfigurator) (ctypes.ChainConfigur
 	// https://stackoverflow.com/a/37851764
 	to = reflect.New(reflect.ValueOf(from).Elem().Type()).Interface().(ctypes.ChainConfigurator)
 
-	// To complete the clone, we convert the original into the zero-value copy.
+	// To complete the clone, we crush the original into the zero-value copy.
 	if err := Crush(to, from); err != nil {
 		return nil, err
 	}
@@ -45,8 +45,8 @@ func CloneChainConfigurator(from ctypes.ChainConfigurator) (ctypes.ChainConfigur
 
 // Crush passes the Getter values from source to the Setters in dest,
 // doing so for all interface types that together compose the relevant Configurator interface.
+// Interfaces must be either ChainConfigurator or GenesisBlocker.
 func Crush(dest, source interface{}) error {
-	// Interfaces must be either ChainConfigurator or GenesisBlocker.
 	for i, v := range []interface{}{
 		source, dest,
 	} {
@@ -69,7 +69,7 @@ func Crush(dest, source interface{}) error {
 		switch et {
 		case ctypes.BlockSealing_Ethereum:
 			k := reflect.TypeOf((*ctypes.GenesisBlocker)(nil)).Elem()
-			if err := convert(k, fromGener, toGener); err != nil {
+			if err := crush(k, fromGener, toGener); err != nil {
 				return err
 			}
 		default:
@@ -91,7 +91,7 @@ func Crush(dest, source interface{}) error {
 
 	// Set general chain parameters.
 	k := reflect.TypeOf((*ctypes.ProtocolSpecifier)(nil)).Elem()
-	if err := convert(k, fromChainer, toChainer); err != nil {
+	if err := crush(k, fromChainer, toChainer); err != nil {
 		return err
 	}
 
@@ -110,17 +110,17 @@ func Crush(dest, source interface{}) error {
 	switch engineType {
 	case ctypes.ConsensusEngineT_Ethash:
 		k := reflect.TypeOf((*ctypes.EthashConfigurator)(nil)).Elem()
-		if err := convert(k, fromChainer, toChainer); err != nil {
+		if err := crush(k, fromChainer, toChainer); err != nil {
 			return err
 		}
 	case ctypes.ConsensusEngineT_Clique:
 		k := reflect.TypeOf((*ctypes.CliqueConfigurator)(nil)).Elem()
-		if err := convert(k, fromChainer, toChainer); err != nil {
+		if err := crush(k, fromChainer, toChainer); err != nil {
 			return err
 		}
 	case ctypes.ConsensusEngineT_Lyra2:
 		k := reflect.TypeOf((*ctypes.Lyra2Configurator)(nil)).Elem()
-		if err := convert(k, fromChainer, toChainer); err != nil {
+		if err := crush(k, fromChainer, toChainer); err != nil {
 			return err
 		}
 	default:
@@ -130,7 +130,7 @@ func Crush(dest, source interface{}) error {
 	return nil
 }
 
-func convert(k reflect.Type, source, target interface{}) error {
+func crush(k reflect.Type, source, target interface{}) error {
 	for i := 0; i < k.NumMethod(); i++ {
 		method := k.Method(i)
 

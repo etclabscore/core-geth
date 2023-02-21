@@ -1395,7 +1395,7 @@ func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool, config ctypes
 	}
 	fields.Uncles = uncleHashes
 	if block.Header().WithdrawalsHash != nil {
-		fields["withdrawals"] = block.Withdrawals()
+		fields.Withdrawals = block.Withdrawals()
 	}
 	return fields, nil
 }

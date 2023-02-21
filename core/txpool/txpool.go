@@ -273,7 +273,7 @@ type TxPool struct {
 	eip2028f bool
 	eip2718  bool // Fork indicator whether we are using EIP-2718 type transactions.
 	eip1559  bool // Fork indicator whether we are using EIP-1559 type transactions.
-	shanghai bool // Fork indicator whether we are in the Shanghai stage.
+	eip3860  bool // Fork indicator whether we are in the Shanghai stage; specifically, whether we are using EIP-3860 type transactions, which limit initcode size.
 }
 
 type txpoolResetRequest struct {
@@ -609,7 +609,7 @@ func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 		return ErrOversizedData
 	}
 	// Check whether the init code size has been exceeded.
-	if pool.shanghai && tx.To() == nil && uint64(len(tx.Data())) > vars.MaxInitCodeSize {
+	if pool.eip3860 && tx.To() == nil && uint64(len(tx.Data())) > vars.MaxInitCodeSize {
 		return fmt.Errorf("%w: code size %v limit %v", core.ErrMaxInitCodeSizeExceeded, len(tx.Data()), vars.MaxInitCodeSize)
 	}
 	// Transactions can't be negative. This may never happen using RLP decoded
@@ -651,7 +651,7 @@ func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 		return core.ErrInsufficientFunds
 	}
 	// Ensure the transaction has more gas than the basic tx fee.
-	intrGas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil, pool.eip2f, pool.eip2028f, pool.shanghai)
+	intrGas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil, pool.eip2f, pool.eip2028f, pool.eip3860)
 	if err != nil {
 		return err
 	}
@@ -1329,7 +1329,8 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 	pool.eip2028f = pool.chainconfig.IsEnabled(pool.chainconfig.GetEIP2028Transition, next)
 	pool.eip2718 = pool.chainconfig.IsEnabled(pool.chainconfig.GetEIP2718Transition, next)
 	pool.eip1559 = pool.chainconfig.IsEnabled(pool.chainconfig.GetEIP1559Transition, next)
-	pool.shanghai = pool.chainconfig.IsShanghai(uint64(time.Now().Unix())) // FIXME-meowsbits Need to implement EIPXXXXs for Shanghai.
+	now := uint64(time.Now().Unix())
+	pool.eip3860 = pool.chainconfig.IsEnabledByTime(pool.chainconfig.GetEIP3860TransitionTime, &now)
 }
 
 // promoteExecutables moves transactions that have become processable from the

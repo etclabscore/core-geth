@@ -143,10 +143,12 @@ func Transaction(ctx *cli.Context) error {
 
 		eip2f := chainConfig.IsEnabled(chainConfig.GetEIP2Transition, new(big.Int))
 		eip2028f := chainConfig.IsEnabled(chainConfig.GetEIP2028Transition, new(big.Int))
+		zero := uint64(0)
+		eip3860f := chainConfig.IsEnabledByTime(chainConfig.GetEIP3860TransitionTime, &zero)
 
 		// Check intrinsic gas
 		if gas, err := core.IntrinsicGas(tx.Data(), tx.AccessList(), tx.To() == nil,
-			eip2f, eip2028f, eipXXXXf); err != nil {
+			eip2f, eip2028f, eip3860f); err != nil {
 			r.Error = err
 			results = append(results, r)
 			continue

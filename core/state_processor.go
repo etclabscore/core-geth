@@ -26,7 +26,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/params/mutations"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
 	"github.com/ethereum/go-ethereum/params/vars"
@@ -103,7 +102,7 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 	return receipts, allLogs, *usedGas, nil
 }
 
-func applyTransaction(msg types.Message, config *params.ChainConfig, gp *GasPool, statedb *state.StateDB, blockNumber *big.Int, blockHash common.Hash, tx *types.Transaction, usedGas *uint64, evm *vm.EVM) (*types.Receipt, error) {
+func applyTransaction(msg types.Message, config ctypes.ChainConfigurator, gp *GasPool, statedb *state.StateDB, blockNumber *big.Int, blockHash common.Hash, tx *types.Transaction, usedGas *uint64, evm *vm.EVM) (*types.Receipt, error) {
 	// Create a new context to be used in the EVM environment.
 	txContext := NewEVMTxContext(msg)
 	evm.Reset(txContext, statedb)

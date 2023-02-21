@@ -142,7 +142,7 @@ func readJSONFromFile(name string, value interface{}) (sha1sum []byte, err error
 // This feature is DEPRECATED.
 // Write core-geth format configuration for testing instead.
 func writeDifficultyConfigFileParity(conf ctypes.ChainConfigurator, forkName string) (string, [20]byte, error) {
-	genesis := params.DefaultRopstenGenesisBlock()
+	genesis := params.DefaultMordorGenesisBlock()
 	genesis.Config = conf
 
 	pspec, err := tconvert.NewParityChainSpec(forkName, genesis, []string{})

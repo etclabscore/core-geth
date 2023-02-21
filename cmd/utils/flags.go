@@ -1199,8 +1199,6 @@ func setBootstrapNodesV5(ctx *cli.Context, cfg *p2p.Config) {
 		urls = params.ClassicBootnodes
 	case ctx.IsSet(MordorFlag.Name):
 		urls = params.MordorBootnodes
-	case ctx.Bool(RopstenFlag.Name):
-		urls = params.RopstenBootnodes
 	case ctx.Bool(RinkebyFlag.Name):
 		urls = params.RinkebyBootnodes
 	case ctx.Bool(KottiFlag.Name):
@@ -1657,8 +1655,6 @@ func setSmartCard(ctx *cli.Context, cfg *node.Config) {
 
 func dataDirPathForCtxChainConfig(ctx *cli.Context, baseDataDirPath string) string {
 	switch {
-	case ctx.Bool(RopstenFlag.Name):
-		return filepath.Join(baseDataDirPath, "ropsten")
 	case ctx.Bool(ClassicFlag.Name):
 		return filepath.Join(baseDataDirPath, "classic")
 	case ctx.Bool(MordorFlag.Name):
@@ -2157,12 +2153,6 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 		SetDNSDiscoveryDefaults2(cfg, params.KottiDNSNetwork1)
 	case ctx.Bool(MordorFlag.Name):
 		SetDNSDiscoveryDefaults2(cfg, params.MordorDNSNetwork1)
-	case ctx.Bool(KilnFlag.Name):
-		if !ctx.IsSet(NetworkIdFlag.Name) {
-			cfg.NetworkId = 1337802
-		}
-		cfg.Genesis = core.DefaultKilnGenesisBlock()
-		SetDNSDiscoveryDefaults(cfg, params.KilnGenesisHash)
 	default:
 		// No --<chain> flag was given.
 	}

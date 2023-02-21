@@ -36,6 +36,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/params/types/ctypes"
+	"github.com/ethereum/go-ethereum/params/vars"
 )
 
 const (
@@ -608,8 +609,8 @@ func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 		return ErrOversizedData
 	}
 	// Check whether the init code size has been exceeded.
-	if pool.shanghai && tx.To() == nil && len(tx.Data()) > params.MaxInitCodeSize {
-		return fmt.Errorf("%w: code size %v limit %v", core.ErrMaxInitCodeSizeExceeded, len(tx.Data()), params.MaxInitCodeSize)
+	if pool.shanghai && tx.To() == nil && uint64(len(tx.Data())) > vars.MaxInitCodeSize {
+		return fmt.Errorf("%w: code size %v limit %v", core.ErrMaxInitCodeSizeExceeded, len(tx.Data()), vars.MaxInitCodeSize)
 	}
 	// Transactions can't be negative. This may never happen using RLP decoded
 	// transactions but may occur if you create a transaction using the RPC.

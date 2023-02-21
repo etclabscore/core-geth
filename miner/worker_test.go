@@ -552,9 +552,9 @@ func TestGetSealingWorkClique(t *testing.T) {
 }
 
 func TestGetSealingWorkPostMerge(t *testing.T) {
-	local := new(goethereum.ChainConfig)
-	*local = *ethashChainConfig // FIXME-meowsbits Copy value, respecting types.
-	local.TerminalTotalDifficulty = big.NewInt(0)
+	local := (ctypes.ChainConfigurator)(new(goethereum.ChainConfig))
+	local = ethashChainConfig // FIXME-meowsbits Copy value, respecting types.
+	local.SetEthashTerminalTotalDifficulty(big.NewInt(0))
 	testGetSealingWork(t, local, ethash.NewFaker())
 }
 

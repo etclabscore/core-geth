@@ -63,7 +63,7 @@ func newTestHandlerWithBlocksWithOpts(blocks int, mode downloader.SyncMode, gen 
 	}
 	core.MustCommitGenesis(db, gspec)
 
-	chain, _ := core.NewBlockChain(db, nil, params.TestChainConfig, ethash.NewFaker(), vm.Config{}, nil, nil)
+	chain, _ := core.NewBlockChain(db, nil, gspec, nil, ethash.NewFaker(), vm.Config{}, nil, nil)
 
 	bs, _ := core.GenerateChain(params.TestChainConfig, chain.Genesis(), ethash.NewFaker(), db, blocks, gen)
 	if _, err := chain.InsertChain(bs); err != nil {

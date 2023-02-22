@@ -56,7 +56,7 @@ type snapshotTestBasic struct {
 	db      ethdb.Database
 	genDb   ethdb.Database
 	engine  consensus.Engine
-	gspec   *Genesis
+	gspec   *genesisT.Genesis
 }
 
 func (basic *snapshotTestBasic) prepare(t *testing.T) (*BlockChain, []*types.Block) {
@@ -181,11 +181,11 @@ func (basic *snapshotTestBasic) dump() string {
 	}
 	fmt.Fprint(buffer, "\n")
 
-	//if crash {
+	// if crash {
 	//	fmt.Fprintf(buffer, "\nCRASH\n\n")
-	//} else {
+	// } else {
 	//	fmt.Fprintf(buffer, "\nSetHead(%d)\n\n", basic.setHead)
-	//}
+	// }
 	fmt.Fprintf(buffer, "------------------------------\n\n")
 
 	fmt.Fprint(buffer, "Expected in leveldb:\n  G")
